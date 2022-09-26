@@ -49,10 +49,13 @@ enum kegThrowers
     SPELL_THROW_KEG                             = 43660,
     SPELL_RAM_AURA                              = 43883,
     SPELL_ADD_TOKENS                            = 44501,
-    SPELL_COOLDOWN_CHECKER                      = 43755,
+    SPELL_RAM_RACING_CROP                       = 44262,
+    SPELL_COOLDOWN_CHECKER                      = 44689,
     NPC_RAM_MASTER_RAY                          = 24497,
     NPC_NEILL_RAMSTEIN                          = 23558,
     KEG_KILL_CREDIT                             = 24337,
+    GOSSIP_NEIL                                 = 8953,
+    GOSSIP_RAY                                  = 8973
 };
 
 struct npc_brewfest_keg_thrower : public ScriptedAI
@@ -112,30 +115,21 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
         }
     }
 
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*uiSender*/, uint32 uiAction)
+    void sGossipSelect(Player* player, uint32 uiSender, uint32 uiAction) override
     {
-        switch (uiAction)
+        if (uiSender == GOSSIP_NEIL || uiSender == GOSSIP_RAY)
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                CloseGossipMenuFor(player);
-                player->AddSpellCooldown(SPELL_COOLDOWN_CHECKER, 0, 18 * HOUR * IN_MILLISECONDS);
-                player->CastSpell(player, 43883, true);
-                player->CastSpell(player, 44262, true);
-                break;
+            player->CastSpell(player, SPELL_COOLDOWN_CHECKER, true);
+            player->AddSpellCooldown(SPELL_COOLDOWN_CHECKER, 0, 18 * HOUR * IN_MILLISECONDS);
         }
-        return true;
-    }
 
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
+        if (uiAction != 4)
+        {
+            CloseGossipMenuFor(player);
 
-        if (!player->HasSpellCooldown(SPELL_COOLDOWN_CHECKER) && player->GetQuestRewardStatus(player->GetTeamId() == TEAM_ALLIANCE ? QUEST_THERE_AND_BACK_AGAIN_A : QUEST_THERE_AND_BACK_AGAIN_H))
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Do you have additional work?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, (creature->GetEntry() == NPC_NEILL_RAMSTEIN ? 8934 : 8976), creature->GetGUID());
-        return true;
+            player->CastSpell(player, SPELL_RAM_AURA, true);
+            player->CastSpell(player, SPELL_RAM_RACING_CROP, true);
+        }
     }
 };
 
