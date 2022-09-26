@@ -99,7 +99,7 @@ public:
                 if (vem->IsAlive() && !vem->IsInEvadeMode())
                     vem->AI()->EnterEvadeMode(why);
                 else
-                    vem->Respawn(true);
+                    vem->Respawn();
             }
         }
 
@@ -110,7 +110,7 @@ public:
                 if (kri->IsAlive() && !kri->IsInEvadeMode())
                     kri->AI()->EnterEvadeMode(why);
                 else
-                    kri->Respawn(true);
+                    kri->Respawn();
             }
         }
 
@@ -121,7 +121,7 @@ public:
                 if (yauj->IsAlive() && !yauj->IsInEvadeMode())
                     yauj->AI()->EnterEvadeMode(why);
                 else
-                    yauj->Respawn(true);
+                    yauj->Respawn();
             }
         }
     }
