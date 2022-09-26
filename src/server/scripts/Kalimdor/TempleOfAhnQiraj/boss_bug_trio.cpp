@@ -222,7 +222,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetControlled(true, UNIT_STATE_ROOT);
             _dying = true;
-            float x, float y, float z;
+            float x, y, z;
             // Move the other bugs to this bug position
             if (Creature* vem = instance->GetCreature(DATA_VEM))
             {
