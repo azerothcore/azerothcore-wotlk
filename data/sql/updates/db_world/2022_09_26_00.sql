@@ -1,3 +1,4 @@
+-- DB update 2022_09_25_05 -> 2022_09_26_00
 -- Sartura updated waypoints.
 SET @PATH=876480;
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
