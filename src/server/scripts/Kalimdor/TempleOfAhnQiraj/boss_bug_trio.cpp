@@ -148,11 +148,11 @@ public:
         DoCastSelf(SPELL_FULL_HEAL, true);
         if (me->GetThreatMgr().GetThreatListSize())
             DoResetThreat();
-        _isEating = false;
 
         _scheduler.Schedule(4s, [this](TaskContext /*context*/)
         {
             me->SetReactState(REACT_AGGRESSIVE);
+            _isEating = false;
             if (Unit* target = me->GetVictim())
             {
                 me->GetMotionMaster()->Clear();
@@ -245,9 +245,9 @@ public:
                 if (!me->IsInEvadeMode() && instance->GetData(DATA_BUG_TRIO_DEATH) < 2)
                 {
                     DoFinalSpell();
-                    DoCastSelf(SPELL_BLOODY_DEATH, true);
                     Talk(EMOTE_DEVOURED);
-                    me->DespawnOrUnsummon(1000);
+                    DoCastSelf(SPELL_BLOODY_DEATH, true);
+                    me->DespawnOrUnsummon(2000);
                 }
             });
         }
