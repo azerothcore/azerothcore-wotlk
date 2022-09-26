@@ -496,7 +496,7 @@ public:
             {
                 if (me->GetVictim())
                 {
-                    DoModifyThreatPercent(me->GetVictim(), -100);
+                    DoModifyThreatByPercent(me->GetVictim(), -100);
                 }
 
                 me->AddThreat(target, 1000000.0f);

@@ -383,7 +383,7 @@ public:
                 me->CastSpell(me, SPELL_WEAK_RADIATING_OOZE, true);
                 events.Reset();
                 events.ScheduleEvent(EVENT_STICKY_OOZE, 5000);
-                DoResetThreat();
+                DoResetThreatList();
                 me->SetInCombatWithZone();
                 if (TempSummon* ts = me->ToTempSummon())
                     if (Unit* summoner = ts->GetSummonerUnit())
@@ -468,7 +468,7 @@ public:
                 me->CastSpell(me, SPELL_GREEN_ABOMINATION_HITTIN__YA_PROC, true);
                 events.Reset();
                 events.ScheduleEvent(EVENT_STICKY_OOZE, 5000);
-                DoResetThreat();
+                DoResetThreatList();
                 me->SetInCombatWithZone();
                 if (Player* p = me->SelectNearestPlayer(100.0f))
                     AttackStart(p);

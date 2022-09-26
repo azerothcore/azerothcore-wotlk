@@ -158,7 +158,7 @@ struct boss_twinemperorsAI : public BossAI
 
         if (action == ACTION_AFTER_TELEPORT)
         {
-            DoResetThreat();
+            DoResetThreatList();
             me->SetReactState(REACT_PASSIVE);
             DoCastSelf(SPELL_TWIN_TELEPORT_VISUAL, true);
             _scheduler.DelayAll(2300ms);

@@ -164,7 +164,7 @@ struct boss_jeklik : public BossAI
         if (events.IsInPhase(PHASE_ONE) && !HealthAbovePct(50))
         {
             me->RemoveAurasDueToSpell(SPELL_BAT_FORM);
-            DoResetThreat();
+            DoResetThreatList();
             events.SetPhase(PHASE_TWO);
             events.CancelEventGroup(PHASE_ONE);
 
