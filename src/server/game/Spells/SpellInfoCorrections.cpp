@@ -4391,6 +4391,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
     });
 
+    // Collect Rookery Egg
+    ApplySpellFix({ 15958 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+    });
+
     // Boundary Warning
     ApplySpellFix({ 51259 }, [](SpellInfo* spellInfo)
     {
