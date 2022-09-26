@@ -111,7 +111,7 @@ bool NPCStaveQuestAI::IsFairFight()
     {
         Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
 
-        if (!(*itr)->getThreat())
+        if (!(*itr)->GetThreat())
         {
             // if target threat is 0 its fair, this prevents despawn in the case when
             // there is a bystander since UpdateVictim adds nearby enemies to the threatlist

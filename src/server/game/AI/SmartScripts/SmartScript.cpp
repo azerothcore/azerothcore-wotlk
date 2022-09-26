@@ -522,12 +522,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!me)
                 break;
 
-            ThreatContainer::StorageType threatList = me->GetThreatMgr().getThreatList();
+            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
             for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                 {
-                    me->GetThreatMgr().modifyThreatPercent(target, e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
+                    me->GetThreatMgr().ModifyThreatByPercent(target, e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                     LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_THREAT_ALL_PCT: Creature {} modify threat for unit {}, value {}",
                                    me->GetGUID().ToString(), target->GetGUID().ToString(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                 }
@@ -543,7 +543,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 if (IsUnit(target))
                 {
-                    me->GetThreatMgr().modifyThreatPercent(target->ToUnit(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
+                    me->GetThreatMgr().ModifyThreatByPercent(target->ToUnit(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_THREAT_SINGLE_PCT: Creature guidLow {} modify threat for unit {}, value %i",
                               me->GetGUID().ToString(), target->GetGUID().ToString(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                 }
@@ -3219,7 +3219,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         {
             if (me)
             {
-                ThreatContainer::StorageType threatList = me->GetThreatMgr().getThreatList();
+                ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
                 for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
                     if (Unit* temp = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                         // Xinef: added distance check
@@ -3428,15 +3428,19 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (!me || !me->IsEngaged() || !me->GetVictim())
                     return;
 
-                if (me->IsInRange(me->GetVictim(), (float)e.event.minMaxRepeat.min, (float)e.event.minMaxRepeat.max))
-                    ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax, me->GetVictim());
-                else
+                if (me->IsInRange(me->GetVictim(), (float)e.event.rangeRepeat.minRange, (float)e.event.rangeRepeat.maxRange))
                 {
-                    if (!e.event.minMaxRepeat.controller)
-                        RecalcTimer(e, 500, 500); // xinef: make it predictable "Malcrom: This seems to be done to standardize min, max start rather than using the range values for the timer."
+                    if (e.event.rangeRepeat.onlyFireOnRepeat == 2)
+                    {
+                        e.event.rangeRepeat.onlyFireOnRepeat = 1;
+                        RecalcTimer(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax);
+                    }
                     else
-                        RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax); // Malcrom: if param5 value is greater than 0 first action will not happen until after repeat timer fires.
+                        ProcessTimedAction(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax, me->GetVictim());
                 }
+                else
+                    RecalcTimer(e, 500, 500); // make it predictable
+
                 break;
             }
         case SMART_EVENT_VICTIM_CASTING:
@@ -4000,6 +4004,13 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
     switch (e.GetEventType())
     {
         //set only events which have initial timers
+        case SMART_EVENT_RANGE:
+            // If onlyFireOnRepeat is true set to 2 before entering combat. Will be set back to 1 after entering combat to ignore initial firing.
+            if (e.event.rangeRepeat.onlyFireOnRepeat == 1)
+                e.event.rangeRepeat.onlyFireOnRepeat = 2;
+            // make it predictable
+            RecalcTimer(e, 500, 500);
+            break;
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
             RecalcTimer(e, e.event.nearPlayer.firstTimer, e.event.nearPlayer.firstTimer);
@@ -4291,10 +4302,10 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
         InitTimer((*i));//calculate timers for first time use
         if (i->GetEventType() == SMART_EVENT_RANGE && i->GetActionType() == SMART_ACTION_ALLOW_COMBAT_MOVEMENT)
         {
-            if (i->action.combatMove.move == 1 && i->event.minMaxRepeat.min > minEnableDist)
-                minEnableDist = i->event.minMaxRepeat.min;
-            else if (i->action.combatMove.move == 0 && (i->event.minMaxRepeat.max < maxDisableDist || maxDisableDist == 0))
-                maxDisableDist = i->event.minMaxRepeat.max;
+            if (i->action.combatMove.move == 1 && i->event.rangeRepeat.minRange > minEnableDist)
+                minEnableDist = i->event.rangeRepeat.minRange;
+            else if (i->action.combatMove.move == 0 && (i->event.rangeRepeat.maxRange < maxDisableDist || maxDisableDist == 0))
+                maxDisableDist = i->event.rangeRepeat.maxRange;
         }
 
         // Xinef: if smartcast combat move flag is present
