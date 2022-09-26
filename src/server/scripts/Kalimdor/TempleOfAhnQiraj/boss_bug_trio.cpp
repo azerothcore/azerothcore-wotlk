@@ -78,20 +78,20 @@ public:
 
     void EnterCombatWithTrio(Unit* who)
     {
-        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VEM)))
+        if (Creature* vem = instance->GetCreature(DATA_VEM))
             if (vem->GetGUID() != me->GetGUID())
                 vem->GetAI()->AttackStart(who);
-        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KRI)))
+        if (Creature* kri = instance->GetCreature(DATA_KRI))
             if (kri->GetGUID() != me->GetGUID())
                 kri->GetAI()->AttackStart(who);
-        if (Creature* yauj = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YAUJ)))
+        if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
             if (yauj->GetGUID() != me->GetGUID())
                 yauj->GetAI()->AttackStart(who);
     }
 
     void EvadeAllBosses(EvadeReason why)
     {
-        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VEM)))
+        if (Creature* vem = instance->GetCreature(DATA_VEM))
         {
             if (vem->GetGUID() != me->GetGUID())
             {
@@ -102,7 +102,7 @@ public:
             }
         }
 
-        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KRI)))
+        if (Creature* kri = instance->GetCreature(DATA_KRI))
         {
             if (kri->GetGUID() != me->GetGUID())
             {
@@ -113,7 +113,7 @@ public:
             }
         }
 
-        if (Creature* yauj = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YAUJ)))
+        if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
         {
             if (yauj->GetGUID() != me->GetGUID())
             {
@@ -127,14 +127,15 @@ public:
 
     void DoAction(int32 action) override
     {
-        if (action != ACTION_CONSUME || dying)
+        if (action != ACTION_CONSUME || _dying)
         {
             return;
         }
 
-        isEating = true;
+        _isEating = true;
         me->SetSpeed(MOVE_RUN, 45.f/7.f); // From sniffs
         me->SetReactState(REACT_PASSIVE);
+        _scheduler.DelayAll(6s);
     }
 
     void MovementInform(uint32 type, uint32 id) override
@@ -145,8 +146,9 @@ public:
         me->GetMotionMaster()->MoveIdle();
         me->SetSpeed(MOVE_RUN, 15.f/7.f); // From sniffs
         DoCastSelf(SPELL_FULL_HEAL, true);
-        DoResetThreat();
-        isEating = false;
+        if (me->GetThreatMgr().GetThreatListSize())
+            DoResetThreat();
+        _isEating = false;
 
         _scheduler.Schedule(4s, [this](TaskContext /*context*/)
         {
@@ -170,8 +172,8 @@ public:
     {
         BossAI::Reset();
         _scheduler.CancelAll();
-        dying = false;
-        isEating = false;
+        _dying = false;
+        _isEating = false;
         instance->SetData(DATA_BUG_TRIO_DEATH, 0);
         me->SetSpeed(MOVE_RUN, 15.f / 7.f); // From sniffs
         me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -185,33 +187,35 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim() || isEating || !CheckInRoom())
+        if (!UpdateVictim() || _isEating || !CheckInRoom())
             return;
 
         _scheduler.Update(diff, [this]
         {
-            DoMeleeAttackIfReady();
+            if (!_dying && !_isEating)
+                DoMeleeAttackIfReady();
         });
     }
 
     void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (me->HealthBelowPctDamaged(1, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && who->GetGUID() != me->GetGUID() && !dying)
+        if (_dying && who->GetGUID() != me->GetGUID())
+            damage = 0;
+
+        if (me->HealthBelowPctDamaged(1, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && !_dying)
         {
             damage = 0;
-            if (isEating)
+            if (_isEating)
                 return;
 
             _scheduler.CancelAll();
             me->SetStandState(UNIT_STAND_STATE_DEAD);
             me->SetReactState(REACT_PASSIVE);
             me->SetControlled(true, UNIT_STATE_ROOT);
-            dying = true;
-
-            DoFinalSpell();
+            _dying = true;
 
             // Move the other bugs to this bug position
-            if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VEM)))
+            if (Creature* vem = instance->GetCreature(DATA_VEM))
             {
                 if (vem->GetGUID() != me->GetGUID())
                 {
@@ -219,7 +223,7 @@ public:
                     vem->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                 }
             }
-            if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KRI)))
+            if (Creature* kri = instance->GetCreature(DATA_KRI))
             {
                 if (kri->GetGUID() != me->GetGUID())
                 {
@@ -227,7 +231,7 @@ public:
                     kri->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                 }
             }
-            if (Creature* yauj = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YAUJ)))
+            if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
             {
                 if (yauj->GetGUID() != me->GetGUID())
                 {
@@ -240,6 +244,7 @@ public:
             {
                 if (!me->IsInEvadeMode() && instance->GetData(DATA_BUG_TRIO_DEATH) < 2)
                 {
+                    DoFinalSpell();
                     DoCastSelf(SPELL_BLOODY_DEATH, true);
                     Talk(EMOTE_DEVOURED);
                     me->DespawnOrUnsummon(1000);
@@ -274,9 +279,9 @@ public:
 
     void JustDied(Unit* killer) override
     {
-        if (killer->GetGUID() == me->GetGUID())
+        instance->SetData(DATA_BUG_TRIO_DEATH, 1);
+        if (instance->GetData(DATA_BUG_TRIO_DEATH) < 3)
         {
-            instance->SetData(DATA_BUG_TRIO_DEATH, 1);
             me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             return;
         }
@@ -285,8 +290,8 @@ public:
     }
 
     TaskScheduler _scheduler;
-    bool dying;
-    bool isEating;
+    bool _dying;
+    bool _isEating;
 };
 
 struct boss_kri : public boss_bug_trio
@@ -299,20 +304,20 @@ struct boss_kri : public boss_bug_trio
     {
         EnterCombatWithTrio(who);
 
-        _scheduler.Schedule(4s, 8s, [this](TaskContext context)
+        _scheduler.Schedule(7s, 18s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_CLEAVE);
-            context.Repeat(5s, 12s);
+            context.Repeat();
         })
-        .Schedule(6s, 30s, [this](TaskContext context)
+        .Schedule(8s, 17s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_TOXIC_VOLLEY);
-            context.Repeat(10s, 25s);
+            context.Repeat();
         })
-        .Schedule(6s, [this](TaskContext context)
+        .Schedule(7s, 16s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_THRASH);
-            context.Repeat(2s, 6s);
+            context.Repeat();
         });
     }
 };
@@ -343,17 +348,17 @@ struct boss_vem : public boss_bug_trio
             {
                 DoCast(target, SPELL_CHARGE);
             }
-            context.Repeat(8s, 16s);
+            context.Repeat();
         })
-        .Schedule(10s, 20s, [this](TaskContext context)
+        .Schedule(10s, 24s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_KNOCKBACK);
-            context.Repeat(10s, 20s);
+            context.Repeat();
         })
-        .Schedule(5s, 8s, [this](TaskContext context)
+        .Schedule(10s, 23s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_KNOCKDOWN);
-            context.Repeat(15s, 20s);
+            context.Repeat();
         })
         .Schedule(1s, [this](TaskContext context)
         {
@@ -376,7 +381,7 @@ struct boss_yauj : public boss_bug_trio
     {
         EnterCombatWithTrio(who);
 
-        _scheduler.Schedule(20s, 30s, [this](TaskContext context)
+        _scheduler.Schedule(12100ms, [this](TaskContext context)
         {
             if (me->GetHealthPct() <= 93.f)
             {
@@ -386,18 +391,20 @@ struct boss_yauj : public boss_bug_trio
             {
                 DoCast(friendly, SPELL_HEAL);
             }
-            context.Repeat(10s, 30s);
-        })
-        .Schedule(12s, 24s, [this](TaskContext context)
-        {
-            DoCastAOE(SPELL_FEAR);
-            DoResetThreat();
-            context.Repeat(20s);
+            context.Repeat();
         })
         .Schedule(12s, [this](TaskContext context)
         {
-            DoCastVictim(SPELL_RAVAGE);
-            context.Repeat(10s, 15s);
+            DoCastAOE(SPELL_FEAR);
+            DoResetThreat();
+            context.Repeat(20600ms);
+        })
+        .Schedule(11s, 14500ms, [this](TaskContext context)
+        {
+            if (DoCastVictim(SPELL_RAVAGE) == SPELL_CAST_OK)
+                context.Repeat(10s, 15s);
+            else
+                context.Repeat(1200ms);
         })
         .Schedule(10s, 30s, [this](TaskContext context)
         {
