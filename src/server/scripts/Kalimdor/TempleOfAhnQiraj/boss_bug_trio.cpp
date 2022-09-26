@@ -141,7 +141,6 @@ public:
             DoCastSelf(SPELL_BLOODY_DEATH);
             _dying = false;
         }
-
     }
 
     void MovementInform(uint32 type, uint32 id) override
@@ -291,8 +290,6 @@ public:
 
     void JustDied(Unit* killer) override
     {
-        if (killer && killer->GetGUID() == me->GetGUID())
-            std::cout << "yes" << std::endl;
         instance->SetData(DATA_BUG_TRIO_DEATH, 1);
         if (instance->GetData(DATA_BUG_TRIO_DEATH) < 3)
         {
