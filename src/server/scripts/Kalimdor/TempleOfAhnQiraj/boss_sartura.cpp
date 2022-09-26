@@ -169,8 +169,8 @@ struct boss_sartura : public BossAI
                         if (Unit* originalTarget = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             _savedTargetGUID = originalTarget->GetGUID();
-                            _savedTargetThreat = me->GetThreatMgr().getThreat(originalTarget);
-                            me->GetThreatMgr().modifyThreatPercent(originalTarget, -100);
+                            _savedTargetThreat = me->GetThreatMgr().GetThreat(originalTarget);
+                            me->GetThreatMgr().ModifyThreatByPercent(originalTarget, -100);
                         }
                         aggroReset = true;
                         events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET_END, 5000);
@@ -190,7 +190,7 @@ struct boss_sartura : public BossAI
                     events.CancelEvent(EVENT_SARTURA_AGGRO_RESET);
                     if (Unit* originalTarget = ObjectAccessor::GetUnit(*me, _savedTargetGUID))
                     {
-                        me->GetThreatMgr().addThreat(originalTarget, _savedTargetThreat);
+                        me->GetThreatMgr().AddThreat(originalTarget, _savedTargetThreat);
                         _savedTargetGUID.Clear();
                     }
                     aggroReset = false;
@@ -286,8 +286,8 @@ struct npc_sartura_royal_guard : public ScriptedAI
                         if (Unit* originalTarget = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             _savedTargetGUID = originalTarget->GetGUID();
-                            _savedTargetThreat = me->GetThreatMgr().getThreat(originalTarget);
-                            me->GetThreatMgr().modifyThreatPercent(originalTarget, -100);
+                            _savedTargetThreat = me->GetThreatMgr().GetThreat(originalTarget);
+                            me->GetThreatMgr().ModifyThreatByPercent(originalTarget, -100);
                         }
                         aggroReset = true;
                         events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET_END, 5000);
@@ -307,7 +307,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
                     events.CancelEvent(EVENT_GUARD_AGGRO_RESET);
                     if (Unit* originalTarget = ObjectAccessor::GetUnit(*me, _savedTargetGUID))
                     {
-                        me->GetThreatMgr().addThreat(originalTarget, _savedTargetThreat);
+                        me->GetThreatMgr().AddThreat(originalTarget, _savedTargetThreat);
                         _savedTargetGUID.Clear();
                     }
                     aggroReset = false;
