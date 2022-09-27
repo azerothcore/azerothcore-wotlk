@@ -84,7 +84,7 @@ void PlayerbotsDatabaseConnection::DoPrepareStatements()
     PrepareStatement(PLAYERBOTS_INS_TRAVELNODE_PATH, "INSERT INTO `playerbots_travelnode_path` (`node_id`, `to_node_id`, `nr`, `map_id`, `x`, `y`, `z`) VALUES (?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(PLAYERBOTS_DEL_TRAVELNODE_PATH, "DELETE FROM playerbots_travelnode_path", CONNECTION_ASYNC);
 
-    PrepareStatement(PLAYERBOTS_SEL_TEXT, "SELECT `key`,`text` FROM playerbots_text", CONNECTION_SYNCH);
+    PrepareStatement(PLAYERBOTS_SEL_TEXT, "SELECT `name`, `text`, `say_type`, `reply_type`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8` FROM `ai_playerbot_texts`", CONNECTION_SYNCH);
     PrepareStatement(
         PLAYERBOTS_SEL_DUNGEON_SUGGESTION,
         "SELECT"
