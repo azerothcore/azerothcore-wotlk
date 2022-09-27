@@ -62,16 +62,19 @@ enum Summons
 
 enum EVENTS
 {
-    EVENT_CLEAVE                = 1,
-    EVENT_STOMP                 = 2,
-    EVENT_FIREBALL              = 3,
-    EVENT_CONFLAGRATION         = 4
+    EVENT_CLEAVE                     = 1,
+    EVENT_STOMP                      = 2,
+    EVENT_FIREBALL                   = 3,
+    EVENT_CONFLAGRATION              = 4,
+    EVENT_CHECK_CONFLAGRATION_TARGET = 5
 };
 
 class boss_razorgore : public CreatureScript
 {
 public:
-    boss_razorgore() : CreatureScript("boss_razorgore") { }
+    boss_razorgore() : CreatureScript("boss_razorgore") {
+        _conflagrateThreat = 0.0f;
+    }
 
     struct boss_razorgoreAI : public BossAI
     {
@@ -244,10 +247,20 @@ public:
                         break;
                     case EVENT_CONFLAGRATION:
                         DoCastVictim(SPELL_CONFLAGRATION);
-                        if (me->GetVictim() && me->GetVictim()->HasAura(SPELL_CONFLAGRATION))
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
-                                me->TauntApply(target);
+                        if (Unit* target = me->GetVictim())
+                        {
+                            _conflagrateTarget = me->GetVictim()->GetGUID();
+                            _conflagrateThreat = me->getThreatMgr().getThreat(me->GetVictim());
+                            me->getThreatMgr().modifyThreatPercent(target, -100);
+                        }
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 30000);
+                        events.ScheduleEvent(EVENT_CHECK_CONFLAGRATION_TARGET, 10000);
+                        break;
+                    case EVENT_CHECK_CONFLAGRATION_TARGET:
+                        if (Unit* target = ObjectAccessor::GetUnit(*me, _conflagrateTarget))
+                        {
+                            me->GetThreatMgr().addThreat(target, _conflagrateThreat);
+                        }
                         break;
                 }
             }
