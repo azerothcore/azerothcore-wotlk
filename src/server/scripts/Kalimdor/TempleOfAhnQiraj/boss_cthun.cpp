@@ -186,7 +186,6 @@ struct boss_eye_of_cthun : public BossAI
 
     void EnterCombat(Unit* who) override
     {
-        DoZoneInCombat();
         ScheduleTasks();
         BossAI::EnterCombat(who);
     }
