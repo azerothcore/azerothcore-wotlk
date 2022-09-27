@@ -72,13 +72,13 @@ enum EVENTS
 class boss_razorgore : public CreatureScript
 {
 public:
-    boss_razorgore() : CreatureScript("boss_razorgore") {
-        _conflagrateThreat = 0.0f;
-    }
+    boss_razorgore() : CreatureScript("boss_razorgore") { }
 
     struct boss_razorgoreAI : public BossAI
     {
-        boss_razorgoreAI(Creature* creature) : BossAI(creature, DATA_RAZORGORE_THE_UNTAMED) { }
+        boss_razorgoreAI(Creature* creature) : BossAI(creature, DATA_RAZORGORE_THE_UNTAMED) {
+            _conflagrateThreat = 0.0f;
+        }
 
         void Reset() override
         {
