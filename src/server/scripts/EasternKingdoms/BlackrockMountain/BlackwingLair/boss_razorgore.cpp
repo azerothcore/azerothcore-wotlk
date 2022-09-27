@@ -250,7 +250,7 @@ public:
                         if (Unit* target = me->GetVictim())
                         {
                             _conflagrateTarget = me->GetVictim()->GetGUID();
-                            _conflagrateThreat = me->GetThreatMgr().getThreat(me->GetVictim());
+                            _conflagrateThreat = me->GetThreatMgr().GetThreat(me->GetVictim());
                             me->GetThreatMgr().modifyThreatPercent(target, -100);
                         }
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 30000);
