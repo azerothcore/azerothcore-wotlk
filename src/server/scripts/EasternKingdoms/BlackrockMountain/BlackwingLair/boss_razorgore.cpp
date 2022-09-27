@@ -272,6 +272,8 @@ public:
         bool secondPhase;
         ObjectGuid _charmerGUID;
         GuidVector _summonGUIDS;
+        float _conflagrateThreat;
+        ObjectGuid _conflagrateTarget;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
