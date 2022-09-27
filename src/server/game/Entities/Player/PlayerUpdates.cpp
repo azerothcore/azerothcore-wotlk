@@ -720,8 +720,7 @@ int ProgressiveSkillGainChance(int32 SkillValue, int32 LowChance, int32 HighChan
     return baseResult + (chanceDelta * progress * Coeff / cutoffDelta);
 }
 
-inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel,
-                           uint32 GreenLevel, uint32 YellowLevel)
+inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 YellowLevel)
 {
     // Use a linear function for skillups instead of tiers.
     // This has the side effect of ignoring values for yellow/green.
@@ -754,22 +753,20 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
     case SKILL_INSCRIPTION:
         return UpdateSkillPro(SkillId,
                               SkillGainChance(SkillValue, RedLevel + 100,
-                                              RedLevel + 50, RedLevel + 25) *
+                                              RedLevel + 50) *
                                   Multiplicator,
                               gathering_skill_gain);
     case SKILL_SKINNING:
         if (sWorld->getIntConfig(CONFIG_SKILL_CHANCE_SKINNING_STEPS) == 0)
             return UpdateSkillPro(SkillId,
                                   SkillGainChance(SkillValue, RedLevel + 100,
-                                                  RedLevel + 50,
-                                                  RedLevel + 25) *
+                                                  RedLevel + 50) *
                                       Multiplicator,
                                   gathering_skill_gain);
         else
             return UpdateSkillPro(
                 SkillId,
-                (SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50,
-                                 RedLevel + 25) *
+                (SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50) *
                  Multiplicator) >>
                     (SkillValue /
                      sWorld->getIntConfig(CONFIG_SKILL_CHANCE_SKINNING_STEPS)),
@@ -778,15 +775,13 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
         if (sWorld->getIntConfig(CONFIG_SKILL_CHANCE_MINING_STEPS) == 0)
             return UpdateSkillPro(SkillId,
                                   SkillGainChance(SkillValue, RedLevel + 100,
-                                                  RedLevel + 50,
-                                                  RedLevel + 25) *
+                                                  RedLevel + 50) *
                                       Multiplicator,
                                   gathering_skill_gain);
         else
             return UpdateSkillPro(
                 SkillId,
-                (SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50,
-                                 RedLevel + 25) *
+                (SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50) *
                  Multiplicator) >>
                     (SkillValue /
                      sWorld->getIntConfig(CONFIG_SKILL_CHANCE_MINING_STEPS)),
@@ -827,8 +822,7 @@ bool Player::UpdateCraftSkill(uint32 spellid)
                                 _spell_idx->second->TrivialSkillLineRankHigh,
                                 (_spell_idx->second->TrivialSkillLineRankHigh +
                                  _spell_idx->second->TrivialSkillLineRankLow) /
-                                    2,
-                                _spell_idx->second->TrivialSkillLineRankLow),
+                                    2),
                 craft_skill_gain);
         }
     }
