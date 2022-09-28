@@ -1,3 +1,4 @@
+-- DB update 2022_09_28_03 -> 2022_09_28_04
 --
 DELETE FROM `linked_respawn` WHERE `linkedGuid`=84387 AND `linkType`=0;
 INSERT INTO `linked_respawn` VALUES
