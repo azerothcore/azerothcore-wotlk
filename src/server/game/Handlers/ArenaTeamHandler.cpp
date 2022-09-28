@@ -33,23 +33,23 @@ void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
     LOG_DEBUG("network", "Inspect Arena stats ({})", guid.ToString());
-    
+
     Player* player = ObjectAccessor::FindPlayer(guid);
     if (!player)
     {
         return;
     }
-    
+
     if (!GetPlayer()->IsWithinDistInMap(player, INSPECT_DISTANCE, false))
     {
         return;
     }
-    
+
     if (GetPlayer()->IsValidAttackTarget(player))
     {
         return;
     }
-    
+
     for (uint8 i = 0; i < MAX_ARENA_SLOT; ++i)
     {
         if (uint32 a_id = player->GetArenaTeamId(i))
