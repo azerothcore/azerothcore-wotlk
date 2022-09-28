@@ -4391,6 +4391,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
     });
 
+    // Refocus (Renataki's charm of beasts)
+    ApplySpellFix({ 24531 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+    });
+
     // Collect Rookery Egg
     ApplySpellFix({ 15958 }, [](SpellInfo* spellInfo)
     {
