@@ -1,3 +1,4 @@
+-- DB update 2022_09_26_00 -> 2022_09_28_00
 -- Ossirian
 UPDATE `creature_template` SET `detection_range` = 37 WHERE (`entry` = 15339);
 -- Qiraji Gladiator
