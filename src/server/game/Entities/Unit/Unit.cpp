@@ -8977,7 +8977,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             return false;
 
                         if (victim && victim->IsAlive())
-                            victim->GetThreatMgr().modifyThreatPercent(this, -10);
+                            victim->GetThreatMgr().ModifyThreatByPercent(this, -10);
 
                         basepoints0 = int32(CountPctFromMaxHealth(triggerAmount));
                         trigger_spell_id = 31616;
@@ -14104,7 +14104,7 @@ void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask, Sp
     // Only mobs can manage threat lists
     if (CanHaveThreatList() && !HasUnitState(UNIT_STATE_EVADE))
     {
-        m_ThreatMgr.addThreat(victim, fThreat, schoolMask, threatSpell);
+        m_ThreatMgr.AddThreat(victim, fThreat, schoolMask, threatSpell);
     }
 }
 
@@ -15742,21 +15742,18 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
 
         // Update skills here for players
         // only when you are not fighting other players or their pets/totems (pvp)
-        if (GetTypeId() == TYPEID_PLAYER &&
-                target->GetTypeId() != TYPEID_PLAYER &&
-                !(target->IsTotem() && target->ToTotem()->GetOwner()->IsPlayer()) &&
-                !target->IsPet()
-           )
+        if (IsPlayer() && !target->IsCharmedOwnedByPlayerOrPlayer())
         {
             // On melee based hit/miss/resist/parry/dodge need to update skill (for victim and attacker)
             if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST | PROC_EX_PARRY | PROC_EX_DODGE))
             {
-                if (target->GetTypeId() != TYPEID_PLAYER)
-                    ToPlayer()->UpdateCombatSkills(target, attType, isVictim, procSpell ? procSpell->m_weaponItem : nullptr);
+                ToPlayer()->UpdateCombatSkills(target, attType, isVictim, procSpell ? procSpell->m_weaponItem : nullptr);
             }
-            // Update defence if player is victim and we block
+            // Update defence if player is victim and we block - TODO: confirm that blocked attacks only have a chance to increase defence skill
             else if (isVictim && procExtra & (PROC_EX_BLOCK))
+            {
                 ToPlayer()->UpdateCombatSkills(target, attType, true);
+            }
         }
         // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
         if (procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK))
@@ -18682,8 +18679,8 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
             // modify threat lists for new phasemask
             if (GetTypeId() != TYPEID_PLAYER)
             {
-                ThreatContainer::StorageType threatList = GetThreatMgr().getThreatList();
-                ThreatContainer::StorageType offlineThreatList = GetThreatMgr().getOfflineThreatList();
+                ThreatContainer::StorageType threatList = GetThreatMgr().GetThreatList();
+                ThreatContainer::StorageType offlineThreatList = GetThreatMgr().GetOfflineThreatList();
 
                 // merge expects sorted lists
                 threatList.sort();
@@ -19657,17 +19654,17 @@ void Unit::SendThreatListUpdate()
 {
     if (!GetThreatMgr().isThreatListEmpty())
     {
-        uint32 count = GetThreatMgr().getThreatList().size();
+        uint32 count = GetThreatMgr().GetThreatList().size();
 
         //LOG_DEBUG("entities.unit", "WORLD: Send SMSG_THREAT_UPDATE Message");
         WorldPacket data(SMSG_THREAT_UPDATE, 8 + count * 8);
         data << GetPackGUID();
         data << uint32(count);
-        ThreatContainer::StorageType const& tlist = GetThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tlist = GetThreatMgr().GetThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
         {
             data << (*itr)->getUnitGuid().WriteAsPacked();
-            data << uint32((*itr)->getThreat() * 100);
+            data << uint32((*itr)->GetThreat() * 100);
         }
         SendMessageToSet(&data, false);
     }
@@ -19677,18 +19674,18 @@ void Unit::SendChangeCurrentVictimOpcode(HostileReference* pHostileReference)
 {
     if (!GetThreatMgr().isThreatListEmpty())
     {
-        uint32 count = GetThreatMgr().getThreatList().size();
+        uint32 count = GetThreatMgr().GetThreatList().size();
 
         LOG_DEBUG("entities.unit", "WORLD: Send SMSG_HIGHEST_THREAT_UPDATE Message");
         WorldPacket data(SMSG_HIGHEST_THREAT_UPDATE, 8 + 8 + count * 8);
         data << GetPackGUID();
         data << pHostileReference->getUnitGuid().WriteAsPacked();
         data << uint32(count);
-        ThreatContainer::StorageType const& tlist = GetThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tlist = GetThreatMgr().GetThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
         {
             data << (*itr)->getUnitGuid().WriteAsPacked();
-            data << uint32((*itr)->getThreat() * 100);
+            data << uint32((*itr)->GetThreat() * 100);
         }
         SendMessageToSet(&data, false);
     }
@@ -20618,7 +20615,7 @@ bool Unit::IsInCombatWith(Unit const* who) const
         return false;
     // Search in threat list
     ObjectGuid guid = who->GetGUID();
-    for (ThreatContainer::StorageType::const_iterator i = m_ThreatMgr.getThreatList().begin(); i != m_ThreatMgr.getThreatList().end(); ++i)
+    for (ThreatContainer::StorageType::const_iterator i = m_ThreatMgr.GetThreatList().begin(); i != m_ThreatMgr.GetThreatList().end(); ++i)
     {
         HostileReference* ref = (*i);
         // Return true if the unit matches

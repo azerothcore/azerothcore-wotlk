@@ -24,6 +24,7 @@
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "blackrock_spire.h"
 
 uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUMMONER, NPC_BLACKHAND_VETERAN };
@@ -80,6 +81,7 @@ public:
         uint32 CurrentSolakarWave = 0;
         uint32 SolakarState       = NOT_STARTED; // there should be a global instance encounter state, where is it?
         GuidVector SolakarSummons;
+        uint32 VaelastraszState   = NOT_STARTED;
 
         instance_blackrock_spireMapScript(InstanceMap* map) : InstanceScript(map)
         {
@@ -89,6 +91,7 @@ public:
             CurrentSolakarWave = 0;
             SolakarState       = NOT_STARTED;
             SolakarSummons.clear();
+            VaelastraszState   = NOT_STARTED;
         }
 
         void CreatureLooted(Creature* creature, LootType loot) override
@@ -377,6 +380,9 @@ public:
                     }
                     SolakarState = data;
                     break;
+                case DATA_VAELASTRASZ:
+                    VaelastraszState = data;
+                    break;
                 case DATA_UROK_DOOMHOWL:
                     if (data == FAIL)
                     {
@@ -419,6 +425,10 @@ public:
             if (type == DATA_SOLAKAR_FLAMEWREATH)
             {
                 return SolakarState;
+            }
+            else if (type == DATA_VAELASTRASZ)
+            {
+                return VaelastraszState;
             }
             else
             {
@@ -877,6 +887,247 @@ public:
     }
 };
 
+/*#####
+# npc_vaelastrasz_the_red and Seal of Ascension event
+#####*/
+
+// Set fixed spawn points so there's enough room for the dragon model
+Position VaelastraszTheRedPosNorth = Position(168.815506f, -420.311066f, 110.472298f, 3.141593f);
+Position VaelastraszTheRedPosSouth = Position(134.369049f, -420.311066f, 110.472298f, 6.283184f);
+
+// 16349 - Call of Vaelastrasz
+
+class spell_blackrock_spire_call_of_vaelastrasz : public SpellScript
+{
+    PrepareSpellScript(spell_blackrock_spire_call_of_vaelastrasz);
+
+    void OnEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (InstanceScript* instance = caster->GetInstanceScript())
+            {
+                instance->SetData(DATA_VAELASTRASZ, IN_PROGRESS);
+                float distanceToNorthSpawn = caster->GetDistance2d(VaelastraszTheRedPosNorth.m_positionX, VaelastraszTheRedPosNorth.m_positionY);
+                float distanceToSouthSpawn = caster->GetDistance2d(VaelastraszTheRedPosSouth.m_positionX, VaelastraszTheRedPosSouth.m_positionY);
+                Position spawnPosition = distanceToNorthSpawn < distanceToSouthSpawn ? VaelastraszTheRedPosNorth : VaelastraszTheRedPosSouth;
+                // despawn is called by the CreatureAI
+                caster->SummonCreature(NPC_VAELASTRASZ_THE_RED, spawnPosition, TEMPSUMMON_TIMED_DESPAWN, 60 * IN_MILLISECONDS);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_blackrock_spire_call_of_vaelastrasz::OnEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
+    }
+};
+
+enum Spells
+{
+    // Vaelastrasz the Red
+    SPELL_VAELAN_SPAWNS               = 16634, // Lightning Effect (Self cast)
+    SPELL_TOUCH_OF_VAELASTRASZ        = 16319, // AoE heal (Self cast)
+    // Vaelastrasz
+    SPELL_FLAMEBREATH                 = 16396, // Combat (Self cast)
+    SPELL_VAELASTRASZ_SPAWN           = 16354, // Self Cast Despawn (Self cast)
+    // Victor Nefarius
+    SPELL_NEFARIUS_CORRUPTION         = 23642,
+};
+
+enum ModelIds
+{
+    MODEL_VAELASTRASZ_UBRS    = 9909,
+    MODEL_VAELASTRASZ_THE_RED = 9912,
+};
+
+enum Says
+{
+    // Vaelastrasz the Red
+    SAY_RED_SUMMONED          = 0,
+    SAY_RED_BEFORE_TRANSFORM  = 1,
+    // Vaelastrasz
+    SAY_VAEL_SUMMONED         = 0,
+    SAY_VAEL_STOP_COMBAT      = 1,
+    // Victor Nefarius
+    SAY_NEFARIUS_15           = 15,
+    SAY_NEFARIUS_16           = 16,
+    SAY_NEFARIUS_17           = 17,
+};
+
+enum Events
+{
+    // Vaelastrasz the Red
+    EVENT_RED_1_TALK_BEFORE_TRANSFORM = 1,
+    EVENT_RED_2_TRANSFORM,
+    // Vaelastrasz
+    EVENT_VAEL_TALK_SUMMON,
+    EVENT_VAEL_1_START_COMBAT,
+    EVENT_NEFARIUS_TALK_1,
+    EVENT_NEFARIUS_TALK_2,
+    EVENT_NEFARIUS_TALK_3,
+    EVENT_NEFARIUS_CORRUPTION,
+    EVENT_VAEL_2_TRANSFORM,
+    EVENT_VAEL_3_DESPAWN,
+    EVENT_FLAME_BREATH,
+};
+
+class npc_vaelastrasz_the_red : public CreatureScript
+{
+public:
+    npc_vaelastrasz_the_red() : CreatureScript("npc_vaelastrasz_the_red") { }
+
+    struct npc_vaelastrasz_the_redAI : public CreatureAI
+    {
+        npc_vaelastrasz_the_redAI(Creature* creature) : CreatureAI(creature) { }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (!summoner)
+            {
+                return;
+            }
+            _combatEnabled = false;
+            me->CastSpell(me, SPELL_VAELAN_SPAWNS, false);
+            me->SetFacingToObject(summoner);
+            Talk(SAY_RED_SUMMONED);
+            if (Creature* victor = me->FindNearestCreature(NPC_LORD_VICTOR_NEFARIUS, 100.0f))
+            {
+                _victorGUID = victor->GetGUID();
+            }
+            events.ScheduleEvent(EVENT_RED_1_TALK_BEFORE_TRANSFORM, 3s);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_RED_1_TALK_BEFORE_TRANSFORM:
+                        Talk(SAY_RED_BEFORE_TRANSFORM);
+                        events.ScheduleEvent(EVENT_RED_2_TRANSFORM, 2s);
+                        break;
+                    case EVENT_RED_2_TRANSFORM:
+                        me->CastSpell(me, SPELL_TOUCH_OF_VAELASTRASZ, false);
+                        me->SetEntry(NPC_VAELASTRASZ_UBRS);
+                        me->SetDisplayId(MODEL_VAELASTRASZ_UBRS);
+                        events.ScheduleEvent(EVENT_VAEL_TALK_SUMMON, 1s);
+                        events.ScheduleEvent(EVENT_VAEL_1_START_COMBAT, 5s);
+                        break;
+                    case EVENT_VAEL_TALK_SUMMON:
+                        Talk(SAY_VAEL_SUMMONED);
+                        break;
+                    case EVENT_VAEL_1_START_COMBAT:
+                        _combatEnabled = true;
+                        me->SetImmuneToNPC(false);
+                        if (Creature* gyth = me->FindNearestCreature(NPC_GYTH, 100.0f, true))
+                        {
+                            me->AddThreat(gyth, 1000000.f);
+                            me->AI()->AttackStart(gyth);
+                        }
+                        if (Creature* rend = me->FindNearestCreature(NPC_WARCHIEF_REND_BLACKHAND, 100.0f, true))
+                        {
+                            if (!rend->IsImmuneToNPC() && rend->isTargetableForAttack())
+                            {
+                                me->AddThreat(rend, 100000.f);
+                                if (!me->FindNearestCreature(NPC_GYTH, 100.0f, true))
+                                {
+                                    me->AI()->AttackStart(rend);
+                                }
+                            }
+                        }
+                        _events2.ScheduleEvent(EVENT_FLAME_BREATH, 5s);
+                        events.ScheduleEvent(EVENT_NEFARIUS_TALK_1, 500ms);
+                        break;
+                    case EVENT_NEFARIUS_TALK_1:
+                        if (Creature* victor = ObjectAccessor::GetCreature(*me, _victorGUID))
+                        {
+                            victor->GetMotionMaster()->Clear(); // stop pacing
+                            victor->GetMotionMaster()->MoveIdle();
+                            victor->StopMovingOnCurrentPos();
+                            victor->SetFacingToObject(me);
+                            victor->AI()->Talk(SAY_NEFARIUS_15);
+                        }
+                        events.ScheduleEvent(EVENT_NEFARIUS_TALK_2, 6s);
+                        break;
+                    case EVENT_NEFARIUS_TALK_2:
+                        if (Creature* victor = ObjectAccessor::GetCreature(*me, _victorGUID))
+                        {
+                            victor->SetFacingToObject(me);
+                            victor->AI()->Talk(SAY_NEFARIUS_16);
+                        }
+                        events.ScheduleEvent(EVENT_NEFARIUS_TALK_3, 5s);
+                        break;
+                    case EVENT_NEFARIUS_TALK_3:
+                        if (Creature* victor = ObjectAccessor::GetCreature(*me, _victorGUID))
+                        {
+                            victor->SetFacingToObject(me);
+                            victor->AI()->Talk(SAY_NEFARIUS_17);
+                        }
+                        events.ScheduleEvent(EVENT_NEFARIUS_CORRUPTION, 5s);
+                        break;
+                    case EVENT_NEFARIUS_CORRUPTION:
+                        _combatEnabled = false;
+                        me->AttackStop();
+                        me->RemoveAllAuras();
+                        me->StopMovingOnCurrentPos();
+                        me->SetFaction(FACTION_FRIENDLY);
+                        if (Creature* victor = ObjectAccessor::GetCreature(*me, _victorGUID))
+                        {
+                            victor->SetFacingToObject(me);
+                            victor->CastSpell(me, SPELL_NEFARIUS_CORRUPTION, TRIGGERED_CAST_DIRECTLY);
+                        }
+                        events.ScheduleEvent(EVENT_VAEL_2_TRANSFORM, 1s);
+                        break;
+                    case EVENT_VAEL_2_TRANSFORM:
+                        Talk(SAY_VAEL_STOP_COMBAT);
+                        me->SetDisplayId(MODEL_VAELASTRASZ_THE_RED);
+                        events.ScheduleEvent(EVENT_VAEL_3_DESPAWN, 500ms);
+                        break;
+                    case EVENT_VAEL_3_DESPAWN:
+                        DoCast(me, SPELL_VAELASTRASZ_SPAWN);
+                        me->DespawnOrUnsummon(1500);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (!_combatEnabled || !UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
+
+            _events2.Update(diff);
+
+            switch (_events2.ExecuteEvent())
+            {
+                case EVENT_FLAME_BREATH:
+                    me->CastSpell(me, SPELL_FLAMEBREATH, false);
+                    break;
+                default:
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+            return;
+        }
+
+    private:
+        ObjectGuid _victorGUID;
+        bool _combatEnabled;
+        EventMap _events2;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetBlackrockSpireAI<npc_vaelastrasz_the_redAI>(creature);
+    }
+};
+
 void AddSC_instance_blackrock_spire()
 {
     new instance_blackrock_spire();
@@ -885,4 +1136,6 @@ void AddSC_instance_blackrock_spire()
     new go_father_flame();
     new near_scarshield_infiltrator();
     new at_scarshield_infiltrator();
+    RegisterSpellScript(spell_blackrock_spire_call_of_vaelastrasz);
+    new npc_vaelastrasz_the_red();
 }

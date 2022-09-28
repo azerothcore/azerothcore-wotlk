@@ -456,7 +456,7 @@ public:
                     me->GetThreatMgr().resetAggro(NotOnSameSide(me));
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0))
                     {
-                        me->GetThreatMgr().addThreat(pTarget, 100.0f);
+                        me->GetThreatMgr().AddThreat(pTarget, 100.0f);
                         AttackStart(pTarget);
                     }
                     events.RepeatEvent(20000);
