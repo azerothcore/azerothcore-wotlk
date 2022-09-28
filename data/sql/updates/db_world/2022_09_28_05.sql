@@ -1,3 +1,4 @@
+-- DB update 2022_09_28_04 -> 2022_09_28_05
 -- Vekniss Wasp (15236)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 15236;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15236) AND (`source_type` = 0) AND (`id` IN (0, 1, 2));
