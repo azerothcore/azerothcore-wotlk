@@ -406,13 +406,16 @@ bool CreatureGroup::IsFormationInCombat()
     return false;
 }
 
-bool CreatureGroup::IsAnyMemberAlive()
+bool CreatureGroup::IsAnyMemberAlive(bool ignoreLeader /*= false*/)
 {
     for (auto const& itr : m_members)
     {
         if (itr.first && itr.first->IsAlive())
         {
-            return true;
+            if (!ignoreLeader || itr.first != m_leader)
+            {
+                return true;
+            }
         }
     }
 
