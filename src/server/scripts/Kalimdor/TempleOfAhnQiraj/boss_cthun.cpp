@@ -853,7 +853,7 @@ struct npc_giant_eye_tentacle : public ScriptedAI
                 DoCastAOE(SPELL_MASSIVE_GROUND_RUPTURE);
             }).Schedule(1s, 5s, [this](TaskContext context)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_DIGESTIVE_ACID))
                 {
                     DoCast(target, SPELL_GREEN_BEAM);
                 }
