@@ -43,8 +43,8 @@ struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
 {
     Unit const* me;
     float m_dist;
-    bool m_playerOnly;
     Unit const* except;
+    bool m_playerOnly;
     int32 m_aura;
 
     // unit: the reference unit
