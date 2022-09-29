@@ -459,7 +459,7 @@ struct boss_cthun : public BossAI
             context.Repeat(30s);
         }).Schedule(15s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_DIGESTIVE_ACID))
             {
                 //Spawn claw tentacle on the random target
                 if (Creature* spawned = me->SummonCreature(NPC_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
@@ -470,7 +470,7 @@ struct boss_cthun : public BossAI
             context.Repeat(1min);
         }).Schedule(15s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_DIGESTIVE_ACID))
             {
                 //Spawn claw tentacle on the random target
                 if (Creature* spawned = me->SummonCreature(NPC_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
