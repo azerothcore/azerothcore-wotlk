@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
 ObjectData const creatureData[] =
@@ -68,6 +70,8 @@ public:
 
         uint32 BugTrioDeathCount;
         uint32 CthunPhase;
+
+        TaskScheduler scheduler;
 
         void Initialize() override
         {
@@ -138,6 +142,37 @@ public:
             }
 
             InstanceScript::OnGameObjectCreate(go);
+        }
+
+        void OnUnitDeath(Unit* unit) override
+        {
+            switch (unit->GetEntry())
+            {
+                case NPC_QIRAJI_SLAYER:
+                case NPC_QIRAJI_MINDSLAYER:
+                    if (Creature* creature = unit->ToCreature())
+                    {
+                        if (CreatureGroup* formation = creature->GetFormation())
+                        {
+                            scheduler.Schedule(100ms, [formation](TaskContext /*context*/)
+                            {
+                                if (!formation->IsAnyMemberAlive(true))
+                                {
+                                    if (Creature* leader = formation->GetLeader())
+                                    {
+                                        if (leader->IsAlive())
+                                        {
+                                            leader->AI()->SetData(0, 1);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         uint32 GetData(uint32 type) const override
@@ -216,6 +251,11 @@ public:
             }
 
             return true;
+        }
+
+        void Update(uint32 diff) override
+        {
+            scheduler.Update(diff);
         }
     };
 };
