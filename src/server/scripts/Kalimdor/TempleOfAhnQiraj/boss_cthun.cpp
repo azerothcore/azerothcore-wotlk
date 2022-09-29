@@ -435,7 +435,7 @@ struct boss_cthun : public BossAI
     {
         _scheduler.Schedule(13800ms, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_DIGESTIVE_ACID))
             {
                 target->CastSpell(target, SPELL_MOUTH_TENTACLE, true);
 
