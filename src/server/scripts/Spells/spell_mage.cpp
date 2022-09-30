@@ -905,6 +905,11 @@ class spell_mage_summon_water_elemental : public SpellScript
     {
         Unit* caster = GetCaster();
 
+        //npcbot: prevent default handler for bots
+        if (caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+            return;
+        //end npcbot
+
         if (Creature* pet = ObjectAccessor::GetCreature(*caster, caster->GetPetGUID()))
             if (!pet->IsAlive())
                 pet->ToTempSummon()->UnSummon();

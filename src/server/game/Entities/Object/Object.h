@@ -587,6 +587,9 @@ public:
     [[nodiscard]] float GetTransOffsetY() const { return m_movementInfo.transport.pos.GetPositionY(); }
     [[nodiscard]] float GetTransOffsetZ() const { return m_movementInfo.transport.pos.GetPositionZ(); }
     [[nodiscard]] float GetTransOffsetO() const { return m_movementInfo.transport.pos.GetOrientation(); }
+    //npcbot: TC method transfer
+    [[nodiscard]] Position const& GetTransOffset() const { return m_movementInfo.transport.pos; }
+    //end npcbot
     [[nodiscard]] uint32 GetTransTime()   const { return m_movementInfo.transport.time; }
     [[nodiscard]] int8 GetTransSeat()     const { return m_movementInfo.transport.seat; }
     [[nodiscard]] virtual ObjectGuid GetTransGUID()   const;

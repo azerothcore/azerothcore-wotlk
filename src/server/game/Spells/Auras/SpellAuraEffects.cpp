@@ -945,6 +945,21 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                         case 49472: // Drink Coffee
                         case 57073:
                         case 61830:
+                            //npcbot
+                            if (caster && caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+                            {
+                                if (AuraEffect* aurEff = GetBase()->GetEffect(EFFECT_0))
+                                {
+                                    if (aurEff->GetAuraType() == SPELL_AURA_MOD_POWER_REGEN)
+                                    {
+                                        aurEff->ChangeAmount(GetAmount());
+                                        m_isPeriodic = false;
+                                    }
+                                }
+                                break;
+                            }
+                            //end npcbot
+
                             if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
                                 return;
                             // Get SPELL_AURA_MOD_POWER_REGEN aura from spell
@@ -2037,6 +2052,10 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
             case FORM_DEFENSIVESTANCE:
             case FORM_BERSERKERSTANCE:
                 {
+                    //npcbot: skip this, handled inside class ai
+                    if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsNPCBot())
+                        break;
+                    //end npcbot
                     uint32 Rage_val = 0;
                     // Defensive Tactics
                     if (form == FORM_DEFENSIVESTANCE)
@@ -2098,6 +2117,11 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         // and also HandleAuraModDisarm is not triggered
         if (!target->CanUseAttackType(BASE_ATTACK))
         {
+            //npcbot: skip bots (handled inside AI)
+            if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsNPCBotOrPet())
+            {}
+            else
+            //end npcbot
             if (Item* pItem = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
             {
                 target->ToPlayer()->_ApplyWeaponDamage(EQUIPMENT_SLOT_MAINHAND, pItem->GetTemplate(), nullptr, apply);
@@ -3034,6 +3058,17 @@ void AuraEffect::HandleAuraModTotalThreat(AuraApplication const* aurApp, uint8 m
         return;
 
     Unit* target = aurApp->GetTarget();
+
+    //npcbot: handle for bots
+    if (target->IsAlive() && target->GetTypeId() == TYPEID_UNIT &&
+        target->ToCreature()->IsNPCBotOrPet())
+    {
+        Unit* caster = GetCaster();
+        if (caster && caster->IsAlive())
+            target->getHostileRefMgr().addTempThreat((float)GetAmount(), apply);
+        return;
+    }
+    //end npcbot
 
     if (!target->IsAlive() || target->GetTypeId() != TYPEID_PLAYER)
         return;
@@ -6302,6 +6337,14 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
 
     if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
     {
+        //npcbot: Black Arrow damage on targets below 20%
+        if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARLOCK && (GetSpellInfo()->SpellFamilyFlags[1] & 0x4) &&
+            target->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
+        {
+            damage *= 5;
+        }
+        //end npcbot
+
         // xinef: leave only target depending bonuses, rest is handled in calculate amount
         if (GetBase()->GetType() == DYNOBJ_AURA_TYPE && caster)
             damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, 0.0f, GetBase()->GetStackAmount());
@@ -6858,6 +6901,44 @@ void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEve
     if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
     {
         LOG_DEBUG("spells.aura", "AuraEffect::HandleProcTriggerSpellAuraProc: Triggering spell {} from aura {} proc", triggeredSpellInfo->Id, GetId());
+
+        //npcbot
+        Aura const* triggeredByAura = aurApp->GetBase();
+        int32 basepoints0 = 0;
+        switch (triggerSpellId)
+        {
+            // Quest - Self Healing from resurrect (invisible in log)
+            case 25155:
+            {
+                switch (GetId())
+                {
+                    //Vampiric Aura
+                    case 20810:
+                    {
+                        DamageInfo const* dinfo = eventInfo.GetDamageInfo();
+                        uint32 damage = dinfo->GetDamage();
+                        if (!damage)
+                            return;
+
+                        // 100% / 25%
+                        if (triggerTarget->GetGUID() == triggeredByAura->GetCasterGUID())
+                            basepoints0 = int32(damage);
+                        else
+                            basepoints0 = int32(damage / 4);
+
+                        triggerCaster->CastCustomSpell(triggerTarget, triggerSpellId, &basepoints0, nullptr, nullptr, true, nullptr);
+                        return;
+                    }
+                    default:
+                        break;
+                }
+                break;
+            }
+            default:
+                break;
+        }
+        //end npcbot
+
         triggerCaster->CastSpell(triggerTarget, triggeredSpellInfo, true, nullptr, this);
     }
     else

@@ -35,6 +35,10 @@
 #include "World.h"
 #include "WorldPacket.h"
 
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 MapMgr::MapMgr()
 {
     i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
@@ -59,6 +63,10 @@ void MapMgr::Initialize()
     // Start mtmaps if needed
     if (num_threads > 0)
         m_updater.activate(num_threads);
+
+    //npcbot: load bots
+    BotMgr::Initialize();
+    //end npcbot
 }
 
 void MapMgr::InitializeVisibilityDistanceInfo()

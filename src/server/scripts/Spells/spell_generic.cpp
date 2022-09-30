@@ -2357,6 +2357,10 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
 
     bool Load() override
     {
+        //npcbot
+        if (GetCaster() && GetCaster()->GetTypeId() == TYPEID_UNIT && GetCaster()->ToCreature()->IsNPCBot() && GetOwner()->GetTypeId() == TYPEID_UNIT)
+            return true;
+        //end npcbot
         return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetTypeId() == TYPEID_UNIT;
     }
 
@@ -2379,7 +2383,19 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
                 break;
         }
 
+        //npcbot
+        /*
+        //end npcbot
         float avgILvl = caster->ToPlayer()->GetAverageItemLevel();
+        //npcbot
+        */
+        float avgILvl;
+        if (caster->GetTypeId() == TYPEID_PLAYER)
+            avgILvl = caster->ToPlayer()->GetAverageItemLevel();
+        else
+            avgILvl = caster->ToCreature()->GetBotAverageItemLevel();
+        //end npcbot
+
         if (avgILvl < baseItemLevel)
             return;                     /// @todo Research possibility of scaling down
 
@@ -3486,6 +3502,11 @@ class spell_gen_tournament_pennant : public AuraScript
 
     bool Load() override
     {
+        //npcbot
+        if (GetCaster() && GetCaster()->GetTypeId() == TYPEID_UNIT && GetCaster()->ToCreature()->IsNPCBot())
+            return true;
+        //end npcbot
+
         return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 

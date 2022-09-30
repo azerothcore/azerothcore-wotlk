@@ -125,6 +125,9 @@ namespace lfg
             // Xinef: Destroy group if only one player is left
             if (Group* group = player->GetGroup())
                 if (group->GetMembersCount() <= 1u)
+                //npcbot
+                if (!player->GetSession()->PlayerLoading())
+                //end npcbot
                     group->Disband();
         }
     }
