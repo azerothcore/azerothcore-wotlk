@@ -531,7 +531,7 @@ public:
             if (opponent->CanHaveThreatList())
             {
                 if (IsSpellReady(FEINT_1, diff) && !stealthed && !IsTank() && opponent->GetVictim() == me && Rand() < 35 &&
-                    energy >= ecost(FEINT_1) && int32(opponent->GetThreatMgr().getThreatList().size()) > 1 &&
+                    energy >= ecost(FEINT_1) && int32(opponent->GetThreatMgr().GetThreatList().size()) > 1 &&
                     int32(opponent->getAttackers().size()) > 1)
                 {
                     if (doCast(opponent, GetSpell(FEINT_1)))
@@ -956,7 +956,7 @@ public:
                 if (IsTank(player) || player->GetVictim() == victim)
                 {
                     if (!victim->CanHaveThreatList() ||
-                        victim->GetThreatMgr().getThreat(player) < victim->GetThreatMgr().getThreat(me) * 0.75f)
+                        victim->GetThreatMgr().GetThreat(player) < victim->GetThreatMgr().GetThreat(me) * 0.75f)
                     {
                         target = player;
                         break;

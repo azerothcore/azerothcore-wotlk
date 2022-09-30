@@ -1378,7 +1378,7 @@ Unit* bot_pet_ai::_getTarget(bool &reset) const
     if (dropTarget)
         return nullptr;
 
-    if (mytar && (!IAmFree() || me->GetDistance(mytar) < BOT_MAX_CHASE_RANGE) && me->IsValidAttackTarget(mytar) && !petOwner->GetBotAI()->IsPointedNoDPSTarget(mytar))
+    if (mytar && (!IAmFree() || me->GetDistance(mytar) < float(BOT_MAX_CHASE_RANGE)) && me->IsValidAttackTarget(mytar) && !petOwner->GetBotAI()->IsPointedNoDPSTarget(mytar))
     {
         if (me->GetDistance(mytar) > (!IsPetMelee() ? 20.f : 5.f) && m_botCommandState != COMMAND_STAY && m_botCommandState != COMMAND_FOLLOW)
             reset = true;
@@ -1610,7 +1610,7 @@ void bot_pet_ai::Regenerate()
             else
                 addvalue = petOwner->GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER);
 
-            addvalue *= sWorld->getRate(RATE_POWER_MANA) * REGEN_CD * 0.001f; //regenTimer threshold / 1000
+            addvalue *= sWorld->getRate(RATE_POWER_MANA) * float(REGEN_CD) * 0.001f; //regenTimer threshold / 1000
             if (addvalue < 0.0f)
                 addvalue = 0.0f;
 

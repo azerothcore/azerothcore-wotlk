@@ -2676,7 +2676,7 @@ public:
             if (InitSpell(me, HEALING_WAVE_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, HEALING_WAVE_1));
-                _heals[HEALING_WAVE_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL);
+                _heals[HEALING_WAVE_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL, 0);
             }
             else
                 _heals[HEALING_WAVE_1] = 0;
@@ -2684,7 +2684,7 @@ public:
             if (InitSpell(me, LESSER_HEALING_WAVE_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, LESSER_HEALING_WAVE_1));
-                _heals[LESSER_HEALING_WAVE_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL);
+                _heals[LESSER_HEALING_WAVE_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL, 0);
             }
             else
                 _heals[LESSER_HEALING_WAVE_1] = 0;
@@ -2692,7 +2692,7 @@ public:
             if (InitSpell(me, RIPTIDE_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, RIPTIDE_1));
-                _heals[RIPTIDE_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL);
+                _heals[RIPTIDE_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL, 0);
             }
             else
                 _heals[RIPTIDE_1] = 0;
@@ -2700,7 +2700,7 @@ public:
             if (InitSpell(me, CHAIN_HEAL_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, CHAIN_HEAL_1));
-                _heals[CHAIN_HEAL_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL);
+                _heals[CHAIN_HEAL_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL, 0);
             }
             else
                 _heals[CHAIN_HEAL_1] = 0;

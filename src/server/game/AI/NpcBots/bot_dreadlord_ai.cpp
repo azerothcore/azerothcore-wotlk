@@ -42,7 +42,6 @@ enum DreadlordSpecial
 
     DAMAGE_CD_REDUCTION     = 250,//ms
     INFERNO_SPAWN_DELAY     = 650,//ms
-    INFERNO_DURATION        = 3 * MINUTE * IN_MILLISECONDS - 10 * IN_MILLISECONDS,
 
     IMMOLATION              = 39007
 };
@@ -410,7 +409,7 @@ public:
 
             //Position pos;
 
-            Creature* myPet = me->SummonCreature(entry, *sPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, INFERNO_DURATION);
+            Creature* myPet = me->SummonCreature(entry, *sPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
             //me->GetNearPoint(myPet, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 0, 2, me->GetOrientation());
             //myPet->GetMotionMaster()->MovePoint(me->GetMapId(), pos);
             myPet->SetCreatorGUID(master->GetGUID());

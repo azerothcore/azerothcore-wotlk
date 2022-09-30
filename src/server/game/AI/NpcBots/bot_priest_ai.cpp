@@ -2059,7 +2059,7 @@ public:
             if (InitSpell(me, HEAL))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, HEAL));
-                _heals[HEAL] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), DamageEffectType::HEAL);
+                _heals[HEAL] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), DamageEffectType::HEAL, 0);
             }
             else
                 _heals[HEAL] = 0;
@@ -2067,7 +2067,7 @@ public:
             if (InitSpell(me, FLASH_HEAL_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, FLASH_HEAL_1));
-                _heals[FLASH_HEAL_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), DamageEffectType::HEAL);
+                _heals[FLASH_HEAL_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), DamageEffectType::HEAL, 0);
             }
             else
                 _heals[FLASH_HEAL_1] = 0;
@@ -2075,7 +2075,7 @@ public:
             if (InitSpell(me, PENANCE_HEAL_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, PENANCE_HEAL_1));
-                _heals[PENANCE_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), DamageEffectType::HEAL);
+                _heals[PENANCE_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), DamageEffectType::HEAL, 0);
             }
             else
                 _heals[PENANCE_1] = 0;
@@ -2083,7 +2083,7 @@ public:
             if (InitSpell(me, DESPERATE_PRAYER_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, DESPERATE_PRAYER_1));
-                _heals[DESPERATE_PRAYER_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), DamageEffectType::HEAL);
+                _heals[DESPERATE_PRAYER_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), DamageEffectType::HEAL, 0);
             }
             else
                 _heals[DESPERATE_PRAYER_1] = 0;

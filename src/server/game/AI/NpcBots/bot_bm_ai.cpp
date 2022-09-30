@@ -741,7 +741,7 @@ public:
             {
                 //manually add threat as if damage was done
                 if (victim->GetTypeId() == TYPEID_UNIT)
-                    victim->GetThreatMgr().addThreat(me, float(damage + damage));
+                    victim->GetThreatMgr().AddThreat(me, float(damage + damage));
 
                 damage = 0;
             }

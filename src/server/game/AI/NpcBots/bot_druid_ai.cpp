@@ -977,7 +977,7 @@ public:
             if (opponent->CanHaveThreatList())
             {
                 if (IsSpellReady(COWER_1, diff) && opponent->GetVictim() == me && energy >= acost(COWER_1) &&
-                    int32(opponent->GetThreatMgr().getThreatList().size()) > 1 &&
+                    int32(opponent->GetThreatMgr().GetThreatList().size()) > 1 &&
                     int32(opponent->getAttackers().size()) > 1 && Rand() < 45)
                 {
                     if (doCast(opponent, GetSpell(COWER_1)))
@@ -2877,7 +2877,7 @@ public:
             if (InitSpell(me, NOURISH_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, NOURISH_1));
-                _heals[NOURISH_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL);
+                _heals[NOURISH_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL, 0);
             }
             else
                 _heals[NOURISH_1] = 0;
@@ -2885,7 +2885,7 @@ public:
             if (InitSpell(me, REGROWTH_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, REGROWTH_1));
-                _heals[REGROWTH_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL);
+                _heals[REGROWTH_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL, 0);
             }
             else
                 _heals[REGROWTH_1] = 0;
@@ -2893,7 +2893,7 @@ public:
             if (InitSpell(me, HEALING_TOUCH_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, HEALING_TOUCH_1));
-                _heals[HEALING_TOUCH_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL);
+                _heals[HEALING_TOUCH_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), HEAL, 0);
             }
             else
                 _heals[HEALING_TOUCH_1] = 0;
@@ -2901,7 +2901,7 @@ public:
             if (InitSpell(me, REJUVENATION_1))
             {
                 spellInfo = sSpellMgr->GetSpellInfo(InitSpell(me, REJUVENATION_1));
-                _heals[REJUVENATION_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), DOT);
+                _heals[REJUVENATION_1] = me->SpellHealingBonusDone(me, spellInfo, spellInfo->Effects[0].CalcValue(me), DOT, 0);
             }
             else
                 _heals[REJUVENATION_1] = 0;
