@@ -791,44 +791,20 @@ class spell_mage_master_of_elements : public AuraScript
     {
         _spellInfo = eventInfo.GetSpellInfo();
         if (!_spellInfo || !eventInfo.GetActor() || !eventInfo.GetActionTarget())
-        {
             return false;
-        }
 
-        bool selectCaster = false;
         // Triggered spells cost no mana so we need triggering spellInfo
         if (SpellInfo const* triggeredByAuraSpellInfo = eventInfo.GetTriggerAuraSpell())
-        {
             _spellInfo = triggeredByAuraSpellInfo;
-            selectCaster = true;
-        }
 
-        // If spell is periodic, mana amount is divided by tick number
-        if (eventInfo.GetTriggerAuraEffectIndex() >= EFFECT_0)
-        {
-            if (Unit* caster = GetCaster())
-            {
-                if (Unit* target = (selectCaster ? eventInfo.GetActor() : eventInfo.GetActionTarget()))
-                {
-                    if (AuraEffect const* aurEff = target->GetAuraEffect(_spellInfo->Id, eventInfo.GetTriggerAuraEffectIndex(), caster->GetGUID()))
-                    {
-                        ticksModifier = aurEff->GetTotalTicks();
-                    }
-                }
-            }
-        }
-
-        return _spellInfo; // eventInfo.GetSpellInfo()
+        return _spellInfo;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        if (ticksModifier == 0)
-            return;
-
-        int32 mana = int32(_spellInfo->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask()) / ticksModifier);
+        int32 mana = int32(_spellInfo->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask()));
         mana = CalculatePct(mana, aurEff->GetAmount());
 
         if (mana > 0)
@@ -843,7 +819,6 @@ class spell_mage_master_of_elements : public AuraScript
 
 private:
     SpellInfo const* _spellInfo = nullptr;
-    uint8 ticksModifier = 1;
 };
 
 enum SilvermoonPolymorph
