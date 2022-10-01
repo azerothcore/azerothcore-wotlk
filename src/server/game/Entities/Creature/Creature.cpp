@@ -2423,6 +2423,12 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (GetCharmerOrOwnerGUID())
         return false;
 
+    // Bosses cannot assist
+    if (isWorldBoss() || IsDungeonBoss())
+    {
+        return false;
+    }
+
     // only from same creature faction
     if (checkfaction)
     {
