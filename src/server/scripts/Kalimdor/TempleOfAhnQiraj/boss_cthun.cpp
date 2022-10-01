@@ -323,48 +323,32 @@ struct boss_eye_of_cthun : public BossAI
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        switch (instance->GetData(DATA_CTHUN_PHASE))
+        //Only if it will kill
+        if (damage < me->GetHealth())
+            return;
+
+        //Fake death in phase 0 or 1 (green beam or dark glare phase)
+        me->InterruptNonMeleeSpells(false);
+
+        //Remove Red coloration from c'thun
+        me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
+
+        //Reset to normal emote state and prevent select and attack
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+
+        //Remove Target field
+        me->SetTarget();
+
+        me->SetHealth(0);
+        damage = 0;
+
+        me->InterruptNonMeleeSpells(true);
+        me->RemoveAllAuras();
+        _scheduler.CancelAll();
+
+        if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
         {
-            case PHASE_EYE_GREEN_BEAM:
-            case PHASE_EYE_RED_BEAM:
-                //Only if it will kill
-                if (damage < me->GetHealth())
-                    return;
-
-                //Fake death in phase 0 or 1 (green beam or dark glare phase)
-                me->InterruptNonMeleeSpells(false);
-
-                //Remove Red coloration from c'thun
-                me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
-
-                //Reset to normal emote state and prevent select and attack
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-
-                //Remove Target field
-                me->SetTarget();
-
-                me->SetHealth(0);
-                damage = 0;
-
-                me->InterruptNonMeleeSpells(true);
-                me->RemoveAllAuras();
-                _scheduler.CancelAll();
-
-                if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
-                {
-                    cthun->AI()->DoAction(ACTION_START_PHASE_TWO);
-                }
-
-                break;
-
-            case PHASE_CTHUN_DONE:
-                //Allow death here
-                return;
-
-            default:
-                //Prevent death in these phases
-                damage = 0;
-                return;
+            cthun->AI()->DoAction(ACTION_START_PHASE_TWO);
         }
     }
 
@@ -462,8 +446,9 @@ struct boss_cthun : public BossAI
             {
                 //Spawn claw tentacle on the random target
                 if (Creature* spawned = me->SummonCreature(NPC_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                    if (spawned->AI())
-                        spawned->AI()->AttackStart(target);
+                {
+                    spawned->AI()->AttackStart(target);
+                }
             }
 
             context.Repeat(1min);
@@ -473,8 +458,9 @@ struct boss_cthun : public BossAI
             {
                 //Spawn claw tentacle on the random target
                 if (Creature* spawned = me->SummonCreature(NPC_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                    if (spawned->AI())
-                        spawned->AI()->AttackStart(target);
+                {
+                    spawned->AI()->AttackStart(target);
+                }
             }
 
             context.Repeat(1min);
