@@ -40,16 +40,6 @@ void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!GetPlayer()->IsWithinDistInMap(player, INSPECT_DISTANCE, false))
-    {
-        return;
-    }
-
-    if (GetPlayer()->IsValidAttackTarget(player))
-    {
-        return;
-    }
-
     for (uint8 i = 0; i < MAX_ARENA_SLOT; ++i)
     {
         if (uint32 a_id = player->GetArenaTeamId(i))
