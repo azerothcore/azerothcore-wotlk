@@ -144,7 +144,7 @@ class spell_item_mind_amplify_dish : public SpellScript
 enum RunescrollOfFortitude
 {
     SPELL_FORTITUDE = 72590,
-}
+};
 
 class spell_item_runescroll_of_fortitude : public SpellScript
 {
