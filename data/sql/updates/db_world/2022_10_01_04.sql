@@ -1,3 +1,4 @@
+-- DB update 2022_10_01_03 -> 2022_10_01_04
 --
 -- Yougotta 00001-00005 Sunstider Isle Part 1-5
 -- ITEM Tainted Arcane Silver (20483) should be 100% drop rate off NPC Tainted Arcane Wraith (15298) for QUEST Tainted Arcane Sliver (8338) (ALREADY CORRECT)
