@@ -180,7 +180,7 @@ struct boss_ouro : public BossAI
     void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_SAND_BLAST && target)
-            me->GetThreatMgr().modifyThreatPercent(target, 100);
+            me->GetThreatMgr().ModifyThreatByPercent(target, 100);
     }
 
     void Emerge()
@@ -291,6 +291,7 @@ struct npc_dirt_mound : ScriptedAI
         {
             creature->SetInCombatWithZone();
             creature->SetHealth(_ouroHealth);
+            creature->LowerPlayerDamageReq(creature->GetMaxHealth() - creature->GetHealth());
         }
     }
 
