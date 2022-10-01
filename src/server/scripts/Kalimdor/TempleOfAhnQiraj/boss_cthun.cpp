@@ -930,9 +930,12 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
-        if (Creature* trigger = player->FindNearestCreature(NPC_TRIGGER, 15.0f))
+        if (InstanceScript* instance = player->GetInstanceScript())
         {
-            trigger->CastSpell(player, SPELL_SPIT_OUT, true);
+            if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+            {
+                cthun->CastSpell(player, SPELL_SPIT_OUT, true);
+            }
         }
 
         return true;
