@@ -121,14 +121,6 @@ struct boss_sartura : public BossAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id != SPELL_SUNDERING_CLEAVE)
-            return;
-
-        me->RemoveAura(SPELL_SUNDERING_CLEAVE);
-    }
-
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
@@ -162,6 +154,7 @@ struct boss_sartura : public BossAI
                     events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
                     whirlwind = false;
                     events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
+                    DoCastVictim(SPELL_SUNDERING_CLEAVE, true);
                     break;
                 case EVENT_SARTURA_AGGRO_RESET:
                     if (aggroReset == false)
@@ -236,14 +229,6 @@ struct npc_sartura_royal_guard : public ScriptedAI
         events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 30000);
         events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET, urand(45000, 55000));
         events.ScheduleEvent(EVENT_GUARD_KNOCKBACK, 10000);
-    }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id != SPELL_SUNDERING_CLEAVE)
-            return;
-
-        me->RemoveAura(SPELL_SUNDERING_CLEAVE);
     }
 
     void UpdateAI(uint32 diff) override
