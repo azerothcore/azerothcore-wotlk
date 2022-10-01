@@ -173,7 +173,7 @@ enum BrannsCommunicator
 {
     NPC_BRANN_BRONZEBEARD = 29579,
     SPELL_CONTACT_BRANN   = 55038,
-}
+};
 
 class spell_item_branns_communicator : public SpellScript
 {
