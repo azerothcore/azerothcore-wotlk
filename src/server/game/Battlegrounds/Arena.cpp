@@ -186,8 +186,8 @@ void Arena::EndBattleground(TeamId winnerTeamId)
             stmt2->SetData(0, fightId);
             stmt2->SetData(1, GetArenaType());
             stmt2->SetData(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
-            stmt2->SetData(3, winnerArenaTeam->GetId());
-            stmt2->SetData(4, loserArenaTeam->GetId());
+            stmt2->SetData(3, winnerArenaTeam ? winnerArenaTeam->GetId() : 0);
+            stmt2->SetData(4, loserArenaTeam ? loserArenaTeam->GetId() : 0);
             stmt2->SetData(5, (uint16)winnerTeamRating);
             stmt2->SetData(6, (uint16)winnerMatchmakerRating);
             stmt2->SetData(7, (int16)winnerChange);
@@ -312,19 +312,22 @@ void Arena::EndBattleground(TeamId winnerTeamId)
             }
         }
 
-        // update previous opponents for arena queue
-        winnerArenaTeam->SetPreviousOpponents(loserArenaTeam->GetId());
-        loserArenaTeam->SetPreviousOpponents(winnerArenaTeam->GetId());
-
-        // save the stat changes
-        if (bValidArena)
+        if (winnerArenaTeam && loserArenaTeam)
         {
-            winnerArenaTeam->SaveToDB();
-            winnerArenaTeam->NotifyStatsChanged();
-        }
+            // update previous opponents for arena queue
+            winnerArenaTeam->SetPreviousOpponents(loserArenaTeam->GetId());
+            loserArenaTeam->SetPreviousOpponents(winnerArenaTeam->GetId());
 
-        loserArenaTeam->SaveToDB();
-        loserArenaTeam->NotifyStatsChanged();
+            // save the stat changes
+            if (bValidArena)
+            {
+                winnerArenaTeam->SaveToDB();
+                winnerArenaTeam->NotifyStatsChanged();
+            }
+
+            loserArenaTeam->SaveToDB();
+            loserArenaTeam->NotifyStatsChanged();
+        }
     }
 
     // end battleground
