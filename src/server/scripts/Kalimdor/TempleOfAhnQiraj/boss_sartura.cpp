@@ -96,7 +96,7 @@ struct boss_sartura : public BossAI
     {
         BossAI::EnterCombat(who);
         Talk(SAY_AGGRO);
-        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 30000);
+        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 12s, 22s);
         events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(45000, 55000));
         events.ScheduleEvent(EVENT_SPELL_BERSERK, 10 * 60000);
     }
@@ -161,7 +161,7 @@ struct boss_sartura : public BossAI
                 case EVENT_SARTURA_WHIRLWIND_END:
                     events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
                     whirlwind = false;
-                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 5s, 11s);
                     break;
                 case EVENT_SARTURA_AGGRO_RESET:
                     if (aggroReset == false)
@@ -233,9 +233,9 @@ struct npc_sartura_royal_guard : public ScriptedAI
 
     void EnterCombat(Unit* /*who*/) override
     {
-        events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 30000);
+        events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 6s, 10s);
         events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET, urand(45000, 55000));
-        events.ScheduleEvent(EVENT_GUARD_KNOCKBACK, 10000);
+        events.ScheduleEvent(EVENT_GUARD_KNOCKBACK, 12s, 16s);
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -278,7 +278,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
                 case EVENT_GUARD_WHIRLWIND_END:
                     events.CancelEvent(EVENT_GUARD_WHIRLWIND_RANDOM);
                     whirlwind = false;
-                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, urand(25000, 40000));
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 500ms, 9s);
                     break;
                 case EVENT_GUARD_AGGRO_RESET:
                     if (aggroReset == true)
@@ -315,7 +315,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
                     break;
                 case EVENT_GUARD_KNOCKBACK:
                     DoCastVictim(SPELL_GUARD_KNOCKBACK);
-                    events.RepeatEvent(urand(10000, 20000));
+                    events.RepeatEvent(21, 37s);
                     break;
             }
         }
