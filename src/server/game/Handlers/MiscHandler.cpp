@@ -1607,9 +1607,7 @@ void WorldSession::HandleQueryInspectAchievements(WorldPacket& recv_data)
 
     Player* player = ObjectAccessor::GetPlayer(*_player, guid);
     if (!player)
-    {
         return;
-    }
 
     player->SendRespondInspectAchievements(_player);
 }
