@@ -407,7 +407,7 @@ struct boss_cthun : public BossAI
             //Spawn flesh tentacle
             for (uint8 i = 0; i < 2; i++)
             {
-                me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
+                me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             }
 
             ScheduleTasks();
@@ -565,6 +565,14 @@ struct npc_eye_tentacle : public ScriptedAI
         {
             portal->SetReactState(REACT_PASSIVE);
             _portalGUID = portal->GetGUID();
+
+            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+            {
+                if (Creature* creature = summoner->ToCreature())
+                {
+                    creature->AI()->JustSummoned(portal);
+                }
+            }
         }
 
         SetCombatMovement(false);
@@ -628,6 +636,14 @@ struct npc_claw_tentacle : public ScriptedAI
         {
             portal->SetReactState(REACT_PASSIVE);
             _portalGUID = portal->GetGUID();
+
+            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+            {
+                if (Creature* creature = summoner->ToCreature())
+                {
+                    creature->AI()->JustSummoned(portal);
+                }
+            }
         }
     }
 
@@ -687,6 +703,14 @@ struct npc_giant_claw_tentacle : public ScriptedAI
         {
             portal->SetReactState(REACT_PASSIVE);
             _portalGUID = portal->GetGUID();
+
+            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+            {
+                if (Creature* creature = summoner->ToCreature())
+                {
+                    creature->AI()->JustSummoned(portal);
+                }
+            }
         }
     }
 
@@ -820,6 +844,14 @@ struct npc_giant_eye_tentacle : public ScriptedAI
         {
             portal->SetReactState(REACT_PASSIVE);
             _portalGUID = portal->GetGUID();
+
+            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+            {
+                if (Creature* creature = summoner->ToCreature())
+                {
+                    creature->AI()->JustSummoned(portal);
+                }
+            }
         }
     }
 
