@@ -1,3 +1,4 @@
+-- DB update 2022_09_28_08 -> 2022_10_01_00
 --
 -- Yougotta 00006 Ruins of Silvermoon Eversong Woods 
 -- ITEM Unstable Mana Crystal (20743) 1x from all OBJECT Unstable Mana Crystal Crate (180600) in static spawns on a randomized timer that can all be up at once
