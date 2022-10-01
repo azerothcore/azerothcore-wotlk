@@ -403,7 +403,7 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
     if (isNeedPrintInfo)
     {
         LOG_INFO("server.loading", " ");
-        LOG_INFO("server.loading", "Loading modules configuration...");
+        LOG_INFO("server.loading", "Loading Modules Configuration...");
     }
 
     // Start loading module configs
