@@ -70,6 +70,7 @@ enum Spells
     // Tentacles
     SPELL_SUBMERGE_VISUAL                       = 26234,
     SPELL_BIRTH                                 = 26262,
+    SPELL_ROCKY_GROUND_IMPACT                   = 26271,
 
     // Areatriggers
     SPELL_SPIT_OUT                              = 25383,
@@ -520,6 +521,8 @@ struct boss_cthun : public BossAI
         if (creature->GetEntry() == NPC_FLESH_TENTACLE)
         {
             ++_fleshTentaclesKilled;
+
+            creature->CastSpell(creature, SPELL_ROCKY_GROUND_IMPACT, true);
 
             if (_fleshTentaclesKilled > 1)
             {
