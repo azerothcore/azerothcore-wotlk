@@ -648,7 +648,7 @@ class spell_dk_dancing_rune_weapon : public AuraScript
         {
             target = player->GetMeleeHitRedirectTarget(target);
             CalcDamageInfo damageInfo;
-            player->CalculateMeleeDamage(target, 0, &damageInfo, eventInfo.GetDamageInfo()->GetAttackType());
+            player->CalculateMeleeDamage(target, &damageInfo, eventInfo.GetDamageInfo()->GetAttackType());
             for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
             {
                 Unit::DealDamageMods(target, damageInfo.damages[i].damage, &damageInfo.damages[i].absorb);

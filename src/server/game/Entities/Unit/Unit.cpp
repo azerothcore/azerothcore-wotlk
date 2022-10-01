@@ -1450,7 +1450,7 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss,
 }
 
 // TODO for melee need create structure as in
-void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType, const bool sittingVictim)
+void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, WeaponAttackType attackType, const bool sittingVictim)
 {
     damageInfo->attacker         = this;
     damageInfo->target           = victim;
@@ -2561,7 +2561,7 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
         // attack can be redirected to another target
         victim = GetMeleeHitRedirectTarget(victim);
         CalcDamageInfo damageInfo;
-        CalculateMeleeDamage(victim, 0, &damageInfo, attType, sittingVictim);
+        CalculateMeleeDamage(victim, &damageInfo, attType, sittingVictim);
 
         // Send log damage message to client
         for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
