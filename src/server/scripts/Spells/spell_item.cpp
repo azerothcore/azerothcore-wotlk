@@ -34,7 +34,7 @@
 enum MassiveSeaforiumCharge
 {
     ITEM_MASSIVE_SEAFORIUM_CHARGE = 39213,
-}
+};
 
 class spell_item_massive_seaforium_charge : public SpellScript
 {
