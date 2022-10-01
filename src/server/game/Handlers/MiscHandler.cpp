@@ -1041,16 +1041,6 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (!GetPlayer()->IsWithinDistInMap(player, INSPECT_DISTANCE, false))
-    {
-        return;
-    }
-
-    if (GetPlayer()->IsValidAttackTarget(player))
-    {
-        return;
-    }
-
     uint32 talent_points = 0x47;
     uint32 guid_size = player->GetPackGUID().size();
     WorldPacket data(SMSG_INSPECT_TALENT, guid_size + 4 + talent_points);
