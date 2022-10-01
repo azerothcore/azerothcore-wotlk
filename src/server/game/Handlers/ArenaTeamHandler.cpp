@@ -34,18 +34,15 @@ void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
     recvData >> guid;
     LOG_DEBUG("network", "Inspect Arena stats ({})", guid.ToString());
 
-    Player* player = ObjectAccessor::FindPlayer(guid);
-    if (!player)
+    if (Player* player = ObjectAccessor::FindPlayer(guid))
     {
-        return;
-    }
-
-    for (uint8 i = 0; i < MAX_ARENA_SLOT; ++i)
-    {
-        if (uint32 a_id = player->GetArenaTeamId(i))
+        for (uint8 i = 0; i < MAX_ARENA_SLOT; ++i)
         {
-            if (ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(a_id))
-                arenaTeam->Inspect(this, player->GetGUID());
+            if (uint32 a_id = player->GetArenaTeamId(i))
+            {
+                if (ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(a_id))
+                    arenaTeam->Inspect(this, player->GetGUID());
+            }
         }
     }
 }
