@@ -1073,16 +1073,6 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (!GetPlayer()->IsWithinDistInMap(player, INSPECT_DISTANCE, false))
-    {
-        return;
-    }
-
-    if (GetPlayer()->IsValidAttackTarget(player))
-    {
-        return;
-    }
-
     WorldPacket data(MSG_INSPECT_HONOR_STATS, 8 + 1 + 4 * 4);
     data << player->GetGUID();
     data << uint8(player->GetHonorPoints());
@@ -1617,16 +1607,6 @@ void WorldSession::HandleQueryInspectAchievements(WorldPacket& recv_data)
 
     Player* player = ObjectAccessor::GetPlayer(*_player, guid);
     if (!player)
-    {
-        return;
-    }
-
-    if (!GetPlayer()->IsWithinDistInMap(player, INSPECT_DISTANCE, false))
-    {
-        return;
-    }
-
-    if (GetPlayer()->IsValidAttackTarget(player))
     {
         return;
     }
