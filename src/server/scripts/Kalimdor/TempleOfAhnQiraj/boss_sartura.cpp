@@ -315,7 +315,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
                     break;
                 case EVENT_GUARD_KNOCKBACK:
                     DoCastVictim(SPELL_GUARD_KNOCKBACK);
-                    events.RepeatEvent(21, 37s);
+                    events.Repeat(21s, 37s);
                     break;
             }
         }
