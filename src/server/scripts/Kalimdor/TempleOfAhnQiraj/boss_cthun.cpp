@@ -229,14 +229,21 @@ struct boss_eye_of_cthun : public BossAI
                     {
                         DoCast(target, SPELL_GREEN_BEAM);
                     }
+
+                    task.Repeat();
                 }
                 else
                 {
-                    DoCastRandomTarget(SPELL_GREEN_BEAM);
+                    _scheduler.Schedule(5s, [this](TaskContext task)
+                    {
+                        DoCastRandomTarget(SPELL_GREEN_BEAM);
+
+                        task.SetGroup(GROUP_BEAM_PHASE);
+                        task.Repeat(3s);
+                    });
                 }
 
                 task.SetGroup(GROUP_BEAM_PHASE);
-                task.Repeat();
             })
             .Schedule(8s, [this](TaskContext task)
             {
