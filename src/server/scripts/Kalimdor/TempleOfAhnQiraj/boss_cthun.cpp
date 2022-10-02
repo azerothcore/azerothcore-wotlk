@@ -189,6 +189,7 @@ struct boss_eye_of_cthun : public BossAI
     {
         ScheduleTasks();
         BossAI::EnterCombat(who);
+        _beamTarget = who->GetGUID();
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -222,11 +223,22 @@ struct boss_eye_of_cthun : public BossAI
         _scheduler.
             Schedule(3s, [this](TaskContext task)
             {
-                DoCastRandomTarget(SPELL_GREEN_BEAM);
+                if (task.GetRepeatCounter() < 3)
+                {
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, _beamTarget))
+                    {
+                        DoCast(target, SPELL_GREEN_BEAM);
+                    }
+                }
+                else
+                {
+                    DoCastRandomTarget(SPELL_GREEN_BEAM);
+                }
+
                 task.SetGroup(GROUP_BEAM_PHASE);
                 task.Repeat();
             })
-            .Schedule(12s, [this](TaskContext task)
+            .Schedule(8s, [this](TaskContext task)
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                 {
@@ -360,6 +372,7 @@ private:
     bool ClockWise;
 
     uint32 _eyeTentacleCounter;
+    ObjectGuid _beamTarget;
     TaskScheduler _scheduler;
 };
 
@@ -441,7 +454,7 @@ struct boss_cthun : public BossAI
             }
 
             context.Repeat(30s);
-        }).Schedule(15s, [this](TaskContext context)
+        }).Schedule(8s, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
             {
@@ -453,7 +466,7 @@ struct boss_cthun : public BossAI
             }
 
             context.Repeat(1min);
-        }).Schedule(15s, [this](TaskContext context)
+        }).Schedule(38s, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
             {
