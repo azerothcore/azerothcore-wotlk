@@ -637,7 +637,7 @@ void LoadDBCStores(const std::string& dataPath)
         exit(1);
     }
 
-    LOG_INFO("server.loading", ">> Initialized {} data stores in {} ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Initialized {} Data Stores in {} ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 

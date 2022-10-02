@@ -10697,7 +10697,7 @@ void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask, Sp
     // Only mobs can manage threat lists
     if (CanHaveThreatList() && !HasUnitState(UNIT_STATE_EVADE))
     {
-        m_ThreatMgr.addThreat(victim, fThreat, schoolMask, threatSpell);
+        m_ThreatMgr.AddThreat(victim, fThreat, schoolMask, threatSpell);
     }
 }
 
@@ -14582,8 +14582,8 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
             // modify threat lists for new phasemask
             if (GetTypeId() != TYPEID_PLAYER)
             {
-                ThreatContainer::StorageType threatList = GetThreatMgr().getThreatList();
-                ThreatContainer::StorageType offlineThreatList = GetThreatMgr().getOfflineThreatList();
+                ThreatContainer::StorageType threatList = GetThreatMgr().GetThreatList();
+                ThreatContainer::StorageType offlineThreatList = GetThreatMgr().GetOfflineThreatList();
 
                 // merge expects sorted lists
                 threatList.sort();
@@ -15549,17 +15549,17 @@ void Unit::SendThreatListUpdate()
 {
     if (!GetThreatMgr().isThreatListEmpty())
     {
-        uint32 count = GetThreatMgr().getThreatList().size();
+        uint32 count = GetThreatMgr().GetThreatList().size();
 
         //LOG_DEBUG("entities.unit", "WORLD: Send SMSG_THREAT_UPDATE Message");
         WorldPacket data(SMSG_THREAT_UPDATE, 8 + count * 8);
         data << GetPackGUID();
         data << uint32(count);
-        ThreatContainer::StorageType const& tlist = GetThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tlist = GetThreatMgr().GetThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
         {
             data << (*itr)->getUnitGuid().WriteAsPacked();
-            data << uint32((*itr)->getThreat() * 100);
+            data << uint32((*itr)->GetThreat() * 100);
         }
         SendMessageToSet(&data, false);
     }
@@ -15569,18 +15569,18 @@ void Unit::SendChangeCurrentVictimOpcode(HostileReference* pHostileReference)
 {
     if (!GetThreatMgr().isThreatListEmpty())
     {
-        uint32 count = GetThreatMgr().getThreatList().size();
+        uint32 count = GetThreatMgr().GetThreatList().size();
 
         LOG_DEBUG("entities.unit", "WORLD: Send SMSG_HIGHEST_THREAT_UPDATE Message");
         WorldPacket data(SMSG_HIGHEST_THREAT_UPDATE, 8 + 8 + count * 8);
         data << GetPackGUID();
         data << pHostileReference->getUnitGuid().WriteAsPacked();
         data << uint32(count);
-        ThreatContainer::StorageType const& tlist = GetThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tlist = GetThreatMgr().GetThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
         {
             data << (*itr)->getUnitGuid().WriteAsPacked();
-            data << uint32((*itr)->getThreat() * 100);
+            data << uint32((*itr)->GetThreat() * 100);
         }
         SendMessageToSet(&data, false);
     }
@@ -16510,7 +16510,7 @@ bool Unit::IsInCombatWith(Unit const* who) const
         return false;
     // Search in threat list
     ObjectGuid guid = who->GetGUID();
-    for (ThreatContainer::StorageType::const_iterator i = m_ThreatMgr.getThreatList().begin(); i != m_ThreatMgr.getThreatList().end(); ++i)
+    for (ThreatContainer::StorageType::const_iterator i = m_ThreatMgr.GetThreatList().begin(); i != m_ThreatMgr.GetThreatList().end(); ++i)
     {
         HostileReference* ref = (*i);
         // Return true if the unit matches
