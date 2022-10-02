@@ -13953,7 +13953,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(45002, 3180, 0, 10, 0, 1, 0, 1, 1, 'Flecked Raptor Scale'),
 	(45002, 3685, 0, 60, 0, 1, 0, 1, 1, 'Raptor Egg'),
 	(45002, 5635, 0, 8, 0, 1, 0, 1, 1, 'Sharp Claw'),
-	(45002, 24063, 24063, 5, 0, 1, 1, 1, 1, '(ReferenceTable)'),
+	(45002, 24063, 24063, 3, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(45002, 24107, 24107, 20, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(45002, 24732, 24732, 1, 0, 1, 0, 1, 1, '(ReferenceTable)'),
 	(45003, 730, 0, 40, 0, 1, 0, 1, 1, 'Murloc Eye'),
