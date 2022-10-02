@@ -285,7 +285,7 @@
                         else if(limit_A == 2)
                         {
                             itr->second->GetPlayer()->TextEmote("[Hinterland Verteidigung]: Die Allianz hat keine Ressourcen mehr uebrig! Die Horde gewinnt!");
-                            itr->second->GetPlayer().GetGUID();
+                            itr->second->GetPlayer()->GetGUID();
                             HandleWinMessage("Lok'thar ogar!");
                             HandleRewards(itr->second->GetPlayer(), 1500, true, false, false);
                             
@@ -315,7 +315,7 @@
                         else if(limit_H == 2)
                         {
                             itr->second->GetPlayer()->TextEmote("[Hinterland Verteidigung]: Die Horde hat keine Ressourcen mehr uebrig! Die Allianz gewinnt!");
-                            itr->second->GetPlayer().GetGUID();
+                            itr->second->GetPlayer()->GetGUID();
                             HandleWinMessage("Fuer die Allianz!");
                             HandleRewards(itr->second->GetPlayer(), 1500, true, false, false);
                             switch(itr->second->GetPlayer()->GetTeamId())
