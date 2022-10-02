@@ -261,7 +261,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
                     DoCastSelf(SPELL_GUARD_WHIRLWIND);
                     whirlwind = true;
                     events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_RANDOM, urand(3000, 7000));
-                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 15000);
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 8s);
                     break;
                 case EVENT_GUARD_WHIRLWIND_RANDOM:
                     if (whirlwind == true)
