@@ -8,3 +8,4 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 (15725, 1, 0, 0, 1, 0, 0, 0),
 (15726, 1, 0, 0, 1, 0, 0, 0);
 
+UPDATE `creature_template` SET `unit_flags` = `unit_flags` |33554432 WHERE `entry` IN (15910, 15904, 15896);
