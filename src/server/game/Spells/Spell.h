@@ -414,7 +414,7 @@ public:
     void EffectCastButtons(SpellEffIndex effIndex);
     void EffectRechargeManaGem(SpellEffIndex effIndex);
 
-    typedef std::set<Aura*> UsedSpellMods;
+    typedef std::unordered_set<Aura*> UsedSpellMods;
 
     void InitExplicitTargets(SpellCastTargets const& targets);
     void SelectExplicitTargets();
@@ -554,6 +554,8 @@ public:
     bool IsAutoActionResetSpell() const;
     bool IsIgnoringCooldowns() const;
 
+    bool IsTriggeredByAura(SpellInfo const* auraSpellInfo) const { return (auraSpellInfo == m_triggeredByAuraSpell.spellInfo); }
+
     bool IsDeletable() const { return !m_referencedFromCurrentSpell && !m_executedCurrently; }
     void SetReferencedFromCurrent(bool yes) { m_referencedFromCurrentSpell = yes; }
     bool IsInterruptable() const { return !m_executedCurrently; }
@@ -670,8 +672,8 @@ public:
     // ******************************************
     uint32 m_procAttacker;                // Attacker trigger flags
     uint32 m_procVictim;                  // Victim   trigger flags
-    uint32 m_procEx;
-    void   prepareDataForTriggerSystem(AuraEffect const* triggeredByAura);
+    uint32 m_hitMask;
+    void   prepareDataForTriggerSystem();
 
     // *****************************************
     // Spell target subsystem
@@ -739,6 +741,9 @@ public:
 
     struct HitTriggerSpell
     {
+        HitTriggerSpell(SpellInfo const* spellInfo, SpellInfo const* auraSpellInfo, int32 procChance) :
+                triggeredSpell(spellInfo), triggeredByAura(auraSpellInfo), chance(procChance) { }
+
         SpellInfo const* triggeredSpell;
         SpellInfo const* triggeredByAura;
         uint8 triggeredByEffIdx;
@@ -747,7 +752,7 @@ public:
 
     bool CanExecuteTriggersOnHit(uint8 effMask, SpellInfo const* triggeredByAura = nullptr) const;
     void PrepareTriggersExecutedOnHit();
-    typedef std::list<HitTriggerSpell> HitTriggerSpellList;
+    typedef std::vector<HitTriggerSpell> HitTriggerSpellList;
     HitTriggerSpellList m_hitTriggerSpells;
 
     // effect helpers
@@ -838,17 +843,4 @@ namespace Acore
 }
 
 typedef void(Spell::*pEffect)(SpellEffIndex effIndex);
-
-class ReflectEvent : public BasicEvent
-{
-    public:
-        ReflectEvent(Unit* caster, ObjectGuid targetGUID, SpellInfo const* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
-        bool Execute(uint64 e_time, uint32 p_time) override;
-
-    protected:
-        Unit* _caster;
-        ObjectGuid _targetGUID;
-        SpellInfo const* _spellInfo;
-};
-
 #endif
