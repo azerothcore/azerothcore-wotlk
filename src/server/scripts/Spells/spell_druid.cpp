@@ -93,7 +93,9 @@ enum DruidSpells
     SPELL_DRUID_LANGUISH                    = 71023,
     SPELL_DRUID_REJUVENATION_T10_PROC       = 70691,
     SPELL_DRUID_BALANCE_T10_BONUS           = 70718,
-    SPELL_DRUID_BALANCE_T10_BONUS_PROC      = 70721
+    SPELL_DRUID_BALANCE_T10_BONUS_PROC      = 70721,
+    SPELL_DRUID_ECLIPSE_LUNAR_PROC          = 48518,
+    SPELL_DRUID_ECLIPSE_SOLAR_PROC          = 48517
 };
 
 // 1178 - Bear Form (Passive)
@@ -1765,6 +1767,80 @@ class spell_dru_moonkin_form_passive_proc : public AuraScript
     }
 };
 
+class spell_dru_eclipse : public AuraScript
+{
+    PrepareAuraScript(spell_dru_eclipse);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_DRUID_ECLIPSE_LUNAR_PROC,
+                SPELL_DRUID_ECLIPSE_SOLAR_PROC
+            });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetActor()->HasAura(SPELL_DRUID_ECLIPSE_LUNAR_PROC) || eventInfo.GetActor()->HasAura(SPELL_DRUID_ECLIPSE_SOLAR_PROC))
+            return false;
+
+        return true;
+    }
+
+    bool CheckSolar(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || !(spellInfo->SpellFamilyFlags[0] & 4)) // Starfire
+            return false;
+
+        return _solarProcCooldownEnd <= std::chrono::steady_clock::now();
+    }
+
+    bool CheckLunar(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || !(spellInfo->SpellFamilyFlags[0] & 1)) // Wrath
+            return false;
+
+        // Reduced lunar proc chance (60% of normal)
+        if (!roll_chance_i(60))
+            return false;
+
+        return _lunarProcCooldownEnd <= std::chrono::steady_clock::now();
+    }
+
+    void ProcSolar(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        _solarProcCooldownEnd = std::chrono::steady_clock::now() + 30s;
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_DRUID_ECLIPSE_SOLAR_PROC, aurEff);
+    }
+
+    void ProcLunar(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        _lunarProcCooldownEnd = std::chrono::steady_clock::now() + 30s;
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_DRUID_ECLIPSE_LUNAR_PROC, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_eclipse::CheckProc);
+
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_dru_eclipse::CheckSolar, EFFECT_0, SPELL_AURA_DUMMY);
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_dru_eclipse::CheckLunar, EFFECT_1, SPELL_AURA_DUMMY);
+
+        OnEffectProc += AuraEffectProcFn(spell_dru_eclipse::ProcSolar, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_dru_eclipse::ProcLunar, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+
+    TimePoint _lunarProcCooldownEnd = std::chrono::steady_clock::time_point::min();
+    TimePoint _solarProcCooldownEnd = std::chrono::steady_clock::time_point::min();
+};
+
 void AddSC_druid_spell_scripts()
 {
     RegisterSpellScript(spell_dru_bear_form_passive);
@@ -1815,4 +1891,5 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_item_t6_trinket);
     RegisterSpellScript(spell_dru_t10_restoration_4p_bonus_dummy);
     RegisterSpellScript(spell_dru_moonkin_form_passive_proc);
+    RegisterSpellScript(spell_dru_eclipse);
 }
