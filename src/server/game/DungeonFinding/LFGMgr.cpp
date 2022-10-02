@@ -206,7 +206,7 @@ namespace lfg
 
         if (!result)
         {
-            LOG_ERROR("lfg", ">> Loaded 0 LFG Rntrance Positions. DB Table `lfg_dungeon_template` Is Empty!");
+            LOG_ERROR("lfg", ">> Loaded 0 LFG Entrance Positions. DB Table `lfg_dungeon_template` Is Empty!");
             LOG_INFO("server.loading", " ");
             return;
         }
