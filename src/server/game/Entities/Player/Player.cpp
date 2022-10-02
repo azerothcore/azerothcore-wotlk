@@ -6793,7 +6793,6 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
         return;
     }
 
-    float damage = 0.0f;
     for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
     {
         float minDamage = proto->Damage[i].DamageMin;
@@ -6815,13 +6814,11 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
         {
             if (minDamage > 0.f)
             {
-                damage = minDamage;
                 SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, minDamage, i);
             }
 
             if (maxDamage > 0.f)
             {
-                damage = maxDamage;
                 SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, maxDamage, i);
             }
         }
@@ -6831,8 +6828,14 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
     {
         for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
         {
-            SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, i == 0 ? BASE_MINDAMAGE : 0.f, i);
-            SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, i == 0 ? BASE_MAXDAMAGE : 0.f, i);
+            SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, 0.f, i);
+            SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, 0.f, i);
+        }
+
+        if (attType == BASE_ATTACK)
+        {
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, BASE_MINDAMAGE);
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, BASE_MAXDAMAGE);
         }
     }
 
@@ -6850,7 +6853,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
     if (IsInFeralForm())
         return;
 
-    if (CanModifyStats() && (damage || proto->Delay))
+    if (CanModifyStats() && (GetWeaponDamageRange(WeaponAttackType(attType), MAXDAMAGE) || proto->Delay))
         UpdateDamagePhysical(WeaponAttackType(attType));
 }
 
