@@ -1,3 +1,4 @@
+-- DB update 2022_10_02_00 -> 2022_10_02_01
 -- Earth shield heal is DAMAGE_CLASS_NONE, it won't scale
 -- Entry is unneeded
 DELETE FROM `spell_bonus_data` WHERE `entry`=379;
