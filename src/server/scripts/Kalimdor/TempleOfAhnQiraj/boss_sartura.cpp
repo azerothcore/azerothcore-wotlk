@@ -49,14 +49,15 @@ enum events
     EVENT_SPELL_BERSERK             = 4,
     EVENT_SARTURA_AGGRO_RESET       = 5,
     EVENT_SARTURA_AGGRO_RESET_END   = 6,
+    EVENT_SARTURA_SUNDERING_CLEAVE  = 7,
 
     // Sartura's Royal Guard
-    EVENT_GUARD_WHIRLWIND           = 7,
-    EVENT_GUARD_WHIRLWIND_RANDOM    = 8,
-    EVENT_GUARD_WHIRLWIND_END       = 9,
-    EVENT_GUARD_KNOCKBACK           = 10,
-    EVENT_GUARD_AGGRO_RESET         = 11,
-    EVENT_GUARD_AGGRO_RESET_END     = 12
+    EVENT_GUARD_WHIRLWIND           = 8,
+    EVENT_GUARD_WHIRLWIND_RANDOM    = 9,
+    EVENT_GUARD_WHIRLWIND_END       = 10,
+    EVENT_GUARD_KNOCKBACK           = 11,
+    EVENT_GUARD_AGGRO_RESET         = 12,
+    EVENT_GUARD_AGGRO_RESET_END     = 13
 };
 
 struct boss_sartura : public BossAI
@@ -99,6 +100,7 @@ struct boss_sartura : public BossAI
         events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 30000);
         events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(45000, 55000));
         events.ScheduleEvent(EVENT_SPELL_BERSERK, 10 * 60000);
+        events.ScheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, 2400ms, 3s);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -154,7 +156,6 @@ struct boss_sartura : public BossAI
                     events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
                     whirlwind = false;
                     events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
-                    DoCastVictim(SPELL_SUNDERING_CLEAVE, true);
                     break;
                 case EVENT_SARTURA_AGGRO_RESET:
                     if (aggroReset == false)
@@ -194,6 +195,18 @@ struct boss_sartura : public BossAI
                     {
                         DoCastSelf(SPELL_BERSERK);
                         berserked = true;
+                    }
+                    break;
+                case EVENT_SARTURA_SUNDERING_CLEAVE:
+                    if (whirlwind)
+                    {
+                        Milliseconds whirlwindTimer = events.GetTimeUntilEvent(EVENT_SARTURA_WHIRLWIND_END);
+                        events.RescheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, whirlwindTimer + 500ms);
+                    }
+                    else
+                    {
+                        DoCastVictim(SPELL_SUNDERING_CLEAVE, true);
+                        events.RescheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, 2400ms, 3s);
                     }
                     break;
                 default:
