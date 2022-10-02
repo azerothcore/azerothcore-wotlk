@@ -143,7 +143,7 @@ struct boss_sartura : public BossAI
                     events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_END, 15000);
                     break;
                 case EVENT_SARTURA_WHIRLWIND_RANDOM:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
                         SetGazeOn(target);
                     }
@@ -220,7 +220,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
                     events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 15000);
                     break;
                 case EVENT_GUARD_WHIRLWIND_RANDOM:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
                         SetGazeOn(target);
                     }
