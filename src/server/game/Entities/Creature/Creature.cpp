@@ -2424,7 +2424,7 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
         return false;
 
     // Bosses cannot assist
-    if (isWorldBoss() || IsDungeonBoss())
+    if (m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_IGNORE_ASSISTANCE_CALL))
     {
         return false;
     }
