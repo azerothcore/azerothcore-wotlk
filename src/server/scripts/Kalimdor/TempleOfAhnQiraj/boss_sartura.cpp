@@ -205,7 +205,7 @@ struct boss_sartura : public BossAI
                     }
                     else
                     {
-                        DoCastVictim(SPELL_SUNDERING_CLEAVE, true);
+                        DoCastVictim(SPELL_SUNDERING_CLEAVE, false);
                         events.RescheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, 2400ms, 3s);
                     }
                     break;
