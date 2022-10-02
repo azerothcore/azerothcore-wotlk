@@ -1496,24 +1496,32 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
             return;
     }
 
-    // Physical Immune check (must immune to all damages)
+    // School Immune check
     uint8 immunedMask = 0;
+    bool hasNonPhysicalSchoolMask = false;
     for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
     {
         if (damageInfo->target->IsImmunedToDamageOrSchool(SpellSchoolMask(damageInfo->damages[i].damageSchoolMask)))
         {
             immunedMask |= (1 << i);
+            if (damageInfo->damages[i].damageSchoolMask != SPELL_SCHOOL_MASK_NORMAL)
+            {
+                hasNonPhysicalSchoolMask = true;
+            }
         }
     }
 
-    // Physical Immune check
-    if (immunedMask == ((1 << 0) | (1 << 1)))
+    // School Immune check
+    if (immunedMask & ((1 << 0) | (1 << 1)))
     {
-        damageInfo->HitInfo       |= HITINFO_NORMALSWING;
-        damageInfo->TargetState    = VICTIMSTATE_IS_IMMUNE;
+        if (hasNonPhysicalSchoolMask || immunedMask == ((1 << 0) | (1 << 1)))
+        {
+            damageInfo->HitInfo |= HITINFO_NORMALSWING;
+            damageInfo->TargetState = VICTIMSTATE_IS_IMMUNE;
 
-        damageInfo->procEx        |= PROC_EX_IMMUNE;
-        return;
+            damageInfo->procEx |= PROC_EX_IMMUNE;
+            return;
+        }
     }
 
     for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
@@ -1973,7 +1981,6 @@ bool Unit::IsDamageReducedByArmor(SpellSchoolMask schoolMask, SpellInfo const* s
 
 uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, const uint32 damage, SpellInfo const* spellInfo, uint8 attackerLevel, WeaponAttackType /*attackType*/)
 {
-    uint32 newdamage = 0;
     float armor = float(victim->GetArmor());
 
     // Ignore enemy armor by SPELL_AURA_MOD_TARGET_RESISTANCE aura
