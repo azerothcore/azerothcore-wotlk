@@ -1140,6 +1140,9 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         {
             uint32 unDamage = health < damage ? health : damage;
             bool damagedByPlayer = unDamage && attacker && attacker->m_movedByPlayer != nullptr;
+            //npcbot: npcbots' damage allways counts towards damage requirement
+            damagedByPlayer |= attacker && attacker->GetTypeId() == TYPEID_UNIT && attacker->ToCreature()->IsNPCBotOrPet();
+            //end npcbot
             victim->ToCreature()->LowerPlayerDamageReq(unDamage, damagedByPlayer);
         }
     }
