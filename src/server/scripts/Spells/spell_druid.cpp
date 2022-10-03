@@ -1765,6 +1765,56 @@ class spell_dru_moonkin_form_passive_proc : public AuraScript
     }
 };
 
+// 24932 - Leader of the Pack
+class spell_dru_leader_of_the_pack : public AuraScript
+{
+    PrepareAuraScript(spell_dru_leader_of_the_pack);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_DRUID_IMP_LEADER_OF_THE_PACK_R1,
+            SPELL_DRUID_IMP_LEADER_OF_THE_PACK_HEAL,
+            SPELL_DRUID_IMP_LEADER_OF_THE_PACK_MANA
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        if (!aurEff->GetAmount())
+            return;
+
+        Unit* caster = eventInfo.GetActor();
+        if (caster->ToPlayer()->HasSpellCooldown(SPELL_DRUID_IMP_LEADER_OF_THE_PACK_HEAL))
+            return;
+
+        int32 amount = caster->CountPctFromMaxHealth(aurEff->GetAmount());
+        caster->CastCustomSpell(SPELL_DRUID_IMP_LEADER_OF_THE_PACK_HEAL, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true);
+
+        // Because of how proc system works, we can't store proc cd on db, it would be applied to entire aura
+        // so aura could only proc once per 6 seconds, independently of caster
+        caster->ToPlayer()->AddSpellCooldown(SPELL_DRUID_IMP_LEADER_OF_THE_PACK_HEAL, 0, 6000);
+
+        // only proc on self
+        if (aurEff->GetCasterGUID() != caster->GetGUID())
+            return;
+
+        AuraEffect const* impLotpMana = caster->GetAuraEffectOfRankedSpell(SPELL_DRUID_IMP_LEADER_OF_THE_PACK_R1, EFFECT_1, aurEff->GetCasterGUID());
+        if (!impLotpMana)
+            return;
+
+        int32 manaAmount = CalculatePct(static_cast<int32>(caster->GetMaxPower(POWER_MANA)), impLotpMana->GetAmount());
+        caster->CastCustomSpell(SPELL_DRUID_IMP_LEADER_OF_THE_PACK_MANA, SPELLVALUE_BASE_POINT0, manaAmount, (Unit*)nullptr, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_leader_of_the_pack::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     RegisterSpellScript(spell_dru_bear_form_passive);
@@ -1815,4 +1865,5 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_item_t6_trinket);
     RegisterSpellScript(spell_dru_t10_restoration_4p_bonus_dummy);
     RegisterSpellScript(spell_dru_moonkin_form_passive_proc);
+    RegisterSpellScript(spell_dru_leader_of_the_pack);
 }
