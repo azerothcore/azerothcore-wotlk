@@ -97,7 +97,7 @@ void LoadGameObjectModelList(std::string const& dataPath)
 
     fclose(model_list_file);
 
-    LOG_INFO("server.loading", ">> Loaded {} GameObject models in {} ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} GameObject Models in {} ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 

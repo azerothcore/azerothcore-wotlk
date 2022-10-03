@@ -170,7 +170,7 @@ namespace lfg
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", ">> Loaded {} lfg dungeon rewards in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} LFG Dungeon Rewards in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
 
@@ -213,7 +213,7 @@ namespace lfg
 
         if (!result)
         {
-            LOG_ERROR("lfg", ">> Loaded 0 lfg entrance positions. DB table `lfg_dungeon_template` is empty!");
+            LOG_ERROR("lfg", ">> Loaded 0 LFG Entrance Positions. DB Table `lfg_dungeon_template` Is Empty!");
             LOG_INFO("server.loading", " ");
             return;
         }
@@ -240,7 +240,7 @@ namespace lfg
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", ">> Loaded {} lfg entrance positions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} LFG Entrance Positions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
 
         // Fill all other teleport coords from areatriggers
