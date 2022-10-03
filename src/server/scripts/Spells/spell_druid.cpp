@@ -1815,7 +1815,7 @@ class spell_dru_eclipse : public AuraScript
         PreventDefaultAction();
 
         _solarProcCooldownEnd = std::chrono::steady_clock::now() + 30s;
-        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_DRUID_ECLIPSE_SOLAR_PROC, aurEff);
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_DRUID_ECLIPSE_SOLAR_PROC, TRIGGERED_FULL_MASK, nullptr, aurEff);
     }
 
     void ProcLunar(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -1823,7 +1823,7 @@ class spell_dru_eclipse : public AuraScript
         PreventDefaultAction();
 
         _lunarProcCooldownEnd = std::chrono::steady_clock::now() + 30s;
-        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_DRUID_ECLIPSE_LUNAR_PROC, aurEff);
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_DRUID_ECLIPSE_LUNAR_PROC, TRIGGERED_FULL_MASK, nullptr, aurEff);
     }
 
     void Register() override
