@@ -403,12 +403,12 @@ class spell_item_lil_phylactery : public AuraScript
         return eventInfo.GetActionTarget() && (eventInfo.GetActionTarget()->GetTypeId() != TYPEID_UNIT || eventInfo.GetActionTarget()->ToCreature()->isWorldBoss());
     }
 
-    void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo&  /*eventInfo*/)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo&  /*eventInfo*/)
     {
         PreventDefaultAction();
 
         if (Unit* critter = ObjectAccessor::GetUnit(*GetUnitOwner(), GetUnitOwner()->GetCritterGUID()))
-            GetUnitOwner()->CastSpell(critter, 69731 /*SPELL_LICH_PET_AURA_ON_KILL*/, true);
+            GetUnitOwner()->CastSpell(critter, 69731 /*SPELL_LICH_PET_AURA_ON_KILL*/, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -954,10 +954,10 @@ class spell_item_trauma : public AuraScript
         return eventInfo.GetActionTarget();
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        GetUnitOwner()->CastSpell(eventInfo.GetActionTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+        GetUnitOwner()->CastSpell(eventInfo.GetActionTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -971,7 +971,7 @@ class spell_item_blade_ward_enchant : public AuraScript
 {
     PrepareAuraScript(spell_item_blade_ward_enchant);
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         if (!eventInfo.GetActionTarget())
@@ -982,7 +982,7 @@ class spell_item_blade_ward_enchant : public AuraScript
         if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(64442 /*SPELL_BLADE_WARDING*/))
         {
             int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
-            eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
+            eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true, nullptr, aurEff);
         }
     }
 
@@ -1628,9 +1628,9 @@ class spell_item_fate_rune_of_unsurpassed_vigor : public AuraScript
         return ValidateSpellInfo({ SPELL_UNSURPASSED_VIGOR });
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
-        GetTarget()->CastSpell(GetTarget(), SPELL_UNSURPASSED_VIGOR, true);
+        GetTarget()->CastSpell(GetTarget(), SPELL_UNSURPASSED_VIGOR, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -2247,7 +2247,7 @@ class spell_item_unsated_craving : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(eventInfo.GetActionTarget(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, TRIGGERED_FULL_MASK);
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActionTarget(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, TRIGGERED_FULL_MASK, nullptr, aurEff);
     }
 
     void Register() override
@@ -2261,7 +2261,7 @@ class spell_item_shadows_fate : public AuraScript
 {
     PrepareAuraScript(spell_item_shadows_fate);
 
-    void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
@@ -2270,7 +2270,7 @@ class spell_item_shadows_fate : public AuraScript
         if (!caster || !target)
             return;
 
-        caster->CastSpell(target, SPELL_SOUL_FEAST, TRIGGERED_FULL_MASK);
+        caster->CastSpell(target, SPELL_SOUL_FEAST, TRIGGERED_FULL_MASK, nullptr, aurEff);
     }
 
     void Register() override
@@ -4029,7 +4029,7 @@ class spell_item_alchemists_stone : public AuraScript
                 });
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
@@ -4053,7 +4053,7 @@ class spell_item_alchemists_stone : public AuraScript
             }
 
             int32 amount = CalculatePct(spellInfo->Effects[i].CalcValue(caster), 40);
-            caster->CastCustomSpell(spellId, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true);
+            caster->CastCustomSpell(spellId, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true, nullptr, aurEff);
         }
     }
 
@@ -4096,7 +4096,7 @@ public:
                     });
         }
 
-        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
             Unit* caster = eventInfo.GetActor();
@@ -4113,7 +4113,7 @@ public:
                 if (player->GetWeaponForAttack(OFF_ATTACK, true) && urand(0, 1))
                     spellId = SPELL_MANIFEST_ANGER_OFF_HAND;
 
-            caster->CastSpell(target, spellId, true);
+            caster->CastSpell(target, spellId, true, nullptr, aurEff);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -4207,7 +4207,7 @@ class spell_item_aura_of_madness : public AuraScript
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
         uint32 spellId = Acore::Containers::SelectRandomContainerElement(triggeredSpells[caster->getClass()]);
-        caster->CastSpell(caster, spellId, aurEff);
+        caster->CastSpell(caster, spellId, true, nullptr, aurEff);
 
         if (roll_chance_i(10))
             caster->Unit::Say(SAY_MADNESS);
@@ -4369,7 +4369,7 @@ public:
                 return;
 
             uint32 spellId = Acore::Containers::SelectRandomContainerElement(randomSpells);
-            caster->CastSpell(caster, spellId, aurEff);
+            caster->CastSpell(caster, spellId, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -4436,7 +4436,7 @@ class spell_item_frozen_shadoweave : public AuraScript
 
         int32 amount = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
         Unit* caster = eventInfo.GetActor();
-        caster->CastCustomSpell(SPELL_SHADOWMEND, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true);
+        caster->CastCustomSpell(SPELL_SHADOWMEND, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -4461,10 +4461,10 @@ class spell_item_healing_touch_refund : public AuraScript
         return ValidateSpellInfo({ SPELL_HEALING_TOUCH_MANA });
     }
 
-    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_HEALING_TOUCH_MANA, true);
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_HEALING_TOUCH_MANA, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -4513,7 +4513,7 @@ public:
             });
         }
 
-        void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
             Unit* caster = eventInfo.GetActor();
@@ -4530,7 +4530,7 @@ public:
                 case POWER_RAGE:
                     spellId = Rage;
                     break;
-                    // Death Knights can't use daggers, but oh well
+                // Death Knights can't use daggers, but oh well
                 case POWER_RUNIC_POWER:
                     spellId = RunicPower;
                     break;
@@ -4538,7 +4538,7 @@ public:
                     return;
             }
 
-            caster->CastSpell((Unit*)nullptr, spellId, true);
+            caster->CastSpell((Unit*)nullptr, spellId, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -4592,14 +4592,14 @@ class spell_item_mark_of_conquest : public AuraScript
         return ValidateSpellInfo({ SPELL_MARK_OF_CONQUEST_ENERGIZE });
     }
 
-    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         if (eventInfo.GetTypeMask() & (PROC_FLAG_DONE_RANGED_AUTO_ATTACK | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS))
         {
             // in that case, do not cast heal spell
             PreventDefaultAction();
             // but mana instead
-            eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_MARK_OF_CONQUEST_ENERGIZE, true);
+            eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_MARK_OF_CONQUEST_ENERGIZE, true, nullptr, aurEff);
         }
     }
 
@@ -4676,7 +4676,7 @@ class spell_item_pet_healing : public AuraScript
 
         int32 bp = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
         Unit* caster = eventInfo.GetActor();
-        caster->CastCustomSpell(SPELL_HEALTH_LINK, SPELLVALUE_BASE_POINT0, bp, (Unit*)nullptr, true);
+        caster->CastCustomSpell(SPELL_HEALTH_LINK, SPELLVALUE_BASE_POINT0, bp, (Unit*)nullptr, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -4706,7 +4706,7 @@ class spell_item_swift_hand_justice_dummy : public AuraScript
 
         Unit* caster = eventInfo.GetActor();
         int32 amount = caster->CountPctFromMaxHealth(aurEff->GetAmount());
-        caster->CastCustomSpell(SPELL_SWIFT_HAND_OF_JUSTICE_HEAL, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true);
+        caster->CastCustomSpell(SPELL_SWIFT_HAND_OF_JUSTICE_HEAL, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -4731,10 +4731,10 @@ class spell_item_totem_of_flowing_water : public AuraScript
         return ValidateSpellInfo({ SPELL_LESSER_HEALING_WAVE_MANA });
     }
 
-    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_LESSER_HEALING_WAVE_MANA, true);
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_LESSER_HEALING_WAVE_MANA, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -4784,10 +4784,10 @@ public:
             Unit* target = eventInfo.GetProcTarget();
 
             if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS)
-                caster->CastSpell(target, HealProc, aurEff);
+                caster->CastSpell(target, HealProc, true, nullptr, aurEff);
 
             if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
-                caster->CastSpell(target, DamageProc, aurEff);
+                caster->CastSpell(target, DamageProc, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -4864,10 +4864,10 @@ public:
 
             // Aggression checks are in the spell system... just cast and forget
             if (player->GetReputationRank(FACTION_ALDOR) == REP_EXALTED)
-                player->CastSpell(target, Aldors, aurEff);
+                player->CastSpell(target, Aldors, true, nullptr, aurEff);
 
             if (player->GetReputationRank(FACTION_SCRYERS) == REP_EXALTED)
-                player->CastSpell(target, Scryers, aurEff);
+                player->CastSpell(target, Scryers, true, nullptr, aurEff);
         }
 
         void Register() override

@@ -4540,7 +4540,7 @@ public:
         return ValidateSpellInfo({ _spellId1, _spellId2 });
     }
 
-    void HandleProc(AuraEffect* /*aurEff*/)
+    void HandleProc(AuraEffect* aurEff)
     {
         if (Unit* caster = GetCaster())
         {
@@ -4550,7 +4550,7 @@ public:
                 return;
             }
 
-            caster->CastSpell(GetUnitOwner(), _spellId1, true);
+            caster->CastSpell(GetUnitOwner(), _spellId1, true, nullptr, aurEff);
         }
     }
 
