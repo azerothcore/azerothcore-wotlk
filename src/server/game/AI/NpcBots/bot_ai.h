@@ -17,7 +17,7 @@ class TeleportFinishEvent;
 
 enum CombatRating : uint8;
 enum GossipOptionIcon;
-enum MeleeHitOutcome;
+enum MeleeHitOutcome : uint8;
 
 struct CleanDamage;
 struct CalcDamageInfo;
