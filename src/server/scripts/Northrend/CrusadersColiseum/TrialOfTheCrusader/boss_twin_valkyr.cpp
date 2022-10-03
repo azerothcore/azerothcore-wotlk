@@ -857,7 +857,7 @@ public:
                             resilienceReduction = damage - resilienceReduction;
                             damage -= resilienceReduction;
                             uint32 mitigated_damage = resilienceReduction;
-                            DamageInfo dmgInfo(caster, plr, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, mitigated_damage);
+                            DamageInfo dmgInfo(caster, plr, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, BASE_ATTACK, mitigated_damage);
                             Unit::CalcAbsorbResist(dmgInfo);
                             Unit::DealDamageMods(plr, damage, &absorb);
                             int32 overkill = damage - plr->GetHealth();
