@@ -2215,7 +2215,18 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
 
     //npcbot: totem emul step 2
     if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->ToCreature()->IsNPCBot())
+    {
+        summon->SetFaction(summoner->ToCreature()->GetFaction());
+        summon->SetPvP(summoner->ToCreature()->IsPvP());
         summon->SetCreatorGUID(summoner->GetGUID()); // see TempSummon::InitStats()
+        //set key flags if needed
+        if (!summoner->ToCreature()->IsFreeBot())
+        {
+            summon->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
+            summon->SetOwnerGUID(summoner->ToCreature()->GetBotOwner()->GetGUID());
+            summon->SetControlledByPlayer(true);
+        }
+    }
     //end npcbot
 
     summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);
