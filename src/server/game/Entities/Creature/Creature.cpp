@@ -932,6 +932,9 @@ void Creature::Update(uint32 diff)
     {
         // pussywizard:
         if (GetOwnerGUID().IsPlayer())
+        //npcbot: do not add bots to transport (handled inside AI)
+        if (!IsNPCBotOrPet())
+        //end npcbot
         {
             if (m_transportCheckTimer <= diff)
             {

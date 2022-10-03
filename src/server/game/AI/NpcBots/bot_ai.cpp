@@ -15197,7 +15197,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             {
                 if (me->GetDistance2d(master) < 20.f)
                 {
-                    master->GetTransport()->AddPassenger(me);
+                    master->GetTransport()->AddPassenger(me, true);
                     me->m_movementInfo.transport.pos.Relocate(master->GetTransOffset());
                     me->Relocate(GetAbsoluteTransportPosition(master));
                     me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
@@ -15206,7 +15206,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             else
             {
                 me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
-                me->GetTransport()->RemovePassenger(me);
+                me->GetTransport()->RemovePassenger(me, true);
             }
         }
         //Model size / Combat reach
@@ -15759,7 +15759,7 @@ bool bot_ai::FinishTeleport(/*uint32 mapId, uint32 instanceId, float x, float y,
     me->SetMap(map);
     if (master->GetTransport())
     {
-        master->GetTransport()->AddPassenger(me);
+        master->GetTransport()->AddPassenger(me, true);
         me->m_movementInfo.transport.pos.Relocate(master->GetTransOffset());
         me->Relocate(GetAbsoluteTransportPosition(master));
         me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
@@ -16049,7 +16049,7 @@ Unit* bot_ai::SpawnVehicle(uint32 creEntry, uint32 vehEntry)
         //vc->SetTransport(me->GetTransport());
         //vc->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         //vc->m_movementInfo.transport.guid = GetGUID();
-        me->GetTransport()->AddPassenger(vc);
+        me->GetTransport()->AddPassenger(vc, true);
 
         vc->m_movementInfo.transport.pos.Relocate(vehpos);
         vc->Relocate(x, y, z, o);

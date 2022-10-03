@@ -2107,7 +2107,7 @@ void bot_pet_ai::IsSummonedBy(Unit* summoner)
     SetPetStats(true);
     if (petOwner->GetTransport())
     {
-        petOwner->GetTransport()->AddPassenger(me);
+        petOwner->GetTransport()->AddPassenger(me, true);
         me->m_movementInfo.transport.pos.Relocate(petOwner->GetTransOffset());
         me->Relocate(bot_ai::GetAbsoluteTransportPosition(petOwner));
         me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
@@ -2276,7 +2276,7 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
             {
                 if (me->GetDistance2d(petOwner->GetBotOwner()) < 20.f)
                 {
-                    petOwner->GetBotOwner()->GetTransport()->AddPassenger(me);
+                    petOwner->GetBotOwner()->GetTransport()->AddPassenger(me, true);
                     me->m_movementInfo.transport.pos.Relocate(petOwner->GetBotOwner()->GetTransOffset());
                     me->Relocate(bot_ai::GetAbsoluteTransportPosition(petOwner->GetBotOwner()));
                     me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
@@ -2292,7 +2292,7 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
                         me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
                     break;
                 }
-                me->GetTransport()->RemovePassenger(me);
+                me->GetTransport()->RemovePassenger(me, true);
             }
         }
         //end DEBUG

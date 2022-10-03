@@ -592,6 +592,9 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     //obj->SetMap(this);
     obj->AddToWorld();
 
+    //npcbot: do not add bots to transport (handled inside AI)
+    if (!(obj->GetTypeId() == TYPEID_UNIT && obj->ToCreature()->IsNPCBotOrPet()))
+    //end npcbot
     if (checkTransport)
         if (!(obj->GetTypeId() == TYPEID_GAMEOBJECT && obj->ToGameObject()->IsTransport())) // dont add transport to transport ;d
             if (Transport* transport = GetTransportForPos(obj->GetPhaseMask(), obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj))

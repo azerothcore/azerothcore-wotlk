@@ -802,7 +802,7 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
     if (bot->GetTransport())
     {
         bot->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
-        bot->GetTransport()->RemovePassenger(bot);
+        bot->GetTransport()->RemovePassenger(bot, true);
     }
 
     if (bot->IsInWorld())
