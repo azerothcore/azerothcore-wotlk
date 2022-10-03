@@ -848,8 +848,7 @@ class spell_gen_fixate_aura : public AuraScript
     }
 };
 
-/* 64440 - Blade Warding
-   64568 - Blood Reserve */
+// 64440 - Blade Warding
 class spell_gen_proc_above_75 : public AuraScript
 {
     PrepareAuraScript(spell_gen_proc_above_75);
@@ -893,7 +892,7 @@ class spell_gen_knock_away : public SpellScript
         PreventHitDefaultEffect(effIndex);
         if (Unit* target = GetHitUnit())
             if (Creature* caster = GetCaster()->ToCreature())
-                caster->GetThreatMgr().modifyThreatPercent(target, -25); // Xinef: amount confirmed by onyxia and void reaver notes
+                caster->GetThreatMgr().ModifyThreatByPercent(target, -25); // Xinef: amount confirmed by onyxia and void reaver notes
     }
 
     void Register() override
@@ -999,7 +998,7 @@ class spell_gen_hate_to_zero : public SpellScript
         PreventHitDefaultEffect(effIndex);
         if (Unit* target = GetHitUnit())
             if (Creature* caster = GetCaster()->ToCreature())
-                caster->GetThreatMgr().modifyThreatPercent(target, -100);
+                caster->GetThreatMgr().ModifyThreatByPercent(target, -100);
     }
 
     void Register() override
@@ -3634,6 +3633,53 @@ class spell_gen_bandage : public SpellScript
     }
 };
 
+// Blood Reserve - 64568
+enum BloodReserve
+{
+    SPELL_GEN_BLOOD_RESERVE_AURA = 64568,
+    SPELL_GEN_BLOOD_RESERVE_HEAL = 64569
+};
+
+class spell_gen_blood_reserve : public AuraScript
+{
+    PrepareAuraScript(spell_gen_blood_reserve);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        if (!sSpellMgr->GetSpellInfo(SPELL_GEN_BLOOD_RESERVE_HEAL))
+            return false;
+        return true;
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (Unit* caster = eventInfo.GetActionTarget())
+        {
+            if (caster->HealthBelowPct(35))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = eventInfo.GetActionTarget();
+        caster->CastCustomSpell(SPELL_GEN_BLOOD_RESERVE_HEAL, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), caster, TRIGGERED_FULL_MASK, nullptr, aurEff);
+        caster->RemoveAura(SPELL_GEN_BLOOD_RESERVE_AURA);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_gen_blood_reserve::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_gen_blood_reserve::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 enum ParalyticPoison
 {
     SPELL_PARALYSIS = 35202
@@ -4571,6 +4617,29 @@ private:
     uint32 _aura;
 };
 
+// 818 Basic Campfire
+class spell_gen_basic_campfire : public SpellScript
+{
+    PrepareSpellScript(spell_gen_basic_campfire);
+
+    void ModDest(SpellDestination& dest)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (caster->GetMap()->GetGameObjectFloor(caster->GetPhaseMask(), caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ()) == -G3D::finf())
+            {
+                float ground = caster->GetMap()->GetHeight(dest._position.GetPositionX(), dest._position.GetPositionY(), dest._position.GetPositionZ() + caster->GetCollisionHeight() * 0.5f);
+                dest._position.m_positionZ = ground;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_gen_basic_campfire::ModDest, EFFECT_0, TARGET_DEST_CASTER_SUMMON);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4708,4 +4777,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_consume, "spell_consume_aq20", SPELL_CONSUME_LEECH_AQ20, SPELL_CONSUME_LEECH_HEAL_AQ20);
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq20", SPELL_HIVEZARA_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq40", SPELL_VEKNISS_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
+    RegisterSpellScript(spell_gen_basic_campfire);
 }

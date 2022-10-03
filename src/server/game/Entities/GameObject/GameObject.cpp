@@ -1744,11 +1744,13 @@ void GameObject::Use(Unit* user)
 
                             LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} chance {} roll: {}", skill, zone_skill, chance, roll);
 
+                            if (sScriptMgr->OnUpdateFishingSkill(player, skill, zone_skill, chance, roll))
+                            {
+                                player->UpdateFishingSkill();
+                            }
                             // but you will likely cause junk in areas that require a high fishing skill (not yet implemented)
                             if (chance >= roll)
                             {
-                                player->UpdateFishingSkill();
-
                                 //TODO: I do not understand this hack. Need some explanation.
                                 // prevent removing GO at spell cancel
                                 RemoveFromOwner();
@@ -2086,8 +2088,14 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
         if (owner->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
             trigger->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
         if (owner->IsFFAPvP())
-            trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        {
+            if (!trigger->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
+            {
+                sScriptMgr->OnFfaPvpStateUpdate(trigger, true);
+                trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+            }
 
+        }
         // xinef: Remove Immunity flags
         trigger->SetImmuneToNPC(false);
         // xinef: set proper orientation, fixes cast against stealthed targets

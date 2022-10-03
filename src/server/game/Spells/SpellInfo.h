@@ -377,7 +377,7 @@ public:
     std::array<uint32, 2> SpellVisual;
     uint32 SpellIconID;
     uint32 ActiveIconID;
-    uint32 SpellPriority;
+    uint32 Priority;
     std::array<char const*, 16> SpellName;
     std::array<char const*, 16> Rank;
     uint32 MaxTargetLevel;
@@ -462,6 +462,8 @@ public:
     bool IsBreakingStealth() const;
     bool IsRangedWeaponSpell() const;
     bool IsAutoRepeatRangedSpell() const;
+
+    bool IsAffected(uint32 familyName, flag96 const& familyFlags) const;
 
     bool IsAffectedBySpellMods() const;
     bool IsAffectedBySpellMod(SpellModifier const* mod) const;

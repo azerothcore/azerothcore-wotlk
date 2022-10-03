@@ -207,8 +207,8 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     {
         if (m_owner.IsInCombatWith(victim))
         {
-            m_owner.GetThreatMgr().modifyThreatPercent(victim, -100); // Reset threat to zero.
-            m_owner.GetThreatMgr().addThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
+            m_owner.GetThreatMgr().ModifyThreatByPercent(victim, -100); // Reset threat to zero.
+            m_owner.GetThreatMgr().AddThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
         }
     }
 
@@ -839,13 +839,13 @@ void Creature::Update(uint32 diff)
                             }
                         };
 
-                        if (GetThreatMgr().getThreatList().size() <= 1)
+                        if (GetThreatMgr().GetThreatListSize() <= 1)
                         {
                             EnterEvade();
                         }
                         else
                         {
-                            if (HostileReference* ref = GetThreatMgr().getOnlineContainer().getReferenceByTarget(m_cannotReachTarget))
+                            if (HostileReference* ref = GetThreatMgr().GetOnlineContainer().getReferenceByTarget(m_cannotReachTarget))
                             {
                                 ref->removeReference();
                                 SetCannotReachTarget();
@@ -2751,8 +2751,8 @@ void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_t
     uint32 categorycooldown = categoryId ? spellInfo->CategoryRecoveryTime : 0;
     if (Player* modOwner = GetSpellModOwner())
     {
-        modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, spellcooldown);
-        modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, categorycooldown);
+        modOwner->ApplySpellMod<SPELLMOD_COOLDOWN>(spellInfo->Id, spellcooldown);
+        modOwner->ApplySpellMod<SPELLMOD_COOLDOWN>(spellInfo->Id, categorycooldown);
     }
 
     SpellCategoryStore::const_iterator i_scstore = sSpellsByCategoryStore.find(categoryId);
@@ -3626,11 +3626,11 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
 {
     if (victim)
     {
-        float currentThreat = GetThreatMgr().getThreat(victim);
+        float currentThreat = GetThreatMgr().GetThreat(victim);
 
         if (percent != 0.0f)
         {
-            GetThreatMgr().modifyThreatPercent(victim, percent);
+            GetThreatMgr().ModifyThreatByPercent(victim, percent);
         }
 
         TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat);

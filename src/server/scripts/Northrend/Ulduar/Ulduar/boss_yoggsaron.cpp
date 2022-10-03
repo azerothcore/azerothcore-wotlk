@@ -2987,6 +2987,8 @@ public:
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
+            PreventDefaultAction();
+
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
 
             if (!damageInfo || !damageInfo->GetDamage())

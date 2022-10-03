@@ -310,7 +310,7 @@ void Spell::EffectEnvironmentalDMG(SpellEffIndex /*effIndex*/)
         unitTarget->ToPlayer()->EnvironmentalDamage(DAMAGE_FIRE, damage);
     else
     {
-        DamageInfo dmgInfo(m_caster, unitTarget, damage, m_spellInfo, m_spellInfo->GetSchoolMask(), SPELL_DIRECT_DAMAGE);
+        DamageInfo dmgInfo(m_caster, unitTarget, damage, m_spellInfo, m_spellInfo->GetSchoolMask(), SPELL_DIRECT_DAMAGE, BASE_ATTACK);
 
         uint32 absorb = dmgInfo.GetAbsorb();
         uint32 resist = dmgInfo.GetResist();
@@ -644,7 +644,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             if (damage < 0)
                 damage = 0;
 
-            damage = m_originalCaster->SpellDamageBonusDone(unitTarget, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE);
+            damage = m_originalCaster->SpellDamageBonusDone(unitTarget, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE, effIndex);
             damage = unitTarget->SpellDamageBonusTaken(m_originalCaster, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE);
         }
 
@@ -1356,7 +1356,7 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
         return;
 
     // add spell damage bonus
-    damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
+    damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE, effIndex);
     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
 
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
@@ -1463,7 +1463,7 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     m_damage += newDamage;
 }
 
-void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
+void Spell::EffectHeal(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
         return;
@@ -1550,12 +1550,12 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         // Death Pact - return pct of max health to caster
         else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] & 0x00080000)
         {
-            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, int32(caster->CountPctFromMaxHealth(damage)), HEAL);
+            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, int32(caster->CountPctFromMaxHealth(damage)), HEAL, effIndex);
             addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
         }
         else if (m_spellInfo->Id != 33778) // not lifebloom
         {
-            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, effIndex);
             addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
         }
 
@@ -1574,7 +1574,7 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
     }
 }
 
-void Spell::EffectHealPct(SpellEffIndex /*effIndex*/)
+void Spell::EffectHealPct(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
         return;
@@ -1586,13 +1586,13 @@ void Spell::EffectHealPct(SpellEffIndex /*effIndex*/)
     if (!m_originalCaster)
         return;
 
-    uint32 heal = m_originalCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, unitTarget->CountPctFromMaxHealth(damage), HEAL);
+    uint32 heal = m_originalCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, unitTarget->CountPctFromMaxHealth(damage), HEAL, effIndex);
     heal = unitTarget->SpellHealingBonusTaken(m_originalCaster, m_spellInfo, heal, HEAL);
 
     m_damage -= heal;
 }
 
-void Spell::EffectHealMechanical(SpellEffIndex /*effIndex*/)
+void Spell::EffectHealMechanical(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
         return;
@@ -1604,12 +1604,12 @@ void Spell::EffectHealMechanical(SpellEffIndex /*effIndex*/)
     if (!m_originalCaster)
         return;
 
-    uint32 heal = m_originalCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, uint32(damage), HEAL);
+    uint32 heal = m_originalCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, uint32(damage), HEAL, effIndex);
 
     m_damage -= unitTarget->SpellHealingBonusTaken(m_originalCaster, m_spellInfo, heal, HEAL);
 }
 
-void Spell::EffectHealthLeech(SpellEffIndex  /*effIndex*/)
+void Spell::EffectHealthLeech(SpellEffIndex  effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
@@ -1617,7 +1617,7 @@ void Spell::EffectHealthLeech(SpellEffIndex  /*effIndex*/)
     if (!unitTarget || !unitTarget->IsAlive() || damage < 0)
         return;
 
-    damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
+    damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE, effIndex);
     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
 
     LOG_DEBUG("spells.aura", "HealthLeech :{}", damage);
@@ -2342,7 +2342,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
     int32 duration = m_spellInfo->GetDuration();
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+        modOwner->ApplySpellMod<SPELLMOD_DURATION>(m_spellInfo->Id, duration);
 
     TempSummon* summon = nullptr;
 
@@ -3148,7 +3148,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     int32 duration = m_spellInfo->GetDuration();
 
     if(Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+        modOwner->ApplySpellMod<SPELLMOD_DURATION>(m_spellInfo->Id, duration);
 
     Player* owner = m_originalCaster->ToPlayer();
     if (!owner && m_originalCaster->ToCreature()->IsTotem())
@@ -3299,16 +3299,16 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         return;
     }
 
-    if (!unitTarget->GetThreatMgr().getOnlineContainer().empty())
+    if (!unitTarget->GetThreatMgr().GetOnlineContainer().empty())
     {
         // Also use this effect to set the taunter's threat to the taunted creature's highest value
-        float myThreat = unitTarget->GetThreatMgr().getThreat(m_caster);
-        float topThreat = unitTarget->GetThreatMgr().getOnlineContainer().getMostHated()->getThreat();
+        float myThreat = unitTarget->GetThreatMgr().GetThreat(m_caster);
+        float topThreat = unitTarget->GetThreatMgr().GetOnlineContainer().getMostHated()->GetThreat();
         if (topThreat > myThreat)
-            unitTarget->GetThreatMgr().doAddThreat(m_caster, topThreat - myThreat);
+            unitTarget->GetThreatMgr().DoAddThreat(m_caster, topThreat - myThreat);
 
         //Set aggro victim to caster
-        if (HostileReference* forcedVictim = unitTarget->GetThreatMgr().getOnlineContainer().getReferenceByTarget(m_caster))
+        if (HostileReference* forcedVictim = unitTarget->GetThreatMgr().GetOnlineContainer().getReferenceByTarget(m_caster))
             unitTarget->GetThreatMgr().setCurrentVictim(forcedVictim);
     }
 
@@ -3722,6 +3722,7 @@ void Spell::EffectInterruptCast(SpellEffIndex effIndex)
                 {
                     int32 duration = m_originalCaster->ModSpellDuration(m_spellInfo, unitTarget, m_originalCaster->CalcSpellDuration(m_spellInfo), false, 1 << effIndex);
                     unitTarget->ProhibitSpellSchool(curSpellInfo->GetSchoolMask(), duration/*spellInfo->GetDuration()*/);
+                    m_originalCaster->ProcSkillsAndAuras(unitTarget, PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG, PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG, PROC_SPELL_TYPE_MASK_ALL, PROC_SPELL_PHASE_HIT, PROC_HIT_INTERRUPT, nullptr, nullptr, nullptr);
                 }
                 ExecuteLogEffectInterruptCast(effIndex, unitTarget, curSpellInfo->Id);
                 unitTarget->InterruptSpell(CurrentSpellTypes(i), false);
@@ -4682,18 +4683,17 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
 void Spell::EffectAddExtraAttacks(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
-    {
         return;
-    }
 
-    if (!unitTarget || !unitTarget->IsAlive())
-    {
+    if (!unitTarget || !unitTarget->IsAlive() || !unitTarget->GetVictim())
         return;
-    }
 
-    unitTarget->AddExtraAttacks(damage);
+    if (unitTarget->m_extraAttacks)
+        return;
 
-    ExecuteLogEffectExtraAttacks(effIndex, unitTarget, damage);
+    unitTarget->m_extraAttacks = damage;
+
+    ExecuteLogEffectExtraAttacks(effIndex, unitTarget->GetVictim(), damage);
 }
 
 void Spell::EffectParry(SpellEffIndex /*effIndex*/)
@@ -5386,7 +5386,7 @@ void Spell::EffectModifyThreatPercent(SpellEffIndex /*effIndex*/)
     if (!unitTarget)
         return;
 
-    unitTarget->GetThreatMgr().modifyThreatPercent(m_caster, damage);
+    unitTarget->GetThreatMgr().ModifyThreatByPercent(m_caster, damage);
 }
 
 void Spell::EffectTransmitted(SpellEffIndex effIndex)
@@ -5816,19 +5816,8 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
     m_runesState = m_caster->ToPlayer()->GetRunesState();
 
     uint32 count = damage;
-    if (count == 0) count = 1;
-    for (uint32 j = 0; j < MAX_RUNES && count > 0; ++j)
-    {
-        if (player->GetRuneCooldown(j) && player->GetCurrentRune(j) == RuneType(m_spellInfo->Effects[effIndex].MiscValue))
-        {
-            if (m_spellInfo->Id == 45529)
-                if (player->GetBaseRune(j) != RuneType(m_spellInfo->Effects[effIndex].MiscValueB))
-                    continue;
-            player->SetRuneCooldown(j, 0);
-            player->SetGracePeriod(j, player->IsInCombat()); // xinef: reset grace period
-            --count;
-        }
-    }
+    if (count == 0)
+        count = 1;
 
     // Blood Tap
     if (m_spellInfo->Id == 45529 && count > 0)
@@ -5836,10 +5825,10 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
         for (uint32 l = 0; l < MAX_RUNES && count > 0; ++l)
         {
             // Check if both runes are on cd as that is the only time when this needs to come into effect
-            if ((player->GetRuneCooldown(l) && player->GetCurrentRune(l) == RuneType(m_spellInfo->Effects[effIndex].MiscValueB)) && (player->GetRuneCooldown(l + 1) && player->GetCurrentRune(l + 1) == RuneType(m_spellInfo->Effects[effIndex].MiscValueB)))
+            if ((player->GetRuneCooldown(l) && player->GetCurrentRune(l) == RUNE_BLOOD) && (player->GetRuneCooldown(l + 1) && player->GetCurrentRune(l + 1) == RUNE_BLOOD))
             {
                 // Should always update the rune with the lowest cd
-                if (player->GetRuneCooldown(l) >= player->GetRuneCooldown(l + 1))
+                if (l + 1 < MAX_RUNES && player->GetRuneCooldown(l) >= player->GetRuneCooldown(l + 1))
                     l++;
                 player->SetRuneCooldown(l, 0);
                 player->SetGracePeriod(l, player->IsInCombat()); // xinef: reset grace period
@@ -5847,6 +5836,15 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
             }
             else
                 break;
+        }
+    }
+
+    for (uint32 j = 0; j < MAX_RUNES && count > 0; ++j)
+    {
+        if (player->GetRuneCooldown(j) && player->GetCurrentRune(j) == RuneType(m_spellInfo->Effects[effIndex].MiscValue))
+        {
+            player->SetRuneCooldown(j, 0);
+            --count;
         }
     }
 
@@ -5859,7 +5857,7 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
 
         for (uint32 i = 0; i < MAX_RUNES; ++i)
         {
-            if (player->GetRuneCooldown(i) && (player->GetCurrentRune(i) == RUNE_FROST ||  player->GetCurrentRune(i) == RUNE_DEATH))
+            if (player->GetRuneCooldown(i) && (player->GetCurrentRune(i) == RUNE_FROST))
             {
                 player->SetRuneCooldown(i, 0);
                 player->SetGracePeriod(i, player->IsInCombat()); // xinef: reset grace period
@@ -6015,6 +6013,43 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
                 case 13049:
                     summonLevel = 55;
                     break;
+
+                // Cleansed Timberling Heart: Summon Timberling
+                case 5666:
+                    summonLevel = 7;
+                    break;
+
+                // Glowing Cat Figurine: Summon Ghost Saber
+                case 6084:
+                    // minLevel 19, maxLevel 20
+                    summonLevel = 20;
+                    break;
+
+                // Spiked Collar: Summon Felhunter
+                case 8176:
+                    summonLevel = 30;
+                    break;
+
+                // Dog Whistle: Summon Tracking Hound
+                case 9515:
+                    summonLevel = 30;
+                    break;
+
+                // Barov Peasant Caller: Death by Peasant
+                case 18307:
+                case 18308:
+                    summonLevel = 60;
+                    break;
+
+                // Thornling Seed: Plant Thornling
+                case 22792:
+                    summonLevel = 60;
+                    break;
+
+                // Cannonball Runner: Summon Crimson Cannon
+                case 6251:
+                    summonLevel = 61;
+                    break;
             }
         }
 
@@ -6024,7 +6059,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
     int32 duration = m_spellInfo->GetDuration();
 
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+        modOwner->ApplySpellMod<SPELLMOD_DURATION>(m_spellInfo->Id, duration);
 
     //TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
     Map* map = caster->GetMap();
@@ -6055,6 +6090,12 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
         // xinef: set calculated level
         summon->SetLevel(summonLevel);
+
+        // if summonLevel changed, set stats for calculated level
+        if (summonLevel != caster->getLevel())
+        {
+            ((Guardian*)summon)->InitStatsForLevel(summonLevel);
+        }
 
         // xinef: if we have more than one guardian, change follow angle
         if (summon->HasUnitTypeMask(UNIT_MASK_MINION) && totalNumGuardians > 1)
