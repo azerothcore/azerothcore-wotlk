@@ -373,7 +373,7 @@ private:
         //npcbot - calc for bots
         if (victim->GetTypeId() == TYPEID_UNIT/* && victim->ToCreature()->IsNPCBot()*/)
         {
-            if (remainingHealth <= 0 && !victim->HasSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL) &&
+            if (remainingHealth <= 0 &&/* !victim->GetSpellHistory()->HasCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL) &&*/
                 !victim->ToCreature()->HasSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL))
             {
                 // Cast healing spell, completely avoid damage

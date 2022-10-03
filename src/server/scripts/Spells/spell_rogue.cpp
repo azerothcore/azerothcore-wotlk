@@ -182,7 +182,7 @@ class spell_rog_cheat_death : public AuraScript
         if (Creature* bot = GetTarget()->ToCreature())
         {
             if (dmgInfo.GetDamage() < bot->GetHealth() || bot->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) ||
-                bot->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) || !roll_chance_i(absorbChance))
+                /*bot->GetSpellHistory()->HasCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) || */!roll_chance_i(absorbChance))
                 return;
 
             bot->CastSpell(bot, SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, true);
@@ -833,6 +833,12 @@ class spell_rog_setup : public AuraScript
         if (Player* target = GetTarget()->ToPlayer())
             if (eventInfo.GetActor() == target->GetSelectedUnit())
                 return true;
+
+        //npcbot
+        if (Creature* creature = GetTarget()->ToCreature())
+            if (creature->IsNPCBot())
+                return true;
+        //end npcbot
 
         return false;
     }
