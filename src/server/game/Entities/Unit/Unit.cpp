@@ -12677,24 +12677,6 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMa
             !(procTarget->IsTotem() && procTarget->ToTotem()->GetOwner()->IsPlayer()) &&
             !procTarget->IsPet()
                 )
-                //npcbot - update reactives for bots (victim)
-                if ((hitMask & PROC_HIT_PARRY) && GetTypeId() == TYPEID_UNIT &&
-                    ToCreature()->IsNPCBot() && ToCreature()->GetBotClass() == CLASS_HUNTER)
-                {
-                    ModifyAuraState(AURA_STATE_HUNTER_PARRY, true);
-                    StartReactiveTimer(REACTIVE_HUNTER_PARRY);
-                }
-                //end npcbot
-
-                //npcbot - update reactives for bots (attacker)
-                if ((hitMask & (PROC_HIT_DODGE | PROC_HIT_PARRY)) && GetTypeId() == TYPEID_UNIT &&
-                    ToCreature()->IsNPCBot() && ToCreature()->GetBotClass() == CLASS_WARRIOR)
-                {
-                    AddComboPoints(procTarget, 1);
-                    StartReactiveTimer(REACTIVE_OVERPOWER);
-                }
-                //TODO REACTIVE_WOLVERINE_BITE for bot hunter pets
-                //end npcbot
         {
             // On melee based hit/miss/resist/parry/dodge need to update skill (for victim and attacker)
             if (hitMask & (PROC_HIT_NORMAL | PROC_HIT_MISS | PROC_HIT_FULL_RESIST))
@@ -12743,6 +12725,14 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMa
                     ModifyAuraState(AURA_STATE_DEFENSE, true);
                     StartReactiveTimer(REACTIVE_DEFENSE);
                 }
+                //npcbot - update reactives for bots (victim)
+                if ((hitMask & PROC_HIT_PARRY) && GetTypeId() == TYPEID_UNIT &&
+                    ToCreature()->IsNPCBot() && ToCreature()->GetBotClass() == CLASS_HUNTER)
+                {
+                    ModifyAuraState(AURA_STATE_HUNTER_PARRY, true);
+                    StartReactiveTimer(REACTIVE_HUNTER_PARRY);
+                }
+                //end npcbot
             }
             else // For attacker
             {
@@ -12759,6 +12749,16 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMa
                     AddComboPoints(procTarget, 1);
                     StartReactiveTimer(REACTIVE_WOLVERINE_BITE);
                 }
+
+                //npcbot - update reactives for bots (attacker)
+                if ((hitMask & (PROC_HIT_DODGE | PROC_HIT_PARRY)) && GetTypeId() == TYPEID_UNIT &&
+                    ToCreature()->IsNPCBot() && ToCreature()->GetBotClass() == CLASS_WARRIOR)
+                {
+                    AddComboPoints(procTarget, 1);
+                    StartReactiveTimer(REACTIVE_OVERPOWER);
+                }
+                //TODO REACTIVE_WOLVERINE_BITE for bot hunter pets
+                //end npcbot
             }
         }
     }
