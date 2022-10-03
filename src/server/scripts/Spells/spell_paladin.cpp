@@ -125,7 +125,8 @@ enum PaladinSpells
 
 enum PaladinSpellIcons
 {
-    PALADIN_ICON_ID_RETRIBUTION_AURA             = 555
+    PALADIN_ICON_ID_RETRIBUTION_AURA             = 555,
+    PALADIN_ICON_ID_HAMMER_OF_THE_RIGHTEOUS      = 3023
 };
 
 class spell_pal_seal_of_command_aura : public AuraScript
@@ -1574,7 +1575,12 @@ public:
             PreventDefaultAction();
 
             if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_MELEE_AUTO_ATTACK))
-                return;
+            {
+                // Patch 3.2.0 Notes: Only auto-attacks and Hammer of the Righteous can place the debuff on the paladin's current target(s).
+                SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+                if (!spellInfo || spellInfo->SpellIconID != PALADIN_ICON_ID_HAMMER_OF_THE_RIGHTEOUS)
+                    return;
+            }
 
             // don't cast triggered, spell already has SPELL_ATTR4_CAN_CAST_WHILE_CASTING attr
             eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), DoTSpell, false);
