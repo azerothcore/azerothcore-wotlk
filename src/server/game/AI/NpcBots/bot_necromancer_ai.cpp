@@ -80,6 +80,25 @@ public:
         return new necromancer_botAI(creature);
     }
 
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        return creature->GetBotAI()->OnGossipHello(player, 0);
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    {
+        if (bot_ai* ai = creature->GetBotAI())
+            return ai->OnGossipSelect(player, creature, sender, action);
+        return true;
+    }
+
+    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code)
+    {
+        if (bot_ai* ai = creature->GetBotAI())
+            return ai->OnGossipSelectCode(player, creature, sender, action, code);
+        return true;
+    }
+
     struct necromancer_botAI : public bot_ai
     {
         necromancer_botAI(Creature* creature) : bot_ai(creature)

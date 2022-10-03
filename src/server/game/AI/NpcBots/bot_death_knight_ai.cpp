@@ -199,24 +199,27 @@ public:
         return new death_knight_botAI(creature);
     }
 
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        return creature->GetBotAI()->OnGossipHello(player, 0);
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    {
+        if (bot_ai* ai = creature->GetBotAI())
+            return ai->OnGossipSelect(player, creature, sender, action);
+        return true;
+    }
+
+    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code)
+    {
+        if (bot_ai* ai = creature->GetBotAI())
+            return ai->OnGossipSelectCode(player, creature, sender, action, code);
+        return true;
+    }
+
     struct death_knight_botAI : public bot_ai
     {
-/*
-        bool OnGossipHello(Player* player) override
-        {
-            return OnGossipHello(player, 0);
-        }
-
-        bool OnGossipSelect(Player* player, uint32 sender, uint32 action) override
-        {
-            return OnGossipSelect(player, me, sender, action);
-        }
-
-        bool OnGossipSelectCode(Player* player, uint32 sender, uint32 action, char const* code) override
-        {
-            return OnGossipSelectCode(player, me, sender, action, code);
-        }
-*/
         death_knight_botAI(Creature* creature) : bot_ai(creature)
         {
             _botclass = BOT_CLASS_DEATH_KNIGHT;

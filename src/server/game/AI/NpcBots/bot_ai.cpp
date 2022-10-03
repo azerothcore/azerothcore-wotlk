@@ -17366,7 +17366,7 @@ void bot_ai::InitBotCustomSpells()
         sinfo->RangeEntry = sSpellRangeStore.LookupEntry(1); //0 yds
         sinfo->ExplicitTargetMask = TARGET_FLAG_UNIT;
         sinfo->Attributes |= SPELL_ATTR0_IS_ABILITY | SPELL_ATTR0_PASSIVE;
-        sinfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_FROM_PROCS;
+        sinfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED;
         sinfo->AttributesEx4 |= SPELL_ATTR4_ALLOW_ENETRING_ARENA;
         sinfo->AttributesEx7 |= SPELL_ATTR7_DO_NOT_COUNT_FOR_PVP_SCOREBOARD;
 
@@ -17404,7 +17404,7 @@ void bot_ai::InitBotCustomSpells()
         sinfo->Attributes &= ~(SPELL_ATTR0_NOT_SHAPESHIFTED);
         sinfo->AttributesEx |= SPELL_ATTR1_NO_REFLECTION | SPELL_ATTR1_NO_REDIRECTION | SPELL_ATTR1_NO_THREAT;
         sinfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-        sinfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT | SPELL_ATTR3_INSTANT_TARGET_PROCS | SPELL_ATTR3_CAN_PROC_FROM_PROCS | SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
+        sinfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT | SPELL_ATTR3_DISABLE_PROC | SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED | SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
 
         sinfo->Effects[0].BasePoints = 1;
 
