@@ -1,6 +1,7 @@
 --
-DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_dru_eclipse';
-INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
+DELETE FROM `spell_script_names` WHERE `spell_id`=-48516;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (-48516, 'spell_dru_eclipse');
 
-UPDATE `spell_proc_event` SET `Cooldown`=0 WHERE `entry`=-48516; -- set cooldown to 0, handled by a script
+-- set cooldown to 0, handled by a script
+UPDATE `spell_proc_event` SET `Cooldown`=0 WHERE `entry`=-48516; 
