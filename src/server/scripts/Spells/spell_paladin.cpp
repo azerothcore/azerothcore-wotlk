@@ -1678,6 +1678,42 @@ class spell_pal_spiritual_attunement : public AuraScript
     }
 };
 
+// -53501 - Sheath of Light
+class spell_pal_sheath_of_light : public AuraScript
+{
+    PrepareAuraScript(spell_pal_sheath_of_light);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PALADIN_SHEATH_OF_LIGHT_HEAL });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetEffectiveHeal())
+            return;
+
+        Unit* caster = eventInfo.GetActor();
+        Unit* target = eventInfo.GetProcTarget();
+
+        SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_PALADIN_SHEATH_OF_LIGHT_HEAL);
+        int32 amount = CalculatePct(static_cast<int32>(healInfo->GetEffectiveHeal()), aurEff->GetAmount());
+
+        ASSERT(spellInfo->GetMaxTicks() > 0);
+        amount /= spellInfo->GetMaxTicks();
+
+        caster->CastCustomSpell(SPELL_PALADIN_SHEATH_OF_LIGHT_HEAL, SPELLVALUE_BASE_POINT0, amount, target, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_pal_sheath_of_light::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
 // 28789 - Holy Power
 class spell_pal_t3_6p_bonus : public AuraScript
 {
@@ -1778,5 +1814,6 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_seal_of_vengeance<SPELL_PALADIN_BLOOD_CORRUPTION, SPELL_PALADIN_SEAL_OF_CORRUPTION_DAMAGE>("spell_pal_seal_of_corruption");
     RegisterSpellScript(spell_pal_seals);
     RegisterSpellScript(spell_pal_spiritual_attunement);
+    RegisterSpellScript(spell_pal_sheath_of_light);
     RegisterSpellScript(spell_pal_t3_6p_bonus);
 }
