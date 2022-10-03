@@ -2542,6 +2542,63 @@ public:
     }
 };
 
+enum ArcaniteSpell
+{
+    SPELL_FLAME_BUFFET    = 9658,
+    SPELL_FLAME_BREATH    = 8873,
+
+    EVENT_FLAME_BUFFET    = 1,
+    EVENT_FLAME_BREATH    = 2
+};
+
+struct npc_arcanite_dragonling : public ScriptedAI
+{
+public:
+    npc_arcanite_dragonling(Creature* creature) : ScriptedAI(creature)
+    {
+        creature->SetCanModifyStats(true);
+        creature->SetReactState(REACT_AGGRESSIVE);
+    }
+
+    void Reset() override
+    {
+        events.Reset();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        events.ScheduleEvent(EVENT_FLAME_BUFFET, 4000);
+        events.ScheduleEvent(EVENT_FLAME_BREATH, 12000);
+    }
+
+    void IsSummonedBy(Unit* summoner) override
+    {
+        me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events.Update(diff);
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_FLAME_BUFFET:
+                me->CastSpell(me->GetVictim(), SPELL_FLAME_BUFFET, false);
+                events.RepeatEvent(12000);
+                break;
+            case EVENT_FLAME_BREATH:
+                me->CastSpell(me->GetVictim(), SPELL_FLAME_BREATH, false);
+                events.RepeatEvent(24000);
+                break;
+        }
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 void AddSC_npcs_special()
 {
     // Ours
@@ -2568,4 +2625,5 @@ void AddSC_npcs_special()
     new npc_firework();
     new npc_spring_rabbit();
     new npc_stable_master();
+    RegisterCreatureAI(npc_arcanite_dragonling);
 }
