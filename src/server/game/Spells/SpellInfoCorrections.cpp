@@ -4458,6 +4458,10 @@ void SpellMgr::LoadSpellInfoCorrections()
             }
         }
 
+        // disable proc for magnet auras, they're handled differently
+        if (spellInfo->HasAura(SPELL_AURA_SPELL_MAGNET))
+            spellInfo->ProcFlags = 0;
+
         if (spellInfo->ActiveIconID == 2158)  // flight
         {
             spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;

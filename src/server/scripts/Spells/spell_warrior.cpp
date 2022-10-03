@@ -173,7 +173,7 @@ class spell_warr_improved_spell_reflection : public AuraScript
         CustomSpellValues values;
         values.AddSpellMod(SPELLVALUE_MAX_TARGETS, aurEff->GetAmount());
         values.AddSpellMod(SPELLVALUE_RADIUS_MOD, 2000); // Base range = 100, final range = 20 value / 10000.0f = 0.2f
-        eventInfo.GetActor()->CastCustomSpell(SPELL_WARRIOR_IMPROVED_SPELL_REFLECTION_TRIGGER, values, eventInfo.GetActor(), TRIGGERED_FULL_MASK, nullptr);
+        eventInfo.GetActor()->CastCustomSpell(SPELL_WARRIOR_IMPROVED_SPELL_REFLECTION_TRIGGER, values, eventInfo.GetActor(), TRIGGERED_FULL_MASK, nullptr, aurEff);
     }
 
     void Register() override
@@ -569,7 +569,7 @@ class spell_warr_glyph_of_blocking : public AuraScript
     {
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
-        caster->CastSpell(caster, SPELL_WARRIOR_GLYPH_OF_BLOCKING, aurEff);
+        caster->CastSpell(caster, SPELL_WARRIOR_GLYPH_OF_BLOCKING, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -766,7 +766,7 @@ class spell_warr_second_wind : public AuraScript
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActionTarget();
         uint32 spellId = triggeredSpells[GetSpellInfo()->GetRank() - 1];
-        caster->CastSpell(caster, spellId, aurEff);
+        caster->CastSpell(caster, spellId, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -846,7 +846,7 @@ class spell_warr_sweeping_strikes : public AuraScript
             if (spellInfo && spellInfo->Id == SPELL_WARRIOR_EXECUTE && !_procTarget->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
             {
                 // If triggered by Execute (while target is not under 20% hp) deals normalized weapon damage
-                GetTarget()->CastSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2, aurEff);
+                GetTarget()->CastSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2, true, nullptr, aurEff);
             }
             else
             {
