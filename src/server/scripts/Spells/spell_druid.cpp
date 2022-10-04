@@ -1791,7 +1791,7 @@ class spell_dru_leader_of_the_pack : public AuraScript
             return;
 
         int32 amount = caster->CountPctFromMaxHealth(aurEff->GetAmount());
-        caster->CastCustomSpell(SPELL_DRUID_IMP_LEADER_OF_THE_PACK_HEAL, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true);
+        caster->CastCustomSpell(SPELL_DRUID_IMP_LEADER_OF_THE_PACK_HEAL, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true, nullptr, aurEff);
 
         // Because of how proc system works, we can't store proc cd on db, it would be applied to entire aura
         // so aura could only proc once per 6 seconds, independently of caster
