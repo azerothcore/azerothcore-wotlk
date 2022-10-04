@@ -1782,7 +1782,7 @@ class spell_pal_light_s_beacon : public AuraScript
         /// @todo: caster must be the healed unit to perform distance checks correctly
         ///        but that will break animation on clientside
         ///        caster in spell packets must be the healing unit
-        eventInfo.GetActor()->CastCustomSpell(healSpellId, SPELLVALUE_BASE_POINT0, heal, beaconTarget, true);
+        eventInfo.GetActor()->CastCustomSpell(healSpellId, SPELLVALUE_BASE_POINT0, heal, beaconTarget, true, nullptr, aurEff);
     }
 
     void Register() override
