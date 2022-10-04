@@ -852,7 +852,7 @@ class spell_rog_honor_among_thieves : public AuraScript
         return true;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
 
@@ -861,7 +861,7 @@ class spell_rog_honor_among_thieves : public AuraScript
             return;
 
         Unit* target = GetTarget();
-        target->CastSpell(target, aurEff->GetSpellEffectInfo().TriggerSpell, { aurEff, caster->GetGUID() });
+        target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, caster->GetGUID());
     }
 
     void Register() override
@@ -909,7 +909,7 @@ class spell_rog_honor_among_thieves_proc_aura : public AuraScript
             return;
 
         if (Player* player = caster->ToPlayer())
-            player->CastSpell(nullptr, SPELL_ROGUE_HONOR_AMONG_THIEVES_2, true);
+            player->CastSpell(player, SPELL_ROGUE_HONOR_AMONG_THIEVES_2, true);
     }
 
     void Register() override
