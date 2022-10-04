@@ -1733,8 +1733,6 @@ public:
     bool HasSpellMod(SpellModifier* mod, Spell* spell);
     template <SpellModOp op, class T>
     void ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell = nullptr) const;
-    void RestoreSpellMods(Spell* spell, uint32 ownerAuraId = 0, Aura* aura = nullptr);
-    void RestoreAllSpellMods(uint32 ownerAuraId = 0, Aura* aura = nullptr);
     static void ApplyModToSpell(SpellModifier* mod, Spell* spell);
     static bool HasSpellModApplied(SpellModifier* mod, Spell* spell);
     void SetSpellModTakingSpell(Spell* spell, bool apply);

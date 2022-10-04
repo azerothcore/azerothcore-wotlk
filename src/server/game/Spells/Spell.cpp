@@ -4422,9 +4422,6 @@ void Spell::finish(bool ok)
     {
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
         {
-            // Xinef: Restore spell mods in case of fail cast
-            m_caster->ToPlayer()->RestoreSpellMods(this);
-
             // Xinef: Reset cooldown event in case of fail cast
             if (m_spellInfo->IsCooldownStartedOnEvent())
                 m_caster->ToPlayer()->SendCooldownEvent(m_spellInfo, 0, 0, false);
