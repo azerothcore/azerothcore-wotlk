@@ -12231,7 +12231,7 @@ uint32 createProcHitMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCond
             hitMask |= PROC_HIT_ABSORB;
 
         // Don't set hit/crit hitMask if damage is nullified
-        bool const damageNullified = (damageInfo->HitInfo & (HITINFO_FULL_ABSORB | HITINFO_FULL_RESIST) != 0) || (hitMask & PROC_HIT_FULL_BLOCK) != 0;
+        bool const damageNullified = (damageInfo->HitInfo & (HITINFO_FULL_ABSORB | HITINFO_FULL_RESIST)) != 0 || (hitMask & PROC_HIT_FULL_BLOCK) != 0;
         if (!damageNullified)
         {
             // On crit
