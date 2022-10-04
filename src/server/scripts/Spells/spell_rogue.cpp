@@ -44,7 +44,10 @@ enum RogueSpells
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC        = 59628,
     SPELL_ROGUE_GLYPH_OF_BACKSTAB_TRIGGER       = 63975,
     SPELL_ROGUE_QUICK_RECOVERY_ENERGY           = 31663,
-    SPELL_ROGUE_CRIPPLING_POISON                = 3409
+    SPELL_ROGUE_CRIPPLING_POISON                = 3409,
+    SPELL_ROGUE_HONOR_AMONG_THIEVES             = 51698,
+    SPELL_ROGUE_HONOR_AMONG_THIEVES_PROC        = 52916,
+    SPELL_ROGUE_HONOR_AMONG_THIEVES_2           = 51699,
 };
 
 class spell_rog_savage_combat : public AuraScript
@@ -826,6 +829,95 @@ class spell_rog_turn_the_tables : public AuraScript
     }
 };
 
+// -51698, 51700, 51701 - Honor Among Thieves
+class spell_rog_honor_among_thieves : public AuraScript
+{
+    PrepareAuraScript(spell_rog_honor_among_thieves);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_ROGUE_HONOR_AMONG_THIEVES_2,
+            spellInfo->GetEffect(EFFECT_0).TriggerSpell
+        });
+    }
+
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || caster->HasAura(SPELL_ROGUE_HONOR_AMONG_THIEVES_2))
+            return false;
+
+        return true;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        Unit* target = GetTarget();
+        target->CastSpell(target, aurEff->GetSpellEffectInfo().TriggerSpell, { aurEff, caster->GetGUID() });
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_rog_honor_among_thieves::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_rog_honor_among_thieves::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 52916 - Honor Among Thieves (Proc)
+class spell_rog_honor_among_thieves_proc : public SpellScript
+{
+    PrepareSpellScript(spell_rog_honor_among_thieves_proc);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_HONOR_AMONG_THIEVES_PROC });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.clear();
+
+        Unit* target = GetOriginalCaster();
+        if (!target)
+            return;
+
+        targets.push_back(target);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rog_honor_among_thieves_proc::FilterTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_PARTY);
+    }
+};
+
+class spell_rog_honor_among_thieves_proc_aura : public AuraScript
+{
+    PrepareAuraScript(spell_rog_honor_among_thieves_proc_aura);
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        if (Player* player = caster->ToPlayer())
+            player->CastSpell(nullptr, SPELL_ROGUE_HONOR_AMONG_THIEVES_2, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_rog_honor_among_thieves_proc_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
@@ -847,4 +939,6 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_glyph_of_backstab);
     RegisterSpellScript(spell_rog_setup);
     RegisterSpellScript(spell_rog_turn_the_tables);
+    RegisterSpellScript(spell_rog_honor_among_thieves);
+    RegisterSpellAndAuraScriptPair(spell_rog_honor_among_thieves_proc, spell_rog_honor_among_thieves_proc_aura);
 }
