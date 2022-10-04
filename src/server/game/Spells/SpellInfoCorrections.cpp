@@ -4409,6 +4409,25 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(27);
     });
 
+    // Turn the tables
+    ApplySpellFix({
+        51627, // (Rank 1)
+        51628, // (Rank 2)
+        51629  // (Rank 3)
+    }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
+    });
+
+    ApplySpellFix({
+        52910, // Turn the tables
+        52914, // Turn the tables
+        52915  // Turn the tables
+    }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
