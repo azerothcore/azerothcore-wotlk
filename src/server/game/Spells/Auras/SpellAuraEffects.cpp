@@ -6434,10 +6434,10 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
         damage = target->CalculateAOEDamageReduction(damage, GetSpellInfo()->SchoolMask, caster);
     }
 
-    int32 dmg = damage;
-    int32 mitigatedDamage = cleanDamage.mitigated_damage;
     if (CanApplyResilience())
     {
+        int32 dmg = damage;
+        int32 mitigatedDamage = cleanDamage.mitigated_damage;
         int32 resilienceReduction = dmg;
         Unit::ApplyResilience(target, nullptr, &resilienceReduction, crit, CR_CRIT_TAKEN_SPELL);
 
