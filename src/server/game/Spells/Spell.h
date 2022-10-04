@@ -553,6 +553,7 @@ public:
     bool IsChannelActive() const { return m_caster->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0; }
     bool IsAutoActionResetSpell() const;
     bool IsIgnoringCooldowns() const;
+    bool IsProcDisabled() const { return (_triggeredCastFlags & TRIGGERED_DISALLOW_PROC_EVENTS) != 0; }
 
     bool IsTriggeredByAura(SpellInfo const* auraSpellInfo) const { return (auraSpellInfo == m_triggeredByAuraSpell.spellInfo); }
 
