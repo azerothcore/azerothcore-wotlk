@@ -872,6 +872,6 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_glyph_of_backstab);
     RegisterSpellScript(spell_rog_setup);
     RegisterSpellScript(spell_rog_turn_the_tables);
-    RegisterSpellScript(spell_rog_overkill_mos<SPELL_ROGUE_OVERKILL_BUFF>, "spell_rog_overkill");
-    RegisterSpellScript(spell_rog_overkill_mos<SPELL_ROGUE_MASTER_OF_SUBTLETY_BUFF>, "spell_rog_master_of_subtlety");
+    RegisterSpellScriptWithArgs(spell_rog_overkill_mos<SPELL_ROGUE_OVERKILL_BUFF>, "spell_rog_overkill");
+    RegisterSpellScriptWithArgs(spell_rog_overkill_mos<SPELL_ROGUE_MASTER_OF_SUBTLETY_BUFF>, "spell_rog_master_of_subtlety");
 }
