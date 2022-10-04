@@ -6747,6 +6747,9 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
         Unit::DealDamage(caster, caster, manaPerSecond, &cleanDamage, SELF_DAMAGE, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
     }
 
+    if (GetAuraType() == SPELL_AURA_OBS_MOD_HEALTH)
+        return;
+
     uint32 procAttacker = PROC_FLAG_DONE_PERIODIC;
     uint32 procVictim   = PROC_FLAG_TAKEN_PERIODIC;
     uint32 hitMask = (crit ? PROC_HIT_CRITICAL : PROC_HIT_NORMAL);
