@@ -93,7 +93,8 @@ enum DruidSpells
     SPELL_DRUID_LANGUISH                    = 71023,
     SPELL_DRUID_REJUVENATION_T10_PROC       = 70691,
     SPELL_DRUID_BALANCE_T10_BONUS           = 70718,
-    SPELL_DRUID_BALANCE_T10_BONUS_PROC      = 70721
+    SPELL_DRUID_BALANCE_T10_BONUS_PROC      = 70721,
+    SPELL_DRUID_BARKSKIN_01                 = 63058,
 };
 
 // 1178 - Bear Form (Passive)
@@ -1765,6 +1766,28 @@ class spell_dru_moonkin_form_passive_proc : public AuraScript
     }
 };
 
+// 63057 - Glyph of Barkskin
+class spell_dru_glyph_of_barkskin : public AuraScript
+{
+    PrepareAuraScript(spell_dru_glyph_of_barkskin);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_BARKSKIN_01 });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_DRUID_BARKSKIN_01, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_glyph_of_barkskin::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     RegisterSpellScript(spell_dru_bear_form_passive);
@@ -1815,4 +1838,5 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_item_t6_trinket);
     RegisterSpellScript(spell_dru_t10_restoration_4p_bonus_dummy);
     RegisterSpellScript(spell_dru_moonkin_form_passive_proc);
+    RegisterSpellScript(spell_dru_glyph_of_barkskin);
 }
