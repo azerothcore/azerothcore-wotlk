@@ -44,7 +44,9 @@ enum RogueSpells
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC        = 59628,
     SPELL_ROGUE_GLYPH_OF_BACKSTAB_TRIGGER       = 63975,
     SPELL_ROGUE_QUICK_RECOVERY_ENERGY           = 31663,
-    SPELL_ROGUE_CRIPPLING_POISON                = 3409
+    SPELL_ROGUE_CRIPPLING_POISON                = 3409,
+    SPELL_ROGUE_MASTER_OF_SUBTLETY_BUFF         = 31665,
+    SPELL_ROGUE_OVERKILL_BUFF                   = 58427
 };
 
 class spell_rog_savage_combat : public AuraScript
@@ -826,6 +828,29 @@ class spell_rog_turn_the_tables : public AuraScript
     }
 };
 
+// 31666 - Master of Subtlety
+// 58428 - Overkill - aura remove spell (SERVERSIDE)
+template <uint32 RemoveSpellId>
+class spell_rog_overkill_mos : public AuraScript
+{
+    PrepareAuraScript(spell_rog_overkill_mos);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ RemoveSpellId });
+    }
+
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(RemoveSpellId);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_rog_overkill_mos::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
@@ -847,4 +872,6 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_glyph_of_backstab);
     RegisterSpellScript(spell_rog_setup);
     RegisterSpellScript(spell_rog_turn_the_tables);
+    RegisterSpellScript(spell_rog_overkill_mos<SPELL_ROGUE_OVERKILL_BUFF>, "spell_rog_overkill");
+    RegisterSpellScript(spell_rog_overkill_mos<SPELL_ROGUE_MASTER_OF_SUBTLETY_BUFF>, "spell_rog_master_of_subtlety");
 }
