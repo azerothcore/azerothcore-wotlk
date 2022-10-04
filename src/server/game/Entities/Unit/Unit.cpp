@@ -12398,11 +12398,6 @@ void Unit::TriggerAurasProcOnEvent(Unit* actionTarget, uint32 typeMaskActor, uin
 
 void Unit::TriggerAurasProcOnEvent(ProcEventInfo& eventInfo, AuraApplicationProcContainer& aurasTriggeringProc)
 {
-    Spell const* triggeringSpell = eventInfo.GetProcSpell();
-    bool const disableProcs = triggeringSpell && triggeringSpell->IsProcDisabled();
-    if (disableProcs)
-        SetCantProc(true);
-
     for (auto const& aurAppProc : aurasTriggeringProc)
     {
         AuraApplication* aurApp;
@@ -12427,9 +12422,6 @@ void Unit::TriggerAurasProcOnEvent(ProcEventInfo& eventInfo, AuraApplicationProc
             SetCantProc(false);
         }
     }
-
-    if (disableProcs)
-        SetCantProc(false);
 }
 
 SpellSchoolMask Unit::GetMeleeDamageSchoolMask() const
