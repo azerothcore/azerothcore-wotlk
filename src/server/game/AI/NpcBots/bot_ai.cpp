@@ -13419,7 +13419,7 @@ void bot_ai::_LocalizeGameObject(Player const* forPlayer, std::string &gameobjec
 
 void bot_ai::_LocalizeSpell(Player const* forPlayer, std::string &spellName, uint32 entry) const
 {
-    uint32 loc = forPlayer->GetSession()->GetSessionDbLocaleIndex();
+    uint32 loc = forPlayer->GetSession()->GetSessionDbcLocale();
     std::wstring wnamepart;
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(entry);
