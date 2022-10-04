@@ -154,10 +154,10 @@ class spell_mage_burning_determination : public AuraScript
         return true;
     }
 
-    void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo&  /*eventInfo*/)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo&  /*eventInfo*/)
     {
         PreventDefaultAction();
-        GetUnitOwner()->CastSpell(GetUnitOwner(), 54748, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), 54748, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -993,7 +993,7 @@ class spell_mage_arcane_potency : public AuraScript
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
         uint32 spellId = triggerSpell[GetSpellInfo()->GetRank() - 1];
-        caster->CastSpell(caster, spellId, aurEff);
+        caster->CastSpell(caster, spellId, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1064,10 +1064,10 @@ class spell_mage_imp_mana_gems : public AuraScript
         return ValidateSpellInfo({ SPELL_MAGE_MANA_SURGE });
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_MAGE_MANA_SURGE, true);
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_MAGE_MANA_SURGE, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1253,7 +1253,7 @@ class spell_mage_hot_streak : public AuraScript
                 return;
 
             Unit* caster = eventInfo.GetActor();
-            caster->CastSpell(caster, SPELL_MAGE_HOT_STREAK_PROC, aurEff);
+            caster->CastSpell(caster, SPELL_MAGE_HOT_STREAK_PROC, true, nullptr, aurEff);
         }
 
         // reset counter
@@ -1281,7 +1281,7 @@ class spell_mage_magic_absorption : public AuraScript
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActionTarget();
         int32 bp = CalculatePct(static_cast<int32>(caster->GetMaxPower(POWER_MANA)), aurEff->GetAmount());
-        caster->CastCustomSpell(SPELL_MAGE_MAGIC_ABSORPTION_MANA, SPELLVALUE_BASE_POINT0, bp, caster, true);
+        caster->CastCustomSpell(SPELL_MAGE_MAGIC_ABSORPTION_MANA, SPELLVALUE_BASE_POINT0, bp, caster, true, nullptr, aurEff);
     }
 
     void Register() override

@@ -6468,7 +6468,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     if (damage)
     {
         procVictim |= PROC_FLAG_TAKEN_DAMAGE;
-        hitMask = crit ? PROC_HIT_CRITICAL : PROC_HIT_NORMAL;
+        hitMask |= crit ? PROC_HIT_CRITICAL : PROC_HIT_NORMAL;
     }
 
     int32 overkill = damage - target->GetHealth();
