@@ -59,6 +59,7 @@ class bot_ai : public CreatureAI
         virtual void OnBotDespawn(Creature* /*summon*/) {}
         virtual void UnsummonAll() {}
 
+        virtual void OnBotDamageTaken(Unit* /*attacker*/, uint32 /*damage*/, CleanDamage const* /*cleanDamage*/, DamageEffectType /*damagetype*/, SpellInfo const* /*spellInfo*/) {}
         virtual void OnBotDamageDealt(Unit* /*victim*/, uint32 /*damage*/, CleanDamage const* /*cleanDamage*/, DamageEffectType /*damagetype*/, SpellInfo const* /*spellInfo*/) {}
         virtual void OnBotDispelDealt(Unit* /*dispelled*/, uint8 /*num*/) {}
 

@@ -2324,26 +2324,29 @@ public:
             bot_ai::DamageDealt(victim, damage, damageType);
         }
 
-        void DamageTaken(Unit* u, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*schoolMask*/) override
+        void OnBotDamageTaken(Unit* /*attacker*/, uint32 damage, CleanDamage const* /*cleanDamage*/, DamageEffectType /*damagetype*/, SpellInfo const* spellInfo) override
         {
             // Divine Sacrifice helper - calculate remaining damage amount and find if we can be one-shot'ed
-            //if (damage && _sacDamage < int32(me->GetMaxHealth() / 4))
-            //{
-            //    if (spellInfo && spellInfo->Id == DIVINE_SACRIFICE_1)
-            //        _sacDamage -= int32(damage);
-            //    else
-            //        _sacDamage += int32(damage);
+            if (damage && _sacDamage < int32(me->GetMaxHealth() / 4))
+            {
+                if (spellInfo && spellInfo->Id == DIVINE_SACRIFICE_1)
+                    _sacDamage -= int32(damage);
+                else
+                    _sacDamage += int32(damage);
 
-            //    if (me->GetHealth() - _sacDamage < me->GetMaxHealth() / 5)
-            //    {
-            //        if (me->GetAuraEffect(SPELL_AURA_SPLIT_DAMAGE_PCT, SPELLFAMILY_PALADIN, 0x0, 0x0, 0x4, me->GetGUID()))
-            //        {
-            //            _sacDamage = me->GetMaxHealth();
-            //            me->RemoveAurasDueToSpell(DIVINE_SACRIFICE_1, me->GetGUID());
-            //        }
-            //    }
-            //}
+                if (me->GetHealth() - _sacDamage < me->GetMaxHealth() / 5)
+                {
+                    if (me->GetAuraEffect(SPELL_AURA_SPLIT_DAMAGE_PCT, SPELLFAMILY_PALADIN, 0x0, 0x0, 0x4, me->GetGUID()))
+                    {
+                        _sacDamage = me->GetMaxHealth();
+                        me->RemoveAurasDueToSpell(DIVINE_SACRIFICE_1, me->GetGUID());
+                    }
+                }
+            }
+        }
 
+        void DamageTaken(Unit* u, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellSchoolMask /*schoolMask*/) override
+        {
             if (!u)
                 return;
             if (!u->IsInCombat() && !me->IsInCombat())
