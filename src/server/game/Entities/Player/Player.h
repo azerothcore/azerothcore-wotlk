@@ -89,10 +89,10 @@ typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
 #define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t, p)
 
 // Note: SPELLMOD_* values is aura types in fact
-enum SpellModType : uint8
+enum SpellModType
 {
-    SPELLMOD_FLAT         = SPELL_AURA_ADD_FLAT_MODIFIER,
-    SPELLMOD_PCT          = SPELL_AURA_ADD_PCT_MODIFIER
+    SPELLMOD_FLAT         = 107,                            // SPELL_AURA_ADD_FLAT_MODIFIER
+    SPELLMOD_PCT          = 108                             // SPELL_AURA_ADD_PCT_MODIFIER
 };
 
 // 2^n values, Player::m_isunderwater is a bitmask. These are Trinity internal values, they are never send to any client
@@ -180,9 +180,10 @@ enum TalentTree // talent tabs
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
-    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), mask(),  ownerAura(_ownerAura) {}
-    SpellModOp   op;
-    SpellModType type;
+    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(), ownerAura(_ownerAura) {}
+    SpellModOp   op   : 8;
+    SpellModType type : 8;
+    int16 charges     : 16;
     int32 value{0};
     flag96 mask;
     uint32 spellId{0};
@@ -191,7 +192,7 @@ struct SpellModifier
 
 typedef std::unordered_map<uint32, PlayerTalent*> PlayerTalentMap;
 typedef std::unordered_map<uint32, PlayerSpell*> PlayerSpellMap;
-typedef std::unordered_set<SpellModifier*> SpellModContainer;
+typedef std::list<SpellModifier*> SpellModList;
 
 typedef GuidList WhisperListContainer;
 
@@ -1729,14 +1730,13 @@ public:
     SpellCooldowns&       GetSpellCooldownMap()       { return m_spellCooldowns; }
 
     void AddSpellMod(SpellModifier* mod, bool apply);
-    static bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
+    bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
     bool HasSpellMod(SpellModifier* mod, Spell* spell);
-    template <SpellModOp op, class T>
-    void ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell = nullptr) const;
+    template <class T> T ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* spell = nullptr, bool temporaryPet = false);
+    void RemoveSpellMods(Spell* spell);
     void RestoreSpellMods(Spell* spell, uint32 ownerAuraId = 0, Aura* aura = nullptr);
     void RestoreAllSpellMods(uint32 ownerAuraId = 0, Aura* aura = nullptr);
-    static void ApplyModToSpell(SpellModifier* mod, Spell* spell);
-    static bool HasSpellModApplied(SpellModifier* mod, Spell* spell);
+    void DropModCharge(SpellModifier* mod, Spell* spell);
     void SetSpellModTakingSpell(Spell* spell, bool apply);
 
     [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
@@ -2166,9 +2166,9 @@ public:
     void ApplyItemEquipSpell(Item* item, bool apply, bool form_change = false);
     void ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply, bool form_change = false);
     void UpdateEquipSpellsAtFormChange();
-    void CastItemCombatSpell(DamageInfo const& damageInfo);
-    void CastItemCombatSpell(DamageInfo const& damageInfo, Item* item, ItemTemplate const* proto);
+    void CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx);
     void CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
+    void CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto);
 
     void SendEquipmentSetList();
     void SetEquipmentSet(uint32 index, EquipmentSet eqset);
@@ -2551,7 +2551,7 @@ public:
     // mt maps
     [[nodiscard]] const PlayerTalentMap& GetTalentMap() const { return m_talents; }
     [[nodiscard]] uint32 GetNextSave() const { return m_nextSave; }
-    [[nodiscard]] SpellModContainer const& GetSpellModContainer(uint32 type) const { return m_spellMods[type]; }
+    [[nodiscard]] SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
 
     void SetServerSideVisibility(ServerSideVisibilityType type, AccountTypes sec);
     void SetServerSideVisibilityDetect(ServerSideVisibilityType type, AccountTypes sec);
@@ -2756,7 +2756,7 @@ public:
     uint32 m_baseHealthRegen;
     int32 m_spellPenetrationItemMod;
 
-    SpellModContainer m_spellMods[MAX_SPELLMOD];
+    SpellModList m_spellMods[MAX_SPELLMOD];
     //uint32 m_pad;
     //        Spell* m_spellModTakingSpell;  // Spell for which charges are dropped in spell::finish
 
@@ -2940,132 +2940,130 @@ void AddItemsSetItem(Player* player, Item* item);
 void RemoveItemsSetItem(Player* player, ItemTemplate const* proto);
 
 // "the bodies of template functions must be made available in a header file"
-template <SpellModOp op, class T>
-void Player::ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell) const
+template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* spell, bool temporaryPet)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
-        return;
+    {
+        return 0;
+    }
 
-    float totalmul = 1.f;
+    float totalmul = 1.0f;
     int32 totalflat = 0;
+
+    auto calculateSpellMod = [&](SpellModifier* mod)
+    {
+        // xinef: temporary pets cannot use charged mods of owner, needed for mirror image QQ they should use their own auras
+        if (temporaryPet && mod->charges != 0)
+        {
+            return;
+        }
+
+        if (mod->type == SPELLMOD_FLAT)
+        {
+            // xinef: do not allow to consume more than one 100% crit increasing spell
+            if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
+            {
+                return;
+            }
+
+            int32 flatValue = mod->value;
+
+            // SPELL_MOD_THREAT - divide by 100 (in packets we send threat * 100)
+            if (mod->op == SPELLMOD_THREAT)
+            {
+                flatValue /= 100;
+            }
+
+            totalflat += flatValue;
+        }
+        else if (mod->type == SPELLMOD_PCT)
+        {
+            // skip percent mods for null basevalue (most important for spell mods with charges)
+            if (basevalue == T(0) || totalmul == 0.0f)
+            {
+                return;
+            }
+
+            // special case (skip > 10sec spell casts for instant cast setting)
+            if (mod->op == SPELLMOD_CASTING_TIME && basevalue >= T(10000) && mod->value <= -100)
+            {
+                return;
+            }
+            // xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
+            else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
+            {
+                return;
+            }
+            // xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
+            else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
+            {
+                return;
+            }
+
+            // xinef: those two mods should be multiplicative (Glyph of Renew)
+            if (mod->op == SPELLMOD_DAMAGE || mod->op == SPELLMOD_DOT)
+            {
+                totalmul *= CalculatePct(1.0f, 100.0f + mod->value);
+            }
+            else
+            {
+                totalmul += CalculatePct(1.0f, mod->value);
+            }
+        }
+
+        DropModCharge(mod, spell);
+    };
 
     // Drop charges for triggering spells instead of triggered ones
     if (m_spellModTakingSpell)
-        spell = m_spellModTakingSpell;
-
-    switch (op)
     {
-        // special case, if a mod makes spell instant, only consume that mod
-        case SPELLMOD_CASTING_TIME:
-        {
-            SpellModifier* modInstantSpell = nullptr;
-            for (SpellModifier* mod : m_spellMods[SPELLMOD_CASTING_TIME])
-            {
-                if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-                {
-                    continue;
-                }
-
-                if (mod->type == SPELLMOD_PCT && basevalue < T(10000) && mod->value <= -100)
-                {
-                    modInstantSpell = mod;
-                    break;
-                }
-            }
-
-            if (modInstantSpell)
-            {
-                Player::ApplyModToSpell(modInstantSpell, spell);
-                basevalue = T(0);
-                return;
-            }
-            break;
-        }
-
-            // special case if two mods apply 100% critical chance, only consume one
-        case SPELLMOD_CRITICAL_CHANCE:
-        {
-            SpellModifier* modCritical = nullptr;
-            for (auto mod : m_spellMods[SPELLMOD_CRITICAL_CHANCE])
-            {
-                if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-                {
-                    continue;
-                }
-
-                if (mod->type == SPELLMOD_FLAT && mod->value >= 100)
-                {
-                    modCritical = mod;
-                    break;
-                }
-            }
-
-            if (modCritical)
-            {
-                Player::ApplyModToSpell(modCritical, spell);
-                basevalue = T(100);
-                return;
-            }
-            break;
-        }
-
-        default:
-            break;
+        spell = m_spellModTakingSpell;
     }
 
+    SpellModifier* chargedMod = nullptr;
     for (auto mod : m_spellMods[op])
     {
-        if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-            continue;
-
-        switch (mod->type)
+        // Charges can be set only for mods with auras
+        if (!mod->ownerAura)
         {
-            case SPELLMOD_FLAT:
-                totalflat += mod->value;
-                break;
-            case SPELLMOD_PCT:
-            {
-                // skip percent mods for null basevalue (most important for spell mods with charges)
-                if (basevalue == T(0))
-                {
-                    continue;
-                }
-
-                // special case (skip > 10s spell casts for instant cast setting)
-                if (op == SPELLMOD_CASTING_TIME)
-                {
-                    if (mod->value <= -100 && basevalue >= T(10000))
-                    {
-                        continue;
-                    }
-                }
-
-                totalmul += CalculatePct(1.f, mod->value);
-                break;
-            }
+            ASSERT(!mod->charges);
         }
 
-        /*// xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
-        else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
+        if (!IsAffectedBySpellmod(spellInfo, mod, spell))
+        {
             continue;
-        // xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
-        else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
-            continue;
-        // xinef: those two mods should be multiplicative (Glyph of Renew)
-        if (mod->op == SPELLMOD_DAMAGE || mod->op == SPELLMOD_DOT)
-            totalmul *= CalculatePct(1.0f, 100.0f + mod->value);
-        else
-            totalmul += CalculatePct(1.0f, mod->value);*/
+        }
 
-        Player::ApplyModToSpell(mod, spell);
+        if (mod->ownerAura->IsUsingCharges())
+        {
+            if (!chargedMod || (chargedMod->ownerAura->GetSpellInfo()->SpellPriority < mod->ownerAura->GetSpellInfo()->SpellPriority))
+            {
+                chargedMod = mod;
+            }
+
+            continue;
+        }
+
+        calculateSpellMod(mod);
     }
+
+    if (chargedMod)
+    {
+        calculateSpellMod(chargedMod);
+    }
+
     float diff = 0.0f;
     if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
+    {
         diff = ((float)basevalue + totalflat) * (totalmul - 1.0f) + (float)totalflat;
+    }
     else
+    {
         diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
-    basevalue = T((float)basevalue + diff);
-}
+    }
 
+    basevalue = T((float)basevalue + diff);
+    return T(diff);
+}
 #endif
