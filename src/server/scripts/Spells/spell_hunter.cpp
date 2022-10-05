@@ -1181,7 +1181,7 @@ class spell_hun_glyph_of_arcane_shot : public AuraScript
         int32 mana = procSpell->CalcPowerCost(GetTarget(), procSpell->GetSchoolMask());
         ApplyPct(mana, aurEff->GetAmount());
 
-        GetTarget()->CastCustomSpell(SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT, SPELLVALUE_BASE_POINT0, mana, GetTarget());
+        GetTarget()->CastCustomSpell(SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT, SPELLVALUE_BASE_POINT0, mana, GetTarget(), TRIGGERED_NONE, nullptr, aurEff);
     }
 
     void Register() override
@@ -1330,7 +1330,7 @@ class spell_hun_lock_and_load : public AuraScript
         }
 
         Unit* caster = eventInfo.GetActor();
-        caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_TRIGGER, true);
+        caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_TRIGGER, true, nullptr, aurEff);
     }
 
     void ApplyMarker(ProcEventInfo& eventInfo)
@@ -1418,10 +1418,10 @@ class spell_hun_glyph_of_mend_pet : public AuraScript
         return ValidateSpellInfo({ SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS });
     }
 
-    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS, true);
+        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1440,10 +1440,10 @@ class spell_hun_hunting_party : public AuraScript
         return ValidateSpellInfo({ SPELL_REPLENISHMENT });
     }
 
-    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_REPLENISHMENT, true);
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_REPLENISHMENT, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1504,7 +1504,7 @@ class spell_hun_rapid_recuperation_trigger : public AuraScript
         }
     }
 
-    void HandleRapidKillingProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
+    void HandleRapidKillingProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         static uint32 const triggerSpells[2] = { SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1, SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2 };
 
@@ -1517,7 +1517,7 @@ class spell_hun_rapid_recuperation_trigger : public AuraScript
 
         uint8 rank = GetSpellInfo()->GetRank();
         uint32 spellId = triggerSpells[rank - 1];
-        eventInfo.GetActor()->CastSpell((Unit*)nullptr, spellId, true);
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, spellId, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1565,7 +1565,7 @@ class spell_hun_thrill_of_the_hunt : public AuraScript
         if (!amount)
             return;
 
-        caster->CastCustomSpell(SPELL_HUNTER_THRILL_OF_THE_HUNT_MANA, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true);
+        caster->CastCustomSpell(SPELL_HUNTER_THRILL_OF_THE_HUNT_MANA, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true, nullptr, aurEff);
     }
 
     void Register() override
