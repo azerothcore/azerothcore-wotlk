@@ -6366,8 +6366,8 @@ void bot_ai::OnSpellHit(Unit* caster, SpellInfo const* spell)
                         }
                     }
                 }
-                //me->SetSpeedRate(MOVE_FLIGHT, master->GetSpeedRate(MOVE_FLIGHT) * 1.37f);
-                //me->SetSpeedRate(MOVE_RUN, master->GetSpeedRate(MOVE_FLIGHT) * 1.37f);
+                me->SetSpeedRate(MOVE_FLIGHT, master->GetSpeedRate(MOVE_FLIGHT) * 1.17f);
+                me->SetSpeedRate(MOVE_RUN, master->GetSpeedRate(MOVE_FLIGHT) * 1.17f);
                 me->m_movementInfo.SetMovementFlags(MOVEMENTFLAG_FLYING);
             }
             else
