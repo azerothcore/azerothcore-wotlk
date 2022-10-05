@@ -2946,3 +2946,5 @@ INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `Spell
 DELETE FROM `command` WHERE `name`='reload spell_proc_event';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES 
 ('reload spell_proc_event', 3, 'Syntax: .reload spell_proc_event\nReload spell_proc_event table.');
+
+DELETE FROM `updates` WHERE `name` = '2022_10_02_01.sql';
