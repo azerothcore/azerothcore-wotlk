@@ -2022,7 +2022,7 @@ class spell_sha_windfury_weapon : public AuraScript
             //args.AddSpellBP0(amount);
             // Attack twice
             for (uint8 i = 0; i < 2; ++i)
-                bot->CastCustomSpell(spellId, SPELLVALUE_BASE_POINT0, amount, eventInfo.GetProcTarget(), true, item/*, aurEff*/);
+                bot->CastCustomSpell(spellId, SPELLVALUE_BASE_POINT0, amount, eventInfo.GetProcTarget(), true, item, aurEff);
 //                bot->CastSpell(eventInfo.GetProcTarget(), spellId, args);
 
             return;
