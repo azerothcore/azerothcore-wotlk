@@ -171,7 +171,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         53232,  // Rapid Killing (Rank 2)
         }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED; // Entries were not updated after spell effect change, we have to do that manually
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_FROM_PROCS; // Entries were not updated after spell effect change, we have to do that manually
     });
 
     ApplySpellFix({
@@ -257,7 +257,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 57761 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 1;
-        spellInfo->Priority = 50;
+        spellInfo->SpellPriority = 50;
     });
 
     // Tidal Wave
@@ -272,10 +272,10 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
-    // Death and Decay
-    ApplySpellFix({ 52212 }, [](SpellInfo* spellInfo)
+    // Ascendance (Talisman of Ascendance trinket)
+    ApplySpellFix({ 28200 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
+        spellInfo->ProcCharges = 6;
     });
 
     // The Eye of Acherus (no spawn in phase 2 in db)
@@ -4457,10 +4457,6 @@ void SpellMgr::LoadSpellInfoCorrections()
                 }
             }
         }
-
-        // disable proc for magnet auras, they're handled differently
-        if (spellInfo->HasAura(SPELL_AURA_SPELL_MAGNET))
-            spellInfo->ProcFlags = 0;
 
         if (spellInfo->ActiveIconID == 2158)  // flight
         {
