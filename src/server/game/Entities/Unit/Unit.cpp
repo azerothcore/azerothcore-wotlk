@@ -10219,12 +10219,14 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
         controlled->SetInCombatState(PvP, enemy, duration);
     }
 
-    //npcbot: combatstop for bots
+    //npcbot: combatstate for bots
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->HaveBot())
     {
         BotMap const* map = ToPlayer()->GetBotMgr()->GetBotMap();
         for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
         {
+            if (!itr->second->IsInWorld())
+                continue;
             itr->second->SetInCombatState(PvP, enemy);
             if (Unit* botPet = itr->second->GetBotsPet())
                 botPet->SetInCombatState(PvP, enemy);
