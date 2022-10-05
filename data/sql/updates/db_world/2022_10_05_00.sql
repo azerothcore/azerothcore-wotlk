@@ -1,3 +1,4 @@
+-- DB update 2022_10_02_00 -> 2022_10_05_00
 --
 -- Restoring spell_proc to how it was before the commit.
 DROP TABLE IF EXISTS `spell_proc`;
