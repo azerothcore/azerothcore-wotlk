@@ -5482,7 +5482,12 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
     if (dispelMask & (1 << DISPEL_DISEASE) && HasAura(50536))
         dispelMask &= ~(1 << DISPEL_DISEASE);
 
+    //npcbot
+    /*
     ReputationRank rank = GetReactionTo(caster, IsCharmed());
+    */
+    ReputationRank rank = GetReactionTo(caster, IsCharmed() && !(caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBotOrPet()));
+    //end npcbot
     bool positive = rank >= REP_FRIENDLY;
 
     // Neutral unit not at war with caster should be treated as a friendly unit
