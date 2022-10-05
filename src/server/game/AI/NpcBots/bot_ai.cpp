@@ -4236,7 +4236,14 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
             if (Rand() < 4)
             {
                 InstanceScript* iscript = me->GetMap()->ToInstanceMap()->GetInstanceScript();
-                Unit* najentus = iscript ? iscript->GetCreature(0) : nullptr; // boss_warlord_najentus.cpp::DATA_HIGH_WARLORD_NAJENTUS
+                Creature* najentus = iscript ? iscript->GetCreature(0) : nullptr; // boss_warlord_najentus.cpp::DATA_HIGH_WARLORD_NAJENTUS
+                if (!najentus)
+                {
+                    static const uint32 CREATURE_HIGH_WARLORD_NAJENTUS = 22887u;
+                    Acore::AllCreaturesOfEntryInRange check(master, CREATURE_HIGH_WARLORD_NAJENTUS, 60.f);
+                    Acore::CreatureSearcher<Acore::AllCreaturesOfEntryInRange> searcher(master, najentus, check);
+                    Cell::VisitAllObjects(master, searcher, 60.f);
+                }
 
                 if (najentus && najentus->HasAuraTypeWithMiscvalue(SPELL_AURA_SCHOOL_IMMUNITY, 127)) // Tidal Shield
                 {
@@ -4291,17 +4298,20 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
             if (Unit* u = spines.empty() ? nullptr : spines.size() == 1u ? spines.front() :
                 Acore::Containers::SelectRandomContainerElement(spines))
             {
-                if (GameObject const* spine = u->GetFirstGameObjectById(185584)) // Naj'entus Spine
+                GameObject* spine = u->GetFirstGameObjectById(185584); // Naj'entus Spine
+                if (!spine)
+                {
+                    Acore::GameObjectInRangeCheck check(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), 5.f, 185584);
+                    Acore::GameObjectLastSearcher<Acore::GameObjectInRangeCheck> searcher(u, spine, check);
+                    Cell::VisitAllObjects(u, searcher, 5.f);
+                }
+                if (spine && spine->getLootState() != GO_JUST_DEACTIVATED)
                 {
                     Player* receiver = u->GetTypeId() == TYPEID_PLAYER ? u->ToPlayer() : master;
-                    //TODO: debug najentus
-                    //if (spine->AI() && spine->AI()->GossipHello(receiver))
-                    {
-                        // Item is created by spell 39956 Create Naj'entus Spine - cannot target dead, force add item
-                        if (!receiver->IsAlive())
-                            receiver->AddItem(32408, 1); // Naj'entus Spine
-                        return true;
-                    }
+                    u->RemoveAurasDueToSpell(39837); // Remove Impaling Spine aura since it doesn't work at all right now
+                    spine->SetLootState(GO_JUST_DEACTIVATED);
+                    receiver->AddItem(32408, 1); // Naj'entus Spine
+                    return true;
                 }
             }
         }
