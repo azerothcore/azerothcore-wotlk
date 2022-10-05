@@ -2,31 +2,31 @@
 -- Restoring spell_proc to how it was before the commit.
 DROP TABLE IF EXISTS `spell_proc`;
 CREATE TABLE IF NOT EXISTS `spell_proc` (
-  `spellId` mediumint(9) NOT NULL DEFAULT '0',
-  `schoolMask` tinyint(4) NOT NULL DEFAULT '0',
-  `spellFamilyName` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `spellFamilyMask0` int(10) unsigned NOT NULL DEFAULT '0',
-  `spellFamilyMask1` int(10) unsigned NOT NULL DEFAULT '0',
-  `spellFamilyMask2` int(10) unsigned NOT NULL DEFAULT '0',
-  `typeMask` int(10) unsigned NOT NULL DEFAULT '0',
-  `spellTypeMask` int(10) unsigned NOT NULL DEFAULT '0',
-  `spellPhaseMask` int(11) NOT NULL DEFAULT '0',
-  `hitMask` int(11) NOT NULL DEFAULT '0',
-  `attributesMask` int(10) unsigned NOT NULL DEFAULT '0',
-  `ratePerMinute` float NOT NULL DEFAULT '0',
-  `chance` float NOT NULL DEFAULT '0',
-  `cooldown` float NOT NULL DEFAULT '0',
-  `charges` int(10) unsigned NOT NULL DEFAULT '0',
+  `spellId` MEDIUMINT(9) NOT NULL DEFAULT '0',
+  `schoolMask` TINYINT(4) NOT NULL DEFAULT '0',
+  `spellFamilyName` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0',
+  `spellFamilyMask0` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `spellFamilyMask1` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `spellFamilyMask2` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `typeMask` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `spellTypeMask` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `spellPhaseMask` INT(11) NOT NULL DEFAULT '0',
+  `hitMask` INT(11) NOT NULL DEFAULT '0',
+  `attributesMask` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `ratePerMinute` FLOAT NOT NULL DEFAULT '0',
+  `chance` FLOAT NOT NULL DEFAULT '0',
+  `cooldown` FLOAT NOT NULL DEFAULT '0',
+  `charges` INT(10) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`spellId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4;
 
 -- Restoring spell_script_names to how it was before the commit
 DROP TABLE IF EXISTS `spell_script_names`;
 CREATE TABLE IF NOT EXISTS `spell_script_names` (
-  `spell_id` int(11) NOT NULL,
-  `ScriptName` char(64) NOT NULL,
+  `spell_id` INT(11) NOT NULL,
+  `ScriptName` CHAR(64) NOT NULL,
   UNIQUE KEY `spell_id` (`spell_id`,`ScriptName`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4;
 
 DELETE FROM `spell_script_names`;
 
@@ -2099,8 +2099,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (100101, 'spell_valkyr_ball_periodic_dummy');
 
 -- Restoring deleted spell_ranks for Threat of Thassarian
-DELETE FROM `spell_ranks` WHERE `first_spell_id` = 59133;
-INSERT INTO `spell_ranks` (`first_spell_id`,`spell_id`,`ranks`) VALUES
+DELETE FROM `spell_ranks` WHERE `first_spell_id` IN (59133, 66216);
+INSERT INTO `spell_ranks` (`first_spell_id`,`spell_id`,`rank`) VALUES
 (59133, 59133, 1),
 (59133, 66988, 2),
 (59133, 66989, 3),
@@ -2111,20 +2111,22 @@ INSERT INTO `spell_ranks` (`first_spell_id`,`spell_id`,`ranks`) VALUES
 -- Restoring spell_proc_events to how it was before the commit.
 DROP TABLE IF EXISTS `spell_proc_event`;
 CREATE TABLE IF NOT EXISTS `spell_proc_event` (
-  `entry` mediumint(9) NOT NULL DEFAULT '0',
-  `SchoolMask` tinyint(4) NOT NULL DEFAULT '0',
-  `SpellFamilyName` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `SpellFamilyMask0` int(10) unsigned NOT NULL DEFAULT '0',
-  `SpellFamilyMask1` int(10) unsigned NOT NULL DEFAULT '0',
-  `SpellFamilyMask2` int(10) unsigned NOT NULL DEFAULT '0',
-  `procFlags` int(10) unsigned NOT NULL DEFAULT '0',
-  `procEx` int(10) unsigned NOT NULL DEFAULT '0',
-  `procPhase` int(10) unsigned NOT NULL DEFAULT '0',
-  `ppmRate` float NOT NULL DEFAULT '0',
-  `CustomChance` float NOT NULL DEFAULT '0',
-  `Cooldown` int(10) unsigned NOT NULL DEFAULT '0',
+  `entry` MEDIUMINT(9) NOT NULL DEFAULT '0',
+  `SchoolMask` TINYINT(4) NOT NULL DEFAULT '0',
+  `SpellFamilyName` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0',
+  `SpellFamilyMask0` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `SpellFamilyMask1` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `SpellFamilyMask2` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `procFlags` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `procEx` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `procPhase` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `ppmRate` FLOAT NOT NULL DEFAULT '0',
+  `CustomChance` FLOAT NOT NULL DEFAULT '0',
+  `Cooldown` INT(10) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4;
+
+DELETE FROM `spell_proc_event`;
 
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `procPhase`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES
 (-66799, 0, 15, 4194304, 0, 0, 16, 0, 0, 0, 0, 0),
