@@ -291,6 +291,12 @@ services:
       - ${DOCKER_VOL_TOOLS_MMAPS:-./var/extractors/mmaps}:/azerothcore/env/client/mmaps
     profiles: [prod, tools]
 
+  ac-db-import:
+    <<: *ac-shared-conf
+    image: acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    command: ./env/dist/bin/dbimport
+    profiles: [db-import]
+
 volumes:
   ac-database:
   ac-bin:

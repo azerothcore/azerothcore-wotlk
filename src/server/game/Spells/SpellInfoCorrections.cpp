@@ -4379,6 +4379,42 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Attributes |= SPELL_ATTR0_ALLOW_WHILE_SITTING;
     });
 
+    // Judgement (Paladin T2 8P Bonus)
+    ApplySpellFix({ 23591 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcFlags = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
+    });
+
+    // Gift of Arthas
+    ApplySpellFix({ 11371 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
+    });
+
+    // Refocus (Renataki's charm of beasts)
+    ApplySpellFix({ 24531 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+    });
+
+    // Collect Rookery Egg
+    ApplySpellFix({ 15958 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+    });
+
+    // WotLK Prologue Frozen Shade Visual, temp used to restore visual after Dispersion
+    ApplySpellFix({ 53444 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(27);
+    });
+
+    // Rental Racing Ram
+    ApplySpellFix({ 43883 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

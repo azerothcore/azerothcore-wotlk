@@ -1468,7 +1468,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                                 }
                                 tstZ = beforewaterz;
                                 srange = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX));
-                                //TC_LOG_ERROR("server", "(start was from land) step in water , number of cycle = %i , distance of step = %f, total path = %f, Z = %f", j, srange, totalpath, tstZ);
+                                //LOG_ERROR("spells", "(start was from land) step in water , number of cycle = {} , distance of step = {}, total path = {}, Z = {}", j, srange, totalpath, tstZ);
                             }
                         }
                         else if (map->IsInWater(phasemask, tstX, tstY, tstZ, collisionHeight))
@@ -1481,13 +1481,13 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                             if (inwater && (fabs(tstZ - ground) < 2.0f))
                             {
                                 wcol = true;
-                                //TC_LOG_ERROR("server", "step in water with collide and use standart check (for continue way after possible collide), number of cycle = %i ", j);
+                                //LOG_ERROR("spells", "step in water with collide and use standart check (for continue way after possible collide), number of cycle = {} ", j);
                             }
 
                             // if (j < 2)
-                            //    TC_LOG_ERROR("server", "(start in water) step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                            //    LOG_ERROR("spells", "(start in water) step in water, number of cycle = {} , distance of step = {}, total path = {}", j, srange, totalpath);
                             // else
-                            //    TC_LOG_ERROR("server", "step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                            //    LOG_ERROR("spells", "step in water, number of cycle = {} , distance of step = {}, total path = {}", j, srange, totalpath);
                         }
 
                         bool IsInWater = map->IsInWater(phasemask, tstX, tstY, tstZ, collisionHeight);
@@ -1505,11 +1505,11 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                             //distance of rays, will select the shortest in 3D
                             srange1 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ1 - prevZ) * (tstZ1 - prevZ));
-                            //TC_LOG_ERROR("server", "step = %i, distance of ray1 = %f", j, srange1);
+                            //LOG_ERROR("spells", "step = {}, distance of ray1 = {}", j, srange1);
                             srange2 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ2 - prevZ) * (tstZ2 - prevZ));
-                            //TC_LOG_ERROR("server", "step = %i, distance of ray2 = %f", j, srange2);
+                            //LOG_ERROR("spells", "step = {}, distance of ray2 = {}", j, srange2);
                             srange3 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ3 - prevZ) * (tstZ3 - prevZ));
-                            //TC_LOG_ERROR("server", "step = %i, distance of ray3 = %f", j, srange3);
+                            //LOG_ERROR("spells", "step = {}, distance of ray3 = {}", j, srange3);
 
                             if (srange1 < srange2)
                             {
@@ -1527,7 +1527,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                                 srange = srange2;
                             }
 
-                            //TC_LOG_ERROR("server", "step on ground, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                            //LOG_ERROR("spells", "step on ground, number of cycle = {} , distance of step = {}, total path = {}", j, srange, totalpath);
                         }
 
                         destx = tstX;
@@ -1539,7 +1539,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         if (totalpath > distance)
                         {
                             overdistance = totalpath - distance;
-                            //TC_LOG_ERROR("server", "total path > than distance in 3D , need to move back a bit for save distance, total path = %f, overdistance = %f", totalpath, overdistance);
+                            //LOG_ERROR("spells", "total path > than distance in 3D , need to move back a bit for save distance, total path = {}, overdistance = {}", totalpath, overdistance);
                         }
 
                         bool col = VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(mapid, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
@@ -1549,18 +1549,18 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         // collision occured
                         if (col || dcol || (overdistance > 0.0f && !map->IsInWater(phasemask, tstX, tstY, ground, collisionHeight)) || (fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
                         {
-                            if ((overdistance > 0.0f) && (overdistance < step))
+                            if ((overdistance > 0.0f) && (overdistance < 1.f))
                             {
                                 destx = prevX + overdistance * cos(pos.GetOrientation());
                                 desty = prevY + overdistance * sin(pos.GetOrientation());
-                                //TC_LOG_ERROR("server", "(collision) collision occured 1");
+                                //LOG_ERROR("spells", "(collision) collision occured 1");
                             }
                             else
                             {
                                 // move back a bit
                                 destx = tstX - (0.6 * cos(pos.GetOrientation()));
                                 desty = tstY - (0.6 * sin(pos.GetOrientation()));
-                                //TC_LOG_ERROR("server", "(collision) collision occured 2");
+                                //LOG_ERROR("spells", "(collision) collision occured 2");
                             }
 
                             // highest available point
@@ -1584,15 +1584,14 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                             if (inwater && destz < prevZ && !wcol)
                                 destz = prevZ;
-                            //TC_LOG_ERROR("server", "(collision) destZ rewrited in prevZ");
+                            //LOG_ERROR("spells", "(collision) destZ rewrited in prevZ");
 
                             break;
                         }
                         // we have correct destz now
                     }
-                    //}
 
-                    lastpos.Relocate(destx, desty, destz + 0.5f, pos.GetOrientation());
+                    lastpos.Relocate(destx, desty, destz, pos.GetOrientation());
                     dest = SpellDestination(lastpos);
                 }
                 else
@@ -1613,7 +1612,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     lastpos.Relocate(destx, desty, z, pos.GetOrientation());
                     dest = SpellDestination(lastpos);
                     //float range = sqrt((desty - pos.GetPositionY())*(desty - pos.GetPositionY()) + (destx - pos.GetPositionX())*(destx - pos.GetPositionX()));
-                    //TC_LOG_ERROR("server", "Blink number 2, in falling but at a hight, distance of blink = %f", range);
+                    //LOG_ERROR("spells", "Blink number 2, in falling but at a hight, distance of blink = {}", range);
                 }
                 break;
             }
@@ -2845,7 +2844,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
             if (m_caster->IsAlive())
             {
-                healthGain = m_caster->SpellHealingBonusDone(m_caster, m_spellInfo, healthGain, HEAL);
+                healthGain = m_caster->SpellHealingBonusDone(m_caster, m_spellInfo, healthGain, HEAL, effIndex);
                 healthGain = m_caster->SpellHealingBonusTaken(m_caster, m_spellInfo, healthGain, HEAL);
 
                 HealInfo healInfo(m_caster, m_caster, healthGain, m_spellInfo, m_spellInfo->GetSchoolMask());
@@ -3259,31 +3258,23 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
         {
             if (CanExecuteTriggersOnHit(effMask, i->triggeredByAura) && roll_chance_i(i->chance))
             {
+                m_caster->CastSpell(unit, i->triggeredSpell->Id, true);
                 LOG_DEBUG("spells.aura", "Spell {} triggered spell {} by SPELL_AURA_ADD_TARGET_TRIGGER aura", m_spellInfo->Id, i->triggeredSpell->Id);
 
                 // SPELL_AURA_ADD_TARGET_TRIGGER auras shouldn't trigger auras without duration
                 // set duration of current aura to the triggered spell
                 if (i->triggeredSpell->GetDuration() == -1)
                 {
-                    // get duration from aura-only once
-                    if (!_duration)
-                    {
-                        Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
-                        _duration = aur ? aur->GetDuration() : -1;
-                    }
-
                     if (Aura* triggeredAur = unit->GetAura(i->triggeredSpell->Id, m_caster->GetGUID()))
                     {
-                        triggeredAur->SetDuration(std::max(triggeredAur->GetDuration(), _duration));
+                        // get duration from aura-only once
+                        if (!_duration)
+                        {
+                            Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
+                            _duration = aur ? aur->GetDuration() : -1;
+                        }
+                        triggeredAur->SetDuration(_duration);
                     }
-                    else
-                    {
-                        m_caster->CastCustomSpell(i->triggeredSpell->Id, SPELLVALUE_AURA_DURATION, _duration, unit, true);
-                    }
-                }
-                else
-                {
-                    m_caster->CastSpell(unit, i->triggeredSpell, true);
                 }
             }
         }
@@ -6336,11 +6327,26 @@ SpellCastResult Spell::CheckCast(bool strict)
                 {
                     Unit* unitCaster = m_caster->ToUnit();
                     if (!unitCaster)
+                    {
                         return SPELL_FAILED_BAD_TARGETS;
+                    }
 
                     Creature* pet = unitCaster->GetGuardianPet();
-                    if (pet && pet->IsAlive())
-                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                    if (pet)
+                    {
+                        if (pet->IsAlive())
+                        {
+                            return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                        }
+                    }
+                    else if (Player* playerCaster = m_caster->ToPlayer())
+                    {
+                        PetStable& petStable = playerCaster->GetOrInitPetStable();
+                        if (!petStable.CurrentPet && petStable.UnslottedPets.empty())
+                        {
+                            return SPELL_FAILED_NO_PET;
+                        }
+                    }
 
                     break;
                 }
@@ -8751,6 +8757,7 @@ void Spell::PrepareTriggersExecutedOnHit()
             HitTriggerSpell spellTriggerInfo;
             spellTriggerInfo.triggeredSpell = spellInfo;
             spellTriggerInfo.triggeredByAura = auraSpellInfo;
+            spellTriggerInfo.triggeredByEffIdx = (*i)->GetEffIndex();
             spellTriggerInfo.chance = chance * (*i)->GetBase()->GetStackAmount();
             m_hitTriggerSpells.push_back(spellTriggerInfo);
         }

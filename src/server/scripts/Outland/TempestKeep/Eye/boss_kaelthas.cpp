@@ -994,7 +994,7 @@ public:
         {
             PreventHitEffect(effIndex);
 
-            ThreatContainer::StorageType const& ThreatList = GetCaster()-> GetThreatMgr().getThreatList();
+            ThreatContainer::StorageType const& ThreatList = GetCaster()-> GetThreatMgr().GetThreatList();
             std::list<Unit*> targetList;
             for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
             {

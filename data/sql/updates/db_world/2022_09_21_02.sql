@@ -1,0 +1,2 @@
+-- DB update 2022_09_21_01 -> 2022_09_21_02
+UPDATE `quest_offer_reward` SET `RewardText`='Hmmm, Narm sent you to me, did he?$b$bWell then, Narm could always be trusted, so that must mean you\'re ready to take part of the next sapta--the sapta of fire.$b$bI see it in your eyes already, the burning, the desire. You\'ve tasted power, and now you\'re ready for more of it. Patience, $N. Remember what earth taught you. Power and destruction will come easily, but you must still know when to stay your hand.' WHERE  `ID`=2984;
