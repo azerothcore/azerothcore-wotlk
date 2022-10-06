@@ -848,7 +848,8 @@ class spell_gen_fixate_aura : public AuraScript
     }
 };
 
-// 64440 - Blade Warding
+/* 64440 - Blade Warding
+   64568 - Blood Reserve */
 class spell_gen_proc_above_75 : public AuraScript
 {
     PrepareAuraScript(spell_gen_proc_above_75);
@@ -3633,53 +3634,6 @@ class spell_gen_bandage : public SpellScript
     }
 };
 
-// Blood Reserve - 64568
-enum BloodReserve
-{
-    SPELL_GEN_BLOOD_RESERVE_AURA = 64568,
-    SPELL_GEN_BLOOD_RESERVE_HEAL = 64569
-};
-
-class spell_gen_blood_reserve : public AuraScript
-{
-    PrepareAuraScript(spell_gen_blood_reserve);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        if (!sSpellMgr->GetSpellInfo(SPELL_GEN_BLOOD_RESERVE_HEAL))
-            return false;
-        return true;
-    }
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        if (Unit* caster = eventInfo.GetActionTarget())
-        {
-            if (caster->HealthBelowPct(35))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-
-        Unit* caster = eventInfo.GetActionTarget();
-        caster->CastCustomSpell(SPELL_GEN_BLOOD_RESERVE_HEAL, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), caster, TRIGGERED_FULL_MASK, nullptr, aurEff);
-        caster->RemoveAura(SPELL_GEN_BLOOD_RESERVE_AURA);
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_gen_blood_reserve::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_gen_blood_reserve::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-    }
-};
-
 enum ParalyticPoison
 {
     SPELL_PARALYSIS = 35202
@@ -4540,7 +4494,7 @@ public:
         return ValidateSpellInfo({ _spellId1, _spellId2 });
     }
 
-    void HandleProc(AuraEffect* aurEff)
+    void HandleProc(AuraEffect* /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
         {
@@ -4550,7 +4504,7 @@ public:
                 return;
             }
 
-            caster->CastSpell(GetUnitOwner(), _spellId1, true, nullptr, aurEff);
+            caster->CastSpell(GetUnitOwner(), _spellId1, true);
         }
     }
 
