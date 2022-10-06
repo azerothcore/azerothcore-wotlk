@@ -199,6 +199,14 @@ public:
     void Repeat(Milliseconds time);
 
     /**
+    * @name RepeatEvent
+    * @brief Repeats the most recently executed event.
+    * @param minTime The minimum time until the event occurs as std::chrono type.
+    * @param maxTime The maximum time until the event occurs as std::chrono type.
+    */
+    void Repeat(Milliseconds minTime, Milliseconds maxTime);
+
+    /**
     * @name ExecuteEvent
     * @brief Returns the next event to execute and removes it from map.
     * @return Id of the event to execute.

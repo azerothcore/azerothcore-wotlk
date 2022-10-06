@@ -44,15 +44,16 @@ enum events
 {
     // Battleguard Sartura
     EVENT_SARTURA_WHIRLWIND         = 1,
-    EVENT_SARTURA_WHIRLWIND_RANDOM  = 2,
-    EVENT_SARTURA_WHIRLWIND_END     = 3,
-    EVENT_SPELL_BERSERK             = 4,
-
+    EVENT_SARTURA_WHIRLWIND_RANDOM,
+    EVENT_SARTURA_WHIRLWIND_END,
+    EVENT_SPELL_BERSERK,
+    EVENT_SARTURA_SUNDERING_CLEAVE,
+    
     // Sartura's Royal Guard
-    EVENT_GUARD_WHIRLWIND           = 5,
-    EVENT_GUARD_WHIRLWIND_RANDOM    = 6,
-    EVENT_GUARD_WHIRLWIND_END       = 7,
-    EVENT_GUARD_KNOCKBACK           = 8
+    EVENT_GUARD_WHIRLWIND,
+    EVENT_GUARD_WHIRLWIND_RANDOM,
+    EVENT_GUARD_WHIRLWIND_END,
+    EVENT_GUARD_KNOCKBACK,
 };
 
 struct boss_sartura : public BossAI
@@ -92,6 +93,7 @@ struct boss_sartura : public BossAI
         Talk(SAY_AGGRO);
         events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 30000);
         events.ScheduleEvent(EVENT_SPELL_BERSERK, 10 * 60000);
+        events.ScheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, 2400ms, 3s);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -112,14 +114,6 @@ struct boss_sartura : public BossAI
             DoCastSelf(SPELL_ENRAGE);
             enraged = true;
         }
-    }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id != SPELL_SUNDERING_CLEAVE)
-            return;
-
-        me->RemoveAura(SPELL_SUNDERING_CLEAVE);
     }
 
     void UpdateAI(uint32 diff) override
@@ -161,6 +155,18 @@ struct boss_sartura : public BossAI
                         berserked = true;
                     }
                     break;
+                case EVENT_SARTURA_SUNDERING_CLEAVE:
+                    if (whirlwind)
+                    {
+                        Milliseconds whirlwindTimer = events.GetTimeUntilEvent(EVENT_SARTURA_WHIRLWIND_END);
+                        events.RescheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, whirlwindTimer + 500ms);
+                    }
+                    else
+                    {
+                        DoCastVictim(SPELL_SUNDERING_CLEAVE, false);
+                        events.RescheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, 2400ms, 3s);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -189,14 +195,6 @@ struct npc_sartura_royal_guard : public ScriptedAI
     {
         events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 30000);
         events.ScheduleEvent(EVENT_GUARD_KNOCKBACK, 10000);
-    }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id != SPELL_SUNDERING_CLEAVE)
-            return;
-
-        me->RemoveAura(SPELL_SUNDERING_CLEAVE);
     }
 
     void UpdateAI(uint32 diff) override
