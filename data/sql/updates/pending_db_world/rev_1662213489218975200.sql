@@ -88,5 +88,28 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Chance`, `GroupId`, `Co
 (34046, 21232, 0, 1, 'Imperial Qiraji Armaments'),
 (34046, 21237, 0, 1, 'Imperial Qiraji Regalia');
 
-UPDATE `creature_loot_template` SET `Item`=34046, `Reference`=34046, `GroupId`=0, `Chance`=8 WHERE `Item`=34045 AND `Reference`=34045 AND `Chance` IN (2, 5);
-UPDATE `creature_loot_template` SET `Item`=34045, `GroupId`=0, `Chance`=7 WHERE `Item` IN (190045, 90045) AND `Reference`=34045 AND `Chance` IN (2, 5);
+DELETE FROM `creature_loot_template` WHERE `Reference` IN (34045, 34046);
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(15263, 34045, 34045, 7, 0, 1, 0, 1, 1, 'The Prophet Skeram - Reference Table'),
+(15516, 34045, 34045, 7, 0, 1, 0, 1, 1, 'Battleguard Sartura - Reference Table'),
+(15516, 34046, 34046, 8, 0, 1, 0, 1, 1, 'Battleguard Sartura - Reference Table'),
+(15544, 34045, 34045, 7, 0, 1, 0, 1, 1, 'Vem - Reference Table'),
+(15544, 34046, 34046, 8, 0, 1, 0, 1, 1, 'Vem - Reference Table'),
+(15543, 34045, 34045, 7, 0, 1, 0, 1, 1, 'Princess Yauj - Reference Table'),
+(15543, 34046, 34046, 8, 0, 1, 0, 1, 1, 'Princess Yauj - Reference Table'),
+(15511, 34045, 34045, 7, 0, 1, 0, 1, 1, 'Lord Kri - Reference Table'),
+(15511, 34046, 34046, 8, 0, 1, 0, 1, 1, 'Lord Kri - Reference Table'),
+(15510, 34045, 34045, 7, 0, 1, 0, 1, 1, 'Fankriss the Unyielding - Reference Table'),
+(15510, 34046, 34046, 8, 0, 1, 0, 1, 1, 'Fankriss the Unyielding - Reference Table'),
+(15299, 34045, 34045, 7, 0, 1, 0, 1, 1, 'Viscidus - Reference Table'),
+(15299, 34046, 34046, 8, 0, 1, 0, 1, 1, 'Viscidus - Reference Table'),
+(15509, 34045, 34045, 7, 0, 1, 0, 1, 1, 'Princess Huhuran - Reference Table'),
+(15509, 34046, 34046, 8, 0, 1, 0, 1, 1, 'Princess Huhuran - Reference Table'),
+(15275, 34045, 34045, 7, 0, 1, 0, 1, 1, 'Emperor Vek\'nilash - Reference Table'),
+(15275, 34046, 34046, 8, 0, 1, 0, 1, 1, 'Emperor Vek\'nilash - Reference Table'),
+(15276, 34045, 34045, 7, 0, 1, 0, 1, 1, 'Emperor Vek\'lor - Reference Table'),
+(15276, 34046, 34046, 8, 0, 1, 0, 1, 1, 'Emperor Vek\'lor - Reference Table'),
+(15517, 34045, 34045, 7, 0, 1, 0, 1, 1, 'Ouro - Reference Table'),
+(15517, 34046, 34046, 8, 0, 1, 0, 1, 1, 'Ouro - Reference Table'),
+(15727, 34045, 34045, 7, 0, 1, 0, 1, 1, 'C\'Thun - Reference Table'),
+(15727, 34046, 34046, 8, 0, 1, 0, 1, 1, 'C\'Thun - Reference Table');
