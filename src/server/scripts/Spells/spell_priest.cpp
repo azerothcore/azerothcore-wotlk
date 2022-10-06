@@ -1004,7 +1004,7 @@ class spell_pri_aq_3p_bonus : public AuraScript
         return ValidateSpellInfo({ SPELL_PRIEST_ORACULAR_HEAL });
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
@@ -1016,7 +1016,7 @@ class spell_pri_aq_3p_bonus : public AuraScript
             return;
 
         int32 amount = CalculatePct(static_cast<int32>(healInfo->GetHeal()), 10);
-        caster->CastCustomSpell(SPELL_PRIEST_ORACULAR_HEAL, SPELLVALUE_BASE_POINT0, amount, caster, true);
+        caster->CastCustomSpell(SPELL_PRIEST_ORACULAR_HEAL, SPELLVALUE_BASE_POINT0, amount, caster, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1064,7 +1064,7 @@ class spell_pri_body_and_soul : public AuraScript
             return;
 
         if (roll_chance_i(aurEff->GetAmount()))
-            caster->CastSpell(caster, SPELL_PRIEST_BODY_AND_SOUL_POISON_TRIGGER, aurEff);
+            caster->CastSpell(caster, SPELL_PRIEST_BODY_AND_SOUL_POISON_TRIGGER, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1096,7 +1096,7 @@ class spell_pri_glyph_of_dispel_magic : public AuraScript
         Unit* target = eventInfo.GetProcTarget();
         int32 amount = static_cast<int32>(target->CountPctFromMaxHealth(aurEff->GetAmount()));
 
-        caster->CastCustomSpell(SPELL_PRIEST_GLYPH_OF_DISPEL_MAGIC_HEAL, SPELLVALUE_BASE_POINT0, amount, target, true);
+        caster->CastCustomSpell(SPELL_PRIEST_GLYPH_OF_DISPEL_MAGIC_HEAL, SPELLVALUE_BASE_POINT0, amount, target, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1171,15 +1171,15 @@ class spell_pri_item_t6_trinket : public AuraScript
         });
     }
 
-    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
         if (eventInfo.GetSpellTypeMask() & PROC_SPELL_TYPE_HEAL)
-            caster->CastSpell((Unit*)nullptr, SPELL_PRIEST_DIVINE_BLESSING, true);
+            caster->CastSpell((Unit*)nullptr, SPELL_PRIEST_DIVINE_BLESSING, true, nullptr, aurEff);
 
         if (eventInfo.GetSpellTypeMask() & PROC_SPELL_TYPE_DAMAGE)
-            caster->CastSpell((Unit*)nullptr, SPELL_PRIEST_DIVINE_WRATH, true);
+            caster->CastSpell((Unit*)nullptr, SPELL_PRIEST_DIVINE_WRATH, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1215,7 +1215,7 @@ class spell_pri_shadowfiend_death : public AuraScript
     {
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActionTarget()->GetOwner();
-        caster->CastSpell(caster, SPELL_PRIEST_GLYPH_OF_SHADOWFIEND_MANA, aurEff);
+        caster->CastSpell(caster, SPELL_PRIEST_GLYPH_OF_SHADOWFIEND_MANA, aurEff, nullptr, aurEff);
     }
 
     void Register() override
@@ -1245,7 +1245,7 @@ class spell_pri_vampiric_embrace : public AuraScript
         int32 selfHeal = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
         int32 partyHeal = selfHeal / 5;
         Unit* caster = eventInfo.GetActor();
-        caster->CastCustomSpell((Unit*)nullptr, SPELL_PRIEST_VAMPIRIC_EMBRACE_HEAL, &partyHeal, &selfHeal, nullptr, true);
+        caster->CastCustomSpell((Unit*)nullptr, SPELL_PRIEST_VAMPIRIC_EMBRACE_HEAL, &partyHeal, &selfHeal, nullptr, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1267,7 +1267,7 @@ class spell_pri_t3_4p_bonus : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_PRIEST_ARMOR_OF_FAITH, aurEff);
+        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_PRIEST_ARMOR_OF_FAITH, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1300,7 +1300,7 @@ class spell_pri_t5_heal_2p_bonus : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_PRIEST_ITEM_EFFICIENCY, aurEff);
+        GetTarget()->CastSpell(GetTarget(), SPELL_PRIEST_ITEM_EFFICIENCY, true, nullptr, aurEff);
     }
 
     void Register() override

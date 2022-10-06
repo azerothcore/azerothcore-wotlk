@@ -641,13 +641,13 @@ class spell_rog_tricks_of_the_trade : public AuraScript
         return _redirectTarget;
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
 
         Unit* target = GetTarget();
-        target->CastSpell(_redirectTarget, SPELL_ROGUE_TRICKS_OF_THE_TRADE_DMG_BOOST, true);
-        target->CastSpell(target, SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC, true);
+        target->CastSpell(_redirectTarget, SPELL_ROGUE_TRICKS_OF_THE_TRADE_DMG_BOOST, true, nullptr, aurEff);
+        target->CastSpell(target, SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC, true, nullptr, aurEff);
         Remove(AURA_REMOVE_BY_DEFAULT); // maybe handle by proc charges
     }
 
@@ -719,7 +719,7 @@ class spell_rog_deadly_brew : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_ROGUE_CRIPPLING_POISON, aurEff);
+        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_ROGUE_CRIPPLING_POISON, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -747,7 +747,7 @@ class spell_rog_quick_recovery : public AuraScript
 
         Unit* caster = eventInfo.GetActor();
         int32 amount = CalculatePct(spellInfo->CalcPowerCost(caster, spellInfo->GetSchoolMask()), aurEff->GetAmount());
-        caster->CastCustomSpell(SPELL_ROGUE_QUICK_RECOVERY_ENERGY, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true);
+        caster->CastCustomSpell(SPELL_ROGUE_QUICK_RECOVERY_ENERGY, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -769,7 +769,7 @@ class spell_rog_glyph_of_backstab : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_ROGUE_GLYPH_OF_BACKSTAB_TRIGGER, aurEff);
+        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_ROGUE_GLYPH_OF_BACKSTAB_TRIGGER, true, nullptr, aurEff);
     }
 
     void Register() override
