@@ -34,7 +34,6 @@ enum Spells
     SPELL_ENRAGE                    = 8269,
     SPELL_BERSERK                   = 27680,
     SPELL_SUNDERING_CLEAVE          = 25174,
-
     // Sartura's Royal Guard
     SPELL_GUARD_WHIRLWIND           = 26038,
     SPELL_GUARD_KNOCKBACK           = 26027
