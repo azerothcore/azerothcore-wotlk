@@ -301,6 +301,8 @@ struct boss_eye_of_cthun : public BossAI
                         me->SetTarget(ObjectGuid::Empty);
                         me->StopMoving();
 
+                        DoCastSelf(SPELL_DARK_GLARE);
+
                         if (ClockWise)
                         {
                             me->SetFacingTo(DarkGlareAngle + DarkGlareTick * float(M_PI) / 35);
@@ -313,7 +315,6 @@ struct boss_eye_of_cthun : public BossAI
                             me->SetOrientation(DarkGlareAngle - DarkGlareTick * float(M_PI) / 35);
                         }
 
-                        DoCastSelf(SPELL_DARK_GLARE);
                         ++DarkGlareTick;
 
                         if (tasker.GetRepeatCounter() >= 35)
@@ -533,6 +534,11 @@ struct boss_cthun : public BossAI
         if (Creature* pPortal = me->FindNearestCreature(NPC_CTHUN_PORTAL, 10.0f))
         {
             pPortal->DespawnOrUnsummon();
+        }
+
+        if (Creature* eye = instance->GetCreature(DATA_EYE_OF_CTHUN))
+        {
+            eye->DespawnOrUnsummon();
         }
     }
 
