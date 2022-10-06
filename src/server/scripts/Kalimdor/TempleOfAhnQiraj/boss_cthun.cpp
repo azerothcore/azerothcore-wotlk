@@ -569,7 +569,7 @@ struct boss_cthun : public BossAI
                     ScheduleTasks();
                     //Remove purple coloration
                     me->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
-
+                    DoCastSelf(SPELL_CARAPACE_CTHUN, true);
                     //Spawn flesh tentacle
                     for (uint8 i = 0; i < 2; i++)
                     {
