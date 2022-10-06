@@ -1,3 +1,4 @@
+-- DB update 2022_10_06_02 -> 2022_10_06_03
 --
 DELETE FROM `creature_template_movement` WHERE `creatureId` IN (21221, 15728, 15334, 15802, 15725, 15726);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
