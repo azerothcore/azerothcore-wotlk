@@ -16,7 +16,6 @@ if [ -f "$AC_PATH_INSTALLER/config.sh"  ]; then
 fi
 
 source "$AC_PATH_APPS/compiler/includes/includes.sh"
-source "$AC_PATH_APPS/db_assembler/includes/includes.sh"
 
 source "$AC_PATH_DEPS/semver_bash/semver.sh"
 
