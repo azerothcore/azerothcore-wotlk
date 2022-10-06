@@ -301,8 +301,6 @@ struct boss_eye_of_cthun : public BossAI
                         me->SetTarget(ObjectGuid::Empty);
                         me->StopMoving();
 
-                        DoCastSelf(SPELL_DARK_GLARE);
-
                         if (ClockWise)
                         {
                             me->SetFacingTo(DarkGlareAngle + DarkGlareTick * float(M_PI) / 35);
@@ -314,6 +312,11 @@ struct boss_eye_of_cthun : public BossAI
                             me->SetFacingTo(DarkGlareAngle - DarkGlareTick * float(M_PI) / 35);
                             me->SetOrientation(DarkGlareAngle - DarkGlareTick * float(M_PI) / 35);
                         }
+
+                        _scheduler.Schedule(500ms, [this](TaskContext /*Task*/)
+                        {
+                            DoCastSelf(SPELL_DARK_GLARE);
+                        });
 
                         ++DarkGlareTick;
 
