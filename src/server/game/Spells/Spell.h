@@ -741,7 +741,7 @@ public:
     {
         SpellInfo const* triggeredSpell;
         SpellInfo const* triggeredByAura;
-        // uint8 triggeredByEffIdx          This might be needed at a later stage - No need known for now
+        uint8 triggeredByEffIdx;
         int32 chance;
     };
 

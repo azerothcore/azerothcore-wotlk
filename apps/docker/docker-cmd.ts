@@ -3,7 +3,7 @@ import * as ink from "https://deno.land/x/ink/mod.ts";
 import {
   Input,
   Select,
-} from "https://deno.land/x/cliffy@v0.18.2/prompt/mod.ts";
+} from "https://deno.land/x/cliffy@v0.25.2/prompt/mod.ts";
 
 const program = new Command();
 

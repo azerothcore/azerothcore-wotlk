@@ -111,6 +111,7 @@ function comp_compile() {
     echo "Generating confs..."
     cp -n "env/dist/etc/worldserver.conf.dockerdist" "env/dist/etc/worldserver.conf"
     cp -n "env/dist/etc/authserver.conf.dockerdist" "env/dist/etc/authserver.conf"
+    cp -n "env/dist/etc/dbimport.conf.dockerdist" "env/dist/etc/dbimport.conf"
   fi
 
   runHooks "ON_AFTER_BUILD"

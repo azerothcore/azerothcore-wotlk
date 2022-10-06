@@ -160,7 +160,7 @@ void FormationMgr::LoadCreatureFormations()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded {} creatures in formations in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Creatures In Formations in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -406,13 +406,16 @@ bool CreatureGroup::IsFormationInCombat()
     return false;
 }
 
-bool CreatureGroup::IsAnyMemberAlive()
+bool CreatureGroup::IsAnyMemberAlive(bool ignoreLeader /*= false*/)
 {
     for (auto const& itr : m_members)
     {
         if (itr.first && itr.first->IsAlive())
         {
-            return true;
+            if (!ignoreLeader || itr.first != m_leader)
+            {
+                return true;
+            }
         }
     }
 
