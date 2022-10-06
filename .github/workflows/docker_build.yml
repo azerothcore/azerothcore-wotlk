@@ -68,7 +68,7 @@ jobs:
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile dev --profile local build --parallel
+          ./acore.sh docker build
 
       - name: Deploy Dev
         #env:
@@ -97,7 +97,7 @@ jobs:
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile build --profile prod build --parallel
+          ./acore.sh docker prod:build
           docker-compose run --no-deps --name build ac-build echo "image created"
           docker cp build:/azerothcore/var/ccache var/docker/
           echo "ccache exported"
