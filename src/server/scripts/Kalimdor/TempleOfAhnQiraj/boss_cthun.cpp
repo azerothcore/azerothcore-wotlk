@@ -313,10 +313,7 @@ struct boss_eye_of_cthun : public BossAI
                             me->SetOrientation(DarkGlareAngle - DarkGlareTick * float(M_PI) / 35);
                         }
 
-                        _scheduler.Schedule(500ms, [this](TaskContext /*Task*/)
-                        {
-                            DoCastSelf(SPELL_DARK_GLARE);
-                        });
+                        DoCastSelf(SPELL_DARK_GLARE);
 
                         ++DarkGlareTick;
 
