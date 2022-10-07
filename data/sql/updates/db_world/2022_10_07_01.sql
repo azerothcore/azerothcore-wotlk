@@ -1,3 +1,4 @@
+-- DB update 2022_10_07_00 -> 2022_10_07_01
 --
 -- Drop rate improvements over 1144 itterations:
 -- ITEM Captain Kelisendra's Lost Rutters (21776) = Already Correct 10%

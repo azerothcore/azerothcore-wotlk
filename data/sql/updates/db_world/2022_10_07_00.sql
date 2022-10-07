@@ -1,3 +1,4 @@
+-- DB update 2022_10_06_05 -> 2022_10_07_00
 -- Idols
 UPDATE `creature_loot_template` SET `Chance`=0.4 WHERE `Item` IN (20874, 20875, 20876, 20877, 20878, 20879, 20881, 20882);
 

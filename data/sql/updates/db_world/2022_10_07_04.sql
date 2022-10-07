@@ -1,3 +1,4 @@
+-- DB update 2022_10_07_03 -> 2022_10_07_04
 UPDATE `creature_template` SET `detection_range` = 37.5 WHERE (`entry` IN (15262, 15312));
 UPDATE `creature_template` SET `detection_range` = 38.5 WHERE (`entry` = 15263);
 UPDATE `creature_template` SET `detection_range` = 15 WHERE (`entry` = 15300);
