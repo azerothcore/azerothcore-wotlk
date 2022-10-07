@@ -790,7 +790,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (2135239, 747, 0, 'Stranglekelp');
 
 -- Wyrmscar Isle
--- Bruiseweed: (, , , , );
 DELETE FROM `pool_template` WHERE `entry` BETWEEN 748 AND 751;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (748, 2, 'Peacebloom in Wyrmscar Isle'),
