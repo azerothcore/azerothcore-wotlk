@@ -1,3 +1,4 @@
+-- DB update 2022_10_07_05 -> 2022_10_07_06
 --
 -- Not every GAMEOBJECT Captain Kelisendra's Cargo (180917) will be spawned at the same time and object bunching is possible (1 pool). 6 can be up at time (confirmed twice) and thier respawn seem very fast.
 
