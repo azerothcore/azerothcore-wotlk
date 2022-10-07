@@ -46,8 +46,10 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@OGUID+38, 180917, 530, 3430, 3460, 1, 1, 8848.1298828125, -5716.017578125, 0.576173007488250732, 3.001946926116943359, 0, 0, 0.997563362121582031, 0.069766148924827575, 30, 255, 1, 0), -- 180917 (Area: 3460 - Difficulty: 0)
 (@OGUID+39, 180917, 530, 3430, 3460, 1, 1, 8743.2236328125, -5693.51123046875, 0.123534001410007476, 5.864306926727294921, 0, 0, -0.20791149139404296, 0.978147625923156738, 30, 255, 1, 0);
 
+DELETE FROM `pool_template` WHERE `entry`=505;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (505, 6, 'Captain Kelisendra\'s Cargo (6 spawns)');
+DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+39;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@OGUID+0, 505, 0, 'Captain Kelisendra\'s Cargo 1 of 40'),
 (@OGUID+1, 505, 0, 'Captain Kelisendra\'s Cargo 2 of 40'),
