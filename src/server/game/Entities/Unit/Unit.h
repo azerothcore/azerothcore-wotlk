@@ -763,6 +763,10 @@ private:
     uint32 m_block;
     uint32 m_cleanDamage;
 
+    //npcbot
+    uint32 m_procEx = 0;
+    //end npcbot
+
 public:
     explicit DamageInfo(Unit* _attacker, Unit* _victim, uint32 _damage, SpellInfo const* _spellInfo, SpellSchoolMask _schoolMask, DamageEffectType _damageType, uint32 cleanDamage = 0);
     explicit DamageInfo(CalcDamageInfo& dmgInfo);
@@ -785,6 +789,10 @@ public:
     [[nodiscard]] uint32 GetBlock() const { return m_block; };
 
     [[nodiscard]] uint32 GetUnmitigatedDamage() const;
+
+    //npcbot
+    [[nodiscard]] uint32 GetHitMask() const { return m_procEx; }
+    //end npcbot
 };
 
 class HealInfo

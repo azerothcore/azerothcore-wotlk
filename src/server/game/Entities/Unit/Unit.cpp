@@ -126,6 +126,9 @@ DamageInfo::DamageInfo(CalcDamageInfo& dmgInfo)
     : m_attacker(dmgInfo.attacker), m_victim(dmgInfo.target), m_damage(dmgInfo.damage), m_spellInfo(nullptr), m_schoolMask(SpellSchoolMask(dmgInfo.damageSchoolMask)),
       m_damageType(DIRECT_DAMAGE), m_attackType(dmgInfo.attackType), m_absorb(dmgInfo.absorb), m_resist(dmgInfo.resist), m_block(dmgInfo.blocked_amount),
       m_cleanDamage(dmgInfo.cleanDamage)
+      //npcbot
+      , m_procEx(dmgInfo.procEx)
+      //end npcbot
 {
 }
 
@@ -465,6 +468,7 @@ void Unit::Update(uint32 p_time)
                 m_CombatTimer -= p_time;
         }
     }
+    //end npcbot
 
     _lastDamagedTargetGuid = ObjectGuid::Empty;
     if (_lastExtraAttackSpell)
@@ -1788,7 +1792,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         victim->HandleEmoteCommand(EMOTE_ONESHOT_PARRY_SHIELD);
 
     if (damageInfo->TargetState == VICTIMSTATE_PARRY)
-    //npcbot - implement CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN (TC sup)
+    //npcbot - implement CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN (AC sup)
     if (!(GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN))
     //end npcbot
     {
@@ -2773,6 +2777,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
     {
         //TC_LOG_DEBUG("entities.unit", "RollMeleeOutcomeAgainst: attack came from behind and victim was a bot.");
     }
+    //end npcbot
     // Xinef: do not allow to dodge with CREATURE_FLAG_EXTRA_NO_DODGE flag
     else if (victim->GetTypeId() == TYPEID_PLAYER || !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_DODGE))
     {
@@ -2782,8 +2787,8 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
         //npcbot - manual expertise instead of auras
         else if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
         {
-            parry_chance -= ToCreature()->GetCreatureExpertise() * 25;
-            parry_chance -= GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE) * 25;
+            dodge_chance -= ToCreature()->GetCreatureExpertise() * 25;
+            dodge_chance -= GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE) * 25;
         }
         //end npcbot
         else
@@ -2823,8 +2828,8 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
         //npcbot - manual expertise instead of auras
         else if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
         {
-            dodge_chance -= ToCreature()->GetCreatureExpertise() * 25;
-            dodge_chance -= GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE) * 25;
+            parry_chance -= ToCreature()->GetCreatureExpertise() * 25;
+            parry_chance -= GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE) * 25;
         }
         //end npcbot
         else
@@ -3551,6 +3556,7 @@ float Unit::GetUnitParryChance() const
             else
             //end npcbot
             chance = 5.0f;
+
         // Xinef: if aura is present, type should not matter
         chance += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
     }
@@ -9664,6 +9670,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                 if (!target)
                     return false;
 
+                //npcbot
                 if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsNPCBot())
                 {
                     if (cooldown)
@@ -9692,6 +9699,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                         return true;
                     }
                 }
+                //end npcbot
 
                 if (Player* pTarget = target->ToPlayer())
                 {
