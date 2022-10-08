@@ -21034,6 +21034,43 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 UPDATE `gameobject` SET `ZoneId`=45 WHERE `guid` IN (2264,2269,2272,2275,2276,2277,2291,2292,2293);
 UPDATE `gameobject` SET `ZoneId`=10 WHERE `guid` IN (2255,2256,2257,2258,2259,2261,2262,2263,2265,2268,2270,2271,2273,2279,2280,2282,2283,2284,2285,2286,2287,2288,2289,2290,2294,2295,2297,2298,2299,2300,2260,2266,2267,2274,2278,2281,2296);
 
+-- Restore Desolace Ghost Mushroom
+DELETE FROM `pool_template` WHERE `entry`=680;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(680, 4, 'Ghost Mushroom in Desolace');
+
+DELETE FROM `pool_gameobject` WHERE `pool_entry`=680;
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+(2058, 680, 0, 'Ghost Mushroom - Desolace'),
+(2059, 680, 0, 'Ghost Mushroom - Desolace'),
+(2060, 680, 0, 'Ghost Mushroom - Desolace'),
+(2061, 680, 0, 'Ghost Mushroom - Desolace'),
+(2062, 680, 0, 'Ghost Mushroom - Desolace'),
+(2063, 680, 0, 'Ghost Mushroom - Desolace'),
+(2064, 680, 0, 'Ghost Mushroom - Desolace'),
+(2065, 680, 0, 'Ghost Mushroom - Desolace'),
+(2066, 680, 0, 'Ghost Mushroom - Desolace'),
+(2067, 680, 0, 'Ghost Mushroom - Desolace'),
+(2068, 680, 0, 'Ghost Mushroom - Desolace'),
+(2069, 680, 0, 'Ghost Mushroom - Desolace'),
+(2070, 680, 0, 'Ghost Mushroom - Desolace');
+
+DELETE FROM `gameobject` WHERE `guid` BETWEEN 2058 AND 2070;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
+(2058, 142144, 1, 405, 607, 1, 1, -1190.75, 2932.62, 77.6618, -0.767945, 0, 0, 0.374607, -0.927184, 2700, 100, 1, '', 0),
+(2059, 142144, 1, 405, 2100, 1, 1, -1455, 2957.73, 123.418, -1, 0, 0, -0.34202, 0.939693, 2700, 100, 1, '', 0),
+(2060, 142144, 1, 405, 607, 1, 1, -1427, 2782.11, 112.419, 1.414, 0, 0, 0.649448, 0.760406, 2700, 100, 1, '', 0),
+(2061, 142144, 1, 405, 2100, 1, 1, -1300, 2915.14, 88.297, 2.059, 0, 0, 0.857167, 0.515038, 2700, 100, 1, '', 0),
+(2062, 142144, 1, 405, 2100, 1, 1, -1444.11, 2787, 93.5777, 1.41372, 0, 0, 0.649448, 0.760406, 2700, 100, 1, '', 0),
+(2063, 142144, 1, 405, 607, 1, 1, -1169, 2923.8, 143.438, -1, 0, 0, -0.453991, 0.891006, 2700, 100, 1, '', 0),
+(2064, 142144, 1, 405, 607, 1, 1, -1276, 2995.79, 73.339, -2, 0, 0, -0.894934, 0.446198, 2700, 100, 1, '', 0),
+(2065, 142144, 1, 405, 607, 1, 1, -1516, 2886.97, 113.888, 1.204, 0, 0, 0.566406, 0.824126, 2700, 100, 1, '', 0),
+(2066, 142144, 1, 405, 607, 1, 1, -1365, 2876.25, 76.388, -2, 0, 0, -0.87462, 0.48481, 2700, 100, 1, '', 0),
+(2067, 142144, 1, 405, 607, 1, 1, -1443.13, 2864.16, 87.9732, -1.25664, 0, 0, 0.587785, -0.809017, 2700, 100, 1, '', 0),
+(2068, 142144, 1, 405, 607, 1, 1, -1370.94, 2878.47, 76.912, -2.1293, 0, 0, 0.87462, -0.48481, 2700, 100, 1, '', 0),
+(2069, 142144, 1, 405, 607, 1, 1, -1199.4, 2971.74, 64.6476, -0.942478, 0, 0, 0.453991, -0.891006, 2700, 100, 1, '', 0),
+(2070, 142144, 1, 405, 607, 1, 1, -1255.65, 2933.59, 74.1313, 2.05949, 0, 0, 0, 1, 2700, 100, 1, '', 0);
+
 -- Delete old unpooled nodes
 DELETE FROM `gameobject` WHERE `id` IN (1618, 3724, 1617, 3725, 1620, 3727, 1619, 3726, 1621, 3729, 1622, 3730, 2045, 1623, 1628, 1624, 2041, 2042, 2046, 2043, 2044, 2866, 142140, 142141, 176642, 142142, 176636, 142143, 183046, 142144, 142145, 176637, 176583, 176638, 176584, 176639, 176586, 176640, 176587, 176641, 176588) AND `position_z`<1200 AND `map` IN (0, 1) AND `guid` NOT IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` BETWEEN 489 AND 716);
 
