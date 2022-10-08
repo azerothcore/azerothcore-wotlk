@@ -6414,6 +6414,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
     Item* castItem = triggeredByAura->GetBase()->GetCastItemGUID() && GetTypeId() == TYPEID_PLAYER
                      ? ToPlayer()->GetItemByGuid(triggeredByAura->GetBase()->GetCastItemGUID()) : nullptr;
 
+    //npcbot: find bot equips
+    if (!castItem && GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+        castItem = ToCreature()->GetBotEquipsByGuid(triggeredByAura->GetBase()->GetCastItemGUID());
+    //end npcbot
+
     uint32 triggered_spell_id = 0;
     uint32 cooldown_spell_id = 0; // for random trigger, will be one of the triggered spell to avoid repeatable triggers
     // otherwise, it's the triggered_spell_id by default
@@ -7325,6 +7330,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             // Check cooldown of heal spell cooldown
                             if (GetTypeId() == TYPEID_PLAYER && !ToPlayer()->HasSpellCooldown(34299))
                                 CastCustomSpell(this, 68285, &basepoints1, 0, 0, true, 0, triggeredByAura);
+
+                            //npcbot - proc for bot
+                            if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot() && !ToCreature()->HasSpellCooldown(34299))
+                                CastCustomSpell(this, 68285, &basepoints1, 0, 0, true, 0, triggeredByAura);
+                            //end npcbot
+
                             break;
                         }
                     // Healing Touch (Dreamwalker Raiment set)
@@ -7406,6 +7417,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             if (!victim || !procSpell || procSpell->SpellIconID != 64)
                                 return false;
 
+                            //npcbot: support for Item - Druid T10 Restoration 4P Bonus (Rejuvenation)
+                            if (victim != this && GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+                            {
+                                CastCustomSpell(70691, SPELLVALUE_BASE_POINT0, damage, victim, true);
+                                return true;
+                            }
+                            //end npcbot
+
                             Player* caster = ToPlayer();
                             if (!caster)
                                 return false;
@@ -7434,6 +7453,30 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = isWrathSpell ? 48518 : 48517;
                     break;
                 }
+                //npcbot - Eclipse for bot
+                if (dummySpell->SpellIconID == 2856 && GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+                {
+                    if (!procSpell || effIndex != 0)
+                        return false;
+
+                    bool isWrathSpell = (procSpell->SpellFamilyFlags[0] & 1);
+
+                    if (!roll_chance_f(dummySpell->ProcChance * (isWrathSpell ? 0.6f : 1.0f)))
+                        return false;
+
+                    target = this;
+                    if (target->HasAura(isWrathSpell ? 48517 : 48518))
+                        return false;
+
+                    triggered_spell_id = isWrathSpell ? 48518 : 48517;
+
+                    if (ToCreature()->HasSpellCooldown(triggered_spell_id))
+                        return false;
+
+                    break;
+                }
+                //end npcbot
+
                 [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
             }
         case SPELLFAMILY_ROGUE:
@@ -7515,6 +7558,28 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         {
                             if (!procSpell)
                                 return false;
+
+                            //npcbot: calc amount
+                            if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+                            {
+                                if (procSpell->SpellFamilyFlags[2] & 0x200)
+                                {
+                                    if (!victim)
+                                        return false;
+                                    if (AuraEffect const* pEff = victim->GetAuraEffect(SPELL_AURA_PERIODIC_DUMMY, SPELLFAMILY_HUNTER, 0x0, 0x80000000, 0x0, GetGUID()))
+                                        basepoints0 = pEff->GetSpellInfo()->CalcPowerCost(this, SpellSchoolMask(pEff->GetSpellInfo()->SchoolMask)) * 4/10/3;
+                                }
+                                else
+                                    basepoints0 = procSpell->CalcPowerCost(this, SpellSchoolMask(procSpell->SchoolMask)) * 4/10;
+
+                                if (basepoints0 <= 0)
+                                    return false;
+
+                                target = this;
+                                triggered_spell_id = 34720;
+                                break;
+                            }
+                            //end npcbot
 
                             Spell* spell = ToPlayer()->m_spellModTakingSpell;
 
@@ -7942,6 +8007,78 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Windfury Weapon (Passive) 1-8 Ranks
                     case 33757:
                         {
+                            //npcbot: handle bot enchant
+                            if (Creature* bot = ToCreature())
+                            {
+                                if (!bot->IsNPCBot() || !castItem || !victim || !victim->IsAlive())
+                                    return false;
+
+                               //dummySpell->Id must be init'ed
+                                if (cooldown && bot->HasSpellCooldown(dummySpell->Id))
+                                    return false;
+
+                                if (triggeredByAura->GetBase() && castItem->GetGUID() != triggeredByAura->GetBase()->GetCastItemGUID())
+                                    return false;
+
+                                WeaponAttackType attType = bot->GetBotEquips(0/*BOT_SLOT_MAINHAND*/) == castItem ? BASE_ATTACK : OFF_ATTACK;
+                                if ((attType != BASE_ATTACK && attType != OFF_ATTACK)
+                                    || (attType == BASE_ATTACK && procFlag & PROC_FLAG_DONE_OFFHAND_ATTACK)
+                                    || (attType == OFF_ATTACK && procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK))
+                                     return false;
+
+                                uint32 chance = 20;
+                                if (getLevel() >= 30)
+                                    chance += 2;
+
+                                Item const* addWeapon = bot->GetBotEquips(attType == BASE_ATTACK ? 1/*BOT_SLOT_OFFHAND*/ : 0/*BOT_SLOT_MAINHAND*/);
+                                uint32 enchant_id_add = addWeapon ? addWeapon->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) : 0;
+                                SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id_add);
+                                if (pEnchant && pEnchant->spellid[0] == dummySpell->Id)
+                                    chance += 14;
+
+                                if (!roll_chance_i(chance))
+                                    return false;
+
+                                uint32 spellId;
+                                switch (castItem->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+                                {
+                                    case 283: spellId =  8232; break;   // 1 Rank
+                                    case 284: spellId =  8235; break;   // 2 Rank
+                                    case 525: spellId = 10486; break;   // 3 Rank
+                                    case 1669:spellId = 16362; break;   // 4 Rank
+                                    case 2636:spellId = 25505; break;   // 5 Rank
+                                    case 3785:spellId = 58801; break;   // 6 Rank
+                                    case 3786:spellId = 58803; break;   // 7 Rank
+                                    case 3787:spellId = 58804; break;   // 8 Rank
+                                    default:
+                                    {
+                                        LOG_ERROR("entities.unit", "Unit::HandleDummyAuraProc (bot): non handled item enchantment (rank?) {} for spell id: {} (Windfury)",
+                                            castItem->GetEnchantmentId(EnchantmentSlot(TEMP_ENCHANTMENT_SLOT)), dummySpell->Id);
+                                        return false;
+                                    }
+                                }
+
+                                SpellInfo const* windfurySpellInfo = sSpellMgr->GetSpellInfo(spellId);
+                                if (!windfurySpellInfo)
+                                {
+                                    LOG_ERROR("entities.unit", "Unit::HandleDummyAuraProc (bot): non-existing spell id: {} (Windfury)", spellId);
+                                    return false;
+                                }
+
+                                int32 extra_attack_power = CalculateSpellDamage(victim, windfurySpellInfo, 1);
+                                basepoints0 = int32(extra_attack_power / 14.0f * GetAttackTime(attType) / 1000);
+                                triggered_spell_id = (procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK) ? 25504 : 33750;
+
+                                if (cooldown)
+                                    bot->AddBotSpellCooldown(dummySpell->Id, cooldown * IN_MILLISECONDS);
+
+                                for (uint32 i = 0; i != 2; ++i)
+                                    CastCustomSpell(victim, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
+
+                                return true;
+                            }
+                            //end npcbot
+
                             Player* player = ToPlayer();
                             if (!player || !castItem || !castItem->IsEquipped() || !victim || !victim->IsAlive())
                                 return false;
@@ -8144,6 +8281,40 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Flametongue Weapon (Passive)
                 if (dummySpell->SpellFamilyFlags[0] & 0x200000)
                 {
+                    //npcbot: handle proc for bots
+                    if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+                    {
+                        if (!victim || !victim->IsAlive() || !castItem)
+                            return false;
+
+                        WeaponAttackType attType = ToCreature()->GetBotEquips(0) == castItem ? BASE_ATTACK : OFF_ATTACK;
+                        if ((attType != BASE_ATTACK && attType != OFF_ATTACK)
+                            || (attType == BASE_ATTACK && procFlag & PROC_FLAG_DONE_OFFHAND_ATTACK)
+                            || (attType == OFF_ATTACK && procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK))
+                            return false;
+
+                        float fire_onhit = float(CalculatePct(dummySpell->Effects[EFFECT_0].CalcValue(), 1.0f));
+                        float add_spellpower = (float)(SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE)
+                                             + victim->SpellBaseDamageBonusTaken(SPELL_SCHOOL_MASK_FIRE));
+
+                        // 1.3speed = 5%, 2.6speed = 10%, 4.0 speed = 15%, so, 1.0speed = 3.84%
+                        ApplyPct(add_spellpower, 3.84f);
+
+                        float BaseWeaponSpeed;
+                        if (attType == OFF_ATTACK && (procFlag & PROC_FLAG_DONE_OFFHAND_ATTACK))
+                            BaseWeaponSpeed = GetAttackTime(OFF_ATTACK) / 1000.0f;
+                        else if (attType == BASE_ATTACK && procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK)
+                            BaseWeaponSpeed = GetAttackTime(BASE_ATTACK) / 1000.0f;
+                        else
+                            return false;
+
+                        basepoints0 = int32((fire_onhit + add_spellpower) * BaseWeaponSpeed);
+                        triggered_spell_id = 10444;
+                        CastCustomSpell(victim, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
+                        return true;
+                    }
+                    //end npcbot
+
                     if (GetTypeId() != TYPEID_PLAYER  || !victim || !victim->IsAlive() || !castItem || !castItem->IsEquipped())
                         return false;
 
@@ -9311,6 +9482,24 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         case 12849:
         case 12867:
             {
+                //npcbot: Deep Wounds for bots
+                if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+                {
+                    // now compute approximate weapon damage by formula from wowwiki.com
+                    Item const* item = ToCreature()->GetBotEquips((procFlags & PROC_FLAG_DONE_OFFHAND_ATTACK) ? 1/*BOT_SLOT_OFFHAND*/ : 0/*BOT_SLOT_MAINHAND*/);
+                    if (!item)
+                        return false;
+
+                    ItemTemplate const* weapon = item->GetTemplate();
+
+                    float weaponDPS = weapon->getDPS();
+                    float attackPowerDPS = GetTotalAttackPowerValue(BASE_ATTACK) / 14.0f;
+                    float weaponSpeed = float(weapon->Delay) / 1000.0f;
+                    basepoints0 = int32((weaponDPS + attackPowerDPS) * weaponSpeed);
+                    break;
+                }
+                //end npcbot
+
                 if (GetTypeId() != TYPEID_PLAYER)
                     return false;
 
@@ -9474,6 +9663,35 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                 target = triggeredByAura->GetBase()->GetCaster();
                 if (!target)
                     return false;
+
+                if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsNPCBot())
+                {
+                    if (cooldown)
+                    {
+                        if (target->HasSpellCooldown(trigger_spell_id) )
+                            return false;
+                        target->AddSpellCooldown(trigger_spell_id, 0, cooldown);
+                    }
+
+                    Unit* cptarget = nullptr;
+                    if (trigger_spell_id == 51699)
+                    {
+                        cptarget = target->GetComboTarget();
+                        if (!cptarget)
+                        {
+                            if (ObjectGuid targetGuid = target->GetTarget())
+                                cptarget = ObjectAccessor::GetUnit(*target, targetGuid);
+                        }
+                    }
+                    else
+                        cptarget = target;
+
+                    if (cptarget)
+                    {
+                        target->CastSpell(cptarget, trigger_spell_id, true);
+                        return true;
+                    }
+                }
 
                 if (Player* pTarget = target->ToPlayer())
                 {
@@ -16176,24 +16394,6 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         // Update skills here for players
         // only when you are not fighting other players or their pets/totems (pvp)
         if (IsPlayer() && !target->IsCharmedOwnedByPlayerOrPlayer())
-                //npcbot - update reactives for bots (victim)
-                if ((procExtra & PROC_HIT_PARRY) && GetTypeId() == TYPEID_UNIT &&
-                    ToCreature()->IsNPCBot() && ToCreature()->GetBotClass() == CLASS_HUNTER)
-                {
-                    ModifyAuraState(AURA_STATE_HUNTER_PARRY, true);
-                    StartReactiveTimer(REACTIVE_HUNTER_PARRY);
-                }
-                //end npcbot
-
-                //npcbot - update reactives for bots (attacker)
-                if ((procExtra & (PROC_HIT_DODGE | PROC_HIT_PARRY)) && GetTypeId() == TYPEID_UNIT &&
-                    ToCreature()->IsNPCBot() && ToCreature()->GetBotClass() == CLASS_WARRIOR)
-                {
-                    AddComboPoints(target, 1);
-                    StartReactiveTimer(REACTIVE_OVERPOWER);
-                }
-                //TODO REACTIVE_WOLVERINE_BITE for bot hunter pets
-                //end npcbot
         {
             // On melee based hit/miss/resist/parry/dodge need to update skill (for victim and attacker)
             if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST | PROC_EX_PARRY | PROC_EX_DODGE))
@@ -16243,6 +16443,14 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     ModifyAuraState(AURA_STATE_DEFENSE, true);
                     StartReactiveTimer(REACTIVE_DEFENSE);
                 }
+                //npcbot - update reactives for bots (victim)
+                if ((procExtra & PROC_HIT_PARRY) && GetTypeId() == TYPEID_UNIT &&
+                    ToCreature()->IsNPCBot() && ToCreature()->GetBotClass() == CLASS_HUNTER)
+                {
+                    ModifyAuraState(AURA_STATE_HUNTER_PARRY, true);
+                    StartReactiveTimer(REACTIVE_HUNTER_PARRY);
+                }
+                //end npcbot
             }
             else // For attacker
             {
@@ -16262,6 +16470,16 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     AddComboPoints(target, 1);
                     StartReactiveTimer(REACTIVE_WOLVERINE_BITE);
                 }
+
+                //npcbot - update reactives for bots (attacker)
+                if ((procExtra & (PROC_HIT_DODGE | PROC_HIT_PARRY)) && GetTypeId() == TYPEID_UNIT &&
+                    ToCreature()->IsNPCBot() && ToCreature()->GetBotClass() == CLASS_WARRIOR)
+                {
+                    AddComboPoints(target, 1);
+                    StartReactiveTimer(REACTIVE_OVERPOWER);
+                }
+                //TODO REACTIVE_WOLVERINE_BITE for bot hunter pets
+                //end npcbot
             }
         }
     }
@@ -17664,6 +17882,13 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CHANCE_OF_SUCCESS, chance);
     }
 
+    //npcbot: apply chance of success spellmods for bots
+    if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+    {
+        ToCreature()->ApplyCreatureSpellChanceOfSuccessMods(spellProto, chance);
+    }
+    //end npcbot
+
     return roll_chance_f(chance);
 }
 
@@ -17809,13 +18034,6 @@ bool Unit::HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura)
 
 void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackType attackType, SpellInfo const* spellProto, Spell const* spell /*= nullptr*/)
 {
-    //npcbot: apply chance of success spellmods for bots
-    if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
-    {
-        ToCreature()->ApplyCreatureSpellChanceOfSuccessMods(spellProto, chance);
-    }
-    //end npcbot
-
     // Prevent killing unit twice (and giving reward from kill twice)
     if (!victim->GetHealth())
         return;
