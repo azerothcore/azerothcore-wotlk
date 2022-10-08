@@ -3299,16 +3299,16 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         return;
     }
 
-    if (!unitTarget->GetThreatMgr().getOnlineContainer().empty())
+    if (!unitTarget->GetThreatMgr().GetOnlineContainer().empty())
     {
         // Also use this effect to set the taunter's threat to the taunted creature's highest value
-        float myThreat = unitTarget->GetThreatMgr().getThreat(m_caster);
-        float topThreat = unitTarget->GetThreatMgr().getOnlineContainer().getMostHated()->getThreat();
+        float myThreat = unitTarget->GetThreatMgr().GetThreat(m_caster);
+        float topThreat = unitTarget->GetThreatMgr().GetOnlineContainer().getMostHated()->GetThreat();
         if (topThreat > myThreat)
-            unitTarget->GetThreatMgr().doAddThreat(m_caster, topThreat - myThreat);
+            unitTarget->GetThreatMgr().DoAddThreat(m_caster, topThreat - myThreat);
 
         //Set aggro victim to caster
-        if (HostileReference* forcedVictim = unitTarget->GetThreatMgr().getOnlineContainer().getReferenceByTarget(m_caster))
+        if (HostileReference* forcedVictim = unitTarget->GetThreatMgr().GetOnlineContainer().getReferenceByTarget(m_caster))
             unitTarget->GetThreatMgr().setCurrentVictim(forcedVictim);
     }
 
@@ -5386,7 +5386,7 @@ void Spell::EffectModifyThreatPercent(SpellEffIndex /*effIndex*/)
     if (!unitTarget)
         return;
 
-    unitTarget->GetThreatMgr().modifyThreatPercent(m_caster, damage);
+    unitTarget->GetThreatMgr().ModifyThreatByPercent(m_caster, damage);
 }
 
 void Spell::EffectTransmitted(SpellEffIndex effIndex)
@@ -6015,6 +6015,43 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
                 case 13049:
                     summonLevel = 55;
                     break;
+
+                // Cleansed Timberling Heart: Summon Timberling
+                case 5666:
+                    summonLevel = 7;
+                    break;
+
+                // Glowing Cat Figurine: Summon Ghost Saber
+                case 6084:
+                    // minLevel 19, maxLevel 20
+                    summonLevel = 20;
+                    break;
+
+                // Spiked Collar: Summon Felhunter
+                case 8176:
+                    summonLevel = 30;
+                    break;
+
+                // Dog Whistle: Summon Tracking Hound
+                case 9515:
+                    summonLevel = 30;
+                    break;
+
+                // Barov Peasant Caller: Death by Peasant
+                case 18307:
+                case 18308:
+                    summonLevel = 60;
+                    break;
+
+                // Thornling Seed: Plant Thornling
+                case 22792:
+                    summonLevel = 60;
+                    break;
+
+                // Cannonball Runner: Summon Crimson Cannon
+                case 6251:
+                    summonLevel = 61;
+                    break;
             }
         }
 
@@ -6055,6 +6092,12 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
         // xinef: set calculated level
         summon->SetLevel(summonLevel);
+
+        // if summonLevel changed, set stats for calculated level
+        if (summonLevel != caster->getLevel())
+        {
+            ((Guardian*)summon)->InitStatsForLevel(summonLevel);
+        }
 
         // xinef: if we have more than one guardian, change follow angle
         if (summon->HasUnitTypeMask(UNIT_MASK_MINION) && totalNumGuardians > 1)

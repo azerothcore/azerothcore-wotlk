@@ -15,13 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
 ObjectData const creatureData[] =
 {
+    { NPC_VEM, DATA_VEM },
+    { NPC_KRI, DATA_KRI },
+    { NPC_YAUJ, DATA_YAUJ },
     { NPC_SARTURA, DATA_SARTURA },
     { NPC_CTHUN, DATA_CTHUN },
     { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
@@ -60,14 +65,13 @@ public:
         }
 
         ObjectGuid SkeramGUID;
-        ObjectGuid VemGUID;
-        ObjectGuid KriGUID;
-        ObjectGuid YaujGUID;
         ObjectGuid CThunGUID;
         GuidVector CThunGraspGUIDs;
 
         uint32 BugTrioDeathCount;
         uint32 CthunPhase;
+
+        TaskScheduler scheduler;
 
         void Initialize() override
         {
@@ -81,15 +85,6 @@ public:
             {
                 case NPC_SKERAM:
                     SkeramGUID = creature->GetGUID();
-                    break;
-                case NPC_VEM:
-                    VemGUID = creature->GetGUID();
-                    break;
-                case NPC_KRI:
-                    KriGUID = creature->GetGUID();
-                    break;
-                case NPC_YAUJ:
-                    YaujGUID = creature->GetGUID();
                     break;
                 case NPC_OURO_SPAWNER:
                     if (GetBossState(DATA_OURO) != DONE)
@@ -140,6 +135,37 @@ public:
             InstanceScript::OnGameObjectCreate(go);
         }
 
+        void OnUnitDeath(Unit* unit) override
+        {
+            switch (unit->GetEntry())
+            {
+                case NPC_QIRAJI_SLAYER:
+                case NPC_QIRAJI_MINDSLAYER:
+                    if (Creature* creature = unit->ToCreature())
+                    {
+                        if (CreatureGroup* formation = creature->GetFormation())
+                        {
+                            scheduler.Schedule(100ms, [formation](TaskContext /*context*/)
+                            {
+                                if (!formation->IsAnyMemberAlive(true))
+                                {
+                                    if (Creature* leader = formation->GetLeader())
+                                    {
+                                        if (leader->IsAlive())
+                                        {
+                                            leader->AI()->SetData(0, 1);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
         uint32 GetData(uint32 type) const override
         {
             switch (type)
@@ -159,12 +185,6 @@ public:
             {
                 case DATA_SKERAM:
                     return SkeramGUID;
-                case DATA_VEM:
-                    return VemGUID;
-                case DATA_KRI:
-                    return KriGUID;
-                case DATA_YAUJ:
-                    return YaujGUID;
             }
             return ObjectGuid::Empty;
         }
@@ -216,6 +236,11 @@ public:
             }
 
             return true;
+        }
+
+        void Update(uint32 diff) override
+        {
+            scheduler.Update(diff);
         }
     };
 };
