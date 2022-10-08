@@ -314,6 +314,7 @@ struct boss_eye_of_cthun : public BossAI
                         }
 
                         DoCastSelf(SPELL_DARK_GLARE);
+
                         ++DarkGlareTick;
 
                         if (tasker.GetRepeatCounter() >= 35)
@@ -534,6 +535,11 @@ struct boss_cthun : public BossAI
         {
             pPortal->DespawnOrUnsummon();
         }
+
+        if (Creature* eye = instance->GetCreature(DATA_EYE_OF_CTHUN))
+        {
+            eye->DespawnOrUnsummon();
+        }
     }
 
     void SummonedCreatureDies(Creature* creature, Unit* /*killer*/) override
@@ -560,7 +566,7 @@ struct boss_cthun : public BossAI
                     ScheduleTasks();
                     //Remove purple coloration
                     me->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
-
+                    DoCastSelf(SPELL_CARAPACE_CTHUN, true);
                     //Spawn flesh tentacle
                     for (uint8 i = 0; i < 2; i++)
                     {
