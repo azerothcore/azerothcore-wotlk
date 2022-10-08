@@ -1786,12 +1786,6 @@ class spell_dru_t10_restoration_4p_bonus_dummy : public AuraScript
         if (!healInfo || !healInfo->GetHeal())
             return false;
 
-        //npcbot: support for Item - Druid T10 Restoration 4P Bonus (Rejuvenation)
-        Creature* creCaster = eventInfo.GetActor()->ToCreature();
-        if (creCaster && creCaster->IsNPCBot())
-            return true;
-        //end npcbot
-
         Player* caster = eventInfo.GetActor()->ToPlayer();
         if (!caster)
             return false;
