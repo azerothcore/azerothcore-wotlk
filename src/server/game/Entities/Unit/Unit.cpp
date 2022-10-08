@@ -549,7 +549,6 @@ void Unit::Update(uint32 p_time)
                 m_CombatTimer -= p_time;
         }
     }
-    //end npcbot
 
     // not implemented before 3.0.2
     // xinef: if attack time > 0, reduce by diff
@@ -2793,7 +2792,6 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
     {
         //TC_LOG_DEBUG("entities.unit", "RollMeleeOutcomeAgainst: attack came from behind and victim was a bot.");
     }
-    //end npcbot
     // Xinef: do not allow to dodge with CREATURE_FLAG_EXTRA_NO_DODGE flag
     else if (victim->GetTypeId() == TYPEID_PLAYER || !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_DODGE))
     {
@@ -2803,8 +2801,8 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
         //npcbot - manual expertise instead of auras
         else if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
         {
-            dodge_chance -= ToCreature()->GetCreatureExpertise() * 25;
-            dodge_chance -= GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE) * 25;
+            parry_chance -= ToCreature()->GetCreatureExpertise() * 25;
+            parry_chance -= GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE) * 25;
         }
         //end npcbot
         else
@@ -2844,8 +2842,8 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
         //npcbot - manual expertise instead of auras
         else if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
         {
-            parry_chance -= ToCreature()->GetCreatureExpertise() * 25;
-            parry_chance -= GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE) * 25;
+            dodge_chance -= ToCreature()->GetCreatureExpertise() * 25;
+            dodge_chance -= GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE) * 25;
         }
         //end npcbot
         else
@@ -12707,7 +12705,7 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMa
             !procTarget->IsPet()
                 )
                 //npcbot - update reactives for bots (victim)
-                if ((hitMask & PROC_HIT_PARRY) && GetTypeId() == TYPEID_UNIT &&
+                if ((procExtra & PROC_HIT_PARRY) && GetTypeId() == TYPEID_UNIT &&
                     ToCreature()->IsNPCBot() && ToCreature()->GetBotClass() == CLASS_HUNTER)
                 {
                     ModifyAuraState(AURA_STATE_HUNTER_PARRY, true);
@@ -12716,10 +12714,10 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMa
                 //end npcbot
 
                 //npcbot - update reactives for bots (attacker)
-                if ((hitMask & (PROC_HIT_DODGE | PROC_HIT_PARRY)) && GetTypeId() == TYPEID_UNIT &&
+                if ((procExtra & (PROC_HIT_DODGE | PROC_HIT_PARRY)) && GetTypeId() == TYPEID_UNIT &&
                     ToCreature()->IsNPCBot() && ToCreature()->GetBotClass() == CLASS_WARRIOR)
                 {
-                    AddComboPoints(procTarget, 1);
+                    AddComboPoints(target, 1);
                     StartReactiveTimer(REACTIVE_OVERPOWER);
                 }
                 //TODO REACTIVE_WOLVERINE_BITE for bot hunter pets
@@ -13736,6 +13734,13 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
 
 void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackType /* attackType */, SpellInfo const* /* spellProto */)
 {
+    //npcbot: apply chance of success spellmods for bots
+    if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+    {
+        ToCreature()->ApplyCreatureSpellChanceOfSuccessMods(spellProto, chance);
+    }
+    //end npcbot
+
     // Prevent killing unit twice (and giving reward from kill twice)
     if (!victim->GetHealth())
         return;
