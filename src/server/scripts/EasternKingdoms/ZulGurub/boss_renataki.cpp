@@ -85,7 +85,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            if (me->GetThreatMgr().getThreatList().size() > 1 && me->GetThreatMgr().getOnlineContainer().getMostHated()->getTarget() == target)
+            if (me->GetThreatMgr().GetThreatListSize() > 1 && me->GetThreatMgr().GetOnlineContainer().getMostHated()->getTarget() == target)
                 return !target->HasAura(SPELL_GOUGE);
 
             return true;
@@ -158,7 +158,7 @@ public:
                         if (_thousandBladesTargets.empty())
                         {
                             std::vector<Unit*> targetList;
-                            ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
+                            ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().GetThreatList();
                             for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                             {
                                 if (Unit* target = (*itr)->getTarget())

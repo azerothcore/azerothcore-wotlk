@@ -1800,6 +1800,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 switch (GetId())
                 {
                     case 47788: // Guardian Spirit
+                    {
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;
                         if (caster->GetTypeId() != TYPEID_PLAYER)
@@ -1821,6 +1822,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             player->SendDirectMessage(&data);
                         }
                         break;
+                    }
+                    case 47585: // Dispersion (fixed bug invisible as a Shadow Priest)
+                    {
+                        if (target->IsMounted())
+                        {
+                            target->CastSpell(target, 53444, true);
+                        }
+                        break;
+                    }
                 }
                 break;
             case SPELLFAMILY_ROGUE:

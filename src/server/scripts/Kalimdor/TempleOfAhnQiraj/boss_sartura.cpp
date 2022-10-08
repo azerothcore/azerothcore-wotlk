@@ -49,14 +49,15 @@ enum events
     EVENT_SPELL_BERSERK             = 4,
     EVENT_SARTURA_AGGRO_RESET       = 5,
     EVENT_SARTURA_AGGRO_RESET_END   = 6,
+    EVENT_SARTURA_SUNDERING_CLEAVE  = 7,
 
     // Sartura's Royal Guard
-    EVENT_GUARD_WHIRLWIND           = 7,
-    EVENT_GUARD_WHIRLWIND_RANDOM    = 8,
-    EVENT_GUARD_WHIRLWIND_END       = 9,
-    EVENT_GUARD_KNOCKBACK           = 10,
-    EVENT_GUARD_AGGRO_RESET         = 11,
-    EVENT_GUARD_AGGRO_RESET_END     = 12
+    EVENT_GUARD_WHIRLWIND           = 8,
+    EVENT_GUARD_WHIRLWIND_RANDOM    = 9,
+    EVENT_GUARD_WHIRLWIND_END       = 10,
+    EVENT_GUARD_KNOCKBACK           = 11,
+    EVENT_GUARD_AGGRO_RESET         = 12,
+    EVENT_GUARD_AGGRO_RESET_END     = 13
 };
 
 struct boss_sartura : public BossAI
@@ -96,9 +97,10 @@ struct boss_sartura : public BossAI
     {
         BossAI::EnterCombat(who);
         Talk(SAY_AGGRO);
-        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 30000);
+        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 12s, 22s);
         events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(45000, 55000));
         events.ScheduleEvent(EVENT_SPELL_BERSERK, 10 * 60000);
+        events.ScheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, 2400ms, 3s);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -119,14 +121,6 @@ struct boss_sartura : public BossAI
             DoCastSelf(SPELL_ENRAGE);
             enraged = true;
         }
-    }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id != SPELL_SUNDERING_CLEAVE)
-            return;
-
-        me->RemoveAura(SPELL_SUNDERING_CLEAVE);
     }
 
     void UpdateAI(uint32 diff) override
@@ -161,7 +155,7 @@ struct boss_sartura : public BossAI
                 case EVENT_SARTURA_WHIRLWIND_END:
                     events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
                     whirlwind = false;
-                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 5s, 11s);
                     break;
                 case EVENT_SARTURA_AGGRO_RESET:
                     if (aggroReset == false)
@@ -169,8 +163,8 @@ struct boss_sartura : public BossAI
                         if (Unit* originalTarget = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             _savedTargetGUID = originalTarget->GetGUID();
-                            _savedTargetThreat = me->GetThreatMgr().getThreat(originalTarget);
-                            me->GetThreatMgr().modifyThreatPercent(originalTarget, -100);
+                            _savedTargetThreat = me->GetThreatMgr().GetThreat(originalTarget);
+                            me->GetThreatMgr().ModifyThreatByPercent(originalTarget, -100);
                         }
                         aggroReset = true;
                         events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET_END, 5000);
@@ -190,7 +184,7 @@ struct boss_sartura : public BossAI
                     events.CancelEvent(EVENT_SARTURA_AGGRO_RESET);
                     if (Unit* originalTarget = ObjectAccessor::GetUnit(*me, _savedTargetGUID))
                     {
-                        me->GetThreatMgr().addThreat(originalTarget, _savedTargetThreat);
+                        me->GetThreatMgr().AddThreat(originalTarget, _savedTargetThreat);
                         _savedTargetGUID.Clear();
                     }
                     aggroReset = false;
@@ -201,6 +195,18 @@ struct boss_sartura : public BossAI
                     {
                         DoCastSelf(SPELL_BERSERK);
                         berserked = true;
+                    }
+                    break;
+                case EVENT_SARTURA_SUNDERING_CLEAVE:
+                    if (whirlwind)
+                    {
+                        Milliseconds whirlwindTimer = events.GetTimeUntilEvent(EVENT_SARTURA_WHIRLWIND_END);
+                        events.RescheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, whirlwindTimer + 500ms);
+                    }
+                    else
+                    {
+                        DoCastVictim(SPELL_SUNDERING_CLEAVE, false);
+                        events.RescheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, 2400ms, 3s);
                     }
                     break;
                 default:
@@ -233,17 +239,9 @@ struct npc_sartura_royal_guard : public ScriptedAI
 
     void EnterCombat(Unit* /*who*/) override
     {
-        events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 30000);
+        events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 6s, 10s);
         events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET, urand(45000, 55000));
-        events.ScheduleEvent(EVENT_GUARD_KNOCKBACK, 10000);
-    }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id != SPELL_SUNDERING_CLEAVE)
-            return;
-
-        me->RemoveAura(SPELL_SUNDERING_CLEAVE);
+        events.ScheduleEvent(EVENT_GUARD_KNOCKBACK, 12s, 16s);
     }
 
     void UpdateAI(uint32 diff) override
@@ -261,7 +259,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
                     DoCastSelf(SPELL_GUARD_WHIRLWIND);
                     whirlwind = true;
                     events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_RANDOM, urand(3000, 7000));
-                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 15000);
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 8s);
                     break;
                 case EVENT_GUARD_WHIRLWIND_RANDOM:
                     if (whirlwind == true)
@@ -278,7 +276,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
                 case EVENT_GUARD_WHIRLWIND_END:
                     events.CancelEvent(EVENT_GUARD_WHIRLWIND_RANDOM);
                     whirlwind = false;
-                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, urand(25000, 40000));
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 500ms, 9s);
                     break;
                 case EVENT_GUARD_AGGRO_RESET:
                     if (aggroReset == true)
@@ -286,8 +284,8 @@ struct npc_sartura_royal_guard : public ScriptedAI
                         if (Unit* originalTarget = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             _savedTargetGUID = originalTarget->GetGUID();
-                            _savedTargetThreat = me->GetThreatMgr().getThreat(originalTarget);
-                            me->GetThreatMgr().modifyThreatPercent(originalTarget, -100);
+                            _savedTargetThreat = me->GetThreatMgr().GetThreat(originalTarget);
+                            me->GetThreatMgr().ModifyThreatByPercent(originalTarget, -100);
                         }
                         aggroReset = true;
                         events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET_END, 5000);
@@ -307,7 +305,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
                     events.CancelEvent(EVENT_GUARD_AGGRO_RESET);
                     if (Unit* originalTarget = ObjectAccessor::GetUnit(*me, _savedTargetGUID))
                     {
-                        me->GetThreatMgr().addThreat(originalTarget, _savedTargetThreat);
+                        me->GetThreatMgr().AddThreat(originalTarget, _savedTargetThreat);
                         _savedTargetGUID.Clear();
                     }
                     aggroReset = false;
@@ -315,7 +313,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
                     break;
                 case EVENT_GUARD_KNOCKBACK:
                     DoCastVictim(SPELL_GUARD_KNOCKBACK);
-                    events.RepeatEvent(urand(10000, 20000));
+                    events.Repeat(21s, 37s);
                     break;
             }
         }
