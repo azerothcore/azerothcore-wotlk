@@ -219,6 +219,16 @@ struct boss_eye_of_cthun : public BossAI
         }
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+
+        if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+        {
+            cthun->AI()->JustSummoned(summon);
+        }
+    }
+
     void ScheduleTasks()
     {
         _scheduler.
@@ -537,7 +547,6 @@ struct boss_cthun : public BossAI
 
         if (Creature* eye = instance->GetCreature(DATA_EYE_OF_CTHUN))
         {
-            eye->AI()->JustDied(me);
             eye->DespawnOrUnsummon();
         }
     }
