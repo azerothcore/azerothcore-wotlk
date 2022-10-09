@@ -198,7 +198,10 @@ void AuthSession::CheckIpCallback(PreparedQueryResult result)
         for (auto const& fields : *result)
         {
             if (fields[0].Get<uint64>() != 0)
+            {
                 banned = true;
+                break;
+            }
         }
 
         if (banned)
