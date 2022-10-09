@@ -4409,6 +4409,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(27);
     });
 
+    // Rental Racing Ram
+    ApplySpellFix({ 43883 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
+    });
+
     // Eye of Kilrogg Passive (DND)
     ApplySpellFix({ 58083 }, [](SpellInfo* spellInfo)
     {
@@ -4417,7 +4423,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_2].DieSides = 1;
         spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
         spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_MOD_INCREASE_SPEED;
-    });
+     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
