@@ -946,7 +946,7 @@ class spell_cthun_digestive_acid : public AuraScript
 {
     PrepareAuraScript(spell_cthun_digestive_acid);
 
-    void OnPeriodic(AuraEffect const* aurEff)
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
         if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
         {
