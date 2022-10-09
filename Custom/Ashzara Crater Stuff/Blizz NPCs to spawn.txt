@@ -77,7 +77,15 @@ https://www.wowhead.com/wotlk/de/npc=4132/silithidverheerer
 https://www.wowhead.com/wotlk/de/npc=14237/schlammwurm
 
 -- 41 - 50
+https://www.wowhead.com/wotlk/de/npc=2544/s%C3%BCdlicher-sandkriecher
+https://www.wowhead.com/wotlk/de/npc=5307/talkreischer
+https://www.wowhead.com/wotlk/de/npc=5258/alpha-der-waldpfoten
+https://www.wowhead.com/wotlk/de/npc=5255/h%C3%A4scher-der-waldpfoten
+https://www.wowhead.com/wotlk/de/npc=5251/fallensteller-der-waldpfoten
 
 
 Rares:
 https://www.wowhead.com/wotlk/de/npc=8211/klippenspringer
+https://www.wowhead.com/wotlk/de/npc=2601/faulbauch
+https://www.wowhead.com/wotlk/de/npc=14234/hayoc
+https://www.wowhead.com/wotlk/de/npc=14236/lord-angler
