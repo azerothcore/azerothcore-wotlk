@@ -79,7 +79,7 @@ PlayerSetting Player::GetPlayerSetting(std::string source, uint8 index)
     }
 
     PlayerSettingVector settingVector = itr->second;
-    if (settingVector.size() < index+1)
+    if (settingVector.size() < (uint8)(index + 1))
     {
         UpdatePlayerSetting(source, index, 0);
         return GetPlayerSetting(source, index);
