@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "MapReference.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -445,6 +446,19 @@ struct npc_ahnqiraji_critter : public ScriptedAI
         me->RestoreFaction();
 
         _scheduler.CancelAll();
+
+        // Don't attack nearby players randomly if they are the Twin's pet bugs.
+        if (CreatureGroup* formation = me->GetFormation())
+        {
+            if (Creature* leader = formation->GetLeader())
+            {
+                if (leader->GetEntry() == NPC_VEKLOR)
+                {
+                    return;
+                }
+            }
+        }
+
         _scheduler.Schedule(100ms, [this](TaskContext context)
         {
             if (Player* player = me->SelectNearestPlayer(10.f))
