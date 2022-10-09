@@ -129,6 +129,9 @@ struct boss_ouro : public BossAI
 
     void Submerge()
     {
+        if (_enraged)
+            return;
+
         me->AttackStop();
         me->SetReactState(REACT_PASSIVE);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
