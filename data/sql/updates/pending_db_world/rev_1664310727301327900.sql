@@ -78,7 +78,8 @@ INSERT INTO `creature_addon` (`guid`, `path_id`) VALUES
 (43494, @PATH27);
 
 
-DELETE FROM `waypoint_data` WHERE `id` IN (@PATH0, @PATH1, @PATH2, @PATH3, @PATH4, @PATH5, @PATH6);
+DELETE FROM `waypoint_data` WHERE `id` IN (@PATH0, @PATH1, @PATH2, @PATH3, @PATH4, @PATH5, @PATH6, @PATH16, @PATH17,
+@PATH18, @PATH19, @PATH20, @PATH21, @PATH22, @PATH23, @PATH24, @PATH25, @PATH26, @PATH27);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES
 (@PATH0, 1, -9540.26, -4662.27, -48.3184, 100, 0),
 (@PATH0, 2, -9510.95, -4663.54, -49.0854, 100, 0),
