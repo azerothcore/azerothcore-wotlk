@@ -3,6 +3,7 @@
 -- uses Eluna teleporter script
 
 UPDATE `creature_template` SET `npcflag` = 1 WHERE (`entry` = 33274);
+UPDATE `creature_template` SET `subname` = 'Teleporter' WHERE (`entry` = 33274);
 
 INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 1, 62674, 'Mobile Teleport');
 INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 2, 62674, 'Mobile Teleport');

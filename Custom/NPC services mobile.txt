@@ -1,0 +1,137 @@
+-- https://www.wowhead.com/wotlk/de/spell=44369/kleiner-rosafarbener-dickh%C3%A4uter
+-- https://www.wowhead.com/wotlk/de/npc=24753/kleiner-rosafarbener-dickh%C3%A4uter
+
+UPDATE `creature_template` SET `npcflag` = 1 WHERE (`entry` = 24753);
+UPDATE `creature_template` SET `subname` = 'Npc_Services', `ScriptName` = 'Npc_Services' WHERE (`entry` = 24753);
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1, 1024, 44369, 'Mobile Teleport');
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (2, 1024, 44369, 'Mobile Teleport');
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (4, 1024, 44369, 'Mobile Teleport');
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (8, 1024, 44369, 'Mobile Teleport');
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (16, 1024, 44369, 'Mobile Teleport');
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (32, 1024, 44369, 'Mobile Teleport');
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (64, 1024, 44369, 'Mobile Teleport');
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (128, 1024, 44369, 'Mobile Teleport');
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (256, 1024, 44369, 'Mobile Teleport');
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (512, 1024, 44369, 'Mobile Teleport');
+
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 1, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 2, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 4, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 8, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 16, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 32, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 64, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 128, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 256, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 512, 44369, 'Mobile Teleport');
+INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES (1024, 1024, 44369, 'Mobile Teleport');
