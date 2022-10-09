@@ -25,6 +25,7 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
@@ -273,6 +274,9 @@ struct boss_eye_of_cthun : public BossAI
                 me->InterruptNonMeleeSpells(false);
                 me->SetTarget(ObjectGuid::Empty);
 
+                //Freeze animation
+                DoCast(me, SPELL_FREEZE_ANIM, true);
+
                 _scheduler.Schedule(1s, [this](TaskContext /*task*/)
                 {
                     //Select random target for dark beam to start on
@@ -283,13 +287,8 @@ struct boss_eye_of_cthun : public BossAI
                         DarkGlareTick = 0;
                         ClockWise = RAND(true, false);
 
-                        me->SetTarget(target->GetGUID());
-
                         //Add red coloration to C'thun
                         DoCast(me, SPELL_RED_COLORATION, true);
-
-                        //Freeze animation
-                        DoCast(me, SPELL_FREEZE_ANIM, true);
 
                         me->StopMoving();
                         me->SetFacingToObject(target);
@@ -314,6 +313,7 @@ struct boss_eye_of_cthun : public BossAI
                         }
 
                         DoCastSelf(SPELL_DARK_GLARE);
+
                         ++DarkGlareTick;
 
                         if (tasker.GetRepeatCounter() >= 35)
@@ -534,6 +534,11 @@ struct boss_cthun : public BossAI
         {
             pPortal->DespawnOrUnsummon();
         }
+
+        if (Creature* eye = instance->GetCreature(DATA_EYE_OF_CTHUN))
+        {
+            eye->DespawnOrUnsummon();
+        }
     }
 
     void SummonedCreatureDies(Creature* creature, Unit* /*killer*/) override
@@ -560,7 +565,7 @@ struct boss_cthun : public BossAI
                     ScheduleTasks();
                     //Remove purple coloration
                     me->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
-
+                    DoCastSelf(SPELL_CARAPACE_CTHUN, true);
                     //Spawn flesh tentacle
                     for (uint8 i = 0; i < 2; i++)
                     {
@@ -921,6 +926,22 @@ private:
     ObjectGuid _portalGUID;
 };
 
+class spell_cthun_dark_glare : public SpellScript
+{
+    PrepareSpellScript(spell_cthun_dark_glare);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        targets.remove_if([caster](WorldObject const* target) { return !caster->HasInLine(target, 5.0f); });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_cthun_dark_glare::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ENEMY_24);
+    }
+};
+
 // 4033 - At C'thun's stomach
 class at_cthun_stomach_exit : public AreaTriggerScript
 {
@@ -991,6 +1012,7 @@ void AddSC_boss_cthun()
     RegisterTempleOfAhnQirajCreatureAI(npc_claw_tentacle);
     RegisterTempleOfAhnQirajCreatureAI(npc_giant_claw_tentacle);
     RegisterTempleOfAhnQirajCreatureAI(npc_giant_eye_tentacle);
+    RegisterSpellScript(spell_cthun_dark_glare);
     new at_cthun_stomach_exit();
     new at_cthun_center();
 }
