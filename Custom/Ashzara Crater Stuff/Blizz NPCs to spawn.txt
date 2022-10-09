@@ -53,9 +53,31 @@ https://www.wowhead.com/wotlk/de/npc=2108/garneg-brandsch%C3%A4del
 -- 31 - 40
 https://www.wowhead.com/wotlk/de/npc=4635/windhetzer-der-kolkar
 https://www.wowhead.com/wotlk/de/npc=4634/raufer-der-kolkar
+https://www.wowhead.com/wotlk/de/npc=686/schmetterschwanz
+https://www.wowhead.com/wotlk/de/npc=2561/hochlandfleischpirscher
+https://www.wowhead.com/wotlk/de/npc=2635/alter-salzwasserkrokilisk
+https://www.wowhead.com/wotlk/de/npc=4360/krieger-der-schlammflossen
+https://www.wowhead.com/wotlk/de/npc=4718/orakel-der-zackenk%C3%A4mme
+https://www.wowhead.com/wotlk/de/npc=4713/krieger-der-zackenk%C3%A4mme
+https://www.wowhead.com/wotlk/de/npc=14229/verfluchter-der-zackenk%C3%A4mme
+https://www.wowhead.com/wotlk/de/npc=4714/myrmidone-der-zackenk%C3%A4mme
+https://www.wowhead.com/wotlk/de/npc=4719/meerhexe-der-zackenk%C3%A4mme
 
 Rares:
 https://www.wowhead.com/wotlk/de/npc=522/morladim
 https://www.wowhead.com/wotlk/de/npc=2600/s%C3%A4nger
 https://www.wowhead.com/wotlk/de/npc=3985/gro%C3%9Fvater-vishas
 https://www.wowhead.com/wotlk/de/npc=13602/der-monstr%C3%B6se-griesgram
+https://www.wowhead.com/wotlk/de/npc=2417/grelborg-der-horter
+https://www.wowhead.com/wotlk/de/npc=2753/barnabus
+https://www.wowhead.com/wotlk/de/npc=14487/gluckser
+https://www.wowhead.com/wotlk/de/npc=2598/darbel-montrose
+https://www.wowhead.com/wotlk/de/npc=2602/ruul-zweistein
+https://www.wowhead.com/wotlk/de/npc=4132/silithidverheerer
+https://www.wowhead.com/wotlk/de/npc=14237/schlammwurm
+
+-- 41 - 50
+
+
+Rares:
+https://www.wowhead.com/wotlk/de/npc=8211/klippenspringer
