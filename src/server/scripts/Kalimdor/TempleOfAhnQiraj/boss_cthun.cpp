@@ -537,7 +537,7 @@ struct boss_cthun : public BossAI
 
         if (Creature* eye = instance->GetCreature(DATA_EYE_OF_CTHUN))
         {
-            eye->DespawnOrUnsummon();
+            me->Kill(me, eye);
         }
     }
 
