@@ -402,9 +402,16 @@ public:
 
                     GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_TELEPORT, true);
 
+                    //npcbot: prevent crash from trying to access player fields
+                    if (GetTarget()->GetTypeId() == TYPEID_PLAYER)
+                    {
+                    //end npcbot
                     // xinef: ensure fast coordinates switch, dont wait for client to send opcode
                     WorldLocation const& dest = GetTarget()->ToPlayer()->GetTeleportDest();
                     GetTarget()->ToPlayer()->UpdatePosition(dest, true);
+                    //npcbot
+                    }
+                    //end npcbot
 
                     GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_DONT_REPORT_CAST_ERROR));
                     break;
