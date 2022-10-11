@@ -219,6 +219,16 @@ struct boss_eye_of_cthun : public BossAI
         }
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+
+        if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+        {
+            cthun->AI()->JustSummoned(summon);
+        }
+    }
+
     void ScheduleTasks()
     {
         _scheduler.
@@ -942,6 +952,27 @@ class spell_cthun_dark_glare : public SpellScript
     }
 };
 
+class spell_cthun_digestive_acid : public AuraScript
+{
+    PrepareAuraScript(spell_cthun_digestive_acid);
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
+        {
+            if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+            {
+                cthun->CastSpell(GetUnitOwner(), SPELL_DIGESTIVE_ACID, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_cthun_digestive_acid::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
 // 4033 - At C'thun's stomach
 class at_cthun_stomach_exit : public AreaTriggerScript
 {
@@ -1013,6 +1044,7 @@ void AddSC_boss_cthun()
     RegisterTempleOfAhnQirajCreatureAI(npc_giant_claw_tentacle);
     RegisterTempleOfAhnQirajCreatureAI(npc_giant_eye_tentacle);
     RegisterSpellScript(spell_cthun_dark_glare);
+    RegisterSpellScript(spell_cthun_digestive_acid);
     new at_cthun_stomach_exit();
     new at_cthun_center();
 }
