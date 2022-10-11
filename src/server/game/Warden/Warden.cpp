@@ -76,11 +76,11 @@ void Warden::RequestModule()
     LOG_DEBUG("warden", "Request module");
 
     // Create packet structure
-    WardenModuleUse request;
+    WardenModuleUse request{};
     request.Command = WARDEN_SMSG_MODULE_USE;
 
-    memcpy(request.ModuleId, _module->Id, 16);
-    memcpy(request.ModuleKey, _module->Key, 16);
+    memcpy(request.ModuleId, _module->Id.data(), 16);
+    memcpy(request.ModuleKey, _module->Key.data(), 16);
     request.Size = _module->CompressedSize;
 
     EndianConvert(request.Size);
