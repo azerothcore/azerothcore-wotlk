@@ -1,3 +1,4 @@
+-- DB update 2022_10_11_02 -> 2022_10_11_03
 --
 DELETE FROM `pool_creature` WHERE `pool_entry`=1004 AND `guid` IN (33621, 34520);
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
