@@ -1,3 +1,4 @@
+-- DB update 2022_10_11_05 -> 2022_10_11_06
 --
 DELETE FROM `creature` WHERE `guid` BETWEEN 160359 AND 160363;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`) VALUES

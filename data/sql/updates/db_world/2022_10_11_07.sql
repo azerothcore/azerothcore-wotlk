@@ -1,3 +1,4 @@
+-- DB update 2022_10_11_06 -> 2022_10_11_07
 --
 -- Replenishing the Healing Crystals (9280 Draenei Version) (DROP QUEST)
 -- Vial of Moth Blood (item 22889): 50/50 
