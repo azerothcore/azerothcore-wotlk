@@ -59,7 +59,14 @@ enum Spells
 
     // Obsidian Nullifier
     SPELL_NULLIFY                       = 26552,
-    SPELL_CLEAVE                        = 40504
+    SPELL_CLEAVE                        = 40504,
+
+    // Qiraji Scorpion
+    // Qiraji Scarab
+    SPELL_PIERCE_ARMOR                  = 6016,
+    SPELL_ACID_SPIT                     = 26050,
+
+    NPC_QIRAJI_SCORPION                 = 15317
 };
 
 struct npc_anubisath_defender : public ScriptedAI
@@ -427,6 +434,74 @@ private:
     std::list<Player*> _targets;
 };
 
+struct npc_ahnqiraji_critter : public ScriptedAI
+{
+    npc_ahnqiraji_critter(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        me->RestoreFaction();
+
+        _scheduler.CancelAll();
+        _scheduler.Schedule(100ms, [this](TaskContext context)
+        {
+            if (Player* player = me->SelectNearestPlayer(10.f))
+            {
+                if (player->IsInCombat())
+                {
+                    AttackStart(player);
+                }
+            }
+
+            context.Repeat(3500ms, 4000ms);
+        });
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.CancelAll();
+
+        if (me->GetEntry() == NPC_QIRAJI_SCORPION)
+        {
+            _scheduler.Schedule(2s, 5s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_PIERCE_ARMOR, true);
+                context.Repeat(5s, 9s);
+            })
+            .Schedule(5s, 9s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_ACID_SPIT, true);
+                context.Repeat(6s, 12s);
+            });
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (me->GetEntry() == NPC_QIRAJI_SCORPION)
+        {
+            me->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 enum NPCs
 {
     NPC_VEKNISS_DRONE   = 15300
@@ -484,6 +559,7 @@ void AddSC_temple_of_ahnqiraj()
     RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_eradicator);
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_warder);
     RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_nullifier);
+    RegisterTempleOfAhnQirajCreatureAI(npc_ahnqiraji_critter);
     RegisterSpellScript(spell_aggro_drones);
     RegisterSpellScript(spell_nullify);
 }
