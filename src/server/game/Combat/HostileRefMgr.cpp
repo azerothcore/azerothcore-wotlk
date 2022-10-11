@@ -53,7 +53,7 @@ void HostileRefMgr::threatAssist(Unit* victim, float baseThreat, SpellInfo const
                 }
             }
 
-            ref->GetSource()->doAddThreat(victim, threat);
+            ref->GetSource()->DoAddThreat(victim, threat);
         }
 
         ref = ref->next();
@@ -239,7 +239,7 @@ void HostileRefMgr::UpdateVisibility(bool checkThreat)
     while (ref)
     {
         HostileReference* nextRef = ref->next();
-        if ((!checkThreat || ref->GetSource()->getThreatList().size() <= 1))
+        if ((!checkThreat || ref->GetSource()->GetThreatListSize() <= 1))
         {
             nextRef = ref->next();
             ref->removeReference();

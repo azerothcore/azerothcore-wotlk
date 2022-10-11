@@ -18,6 +18,7 @@
 #include "mpq_libmpq04.h"
 #include <cstdio>
 #include <deque>
+#include <algorithm>
 
 ArchiveSet gOpenArchives;
 
@@ -51,6 +52,11 @@ MPQArchive::MPQArchive(const char* filename)
         return;
     }
     gOpenArchives.push_front(this);
+}
+
+bool MPQArchive::isOpened() const
+{
+    return std::find(gOpenArchives.begin(), gOpenArchives.end(), this) != gOpenArchives.end();
 }
 
 void MPQArchive::close()

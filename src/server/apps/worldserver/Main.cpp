@@ -421,7 +421,7 @@ bool StartDB()
         return false;
     }
 
-    LOG_INFO("server.loading", "Loading world information...");
+    LOG_INFO("server.loading", "Loading World Information...");
     LOG_INFO("server.loading", "> RealmID:              {}", realm.Id.Realm);
 
     ///- Clean the database before starting
