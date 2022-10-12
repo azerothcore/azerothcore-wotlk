@@ -2,6 +2,7 @@ SET @GUID = 110000; -- 454
 SET @POOLMOTHER = 6000; -- 8
 SET @POOL = 6008; -- 227
 
+DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+7;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0, 3, 'Hellfire Peninsula - Ores - North Thrallmar'),
 (@POOLMOTHER+1, 5, 'Hellfire Peninsula - Ores - Thrallmar - Honor Hold - Path of Glory'),
