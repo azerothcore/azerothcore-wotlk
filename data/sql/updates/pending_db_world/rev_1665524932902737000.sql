@@ -1,6 +1,6 @@
-SET @GUID = N;
-SET @POOLMOTHER = N;
-SET @POOL = N;
+SET @GUID = 110000; -- 454
+SET @POOLMOTHER = 6000; -- 8
+SET @POOL = 6008; -- 227
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0, 3, 'Hellfire Peninsula - Ores - North Thrallmar'),
