@@ -273,7 +273,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_SHOCK_BLAST, true);
+                DoCastAOE(SPELL_SHOCK_BLAST);
             }
 
             context.Repeat(3500ms);
