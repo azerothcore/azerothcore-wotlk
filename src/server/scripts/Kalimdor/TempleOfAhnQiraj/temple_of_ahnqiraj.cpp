@@ -445,6 +445,19 @@ struct npc_ahnqiraji_critter : public ScriptedAI
         me->RestoreFaction();
 
         _scheduler.CancelAll();
+
+        // Don't attack nearby players randomly if they are the Twin's pet bugs.
+        if (CreatureData const* crData = me->GetCreatureData())
+        {
+            ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(crData->id1, me->GetSpawnId());
+            ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+
+            if (targetGuid.GetEntry() == NPC_VEKLOR)
+            {
+                return;
+            }
+        }
+
         _scheduler.Schedule(100ms, [this](TaskContext context)
         {
             if (Player* player = me->SelectNearestPlayer(10.f))
