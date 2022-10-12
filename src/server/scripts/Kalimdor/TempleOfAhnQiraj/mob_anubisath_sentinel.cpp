@@ -179,7 +179,7 @@ public:
         void AddSentinelsNear(Unit* /*nears*/)
         {
             std::list<Creature*> assistList;
-            me->GetCreatureListWithEntryInGrid(assistList, 15264, 70.0f);
+            me->GetCreatureListWithEntryInGrid(assistList, 15264, 100.0f);
 
             if (assistList.empty())
                 return;

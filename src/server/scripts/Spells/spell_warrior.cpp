@@ -567,8 +567,14 @@ class spell_warr_rend : public AuraScript
             // $0.2 * (($MWB + $mwb) / 2 + $AP / 14 * $MWS) bonus per tick
             float ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
             int32 mws = caster->GetAttackTime(BASE_ATTACK);
-            float mwbMin = caster->GetWeaponDamageRange(BASE_ATTACK, MINDAMAGE);
-            float mwbMax = caster->GetWeaponDamageRange(BASE_ATTACK, MAXDAMAGE);
+            float mwbMin = 0.f;
+            float mwbMax = 0.f;
+            for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+            {
+                mwbMin += caster->GetWeaponDamageRange(BASE_ATTACK, MINDAMAGE, i);
+                mwbMax += caster->GetWeaponDamageRange(BASE_ATTACK, MAXDAMAGE, i);
+            }
+
             float mwb = ((mwbMin + mwbMax) / 2 + ap * mws / 14000) * 0.2f;
             amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), mwb));
 
