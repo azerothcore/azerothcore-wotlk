@@ -1,3 +1,4 @@
+-- DB update 2022_10_11_08 -> 2022_10_13_00
 --
 ALTER TABLE `spell_proc`
   CHANGE `spellId` `SpellId` INT(11) NOT NULL DEFAULT 0 FIRST,
