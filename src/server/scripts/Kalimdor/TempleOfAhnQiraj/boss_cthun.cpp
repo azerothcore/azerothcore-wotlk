@@ -983,16 +983,13 @@ public:
             {
                 if (Creature* trigger = player->FindNearestCreature(NPC_TRIGGER, 15.0f))
                 {
-                    trigger->CastSpell(player, SPELL_RUBBLE_ROCKY, true);
-                }
+                    trigger->CastSpell(player, SPELL_EXIT_STOMACH, true);
 
-                player->m_Events.AddEventAtOffset([player]()
-                {
-                    if (Creature* trigger = player->FindNearestCreature(NPC_TRIGGER, 15.0f))
+                    if (Creature* exittrigger = player->FindNearestCreature(NPC_EXIT_TRIGGER, 15.0f))
                     {
-                        trigger->CastSpell(player, SPELL_EXIT_STOMACH, true);
+                        exittrigger->CastSpell(player, SPELL_RUBBLE_ROCKY, true);
                     }
-                }, 3s);
+                }
 
                 player->m_Events.AddEventAtOffset([player, cthun]()
                 {
