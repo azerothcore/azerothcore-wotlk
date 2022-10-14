@@ -375,7 +375,7 @@ struct boss_eye_of_cthun : public BossAI
             {
                 cthun->AI()->DoAction(ACTION_START_PHASE_TWO);
             }
-        }, 500ms);
+        }, 3s);
     }
 
 private:
