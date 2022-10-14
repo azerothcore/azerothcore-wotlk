@@ -1011,7 +1011,7 @@ public:
                     {
                         player->m_Events.KillAllEvents(false);
                     }
-                }, 5s);
+                }, 3s);
             }
         }
 
