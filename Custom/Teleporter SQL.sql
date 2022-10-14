@@ -136,6 +136,10 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (405, 401, 2, -1, 2, 'Level 40 - 45', 37, 902.614, 154.535, 285.419, 3.56091);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (406, 401, 2, -1, 2, 'Level 45', 37, 865.102, 438.741, 281.501, 3.79633);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (407, 401, 2, -1, 2, 'Profession trainers', 37, 43.9049, 1172.42, 367.342, 2.56045);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (408, 401, 2, -1, 2, 'Level 50 - 70', 37, 896.217, 142.282, 285.359, 4.09048);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (409, 401, 2, -1, 2, 'Level 70', 37, 1035.75, 216.876, 367.189, 4.26867);
+
+
 -- Starter locations Level 81 - 100 (ID 410 - 419)
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (410, 400, 1, -1, 2, 'Hyjal 81 - 130', null, null, null, null, null);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (411, 410, 2, -1, 2, 'Hyjal Start', 1, 4625.877, -3840.538, 943.76, 1.145);
