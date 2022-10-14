@@ -78,8 +78,13 @@ struct npc_ouro_spawner : public ScriptedAI
         // Spawn Ouro on LoS check
         if (!hasSummoned && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 40.0f) && !who->ToPlayer()->IsGameMaster())
         {
-            DoCastSelf(SPELL_SUMMON_OURO);
-            hasSummoned = true;
+            if (InstanceScript* instance = me->GetInstanceScript())
+            {
+                Creature* ouro = instance->GetCreature(DATA_OURO);
+                if (!ouro)
+                    DoCastSelf(SPELL_SUMMON_OURO);
+                hasSummoned = true;
+            }
         }
 
         ScriptedAI::MoveInLineOfSight(who);
