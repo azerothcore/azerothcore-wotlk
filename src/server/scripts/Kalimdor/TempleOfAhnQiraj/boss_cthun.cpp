@@ -102,6 +102,7 @@ enum Misc
 {
     MAX_TENTACLE_GROUPS                         = 5,
     NPC_TRIGGER                                 = 15384,
+    NPC_EXIT_TRIGGER                            = 15800
 };
 
 enum Yells
@@ -990,20 +991,23 @@ public:
                     }
                 }, 3s);
 
-                player->m_Events.AddEventAtOffset([player]()
-                {
-                    player->JumpTo(0.0f, 80.0f, false);
-                }, 5s);
-
                 player->m_Events.AddEventAtOffset([player, cthun]()
                 {
-                    if (cthun)
+                    if (Creature* trigger = player->FindNearestCreature(NPC_EXIT_TRIGGER, 10.0f))
                     {
-                        player->NearTeleportTo(cthun->GetPositionX(), cthun->GetPositionY(), cthun->GetPositionZ() + 10, float(rand32() % 6));
-                    }
+                        player->JumpTo(0.0f, 80.0f, false);
 
-                    player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-                }, 6s);
+                        player->m_Events.AddEventAtOffset([player, cthun]()
+                        {
+                            if (cthun)
+                            {
+                                player->NearTeleportTo(cthun->GetPositionX(), cthun->GetPositionY(), cthun->GetPositionZ() + 10, float(rand32() % 6));
+                            }
+
+                            player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                        }, 6s);
+                    }
+                }, 5s);
             }
         }
 
