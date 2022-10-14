@@ -80,9 +80,12 @@ struct npc_ouro_spawner : public ScriptedAI
         {
             if (InstanceScript* instance = me->GetInstanceScript())
             {
-                if (instance->GetBossState(DATA_OURO) != IN_PROGRESS)
+                Creature* ouro = instance->GetCreature(DATA_OURO);
+                if (instance->GetBossState(DATA_OURO) != IN_PROGRESS && !ouro)
+                {
                     DoCastSelf(SPELL_SUMMON_OURO);
-                hasSummoned = true;
+                    hasSummoned = true;
+                }
             }
         }
 
