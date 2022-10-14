@@ -1007,6 +1007,10 @@ public:
                             player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
                         }, 6s);
                     }
+                    else
+                    {
+                        player->m_Events.KillAllEvents(false);
+                    }
                 }, 5s);
             }
         }
