@@ -1005,7 +1005,7 @@ public:
                             }
 
                             player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-                        }, 6s);
+                        }, 1s);
                     }
                     else
                     {
