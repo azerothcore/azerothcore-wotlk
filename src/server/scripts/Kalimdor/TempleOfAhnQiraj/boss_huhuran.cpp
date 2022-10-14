@@ -51,7 +51,7 @@ struct boss_huhuran : public BossAI
 {
     boss_huhuran(Creature* creature) : BossAI(creature, DATA_HUHURAN)
     {
-        me->m_CombatDistance = 60.f;
+        me->m_CombatDistance = 90.f;
     }
 
     void Reset() override
