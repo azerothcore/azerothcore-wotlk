@@ -310,17 +310,9 @@ struct boss_eye_of_cthun : public BossAI
                         me->SetTarget(ObjectGuid::Empty);
                         me->StopMoving();
 
-                        if (ClockWise)
-                        {
-                            me->SetFacingTo(DarkGlareAngle + DarkGlareTick * float(M_PI) / 35);
-                            me->SetOrientation(DarkGlareAngle + DarkGlareTick * float(M_PI) / 35);
-
-                        }
-                        else
-                        {
-                            me->SetFacingTo(DarkGlareAngle - DarkGlareTick * float(M_PI) / 35);
-                            me->SetOrientation(DarkGlareAngle - DarkGlareTick * float(M_PI) / 35);
-                        }
+                        float angle = ClockWise ? DarkGlareAngle + DarkGlareTick * float(M_PI) / 35 : DarkGlareAngle - DarkGlareTick * float(M_PI) / 35;
+                        me->SetFacingTo(angle);
+                        me->SetOrientation(angle);
 
                         DoCastSelf(SPELL_DARK_GLARE);
 
@@ -354,7 +346,7 @@ struct boss_eye_of_cthun : public BossAI
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         //Only if it will kill
-        if (damage < me->GetHealth())
+        if (damage < me->GetHealth() || !me->GetHealth())
             return;
 
         //Fake death in phase 0 or 1 (green beam or dark glare phase)
