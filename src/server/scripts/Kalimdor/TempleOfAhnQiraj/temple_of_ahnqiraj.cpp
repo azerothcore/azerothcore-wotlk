@@ -406,7 +406,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_NULLIFY, true);
+                DoCastAOE(SPELL_NULLIFY);
             }
 
             context.Repeat(6s);
