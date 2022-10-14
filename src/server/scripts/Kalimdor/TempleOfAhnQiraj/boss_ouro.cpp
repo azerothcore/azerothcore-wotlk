@@ -129,7 +129,7 @@ struct boss_ouro : public BossAI
 
     void Submerge()
     {
-        if (_enraged)
+        if (_enraged || _submerged)
             return;
 
         me->AttackStop();
@@ -209,6 +209,9 @@ struct boss_ouro : public BossAI
                 })
             .Schedule(3s, GROUP_PHASE_TRANSITION, [this](TaskContext context)
                 {
+                    if (_enraged)
+                        return;
+
                     if (!IsPlayerWithinMeleeRange() && !_submerged)
                     {
                         if (_submergeMelee < 10)
@@ -217,8 +220,7 @@ struct boss_ouro : public BossAI
                         }
                         else
                         {
-                            if (!_enraged)
-                                Submerge();
+                            Submerge();
                             _submergeMelee = 0;
                         }
                     }
