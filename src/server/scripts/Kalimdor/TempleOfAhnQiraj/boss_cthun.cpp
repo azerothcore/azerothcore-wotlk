@@ -1030,7 +1030,10 @@ public:
         {
             if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
             {
-                cthun->CastSpell(player, SPELL_SPIT_OUT, true);
+                if (cthun->IsAlive())
+                {
+                    cthun->CastSpell(player, SPELL_SPIT_OUT, true);
+                }
             }
         }
 
