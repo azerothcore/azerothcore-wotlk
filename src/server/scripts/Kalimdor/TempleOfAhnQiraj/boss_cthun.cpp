@@ -261,7 +261,7 @@ struct boss_eye_of_cthun : public BossAI
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                 {
-                    if (Creature* tentacle = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 1000))
+                    if (Creature* tentacle = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                     {
                         tentacle->AI()->AttackStart(target);
                     }
@@ -472,7 +472,7 @@ struct boss_cthun : public BossAI
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
             {
                 //Spawn claw tentacle on the random target
-                if (Creature* spawned = me->SummonCreature(NPC_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
+                if (Creature* spawned = me->SummonCreature(NPC_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                 {
                     spawned->AI()->AttackStart(target);
                 }
@@ -484,7 +484,7 @@ struct boss_cthun : public BossAI
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
             {
                 //Spawn claw tentacle on the random target
-                if (Creature* spawned = me->SummonCreature(NPC_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
+                if (Creature* spawned = me->SummonCreature(NPC_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                 {
                     spawned->AI()->AttackStart(target);
                 }
@@ -575,7 +575,7 @@ struct boss_cthun : public BossAI
                     //Spawn flesh tentacle
                     for (uint8 i = 0; i < 2; i++)
                     {
-                        me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
+                        me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
                     }
                 });
             }
