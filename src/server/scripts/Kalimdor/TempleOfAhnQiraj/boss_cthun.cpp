@@ -369,10 +369,13 @@ struct boss_eye_of_cthun : public BossAI
         me->RemoveAllAuras();
         _scheduler.CancelAll();
 
-        if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+        _scheduler.Schedule(500s, [this](TaskContext /*context*/)
         {
-            cthun->AI()->DoAction(ACTION_START_PHASE_TWO);
-        }
+            if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+            {
+                cthun->AI()->DoAction(ACTION_START_PHASE_TWO);
+            }
+        });
     }
 
 private:
