@@ -977,7 +977,10 @@ public:
         {
             if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
             {
-                player->CastSpell(player, SPELL_RUBBLE_ROCKY, true);
+                if (Creature* trigger = player->FindNearestCreature(NPC_TRIGGER, 15.0f))
+                {
+                    trigger->CastSpell(player, SPELL_RUBBLE_ROCKY, true);
+                }
 
                 player->m_Events.AddEventAtOffset([player]()
                 {
