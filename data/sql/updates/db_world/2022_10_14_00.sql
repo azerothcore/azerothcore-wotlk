@@ -1,3 +1,4 @@
+-- DB update 2022_10_13_00 -> 2022_10_14_00
 UPDATE `broadcast_text_locale` SET `MaleText`="Esta es nuestra batalla final. El paso del tiempo se hará eco de lo que aquí ocurra. Sin importar el resultado, sabrán que luchamos con honor. ¡Que luchamos por la libertad y la seguridad de nuestro pueblo!" WHERE `ID`=36923 AND `locale` IN ('esEs', 'esMX');
 
 UPDATE `creature_text` SET `BroadcastTextId`=37037 WHERE `CreatureID`=38607 AND `GroupID`=13 AND `ID`=0;
