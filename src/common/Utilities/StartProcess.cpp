@@ -93,8 +93,6 @@ namespace Acore
         {
             if (inputFile)
             {
-
-
                 // With binding stdin
                 return child{
                     exe = std::filesystem::absolute(executable).string(),
