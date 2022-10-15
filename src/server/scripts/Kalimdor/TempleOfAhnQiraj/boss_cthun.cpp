@@ -993,7 +993,7 @@ public:
 
                 player->m_Events.AddEventAtOffset([player, cthun]()
                 {
-                    if (Creature* trigger = player->FindNearestCreature(NPC_EXIT_TRIGGER, 10.0f))
+                    if (player->FindNearestCreature(NPC_EXIT_TRIGGER, 10.0f))
                     {
                         player->JumpTo(0.0f, 80.0f, false);
 
