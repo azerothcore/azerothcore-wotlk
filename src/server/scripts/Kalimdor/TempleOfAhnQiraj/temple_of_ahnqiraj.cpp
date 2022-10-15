@@ -273,7 +273,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_SHOCK_BLAST, true);
+                DoCastAOE(SPELL_SHOCK_BLAST);
             }
 
             context.Repeat(3500ms);
@@ -406,7 +406,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_NULLIFY, true);
+                DoCastAOE(SPELL_NULLIFY);
             }
 
             context.Repeat(6s);
@@ -445,6 +445,19 @@ struct npc_ahnqiraji_critter : public ScriptedAI
         me->RestoreFaction();
 
         _scheduler.CancelAll();
+
+        // Don't attack nearby players randomly if they are the Twin's pet bugs.
+        if (CreatureData const* crData = me->GetCreatureData())
+        {
+            ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(crData->id1, me->GetSpawnId());
+            ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+
+            if (targetGuid.GetEntry() == NPC_VEKLOR)
+            {
+                return;
+            }
+        }
+
         _scheduler.Schedule(100ms, [this](TaskContext context)
         {
             if (Player* player = me->SelectNearestPlayer(10.f))

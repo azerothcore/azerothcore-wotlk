@@ -53,11 +53,10 @@ void RealmList::Close()
 void RealmList::LoadBuildInfo()
 {
     //                                                              0             1              2              3      4                5                6
-    if (QueryResult result = LoginDatabase.Query("SELECT majorVersion, minorVersion, bugfixVersion, hotfixVersion, build, winChecksumSeed, macChecksumSeed FROM build_info ORDER BY build ASC"))
+    if (auto result = LoginDatabase.Query("SELECT majorVersion, minorVersion, bugfixVersion, hotfixVersion, build, winChecksumSeed, macChecksumSeed FROM build_info ORDER BY build ASC"))
     {
-        do
+        for (auto const& fields : *result)
         {
-            Field* fields = result->Fetch();
             RealmBuildInfo& build = _builds.emplace_back();
             build.MajorVersion = fields[0].Get<uint32>();
             build.MinorVersion = fields[1].Get<uint32>();
@@ -87,7 +86,7 @@ void RealmList::LoadBuildInfo()
             {
                 HexStrToByteArray(macHash, build.MacHash);
             }
-        } while (result->NextRow());
+        }
     }
 }
 
@@ -149,11 +148,10 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
     // Circle through results and add them to the realm map
     if (result)
     {
-        do
+        for (auto const& fields : *result)
         {
             try
             {
-                Field* fields = result->Fetch();
                 uint32 realmId = fields[0].Get<uint32>();
                 std::string name = fields[1].Get<std::string>();
                 std::string externalAddressString = fields[2].Get<std::string>();
@@ -221,7 +219,7 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
                 LOG_ERROR("server.authserver", "Realmlist::UpdateRealms has thrown an exception: {}", ex.what());
                 ABORT();
             }
-        } while (result->NextRow());
+        }
     }
 
     for (auto itr = existingRealms.begin(); itr != existingRealms.end(); ++itr)

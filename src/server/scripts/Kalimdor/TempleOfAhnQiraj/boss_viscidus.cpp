@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
@@ -100,6 +101,7 @@ struct boss_viscidus : public BossAI
     boss_viscidus(Creature* creature) : BossAI(creature, DATA_VISCIDUS)
     {
         me->LowerPlayerDamageReq(me->GetMaxHealth());
+        me->m_CombatDistance = 60.f;
     }
 
     bool CheckInRoom() override
@@ -131,13 +133,25 @@ struct boss_viscidus : public BossAI
         me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
     }
 
-    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType effType, SpellSchoolMask) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType effType, SpellSchoolMask spellSchoolMask) override
     {
         if (me->HealthBelowPct(5))
             damage = 0;
 
-        if (!attacker || _phase != PHASE_MELEE)
+        if (!attacker)
+        {
             return;
+        }
+
+        if (_phase != PHASE_MELEE)
+        {
+            if (_phase == PHASE_FROST && effType == DIRECT_DAMAGE && (spellSchoolMask & SPELL_SCHOOL_MASK_FROST) != 0)
+            {
+                ++_hitcounter;
+            }
+
+            return;
+        }
 
         if (effType == DIRECT_DAMAGE)
             ++_hitcounter;
@@ -183,14 +197,23 @@ struct boss_viscidus : public BossAI
             Talk(EMOTE_CRACK);
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
-        if (spell->Id == SPELL_REJOIN_VISCIDUS)
+        if (spellInfo->Id == SPELL_REJOIN_VISCIDUS)
         {
             me->RemoveAuraFromStack(SPELL_VISCIDUS_SHRINKS);
         }
 
-        if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST)
+        SpellSchoolMask spellSchoolMask = spellInfo->GetSchoolMask();
+        if (spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON && spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_WEAPON_WAND))
+        {
+            if (Item* pItem = caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK))
+            {
+                spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
+            }
+        }
+
+        if ((spellSchoolMask & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST)
         {
             ++_hitcounter;
 
