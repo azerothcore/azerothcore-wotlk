@@ -35,8 +35,7 @@ enum Spells
     SPELL_WYVERN_STING          = 26180,
     SPELL_ACID_SPIT             = 26050,
     SPELL_WYVERN_STING_DAMAGE   = 26233,
-    SPELL_POISON_BOLT           = 26052,
-    SPELL_HARD_ENRAGE           = 26662
+    SPELL_POISON_BOLT           = 26052
 };
 
 enum Events
@@ -50,22 +49,25 @@ enum Events
 
 struct boss_huhuran : public BossAI
 {
-    boss_huhuran(Creature* creature) : BossAI(creature, DATA_HUHURAN) { }
+    boss_huhuran(Creature* creature) : BossAI(creature, DATA_HUHURAN)
+    {
+        me->m_CombatDistance = 90.f;
+    }
 
     void Reset() override
     {
-        _Reset();
+        BossAI::Reset();
         _berserk = false;
         _hardEnrage = false;
     }
 
     void EnterCombat(Unit* /*who*/) override
     {
-        events.ScheduleEvent(EVENT_FRENZY, urand(25000, 35000));
-        events.ScheduleEvent(EVENT_WYVERN_STING, urand(18000, 28000));
-        events.ScheduleEvent(EVENT_ACID_SPIT, 8000);
-        events.ScheduleEvent(EVENT_NOXIOUS_POISON, urand(10000, 20000));
-        events.ScheduleEvent(EVENT_HARD_ENRAGE, 300000);
+        events.ScheduleEvent(EVENT_FRENZY, 12s, 21s);
+        events.ScheduleEvent(EVENT_WYVERN_STING, 25s, 43s);
+        events.ScheduleEvent(EVENT_ACID_SPIT, 1s, 20s);
+        events.ScheduleEvent(EVENT_NOXIOUS_POISON, 10s, 22s);
+        events.ScheduleEvent(EVENT_HARD_ENRAGE, 5min);
     }
 
     void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
@@ -74,6 +76,7 @@ struct boss_huhuran : public BossAI
         {
             DoCastSelf(SPELL_BERSERK, true);
             me->TextEmote(EMOTE_BERSERK);
+            events.CancelEvent(EVENT_FRENZY);
             _berserk = true;
         }
     }
@@ -91,39 +94,43 @@ struct boss_huhuran : public BossAI
                 case EVENT_FRENZY:
                     DoCastSelf(SPELL_FRENZY, true);
                     Talk(EMOTE_FRENZY_KILL);
-                    events.RepeatEvent(urand(25000, 35000));
+                    events.Repeat(12s, 21s);
                     break;
                 case EVENT_WYVERN_STING:
                     me->CastCustomSpell(SPELL_WYVERN_STING, SPELLVALUE_MAX_TARGETS, 10, me, true);
-                    events.RepeatEvent(urand(15000, 32000));
+                    events.Repeat(25s, 43s);
                     break;
                 case EVENT_ACID_SPIT:
                     DoCastVictim(SPELL_ACID_SPIT);
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.Repeat(1s, 20s);
                     break;
                 case EVENT_NOXIOUS_POISON:
-                    DoCastRandomTarget(SPELL_NOXIOUS_POISON, 0, 100, true);
-                    events.RepeatEvent(urand(12000, 24000));
+                    DoCastRandomTarget(SPELL_NOXIOUS_POISON, 0, 100.f, true);
+                    events.Repeat(10s, 22s);
                     break;
                 case EVENT_HARD_ENRAGE:
                     if (!_hardEnrage)
                     {
-                        DoCastSelf(SPELL_HARD_ENRAGE, true);
+                        DoCastSelf(SPELL_BERSERK, true);
+                        events.CancelEvent(EVENT_FRENZY);
                         _hardEnrage = true;
                     }
                     else
                     {
                         DoCastAOE(SPELL_POISON_BOLT);
                     }
-                    events.RepeatEvent(3000);
+                    events.Repeat(2s);
+                    break;
+                default:
                     break;
             }
         }
         DoMeleeAttackIfReady();
     }
-    private:
-        bool _berserk;
-        bool _hardEnrage;
+
+private:
+    bool _berserk;
+    bool _hardEnrage;
 };
 
 // 26180 - Wyvern Sting
