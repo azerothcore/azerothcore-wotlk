@@ -92,7 +92,7 @@ Guild* GuildMgr::GetGuildByLeader(ObjectGuid guid) const
 void GuildMgr::LoadGuilds()
 {
     // 1. Load all guilds
-    LOG_INFO("server.loading", "Loading guilds definitions...");
+    LOG_INFO("server.loading", "Loading Guilds Definitions...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -134,7 +134,7 @@ void GuildMgr::LoadGuilds()
     }
 
     // 2. Load all guild ranks
-    LOG_INFO("server.loading", "Loading guild ranks...");
+    LOG_INFO("server.loading", "Loading Guild Ranks...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -169,7 +169,7 @@ void GuildMgr::LoadGuilds()
     }
 
     // 3. Load all guild members
-    LOG_INFO("server.loading", "Loading guild members...");
+    LOG_INFO("server.loading", "Loading Guild Members...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -211,7 +211,7 @@ void GuildMgr::LoadGuilds()
     }
 
     // 4. Load all guild bank tab rights
-    LOG_INFO("server.loading", "Loading bank tab rights...");
+    LOG_INFO("server.loading", "Loading Bank Tab Rights...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -246,7 +246,7 @@ void GuildMgr::LoadGuilds()
     }
 
     // 5. Load all event logs
-    LOG_INFO("server.loading", "Loading guild event logs...");
+    LOG_INFO("server.loading", "Loading Guild Event Logs...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -280,7 +280,7 @@ void GuildMgr::LoadGuilds()
     }
 
     // 6. Load all bank event logs
-    LOG_INFO("server.loading", "Loading guild bank event logs...");
+    LOG_INFO("server.loading", "Loading Guild Bank Event Logs...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -315,7 +315,7 @@ void GuildMgr::LoadGuilds()
     }
 
     // 7. Load all guild bank tabs
-    LOG_INFO("server.loading", "Loading guild bank tabs...");
+    LOG_INFO("server.loading", "Loading Guild Bank Tabs...");
     {
         uint32 oldMSTime = getMSTime();
 

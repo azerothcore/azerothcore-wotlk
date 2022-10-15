@@ -250,7 +250,11 @@ public:
 
             if (bossId == DATA_MAJORDOMO_EXECUTUS && state == DONE)
             {
-                DoRespawnGameObject(_cacheOfTheFirelordGUID, 7 * DAY);
+                if (GameObject* cache = instance->GetGameObject(_cacheOfTheFirelordGUID))
+                {
+                    cache->SetRespawnTime(7 * DAY);
+                    cache->SetLootRecipient(instance);
+                }
             }
             else if (bossId == DATA_GOLEMAGG)
             {
