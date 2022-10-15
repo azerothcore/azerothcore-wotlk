@@ -592,6 +592,8 @@ public:
 
     [[nodiscard]] TriggerCastFlags GetTriggeredCastFlags() const { return _triggeredCastFlags; }
 
+    [[nodiscard]] SpellSchoolMask GetSpellSchoolMask() const { return m_spellSchoolMask; }
+
  protected:
     bool HasGlobalCooldown() const;
     void TriggerGlobalCooldown();
