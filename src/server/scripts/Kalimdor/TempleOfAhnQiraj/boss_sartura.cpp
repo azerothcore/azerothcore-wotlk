@@ -89,8 +89,8 @@ struct boss_sartura : public BossAI
     {
         BossAI::EnterCombat(who);
         Talk(SAY_AGGRO);
-        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 30000);
-        events.ScheduleEvent(EVENT_SPELL_BERSERK, 10 * 60000);
+        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 12s, 22s);
+        events.ScheduleEvent(EVENT_SPELL_BERSERK, 10min);
         events.ScheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, 2400ms, 3s);
     }
 
@@ -131,20 +131,20 @@ struct boss_sartura : public BossAI
                         SetGazeOn(target);
                     }
                     DoCastSelf(SPELL_WHIRLWIND, true);
-                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_RANDOM, urand(2000, 7000));
-                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_END, 15000);
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_RANDOM, 2s, 7s);
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_END, 15s);
                     break;
                 case EVENT_SARTURA_WHIRLWIND_RANDOM:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
                         SetGazeOn(target);
                     }
-                    events.RepeatEvent(urand(2000, 7000));
+                    events.Repeat(2s, 7s);
                     break;
                 case EVENT_SARTURA_WHIRLWIND_END:
                     me->SetReactState(REACT_AGGRESSIVE);
                     events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
-                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 5s, 11s);
                     break;
                 case EVENT_SPELL_BERSERK:
                     if (!berserked)
@@ -191,8 +191,8 @@ struct npc_sartura_royal_guard : public ScriptedAI
 
     void EnterCombat(Unit* /*who*/) override
     {
-        events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 30000);
-        events.ScheduleEvent(EVENT_GUARD_KNOCKBACK, 10000);
+        events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 6s, 10s);
+        events.ScheduleEvent(EVENT_GUARD_KNOCKBACK, 12s, 16s);
     }
 
     void UpdateAI(uint32 diff) override
@@ -212,24 +212,24 @@ struct npc_sartura_royal_guard : public ScriptedAI
                         SetGazeOn(target);
                     }
                     DoCastSelf(SPELL_GUARD_WHIRLWIND);
-                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_RANDOM, urand(2000, 7000));
-                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 15000);
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_RANDOM, 2s, 7s);
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 8s);
                     break;
                 case EVENT_GUARD_WHIRLWIND_RANDOM:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
                         SetGazeOn(target);
                     }
-                    events.RepeatEvent(urand(2000, 7000));
+                    events.Repeat(2s, 7s);
                     break;
                 case EVENT_GUARD_WHIRLWIND_END:
                     me->SetReactState(REACT_AGGRESSIVE);
                     events.CancelEvent(EVENT_GUARD_WHIRLWIND_RANDOM);
-                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, urand(25000, 40000));
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 500ms, 9s);
                     break;
                 case EVENT_GUARD_KNOCKBACK:
                     DoCastVictim(SPELL_GUARD_KNOCKBACK);
-                    events.RepeatEvent(urand(10000, 20000));
+                    events.Repeat(21s, 37s);
                     break;
             }
         }
