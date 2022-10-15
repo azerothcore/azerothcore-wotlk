@@ -170,7 +170,6 @@ namespace Acore
         bool const is_secure;
         boost::process::environment envVariables;
 
-
         std::atomic<bool> was_terminated;
 
         Optional<std::shared_ptr<std::future<int>>> result;
