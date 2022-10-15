@@ -154,7 +154,7 @@ struct boss_sartura : public BossAI
                     }
                     break;
                 case EVENT_SARTURA_SUNDERING_CLEAVE:
-                    if (whirlwind)
+                    if (me->HasReactState(REACT_PASSIVE))
                     {
                         Milliseconds whirlwindTimer = events.GetTimeUntilEvent(EVENT_SARTURA_WHIRLWIND_END);
                         events.RescheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, whirlwindTimer + 500ms);
