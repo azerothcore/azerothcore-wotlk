@@ -1720,7 +1720,7 @@ public:
                     pctbonus += 0.05f;
             }
 
-            damageinfo.damage = uint32(damageinfo.damage * (1.0f + pctbonus));
+            damageinfo.damages[0].damage = uint32(damageinfo.damages[0].damage * (1.0f + pctbonus));
         }
 
         void ApplyClassDamageMultiplierMeleeSpell(int32& damage, SpellNonMeleeDamage& damageinfo, SpellInfo const* spellInfo, WeaponAttackType /*attackType*/, bool iscrit) const override

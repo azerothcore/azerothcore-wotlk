@@ -129,6 +129,9 @@ DamageInfo::DamageInfo(CalcDamageInfo const& dmgInfo) : DamageInfo(DamageInfo(dm
 DamageInfo::DamageInfo(DamageInfo const& dmg1, DamageInfo const& dmg2)
     : m_attacker(dmg1.m_attacker), m_victim(dmg1.m_victim), m_damage(dmg1.m_damage + dmg2.m_damage), m_spellInfo(dmg1.m_spellInfo), m_schoolMask(SpellSchoolMask(dmg1.m_schoolMask | dmg2.m_schoolMask)),
     m_damageType(dmg1.m_damageType), m_attackType(dmg1.m_attackType), m_absorb(dmg1.m_absorb + dmg2.m_absorb), m_resist(dmg1.m_resist + dmg2.m_resist), m_block(dmg1.m_block)
+      //npcbot
+      , m_procEx(dmg1.m_procEx)
+      //end npcbot
 {
 }
 
@@ -147,6 +150,9 @@ DamageInfo::DamageInfo(SpellNonMeleeDamage const& spellNonMeleeDamage, DamageEff
       m_spellInfo(spellNonMeleeDamage.spellInfo), m_schoolMask(SpellSchoolMask(spellNonMeleeDamage.schoolMask)), m_damageType(damageType),
       m_absorb(spellNonMeleeDamage.absorb), m_resist(spellNonMeleeDamage.resist), m_block(spellNonMeleeDamage.blocked),
       m_cleanDamage(spellNonMeleeDamage.cleanDamage)
+      //npcbot
+      , m_procEx(spellNonMeleeDamage.HitInfo)
+      //end npcbot
 {
 }
 
@@ -1654,16 +1660,16 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
         // Script Hook For CalculateMeleeDamage -- Allow scripts to change the Damage pre class mitigation calculations
         sScriptMgr->ModifyMeleeDamage(damageInfo->target, damageInfo->attacker, damage);
 
-    //NpcBot mod: apply bot damage mods
-    if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBotOrPet())
-    {
-        damageInfo->damage = damage;
-        //damage is unused. TODO: remove this redundant argument
-        ToCreature()->ApplyBotDamageMultiplierMelee(damageInfo->damage, *damageInfo);
-        damage = damageInfo->damage;
-        damage *= BotMgr::GetBotDamageModPhysical();
-    }
-    //End NpcBot
+        //NpcBot mod: apply bot damage mods
+        if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBotOrPet())
+        {
+            damageInfo->damages[i].damage = damage;
+            //damage is unused. TODO: remove this redundant argument
+            ToCreature()->ApplyBotDamageMultiplierMelee(damageInfo->damages[i].damage, *damageInfo);
+            damage = damageInfo->damages[i].damage;
+            damage *= BotMgr::GetBotDamageModPhysical();
+        }
+        //End NpcBot
 
         // Calculate armor reduction
         if (IsDamageReducedByArmor((SpellSchoolMask)(damageInfo->damages[i].damageSchoolMask)))

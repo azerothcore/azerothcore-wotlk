@@ -287,7 +287,7 @@ public:
             if (CCed(damageinfo.target))
                 pctbonus *= 1.5f;
 
-            damageinfo.damage = uint32(damageinfo.damage * pctbonus);
+            damageinfo.damages[0].damage = uint32(damageinfo.damages[0].damage * pctbonus);
         }
 
         void ApplyClassDamageMultiplierSpell(int32& damage, SpellNonMeleeDamage& damageinfo, SpellInfo const* spellInfo, WeaponAttackType /*attackType*/, bool iscrit) const override

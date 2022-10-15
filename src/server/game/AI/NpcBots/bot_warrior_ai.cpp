@@ -1278,7 +1278,7 @@ public:
                                 pctbonus *= 1.025f;
             }
 
-            damageinfo.damage *= pctbonus;
+            damageinfo.damages[0].damage *= pctbonus;
         }
 
         void ApplyClassSpellCritMultiplierAll(Unit const* /*victim*/, float& crit_chance, SpellInfo const* spellInfo, SpellSchoolMask /*schoolMask*/, WeaponAttackType attackType) const override

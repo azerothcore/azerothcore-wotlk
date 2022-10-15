@@ -614,7 +614,7 @@ public:
             }
 
             CalcDamageInfo* dinfo = new CalcDamageInfo();
-            me->CalculateMeleeDamage(target, 0, dinfo, BASE_ATTACK);
+            me->CalculateMeleeDamage(target, dinfo, BASE_ATTACK);
 
             me->SetFloatValue(UNIT_FIELD_MINDAMAGE, mindam);
             me->SetFloatValue(UNIT_FIELD_MAXDAMAGE, maxdam);
@@ -672,7 +672,7 @@ public:
                 SPELL_SCHOOL_MASK_NORMAL, dinfo.GetAbsorb(), dinfo.GetResist(), false, dinfo.GetBlock(), true);
             CleanDamage cl(0, 0, BASE_ATTACK, MELEE_HIT_CRIT);
             Unit::DealDamage(me, target, dinfo.GetDamage(), &cl);
-            Unit::ProcDamageAndSpell(me, dinfo.GetVictim(), calcdinfo->procAttacker, calcdinfo->procVictim, calcdinfo->procEx, calcdinfo->damage, calcdinfo->attackType);
+            Unit::ProcDamageAndSpell(me, dinfo.GetVictim(), calcdinfo->procAttacker, calcdinfo->procVictim, calcdinfo->procEx, dinfo.GetDamage(), calcdinfo->attackType);
             me->CombatStart(target);
 
             me->resetAttackTimer(BASE_ATTACK);

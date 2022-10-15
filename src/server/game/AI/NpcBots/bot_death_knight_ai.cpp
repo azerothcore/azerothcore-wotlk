@@ -936,14 +936,14 @@ public:
         void ApplyClassDamageMultiplierMelee(uint32& /*damage*/, CalcDamageInfo& damageinfo) const override
         {
             uint8 lvl = me->GetLevel();
-            float fdamage = float(damageinfo.damage);
+            float fdamage = float(damageinfo.damages[0].damage);
             float pctbonus = 0.0f;
 
             //Blood Gorged part 1 (white attacks): 10% bonus damage for all attacks
             if ((_spec == BOT_SPEC_DK_BLOOD) && lvl >= 64 && me->HasAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT))
                 pctbonus += 0.1f;
 
-            damageinfo.damage = uint32(fdamage * (1.0f + pctbonus));
+            damageinfo.damages[0].damage = uint32(fdamage * (1.0f + pctbonus));
         }
 
         void ApplyClassSpellCritMultiplierAll(Unit const* /*victim*/, float& crit_chance, SpellInfo const* spellInfo, SpellSchoolMask /*schoolMask*/, WeaponAttackType /*attackType*/) const override

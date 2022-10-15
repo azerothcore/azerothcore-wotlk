@@ -185,7 +185,7 @@ public:
             else if (_doCrit == true)
                 _doCrit = false;
 
-            damageinfo.damage *= pctbonus;
+            damageinfo.damages[0].damage *= pctbonus;
         }
 
         void ApplyClassEffectMods(WorldObject const* /*wtarget*/, SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
