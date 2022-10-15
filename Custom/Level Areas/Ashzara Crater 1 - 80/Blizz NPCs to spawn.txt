@@ -109,6 +109,8 @@ https://www.wowhead.com/wotlk/de/npc=20058/terrorwolf-der-blutschl%C3%A4ger
 https://www.wowhead.com/wotlk/de/npc=19952/geomant-der-blutschl%C3%A4ger
 https://www.wowhead.com/wotlk/de/npc=19992/schamane-der-blutschl%C3%A4ger
 https://www.wowhead.com/wotlk/de/npc=19991/schl%C3%A4ger-der-blutschl%C3%A4ger
+https://www.wowhead.com/wotlk/de/npc=19183/grollhufkalb
+https://www.wowhead.com/wotlk/de/npc=18283/schwarzsichel
 
 -- Rares: 
 https://www.wowhead.com/wotlk/de/npc=1838/scharlachroter-befrager
@@ -120,3 +122,13 @@ https://www.wowhead.com/wotlk/de/npc=18697/chefingenieur-lorthander
 https://www.wowhead.com/wotlk/de/npc=20932/nuramoc
 https://www.wowhead.com/wotlk/de/npc=32400/tukemuth
 https://www.wowhead.com/wotlk/de/npc=18728/verdammnislord-kazzak
+https://www.wowhead.com/wotlk/de/npc=18689/verkr%C3%BCppler
+https://www.wowhead.com/wotlk/de/npc=18678/gierschlund
+
+-- 71 - 80
+https://www.wowhead.com/wotlk/de/npc=26283/eisklagegeist
+https://www.wowhead.com/wotlk/de/npc=28097/pech
+
+-- Rares:
+https://www.wowhead.com/wotlk/de/npc=32495/hildana-todesstehler
+https://www.wowhead.com/wotlk/de/npc=26360/r%C3%BCttelbohrer
