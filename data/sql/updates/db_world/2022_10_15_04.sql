@@ -1,3 +1,4 @@
+-- DB update 2022_10_15_03 -> 2022_10_15_04
 -- Rookery Whelp (10161)
 DELETE FROM `creature_loot_template` WHERE `Entry` = 10161;
 UPDATE `creature_template` SET `lootid` = 0, `skinloot` = 0 WHERE (`entry` = 10161);
