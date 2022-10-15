@@ -1,3 +1,4 @@
+-- DB update 2022_10_15_00 -> 2022_10_15_01
 -- Shade of Taerar
 UPDATE `creature_template` SET `DamageModifier` = 12.65, `ArmorModifier` = 1.05 WHERE (`entry` = 15302);
 
