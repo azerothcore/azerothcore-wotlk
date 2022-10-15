@@ -1,3 +1,4 @@
+-- DB update 2022_10_15_08 -> 2022_10_15_09
 -- Durotar Food Crate Water Barrel Gameobject Overhaul
 
 /* Remove existing Water Barrels 3658--some of these may be correct, but we have all the spawns now so this will be easier */
