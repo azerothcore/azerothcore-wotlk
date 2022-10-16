@@ -30,6 +30,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
+#include "SpellScript.h"
 #include "WorldPacket.h"
 
 enum Spells
