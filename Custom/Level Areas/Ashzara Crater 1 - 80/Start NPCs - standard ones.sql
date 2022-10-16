@@ -51,3 +51,7 @@ INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entr
 DELETE FROM `creature_template_addon` WHERE (`entry` = 800004);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (800004, 0, 0, 54432, 0, 0, 0, '');
+
+UPDATE `creature_template` SET `subname` = 'DC-WoW' WHERE (`entry` = 800003);
+UPDATE `creature_template` SET `subname` = 'DC-WoW' WHERE (`entry` = 800000);
+UPDATE `creature_template` SET `subname` = 'DC-WoW' WHERE (`entry` = 800002);
