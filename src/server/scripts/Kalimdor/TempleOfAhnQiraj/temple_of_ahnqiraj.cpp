@@ -59,7 +59,7 @@ enum Spells
 
     // Obsidian Nullifier
     SPELL_NULLIFY                       = 26552,
-	SPELL_DRAIN_MANA_NULLIFIER          = 25671,
+    SPELL_DRAIN_MANA_NULLIFIER          = 25671,
     SPELL_CLEAVE                        = 40504,
 
     // Qiraji Scorpion
