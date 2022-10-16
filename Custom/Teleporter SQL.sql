@@ -139,10 +139,13 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (408, 401, 2, -1, 2, 'Level 50 - 70', 37, 896.217, 142.282, 285.359, 4.09048);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (409, 401, 2, -1, 2, 'Level 70', 37, 1035.75, 216.876, 367.189, 4.26867);
 
-
--- Starter locations Level 81 - 100 (ID 410 - 419)
+-- Starter locations Level 81 - 130 (ID 410 - 419)
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (410, 400, 1, -1, 2, 'Hyjal 81 - 130', null, null, null, null, null);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (411, 410, 2, -1, 2, 'Hyjal Start', 1, 4625.877, -3840.538, 943.76, 1.145);
+
+-- Starter locations Level 130 - 160 (ID 420 - 429)
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (420, 400, 1, -1, 2, 'Strathholme Outside 130 - 160', null, null, null, null, null);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (421, 420, 2, -1, 2, 'Strathholme Start', 329, 3138.68, -3710.41, 133.63, 4.43518);
 
 -- Custom Locations ID 500 - 599
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES ('500', '0', '1', '-1', '2', 'Custom Locations', null, null, null, null, null);
