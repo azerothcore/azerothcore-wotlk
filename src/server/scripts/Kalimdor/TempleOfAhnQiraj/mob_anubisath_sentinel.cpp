@@ -316,7 +316,46 @@ public:
     };
 };
 
+// 9347: Mortal Strike
+class spell_anubisath_mortal_strike : public AuraScript
+{
+    PrepareAuraScript(spell_anubisath_mortal_strike);
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+
+        if (Unit* target = GetUnitOwner()->GetVictim())
+            if (target->IsWithinDist(GetUnitOwner(), 5.f))
+                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_anubisath_mortal_strike::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+// 26626 (Server-side): Mana Burn Area
+class spell_mana_burn_area : public SpellScript
+{
+    PrepareSpellScript(spell_mana_burn_area);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, SPELL_MANAB, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_mana_burn_area::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_npc_anubisath_sentinel()
 {
     new npc_anubisath_sentinel();
+    RegisterSpellScript(spell_anubisath_mortal_strike);
+    RegisterSpellScript(spell_mana_burn_area);
 }
