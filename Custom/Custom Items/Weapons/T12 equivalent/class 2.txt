@@ -121,7 +121,7 @@ INSERT INTO `item_template` (`entry`, `class`, `subclass`, `SoundOverrideSubclas
 update item_template set ItemLevel = 304 where entry >= 91100 and entry < 91200;
 
 -- Required Level to use = 130
-update item_template set RequiredLevel = 100 where entry >= 91100 and entry < 91200;
+update item_template set RequiredLevel = 130 where entry >= 91100 and entry < 91200;
 
 -- Stat Value upgrade by 20%
 update item_template set stat_value1 = (stat_value1 * 1.2) where entry >= 91100 and entry < 91200;
