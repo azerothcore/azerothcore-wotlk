@@ -104,11 +104,11 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@OBJECTPOOLS+3, 1, 'Battered Chest 106318 Echo Isles');
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
-(@OGUID+10, @OBJECTPOOLS+3, 25, 'Echo Isles Battered Chest 1/5'),
-(@OGUID+11, @OBJECTPOOLS+3, 25, 'Echo Isles Battered Chest 2/5'),
-(@OGUID+12, @OBJECTPOOLS+3, 25, 'Echo Isles Battered Chest 3/5'),
-(@OGUID+13, @OBJECTPOOLS+3, 25, 'Echo Isles Battered Chest 4/5'),
-(@OGUID+14, @OBJECTPOOLS+3, 25, 'Echo Isles Battered Chest 5/5');
+(@OGUID+10, @OBJECTPOOLS+3, 20, 'Echo Isles Battered Chest 1/5'),
+(@OGUID+11, @OBJECTPOOLS+3, 20, 'Echo Isles Battered Chest 2/5'),
+(@OGUID+12, @OBJECTPOOLS+3, 20, 'Echo Isles Battered Chest 3/5'),
+(@OGUID+13, @OBJECTPOOLS+3, 20, 'Echo Isles Battered Chest 4/5'),
+(@OGUID+14, @OBJECTPOOLS+3, 20, 'Echo Isles Battered Chest 5/5');
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@OBJECTPOOLS+4, 1, 'Battered Chest 106318 Outer Harpy Area');
@@ -162,11 +162,11 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@OBJECTPOOLS+10, 1, 'Battered Chest 106318 Skull Rock');
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
-(@OGUID+40, @OBJECTPOOLS+10, 25, 'Skull Rock Battered Chest 1/5'),
-(@OGUID+41, @OBJECTPOOLS+10, 25, 'Skull Rock Battered Chest 2/5'),
-(@OGUID+42, @OBJECTPOOLS+10, 25, 'Skull Rock Battered Chest 3/5'),
-(@OGUID+43, @OBJECTPOOLS+10, 25, 'Skull Rock Battered Chest 4/5'),
-(@OGUID+44, @OBJECTPOOLS+10, 25, 'Skull Rock Battered Chest 5/5');
+(@OGUID+40, @OBJECTPOOLS+10, 20, 'Skull Rock Battered Chest 1/5'),
+(@OGUID+41, @OBJECTPOOLS+10, 20, 'Skull Rock Battered Chest 2/5'),
+(@OGUID+42, @OBJECTPOOLS+10, 20, 'Skull Rock Battered Chest 3/5'),
+(@OGUID+43, @OBJECTPOOLS+10, 20, 'Skull Rock Battered Chest 4/5'),
+(@OGUID+44, @OBJECTPOOLS+10, 20, 'Skull Rock Battered Chest 5/5');
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@OBJECTPOOLS+11, 1, 'Battered Chest 106318 Dustwind Cave');
