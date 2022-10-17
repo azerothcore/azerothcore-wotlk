@@ -211,17 +211,6 @@ SourceDirectory = ""
 MySQLExecutable = ""
 
 #
-#    MySQLConfigEditorExecutable
-#        Description: The path to your MySQL CLI binary.
-#                     If the path is left empty, built-in path from cmake is used.
-#        Example:     "C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql_config_editor.exe"
-#                     "mysql.exe"
-#                     "/usr/bin/mysql_config_editor"
-#        Default:     ""
-
-MySQLConfigEditorExecutable = ""
-
-#
 #    ThreadPool
 #        Description: Number of threads to be used for the global thread pool
 #                     The thread pool is currently used for:
