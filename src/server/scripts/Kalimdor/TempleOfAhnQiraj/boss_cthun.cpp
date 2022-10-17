@@ -102,6 +102,7 @@ enum Misc
 {
     MAX_TENTACLE_GROUPS                         = 5,
     NPC_TRIGGER                                 = 15384,
+    NPC_EXIT_TRIGGER                            = 15800
 };
 
 enum Yells
@@ -150,6 +151,7 @@ struct boss_eye_of_cthun : public BossAI
     boss_eye_of_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
         SetCombatMovement(false);
+        me->m_SightDistance = 90.f;
     }
 
     void Reset() override
@@ -198,7 +200,7 @@ struct boss_eye_of_cthun : public BossAI
         if (who->GetTypeId() == TYPEID_PLAYER && !me->IsInCombat())
         {
             // Z checks are necessary here because AQ maps do funky stuff.
-            if (me->IsWithinLOSInMap(who) && me->IsWithinDist2d(who, 50.0f) && who->GetPositionZ() > 100.0f)
+            if (me->IsWithinLOSInMap(who) && me->IsWithinDist2d(who, 90.0f) && who->GetPositionZ() > 100.0f)
             {
                 AttackStart(who);
             }
@@ -216,6 +218,16 @@ struct boss_eye_of_cthun : public BossAI
             {
                 _eyeTentacleCounter = 0;
             }
+        }
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+
+        if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+        {
+            cthun->AI()->JustSummoned(summon);
         }
     }
 
@@ -250,7 +262,7 @@ struct boss_eye_of_cthun : public BossAI
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                 {
-                    if (Creature* tentacle = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 1000))
+                    if (Creature* tentacle = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                     {
                         tentacle->AI()->AttackStart(target);
                     }
@@ -300,17 +312,9 @@ struct boss_eye_of_cthun : public BossAI
                         me->SetTarget(ObjectGuid::Empty);
                         me->StopMoving();
 
-                        if (ClockWise)
-                        {
-                            me->SetFacingTo(DarkGlareAngle + DarkGlareTick * float(M_PI) / 35);
-                            me->SetOrientation(DarkGlareAngle + DarkGlareTick * float(M_PI) / 35);
-
-                        }
-                        else
-                        {
-                            me->SetFacingTo(DarkGlareAngle - DarkGlareTick * float(M_PI) / 35);
-                            me->SetOrientation(DarkGlareAngle - DarkGlareTick * float(M_PI) / 35);
-                        }
+                        float angle = ClockWise ? DarkGlareAngle + DarkGlareTick * float(M_PI) / 35 : DarkGlareAngle - DarkGlareTick * float(M_PI) / 35;
+                        me->SetFacingTo(angle);
+                        me->SetOrientation(angle);
 
                         DoCastSelf(SPELL_DARK_GLARE);
 
@@ -344,7 +348,7 @@ struct boss_eye_of_cthun : public BossAI
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         //Only if it will kill
-        if (damage < me->GetHealth())
+        if (damage < me->GetHealth() || !me->GetHealth())
             return;
 
         //Fake death in phase 0 or 1 (green beam or dark glare phase)
@@ -366,10 +370,13 @@ struct boss_eye_of_cthun : public BossAI
         me->RemoveAllAuras();
         _scheduler.CancelAll();
 
-        if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+        me->m_Events.AddEventAtOffset([this]()
         {
-            cthun->AI()->DoAction(ACTION_START_PHASE_TWO);
-        }
+            if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+            {
+                cthun->AI()->DoAction(ACTION_START_PHASE_TWO);
+            }
+        }, 3s);
     }
 
 private:
@@ -466,7 +473,7 @@ struct boss_cthun : public BossAI
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
             {
                 //Spawn claw tentacle on the random target
-                if (Creature* spawned = me->SummonCreature(NPC_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
+                if (Creature* spawned = me->SummonCreature(NPC_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                 {
                     spawned->AI()->AttackStart(target);
                 }
@@ -478,7 +485,7 @@ struct boss_cthun : public BossAI
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
             {
                 //Spawn claw tentacle on the random target
-                if (Creature* spawned = me->SummonCreature(NPC_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
+                if (Creature* spawned = me->SummonCreature(NPC_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                 {
                     spawned->AI()->AttackStart(target);
                 }
@@ -569,7 +576,7 @@ struct boss_cthun : public BossAI
                     //Spawn flesh tentacle
                     for (uint8 i = 0; i < 2; i++)
                     {
-                        me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
+                        me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
                     }
                 });
             }
@@ -942,6 +949,27 @@ class spell_cthun_dark_glare : public SpellScript
     }
 };
 
+class spell_cthun_digestive_acid : public AuraScript
+{
+    PrepareAuraScript(spell_cthun_digestive_acid);
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
+        {
+            if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+            {
+                cthun->CastSpell(GetUnitOwner(), SPELL_DIGESTIVE_ACID, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_cthun_digestive_acid::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
 // 4033 - At C'thun's stomach
 class at_cthun_stomach_exit : public AreaTriggerScript
 {
@@ -954,30 +982,37 @@ public:
         {
             if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
             {
-                player->CastSpell(player, SPELL_RUBBLE_ROCKY, true);
-
-                player->m_Events.AddEventAtOffset([player]()
+                if (Creature* trigger = player->FindNearestCreature(NPC_TRIGGER, 15.0f))
                 {
-                    if (Creature* trigger = player->FindNearestCreature(NPC_TRIGGER, 15.0f))
+                    trigger->CastSpell(player, SPELL_EXIT_STOMACH, true);
+
+                    if (Creature* exittrigger = player->FindNearestCreature(NPC_EXIT_TRIGGER, 15.0f))
                     {
-                        trigger->CastSpell(player, SPELL_EXIT_STOMACH, true);
+                        exittrigger->CastSpell(player, SPELL_RUBBLE_ROCKY, true);
                     }
-                }, 3s);
-
-                player->m_Events.AddEventAtOffset([player]()
-                {
-                    player->JumpTo(0.0f, 80.0f, false);
-                }, 5s);
+                }
 
                 player->m_Events.AddEventAtOffset([player, cthun]()
                 {
-                    if (cthun)
+                    if (player->FindNearestCreature(NPC_EXIT_TRIGGER, 10.0f))
                     {
-                        player->NearTeleportTo(cthun->GetPositionX(), cthun->GetPositionY(), cthun->GetPositionZ() + 10, float(rand32() % 6));
-                    }
+                        player->JumpTo(0.0f, 80.0f, false);
 
-                    player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-                }, 6s);
+                        player->m_Events.AddEventAtOffset([player, cthun]()
+                        {
+                            if (cthun)
+                            {
+                                player->NearTeleportTo(cthun->GetPositionX(), cthun->GetPositionY(), cthun->GetPositionZ() + 10, float(rand32() % 6));
+                            }
+
+                            player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                        }, 1s);
+                    }
+                    else
+                    {
+                        player->m_Events.KillAllEvents(false);
+                    }
+                }, 3s);
             }
         }
 
@@ -996,7 +1031,10 @@ public:
         {
             if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
             {
-                cthun->CastSpell(player, SPELL_SPIT_OUT, true);
+                if (cthun->IsAlive())
+                {
+                    cthun->CastSpell(player, SPELL_SPIT_OUT, true);
+                }
             }
         }
 
@@ -1013,6 +1051,7 @@ void AddSC_boss_cthun()
     RegisterTempleOfAhnQirajCreatureAI(npc_giant_claw_tentacle);
     RegisterTempleOfAhnQirajCreatureAI(npc_giant_eye_tentacle);
     RegisterSpellScript(spell_cthun_dark_glare);
+    RegisterSpellScript(spell_cthun_digestive_acid);
     new at_cthun_stomach_exit();
     new at_cthun_center();
 }
