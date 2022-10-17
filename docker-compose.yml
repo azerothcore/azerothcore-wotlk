@@ -181,7 +181,6 @@ services:
       - seccomp:unconfined
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    user: ${DOCKER_USER:-acore}
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
