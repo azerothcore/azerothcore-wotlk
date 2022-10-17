@@ -151,6 +151,7 @@ struct boss_eye_of_cthun : public BossAI
     boss_eye_of_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
         SetCombatMovement(false);
+        me->m_SightDistance = 90.f;
     }
 
     void Reset() override
@@ -199,7 +200,7 @@ struct boss_eye_of_cthun : public BossAI
         if (who->GetTypeId() == TYPEID_PLAYER && !me->IsInCombat())
         {
             // Z checks are necessary here because AQ maps do funky stuff.
-            if (me->IsWithinLOSInMap(who) && me->IsWithinDist2d(who, 50.0f) && who->GetPositionZ() > 100.0f)
+            if (me->IsWithinLOSInMap(who) && me->IsWithinDist2d(who, 90.0f) && who->GetPositionZ() > 100.0f)
             {
                 AttackStart(who);
             }
