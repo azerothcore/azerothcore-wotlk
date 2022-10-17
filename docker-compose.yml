@@ -91,7 +91,7 @@ services:
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    user: ${DOCKER_USER:-acore}
+    user: root # containers that have to write on host folders, need the root user
     privileged: true
     build:
       context: .
@@ -116,7 +116,7 @@ services:
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    user: ${DOCKER_USER:-acore}
+    user: root # containers that have to write on host folders, need the root user
     build:
       context: .
       target: authserver-local
@@ -139,6 +139,7 @@ services:
     <<: *ac-shared-conf
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+    user: root # containers that have to write on host folders, need the root user
     build:
       context: .
       target: ${DOCKER_AC_BUILD_TARGET:-dev}
@@ -166,6 +167,7 @@ services:
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     tty: true
     image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+    user: root # containers that have to write on host folders, need the root user
     build:
       context: .
       target: dev
@@ -180,8 +182,6 @@ services:
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     user: ${DOCKER_USER:-acore}
-    environment:
-        DBLIST: AUTH,CHARACTERS,WORLD
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
@@ -190,7 +190,7 @@ services:
       - ac-build-dev:/azerothcore/var/build
       - ac-ccache-dev:/azerothcore/var/ccache
       # this is not the directory of the extracted data! It's the client folder used by the extractors
-      - ${DOCKER_CLIENT_DATA_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
+      - ${DOCKER_AC_CLIENT_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
     profiles: [dev]
 
 #======================
@@ -208,7 +208,7 @@ services:
     restart: unless-stopped
     env_file:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    user: ${DOCKER_USER:-acore}
+    user: root # containers that have to write on host folders, need the root user
     privileged: true
     build:
       context: .
@@ -225,7 +225,7 @@ services:
     volumes:
       - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
     volumes_from:
-      - ac-client-data-server:ro
+      - ac-client-data-prod:/azerothcore/env/dist/data:ro
     depends_on:
       - ac-client-data-server
     profiles: [prod, prod-app, prod-worldserver]
@@ -238,7 +238,7 @@ services:
     restart: unless-stopped
     env_file:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    user: ${DOCKER_USER:-acore}
+    user: root # containers that have to write on host folders, need the root user
     build:
       context: .
       target: authserver
@@ -267,12 +267,12 @@ services:
         DOCKER_USER: ${DOCKER_USER:-acore}
       <<: *cache-from
     volumes:
-      - /azerothcore/env/dist/data
+      - ac-client-data-prod:/azerothcore/env/dist/data
     profiles: [prod, prod-app, clientdata]
 
   ac-tools:
     image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
-    user: ${DOCKER_USER:-acore}
+    user: root # containers that have to write on host folders, need the root user
     build:
       context: .
       target: tools
@@ -305,13 +305,13 @@ volumes:
   ac-ccache-dev:
   ac-ccache:
   ac-proj:
+  ac-client-data-prod:
   # not used, but you can use them by setting
   # the DOCKER_VOL_* env variabiles
   ac-conf:
   ac-etc:
   ac-logs:
   ac-client-data:
-  ac-client-data-prod:
 
 networks:
   ac-network:
