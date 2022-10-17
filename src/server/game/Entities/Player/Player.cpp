@@ -11293,7 +11293,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // guild bank list?
 
     // Homebind
-    WorldPacket data(SMSG_BINDPOINTUPDATE, 5 * 4);
+    WorldPacket data(SMSG_BINDPOINTUPDATE, 6 * 4);
     data << m_homebindX << m_homebindY << m_homebindZ << m_homebindO;
     data << (uint32) m_homebindMapId;
     data << (uint32) m_homebindAreaId;
