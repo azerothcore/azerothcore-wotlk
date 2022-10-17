@@ -66,7 +66,7 @@ std::string Acore::String::TrimRightInPlace(std::string& str)
 
 /**
  * @brief Util function to add a suffix char. Can be used to add a slash at the end of a path
- * 
+ *
  * @param str String where to apply the suffix
  * @param suffix Character to add at the end of the str
  * @return std::string Suffixed string
