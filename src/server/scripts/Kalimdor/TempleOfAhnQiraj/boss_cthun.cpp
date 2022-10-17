@@ -151,6 +151,7 @@ struct boss_eye_of_cthun : public BossAI
     boss_eye_of_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
         SetCombatMovement(false);
+        me->m_SightDistance = 90.f;
     }
 
     void Reset() override
