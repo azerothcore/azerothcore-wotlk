@@ -3456,7 +3456,7 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell) const
         (target->IsAlive() && target->IsVisible() && me->IsValidAttackTarget(target) &&
         target->isTargetableForAttack(false) && !IsInBotParty(target) &&
         ((me->CanSeeOrDetect(target) && target->InSamePhase(me)) || CanSeeEveryone()) &&
-        (!master->IsAlive() || target->IsControlledByPlayer() || master->GetDistance(target) <= foldist) &&//if master is killed pursue to the end
+        (!master->IsAlive() || target->IsControlledByPlayer() || (followdist > 0 && master->GetDistance(target) <= foldist)) &&//if master is killed pursue to the end
         (target->IsHostileTo(master) || target->IsHostileTo(me) ||//if master is controlled
         (target->GetReactionTo(me) < REP_FRIENDLY && (master->IsInCombat() || target->IsInCombat()))) &&
         (byspell == -1 || !target->IsTotem()) &&
