@@ -1419,6 +1419,25 @@ public:
     }
 };
 
+class go_pumpkin_shrine : public GameObjectScript
+{
+public:
+    go_pumpkin_shrine() : GameObjectScript("go_pumpkin_shrine") {}
+
+    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 /*action*/) override
+    {
+        CloseGossipMenuFor(player);
+
+        if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
+            return true;
+
+        if (Creature* horseman = go->SummonCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 1754.00f, 1346.00f, 17.50f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+            horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
+
+        return true;
+    }
+};
+
 void AddSC_event_hallows_end_scripts()
 {
     // Spells
@@ -1443,6 +1462,7 @@ void AddSC_event_hallows_end_scripts()
 
     // Headless Horseman
     new go_loosely_turned_soil();
+    new go_pumpkin_shrine();
     RegisterCreatureAI(boss_headless_horseman);
     RegisterCreatureAI(boss_headless_horseman_head);
     RegisterCreatureAI(boss_headless_horseman_pumpkin);
