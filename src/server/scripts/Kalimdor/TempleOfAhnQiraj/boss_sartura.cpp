@@ -34,7 +34,6 @@ enum Spells
     SPELL_ENRAGE                    = 8269,
     SPELL_BERSERK                   = 27680,
     SPELL_SUNDERING_CLEAVE          = 25174,
-
     // Sartura's Royal Guard
     SPELL_GUARD_WHIRLWIND           = 26038,
     SPELL_GUARD_KNOCKBACK           = 26027
@@ -44,20 +43,15 @@ enum events
 {
     // Battleguard Sartura
     EVENT_SARTURA_WHIRLWIND         = 1,
-    EVENT_SARTURA_WHIRLWIND_RANDOM  = 2,
-    EVENT_SARTURA_WHIRLWIND_END     = 3,
-    EVENT_SPELL_BERSERK             = 4,
-    EVENT_SARTURA_AGGRO_RESET       = 5,
-    EVENT_SARTURA_AGGRO_RESET_END   = 6,
-    EVENT_SARTURA_SUNDERING_CLEAVE  = 7,
-
+    EVENT_SARTURA_WHIRLWIND_RANDOM,
+    EVENT_SARTURA_WHIRLWIND_END,
+    EVENT_SPELL_BERSERK,
+    EVENT_SARTURA_SUNDERING_CLEAVE,
     // Sartura's Royal Guard
-    EVENT_GUARD_WHIRLWIND           = 8,
-    EVENT_GUARD_WHIRLWIND_RANDOM    = 9,
-    EVENT_GUARD_WHIRLWIND_END       = 10,
-    EVENT_GUARD_KNOCKBACK           = 11,
-    EVENT_GUARD_AGGRO_RESET         = 12,
-    EVENT_GUARD_AGGRO_RESET_END     = 13
+    EVENT_GUARD_WHIRLWIND,
+    EVENT_GUARD_WHIRLWIND_RANDOM,
+    EVENT_GUARD_WHIRLWIND_END,
+    EVENT_GUARD_KNOCKBACK,
 };
 
 struct boss_sartura : public BossAI
@@ -74,13 +68,11 @@ struct boss_sartura : public BossAI
     void Reset() override
     {
         _Reset();
-        whirlwind = false;
         enraged = false;
         berserked = false;
-        aggroReset = false;
         MinionReset();
-        _savedTargetGUID.Clear();
-        _savedTargetThreat = 0.f;
+
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void MinionReset()
@@ -98,8 +90,7 @@ struct boss_sartura : public BossAI
         BossAI::EnterCombat(who);
         Talk(SAY_AGGRO);
         events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 12s, 22s);
-        events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(45000, 55000));
-        events.ScheduleEvent(EVENT_SPELL_BERSERK, 10 * 60000);
+        events.ScheduleEvent(EVENT_SPELL_BERSERK, 10min);
         events.ScheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, 2400ms, 3s);
     }
 
@@ -125,7 +116,7 @@ struct boss_sartura : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
+        if (!UpdateVictimWithGaze())
             return;
 
         events.Update(diff);
@@ -135,60 +126,25 @@ struct boss_sartura : public BossAI
             switch (eventId)
             {
                 case EVENT_SARTURA_WHIRLWIND:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
+                    {
+                        SetGazeOn(target);
+                    }
                     DoCastSelf(SPELL_WHIRLWIND, true);
-                    whirlwind = true;
-                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_RANDOM, urand(3000, 7000));
-                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_END, 15000);
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_RANDOM, 2s, 7s);
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_END, 15s);
                     break;
                 case EVENT_SARTURA_WHIRLWIND_RANDOM:
-                    if (whirlwind == true)
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
-                        {
-                            me->AddThreat(target, 1.0f);
-                            me->TauntApply(target);
-                            AttackStart(target);
-                        }
-                        events.RepeatEvent(urand(3000, 7000));
+                        SetGazeOn(target);
                     }
+                    events.Repeat(2s, 7s);
                     break;
                 case EVENT_SARTURA_WHIRLWIND_END:
+                    me->SetReactState(REACT_AGGRESSIVE);
                     events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
-                    whirlwind = false;
                     events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 5s, 11s);
-                    break;
-                case EVENT_SARTURA_AGGRO_RESET:
-                    if (aggroReset == false)
-                    {
-                        if (Unit* originalTarget = SelectTarget(SelectTargetMethod::Random, 0))
-                        {
-                            _savedTargetGUID = originalTarget->GetGUID();
-                            _savedTargetThreat = me->GetThreatMgr().GetThreat(originalTarget);
-                            me->GetThreatMgr().ModifyThreatByPercent(originalTarget, -100);
-                        }
-                        aggroReset = true;
-                        events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET_END, 5000);
-                    }
-                    else
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
-                        {
-                            me->AddThreat(target, 1.0f);
-                            me->TauntApply(target);
-                            AttackStart(target);
-                        }
-                    }
-                    events.RepeatEvent(urand(1000, 2000));
-                    break;
-                case EVENT_SARTURA_AGGRO_RESET_END:
-                    events.CancelEvent(EVENT_SARTURA_AGGRO_RESET);
-                    if (Unit* originalTarget = ObjectAccessor::GetUnit(*me, _savedTargetGUID))
-                    {
-                        me->GetThreatMgr().AddThreat(originalTarget, _savedTargetThreat);
-                        _savedTargetGUID.Clear();
-                    }
-                    aggroReset = false;
-                    events.RescheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(30000, 40000));
                     break;
                 case EVENT_SPELL_BERSERK:
                     if (!berserked)
@@ -198,7 +154,7 @@ struct boss_sartura : public BossAI
                     }
                     break;
                 case EVENT_SARTURA_SUNDERING_CLEAVE:
-                    if (whirlwind)
+                    if (me->HasReactState(REACT_PASSIVE))
                     {
                         Milliseconds whirlwindTimer = events.GetTimeUntilEvent(EVENT_SARTURA_WHIRLWIND_END);
                         events.RescheduleEvent(EVENT_SARTURA_SUNDERING_CLEAVE, whirlwindTimer + 500ms);
@@ -213,15 +169,13 @@ struct boss_sartura : public BossAI
                     break;
             }
         }
+
         DoMeleeAttackIfReady();
     };
+
     private:
-        bool whirlwind;
         bool enraged;
         bool berserked;
-        bool aggroReset;
-        ObjectGuid _savedTargetGUID;
-        float _savedTargetThreat;
 };
 
 struct npc_sartura_royal_guard : public ScriptedAI
@@ -231,22 +185,19 @@ struct npc_sartura_royal_guard : public ScriptedAI
     void Reset() override
     {
         events.Reset();
-        whirlwind = false;
-        aggroReset = false;
-        _savedTargetGUID.Clear();
-        _savedTargetThreat = 0.f;
+
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void EnterCombat(Unit* /*who*/) override
     {
         events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 6s, 10s);
-        events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET, urand(45000, 55000));
         events.ScheduleEvent(EVENT_GUARD_KNOCKBACK, 12s, 16s);
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
+        if (!UpdateVictimWithGaze())
             return;
 
         events.Update(diff);
@@ -256,60 +207,25 @@ struct npc_sartura_royal_guard : public ScriptedAI
             switch (eventid)
             {
                 case EVENT_GUARD_WHIRLWIND:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
+                    {
+                        SetGazeOn(target);
+                    }
                     DoCastSelf(SPELL_GUARD_WHIRLWIND);
-                    whirlwind = true;
-                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_RANDOM, urand(3000, 7000));
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_RANDOM, 2s, 7s);
                     events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 8s);
                     break;
                 case EVENT_GUARD_WHIRLWIND_RANDOM:
-                    if (whirlwind == true)
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
-                        {
-                            me->AddThreat(target, 1.0f);
-                            me->TauntApply(target);
-                            AttackStart(target);
-                        }
-                        events.RepeatEvent(urand(3000, 7000));
+                        SetGazeOn(target);
                     }
+                    events.Repeat(2s, 7s);
                     break;
                 case EVENT_GUARD_WHIRLWIND_END:
+                    me->SetReactState(REACT_AGGRESSIVE);
                     events.CancelEvent(EVENT_GUARD_WHIRLWIND_RANDOM);
-                    whirlwind = false;
                     events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 500ms, 9s);
-                    break;
-                case EVENT_GUARD_AGGRO_RESET:
-                    if (aggroReset == true)
-                    {
-                        if (Unit* originalTarget = SelectTarget(SelectTargetMethod::Random, 0))
-                        {
-                            _savedTargetGUID = originalTarget->GetGUID();
-                            _savedTargetThreat = me->GetThreatMgr().GetThreat(originalTarget);
-                            me->GetThreatMgr().ModifyThreatByPercent(originalTarget, -100);
-                        }
-                        aggroReset = true;
-                        events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET_END, 5000);
-                    }
-                    else
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
-                        {
-                            me->AddThreat(target, 1.0f);
-                            me->TauntApply(target);
-                            AttackStart(target);
-                        }
-                    }
-                    events.RepeatEvent(urand(1000, 2000));
-                    break;
-                case EVENT_GUARD_AGGRO_RESET_END:
-                    events.CancelEvent(EVENT_GUARD_AGGRO_RESET);
-                    if (Unit* originalTarget = ObjectAccessor::GetUnit(*me, _savedTargetGUID))
-                    {
-                        me->GetThreatMgr().AddThreat(originalTarget, _savedTargetThreat);
-                        _savedTargetGUID.Clear();
-                    }
-                    aggroReset = false;
-                    events.RescheduleEvent(EVENT_GUARD_AGGRO_RESET, urand(30000, 40000));
                     break;
                 case EVENT_GUARD_KNOCKBACK:
                     DoCastVictim(SPELL_GUARD_KNOCKBACK);
@@ -317,13 +233,9 @@ struct npc_sartura_royal_guard : public ScriptedAI
                     break;
             }
         }
+
         DoMeleeAttackIfReady();
     }
-    private:
-        bool whirlwind;
-        bool aggroReset;
-        ObjectGuid _savedTargetGUID;
-        float _savedTargetThreat;
 };
 
 void AddSC_boss_sartura()
