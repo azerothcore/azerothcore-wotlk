@@ -101,6 +101,7 @@ struct boss_viscidus : public BossAI
     boss_viscidus(Creature* creature) : BossAI(creature, DATA_VISCIDUS)
     {
         me->LowerPlayerDamageReq(me->GetMaxHealth());
+        me->m_CombatDistance = 60.f;
     }
 
     bool CheckInRoom() override

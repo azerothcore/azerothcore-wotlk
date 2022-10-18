@@ -47,7 +47,7 @@ enum Spells
 
     // Obsidian Eradicator
     SPELL_SHOCK_BLAST                   = 26458,
-    SPELL_DRAIN_MANA                    = 25671,
+    SPELL_DRAIN_MANA_ERADICATOR         = 25755,
     SPELL_DRAIN_MANA_VISUAL             = 26639,
 
     // Anubisath Warder
@@ -59,6 +59,7 @@ enum Spells
 
     // Obsidian Nullifier
     SPELL_NULLIFY                       = 26552,
+    SPELL_DRAIN_MANA_NULLIFIER          = 25671,
     SPELL_CLEAVE                        = 40504,
 
     // Qiraji Scorpion
@@ -268,12 +269,12 @@ struct npc_obsidian_eradicator : public ScriptedAI
 
             for (Unit* target : _targets)
             {
-                DoCast(target, SPELL_DRAIN_MANA, true);
+                DoCast(target, SPELL_DRAIN_MANA_ERADICATOR, true);
             }
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_SHOCK_BLAST, true);
+                DoCastAOE(SPELL_SHOCK_BLAST);
             }
 
             context.Repeat(3500ms);
@@ -401,12 +402,12 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
             for (Unit* target : _targets)
             {
-                DoCast(target, SPELL_DRAIN_MANA, true);
+                DoCast(target, SPELL_DRAIN_MANA_NULLIFIER, true);
             }
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_NULLIFY, true);
+                DoCastAOE(SPELL_NULLIFY);
             }
 
             context.Repeat(6s);
@@ -445,6 +446,19 @@ struct npc_ahnqiraji_critter : public ScriptedAI
         me->RestoreFaction();
 
         _scheduler.CancelAll();
+
+        // Don't attack nearby players randomly if they are the Twin's pet bugs.
+        if (CreatureData const* crData = me->GetCreatureData())
+        {
+            ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(crData->id1, me->GetSpawnId());
+            ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+
+            if (targetGuid.GetEntry() == NPC_VEKLOR)
+            {
+                return;
+            }
+        }
+
         _scheduler.Schedule(100ms, [this](TaskContext context)
         {
             if (Player* player = me->SelectNearestPlayer(10.f))
