@@ -47,7 +47,7 @@ enum Spells
 
     // Obsidian Eradicator
     SPELL_SHOCK_BLAST                   = 26458,
-    SPELL_DRAIN_MANA                    = 25671,
+    SPELL_DRAIN_MANA_ERADICATOR         = 25755,
     SPELL_DRAIN_MANA_VISUAL             = 26639,
 
     // Anubisath Warder
@@ -59,6 +59,7 @@ enum Spells
 
     // Obsidian Nullifier
     SPELL_NULLIFY                       = 26552,
+    SPELL_DRAIN_MANA_NULLIFIER          = 25671,
     SPELL_CLEAVE                        = 40504,
 
     // Qiraji Scorpion
@@ -268,7 +269,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
 
             for (Unit* target : _targets)
             {
-                DoCast(target, SPELL_DRAIN_MANA, true);
+                DoCast(target, SPELL_DRAIN_MANA_ERADICATOR, true);
             }
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
@@ -401,7 +402,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
             for (Unit* target : _targets)
             {
-                DoCast(target, SPELL_DRAIN_MANA, true);
+                DoCast(target, SPELL_DRAIN_MANA_NULLIFIER, true);
             }
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
