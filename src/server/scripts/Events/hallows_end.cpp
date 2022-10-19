@@ -1404,19 +1404,11 @@ public:
 
     bool OnQuestReward(Player* player, GameObject* go, Quest const* /*quest*/, uint32 /*opt*/) override
     {
-        if (InstanceScript* instance = go->GetInstanceScript())
-        {
-            if (instance->GetData(DATA_HORSEMAN_EVENT) == IN_PROGRESS || instance->GetData(DATA_HORSEMAN_EVENT) == DONE)
-                return true;
+        if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
+            return true;
 
-            if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
-                return true;
-
-            if (Creature* horseman = go->SummonCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 1754.00f, 1346.00f, 17.50f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
-                horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
-
-            instance->SetData(DATA_HORSEMAN_EVENT, IN_PROGRESS);
-        }
+        if (Creature* horseman = go->SummonCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 1754.00f, 1346.00f, 17.50f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+            horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
 
         return true;
     }
