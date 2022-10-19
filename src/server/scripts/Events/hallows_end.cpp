@@ -960,6 +960,11 @@ enum hhSounds
     SOUND_DEATH                                     = 11964,
 };
 
+enum hhMisc
+{
+    DATA_HORSEMAN_EVENT                             = 5,
+};
+
 struct boss_headless_horseman : public ScriptedAI
 {
     boss_headless_horseman(Creature* creature) : ScriptedAI(creature), summons(me) { }
@@ -985,6 +990,9 @@ struct boss_headless_horseman : public ScriptedAI
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
         if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
             sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_HEADLESS_HORSEMAN, me->FindMap());
+
+        if (InstanceScript* instance = me->GetInstanceScript())
+            instance->SetData(DATA_HORSEMAN_EVENT, DONE);
     }
 
     void KilledUnit(Unit*  /*who*/) override
@@ -1098,6 +1106,14 @@ struct boss_headless_horseman : public ScriptedAI
 
         me->SetDisableGravity(true);
         me->SetSpeed(MOVE_WALK, 5.0f, true);
+    }
+
+    void JustReachedHome() override
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            instance->SetData(DATA_HORSEMAN_EVENT, FAIL);
+
+        me->DespawnOrUnsummon();
     }
 
     void UpdateAI(uint32 diff) override
@@ -1388,11 +1404,19 @@ public:
 
     bool OnQuestReward(Player* player, GameObject* go, Quest const* /*quest*/, uint32 /*opt*/) override
     {
-        if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
-            return true;
+        if (InstanceScript* instance = go->GetInstanceScript())
+        {
+            if (instance->GetData(DATA_HORSEMAN_EVENT) == IN_PROGRESS || instance->GetData(DATA_HORSEMAN_EVENT) == DONE)
+                return true;
 
-        if (Creature* horseman = go->SummonCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 1754.00f, 1346.00f, 17.50f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
-            horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
+            if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
+                return true;
+
+            if (Creature* horseman = go->SummonCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 1754.00f, 1346.00f, 17.50f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
+
+            instance->SetData(DATA_HORSEMAN_EVENT, IN_PROGRESS);
+        }
 
         return true;
     }
@@ -1428,11 +1452,19 @@ public:
     {
         CloseGossipMenuFor(player);
 
-        if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
-            return true;
+        if (InstanceScript* instance = go->GetInstanceScript())
+        {
+            if (instance->GetData(DATA_HORSEMAN_EVENT) == IN_PROGRESS || instance->GetData(DATA_HORSEMAN_EVENT) == DONE)
+                return true;
 
-        if (Creature* horseman = go->SummonCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 1754.00f, 1346.00f, 17.50f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
-            horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
+            if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
+                return true;
+
+            if (Creature* horseman = go->SummonCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 1754.00f, 1346.00f, 17.50f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
+
+            instance->SetData(DATA_HORSEMAN_EVENT, IN_PROGRESS);
+        }
 
         return true;
     }
