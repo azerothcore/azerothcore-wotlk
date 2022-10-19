@@ -950,14 +950,13 @@ enum headlessHorseman
     EVENT_HORSEMAN_CONFLAGRATION                    = 5,
     EVENT_SUMMON_PUMPKIN                            = 6,
     EVENT_HORSEMAN_FOLLOW                           = 7,
-};
 
-enum hhSounds
-{
-    SOUND_AGGRO                                     = 11961,
-    SOUND_SLAY                                      = 11962,
-    SOUND_SPROUT                                    = 11963,
-    SOUND_DEATH                                     = 11964,
+    SAY_ENTRANCE                                    = 0,
+    SAY_REJOINED                                    = 1,
+    SAY_CONFLAGRATION                               = 2,
+    SAY_SPROUTING_PUMPKINS                          = 3,
+    SAY_DEATH                                       = 4,
+    SAY_PLAYER_DEATH                                = 5,
 };
 
 enum hhMisc
@@ -980,8 +979,7 @@ struct boss_headless_horseman : public ScriptedAI
     void JustDied(Unit*  /*killer*/) override
     {
         summons.DespawnAll();
-        me->Say("This end have I reached before. What new adventure lies in store?", LANG_UNIVERSAL);
-        me->PlayDirectSound(SOUND_DEATH);
+        Talk(SAY_DEATH);
         std::list<Creature*> unitList;
         me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
         for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
@@ -997,8 +995,7 @@ struct boss_headless_horseman : public ScriptedAI
 
     void KilledUnit(Unit*  /*who*/) override
     {
-        me->Yell("Your body lies beaten, battered and broken. Let my curse be your own, fate has spoken.", LANG_UNIVERSAL);
-        me->PlayDirectSound(SOUND_SLAY);
+        Talk(SAY_PLAYER_DEATH);
     }
 
     void DoAction(int32 param) override
@@ -1029,7 +1026,7 @@ struct boss_headless_horseman : public ScriptedAI
             events.CancelEvent(EVENT_HORSEMAN_WHIRLWIND);
             events.CancelEvent(EVENT_HORSEMAN_CONFLAGRATION);
             events.CancelEvent(EVENT_SUMMON_PUMPKIN);
-            me->Yell("Here's my body, fit and pure! Now, your blackened souls I'll cure!", LANG_UNIVERSAL);
+            Talk(SAY_REJOINED);
 
             if (phase == 1)
                 events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6000);
@@ -1148,8 +1145,7 @@ struct boss_headless_horseman : public ScriptedAI
                             me->GetMotionMaster()->MovePath(236820, false);
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
                             player->Say("You felt death once...", LANG_UNIVERSAL);
-                            me->Say("It is over, your search is done. Let fate choose now, the righteous one.", LANG_UNIVERSAL);
-                            me->PlayDirectSound(SOUND_AGGRO);
+                            Talk(SAY_ENTRANCE);
                             break;
                         case 4:
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_MEDIUM, true);
@@ -1205,7 +1201,7 @@ struct boss_headless_horseman : public ScriptedAI
                     {
                         me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
                         target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
-                        me->Say("Harken, cur! Tis you I spurn! Now feel... the burn!", LANG_UNIVERSAL, target);
+                        Talk(SAY_CONFLAGRATION);
                     }
 
                     events.RepeatEvent(12500);
@@ -1221,8 +1217,7 @@ struct boss_headless_horseman : public ScriptedAI
                     }
                     else
                     {
-                        me->Say("Soldiers arise, stand and fight! Bring victory at last to this fallen knight!", LANG_UNIVERSAL);
-                        me->PlayDirectSound(SOUND_SPROUT);
+                        Talk(SAY_SPROUTING_PUMPKINS);
                         events.RepeatEvent(15000);
                         talkCount = 0;
                     }
