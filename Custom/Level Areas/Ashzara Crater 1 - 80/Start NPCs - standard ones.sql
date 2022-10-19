@@ -55,3 +55,5 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 UPDATE `creature_template` SET `subname` = 'DC-WoW' WHERE (`entry` = 800003);
 UPDATE `creature_template` SET `subname` = 'DC-WoW' WHERE (`entry` = 800000);
 UPDATE `creature_template` SET `subname` = 'DC-WoW' WHERE (`entry` = 800002);
+
+UPDATE `creature_template` SET `scale` = 2.5 WHERE (`entry` = 800001);

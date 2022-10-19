@@ -41,3 +41,45 @@ INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entr
 update creature_template set minlevel = 130 where entry >= 830000 and entry < 831000;
 update creature_template set maxlevel = 130 where entry >= 830000 and entry < 831000;
 update creature_template set subname = "DC-WoW" where entry >= 830000 and entry < 831000;
+UPDATE `creature_template` SET `ScriptName` = '' WHERE (`entry` = 830005);
+UPDATE `creature_template` SET `gossip_menu_id` = 0 WHERE (`entry` = 830005);
+
+-- creature equip template
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830000);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830000, 1, 1896, 0, 5260, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830001);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830001, 1, 5870, 0, 0, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830002);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830002, 1, 5598, 0, 0, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830007);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830007, 1, 1905, 0, 0, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830008);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830008, 1, 5289, 0, 0, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830009);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830009, 1, 14084, 0, 0, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830010);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830010, 1, 6680, 0, 5870, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830011);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830011, 1, 19214, 0, 0, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830012);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830012, 1, 19214, 0, 0, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830014);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830014, 1, 1899, 1984, 0, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830015);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830015, 1, 12890, 0, 0, 18019);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 830016);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(830016, 1, 1905, 0, 12523, 18019);
+
+update creature set equipment_id = 1 where id1 >= 830000 and id1 <= 830017;
