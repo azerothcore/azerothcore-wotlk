@@ -1442,7 +1442,7 @@ public:
 
     bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 /*action*/) override
     {
-        CloseGossipMenuFor(player);
+        //CloseGossipMenuFor(player);
 
         if (InstanceScript* instance = go->GetInstanceScript())
         {
