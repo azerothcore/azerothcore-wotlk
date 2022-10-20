@@ -1006,28 +1006,28 @@ UPDATE `gameobject` SET `position_z`=-25.392063 WHERE `guid`=40335;
 DELETE FROM `pool_template` WHERE `description` LIKE '%Terokkar Forest%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+18;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 -- Terocone
-(@POOLMOTHER+0 , 3, 'Terokkar Forest - Terocone - Group 1'),
-(@POOLMOTHER+1 , 3, 'Terokkar Forest - Terocone - Group 2'),
-(@POOLMOTHER+2 , 3, 'Terokkar Forest - Terocone - Group 3'),
-(@POOLMOTHER+3 , 3, 'Terokkar Forest - Terocone - Group 4'),
+(@POOLMOTHER+0 , 7, 'Terokkar Forest - Terocone - Group 1'),
+(@POOLMOTHER+1 , 8, 'Terokkar Forest - Terocone - Group 2'),
+(@POOLMOTHER+2 , 2, 'Terokkar Forest - Terocone - Group 3'),
+(@POOLMOTHER+3 , 4, 'Terokkar Forest - Terocone - Group 4'),
 -- Felweed
-(@POOLMOTHER+4 , 3, 'Terokkar Forest - Felweed - Group 1'),
-(@POOLMOTHER+5 , 3, 'Terokkar Forest - Felweed - Group 2'),
-(@POOLMOTHER+6 , 3, 'Terokkar Forest - Felweed - Group 3'),
+(@POOLMOTHER+4 , 5, 'Terokkar Forest - Felweed - Group 1'),
+(@POOLMOTHER+5 , 6, 'Terokkar Forest - Felweed - Group 2'),
+(@POOLMOTHER+6 , 7, 'Terokkar Forest - Felweed - Group 3'),
 -- Dreaming Glory
-(@POOLMOTHER+7 , 3, 'Terokkar Forest - Dreaming Glory - Group 1'),
-(@POOLMOTHER+8 , 3, 'Terokkar Forest - Dreaming Glory - Group 2'),
-(@POOLMOTHER+9 , 3, 'Terokkar Forest - Dreaming Glory - Group 3'),
-(@POOLMOTHER+10, 3, 'Terokkar Forest - Dreaming Glory - Group 4'),
-(@POOLMOTHER+11, 3, 'Terokkar Forest - Dreaming Glory - Group 5'),
-(@POOLMOTHER+12, 3, 'Terokkar Forest - Dreaming Glory - Group 6'),
+(@POOLMOTHER+7 , 1, 'Terokkar Forest - Dreaming Glory - Group 1'),
+(@POOLMOTHER+8 , 1, 'Terokkar Forest - Dreaming Glory - Group 2'),
+(@POOLMOTHER+9 , 1, 'Terokkar Forest - Dreaming Glory - Group 3'),
+(@POOLMOTHER+10, 1, 'Terokkar Forest - Dreaming Glory - Group 4'),
+(@POOLMOTHER+11, 1, 'Terokkar Forest - Dreaming Glory - Group 5'),
+(@POOLMOTHER+12, 1, 'Terokkar Forest - Dreaming Glory - Group 6'),
 (@POOLMOTHER+13, 3, 'Terokkar Forest - Dreaming Glory - Group 7'),
-(@POOLMOTHER+14, 3, 'Terokkar Forest - Dreaming Glory - Group 8'),
+(@POOLMOTHER+14, 4, 'Terokkar Forest - Dreaming Glory - Group 8'),
 (@POOLMOTHER+15, 3, 'Terokkar Forest - Dreaming Glory - Skettis'),
-(@POOLMOTHER+16, 3, 'Terokkar Forest - Dreaming Glory - The Barrier Hills'),
+(@POOLMOTHER+16, 2, 'Terokkar Forest - Dreaming Glory - The Barrier Hills'),
 -- Mana Thistle
-(@POOLMOTHER+17, 3, 'Terokkar Forest - Mana Thistle - The Barrier Hills'),
-(@POOLMOTHER+18, 3, 'Terokkar Forest - Mana Thistle - Skettis');
+(@POOLMOTHER+17, 2, 'Terokkar Forest - Mana Thistle - The Barrier Hills'),
+(@POOLMOTHER+18, 2, 'Terokkar Forest - Mana Thistle - Skettis');
 
 DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Terokkar Forest%' AND `pool_entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+18;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
