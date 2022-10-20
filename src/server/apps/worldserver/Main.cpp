@@ -111,7 +111,6 @@ bool LoadRealmInfo(Acore::Asio::IoContext& ioContext);
 AsyncAcceptor* StartRaSocketAcceptor(Acore::Asio::IoContext& ioContext);
 void ShutdownCLIThread(std::thread* cliThread);
 void AuctionListingRunnable();
-void ShutdownAuctionListingThread(std::thread* thread);
 void WorldUpdateLoop();
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [[maybe_unused]] std::string& cfg_service);
 
@@ -358,9 +357,9 @@ int main(int argc, char** argv)
         cliThread.reset(new std::thread(CliThread), &ShutdownCLIThread);
     }
 
-    // Launch CliRunnable thread
-    std::shared_ptr<std::thread> auctionLisingThread;
-    auctionLisingThread.reset(new std::thread(AuctionListingRunnable),
+    // Launch auction listing thread
+    std::shared_ptr<std::thread> auctionListingThread;
+    auctionListingThread.reset(new std::thread(AuctionListingRunnable),
         [](std::thread* thr)
     {
         thr->join();
@@ -666,57 +665,47 @@ void AuctionListingRunnable()
 
     while (!World::IsStopped())
     {
-        if (AsyncAuctionListingMgr::IsAuctionListingAllowed())
+        Milliseconds diff = AsyncAuctionListingMgr::GetDiff();
+        AsyncAuctionListingMgr::ResetDiff();
+
+        if (!AsyncAuctionListingMgr::GetTempList().empty() || !AsyncAuctionListingMgr::GetList().empty())
         {
-            uint32 diff = AsyncAuctionListingMgr::GetDiff();
-            AsyncAuctionListingMgr::ResetDiff();
-
-            if (AsyncAuctionListingMgr::GetTempList().size() || AsyncAuctionListingMgr::GetList().size())
             {
-                std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetLock());
+                std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
 
+                for (auto const& delayEvent: AsyncAuctionListingMgr::GetTempList())
+                    AsyncAuctionListingMgr::GetList().emplace_back(delayEvent);
+
+                AsyncAuctionListingMgr::GetTempList().clear();
+            }
+
+            for (auto& itr: AsyncAuctionListingMgr::GetList())
+            {
+                if (itr._pickupTimer <= diff)
                 {
-                    std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
-
-                    for (auto const& delayEvent : AsyncAuctionListingMgr::GetTempList())
-                        AsyncAuctionListingMgr::GetList().emplace_back(delayEvent);
-
-                    AsyncAuctionListingMgr::GetTempList().clear();
+                    itr._pickupTimer = Milliseconds::zero();
                 }
-
-                for (auto& itr : AsyncAuctionListingMgr::GetList())
+                else
                 {
-                    if (itr._msTimer <= diff)
-                        itr._msTimer = 0;
-                    else
-                        itr._msTimer -= diff;
+                    itr._pickupTimer -= diff;
                 }
+            }
 
-                for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
-                {
-                    if ((*itr)._msTimer != 0)
-                        continue;
+            for (auto itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
+            {
+                if ((*itr)._pickupTimer != Milliseconds::zero())
+                    continue;
 
-                    if ((*itr).Execute())
-                        AsyncAuctionListingMgr::GetList().erase(itr);
+                if ((*itr).Execute())
+                    AsyncAuctionListingMgr::GetList().erase(itr);
 
-                    break;
-                }
+                break;
             }
         }
         std::this_thread::sleep_for(1ms);
     }
 
     LOG_INFO("server", "Auction House Listing thread exiting without problems.");
-}
-
-void ShutdownAuctionListingThread(std::thread* thread)
-{
-    if (thread)
-    {
-        thread->join();
-        delete thread;
-    }
 }
 
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [[maybe_unused]] std::string& configService)
