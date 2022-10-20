@@ -228,11 +228,13 @@ BaseLocation DBUpdater<T>::GetBaseLocationType()
 template<class T>
 bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
-    LOG_WARN("sql.updates", "Database \"{}\" does not exist, do you want to create it? [yes (default) / no]: ",
-             pool.GetConnectionInfo()->database);
+    LOG_WARN("sql.updates", "Database \"{}\" does not exist", pool.GetConnectionInfo()->database);
 
-    if (!sConfigMgr->isDryRun())
+    const char* interactiveOpt = std::getenv("AC_DISABLE_INTERACTIVE");
+
+    if (!sConfigMgr->isDryRun() && std::strcmp(interactiveOpt, "1") != 0)
     {
+        std::cout << "Do you want to create it? [yes (default) / no]:" << std::endl;
         std::string answer;
         std::getline(std::cin, answer);
         if (!answer.empty() && !(answer.substr(0, 1) == "y"))
@@ -558,7 +560,6 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
         args.emplace_back(database);
 
     auto env = boost::process::environment();
-
 
     // Invokes a mysql process which doesn't leak credentials to logs
     int const ret = Acore::StartProcess(DBUpdaterUtil::GetCorrectedMySQLExecutable(), args,
