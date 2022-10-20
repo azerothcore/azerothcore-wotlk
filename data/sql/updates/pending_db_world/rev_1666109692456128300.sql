@@ -975,3 +975,335 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 /*---------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------HERBS--------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------------------*/
+
+-- Delete Duplicates
+DELETE FROM `gameobject` WHERE `guid` IN (40307, 40361, 40388, 40370, 40387, 40331);
+-- Delete old pools
+-- DELETE FROM `pool_template` WHERE `entry` IN (975, 977);
+-- DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (975, 977);
+-- Move underground/floating nodes
+UPDATE `gameobject` SET `position_z`=-5.233534 WHERE `guid`=40402;
+UPDATE `gameobject` SET `position_z`=2.317139 WHERE `guid`=40376;
+UPDATE `gameobject` SET `position_z`=11.266653 WHERE `guid`=40345;
+UPDATE `gameobject` SET `position_z`=0.931270 WHERE `guid`=40327;
+UPDATE `gameobject` SET `position_z`=16.616777 WHERE `guid`=40350;
+UPDATE `gameobject` SET `position_z`=-79.320175 WHERE `guid`=40358;
+UPDATE `gameobject` SET `position_z`=10.363665 WHERE `guid`=40347;
+UPDATE `gameobject` SET `position_z`=88.581879 WHERE `guid`=40338;
+UPDATE `gameobject` SET `position_z`=13.915686 WHERE `guid`=40328;
+UPDATE `gameobject` SET `position_z`=-13.027707 WHERE `guid`=40300;
+UPDATE `gameobject` SET `position_z`=-9.343635 WHERE `guid`=21402;
+UPDATE `gameobject` SET `position_z`=-22.510757 WHERE `guid`=40311;
+UPDATE `gameobject` SET `position_z`=-67.350998 WHERE `guid`=40366;
+UPDATE `gameobject` SET `position_z`=2.140171 WHERE `guid`=40404;
+UPDATE `gameobject` SET `position_z`=-0.108467 WHERE `guid`=40360;
+UPDATE `gameobject` SET `position_z`=-38.834995 WHERE `guid`=40293;
+UPDATE `gameobject` SET `position_z`=-25.392063 WHERE `guid`=40335;
+-- SET @POOLMOTHER=1196;
+-- SET @GUID=78647;
+
+DELETE FROM `pool_template` WHERE `description` LIKE '%Terokkar Forest%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+18;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+-- Terocone
+(@POOLMOTHER+0 , 3, 'Terokkar Forest - Terocone - Group 1'),
+(@POOLMOTHER+1 , 3, 'Terokkar Forest - Terocone - Group 2'),
+(@POOLMOTHER+2 , 3, 'Terokkar Forest - Terocone - Group 3'),
+(@POOLMOTHER+3 , 3, 'Terokkar Forest - Terocone - Group 4'),
+-- Felweed
+(@POOLMOTHER+4 , 3, 'Terokkar Forest - Felweed - Group 1'),
+(@POOLMOTHER+5 , 3, 'Terokkar Forest - Felweed - Group 2'),
+(@POOLMOTHER+6 , 3, 'Terokkar Forest - Felweed - Group 3'),
+-- Dreaming Glory
+(@POOLMOTHER+7 , 3, 'Terokkar Forest - Dreaming Glory - Group 1'),
+(@POOLMOTHER+8 , 3, 'Terokkar Forest - Dreaming Glory - Group 2'),
+(@POOLMOTHER+9 , 3, 'Terokkar Forest - Dreaming Glory - Group 3'),
+(@POOLMOTHER+10, 3, 'Terokkar Forest - Dreaming Glory - Group 4'),
+(@POOLMOTHER+11, 3, 'Terokkar Forest - Dreaming Glory - Group 5'),
+(@POOLMOTHER+12, 3, 'Terokkar Forest - Dreaming Glory - Group 6'),
+(@POOLMOTHER+13, 3, 'Terokkar Forest - Dreaming Glory - Group 7'),
+(@POOLMOTHER+14, 3, 'Terokkar Forest - Dreaming Glory - Group 8'),
+(@POOLMOTHER+15, 3, 'Terokkar Forest - Dreaming Glory - Skettis'),
+(@POOLMOTHER+16, 3, 'Terokkar Forest - Dreaming Glory - The Barrier Hills'),
+-- Mana Thistle
+(@POOLMOTHER+17, 3, 'Terokkar Forest - Mana Thistle - The Barrier Hills'),
+(@POOLMOTHER+18, 3, 'Terokkar Forest - Mana Thistle - Skettis');
+
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Terokkar Forest%' AND `pool_entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+18;
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
+-- Terocone
+-- GROUP 1 - WEST TUUREM
+(18912 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(61343 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(@GUID+0, @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(42198 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(40386 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(61341 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(61332 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(61342 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(64855 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(40385 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(40406 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(40384 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(42203 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(40365 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(28415 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(21566 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(15096 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(61327 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(40389 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(61330 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(64854 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(87157 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(40380 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(61324 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(31050 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(40368 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(21565 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(40373 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(42177 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(40399 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(21564 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+(21558 , @POOLMOTHER+0, 0, 'Terocone - Terokkar Forest'),
+-- GROUP 2 - EAST TUUREM
+(40381 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(61344 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40363 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(4506  , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40383 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40409 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40366 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40362 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40390 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(61328 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(29720 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40410 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(@GUID+1, @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40396 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40404 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(61322 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40375 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40397 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40360 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(64853 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40395 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(61337 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(@GUID+2, @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40398 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(28490 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(15093 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40408 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(61329 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(21556 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(@GUID+3, @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40371 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(21557 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40382 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40372 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(40374 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+(32361 , @POOLMOTHER+1, 0, 'Terocone - Terokkar Forest'),
+-- GROUP 3 - EAST AUCHINDOUN
+(40364, @POOLMOTHER+2, 0, 'Terocone - Terokkar Forest'),
+(32362, @POOLMOTHER+2, 0, 'Terocone - Terokkar Forest'),
+(40379, @POOLMOTHER+2, 0, 'Terocone - Terokkar Forest'),
+(28410, @POOLMOTHER+2, 0, 'Terocone - Terokkar Forest'),
+(40369, @POOLMOTHER+2, 0, 'Terocone - Terokkar Forest'),
+(21563, @POOLMOTHER+2, 0, 'Terocone - Terokkar Forest'),
+(61339, @POOLMOTHER+2, 0, 'Terocone - Terokkar Forest'),
+(40405, @POOLMOTHER+2, 0, 'Terocone - Terokkar Forest'),
+(40391, @POOLMOTHER+2, 0, 'Terocone - Terokkar Forest'),
+(21562, @POOLMOTHER+2, 0, 'Terocone - Terokkar Forest'),
+-- GROUP 4 - WEST AUCHINDOUN
+(40377, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(40401, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(42260, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(40378, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(61338, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(40376, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(40402, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(21559, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(40394, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(40400, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(40407, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(61340, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(40393, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(40392, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(21560, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(21561, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+(40403, @POOLMOTHER+3, 0, 'Terocone - Terokkar Forest'),
+-- FELWEED
+-- GROUP 1 - WEST TUUREM
+(4791 , @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(40297, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(40301, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(40303, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(40304, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(28492, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(40290, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(40325, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(55695, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(87144, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(28217, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(42395, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(21399, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(40323, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(15095, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(40317, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(55851, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(2823 , @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(42214, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(40315, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+(40296, @POOLMOTHER+4, 0, 'Felweed - Terokkar Forest'),
+-- GROUP 2 - EAST TUUREM
+(40313 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(26630 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40320 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40292 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(21398 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40314 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(21397 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(87146 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40293 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(31307 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(@GUID+4, @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(26661 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40316 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(55699 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40322 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(14128 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40310 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40305 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40306 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40294 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40291 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(40302 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+(64834 , @POOLMOTHER+5, 0, 'Felweed - Terokkar Forest'),
+-- GROUP 3 - AUCHINDOUN
+(21404, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(56370, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(21402, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(42259, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40324, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(42261, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(21401, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40312, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40311, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40319, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(87418, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40299, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(87419, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(56374, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40298, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(21403, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(87414, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(64835, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40295, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40300, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(21400, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40321, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40318, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+(40308, @POOLMOTHER+6, 0, 'Felweed - Terokkar Forest'),
+-- DREAMING GLORY
+-- GROUP 1
+(40342, @POOLMOTHER+7, 0, 'Dreaming Glory - Terokkar Forest'),
+(56412, @POOLMOTHER+7, 0, 'Dreaming Glory - Terokkar Forest'),
+(42367, @POOLMOTHER+7, 0, 'Dreaming Glory - Terokkar Forest'),
+(56421, @POOLMOTHER+7, 0, 'Dreaming Glory - Terokkar Forest'),
+(40341, @POOLMOTHER+7, 0, 'Dreaming Glory - Terokkar Forest'),
+(40343, @POOLMOTHER+7, 0, 'Dreaming Glory - Terokkar Forest'),
+(32470, @POOLMOTHER+7, 0, 'Dreaming Glory - Terokkar Forest'),
+(26689, @POOLMOTHER+7, 0, 'Dreaming Glory - Terokkar Forest'),
+(26697, @POOLMOTHER+7, 0, 'Dreaming Glory - Terokkar Forest'),
+(87052, @POOLMOTHER+7, 0, 'Dreaming Glory - Terokkar Forest'),
+-- GROUP 2
+(21433, @POOLMOTHER+8, 0, 'Dreaming Glory - Terokkar Forest'),
+(40330, @POOLMOTHER+8, 0, 'Dreaming Glory - Terokkar Forest'),
+(40344, @POOLMOTHER+8, 0, 'Dreaming Glory - Terokkar Forest'),
+(26687, @POOLMOTHER+8, 0, 'Dreaming Glory - Terokkar Forest'),
+-- GROUP 3
+(26675, @POOLMOTHER+9, 0, 'Dreaming Glory - Terokkar Forest'),
+(40351, @POOLMOTHER+9, 0, 'Dreaming Glory - Terokkar Forest'),
+(40333, @POOLMOTHER+9, 0, 'Dreaming Glory - Terokkar Forest'),
+(40356, @POOLMOTHER+9, 0, 'Dreaming Glory - Terokkar Forest'),
+(14116, @POOLMOTHER+9, 0, 'Dreaming Glory - Terokkar Forest'),
+-- GROUP 4
+(40327, @POOLMOTHER+10, 0, 'Dreaming Glory - Terokkar Forest'),
+(26690, @POOLMOTHER+10, 0, 'Dreaming Glory - Terokkar Forest'),
+(40329, @POOLMOTHER+10, 0, 'Dreaming Glory - Terokkar Forest'),
+(40352, @POOLMOTHER+10, 0, 'Dreaming Glory - Terokkar Forest'),
+-- GROUP 5
+(40326, @POOLMOTHER+11, 0, 'Dreaming Glory - Terokkar Forest'),
+(26702, @POOLMOTHER+11, 0, 'Dreaming Glory - Terokkar Forest'),
+(40335, @POOLMOTHER+11, 0, 'Dreaming Glory - Terokkar Forest'),
+(21427, @POOLMOTHER+11, 0, 'Dreaming Glory - Terokkar Forest'),
+(40345, @POOLMOTHER+11, 0, 'Dreaming Glory - Terokkar Forest'),
+-- GROUP 6
+(42318, @POOLMOTHER+12, 0, 'Dreaming Glory - Terokkar Forest'),
+(40346, @POOLMOTHER+12, 0, 'Dreaming Glory - Terokkar Forest'),
+(40332, @POOLMOTHER+12, 0, 'Dreaming Glory - Terokkar Forest'),
+(14125, @POOLMOTHER+12, 0, 'Dreaming Glory - Terokkar Forest'),
+(26664, @POOLMOTHER+12, 0, 'Dreaming Glory - Terokkar Forest'),
+-- GROUP 7
+(21428, @POOLMOTHER+13, 0, 'Dreaming Glory - Terokkar Forest'),
+(40359, @POOLMOTHER+13, 0, 'Dreaming Glory - Terokkar Forest'),
+(26666, @POOLMOTHER+13, 0, 'Dreaming Glory - Terokkar Forest'),
+(21432, @POOLMOTHER+13, 0, 'Dreaming Glory - Terokkar Forest'),
+(40328, @POOLMOTHER+13, 0, 'Dreaming Glory - Terokkar Forest'),
+(21431, @POOLMOTHER+13, 0, 'Dreaming Glory - Terokkar Forest'),
+(42258, @POOLMOTHER+13, 0, 'Dreaming Glory - Terokkar Forest'),
+(40338, @POOLMOTHER+13, 0, 'Dreaming Glory - Terokkar Forest'),
+(40347, @POOLMOTHER+13, 0, 'Dreaming Glory - Terokkar Forest'),
+(26665, @POOLMOTHER+13, 0, 'Dreaming Glory - Terokkar Forest'),
+-- GROUP 8
+(40358, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(40348, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(40349, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(40337, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(40334, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(40350, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(21430, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(40355, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(40336, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(21429, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(40354, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+(40353, @POOLMOTHER+14, 0, 'Dreaming Glory - Terokkar Forest'),
+-- GROUP 9
+(40357, @POOLMOTHER+15, 0, 'Dreaming Glory - Terokkar Forest'),
+(40340, @POOLMOTHER+15, 0, 'Dreaming Glory - Terokkar Forest'),
+(21434, @POOLMOTHER+15, 0, 'Dreaming Glory - Terokkar Forest'),
+(40339, @POOLMOTHER+15, 0, 'Dreaming Glory - Terokkar Forest'),
+(21435, @POOLMOTHER+15, 0, 'Dreaming Glory - Terokkar Forest'),
+(21436, @POOLMOTHER+15, 0, 'Dreaming Glory - Terokkar Forest'),
+-- GROUP 10
+(21511, @POOLMOTHER+16, 0, 'Dreaming Glory - Terokkar Forest'),
+(20949, @POOLMOTHER+16, 0, 'Dreaming Glory - Terokkar Forest'),
+(28319, @POOLMOTHER+16, 0, 'Dreaming Glory - Terokkar Forest'),
+(20953, @POOLMOTHER+16, 0, 'Dreaming Glory - Terokkar Forest'),
+-- MANA THISTLE
+-- GROUP 1
+(27559, @POOLMOTHER+17, 0, 'Mana Thistle - Terokkar Forest'),
+(32796, @POOLMOTHER+17, 0, 'Mana Thistle - Terokkar Forest'),
+(40264, @POOLMOTHER+17, 0, 'Mana Thistle - Terokkar Forest'),
+(86020, @POOLMOTHER+17, 0, 'Mana Thistle - Terokkar Forest'),
+(40263, @POOLMOTHER+17, 0, 'Mana Thistle - Terokkar Forest'),
+(32735, @POOLMOTHER+17, 0, 'Mana Thistle - Terokkar Forest'),
+-- GROUP 2
+(40261, @POOLMOTHER+18, 0, 'Mana Thistle - Terokkar Forest'),
+(40262, @POOLMOTHER+18, 0, 'Mana Thistle - Terokkar Forest'),
+(21601, @POOLMOTHER+18, 0, 'Mana Thistle - Terokkar Forest'),
+(21600, @POOLMOTHER+18, 0, 'Mana Thistle - Terokkar Forest'),
+(40260, @POOLMOTHER+18, 0, 'Mana Thistle - Terokkar Forest'),
+(14696, @POOLMOTHER+18, 0, 'Mana Thistle - Terokkar Forest'),
+(87161, @POOLMOTHER+18, 0, 'Mana Thistle - Terokkar Forest'),
+(28332, @POOLMOTHER+18, 0, 'Mana Thistle - Terokkar Forest');
+
+DELETE FROM `gameobject` WHERE `map`=530 AND `id` IN (181277, 181270) AND `guid` BETWEEN @GUID+0 AND @GUID+4;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
+(@GUID+0, 181277, 530, 3519, 0, 1, 1, -1501.82, 4716.46, -4.37548, 2.63544, 0, 0, 0, 0, 90, 100, 1, '', 0),
+(@GUID+1, 181277, 530, 3519, 0, 1, 1, -2432.15, 3471.92, -14.897, -0.331611, 0, 0, 0, 0, 90, 100, 1, '', 0),
+(@GUID+2, 181277, 530, 3519, 0, 1, 1, -2217.59, 4095.92, -1.99839, 1.98967, 0, 0, 0.838669, 0.544641, 90, 100, 1, '', 0),
+(@GUID+3, 181277, 530, 3519, 0, 1, 1, -2731.31, 3816.55, -10.5897, -1.25664, 0, 0, -0.587786, 0.809016, 90, 100, 1, '', 0),
+(@GUID+4, 181270, 530, 3519, 0, 1, 1, -2426.72, 3414.13, -20.9232, -0.645772, 0, 0, 0, 0, 90, 100, 1, '', 0);
+
+UPDATE `gameobject` SET `ZoneId`=3519 WHERE `guid` IN (2823,4506,4791,14116,14125,14128,14696,15093,15095,15096,18912,20949,20953,21397,21398,21399,21400,21401,21402,21403,21404,21427,21428,21429,21430,21431,21432,21433,21434,21435,21436,21511,21556,21557,21558,21559,21560,21561,21562,21563,21564,21565,21566,21600,21601,26630,26661,26664,26665,26666,26675,26687,26689,26690,26697,26702,27559,28217,28319,28332,28410,28415,28490,28492,29720,31050,31307,32361,32362,32470,32735,32796,40260,40261,40262,40263,40264,40290,40291,40292,40293,40294,40295,40296,40297,40298,40299,40300,40301,40302,40303,40304,40305,40306,40308,40310,40311,40312,40313,40314,40315,40316,40317,40318,40319,40320,40321,40322,40323,40324,40325,40326,40327,40328,40329,40330,40332,40333,40334,40335,40336,40337,40338,40339,40340,40341,40342,40343,40344,40345,40346,40347,40348,40349,40350,40351,40352,40353,40354,40355,40356,40357,40358,40359,40360,40362,40363,40364,40365,40366,40368,40369,40371,40372,40373,40374,40375,40376,40377,40378,40379,40380,40381,40382,40383,40384,40385,40386,40389,40390,40391,40392,40393,40394,40395,40396,40397,40398,40399,40400,40401,40402,40403,40404,40405,40406,40407,40408,40409,40410,42177,42198,42203,42214,42258,42259,42260,42261,42318,42367,42395,55695,55699,55851,56370,56374,56412,56421,61322,61324,61327,61328,61329,61330,61332,61337,61338,61339,61340,61341,61342,61343,61344,64834,64835,64853,64854,64855,86020,87052,87144,87146,87157,87161,87414,87418,87419);
+UPDATE `gameobject` SET `AreaId`=3696 WHERE `guid` IN (27559,32796,40264,86020,40263,32735,21511,20949,28319,20953);
+UPDATE `gameobject` SET `AreaId`=3679 WHERE `guid` IN (40357,40340,21434,40339,21435,21436,40261,40262,21601,21600,40260,14696,87161,28332);
