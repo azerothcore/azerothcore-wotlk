@@ -22,7 +22,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+8 , 1, 'Terokkar Forest - Fel Iron Deposit - Group 9 '),
 (@POOLMOTHER+9 , 1, 'Terokkar Forest - Fel Iron Deposit - Group 10'),
 (@POOLMOTHER+10, 1, 'Terokkar Forest - Fel Iron Deposit - Group 11'),
-(@POOLMOTHER+11, 1, 'Terokkar Forest - Fel Iron Deposit - Group 12'),
+(@POOLMOTHER+11, 1, 'Terokkar Forest - Fel Iron Deposit - Group 12');
 
 DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOL+0 AND @POOL+59 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+11;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
@@ -407,7 +407,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+113, 181557, 530, 3519, 0, 1, 1, -2839.94, 5601.23, 9.60491, -0.436332, 0, 0, -0.216439, 0.976296, 3600, 255, 1, '', 0),
 (@GUID+115, 181557, 530, 3519, 0, 1, 1, -2611.83, 5453.13, 13.1311, 3.03684, 0, 0, 0, 0, 3600, 255, 1, '', 0),
 (@GUID+117, 181557, 530, 3519, 0, 1, 1, -2515.9, 5468.29, 8.422, -2.60054, 0, 0, -0.96363, 0.267241, 3600, 255, 1, '', 0),
-(@GUID+119, 181557, 530, 3519, 0, 1, 1, -2306.47, 5454.43, 5.74422, -1.76278, 0, 0, 0, 0, 3600, 255, 1, '', 0),
+(@GUID+119, 181557, 530, 3519, 0, 1, 1, -2306.47, 5454.43, 5.74422, -1.76278, 0, 0, 0, 0, 3600, 255, 1, '', 0);
 
 -- Adamantite
 -- SET @GUID = 78409; -- 49
@@ -541,7 +541,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL+45, 1, 'Terokkar Forest - Adamantite Deposit / Khorium Vein'),
 (@POOL+46, 1, 'Terokkar Forest - Adamantite Deposit / Khorium Vein'),
 (@POOL+47, 1, 'Terokkar Forest - Adamantite Deposit / Khorium Vein'),
-(@POOL+48, 1, 'Terokkar Forest - Adamantite Deposit / Khorium Vein'),
+(@POOL+48, 1, 'Terokkar Forest - Adamantite Deposit / Khorium Vein');
 
 DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @GUID+0 AND @GUID+97 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+48;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
@@ -758,7 +758,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+2, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 14'),
 (@POOLMOTHER+3, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 15'),
 (@POOLMOTHER+4, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 16'),
-(@POOLMOTHER+5, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 17'),
+(@POOLMOTHER+5, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 17');
 
 DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOL+0 AND @POOL+23 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+5;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
