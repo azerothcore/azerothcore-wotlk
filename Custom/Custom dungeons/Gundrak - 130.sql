@@ -62,7 +62,7 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (820001, 820012),
 (820001, 820013);
 
--- second entry
+-- second entrance
 DELETE FROM `creature` WHERE `guid`=3112289;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (3112289, 800003, 0, 0, 571, 0, 0, 1, 1, 0, 6730.54, -4647.9, 450.652, 2.33886, 300, 0, 0, 111864, 0, 0, 0, 0, 0, '', 0);
 DELETE FROM `creature` WHERE `guid`=3112290;
