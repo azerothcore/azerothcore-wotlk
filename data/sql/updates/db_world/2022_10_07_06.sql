@@ -4,7 +4,7 @@
 
 DELETE FROM `gameobject` WHERE `id`=180917;
 SET @OGUID :=18017;
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @GUID+39;
+DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+39;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
 (@OGUID+0, 180917, 530, 3430, 3460, 1, 1, 8881.802734375, -5735.43359375, 0.117886997759342193, 4.607671737670898437, 0, 0, -0.74314403533935546, 0.669131457805633544, 30, 255, 1, 0), -- 180917 (Area: 3460 - Difficulty: 0)
 (@OGUID+1, 180917, 530, 3430, 3460, 1, 1, 8742.2236328125, -5697.8486328125, 0.245764002203941345, 1.570795774459838867, 0, 0, 0.707106590270996093, 0.707106947898864746, 30, 255, 1, 0), -- 180917 (Area: 3460 - Difficulty: 0)
