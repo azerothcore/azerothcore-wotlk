@@ -1,3 +1,4 @@
+-- DB update 2022_10_20_00 -> 2022_10_20_01
 -- Spawns npc's from 13:00 - 17:00
 UPDATE `game_event` SET `start_time`= '2016-10-30 13:00:00', `length` = 240,  `description`= 'Stranglethorn Fishing Extravaganza - The Crew' WHERE `eventEntry` = 62;
 

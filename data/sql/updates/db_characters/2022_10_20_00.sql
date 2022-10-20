@@ -1,3 +1,4 @@
+-- DB update 2022_10_13_00 -> 2022_10_20_00
 -- Insert world states (for conditions)
 DELETE FROM `worldstates` WHERE `entry` IN (197,198,199,200);
 INSERT INTO `worldstates` (`entry`, `value`, `comment`) values
