@@ -5,9 +5,9 @@ DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (11706, 11707, 11708);
 DELETE FROM `gameobject` WHERE `id` IN (181555, 181556, 181557, 181569, 181570) AND `guid` IN (14106,14127,14142,14215,14226,15092,21848,21849,21850,21851,21852,21853,21854,21855,21856,21857,21873,21874,21875,21876,21877,21878,21879,21880,21881,21917,21919,21920,28130,28164,28196,28211,28212,28216,28318,28329,28417,28489,29719,30545,32471,40243,40244,40245,40246,40247,40248,40249,40250,40251,40252,40253,40254,40256,40257,40258,40259,40265,40266,40267,40268,40269,40270,40272,40273,40274,40275,40276,40277,40278,40279,40280,40281,40282,40283,40284,40285,40286,40287,40288,40289,42269,42299,42341,42370,42377,42378,42380,42386,42408,61457,61463,61465,61466,61733,61883,61885,61909,61920,61924,61925,61937,61948,61950,61953,61955,61956,61957,64881,64882,64887,78627,78628,120195,120225,120226,120232,120233,120238,120575,120750,120764);
 
 -- Fel Iron Deposit
--- SET @GUID = 78409; -- 120
--- SET @POOLMOTHER = 1163; -- 12
--- SET @POOL = 12228; -- 60
+SET @GUID = 78660; -- 120
+SET @POOLMOTHER = 1219; -- 12
+SET @POOL = 12347; -- 60
 
 DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+11;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
@@ -410,9 +410,9 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+119, 181557, 530, 3519, 0, 1, 1, -2306.47, 5454.43, 5.74422, -1.76278, 0, 0, 0, 0, 3600, 255, 1, '', 0);
 
 -- Adamantite
--- SET @GUID = 78409; -- 49
--- SET @POOLMOTHER = 1163; -- 11
--- SET @POOL = 12228; -- 77 + 42 = 97
+SET @GUID = 78780; -- 98
+SET @POOLMOTHER = 1231; -- 11
+SET @POOL = 12407; -- 49
 
 DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+10;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
@@ -747,9 +747,9 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+97, 181557, 530, 3519, 0, 1, 1, -2714.58, 5510.92, 31.1673, 5.98648, 0, 0, -0.147809, 0.989016, 3600, 255, 1, '', 0);
 
 -- Rich Adamantite
--- SET @GUID = 78409; -- 72
--- SET @POOLMOTHER = 1163; -- 6
--- SET @POOL = 12228; -- 24
+SET @GUID = 78878; -- 72
+SET @POOLMOTHER = 1242; -- 6
+SET @POOL = 12456; -- 24
 
 DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+5;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
@@ -979,9 +979,9 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 -- Delete Duplicates
 DELETE FROM `gameobject` WHERE `guid` IN (40307, 40361, 40388, 40370, 40387, 40331);
 -- Delete old pools
--- DELETE FROM `pool_template` WHERE `entry` IN (975, 977);
--- DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (975, 977);
--- Move underground/floating nodes
+DELETE FROM `pool_template` WHERE `entry` IN (977);
+DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (977);
+-- Move underground/floating nodes -- These aren't correct anyways
 UPDATE `gameobject` SET `position_z`=-5.233534 WHERE `guid`=40402;
 UPDATE `gameobject` SET `position_z`=2.317139 WHERE `guid`=40376;
 UPDATE `gameobject` SET `position_z`=11.266653 WHERE `guid`=40345;
@@ -1000,8 +1000,8 @@ UPDATE `gameobject` SET `position_z`=-0.108467 WHERE `guid`=40360;
 UPDATE `gameobject` SET `position_z`=-38.834995 WHERE `guid`=40293;
 UPDATE `gameobject` SET `position_z`=-25.392063 WHERE `guid`=40335;
 
--- SET @POOLMOTHER=1196; -- 5
--- SET @GUID=78647; -- 19
+SET @POOLMOTHER=1248; -- 19
+SET @GUID=40005; -- 5
 
 DELETE FROM `pool_template` WHERE `description` LIKE '%Terokkar Forest%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+18;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
