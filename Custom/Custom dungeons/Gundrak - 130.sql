@@ -61,3 +61,17 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (820001, 820011),
 (820001, 820012),
 (820001, 820013);
+
+-- second entry
+DELETE FROM `creature` WHERE `guid`=3112289;
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (3112289, 800003, 0, 0, 571, 0, 0, 1, 1, 0, 6730.54, -4647.9, 450.652, 2.33886, 300, 0, 0, 111864, 0, 0, 0, 0, 0, '', 0);
+DELETE FROM `creature` WHERE `guid`=3112290;
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (3112290, 800003, 0, 0, 571, 0, 0, 1, 1, 0, 6724.04, -4654.39, 450.652, 2.39384, 300, 0, 0, 111864, 0, 0, 0, 0, 0, '', 0);
+DELETE FROM `creature` WHERE `guid`=3112291;
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (3112291, 800003, 0, 0, 571, 0, 0, 1, 1, 0, 6709.45, -4639.05, 450.651, 5.47966, 300, 0, 0, 111864, 0, 0, 0, 0, 0, '', 0);
+DELETE FROM `creature` WHERE `guid`=3112292;
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (3112292, 800003, 0, 0, 571, 0, 0, 1, 1, 0, 6715.79, -4632.98, 450.651, 5.51893, 300, 0, 0, 111864, 0, 0, 0, 0, 0, '', 0);
+DELETE FROM `creature` WHERE `guid`=3112293;
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (3112293, 800002, 0, 0, 571, 0, 0, 1, 1, 0, 6727.6, -4651.16, 450.652, 2.34722, 300, 0, 0, 111864, 0, 0, 0, 0, 0, '', 0);
+DELETE FROM `creature` WHERE `guid`=3112294;
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (3112294, 820001, 0, 0, 571, 0, 0, 1, 1, 0, 6712.58, -4635.29, 450.652, 5.48488, 300, 0, 0, 278960, 17652, 0, 0, 0, 0, '', 0);

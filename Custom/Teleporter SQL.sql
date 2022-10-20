@@ -61,7 +61,6 @@ INSERT INTO `eluna_teleporter` (id, parent, type, faction, icon, name, map, x, y
 
 -- Dungeons - Classic ID 80 - 99
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES ('80', '0', '1', '-1', '0', 'Dungeons Classic', null, null, null, null, null);
-INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (81, 80, 2, -1, 2, 'Zul Gurub', 0, -11916.7, -1212.82, 92.2868, 4.6095);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (82, 80, 2, -1, 2, 'Stratholme', 1, -8648.95, -4387.76, -207.95, 3.5049);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (83, 80, 2, -1, 2, 'Wailing Caverns', 1, -722.53, -2226.30, 16.94, 2.71);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (84, 80, 2, -1, 2, 'Deathmines', 0, -11212.04, 1658.58, 25.67, 1.45);
@@ -75,7 +74,6 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (93, 80, 2, -1, 2, 'Sunken Temple', 1, -10346.92, -3851.90, -43.41, 6.09);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (94, 80, 2, -1, 2, 'Duesterbruch', 1, -3982.47, 1127.79, 161.02, 0.05);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (95, 80, 2, -1, 2, 'Scholomance', 0, 1219.01, -2604.66, 85.61, 0.50);
-INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (96, 80, 2, -1, 2, 'Duesterbruch', 1, -6839.39, -2911.03, 8.87, 0.41);
 
 -- Dungeons - TBC ID 100 - 149
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES ('100', '0', '1', '-1', '0', 'Dungeons TBC', null, null, null, null, null);
@@ -91,7 +89,6 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (152, 150, 2, -1, 2, 'Utgarde Tower', 571, 1256.96, -4852.94, 215.55, 3.447);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (153, 150, 2, -1, 2, 'Halls of Stone', 571, 8922.45, -1012.96, 1039.59, 1.563);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (155, 150, 2, -1, 2, 'Violet Citadel', 571, 5705.19, 517.96, 649.78, 4.0307);
-INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (156, 150, 2, -1, 2, 'DrakTharon', 571, 4774.32, -2036.68, 229.38, 1.567);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (157, 150, 2, -1, 2, 'AhnKahet', 571, 3700.87, 2152.58, 36.044, 3.5956);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (158, 150, 2, -1, 2, 'Azjol Nerub', 571, 3700.87, 2152.58, 36.044, 3.5956);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (160, 150, 2, -1, 2, 'Utgarde Keep', 571, 1206.94, -4868.05, 41.249,0.2804);
@@ -104,6 +101,7 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES ('203', '200', '2', '-1', '2', 'Blackwing Lair', 469, -7665.55, -1102.49, 400.679, 0.0);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (204, 200, 2, -1, 2, 'RuinsAhn Qiraj', 1, -8409.032227, 1498.830933, 27.361542, 2.497567);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (205, 200, 2, -1, 2, 'Temple of Ahn Qiraj', 1, -8245.837891, 1983.736206, 129.071686, 0.936195);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (206, 200, 2, -1, 2, 'Zul Gurub', 0, -11916.7, -1212.82, 92.2868, 4.6095);
 
 -- Raids TBC ID 250 - 299
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES ('250', '0', '1', '-1', '0', 'Raids TBC', null, null, null, null, null);
@@ -160,6 +158,7 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (701, 700, 2, -1, 2, 'Nexus - Level 100', 571, 3876.24, 6985, 75.68, 0.01);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (702, 700, 2, -1, 2, 'The Oculus - Level 100', 571, 3780.6, 6955.63, 104.89, 0.3676);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (703, 700, 2, -1, 2, 'Gundrak - Level 130', 571, 6936.08, -4436.54, 450.51, 0.7698);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (156, 150, 2, -1, 2, 'DrakTharon  - Level 130', 571, 4774.32, -2036.68, 229.38, 1.567);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (704, 700, 2, -1, 2, 'Auchenai Crypts - Level 160', 530, -3362.535645, 5220.6640, -101.04, 1.48);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (705, 700, 2, -1, 2, 'Zul`Farrak - Level 190', 1, -6839.39, -2911.03, 8.87, 0.41);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (706, 700, 2, -1, 2, 'Zul Aman - Level 220', 530, 6846.95, -7954.5, 170.028, 4.61501);
