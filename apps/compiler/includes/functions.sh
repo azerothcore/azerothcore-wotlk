@@ -109,6 +109,7 @@ function comp_compile() {
   comp_ccacheResetStats
 
   time cmake --build . --config $CTYPE  -j $MTHREADS
+  cmake --install . --config $CTYPE
 
   comp_ccacheShowStats
 
