@@ -6,6 +6,8 @@
 # Do not change this
 # Files in LogsDir will reflect on your host directory: docker/authserver/logs
 LogsDir = "/azerothcore/env/dist/logs"
+# Files in TempDir will reflect on your host directory: docker/authserver/temp
+TempDir = "/azerothcore/env/dist/temp"
 
 # Change this configuration accordingly with your docker setup
 # The format is "hostname;port;username;password;database":
