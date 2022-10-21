@@ -37,8 +37,6 @@ jobs:
         run: |
           export CTOOLS_BUILD=all
           ./acore.sh compiler build
-      - name: Start MySQL
-        run: net start mysql
       - name: Dry run authserver
         shell: bash
         run: |
