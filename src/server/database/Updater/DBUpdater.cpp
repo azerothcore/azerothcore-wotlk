@@ -440,10 +440,9 @@ template<class T>
 void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
                              std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path)
 {
-    std::string tempDir = sConfigMgr->GetOption<std::string>("TempDir", "");
+    std::string configTempDir = sConfigMgr->GetOption<std::string>("TempDir", "");
 
-    if (tempDir.empty())
-        tempDir = std::filesystem::temp_directory_path().filename().string();;
+    auto tempDir = configTempDir.empty() ? std::filesystem::temp_directory_path().generic_string() : configTempDir;
 
     tempDir = Acore::String::AddSuffixIfNotExists(tempDir, '/');
     std::string confFileName = "mysql_ac.conf";
