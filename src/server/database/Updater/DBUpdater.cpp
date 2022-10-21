@@ -442,9 +442,10 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
 {
     std::string configTempDir = sConfigMgr->GetOption<std::string>("TempDir", "");
 
-    auto tempDir = configTempDir.empty() ? std::filesystem::temp_directory_path().generic_string() : configTempDir;
+    auto tempDir = configTempDir.empty() ? std::filesystem::temp_directory_path().string() : configTempDir;
 
-    tempDir = Acore::String::AddSuffixIfNotExists(tempDir, '/');
+    tempDir = Acore::String::AddSuffixIfNotExists(tempDir, std::filesystem::path::preferred_separator);
+
     std::string confFileName = "mysql_ac.conf";
 
     std::ofstream outfile (tempDir + confFileName);
