@@ -442,15 +442,28 @@ template<class T>
 void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
                              std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path)
 {
+    std::string configTempDir = sConfigMgr->GetOption<std::string>("TempDir", "");
+
+    auto tempDir = configTempDir.empty() ? std::filesystem::temp_directory_path().string() : configTempDir;
+
+    tempDir = Acore::String::AddSuffixIfNotExists(tempDir, std::filesystem::path::preferred_separator);
+
+    std::string confFileName = "mysql_ac.conf";
+
+    std::ofstream outfile (tempDir + confFileName);
+
+    outfile << "[client]\npassword = \"" << password << '"' << std::endl;
+
+    outfile.close();
+
     std::vector<std::string> args;
     args.reserve(9);
+
+    args.emplace_back("--defaults-extra-file="+tempDir + confFileName+"");
 
     // CLI Client connection info
     args.emplace_back("-h" + host);
     args.emplace_back("-u" + user);
-
-    if (!password.empty())
-        args.emplace_back("-p" + password);
 
     // Check if we want to connect through ip or socket (Unix only)
 #ifdef _WIN32
