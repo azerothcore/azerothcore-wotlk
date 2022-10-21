@@ -172,9 +172,9 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
     LOG_WARN("sql.updates", "Database \"{}\" does not exist", pool.GetConnectionInfo()->database);
 
-    const char* interactiveOpt = std::getenv("AC_DISABLE_INTERACTIVE");
+    const char* disableInteractive = std::getenv("AC_DISABLE_INTERACTIVE");
 
-    if (!sConfigMgr->isDryRun() && std::strcmp(interactiveOpt, "1") != 0)
+    if (!sConfigMgr->isDryRun() && (disableInteractive == nullptr || std::strcmp(disableInteractive, "1") != 0))
     {
         std::cout << "Do you want to create it? [yes (default) / no]:" << std::endl;
         std::string answer;
