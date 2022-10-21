@@ -35,13 +35,13 @@ jobs:
       - name: Dry run authserver
         shell: bash
         run: |
-        cd var/build/obj/bin/Release
-        ./authserver -dry-run
+          cd var/build/obj/bin/Release
+          ./authserver -dry-run
       - name: Dry run worldserver
         shell: bash
         run: |
-        cd var/build/obj/bin/Release
-        ./worldserver -dry-run
+          cd var/build/obj/bin/Release
+          ./worldserver -dry-run
       - name: Copy dll files
         shell: bash
         run: |
