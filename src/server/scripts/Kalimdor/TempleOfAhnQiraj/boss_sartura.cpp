@@ -130,7 +130,7 @@ struct boss_sartura : public BossAI
                     {
                         SetGazeOn(target);
                     }
-                    DoCastSelf(SPELL_WHIRLWIND, true);
+                    DoCastSelf(SPELL_WHIRLWIND);
                     events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_RANDOM, 2s, 7s);
                     events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_END, 15s);
                     break;
