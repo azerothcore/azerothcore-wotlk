@@ -1,3 +1,4 @@
+-- DB update 2022_10_21_00 -> 2022_10_21_01
 -- https://github.com/azerothcore/azerothcore-wotlk/issues/13391
 -- corrects alliance respawn in wrong zone
 UPDATE `graveyard_zone` SET `ID`='1471' WHERE  `ID`=101 AND `GhostZone`=135;
