@@ -40,13 +40,13 @@ jobs:
       - name: Dry run authserver
         shell: bash
         run: |
-          source ./apps/ci/ci-gen-server-conf.sh authserver
+          source ./apps/ci/ci-gen-server-conf-files.sh authserver configs
           cd var/build/obj/bin/Release
           ./authserver -dry-run
       - name: Dry run worldserver
         shell: bash
         run: |
-          source ./apps/ci/ci-gen-server-conf.sh worldserver
+          source ./apps/ci/ci-gen-server-conf-files.sh worldserver configs
           cd var/build/obj/bin/Release
           ./worldserver -dry-run
       - name: Stop MySQL
