@@ -1,6 +1,3 @@
-echo "WARNING: Installer Script for Windows is not fully supported yet. Work in progress.."
-echo "!!README!!: Please install openssl and mysql libraries manually following our wiki"
-
 # install chocolatey before
 
 @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
@@ -30,4 +27,3 @@ choco install -y --skip-checksums $INSTALL_ARGS  visualstudio2022-workload-nativ
 choco install -y --skip-checksums $INSTALL_ARGS  boost-msvc-14.3 --version=1.79.0
 choco install -y --skip-checksums $INSTALL_ARGS  mysql --version 8.0.31
 
-echo "!!README!!: Please remember to install openssl and mysql libraries manually following our wiki"

@@ -70,12 +70,12 @@ function comp_configure() {
 
     echo "Platform: $OSTYPE"
     case "$OSTYPE" in
-        darwin*)
-          OSOPTIONS=" -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@1.1/include -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libssl.dylib -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libcrypto.dylib "
-         ;;
-        msys*)
-          OSOPTIONS=" -DMYSQL_INCLUDE_DIR=C:\tools\mysql\mysql-8.0.31-winx64\include -DMYSQL_LIBRARY=C:\tools\mysql\mysql-8.0.31-winx64\lib\mysqlclient.lib "
-         ;;
+      darwin*)
+        OSOPTIONS=" -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@1.1/include -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libssl.dylib -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libcrypto.dylib "
+        ;;
+      msys*)
+        OSOPTIONS=" -DMYSQL_INCLUDE_DIR=C:\tools\mysql\mysql-8.0.31-winx64\include -DMYSQL_LIBRARY=C:\tools\mysql\mysql-8.0.31-winx64\lib\mysqlclient.lib "
+        ;;
     esac
 
   cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH $DCONF \
@@ -124,9 +124,19 @@ function comp_compile() {
 
   runHooks "ON_AFTER_BUILD"
 
-  # set all aplications SUID bit
-  sudo chown -R root:root "$AC_BINPATH_FULL"
-  sudo chmod -R u+s "$AC_BINPATH_FULL"
+  echo "Platform: $OSTYPE"
+  case "$OSTYPE" in
+    msys*)
+      echo "Done"
+      ;;
+    linux*|darwin*)
+      # set all aplications SUID bit
+      sudo chown -R root:root "$AC_BINPATH_FULL"
+      sudo chmod -R u+s "$AC_BINPATH_FULL"
+      echo "Done"
+    ;;
+  esac
+
 }
 
 function comp_build() {
