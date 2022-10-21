@@ -1,7 +1,7 @@
 APP_NAME=$1
 CONFIG_FOLDER=$2
 
-echo "LoginDatabaseInfo     = \"localhost;3306;root;root;acore_auth\"" >> ./env/dist/etc/$APP_NAME.conf
+echo "LoginDatabaseInfo     = \"localhost;3306;root;root;acore_auth\"" >> ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
 
 # worldserver or dbimport
 if [[ $APP_NAME != "authserver" ]]; then
