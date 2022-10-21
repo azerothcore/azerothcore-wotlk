@@ -23,7 +23,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <boost/process/environment.hpp>
 
 namespace Acore
 {
@@ -35,7 +34,7 @@ namespace Acore
     /// Note that most executables expect it's name as the first argument.
     AC_COMMON_API int StartProcess(std::string const& executable, std::vector<std::string> const& args,
                                    std::string const& logger, std::string input_file = "",
-                                   bool secure = false, boost::process::environment env = boost::this_process::environment());
+                                   bool secure = false);
 
     /// Platform and library independent representation
     /// of asynchronous process results
@@ -59,7 +58,7 @@ namespace Acore
     /// Note that most executables expect it's name as the first argument.
     AC_COMMON_API std::shared_ptr<AsyncProcessResult> StartAsyncProcess(std::string executable, std::vector<std::string> args,
             std::string logger, std::string input_file = "",
-            bool secure = false, boost::process::environment env = boost::this_process::environment());
+            bool secure = false);
 
     /// Searches for the given executable in the PATH variable
     /// and returns a non-empty string when it was found.

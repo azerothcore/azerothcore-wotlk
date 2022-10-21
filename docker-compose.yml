@@ -18,6 +18,8 @@ x-cache-from: &cache-from
 x-ac-shared-conf: &ac-shared-conf
   <<: *networks
   working_dir: /azerothcore
+  environment:
+    AC_DISABLE_INTERACTIVE: "1"
   depends_on:
     ac-database:
       condition: service_healthy
