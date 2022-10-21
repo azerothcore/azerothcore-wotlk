@@ -19,12 +19,7 @@ function comp_ccacheEnable() {
     export CCACHE_COMPRESSLEVEL=${CCACHE_COMPRESSLEVEL:-9}
     #export CCACHE_NODIRECT=true
 
-    unamestr=$(uname)
-    if [[ "$unamestr" == 'Darwin' ]]; then
-      export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@1.1/include -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libssl.dylib -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libcrypto.dylib"
-    else
-      export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
-    fi
+    export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
 }
 
 function comp_ccacheClean() {
@@ -70,6 +65,19 @@ function comp_configure() {
 
   comp_ccacheEnable
 
+  OSOPTIONS=""
+
+
+    echo "Platform: $OSTYPE"
+    case "$OSTYPE" in
+        darwin*)
+          OSOPTIONS=" -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@1.1/include -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libssl.dylib -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libcrypto.dylib "
+         ;;
+        msys*)
+          OSOPTIONS=" -DMYSQL_INCLUDE_DIR=C:\tools\mysql\mysql-8.0.31-winx64\include -DMYSQL_LIBRARY=C:\tools\mysql\mysql-8.0.31-winx64\lib\mysqlclient.lib "
+         ;;
+    esac
+
   cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH $DCONF \
   -DAPPS_BUILD=$CAPPS_BUILD \
   -DTOOLS_BUILD=$CTOOLS_BUILD \
@@ -82,7 +90,7 @@ function comp_configure() {
   -DWITH_WARNINGS=$CWARNINGS \
   -DCMAKE_C_COMPILER=$CCOMPILERC \
   -DCMAKE_CXX_COMPILER=$CCOMPILERCXX \
-  $CBUILD_APPS_LIST $CBUILD_TOOLS_LIST $CCUSTOMOPTIONS
+  $CBUILD_APPS_LIST $CBUILD_TOOLS_LIST $OSOPTIONS $CCUSTOMOPTIONS
 
   cd $CWD
 
@@ -100,8 +108,7 @@ function comp_compile() {
 
   comp_ccacheResetStats
 
-  time make -j $MTHREADS
-  make -j $MTHREADS install
+  time cmake --build . --config $CTYPE  -j $MTHREADS
 
   comp_ccacheShowStats
 
