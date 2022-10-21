@@ -47,6 +47,7 @@ RUN addgroup --gid $GROUP_ID acore && \
 RUN mkdir -p /azerothcore/env/dist/bin
 RUN mkdir -p /azerothcore/env/dist/data
 RUN mkdir -p /azerothcore/env/dist/logs
+RUN mkdir -p /azerothcore/env/dist/temp
 RUN mkdir -p /azerothcore/env/dist/etc
 RUN mkdir -p /azerothcore/var/build/obj
 
