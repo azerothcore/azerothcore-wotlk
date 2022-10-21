@@ -11,22 +11,22 @@ echo "!!README!!: Please install openssl and mysql libraries manually following 
 # microsoft-build-tools
 # mysql
 
-{ # try
-  choco uninstall -y -n cmake.install cmake # needed to make sure that following install set the env properly
-} || { # catch
-  echo "nothing to do"
-}
-
 INSTALL_ARGS=""
 
-if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
+if [[ $CONTINUOUS_INTEGRATION ]]; then
     INSTALL_ARGS=" --no-progress "
 else
-    choco install -y --skip-checksums $INSTALL_ARGS  visualstudio2022community
+    { # try
+        choco uninstall -y -n cmake.install cmake # needed to make sure that following install set the env properly
+    } || { # catch
+        echo "nothing to do"
+    }
+
+    choco install -y --skip-checksums $INSTALL_ARGS  git visualstudio2022community
 fi
 
 choco install -y --skip-checksums $INSTALL_ARGS  cmake.install -y --installargs 'ADD_CMAKE_TO_PATH=System'
-choco install -y --skip-checksums $INSTALL_ARGS  git microsoft-build-tools visualstudio2022buildtools ccache openssl
+choco install -y --skip-checksums $INSTALL_ARGS  microsoft-build-tools visualstudio2022buildtools openssl
 choco install -y --skip-checksums $INSTALL_ARGS  visualstudio2022-workload-nativedesktop
 choco install -y --skip-checksums $INSTALL_ARGS  boost-msvc-14.3 --version=1.79.0
 choco install -y --skip-checksums $INSTALL_ARGS  mysql --version 8.0.31
