@@ -112,15 +112,6 @@ function comp_compile() {
 
   comp_ccacheShowStats
 
-  local confDir=${CONFDIR:-"etc"}
-
-  # create the folders before installing to 
-  # set the current user and permissions
-  mkdir -p $AC_BINPATH_FULL
-  mkdir -p $confDir
-
-
-
   echo "Platform: $OSTYPE"
   case "$OSTYPE" in
     msys*)
@@ -131,6 +122,15 @@ function comp_compile() {
       echo "Done"
       ;;
     linux*|darwin*)
+      local confDir=${CONFDIR:-"$AC_BINPATH_FULL/../etc"}
+
+      # create the folders before installing to
+      # set the current user and permissions
+      echo "Creating $AC_BINPATH_FULL..."
+      mkdir -p "$AC_BINPATH_FULL"
+      echo "Creating $confDir..."
+      mkdir -p "$confDir"
+
       echo "Cmake install..."
       sudo cmake --install . --config $CTYPE
 
