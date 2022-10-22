@@ -18,6 +18,8 @@ x-cache-from: &cache-from
 x-ac-shared-conf: &ac-shared-conf
   <<: *networks
   working_dir: /azerothcore
+  environment:
+    AC_DISABLE_INTERACTIVE: "1"
   depends_on:
     ac-database:
       condition: service_healthy
@@ -290,6 +292,12 @@ services:
       - ${DOCKER_VOL_TOOLS_VMAPS:-./var/extractors/vmaps}:/azerothcore/env/client/vmaps
       - ${DOCKER_VOL_TOOLS_MMAPS:-./var/extractors/mmaps}:/azerothcore/env/client/mmaps
     profiles: [prod, tools]
+
+  ac-db-import:
+    <<: *ac-shared-conf
+    image: acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    command: ./env/dist/bin/dbimport
+    profiles: [db-import]
 
 volumes:
   ac-database:

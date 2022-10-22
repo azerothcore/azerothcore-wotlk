@@ -20,8 +20,11 @@
 /env/docker/*
 !/env/docker/bin/.gitkeep
 !/env/docker/data/.gitkeep
+!/env/docker/etc/
+/env/docker/etc/*
 !/env/docker/etc/authserver.conf.dockerdist
 !/env/docker/etc/worldserver.conf.dockerdist
+!/env/docker/etc/dbimport.conf.dockerdist
 !/env/docker/logs/.gitkeep
 /.env*
 /apps/joiner
@@ -63,9 +66,7 @@ nbproject/
 *.kate-swp
 .browse.VC*
 .idea
-cmake-build-debug/*
-cmake-build-debug-coverage/*
-cmake-build-debug-event-trace/*
+cmake-build-*/*
 coverage-report/
 
 #

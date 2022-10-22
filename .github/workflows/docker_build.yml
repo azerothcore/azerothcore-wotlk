@@ -38,7 +38,7 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
           docker --version
-          docker-compose --version
+          docker compose --version
 
     # TODO: make it work
     #   - uses: whoan/docker-build-with-cache-action@v5
@@ -68,14 +68,14 @@ jobs:
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile dev --profile local build --parallel
+          ./acore.sh docker build
 
       - name: Deploy Dev
         #env:
         #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
         run: |
-          docker-compose --profile dev --profile local push
+          docker compose --profile dev --profile local push
 
       - name: Cache
         uses: actions/cache@v2
@@ -97,8 +97,8 @@ jobs:
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile build --profile prod build --parallel
-          docker-compose run --no-deps --name build ac-build echo "image created"
+          ./acore.sh docker prod:build
+          docker compose run --no-deps --name build ac-build echo "image created"
           docker cp build:/azerothcore/var/ccache var/docker/
           echo "ccache exported"
 
@@ -107,4 +107,4 @@ jobs:
         #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
         run: |
-          docker-compose --profile prod push
+          docker compose --profile prod push
