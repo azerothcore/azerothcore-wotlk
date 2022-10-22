@@ -168,7 +168,7 @@ struct boss_twinemperorsAI : public BossAI
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     if (Unit* victim = me->SelectNearestTarget())
                     {
-                        me->AddThreat(victim, 200000.f);
+                        me->AddThreat(victim, 2000.f);
                         AttackStart(victim);
                     }
                 });
