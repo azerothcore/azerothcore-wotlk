@@ -16541,16 +16541,12 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     {
                         if (SpellModifier* mod = triggeredByAura->GetSpellModifier())
                         {
-                            if (mod->op == SPELLMOD_CASTING_TIME && mod->value < 0 && procSpell)
+                            // Do proc if mod is consumed by spell
+                            if (!procSpell || procSpell->m_appliedMods.find(i->aura) != procSpell->m_appliedMods.end())
                             {
-                                // Skip instant spells
-                                if (procSpellInfo->CalcCastTime() <= 0 || (procSpell->GetTriggeredCastFlags() & TRIGGERED_CAST_DIRECTLY) != 0)
-                                {
-                                    break;
-                                }
+                                takeCharges = true;
                             }
                         }
-                        takeCharges = true;
                         break;
                     }
                     default:
