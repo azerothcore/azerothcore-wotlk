@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GridNotifiers.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 
@@ -33,7 +34,7 @@ class spell_axe_flurry : public SpellScript
         Acore::Containers::RandomResize(targets, 1);
     }
 
-    void HandelEffect(SpellEffIndex /*effIndex*/)
+    void HandleEffect(SpellEffIndex /*effIndex*/)
     {
         if (Unit* caster = GetCaster())
         {
@@ -47,7 +48,7 @@ class spell_axe_flurry : public SpellScript
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_axe_flurry::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        OnEffectHitTarget += SpellEffectFn(spell_axe_flurry::HandelEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnEffectHitTarget += SpellEffectFn(spell_axe_flurry::HandleEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
