@@ -48,7 +48,9 @@ enum Events
     EVENT_POISONBOLT_VOLLEY     = 1,
     EVENT_POISON_SHOCK          = 2,
     EVENT_TOXIN                 = 3,
-    EVENT_RESET_PHASE           = 4
+    EVENT_RESET_PHASE_SLOW      = 4,
+    EVENT_RESET_PHASE_FREEZE    = 5,
+    EVENT_RESET_PHASE_FROZEN    = 6
 };
 
 enum Phases
@@ -148,6 +150,29 @@ struct boss_viscidus : public BossAI
             if (_phase == PHASE_FROST && effType == DIRECT_DAMAGE && (spellSchoolMask & SPELL_SCHOOL_MASK_FROST) != 0)
             {
                 ++_hitcounter;
+
+                if (_hitcounter >= HITCOUNTER_FREEZE)
+                {
+                    _hitcounter = 0;
+                    Talk(EMOTE_FROZEN);
+                    _phase = PHASE_MELEE;
+                    me->RemoveAura(SPELL_VISCIDUS_SLOWED_MORE);
+                    DoCastSelf(SPELL_VISCIDUS_FREEZE);
+                    events.ScheduleEvent(EVENT_RESET_PHASE_FROZEN, 15s);
+                }
+                else if (_hitcounter == HITCOUNTER_SLOW_MORE)
+                {
+                    Talk(EMOTE_FREEZE);
+                    me->RemoveAura(SPELL_VISCIDUS_SLOWED);
+                    DoCastSelf(SPELL_VISCIDUS_SLOWED_MORE);
+                    events.ScheduleEvent(EVENT_RESET_PHASE_FREEZE, 15s);
+                }
+                else if (_hitcounter == HITCOUNTER_SLOW)
+                {
+                    Talk(EMOTE_SLOW);
+                    DoCastSelf(SPELL_VISCIDUS_SLOWED);
+                    events.ScheduleEvent(EVENT_RESET_PHASE_SLOW, 15s);
+                }
             }
 
             return;
@@ -224,18 +249,20 @@ struct boss_viscidus : public BossAI
                 _phase = PHASE_MELEE;
                 me->RemoveAura(SPELL_VISCIDUS_SLOWED_MORE);
                 DoCastSelf(SPELL_VISCIDUS_FREEZE);
-                events.ScheduleEvent(EVENT_RESET_PHASE, 15s);
+                events.ScheduleEvent(EVENT_RESET_PHASE_FROZEN, 15s);
             }
             else if (_hitcounter == HITCOUNTER_SLOW_MORE)
             {
                 Talk(EMOTE_FREEZE);
                 me->RemoveAura(SPELL_VISCIDUS_SLOWED);
                 DoCastSelf(SPELL_VISCIDUS_SLOWED_MORE);
+                events.ScheduleEvent(EVENT_RESET_PHASE_FREEZE, 15s);
             }
             else if (_hitcounter == HITCOUNTER_SLOW)
             {
                 Talk(EMOTE_SLOW);
                 DoCastSelf(SPELL_VISCIDUS_SLOWED);
+                events.ScheduleEvent(EVENT_RESET_PHASE_SLOW, 15s);
             }
         }
     }
@@ -302,10 +329,24 @@ struct boss_viscidus : public BossAI
                     DoCastRandomTarget(SPELL_SUMMON_TOXIN_SLIME);
                     events.ScheduleEvent(EVENT_TOXIN, 15s, 20s);
                     break;
-                case EVENT_RESET_PHASE:
+                case EVENT_RESET_PHASE_SLOW:
                     _hitcounter = 0;
+                    me->RemoveAura(SPELL_VISCIDUS_SLOWED);
+                    break;
+                case EVENT_RESET_PHASE_FREEZE:
+                    Talk(EMOTE_SLOW);
+                    _hitcounter = HITCOUNTER_SLOW;
+                    me->RemoveAura(SPELL_VISCIDUS_SLOWED_MORE);
+                    DoCastSelf(SPELL_VISCIDUS_SLOWED);
+                    events.ScheduleEvent(EVENT_RESET_PHASE_SLOW, 15s);
+                    break;
+                case EVENT_RESET_PHASE_FROZEN:
+                    Talk(EMOTE_FREEZE);
+                    _hitcounter = HITCOUNTER_SLOW_MORE;
                     me->RemoveAura(SPELL_VISCIDUS_FREEZE);
+                    DoCastSelf(SPELL_VISCIDUS_SLOWED_MORE);
                     _phase = PHASE_FROST;
+                    events.ScheduleEvent(EVENT_RESET_PHASE_FREEZE, 15s);
                     break;
                 default:
                     break;
