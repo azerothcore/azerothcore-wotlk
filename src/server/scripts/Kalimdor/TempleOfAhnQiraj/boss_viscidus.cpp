@@ -133,7 +133,7 @@ struct boss_viscidus : public BossAI
         me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
     }
 
-    void JustDied(Unit* killer) override
+    void JustDied(Unit* /*killer*/) override
     {
         events.Reset();
         summons.DespawnAll(10 * IN_MILLISECONDS);
