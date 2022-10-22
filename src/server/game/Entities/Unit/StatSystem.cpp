@@ -62,9 +62,9 @@ void Unit::UpdateDamagePhysical(WeaponAttackType attType)
     float totalMin = 0.f;
     float totalMax = 0.f;
 
+    float tmpMin, tmpMax;
     for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
     {
-        float tmpMin, tmpMax;
         CalculateMinMaxDamage(attType, false, true, tmpMin, tmpMax, i);
         totalMin += tmpMin;
         totalMax += tmpMax;
