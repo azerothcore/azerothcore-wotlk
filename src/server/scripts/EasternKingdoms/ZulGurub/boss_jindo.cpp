@@ -81,7 +81,7 @@ struct boss_jindo : public BossAI
         {
             case NPC_BRAIN_WASH_TOTEM:
                 summon->SetReactState(REACT_PASSIVE);
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, me->GetThreatMgr().getThreatList().size() > 1 ? 1 : 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, me->GetThreatMgr().GetThreatListSize() > 1 ? 1 : 0))
                 {
                     summon->CastSpell(target, summon->m_spells[0], true);
                 }
@@ -132,7 +132,7 @@ struct boss_jindo : public BossAI
                 events.ScheduleEvent(EVENT_POWERFULL_HEALING_WARD, urand(14000, 20000));
                 break;
             case EVENT_HEX:
-                if (me->GetThreatMgr().getThreatList().size() > 1)
+                if (me->GetThreatMgr().GetThreatListSize() > 1)
                     DoCastVictim(SPELL_HEX, true);
                 events.ScheduleEvent(EVENT_HEX, urand(12000, 20000));
                 break;
@@ -154,7 +154,7 @@ struct boss_jindo : public BossAI
 
     bool CanAIAttack(Unit const* target) const override
     {
-        if (me->GetThreatMgr().getThreatList().size() > 1 && me->GetThreatMgr().getOnlineContainer().getMostHated()->getTarget() == target)
+        if (me->GetThreatMgr().GetThreatListSize() > 1 && me->GetThreatMgr().GetOnlineContainer().getMostHated()->getTarget() == target)
             return !target->HasAura(SPELL_HEX);
 
         return true;

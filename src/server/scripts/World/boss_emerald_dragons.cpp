@@ -320,7 +320,7 @@ public:
             {
                 Talk(SAY_YSONDRE_SUMMON_DRUIDS);
 
-                auto const& attackers = me->GetThreatMgr().getThreatList();
+                auto const& attackers = me->GetThreatMgr().GetThreatList();
                 uint8 attackersCount = 0;
 
                 for (const auto attacker : attackers)

@@ -11,16 +11,15 @@ options=(
     "pull (u): Update Repository"                   # 3
     "reset (r): Reset & Clean Repository"           # 4
     "compiler (c): Run compiler tool"               # 5
-    "db-assembler (a): Run db assembler tool"       # 6
-    "module-search (ms): Module Search by keyword" # 7
-    "module-install (mi): Module Install by name"  # 8
-    "module-update (mu): Module Update by name"    # 9
-    "module-remove: (mr): Module Remove by name"   # 10
-    "client-data: (gd): download client data from github repository (beta)"   # 11
-    "run-worldserver (rw): execute a simple restarter for worldserver" # 12
-    "run-authserver (ra): execute a simple restarter for authserver" # 13
-    "docker (dr): Run docker tools" # 14
-    "quit: Exit from this menu"                     # 15
+    "module-search (ms): Module Search by keyword" # 6
+    "module-install (mi): Module Install by name"  # 7
+    "module-update (mu): Module Update by name"    # 8
+    "module-remove: (mr): Module Remove by name"   # 9
+    "client-data: (gd): download client data from github repository (beta)"   # 10
+    "run-worldserver (rw): execute a simple restarter for worldserver" # 11
+    "run-authserver (ra): execute a simple restarter for authserver" # 12
+    "docker (dr): Run docker tools" # 13
+    "quit: Exit from this menu"                     # 14
     )
 
 function _switch() {
@@ -43,35 +42,32 @@ function _switch() {
         ""|"c"|"compiler"|"5")
             bash "$AC_PATH_APPS/compiler/compiler.sh" $_opt
             ;;
-        ""|"a"|"db-assembler"|"6")
-            bash "$AC_PATH_APPS/db_assembler/db_assembler.sh" $_opt
-            ;;
-        ""|"ms"|"module-search"|"7")
+        ""|"ms"|"module-search"|"6")
             inst_module_search "$_opt"
             ;;
-        ""|"mi"|"module-install"|"8")
+        ""|"mi"|"module-install"|"7")
             inst_module_install "$_opt"
             ;;
-        ""|"mu"|"module-update"|"9")
+        ""|"mu"|"module-update"|"8")
             inst_module_update "$_opt"
             ;;
-        ""|"mr"|"module-remove"|"10")
+        ""|"mr"|"module-remove"|"9")
             inst_module_remove "$_opt"
             ;;
-        ""|"gd"|"client-data"|"11")
+        ""|"gd"|"client-data"|"10")
             inst_download_client_data
             ;;
-        ""|"rw"|"run-worldserver"|"12")
+        ""|"rw"|"run-worldserver"|"11")
             inst_simple_restarter worldserver
             ;;
-        ""|"ra"|"run-authserver"|"13")
+        ""|"ra"|"run-authserver"|"12")
             inst_simple_restarter authserver
             ;;
-        ""|"dr"|"docker"|"14")
+        ""|"dr"|"docker"|"13")
             DOCKER=1 denoRunFile "$AC_PATH_APPS/docker/docker-cmd.ts" "${@:2}"
             exit
             ;;
-        ""|"quit"|"15")
+        ""|"quit"|"14")
             echo "Goodbye!"
             exit
             ;;

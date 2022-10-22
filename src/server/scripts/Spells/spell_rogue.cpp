@@ -104,6 +104,9 @@ class spell_rog_blade_flurry : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
+        if (!eventInfo.GetActor())
+            return false;
+
         Unit* _procTarget = eventInfo.GetActor()->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
         if (_procTarget)
             _procTargetGUID = _procTarget->GetGUID();
@@ -119,7 +122,7 @@ class spell_rog_blade_flurry : public AuraScript
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
         if (procTarget && damageInfo)
         {
-            int32 damage = damageInfo->GetUnmitigatedDamage();
+            int32 damage = damageInfo->GetDamage();
 
             CustomSpellValues values;
             values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
