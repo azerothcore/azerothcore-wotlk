@@ -41,20 +41,20 @@ jobs:
         shell: bash
         run: |
           source ./apps/ci/ci-gen-server-conf-files.sh authserver configs
-          cd var/build/obj/bin/Release
+          cd env/dist
           ./authserver -dry-run
       - name: Dry run worldserver
         shell: bash
         run: |
           source ./apps/ci/ci-gen-server-conf-files.sh worldserver configs
-          cd var/build/obj/bin/Release
+          cd env/dist
           ./worldserver -dry-run
       - name: Stop MySQL
         run: net stop mysql
       - name: Copy dll files
         shell: bash
         run: |
-          cp "/c/tools/mysql/mysql-8.0.31-winx64/libmysql.dll" "build/bin/Release/"
+          cp "/c/tools/mysql/current/libmysql.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
       - uses: actions/upload-artifact@v2

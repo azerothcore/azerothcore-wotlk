@@ -74,7 +74,7 @@ function comp_configure() {
         OSOPTIONS=" -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@1.1/include -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libssl.dylib -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libcrypto.dylib "
         ;;
       msys*)
-        OSOPTIONS=" -DMYSQL_INCLUDE_DIR=C:\tools\mysql\mysql-8.0.31-winx64\include -DMYSQL_LIBRARY=C:\tools\mysql\mysql-8.0.31-winx64\lib\mysqlclient.lib "
+        OSOPTIONS=" -DMYSQL_INCLUDE_DIR=C:\tools\mysql\current\include -DMYSQL_LIBRARY=C:\tools\mysql\current\lib\mysqlclient.lib "
         ;;
     esac
 
