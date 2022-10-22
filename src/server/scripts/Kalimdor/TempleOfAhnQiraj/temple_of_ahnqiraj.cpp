@@ -33,7 +33,7 @@ enum Spells
     SPELL_SHADOW_STORM                  = 26555,
     SPELL_THUNDERCLAP                   = 26554,
     SPELL_ENRAGE                        = 14204,
-    SPELL_EXPLODE                       = 25699,
+    SPELL_EXPLODE                       = 25698,
     SPELL_SUMMON_WARRIOR                = 17431,
     SPELL_SUMMON_SWARMGUARD             = 17430,
     SPELL_SUMMON_LARGE_OBSIDIAN_CHUNK   = 27630, // Server-side
