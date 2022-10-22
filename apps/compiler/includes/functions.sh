@@ -109,34 +109,49 @@ function comp_compile() {
   comp_ccacheResetStats
 
   time cmake --build . --config $CTYPE  -j $MTHREADS
-  cmake --install . --config $CTYPE
 
   comp_ccacheShowStats
 
-  cd $CWD
+  local confDir=${CONFDIR:-"etc"}
 
-  if [[ $DOCKER = 1 ]]; then
-    echo "Generating confs..."
-    cp -n "env/dist/etc/worldserver.conf.dockerdist" "env/dist/etc/worldserver.conf"
-    cp -n "env/dist/etc/authserver.conf.dockerdist" "env/dist/etc/authserver.conf"
-    cp -n "env/dist/etc/dbimport.conf.dockerdist" "env/dist/etc/dbimport.conf"
-  fi
+  # create the folders before installing to 
+  # set the current user and permissions
+  mkdir -p $AC_BINPATH_FULL
+  mkdir -p $confDir
 
-  runHooks "ON_AFTER_BUILD"
+
 
   echo "Platform: $OSTYPE"
   case "$OSTYPE" in
     msys*)
+      cmake --install . --config $CTYPE
+
+      cd $CWD
+
       echo "Done"
       ;;
     linux*|darwin*)
+      echo "Cmake install..."
+      sudo cmake --install . --config $CTYPE
+
+      cd $CWD
+
+      if [[ $DOCKER = 1 ]]; then
+        echo "Generating confs..."
+        cp -n "env/dist/etc/worldserver.conf.dockerdist" "env/dist/${confDir}/worldserver.conf"
+        cp -n "env/dist/etc/authserver.conf.dockerdist" "env/dist/${confDir}/authserver.conf"
+        cp -n "env/dist/etc/dbimport.conf.dockerdist" "env/dist/${confDir}/dbimport.conf"
+      fi
       # set all aplications SUID bit
-      sudo chown -R root:root "$AC_BINPATH_FULL/*"
-      sudo chmod -R u+s "$AC_BINPATH_FULL/*"
+      echo "Setting permissions on binary files"
+      find "$AC_BINPATH_FULL" -type f -exec sudo chown root:root -- {} +
+      find "$AC_BINPATH_FULL" -type f -exec sudo chmod u+s  -- {} +
+
       echo "Done"
     ;;
   esac
 
+  runHooks "ON_AFTER_BUILD"
 }
 
 function comp_build() {
