@@ -138,9 +138,9 @@ function comp_compile() {
 
       if [[ $DOCKER = 1 ]]; then
         echo "Generating confs..."
-        cp -n "env/dist/etc/worldserver.conf.dockerdist" "env/dist/${confDir}/worldserver.conf"
-        cp -n "env/dist/etc/authserver.conf.dockerdist" "env/dist/${confDir}/authserver.conf"
-        cp -n "env/dist/etc/dbimport.conf.dockerdist" "env/dist/${confDir}/dbimport.conf"
+        cp -n "env/dist/etc/worldserver.conf.dockerdist" "${confDir}/worldserver.conf"
+        cp -n "env/dist/etc/authserver.conf.dockerdist" "${confDir}/authserver.conf"
+        cp -n "env/dist/etc/dbimport.conf.dockerdist" "${confDir}/dbimport.conf"
       fi
       # set all aplications SUID bit
       echo "Setting permissions on binary files"
