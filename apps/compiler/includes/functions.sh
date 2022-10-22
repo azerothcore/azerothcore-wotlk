@@ -131,8 +131,8 @@ function comp_compile() {
       ;;
     linux*|darwin*)
       # set all aplications SUID bit
-      sudo chown -R root:root "$AC_BINPATH_FULL"
-      sudo chmod -R u+s "$AC_BINPATH_FULL"
+      sudo chown -R root:root "$AC_BINPATH_FULL/*"
+      sudo chmod -R u+s "$AC_BINPATH_FULL/*"
       echo "Done"
     ;;
   esac
