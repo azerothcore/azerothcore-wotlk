@@ -220,9 +220,9 @@ enum FishingExtravaganzaWorldStates
 
 enum RiggleBassbait
 {
-    RIGGLE_SAY_START            = 0,
-    RIGGLE_SAY_POOLS_END        = 1,
-    RIGGLE_SAY_WINNER           = 2,
+    RIGGLE_SAY_START            = 10608,
+    RIGGLE_SAY_POOLS_END        = 10609,
+    RIGGLE_SAY_WINNER           = 10610,
 
     QUEST_MASTER_ANGLER         = 8193,
 
