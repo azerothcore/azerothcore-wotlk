@@ -3288,7 +3288,7 @@ float Creature::GetAggroRange(Unit const* target) const
     return (aggroRadius * aggroRate);
 }
 
-void Creature::UpdateMovementFlags()
+void Creature::UpdateMovementFlags(bool spawn /*= false*/)
 {
     // Do not update movement flags if creature is controlled by a player (charm/vehicle)
     if (m_movedByPlayer)
