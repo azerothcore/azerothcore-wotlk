@@ -1061,30 +1061,50 @@ public:
         return true;
     }
 
-    static bool HandleCharacterChangeAccountCommand(ChatHandler* handler, PlayerIdentifier player, std::string accountName)
+    static bool HandleCharacterChangeAccountCommand(ChatHandler* handler, std::string accountName, Optional<PlayerIdentifier> player)
     {
-        if (Player* target = player.GetConnectedPlayer())
+        if (!player)
         {
-            if (uint32 accountId = AccountMgr::GetId(accountName))
-            {
-                if (AccountMgr::GetCharactersCount(accountId) >= 10)
-                {
-                    handler->SendSysMessage("The account already has the maximum number of characters.");
-                    handler->SetSentErrorMessage(true);
-                    return true;
-                }
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
 
-                target->GetSession()->KickPlayer();
-                CharacterDatabase.Query("UPDATE characters SET account = {} WHERE guid = {};", target->GetDBGuid());
-                sCharacterCache->UpdateCharacterAccountId(target->GetGUID(), accountId);
-                
-            }
-            else
+        if (!player)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (uint32 accountId = AccountMgr::GetId(accountName))
+        {
+            if (AccountMgr::GetCharactersCount(accountId) >= 10)
             {
-                handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+                handler->PSendSysMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, accountName, accountId);
                 handler->SetSentErrorMessage(true);
                 return true;
             }
+
+            if (CharacterCacheEntry const* cache = sCharacterCache->GetCharacterCacheByName(player->GetName()))
+            {
+                std::string accName;
+                AccountMgr::GetName(cache->AccountId, accName);
+                handler->PSendSysMessage(LANG_CMD_CHAR_CHANGE_ACC_SUCCESS, player->GetName(), player->GetGUID().GetCounter(), accName, cache->AccountId, accountName, accountId);
+            }
+
+            if (player->IsConnected())
+            {
+                player->GetConnectedPlayer()->GetSession()->KickPlayer("CMD char changeaccount");
+            }
+
+            CharacterDatabase.Query("UPDATE characters SET account = {} WHERE guid = {}", accountId, player->GetGUID().GetCounter());
+            sCharacterCache->UpdateCharacterAccountId(player->GetGUID(), accountId);
+
+        }
+        else
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+            handler->SetSentErrorMessage(true);
+            return true;
         }
 
         return true;
