@@ -361,7 +361,7 @@ public:
                 case NPC_SE_HIGH_OVERLORD_SAURFANG:
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                     {
-                        creature->UpdateEntry(NPC_SE_MURADIN_BRONZEBEARD, creature->GetCreatureData());
+                        creature->UpdateEntry(NPC_SE_MURADIN_BRONZEBEARD, creature->GetCreatureData(), true, true);
                         creature->LoadEquipment();
                     }
                     DeathbringerSaurfangEventGUID = creature->GetGUID();
