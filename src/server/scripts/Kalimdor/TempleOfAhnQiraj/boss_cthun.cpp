@@ -546,6 +546,8 @@ struct boss_cthun : public BossAI
         {
             eye->DespawnOrUnsummon();
         }
+
+        instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_DONE);
     }
 
     void SummonedCreatureDies(Creature* creature, Unit* /*killer*/) override
