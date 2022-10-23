@@ -4,6 +4,14 @@ fi
 
 UBUNTU_VERSION=$(lsb_release -sr);
 
+if [[ $UBUNTU_VERSION == *"22.04"* ]]; then
+  apt install libboost-all-dev
+  # FILE=/etc/apt/sources.list.d/mhier-ubuntu-libboost-latest-jammy.list
+  # if [[ -f "$FILE" ]]; then
+  #     sed -i 's/^/#/' $FILE
+  # fi
+fi
+
 sudo apt update
 
 # shared deps

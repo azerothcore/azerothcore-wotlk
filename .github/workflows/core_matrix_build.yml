@@ -17,13 +17,13 @@ jobs:
             matrix:
                 # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
                 include:
-                    - os: ubuntu-22.04
+                    - os: ubuntu-22.04.1
                       compiler: clang12
-                    - os: ubuntu-22.04
+                    - os: ubuntu-22.04.1
                       compiler: clang11
-                    - os: ubuntu-22.04
-                      compiler: gcc # default in 20.04 is gcc 9
-                    - os: ubuntu-22.04
+                    - os: ubuntu-22.04.1
+                      compiler: gcc # default in 22.04 is gcc 11
+                    - os: ubuntu-22.04.1
                       compiler: gcc10
         runs-on: ${{ matrix.os }}
         name: ${{ matrix.os }}-${{ matrix.compiler }}

@@ -16,7 +16,7 @@ jobs:
             fail-fast: false
             matrix:
                 # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
-                os: [ubuntu-22.04]
+                os: [ubuntu-22.04.1]
                 compiler: [clang]
                 modules: [with]
         runs-on: ${{ matrix.os }}

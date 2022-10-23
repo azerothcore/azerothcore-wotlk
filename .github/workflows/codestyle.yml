@@ -7,7 +7,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                os: [ubuntu-22.04]
+                os: [ubuntu-22.04.1]
         runs-on: ${{ matrix.os }}
         name: check codestyle
         steps:
