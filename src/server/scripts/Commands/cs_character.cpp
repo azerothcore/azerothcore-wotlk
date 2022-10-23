@@ -72,6 +72,7 @@ public:
             { "customize",      HandleCharacterCustomizeCommand,        SEC_GAMEMASTER, Console::Yes },
             { "changefaction",  HandleCharacterChangeFactionCommand,    SEC_GAMEMASTER, Console::Yes },
             { "changerace",     HandleCharacterChangeRaceCommand,       SEC_GAMEMASTER, Console::Yes },
+            { "changeaccount",  HandleCharacterChangeAccountCommand,    SEC_ADMINISTRATOR, Console::Yes },
             { "check",          characterCheckCommandTable },
             { "erase",          HandleCharacterEraseCommand,            SEC_CONSOLE,    Console::Yes },
             { "deleted",        characterDeletedCommandTable },
@@ -1057,6 +1058,35 @@ public:
         }
 
         handler->PSendSysMessage("--------------------------------------");
+        return true;
+    }
+
+    static bool HandleCharacterChangeAccountCommand(ChatHandler* handler, PlayerIdentifier player, std::string accountName)
+    {
+        if (Player* target = player.GetConnectedPlayer())
+        {
+            if (uint32 accountId = AccountMgr::GetId(accountName))
+            {
+                if (AccountMgr::GetCharactersCount(accountId) >= 10)
+                {
+                    handler->SendSysMessage("The account already has the maximum number of characters.");
+                    handler->SetSentErrorMessage(true);
+                    return true;
+                }
+
+                target->GetSession()->KickPlayer();
+                CharacterDatabase.Query("UPDATE characters SET account = {} WHERE guid = {};", target->GetDBGuid());
+                sCharacterCache->UpdateCharacterAccountId(target->GetGUID(), accountId);
+                
+            }
+            else
+            {
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+                handler->SetSentErrorMessage(true);
+                return true;
+            }
+        }
+
         return true;
     }
 };
