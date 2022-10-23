@@ -2372,7 +2372,7 @@ public:
     [[nodiscard]] bool isSwimming() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SWIMMING); }
     [[nodiscard]] virtual bool CanFly() const = 0;
     [[nodiscard]] bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); }
-    [[nodiscard]] bool IsFalling() const;
+    [[nodiscard]] bool IsFalling(bool spawn = false) const;
     [[nodiscard]] float GetHoverHeight() const { return IsHovering() ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f; }
     [[nodiscard]] virtual bool CanEnterWater() const = 0;
 
