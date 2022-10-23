@@ -19906,7 +19906,7 @@ void Unit::BuildMovementPacket(ByteBuffer* data) const
         *data << (float)m_movementInfo.splineElevation;
 }
 
-bool Unit::IsFalling() const
+bool Unit::IsFalling(bool spawn /*= false*/) const
 {
     if (spawn)
         return false;
