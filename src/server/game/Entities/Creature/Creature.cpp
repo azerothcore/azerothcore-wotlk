@@ -1971,7 +1971,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
         if (HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
             RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
 
-        UpdateMovementFlags();
+        UpdateMovementFlags(true);
 
         ReplaceAllNpcFlags(NPCFlags(cinfo->npcflag));
         ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD)));
@@ -3306,8 +3306,9 @@ void Creature::UpdateMovementFlags()
 
     bool canHover = CanHover();
     bool isInAir  = (G3D::fuzzyGt(GetPositionZ(), ground + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(GetPositionZ(), ground - GROUND_HEIGHT_TOLERANCE)); // Can be underground too, prevent the falling
+    bool IsFlightAllowed = GetMovementTemplate().IsFlightAllowed();
 
-    if (GetMovementTemplate().IsFlightAllowed() && isInAir && !IsFalling())
+    if (IsFlightAllowed && isInAir && !IsFalling(spawn && IsFlightAllowed))
     {
         if (GetMovementTemplate().Flight == CreatureFlightMovementType::CanFly)
             SetCanFly(true);
