@@ -4,9 +4,9 @@ fi
 
 UBUNTU_VERSION=$(lsb_release -sr);
 
-if [[ $UBUNTU_VERSION == *"22.04"* ]]; then
-  sed -i 's/^/#/' /etc/apt/sources.list.d/mhier-ubuntu-libboost-latest-jammy.list
-fi
+# if [[ $UBUNTU_VERSION == *"22.04"* ]]; then
+#   sed -i 's/^/#/' /etc/apt/sources.list.d/mhier-ubuntu-libboost-latest-jammy.list
+# fi
 
 sudo apt update
 
