@@ -90,7 +90,6 @@ UPDATE `areatrigger_tavern` SET `faction` = @FACTION_HORDE WHERE `id` IN (
 4755,
 4595);
 
-
 UPDATE `areatrigger_tavern` SET `faction` = @FACTION_BOTH WHERE `id` IN (
 98,  
 743, 
