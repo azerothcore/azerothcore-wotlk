@@ -1744,7 +1744,7 @@ public:
     void SendAttackStateUpdate(uint32 HitInfo, Unit* target, uint8 SwingType, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, uint32 Resist, VictimState TargetState, uint32 BlockedAmount);
     void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log);
     void SendSpellNonMeleeReflectLog(SpellNonMeleeDamage* log, Unit* attacker);
-    void SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, uint32 Damage, SpellSchoolMask damageSchoolMask, uint32 AbsorbedDamage, uint32 Resist, bool PhysicalDamage, uint32 Blocked, bool CriticalHit = false);
+    void SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, uint32 Damage, SpellSchoolMask damageSchoolMask, uint32 AbsorbedDamage, uint32 Resist, bool PhysicalDamage, uint32 Blocked, bool CriticalHit = false, bool Split = false);
     void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo);
     void SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo missInfo);
     void SendSpellDamageResist(Unit* target, uint32 spellId);
