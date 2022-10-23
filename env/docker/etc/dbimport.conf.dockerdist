@@ -1,6 +1,8 @@
 # Do NOT change those Dir configs
 # Files in LogsDir will reflect on your host directory: docker/worldserver/logs
 LogsDir = "/azerothcore/env/dist/logs"
+# Files in TempDir will reflect on your host directory: docker/authserver/temp
+TempDir = "/azerothcore/env/dist/temp"
 DataDir = "/azerothcore/env/dist/data"
 
 # Change this configuration accordingly with your docker setup
