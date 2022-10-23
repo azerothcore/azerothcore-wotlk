@@ -1057,9 +1057,6 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
-    // GUID from character's table, use this to update database rows using the character GUID.
-    ObjectGuid::LowType GetDBGuid() { return GetGUID().GetCounter(); };
-
     void SetObjectScale(float scale) override
     {
         Unit::SetObjectScale(scale);
