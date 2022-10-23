@@ -167,7 +167,7 @@ public:
 
     [[nodiscard]] bool HasSpell(uint32 spellID) const override;
 
-    void UpdateMovementFlags();
+    void UpdateMovementFlags(bool spawn = false);
     uint32 GetRandomId(uint32 id1, uint32 id2, uint32 id3);
     bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true, bool updateAI = false);
     bool UpdateEntry(uint32 entry, bool updateAI) { return UpdateEntry(entry, nullptr, true, updateAI); }
