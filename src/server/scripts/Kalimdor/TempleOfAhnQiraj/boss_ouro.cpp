@@ -78,8 +78,15 @@ struct npc_ouro_spawner : public ScriptedAI
         // Spawn Ouro on LoS check
         if (!hasSummoned && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 40.0f) && !who->ToPlayer()->IsGameMaster())
         {
-            DoCastSelf(SPELL_SUMMON_OURO);
-            hasSummoned = true;
+            if (InstanceScript* instance = me->GetInstanceScript())
+            {
+                Creature* ouro = instance->GetCreature(DATA_OURO);
+                if (instance->GetBossState(DATA_OURO) != IN_PROGRESS && !ouro)
+                {
+                    DoCastSelf(SPELL_SUMMON_OURO);
+                    hasSummoned = true;
+                }
+            }
         }
 
         ScriptedAI::MoveInLineOfSight(who);
@@ -129,6 +136,9 @@ struct boss_ouro : public BossAI
 
     void Submerge()
     {
+        if (_enraged || _submerged)
+            return;
+
         me->AttackStop();
         me->SetReactState(REACT_PASSIVE);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
@@ -206,6 +216,9 @@ struct boss_ouro : public BossAI
                 })
             .Schedule(3s, GROUP_PHASE_TRANSITION, [this](TaskContext context)
                 {
+                    if (_enraged)
+                        return;
+
                     if (!IsPlayerWithinMeleeRange() && !_submerged)
                     {
                         if (_submergeMelee < 10)
@@ -214,8 +227,7 @@ struct boss_ouro : public BossAI
                         }
                         else
                         {
-                            if (!_enraged)
-                                Submerge();
+                            Submerge();
                             _submergeMelee = 0;
                         }
                     }

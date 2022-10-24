@@ -168,7 +168,7 @@ struct boss_twinemperorsAI : public BossAI
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     if (Unit* victim = me->SelectNearestTarget())
                     {
-                        me->AddThreat(victim, 200000.f);
+                        me->AddThreat(victim, 2000.f);
                         AttackStart(victim);
                     }
                 });
@@ -309,7 +309,7 @@ struct boss_veknilash : public boss_twinemperorsAI
         _scheduler
             .Schedule(14s, [this](TaskContext context)
             {
-                DoCastRandomTarget(SPELL_UPPERCUT, 0, me->GetMeleeReach(), true);
+                DoCastRandomTarget(SPELL_UPPERCUT, 0, me->GetMeleeReach(), true, true);
                 context.Repeat(4s, 15s);
             })
             .Schedule(12s, [this](TaskContext context)
