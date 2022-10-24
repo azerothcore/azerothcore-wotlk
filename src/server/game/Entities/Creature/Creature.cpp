@@ -207,8 +207,8 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     {
         if (m_owner.IsInCombatWith(victim))
         {
-            m_owner.GetThreatMgr().modifyThreatPercent(victim, -100); // Reset threat to zero.
-            m_owner.GetThreatMgr().addThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
+            m_owner.GetThreatMgr().ModifyThreatByPercent(victim, -100); // Reset threat to zero.
+            m_owner.GetThreatMgr().AddThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
         }
     }
 
@@ -646,7 +646,7 @@ void Creature::Update(uint32 diff)
                 if (!allowed)                                               // Will be rechecked on next Update call
                     break;
 
-                ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(GetEntry(), m_spawnId);
+                ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
                 time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                 if (!linkedRespawntime)             // Can respawn
                     Respawn();
@@ -839,13 +839,13 @@ void Creature::Update(uint32 diff)
                             }
                         };
 
-                        if (GetThreatMgr().getThreatList().size() <= 1)
+                        if (GetThreatMgr().GetThreatListSize() <= 1)
                         {
                             EnterEvade();
                         }
                         else
                         {
-                            if (HostileReference* ref = GetThreatMgr().getOnlineContainer().getReferenceByTarget(m_cannotReachTarget))
+                            if (HostileReference* ref = GetThreatMgr().GetOnlineContainer().getReferenceByTarget(m_cannotReachTarget))
                             {
                                 ref->removeReference();
                                 SetCannotReachTarget();
@@ -2156,7 +2156,7 @@ void Creature::LoadSpellTemplateImmunity()
     }
 }
 
-bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo)
+bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
 {
     if (!spellInfo)
         return false;
@@ -2178,7 +2178,7 @@ bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo)
     if (immunedToAllEffects)
         return true;
 
-    return Unit::IsImmunedToSpell(spellInfo);
+    return Unit::IsImmunedToSpell(spellInfo, spell);
 }
 
 bool Creature::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const
@@ -2422,6 +2422,12 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     // only free creature
     if (GetCharmerOrOwnerGUID())
         return false;
+
+    // Check for ignore assistance extra flag
+    if (m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_IGNORE_ASSISTANCE_CALL))
+    {
+        return false;
+    }
 
     // only from same creature faction
     if (checkfaction)
@@ -3626,11 +3632,11 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
 {
     if (victim)
     {
-        float currentThreat = GetThreatMgr().getThreat(victim);
+        float currentThreat = GetThreatMgr().GetThreat(victim);
 
         if (percent != 0.0f)
         {
-            GetThreatMgr().modifyThreatPercent(victim, percent);
+            GetThreatMgr().ModifyThreatByPercent(victim, percent);
         }
 
         TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat);

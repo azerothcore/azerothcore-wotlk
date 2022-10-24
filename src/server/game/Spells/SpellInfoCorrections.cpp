@@ -4391,6 +4391,36 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
     });
 
+    // Refocus (Renataki's charm of beasts)
+    ApplySpellFix({ 24531 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+    });
+
+    // Collect Rookery Egg
+    ApplySpellFix({ 15958 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+    });
+
+    // WotLK Prologue Frozen Shade Visual, temp used to restore visual after Dispersion
+    ApplySpellFix({ 53444 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(27);
+    });
+
+    // Rental Racing Ram
+    ApplySpellFix({ 43883 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
+    });
+
+    // Summon Worm
+    ApplySpellFix({ 518, 25831, 25832 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

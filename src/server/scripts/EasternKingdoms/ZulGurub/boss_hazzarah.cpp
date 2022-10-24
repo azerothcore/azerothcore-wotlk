@@ -80,7 +80,7 @@ struct boss_hazzarah : public BossAI
 
     bool CanAIAttack(Unit const* target) const override
     {
-        if (me->GetThreatMgr().getThreatList().size() > 1 && me->GetThreatMgr().getOnlineContainer().getMostHated()->getTarget() == target)
+        if (me->GetThreatMgr().GetThreatListSize() > 1 && me->GetThreatMgr().GetOnlineContainer().getMostHated()->getTarget() == target)
             return !target->HasAura(SPELL_SLEEP);
 
         return true;

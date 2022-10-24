@@ -33,7 +33,7 @@ enum Spells
     SPELL_SHADOW_STORM                  = 26555,
     SPELL_THUNDERCLAP                   = 26554,
     SPELL_ENRAGE                        = 14204,
-    SPELL_EXPLODE                       = 25699,
+    SPELL_EXPLODE                       = 25698,
     SPELL_SUMMON_WARRIOR                = 17431,
     SPELL_SUMMON_SWARMGUARD             = 17430,
     SPELL_SUMMON_LARGE_OBSIDIAN_CHUNK   = 27630, // Server-side
@@ -47,7 +47,7 @@ enum Spells
 
     // Obsidian Eradicator
     SPELL_SHOCK_BLAST                   = 26458,
-    SPELL_DRAIN_MANA                    = 25671,
+    SPELL_DRAIN_MANA_ERADICATOR         = 25755,
     SPELL_DRAIN_MANA_VISUAL             = 26639,
 
     // Anubisath Warder
@@ -59,7 +59,15 @@ enum Spells
 
     // Obsidian Nullifier
     SPELL_NULLIFY                       = 26552,
-    SPELL_CLEAVE                        = 40504
+    SPELL_DRAIN_MANA_NULLIFIER          = 25671,
+    SPELL_CLEAVE                        = 40504,
+
+    // Qiraji Scorpion
+    // Qiraji Scarab
+    SPELL_PIERCE_ARMOR                  = 6016,
+    SPELL_ACID_SPIT                     = 26050,
+
+    NPC_QIRAJI_SCORPION                 = 15317
 };
 
 struct npc_anubisath_defender : public ScriptedAI
@@ -261,12 +269,12 @@ struct npc_obsidian_eradicator : public ScriptedAI
 
             for (Unit* target : _targets)
             {
-                DoCast(target, SPELL_DRAIN_MANA, true);
+                DoCast(target, SPELL_DRAIN_MANA_ERADICATOR, true);
             }
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_SHOCK_BLAST, true);
+                DoCastAOE(SPELL_SHOCK_BLAST);
             }
 
             context.Repeat(3500ms);
@@ -394,12 +402,12 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
             for (Unit* target : _targets)
             {
-                DoCast(target, SPELL_DRAIN_MANA, true);
+                DoCast(target, SPELL_DRAIN_MANA_NULLIFIER, true);
             }
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_NULLIFY, true);
+                DoCastAOE(SPELL_NULLIFY);
             }
 
             context.Repeat(6s);
@@ -425,6 +433,87 @@ struct npc_obsidian_nullifier : public ScriptedAI
 private:
     TaskScheduler _scheduler;
     std::list<Player*> _targets;
+};
+
+struct npc_ahnqiraji_critter : public ScriptedAI
+{
+    npc_ahnqiraji_critter(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        me->RestoreFaction();
+
+        _scheduler.CancelAll();
+
+        // Don't attack nearby players randomly if they are the Twin's pet bugs.
+        if (CreatureData const* crData = me->GetCreatureData())
+        {
+            ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(crData->id1, me->GetSpawnId());
+            ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+
+            if (targetGuid.GetEntry() == NPC_VEKLOR)
+            {
+                return;
+            }
+        }
+
+        _scheduler.Schedule(100ms, [this](TaskContext context)
+        {
+            if (Player* player = me->SelectNearestPlayer(10.f))
+            {
+                if (player->IsInCombat())
+                {
+                    AttackStart(player);
+                }
+            }
+
+            context.Repeat(3500ms, 4000ms);
+        });
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.CancelAll();
+
+        if (me->GetEntry() == NPC_QIRAJI_SCORPION)
+        {
+            _scheduler.Schedule(2s, 5s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_PIERCE_ARMOR, true);
+                context.Repeat(5s, 9s);
+            })
+            .Schedule(5s, 9s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_ACID_SPIT, true);
+                context.Repeat(6s, 12s);
+            });
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (me->GetEntry() == NPC_QIRAJI_SCORPION)
+        {
+            me->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 enum NPCs
@@ -484,6 +573,7 @@ void AddSC_temple_of_ahnqiraj()
     RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_eradicator);
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_warder);
     RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_nullifier);
+    RegisterTempleOfAhnQirajCreatureAI(npc_ahnqiraji_critter);
     RegisterSpellScript(spell_aggro_drones);
     RegisterSpellScript(spell_nullify);
 }
