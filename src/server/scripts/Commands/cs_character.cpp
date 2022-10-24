@@ -381,6 +381,8 @@ public:
             {
                 target->SetName(newName);
 
+                ObjectAccessor::UpdatePlayerNameMapReference(player->GetName(), target);
+
                 if (WorldSession* session = target->GetSession())
                     session->KickPlayer("HandleCharacterRenameCommand GM Command renaming character");
             }
