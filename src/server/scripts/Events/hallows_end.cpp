@@ -233,8 +233,6 @@ enum costumedOrphan
 
     // Actions
     ACTION_START_EVENT                      = 1,
-    DATA_EVENT                              = 1,
-    DATA_ALLOW_START                        = 2,
 
     // Talks
     TALK_SHADE_CONFLAGRATION                = 0,
@@ -323,7 +321,7 @@ class spell_hallows_end_base_fire : public AuraScript
 
 struct npc_costumed_orphan_matron : public ScriptedAI
 {
-    npc_costumed_orphan_matron(Creature* c) : ScriptedAI(c) { }
+    npc_costumed_orphan_matron(Creature* c) : ScriptedAI(c) {}
 
     uint32 eventStarted;
     bool allowQuest;
@@ -340,48 +338,48 @@ struct npc_costumed_orphan_matron : public ScriptedAI
     {
         switch (me->GetAreaId())
         {
-            case 87: // Goldshire
-                x = -9494.4f;
-                y = 48.53f;
-                z = 70.5f;
-                o = 0.5f;
-                path = 235431;
-                break;
-            case 131: // Kharanos
-                x = -5558.34f;
-                y = -499.46f;
-                z = 414.12f;
-                o = 2.08f;
-                path = 235432;
-                break;
-            case 3576: // Azure Watch
-                x = -4163.58f;
-                y = -12460.30f;
-                z = 63.02f;
-                o = 4.31f;
-                path = 235433;
-                break;
-            case 362: // Razor Hill
-                x = 373.2f;
-                y = -4723.4f;
-                z = 31.2f;
-                o = 3.2f;
-                path = 235434;
-                break;
-            case 159: // Brill
-                x = 2195.2f;
-                y = 264.0f;
-                z = 55.62f;
-                o = 0.15f;
-                path = 235435;
-                break;
-            case 3665: // Falcon Wing Square
-                x = 9547.91f;
-                y = -6809.9f;
-                z = 27.96f;
-                o = 3.4f;
-                path = 235436;
-                break;
+        case 87: // Goldshire
+            x = -9494.4f;
+            y = 48.53f;
+            z = 70.5f;
+            o = 0.5f;
+            path = 235431;
+            break;
+        case 131: // Kharanos
+            x = -5558.34f;
+            y = -499.46f;
+            z = 414.12f;
+            o = 2.08f;
+            path = 235432;
+            break;
+        case 3576: // Azure Watch
+            x = -4163.58f;
+            y = -12460.30f;
+            z = 63.02f;
+            o = 4.31f;
+            path = 235433;
+            break;
+        case 362: // Razor Hill
+            x = 373.2f;
+            y = -4723.4f;
+            z = 31.2f;
+            o = 3.2f;
+            path = 235434;
+            break;
+        case 159: // Brill
+            x = 2195.2f;
+            y = 264.0f;
+            z = 55.62f;
+            o = 0.15f;
+            path = 235435;
+            break;
+        case 3665: // Falcon Wing Square
+            x = 9547.91f;
+            y = -6809.9f;
+            z = 27.96f;
+            o = 3.4f;
+            path = 235436;
+            break;
         }
     }
 
@@ -403,14 +401,6 @@ struct npc_costumed_orphan_matron : public ScriptedAI
         }
     }
 
-    uint32 GetData(uint32 param) const override
-    {
-        if (param == DATA_ALLOW_START)
-            return allowQuest;
-
-        return 0;
-    }
-
     void UpdateAI(uint32 diff) override
     {
         if (eventStarted)
@@ -423,67 +413,78 @@ struct npc_costumed_orphan_matron : public ScriptedAI
             }
         }
     }
-};
 
-bool OnGossipHello(Player* player, Creature* creature)
-{
-    QuestRelationBounds pObjectQR = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
-    QuestRelationBounds pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
-
-    QuestMenu& qm = player->PlayerTalkClass->GetQuestMenu();
-    qm.ClearMenu();
-
-    for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
+    void sGossipHello(Player* player) override
     {
-        uint32 quest_id = i->second;
-        QuestStatus status = player->GetQuestStatus(quest_id);
-        if (status == QUEST_STATUS_COMPLETE)
-            qm.AddMenuItem(quest_id, 4);
-        else if (status == QUEST_STATUS_INCOMPLETE)
-            qm.AddMenuItem(quest_id, 4);
-    }
+        QuestRelationBounds pObjectQR = sObjectMgr->GetCreatureQuestRelationBounds(me->GetEntry());
+        QuestRelationBounds pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(me->GetEntry());
 
-    for (QuestRelations::const_iterator i = pObjectQR.first; i != pObjectQR.second; ++i)
-    {
-        uint32 quest_id = i->second;
-        Quest const* pQuest = sObjectMgr->GetQuestTemplate(quest_id);
-        if (!pQuest)
-            continue;
+        QuestMenu& qm = player->PlayerTalkClass->GetQuestMenu();
+        qm.ClearMenu();
 
-        if (!player->CanTakeQuest(pQuest, false))
-            continue;
-        else if (player->GetQuestStatus(quest_id) == QUEST_STATUS_NONE)
+        for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
         {
-            switch (quest_id)
+            uint32 quest_id = i->second;
+            QuestStatus status = player->GetQuestStatus(quest_id);
+            if (status == QUEST_STATUS_COMPLETE)
             {
-                case QUEST_LET_THE_FIRES_COME_A:
-                case QUEST_LET_THE_FIRES_COME_H:
-                    if (!creature->AI()->GetData(DATA_ALLOW_START))
-                        qm.AddMenuItem(quest_id, 2);
-                    break;
-                case QUEST_STOP_THE_FIRES_A:
-                case QUEST_STOP_THE_FIRES_H:
-                    if (creature->AI()->GetData(DATA_ALLOW_START))
-                        qm.AddMenuItem(quest_id, 2);
-                    break;
-                default:
-                    qm.AddMenuItem(quest_id, 2);
-                    break;
+                qm.AddMenuItem(quest_id, 4);
+            }
+            else if (status == QUEST_STATUS_INCOMPLETE)
+            {
+                qm.AddMenuItem(quest_id, 4);
             }
         }
+
+        for (QuestRelations::const_iterator i = pObjectQR.first; i != pObjectQR.second; ++i)
+        {
+            uint32 quest_id = i->second;
+            Quest const* pQuest = sObjectMgr->GetQuestTemplate(quest_id);
+            if (!pQuest)
+            {
+                continue;
+            }
+
+            if (!player->CanTakeQuest(pQuest, false))
+            {
+                continue;
+            }
+            else if (player->GetQuestStatus(quest_id) == QUEST_STATUS_NONE)
+            {
+                switch (quest_id)
+                {
+                    case QUEST_LET_THE_FIRES_COME_A:
+                    case QUEST_LET_THE_FIRES_COME_H:
+                        if (!allowQuest)
+                        {
+                            qm.AddMenuItem(quest_id, 2);
+                        }
+                        break;
+                    case QUEST_STOP_THE_FIRES_A:
+                    case QUEST_STOP_THE_FIRES_H:
+                        if (allowQuest)
+                        {
+                            qm.AddMenuItem(quest_id, 2);
+                        }
+                        break;
+                    default:
+                        qm.AddMenuItem(quest_id, 2);
+                        break;
+                }
+            }
+        }
+
+        player->SendPreparedQuest(me->GetGUID());
     }
 
-    player->SendPreparedQuest(creature->GetGUID());
-    return true;
-}
-
-bool OnQuestAccept(Player*  /*player*/, Creature* creature, Quest const* quest)
-{
-    if ((quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_A || quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_H) && !creature->AI()->GetData(DATA_ALLOW_START))
-        creature->AI()->DoAction(ACTION_START_EVENT);
-
-    return true;
-}
+    void sQuestAccept(Player*  /*player*/, Quest const* quest) override
+    {
+        if ((quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_A || quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_H) && !allowQuest)
+        {
+            DoAction(ACTION_START_EVENT);
+        }
+    }
+};
 
 struct npc_soh_fire_trigger : public NullCreatureAI
 {
