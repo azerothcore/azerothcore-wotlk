@@ -100,6 +100,11 @@ namespace PlayerNameMapHolder
         PlayerNameMap.erase(p->GetName());
     }
 
+    void RemoveByName(std::string const& name)
+    {
+        PlayerNameMap.erase(name);
+    }
+
     Player* Find(std::string const& name)
     {
         std::string charName(name);
@@ -289,4 +294,10 @@ void ObjectAccessor::RemoveObject(Player* player)
 {
     HashMapHolder<Player>::Remove(player);
     PlayerNameMapHolder::Remove(player);
+}
+
+void ObjectAccessor::UpdatePlayerNameMapReference(std::string oldname, Player* player)
+{
+    PlayerNameMapHolder::RemoveByName(oldname);
+    PlayerNameMapHolder::Insert(player);
 }

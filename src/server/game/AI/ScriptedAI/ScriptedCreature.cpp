@@ -64,14 +64,14 @@ void SummonList::DespawnEntry(uint32 entry)
     }
 }
 
-void SummonList::DespawnAll()
+void SummonList::DespawnAll(uint32 delay /*= 0*/)
 {
     while (!storage_.empty())
     {
         Creature* summon = ObjectAccessor::GetCreature(*me, storage_.front());
         storage_.pop_front();
         if (summon)
-            summon->DespawnOrUnsummon();
+            summon->DespawnOrUnsummon(delay);
     }
 }
 
