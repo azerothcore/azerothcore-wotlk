@@ -1,3 +1,4 @@
+-- DB update 2022_10_23_02 -> 2022_10_25_00
 --
 DELETE FROM `acore_string` WHERE `entry` = 5083;
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
