@@ -1,3 +1,4 @@
+-- DB update 2022_10_25_02 -> 2022_10_25_03
 --
 UPDATE `spell_dbc` SET `MaxTargets`=0 WHERE `id`=24019;
 
