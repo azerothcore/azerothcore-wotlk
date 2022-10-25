@@ -190,7 +190,7 @@ struct boss_eye_of_cthun : public BossAI
 
     void EnterCombat(Unit* who) override
     {
-        ScheduleTasks();
+        ScheduleTasks(true);
         BossAI::EnterCombat(who);
         _beamTarget = who->GetGUID();
     }
@@ -231,12 +231,12 @@ struct boss_eye_of_cthun : public BossAI
         }
     }
 
-    void ScheduleTasks()
+    void ScheduleTasks(bool onEngage = false)
     {
         _scheduler.
-            Schedule(3s, [this](TaskContext task)
+            Schedule(3s, [this, onEngage](TaskContext task)
             {
-                if (task.GetRepeatCounter() < 3)
+                if (task.GetRepeatCounter() < 3 && onEngage)
                 {
                     if (Unit* target = ObjectAccessor::GetUnit(*me, _beamTarget))
                     {
