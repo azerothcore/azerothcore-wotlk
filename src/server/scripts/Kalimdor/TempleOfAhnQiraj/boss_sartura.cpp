@@ -70,19 +70,8 @@ struct boss_sartura : public BossAI
         _Reset();
         enraged = false;
         berserked = false;
-        MinionReset();
 
         me->SetReactState(REACT_AGGRESSIVE);
-    }
-
-    void MinionReset()
-    {
-        std::list<Creature*> royalGuards;
-        me->GetCreaturesWithEntryInRange(royalGuards, 200.0f, NPC_SARTURA_ROYAL_GUARD);
-        for (Creature* minion : royalGuards)
-        {
-            minion->Respawn();
-        }
     }
 
     void EnterCombat(Unit* who) override
