@@ -5,17 +5,17 @@ DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (11701,11702,11703,11704,117
 DELETE FROM `gameobject` WHERE `id` IN (181555, 181556, 181557, 181569, 181570) AND `guid` IN (21790,21791,21792,21793,21794,21795,21796,21797,21798,21895,21896,21897,21898,21899,21900,21901,21902,21903,21904,21905,21915,21916,21923,21924,21925,28147,28151,28262,28499,28500,30429,40105,40106,40107,40108,40109,40110,40111,40112,40113,40114,40115,40116,40117,40118,40119,40120,40121,40123,40124,40125,40126,40127,40128,40129,40130,40131,40132,40134,40135,40136,40137,40138,40139,40140,40141,40142,40143,40144,40145,40146,40147,40148,40149,40150,40151,40196,40197,40198,40199,40200,40201,40202,40203,40204,40205,40206,42397,42398,42402,42403,42404,42405,42406,42409,42410,42412,42413,42414,42415,42416,42417,42418,42420,42421,42426,42428,42429,42431,42432,61454,61913,61916,61919,61927,61931,61935,61960,61961,63203,63204,63205,63206,63207,63208,63209,63210,120206,120234,120247,120574,120580,120581,120763);
 
 -- Fel Iron Deposit
--- SET @GUID = N; -- 122
--- SET @POOLMOTHER = N; -- 3
--- SET @POOL = N; -- 61
+SET @GUID = 78950; -- 122 -- Total of 552
+SET @POOLMOTHER = 1267; -- 3 -- Total of 29
+SET @POOL = 12480; -- 61 -- Total of 201
 
-DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+2;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Nagrand%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+2;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0, 4, 'Nagrand - Fel Iron Deposit - Group 1'),
 (@POOLMOTHER+1, 4, 'Nagrand - Fel Iron Deposit - Group 2'),
 (@POOLMOTHER+2, 4, 'Nagrand - Fel Iron Deposit - Group 3');
 
-DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOL+0 AND @POOL+60 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+2;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Nagrand%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+60 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+2;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 (@POOL+0 , @POOLMOTHER+0, 0, 'Nagrand - Fel Iron Deposit - Group 1'),
 (@POOL+1 , @POOLMOTHER+0, 0, 'Nagrand - Fel Iron Deposit - Group 1'),
@@ -143,7 +143,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL+59, 1, 'Nagrand - Fel Iron Deposit / Khorium Vein'),
 (@POOL+60, 1, 'Nagrand - Fel Iron Deposit / Khorium Vein');
 
-DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @GUID+0 AND @GUID+121 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+60;
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Nagrand%' AND `guid` BETWEEN @GUID+0 AND @GUID+121 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+60;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+0  , @POOL+0 , 0, 'Fel Iron Deposit - Nagrand'),
 (@GUID+2  , @POOL+1 , 0, 'Fel Iron Deposit - Nagrand'),
@@ -268,7 +268,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@GUID+119, @POOL+59, 2, 'Khorium for Fel Iron - Nagrand'),
 (@GUID+121, @POOL+60, 2, 'Khorium for Fel Iron - Nagrand');
 
-DELETE FROM `gameobject` WHERE `map`=530 AND `id` IN (181555, 181557) AND `guid` BETWEEN @GUID+0 AND @GUID+121;
+DELETE FROM `gameobject` WHERE `map`=530 AND `ZoneId`=3518 AND `id` IN (181555, 181557) AND `guid` BETWEEN @GUID+0 AND @GUID+121;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (@GUID+0  , 181555, 530, 3518, 0, 1, 1, -580.144, 7159.36, 73.7917, 1.55334, 0, 0, 0, 0, 90, 255, 1, '', 0),
 (@GUID+2  , 181555, 530, 3518, 0, 1, 1, -708.178, 7310.18, 76.4781, -2.60053, 0, 0, 0, 0, 90, 255, 1, '', 0),
@@ -395,11 +395,11 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+121, 181557, 530, 3518, 0, 1, 1, -2034.08, 8031.61, -11.9399, -2.04204, 0, 0, 0, 0, 90, 255, 1, '', 0);
 
 -- Adamantite Deposits
--- SET @GUID = N; -- 420
--- SET @POOLMOTHER = N; -- 14
--- SET @POOL = N; -- 140
+SET @GUID = 79072; -- 420
+SET @POOLMOTHER = 1270; -- 14
+SET @POOL = 12541; -- 140
 
-DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+13;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Nagrand%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+13;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0 , 2, 'Nagrand - Adamantite / Rich / Khorium - Group 1 '),
 (@POOLMOTHER+1 , 2, 'Nagrand - Adamantite / Rich / Khorium - Group 2 '),
@@ -416,7 +416,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+12, 1, 'Nagrand - Adamantite / Rich / Khorium - Group 13'),
 (@POOLMOTHER+13, 2, 'Nagrand - Adamantite / Rich / Khorium - Group 14');
 
-DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOL+0 AND @POOL+139 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+13;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Nagrand%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+139 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+13;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 (@POOL+0  , @POOLMOTHER+0, 0, 'Nagrand - Adamantite / Rich / Khorium - Group 1 '),
 (@POOL+1  , @POOLMOTHER+0, 0, 'Nagrand - Adamantite / Rich / Khorium - Group 1 '),
@@ -559,7 +559,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 (@POOL+138, @POOLMOTHER+13, 0, 'Nagrand - Adamantite / Rich / Khorium - Group 14'),
 (@POOL+139, @POOLMOTHER+13, 0, 'Nagrand - Adamantite / Rich / Khorium - Group 14');
 
-DELETE FROM `pool_template` WHERE `description`='Terokkar Forest - Adamantite / Rich / Khorium' AND `entry` BETWEEN @POOL+0 AND @POOL+23;
+DELETE FROM `pool_template` WHERE `description`='Nagrand - Adamantite / Rich / Khorium' AND `entry` BETWEEN @POOL+0 AND @POOL+139;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL+0  , 1, 'Nagrand - Adamantite / Rich / Khorium'),
 (@POOL+1  , 1, 'Nagrand - Adamantite / Rich / Khorium'),
@@ -702,7 +702,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL+138, 1, 'Nagrand - Adamantite / Rich / Khorium'),
 (@POOL+139, 1, 'Nagrand - Adamantite / Rich / Khorium');
 
-DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @GUID+0 AND @GUID+419 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+139;
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Nagrand%' AND `guid` BETWEEN @GUID+0 AND @GUID+419 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+139;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+0  , @POOL+0  , 0, 'Adamantite Deposit - Nagrand'),
 (@GUID+3  , @POOL+1  , 0, 'Adamantite Deposit - Nagrand'),
@@ -1125,7 +1125,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@GUID+416, @POOL+138, 4, 'Khorium for Rich Adamantite - Nagrand'),
 (@GUID+419, @POOL+139, 4, 'Khorium for Rich Adamantite - Nagrand');
 
-DELETE FROM `gameobject` WHERE `map`=530 AND `id` IN (181556, 181557, 181569) AND `guid` BETWEEN @GUID+0 AND @GUID+419;
+DELETE FROM `gameobject` WHERE `ZoneId`=3518 AND `map`=530 AND `id` IN (181556, 181557, 181569) AND `guid` BETWEEN @GUID+0 AND @GUID+419;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (@GUID+0  , 181556, 530, 3518, 0, 1, 1, -646.408, 8781.49, 202.061, -2.26892, 0, 0, 0, 0, 90, 255, 1, '', 0),
 (@GUID+3  , 181556, 530, 3518, 0, 1, 1, -561.739, 8876.58, 212.408, -1.32645, 0, 0, -0.615661, 0.788011, 90, 255, 1, '', 0),
@@ -1566,10 +1566,10 @@ UPDATE `gameobject` SET `position_z`=21.815708 WHERE `guid`=40155;
 UPDATE `gameobject` SET `position_z`=33.026737 WHERE `guid`=40178;
 UPDATE `gameobject` SET `position_z`=-10.123981 WHERE `guid`=40185;
 
--- SET @POOLMOTHER=N; -- 12
--- SET @GUID=N; -- 10
+SET @POOLMOTHER=1284; -- 12
+SET @GUID=71984; -- 10
 
-DELETE FROM `pool_template` WHERE `description` LIKE '%Terokkar Forest%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+11;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Nagrand%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+11;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0 , 7, 'Nagrand - Felweed - Group 1'),
 (@POOLMOTHER+1 , 2, 'Nagrand - Felweed - Group 2'),
@@ -1750,7 +1750,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (40104, @POOLMOTHER+11, 0, 'Mana Thistle - Nagrand'),
 (21597, @POOLMOTHER+11, 0, 'Mana Thistle - Nagrand');
 
-DELETE FROM `gameobject` WHERE `map`=530 AND `id` IN (181270, 181271) AND `guid` BETWEEN @GUID+0 AND @GUID+9;
+DELETE FROM `gameobject` WHERE `ZoneId`=3518 AND `map`=530 AND `id` IN (181270, 181271) AND `guid` BETWEEN @GUID+0 AND @GUID+9;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (@GUID+0, 181270, 530, 3518, 0, 1, 1, -1684.31, 8838.18, 35.5142, 3.15906, 0, 0, -0.999962, 0.00873464, 90, 100, 1, '', 0),
 (@GUID+1, 181270, 530, 3518, 0, 1, 1, -1295.84, 6787.8, 36.2085, 4.90438, 0, 0, -0.636078, 0.771625, 90, 100, 1, '', 0),
