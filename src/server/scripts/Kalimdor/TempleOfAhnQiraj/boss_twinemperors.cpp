@@ -396,7 +396,7 @@ struct boss_veklor : public boss_twinemperorsAI
             // VL doesn't melee
             if (me->Attack(who, false))
             {
-                me->GetMotionMaster()->MoveChase(who, 20.0f, 0);
+                me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
                 me->AddThreat(who, 0.0f);
             }
         }
