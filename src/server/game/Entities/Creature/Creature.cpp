@@ -1946,7 +1946,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
         if (m_formation && m_formation->GetLeader() == this)
             m_formation->FormationReset(true, false);
 
-        bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
+        bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsInWater();
         SetHover(false, false, false);
         SetDisableGravity(false, false, false);
 
