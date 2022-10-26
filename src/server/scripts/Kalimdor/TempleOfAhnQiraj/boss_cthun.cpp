@@ -452,10 +452,9 @@ struct boss_cthun : public BossAI
 
                 target->m_Events.AddEventAtOffset([target, this]()
                 {
+                    DoCast(target, SPELL_DIGESTIVE_ACID, true);
                     DoTeleportPlayer(target, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
                     target->RemoveAurasDueToSpell(SPELL_MIND_FLAY);
-                    //Cast digestive acid on them
-                    DoCast(target, SPELL_DIGESTIVE_ACID, true);
                 }, 3800ms);
             }
 
@@ -861,7 +860,10 @@ struct npc_giant_claw_tentacle : public ScriptedAI
 
         _scheduler.Update(diff);
 
-        DoMeleeAttackIfReady();
+        if (!me->HasAura(SPELL_SUBMERGE_VISUAL))
+        {
+            DoMeleeAttackIfReady();
+        }
     }
 
 private:
