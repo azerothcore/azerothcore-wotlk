@@ -679,6 +679,8 @@ struct npc_claw_tentacle : public ScriptedAI
                 }
             }
         }
+
+        _canAttack = false;
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -705,10 +707,11 @@ struct npc_claw_tentacle : public ScriptedAI
         DoZoneInCombat();
 
         _scheduler.Schedule(2s, [this](TaskContext context)
-            {
-                DoCastVictim(SPELL_HAMSTRING);
-                context.Repeat(5s);
-            });
+        {
+            _canAttack = true;
+            DoCastVictim(SPELL_HAMSTRING);
+            context.Repeat(5s);
+        });
     }
 
     void UpdateAI(uint32 diff) override
@@ -719,12 +722,16 @@ struct npc_claw_tentacle : public ScriptedAI
 
         _scheduler.Update(diff);
 
-        DoMeleeAttackIfReady();
+        if (_canAttack)
+        {
+            DoMeleeAttackIfReady();
+        }
     }
 
 private:
     TaskScheduler _scheduler;
     ObjectGuid _portalGUID;
+    bool _canAttack;
 };
 
 struct npc_giant_claw_tentacle : public ScriptedAI
