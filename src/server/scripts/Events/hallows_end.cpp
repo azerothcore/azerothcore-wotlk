@@ -951,12 +951,23 @@ enum headlessHorseman
     EVENT_SUMMON_PUMPKIN                            = 6,
     EVENT_HORSEMAN_FOLLOW                           = 7,
 
-    SAY_ENTRANCE                                    = 0,
-    SAY_REJOINED                                    = 1,
-    SAY_CONFLAGRATION                               = 2,
-    SAY_SPROUTING_PUMPKINS                          = 3,
-    SAY_DEATH                                       = 4,
-    SAY_PLAYER_DEATH                                = 5,
+    // Headless Horseman
+    TALK_ENTRANCE                                   = 0,
+    TALK_REJOINED                                   = 1,
+    TALK_CONFLAGRATION                              = 2,
+    TALK_SPROUTING_PUMPKINS                         = 3,
+    TALK_DEATH                                      = 4,
+    TALK_PLAYER_DEATH                               = 5,
+
+    // Head of the Horseman
+    TALK_LAUGH                                      = 0,
+    TALK_LOST_HEAD                                  = 1,
+
+    // Player
+    TALK_PLAYER_RISE                                = 22695,
+    TALK_PLAYER_TIME_IS_NIGH                        = 22696,
+    TALK_PLAYER_FELT_DEATH                          = 22720,
+    TALK_PLAYER_KNOW_DEMISE                         = 22721,
 };
 
 enum hhMisc
@@ -979,7 +990,7 @@ struct boss_headless_horseman : public ScriptedAI
     void JustDied(Unit*  /*killer*/) override
     {
         summons.DespawnAll();
-        Talk(SAY_DEATH);
+        Talk(TALK_DEATH);
         std::list<Creature*> unitList;
         me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
         for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
@@ -995,7 +1006,7 @@ struct boss_headless_horseman : public ScriptedAI
 
     void KilledUnit(Unit*  /*who*/) override
     {
-        Talk(SAY_PLAYER_DEATH);
+        Talk(TALK_PLAYER_DEATH);
     }
 
     void DoAction(int32 param) override
@@ -1026,7 +1037,7 @@ struct boss_headless_horseman : public ScriptedAI
             events.CancelEvent(EVENT_HORSEMAN_WHIRLWIND);
             events.CancelEvent(EVENT_HORSEMAN_CONFLAGRATION);
             events.CancelEvent(EVENT_SUMMON_PUMPKIN);
-            Talk(SAY_REJOINED);
+            Talk(TALK_REJOINED);
 
             if (phase == 1)
                 events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6000);
@@ -1134,22 +1145,22 @@ struct boss_headless_horseman : public ScriptedAI
                     switch (talkCount)
                     {
                         case 1:
-                            player->Say("Horseman rise...", LANG_UNIVERSAL);
+                            player->Say(TALK_PLAYER_RISE);
                             break;
                         case 2:
-                            player->Say("Your time is nigh...", LANG_UNIVERSAL);
+                            player->Say(TALK_PLAYER_TIME_IS_NIGH);
                             if (Creature* trigger = me->SummonTrigger(1765.28f, 1347.46f, 17.5514f, 0.0f, 15 * IN_MILLISECONDS))
                                 trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
                             break;
                         case 3:
                             me->GetMotionMaster()->MovePath(236820, false);
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
-                            player->Say("You felt death once...", LANG_UNIVERSAL);
-                            Talk(SAY_ENTRANCE);
+                            player->Say(TALK_PLAYER_FELT_DEATH);
+                            Talk(TALK_ENTRANCE);
                             break;
                         case 4:
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_MEDIUM, true);
-                            player->Say("Now, know demise!", LANG_UNIVERSAL);
+                            player->Say(TALK_PLAYER_KNOW_DEMISE);
                             talkCount = 0;
                             return; // pop and return, skip repeat
                     }
@@ -1201,7 +1212,7 @@ struct boss_headless_horseman : public ScriptedAI
                     {
                         me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
                         target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
-                        Talk(SAY_CONFLAGRATION);
+                        Talk(TALK_CONFLAGRATION);
                     }
 
                     events.RepeatEvent(12500);
@@ -1217,7 +1228,7 @@ struct boss_headless_horseman : public ScriptedAI
                     }
                     else
                     {
-                        Talk(SAY_SPROUTING_PUMPKINS);
+                        Talk(TALK_SPROUTING_PUMPKINS);
                         events.RepeatEvent(15000);
                         talkCount = 0;
                     }
@@ -1314,6 +1325,8 @@ struct boss_headless_horseman_head : public ScriptedAI
             me->CastSpell(me, SPELL_THROW_HEAD_BACK, true);
             if (Unit* owner = GetOwner())
                 owner->RemoveAura(SPELL_HORSEMAN_IMMUNITY);
+            
+            Talk(TALK_LOST_HEAD);
         }
     }
 
@@ -1331,20 +1344,8 @@ struct boss_headless_horseman_head : public ScriptedAI
         if (timer >= 30000)
         {
             timer = urand(0, 15000);
-            uint32 sound = 11965;
-            switch (urand(0, 2))
-            {
-                case 1:
-                    sound = 11975;
-                    break;
-                case 2:
-                    sound = 11976;
-                    break;
-            }
-
             me->CastSpell(me, SPELL_HORSEMAN_SPEAKS, true);
-            me->TextEmote("Headless Horseman laughs");
-            me->PlayDirectSound(sound);
+            Talk(TALK_LAUGH);
         }
     }
 };
@@ -1437,7 +1438,7 @@ public:
 
     bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 /*action*/) override
     {
-        //CloseGossipMenuFor(player);
+        CloseGossipMenuFor(player);
 
         if (InstanceScript* instance = go->GetInstanceScript())
         {
