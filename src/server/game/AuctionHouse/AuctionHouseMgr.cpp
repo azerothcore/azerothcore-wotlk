@@ -110,6 +110,11 @@ static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrde
                     }
                 }
 
+                if (leftName.empty())
+                    protoLeft->Name1;
+                if (rightName.empty())
+                    protoRight->Name1;
+
                 int result = leftName.compare(rightName);
                 if (result == 0)
                 {
@@ -836,6 +841,9 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 if (loc_idx >= 0)
                     if (ItemLocale const* il = sObjectMgr->GetItemLocale(proto->ItemId))
                         ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+
+                if (name.empty())
+                    name = proto->Name1;
 
                 // DO NOT use GetItemEnchantMod(proto->RandomProperty) as it may return a result
                 //  that matches the search but it may not equal item->GetItemRandomPropertyId()
