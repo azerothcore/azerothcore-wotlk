@@ -49,7 +49,10 @@ enum Events
 
 struct boss_huhuran : public BossAI
 {
-    boss_huhuran(Creature* creature) : BossAI(creature, DATA_HUHURAN) { }
+    boss_huhuran(Creature* creature) : BossAI(creature, DATA_HUHURAN)
+    {
+        me->m_CombatDistance = 90.f;
+    }
 
     void Reset() override
     {
@@ -153,6 +156,7 @@ class spell_huhuran_wyvern_sting : public AuraScript
 };
 
 // 26052 - Poison Bolt
+// 26180 - Wyvern Sting
 class spell_huhuran_poison_bolt : public SpellScript
 {
     PrepareSpellScript(spell_huhuran_poison_bolt);
