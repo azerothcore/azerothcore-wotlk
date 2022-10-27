@@ -24,22 +24,41 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS
+        shell: bash
+        env:
+          CONTINUOUS_INTEGRATION: true
         run: |
-          choco install --no-progress openssl
-          choco install --no-progress boost-msvc-14.3 --version=1.79.0
+          ./acore.sh install-deps
+      - name: Process pending sql
+        shell: bash
+        run: bash bin/acore-db-pendings
       - name: Build
         shell: bash
         run: |
-          mkdir -p build && cd build
-          cmake .. -DTOOLS_BUILD=all
-          cmake --build . --config Release --parallel 4
+          export CTOOLS_BUILD=all
+          ./acore.sh compiler build
+      - name: Dry run authserver
+        shell: bash
+        run: |
+          source ./apps/ci/ci-gen-server-conf-files.sh "authserver" "configs" "."
+          cd env/dist
+          ./authserver -dry-run
+      - name: Dry run worldserver
+        shell: bash
+        run: |
+          source ./apps/ci/ci-gen-server-conf-files.sh "worldserver" "configs" "."
+          cd env/dist
+          ./worldserver -dry-run
+      - name: Stop MySQL
+        run: net stop mysql
       - name: Copy dll files
         shell: bash
         run: |
-          cp "/c/mysql/lib/libmysql.dll" "build/bin/Release/"
-          cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
-          cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
+          rm -rf env/dist/data
+          cp "/c/tools/mysql/current/lib/libmysql.dll" "env/dist"
+          cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "env/dist"
+          cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "env/dist"
       - uses: actions/upload-artifact@v2
         with:
           name: windows-2022-MSVC17-release
-          path: build/bin/Release
+          path: env/dist
