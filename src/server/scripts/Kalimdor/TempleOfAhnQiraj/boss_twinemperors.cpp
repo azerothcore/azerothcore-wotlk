@@ -340,7 +340,14 @@ struct boss_veklor : public boss_twinemperorsAI
         _scheduler
             .Schedule(4s, [this](TaskContext context)
             {
-                DoCastVictim(SPELL_SHADOW_BOLT);
+                if (!me->IsWithinDist(me->GetVictim(), 45.0f))
+                {
+                    me->GetMotionMaster()->MoveChase(me->GetVictim(), 20.0f, 0);
+                }
+                else
+                {
+                    DoCastVictim(SPELL_SHADOW_BOLT);
+                }
                 context.Repeat(2500ms);
             })
             .Schedule(10s, 15s, [this](TaskContext context)
@@ -396,7 +403,7 @@ struct boss_veklor : public boss_twinemperorsAI
             // VL doesn't melee
             if (me->Attack(who, false))
             {
-                me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
+                me->GetMotionMaster()->MoveChase(who, 20.0f, 0);
                 me->AddThreat(who, 0.0f);
             }
         }
