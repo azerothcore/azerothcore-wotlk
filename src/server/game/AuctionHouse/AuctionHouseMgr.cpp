@@ -91,13 +91,13 @@ static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrde
                     continue;
                 }
 
-                LocaleConstant locale = LOCALE_enUS;
+                LocaleConstant locale = DEFAULT_LOCALE;
                 if (player && player->GetSession())
                 {
                     locale = player->GetSession()->GetSessionDbLocaleIndex();
                 }
 
-                if (locale > LOCALE_enUS)
+                if (locale != DEFAULT_LOCALE)
                 {
                     if (ItemLocale const* leftIl = sObjectMgr->GetItemLocale(protoLeft->ItemId))
                     {
@@ -868,7 +868,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                         // Append the suffix (ie: of the Monkey) to the name using localization
                         // or default enUS if localization is invalid
                         name += ' ';
-                        name += (*suffix)[locdbc_idx >= 0 ? locdbc_idx : LOCALE_enUS];
+                        name += (*suffix)[locdbc_idx >= 0 ? locdbc_idx : DEFAULT_LOCALE];
                     }
                 }
 
