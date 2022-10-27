@@ -402,7 +402,8 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
             for (Unit* target : _targets)
             {
-                DoCast(target, SPELL_DRAIN_MANA_NULLIFIER, true);
+                if (target)
+                    DoCast(target, SPELL_DRAIN_MANA_NULLIFIER, true);
             }
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)

@@ -327,10 +327,7 @@ struct boss_veknilash : public boss_twinemperorsAI
 
 struct boss_veklor : public boss_twinemperorsAI
 {
-    boss_veklor(Creature* creature) : boss_twinemperorsAI(creature)
-    {
-        me->SetFloatValue(UNIT_FIELD_COMBATREACH, 45.f);
-    }
+    boss_veklor(Creature* creature) : boss_twinemperorsAI(creature) { }
 
     bool IAmVeklor() override { return true; }
 
@@ -388,6 +385,19 @@ struct boss_veklor : public boss_twinemperorsAI
 
                 veknilash->AI()->DoAction(ACTION_AFTER_TELEPORT);
                 DoAction(ACTION_AFTER_TELEPORT);
+            }
+        }
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
+        {
+            // VL doesn't melee
+            if (me->Attack(who, false))
+            {
+                me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
+                me->AddThreat(who, 0.0f);
             }
         }
     }

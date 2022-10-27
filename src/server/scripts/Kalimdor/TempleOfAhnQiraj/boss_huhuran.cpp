@@ -156,6 +156,7 @@ class spell_huhuran_wyvern_sting : public AuraScript
 };
 
 // 26052 - Poison Bolt
+// 26180 - Wyvern Sting
 class spell_huhuran_poison_bolt : public SpellScript
 {
     PrepareSpellScript(spell_huhuran_poison_bolt);
