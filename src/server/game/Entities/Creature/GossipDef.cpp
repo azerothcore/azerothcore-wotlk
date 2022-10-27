@@ -127,6 +127,11 @@ void GossipMenu::AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, ui
             }
         }
 
+        if (strOptionText.empty())
+            strOptionText = itr->second.OptionText;
+        if (strBoxText.empty())
+            strBoxText = itr->second.BoxText;
+
         /// Add menu item with existing method. Menu item id -1 is also used in ADD_GOSSIP_ITEM macro.
         AddMenuItem(-1, itr->second.OptionIcon, strOptionText, sender, action, strBoxText, boxMoney ? boxMoney : itr->second.BoxMoney, itr->second.BoxCoded);
     }
