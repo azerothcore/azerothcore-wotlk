@@ -556,6 +556,12 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recvData)
                 ObjectMgr::GetLocaleString(il->Description, loc_idx, Description);
             }
         }
+
+        if (Name.empty())
+            Name = pProto->Name1;
+        if (Description.empty())
+            Description = pProto->Description;
+
         // guess size
         WorldPacket queryData(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 600);
         queryData << pProto->ItemId;
@@ -1212,6 +1218,9 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recvData)
         if (loc_idx >= 0)
             if (ItemSetNameLocale const* isnl = sObjectMgr->GetItemSetNameLocale(itemid))
                 ObjectMgr::GetLocaleString(isnl->Name, loc_idx, Name);
+
+        if (Name.empty())
+            Name = pName->name;
 
         WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4 + Name.size() + 1 + 4));
         data << uint32(itemid);
