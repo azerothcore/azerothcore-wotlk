@@ -498,5 +498,8 @@ std::string CreatureTextMgr::GetLocalizedChatString(uint32 entry, uint8 gender, 
             ObjectMgr::GetLocaleString(locItr->second.Text, locale, baseText);
     }
 
+    if (baseText.empty())
+        baseText = groupItr->text;
+
     return baseText;
 }
