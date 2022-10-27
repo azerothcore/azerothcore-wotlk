@@ -114,6 +114,12 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
                 ObjectMgr::GetLocaleString(cl->Title, loc_idx, Title);
             }
         }
+
+        if (Name.empty())
+            Name = ci->Name;
+        if (Title.empty())
+            Title = ci->SubName;
+
         // guess size
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
         data << uint32(entry);                              // creature entry
@@ -182,6 +188,11 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recvData)
                 ObjectMgr::GetLocaleString(gameObjectLocale->Name, localeConstant, Name);
                 ObjectMgr::GetLocaleString(gameObjectLocale->CastBarCaption, localeConstant, CastBarCaption);
             }
+
+        if (Name.empty())
+            Name = info->name;
+        if (CastBarCaption.empty())
+            CastBarCaption = info->castBarCaption;
 
         LOG_DEBUG("network", "WORLD: CMSG_GAMEOBJECT_QUERY '{}' - Entry: {}. ", info->name, entry);
         WorldPacket data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 150);
@@ -383,6 +394,9 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recvData)
             if (loc_idx >= 0)
                 if (PageTextLocale const* player = sObjectMgr->GetPageTextLocale(pageID))
                     ObjectMgr::GetLocaleString(player->Text, loc_idx, Text);
+
+            if (Text.empty())
+                Text = pageText->Text;
 
             data << Text;
             data << uint32(pageText->NextPage);
