@@ -298,7 +298,7 @@ struct AccountInfo
             Expansion = world_expansion;
 
         if (Locale >= TOTAL_LOCALES)
-            Locale = LOCALE_enUS;
+            Locale = DEFAULT_LOCALE;
     }
 };
 
