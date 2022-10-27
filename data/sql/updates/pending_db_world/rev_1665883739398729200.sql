@@ -6,33 +6,33 @@ DELETE FROM `gameobject` WHERE `map`=530 AND `ZoneId`=3521 AND `id` IN (181555, 
 DELETE FROM `gameobject` WHERE `id` IN (181555, 181556, 181557, 181569, 181570) AND `guid` IN (34924,64884,1523,32711,34838,34922,34925,34934,34956,34962,40532,40548,40549,40550,40551,40552,40553,40554,40555,40556,40557,40558,40559,40560,40609,40610,40611,40612,40613,40614,40615,40616,42284,42307,42326,42342,42396,42399,42400,42401,42419,42424,42425,42427,42433,61453,61455,61456,61458,61459,61460,61540,61932,61933,61954,61964,61965,64863,64865,64867,64870,64872,64875,64876,64883,64886,120209,120224,120244,120557,120561,120569,120759,120194,120245,61866,88,30409);
 
 -- Fel Iron Deposits
-SET @GUID = 78409; -- 154 + 84 + 13 = 251
-SET @POOLMOTHER = 1163; -- 19 + 14 + 23 = 56
-SET @POOL = 12228; -- 77 + 42 = 119
+SET @GUID = 101513; -- 154 + 84 + 13 = 251
+SET @POOLMOTHER = 8043; -- 19 + 14 + 23 = 56
+SET @POOL = 12227; -- 77 + 42 = 119
 
-DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+18;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Zangarmarsh - Fel Iron Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+18;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(@POOLMOTHER+0 , 1, 'Zangarmarsh - Fel Iron - Group 1'),
-(@POOLMOTHER+1 , 1, 'Zangarmarsh - Fel Iron - Group 2'),
-(@POOLMOTHER+2 , 1, 'Zangarmarsh - Fel Iron - Group 3'),
-(@POOLMOTHER+3 , 1, 'Zangarmarsh - Fel Iron - Group 4'),
-(@POOLMOTHER+4 , 2, 'Zangarmarsh - Fel Iron - Group 5'),
-(@POOLMOTHER+5 , 1, 'Zangarmarsh - Fel Iron - Group 6'),
-(@POOLMOTHER+6 , 1, 'Zangarmarsh - Fel Iron - Group 7'),
-(@POOLMOTHER+7 , 1, 'Zangarmarsh - Fel Iron - Group 8'),
-(@POOLMOTHER+8 , 1, 'Zangarmarsh - Fel Iron - Group 9'),
-(@POOLMOTHER+9 , 1, 'Zangarmarsh - Fel Iron - Group 10'),
-(@POOLMOTHER+10, 1, 'Zangarmarsh - Fel Iron - Group 11'),
-(@POOLMOTHER+11, 2, 'Zangarmarsh - Fel Iron - Group 12'),
-(@POOLMOTHER+12, 1, 'Zangarmarsh - Fel Iron - Group 13'),
-(@POOLMOTHER+13, 1, 'Zangarmarsh - Fel Iron - Group 14'),
-(@POOLMOTHER+14, 1, 'Zangarmarsh - Fel Iron - Group 15'),
-(@POOLMOTHER+15, 1, 'Zangarmarsh - Fel Iron - Group 16'),
-(@POOLMOTHER+16, 1, 'Zangarmarsh - Fel Iron - Group 17'),
-(@POOLMOTHER+17, 1, 'Zangarmarsh - Fel Iron - Group 18'),
-(@POOLMOTHER+18, 2, 'Zangarmarsh - Fel Iron - Small Lakes');
+(@POOLMOTHER+0 , 1, 'Zangarmarsh - Fel Iron Deposit - Group 1'),
+(@POOLMOTHER+1 , 1, 'Zangarmarsh - Fel Iron Deposit - Group 2'),
+(@POOLMOTHER+2 , 1, 'Zangarmarsh - Fel Iron Deposit - Group 3'),
+(@POOLMOTHER+3 , 1, 'Zangarmarsh - Fel Iron Deposit - Group 4'),
+(@POOLMOTHER+4 , 2, 'Zangarmarsh - Fel Iron Deposit - Group 5'),
+(@POOLMOTHER+5 , 1, 'Zangarmarsh - Fel Iron Deposit - Group 6'),
+(@POOLMOTHER+6 , 1, 'Zangarmarsh - Fel Iron Deposit - Group 7'),
+(@POOLMOTHER+7 , 1, 'Zangarmarsh - Fel Iron Deposit - Group 8'),
+(@POOLMOTHER+8 , 1, 'Zangarmarsh - Fel Iron Deposit - Group 9'),
+(@POOLMOTHER+9 , 1, 'Zangarmarsh - Fel Iron Deposit - Group 10'),
+(@POOLMOTHER+10, 1, 'Zangarmarsh - Fel Iron Deposit - Group 11'),
+(@POOLMOTHER+11, 2, 'Zangarmarsh - Fel Iron Deposit - Group 12'),
+(@POOLMOTHER+12, 1, 'Zangarmarsh - Fel Iron Deposit - Group 13'),
+(@POOLMOTHER+13, 1, 'Zangarmarsh - Fel Iron Deposit - Group 14'),
+(@POOLMOTHER+14, 1, 'Zangarmarsh - Fel Iron Deposit - Group 15'),
+(@POOLMOTHER+15, 1, 'Zangarmarsh - Fel Iron Deposit - Group 16'),
+(@POOLMOTHER+16, 1, 'Zangarmarsh - Fel Iron Deposit - Group 17'),
+(@POOLMOTHER+17, 1, 'Zangarmarsh - Fel Iron Deposit - Group 18'),
+(@POOLMOTHER+18, 2, 'Zangarmarsh - Fel Iron Deposit - Small Lakes');
 
-DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOL+0 AND @POOL+76 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+17;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Zangarmarsh - Fel Iron Deposit%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+76 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+17;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 -- Zangarmarsh Fel Iron Deposit - Group 1
 (@POOL+0, @POOLMOTHER+0, 0, 'Zangarmarsh - Fel Iron Deposit - Group 1'),
@@ -129,7 +129,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 -- Zangarmarsh Fel Iron Deposit - Group 18
 (@POOL+75, @POOLMOTHER+17, 0, 'Zangarmarsh - Fel Iron Deposit - Group 18'),
 (@POOL+76, @POOLMOTHER+17, 0, 'Zangarmarsh - Fel Iron Deposit - Group 18');
-DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOLMOTHER+14 AND @POOLMOTHER+17 AND `mother_pool`=@POOLMOTHER+18;
+DELETE FROM `pool_pool` WHERE `description`='Zangarmarsh - Fel Iron Deposit - Small Lakes' AND `pool_id` BETWEEN @POOLMOTHER+14 AND @POOLMOTHER+17 AND `mother_pool`=@POOLMOTHER+18;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 -- Small Lakes share 2 spawns
 (@POOLMOTHER+14, @POOLMOTHER+18, 0, 'Zangarmarsh - Fel Iron Deposit - Small Lakes'),
@@ -217,7 +217,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL+75, 1, 'Zangarmarsh - Fel Iron Deposit / Khorium Vein'),
 (@POOL+76, 1, 'Zangarmarsh - Fel Iron Deposit / Khorium Vein');
 
-DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @GUID+0 AND @GUID+153 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+76;
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Zangarmarsh%' AND `guid` BETWEEN @GUID+0 AND @GUID+153 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+76;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+0  , @POOL+0 , 0, 'Fel Iron Deposit - Zangarmarsh'),
 (@GUID+2  , @POOL+1 , 0, 'Fel Iron Deposit - Zangarmarsh'),
@@ -375,7 +375,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@GUID+151, @POOL+75, 2, 'Khorium for Fel Iron - Zangarmarsh'),
 (@GUID+153, @POOL+76, 2, 'Khorium for Fel Iron - Zangarmarsh');
 
-DELETE FROM `gameobject` WHERE `map`=530 AND `id` IN (181555, 181557) AND `guid` BETWEEN @GUID+0 AND @GUID+153;
+DELETE FROM `gameobject` WHERE `map`=530 AND `ZoneId`=3521 AND `id` IN (181555, 181557) AND `guid` BETWEEN @GUID+0 AND @GUID+153;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES 
 (@GUID+0  , 181555, 530, 3521, 0, 1, 1, -1104.46, 5134.89, 21.8253, 0.977383, 0, 0, 0, 0, 3600, 255, 1, '', 0),
 (@GUID+2  , 181555, 530, 3521, 0, 1, 1, -606.227, 5284.04, 21.1394, 0.471239, 0, 0, 0, 0, 3600, 255, 1, '', 0),
@@ -534,29 +534,28 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+153, 181557, 530, 3521, 0, 1, 1, 287.996, 8765.14, -4.13529, 0.453786, 0, 0, 0, 0, 3600, 255, 1, '', 0);
 
 -- Adamantite
+SET @GUID = 101667; -- 84
+SET @POOLMOTHER = 8062; -- 14
+SET @POOL = 12304; -- 42
 
-SET @GUID = 78563; -- 84
-SET @POOLMOTHER = 1182; -- 14
-SET @POOL = 12305; -- 42
-
-DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+13;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Zangarmarsh - Adamantite Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+13;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(@POOLMOTHER+0 , 1, 'Zangarmarsh - Adamantite - Group 1 '),
-(@POOLMOTHER+1 , 1, 'Zangarmarsh - Adamantite - Group 2 '),
-(@POOLMOTHER+2 , 1, 'Zangarmarsh - Adamantite - Group 3 '),
-(@POOLMOTHER+3 , 1, 'Zangarmarsh - Adamantite - Group 4 '),
-(@POOLMOTHER+4 , 1, 'Zangarmarsh - Adamantite - Group 5 '),
-(@POOLMOTHER+5 , 1, 'Zangarmarsh - Adamantite - Group 6 '),
-(@POOLMOTHER+6 , 1, 'Zangarmarsh - Adamantite - Group 7 '),
-(@POOLMOTHER+7 , 1, 'Zangarmarsh - Adamantite - Group 8 '),
-(@POOLMOTHER+8 , 1, 'Zangarmarsh - Adamantite - Group 9 '),
-(@POOLMOTHER+9 , 1, 'Zangarmarsh - Adamantite - Group 10'),
-(@POOLMOTHER+10, 1, 'Zangarmarsh - Adamantite - Group 11'),
-(@POOLMOTHER+11, 1, 'Zangarmarsh - Adamantite - Group 12'),
-(@POOLMOTHER+12, 1, 'Zangarmarsh - Adamantite - Group 13'),
-(@POOLMOTHER+13, 1, 'Zangarmarsh - Adamantite - Small Lake Groups');
+(@POOLMOTHER+0 , 1, 'Zangarmarsh - Adamantite Deposit - Group 1 '),
+(@POOLMOTHER+1 , 1, 'Zangarmarsh - Adamantite Deposit - Group 2 '),
+(@POOLMOTHER+2 , 1, 'Zangarmarsh - Adamantite Deposit - Group 3 '),
+(@POOLMOTHER+3 , 1, 'Zangarmarsh - Adamantite Deposit - Group 4 '),
+(@POOLMOTHER+4 , 1, 'Zangarmarsh - Adamantite Deposit - Group 5 '),
+(@POOLMOTHER+5 , 1, 'Zangarmarsh - Adamantite Deposit - Group 6 '),
+(@POOLMOTHER+6 , 1, 'Zangarmarsh - Adamantite Deposit - Group 7 '),
+(@POOLMOTHER+7 , 1, 'Zangarmarsh - Adamantite Deposit - Group 8 '),
+(@POOLMOTHER+8 , 1, 'Zangarmarsh - Adamantite Deposit - Group 9 '),
+(@POOLMOTHER+9 , 1, 'Zangarmarsh - Adamantite Deposit - Group 10'),
+(@POOLMOTHER+10, 1, 'Zangarmarsh - Adamantite Deposit - Group 11'),
+(@POOLMOTHER+11, 1, 'Zangarmarsh - Adamantite Deposit - Group 12'),
+(@POOLMOTHER+12, 1, 'Zangarmarsh - Adamantite Deposit - Group 13'),
+(@POOLMOTHER+13, 1, 'Zangarmarsh - Adamantite Deposit - Small Lake Groups');
 
-DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOL+0 AND @POOL+41 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+12;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Zangarmarsh - Adamantite Deposit%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+41 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+12;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 -- Zangarmarsh Adamantite Deposit - Group 1
 (@POOL+0, @POOLMOTHER+0, 0, 'Zangarmarsh - Adamantite Deposit - Group 1'),
@@ -613,7 +612,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 (@POOL+40, @POOLMOTHER+11, 0, 'Zangarmarsh - Adamantite Deposit - Group 12'),
 -- Zangarmarsh Adamantite Deposit - Group 13
 (@POOL+41, @POOLMOTHER+12, 0, 'Zangarmarsh - Adamantite Deposit - Group 13');
-DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOLMOTHER+9 AND @POOLMOTHER+12 AND `mother_pool`=@POOLMOTHER+13;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Zangarmarsh - Adamantite Deposit%' AND `pool_id` BETWEEN @POOLMOTHER+9 AND @POOLMOTHER+12 AND `mother_pool`=@POOLMOTHER+13;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 -- Zangarmarsh Adamantite Deposit - Small Lake Groups
 (@POOLMOTHER+9, @POOLMOTHER+13, 0, 'Zangarmarsh - Adamantite Deposit - Small Lake Groups'),
@@ -666,7 +665,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL+40, 1, 'Zangarmarsh - Adamantite Deposit / Khorium Vein'),
 (@POOL+41, 1, 'Zangarmarsh - Adamantite Deposit / Khorium Vein');
 
-DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @GUID+0 AND @GUID+83 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+41;
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Zangarmarsh%' AND `guid` BETWEEN @GUID+0 AND @GUID+83 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+41;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+0 , @POOL+0 , 0, 'Adamantite Deposit - Zangarmarsh'),
 (@GUID+2 , @POOL+1 , 0, 'Adamantite Deposit - Zangarmarsh'),
@@ -854,10 +853,10 @@ UPDATE `gameobject` SET `position_z`=9.923596 WHERE `guid`=40624;
 DELETE FROM `pool_template` WHERE `entry` IN (975, 977);
 DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (975, 977);
 
-SET @POOLMOTHER=1196;
-SET @GUID=78647;
+SET @POOLMOTHER=8076;
+SET @GUID=101751;
 
-DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+22;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Zangarmarsh%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+22;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 -- Ghost Mushroom
 (@POOLMOTHER+0 , 3, 'Zangarmarsh - Ghost Mushroom - Funggor Cavern'),
@@ -891,7 +890,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+21, 5, 'Zangarmarsh - Blindweed - Group West'),
 (@POOLMOTHER+22, 5, 'Zangarmarsh - Blindweed - Group East');
 
-DELETE FROM `pool_gameobject` WHERE `pool_entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+22;
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Zangarmarsh%' AND `pool_entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+22;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 -- Ghost Mushroom
 -- SOUTH CAVE
