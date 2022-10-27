@@ -2282,6 +2282,11 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                 }
             }
 
+            if (subject.empty())
+                subject = reward->subject;
+            if (text.empty())
+                text = reward->text;
+
             draft = MailDraft(subject, text);
         }
 
