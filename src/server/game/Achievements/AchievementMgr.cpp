@@ -2273,7 +2273,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
             std::string text = reward->text;
 
             LocaleConstant localeConstant = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
-            if (localeConstant != LOCALE_enUS)
+            if (localeConstant != DEFAULT_LOCALE)
             {
                 if(AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
                 {
@@ -2970,7 +2970,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
         }
 
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         AchievementRewardLocale& data = m_achievementRewardLocales[ID];
