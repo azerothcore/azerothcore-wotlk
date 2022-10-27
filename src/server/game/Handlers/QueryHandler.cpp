@@ -176,7 +176,7 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recvData)
         CastBarCaption = info->castBarCaption;
 
         LocaleConstant localeConstant = GetSessionDbLocaleIndex();
-        if (localeConstant >= LOCALE_enUS)
+        if (localeConstant != DEFAULT_LOCALE)
             if (GameObjectLocale const* gameObjectLocale = sObjectMgr->GetGameObjectLocale(entry))
             {
                 ObjectMgr::GetLocaleString(gameObjectLocale->Name, localeConstant, Name);
