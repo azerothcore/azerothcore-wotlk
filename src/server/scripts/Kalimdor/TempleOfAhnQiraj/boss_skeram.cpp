@@ -134,6 +134,8 @@ struct boss_skeram : public BossAI
         {
             _JustDied();
             Talk(SAY_DEATH);
+            if (me->GetMap() && me->GetMap()->ToInstanceMap())
+                me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
         }
         else
             me->RemoveCorpse();
