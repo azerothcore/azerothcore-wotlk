@@ -5,11 +5,11 @@ DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (11706, 11707, 11708);
 DELETE FROM `gameobject` WHERE `id` IN (181555, 181556, 181557, 181569, 181570) AND `guid` IN (14106,14127,14142,14215,14226,15092,21848,21849,21850,21851,21852,21853,21854,21855,21856,21857,21873,21874,21875,21876,21877,21878,21879,21880,21881,21917,21919,21920,28130,28164,28196,28211,28212,28216,28318,28329,28417,28489,29719,30545,32471,40243,40244,40245,40246,40247,40248,40249,40250,40251,40252,40253,40254,40256,40257,40258,40259,40265,40266,40267,40268,40269,40270,40272,40273,40274,40275,40276,40277,40278,40279,40280,40281,40282,40283,40284,40285,40286,40287,40288,40289,42269,42299,42341,42370,42377,42378,42380,42386,42408,61457,61463,61465,61466,61733,61883,61885,61909,61920,61924,61925,61937,61948,61950,61953,61955,61956,61957,64881,64882,64887,120195,120225,120226,120232,120233,120238,120575,120750,120764,14124,61966);
 
 -- Fel Iron Deposit
-SET @GUID = 78660; -- 120
-SET @POOLMOTHER = 1219; -- 12
-SET @POOL = 12347; -- 60
+SET @GUID = 101764; -- 120
+SET @POOLMOTHER = 8099; -- 12
+SET @POOL = 12346; -- 60
 
-DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+11;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Terokkar Forest - Fel Iron Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+11;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0 , 1, 'Terokkar Forest - Fel Iron Deposit - Group 1 '),
 (@POOLMOTHER+1 , 1, 'Terokkar Forest - Fel Iron Deposit - Group 2 '),
@@ -24,7 +24,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+10, 1, 'Terokkar Forest - Fel Iron Deposit - Group 11'),
 (@POOLMOTHER+11, 1, 'Terokkar Forest - Fel Iron Deposit - Group 12');
 
-DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOL+0 AND @POOL+59 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+11;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Terokkar Forest - Fel Iron Deposit%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+59 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+11;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 -- Terokkar Forest Fel Iron Deposit GROUP 1 
 (@POOL+0, @POOLMOTHER+0, 0, 'Terokkar Forest - Fel Iron Deposit - Group 1'),
@@ -162,7 +162,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL+58, 1, 'Terokkar Forest - Fel Iron Deposit / Khorium Vein'),
 (@POOL+59, 1, 'Terokkar Forest - Fel Iron Deposit / Khorium Vein');
 
-DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @GUID+0 AND @GUID+119 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+59;
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Terokkar Forest%' AND `guid` BETWEEN @GUID+0 AND @GUID+119 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+59;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+0  , @POOL+0 , 0, 'Fel Iron Deposit - Terokkar Forest'),
 (@GUID+2  , @POOL+1 , 0, 'Fel Iron Deposit - Terokkar Forest'),
@@ -285,7 +285,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@GUID+117, @POOL+58, 2, 'Khorium for Fel Iron - Terokkar Forest'),
 (@GUID+119, @POOL+59, 2, 'Khorium for Fel Iron - Terokkar Forest');
 
-DELETE FROM `gameobject` WHERE `map`=530 AND `id` IN (181555, 181557) AND `guid` BETWEEN @GUID+0 AND @GUID+119;
+DELETE FROM `gameobject` WHERE `map`=530 AND `ZoneId`=3519 AND `id` IN (181555, 181557) AND `guid` BETWEEN @GUID+0 AND @GUID+119;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (@GUID+0  , 181555, 530, 3519, 0, 1, 1, -1316.37, 5294.51, 51.2865, 1.6057, 0, 0, 0, 0, 3600, 255, 1, '', 0),
 (@GUID+2  , 181555, 530, 3519, 0, 1, 1, -1220.5, 5175.53, 65.2973, 2.54818, 0, 0, 0.956305, 0.292372, 3600, 255, 1, '', 0),
@@ -410,11 +410,11 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+119, 181557, 530, 3519, 0, 1, 1, -2306.47, 5454.43, 5.74422, -1.76278, 0, 0, 0, 0, 3600, 255, 1, '', 0);
 
 -- Adamantite
-SET @GUID = 78780; -- 98
-SET @POOLMOTHER = 1231; -- 11
-SET @POOL = 12407; -- 49
+SET @GUID = 101884; -- 98
+SET @POOLMOTHER = 8111; -- 11
+SET @POOL = 12406; -- 49
 
-DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+10;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Terokkar Forest - Adamantite Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+10;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0 , 1, 'Terokkar Forest - Adamantite Deposit - Group 1 '),
 (@POOLMOTHER+1 , 1, 'Terokkar Forest - Adamantite Deposit - Group 2 '),
@@ -428,7 +428,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+9 , 1, 'Terokkar Forest - Adamantite Deposit - Group 10'),
 (@POOLMOTHER+10, 1, 'Terokkar Forest - Adamantite Deposit - Group 11');
 
-DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOL+0 AND @POOL+48 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+10;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Terokkar Forest - Adamantite Deposit%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+48 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+10;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 -- Terokkar Forest Adamantite Deposit - GROUP 1
 (@POOL+0, @POOLMOTHER+0, 0, 'Terokkar Forest - Adamantite Deposit - Group 1'),
@@ -543,7 +543,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL+47, 1, 'Terokkar Forest - Adamantite Deposit / Khorium Vein'),
 (@POOL+48, 1, 'Terokkar Forest - Adamantite Deposit / Khorium Vein');
 
-DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @GUID+0 AND @GUID+97 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+48;
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Terokkar Forest%' AND `guid` BETWEEN @GUID+0 AND @GUID+97 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+48;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+0 , @POOL+0 , 0, 'Adamantite Deposit - Terokkar Forest'),
 (@GUID+2 , @POOL+1 , 0, 'Adamantite Deposit - Terokkar Forest'),
@@ -644,7 +644,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@GUID+95, @POOL+47, 3, 'Khorium for Adamantite - Terokkar Forest'),
 (@GUID+97, @POOL+48, 3, 'Khorium for Adamantite - Terokkar Forest');
 
-DELETE FROM `gameobject` WHERE `map`=530 AND `id` IN (181556, 181557) AND `guid` BETWEEN @GUID+0 AND @GUID+97;
+DELETE FROM `gameobject` WHERE `map`=530 AND `ZoneId`=3519 AND `id` IN (181556, 181557) AND `guid` BETWEEN @GUID+0 AND @GUID+97;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (@GUID+0 , 181556, 530, 3519, 0, 1, 1, -1505.07, 4593.05, 27.4576, -2.07694, 0, 0, 0, 0, 3600, 255, 1, '', 0),
 (@GUID+2 , 181556, 530, 3519, 0, 1, 1, -1414.66, 4610.82, 44.1812, -2.80997, 0, 0, 0, 0, 3600, 255, 1, '', 0),
@@ -747,80 +747,80 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+97, 181557, 530, 3519, 0, 1, 1, -2714.58, 5510.92, 31.1673, 5.98648, 0, 0, -0.147809, 0.989016, 3600, 255, 1, '', 0);
 
 -- Rich Adamantite
-SET @GUID = 78878; -- 72
-SET @POOLMOTHER = 1242; -- 6
-SET @POOL = 12456; -- 24
+SET @GUID = 101982; -- 72
+SET @POOLMOTHER = 8122; -- 6
+SET @POOL = 12455; -- 24
 
-DELETE FROM `pool_template` WHERE `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+5;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Terokkar Forest - Adamantite / Khorium / Rich%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+5;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(@POOLMOTHER+0, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 12'),
-(@POOLMOTHER+1, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 13'),
-(@POOLMOTHER+2, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 14'),
-(@POOLMOTHER+3, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 15'),
-(@POOLMOTHER+4, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 16'),
-(@POOLMOTHER+5, 1, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 17');
+(@POOLMOTHER+0, 1, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 12'),
+(@POOLMOTHER+1, 1, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 13'),
+(@POOLMOTHER+2, 1, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 14'),
+(@POOLMOTHER+3, 1, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 15'),
+(@POOLMOTHER+4, 1, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 16'),
+(@POOLMOTHER+5, 1, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 17');
 
-DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOL+0 AND @POOL+23 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+5;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Terokkar Forest - Adamantite / Khorium / Rich%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+23 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+5;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
--- Terokkar Forest - Adamantite / Rich / Khorium - Group 12
-(@POOL+0, @POOLMOTHER+0, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 12'),
-(@POOL+1, @POOLMOTHER+0, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 12'),
-(@POOL+2, @POOLMOTHER+0, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 12'),
-(@POOL+3, @POOLMOTHER+0, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 12'),
--- Terokkar Forest - Adamantite / Rich / Khorium - Group 13
-(@POOL+4, @POOLMOTHER+1, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 13'),
-(@POOL+5, @POOLMOTHER+1, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 13'),
-(@POOL+6, @POOLMOTHER+1, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 13'),
-(@POOL+7, @POOLMOTHER+1, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 13'),
--- Terokkar Forest - Adamantite / Rich / Khorium - Group 14
-(@POOL+8 , @POOLMOTHER+2, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 14'),
-(@POOL+9 , @POOLMOTHER+2, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 14'),
-(@POOL+10, @POOLMOTHER+2, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 14'),
-(@POOL+11, @POOLMOTHER+2, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 14'),
--- Terokkar Forest - Adamantite / Rich / Khorium - Group 15
-(@POOL+12, @POOLMOTHER+3, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 15'),
-(@POOL+13, @POOLMOTHER+3, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 15'),
-(@POOL+14, @POOLMOTHER+3, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 15'),
-(@POOL+15, @POOLMOTHER+3, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 15'),
--- Terokkar Forest - Adamantite / Rich / Khorium - Group 16
-(@POOL+16, @POOLMOTHER+4, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 16'),
-(@POOL+17, @POOLMOTHER+4, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 16'),
-(@POOL+18, @POOLMOTHER+4, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 16'),
-(@POOL+19, @POOLMOTHER+4, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 16'),
--- Terokkar Forest - Adamantite / Rich / Khorium - Group 17
-(@POOL+20, @POOLMOTHER+5, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 17'),
-(@POOL+21, @POOLMOTHER+5, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 17'),
-(@POOL+22, @POOLMOTHER+5, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 17'),
-(@POOL+23, @POOLMOTHER+5, 0, 'Terokkar Forest - Adamantite / Rich / Khorium - Group 17');
+-- Terokkar Forest - Adamantite / Khorium / Rich - Group 12
+(@POOL+0, @POOLMOTHER+0, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 12'),
+(@POOL+1, @POOLMOTHER+0, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 12'),
+(@POOL+2, @POOLMOTHER+0, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 12'),
+(@POOL+3, @POOLMOTHER+0, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 12'),
+-- Terokkar Forest - Adamantite / Khorium / Rich - Group 13
+(@POOL+4, @POOLMOTHER+1, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 13'),
+(@POOL+5, @POOLMOTHER+1, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 13'),
+(@POOL+6, @POOLMOTHER+1, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 13'),
+(@POOL+7, @POOLMOTHER+1, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 13'),
+-- Terokkar Forest - Adamantite / Khorium / Rich - Group 14
+(@POOL+8 , @POOLMOTHER+2, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 14'),
+(@POOL+9 , @POOLMOTHER+2, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 14'),
+(@POOL+10, @POOLMOTHER+2, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 14'),
+(@POOL+11, @POOLMOTHER+2, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 14'),
+-- Terokkar Forest - Adamantite / Khorium / Rich - Group 15
+(@POOL+12, @POOLMOTHER+3, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 15'),
+(@POOL+13, @POOLMOTHER+3, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 15'),
+(@POOL+14, @POOLMOTHER+3, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 15'),
+(@POOL+15, @POOLMOTHER+3, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 15'),
+-- Terokkar Forest - Adamantite / Khorium / Rich - Group 16
+(@POOL+16, @POOLMOTHER+4, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 16'),
+(@POOL+17, @POOLMOTHER+4, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 16'),
+(@POOL+18, @POOLMOTHER+4, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 16'),
+(@POOL+19, @POOLMOTHER+4, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 16'),
+-- Terokkar Forest - Adamantite / Khorium / Rich - Group 17
+(@POOL+20, @POOLMOTHER+5, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 17'),
+(@POOL+21, @POOLMOTHER+5, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 17'),
+(@POOL+22, @POOLMOTHER+5, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 17'),
+(@POOL+23, @POOLMOTHER+5, 0, 'Terokkar Forest - Adamantite / Khorium / Rich - Group 17');
 
-DELETE FROM `pool_template` WHERE `description`='Terokkar Forest - Adamantite / Rich / Khorium' AND `entry` BETWEEN @POOL+0 AND @POOL+23;
+DELETE FROM `pool_template` WHERE `description`='Terokkar Forest - Adamantite / Khorium / Rich' AND `entry` BETWEEN @POOL+0 AND @POOL+23;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(@POOL+0 , 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+1 , 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+2 , 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+3 , 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+4 , 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+5 , 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+6 , 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+7 , 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+8 , 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+9 , 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+10, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+11, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+12, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+13, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+14, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+15, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+16, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+17, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+18, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+19, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+20, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+21, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+22, 1, 'Terokkar Forest - Adamantite / Rich / Khorium'),
-(@POOL+23, 1, 'Terokkar Forest - Adamantite / Rich / Khorium');
+(@POOL+0 , 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+1 , 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+2 , 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+3 , 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+4 , 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+5 , 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+6 , 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+7 , 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+8 , 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+9 , 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+10, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+11, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+12, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+13, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+14, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+15, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+16, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+17, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+18, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+19, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+20, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+21, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+22, 1, 'Terokkar Forest - Adamantite / Khorium / Rich'),
+(@POOL+23, 1, 'Terokkar Forest - Adamantite / Khorium / Rich');
 
-DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @GUID+0 AND @GUID+71 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+23;
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Terokkar Forest%' AND `guid` BETWEEN @GUID+0 AND @GUID+71 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+23;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+0 , @POOL+0 , 0, 'Adamantite Deposit - Terokkar Forest'),
 (@GUID+3 , @POOL+1 , 0, 'Adamantite Deposit - Terokkar Forest'),
@@ -895,7 +895,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@GUID+68, @POOL+22, 30, 'Rich Adamantite Deposit - Terokkar Forest'),
 (@GUID+71, @POOL+23, 30, 'Rich Adamantite Deposit - Terokkar Forest');
 
-DELETE FROM `gameobject` WHERE `map`=530 AND `id` IN (181556, 181557, 181569) AND `guid` BETWEEN @GUID+0 AND @GUID+71;
+DELETE FROM `gameobject` WHERE `map`=530 AND `ZoneId`=3519 AND `id` IN (181556, 181557, 181569) AND `guid` BETWEEN @GUID+0 AND @GUID+71;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (@GUID+0 , 181556, 530, 3519, 3679, 1, 1, -3360.89, 3704.55, 280.923, 2.21657, 0, 0, 0.894934, 0.446199, 3600, 255, 1, '', 0),
 (@GUID+3 , 181556, 530, 3519, 3679, 1, 1, -3592.54, 3706.81, 287.893, 2.05949, 0, 0, 0.857167, 0.515038, 3600, 255, 1, '', 0),
@@ -1002,8 +1002,8 @@ UPDATE `gameobject` SET `position_z`=-25.392063 WHERE `guid`=40335;
 UPDATE `gameobject` SET `position_z`=-66.691635 WHERE `guid`=40337;
 UPDATE `gameobject` SET `position_z`=186.785126 WHERE `guid`=40263;
 
-SET @POOLMOTHER=1248; -- 19
-SET @GUID=40005; -- 5
+SET @POOLMOTHER=8128; -- 19
+SET @GUID=102054; -- 5
 
 DELETE FROM `pool_template` WHERE `description` LIKE '%Terokkar Forest%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+18;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
@@ -1299,7 +1299,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (87161, @POOLMOTHER+18, 0, 'Mana Thistle - Terokkar Forest'),
 (28332, @POOLMOTHER+18, 0, 'Mana Thistle - Terokkar Forest');
 
-DELETE FROM `gameobject` WHERE `map`=530 AND `id` IN (181277, 181270) AND `guid` BETWEEN @GUID+0 AND @GUID+4;
+DELETE FROM `gameobject` WHERE `map`=530 AND `ZoneId`=3519 AND `id` IN (181277, 181270) AND `guid` BETWEEN @GUID+0 AND @GUID+4;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (@GUID+0, 181277, 530, 3519, 0, 1, 1, -1501.82, 4716.46, -4.37548, 2.63544, 0, 0, 0, 0, 90, 100, 1, '', 0),
 (@GUID+1, 181277, 530, 3519, 0, 1, 1, -2432.15, 3471.92, -14.897, -0.331611, 0, 0, 0, 0, 90, 100, 1, '', 0),
