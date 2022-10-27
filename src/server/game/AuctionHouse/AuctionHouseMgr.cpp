@@ -111,9 +111,9 @@ static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrde
                 }
 
                 if (leftName.empty())
-                    protoLeft->Name1;
+                    leftName = protoLeft->Name1;
                 if (rightName.empty())
-                    protoRight->Name1;
+                    rightName = protoRight->Name1;
 
                 int result = leftName.compare(rightName);
                 if (result == 0)
