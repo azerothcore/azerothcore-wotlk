@@ -93,7 +93,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         {
             if (Creature* cOwner2 = owner->ToCreature())
             {
-                cOwner2->SetCannotReachTarget(i_path && i_path->GetPathType() & PATHFIND_INCOMPLETE ? target->GetGUID() : ObjectGuid::Empty);
+                cOwner2->SetCannotReachTarget();
             }
 
             i_recalculateTravel = false;
