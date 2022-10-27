@@ -6633,6 +6633,9 @@ void Player::PrettyPrintRequirementsQuestList(const std::vector<const Progressio
             ObjectMgr::GetLocaleString(questLocale->Title, loc_idx, questTitle);
         }
 
+        if (questTitle.empty())
+            questTitle = questTemplate->GetTitle();
+
         std::stringstream stream;
         stream << "|cffff7c0a|Hquest:";
         stream << questTemplate->GetQuestId();
@@ -6703,6 +6706,9 @@ void Player::PrettyPrintRequirementsItemsList(const std::vector<const Progressio
         {
             ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
         }
+
+        if (name.empty())
+            name = itemTemplate->Name1;
 
         std::stringstream stream;
         stream << "|c";
