@@ -301,7 +301,7 @@ ObjectMgr::ObjectMgr():
     _hiPetNumber(1),
     _creatureSpawnId(1),
     _gameObjectSpawnId(1),
-    DBCLocaleIndex(LOCALE_enUS)
+    DBCLocaleIndex(DEFAULT_LOCALE)
 {
     for (uint8 i = 0; i < MAX_CLASSES; ++i)
     {
@@ -406,7 +406,7 @@ void ObjectMgr::LoadCreatureLocales()
         uint32 ID = fields[0].Get<uint32>();
 
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         CreatureLocale& data = _creatureLocaleStore[ID];
@@ -437,7 +437,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
         uint16 OptionID = fields[1].Get<uint16>();
 
         LocaleConstant locale = GetLocaleByName(fields[2].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         GossipMenuItemsLocale& data = _gossipMenuItemsLocaleStore[MAKE_PAIR32(MenuID, OptionID)];
@@ -467,7 +467,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
         uint32 ID = fields[0].Get<uint32>();
 
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         PointOfInterestLocale& data = _pointOfInterestLocaleStore[ID];
@@ -2581,7 +2581,7 @@ void ObjectMgr::LoadItemLocales()
         uint32 ID = fields[0].Get<uint32>();
 
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         ItemLocale& data = _itemLocaleStore[ID];
@@ -3202,7 +3202,7 @@ void ObjectMgr::LoadItemSetNameLocales()
         uint32 ID = fields[0].Get<uint32>();
 
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         ItemSetNameLocale& data = _itemSetNameLocaleStore[ID];
@@ -5053,7 +5053,7 @@ void ObjectMgr::LoadQuestLocales()
         uint32 ID = fields[0].Get<uint32>();
 
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         QuestLocale& data = _questLocaleStore[ID];
@@ -5682,7 +5682,7 @@ void ObjectMgr::LoadPageTextLocales()
         uint32 ID = fields[0].Get<uint32>();
 
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         PageTextLocale& data = _pageTextLocaleStore[ID];
@@ -5933,7 +5933,7 @@ void ObjectMgr::LoadNpcTextLocales()
         uint32 ID = fields[0].Get<uint32>();
 
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         NpcTextLocale& data = _npcTextLocaleStore[ID];
@@ -6243,7 +6243,7 @@ void ObjectMgr::LoadQuestGreetingsLocales()
         std::string localeName = fields[2].Get<std::string>();
 
         LocaleConstant locale = GetLocaleByName(localeName);
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         QuestGreetingLocale& data = _questGreetingLocaleStore[MAKE_PAIR32(type, id)];
@@ -6275,7 +6275,7 @@ void ObjectMgr::LoadQuestOfferRewardLocale()
         std::string localeName = fields[1].Get<std::string>();
 
         LocaleConstant locale = GetLocaleByName(localeName);
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         QuestOfferRewardLocale& data = _questOfferRewardLocaleStore[id];
@@ -6304,7 +6304,7 @@ void ObjectMgr::LoadQuestRequestItemsLocale()
         std::string localeName = fields[1].Get<std::string>();
 
         LocaleConstant locale = GetLocaleByName(localeName);
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         QuestRequestItemsLocale& data = _questRequestItemsLocaleStore[id];
@@ -6942,7 +6942,7 @@ void ObjectMgr::LoadGameObjectLocales()
         uint32 ID = fields[0].Get<uint32>();
 
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         GameObjectLocale& data = _gameObjectLocaleStore[ID];
@@ -9298,7 +9298,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
         }
 
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         AddLocaleString(fields[2].Get<std::string>(), locale, bct->second.MaleText);
