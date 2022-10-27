@@ -129,7 +129,7 @@ World::World()
     m_NextRandomBGReset = 0s;
     m_NextCalendarOldEventsDeletionTime = 0s;
     m_NextGuildReset = 0s;
-    m_defaultDbcLocale = LOCALE_enUS;
+    m_defaultDbcLocale = DEFAULT_LOCALE;
     mail_expire_check_timer = 0s;
     m_isClosed = false;
     m_CleaningFlags = 0;
@@ -2182,7 +2182,7 @@ void World::DetectDBCLang()
     if (m_lang_confid != 255 && m_lang_confid >= TOTAL_LOCALES)
     {
         LOG_ERROR("server.loading", "Incorrect DBC.Locale! Must be >= 0 and < {} (set to 0)", TOTAL_LOCALES);
-        m_lang_confid = LOCALE_enUS;
+        m_lang_confid = DEFAULT_LOCALE;
     }
 
     ChrRacesEntry const* race = sChrRacesStore.LookupEntry(1);
