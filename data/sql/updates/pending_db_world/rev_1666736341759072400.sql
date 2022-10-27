@@ -8,11 +8,11 @@
 DELETE FROM `gameobject` WHERE `id` IN (181555, 181556, 181557, 181569, 181570) AND `guid` IN (20849,20858,21779,21780,21781,21782,21783,21784,21785,21786,21787,21788,21789,21858,21859,21865,21882,21883,21884,21885,21886,21887,21888,21889,21890,21891,21892,21893,21894,21913,21914,21921,27619,28059,28126,28291,28301,28304,32787,40207,40208,40209,40210,40211,40212,40213,40214,40215,40216,40217,40218,40219,40220,40221,40222,40242,42252,42254,42257,42302,42306,42339,42344,42345,42347,42348,42349,42350,42351,42352,42353,42354,42355,42357,42358,42359,42361,42362,42364,42365,42366,42368,42371,42373,120198,120202,120223,120239,120241,120242,120243,120558,120559,120567,120568,120571,120572,120577,120665,120666);
 
 -- Fel Iron Deposit
-SET @GUID = 81187; -- 124
-SET @POOLMOTHER = 1296; -- 7
-SET @POOL = 12681; -- 62
+SET @GUID = 102611; -- 124
+SET @POOLMOTHER = 8176; -- 7
+SET @POOL = 12680; -- 62
 
-DELETE FROM `pool_template` WHERE `description` LIKE '%Blade\'s Edge Mountains%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+6;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Blade\'s Edge Mountains - Fel Iron Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+6;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0, 1, 'Blade\'s Edge Mountains - Fel Iron Deposit - Group 1'),
 (@POOLMOTHER+1, 4, 'Blade\'s Edge Mountains - Fel Iron Deposit - Group 2'),
@@ -22,7 +22,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+5, 3, 'Blade\'s Edge Mountains - Fel Iron Deposit - Group 6'),
 (@POOLMOTHER+6, 1, 'Blade\'s Edge Mountains - Fel Iron Deposit - Group 7');
 
-DELETE FROM `pool_pool` WHERE `description` LIKE '%Blade\'s Edge Mountains%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+61 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+6;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Blade\'s Edge Mountains - Fel Iron Deposit%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+61 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+6;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 (@POOL+0 , @POOLMOTHER+0, 0, 'Blade\'s Edge Mountains - Fel Iron Deposit - Group 1'),
 (@POOL+1 , @POOLMOTHER+0, 0, 'Blade\'s Edge Mountains - Fel Iron Deposit - Group 1'),
@@ -408,11 +408,11 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+123, 181557, 530, 3522, 0, 1, 1, 1613.02, 4712.15, 144.661, 1.50098, 0, 0, 0, 0, 90, 255, 1, '', 0);
 
 -- Adamantite Deposit
-SET @GUID = 81311; -- 182
-SET @POOLMOTHER = 1303; -- 9
-SET @POOL = 12743; -- 91
+SET @GUID = 102735; -- 182
+SET @POOLMOTHER = 8183; -- 9
+SET @POOL = 12742; -- 91
 
-DELETE FROM `pool_template` WHERE `description` LIKE '%Blade\'s Edge Mountains%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+8;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Blade\'s Edge Mountains - Adamantine Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+8;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0, 2, 'Blade\'s Edge Mountains - Adamantine Deposit - Group 1'),
 (@POOLMOTHER+1, 2, 'Blade\'s Edge Mountains - Adamantine Deposit - Group 2'),
@@ -424,7 +424,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+7, 2, 'Blade\'s Edge Mountains - Adamantine Deposit - Group 8'),
 (@POOLMOTHER+8, 1, 'Blade\'s Edge Mountains - Adamantine Deposit - Group 9');
 
-DELETE FROM `pool_pool` WHERE `description` LIKE '%Blade\'s Edge Mountains%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+90 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+8;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Blade\'s Edge Mountains - Adamantite Deposit%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+90 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+8;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 (@POOL+0 , @POOLMOTHER+0, 0, 'Blade\'s Edge Mountains - Adamantite Deposit - Group 1'),
 (@POOL+1 , @POOLMOTHER+0, 0, 'Blade\'s Edge Mountains - Adamantite Deposit - Group 1'),
@@ -984,16 +984,16 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+181, 181557, 530, 3522, 0, 1, 1, 1730.84, 4562.15, 144.356, 2.74017, 0, 0, 0, 0, 90, 255, 1, '', 0);
 
 -- Rich Adamantite Deposit
-SET @GUID = 81493; -- 42
-SET @POOLMOTHER = 1312; -- 2
-SET @POOL = 12834; -- 14
+SET @GUID = 102917; -- 42
+SET @POOLMOTHER = 8192; -- 2
+SET @POOL = 12833; -- 14
 
-DELETE FROM `pool_template` WHERE `description` LIKE '%Blade\'s Edge Mountains%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+1;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Blade\'s Edge Mountains - Rich Adamantite Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+1;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0, 2, 'Blade\'s Edge Mountains - Rich Adamantite Deposit - Group 1'),
 (@POOLMOTHER+1, 2, 'Blade\'s Edge Mountains - Rich Adamantite Deposit - Group 2');
 
-DELETE FROM `pool_pool` WHERE `description` LIKE '%Blade\'s Edge Mountains%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+13 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+1;
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Blade\'s Edge Mountains - Rich Adamantite Deposit%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+13 AND `mother_pool` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+1;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 (@POOL+0 , @POOLMOTHER+0, 0, 'Blade\'s Edge Mountains - Rich Adamantite Deposit - Group 1'),
 (@POOL+1 , @POOLMOTHER+0, 0, 'Blade\'s Edge Mountains - Rich Adamantite Deposit - Group 1'),
@@ -1132,8 +1132,8 @@ DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (978);
 UPDATE `gameobject` SET `position_z`=364.469971 WHERE `guid`=21447;
 UPDATE `gameobject` SET `position_z`=-4.025352 WHERE `guid`=21338;
 
-SET @POOLMOTHER = 1314; -- 19
-SET @GUID = 81535; -- 12
+SET @POOLMOTHER = 8194; -- 19
+SET @GUID = 102959; -- 12
 
 DELETE FROM `pool_template` WHERE `description` LIKE '%Blade\'s Edge Mountains%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+18;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
