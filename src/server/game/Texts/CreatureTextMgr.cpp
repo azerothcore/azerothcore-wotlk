@@ -186,7 +186,7 @@ void CreatureTextMgr::LoadCreatureTextLocales()
         uint32 ID                   = fields[2].Get<uint8>();
 
         LocaleConstant locale = GetLocaleByName(fields[3].Get<std::string>());
-        if (locale == LOCALE_enUS)
+        if (locale == DEFAULT_LOCALE)
             continue;
 
         CreatureTextLocale& data = mLocaleTextMap[CreatureTextId(CreatureId, GroupId, ID)];
