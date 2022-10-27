@@ -415,7 +415,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
         ObjectMgr::GetLocaleString(localeData->Objectives, locale, questObjectives);
         ObjectMgr::GetLocaleString(localeData->AreaDescription, locale, questAreaDescription);
     }
-    
+
     if (questTitle.empty())
         questTitle = quest->GetTitle();
     if (questDetails.empty())
