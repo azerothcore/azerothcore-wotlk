@@ -17464,10 +17464,16 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
     // Xinef: additional check for player auras - only player spells can trigger player proc auras
     // Xinef: skip victim auras
     // Excluded player shoot spells
-    if (!isVictim && GetTypeId() == TYPEID_PLAYER) //spellProto->SpellFamilyName != SPELLFAMILY_GENERIC)
-        if (!(EventProcFlag & (PROC_FLAG_KILL | PROC_FLAG_DEATH)) && procSpell && procSpell->SpellFamilyName == SPELLFAMILY_GENERIC && procSpell->GetCategory() != 76 &&
+    // Excluded player item spells
+    if (!isVictim && IsPlayer() && !(EventProcFlag & (PROC_FLAG_KILL | PROC_FLAG_DEATH)))
+    {
+        if (procSpell && procSpell->SpellFamilyName == SPELLFAMILY_GENERIC && procSpell->GetCategory() != 76 &&
+            (!eventInfo.GetProcSpell() || !eventInfo.GetProcSpell()->m_CastItem) &&
             (!eventInfo.GetTriggerAuraSpell() || eventInfo.GetTriggerAuraSpell()->SpellFamilyName == SPELLFAMILY_GENERIC))
+        {
             return false;
+        }
+    }
 
     // Check spellProcEvent data requirements
     if (!sSpellMgr->IsSpellProcEventCanTriggeredBy(spellProto, spellProcEvent, EventProcFlag, eventInfo, active))

@@ -1139,14 +1139,14 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
             break;
     }
 
-    LoadCreaturesAddon();
-
     uint32 displayID = GetNativeDisplayId();
     if (sObjectMgr->GetCreatureModelRandomGender(&displayID) && !IsTotem())                               // Cancel load if no model defined or if totem
     {
         SetDisplayId(displayID);
         SetNativeDisplayId(displayID);
     }
+
+    LoadCreaturesAddon();
 
     //! Need to be called after LoadCreaturesAddon - MOVEMENTFLAG_HOVER is set there
     m_positionZ += GetHoverHeight();
@@ -2031,11 +2031,15 @@ void Creature::Respawn(bool force)
         setDeathState(JUST_RESPAWNED);
 
         // MDic - Acidmanifesto
-        uint32 displayID = GetNativeDisplayId();
-        if (sObjectMgr->GetCreatureModelRandomGender(&displayID))                                             // Cancel load if no model defined
+        // Do not override transform auras
+        if (GetAuraEffectsByType(SPELL_AURA_TRANSFORM).empty())
         {
-            SetDisplayId(displayID);
-            SetNativeDisplayId(displayID);
+            uint32 displayID = GetNativeDisplayId();
+            if (sObjectMgr->GetCreatureModelRandomGender(&displayID))                                             // Cancel load if no model defined
+            {
+                SetDisplayId(displayID);
+                SetNativeDisplayId(displayID);
+            }
         }
 
         GetMotionMaster()->InitDefault();

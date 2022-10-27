@@ -89,7 +89,7 @@ public:
     void Summon(Creature const* summon) { storage_.push_back(summon->GetGUID()); }
     void Despawn(Creature const* summon) { storage_.remove(summon->GetGUID()); }
     void DespawnEntry(uint32 entry);
-    void DespawnAll();
+    void DespawnAll(uint32 delay = 0);
     bool IsAnyCreatureAlive() const;
     bool IsAnyCreatureWithEntryAlive(uint32 entry) const;
     bool IsAnyCreatureInCombat() const;
