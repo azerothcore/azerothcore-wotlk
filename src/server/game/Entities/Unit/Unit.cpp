@@ -529,6 +529,44 @@ void Unit::Update(uint32 p_time)
 
     UpdateSplineMovement(p_time);
     GetMotionMaster()->UpdateMotion(p_time);
+
+    switch (m_events.ExecuteEvent())
+    {
+        case EVENT_BOSS_THREAT_PULSE:
+        {
+            /* When bosses are engaged or in combat, every 2s a threat pulse
+             * event is called to add missing players to the encounter,
+             * setting them in combat.
+             */
+            if (IsAlive() && IsInCombat())
+            {
+                if (ToCreature()->isRaidBoss())
+                {
+                    int instanceId = GetVictim()->GetInstanceId();
+
+                    auto PlayerList = GetMap()->GetPlayers();
+                    for (auto i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    {
+                        if (Player* groupMember = i->GetSource())
+                        {
+                            if (!groupMember->IsGameMaster() || !groupMember->IsSpectator())
+                            {
+                                if (groupMember->GetInstanceId() == instanceId)
+                                {
+                                    groupMember->SetInCombatWith(this);
+                                    SetInCombatWith(groupMember);
+                                    AddThreat(groupMember, 0.0f);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                m_events.ScheduleEvent(EVENT_BOSS_THREAT_PULSE, 2s);
+            }
+        }
+        break;
+    }
 }
 
 bool Unit::haveOffhandWeapon() const
@@ -13490,6 +13528,11 @@ void Unit::SetImmuneToNPC(bool apply, bool keepCombat)
 
 void Unit::CombatStart(Unit* victim, bool initialAggro)
 {
+    if (!IsPlayer() && !IsPet())
+    {
+        m_events.ScheduleEvent(EVENT_BOSS_THREAT_PULSE, 2s);
+    }
+
     // Xinef: Dont allow to start combat with triggers
     if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsTrigger())
         return;
