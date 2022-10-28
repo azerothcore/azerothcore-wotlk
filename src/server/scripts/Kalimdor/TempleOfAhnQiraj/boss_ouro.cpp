@@ -202,7 +202,10 @@ struct boss_ouro : public BossAI
         _scheduler
             .Schedule(20s, GROUP_EMERGED, [this](TaskContext context)
                 {
-                    DoCastVictim(SPELL_SAND_BLAST);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true))
+                    {
+                        DoCast(target, SPELL_SAND_BLAST);
+                    }
                     context.Repeat();
                 })
             .Schedule(22s, GROUP_EMERGED, [this](TaskContext context)
