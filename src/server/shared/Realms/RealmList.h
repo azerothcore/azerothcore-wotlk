@@ -53,7 +53,7 @@ public:
     void Close();
 
     [[nodiscard]] RealmMap const& GetRealms() const { return _realms; }
-    [[nodiscard]] Realm const* GetRealm(RealmHandle const& id) const;
+    [[nodiscard]] Realm const* GetRealm(RealmHandle const& name) const;
 
     [[nodiscard]] RealmBuildInfo const* GetBuildInfo(uint32 build) const;
 
@@ -63,7 +63,7 @@ private:
 
     void LoadBuildInfo();
     void UpdateRealms(boost::system::error_code const& error);
-    void UpdateRealm(RealmHandle const& id, uint32 build, std::string const& name,
+    void UpdateRealm(uint32 id, uint32 build, RealmHandle const& name,
         boost::asio::ip::address&& address, boost::asio::ip::address&& localAddr, boost::asio::ip::address&& localSubmask,
         uint16 port, uint8 icon, RealmFlags flag, uint8 timezone, AccountTypes allowedSecurityLevel, float population);
 
