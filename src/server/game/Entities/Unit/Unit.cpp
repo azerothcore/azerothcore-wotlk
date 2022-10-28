@@ -542,7 +542,7 @@ void Unit::Update(uint32 p_time)
             {
                 if (ToCreature()->isRaidBoss())
                 {
-                    int instanceId = GetVictim()->GetInstanceId();
+                    uint32 instanceId = GetVictim()->GetInstanceId();
 
                     auto PlayerList = GetMap()->GetPlayers();
                     for (auto i = PlayerList.begin(); i != PlayerList.end(); ++i)
