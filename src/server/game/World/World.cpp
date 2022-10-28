@@ -437,7 +437,7 @@ void World::LoadConfigSettings(bool reload)
     }
 
     // Set realm id and enable db logging
-    sLog->SetRealmId(realm.Id.Realm);
+    sLog->SetRealmId(realm.Id);
 
     sScriptMgr->OnBeforeConfigLoad(reload);
 
@@ -1547,7 +1547,7 @@ void World::SetInitialWorldSettings()
 
     uint32 realm_zone = getIntConfig(CONFIG_REALM_ZONE);
 
-    LoginDatabase.Execute("UPDATE realmlist SET icon = {}, timezone = {} WHERE id = '{}'", server_type, realm_zone, realm.Id.Realm);      // One-time query
+    LoginDatabase.Execute("UPDATE realmlist SET icon = {}, timezone = {} WHERE id = '{}'", server_type, realm_zone, realm.Id);      // One-time query
 
     ///- Custom Hook for loading DB items
     sScriptMgr->OnLoadCustomDatabaseTable();
@@ -2028,7 +2028,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", " ");
 
     LoginDatabase.Execute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES ({}, {}, 0, '{}')",
-                           realm.Id.Realm, uint32(GameTime::GetStartTime().count()), GitRevision::GetFullVersion());       // One-time query
+                           realm.Id, uint32(GameTime::GetStartTime().count()), GitRevision::GetFullVersion());       // One-time query
 
     m_timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
     m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE * IN_MILLISECONDS);
@@ -2453,7 +2453,7 @@ void World::Update(uint32 diff)
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_PLAYERS);
         stmt->SetData(0, uint32(GameTime::GetUptime().count()));
         stmt->SetData(1, uint16(GetMaxPlayerCount()));
-        stmt->SetData(2, realm.Id.Realm);
+        stmt->SetData(2, realm.Id);
         stmt->SetData(3, uint32(GameTime::GetStartTime().count()));
         LoginDatabase.Execute(stmt);
     }
@@ -3079,7 +3079,7 @@ void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount)
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
         stmt->SetData(0, charCount);
         stmt->SetData(1, accountId);
-        stmt->SetData(2, realm.Id.Realm);
+        stmt->SetData(2, realm.Id);
         trans->Append(stmt);
 
         LoginDatabase.CommitTransaction(trans);
@@ -3182,7 +3182,7 @@ void World::ResetDailyQuests()
 void World::LoadDBAllowedSecurityLevel()
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REALMLIST_SECURITY_LEVEL);
-    stmt->SetData(0, int32(realm.Id.Realm));
+    stmt->SetData(0, int32(realm.Id));
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
     if (result)
