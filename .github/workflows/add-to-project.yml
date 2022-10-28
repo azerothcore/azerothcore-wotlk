@@ -11,7 +11,7 @@ jobs:
     name: Add issue to project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@v0.3.0
+      - uses: actions/add-to-project@v0.0.5
         with:
           project-url: https://github.com/azerothcore/azerothcore-wotlk/projects/14
           github-token: ${{ secrets.GITHUB_TOKEN }}
