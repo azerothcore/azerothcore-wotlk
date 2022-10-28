@@ -262,11 +262,14 @@ struct boss_ouro : public BossAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
-        me->DespawnOrUnsummon(1000);
-        instance->SetBossState(DATA_OURO, FAIL);
-        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
-            base->DespawnOrUnsummon();
+        if (me->GetThreatMgr().GetThreatList().empty())
+        {
+            DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
+            me->DespawnOrUnsummon(1000);
+            instance->SetBossState(DATA_OURO, FAIL);
+            if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
+                base->DespawnOrUnsummon();
+        }
     }
 
     void EnterCombat(Unit* who) override
