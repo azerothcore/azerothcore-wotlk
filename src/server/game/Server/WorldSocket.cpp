@@ -443,7 +443,7 @@ void WorldSocket::HandleAuthSession(WorldPacket & recvPacket)
 
     // Get the account information from the auth database
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO_BY_NAME);
-    stmt->SetData(0, int32(realm.Id.Realm));
+    stmt->SetData(0, int32(realm.Id));
     stmt->SetData(1, authSession->Account);
 
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSocket::HandleAuthSessionCallback, this, authSession, std::placeholders::_1)));
@@ -487,11 +487,11 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
-    if (authSession->RealmID != realm.Id.Realm)
+    if (authSession->RealmID != realm.Id)
     {
         SendAuthResponseError(REALM_LIST_REALM_NOT_FOUND);
         LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client {} requested connecting with realm id {} but this realm has id {} set in config.",
-            GetRemoteIpAddress().to_string(), authSession->RealmID, realm.Id.Realm);
+            GetRemoteIpAddress().to_string(), authSession->RealmID, realm.Id);
         DelayedCloseSocket();
         return;
     }
