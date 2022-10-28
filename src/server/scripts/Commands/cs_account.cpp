@@ -874,7 +874,7 @@ public:
         {
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
             stmt->SetData(0, targetAccountId);
-            stmt->SetData(1, realm.Id.Realm);
+            stmt->SetData(1, realm.Id);
         }
 
         LoginDatabase.Execute(stmt);
