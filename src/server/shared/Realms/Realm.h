@@ -37,13 +37,13 @@ enum RealmFlags
 struct AC_SHARED_API RealmHandle
 {
     RealmHandle()  = default;
-    RealmHandle(uint32 index) : Realm(index) { }
+    RealmHandle(std::string index) : Realm(index) { }
 
-    uint32 Realm{0};   // primary key in `realmlist` table
+    std::string Realm{};   // primary key in `realmlist` table
 
     bool operator<(RealmHandle const& r) const
     {
-        return Realm < r.Realm;
+        return Realm != r.Realm;
     }
 };
 
@@ -65,13 +65,13 @@ enum RealmType
 // Storage object for a realm
 struct AC_SHARED_API Realm
 {
-    RealmHandle Id;
+    uint32 Id;
     uint32 Build;
     std::unique_ptr<boost::asio::ip::address> ExternalAddress;
     std::unique_ptr<boost::asio::ip::address> LocalAddress;
     std::unique_ptr<boost::asio::ip::address> LocalSubnetMask;
     uint16 Port;
-    std::string Name;
+    RealmHandle Name;
     uint8 Type;
     RealmFlags Flags;
     uint8 Timezone;
