@@ -3,8 +3,7 @@ name: Auto Assign to Project(s)
 on:
   issues:
     types: [opened, labeled]
-  issue_comment:
-    types: [created]
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -13,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Assign to One Project
     steps:
+
     - name: Assign issues with `1-19` label to their project
       uses: srggrs/assign-one-project-github-action@1.2.1
       if: |
