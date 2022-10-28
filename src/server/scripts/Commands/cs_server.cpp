@@ -119,13 +119,13 @@ public:
 
         {
             uint16 dbPort = 0;
-            if (QueryResult res = LoginDatabase.Query("SELECT port FROM realmlist WHERE id = {}", realm.Id.Realm))
+            if (QueryResult res = LoginDatabase.Query("SELECT port FROM realmlist WHERE id = {}", realm.Id))
                 dbPort = (*res)[0].Get<uint16>();
 
             if (dbPort)
-                dbPortOutput = Acore::StringFormatFmt("Realmlist (Realm Id: {}) configured in port {}", realm.Id.Realm, dbPort);
+                dbPortOutput = Acore::StringFormatFmt("Realmlist (Realm Id: {}) configured in port {}", realm.Id, dbPort);
             else
-                dbPortOutput = Acore::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
+                dbPortOutput = Acore::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id);
         }
 
         handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
