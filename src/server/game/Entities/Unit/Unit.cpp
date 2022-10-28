@@ -530,7 +530,7 @@ void Unit::Update(uint32 p_time)
     UpdateSplineMovement(p_time);
     GetMotionMaster()->UpdateMotion(p_time);
 
-    switch (m_events.ExecuteEvent())
+    switch (m_combatEvents.ExecuteEvent())
     {
         case EVENT_BOSS_THREAT_PULSE:
         {
@@ -562,7 +562,7 @@ void Unit::Update(uint32 p_time)
                     }
                 }
 
-                m_events.ScheduleEvent(EVENT_BOSS_THREAT_PULSE, 2s);
+                m_combatEvents.ScheduleEvent(EVENT_BOSS_THREAT_PULSE, 2s);
             }
         }
         break;
@@ -13530,7 +13530,7 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
 {
     if (!IsPlayer() && !IsPet())
     {
-        m_events.ScheduleEvent(EVENT_BOSS_THREAT_PULSE, 2s);
+        m_combatEvents.ScheduleEvent(EVENT_BOSS_THREAT_PULSE, 2s);
     }
 
     // Xinef: Dont allow to start combat with triggers

@@ -2584,7 +2584,7 @@ private:
     std::unordered_map<ObjectGuid /*guid*/, uint32 /*count*/> extraAttacksTargets;
     ObjectGuid _lastDamagedTargetGuid;
 
-    EventMap m_events;
+    EventMap m_combatEvents;
 };
 
 namespace Acore
