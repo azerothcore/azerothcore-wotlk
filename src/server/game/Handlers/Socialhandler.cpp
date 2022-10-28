@@ -63,7 +63,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
     TeamId teamId = Player::TeamIdForRace(playerData->Race);
     FriendsResult friendResult = FRIEND_NOT_FOUND;
 
-    if (!AccountMgr::IsPlayerAccount(GetSecurity()) || sWorld->getBoolConfig(CONFIG_ALLOW_GM_FRIEND)|| AccountMgr::IsPlayerAccount(AccountMgr::GetSecurity(friendAccountId, realm.Id.Realm)))
+    if (!AccountMgr::IsPlayerAccount(GetSecurity()) || sWorld->getBoolConfig(CONFIG_ALLOW_GM_FRIEND)|| AccountMgr::IsPlayerAccount(AccountMgr::GetSecurity(friendAccountId, realm.Id)))
     {
         if (friendGuid)
         {
