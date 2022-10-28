@@ -12,6 +12,8 @@ SET @GUID = 102611; -- 124
 SET @POOLMOTHER = 8176; -- 7
 SET @POOL = 12680; -- 62
 
+
+
 DELETE FROM `pool_template` WHERE `description` LIKE '%Blade\'s Edge Mountains - Fel Iron Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+6;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0, 1, 'Blade\'s Edge Mountains - Fel Iron Deposit - Group 1'),
