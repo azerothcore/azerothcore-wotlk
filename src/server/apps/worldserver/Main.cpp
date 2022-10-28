@@ -242,11 +242,11 @@ int main(int argc, char** argv)
     std::shared_ptr<void> dbHandle(nullptr, [](void*) { StopDB(); });
 
     // set server offline (not connectable)
-    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
+    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.Id);
 
     LoadRealmInfo(*ioContext);
 
-    sMetric->Initialize(realm.Name, *ioContext, []()
+    sMetric->Initialize(realm.Name.Realm, *ioContext, []()
     {
         METRIC_VALUE("online_players", sWorld->GetPlayerCount());
         METRIC_VALUE("db_queue_login", uint64(LoginDatabase.QueueSize()));
@@ -330,7 +330,7 @@ int main(int argc, char** argv)
     });
 
     // Set server online (allow connecting now)
-    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag & ~{}, population = 0 WHERE id = '{}'", REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
+    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag & ~{}, population = 0 WHERE id = '{}'", REALM_FLAG_VERSION_MISMATCH, realm.Id);
     realm.PopulationLevel = 0.0f;
     realm.Flags = RealmFlags(realm.Flags & ~uint32(REALM_FLAG_VERSION_MISMATCH));
 
@@ -377,7 +377,7 @@ int main(int argc, char** argv)
     sScriptMgr->OnShutdown();
 
     // set server offline
-    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, realm.Id.Realm);
+    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, realm.Id);
 
     LOG_INFO("server.worldserver", "Halting process...");
 
@@ -405,12 +405,12 @@ bool StartDB()
 
     ///- Get the realm Id from the configuration file
     realm.Id.Realm = sConfigMgr->GetOption<uint32>("RealmID", 0);
-    if (!realm.Id.Realm)
+    if (!realm.Id)
     {
         LOG_ERROR("server.worldserver", "Realm ID not defined in configuration file");
         return false;
     }
-    else if (realm.Id.Realm > 255)
+    else if (realm.Id > 255)
     {
         /*
          * Due to the client only being able to read a realm.Id.Realm
@@ -422,7 +422,7 @@ bool StartDB()
     }
 
     LOG_INFO("server.loading", "Loading World Information...");
-    LOG_INFO("server.loading", "> RealmID:              {}", realm.Id.Realm);
+    LOG_INFO("server.loading", "> RealmID:              {}", realm.Id);
 
     ///- Clean the database before starting
     ClearOnlineAccounts();
@@ -453,7 +453,7 @@ void ClearOnlineAccounts()
 {
     // Reset online status for all accounts with characters on the current realm
     // pussywizard: tc query would set online=0 even if logged in on another realm >_>
-    LoginDatabase.DirectExecute("UPDATE account SET online = 0 WHERE online = {}", realm.Id.Realm);
+    LoginDatabase.DirectExecute("UPDATE account SET online = 0 WHERE online = {}", realm.Id);
 
     // Reset online status for all characters
     CharacterDatabase.DirectExecute("UPDATE characters SET online = 0 WHERE online <> 0");
@@ -614,7 +614,7 @@ AsyncAcceptor* StartRaSocketAcceptor(Acore::Asio::IoContext& ioContext)
 
 bool LoadRealmInfo(Acore::Asio::IoContext& ioContext)
 {
-    QueryResult result = LoginDatabase.Query("SELECT id, name, address, localAddress, localSubnetMask, port, icon, flag, timezone, allowedSecurityLevel, population, gamebuild FROM realmlist WHERE id = {}", realm.Id.Realm);
+    QueryResult result = LoginDatabase.Query("SELECT id, name, address, localAddress, localSubnetMask, port, icon, flag, timezone, allowedSecurityLevel, population, gamebuild FROM realmlist WHERE id = {}", realm.Id);
     if (!result)
         return false;
 
