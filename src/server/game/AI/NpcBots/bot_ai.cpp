@@ -15265,12 +15265,14 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         //Zone / Area / WMOArea
         if (me->IsInWorld())
         {
+            me->SetPositionDataUpdate();
+
             uint32 newzone, newarea;
             me->GetZoneAndAreaId(newzone, newarea);
 
             if (_lastZoneId != newzone)
                 _OnZoneUpdate(newzone, newarea); // also updates area
-            else if (_lastAreaId != newarea)
+            else// if (_lastAreaId != newarea)
                 _OnAreaUpdate(newarea);
 
             if (_wmoAreaUpdateTimer <= diff)
