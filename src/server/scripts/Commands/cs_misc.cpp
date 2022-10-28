@@ -2021,7 +2021,7 @@ public:
 
         // Query the prepared statement for login data
         loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
-        loginStmt->SetData(0, int32(realm.Id.Realm));
+        loginStmt->SetData(0, int32(realm.Id));
         loginStmt->SetData(1, accId);
 
         PreparedQueryResult accInfoResult = LoginDatabase.Query(loginStmt);
