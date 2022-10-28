@@ -1165,6 +1165,7 @@ public:
         bot->GetBotAI()->Reset();
         bot->GetBotAI()->canUpdate = false;
         bot->DeleteFromDB();
+        bot->AddObjectToRemoveList();
 
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ERASE);
 
