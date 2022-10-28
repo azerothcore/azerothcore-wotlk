@@ -1043,12 +1043,17 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 -----------------------------------------------------------------------------------------------------------------------------*/
 
 -- Delete Duplicates
-DELETE FROM `gameobject` WHERE `guid` IN ();
+DELETE FROM `gameobject` WHERE `guid` IN (40077, 40081, 40087, 40082, 40079, 40086, 40071, 40078, 40084, 40072, 40069, 40074, 40068, 40075);
 -- Delete old pools
 DELETE FROM `pool_template` WHERE `entry` IN (974);
 DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (974);
 
-UPDATE `gameobject` SET `position_z`=64.519707 WHERE `guid`=40157;
+UPDATE `gameobject` SET `position_z`=125.395622 WHERE `guid`=40076;
+UPDATE `gameobject` SET `position_z`=130.508102 WHERE `guid`=40045;
+UPDATE `gameobject` SET `position_z`=101.220291 WHERE `guid`=40059;
+UPDATE `gameobject` SET `position_x`=3926.660400, `position_y`=2182.787354, `position_z`=235.389816 WHERE `guid`=40078; -- Usually these are bad nodes. Mangos didn't have a better one, so these coords are custom.
+UPDATE `gameobject` SET `position_z`=232.564056 WHERE `guid`=40052;
+UPDATE `gameobject` SET `position_z`=210.632187 WHERE `guid`=40053;
 
 SET @POOLMOTHER=8164; -- 12
 SET @GUID=102601; -- 10
