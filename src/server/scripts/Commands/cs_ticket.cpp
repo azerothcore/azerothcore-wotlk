@@ -102,7 +102,7 @@ public:
         // Get target information
         ObjectGuid targetGuid = sCharacterCache->GetCharacterGuidByName(target);
         uint32 targetAccountId = sCharacterCache->GetCharacterAccountIdByGuid(targetGuid);
-        uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realm.Id.Realm);
+        uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realm.Id);
 
         // Target must exist and have administrative rights
         if (!targetGuid || AccountMgr::IsPlayerAccount(targetGmLevel))
@@ -400,7 +400,7 @@ public:
         {
             ObjectGuid guid = ticket->GetAssignedToGUID();
             uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
-            security = AccountMgr::GetSecurity(accountId, realm.Id.Realm);
+            security = AccountMgr::GetSecurity(accountId, realm.Id);
         }
 
         // Check security
