@@ -18,6 +18,7 @@
 #ifndef __UNIT_H
 #define __UNIT_H
 
+#include "EventMap.h"
 #include "EventProcessor.h"
 #include "EnumFlag.h"
 #include "FollowerRefMgr.h"
