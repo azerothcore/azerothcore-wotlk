@@ -570,7 +570,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
             stmt->SetData(0, createInfo->CharCount);
             stmt->SetData(1, GetAccountId());
-            stmt->SetData(2, realm.Id.Realm);
+            stmt->SetData(2, realm.Id);
             trans->Append(stmt);
 
             LoginDatabase.CommitTransaction(trans);
@@ -903,7 +903,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     CharacterDatabase.Execute(stmt);
 
     LoginDatabasePreparedStatement* loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_ONLINE);
-    loginStmt->SetData(0, realm.Id.Realm);
+    loginStmt->SetData(0, realm.Id);
     loginStmt->SetData(1, GetAccountId());
     LoginDatabase.Execute(loginStmt);
 
