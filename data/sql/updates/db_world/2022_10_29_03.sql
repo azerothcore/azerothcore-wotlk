@@ -1,3 +1,4 @@
+-- DB update 2022_10_29_02 -> 2022_10_29_03
 --
 -- Lava Spawn (12265)
 DELETE FROM `creature_text` WHERE `CreatureID`=12265;

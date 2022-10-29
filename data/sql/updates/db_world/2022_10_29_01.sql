@@ -1,3 +1,4 @@
+-- DB update 2022_10_29_00 -> 2022_10_29_01
 --
 ALTER TABLE `areatrigger_tavern` ADD COLUMN `faction` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `name`;
 
