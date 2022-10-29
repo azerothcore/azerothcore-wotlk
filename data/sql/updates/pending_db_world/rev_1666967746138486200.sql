@@ -1,9 +1,4 @@
 -- Netherstorm
--- Totals:
--- GUIDs: 124 + 182 + 42 + 12 = 360
--- Pools: 62 + 91 + 14 = 167
--- Mother Pools: 7 + 9 + 2 + 19 = 37
-
 -- DELETE old spawns 
 DELETE FROM `gameobject` WHERE `id` IN (181555, 181556, 181557, 181569, 181570) AND `guid` IN (21842, 21843, 21844, 21845, 21846, 21847, 21866, 21867, 21868, 21869, 21870, 21871, 21872, 21918, 28266, 28267, 28270, 28271, 32777, 32808, 32809, 40025, 40026, 40027, 40028, 40029, 40030, 40031, 40032, 40036, 40037, 40038, 40039, 40040, 40041, 40092, 40093, 40094, 40095, 40096, 40097, 40098, 40099, 40100, 40101, 40102, 40103, 42304, 42305, 42309, 42310, 42312, 42314, 42319, 42320, 42321, 42322, 42323, 42324, 42327, 42329, 42332, 42334, 42336, 42337, 42338, 42340, 120237, 120560, 120566, 120570, 120573, 120576, 120578);
 
@@ -1058,18 +1053,273 @@ UPDATE `gameobject` SET `position_z`=210.632187 WHERE `guid`=40053;
 SET @POOLMOTHER=8164; -- 12
 SET @GUID=102601; -- 10
 
-DELETE FROM `pool_template` WHERE `description` LIKE '%Nagrand%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+11;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Netherstorm%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+24;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(@POOLMOTHER+0 , 7, 'Nagrand - Felweed - Group 1'),
+(@POOLMOTHER+0, 2, 'Netherstorm - Netherbloom - Group 1'),
+(@POOLMOTHER+1, 7, 'Netherstorm - Netherbloom - Group 2'),
+(@POOLMOTHER+2, 5, 'Netherstorm - Netherbloom - Group 3'),
+(@POOLMOTHER+3, 5, 'Netherstorm - Netherbloom - Group 4'),
+(@POOLMOTHER+4, 7, 'Netherstorm - Netherbloom - Group 5'),
+(@POOLMOTHER+5, 4, 'Netherstorm - Netherbloom - Group 6'),
 
-DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Nagrand%' AND `pool_entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+11;
+(@POOLMOTHER+6 , 1, 'Netherstorm - Dreaming Glory - Group 1'),
+(@POOLMOTHER+7 , 3, 'Netherstorm - Dreaming Glory - Group 2'),
+(@POOLMOTHER+8 , 3, 'Netherstorm - Dreaming Glory - Group 3'),
+(@POOLMOTHER+9 , 2, 'Netherstorm - Dreaming Glory - Group 4'),
+(@POOLMOTHER+10, 2, 'Netherstorm - Dreaming Glory - Group 5'),
+(@POOLMOTHER+11, 3, 'Netherstorm - Dreaming Glory - Group 6'),
+(@POOLMOTHER+12, 2, 'Netherstorm - Dreaming Glory - Group 7'),
+
+(@POOLMOTHER+13, 2, 'Netherstorm - Mana Thistle'),
+
+(@POOLMOTHER+14, 1, 'Netherstorm - Eco-Dome Farfield - Felweed'),
+(@POOLMOTHER+15, 1, 'Netherstorm - Eco-Dome Farfield - Dreaming Glory'),
+(@POOLMOTHER+16, 1, 'Netherstorm - Eco-Dome Farfield - Golden Sansam'),
+
+(@POOLMOTHER+17, 3, 'Netherstorm - Eco-Dome Sutheron - Felweed'),
+(@POOLMOTHER+18, 2, 'Netherstorm - Eco-Dome Sutheron - Dreaming Glory'),
+(@POOLMOTHER+19, 2, 'Netherstorm - Eco-Dome Sutheron - Golden Sansam'),
+(@POOLMOTHER+20, 1, 'Netherstorm - Eco-Dome Sutheron - Liferoot'),
+
+(@POOLMOTHER+21, 1, 'Netherstorm - Eco-Dome Midrealm - Felweed'),
+(@POOLMOTHER+22, 2, 'Netherstorm - Eco-Dome Midrealm - Dreaming Glory'),
+(@POOLMOTHER+23, 1, 'Netherstorm - Eco-Dome Midrealm - Golden Sansam'),
+(@POOLMOTHER+24, 1, 'Netherstorm - Eco-Dome Midrealm - Liferoot');
+
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Netherstorm%' AND `pool_entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+24;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
--- FELWEED
+-- Netherbloom
 -- GROUP 1
-(56366  , @POOLMOTHER+0, 0, 'Felweed - Nagrand'),
+(@GUID+0 , @POOLMOTHER+0, 0, 'Netherbloom - Netherstorm'),
+(42211   , @POOLMOTHER+0, 0, 'Netherbloom - Netherstorm'),
+(21581   , @POOLMOTHER+0, 0, 'Netherbloom - Netherstorm'),
+(21580   , @POOLMOTHER+0, 0, 'Netherbloom - Netherstorm'),
+(28263   , @POOLMOTHER+0, 0, 'Netherbloom - Netherstorm'),
+(42166   , @POOLMOTHER+0, 0, 'Netherbloom - Netherstorm'),
+-- GROUP 2
+(28275   , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+1 , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(30844   , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+2 , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(21573   , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(87160   , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+3 , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(40091   , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(40066   , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+4 , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(21574   , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(30856   , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+5 , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+6 , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+7 , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(42222   , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+8 , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+9 , @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+10, @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+(@GUID+11, @POOLMOTHER+1, 0, 'Netherbloom - Netherstorm'),
+-- GROUP 3
+(21577   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(32804   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(42164   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(@GUID+12, @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(42193   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(21578   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(@GUID+13, @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(40073   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(21579   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(@GUID+14, @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(@GUID+15, @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(42195   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(32811   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(@GUID+16, @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(42224   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+(40088   , @POOLMOTHER+2, 0, 'Netherbloom - Netherstorm'),
+-- GROUP 4
+(@GUID+17, @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(40067   , @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(40083   , @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(@GUID+18, @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(@GUID+19, @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(42225   , @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(40065   , @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(21575   , @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(42328   , @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(40090   , @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(@GUID+20, @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(42325   , @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(@GUID+21, @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(21576   , @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+(@GUID+22, @POOLMOTHER+3, 0, 'Netherbloom - Netherstorm'),
+-- GROUP 5
+(87158   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(@GUID+23, @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(42163   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(@GUID+24, @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(21582   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(40070   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(42165   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(@GUID+25, @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(30845   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(21583   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(@GUID+26, @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(@GUID+27, @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(40089   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(21584   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(42231   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(@GUID+28, @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(87159   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(21585   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(42210   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(@GUID+29, @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(42223   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+(40085   , @POOLMOTHER+4, 0, 'Netherbloom - Netherstorm'),
+-- GROUP 6
+(@GUID+30, @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(@GUID+31, @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(@GUID+32, @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(40076   , @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(@GUID+33, @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(@GUID+34, @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(42263   , @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(22233   , @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(@GUID+35, @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(@GUID+36, @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(42213   , @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+(40080   , @POOLMOTHER+5, 0, 'Netherbloom - Netherstorm'),
+-- DREAMING GLORY
+-- GROUP 1
+(22234, @POOLMOTHER+6, 0, 'Dreaming Glory - Netherstorm'),
+(21425, @POOLMOTHER+6, 0, 'Dreaming Glory - Netherstorm'),
+(28268, @POOLMOTHER+6, 0, 'Dreaming Glory - Netherstorm'),
+-- GROUP 2
+(32806, @POOLMOTHER+7, 0, 'Dreaming Glory - Netherstorm'),
+(42232, @POOLMOTHER+7, 0, 'Dreaming Glory - Netherstorm'),
+(21421, @POOLMOTHER+7, 0, 'Dreaming Glory - Netherstorm'),
+(40058, @POOLMOTHER+7, 0, 'Dreaming Glory - Netherstorm'),
+(21420, @POOLMOTHER+7, 0, 'Dreaming Glory - Netherstorm'),
+(42197, @POOLMOTHER+7, 0, 'Dreaming Glory - Netherstorm'),
+(32813, @POOLMOTHER+7, 0, 'Dreaming Glory - Netherstorm'),
+(40053, @POOLMOTHER+7, 0, 'Dreaming Glory - Netherstorm'),
+(21422, @POOLMOTHER+7, 0, 'Dreaming Glory - Netherstorm'),
+-- GROUP 3
+(42317, @POOLMOTHER+8, 0, 'Dreaming Glory - Netherstorm'),
+(40055, @POOLMOTHER+8, 0, 'Dreaming Glory - Netherstorm'),
+(42196, @POOLMOTHER+8, 0, 'Dreaming Glory - Netherstorm'),
+(40050, @POOLMOTHER+8, 0, 'Dreaming Glory - Netherstorm'),
+(40054, @POOLMOTHER+8, 0, 'Dreaming Glory - Netherstorm'),
+(21416, @POOLMOTHER+8, 0, 'Dreaming Glory - Netherstorm'),
+(32781, @POOLMOTHER+8, 0, 'Dreaming Glory - Netherstorm'),
+(21415, @POOLMOTHER+8, 0, 'Dreaming Glory - Netherstorm'),
+-- GROUP 4
+(40059, @POOLMOTHER+9, 0, 'Dreaming Glory - Netherstorm'),
+(40045, @POOLMOTHER+9, 0, 'Dreaming Glory - Netherstorm'),
+(40043, @POOLMOTHER+9, 0, 'Dreaming Glory - Netherstorm'),
+(22232, @POOLMOTHER+9, 0, 'Dreaming Glory - Netherstorm'),
+(42330, @POOLMOTHER+9, 0, 'Dreaming Glory - Netherstorm'),
+(21417, @POOLMOTHER+9, 0, 'Dreaming Glory - Netherstorm'),
+-- GROUP 5
+(21424, @POOLMOTHER+10, 0, 'Dreaming Glory - Netherstorm'),
+(21423, @POOLMOTHER+10, 0, 'Dreaming Glory - Netherstorm'),
+-- GROUP 6
+(21426, @POOLMOTHER+11, 0, 'Dreaming Glory - Netherstorm'),
+(87151, @POOLMOTHER+11, 0, 'Dreaming Glory - Netherstorm'),
+(42194, @POOLMOTHER+11, 0, 'Dreaming Glory - Netherstorm'),
+(40052, @POOLMOTHER+11, 0, 'Dreaming Glory - Netherstorm'),
+(42212, @POOLMOTHER+11, 0, 'Dreaming Glory - Netherstorm'),
+-- GROUP 7
+(40047, @POOLMOTHER+12, 0, 'Dreaming Glory - Netherstorm'),
+(40048, @POOLMOTHER+12, 0, 'Dreaming Glory - Netherstorm'),
+(40049, @POOLMOTHER+12, 0, 'Dreaming Glory - Netherstorm'),
+(42335, @POOLMOTHER+12, 0, 'Dreaming Glory - Netherstorm'),
+(40046, @POOLMOTHER+12, 0, 'Dreaming Glory - Netherstorm'),
+(22231, @POOLMOTHER+12, 0, 'Dreaming Glory - Netherstorm'),
+-- MANA THISTLE
+(21599, @POOLMOTHER+13, 0, 'Mana Thistle - Netherstorm'),
+(21598, @POOLMOTHER+13, 0, 'Mana Thistle - Netherstorm'),
+-- ECO-DOME 1 - FARFIELD
+-- FELWEED
+(40064, @POOLMOTHER+14, 0, 'Felweed - Netherstorm - Eco-Dome Farfield'),
+-- DREAMING GLORY
+(40057, @POOLMOTHER+15, 0, 'Dreaming Glory - Netherstorm - Eco-Dome Farfield'),
+-- GOLDEN SANSAM
+(18943, @POOLMOTHER+16, 0, 'Golden Sansam - Netherstorm - Eco-Dome Farfield'),
+-- ECO-DOME 2 - SUTHERON
+-- FELWEED
+(40060, @POOLMOTHER+17, 0, 'Felweed - Netherstorm - Eco-Dome Sutheron'),
+(21395, @POOLMOTHER+17, 0, 'Felweed - Netherstorm - Eco-Dome Sutheron'),
+(22236, @POOLMOTHER+17, 0, 'Felweed - Netherstorm - Eco-Dome Sutheron'),
+(21396, @POOLMOTHER+17, 0, 'Felweed - Netherstorm - Eco-Dome Sutheron'),
+(85961, @POOLMOTHER+17, 0, 'Felweed - Netherstorm - Eco-Dome Sutheron'),
+(21394, @POOLMOTHER+17, 0, 'Felweed - Netherstorm - Eco-Dome Sutheron'),
+-- DREAMING GLORY
+(21418, @POOLMOTHER+18, 0, 'Dreaming Glory - Netherstorm - Eco-Dome Sutheron'),
+(22235, @POOLMOTHER+18, 0, 'Dreaming Glory - Netherstorm - Eco-Dome Sutheron'),
+(21419, @POOLMOTHER+18, 0, 'Dreaming Glory - Netherstorm - Eco-Dome Sutheron'),
+(87152, @POOLMOTHER+18, 0, 'Dreaming Glory - Netherstorm - Eco-Dome Sutheron'),
+-- GOLDEN SANSAM
+(28272, @POOLMOTHER+19, 0, 'Golden Sansam - Netherstorm - Eco-Dome Sutheron'),
+(18942, @POOLMOTHER+19, 0, 'Golden Sansam - Netherstorm - Eco-Dome Sutheron'),
+(87299, @POOLMOTHER+19, 0, 'Golden Sansam - Netherstorm - Eco-Dome Sutheron'),
+(18941, @POOLMOTHER+19, 0, 'Golden Sansam - Netherstorm - Eco-Dome Sutheron'),
+(86398, @POOLMOTHER+19, 0, 'Golden Sansam - Netherstorm - Eco-Dome Sutheron'),
+-- LIFEROOT
+(7487 , @POOLMOTHER+20, 0, 'Liferoot - Netherstorm - Eco-Dome Sutheron'),
+(40033, @POOLMOTHER+20, 0, 'Liferoot - Netherstorm - Eco-Dome Sutheron'),
+-- ECO-DOME 3 - MIDREALM
+-- FELWEED
+(40063, @POOLMOTHER+21, 0, 'Felweed - Netherstorm - Eco-Dome Midrealm'),
+(40061, @POOLMOTHER+21, 0, 'Felweed - Netherstorm - Eco-Dome Midrealm'),
+(40062, @POOLMOTHER+21, 0, 'Felweed - Netherstorm - Eco-Dome Midrealm'),
+-- DREAMING GLORY
+(40042, @POOLMOTHER+22, 0, 'Dreaming Glory - Netherstorm - Eco-Dome Midrealm'),
+(40056, @POOLMOTHER+22, 0, 'Dreaming Glory - Netherstorm - Eco-Dome Midrealm'),
+(40051, @POOLMOTHER+22, 0, 'Dreaming Glory - Netherstorm - Eco-Dome Midrealm'),
+(40044, @POOLMOTHER+22, 0, 'Dreaming Glory - Netherstorm - Eco-Dome Midrealm'),
+-- GOLDEN SANSAM
+(18940, @POOLMOTHER+23, 0, 'Golden Sansam - Netherstorm - Eco-Dome Midrealm'),
+(40035, @POOLMOTHER+23, 0, 'Golden Sansam - Netherstorm - Eco-Dome Midrealm'),
+-- LIFEROOT
+(40034, @POOLMOTHER+24, 0, 'Liferoot - Netherstorm - Eco-Dome Midrealm'),
+(7486 , @POOLMOTHER+24, 0, 'Liferoot - Netherstorm - Eco-Dome Midrealm');
 
-DELETE FROM `gameobject` WHERE `ZoneId`=3518 AND `map`=530 AND `id` IN (181270, 181271) AND `guid` BETWEEN @GUID+0 AND @GUID+9;
+DELETE FROM `gameobject` WHERE `ZoneId`=3523 AND `map`=530 AND `id`=181279 AND `guid` BETWEEN @GUID+0 AND @GUID+36;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
+(@GUID+0 , 181279, 530, 3523, 0, 1, 1, 3846.62, 3800.19, 113.835, 5.51524, 0, 0, -0.374606, 0.927184, 90, 255, 1, '', 0),
+(@GUID+1 , 181279, 530, 3523, 0, 1, 1, 3547.38, 3731.83, 128.255, 3.01941, 0, 0, 0.998135, 0.0610518, 90, 255, 1, '', 0),
+(@GUID+2 , 181279, 530, 3523, 0, 1, 1, 3316.76, 4046.62, 156.215, 1.39626, 0, 0, 0.642787, 0.766045, 90, 255, 1, '', 0),
+(@GUID+3 , 181279, 530, 3523, 0, 1, 1, 2768.9, 4327.88, 142.829, 0.523598, 0, 0, 0.258819, 0.965926, 90, 255, 1, '', 0),
+(@GUID+4 , 181279, 530, 3523, 0, 1, 1, 2751.38, 4152.16, 185.474, 1.29154, 0, 0, 0.601814, 0.798636, 90, 255, 1, '', 0),
+(@GUID+5 , 181279, 530, 3523, 0, 1, 1, 2687.35, 3722.97, 143.994, 5.37562, 0, 0, -0.438371, 0.898794, 90, 255, 1, '', 0),
+(@GUID+6 , 181279, 530, 3523, 0, 1, 1, 2706.27, 3521.64, 139.136, 2.87979, 0, 0, 0.991445, 0.130528, 90, 255, 1, '', 0),
+(@GUID+7 , 181279, 530, 3523, 0, 1, 1, 2530.76, 3414.56, 131.92, 2.47837, 0, 0, 0.945518, 0.325568, 90, 255, 1, '', 0),
+(@GUID+8 , 181279, 530, 3523, 0, 1, 1, 2842.14, 3050.35, 127.269, 1.39626, 0, 0, 0.642787, 0.766045, 90, 255, 1, '', 0),
+(@GUID+9 , 181279, 530, 3523, 0, 1, 1, 2982.9, 3125, 121.077, 0.383971, 0, 0, 0.190808, 0.981627, 90, 255, 1, '', 0),
+(@GUID+10, 181279, 530, 3523, 0, 1, 1, 2974.98, 3269.81, 138.159, 0.890117, 0, 0, 0.430511, 0.902586, 90, 255, 1, '', 0),
+(@GUID+11, 181279, 530, 3523, 0, 1, 1, 3147.27, 3310.23, 111.634, 6.16101, 0, 0, -0.0610485, 0.998135, 90, 255, 1, '', 0),
+(@GUID+12, 181279, 530, 3523, 0, 1, 1, 4370.91, 3693.32, 101.836, 0.820303, 0, 0, 0.398748, 0.91706, 90, 255, 1, '', 0),
+(@GUID+13, 181279, 530, 3523, 0, 1, 1, 4856.01, 3117.19, 114.864, 4.95674, 0, 0, -0.615661, 0.788011, 90, 255, 1, '', 0),
+(@GUID+14, 181279, 530, 3523, 0, 1, 1, 4993.6, 2758.29, 49.1405, 2.96704, 0, 0, 0.996194, 0.087165, 90, 255, 1, '', 0),
+(@GUID+15, 181279, 530, 3523, 0, 1, 1, 4811.17, 2713.62, 86.4097, 1.67551, 0, 0, 0.743144, 0.669131, 90, 255, 1, '', 0),
+(@GUID+16, 181279, 530, 3523, 0, 1, 1, 4817.3, 2388.41, 119.548, 0.174532, 0, 0, 0.0871553, 0.996195, 90, 255, 1, '', 0),
+(@GUID+17, 181279, 530, 3523, 0, 1, 1, 3610.48, 2737.97, 147.736, 4.25861, 0, 0, -0.848047, 0.529921, 90, 255, 1, '', 0),
+(@GUID+18, 181279, 530, 3523, 0, 1, 1, 3286.94, 2298.71, 107.738, 1.11701, 0, 0, 0.529919, 0.848048, 90, 255, 1, '', 0),
+(@GUID+19, 181279, 530, 3523, 0, 1, 1, 3244.6, 2112.57, 131.2, 1.32645, 0, 0, 0.615661, 0.788011, 90, 255, 1, '', 0),
+(@GUID+20, 181279, 530, 3523, 0, 1, 1, 2891.67, 2682.74, 111.815, 0.383971, 0, 0, 0.190808, 0.981627, 90, 255, 1, '', 0),
+(@GUID+21, 181279, 530, 3523, 0, 1, 1, 3208.76, 2908.86, 129.124, 4.27606, 0, 0, -0.843391, 0.5373, 90, 255, 1, '', 0),
+(@GUID+22, 181279, 530, 3523, 0, 1, 1, 3491.45, 3249.36, 102.823, 0.680677, 0, 0, 0.333806, 0.942642, 90, 255, 1, '', 0),
+(@GUID+23, 181279, 530, 3523, 0, 1, 1, 3974.76, 2413, 111.497, 0.261798, 0, 0, 0.130526, 0.991445, 90, 255, 1, '', 0),
+(@GUID+24, 181279, 530, 3523, 0, 1, 1, 4089.25, 2335.09, 104.229, 3.31614, 0, 0, -0.996194, 0.087165, 90, 255, 1, '', 0),
+(@GUID+25, 181279, 530, 3523, 0, 1, 1, 4112, 1685.45, 132.024, 2.56563, 0, 0, 0.958819, 0.284016, 90, 255, 1, '', 0),
+(@GUID+26, 181279, 530, 3523, 0, 1, 1, 3950.2, 1391.16, -128.383, 4.01426, 0, 0, -0.906307, 0.422619, 90, 255, 1, '', 0),
+(@GUID+27, 181279, 530, 3523, 0, 1, 1, 4148.77, 1399.9, -121.048, 4.32842, 0, 0, -0.829037, 0.559194, 90, 255, 1, '', 0),
+(@GUID+28, 181279, 530, 3523, 0, 1, 1, 3703.02, 2224.27, 124.298, 5.74214, 0, 0, -0.267238, 0.963631, 90, 255, 1, '', 0),
+(@GUID+29, 181279, 530, 3523, 0, 1, 1, 3786.64, 1981.48, 257.998, 4.34587, 0, 0, -0.824126, 0.566406, 90, 255, 1, '', 0),
+(@GUID+30, 181279, 530, 3523, 0, 1, 1, 2534.97, 2129.95, 99.1451, 5.70723, 0, 0, -0.284015, 0.95882, 90, 255, 1, '', 0),
+(@GUID+31, 181279, 530, 3523, 0, 1, 1, 2505.52, 2062.02, 91.5479, 3.31614, 0, 0, -0.996194, 0.087165, 90, 255, 1, '', 0),
+(@GUID+32, 181279, 530, 3523, 0, 1, 1, 2417.6, 2139.08, 87.7451, 3.9619, 0, 0, -0.91706, 0.39875, 90, 255, 1, '', 0),
+(@GUID+33, 181279, 530, 3523, 0, 1, 1, 2248.26, 2138.87, 76.2446, 3.47321, 0, 0, -0.986285, 0.16505, 90, 255, 1, '', 0),
+(@GUID+34, 181279, 530, 3523, 0, 1, 1, 2390.51, 2577.47, 136.814, 1.43117, 0, 0, 0.656058, 0.75471, 90, 255, 1, '', 0),
+(@GUID+35, 181279, 530, 3523, 0, 1, 1, 2520.22, 2760.72, 132.16, 2.54818, 0, 0, 0.956305, 0.292372, 90, 255, 1, '', 0),
+(@GUID+36, 181279, 530, 3523, 0, 1, 1, 2495.54, 2828.56, 137.792, 3.14159, 0, 0, -1, 0, 90, 255, 1, '', 0);
 
-UPDATE `gameobject` SET `ZoneId`=3518 WHERE `guid` IN (56366,55626,56364,56061,5147,42140,55681,40175,21361,87145,55192,40174,21362,42189,40168,42208,40157,21363,40173,40172,21364,40152,26632,42209,85968,55691,42394,40155,55195,21349,56377,21358,85964,87417,21357,42187,42423,87416,42422,40166,56368,40165,40163,40164,40171,21359,21360,40180,40170,40169,40159,5372,21356,55628,40161,40177,40182,40154,21350,40178,21351,87413,56367,40162,40156,42188,21352,40153,21353,40167,5324,21354,56365,42331,21355,40181,40179,26684,26694,30581,26667,21466,85983,42143,87429,42393,85982,40193,40194,21456,87427,87430,21457,30680,40187,87432,40186,26673,21459,21458,40185,21460,21464,56410,30679,21463,40195,40188,42407,26674,21462,21465,42144,42142,87431,40190,21461,40192,40183,42207,42333,26700,26698,42139,21468,21467,5647,87150);
-UPDATE `gameobject` SET `ZoneId`=3518, `AreaId`=3764 WHERE `guid` IN (21472,30627,40189,21471,21470,21469,42138,21596,42141,40104,21597);
+UPDATE `gameobject` SET `ZoneId`=3523 WHERE `guid` IN (42211,21581,21580,28263,42166,28275,30844,21573,87160,40091,40066,21574,30856,42222,21577,32804,42164,42193,21578,40073,21579,42195,32811,42224,40088,40067,40083,42225,40065,21575,42328,40090,42325,21576,87158,42163,21582,40070,42165,30845,21583,40089,21584,42231,87159,21585,42210,42223,40085,40076,42263,22233,42213,40080,22234,21425,28268,32806,42232,21421,40058,21420,42197,32813,40053,21422,42317,40055,42196,40050,40054,21416,32781,21415,40059,40045,40043,22232,42330,21417,21424,21423,21426,87151,42194,40052,42212,40047,40048,40049,42335,40046,22231,21599,21598,40064,40057,18943,40060,21395,22236,21396,85961,21394,21418,22235,21419,87152,28272,18942,87299,18941,86398,7487,40033,40063,40061,40062,40042,40056,40051,40044,18940,40035,40034,7486);
