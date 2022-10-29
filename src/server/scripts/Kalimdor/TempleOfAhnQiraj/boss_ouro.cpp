@@ -211,8 +211,19 @@ struct boss_ouro : public BossAI
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true))
                     {
-                        DoCast(target, SPELL_SAND_BLAST);
+                        me->SetTarget(target->GetGUID());
                     }
+
+                    DoCastAOE(SPELL_SAND_BLAST);
+
+                    me->m_Events.AddEventAtOffset([this]()
+                    {
+                        if (Unit* victim = me->GetVictim())
+                        {
+                            me->SetTarget(victim->GetGUID());
+                        }
+                    }, 3s);
+
                     context.Repeat();
                 })
             .Schedule(22s, GROUP_EMERGED, [this](TaskContext context)
