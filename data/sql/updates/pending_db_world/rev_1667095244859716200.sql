@@ -5,9 +5,9 @@ DELETE FROM `pool_pool` WHERE `mother_pool`=2017;
 DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (4870,4871,4872,4873,4874,4875);
 
 -- Ores
-SET @GUID = 102611; -- 124
-SET @POOLMOTHER = 8176; -- 7
-SET @POOL = 12680; -- 62
+SET @GUID = 103803; -- 124
+SET @POOLMOTHER = 8282; -- 7
+SET @POOL = 13130; -- 62
 
 DELETE FROM `pool_template` WHERE `description` LIKE '%Isle of Quel\'Danas - Rich Adamantite Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+3;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
@@ -180,8 +180,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+53, 181569, 530, 4080, 0, 1, 1, 11666.1, -7135.6, 16.2156, 3.82227, 0, 0, -0.942641, 0.333808, 90, 255, 1, '', 0);
 
 -- Herbs
-SET @GUID = 102611; -- 124
-SET @POOLMOTHER = 8176; -- 7
+SET @GUID = 103857; -- 124
+SET @POOLMOTHER = 8286; -- 7
 
 DELETE FROM `pool_template` WHERE `description` LIKE '%Isle of Quel\'Danas%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+4;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
