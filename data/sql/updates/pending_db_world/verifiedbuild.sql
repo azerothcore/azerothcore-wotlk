@@ -1,5 +1,3 @@
-ALTER TABLE `broadcast_text` CHANGE COLUMN `VerifiedBuild` `VerifiedBuild` MEDIUMINT NULL DEFAULT NULL;
-ALTER TABLE `broadcast_text_locale` CHANGE COLUMN `VerifiedBuild` `VerifiedBuild` MEDIUMINT NULL DEFAULT NULL;
 ALTER TABLE `creature` CHANGE COLUMN `VerifiedBuild` `VerifiedBuild` MEDIUMINT NULL DEFAULT NULL;
 ALTER TABLE `creature_equip_template` CHANGE COLUMN `VerifiedBuild` `VerifiedBuild` MEDIUMINT NULL DEFAULT NULL;
 ALTER TABLE `creature_questitem` CHANGE COLUMN `VerifiedBuild` `VerifiedBuild` MEDIUMINT NULL DEFAULT NULL;
