@@ -3,9 +3,9 @@
 DELETE FROM `gameobject` WHERE `id` IN (181555, 181556, 181557, 181569, 181570) AND `guid` IN (21842, 21843, 21844, 21845, 21846, 21847, 21866, 21867, 21868, 21869, 21870, 21871, 21872, 21918, 28266, 28267, 28270, 28271, 32777, 32808, 32809, 40025, 40026, 40027, 40028, 40029, 40030, 40031, 40032, 40036, 40037, 40038, 40039, 40040, 40041, 40092, 40093, 40094, 40095, 40096, 40097, 40098, 40099, 40100, 40101, 40102, 40103, 42304, 42305, 42309, 42310, 42312, 42314, 42319, 42320, 42321, 42322, 42323, 42324, 42327, 42329, 42332, 42334, 42336, 42337, 42338, 42340, 120237, 120560, 120566, 120570, 120573, 120576, 120578);
 
 -- Fel Iron Deposit
-SET @GUID = 102611; -- 124
-SET @POOLMOTHER = 8176; -- 7
-SET @POOL = 12680; -- 62
+SET @GUID = 102971; -- 124
+SET @POOLMOTHER = 8213; -- 7
+SET @POOL = 12847; -- 62
 
 -- Fel Iron Deposit
 DELETE FROM `pool_template` WHERE `description` LIKE '%Netherstorm - Fel Iron Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+4;
@@ -269,11 +269,11 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+77, 181557, 530, 3523, 0, 1, 1, 2576.05, 2709.51, 113.1, 1.37881, 0, 0, 0, 0, 90, 255, 1, '', 0);
 
 -- Adamantite Deposit
-SET @GUID = 102611; -- 124
-SET @POOLMOTHER = 8176; -- 7
-SET @POOL = 12680; -- 62
+SET @GUID = 103049; -- 124
+SET @POOLMOTHER = 8218; -- 7
+SET @POOL = 12886; -- 62
 
-DELETE FROM `pool_template` WHERE `description` LIKE '%Netherstorm - Rich Adamantite Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+6;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Netherstorm - Rich Adamantite Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+10;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0 , 1, 'Netherstorm - Rich Adamantite Deposit - Group 1 '),
 (@POOLMOTHER+1 , 3, 'Netherstorm - Rich Adamantite Deposit - Group 2 '),
@@ -1050,8 +1050,8 @@ UPDATE `gameobject` SET `position_x`=3926.660400, `position_y`=2182.787354, `pos
 UPDATE `gameobject` SET `position_z`=232.564056 WHERE `guid`=40052;
 UPDATE `gameobject` SET `position_z`=210.632187 WHERE `guid`=40053;
 
-SET @POOLMOTHER=8164; -- 12
-SET @GUID=102601; -- 10
+SET @POOLMOTHER=8229; -- 12
+SET @GUID=103319; -- 10
 
 DELETE FROM `pool_template` WHERE `description` LIKE '%Netherstorm%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+24;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
