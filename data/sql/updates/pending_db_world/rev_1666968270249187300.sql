@@ -3,9 +3,9 @@
 DELETE FROM `gameobject` WHERE `id` IN (181555, 181556, 181557, 181569, 181570) AND `guid` IN (21799, 21800, 21801, 21802, 21803, 21804, 21805, 21806, 21807, 21841, 21906, 21907, 21908, 21909, 21910, 21922, 28145, 28146, 28419, 28421, 28432, 28433, 28446, 30439, 30857, 40429, 40430, 40431, 40455, 40456, 40457, 40458, 40481, 40482, 40483, 40484, 40485, 40486, 40487, 40488, 40489, 40490, 40491, 40492, 40493, 40494, 40495, 40496, 40497, 40498, 40499, 40500, 40501, 40502, 40503, 40504, 40505, 40506, 40507, 40508, 40509, 40510, 40511, 40512, 40513, 40514, 42158, 42159, 42160, 42268, 42286, 42356, 42360, 42363, 42369, 42372, 42374, 42375, 42376, 42379, 42381, 42382, 42383, 42387, 61768, 61910, 61922, 63201, 120196, 120197, 120207, 120235, 120236, 120240, 120663, 120664, 35340);
 
 -- Fel Iron Deposit
-SET @GUID = 102611; -- 124
-SET @POOLMOTHER = 8176; -- 7
-SET @POOL = 12680; -- 62
+SET @GUID = 103356; -- 124
+SET @POOLMOTHER = 8254; -- 7
+SET @POOL = 12976; -- 62
 
 DELETE FROM `pool_template` WHERE `description` LIKE '%Shadowmoon Valley - Fel Iron Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+6;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
@@ -476,11 +476,11 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+145, 181557, 530, 3520, 0, 1, 1, -4568.63, 943.492, -10.3849, 3.14159, 0, 0, 1, -0.0000000437114, 90, 255, 1, '', 0);
 
 -- Rich Adamantite Deposit
-SET @GUID = 102611; -- 124
-SET @POOLMOTHER = 8176; -- 7
-SET @POOL = 12680; -- 62
+SET @GUID = 103502; -- 124
+SET @POOLMOTHER = 8261; -- 7
+SET @POOL = 13049; -- 62
 
-DELETE FROM `pool_template` WHERE `description` LIKE '%Shadowmoon Valley - Fel Iron Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+6;
+DELETE FROM `pool_template` WHERE `description` LIKE '%Shadowmoon Valley - Rich Adamantite Deposit%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+7;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOLMOTHER+0, 4, 'Shadowmoon Valley - Rich Adamantite Deposit - Group 1'),
 (@POOLMOTHER+1, 2, 'Shadowmoon Valley - Rich Adamantite Deposit - Group 2'),
@@ -1178,8 +1178,8 @@ UPDATE `gameobject` SET `position_z`=75.413795 WHERE `guid`=40437;
 UPDATE `gameobject` SET `position_z`=121.735435 WHERE `guid`=40467;
 UPDATE `gameobject` SET `position_x`=-4108.814941, `position_y`=453.091736, `position_z`=34.163490 WHERE `guid`=21367;
 
-SET @POOLMOTHER=8164; -- 12
-SET @GUID=102601; -- 10
+SET @POOLMOTHER=8269; -- 12
+SET @GUID=103745; -- 10
 
 DELETE FROM `pool_template` WHERE `description` LIKE '%Shadowmoon Valley%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+12;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
