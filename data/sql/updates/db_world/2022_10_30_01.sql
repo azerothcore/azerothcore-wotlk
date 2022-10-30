@@ -1,3 +1,4 @@
+-- DB update 2022_10_30_00 -> 2022_10_30_01
 ALTER TABLE `creature` CHANGE COLUMN `VerifiedBuild` `VerifiedBuild` MEDIUMINT NULL DEFAULT NULL;
 ALTER TABLE `creature_equip_template` CHANGE COLUMN `VerifiedBuild` `VerifiedBuild` MEDIUMINT NULL DEFAULT NULL;
 ALTER TABLE `creature_questitem` CHANGE COLUMN `VerifiedBuild` `VerifiedBuild` MEDIUMINT NULL DEFAULT NULL;
