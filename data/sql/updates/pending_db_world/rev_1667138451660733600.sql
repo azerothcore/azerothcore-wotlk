@@ -1,5 +1,5 @@
 -- Deathwhisperer (19299)
-UPDATE `creature_template_addon` SET `auras` = '15088, 12787' WHERE (`entry` = 19299);
+UPDATE `creature_template_addon` SET `auras` = '15088 12787' WHERE (`entry` = 19299);
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19299;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 19299) AND (`source_type` = 0) AND (`id` IN (0, 1, 2));
@@ -23,16 +23,12 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (18977,0,2,0,0,0,100,0,3000,5000,7000,11000,0,11,40505,0,0,0,0,0,2,0,0,0,0,0,0,0,"Felguard Destroyer - In Combat - Cast 'Cleave'");
 
 -- Subjugator Yalqiz (19335)
-DELETE FROM `creature_addon` WHERE (`guid` IN (68916));
-INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(68916, 689160, 0, 0, 1, 0, 0, '29651');
-UPDATE `creature_template_addon` SET `auras` = '29651' WHERE (`entry` = 19335);
-
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19335;
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 19335) AND (`source_type` = 0) AND (`id` IN (0, 1, 2));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19335);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (19335, 0, 0, 0, 0, 0, 100, 0, 5000, 10000, 15000, 20000, 0, 11, 32026, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Subjugator Yalqiz - In Combat - Cast \'Pain Spike\''),
-(19335, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 0, 11, 32000, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Subjugator Yalqiz - Between 20-80% Health - Cast \'Mind Sear\' (No Repeat)');
+(19335, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 0, 11, 32000, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Subjugator Yalqiz - Between 20-80% Health - Cast \'Mind Sear\' (No Repeat)'),
+(19335, 0, 2, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 29651, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Subjugator Yalqiz - On Reset - Cast \'Dual Wield\'');
 
 -- Vorakem Doomspeaker
 UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=18679;
@@ -79,7 +75,7 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16906) AND (`source_type` = 0
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (16906, 0, 0, 0, 25, 0, 100, 1, 0, 0, 0, 0, 0, 11, 33900, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unyielding Knight - On Reset - Cast \'Shroud of Death\' (No Repeat)'),
 (16906, 0, 1, 0, 4, 0, 75, 1, 0, 0, 0, 0, 0, 11, 22911, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Unyielding Knight - On Aggro - Cast \'Charge\' (No Repeat)'),
-(16906, 0, 2, 0, 2, 0, 100, 0, 0, 49, 22000, 22000, 0, 11, 33910, 0, 0, 0, 0, 0, 26, 40, 0, 0, 0, 0, 0, 0, 0, 'Unyielding Knight - Between 0-49% Health - Cast \'Heal Other\'');
+(16906, 0, 2, 0, 12, 0, 100, 0, 0, 50, 22000, 22000, 0, 11, 33910, 0, 0, 0, 0, 0, 26, 40, 0, 0, 0, 0, 0, 0, 0, 'Unyielding Knight - Target Between 0-50% Health - Cast \'Heal Other\'');
 
 -- Arch Mage Xintor (16977)
 DELETE FROM `creature_template_addon` WHERE (`entry` = 16977);
@@ -130,7 +126,7 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 22323);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (22323, 0, 0, 0, 0, 0, 100, 0, 1000, 2000, 3000, 5000, 0, 11, 36247, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Incandescent Fel Spark - In Combat - Cast \'Fel Fireball\''),
 (22323, 0, 2, 0, 0, 0, 100, 0, 8000, 11000, 18000, 24000, 0, 11, 39055, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Incandescent Fel Spark - In Combat - Cast \'Flames of Chaos\''),
-(22323, 0, 1, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 11, 44877, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Incandescent Fel Spark - On Just Died - Cast \'Living Flare Master\'');
+(22323, 0, 1, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 11, 44877, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Incandescent Fel Spark - On Just Died - Cast \'Living Flare Master\'');
 
 -- Thornfang Venomspitter (19350)
 UPDATE `creature_template_addon` SET `auras` = '22696' WHERE (`entry` = 19350);
