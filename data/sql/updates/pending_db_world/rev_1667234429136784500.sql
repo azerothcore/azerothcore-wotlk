@@ -32,22 +32,22 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Barrel (182589) - Escape from Durnholde Keep%' AND `pool_entry` BETWEEN @POOL+0 AND @POOL+4;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 -- GROUP 1
-(21786, @POOL+0, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 1'),
-(21783, @POOL+0, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 1'),
-(21788, @POOL+0, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 1'),
+(@GUID+6 , @POOL+0, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 1'),
+(@GUID+3 , @POOL+0, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 1'),
+(@GUID+8 , @POOL+0, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 1'),
 -- GROUP 2
-(21780, @POOL+1, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 2'),
-(21790, @POOL+1, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 2'),
-(21789, @POOL+1, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 2'),
+(@GUID+0 , @POOL+1, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 2'),
+(@GUID+10, @POOL+1, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 2'),
+(@GUID+9 , @POOL+1, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 2'),
 -- GROUP 3
-(21781, @POOL+2, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 3'),
-(21787, @POOL+2, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 3'),
-(21791, @POOL+2, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 3'),
+(@GUID+1 , @POOL+2, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 3'),
+(@GUID+7 , @POOL+2, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 3'),
+(@GUID+11, @POOL+2, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 3'),
 -- GROUP 4
-(21784, @POOL+3, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 4'),
-(21785, @POOL+3, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 4'),
-(21792, @POOL+3, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 4'),
+(@GUID+4 , @POOL+3, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 4'),
+(@GUID+5 , @POOL+3, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 4'),
+(@GUID+12, @POOL+3, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 4'),
 -- GROUP 5
-(21794, @POOL+4, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 5'),
-(21793, @POOL+4, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 5'),
-(21782, @POOL+4, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 5');
+(@GUID+14, @POOL+4, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 5'),
+(@GUID+13, @POOL+4, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 5'),
+(@GUID+2 , @POOL+4, 0, 'Barrel (182589) - Escape from Durnholde Keep - Group 5');
