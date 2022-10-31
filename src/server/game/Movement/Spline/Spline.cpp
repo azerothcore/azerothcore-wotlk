@@ -286,7 +286,6 @@ namespace Movement
         index_lo = 0;
         index_hi = 0;
         points.clear();
-        pointsVisual.clear();
     }
 
     std::string SplineBase::ToString() const
