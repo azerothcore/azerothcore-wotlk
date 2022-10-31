@@ -370,11 +370,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         // 0x08000000
         if (unit->m_movementInfo.GetMovementFlags() & MOVEMENTFLAG_SPLINE_ENABLED)
         {
-            const G3D::Vector3* p = &unit->movespline->_Spline().getPoints(true)[0];
-            if (unit->movespline->_Spline().getPoints(true).empty() || (!unit->movespline->_Spline().getPoints(true).empty() && !p))
-                const_cast<Unit*>(unit)->DisableSpline();
-            else
-                Movement::PacketBuilder::WriteCreate(*unit->movespline, *data);
+            Movement::PacketBuilder::WriteCreate(*unit->movespline, *data);
         }
     }
     else

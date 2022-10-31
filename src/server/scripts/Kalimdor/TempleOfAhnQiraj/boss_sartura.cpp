@@ -138,7 +138,7 @@ struct boss_sartura : public BossAI
                 case EVENT_SPELL_BERSERK:
                     if (!berserked)
                     {
-                        DoCastSelf(SPELL_BERSERK);
+                        DoCastSelf(SPELL_BERSERK, true);
                         berserked = true;
                     }
                     break;
