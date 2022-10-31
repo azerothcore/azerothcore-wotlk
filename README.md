@@ -7,6 +7,8 @@
 * Custom Quests
 * Custom features
 * Blizzlike orientation
+* Teleporters (mobile + NPC)
+* Service NPC mobile
 
 ## Handling in general:
 
@@ -30,18 +32,22 @@
 
 ## Custom Item Sets:
 
-* T11 - Level 100
-* T12 - Level 130
+* T11 - Level 100 (weapons + armor)
+* T12 - Level 130 (weapons + armor)
 * two new bags (30 + 36 spaces) + quests
 
 ## Custom Dungeons - all Blizz NPCs, Scripts, Quests (Questgiver in front of every dungeon) kept and upgraded
 
 * The Nexus       - Level 100 -> prepared non-HC + HC
+* The Oculus      - Level 100 -> prepared non-HC + HC
 * Gundrak         - Level 130 -> prepared non-HC + HC
+* AhnCahet        - Level 130 -> prepared non-HC + HC
 * Auchenai Crypts - Level 160 -> prepared non-HC + HC
 * Zul'Farrak      - Level 190
 * Zul Aman        - Level 220
 * Karazhan        - Level 250
 
 ## Custom Level Areas:
-* Ashzara Crater - Level 1 - 80 -> NPCs prepared till Level 40
+* Ashzara Crater - Level 1 - 80
+* Hyjal - Level 80 - 130
+* Strathholme dungeon outside - Level 130 - 160
