@@ -1,3 +1,4 @@
+-- DB update 2022_11_01_00 -> 2022_11_01_01
 -- Wolves aren't parallel here
 UPDATE `creature_formations` SET `angle`=270 WHERE `memberGUID`=202682 AND `leaderGUID`=202628;
 -- Patrolling packs need to assist
