@@ -28,24 +28,27 @@
 ## Custom areas:
 
 * Hinterland BG - Scripted OutdoorPvP Area (WIP)
-
+* Custom Tier Vendor Jail
 
 ## Custom Item Sets:
 
-* T11 - Level 100 (weapons + armor)
-* T12 - Level 130 (weapons + armor)
-* two new bags (30 + 36 spaces) + quests
+* T11 - Level 100 (weapons + armor from PvE and PvP)
+* T12 - Level 130 (weapons + armor from PvE and PvP)
+* two new bags (30 + 36 spaces) + quests per dungeon
 
 ## Custom Dungeons - all Blizz NPCs, Scripts, Quests (Questgiver in front of every dungeon) kept and upgraded
 
-* The Nexus       - Level 100 -> prepared non-HC + HC
-* The Oculus      - Level 100 -> prepared non-HC + HC
-* Gundrak         - Level 130 -> prepared non-HC + HC
-* AhnCahet        - Level 130 -> prepared non-HC + HC
-* Auchenai Crypts - Level 160 -> prepared non-HC + HC
-* Zul'Farrak      - Level 190
-* Zul Aman        - Level 220
-* Karazhan        - Level 250
+* The Nexus         - Level 100 -> prepared non-HC + HC
+* The Oculus        - Level 100 -> prepared non-HC + HC
+* Gundrak           - Level 130 -> prepared non-HC + HC
+* AhnCahet          - Level 130 -> prepared non-HC + HC
+* Auchenai Crypts   - Level 160 -> prepared non-HC + HC
+* Mana Tombs        - Level 160
+* Sethekk Halls     - Level 160
+* Shadow Labyrinth  - Level 160
+* Zul'Farrak        - Level 190
+* Zul Aman          - Level 220
+* Karazhan          - Level 250
 
 ## Custom Level Areas:
 * Ashzara Crater - Level 1 - 80
