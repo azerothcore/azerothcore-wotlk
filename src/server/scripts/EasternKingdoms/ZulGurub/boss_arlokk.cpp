@@ -38,15 +38,15 @@ enum Says
 
 enum Spells
 {
-    SPELL_SHADOW_WORD_PAIN      = 24212, // Corrected
-    SPELL_GOUGE                 = 12540, // Corrected
+    SPELL_SHADOW_WORD_PAIN      = 24212,
+    SPELL_GOUGE                 = 12540,
     SPELL_MARK_OF_ARLOKK        = 24210, // triggered spell 24211 Added to spell_dbc
-    SPELL_RAVAGE                = 24213, // Corrected
-    SPELL_CLEAVE                = 25174, // Searching for right spell
-    SPELL_PANTHER_TRANSFORM     = 24190, // Transform to panther now used
+    SPELL_RAVAGE                = 24213,
+    SPELL_WHIRLWIND             = 24236, // Triggers 15589
+    SPELL_PANTHER_TRANSFORM     = 24190,
     SPELL_SUMMON_PROWLER        = 24246, // Added to Spell_dbc
-    SPELL_VANISH_VISUAL         = 24222, // Added
-    SPELL_VANISH                = 24223, // Added
+    SPELL_VANISH_VISUAL         = 24222,
+    SPELL_VANISH                = 24223,
     SPELL_SUPER_INVIS           = 24235  // Added to Spell_dbc
 };
 
@@ -61,7 +61,8 @@ enum Events
     EVENT_VANISH_2              = 7,
     EVENT_TRANSFORM_BACK        = 8,
     EVENT_VISIBLE               = 9,
-    EVENT_SUMMON_PROWLERS       = 10
+    EVENT_WHIRLWIND             = 10,
+    EVENT_SUMMON_PROWLERS       = 11
 };
 
 enum Phases
@@ -112,6 +113,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MARK_OF_ARLOKK);
             Talk(SAY_DEATH);
         }
 
@@ -215,9 +217,11 @@ public:
                         break;
                     case EVENT_MARK_OF_ARLOKK:
                         {
-                            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, urand(1, 3), 0.0f, false, -SPELL_MARK_OF_ARLOKK);
+                            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, urand(1, 3), 0.0f, true, -SPELL_MARK_OF_ARLOKK);
                             if (!target)
+                            {
                                 target = me->GetVictim();
+                            }
                             if (target)
                             {
                                 DoCast(target, SPELL_MARK_OF_ARLOKK, true);
@@ -228,7 +232,7 @@ public:
                         }
                     case EVENT_TRANSFORM:
                         {
-                            DoCastSelf(SPELL_PANTHER_TRANSFORM); // SPELL_AURA_TRANSFORM
+                            DoCastSelf(SPELL_PANTHER_TRANSFORM);
                             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(EQUIP_UNEQUIP));
                             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(EQUIP_UNEQUIP));
                             me->AttackStop();
@@ -259,9 +263,14 @@ public:
                         me->RemoveAura(SPELL_SUPER_INVIS);
                         me->RemoveAura(SPELL_VANISH);
                         events.ScheduleEvent(EVENT_RAVAGE, urand(10000, 14000), 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_WHIRLWIND, 2000, 0, PHASE_TWO);
                         events.ScheduleEvent(EVENT_TRANSFORM_BACK, urand(30000, 40000), 0, PHASE_TWO);
                         events.SetPhase(PHASE_TWO);
                         me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
+                        break;
+                    case EVENT_WHIRLWIND:
+                        DoCastSelf(SPELL_WHIRLWIND);
+                        events.ScheduleEvent(EVENT_WHIRLWIND, urand(14000, 16000), 0, PHASE_TWO);
                         break;
                     case EVENT_RAVAGE:
                         DoCastVictim(SPELL_RAVAGE, true);
@@ -269,7 +278,7 @@ public:
                         break;
                     case EVENT_TRANSFORM_BACK:
                         {
-                            me->RemoveAura(SPELL_PANTHER_TRANSFORM); // SPELL_AURA_TRANSFORM
+                            me->RemoveAura(SPELL_PANTHER_TRANSFORM);
                             DoCast(me, SPELL_VANISH_VISUAL);
                             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_DAGGER));
                             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(WEAPON_DAGGER));
