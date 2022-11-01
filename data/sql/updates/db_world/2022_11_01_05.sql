@@ -1,3 +1,4 @@
+-- DB update 2022_11_01_04 -> 2022_11_01_05
 
 -- Fixed spawntime
 UPDATE `creature` SET `spawntimesecs`= 60 WHERE  `guid`=66716;
