@@ -161,8 +161,8 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (704, 700, 2, -1, 2, 'DrakTharon  - Level 130', 571, 4774.32, -2036.68, 229.38, 1.567);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (705, 700, 2, -1, 2, 'Auchenai Crypts - Level 160', 530, -3362.535645, 5220.6640, -101.04, 1.48);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (706, 700, 2, -1, 2, 'Mana Tombs - Level 160', 530, -3104.18, 4945.52, -101.507, 6.22344);
-INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (707, 700, 2, -1, 2, 'Sethekk Halls - Level 160', 530, -3362.2, 4664.12, -101.049, 4.6605);
-INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (708, 700, 2, -1, 2, 'Shadow Labyrinth - Level 160', 530, 4941.98, 4664.12, -101.049, 3.16039);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (707, 700, 2, -1, 2, 'Sethekk Halls - Level 160', 530, -3362.2, 4667.12, -101.049, 4.6605);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (708, 700, 2, -1, 2, 'Shadow Labyrinth - Level 160', 530, -3535.625, 4942.57, -101.40, 0);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (709, 700, 2, -1, 2, 'Zul`Farrak - Level 190', 1, -6839.39, -2911.03, 8.87, 0.41);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (710, 700, 2, -1, 2, 'Zul Aman - Level 220', 530, 6846.95, -7954.5, 170.028, 4.61501);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (711, 700, 2, -1, 2, 'Karazhan - Level 250', 0, -11118.8, -2010.84, 47.0807, 0.0);
