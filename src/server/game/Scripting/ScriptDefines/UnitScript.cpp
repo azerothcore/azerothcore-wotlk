@@ -77,11 +77,11 @@ void ScriptMgr::ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& dama
     });
 }
 
-void ScriptMgr::ModifyHealRecieved(Unit* target, Unit* attacker, uint32& damage)
+void ScriptMgr::ModifyHealReceived(Unit* target, Unit* healer, uint32& heal, SpellInfo const* spellInfo)
 {
     ExecuteScript<UnitScript>([&](UnitScript* script)
     {
-        script->ModifyHealRecieved(target, attacker, damage);
+        script->ModifyHealReceived(target, healer, heal, spellInfo);
     });
 }
 
