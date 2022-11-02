@@ -122,7 +122,7 @@ class spell_rog_blade_flurry : public AuraScript
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
         if (procTarget && damageInfo)
         {
-            int32 damage = damageInfo->GetDamage();
+            int32 damage = damageInfo->GetUnmitigatedDamage();
 
             CustomSpellValues values;
             values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);

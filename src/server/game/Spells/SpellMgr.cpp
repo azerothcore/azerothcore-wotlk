@@ -1143,7 +1143,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 if (!player)
                     return false;
 
-                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
+                if (sWorld->getIntConfig(CONFIG_WINTERGRASP_ENABLE) != 1)
                     return false;
 
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
