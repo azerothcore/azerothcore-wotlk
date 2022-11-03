@@ -2373,7 +2373,7 @@ public:
     [[nodiscard]] virtual bool CanFly() const = 0;
     [[nodiscard]] bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); }
     [[nodiscard]] bool IsFalling() const;
-    [[nodiscard]] float GetHoverHeight() const { return IsHovering() ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f; }
+    [[nodiscard]] float GetHoverHeight() const { return IsHovering() || IsFlying() ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f; }
     [[nodiscard]] virtual bool CanEnterWater() const = 0;
 
     void RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker);
