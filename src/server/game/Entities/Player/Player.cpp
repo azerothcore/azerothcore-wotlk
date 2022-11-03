@@ -8698,7 +8698,7 @@ void Player::SendBGWeekendWorldStates()
 void Player::SendBattlefieldWorldStates()
 {
     /// Send misc stuff that needs to be sent on every login, like the battle timers.
-    if (sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
+    if (sWorld->getIntConfig(CONFIG_WINTERGRASP_ENABLE) == 1)
     {
         if (BattlefieldWG* wg = (BattlefieldWG*)sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
         {
