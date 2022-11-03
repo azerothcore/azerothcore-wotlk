@@ -242,3 +242,11 @@ void ScriptMgr::OnUnitDeath(Unit* unit, Unit* killer)
         script->OnUnitDeath(unit, killer);
     });
 }
+
+void ScriptMgr::OnAuraApply(Unit* unit, Aura* aura)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnAuraApply(unit, aura);
+    });
+}
