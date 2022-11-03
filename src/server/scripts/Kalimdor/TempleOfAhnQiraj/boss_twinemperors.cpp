@@ -340,6 +340,19 @@ struct boss_veklor : public boss_twinemperorsAI
         _scheduler
             .Schedule(4s, [this](TaskContext context)
             {
+                if (me->GetVictim())
+                {
+                    if (!me->IsWithinDist(me->GetVictim(), 45.0f))
+                    {
+                        me->GetMotionMaster()->MoveChase(me->GetVictim(), 45.0f, 0);
+                    }
+                    else
+                    {
+                        me->StopMoving();
+                        me->GetMotionMaster()->Clear();
+                    }
+                }
+
                 DoCastVictim(SPELL_SHADOW_BOLT);
                 context.Repeat(2500ms);
             })
