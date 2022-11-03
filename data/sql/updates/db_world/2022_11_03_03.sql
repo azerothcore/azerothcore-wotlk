@@ -1,3 +1,4 @@
+-- DB update 2022_11_03_02 -> 2022_11_03_03
 -- Deletes
 DELETE FROM `pool_template` WHERE `entry` IN (2036, 11711);
 DELETE FROM `pool_pool` WHERE `mother_pool`=2036;

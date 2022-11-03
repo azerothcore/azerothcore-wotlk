@@ -1,3 +1,4 @@
+-- DB update 2022_11_03_03 -> 2022_11_03_04
 -- DELETE old spawns 
 DELETE FROM `pool_template` WHERE `entry` IN (2033, 11706, 11707, 11708);
 DELETE FROM `pool_pool` WHERE `mother_pool`=2033;
