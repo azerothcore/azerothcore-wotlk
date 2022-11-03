@@ -1,3 +1,4 @@
+-- DB update 2022_11_03_01 -> 2022_11_03_02
 DELETE FROM `pool_template` WHERE `entry` IN (2031, 11699, 11700);
 DELETE FROM `pool_pool` WHERE `mother_pool`=2031;
 DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (11699, 11700);
