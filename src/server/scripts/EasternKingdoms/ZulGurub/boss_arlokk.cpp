@@ -15,15 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-TCName: Boss_Arlokk
-TC%Complete: 95
-TCComment: Wrong cleave and red aura is missing not yet added.
-TCComment: Prowlers moving through wall hopefully mmaps will fix.
-TCComment: Can't test LOS until mmaps.
-TCCategory: Zul'Gurub
-EndScriptData */
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
@@ -42,7 +33,7 @@ enum Spells
     SPELL_GOUGE                 = 12540,
     SPELL_MARK_OF_ARLOKK        = 24210, // triggered spell 24211 Added to spell_dbc
     SPELL_RAVAGE                = 24213,
-    SPELL_WHIRLWIND             = 24236, // Triggers 15589
+    SPELL_WHIRLWIND             = 24236, // Triggers spell 15589
     SPELL_PANTHER_TRANSFORM     = 24190,
     SPELL_SUMMON_PROWLER        = 24246, // Added to Spell_dbc
     SPELL_VANISH_VISUAL         = 24222,
@@ -112,8 +103,8 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MARK_OF_ARLOKK);
+            _JustDied();
             Talk(SAY_DEATH);
         }
 
