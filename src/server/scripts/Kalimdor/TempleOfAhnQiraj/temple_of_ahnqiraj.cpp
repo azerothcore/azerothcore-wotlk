@@ -269,7 +269,10 @@ struct npc_obsidian_eradicator : public ScriptedAI
 
             for (Unit* target : _targets)
             {
-                DoCast(target, SPELL_DRAIN_MANA_ERADICATOR, true);
+                if (target)
+                {
+                    DoCast(target, SPELL_DRAIN_MANA_ERADICATOR, true);
+                }
             }
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
