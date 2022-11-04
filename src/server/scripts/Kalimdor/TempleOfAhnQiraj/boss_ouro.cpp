@@ -112,11 +112,6 @@ struct boss_ouro : public BossAI
         _scheduler.SetValidator([this] { return !me->HasUnitState(UNIT_STATE_CASTING); });
     }
 
-    bool CanAIAttack(Unit const* victim) const override
-    {
-        return me->IsWithinMeleeRange(victim);
-    }
-
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         if (me->HealthBelowPctDamaged(20, damage) && !_enraged)
