@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Cthun
-SD%Complete: 95
-SDComment: Darkglare tracking issue
-SDCategory: Temple of Ahn'Qiraj
-EndScriptData */
-
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -778,7 +771,8 @@ struct npc_giant_claw_tentacle : public ScriptedAI
                 context.Repeat(10s);
         }).Schedule(5s, [this](TaskContext context)
         {
-            DoCastSelf(SPELL_THRASH);
+            if (me->GetVictim()->IsWithinMeleeRange(me))
+                DoCastSelf(SPELL_THRASH);
             context.Repeat(10s);
         }).Schedule(3s, [this](TaskContext /*context*/)
         {
@@ -857,12 +851,8 @@ struct npc_giant_claw_tentacle : public ScriptedAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
             ScheduleMeleeCheck();
+            EnterCombat(target);
         }
-
-        _scheduler.Schedule(3s, [this](TaskContext /*context*/)
-        {
-            _canAttack = true;
-        });
     }
 
     void UpdateAI(uint32 diff) override
