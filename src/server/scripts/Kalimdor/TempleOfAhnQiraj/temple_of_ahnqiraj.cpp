@@ -259,7 +259,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
                     {
                         if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
                         {
-                            _targetGUIDs.insert(player->GetGUID());
+                            _targetGUIDs.push_back(player->GetGUID());
                         }
                     }
                 }
@@ -297,7 +297,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
-    GuidSet _targetGUIDs;
+    GuidList _targetGUIDs;
 };
 
 struct npc_anubisath_warder : public ScriptedAI
@@ -438,7 +438,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
-    GuidSet _targetGUIDs;
+    GuidList _targetGUIDs;
 };
 
 struct npc_ahnqiraji_critter : public ScriptedAI
