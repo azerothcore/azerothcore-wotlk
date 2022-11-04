@@ -395,7 +395,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
                     {
                         if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
                         {
-                            _targetGUIDs.insert(player->GetGUID());
+                            _targetGUIDs.push_back(player->GetGUID());
                         }
                     }
                 }
