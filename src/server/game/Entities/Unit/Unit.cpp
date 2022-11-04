@@ -4327,6 +4327,7 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8
 
             // try to increase stack amount
             foundAura->ModStackAmount(1, AURA_REMOVE_BY_DEFAULT, periodicReset);
+            sScriptMgr->OnAuraApply(this, foundAura);
             return foundAura;
         }
     }
@@ -4473,6 +4474,8 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
         if (effMask & 1 << i && (!aurApp->GetRemoveMode()))
             aurApp->_HandleEffect(i, true);
     }
+
+    sScriptMgr->OnAuraApply(this, aura);
 }
 
 // removes aura application from lists and unapplies effects
@@ -11200,7 +11203,7 @@ void Unit::SendHealSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, uint32 
 int32 Unit::HealBySpell(HealInfo& healInfo, bool critical)
 {
     uint32 heal = healInfo.GetHeal();
-    sScriptMgr->ModifyHealRecieved(this, healInfo.GetTarget(), heal);
+    sScriptMgr->ModifyHealReceived(this, healInfo.GetTarget(), heal, healInfo.GetSpellInfo());
     healInfo.SetHeal(heal);
 
     // calculate heal absorb and reduce healing
