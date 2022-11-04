@@ -79,15 +79,29 @@ public:
 
     void EnterCombatWithTrio(Unit* who)
     {
+        BossAI::EnterCombat(who);
+
         if (Creature* vem = instance->GetCreature(DATA_VEM))
+        {
             if (vem->GetGUID() != me->GetGUID())
+            {
                 vem->GetAI()->AttackStart(who);
+            }
+        }
         if (Creature* kri = instance->GetCreature(DATA_KRI))
+        {
             if (kri->GetGUID() != me->GetGUID())
+            {
                 kri->GetAI()->AttackStart(who);
+            }
+        }
         if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
+        {
             if (yauj->GetGUID() != me->GetGUID())
+            {
                 yauj->GetAI()->AttackStart(who);
+            }
+        }
     }
 
     void EvadeAllBosses(EvadeReason why)
