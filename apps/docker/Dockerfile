@@ -43,14 +43,6 @@ RUN addgroup --gid $GROUP_ID acore && \
     passwd -d acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-# Correct permissions for non-root operations
-RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
-RUN chown -R $DOCKER_USER:$DOCKER_USER /run
-RUN chown -R $DOCKER_USER:$DOCKER_USER /opt
-RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
-
-USER $DOCKER_USER
-
 # must be created to set the correct permissions on them
 RUN mkdir -p /azerothcore/env/dist/bin
 RUN mkdir -p /azerothcore/env/dist/data/Cameras
@@ -62,6 +54,15 @@ RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/temp
 RUN mkdir -p /azerothcore/env/dist/etc
 RUN mkdir -p /azerothcore/var/build/obj
+
+# Correct permissions for non-root operations
+RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
+RUN chown -R $DOCKER_USER:$DOCKER_USER /run
+RUN chown -R $DOCKER_USER:$DOCKER_USER /opt
+RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
+
+USER $DOCKER_USER
+
 
 # copy everything so we can work directly within the container
 # using tools such as vscode dev-container
