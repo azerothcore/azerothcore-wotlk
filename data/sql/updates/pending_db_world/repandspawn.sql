@@ -4,3 +4,4 @@ INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`,
 (26081, 87, 21, 5, 0, 5, 7, 1, -25, 0);
 --Spawn to 8 hours
 UPDATE `creature` SET `spawntimesecs`=28800 WHERE `guid`=1975960 AND `id1`=26081;
+
