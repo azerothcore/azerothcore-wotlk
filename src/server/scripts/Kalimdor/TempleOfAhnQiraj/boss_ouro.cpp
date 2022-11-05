@@ -112,6 +112,11 @@ struct boss_ouro : public BossAI
         _scheduler.SetValidator([this] { return !me->HasUnitState(UNIT_STATE_CASTING); });
     }
 
+    bool CanAIAttack(Unit const* victim) const override
+    {
+        return me->IsWithinMeleeRange(victim);
+    }
+
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         if (me->HealthBelowPctDamaged(20, damage) && !_enraged)
@@ -190,7 +195,9 @@ struct boss_ouro : public BossAI
     void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_SAND_BLAST && target)
-            me->GetThreatMgr().ModifyThreatByPercent(target, 100);
+        {
+            me->GetThreatMgr().ModifyThreatByPercent(target, -100);
+        }
     }
 
     void Emerge()
@@ -202,7 +209,21 @@ struct boss_ouro : public BossAI
         _scheduler
             .Schedule(20s, GROUP_EMERGED, [this](TaskContext context)
                 {
-                    DoCastVictim(SPELL_SAND_BLAST);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true))
+                    {
+                        me->SetTarget(target->GetGUID());
+                    }
+
+                    DoCastAOE(SPELL_SAND_BLAST);
+
+                    me->m_Events.AddEventAtOffset([this]()
+                    {
+                        if (Unit* victim = me->GetVictim())
+                        {
+                            me->SetTarget(victim->GetGUID());
+                        }
+                    }, 3s);
+
                     context.Repeat();
                 })
             .Schedule(22s, GROUP_EMERGED, [this](TaskContext context)
@@ -252,11 +273,14 @@ struct boss_ouro : public BossAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
-        me->DespawnOrUnsummon(1000);
-        instance->SetBossState(DATA_OURO, FAIL);
-        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
-            base->DespawnOrUnsummon();
+        if (me->GetThreatMgr().GetThreatList().empty())
+        {
+            DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
+            me->DespawnOrUnsummon(1000);
+            instance->SetBossState(DATA_OURO, FAIL);
+            if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
+                base->DespawnOrUnsummon();
+        }
     }
 
     void EnterCombat(Unit* who) override
@@ -268,9 +292,7 @@ struct boss_ouro : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        //Return since we have no target
-        if (!UpdateVictim())
-            return;
+        UpdateVictim();
 
         _scheduler.Update(diff, [this]
             {

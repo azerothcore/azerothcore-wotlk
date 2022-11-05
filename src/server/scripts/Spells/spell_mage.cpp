@@ -789,11 +789,12 @@ class spell_mage_master_of_elements : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        _spellInfo = eventInfo.GetSpellInfo();
-        if (!_spellInfo || !eventInfo.GetActor() || !eventInfo.GetActionTarget())
+        if (!eventInfo.GetActor() || !eventInfo.GetActionTarget())
         {
             return false;
         }
+
+        _spellInfo = eventInfo.GetSpellInfo();
 
         bool selectCaster = false;
         // Triggered spells cost no mana so we need triggering spellInfo
@@ -802,6 +803,13 @@ class spell_mage_master_of_elements : public AuraScript
             _spellInfo = triggeredByAuraSpellInfo;
             selectCaster = true;
         }
+
+        if (!_spellInfo)
+        {
+            return false;
+        }
+
+        _ticksModifier = 1;
 
         // If spell is periodic, mana amount is divided by tick number
         if (eventInfo.GetTriggerAuraEffectIndex() >= EFFECT_0)
@@ -812,24 +820,29 @@ class spell_mage_master_of_elements : public AuraScript
                 {
                     if (AuraEffect const* aurEff = target->GetAuraEffect(_spellInfo->Id, eventInfo.GetTriggerAuraEffectIndex(), caster->GetGUID()))
                     {
-                        ticksModifier = aurEff->GetTotalTicks();
+                        _ticksModifier = std::max(1, aurEff->GetTotalTicks());
                     }
                 }
             }
         }
 
-        return _spellInfo; // eventInfo.GetSpellInfo()
+        return true;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        int32 mana = int32(_spellInfo->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask()) / ticksModifier);
-        mana = CalculatePct(mana, aurEff->GetAmount());
+        if (Unit* target = GetTarget())
+        {
+            int32 mana = int32(_spellInfo->CalcPowerCost(target, eventInfo.GetSchoolMask()) / _ticksModifier);
+            mana = CalculatePct(mana, aurEff->GetAmount());
 
-        if (mana > 0)
-            GetTarget()->CastCustomSpell(SPELL_MAGE_MASTER_OF_ELEMENTS_ENERGIZE, SPELLVALUE_BASE_POINT0, mana, GetTarget(), true, nullptr, aurEff);
+            if (mana > 0)
+            {
+                target->CastCustomSpell(SPELL_MAGE_MASTER_OF_ELEMENTS_ENERGIZE, SPELLVALUE_BASE_POINT0, mana, target, true, nullptr, aurEff);
+            }
+        }
     }
 
     void Register() override
@@ -840,7 +853,7 @@ class spell_mage_master_of_elements : public AuraScript
 
 private:
     SpellInfo const* _spellInfo = nullptr;
-    uint8 ticksModifier = 1;
+    uint8 _ticksModifier = 0;
 };
 
 enum SilvermoonPolymorph

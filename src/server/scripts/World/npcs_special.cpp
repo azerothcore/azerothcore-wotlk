@@ -265,7 +265,7 @@ public:
                 }
                 if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN))
                 {
-                    me->Yell(RIGGLE_SAY_START);
+                    me->AI()->Talk(RIGGLE_SAY_START);
                     sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
                 }
             }
@@ -285,7 +285,7 @@ public:
             {
                 if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN))
                 {
-                    me->Yell(RIGGLE_SAY_POOLS_END);
+                    me->AI()->Talk(RIGGLE_SAY_POOLS_END);
                     sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
                 }
             }
@@ -328,7 +328,7 @@ public:
         if (quest->GetQuestId() == QUEST_MASTER_ANGLER)
         {
             creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-            creature->Yell(RIGGLE_SAY_WINNER, player);
+            creature->AI()->Talk(RIGGLE_SAY_WINNER, player);
             sWorld->setWorldState(STV_FISHING_PREV_WIN_TIME, GameTime::GetGameTime().count());
             sWorld->setWorldState(STV_FISHING_HAS_WINNER, 1);
         }
