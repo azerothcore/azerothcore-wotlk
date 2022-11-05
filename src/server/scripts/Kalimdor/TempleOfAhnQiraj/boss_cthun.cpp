@@ -452,10 +452,9 @@ struct boss_cthun : public BossAI
 
                 target->m_Events.AddEventAtOffset([target, this]()
                 {
+                    DoCast(target, SPELL_DIGESTIVE_ACID, true);
                     DoTeleportPlayer(target, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
                     target->RemoveAurasDueToSpell(SPELL_MIND_FLAY);
-                    //Cast digestive acid on them
-                    DoCast(target, SPELL_DIGESTIVE_ACID, true);
                 }, 3800ms);
             }
 
@@ -546,6 +545,8 @@ struct boss_cthun : public BossAI
         {
             eye->DespawnOrUnsummon();
         }
+
+        instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_DONE);
     }
 
     void SummonedCreatureDies(Creature* creature, Unit* /*killer*/) override
@@ -601,11 +602,14 @@ struct npc_eye_tentacle : public ScriptedAI
             portal->SetReactState(REACT_PASSIVE);
             _portalGUID = portal->GetGUID();
 
-            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+            if (me->ToTempSummon())
             {
-                if (Creature* creature = summoner->ToCreature())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
-                    creature->AI()->JustSummoned(portal);
+                    if (Creature* creature = summoner->ToCreature())
+                    {
+                        creature->AI()->JustSummoned(portal);
+                    }
                 }
             }
         }
@@ -672,11 +676,14 @@ struct npc_claw_tentacle : public ScriptedAI
             portal->SetReactState(REACT_PASSIVE);
             _portalGUID = portal->GetGUID();
 
-            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+            if (me->ToTempSummon())
             {
-                if (Creature* creature = summoner->ToCreature())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
-                    creature->AI()->JustSummoned(portal);
+                    if (Creature* creature = summoner->ToCreature())
+                    {
+                        creature->AI()->JustSummoned(portal);
+                    }
                 }
             }
         }
@@ -739,14 +746,19 @@ struct npc_giant_claw_tentacle : public ScriptedAI
             portal->SetReactState(REACT_PASSIVE);
             _portalGUID = portal->GetGUID();
 
-            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+            if (me->ToTempSummon())
             {
-                if (Creature* creature = summoner->ToCreature())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
-                    creature->AI()->JustSummoned(portal);
+                    if (Creature* creature = summoner->ToCreature())
+                    {
+                        creature->AI()->JustSummoned(portal);
+                    }
                 }
             }
         }
+
+        _canAttack = false;
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -768,21 +780,10 @@ struct npc_giant_claw_tentacle : public ScriptedAI
     void EnterCombat(Unit* /*who*/) override
     {
         DoZoneInCombat();
-
-        _scheduler.Schedule(2s, [this](TaskContext context)
-            {
-                DoCastVictim(SPELL_HAMSTRING);
-                context.Repeat(10s);
-            }).Schedule(5s, [this](TaskContext context)
-            {
-                DoCastSelf(SPELL_THRASH);
-                context.Repeat(10s);
-            });
-
-        ScheduleMeleeCheck();
+        ScheduleTasks();
     }
 
-    void ScheduleMeleeCheck()
+    void ScheduleTasks()
     {
         // Check if a target is in melee range
         _scheduler.Schedule(10s, [this](TaskContext task)
@@ -804,6 +805,17 @@ struct npc_giant_claw_tentacle : public ScriptedAI
                 }
 
                 task.Repeat();
+            }).Schedule(2s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_HAMSTRING);
+                context.Repeat(10s);
+            }).Schedule(5s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_THRASH);
+                context.Repeat(10s);
+            }).Schedule(3s, [this](TaskContext /*context*/)
+            {
+                _canAttack = true;
             });
     }
 
@@ -825,6 +837,7 @@ struct npc_giant_claw_tentacle : public ScriptedAI
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
         _scheduler.CancelAll();
+        _canAttack = false;
 
         _scheduler.Schedule(5s, [this](TaskContext /*task*/)
             {
@@ -849,7 +862,7 @@ struct npc_giant_claw_tentacle : public ScriptedAI
             DoCastAOE(SPELL_MASSIVE_GROUND_RUPTURE, true);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
-            ScheduleMeleeCheck();
+            ScheduleTasks();
         }
     }
 
@@ -861,12 +874,16 @@ struct npc_giant_claw_tentacle : public ScriptedAI
 
         _scheduler.Update(diff);
 
-        DoMeleeAttackIfReady();
+        if (_canAttack)
+        {
+            DoMeleeAttackIfReady();
+        }
     }
 
 private:
     TaskScheduler _scheduler;
     ObjectGuid _portalGUID;
+    bool _canAttack;
 };
 
 struct npc_giant_eye_tentacle : public ScriptedAI
@@ -880,11 +897,14 @@ struct npc_giant_eye_tentacle : public ScriptedAI
             portal->SetReactState(REACT_PASSIVE);
             _portalGUID = portal->GetGUID();
 
-            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+            if (me->ToTempSummon())
             {
-                if (Creature* creature = summoner->ToCreature())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
-                    creature->AI()->JustSummoned(portal);
+                    if (Creature* creature = summoner->ToCreature())
+                    {
+                        creature->AI()->JustSummoned(portal);
+                    }
                 }
             }
         }

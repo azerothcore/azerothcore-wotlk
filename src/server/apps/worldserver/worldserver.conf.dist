@@ -2919,8 +2919,9 @@ Battleground.SpeedBuffRespawn = 150
 #
 #     Wintergrasp.Enable
 #         Description: Enable the Wintergrasp battlefield.
-#         Default:     0 - (Disabled)
-#                      1 - (Enabled, Experimental as of still being in development)
+#         Default:     1 - (Enabled, Experimental as of still being in development)
+#                      0 - (Battleground disabled, Wintergrasp world processing still occurs)
+#                      2 - (Disable all Wintergrasp processing)
 
 Wintergrasp.Enable = 1
 

@@ -124,7 +124,8 @@ DamageInfo::DamageInfo(CalcDamageInfo const& dmgInfo) : DamageInfo(DamageInfo(dm
 
 DamageInfo::DamageInfo(DamageInfo const& dmg1, DamageInfo const& dmg2)
     : m_attacker(dmg1.m_attacker), m_victim(dmg1.m_victim), m_damage(dmg1.m_damage + dmg2.m_damage), m_spellInfo(dmg1.m_spellInfo), m_schoolMask(SpellSchoolMask(dmg1.m_schoolMask | dmg2.m_schoolMask)),
-    m_damageType(dmg1.m_damageType), m_attackType(dmg1.m_attackType), m_absorb(dmg1.m_absorb + dmg2.m_absorb), m_resist(dmg1.m_resist + dmg2.m_resist), m_block(dmg1.m_block)
+    m_damageType(dmg1.m_damageType), m_attackType(dmg1.m_attackType), m_absorb(dmg1.m_absorb + dmg2.m_absorb), m_resist(dmg1.m_resist + dmg2.m_resist), m_block(dmg1.m_block),
+    m_cleanDamage(dmg1.m_cleanDamage + dmg1.m_cleanDamage)
 {
 }
 
@@ -468,7 +469,11 @@ void Unit::Update(uint32 p_time)
             extraAttacksTargets.erase(itr);
             if (Unit* victim = ObjectAccessor::GetUnit(*this, targetGuid))
             {
-                HandleProcExtraAttackFor(victim, count);
+                if (_lastExtraAttackSpell == SPELL_SWORD_SPECIALIZATION || _lastExtraAttackSpell == SPELL_HACK_AND_SLASH
+                    || victim->IsWithinMeleeRange(this))
+                {
+                    HandleProcExtraAttackFor(victim, count);
+                }
             }
         }
         _lastExtraAttackSpell = 0;
@@ -915,7 +920,9 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             }
 
             if (attacker && shareDamageTarget->GetTypeId() == TYPEID_PLAYER)
-                attacker->SendSpellNonMeleeDamageLog(shareDamageTarget, spell, shareDamage, damageSchoolMask, shareAbsorb, shareResist, damagetype == DIRECT_DAMAGE, 0, false);
+            {
+                attacker->SendSpellNonMeleeDamageLog(shareDamageTarget, spell, shareDamage, damageSchoolMask, shareAbsorb, shareResist, damagetype == DIRECT_DAMAGE, 0, false, true);
+            }
 
             Unit::DealDamage(attacker, shareDamageTarget, shareDamage, cleanDamage, NODAMAGE, damageSchoolMask, spellProto, false, false, damageSpell);
         }
@@ -1299,7 +1306,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
     uint32 crTypeMask = victim->GetCreatureTypeMask();
 
      // Script Hook For CalculateSpellDamageTaken -- Allow scripts to change the Damage post class mitigation calculations
-    sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);
+    sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage, spellInfo);
 
     int32 cleanDamage = 0;
     if (Unit::IsDamageReducedByArmor(damageSchoolMask, spellInfo))
@@ -2359,7 +2366,9 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             caster->ProcDamageAndSpellFor(true, attacker, procVictim, procEx, BASE_ATTACK, spellInfo, splitted, nullptr, -1, nullptr, &splittedDmgInfo);
 
             if (attacker)
-                attacker->SendSpellNonMeleeDamageLog(caster, (*itr)->GetSpellInfo(), splitted, schoolMask, splitted_absorb, splitted_resist, false, 0, false);
+            {
+                attacker->SendSpellNonMeleeDamageLog(caster, (*itr)->GetSpellInfo(), splitted, schoolMask, splitted_absorb, splitted_resist, false, 0, false, true);
+            }
 
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
             Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*itr)->GetSpellInfo(), false);
@@ -2430,7 +2439,9 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             caster->ProcDamageAndSpellFor(true, attacker, procVictim, procEx, BASE_ATTACK, spellInfo, splitted);
 
             if (attacker)
-                attacker->SendSpellNonMeleeDamageLog(caster, splitSpellInfo, splitted, splitSchoolMask, splitted_absorb, splitted_resist, false, 0, false);
+            {
+                attacker->SendSpellNonMeleeDamageLog(caster, splitSpellInfo, splitted, splitSchoolMask, splitted_absorb, splitted_resist, false, 0, false, true);
+            }
 
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
             Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, splitSchoolMask, splitSpellInfo, false);
@@ -3148,19 +3159,17 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
     // xinef: if from behind or spell requires cast from behind
     if (!victim->HasInArc(M_PI, this))
     {
-        if (!victim->HasAuraType(SPELL_AURA_IGNORE_HIT_DIRECTION))
+        if (!victim->HasAuraType(SPELL_AURA_IGNORE_HIT_DIRECTION) || spellInfo->HasAttribute(SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET))
         {
             // Can`t dodge from behind in PvP (but its possible in PvE)
             if (victim->GetTypeId() == TYPEID_PLAYER)
+            {
                 canDodge = false;
+            }
+
             // Can`t parry or block
             canParry = false;
             canBlock = false;
-        }
-        else // Only deterrence as of 3.3.5
-        {
-            if (spellInfo->HasAttribute(SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET))
-                canParry = false;
         }
     }
 
@@ -4322,6 +4331,7 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8
 
             // try to increase stack amount
             foundAura->ModStackAmount(1, AURA_REMOVE_BY_DEFAULT, periodicReset);
+            sScriptMgr->OnAuraApply(this, foundAura);
             return foundAura;
         }
     }
@@ -4468,6 +4478,8 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
         if (effMask & 1 << i && (!aurApp->GetRemoveMode()))
             aurApp->_HandleEffect(i, true);
     }
+
+    sScriptMgr->OnAuraApply(this, aura);
 }
 
 // removes aura application from lists and unapplies effects
@@ -6219,11 +6231,31 @@ void Unit::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log)
     data << uint8 (log->unused);                            // unused
     data << uint32(log->blocked);                           // blocked
     data << uint32(log->HitInfo);
-    data << uint8 (0);                                      // flag to use extend data
+    data << uint32(log->HitInfo);
+    data << uint8(log->HitInfo & (SPELL_HIT_TYPE_CRIT_DEBUG | SPELL_HIT_TYPE_HIT_DEBUG | SPELL_HIT_TYPE_ATTACK_TABLE_DEBUG));
+    //if (log->HitInfo & SPELL_HIT_TYPE_CRIT_DEBUG)
+    //{
+    //    data << float(log->CritRoll);
+    //    data << float(log->CritNeeded);
+    //}
+    //if (log->HitInfo & SPELL_HIT_TYPE_HIT_DEBUG)
+    //{
+    //    data << float(log->HitRoll);
+    //    data << float(log->HitNeeded);
+    //}
+    //if (log->HitInfo & SPELL_HIT_TYPE_ATTACK_TABLE_DEBUG)
+    //{
+    //    data << float(log->MissChance);
+    //    data << float(log->DodgeChance);
+    //    data << float(log->ParryChance);
+    //    data << float(log->BlockChance);
+    //    data << float(log->GlanceChance);
+    //    data << float(log->CrushChance);
+    //}
     SendMessageToSet(&data, true);
 }
 
-void Unit::SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, uint32 Damage, SpellSchoolMask damageSchoolMask, uint32 AbsorbedDamage, uint32 Resist, bool PhysicalDamage, uint32 Blocked, bool CriticalHit)
+void Unit::SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, uint32 Damage, SpellSchoolMask damageSchoolMask, uint32 AbsorbedDamage, uint32 Resist, bool PhysicalDamage, uint32 Blocked, bool CriticalHit /*= false*/, bool Split /*= false*/)
 {
     SpellNonMeleeDamage log(this, target, spellInfo, damageSchoolMask);
     log.damage = Damage;
@@ -6231,9 +6263,15 @@ void Unit::SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, 
     log.resist = Resist;
     log.physicalLog = PhysicalDamage;
     log.blocked = Blocked;
-    log.HitInfo = SPELL_HIT_TYPE_UNK1 | SPELL_HIT_TYPE_UNK3 | SPELL_HIT_TYPE_UNK6;
+    log.HitInfo = 0;
     if (CriticalHit)
+    {
         log.HitInfo |= SPELL_HIT_TYPE_CRIT;
+    }
+    if (Split)
+    {
+        log.HitInfo |= SPELL_HIT_TYPE_SPLIT;
+    }
     SendSpellNonMeleeDamageLog(&log);
 }
 
@@ -9339,7 +9377,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 
         // Patch 2.2.0 Sword Specialization (Warrior, Rogue) extra attack can no longer proc additional extra attacks
         // 3.3.5 Sword Specialization (Warrior), Hack and Slash (Rogue)
-        if (lastExtraAttackSpell == 16459 || lastExtraAttackSpell == 66923)
+        if (lastExtraAttackSpell == SPELL_SWORD_SPECIALIZATION || lastExtraAttackSpell == SPELL_HACK_AND_SLASH)
         {
             return false;
         }
@@ -11152,7 +11190,7 @@ void Unit::SendHealSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, uint32 
 int32 Unit::HealBySpell(HealInfo& healInfo, bool critical)
 {
     uint32 heal = healInfo.GetHeal();
-    sScriptMgr->ModifyHealRecieved(this, healInfo.GetTarget(), heal);
+    sScriptMgr->ModifyHealReceived(this, healInfo.GetTarget(), heal, healInfo.GetSpellInfo());
     healInfo.SetHeal(heal);
 
     // calculate heal absorb and reduce healing
@@ -17464,10 +17502,16 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
     // Xinef: additional check for player auras - only player spells can trigger player proc auras
     // Xinef: skip victim auras
     // Excluded player shoot spells
-    if (!isVictim && GetTypeId() == TYPEID_PLAYER) //spellProto->SpellFamilyName != SPELLFAMILY_GENERIC)
-        if (!(EventProcFlag & (PROC_FLAG_KILL | PROC_FLAG_DEATH)) && procSpell && procSpell->SpellFamilyName == SPELLFAMILY_GENERIC && procSpell->GetCategory() != 76 &&
+    // Excluded player item spells
+    if (!isVictim && IsPlayer() && !(EventProcFlag & (PROC_FLAG_KILL | PROC_FLAG_DEATH)))
+    {
+        if (procSpell && procSpell->SpellFamilyName == SPELLFAMILY_GENERIC && procSpell->GetCategory() != 76 &&
+            (!eventInfo.GetProcSpell() || !eventInfo.GetProcSpell()->m_CastItem) &&
             (!eventInfo.GetTriggerAuraSpell() || eventInfo.GetTriggerAuraSpell()->SpellFamilyName == SPELLFAMILY_GENERIC))
+        {
             return false;
+        }
+    }
 
     // Check spellProcEvent data requirements
     if (!sSpellMgr->IsSpellProcEventCanTriggeredBy(spellProto, spellProcEvent, EventProcFlag, eventInfo, active))
