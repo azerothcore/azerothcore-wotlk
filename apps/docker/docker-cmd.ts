@@ -41,7 +41,7 @@ shellCommandFactory(
   [
     "docker compose --profile local build --parallel",
     "docker image prune -f",
-    "docker compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
+    "docker compose run --rm --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
   ],
   env
 );
@@ -52,18 +52,7 @@ shellCommandFactory(
   [
     "docker compose --profile local build --no-cache --parallel",
     "docker image prune -f",
-    "docker compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
-  ],
-  env
-);
-
-shellCommandFactory(
-  "build:compile",
-  "Run the compilation process only, without rebuilding all docker images",
-  [
-    "docker compose build --parallel ac-build",
-    "docker image prune -f",
-    "docker compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
+    "docker compose run --rm --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
   ],
   env
 );
@@ -73,7 +62,7 @@ shellCommandFactory(
   "Clean build files",
   [
     "docker image prune -f",
-    `docker compose run --rm ac-build bash acore.sh compiler clean`,
+    `docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler clean`,
   ],
   env
 );
@@ -81,7 +70,7 @@ shellCommandFactory(
 shellCommandFactory(
   "client-data",
   "Download client data inside the ac-data volume",
-  ["docker compose run --rm ac-build bash acore.sh client-data"],
+  ["docker compose run --rm --no-deps ac-dev-server bash acore.sh client-data"],
   env
 );
 
@@ -94,7 +83,7 @@ shellCommandFactory(
 
 shellCommandFactory(
   "dev:build",
-  "Build using the dev server, it uses volumes to compile which can be faster on linux & WSL",
+  "Build using the dev server",
   ["docker compose run --rm ac-dev-server bash acore.sh compiler build"],
   env
 );
@@ -118,28 +107,28 @@ shellCommandFactory(
 
 shellCommandFactory(
   "prod:build",
-  "Build producion services",
+  "[TEST ONLY] Build producion services",
   ["docker compose --profile prod build --parallel", "docker image prune -f"],
   env
 );
 
 shellCommandFactory(
   "prod:pull",
-  "Pull production services from the remote registry",
+  "[TEST ONLY] Pull production services from the remote registry",
   ["docker compose --profile prod pull"],
   env
 );
 
 shellCommandFactory(
   "prod:up",
-  "Start production services (foreground)",
+  "[TEST ONLY] Start production services (foreground)",
   ["docker compose --profile prod-app up"],
   env
 );
 
 shellCommandFactory(
   "prod:up:d",
-  "Start production services (background)",
+  "[TEST ONLY] Start production services (background)",
   ["docker compose --profile prod-app up -d"],
   env
 );

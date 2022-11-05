@@ -65,7 +65,6 @@ jobs:
         if: github.repository == 'azerothcore/azerothcore-wotlk'
         env:
           #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-          DOCKER_EXTENDS_BIND: abstract-no-bind
           DOCKER_CLIENT_TIMEOUT: 400
           COMPOSE_HTTP_TIMEOUT: 400
         run: |
@@ -93,7 +92,6 @@ jobs:
         if: github.repository == 'azerothcore/azerothcore-wotlk'
         env:
           #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-          DOCKER_EXTENDS_BIND: abstract-no-bind
           DOCKER_AC_BUILD_TARGET: build
           DOCKER_CLIENT_TIMEOUT: 220
           COMPOSE_HTTP_TIMEOUT: 220
@@ -101,7 +99,6 @@ jobs:
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
           ./acore.sh docker prod:build
-          docker compose run --no-deps --name build ac-build echo "image created"
           docker cp build:/azerothcore/var/ccache var/docker/
           echo "ccache exported"
 

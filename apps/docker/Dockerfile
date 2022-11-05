@@ -43,14 +43,6 @@ RUN addgroup --gid $GROUP_ID acore && \
     passwd -d acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-# must be created to set the correct permissions on them
-RUN mkdir -p /azerothcore/env/dist/bin
-RUN mkdir -p /azerothcore/env/dist/data
-RUN mkdir -p /azerothcore/env/dist/logs
-RUN mkdir -p /azerothcore/env/dist/temp
-RUN mkdir -p /azerothcore/env/dist/etc
-RUN mkdir -p /azerothcore/var/build/obj
-
 # Correct permissions for non-root operations
 RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
 RUN chown -R $DOCKER_USER:$DOCKER_USER /run
@@ -58,6 +50,18 @@ RUN chown -R $DOCKER_USER:$DOCKER_USER /opt
 RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 USER $DOCKER_USER
+
+# must be created to set the correct permissions on them
+RUN mkdir -p /azerothcore/env/dist/bin
+RUN mkdir -p /azerothcore/env/dist/data/Cameras
+RUN mkdir -p /azerothcore/env/dist/data/dbc
+RUN mkdir -p /azerothcore/env/dist/data/maps
+RUN mkdir -p /azerothcore/env/dist/data/mmaps
+RUN mkdir -p /azerothcore/env/dist/data/vmaps
+RUN mkdir -p /azerothcore/env/dist/logs
+RUN mkdir -p /azerothcore/env/dist/temp
+RUN mkdir -p /azerothcore/env/dist/etc
+RUN mkdir -p /azerothcore/var/build/obj
 
 # copy everything so we can work directly within the container
 # using tools such as vscode dev-container
@@ -78,6 +82,8 @@ WORKDIR /azerothcore
 FROM base as dev
 
 LABEL description="AC dev image for dev containers"
+
+USER $DOCKER_USER
 
 #================================================================
 #
@@ -134,7 +140,11 @@ RUN chown $DOCKER_USER:$DOCKER_USER /azerothcore
 USER $DOCKER_USER
 
 # must be created to avoid permissions errors
-RUN mkdir -p /azerothcore/env/dist/data
+RUN mkdir -p /azerothcore/env/dist/data/Cameras
+RUN mkdir -p /azerothcore/env/dist/data/dbc
+RUN mkdir -p /azerothcore/env/dist/data/maps
+RUN mkdir -p /azerothcore/env/dist/data/mmaps
+RUN mkdir -p /azerothcore/env/dist/data/vmaps
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc
 RUN mkdir -p /azerothcore/env/dist/bin
@@ -157,11 +167,15 @@ LABEL description="AC authserver image for local environment"
 
 CMD ./acore.sh run-authserver
 
+USER $DOCKER_USER
+
 FROM servicebase as worldserver-local
 
 LABEL description="AC worldserver image for local environment"
 
 CMD ./acore.sh run-worldserver
+
+USER $DOCKER_USER
 
 #================================================================
 #
@@ -171,6 +185,7 @@ CMD ./acore.sh run-worldserver
 FROM base as build
 
 ARG DOCKER_USER=acore
+USER $DOCKER_USER
 
 LABEL description="AC Image used by the build stage to generate production images"
 
@@ -207,6 +222,7 @@ FROM authserver-local as authserver
 LABEL description="AC Production: authserver"
 
 ARG DOCKER_USER=acore
+USER $DOCKER_USER
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/authserver /azerothcore/env/dist/bin/authserver
@@ -222,6 +238,7 @@ FROM worldserver-local as worldserver
 LABEL description="AC Production: worldserver"
 
 ARG DOCKER_USER=acore
+USER $DOCKER_USER
 
 RUN mkdir -p /azerothcore/env/dist/bin/lua_scripts
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
@@ -307,9 +324,8 @@ RUN mkdir -p /azerothcore/env/client/maps
 RUN mkdir -p /azerothcore/env/client/mmaps
 RUN mkdir -p /azerothcore/env/client/vmaps
 
-# Need fix
-# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mapextractor /azerothcore/env/client/mapextractor
-# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator
-# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4assembler /azerothcore/env/client/vmap4assembler
-# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4extractor /azerothcore/env/client/vmap4extractor
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mapextractor /azerothcore/env/client/mapextractor
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4assembler /azerothcore/env/client/vmap4assembler
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4extractor /azerothcore/env/client/vmap4extractor
 
