@@ -116,6 +116,9 @@ services:
       # this is not the directory of the extracted data! It's the client folder used by the extractors
       - ${DOCKER_AC_CLIENT_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
     profiles: [dev]
+    depends_on:
+      ac-database:
+        condition: service_healthy
 
 #=======================
 #

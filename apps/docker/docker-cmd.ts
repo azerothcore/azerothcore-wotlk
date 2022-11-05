@@ -63,6 +63,7 @@ shellCommandFactory(
   [
     "docker image prune -f",
     `docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler clean`,
+    `docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler ccacheClean`,
   ],
   env
 );
