@@ -1,3 +1,4 @@
+-- DB update 2022_11_05_00 -> 2022_11_05_01
 
 -- Set CALLKILLEDMONSTER non repeteable
 UPDATE `smart_scripts` SET `event_flags` = `event_flags`|1 WHERE `entryorguid` IN (21859, 21846) AND `source_type`=0 AND `id`=0 AND `link`=1;
