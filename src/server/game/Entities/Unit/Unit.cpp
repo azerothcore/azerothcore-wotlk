@@ -469,8 +469,8 @@ void Unit::Update(uint32 p_time)
             extraAttacksTargets.erase(itr);
             if (Unit* victim = ObjectAccessor::GetUnit(*this, targetGuid))
             {
-                if ((_lastExtraAttackSpell != SPELL_SWORD_SPECIALIZATION && _lastExtraAttackSpell != SPELL_HACK_AND_SLASH)
-                    && victim->IsWithinMeleeRange(this))
+                if (_lastExtraAttackSpell == SPELL_SWORD_SPECIALIZATION || _lastExtraAttackSpell == SPELL_HACK_AND_SLASH
+                    || victim->IsWithinMeleeRange(this))
                 {
                     HandleProcExtraAttackFor(victim, count);
                 }
