@@ -1,6 +1,6 @@
 
---Set CALL_KILLEDMONSTER non repeteable
-UPDATE `smart_scripts` SET `event_flags`='1' WHERE  `entryorguid` IN (21859, 21846) AND `source_type`=0 AND `id`=0 AND `link`=1;
+--Set CALLKILLEDMONSTER non repeteable
+UPDATE `smart_scripts` SET `event_flags`=`event_flags`|1| WHERE  `entryorguid` IN (21859, 21846) AND `source_type`=0 AND `id`=0 AND `link`=1;
 
 --Add some spawn like the ones displayed in Wowhead
 DELETE FROM `creature` WHERE (`id1` = 21846) AND (`guid` IN (1977369,1977370,1977371,1977372,1977373,1977374,1977375,1977376,1977377,1977378,1977379,1977380));
@@ -17,4 +17,3 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 (1977378, 21859, 0, 0, 530, 0, 0, 1, 1, 1, -3642.40, 5322.93, -18.42, 0, 120, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (1977379, 21859, 0, 0, 530, 0, 0, 1, 1, 1, -3678.40, 5301.33, -19.96, 0, 120, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (1977380, 21859, 0, 0, 530, 0, 0, 1, 1, 1, -3743.2, 5171.73, -21.93, 0, 120, 0, 0, 1, 0, 0, 0, 0, 0, '', 0);
-
