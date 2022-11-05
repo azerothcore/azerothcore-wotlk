@@ -1,6 +1,6 @@
 
 --Set CALLKILLEDMONSTER non repeteable
-UPDATE `smart_scripts` SET `event_flags`=`event_flags`|1| WHERE `entryorguid` IN (21859,21846) AND `source_type`=0 AND `id`=0 AND `link`=1;
+UPDATE `smart_scripts` SET `event_flags` = `event_flags`|1 WHERE `entryorguid` IN (21859, 21846) AND `source_type`=0 AND `id`=0 AND `link`=1;
 
 --Add some spawn like the ones displayed in Wowhead
 DELETE FROM `creature` WHERE (`id1` = 21846) AND (`guid` IN (1977369,1977370,1977371,1977372,1977373,1977374,1977375,1977376,1977377,1977378,1977379,1977380));
