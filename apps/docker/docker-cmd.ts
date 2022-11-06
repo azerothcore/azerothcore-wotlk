@@ -52,7 +52,6 @@ shellCommandFactory(
   [
     "docker compose --profile local pull --parallel",
     "docker image prune -f",
-    "docker compose run --rm --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
   ],
   env
 );
