@@ -1,5 +1,5 @@
 -- Fire brigade esES / esMX
-DELETE FROM `quest_offer_reward_locale` WHERE `ID` in (11360, 11439, 11440) AND `locale` in ('esES', 'esMX');
+DELETE FROM `quest_offer_reward_locale` WHERE `ID` IN (11360, 11439, 11440) AND `locale` IN ('esES', 'esMX');
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
 	(11360, 'esES', '¡Estás mojado y lleno de ceniza! ¡Tienes que haber estado apagando fuegos!$b$b¡Bien hecho! Como miembro honorífico de la brigada de bomberos, te ruego que regreses si alguna vez te necesitamos.', 0),
 	(11439, 'esES', '¡Estás mojado y lleno de ceniza! ¡Tienes que haber estado apagando fuegos!$b$b¡Bien hecho! Como miembro honorífico de la brigada de bomberos, te ruego que regreses si alguna vez te necesitamos.', 0),
