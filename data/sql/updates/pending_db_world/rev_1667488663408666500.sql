@@ -1,16 +1,17 @@
 -- Update and insert some missing quests and creature texts (esES and esMX)
 -- QUEST_TEMPLATE_LOCALE
-UPDATE quest_template_locale SET ObjectiveText1 = 'Miembro de la Plaga asesinado'  WHERE id = 12919 AND (locale = 'esES' OR locale = 'esMX');
-UPDATE quest_template_locale SET ObjectiveText1 = 'Cianigosa asesinada'  WHERE id = 13159 AND (locale = 'esES' OR locale = 'esMX');
-UPDATE quest_template_locale SET ObjectiveText1 = 'Miembros de la Horda asesinados'  WHERE id = 13177 AND (locale = 'esES' OR locale = 'esMX');
-UPDATE quest_template_locale SET ObjectiveText1 = 'Miembros de la Alianza asesinados'  WHERE id = 13178 AND (locale = 'esES' OR locale = 'esMX');
-UPDATE quest_template_locale SET ObjectiveText1 = 'Miembros de la Horda asesinados'  WHERE id = 13179 AND (locale = 'esES' OR locale = 'esMX');
-UPDATE quest_template_locale SET ObjectiveText1 = 'Miembros de la Alianza asesinados'  WHERE id = 13180 AND (locale = 'esES' OR locale = 'esMX');
-UPDATE quest_template_locale SET ObjectiveText1 = 'Destruye una de las tres torres sur'  WHERE id = 13538 AND (locale = 'esES' OR locale = 'esMX');
-UPDATE quest_template_locale SET ObjectiveText1 = 'Miembro de la Plaga de Corona de Hielo muerto'  WHERE id = 13676 AND (locale = 'esES' OR locale = 'esMX');
-UPDATE quest_template_locale SET ObjectiveText1 = 'Vehículo de Asedio de la Horda Defendido'  WHERE id = 13223 AND (locale = 'esES' OR locale = 'esMX');
+UPDATE `quest_template_locale` SET ObjectiveText1 = 'Miembro de la Plaga asesinado'  WHERE id = 12919 AND locale IN ('esES', 'esMX');
+UPDATE `quest_template_locale` SET ObjectiveText1 = 'Cianigosa asesinada'  WHERE id = 13159 AND locale IN ('esES', 'esMX');
+UPDATE `quest_template_locale` SET ObjectiveText1 = 'Miembros de la Horda asesinados'  WHERE id = 13177 AND locale IN ('esES', 'esMX');
+UPDATE `quest_template_locale` SET ObjectiveText1 = 'Miembros de la Alianza asesinados'  WHERE id = 13178 AND locale IN ('esES', 'esMX');
+UPDATE `quest_template_locale` SET ObjectiveText1 = 'Miembros de la Horda asesinados'  WHERE id = 13179 AND locale IN ('esES', 'esMX');
+UPDATE `quest_template_locale` SET ObjectiveText1 = 'Miembros de la Alianza asesinados'  WHERE id = 13180 AND locale IN ('esES', 'esMX');
+UPDATE `quest_template_locale` SET ObjectiveText1 = 'Destruye una de las tres torres sur'  WHERE id = 13538 AND locale IN ('esES', 'esMX');
+UPDATE `quest_template_locale` SET ObjectiveText1 = 'Miembro de la Plaga de Corona de Hielo muerto'  WHERE id = 13676 AND locale IN ('esES', 'esMX');
+UPDATE `quest_template_locale` SET ObjectiveText1 = 'Vehículo de Asedio de la Horda Defendido'  WHERE id = 13223 AND locale IN ('esES', 'esMX');
 -- CREATURE_TEXT_LOCALE
-INSERT INTO creature_text_locale (CreatureID, GroupID, ID, Locale, Text) VALUES	
+DELETE FROM `creature_text_locale` WHERE CreatureID IN (29120, 32169, 32170) AND locale IN ('esES', 'esMX');
+INSERT INTO `creature_text_locale` (CreatureID, GroupID, ID, Locale, TEXT) VALUES	
 	(29120, 5, 0, 'esES', 'Yo fuí el Rey de este Imperio, hace mucho. En vida yo era un campeón. En la muerte regresé como conquistador. Ahora vuelvo a proteger el Reino. Irónico ¿Verdad?'),
 	(29120, 5, 0, 'esMX', 'Yo fuí el Rey de este Imperio, hace mucho. En vida yo era un campeón. En la muerte regresé como conquistador. Ahora vuelvo a proteger el Reino. Irónico ¿Verdad?'),
 	(32169, 0, 0, 'esES', '¡Se necesitan refuerzos para combatir en el campo de batalla de Conquista del Invierno! He abierto un portal para viajar rápido al campo de batalla en el Enclave de Plata.'),
@@ -18,7 +19,8 @@ INSERT INTO creature_text_locale (CreatureID, GroupID, ID, Locale, Text) VALUES
 	(32170, 0, 0, 'esES', '¡La batalla por el control de la Fortaleza de Conquista del Invierno comenzará en 5 minutos! ¡Preparaos para la batalla!'),
 	(32170, 0, 0, 'esMX', '¡La batalla por el control de la Fortaleza de Conquista del Invierno comenzará en 5 minutos! ¡Prepárense para la batalla!');
 -- QUEST_REQUEST_ITEMS_LOCALE
-INSERT INTO quest_request_items_locale (ID, locale, CompletionText, VerifiedBuild) VALUES 
+DELETE FROM `quest_request_items_locale` WHERE ID IN (11405, 13154, 13538, 13193, 13196, 13199, 13159, 13183, 13223, 13180, 13178) AND locale IN ('esES', 'esMX');
+INSERT INTO `quest_request_items_locale` (ID, locale, CompletionText, VerifiedBuild) VALUES 
 	(11405, 'esES', 'Esta tierra ha sido removida recientemente. En la capa superior hay lombrices que intentan escapar de la profunda oscuridad que se extiende debajo.', 0),
 	(11405, 'esMX', 'Esta tierra ha sido removida recientemente. En la capa superior hay lombrices que intentan escapar de la profunda oscuridad que se extiende debajo.', 0),
 	(13154, 'esES', '¿Como ha ido la caza? He oído rumores de que ese lugar esta embrujado, aunque no se me ocurriría aventurarme solo por ese lugar.', 0),
@@ -42,7 +44,8 @@ INSERT INTO quest_request_items_locale (ID, locale, CompletionText, VerifiedBuil
 	(13178, 'esES', 'Bueno, ¿Has completado tu misión?', 0),
 	(13178, 'esMX', 'Bueno, ¿Has completado tu misión?', 0);
 -- QUEST_OFFER_REWARD_LOCALE
-INSERT INTO quest_offer_reward_locale (ID, locale, RewardText, VerifiedBuild) VALUES
+DELETE FROM `quest_offer_reward_locale` WHERE ID IN(11404, 11405, 13222, 13223, 13177, 13179, 13181, 13183, 13158, 13159, 24585, 13178, 13180) AND locale IN ('esES', 'esMX');
+INSERT INTO `quest_offer_reward_locale` (ID, locale, RewardText, VerifiedBuild) VALUES
 	(11404, 'esES', '¿Dejarás la vela e invocarás a El Jinete decapitado de su descanso maldito?', 0),
 	(11404, 'esMX', '¿Dejarás la vela e invocarás a El Jinete decapitado de su descanso maldito?', 0),
 	(11405, 'esES', '¿Dejarás la vela e invocarás a El Jinete decapitado de su descanso maldito?', 0),
@@ -70,6 +73,7 @@ INSERT INTO quest_offer_reward_locale (ID, locale, RewardText, VerifiedBuild) VA
 	(13180, 'esES', '¡Lok\'tar! ¡Victoria para la Horda!', 0),
 	(13180, 'esMX', '¡Lok\'tar! ¡Victoria para la Horda!', 0);
 -- ITEM_TEMPLATE_LOCALE
-INSERT INTO item_template_locale (ID, locale, Name, Description, VerifiedBuild) VALUES
+DELETE FROM `item_template_locale` WHERE ID = 42482 AND locale IN ('esES', 'esMX');
+INSERT INTO `item_template_locale` (ID, locale, NAME, Description, VerifiedBuild) VALUES
 	(42482, 'esES', 'Llave de El Bastión Violeta', '', 0),
 	(42482, 'esMX', 'Llave de El Bastión Violeta', '', 0);
