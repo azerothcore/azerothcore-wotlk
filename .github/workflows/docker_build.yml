@@ -110,6 +110,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: var/docker/ccache
+          key: ccache:${{ matrix.os }}:clang:without-modules:${{ github.ref }}:${{ github.sha }}
+          restore-keys: |
+            ccache:${{ matrix.os }}:clang:without-modules:${{ github.ref }}
+            ccache:${{ matrix.os }}:clang:without-modules
+
       - name: Build Production images
         if: github.repository == 'azerothcore/azerothcore-wotlk'
         env:
