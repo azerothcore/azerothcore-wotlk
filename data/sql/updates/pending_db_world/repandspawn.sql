@@ -1,7 +1,4 @@
 --lots of Reputation changes
-DELETE FROM `creature_onkill_reputation` WHERE (`creature_id` = 26081);
-INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`, `MaxStanding1`, `IsTeamAward1`, `RewOnKillRepValue1`, `MaxStanding2`, `IsTeamAward2`, `RewOnKillRepValue2`, `TeamDependent`) VALUES
-(26081, 87, 21, 5, 0, 5, 7, 1, -25, 0);
+UPDATE `creature_onkill_reputation` SET `RewOnKillRepFaction1`=87, `RewOnKillRepFaction2`=21, `MaxStanding1`=5, `IsTeamAward1`=0, `RewOnKillRepValue1`=5, `MaxStanding2`=7, `IsTeamAward2`=1, `RewOnKillRepValue2`=-25, `TeamDependent`=0 WHERE `creature_id`=26081;
 --Spawn to 8 hours
 UPDATE `creature` SET `spawntimesecs`=28800 WHERE `guid`=1975960 AND `id1`=26081;
-
