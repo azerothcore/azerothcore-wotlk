@@ -50,7 +50,7 @@ shellCommandFactory(
   "pull",
   "Pull build and local images",
   [
-    "docker compose --profile local dev --parallel",
+    "docker compose --profile local pull --parallel",
     "docker image prune -f",
     "docker compose run --rm --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
   ],
@@ -177,7 +177,7 @@ program
     }
 
     services.pop();
-    services = services.slice(2);
+    services = services.slice(1);
 
     res.close(); // Don't forget to close it
 
