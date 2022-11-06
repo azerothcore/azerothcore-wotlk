@@ -70,6 +70,8 @@ jobs:
         if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
         run: |
           docker compose --profile dev --profile local push
+          output=$(./acore.sh version | grep "AzerothCore Rev.") && version=${output#"AzerothCore Rev."}
+          DOCKER_IMAGE_TAG=$version docker compose --profile local push
 
   docker-build-n-deploy-prod:
     strategy:
@@ -142,3 +144,5 @@ jobs:
         if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
         run: |
           docker compose --profile prod push
+          output=$(./acore.sh version | grep "AzerothCore Rev.") && version=${output#"AzerothCore Rev."}
+          DOCKER_IMAGE_TAG=$version docker compose --profile prod push
