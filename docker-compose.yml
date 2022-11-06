@@ -322,7 +322,7 @@ services:
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     working_dir: /azerothcore/
-    profiles: [local, build]
+    profiles: [test-build]
 
 volumes:
   ac-database:
