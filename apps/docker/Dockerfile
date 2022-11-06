@@ -191,6 +191,8 @@ LABEL description="AC Image used by the build stage to generate production image
 
 RUN mkdir -p /azerothcore/env/etc/
 
+# .git is needed by the compiler
+COPY --chown=$DOCKER_USER:$DOCKER_USER ./.git /azerothcore/.git
 COPY --chown=$DOCKER_USER:$DOCKER_USER ./CMakeLists.txt /azerothcore/CMakeLists.txt
 COPY --chown=$DOCKER_USER:$DOCKER_USER ./deps /azerothcore/deps
 COPY --chown=$DOCKER_USER:$DOCKER_USER ./src /azerothcore/src
