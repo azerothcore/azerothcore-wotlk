@@ -143,9 +143,9 @@ public:
         return commandTable;
     }
 
-    static bool HandleSkirmishCommand(ChatHandler* handler, std::string_view args)
+    static bool HandleSkirmishCommand(ChatHandler* handler, std::vector<std::string_view> args)
     {
-        auto tokens = Acore::Tokenize(args, ' ', true);
+        auto tokens = args;
 
         if (args.empty() || !tokens.size())
         {
@@ -1399,7 +1399,7 @@ public:
 
         if (location->empty() || *location == "inn")
         {
-            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
             return true;
         }
 

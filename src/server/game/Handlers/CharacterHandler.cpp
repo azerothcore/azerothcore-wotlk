@@ -432,6 +432,11 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
         std::function<void(PreparedQueryResult)> finalizeCharacterCreation = [this, createInfo](PreparedQueryResult result)
         {
+            if (!sScriptMgr->CanAccountCreateCharacter(GetAccountId(), createInfo->Race, createInfo->Class))
+            {
+                SendCharCreate(CHAR_CREATE_DISABLED);
+                return;
+            }
             bool haveSameRace = false;
             uint32 heroicReqLevel = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER);
             bool hasHeroicReqLevel = (heroicReqLevel == 0);
@@ -888,7 +893,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         if (at)
             pCurrChar->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, pCurrChar->GetOrientation());
         else
-            pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->GetOrientation());
+            pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->m_homebindO);
     }
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
@@ -949,7 +954,11 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
     // Set FFA PvP for non GM in non-rest mode
     if (sWorld->IsFFAPvPRealm() && !pCurrChar->IsGameMaster() && !pCurrChar->HasPlayerFlag(PLAYER_FLAGS_RESTING))
-        pCurrChar->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        if (!pCurrChar->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
+        {
+            sScriptMgr->OnFfaPvpStateUpdate(pCurrChar,true);
+            pCurrChar->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        }
 
     if (pCurrChar->HasPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP))
     {
@@ -1579,6 +1588,23 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
         if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph))
         {
             _player->RemoveAurasDueToSpell(glyphEntry->SpellId);
+
+            // Removed any triggered auras
+            Unit::AuraMap& ownedAuras = _player->GetOwnedAuras();
+            for (Unit::AuraMap::iterator iter = ownedAuras.begin(); iter != ownedAuras.end();)
+            {
+                Aura* aura = iter->second;
+                if (SpellInfo const* triggeredByAuraSpellInfo = aura->GetTriggeredByAuraSpellInfo())
+                {
+                    if (triggeredByAuraSpellInfo->Id == glyphEntry->SpellId)
+                    {
+                        _player->RemoveOwnedAura(iter);
+                        continue;
+                    }
+                }
+                ++iter;
+            }
+
             _player->SendLearnPacket(glyphEntry->SpellId, false); // Send packet to properly handle client-side spell tooltips
             _player->SetGlyph(slot, 0, true);
             _player->SendTalentsInfoData(false);
@@ -2178,7 +2204,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
                 // Update Taxi path
                 TaxiMask newTaxiMask;
-                memset(newTaxiMask, 0, sizeof(newTaxiMask));
+                newTaxiMask.fill(0);
 
                 TaxiMask const& factionMask = newTeam == TEAM_HORDE ? sHordeTaxiNodesMask : sAllianceTaxiNodesMask;
                 for (auto const& itr : sTaxiPathSetBySource)
@@ -2318,6 +2344,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             stmt->SetData(3, loc.GetPositionX());
             stmt->SetData(4, loc.GetPositionY());
             stmt->SetData(5, loc.GetPositionZ());
+            stmt->SetData(6, loc.GetOrientation());
             trans->Append(stmt);
 
             Player::SavePositionInDB(loc, zoneId, factionChangeInfo->Guid, trans);
@@ -2523,6 +2550,12 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             }
         }
     }
+
+    // Re-check all achievement criterias
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+    stmt->SetData(0, uint16(AT_LOGIN_CHECK_ACHIEVS));
+    stmt->SetData(1, lowGuid);
+    trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
 

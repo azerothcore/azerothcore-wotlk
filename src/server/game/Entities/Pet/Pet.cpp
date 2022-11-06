@@ -553,8 +553,10 @@ void Pet::SavePetToDB(PetSaveMode mode)
         // save pet
         std::string actionBar = GenerateActionBarData();
 
-        ASSERT(owner->GetPetStable()->CurrentPet && owner->GetPetStable()->CurrentPet->PetNumber == m_charmInfo->GetPetNumber());
-        FillPetInfo(&owner->GetPetStable()->CurrentPet.value());
+        if (owner->GetPetStable()->CurrentPet && owner->GetPetStable()->CurrentPet->PetNumber == m_charmInfo->GetPetNumber())
+        {
+            FillPetInfo(&owner->GetPetStable()->CurrentPet.value());
+        }
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_PET);
         stmt->SetData(0, m_charmInfo->GetPetNumber());
@@ -1050,7 +1052,14 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     uint32 creature_ID = (petType == HUNTER_PET) ? 1 : cinfo->Entry;
 
-    SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+    if (petType == HUNTER_PET)
+    {
+        SetMeleeDamageSchool(SPELL_SCHOOL_NORMAL);
+    }
+    else
+    {
+        SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+    }
 
     SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
 
@@ -1152,7 +1161,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         {
                             // xinef: Glyph of Felguard, so ugly im crying... no appropriate spell
                             if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_FELGUARD))
-                                SetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, 1.0f + float(aurEff->GetAmount() / 100.0f));
+                            {
+                                HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
+                            }
 
                             break;
                         }
@@ -1277,6 +1288,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_01, this);
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_02, this);
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_03, this);
+
+                            if (owner->getRace() == RACE_ORC)
+                            {
+                                CastSpell(this, SPELL_ORC_RACIAL_COMMAND_SHAMAN, true, nullptr, nullptr, owner->GetGUID());
+                            }
+
                             break;
                         }
                     case NPC_MIRROR_IMAGE: // Mirror Image
@@ -1353,7 +1370,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
         // xinef: fixes orc death knight command racial
         if (owner->getRace() == RACE_ORC)
-            CastSpell(this, SPELL_ORC_RACIAL_COMMAND, true, nullptr, nullptr, owner->GetGUID());
+            CastSpell(this, SPELL_ORC_RACIAL_COMMAND_DK, true, nullptr, nullptr, owner->GetGUID());
 
         // Avoidance, Night of the Dead
         if (Aura* aur = AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this))
@@ -2434,4 +2451,14 @@ std::string Pet::GenerateActionBarData() const
     }
 
     return oss.str();
+}
+
+std::string Pet::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Guardian::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "PetType: " << std::to_string(getPetType()) << " "
+        << "PetNumber: " << m_charmInfo->GetPetNumber();
+    return sstr.str();
 }

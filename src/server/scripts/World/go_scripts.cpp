@@ -821,19 +821,19 @@ public:
                             if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
                                 break;
 
-                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            std::list<Player*> targets;
+                            Acore::AnyPlayerInObjectRangeCheck check(me, me->GetVisibilityRange(), false);
+                            Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
+                            Cell::VisitWorldObjects(me, searcher, me->GetVisibilityRange());
+                            for (Player* player : targets)
                             {
-                                if (Player* player = itr->GetSource())
+                                if (player->GetTeamId() == TEAM_HORDE)
                                 {
-                                    if (player->GetTeamId() == TEAM_HORDE)
-                                    {
-                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
-                                    }
-                                    else
-                                    {
-                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
-                                    }
+                                    me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
+                                }
+                                else
+                                {
+                                    me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
                                 }
                             }
 
@@ -1876,6 +1876,12 @@ public:
                     tm local_tm = Acore::Time::TimeBreakdown();
                     uint8 _rings = (local_tm.tm_hour) % 12;
                     _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
+
+                    // Dwarf hourly horn should only play a single time, each time the next hour begins.
+                    if (_soundId == BELLTOLLDWARFGNOME)
+                    {
+                        _rings = 1;
+                    }
 
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)

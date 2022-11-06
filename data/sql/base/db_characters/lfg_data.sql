@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_characters.lfg_data
 DROP TABLE IF EXISTS `lfg_data`;
 CREATE TABLE IF NOT EXISTS `lfg_data` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `dungeon` INT unsigned NOT NULL DEFAULT 0,
-  `state` TINYINT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `dungeon` int unsigned NOT NULL DEFAULT '0',
+  `state` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='LFG Data';
 

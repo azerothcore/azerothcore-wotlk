@@ -67,8 +67,8 @@ enum NotifyFlags
 
 enum GOSummonType
 {
-    GO_SUMMON_TIMED_OR_CORPSE_DESPAWN = 0,    // despawns after a specified time OR when the summoner dies
-    GO_SUMMON_TIMED_DESPAWN = 1     // despawns after a specified time
+    GO_SUMMON_TIMED_OR_CORPSE_DESPAWN = 0,      // despawns after a specified time OR when the summoner dies
+    GO_SUMMON_TIMED_DESPAWN = 1                 // despawns after a specified time
 };
 
 class WorldPacket;
@@ -207,6 +207,8 @@ public:
 
     DynamicObject* ToDynObject() { if (GetTypeId() == TYPEID_DYNAMICOBJECT) return reinterpret_cast<DynamicObject*>(this); else return nullptr; }
     [[nodiscard]] DynamicObject const* ToDynObject() const { if (GetTypeId() == TYPEID_DYNAMICOBJECT) return reinterpret_cast<DynamicObject const*>(this); else return nullptr; }
+
+    virtual std::string GetDebugInfo() const;
 
     DataMap CustomData;
 
@@ -463,9 +465,9 @@ public:
     bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
     bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
     [[nodiscard]] bool IsWithinLOS(float x, float y, float z, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
-    [[nodiscard]] bool IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
-    [[nodiscard]] Position GetHitSpherePointFor(Position const& dest) const;
-    void GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z) const;
+    [[nodiscard]] bool IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS, Optional<float> collisionHeight = { }) const;
+    [[nodiscard]] Position GetHitSpherePointFor(Position const& dest, Optional<float> collisionHeight = { }) const;
+    void GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z, Optional<float> collisionHeight = { }) const;
     bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;
     bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;
     [[nodiscard]] bool IsInRange2d(float x, float y, float minRange, float maxRange) const;
@@ -612,6 +614,8 @@ public:
     void SetAllowedLooters(GuidUnorderedSet const looters);
     [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
     [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
+
+    std::string GetDebugInfo() const override;
 
     ElunaEventProcessor* elunaEvents;
 

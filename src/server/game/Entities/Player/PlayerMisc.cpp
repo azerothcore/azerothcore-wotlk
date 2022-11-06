@@ -26,34 +26,44 @@
 /***               FLOOD FILTER SYSTEM                 ***/
 /*********************************************************/
 
-void Player::UpdateSpeakTime(uint32 specialMessageLimit)
+void Player::UpdateSpeakTime(ChatFloodThrottle::Index index)
 {
     // ignore chat spam protection for GMs in any mode
     if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
         return;
 
-    time_t current = GameTime::GetGameTime().count();
-    if (m_speakTime > current)
+    uint32 limit, delay;
+    switch (index)
     {
-        uint32 max_count = specialMessageLimit ? specialMessageLimit : sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_COUNT);
-        if (!max_count)
-            return;
-
-        ++m_speakCount;
-        if (m_speakCount >= max_count)
+         case ChatFloodThrottle::ADDON:
+             limit = sWorld->getIntConfig(CONFIG_CHATFLOOD_ADDON_MESSAGE_COUNT);
+             delay = sWorld->getIntConfig(CONFIG_CHATFLOOD_ADDON_MESSAGE_DELAY);
+             break;
+         case ChatFloodThrottle::REGULAR:
+             limit = sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_COUNT);
+             delay = sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_DELAY);
+             [[fallthrough]];
+         default:
+             return;
+    }
+    time_t current = GameTime::GetGameTime().count();
+    if (m_chatFloodData[index].Time > current)
+    {
+        ++m_chatFloodData[index].Count;
+        if (m_chatFloodData[index].Count >= limit)
         {
             // prevent overwrite mute time, if message send just before mutes set, for example.
             time_t new_mute = current + sWorld->getIntConfig(CONFIG_CHATFLOOD_MUTE_TIME);
             if (GetSession()->m_muteTime < new_mute)
                 GetSession()->m_muteTime = new_mute;
 
-            m_speakCount = 0;
+            m_chatFloodData[index].Count = 0;
         }
     }
     else
-        m_speakCount = 1;
+        m_chatFloodData[index].Count = 1;
 
-    m_speakTime = current + sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_DELAY);
+    m_chatFloodData[index].Time = current + delay;
 }
 
 bool Player::CanSpeak() const
@@ -386,8 +396,11 @@ void Player::UpdateFFAPvPFlag(time_t currTime)
     }
 
     pvpInfo.FFAPvPEndTimer = time_t(0);
-
-    RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+    if (HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
+    {
+        RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        sScriptMgr->OnFfaPvpStateUpdate(this, false);
+    }
     for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
         (*itr)->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
 

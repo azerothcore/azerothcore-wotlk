@@ -1015,7 +1015,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
                     continue;
                 if (member->IsAtLootRewardDistance(pLootedObject))
                 {
-                    if (i->AllowedForPlayer(member))
+                    if (i->AllowedForPlayer(member, loot->sourceWorldObjectGUID))
                     {
                         r->totalPlayersRolling++;
 
@@ -1099,7 +1099,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
 
             if (member->IsAtLootRewardDistance(pLootedObject))
             {
-                if (i->AllowedForPlayer(member))
+                if (i->AllowedForPlayer(member, loot->sourceWorldObjectGUID))
                 {
                     r->totalPlayersRolling++;
                     r->playerVote[member->GetGUID()] = NOT_EMITED_YET;
@@ -1157,7 +1157,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
                 if (!playerToRoll)
                     continue;
 
-                if (i->AllowedForPlayer(playerToRoll) && playerToRoll->IsAtLootRewardDistance(lootedObject))
+                if (i->AllowedForPlayer(playerToRoll, loot->sourceWorldObjectGUID) && playerToRoll->IsAtLootRewardDistance(lootedObject))
                 {
                     r->totalPlayersRolling++;
                     if (playerToRoll->GetPassOnGroupLoot())
@@ -1231,7 +1231,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
             if (!playerToRoll)
                 continue;
 
-            if (i->AllowedForPlayer(playerToRoll) && playerToRoll->IsAtLootRewardDistance(lootedObject))
+            if (i->AllowedForPlayer(playerToRoll, loot->sourceWorldObjectGUID) && playerToRoll->IsAtLootRewardDistance(lootedObject))
             {
                 r->totalPlayersRolling++;
                 r->playerVote[playerToRoll->GetGUID()] = NOT_EMITED_YET;
@@ -1448,7 +1448,9 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                         roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                         roll->getLoot()->unlootedCount--;
                         AllowedLooterSet looters = item->GetAllowedLooters();
-                        player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
+                        Item* _item = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
+                        if (_item)
+                            sScriptMgr->OnGroupRollRewardItem(player, _item, _item->GetCount(), NEED, roll);
                         player->UpdateLootAchievements(item, roll->getLoot());
                     }
                     else
@@ -1516,7 +1518,9 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                             roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                             roll->getLoot()->unlootedCount--;
                             AllowedLooterSet looters = item->GetAllowedLooters();
-                            player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
+                            Item* _item = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
+                            if (_item)
+                                sScriptMgr->OnGroupRollRewardItem(player, _item, _item->GetCount(), GREED, roll);
                             player->UpdateLootAchievements(item, roll->getLoot());
                         }
                         else
@@ -1982,6 +1986,11 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         // don't let Death Knights join BG queues when they are not allowed to be teleported yet
         if (member->getClass() == CLASS_DEATH_KNIGHT && member->GetMapId() == 609 && !member->IsGameMaster() && !member->HasSpell(50977))
             return ERR_GROUP_JOIN_BATTLEGROUND_FAIL;
+
+        if (!member->GetBGAccessByLevel(bgTemplate->GetBgTypeID()))
+        {
+            return ERR_BATTLEGROUND_JOIN_TIMED_OUT;
+        }
     }
 
     // for arenas: check party size is proper

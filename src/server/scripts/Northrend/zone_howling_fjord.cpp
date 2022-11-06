@@ -125,20 +125,27 @@ public:
         {
             if (HealthBelowPct(50) && !health50)
             {
-                WorldObject* summoner = nullptr;
                 if (TempSummon const* tempSummon = me->ToTempSummon())
                 {
-                    summoner = tempSummon->GetSummonerUnit();
+                    if (WorldObject* summoner = tempSummon->GetSummonerUnit())
+                    {
+                        Talk(SAY_TURMOIL_HALF_HP, summoner);
+                    }
                 }
 
-                Talk(SAY_TURMOIL_HALF_HP, summoner);
                 health50 = true;
             }
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            Talk(SAY_TURMOIL_DEATH, me->ToTempSummon()->GetSummonerUnit()->ToPlayer());
+            if (TempSummon const* tempSummon = me->ToTempSummon())
+            {
+                if (WorldObject* summoner = tempSummon->GetSummonerUnit())
+                {
+                    Talk(SAY_TURMOIL_DEATH, summoner);
+                }
+            }
         }
 
         void setphase(short newPhase)

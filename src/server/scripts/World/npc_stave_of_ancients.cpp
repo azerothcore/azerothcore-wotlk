@@ -111,7 +111,7 @@ bool NPCStaveQuestAI::IsFairFight()
     {
         Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
 
-        if (!(*itr)->getThreat())
+        if (!(*itr)->GetThreat())
         {
             // if target threat is 0 its fair, this prevents despawn in the case when
             // there is a bystander since UpdateVictim adds nearby enemies to the threatlist
@@ -392,6 +392,14 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (attacker == me)
+            {
+                me->LowerPlayerDamageReq(damage);
+            }
         }
 
         void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
@@ -1170,6 +1178,14 @@ public:
             if (Spell->Id == FRANKLIN_WEAKNESS_SCORPID_STING)
             {
                 me->CastSpell(me, FRANKLIN_SPELL_ENTROPIC_STING, false);
+            }
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (attacker == me)
+            {
+                me->LowerPlayerDamageReq(damage);
             }
         }
 

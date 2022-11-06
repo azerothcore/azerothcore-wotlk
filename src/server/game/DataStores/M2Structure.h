@@ -73,7 +73,7 @@ struct M2Header
     uint32 ofsTransLookup;         // Everything needs its lookup. Here are the transparencies.
     uint32 nUVAnimLookup;
     uint32 ofsUVAnimLookup;
-    G3D::AABox BoundingBox;            // min/max( [1].z, 2.0277779f ) - 0.16f seems to be the maximum camera height
+    G3D::AABox BoundingBox;        // min/max( [1].z, 2.0277779f ) - 0.16f seems to be the maximum camera height
     float  BoundingSphereRadius;
     G3D::AABox CollisionBox;
     float  CollisionSphereRadius;
@@ -118,15 +118,15 @@ struct M2Track
 
 struct M2Camera
 {
-    uint32_t type; // 0: portrait, 1: characterinfo; -1: else (flyby etc.); referenced backwards in the lookup table.
-    float fov; // No radians, no degrees. Multiply by 35 to get degrees.
+    uint32_t type;                  // 0: portrait, 1: characterinfo; -1: else (flyby etc.); referenced backwards in the lookup table.
+    float fov;                      // No radians, no degrees. Multiply by 35 to get degrees.
     float far_clip;
     float near_clip;
-    M2Track positions; // How the camera's position moves. Should be 3*3 floats.
+    M2Track positions;              // How the camera's position moves. Should be 3*3 floats.
     G3D::Vector3 position_base;
-    M2Track target_positions; // How the target moves. Should be 3*3 floats.
+    M2Track target_positions;       // How the target moves. Should be 3*3 floats.
     G3D::Vector3 target_position_base;
-    M2Track rolldata; // The camera can have some roll-effect. Its 0 to 2*Pi.
+    M2Track rolldata;               // The camera can have some roll-effect. Its 0 to 2*Pi.
 };
 #pragma pack(pop)
 

@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_world.quest_details
 DROP TABLE IF EXISTS `quest_details`;
 CREATE TABLE IF NOT EXISTS `quest_details` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Emote1` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `Emote2` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `Emote3` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `Emote4` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `EmoteDelay1` INT unsigned NOT NULL DEFAULT 0,
-  `EmoteDelay2` INT unsigned NOT NULL DEFAULT 0,
-  `EmoteDelay3` INT unsigned NOT NULL DEFAULT 0,
-  `EmoteDelay4` INT unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` INT NOT NULL DEFAULT 0,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `Emote1` smallint unsigned NOT NULL DEFAULT '0',
+  `Emote2` smallint unsigned NOT NULL DEFAULT '0',
+  `Emote3` smallint unsigned NOT NULL DEFAULT '0',
+  `Emote4` smallint unsigned NOT NULL DEFAULT '0',
+  `EmoteDelay1` int unsigned NOT NULL DEFAULT '0',
+  `EmoteDelay2` int unsigned NOT NULL DEFAULT '0',
+  `EmoteDelay3` int unsigned NOT NULL DEFAULT '0',
+  `EmoteDelay4` int unsigned NOT NULL DEFAULT '0',
+  `VerifiedBuild` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

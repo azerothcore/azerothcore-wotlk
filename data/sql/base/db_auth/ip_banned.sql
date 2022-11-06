@@ -13,13 +13,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumpar struktur för tabell acore_auth.ip_banned
-DROP TABLE IF EXISTS `ip_banned`;
 CREATE TABLE IF NOT EXISTS `ip_banned` (
-  `ip` VARCHAR(15) NOT NULL DEFAULT '127.0.0.1',
-  `bandate` INT unsigned NOT NULL,
-  `unbandate` INT unsigned NOT NULL,
-  `bannedby` VARCHAR(50) NOT NULL DEFAULT '[Console]',
-  `banreason` VARCHAR(255) NOT NULL DEFAULT 'no reason',
+  `ip` varchar(15) NOT NULL DEFAULT '127.0.0.1',
+  `bandate` int unsigned NOT NULL,
+  `unbandate` int unsigned NOT NULL,
+  `bannedby` varchar(50) NOT NULL DEFAULT '[Console]',
+  `banreason` varchar(255) NOT NULL DEFAULT 'no reason',
   PRIMARY KEY (`ip`,`bandate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Banned IPs';
 

@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.gtchancetomeleecritbase_dbc
 DROP TABLE IF EXISTS `gtchancetomeleecritbase_dbc`;
 CREATE TABLE IF NOT EXISTS `gtchancetomeleecritbase_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Data` float NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Data` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 

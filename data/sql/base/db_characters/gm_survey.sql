@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_characters.gm_survey
 DROP TABLE IF EXISTS `gm_survey`;
 CREATE TABLE IF NOT EXISTS `gm_survey` (
-  `surveyId` INT unsigned NOT NULL AUTO_INCREMENT,
-  `guid` INT unsigned NOT NULL DEFAULT 0,
-  `mainSurvey` INT unsigned NOT NULL DEFAULT 0,
+  `surveyId` int unsigned NOT NULL AUTO_INCREMENT,
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `mainSurvey` int unsigned NOT NULL DEFAULT '0',
   `comment` longtext NOT NULL,
-  `createTime` INT unsigned NOT NULL DEFAULT 0,
-  `maxMMR` SMALLINT NOT NULL,
+  `createTime` int unsigned NOT NULL DEFAULT '0',
+  `maxMMR` smallint NOT NULL,
   PRIMARY KEY (`surveyId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 

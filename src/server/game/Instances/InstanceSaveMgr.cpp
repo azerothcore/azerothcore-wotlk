@@ -94,7 +94,7 @@ InstanceSave* InstanceSaveMgr::AddInstanceSave(uint32 mapId, uint32 instanceId, 
     }
     else
     {
-        resetTime = GameTime::GetGameTime().count() + 3 * DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
+        resetTime = GameTime::GetGameTime().count() + static_cast<long long>(3) * DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
         extendedResetTime = 0;
     }
     InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, resetTime, extendedResetTime);
@@ -290,7 +290,7 @@ void InstanceSaveMgr::LoadInstances()
     // Sanitize pending rows on Instance_saved_data for data that wasn't deleted properly
     SanitizeInstanceSavedData();
 
-    LOG_INFO("server.loading", ">> Loaded instances and binds in {} ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded Instances And Binds in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 

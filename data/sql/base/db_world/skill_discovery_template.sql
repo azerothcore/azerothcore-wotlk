@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.skill_discovery_template
 DROP TABLE IF EXISTS `skill_discovery_template`;
 CREATE TABLE IF NOT EXISTS `skill_discovery_template` (
-  `spellId` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'SpellId of the discoverable spell',
-  `reqSpell` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'spell requirement',
-  `reqSkillValue` SMALLINT unsigned NOT NULL DEFAULT 0 COMMENT 'skill points requirement',
-  `chance` float NOT NULL DEFAULT 0 COMMENT 'chance to discover',
+  `spellId` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'SpellId of the discoverable spell',
+  `reqSpell` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'spell requirement',
+  `reqSkillValue` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'skill points requirement',
+  `chance` float NOT NULL DEFAULT '0' COMMENT 'chance to discover',
   PRIMARY KEY (`spellId`,`reqSpell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Skill Discovery System';
 

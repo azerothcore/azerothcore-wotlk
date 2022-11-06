@@ -96,7 +96,7 @@ bool GameObject::AIM_Initialize()
     return true;
 }
 
-std::string GameObject::GetAIName() const
+std::string const& GameObject::GetAIName() const
 {
     return sObjectMgr->GetGameObjectTemplate(GetEntry())->AIName;
 }
@@ -131,7 +131,7 @@ void GameObject::RemoveFromOwner()
         return;
     }
 
-    LOG_FATAL("entities.gameobject", "Delete GameObject ({} Entry: {} SpellId {} LinkedGO {}) that lost references to owner {} GO list. Crash possible later.",
+    LOG_DEBUG("entities.gameobject", "Delete GameObject ({} Entry: {} SpellId {} LinkedGO {}) that lost references to owner {} GO list.",
         GetGUID().ToString(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), ownerGUID.ToString());
 
     SetOwnerGUID(ObjectGuid::Empty);
@@ -158,6 +158,8 @@ void GameObject::AddToWorld()
         EnableCollision(GetGoState() == GO_STATE_READY || IsTransport()); // pussywizard: this startOpen is unneeded here, collision depends entirely on GOState
 
         WorldObject::AddToWorld();
+
+        loot.sourceWorldObjectGUID = GetGUID();
 
         sScriptMgr->OnGameObjectAddWorld(this);
     }
@@ -1742,11 +1744,13 @@ void GameObject::Use(Unit* user)
 
                             LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} chance {} roll: {}", skill, zone_skill, chance, roll);
 
+                            if (sScriptMgr->OnUpdateFishingSkill(player, skill, zone_skill, chance, roll))
+                            {
+                                player->UpdateFishingSkill();
+                            }
                             // but you will likely cause junk in areas that require a high fishing skill (not yet implemented)
                             if (chance >= roll)
                             {
-                                player->UpdateFishingSkill();
-
                                 //TODO: I do not understand this hack. Need some explanation.
                                 // prevent removing GO at spell cancel
                                 RemoveFromOwner();
@@ -2053,20 +2057,19 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
     if (!spellInfo)
         return;
 
-    bool self = false;
+    bool self = true;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        if (spellInfo->Effects[i].TargetA.GetTarget() == TARGET_UNIT_CASTER)
+        if (spellInfo->Effects[i].TargetA.GetReferenceType() != TARGET_REFERENCE_TYPE_CASTER || spellInfo->Effects[i].TargetB.GetTarget())
         {
-            self = true;
+            self = false;
             break;
         }
     }
 
-    if (self)
+    if (self && target && target->GetGUID() != GetGUID())
     {
-        if (target)
-            target->CastSpell(target, spellInfo, true);
+        target->CastSpell(target, spellInfo, true);
         return;
     }
 
@@ -2085,8 +2088,14 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
         if (owner->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
             trigger->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
         if (owner->IsFFAPvP())
-            trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        {
+            if (!trigger->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
+            {
+                sScriptMgr->OnFfaPvpStateUpdate(trigger, true);
+                trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+            }
 
+        }
         // xinef: Remove Immunity flags
         trigger->SetImmuneToNPC(false);
         // xinef: set proper orientation, fixes cast against stealthed targets
@@ -2786,13 +2795,17 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
                     case GAMEOBJECT_TYPE_CHEST:
                     case GAMEOBJECT_TYPE_GOOBER:
                         if (ActivateToQuest(target))
-                            dynFlags |= GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE;
+                        {
+                            dynFlags |= GO_DYNFLAG_LO_ACTIVATE;
+                            if (sWorld->getBoolConfig(CONFIG_OBJECT_SPARKLES))
+                                dynFlags |= GO_DYNFLAG_LO_SPARKLE;
+                        }
                         else if (targetIsGM)
                             dynFlags |= GO_DYNFLAG_LO_ACTIVATE;
                         break;
                     case GAMEOBJECT_TYPE_SPELL_FOCUS:
                     case GAMEOBJECT_TYPE_GENERIC:
-                        if (ActivateToQuest(target))
+                        if (ActivateToQuest(target) && sWorld->getBoolConfig(CONFIG_OBJECT_SPARKLES))
                             dynFlags |= GO_DYNFLAG_LO_SPARKLE;
                         break;
                     case GAMEOBJECT_TYPE_TRANSPORT:
@@ -3088,4 +3101,12 @@ bool GameObject::IsInSkillupList(ObjectGuid playerGuid) const
     }
 
     return false;
+}
+
+std::string GameObject::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << WorldObject::GetDebugInfo() << "\n"
+        << "SpawnId: " << GetSpawnId() << " GoState: " << std::to_string(GetGoState()) << " ScriptId: " << GetScriptId() << " AIName: " << GetAIName();
+    return sstr.str();
 }

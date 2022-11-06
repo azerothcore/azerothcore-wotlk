@@ -58,7 +58,8 @@ public:
             { "cinematic",      HandleDebugPlayCinematicCommand,       SEC_ADMINISTRATOR, Console::No },
             { "movie",          HandleDebugPlayMovieCommand,           SEC_ADMINISTRATOR, Console::No },
             { "sound",          HandleDebugPlaySoundCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "music",          HandleDebugPlayMusicCommand,           SEC_ADMINISTRATOR, Console::No }
+            { "music",          HandleDebugPlayMusicCommand,           SEC_ADMINISTRATOR, Console::No },
+            { "visual",         HandleDebugVisualCommand,              SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable debugSendCommandTable =
         {
@@ -200,6 +201,28 @@ public:
         player->PlayDirectMusic(musicId, player);
 
         handler->PSendSysMessage(LANG_YOU_HEAR_SOUND, musicId);
+        return true;
+    }
+
+    static bool HandleDebugVisualCommand(ChatHandler* handler, uint32 visualId)
+    {
+        if (!visualId)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* player = handler->GetPlayer();
+        Unit* target = handler->getSelectedUnit();
+
+        if (!target)
+        {
+            player->SendPlaySpellVisual(visualId);
+            return true;
+        }
+
+        player->SendPlaySpellImpact(target->GetGUID(), visualId);
         return true;
     }
 
@@ -783,7 +806,7 @@ public:
         if (!target || target->IsTotem() || target->IsPet())
             return false;
 
-        auto const& threatList = target->GetThreatMgr().getThreatList();
+        auto const& threatList = target->GetThreatMgr().GetThreatList();
         ThreatContainer::StorageType::const_iterator itr;
         uint32 count = 0;
 
@@ -794,24 +817,24 @@ public:
             Unit* unit = (*itr)->getTarget();
             if (!unit)
             {
-                handler->PSendSysMessage("   %u.   No Unit  - threat %f", ++count, (*itr)->getThreat());
+                handler->PSendSysMessage("   %u.   No Unit  - threat %f", ++count, (*itr)->GetThreat());
                 continue;
             }
 
-            handler->PSendSysMessage("   %u.   %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->getThreat());
+            handler->PSendSysMessage("   %u.   %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->GetThreat());
         }
 
-        auto const& threatList2 = target->GetThreatMgr().getOfflineThreatList();
+        auto const& threatList2 = target->GetThreatMgr().GetOfflineThreatList();
         for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
         {
             Unit* unit = (*itr)->getTarget();
             if (!unit)
             {
-                handler->PSendSysMessage("   %u.   [offline] No Unit  - threat %f", ++count, (*itr)->getThreat());
+                handler->PSendSysMessage("   %u.   [offline] No Unit  - threat %f", ++count, (*itr)->GetThreat());
                 continue;
             }
 
-            handler->PSendSysMessage("   %u.   [offline] %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->getThreat());
+            handler->PSendSysMessage("   %u.   [offline] %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->GetThreat());
         }
 
         handler->SendSysMessage("End of threat list.");
@@ -834,12 +857,12 @@ public:
         {
             if (Unit* unit = ref->GetSource()->GetOwner())
             {
-                handler->PSendSysMessage("   %u.   %s %s   (%s)  - threat %f", ++count, (ref->isOnline() ? "" : "[offline]"),
-                    unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), ref->getThreat());
+                handler->PSendSysMessage("   %u.   %s %s   (%s)  - threat %f", ++count, (ref->IsOnline() ? "" : "[offline]"),
+                    unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), ref->GetThreat());
             }
             else
             {
-                handler->PSendSysMessage("   %u.   No Owner  - threat %f", ++count, ref->getThreat());
+                handler->PSendSysMessage("   %u.   No Owner  - threat %f", ++count, ref->GetThreat());
             }
 
             ref = ref->next();

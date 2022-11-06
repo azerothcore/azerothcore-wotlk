@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.spell_enchant_proc_data
 DROP TABLE IF EXISTS `spell_enchant_proc_data`;
 CREATE TABLE IF NOT EXISTS `spell_enchant_proc_data` (
-  `entry` INT unsigned NOT NULL,
-  `customChance` INT unsigned NOT NULL DEFAULT 0,
-  `PPMChance` float NOT NULL DEFAULT 0,
-  `procEx` INT unsigned NOT NULL DEFAULT 0,
+  `entry` int unsigned NOT NULL,
+  `customChance` int unsigned NOT NULL DEFAULT '0',
+  `PPMChance` float NOT NULL DEFAULT '0',
+  `procEx` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`),
   CONSTRAINT `spell_enchant_proc_data_chk_1` CHECK ((`PPMChance` >= 0))
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Spell enchant proc data';

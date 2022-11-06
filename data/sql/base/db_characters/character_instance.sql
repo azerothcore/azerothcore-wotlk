@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.character_instance
 DROP TABLE IF EXISTS `character_instance`;
 CREATE TABLE IF NOT EXISTS `character_instance` (
-  `guid` INT unsigned NOT NULL DEFAULT 0,
-  `instance` INT unsigned NOT NULL DEFAULT 0,
-  `permanent` TINYINT unsigned NOT NULL DEFAULT 0,
-  `extended` TINYINT unsigned NOT NULL,
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `instance` int unsigned NOT NULL DEFAULT '0',
+  `permanent` tinyint unsigned NOT NULL DEFAULT '0',
+  `extended` tinyint unsigned NOT NULL,
   PRIMARY KEY (`guid`,`instance`),
   KEY `instance` (`instance`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

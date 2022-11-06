@@ -28,9 +28,9 @@ enum ReactStates : uint8;
 
 enum PetType : uint8
 {
-    SUMMON_PET              = 0,
-    HUNTER_PET              = 1,
-    MAX_PET_TYPE            = 4
+    SUMMON_PET                  = 0,
+    HUNTER_PET                  = 1,
+    MAX_PET_TYPE                = 4
 };
 
 constexpr auto MAX_PET_STABLES = 4;
@@ -38,54 +38,54 @@ constexpr auto MAX_PET_STABLES = 4;
 // stored in character_pet.slot
 enum PetSaveMode : int8
 {
-    PET_SAVE_AS_DELETED        = -1,                        // not saved in fact
-    PET_SAVE_AS_CURRENT        =  0,                        // in current slot (with player)
-    PET_SAVE_FIRST_STABLE_SLOT =  1,
-    PET_SAVE_LAST_STABLE_SLOT  =  MAX_PET_STABLES,          // last in DB stable slot index (including), all higher have same meaning as PET_SAVE_NOT_IN_SLOT
-    PET_SAVE_NOT_IN_SLOT       =  100                       // for avoid conflict with stable size grow will use 100
+    PET_SAVE_AS_DELETED         = -1,                        // not saved in fact
+    PET_SAVE_AS_CURRENT         =  0,                        // in current slot (with player)
+    PET_SAVE_FIRST_STABLE_SLOT  =  1,
+    PET_SAVE_LAST_STABLE_SLOT   =  MAX_PET_STABLES,          // last in DB stable slot index (including), all higher have same meaning as PET_SAVE_NOT_IN_SLOT
+    PET_SAVE_NOT_IN_SLOT        =  100                       // for avoid conflict with stable size grow will use 100
 };
 
 enum HappinessState
 {
-    UNHAPPY = 1,
-    CONTENT = 2,
-    HAPPY   = 3
+    UNHAPPY                     = 1,
+    CONTENT                     = 2,
+    HAPPY                       = 3
 };
 
 enum PetSpellState
 {
-    PETSPELL_UNCHANGED = 0,
-    PETSPELL_CHANGED   = 1,
-    PETSPELL_NEW       = 2,
-    PETSPELL_REMOVED   = 3
+    PETSPELL_UNCHANGED          = 0,
+    PETSPELL_CHANGED            = 1,
+    PETSPELL_NEW                = 2,
+    PETSPELL_REMOVED            = 3
 };
 
 enum PetSpellType
 {
-    PETSPELL_NORMAL = 0,
-    PETSPELL_FAMILY = 1,
-    PETSPELL_TALENT = 2
+    PETSPELL_NORMAL             = 0,
+    PETSPELL_FAMILY             = 1,
+    PETSPELL_TALENT             = 2
 };
 
 enum ActionFeedback
 {
-    FEEDBACK_NONE            = 0,
-    FEEDBACK_PET_DEAD        = 1,
-    FEEDBACK_NOTHING_TO_ATT  = 2,
-    FEEDBACK_CANT_ATT_TARGET = 3
+    FEEDBACK_NONE               = 0,
+    FEEDBACK_PET_DEAD           = 1,
+    FEEDBACK_NOTHING_TO_ATT     = 2,
+    FEEDBACK_CANT_ATT_TARGET    = 3
 };
 
 enum PetTalk
 {
-    PET_TALK_SPECIAL_SPELL  = 0,
-    PET_TALK_ATTACK         = 1
+    PET_TALK_SPECIAL_SPELL      = 0,
+    PET_TALK_ATTACK             = 1
 };
 
 enum PetLoadState
 {
-    PET_LOAD_OK                                 = 0,
-    PET_LOAD_NO_RESULT                          = 1,
-    PET_LOAD_ERROR                              = 2
+    PET_LOAD_OK                 = 0,
+    PET_LOAD_NO_RESULT          = 1,
+    PET_LOAD_ERROR              = 2
 };
 
 enum NPCEntries
@@ -162,6 +162,7 @@ enum PetScalingSpells
     SPELL_EARTH_ELEMENTAL_SCALING_02    = 65226,
     SPELL_EARTH_ELEMENTAL_SCALING_03    = 65227,
     SPELL_EARTH_ELEMENTAL_SCALING_04    = 65228,
+    SPELL_ORC_RACIAL_COMMAND_SHAMAN     = 65223,
 
     // Priest
     SPELL_SHADOWFIEND_SCALING_01        = 35661,
@@ -182,7 +183,7 @@ enum PetScalingSpells
     SPELL_MAGE_PET_SCALING_04           = 35660,
 
     // Death Knight
-    SPELL_ORC_RACIAL_COMMAND            = 65221,
+    SPELL_ORC_RACIAL_COMMAND_DK         = 65221,
     SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE   = 62137,
     SPELL_DK_PET_SCALING_01             = 51996,
     SPELL_DK_PET_SCALING_02             = 54566,

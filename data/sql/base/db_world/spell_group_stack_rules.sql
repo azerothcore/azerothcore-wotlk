@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_world.spell_group_stack_rules
 DROP TABLE IF EXISTS `spell_group_stack_rules`;
 CREATE TABLE IF NOT EXISTS `spell_group_stack_rules` (
-  `group_id` INT unsigned NOT NULL DEFAULT 0,
-  `stack_rule` TINYINT NOT NULL DEFAULT 0,
-  `description` VARCHAR(150) NOT NULL DEFAULT '',
+  `group_id` int unsigned NOT NULL DEFAULT '0',
+  `stack_rule` tinyint NOT NULL DEFAULT '0',
+  `description` varchar(150) NOT NULL DEFAULT '',
   PRIMARY KEY (`group_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

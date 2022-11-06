@@ -29,6 +29,7 @@ GossipMenu::GossipMenu()
 {
     _menuId = 0;
     _locale = DEFAULT_LOCALE;
+    _senderGUID.Clear();
 }
 
 GossipMenu::~GossipMenu()
@@ -188,8 +189,10 @@ void PlayerMenu::ClearMenus()
     _questMenu.ClearMenu();
 }
 
-void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID) const
+void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID)
 {
+    _gossipMenu.SetSenderGUID(objectGUID);
+
     WorldPacket data(SMSG_GOSSIP_MESSAGE, 24 + _gossipMenu.GetMenuItemCount() * 100 + _questMenu.GetMenuItemCount() * 75);     // guess size
     data << objectGUID;
     data << uint32(_gossipMenu.GetMenuId());            // new 2.4.0
@@ -234,8 +237,10 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID) const
     _session->SendPacket(&data);
 }
 
-void PlayerMenu::SendCloseGossip() const
+void PlayerMenu::SendCloseGossip()
 {
+    _gossipMenu.SetSenderGUID(ObjectGuid::Empty);
+
     WorldPacket data(SMSG_GOSSIP_COMPLETE, 0);
     _session->SendPacket(&data);
 }
@@ -447,7 +452,9 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
 
         uint8 playerLevel = _session->GetPlayer() ? _session->GetPlayer()->getLevel() : 0;
         data << uint32(quest->GetRewOrReqMoney(playerLevel));
-        data << uint32(quest->XPValue(playerLevel) * _session->GetPlayer()->GetQuestRate());
+        uint32 questXp = uint32(quest->XPValue(playerLevel) * _session->GetPlayer()->GetQuestRate());
+        sScriptMgr->OnQuestComputeXP(_session->GetPlayer(), quest, questXp);
+        data << questXp;
     }
 
     // rewarded honor points. Multiply with 10 to satisfy client
@@ -675,7 +682,9 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
     uint8 playerLevel = _session->GetPlayer() ? _session->GetPlayer()->getLevel() : 0;
 
     data << uint32(quest->GetRewOrReqMoney(playerLevel));
-    data << uint32(quest->XPValue(playerLevel) * _session->GetPlayer()->GetQuestRate());
+    uint32 questXp = uint32(quest->XPValue(playerLevel) * _session->GetPlayer()->GetQuestRate());
+    sScriptMgr->OnQuestComputeXP(_session->GetPlayer(), quest, questXp);
+    data << questXp;
 
     // rewarded honor points. Multiply with 10 to satisfy client
     data << uint32(10 * quest->CalculateHonorGain(_session->GetPlayer()->GetQuestLevel(quest)));

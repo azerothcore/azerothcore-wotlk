@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.summonproperties_dbc
 DROP TABLE IF EXISTS `summonproperties_dbc`;
 CREATE TABLE IF NOT EXISTS `summonproperties_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Control` INT NOT NULL DEFAULT 0,
-  `Faction` INT NOT NULL DEFAULT 0,
-  `Title` INT NOT NULL DEFAULT 0,
-  `Slot` INT NOT NULL DEFAULT 0,
-  `Flags` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Control` int NOT NULL DEFAULT '0',
+  `Faction` int NOT NULL DEFAULT '0',
+  `Title` int NOT NULL DEFAULT '0',
+  `Slot` int NOT NULL DEFAULT '0',
+  `Flags` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

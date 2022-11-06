@@ -31,22 +31,22 @@
 
 enum RollType
 {
-    ROLL_PASS         = 0,
-    ROLL_NEED         = 1,
-    ROLL_GREED        = 2,
-    ROLL_DISENCHANT   = 3,
-    MAX_ROLL_TYPE     = 4
+    ROLL_PASS                           = 0,
+    ROLL_NEED                           = 1,
+    ROLL_GREED                          = 2,
+    ROLL_DISENCHANT                     = 3,
+    MAX_ROLL_TYPE                       = 4
 };
 
 enum RollMask
 {
-    ROLL_FLAG_TYPE_PASS         = 0x01,
-    ROLL_FLAG_TYPE_NEED         = 0x02,
-    ROLL_FLAG_TYPE_GREED        = 0x04,
-    ROLL_FLAG_TYPE_DISENCHANT   = 0x08,
+    ROLL_FLAG_TYPE_PASS                 = 0x01,
+    ROLL_FLAG_TYPE_NEED                 = 0x02,
+    ROLL_FLAG_TYPE_GREED                = 0x04,
+    ROLL_FLAG_TYPE_DISENCHANT           = 0x08,
 
-    ROLL_ALL_TYPE_NO_DISENCHANT = 0x07,
-    ROLL_ALL_TYPE_MASK          = 0x0F
+    ROLL_ALL_TYPE_NO_DISENCHANT         = 0x07,
+    ROLL_ALL_TYPE_MASK                  = 0x0F
 };
 
 #define MAX_NR_LOOT_ITEMS 18
@@ -56,40 +56,40 @@ enum RollMask
 
 enum LootMethod
 {
-    FREE_FOR_ALL      = 0,
-    ROUND_ROBIN       = 1,
-    MASTER_LOOT       = 2,
-    GROUP_LOOT        = 3,
-    NEED_BEFORE_GREED = 4
+    FREE_FOR_ALL                        = 0,
+    ROUND_ROBIN                         = 1,
+    MASTER_LOOT                         = 2,
+    GROUP_LOOT                          = 3,
+    NEED_BEFORE_GREED                   = 4
 };
 
 enum PermissionTypes
 {
-    ALL_PERMISSION              = 0,
-    GROUP_PERMISSION            = 1,
-    MASTER_PERMISSION           = 2,
-    RESTRICTED_PERMISSION       = 3,
-    ROUND_ROBIN_PERMISSION      = 4,
-    OWNER_PERMISSION            = 5,
-    NONE_PERMISSION             = 6
+    ALL_PERMISSION                      = 0,
+    GROUP_PERMISSION                    = 1,
+    MASTER_PERMISSION                   = 2,
+    RESTRICTED_PERMISSION               = 3,
+    ROUND_ROBIN_PERMISSION              = 4,
+    OWNER_PERMISSION                    = 5,
+    NONE_PERMISSION                     = 6
 };
 
 enum LootType
 {
-    LOOT_NONE                   = 0,
+    LOOT_NONE                           = 0,
 
-    LOOT_CORPSE                 = 1,
-    LOOT_PICKPOCKETING          = 2,
-    LOOT_FISHING                = 3,
-    LOOT_DISENCHANTING          = 4,
+    LOOT_CORPSE                         = 1,
+    LOOT_PICKPOCKETING                  = 2,
+    LOOT_FISHING                        = 3,
+    LOOT_DISENCHANTING                  = 4,
     // ignored always by client
-    LOOT_SKINNING               = 6,
-    LOOT_PROSPECTING            = 7,
-    LOOT_MILLING                = 8,
+    LOOT_SKINNING                       = 6,
+    LOOT_PROSPECTING                    = 7,
+    LOOT_MILLING                        = 8,
 
-    LOOT_FISHINGHOLE            = 20,                       // unsupported by client, sending LOOT_FISHING instead
-    LOOT_INSIGNIA               = 21,                       // unsupported by client, sending LOOT_CORPSE instead
-    LOOT_FISHING_JUNK           = 22                        // unsupported by client, sending LOOT_FISHING instead
+    LOOT_FISHINGHOLE                    = 20,   // unsupported by client, sending LOOT_FISHING instead
+    LOOT_INSIGNIA                       = 21,   // unsupported by client, sending LOOT_CORPSE instead
+    LOOT_FISHING_JUNK                   = 22    // unsupported by client, sending LOOT_FISHING instead
 };
 
 enum LootError
@@ -112,11 +112,11 @@ enum LootError
 // type of Loot Item in Loot View
 enum LootSlotType
 {
-    LOOT_SLOT_TYPE_ALLOW_LOOT   = 0,                        // player can loot the item.
-    LOOT_SLOT_TYPE_ROLL_ONGOING = 1,                        // roll is ongoing. player cannot loot.
-    LOOT_SLOT_TYPE_MASTER       = 2,                        // item can only be distributed by group loot master.
-    LOOT_SLOT_TYPE_LOCKED       = 3,                        // item is shown in red. player cannot loot.
-    LOOT_SLOT_TYPE_OWNER        = 4,                        // ignore binding confirmation and etc, for single player looting
+    LOOT_SLOT_TYPE_ALLOW_LOOT           = 0,    // player can loot the item.
+    LOOT_SLOT_TYPE_ROLL_ONGOING         = 1,    // roll is ongoing. player cannot loot.
+    LOOT_SLOT_TYPE_MASTER               = 2,    // item can only be distributed by group loot master.
+    LOOT_SLOT_TYPE_LOCKED               = 3,    // item is shown in red. player cannot loot.
+    LOOT_SLOT_TYPE_OWNER                = 4,    // ignore binding confirmation and etc, for single player looting
 };
 
 class Player;
@@ -127,15 +127,15 @@ struct Loot;
 
 struct LootStoreItem
 {
-    uint32  itemid;                                         // id of the item
-    int32   reference;                                      // referenced TemplateleId
-    float   chance;                                         // chance to drop for both quest and non-quest items, chance to be used for refs
-    bool    needs_quest : 1;                                // quest drop (quest is required for item to drop)
+    uint32  itemid;                             // id of the item
+    int32   reference;                          // referenced TemplateleId
+    float   chance;                             // chance to drop for both quest and non-quest items, chance to be used for refs
+    bool    needs_quest : 1;                    // quest drop (quest is required for item to drop)
     uint16  lootmode;
     uint8   groupid     : 7;
-    uint8   mincount;                                       // mincount for drop items
-    uint8   maxcount;                                       // max drop count for the item mincount or Ref multiplicator
-    ConditionList conditions;                               // additional loot condition
+    uint8   mincount;                           // mincount for drop items
+    uint8   maxcount;                           // max drop count for the item mincount or Ref multiplicator
+    ConditionList conditions;                   // additional loot condition
 
     // Constructor
     // displayid is filled in IsValid() which must be called after
@@ -144,7 +144,7 @@ struct LootStoreItem
           lootmode(_lootmode), groupid(_groupid), mincount(_mincount), maxcount(_maxcount)
     {}
 
-    bool Roll(bool rate, Player const* player, Loot& loot, LootStore const& store) const;                             // Checks if the entry takes it's chance (at loot generation)
+    bool Roll(bool rate, Player const* player, Loot& loot, LootStore const& store) const;   // Checks if the entry takes it's chance (at loot generation)
     [[nodiscard]] bool IsValid(LootStore const& store, uint32 entry) const;
     // Checks correctness of values
 };
@@ -176,8 +176,8 @@ struct LootItem
     LootItem() = default;
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-    bool AllowedForPlayer(Player const* player, bool isGivenByMasterLooter = false, bool allowQuestLoot = true) const;
-
+    bool AllowedForPlayer(Player const* player, bool isGivenByMasterLooter = false, bool allowQuestLoot = true, ObjectGuid source = ObjectGuid::Empty) const;
+    bool AllowedForPlayer(Player const* player, ObjectGuid source) { return AllowedForPlayer(player, false, true, source); };
     void AddAllowedLooter(Player const* player);
     [[nodiscard]] const AllowedLooterSet& GetAllowedLooters() const { return allowedGUIDs; }
 };
@@ -327,6 +327,7 @@ struct Loot
 
     // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
     ObjectGuid containerGUID;
+    ObjectGuid sourceWorldObjectGUID;
     GameObject* sourceGameObject{nullptr};
 
     Loot(uint32 _gold = 0) : gold(_gold) { }
