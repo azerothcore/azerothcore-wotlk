@@ -73,10 +73,12 @@ services:
     <<: [ *ac-shared-conf ] # merge with
     tty: true
     image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
-    user: ${DOCKER_USER:-acore}
+    user: ${DOCKER_USER:-root}
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
     build:
       context: .
-      target: ${DOCKER_AC_BUILD_TARGET:-dev}
+      target: dev
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
@@ -130,12 +132,14 @@ services:
     <<: *ac-service-conf # merge with ac-service-conf
     stdin_open: true
     tty: true
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
     command: ./acore.sh run-worldserver
     image: acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    user: ${DOCKER_USER:-acore}
+    user: ${DOCKER_USER:-root}
     privileged: true
     build:
       context: .
@@ -171,7 +175,7 @@ services:
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    user: ${DOCKER_USER:-acore}
+    user: ${DOCKER_USER:-root}
     build:
       context: .
       target: authserver-local
@@ -207,12 +211,14 @@ services:
     <<: *ac-service-conf # merge with ac-service-conf
     stdin_open: true
     tty: true
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
     command: ./acore.sh run-worldserver
     image: acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    user: ${DOCKER_USER:-acore}
+    user: ${DOCKER_USER:-root}
     privileged: true
     build:
       context: .
@@ -242,7 +248,7 @@ services:
     restart: unless-stopped
     env_file:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    user: ${DOCKER_USER:-acore}
+    user: ${DOCKER_USER:-root}
     build:
       context: .
       target: authserver
@@ -261,7 +267,7 @@ services:
 
   ac-client-data-init:
     image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
-    user: ${DOCKER_USER:-acore}
+    user: ${DOCKER_USER:-root}
     build:
       context: .
       target: client-data
@@ -277,7 +283,7 @@ services:
 
   ac-tools:
     image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
-    user: ${DOCKER_USER:-acore}
+    user: ${DOCKER_USER:-root}
     build:
       context: .
       target: tools
@@ -298,6 +304,25 @@ services:
     image: acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     command: ./env/dist/bin/dbimport
     profiles: [db-import]
+
+  #
+  # Only for internal tests
+  #
+  ac-test-build:
+    <<: *ac-shared-conf
+    build:
+      context: .
+      target: build
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      <<: *cache-from
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    working_dir: /azerothcore/
+    profiles: [local, build]
 
 volumes:
   ac-database:

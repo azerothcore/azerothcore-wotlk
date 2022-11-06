@@ -39,7 +39,18 @@ shellCommandFactory(
   "build",
   "Build the authserver and worldserver",
   [
-    "docker compose --profile local build --parallel",
+    "docker compose --profile local --parallel",
+    "docker image prune -f",
+    "docker compose run --rm --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
+  ],
+  env
+);
+
+shellCommandFactory(
+  "pull",
+  "Pull build and local images",
+  [
+    "docker compose --profile local dev --parallel",
     "docker image prune -f",
     "docker compose run --rm --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
   ],

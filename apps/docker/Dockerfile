@@ -63,11 +63,14 @@ RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 USER $DOCKER_USER
 
-
-# copy everything so we can work directly within the container
-# using tools such as vscode dev-container
-# NOTE: this folder is different by the /azerothcore (which is binded instead)
-COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
+# copy only necessary files for the acore dashboard
+COPY --chown=$DOCKER_USER:$DOCKER_USER apps /azerothcore/apps
+COPY --chown=$DOCKER_USER:$DOCKER_USER bin /azerothcore/bin
+COPY --chown=$DOCKER_USER:$DOCKER_USER conf /azerothcore/conf
+COPY --chown=$DOCKER_USER:$DOCKER_USER data /azerothcore/data
+COPY --chown=$DOCKER_USER:$DOCKER_USER deps /azerothcore/deps
+COPY --chown=$DOCKER_USER:$DOCKER_USER acore.json /azerothcore/acore.json
+COPY --chown=$DOCKER_USER:$DOCKER_USER acore.sh /azerothcore/acore.sh
 
 # Download deno and make sure the dashboard works
 RUN bash /azerothcore/acore.sh quit
@@ -85,6 +88,11 @@ FROM base as dev
 LABEL description="AC dev image for dev containers"
 
 USER $DOCKER_USER
+
+# copy everything so we can work directly within the container
+# using tools such as vscode dev-container
+# NOTE: this folder is different by the /azerothcore (which is binded instead)
+COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
 
 #================================================================
 #
@@ -122,21 +130,12 @@ RUN apt-get update && apt-get install -y dos2unix gdb gdbserver google-perftools
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
-# copy the sources from the host machine
-COPY --chown=$DOCKER_USER:$DOCKER_USER apps /azerothcore/apps
-COPY --chown=$DOCKER_USER:$DOCKER_USER bin /azerothcore/bin
-COPY --chown=$DOCKER_USER:$DOCKER_USER conf /azerothcore/conf
-COPY --chown=$DOCKER_USER:$DOCKER_USER data /azerothcore/data
-COPY --chown=$DOCKER_USER:$DOCKER_USER deps /azerothcore/deps
-COPY --chown=$DOCKER_USER:$DOCKER_USER acore.json /azerothcore/acore.json
-COPY --chown=$DOCKER_USER:$DOCKER_USER acore.sh /azerothcore/acore.sh
-
 # Correct permissions for non-root operations
 RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
 RUN chown -R $DOCKER_USER:$DOCKER_USER /run
 RUN chown -R $DOCKER_USER:$DOCKER_USER /opt
 
-RUN chown $DOCKER_USER:$DOCKER_USER /azerothcore
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=base /azerothcore /azerothcore
 
 USER $DOCKER_USER
 
@@ -192,7 +191,12 @@ LABEL description="AC Image used by the build stage to generate production image
 
 RUN mkdir -p /azerothcore/env/etc/
 
+COPY --chown=$DOCKER_USER:$DOCKER_USER ./CMakeLists.txt /azerothcore/CMakeLists.txt
+COPY --chown=$DOCKER_USER:$DOCKER_USER ./deps /azerothcore/deps
+COPY --chown=$DOCKER_USER:$DOCKER_USER ./src /azerothcore/src
+COPY --chown=$DOCKER_USER:$DOCKER_USER ./modules /azerothcore/modules
 # check if we have ccache files available outside
+RUN rm -rf /azerothcore/var/ccache/*
 COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker/ccache /azerothcore/var/ccache
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/dist/etc/authserver.conf.dockerdist
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
@@ -276,9 +280,8 @@ RUN addgroup --gid $GROUP_ID acore && \
 ENV DATAPATH=/azerothcore/env/dist/data
 ENV DATAPATH_ZIP=/tmp/data.zip
 
-RUN --mount=type=bind,target=/azerothcore-temp,readwrite /azerothcore-temp/acore.sh client-data && chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
-
-RUN apt-get remove --purge -y tzdata curl unzip && apt-get autoremove -y
+RUN mkdir -p "$DATAPATH"
+RUN --mount=type=bind,target=/azerothcore-temp,readwrite --mount=type=cache,target=/azerothcore/env/dist/data /azerothcore-temp/acore.sh client-data && chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 USER $DOCKER_USER
 
@@ -320,6 +323,7 @@ USER $DOCKER_USER
 
 WORKDIR /azerothcore/env/client/
 
+RUN mkdir -p /azerothcore/env/client/Cameras
 RUN mkdir -p /azerothcore/env/client/dbc
 RUN mkdir -p /azerothcore/env/client/maps
 RUN mkdir -p /azerothcore/env/client/mmaps
