@@ -292,9 +292,7 @@ struct boss_ouro : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        //Return since we have no target
-        if (!UpdateVictim())
-            return;
+        UpdateVictim();
 
         _scheduler.Update(diff, [this]
             {
