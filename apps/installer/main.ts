@@ -16,18 +16,16 @@ program
 //     process.exit(0);
 //   });
 
-
 program
   .command("version")
   .description("Get the version of the current AzerothCore revision")
   .action(async () => {
-    console.log(await getAcoreReleaseVersion())
+    console.log(await getAcoreReleaseVersion());
   });
 
 async function main() {
-  // Handle it however you like
-  // e.g. display usage
-  while (true) {
+  let exit = false;
+  do {
     if (Deno.args.length === 0) {
       program.outputHelp();
       const command = await Input.prompt({
@@ -36,10 +34,10 @@ async function main() {
       console.log(command);
       await program.parseAsync(command.split(" "));
     } else {
+      exit = true;
       await program.parseAsync(Deno.args);
       process.exit(0);
     }
-  }
+  } while (!exit);
 }
-
 main();

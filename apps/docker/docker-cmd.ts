@@ -304,8 +304,6 @@ async function checkDockerVersion() {
 }
 
 async function main() {
-  // Handle it however you like
-  // e.g. display usage
   while (true) {
     const version = await checkDockerVersion();
     if (version !== true) {
