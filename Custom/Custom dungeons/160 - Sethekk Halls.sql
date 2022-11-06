@@ -29,6 +29,7 @@ INSERT INTO `dungeon_access_template` (`id`, `map_id`, `difficulty`, `min_level`
 DELETE FROM `creature_template` WHERE (`entry` = 820005);
 INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `speed_swim`, `speed_flight`, `detection_range`, `scale`, `rank`, `dmgschool`, `DamageModifier`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `spell_school_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
 (820005, 0, 0, 0, 0, 0, 17865, 0, 0, 0, 'Isfar', '', NULL, 7866, 67, 67, 1, 1818, 3, 1, 1.14286, 1, 1, 20, 1, 0, 0, 1, 1200, 2000, 1, 1, 2, 32832, 2048, 0, 0, 0, 0, 0, 0, 7, 64, 0, 0, 0, 0, 0, 0, 0, '', 1, 1, 8.5, 1, 1, 1, 0, 0, 1, 0, 0, 2, '', 12340);
+update creature_template set subname = 'Sethekk Halls Quests' where entry = 820005;
 
 -- 10097 Brother Against Brother
 DELETE FROM `quest_template` WHERE (`ID` = 820050);
@@ -44,9 +45,9 @@ INSERT INTO `quest_template` (`ID`, `QuestType`, `QuestLevel`, `MinLevel`, `Ques
 delete from creature_queststarter where id = 820005;
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 (820005, 820050),
-(820004, 820051);
+(820005, 820051);
 
 delete from creature_questender where id = 820005;
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (820005, 820050),
-(820004, 820051);
+(820005, 820051);
