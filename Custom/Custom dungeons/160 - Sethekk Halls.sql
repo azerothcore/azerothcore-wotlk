@@ -1,5 +1,5 @@
 -- Sethekk Halls
--- Level 6 - 68 originally
+-- Level 65 - 68 originally
 -- map 556
 
 -- NHC
