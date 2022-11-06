@@ -404,7 +404,7 @@ LootItem::LootItem(LootStoreItem const& li)
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-bool LootItem::AllowedForPlayer(Player const *player, ObjectGuid source) const
+bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
 {
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
     if (!pProto)
@@ -658,9 +658,9 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     if (items.size() == MAX_NR_LOOT_ITEMS)
         return nullptr;
 
-    auto* ql = new QuestItemList();
+    QuestItemList* ql = new QuestItemList();
 
-    Player *lootOwner = (roundRobinPlayer) ? ObjectAccessor::FindPlayer(roundRobinPlayer) : player;
+    Player* lootOwner = (roundRobinPlayer) ? ObjectAccessor::FindPlayer(roundRobinPlayer) : player;
 
     for (uint8 i = 0; i < quest_items.size(); ++i)
     {
@@ -682,7 +682,8 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
         ql->push_back(QuestItem(i));
         ++unlootedCount;
 
-        if (!item.freeforall) {
+        if (!item.freeforall)
+        {
             item.is_blocked = true;
         }
 
@@ -701,7 +702,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
 
 QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
 {
-    auto* ql = new QuestItemList();
+    QuestItemList* ql = new QuestItemList();
 
     for (uint8 i = 0; i < items.size(); ++i)
     {
