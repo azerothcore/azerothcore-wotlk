@@ -155,6 +155,11 @@ jobs:
     needs: [ docker-build-n-deploy-prod , docker-build-n-deploy-dev]
     runs-on: ubuntu-latest
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
       - name: Repository Dispatch
         if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
         uses: peter-evans/repository-dispatch@v2
