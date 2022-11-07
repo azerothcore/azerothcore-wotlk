@@ -334,7 +334,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-        BUILDKIT_INLINE_CACHE: 1
+        # BUILDKIT_INLINE_CACHE: 1
     volumes:
       - ${DOCKER_VOL_CLIENT_DATA_PROD:-ac-client-data-prod}:/azerothcore/env/dist/data:ro
     profiles: [prod, prod-app, clientdata]
