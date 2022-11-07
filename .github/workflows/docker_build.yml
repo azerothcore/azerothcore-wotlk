@@ -150,12 +150,12 @@ jobs:
   dispatch-acore-docker:
     needs: [ docker-build-n-deploy-prod , docker-build-n-deploy-dev]
     runs-on: ubuntu-latest
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
     steps:
       - name: Repository Dispatch
+        if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.ACORE_DOCKER_REPO_ACCESS_TOKEN }}
           repository: azerothcore/acore-docker
-          event-type: my-event
+          # event-type: my-event
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
