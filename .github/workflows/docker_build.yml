@@ -167,5 +167,5 @@ jobs:
         with:
           token: ${{ secrets.ACORE_DOCKER_REPO_ACCESS_TOKEN }}
           repository: azerothcore/acore-docker
-          # event-type: my-event
+          event-type: azerothcore-new-images
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
