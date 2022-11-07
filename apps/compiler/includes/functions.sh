@@ -17,6 +17,8 @@ function comp_ccacheEnable() {
     export CCACHE_CPP2=${CCACHE_CPP2:-true} # optimization for clang
     export CCACHE_COMPRESS=${CCACHE_COMPRESS:-1}
     export CCACHE_COMPRESSLEVEL=${CCACHE_COMPRESSLEVEL:-9}
+    export CCACHE_COMPILERCHECK=${CCACHE_COMPILERCHECK:-content}
+    export CCACHE_LOGFILE=${CCACHE_LOGFILE:-"$CCACHE_DIR/cache.debug"}
     #export CCACHE_NODIRECT=true
 
     export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
@@ -105,6 +107,8 @@ function comp_compile() {
   CWD=$(pwd)
 
   cd $BUILDPATH
+
+  comp_ccacheEnable
 
   comp_ccacheResetStats
 
