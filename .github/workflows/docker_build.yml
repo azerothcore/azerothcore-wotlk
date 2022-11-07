@@ -73,7 +73,7 @@ jobs:
         run: |
           docker compose --profile dev --profile local push
           output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
-          DOCKER_IMAGE_TAG=$version docker compose --profile local push
+          DOCKER_IMAGE_TAG=$version docker compose --profile dev --profile local push
 
   docker-build-n-deploy-prod:
     strategy:
