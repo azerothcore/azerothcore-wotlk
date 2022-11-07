@@ -1180,6 +1180,9 @@ public:
     //After looting item
     virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
 
+    //After looting item (includes master loot).
+    virtual void OnStoreNewItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
+
     //After creating item (eg profession item creation)
     virtual void OnCreateItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
 
@@ -2275,6 +2278,7 @@ public: /* PlayerScript */
     void GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const;
     void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
+    void OnStoreNewItem(Player* player, Item* item, uint32 count);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
     void OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll);
