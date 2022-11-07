@@ -34,7 +34,7 @@ jobs:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
-          root-reserve-mb: 512
+          root-reserve-mb: 10240
           swap-size-mb: 1024
           remove-dotnet: 'true'
           remove-android: 'true'
@@ -69,7 +69,7 @@ jobs:
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
           # pull the images first to load the docker cache layers
-          ./acore.sh docker pull
+          #./acore.sh docker pull
           ./acore.sh docker build
           output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
           DOCKER_IMAGE_TAG=$version docker compose --profile dev --profile local build
@@ -106,7 +106,7 @@ jobs:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
-          root-reserve-mb: 512
+          root-reserve-mb: 10240
           swap-size-mb: 1024
           remove-dotnet: 'true'
           remove-android: 'true'
@@ -149,7 +149,7 @@ jobs:
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
           # pull the images first to load the docker cache layers
-          ./acore.sh docker prod:pull
+          #./acore.sh docker prod:pull
           ./acore.sh docker prod:build
           output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
           DOCKER_IMAGE_TAG=$version ./acore.sh docker prod:build

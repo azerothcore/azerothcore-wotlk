@@ -12,7 +12,7 @@ x-build-params: &build-params
     USER_ID: ${DOCKER_USER_ID:-1000}
     GROUP_ID: ${DOCKER_GROUP_ID:-1000}
     DOCKER_USER: ${DOCKER_USER:-acore}
-    BUILDKIT_INLINE_CACHE: 1
+    # BUILDKIT_INLINE_CACHE: 1
   cache_from:
     - registry.hub.docker.com/acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master}
     - registry.hub.docker.com/acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master}
