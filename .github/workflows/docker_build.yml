@@ -145,3 +145,17 @@ jobs:
           docker compose --profile prod push
           output=$(./acore.sh version | grep "AzerothCore Rev.") && version=${output#"AzerothCore Rev."}
           DOCKER_IMAGE_TAG=$version docker compose --profile prod push
+
+
+  dispatch-acore-docker:
+    needs: [ docker-build-n-deploy-prod , docker-build-n-deploy-dev]
+    runs-on: ubuntu-latest
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: azerothcore/acore-docker
+          event-type: my-event
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
