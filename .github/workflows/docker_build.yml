@@ -62,6 +62,8 @@ jobs:
           # pull the images first to load the docker cache layers
           ./acore.sh docker pull
           ./acore.sh docker build
+          output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
+          DOCKER_IMAGE_TAG=$version docker compose --profile dev --profile local build
 
       - name: Deploy Dev
         #env:
@@ -69,7 +71,7 @@ jobs:
         if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
         run: |
           docker compose --profile dev --profile local push
-          output=$(./acore.sh version | grep "AzerothCore Rev.") && version=${output#"AzerothCore Rev."}
+          output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
           DOCKER_IMAGE_TAG=$version docker compose --profile local push
 
   docker-build-n-deploy-prod:
@@ -132,6 +134,8 @@ jobs:
           # pull the images first to load the docker cache layers
           ./acore.sh docker prod:pull
           ./acore.sh docker prod:build
+          output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
+          DOCKER_IMAGE_TAG=$version ./acore.sh docker prod:build
           # create the container to allow the copy right after
           docker compose create ac-build-prod
           docker compose cp ac-build-prod:/azerothcore/var/ccache var/docker/
@@ -143,7 +147,7 @@ jobs:
         if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
         run: |
           docker compose --profile prod push
-          output=$(./acore.sh version | grep "AzerothCore Rev.") && version=${output#"AzerothCore Rev."}
+          output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
           DOCKER_IMAGE_TAG=$version docker compose --profile prod push
 
 
