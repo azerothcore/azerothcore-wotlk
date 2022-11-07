@@ -14,13 +14,13 @@ x-build-params: &build-params
     DOCKER_USER: ${DOCKER_USER:-acore}
     # BUILDKIT_INLINE_CACHE: 1
   cache_from:
-    - registry.hub.docker.com/acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master}
-    - registry.hub.docker.com/acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master}
-    - registry.hub.docker.com/acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
-    - registry.hub.docker.com/acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
-    - registry.hub.docker.com/acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
-    - registry.hub.docker.com/acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master}
-    - registry.hub.docker.com/acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master}
 
 x-ac-shared-conf: &ac-shared-conf
   <<: *networks

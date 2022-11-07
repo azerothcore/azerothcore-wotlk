@@ -47,8 +47,9 @@ jobs:
           docker compose version
 
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
+        # we need the entire history for the ac-dev-server
+        # with:
+        #   fetch-depth: 2
 
       # - name: Set up Docker Buildx
       #   uses: docker/setup-buildx-action@v1
@@ -121,8 +122,9 @@ jobs:
           docker compose version
 
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
+        # we need the entire history for the ac-dev-server
+        # with:
+        #   fetch-depth: 2
 
       # - name: Set up Docker Buildx
       #   uses: docker/setup-buildx-action@v1
