@@ -94,7 +94,7 @@ services:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
-      - ${DOCKER_VOL_ROOT:-.}:/azerothcore
+      - ${DOCKER_VOL_ROOT:-.}:/azerothcore:cached
       # expose some dist folder outside allowing the host to use them
       - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
       - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin

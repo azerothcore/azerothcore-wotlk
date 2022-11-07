@@ -41,7 +41,9 @@ shellCommandFactory(
   [
     "docker compose --profile local --profile dev build --parallel",
     "docker image prune -f",
-    "docker compose run --rm --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
+    // We mount the /azerothcore folder by using the internal filesystem to improve the compilation performance.
+    // This is safe because the previous build command is going to copy the latest sources inside the new image
+    "docker compose run --rm -v /azerothcore --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
   ],
   env
 );
@@ -62,7 +64,9 @@ shellCommandFactory(
   [
     "docker compose --profile local --profile dev build --no-cache --parallel",
     "docker image prune -f",
-    "docker compose run --rm --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
+    // We mount the /azerothcore folder by using the internal filesystem to improve the compilation performance.
+    // This is safe because the previous build command is going to copy the latest sources inside the new image
+    "docker compose run --rm -v /azerothcore --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
   ],
   env
 );
