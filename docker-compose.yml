@@ -20,7 +20,8 @@ x-build-params: &build-params
     - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
     - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     - acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master}
-    - acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master}
+    # Need to fix reduced space on GH actions first
+    # - acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master}
 
 x-ac-shared-conf: &ac-shared-conf
   <<: *networks
