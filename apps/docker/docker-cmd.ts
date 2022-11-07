@@ -11,7 +11,7 @@ const program = new Command();
 const env = {
   COMPOSE_DOCKER_CLI_BUILD: "1",
   DOCKER_BUILDKIT: "1",
-  BUILDKIT_INLINE_CACHE: "1",
+  // BUILDKIT_INLINE_CACHE: "1",
 };
 
 const MIN_COMPOSE_VERSION = "2.0.0";
