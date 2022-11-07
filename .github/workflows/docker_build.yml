@@ -57,6 +57,7 @@ jobs:
           DOCKER_CLIENT_TIMEOUT: 400
           COMPOSE_HTTP_TIMEOUT: 400
         run: |
+          export CACHEBUST=$EPOCHSECONDS
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
           # pull the images first to load the docker cache layers
