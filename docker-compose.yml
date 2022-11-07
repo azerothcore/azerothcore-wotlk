@@ -5,7 +5,14 @@ x-networks: &networks
   networks:
     - ac-network
 
-x-cache-from: &cache-from
+x-build-params: &build-params
+  context: .
+  dockerfile: ./apps/docker/Dockerfile
+  args:
+    USER_ID: ${DOCKER_USER_ID:-1000}
+    GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+    DOCKER_USER: ${DOCKER_USER:-acore}
+    BUILDKIT_INLINE_CACHE: 1
   cache_from:
     - acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master}
     - acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master}
@@ -76,14 +83,8 @@ services:
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
     build:
-      context: .
       target: dev
-      dockerfile: ./apps/docker/Dockerfile
-      args:
-        USER_ID: ${DOCKER_USER_ID:-1000}
-        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-        DOCKER_USER: ${DOCKER_USER:-acore}
-      <<: *cache-from
+      <<: *build-params
     security_opt:
       - seccomp:unconfined
     env_file:
@@ -110,14 +111,8 @@ services:
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
     build:
-      context: .
       target: dev
-      dockerfile: ./apps/docker/Dockerfile
-      args:
-        USER_ID: ${DOCKER_USER_ID:-1000}
-        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-        DOCKER_USER: ${DOCKER_USER:-acore}
-      <<: *cache-from
+      <<: *build-params
     security_opt:
       - seccomp:unconfined
     env_file:
@@ -190,14 +185,8 @@ services:
     user: ${DOCKER_USER:-root}
     privileged: true
     build:
-      context: .
       target: worldserver-local
-      dockerfile: ./apps/docker/Dockerfile
-      args:
-        USER_ID: ${DOCKER_USER_ID:-1000}
-        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-        DOCKER_USER: ${DOCKER_USER:-acore}
-      <<: *cache-from
+      <<: *build-params
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
@@ -230,14 +219,8 @@ services:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     user: ${DOCKER_USER:-root}
     build:
-      context: .
       target: authserver-local
-      dockerfile: ./apps/docker/Dockerfile
-      args:
-        USER_ID: ${DOCKER_USER_ID:-1000}
-        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-        DOCKER_USER: ${DOCKER_USER:-acore}
-      <<: *cache-from
+      <<: *build-params
     volumes:
       # read-only binaries compiled by ac-dev-server
       - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin:ro
@@ -300,14 +283,8 @@ services:
     user: ${DOCKER_USER:-root}
     privileged: true
     build:
-      context: .
       target: worldserver
-      dockerfile: ./apps/docker/Dockerfile
-      args:
-        USER_ID: ${DOCKER_USER_ID:-1000}
-        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-        DOCKER_USER: ${DOCKER_USER:-acore}
-      <<: *cache-from
+      <<: *build-params
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
@@ -333,14 +310,8 @@ services:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     user: ${DOCKER_USER:-root}
     build:
-      context: .
       target: authserver
-      dockerfile: ./apps/docker/Dockerfile
-      args:
-        USER_ID: ${DOCKER_USER_ID:-1000}
-        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-        DOCKER_USER: ${DOCKER_USER:-acore}
-      <<: *cache-from
+      <<: *build-params
     volumes:
       - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
     ports:
@@ -357,15 +328,13 @@ services:
     image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     user: ${DOCKER_USER:-root}
     build:
-      context: .
       target: client-data
-      dockerfile: ./apps/docker/Dockerfile
+      <<: *build-params
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-        CACHEBUST: ${CACHEBUST:-1}
-      <<: *cache-from
+        BUILDKIT_INLINE_CACHE: 1
     volumes:
       - ${DOCKER_VOL_CLIENT_DATA_PROD:-ac-client-data-prod}:/azerothcore/env/dist/data:ro
     profiles: [prod, prod-app, clientdata]
@@ -374,14 +343,8 @@ services:
     image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     user: ${DOCKER_USER:-root}
     build:
-      context: .
       target: tools
-      dockerfile: ./apps/docker/Dockerfile
-      args:
-        USER_ID: ${DOCKER_USER_ID:-1000}
-        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-        DOCKER_USER: ${DOCKER_USER:-acore}
-      <<: *cache-from
+      <<: *build-params
     working_dir: /azerothcore/env/client/
     volumes:
       # this is not the directory of the extracted data! It's the client folder used by the extractors
@@ -400,14 +363,8 @@ services:
   ac-build-prod:
     <<: *ac-shared-conf
     build:
-      context: .
       target: build
-      dockerfile: ./apps/docker/Dockerfile
-      args:
-        USER_ID: ${DOCKER_USER_ID:-1000}
-        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-        DOCKER_USER: ${DOCKER_USER:-acore}
-      <<: *cache-from
+      <<: *build-params
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     working_dir: /azerothcore/
