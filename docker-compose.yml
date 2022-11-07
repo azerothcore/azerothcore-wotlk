@@ -23,11 +23,6 @@ x-ac-shared-conf: &ac-shared-conf
 
 x-ac-service-conf: &ac-service-conf
   <<: *ac-shared-conf
-  depends_on:
-    ac-database:
-      condition: service_healthy
-    ac-db-import:
-      condition: service_completed_successfully
   # List can't be merged. See: https://forums.docker.com/t/how-to-merge-a-list-of-volumes-from-an-extension-field-into-the-service-definition/77454
   # volumes:
   #   - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
@@ -160,6 +155,21 @@ services:
       ac-database:
         condition: service_healthy
 
+  ac-db-import:
+    <<: *ac-shared-conf
+    image: acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    command: ./env/dist/bin/dbimport
+    volumes:
+      # read-only binaries compiled by ac-dev-server
+      - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin:ro
+      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
+      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+    profiles: [local, app, db-import-local]
+    depends_on:
+      ac-database:
+        condition: service_healthy
+
 #=======================
 #
 # APP Services
@@ -204,6 +214,11 @@ services:
       - ${DOCKER_VOL_DATA_VMAPS:-./env/docker/data/vmaps}:/azerothcore/env/dist/data/vmaps
       - ${DOCKER_VOL_DATA_MMAPS:-./env/docker/data/mmaps}:/azerothcore/env/dist/data/mmaps
     profiles: [local, app, worldserver]
+    depends_on:
+      ac-database:
+        condition: service_healthy
+      ac-db-import:
+        condition: service_completed_successfully
 
   ac-authserver:
     <<: *ac-service-conf # merge with ac-service-conf
@@ -232,6 +247,11 @@ services:
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [local, app, authserver]
+    depends_on:
+      ac-database:
+        condition: service_healthy
+      ac-db-import:
+        condition: service_completed_successfully
 
 #======================
 #
@@ -244,6 +264,27 @@ services:
 # For a production-ready docker-compose, please check the official repo: https://github.com/azerothcore/acore-docker
 #
 #======================
+
+  ac-database-prod:
+    <<: *networks
+    image: mysql:8.0
+    restart: unless-stopped
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+    ports:
+      - ${DOCKER_DB_EXTERNAL_PORT:-3306}:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DOCKER_DB_ROOT_PASSWORD:-password}
+    volumes:
+      - type: volume
+        source: ac-database-prod
+        target: /var/lib/mysql
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
+      interval: 5s
+      timeout: 10s
+      retries: 40
+    profiles: [prod]
 
   ac-worldserver-prod:
     <<: *ac-service-conf # merge with ac-service-conf
@@ -275,6 +316,10 @@ services:
       - ${DOCKER_VOL_CLIENT_DATA_PROD:-ac-client-data-prod}:/azerothcore/env/dist/data:ro
     profiles: [prod, prod-app, prod-worldserver]
     depends_on:
+      ac-database-prod:
+        condition: service_healthy
+      ac-db-import-prod:
+        condition: service_completed_successfully
       ac-client-data-init:
         condition: service_started
 
@@ -301,6 +346,11 @@ services:
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [prod, prod-app, prod-authserver]
+    depends_on:
+      ac-database-prod:
+        condition: service_healthy
+      ac-db-import-prod:
+        condition: service_completed_successfully
 
 
   ac-client-data-init:
@@ -337,11 +387,11 @@ services:
       - ${DOCKER_AC_CLIENT_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
     profiles: [prod, tools]
 
-  ac-db-import:
+  ac-db-import-prod:
     <<: *ac-shared-conf
     image: acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     command: ./env/dist/bin/dbimport
-    profiles: [db-import]
+    profiles: [prod, prod-app, db-import-prod]
 
   #
   # Only for internal tests
@@ -364,6 +414,7 @@ services:
 
 volumes:
   ac-database:
+  ac-database-prod:
   ac-bin-dev:
   ac-build-dev:
   ac-ccache-dev:
