@@ -39,7 +39,7 @@ shellCommandFactory(
   "build",
   "Build the authserver and worldserver",
   [
-    "docker compose --profile local build --parallel",
+    "docker compose --profile local --profile dev build --parallel",
     "docker image prune -f",
     "docker compose run --rm --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
   ],
@@ -50,7 +50,7 @@ shellCommandFactory(
   "pull",
   "Pull build and local images",
   [
-    "docker compose --profile local pull --parallel",
+    "docker compose --profile local --profile dev pull --parallel",
     "docker image prune -f",
   ],
   env
@@ -60,7 +60,7 @@ shellCommandFactory(
   "build:nocache",
   "Build the authserver and worldserver without docker cache",
   [
-    "docker compose --profile local build --no-cache --parallel",
+    "docker compose --profile local --profile dev build --no-cache --parallel",
     "docker image prune -f",
     "docker compose run --rm --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
   ],

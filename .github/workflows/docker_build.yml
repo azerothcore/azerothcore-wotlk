@@ -62,7 +62,6 @@ jobs:
           # pull the images first to load the docker cache layers
           ./acore.sh docker pull
           ./acore.sh docker build
-          docker compose build ac-dev-server
 
       - name: Deploy Dev
         #env:
