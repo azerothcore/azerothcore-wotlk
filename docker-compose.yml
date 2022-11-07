@@ -69,6 +69,44 @@ services:
 #
 #======================
 
+  #
+  # Used for the build process to avoid the host binding of the /azerothcore
+  # and speedup the compilation by avoiding the host-container filesystem conversion issue
+  # on non-ext filesystems. Reference https://stackoverflow.com/a/63437557/1964544
+  #
+  ac-dev-build:
+    <<: [ *ac-shared-conf ] # merge with
+    image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+    user: ${DOCKER_USER:-root}
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+    build:
+      context: .
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      <<: *cache-from
+    security_opt:
+      - seccomp:unconfined
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    volumes:
+      # expose some dist folder outside allowing the host to use them
+      - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
+      - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin
+      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      - ac-build-dev:/azerothcore/var/build
+      - ac-ccache-dev:/azerothcore/var/ccache
+    profiles: [dev-build]
+
+  #
+  # Dev server with the ./azerothcore folder binded from the host
+  # Please use Linux, WSL2 or any ext-compatible filesystem
+  # to avoid performance issues
+  #
   ac-dev-server:
     <<: [ *ac-shared-conf ] # merge with
     tty: true
@@ -308,7 +346,7 @@ services:
   #
   # Only for internal tests
   #
-  ac-test-build:
+  ac-build-prod:
     <<: *ac-shared-conf
     build:
       context: .
@@ -322,7 +360,7 @@ services:
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     working_dir: /azerothcore/
-    profiles: [test-build]
+    profiles: [prod-build]
 
 volumes:
   ac-database:

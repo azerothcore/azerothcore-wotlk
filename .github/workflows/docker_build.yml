@@ -133,8 +133,8 @@ jobs:
           ./acore.sh docker prod:pull
           ./acore.sh docker prod:build
           # create the container to allow the copy right after
-          docker compose create ac-test-build
-          docker compose cp ac-test-build:/azerothcore/var/ccache var/docker/
+          docker compose create ac-build-prod
+          docker compose cp ac-build-prod:/azerothcore/var/ccache var/docker/
           echo "ccache exported"
 
       - name: Deploy Production images

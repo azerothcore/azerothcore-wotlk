@@ -39,11 +39,9 @@ shellCommandFactory(
   "build",
   "Build the authserver and worldserver",
   [
-    "docker compose --profile local --profile dev build --parallel",
+    "docker compose --profile local --profile dev --profile dev-build build --parallel",
     "docker image prune -f",
-    // We mount the /azerothcore folder by using the internal filesystem to improve the compilation performance.
-    // This is safe because the previous build command is going to copy the latest sources inside the new image
-    "docker compose run --rm -v /azerothcore --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
+    "docker compose run --rm --no-deps ac-dev-build bash apps/docker/docker-build-dev.sh",
   ],
   env
 );
@@ -52,7 +50,7 @@ shellCommandFactory(
   "pull",
   "Pull build and local images",
   [
-    "docker compose --profile local --profile dev pull --parallel",
+    "docker compose --profile local --profile dev --profile dev-build pull --parallel",
     "docker image prune -f",
   ],
   env
@@ -62,11 +60,9 @@ shellCommandFactory(
   "build:nocache",
   "Build the authserver and worldserver without docker cache",
   [
-    "docker compose --profile local --profile dev build --no-cache --parallel",
+    "docker compose --profile local --profile dev --profile dev-build build --no-cache --parallel",
     "docker image prune -f",
-    // We mount the /azerothcore folder by using the internal filesystem to improve the compilation performance.
-    // This is safe because the previous build command is going to copy the latest sources inside the new image
-    "docker compose run --rm -v /azerothcore --no-deps ac-dev-server bash apps/docker/docker-build-dev.sh",
+    "docker compose run --rm --no-deps ac-dev-build bash apps/docker/docker-build-dev.sh",
   ],
   env
 );
