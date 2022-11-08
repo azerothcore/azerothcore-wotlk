@@ -37,3 +37,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 UPDATE `gameobject` SET `ZoneId`=3521 WHERE `guid` IN (34029, 42217, 42430, 87125, 87126);
 UPDATE `gameobject` SET `ZoneId`=3519, `AreaId`=3961 WHERE `guid`=40309;
 UPDATE `gameobject` SET `ZoneId`=3483 WHERE `guid`=86396;
+
+-- Lower chances for Khorium to spawn on Fel Iron nodes from 2% to 1% I think it's even lower than that, actually.
+UPDATE `pool_gameobject` SET `chance`=1 WHERE `description` LIKE '%Khorium for Fel Iron%';
