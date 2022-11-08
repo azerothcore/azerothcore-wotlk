@@ -4427,7 +4427,7 @@ void SpellMgr::LoadSpellInfoCorrections()
             spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
     });
 
-    // Digestive Acid
+    // Digestive Acid (Temporary)
     ApplySpellFix({ 26476 }, [](SpellInfo* spellInfo)
     {
             spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
