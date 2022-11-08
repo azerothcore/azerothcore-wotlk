@@ -51,7 +51,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         53307,  // Thorns (Rank 8)
         53352,  // Explosive Shot (trigger)
         50783,  // Slam (Triggered spell)
-        20647  // Execute (Triggered spell)
+        20647   // Execute (Triggered spell)
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
