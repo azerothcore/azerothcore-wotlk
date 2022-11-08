@@ -51,8 +51,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         53307,  // Thorns (Rank 8)
         53352,  // Explosive Shot (trigger)
         50783,  // Slam (Triggered spell)
-        20647,  // Execute (Triggered spell)
-        26476   // Digestive Acid
+        20647  // Execute (Triggered spell)
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
@@ -4426,6 +4425,14 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 26007 }, [](SpellInfo* spellInfo)
     {
             spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
+    });
+
+    // Digestive Acid
+    ApplySpellFix({ 26476 }, [](SpellInfo* spellInfo)
+    {
+            spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
