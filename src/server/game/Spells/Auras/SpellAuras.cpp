@@ -2923,18 +2923,15 @@ void DynObjAura::FillTargetMap(std::map<Unit*, uint8>& targets, Unit* /*caster*/
 
         for (UnitList::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
         {
+            // xinef: check z level and los dependence
             Unit* target = *itr;
-
-            Optional<float> collisionHeight = { };
-            if (Unit* dynObjCaster = GetDynobjOwner()->GetCaster())
+            float zLevel = GetDynobjOwner()->GetPositionZ();
+            if (target->GetPositionZ() + 3.0f < zLevel || target->GetPositionZ() - 5.0f > zLevel)
             {
-                collisionHeight = dynObjCaster->GetCollisionHeight();
-            }
-
-            if (!spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) && !spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) &&
-                !target->IsWithinLOSInMap(GetDynobjOwner(), VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_ALL_CHECKS, collisionHeight))
-            {
-                continue;
+                if (!spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) && !spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) && !target->IsWithinLOSInMap(GetDynobjOwner()))
+                {
+                    continue;
+                }
             }
 
             std::map<Unit*, uint8>::iterator existing = targets.find(*itr);
