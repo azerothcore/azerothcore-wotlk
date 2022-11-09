@@ -152,9 +152,9 @@ This project exists thanks to:
 
 ## Important Links
 
-<!-- Remove if the PR 3210 is accepted
+- [Doxygen Documentation](https://www.azerothcore.org/pages/doxygen/index.html)
+
 - [Code of Conduct](https://github.com/azerothcore-wotlk/.github/code_of_conduct.md
--->
 - [Website](http://www.azerothcore.org/)
 - [AzerothCore catalogue](http://www.azerothcore.org/catalogue.html  "Modules, tools, and other stuff for AzerothCore") (modules, tools, etc...)
 - [Module template / Module skeleton](https://github.com/azerothcore/skeleton-module/)
