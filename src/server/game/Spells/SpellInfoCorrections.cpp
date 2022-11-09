@@ -21,6 +21,18 @@
 #include "GameGraveyard.h"
 #include "SpellMgr.h"
 
+/**
+    @file SpellInfoCorrections.cpp
+
+    @brief This file contains SpellInfo Corrections for spells.
+ */
+
+/**
+    @brief Used to apply the SpellInfo fixes to spells.
+
+    @param spellIds SpellID, can be several seperated by a comma.
+    @param SpellInfo SpellInfo field to change.
+*/
 inline void ApplySpellFix(std::initializer_list<uint32> spellIds, void(*fix)(SpellInfo*))
 {
     for (uint32 spellId : spellIds)
