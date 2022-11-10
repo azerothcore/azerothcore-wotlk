@@ -17,6 +17,16 @@ SET @CGUID := 138300;
 -- 3300 done
 -- 18409 needs WDBE
 -- 17731 done
+-- 17882 Boss w/ scripts
+-- 17734 done
+-- 17723 done
+-- 20465 done
+-- 17726 needs attention
+-- 18105 Boss
+-- 17735 done
+-- 16030 done
+-- 17732 needs attention
+-- 19632 needs attention
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+224;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
 (@CGUID+0  , 17725, 546, 3716, 3716, 3, 1, 0, 53.30517196655273437, -115.721046447753906, -2.65770363807678222, 3.630284786224365234, 86400, 1, 5, 16028, 0, 1, 0, 0, 0, 46368), -- 17725 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
@@ -56,7 +66,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+34 , 17724, 546, 3716, 3716, 3, 1, 0, 0.224553108215332031, -173.079132080078125, -4.53405666351318359, 0.691599786281585693, 86400, 1, 4, 16028, 0, 1, 0, 0, 0, 46368), -- 17724 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+35 , 17725, 546, 3716, 3716, 3, 1, 0, -55.9498291015625, -257.518524169921875, -4.45344161987304687, 5.916666030883789062, 86400, 0, 0, 15489, 0, 0, 0, 0, 0, 46368), -- 17725 (Area: 3716 - Difficulty: 1)
 (@CGUID+36 , 17724, 546, 3716, 3716, 3, 1, 0, 2.884120941162109375, -185.097015380859375, -4.53397274017333984, 5.816865444183349609, 86400, 0, 0, 16028, 0, 1, 0, 0, 0, 46368), -- 17724 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
-(@CGUID+37 , 17723, 546, 3716, 3716, 3, 1, 0, 10.4918975830078125, -208.06329345703125, -4.5332193374633789, 4.59362649917602539, 86400, 0, 0, 36478, 0, 1, 0, 0, 0, 46368), -- 17723 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
+(@CGUID+37 , 17723, 546, 3716, 3716, 3, 1, 0, 10.4918975830078125, -208.06329345703125, -4.5332193374633789, 4.59362649917602539, 86400, 1, 5, 36478, 0, 1, 0, 0, 0, 46368), -- 17723 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+38 , 17724, 546, 3716, 3716, 3, 1, 0, -16.8087425231933593, -194.322494506835937, -4.53450822830200195, 2.589608430862426757, 86400, 0, 0, 15489, 0, 1, 0, 0, 0, 46368), -- 17724 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+39 , 17871, 546, 3716, 3716, 3, 1, 0, -134.443710327148437, -221.692276000976562, -3.8408522605895996, 3.7479248046875, 86400, 0, 0, 12395, 5136, 1, 0, 0, 0, 46368), -- 17871 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+40 , 17871, 546, 3716, 3716, 3, 1, 0, -138.559707641601562, -223.74798583984375, -3.80365943908691406, 3.85886549949645996, 86400, 0, 0, 12395, 5136, 1, 0, 0, 0, 46368), -- 17871 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
@@ -103,13 +113,13 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+81 , 1420, 546, 3716, 3716, 3, 1, 0, -114.916908264160156, -359.645843505859375, 34.63579940795898437, 6.140144824981689453, 86400, 1, 7, 8, 0, 1, 0, 0, 0, 46368), -- 1420 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+82 , 20465, 546, 3716, 3716, 3, 1, 0, -61.8247871398925781, -395.373992919921875, -20.1860847473144531, 2.978006601333618164, 86400, 1, 30, 19986, 0, 1, 0, 0, 0, 46368), -- 20465 (Area: 3716 - Difficulty: 1) (Auras: 18943 - 18943, 18950 - 18950) (possible waypoints or random movement)
 (@CGUID+83 , 20465, 546, 3716, 3716, 3, 1, 0, -75.2216567993164062, -413.634674072265625, -29.7494258880615234, 1.167413115501403808, 86400, 1, 30, 19422, 0, 1, 0, 0, 0, 46368), -- 20465 (Area: 3716 - Difficulty: 1) (Auras: 18943 - 18943) (possible waypoints or random movement)
-(@CGUID+84 , 17723, 546, 3716, 3716, 3, 1, 0, 5.765883445739746093, -382.78369140625, 27.06412506103515625, 0.9276963472366333, 86400, 0, 0, 36478, 0, 1, 0, 0, 0, 46368), -- 17723 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
+(@CGUID+84 , 17723, 546, 3716, 3716, 3, 1, 0, 5.765883445739746093, -382.78369140625, 27.06412506103515625, 0.9276963472366333, 86400, 1, 7, 36478, 0, 1, 0, 0, 0, 46368), -- 17723 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+85 , 20465, 546, 3716, 3716, 3, 1, 0, -19.6737327575683593, -400.955230712890625, -27.7520751953125, 4.101523876190185546, 86400, 1, 30, 19422, 0, 0, 0, 0, 0, 46368), -- 20465 (Area: 3716 - Difficulty: 1) (Auras: 18943 - 18943, 18950 - 18950)
 (@CGUID+86 , 20465, 546, 3716, 3716, 3, 1, 0, 16.55997276306152343, -386.068389892578125, -20.265960693359375, 4.107356548309326171, 86400, 1, 30, 19986, 0, 1, 0, 0, 0, 46368), -- 20465 (Area: 3716 - Difficulty: 1) (Auras: 18943 - 18943, 18950 - 18950) (possible waypoints or random movement)
 (@CGUID+87 , 20465, 546, 3716, 3716, 3, 1, 0, 8.97026824951171875, -426.08447265625, -22.3979091644287109, 3.527451753616333007, 86400, 1, 30, 19422, 0, 1, 0, 0, 0, 46368), -- 20465 (Area: 3716 - Difficulty: 1) (Auras: 18943 - 18943) (possible waypoints or random movement)
 (@CGUID+88 , 17723, 546, 3716, 3716, 3, 1, 0, 19.44412040710449218, -308.636138916015625, 31.8928375244140625, 3.714715957641601562, 86400, 0, 0, 36478, 0, 1, 0, 0, 0, 46368), -- 17723 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+89 , 20465, 546, 3716, 3716, 3, 1, 0, 44.63208770751953125, -395.77447509765625, -22.0020713806152343, 1.059683799743652343, 86400, 1, 30, 19422, 0, 1, 0, 0, 0, 46368), -- 20465 (Area: 3716 - Difficulty: 1) (Auras: 18943 - 18943, 18950 - 18950) (possible waypoints or random movement)
-(@CGUID+90 , 17723, 546, 3716, 3716, 3, 1, 0, 77.6444244384765625, -384.56866455078125, 33.31194305419921875, 6.084620475769042968, 86400, 0, 0, 36478, 0, 1, 0, 0, 0, 46368), -- 17723 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
+(@CGUID+90 , 17723, 546, 3716, 3716, 3, 1, 0, 77.6444244384765625, -384.56866455078125, 33.31194305419921875, 6.084620475769042968, 86400, 1, 6, 36478, 0, 1, 0, 0, 0, 46368), -- 17723 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+91 , 17726, 546, 3716, 3716, 3, 1, 0, 99.41526031494140625, -396.649139404296875, 36.55694961547851562, 5.781200408935546875, 86400, 0, 0, 16574, 0, 1, 0, 0, 0, 46368), -- 17726 (Area: 3716 - Difficulty: 1) (Auras: ) (possible waypoints or random movement)
 (@CGUID+92 , 18105, 546, 3716, 3716, 3, 1, 0, 193.6833953857421875, -425.00103759765625, 43.53683853149414062, 4.910074710845947265, 86400, 0, 0, 59140, 0, 1, 0, 0, 0, 46368), -- 18105 (Area: 3716 - Difficulty: 1) (Auras: 8876 - 8876) (possible waypoints or random movement)
 (@CGUID+93 , 17726, 546, 3716, 3716, 3, 1, 0, 98.21234130859375, -398.8406982421875, 36.511749267578125, 5.781207561492919921, 86400, 0, 0, 16574, 0, 1, 0, 0, 0, 46368), -- 17726 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
@@ -193,29 +203,29 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+171, 20465, 546, 3716, 3716, 3, 1, 0, 292.789520263671875, -466.64056396484375, 3.48419046401977539, 4.818709373474121093, 86400, 1, 30, 19422, 0, 1, 0, 0, 0, 46368), -- 20465 (Area: 3716 - Difficulty: 1) (Auras: 18943 - 18943, 18950 - 18950) (possible waypoints or random movement)
 (@CGUID+172, 3300, 546, 3716, 3716, 3, 1, 0, 361.69378662109375, -451.887908935546875, 30.06296730041503906, 4.588304042816162109, 86400, 1, 8, 1, 0, 1, 0, 0, 0, 46368), -- 3300 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+173, 17731, 546, 3716, 3716, 3, 1, 0, 310.3460693359375, -320.663238525390625, 19.90793991088867187, 5.707941055297851562, 86400, 0, 0, 16574, 0, 0, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1)
-(@CGUID+174, 16030, 546, 3716, 3716, 3, 1, 0, 307.504730224609375, -306.9287109375, 18.90543174743652343, 1.589548826217651367, 86400, 0, 0, 8, 0, 1, 0, 0, 0, 46368), -- 16030 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
+(@CGUID+174, 16030, 546, 3716, 3716, 3, 1, 0, 307.504730224609375, -306.9287109375, 18.90543174743652343, 1.589548826217651367, 86400, 1, 9, 8, 0, 1, 0, 0, 0, 46368), -- 16030 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+175, 17731, 546, 3716, 3716, 3, 1, 0, 297.064788818359375, -297.573089599609375, 20.72171401977539062, 2.99703836441040039, 86400, 1, 8, 16574, 0, 0, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1)
 (@CGUID+176, 17732, 546, 3716, 3716, 3, 1, 0, 275.003387451171875, -292.1968994140625, 21.16566848754882812, 2.482410907745361328, 86400, 0, 0, 16028, 0, 1, 0, 0, 0, 46368), -- 17732 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+177, 19632, 546, 3716, 3716, 3, 1, 0, 278.678192138671875, -287.45391845703125, 22.65006065368652343, 2.482411623001098632, 86400, 0, 0, 16574, 0, 1, 0, 0, 0, 46368), -- 19632 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+178, 17885, 546, 3716, 3716, 3, 1, 0, 296.697418212890625, -362.373046875, 50.1506195068359375, 5.567600250244140625, 86400, 0, 0, 4572, 2705, 0, 0, 0, 0, 46368), -- 17885 (Area: 3716 - Difficulty: 1) (Auras: 31526 - 31526)
 (@CGUID+179, 17732, 546, 3716, 3716, 3, 1, 0, 276.840789794921875, -289.825408935546875, 21.84542465209960937, 2.482409477233886718, 86400, 0, 0, 16028, 0, 1, 0, 0, 0, 46368), -- 17732 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+180, 17731, 546, 3716, 3716, 3, 1, 0, 269.434051513671875, -271.4952392578125, 25.82761192321777343, 2.013846158981323242, 86400, 1, 8, 16574, 0, 1, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
-(@CGUID+181, 16030, 546, 3716, 3716, 3, 1, 0, 265.589599609375, -257.714263916015625, 26.0072174072265625, 3.904292583465576171, 86400, 0, 0, 8, 0, 1, 0, 0, 0, 46368), -- 16030 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
+(@CGUID+181, 16030, 546, 3716, 3716, 3, 1, 0, 265.589599609375, -257.714263916015625, 26.0072174072265625, 3.904292583465576171, 86400, 1, 9, 8, 0, 1, 0, 0, 0, 46368), -- 16030 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+182, 17731, 546, 3716, 3716, 3, 1, 0, 261.269378662109375, -266.996307373046875, 24.53288078308105468, 1.782908082008361816, 86400, 1, 8, 16574, 0, 1, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+183, 17731, 546, 3716, 3716, 3, 1, 0, 267.347259521484375, -259.0350341796875, 26.24045562744140625, 4.32236480712890625, 86400, 0, 0, 16574, 1, 8, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1)
 (@CGUID+184, 17731, 546, 3716, 3716, 3, 1, 0, 273.348663330078125, -222.741073608398437, 29.430328369140625, 2.017953872680664062, 86400, 1, 6, 16574, 0, 0, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1)
-(@CGUID+185, 16030, 546, 3716, 3716, 3, 1, 0, 262.991729736328125, -230.167022705078125, 27.49382400512695312, 3.45156407356262207, 86400, 0, 0, 8, 0, 0, 0, 0, 0, 46368), -- 16030 (Area: 3716 - Difficulty: 1)
+(@CGUID+185, 16030, 546, 3716, 3716, 3, 1, 0, 262.991729736328125, -230.167022705078125, 27.49382400512695312, 3.45156407356262207, 86400, 1, 9, 8, 0, 0, 0, 0, 0, 46368), -- 16030 (Area: 3716 - Difficulty: 1)
 (@CGUID+186, 17732, 546, 3716, 3716, 3, 1, 0, 266.96685791015625, -218.227981567382812, 28.86172866821289062, 5.894797325134277343, 86400, 0, 0, 16028, 0, 0, 0, 0, 0, 46368), -- 17732 (Area: 3716 - Difficulty: 1)
 (@CGUID+187, 17731, 546, 3716, 3716, 3, 1, 0, 271.235595703125, -210.660186767578125, 29.03068351745605468, 0.156309396028518676, 86400, 1, 4, 16574, 0, 0, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1)
 (@CGUID+188, 17732, 546, 3716, 3716, 3, 1, 0, 266.515289306640625, -207.49920654296875, 28.72848892211914062, 4.804712295532226562, 86400, 0, 0, 16028, 0, 1, 0, 0, 0, 46368), -- 17732 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
-(@CGUID+189, 16030, 546, 3716, 3716, 3, 1, 0, 270.178741455078125, -201.12567138671875, 28.96302413940429687, 3.366828680038452148, 86400, 0, 0, 8, 0, 0, 0, 0, 0, 46368), -- 16030 (Area: 3716 - Difficulty: 1)
+(@CGUID+189, 16030, 546, 3716, 3716, 3, 1, 0, 270.178741455078125, -201.12567138671875, 28.96302413940429687, 3.366828680038452148, 86400, 1, 9, 8, 0, 0, 0, 0, 0, 46368), -- 16030 (Area: 3716 - Difficulty: 1)
 (@CGUID+190, 17732, 546, 3716, 3716, 3, 1, 0, 262.749908447265625, -210.218246459960937, 28.48742866516113281, 4.804712772369384765, 86400, 0, 0, 16028, 0, 1, 0, 0, 0, 46368), -- 17732 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+191, 19632, 546, 3716, 3716, 3, 1, 0, 270.702239990234375, -209.333526611328125, 28.99435997009277343, 4.804712772369384765, 86400, 0, 0, 16574, 0, 1, 0, 0, 0, 46368), -- 19632 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+192, 17731, 546, 3716, 3716, 3, 1, 0, 276.651947021484375, -188.849929809570312, 28.7522735595703125, 3.996803998947143554, 86400, 0, 0, 16574, 0, 0, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1)
 (@CGUID+193, 17731, 546, 3716, 3716, 3, 1, 0, 272.976715087890625, -184.734725952148437, 28.97068977355957031, 3.647738218307495117, 86400, 0, 0, 16574, 0, 0, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1)
 (@CGUID+194, 17732, 546, 3716, 3716, 3, 1, 0, 253.9568634033203125, -183.705596923828125, 28.1859588623046875, 4.081171989440917968, 86400, 0, 0, 16028, 0, 0, 0, 0, 0, 46368), -- 17732 (Area: 3716 - Difficulty: 1)
 (@CGUID+195, 17731, 546, 3716, 3716, 3, 1, 0, 245.215911865234375, -182.948806762695312, 26.83671379089355468, 1.8245391845703125, 86400, 1, 4, 16574, 0, 1, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
-(@CGUID+196, 16030, 546, 3716, 3716, 3, 1, 0, 247.648162841796875, -172.632354736328125, 27.69061470031738281, 4.107637405395507812, 86400, 0, 0, 8, 0, 1, 0, 0, 0, 46368), -- 16030 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
+(@CGUID+196, 16030, 546, 3716, 3716, 3, 1, 0, 247.648162841796875, -172.632354736328125, 27.69061470031738281, 4.107637405395507812, 86400, 1, 9, 8, 0, 1, 0, 0, 0, 46368), -- 16030 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+197, 17731, 546, 3716, 3716, 3, 1, 0, 249.083282470703125, -171.4796142578125, 27.97526931762695312, 1.225289702415466308, 86400, 1, 5, 16574, 0, 1, 0, 0, 0, 46368), -- 17731 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+198, 17734, 546, 3716, 3716, 3, 1, 0, 217.05517578125, -131.514968872070312, 26.75313758850097656, 0.087230674922466278, 86400, 0, 0, 45720, 0, 1, 0, 0, 0, 46368), -- 17734 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+199, 17827, 546, 3716, 3716, 3, 1, 0, 289.255279541015625, -129.70013427734375, 29.82100868225097656, 2.49582076072692871, 86400, 0, 0, 53226, 0, 0, 0, 0, 0, 46368), -- 17827 (Area: 3716 - Difficulty: 1)
@@ -258,6 +268,14 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 DELETE FROM `creature_template_addon` WHERE (`entry` = 20465);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (20465, 0, 0, 0, 0, 0, 0, '18943, 18950');
+
+-- Ghaz'an Thrash
+UPDATE `creature_template_addon` SET `auras` = '8876' WHERE (`entry` = 18105);
+
+-- Wrathfin Sentry Stealth Detection aura
+DELETE FROM `creature_template_addon` WHERE (`entry` = 17727);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(17727, 0, 0, 0, 0, 0, 0, '18950');
 
 -- 2 members
 SET @NPC := @CGUID+36;
@@ -488,3 +506,196 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 -- (@PATH,11,137.54929,3.156878,26.791546,NULL,0,0,0,100,0),
 -- (@PATH,12,147.90135,15.377421,26.796476,NULL,0,0,0,100,0),
 -- (@PATH,13,151.38458,20.670511,26.857647,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+198;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,217.05518,-131.51497,26.753138,NULL,0,0,0,100,0),
+(@PATH,2,193.61502,-133.56485,28.525309,NULL,0,0,0,100,0),
+(@PATH,3,169.54633,-135.7898,28.335976,NULL,0,0,0,100,0),
+(@PATH,4,158.52997,-167.41908,32.282738,NULL,0,0,0,100,0),
+(@PATH,5,169.54633,-135.7898,28.335976,NULL,0,0,0,100,0),
+(@PATH,6,193.61502,-133.56485,28.525309,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+28;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,161.12509,-70.36053,27.062626,NULL,0,0,0,100,0),
+(@PATH,2,153.02617,-93.89476,26.35261,NULL,0,0,0,100,0),
+(@PATH,3,176.59203,-61.29988,26.51584,NULL,0,0,0,100,0),
+(@PATH,4,190.18256,-52.506645,26.633347,NULL,0,0,0,100,0),
+(@PATH,5,176.59203,-61.29988,26.51584,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+88;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,19.44412,-308.63614,31.892838,NULL,0,0,0,100,0),
+(@PATH,2,42.476913,-293.77115,32.69076,NULL,0,0,0,100,0),
+(@PATH,3,68.26116,-284.1465,32.08228,NULL,0,0,0,100,0),
+(@PATH,4,88.84355,-286.01645,32.128727,NULL,0,0,0,100,0),
+(@PATH,5,96.96455,-311.36377,32.529114,NULL,0,0,0,100,0),
+(@PATH,6,101.42537,-344.6663,32.977905,NULL,0,0,0,100,0),
+(@PATH,7,93.06754,-360.33292,33.215553,NULL,0,0,0,100,0),
+(@PATH,8,101.42537,-344.6663,32.977905,NULL,0,0,0,100,0),
+(@PATH,9,96.96455,-311.36377,32.529114,NULL,0,0,0,100,0),
+(@PATH,10,88.84355,-286.01645,32.128727,NULL,0,0,0,100,0),
+(@PATH,11,68.26116,-284.1465,32.08228,NULL,0,0,0,100,0),
+(@PATH,12,42.476913,-293.77115,32.69076,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+61;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-69.680275,-228.86562,-4.5370073,NULL,0,0,0,100,0),
+(@PATH,2,-96.95158,-227.70627,-4.376714,NULL,0,0,0,100,0),
+(@PATH,3,-69.680275,-228.86562,-4.5370073,NULL,0,0,0,100,0),
+(@PATH,4,-50.817432,-226.48108,-4.5365863,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+62;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-21.110575,-342.88358,30.821274,NULL,0,0,0,100,0),
+(@PATH,2,1.211546,-323.15225,30.926214,NULL,0,0,0,100,0),
+(@PATH,3,27.59817,-304.36447,32.139996,NULL,0,0,0,100,0),
+(@PATH,4,1.211546,-323.15225,30.926214,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+64;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-92.30222,-302.19803,-4.5357122,NULL,0,0,0,100,0),
+(@PATH,2,-59.19425,-289.67743,-4.5349183,NULL,0,0,0,100,0),
+(@PATH,3,-42.62119,-269.50012,-4.535499,NULL,0,0,0,100,0),
+(@PATH,4,-59.19425,-289.67743,-4.5349183,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+123;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,188.47975,-404.16498,72.504776,NULL,0,0,0,100,0),
+(@PATH,2,171.54146,-424.23203,72.47367,NULL,0,0,0,100,0),
+(@PATH,3,164.67918,-452.26797,72.48773,NULL,0,0,0,100,0),
+(@PATH,4,171.54146,-424.23203,72.47367,NULL,0,0,0,100,0);
+
+-- Ghaz'an 
+-- SET @NPC := XXXXXX;
+-- SET @PATH := @NPC * 10;
+-- UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=276.92447,`position_y`=-457.9421,`position_z`=37.05632 WHERE `guid`=@NPC;
+-- DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+-- INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+-- DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+-- INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+-- (@PATH,1,276.92447,-457.9421,37.05632,NULL,0,0,0,100,0),
+-- (@PATH,2,230.84842,-473.81586,44.384487,NULL,0,0,0,100,0),
+-- (@PATH,3,223.15588,-474.34158,46.36878,NULL,0,0,0,100,0),
+-- (@PATH,4,214.68163,-479.58606,52.51196,NULL,0,0,0,100,0),
+-- (@PATH,5,200.88074,-483.32407,58.438652,NULL,0,0,0,100,0),
+-- (@PATH,6,185.70932,-485.64243,64.15632,NULL,0,0,0,100,0),
+-- (@PATH,7,175.2845,-486.21573,67.86781,NULL,0,0,0,100,0),
+-- (@PATH,8,160.93648,-476.7256,74.70425,NULL,0,0,0,100,0),
+-- (@PATH,9,158.37117,-472.06967,74.63962,NULL,0,0,0,100,0),
+-- (@PATH,10,159.37047,-467.53186,75.40111,NULL,0,0,0,100,0),
+-- (@PATH,11,180.78477,-471.30957,77.03179,NULL,0,0,0,100,0),
+-- (@PATH,12,189.26646,-471.74365,77.766594,NULL,0,0,0,100,0),
+-- (@PATH,13,200.31303,-472.0223,79.02495,NULL,0,0,0,100,0),
+-- (@PATH,14,212.294,-480.27985,80.729095,NULL,0,0,0,100,0),
+-- (@PATH,15,222.19577,-476.2322,81.27319,NULL,0,0,0,100,0),
+-- (@PATH,16,233.52731,-471.28235,81.37284,NULL,0,0,0,100,0),
+-- (@PATH,17,239.5655,-468.65033,81.37284,NULL,0,0,0,100,0),
+-- (@PATH,18,248.33444,-465.86627,81.37284,NULL,0,0,0,100,0),
+-- (@PATH,19,260.44455,-457.9094,81.37284,NULL,0,0,0,100,0),
+-- (@PATH,20,256.2785,-458.73138,81.37284,NULL,0,0,0,100,0),
+-- (@PATH,21,256.2785,-458.73138,81.37284,3.543018341064453125,0,0,0,100,0);
+
+SET @NPC := @CGUID+151;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,272.08115,-381.04507,72.14804,NULL,0,0,0,100,0),
+(@PATH,2,264.9766,-377.12155,72.15923,NULL,0,0,0,100,0),
+(@PATH,3,256.61053,-374.54532,72.26968,NULL,0,0,0,100,0),
+(@PATH,4,250.05904,-367.16782,72.172905,NULL,0,0,0,100,0),
+(@PATH,5,256.61053,-374.54532,72.26968,NULL,0,0,0,100,0),
+(@PATH,6,264.9766,-377.12155,72.15923,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+145;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=237.12813,`position_y`=-373.9269,`position_z`=48.178493 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,237.12813,-373.9269,48.178493,NULL,0,0,0,100,0),
+(@PATH,2,227.23715,-378.54562,48.189976,NULL,0,0,0,100,0),
+(@PATH,3,214.0971,-380.00208,48.148045,NULL,0,0,0,100,0),
+(@PATH,4,204.41469,-378.89005,48.1181,NULL,0,0,0,100,0),
+(@PATH,5,214.0971,-380.00208,48.148045,NULL,0,0,0,100,0),
+(@PATH,6,227.23715,-378.54562,48.189976,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+179;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,266.3294,-220.27826,28.777576,NULL,0,0,0,100,0),
+(@PATH,2,269.6321,-240.93237,27.48778,NULL,0,0,0,100,0),
+(@PATH,3,265.96866,-271.0043,24.540274,NULL,0,0,0,100,0),
+(@PATH,4,276.8408,-289.8254,21.845425,NULL,0,0,0,100,0),
+(@PATH,5,303.27896,-310.3096,18.873123,NULL,0,0,0,100,0),
+(@PATH,6,276.8408,-289.8254,21.845425,NULL,0,0,0,100,0),
+(@PATH,7,265.96866,-271.0043,24.540274,NULL,0,0,0,100,0),
+(@PATH,8,269.6321,-240.93237,27.48778,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+188;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,268.6617,-230.68227,28.236944,NULL,0,0,0,100,0),
+(@PATH,2,265.41608,-195.6269,28.487965,NULL,0,0,0,100,0),
+(@PATH,3,251.65063,-161.90324,28.616928,NULL,0,0,0,100,0),
+(@PATH,4,265.41608,-195.6269,28.487965,NULL,0,0,0,100,0);
+
+SET @NPC := @CGUID+200;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,288.5823,-121.83091,29.703293,NULL,0,0,0,100,0),
+(@PATH,2,281.52713,-120.36844,29.751406,NULL,0,0,0,100,0),
+(@PATH,3,274.06772,-122.05376,29.809622,NULL,0,0,0,100,0),
+(@PATH,4,281.52713,-120.36844,29.751406,NULL,0,0,0,100,0);
