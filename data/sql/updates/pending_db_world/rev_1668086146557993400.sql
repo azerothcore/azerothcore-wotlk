@@ -340,7 +340,7 @@ INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verified
 --- 2 SECTION
 ----------------------
 -- BOREAN TUNDRA esES missing quest_request_items_locale 
-DELETE FROM `quest_request_items_locale` WHERE `locale` IN ('esES', 'esMX') AND `ID` IN(11559, 11560, 11561, 11563, 11564, 11565, 11566, 11569, 11570, 11571, 11576, 11582, 11587, 11590, 11600, 11603, 11605, 11607, 11608, 11609, 11610, 11612, 11613, 11617, 11623, 11625, 11645, 11648, 11650, 11652, 11653, 11658, 11670, 11671, 11679, 11699, 11705, 11708, 11710, 11712, 11713, 11715, 11718, 11723, 11726, 11728, 11729, 11730, 11788, 11789, 11792, 11793, 11794, 11795, 11796, 11797, 11798, 11865, 11866, 11867, 11868, 11869, 11871, 11872, 11876, 11879, 11884, 11889, 11892, 11897, 11900, 11903, 11904, 11905, 11908, 11910, 11911, 11912, 11913, 11914, 11918, 11919, 11931, 11936, 11938, 11940, 11941, 11942, 11943, 11944, 11945, 11949, 11951, 11956, 11957, 11961, 11962, 11965, 11967, 11968, 11969, 11973, 12019, 12035, 12517, 12518, 12728, 12791, 12798, 13002, 13004, 13088, 13090, 13094, 13095, 13128, 13265, 13270, 13311, 13413, 13414);
+DELETE FROM `quest_request_items_locale` WHERE `locale` IN ('esES', 'esMX') AND `ID` IN(11559, 11560, 11561, 11563, 11564, 11565, 11566, 11569, 11570, 11571, 11576, 11582, 11587, 11590, 11600, 11603, 11605, 11607, 11608, 11609, 11610, 11611, 11612, 11613, 11617, 11623, 11625, 11645, 11648, 11650, 11652, 11653, 11658, 11670, 11671, 11679, 11699, 11705, 11708, 11710, 11712, 11713, 11715, 11718, 11723, 11726, 11728, 11729, 11730, 11788, 11789, 11792, 11793, 11794, 11795, 11796, 11797, 11798, 11865, 11866, 11867, 11868, 11869, 11871, 11872, 11876, 11879, 11884, 11889, 11892, 11897, 11900, 11903, 11904, 11905, 11908, 11910, 11911, 11912, 11913, 11914, 11918, 11919, 11931, 11936, 11938, 11940, 11941, 11942, 11943, 11944, 11945, 11949, 11951, 11956, 11957, 11961, 11962, 11965, 11967, 11968, 11969, 11973, 12019, 12035, 12517, 12518, 12728, 12791, 12798, 13002, 13004, 13088, 13090, 13094, 13095, 13128, 13265, 13270, 13311, 13413, 13414);
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES 
 (11559, 'esES', '¿Qué es esto? ¿Quién eres tú?$b$bEres una cosa de esas... ¡Un $r! ¿Por qué puedes hablar nuestra lengua?', 0),
 (11560, 'esES', 'Si no se rescatan mas renacuajos, no importará lo que hagamos: ¡los murclos de Aleta Invernal dejarán de tener cualquier posibilidad de futuro!', 0),
@@ -363,6 +363,7 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (11608, 'esES', '¿Y Bien?', 0),
 (11609, 'esES', '¿Has recuperado un conjunto completo de objetos rituales?', 0),
 (11610, 'esES', '¿Has completado las ceremonias de los ancestros?', 0),
+(11611, 'esES', 'No hay peones, no hay construcciones. Y no, no vamos a reemplazarlos por goblins. Son extremadamente caros...', 0),
 (11612, 'esES', '¿Has liberado la Cantera Fríoescollo de nuestros enemigos?', 0),
 (11613, 'esES', '¿Lo conseguiste, $r? Los Kvaldir son guerreros muy crueles. No esperes ninguna tregua de ellos.', 0),
 (11617, 'esES', '¿Has tenido exito destruyendo las plataformas voladores de los cazadores de magos?', 0),
@@ -485,6 +486,7 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (11608, 'esMX', '¿Y Bien?', 0),
 (11609, 'esMX', '¿Has recuperado un conjunto completo de objetos rituales?', 0),
 (11610, 'esMX', '¿Has completado las ceremonias de los ancestros?', 0),
+(11611, 'esMX', 'No hay peones, no hay construcciones. Y no, no vamos a reemplazarlos por goblins. Son extremadamente caros...', 0),
 (11612, 'esMX', '¿Has liberado la Cantera Fríoescollo de nuestros enemigos?', 0),
 (11613, 'esMX', '¿Lo conseguiste, $r? Los Kvaldir son guerreros muy crueles. No esperes ninguna tregua de ellos.', 0),
 (11617, 'esMX', '¿Has tenido exito destruyendo las plataformas voladores de los cazadores de magos?', 0),
@@ -585,3 +587,74 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (13311, 'esMX', '¡Veo que has logrado reunir una baraja de Demonios! Me has impresionado.', 0),
 (13413, 'esMX', 'Y bien, mortal, ¿qué piensas sobre mis mascotas?', 0),
 (13414, 'esMX', '¿Sí, $r?', 0);
+-------------------------
+-- SECTION 3
+-------------------------
+-- quest_template_locale esES
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Renacuajo Aleta Invernal rescatado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11560;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Múrlocs Aleta Invernal muertos', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11561;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Lectura de la Anomalía del Acantilado Agrietado conseguida', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11576;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Lectura de la Sima Quebrada conseguida', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11582;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Prisioneros Arcanos rescatados', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11587;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Hechicero de Berilo capturado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11590;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Guardias y trabajadores de caravana muertos quemados', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11593;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Espíritus taunka en paz', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11594;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Nerub\'ar muertos', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11598;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Ancestro Kesuk identificado', `ObjectiveText2` = 'Ancestro Sagani identificado', `ObjectiveText3` = 'Ancestro Takret identificado', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11605;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Artesanos de Kashala liberados', `ObjectiveText2` = 'Chamanes de Kashala liberados', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11607;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Sumidero Sur de Nerub\'ar destruido', `ObjectiveText2` = 'Sumidero Este de Nerub\'ar destruido', `ObjectiveText3` = 'Sumidero Oeste de Nerub\'ar destruido', `ObjectiveText4` = 'Sumidero Norte de Nerub\'ar destruido' WHERE `locale` in ('esES', 'esMX') AND ID = 11608;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Ceremonia del ancestro Kesuk completada', `ObjectiveText2` = 'Ceremonia del ancestro Sagani completada', `ObjectiveText3` = 'Ceremonia del ancestro Takret completada', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11610;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Peón Grito de Guerra liberado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11611;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Plataforma Este destruida', `ObjectiveText2` = 'Plataforma Norte destruida', `ObjectiveText3` = 'Plataforma Oeste destruida', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11617;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Cocer se ha rendido', `ObjectiveText2` = 'Xurn se ha rendido', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11627;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Destino del clarividente Caminante Siniestro vaticinado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11631;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Aguja de Putrefacción inspeccionada', `ObjectiveText2` = 'Aguja de Sangre inspeccionada', `ObjectiveText3` = 'Aguja de Dolor inspeccionada', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11633;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Clarividente Caminante Siniestro liberado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11637;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Caldera este neutralizada', `ObjectiveText2` = 'Caldera central neutralizada', `ObjectiveText3` = 'Caldera oeste neutralizada', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11647;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Prisionero interrogado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11648;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Unidad de la Plaga destruida', `ObjectiveText2` = 'Soldado Grito de Guerra herido rescatado', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11652;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Rayo de Ingeniosa puesto a prueba', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11653;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Las Fauces de la Sierpe destruido', `ObjectiveText2` = 'El Kur Drakkar destruido', `ObjectiveText3` = 'Martillo de Bor destruido', `ObjectiveText4` = 'Yunque de Bor destruido' WHERE `locale` in ('esES', 'esMX') AND ID = 11656;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Globos de sangre destruidos', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11659;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Estandarte Grito de Guerra clavado sobre Magmothregar', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11670;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Prisionero de la Plaga liberado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11676;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Caldera de peste neutralizada', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11677;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Miembro de la Plaga de Talramas muerto', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11683;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Marcar situación del sumidero sur', `ObjectiveText2` = 'Marcar situación del sumidero noreste', `ObjectiveText3` = 'Marcar situación del sumidero noroeste', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11684;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Observar Granero Grito de Guerra', `ObjectiveText2` = 'Observar Granja de Torp', `ObjectiveText3` = 'Observar Matadero Grito de Guerra', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11686;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Kodos rescatados', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11690;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Caldera de peste neutralizada', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11694;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Miembro de la Plaga de Talramas muerto', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11698;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Gnomo de Palanqueta maldito y rescatado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11712;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Marcar situación del sumidero sur', `ObjectiveText2` = 'Marcar situación del sumidero noreste', `ObjectiveText3` = 'Marcar situación del sumidero noroeste', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11713;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Barriles de aceite recogidos', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11715;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Robots reprogramados', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11730;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Cultor en muelles derrotado', `ObjectiveText2` = 'Cultor en la cárcel derrotado', `ObjectiveText3` = 'Cultor en la cocina derrotado', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11794;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Hunde unos restos al Este', `ObjectiveText2` = 'Hunde unos restos al Sur', `ObjectiveText3` = 'Hunde unos restos al Noroeste', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11796;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Busca el manual del maestro de palancas', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11798;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Trampero de Nesingwary atrapado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11865;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Cría de mamut liberada', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11876;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Trae a Jenny a salvo sin perder el cargamento', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11881;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Energía reunida', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11893;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Tormenta dominada', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11895;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Robots debilitados y destruidos', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11896;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Explosivos colocados en el sumidero sur', `ObjectiveText2` = 'Explosivos colocados en el sumidero norte', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11897;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Alma de gnomo capturada', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11899;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Lectura geológica de El Nexo', `ObjectiveText2` = 'Lectura del sur de Gelidar', `ObjectiveText3` = 'Lectura del norte de Gelidar', `ObjectiveText4` = 'Lectura del oeste de Gelidar' WHERE `locale` in ('esES', 'esMX') AND ID = 11900;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Vagoneta de mena liberada', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11904;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Falla interdimensional ralentizada', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11905;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Busca el manual del maestro de palancas', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11909;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Grano de Lindeallá quemado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11913;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Draco de El Nexo capturado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11919;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Huevos de draco destruidos', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11936;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Baja en En\'kilah', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11938;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Draco de El Nexo capturado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11940;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Toca la campana de Lindeallá', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11965;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Malygos atraído', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11969;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Keristrasza en paz', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 11973;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Los últimos ritos', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 12019;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Recolector de cosecha alterado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 12035;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Lectura de las Cavernas Aletas Invernal tomada', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 12728;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Guardián-Ley Eregos derrotado', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 13128;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Élites Juraescama asesinados', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 13413;
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Élites Juraescama asesinados', `ObjectiveText2` = '', `ObjectiveText3` = '', `ObjectiveText4` = '' WHERE `locale` in ('esES', 'esMX') AND ID = 13414;
