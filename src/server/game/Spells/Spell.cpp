@@ -5750,7 +5750,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             return SPELL_FAILED_NOT_READY;
 
         //npcbot
-        if (m_caster->GetTypeId() == TYPEID_UNIT && !m_caster->ToCreature()->IsNPCBot() &&
+        if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsNPCBot() &&
             m_caster->ToCreature()->HasSpellCooldown(m_spellInfo->Id))
         {
             //TC_LOG_ERROR("spells", "%s has cd of %u on %s", m_caster->GetName().c_str(), m_caster->ToCreature()->GetCreatureSpellCooldownDelay(m_spellInfo->Id), m_spellInfo->SpellName[0]);
@@ -5833,18 +5833,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                 break;
             }
         }
-
-        //npcbot
-        if (m_caster->GetTypeId() == TYPEID_UNIT && !m_caster->ToCreature()->IsNPCBot() &&
-            m_caster->ToCreature()->HasSpellCooldown(m_spellInfo->Id))
-        {
-            //TC_LOG_ERROR("spells", "%s has cd of %u on %s", m_caster->GetName().c_str(), m_caster->ToCreature()->GetCreatureSpellCooldownDelay(m_spellInfo->Id), m_spellInfo->SpellName[0]);
-            if (m_triggeredByAuraSpell)
-                return SPELL_FAILED_DONT_REPORT;
-            else
-                return SPELL_FAILED_NOT_READY;
-        }
-        //end npcbot
     }
 
     // caster state requirements
