@@ -763,7 +763,7 @@ public:
             if (lifeTapCheckTimer <= diff && HasRole(BOT_ROLE_DPS) && Rand() < 75)
             {
                 lifeTapCheckTimer = 10000;
-                if (!me->GetAuraEffect(SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT, SPELLFAMILY_WARLOCK, 208, 0))
+                if (me->GetLevel() >= 15 && !me->GetAuraEffect(SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT, SPELLFAMILY_WARLOCK, 208, 0))
                 {
                     //doesn't work: wrong spell proc entry 10.12.2020
                     //if (IsSpellReady(DARK_PACT_1, diff) && botPet && GetManaPCT(me) > 70)
