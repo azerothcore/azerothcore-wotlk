@@ -1,3 +1,4 @@
+-- DB update 2022_11_12_10 -> 2022_11_12_11
 -- Closes gossip on selecting last option
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10740;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 10740) AND (`source_type` = 0) AND (`id` IN (0));
