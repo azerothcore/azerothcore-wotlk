@@ -13,7 +13,7 @@ DELETE FROM `creature` WHERE `map`=546;
 
 SET @CGUID := 138300;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+218;
+DELETE FROM `creature` WHERE `map`=546 AND `ZoneId`=3716 AND `guid` BETWEEN @CGUID+0 AND @CGUID+218;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `wander_distance`, `curhealth`, `curmana`, `currentwaypoint`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
 (@CGUID+0  , 17725, 546, 3716, 3716, 3, 1, 0, 53.30517196655273437, -115.721046447753906, -2.65770363807678222, 3.630284786224365234, 86400, 1, 5, 16028, 0, 0, 0, 0, 0, 46368), -- 17725 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+1  , 17871, 546, 3716, 3716, 3, 1, 0, 59.85622024536132812, -97.7351760864257812, -2.66830062866210937, 2.426007747650146484, 86400, 1, 4, 12395, 5136, 0, 0, 0, 0, 46368), -- 17871 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
