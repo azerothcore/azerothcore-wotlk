@@ -668,7 +668,7 @@ class spell_warr_sweeping_strikes : public AuraScript
             }
             else
             {
-                int32 damage = damageInfo->GetDamage();
+                int32 damage = damageInfo->GetUnmitigatedDamage();
                 GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, &damage, 0, 0, true, nullptr, aurEff);
             }
         }
