@@ -16577,7 +16577,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_ADD_FLAT_MODIFIER:
                     case SPELL_AURA_ADD_PCT_MODIFIER:
                     {
-                        if (SpellModifier* mod = triggeredByAura->GetSpellModifier())
+                        if (triggeredByAura->GetSpellModifier())
                         {
                             // Do proc if mod is consumed by spell
                             if (!procSpell || procSpell->m_appliedMods.find(i->aura) != procSpell->m_appliedMods.end())
