@@ -1417,7 +1417,7 @@ public:
         bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
         {
             uint8 aliveCount = 0;
-            for (const auto &itr: instance->GetPlayers())
+            for (auto const& itr: instance->GetPlayers())
             {
                 if (Player* plr = itr.GetSource())
                 {
