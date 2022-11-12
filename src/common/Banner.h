@@ -23,6 +23,13 @@
 
 namespace Acore::Banner
 {
+    /**
+     * @brief 
+     * 
+     * @param applicationName 
+     * @param log 
+     * @param logExtraInfo 
+     */
     AC_COMMON_API void Show(std::string_view applicationName, void(*log)(std::string_view text), void(*logExtraInfo)());
 }
 

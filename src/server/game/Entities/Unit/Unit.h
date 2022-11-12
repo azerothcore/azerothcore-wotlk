@@ -581,7 +581,7 @@ enum MovementFlags
     MOVEMENTFLAG_FALLING_SLOW          = 0x20000000,               // active rogue safe fall spell (passive)
     MOVEMENTFLAG_HOVER                 = 0x40000000,               // hover, cannot jump
 
-    // TODO: Check if PITCH_UP and PITCH_DOWN really belong here..
+    /// @todo: Check if PITCH_UP and PITCH_DOWN really belong here..
     MOVEMENTFLAG_MASK_MOVING =
         MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT |
         MOVEMENTFLAG_PITCH_UP | MOVEMENTFLAG_PITCH_DOWN | MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR | MOVEMENTFLAG_ASCENDING | MOVEMENTFLAG_DESCENDING |
@@ -900,7 +900,7 @@ struct CalcDamageInfo
     uint32 procVictim;
     uint32 procEx;
     uint32 cleanDamage;          // Used only for rage calculation
-    MeleeHitOutcome hitOutCome;  // TODO: remove this field (need use TargetState)
+    MeleeHitOutcome hitOutCome;  /// @todo: remove this field (need use TargetState)
 };
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
@@ -1544,6 +1544,21 @@ public:
 
     uint16 GetMaxSkillValueForLevel(Unit const* target = nullptr) const { return (target ? getLevelForTarget(target) : getLevel()) * 5; }
     static void DealDamageMods(Unit const* victim, uint32& damage, uint32* absorb);
+    /**
+     * @brief 
+     * 
+     * @param attacker 
+     * @param victim 
+     * @param damage 
+     * @param cleanDamage 
+     * @param damagetype 
+     * @param damageSchoolMask 
+     * @param spellProto 
+     * @param durabilityLoss 
+     * @param allowGM 
+     * @param spell 
+     * @return uint32 
+     */
     static uint32 DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* spellProto = nullptr, bool durabilityLoss = true, bool allowGM = false, Spell const* spell = nullptr);
     static void Kill(Unit* killer, Unit* victim, bool durabilityLoss = true, WeaponAttackType attackType = BASE_ATTACK, SpellInfo const* spellProto = nullptr, Spell const* spell = nullptr);
     static int32 DealHeal(Unit* healer, Unit* victim, uint32 addhealth);
@@ -1557,7 +1572,15 @@ public:
     void TriggerAurasProcOnEvent(ProcEventInfo& eventInfo, std::list<AuraApplication*>& procAuras);
 
     void HandleEmoteCommand(uint32 emoteId);
-    void AttackerStateUpdate (Unit* victim, WeaponAttackType attType = BASE_ATTACK, bool extra = false, bool ignoreCasting = false);
+    /**
+     * @brief 
+     * 
+     * @param victim 
+     * @param attType 
+     * @param extra 
+     * @param ignoreCasting 
+     */
+    void AttackerStateUpdate(Unit* victim, WeaponAttackType attType = BASE_ATTACK, bool extra = false, bool ignoreCasting = false);
 
     void CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, WeaponAttackType attackType = BASE_ATTACK, const bool sittingVictim = false);
     void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
@@ -1569,7 +1592,23 @@ public:
     void SetLastDamagedTargetGuid(ObjectGuid const& guid) { _lastDamagedTargetGuid = guid; }
     [[nodiscard]] ObjectGuid const& GetLastDamagedTargetGuid() const { return _lastDamagedTargetGuid; }
 
+    /**
+     * @brief 
+     * 
+     * @param damageInfo 
+     * @param damage 
+     * @param spellInfo 
+     * @param attackType 
+     * @param crit 
+     */
     void CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType = BASE_ATTACK, bool crit = false);
+    /**
+     * @brief 
+     * 
+     * @param damageInfo 
+     * @param durabilityLoss 
+     * @param spell 
+     */
     void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss, Spell const* spell = nullptr);
 
     // player or player's pet resilience (-1%)
@@ -1725,23 +1764,203 @@ public:
     void SendEnergizeSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
     void EnergizeBySpell(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
 
+    /**
+     * @brief
+     * 
+     * @param targets 
+     * @param spellInfo 
+     * @param value 
+     * @param triggerFlags 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param victim 
+     * @param spellId 
+     * @param triggered 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param victim 
+     * @param spellId 
+     * @param triggerFlags 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param victim 
+     * @param spellInfo 
+     * @param triggered 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastSpell(Unit* victim, SpellInfo const* spellInfo, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param victim 
+     * @param spellInfo 
+     * @param triggerFlags 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastSpell(Unit* victim, SpellInfo const* spellInfo, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param x 
+     * @param y 
+     * @param z 
+     * @param spellId 
+     * @param triggered 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param go 
+     * @param spellId 
+     * @param triggered 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastSpell(GameObject* go, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param victim 
+     * @param spellId 
+     * @param bp0 
+     * @param bp1 
+     * @param bp2 
+     * @param triggered 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastCustomSpell(Unit* victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param spellId 
+     * @param mod 
+     * @param value 
+     * @param victim 
+     * @param triggered 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param spellId 
+     * @param mod 
+     * @param value 
+     * @param victim 
+     * @param triggerFlags 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param spellId 
+     * @param value 
+     * @param victim 
+     * @param triggerFlags 
+     * @param castItem 
+     * @param triggeredByAura 
+     * @param originalCaster 
+     * @return SpellCastResult 
+     */
     SpellCastResult CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    /**
+     * @brief 
+     * 
+     * @param spellId 
+     * @param target 
+     * @return Aura* 
+     */
     Aura* AddAura(uint32 spellId, Unit* target);
+    /**
+     * @brief 
+     * 
+     * @param spellInfo 
+     * @param effMask 
+     * @param target 
+     * @return Aura* 
+     */
     Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
+    /**
+     * @brief Set the AuraStack object
+     * 
+     * @param spellId 
+     * @param target 
+     * @param stack 
+     */
     void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
+    /**
+     * @brief 
+     * 
+     * @param id 
+     */
     void SendPlaySpellVisual(uint32 id);
+    /**
+     * @brief 
+     * 
+     * @param guid 
+     * @param id 
+     */
     void SendPlaySpellImpact(ObjectGuid guid, uint32 id);
+    /**
+     * @brief 
+     * 
+     * @param data 
+     * @param flags 
+     * @param spellId 
+     * @param cooldown 
+     */
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, uint32 spellId, uint32 cooldown);
+    /**
+     * @brief 
+     * 
+     * @param data 
+     * @param flags 
+     * @param cooldowns 
+     */
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns const& cooldowns);
 
     void DeMorph();
@@ -1895,6 +2114,18 @@ public:
     bool InitTamedPet(Pet* pet, uint8 level, uint32 spell_id);
 
     // aura apply/remove helpers - you should better not use these
+    /**
+     * @brief 
+     * 
+     * @param newAura 
+     * @param effMask 
+     * @param caster 
+     * @param baseAmount 
+     * @param castItem 
+     * @param casterGUID 
+     * @param periodicReset 
+     * @return Aura* 
+     */
     Aura* _TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, ObjectGuid casterGUID = ObjectGuid::Empty, bool periodicReset = false);
     void _AddAura(UnitAura* aura, Unit* caster);
     AuraApplication* _CreateAuraApplication(Aura* aura, uint8 effMask);
@@ -1936,11 +2167,27 @@ public:
 
     void RemoveAurasDueToSpell(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
     void RemoveAuraFromStack(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
+    /**
+     * @brief 
+     * 
+     * @param spellId 
+     * @param dispellerSpellId 
+     * @param casterGUID 
+     * @param dispeller 
+     * @param chargesRemoved 
+     */
     void RemoveAurasDueToSpellByDispel(uint32 spellId, uint32 dispellerSpellId, ObjectGuid casterGUID, Unit* dispeller, uint8 chargesRemoved = 1);
     void RemoveAurasDueToSpellBySteal(uint32 spellId, ObjectGuid casterGUID, Unit* stealer);
     void RemoveAurasDueToItemSpell(uint32 spellId, ObjectGuid castItemGuid);
     void RemoveAurasByType(AuraType auraType, ObjectGuid casterGUID = ObjectGuid::Empty, Aura* except = nullptr, bool negative = true, bool positive = true);
     void RemoveNotOwnSingleTargetAuras();
+    /**
+     * @brief 
+     * 
+     * @param flag 
+     * @param except 
+     * @param isAutoshot 
+     */
     void RemoveAurasWithInterruptFlags(uint32 flag, uint32 except = 0, bool isAutoshot = false);
     void RemoveAurasWithAttribute(uint32 flags);
     void RemoveAurasWithFamily(SpellFamilyNames family, uint32 familyFlag1, uint32 familyFlag2, uint32 familyFlag3, ObjectGuid casterGUID);
@@ -2044,6 +2291,12 @@ public:
     void SetCurrentCastedSpell(Spell* pSpell);
     virtual void ProhibitSpellSchool(SpellSchoolMask /*idSchoolMask*/, uint32 /*unTimeMs*/) { }
     void InterruptSpell(CurrentSpellTypes spellType, bool withDelayed = true, bool withInstant = true, bool bySelf = false);
+    /**
+     * @brief 
+     * 
+     * @param spellType 
+     * @param ok 
+     */
     void FinishSpell(CurrentSpellTypes spellType, bool ok = true);
 
     // set withDelayed to true to account delayed spells as casted
@@ -2114,6 +2367,15 @@ public:
     [[nodiscard]] float GetWeaponDamageRange(WeaponAttackType attType, WeaponDamageRange type, uint8 damageIndex = 0) const;
     void SetBaseWeaponDamage(WeaponAttackType attType, WeaponDamageRange damageRange, float value, uint8 damageIndex = 0) { m_weaponDamage[attType][damageRange][damageIndex] = value; }
     virtual void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex = 0) = 0;
+    /**
+     * @brief 
+     * 
+     * @param attType 
+     * @param normalized 
+     * @param addTotalPct 
+     * @param itemDamagesMask 
+     * @return uint32 
+     */
     uint32 CalculateDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, uint8 itemDamagesMask = 0);
     float GetAPMultiplier(WeaponAttackType attType, bool normalized);
 
@@ -2234,6 +2496,17 @@ public:
     virtual bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const;
     // redefined in Creature
     static bool IsDamageReducedByArmor(SpellSchoolMask damageSchoolMask, SpellInfo const* spellInfo = nullptr, uint8 effIndex = MAX_SPELL_EFFECTS);
+    /**
+     * @brief 
+     * 
+     * @param attacker 
+     * @param victim 
+     * @param damage 
+     * @param spellInfo 
+     * @param attackerLevel 
+     * @param attackType 
+     * @return uint32 
+     */
     static uint32 CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, const uint32 damage, SpellInfo const* spellInfo, uint8 attackerLevel = 0, WeaponAttackType attackType = MAX_ATTACK);
     static void CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited = false);
     static void CalcHealAbsorb(HealInfo& healInfo);

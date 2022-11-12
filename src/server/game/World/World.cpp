@@ -164,7 +164,7 @@ World::~World()
     VMAP::VMapFactory::clear();
     MMAP::MMapFactory::clear();
 
-    //TODO free addSessQueue
+    /// @todo free addSessQueue
 }
 
 std::unique_ptr<IWorld>& getWorldInstance()

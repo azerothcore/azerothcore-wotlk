@@ -27,11 +27,11 @@
 */
 
 /**
-* @brief Used to apply the SpellInfo fixes to spells.
-*
-* @param spellIds SpellID, can be several seperated by a comma.
-* @param SpellInfo SpellInfo field to change.
-*/
+ * @brief Used to apply the SpellInfo changes to spells.
+ * 
+ * @param spellIds SpellID, can be several seperated by a comma
+ * @param fix SpellInfo field to fix
+ */
 inline void ApplySpellFix(std::initializer_list<uint32> spellIds, void(*fix)(SpellInfo*))
 {
     for (uint32 spellId : spellIds)

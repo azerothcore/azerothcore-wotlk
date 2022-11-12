@@ -45,7 +45,19 @@ struct AC_GAME_API CliCommandHolder
     Print m_print;
     CommandFinished m_commandFinished;
 
+    /**
+     * @brief Construct a new CliCommandHolder object
+     * 
+     * @param callbackArg 
+     * @param command 
+     * @param zprint 
+     * @param commandFinished 
+     */
     CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished);
+    /**
+     * @brief Destroy the CliCommandHolder object
+     * 
+     */
     ~CliCommandHolder();
 
 private:
