@@ -651,6 +651,11 @@ struct npc_eye_tentacle : public ScriptedAI
         DoZoneInCombat();
     }
 
+    void AttackStart(Unit* victim) override
+    {
+        me->Attack(victim, false);
+    }
+
     void UpdateAI(uint32 diff) override
     {
         //Check if we have a target
@@ -717,6 +722,11 @@ struct npc_claw_tentacle : public ScriptedAI
                 DoCastVictim(SPELL_HAMSTRING);
                 context.Repeat(5s);
             });
+    }
+
+    void AttackStart(Unit* victim) override
+    {
+        me->Attack(victim, false);
     }
 
     void UpdateAI(uint32 diff) override
@@ -866,6 +876,11 @@ struct npc_giant_claw_tentacle : public ScriptedAI
         }
     }
 
+    void AttackStart(Unit* victim) override
+    {
+        me->Attack(victim, false);
+    }
+
     void UpdateAI(uint32 diff) override
     {
         //Check if we have a target
@@ -937,6 +952,11 @@ struct npc_giant_eye_tentacle : public ScriptedAI
     void EnterCombat(Unit* /*who*/) override
     {
         DoZoneInCombat();
+    }
+
+    void AttackStart(Unit* victim) override
+    {
+        me->Attack(victim, false);
     }
 
     void UpdateAI(uint32 diff) override
