@@ -3,7 +3,7 @@ SET @GUID = 21780;
 SET @POOL = 1163;
 
 DELETE FROM `gameobject` WHERE `id`=182589 AND `map`=560 AND `guid` IN (30242,30243,30244,30263,30286,33565,33567,34868);
-DELETE FROM `gameobject` WHERE `id`=182589 AND `map`=560 AND `guid` BETWEEN @GUID+0 AND @GUID+15;
+DELETE FROM `gameobject` WHERE `id`=182589 AND `map`=560 AND `guid` BETWEEN @GUID+0 AND @GUID+14;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `ZoneId`, `AreaId`, `spawnMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `animprogress`, `state`) VALUES
 (@GUID+0 , 182589, 560, 2367, 2370, 3, 2151.68, 248.571, 53.8705, -1.93731, 86400, 100, 1),
 (@GUID+1 , 182589, 560, 2367, 2370, 3, 2067.49, 106.071, 54.6145, -1.93731, 86400, 100, 1),
