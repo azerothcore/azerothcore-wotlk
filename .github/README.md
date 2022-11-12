@@ -154,7 +154,7 @@ This project exists thanks to:
 
 - [Doxygen Documentation](https://www.azerothcore.org/pages/doxygen/index.html)
 
-- [Code of Conduct](https://github.com/azerothcore-wotlk/.github/code_of_conduct.md
+- [Code of Conduct](https://github.com/azerothcore/azerothcore-wotlk/blob/master/.github/CODE_OF_CONDUCT.md)
 - [Website](http://www.azerothcore.org/)
 - [AzerothCore catalogue](http://www.azerothcore.org/catalogue.html  "Modules, tools, and other stuff for AzerothCore") (modules, tools, etc...)
 - [Module template / Module skeleton](https://github.com/azerothcore/skeleton-module/)
