@@ -1,3 +1,4 @@
+-- DB update 2022_11_12_05 -> 2022_11_12_06
 -- Update and insert some missing quests and creature texts (esES and esMX)
 -- QUEST_TEMPLATE_LOCALE
 UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Miembro de la Plaga asesinado'  WHERE `id` = 12919 AND `locale` IN ('esES', 'esMX');
