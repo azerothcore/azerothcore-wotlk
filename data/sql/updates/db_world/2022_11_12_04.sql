@@ -1,3 +1,4 @@
+-- DB update 2022_11_12_03 -> 2022_11_12_04
 --
 UPDATE `creature_template_locale` SET `Title`='Gemischtwaren' WHERE `entry`=2808 AND `locale`='deDE';
 UPDATE `creature_template_locale` SET `Title`='Suministros generales' WHERE `entry`=2808 AND `locale`='esES';
