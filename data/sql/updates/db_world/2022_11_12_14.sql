@@ -1,3 +1,4 @@
+-- DB update 2022_11_12_13 -> 2022_11_12_14
 -- Delete the ores that survived the purge
 DELETE FROM `gameobject` WHERE `guid` IN (40255, 40271, 42411, 61962) AND `id` IN (181555, 181556, 181557);
 -- Ore spawn timers

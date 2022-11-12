@@ -1,3 +1,4 @@
+-- DB update 2022_11_12_14 -> 2022_11_12_15
 -- Not pulling together
 UPDATE `creature_formations` SET `GroupAI`=515 WHERE `leaderGUID` IN (138187, 138213) AND `memberGUID` IN (138186, 138211, 138212);
 UPDATE `creature_formations` SET `GroupAI`=3 WHERE `leaderGUID` IN (138187, 138213) AND `memberGUID` IN (138187, 138213);
