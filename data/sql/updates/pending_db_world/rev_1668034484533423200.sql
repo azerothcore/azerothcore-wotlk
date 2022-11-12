@@ -1168,3 +1168,15 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@CGUID+194, @CGUID+197, 0, 0, 3),
 (@CGUID+38 , @CGUID+05 , 0, 0, 3),
 (@CGUID+47 , @CGUID+25 , 0, 0, 3);
+
+-- Bytes2
+DELETE FROM `creature_template_addon` WHERE (`entry` IN (17728, 17726, 17735, 17771, 17729, 17730));
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(17728, 0, 0, 0, 1, 0, 0, ''),
+(17726, 0, 0, 0, 1, 0, 0, ''),
+(17735, 0, 0, 0, 1, 0, 0, ''),
+(17771, 0, 0, 0, 1, 0, 0, ''),
+(17729, 0, 0, 0, 2, 0, 0, ''),
+(17730, 0, 0, 0, 1, 0, 0, '');
+
+UPDATE `creature_template_addon` SET `bytes2` = 1 WHERE (`entry` = 17727);
