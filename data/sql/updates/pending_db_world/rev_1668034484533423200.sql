@@ -1,4 +1,7 @@
---
+-- DELETES
+DELETE FROM `waypoint_data` WHERE `id` IN (SELECT `path_id` FROM `creature_addon` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `map`=546));
+DELETE FROM `creature_addon` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `map`=546);
+DELETE FROM `linked_respawn` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `map`=546);
 DELETE FROM `creature` WHERE `map`=546;
 
 -- TrinityCore - WowPacketParser
