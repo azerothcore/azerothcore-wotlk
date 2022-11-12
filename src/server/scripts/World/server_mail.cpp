@@ -21,6 +21,11 @@
 #include "ObjectMgr.h"
 #include "QueryResult.h"
 
+/**
+* @file server_mail.cpp
+* @brief server_mail_template worldscript
+*/
+
 class ServerMailReward : public PlayerScript
 {
 public:

@@ -477,6 +477,9 @@ void ObjectMgr::LoadPointOfInterestLocales()
     LOG_INFO("server.loading", ">> Loaded {} Points Of Interest Locale Strings in {} ms", (uint32)_pointOfInterestLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
+/**
+* @brief Loads creature_template table
+*/
 void ObjectMgr::LoadCreatureTemplates()
 {
     uint32 oldMSTime = getMSTime();
@@ -656,6 +659,9 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.ScriptID              = GetScriptId(fields[70].Get<std::string>());
 }
 
+/**
+* @brief Loads creature_template_resistance table
+*/
 void ObjectMgr::LoadCreatureTemplateResistances()
 {
     uint32 oldMSTime = getMSTime();
@@ -702,6 +708,9 @@ void ObjectMgr::LoadCreatureTemplateResistances()
     LOG_INFO("server.loading", " ");
 }
 
+/**
+* @brief Loads creature_template_spell table
+*/
 void ObjectMgr::LoadCreatureTemplateSpells()
 {
     uint32 oldMSTime = getMSTime();
@@ -2035,6 +2044,9 @@ void ObjectMgr::LoadTempSummons()
     LOG_INFO("server.loading", " ");
 }
 
+/**
+* @brief Loads creature table
+*/
 void ObjectMgr::LoadCreatures()
 {
     uint32 oldMSTime = getMSTime();
@@ -2364,6 +2376,9 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     return spawnId;
 }
 
+/**
+* @brief Loads gameobject table
+*/
 void ObjectMgr::LoadGameobjects()
 {
     uint32 oldMSTime = getMSTime();
@@ -2592,6 +2607,9 @@ void ObjectMgr::LoadItemLocales()
     LOG_INFO("server.loading", ">> Loaded {} Item Locale Strings in {} ms", (uint32)_itemLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
+/**
+* @brief Loads item_template table
+*/
 void ObjectMgr::LoadItemTemplates()
 {
     uint32 oldMSTime = getMSTime();
@@ -3179,6 +3197,12 @@ void ObjectMgr::LoadItemTemplates()
     LOG_INFO("server.loading", " ");
 }
 
+/**
+* @brief Get ItemTemplate
+*
+* @param entry ItemID
+* @return ItemTemplate
+*/
 ItemTemplate const* ObjectMgr::GetItemTemplate(uint32 entry)
 {
     return entry < _itemTemplateStoreFast.size() ? _itemTemplateStoreFast[entry] : nullptr;
@@ -6128,6 +6152,13 @@ void ObjectMgr::LoadQuestAreaTriggers()
     LOG_INFO("server.loading", " ");
 }
 
+/**
+* @brief Get QuestGreeting
+*
+* @param type WorldObject type
+* @param id QuestID
+* @return QuestGreeting
+*/
 QuestGreeting const* ObjectMgr::GetQuestGreeting(TypeID type, uint32 id) const
 {
     uint32 typeIndex;
@@ -6141,6 +6172,9 @@ QuestGreeting const* ObjectMgr::GetQuestGreeting(TypeID type, uint32 id) const
     return Acore::Containers::MapGetValuePtr(_questGreetingStore[typeIndex], id);
 }
 
+/**
+* @brief Loads quest_greetings table
+*/
 void ObjectMgr::LoadQuestGreetings()
 {
     uint32 oldMSTime = getMSTime();
@@ -6198,6 +6232,11 @@ void ObjectMgr::LoadQuestGreetings()
     LOG_INFO("server.loading", " ");
 }
 
+/**
+* @brief Loads quest_greetings_locale table
+*
+* @bug Does not load Locale greetings. https://github.com/azerothcore/azerothcore-wotlk/issues/10913
+*/
 void ObjectMgr::LoadQuestGreetingsLocales()
 {
     uint32 oldMSTime = getMSTime();

@@ -596,6 +596,12 @@ struct QuestGreeting
     std::string Text;
 
     QuestGreeting() : EmoteType(0), EmoteDelay(0) { }
+
+    /**
+    * @param emoteType EmoteType
+    * @param emoteDelay EmoteDelay
+    * @param Text QuestGreeting Text
+    */
     QuestGreeting(uint16 emoteType, uint32 emoteDelay, std::string text)
         : EmoteType(emoteType), EmoteDelay(emoteDelay), Text(std::move(text)) { }
 };

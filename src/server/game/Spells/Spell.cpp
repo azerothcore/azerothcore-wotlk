@@ -64,6 +64,13 @@ SpellDestination::SpellDestination()
     _transportOffset.Relocate(0, 0, 0, 0);
 }
 
+/**
+* @brief
+*
+* @param x,y,z Coords
+* @param orientation Orientation
+* @param mapId MapID
+*/
 SpellDestination::SpellDestination(float x, float y, float z, float orientation, uint32 mapId)
 {
     _position.Relocate(x, y, z, orientation);
@@ -71,12 +78,22 @@ SpellDestination::SpellDestination(float x, float y, float z, float orientation,
     _transportOffset.Relocate(0, 0, 0, 0);
 }
 
+/**
+* @brief
+*
+* @param pos Position
+*/
 SpellDestination::SpellDestination(Position const& pos)
 {
     _position.Relocate(pos);
     _transportOffset.Relocate(0, 0, 0, 0);
 }
 
+/**
+* @brief
+*
+* @param wObj WorldObject
+*/
 SpellDestination::SpellDestination(WorldObject const& wObj)
 {
     _transportGUID = wObj.GetTransGUID();
@@ -84,6 +101,11 @@ SpellDestination::SpellDestination(WorldObject const& wObj)
     _position.Relocate(wObj);
 }
 
+/**
+* @brief
+*
+* @param pos Position
+*/
 void SpellDestination::Relocate(Position const& pos)
 {
     if (_transportGUID)
@@ -95,6 +117,11 @@ void SpellDestination::Relocate(Position const& pos)
     _position.Relocate(pos);
 }
 
+/**
+* @brief
+*
+* @param offset Position
+*/
 void SpellDestination::RelocateOffset(Position const& offset)
 {
     if (_transportGUID)
@@ -223,6 +250,11 @@ ObjectGuid SpellCastTargets::GetUnitTargetGUID() const
     return ObjectGuid::Empty;
 }
 
+/**
+* @brief Get Unit Target
+*
+* @return Unit
+*/
 Unit* SpellCastTargets::GetUnitTarget() const
 {
     if (m_objectTarget)
@@ -230,6 +262,11 @@ Unit* SpellCastTargets::GetUnitTarget() const
     return nullptr;
 }
 
+/**
+* @brief Set Unit Target
+*
+* @param target Unit Target
+*/
 void SpellCastTargets::SetUnitTarget(Unit* target)
 {
     if (!target)
@@ -240,6 +277,11 @@ void SpellCastTargets::SetUnitTarget(Unit* target)
     m_targetMask |= TARGET_FLAG_UNIT;
 }
 
+/**
+* @brief Get GameObject Target GUID
+*
+* @return ObjectGuid
+*/
 ObjectGuid SpellCastTargets::GetGOTargetGUID() const
 {
     switch (m_objectTargetGUID.GetHigh())
@@ -255,6 +297,11 @@ ObjectGuid SpellCastTargets::GetGOTargetGUID() const
     return ObjectGuid::Empty;
 }
 
+/**
+* @brief Get GameObject Target
+*
+* @return GameObject
+*/
 GameObject* SpellCastTargets::GetGOTarget() const
 {
     if (m_objectTarget)
@@ -262,6 +309,11 @@ GameObject* SpellCastTargets::GetGOTarget() const
     return nullptr;
 }
 
+/**
+* @brief Set GameObject Target
+*
+* @param target GameObject
+*/
 void SpellCastTargets::SetGOTarget(GameObject* target)
 {
     if (!target)
@@ -8290,7 +8342,7 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier)
 
     // xinef: totem's inherit owner crit chance and dancing rune weapon
     Unit* caster = m_caster;
-    if (m_caster->IsTotem() || m_caster->GetEntry() == 27893)
+    if (m_caster->IsTotem() || m_caster->GetEntry() == 27893) /** @todo Remove magic numbers */
     {
         if (Unit* owner = m_caster->GetOwner())
             caster = owner;
@@ -8681,6 +8733,7 @@ bool Spell::CheckScriptEffectImplicitTargets(uint32 effIndex, uint32 effIndexToC
 
 bool Spell::CanExecuteTriggersOnHit(uint8 effMask, SpellInfo const* triggeredByAura) const
 {
+    /** @todo Remove magic numbers */
     // Relentless strikes, proc only from first effect
     if (triggeredByAura && triggeredByAura->SpellIconID == 559)
         return effMask & (1 << EFFECT_0);
@@ -8718,6 +8771,7 @@ void Spell::PrepareTriggersExecutedOnHit()
                     Unit::AuraEffectList const& mVindication = m_caster->GetAuraEffectsByType(SPELL_AURA_PROC_TRIGGER_SPELL);
                     for(Unit::AuraEffectList::const_iterator itr = mVindication.begin(); itr != mVindication.end(); ++itr)
                     {
+                        /** @todo Remove magic numbers */
                         if( (*itr)->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell == 26017 )
                         {
                             m_preCastSpell = 26017;
@@ -8731,6 +8785,7 @@ void Spell::PrepareTriggersExecutedOnHit()
             }
         case SPELLFAMILY_DRUID:
             {
+                /** @todo Remove magic numbers */
                 // Faerie Fire (Feral)
                 if( m_spellInfo->Id == 16857 && (m_caster->GetShapeshiftForm() == FORM_BEAR || m_caster->GetShapeshiftForm() == FORM_DIREBEAR) )
                     m_preCastSpell = 60089;
@@ -8855,6 +8910,7 @@ void Spell::OnSpellLaunch()
 
     // Make sure the player is sending a valid GO target and lock ID. SPELL_EFFECT_OPEN_LOCK
     // can succeed with a lockId of 0
+    /** @todo Remove magic number */
     if (m_spellInfo->Id == 21651)
     {
         if (GameObject* go = m_targets.GetGOTarget())

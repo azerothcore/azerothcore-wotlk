@@ -240,6 +240,13 @@ void ScriptedAI::DoStopAttack()
         me->AttackStop();
 }
 
+/**
+* @brief Cast Spell
+*
+* @param target Unit
+* @param spellInfo SpellInfo
+* @param triggered bool
+*/
 void ScriptedAI::DoCastSpell(Unit* target, SpellInfo const* spellInfo, bool triggered)
 {
     if (!target || me->IsNonMeleeSpellCast(false))
@@ -249,6 +256,12 @@ void ScriptedAI::DoCastSpell(Unit* target, SpellInfo const* spellInfo, bool trig
     me->CastSpell(target, spellInfo, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE);
 }
 
+/**
+* @brief Play sound
+*
+* @param source WorldObject
+* @param soundId SoundId from DBC
+*/
 void ScriptedAI::DoPlaySoundToSet(WorldObject* source, uint32 soundId)
 {
     if (!source)
@@ -384,6 +397,9 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
     return apSpell[urand(0, spellCount - 1)];
 }
 
+/**
+* @brief Reset Threat
+*/
 void ScriptedAI::DoResetThreat()
 {
     if (!me->CanHaveThreatList() || me->GetThreatMgr().isThreatListEmpty())
@@ -402,6 +418,12 @@ float ScriptedAI::DoGetThreat(Unit* unit)
     return me->GetThreatMgr().GetThreat(unit);
 }
 
+/**
+* @brief Modify Unit Threat
+*
+* @param unit Unit
+* @param pct Percent
+*/
 void ScriptedAI::DoModifyThreatPercent(Unit* unit, int32 pct)
 {
     if (!unit)
@@ -409,6 +431,13 @@ void ScriptedAI::DoModifyThreatPercent(Unit* unit, int32 pct)
     me->GetThreatMgr().ModifyThreatByPercent(unit, pct);
 }
 
+/**
+* @brief Teleport player
+*
+* @param unit Unit
+* @param x,y,z coords
+* @param o Orientation
+*/
 void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o)
 {
     if (!unit)
@@ -421,6 +450,12 @@ void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o
             me->GetGUID().ToString(), unit->GetGUID().ToString(), x, y, z, o);
 }
 
+/**
+* @brief Teleport all
+*
+* @param x,y,z coords
+* @param o Orientation
+*/
 void ScriptedAI::DoTeleportAll(float x, float y, float z, float o)
 {
     Map* map = me->GetMap();
@@ -492,6 +527,11 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, uint32(ranged));
 }
 
+/**
+* @brief Set Combat Movement
+*
+* @param allowMovement bool
+*/
 void ScriptedAI::SetCombatMovement(bool allowMovement)
 {
     _isCombatMovementAllowed = allowMovement;

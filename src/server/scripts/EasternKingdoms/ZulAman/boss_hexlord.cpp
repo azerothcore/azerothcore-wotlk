@@ -624,9 +624,11 @@ public:
                         DoCast(target, SPELL_FLASH_HEAL, false);
                     else
                     {
-                        // bugged
-                        //me->GetMotionMaster()->Clear();
-                        //me->GetMotionMaster()->MoveChase(target, 20);
+                        /** 
+                        * @bug 
+                        * //me->GetMotionMaster()->Clear();
+                        * //me->GetMotionMaster()->MoveChase(target, 20);
+                        */
                     }
                 }
                 else

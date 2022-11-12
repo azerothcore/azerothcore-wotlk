@@ -960,12 +960,8 @@ bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, floa
  * @brief Check if a slope can be climbed based on source height
  * This method is meant for short distances or linear paths
  *
- * @param x start x coord
- * @param y start y coord
- * @param z start z coord
- * @param destX destination x coord
- * @param destY destination y coord
- * @param destZ destination z coord
+ * @param x,y,z start coord
+ * @param destX,destY,destZ destination coord
  * @param sourceHeight height of the source
  * @return bool check if you can climb the path
  */
@@ -981,12 +977,8 @@ bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, floa
  * @brief Return the height of a slope that can be climbed based on source height
  * This method is meant for short distances or linear paths
  *
- * @param x start x coord
- * @param y start y coord
- * @param z start z coord
- * @param destX destination x coord
- * @param destY destination y coord
- * @param destZ destination z coord
+ * @param x,y,z start coord
+ * @param destX,destY,destZ destination coord
  * @param sourceHeight height of the source
  * @return float the maximum height that a source can climb based on slope angle
  */
@@ -1071,9 +1063,11 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
         }
     }
 
-    // ok, _pathPoints[i] is too close, _pathPoints[i-1] is not, so our target point is somewhere between the two...
-    //   ... settle for a guesstimate since i'm not confident in doing trig on every chase motion tick...
-    // (@todo review this)
+    /** 
+    * ok, _pathPoints[i] is too close, _pathPoints[i-1] is not, so our target point is somewhere between the two...
+    *   ... settle for a guesstimate since i'm not confident in doing trig on every chase motion tick...
+    * @todo review this
+    */
     _pathPoints[i] += (_pathPoints[i - 1] - _pathPoints[i]).direction() * (dist - (_pathPoints[i] - target).length());
     _pathPoints.resize(i + 1);
 }
@@ -1115,12 +1109,8 @@ bool PathGenerator::IsSwimmableSegment(float const* v1, float const* v2, bool ch
  * Must only be used for very short segments since this check doesn't work on
  * long paths that alternate terrain and water.
  *
- * @param x
- * @param y
- * @param z
- * @param destX
- * @param destY
- * @param destZ
+ * @param x,y,z start coord
+ * @param destX,destY,destZ destination coord
  * @param checkSwim also check if the unit can swim
  * @return true if there's water at the end AND at the start of the segment
  * @return false if there's no water at the end OR at the start of the segment

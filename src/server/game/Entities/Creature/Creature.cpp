@@ -1346,10 +1346,14 @@ bool Creature::isTappedBy(Player const* player) const
     return true;
 }
 
+/**
+* @brief Saves the Creature to Database.
+*
+* this should only be used when the creature has already been loaded
+* preferably after adding to map, because mapid may not be valid otherwise
+*/
 void Creature::SaveToDB()
 {
-    // this should only be used when the creature has already been loaded
-    // preferably after adding to map, because mapid may not be valid otherwise
     CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
     if (!data)
     {
@@ -1361,6 +1365,13 @@ void Creature::SaveToDB()
     SaveToDB(mapId, data->spawnMask, GetPhaseMask());
 }
 
+/**
+* @brief Saves the Creature to Database.
+*
+* @param mapid MapID
+* @param spawnMask SpawnMask
+* @param phaseMask PhaseMask
+*/
 void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 {
     // update in loaded data
@@ -1752,12 +1763,23 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     return true;
 }
 
+/**
+* @brief Set allow Dual Weild
+*
+* @param value true/false
+*/
 void Creature::SetCanDualWield(bool value)
 {
     Unit::SetCanDualWield(value);
     UpdateDamagePhysical(OFF_ATTACK);
 }
 
+/**
+* @brief Load Equipment for Creature
+*
+* @param id Creature Entry
+* @param force true/false
+*/
 void Creature::LoadEquipment(int8 id, bool force /*= false*/)
 {
     if (id == 0)
@@ -1780,6 +1802,12 @@ void Creature::LoadEquipment(int8 id, bool force /*= false*/)
         SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, einfo->ItemEntry[i]);
 }
 
+/**
+* @brief Check if creature has quest
+*
+* @param quest_id Quest Id
+* @return bool
+*/
 bool Creature::hasQuest(uint32 quest_id) const
 {
     QuestRelationBounds qr = sObjectMgr->GetCreatureQuestRelationBounds(GetEntry());
@@ -1791,6 +1819,12 @@ bool Creature::hasQuest(uint32 quest_id) const
     return false;
 }
 
+/**
+* @brief Check if creature has involved quest
+*
+* @param quest_id Quest Id
+* @return bool
+*/
 bool Creature::hasInvolvedQuest(uint32 quest_id) const
 {
     QuestRelationBounds qir = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(GetEntry());
@@ -1802,6 +1836,9 @@ bool Creature::hasInvolvedQuest(uint32 quest_id) const
     return false;
 }
 
+/**
+* @brief Delete creature spawn
+*/
 void Creature::DeleteFromDB()
 {
     if (!m_spawnId)
@@ -1915,6 +1952,12 @@ bool Creature::CanStartAttack(Unit const* who) const
     return IsWithinLOSInMap(who);
 }
 
+/**
+* @brief Set DeathState
+*
+* @param s DeathState
+* @param despawn true/false
+*/
 void Creature::setDeathState(DeathState s, bool despawn)
 {
     Unit::setDeathState(s, despawn);
@@ -1986,6 +2029,11 @@ void Creature::setDeathState(DeathState s, bool despawn)
     }
 }
 
+/**
+* @brief Respawn creature
+*
+* @param force true/false
+*/
 void Creature::Respawn(bool force)
 {
     //DestroyForNearbyPlayers(); // pussywizard: not needed
@@ -2067,6 +2115,12 @@ void Creature::Respawn(bool force)
     UpdateObjectVisibility(false);
 }
 
+/**
+* @brief Forced Despawn
+*
+* @param timeMSToDespawn Time in Milliseconds until forced despawn
+* @param forceRespawnTimer Time in Seconds until forced respawn
+*/
 void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
 {
     if (timeMSToDespawn)
@@ -2089,6 +2143,12 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
     }
 }
 
+/**
+* @brief Despawn or Unsummon creature. If creature is a TempSummon it will be unsummoned.
+*
+* @param timeMSToDespawn Time in Milliseconds until forced despawn
+* @param forceRespawnTimer Time in Seconds until forced respawn
+*/
 void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0*/, Seconds forcedRespawnTimer)
 {
     if (TempSummon* summon = this->ToTempSummon())
@@ -2097,12 +2157,18 @@ void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0*/, Seconds f
         ForcedDespawn(msTimeToDespawn.count(), forcedRespawnTimer);
 }
 
+/**
+* @brief Despawn when evading
+*/
 void Creature::DespawnOnEvade()
 {
     SetVisible(false);
     AI()->SummonedCreatureDespawnAll();
 }
 
+/**
+* @brief Respawn when evading
+*/
 void Creature::RespawnOnEvade()
 {
     SetVisible(true);
@@ -2125,11 +2191,20 @@ void Creature::InitializeReactState()
     SetReactState(REACT_DEFENSIVE);*/
 }
 
+/**
+* @brief Check if a creature has a MechanicImmuneMask
+*
+* @param mask MechanicImmuneMask
+* @return bool
+*/
 bool Creature::HasMechanicTemplateImmunity(uint32 mask) const
 {
     return !GetOwnerGUID().IsPlayer() && (GetCreatureTemplate()->MechanicImmuneMask & mask);
 }
 
+/**
+* @brief Loads SpellTemplateImmunity
+*/
 void Creature::LoadSpellTemplateImmunity()
 {
     // uint32 max used for "spell id", the immunity system will not perform SpellInfo checks against invalid spells
@@ -2292,7 +2367,13 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
     return nullptr;
 }
 
-// select nearest hostile unit within the given distance (regardless of threat list).
+/**
+* @brief select nearest hostile unit within the given distance (regardless of threat list).
+*
+* @param dist Distance
+* @param playerOnly true/false
+* @return target
+*/
 Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) const
 {
     if (dist == 0.0f)
@@ -2308,7 +2389,12 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
     return target;
 }
 
-// select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
+/**
+* @brief select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
+*
+* @param dist Distance
+* @return target
+*/
 Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
 {
     if (dist < ATTACK_DISTANCE)
@@ -2528,6 +2614,13 @@ void Creature::SaveRespawnTime()
     GetMap()->SaveCreatureRespawnTime(m_spawnId, m_respawnTime);
 }
 
+/**
+* @brief Checks if creature can start attack.
+*
+* @param victim Unit
+* @param skipDistCheck true/false
+* @return bool
+*/
 bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 {
     if (!victim->IsInMap(this))
@@ -2591,6 +2684,11 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     }
 }
 
+/**
+* @brief Get creature's addon or template addon
+*
+* @return addon/GetCreatureTemplateAddon()
+*/
 CreatureAddon const* Creature::GetCreatureAddon() const
 {
     if (m_spawnId)
@@ -2603,7 +2701,12 @@ CreatureAddon const* Creature::GetCreatureAddon() const
     return sObjectMgr->GetCreatureTemplateAddon(GetCreatureTemplate()->Entry);
 }
 
-//creature_addon table
+/**
+* @brief Load creature_addon table
+*
+* @param reload bool, load during runtime
+* @return bool
+*/
 bool Creature::LoadCreaturesAddon(bool reload)
 {
     CreatureAddon const* cainfo = GetCreatureAddon();
@@ -2813,6 +2916,13 @@ time_t Creature::GetRespawnTimeEx() const
         return now;
 }
 
+/**
+* @brief Get creature's Respawn Position
+*
+* @param x,y,z coords
+* @param ori Orientation
+* @param dist Distance
+*/
 void Creature::GetRespawnPosition(float& x, float& y, float& z, float* ori, float* dist) const
 {
     if (m_spawnId)
@@ -2906,16 +3016,31 @@ uint8 Creature::getLevelForTarget(WorldObject const* target) const
     return uint8(level);
 }
 
+/**
+* @brief Get creature's AIName
+*
+* @return AIName
+*/
 std::string const& Creature::GetAIName() const
 {
     return sObjectMgr->GetCreatureTemplate(GetEntry())->AIName;
 }
 
+/**
+* @brief Get creature's ScriptName
+*
+* @return ScriptName
+*/
 std::string Creature::GetScriptName() const
 {
     return sObjectMgr->GetScriptName(GetScriptId());
 }
 
+/**
+* @brief Get creature's ScriptId
+*
+* @return ScriptId
+*/
 uint32 Creature::GetScriptId() const
 {
     if (CreatureData const* creatureData = GetCreatureData())
@@ -3024,6 +3149,12 @@ std::string const& Creature::GetNameForLocaleIdx(LocaleConstant loc_idx) const
     return GetName();
 }
 
+/**
+* @brief Set creature position
+*
+* @param x,y,z coords
+* @param o Orientation
+*/
 void Creature::SetPosition(float x, float y, float z, float o)
 {
     if (!Acore::IsValidMapCoord(x, y, z, o))
@@ -3369,6 +3500,11 @@ void Creature::SetObjectScale(float scale)
     SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * scale);
 }
 
+/**
+* @brief Change creature DisplayID temporarly
+*
+* @param modelId ModelID
+*/
 void Creature::SetDisplayId(uint32 modelId)
 {
     Unit::SetDisplayId(modelId);
@@ -3582,6 +3718,12 @@ bool Creature::CanPeriodicallyCallForAssistance() const
     return true;
 }
 
+/**
+* @brief Get random ID of a creature with several IDs
+*
+* @param id1,id2,id3 Creature Entry
+* @return id
+*/
 uint32 Creature::GetRandomId(uint32 id1, uint32 id2, uint32 id3)
 {
     uint32 id = id1;
@@ -3627,11 +3769,23 @@ void Creature::SetRespawnTime(uint32 respawn)
     m_respawnTime = respawn ? GameTime::GetGameTime().count() + respawn : 0;
 }
 
+/**
+* @brief Set time at when the corpse should be removed.
+*
+* @param delay Delay in milliseconds
+*/
 void Creature::SetCorpseRemoveTime(uint32 delay)
 {
     m_corpseRemoveTime = GameTime::GetGameTime().count() + delay;
 }
 
+/**
+* @brief Modify creature threat temporarly
+*
+* @param victim Unit Victim
+* @param percent Threat %
+* @param duration Duration in Milliseconds
+*/
 void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration)
 {
     if (victim)

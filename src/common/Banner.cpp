@@ -19,6 +19,11 @@
 #include "GitRevision.h"
 #include "StringFormat.h"
 
+/**
+* @file Banner.cpp
+* @brief The AzerothCore Banner.
+*/
+
 void Acore::Banner::Show(std::string_view applicationName, void(*log)(std::string_view text), void(*logExtraInfo)())
 {
     log(Acore::StringFormatFmt("{} ({})", GitRevision::GetFullVersion(), applicationName));
