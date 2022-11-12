@@ -195,7 +195,7 @@ struct boss_viscidus : public BossAI
                     me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
                     me->LowerPlayerDamageReq(me->GetMaxHealth());
                     me->SetHealth(me->GetMaxHealth() * 0.01f); // set 1% health
-                    DoResetThreat();
+                    DoResetThreatList();
                     me->NearTeleportTo(roomCenter.GetPositionX(),
                         roomCenter.GetPositionY(),
                         roomCenter.GetPositionZ(),
