@@ -1,3 +1,4 @@
+-- DB update 2022_11_12_00 -> 2022_11_12_01
 -- Set target to victim
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17264;
 
