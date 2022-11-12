@@ -63,7 +63,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 -- Insert Orc Captive NPCs (not interactable)
 UPDATE `creature_template` SET `unit_flags` = 33555200 WHERE (`entry` = 17416);
 
-SET @GUID=138256;
+SET @GUID := 138256;
 DELETE FROM `creature` WHERE `id1`=17416 AND `guid` BETWEEN @GUID+0 AND @GUID+37;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (@GUID+0 , 17416, 0, 0, 542, 3713, 3713, 3, 1, 0, 280.142, 70.3569, 9.74308, 6.17847, 86400, 0, 0, 3735, 5468, 0, 0, 0, 0, '', 0),
