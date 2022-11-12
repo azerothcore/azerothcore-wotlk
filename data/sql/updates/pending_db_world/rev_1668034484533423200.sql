@@ -259,7 +259,8 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 DELETE FROM `creature_template_addon` WHERE `entry` IN (20465, 17726, 17727, 17728, 17735, 17771, 17729, 17730);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (20465, 0, 0, 0, 0, 0, 0, '18943 18950'), -- Underbog Frenzy
-(17726, 0, 0, 0, 1, 0, 0, '32636'), -- Wrathfin Myrmidon Overrun (aura 378027 in Classic)
+-- (17726, 0, 0, 0, 1, 0, 0, '32636'), // Wrathfin Myrmidon Overrun (aura 378027 in Classic) - Unconfirmed
+(17726, 0, 0, 0, 1, 0, 0, ''),
 (17727, 0, 0, 0, 1, 0, 0, '18950'), -- Wrathfin Sentry Stealth Detection aura
 (17728, 0, 0, 0, 1, 0, 0, ''),
 (17735, 0, 0, 0, 1, 0, 0, ''),
