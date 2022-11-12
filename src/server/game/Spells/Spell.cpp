@@ -3974,6 +3974,20 @@ void Spell::_cast(bool skipCheck)
     if (modOwner)
         modOwner->SetSpellModTakingSpell(this, true);
 
+    bool resetAttackTimers = IsAutoActionResetSpell() && !m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS);
+    if (resetAttackTimers)
+    {
+        Unit::AuraEffectList const& vIgnoreReset = m_caster->GetAuraEffectsByType(SPELL_AURA_IGNORE_MELEE_RESET);
+        for (Unit::AuraEffectList::const_iterator i = vIgnoreReset.begin(); i != vIgnoreReset.end(); ++i)
+        {
+            if ((*i)->IsAffectedOnSpell(m_spellInfo))
+            {
+                resetAttackTimers = false;
+                break;
+            }
+        }
+    }
+
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
     if ((m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled())/* xinef: we dont need this || m_spellInfo->Id == 14157*/)
     {
@@ -4006,38 +4020,23 @@ void Spell::_cast(bool skipCheck)
         handle_immediate();
     }
 
-    if (IsAutoActionResetSpell())
+    if (resetAttackTimers)
     {
-        bool found = false;
-        Unit::AuraEffectList const& vIgnoreReset = m_caster->GetAuraEffectsByType(SPELL_AURA_IGNORE_MELEE_RESET);
-        for (Unit::AuraEffectList::const_iterator i = vIgnoreReset.begin(); i != vIgnoreReset.end(); ++i)
+        if (m_casttime == 0 && m_spellInfo->CalcCastTime())
         {
-            if ((*i)->IsAffectedOnSpell(m_spellInfo))
-            {
-                found = true;
-                break;
-            }
+            resetAttackTimers = false;
         }
 
-        if (!found && !m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS))
+        if (resetAttackTimers)
         {
-            bool allow = true;
-            if (m_casttime == 0 && m_spellInfo->CalcCastTime())
+            m_caster->resetAttackTimer(BASE_ATTACK);
+
+            if (m_caster->haveOffhandWeapon())
             {
-                allow = false;
+                m_caster->resetAttackTimer(OFF_ATTACK);
             }
 
-            if (allow)
-            {
-                m_caster->resetAttackTimer(BASE_ATTACK);
-
-                if (m_caster->haveOffhandWeapon())
-                {
-                    m_caster->resetAttackTimer(OFF_ATTACK);
-                }
-
-                m_caster->resetAttackTimer(RANGED_ATTACK);
-            }
+            m_caster->resetAttackTimer(RANGED_ATTACK);
         }
     }
 

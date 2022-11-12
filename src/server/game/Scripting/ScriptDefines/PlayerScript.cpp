@@ -582,6 +582,14 @@ void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid 
     });
 }
 
+void ScriptMgr::OnStoreNewItem(Player* player, Item* item, uint32 count)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnStoreNewItem(player, item, count);
+    });
+}
+
 void ScriptMgr::OnCreateItem(Player* player, Item* item, uint32 count)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
