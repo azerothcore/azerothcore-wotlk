@@ -10,17 +10,17 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=16959;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=16959 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(16959,0,0,0,0,0,100,0,5000,8000,15000,20000,0,11,33678,0,0,0,0,0,2,0,0,0,0,0,0,0,'Dread Tactician - In Combat - Cast 'Carrion Swarm''),
-(16959,0,1,0,0,0,100,0,8000,11000,24000,29000,0,11,12098,0,0,0,0,0,6,0,0,0,0,0,0,0,'Dread Tactician - In Combat - Cast 'Sleep''),
-(16959,0,2,0,2,0,100,1,0,30,0,0,0,11,33679,0,0,0,0,0,5,0,0,0,0,0,0,0,'Dread Tactician - Between 0-30% Health - Cast 'Inferno' (No Repeat)');
+(16959,0,0,0,0,0,100,0,5000,8000,15000,20000,0,11,33678,0,0,0,0,0,2,0,0,0,0,0,0,0,'Dread Tactician - In Combat - Cast \'Carrion Swarm\''),
+(16959,0,1,0,0,0,100,0,8000,11000,24000,29000,0,11,12098,0,0,0,0,0,6,0,0,0,0,0,0,0,'Dread Tactician - In Combat - Cast \'Sleep\''),
+(16959,0,2,0,2,0,100,1,0,30,0,0,0,11,33679,0,0,0,0,0,5,0,0,0,0,0,0,0,'Dread Tactician - Between 0-30% Health - Cast \'Inferno\' (No Repeat)');
 
 -- Felguard Destroyer (18977)
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=18977;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=18977 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(18977,0,0,0,9,0,100,1,8,40,0,0,0,11,33971,2,0,0,0,0,2,0,0,0,0,0,0,0,'Felguard Destroyer - Within 8-40 Range - Cast 'Sweeping Charge' (No Repeat)'),
-(18977,0,1,0,0,0,100,0,7000,9000,11000,15000,0,11,13737,0,0,0,0,0,2,0,0,0,0,0,0,0,'Felguard Destroyer - In Combat - Cast 'Mortal Strike''),
-(18977,0,2,0,0,0,100,0,3000,5000,7000,11000,0,11,40505,0,0,0,0,0,2,0,0,0,0,0,0,0,'Felguard Destroyer - In Combat - Cast 'Cleave'');
+(18977,0,0,0,9,0,100,1,8,40,0,0,0,11,33971,2,0,0,0,0,2,0,0,0,0,0,0,0,'Felguard Destroyer - Within 8-40 Range - Cast \'Sweeping Charge\' (No Repeat)'),
+(18977,0,1,0,0,0,100,0,7000,9000,11000,15000,0,11,13737,0,0,0,0,0,2,0,0,0,0,0,0,0,'Felguard Destroyer - In Combat - Cast \'Mortal Strike\''),
+(18977,0,2,0,0,0,100,0,3000,5000,7000,11000,0,11,40505,0,0,0,0,0,2,0,0,0,0,0,0,0,'Felguard Destroyer - In Combat - Cast \'Cleave\'');
 
 -- Subjugator Yalqiz (19335)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19335;
@@ -34,8 +34,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=18679;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=18679 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(18679,0,0,0,0,0,100,0,5000,7000,11000,14000,0,11,9080,0,0,0,0,0,2,0,0,0,0,0,0,0,'Vorakem Doomspeaker - In Combat - Cast 'Hamstring''),
-(18679,0,1,0,0,0,100,0,7000,9000,12000,15000,0,11,33804,0,0,0,0,0,1,0,0,0,0,0,0,0,'Vorakem Doomspeaker - In Combat - Cast 'Flame Wave''),
+(18679,0,0,0,0,0,100,0,5000,7000,11000,14000,0,11,9080,0,0,0,0,0,2,0,0,0,0,0,0,0,'Vorakem Doomspeaker - In Combat - Cast \'Hamstring\''),
+(18679,0,1,0,0,0,100,0,7000,9000,12000,15000,0,11,33804,0,0,0,0,0,1,0,0,0,0,0,0,0,'Vorakem Doomspeaker - In Combat - Cast \'Flame Wave\''),
 (18679,0,2,0,2,0,100,1,0,20,0,0,0,11,8599,0,0,0,0,0,1,0,0,0,0,0,0,0,'Vorakem Doomspeaker - Between 0-20% Health - Cast Enrage (No Repeat)'),
 (18679,0,3,0,2,0,100,1,0,20,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,'Vorakem Doomspeaker - Between 0-20% Health - Say Line 0 (No Repeat)');
 
@@ -85,7 +85,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=19681;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=19681 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(19681,0,0,0,1,0,100,0,1000,120000,120000,240000,0,11,34303,0,0,0,0,0,1,0,0,0,0,0,0,0,'Void Spawner L - Out of Combat - Cast 'Nether Charge'');
+(19681,0,0,0,1,0,100,0,1000,120000,120000,240000,0,11,34303,0,0,0,0,0,1,0,0,0,0,0,0,0,'Void Spawner L - Out of Combat - Cast \'Nether Charge\'');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry`=34303;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
@@ -95,13 +95,13 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=19263;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=19263 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(19263,0,0,0,0,0,100,0,5000,7000,12000,16000,0,11,34113,0,0,0,0,0,2,0,0,0,0,0,0,0,'Warboss Nekrogg - In Combat - Cast 'Bonechewer Bite''),
-(19263,0,1,0,0,0,100,0,10000,12000,25000,30000,0,11,30474,0,0,0,0,0,2,0,0,0,0,0,0,0,'Warboss Nekrogg - In Combat - Cast 'Bloodthirst'');
+(19263,0,0,0,0,0,100,0,5000,7000,12000,16000,0,11,34113,0,0,0,0,0,2,0,0,0,0,0,0,0,'Warboss Nekrogg - In Combat - Cast \'Bonechewer Bite\''),
+(19263,0,1,0,0,0,100,0,10000,12000,25000,30000,0,11,30474,0,0,0,0,0,2,0,0,0,0,0,0,0,'Warboss Nekrogg - In Combat - Cast \'Bloodthirst\'');
 
 -- Shattered Hand Guard (19414)
 DELETE FROM `smart_scripts` WHERE `entryorguid`=19414 AND `source_type`=0 AND `id`=1;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(19414,0,1,0,0,0,100,0,6000,9000,13000,16000,0,11,33960,0,0,0,0,0,2,0,0,0,0,0,0,0,'Shattered Hand Guard - In Combat - Cast 'Counterstrike'');
+(19414,0,1,0,0,0,100,0,6000,9000,13000,16000,0,11,33960,0,0,0,0,0,2,0,0,0,0,0,0,0,'Shattered Hand Guard - In Combat - Cast \'Counterstrike\'');
 
 -- Mo'arg Forgefiend (16946)
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16946) AND (`source_type` = 0) AND (`id` IN (0, 1));
@@ -128,12 +128,12 @@ UPDATE `creature_template_addon` SET `auras` = '22696' WHERE (`entry` = 19350);
 UPDATE `creature_template_addon` SET `auras` = '29651' WHERE (`entry` = 16967);
 DELETE FROM `smart_scripts` WHERE `entryorguid`=16967 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(16967,0,0,0,4,0,100,0,0,0,0,0,0,11,32720,0,0,0,0,0,1,0,0,0,0,0,0,0,'Haal'eshi Talonguard - On Aggro - Cast 'Sprint''),
-(16967,0,1,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,'Haal'eshi Talonguard - Between 0-15% Health - Flee For Assist (No Repeat)');
+(16967,0,0,0,4,0,100,0,0,0,0,0,0,11,32720,0,0,0,0,0,1,0,0,0,0,0,0,0,'Haal\'eshi Talonguard - On Aggro - Cast \'Sprint\''),
+(16967,0,1,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,'Haal\'eshi Talonguard - Between 0-15% Health - Flee For Assist (No Repeat)');
 
 -- Haal'eshi Windwalker (16966)
 DELETE FROM `smart_scripts` WHERE `entryorguid`=16966 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(16966,0,0,0,0,0,100,0,0,0,3000,5000,0,11,9532,64,0,0,0,0,2,0,0,0,0,0,0,0,'Haal'eshi Windwalker - In Combat - Cast 'Lightning Bolt''),
-(16966,0,1,0,0,0,100,0,8000,12000,20000,24000,0,11,32717,0,0,0,0,0,5,0,0,0,0,0,0,0,'Haal'eshi Windwalker - In Combat - Cast 'Hurricane''),
-(16966,0,2,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,'Haal'eshi Windwalker - Between 0-15% Health - Flee For Assist (No Repeat)');
+(16966,0,0,0,0,0,100,0,0,0,3000,5000,0,11,9532,64,0,0,0,0,2,0,0,0,0,0,0,0,'Haal\'eshi Windwalker - In Combat - Cast \'Lightning Bolt\''),
+(16966,0,1,0,0,0,100,0,8000,12000,20000,24000,0,11,32717,0,0,0,0,0,5,0,0,0,0,0,0,0,'Haal\'eshi Windwalker - In Combat - Cast \'Hurricane\''),
+(16966,0,2,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,'Haal\'eshi Windwalker - Between 0-15% Health - Flee For Assist (No Repeat)');
