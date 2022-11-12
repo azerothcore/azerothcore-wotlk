@@ -13,8 +13,7 @@ DELETE FROM `creature` WHERE `map`=546;
 
 SET @CGUID := 138300;
 
--- 18409 needs WDBE
-DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+224;
+DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+218;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `wander_distance`, `curhealth`, `curmana`, `currentwaypoint`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
 (@CGUID+0  , 17725, 546, 3716, 3716, 3, 1, 0, 53.30517196655273437, -115.721046447753906, -2.65770363807678222, 3.630284786224365234, 86400, 1, 5, 16028, 0, 0, 0, 0, 0, 46368), -- 17725 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
 (@CGUID+1  , 17871, 546, 3716, 3716, 3, 1, 0, 59.85622024536132812, -97.7351760864257812, -2.66830062866210937, 2.426007747650146484, 86400, 1, 4, 12395, 5136, 0, 0, 0, 0, 46368), -- 17871 (Area: 3716 - Difficulty: 1) (possible waypoints or random movement)
@@ -1303,3 +1302,58 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@OGUID+51, @POOL+13, 25, 'Flame Cap - The Underbog'),
 (@OGUID+53, @POOL+14, 25, 'Flame Cap - The Underbog'),
 (@OGUID+55, @POOL+15, 25, 'Flame Cap - The Underbog');
+
+DELETE FROM `pool_template` WHERE `description` LIKE '%Underbog%' AND `entry` BETWEEN @POOLMOTHER+5 AND @POOLMOTHER+11;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(@POOLMOTHER+5 , 12, 'The Underbog - Sanguine Hibiscus - Master Group'),
+(@POOLMOTHER+6 , 1, 'The Underbog - Felweed - Group 1'),
+(@POOLMOTHER+7 , 1, 'The Underbog - Felweed - Group 2'),
+(@POOLMOTHER+8 , 1, 'The Underbog - Ancient Lichen - Group 1'),
+(@POOLMOTHER+9 , 1, 'The Underbog - Ancient Lichen - Group 2'),
+(@POOLMOTHER+10, 1, 'The Underbog - Ancient Lichen - Group 3'),
+(@POOLMOTHER+11, 1, 'The Underbog - Ancient Lichen - Group 4');
+
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Underbog%' AND `guid` BETWEEN @OGUID+0 AND @OGUID+41 AND `pool_entry` BETWEEN @POOLMOTHER+5 AND @POOLMOTHER+11;
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
+(@OGUID+22, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+23, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+24, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+25, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+26, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+27, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+28, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+29, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+30, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+31, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+32, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+33, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+34, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+35, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+36, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+37, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+38, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+39, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+40, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+41, @POOLMOTHER+5, 0, 'Sanguine Hibiscus - The Underbog'),
+(@OGUID+0, @POOLMOTHER+6, 0, 'Felweed - The Underbog'),
+(@OGUID+3, @POOLMOTHER+6, 0, 'Felweed - The Underbog'),
+(@OGUID+6, @POOLMOTHER+6, 0, 'Felweed - The Underbog'),
+(@OGUID+5, @POOLMOTHER+7, 0, 'Felweed - The Underbog'),
+(@OGUID+4, @POOLMOTHER+7, 0, 'Felweed - The Underbog'),
+(@OGUID+1, @POOLMOTHER+7, 0, 'Felweed - The Underbog'),
+(@OGUID+2, @POOLMOTHER+7, 0, 'Felweed - The Underbog'),
+(@OGUID+21, @POOLMOTHER+8, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+9 , @POOLMOTHER+8, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+20, @POOLMOTHER+8, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+13, @POOLMOTHER+8, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+16, @POOLMOTHER+9, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+8 , @POOLMOTHER+9, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+18, @POOLMOTHER+9, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+11, @POOLMOTHER+9, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+14, @POOLMOTHER+10, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+17, @POOLMOTHER+10, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+7 , @POOLMOTHER+10, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+12, @POOLMOTHER+10, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+19, @POOLMOTHER+11, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+10, @POOLMOTHER+11, 0, 'Ancient Lichen - The Underbog'),
+(@OGUID+15, @POOLMOTHER+11, 0, 'Ancient Lichen - The Underbog');
