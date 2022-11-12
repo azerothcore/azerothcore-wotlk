@@ -1,5 +1,5 @@
 -- Delete the ores that survived the purge
-DELETE FROM `gameobject` WHERE `guid` IN (40255, 40271, 42411, 61962);
+DELETE FROM `gameobject` WHERE `guid` IN (40255, 40271, 42411, 61962) AND `id` IN (181555, 181556, 181557);
 -- Ore spawn timers
 UPDATE `gameobject` SET `spawntimesecs`=1200 WHERE `id` IN (181555, 181556, 181557, 181569) AND `map`=530;
 -- Common herb spawn timers
