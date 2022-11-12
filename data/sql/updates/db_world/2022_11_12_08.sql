@@ -1,3 +1,4 @@
+-- DB update 2022_11_12_07 -> 2022_11_12_08
 -- Jammal\'an the Prophet
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5710;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 5710) AND (`source_type` = 0) AND (`id` IN (4, 5));
