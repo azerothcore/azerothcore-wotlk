@@ -6235,7 +6235,7 @@ void ObjectMgr::LoadQuestGreetings()
 /**
 * @brief Loads quest_greetings_locale table
 *
-* @bug Does not load Locale greetings. https://github.com/azerothcore/azerothcore-wotlk/issues/10913
+* @bug Does not load Locale greetings. See https://github.com/azerothcore/azerothcore-wotlk/issues/10913
 */
 void ObjectMgr::LoadQuestGreetingsLocales()
 {
