@@ -33,8 +33,7 @@ enum class GroupAIFlags : uint16
     GROUP_AI_FLAG_EVADE_TOGETHER                = 0x004,
     GROUP_AI_FLAG_RESPAWN_ON_EVADE              = 0x008,
     GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE  = 0x010,
-    //GROUP_AI_FLAG_UNK3                        = 0x010,
-    //GROUP_AI_FLAG_UNK4                        = 0x020,
+    GROUP_AI_FLAG_ACQUIRE_NEW_TARGET_ON_EVADE   = 0x020,
     //GROUP_AI_FLAG_UNK5                        = 0x040,
     //GROUP_AI_FLAG_UNK6                        = 0x080,
     //GROUP_AI_FLAG_UNK7                        = 0x100,
@@ -44,7 +43,8 @@ enum class GroupAIFlags : uint16
     GROUP_AI_FLAG_EVADE_MASK                    = GROUP_AI_FLAG_EVADE_TOGETHER | GROUP_AI_FLAG_RESPAWN_ON_EVADE,
 
     // Used to verify valid and usable flags
-    GROUP_AI_FLAG_SUPPORTED                     = GROUP_AI_FLAG_ASSIST_MASK | GROUP_AI_FLAG_EVADE_MASK | GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE | GROUP_AI_FLAG_FOLLOW_LEADER
+    GROUP_AI_FLAG_SUPPORTED                     = GROUP_AI_FLAG_ASSIST_MASK | GROUP_AI_FLAG_EVADE_MASK | GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE |
+                                                  GROUP_AI_FLAG_FOLLOW_LEADER | GROUP_AI_FLAG_ACQUIRE_NEW_TARGET_ON_EVADE
 };
 
 struct FormationInfo

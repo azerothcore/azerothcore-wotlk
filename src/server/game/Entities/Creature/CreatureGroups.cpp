@@ -229,7 +229,7 @@ void CreatureGroup::MemberEngagingTarget(Creature* member, Unit* target)
 Unit* CreatureGroup::GetNewTargetForMember(Creature* member)
 {
     uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()].groupAI;
-    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_ASSIST_MASK)))
+    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_ACQUIRE_NEW_TARGET_ON_EVADE)))
     {
         return nullptr;
     }
