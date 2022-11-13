@@ -316,6 +316,17 @@ class spell_dru_treant_scaling : public AuraScript
         }
     }
 
+    void CalculateHasteAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (Unit* owner = GetUnitOwner()->GetOwner())
+        {
+            if (owner->GetFloatValue(UNIT_MOD_CAST_SPEED) < 1.0f)
+            {
+                amount = std::min<int32>(100, int32(((1.0f / owner->GetFloatValue(UNIT_MOD_CAST_SPEED)) - 1.0f) * 100.0f));
+            }
+        }
+    }
+
     void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         // xinef: treant inherits 105% of SP as AP - 15% of damage increase per hit
@@ -366,6 +377,9 @@ class spell_dru_treant_scaling : public AuraScript
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
         }
+
+        if (m_scriptSpellId == 35672)
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling::CalculateHasteAmount, EFFECT_1, SPELL_AURA_MELEE_SLOW);
 
         OnEffectApply += AuraEffectApplyFn(spell_dru_treant_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
     }
