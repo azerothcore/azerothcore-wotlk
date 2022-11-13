@@ -2926,13 +2926,15 @@ void DynObjAura::FillTargetMap(std::map<Unit*, uint8>& targets, Unit* /*caster*/
             Unit* target = *itr;
 
             Optional<float> collisionHeight = { };
+            Optional<float> combatReach = { };
             if (Unit* dynObjCaster = GetDynobjOwner()->GetCaster())
             {
                 collisionHeight = dynObjCaster->GetCollisionHeight();
+                combatReach = dynObjCaster->GetCombatReach();
             }
 
             if (!spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) && !spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) &&
-                !target->IsWithinLOSInMap(GetDynobjOwner(), VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_ALL_CHECKS, collisionHeight))
+                !GetDynobjOwner()->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_ALL_CHECKS, collisionHeight, combatReach))
             {
                 continue;
             }
