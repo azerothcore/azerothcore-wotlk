@@ -1,5 +1,5 @@
 -- esES missing reward_locale 
-DELETE FROM `quest_offer_reward_locale` WHERE `locale` in ('esES', 'esMX') AND `ID` IN (11262, 12118, 12182, 12297, 12298, 12918, 12952, 13087, 13089, 13206, 13268, 13269)
+DELETE FROM `quest_offer_reward_locale` WHERE `locale` IN ('esES', 'esMX') AND `ID` IN (11262, 12118, 12182, 12297, 12298, 12918, 12952, 13087, 13089, 13206, 13268, 13269);
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES 
 (11262, 'esES', 'Excelente trabajo, $N. Ahora que nos hemos librado de su líder, nuestros esfuerzos contra esos vrykuls deberían ser más fructíferos.$b$b¡Un servicio así merece una recompensa!', 0),
 (12118, 'esES', '¿Qué dices, $R? ¿Te envía Anuniaq?$b$bBien, bien... hay mucho trabajo. ¡Toda ayuda es bien recibida!', 0),
@@ -28,7 +28,7 @@ INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verified
 (13269, 'esMX', 'Mata suficientes humanoides y obtén sus telas.', 0);
 -- 2 SECTION
 -- esES missing quest_request_items_locale 
-DELETE FROM `quest_request_items_locale` WHERE `locale` IN ('esES', 'esMX') AND `ID` IN (11262, 11452, 11453, 12182, 12297, 12298, 12918, 12952, 13087, 13089, 13206, 13268, 13269)
+DELETE FROM `quest_request_items_locale` WHERE `locale` IN ('esES', 'esMX') AND `ID` IN (11262, 11452, 11453, 12182, 12297, 12298, 12918, 12952, 13087, 13089, 13206, 13268, 13269);
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES 
 (11262, 'esES', 'Prepárate, $R.$b$bAún queda mucho por hacer. Esto es solo la punta del iceberg, por decirlo de alguna manera.', 0),
 (11452, 'esES', '¡$n, qué nuevas noticias nos traes?', 0),
