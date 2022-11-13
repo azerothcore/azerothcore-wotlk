@@ -113,9 +113,17 @@ public:
                 return false;
             }
 
-            if (me->GetThreatMgr().GetThreatListSize() > 1 && me->GetThreatMgr().GetOnlineContainer().getMostHated()->getTarget() == target)
+            if (me->GetThreatMgr().GetThreatListSize() > 1)
             {
-                return !target->HasAura(SPELL_CONFLAGRATION);
+                ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
+                --lastRef;
+                if (Unit* lastTarget = (*lastRef)->getTarget())
+                {
+                    if (lastTarget != target)
+                    {
+                        return !target->HasAura(SPELL_CONFLAGRATION);
+                    }
+                }
             }
 
             return true;
@@ -254,9 +262,6 @@ public:
                         break;
                     case EVENT_CONFLAGRATION:
                         DoCastVictim(SPELL_CONFLAGRATION);
-                        if (me->GetVictim() && me->GetVictim()->HasAura(SPELL_CONFLAGRATION))
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
-                                me->TauntApply(target);
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 30000);
                         break;
                 }
