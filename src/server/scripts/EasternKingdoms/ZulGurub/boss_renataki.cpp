@@ -207,7 +207,7 @@ public:
                             GuidVector::iterator itr = _thousandBladesTargets.begin();
                             std::advance(itr, urand(0, _thousandBladesTargets.size() - 1));
 
-                            if (Unit* target = ObjectAccessor::GetPlayer(*me, *itr))
+                            if (Unit* target = ObjectAccessor::GetUnit(*me, *itr))
                             {
                                 DoCast(target, SPELL_THOUSAND_BLADES);
                             }
