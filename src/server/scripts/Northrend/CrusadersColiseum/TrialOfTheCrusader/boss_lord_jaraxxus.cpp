@@ -336,7 +336,7 @@ public:
                 case EVENT_SPELL_FEL_STEAK:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 44.0f, true) )
                     {
-                        DoResetThreat();
+                        DoResetThreatList();
                         me->AddThreat(target, 50000.0f);
                         me->CastSpell(target, SPELL_FEL_STEAK_MORPH, true);
                         me->CastSpell(target, SPELL_FEL_STEAK, true);

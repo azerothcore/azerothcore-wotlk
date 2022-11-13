@@ -256,26 +256,36 @@ public:
 
         // EVENT STUFF BELOW:
 
-        void OnPlayerEnter(Player*) override
+        void OnPlayerEnter(Player* plr) override
         {
-            if( DoNeedCleanup(true) )
+            if (DoNeedCleanup(plr))
+            {
                 InstanceCleanup();
+            }
 
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
         }
 
-        bool DoNeedCleanup(bool /*enter*/)
+        bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
         {
             uint8 aliveCount = 0;
-            Map::PlayerList const& pl = instance->GetPlayers();
-            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                if( Player* plr = itr->GetSource() )
-                    if( plr->IsAlive() && !plr->IsGameMaster() )
+            for (const auto &itr: instance->GetPlayers())
+            {
+                if (Player* plr = itr.GetSource())
+                {
+                    if (plr != ignoredPlayer && plr->IsAlive() && !plr->IsGameMaster())
+                    {
                         ++aliveCount;
+                    }
+                }
+            }
 
             bool need = aliveCount == 0;
-            if( !need && CLEANED )
+            if (!need && CLEANED)
+            {
                 CLEANED = false;
+            }
+
             return need;
         }
 
@@ -769,8 +779,10 @@ public:
                     break;
                 case EVENT_CHECK_PLAYERS:
                     {
-                        if( DoNeedCleanup(false) )
+                        if (DoNeedCleanup())
+                        {
                             InstanceCleanup();
+                        }
                         events.RepeatEvent(CLEANUP_CHECK_INTERVAL);
                     }
                     break;
