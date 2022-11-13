@@ -219,7 +219,6 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         bool startInWaterEndUnderWater = (liquidDataStart.Status & MAP_LIQUID_STATUS_IN_CONTACT) != 0 &&
                                          liquidDataEnd.Status == LIQUID_MAP_UNDER_WATER;
         bool waterPath = startUnderWaterEndInWater || startInWaterEndUnderWater;
-        
         Unit const* _sourceUnit = _source->ToUnit();
 
         if (_sourceUnit)
