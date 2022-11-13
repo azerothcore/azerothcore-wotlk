@@ -1,5 +1,5 @@
 --
-UPDATE `creature_template` SET `type_flags`=`type_flags`|0x08000000 WHERE `entry`=3443;
+UPDATE `creature_template` SET `type_flags`=`type_flags`|0x08000000, `npcflag`=130 WHERE `entry`=3443;
 
 DELETE FROM `gossip_menu_option` WHERE `MenuId`=10311;
 INSERT INTO `gossip_menu_option` VALUES
