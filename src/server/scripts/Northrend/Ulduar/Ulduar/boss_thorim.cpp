@@ -552,7 +552,7 @@ public:
                     summons.DoAction(ACTION_SIF_JOIN_FIGHT, pred);
                 }
 
-                DoResetThreat();
+                DoResetThreatList();
                 if (Player* player = GetArenaPlayer())
                     me->AddThreat(player, 1000.0f);
             }

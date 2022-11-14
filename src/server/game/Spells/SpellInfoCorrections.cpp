@@ -4427,6 +4427,14 @@ void SpellMgr::LoadSpellInfoCorrections()
             spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
     });
 
+    // Digestive Acid (Temporary)
+    ApplySpellFix({ 26476 }, [](SpellInfo* spellInfo)
+    {
+            spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

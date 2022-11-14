@@ -247,7 +247,7 @@ public:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->SetReactState(REACT_AGGRESSIVE);
-                        DoResetThreat();
+                        DoResetThreatList();
                         me->GetVictim()->InterruptNonMeleeSpells(false);
                         me->AddThreat(me->GetVictim(), 1000000.0f);
                         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);

@@ -232,7 +232,7 @@ public:
                             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(EQUIP_UNEQUIP));
                             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(EQUIP_UNEQUIP));
                             me->AttackStop();
-                            DoResetThreat();
+                            DoResetThreatList();
                             me->SetReactState(REACT_PASSIVE);
                             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                             DoCastSelf(SPELL_VANISH_VISUAL);
