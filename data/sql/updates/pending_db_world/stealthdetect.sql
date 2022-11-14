@@ -2,6 +2,9 @@
 DELETE FROM `creature_template_addon` WHERE (`entry` = 17624);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (17624, 0, 0, 0, 0, 0, 0, '18950');
+DELETE FROM `creature_addon` WHERE (`guid` IN (138187));
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(138187, 1381870, 0, 0, 0, 0, 0, '18950');
 -- Remove Stealth detect smartai and reorder
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17624;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 17624) AND (`source_type` = 0) AND (`id` IN (1, 2));
