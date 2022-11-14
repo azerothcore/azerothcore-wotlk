@@ -456,7 +456,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL+5 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
 (@POOL+6 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
 (@POOL+7 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
-(@POOL+8 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
+(@POOL+8 , 1, 'The Slave Pens - Adamantite Deposit / Rich Adamantite Deposit / Khorium Vein'),
 (@POOL+9 , 1, 'The Slave Pens - Adamantite Deposit / Rich Adamantite Deposit / Khorium Vein'),
 (@POOL+10, 1, 'The Slave Pens - Adamantite Deposit / Rich Adamantite Deposit / Khorium Vein'),
 (@POOL+11, 1, 'The Slave Pens - Adamantite Deposit / Rich Adamantite Deposit / Khorium Vein'),
