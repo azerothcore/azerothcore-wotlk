@@ -348,3 +348,166 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,6,-194.77405,-707.0978,37.89232,NULL,0,1,0,100,0),
 (@PATH,7,-172.50328,-720.9616,37.892315,NULL,0,1,0,100,0),
 (@PATH,8,-144.27388,-731.4174,37.89232,NULL,0,1,0,100,0);
+
+-- Gameobjects
+DELETE FROM `gameobject` WHERE `map`=547 AND `id` IN (181278, 181270, 181275, 181276, 181556, 181557, 181569) AND `guid` IN (26558,26594,60189,60191,60192,61227,61404,61405,61407,61409,61900,61903,61904,63198,63199,61408);
+
+SET @GUID := 104413;
+SET @POOL := 13313;
+SET @POOLMOTHER := 8314;
+
+DELETE FROM `gameobject` WHERE `id` IN (181278, 181270, 181275, 181276, 181556, 181557, 181569) AND `map`=547 AND `ZoneId`=3717 AND `guid` BETWEEN @GUID+0 AND @GUID+52;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
+(@GUID+0 , 181278, 547, 3717, 3717, 3, 1, -15.1088, -328.102, -1.58162, 0.244346, 0, 0, 0, 1, 86400, 100, 1, '', 0),
+(@GUID+1 , 181278, 547, 3717, 3717, 3, 1, -55.6236, 13.8905, -1.58162, 0.925024, 0, 0, 0.446198, 0.894935, 86400, 255, 1, '', 46597),
+(@GUID+2 , 181278, 547, 3717, 3717, 3, 1, -6.49786, -268.131, -0.405657, 1.48353, 0, 0, 0.67559, 0.737278, 86400, 255, 1, '', 46597),
+(@GUID+3 , 181278, 547, 3717, 3717, 3, 1, -110.174, -316.995, -1.5811, 3.82227, 0, 0, -0.942641, 0.333808, 86400, 255, 1, '', 46597),
+(@GUID+4 , 181278, 547, 3717, 3717, 3, 1, -108.203, -6.1077, -8.88713, 0.994837, 0, 0, 0.477159, 0.878817, 86400, 255, 1, '', 46597),
+(@GUID+5 , 181278, 547, 3717, 3717, 3, 1, -71.7667, -314.165, -1.4775, 3.68265, 0, 0, -0.96363, 0.267241, 86400, 255, 1, '', 46597),
+(@GUID+6 , 181278, 547, 3717, 3717, 3, 1, -118.49, -195.385, -1.52758, 5.55015, 0, 0, -0.358368, 0.93358, 86400, 255, 1, '', 46597),
+(@GUID+7 , 181278, 547, 3717, 3717, 3, 1, -9.24667, -186.432, -1.56752, 6.05629, 0, 0, -0.113203, 0.993572, 86400, 255, 1, '', 46597),
+(@GUID+8 , 181278, 547, 3717, 3717, 3, 1, -9.61051, -69.0904, -1.58162, 2.84488, 0, 0, 0.989016, 0.147811, 86400, 255, 1, '', 46597),
+(@GUID+9 , 181278, 547, 3717, 3717, 3, 1, -67.6224, -275.954, -1.35519, 5.044, 0, 0, -0.580703, 0.814116, 86400, 255, 1, '', 46597),
+(@GUID+10, 181278, 547, 3717, 3717, 3, 1, -85.9097, -548.388, -1.58175, 0.104719, 0, 0, 0.0523357, 0.99863, 86400, 255, 1, '', 46597),
+(@GUID+11, 181278, 547, 3717, 3717, 3, 1, -146.844, -479.709, -0.817709, 2.80998, 0, 0, 0.986285, 0.16505, 86400, 255, 1, '', 46597),
+(@GUID+12, 181278, 547, 3717, 3717, 3, 1, -41.414, -512.581, -1.58581, 3.78737, 0, 0, -0.948323, 0.317306, 86400, 255, 1, '', 46597),
+(@GUID+13, 181278, 547, 3717, 3717, 3, 1, -117.839, -585.493, 5.45307, 1.0821, 0, 0, 0.515038, 0.857168, 86400, 255, 1, '', 46597),
+(@GUID+14, 181270, 547, 3717, 3717, 3, 1, -130.503, -273.61, -1.58329, 2.60054, 0, 0, 0.96363, 0.267241, 86400, 255, 1, '', 46597),
+(@GUID+15, 181270, 547, 3717, 3717, 3, 1, -168.039, -701.512, 37.9013, 4.20625, 0, 0, -0.861629, 0.507539, 86400, 255, 1, '', 46597),
+(@GUID+16, 181270, 547, 3717, 3717, 3, 1, -43.2663, -451.806, -1.9612, 2.42601, 0, 0, 0.936672, 0.350207, 86400, 255, 1, '', 46597),
+(@GUID+17, 181270, 547, 3717, 3717, 3, 1, -19.0182, -556.112, -1.58351, 0.453785, 0, 0, 0.224951, 0.97437, 86400, 255, 1, '', 46597),
+(@GUID+18, 181270, 547, 3717, 3717, 3, 1, -94.6669, -705.023, 37.3486, 2.18166, 0, 0, 0.887011, 0.461749, 86400, 255, 1, '', 46597),
+(@GUID+19, 181270, 547, 3717, 3717, 3, 1, -86.5097, -632.706, 20.4527, 3.97935, 0, 0, -0.913545, 0.406738, 86400, 255, 1, '', 46597),
+(@GUID+20, 181270, 547, 3717, 3717, 3, 1, -196.949, -756.071, 40.2413, 6.03884, 0, 0, -0.121869, 0.992546, 86400, 255, 1, '', 46597),
+(@GUID+21, 181270, 547, 3717, 3717, 3, 1, -110.273, -755.954, 37.3613, 3.10665, 0, 0, 0.999847, 0.0174693, 86400, 255, 1, '', 46597),
+(@GUID+22, 181275, 547, 3717, 3717, 3, 1, -131.525, -133.744, -1.97161, 1.88495, 0, 0, 0.809016, 0.587786, 86400, 255, 1, '', 46597),
+(@GUID+24, 181275, 547, 3717, 3717, 3, 1, -61.4976, -616.144, -0.567495, 3.01941, 0, 0, 0.998135, 0.0610518, 86400, 255, 1, '', 46597),
+(@GUID+26, 181275, 547, 3717, 3717, 3, 1, -58.8091, -152.355, -1.42225, 5.3058, 0, 0, -0.469471, 0.882948, 86400, 255, 1, '', 46597),
+(@GUID+28, 181275, 547, 3717, 3717, 3, 1, -55.9415, -29.0174, -1.69497, 4.95674, 0, 0, -0.615661, 0.788011, 86400, 255, 1, '', 46597),
+(@GUID+30, 181275, 547, 3717, 3717, 3, 1, -76.0176, -482.555, -1.58448, 3.52557, 0, 0, -0.981627, 0.190812, 86400, 255, 1, '', 46597),
+(@GUID+32, 181275, 547, 3717, 3717, 3, 1, -146.687, -255.88, -1.58513, 5.65487, 0, 0, -0.309016, 0.951057, 86400, 255, 1, '', 46597),
+(@GUID+34, 181275, 547, 3717, 3717, 3, 1, -8.01602, -3.30066, -1.2195, 2.25147, 0, 0, 0.902585, 0.430512, 86400, 255, 1, '', 46597),
+(@GUID+36, 181275, 547, 3717, 3717, 3, 1, -170.84, -779.574, 42.7871, 3.24635, 0, 0, -0.998629, 0.0523532, 86400, 255, 1, '', 46597),
+(@GUID+23, 181276, 547, 3717, 3717, 3, 1, -131.525, -133.744, -1.97161, 1.88495, 0, 0, 0.809016, 0.587786, 86400, 255, 1, '', 46597),
+(@GUID+25, 181276, 547, 3717, 3717, 3, 1, -61.4976, -616.144, -0.567495, 3.01941, 0, 0, 0.998135, 0.0610518, 86400, 255, 1, '', 46597),
+(@GUID+27, 181276, 547, 3717, 3717, 3, 1, -58.8091, -152.355, -1.42225, 5.3058, 0, 0, -0.469471, 0.882948, 86400, 255, 1, '', 46597),
+(@GUID+29, 181276, 547, 3717, 3717, 3, 1, -55.9415, -29.0174, -1.69497, 4.95674, 0, 0, -0.615661, 0.788011, 86400, 255, 1, '', 46597),
+(@GUID+31, 181276, 547, 3717, 3717, 3, 1, -76.0176, -482.555, -1.58448, 3.52557, 0, 0, -0.981627, 0.190812, 86400, 255, 1, '', 46597),
+(@GUID+33, 181276, 547, 3717, 3717, 3, 1, -146.687, -255.88, -1.58513, 5.65487, 0, 0, -0.309016, 0.951057, 86400, 255, 1, '', 46597),
+(@GUID+35, 181276, 547, 3717, 3717, 3, 1, -8.01602, -3.30066, -1.2195, 2.25147, 0, 0, 0.902585, 0.430512, 86400, 255, 1, '', 46597),
+(@GUID+37, 181276, 547, 3717, 3717, 3, 1, -170.84, -779.574, 42.7871, 3.24635, 0, 0, -0.998629, 0.0523532, 86400, 255, 1, '', 46597),
+(@GUID+38, 181556, 547, 3717, 3717, 3, 1, -136.808, -128.963, -1.69219, 1.91986, 0, 0, 0.819152, 0.573577, 86400, 255, 1, '', 46597),
+(@GUID+41, 181556, 547, 3717, 3717, 3, 1, 0.00864, -186.667, -1.55533, 3.94445, 0, 0, -0.920505, 0.390732, 86400, 255, 1, '', 46597),
+(@GUID+44, 181556, 547, 3717, 3717, 3, 1, -71.3426, -282.686, -1.4015, 0.733038, 0, 0, 0.358368, 0.93358, 86400, 255, 1, '', 46597),
+(@GUID+39, 181557, 547, 3717, 3717, 3, 1, -136.808, -128.963, -1.69219, 1.91986, 0, 0, 0.819152, 0.573577, 86400, 255, 1, '', 46597),
+(@GUID+42, 181557, 547, 3717, 3717, 3, 1, 0.00864, -186.667, -1.55533, 3.94445, 0, 0, -0.920505, 0.390732, 86400, 255, 1, '', 46597),
+(@GUID+45, 181557, 547, 3717, 3717, 3, 1, -71.3426, -282.686, -1.4015, 0.733038, 0, 0, 0.358368, 0.93358, 86400, 255, 1, '', 46597),
+(@GUID+40, 181569, 547, 3717, 3717, 3, 1, -136.808, -128.963, -1.69219, 1.91986, 0, 0, 0.819152, 0.573577, 86400, 255, 1, '', 46597),
+(@GUID+43, 181569, 547, 3717, 3717, 3, 1, 0.00864, -186.667, -1.55533, 3.94445, 0, 0, -0.920505, 0.390732, 86400, 255, 1, '', 46597),
+(@GUID+46, 181569, 547, 3717, 3717, 3, 1, -71.3426, -282.686, -1.4015, 0.733038, 0, 0, 0.358368, 0.93358, 86400, 255, 1, '', 46597),
+(@GUID+47, 181556, 547, 3717, 3717, 3, 1, -78.1511, -601.834, 3.77027, 2.28638, 0, 0, 0.909961, 0.414694, 86400, 255, 1, '', 46597),
+(@GUID+50, 181556, 547, 3717, 3717, 3, 1, -70.0015, -481.986, -1.59485, 2.35619, 0, 0, 0.92388, 0.382683, 86400, 255, 1, '', 46597),
+(@GUID+48, 181557, 547, 3717, 3717, 3, 1, -78.1511, -601.834, 3.77027, 2.28638, 0, 0, 0.909961, 0.414694, 86400, 255, 1, '', 46597),
+(@GUID+51, 181557, 547, 3717, 3717, 3, 1, -70.0015, -481.986, -1.59485, 2.35619, 0, 0, 0.92388, 0.382683, 86400, 255, 1, '', 46597),
+(@GUID+49, 181569, 547, 3717, 3717, 3, 1, -78.1511, -601.834, 3.77027, 2.28638, 0, 0, 0.909961, 0.414694, 86400, 255, 1, '', 46597),
+(@GUID+52, 181569, 547, 3717, 3717, 3, 1, -70.0015, -481.986, -1.59485, 2.35619, 0, 0, 0.92388, 0.382683, 86400, 255, 1, '', 46597);
+
+DELETE FROM `pool_template` WHERE `description` LIKE '%Slave Pens%' AND `entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+5;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(@POOLMOTHER+0, 3, 'The Slave Pens - Ancient Lichen - West Group'),
+(@POOLMOTHER+1, 1, 'The Slave Pens - Ancient Lichen - East Group'),
+(@POOLMOTHER+2, 2, 'The Slave Pens - Felweed - Master Group'),
+(@POOLMOTHER+3, 2, 'The Slave Pens - Ragveil / Flame Cap - Master Group'),
+(@POOLMOTHER+4, 1, 'The Slave Pens - Ores - Group West'),
+(@POOLMOTHER+5, 1, 'The Slave Pens - Ores - Group East');
+
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Slave Pens%' AND `guid` BETWEEN @GUID+0 AND @GUID+21 AND `pool_entry` BETWEEN @POOLMOTHER+0 AND @POOLMOTHER+2;
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
+(@GUID+0 , @POOLMOTHER+0, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+1 , @POOLMOTHER+0, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+2 , @POOLMOTHER+0, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+3 , @POOLMOTHER+0, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+4 , @POOLMOTHER+0, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+5 , @POOLMOTHER+0, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+6 , @POOLMOTHER+0, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+7 , @POOLMOTHER+0, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+8 , @POOLMOTHER+0, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+9 , @POOLMOTHER+0, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+10, @POOLMOTHER+1, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+11, @POOLMOTHER+1, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+12, @POOLMOTHER+1, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+13, @POOLMOTHER+1, 0, 'Ancient Lichen - The Slave Pens'),
+(@GUID+14, @POOLMOTHER+2, 0, 'Felweed - The Slave Pens'),
+(@GUID+15, @POOLMOTHER+2, 0, 'Felweed - The Slave Pens'),
+(@GUID+16, @POOLMOTHER+2, 0, 'Felweed - The Slave Pens'),
+(@GUID+17, @POOLMOTHER+2, 0, 'Felweed - The Slave Pens'),
+(@GUID+18, @POOLMOTHER+2, 0, 'Felweed - The Slave Pens'),
+(@GUID+19, @POOLMOTHER+2, 0, 'Felweed - The Slave Pens'),
+(@GUID+20, @POOLMOTHER+2, 0, 'Felweed - The Slave Pens'),
+(@GUID+21, @POOLMOTHER+2, 0, 'Felweed - The Slave Pens');
+
+DELETE FROM `pool_template` WHERE `description` LIKE '%Slave Pens%' AND `entry` BETWEEN @POOL+0 AND @POOL+12;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(@POOL+0 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
+(@POOL+1 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
+(@POOL+2 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
+(@POOL+3 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
+(@POOL+4 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
+(@POOL+5 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
+(@POOL+6 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
+(@POOL+7 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
+(@POOL+8 , 1, 'The Slave Pens - Ragveil / Flame Cap'),
+(@POOL+9 , 1, 'The Slave Pens - Adamantite Deposit / Rich Adamantite Deposit / Khorium Vein'),
+(@POOL+10, 1, 'The Slave Pens - Adamantite Deposit / Rich Adamantite Deposit / Khorium Vein'),
+(@POOL+11, 1, 'The Slave Pens - Adamantite Deposit / Rich Adamantite Deposit / Khorium Vein'),
+(@POOL+12, 1, 'The Slave Pens - Adamantite Deposit / Rich Adamantite Deposit / Khorium Vein');
+
+DELETE FROM `pool_pool` WHERE `description` LIKE '%Slave Pens%' AND `pool_id` BETWEEN @POOL+0 AND @POOL+12 AND `mother_pool` BETWEEN @POOLMOTHER+3 AND @POOLMOTHER+5;
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
+(@POOL+0 , @POOLMOTHER+3, 0, 'The Slave Pens - Ragveil / Flame Cap - Master Group'),
+(@POOL+1 , @POOLMOTHER+3, 0, 'The Slave Pens - Ragveil / Flame Cap - Master Group'),
+(@POOL+2 , @POOLMOTHER+3, 0, 'The Slave Pens - Ragveil / Flame Cap - Master Group'),
+(@POOL+3 , @POOLMOTHER+3, 0, 'The Slave Pens - Ragveil / Flame Cap - Master Group'),
+(@POOL+4 , @POOLMOTHER+3, 0, 'The Slave Pens - Ragveil / Flame Cap - Master Group'),
+(@POOL+5 , @POOLMOTHER+3, 0, 'The Slave Pens - Ragveil / Flame Cap - Master Group'),
+(@POOL+6 , @POOLMOTHER+3, 0, 'The Slave Pens - Ragveil / Flame Cap - Master Group'),
+(@POOL+7 , @POOLMOTHER+3, 0, 'The Slave Pens - Ragveil / Flame Cap - Master Group'),
+(@POOL+8 , @POOLMOTHER+4, 0, 'The Slave Pens - Adamantite / Khorium / Rich Adamantite - Group West'),
+(@POOL+9 , @POOLMOTHER+4, 0, 'The Slave Pens - Adamantite / Khorium / Rich Adamantite - Group West'),
+(@POOL+10, @POOLMOTHER+4, 0, 'The Slave Pens - Adamantite / Khorium / Rich Adamantite - Group West'),
+(@POOL+11, @POOLMOTHER+5, 0, 'The Slave Pens - Adamantite / Khorium / Rich Adamantite - Group East'),
+(@POOL+12, @POOLMOTHER+5, 0, 'The Slave Pens - Adamantite / Khorium / Rich Adamantite - Group East');
+
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%Slave Pens%' AND `guid` BETWEEN @GUID+22 AND @GUID+52 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+12;
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
+(@GUID+22, @POOL+0, 0 , 'Ragveil - The Slave Pens'),
+(@GUID+24, @POOL+1, 0 , 'Ragveil - The Slave Pens'),
+(@GUID+26, @POOL+2, 0 , 'Ragveil - The Slave Pens'),
+(@GUID+28, @POOL+3, 0 , 'Ragveil - The Slave Pens'),
+(@GUID+30, @POOL+4, 0 , 'Ragveil - The Slave Pens'),
+(@GUID+32, @POOL+5, 0 , 'Ragveil - The Slave Pens'),
+(@GUID+34, @POOL+6, 0 , 'Ragveil - The Slave Pens'),
+(@GUID+36, @POOL+7, 0 , 'Ragveil - The Slave Pens'),
+(@GUID+23, @POOL+0, 25, 'Flame Cap - The Slave Pens'),
+(@GUID+25, @POOL+1, 25, 'Flame Cap - The Slave Pens'),
+(@GUID+27, @POOL+2, 25, 'Flame Cap - The Slave Pens'),
+(@GUID+29, @POOL+3, 25, 'Flame Cap - The Slave Pens'),
+(@GUID+31, @POOL+4, 25, 'Flame Cap - The Slave Pens'),
+(@GUID+33, @POOL+5, 25, 'Flame Cap - The Slave Pens'),
+(@GUID+35, @POOL+6, 25, 'Flame Cap - The Slave Pens'),
+(@GUID+37, @POOL+7, 25, 'Flame Cap - The Slave Pens'),
+(@GUID+38, @POOL+8 , 0, 'Adamantite Deposit - The Slave Pens'),
+(@GUID+41, @POOL+9 , 0, 'Adamantite Deposit - The Slave Pens'),
+(@GUID+44, @POOL+10, 0, 'Adamantite Deposit - The Slave Pens'),
+(@GUID+39, @POOL+8 , 5, 'Khorium Vein - The Slave Pens'),
+(@GUID+42, @POOL+9 , 5, 'Khorium Vein - The Slave Pens'),
+(@GUID+45, @POOL+10, 5, 'Khorium Vein - The Slave Pens'),
+(@GUID+40, @POOL+8 , 40, 'Rich Adamantite Deposit - The Slave Pens'),
+(@GUID+43, @POOL+9 , 40, 'Rich Adamantite Deposit - The Slave Pens'),
+(@GUID+46, @POOL+10, 40, 'Rich Adamantite Deposit - The Slave Pens'),
+(@GUID+47, @POOL+11, 0, 'Adamantite Deposit - The Slave Pens'),
+(@GUID+50, @POOL+12, 0, 'Adamantite Deposit - The Slave Pens'),
+(@GUID+48, @POOL+11, 5, 'Khorium Vein - The Slave Pens'),
+(@GUID+51, @POOL+12, 5, 'Khorium Vein - The Slave Pens'),
+(@GUID+49, @POOL+11, 40, 'Rich Adamantite Deposit - The Slave Pens'),
+(@GUID+52, @POOL+12, 40, 'Rich Adamantite Deposit - The Slave Pens');
