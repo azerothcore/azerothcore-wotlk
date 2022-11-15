@@ -1,3 +1,4 @@
+-- DB update 2022_11_13_00 -> 2022_11_15_00
 -- Fire brigade esES / esMX
 DELETE FROM `quest_offer_reward_locale` WHERE `ID` IN (11360, 11439, 11440, 11449, 11450, 11361) AND `locale` IN ('esES', 'esMX');
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
