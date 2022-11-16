@@ -359,7 +359,7 @@ struct boss_veklor : public boss_twinemperorsAI
             .Schedule(10s, 15s, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_BLIZZARD, 0, 45.f);
-                context.Repeat(5s, 12s);
+                context.Repeat(10s, 24s);
             })
             .Schedule(1s, [this](TaskContext context)
             {
