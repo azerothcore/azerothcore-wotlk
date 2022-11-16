@@ -367,10 +367,10 @@ struct boss_veklor : public boss_twinemperorsAI
                     DoCastAOE(SPELL_ARCANE_BURST);
                 context.Repeat(7s, 12s);
             })
-            .Schedule(30s, 40s, [this](TaskContext context)
+            .Schedule(30s, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_TWIN_TELEPORT_0);
-                context.Repeat();
+                context.Repeat(30s, 40s);
             })
             .Schedule(5s, [this](TaskContext context)
             {
