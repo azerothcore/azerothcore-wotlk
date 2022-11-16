@@ -61,6 +61,11 @@ bool _displayEquipment;
 bool _showCloak;
 bool _showHelm;
 bool _sendEquipListItems;
+bool _transmog_enable;
+bool _transmog_mixArmorClasses;
+bool _transmog_mixWeaponClasses;
+bool _transmog_mixWeaponInvTypes;
+bool _transmog_useEquipmentSlots;
 bool _enableclass_blademaster;
 bool _enableclass_sphynx;
 bool _enableclass_archmage;
@@ -229,6 +234,11 @@ void BotMgr::LoadConfig(bool reload)
     _showCloak                      = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.ShowCloak", true);
     _showHelm                       = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.ShowHelm", false);
     _sendEquipListItems             = sConfigMgr->GetBoolDefault("NpcBot.Gossip.ShowEquipmentListItems", false);
+    _transmog_enable                = sConfigMgr->GetBoolDefault("NpcBot.Transmog.Enable", false);
+    _transmog_mixArmorClasses       = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixArmorClasses", false);
+    _transmog_mixWeaponClasses      = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixWeaponClasses", false);
+    _transmog_mixWeaponInvTypes     = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixWeaponInventoryTypes", false);
+    _transmog_useEquipmentSlots     = sConfigMgr->GetBoolDefault("NpcBot.Transmog.UseEquipmentSlots", false);
     _enableclass_blademaster        = sConfigMgr->GetBoolDefault("NpcBot.NewClasses.Blademaster.Enable", true);
     _enableclass_sphynx             = sConfigMgr->GetBoolDefault("NpcBot.NewClasses.ObsidianDestroyer.Enable", true);
     _enableclass_archmage           = sConfigMgr->GetBoolDefault("NpcBot.NewClasses.Archmage.Enable", true);
@@ -360,6 +370,27 @@ bool BotMgr::ShowEquippedHelm()
 bool BotMgr::SendEquipListItems()
 {
     return _sendEquipListItems;
+}
+
+bool BotMgr::IsTransmogEnabled()
+{
+    return _transmog_enable;
+}
+bool BotMgr::MixArmorClasses()
+{
+    return _transmog_mixArmorClasses;
+}
+bool BotMgr::MixWeaponClasses()
+{
+    return _transmog_mixWeaponClasses;
+}
+bool BotMgr::MixWeaponInventoryTypes()
+{
+    return _transmog_mixWeaponInvTypes;
+}
+bool BotMgr::TransmogUseEquipmentSlots()
+{
+    return _transmog_useEquipmentSlots;
 }
 
 bool BotMgr::IsClassEnabled(uint8 m_class)
@@ -944,6 +975,7 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
 
     if (removetype == BOT_REMOVE_DISMISS)
     {
+        BotDataMgr::ResetNpcBotTransmogData(bot->GetEntry(), false);
         uint32 newOwner = 0;
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &newOwner);
     }

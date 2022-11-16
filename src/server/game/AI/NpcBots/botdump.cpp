@@ -41,10 +41,11 @@ private:
 enum ImportDataTableType : uint8
 {
     TABLE_TYPE_CHARACTERS_NPCBOT    = 0,
-    TABLE_TYPE_ITEM_INSTANCE        = 1,
-    TABLE_TYPE_CREATURE             = 2,
+    TABLE_TYPE_NPCBOT_TRANSMOG      = 1,
+    TABLE_TYPE_ITEM_INSTANCE        = 2,
+    TABLE_TYPE_CREATURE             = 3,
 
-    IMPORT_TABLES_COUNT             = 3,
+    IMPORT_TABLES_COUNT             = 4,
     IMPORT_TABLE_INVALID            = 255
 };
 
@@ -68,6 +69,12 @@ TableImportData TableImportDatas[IMPORT_TABLES_COUNT] =
       //18          19             20             21              22              23
       "`equipBody`,`equipFinger1`,`equipFinger2`,`equipTrinket1`,`equipTrinket2`,`equipNeck`"
       ") VALUES ", 24, 6, 23 },
+
+    { "`characters_npcbot_transmog` ",
+      "("
+      //0       1      2         3
+      "`entry`,`slot`,`item_id`,`fake_id`"
+      ") VALUES ", 4, 0, 0 },
 
     { "`item_instance` ",
       "("
@@ -123,6 +130,7 @@ inline void FixNULLfields(std::string& line)
 }
 
 std::set<uint32> ExistingNPCBots;
+std::set<uint32> ExistingNPCBotTransmogs;
 
 template<typename T>
 void StringToVal(std::string const& /*line*/, T& /*v*/, size_t /*begin_pos*/, size_t /*end_pos*/)
@@ -462,6 +470,16 @@ BotDataDumpResult NPCBotsDump::LoadDump(std::ifstream& input)
             ExistingNPCBots.insert((*fields).Get<uint32>());
         } while (result->NextRow());
     }
+    //bot transmogs
+    result = CharacterDatabase.Query("SELECT `entry` FROM `characters_npcbot_transmog`");
+    if (result)
+    {
+        fields = result->Fetch();
+        do
+        {
+            ExistingNPCBotTransmogs.insert((*fields).Get<uint32>());
+        } while (result->NextRow());
+    }
     //item guid
     result = CharacterDatabase.Query("SELECT MAX(`guid`) FROM `item_instance`");
     ASSERT(result);
@@ -502,6 +520,7 @@ BotDataDumpResult NPCBotsDump::LoadDump(std::ifstream& input)
             switch (curImportDataTableType)
             {
                 case TABLE_TYPE_CHARACTERS_NPCBOT:
+                case TABLE_TYPE_NPCBOT_TRANSMOG:
                 case TABLE_TYPE_ITEM_INSTANCE:
                 case TABLE_TYPE_CREATURE:
                     curFieldsStr = TableImportDatas[curImportDataTableType].fieldsStr;
@@ -543,6 +562,11 @@ BotDataDumpResult NPCBotsDump::LoadDump(std::ifstream& input)
                     //checkOffset = 0;
                     needCheckVal = true;
                     break;
+                case TABLE_TYPE_NPCBOT_TRANSMOG:
+                    //entry
+                    //checkOffset = 0;
+                    needCheckVal = true;
+                    break;
                 default:
                     break;
             }
@@ -559,6 +583,13 @@ BotDataDumpResult NPCBotsDump::LoadDump(std::ifstream& input)
                     if (ExistingNPCBots.find(checkVal) != ExistingNPCBots.end())
                     {
                         LOG_ERROR("scripts", "import: NPCBot id {} already exists in `characters_npcbot` or `creature` table! Aborting", checkVal);
+                        return BOT_DUMP_FAIL_DATA_OCCUPIED;
+                    }
+                    break;
+                case TABLE_TYPE_NPCBOT_TRANSMOG:
+                    if (ExistingNPCBotTransmogs.find(checkVal) != ExistingNPCBotTransmogs.end())
+                    {
+                        LOG_ERROR("scripts", "import: NPCBot id {} already exists in `characters_npcbot_transmog` table! Aborting", checkVal);
                         return BOT_DUMP_FAIL_DATA_OCCUPIED;
                     }
                     break;
@@ -607,6 +638,7 @@ BotDataDumpResult NPCBotsDump::LoadDump(std::ifstream& input)
         switch (curImportDataTableType)
         {
             case TABLE_TYPE_CHARACTERS_NPCBOT:
+            case TABLE_TYPE_NPCBOT_TRANSMOG:
             case TABLE_TYPE_ITEM_INSTANCE:
                 //TC_LOG_ERROR("scripts", "import: adding to chars DB");
                 ctransStrings.push_back(curExecLine);
@@ -720,6 +752,7 @@ bool NPCBotsDump::GetDump(std::string& dump)
     for (std::set<uint32>::const_iterator ci = valid_ids.begin(); ci != valid_ids.end(); ++ci)
     {
         AppendBotNPCBotData(&trans, *ci);
+        AppendBotNPCBotTransmogData(&trans, *ci);
         AppendBotEquipsData(&trans, *ci);
         AppendBotCreatureData(&trans, *ci);
     }
@@ -814,6 +847,54 @@ void NPCBotsDump::AppendBotNPCBotData(BotStringTransaction* trans, uint32 entry)
         AppendEscapedValue(ss, botData->equips[i], i == BOT_INVENTORY_SIZE-1);
 
     ss << ");\n";
+
+    trans->Append(ss.str());
+}
+
+void NPCBotsDump::AppendBotNPCBotTransmogData(BotStringTransaction* trans, uint32 entry) const
+{
+    NpcBotData const* botData = BotDataMgr::SelectNpcBotData(entry);
+    ASSERT(botData);
+
+    QueryResult tresult = CharacterDatabase.Query("SELECT `entry`,`slot`,`item_id`,`fake_id` FROM `characters_npcbot_transmog` WHERE entry = {}", entry);
+
+    if (!tresult)
+        return;
+
+    std::ostringstream ss;
+    ss << "INSERT INTO " << TableImportDatas[TABLE_TYPE_NPCBOT_TRANSMOG].name << '\n'
+        << TableImportDatas[TABLE_TYPE_NPCBOT_TRANSMOG].fieldsStr << '\n';
+
+    static const uint32 transmog_fields_count = TableImportDatas[TABLE_TYPE_NPCBOT_TRANSMOG].paramsCount;
+
+    while (true)
+    {
+        Field* fields = tresult->Fetch();
+
+        ss << '(';
+
+        for (uint8 i = 0; i != transmog_fields_count; ++i)
+        {
+            bool end = i == transmog_fields_count - 1;
+            switch (i)
+            {
+                case 1:  //slot
+                    AppendEscapedValue(ss, uint32(fields[i].Get<uint8>()), end);
+                    break;
+                default:
+                    AppendEscapedValue(ss,        fields[i].Get<uint32>(), end);
+                    break;
+            }
+        }
+
+        if (tresult->NextRow())
+            ss << "),\n";
+        else
+        {
+            ss << ");\n";
+            break;
+        }
+    }
 
     trans->Append(ss.str());
 }

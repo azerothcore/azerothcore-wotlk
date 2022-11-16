@@ -4310,6 +4310,33 @@ NpcBot.EquipmentDisplay.ShowCloak = 1
 NpcBot.EquipmentDisplay.ShowHelm  = 1
 
 #
+#    NpcBot.Transmog.Enable
+#        Description: Enable transmogrification of bots' equipment.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+NpcBot.Transmog.Enable = 0
+
+#
+#    NpcBot.Transmog.MixArmorClasses
+#    NpcBot.Transmog.MixWeaponClasses
+#    NpcBot.Transmog.MixWeaponInventoryTypes
+#    NpcBot.Transmog.UseEquipmentSlots
+#        Description: Enable different armor/weapon types to be transmogrified from one to another
+#                     (i.e. plate to leather, axe to mace, dagger to polearm).
+#                     'NpcBot.Transmog.UseEquipmentSlots' makes transmog affect equipment slots
+#                     instead of item IDs and forces all other options.
+#        Default:     0 - (NpcBot.Transmog.MixArmorClasses)
+#                     0 - (NpcBot.Transmog.MixWeaponClasses)
+#                     0 - (NpcBot.Transmog.MixWeaponInventoryTypes)
+#                     0 - (NpcBot.Transmog.UseEquipmentSlots)
+
+NpcBot.Transmog.MixArmorClasses = 0
+NpcBot.Transmog.MixWeaponClasses = 0
+NpcBot.Transmog.MixWeaponInventoryTypes = 0
+NpcBot.Transmog.UseEquipmentSlots = 0
+
+#
 #    NpcBot.Gossip.ShowEquipmentListItems
 #        Description: Send whisper message with clickable items list in equipment gossip menu.
 #        Default:     0 - (Disable)

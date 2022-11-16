@@ -757,9 +757,9 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
                     continue;
                 }
 
-                Item const* item = bot->GetBotEquips(slot);
-                if (item)
-                    data << uint32(item->GetTemplate()->DisplayInfoID);
+                uint32 display_id = bot->GetBotAI()->GetEquipDisplayId(slot);
+                if (display_id)
+                    data << uint32(display_id);
                 else
                 {
                     //don't allow to go naked

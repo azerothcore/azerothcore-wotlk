@@ -70,6 +70,11 @@ class BotMgr
         static bool ShowEquippedCloak();
         static bool ShowEquippedHelm();
         static bool SendEquipListItems();
+        static bool IsTransmogEnabled();
+        static bool MixArmorClasses();
+        static bool MixWeaponClasses();
+        static bool MixWeaponInventoryTypes();
+        static bool TransmogUseEquipmentSlots();
         static bool IsClassEnabled(uint8 m_class);
         static bool IsEnrageOnDimissEnabled();
         static bool IsBotStatsLimitsEnabled();

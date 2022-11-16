@@ -41,6 +41,7 @@ class NPCBotsDump
         bool GetDump(std::string& dump);
         BotDataVerificationResult VerifyWriteData(uint32 entry) const;
         void AppendBotNPCBotData(BotStringTransaction* trans, uint32 entry) const;
+        void AppendBotNPCBotTransmogData(BotStringTransaction* trans, uint32 entry) const;
         void AppendBotEquipsData(BotStringTransaction* trans, uint32 entry) const;
         void AppendBotCreatureData(BotStringTransaction* trans, uint32 entry) const;
 

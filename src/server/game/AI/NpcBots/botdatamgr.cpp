@@ -18,9 +18,11 @@ NpcBots DB Data management
 typedef std::unordered_map<uint32 /*entry*/, NpcBotData*> NpcBotDataMap;
 typedef std::unordered_map<uint32 /*entry*/, NpcBotAppearanceData*> NpcBotAppearanceDataMap;
 typedef std::unordered_map<uint32 /*entry*/, NpcBotExtras*> NpcBotExtrasMap;
+typedef std::unordered_map<uint32 /*entry*/, NpcBotTransmogData*> NpcBotTransmogDataMap;
 NpcBotDataMap _botsData;
 NpcBotAppearanceDataMap _botsAppearanceData;
 NpcBotExtrasMap _botsExtras;
+NpcBotTransmogDataMap _botsTransmogData;
 NpcBotRegistry _existingBots;
 
 bool allBotsLoaded = false;
@@ -97,6 +99,33 @@ void BotDataMgr::LoadNpcBots(bool spawn)
     }
     else
         LOG_INFO("server.loading", ">> Bots race data is not loaded. Table `creature_template_npcbot_extras` is empty!");
+
+    //                                              1     2        3
+    result = CharacterDatabase.Query("SELECT entry, slot, item_id, fake_id FROM characters_npcbot_transmog");
+    if (result)
+    {
+        do
+        {
+            field = result->Fetch();
+            index = 0;
+            uint32 entry =          field[  index].Get<uint32>();
+
+            if (_botsTransmogData.count(entry) == 0)
+                _botsTransmogData[entry] = new NpcBotTransmogData();
+
+            //load data
+            uint8 slot =            field[++index].Get<uint8>();
+            uint32 item_id =        field[++index].Get<uint32>();
+            uint32 fake_id =        field[++index].Get<uint32>();
+
+            _botsTransmogData[entry]->transmogs[slot] = { item_id, fake_id };
+
+        } while (result->NextRow());
+
+        LOG_INFO("server.loading", ">> Bot transmog data loaded");
+    }
+    else
+        LOG_INFO("server.loading", ">> Bots transmog data is not loaded. Table `creature_template_npcbot_transmog` is empty!");
 
     //                                       0      1      2      3     4        5          6          7          8          9               10          11          12         13
     result = CharacterDatabase.Query("SELECT entry, owner, roles, spec, faction, equipMhEx, equipOhEx, equipRhEx, equipHead, equipShoulders, equipChest, equipWaist, equipLegs, equipFeet,"
@@ -263,11 +292,20 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
     switch (updateType)
     {
         case NPCBOT_UPDATE_OWNER:
+            if (itr->second->owner == *(uint32*)(data))
+                break;
             itr->second->owner = *(uint32*)(data);
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_OWNER);
             //"UPDATE characters_npcbot SET owner = ? WHERE entry = ?", CONNECTION_ASYNC
             bstmt->SetData(0, itr->second->owner);
             bstmt->SetData(1, entry);
+            CharacterDatabase.Execute(bstmt);
+            //break; //no break: erase transmogs
+        [[fallthrough]];
+        case NPCBOT_UPDATE_TRANSMOG_ERASE:
+            bstmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NPCBOT_TRANSMOG);
+            //"DELETE FROM characters_npcbot_transmog WHERE entry = ?", CONNECTION_ASYNC
+            bstmt->SetData(0, entry);
             CharacterDatabase.Execute(bstmt);
             break;
         case NPCBOT_UPDATE_ROLES:
@@ -417,6 +455,13 @@ void BotDataMgr::UpdateNpcBotDataAll(uint32 playerGuid, NpcBotDataUpdateType upd
             bstmt->SetData(0, *(uint32*)(data));
             bstmt->SetData(1, playerGuid);
             CharacterDatabase.Execute(bstmt);
+            //break; //no break: erase transmogs
+        [[fallthrough]];
+        case NPCBOT_UPDATE_TRANSMOG_ERASE:
+            bstmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NPCBOT_TRANSMOG_ALL);
+            //"DELETE FROM characters_npcbot_transmog WHERE entry IN (SELECT entry FROM characters_npcbot WHERE owner = ?)", CONNECTION_ASYNC
+            bstmt->SetData(0, playerGuid);
+            CharacterDatabase.Execute(bstmt);
             break;
         //case NPCBOT_UPDATE_ROLES:
         //case NPCBOT_UPDATE_FACTION:
@@ -478,6 +523,64 @@ NpcBotExtras const* BotDataMgr::SelectNpcBotExtras(uint32 entry)
 {
     NpcBotExtrasMap::const_iterator itr = _botsExtras.find(entry);
     return itr != _botsExtras.end() ? itr->second : nullptr;
+}
+
+NpcBotTransmogData const* BotDataMgr::SelectNpcBotTransmogs(uint32 entry)
+{
+    NpcBotTransmogDataMap::const_iterator itr = _botsTransmogData.find(entry);
+    return itr != _botsTransmogData.end() ? itr->second : nullptr;
+}
+void BotDataMgr::UpdateNpcBotTransmogData(uint32 entry, uint8 slot, uint32 item_id, uint32 fake_id, bool update_db)
+{
+    ASSERT(slot < BOT_TRANSMOG_INVENTORY_SIZE);
+
+    NpcBotTransmogDataMap::iterator itr = _botsTransmogData.find(entry);
+    if (itr == _botsTransmogData.end())
+        _botsTransmogData[entry] = new NpcBotTransmogData();
+
+    _botsTransmogData[entry]->transmogs[slot] = { item_id, fake_id };
+
+    if (update_db)
+    {
+        CharacterDatabasePreparedStatement* bstmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_NPCBOT_TRANSMOG);
+        //"REPLACE INTO characters_npcbot_transmog (entry, slot, item_id, fake_id) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC
+        bstmt->SetData(0, entry);
+        bstmt->SetData(1, slot);
+        bstmt->SetData(2, item_id);
+        bstmt->SetData(3, fake_id);
+        CharacterDatabase.Execute(bstmt);
+    }
+}
+
+void BotDataMgr::ResetNpcBotTransmogData(uint32 entry, bool update_db)
+{
+    NpcBotTransmogDataMap::iterator itr = _botsTransmogData.find(entry);
+    if (itr == _botsTransmogData.end())
+        return;
+
+    if (update_db)
+    {
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        for (uint8 i = 0; i != BOT_TRANSMOG_INVENTORY_SIZE; ++i)
+        {
+            if (_botsTransmogData[entry]->transmogs[i].first == 0 && _botsTransmogData[entry]->transmogs[i].second == 0)
+                continue;
+
+            CharacterDatabasePreparedStatement* bstmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_NPCBOT_TRANSMOG);
+            //"REPLACE INTO characters_npcbot_transmog (entry, slot, item_id, fake_id) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC
+            bstmt->SetData(0, entry);
+            bstmt->SetData(1, i);
+            bstmt->SetData(2, 0);
+            bstmt->SetData(3, 0);
+            trans->Append(bstmt);
+        }
+
+        if (trans->GetSize() > 0)
+            CharacterDatabase.CommitTransaction(trans);
+    }
+
+    for (uint8 i = 0; i != BOT_TRANSMOG_INVENTORY_SIZE; ++i)
+        _botsTransmogData[entry]->transmogs[i] = { 0, 0 };
 }
 
 void BotDataMgr::RegisterBot(Creature const* bot)

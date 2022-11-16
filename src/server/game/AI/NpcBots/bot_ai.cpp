@@ -514,7 +514,7 @@ void bot_ai::CheckOwnerExpiry()
 
 void bot_ai::InitUnitFlags()
 {
-    if (BotMgr::DisplayEquipment() == true && (_botclass < BOT_CLASS_EX_START || _botclass == BOT_CLASS_ARCHMAGE))
+    if (BotMgr::DisplayEquipment() == true && CanDisplayNonWeaponEquipmentChanges())
     {
         (const_cast<CreatureTemplate*>(me->GetCreatureTemplate()))->unit_flags2 |= UNIT_FLAG2_MIRROR_IMAGE;
         me->ReplaceAllUnitFlags2(UnitFlags2(me->GetCreatureTemplate()->unit_flags2));
@@ -7701,6 +7701,209 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
 
             break;
         }
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_MHAND:     //0 - 1 main hand
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_OHAND:     //1 - 1 off hand
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_RANGED:    //2 - 1 ranged
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_HEAD:      //3 - 1 head
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_SHOULDERS: //4 - 1 shoulders
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_CHEST:     //5 - 1 chest
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_WAIST:     //6 - 1 waist
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_LEGS:      //7 - 1 legs
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_FEET:      //8 - 1 feet
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_WRIST:     //9 - 1 wrist
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_HANDS:     //10 - 1 hands
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_BACK:      //11 - 1 back
+        case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_BODY:      //12 - 1 body
+        {
+            uint8 slot = sender - GOSSIP_SENDER_EQUIP_TRANSMOGRIFY;
+            uint32 itemId = action;
+
+            Item const* item = _equips[slot];
+            ASSERT(item);
+
+            BotDataMgr::UpdateNpcBotTransmogData(me->GetEntry(), slot, item->GetEntry(), itemId);
+
+            if (slot <= BOT_SLOT_RANGED)
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, itemId ? itemId : item->GetEntry());
+
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
+        }
+        case GOSSIP_SENDER_EQUIP_TRANSMOG_INFO:
+        {
+            uint8 slot = action - GOSSIP_ACTION_INFO_DEF;
+
+            NpcBotTransmogData const* tramsmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
+            ASSERT(tramsmogData);
+            ASSERT(tramsmogData->transmogs[slot].second);
+
+            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tramsmogData->transmogs[slot].second);
+            if (proto)
+            {
+                std::ostringstream msg;
+                _AddItemTemplateLink(player, proto, msg);
+
+                BotWhisper(msg.str(), player);
+            }
+
+            //break; //no break here - return to menu
+        }
+        [[fallthrough]];
+        case GOSSIP_SENDER_EQUIP_TRANSMOGS:
+        {
+            subMenu = true;
+
+            uint8 slot = action - GOSSIP_ACTION_INFO_DEF;
+            Item const* item = _equips[slot];
+            ASSERT(item);
+
+            std::set<uint32> itemList, idsList;
+
+            //s5.1: build list
+            //s5.1.1: backpack
+            for (uint8 i = INVENTORY_SLOT_ITEM_START; i != INVENTORY_SLOT_ITEM_END; ++i)
+            {
+                if (Item const* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                {
+                    if (IsValidTransmog(slot, pItem->GetTemplate()) && idsList.find(pItem->GetEntry()) == idsList.end())
+                    {
+                        itemList.insert(pItem->GetGUID().GetCounter());
+                        idsList.insert(pItem->GetEntry());
+                    }
+                }
+            }
+
+            //s5.1.2: other bags
+            for (uint8 i = INVENTORY_SLOT_BAG_START; i != INVENTORY_SLOT_BAG_END; ++i)
+            {
+                if (Bag const* pBag = player->GetBagByPos(i))
+                {
+                    for (uint32 j = 0; j != pBag->GetBagSize(); ++j)
+                    {
+                        if (Item const* pItem = player->GetItemByPos(i, j))
+                        {
+                            if (IsValidTransmog(slot, pItem->GetTemplate()) && idsList.find(pItem->GetEntry()) == idsList.end())
+                            {
+                                itemList.insert(pItem->GetGUID().GetCounter());
+                                idsList.insert(pItem->GetEntry());
+                            }
+                        }
+                    }
+                }
+            }
+
+            //s5.1.3: inventory
+            for (uint8 i = EQUIPMENT_SLOT_START; i != EQUIPMENT_SLOT_END; ++i)
+            {
+                if (Item const* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                {
+                    if (IsValidTransmog(slot, pItem->GetTemplate()) && idsList.find(pItem->GetEntry()) == idsList.end())
+                    {
+                        itemList.insert(pItem->GetGUID().GetCounter());
+                        idsList.insert(pItem->GetEntry());
+                    }
+                }
+            }
+
+            //s5.2: add gossips
+            NpcBotTransmogData const* tramsmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
+            if (tramsmogData && tramsmogData->transmogs[slot].first)
+            {
+                if (tramsmogData->transmogs[slot].second)
+                {
+                    //s5.2.1.1: current
+                    std::ostringstream msg;
+                    if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tramsmogData->transmogs[slot].second))
+                        _AddItemTemplateLink(player, proto, msg);
+                    else
+                        msg << '<' << LocalizedNpcText(player, BOT_TEXT_UNKNOWN) << "(" << tramsmogData->transmogs[slot].second << ")>";
+
+                    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, msg.str(), GOSSIP_SENDER_EQUIP_TRANSMOG_INFO, GOSSIP_ACTION_INFO_DEF + slot);
+
+                    //s5.2.1.2a: reset
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_EQUIP_TRANSMOGRIFY + slot, 0);
+                }
+                else
+                {
+                    //s5.2.1.2b: None
+                    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_EQUIP_TRANSMOGS, action);
+                }
+            }
+
+            if (!itemList.empty())
+            {
+                uint32 counter = 0;
+                uint32 maxcounter = BOT_GOSSIP_MAX_ITEMS - 3; //current, reset, back
+                Item const* item;
+                //s5.2.2: add items as gossip options
+                for (std::set<uint32>::const_iterator itr = itemList.begin(); itr != itemList.end() && counter < maxcounter; ++itr)
+                {
+                    bool found = false;
+                    for (uint8 i = INVENTORY_SLOT_ITEM_START; i != INVENTORY_SLOT_ITEM_END; ++i)
+                    {
+                        item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+                        if (item && item->GetGUID().GetCounter() == (*itr))
+                        {
+                            std::ostringstream name;
+                            _AddItemLink(player, item, name);
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP_TRANSMOGRIFY + slot, item->GetEntry());
+                            ++counter;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found)
+                        continue;
+
+                    for (uint8 i = EQUIPMENT_SLOT_START; i != EQUIPMENT_SLOT_END; ++i)
+                    {
+                        item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+                        if (item && item->GetGUID().GetCounter() == (*itr))
+                        {
+                            std::ostringstream name;
+                            _AddItemLink(player, item, name);
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP_TRANSMOGRIFY + slot, item->GetEntry());
+                            ++counter;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found)
+                        continue;
+
+                    for (uint8 i = INVENTORY_SLOT_BAG_START; i != INVENTORY_SLOT_BAG_END; ++i)
+                    {
+                        if (Bag const* pBag = player->GetBagByPos(i))
+                        {
+                            for (uint32 j = 0; j != pBag->GetBagSize(); ++j)
+                            {
+                                item = player->GetItemByPos(i, j);
+                                if (item && item->GetGUID().GetCounter() == (*itr))
+                                {
+                                    std::ostringstream name;
+                                    _AddItemLink(player, item, name);
+                                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP_TRANSMOGRIFY + slot, item->GetEntry());
+                                    ++counter;
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (found)
+                            break;
+                    }
+
+                    if (found)
+                        continue;
+                }
+            }
+
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 2);
+
+            break;
+        }
         case GOSSIP_SENDER_EQUIPMENT_INFO: //request equip item info
         {
             //GOSSIP ITEMS RESTRICTED
@@ -7802,11 +8005,16 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             str << LocalizedNpcText(player, BOT_TEXT_EQUIPPED) << ": ";
             if (Item const* item = _equips[slot])
             {
+                bool visual_only = slot <= BOT_SLOT_RANGED && einfo->ItemEntry[slot] == item->GetEntry();
+
                 _AddItemLink(player, item, str);
-                if (slot <= BOT_SLOT_RANGED && einfo->ItemEntry[slot] == item->GetEntry())
+                if (visual_only)
                     str << " |cffe6cc80|h[!" << LocalizedNpcText(player, BOT_TEXT_VISUALONLY) << "!]|h|r";
 
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, str.str().c_str(), GOSSIP_SENDER_EQUIPMENT_INFO, action);
+
+                if (!visual_only && BotMgr::DisplayEquipment() && BotMgr::IsTransmogEnabled() && slot < BOT_TRANSMOG_INVENTORY_SIZE && CanDisplayNonWeaponEquipmentChanges())
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_TRANSMOGRIFICATION), GOSSIP_SENDER_EQUIP_TRANSMOGS, action);
             }
             else
             {
@@ -7838,7 +8046,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             else
             {
                 uint32 counter = 0;
-                uint32 maxcounter = BOT_GOSSIP_MAX_ITEMS - 4; //unequip, reset, current, back
+                uint32 maxcounter = BOT_GOSSIP_MAX_ITEMS - 5; //unequip, reset, current, transmog, back
                 Item const* item;
                 //s2.2.3b: add items as gossip options
                 for (std::set<uint32>::const_iterator itr = itemList.begin(); itr != itemList.end() && counter < maxcounter; ++itr)
@@ -7904,7 +8112,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         {
             if (!_unequip(action - GOSSIP_ACTION_INFO_DEF, player->GetGUID().GetCounter()))
             {} //BotWhisper("Impossible...", player);
-            break;
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
         }
         case GOSSIP_SENDER_UNEQUIP_ALL:
         {
@@ -8176,7 +8384,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         case GOSSIP_SENDER_EQUIP_RESET: //equips change s4a: reset equipment
         {
             if (_resetEquipment(action - GOSSIP_ACTION_INFO_DEF, player->GetGUID().GetCounter())){}
-            break;
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
         }
         //equips change s4b: Equip item
         //base is GOSSIP_SENDER_EQUIP + 0...1...2... etc.
@@ -8236,7 +8444,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             }
 
             if (found && _equip(sender - GOSSIP_SENDER_EQUIP, item, player->GetGUID().GetCounter())){}
-            break;
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
         }
         case GOSSIP_SENDER_ROLES_MAIN_TOGGLE: //ROLES 2: set/unset
         {
@@ -10941,7 +11149,13 @@ bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid::LowType receiver)
     if (slot <= BOT_SLOT_RANGED)
     {
         if (CanChangeEquip(slot))
-            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, newItemId);
+        {
+            NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
+            if (einfo->ItemEntry[slot] != newItemId && transmogData && BotMgr::IsTransmogEnabled() && (transmogData->transmogs[slot].first == newItemId || BotMgr::TransmogUseEquipmentSlots()))
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, transmogData->transmogs[slot].second);
+            else
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, newItemId);
+        }
         uint32 delay =
             /*einfo->ItemEntry[slot] != newItemId || */RespectEquipsAttackTime() || slot == BOT_SLOT_OFFHAND ? proto->Delay :
             slot == BOT_SLOT_RANGED ? me->GetCreatureTemplate()->RangeAttackTime : me->GetCreatureTemplate()->BaseAttackTime;
@@ -12288,6 +12502,33 @@ Item* bot_ai::GetEquipsByGuid(ObjectGuid itemGuid) const
     return nullptr;
 }
 
+uint32 bot_ai::GetEquipDisplayId(uint8 slot) const
+{
+    uint32 displayId = 0;
+    if (_equips[slot])
+    {
+        NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
+        if (transmogData && BotMgr::IsTransmogEnabled() &&
+            (_equips[slot]->GetTemplate()->ItemId == transmogData->transmogs[slot].first || BotMgr::TransmogUseEquipmentSlots()))
+        {
+            uint32 item_id = transmogData->transmogs[slot].second;
+            if (ItemTemplate const* proto = item_id ? sObjectMgr->GetItemTemplate(item_id) : nullptr)
+            {
+                displayId = proto->DisplayInfoID;
+            }
+            else if (item_id != 0)
+            {
+                LOG_ERROR("scripts", "bot_ai::GetEquipDisplayId(): ivalid item Id {} for bot {} {} slot {}",
+                    item_id, me->GetEntry(), me->GetName().c_str(), uint32(slot));
+            }
+        }
+        if (!displayId)
+            displayId = _equips[slot]->GetTemplate()->DisplayInfoID;
+    }
+
+    return displayId;
+}
+
 bool bot_ai::UnEquipAll(ObjectGuid::LowType receiver)
 {
     bool suc = true;
@@ -13016,7 +13257,13 @@ void bot_ai::InitEquips()
     for (uint8 i = BOT_SLOT_MAINHAND; i <= BOT_SLOT_RANGED; ++i)
     {
         if (CanChangeEquip(i) && _equips[i])
-            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, _equips[i]->GetEntry());
+        {
+            NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
+            if (einfo->ItemEntry[i] != _equips[i]->GetEntry() && transmogData && BotMgr::IsTransmogEnabled() && (transmogData->transmogs[i].first == _equips[i]->GetEntry() || BotMgr::TransmogUseEquipmentSlots()))
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, transmogData->transmogs[i].second);
+            else
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, _equips[i]->GetEntry());
+        }
         else if (einfo->ItemEntry[i])
             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, einfo->ItemEntry[i]);
     }
@@ -13159,7 +13406,6 @@ bool bot_ai::IAmFree() const
 }
 
 //UTILITIES
-//Unused
 void bot_ai::_AddItemTemplateLink(Player const* forPlayer, ItemTemplate const* item, std::ostringstream &str) const
 {
     //color
@@ -15233,12 +15479,19 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             //debug: restore offhand visual if needed
             if (me->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + BOT_SLOT_OFFHAND) == 0 && _canUseOffHand())
             {
+                int8 id = 1;
+                EquipmentInfo const* einfo = sObjectMgr->GetEquipmentInfo(me->GetEntry(), id);
                 if (CanChangeEquip(BOT_SLOT_OFFHAND) && _equips[BOT_SLOT_OFFHAND])
-                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + BOT_SLOT_OFFHAND, _equips[BOT_SLOT_OFFHAND]->GetEntry());
+                {
+                    NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
+                    if (einfo->ItemEntry[BOT_SLOT_OFFHAND] != _equips[BOT_SLOT_OFFHAND]->GetEntry() &&
+                        transmogData && BotMgr::IsTransmogEnabled() && (transmogData->transmogs[BOT_SLOT_OFFHAND].first == _equips[BOT_SLOT_OFFHAND]->GetEntry() || BotMgr::TransmogUseEquipmentSlots()))
+                        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + BOT_SLOT_OFFHAND, transmogData->transmogs[BOT_SLOT_OFFHAND].second);
+                    else
+                        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + BOT_SLOT_OFFHAND, _equips[BOT_SLOT_OFFHAND]->GetEntry());
+                }
                 else
                 {
-                    int8 id = 1;
-                    EquipmentInfo const* einfo = sObjectMgr->GetEquipmentInfo(me->GetEntry(), id);
                     me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + BOT_SLOT_OFFHAND, einfo->ItemEntry[BOT_SLOT_OFFHAND]);
                 }
             }
@@ -16703,6 +16956,81 @@ bool bot_ai::CanChangeEquip(uint8 slot) const
         _botclass != BOT_CLASS_DARK_RANGER && _botclass != BOT_CLASS_NECROMANCER &&
         _botclass != BOT_CLASS_SEA_WITCH) ||
         slot > BOT_SLOT_RANGED;
+}
+bool bot_ai::CanDisplayNonWeaponEquipmentChanges() const
+{
+    return (_botclass < BOT_CLASS_EX_START || _botclass == BOT_CLASS_ARCHMAGE);
+}
+bool bot_ai::IsValidTransmog(uint8 slot, ItemTemplate const* source) const
+{
+    ASSERT(slot < BOT_TRANSMOG_INVENTORY_SIZE);
+
+    if (!CanChangeEquip(slot))
+        return false;
+
+    Item const* item = _equips[slot];
+    if (!item)
+        return false;
+
+    ItemTemplate const* target = item->GetTemplate();
+
+    if (target->ItemId == source->ItemId)
+        return false;
+    if (target->Class != source->Class)
+        return false;
+
+    switch (target->InventoryType)
+    {
+        case INVTYPE_RELIC:
+        case INVTYPE_NECK:
+        case INVTYPE_FINGER:
+        case INVTYPE_TRINKET:
+        case INVTYPE_THROWN:
+            return false;
+        default:
+            break;
+    }
+    switch (source->InventoryType)
+    {
+        case INVTYPE_RELIC:
+        case INVTYPE_NECK:
+        case INVTYPE_FINGER:
+        case INVTYPE_TRINKET:
+        case INVTYPE_THROWN:
+        case INVTYPE_BAG:
+        case INVTYPE_AMMO:
+        case INVTYPE_QUIVER:
+        case INVTYPE_NON_EQUIP:
+            return false;
+        default:
+            break;
+    }
+
+    if (target->SubClass != source->SubClass)
+    {
+        if (target->Class == ITEM_CLASS_WEAPON && !BotMgr::MixWeaponClasses())
+            return false;
+        if (target->Class == ITEM_CLASS_ARMOR && !BotMgr::MixArmorClasses())
+            return false;
+    }
+
+    if (target->InventoryType != source->InventoryType)
+    {
+        if (target->Class == ITEM_CLASS_ARMOR)
+        {
+            if (!((target->InventoryType == INVTYPE_ROBE || target->InventoryType == INVTYPE_CHEST) &&
+                (source->InventoryType == INVTYPE_ROBE || source->InventoryType == INVTYPE_CHEST)))
+                return false;
+        }
+        if (target->Class == ITEM_CLASS_WEAPON && !BotMgr::MixWeaponInventoryTypes())
+            return false;
+    }
+
+    NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
+    if (transmogData && transmogData->transmogs[slot].second == source->ItemId)
+        return false;
+
+    return true;
 }
 
 //bool bot_ai::OnGossipHello(Player* player)
