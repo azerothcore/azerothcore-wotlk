@@ -547,20 +547,13 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
     }
     else // leave queue
     {
-        for (auto const& playerGuid : ginfo.Players)
-        {
-            auto player = ObjectAccessor::FindConnectedPlayer(playerGuid);
-            if (!player)
-                continue;
+        bgQueue.RemovePlayer(_player->GetGUID(), true);
+        _player->RemoveBattlegroundQueueId(bgQueueTypeId);
 
-            bgQueue.RemovePlayer(playerGuid, true);
-            player->RemoveBattlegroundQueueId(bgQueueTypeId);
+        sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
+        SendPacket(&data);
 
-            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
-            player->SendDirectMessage(&data);
-
-            LOG_DEBUG("bg.battleground", "Battleground: player {} {} left queue for bgtype {}, queue type {}.", player->GetName(), playerGuid.ToString(), bg->GetBgTypeID(), bgQueueTypeId);
-        }
+        LOG_DEBUG("bg.battleground", "Battleground: player {} {} left queue for bgtype {}, queue type {}.", _player->GetName(), _player->GetGUID().ToString(), bg->GetBgTypeID(), bgQueueTypeId);
 
         // player left queue, we should update it - do not update Arena Queue
         if (!ginfo.ArenaType)

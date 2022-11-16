@@ -51,17 +51,17 @@ using Months = std::chrono::duration<__INT64_TYPE__, std::ratio<2629746>>;
 
 #else
 
-/// Days shorthand typedef.
-using Days = std::chrono::days;
+/// To fix fatal error: no type named 'days' in namespace 'std::chrono' 
+using Days = std::chrono::duration<int, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
 
-/// Weeks shorthand typedef.
-using Weeks = std::chrono::weeks;
+/// To fix fatal error: no type named 'weeks' in namespace 'std::chrono'
+using Weeks = std::chrono::duration<int, std::ratio_multiply<std::ratio<7>, Days::period>>;
 
-/// Years shorthand typedef.
-using Years = std::chrono::years;
+/// To fix fatal error: no type named 'years' in namespace 'std::chrono'
+using Years = std::chrono::duration<int, std::ratio_multiply<std::ratio<146097, 400>, Days::period>>;
 
-/// Months shorthand typedef.
-using Months = std::chrono::months;
+/// To fix fatal error: no type named 'months' in namespace 'std::chrono'
+using Months = std::chrono::duration<int, std::ratio_divide<Years::period, std::ratio<12>>>;
 
 #endif // GCC_VERSION
 
