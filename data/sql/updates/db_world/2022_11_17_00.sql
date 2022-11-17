@@ -1,3 +1,4 @@
+-- DB update 2022_11_16_05 -> 2022_11_17_00
 --
 DELETE FROM `creature` WHERE `id1` IN (21846, 21859);
 DELETE FROM `creature` WHERE `id2` IN (21846, 21859);
