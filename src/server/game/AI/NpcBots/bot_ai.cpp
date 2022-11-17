@@ -15456,7 +15456,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         {
             if (master->GetTransport())
             {
-                if (me->GetDistance2d(master) < 20.f && !master->GetTransport()->IsStaticTransport())
+                if (me->GetDistance2d(master) < 20.f)
                 {
                     master->GetTransport()->AddPassenger(me, true);
                     me->m_movementInfo.transport.pos.Relocate(master->GetTransOffset());
@@ -16027,7 +16027,7 @@ bool bot_ai::FinishTeleport(/*uint32 mapId, uint32 instanceId, float x, float y,
     }
 
     me->SetMap(map);
-    if (master->GetTransport() && !master->GetTransport()->IsStaticTransport())
+    if (master->GetTransport())
     {
         master->GetTransport()->AddPassenger(me, true);
         me->m_movementInfo.transport.pos.Relocate(master->GetTransOffset());

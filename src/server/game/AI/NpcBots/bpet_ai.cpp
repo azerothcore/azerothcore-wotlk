@@ -2274,7 +2274,7 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
         {
             if (petOwner->GetBotOwner()->GetTransport())
             {
-                if (me->GetDistance2d(petOwner->GetBotOwner()) < 20.f && !petOwner->GetBotOwner()->GetTransport()->IsStaticTransport())
+                if (me->GetDistance2d(petOwner->GetBotOwner()) < 20.f)
                 {
                     petOwner->GetBotOwner()->GetTransport()->AddPassenger(me, true);
                     me->m_movementInfo.transport.pos.Relocate(petOwner->GetBotOwner()->GetTransOffset());
