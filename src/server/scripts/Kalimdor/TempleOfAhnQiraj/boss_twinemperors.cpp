@@ -359,7 +359,7 @@ struct boss_veklor : public boss_twinemperorsAI
             .Schedule(10s, 15s, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_BLIZZARD, 0, 45.f);
-                context.Repeat(5s, 12s);
+                context.Repeat(10s, 24s);
             })
             .Schedule(1s, [this](TaskContext context)
             {
@@ -367,10 +367,10 @@ struct boss_veklor : public boss_twinemperorsAI
                     DoCastAOE(SPELL_ARCANE_BURST);
                 context.Repeat(7s, 12s);
             })
-            .Schedule(30s, 40s, [this](TaskContext context)
+            .Schedule(30s, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_TWIN_TELEPORT_0);
-                context.Repeat();
+                context.Repeat(30s, 40s);
             })
             .Schedule(5s, [this](TaskContext context)
             {
