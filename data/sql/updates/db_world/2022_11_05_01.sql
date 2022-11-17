@@ -7,6 +7,7 @@ UPDATE `smart_scripts` SET `event_flags` = `event_flags`|1 WHERE `entryorguid` I
 -- Add spawns imported from TC
 DELETE FROM `creature` WHERE `id1` IN (21846, 21859);
 DELETE FROM `creature` WHERE `id2` IN (21846, 21859);
+DELETE FROM `creature` WHERE `guid` BETWEEN @GUID+0 AND @GUID+35;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`) VALUES
 (@GUID+0 , 21846, 21859, 530, 3519, 0, 1, 1, -3780.56, 5215.07, -23.1934, 0.0349066, 7, 0),
 (@GUID+1 , 21846, 21859, 530, 3519, 0, 1, 1, -3777.38, 5184.86, -24.4552, 3.9968, 7, 0),
