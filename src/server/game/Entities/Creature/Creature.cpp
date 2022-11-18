@@ -646,7 +646,7 @@ void Creature::Update(uint32 diff)
                 if (!allowed)                                               // Will be rechecked on next Update call
                     break;
 
-                ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(GetEntry(), m_spawnId);
+                ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
                 time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                 if (!linkedRespawntime)             // Can respawn
                     Respawn();
@@ -1139,14 +1139,14 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
             break;
     }
 
-    LoadCreaturesAddon();
-
     uint32 displayID = GetNativeDisplayId();
     if (sObjectMgr->GetCreatureModelRandomGender(&displayID) && !IsTotem())                               // Cancel load if no model defined or if totem
     {
         SetDisplayId(displayID);
         SetNativeDisplayId(displayID);
     }
+
+    LoadCreaturesAddon();
 
     //! Need to be called after LoadCreaturesAddon - MOVEMENTFLAG_HOVER is set there
     m_positionZ += GetHoverHeight();
@@ -2032,11 +2032,15 @@ void Creature::Respawn(bool force)
         setDeathState(JUST_RESPAWNED);
 
         // MDic - Acidmanifesto
-        uint32 displayID = GetNativeDisplayId();
-        if (sObjectMgr->GetCreatureModelRandomGender(&displayID))                                             // Cancel load if no model defined
+        // Do not override transform auras
+        if (GetAuraEffectsByType(SPELL_AURA_TRANSFORM).empty())
         {
-            SetDisplayId(displayID);
-            SetNativeDisplayId(displayID);
+            uint32 displayID = GetNativeDisplayId();
+            if (sObjectMgr->GetCreatureModelRandomGender(&displayID))                                             // Cancel load if no model defined
+            {
+                SetDisplayId(displayID);
+                SetNativeDisplayId(displayID);
+            }
         }
 
         GetMotionMaster()->InitDefault();
@@ -2157,7 +2161,7 @@ void Creature::LoadSpellTemplateImmunity()
     }
 }
 
-bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo)
+bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
 {
     if (!spellInfo)
         return false;
@@ -2179,7 +2183,7 @@ bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo)
     if (immunedToAllEffects)
         return true;
 
-    return Unit::IsImmunedToSpell(spellInfo);
+    return Unit::IsImmunedToSpell(spellInfo, spell);
 }
 
 bool Creature::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const

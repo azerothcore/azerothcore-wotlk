@@ -49,7 +49,10 @@ enum Events
 
 struct boss_huhuran : public BossAI
 {
-    boss_huhuran(Creature* creature) : BossAI(creature, DATA_HUHURAN) { }
+    boss_huhuran(Creature* creature) : BossAI(creature, DATA_HUHURAN)
+    {
+        me->m_CombatDistance = 90.f;
+    }
 
     void Reset() override
     {
@@ -58,8 +61,9 @@ struct boss_huhuran : public BossAI
         _hardEnrage = false;
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void EnterCombat(Unit* who) override
     {
+        BossAI::EnterCombat(who);
         events.ScheduleEvent(EVENT_FRENZY, 12s, 21s);
         events.ScheduleEvent(EVENT_WYVERN_STING, 25s, 43s);
         events.ScheduleEvent(EVENT_ACID_SPIT, 1s, 20s);
@@ -153,6 +157,7 @@ class spell_huhuran_wyvern_sting : public AuraScript
 };
 
 // 26052 - Poison Bolt
+// 26180 - Wyvern Sting
 class spell_huhuran_poison_bolt : public SpellScript
 {
     PrepareSpellScript(spell_huhuran_poison_bolt);

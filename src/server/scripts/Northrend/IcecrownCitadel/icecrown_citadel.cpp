@@ -1777,7 +1777,7 @@ public:
                 c->NearTeleportTo(myPos.GetPositionX(), myPos.GetPositionY(), myPos.GetPositionZ(), myPos.GetOrientation());
                 const ThreatContainer::StorageType me_tl = me->GetThreatMgr().GetThreatList();
                 const ThreatContainer::StorageType target_tl = c->GetThreatMgr().GetThreatList();
-                DoResetThreat();
+                DoResetThreatList();
                 for (ThreatContainer::StorageType::const_iterator iter = target_tl.begin(); iter != target_tl.end(); ++iter)
                     me->GetThreatMgr().AddThreat((*iter)->getTarget(), (*iter)->GetThreat());
 

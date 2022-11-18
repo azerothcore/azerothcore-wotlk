@@ -898,11 +898,11 @@ SpellProcEntry const* SpellMgr::GetSpellProcEntry(uint32 spellId) const
 bool SpellMgr::CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const
 {
     // proc type doesn't match
-    if (!(eventInfo.GetTypeMask() & procEntry.typeMask))
+    if (!(eventInfo.GetTypeMask() & procEntry.ProcFlags))
         return false;
 
     // check XP or honor target requirement
-    if (procEntry.attributesMask & PROC_ATTR_REQ_EXP_OR_HONOR)
+    if (procEntry.AttributesMask & PROC_ATTR_REQ_EXP_OR_HONOR)
         if (Player* actor = eventInfo.GetActor()->ToPlayer())
             if (eventInfo.GetActionTarget() && !actor->isHonorOrXPTarget(eventInfo.GetActionTarget()))
                 return false;
@@ -912,37 +912,37 @@ bool SpellMgr::CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcE
         return true;
 
     // check school mask (if set) for other trigger types
-    if (procEntry.schoolMask && !(eventInfo.GetSchoolMask() & procEntry.schoolMask))
+    if (procEntry.SchoolMask && !(eventInfo.GetSchoolMask() & procEntry.SchoolMask))
         return false;
 
     // check spell family name/flags (if set) for spells
     if (eventInfo.GetTypeMask() & (PERIODIC_PROC_FLAG_MASK | SPELL_PROC_FLAG_MASK | PROC_FLAG_DONE_TRAP_ACTIVATION))
     {
-        if (procEntry.spellFamilyName && (procEntry.spellFamilyName != eventInfo.GetSpellInfo()->SpellFamilyName))
+        if (procEntry.SpellFamilyName && (procEntry.SpellFamilyName != eventInfo.GetSpellInfo()->SpellFamilyName))
             return false;
 
-        if (procEntry.spellFamilyMask && !(procEntry.spellFamilyMask & eventInfo.GetSpellInfo()->SpellFamilyFlags))
+        if (procEntry.SpellFamilyMask && !(procEntry.SpellFamilyMask & eventInfo.GetSpellInfo()->SpellFamilyFlags))
             return false;
     }
 
     // check spell type mask (if set)
     if (eventInfo.GetTypeMask() & (SPELL_PROC_FLAG_MASK | PERIODIC_PROC_FLAG_MASK))
     {
-        if (procEntry.spellTypeMask && !(eventInfo.GetSpellTypeMask() & procEntry.spellTypeMask))
+        if (procEntry.SpellTypeMask && !(eventInfo.GetSpellTypeMask() & procEntry.SpellTypeMask))
             return false;
     }
 
     // check spell phase mask
     if (eventInfo.GetTypeMask() & REQ_SPELL_PHASE_PROC_FLAG_MASK)
     {
-        if (!(eventInfo.GetSpellPhaseMask() & procEntry.spellPhaseMask))
+        if (!(eventInfo.GetSpellPhaseMask() & procEntry.SpellPhaseMask))
             return false;
     }
 
     // check hit mask (on taken hit or on done hit, but not on spell cast phase)
     if ((eventInfo.GetTypeMask() & TAKEN_HIT_PROC_FLAG_MASK) || ((eventInfo.GetTypeMask() & DONE_HIT_PROC_FLAG_MASK) && !(eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST)))
     {
-        uint32 hitMask = procEntry.hitMask;
+        uint32 hitMask = procEntry.HitMask;
         // get default values if hit mask not set
         if (!hitMask)
         {
@@ -1143,7 +1143,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 if (!player)
                     return false;
 
-                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
+                if (sWorld->getIntConfig(CONFIG_WINTERGRASP_ENABLE) != 1)
                     return false;
 
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
@@ -1833,8 +1833,8 @@ void SpellMgr::LoadSpellProcs()
 
     mSpellProcMap.clear();                             // need for reload case
 
-    //                                                 0        1           2                3                 4                 5                 6         7              8               9        10              11             12      13        14
-    QueryResult result = WorldDatabase.Query("SELECT spellId, schoolMask, spellFamilyName, spellFamilyMask0, spellFamilyMask1, spellFamilyMask2, typeMask, spellTypeMask, spellPhaseMask, hitMask, attributesMask, ratePerMinute, chance, cooldown, charges FROM spell_proc");
+    //                                                 0        1           2                3                 4                 5                 6          7              8              9         10              11             12      13        14
+    QueryResult result = WorldDatabase.Query("SELECT SpellId, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2, ProcFlags, SpellTypeMask, SpellPhaseMask, HitMask, AttributesMask, ProcsPerMinute, Chance, Cooldown, Charges FROM spell_proc");
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 Spell Proc Conditions And Data. DB table `spell_proc` Is Empty.");
@@ -1874,21 +1874,20 @@ void SpellMgr::LoadSpellProcs()
 
         SpellProcEntry baseProcEntry;
 
-        baseProcEntry.schoolMask      = fields[1].Get<int8>();
-        baseProcEntry.spellFamilyName = fields[2].Get<uint16>();
-        baseProcEntry.spellFamilyMask[0] = fields[3].Get<uint32>();
-        baseProcEntry.spellFamilyMask[1] = fields[4].Get<uint32>();
-        baseProcEntry.spellFamilyMask[2] = fields[5].Get<uint32>();
-        baseProcEntry.typeMask        = fields[6].Get<uint32>();
-        baseProcEntry.spellTypeMask   = fields[7].Get<uint32>();
-        baseProcEntry.spellPhaseMask  = fields[8].Get<uint32>();
-        baseProcEntry.hitMask         = fields[9].Get<uint32>();
-        baseProcEntry.attributesMask  = fields[10].Get<uint32>();
-        baseProcEntry.ratePerMinute   = fields[11].Get<float>();
-        baseProcEntry.chance          = fields[12].Get<float>();
-        float cooldown                = fields[13].Get<float>();
-        baseProcEntry.cooldown        = uint32(cooldown);
-        baseProcEntry.charges         = fields[14].Get<uint32>();
+        baseProcEntry.SchoolMask         = fields[1].Get<int8>();
+        baseProcEntry.SpellFamilyName    = fields[2].Get<uint16>();
+        baseProcEntry.SpellFamilyMask[0] = fields[3].Get<uint32>();
+        baseProcEntry.SpellFamilyMask[1] = fields[4].Get<uint32>();
+        baseProcEntry.SpellFamilyMask[2] = fields[5].Get<uint32>();
+        baseProcEntry.ProcFlags          = fields[6].Get<uint32>();
+        baseProcEntry.SpellTypeMask      = fields[7].Get<uint32>();
+        baseProcEntry.SpellPhaseMask     = fields[8].Get<uint32>();
+        baseProcEntry.HitMask            = fields[9].Get<uint32>();
+        baseProcEntry.AttributesMask     = fields[10].Get<uint32>();
+        baseProcEntry.ProcsPerMinute     = fields[11].Get<float>();
+        baseProcEntry.Chance             = fields[12].Get<float>();
+        baseProcEntry.Cooldown           = Milliseconds(fields[13].Get<uint32>());
+        baseProcEntry.Charges            = fields[14].Get<uint32>();
 
         while (spellInfo)
         {
@@ -1900,56 +1899,51 @@ void SpellMgr::LoadSpellProcs()
             SpellProcEntry procEntry = SpellProcEntry(baseProcEntry);
 
             // take defaults from dbcs
-            if (!procEntry.typeMask)
-                procEntry.typeMask = spellInfo->ProcFlags;
-            if (!procEntry.charges)
-                procEntry.charges = spellInfo->ProcCharges;
-            if (!procEntry.chance && !procEntry.ratePerMinute)
-                procEntry.chance = float(spellInfo->ProcChance);
+            if (!procEntry.ProcFlags)
+                procEntry.ProcFlags = spellInfo->ProcFlags;
+            if (!procEntry.Charges)
+                procEntry.Charges = spellInfo->ProcCharges;
+            if (!procEntry.Chance && !procEntry.ProcsPerMinute)
+                procEntry.Chance = float(spellInfo->ProcChance);
 
             // validate data
-            if (procEntry.schoolMask & ~SPELL_SCHOOL_MASK_ALL)
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has wrong `schoolMask` set: {}", spellId, procEntry.schoolMask);
-            if (procEntry.spellFamilyName && (procEntry.spellFamilyName < 3 || procEntry.spellFamilyName > 17 || procEntry.spellFamilyName == 14 || procEntry.spellFamilyName == 16))
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has wrong `spellFamilyName` set: {}", spellId, procEntry.spellFamilyName);
-            if (procEntry.chance < 0)
+            if (procEntry.SchoolMask & ~SPELL_SCHOOL_MASK_ALL)
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has wrong `SchoolMask` set: {}", spellId, procEntry.SchoolMask);
+            if (procEntry.SpellFamilyName && (procEntry.SpellFamilyName < 3 || procEntry.SpellFamilyName > 17 || procEntry.SpellFamilyName == 14 || procEntry.SpellFamilyName == 16))
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has wrong `SpellFamilyName` set: {}", spellId, procEntry.SpellFamilyName);
+            if (procEntry.Chance < 0)
             {
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has negative value in `chance` field", spellId);
-                procEntry.chance = 0;
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has negative value in `Chance` field", spellId);
+                procEntry.Chance = 0;
             }
-            if (procEntry.ratePerMinute < 0)
+            if (procEntry.ProcsPerMinute < 0)
             {
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has negative value in `ratePerMinute` field", spellId);
-                procEntry.ratePerMinute = 0;
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has negative value in `ProcsPerMinute` field", spellId);
+                procEntry.ProcsPerMinute = 0;
             }
-            if (cooldown < 0)
+            if (procEntry.Chance == 0 && procEntry.ProcsPerMinute == 0)
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} doesn't have `Chance` and `ProcsPerMinute` values defined, proc will not be triggered", spellId);
+            if (procEntry.Charges > 99)
             {
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has negative value in `cooldown` field", spellId);
-                procEntry.cooldown = 0;
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has too big value in `Charges` field", spellId);
+                procEntry.Charges = 99;
             }
-            if (procEntry.chance == 0 && procEntry.ratePerMinute == 0)
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} doesn't have `chance` and `ratePerMinute` values defined, proc will not be triggered", spellId);
-            if (procEntry.charges > 99)
-            {
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has too big value in `charges` field", spellId);
-                procEntry.charges = 99;
-            }
-            if (!procEntry.typeMask)
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} doesn't have `typeMask` value defined, proc will not be triggered", spellId);
-            if (procEntry.spellTypeMask & ~PROC_SPELL_TYPE_MASK_ALL)
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has wrong `spellTypeMask` set: {}", spellId, procEntry.spellTypeMask);
-            if (procEntry.spellTypeMask && !(procEntry.typeMask & (SPELL_PROC_FLAG_MASK | PERIODIC_PROC_FLAG_MASK)))
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has `spellTypeMask` value defined, but it won't be used for defined `typeMask` value", spellId);
-            if (!procEntry.spellPhaseMask && procEntry.typeMask & REQ_SPELL_PHASE_PROC_FLAG_MASK)
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} doesn't have `spellPhaseMask` value defined, but it's required for defined `typeMask` value, proc will not be triggered", spellId);
-            if (procEntry.spellPhaseMask & ~PROC_SPELL_PHASE_MASK_ALL)
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has wrong `spellPhaseMask` set: {}", spellId, procEntry.spellPhaseMask);
-            if (procEntry.spellPhaseMask && !(procEntry.typeMask & REQ_SPELL_PHASE_PROC_FLAG_MASK))
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has `spellPhaseMask` value defined, but it won't be used for defined `typeMask` value", spellId);
-            if (procEntry.hitMask & ~PROC_HIT_MASK_ALL)
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has wrong `hitMask` set: {}", spellId, procEntry.hitMask);
-            if (procEntry.hitMask && !(procEntry.typeMask & TAKEN_HIT_PROC_FLAG_MASK || (procEntry.typeMask & DONE_HIT_PROC_FLAG_MASK && (!procEntry.spellPhaseMask || procEntry.spellPhaseMask & (PROC_SPELL_PHASE_HIT | PROC_SPELL_PHASE_FINISH)))))
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for spellId {} has `hitMask` value defined, but it won't be used for defined `typeMask` and `spellPhaseMask` values", spellId);
+            if (!procEntry.ProcFlags)
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} doesn't have `ProcFlags` value defined, proc will not be triggered", spellId);
+            if (procEntry.SpellTypeMask & ~PROC_SPELL_TYPE_MASK_ALL)
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has wrong `SpellTypeMask` set: {}", spellId, procEntry.SpellTypeMask);
+            if (procEntry.SpellTypeMask && !(procEntry.ProcFlags & (SPELL_PROC_FLAG_MASK | PERIODIC_PROC_FLAG_MASK)))
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has `SpellTypeMask` value defined, but it won't be used for defined `ProcFlags` value", spellId);
+            if (!procEntry.SpellPhaseMask && procEntry.ProcFlags & REQ_SPELL_PHASE_PROC_FLAG_MASK)
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} doesn't have `SpellPhaseMask` value defined, but it's required for defined `ProcFlags` value, proc will not be triggered", spellId);
+            if (procEntry.SpellPhaseMask & ~PROC_SPELL_PHASE_MASK_ALL)
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has wrong `SpellPhaseMask` set: {}", spellId, procEntry.SpellPhaseMask);
+            if (procEntry.SpellPhaseMask && !(procEntry.ProcFlags & REQ_SPELL_PHASE_PROC_FLAG_MASK))
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has `SpellPhaseMask` value defined, but it won't be used for defined `ProcFlags` value", spellId);
+            if (procEntry.HitMask & ~PROC_HIT_MASK_ALL)
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has wrong `HitMask` set: {}", spellId, procEntry.HitMask);
+            if (procEntry.HitMask && !(procEntry.ProcFlags & TAKEN_HIT_PROC_FLAG_MASK || (procEntry.ProcFlags & DONE_HIT_PROC_FLAG_MASK && (!procEntry.SpellPhaseMask || procEntry.SpellPhaseMask & (PROC_SPELL_PHASE_HIT | PROC_SPELL_PHASE_FINISH)))))
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has `HitMask` value defined, but it won't be used for defined `ProcFlags` and `SpellPhaseMask` values", spellId);
 
             mSpellProcMap[spellInfo->Id] = procEntry;
 

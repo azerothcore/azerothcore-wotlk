@@ -319,7 +319,7 @@ void Spell::EffectEnvironmentalDMG(SpellEffIndex /*effIndex*/)
         Unit::DealDamageMods(unitTarget, envDamage, &absorb);
         damage = envDamage;
 
-        m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo, damage, m_spellInfo->GetSchoolMask(), absorb, resist, false, 0, false);
+        m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo, damage, m_spellInfo->GetSchoolMask(), absorb, resist, false, 0);
     }
 }
 
@@ -593,8 +593,14 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (Player* caster = m_caster->ToPlayer())
                         {
                             // Add Ammo and Weapon damage plus RAP * 0.1
-                            float dmg_min = caster->GetWeaponDamageRange(RANGED_ATTACK, MINDAMAGE);
-                            float dmg_max = caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE);
+                            float dmg_min = 0.f;
+                            float dmg_max = 0.f;
+                            for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+                            {
+                                dmg_min += caster->GetWeaponDamageRange(RANGED_ATTACK, MINDAMAGE, i);
+                                dmg_max += caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE, i);
+                            }
+
                             if (dmg_max == 0.0f && dmg_min > dmg_max)
                             {
                                 damage += int32(dmg_min);
@@ -616,9 +622,17 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         // Add main hand dps * effect[2] amount
                         if (Player* player = m_caster->ToPlayer())
                         {
-                            float mindamage, maxdamage;
-                            player->CalculateMinMaxDamage(BASE_ATTACK, false, false, mindamage, maxdamage);
-                            float average = (mindamage + maxdamage) / 2;
+                            float minTotal = 0.f;
+                            float maxTotal = 0.f;
+                            for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+                            {
+                                float tmpMin, tmpMax;
+                                player->CalculateMinMaxDamage(BASE_ATTACK, false, false, tmpMin, tmpMax, i);
+                                minTotal += tmpMin;
+                                maxTotal += tmpMax;
+                            }
+
+                            float average = (minTotal + maxTotal) / 2;
                             int32 count = m_caster->CalculateSpellDamage(unitTarget, m_spellInfo, EFFECT_2);
                             damage += count * int32(average * IN_MILLISECONDS) / m_caster->GetAttackTime(BASE_ATTACK);
                         }
@@ -3644,8 +3658,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     uint32 eff_damage(std::max(weaponDamage, 0));
 
     // Add melee damage bonuses (also check for negative)
-    eff_damage = m_caster->MeleeDamageBonusDone(unitTarget, eff_damage, m_attackType, m_spellInfo);
-    eff_damage = unitTarget->MeleeDamageBonusTaken(m_caster, eff_damage, m_attackType, m_spellInfo);
+    eff_damage = m_caster->MeleeDamageBonusDone(unitTarget, eff_damage, m_attackType, m_spellInfo, m_spellSchoolMask);
+    eff_damage = unitTarget->MeleeDamageBonusTaken(m_caster, eff_damage, m_attackType, m_spellInfo, m_spellSchoolMask);
 
     // Meteor like spells (divided damage to targets)
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_SHARE_DAMAGE))
@@ -5515,6 +5529,11 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
         linkedTrap->SetOwnerGUID(m_caster->GetGUID());
 
         ExecuteLogEffectSummonObject(effIndex, linkedTrap);
+    }
+
+    if (Player* player = m_caster->ToPlayer())
+    {
+        player->SetCanTeleport(true);
     }
 }
 

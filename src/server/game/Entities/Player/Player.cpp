@@ -349,6 +349,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_homebindX = 0;
     m_homebindY = 0;
     m_homebindZ = 0;
+    m_homebindO = 0;
 
     m_contestedPvPTimer = 0;
 
@@ -1585,7 +1586,7 @@ bool Player::TeleportToEntryPoint()
 
     if (loc.m_mapId == MAPID_INVALID)
     {
-        return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
+        return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, m_homebindO);
     }
 
     return TeleportTo(loc);
@@ -4853,7 +4854,7 @@ void Player::RepopAtGraveyard()
         }
     }
     else if (GetPositionZ() < GetMap()->GetMinHeight(GetPositionX(), GetPositionY()))
-        TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
+        TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, m_homebindO);
 
     RemovePlayerFlag(PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
 }
@@ -6742,21 +6743,11 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     if (proto->ArcaneRes)
         HandleStatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(proto->ArcaneRes), apply);
 
-    WeaponAttackType attType = BASE_ATTACK;
-
-    if (slot == EQUIPMENT_SLOT_RANGED && (
-                proto->InventoryType == INVTYPE_RANGED || proto->InventoryType == INVTYPE_THROWN ||
-                proto->InventoryType == INVTYPE_RANGEDRIGHT))
+    uint8 attType = Player::GetAttackBySlot(slot);
+    if (attType != MAX_ATTACK)
     {
-        attType = RANGED_ATTACK;
-    }
-    else if (slot == EQUIPMENT_SLOT_OFFHAND)
-    {
-        attType = OFF_ATTACK;
-    }
-
-    if (CanUseAttackType(attType))
         _ApplyWeaponDamage(slot, proto, ssv, apply);
+    }
 
     // Druids get feral AP bonus from weapon dps (also use DPS from ScalingStatValue)
     if (getClass() == CLASS_DRUID)
@@ -6799,45 +6790,56 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
         ssv = ScalingStatValue ? sScalingStatValuesStore.LookupEntry(ssd_level) : nullptr;
     }
 
-    WeaponAttackType attType = BASE_ATTACK;
-    float damage = 0.0f;
-
-    if (slot == EQUIPMENT_SLOT_RANGED && (
-                proto->InventoryType == INVTYPE_RANGED || proto->InventoryType == INVTYPE_THROWN ||
-                proto->InventoryType == INVTYPE_RANGEDRIGHT))
+    uint8 attType = Player::GetAttackBySlot(slot);
+    if (!IsInFeralForm() && apply && !CanUseAttackType(attType))
     {
-        attType = RANGED_ATTACK;
-    }
-    else if (slot == EQUIPMENT_SLOT_OFFHAND)
-    {
-        attType = OFF_ATTACK;
+        return;
     }
 
-    float minDamage = proto->Damage[0].DamageMin;
-    float maxDamage = proto->Damage[0].DamageMax;
-
-    // If set dpsMod in ScalingStatValue use it for min (70% from average), max (130% from average) damage
-    if (ssv)
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
     {
-        int32 extraDPS = ssv->getDPSMod(ScalingStatValue);
-        if (extraDPS)
+        float minDamage = proto->Damage[i].DamageMin;
+        float maxDamage = proto->Damage[i].DamageMax;
+
+        // If set dpsMod in ScalingStatValue use it for min (70% from average), max (130% from average) damage
+        if (ssv)
         {
-            float average = extraDPS * proto->Delay / 1000.0f;
-            minDamage = 0.7f * average;
-            maxDamage = 1.3f * average;
+            int32 extraDPS = ssv->getDPSMod(ScalingStatValue);
+            if (extraDPS)
+            {
+                float average = extraDPS * proto->Delay / 1000.0f;
+                minDamage = 0.7f * average;
+                maxDamage = 1.3f * average;
+            }
+        }
+
+        if (apply)
+        {
+            if (minDamage > 0.f)
+            {
+                SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, minDamage, i);
+            }
+
+            if (maxDamage > 0.f)
+            {
+                SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, maxDamage, i);
+            }
         }
     }
 
-    if (minDamage > 0)
+    if (!apply)
     {
-        damage = apply ? minDamage : BASE_MINDAMAGE;
-        SetBaseWeaponDamage(attType, MINDAMAGE, damage);
-    }
+        for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+        {
+            SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, 0.f, i);
+            SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, 0.f, i);
+        }
 
-    if (maxDamage  > 0)
-    {
-        damage = apply ? maxDamage : BASE_MAXDAMAGE;
-        SetBaseWeaponDamage(attType, MAXDAMAGE, damage);
+        if (attType == BASE_ATTACK)
+        {
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, BASE_MINDAMAGE);
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, BASE_MAXDAMAGE);
+        }
     }
 
     if (proto->Delay && !IsInFeralForm())
@@ -6854,8 +6856,18 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
     if (IsInFeralForm())
         return;
 
-    if (CanModifyStats() && (damage || proto->Delay))
-        UpdateDamagePhysical(attType);
+    if (CanModifyStats() && (GetWeaponDamageRange(WeaponAttackType(attType), MAXDAMAGE) || proto->Delay))
+        UpdateDamagePhysical(WeaponAttackType(attType));
+}
+
+SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*= BASE_ATTACK*/, uint8 damageIndex /*= 0*/) const
+{
+    if (Item const* weapon = GetWeaponForAttack(attackType, true))
+    {
+        return SpellSchoolMask(1 << weapon->GetTemplate()->Damage[damageIndex].DamageType);
+    }
+
+    return SPELL_SCHOOL_MASK_NORMAL;
 }
 
 void Player::_ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply)
@@ -8688,7 +8700,7 @@ void Player::SendBGWeekendWorldStates()
 void Player::SendBattlefieldWorldStates()
 {
     /// Send misc stuff that needs to be sent on every login, like the battle timers.
-    if (sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
+    if (sWorld->getIntConfig(CONFIG_WINTERGRASP_ENABLE) == 1)
     {
         if (BattlefieldWG* wg = (BattlefieldWG*)sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
         {
@@ -11045,7 +11057,7 @@ void Player::SetEntryPoint()
     }
 
     if (m_entryPointData.joinPos.m_mapId == MAPID_INVALID)
-        m_entryPointData.joinPos = WorldLocation(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, 0.0f);
+        m_entryPointData.joinPos = WorldLocation(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, m_homebindO);
 }
 
 void Player::LeaveBattleground(Battleground* bg)
@@ -13306,14 +13318,21 @@ uint32 Player::CalculateTalentsPoints() const
 {
     uint32 base_talent = getLevel() < 10 ? 0 : getLevel() - 9;
 
+    uint32 talentPointsForLevel = 0;
     if (getClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
-        return uint32(base_talent * sWorld->getRate(RATE_TALENT));
-
-    uint32 talentPointsForLevel = getLevel() < 56 ? 0 : getLevel() - 55;
-    talentPointsForLevel += m_questRewardTalentCount;
-
-    if (talentPointsForLevel > base_talent)
+    {
         talentPointsForLevel = base_talent;
+    }
+    else
+    {
+        talentPointsForLevel = getLevel() < 56 ? 0 : getLevel() - 55;
+        talentPointsForLevel += m_questRewardTalentCount;
+
+        if (talentPointsForLevel > base_talent)
+        {
+            talentPointsForLevel = base_talent;
+        }
+    }
 
     talentPointsForLevel += m_extraBonusTalentCount;
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
@@ -13611,16 +13630,23 @@ void Player::CompletedAchievement(AchievementEntry const* entry)
     m_achievementMgr->CompletedAchievement(entry);
 }
 
-void Player::LearnTalent(uint32 talentId, uint32 talentRank)
+void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= false*/)
 {
     uint32 CurTalentPoints = GetFreeTalentPoints();
 
-    // xinef: check basic data
-    if (CurTalentPoints == 0)
-        return;
+    if (!command)
+    {
+        // xinef: check basic data
+        if (!CurTalentPoints)
+        {
+            return;
+        }
 
-    if (talentRank >= MAX_TALENT_RANK)
-        return;
+        if (talentRank >= MAX_TALENT_RANK)
+        {
+            return;
+        }
+    }
 
     TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
     if (!talentInfo)
@@ -13649,10 +13675,15 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     if (currentTalentRank >= talentRank + 1)
         return;
 
-    // xinef: check if we have enough free talent points
     uint32 talentPointsChange = (talentRank - currentTalentRank + 1);
-    if (CurTalentPoints < talentPointsChange)
-        return;
+    if (!command)
+    {
+        // xinef: check if we have enough free talent points
+        if (CurTalentPoints < talentPointsChange)
+        {
+            return;
+        }
+    }
 
     // xinef: check if talent deponds on another talent
     if (talentInfo->DependsOn > 0)
@@ -13674,23 +13705,26 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
                 return;
         }
 
-    // xinef: check amount of points spent in current talent tree
-    // xinef: be smart and quick
-    uint32 spentPoints = 0;
-    if (talentInfo->Row > 0)
+    if (!command)
     {
-        const PlayerTalentMap& talentMap = GetTalentMap();
-        for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
-            if (TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first))
-                if (TalentEntry const* itrTalentInfo = sTalentStore.LookupEntry(talentPos->talent_id))
-                    if (itrTalentInfo->TalentTab == talentInfo->TalentTab)
-                        if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(GetActiveSpec())) // pussywizard
-                            spentPoints += talentPos->rank + 1;
-    }
+        // xinef: check amount of points spent in current talent tree
+        // xinef: be smart and quick
+        uint32 spentPoints = 0;
+        if (talentInfo->Row > 0)
+        {
+            const PlayerTalentMap& talentMap = GetTalentMap();
+            for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
+                if (TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first))
+                    if (TalentEntry const* itrTalentInfo = sTalentStore.LookupEntry(talentPos->talent_id))
+                        if (itrTalentInfo->TalentTab == talentInfo->TalentTab)
+                            if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(GetActiveSpec())) // pussywizard
+                                spentPoints += talentPos->rank + 1;
+        }
 
-    // xinef: we do not have enough talent points to add talent of this tier
-    if (spentPoints < (talentInfo->Row * MAX_TALENT_RANK))
-        return;
+        // xinef: we do not have enough talent points to add talent of this tier
+        if (spentPoints < (talentInfo->Row * MAX_TALENT_RANK))
+            return;
+    }
 
     // xinef: hacking attempt, tries to learn unknown rank
     uint32 spellId = talentInfo->RankID[talentRank];
@@ -13723,7 +13757,11 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
 
     // xinef: update free talent points count
     m_usedTalentCount += talentPointsChange;
-    SetFreeTalentPoints(CurTalentPoints - talentPointsChange);
+
+    if (!command)
+    {
+        SetFreeTalentPoints(CurTalentPoints - talentPointsChange);
+    }
 
     sScriptMgr->OnPlayerLearnTalents(this, talentId, talentRank, spellId);
 }

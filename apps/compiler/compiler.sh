@@ -29,6 +29,7 @@ comp_options=(
     "compile: Compile only"
     "all: clean, configure and compile"
     "ccacheClean: Clean ccache files, normally not needed"
+    "ccacheShowStats: show ccache statistics"
     "quit: Close this menu")
 comp_functions=(
     "comp_build"
@@ -37,6 +38,7 @@ comp_functions=(
     "comp_compile"
     "comp_all"
     "comp_ccacheClean"
+    "comp_ccacheShowStats"
     "comp_quit")
 
 PS3='[ Please enter your choice ]: '
