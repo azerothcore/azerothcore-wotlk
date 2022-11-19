@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.group_member
 DROP TABLE IF EXISTS `group_member`;
 CREATE TABLE IF NOT EXISTS `group_member` (
-  `guid` INT unsigned NOT NULL,
-  `memberGuid` INT unsigned NOT NULL,
-  `memberFlags` TINYINT unsigned NOT NULL DEFAULT 0,
-  `subgroup` TINYINT unsigned NOT NULL DEFAULT 0,
-  `roles` TINYINT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL,
+  `memberGuid` int unsigned NOT NULL,
+  `memberFlags` tinyint unsigned NOT NULL DEFAULT '0',
+  `subgroup` tinyint unsigned NOT NULL DEFAULT '0',
+  `roles` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`memberGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Groups';
 

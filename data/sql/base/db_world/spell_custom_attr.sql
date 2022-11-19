@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.spell_custom_attr
 DROP TABLE IF EXISTS `spell_custom_attr`;
 CREATE TABLE IF NOT EXISTS `spell_custom_attr` (
-  `spell_id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'spell id',
-  `attributes` INT unsigned NOT NULL DEFAULT 0 COMMENT 'SpellCustomAttributes',
+  `spell_id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'spell id',
+  `attributes` int unsigned NOT NULL DEFAULT '0' COMMENT 'SpellCustomAttributes',
   PRIMARY KEY (`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='SpellInfo custom attributes';
 
--- Dumpar data för tabell acore_world.spell_custom_attr: 263 rows
+-- Dumpar data för tabell acore_world.spell_custom_attr: 264 rows
 DELETE FROM `spell_custom_attr`;
 /*!40000 ALTER TABLE `spell_custom_attr` DISABLE KEYS */;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
@@ -286,7 +286,8 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(22285, 2048),
 	(22286, 2048),
 	(22287, 2048),
-	(22288, 2048);
+	(22288, 2048),
+	(5255, 32768);
 /*!40000 ALTER TABLE `spell_custom_attr` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

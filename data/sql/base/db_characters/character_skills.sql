@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.character_skills
 DROP TABLE IF EXISTS `character_skills`;
 CREATE TABLE IF NOT EXISTS `character_skills` (
-  `guid` INT unsigned NOT NULL COMMENT 'Global Unique Identifier',
-  `skill` SMALLINT unsigned NOT NULL,
-  `value` SMALLINT unsigned NOT NULL,
-  `max` SMALLINT unsigned NOT NULL,
+  `guid` int unsigned NOT NULL COMMENT 'Global Unique Identifier',
+  `skill` smallint unsigned NOT NULL,
+  `value` smallint unsigned NOT NULL,
+  `max` smallint unsigned NOT NULL,
   PRIMARY KEY (`guid`,`skill`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 

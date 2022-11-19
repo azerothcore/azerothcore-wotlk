@@ -4,7 +4,7 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['labeled', 'labeled', 'opened', 'synchronize', 'reopened']
+    types: ['labeled', 'opened', 'synchronize', 'reopened']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -21,10 +21,6 @@ jobs:
             compiler: clang12
           - os: ubuntu-20.04
             compiler: clang11
-          - os: ubuntu-18.04
-            compiler: clang10
-          - os: ubuntu-18.04
-            compiler: gcc8
           - os: ubuntu-20.04
             compiler: gcc # default in 20.04 is gcc 9
           - os: ubuntu-20.04
@@ -33,7 +29,16 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.compiler }}
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'file-cpp') || github.event.label.name == 'file-cpp' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
+    if: |
+      github.repository == 'azerothcore/azerothcore-wotlk'
+      && !github.event.pull_request.draft
+      && (
+        github.ref == 'refs/heads/master'
+        || contains(github.event.pull_request.labels.*.name, 'file-cpp'
+        || github.event.label.name == 'file-cpp'
+        || contains(github.event.pull_request.labels.*.name, 'run-build')
+        || github.event.label.name == 'run-build')
+      )
     steps:
       - uses: actions/checkout@v2
       - name: Cache
@@ -54,7 +59,9 @@ jobs:
         run: bash bin/acore-db-pendings
       - name: Build
         run: source ./apps/ci/ci-compile.sh
-      - name: Dry run
+      - name: Dry run authserver
+        run: source ./apps/ci/ci-dry-run.sh authserver
+      - name: Dry run worldserver
         run: source ./apps/ci/ci-dry-run.sh worldserver
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh

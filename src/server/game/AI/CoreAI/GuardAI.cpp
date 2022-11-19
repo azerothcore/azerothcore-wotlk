@@ -19,10 +19,10 @@
 #include "CreatureAIImpl.h"
 #include "Player.h"
 
-int GuardAI::Permissible(Creature const* creature)
+int32 GuardAI::Permissible(Creature const* creature)
 {
     if (creature->IsGuard())
-        return PERMIT_BASE_SPECIAL;
+        return PERMIT_BASE_PROACTIVE;
 
     return PERMIT_BASE_NO;
 }

@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_world.item_enchantment_template
 DROP TABLE IF EXISTS `item_enchantment_template`;
 CREATE TABLE IF NOT EXISTS `item_enchantment_template` (
-  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `ench` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `chance` float NOT NULL DEFAULT 0,
+  `entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `ench` mediumint unsigned NOT NULL DEFAULT '0',
+  `chance` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`,`ench`),
   CONSTRAINT `item_enchantment_template_chk_1` CHECK ((`chance` >= 0))
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Item Random Enchantment System';

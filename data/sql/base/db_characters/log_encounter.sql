@@ -16,10 +16,10 @@
 DROP TABLE IF EXISTS `log_encounter`;
 CREATE TABLE IF NOT EXISTS `log_encounter` (
   `time` datetime NOT NULL,
-  `map` SMALLINT unsigned NOT NULL,
-  `difficulty` TINYINT unsigned NOT NULL,
-  `creditType` TINYINT unsigned NOT NULL,
-  `creditEntry` INT unsigned NOT NULL,
+  `map` smallint unsigned NOT NULL,
+  `difficulty` tinyint unsigned NOT NULL,
+  `creditType` tinyint unsigned NOT NULL,
+  `creditEntry` int unsigned NOT NULL,
   `playersInfo` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

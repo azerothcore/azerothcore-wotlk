@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_characters.character_talent
 DROP TABLE IF EXISTS `character_talent`;
 CREATE TABLE IF NOT EXISTS `character_talent` (
-  `guid` INT unsigned NOT NULL,
-  `spell` MEDIUMINT unsigned NOT NULL,
-  `specMask` TINYINT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL,
+  `spell` mediumint unsigned NOT NULL,
+  `specMask` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

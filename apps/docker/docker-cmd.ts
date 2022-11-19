@@ -3,15 +3,18 @@ import * as ink from "https://deno.land/x/ink/mod.ts";
 import {
   Input,
   Select,
-} from "https://deno.land/x/cliffy@v0.18.2/prompt/mod.ts";
+} from "https://deno.land/x/cliffy@v0.25.2/prompt/mod.ts";
+import * as semver from "https://deno.land/std@0.159.0/semver/mod.ts";
 
 const program = new Command();
 
 const env = {
   COMPOSE_DOCKER_CLI_BUILD: "1",
   DOCKER_BUILDKIT: "1",
-  BUILDKIT_INLINE_CACHE: "1",
+  // BUILDKIT_INLINE_CACHE: "1",
 };
+
+const MIN_COMPOSE_VERSION = "2.0.0";
 
 program
   .name("acore.sh docker")
@@ -21,43 +24,47 @@ program
 shellCommandFactory(
   "start:app",
   "Startup the authserver and worldserver apps",
-  ["docker-compose --profile app up"],
-  env,
+  ["docker compose --profile app up"],
+  env
 );
 
 shellCommandFactory(
   "start:app:d",
   "Startup the authserver and worldserver apps in detached mode",
-  ["docker-compose --profile app up -d"],
-  env,
+  ["docker compose --profile app up -d"],
+  env
 );
 
-shellCommandFactory("build", "Build the authserver and worldserver", [
-  "docker-compose --profile local build --parallel",
-  "docker image prune -f",
-  "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
-], env);
+shellCommandFactory(
+  "build",
+  "Build the authserver and worldserver",
+  [
+    "docker compose --profile local --profile dev --profile dev-build build --parallel",
+    "docker image prune -f",
+    "docker compose run --rm --no-deps ac-dev-build bash apps/docker/docker-build-dev.sh",
+  ],
+  env
+);
+
+shellCommandFactory(
+  "pull",
+  "Pull build and local images",
+  [
+    "docker compose --profile local --profile dev --profile dev-build pull --parallel",
+    "docker image prune -f",
+  ],
+  env
+);
 
 shellCommandFactory(
   "build:nocache",
   "Build the authserver and worldserver without docker cache",
   [
-    "docker-compose --profile local build --no-cache --parallel",
+    "docker compose --profile local --profile dev --profile dev-build build --no-cache --parallel",
     "docker image prune -f",
-    "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
+    "docker compose run --rm --no-deps ac-dev-build bash apps/docker/docker-build-dev.sh",
   ],
-  env,
-);
-
-shellCommandFactory(
-  "build:compile",
-  "Run the compilation process only, without rebuilding all docker images and importing db",
-  [
-    "docker-compose build --parallel ac-build",
-    "docker image prune -f",
-    "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh 0",
-  ],
-  env,
+  env
 );
 
 shellCommandFactory(
@@ -65,85 +72,76 @@ shellCommandFactory(
   "Clean build files",
   [
     "docker image prune -f",
-    `docker-compose run --rm ac-build bash acore.sh compiler clean`,
+    `docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler clean`,
+    `docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler ccacheClean`,
   ],
-  env,
+  env
 );
 
 shellCommandFactory(
   "client-data",
   "Download client data inside the ac-data volume",
-  ["docker-compose run --rm ac-build bash acore.sh client-data"],
-  env,
-);
-
-shellCommandFactory(
-  "db-import",
-  "Create and upgrade the database with latest updates",
-  ["docker-compose run --rm ac-build bash acore.sh db-assembler import-all"],
-  env,
+  ["docker compose run --rm --no-deps ac-dev-server bash acore.sh client-data"],
+  env
 );
 
 shellCommandFactory(
   "dev:up",
   "Start the dev server container in background",
-  ["docker-compose up -d ac-dev-server"],
-  env,
+  ["docker compose up -d ac-dev-server"],
+  env
 );
 
 shellCommandFactory(
   "dev:build",
-  "Build using the dev server, it uses volumes to compile which can be faster on linux & WSL",
-  ["docker-compose run --rm ac-dev-server bash acore.sh compiler build"],
-  env,
+  "Build using the dev server",
+  ["docker compose run --rm ac-dev-server bash acore.sh compiler build"],
+  env
 );
 
 shellCommandFactory(
   "dev:dash [args...]",
   "Execute acore dashboard within a running ac-dev-server",
-  ["docker-compose run --rm ac-dev-server bash acore.sh"],
-  env,
+  ["docker compose run --rm ac-dev-server bash acore.sh"],
+  env
 );
 
 shellCommandFactory(
   "dev:shell [args...]",
   "Open an interactive shell within the dev server",
   [
-    "docker-compose up -d ac-dev-server",
-    "docker-compose exec ac-dev-server bash",
+    "docker compose up -d ac-dev-server",
+    "docker compose exec ac-dev-server bash",
   ],
-  env,
+  env
 );
 
 shellCommandFactory(
   "prod:build",
-  "Build producion services",
-  [
-    "docker-compose --profile prod build --parallel",
-    "docker image prune -f",
-  ],
-  env,
+  "[TEST ONLY] Build producion services",
+  ["docker compose --profile prod build --parallel", "docker image prune -f"],
+  env
 );
 
 shellCommandFactory(
   "prod:pull",
-  "Pull production services from the remote registry",
-  ["docker-compose --profile prod pull"],
-  env,
+  "[TEST ONLY] Pull production services from the remote registry",
+  ["docker compose --profile prod pull"],
+  env
 );
 
 shellCommandFactory(
   "prod:up",
-  "Start production services (foreground)",
-  ["docker-compose --profile prod-app up"],
-  env,
+  "[TEST ONLY] Start production services (foreground)",
+  ["docker compose --profile prod-app up"],
+  env
 );
 
 shellCommandFactory(
   "prod:up:d",
-  "Start production services (background)",
-  ["docker-compose --profile prod-app up -d"],
-  env,
+  "[TEST ONLY] Start production services (background)",
+  ["docker compose --profile prod-app up -d"],
+  env
 );
 
 program
@@ -152,7 +150,7 @@ program
   .action(async (service: string | undefined) => {
     const { run } = Deno;
 
-    let command = `docker-compose ps`;
+    let command = `docker compose ps`;
 
     if (service) {
       command = `${command} ${service}`;
@@ -178,7 +176,7 @@ program
     }
 
     services.pop();
-    services = services.slice(2);
+    services = services.slice(1);
 
     res.close(); // Don't forget to close it
 
@@ -203,8 +201,8 @@ program
 
     console.log(
       ink.colorize(
-        "<yellow>NOTE: you can detach from a container and leave it running using the CTRL-p CTRL-q key sequence.</yellow>",
-      ),
+        "<yellow>NOTE: you can detach from a container and leave it running using the CTRL-p CTRL-q key sequence.</yellow>"
+      )
     );
 
     cmd = command.split(" ");
@@ -226,22 +224,6 @@ program
     process.exit(0);
   });
 
-// Handle it however you like
-// e.g. display usage
-while (true) {
-  if (Deno.args.length === 0) {
-    program.outputHelp();
-    const command = await Input.prompt({
-      message: "Enter the command:",
-    });
-    console.log(command);
-    await program.parseAsync(command.split(" "));
-  } else {
-    await program.parseAsync(Deno.args);
-    process.exit(0);
-  }
-}
-
 /**
  *
  * @param name
@@ -253,24 +235,20 @@ function shellCommandFactory(
   name: string,
   description: string,
   commands: string[],
-  env?: { [key: string]: string },
+  env?: { [key: string]: string }
 ): Command {
   return program
     .command(name)
     .description(
-      `${description}. Command: \n"${
-        ink.colorize(
-          `<green>${commands.join(" && ")}</green>`,
-        )
-      }"\n`,
+      `${description}. Command: \n"${ink.colorize(
+        `<green>${commands.join(" && ")}</green>`
+      )}"\n`
     )
     .action(async (args: string[] | undefined) => {
       const { run } = Deno;
 
       for (const command of commands) {
-        console.log(
-          ink.colorize(`<green>>>>>> Running: ${command}</green>`),
-        );
+        console.log(ink.colorize(`<green>>>>>> Running: ${command}</green>`));
 
         const cmd = command.split(" ");
 
@@ -288,11 +266,65 @@ function shellCommandFactory(
 
         if (!status.success) {
           throw new Error(`Failed with error: ${status.code}, however,
-            it's not related to this Deno script directly. An error occurred within
-            the script called by the command itself`);
+          it's not related to this Deno script directly. An error occurred within
+          the script called by the command itself`);
         }
 
         shellCmd.close();
       }
     });
 }
+
+async function checkDockerVersion() {
+  const { run } = Deno;
+  const dockerVerCmd = run({
+    cmd: ["docker", "compose", "version"],
+    cwd: process.cwd(),
+    env: { ...process.env, ...env },
+    stdout: "piped",
+  });
+
+  const output = await dockerVerCmd.output();
+  const status = await dockerVerCmd.status();
+  const outStr = new TextDecoder().decode(output);
+
+  if (!status.success) {
+    return 'not installed?'
+  }
+
+  const version = outStr.split(" ").pop()?.trim();
+
+  if (!version) return version;
+
+  if (!semver.gte(version, MIN_COMPOSE_VERSION)) {
+    return version;
+  }
+
+  return true;
+}
+
+async function main() {
+  while (true) {
+    const version = await checkDockerVersion();
+    if (version !== true) {
+      console.error(
+        ink.colorize(`<red>ERROR: Your docker compose version (${version}) must be higher or equal to ${MIN_COMPOSE_VERSION}. Please install the new version of docker compose and try again</red>`)
+      );
+      return false
+    }
+
+    if (Deno.args.length === 0) {
+      program.outputHelp();
+      const command = await Input.prompt({
+        message: "Enter the command:",
+      });
+      console.log(command);
+      await program.parseAsync(command.split(" "));
+    } else {
+      await program.parseAsync(Deno.args);
+      process.exit(0);
+    }
+  }
+}
+
+main();

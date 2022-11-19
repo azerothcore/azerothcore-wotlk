@@ -286,7 +286,7 @@ public:
             if (_chargeTarget.first == hatedUnit->GetGUID())
             {
                 // Do not count DOTs/HOTs
-                if (!threatSpell || !threatSpell->HasAttribute(SPELL_ATTR0_CU_NO_INITIAL_THREAT))
+                if (!(threatSpell && (threatSpell->HasAura(SPELL_AURA_DAMAGE_SHIELD) || threatSpell->HasAttribute(SPELL_ATTR0_CU_NO_INITIAL_THREAT))))
                 {
                     _chargeTarget.second += threat;
                 }
@@ -311,6 +311,12 @@ public:
                     events.CancelEvent(EVENT_EXECUTE);
                 }
             }
+        }
+
+        bool OnTeleportUnreacheablePlayer(Player* player) override
+        {
+            DoCast(player, SPELL_SUMMON_PLAYER, true);
+            return true;
         }
 
         void DoMeleeAttackIfReady(bool ignoreCasting)
@@ -375,6 +381,7 @@ public:
                                 break;
                             case EVENT_STARTED:
                                 me->SetImmuneToAll(false);
+                                me->SetInCombatWithZone();
                                 break;
                             default:
                                 break;
@@ -450,7 +457,7 @@ public:
                             events.DelayEvents(1500);
                             if (Unit* mainTarget = SelectTarget(SelectTargetMethod::MaxThreat, 0, 100.0f))
                             {
-                                me->GetThreatMgr().modifyThreatPercent(mainTarget, -100);
+                                me->GetThreatMgr().ModifyThreatByPercent(mainTarget, -100);
                             }
                         }
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
@@ -462,8 +469,8 @@ public:
                     case EVENT_CLEAVE:
                         {
                             std::list<Unit*> meleeRangeTargets;
-                            auto i = me->GetThreatMgr().getThreatList().begin();
-                            for (; i != me->GetThreatMgr().getThreatList().end(); ++i)
+                            auto i = me->GetThreatMgr().GetThreatList().begin();
+                            for (; i != me->GetThreatMgr().GetThreatList().end(); ++i)
                             {
                                 Unit* target = (*i)->getTarget();
                                 if (me->IsWithinMeleeRange(target))
@@ -507,7 +514,7 @@ public:
 enum OhganSpells
 {
     SPELL_SUNDERARMOR         = 24317,
-    SPELL_THRASH              = 3417 // Triggers 3391
+    SPELL_THRASH              = 3391
 };
 
 class npc_ohgan : public CreatureScript
@@ -521,7 +528,6 @@ public:
 
         void Reset() override
         {
-            me->AddAura(SPELL_THRASH, me);
             _scheduler.CancelAll();
             _scheduler.SetValidator([this]
             {
@@ -540,6 +546,11 @@ public:
             {
                 DoCastVictim(SPELL_SUNDERARMOR);
                 context.Repeat(6s, 12s);
+            });
+            _scheduler.Schedule(12s, 18s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_THRASH);
+                context.Repeat(12s, 18s);
             });
         }
 
@@ -713,11 +724,14 @@ public:
             {
                 if (Unit* target = GetTarget())
                 {
-                    if (Creature* caster = GetCaster()->ToCreature())
+                    if (Unit* caster = GetCaster())
                     {
-                        if (caster->IsAIEnabled)
+                        if (Creature* cCaster = caster->ToCreature())
                         {
-                            caster->AI()->SetGUID(target->GetGUID(), ACTION_CHARGE);
+                            if (cCaster->IsAIEnabled)
+                            {
+                                cCaster->AI()->SetGUID(target->GetGUID(), ACTION_CHARGE);
+                            }
                         }
                     }
                 }

@@ -164,7 +164,7 @@ public:
     ObjectGuid GetGUID(int32 id = 0) const override;
 
     //core related
-    static int32 Permissible(Creature const*);
+    static int32 Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
 
     // Called at movepoint reached
     void MovepointReached(uint32 id);
@@ -259,7 +259,7 @@ public:
     void InitializeAI() override;
     void Reset() override;
     SmartScript* GetScript() { return &mScript; }
-    static int32 Permissible(GameObject const* g);
+    static int32 Permissible(GameObject const* /*go*/) { return PERMIT_BASE_NO; }
 
     bool GossipHello(Player* player, bool reportUse) override;
     bool GossipSelect(Player* player, uint32 sender, uint32 action) override;

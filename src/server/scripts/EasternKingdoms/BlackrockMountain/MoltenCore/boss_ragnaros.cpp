@@ -236,7 +236,7 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            if (!me->GetThreatMgr().getThreatList().empty())
+            if (!me->GetThreatMgr().GetThreatList().empty())
             {
                 if (!_processingMagmaBurst)
                 {
@@ -411,7 +411,7 @@ public:
                         me->SetReactState(REACT_PASSIVE);
                         me->InterruptNonMeleeSpells(false);
                         me->AttackStop();
-                        DoResetThreat();
+                        DoResetThreatList();
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
                         DoCastSelf(SPELL_RAGNA_SUBMERGE_VISUAL, true);

@@ -679,7 +679,7 @@ struct boss_nefarian : public BossAI
                 case EVENT_CLASSCALL:
                     if (classesPresent.empty())
                     {
-                        for (auto& ref : me->GetThreatMgr().getThreatList())
+                        for (auto& ref : me->GetThreatMgr().GetThreatList())
                         {
                             if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
                             {
