@@ -1,5 +1,5 @@
 --
-UPDATE `creature_template` SET `type_flags`=`type_flags`|0x08000000, `npcflag`=130 WHERE `entry`=3443;
+UPDATE `creature_template` SET `npcflag`=130, `type_flags`=`type_flags`|0x08000000, `flags_extra`=`flags_extra`|0x01000000 WHERE `entry`=3443;
 
 DELETE FROM `gossip_menu_option` WHERE `MenuId`=10311;
 INSERT INTO `gossip_menu_option` VALUES
@@ -15,3 +15,4 @@ INSERT INTO `conditions` VALUES
 (23,3443,0,0,0,7,0,185,15,0,0,0,0,'','Show vendor flag if player has cooking'),
 (23,3443,0,0,0,8,0,862,0,0,0,0,0,'','Show vendor flag if player player has quest Dig Rat Stew rewarded');
 
+UPDATE `quest_template_addon` SET `RequiredSkillPoints`=15 WHERE `id`=862;
