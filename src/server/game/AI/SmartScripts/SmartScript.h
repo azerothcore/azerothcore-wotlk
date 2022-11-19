@@ -232,6 +232,9 @@ public:
     bool AllowPhaseReset() const { return _allowPhaseReset; }
     void SetPhaseReset(bool allow) { _allowPhaseReset = allow; }
 
+    void AddCreatureSummon(ObjectGuid const& guid);
+    void RemoveCreatureSummon(ObjectGuid const& guid);
+
 private:
     void IncPhase(uint32 p);
     void DecPhase(uint32 p);
@@ -306,6 +309,8 @@ private:
         SmartScriptHolder s;
         return s;
     }
+
+    GuidUnorderedSet _summonList;
 };
 
 #endif
