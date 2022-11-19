@@ -465,9 +465,9 @@ public:
     bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
     bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
     [[nodiscard]] bool IsWithinLOS(float x, float y, float z, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
-    [[nodiscard]] bool IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS, Optional<float> collisionHeight = { }) const;
-    [[nodiscard]] Position GetHitSpherePointFor(Position const& dest, Optional<float> collisionHeight = { }) const;
-    void GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z, Optional<float> collisionHeight = { }) const;
+    [[nodiscard]] bool IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS, Optional<float> collisionHeight = { }, Optional<float> combatReach = { }) const;
+    [[nodiscard]] Position GetHitSpherePointFor(Position const& dest, Optional<float> collisionHeight = { }, Optional<float> combatReach = { }) const;
+    void GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z, Optional<float> collisionHeight = { }, Optional<float> combatReach = { }) const;
     bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;
     bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;
     [[nodiscard]] bool IsInRange2d(float x, float y, float minRange, float maxRange) const;

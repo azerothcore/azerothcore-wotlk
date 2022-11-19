@@ -198,7 +198,7 @@ public:
                 case EVENT_SHARVALD_CHARGE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, (IsHeroic() ? 100.0f : 30.0f), true))
                     {
-                        ScriptedAI::DoResetThreat();
+                        DoResetThreatList();
                         me->AddThreat(target, 10000.0f);
                         me->CastSpell(target, SPELL_CHARGE, false);
                     }

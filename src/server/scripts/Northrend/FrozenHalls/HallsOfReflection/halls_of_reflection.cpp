@@ -971,7 +971,7 @@ public:
                 case EVENT_SHADOW_STEP:
                     if (Unit* target = SelectTargetFromPlayerList(100.0f, 0, true))
                     {
-                        DoResetThreat();
+                        DoResetThreatList();
                         me->AddThreat(target, 5000.0f);
                         AttackStart(target);
                         me->CastSpell(target, SPELL_SHADOW_STEP, false);

@@ -120,7 +120,7 @@ struct boss_buru : public BossAI
         events.ScheduleEvent(EVENT_GATHERING_SPEED, 2s);
         if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.f, true))
         {
-            DoResetThreat();
+            DoResetThreatList();
             AttackStart(victim);
             me->AddThreat(victim, 1000000.f);
             Talk(EMOTE_TARGET, victim);
@@ -143,7 +143,7 @@ struct boss_buru : public BossAI
             events.Reset();
             _phase = PHASE_TRANSFORM;
             instance->SetData(DATA_BURU_PHASE, _phase);
-            DoResetThreat();
+            DoResetThreatList();
             events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2s);
             DoCastSelf(SPELL_BURU_TRANSFORM);
         }
