@@ -1,2 +1,2 @@
 --
-UPDATE `spell_dbc` SET `EffectAura_2`=193 WHERE `ID`=35672;
+UPDATE `spell_dbc` SET `Effect_2`=6, `EffectAura_2`=193, `ImplicitTargetA_2`=1 WHERE `ID`=35672;;
