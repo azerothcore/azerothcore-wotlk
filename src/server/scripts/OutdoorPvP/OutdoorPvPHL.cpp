@@ -399,19 +399,19 @@
             {
                 switch(killed->GetEntry()) // Alliance killing horde guards
                 {
-                    case Infantry:
+                    case Horde_Infantry:
                         m_horde_gathered -= PointsLoseOnPvPKill;
                         Randomizer(player); // Randomizes the honor reward
                         break;
-                    case Squadleader: // 2?
+                    case Horde_Squadleader: // 2?
                         m_horde_gathered -= PointsLoseOnPvPKill;
                         Randomizer(player); // Randomizes the honor reward
                         break;
-                    case Hordeboss:
+                    case Horde_Boss:
                         m_horde_gathered -= PointsLoseOnPvPKill;
                         /*BossReward(player); */
                         break;
-                    case Heiler_der_Horde:
+                    case Horde_Heal:
                         m_horde_gathered -= PointsLoseOnPvPKill;
                         Randomizer(player); // Randomizes the honor reward
                         break;
@@ -443,19 +443,19 @@
             {
                 switch(killed->GetEntry()) // Horde killing alliance guards
                 {
-                    case Heiler_der_Allianz:
+                    case Alliance_Healer:
                         m_ally_gathered -= PointsLoseOnPvPKill;
                         Randomizer(player); // Randomizes the honor reward
                         break;
-                    case Allianzboss:
+                    case Alliance_Boss:
                         m_ally_gathered -= PointsLoseOnPvPKill;
                         /*BossReward(player); <- NEU? */
                         break;
-                    case Infantrya:
+                    case Alliance_Infantry:
                         m_ally_gathered -= PointsLoseOnPvPKill;
                         Randomizer(player); // Randomizes the honor reward
                         break;
-                    case Squadleadera: // Wrong?
+                    case Alliance_Squadleadera: // Wrong?
                         m_ally_gathered -= PointsLoseOnPvPKill;
                         Randomizer(player); // Randomizes the honor reward
                         break;

@@ -42,18 +42,18 @@
 
     enum AllianceNpcs
     {
-            Heiler_der_Allianz = 600005,
-			Allianzboss = 600007,
-			Infantrya = 600010,
-			Squadleadera = 600011
+            Alliance_Healer = 600005,
+			Alliance_Boss = 600007,
+			Alliance_Infantry = 810000, // updated DC-WoW
+			Alliance_Squadleadera = 600011
     };
 
     enum HordeNpcs
     {
-            Heiler_der_Horde = 600004,
-			Squadleader = 600008,
-			Infantry = 600009,
-			Hordeboss = 14996
+            Horde_Heal = 600004,
+			Horde_Squadleader = 600008,
+			Horde_Infantry = 810001, // updated DC-WoW
+			Horde_Boss = 14996
     };
 
 /* OutdoorPvPHL Related */
