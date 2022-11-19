@@ -930,10 +930,7 @@ namespace Acore
             if (i_obj->GetTypeId() == TYPEID_GAMEOBJECT)
             {
                 losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
-                if (i_owner->IsPlayer())
-                {
-                    collisionHeight = i_owner->GetCollisionHeight();
-                }
+                collisionHeight = i_owner->GetCollisionHeight();
             }
 
             if (!i_obj->IsWithinDistInMap(u, i_range) || !i_owner->IsValidAttackTarget(u) ||
