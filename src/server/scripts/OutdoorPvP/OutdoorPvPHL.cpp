@@ -71,7 +71,7 @@
     void OutdoorPvPHL::HandlePlayerLeaveZone(Player* player, uint32 zone)
     {
         //player->MonsterTextEmote("Du verl�sst die Zone, w�hrend ein PvP-Kampf l�uft!", player->GetGUID());
-        player->TextEmote(", you are leaving the zone, while a battle is on going!");
+        player->TextEmote("HEY, you are leaving the zone, while a battle is on going!");
         OutdoorPvP::HandlePlayerLeaveZone(player, zone);
     }
 
@@ -265,26 +265,26 @@
                     char msg[250];
                     if(limit_resources_message_A == 1 || limit_resources_message_A == 2 || limit_resources_message_A == 3)
                     {
-                        snprintf(msg, 250, "[Hinterland Defence]: The Alliance got %u resources left!", m_ally_gathered);
-                        itr->second->GetPlayer()->TextEmote(msg);
+                        //snprintf(msg, 250, "[Hinterland Defence]: The Alliance got %u resources left!", m_ally_gathered);
+                        itr->second->GetPlayer()->TextEmote("[Hinterland Defence]: The Alliance got %u resources left!");
                     }
                     else if(limit_resources_message_H == 1 || limit_resources_message_H == 2 || limit_resources_message_H == 3)
                     {
-                        snprintf(msg, 250, "[Hinterland Defence]: The Horde got %u resources left!", m_horde_gathered);
-                        itr->second->GetPlayer()->TextEmote(msg);
+                        //snprintf(msg, 250, "[Hinterland Defence]: The Horde got %u resources left!", m_horde_gathered);
+                        itr->second->GetPlayer()->TextEmote("[Hinterland Defence]: The Horde got %u resources left!");
                     }
      
                     if(IS_RESOURCE_MESSAGE_A == true)
                     {
                         if(limit_A == 1)
                         {
-                            snprintf(msg, 250, "[Hinterland Defence]: The Alliance got %u resources left!", m_ally_gathered);
-                            itr->second->GetPlayer()->TextEmote(msg);
+                            //snprintf(msg, 250, "[Hinterland Defence]: The Alliance got %u resources left!", m_ally_gathered);
+                            itr->second->GetPlayer()->TextEmote("[Hinterland Defence]: The Alliance got %u resources left!");
                             IS_RESOURCE_MESSAGE_A = false; // Reset
                         }
                         else if(limit_A == 2)
                         {
-                            itr->second->GetPlayer()->TextEmote("[Hinterland Defence]: The Alliance has no more resources left! Horde wins!");
+                            itr->second->GetPlayer()->TextEmote("[Hinterland Defence]: The Alliance got no more resources left! Horde wins!");
                             //itr->second->GetPlayer()->GetGUID();
                             HandleWinMessage("For the HORDE!");
                             HandleRewards(itr->second->GetPlayer(), 1500, true, false, false);
@@ -308,8 +308,8 @@
                     {
                         if(limit_H == 1)
                         {
-                            snprintf(msg, 250	, "[Hinterland Defence]: The Horde got %u resources left!", m_horde_gathered);
-                            itr->second->GetPlayer()->TextEmote(msg);
+                            //snprintf(msg, 250	, "[Hinterland Defence]: The Horde got %u resources left!", m_horde_gathered);
+                            itr->second->GetPlayer()->TextEmote("[Hinterland Defence]: The Horde got %u resources left!");
                             IS_RESOURCE_MESSAGE_H = false; // Reset
                         }
                         else if(limit_H == 2)
