@@ -455,7 +455,7 @@
                         m_ally_gathered -= PointsLoseOnPvPKill;
                         Randomizer(player); // Randomizes the honor reward
                         break;
-                    case Alliance_Squadleadera: // Wrong?
+                    case Alliance_Squadleader: // Wrong?
                         m_ally_gathered -= PointsLoseOnPvPKill;
                         Randomizer(player); // Randomizes the honor reward
                         break;
