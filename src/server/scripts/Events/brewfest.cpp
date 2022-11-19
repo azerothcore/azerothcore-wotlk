@@ -1009,6 +1009,14 @@ class spell_brewfest_apple_trap : public SpellScript
 {
     PrepareSpellScript(spell_brewfest_apple_trap);
 
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::UnitAuraCheck(false, SPELL_RAM_FATIGUE));
+
+        if (targets.empty())
+            FinishCast(SPELL_FAILED_CASTER_AURASTATE);
+    }
+
     void HandleDummyEffect(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
@@ -1018,6 +1026,7 @@ class spell_brewfest_apple_trap : public SpellScript
 
     void Register() override
     {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_brewfest_apple_trap::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
         OnEffectHitTarget += SpellEffectFn(spell_brewfest_apple_trap::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
