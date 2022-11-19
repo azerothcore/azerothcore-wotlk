@@ -1,6 +1,3 @@
--- Coilfang Slavehandler spam-prevention
-UPDATE `smart_scripts` SET `event_chance`=20 WHERE `entryorguid`=17959 AND `source_type` = 0 AND `id`=5;
-
 -- Equipment ID for slaves
 UPDATE `creature` SET `equipment_id`=1 WHERE `id1` IN (17963, 17964);
 -- Emotes for Heroic ver
