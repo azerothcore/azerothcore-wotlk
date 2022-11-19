@@ -42,8 +42,6 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+30, 18557, 558, 3790, 3790, 3, 1, 0, 63.40744400024414062, -175.263900756835937, 15.34021472930908203, 6.143558979034423828, 86400, 10, 0, 4731, 8370, 1, 0, 0, 0, 46368), -- 18557 (Area: 3790 - Difficulty: 1) (Auras: 35838 - 35838) (possible waypoints or random movement)
 (@CGUID+31, 18558, 558, 3790, 3790, 3, 1, 0, 108.3681259155273437, -168.1009521484375, 14.66339969635009765, 4.031710624694824218, 86400, 10, 0, 4731, 8370, 1, 0, 0, 0, 46368), -- 18558 (Area: 3790 - Difficulty: 1) (Auras: 35838 - 35838) (possible waypoints or random movement)
 (@CGUID+32, 18726, 558, 3790, 3790, 3, 1, 0, 25.89444541931152343, -345.461029052734375, 46.5911712646484375, 1.54946136474609375, 86400, 10, 0, 3914, 2846, 1, 0, 0, 0, 46368), -- 18726 (Area: 3790 - Difficulty: 1) (Auras: ) (possible waypoints or random movement)
-(@CGUID+33, 18506, 558, 3790, 3790, 3, 1, 0, 48.44750595092773437, -170.952972412109375, 15.11065673828125, 6.016101837158203125, 86400, 0, 0, 2602, 2790, 0, 0, 0, 0, 46368), -- 18506 (Area: 3790 - Difficulty: 1) (Auras: 35841 - 35841, 35850 - 35850, 378027 - 378027)
-(@CGUID+34, 18506, 558, 3790, 3790, 3, 1, 0, 60.22912216186523437, -165.152603149414062, 15.32995414733886718, 3.326717376708984375, 86400, 0, 0, 2602, 2790, 0, 0, 0, 0, 46368), -- 18506 (Area: 3790 - Difficulty: 1) (Auras: 35841 - 35841, 35850 - 35850, 378027 - 378027)
 (@CGUID+35, 14881, 558, 3790, 3790, 3, 1, 0, -109.882362365722656, -154.428543090820312, 26.5885162353515625, 3.14505171775817871, 86400, 0, 0, 8, 0, 0, 0, 0, 0, 46368), -- 14881 (Area: 3790 - Difficulty: 1)
 (@CGUID+36, 18556, 558, 3790, 3790, 3, 1, 0, -130.409500122070312, -169.439208984375, 26.58745956420898437, 0.149694308638572692, 86400, 10, 0, 6116, 0, 1, 0, 0, 0, 46368), -- 18556 (Area: 3790 - Difficulty: 1) (Auras: 35838 - 35838, 32828 - 32828) (possible waypoints or random movement)
 (@CGUID+37, 18558, 558, 3790, 3790, 3, 1, 0, -144.49114990234375, -158.025375366210937, 26.58998870849609375, 1.594105005264282226, 86400, 10, 0, 4892, 8538, 1, 0, 0, 0, 46368), -- 18558 (Area: 3790 - Difficulty: 1) (Auras: 35838 - 35838) (possible waypoints or random movement)
@@ -54,15 +52,19 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 -- (@CGUID+42, 18499, 558, 3790, 3790, 3, 1, 0, -119.939155578613281, -163.717010498046875, 26.67186164855957031, 0.069813169538974761, 86400, 0, 0, 6604, 8538, 0, 0, 0, 0, 46368), -- 18499 (Area: 3790 - Difficulty: 1) (Auras: 33422 - 33422) - !!! might be temporary spawn !!!
 -- (@CGUID+43, 18499, 558, 3790, 3790, 3, 1, 0, -148.999969482421875, -157.538055419921875, 26.67399024963378906, 3.255656719207763671, 86400, 0, 0, 6387, 8370, 0, 0, 0, 0, 46368); -- 18499 (Area: 3790 - Difficulty: 1) (Auras: 33422 - 33422) - !!! might be temporary spawn !!!
 
--- 
+-- Cosmetic Flying creatures
 UPDATE `creature_template_addon` SET `auras` = '32460' WHERE `entry` IN (18726, 18778);
 -- ID - 35838 Ghost Visual
-DELETE FROM `creature_template_addon` WHERE `entry` IN (18556, 18557, 18558, 18559);
+DELETE FROM `creature_template_addon` WHERE `entry` IN (18556, 18557, 18558, 18559, 18506);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (18556, 0, 0, 0, 0, 0, 0, '32828 35838 35841 35850'),
 (18557, 0, 0, 0, 0, 0, 0, '35838'),
 (18558, 0, 0, 0, 0, 0, 0, '35838'),
-(18559, 0, 0, 0, 0, 0, 0, '35838');
+(18559, 0, 0, 0, 0, 0, 0, '35838'),
+(18506, 0, 0, 0, 0, 0, 0, '35841 35850'); -- Raging Soul
+
+-- Correct Movement Speed of Auchenai Monks (Previously 1,6 and 1,71429)
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.14286 WHERE (`entry` = 18497);
 
 SET @NPC := @CGUID+1;
 SET @PATH := @NPC * 10;
@@ -164,7 +166,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,4,143.56517,-26.607273,10.320737,NULL,0,0,0,100,0),
 (@PATH,5,137.3586,-29.342598,11.133306,NULL,0,0,0,100,0),
 (@PATH,6,132.71771,-32.661335,12.362364,NULL,0,0,0,100,0),
-(@PATH,7,127.05344,-36.36787,11.95393,NULL,180000,0,0,100,0);
+(@PATH,7,127.05344,-36.36787,11.95393,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F0000016F000061BFFA .go xyz 163.42021 -22.144464 3.9059505
 
 -- Pathing for Phasing Soldier Entry: 18556
@@ -178,7 +180,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,1,186.39815,-187.63376,26.586843,NULL,0,0,0,100,0),
 (@PATH,2,186.01659,-170.86678,26.57505,NULL,0,0,0,100,0),
 (@PATH,3,185.84586,-152.141,26.433743,NULL,0,0,0,100,0),
-(@PATH,4,186.82649,-139.19202,26.515371,NULL,180000,0,0,100,0);
+(@PATH,4,186.82649,-139.19202,26.515371,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F0000016F000061BFFB .go xyz 186.39815 -187.63376 26.586843
 
 -- Pathing for Phasing Soldier Entry: 18556
@@ -192,7 +194,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,1,-140.33557,-182.85066,26.59173,NULL,0,0,0,100,0),
 (@PATH,2,-139.43959,-177.26666,26.591074,NULL,0,0,0,100,0),
 (@PATH,3,-137.69144,-172.42462,26.592718,NULL,0,0,0,100,0),
-(@PATH,4,-130.4095,-169.43921,26.58746,NULL,180000,0,0,100,0);
+(@PATH,4,-130.4095,-169.43921,26.58746,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F0000016F0000E1BFFA .go xyz -140.33557 -182.85066 26.59173
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -215,7 +217,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,10,222.65584,-177.14705,26.59129,NULL,0,0,0,100,0),
 (@PATH,11,229.7245,-182.66959,26.591282,NULL,0,0,0,100,0),
 (@PATH,12,233.93506,-186.75621,26.591286,NULL,0,0,0,100,0),
-(@PATH,13,234.9648,-190.40332,26.59129,NULL,180000,0,0,100,0);
+(@PATH,13,234.9648,-190.40332,26.59129,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F4000016F000061BFFA .go xyz 252.76212 -143.58017 31.344828
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -234,7 +236,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,6,236.51315,-182.80513,26.591282,NULL,0,0,0,100,0),
 (@PATH,7,230.59372,-180.36035,26.59128,NULL,0,0,0,100,0),
 (@PATH,8,226.47932,-182.74487,26.591282,NULL,0,0,0,100,0),
-(@PATH,9,223.12943,-185.35706,26.59129,NULL,180000,0,0,100,0);
+(@PATH,9,223.12943,-185.35706,26.59129,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F4000016F0000E1BFFA .go xyz 265.72266 -167.39992 26.591297
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -253,7 +255,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,6,143.1685,-34.106094,13.614726,NULL,0,0,0,100,0),
 (@PATH,7,150.10359,-36.330883,13.5456295,NULL,0,0,0,100,0),
 (@PATH,8,154.84016,-37.25858,13.179008,NULL,0,0,0,100,0),
-(@PATH,9,161.82185,-39.311287,12.2130375,NULL,180000,0,0,100,0);
+(@PATH,9,161.82185,-39.311287,12.2130375,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F4000016F000161BFFA .go xyz 127.67527 -9.820141 0.9092922
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -271,7 +273,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,5,191.94017,-6.714968,-0.12076864,NULL,0,0,0,100,0),
 (@PATH,6,192.66939,2.518242,-0.116914734,NULL,0,0,0,100,0),
 (@PATH,7,191.38432,9.125355,-0.11827608,NULL,0,0,0,100,0),
-(@PATH,8,190.95491,15.178104,1.7854161,NULL,180000,0,0,100,0);
+(@PATH,8,190.95491,15.178104,1.7854161,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F4000016F0001E1BFFA .go xyz 170.21268 -18.678844 1.8106413
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -291,7 +293,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,7,54.855816,-154.90836,15.210086,NULL,0,0,0,100,0),
 (@PATH,8,42.59613,-157.50063,14.917099,NULL,0,0,0,100,0),
 (@PATH,9,38.038113,-157.83847,14.781163,NULL,0,0,0,100,0),
-(@PATH,10,34.37812,-156.34639,14.540044,NULL,180000,0,0,100,0);
+(@PATH,10,34.37812,-156.34639,14.540044,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F4000016F000261BFFA .go xyz 63.407444 -175.2639 15.340215
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -314,7 +316,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,10,245.5611,-29.118198,26.610186,NULL,0,0,0,100,0),
 (@PATH,11,256.06567,-29.392622,26.598423,NULL,0,0,0,100,0),
 (@PATH,12,264.68683,-30.948347,26.591227,NULL,0,0,0,100,0),
-(@PATH,13,273.67218,-31.774408,26.591225,NULL,180000,0,0,100,0);
+(@PATH,13,273.67218,-31.774408,26.591225,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F4000016F0002E1BFFA .go xyz 219.37904 0.33060265 28.327349
 
 -- Pathing for Phasing Sorcerer Entry: 18558
@@ -329,7 +331,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,2,94.0889,-166.98608,15.221693,NULL,0,0,0,100,0),
 (@PATH,3,87.63592,-167.62035,15.353543,NULL,0,0,0,100,0),
 (@PATH,4,83.18925,-169.28035,15.387257,NULL,0,0,0,100,0),
-(@PATH,5,80.92766,-172.92093,15.428644,NULL,180000,0,0,100,0);
+(@PATH,5,80.92766,-172.92093,15.428644,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F8000016F0000E1BFFA .go xyz 108.368126 -168.10095 14.6634
 
 -- Pathing for Phasing Sorcerer Entry: 18558
@@ -342,7 +344,7 @@ DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
 (@PATH,1,60.7609,14.71426,2.9304667,NULL,0,0,0,100,0),
 (@PATH,2,62.473858,-0.185765,-0.1819104,NULL,0,0,0,100,0),
-(@PATH,3,60.937054,-19.739634,2.7972555,NULL,180000,0,0,100,0);
+(@PATH,3,60.937054,-19.739634,2.7972555,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121F8000016F000261BFFA .go xyz 60.7609 14.71426 2.9304667
 
 -- Pathing for Phasing Sorcerer Entry: 18558
@@ -358,7 +360,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,3,-144.36652,-163.37152,26.590195,NULL,0,0,0,100,0),
 (@PATH,4,-144.37608,-162.96107,26.58878,NULL,0,0,0,100,0),
 (@PATH,5,-144.54129,-155.87457,26.590515,NULL,0,0,0,100,0),
-(@PATH,6,-144.54129,-155.87457,26.590515,NULL,180000,0,0,100,0);
+(@PATH,6,-144.54129,-155.87457,26.590515,NULL,3600,0,0,100,0);
 
 -- Pathing for Phasing Sorcerer Entry: 18558
 SET @NPC := @CGUID+17;
@@ -375,7 +377,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,5,235.16656,-85.652824,26.59131,NULL,0,0,0,100,0),
 (@PATH,6,234.99062,-85.08963,26.59131,NULL,0,0,0,100,0),
 (@PATH,7,233.66092,-80.833466,26.591309,NULL,0,0,0,100,0),
-(@PATH,8,233.66092,-80.833466,26.591309,NULL,180000,0,0,100,0);
+(@PATH,8,233.66092,-80.833466,26.591309,NULL,3600,0,0,100,0);
 
 -- Pathing for Phasing Stalker Entry: 18559
 SET @NPC := @CGUID+20;
@@ -395,7 +397,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,8,239.66989,-16.145578,-0.07585467,NULL,0,0,0,100,0),
 (@PATH,9,239.524,-20.53202,-0.06419688,NULL,0,0,0,100,0),
 (@PATH,10,240.83255,-25.9776,-0.06601114,NULL,0,0,0,100,0),
-(@PATH,11,244.28032,-28.857412,1.3836285,NULL,180000,0,0,100,0);
+(@PATH,11,244.28032,-28.857412,1.3836285,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121FC000016F000061BFFA .go xyz 254.08589 16.281115 1.0690411
 
 -- Pathing for Phasing Stalker Entry: 18559
@@ -415,7 +417,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,7,274.67148,31.516829,13.418446,NULL,0,0,0,100,0),
 (@PATH,8,274.31213,21.329618,13.449085,NULL,0,0,0,100,0),
 (@PATH,9,274.1166,11.805699,6.4145527,NULL,0,0,0,100,0),
-(@PATH,10,274.6112,1.604477,-0.08050743,NULL,180000,0,0,100,0);
+(@PATH,10,274.6112,1.604477,-0.08050743,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121FC000016F0000E1BFFA .go xyz 235.88821 37.07132 26.606709
 
 -- Pathing for Phasing Stalker Entry: 18559
@@ -430,7 +432,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,2,244.45204,-93.25677,26.591284,NULL,0,0,0,100,0),
 (@PATH,3,244.03363,-86.45776,26.591278,NULL,0,0,0,100,0),
 (@PATH,4,243.87628,-83.90097,26.59128,NULL,0,0,0,100,0),
-(@PATH,5,243.87628,-83.90097,26.59128,NULL,180000,0,0,100,0);
+(@PATH,5,243.87628,-83.90097,26.59128,NULL,3600,0,0,100,0);
 
 -- Pathing for Phasing Stalker Entry: 18559
 SET @NPC := @CGUID+8;
@@ -449,7 +451,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,7,150.151,-6.409088,1.8575414,NULL,0,0,0,100,0),
 (@PATH,8,158.26154,-6.41169,1.2996879,NULL,0,0,0,100,0),
 (@PATH,9,162.83406,-10.075247,1.2974932,NULL,0,0,0,100,0),
-(@PATH,10,166.6864,-15.174739,2.4810312,NULL,180000,0,0,100,0);
+(@PATH,10,166.6864,-15.174739,2.4810312,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121FC000016F000261BFFA .go xyz 126.1766 27.948132 -0.105519295
 
 -- Pathing for Phasing Stalker Entry: 18559
@@ -469,7 +471,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,7,103.2398,12.823616,-0.098418705,NULL,0,0,0,100,0),
 (@PATH,8,104.68291,17.770578,0.1706654,NULL,0,0,0,100,0),
 (@PATH,9,108.10148,21.937067,0.16965415,NULL,0,0,0,100,0),
-(@PATH,10,111.47976,22.290707,0.009937675,NULL,180000,0,0,100,0);
+(@PATH,10,111.47976,22.290707,0.009937675,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121FC000016F0002E1BFFA .go xyz 103.51044 -31.661163 2.2046442
 
 -- Pathing for Phasing Stalker Entry: 18559
@@ -487,7 +489,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,5,169.2696,-152.8632,26.444696,NULL,0,0,0,100,0),
 (@PATH,6,162.41,-153.10008,26.06021,NULL,0,0,0,100,0),
 (@PATH,7,152.7405,-152.84781,19.014975,NULL,0,0,0,100,0),
-(@PATH,8,146.63557,-152.49663,14.267556,NULL,180000,0,0,100,0);
+(@PATH,8,146.63557,-152.49663,14.267556,NULL,3600,0,0,100,0);
 -- 0x204CB045C0121FC000016F000361BFFA .go xyz 182.65771 -140.55536 26.389036
 
 -- Pathing for Auchenai Monk Entry: 18497
@@ -616,6 +618,18 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,10,-121.20291,-388.12982,26.58856,NULL,0,0,0,100,0);
 -- 0x203B1C45C0120F400006ED0001E1DDF1 .go xyz -105.24392 -388.10626 26.589207
 
+-- Pathing for Auchenai Monk Entry: 18497
+SET @NPC := 83404;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=222.74164,`position_y`=13.925282,`position_z`=-0.070625804 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,222.74164,13.925282,-0.070625804,NULL,12000,0,0,100,0),
+(@PATH,2,238.14801,13.610128,-0.06791845,NULL,12000,0,0,100,0);
+-- 0x203B1C45C01210400006ED0002E1DDF1 .go xyz 222.74164 13.925282 -0.070625804
+
 -- Emote State for Monks near Shirrak
 DELETE FROM `creature_addon` WHERE (`guid` IN (83395, 83394, 83407, 83409));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
@@ -623,3 +637,154 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (83407, 0, 0, 0, 1, 375, 0, NULL),
 (83394, 0, 0, 0, 1, 375, 0, NULL),
 (83409, 0, 0, 0, 1, 375, 0, NULL);
+
+-- Delete redundant waypoints
+DELETE FROM `waypoint_data` WHERE `id` IN (83374, 83385, 83378, 83406, 83372);
+DELETE FROM `creature_addon` WHERE `guid` IN (83374*10, 83385*10, 83378*10, 83406*10, 83372*10);
+UPDATE `creature` SET `wander_distance`=0, `MovementType`=0 WHERE `guid` IN (83374, 83385, 83378, 83406, 83372) AND `map`=558;
+
+-- Patrolling Formations
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (83405, 83392, 83386, 83391) AND `memberGUID` IN (83405, 83374, 83392, 83385, 83378, 83386, 83406, 83391, 83372);
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
+(83405, 83405, 0, 0, 3),
+(83405, 83374, 3.5, 90, 515),
+(83392, 83392, 0, 0, 3),
+(83392, 83385, 4, 135, 515),
+(83392, 83378, 4, 225, 515),
+(83386, 83386, 0, 0, 3),
+(83386, 83406, 3.5, 180, 515),
+(83391, 83391, 0, 0, 3),
+(83391, 83372, 3.5, 180, 515);
+
+-- Static Formations
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (83352,83360,83368,83369,83373,83375,83380,83382,83384,83393,83394,83395,83396,83400,83415,83416,83423,83426,83427,83429,83356,83358) AND `memberGUID` IN (83352,83353,83360,83361,83368,83369,83371,83373,83375,83376,83377,83380,83381,83382,83384,83387,83389,83393,83394,83395,83396,83397,83398,83399,83400,83401,83402,83403,83404,83407,83408,83409,83410,83411,83412,83413,83414,83415,83416,83417,83418,83419,83420,83421,83422,83423,83424,83425,83426,83427,83428,83429,83430,83431,83432,83433,83434,83435,83436,83437,83438,83439,83440,83441,83442,83443,83444,83445,83446,83447,83448,83449,83450,83451,83452,88277,88278,88279,88280,88281,88283,88284,88285,88286,88287,88288,88289,88290,88291,83356,83357,83358,83363);
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
+(83358, 83358, 0, 0, 3),
+(83358, 83363, 0, 0, 3),
+(83352, 83352, 0, 0, 3),
+(83352, 83353, 0, 0, 3),
+(83356, 83356, 0, 0, 3),
+(83356, 83357, 0, 0, 3),
+(83360, 83360, 0, 0, 3),
+(83360, 83361, 0, 0, 3),
+(83369, 83369, 0, 0, 3),
+(83369, 83376, 0, 0, 3),
+(83375, 83375, 0, 0, 3),
+(83375, 83377, 0, 0, 3),
+(83368, 83368, 0, 0, 3),
+(83368, 83371, 0, 0, 3),
+(83382, 83382, 0, 0, 3),
+(83382, 83389, 0, 0, 3),
+(83373, 83373, 0, 0, 3),
+(83373, 83381, 0, 0, 3),
+(83380, 83380, 0, 0, 3),
+(83380, 83404, 0, 0, 3),
+(83384, 83384, 0, 0, 3),
+(83384, 83387, 0, 0, 3),
+(83384, 83408, 0, 0, 3),
+(83395, 83395, 0, 0, 3),
+(83395, 83407, 0, 0, 3),
+(83394, 83394, 0, 0, 3),
+(83394, 83409, 0, 0, 3),
+(83393, 83393, 0, 0, 3),
+(83393, 83401, 0, 0, 3),
+(83393, 83403, 0, 0, 3),
+(83393, 83410, 0, 0, 3),
+(83396, 83396, 0, 0, 3),
+(83396, 83402, 0, 0, 3),
+(83396, 83398, 0, 0, 3),
+(83396, 83397, 0, 0, 3),
+(83396, 83399, 0, 0, 3),
+(83400, 83400, 0, 0, 3),
+(83400, 83414, 0, 0, 3),
+(83400, 83413, 0, 0, 3),
+(83400, 83412, 0, 0, 3),
+(83400, 83411, 0, 0, 3),
+(83429, 83429, 0, 0, 3),
+(83429, 83430, 0, 0, 3),
+(83429, 83435, 0, 0, 3),
+(83429, 83434, 0, 0, 3),
+(83429, 83439, 0, 0, 3),
+(83429, 83452, 0, 0, 3),
+(83423, 83423, 0, 0, 3),
+(83423, 83431, 0, 0, 3),
+(83423, 83436, 0, 0, 3),
+(83423, 83437, 0, 0, 3),
+(83423, 83443, 0, 0, 3),
+(83423, 83445, 0, 0, 3),
+(83423, 83442, 0, 0, 3),
+(83423, 83444, 0, 0, 3),
+(83423, 83440, 0, 0, 3),
+(83423, 88291, 0, 0, 3),
+(83423, 83448, 0, 0, 3),
+(83423, 83441, 0, 0, 3),
+(83415, 83415, 0, 0, 3),
+(83415, 83417, 0, 0, 3),
+(83415, 83422, 0, 0, 3),
+(83415, 83418, 0, 0, 3),
+(83415, 83419, 0, 0, 3),
+(83415, 83424, 0, 0, 3),
+(83415, 83425, 0, 0, 3),
+(83415, 83421, 0, 0, 3),
+(83415, 83433, 0, 0, 3),
+(83415, 83420, 0, 0, 3),
+(83426, 83426, 0, 0, 3),
+(83426, 88278, 0, 0, 3),
+(83426, 83428, 0, 0, 3),
+(83426, 83438, 0, 0, 3),
+(83426, 83432, 0, 0, 3),
+(83416, 83416, 0, 0, 3),
+(83416, 88279, 0, 0, 3),
+(83416, 88286, 0, 0, 3),
+(83416, 88280, 0, 0, 3),
+(83416, 88290, 0, 0, 3),
+(83416, 88289, 0, 0, 3),
+(83416, 88281, 0, 0, 3),
+(83416, 88284, 0, 0, 3),
+(83416, 88285, 0, 0, 3),
+(83416, 88288, 0, 0, 3),
+(83416, 88287, 0, 0, 3),
+(83416, 88283, 0, 0, 3),
+(83427, 83427, 0, 0, 3),
+(83427, 83451, 0, 0, 3),
+(83427, 88277, 0, 0, 3),
+(83427, 83449, 0, 0, 3),
+(83427, 83447, 0, 0, 3),
+(83427, 83450, 0, 0, 3),
+(83427, 83446, 0, 0, 3);
+
+-- Remove assistance from Reanimated Bones
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`|33554432 WHERE `entry` = 18700;
+
+-- Condition for Blue Beam (32930)
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 32930) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 18778) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 32930, 0, 0, 31, 0, 3, 18778, 0, 0, 0, 0, '', 'Blue Beam (32930) can only target Cosmetic Raging Soul (18778)');
+
+-- SAI for Blue Beam Soulpriests
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18493;
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (-83375, -83377)) AND (`source_type` = 0) AND (`id` IN (1, 2, 3, 4, 5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-83375, 0, 1, 0, 0, 0, 100, 2, 1000, 1000, 6000, 9000, 0, 11, 32860, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Shadow Bolt\' (Normal Dungeon)'),
+(-83375, 0, 2, 0, 0, 0, 100, 4, 1000, 1000, 6000, 9000, 0, 11, 38378, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Shadow Bolt\' (Heroic Dungeon)'),
+(-83375, 0, 3, 0, 0, 0, 100, 0, 12000, 15000, 25000, 25000, 0, 11, 32859, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Falter\''),
+(-83375, 0, 4, 0, 0, 0, 100, 2, 5000, 6000, 50000, 50000, 0, 11, 32858, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Touch of the Forgotten\' (Normal Dungeon)'),
+(-83375, 0, 5, 0, 0, 0, 100, 4, 5000, 6000, 50000, 50000, 0, 11, 38377, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Touch of the Forgotten\' (Heroic Dungeon)'),
+(-83375, 0, 6, 0, 0, 0, 100, 513, 5000, 11000, 0, 0, 0, 88, 1849300, 1849304, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Run Random Script (No Repeat)'),
+(-83375, 0, 7, 0, 1, 0, 100, 7, 3600, 3600, 3600, 3600, 0, 11, 32930, 0, 1, 0, 0, 0, 19, 18778, 20, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - Out of Combat - Cast \'Blue Beam\' (No Repeat) (Dungeon)'),
+
+(-83377, 0, 1, 0, 0, 0, 100, 2, 1000, 1000, 6000, 9000, 0, 11, 32860, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Shadow Bolt\' (Normal Dungeon)'),
+(-83377, 0, 2, 0, 0, 0, 100, 4, 1000, 1000, 6000, 9000, 0, 11, 38378, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Shadow Bolt\' (Heroic Dungeon)'),
+(-83377, 0, 3, 0, 0, 0, 100, 0, 12000, 15000, 25000, 25000, 0, 11, 32859, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Falter\''),
+(-83377, 0, 4, 0, 0, 0, 100, 2, 5000, 6000, 50000, 50000, 0, 11, 32858, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Touch of the Forgotten\' (Normal Dungeon)'),
+(-83377, 0, 5, 0, 0, 0, 100, 4, 5000, 6000, 50000, 50000, 0, 11, 38377, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Touch of the Forgotten\' (Heroic Dungeon)'),
+(-83377, 0, 6, 0, 0, 0, 100, 513, 5000, 11000, 0, 0, 0, 88, 1849300, 1849304, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Run Random Script (No Repeat)'),
+(-83377, 0, 7, 0, 1, 0, 100, 7, 3600, 3600, 3600, 3600, 0, 11, 32930, 0, 1, 0, 0, 0, 19, 18778, 20, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - Out of Combat - Cast \'Blue Beam\' (No Repeat) (Dungeon)');
+
+-- DELETE creature Pools and replace with id2
+DELETE FROM `pool_template` WHERE `description` LIKE '%auchenai%' AND `entry` BETWEEN 1500 AND 1509;
+DELETE FROM `pool_creature` WHERE `description` LIKE '%auchenai%' AND `pool_entry` BETWEEN 1500 AND 1509;
+DELETE FROM `creature` WHERE `guid` IN (83355,83354,83365,83359,83364,83362,83366,83351,83367,83370) AND `id1`=18495 AND `map`=558;
+DELETE FROM `creature_addon` WHERE `guid` IN (83355,83354,83365,83359,83364,83362,83366,83351,83367,83370);
+UPDATE `creature` SET `id2`=18495 WHERE `guid` IN (83363,83358,83353,83352,83360,83361,83356,83357,83368,83371) AND `id1`=18493 AND `map`=558;
