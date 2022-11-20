@@ -1,8 +1,8 @@
 -- DB update 2022_11_03_06 -> 2022_11_03_07
 -- Fishe
-SET @GUID = 103877;
-SET @POOL = 13148;
-SET @POOLMOTHER = 8291;
+SET @GUID := 103877;
+SET @POOL := 13148;
+SET @POOLMOTHER := 8291;
 
 -- Delete OLD
 DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (182954, 182953, 182952, 182957, 182954, 182956, 182951, 182959, 182958) AND `map`=530));
