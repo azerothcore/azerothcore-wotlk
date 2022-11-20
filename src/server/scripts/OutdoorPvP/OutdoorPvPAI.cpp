@@ -11,6 +11,8 @@
 #include "Group.h"
 #include "GroupMgr.h"
 #include "Log.h"
+#include "WorldPacket.h"
+#include "Player.h"
 
 OutdoorPvPAI::OutdoorPvPAI()
 {
@@ -76,7 +78,14 @@ void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone)
 {
     if(AddOrSetPlayerToCorrectBfGroup(player))
     {
+        player->GetSession()->SendBfEntered(m_BattleId);
+        m_PlayersInWar[player->GetTeamId()].insert(player->GetGUID());
+        m_InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
 
+        if (player->isAFK())
+            player->ToggleAFK();
+
+        OnPlayerJoinWar(player);  
     }
 
     //Faction buffs from Wintergrasp

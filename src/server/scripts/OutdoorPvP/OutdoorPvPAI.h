@@ -31,9 +31,17 @@ class OutdoorPvPAI : public OutdoorPvP
         Group* GetFreeBfRaid(TeamId TeamId);
         Group* GetGroupPlayer(ObjectGuid guid, TeamId TeamId);
 
-   protected:
+    // from Battlefield.cpp
+    // Players info maps
+    GuidUnorderedSet m_players[PVP_TEAMS_COUNT];             // Players in zone
+    GuidUnorderedSet m_PlayersInQueue[PVP_TEAMS_COUNT];      // Players in the queue
+    GuidUnorderedSet m_PlayersInWar[PVP_TEAMS_COUNT];        // Players in WG combat
+    PlayerTimerMap m_InvitedPlayers[PVP_TEAMS_COUNT];
+    PlayerTimerMap m_PlayersWillBeKick[PVP_TEAMS_COUNT];
+
+      protected:
 	  GuidSet m_Groups[2];
-	  PlayerSet m_PlayersInWar[2];
+	  //PlayerSet m_PlayersInWar[2]; // deactivated for testing
 
     //Faction buffs Wintergrasp
     //AllianceBuff = 32071,
