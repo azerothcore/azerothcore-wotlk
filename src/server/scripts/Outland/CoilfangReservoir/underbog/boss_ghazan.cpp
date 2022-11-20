@@ -76,7 +76,7 @@ struct boss_ghazan : public ScriptedAI
 
     void DoAction(int32 type) override
     {
-        if (ACTION_MOVE_TO_PLATFORM && !_movedToPlatform)
+        if (type == ACTION_MOVE_TO_PLATFORM && !_movedToPlatform)
         {
             _movedToPlatform = true;
             me->GetMotionMaster()->MovePath((me->GetSpawnId() * 10) + 1, false);
