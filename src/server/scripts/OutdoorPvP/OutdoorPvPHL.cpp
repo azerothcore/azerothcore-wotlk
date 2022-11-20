@@ -49,7 +49,7 @@
 		m_horde_gathered = HL_RESOURCES_H;
 
         //char message[250];
-        if(player->GetTeam() == ALLIANCE)
+        if(player->GetTeamId() == ALLIANCE)
             //snprintf(message, 250, "[Hinterland Verteidigung]: Die Allianz hat noch %u Ressourcen uebrig!", m_ally_gathered);
         player->TextEmote(", Alliance has under 250 resources remaining!");
         else
