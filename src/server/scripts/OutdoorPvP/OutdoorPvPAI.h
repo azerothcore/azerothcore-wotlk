@@ -23,6 +23,8 @@ class OutdoorPvPAI : public OutdoorPvP
 {
    public:
         OutdoorPvPAI();
+
+        HL_ZONE                             = 47,
         
         bool SetupOutdoorPvP();
         bool AddOrSetPlayerToCorrectBfGroup(Player *plr);
@@ -35,12 +37,11 @@ class OutdoorPvPAI : public OutdoorPvP
     // Players info maps
     GuidUnorderedSet m_players[PVP_TEAMS_COUNT];             // Players in zone
     GuidUnorderedSet m_PlayersInQueue[PVP_TEAMS_COUNT];      // Players in the queue
-    GuidUnorderedSet m_PlayersInWar[PVP_TEAMS_COUNT];        // Players in WG combat
-    PlayerTimerMap m_InvitedPlayers[PVP_TEAMS_COUNT];
-    PlayerTimerMap m_PlayersWillBeKick[PVP_TEAMS_COUNT];
+    GuidUnorderedSet m_PlayersInWar[PVP_TEAMS_COUNT];
 
       protected:
 	  GuidSet m_Groups[2];
+      uint32 m_BattleId;
 	  //PlayerSet m_PlayersInWar[2]; // deactivated for testing
 
     //Faction buffs Wintergrasp
