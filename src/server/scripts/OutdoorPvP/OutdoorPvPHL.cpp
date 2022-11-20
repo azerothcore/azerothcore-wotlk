@@ -50,22 +50,18 @@
 
         //char message[250];
         if(player->GetTeamId() == ALLIANCE)
-            //snprintf(message, 250, "[Hinterland Verteidigung]: Die Allianz hat noch %u Ressourcen uebrig!", m_ally_gathered);
         player->TextEmote(", Alliance has under 250 resources remaining!");
         else
         player->TextEmote(", Horde has under 250 resources remaining!");
-            //snprintf(message, 250, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", m_horde_gathered);
-
+        
         if (HL_RESOURCES_A <= 250)
         {
         player->TextEmote(", Alliance has under 250 resources remaining!");
-        //    sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Allianz hat noch %u Ressourcen uebrig!", TEAM_ALLIANCE);
         }
 
         if (HL_RESOURCES_H <= 250)
         {
         player->TextEmote(", Horde has under 250 resources remaining!");
-        //    sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", TEAM_HORDE);
         }           
              
         //player->TextEmote(message);
@@ -74,8 +70,7 @@
 
     void OutdoorPvPHL::HandlePlayerLeaveZone(Player* player, uint32 zone)
     {
-        //player->MonsterTextEmote("Du verl�sst die Zone, w�hrend ein PvP-Kampf l�uft!", player->GetGUID());
-        player->TextEmote("HEY, you are leaving the zone, while a battle is on going!");
+         player->MonsterTextEmote("HEY, you are leaving the zone, while a battle is on going!", 0);
         OutdoorPvP::HandlePlayerLeaveZone(player, zone);
     }
 
@@ -172,17 +167,17 @@
         OutdoorPvP::Update(diff);
         if(m_FirstLoad == false)
         {
-            if(m_LastWin == ALLIANCE) //sLog->outmessage("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Alliance(%u)", ALLIANCE);
+            if(m_LastWin == ALLIANCE) 
             {
                 LOG_INFO("misc", "[OutdoorPvPHL]: The battle of Hinterland has started! Last winner: Alliance");                
             }
              
-            else if(m_LastWin == HORDE) //sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Horde(%u)", HORDE);
+            else if(m_LastWin == HORDE) 
             {
                 LOG_INFO("misc", "[OutdoorPvPHL]: The battle of Hinterland has started! Last winner: Horde ");
             }
                 
-            else if(m_LastWin == 0) //sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Es gab letztes mal keinen Sieger!(0)");
+            else if(m_LastWin == 0) 
             {
                 LOG_INFO("misc", "[OutdoorPvPHL]: The battle of Hinterland has started! There was no winner last time!");
             }
@@ -269,12 +264,10 @@
                     char msg[250];
                     if(limit_resources_message_A == 1 || limit_resources_message_A == 2 || limit_resources_message_A == 3)
                     {
-                        //snprintf(msg, 250, "[Hinterland Defence]: The Alliance got %u resources left!", m_ally_gathered);
                         itr->second->GetPlayer()->TextEmote("[Hinterland Defence]: The Alliance got %u resources left!");
                     }
                     else if(limit_resources_message_H == 1 || limit_resources_message_H == 2 || limit_resources_message_H == 3)
                     {
-                        //snprintf(msg, 250, "[Hinterland Defence]: The Horde got %u resources left!", m_horde_gathered);
                         itr->second->GetPlayer()->TextEmote("[Hinterland Defence]: The Horde got %u resources left!");
                     }
      
@@ -282,7 +275,6 @@
                     {
                         if(limit_A == 1)
                         {
-                            //snprintf(msg, 250, "[Hinterland Defence]: The Alliance got %u resources left!", m_ally_gathered);
                             itr->second->GetPlayer()->TextEmote("[Hinterland Defence]: The Alliance got %u resources left!");
                             IS_RESOURCE_MESSAGE_A = false; // Reset
                         }
@@ -312,7 +304,6 @@
                     {
                         if(limit_H == 1)
                         {
-                            //snprintf(msg, 250	, "[Hinterland Defence]: The Horde got %u resources left!", m_horde_gathered);
                             itr->second->GetPlayer()->TextEmote("[Hinterland Defence]: The Horde got %u resources left!");
                             IS_RESOURCE_MESSAGE_H = false; // Reset
                         }
@@ -343,7 +334,9 @@
         IS_ABLE_TO_SHOW_MESSAGE = false; // Reset
         return false;
     }
-     
+    
+
+    // marks the height of honour given for each NPC kill
     void OutdoorPvPHL::Randomizer(Player* player)
     {
         switch(urand(0, 4))
