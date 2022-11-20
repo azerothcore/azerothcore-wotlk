@@ -44,6 +44,9 @@ class OutdoorPvPAI : public OutdoorPvP
       uint32 m_BattleId;
 	  //PlayerSet m_PlayersInWar[2]; // deactivated for testing
 
+    /// Called when a player accept to join the battle
+    virtual void OnPlayerJoinWar(Player* /*player*/) {};
+
     //Faction buffs Wintergrasp
     //AllianceBuff = 32071,
     //HordeBuff = 32049
