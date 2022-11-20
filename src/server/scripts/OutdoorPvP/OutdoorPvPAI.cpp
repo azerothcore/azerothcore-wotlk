@@ -25,10 +25,13 @@ bool OutdoorPvPAI::SetupOutdoorPvP()
     //SetMapFromZone(HL_ZONE);
 
     for (int i = 0; i < OutdoorPvPHPBuffZonesNum; ++i)
-        RegisterZone(OutdoorPvPHPBuffZones[i]);
-        SetMapFromZone(OutdoorPvPHPBuffZones[i]);
+    {
+    RegisterZone(OutdoorPvPHPBuffZones[i]);
+    SetMapFromZone(OutdoorPvPHPBuffZones[i]);  
+    }
+
     LOG_INFO("misc", "Autoinvite works!");
-    return true;
+    return true;        
 }
 
 Group* OutdoorPvPAI::GetFreeBfRaid(TeamId TeamId)
@@ -78,14 +81,13 @@ bool OutdoorPvPAI::AddOrSetPlayerToCorrectBfGroup(Player* plr)
     return true;
 }
 
-void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone, uint32 battleId)
+void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone)
 {
     if(AddOrSetPlayerToCorrectBfGroup(player))
     {
         player->GetSession()->SendBfEntered(m_BattleId);
         m_PlayersInWar[player->GetTeamId()].insert(player->GetGUID());
-        m_InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
-
+        
         if (player->isAFK())
             player->ToggleAFK();
 
