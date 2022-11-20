@@ -25,10 +25,9 @@ bool OutdoorPvPAI::SetupOutdoorPvP()
     //SetMapFromZone(HL_ZONE);
 
     for (int i = 0; i < OutdoorPvPHPBuffZonesNum; ++i)
-    {
     RegisterZone(OutdoorPvPHPBuffZones[i]);
-    SetMapFromZone(OutdoorPvPHPBuffZones[i]);  
-    }
+
+    SetMapFromZone(OutdoorPvPHPBuffZones[0]);  
 
     LOG_INFO("misc", "Autoinvite works!");
     return true;        

@@ -24,7 +24,7 @@ class OutdoorPvPAI : public OutdoorPvP
    public:
         OutdoorPvPAI();
 
-        HL_ZONE                             = 47;
+        //const HL_ZONE                             = 47;
         
         bool SetupOutdoorPvP();
         bool AddOrSetPlayerToCorrectBfGroup(Player *plr);
