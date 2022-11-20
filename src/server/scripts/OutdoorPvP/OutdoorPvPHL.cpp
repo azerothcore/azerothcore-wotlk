@@ -49,7 +49,7 @@
 		m_horde_gathered = HL_RESOURCES_H;
 
         //char message[250];
-        if(player->GetTeamId() == ALLIANCE)
+        if(player->GetTeamId() == TEAM_ALLIANCE)
         player->TextEmote(", Alliance has under 250 resources remaining!");
         else
         player->TextEmote(", Horde has under 250 resources remaining!");
@@ -70,7 +70,7 @@
 
     void OutdoorPvPHL::HandlePlayerLeaveZone(Player* player, uint32 zone)
     {
-         player->MonsterTextEmote("HEY, you are leaving the zone, while a battle is on going!", 0);
+         player->TextEmote("HEY, you are leaving the zone, while a battle is on going!");
         OutdoorPvP::HandlePlayerLeaveZone(player, zone);
     }
 
