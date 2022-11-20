@@ -199,9 +199,13 @@ struct boss_eye_of_cthun : public BossAI
             // Z checks are necessary here because AQ maps do funky stuff.
             if (me->IsWithinLOSInMap(who) && me->IsWithinDist2d(who, 90.0f) && who->GetPositionZ() > 100.0f)
             {
-                AttackStart(who);
+                me->Attack(who, false);
             }
         }
+    }
+
+    void AttackStart(Unit* /*victim*/) override
+    {
     }
 
     void DoAction(int32 action) override
@@ -238,6 +242,7 @@ struct boss_eye_of_cthun : public BossAI
                     if (Unit* target = ObjectAccessor::GetUnit(*me, _beamTarget))
                     {
                         DoCast(target, SPELL_GREEN_BEAM);
+                        me->Attack(target, false);
                     }
 
                     task.Repeat();
@@ -246,7 +251,11 @@ struct boss_eye_of_cthun : public BossAI
                 {
                     _scheduler.Schedule(5s, [this](TaskContext task)
                     {
-                        DoCastRandomTarget(SPELL_GREEN_BEAM);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.f, 0))
+                        {
+                            DoCast(target, SPELL_GREEN_BEAM);
+                            me->Attack(target, false);
+                        }
 
                         task.SetGroup(GROUP_BEAM_PHASE);
                         task.Repeat(3s);
