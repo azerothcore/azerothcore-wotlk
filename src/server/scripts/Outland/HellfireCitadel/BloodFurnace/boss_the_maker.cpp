@@ -28,7 +28,7 @@ enum eEnums
     SPELL_ACID_SPRAY            = 38153,
     SPELL_EXPLODING_BREAKER     = 30925,
     SPELL_KNOCKDOWN             = 20276,
-    SPELL_DOMINATION            = 25772,
+    SPELL_DOMINATION            = 30923,
 
     EVENT_SPELL_ACID                = 1,
     EVENT_SPELL_EXPLODING           = 2,
