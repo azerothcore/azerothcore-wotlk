@@ -1,3 +1,4 @@
+-- DB update 2022_11_21_09 -> 2022_11_21_10
 --
 UPDATE `creature_template` SET `npcflag`=130, `type_flags`=`type_flags`|0x08000000, `flags_extra`=`flags_extra`|0x01000000 WHERE `entry`=3443;
 
