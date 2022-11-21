@@ -1,4 +1,4 @@
-DELETE FROM `playercreateinfo_action`;
+DELETE FROM `playercreateinfo_action` WHERE `race` IN (1, 2, 3, 4, 5, 6, 7, 8, 10, 11);
 INSERT INTO `playercreateinfo_action` (`race`, `class`, `button`, `action`, `type`) VALUES
   (1, 1, 96, 6603, 0),
   (1, 1, 84, 6603, 0),
