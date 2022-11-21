@@ -1,3 +1,4 @@
+-- DB update 2022_11_21_00 -> 2022_11_21_01
 -- Pandemonius movement
 UPDATE `creature` SET `MovementType`=1, `wander_distance`=4.5 WHERE `guid`=91163 AND `id1`=18341;
 
