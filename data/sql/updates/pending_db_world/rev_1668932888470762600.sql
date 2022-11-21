@@ -1,6 +1,6 @@
 --
-UPDATE `creature_template` SET `mechanic_immune_mask` =
- 1              -- MECHANIC_CHARM  
+UPDATE `creature_template` SET `mechanic_immune_mask` = `mechanic_immune_mask`
+ | 1            -- MECHANIC_CHARM  
  | 2            -- MECHANIC_DISORIENTED    
  | 4            -- MECHANIC_DISARM         
  | 8            -- MECHANIC_DISTRACT       
