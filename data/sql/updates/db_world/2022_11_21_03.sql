@@ -1,3 +1,4 @@
+-- DB update 2022_11_21_02 -> 2022_11_21_03
 -- esES missing reward_locale 
 DELETE FROM `quest_offer_reward_locale` WHERE `locale` IN ('esES', 'esMX') AND `ID` IN (11262, 12118, 12182, 12297, 12298, 12918, 12952, 13087, 13089, 13206, 13268, 13269);
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES 
