@@ -1,3 +1,4 @@
+-- DB update 2022_11_21_18 -> 2022_11_21_19
 --
 UPDATE `creature_template` SET `mechanic_immune_mask` = `mechanic_immune_mask`
  | 1            -- MECHANIC_CHARM  
