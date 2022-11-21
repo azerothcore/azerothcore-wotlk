@@ -1,3 +1,4 @@
+-- DB update 2022_11_21_16 -> 2022_11_21_17
 -- Deathwhisperer (19299)
 UPDATE `creature_template_addon` SET `auras` = '15088 12787' WHERE (`entry` = 19299);
 
