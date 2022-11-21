@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef OPENSSL_CRYPTO_H
-#define OPENSSL_CRYPTO_H
+#ifndef OPENSSL_CRYPTO_H_
+#define OPENSSL_CRYPTO_H_
 
 #include "Define.h"
 #include <openssl/opensslv.h>

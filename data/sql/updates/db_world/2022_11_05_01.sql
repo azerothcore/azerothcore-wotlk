@@ -1,10 +1,13 @@
 -- DB update 2022_11_05_00 -> 2022_11_05_01
+SET @GUID := 1977353;
 
 -- Set CALLKILLEDMONSTER non repeteable
 UPDATE `smart_scripts` SET `event_flags` = `event_flags`|1 WHERE `entryorguid` IN (21859, 21846) AND `source_type`=0 AND `id`=0 AND `link`=1;
 
 -- Add spawns imported from TC
-DELETE FROM `creature` WHERE `id1` IN (21846, 21859) AND `id2` IN (21846, 21859) AND `guid` BETWEEN @GUID+0 AND @GUID+35;
+DELETE FROM `creature` WHERE `id1` IN (21846, 21859);
+DELETE FROM `creature` WHERE `id2` IN (21846, 21859);
+DELETE FROM `creature` WHERE `guid` BETWEEN @GUID+0 AND @GUID+35;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`) VALUES
 (@GUID+0 , 21846, 21859, 530, 3519, 0, 1, 1, -3780.56, 5215.07, -23.1934, 0.0349066, 7, 0),
 (@GUID+1 , 21846, 21859, 530, 3519, 0, 1, 1, -3777.38, 5184.86, -24.4552, 3.9968, 7, 0),
