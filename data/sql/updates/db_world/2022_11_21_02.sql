@@ -1,3 +1,4 @@
+-- DB update 2022_11_21_01 -> 2022_11_21_02
 -- Equipment ID for slaves
 UPDATE `creature` SET `equipment_id`=1 WHERE `id1` IN (17963, 17964);
 -- Emotes for Heroic ver
