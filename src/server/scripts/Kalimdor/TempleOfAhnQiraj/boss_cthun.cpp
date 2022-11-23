@@ -136,10 +136,7 @@ public:
 
     bool operator()(Unit* unit) const
     {
-        if (unit->GetTypeId() != TYPEID_PLAYER || unit->HasAura(SPELL_DIGESTIVE_ACID))
-            return false;
-
-        return true;
+        return unit->IsPlayer() && !unit->HasAura(SPELL_DIGESTIVE_ACID) && (unit->GetPositionZ() > 0.0f);
     }
 };
 
@@ -202,9 +199,13 @@ struct boss_eye_of_cthun : public BossAI
             // Z checks are necessary here because AQ maps do funky stuff.
             if (me->IsWithinLOSInMap(who) && me->IsWithinDist2d(who, 90.0f) && who->GetPositionZ() > 100.0f)
             {
-                AttackStart(who);
+                me->Attack(who, false);
             }
         }
+    }
+
+    void AttackStart(Unit* /*victim*/) override
+    {
     }
 
     void DoAction(int32 action) override
@@ -241,6 +242,7 @@ struct boss_eye_of_cthun : public BossAI
                     if (Unit* target = ObjectAccessor::GetUnit(*me, _beamTarget))
                     {
                         DoCast(target, SPELL_GREEN_BEAM);
+                        me->Attack(target, false);
                     }
 
                     task.Repeat();
@@ -249,7 +251,11 @@ struct boss_eye_of_cthun : public BossAI
                 {
                     _scheduler.Schedule(5s, [this](TaskContext task)
                     {
-                        DoCastRandomTarget(SPELL_GREEN_BEAM);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.f, 0))
+                        {
+                            DoCast(target, SPELL_GREEN_BEAM);
+                            me->Attack(target, false);
+                        }
 
                         task.SetGroup(GROUP_BEAM_PHASE);
                         task.Repeat(3s);
@@ -446,15 +452,19 @@ struct boss_cthun : public BossAI
     {
         _scheduler.Schedule(13800ms, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NotInStomachSelector()))
             {
                 target->CastSpell(target, SPELL_MOUTH_TENTACLE, true);
 
                 target->m_Events.AddEventAtOffset([target, this]()
                 {
-                    DoCast(target, SPELL_DIGESTIVE_ACID, true);
                     DoTeleportPlayer(target, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
                     target->RemoveAurasDueToSpell(SPELL_MIND_FLAY);
+
+                    target->m_Events.AddEventAtOffset([target, this]()
+                    {
+                        DoCast(target, SPELL_DIGESTIVE_ACID, true);
+                    }, 2s);
                 }, 3800ms);
             }
 
@@ -469,7 +479,7 @@ struct boss_cthun : public BossAI
             context.Repeat(30s);
         }).Schedule(8s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NotInStomachSelector()))
             {
                 //Spawn claw tentacle on the random target
                 if (Creature* spawned = me->SummonCreature(NPC_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
@@ -481,7 +491,7 @@ struct boss_cthun : public BossAI
             context.Repeat(1min);
         }).Schedule(38s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NotInStomachSelector()))
             {
                 //Spawn claw tentacle on the random target
                 if (Creature* spawned = me->SummonCreature(NPC_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
@@ -637,7 +647,7 @@ struct npc_eye_tentacle : public ScriptedAI
             })
             .Schedule(1s, 5s, [this](TaskContext context)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u) { return u && u->GetTypeId() == TYPEID_PLAYER && !u->HasAura(SPELL_DIGESTIVE_ACID) && !u->HasAura(SPELL_MIND_FLAY); }))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NotInStomachSelector()))
                 {
                     DoCast(target, SPELL_MIND_FLAY);
                 }
@@ -925,7 +935,7 @@ struct npc_giant_eye_tentacle : public ScriptedAI
                 DoCastAOE(SPELL_MASSIVE_GROUND_RUPTURE);
             }).Schedule(1s, 5s, [this](TaskContext context)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NotInStomachSelector()))
                 {
                     DoCast(target, SPELL_GREEN_BEAM);
                 }
