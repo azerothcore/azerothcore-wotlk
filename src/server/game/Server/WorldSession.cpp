@@ -1254,8 +1254,8 @@ void WorldSession::SendAddonsInfo()
     for (AddonMgr::BannedAddonList::const_iterator itr = bannedAddons->begin(); itr != bannedAddons->end(); ++itr)
     {
         data << uint32(itr->Id);
-        data.append(itr->NameMD5, sizeof(itr->NameMD5));
-        data.append(itr->VersionMD5, sizeof(itr->VersionMD5));
+        data.append(itr->NameMD5);
+        data.append(itr->VersionMD5);
         data << uint32(itr->Timestamp);
         data << uint32(1);  // IsBanned
     }

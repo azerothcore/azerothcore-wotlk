@@ -20,21 +20,20 @@
 
 #include "AuthDefines.h"
 #include "BigNumber.h"
-#include "Common.h"
 #include "CryptoHash.h"
-#include "Define.h"
-#include <array>
 #include <optional>
 
 namespace Acore::Crypto
 {
-    class SRP6
+    class AC_COMMON_API SRP6
     {
     public:
         static constexpr size_t SALT_LENGTH = 32;
         using Salt = std::array<uint8, SALT_LENGTH>;
+
         static constexpr size_t VERIFIER_LENGTH = 32;
         using Verifier = std::array<uint8, VERIFIER_LENGTH>;
+
         static constexpr size_t EPHEMERAL_KEY_LENGTH = 32;
         using EphemeralKey = std::array<uint8, EPHEMERAL_KEY_LENGTH>;
 
@@ -43,6 +42,7 @@ namespace Acore::Crypto
 
         // username + password must be passed through Utf8ToUpperOnlyLatin FIRST!
         static std::pair<Salt, Verifier> MakeRegistrationData(std::string const& username, std::string const& password);
+
         // username + password must be passed through Utf8ToUpperOnlyLatin FIRST!
         static bool CheckLogin(std::string const& username, std::string const& password, Salt const& salt, Verifier const& verifier)
         {
