@@ -48,6 +48,10 @@
 #include "WorldPacket.h"
 #include "WorldStatePackets.h"
 
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 namespace Acore
 {
     class BattlegroundChatBuilder
@@ -986,9 +990,29 @@ void Battleground::RemovePlayerAtLeave(Player* player)
 
         // remove from raid group if player is member
         if (Group* group = GetBgRaid(teamId))
+        {
             if (group->IsMember(player->GetGUID()))
+            {
+                //npcbot
+                if (player && player->HaveBot())
+                {
+                    BotMap const* map = player->GetBotMgr()->GetBotMap();
+                    for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
+                    {
+                        Creature const* bot = itr->second;
+                        if (!bot || !group->IsMember(bot->GetGUID()))
+                            continue;
+
+                        group->RemoveMember(bot->GetGUID());
+                        UpdatePlayersCountByTeam(teamId, true);
+                        DecreaseInvitedCount(teamId);
+                    }
+                }
+                //end npcbot
                 if (!group->RemoveMember(player->GetGUID())) // group was disbanded
                     SetBgRaid(teamId, nullptr);
+            }
+        }
 
         // let others know
         sBattlegroundMgr->BuildPlayerLeftBattlegroundPacket(&data, player->GetGUID());
@@ -1091,6 +1115,21 @@ void Battleground::AddPlayer(Player* player)
     m_Players[guid] = player;
 
     UpdatePlayersCountByTeam(teamId, false);                  // +1 player
+
+    //npcbot
+    if (player->GetGroup() && player->HaveBot())
+    {
+        BotMap const* map = player->GetBotMgr()->GetBotMap();
+        for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
+        {
+            Creature const* bot = itr->second;
+            if (!bot || !player->GetGroup()->IsMember(bot->GetGUID()))
+                continue;
+
+            UpdatePlayersCountByTeam(teamId, false);
+        }
+    }
+    //end npcbot
 
     WorldPacket data;
     sBattlegroundMgr->BuildPlayerJoinedBattlegroundPacket(&data, player);

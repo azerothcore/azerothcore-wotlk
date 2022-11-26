@@ -627,3 +627,16 @@ NpcBotRegistry const& BotDataMgr::GetExistingNPCBots()
 {
     return _existingBots;
 }
+
+void BotDataMgr::GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid)
+{
+    ASSERT(AllBotsLoaded());
+
+    std::shared_lock<std::shared_mutex> lock(*GetLock());
+
+    for (NpcBotRegistry::const_iterator ci = _existingBots.begin(); ci != _existingBots.end(); ++ci)
+    {
+        if (_botsData[(*ci)->GetEntry()]->owner == owner_guid.GetCounter())
+            guids_vec.push_back((*ci)->GetGUID());
+    }
+}

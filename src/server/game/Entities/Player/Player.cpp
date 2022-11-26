@@ -12950,6 +12950,21 @@ void Player::SetBattlegroundOrBattlefieldRaid(Group* group, int8 subgroup)
         //ABORT(); // pussywizard: origanal group can never be bf/bg group
     }
 
+    //npcbot: add bots to new group
+    if (HaveBot() && GetGroup())
+    {
+        BotMap const* map = GetBotMgr()->GetBotMap();
+        for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
+        {
+            Creature const* bot = itr->second;
+            if (!bot || !GetGroup()->IsMember(bot->GetGUID()))
+                continue;
+
+            ASSERT(group->AddMember((Player*)bot));
+        }
+    }
+    //end npcbot
+
     SetOriginalGroup(GetGroup(), GetSubGroup());
 
     m_group.unlink();

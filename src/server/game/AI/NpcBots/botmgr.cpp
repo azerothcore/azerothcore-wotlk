@@ -1,3 +1,5 @@
+#include "Battleground.h"
+#include "BattlegroundMgr.h"
 #include "bot_ai.h"
 #include "bot_Events.h"
 #include "botdatamgr.h"
@@ -508,6 +510,9 @@ int32 BotMgr::GetBotInfoPacketsLimit()
 
 bool BotMgr::LimitBots(Map const* map)
 {
+    if (map->IsBattlegroundOrArena())
+        return true;
+
     if (_limitNpcBotsDungeons && map->IsNonRaidDungeon())
         return true;
     if (_limitNpcBotsRaids && map->IsRaid())
@@ -637,8 +642,15 @@ bool BotMgr::RestrictBots(Creature const* bot, bool add) const
             if (!_owner->GetGroup() || !_owner->GetGroup()->IsMember(bot->GetGUID()))
                 return true;
 
-        InstanceMap const* map = currMap->ToInstanceMap();
-        if (map->GetPlayersCountExceptGMs() + uint32(add) > map->GetMaxPlayers())
+        uint32 max_players = 0;
+        if (currMap->IsDungeon())
+            max_players = currMap->ToInstanceMap()->GetMaxPlayers();
+        else if (currMap->IsBattleground())
+            max_players = _owner->GetBattleground()->GetMaxPlayersPerTeam();
+        else if (currMap->IsBattleArena())
+            max_players = _owner->GetBattleground()->GetArenaType();
+
+        if (max_players && currMap->GetPlayersCountExceptGMs() + uint32(add) > max_players)
             return true;
     }
 
@@ -905,6 +917,7 @@ void BotMgr::CleanupsBeforeBotDelete(ObjectGuid guid, uint8 /*removetype*/)
     if (bot->GetVehicle())
         bot->ExitVehicle();
 
+    RemoveBotFromBGQueue(bot);
     RemoveBotFromGroup(bot);
 
     //remove any summons
@@ -1136,6 +1149,15 @@ bool BotMgr::AddBotToGroup(Creature* bot)
     return false;
 }
 
+void BotMgr::RemoveBotFromBGQueue(Creature const* bot)
+{
+    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+    {
+        if (BattlegroundQueueTypeId bgQueueTypeId = _owner->GetBattlegroundQueueTypeId(i))
+            sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(bot->GetGUID(), true);
+    }
+}
+
 bool BotMgr::RemoveBotFromGroup(Creature* bot)
 {
     ASSERT(GetBot(bot->GetGUID()));
@@ -1143,6 +1165,8 @@ bool BotMgr::RemoveBotFromGroup(Creature* bot)
     Group* gr = _owner->GetGroup();
     if (!gr || !gr->IsMember(bot->GetGUID()))
         return false;
+
+    RemoveBotFromBGQueue(bot);
 
     if (bot->GetBotAI()->HasRole(BOT_ROLE_PARTY) && !_owner->GetSession()->PlayerLogout())
         bot->GetBotAI()->ToggleRole(BOT_ROLE_PARTY, true);

@@ -609,10 +609,10 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
 
         // do not disband raid group if bot owner logging out within dungeon
         // 1-player raid groups will not happen unless player is gm - bots will rejoin at login
-        if (GetMembersCount() < 2 && isRaidGroup() && GetLeaderGUID())
+        if (GetMembersCount() < 2 && isRaidGroup() && !(isBGGroup() || isBFGroup()) && GetLeaderGUID())
         {
-            Player* player = ObjectAccessor::FindPlayer(GetLeaderGUID());
-            Map* map = player ? player->FindMap() : nullptr;
+            Player const* player = ObjectAccessor::FindPlayer(GetLeaderGUID());
+            Map const* map = player ? player->FindMap() : nullptr;
             if (!(map && map->IsDungeon() && player && player->GetSession()->PlayerLogout()))
                 Disband();
         }

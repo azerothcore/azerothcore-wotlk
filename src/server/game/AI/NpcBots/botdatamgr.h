@@ -5,6 +5,7 @@
 
 #include <set>
 #include <shared_mutex>
+#include <vector>
 
 class Creature;
 
@@ -143,6 +144,7 @@ class BotDataMgr
         static void UnregisterBot(Creature const* bot);
         static Creature const* FindBot(uint32 entry);
         static NpcBotRegistry const& GetExistingNPCBots();
+        static void GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid);
 
         static std::shared_mutex* GetLock();
 
