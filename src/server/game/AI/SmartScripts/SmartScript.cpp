@@ -3334,6 +3334,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     }
                 }
             }
+            break;
         }
         case SMART_TARGET_SUMMONED_CREATURES:
         {
@@ -3350,6 +3351,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     }
                 }
             }
+            break;
         }
         case SMART_TARGET_NONE:
         case SMART_TARGET_POSITION:
