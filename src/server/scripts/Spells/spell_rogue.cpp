@@ -183,7 +183,7 @@ class spell_rog_cheat_death : public AuraScript
                 return;
 
             bot->CastSpell(bot, SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, true);
-            bot->AddSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, 0, MINUTE * IN_MILLISECONDS);
+            bot->AddBotSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, MINUTE * IN_MILLISECONDS);
 
             uint32 health10 = bot->CountPctFromMaxHealth(10);
 

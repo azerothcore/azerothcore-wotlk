@@ -356,7 +356,7 @@ private:
 
                 int32 healAmount = int32(victim->CountPctFromMaxHealth(uint32(healPct * defenseFactor)));
                 victim->CastCustomSpell(PAL_SPELL_ARDENT_DEFENDER_HEAL, SPELLVALUE_BASE_POINT0, healAmount, victim, true, nullptr, aurEff);
-                victim->AddSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL, 0, 120000);
+                victim->ToCreature()->AddBotSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL, 120000);
             }
             else if (remainingHealth < int32(allowedHealth))
             {
