@@ -31,7 +31,6 @@ enum eBlackStalker
     EVENT_ACID_BREATH               = 1,
     EVENT_ACID_SPIT                 = 2,
     EVENT_TAIL_SWEEP                = 3,
-    EVENT_ENRAGE                    = 4,
 
     ACTION_MOVE_TO_PLATFORM         = 1
 };
@@ -61,9 +60,9 @@ struct boss_ghazan : public ScriptedAI
 
     void EnterCombat(Unit*) override
     {
-        events.ScheduleEvent(SPELL_ACID_BREATH, 3s);
-        events.ScheduleEvent(SPELL_ACID_SPIT, 1s);
-        events.ScheduleEvent(SPELL_TAIL_SWEEP, DUNGEON_MODE<Milliseconds>(5900ms, 10s));
+        events.ScheduleEvent(EVENT_ACID_BREATH, 3s);
+        events.ScheduleEvent(EVENT_ACID_SPIT, 1s);
+        events.ScheduleEvent(EVENT_TAIL_SWEEP, DUNGEON_MODE<Milliseconds>(5900ms, 10s));
     }
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
@@ -127,7 +126,7 @@ struct boss_ghazan : public ScriptedAI
         {
             switch (eventId)
             {
-                case SPELL_ACID_BREATH:
+                case EVENT_ACID_BREATH:
                     DoCastVictim(SPELL_ACID_BREATH);
                     events.Repeat(7s, 9s);
                     break;
@@ -138,7 +137,7 @@ struct boss_ghazan : public ScriptedAI
                     }
                     events.Repeat(7s, 9s);
                     break;
-                case SPELL_TAIL_SWEEP:
+                case EVENT_TAIL_SWEEP:
                     DoCastVictim(SPELL_TAIL_SWEEP);
                     events.Repeat(7s, 9s);
                     break;

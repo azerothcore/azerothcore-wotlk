@@ -36,6 +36,8 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
                 case NPC_GHAZAN:
