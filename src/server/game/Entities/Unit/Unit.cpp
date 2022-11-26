@@ -18932,6 +18932,11 @@ void Unit::SetControlled(bool apply, UnitState state)
 
 void Unit::SetStunned(bool apply)
 {
+    if (HasUnitState(UNIT_STATE_IN_FLIGHT))
+    {
+        return;
+    }
+
     if (apply)
     {
         SetTarget();
