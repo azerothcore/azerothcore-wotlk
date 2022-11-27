@@ -1,3 +1,4 @@
+-- DB update 2022_11_21_19 -> 2022_11_27_00
 --
 DELETE FROM `npc_trainer` WHERE `ID`=33621 AND `SpellID`=-202009;
 DELETE FROM `npc_trainer` WHERE `ID`=33623 AND `SpellID`=-202003;
