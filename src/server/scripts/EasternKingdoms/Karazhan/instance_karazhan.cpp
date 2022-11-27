@@ -73,7 +73,18 @@ public:
                 case NPC_RELAY:
                     m_uiRelayGUID = creature->GetGUID();
                     break;
+                case NPC_BARNES:
+                    _barnesGUID = creature->GetGUID();
+                    if (GetBossState(DATA_OPERA_PERFORMANCE) != DONE && !creature->IsAlive())
+                    {
+                        creature->Respawn(true);
+                    }
+                    break;
+                default:
+                    break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -145,6 +156,10 @@ public:
                         if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
                             sideEntrance->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
+                    }
+                    else if (state == FAIL)
+                    {
+                        DoRespawnCreature(_barnesGUID, true);
                     }
                     break;
                 case DATA_CHESS:
@@ -315,6 +330,7 @@ public:
         ObjectGuid ImageGUID;
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;
+        ObjectGuid _barnesGUID;
     };
 };
 
