@@ -628,6 +628,9 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_REP_NPCBOT_TRANSMOG, "REPLACE INTO characters_npcbot_transmog (entry, slot, item_id, fake_id) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_NPCBOT_TRANSMOG, "DELETE FROM characters_npcbot_transmog WHERE entry = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_NPCBOT_TRANSMOG_ALL, "DELETE FROM characters_npcbot_transmog WHERE entry IN (SELECT entry FROM characters_npcbot WHERE owner = ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_REP_NPCBOT_GROUP_MEMBER, "REPLACE INTO characters_npcbot_group_member (guid, entry, memberFlags, subgroup, roles) VALUES(?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_NPCBOT_GROUP_MEMBER, "DELETE FROM characters_npcbot_group_member WHERE entry = ? AND guid = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UPD_NPCBOT_GROUP_MEMBER_FLAG, "UPDATE characters_npcbot_group_member SET memberFlags = ? WHERE entry = ?", CONNECTION_ASYNC);
     // End NPCBots
 }
 

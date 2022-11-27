@@ -561,6 +561,8 @@ void WorldSession::LogoutPlayer(bool save)
     m_playerSave = save;
 
     //npcbot - free all bots and remove from botmap
+    if (_player->HaveBot() && _player->GetGroup() && !_player->GetGroup()->isRaidGroup() && !_player->GetGroup()->isLFGGroup() && m_Socket && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
+        _player->GetBotMgr()->RemoveAllBotsFromGroup();
     _player->RemoveAllBots();
     //end npcbots
 

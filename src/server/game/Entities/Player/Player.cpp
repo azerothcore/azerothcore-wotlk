@@ -2379,6 +2379,21 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method 
                     return; //group has been disbanded
             }
         }
+        //npcbot - deleting player from db: remove bots
+        else if (guid.IsPlayer())
+        {
+            std::vector<ObjectGuid> botguids;
+            botguids.reserve(BotMgr::GetMaxNpcBots() / 2 + 1);
+            BotDataMgr::GetNPCBotGuidsByOwner(botguids, guid);
+            for (std::vector<ObjectGuid>::const_iterator ci = botguids.begin(); ci != botguids.end(); ++ci)
+            {
+                if (group->IsMember(*ci))
+                {
+                    if (!group->RemoveMember(*ci, method, kicker, reason))
+                        return;
+                }
+            }
+        }
         //npcbot - bot is being removed from group - find master and remove bot through botmap
         //else if (Creature* bot = ObjectAccessor::GetObjectInOrOutOfWorld(guid, (Creature*)NULL))
         else if (guid.IsCreature())
