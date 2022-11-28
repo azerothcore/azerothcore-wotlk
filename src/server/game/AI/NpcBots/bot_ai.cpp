@@ -15294,22 +15294,31 @@ bool bot_ai::GlobalUpdate(uint32 diff)
     if (me->HasUnitState(UNIT_STATE_CASTING) && !HasBotCommandState(BOT_COMMAND_ISSUED_ORDER) && urand(1,100) <= 75)
     {
         bool interrupt;
+        Unit const* target;
         for (uint8 i = CURRENT_FIRST_NON_MELEE_SPELL; i != CURRENT_MAX_SPELL; ++i)
         {
             interrupt = false;
-            Spell const* spell = me->GetCurrentSpell(CurrentSpellTypes(i));
+            Spell* spell = me->GetCurrentSpell(CurrentSpellTypes(i));
             if (!spell)
                 continue;
-            Unit const* target = spell->m_targets.GetUnitTarget();
-            if (!target)
-                continue;
+
             SpellInfo const* info = spell->GetSpellInfo();
             if (!info->CastTimeEntry)
                 continue;
+
             if (info->Id == SHOOT_WAND && me->isMoving())
-            {
                 interrupt = true;
+            else
+            {
+                // not interrupted yet, next checks require target, ensure validity
+                // kidna expensive but prevents invalid targets
+                if (spell->m_targets.GetObjectTargetGUID().IsAnyTypeCreature())
+                    spell->m_targets.Update(me);
+                target = spell->m_targets.GetUnitTarget();
+                if (!target)
+                    continue;
             }
+
             if (!interrupt && !info->IsPositive())
             {
                 if (!target->IsAlive() && info->Id != SPELL_CORPSE_EXPLOSION && info->Id != SPELL_RAISE_DEAD)
