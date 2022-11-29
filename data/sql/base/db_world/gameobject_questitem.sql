@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.gameobject_questitem
 DROP TABLE IF EXISTS `gameobject_questitem`;
 CREATE TABLE IF NOT EXISTS `gameobject_questitem` (
-  `GameObjectEntry` INT unsigned NOT NULL DEFAULT 0,
-  `Idx` INT unsigned NOT NULL DEFAULT 0,
-  `ItemId` INT unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` SMALLINT NOT NULL DEFAULT 0,
+  `GameObjectEntry` int unsigned NOT NULL DEFAULT '0',
+  `Idx` int unsigned NOT NULL DEFAULT '0',
+  `ItemId` int unsigned NOT NULL DEFAULT '0',
+  `VerifiedBuild` smallint NOT NULL DEFAULT '0',
   PRIMARY KEY (`GameObjectEntry`,`Idx`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

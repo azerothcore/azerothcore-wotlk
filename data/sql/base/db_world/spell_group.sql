@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.spell_group
 DROP TABLE IF EXISTS `spell_group`;
 CREATE TABLE IF NOT EXISTS `spell_group` (
-  `id` INT unsigned NOT NULL DEFAULT 0,
-  `spell_id` INT unsigned NOT NULL DEFAULT 0,
-  `special_flag` INT unsigned NOT NULL DEFAULT 0,
+  `id` int unsigned NOT NULL DEFAULT '0',
+  `spell_id` int unsigned NOT NULL DEFAULT '0',
+  `special_flag` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell System';
 
--- Dumpar data för tabell acore_world.spell_group: 354 rows
+-- Dumpar data för tabell acore_world.spell_group: 356 rows
 DELETE FROM `spell_group`;
 /*!40000 ALTER TABLE `spell_group` DISABLE KEYS */;
 INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
@@ -378,7 +378,9 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1001, 18193, 0),
 	(1001, 18194, 0),
 	(1001, 18222, 0),
-	(1001, 15852, 0);
+	(1001, 15852, 0),
+	(1014, 8042, 0),
+	(1014, 20005, 0);
 /*!40000 ALTER TABLE `spell_group` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

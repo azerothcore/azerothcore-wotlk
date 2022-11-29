@@ -30,8 +30,6 @@ public:
     MovementGeneratorType GetMovementGeneratorType() override { return IDLE_MOTION_TYPE; }
 };
 
-extern IdleMovementGenerator si_idleMovement;
-
 class RotateMovementGenerator : public MovementGenerator
 {
 public:

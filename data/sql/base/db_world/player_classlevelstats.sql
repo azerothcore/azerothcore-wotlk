@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.player_classlevelstats
 DROP TABLE IF EXISTS `player_classlevelstats`;
 CREATE TABLE IF NOT EXISTS `player_classlevelstats` (
-  `class` TINYINT unsigned NOT NULL,
-  `level` TINYINT unsigned NOT NULL,
-  `basehp` SMALLINT unsigned NOT NULL,
-  `basemana` SMALLINT unsigned NOT NULL,
+  `class` tinyint unsigned NOT NULL,
+  `level` tinyint unsigned NOT NULL,
+  `basehp` int unsigned NOT NULL DEFAULT '1',
+  `basemana` int unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`class`,`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores levels stats.';
 

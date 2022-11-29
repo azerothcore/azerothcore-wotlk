@@ -21,6 +21,7 @@
  * Scriptnames of files in this file should be prefixed with "spell_warl_".
  */
 
+#include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
@@ -61,7 +62,8 @@ enum WarlockSpells
     SPELL_WARLOCK_SIPHON_LIFE_HEAL                  = 63106,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
     SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1            = 18213,
-    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371
+    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371,
+    SPELL_WARLOCK_EYE_OF_KILROGG_FLY                = 58083
 };
 
 enum WarlockSpellIcons
@@ -83,16 +85,15 @@ class spell_warl_eye_of_kilrogg : public AuraScript
 
             // Glyph of Kilrogg
             if (player->HasAura(58081))
+            {
                 if (Unit* charm = player->GetCharm())
                 {
-                    charm->SetSpeed(MOVE_RUN, 2.14f, true);
                     if (charm->GetMapId() == 530 || charm->GetMapId() == 571)
                     {
-                        charm->SetCanFly(true);
-                        charm->SetSpeed(MOVE_FLIGHT, 2.14f, true);
-                        charm->SendMovementFlagUpdate();
+                        charm->CastSpell(charm, SPELL_WARLOCK_EYE_OF_KILROGG_FLY, true);
                     }
                 }
+            }
         }
     }
 
@@ -698,7 +699,7 @@ class spell_warl_soulshatter : public SpellScript
         Unit* caster = GetCaster();
         if (Unit* target = GetHitUnit())
         {
-            if (target->CanHaveThreatList() && target->GetThreatMgr().getThreat(caster) > 0.0f)
+            if (target->CanHaveThreatList() && target->GetThreatMgr().GetThreat(caster) > 0.0f)
                 caster->CastSpell(target, SPELL_WARLOCK_SOULSHATTER, true);
         }
     }
@@ -1229,6 +1230,45 @@ class spell_warl_shadowburn : public AuraScript
     }
 };
 
+class spell_warl_glyph_of_felguard : public AuraScript
+{
+    PrepareAuraScript(spell_warl_glyph_of_felguard);
+
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_FELGUARD)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
+                }
+            }
+        }
+    }
+
+    void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_FELGUARD)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), false);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_warl_glyph_of_felguard::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_warl_glyph_of_felguard::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     RegisterSpellScript(spell_warl_eye_of_kilrogg);
@@ -1260,4 +1300,5 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_unstable_affliction);
     RegisterSpellScript(spell_warl_drain_soul);
     RegisterSpellScript(spell_warl_shadowburn);
+    RegisterSpellScript(spell_warl_glyph_of_felguard);
 }

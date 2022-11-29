@@ -13,13 +13,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumpar struktur för tabell acore_auth.account_muted
-DROP TABLE IF EXISTS `account_muted`;
 CREATE TABLE IF NOT EXISTS `account_muted` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `mutedate` INT unsigned NOT NULL DEFAULT 0,
-  `mutetime` INT unsigned NOT NULL DEFAULT 0,
-  `mutedby` VARCHAR(50) NOT NULL,
-  `mutereason` VARCHAR(255) NOT NULL,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `mutedate` int unsigned NOT NULL DEFAULT '0',
+  `mutetime` int unsigned NOT NULL DEFAULT '0',
+  `mutedby` varchar(50) NOT NULL,
+  `mutereason` varchar(255) NOT NULL,
   PRIMARY KEY (`guid`,`mutedate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='mute List';
 

@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_world.playercreateinfo_item
 DROP TABLE IF EXISTS `playercreateinfo_item`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_item` (
-  `race` TINYINT unsigned NOT NULL DEFAULT 0,
-  `class` TINYINT unsigned NOT NULL DEFAULT 0,
-  `itemid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `amount` INT NOT NULL DEFAULT 1,
-  `Note` VARCHAR(255) DEFAULT NULL,
+  `race` tinyint unsigned NOT NULL DEFAULT '0',
+  `class` tinyint unsigned NOT NULL DEFAULT '0',
+  `itemid` mediumint unsigned NOT NULL DEFAULT '0',
+  `amount` int NOT NULL DEFAULT '1',
+  `Note` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`race`,`class`,`itemid`),
   KEY `playercreateinfo_race_class_index` (`race`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

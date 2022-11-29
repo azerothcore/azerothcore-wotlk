@@ -655,23 +655,31 @@ class spell_hun_readiness : public SpellScript
 
         SpellCooldowns& cooldowns = caster->GetSpellCooldownMap();
 
-        SpellCooldowns::iterator itr, next;
-        for (itr = cooldowns.begin(); itr != cooldowns.end(); itr = next)
-        {
-            next = itr;
-            ++next;
+        std::set<std::pair<uint32, bool>> spellsToRemove;
+        std::set<uint32> categoriesToRemove;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+        for (const auto& [spellId, cooldown] : cooldowns)
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (spellInfo
             && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
             && spellInfo->Id != SPELL_HUNTER_READINESS
             && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH
-            && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU
-            && spellInfo->GetRecoveryTime() > 0)
+            && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU)
             {
-                caster->RemoveSpellCooldown(spellInfo->Id, itr->second.needSendToClient);
+                if (spellInfo->RecoveryTime > 0)
+                    spellsToRemove.insert(std::make_pair(spellInfo->Id, cooldown.needSendToClient));
+
+                if (spellInfo->CategoryRecoveryTime > 0)
+                    categoriesToRemove.insert(spellInfo->GetCategory());
             }
         }
+
+        // we can't remove spell cooldowns while iterating.
+        for (const auto& [spellId, sendToClient] : spellsToRemove)
+            caster->RemoveSpellCooldown(spellId, sendToClient);
+        for (const auto& category : categoriesToRemove)
+            caster->RemoveCategoryCooldown(category);
     }
 
     void Register() override

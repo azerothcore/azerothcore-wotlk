@@ -118,11 +118,11 @@ public:
             if( pInstance )
                 pInstance->SetData(TYPE_JARAXXUS, NOT_STARTED);
 
-            // checked for safety
-            while( Creature* c = me->FindNearestCreature(NPC_INFERNAL_VOLCANO, 500.0f, true) )
-                c->DespawnOrUnsummon();
-            while( Creature* c = me->FindNearestCreature(NPC_NETHER_PORTAL, 500.0f, true) )
-                c->DespawnOrUnsummon();
+            std::list<Creature*> creatures;
+            me->GetCreatureListWithEntryInGrid(creatures, NPC_INFERNAL_VOLCANO, 500.f);
+            me->GetCreatureListWithEntryInGrid(creatures, NPC_NETHER_PORTAL, 500.f);
+            for (Creature* creature : creatures)
+                creature->DespawnOrUnsummon();
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -336,7 +336,7 @@ public:
                 case EVENT_SPELL_FEL_STEAK:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 44.0f, true) )
                     {
-                        DoResetThreat();
+                        DoResetThreatList();
                         me->AddThreat(target, 50000.0f);
                         me->CastSpell(target, SPELL_FEL_STEAK_MORPH, true);
                         me->CastSpell(target, SPELL_FEL_STEAK, true);

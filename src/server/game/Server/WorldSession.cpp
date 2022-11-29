@@ -130,6 +130,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     isRecruiter(isARecruiter),
     m_currentVendorEntry(0),
     _calendarEventCreationCooldown(0),
+    _addonMessageReceiveCount(0),
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
     _pendingTimeSyncRequests()
@@ -446,6 +447,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     _recvQueue.readd(requeuePackets.begin(), requeuePackets.end());
 
     METRIC_VALUE("processed_packets", processedPackets);
+    METRIC_VALUE("addon_messages", _addonMessageReceiveCount.load());
+    _addonMessageReceiveCount = 0;
 
     if (!updater.ProcessUnsafe()) // <=> updater is of type MapSessionFilter
     {
@@ -665,11 +668,12 @@ void WorldSession::LogoutPlayer(bool save)
             _player->GetGroup()->SendUpdate();
             _player->GetGroup()->ResetMaxEnchantingLevel();
 
-            Map::PlayerList const& playerList = _player->GetMap()->GetPlayers();
-
             if (_player->GetMap()->IsDungeon() || _player->GetMap()->IsRaidOrHeroicDungeon())
+            {
+                Map::PlayerList const &playerList = _player->GetMap()->GetPlayers();
                 if (playerList.IsEmpty())
                     _player->TeleportToEntryPoint();
+            }
         }
 
         //! Broadcast a logout message to the player's friends
@@ -1250,8 +1254,8 @@ void WorldSession::SendAddonsInfo()
     for (AddonMgr::BannedAddonList::const_iterator itr = bannedAddons->begin(); itr != bannedAddons->end(); ++itr)
     {
         data << uint32(itr->Id);
-        data.append(itr->NameMD5, sizeof(itr->NameMD5));
-        data.append(itr->VersionMD5, sizeof(itr->VersionMD5));
+        data.append(itr->NameMD5);
+        data.append(itr->VersionMD5);
         data << uint32(itr->Timestamp);
         data << uint32(1);  // IsBanned
     }

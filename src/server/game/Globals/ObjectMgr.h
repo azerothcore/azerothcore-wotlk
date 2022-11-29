@@ -520,14 +520,17 @@ typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator
 
 struct PetLevelInfo
 {
-    PetLevelInfo() { for (unsigned short & stat : stats) stat = 0; }
+    PetLevelInfo()
+    {
+        stats.fill(0);
+    }
 
-    uint16 stats[MAX_STATS];
-    uint16 health{0};
-    uint16 mana{0};
+    std::array<uint32, MAX_STATS> stats = { };
+    uint32 health{0};
+    uint32 mana{0};
     uint32 armor{0};
-    uint16 min_dmg{0};
-    uint16 max_dmg{0};
+    uint32 min_dmg{0};
+    uint32 max_dmg{0};
 };
 
 struct MailLevelReward
@@ -837,9 +840,15 @@ public:
         return 0;
     }
 
-    [[nodiscard]] bool IsTavernAreaTrigger(uint32 Trigger_ID) const
+    [[nodiscard]] bool IsTavernAreaTrigger(uint32 triggerID, uint32 faction) const
     {
-        return _tavernAreaTriggerStore.find(Trigger_ID) != _tavernAreaTriggerStore.end();
+        auto itr = _tavernAreaTriggerStore.find(triggerID);
+        if (itr != _tavernAreaTriggerStore.end())
+        {
+            return (itr->second & faction) != 0;
+        }
+
+        return false;
     }
 
     [[nodiscard]] GossipText const* GetGossipText(uint32 Text_ID) const;
@@ -1445,7 +1454,7 @@ private:
 
     typedef std::unordered_map<uint32, GossipText> GossipTextContainer;
     typedef std::unordered_map<uint32, uint32> QuestAreaTriggerContainer;
-    typedef std::set<uint32> TavernAreaTriggerContainer;
+    typedef std::unordered_map<uint32, uint32> TavernAreaTriggerContainer;
 
     QuestAreaTriggerContainer _questAreaTriggerStore;
     TavernAreaTriggerContainer _tavernAreaTriggerStore;

@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.emotes_dbc
 DROP TABLE IF EXISTS `emotes_dbc`;
 CREATE TABLE IF NOT EXISTS `emotes_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `EmoteSlashCommand` VARCHAR(100) DEFAULT NULL,
-  `AnimID` INT NOT NULL DEFAULT 0,
-  `EmoteFlags` INT NOT NULL DEFAULT 0,
-  `EmoteSpecProc` INT NOT NULL DEFAULT 0,
-  `EmoteSpecProcParam` INT NOT NULL DEFAULT 0,
-  `EventSoundID` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `EmoteSlashCommand` varchar(100) DEFAULT NULL,
+  `AnimID` int NOT NULL DEFAULT '0',
+  `EmoteFlags` int NOT NULL DEFAULT '0',
+  `EmoteSpecProc` int NOT NULL DEFAULT '0',
+  `EmoteSpecProcParam` int NOT NULL DEFAULT '0',
+  `EventSoundID` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

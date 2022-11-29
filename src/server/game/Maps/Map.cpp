@@ -1269,7 +1269,7 @@ void Map::RemoveAllPlayers()
             {
                 // this is happening for bg
                 LOG_ERROR("maps", "Map::UnloadAll: player {} is still in map {} during unload, this should not happen!", player->GetName(), GetId());
-                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
             }
         }
     }
@@ -1946,11 +1946,11 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
             {
                 // Get water level
                 float liquid_level = _liquidMap ? _liquidMap[lx_int * _liquidWidth + ly_int] : _liquidLevel;
-                // Get ground level (sub 0.2 for fix some errors)
+                // Get ground level
                 float ground_level = getHeight(x, y);
 
-                // Check water level and ground level
-                if (liquid_level >= ground_level && z >= ground_level)
+                // Check water level and ground level (sub 0.2 for fix some errors)
+                if (liquid_level >= ground_level && z >= ground_level - 0.2f)
                 {
                     // All ok in water -> store data
                     liquidData.Entry  = entry;
@@ -2958,6 +2958,11 @@ bool InstanceMap::AddPlayerToMap(Player* player)
                     playerBind->save->CanReset(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), mapSave->CanReset());
                 return false;
             }
+        }
+        else if (player->GetSession()->PlayerLoading() && playerBind && playerBind->save != mapSave)
+        {
+            // Prevent "Convert to Raid" exploit to reset instances
+            return false;
         }
         else
         {
@@ -4015,4 +4020,22 @@ void Map::DeleteCorpseData()
     stmt->SetData(0, GetId());
     stmt->SetData(1, GetInstanceId());
     CharacterDatabase.Execute(stmt);
+}
+
+std::string Map::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << std::boolalpha
+        << "Id: " << GetId() << " InstanceId: " << GetInstanceId() << " Difficulty: " << std::to_string(GetDifficulty())
+        << " HasPlayers: " << HavePlayers();
+    return sstr.str();
+}
+
+std::string InstanceMap::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Map::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "ScriptId: " << GetScriptId() << " ScriptName: " << GetScriptName();
+    return sstr.str();
 }

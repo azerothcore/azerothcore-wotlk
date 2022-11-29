@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_world.spell_target_position
 DROP TABLE IF EXISTS `spell_target_position`;
 CREATE TABLE IF NOT EXISTS `spell_target_position` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
-  `EffectIndex` TINYINT unsigned NOT NULL DEFAULT 0,
-  `MapID` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `PositionX` float NOT NULL DEFAULT 0,
-  `PositionY` float NOT NULL DEFAULT 0,
-  `PositionZ` float NOT NULL DEFAULT 0,
-  `Orientation` float NOT NULL DEFAULT 0,
-  `VerifiedBuild` SMALLINT DEFAULT 0,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
+  `EffectIndex` tinyint unsigned NOT NULL DEFAULT '0',
+  `MapID` smallint unsigned NOT NULL DEFAULT '0',
+  `PositionX` float NOT NULL DEFAULT '0',
+  `PositionY` float NOT NULL DEFAULT '0',
+  `PositionZ` float NOT NULL DEFAULT '0',
+  `Orientation` float NOT NULL DEFAULT '0',
+  `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`ID`,`EffectIndex`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell System';
 
--- Dumpar data för tabell acore_world.spell_target_position: 629 rows
+-- Dumpar data för tabell acore_world.spell_target_position: 645 rows
 DELETE FROM `spell_target_position`;
 /*!40000 ALTER TABLE `spell_target_position` DISABLE KEYS */;
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES
@@ -249,8 +249,8 @@ INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, 
 	(23442, 0, 1, 6755.33, -4658.09, 724.8, 3.4049, 0),
 	(23446, 0, 1, -7109.1, -3825.21, 10.151, 2.8331, 0),
 	(23460, 0, 469, -7672.46, -1107.19, 396.65, 0.59, 0),
-	(24325, 0, 309, -11726.3, -1777.38, 10.46, 0.16, 0),
-	(24593, 0, 309, -11726.3, -1777.38, 10.46, 0.16, 0),
+	(24325, 0, 309, -11688.5, -1737.74, 8.40984, 0.16, 0),
+	(24593, 0, 309, -11688.5, -1737.74, 8.40984, 0.16, 0),
 	(24730, 0, 1, -1325.87, 86.6842, 129.79, 3.51259, 0),
 	(24831, 0, 0, -9570.82, -18.9837, 62.9345, 4.98, 0),
 	(25004, 0, 1, 7730.53, -2318.86, 451.34, 0, 0),
@@ -658,7 +658,23 @@ INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, 
 	(22673, 0, 469, -7506.58, -1165.26, 476.796, 0, 0),
 	(22674, 0, 469, -7500.7, -1249.89, 476.798, 0, 0),
 	(22675, 0, 469, -7486.36, -1194.32, 476.8, 0, 0),
-	(22676, 0, 469, -7469.93, -1227.93, 476.777, 0, 0);
+	(22676, 0, 469, -7469.93, -1227.93, 476.777, 0, 0),
+	(26660, 0, 530, 9050, -7434, 85, 0, 0),
+	(24466, 0, 309, -11582.9, -1251.15, 90, 5.04179, 0),
+	(26538, 0, 509, -9678.29, 1526.39, 24.4038, 0, 0),
+	(26539, 0, 509, -9709, 1551.2, 23.9888, 0, 0),
+	(720, 0, 531, -8043.6, 1254.1, -84.3, 0, 0),
+	(731, 0, 531, -8003, 1222.9, -82.1, 0, 0),
+	(1121, 0, 531, -8022.3, 1149, -89.1, 0, 0),
+	(518, 0, 531, -8028.5, 1050.9, -54, 0, 0),
+	(25831, 0, 531, -8158.03, 1139.3, -83.95, 0, 0),
+	(25832, 0, 531, -8029.25, 1237.78, -85.2285, 0, 0),
+	(25708, 0, 509, -9846, 1353, 106.083, 0, 0),
+	(25709, 0, 509, -9757.87, 1416.71, 76.7664, 0, 0),
+	(25825, 0, 509, -9805.95, 1422.85, 77.5852, 0, 0),
+	(25826, 0, 509, -9827.58, 1506.28, 82.3052, 0, 0),
+	(25827, 0, 509, -9778.91, 1419.98, 61.0743, 0, 0),
+	(25828, 0, 509, -9829.42, 1456.37, 90.7015, 0, 0);
 /*!40000 ALTER TABLE `spell_target_position` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

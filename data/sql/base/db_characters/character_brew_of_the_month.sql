@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_characters.character_brew_of_the_month
 DROP TABLE IF EXISTS `character_brew_of_the_month`;
 CREATE TABLE IF NOT EXISTS `character_brew_of_the_month` (
-  `guid` INT unsigned NOT NULL,
-  `lastEventId` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL,
+  `lastEventId` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
