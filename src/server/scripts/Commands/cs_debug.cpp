@@ -806,7 +806,7 @@ public:
         if (!target || target->IsTotem() || target->IsPet())
             return false;
 
-        auto const& threatList = target->GetThreatMgr().getThreatList();
+        auto const& threatList = target->GetThreatMgr().GetThreatList();
         ThreatContainer::StorageType::const_iterator itr;
         uint32 count = 0;
 
@@ -817,24 +817,24 @@ public:
             Unit* unit = (*itr)->getTarget();
             if (!unit)
             {
-                handler->PSendSysMessage("   %u.   No Unit  - threat %f", ++count, (*itr)->getThreat());
+                handler->PSendSysMessage("   %u.   No Unit  - threat %f", ++count, (*itr)->GetThreat());
                 continue;
             }
 
-            handler->PSendSysMessage("   %u.   %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->getThreat());
+            handler->PSendSysMessage("   %u.   %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->GetThreat());
         }
 
-        auto const& threatList2 = target->GetThreatMgr().getOfflineThreatList();
+        auto const& threatList2 = target->GetThreatMgr().GetOfflineThreatList();
         for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
         {
             Unit* unit = (*itr)->getTarget();
             if (!unit)
             {
-                handler->PSendSysMessage("   %u.   [offline] No Unit  - threat %f", ++count, (*itr)->getThreat());
+                handler->PSendSysMessage("   %u.   [offline] No Unit  - threat %f", ++count, (*itr)->GetThreat());
                 continue;
             }
 
-            handler->PSendSysMessage("   %u.   [offline] %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->getThreat());
+            handler->PSendSysMessage("   %u.   [offline] %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->GetThreat());
         }
 
         handler->SendSysMessage("End of threat list.");
@@ -857,12 +857,12 @@ public:
         {
             if (Unit* unit = ref->GetSource()->GetOwner())
             {
-                handler->PSendSysMessage("   %u.   %s %s   (%s)  - threat %f", ++count, (ref->isOnline() ? "" : "[offline]"),
-                    unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), ref->getThreat());
+                handler->PSendSysMessage("   %u.   %s %s   (%s)  - threat %f", ++count, (ref->IsOnline() ? "" : "[offline]"),
+                    unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), ref->GetThreat());
             }
             else
             {
-                handler->PSendSysMessage("   %u.   No Owner  - threat %f", ++count, ref->getThreat());
+                handler->PSendSysMessage("   %u.   No Owner  - threat %f", ++count, ref->GetThreat());
             }
 
             ref = ref->next();

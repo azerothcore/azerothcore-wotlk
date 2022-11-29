@@ -109,8 +109,10 @@ void Vehicle::Uninstall()
     LOG_DEBUG("vehicles", "Vehicle::Uninstall {}", _me->GetGUID().ToString());
     RemoveAllPassengers();
 
-    if (GetBase()->GetTypeId() == TYPEID_UNIT)
+    if (_me && _me->GetTypeId() == TYPEID_UNIT)
+    {
         sScriptMgr->OnUninstall(this);
+    }
 }
 
 void Vehicle::Reset(bool evading /*= false*/)
@@ -341,6 +343,9 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
 
         ASSERT(seat->second.IsEmpty());
     }
+
+    if (!seat->second.SeatInfo)
+        return false;
 
     LOG_DEBUG("vehicles", "Unit {} enter vehicle entry {} id {} ({}) seat {}",
         unit->GetName(), _me->GetEntry(), _vehicleInfo->m_ID, _me->GetGUID().ToString(), (int32)seat->first);

@@ -245,7 +245,7 @@ public:
         {
             PreventHitEffect(effIndex);
             if (Unit* target = GetHitUnit())
-                GetCaster()->GetThreatMgr().modifyThreatPercent(target, -20);
+                GetCaster()->GetThreatMgr().ModifyThreatByPercent(target, -20);
         }
 
         void Register() override

@@ -1052,7 +1052,14 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     uint32 creature_ID = (petType == HUNTER_PET) ? 1 : cinfo->Entry;
 
-    SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+    if (petType == HUNTER_PET)
+    {
+        SetMeleeDamageSchool(SPELL_SCHOOL_NORMAL);
+    }
+    else
+    {
+        SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+    }
 
     SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
 
@@ -1281,6 +1288,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_01, this);
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_02, this);
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_03, this);
+
+                            if (owner->getRace() == RACE_ORC)
+                            {
+                                CastSpell(this, SPELL_ORC_RACIAL_COMMAND_SHAMAN, true, nullptr, nullptr, owner->GetGUID());
+                            }
+
                             break;
                         }
                     case NPC_MIRROR_IMAGE: // Mirror Image
@@ -1357,7 +1370,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
         // xinef: fixes orc death knight command racial
         if (owner->getRace() == RACE_ORC)
-            CastSpell(this, SPELL_ORC_RACIAL_COMMAND, true, nullptr, nullptr, owner->GetGUID());
+            CastSpell(this, SPELL_ORC_RACIAL_COMMAND_DK, true, nullptr, nullptr, owner->GetGUID());
 
         // Avoidance, Night of the Dead
         if (Aura* aur = AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this))
@@ -1486,7 +1499,7 @@ void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans)
         {
             m_CreatureSpellCooldowns.erase(itr2);
         }
-        else if (itr2->second.end <= infTime && (itr2->second.end > (curMSTime + 30 * IN_MILLISECONDS)))
+        else if (itr2->second.end <= infTime)
         {
             uint32 cooldown = ((itr2->second.end - curMSTime) / IN_MILLISECONDS) + curTime;
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL_COOLDOWN);

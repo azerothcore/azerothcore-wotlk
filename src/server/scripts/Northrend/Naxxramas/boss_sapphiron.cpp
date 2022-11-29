@@ -321,8 +321,8 @@ public:
                         }
 
                         std::vector<Unit*> targets;
-                        auto i = me->GetThreatMgr().getThreatList().begin();
-                        for (; i != me->GetThreatMgr().getThreatList().end(); ++i)
+                        auto i = me->GetThreatMgr().GetThreatList().begin();
+                        for (; i != me->GetThreatMgr().GetThreatList().end(); ++i)
                         {
                             if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER)
                             {

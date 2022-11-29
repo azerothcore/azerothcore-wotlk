@@ -191,6 +191,11 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
+            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            {
+                return;
+            }
+
             if (Unit* caster = GetCaster())
                 if (Unit* target = GetTarget())
                     caster->CastSpell(target, 32830 /*POSSESS*/, true);
