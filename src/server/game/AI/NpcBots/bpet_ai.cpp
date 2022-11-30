@@ -2309,7 +2309,7 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
 
     //update movement orders if near owner, otherwise get close
     bool closeToOwner = false;
-    if (!opponent && !HasBotCommandState(BOT_COMMAND_STAY) && !IsCasting())
+    if (!opponent && !IsCasting())
     {
         _calculatePos(movepos);
         if (!petOwner->isMoving())
@@ -2317,7 +2317,7 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
             if (me->GetExactDist(&movepos) > 5.f)
                 SetBotCommandState(BOT_COMMAND_FOLLOW, true, &movepos);
             else
-                closeToOwner = true;
+                closeToOwner = !me->isMoving();
         }
         else
         {
@@ -2326,7 +2326,7 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
             if (destPos.GetExactDist(&movepos) > 5.f)
                 SetBotCommandState(BOT_COMMAND_FOLLOW, true, &movepos);
             else
-                closeToOwner = true;
+                closeToOwner = !me->isMoving();
         }
     }
     if (closeToOwner || me->IsInCombat())
