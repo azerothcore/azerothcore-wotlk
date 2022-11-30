@@ -126,7 +126,7 @@ void BotDataMgr::LoadNpcBots(bool spawn)
         LOG_INFO("server.loading", ">> Bot transmog data loaded");
     }
     else
-        LOG_INFO("server.loading", ">> Bots transmog data is not loaded. Table `creature_template_npcbot_transmog` is empty!");
+        LOG_INFO("server.loading", ">> Bots transmog data is not loaded. Table `characters_npcbot_transmog` is empty!");
 
     //                                       0      1      2      3     4        5          6          7          8          9               10          11          12         13
     result = CharacterDatabase.Query("SELECT entry, owner, roles, spec, faction, equipMhEx, equipOhEx, equipRhEx, equipHead, equipShoulders, equipChest, equipWaist, equipLegs, equipFeet,"
