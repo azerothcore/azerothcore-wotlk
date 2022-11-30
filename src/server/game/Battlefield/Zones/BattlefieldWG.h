@@ -1474,7 +1474,7 @@ struct WGWorkshop
                     // Send warning message to all player to inform a faction attack to a workshop
                     // alliance / horde attacking a workshop
                     bf->SendWarning(teamControl ? WorkshopsData[workshopId].attackText : (WorkshopsData[workshopId].attackText + 2));
-                    
+
                     // Updating worldstate, update icon to neutral
                     state = BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_INTACT;
                     bf->SendUpdateWorldState(WorkshopsData[workshopId].worldstate, state);
