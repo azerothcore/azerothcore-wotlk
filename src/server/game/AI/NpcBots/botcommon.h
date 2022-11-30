@@ -1039,6 +1039,12 @@ enum BotCommandStates
     BOT_COMMAND_MASK_UNMOVING           = BOT_COMMAND_STAY | BOT_COMMAND_FULLSTOP | BOT_COMMAND_ISSUED_ORDER
 };
 
+enum BotAwaitStates
+{
+    BOT_AWAIT_NONE                      = 0x00,
+    BOT_AWAIT_SEND                      = 0x01
+};
+
 #define FROM_ARRAY(arr) arr, arr + sizeof(arr) / sizeof(arr[0])
 
 //Only non-persistent types are allowed

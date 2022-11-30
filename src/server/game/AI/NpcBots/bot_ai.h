@@ -14,6 +14,7 @@ NpcBot System by Trickerer (onlysuffering@gmail.com)
 
 class TeleportHomeEvent;
 class TeleportFinishEvent;
+class AwaitStateRemovalEvent;
 
 enum CombatRating : uint8;
 enum GossipOptionIcon;
@@ -106,6 +107,11 @@ class bot_ai : public CreatureAI
         void SetBotCommandState(uint8 st, bool force = false, Position* newpos = nullptr);
         void RemoveBotCommandState(uint8 st);
         bool HasBotCommandState(uint8 st) const { return (m_botCommandState & st); }
+        void SetBotAwaitState(uint8 state);
+        inline void RemoveBotAwaitState(uint8 state) { _botAwaitState &= ~state; }
+        inline bool HasBotAwaitState(uint8 state) const { return !!(_botAwaitState & state); }
+        void EventRemoveBotAwaitState(uint8 state);
+        void AbortAwaitStateRemoval();
         uint8 GetBotCommandState() const { return m_botCommandState; }
         bool IsInBotParty(Unit const* unit) const;
         bool IsInBotParty(ObjectGuid guid) const;
@@ -587,6 +593,7 @@ class bot_ai : public CreatureAI
         Position movepos, attackpos;
 
         uint8 m_botCommandState;
+        uint8 _botAwaitState;
 
         //stats
         float hit, parry, dodge, block, crit, dmg_taken_phy, dmg_taken_mag, armor_pen;
@@ -627,6 +634,7 @@ class bot_ai : public CreatureAI
 
         TeleportHomeEvent* teleHomeEvent;
         TeleportFinishEvent* teleFinishEvent;
+        AwaitStateRemovalEvent* awaitStateRemEvent;
 
         struct BotSpell
         {

@@ -49,5 +49,24 @@ class TeleportFinishEvent : public BasicEvent
     private:
         bot_ai* _ai;
 };
+//Await state removal
+class AwaitStateRemovalEvent : public BasicEvent
+{
+    friend class bot_ai;
+    protected:
+        AwaitStateRemovalEvent(bot_ai* ai, uint8 state) : _ai(ai), _state(state) {}
+        ~AwaitStateRemovalEvent() = default;
+
+        //Execute is always called while creature is out of world so ai is never deleted
+        bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+        {
+            _ai->EventRemoveBotAwaitState(_state);
+            return true;
+        }
+
+    private:
+        bot_ai* _ai;
+        const uint8 _state;
+};
 
 #endif

@@ -154,6 +154,7 @@ class BotMgr
         void ReviveAllBots();
         void SendBotCommandState(uint8 state);
         void SendBotCommandStateRemove(uint8 state);
+        void SendBotAwaitState(uint8 state);
         void RecallAllBots(bool teleport = false);
         void RecallBot(Creature* bot);
         void KillAllBots();

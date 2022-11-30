@@ -1314,6 +1314,12 @@ void BotMgr::SendBotCommandStateRemove(uint8 state)
         itr->second->GetBotAI()->RemoveBotCommandState(state);
 }
 
+void BotMgr::SendBotAwaitState(uint8 state)
+{
+    for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
+        itr->second->GetBotAI()->SetBotAwaitState(state);
+}
+
 void BotMgr::RecallAllBots(bool teleport)
 {
     if (teleport)
@@ -1541,6 +1547,9 @@ void BotMgr::OnBotOwnerSpellGo(Unit const* caster, Spell const* spell, bool ok)
     {
         if (Creature const* bot = itr->second)
         {
+            if (!bot->IsInWorld() || !bot->IsAlive())
+                continue;
+
             bot->GetBotAI()->OnBotOwnerSpellGo(spell, ok);
             //if (Creature const* botpet = bot->GetBotsPet())
             //    botpet->GetBotAI()->OnBotPetOwnerSpellGo(spell, ok);
