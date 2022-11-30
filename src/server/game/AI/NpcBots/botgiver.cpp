@@ -18,7 +18,6 @@ Complete - 100%
 #define HIRE_ENTRY GOSSIP_SENDER_BOTGIVER_HIRE_ENTRY
 
 typedef std::set<Creature const*> NpcBotRegistry;
-extern NpcBotRegistry _existingBots;
 
 class script_bot_giver : public CreatureScript
 {
@@ -86,6 +85,21 @@ public:
                     subMenu = true;
 
                     uint8 availCount = 0;
+                    std::array<uint32, BOT_CLASS_END> npcbot_count_per_class{ 0 };
+
+                    {
+                        std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
+                        for (Creature const* bot : BotDataMgr::GetExistingNPCBots())
+                        {
+                            if (!bot->IsAlive() || bot->IsTempBot() || bot->GetBotAI()->GetBotOwnerGuid() || bot->HasAura(BERSERK))
+                                continue;
+                            if (BotMgr::FilterRaces() && bot->GetBotClass() < BOT_CLASS_EX_START && (bot->GetRaceMask() & RACEMASK_ALL_PLAYABLE) &&
+                                !(bot->GetRaceMask() & ((player->GetRaceMask() & RACEMASK_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE)))
+                                continue;
+
+                            ++npcbot_count_per_class[bot->GetBotClass()];
+                        }
+                    }
 
                     for (uint8 botclass = BOT_CLASS_WARRIOR; botclass < BOT_CLASS_END; ++botclass)
                     {
@@ -131,7 +145,7 @@ public:
                             continue;
 
                         std::ostringstream bclass;
-                        bclass << bot_ai::LocalizedNpcText(player, textId) << " (" << BotMgr::GetNpcBotCostStr(player->GetLevel(), botclass) << ")";
+                        bclass << npcbot_count_per_class[botclass] << " " << bot_ai::LocalizedNpcText(player, textId) << " (" << BotMgr::GetNpcBotCostStr(player->GetLevel(), botclass) << ")";
 
                         AddGossipItemFor(player, GOSSIP_ICON_TALK, bclass.str(), HIRE_CLASS, GOSSIP_ACTION_INFO_DEF + botclass);
 
@@ -164,7 +178,8 @@ public:
                     uint8 availCount = 0;
 
                     //go through bots map to find what bots are available
-                    NpcBotRegistry const& allBots = _existingBots;
+                    std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
+                    NpcBotRegistry const& allBots = BotDataMgr::GetExistingNPCBots();
                     for (NpcBotRegistry::const_iterator ci = allBots.begin(); ci != allBots.end(); ++ci)
                     {
                         Creature const* bot = *ci;
