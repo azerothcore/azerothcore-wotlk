@@ -17,8 +17,6 @@ Complete - 100%
 #define HIRE_CLASS GOSSIP_SENDER_BOTGIVER_HIRE_CLASS
 #define HIRE_ENTRY GOSSIP_SENDER_BOTGIVER_HIRE_ENTRY
 
-typedef std::set<Creature const*> NpcBotRegistry;
-
 class script_bot_giver : public CreatureScript
 {
 public:
