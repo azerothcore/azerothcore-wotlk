@@ -91,10 +91,10 @@ struct WardenHashRequest
 
 struct ClientWardenModule
 {
-    uint8 Id[16];
-    uint8 Key[16];
-    uint32 CompressedSize;
-    uint8* CompressedData;
+    std::array<uint8, 16> Id{};
+    std::array<uint8, 16> Key{};
+    uint32 CompressedSize{};
+    uint8* CompressedData{};
 };
 
 class WorldSession;
