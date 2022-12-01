@@ -22,12 +22,12 @@ enum BotCommonValues
 //MISC
     BOT_GIVER_ENTRY                     = 70000,
     BOT_ENTRY_BEGIN                     = 70001,
-    BOT_ENTRY_END                       = 71000,
-    BOT_ENTRY_CREATE_BEGIN              = 70800, // 70800 - 71000 reserved for bot creation
+    //BOT_ENTRY_END                       = 71000,
+    BOT_ENTRY_CREATE_BEGIN              = 70800, // 70800+ reserved for bot creation
     //BOT_PET_ENTRY_BEGIN                 = 70501,
     //BOT_PET_ENTRY_END                   = 70550,
     BOT_ENTRY_MIRROR_IMAGE_BM           = 70552,
-    BOT_ENTRY_CONVERSING_WITH_THE_DEPTHS_TRIGGER = 70100,
+    //BOT_ENTRY_CONVERSING_WITH_THE_DEPTHS_TRIGGER = 70100,
     BOT_MAX_CHASE_RANGE                 = 120,  //yds
     //BOT_EVADE_TIME                      = 3000, //ms
 //COMMON GAMEOBJECTS

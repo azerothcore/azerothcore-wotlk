@@ -147,6 +147,7 @@ class BotDataMgr
         static NpcBotRegistry const& GetExistingNPCBots();
         static void GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid);
         static ObjectGuid GetNPCBotGuid(uint32 entry);
+        static std::vector<uint32> GetExistingNPCBotIds();
 
         static std::shared_mutex* GetLock();
 

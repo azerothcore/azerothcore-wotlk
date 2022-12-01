@@ -1092,7 +1092,7 @@ public:
         for (CreatureTemplateContainer::const_iterator itr = ctc->begin(); itr != ctc->end(); ++itr)
         {
             uint32 id = itr->second.Entry;
-            if (id < BOT_ENTRY_BEGIN || id > BOT_ENTRY_END || id == BOT_ENTRY_CONVERSING_WITH_THE_DEPTHS_TRIGGER)
+            if (!BotDataMgr::SelectNpcBotExtras(id))
                 continue;
 
             if (id == BOT_ENTRY_MIRROR_IMAGE_BM)
@@ -1459,21 +1459,16 @@ public:
         }
 
         uint32 newentry = 0;
-        QueryResult creres = WorldDatabase.Query("SELECT MAX(entry) FROM creature_template WHERE entry >= {} AND entry < {}", BOT_ENTRY_CREATE_BEGIN, BOT_ENTRY_END);
-        if (creres)
+        QueryResult creres = WorldDatabase.Query("SELECT entry FROM creature_template WHERE entry = {}", BOT_ENTRY_CREATE_BEGIN);
+        if (!creres)
+            newentry = BOT_ENTRY_CREATE_BEGIN;
+        else
         {
+            creres = WorldDatabase.Query("SELECT MIN(entry) FROM creature_template WHERE entry >= {} AND entry IN (SELECT entry FROM creature_template) AND entry+1 NOT IN (SELECT entry FROM creature_template)", BOT_ENTRY_CREATE_BEGIN);
+            ASSERT(creres);
             Field* field = creres->Fetch();
             newentry = field[0].Get<uint32>() + 1;
         }
-        if (newentry < BOT_ENTRY_CREATE_BEGIN)
-            newentry = BOT_ENTRY_CREATE_BEGIN;
-
-        if (newentry >= BOT_ENTRY_END)
-        {
-            handler->SendSysMessage("Error: last entry is occupied, assuming no free entries left!");
-            handler->SetSentErrorMessage(true);
-            return false;
-        };
 
         WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
         trans->Append("DROP TEMPORARY TABLE IF EXISTS creature_template_temp_npcbot_create");
