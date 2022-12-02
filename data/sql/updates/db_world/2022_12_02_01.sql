@@ -1,3 +1,4 @@
+-- DB update 2022_12_02_00 -> 2022_12_02_01
 --
 UPDATE `creature` SET `curmana` = 0 WHERE `id1` = 20196;
 UPDATE `creature_template` SET `unit_flags2` = `unit_flags2`&~2048 WHERE (`entry` = 20196);
