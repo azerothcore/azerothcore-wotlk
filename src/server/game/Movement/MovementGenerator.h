@@ -42,7 +42,7 @@ public:
 
     virtual uint32 GetSplineId() const { return 0; }  // Xinef: Escort system
 
-    virtual void unitSpeedChanged() { }
+    virtual void UnitSpeedChanged() { }
 
     // timer in ms
     virtual void Pause(uint32 /* timer = 0*/) {}
