@@ -1433,6 +1433,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             if (!IsSpellValid(e, e.action.castCustom.spell))
                 return false;
             break;
+        case SMART_ACTION_SELF_CAST:
         case SMART_ACTION_ADD_AURA:
             if (!IsSpellValid(e, e.action.addAura.spell))
                 return false;
