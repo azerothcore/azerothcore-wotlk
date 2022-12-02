@@ -28,11 +28,8 @@ static constexpr uint32 HMAC_RESULT_SIZE = 20;
 {
     timestamp /= TOTP_INTERVAL;
     unsigned char challenge[8];
-
     for (int i = 8; i--; timestamp >>= 8)
-    {
         challenge[i] = timestamp;
-    }
 
     unsigned char digest[HMAC_RESULT_SIZE];
     uint32 digestSize = HMAC_RESULT_SIZE;
@@ -41,7 +38,6 @@ static constexpr uint32 HMAC_RESULT_SIZE = 20;
     uint32 offset = digest[19] & 0xF;
     uint32 truncated = (digest[offset] << 24) | (digest[offset + 1] << 16) | (digest[offset + 2] << 8) | (digest[offset + 3]);
     truncated &= 0x7FFFFFFF;
-
     return (truncated % 1000000);
 }
 
