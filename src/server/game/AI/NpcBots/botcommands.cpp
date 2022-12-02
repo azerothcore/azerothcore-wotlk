@@ -81,6 +81,103 @@ using namespace Acore::ChatCommands;
 class script_bot_commands : public CommandScript
 {
 private:
+    static constexpr size_t SOUND_SETS_COUNT = 3;
+    static constexpr size_t GENDERS_COUNT = 2;
+    static constexpr size_t RACES_COUNT = 10;
+
+    // model ids with different sound sets tied to them
+    enum SoundSetModels : uint32
+    {
+        SOUNDSETMODEL_HUMAN_MALE_1          = 3192,
+        SOUNDSETMODEL_HUMAN_MALE_2          = 1290,
+        SOUNDSETMODEL_HUMAN_MALE_3          = 793,
+        SOUNDSETMODEL_HUMAN_FEMALE_1        = 1295,
+        SOUNDSETMODEL_HUMAN_FEMALE_2        = 1296,
+        SOUNDSETMODEL_HUMAN_FEMALE_3        = 1297,
+        SOUNDSETMODEL_DWARF_MALE_1          = 1280,
+        SOUNDSETMODEL_DWARF_MALE_2          = 1354,
+        SOUNDSETMODEL_DWARF_MALE_3          = 1362,
+        SOUNDSETMODEL_DWARF_FEMALE_1        = 1286,
+        SOUNDSETMODEL_DWARF_FEMALE_2        = 1407,
+        SOUNDSETMODEL_DWARF_FEMALE_3        = 2585,
+        SOUNDSETMODEL_NIGHTELF_MALE_1       = 1285,
+        SOUNDSETMODEL_NIGHTELF_MALE_2       = 3599,
+        SOUNDSETMODEL_NIGHTELF_MALE_3       = 3602,
+        SOUNDSETMODEL_NIGHTELF_FEMALE_1     = 2151,
+        SOUNDSETMODEL_NIGHTELF_FEMALE_2     = 2081,
+        SOUNDSETMODEL_NIGHTELF_FEMALE_3     = 1719,
+        SOUNDSETMODEL_GNOME_MALE_1          = 1832,
+        SOUNDSETMODEL_GNOME_MALE_2          = 4287,
+        SOUNDSETMODEL_GNOME_MALE_3          = 4717,
+        SOUNDSETMODEL_GNOME_FEMALE_1        = 3124,
+        SOUNDSETMODEL_GNOME_FEMALE_2        = 5378,
+        SOUNDSETMODEL_GNOME_FEMALE_3        = 3108,
+        SOUNDSETMODEL_DRAENEI_MALE_1        = 16503,
+        SOUNDSETMODEL_DRAENEI_MALE_2        = 16477,
+        SOUNDSETMODEL_DRAENEI_MALE_3        = 16475,
+        SOUNDSETMODEL_DRAENEI_FEMALE_1      = 16222,
+        SOUNDSETMODEL_DRAENEI_FEMALE_2      = 16202,
+        SOUNDSETMODEL_DRAENEI_FEMALE_3      = 16636,
+        SOUNDSETMODEL_ORC_MALE_1            = 1275,
+        SOUNDSETMODEL_ORC_MALE_2            = 1326,
+        SOUNDSETMODEL_ORC_MALE_3            = 1368,
+        SOUNDSETMODEL_ORC_FEMALE_1          = 1325,
+        SOUNDSETMODEL_ORC_FEMALE_2          = 1868,
+        SOUNDSETMODEL_ORC_FEMALE_3          = 1874,
+        SOUNDSETMODEL_UNDEAD_MALE_1         = 1278,
+        SOUNDSETMODEL_UNDEAD_MALE_2         = 1562,
+        SOUNDSETMODEL_UNDEAD_MALE_3         = 1578,
+        SOUNDSETMODEL_UNDEAD_FEMALE_1       = 1592,
+        SOUNDSETMODEL_UNDEAD_FEMALE_2       = 1593,
+        SOUNDSETMODEL_UNDEAD_FEMALE_3       = 1603,
+        SOUNDSETMODEL_TAUREN_MALE_1         = 2083,
+        SOUNDSETMODEL_TAUREN_MALE_2         = 2087,
+        SOUNDSETMODEL_TAUREN_MALE_3         = 2096,
+        SOUNDSETMODEL_TAUREN_FEMALE_1       = 2113,
+        SOUNDSETMODEL_TAUREN_FEMALE_2       = 2112,
+        SOUNDSETMODEL_TAUREN_FEMALE_3       = 2127,
+        SOUNDSETMODEL_TROLL_MALE_1          = 3608,
+        SOUNDSETMODEL_TROLL_MALE_2          = 4047,
+        SOUNDSETMODEL_TROLL_MALE_3          = 4068,
+        SOUNDSETMODEL_TROLL_FEMALE_1        = 4085,
+        SOUNDSETMODEL_TROLL_FEMALE_2        = 4231,
+        SOUNDSETMODEL_TROLL_FEMALE_3        = 4524,
+        SOUNDSETMODEL_BLOODELF_MALE_1       = 15532,
+        SOUNDSETMODEL_BLOODELF_MALE_2       = 16700,
+        SOUNDSETMODEL_BLOODELF_MALE_3       = 16699,
+        SOUNDSETMODEL_BLOODELF_FEMALE_1     = 15514,
+        SOUNDSETMODEL_BLOODELF_FEMALE_2     = 15518,
+        SOUNDSETMODEL_BLOODELF_FEMALE_3     = 15520,
+    };
+
+    static constexpr size_t RaceToRaceOffset[MAX_RACES] = {
+        RACE_NONE,
+        0, //RACE_HUMAN
+        5, //RACE_ORC
+        1, //RACE_DWARF
+        2, //RACE_RACE_NIGHTELF
+        6, //RACE_RACE_UNDEAD_PLAYER
+        7, //RACE_TAUREN
+        3, //RACE_GNOME
+        8, //RACE_TROLL
+        RACE_NONE,
+        9, //RACE_BLOODELF
+        4, //RACE_DRAENEI
+    };
+    
+    static constexpr uint32 SoundSetModelsArray[RACES_COUNT][GENDERS_COUNT][SOUND_SETS_COUNT] = {
+        {{SOUNDSETMODEL_HUMAN_MALE_1, SOUNDSETMODEL_HUMAN_MALE_2, SOUNDSETMODEL_HUMAN_MALE_3}, {SOUNDSETMODEL_HUMAN_FEMALE_1, SOUNDSETMODEL_HUMAN_FEMALE_2, SOUNDSETMODEL_HUMAN_FEMALE_3}},
+        {{SOUNDSETMODEL_DWARF_MALE_1, SOUNDSETMODEL_DWARF_MALE_2, SOUNDSETMODEL_DWARF_MALE_3}, {SOUNDSETMODEL_DWARF_FEMALE_1, SOUNDSETMODEL_DWARF_FEMALE_2, SOUNDSETMODEL_DWARF_FEMALE_3}},
+        {{SOUNDSETMODEL_NIGHTELF_MALE_1, SOUNDSETMODEL_NIGHTELF_MALE_2, SOUNDSETMODEL_NIGHTELF_MALE_3}, {SOUNDSETMODEL_NIGHTELF_FEMALE_1, SOUNDSETMODEL_NIGHTELF_FEMALE_2, SOUNDSETMODEL_NIGHTELF_FEMALE_3}},
+        {{SOUNDSETMODEL_GNOME_MALE_1, SOUNDSETMODEL_GNOME_MALE_2, SOUNDSETMODEL_GNOME_MALE_3}, {SOUNDSETMODEL_GNOME_FEMALE_1, SOUNDSETMODEL_GNOME_FEMALE_2, SOUNDSETMODEL_GNOME_FEMALE_3}},
+        {{SOUNDSETMODEL_DRAENEI_MALE_1, SOUNDSETMODEL_DRAENEI_MALE_2, SOUNDSETMODEL_DRAENEI_MALE_3}, {SOUNDSETMODEL_DRAENEI_FEMALE_1, SOUNDSETMODEL_DRAENEI_FEMALE_2, SOUNDSETMODEL_DRAENEI_FEMALE_3}},
+        {{SOUNDSETMODEL_ORC_MALE_1, SOUNDSETMODEL_ORC_MALE_2, SOUNDSETMODEL_ORC_MALE_3}, {SOUNDSETMODEL_ORC_FEMALE_1, SOUNDSETMODEL_ORC_FEMALE_2, SOUNDSETMODEL_ORC_FEMALE_3}},
+        {{SOUNDSETMODEL_UNDEAD_MALE_1, SOUNDSETMODEL_UNDEAD_MALE_2, SOUNDSETMODEL_UNDEAD_MALE_3}, {SOUNDSETMODEL_UNDEAD_FEMALE_1, SOUNDSETMODEL_UNDEAD_FEMALE_2, SOUNDSETMODEL_UNDEAD_FEMALE_3}},
+        {{SOUNDSETMODEL_TAUREN_MALE_1, SOUNDSETMODEL_TAUREN_MALE_2, SOUNDSETMODEL_TAUREN_MALE_3}, {SOUNDSETMODEL_TAUREN_FEMALE_1, SOUNDSETMODEL_TAUREN_FEMALE_2, SOUNDSETMODEL_TAUREN_FEMALE_3}},
+        {{SOUNDSETMODEL_TROLL_MALE_1, SOUNDSETMODEL_TROLL_MALE_2, SOUNDSETMODEL_TROLL_MALE_3}, {SOUNDSETMODEL_TROLL_FEMALE_1, SOUNDSETMODEL_TROLL_FEMALE_2, SOUNDSETMODEL_TROLL_FEMALE_3}},
+        {{SOUNDSETMODEL_BLOODELF_MALE_1, SOUNDSETMODEL_BLOODELF_MALE_2, SOUNDSETMODEL_BLOODELF_MALE_3}, {SOUNDSETMODEL_BLOODELF_FEMALE_1, SOUNDSETMODEL_BLOODELF_FEMALE_2, SOUNDSETMODEL_BLOODELF_FEMALE_3}}
+    };
+
     struct BotInfo
     {
             explicit BotInfo(uint32 Id, std::string&& Name, uint8 Race) : id(Id), name(std::move(Name)), race(Race) {}
@@ -1285,12 +1382,12 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotCreateNewCommand(ChatHandler* handler, Optional<std::string_view> name, Optional<uint8> bclass, Optional<uint8> race, Optional<uint8> gender, Optional<uint8> skin, Optional<uint8> face, Optional<uint8> hairstyle, Optional<uint8> haircolor, Optional<uint8> features)
+    static bool HandleNpcBotCreateNewCommand(ChatHandler* handler, Optional<std::string_view> name, Optional<uint8> bclass, Optional<uint8> race, Optional<uint8> gender, Optional<uint8> skin, Optional<uint8> face, Optional<uint8> hairstyle, Optional<uint8> haircolor, Optional<uint8> features, Optional<uint8> soundset)
     {
         static auto const ret_err = [](ChatHandler* handler) {
             handler->SendSysMessage(".npcbot createnew");
             handler->SendSysMessage("Creates a new npcbot creature entry");
-            handler->SendSysMessage("Syntax: .npcbot createnew #name #class ##race ##gender ##skin ##face ##hairstyle ##haircolor ##features");
+            handler->SendSysMessage("Syntax: .npcbot createnew #name #class ##race ##gender ##skin ##face ##hairstyle ##haircolor ##features ##[sound_variant = {{1,2,3}}]");
             handler->SendSysMessage("In case of class that cannot change appearance all extra arguments must be omitted");
             handler->SetSentErrorMessage(true);
             return false;
@@ -1348,6 +1445,8 @@ public:
         if (can_change_appearance && (!race || !gender || !skin || !face || !hairstyle || !haircolor || !features))
             return ret_err(handler);
         if (!can_change_appearance && (race || gender || skin || face || hairstyle || haircolor || features))
+            return ret_err(handler);
+        if (soundset && (*soundset < 1 || *soundset > SOUND_SETS_COUNT))
             return ret_err(handler);
 
         if (*bclass >= BOT_CLASS_END || (*bclass < BOT_CLASS_EX_START && !((1u << (*bclass - 1)) & CLASSMASK_ALL_PLAYABLE)))
@@ -1445,18 +1544,7 @@ public:
         }
 
         //get normalized modelID
-        uint32 modelId = 0;
-        if (*bclass < BOT_CLASS_EX_START)
-        {
-            PlayerInfo const* info = sObjectMgr->GetPlayerInfo(*race, *bclass);
-            ASSERT(info);
-            switch (*gender)
-            {
-                case GENDER_MALE:   modelId = info->displayId_m; break;
-                case GENDER_FEMALE: modelId = info->displayId_f; break;
-                default:                                         break;
-            }
-        }
+        uint32 modelId = can_change_appearance ? SoundSetModelsArray[RaceToRaceOffset[*race]][*gender][soundset ? *soundset - 1 : urand(0u, 2u)] : 0;
 
         uint32 newentry = 0;
         QueryResult creres = WorldDatabase.Query("SELECT entry FROM creature_template WHERE entry = {}", BOT_ENTRY_CREATE_BEGIN);
