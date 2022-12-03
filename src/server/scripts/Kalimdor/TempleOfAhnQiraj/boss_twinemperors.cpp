@@ -158,7 +158,7 @@ struct boss_twinemperorsAI : public BossAI
 
         if (action == ACTION_AFTER_TELEPORT)
         {
-            DoResetThreat();
+            DoResetThreatList();
             me->SetReactState(REACT_PASSIVE);
             DoCastSelf(SPELL_TWIN_TELEPORT_VISUAL, true);
             _scheduler.DelayAll(2300ms);
@@ -168,7 +168,7 @@ struct boss_twinemperorsAI : public BossAI
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     if (Unit* victim = me->SelectNearestTarget())
                     {
-                        me->AddThreat(victim, 200000.f);
+                        me->AddThreat(victim, 2000.f);
                         AttackStart(victim);
                     }
                 });
@@ -327,10 +327,7 @@ struct boss_veknilash : public boss_twinemperorsAI
 
 struct boss_veklor : public boss_twinemperorsAI
 {
-    boss_veklor(Creature* creature) : boss_twinemperorsAI(creature)
-    {
-        me->SetFloatValue(UNIT_FIELD_COMBATREACH, 45.f);
-    }
+    boss_veklor(Creature* creature) : boss_twinemperorsAI(creature) { }
 
     bool IAmVeklor() override { return true; }
 
@@ -343,13 +340,26 @@ struct boss_veklor : public boss_twinemperorsAI
         _scheduler
             .Schedule(4s, [this](TaskContext context)
             {
+                if (me->GetVictim())
+                {
+                    if (!me->IsWithinDist(me->GetVictim(), 45.0f))
+                    {
+                        me->GetMotionMaster()->MoveChase(me->GetVictim(), 45.0f, 0);
+                    }
+                    else
+                    {
+                        me->StopMoving();
+                        me->GetMotionMaster()->Clear();
+                    }
+                }
+
                 DoCastVictim(SPELL_SHADOW_BOLT);
                 context.Repeat(2500ms);
             })
             .Schedule(10s, 15s, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_BLIZZARD, 0, 45.f);
-                context.Repeat(5s, 12s);
+                context.Repeat(10s, 24s);
             })
             .Schedule(1s, [this](TaskContext context)
             {
@@ -357,10 +367,10 @@ struct boss_veklor : public boss_twinemperorsAI
                     DoCastAOE(SPELL_ARCANE_BURST);
                 context.Repeat(7s, 12s);
             })
-            .Schedule(30s, 40s, [this](TaskContext context)
+            .Schedule(30s, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_TWIN_TELEPORT_0);
-                context.Repeat();
+                context.Repeat(30s, 40s);
             })
             .Schedule(5s, [this](TaskContext context)
             {
@@ -388,6 +398,19 @@ struct boss_veklor : public boss_twinemperorsAI
 
                 veknilash->AI()->DoAction(ACTION_AFTER_TELEPORT);
                 DoAction(ACTION_AFTER_TELEPORT);
+            }
+        }
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
+        {
+            // VL doesn't melee
+            if (me->Attack(who, false))
+            {
+                me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
+                me->AddThreat(who, 0.0f);
             }
         }
     }

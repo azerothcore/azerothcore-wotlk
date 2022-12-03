@@ -567,8 +567,10 @@ public:
                             DoCheckDedicatedInsanity();
                         bSwitcher = !bSwitcher;
 
-                        if( DoNeedCleanup(false) )
+                        if (DoNeedCleanup())
+                        {
                             InstanceCleanup();
+                        }
                         events.RepeatEvent(CLEANUP_CHECK_INTERVAL);
                     }
                     break;
@@ -1401,8 +1403,10 @@ public:
             else
                 plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 0);
 
-            if( DoNeedCleanup(true) )
+            if (DoNeedCleanup(plr))
+            {
                 InstanceCleanup();
+            }
 
             // if missing spawn anub'arak
             SpawnAnubArak();
@@ -1410,18 +1414,26 @@ public:
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
         }
 
-        bool DoNeedCleanup(bool /*enter*/)
+        bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
         {
             uint8 aliveCount = 0;
-            Map::PlayerList const& pl = instance->GetPlayers();
-            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                if( Player* plr = itr->GetSource() )
-                    if( plr->IsAlive() && !plr->IsGameMaster() )
+            for (auto const& itr: instance->GetPlayers())
+            {
+                if (Player* plr = itr.GetSource())
+                {
+                    if (plr != ignoredPlayer && plr->IsAlive() && !plr->IsGameMaster())
+                    {
                         ++aliveCount;
+                    }
+                }
+            }
 
             bool need = aliveCount == 0;
-            if( !need && CLEANED )
+            if (!need && CLEANED)
+            {
                 CLEANED = false;
+            }
+
             return need;
         }
 

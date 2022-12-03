@@ -927,7 +927,7 @@ public:
                             Player* player = itr->GetSource();
                             if( player && me->IsInRange(player, 8.0f, 25.0f, false) )
                             {
-                                DoResetThreat();
+                                DoResetThreatList();
                                 me->AddThreat(player, 5.0f);
                                 me->CastSpell(player, SPELL_INTERCEPT, false);
                                 break;

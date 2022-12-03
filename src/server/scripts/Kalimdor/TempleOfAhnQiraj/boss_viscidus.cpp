@@ -101,6 +101,7 @@ struct boss_viscidus : public BossAI
     boss_viscidus(Creature* creature) : BossAI(creature, DATA_VISCIDUS)
     {
         me->LowerPlayerDamageReq(me->GetMaxHealth());
+        me->m_CombatDistance = 60.f;
     }
 
     bool CheckInRoom() override
@@ -130,6 +131,17 @@ struct boss_viscidus : public BossAI
         me->SetReactState(REACT_AGGRESSIVE);
         _phase = PHASE_FROST;
         me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        events.Reset();
+        summons.DespawnAll(10 * IN_MILLISECONDS);
+        if (instance)
+        {
+            instance->SetBossState(DATA_VISCIDUS, DONE);
+            instance->SaveToDB();
+        }
     }
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType effType, SpellSchoolMask spellSchoolMask) override
@@ -183,7 +195,7 @@ struct boss_viscidus : public BossAI
                     me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
                     me->LowerPlayerDamageReq(me->GetMaxHealth());
                     me->SetHealth(me->GetMaxHealth() * 0.01f); // set 1% health
-                    DoResetThreat();
+                    DoResetThreatList();
                     me->NearTeleportTo(roomCenter.GetPositionX(),
                         roomCenter.GetPositionY(),
                         roomCenter.GetPositionZ(),

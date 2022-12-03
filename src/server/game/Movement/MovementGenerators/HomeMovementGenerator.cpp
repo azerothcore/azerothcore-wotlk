@@ -30,7 +30,7 @@ void HomeMovementGenerator<Creature>::DoInitialize(Creature* owner)
 void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner)
 {
     owner->ClearUnitState(UNIT_STATE_EVADE);
-    if (arrived)
+    if (_arrived)
     {
         // Xinef: npc run by default
         //owner->SetWalk(true);
@@ -68,15 +68,15 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature* owner)
     init.SetWalk(false);
     init.Launch();
 
-    arrived = false;
+    _arrived = false;
 
     owner->ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_POSSESSED | UNIT_STATE_EVADE | UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD)));
 }
 
 bool HomeMovementGenerator<Creature>::DoUpdate(Creature* owner, const uint32 /*time_diff*/)
 {
-    arrived = owner->movespline->Finalized();
-    if (arrived)
+    _arrived = owner->movespline->Finalized();
+    if (_arrived)
         return false;
 
     if (i_recalculateTravel)

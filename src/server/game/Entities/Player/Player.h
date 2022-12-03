@@ -1316,7 +1316,7 @@ public:
     void DestroyZoneLimitedItem(bool update, uint32 new_zone);
     void SplitItem(uint16 src, uint16 dst, uint32 count);
     void SwapItem(uint16 src, uint16 dst);
-    void AddItemToBuyBackSlot(Item* pItem);
+    void AddItemToBuyBackSlot(Item* pItem, uint32 money);
     Item* GetItemFromBuyBackSlot(uint32 slot);
     void RemoveItemFromBuyBackSlot(uint32 slot, bool del);
     [[nodiscard]] uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END - KEYRING_SLOT_START; }
@@ -1677,7 +1677,7 @@ public:
     void BuildPlayerTalentsInfoData(WorldPacket* data);
     void BuildPetTalentsInfoData(WorldPacket* data);
     void SendTalentsInfoData(bool pet);
-    void LearnTalent(uint32 talentId, uint32 talentRank);
+    void LearnTalent(uint32 talentId, uint32 talentRank, bool command = false);
     void LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank);
 
     bool addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank);
@@ -2319,6 +2319,7 @@ public:
     float m_homebindX;
     float m_homebindY;
     float m_homebindZ;
+    float m_homebindO;
 
     [[nodiscard]] WorldLocation GetStartPosition() const;
 

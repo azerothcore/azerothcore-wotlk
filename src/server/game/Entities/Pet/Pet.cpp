@@ -1052,7 +1052,14 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     uint32 creature_ID = (petType == HUNTER_PET) ? 1 : cinfo->Entry;
 
-    SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+    if (petType == HUNTER_PET)
+    {
+        SetMeleeDamageSchool(SPELL_SCHOOL_NORMAL);
+    }
+    else
+    {
+        SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+    }
 
     SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
 
@@ -1492,7 +1499,7 @@ void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans)
         {
             m_CreatureSpellCooldowns.erase(itr2);
         }
-        else if (itr2->second.end <= infTime && (itr2->second.end > (curMSTime + 30 * IN_MILLISECONDS)))
+        else if (itr2->second.end <= infTime)
         {
             uint32 cooldown = ((itr2->second.end - curMSTime) / IN_MILLISECONDS) + curTime;
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL_COOLDOWN);

@@ -971,7 +971,7 @@ public:
                 case EVENT_SHADOW_STEP:
                     if (Unit* target = SelectTargetFromPlayerList(100.0f, 0, true))
                     {
-                        DoResetThreat();
+                        DoResetThreatList();
                         me->AddThreat(target, 5000.0f);
                         AttackStart(target);
                         me->CastSpell(target, SPELL_SHADOW_STEP, false);
@@ -1562,7 +1562,7 @@ public:
                         for (uint8 i = 3; i < PATH_WP_COUNT - 1; ++i)
                             path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
                         me->GetMotionMaster()->MoveSplinePath(&path);
-                        me->GetMotionMaster()->propagateSpeedChange();
+                        me->GetMotionMaster()->PropagateSpeedChange();
                         events.ScheduleEvent(EVENT_LK_SUMMON, 1000);
                     }
                     break;
