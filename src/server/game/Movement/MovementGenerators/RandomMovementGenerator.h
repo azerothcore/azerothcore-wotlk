@@ -49,7 +49,7 @@ public:
     }
     ~RandomMovementGenerator();
 
-    void _setRandomLocation(T*);
+    void SetRandomLocation(T*);
     void DoInitialize(T*);
     void DoFinalize(T*);
     void DoReset(T*);
