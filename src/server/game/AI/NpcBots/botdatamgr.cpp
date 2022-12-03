@@ -269,7 +269,7 @@ void BotDataMgr::LoadNpcBotGroupData()
     QueryResult result = CharacterDatabase.Query("SELECT guid, entry, memberFlags, subgroup, roles FROM characters_npcbot_group_member ORDER BY guid");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 NPCBot group members. DB table `group_member` is empty!");
+        LOG_INFO("server.loading", ">> Loaded 0 NPCBot group members. DB table `characters_npcbot_group_member` is empty!");
         return;
     }
 
