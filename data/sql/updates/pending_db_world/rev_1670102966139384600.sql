@@ -12419,7 +12419,7 @@ INSERT INTO `quest_request_items_locale` (`id`, `locale`, `CompletionText`, `Ver
 DELETE FROM `quest_offer_reward_locale` WHERE `id` = @ID AND `locale` IN('esES', 'esMX');
 INSERT INTO `quest_offer_reward_locale` (`id`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
 (@ID, 'esES', '¡Así que mataste a ese horrible Kruush! Bien hecho, $n. ¡Bien hecho! Su muerte desestabilizará a esos jinetes de huargos. ¡En realidad, espero que te hayas cargado a alguno durante tu viaje a Zeth\'Gor!$B$BAquí está tu recompensa. ¡Te lo mereces!', 0),
-(@ID, 'esMX', '¡Así que mataste a ese horrible Kruush! Bien hecho, $n. ¡Bien hecho! Su muerte desestabilizará a esos jinetes de huargos. ¡En realidad, espero que te hayas cargado a alguno durante tu viaje a Zeth\'Gor!$B$BAquí está tu recompensa. ¡Te lo mereces!', 0);```
+(@ID, 'esMX', '¡Así que mataste a ese horrible Kruush! Bien hecho, $n. ¡Bien hecho! Su muerte desestabilizará a esos jinetes de huargos. ¡En realidad, espero que te hayas cargado a alguno durante tu viaje a Zeth\'Gor!$B$BAquí está tu recompensa. ¡Te lo mereces!', 0);
 -- 10808 Frustra los planes del Cónclave
 -- https://es.tbc.wowhead.com/quest=10808
 SET @ID := 10808;
