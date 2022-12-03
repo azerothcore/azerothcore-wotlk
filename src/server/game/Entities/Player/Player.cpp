@@ -1919,6 +1919,7 @@ void Player::Regenerate(Powers power)
     addvalue += m_powerFraction[power];
     uint32 integerValue = uint32(std::fabs(addvalue));
 
+    bool forcedUpdate = false;
     if (addvalue < 0.0f)
     {
         if (curValue > integerValue)
@@ -1930,24 +1931,33 @@ void Player::Regenerate(Powers power)
         {
             curValue = 0;
             m_powerFraction[power] = 0;
+            forcedUpdate = true;
         }
     }
     else
     {
         curValue += integerValue;
 
-        if (curValue > maxValue)
+        if (curValue >= maxValue)
         {
             curValue = maxValue;
             m_powerFraction[power] = 0;
+            forcedUpdate = true;
         }
         else
+        {
             m_powerFraction[power] = addvalue - integerValue;
+        }
     }
-    if (m_regenTimerCount >= 2000)
-        SetPower(power, curValue);
+
+    if (m_regenTimerCount >= 2000 || forcedUpdate)
+    {
+        SetPower(power, curValue, true, true);
+    }
     else
+    {
         UpdateUInt32Value(static_cast<uint16>(UNIT_FIELD_POWER1) + power, curValue);
+    }
 }
 
 void Player::RegenerateHealth()
