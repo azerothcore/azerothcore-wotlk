@@ -7,8 +7,8 @@ SET @CLASS_WARLOCK          = 9;
 SET @CLASS_DRUID            = 11;
 
 -- actual values are irrelevant, but hp and mana must be > 1
-DELETE FROM creature_classlevelstats WHERE class IN (@CLASS_HUNTER, @CLASS_PRIEST, @CLASS_DK, @CLASS_SHAMAN, @CLASS_WARLOCK, @CLASS_DRUID) AND level BETWEEN 1 AND 100;
-INSERT INTO creature_classlevelstats (level, class, basehp0, basehp1, basehp2, basemana, basearmor, attackpower, rangedattackpower, damage_base, damage_exp1, damage_exp2, comment) VALUES
+DELETE FROM `creature_classlevelstats` WHERE `class` IN (@CLASS_HUNTER,@CLASS_PRIEST,@CLASS_DK,@CLASS_SHAMAN,@CLASS_WARLOCK,@CLASS_DRUID) AND `level` BETWEEN 1 AND 100;
+INSERT INTO `creature_classlevelstats` (`level`,`class`,`basehp0`,`basehp1`,`basehp2`,`basemana`,`basearmor`,`attackpower`,`rangedattackpower`,`damage_base`,`damage_exp1`,`damage_exp2`,`comment`) VALUES
 ('1', @CLASS_HUNTER, '2', '2', '2', '2', '0', '0', '0', '0.1', '0', '0', NULL),
 ('1', @CLASS_PRIEST, '2', '2', '2', '2', '0', '0', '0', '0.1', '0', '0', NULL),
 ('1', @CLASS_DK,     '2', '2', '2', '2', '0', '0', '0', '0.1', '0', '0', NULL),

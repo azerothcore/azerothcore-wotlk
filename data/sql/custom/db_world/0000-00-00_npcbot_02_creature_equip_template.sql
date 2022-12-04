@@ -2,9 +2,9 @@
 SET @BOT_START = 70000;
 SET @BOT_END   = 70585;
 
-DELETE FROM creature_equip_template WHERE CreatureID BETWEEN @BOT_START AND @BOT_END AND CreatureID != 70100;
+DELETE FROM `creature_equip_template` WHERE `CreatureID` BETWEEN @BOT_START AND @BOT_END AND `CreatureID` != 70100;
 
-INSERT INTO creature_equip_template (CreatureID, ID, ItemID1, ItemID2, ItemID3, VerifiedBuild) VALUES
+INSERT INTO `creature_equip_template` (`CreatureID`,`ID`,`ItemID1`,`ItemID2`,`ItemID3`,`VerifiedBuild`) VALUES
 (70001, 1, 2497, 0, 0, -1),
 (70002, 1, 2483, 0, 0, -1),
 (70003, 1, 2497, 0, 0, -1),

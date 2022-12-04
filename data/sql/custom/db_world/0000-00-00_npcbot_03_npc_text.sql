@@ -2,9 +2,9 @@
 SET @BOT_START = 70000;
 SET @BOT_END   = 70658;
 
-DELETE FROM npc_text WHERE ID BETWEEN @BOT_START AND @BOT_END AND ID != 70100;
+DELETE FROM `npc_text` WHERE `ID` BETWEEN @BOT_START AND @BOT_END AND `ID` != 70100;
 
-INSERT INTO npc_text (ID, text0_0, VerifiedBuild) VALUES
+INSERT INTO `npc_text` (`ID`,`text0_0`,`VerifiedBuild`) VALUES
 (70001, "I live only to serve the master.", -1),
 (70002, "You need something?", -1),
 (70003, "Mortals... usually I kill wretches like you at sight.", -1),

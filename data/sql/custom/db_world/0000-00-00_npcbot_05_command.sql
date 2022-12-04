@@ -1,7 +1,7 @@
 --
-DELETE FROM command WHERE name LIKE "npcbot %";
+DELETE FROM `command` WHERE `name` LIKE "npcbot %";
 
-INSERT INTO command (name, security, help) VALUES
+INSERT INTO `command` (`name`,`security`,`help`) VALUES
 ("npcbot add", 0, "NULL"),
 ("npcbot command", 0, "NULL"),
 ("npcbot command follow", 0, "NULL"),
