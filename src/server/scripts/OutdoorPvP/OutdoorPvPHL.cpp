@@ -53,18 +53,18 @@
 
         //char message[250];
         if(player->GetTeamId() == TEAM_ALLIANCE)
-        player->TextEmote(", Alliance has under 250 resources remaining!");
+        player->TextEmote(", Alliance has less than 250 resources remaining!");
         else
-        player->TextEmote(", Horde has under 250 resources remaining!");
+        player->TextEmote(", Horde has less than 250 resources remaining!");
         
         if (HL_RESOURCES_A <= 250)
         {
-        player->TextEmote(", Alliance has under 250 resources remaining!");
+        player->TextEmote(", Alliance has less than 250 resources remaining!");
         }
 
         if (HL_RESOURCES_H <= 250)
         {
-        player->TextEmote(", Horde has under 250 resources remaining!");
+        player->TextEmote(", Horde has less than 250 resources remaining!");
         }           
              
         //player->TextEmote(message);
