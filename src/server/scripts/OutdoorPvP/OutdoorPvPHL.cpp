@@ -46,25 +46,25 @@
     {
 
         //Welcome to Hinterland BG
-        player->TextEmote(", welcome to Hinterland BG!");
+        player->TextEmote("Welcome to Hinterland BG!");
 
 		m_ally_gathered = HL_RESOURCES_A;
 		m_horde_gathered = HL_RESOURCES_H;
 
         //char message[250];
         if(player->GetTeamId() == TEAM_ALLIANCE)
-        player->TextEmote(", Alliance has less than 250 resources remaining!");
+        player->TextEmote("Alliance has less than 250 resources remaining!");
         else
-        player->TextEmote(", Horde has less than 250 resources remaining!");
+        player->TextEmote("Horde has less than 250 resources remaining!");
         
         if (HL_RESOURCES_A <= 250)
         {
-        player->TextEmote(", Alliance has less than 250 resources remaining!");
+        player->TextEmote("Alliance has less than 250 resources remaining!");
         }
 
         if (HL_RESOURCES_H <= 250)
         {
-        player->TextEmote(", Horde has less than 250 resources remaining!");
+        player->TextEmote("Horde has less than 250 resources remaining!");
         }           
              
         //player->TextEmote(message);
@@ -73,7 +73,7 @@
 
     void OutdoorPvPHL::HandlePlayerLeaveZone(Player* player, uint32 zone)
     {
-         player->TextEmote("HEY, you are leaving the zone, while a battle is on going!");
+         player->TextEmote(",HEY, you are leaving the zone, while a battle is on going!");
         OutdoorPvP::HandlePlayerLeaveZone(player, zone);
     }
 
