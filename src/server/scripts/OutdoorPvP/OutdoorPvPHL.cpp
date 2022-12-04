@@ -45,6 +45,9 @@
     void OutdoorPvPHL::HandlePlayerEnterZone(Player* player, uint32 zone)
     {
 
+        //Welcome to Hinterland BG
+        player->TextEmote(", welcome to Hinterland BG!");
+
 		m_ally_gathered = HL_RESOURCES_A;
 		m_horde_gathered = HL_RESOURCES_H;
 

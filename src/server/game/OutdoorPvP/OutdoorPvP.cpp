@@ -254,8 +254,7 @@ OutdoorPvP::~OutdoorPvP()
 
 void OutdoorPvP::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 {
-    m_players[player->GetTeamId()].insert(player->GetGUID());
-    player->TextEmote(", welcome to Hinterland BG!");
+    m_players[player->GetTeamId()].insert(player->GetGUID());    
 }
 
 void OutdoorPvP::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
