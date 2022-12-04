@@ -18,3 +18,11 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 DELETE FROM `creature_questender` WHERE (`quest` = 820056);
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (800009, 820056);
+
+DELETE FROM `quest_request_items` WHERE (`ID` = 820056);
+INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`, `CompletionText`, `VerifiedBuild`) VALUES
+(820056, 10, 0, 'Have some fun on the progression to the current Max Level!', 0);
+
+DELETE FROM `quest_offer_reward` WHERE (`ID` = 820056);
+INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `RewardText`, `VerifiedBuild`) VALUES
+(820056, 0, 0, 0, 0, 0, 0, 0, 0, 'Have a nice day, $N!', 0);
