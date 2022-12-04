@@ -840,7 +840,10 @@ public:
                         break;
                     case TEXT_EMOTE_DANCE:
                         if (!player->HasAura(SPELL_SEDUCTION))
+                        {
+                            player->Dismount();
                             DoCast(player, SPELL_SEDUCTION, true);
+                        }
                         break;
                 }
             }
