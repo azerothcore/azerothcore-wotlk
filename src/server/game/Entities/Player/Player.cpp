@@ -13364,6 +13364,11 @@ uint32 Player::CalculateTalentsPoints() const
 {
     uint32 base_talent = getLevel() < 10 ? 0 : getLevel() - 9;
 
+    if (base_talent > 100) //GFY
+    {
+        base_talent = 100;
+    }
+
     uint32 talentPointsForLevel = 0;
     if (getClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
     {

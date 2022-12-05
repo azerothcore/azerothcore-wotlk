@@ -457,7 +457,7 @@ public: npc_bonus_buff() : CreatureScript("npc_bonus_buff") { }
 				{
 					std::string name = player->GetName();
 					std::ostringstream message;
-					message << "|cff5da673[BELION]|CFFFE8A0E Игрок |CFFE55BB0" << name << "|CFFFE8A0E баффнул всех игроков баффом [|cffEAF4F5" << vvData[action].Name << "|cff02A4B1]|r";
+					message << "|cff5da673[BELION] |CFFE55BB0" << name << "|CFFFE8A0E баффнул всех игроков онлайн баффом [|cffEAF4F5" << vvData[action].Name << "|cff02A4B1]|r";
 					GetBuffOnline(action);
 
 					CharacterDatabase.Query("UPDATE u1756783_blizzcms.users SET vp = vp - {} WHERE id = {}", vvData[action].Cost, player->GetSession()->GetAccountId());
