@@ -144,6 +144,7 @@ class BotMgr
         bool IsPartyInCombat() const;
         bool HasBotClass(uint8 botclass) const;
         bool HasBotPetType(uint32 petType) const;
+        bool IsBeingResurrected(WorldObject const* corpse) const;
 
         static uint32 GetNpcBotCost(uint8 level, uint8 botclass);
         static std::string GetNpcBotCostStr(uint8 level, uint8 botclass);

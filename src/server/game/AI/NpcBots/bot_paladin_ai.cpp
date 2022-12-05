@@ -1082,7 +1082,7 @@ public:
             if (GC_Timer > diff || me->IsMounted() || IsCasting())
                 return;
 
-            RezGroup(GetSpell(REDEMPTION_1));
+            ResurrectGroup(GetSpell(REDEMPTION_1));
         }
 
         void CheckSeal(uint32 diff)

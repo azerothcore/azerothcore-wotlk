@@ -822,7 +822,7 @@ public:
             if (GC_Timer > diff || me->IsMounted() || IsCasting())
                 return;
 
-            RezGroup(GetSpell(RESURRECTION_1));
+            ResurrectGroup(GetSpell(RESURRECTION_1));
 
             if (GetSpell(LEVITATE_1) && !IAmFree() && Rand() < 30)
             {

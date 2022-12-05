@@ -1395,7 +1395,7 @@ public:
             if (GC_Timer > diff || me->IsMounted() || IsCasting())
                 return;
 
-            RezGroup(GetSpell(REVIVE_1));
+            ResurrectGroup(GetSpell(REVIVE_1));
 
             if (!IAmFree() && HasBotCommandState(BOT_COMMAND_FOLLOW) && !master->IsMounted() && Rand() < 35)
             {

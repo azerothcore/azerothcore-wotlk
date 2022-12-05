@@ -695,6 +695,52 @@ bool BotMgr::HasBotPetType(uint32 petType) const
     return false;
 }
 
+bool BotMgr::IsBeingResurrected(WorldObject const* corpse) const
+{
+    std::vector<Unit const*> casters;
+    if (_owner->IsNonMeleeSpellCast(false, true, true))
+        casters.push_back(_owner);
+    for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
+    {
+        if (itr->second->IsNonMeleeSpellCast(false, true, true))
+            casters.push_back(itr->second);
+    }
+
+    if (Group const* group = _owner->GetGroup())
+    {
+        for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player const* player = itr->GetSource();
+            if (!player || player == _owner || player->FindMap() != corpse->GetMap())
+                continue;
+
+            if (player->IsNonMeleeSpellCast(false, true, true))
+                casters.push_back(player);
+
+            if (player->HaveBot())
+            {
+                BotMap const* map = player->GetBotMgr()->GetBotMap();
+                for (BotMap::const_iterator bitr = map->begin(); bitr != map->end(); ++bitr)
+                {
+                    if (bitr->second->IsNonMeleeSpellCast(false, true, true))
+                        casters.push_back(bitr->second);
+                }
+            }
+        }
+    }
+
+    for (Unit const* caster : casters)
+    {
+        if (Spell const* spell = caster->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+        {
+            if (corpse->GetGUID() == (corpse->ToCorpse() ? spell->m_targets.GetCorpseTargetGUID() : spell->m_targets.GetUnitTargetGUID()))
+                return true;
+        }
+    }
+
+    return false;
+}
+
 void BotMgr::_reviveBot(Creature* bot, WorldLocation* dest)
 {
     if (bot->IsAlive())

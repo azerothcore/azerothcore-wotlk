@@ -1184,7 +1184,7 @@ public:
             if (GC_Timer > diff || me->IsMounted() || IsCasting() || Rand() > 25)
                 return;
 
-            RezGroup(GetSpell(ANCESTRAL_SPIRIT_1));
+            ResurrectGroup(GetSpell(ANCESTRAL_SPIRIT_1));
 
             if (mhEnchantExpireTimer > 0 && mhEnchantExpireTimer <= diff)
             {

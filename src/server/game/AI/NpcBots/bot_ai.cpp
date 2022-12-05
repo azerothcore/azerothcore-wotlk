@@ -1461,17 +1461,17 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
 // Attempt to resurrect dead players and bots
 // Target is either bot, player or player corpse
 // no need to check global cooldown
-void bot_ai::RezGroup(uint32 REZZ)
+void bot_ai::ResurrectGroup(uint32 spell_id)
 {
-    if (!REZZ || Rand() > 10)
+    if (!spell_id || Rand() > 10)
         return;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(REZZ);
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
     ASSERT(spellInfo);
     if (int32(me->GetPower(Powers(spellInfo->PowerType))) < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
         return;
 
-    //TC_LOG_ERROR("entities.player", "RezGroup by %s", me->GetName().c_str());
+    //TC_LOG_ERROR("entities.player", "ResurrectGroup by %s", me->GetName().c_str());
 
     if (IAmFree())
     {
@@ -1486,7 +1486,7 @@ void bot_ai::RezGroup(uint32 REZZ)
             me->Relocate(*playerOrCorpse);
 
         Unit* target = playerOrCorpse->GetTypeId() == TYPEID_PLAYER ? playerOrCorpse->ToUnit() : (Unit*)playerOrCorpse->ToCorpse();
-        if (doCast(target, REZZ)) //rezzing it
+        if (doCast(target, spell_id)) //rezzing it
         {
             if (Player const* player = playerOrCorpse->GetTypeId() == TYPEID_PLAYER ? playerOrCorpse->ToPlayer() : ObjectAccessor::FindPlayer(playerOrCorpse->ToCorpse()->GetOwnerGUID()))
                 BotWhisper(LocalizedNpcText(player, BOT_TEXT_REZZING_YOU), player);
@@ -1496,78 +1496,35 @@ void bot_ai::RezGroup(uint32 REZZ)
     }
 
     Group const* group = master->GetGroup();
-    if (!group)
-    {
-        if (master->IsAlive() || master->isResurrectRequested())
-            return;
-
-        Unit* target = master;
-        if (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
-            target = (Unit*)master->GetCorpse();
-        if (!target || !target->IsInWorld()) return;
-        if (me->GetMap() != target->FindMap()) return;
-        if (me->GetDistance(target) > 30 && !HasBotCommandState(BOT_COMMAND_STAY) && !me->GetVehicle())
-        {
-            BotMovement(BOT_MOVE_POINT, target);
-            //me->GetMotionMaster()->MovePoint(master->GetMapId(), *target);
-            return;
-        }
-        else if (me->GetDistance(target) < 15 && !target->IsWithinLOSInMap(me))
-            me->Relocate(*target);
-
-        if (doCast(target, REZZ))//rezzing it
-            BotWhisper(LocalizedNpcText(master, BOT_TEXT_REZZING_YOU));
-
-        return;
-    }
-
-    bool Bots = false;
+    std::vector<Creature*> bottargets;
+    BotMap const* map;
     Player* player;
     Unit* target;
-    for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+    if (!group)
     {
-        player = itr->GetSource();
-        target = player;
-        if (!player || player->FindMap() != me->GetMap()) continue;
-        if (!Bots && player->HaveBot())
-            Bots = true;
-        if (player->IsAlive() || player->isResurrectRequested()) continue;
-        if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
-            target = (Unit*)player->GetCorpse();
-        if (!target || !target->IsInWorld()) continue;
-        if (target->GetTypeId() != player->GetTypeId() && me->GetMap() != target->FindMap()) continue;
-        if (me->GetDistance(target) > 30 && !HasBotCommandState(BOT_COMMAND_STAY) && !me->GetVehicle())
+        player = master;
+        if (!player->IsAlive() && !player->isResurrectRequested())
         {
-            if (player == master)
+            target = player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST) ? player->ToUnit() : (Unit*)player->GetCorpse();
+            if (target && target->IsInWorld() && me->GetMap() == target->FindMap() &&
+                !player->GetBotMgr()->IsBeingResurrected(target))
             {
-                BotMovement(BOT_MOVE_POINT, target);
-                //me->GetMotionMaster()->MovePoint(me->GetMapId(), *target);
-                return;
+                if (me->GetDistance(target) > 30 && !HasBotCommandState(BOT_COMMAND_STAY) && !me->GetVehicle())
+                {
+                    BotMovement(BOT_MOVE_POINT, target);
+                    //me->GetMotionMaster()->MovePoint(master->GetMapId(), *target);
+                    return;
+                }
+                else if (me->GetDistance(target) < 15 && !target->IsWithinLOSInMap(me))
+                    me->Relocate(*target);
+
+                if (doCast(target, spell_id))//rezzing it
+                {
+                    BotWhisper(LocalizedNpcText(player, BOT_TEXT_REZZING_YOU));
+                    return;
+                }
             }
-            continue;
         }
-        else if (me->GetDistance(target) < 15 && !target->IsWithinLOSInMap(me))
-            me->Relocate(*target);
-
-        if (doCast(target, REZZ))//rezzing it
-        {
-            BotWhisper(LocalizedNpcText(player, BOT_TEXT_REZZING_YOU), player);
-            if (player != master)
-                BotWhisper(LocalizedNpcText(master, BOT_TEXT_REZZING_) + player->GetName());
-
-            return;
-        }
-    }
-
-    if (!Bots)
-        return;
-
-    std::list<Unit*> targets;
-    BotMap const* map;
-    for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-    {
-        player = itr->GetSource();
-        if (!player || player->FindMap() != me->GetMap() || !player->HaveBot()) continue;
 
         map = player->GetBotMgr()->GetBotMap();
         for (BotMap::const_iterator bitr = map->begin(); bitr != map->end(); ++bitr)
@@ -1575,19 +1532,78 @@ void bot_ai::RezGroup(uint32 REZZ)
             target = bitr->second;
             if (!target || !target->IsInWorld() || target->IsAlive()) continue;
             if (bitr->second->GetBotAI()->GetReviveTimer() < 15000) continue;
-            if (me->GetDistance(target) < 30 && target->IsWithinLOSInMap(me))
-                targets.push_back(target);
+            if (me->GetDistance(target) < 30 && target->IsWithinLOSInMap(me) &&
+                !player->GetBotMgr()->IsBeingResurrected(target))
+                bottargets.push_back(bitr->second);
+        }
+    }
+    else
+    {
+        bool Bots = false;
+        for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            player = itr->GetSource();
+            target = player;
+            if (!player || player->FindMap() != me->GetMap()) continue;
+            if (!Bots && player->HaveBot())
+                Bots = true;
+            if (player->IsAlive() || player->isResurrectRequested()) continue;
+            if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+                target = (Unit*)player->GetCorpse();
+            if (!target || !target->IsInWorld()) continue;
+            if (target->GetTypeId() != player->GetTypeId() && me->GetMap() != target->FindMap()) continue;
+            if (master->GetBotMgr()->IsBeingResurrected(target)) return;
+            if (me->GetDistance(target) > 30 && !HasBotCommandState(BOT_COMMAND_STAY) && !me->GetVehicle())
+            {
+                if (player == master)
+                {
+                    BotMovement(BOT_MOVE_POINT, target);
+                    //me->GetMotionMaster()->MovePoint(me->GetMapId(), *target);
+                    return;
+                }
+                continue;
+            }
+            else if (me->GetDistance(target) < 15 && !target->IsWithinLOSInMap(me))
+                me->Relocate(*target);
+
+            if (doCast(target, spell_id))//rezzing it
+            {
+                BotWhisper(LocalizedNpcText(player, BOT_TEXT_REZZING_YOU), player);
+                if (player != master)
+                    BotWhisper(LocalizedNpcText(master, BOT_TEXT_REZZING_) + player->GetName());
+                return;
+            }
+        }
+
+        if (!Bots)
+            return;
+
+        for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            player = itr->GetSource();
+            if (!player || player->FindMap() != me->GetMap() || !player->HaveBot()) continue;
+
+            map = player->GetBotMgr()->GetBotMap();
+            for (BotMap::const_iterator bitr = map->begin(); bitr != map->end(); ++bitr)
+            {
+                target = bitr->second;
+                if (!target || !target->IsInWorld() || target->IsAlive()) continue;
+                if (bitr->second->GetBotAI()->GetReviveTimer() < 15000) continue;
+                if (me->GetDistance(target) < 30 && target->IsWithinLOSInMap(me) &&
+                    !player->GetBotMgr()->IsBeingResurrected(target))
+                    bottargets.push_back(bitr->second);
+            }
         }
     }
 
-    //TC_LOG_ERROR("entities.unit", "RezGroup: %s found %u targets", me->GetName().c_str(), uint32(targets.size()));
+    //TC_LOG_ERROR("entities.unit", "ResurrectGroup: %s found %u targets", me->GetName().c_str(), uint32(bottargets.size()));
 
-    if (targets.empty())
+    if (bottargets.empty())
         return;
 
-    target = targets.size() < 2 ? targets.front() : Acore::Containers::SelectRandomContainerElement(targets);
+    target = bottargets.size() < 2 ? bottargets.front() : Acore::Containers::SelectRandomContainerElement(bottargets);
 
-    if (doCast(target, REZZ))
+    if (doCast(target, spell_id))
     {
         Player const* targetOwner = target->ToCreature()->GetBotOwner();
         if (targetOwner != master)
@@ -1597,8 +1613,8 @@ void bot_ai::RezGroup(uint32 REZZ)
             std::string rezstr2 =
                 LocalizedNpcText(master, BOT_TEXT_REZZING_) + target->GetName() + " (" + targetOwner->GetName() + LocalizedNpcText(master, BOT_TEXT__S_BOT) + ")";
 
-            BotWhisper(rezstr1, targetOwner);
-            BotWhisper(rezstr2);
+            BotWhisper(std::move(rezstr1), targetOwner);
+            BotWhisper(std::move(rezstr2));
         }
         else
             BotWhisper(LocalizedNpcText(master, BOT_TEXT_REZZING_) + target->GetName());

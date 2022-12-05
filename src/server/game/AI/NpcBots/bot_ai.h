@@ -297,7 +297,7 @@ class bot_ai : public CreatureAI
         virtual bool BuffTarget(Unit* /*target*/, uint32 /*diff*/) { return false; }
 
         void BuffAndHealGroup(uint32 diff);
-        void RezGroup(uint32 REZZ);
+        void ResurrectGroup(uint32 REZZ);
         void CureGroup(uint32 cureSpell, uint32 diff);
         void SetStats(bool force);
         void DefaultInit();
