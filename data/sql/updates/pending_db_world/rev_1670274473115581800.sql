@@ -833,7 +833,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (1047, 41, 'Coilskar Chest (184716)');
 
 DELETE FROM `pool_gameobject` WHERE `pool_entry`=1047 AND `description`='Coilskar Chest (184716)';
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES (96, 1, 0, '');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (25528    , 1047, 0, 'Coilskar Chest (184716)'),
 (25529    , 1047, 0, 'Coilskar Chest (184716)'),
 (25530    , 1047, 0, 'Coilskar Chest (184716)'),
