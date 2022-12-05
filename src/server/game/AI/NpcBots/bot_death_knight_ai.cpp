@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "botmgr.h"
+#include "bottraits.h"
 #include "DBCStores.h"
 #include "GameEventMgr.h"
 #include "Group.h"
@@ -776,160 +777,156 @@ public:
             AuraEffect const* blop = noDiseases ? nullptr : opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x2000000, 0x0, me->GetGUID());
             AuraEffect const* frof = noDiseases ? nullptr : opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x4000000, 0x0, me->GetGUID());
 
-            if (CanAffectVictim(SPELL_SCHOOL_MASK_FROST|SPELL_SCHOOL_MASK_SHADOW))
+            auto [can_do_frost, can_do_shadow, can_do_physical] = CanAffectVictimBools(opponent, SPELL_SCHOOL_FROST, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_NORMAL);
+
+            //DISEASE SECTION
+
+            //PESTILENCE
+            if (IsSpellReady(PESTILENCE_1, diff) && can_do_shadow && blop && frof && dist < 5 && HaveRunes(PESTILENCE_1))
             {
-                //DISEASE SECTION
-
-                //PESTILENCE
-                if (IsSpellReady(PESTILENCE_1, diff) && blop && frof && dist < 5 && HaveRunes(PESTILENCE_1))
+                if (blop->GetBase()->GetDuration() < 5000 || frof->GetBase()->GetDuration() < 5000)
                 {
-                    if (blop->GetBase()->GetDuration() < 5000 || frof->GetBase()->GetDuration() < 5000)
-                    {
-                        if (doCast(opponent, GetSpell(PESTILENCE_1)))
-                            return;
-                    }
-
-                    if (Rand() < 35 + 65 * me->GetMap()->IsDungeon())
-                    {
-                        std::list<Unit*> targets;
-                        GetNearbyTargetsList(targets, 13.f, 0, opponent);
-                        uint8 count = 0;
-                        for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                        {
-                            //check existing blop and frof
-                            if (!(*itr)->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x2000000, 0x0, me->GetGUID()) ||
-                                !(*itr)->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x4000000, 0x0, me->GetGUID()))
-                                if (++count > 1)
-                                    break;
-                        }
-                        if (count > 1 && doCast(opponent, GetSpell(PESTILENCE_1)))
-                            return;
-                    }
-                }
-                //ICY TOUCH
-                if (IsSpellReady(ICY_TOUCH_1, diff) && !noDiseases && (!frof || frof->GetBase()->GetMaxDuration() < 3000) &&
-                    dist < CalcSpellMaxRange(ICY_TOUCH_1) && HaveRunes(ICY_TOUCH_1))
-                {
-                    if (doCast(opponent, GetSpell(ICY_TOUCH_1)))
-                        return;
-                }
-                //HOWLING BLAST
-                if (IsSpellReady(HOWLING_BLAST_1, diff) && (rimeProcTimer > diff || Rand() < 70) &&
-                    (!u || opponent->IsControlledByPlayer() || rimeProcTimer > diff ||
-                    (u && u != me && IsTank(u) && u->getAttackers().size() > 2)) &&
-                    dist < CalcSpellMaxRange(HOWLING_BLAST_1) && HaveRunes(HOWLING_BLAST_1))
-                {
-                    if (u && u->getAttackers().size() > 4 &&
-                        IsSpellReady(DEATHCHILL_1, diff, false) && doCast(me, GetSpell(DEATHCHILL_1)))
-                    {/* BotWhisper("Deathchill used!"); */}
-                    if (doCast(opponent, GetSpell(HOWLING_BLAST_1)))
+                    if (doCast(opponent, GetSpell(PESTILENCE_1)))
                         return;
                 }
 
-                //END DISEASE SECTION
-
-                //MELEE SECTION
-
-                //FROST STRIKE
-                if (IsSpellReady(FROST_STRIKE_1, diff) && Rand() < 90 && dist < 5 &&
-                    runicpower >= rcost(FROST_STRIKE_1) &&
-                    (runicpower >= 1000 || !GetSpell(OBLITERATE_1) || !HaveRunes(OBLITERATE_1)))
-                {
-                    if (doCast(opponent, GetSpell(FROST_STRIKE_1)))
-                        return;
-                }
-                //BLOOD BOIL
-                if (IsSpellReady(BLOOD_BOIL_1, diff) && IsTank() && Rand() < 25 && HaveRunes(BLOOD_BOIL_1))
+                if (Rand() < 35 + 65 * me->GetMap()->IsDungeon())
                 {
                     std::list<Unit*> targets;
-                    GetNearbyTargetsList(targets, 9.f, 1);
-                    if (targets.size() >= 4)
-                        if (doCast(me, GetSpell(BLOOD_BOIL_1)))
-                            return;
-                }
-                //DEATH AND DECAY
-                if (IsSpellReady(DEATH_AND_DECAY_1, diff) && Rand() < (10 + 30 * IsTank()) && dist < 8 &&
-                    HaveRunes(DEATH_AND_DECAY_1))
-                {
-                    if (Unit* target = FindAOETarget(10))
+                    GetNearbyTargetsList(targets, 13.f, 0, opponent);
+                    uint8 count = 0;
+                    for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     {
-                        if (doCast(target, GetSpell(DEATH_AND_DECAY_1)))
-                            return;
+                        //check existing blop and frof
+                        if (!(*itr)->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x2000000, 0x0, me->GetGUID()) ||
+                            !(*itr)->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x4000000, 0x0, me->GetGUID()))
+                            if (++count > 1)
+                                break;
                     }
-                }
-                //DEATH COIL
-                if (IsSpellReady(DEATH_COIL_1, diff) && Rand() < 50 && (dist > 6 || !GetSpell(FROST_STRIKE_1)) &&
-                    (dist < (IAmFree() ? 30 : 15)) && runicpower > 2 * rcost(DEATH_COIL_1))
-                {
-                    if (doCast(opponent, GetSpell(DEATH_COIL_1)))
+                    if (count > 1 && doCast(opponent, GetSpell(PESTILENCE_1)))
                         return;
                 }
+            }
+            //ICY TOUCH
+            if (IsSpellReady(ICY_TOUCH_1, diff) && can_do_frost && !noDiseases && (!frof || frof->GetBase()->GetMaxDuration() < 3000) &&
+                dist < CalcSpellMaxRange(ICY_TOUCH_1) && HaveRunes(ICY_TOUCH_1))
+            {
+                if (doCast(opponent, GetSpell(ICY_TOUCH_1)))
+                    return;
+            }
+            //HOWLING BLAST
+            if (IsSpellReady(HOWLING_BLAST_1, diff) && can_do_frost && (rimeProcTimer > diff || Rand() < 70) &&
+                (!u || opponent->IsControlledByPlayer() || rimeProcTimer > diff ||
+                (u && u != me && IsTank(u) && u->getAttackers().size() > 2)) &&
+                dist < CalcSpellMaxRange(HOWLING_BLAST_1) && HaveRunes(HOWLING_BLAST_1))
+            {
+                if (u && u->getAttackers().size() > 4 &&
+                    IsSpellReady(DEATHCHILL_1, diff, false) && doCast(me, GetSpell(DEATHCHILL_1)))
+                {/* BotWhisper("Deathchill used!"); */}
+                if (doCast(opponent, GetSpell(HOWLING_BLAST_1)))
+                    return;
+            }
+
+            //END DISEASE SECTION
+
+            //MELEE SECTION
+
+            //FROST STRIKE
+            if (IsSpellReady(FROST_STRIKE_1, diff) && can_do_frost && Rand() < 90 && dist < 5 &&
+                runicpower >= rcost(FROST_STRIKE_1) &&
+                (runicpower >= 1000 || !GetSpell(OBLITERATE_1) || !HaveRunes(OBLITERATE_1)))
+            {
+                if (doCast(opponent, GetSpell(FROST_STRIKE_1)))
+                    return;
+            }
+            //BLOOD BOIL
+            if (IsSpellReady(BLOOD_BOIL_1, diff) && can_do_shadow && IsTank() && Rand() < 25 && HaveRunes(BLOOD_BOIL_1))
+            {
+                std::list<Unit*> targets;
+                GetNearbyTargetsList(targets, 9.f, 1);
+                if (targets.size() >= 4)
+                    if (doCast(me, GetSpell(BLOOD_BOIL_1)))
+                        return;
+            }
+            //DEATH AND DECAY
+            if (IsSpellReady(DEATH_AND_DECAY_1, diff) && can_do_shadow && Rand() < (10 + 30 * IsTank()) && dist < 8 &&
+                HaveRunes(DEATH_AND_DECAY_1))
+            {
+                if (Unit* target = FindAOETarget(10))
+                {
+                    if (doCast(target, GetSpell(DEATH_AND_DECAY_1)))
+                        return;
+                }
+            }
+            //DEATH COIL
+            if (IsSpellReady(DEATH_COIL_1, diff) && can_do_shadow && Rand() < 50 && (dist > 6 || !GetSpell(FROST_STRIKE_1)) &&
+                (dist < (IAmFree() ? 30 : 15)) && runicpower > 2 * rcost(DEATH_COIL_1))
+            {
+                if (doCast(opponent, GetSpell(DEATH_COIL_1)))
+                    return;
             }
 
             MoveBehind(opponent);
 
-            if (dist > 5)
+            if (!can_do_physical || dist > 5)
                 return;
 
-            if (CanAffectVictim(SPELL_SCHOOL_MASK_NORMAL))
+            //PLAGUE STRIKE
+            if (IsSpellReady(PLAGUE_STRIKE_1, diff) && !noDiseases && (!blop || blop->GetBase()->GetDuration() < 3000) &&
+                HaveRunes(PLAGUE_STRIKE_1))
             {
-                //PLAGUE STRIKE
-                if (IsSpellReady(PLAGUE_STRIKE_1, diff) && !noDiseases && (!blop || blop->GetBase()->GetDuration() < 3000) &&
-                    HaveRunes(PLAGUE_STRIKE_1))
-                {
-                    if (doCast(opponent, GetSpell(PLAGUE_STRIKE_1)))
-                        return;
-                }
+                if (doCast(opponent, GetSpell(PLAGUE_STRIKE_1)))
+                    return;
+            }
 
-                //DISEASE SECTION
+            //DISEASE SECTION
 
-                //DEATH STRIKE
-                if (IsSpellReady(DEATH_STRIKE_1, diff) && blop && frof && Rand() < 60 &&
-                    GetHealthPCT(me) < (80 - (10*(blop != nullptr) + 10*(frof != nullptr))) &&
-                    (!me->GetMap()->IsDungeon() || opponent->IsControlledByPlayer()) && HaveRunes(DEATH_STRIKE_1))
-                {
-                    if (doCast(opponent, GetSpell(DEATH_STRIKE_1)))
-                        return;
-                }
-                //OBLITERATE
-                if (IsSpellReady(OBLITERATE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(OBLITERATE_1))
-                {
-                    //DEATHCHILL
-                    if (IsSpellReady(DEATHCHILL_1, diff, false) && doCast(me, GetSpell(DEATHCHILL_1)))
-                    {/* BotWhisper("Deathchill used!"); */}
-                    if (doCast(opponent, GetSpell(OBLITERATE_1)))
-                        return;
-                }
-                //HEART STRIKE - splash
-                if (IsSpellReady(HEART_STRIKE_1, diff) && (noDiseases || (blop && frof)) && (IsTank() || Rand() < 40) &&
-                    HaveRunes(HEART_STRIKE_1) && FindSplashTarget())
-                {
-                    if (doCast(opponent, GetSpell(HEART_STRIKE_1)))
-                        return;
-                }
-                //BLOOD STRIKE
-                if (IsSpellReady(BLOOD_STRIKE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(BLOOD_STRIKE_1))
-                {
-                    if (doCast(opponent, GetSpell(BLOOD_STRIKE_1)))
-                        return;
-                }
-                //SCOURGE STRIKE unused
-                //if (IsSpellReady(SCOURGE_STRIKE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(SCOURGE_STRIKE_1))
-                //{
-                //    if (doCast(opponent, GetSpell(SCOURGE_STRIKE_1)))
-                //        return;
-                //}
+            //DEATH STRIKE
+            if (IsSpellReady(DEATH_STRIKE_1, diff) && blop && frof && Rand() < 60 &&
+                GetHealthPCT(me) < (80 - (10*(blop != nullptr) + 10*(frof != nullptr))) &&
+                (!me->GetMap()->IsDungeon() || opponent->IsControlledByPlayer()) && HaveRunes(DEATH_STRIKE_1))
+            {
+                if (doCast(opponent, GetSpell(DEATH_STRIKE_1)))
+                    return;
+            }
+            //OBLITERATE
+            if (IsSpellReady(OBLITERATE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(OBLITERATE_1))
+            {
+                //DEATHCHILL
+                if (IsSpellReady(DEATHCHILL_1, diff, false) && doCast(me, GetSpell(DEATHCHILL_1)))
+                {/* BotWhisper("Deathchill used!"); */}
+                if (doCast(opponent, GetSpell(OBLITERATE_1)))
+                    return;
+            }
+            //HEART STRIKE - splash
+            if (IsSpellReady(HEART_STRIKE_1, diff) && (noDiseases || (blop && frof)) && (IsTank() || Rand() < 40) &&
+                HaveRunes(HEART_STRIKE_1) && FindSplashTarget())
+            {
+                if (doCast(opponent, GetSpell(HEART_STRIKE_1)))
+                    return;
+            }
+            //BLOOD STRIKE
+            if (IsSpellReady(BLOOD_STRIKE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(BLOOD_STRIKE_1))
+            {
+                if (doCast(opponent, GetSpell(BLOOD_STRIKE_1)))
+                    return;
+            }
+            //SCOURGE STRIKE unused
+            //if (IsSpellReady(SCOURGE_STRIKE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(SCOURGE_STRIKE_1))
+            //{
+            //    if (doCast(opponent, GetSpell(SCOURGE_STRIKE_1)))
+            //        return;
+            //}
 
-                //END DISEASE SECTION
+            //END DISEASE SECTION
 
-                //RUNE STRIKE tank
-                if (IsSpellReady(RUNE_STRIKE_1, diff, false) && (IsTank() || runicpower >= 800) &&
-                    me->HasAuraState(AURA_STATE_DEFENSE) && !me->GetCurrentSpell(CURRENT_MELEE_SPELL) &&
-                    runicpower >= rcost(RUNE_STRIKE_1))
-                {
-                    if (doCast(opponent, GetSpell(RUNE_STRIKE_1)))
-                        return;
-                }
+            //RUNE STRIKE tank
+            if (IsSpellReady(RUNE_STRIKE_1, diff, false) && (IsTank() || runicpower >= 800) &&
+                me->HasAuraState(AURA_STATE_DEFENSE) && !me->GetCurrentSpell(CURRENT_MELEE_SPELL) &&
+                runicpower >= rcost(RUNE_STRIKE_1))
+            {
+                if (doCast(opponent, GetSpell(RUNE_STRIKE_1)))
+                    return;
             }
         }
 

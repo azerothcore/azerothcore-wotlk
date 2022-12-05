@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "botmgr.h"
+#include "bottraits.h"
 #include "Group.h"
 #include "Log.h"
 #include "Map.h"
@@ -1117,11 +1118,12 @@ public:
             if (dist > CalcSpellMaxRange(WRATH_1))
                 return;
 
-            if (!CanAffectVictim(SPELL_SCHOOL_MASK_NATURE|SPELL_SCHOOL_MASK_ARCANE))
+            auto [can_do_nature, can_do_arcane] = CanAffectVictimBools(opponent, SPELL_SCHOOL_NATURE, SPELL_SCHOOL_ARCANE);
+            if (!can_do_nature && !can_do_arcane)
                 return;
 
             //spell reflections
-            if (IsSpellReady(FAERIE_FIRE_NORMAL_1, diff) && CanRemoveReflectSpells(opponent, FAERIE_FIRE_NORMAL_1) &&
+            if (IsSpellReady(FAERIE_FIRE_NORMAL_1, diff) && can_do_nature && CanRemoveReflectSpells(opponent, FAERIE_FIRE_NORMAL_1) &&
                 doCast(opponent, FAERIE_FIRE_NORMAL_1))
                 return;
 
@@ -1172,7 +1174,7 @@ public:
             }
 
             //Faerie Fire (non-feral): moonkin or non-shapeshifted
-            if (IsSpellReady(FAERIE_FIRE_NORMAL_1, diff) && opponent->getAttackers().size() > 2 && Rand() < 50 &&
+            if (IsSpellReady(FAERIE_FIRE_NORMAL_1, diff) && can_do_nature && opponent->getAttackers().size() > 2 && Rand() < 50 &&
                 dist < CalcSpellMaxRange(FAERIE_FIRE_NORMAL_1) &&
                 !opponent->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RESISTANCE_PCT, SPELLFAMILY_DRUID, 0x400)
                 /*!HasAuraName(opponent, FAERIE_FIRE_ANY)*/)
@@ -1183,7 +1185,7 @@ public:
 
             Unit* u = opponent->GetVictim();
             //Insect Swarm
-            if (IsSpellReady(INSECT_SWARM_1, diff) && u && opponent->GetDistance(u) < 8 && Rand() < 30 &&
+            if (IsSpellReady(INSECT_SWARM_1, diff) && can_do_nature && u && opponent->GetDistance(u) < 8 && Rand() < 30 &&
                 dist < CalcSpellMaxRange(INSECT_SWARM_1) &&
                 !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x200000, 0x0, 0x0, me->GetGUID())
                 /*!HasAuraName(opponent, INSECT_SWARM_1, me->GetGUID())*/)
@@ -1192,7 +1194,7 @@ public:
                     return;
             }
 
-            if (IsSpellReady(MOONFIRE_1, diff) && Rand() < 60 && dist < CalcSpellMaxRange(MOONFIRE_1) &&
+            if (IsSpellReady(MOONFIRE_1, diff) && can_do_arcane && Rand() < 60 && dist < CalcSpellMaxRange(MOONFIRE_1) &&
                 !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x2, 0x0, 0x0, me->GetGUID())
                 /*!HasAuraName(opponent, MOONFIRE_1, me->GetGUID())*/)
             {
@@ -1200,7 +1202,7 @@ public:
                     return;
             }
             //TODO: balance starfire/wrath frequency based on mana effeciency
-            if (IsSpellReady(STARFIRE_1, diff) && dist < CalcSpellMaxRange(STARFIRE_1))
+            if (IsSpellReady(STARFIRE_1, diff) && can_do_arcane && dist < CalcSpellMaxRange(STARFIRE_1))
             {
                 AuraEffect const* eclipeLunar = me->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 0x0, 0x0, 0x4000);
                 int32 rand = 30 + 100 * (eclipeLunar && eclipeLunar->GetBase()->GetDuration() > 3000);
@@ -1208,7 +1210,7 @@ public:
                 if (Rand() < rand && doCast(opponent, GetSpell(STARFIRE_1)))
                     return;
             }
-            if (IsSpellReady(WRATH_1, diff))
+            if (IsSpellReady(WRATH_1, diff) && can_do_nature)
             {
                 if (doCast(opponent, GetSpell(WRATH_1)))
                     return;

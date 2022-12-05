@@ -1,6 +1,7 @@
 #include "bot_ai.h"
 #include "botmgr.h"
 #include "botspell.h"
+#include "bottraits.h"
 #include "Group.h"
 #include "Map.h"
 #include "MotionMaster.h"
@@ -572,10 +573,9 @@ public:
             if (me->GetDistance(opponent) > CalcSpellMaxRange(MIND_FLAY_1))
                 return;
 
-            bool canShadow = CanAffectVictim(SPELL_SCHOOL_MASK_SHADOW);
-            bool canHoly = CanAffectVictim(SPELL_SCHOOL_MASK_HOLY);
+            auto [can_do_shadow, can_do_holy] = CanAffectVictimBools(opponent, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_HOLY);
 
-            if (IsSpellReady(PSYCHIC_HORROR_1, diff) && canShadow && Rand() < 20 &&
+            if (IsSpellReady(PSYCHIC_HORROR_1, diff) && can_do_shadow && Rand() < 20 &&
                 opponent->GetHealth() > me->GetMaxHealth()/8 && !CCed(opponent) &&
                 !opponent->HasAuraType(SPELL_AURA_MOD_DISARM) &&
                 (opponent->GetTypeId() == TYPEID_PLAYER ?
@@ -587,7 +587,7 @@ public:
             }
 
             //spell reflections
-            if (IsSpellReady(SW_PAIN_1, diff) && canShadow && CanRemoveReflectSpells(opponent, SW_PAIN_1) &&
+            if (IsSpellReady(SW_PAIN_1, diff) && can_do_shadow && CanRemoveReflectSpells(opponent, SW_PAIN_1) &&
                 doCast(opponent, SW_PAIN_1)) //yes, using rank 1
                 return;
 
@@ -603,16 +603,16 @@ public:
 
             if (!HasRole(BOT_ROLE_HEAL) || GetManaPCT(me) > 35 || botPet)
             {
-                if (IsSpellReady(SW_DEATH_1, diff) && canShadow && Rand() < 90 && GetHealthPCT(me) > 50 &&
+                if (IsSpellReady(SW_DEATH_1, diff) && can_do_shadow && Rand() < 90 && GetHealthPCT(me) > 50 &&
                     (me->GetMap()->IsRaid() || GetHealthPCT(opponent) < 15 || opponent->GetHealth() < me->GetMaxHealth()/8) &&
                     doCast(opponent, GetSpell(SW_DEATH_1)))
                     return;
-                if (IsSpellReady(VAMPIRIC_TOUCH_1, diff) && canShadow && Rand() < 80 &&
+                if (IsSpellReady(VAMPIRIC_TOUCH_1, diff) && can_do_shadow && Rand() < 80 &&
                     opponent->GetHealth() > me->GetMaxHealth()/4 * (1 + opponent->getAttackers().size()) &&
                     !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x0, 0x400, 0x0, me->GetGUID()) &&
                     doCast(opponent, GetSpell(VAMPIRIC_TOUCH_1)))
                     return;
-                if (IsSpellReady(SW_PAIN_1, diff) && canShadow && Rand() < 60 &&
+                if (IsSpellReady(SW_PAIN_1, diff) && can_do_shadow && Rand() < 60 &&
                     opponent->GetHealth() > me->GetMaxHealth()/2 * (1 + opponent->getAttackers().size()) &&
                     !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x8000, 0x0, 0x0, me->GetGUID()))
                 {
@@ -621,32 +621,32 @@ public:
                         if (doCast(opponent, GetSpell(SW_PAIN_1)))
                             return;
                 }
-                if (IsSpellReady(DEVOURING_PLAGUE_1, diff) && canShadow && !Devcheck && Rand() < 80 &&
+                if (IsSpellReady(DEVOURING_PLAGUE_1, diff) && can_do_shadow && !Devcheck && Rand() < 80 &&
                     (_spec == BOT_SPEC_PRIEST_SHADOW || opponent->IsControlledByPlayer()) &&
                     opponent->GetHealth() > me->GetMaxHealth()/2 * (1 + opponent->getAttackers().size()) &&
                     !(opponent->GetTypeId() == TYPEID_UNIT && (opponent->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1)))) &&
                     !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_LEECH, SPELLFAMILY_PRIEST, 0x02000000, 0x0, 0x0, me->GetGUID()) &&
                     doCast(opponent, GetSpell(DEVOURING_PLAGUE_1)))
                     return;
-                if (IsSpellReady(MIND_BLAST_1, diff) && canShadow &&
+                if (IsSpellReady(MIND_BLAST_1, diff) && can_do_shadow &&
                     doCast(opponent, GetSpell(MIND_BLAST_1)))
                     return;
-                if (IsSpellReady(MIND_SEAR_1, diff) && canShadow && (!me->isMoving() || Rand() < 80) &&
+                if (IsSpellReady(MIND_SEAR_1, diff) && can_do_shadow && (!me->isMoving() || Rand() < 80) &&
                     opponent->GetVictim() && opponent->GetVictim()->getAttackers().size() > 3)
                 {
                     if (Unit* u = FindSplashTarget(CalcSpellMaxRange(MIND_SEAR_1), opponent, 14.f, 3)) //glyphed, cluster of 4
                         if (doCast(u, GetSpell(MIND_SEAR_1)))
                             return;
                 }
-                if (IsSpellReady(HOLY_FIRE_1, diff) && canHoly &&
+                if (IsSpellReady(HOLY_FIRE_1, diff) && can_do_holy &&
                     (HasRole(BOT_ROLE_HEAL) || me->GetShapeshiftForm() != FORM_SHADOW) &&
                     doCast(opponent, GetSpell(HOLY_FIRE_1)))
                     return;
-                if (IsSpellReady(MIND_FLAY_1, diff) && canShadow &&
+                if (IsSpellReady(MIND_FLAY_1, diff) && can_do_shadow &&
                     (!HasRole(BOT_ROLE_HEAL) || opponent->GetHealth() < me->GetMaxHealth()/2) &&
                     doCast(opponent, GetSpell(MIND_FLAY_1)))
                     return;
-                if (IsSpellReady(SMITE_1, diff) && canHoly && me->GetLevel() < 20 &&//MF is lvl 20, MB is lvl 10
+                if (IsSpellReady(SMITE_1, diff) && can_do_holy && me->GetLevel() < 20 &&//MF is lvl 20, MB is lvl 10
                     doCast(opponent, GetSpell(SMITE_1)))
                     return;
             }

@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "botmgr.h"
+#include "bottraits.h"
 #include "Group.h"
 #include "Item.h"
 #include "Log.h"
@@ -1052,22 +1053,21 @@ public:
         {
             StartAttack(opponent, IsMelee());
 
-            if (!CanAffectVictim(SPELL_SCHOOL_MASK_FIRE|SPELL_SCHOOL_MASK_NATURE))
-                return;
+            auto [can_do_frost, can_do_fire, can_do_nature] = CanAffectVictimBools(opponent, SPELL_SCHOOL_FROST, SPELL_SCHOOL_FIRE, SPELL_SCHOOL_NATURE);
 
             //AttackerSet m_attackers = master->getAttackers();
             //AttackerSet b_attackers = me->getAttackers();
             float dist = me->GetDistance(opponent);
 
             //spell reflections
-            if (IsSpellReady(EARTH_SHOCK_1, diff) && HasRole(BOT_ROLE_DPS) && dist < 25 && CanRemoveReflectSpells(opponent, EARTH_SHOCK_1) &&
+            if (IsSpellReady(EARTH_SHOCK_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS) && dist < 25 && CanRemoveReflectSpells(opponent, EARTH_SHOCK_1) &&
                 doCast(opponent, EARTH_SHOCK_1))
                 return;
 
             MoveBehind(opponent);
 
             //STORMSTRIKE
-            if (IsSpellReady(STORMSTRIKE_1, diff) && HasRole(BOT_ROLE_DPS) && IsMelee() && dist <= 5 && Rand() < 120)
+            if (IsSpellReady(STORMSTRIKE_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS) && IsMelee() && dist <= 5 && Rand() < 120)
             {
                 if (doCast(opponent, GetSpell(STORMSTRIKE_1)))
                     return;
@@ -1077,7 +1077,7 @@ public:
                 (GetSpell(FLAME_SHOCK_1) || GetSpell(EARTH_SHOCK_1) || GetSpell(FROST_SHOCK_1)) &&
                 dist < 25 && Rand() < 70)
             {
-                if (GetSpell(FLAME_SHOCK_1))
+                if (GetSpell(FLAME_SHOCK_1) && can_do_fire)
                 {
                     AuraEffect const* fsh = opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0x0, 0x0, me->GetGUID());
                     if (!fsh || fsh->GetBase()->GetDuration() < 3000)
@@ -1087,8 +1087,8 @@ public:
                     }
                 }
 
-                uint32 SHOCK = GetSpell(FROST_SHOCK_1);
-                if (!SHOCK)
+                uint32 SHOCK = can_do_frost ? GetSpell(FROST_SHOCK_1) : 0;
+                if (!SHOCK && can_do_nature)
                     SHOCK = GetSpell(EARTH_SHOCK_1);
 
                 if (SHOCK)
@@ -1107,7 +1107,7 @@ public:
             }
 
             //LAVA BURST
-            if (IsSpellReady(LAVA_BURST_1, diff) && _spec == BOT_SPEC_SHAMAN_ELEMENTAL &&
+            if (IsSpellReady(LAVA_BURST_1, diff) && can_do_fire && _spec == BOT_SPEC_SHAMAN_ELEMENTAL &&
                 HasRole(BOT_ROLE_DPS) && dist < CalcSpellMaxRange(LAVA_BURST_1) && Rand() < 60 &&
                 (me->getAttackers().empty() || dist > 10))
             {
@@ -1120,14 +1120,14 @@ public:
                 return;
 
             //CHAIN LIGHTNING
-            if (IsSpellReady(CHAIN_LIGHTNING_1, diff) && HasRole(BOT_ROLE_DPS) && dist < CalcSpellMaxRange(CHAIN_LIGHTNING_1) && Rand() < 80)
+            if (IsSpellReady(CHAIN_LIGHTNING_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS) && dist < CalcSpellMaxRange(CHAIN_LIGHTNING_1) && Rand() < 80)
             {
                 Unit* u = FindSplashTarget(35.f, opponent, 5.f);
                 if (u && doCast(opponent, GetSpell(CHAIN_LIGHTNING_1)))
                     return;
             }
             //LIGHTNING BOLT
-            if (IsSpellReady(LIGHTNING_BOLT_1, diff) && HasRole(BOT_ROLE_DPS) && dist < CalcSpellMaxRange(LIGHTNING_BOLT_1))
+            if (IsSpellReady(LIGHTNING_BOLT_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS) && dist < CalcSpellMaxRange(LIGHTNING_BOLT_1))
             {
                 uint32 LIGHTNING_BOLT = GetSpell(LIGHTNING_BOLT_1);
                 if (doCast(opponent, LIGHTNING_BOLT))

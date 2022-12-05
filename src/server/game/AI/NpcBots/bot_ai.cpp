@@ -1805,14 +1805,24 @@ bool bot_ai::CanAffectVictim(uint32 schoolMask) const
         return false;
     }
 
+    uint32 finalMask = 0;
+    if (Creature const* creature = opponent->ToCreature())
+    {
+        if (uint32 immune_mask = SpellSchoolMask(creature->GetCreatureTemplate()->SpellSchoolImmuneMask))
+        {
+            finalMask |= immune_mask;
+            if ((finalMask & schoolMask) == schoolMask)
+                return false;
+        }
+    }
+
     Unit::AuraEffectList const& schoolImmunityAurasList = opponent->GetAuraEffectsByType(SPELL_AURA_SCHOOL_IMMUNITY);
     if (!schoolImmunityAurasList.empty())
     {
-        uint32 finalMask = 0;
         for (Unit::AuraEffectList::const_iterator itr = schoolImmunityAurasList.begin(); itr != schoolImmunityAurasList.end(); ++itr)
         {
-            finalMask |= ((*itr)->GetMiscValue() & schoolMask);
-            if (finalMask == schoolMask)
+            finalMask |= (*itr)->GetMiscValue();
+            if ((finalMask & schoolMask) == schoolMask)
                 return false;
         }
     }
