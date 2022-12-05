@@ -160,13 +160,13 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '32828 35838 35841 35850');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,163.42021,-22.144464,3.9059505,NULL,0,0,0,100,0),
+(@PATH,1,163.42021,-22.144464,3.9059505,NULL,0,0,491,100,0),
 (@PATH,2,156.25214,-26.96173,7.3015285,NULL,0,0,0,100,0),
 (@PATH,3,148.84656,-26.111628,9.093671,NULL,0,0,0,100,0),
 (@PATH,4,143.56517,-26.607273,10.320737,NULL,0,0,0,100,0),
 (@PATH,5,137.3586,-29.342598,11.133306,NULL,0,0,0,100,0),
 (@PATH,6,132.71771,-32.661335,12.362364,NULL,0,0,0,100,0),
-(@PATH,7,127.05344,-36.36787,11.95393,NULL,3600,0,0,100,0);
+(@PATH,7,127.05344,-36.36787,11.95393,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F0000016F000061BFFA .go xyz 163.42021 -22.144464 3.9059505
 
 -- Pathing for Phasing Soldier Entry: 18556
@@ -177,10 +177,10 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '32828 35838 35841 35850');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,186.39815,-187.63376,26.586843,NULL,0,0,0,100,0),
+(@PATH,1,186.39815,-187.63376,26.586843,NULL,0,0,491,100,0),
 (@PATH,2,186.01659,-170.86678,26.57505,NULL,0,0,0,100,0),
 (@PATH,3,185.84586,-152.141,26.433743,NULL,0,0,0,100,0),
-(@PATH,4,186.82649,-139.19202,26.515371,NULL,3600,0,0,100,0);
+(@PATH,4,186.82649,-139.19202,26.515371,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F0000016F000061BFFB .go xyz 186.39815 -187.63376 26.586843
 
 -- Pathing for Phasing Soldier Entry: 18556
@@ -191,10 +191,10 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '32828 35838 35841 35850');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,-140.33557,-182.85066,26.59173,NULL,0,0,0,100,0),
+(@PATH,1,-140.33557,-182.85066,26.59173,NULL,0,0,491,100,0),
 (@PATH,2,-139.43959,-177.26666,26.591074,NULL,0,0,0,100,0),
 (@PATH,3,-137.69144,-172.42462,26.592718,NULL,0,0,0,100,0),
-(@PATH,4,-130.4095,-169.43921,26.58746,NULL,3600,0,0,100,0);
+(@PATH,4,-130.4095,-169.43921,26.58746,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F0000016F0000E1BFFA .go xyz -140.33557 -182.85066 26.59173
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -205,7 +205,7 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,252.76212,-143.58017,31.344828,NULL,0,0,0,100,0),
+(@PATH,1,252.76212,-143.58017,31.344828,NULL,0,0,491,100,0),
 (@PATH,2,247.20137,-141.40672,28.45697,NULL,0,0,0,100,0),
 (@PATH,3,239.47426,-140.56499,26.604721,NULL,0,0,0,100,0),
 (@PATH,4,232.98956,-142.09483,26.598186,NULL,0,0,0,100,0),
@@ -217,7 +217,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,10,222.65584,-177.14705,26.59129,NULL,0,0,0,100,0),
 (@PATH,11,229.7245,-182.66959,26.591282,NULL,0,0,0,100,0),
 (@PATH,12,233.93506,-186.75621,26.591286,NULL,0,0,0,100,0),
-(@PATH,13,234.9648,-190.40332,26.59129,NULL,3600,0,0,100,0);
+(@PATH,13,234.9648,-190.40332,26.59129,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F4000016F000061BFFA .go xyz 252.76212 -143.58017 31.344828
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -228,7 +228,7 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,265.72266,-167.39992,26.591297,NULL,0,0,0,100,0),
+(@PATH,1,265.72266,-167.39992,26.591297,NULL,0,0,491,100,0),
 (@PATH,2,260.2587,-173.44904,26.5913,NULL,0,0,0,100,0),
 (@PATH,3,254.21541,-174.24063,28.541336,NULL,0,0,0,100,0),
 (@PATH,4,249.80678,-178.8307,29.993172,NULL,0,0,0,100,0),
@@ -236,7 +236,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,6,236.51315,-182.80513,26.591282,NULL,0,0,0,100,0),
 (@PATH,7,230.59372,-180.36035,26.59128,NULL,0,0,0,100,0),
 (@PATH,8,226.47932,-182.74487,26.591282,NULL,0,0,0,100,0),
-(@PATH,9,223.12943,-185.35706,26.59129,NULL,3600,0,0,100,0);
+(@PATH,9,223.12943,-185.35706,26.59129,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F4000016F0000E1BFFA .go xyz 265.72266 -167.39992 26.591297
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -247,7 +247,7 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,127.67527,-9.820141,0.9092922,NULL,0,0,0,100,0),
+(@PATH,1,127.67527,-9.820141,0.9092922,NULL,0,0,491,100,0),
 (@PATH,2,129.5654,-17.583628,5.0594177,NULL,0,0,0,100,0),
 (@PATH,3,129.5531,-21.944284,6.884782,NULL,0,0,0,100,0),
 (@PATH,4,133.11812,-29.490608,10.753902,NULL,0,0,0,100,0),
@@ -255,7 +255,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,6,143.1685,-34.106094,13.614726,NULL,0,0,0,100,0),
 (@PATH,7,150.10359,-36.330883,13.5456295,NULL,0,0,0,100,0),
 (@PATH,8,154.84016,-37.25858,13.179008,NULL,0,0,0,100,0),
-(@PATH,9,161.82185,-39.311287,12.2130375,NULL,3600,0,0,100,0);
+(@PATH,9,161.82185,-39.311287,12.2130375,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F4000016F000161BFFA .go xyz 127.67527 -9.820141 0.9092922
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -266,14 +266,14 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,170.21268,-18.678844,1.8106413,NULL,0,0,0,100,0),
+(@PATH,1,170.21268,-18.678844,1.8106413,NULL,0,0,491,100,0),
 (@PATH,2,176.21935,-20.366,-0.12755382,NULL,0,0,0,100,0),
 (@PATH,3,183.50932,-20.030233,-0.124699146,NULL,0,0,0,100,0),
 (@PATH,4,187.84009,-15.592921,0.09424267,NULL,0,0,0,100,0),
 (@PATH,5,191.94017,-6.714968,-0.12076864,NULL,0,0,0,100,0),
 (@PATH,6,192.66939,2.518242,-0.116914734,NULL,0,0,0,100,0),
 (@PATH,7,191.38432,9.125355,-0.11827608,NULL,0,0,0,100,0),
-(@PATH,8,190.95491,15.178104,1.7854161,NULL,3600,0,0,100,0);
+(@PATH,8,190.95491,15.178104,1.7854161,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F4000016F0001E1BFFA .go xyz 170.21268 -18.678844 1.8106413
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -284,7 +284,7 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,63.407444,-175.2639,15.340215,NULL,0,0,0,100,0),
+(@PATH,1,63.407444,-175.2639,15.340215,NULL,0,0,491,100,0),
 (@PATH,2,63.922012,-164.90332,15.36321,NULL,0,0,0,100,0),
 (@PATH,3,64.89777,-157.71608,15.324875,NULL,0,0,0,100,0),
 (@PATH,4,63.779285,-154.1999,15.270904,NULL,0,0,0,100,0),
@@ -293,7 +293,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,7,54.855816,-154.90836,15.210086,NULL,0,0,0,100,0),
 (@PATH,8,42.59613,-157.50063,14.917099,NULL,0,0,0,100,0),
 (@PATH,9,38.038113,-157.83847,14.781163,NULL,0,0,0,100,0),
-(@PATH,10,34.37812,-156.34639,14.540044,NULL,3600,0,0,100,0);
+(@PATH,10,34.37812,-156.34639,14.540044,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F4000016F000261BFFA .go xyz 63.407444 -175.2639 15.340215
 
 -- Pathing for Phasing Cleric Entry: 18557
@@ -304,7 +304,7 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,219.37904,0.33060265,28.327349,NULL,0,0,0,100,0),
+(@PATH,1,219.37904,0.33060265,28.327349,NULL,0,0,491,100,0),
 (@PATH,2,213.83517,-4.47358,27.131094,NULL,0,0,0,100,0),
 (@PATH,3,212.30658,-9.702579,27.207218,NULL,0,0,0,100,0),
 (@PATH,4,212.08582,-16.853407,27.295864,NULL,0,0,0,100,0),
@@ -316,7 +316,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,10,245.5611,-29.118198,26.610186,NULL,0,0,0,100,0),
 (@PATH,11,256.06567,-29.392622,26.598423,NULL,0,0,0,100,0),
 (@PATH,12,264.68683,-30.948347,26.591227,NULL,0,0,0,100,0),
-(@PATH,13,273.67218,-31.774408,26.591225,NULL,3600,0,0,100,0);
+(@PATH,13,273.67218,-31.774408,26.591225,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F4000016F0002E1BFFA .go xyz 219.37904 0.33060265 28.327349
 
 -- Pathing for Phasing Sorcerer Entry: 18558
@@ -327,11 +327,11 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,108.368126,-168.10095,14.6634,NULL,0,0,0,100,0),
+(@PATH,1,108.368126,-168.10095,14.6634,NULL,0,0,491,100,0),
 (@PATH,2,94.0889,-166.98608,15.221693,NULL,0,0,0,100,0),
 (@PATH,3,87.63592,-167.62035,15.353543,NULL,0,0,0,100,0),
 (@PATH,4,83.18925,-169.28035,15.387257,NULL,0,0,0,100,0),
-(@PATH,5,80.92766,-172.92093,15.428644,NULL,3600,0,0,100,0);
+(@PATH,5,80.92766,-172.92093,15.428644,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F8000016F0000E1BFFA .go xyz 108.368126 -168.10095 14.6634
 
 -- Pathing for Phasing Sorcerer Entry: 18558
@@ -342,9 +342,9 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,60.7609,14.71426,2.9304667,NULL,0,0,0,100,0),
+(@PATH,1,60.7609,14.71426,2.9304667,NULL,0,0,491,100,0),
 (@PATH,2,62.473858,-0.185765,-0.1819104,NULL,0,0,0,100,0),
-(@PATH,3,60.937054,-19.739634,2.7972555,NULL,3600,0,0,100,0);
+(@PATH,3,60.937054,-19.739634,2.7972555,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121F8000016F000261BFFA .go xyz 60.7609 14.71426 2.9304667
 
 -- Pathing for Phasing Sorcerer Entry: 18558
@@ -355,12 +355,12 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,-144.05402,-176.77612,26.591373,NULL,0,0,0,100,0),
+(@PATH,1,-144.05402,-176.77612,26.591373,NULL,0,0,491,100,0),
 (@PATH,2,-144.21027,-170.07382,26.590784,NULL,0,0,0,100,0),
 (@PATH,3,-144.36652,-163.37152,26.590195,NULL,0,0,0,100,0),
 (@PATH,4,-144.37608,-162.96107,26.58878,NULL,0,0,0,100,0),
 (@PATH,5,-144.54129,-155.87457,26.590515,NULL,0,0,0,100,0),
-(@PATH,6,-144.54129,-155.87457,26.590515,NULL,3600,0,0,100,0);
+(@PATH,6,-144.54129,-155.87457,26.590515,NULL,180000,0,492,100,0);
 
 -- Pathing for Phasing Sorcerer Entry: 18558
 SET @NPC := @CGUID+17;
@@ -370,14 +370,14 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,234.08588,-92.13391,26.591291,NULL,0,0,0,100,0),
+(@PATH,1,234.08588,-92.13391,26.591291,NULL,0,0,491,100,0),
 (@PATH,2,234.09532,-91.47241,26.591291,NULL,0,0,0,100,0),
 (@PATH,3,234.10477,-90.81091,26.591291,NULL,0,0,0,100,0),
 (@PATH,4,234.46289,-89.07118,26.591288,NULL,0,0,0,100,0),
 (@PATH,5,235.16656,-85.652824,26.59131,NULL,0,0,0,100,0),
 (@PATH,6,234.99062,-85.08963,26.59131,NULL,0,0,0,100,0),
 (@PATH,7,233.66092,-80.833466,26.591309,NULL,0,0,0,100,0),
-(@PATH,8,233.66092,-80.833466,26.591309,NULL,3600,0,0,100,0);
+(@PATH,8,233.66092,-80.833466,26.591309,NULL,180000,0,492,100,0);
 
 -- Pathing for Phasing Stalker Entry: 18559
 SET @NPC := @CGUID+20;
@@ -387,7 +387,7 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,254.08589,16.281115,1.0690411,NULL,0,0,0,100,0),
+(@PATH,1,254.08589,16.281115,1.0690411,NULL,0,0,491,100,0),
 (@PATH,2,249.09479,11.751573,-0.057969235,NULL,0,0,0,100,0),
 (@PATH,3,248.29317,5.573168,-0.05051643,NULL,0,0,0,100,0),
 (@PATH,4,249.30978,0.292467,-0.04696809,NULL,0,0,0,100,0),
@@ -397,7 +397,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,8,239.66989,-16.145578,-0.07585467,NULL,0,0,0,100,0),
 (@PATH,9,239.524,-20.53202,-0.06419688,NULL,0,0,0,100,0),
 (@PATH,10,240.83255,-25.9776,-0.06601114,NULL,0,0,0,100,0),
-(@PATH,11,244.28032,-28.857412,1.3836285,NULL,3600,0,0,100,0);
+(@PATH,11,244.28032,-28.857412,1.3836285,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121FC000016F000061BFFA .go xyz 254.08589 16.281115 1.0690411
 
 -- Pathing for Phasing Stalker Entry: 18559
@@ -408,7 +408,7 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,235.88821,37.07132,26.606709,NULL,0,0,0,100,0),
+(@PATH,1,235.88821,37.07132,26.606709,NULL,0,0,491,100,0),
 (@PATH,2,247.22252,37.847027,20.479275,NULL,0,0,0,100,0),
 (@PATH,3,257.5441,38.34387,13.4442425,NULL,0,0,0,100,0),
 (@PATH,4,269.6288,37.601143,13.41417,NULL,0,0,0,100,0),
@@ -417,7 +417,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,7,274.67148,31.516829,13.418446,NULL,0,0,0,100,0),
 (@PATH,8,274.31213,21.329618,13.449085,NULL,0,0,0,100,0),
 (@PATH,9,274.1166,11.805699,6.4145527,NULL,0,0,0,100,0),
-(@PATH,10,274.6112,1.604477,-0.08050743,NULL,3600,0,0,100,0);
+(@PATH,10,274.6112,1.604477,-0.08050743,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121FC000016F0000E1BFFA .go xyz 235.88821 37.07132 26.606709
 
 -- Pathing for Phasing Stalker Entry: 18559
@@ -428,11 +428,11 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,244.87045,-100.05577,26.59129,NULL,0,0,0,100,0),
+(@PATH,1,244.87045,-100.05577,26.59129,NULL,0,0,491,100,0),
 (@PATH,2,244.45204,-93.25677,26.591284,NULL,0,0,0,100,0),
 (@PATH,3,244.03363,-86.45776,26.591278,NULL,0,0,0,100,0),
 (@PATH,4,243.87628,-83.90097,26.59128,NULL,0,0,0,100,0),
-(@PATH,5,243.87628,-83.90097,26.59128,NULL,3600,0,0,100,0);
+(@PATH,5,243.87628,-83.90097,26.59128,NULL,180000,0,492,100,0);
 
 -- Pathing for Phasing Stalker Entry: 18559
 SET @NPC := @CGUID+8;
@@ -442,7 +442,7 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,126.1766,27.948132,-0.105519295,NULL,0,0,0,100,0),
+(@PATH,1,126.1766,27.948132,-0.105519295,NULL,0,0,491,100,0),
 (@PATH,2,130.59267,16.555323,-0.12910895,NULL,0,0,0,100,0),
 (@PATH,3,130.62326,8.567173,-0.1291158,NULL,0,0,0,100,0),
 (@PATH,4,132.76746,2.109716,-0.12837085,NULL,0,0,0,100,0),
@@ -451,7 +451,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,7,150.151,-6.409088,1.8575414,NULL,0,0,0,100,0),
 (@PATH,8,158.26154,-6.41169,1.2996879,NULL,0,0,0,100,0),
 (@PATH,9,162.83406,-10.075247,1.2974932,NULL,0,0,0,100,0),
-(@PATH,10,166.6864,-15.174739,2.4810312,NULL,3600,0,0,100,0);
+(@PATH,10,166.6864,-15.174739,2.4810312,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121FC000016F000261BFFA .go xyz 126.1766 27.948132 -0.105519295
 
 -- Pathing for Phasing Stalker Entry: 18559
@@ -462,7 +462,7 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,103.51044,-31.661163,2.2046442,NULL,0,0,0,100,0),
+(@PATH,1,103.51044,-31.661163,2.2046442,NULL,0,0,491,100,0),
 (@PATH,2,104.59338,-23.583656,-0.07155674,NULL,0,0,0,100,0),
 (@PATH,3,102.89938,-19.097414,-0.043581124,NULL,0,0,0,100,0),
 (@PATH,4,102.20383,-13.462062,0.18044646,NULL,0,0,0,100,0),
@@ -471,7 +471,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,7,103.2398,12.823616,-0.098418705,NULL,0,0,0,100,0),
 (@PATH,8,104.68291,17.770578,0.1706654,NULL,0,0,0,100,0),
 (@PATH,9,108.10148,21.937067,0.16965415,NULL,0,0,0,100,0),
-(@PATH,10,111.47976,22.290707,0.009937675,NULL,3600,0,0,100,0);
+(@PATH,10,111.47976,22.290707,0.009937675,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121FC000016F0002E1BFFA .go xyz 103.51044 -31.661163 2.2046442
 
 -- Pathing for Phasing Stalker Entry: 18559
@@ -482,14 +482,14 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '35838');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,182.65771,-140.55536,26.389036,NULL,0,0,0,100,0),
+(@PATH,1,182.65771,-140.55536,26.389036,NULL,0,0,491,100,0),
 (@PATH,2,181.64246,-147.2506,26.326574,NULL,0,0,0,100,0),
 (@PATH,3,179.35037,-150.43063,26.26074,NULL,0,0,0,100,0),
 (@PATH,4,174.82385,-152.08482,26.326044,NULL,0,0,0,100,0),
 (@PATH,5,169.2696,-152.8632,26.444696,NULL,0,0,0,100,0),
 (@PATH,6,162.41,-153.10008,26.06021,NULL,0,0,0,100,0),
 (@PATH,7,152.7405,-152.84781,19.014975,NULL,0,0,0,100,0),
-(@PATH,8,146.63557,-152.49663,14.267556,NULL,3600,0,0,100,0);
+(@PATH,8,146.63557,-152.49663,14.267556,NULL,180000,0,492,100,0);
 -- 0x204CB045C0121FC000016F000361BFFA .go xyz 182.65771 -140.55536 26.389036
 
 -- Pathing for Auchenai Monk Entry: 18497
@@ -508,7 +508,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,6,164.39384,27.017565,-0.03106403,NULL,0,0,0,100,0),
 (@PATH,7,158.12143,30.15233,-0.110156626,NULL,0,0,0,100,0),
 (@PATH,8,154.54019,31.208351,-0.10033583,NULL,0,0,0,100,0),
-(@PATH,9,153.50821,38.660362,4.231137,NULL,0,0,0,100,0),
+(@PATH,9,153.50821,38.660362,4.231137,NULL,40000,0,493,100,0),
 (@PATH,10,150.59761,30.838694,-0.10033666,NULL,0,0,0,100,0),
 (@PATH,11,132.99837,30.463366,-0.09167093,NULL,0,0,0,100,0),
 (@PATH,12,130.24228,29.550669,-0.09694571,NULL,0,0,0,100,0),
@@ -516,7 +516,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,14,130.77061,10.76564,0.09537189,NULL,0,0,0,100,0),
 (@PATH,15,130.48642,2.902071,-0.12865439,NULL,0,0,0,100,0),
 (@PATH,16,129.59958,-2.468409,0.06528245,NULL,0,0,0,100,0),
-(@PATH,17,125.65282,-3.223653,0.120242454,NULL,0,0,0,100,0);
+(@PATH,17,125.65282,-3.223653,0.120242454,NULL,40000,0,493,100,0);
 -- 0x204CB045C012104000016F0002E1BFFA .go xyz 139.49518 2.368823 -0.12775199
 
 -- Pathing for Auchenai Soulpriest Entry: 18493
@@ -787,3 +787,9 @@ DELETE FROM `creature` WHERE `guid` IN (83355,83354,83365,83359,83364,83362,8336
 DELETE FROM `creature_addon` WHERE `guid` IN (83355,83354,83365,83359,83364,83362,83366,83351,83367,83370);
 DELETE FROM `linked_respawn` WHERE `guid` IN (83351,83354,83355,83359,83362,83364,83365,83366,83367,83370) AND `linkedGuid`=83388 AND `linkType`=0;
 UPDATE `creature` SET `id2`=18495 WHERE `guid` IN (83363,83358,83353,83352,83360,83361,83356,83357,83368,83371) AND `id1`=18493 AND `map`=558;
+
+DELETE FROM `waypoint_scripts` WHERE `id` IN (491, 492, 493) AND `command` IN (1, 15) AND `guid` IN (18559, 18560, 18561);
+INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `guid`) VALUES
+(491, 0, 15, 33422, 1, 18559),
+(492, 0, 15, 32754, 1, 18560),
+(493, 10, 1, 68, 0, 18561);
