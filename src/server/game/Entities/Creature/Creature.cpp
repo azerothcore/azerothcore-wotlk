@@ -711,6 +711,24 @@ void Creature::Update(uint32 diff)
                 SelectVictim();
             }
 
+            // if periodic combat pulse is enabled and we are both in combat and in a dungeon, do this now
+            if (m_combatPulseDelay > 0 && IsInCombat() && GetMap()->IsDungeon())
+            {
+                if (diff > m_combatPulseTime)
+                    m_combatPulseTime = 0;
+                else
+                    m_combatPulseTime -= diff;
+
+                if (m_combatPulseTime == 0)
+                {
+                    if (AI())
+                        AI()->DoZoneInCombat();
+                    else
+                        SetInCombatWithZone();
+                    m_combatPulseTime = m_combatPulseDelay * IN_MILLISECONDS;
+                }
+            }
+
             // periodic check to see if the creature has passed an evade boundary
             if (IsAIEnabled && !IsInEvadeMode() && IsEngaged())
             {
