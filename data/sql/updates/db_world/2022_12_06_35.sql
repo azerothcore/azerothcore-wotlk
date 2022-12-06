@@ -1,3 +1,4 @@
+-- DB update 2022_12_06_34 -> 2022_12_06_35
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 6529 AND `OptionID` = 0;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 (6529, 0, 0, 'Baristolth, I have lost my badge and require a replacement.', 10679, 1, 1, 0, 0, 0, 0, '', 0, 0);
