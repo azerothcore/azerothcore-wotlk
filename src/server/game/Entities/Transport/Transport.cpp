@@ -446,6 +446,13 @@ void MotionTransport::UnloadNonStaticPassengers()
             ++itr;
             continue;
         }
+        //npcbot: do not unload bots
+        if ((*itr)->GetTypeId() == TYPEID_UNIT && (*itr)->ToCreature()->IsNPCBotOrPet())
+        {
+            ++itr;
+            continue;
+        }
+        //end npcbot
         PassengerSet::iterator itr2 = itr++;
         (*itr2)->AddObjectToRemoveList();
     }

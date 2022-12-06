@@ -89,6 +89,17 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->BaseLevel = 80;
         spellInfo->MaxLevel = 90;
     });
+    //npcbot: corrections for Gunship Battle Shoot: should be able to target creatures (Hurl Axe can)
+    ApplySpellFix({
+        70162,  // Shoot 10N
+        72566,  // Shoot 25N
+        72567,  // Shoot 10H
+        72568   // Shoot 25H
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_ON_PLAYER;
+        spellInfo->TargetAuraSpell = 0;
+    });
     //end npcbot
 
     ApplySpellFix({

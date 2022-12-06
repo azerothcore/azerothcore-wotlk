@@ -13866,6 +13866,15 @@ void bot_ai::JustDied(Unit*)
     KillEvents(false);
     CancelAllOrders();
 
+    if (me->GetVehicle())
+        me->ExitVehicle();
+
+    if (me->GetTransport())
+    {
+        me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+        me->GetTransport()->RemovePassenger(me, true);
+    }
+
     if (IsTempBot())
     {
         //TC_LOG_ERROR("entities.player", "Unsummoning temp bot %s (%s), owner: %s (%s)...",
@@ -16359,19 +16368,14 @@ void bot_ai::OnBotOwnerEnterVehicle(Vehicle const* /*vehicle*/)
 void bot_ai::OnBotOwnerExitVehicle(Vehicle const* /*vehicle*/)
 {
     shouldEnterVehicle = false;
-    /*
     if (me->GetVehicle())
     {
-        //if (VehicleSeatEntry const* seat = me->GetVehicle()->GetSeatForPassenger(me))
-        //{
-            //if (seat->CanEnterOrExit())
-                me->ExitVehicle();
-                me->BotStopMovement();
-        //}
-        return;
+        if (me->GetMapId() == 631) // Icecrown Citadel
+        {
+            me->ExitVehicle();
+            me->BotStopMovement();
+        }
     }
-    */
-    //TC_LOG_ERROR("scripts", "OnBotOwnerExitVehicle: no vehicle or no seat for bot %s!", me->GetName().c_str());
 }
 
 Unit* bot_ai::SpawnVehicle(uint32 creEntry, uint32 vehEntry)
