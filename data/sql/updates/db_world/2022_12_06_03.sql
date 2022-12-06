@@ -1,3 +1,4 @@
+-- DB update 2022_12_06_02 -> 2022_12_06_03
 -- Fix gossip for trainers
 UPDATE `creature_template` SET `npcflag`=`npcflag`|1 WHERE `entry` IN (33631, 33636, 33676, 33679, 33680, 33682);
 
