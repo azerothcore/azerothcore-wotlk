@@ -1,3 +1,4 @@
+-- DB update 2022_12_06_37 -> 2022_12_06_38
 --
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=30 AND `SourceEntry` IN (24753,22943);
 INSERT INTO `conditions` VALUES
