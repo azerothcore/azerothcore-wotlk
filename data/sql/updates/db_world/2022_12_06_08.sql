@@ -1,3 +1,4 @@
+-- DB update 2022_12_06_07 -> 2022_12_06_08
 -- Normal Mode regular creatures award 5 rep. Heroic awards 15
 UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1` = 5, `RewOnKillRepValue2` = 5 WHERE `creature_id` IN (
 17370, -- Laughing Skull Enforcer

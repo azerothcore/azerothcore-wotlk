@@ -1,3 +1,4 @@
+-- DB update 2022_12_06_10 -> 2022_12_06_11
 -- Adds stealth detect aura
 DELETE FROM `creature_template_addon` WHERE (`entry` = 17624);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
