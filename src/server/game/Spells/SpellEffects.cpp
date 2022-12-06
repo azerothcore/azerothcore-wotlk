@@ -728,6 +728,26 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             int32 count = m_caster->CalculateSpellDamage(unitTarget, m_spellInfo, EFFECT_2);
                             damage += count * int32(average * IN_MILLISECONDS) / m_caster->GetAttackTime(BASE_ATTACK);
                         }
+                        //npcbot: creature weaoin damage
+                        else if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsNPCBot())
+                        {
+                            float minTotal = 0.f;
+                            float maxTotal = 0.f;
+
+                            float tmpMin, tmpMax;
+                            for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+                            {
+                                m_caster->ToCreature()->CalculateMinMaxDamage(BASE_ATTACK, false, false, tmpMin, tmpMax, i);
+                                minTotal += tmpMin;
+                                maxTotal += tmpMax;
+                            }
+
+                            float average = (minTotal + maxTotal) / 2;
+                            // Add main hand dps * effect[2] amount
+                            int32 count = m_caster->CalculateSpellDamage(unitTarget, m_spellInfo, EFFECT_2);
+                            damage += count * int32(average * IN_MILLISECONDS) / m_caster->GetAttackTime(BASE_ATTACK);
+                        }
+                        //end npcbot
                         break;
                     }
                     // Shield of Righteousness
