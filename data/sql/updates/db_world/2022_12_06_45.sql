@@ -1,3 +1,4 @@
+-- DB update 2022_12_06_44 -> 2022_12_06_45
 -- 
 DELETE FROM `game_event` WHERE `eventEntry` IN (75, 76) AND `description` LIKE '%Arena Season%';
 INSERT INTO `game_event` (`eventEntry`, `description`) VALUES
