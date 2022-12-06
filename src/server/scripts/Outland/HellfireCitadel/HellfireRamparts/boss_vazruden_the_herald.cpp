@@ -132,6 +132,14 @@ public:
                 BossAI::EnterEvadeMode();
         }
 
+        void SetData(uint32 type, uint32 data) override
+        {
+            if (type == 0 && data == 1)
+            {
+                summons.DoZoneInCombat(NPC_HELLFIRE_SENTRY);
+            }
+        }
+
         void UpdateAI(uint32  /*diff*/) override
         {
             if (!me->IsVisible() && summons.size() == 0)
