@@ -1,3 +1,4 @@
+-- DB update 2022_12_06_14 -> 2022_12_06_15
 -- TrinityCore - WowPacketParser
 -- File name: 3.4.0.46368_Auchenai Crypts.pkt
 -- Detected build: V3_4_0_46368

@@ -1,3 +1,4 @@
+-- DB update 2022_12_06_33 -> 2022_12_06_34
 -- Delete all old gameobjects andd add new ones
 DELETE FROM `gameobject` WHERE `id`=185541;
 

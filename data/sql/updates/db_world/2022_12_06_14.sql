@@ -1,3 +1,4 @@
+-- DB update 2022_12_06_13 -> 2022_12_06_14
 --
 DELETE FROM `creature_text` WHERE `CreatureID`=15264 AND `groupid`=1;
 INSERT INTO `creature_text` VALUES
