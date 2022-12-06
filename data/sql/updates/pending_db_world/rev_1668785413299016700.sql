@@ -508,7 +508,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,6,164.39384,27.017565,-0.03106403,NULL,0,0,0,100,0),
 (@PATH,7,158.12143,30.15233,-0.110156626,NULL,0,0,0,100,0),
 (@PATH,8,154.54019,31.208351,-0.10033583,NULL,0,0,0,100,0),
-(@PATH,9,153.50821,38.660362,4.231137,NULL,40000,0,493,100,0),
+(@PATH,9,153.50821,38.660362,4.231137,NULL,40000,0,0,100,0),
 (@PATH,10,150.59761,30.838694,-0.10033666,NULL,0,0,0,100,0),
 (@PATH,11,132.99837,30.463366,-0.09167093,NULL,0,0,0,100,0),
 (@PATH,12,130.24228,29.550669,-0.09694571,NULL,0,0,0,100,0),
@@ -516,7 +516,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,14,130.77061,10.76564,0.09537189,NULL,0,0,0,100,0),
 (@PATH,15,130.48642,2.902071,-0.12865439,NULL,0,0,0,100,0),
 (@PATH,16,129.59958,-2.468409,0.06528245,NULL,0,0,0,100,0),
-(@PATH,17,125.65282,-3.223653,0.120242454,NULL,40000,0,493,100,0);
+(@PATH,17,125.65282,-3.223653,0.120242454,NULL,40000,0,0,100,0);
 -- 0x204CB045C012104000016F0002E1BFFA .go xyz 139.49518 2.368823 -0.12775199
 
 -- Pathing for Auchenai Soulpriest Entry: 18493
@@ -761,24 +761,23 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 32930, 0, 0, 31, 0, 3, 18778, 0, 0, 0, 0, '', 'Blue Beam (32930) can only target Cosmetic Raging Soul (18778)');
 
--- SAI for Blue Beam Soulpriests
-DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (-83375, -83377)) AND (`source_type` = 0) AND (`id` IN (1, 2, 3, 4, 5, 6, 7));
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-83375, 0, 1, 0, 0, 0, 100, 2, 1000, 1000, 6000, 9000, 0, 11, 32860, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Shadow Bolt\' (Normal Dungeon)'),
-(-83375, 0, 2, 0, 0, 0, 100, 4, 1000, 1000, 6000, 9000, 0, 11, 38378, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Shadow Bolt\' (Heroic Dungeon)'),
-(-83375, 0, 3, 0, 0, 0, 100, 0, 12000, 15000, 25000, 25000, 0, 11, 32859, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Falter\''),
-(-83375, 0, 4, 0, 0, 0, 100, 2, 5000, 6000, 50000, 50000, 0, 11, 32858, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Touch of the Forgotten\' (Normal Dungeon)'),
-(-83375, 0, 5, 0, 0, 0, 100, 4, 5000, 6000, 50000, 50000, 0, 11, 38377, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Touch of the Forgotten\' (Heroic Dungeon)'),
-(-83375, 0, 6, 0, 0, 0, 100, 513, 5000, 11000, 0, 0, 0, 88, 1849300, 1849304, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Run Random Script (No Repeat)'),
-(-83375, 0, 7, 0, 1, 0, 100, 7, 3600, 3600, 3600, 3600, 0, 11, 32930, 0, 1, 0, 0, 0, 19, 18778, 20, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - Out of Combat - Cast \'Blue Beam\' (No Repeat) (Dungeon)'),
-
-(-83377, 0, 1, 0, 0, 0, 100, 2, 1000, 1000, 6000, 9000, 0, 11, 32860, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Shadow Bolt\' (Normal Dungeon)'),
-(-83377, 0, 2, 0, 0, 0, 100, 4, 1000, 1000, 6000, 9000, 0, 11, 38378, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Shadow Bolt\' (Heroic Dungeon)'),
-(-83377, 0, 3, 0, 0, 0, 100, 0, 12000, 15000, 25000, 25000, 0, 11, 32859, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Falter\''),
-(-83377, 0, 4, 0, 0, 0, 100, 2, 5000, 6000, 50000, 50000, 0, 11, 32858, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Touch of the Forgotten\' (Normal Dungeon)'),
-(-83377, 0, 5, 0, 0, 0, 100, 4, 5000, 6000, 50000, 50000, 0, 11, 38377, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Touch of the Forgotten\' (Heroic Dungeon)'),
-(-83377, 0, 6, 0, 0, 0, 100, 513, 5000, 11000, 0, 0, 0, 88, 1849300, 1849304, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Run Random Script (No Repeat)'),
-(-83377, 0, 7, 0, 1, 0, 100, 7, 3600, 3600, 3600, 3600, 0, 11, 32930, 0, 1, 0, 0, 0, 19, 18778, 20, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - Out of Combat - Cast \'Blue Beam\' (No Repeat) (Dungeon)');
+-- Use waypoint_scripts to script the 
+SET @NPC := 83375;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,131.563,-19.3444,6.32334,5.95491,2147483647,0,493,100,0);
+SET @NPC := 83377;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,135.284,-27.3773,9.91618,0.999043,2147483647,0,493,100,0);
 
 -- DELETE creature Pools and replace with id2
 DELETE FROM `pool_template` WHERE `description` LIKE '%auchenai%' AND `entry` BETWEEN 1500 AND 1509;
@@ -788,8 +787,8 @@ DELETE FROM `creature_addon` WHERE `guid` IN (83355,83354,83365,83359,83364,8336
 DELETE FROM `linked_respawn` WHERE `guid` IN (83351,83354,83355,83359,83362,83364,83365,83366,83367,83370) AND `linkedGuid`=83388 AND `linkType`=0;
 UPDATE `creature` SET `id2`=18495 WHERE `guid` IN (83363,83358,83353,83352,83360,83361,83356,83357,83368,83371) AND `id1`=18493 AND `map`=558;
 
-DELETE FROM `waypoint_scripts` WHERE `id` IN (491, 492, 493) AND `command` IN (1, 15) AND `guid` IN (18559, 18560, 18561);
+DELETE FROM `waypoint_scripts` WHERE `id` IN (491, 492, 493) AND `command`=15 AND `guid` IN (18559, 18560, 18561);
 INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `guid`) VALUES
 (491, 0, 15, 33422, 1, 18559),
 (492, 0, 15, 32754, 1, 18560),
-(493, 10, 1, 68, 0, 18561);
+(493, 0, 15, 32930, 1, 18561);
