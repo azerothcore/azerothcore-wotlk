@@ -447,10 +447,9 @@ public:
     AccountData* GetAccountData(AccountDataType type) { return &m_accountData[type]; }
     void SetAccountData(AccountDataType type, time_t tm, std::string const& data);
     void SendAccountDataTimes(uint32 mask);
-    void LoadGlobalAccountData();
     void LoadAccountData(PreparedQueryResult result, uint32 mask);
 
-    void LoadTutorialsData();
+    void LoadTutorialsData(PreparedQueryResult result);
     void SendTutorialsData();
     void SaveTutorialsData(CharacterDatabaseTransaction trans);
     uint32 GetTutorialInt(uint8 index) const { return m_Tutorials[index]; }
@@ -1076,6 +1075,9 @@ public:                                                 // opcodes handlers
     QueryCallbackProcessor& GetQueryProcessor() { return _queryProcessor; }
     TransactionCallback& AddTransactionCallback(TransactionCallback&& callback);
     SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback);
+
+    void InitializeSession();
+    void InitializeSessionCallback(CharacterDatabaseQueryHolder const& realmHolder, uint32 clientCacheVersion);
 
 private:
     void ProcessQueryCallbacks();
