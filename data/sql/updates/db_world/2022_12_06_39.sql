@@ -1,3 +1,4 @@
+-- DB update 2022_12_06_38 -> 2022_12_06_39
 -- 
 UPDATE `dungeon_access_requirements` SET `comment`='Hellfire Citadel: The Shattered Halls (Heroic)' WHERE `requirement_id`=30637 AND `requirement_type`=2 AND `dungeon_access_id`=34;
 UPDATE `dungeon_access_requirements` SET `comment`='Hellfire Citadel: The Shattered Halls (Heroic)' WHERE `requirement_id`=30622 AND `requirement_type`=2 AND `dungeon_access_id`=34;
