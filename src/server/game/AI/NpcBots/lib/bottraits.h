@@ -64,6 +64,8 @@ std::enable_if_t<std::conjunction_v<std::is_same<Schools, SpellSchools>...>,
     std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>>
 CanAffectVictimSchools(Unit const* target, Schools... schools)
 {
+    static_assert(sizeof...(Schools) > 0, "need at least 1 spell school to check for");
+
     using arr_type = std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>;
     using arr_iter_type = typename arr_type::iterator;
     arr_type results{ std::pair{schools, true}... };
@@ -113,6 +115,8 @@ std::enable_if_t<std::conjunction_v<std::is_same<Schools, SpellSchools>...>,
     typename NPCBots::fixed_tuple<std::pair<SpellSchools, bool>, sizeof...(Schools)>::tuple_type>
 CanAffectVictimTuple(Unit const* target, Schools... schools)
 {
+    static_assert(sizeof...(Schools) > 0, "need at least 1 spell school to check for");
+
     using arr_type = std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>;
 
     arr_type results = CanAffectVictimSchools(target, schools...);
@@ -124,6 +128,8 @@ std::enable_if_t<std::conjunction_v<std::is_same<Schools, SpellSchools>...>,
     typename NPCBots::fixed_tuple<bool, sizeof...(Schools)>::tuple_type>
 CanAffectVictimBools(Unit const* target, Schools... schools)
 {
+    static_assert(sizeof...(Schools) > 0, "need at least 1 spell school to check for");
+
     using arr_type = std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>;
 
     arr_type results = CanAffectVictimSchools(target, schools...);

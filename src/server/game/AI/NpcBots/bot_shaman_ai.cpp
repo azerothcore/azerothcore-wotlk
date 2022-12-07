@@ -1051,25 +1051,29 @@ public:
 
         void DoNormalAttack(uint32 diff)
         {
-            StartAttack(opponent, IsMelee());
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
+                return;
 
-            auto [can_do_frost, can_do_fire, can_do_nature] = CanAffectVictimBools(opponent, SPELL_SCHOOL_FROST, SPELL_SCHOOL_FIRE, SPELL_SCHOOL_NATURE);
+            StartAttack(mytar, IsMelee());
+
+            auto [can_do_frost, can_do_fire, can_do_nature] = CanAffectVictimBools(mytar, SPELL_SCHOOL_FROST, SPELL_SCHOOL_FIRE, SPELL_SCHOOL_NATURE);
 
             //AttackerSet m_attackers = master->getAttackers();
             //AttackerSet b_attackers = me->getAttackers();
-            float dist = me->GetDistance(opponent);
+            float dist = me->GetDistance(mytar);
 
             //spell reflections
-            if (IsSpellReady(EARTH_SHOCK_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS) && dist < 25 && CanRemoveReflectSpells(opponent, EARTH_SHOCK_1) &&
-                doCast(opponent, EARTH_SHOCK_1))
+            if (IsSpellReady(EARTH_SHOCK_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS) && dist < 25 && CanRemoveReflectSpells(mytar, EARTH_SHOCK_1) &&
+                doCast(mytar, EARTH_SHOCK_1))
                 return;
 
-            MoveBehind(opponent);
+            MoveBehind(mytar);
 
             //STORMSTRIKE
             if (IsSpellReady(STORMSTRIKE_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS) && IsMelee() && dist <= 5 && Rand() < 120)
             {
-                if (doCast(opponent, GetSpell(STORMSTRIKE_1)))
+                if (doCast(mytar, GetSpell(STORMSTRIKE_1)))
                     return;
             }
             //SHOCKS
@@ -1079,10 +1083,10 @@ public:
             {
                 if (GetSpell(FLAME_SHOCK_1) && can_do_fire)
                 {
-                    AuraEffect const* fsh = opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0x0, 0x0, me->GetGUID());
+                    AuraEffect const* fsh = mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0x0, 0x0, me->GetGUID());
                     if (!fsh || fsh->GetBase()->GetDuration() < 3000)
                     {
-                        if (doCast(opponent, GetSpell(FLAME_SHOCK_1)))
+                        if (doCast(mytar, GetSpell(FLAME_SHOCK_1)))
                             return;
                     }
                 }
@@ -1093,7 +1097,7 @@ public:
 
                 if (SHOCK)
                 {
-                    if (doCast(opponent, SHOCK))
+                    if (doCast(mytar, SHOCK))
                         return;
                 }
             }
@@ -1101,7 +1105,7 @@ public:
             //Feral Spirit
             if (IsSpellReady(FERAL_SPIRIT_1, diff) && HasRole(BOT_ROLE_DPS) && Rand() < 40 && dist < 5)
             {
-                SummonBotPet(opponent);
+                SummonBotPet(mytar);
                 SetSpellCooldown(FERAL_SPIRIT_1, 180000);
                 return;
             }
@@ -1111,7 +1115,7 @@ public:
                 HasRole(BOT_ROLE_DPS) && dist < CalcSpellMaxRange(LAVA_BURST_1) && Rand() < 60 &&
                 (me->getAttackers().empty() || dist > 10))
             {
-                if (doCast(opponent, GetSpell(LAVA_BURST_1)))
+                if (doCast(mytar, GetSpell(LAVA_BURST_1)))
                     return;
             }
 
@@ -1122,15 +1126,15 @@ public:
             //CHAIN LIGHTNING
             if (IsSpellReady(CHAIN_LIGHTNING_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS) && dist < CalcSpellMaxRange(CHAIN_LIGHTNING_1) && Rand() < 80)
             {
-                Unit* u = FindSplashTarget(35.f, opponent, 5.f);
-                if (u && doCast(opponent, GetSpell(CHAIN_LIGHTNING_1)))
+                Unit* u = FindSplashTarget(35.f, mytar, 5.f);
+                if (u && doCast(mytar, GetSpell(CHAIN_LIGHTNING_1)))
                     return;
             }
             //LIGHTNING BOLT
             if (IsSpellReady(LIGHTNING_BOLT_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS) && dist < CalcSpellMaxRange(LIGHTNING_BOLT_1))
             {
                 uint32 LIGHTNING_BOLT = GetSpell(LIGHTNING_BOLT_1);
-                if (doCast(opponent, LIGHTNING_BOLT))
+                if (doCast(mytar, LIGHTNING_BOLT))
                     return;
             }
         }

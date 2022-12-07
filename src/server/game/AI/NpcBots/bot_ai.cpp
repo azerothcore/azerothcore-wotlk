@@ -230,6 +230,9 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature)
 
     _ownerGuid = 0;
 
+    opponent = nullptr;
+    disttarget = nullptr;
+
     ResetBotAI(BOTAI_RESET_INIT);
 
     BotDataMgr::RegisterBot(me);
@@ -1812,8 +1815,7 @@ void bot_ai::_getBotDispellableAuraList(Unit const* target, uint32 dispelMask, s
 //protected
 // Quick check if current target has school immunities to prevent cast attempts spam
 // CheckBotCast()->_checkImmunities()
-// Only called after opponent is validated in CheckAttackTarget()->_getTarget()
-bool bot_ai::CanAffectVictim(uint32 schoolMask) const
+bool bot_ai::CanAffectVictim(Unit const* target, uint32 schoolMask) const
 {
     if (schoolMask == SPELL_SCHOOL_MASK_NONE)
     {
@@ -1822,7 +1824,7 @@ bool bot_ai::CanAffectVictim(uint32 schoolMask) const
     }
 
     uint32 finalMask = 0;
-    if (Creature const* creature = opponent->ToCreature())
+    if (Creature const* creature = target->ToCreature())
     {
         if (uint32 immune_mask = SpellSchoolMask(creature->GetCreatureTemplate()->SpellSchoolImmuneMask))
         {
@@ -1832,7 +1834,7 @@ bool bot_ai::CanAffectVictim(uint32 schoolMask) const
         }
     }
 
-    Unit::AuraEffectList const& schoolImmunityAurasList = opponent->GetAuraEffectsByType(SPELL_AURA_SCHOOL_IMMUNITY);
+    Unit::AuraEffectList const& schoolImmunityAurasList = target->GetAuraEffectsByType(SPELL_AURA_SCHOOL_IMMUNITY);
     if (!schoolImmunityAurasList.empty())
     {
         for (Unit::AuraEffectList::const_iterator itr = schoolImmunityAurasList.begin(); itr != schoolImmunityAurasList.end(); ++itr)
@@ -3465,7 +3467,7 @@ void bot_ai::RefreshAura(uint32 spellId, int8 count, Unit* target) const
         target->AddAura(spellInfo, MAX_EFFECT_MASK, target);
 }
 
-bool bot_ai::CanBotAttack(Unit const* target, int8 byspell) const
+bool bot_ai::CanBotAttack(Unit const* target, int8 byspell, bool secondary) const
 {
     if (!target)
         return false;
@@ -3486,7 +3488,7 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell) const
 
     uint8 followdist = IAmFree() ? BotMgr::GetBotFollowDistDefault() : master->GetBotMgr()->GetBotFollowDist();
     float foldist = _getAttackDistance(float(followdist));
-    if (!IAmFree() && (HasRole(BOT_ROLE_RANGED) || HasVehicleRoleOverride(BOT_ROLE_RANGED)) && me->IsWithinLOSInMap(target))
+    if (!IAmFree() && IsRanged() && me->IsWithinLOSInMap(target))
         _extendAttackRange(foldist);
 
     SpellSchoolMask mainMask;
@@ -3518,6 +3520,8 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell) const
         ((me->CanSeeOrDetect(target) && target->InSamePhase(me)) || CanSeeEveryone()) &&
         (!master->IsAlive() || target->IsControlledByPlayer() ||
         (followdist > 0 && (master->GetDistance(target) <= foldist || HasBotCommandState(BOT_COMMAND_STAY)))) &&//if master is killed pursue to the end
+        (!HasBotCommandState(BOT_COMMAND_STAY) ||
+        ((!IsRanged() && !secondary) ? me->IsWithinMeleeRange(target) : me->GetDistance(target) <= foldist)) &&//if stationery check own distance
         (target->IsHostileTo(master) || target->IsHostileTo(me) ||//if master is controlled
         (target->GetReactionTo(me) < REP_FRIENDLY && (master->IsInCombat() || target->IsInCombat()))) &&
         (byspell == -1 || !target->IsTotem()) &&
@@ -3649,7 +3653,7 @@ Unit* bot_ai::_getVehicleTarget(BotVehicleStrats /*strat*/) const
     }
 
     //check targets around
-    float maxdist = InitAttackRange(followdist, HasRole(BOT_ROLE_RANGED) || HasVehicleRoleOverride(BOT_ROLE_RANGED));
+    float maxdist = InitAttackRange(followdist, IsRanged());
     Unit* t = nullptr;
     NearbyHostileVehicleTargetCheck check(veh, maxdist, this);
     Acore::UnitSearcher <NearbyHostileVehicleTargetCheck> searcher(veh, t, check);
@@ -3659,15 +3663,15 @@ Unit* bot_ai::_getVehicleTarget(BotVehicleStrats /*strat*/) const
     return t;
 }
 //GETTARGET
-//Returns attack target or 'no target'
-//All code above 'x = _getTarget() call must not dereference opponent since it can be invalid
-Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
+//Returns attack target or 'no target' and distant check target or 'no target'
+//All code above 'x = _getTarget() call must not dereference opponent or disttarget since it can be invalid
+std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &reset) const
 {
     //if (_evadeMode) //IAmFree() case only
-    //    return nullptr;
+    //    return { nullptr, nullptr };
 
     if (!CanBotAttackOnVehicle())
-        return nullptr;
+        return { nullptr, nullptr };
 
     Unit* mytar = me->GetVictim();
 
@@ -3675,16 +3679,16 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
     //TC_LOG_ERROR("entities.player", "bot_ai::getTarget(): bot: %s", me->GetName().c_str());
 
     if (mytar && me->HasAuraType(SPELL_AURA_MOD_TAUNT))
-        return mytar;
+        return { mytar, mytar };
 
     //Immediate targets
     if (!IAmFree() && me->GetMap()->GetEntry() && !me->GetMap()->GetEntry()->IsWorldMap())
     {
-        static constexpr std::array WMOAreaGroupMarrowgar = { 47833u }; // The Spire
-        static constexpr std::array WMOAreaGroupSindragosa = { 48066u }; // Frost Queen's Lair
-        static constexpr std::array WMOAreaGroupLichKing = { 50038u, 50040u }; // The Frozen Throne
+        static const std::array WMOAreaGroupMarrowgar = { 47833u }; // The Spire
+        static const std::array WMOAreaGroupSindragosa = { 48066u }; // Frost Queen's Lair
+        static const std::array WMOAreaGroupLichKing = { 50038u, 50040u }; // The Frozen Throne
 
-        static auto isInWMOArea = [=](auto const& ids) {
+        static auto isInWMOArea = [this](auto const& ids) {
             for (auto wmoId : ids) {
                 if (wmoId == _lastWMOAreaId)
                     return true;
@@ -3695,7 +3699,7 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
         // Icecrown Citadel - Lord Marrowgar
         if (me->GetMapId() == 631 && isInWMOArea(WMOAreaGroupMarrowgar) && me->IsInCombat() && HasRole(BOT_ROLE_DPS) && !IsTank())
         {
-            static constexpr std::array BoneSpikeIds = { CREATURE_ICC_BONE_SPIKE1, CREATURE_ICC_BONE_SPIKE2, CREATURE_ICC_BONE_SPIKE3 };
+            static const std::array BoneSpikeIds = { CREATURE_ICC_BONE_SPIKE1, CREATURE_ICC_BONE_SPIKE2, CREATURE_ICC_BONE_SPIKE3 };
 
             auto boneSpikeCheck = [=, mydist = 50.f](Unit const* unit) mutable {
                 if (!unit->IsAlive())
@@ -3722,7 +3726,7 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
                 Acore::Containers::SelectRandomContainerElement(cList))
             {
                 // Bone Spike is always attackable - no additional checks needed
-                return spike;
+                return { spike, nullptr };
             }
         }
 
@@ -3731,8 +3735,8 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
             (!mytar || (mytar->GetEntry() != CREATURE_ICC_ICE_TOMB1 && mytar->GetEntry() != CREATURE_ICC_ICE_TOMB2 &&
             mytar->GetEntry() != CREATURE_ICC_ICE_TOMB3 && mytar->GetEntry() != CREATURE_ICC_ICE_TOMB4))*/)
         {
-            static constexpr std::array IceTombIds = { CREATURE_ICC_ICE_TOMB1, CREATURE_ICC_ICE_TOMB2, CREATURE_ICC_ICE_TOMB3, CREATURE_ICC_ICE_TOMB4 };
-            static constexpr std::array SindragosaIds = { CREATURE_ICC_SINDRAGOSA1, CREATURE_ICC_SINDRAGOSA2, CREATURE_ICC_SINDRAGOSA3, CREATURE_ICC_SINDRAGOSA4 };
+            static const std::array IceTombIds = { CREATURE_ICC_ICE_TOMB1, CREATURE_ICC_ICE_TOMB2, CREATURE_ICC_ICE_TOMB3, CREATURE_ICC_ICE_TOMB4 };
+            static const std::array SindragosaIds = { CREATURE_ICC_SINDRAGOSA1, CREATURE_ICC_SINDRAGOSA2, CREATURE_ICC_SINDRAGOSA3, CREATURE_ICC_SINDRAGOSA4 };
 
             static auto SiItCheck = [=](Unit const* unit) {
                 if (unit->IsAlive())
@@ -3788,12 +3792,12 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
                     bool air_phase = sindragosa && sindragosa->GetReactState() == REACT_PASSIVE;
                     bool above35 = GetHealthPCT(icetomb) > 35;
                     if (!air_phase || above35)
-                        return icetomb;
+                        return { icetomb, nullptr };
                     else if (mytar == icetomb || !master->GetVictim())
                     {
                         if (botPet && botPet->GetVictim())
                             botPet->AttackStop();
-                        return nullptr;
+                        return { nullptr, nullptr };
                     }
                 }
             }
@@ -3802,8 +3806,8 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
         // Icecrown Citadel - The Lich King
         if (me->GetMapId() == 631 && isInWMOArea(WMOAreaGroupLichKing) && me->IsInCombat() && HasRole(BOT_ROLE_DPS) && !IsTank())
         {
-            static constexpr std::array IceSphereIds = { CREATURE_ICC_ICE_SPHERE1, CREATURE_ICC_ICE_SPHERE2, CREATURE_ICC_ICE_SPHERE3, CREATURE_ICC_ICE_SPHERE4 };
-            static constexpr std::array ValkyrShadowguardIds = { CREATURE_ICC_VALKYR_LK1, CREATURE_ICC_VALKYR_LK2, CREATURE_ICC_VALKYR_LK3, CREATURE_ICC_VALKYR_LK4 };
+            static const std::array IceSphereIds = { CREATURE_ICC_ICE_SPHERE1, CREATURE_ICC_ICE_SPHERE2, CREATURE_ICC_ICE_SPHERE3, CREATURE_ICC_ICE_SPHERE4 };
+            static const std::array ValkyrShadowguardIds = { CREATURE_ICC_VALKYR_LK1, CREATURE_ICC_VALKYR_LK2, CREATURE_ICC_VALKYR_LK3, CREATURE_ICC_VALKYR_LK4 };
 
             static auto valkyrCheck = [=](Unit const* unit) {
                 for (uint32 vsId : ValkyrShadowguardIds) {
@@ -3818,7 +3822,7 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
             Cell::VisitAllObjects(me, searcher, 50.f);
 
             if (valkyr)
-                return valkyr;
+                return { valkyr, nullptr };
 
             Unit const* usearcher = master->IsAlive() ? master->ToUnit() : me->ToUnit();
             auto iceSphereCheck = [=, mydist = 30.f](Unit const* unit) mutable {
@@ -3839,7 +3843,7 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
             Cell::VisitAllObjects(usearcher, searcher2, 30.f);
 
             if (sphere)
-                return sphere;
+                return { sphere, nullptr };
         }
     }
 
@@ -3857,7 +3861,7 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
                     if (mytar && mytar->GetGUID() == guid && mytar->GetVictim() == me)
                     {
                         //TC_LOG_ERROR("entities.unit", "_getTarget: %s continues %s", me->GetName().c_str(), mytar->GetName().c_str());
-                        return mytar;
+                        return { mytar, mytar };
                     }
 
                     if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
@@ -3883,7 +3887,7 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
         if (tankTar)
         {
             //TC_LOG_ERROR("entities.unit", "_getTarget: %s returning %s", me->GetName().c_str(), tankTar->GetName().c_str());
-            return tankTar;
+            return { tankTar, tankTar };
         }
     }
     if (gr && IsTank())
@@ -3898,7 +3902,7 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
                     if (mytar && mytar->GetGUID() == guid && mytar->GetVictim() == me)
                     {
                         //TC_LOG_ERROR("entities.unit", "_getTarget: %s continues %s", me->GetName().c_str(), mytar->GetName().c_str());
-                        return mytar;
+                        return { mytar, mytar };
                     }
 
                     if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
@@ -3924,7 +3928,7 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
         if (tankTar)
         {
             //TC_LOG_ERROR("entities.unit", "_getTarget: %s returning %s", me->GetName().c_str(), tankTar->GetName().c_str());
-            return tankTar;
+            return { tankTar, tankTar };
         }
     }
     if (gr)
@@ -3936,7 +3940,7 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
                 if (HasRole(BOT_ROLE_RANGED) && (BotMgr::GetRangedDPSTargetIconFlags() & GroupIconsFlags[i]))
                 {
                     if (mytar && mytar->GetGUID() == guid)
-                        return mytar;
+                        return { mytar, mytar };
 
                     if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
                     {
@@ -3944,14 +3948,14 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
                             unit->IsInCombat() && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
                         {
                             //TC_LOG_ERROR("entities.unit", "_getTarget: found rdps icon target %s", unit->GetName().c_str());
-                            return unit;
+                            return { unit, unit };
                         }
                     }
                 }
                 if (BotMgr::GetDPSTargetIconFlags() & GroupIconsFlags[i])
                 {
                     if (mytar && mytar->GetGUID() == guid)
-                        return mytar;
+                        return { mytar, mytar };
 
                     if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
                     {
@@ -3959,7 +3963,7 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
                             unit->IsInCombat() && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
                         {
                             //TC_LOG_ERROR("entities.unit", "_getTarget: found dps icon target %s", unit->GetName().c_str());
-                            return unit;
+                            return { unit, unit };
                         }
                     }
                 }
@@ -4008,33 +4012,35 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
     if (u && u == mytar && !IAmFree() && u->GetTypeId() == TYPEID_PLAYER && CanBotAttack(u, byspell))
     {
         //TC_LOG_ERROR("entities.player", "bot %s continues attack common target %s", me->GetName().c_str(), u->GetName().c_str());
-        return u;//forced
+        return { u, u };//forced
     }
     //Follow if...
     uint8 followdist = IAmFree() ? BotMgr::GetBotFollowDistDefault() / 2 : master->GetBotMgr()->GetBotFollowDist();
     float foldist = _getAttackDistance(float(followdist));
-    if (!IAmFree() && (HasRole(BOT_ROLE_RANGED) || HasVehicleRoleOverride(BOT_ROLE_RANGED)))
+    if (!IAmFree() && IsRanged())
     {
         _extendAttackRange(foldist);
         //TC_LOG_ERROR("entities.player", "bot %s ranged foldist %.2f spelldist %.2f", me->GetName().c_str(), foldist, spelldist);
     }
-    bool dropTarget = false;
-    if ((!u || IAmFree()) && master->IsAlive() && mytar)
+    bool dropTarget = followdist == 0 && master->IsAlive();
+    if (!dropTarget && (!u || IAmFree()) && master->IsAlive() && mytar && mytar == opponent)
     {
         dropTarget = IAmFree() ?
             me->GetDistance(mytar) > foldist :
+            HasBotCommandState(BOT_COMMAND_STAY) ?
+            (!IsRanged() ? !me->IsWithinMeleeRange(mytar) : me->GetDistance(mytar) > foldist) :
             (master->GetDistance(mytar) > foldist || (master->GetDistance(mytar) > foldist * 0.75f && !mytar->IsWithinLOSInMap(me)));
     }
     if (dropTarget)
     {
         //TC_LOG_ERROR("entities.player", "bot %s cannot attack target %s, too far away or not in LoS", me->GetName().c_str(), mytar ? mytar->GetName().c_str() : "unk");
-        return nullptr;
+        mytar = nullptr;
     }
 
     if (u && !IAmFree() && (master->IsInCombat() || u->IsInCombat())/* && !InDuel(u)*/ && !IsInBotParty(u) && (BotMgr::IsPvPEnabled() || !u->IsControlledByPlayer()))
     {
         //TC_LOG_ERROR("entities.player", "bot %s starts attack master's target %s", me->GetName().c_str(), u->GetName().c_str());
-        return u;
+        return { u, u };
     }
 
     if (mytar && (!IAmFree() || me->GetDistance(mytar) < float(BOT_MAX_CHASE_RANGE)) && CanBotAttack(mytar, byspell) &&/* !InDuel(mytar) &&*/
@@ -4043,69 +4049,56 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
         //TC_LOG_ERROR("entities.player", "bot %s continues attack its target %s", me->GetName().c_str(), mytar->GetName().c_str());
         if (me->GetDistance(mytar) > (ranged ? 20.f : 5.f) && !HasBotCommandState(BOT_COMMAND_MASK_UNCHASE))
             reset = true;
-        return mytar;
+        return { mytar, mytar };
     }
-
-    if (followdist == 0 && master->IsAlive())
-        return nullptr; //do not bother
 
     //check group
     if (!IAmFree())
     {
         if (!gr)
         {
-            Creature const* bot;
             BotMap const* map = master->GetBotMgr()->GetBotMap();
             for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
             {
-                bot = itr->second;
-                if (!bot || !bot->InSamePhase(me) || bot == me) continue;
+                Creature const* bot = itr->second;
+                if (!bot || bot == me || !bot->InSamePhase(me)) continue;
                 if (IsTank() && IsTank(bot)) continue;
                 u = bot->GetVictim();
-                if (u && (bot->IsInCombat() || u->IsInCombat()) &&
-                    (!master->IsAlive() || master->GetDistance(u) < foldist) &&
-                    CanBotAttack(u, byspell))
+                if (u && (bot->IsInCombat() || u->IsInCombat()) && CanBotAttack(u, byspell))
                 {
                     //TC_LOG_ERROR("entities.player", "bot %s hooked %s's victim %s", me->GetName().c_str(), bot->GetName().c_str(), u->GetName().c_str());
-                    return u;
+                    return { u, u };
                 }
             }
         }
         else
         {
-            Player const* pl;
-            Creature const* bot;
             for (GroupReference const* ref = gr->GetFirstMember(); ref != nullptr; ref = ref->next())
             {
-                pl = ref->GetSource();
+                Player const* pl = ref->GetSource();
                 if (!pl || !pl->IsInWorld() || pl->IsBeingTeleported()) continue;
                 if (me->GetMap() != pl->FindMap() || !pl->InSamePhase(me)) continue;
                 if (IsTank() && IsTank(pl)) continue;
                 u = pl->GetVictim();
-                if (u && pl != master &&
-                    (pl->IsInCombat() || u->IsInCombat()) &&
-                    (!master->IsAlive() || master->GetDistance(u) < foldist) &&
-                    CanBotAttack(u, byspell))
+                if (u && pl != master && (pl->IsInCombat() || u->IsInCombat()) && CanBotAttack(u, byspell))
                 {
                     //TC_LOG_ERROR("entities.player", "bot %s hooked %s's victim %s", me->GetName().c_str(), pl->GetName().c_str(), u->GetName().c_str());
-                    return u;
+                    return { u, u };
                 }
                 if (!pl->HaveBot()) continue;
                 BotMap const* map = pl->GetBotMgr()->GetBotMap();
                 for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
                 {
-                    bot = it->second;
-                    if (!bot || !bot->InSamePhase(me) || bot == me) continue;
+                    Creature const* bot = it->second;
+                    if (!bot || bot == me || !bot->InSamePhase(me)) continue;
                     if (!bot->IsInWorld()) continue;
                     if (me->GetMap() != bot->FindMap()) continue;
                     if (IsTank() && IsTank(bot)) continue;
                     u = bot->GetVictim();
-                    if (u && (bot->IsInCombat() || u->IsInCombat()) &&
-                        (!master->IsAlive() || master->GetDistance(u) < foldist) &&
-                        CanBotAttack(u, byspell))
+                    if (u && (bot->IsInCombat() || u->IsInCombat()) && CanBotAttack(u, byspell))
                     {
                         //TC_LOG_ERROR("entities.player", "bot %s hooked %s's victim %s", me->GetName().c_str(), bot->GetName().c_str(), u->GetName().c_str());
-                        return u;
+                        return { u, u };
                     }
                 }
             }
@@ -4113,35 +4106,38 @@ Unit* bot_ai::_getTarget(bool byspell, bool ranged, bool &reset) const
     }
 
     //check targets around
-    Unit* t = nullptr;
+    Unit* t1 = nullptr;
+    Unit* t2 = nullptr;
     float maxdist = InitAttackRange(float(followdist), ranged);
     //first cycle we search non-cced target, then, if not found, check all
     for (uint8 i = 0; i != 2; ++i)
     {
-        if (!t)
+        if (!t1)
         {
             bool attackCC = i;
-            NearestHostileUnitCheck check(me, maxdist, byspell, this, attackCC);
-            Acore::UnitLastSearcher <NearestHostileUnitCheck> searcher(master, t, check);
-            Cell::VisitAllObjects(master, searcher, maxdist);
+            NearestHostileUnitCheck check(me, maxdist, byspell, this, attackCC, !IsRanged() && HasBotCommandState(BOT_COMMAND_STAY));
+            Unit2LastSearcher<NearestHostileUnitCheck> searcher(t1, t2, check);
+            Cell::VisitAllObjects(HasBotCommandState(BOT_COMMAND_STAY) ? me->ToUnit() : master->ToUnit(), searcher, maxdist);
             //me->VisitNearbyObject(maxdist, searcher);
         }
     }
 
-    if (t && opponent && t != opponent)
+    Unit* curtar = opponent ? opponent : disttarget ? disttarget : nullptr;
+    if (t1 && curtar && t1 != curtar)
         reset = true;
 
     //Allow free bots to ignore temp invulnerabilities if no other target is present
-    if (IAmFree() && t == nullptr)
-        t = mytar;
+    if (IAmFree() && t1 == nullptr)
+        t1 = mytar;
 
     //if (t)
     //    TC_LOG_ERROR("entities.player", "bot %s has found new target %s", me->GetName().c_str(), t->GetName().c_str());
 
-    return t;
+    return { t1, t2 };
 }
 //'CanAttack' function
 //Only called in class ai UpdateAI function
+//Side effects: opponent, disttarget
 bool bot_ai::CheckAttackTarget()
 {
     if (IsDuringTeleport()/* || _evadeMode*/)
@@ -4210,9 +4206,9 @@ bool bot_ai::CheckAttackTarget()
             return false;
     }
 
-    opponent = _getTarget(byspell, ranged, reset);
+    std::tie(opponent, disttarget) = _getTargets(byspell, ranged, reset);
 
-    if (!opponent)
+    if (!opponent && !disttarget)
     {
         //TC_LOG_ERROR("entities.player", "bot_ai: CheckAttackTarget() - bot %s lost target", me->GetName().c_str());
         if (me->GetVictim() || me->IsInCombat()/* || !me->GetThreatManager().isThreatListEmpty()*/)
@@ -4223,26 +4219,27 @@ bool bot_ai::CheckAttackTarget()
             else if (me->IsInCombat())
                 Evade();
         }
-
-        return false;
     }
-
-    //boss engage phase // CanHaveThreatList checks for typeid == UNIT
-    if (GetEngageTimer() > lastdiff)
-        return false;
-    else if (!IsTank() && opponent != me->GetVictim() && opponent->GetVictim() && opponent->CanHaveThreatList() &&
-        opponent->ToCreature()->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS && me->GetMap()->IsRaid())
+    else
     {
-        uint32 threat = uint32(opponent->ToCreature()->GetThreatMgr().GetThreat(opponent->GetVictim()));
-        if (threat < std::min<uint32>(50000, opponent->GetVictim()->GetMaxHealth() / 2))
+        Unit* mytar = opponent ? opponent : disttarget;
+        //boss engage phase // CanHaveThreatList checks for typeid == UNIT
+        if (GetEngageTimer() > lastdiff)
             return false;
+        else if (!IsTank() && mytar != me->GetVictim() && mytar->GetVictim() && mytar->CanHaveThreatList() &&
+            mytar->ToCreature()->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS && me->GetMap()->IsRaid())
+        {
+            uint32 threat = uint32(mytar->ToCreature()->GetThreatMgr().GetThreat(mytar->GetVictim()));
+            if (threat < std::min<uint32>(50000, mytar->GetVictim()->GetMaxHealth() / 2))
+                return false;
+        }
+
+        if (reset)
+            SetBotCommandState(BOT_COMMAND_COMBATRESET);//reset AttackStart()
+
+        if (mytar != me->GetVictim())
+            me->Attack(mytar, !ranged);
     }
-
-    if (reset)
-        SetBotCommandState(BOT_COMMAND_COMBATRESET);//reset AttackStart()
-
-    if (opponent != me->GetVictim())
-        me->Attack(opponent, !ranged);
 
     return true;
 }
@@ -4784,7 +4781,7 @@ void bot_ai::GetInPosition(bool force, Unit* newtarget, Position* mypos)
     }
 
     uint8 followdist = IAmFree() ? BotMgr::GetBotFollowDistDefault() : master->GetBotMgr()->GetBotFollowDist();
-    if (HasRole(BOT_ROLE_RANGED) || HasVehicleRoleOverride(BOT_ROLE_RANGED) || (!IAmFree() && !GetAoeSpots().empty()))
+    if (IsRanged() || (!IAmFree() && !GetAoeSpots().empty()))
     {
         //do not allow constant runaway from player
         if (!force && newtarget->GetTypeId() == TYPEID_PLAYER &&
@@ -4974,7 +4971,7 @@ void bot_ai::_updateMountedState()
     if (!CanMount() && !aura && !mounted)
         return;
 
-    if ((!master->IsMounted() || aura != mounted || (!mounted && template_fly) || (me->IsInCombat() && opponent)) && (aura || mounted || template_fly))
+    if ((!master->IsMounted() || aura != mounted || (!mounted && template_fly) || (me->IsInCombat() && (opponent || disttarget))) && (aura || mounted || template_fly))
     {
         const_cast<CreatureTemplate*>(me->GetCreatureTemplate())->Movement.Flight = CreatureFlightMovementType::None;
         me->SetCanFly(false);
@@ -9877,7 +9874,7 @@ void bot_ai::OnOwnerDamagedBy(Unit* attacker)
         return;
     if (me->GetVictim() && (!IAmFree() || me->GetDistance(me->GetVictim()) < me->GetDistance(attacker)))
         return;
-    else if (!IsMelee() && opponent)
+    else if (!IsMelee() && (opponent || disttarget))
         return;
     //if (InDuel(attacker))
     //    return;
@@ -16933,7 +16930,11 @@ bool bot_ai::IsHeroExClass(uint8 m_class)
 }
 bool bot_ai::IsMelee() const
 {
-    return !HasRole(BOT_ROLE_RANGED) && HasRole(BOT_ROLE_DPS|BOT_ROLE_TANK);
+    return !IsRanged() && HasRole(BOT_ROLE_DPS|BOT_ROLE_TANK);
+}
+bool bot_ai::IsRanged() const
+{
+    return HasRole(BOT_ROLE_RANGED) || HasVehicleRoleOverride(BOT_ROLE_RANGED);
 }
 
 bool bot_ai::IsShootingWand(Unit const* u) const

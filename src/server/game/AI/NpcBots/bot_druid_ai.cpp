@@ -640,15 +640,19 @@ public:
             CheckHibernate(diff);
             Counter(diff);
 
+            if (IsCasting())
+                return;
+
             Attack(diff);
         }
 
         void Attack(uint32 diff)
         {
-            if (IsCasting())
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
                 return;
 
-            StartAttack(opponent, bot_ai::IsMelee());
+            StartAttack(mytar, bot_ai::IsMelee());
 
             //NOT all forms abilities (prioritized)
             //Cat Instaheal
@@ -664,8 +668,8 @@ public:
                     doCast(me, GetSpell(REGROWTH_1))) || doCast(me, GetSpell(HEALING_TOUCH_1)))
                 {
                     Position pos;
-                    opponent->GetNearPoint(me, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 0.f, 15.f, opponent->GetAbsoluteAngle(me));
-                    GetInPosition(true, opponent, &pos);
+                    mytar->GetNearPoint(me, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 0.f, 15.f, mytar->GetAbsoluteAngle(me));
+                    GetInPosition(true, mytar, &pos);
                     return;
                 }
             }
@@ -700,15 +704,15 @@ public:
             //Shapeshift into bear if needed
             //bear is lvl 10, bash is lvl 14
             //Retreat is triggered only if hit (SpellHitTarget)
-            if (IsSpellReady(BASH_1, diff) && !CCed(opponent, !opponent->IsNonMeleeSpellCast(false,false,true)) &&
-                opponent->IsWithinMeleeRange(me))
+            if (IsSpellReady(BASH_1, diff) && !CCed(mytar, !mytar->IsNonMeleeSpellCast(false,false,true)) &&
+                mytar->IsWithinMeleeRange(me))
             {
                 if (_form == DRUID_BEAR_FORM && rage >= acost(BASH_1))
                 {
-                    if (doCast(opponent, GetSpell(BASH_1)))
+                    if (doCast(mytar, GetSpell(BASH_1)))
                         return;
                 }
-                else if (_form != DRUID_BEAR_FORM && opponent->GetVictim() == me && Rand() < 25)
+                else if (_form != DRUID_BEAR_FORM && mytar->GetVictim() == me && Rand() < 25)
                 {
                     if (doCast(me, GetSpell(BEAR_FORM_1)))
                         return;
@@ -722,7 +726,7 @@ public:
             {
                 if (_form == DRUID_BEAR_FORM ||
                     (GC_Timer <= diff && doCast(me, GetSpell(BEAR_FORM_1))))
-                    doBearActions(diff);
+                    doBearActions(mytar, diff);
             }
             //2 Melee (tanking cat impossible: cat lvl 20, bear lvl 10)
             else if (bot_ai::IsMelee())
@@ -730,7 +734,7 @@ public:
                 //if lvl < 20 then bot gonna just melee its targets
                 if (_form == DRUID_CAT_FORM ||
                     (IsSpellReady(CAT_FORM_1, diff) && doCast(me, GetSpell(CAT_FORM_1))))
-                    doCatActions(diff);
+                    doCatActions(mytar, diff);
             }
             //3 Ranged dps
             else if (HasRole(BOT_ROLE_DPS))
@@ -740,7 +744,7 @@ public:
                     ((!GetSpell(MOONKIN_FORM_1) || HasRole(BOT_ROLE_HEAL)) && GC_Timer <= diff && removeShapeshiftForm()) ||
                     HasRole(BOT_ROLE_HEAL) ||
                     (IsSpellReady(MOONKIN_FORM_1, diff) && doCast(me, GetSpell(MOONKIN_FORM_1))))
-                    doBalanceActions(diff);
+                    doBalanceActions(mytar, diff);
             }
             //4 Healer
             else if (HasRole(BOT_ROLE_HEAL))
@@ -754,7 +758,7 @@ public:
             }
         }
 
-        void doBearActions(uint32 diff)
+        void doBearActions(Unit* mytar, uint32 diff)
         {
             //debug
             if (me->GetPowerType() != POWER_RAGE || (me->GetShapeshiftForm() != FORM_BEAR && me->GetShapeshiftForm() != FORM_DIREBEAR))
@@ -773,23 +777,23 @@ public:
                     return;
             }
 
-            float dist = me->GetDistance(opponent);
+            float dist = me->GetDistance(mytar);
             //GROWL //No GCD
-            Unit* u = opponent->GetVictim();
+            Unit* u = mytar->GetVictim();
             if (IsSpellReady(GROWL_1, diff, false) && u && u != me && Rand() < 40 && dist < 30 &&
-                opponent->GetTypeId() == TYPEID_UNIT && !opponent->IsControlledByPlayer() &&
-                !CCed(opponent) && !opponent->HasAuraType(SPELL_AURA_MOD_TAUNT) && IsInBotParty(u) &&
+                mytar->GetTypeId() == TYPEID_UNIT && !mytar->IsControlledByPlayer() &&
+                !CCed(mytar) && !mytar->HasAuraType(SPELL_AURA_MOD_TAUNT) && IsInBotParty(u) &&
                 (!IsTank(u) || (IsTank() && GetHealthPCT(u) < 30 && GetHealthPCT(me) > 67)) &&
                 ((!IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80) || IsTank()))
             {
-                if (doCast(opponent, GetSpell(GROWL_1)))
+                if (doCast(mytar, GetSpell(GROWL_1)))
                     return;
             }
             //GROWL 2 (distant)
             if (IsSpellReady(GROWL_1, diff, false) && !IAmFree() && u == me &&  Rand() < 20 &&IsTank() &&
                 (IsOffTank() || master->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_TANK_OFF) == 0) &&
-                !(me->GetLevel() >= 40 && opponent->GetTypeId() == TYPEID_UNIT &&
-                (opponent->ToCreature()->IsDungeonBoss() || opponent->ToCreature()->isWorldBoss())))
+                !(me->GetLevel() >= 40 && mytar->GetTypeId() == TYPEID_UNIT &&
+                (mytar->ToCreature()->IsDungeonBoss() || mytar->ToCreature()->isWorldBoss())))
             {
                 if (Unit* tUnit = FindDistantTauntTarget())
                 {
@@ -799,12 +803,12 @@ public:
             }
             //Challenging Roar
             if (IsSpellReady(CHALLENGING_ROAR_1, diff) &&
-                !(u == me && me->GetLevel() >= 40 && opponent->GetTypeId() == TYPEID_UNIT &&
-                (opponent->ToCreature()->IsDungeonBoss() || opponent->ToCreature()->isWorldBoss())) &&
+                !(u == me && me->GetLevel() >= 40 && mytar->GetTypeId() == TYPEID_UNIT &&
+                (mytar->ToCreature()->IsDungeonBoss() || mytar->ToCreature()->isWorldBoss())) &&
                 rage >= acost(CHALLENGING_ROAR_1))
             {
-                u = opponent->GetVictim();
-                if (u && u != me && !IsTank(u) && IsInBotParty(u) && !CCed(opponent) && dist <= 10 && Rand() < 25 &&
+                u = mytar->GetVictim();
+                if (u && u != me && !IsTank(u) && IsInBotParty(u) && !CCed(mytar) && dist <= 10 && Rand() < 25 &&
                     (!IsTankingClass(u->GetClass()) || IsTank()))
                 {
                     if (doCast(me, GetSpell(CHALLENGING_ROAR_1)))
@@ -826,23 +830,23 @@ public:
                 }
             }
 
-            if (!CanAffectVictim(SPELL_SCHOOL_MASK_NORMAL))
+            if (!CanAffectVictim(mytar, SPELL_SCHOOL_MASK_NORMAL))
                 return;
 
             //Feral Charge
             if (IsSpellReady(FERAL_CHARGE_BEAR_1, diff, false) && rage >= acost(FERAL_CHARGE_BEAR_1) &&
                 !HasBotCommandState(BOT_COMMAND_STAY) &&
-                !CCed(opponent, true) && dist > 9 && dist < 25)
+                !CCed(mytar, true) && dist > 9 && dist < 25)
             {
-                if (doCast(opponent, GetSpell(FERAL_CHARGE_BEAR_1)))
+                if (doCast(mytar, GetSpell(FERAL_CHARGE_BEAR_1)))
                     return;
             }
 
             //Faerie Fire (Feral, Bear)
             if (IsSpellReady(FAERIE_FIRE_FERAL_1, diff) && me->IsInCombat() && Rand() < 35 && dist < CalcSpellMaxRange(FAERIE_FIRE_FERAL_1) &&
-                !opponent->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RESISTANCE_PCT, SPELLFAMILY_DRUID, 0x400))
+                !mytar->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RESISTANCE_PCT, SPELLFAMILY_DRUID, 0x400))
             {
-                if (doCast(opponent, GetSpell(FAERIE_FIRE_FERAL_1)))
+                if (doCast(mytar, GetSpell(FAERIE_FIRE_FERAL_1)))
                     return;
             }
 
@@ -868,9 +872,9 @@ public:
             if (IsSpellReady(MANGLE_BEAR_1, diff) && rage >= acost(MANGLE_BEAR_1) + 200*isRegenActive)
             {
                 if (me->GetAuraEffect(SPELL_AURA_MECHANIC_IMMUNITY, SPELLFAMILY_DRUID, 0x0, 0x0, 0x40) ||
-                    (Rand() < 30 && !opponent->GetAuraEffect(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, SPELLFAMILY_DRUID, 0x0, 0x40, 0x0)))
+                    (Rand() < 30 && !mytar->GetAuraEffect(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, SPELLFAMILY_DRUID, 0x0, 0x40, 0x0)))
                 {
-                    if (doCast(opponent, GetSpell(MANGLE_BEAR_1)))
+                    if (doCast(mytar, GetSpell(MANGLE_BEAR_1)))
                         return;
                 }
             }
@@ -881,21 +885,21 @@ public:
                 std::list<Unit*> targets;
                 GetNearbyTargetsInConeList(targets, 5);
                 if (targets.size() > 2)
-                    if (doCast(opponent, GetSpell(SWIPE_BEAR_1)))
+                    if (doCast(mytar, GetSpell(SWIPE_BEAR_1)))
                         return;
             }
             //Lacerate
             if (IsSpellReady(LACERATE_1, diff) && rage >= acost(LACERATE_1) + 200*isRegenActive &&
-                opponent->GetHealth() > me->GetMaxHealth() * 2 && Rand() < 45)
+                mytar->GetHealth() > me->GetMaxHealth() * 2 && Rand() < 45)
             {
                 bool cast = rage >= 600;
                 if (!cast)
                 {
-                    AuraApplication const* lacera = opponent->GetAuraApplicationOfRankedSpell(LACERATE_1);
+                    AuraApplication const* lacera = mytar->GetAuraApplicationOfRankedSpell(LACERATE_1);
                     cast = (!lacera || lacera->GetBase()->GetStackAmount() < 5 || lacera->GetBase()->GetDuration() < 6000);
                 }
 
-                if (cast && doCast(opponent, GetSpell(LACERATE_1)))
+                if (cast && doCast(mytar, GetSpell(LACERATE_1)))
                     return;
             }
 
@@ -906,33 +910,33 @@ public:
             //Maul //No GCD
             if (IsSpellReady(MAUL_1, diff, false) && rage >= acost(MAUL_1) + 200 + 200*isRegenActive)
             {
-                if (doCast(opponent, GetSpell(MAUL_1)))
+                if (doCast(mytar, GetSpell(MAUL_1)))
                     return;
             }
         }
 
-        void doCatActions(uint32 diff)
+        void doCatActions(Unit* mytar, uint32 diff)
         {
             //debug
             if (me->GetPowerType() != POWER_ENERGY || me->GetShapeshiftForm() != FORM_CAT)
                 return;
 
             //Prowl (for Cooldown handling see bot_ai::ReleaseSpellCooldown)
-            if (IsSpellReady(PROWL_1, diff, false) && !me->IsInCombat() && Rand() < 50 && me->GetDistance(opponent) < 28)
+            if (IsSpellReady(PROWL_1, diff, false) && !me->IsInCombat() && Rand() < 50 && me->GetDistance(mytar) < 28)
             {
                 if (doCast(me, GetSpell(PROWL_1)))
                 {}
             }
 
-            if (!CanAffectVictim(SPELL_SCHOOL_MASK_NORMAL))
+            if (!CanAffectVictim(mytar, SPELL_SCHOOL_MASK_NORMAL))
                 return;
 
             //Faerie Fire (Feral, Cat)
             if (IsSpellReady(FAERIE_FIRE_FERAL_1, diff) && me->IsInCombat() && !me->HasAuraType(SPELL_AURA_MOD_STEALTH) &&
-                Rand() < 35 && me->GetDistance(opponent) < 30 &&
-                !opponent->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RESISTANCE_PCT, SPELLFAMILY_DRUID, 0x400))
+                Rand() < 35 && me->GetDistance(mytar) < 30 &&
+                !mytar->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RESISTANCE_PCT, SPELLFAMILY_DRUID, 0x400))
             {
-                if (doCast(opponent, GetSpell(FAERIE_FIRE_FERAL_1)))
+                if (doCast(mytar, GetSpell(FAERIE_FIRE_FERAL_1)))
                     return;
             }
 
@@ -944,49 +948,49 @@ public:
                     !HasBotCommandState(BOT_COMMAND_STAY) &&
                     !me->HasAuraType(SPELL_AURA_MOD_STEALTH) && Rand() < 65 &&
                     !me->GetAuraEffect(SPELL_AURA_MOD_INCREASE_SPEED, SPELLFAMILY_DRUID, 0x0, 0x0, 0x8) &&//not dashing
-                    me->GetDistance(opponent) > 10 && me->GetDistance(opponent) < 25)
+                    me->GetDistance(mytar) > 10 && me->GetDistance(mytar) < 25)
                 {
-                    if (doCast(opponent, GetSpell(FERAL_CHARGE_CAT_1)))
+                    if (doCast(mytar, GetSpell(FERAL_CHARGE_CAT_1)))
                         return; //no gcd but jump time
                 }
 
                 //Dash (no GCD)
                 if (IsSpellReady(DASH_1, diff, false) &&
                     (me->HasAuraType(SPELL_AURA_MOD_STEALTH) || (me->IsInCombat() && !IsSpellReady(FERAL_CHARGE_CAT_1, diff, false))) &&
-                    Rand() < 85 && me->GetDistance(opponent) > 15)
+                    Rand() < 85 && me->GetDistance(mytar) > 15)
                 {
                     if (doCast(me, GetSpell(DASH_1)))
                     {}
                 }
                 //Savage Roar
-                if (IsSpellReady(SAVAGE_ROAR_1, diff) && comboPoints >= 1 && (me->IsInCombat() || opponent->IsInCombat()) &&
+                if (IsSpellReady(SAVAGE_ROAR_1, diff) && comboPoints >= 1 && (me->IsInCombat() || mytar->IsInCombat()) &&
                     !me->HasAuraType(SPELL_AURA_MOD_STEALTH) && energy >= acost(SAVAGE_ROAR_1) &&
                     !me->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 0, 0x10000000, 0))
                 {
-                    if (doCast(opponent, GetSpell(SAVAGE_ROAR_1)))
+                    if (doCast(mytar, GetSpell(SAVAGE_ROAR_1)))
                         return;
                 }
             }
 
-            MoveBehind(opponent);
+            MoveBehind(mytar);
 
             //range check (melee) to prevent fake casts
-            if (me->GetDistance(opponent) > 5)
+            if (me->GetDistance(mytar) > 5)
                 return;
 
             //Cower
-            if (opponent->CanHaveThreatList())
+            if (mytar->CanHaveThreatList())
             {
-                if (IsSpellReady(COWER_1, diff) && opponent->GetVictim() == me && energy >= acost(COWER_1) &&
-                    int32(opponent->GetThreatMgr().GetThreatList().size()) > 1 &&
-                    int32(opponent->getAttackers().size()) > 1 && Rand() < 45)
+                if (IsSpellReady(COWER_1, diff) && mytar->GetVictim() == me && energy >= acost(COWER_1) &&
+                    int32(mytar->GetThreatMgr().GetThreatListSize()) > 1 &&
+                    int32(mytar->getAttackers().size()) > 1 && Rand() < 45)
                 {
-                    if (doCast(opponent, GetSpell(COWER_1)))
+                    if (doCast(mytar, GetSpell(COWER_1)))
                         return;
                 }
             }
             //Tiger's Fury (no GCD) cannot use while Berserk is active
-            if (IsSpellReady(TIGERS_FURY_1, diff, false) && opponent->GetHealth() > me->GetHealth() / 4 &&
+            if (IsSpellReady(TIGERS_FURY_1, diff, false) && mytar->GetHealth() > me->GetHealth() / 4 &&
                 (me->GetLevel() < 55 || energy <= 40) && Rand() < 40 &&
                 !me->GetAuraEffect(SPELL_AURA_MECHANIC_IMMUNITY, SPELLFAMILY_DRUID, 0x0, 0x0, 0x40))
             {
@@ -996,7 +1000,7 @@ public:
             //Berserk can be used After Tiger's Fury without dispelling it
             //Berserk (Cat)
             if (IsSpellReady(BERSERK_1, diff) && !HasRole(BOT_ROLE_HEAL) && (!me->HasAuraType(SPELL_AURA_MOD_STEALTH) || energy >= 40) && Rand() < 50 &&
-                (opponent->GetTypeId() == TYPEID_PLAYER || opponent->GetHealth() + 5000 > me->GetHealth()))
+                (mytar->GetTypeId() == TYPEID_PLAYER || mytar->GetHealth() + 5000 > me->GetHealth()))
             {
                 if (doCast(me, GetSpell(BERSERK_1)))
                     return;
@@ -1007,9 +1011,9 @@ public:
             {
                 uint32 opener =
                     GetSpell(POUNCE_1) &&
-                    !opponent->HasAuraType(SPELL_AURA_MOD_STUN) &&
-                    opponent->GetDiminishing(DIMINISHING_OPENING_STUN) < DIMINISHING_LEVEL_3 &&
-                    (opponent->GetTypeId() == TYPEID_PLAYER || (!IAmFree() && master->GetNpcBotsCount() > 1)) ? POUNCE_1 :
+                    !mytar->HasAuraType(SPELL_AURA_MOD_STUN) &&
+                    mytar->GetDiminishing(DIMINISHING_OPENING_STUN) < DIMINISHING_LEVEL_3 &&
+                    (mytar->GetTypeId() == TYPEID_PLAYER || (!IAmFree() && master->GetNpcBotsCount() > 1)) ? POUNCE_1 :
                     GetSpell(RAVAGE_1) ? RAVAGE_1 :
                     GetSpell(SHRED_1) ? SHRED_1 : 0;
 
@@ -1020,13 +1024,13 @@ public:
                     return;
                 }
 
-                if (opener != POUNCE_1 && opponent->HasInArc(float(M_PI), me))
+                if (opener != POUNCE_1 && mytar->HasInArc(float(M_PI), me))
                     return;
 
                 //We do not check combo points amount
                 if (IsSpellReady(opener, diff) && energy >= acost(opener))
                 {
-                    if (doCast(opponent, GetSpell(opener)))
+                    if (doCast(mytar, GetSpell(opener)))
                         return;
                 }
 
@@ -1037,26 +1041,26 @@ public:
             if (comboPoints > 0)
             {
                 //Maim
-                if (IsSpellReady(MAIM_1, diff) && !CCed(opponent) && energy >= acost(MAIM_1) &&
-                    (comboPoints >= 4 || opponent->IsNonMeleeSpellCast(false,false,true)))
+                if (IsSpellReady(MAIM_1, diff) && !CCed(mytar) && energy >= acost(MAIM_1) &&
+                    (comboPoints >= 4 || mytar->IsNonMeleeSpellCast(false,false,true)))
                 {
-                    if (doCast(opponent, GetSpell(MAIM_1)))
+                    if (doCast(mytar, GetSpell(MAIM_1)))
                         return;
                 }
                 //Ferocious Bite
-                if (IsSpellReady(FEROCIOUS_BITE_1, diff) && (comboPoints >= 4 || opponent->GetHealth() < me->GetMaxHealth() / 4) &&
+                if (IsSpellReady(FEROCIOUS_BITE_1, diff) && (comboPoints >= 4 || mytar->GetHealth() < me->GetMaxHealth() / 4) &&
                     energy >= acost(FEROCIOUS_BITE_1) && Rand() < (50 + comboPoints * 20))
                 {
-                    if (doCast(opponent, GetSpell(FEROCIOUS_BITE_1)))
+                    if (doCast(mytar, GetSpell(FEROCIOUS_BITE_1)))
                         return;
                 }
                 //Rip
                 if (IsSpellReady(RIP_1, diff) && (comboPoints < 4 || !GetSpell(FEROCIOUS_BITE_1)) &&
-                    energy >= acost(RIP_1) && opponent->GetHealth() > me->GetMaxHealth() / 4 &&
-                    Rand() < (50 + 40 * (opponent->GetTypeId() == TYPEID_PLAYER && IsMeleeClass(opponent->GetClass()))) &&
-                    !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x800000, 0x0, 0x0, me->GetGUID()))
+                    energy >= acost(RIP_1) && mytar->GetHealth() > me->GetMaxHealth() / 4 &&
+                    Rand() < (50 + 40 * (mytar->GetTypeId() == TYPEID_PLAYER && IsMeleeClass(mytar->GetClass()))) &&
+                    !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x800000, 0x0, 0x0, me->GetGUID()))
                 {
-                    if (doCast(opponent, GetSpell(RIP_1)))
+                    if (doCast(mytar, GetSpell(RIP_1)))
                         return;
                 }
             }
@@ -1068,69 +1072,69 @@ public:
                 std::list<Unit*> targets;
                 GetNearbyTargetsInConeList(targets, 5);
                 if (targets.size() > 2)
-                    if (doCast(opponent, GetSpell(SWIPE_CAT_1)))
+                    if (doCast(mytar, GetSpell(SWIPE_CAT_1)))
                         return;
             }
             //Shred
             if (IsSpellReady(SHRED_1, diff) && comboPoints < 4 && energy >= acost(SHRED_1) && Rand() < 85 &&
-                !opponent->HasInArc(float(M_PI), me))
+                !mytar->HasInArc(float(M_PI), me))
             {
-                if (doCast(opponent, GetSpell(SHRED_1)))
+                if (doCast(mytar, GetSpell(SHRED_1)))
                     return;
             }
             //Mangle (Cat)
             if (IsSpellReady(MANGLE_CAT_1, diff) && comboPoints < 5 && energy >= acost(MANGLE_CAT_1) &&
-                (Rand() < 20 || !opponent->GetAuraEffect(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, SPELLFAMILY_DRUID, 0x0, 0x400, 0x0)))
+                (Rand() < 20 || !mytar->GetAuraEffect(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, SPELLFAMILY_DRUID, 0x0, 0x400, 0x0)))
             {
-                if (doCast(opponent, GetSpell(MANGLE_CAT_1)))
+                if (doCast(mytar, GetSpell(MANGLE_CAT_1)))
                     return;
             }
             //Rake
             if (IsSpellReady(RAKE_1, diff) && comboPoints < 3 && energy >= acost(RAKE_1) && Rand() < 60 &&
-                !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x1000, 0x0, 0x0, me->GetGUID()))
+                !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x1000, 0x0, 0x0, me->GetGUID()))
             {
-                if (doCast(opponent, GetSpell(RAKE_1)))
+                if (doCast(mytar, GetSpell(RAKE_1)))
                     return;
             }
             //Claw
-            if (IsSpellReady(CLAW_1, diff) && comboPoints < 5 && Rand() < 50 && (!GetSpell(SHRED_1) || opponent->HasInArc(float(M_PI), me)) &&
+            if (IsSpellReady(CLAW_1, diff) && comboPoints < 5 && Rand() < 50 && (!GetSpell(SHRED_1) || mytar->HasInArc(float(M_PI), me)) &&
                 energy >= acost(CLAW_1))
             {
-                if (doCast(opponent, GetSpell(CLAW_1)))
+                if (doCast(mytar, GetSpell(CLAW_1)))
                     return;
             }
         }
 
-        void doBalanceActions(uint32 diff)
+        void doBalanceActions(Unit* mytar, uint32 diff)
         {
             //debug
             if (me->GetPowerType() != POWER_MANA)
                 return;
 
-            MoveBehind(opponent);
+            MoveBehind(mytar);
 
             if (HasRole(BOT_ROLE_HEAL) && GetManaPCT(me) < 25)
                 return;
 
             //BOT_ROLE_DPS is checked in Attack(uint32)
 
-            float dist = me->GetDistance(opponent);
+            float dist = me->GetDistance(mytar);
             if (dist > CalcSpellMaxRange(WRATH_1))
                 return;
 
-            auto [can_do_nature, can_do_arcane] = CanAffectVictimBools(opponent, SPELL_SCHOOL_NATURE, SPELL_SCHOOL_ARCANE);
+            auto [can_do_nature, can_do_arcane] = CanAffectVictimBools(mytar, SPELL_SCHOOL_NATURE, SPELL_SCHOOL_ARCANE);
             if (!can_do_nature && !can_do_arcane)
                 return;
 
             //spell reflections
-            if (IsSpellReady(FAERIE_FIRE_NORMAL_1, diff) && can_do_nature && CanRemoveReflectSpells(opponent, FAERIE_FIRE_NORMAL_1) &&
-                doCast(opponent, FAERIE_FIRE_NORMAL_1))
+            if (IsSpellReady(FAERIE_FIRE_NORMAL_1, diff) && can_do_nature && CanRemoveReflectSpells(mytar, FAERIE_FIRE_NORMAL_1) &&
+                doCast(mytar, FAERIE_FIRE_NORMAL_1))
                 return;
 
             //Starfall
             if (IsSpellReady(STARFALL_1, diff) && Rand() < 40)
             {
-                bool cast = (opponent->GetTypeId() == TYPEID_PLAYER || me->getAttackers().size() > 1);
+                bool cast = (mytar->GetTypeId() == TYPEID_PLAYER || me->getAttackers().size() > 1);
                 if (!cast)
                 {
                     std::list<Unit*> targets;
@@ -1168,37 +1172,37 @@ public:
 
             if (IsSpellReady(FORCE_OF_NATURE_1, diff))
             {
-                SummonBotPet(opponent);
+                SummonBotPet(mytar);
                 SetSpellCooldown(FORCE_OF_NATURE_1, 180000);
                 return;
             }
 
             //Faerie Fire (non-feral): moonkin or non-shapeshifted
-            if (IsSpellReady(FAERIE_FIRE_NORMAL_1, diff) && can_do_nature && opponent->getAttackers().size() > 2 && Rand() < 50 &&
+            if (IsSpellReady(FAERIE_FIRE_NORMAL_1, diff) && can_do_nature && mytar->getAttackers().size() > 2 && Rand() < 50 &&
                 dist < CalcSpellMaxRange(FAERIE_FIRE_NORMAL_1) &&
-                !opponent->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RESISTANCE_PCT, SPELLFAMILY_DRUID, 0x400)
-                /*!HasAuraName(opponent, FAERIE_FIRE_ANY)*/)
+                !mytar->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RESISTANCE_PCT, SPELLFAMILY_DRUID, 0x400)
+                /*!HasAuraName(mytar, FAERIE_FIRE_ANY)*/)
             {
-                if (doCast(opponent, GetSpell(FAERIE_FIRE_NORMAL_1)))
+                if (doCast(mytar, GetSpell(FAERIE_FIRE_NORMAL_1)))
                     return;
             }
 
-            Unit* u = opponent->GetVictim();
+            Unit const* u = mytar->GetVictim();
             //Insect Swarm
-            if (IsSpellReady(INSECT_SWARM_1, diff) && can_do_nature && u && opponent->GetDistance(u) < 8 && Rand() < 30 &&
+            if (IsSpellReady(INSECT_SWARM_1, diff) && can_do_nature && u && mytar->GetDistance(u) < 8 && Rand() < 30 &&
                 dist < CalcSpellMaxRange(INSECT_SWARM_1) &&
-                !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x200000, 0x0, 0x0, me->GetGUID())
-                /*!HasAuraName(opponent, INSECT_SWARM_1, me->GetGUID())*/)
+                !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x200000, 0x0, 0x0, me->GetGUID())
+                /*!HasAuraName(mytar, INSECT_SWARM_1, me->GetGUID())*/)
             {
-                if (doCast(opponent, GetSpell(INSECT_SWARM_1)))
+                if (doCast(mytar, GetSpell(INSECT_SWARM_1)))
                     return;
             }
 
             if (IsSpellReady(MOONFIRE_1, diff) && can_do_arcane && Rand() < 60 && dist < CalcSpellMaxRange(MOONFIRE_1) &&
-                !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x2, 0x0, 0x0, me->GetGUID())
-                /*!HasAuraName(opponent, MOONFIRE_1, me->GetGUID())*/)
+                !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x2, 0x0, 0x0, me->GetGUID())
+                /*!HasAuraName(mytar, MOONFIRE_1, me->GetGUID())*/)
             {
-                if (doCast(opponent, GetSpell(MOONFIRE_1)))
+                if (doCast(mytar, GetSpell(MOONFIRE_1)))
                     return;
             }
             //TODO: balance starfire/wrath frequency based on mana effeciency
@@ -1207,12 +1211,12 @@ public:
                 AuraEffect const* eclipeLunar = me->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 0x0, 0x0, 0x4000);
                 int32 rand = 30 + 100 * (eclipeLunar && eclipeLunar->GetBase()->GetDuration() > 3000);
 
-                if (Rand() < rand && doCast(opponent, GetSpell(STARFIRE_1)))
+                if (Rand() < rand && doCast(mytar, GetSpell(STARFIRE_1)))
                     return;
             }
             if (IsSpellReady(WRATH_1, diff) && can_do_nature)
             {
-                if (doCast(opponent, GetSpell(WRATH_1)))
+                if (doCast(mytar, GetSpell(WRATH_1)))
                     return;
             }
         }

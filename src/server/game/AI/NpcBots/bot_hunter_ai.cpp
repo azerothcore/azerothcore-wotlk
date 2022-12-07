@@ -1,6 +1,7 @@
 #include "bot_ai.h"
 #include "botmgr.h"
 #include "botspell.h"
+#include "bottraits.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Map.h"
@@ -405,13 +406,16 @@ public:
             if (!IsSpellReady(SCATTER_SHOT_1, diff) || !HasRole(BOT_ROLE_DPS) || Rand() > 50)
                 return;
 
-            if (opponent->GetVictim() == me && opponent->GetDistance(me) < 10 &&
-                !opponent->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) && opponent->getAttackers().size() <= 1)
+            for (Unit* mtar : { opponent, disttarget })
             {
-                if (doCast(opponent, GetSpell(SCATTER_SHOT_1)))
+                if (mtar && mtar->GetVictim() == me && mtar->GetDistance(me) < 10 &&
+                    !mtar->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) && mtar->getAttackers().size() <= 1)
                 {
-                    GetInPosition(true, nullptr);
-                    return;
+                    if (doCast(mtar, GetSpell(SCATTER_SHOT_1)))
+                    {
+                        GetInPosition(true, nullptr);
+                        return;
+                    }
                 }
             }
             if (Unit* target = FindStunTarget(CalcSpellMaxRange(SCATTER_SHOT_1)))
@@ -593,23 +597,26 @@ public:
                 return;
 
             //First check current target
-            if (me->GetDistance(opponent) > 5 && me->GetDistance(opponent) < CalcSpellMaxRange(TRANQ_SHOT_1) &&
-                !opponent->IsImmunedToSpell(sSpellMgr->GetSpellInfo(TRANQ_SHOT_1)))
+            for (Unit* mtar : { opponent, disttarget })
             {
-                AuraApplication const* aurApp;
-                SpellInfo const* spellInfo;
-                Unit::AuraMap const &auras = opponent->GetOwnedAuras();
-                for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                if (mtar && me->GetDistance(mtar) > 5 && me->GetDistance(mtar) < CalcSpellMaxRange(TRANQ_SHOT_1) &&
+                    !mtar->IsImmunedToSpell(sSpellMgr->GetSpellInfo(TRANQ_SHOT_1)))
                 {
-                    spellInfo = itr->second->GetSpellInfo();
-                    if (spellInfo->Dispel != DISPEL_MAGIC && spellInfo->Dispel != DISPEL_ENRAGE) continue;
-                    if (spellInfo->Attributes & (SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) continue;
-                    //if (spellInfo->AttributesEx & SPELL_ATTR1_NO_AURA_ICON) continue;
-                    aurApp = itr->second->GetApplicationOfTarget(opponent->GetGUID());
-                    if (aurApp && aurApp->IsPositive())
+                    AuraApplication const* aurApp;
+                    SpellInfo const* spellInfo;
+                    Unit::AuraMap const& auras = mtar->GetOwnedAuras();
+                    for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
                     {
-                        if (doCast(opponent, GetSpell(TRANQ_SHOT_1)))
-                            return;
+                        spellInfo = itr->second->GetSpellInfo();
+                        if (spellInfo->Dispel != DISPEL_MAGIC && spellInfo->Dispel != DISPEL_ENRAGE) continue;
+                        if (spellInfo->Attributes & (SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) continue;
+                        //if (spellInfo->AttributesEx & SPELL_ATTR1_NO_AURA_ICON) continue;
+                        aurApp = itr->second->GetApplicationOfTarget(mtar->GetGUID());
+                        if (aurApp && aurApp->IsPositive())
+                        {
+                            if (doCast(mtar, GetSpell(TRANQ_SHOT_1)))
+                                return;
+                        }
                     }
                 }
             }
@@ -746,28 +753,32 @@ public:
 
         void DoRangedAttack(uint32 diff)
         {
-            StartAttack(opponent, IsMelee());
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
+                return;
+
+            StartAttack(mytar, IsMelee());
 
             Counter(diff);
             CheckTranquil(diff);
 
-            MoveBehind(opponent);
+            MoveBehind(mytar);
 
-            float dist = me->GetDistance(opponent);
+            float dist = me->GetDistance(mytar);
             float maxRangeLong = me->GetLevel() >= 10 ? 51.f : 45.f;
             float maxRangeNormal = me->GetLevel() >= 10 ? 41.f : 35.f;
 
-            bool inposition = !opponent->HasAuraType(SPELL_AURA_MOD_CONFUSE) || dist > maxRangeNormal - 15.f;
+            bool inposition = !mytar->HasAuraType(SPELL_AURA_MOD_CONFUSE) || dist > maxRangeNormal - 15.f;
 
             //Auto Shot
             if (Spell const* shot = me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
             {
-                if (shot->GetSpellInfo()->Id == AUTO_SHOT_1 && (shot->m_targets.GetUnitTarget() != opponent || !inposition))
+                if (shot->GetSpellInfo()->Id == AUTO_SHOT_1 && (shot->m_targets.GetUnitTarget() != mytar || !inposition))
                     me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
             }
             else if (HasRole(BOT_ROLE_DPS) && dist > 5 && dist < maxRangeNormal)
             {
-                if (doCast(opponent, AUTO_SHOT_1))
+                if (doCast(mytar, AUTO_SHOT_1))
                 {}
             }
 
@@ -778,18 +789,18 @@ public:
             //TRAPS
             CheckTraps(diff);
 
-            if (!CanAffectVictim(SPELL_SCHOOL_MASK_NORMAL))
-                return;
+            auto [can_do_nature, can_do_fire, can_do_arcane, can_do_shadow, can_do_normal] =
+                CanAffectVictimBools(mytar, SPELL_SCHOOL_NATURE, SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_NORMAL);
 
             //scatter pvp
-            if (IsSpellReady(SCATTER_SHOT_1, diff) && HasRole(BOT_ROLE_DPS) &&
-                opponent->GetTypeId() == TYPEID_PLAYER && dist < 10 && Rand() < 60)
+            if (IsSpellReady(SCATTER_SHOT_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS) &&
+                mytar->GetTypeId() == TYPEID_PLAYER && dist < 10 && Rand() < 60)
             {
-                if (doCast(opponent, GetSpell(SCATTER_SHOT_1)))
+                if (doCast(mytar, GetSpell(SCATTER_SHOT_1)))
                 {
                     me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
                     me->AttackStop();
-                    GetInPosition(true, opponent);
+                    GetInPosition(true, mytar);
                     return;
                 }
             }
@@ -804,36 +815,39 @@ public:
                     return;
             }
 
-            MoveBehind(opponent);
+            MoveBehind(mytar);
 
             //MELEE SECTION
             if (dist < 5)
             {
+                if (!can_do_normal)
+                    return;
+
                 //MONGOOSE BITE
                 if (IsSpellReady(MONGOOSE_BITE_1, diff) && HasRole(BOT_ROLE_DPS) && Rand() < 50)
                 {
-                    if (doCast(opponent, GetSpell(MONGOOSE_BITE_1)))
+                    if (doCast(mytar, GetSpell(MONGOOSE_BITE_1)))
                         return;
                 }
                 //COUNTERATTACK
                 if (IsSpellReady(COUNTERATTACK_1, diff) && HasRole(BOT_ROLE_DPS) &&
                     me->HasReactive(REACTIVE_HUNTER_PARRY) && Rand() < 90)
                 {
-                    if (doCast(opponent, GetSpell(COUNTERATTACK_1)))
+                    if (doCast(mytar, GetSpell(COUNTERATTACK_1)))
                         return;
                 }
                 //WING CLIP
-                if (IsSpellReady(WING_CLIP_1, diff) && (!IsTank() || opponent->isMoving()) &&
-                    Rand() < 80 && !CCed(opponent, true) && !opponent->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+                if (IsSpellReady(WING_CLIP_1, diff) && (!IsTank() || mytar->isMoving()) &&
+                    Rand() < 80 && !CCed(mytar, true) && !mytar->HasAuraWithMechanic(1<<MECHANIC_SNARE))
                 {
-                    if (doCast(opponent, GetSpell(WING_CLIP_1)))
+                    if (doCast(mytar, GetSpell(WING_CLIP_1)))
                         return;
                 }
                 //RAPTOR STRIKE
                 if (IsSpellReady(RAPTOR_STRIKE_1, diff, false) && HasRole(BOT_ROLE_DPS) && Rand() < 40 &&
                     !me->GetCurrentSpell(CURRENT_MELEE_SPELL))
                 {
-                    if (doCast(opponent, GetSpell(RAPTOR_STRIKE_1)))
+                    if (doCast(mytar, GetSpell(RAPTOR_STRIKE_1)))
                         return;
                 }
 
@@ -843,10 +857,10 @@ public:
             //RANGED SECTION
 
             //HUNTERS MARK //100 yd range so don't check it
-            if (IsSpellReady(HUNTERS_MARK_1, diff) && Rand() < 65 &&
-                !opponent->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_STALKED, SPELLFAMILY_HUNTER, 0x400))
+            if (IsSpellReady(HUNTERS_MARK_1, diff) && can_do_arcane && Rand() < 65 &&
+                !mytar->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_STALKED, SPELLFAMILY_HUNTER, 0x400))
             {
-                if (doCast(opponent, GetSpell(HUNTERS_MARK_1)))
+                if (doCast(mytar, GetSpell(HUNTERS_MARK_1)))
                     return;
             }
 
@@ -857,10 +871,10 @@ public:
                 return;
 
             //KILL SHOT
-            if (IsSpellReady(KILL_SHOT_1, diff) && HasRole(BOT_ROLE_DPS) &&
-                opponent->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
+            if (IsSpellReady(KILL_SHOT_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS) &&
+                mytar->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
             {
-                if (doCast(opponent, GetSpell(KILL_SHOT_1)))
+                if (doCast(mytar, GetSpell(KILL_SHOT_1)))
                     return;
             }
 
@@ -872,18 +886,18 @@ public:
                 return;
 
             //CONCUSSIVE SHOT
-            if (IsSpellReady(CONCUSSIVE_SHOT_1, diff) && Rand() < 35 &&
-                !CCed(opponent, true) && !opponent->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+            if (IsSpellReady(CONCUSSIVE_SHOT_1, diff) && can_do_arcane && Rand() < 35 &&
+                !CCed(mytar, true) && !mytar->HasAuraWithMechanic(1<<MECHANIC_SNARE))
             {
-                if (doCast(opponent, GetSpell(CONCUSSIVE_SHOT_1)))
+                if (doCast(mytar, GetSpell(CONCUSSIVE_SHOT_1)))
                     return;
             }
             //DISTRACTING SHOT
-            Unit const* u = opponent->GetVictim();
-            if (IsSpellReady(DISTRACTING_SHOT_1, diff) && u && u != me && IsTank() && !CCed(opponent) &&
+            Unit const* u = mytar->GetVictim();
+            if (IsSpellReady(DISTRACTING_SHOT_1, diff) && can_do_arcane && u && u != me && IsTank() && !CCed(mytar) &&
                 IsInBotParty(u) && Rand() < 75 && (!IsTank(u) || (dist > 25 && GetHealthPCT(u) < 25)))
             {
-                if (doCast(opponent, GetSpell(DISTRACTING_SHOT_1)))
+                if (doCast(mytar, GetSpell(DISTRACTING_SHOT_1)))
                     return;
             }
             //MULTI-SHOT shares cd with aimed shot
@@ -891,7 +905,7 @@ public:
             {
                 if (Rand() < 30 || !GetSpell(STEADY_SHOT_1) || FindSplashTarget(maxRangeNormal))
                 {
-                    if (doCast(opponent, GetSpell(MULTISHOT_1)))
+                    if (doCast(mytar, GetSpell(MULTISHOT_1)))
                         return;
                 }
             }
@@ -905,9 +919,9 @@ public:
                 }
             }
             //RAPID FIRE
-            if (IsSpellReady(RAPID_FIRE_1, diff, false) && HasRole(BOT_ROLE_DPS) && !me->isMoving() && Rand() < 55 &&
-                (opponent->GetHealth() > me->GetMaxHealth() * (1 + opponent->getAttackers().size()) ||
-                opponent->GetTypeId() == TYPEID_PLAYER) &&
+            if (IsSpellReady(RAPID_FIRE_1, diff, false) && can_do_normal && HasRole(BOT_ROLE_DPS) && !me->isMoving() && Rand() < 55 &&
+                (mytar->GetHealth() > me->GetMaxHealth() * (1 + mytar->getAttackers().size()) ||
+                mytar->GetTypeId() == TYPEID_PLAYER) &&
                 !me->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RANGED_HASTE, SPELLFAMILY_HUNTER, 0x20))
             {
                 if (doCast(me, GetSpell(RAPID_FIRE_1)))
@@ -915,28 +929,28 @@ public:
             }
             //BLACK ARROW
             //Black Arrow shares cooldown with fire traps
-            if (IsSpellReady(BLACK_ARROW_1, diff) && HasRole(BOT_ROLE_DPS) &&
-                opponent->GetHealth() > me->GetMaxHealth()/4 * (1 + opponent->getAttackers().size()))
+            if (IsSpellReady(BLACK_ARROW_1, diff) && can_do_shadow && HasRole(BOT_ROLE_DPS) &&
+                mytar->GetHealth() > me->GetMaxHealth()/4 * (1 + mytar->getAttackers().size()))
             {
-                if (doCast(opponent, GetSpell(BLACK_ARROW_1)))
+                if (doCast(mytar, GetSpell(BLACK_ARROW_1)))
                     return;
             }
             //CHIMERA SHOT: no viper
-            if (IsSpellReady(CHIMERA_SHOT_1, diff) && HasRole(BOT_ROLE_DPS))
+            if (IsSpellReady(CHIMERA_SHOT_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS))
             {
                 //Serpent
-                if (opponent->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0, me->GetGUID()))
+                if (mytar->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0, me->GetGUID()))
                 {
-                    if (doCast(opponent, GetSpell(CHIMERA_SHOT_1)))
+                    if (doCast(mytar, GetSpell(CHIMERA_SHOT_1)))
                         return;
                 }
                 //Scorpid
-                else if (opponent->GetAuraEffect(SPELL_AURA_MOD_HIT_CHANCE, SPELLFAMILY_HUNTER, 0x8000, 0x0, 0x0, me->GetGUID()))
+                else if (mytar->GetAuraEffect(SPELL_AURA_MOD_HIT_CHANCE, SPELLFAMILY_HUNTER, 0x8000, 0x0, 0x0, me->GetGUID()))
                 {
-                    if (!opponent->HasAuraType(SPELL_AURA_MOD_DISARM) &&
-                        (opponent->GetTypeId() == TYPEID_PLAYER || opponent->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID)))
+                    if (!mytar->HasAuraType(SPELL_AURA_MOD_DISARM) &&
+                        (mytar->GetTypeId() == TYPEID_PLAYER || mytar->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID)))
                     {
-                        if (doCast(opponent, GetSpell(CHIMERA_SHOT_1)))
+                        if (doCast(mytar, GetSpell(CHIMERA_SHOT_1)))
                             return;
                     }
                 }
@@ -944,30 +958,30 @@ public:
                 SetSpellCooldown(CHIMERA_SHOT_1, 500); //fail
             }
             //STING
-            if (GetSpellCooldown(SERPENT_STING_1) <= diff && stingTimer <= diff && Rand() < 60)
+            if (GetSpellCooldown(SERPENT_STING_1) <= diff && can_do_nature && stingTimer <= diff && Rand() < 60)
             {
                 uint32 STING = 0;
                 AuraEffect const* sting = nullptr;
-                if (!STING && GetSpell(SCORPID_STING_1) && opponent->GetTypeId() == TYPEID_UNIT &&
-                    opponent->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)
+                if (!STING && GetSpell(SCORPID_STING_1) && mytar->GetTypeId() == TYPEID_UNIT &&
+                    mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)
                 {
-                    sting = opponent->GetAuraEffect(SPELL_AURA_MOD_HIT_CHANCE, SPELLFAMILY_HUNTER, 0x8000, 0x0, 0x0);
+                    sting = mytar->GetAuraEffect(SPELL_AURA_MOD_HIT_CHANCE, SPELLFAMILY_HUNTER, 0x8000, 0x0, 0x0);
                     if (!sting || sting->GetBase()->GetCasterGUID() == me->GetGUID())
                         STING = SCORPID_STING_1;
                 }
                 //VIPER STING: pvp only
-                if (!STING && GetSpell(VIPER_STING_1) && opponent->GetTypeId() == TYPEID_PLAYER &&
-                    opponent->GetPowerType() == POWER_MANA && opponent->GetHealth() > me->GetMaxHealth()/2 &&
-                    opponent->GetMaxPower(POWER_MANA) > me->GetMaxPower(POWER_MANA))
+                if (!STING && GetSpell(VIPER_STING_1) && mytar->GetTypeId() == TYPEID_PLAYER &&
+                    mytar->GetPowerType() == POWER_MANA && mytar->GetHealth() > me->GetMaxHealth()/2 &&
+                    mytar->GetMaxPower(POWER_MANA) > me->GetMaxPower(POWER_MANA))
                 {
-                    sting = opponent->GetAuraEffect(SPELL_AURA_PERIODIC_MANA_LEECH, SPELLFAMILY_HUNTER, 0x0, 0x80, 0x0, me->GetGUID());
+                    sting = mytar->GetAuraEffect(SPELL_AURA_PERIODIC_MANA_LEECH, SPELLFAMILY_HUNTER, 0x0, 0x80, 0x0, me->GetGUID());
                     if (!sting)
                         STING = VIPER_STING_1;
                 }
                 if (!STING && GetSpell(SERPENT_STING_1) && HasRole(BOT_ROLE_DPS) &&
-                    opponent->GetHealth() > me->GetMaxHealth()/2 * (1 + opponent->getAttackers().size()))
+                    mytar->GetHealth() > me->GetMaxHealth()/2 * (1 + mytar->getAttackers().size()))
                 {
-                    sting = opponent->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0, me->GetGUID());
+                    sting = mytar->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0, me->GetGUID());
                     if (!sting)
                         STING = SERPENT_STING_1;
                 }
@@ -979,7 +993,7 @@ public:
                 }
                 else
                 {
-                    if (STING && doCast(opponent, GetSpell(STING)))
+                    if (STING && doCast(mytar, GetSpell(STING)))
                     {
                         stingTimer = 8000;
                         return;
@@ -987,27 +1001,27 @@ public:
                 }
             }
             //EXPLOSIVE SHOT: replaces Arcane Shot at 60
-            if (IsSpellReady(EXPLOSIVE_SHOT_1, diff) && HasRole(BOT_ROLE_DPS))
+            if (IsSpellReady(EXPLOSIVE_SHOT_1, diff) && can_do_fire && HasRole(BOT_ROLE_DPS))
             {
-                if (doCast(opponent, GetSpell(EXPLOSIVE_SHOT_1)))
+                if (doCast(mytar, GetSpell(EXPLOSIVE_SHOT_1)))
                     return;
             }
             //ARCANE SHOT: shares cd with Explosive Shot
-            if (IsSpellReady(ARCANE_SHOT_1, diff) && HasRole(BOT_ROLE_DPS) && !GetSpell(EXPLOSIVE_SHOT_1))
+            if (IsSpellReady(ARCANE_SHOT_1, diff) && can_do_arcane && HasRole(BOT_ROLE_DPS) && !GetSpell(EXPLOSIVE_SHOT_1))
             {
-                if (doCast(opponent, GetSpell(ARCANE_SHOT_1)))
+                if (doCast(mytar, GetSpell(ARCANE_SHOT_1)))
                     return;
             }
             //AIMED SHOT shares cd with multishot
-            if (IsSpellReady(AIMED_SHOT_1, diff) && HasRole(BOT_ROLE_DPS))
+            if (IsSpellReady(AIMED_SHOT_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS))
             {
-                if (doCast(opponent, GetSpell(AIMED_SHOT_1)))
+                if (doCast(mytar, GetSpell(AIMED_SHOT_1)))
                     return;
             }
             //STEADY SHOT
-            if (IsSpellReady(STEADY_SHOT_1, diff) && HasRole(BOT_ROLE_DPS))
+            if (IsSpellReady(STEADY_SHOT_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS))
             {
-                if (doCast(opponent, GetSpell(STEADY_SHOT_1)))
+                if (doCast(mytar, GetSpell(STEADY_SHOT_1)))
                     return;
             }
         }

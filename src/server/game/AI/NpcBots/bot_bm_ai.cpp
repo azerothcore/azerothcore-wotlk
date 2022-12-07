@@ -332,9 +332,13 @@ public:
 
         void Attack(uint32 /*diff*/)
         {
-            StartAttack(opponent, IsMelee());
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
+                return;
 
-            MoveBehind(opponent);
+            StartAttack(mytar, IsMelee());
+
+            MoveBehind(mytar);
         }
 
         void DoBMMeleeAttackIfReady()

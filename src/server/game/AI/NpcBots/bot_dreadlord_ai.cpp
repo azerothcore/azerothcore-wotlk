@@ -220,9 +220,13 @@ public:
 
         void Attack(uint32 diff)
         {
-            StartAttack(opponent, IsMelee());
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
+                return;
 
-            MoveBehind(opponent);
+            StartAttack(mytar, IsMelee());
+
+            MoveBehind(mytar);
 
             if (!HasRole(BOT_ROLE_DPS))
                 return;
@@ -230,9 +234,9 @@ public:
             if (IsSpellReady(CARRION_SWARM_1, diff) && me->GetPower(POWER_MANA) >= CARRION_COST && Rand() < 80)
             {
                 bool cast = false;
-                if (me->HasInArc(float(M_PI)/2, opponent) && me->GetDistance(opponent) < 25 &&
+                if (me->HasInArc(float(M_PI)/2, mytar) && me->GetDistance(mytar) < 25 &&
                     (IsTank() || GetManaPCT(me) > 60 || me->getAttackers().empty() || GetHealthPCT(me) < 50 ||
-                    opponent->HasAura(SLEEP_1)))
+                    mytar->HasAura(SLEEP_1)))
                 {
                     cast = true;
                 }

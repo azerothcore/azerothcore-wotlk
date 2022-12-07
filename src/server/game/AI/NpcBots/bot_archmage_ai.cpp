@@ -174,9 +174,13 @@ public:
 
         void Attack(uint32 diff)
         {
-            StartAttack(opponent, IsMelee());
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
+                return;
 
-            MoveBehind(opponent);
+            StartAttack(mytar, IsMelee());
+
+            MoveBehind(mytar);
 
             if (!HasRole(BOT_ROLE_DPS))
                 return;
@@ -184,24 +188,21 @@ public:
             if (GC_Timer > diff)
                 return;
 
-            if (CanAffectVictim(SPELL_SCHOOL_MASK_FROST))
+            //Blizzard
+            if (IsSpellReady(BLIZZARD_1, diff) && !JumpingOrFalling() && Rand() < 50)
             {
-                //Blizzard
-                if (IsSpellReady(BLIZZARD_1, diff) && !JumpingOrFalling() && Rand() < 50)
+                if (Unit* blizztarget = FindAOETarget(CalcSpellMaxRange(BLIZZARD_1)))
                 {
-                    if (Unit* blizztarget = FindAOETarget(CalcSpellMaxRange(BLIZZARD_1)))
-                    {
-                        if (doCast(blizztarget, GetSpell(BLIZZARD_1)))
-                            return;
-                    }
-
-                    SetSpellCooldown(BLIZZARD_1, 1000); //fail
+                    if (doCast(blizztarget, GetSpell(BLIZZARD_1)))
+                        return;
                 }
+
+                SetSpellCooldown(BLIZZARD_1, 1000); //fail
             }
 
-            if (IsSpellReady(MAIN_ATTACK_1, diff))
+            if (IsSpellReady(MAIN_ATTACK_1, diff) && CanAffectVictim(mytar, SPELL_SCHOOL_MASK_FIRE|SPELL_SCHOOL_MASK_ARCANE))
             {
-                if (doCast(opponent, GetSpell(MAIN_ATTACK_1)))
+                if (doCast(mytar, GetSpell(MAIN_ATTACK_1)))
                     return;
             }
         }

@@ -537,6 +537,8 @@ public:
                 CheckHymnOfHope(diff);
             }
 
+            Counter(diff);
+
             if (me->IsInCombat())
             {
                 CheckShackles(diff);
@@ -560,35 +562,42 @@ public:
             if (!CheckAttackTarget())
                 return;
 
-            Counter(diff);
+            Attack(diff);
+        }
 
-            StartAttack(opponent, IsMelee());
+        void Attack(uint32 diff)
+        {
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
+                return;
 
-            MoveBehind(opponent);
+            StartAttack(mytar, IsMelee());
+
+            MoveBehind(mytar);
 
             if (GC_Timer > diff)
                 return;
 
             //shadow skills range
-            if (me->GetDistance(opponent) > CalcSpellMaxRange(MIND_FLAY_1))
+            if (me->GetDistance(mytar) > CalcSpellMaxRange(MIND_FLAY_1))
                 return;
 
-            auto [can_do_shadow, can_do_holy] = CanAffectVictimBools(opponent, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_HOLY);
+            auto [can_do_shadow, can_do_holy] = CanAffectVictimBools(mytar, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_HOLY);
 
             if (IsSpellReady(PSYCHIC_HORROR_1, diff) && can_do_shadow && Rand() < 20 &&
-                opponent->GetHealth() > me->GetMaxHealth()/8 && !CCed(opponent) &&
-                !opponent->HasAuraType(SPELL_AURA_MOD_DISARM) &&
-                (opponent->GetTypeId() == TYPEID_PLAYER ?
-                opponent->ToPlayer()->GetWeaponForAttack(BASE_ATTACK) && opponent->ToPlayer()->GetWeaponForAttack(WeaponAttackType(BASE_ATTACK), true) :
-                opponent->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) && opponent->CanUseAttackType(BASE_ATTACK)))
+                mytar->GetHealth() > me->GetMaxHealth()/8 && !CCed(mytar) &&
+                !mytar->HasAuraType(SPELL_AURA_MOD_DISARM) &&
+                (mytar->GetTypeId() == TYPEID_PLAYER ?
+                mytar->ToPlayer()->GetWeaponForAttack(BASE_ATTACK) && mytar->ToPlayer()->GetWeaponForAttack(WeaponAttackType(BASE_ATTACK), true) :
+                mytar->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) && mytar->CanUseAttackType(BASE_ATTACK)))
             {
-                if (doCast(opponent, GetSpell(PSYCHIC_HORROR_1)))
+                if (doCast(mytar, GetSpell(PSYCHIC_HORROR_1)))
                     return;
             }
 
             //spell reflections
-            if (IsSpellReady(SW_PAIN_1, diff) && can_do_shadow && CanRemoveReflectSpells(opponent, SW_PAIN_1) &&
-                doCast(opponent, SW_PAIN_1)) //yes, using rank 1
+            if (IsSpellReady(SW_PAIN_1, diff) && can_do_shadow && CanRemoveReflectSpells(mytar, SW_PAIN_1) &&
+                doCast(mytar, SW_PAIN_1)) //yes, using rank 1
                 return;
 
             if (!HasRole(BOT_ROLE_DPS))
@@ -596,7 +605,7 @@ public:
 
             if (IsSpellReady(SHADOWFIEND_1, diff) && GetManaPCT(me) < 50)
             {
-                SummonBotPet(opponent);
+                SummonBotPet(mytar);
                 SetSpellCooldown(SHADOWFIEND_1, 180000); // (5 - 2) min with Veiled Shadows
                 return;
             }
@@ -604,60 +613,60 @@ public:
             if (!HasRole(BOT_ROLE_HEAL) || GetManaPCT(me) > 35 || botPet)
             {
                 if (IsSpellReady(SW_DEATH_1, diff) && can_do_shadow && Rand() < 90 && GetHealthPCT(me) > 50 &&
-                    (me->GetMap()->IsRaid() || GetHealthPCT(opponent) < 15 || opponent->GetHealth() < me->GetMaxHealth()/8) &&
-                    doCast(opponent, GetSpell(SW_DEATH_1)))
+                    (me->GetMap()->IsRaid() || GetHealthPCT(mytar) < 15 || mytar->GetHealth() < me->GetMaxHealth()/8) &&
+                    doCast(mytar, GetSpell(SW_DEATH_1)))
                     return;
                 if (IsSpellReady(VAMPIRIC_TOUCH_1, diff) && can_do_shadow && Rand() < 80 &&
-                    opponent->GetHealth() > me->GetMaxHealth()/4 * (1 + opponent->getAttackers().size()) &&
-                    !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x0, 0x400, 0x0, me->GetGUID()) &&
-                    doCast(opponent, GetSpell(VAMPIRIC_TOUCH_1)))
+                    mytar->GetHealth() > me->GetMaxHealth()/4 * (1 + mytar->getAttackers().size()) &&
+                    !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x0, 0x400, 0x0, me->GetGUID()) &&
+                    doCast(mytar, GetSpell(VAMPIRIC_TOUCH_1)))
                     return;
                 if (IsSpellReady(SW_PAIN_1, diff) && can_do_shadow && Rand() < 60 &&
-                    opponent->GetHealth() > me->GetMaxHealth()/2 * (1 + opponent->getAttackers().size()) &&
-                    !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x8000, 0x0, 0x0, me->GetGUID()))
+                    mytar->GetHealth() > me->GetMaxHealth()/2 * (1 + mytar->getAttackers().size()) &&
+                    !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x8000, 0x0, 0x0, me->GetGUID()))
                 {
                     AuraEffect const* weav = me->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, SPELLFAMILY_PRIEST, 0x0, 0x8, 0x0);
                     if (me->GetLevel() < 60 || (weav && weav->GetBase()->GetStackAmount() >= 4))
-                        if (doCast(opponent, GetSpell(SW_PAIN_1)))
+                        if (doCast(mytar, GetSpell(SW_PAIN_1)))
                             return;
                 }
                 if (IsSpellReady(DEVOURING_PLAGUE_1, diff) && can_do_shadow && !Devcheck && Rand() < 80 &&
-                    (_spec == BOT_SPEC_PRIEST_SHADOW || opponent->IsControlledByPlayer()) &&
-                    opponent->GetHealth() > me->GetMaxHealth()/2 * (1 + opponent->getAttackers().size()) &&
-                    !(opponent->GetTypeId() == TYPEID_UNIT && (opponent->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1)))) &&
-                    !opponent->GetAuraEffect(SPELL_AURA_PERIODIC_LEECH, SPELLFAMILY_PRIEST, 0x02000000, 0x0, 0x0, me->GetGUID()) &&
-                    doCast(opponent, GetSpell(DEVOURING_PLAGUE_1)))
+                    (_spec == BOT_SPEC_PRIEST_SHADOW || mytar->IsControlledByPlayer()) &&
+                    mytar->GetHealth() > me->GetMaxHealth()/2 * (1 + mytar->getAttackers().size()) &&
+                    !(mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1)))) &&
+                    !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_LEECH, SPELLFAMILY_PRIEST, 0x02000000, 0x0, 0x0, me->GetGUID()) &&
+                    doCast(mytar, GetSpell(DEVOURING_PLAGUE_1)))
                     return;
                 if (IsSpellReady(MIND_BLAST_1, diff) && can_do_shadow &&
-                    doCast(opponent, GetSpell(MIND_BLAST_1)))
+                    doCast(mytar, GetSpell(MIND_BLAST_1)))
                     return;
                 if (IsSpellReady(MIND_SEAR_1, diff) && can_do_shadow && (!me->isMoving() || Rand() < 80) &&
-                    opponent->GetVictim() && opponent->GetVictim()->getAttackers().size() > 3)
+                    mytar->GetVictim() && mytar->GetVictim()->getAttackers().size() > 3)
                 {
-                    if (Unit* u = FindSplashTarget(CalcSpellMaxRange(MIND_SEAR_1), opponent, 14.f, 3)) //glyphed, cluster of 4
+                    if (Unit* u = FindSplashTarget(CalcSpellMaxRange(MIND_SEAR_1), mytar, 14.f, 3)) //glyphed, cluster of 4
                         if (doCast(u, GetSpell(MIND_SEAR_1)))
                             return;
                 }
                 if (IsSpellReady(HOLY_FIRE_1, diff) && can_do_holy &&
                     (HasRole(BOT_ROLE_HEAL) || me->GetShapeshiftForm() != FORM_SHADOW) &&
-                    doCast(opponent, GetSpell(HOLY_FIRE_1)))
+                    doCast(mytar, GetSpell(HOLY_FIRE_1)))
                     return;
                 if (IsSpellReady(MIND_FLAY_1, diff) && can_do_shadow &&
-                    (!HasRole(BOT_ROLE_HEAL) || opponent->GetHealth() < me->GetMaxHealth()/2) &&
-                    doCast(opponent, GetSpell(MIND_FLAY_1)))
+                    (!HasRole(BOT_ROLE_HEAL) || mytar->GetHealth() < me->GetMaxHealth()/2) &&
+                    doCast(mytar, GetSpell(MIND_FLAY_1)))
                     return;
                 if (IsSpellReady(SMITE_1, diff) && can_do_holy && me->GetLevel() < 20 &&//MF is lvl 20, MB is lvl 10
-                    doCast(opponent, GetSpell(SMITE_1)))
+                    doCast(mytar, GetSpell(SMITE_1)))
                     return;
             }
 
             if (Spell const* shot = me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
             {
-                if (shot->GetSpellInfo()->Id == SHOOT_WAND && shot->m_targets.GetUnitTarget() != opponent)
+                if (shot->GetSpellInfo()->Id == SHOOT_WAND && shot->m_targets.GetUnitTarget() != mytar)
                     me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
             }
-            else if (IsSpellReady(SHOOT_WAND, diff) && me->GetDistance(opponent) < 30 && GetEquips(BOT_SLOT_RANGED) &&
-                doCast(opponent, SHOOT_WAND))
+            else if (IsSpellReady(SHOOT_WAND, diff) && me->GetDistance(mytar) < 30 && GetEquips(BOT_SLOT_RANGED) &&
+                doCast(mytar, SHOOT_WAND))
                 return;
         }
 
@@ -994,7 +1003,7 @@ public:
                 {
                     u = itr->second;
                     if (u->IsAlive() && u->IsInWorld() && u->ToCreature()->GetBotAI()->HasRole(BOT_ROLE_HEAL) &&
-                        !IsHeroExClass(u->ToCreature()->GetBotClass()) &&
+                        u->ToCreature()->GetBotClass() < BOT_CLASS_EX_START &&
                         GetManaPCT(u) < 70 && me->IsWithinDistInMap(u, 30) &&
                         !u->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, SPELLFAMILY_PRIEST, 0x80000000) &&
                         doCast(u, GetSpell(POWER_INFUSION_1)))
@@ -1004,7 +1013,7 @@ public:
                 {
                     u = itr->second;
                     if (u->IsAlive() && u->IsInWorld() && u->GetPowerType() == POWER_MANA && u->GetVictim() && !IsTank(u) &&
-                        !IsHeroExClass(u->ToCreature()->GetBotClass()) &&
+                        u->ToCreature()->GetBotClass() < BOT_CLASS_EX_START &&
                         GetManaPCT(u) < 70 && me->IsWithinDistInMap(u, 30) &&
                         !u->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, SPELLFAMILY_PRIEST, 0x80000000) &&
                         doCast(u, GetSpell(POWER_INFUSION_1)))
@@ -1050,7 +1059,7 @@ public:
                 {
                     u = bitr->second;
                     if (u->IsAlive() && u->IsInWorld() && u->GetPowerType() == POWER_MANA && u->GetVictim() && !IsTank(u) &&
-                        !IsHeroExClass(u->ToCreature()->GetBotClass()) &&
+                        u->ToCreature()->GetBotClass() < BOT_CLASS_EX_START &&
                         GetManaPCT(u) < 70 && me->IsWithinDistInMap(u, 30) &&
                         !u->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, SPELLFAMILY_PRIEST, 0x80000000) &&
                         doCast(u, GetSpell(POWER_INFUSION_1)))

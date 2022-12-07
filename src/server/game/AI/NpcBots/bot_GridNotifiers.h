@@ -24,6 +24,45 @@ Category: creature_cripts/custom/bots/grids
 
 extern bool _botPvP;
 
+template<class Check>
+struct Unit2LastSearcher
+{
+    Unit* &i_result1;
+    Unit* &i_result2;
+    Check& i_check;
+
+    Unit2LastSearcher(Unit* &result1, Unit* &result2, Check& check)
+        : i_result1(result1), i_result2(result2), i_check(check) { }
+
+    void Visit(CreatureMapType &m)
+    {
+        for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+        {
+            switch ((uint32)i_check(itr->GetSource()))
+            {
+                case 1: i_result1 = itr->GetSource(); break;
+                case 2: i_result2 = itr->GetSource(); break;
+                default:                              break;
+            }
+        }
+    }
+
+    void Visit(PlayerMapType &m)
+    {
+        for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+        {
+            switch ((uint32)i_check(itr->GetSource()))
+            {
+                case 1: i_result1 = itr->GetSource(); break;
+                case 2: i_result2 = itr->GetSource(); break;
+                default:                              break;
+            }
+        }
+    }
+
+    template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED> &) { }
+};
+
 class ImmunityShieldDispelTargetCheck
 {
     public:
@@ -63,47 +102,61 @@ class ImmunityShieldDispelTargetCheck
 
 class NearestHostileUnitCheck
 {
+    enum : uint32 {
+        INVALID         = 0,
+        VALID_PRIMARY   = 1,
+        VALID_SECONDARY = 2
+    };
+
     public:
-        explicit NearestHostileUnitCheck(Unit const* unit, float dist, bool magic, bot_ai const* m_ai, bool targetCCed = false) :
-        me(unit), m_range(dist), byspell(magic), ai(m_ai), AttackCCed(targetCCed)
+        NearestHostileUnitCheck(NearestHostileUnitCheck const&) = delete;
+        explicit NearestHostileUnitCheck(Unit const* unit, float dist, bool magic, bot_ai const* m_ai, bool targetCCed = false, bool withSecondary = false) :
+        me(unit), m_range(dist), byspell(magic), ai(m_ai), AttackCCed(targetCCed), checkSecondary(withSecondary)
         { free = ai->IAmFree(); }
-        bool operator()(Unit const* u)
+        uint32 operator()(Unit const* u)
         {
             if (u == me)
-                return false;
+                return INVALID;
             if (!me->IsWithinDistInMap(u, m_range))
-                return false;
+                return INVALID;
             if (me->HasUnitState(UNIT_STATE_ROOT) && (ai->HasRole(BOT_ROLE_RANGED) == me->IsWithinDistInMap(u, 8.f)))
-                return false;
+                return INVALID;
             if (/*!free && */!u->IsInCombat())
-                return false;
-            if (!ai->CanBotAttack(u, byspell))
-                return false;
+                return INVALID;
             //if (ai->InDuel(u))
             //    return false;
             if (!AttackCCed && (u->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE)))
-                return false;//do not allow CCed units if checked
+                return INVALID;//do not allow CCed units if checked
             //if (u->HasUnitState(UNIT_STATE_CASTING) && (u->GetTypeId() == TYPEID_PLAYER || u->IsPet()))
             //    for (uint8 i = 0; i != CURRENT_MAX_SPELL; ++i)
             //        if (Spell* spell = u->GetCurrentSpell(i))
             //            if (ai->IsInBotParty(spell->m_targets.GetUnitTarget()))
             //                return true;
             if (!ai->IsInBotParty(u->GetVictim()))
-                return false;
+                return INVALID;
 
             if (free)
             {
                 if (u->IsControlledByPlayer() && !u->IsInCombat())
-                    return false;
+                    return INVALID;
             }
             else
             {
                 if (!u->IsWithinLOSInMap(me))
-                    return false;
+                    return INVALID;
+            }
+
+            uint32 res = VALID_PRIMARY;
+            if (!ai->CanBotAttack(u, byspell))
+            {
+                if (checkSecondary && ai->CanBotAttack(u, byspell, checkSecondary))
+                    res = VALID_SECONDARY;
+                else
+                    return INVALID;
             }
 
             m_range = me->GetDistance(u);   // use found unit range as new range limit for next check
-            return true;
+            return res;
         }
     private:
         Unit const* me;
@@ -111,8 +164,8 @@ class NearestHostileUnitCheck
         bool byspell;
         bot_ai const* ai;
         bool AttackCCed;
+        bool checkSecondary;
         bool free;
-        NearestHostileUnitCheck(NearestHostileUnitCheck const&);
 };
 
 class NearbyHostileVehicleTargetCheck

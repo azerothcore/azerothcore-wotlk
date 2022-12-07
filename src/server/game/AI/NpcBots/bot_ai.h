@@ -8,6 +8,8 @@
 //#include "ItemDefines.h"
 #include "Position.h"
 
+#include <tuple>
+
 /*
 NpcBot System by Trickerer (onlysuffering@gmail.com)
 */
@@ -115,7 +117,7 @@ class bot_ai : public CreatureAI
         uint8 GetBotCommandState() const { return m_botCommandState; }
         bool IsInBotParty(Unit const* unit) const;
         bool IsInBotParty(ObjectGuid guid) const;
-        bool CanBotAttack(Unit const* target, int8 byspell = 0) const;
+        bool CanBotAttack(Unit const* target, int8 byspell = 0, bool secondary = false) const;
         bool CanBotAttackOnVehicle() const;
         void ApplyBotDamageMultiplierMelee(uint32& damage, CalcDamageInfo& damageinfo) const;
         void ApplyBotDamageMultiplierMelee(int32& damage, SpellNonMeleeDamage& damageinfo, SpellInfo const* spellInfo, WeaponAttackType attackType, bool iscrit) const;
@@ -350,10 +352,12 @@ class bot_ai : public CreatureAI
         SpellCastResult CheckBotCast(Unit const* victim, uint32 spellId) const;
         virtual bool removeShapeshiftForm() { return true; }
 
-        bool CanAffectVictim(uint32 schoolMask) const;
+        [[deprecated("needs to be removed, use variadic lib version instead")]]
+        bool CanAffectVictim(Unit const* target, uint32 schoolMask) const;
         bool CanRemoveReflectSpells(Unit const* target, uint32 spellId) const;
 
         bool IsMelee() const;
+        bool IsRanged() const;
 
         bool IsShootingWand(Unit const* u = nullptr) const;
 
@@ -478,6 +482,7 @@ class bot_ai : public CreatureAI
         Player* master;
         Player* _prevRRobin;
         Unit* opponent;
+        Unit* disttarget;
         Creature* botPet;
         EventProcessor Events;
         ObjectGuid aftercastTargetGuid;
@@ -555,7 +560,7 @@ class bot_ai : public CreatureAI
 
         void _castBotItemUseSpell(Item const* item, SpellCastTargets const& targets/*, uint8 cast_count = 0, uint32 glyphIndex = 0*/);
 
-        Unit* _getTarget(bool byspell, bool ranged, bool &reset) const;
+        std::tuple<Unit*, Unit*> _getTargets(bool byspell, bool ranged, bool &reset) const;
         Unit* _getVehicleTarget(BotVehicleStrats strat) const;
         void _listAuras(Player const* player, Unit const* unit) const;
         bool _checkImmunities(Unit const* target, SpellInfo const* spellInfo) const;

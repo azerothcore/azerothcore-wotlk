@@ -176,11 +176,15 @@ public:
 
         void Attack(uint32 diff)
         {
-            StartAttack(opponent, IsMelee());
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
+                return;
+
+            StartAttack(mytar, IsMelee());
 
             CheckDrainMana(diff);
 
-            MoveBehind(opponent);
+            MoveBehind(mytar);
 
             if (!HasRole(BOT_ROLE_DPS))
                 return;
@@ -188,20 +192,23 @@ public:
             if (GC_Timer > diff)
                 return;
 
-            if (me->GetDistance(opponent) > 20)
+            if (me->GetDistance(mytar) > 20)
                 return;
 
-            if (me->isMoving() && !me->HasInArc(float(M_PI)/2, opponent))
+            if (me->isMoving() && !me->HasInArc(float(M_PI)/2, mytar))
+                return;
+
+            if (!CanAffectVictim(mytar, SPELL_SCHOOL_MASK_SHADOW|SPELL_SCHOOL_MASK_ARCANE))
                 return;
 
             if (me->GetPower(POWER_MANA) >= SPLASH_ATTACK_COST && IsSpellReady(SPLASH_ATTACK_1, diff))
             {
-                if (doCast(opponent, GetSpell(SPLASH_ATTACK_1)))
+                if (doCast(mytar, GetSpell(SPLASH_ATTACK_1)))
                     return;
             }
             else if (IsSpellReady(MAIN_ATTACK_1, diff))
             {
-                if (doCast(opponent, GetSpell(MAIN_ATTACK_1)))
+                if (doCast(mytar, GetSpell(MAIN_ATTACK_1)))
                     return;
             }
         }

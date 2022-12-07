@@ -230,6 +230,8 @@ public:
                 return;
             }
 
+            Counter(diff);
+
             if (IsCasting())
                 return;
 
@@ -238,20 +240,22 @@ public:
 
         void DoRangedAttack(uint32 diff)
         {
-            StartAttack(opponent, IsMelee());
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
+                return;
 
-            Counter(diff);
+            StartAttack(mytar, IsMelee());
 
-            MoveBehind(opponent);
+            MoveBehind(mytar);
 
-            float dist = me->GetDistance(opponent);
+            float dist = me->GetDistance(mytar);
             static constexpr float maxRangeLong = 35.f;
 
-            //bool inpostion = !opponent->HasAuraType(SPELL_AURA_MOD_SPEED_SLOW_ALL) || dist > maxRangeLong - 20.f;
+            //bool inpostion = !mytar->HasAuraType(SPELL_AURA_MOD_SPEED_SLOW_ALL) || dist > maxRangeLong - 20.f;
 
             //Auto Shot
             //Spell const* shot = me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL);
-            //if (shot && shot->GetSpellInfo()->Id == AUTO_SHOT_1 && (shot->m_targets.GetUnitTarget() != opponent || !inpostion))
+            //if (shot && shot->GetSpellInfo()->Id == AUTO_SHOT_1 && (shot->m_targets.GetUnitTarget() != mytar || !inpostion))
             //    me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 
             if (!HasRole(BOT_ROLE_DPS))
@@ -271,14 +275,14 @@ public:
             {
                 //Frost Arrow / Autoshot
                 if (IsSpellReady(FROST_ARROW_1, diff) && me->GetPower(POWER_MANA) >= FROSTARROW_COST &&
-                    !opponent->IsImmunedToDamage(sSpellMgr->GetSpellInfo(FROST_ARROW_1)))
+                    !mytar->IsImmunedToDamage(sSpellMgr->GetSpellInfo(FROST_ARROW_1)))
                 {
-                    if (doCast(opponent, GetSpell(FROST_ARROW_1)))
+                    if (doCast(mytar, GetSpell(FROST_ARROW_1)))
                         return;
                 }
                 else if (IsSpellReady(SHOOT_BOW_1, diff))
                 {
-                    if (doCast(opponent, SHOOT_BOW_1))
+                    if (doCast(mytar, SHOOT_BOW_1))
                         return;
                 }
             }
@@ -286,7 +290,7 @@ public:
 
         bool CheckTornado(uint32 diff)
         {
-            if (!IsSpellReady(TORNADO_1, diff, false) || me->GetPower(POWER_MANA) < TORNADO_COST || Rand() > 50)
+            if (!IsSpellReady(TORNADO_1, diff, false) || !me->GetVictim() || me->GetPower(POWER_MANA) < TORNADO_COST || Rand() > 50)
                 return false;
 
             std::list<Unit*> targets;
@@ -298,8 +302,8 @@ public:
             size_t targets_count = (IAmFree() || !master->GetGroup()) ? TORNADO_MIN_TARGETS : std::max<size_t>(master->GetGroup()->GetMemberSlots().size() / 3, TORNADO_MIN_TARGETS);
             if (targets.size() >= targets_count)
             {
-                me->SetFacingTo(me->GetAbsoluteAngle(opponent));
-                if (doCast(opponent, GetSpell(TORNADO_1)))
+                me->SetFacingTo(me->GetAbsoluteAngle(me->GetVictim()));
+                if (doCast(me->GetVictim(), GetSpell(TORNADO_1)))
                     return true;
             }
 
@@ -308,16 +312,16 @@ public:
 
         bool CheckForkedLightning(uint32 diff)
         {
-            if (!IsSpellReady(FORKED_LIGHTNING_1, diff, false) || me->GetPower(POWER_MANA) < FORKEDLIGHTNING_COST ||
-                Rand() > 90 || !me->HasInArc(float(M_PI), opponent))
+            if (!IsSpellReady(FORKED_LIGHTNING_1, diff, false) || !me->GetVictim() || me->GetPower(POWER_MANA) < FORKEDLIGHTNING_COST ||
+                Rand() > 90 || !me->HasInArc(float(M_PI), me->GetVictim()))
                 return false;
 
             std::list<Unit*> targets;
             GetNearbyTargetsInConeList(targets, CalcSpellMaxRange(FORKED_LIGHTNING_1) - 5.f);
             if (targets.size() > ((me->GetLevel() < 60) ? 1u : 0u))
             {
-                me->SetFacingTo(me->GetAbsoluteAngle(opponent));
-                if (doCast(opponent, GetSpell(FORKED_LIGHTNING_1)))
+                me->SetFacingTo(me->GetAbsoluteAngle(me->GetVictim()));
+                if (doCast(me->GetVictim(), GetSpell(FORKED_LIGHTNING_1)))
                     return true;
             }
 

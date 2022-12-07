@@ -615,7 +615,11 @@ public:
 
         void DoNormalAttack(uint32 diff)
         {
-            StartAttack(opponent, IsMelee());
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
+                return;
+
+            StartAttack(mytar, IsMelee());
 
             //BLOOD TAP
             if (IsSpellReady(BLOOD_TAP_1, diff, false) && Rand() < 65)
@@ -680,17 +684,17 @@ public:
                 }
             }
 
-            float dist = me->GetDistance(opponent);
-            Unit const* u = opponent->GetVictim();
+            float dist = me->GetDistance(mytar);
+            Unit const* u = mytar->GetVictim();
 
             //MARK OF BLOOD
             if (IsSpellReady(MARK_OF_BLOOD_1, diff) && u && Rand() < 55 && dist < 30 && HaveRunes(MARK_OF_BLOOD_1) &&
-                IsInBotParty(u) && GetHealthPCT(u) < 75 && u->GetDistance(opponent) < 10 &&
-                opponent->GetHealth() > me->GetMaxHealth() / 4 * (1 + opponent->getAttackers().size()) &&
+                IsInBotParty(u) && GetHealthPCT(u) < 75 && u->GetDistance(mytar) < 10 &&
+                mytar->GetHealth() > me->GetMaxHealth() / 4 * (1 + mytar->getAttackers().size()) &&
                 (u == me || IsTank(u) || u->GetTypeId() == TYPEID_PLAYER) &&
-                !opponent->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 2285, 0))
+                !mytar->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 2285, 0))
             {
-                if (doCast(opponent, GetSpell(MARK_OF_BLOOD_1)))
+                if (doCast(mytar, GetSpell(MARK_OF_BLOOD_1)))
                     return;
             }
 
@@ -702,20 +706,20 @@ public:
 
             //DARK COMMAND
             if (IsSpellReady(DARK_COMMAND_1, diff, false) && u && u != me && dist < 30 &&
-                opponent->GetTypeId() == TYPEID_UNIT && !opponent->IsControlledByPlayer() && Rand() < 50 &&
-                !CCed(opponent) && !opponent->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
+                mytar->GetTypeId() == TYPEID_UNIT && !mytar->IsControlledByPlayer() && Rand() < 50 &&
+                !CCed(mytar) && !mytar->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
                 (!IsTank(u) || (IsTank() && GetHealthPCT(u) < 30 && GetHealthPCT(me) > 67)) &&
                 (IsTank() || (!IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80)) &&
                 IsInBotParty(u))
             {
-                if (doCast(opponent, GetSpell(DARK_COMMAND_1)))
+                if (doCast(mytar, GetSpell(DARK_COMMAND_1)))
                     return;
             }
             //DARK COMMAND 2 (distant)
             if (IsSpellReady(DARK_COMMAND_1, diff, false) && !IAmFree() && u == me && Rand() < 30 && IsTank() &&
                 (IsOffTank() || master->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_TANK_OFF) == 0) &&
-                !(me->GetLevel() >= 40 && opponent->GetTypeId() == TYPEID_UNIT &&
-                (opponent->ToCreature()->IsDungeonBoss() || opponent->ToCreature()->isWorldBoss())))
+                !(me->GetLevel() >= 40 && mytar->GetTypeId() == TYPEID_UNIT &&
+                (mytar->ToCreature()->IsDungeonBoss() || mytar->ToCreature()->isWorldBoss())))
             {
                 if (Unit* tUnit = FindDistantTauntTarget())
                 {
@@ -726,11 +730,11 @@ public:
 
             ////DEATH GRIP - DISABLED
             //if (DEATH_GRIP && DeathGrip_cd <= diff && dist < 30 &&
-            //    (tank == me && opponent->GetVictim() != me) ||
-            //    (opponent->GetVictim() == me && opponent->ToPlayer() && opponent->IsNonMeleeSpellCast(false)) &&
+            //    (tank == me && mytar->GetVictim() != me) ||
+            //    (mytar->GetVictim() == me && mytar->ToPlayer() && mytar->IsNonMeleeSpellCast(false)) &&
             //    Rand() < 75)
             //{
-            //    if (doCast(opponent, DEATH_GRIP))
+            //    if (doCast(mytar, DEATH_GRIP))
             //    {
             //        DeathGrip_cd = 25000;
             //        return;
@@ -741,7 +745,7 @@ public:
 
             //UNBREAKABLE ARMOR
             if (IsSpellReady(UNBREAKABLE_ARMOR_1, diff, false) && dist < 10 && HaveRunes(UNBREAKABLE_ARMOR_1) &&
-                (IsTank() || !me->getAttackers().empty() || opponent->GetMaxHealth() > me->GetMaxHealth() || Rand() < 35))
+                (IsTank() || !me->getAttackers().empty() || mytar->GetMaxHealth() > me->GetMaxHealth() || Rand() < 35))
             {
                 if (doCast(me, GetSpell(UNBREAKABLE_ARMOR_1)))
                 {}
@@ -751,12 +755,12 @@ public:
                 return;
 
             //CHAINS OF ICE
-            if (IsSpellReady(CHAINS_OF_ICE_1, diff) && Rand() < 65 && dist < CalcSpellMaxRange(CHAINS_OF_ICE_1) && opponent->isMoving() &&
-                !(opponent->GetTypeId() == TYPEID_UNIT && (opponent->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_SNARE-1)))) &&
-                HaveRunes(CHAINS_OF_ICE_1) && !CCed(opponent, true) && (!u || (!IsTank(u) && IsInBotParty(u))) &&
-                !opponent->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+            if (IsSpellReady(CHAINS_OF_ICE_1, diff) && Rand() < 65 && dist < CalcSpellMaxRange(CHAINS_OF_ICE_1) && mytar->isMoving() &&
+                !(mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_SNARE-1)))) &&
+                HaveRunes(CHAINS_OF_ICE_1) && !CCed(mytar, true) && (!u || (!IsTank(u) && IsInBotParty(u))) &&
+                !mytar->HasAuraWithMechanic(1<<MECHANIC_SNARE))
             {
-                if (doCast(opponent, GetSpell(CHAINS_OF_ICE_1)))
+                if (doCast(mytar, GetSpell(CHAINS_OF_ICE_1)))
                     return;
             }
 
@@ -773,11 +777,11 @@ public:
             }
 
             //Diseases in general
-            bool noDiseases = (opponent->GetTypeId() == TYPEID_UNIT && (opponent->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1))));
-            AuraEffect const* blop = noDiseases ? nullptr : opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x2000000, 0x0, me->GetGUID());
-            AuraEffect const* frof = noDiseases ? nullptr : opponent->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x4000000, 0x0, me->GetGUID());
+            bool noDiseases = (mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1))));
+            AuraEffect const* blop = noDiseases ? nullptr : mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x2000000, 0x0, me->GetGUID());
+            AuraEffect const* frof = noDiseases ? nullptr : mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x4000000, 0x0, me->GetGUID());
 
-            auto [can_do_frost, can_do_shadow, can_do_physical] = CanAffectVictimBools(opponent, SPELL_SCHOOL_FROST, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_NORMAL);
+            auto [can_do_frost, can_do_shadow, can_do_physical] = CanAffectVictimBools(mytar, SPELL_SCHOOL_FROST, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_NORMAL);
 
             //DISEASE SECTION
 
@@ -786,14 +790,14 @@ public:
             {
                 if (blop->GetBase()->GetDuration() < 5000 || frof->GetBase()->GetDuration() < 5000)
                 {
-                    if (doCast(opponent, GetSpell(PESTILENCE_1)))
+                    if (doCast(mytar, GetSpell(PESTILENCE_1)))
                         return;
                 }
 
                 if (Rand() < 35 + 65 * me->GetMap()->IsDungeon())
                 {
                     std::list<Unit*> targets;
-                    GetNearbyTargetsList(targets, 13.f, 0, opponent);
+                    GetNearbyTargetsList(targets, 13.f, 0, mytar);
                     uint8 count = 0;
                     for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     {
@@ -803,7 +807,7 @@ public:
                             if (++count > 1)
                                 break;
                     }
-                    if (count > 1 && doCast(opponent, GetSpell(PESTILENCE_1)))
+                    if (count > 1 && doCast(mytar, GetSpell(PESTILENCE_1)))
                         return;
                 }
             }
@@ -811,19 +815,19 @@ public:
             if (IsSpellReady(ICY_TOUCH_1, diff) && can_do_frost && !noDiseases && (!frof || frof->GetBase()->GetMaxDuration() < 3000) &&
                 dist < CalcSpellMaxRange(ICY_TOUCH_1) && HaveRunes(ICY_TOUCH_1))
             {
-                if (doCast(opponent, GetSpell(ICY_TOUCH_1)))
+                if (doCast(mytar, GetSpell(ICY_TOUCH_1)))
                     return;
             }
             //HOWLING BLAST
             if (IsSpellReady(HOWLING_BLAST_1, diff) && can_do_frost && (rimeProcTimer > diff || Rand() < 70) &&
-                (!u || opponent->IsControlledByPlayer() || rimeProcTimer > diff ||
+                (!u || mytar->IsControlledByPlayer() || rimeProcTimer > diff ||
                 (u && u != me && IsTank(u) && u->getAttackers().size() > 2)) &&
                 dist < CalcSpellMaxRange(HOWLING_BLAST_1) && HaveRunes(HOWLING_BLAST_1))
             {
                 if (u && u->getAttackers().size() > 4 &&
                     IsSpellReady(DEATHCHILL_1, diff, false) && doCast(me, GetSpell(DEATHCHILL_1)))
                 {/* BotWhisper("Deathchill used!"); */}
-                if (doCast(opponent, GetSpell(HOWLING_BLAST_1)))
+                if (doCast(mytar, GetSpell(HOWLING_BLAST_1)))
                     return;
             }
 
@@ -836,7 +840,7 @@ public:
                 runicpower >= rcost(FROST_STRIKE_1) &&
                 (runicpower >= 1000 || !GetSpell(OBLITERATE_1) || !HaveRunes(OBLITERATE_1)))
             {
-                if (doCast(opponent, GetSpell(FROST_STRIKE_1)))
+                if (doCast(mytar, GetSpell(FROST_STRIKE_1)))
                     return;
             }
             //BLOOD BOIL
@@ -862,11 +866,11 @@ public:
             if (IsSpellReady(DEATH_COIL_1, diff) && can_do_shadow && Rand() < 50 && (dist > 6 || !GetSpell(FROST_STRIKE_1)) &&
                 (dist < (IAmFree() ? 30 : 15)) && runicpower > 2 * rcost(DEATH_COIL_1))
             {
-                if (doCast(opponent, GetSpell(DEATH_COIL_1)))
+                if (doCast(mytar, GetSpell(DEATH_COIL_1)))
                     return;
             }
 
-            MoveBehind(opponent);
+            MoveBehind(mytar);
 
             if (!can_do_physical || dist > 5)
                 return;
@@ -875,7 +879,7 @@ public:
             if (IsSpellReady(PLAGUE_STRIKE_1, diff) && !noDiseases && (!blop || blop->GetBase()->GetDuration() < 3000) &&
                 HaveRunes(PLAGUE_STRIKE_1))
             {
-                if (doCast(opponent, GetSpell(PLAGUE_STRIKE_1)))
+                if (doCast(mytar, GetSpell(PLAGUE_STRIKE_1)))
                     return;
             }
 
@@ -884,9 +888,9 @@ public:
             //DEATH STRIKE
             if (IsSpellReady(DEATH_STRIKE_1, diff) && blop && frof && Rand() < 60 &&
                 GetHealthPCT(me) < (80 - (10*(blop != nullptr) + 10*(frof != nullptr))) &&
-                (!me->GetMap()->IsDungeon() || opponent->IsControlledByPlayer()) && HaveRunes(DEATH_STRIKE_1))
+                (!me->GetMap()->IsDungeon() || mytar->IsControlledByPlayer()) && HaveRunes(DEATH_STRIKE_1))
             {
-                if (doCast(opponent, GetSpell(DEATH_STRIKE_1)))
+                if (doCast(mytar, GetSpell(DEATH_STRIKE_1)))
                     return;
             }
             //OBLITERATE
@@ -895,26 +899,26 @@ public:
                 //DEATHCHILL
                 if (IsSpellReady(DEATHCHILL_1, diff, false) && doCast(me, GetSpell(DEATHCHILL_1)))
                 {/* BotWhisper("Deathchill used!"); */}
-                if (doCast(opponent, GetSpell(OBLITERATE_1)))
+                if (doCast(mytar, GetSpell(OBLITERATE_1)))
                     return;
             }
             //HEART STRIKE - splash
             if (IsSpellReady(HEART_STRIKE_1, diff) && (noDiseases || (blop && frof)) && (IsTank() || Rand() < 40) &&
                 HaveRunes(HEART_STRIKE_1) && FindSplashTarget())
             {
-                if (doCast(opponent, GetSpell(HEART_STRIKE_1)))
+                if (doCast(mytar, GetSpell(HEART_STRIKE_1)))
                     return;
             }
             //BLOOD STRIKE
             if (IsSpellReady(BLOOD_STRIKE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(BLOOD_STRIKE_1))
             {
-                if (doCast(opponent, GetSpell(BLOOD_STRIKE_1)))
+                if (doCast(mytar, GetSpell(BLOOD_STRIKE_1)))
                     return;
             }
             //SCOURGE STRIKE unused
             //if (IsSpellReady(SCOURGE_STRIKE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(SCOURGE_STRIKE_1))
             //{
-            //    if (doCast(opponent, GetSpell(SCOURGE_STRIKE_1)))
+            //    if (doCast(mytar, GetSpell(SCOURGE_STRIKE_1)))
             //        return;
             //}
 
@@ -925,7 +929,7 @@ public:
                 me->HasAuraState(AURA_STATE_DEFENSE) && !me->GetCurrentSpell(CURRENT_MELEE_SPELL) &&
                 runicpower >= rcost(RUNE_STRIKE_1))
             {
-                if (doCast(opponent, GetSpell(RUNE_STRIKE_1)))
+                if (doCast(mytar, GetSpell(RUNE_STRIKE_1)))
                     return;
             }
         }

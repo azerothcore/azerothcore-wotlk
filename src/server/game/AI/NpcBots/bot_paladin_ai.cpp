@@ -1385,12 +1385,16 @@ public:
                 doCast(target, GetSpell(TURN_EVIL_1)))
                 return;
             else
-            if ((opponent->GetCreatureType() == CREATURE_TYPE_UNDEAD || opponent->GetCreatureType() == CREATURE_TYPE_DEMON) &&
-                !CCed(opponent) &&
-                opponent->GetVictim() && !IsTank(opponent->GetVictim()) && opponent->GetVictim() != me &&
-                GetHealthPCT(me) < 90 &&
-                doCast(opponent, GetSpell(TURN_EVIL_1)))
-                return;
+            {
+                for (Unit* mtar : { opponent, disttarget })
+                {
+                    if (mtar && (mtar->GetCreatureTypeMask() & CREATURE_TYPEMASK_DEMON_OR_UNDEAD) && !CCed(mtar) &&
+                        mtar->GetVictim() && !IsTank(mtar->GetVictim()) && mtar->GetVictim() != me &&
+                        GetHealthPCT(me) < 90 &&
+                        doCast(mtar, GetSpell(TURN_EVIL_1)))
+                        return;
+                }
+            }
         }
 
         void CheckDivineIntervention(uint32 diff)
@@ -1421,16 +1425,20 @@ public:
             if (players.empty())
                 return;
 
-            Unit* target = players.size() == 1 ? *players.begin() : Acore::Containers::SelectRandomContainerElement(players);
+            Unit* target = players.size() == 1 ? players.front() : Acore::Containers::SelectRandomContainerElement(players);
             if (doCast(target, GetSpell(DIVINE_INTERVENTION_1)))
                 return;
         }
 
         void DoNormalAttack(uint32 diff)
         {
-            StartAttack(opponent, IsMelee());
+            Unit* mytar = opponent ? opponent : disttarget ? disttarget : nullptr;
+            if (!mytar)
+                return;
 
-            MoveBehind(opponent);
+            StartAttack(mytar, IsMelee());
+
+            MoveBehind(mytar);
 
             //Divine Shield
             if (IsSpellReady(DIVINE_SHIELD_1, diff) && shieldDelayTimer <= diff && (IAmFree() || !IsTank()) &&
@@ -1448,35 +1456,35 @@ public:
                     return;
             }
 
-            if (!CanAffectVictim(SPELL_SCHOOL_MASK_HOLY))
+            if (!CanAffectVictim(mytar, SPELL_SCHOOL_MASK_HOLY))
                 return;
 
-            float dist = me->GetDistance(opponent);
+            float dist = me->GetDistance(mytar);
 
             //HAMMER OF WRATH
             if (IsSpellReady(HAMMER_OF_WRATH_1, diff) && HasRole(BOT_ROLE_DPS) && Rand() < 80 &&
-                opponent->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT) && dist < 30)
+                mytar->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT) && dist < 30)
             {
-                if (doCast(opponent, GetSpell(HAMMER_OF_WRATH_1)))
+                if (doCast(mytar, GetSpell(HAMMER_OF_WRATH_1)))
                     return;
             }
             //HAND OF RECKONING //No GCD
-            Unit* u = opponent->GetVictim();
+            Unit* u = mytar->GetVictim();
             if (IsSpellReady(HAND_OF_RECKONING_1, diff, false) && u && u != me && dist < 30 &&
-                opponent->GetTypeId() == TYPEID_UNIT && !opponent->IsControlledByPlayer() &&
-                !CCed(opponent) && HasRole(BOT_ROLE_DPS) && !opponent->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
+                mytar->GetTypeId() == TYPEID_UNIT && !mytar->IsControlledByPlayer() &&
+                !CCed(mytar) && HasRole(BOT_ROLE_DPS) && !mytar->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
                 (!IsTank(u) || (IsTank() && GetHealthPCT(u) < 30 && GetHealthPCT(me) > 67)) &&
                 ((!IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80) || IsTank()) &&
                 IsInBotParty(u) && Rand() < 50)
             {
-                if (doCast(opponent, GetSpell(HAND_OF_RECKONING_1)))
+                if (doCast(mytar, GetSpell(HAND_OF_RECKONING_1)))
                     return;
             }
             //HAND OF RECKONING 2 (distant)
             if (IsSpellReady(HAND_OF_RECKONING_1, diff, false) && !IAmFree() && u == me && Rand() < 30 && IsTank() && HasRole(BOT_ROLE_DPS) &&
                 (IsOffTank() || master->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_TANK_OFF) == 0) &&
-                !(me->GetLevel() >= 40 && opponent->GetTypeId() == TYPEID_UNIT &&
-                (opponent->ToCreature()->IsDungeonBoss() || opponent->ToCreature()->isWorldBoss())))
+                !(me->GetLevel() >= 40 && mytar->GetTypeId() == TYPEID_UNIT &&
+                (mytar->ToCreature()->IsDungeonBoss() || mytar->ToCreature()->isWorldBoss())))
             {
                 Unit* tUnit = FindDistantTauntTarget();
                 if (tUnit)
@@ -1487,9 +1495,9 @@ public:
             }
             //RIGHTEOUS DEFENSE //No GCD
             if (IsSpellReady(RIGHTEOUS_DEFENSE_1, diff, false) && !IAmFree() && u && u != me && IsTank() &&
-                me->GetDistance(u) < 40 && opponent->GetTypeId() == TYPEID_UNIT && !opponent->IsControlledByPlayer() &&
+                me->GetDistance(u) < 40 && mytar->GetTypeId() == TYPEID_UNIT && !mytar->IsControlledByPlayer() &&
                 !IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80 &&
-                !CCed(opponent) && !opponent->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
+                !CCed(mytar) && !mytar->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
                 (!IsTank(u) || (GetHealthPCT(u) < 30 && GetHealthPCT(me) > 67)) &&
                 IsInBotParty(u) && Rand() < 20 + 30 * u->getAttackers().size())
             {
@@ -1498,8 +1506,8 @@ public:
             }
             //RIGHTEOUS DEFENSE 2 (distant)
             if (IsSpellReady(RIGHTEOUS_DEFENSE_1, diff, false) && !IAmFree() && u == me && IsTank() && Rand() < 30 &&
-                !(me->GetLevel() >= 40 && opponent->GetTypeId() == TYPEID_UNIT &&
-                (opponent->ToCreature()->IsDungeonBoss() || opponent->ToCreature()->isWorldBoss())))
+                !(me->GetLevel() >= 40 && mytar->GetTypeId() == TYPEID_UNIT &&
+                (mytar->ToCreature()->IsDungeonBoss() || mytar->ToCreature()->isWorldBoss())))
             {
                 Unit* tUnit = FindDistantTauntTarget(40, true);
                 if (tUnit)
@@ -1518,8 +1526,8 @@ public:
             //Avenging Wrath (tank - big threat, dps - big hp, heal - divine plea counter)
             if (IsSpellReady(AVENGING_WRATH_1, diff, false) && avDelayTimer <= diff &&
                 HasRole(BOT_ROLE_HEAL|BOT_ROLE_DPS) && Rand() < 35 && dist < 30 &&
-                IsTank() ? (opponent->GetTypeId() == TYPEID_UNIT && (opponent->ToCreature()->IsDungeonBoss() || opponent->ToCreature()->isWorldBoss())) :
-                (!HasRole(BOT_ROLE_HEAL) || !HasRole(BOT_ROLE_RANGED)) ? (opponent->GetHealth() > me->GetMaxHealth()/4 * (1 + opponent->getAttackers().size())) :
+                IsTank() ? (mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->IsDungeonBoss() || mytar->ToCreature()->isWorldBoss())) :
+                (!HasRole(BOT_ROLE_HEAL) || !HasRole(BOT_ROLE_RANGED)) ? (mytar->GetHealth() > me->GetMaxHealth()/4 * (1 + mytar->getAttackers().size())) :
                 (me->GetAuraEffect(SPELL_AURA_OBS_MOD_POWER, SPELLFAMILY_PALADIN, 0x0, 0x80004000, 0x1) != nullptr))
             {
                 if (doCast(me, GetSpell(AVENGING_WRATH_1)))
@@ -1529,7 +1537,7 @@ public:
             if (IsSpellReady(AVENGERS_SHIELD_1, diff) && CanBlock() &&
                 HasRole(BOT_ROLE_DPS) && dist < 30 && Rand() < 60)
             {
-                if (doCast(opponent, GetSpell(AVENGERS_SHIELD_1)))
+                if (doCast(mytar, GetSpell(AVENGERS_SHIELD_1)))
                     return;
             }
             //Divine Protection tanks only
@@ -1544,15 +1552,15 @@ public:
                 ((IsTank() && dist > 12) || (HasRole(BOT_ROLE_RANGED) && !HasRole(BOT_ROLE_HEAL)) ||
                 me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_PALADIN, 0x0, 0x0, 0x2)))
             {
-                if (doCast(opponent, GetSpell(EXORCISM_1)))
+                if (doCast(mytar, GetSpell(EXORCISM_1)))
                     return;
             }
             //Hammer of Justice
-            if (IsSpellReady(HAMMER_OF_JUSTICE_1, diff) && !CCed(opponent) && dist < 10 && Rand() < 20 &&
-                opponent->GetDiminishing(DIMINISHING_STUN) <= DIMINISHING_LEVEL_2 &&
-                !IsImmunedToMySpellEffect(opponent, sSpellMgr->GetSpellInfo(HAMMER_OF_JUSTICE_1), EFFECT_0))
+            if (IsSpellReady(HAMMER_OF_JUSTICE_1, diff) && !CCed(mytar) && dist < 10 && Rand() < 20 &&
+                mytar->GetDiminishing(DIMINISHING_STUN) <= DIMINISHING_LEVEL_2 &&
+                !IsImmunedToMySpellEffect(mytar, sSpellMgr->GetSpellInfo(HAMMER_OF_JUSTICE_1), EFFECT_0))
             {
-                if (doCast(opponent, GetSpell(HAMMER_OF_JUSTICE_1)))
+                if (doCast(mytar, GetSpell(HAMMER_OF_JUSTICE_1)))
                     return;
             }
             //Judgement
@@ -1560,12 +1568,12 @@ public:
             {
                 uint32 JUDGEMENT = 0;
 
-                if (GetSpell(JUDGEMENT_OF_JUSTICE_1) && opponent->HasAuraType(SPELL_AURA_MOD_INCREASE_SPEED) &&
+                if (GetSpell(JUDGEMENT_OF_JUSTICE_1) && mytar->HasAuraType(SPELL_AURA_MOD_INCREASE_SPEED) &&
                     dist < CalcSpellMaxRange(JUDGEMENT_OF_JUSTICE_1))
                 {
                     //has joj from someone else
                     bool canCast = true;
-                    Unit::AuraEffectList const& notSpeedAuras = opponent->GetAuraEffectsByType(SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED);
+                    Unit::AuraEffectList const& notSpeedAuras = mytar->GetAuraEffectsByType(SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED);
                     for (Unit::AuraEffectList::const_iterator itr = notSpeedAuras.begin(); itr != notSpeedAuras.end(); ++itr)
                     {
                         if ((*itr)->GetCasterGUID() != me->GetGUID() && (*itr)->GetBase()->GetDuration() > 2000)
@@ -1577,7 +1585,7 @@ public:
                     if (canCast)
                     {
                         //has sprint or something
-                        Unit::AuraEffectList const& speedAuras = opponent->GetAuraEffectsByType(SPELL_AURA_MOD_INCREASE_SPEED);
+                        Unit::AuraEffectList const& speedAuras = mytar->GetAuraEffectsByType(SPELL_AURA_MOD_INCREASE_SPEED);
                         for (Unit::AuraEffectList::const_iterator itr = speedAuras.begin(); itr != speedAuras.end(); ++itr)
                         {
                             if (!(*itr)->GetBase()->IsPassive() &&
@@ -1593,8 +1601,8 @@ public:
                 if (!JUDGEMENT && GetSpell(JUDGEMENT_OF_WISDOM_1) && dist < CalcSpellMaxRange(JUDGEMENT_OF_WISDOM_1))
                 {
                     //from 35% to 50% mana
-                    AuraEffect const* wisd = opponent->GetAuraEffect(JUDGEMENT_OF_WISDOM_AURA, 0);
-                    //AuraEffect const* wisd = opponent->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 3014, 0);
+                    AuraEffect const* wisd = mytar->GetAuraEffect(JUDGEMENT_OF_WISDOM_AURA, 0);
+                    //AuraEffect const* wisd = mytar->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 3014, 0);
                     uint8 myManaPct = GetManaPCT(me);
                     if ((!wisd && myManaPct < 35) || (wisd && wisd->GetCasterGUID() == me->GetGUID() && myManaPct < 50))
                         JUDGEMENT = JUDGEMENT_OF_WISDOM_1;
@@ -1615,17 +1623,17 @@ public:
                         JUDGEMENT = JUDGEMENT_OF_JUSTICE_1;
                 }
 
-                if (JUDGEMENT && doCast(opponent, GetSpell(JUDGEMENT)))
+                if (JUDGEMENT && doCast(mytar, GetSpell(JUDGEMENT)))
                     return;
             }
             //Consecration
             if (IsSpellReady(CONSECRATION_1, diff) && HasRole(BOT_ROLE_DPS) && dist < 5 &&
-                !opponent->isMoving() && Rand() < 50)
+                !mytar->isMoving() && Rand() < 50)
             {
                 if (doCast(me, GetSpell(CONSECRATION_1)))
                     return;
             }
-            //Hammer of Righteous (1h only)
+            //Hammer of the Righteous (1h only)
             if (IsSpellReady(HAMMER_OF_THE_RIGHTEOUS_1, diff) && HasRole(BOT_ROLE_DPS) &&
                 dist < 5 && Rand() < 80)
             {
@@ -1633,14 +1641,14 @@ public:
                 if (weapMH &&
                     (weapMH->GetTemplate()->InventoryType == INVTYPE_WEAPON ||
                     weapMH->GetTemplate()->InventoryType == INVTYPE_WEAPONMAINHAND) &&
-                    doCast(opponent, GetSpell(HAMMER_OF_THE_RIGHTEOUS_1)))
+                    doCast(mytar, GetSpell(HAMMER_OF_THE_RIGHTEOUS_1)))
                     return;
             }
             //Shield of Righteousness
             if (IsSpellReady(SHIELD_OF_RIGHTEOUSNESS_1, diff) && HasRole(BOT_ROLE_DPS) && CanBlock() &&
                 (IsTank() || IAmFree()) && dist < 5 && Rand() < 90)
             {
-                if (doCast(opponent, GetSpell(SHIELD_OF_RIGHTEOUSNESS_1)))
+                if (doCast(mytar, GetSpell(SHIELD_OF_RIGHTEOUSNESS_1)))
                     return;
             }
             //Crusader Strike (2h only)
@@ -1648,7 +1656,7 @@ public:
             {
                 Item const* mh = GetEquips(BOT_SLOT_MAINHAND);
                 if (mh && mh->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)
-                    if (doCast(opponent, GetSpell(CRUSADER_STRIKE_1)))
+                    if (doCast(mytar, GetSpell(CRUSADER_STRIKE_1)))
                         return;
             }
             //Divine Storm (2h only)
@@ -1662,7 +1670,7 @@ public:
             //Holy Wrath
             if (IsSpellReady(HOLY_WRATH_1, diff) && HasRole(BOT_ROLE_DPS) && Rand() < 50)
             {
-                if ((opponent->GetCreatureType() == CREATURE_TYPE_UNDEAD || opponent->GetCreatureType() == CREATURE_TYPE_DEMON) &&
+                if ((mytar->GetCreatureType() == CREATURE_TYPE_UNDEAD || mytar->GetCreatureType() == CREATURE_TYPE_DEMON) &&
                     dist < 8.5f && doCast(me, GetSpell(HOLY_WRATH_1)))
                     return;
                 else
