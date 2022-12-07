@@ -52,6 +52,7 @@ GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_respawnDelayTime = 300;
     m_despawnDelay = 0;
     m_despawnRespawnTime = 0s;
+    m_restockTime = 0s;
     m_lootState = GO_NOT_READY;
     m_spawnedByDefault = true;
     m_allowModifyDestructibleBuilding = true;
@@ -585,6 +586,16 @@ void GameObject::Update(uint32 diff)
                             spellCaster->CastSpell(spellCaster, spellId, triggered);
                             return;
                         }
+                    case GAMEOBJECT_TYPE_CHEST:
+                        if (m_restockTime > GameTime::GetGameTime())
+                        {
+                            return;
+                        }
+                        // If there is no restock timer, or if the restock timer passed, the chest becomes ready to loot
+                        m_restockTime = 0s;
+                        m_lootState = GO_READY;
+                        AddToObjectUpdateIfNeeded();
+                        break;
                     default:
                         m_lootState = GO_READY;                         // for other GOis same switched without delay to GO_READY
                         break;
@@ -768,6 +779,14 @@ void GameObject::Update(uint32 diff)
                                 m_groupLootTimer -= diff;
                             }
                         }
+
+                        // Non-consumable chest was partially looted and restock time passed, restock all loot now
+                        if (GetGOInfo()->chest.consumable == 0 && GameTime::GetGameTime() >= m_restockTime)
+                        {
+                            m_restockTime = 0s;
+                            m_lootState = GO_READY;
+                            AddToObjectUpdateIfNeeded();
+                        }
                         break;
                     case GAMEOBJECT_TYPE_TRAP:
                     {
@@ -826,21 +845,29 @@ void GameObject::Update(uint32 diff)
 
                 loot.clear();
 
-                //! If this is summoned by a spell with ie. SPELL_EFFECT_SUMMON_OBJECT_WILD, with or without owner, we check respawn criteria based on spell
-                //! The GetOwnerGUID() check is mostly for compatibility with hacky scripts - 99% of the time summoning should be done trough spells.
-                if (GetSpellId() || GetOwnerGUID())
+                // Do not delete chests or goobers that are not consumed on loot, while still allowing them to despawn when they expire if summoned
+                bool isSummonedAndExpired = (GetOwner() || GetSpellId()) && m_respawnTime == 0;
+                if ((GetGoType() == GAMEOBJECT_TYPE_CHEST || GetGoType() == GAMEOBJECT_TYPE_GOOBER) && !GetGOInfo()->IsDespawnAtAction() && !isSummonedAndExpired)
                 {
-                    //Don't delete spell spawned chests, which are not consumed on loot
-                    if (m_respawnTime > 0 && GetGoType() == GAMEOBJECT_TYPE_CHEST && !GetGOInfo()->IsDespawnAtAction())
+                    if (GetGoType() == GAMEOBJECT_TYPE_CHEST && GetGOInfo()->chest.chestRestockTime > 0)
                     {
-                        UpdateObjectVisibility();
-                        SetLootState(GO_READY);
+                        // Start restock timer when the chest is fully looted
+                        m_restockTime = GameTime::GetGameTime() + Seconds(GetGOInfo()->chest.chestRestockTime);
+                        SetLootState(GO_NOT_READY);
+                        AddToObjectUpdateIfNeeded();
                     }
                     else
                     {
-                        SetRespawnTime(0);
-                        Delete();
+                        SetLootState(GO_READY);
                     }
+
+                    UpdateObjectVisibility();
+                    return;
+                }
+                else if (GetOwnerGUID() || GetSpellId())
+                {
+                    SetRespawnTime(0);
+                    Delete();
                     return;
                 }
 
@@ -2421,6 +2448,13 @@ void GameObject::SetLootState(LootState state, Unit* unit)
 
     AI()->OnStateChanged(state, unit);
     sScriptMgr->OnGameObjectLootStateChanged(this, state, unit);
+
+    // Start restock timer if the chest is partially looted or not looted at all
+    if (GetGoType() == GAMEOBJECT_TYPE_CHEST && state == GO_ACTIVATED && GetGOInfo()->chest.chestRestockTime > 0 && m_restockTime == 0s)
+    {
+        m_restockTime = GameTime::GetGameTime() + Seconds(GetGOInfo()->chest.chestRestockTime);
+    }
+
     // pussywizard: lootState has nothing to do with collision, it depends entirely on GOState. Loot state is for timed close/open door and respawning, which then sets GOState
     /*if (m_model)
     {

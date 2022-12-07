@@ -36,7 +36,7 @@ RandomMovementGenerator<Creature>::~RandomMovementGenerator()
 }
 
 template<>
-void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
+void RandomMovementGenerator<Creature>::SetRandomLocation(Creature* creature)
 {
     if (creature->_moveState != MAP_OBJECT_CELL_MOVE_NONE)
         return;
@@ -292,7 +292,7 @@ bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint3
     {
         _nextMoveTime.Update(diff);
         if (_nextMoveTime.Passed())
-            _setRandomLocation(creature);
+            SetRandomLocation(creature);
     }
     return true;
 }

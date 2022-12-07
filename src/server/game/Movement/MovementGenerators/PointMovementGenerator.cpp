@@ -33,7 +33,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
     {
         // the next line is to ensure that a new spline is created in DoUpdate() once the unit is no longer rooted/stunned
         // todo: rename this flag to something more appropriate since it is set to true even without speed change now.
-        i_recalculateSpeed = true;
+        _recalculateSpeed = true;
         return;
     }
 
@@ -46,48 +46,48 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
         unit->AddUnitState(UNIT_STATE_CHARGING);
     }
 
-    i_recalculateSpeed = false;
+    _recalculateSpeed = false;
     Movement::MoveSplineInit init(unit);
-    if (m_precomputedPath.size() > 2) // pussywizard: for charge
-        init.MovebyPath(m_precomputedPath);
+    if (_precomputedPath.size() > 2) // pussywizard: for charge
+        init.MovebyPath(_precomputedPath);
     else if (_generatePath)
     {
         PathGenerator path(unit);
-        bool result = path.CalculatePath(i_x, i_y, i_z, _forceDestination);
+        bool result = path.CalculatePath(_x, _y, _z, _forceDestination);
         if (result && !(path.GetPathType() & PATHFIND_NOPATH) && path.GetPath().size() > 2)
         {
-            m_precomputedPath = path.GetPath();
-            init.MovebyPath(m_precomputedPath);
+            _precomputedPath = path.GetPath();
+            init.MovebyPath(_precomputedPath);
         }
         else
         {
             // Xinef: fix strange client visual bug, moving on z coordinate only switches orientation by 180 degrees (visual only)
-            if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
+            if (G3D::fuzzyEq(unit->GetPositionX(), _x) && G3D::fuzzyEq(unit->GetPositionY(), _y))
             {
-                i_x += 0.2f * cos(unit->GetOrientation());
-                i_y += 0.2f * std::sin(unit->GetOrientation());
+                _x += 0.2f * cos(unit->GetOrientation());
+                _y += 0.2f * std::sin(unit->GetOrientation());
             }
 
-            init.MoveTo(i_x, i_y, i_z, true);
+            init.MoveTo(_x, _y, _z, true);
         }
     }
     else
     {
         // Xinef: fix strange client visual bug, moving on z coordinate only switches orientation by 180 degrees (visual only)
-        if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
+        if (G3D::fuzzyEq(unit->GetPositionX(), _x) && G3D::fuzzyEq(unit->GetPositionY(), _y))
         {
-            i_x += 0.2f * cos(unit->GetOrientation());
-            i_y += 0.2f * std::sin(unit->GetOrientation());
+            _x += 0.2f * cos(unit->GetOrientation());
+            _y += 0.2f * std::sin(unit->GetOrientation());
         }
 
-        init.MoveTo(i_x, i_y, i_z, true);
+        init.MoveTo(_x, _y, _z, true);
     }
     if (speed > 0.0f)
         init.SetVelocity(speed);
 
-    if (i_orientation > 0.0f)
+    if (_orientation > 0.0f)
     {
-        init.SetFacing(i_orientation);
+        init.SetFacing(_orientation);
     }
 
     init.Launch();
@@ -117,35 +117,35 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
 
     unit->AddUnitState(UNIT_STATE_ROAMING_MOVE);
 
-    if (id != EVENT_CHARGE_PREPATH && i_recalculateSpeed && !unit->movespline->Finalized())
+    if (id != EVENT_CHARGE_PREPATH && _recalculateSpeed && !unit->movespline->Finalized())
     {
-        i_recalculateSpeed = false;
+        _recalculateSpeed = false;
         Movement::MoveSplineInit init(unit);
 
         // xinef: speed changed during path execution, calculate remaining path and launch it once more
-        if (m_precomputedPath.size())
+        if (_precomputedPath.size())
         {
-            uint32 offset = std::min(uint32(unit->movespline->_currentSplineIdx()), uint32(m_precomputedPath.size()));
-            Movement::PointsArray::iterator offsetItr = m_precomputedPath.begin();
+            uint32 offset = std::min(uint32(unit->movespline->_currentSplineIdx()), uint32(_precomputedPath.size()));
+            Movement::PointsArray::iterator offsetItr = _precomputedPath.begin();
             std::advance(offsetItr, offset);
-            m_precomputedPath.erase(m_precomputedPath.begin(), offsetItr);
+            _precomputedPath.erase(_precomputedPath.begin(), offsetItr);
 
             // restore 0 element (current position)
-            m_precomputedPath.insert(m_precomputedPath.begin(), G3D::Vector3(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ()));
+            _precomputedPath.insert(_precomputedPath.begin(), G3D::Vector3(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ()));
 
-            if (m_precomputedPath.size() > 2)
-                init.MovebyPath(m_precomputedPath);
-            else if (m_precomputedPath.size() == 2)
-                init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z, true);
+            if (_precomputedPath.size() > 2)
+                init.MovebyPath(_precomputedPath);
+            else if (_precomputedPath.size() == 2)
+                init.MoveTo(_precomputedPath[1].x, _precomputedPath[1].y, _precomputedPath[1].z, true);
         }
         else
-            init.MoveTo(i_x, i_y, i_z, true);
+            init.MoveTo(_x, _y, _z, true);
         if (speed > 0.0f) // Default value for point motion type is 0.0, if 0.0 spline will use GetSpeed on unit
             init.SetVelocity(speed);
 
-        if (i_orientation > 0.0f)
+        if (_orientation > 0.0f)
         {
-            init.SetFacing(i_orientation);
+            init.SetFacing(_orientation);
         }
 
         init.Launch();
@@ -247,5 +247,5 @@ void EffectMovementGenerator::Finalize(Unit* unit)
     //}
 
     if (unit->ToCreature()->AI())
-        unit->ToCreature()->AI()->MovementInform(EFFECT_MOTION_TYPE, m_Id);
+        unit->ToCreature()->AI()->MovementInform(EFFECT_MOTION_TYPE, _Id);
 }

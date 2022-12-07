@@ -95,7 +95,7 @@ public:
                 }
                 case EVENT_IGNITE_MANA:
                 {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_IGNITE_MANA))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_IGNITE_MANA))
                     {
                         DoCast(target, SPELL_IGNITE_MANA);
                     }
