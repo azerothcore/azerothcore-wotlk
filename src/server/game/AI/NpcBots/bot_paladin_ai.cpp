@@ -1369,7 +1369,7 @@ public:
             if (!target && IsSpellReady(HAMMER_OF_JUSTICE_1, diff, false))
             {
                 target = FindCastingTarget(10, 0, HAMMER_OF_JUSTICE_1);
-                if (target && doCast(opponent, GetSpell(HAMMER_OF_JUSTICE_1)))
+                if (target && doCast(target, GetSpell(HAMMER_OF_JUSTICE_1)))
                 {}
             }
         }
