@@ -2,6 +2,7 @@
 #include "bot_GridNotifiers.h"
 #include "botmgr.h"
 #include "botspell.h"
+#include "bottraits.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -386,7 +387,7 @@ public:
             if (GC_Timer > diff)
                 return;
 
-            if (!CanAffectVictim(mytar, SPELL_SCHOOL_MASK_SHADOW|SPELL_SCHOOL_MASK_ARCANE))
+            if (!CanAffectVictimAny(mytar, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_ARCANE))
                 return;
 
             //Cripple

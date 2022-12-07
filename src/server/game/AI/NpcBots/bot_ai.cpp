@@ -1812,41 +1812,6 @@ void bot_ai::_getBotDispellableAuraList(Unit const* target, uint32 dispelMask, s
         }
     }
 }
-//protected
-// Quick check if current target has school immunities to prevent cast attempts spam
-// CheckBotCast()->_checkImmunities()
-bool bot_ai::CanAffectVictim(Unit const* target, uint32 schoolMask) const
-{
-    if (schoolMask == SPELL_SCHOOL_MASK_NONE)
-    {
-        LOG_ERROR("entities.player", "bot_ai::CanDamageVictim(): schoolMask is not present (class = {})", _botclass);
-        return false;
-    }
-
-    uint32 finalMask = 0;
-    if (Creature const* creature = target->ToCreature())
-    {
-        if (uint32 immune_mask = SpellSchoolMask(creature->GetCreatureTemplate()->SpellSchoolImmuneMask))
-        {
-            finalMask |= immune_mask;
-            if ((finalMask & schoolMask) == schoolMask)
-                return false;
-        }
-    }
-
-    Unit::AuraEffectList const& schoolImmunityAurasList = target->GetAuraEffectsByType(SPELL_AURA_SCHOOL_IMMUNITY);
-    if (!schoolImmunityAurasList.empty())
-    {
-        for (Unit::AuraEffectList::const_iterator itr = schoolImmunityAurasList.begin(); itr != schoolImmunityAurasList.end(); ++itr)
-        {
-            finalMask |= (*itr)->GetMiscValue();
-            if ((finalMask & schoolMask) == schoolMask)
-                return false;
-        }
-    }
-
-    return true;
-}
 // Check if can cast some spell out of main rotation to use up target's spell reflection charges
 // Supposed to check instant non-damaging spells but these checks are not performed (Shaman, Priest)
 bool bot_ai::CanRemoveReflectSpells(Unit const* target, uint32 spellId) const

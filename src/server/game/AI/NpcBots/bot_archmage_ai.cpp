@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "botspell.h"
+#include "bottraits.h"
 #include "MotionMaster.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -200,7 +201,7 @@ public:
                 SetSpellCooldown(BLIZZARD_1, 1000); //fail
             }
 
-            if (IsSpellReady(MAIN_ATTACK_1, diff) && CanAffectVictim(mytar, SPELL_SCHOOL_MASK_FIRE|SPELL_SCHOOL_MASK_ARCANE))
+            if (IsSpellReady(MAIN_ATTACK_1, diff) && CanAffectVictimAny(mytar, SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE))
             {
                 if (doCast(mytar, GetSpell(MAIN_ATTACK_1)))
                     return;

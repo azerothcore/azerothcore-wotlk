@@ -830,7 +830,7 @@ public:
                 }
             }
 
-            if (!CanAffectVictim(mytar, SPELL_SCHOOL_MASK_NORMAL))
+            if (!CanAffectVictimAny(mytar, SPELL_SCHOOL_NORMAL))
                 return;
 
             //Feral Charge
@@ -928,7 +928,7 @@ public:
                 {}
             }
 
-            if (!CanAffectVictim(mytar, SPELL_SCHOOL_MASK_NORMAL))
+            if (!CanAffectVictimAny(mytar, SPELL_SCHOOL_NORMAL))
                 return;
 
             //Faerie Fire (Feral, Cat)

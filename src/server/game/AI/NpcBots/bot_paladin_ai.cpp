@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "botmgr.h"
+#include "bottraits.h"
 #include "Creature.h"
 #include "Group.h"
 #include "Item.h"
@@ -1456,13 +1457,12 @@ public:
                     return;
             }
 
-            if (!CanAffectVictim(mytar, SPELL_SCHOOL_MASK_HOLY))
-                return;
+            auto [can_do_holy, can_do_normal] = CanAffectVictimBools(mytar, SPELL_SCHOOL_HOLY, SPELL_SCHOOL_NORMAL);
 
             float dist = me->GetDistance(mytar);
 
             //HAMMER OF WRATH
-            if (IsSpellReady(HAMMER_OF_WRATH_1, diff) && HasRole(BOT_ROLE_DPS) && Rand() < 80 &&
+            if (IsSpellReady(HAMMER_OF_WRATH_1, diff) && can_do_holy && HasRole(BOT_ROLE_DPS) && Rand() < 80 &&
                 mytar->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT) && dist < 30)
             {
                 if (doCast(mytar, GetSpell(HAMMER_OF_WRATH_1)))
@@ -1470,7 +1470,7 @@ public:
             }
             //HAND OF RECKONING //No GCD
             Unit* u = mytar->GetVictim();
-            if (IsSpellReady(HAND_OF_RECKONING_1, diff, false) && u && u != me && dist < 30 &&
+            if (IsSpellReady(HAND_OF_RECKONING_1, diff, false) && can_do_holy && u && u != me && dist < 30 &&
                 mytar->GetTypeId() == TYPEID_UNIT && !mytar->IsControlledByPlayer() &&
                 !CCed(mytar) && HasRole(BOT_ROLE_DPS) && !mytar->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
                 (!IsTank(u) || (IsTank() && GetHealthPCT(u) < 30 && GetHealthPCT(me) > 67)) &&
@@ -1524,7 +1524,7 @@ public:
                     return;
             }
             //Avenging Wrath (tank - big threat, dps - big hp, heal - divine plea counter)
-            if (IsSpellReady(AVENGING_WRATH_1, diff, false) && avDelayTimer <= diff &&
+            if (IsSpellReady(AVENGING_WRATH_1, diff, false) && can_do_holy && avDelayTimer <= diff &&
                 HasRole(BOT_ROLE_HEAL|BOT_ROLE_DPS) && Rand() < 35 && dist < 30 &&
                 IsTank() ? (mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->IsDungeonBoss() || mytar->ToCreature()->isWorldBoss())) :
                 (!HasRole(BOT_ROLE_HEAL) || !HasRole(BOT_ROLE_RANGED)) ? (mytar->GetHealth() > me->GetMaxHealth()/4 * (1 + mytar->getAttackers().size())) :
@@ -1534,7 +1534,7 @@ public:
                 {}
             }
             //Avenger's shield
-            if (IsSpellReady(AVENGERS_SHIELD_1, diff) && CanBlock() &&
+            if (IsSpellReady(AVENGERS_SHIELD_1, diff) && can_do_holy && CanBlock() &&
                 HasRole(BOT_ROLE_DPS) && dist < 30 && Rand() < 60)
             {
                 if (doCast(mytar, GetSpell(AVENGERS_SHIELD_1)))
@@ -1548,7 +1548,7 @@ public:
                     return;
             }
             //Exorcism (have cast window or instant)
-            if (IsSpellReady(EXORCISM_1, diff) && HasRole(BOT_ROLE_DPS) && dist < 30 && Rand() < 70 &&
+            if (IsSpellReady(EXORCISM_1, diff) && can_do_holy && HasRole(BOT_ROLE_DPS) && dist < 30 && Rand() < 70 &&
                 ((IsTank() && dist > 12) || (HasRole(BOT_ROLE_RANGED) && !HasRole(BOT_ROLE_HEAL)) ||
                 me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_PALADIN, 0x0, 0x0, 0x2)))
             {
@@ -1564,7 +1564,7 @@ public:
                     return;
             }
             //Judgement
-            if (GetSpellCooldown(JUDGEMENT_OF_LIGHT_1) <= diff && HasRole(BOT_ROLE_DPS) && Rand() < 120)
+            if (GetSpellCooldown(JUDGEMENT_OF_LIGHT_1) <= diff && can_do_holy && HasRole(BOT_ROLE_DPS) && Rand() < 120)
             {
                 uint32 JUDGEMENT = 0;
 
@@ -1627,14 +1627,14 @@ public:
                     return;
             }
             //Consecration
-            if (IsSpellReady(CONSECRATION_1, diff) && HasRole(BOT_ROLE_DPS) && dist < 5 &&
+            if (IsSpellReady(CONSECRATION_1, diff) && can_do_holy && HasRole(BOT_ROLE_DPS) && dist < 5 &&
                 !mytar->isMoving() && Rand() < 50)
             {
                 if (doCast(me, GetSpell(CONSECRATION_1)))
                     return;
             }
             //Hammer of the Righteous (1h only)
-            if (IsSpellReady(HAMMER_OF_THE_RIGHTEOUS_1, diff) && HasRole(BOT_ROLE_DPS) &&
+            if (IsSpellReady(HAMMER_OF_THE_RIGHTEOUS_1, diff) && can_do_holy && HasRole(BOT_ROLE_DPS) &&
                 dist < 5 && Rand() < 80)
             {
                 Item const* weapMH = GetEquips(BOT_SLOT_MAINHAND);
@@ -1645,14 +1645,14 @@ public:
                     return;
             }
             //Shield of Righteousness
-            if (IsSpellReady(SHIELD_OF_RIGHTEOUSNESS_1, diff) && HasRole(BOT_ROLE_DPS) && CanBlock() &&
+            if (IsSpellReady(SHIELD_OF_RIGHTEOUSNESS_1, diff) && can_do_holy && HasRole(BOT_ROLE_DPS) && CanBlock() &&
                 (IsTank() || IAmFree()) && dist < 5 && Rand() < 90)
             {
                 if (doCast(mytar, GetSpell(SHIELD_OF_RIGHTEOUSNESS_1)))
                     return;
             }
             //Crusader Strike (2h only)
-            if (IsSpellReady(CRUSADER_STRIKE_1, diff) && HasRole(BOT_ROLE_DPS) && dist < 5 && Rand() < 90)
+            if (IsSpellReady(CRUSADER_STRIKE_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS) && dist < 5 && Rand() < 90)
             {
                 Item const* mh = GetEquips(BOT_SLOT_MAINHAND);
                 if (mh && mh->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)
@@ -1660,7 +1660,7 @@ public:
                         return;
             }
             //Divine Storm (2h only)
-            if (IsSpellReady(DIVINE_STORM_1, diff) && HasRole(BOT_ROLE_DPS) && dist < 7 && Rand() < 40)
+            if (IsSpellReady(DIVINE_STORM_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS) && dist < 7 && Rand() < 40)
             {
                 Item const* mh = GetEquips(BOT_SLOT_MAINHAND);
                 if (mh && mh->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)

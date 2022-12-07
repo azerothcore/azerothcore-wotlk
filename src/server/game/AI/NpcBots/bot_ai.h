@@ -352,8 +352,6 @@ class bot_ai : public CreatureAI
         SpellCastResult CheckBotCast(Unit const* victim, uint32 spellId) const;
         virtual bool removeShapeshiftForm() { return true; }
 
-        [[deprecated("needs to be removed, use variadic lib version instead")]]
-        bool CanAffectVictim(Unit const* target, uint32 schoolMask) const;
         bool CanRemoveReflectSpells(Unit const* target, uint32 spellId) const;
 
         bool IsMelee() const;

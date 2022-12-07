@@ -44,18 +44,30 @@ typename fixed_tuple<typename T::second_type,N>::tuple_type to_spell_school_affe
     return to_spell_school_affect_bool_tuple_helper(std::forward<std::array<T, N>>(arr), std::make_index_sequence<N>{});
 }
 
+template<typename T, std::size_t N, std::size_t... Is>
+std::array<typename T::second_type,N> to_spell_school_affect_bool_arr_helper(std::array<T, N>&& arr, std::index_sequence<Is...>&&)
+{
+    return std::array{ arr[Is].second... };
+}
+
+template<typename T, size_t N>
+std::array<typename T::second_type,N> to_spell_school_affect_bool_arr(std::array<T, N>&& arr)
+{
+    return to_spell_school_affect_bool_arr_helper(std::forward<std::array<T, N>>(arr), std::make_index_sequence<N>{});
+}
+
 }
 
 template<typename School, typename... Schools>
 std::enable_if_t<std::conjunction_v<std::is_same<School, SpellSchools>, std::is_same<Schools, SpellSchools>...>,
     bool>
-is_valid_schools(School school, Schools... schools)
+all_schools_valid(School school, Schools... schools)
 {
     if (school < SPELL_SCHOOL_NORMAL || school >= MAX_SPELL_SCHOOL)
         return false;
 
     if constexpr (sizeof...(Schools) > 0)
-        return is_valid_schools(schools...);
+        return all_schools_valid(schools...);
     return true;
 }
 
@@ -70,7 +82,7 @@ CanAffectVictimSchools(Unit const* target, Schools... schools)
     using arr_iter_type = typename arr_type::iterator;
     arr_type results{ std::pair{schools, true}... };
 
-    if (!is_valid_schools(schools...))
+    if (!all_schools_valid(schools...))
     {
         LOG_ERROR("entities.player", "bot_ai::CanAffectVictimSchools(): trying to check invalid spell school, first: {}", uint32(results.at(0).first));
         return results;
@@ -111,29 +123,34 @@ CanAffectVictimSchools(Unit const* target, Schools... schools)
 }
 
 template<class...Schools>
-std::enable_if_t<std::conjunction_v<std::is_same<Schools, SpellSchools>...>,
-    typename NPCBots::fixed_tuple<std::pair<SpellSchools, bool>, sizeof...(Schools)>::tuple_type>
-CanAffectVictimTuple(Unit const* target, Schools... schools)
+typename NPCBots::fixed_tuple<bool, sizeof...(Schools)>::tuple_type
+CanAffectVictimBools(Unit const* target, Schools... schools)
 {
-    static_assert(sizeof...(Schools) > 0, "need at least 1 spell school to check for");
-
-    using arr_type = std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>;
-
-    arr_type results = CanAffectVictimSchools(target, schools...);
-    return NPCBots::to_tuple(std::move(results));
+    return NPCBots::to_spell_school_affect_bool_tuple(CanAffectVictimSchools(target, schools...));
 }
 
 template<class...Schools>
-std::enable_if_t<std::conjunction_v<std::is_same<Schools, SpellSchools>...>,
-    typename NPCBots::fixed_tuple<bool, sizeof...(Schools)>::tuple_type>
-CanAffectVictimBools(Unit const* target, Schools... schools)
+bool
+CanAffectVictimAny(Unit const* target, Schools... schools)
 {
-    static_assert(sizeof...(Schools) > 0, "need at least 1 spell school to check for");
-
     using arr_type = std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>;
+    using pair_type = typename arr_type::value_type;
 
-    arr_type results = CanAffectVictimSchools(target, schools...);
-    return NPCBots::to_spell_school_affect_bool_tuple(std::move(results));
+    arr_type bools = CanAffectVictimSchools(target, schools...);
+
+    return std::any_of(bools.cbegin(), bools.cend(), [](pair_type const& p) { return p.second; });
+}
+
+template<class...Schools>
+bool
+CanAffectVictimAll(Unit const* target, Schools... schools)
+{
+    using arr_type = std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>;
+    using pair_type = typename arr_type::value_type;
+
+    arr_type bools = CanAffectVictimSchools(target, schools...);
+
+    return std::all_of(bools.cbegin(), bools.cend(), [](pair_type const& p) { return p.second; });
 }
 
 #endif

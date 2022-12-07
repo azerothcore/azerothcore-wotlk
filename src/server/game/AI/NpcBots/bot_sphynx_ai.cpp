@@ -2,6 +2,7 @@
 #include "bot_GridNotifiers.h"
 #include "botmgr.h"
 #include "botspell.h"
+#include "bottraits.h"
 #include "Creature.h"
 #include "ScriptMgr.h"
 /*
@@ -198,7 +199,7 @@ public:
             if (me->isMoving() && !me->HasInArc(float(M_PI)/2, mytar))
                 return;
 
-            if (!CanAffectVictim(mytar, SPELL_SCHOOL_MASK_SHADOW|SPELL_SCHOOL_MASK_ARCANE))
+            if (!CanAffectVictimAny(mytar, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_ARCANE))
                 return;
 
             if (me->GetPower(POWER_MANA) >= SPLASH_ATTACK_COST && IsSpellReady(SPLASH_ATTACK_1, diff))

@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "botmgr.h"
+#include "bottraits.h"
 #include "Creature.h"
 #include "Group.h"
 #include "Item.h"
@@ -324,11 +325,8 @@ public:
                 {}
             }
 
-            if (!CanAffectVictim(mytar, SPELL_SCHOOL_MASK_NORMAL))
-            {
-                //TC_LOG_ERROR("entities.player", "rogue_bot: cannot attack target...");
+            if (!CanAffectVictimAny(mytar, SPELL_SCHOOL_NORMAL))
                 return;
-            }
 
             bool stealthed = me->HasAuraType(SPELL_AURA_MOD_STEALTH);
             bool shadowdance = me->HasAuraType(SPELL_AURA_MOD_IGNORE_SHAPESHIFT);
