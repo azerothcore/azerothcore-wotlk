@@ -5554,25 +5554,33 @@ void Player::SaveRecallPosition()
     m_recallO = GetOrientation();
 }
 
-void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool required3dDist /*= false*/, bool includeMargin, Player const* skipped_rcvr) const
+void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self) const
 {
     if (self)
-        GetSession()->SendPacket(data);
+        SendDirectMessage(data);
 
-    dist += GetObjectSize();
-    if (includeMargin)
-        dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
-    Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr, required3dDist);
+    Acore::MessageDistDeliverer notifier(this, data, dist);
     Cell::VisitWorldObjects(this, notifier, dist);
 }
 
-void Player::SendMessageToSetInRange_OwnTeam(WorldPacket const* data, float dist, bool self) const
+void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool own_team_only, bool required3dDist /*= false*/) const
 {
     if (self)
-        GetSession()->SendPacket(data);
+        SendDirectMessage(data);
 
-    Acore::MessageDistDeliverer notifier(this, data, dist, true);
+    Acore::MessageDistDeliverer notifier(this, data, dist, own_team_only, nullptr, required3dDist);
     Cell::VisitWorldObjects(this, notifier, dist);
+}
+
+void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
+{
+    if (skipped_rcvr != this)
+        SendDirectMessage(data);
+
+    // we use World::GetMaxVisibleDistance() because i cannot see why not use a distance
+    // update: replaced by GetMap()->GetVisibilityDistance()
+    Acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
+    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
 }
 
 void Player::SendDirectMessage(WorldPacket const* data) const
