@@ -593,7 +593,14 @@ SpellCastResult bot_ai::CheckBotCast(Unit const* victim, uint32 spellId) const
         return SPELL_FAILED_NOT_MOUNTED;
 
     if (me->GetMap()->IsDungeon() && spellInfo->CastTimeEntry && !CCed(me, true) && IsWithinAoERadius(*me))
-        return SPELL_FAILED_NOT_IDLE;
+    {
+        int32 castTime = spellInfo->CastTimeEntry->Base;
+        if (castTime > 0)
+            ApplyClassSpellCastTimeMods(spellInfo, castTime);
+
+        if (castTime > 0)
+            return SPELL_FAILED_NOT_IDLE;
+    }
 
     if (int32(me->GetPower(Powers(spellInfo->PowerType))) < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
         return SPELL_FAILED_NO_POWER;
