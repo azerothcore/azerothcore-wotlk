@@ -274,7 +274,7 @@ struct boss_eye_of_cthun : public BossAI
                 task.SetGroup(GROUP_BEAM_PHASE);
                 task.Repeat();
             })
-            .Schedule(50s, [this](TaskContext /*task*/)
+            .Schedule(46s, [this](TaskContext /*task*/)
             {
                 _scheduler.CancelGroup(GROUP_BEAM_PHASE);
 
