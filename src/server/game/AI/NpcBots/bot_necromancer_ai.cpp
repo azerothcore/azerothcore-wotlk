@@ -2,6 +2,7 @@
 #include "bot_GridNotifiers.h"
 #include "botmgr.h"
 #include "botspell.h"
+#include "bottext.h"
 #include "bottraits.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"

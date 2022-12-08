@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "botmgr.h"
+#include "bottext.h"
 #include "bottraits.h"
 #include "Creature.h"
 #include "Group.h"

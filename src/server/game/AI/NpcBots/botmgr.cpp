@@ -6,6 +6,7 @@
 #include "botdpstracker.h"
 #include "botmgr.h"
 #include "botspell.h"
+#include "bottext.h"
 #include "bpet_ai.h"
 #include "Chat.h"
 #include "Config.h"
