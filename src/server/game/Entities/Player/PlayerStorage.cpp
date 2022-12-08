@@ -5476,7 +5476,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     // Extra Bonus Talent Points
     m_extraBonusTalentCount = fields[73].Get<uint8>();
 
-    // after spell, bonus talents and quest load
+    // after spell, bonus talents, and quest load
     InitTalentForLevel();
 
     // must be before inventory (some items required reputation check)
