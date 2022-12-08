@@ -413,6 +413,14 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
                  return false;
             }
             break;
+        case SMART_TARGET_SUMMONED_CREATURES:
+        {
+            if (e.target.summonedCreatures.entry && !IsCreatureValid(e, e.target.summonedCreatures.entry))
+            {
+                return false;
+            }
+            break;
+        }
         case SMART_TARGET_HOSTILE_SECOND_AGGRO:
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
         case SMART_TARGET_HOSTILE_RANDOM:
