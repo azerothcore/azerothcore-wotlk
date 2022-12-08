@@ -181,6 +181,9 @@ class BotMgr
         uint8 GetBotAttackAngleMode() const { return _attackAngleMode; }
         void SetBotAttackAngleMode(uint8 mode) { _attackAngleMode = mode; }
 
+        bool GetBotAllowCombatPositioning() const { return _allowCombatPositioning; }
+        void SetBotAllowCombatPositioning(bool allow) { _allowCombatPositioning = allow; }
+
         uint32 GetEngageDelayDPS() const { return _npcBotEngageDelayDPS; }
         uint32 GetEngageDelayHeal() const { return _npcBotEngageDelayHeal; }
         void SetEngageDelayDPS(uint32 delay) { _npcBotEngageDelayDPS = delay; }
@@ -221,6 +224,7 @@ class BotMgr
         uint8 _exactAttackRange;
         uint8 _attackRangeMode;
         uint8 _attackAngleMode;
+        bool _allowCombatPositioning;
         uint32 _npcBotEngageDelayDPS;
         uint32 _npcBotEngageDelayHeal;
 

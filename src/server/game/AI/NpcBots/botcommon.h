@@ -169,6 +169,7 @@ enum BotCommonValues
     GOSSIP_SENDER_LEAVE_GROUP,
     GOSSIP_SENDER_FORMATION,
     GOSSIP_SENDER_FORMATION_FOLLOW_DISTANCE_SET,
+    GOSSIP_SENDER_FORMATION_TOGGLE_COMBAT_POSITIONING,
     GOSSIP_SENDER_FORMATION_ATTACK_DISTANCE,
     GOSSIP_SENDER_FORMATION_ATTACK_DISTANCE_SET,
     GOSSIP_SENDER_FORMATION_ATTACK_ANGLE,
@@ -548,7 +549,8 @@ enum BotCommonValues
     BOT_TEXT_MANA_PER_DAMAGE            = 70656, //"Mana per damage"
     BOT_TEXT_DAMAGE_PER_MANA            = 70657, //"Damage per mana"
     BOT_TEXT_TRANSMOGRIFICATION         = 70658, //"Transmogrification..."
-    //70659-70799 reserved for custom localization strings
+    BOT_TEXT_DISABLE_COMBAT_POSITIONING = 70659, //"DISABLE combat positioning"
+    //70660-70799 reserved for custom localization strings
 //VEHICLE CREATURES
     CREATURE_NEXUS_SKYTALON_1           = 32535, // [Q] Aces High
     CREATURE_EOE_SKYTALON_N             = 30161, // Eye of Eternity

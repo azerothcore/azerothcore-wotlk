@@ -1,8 +1,8 @@
 #include "bot_ai.h"
 #include "bot_Events.h"
 #include "bot_GridNotifiers.h"
-#include "botmgr.h"
 #include "botdatamgr.h"
+#include "botmgr.h"
 #include "botspell.h"
 #include "bpet_ai.h"
 #include "Bag.h"
@@ -606,6 +606,16 @@ SpellCastResult bot_ai::CheckBotCast(Unit const* victim, uint32 spellId) const
 
     if (!CanBotAttackOnVehicle())
         return SPELL_FAILED_CASTER_AURASTATE;
+
+    //forced to follow but not close enough to master
+    if (!IAmFree() && !master->GetBotMgr()->GetBotAllowCombatPositioning())
+    {
+        Position mpos;
+        _calculatePos(mpos);
+
+        if (me->GetDistance(mpos) > float(std::max<uint8>(5, master->GetBotMgr()->GetBotFollowDist() / 8)))
+            return SPELL_FAILED_NOT_IDLE;
+    }
 
     //scaling aura
     if (victim->isType(TYPEMASK_UNIT) && victim != me &&
@@ -4715,6 +4725,8 @@ void bot_ai::GetInPosition(bool force, Unit* newtarget, Position* mypos)
 {
     Unit* mover = me->GetVehicle() ? me->GetVehicleBase() : me;
     if (HasBotCommandState(BOT_COMMAND_STAY))
+        return;
+    if (!IAmFree() && !master->GetBotMgr()->GetBotAllowCombatPositioning())
         return;
     if (CCed(mover, true) || (mover == me && JumpingOrFalling()))
         return;
@@ -9137,6 +9149,13 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             //BotWhisper("Following");
             break;
         }
+        case GOSSIP_SENDER_FORMATION_TOGGLE_COMBAT_POSITIONING:
+        {
+            player->GetBotMgr()->SetBotAllowCombatPositioning(!player->GetBotMgr()->GetBotAllowCombatPositioning());
+
+            //break; //return to menu
+        }
+        [[fallthrough]];
         case GOSSIP_SENDER_FORMATION:
         {
             subMenu = true;
@@ -9147,14 +9166,16 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
 
             if (HasRole(BOT_ROLE_RANGED))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_ATTACK_DISTANCE) + "...", GOSSIP_SENDER_FORMATION_ATTACK_DISTANCE, GOSSIP_ACTION_INFO_DEF + 2);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_ATTACK_ANGLE) + "...", GOSSIP_SENDER_FORMATION_ATTACK_ANGLE, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, !player->GetBotMgr()->GetBotAllowCombatPositioning() ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT,
+                    LocalizedNpcText(player, BOT_TEXT_DISABLE_COMBAT_POSITIONING) + "...", GOSSIP_SENDER_FORMATION_TOGGLE_COMBAT_POSITIONING, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_ATTACK_DISTANCE) + "...", GOSSIP_SENDER_FORMATION_ATTACK_DISTANCE, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_ATTACK_ANGLE) + "...", GOSSIP_SENDER_FORMATION_ATTACK_ANGLE, GOSSIP_ACTION_INFO_DEF + 4);
             }
 
             if (!HasRole(BOT_ROLE_TANK) && HasRole(BOT_ROLE_DPS | BOT_ROLE_HEAL))
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_ENGAGE_BEHAVIOR) + "...", GOSSIP_SENDER_ENGAGE_BEHAVIOR, GOSSIP_ACTION_INFO_DEF + 4);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_ENGAGE_BEHAVIOR) + "...", GOSSIP_SENDER_ENGAGE_BEHAVIOR, GOSSIP_ACTION_INFO_DEF + 5);
 
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 5);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 6);
             break;
         }
         case GOSSIP_SENDER_FORMATION_ATTACK_DISTANCE_SET:
@@ -15765,6 +15786,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
 
         Unit* mover = me->GetVehicle() ? me->GetVehicleBase() : me;
         if (!HasBotCommandState(BOT_COMMAND_MASK_UNCHASE) && !CCed(mover, true) &&
+            (IAmFree() || master->GetBotMgr()->GetBotAllowCombatPositioning()) &&
             (!mover->isMoving() || Rand() < 50) && !IsCasting(mover) && !IsShootingWand(mover))
         {
             if (Unit* victim = CanBotAttackOnVehicle() ? me->GetVictim() : mover->GetTarget() ? ObjectAccessor::GetUnit(*mover, mover->GetTarget()) : nullptr)
@@ -15822,7 +15844,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         return false;
 
     //opponent unsafe
-    if (!opponent && !IAmFree() && !HasBotCommandState(BOT_COMMAND_STAY) &&
+    if (!IAmFree() && (!opponent || !master->GetBotMgr()->GetBotAllowCombatPositioning()) && !HasBotCommandState(BOT_COMMAND_STAY) &&
         (!me->GetVehicle() || (!CCed(me->GetVehicleBase(), true) && !me->GetVehicleBase()->GetTarget())))
     {
         Unit* mover = me->GetVehicle() ? me->GetVehicleBase() : me;
