@@ -510,17 +510,6 @@ void Battlefield::ShowNpc(Creature* creature, bool aggressive)
     }
 }
 
-void Battlefield::HidePortal(GameObject* go)
-{
-    go->SetPhaseMask(2, false);
-    //TODO
-}
-
-void Battlefield::ShowPortal(GameObject* go)
-{
-    go->SetPhaseMask(1, false);
-    //TODO
-}
 // ****************************************************
 // ******************* Group System *******************
 // ****************************************************
@@ -932,7 +921,8 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint, TeamId team)
 {
     ASSERT(capturePoint);
 
-    if (team == TEAM_NEUTRAL)//At first call we change team neutral, after first call we reset the capturepoints to the new winner of WG
+	//At first call using TEAM_NEUTRAL as a checker but never using it, after first call we reset the capturepoints to the new winner of the last WG war
+    if (team == TEAM_NEUTRAL)
         team = m_team;
     LOG_DEBUG("bg.battlefield", "Creating capture point {}", capturePoint->GetEntry());
 
