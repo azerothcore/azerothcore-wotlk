@@ -3334,6 +3334,24 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     }
                 }
             }
+            break;
+        }
+        case SMART_TARGET_SUMMONED_CREATURES:
+        {
+            if (me)
+            {
+                for (ObjectGuid const& guid : _summonList)
+                {
+                    if (!e.target.summonedCreatures.entry || guid.GetEntry() == e.target.summonedCreatures.entry)
+                    {
+                        if (Creature* creature = me->GetMap()->GetCreature(guid))
+                        {
+                            targets.push_back(creature);
+                        }
+                    }
+                }
+            }
+            break;
         }
         case SMART_TARGET_NONE:
         case SMART_TARGET_POSITION:
@@ -4559,4 +4577,14 @@ bool SmartScript::IsInPhase(uint32 p) const
     }
 
     return ((1 << (mEventPhase - 1)) & p) != 0;
+}
+
+void SmartScript::AddCreatureSummon(ObjectGuid const& guid)
+{
+    _summonList.insert(guid);
+}
+
+void SmartScript::RemoveCreatureSummon(ObjectGuid const& guid)
+{
+    _summonList.erase(guid);
 }
