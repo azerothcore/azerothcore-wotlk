@@ -596,7 +596,7 @@ SpellCastResult bot_ai::CheckBotCast(Unit const* victim, uint32 spellId) const
 
     if (me->GetMap()->IsDungeon() && spellInfo->CastTimeEntry && !CCed(me, true) && IsWithinAoERadius(*me))
     {
-        int32 castTime = spellInfo->CastTimeEntry->Base;
+        int32 castTime = spellInfo->CastTimeEntry->CastTime;
         if (castTime > 0)
             ApplyClassSpellCastTimeMods(spellInfo, castTime);
 
