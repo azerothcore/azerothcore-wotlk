@@ -510,6 +510,17 @@ void Battlefield::ShowNpc(Creature* creature, bool aggressive)
     }
 }
 
+void Battlefield::HidePortal(GameObject* go)
+{
+    go->SetPhaseMask(2, false);
+    //TODO
+}
+
+void Battlefield::ShowPortal(GameObject* go)
+{
+    go->SetPhaseMask(1, false);
+    //TODO
+}
 // ****************************************************
 // ******************* Group System *******************
 // ****************************************************
@@ -917,10 +928,12 @@ void BfCapturePoint::SendChangePhase()
             }
 }
 
-bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
+bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint, TeamId team)
 {
     ASSERT(capturePoint);
 
+    if (team == TEAM_NEUTRAL)//At first call we change team neutral, after first call we reset the capturepoints to the new winner of WG
+        team = m_team;
     LOG_DEBUG("bg.battlefield", "Creating capture point {}", capturePoint->GetEntry());
 
     m_capturePoint = capturePoint->GetGUID();
@@ -939,7 +952,7 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
     m_neutralValuePct = goinfo->capturePoint.neutralPercent;
     m_minValue = m_maxValue * goinfo->capturePoint.neutralPercent / 100;
     m_capturePointEntry = capturePoint->GetEntry();
-    if (m_team == TEAM_ALLIANCE)
+    if (team == TEAM_ALLIANCE)
     {
         m_value = m_maxValue;
         m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE;
