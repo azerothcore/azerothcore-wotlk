@@ -2242,6 +2242,9 @@ void Player::SetGMVisible(bool on)
         RemoveAurasDueToSpell(VISUAL_AURA);
         m_ExtraFlags &= ~PLAYER_EXTRA_GM_INVISIBLE;
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
+
+        getHostileRefMgr().setOnlineOfflineState(false);
+        CombatStopWithPets();
     }
     else
     {
