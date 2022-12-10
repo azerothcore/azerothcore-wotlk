@@ -841,7 +841,7 @@ public:
                     case TEXT_EMOTE_DANCE:
                         if (!player->HasAura(SPELL_SEDUCTION))
                         {
-                            player->Dismount();
+                            player->RemoveAurasByType(SPELL_AURA_MOUNTED);
                             DoCast(player, SPELL_SEDUCTION, true);
                         }
                         break;
