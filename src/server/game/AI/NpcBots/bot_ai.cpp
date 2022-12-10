@@ -10029,7 +10029,7 @@ bool bot_ai::_canLootCreatureForPlayer(Player* player, Creature* creature, uint3
             continue;
         }
 
-        if (_canLootItemForPlayer(player, creature, slot - 1) && i->AllowedForPlayer(player))
+        if (_canLootItemForPlayer(player, creature, slot - 1) && i->AllowedForPlayer(player, creature->GetGUID()))
         {
             canLoot = true;
             break;
@@ -10073,7 +10073,7 @@ bool bot_ai::_canLootCreatureForPlayer(Player* player, Creature* creature, uint3
 
                 uint8 qslot = uint8(creature->loot.items.size() + (qi - q_list->begin()));
 
-                if (_canLootItemForPlayer(player, creature, qslot) && i->AllowedForPlayer(player))
+                if (_canLootItemForPlayer(player, creature, qslot) && i->AllowedForPlayer(player, creature->GetGUID()))
                 {
                     canLoot = true;
                     break;
@@ -10250,7 +10250,7 @@ void bot_ai::_autoLootCreatureItems(Player* receiver, Creature* creature, uint32
         if (!((1 << itemProto->Quality) & lootQualityMask))
             continue;
 
-        if (_canLootItemForPlayer(receiver, creature, slot - 1) && i->AllowedForPlayer(receiver))
+        if (_canLootItemForPlayer(receiver, creature, slot - 1) && i->AllowedForPlayer(receiver, creature->GetGUID()))
         {
             //TC_LOG_ERROR("scripts", "looting %s (%u), quality %u, threshold %u",
             //    itemProto->Name1.c_str(), itemProto->ItemId, itemProto->Quality, lootThreshold);
@@ -10290,7 +10290,7 @@ void bot_ai::_autoLootCreatureItems(Player* receiver, Creature* creature, uint32
 
             uint8 qslot = uint8(creature->loot.items.size() + (qi - q_list->begin()));
 
-            if (_canLootItemForPlayer(receiver, creature, qslot) && i->AllowedForPlayer(receiver))
+            if (_canLootItemForPlayer(receiver, creature, qslot) && i->AllowedForPlayer(receiver, creature->GetGUID()))
                 receiver->StoreLootItem(qslot, &creature->loot);
         }
     }
