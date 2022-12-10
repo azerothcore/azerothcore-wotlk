@@ -1962,7 +1962,7 @@ void bot_ai::_listAuras(Player const* player, Unit const* unit) const
         //ch.PSendSysMessage("base total %s: %.1f", mystat.c_str(), totalstat);
         if (unit == me)
         {
-            BotStatMods t = BotStatMods(-1);
+            BotStatMods t = MAX_BOT_ITEM_MOD;
             switch (i)
             {
                 case STAT_STRENGTH:     t = BOT_STAT_MOD_STRENGTH;  break;
@@ -1973,7 +1973,7 @@ void bot_ai::_listAuras(Player const* player, Unit const* unit) const
                 default:                                            break;
             }
 
-            if (t >= BOT_STAT_MOD_MANA)
+            if (t < MAX_BOT_ITEM_MOD)
                 totalstat = GetTotalBotStat(t);
         }
         botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_TOTAL) << " " << mystat << ": " << float(totalstat);
