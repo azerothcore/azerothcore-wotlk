@@ -112,6 +112,11 @@ public:
                         }
                     }
                     break;
+                case NPC_HYAKISS_THE_LURKER:
+                case NPC_SHADIKITH_THE_GLIDER:
+                case NPC_ROKAD_THE_RAVAGER:
+                    SetBossState(DATA_OPTIONAL_BOSS, DONE);
+                    break;
                 default:
                     break;
             }
@@ -126,6 +131,17 @@ public:
                         ++OzDeathCount;
                     else if (data == IN_PROGRESS)
                         OzDeathCount = 0;
+                    break;
+                case DATA_SPAWN_OPERA_DECORATIONS:
+                {
+                    for (ObjectGuid const& guid : _operaDecorations[data - 1])
+                    {
+                        DoRespawnGameObject(guid, DAY);
+                    }
+
+                    break;
+                }
+                default:
                     break;
             }
         }
@@ -220,20 +236,25 @@ public:
                 case GO_DUST_COVERED_CHEST:
                     DustCoveredChest = go->GetGUID();
                     break;
+                case GO_OZ_BACKDROP:
+                case GO_OZ_HAY:
+                    _operaDecorations[EVENT_OZ - 1].push_back(go->GetGUID());
+                    break;
+                case GO_HOOD_BACKDROP:
+                case GO_HOOD_TREE:
+                case GO_HOOD_HOUSE:
+                    _operaDecorations[EVENT_HOOD - 1].push_back(go->GetGUID());
+                    break;
+                case GO_RAJ_BACKDROP:
+                case GO_RAJ_MOON:
+                case GO_RAJ_BALCONY:
+                    _operaDecorations[EVENT_RAJ - 1].push_back(go->GetGUID());
+                    break;
+                default:
+                    break;
             }
 
-            switch (OperaEvent)
-            {
-                /// @todo Set Object visibilities for Opera based on performance
-                case EVENT_OZ:
-                    break;
-
-                case EVENT_HOOD:
-                    break;
-
-                case EVENT_RAJ:
-                    break;
-            }
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         uint32 GetData(uint32 type) const override
@@ -315,6 +336,7 @@ public:
         ObjectGuid ImageGUID;
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;
+        GuidVector _operaDecorations[EVENT_RAJ];
     };
 };
 
