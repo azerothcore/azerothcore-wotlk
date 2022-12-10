@@ -1,3 +1,4 @@
+-- DB update 2022_12_09_00 -> 2022_12_10_00
 --
 UPDATE `creature_template` SET `unit_class` = 2 WHERE `entry` IN (19287, 19288, 19290);
 
