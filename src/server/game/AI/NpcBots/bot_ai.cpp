@@ -1962,7 +1962,7 @@ void bot_ai::_listAuras(Player const* player, Unit const* unit) const
         //ch.PSendSysMessage("base total %s: %.1f", mystat.c_str(), totalstat);
         if (unit == me)
         {
-            int8 t = -1;
+            BotStatMods t = BotStatMods(-1);
             switch (i)
             {
                 case STAT_STRENGTH:     t = BOT_STAT_MOD_STRENGTH;  break;
@@ -2482,7 +2482,7 @@ void bot_ai::SetStats(bool force)
     for (uint8 i = SPELL_SCHOOL_HOLY; i != MAX_SPELL_SCHOOL; ++i)
     {
         value = IAmFree() ? 0 : mylevel;
-        value += _getTotalBotStat(BOT_STAT_MOD_RESIST_HOLY + (i - 1));
+        value += _getTotalBotStat(BotStatMods(BOT_STAT_MOD_RESIST_HOLY + (i - 1)));
 
         //res bonuses
         if (_botclass == BOT_CLASS_SPHYNX)
@@ -11888,12 +11888,12 @@ void bot_ai::ApplyItemsSpells()
     ApplyItemSetBonuses(nullptr, true); //item set bonuses
 }
 //stats bonuses from equipment
-inline float bot_ai::_getBotStat(uint8 slot, uint8 stat) const
+inline float bot_ai::_getBotStat(uint8 slot, BotStatMods stat) const
 {
     return float(_stats[slot][stat]);
 }
 
-inline float bot_ai::_getTotalBotStat(uint8 stat) const
+inline float bot_ai::_getTotalBotStat(BotStatMods stat) const
 {
     int32 value = 0;
     for (uint8 slot = BOT_SLOT_MAINHAND; slot != BOT_INVENTORY_SIZE; ++slot)

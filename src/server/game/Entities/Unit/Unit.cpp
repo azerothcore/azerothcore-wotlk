@@ -9341,6 +9341,23 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             if (GetStat(STAT_INTELLECT) > stat) { trigger_spell_id = 60234; stat = GetStat(STAT_INTELLECT);}
                             // spirit
                             if (GetStat(STAT_SPIRIT)   > stat) { trigger_spell_id = 60235;                               }
+
+                            //npcbot: try get stats
+                            if (!trigger_spell_id && GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+                            {
+                                int32 bstat = 0;
+                                int32 bstat_str = BotMgr::GetBotStat(ToCreature(), BOT_STAT_MOD_STRENGTH);
+                                int32 bstat_agi = BotMgr::GetBotStat(ToCreature(), BOT_STAT_MOD_AGILITY);
+                                int32 bstat_int = BotMgr::GetBotStat(ToCreature(), BOT_STAT_MOD_INTELLECT);
+                                int32 bstat_spi = BotMgr::GetBotStat(ToCreature(), BOT_STAT_MOD_SPIRIT);
+
+                                if (bstat_str > bstat) { trigger_spell_id = 60229; bstat = bstat_str; }
+                                if (bstat_agi > bstat) { trigger_spell_id = 60233; bstat = bstat_agi; }
+                                if (bstat_int > bstat) { trigger_spell_id = 60234; bstat = bstat_int; }
+                                if (bstat_spi > bstat) { trigger_spell_id = 60235; bstat = bstat_spi; }
+                            }
+                            //end npcbot
+
                             break;
                         }
                     case 67702:             // Death's Choice, Item - Coliseum 25 Normal Melee Trinket
@@ -9352,6 +9369,19 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             if (GetStat(STAT_STRENGTH) > stat) { trigger_spell_id = 67708; stat = GetStat(STAT_STRENGTH); }
                             // agility
                             if (GetStat(STAT_AGILITY)  > stat) { trigger_spell_id = 67703;                               }
+
+                            //npcbot: try get stats
+                            if (!trigger_spell_id && GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+                            {
+                                int32 bstat = 0;
+                                int32 bstat_str = BotMgr::GetBotStat(ToCreature(), BOT_STAT_MOD_STRENGTH);
+                                int32 bstat_agi = BotMgr::GetBotStat(ToCreature(), BOT_STAT_MOD_AGILITY);
+
+                                if (bstat_str > bstat) { trigger_spell_id = 67708; bstat = bstat_str; }
+                                if (bstat_agi > bstat) { trigger_spell_id = 67703; bstat = bstat_agi; }
+                            }
+                            //end npcbot
+
                             break;
                         }
                     case 67771:             // Death's Choice (heroic), Item - Coliseum 25 Heroic Melee Trinket
@@ -9363,6 +9393,19 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             if (GetStat(STAT_STRENGTH) > stat) { trigger_spell_id = 67773; stat = GetStat(STAT_STRENGTH); }
                             // agility
                             if (GetStat(STAT_AGILITY)  > stat) { trigger_spell_id = 67772;                               }
+
+                            //npcbot: try get stats
+                            if (!trigger_spell_id && GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+                            {
+                                int32 bstat = 0;
+                                int32 bstat_str = BotMgr::GetBotStat(ToCreature(), BOT_STAT_MOD_STRENGTH);
+                                int32 bstat_agi = BotMgr::GetBotStat(ToCreature(), BOT_STAT_MOD_AGILITY);
+
+                                if (bstat_str > bstat) { trigger_spell_id = 67773; bstat = bstat_str; }
+                                if (bstat_agi > bstat) { trigger_spell_id = 67772; bstat = bstat_agi; }
+                            }
+                            //end npcbot
+
                             break;
                         }
                     // Mana Drain Trigger

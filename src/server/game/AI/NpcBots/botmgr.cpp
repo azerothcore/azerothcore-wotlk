@@ -1739,6 +1739,11 @@ float BotMgr::GetBotDamageTakenMod(Creature const* bot, bool magic)
     return bot->GetBotAI()->GetBotDamageTakenMod(magic);
 }
 
+int32 BotMgr::GetBotStat(Creature const* bot, BotStatMods stat)
+{
+    return bot->GetBotAI()->GetTotalBotStat(stat);
+}
+
 float BotMgr::GetBotDamageModPhysical()
 {
     return _mult_dmg_physical;

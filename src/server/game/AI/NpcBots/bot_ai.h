@@ -209,7 +209,7 @@ class bot_ai : public CreatureAI
 
         MeleeHitOutcome BotRollCustomMeleeOutcomeAgainst(Unit const* victim, WeaponAttackType attType) const;
 
-        float GetTotalBotStat(uint8 stat) const { return _getTotalBotStat(stat); }
+        float GetTotalBotStat(BotStatMods stat) const { return _getTotalBotStat(stat); }
 
         Item* GetEquips(uint8 slot) const { return _equips[slot]; }
         Item* GetEquipsByGuid(ObjectGuid itemGuid) const;
@@ -582,8 +582,8 @@ class bot_ai : public CreatureAI
         void _LocalizeGameObject(Player const* forPlayer, std::string &gameobjectName, uint32 entry) const;
         void _LocalizeSpell(Player const* forPlayer, std::string &spellName, uint32 entry) const;
 
-        float _getBotStat(uint8 slot, uint8 stat) const;
-        float _getTotalBotStat(uint8 stat) const;
+        float _getBotStat(uint8 slot, BotStatMods stat) const;
+        float _getTotalBotStat(BotStatMods stat) const;
         float _getRatingMultiplier(CombatRating cr) const;
 
         float _getStatScore(uint8 stat) const;

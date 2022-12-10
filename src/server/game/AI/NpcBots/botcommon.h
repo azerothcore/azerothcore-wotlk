@@ -410,7 +410,7 @@ enum BotPetOriginalEntries
     ORIGINAL_ENTRY_HUNTER_PET           = 1 // from Pet.cpp InitStatsForLevel()
 };
 
-enum BotEquipSlot
+enum BotEquipSlot : uint8
 {
     BOT_SLOT_MAINHAND           = 0,
     BOT_SLOT_OFFHAND            = 1,
@@ -435,7 +435,7 @@ enum BotEquipSlot
 
 constexpr uint8 BOT_TRANSMOG_INVENTORY_SIZE = 13; // BOT_SLOT_BODY + 1
 
-enum BotStatMods
+enum BotStatMods: uint8
 {
     //ItemProtoType.h
     BOT_STAT_MOD_MANA                       = 0,
