@@ -102,7 +102,7 @@ bool BattlefieldWG::SetupBattlefield()
 
         // When between games, the graveyard is controlled by the defending team
         if (WGGraveYard[i].startcontrol == TEAM_NEUTRAL)
-            graveyard->Initialize(m_DefenderTeam == TEAM_ALLIANCE && (WGGraveYard[i].gyid == BATTLEFIELD_WG_GY_WORKSHOP_SE || WGGraveYard[i].gyid == BATTLEFIELD_WG_GY_WORKSHOP_SW) ? TEAM_HORDE : m_DefenderTeam, WGGraveYard[i].gyid);
+            graveyard->Initialize(WGGraveYard[i].gyid == BATTLEFIELD_WG_GY_WORKSHOP_SE || WGGraveYard[i].gyid == BATTLEFIELD_WG_GY_WORKSHOP_SW ? GetAttackerTeam() : m_DefenderTeam, WGGraveYard[i].gyid);
         else
             graveyard->Initialize(WGGraveYard[i].startcontrol, WGGraveYard[i].gyid);
 
@@ -114,7 +114,7 @@ bool BattlefieldWG::SetupBattlefield()
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WGWorkshop* workshop = new WGWorkshop(this, i);
-        if ((i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW) && i < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+        if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
             workshop->GiveControlTo(GetAttackerTeam(), true);
         else
             workshop->GiveControlTo(GetDefenderTeam(), true);
@@ -380,7 +380,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // Update all graveyard, control is to defender when no wartime
     for (uint8 i = 0; i < BATTLEFIELD_WG_GY_HORDE; i++)
         if (BfGraveyard* graveyard = GetGraveyardById(i))
-                graveyard->GiveControlTo(i == BATTLEFIELD_WG_GY_WORKSHOP_SE || i == BATTLEFIELD_WG_GY_WORKSHOP_SW ? GetAttackerTeam() : GetDefenderTeam());
+            graveyard->GiveControlTo(i == BATTLEFIELD_WG_GY_WORKSHOP_SE || i == BATTLEFIELD_WG_GY_WORKSHOP_SW ? GetAttackerTeam() : GetDefenderTeam());
 
     for (GameObjectSet::const_iterator itr = m_KeepGameObject[GetDefenderTeam()].begin(); itr != m_KeepGameObject[GetDefenderTeam()].end(); ++itr)
         (*itr)->SetRespawnTime(RESPAWN_IMMEDIATELY);
@@ -403,7 +403,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     for (Workshop::const_iterator itr = WorkshopsList.begin(); itr != WorkshopsList.end(); ++itr)
     {
         (*itr)->GiveControlTo((*itr)->workshopId == BATTLEFIELD_WG_WORKSHOP_SE || (*itr)->workshopId == BATTLEFIELD_WG_WORKSHOP_SW ? GetAttackerTeam() : GetDefenderTeam(), true);
-        (*itr)->Save();   
+        (*itr)->Save();
     }
 
 

@@ -64,10 +64,10 @@ Battlefield::Battlefield()
 Battlefield::~Battlefield()
 {
     for (BfCapturePointVector::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        delete *itr;
+        delete* itr;
 
     for (GraveyardVect::const_iterator itr = m_GraveyardList.begin(); itr != m_GraveyardList.end(); ++itr)
-        delete *itr;
+        delete* itr;
 
     m_capturePoints.clear();
 }
@@ -911,7 +911,7 @@ void BfCapturePoint::SendChangePhase()
                 // send this too, sometimes the slider disappears, dunno why :(
                 player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
                 // send these updates to only the ones in this objective
-                player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) std::ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f));
+                player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32)std::ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f));
                 // send this too, sometimes it resets :S
                 player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
             }
@@ -921,7 +921,7 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint, TeamId team)
 {
     ASSERT(capturePoint);
 
-	//At first call using TEAM_NEUTRAL as a checker but never using it, after first call we reset the capturepoints to the new winner of the last WG war
+    //At first call using TEAM_NEUTRAL as a checker but never using it, after first call we reset the capturepoints to the new winner of the last WG war
     if (team == TEAM_NEUTRAL)
         team = m_team;
     LOG_DEBUG("bg.battlefield", "Creating capture point {}", capturePoint->GetEntry());
@@ -1012,7 +1012,7 @@ bool BfCapturePoint::Update(uint32 diff)
                 HandlePlayerEnter(*itr);
 
     // get the difference of numbers
-    float fact_diff = ((float) m_activePlayers[0].size() - (float) m_activePlayers[1].size()) * diff / BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL;
+    float fact_diff = ((float)m_activePlayers[0].size() - (float)m_activePlayers[1].size()) * diff / BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL;
     if (G3D::fuzzyEq(fact_diff, 0.0f))
         return false;
 
@@ -1110,14 +1110,14 @@ void BfCapturePoint::SendObjectiveComplete(uint32 id, ObjectGuid guid)
     uint8 team;
     switch (m_State)
     {
-        case BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE:
-            team = 0;
-            break;
-        case BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE:
-            team = 1;
-            break;
-        default:
-            return;
+    case BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE:
+        team = 0;
+        break;
+    case BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE:
+        team = 1;
+        break;
+    default:
+        return;
     }
 
     // send to all players present in the area

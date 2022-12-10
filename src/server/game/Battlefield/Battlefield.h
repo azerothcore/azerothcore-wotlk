@@ -348,6 +348,9 @@ public:
 
     void HideNpc(Creature* creature);
     void ShowNpc(Creature* creature, bool aggressive);
+    //Hide|Show Dalaran portals from wintergrasp
+    void HidePortal(GameObject* go);
+    void ShowPortal(GameObject* go);
 
     GraveyardVect GetGraveyardVector() { return m_GraveyardList; }
 
@@ -420,6 +423,7 @@ protected:
 
     // CapturePoint system
     void AddCapturePoint(BfCapturePoint* cp) { m_capturePoints.push_back(cp); }
+    void ClearCapturePoint() { m_capturePoints.clear(); }
 
     void RegisterZone(uint32 zoneid);
     bool HasPlayer(Player* player) const;
