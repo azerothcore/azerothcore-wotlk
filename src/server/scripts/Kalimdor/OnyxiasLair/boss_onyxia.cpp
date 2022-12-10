@@ -211,18 +211,11 @@ public:
             return;
         }
 
-        if (summon->GetEntry() == NPC_ONYXIAN_LAIR_GUARD && Phase != PHASE_LANDED)
-        {
-            return;
-        }
-
         if (Unit* target = summon->SelectNearestTarget(300.0f))
         {
             summon->AI()->AttackStart(target);
             DoZoneInCombat(summon);
         }
-
-        summons.Summon(summon);
     }
 
     void MovementInform(uint32 type, uint32 id) override
