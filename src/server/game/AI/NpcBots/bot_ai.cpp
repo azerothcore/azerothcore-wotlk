@@ -4021,7 +4021,8 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
         mytar = nullptr;
     }
 
-    if (u && !IAmFree() && (master->IsInCombat() || u->IsInCombat())/* && !InDuel(u)*/ && !IsInBotParty(u) && (BotMgr::IsPvPEnabled() || !u->IsControlledByPlayer()))
+    if (u && !IAmFree() && (master->IsInCombat() || u->IsInCombat())/* && !InDuel(u)*/ && !IsInBotParty(u) && (BotMgr::IsPvPEnabled() || !u->IsControlledByPlayer()) &&
+        (!HasBotCommandState(BOT_COMMAND_STAY) || (!IsRanged() ? me->IsWithinMeleeRange(u) : me->GetDistance(u) < foldist)))
     {
         //TC_LOG_ERROR("entities.player", "bot %s starts attack master's target %s", me->GetName().c_str(), u->GetName().c_str());
         return { u, u };
@@ -11893,7 +11894,7 @@ inline float bot_ai::_getBotStat(uint8 slot, BotStatMods stat) const
     return float(_stats[slot][stat]);
 }
 
-inline float bot_ai::_getTotalBotStat(BotStatMods stat) const
+float bot_ai::_getTotalBotStat(BotStatMods stat) const
 {
     int32 value = 0;
     for (uint8 slot = BOT_SLOT_MAINHAND; slot != BOT_INVENTORY_SIZE; ++slot)
