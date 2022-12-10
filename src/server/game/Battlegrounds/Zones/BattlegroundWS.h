@@ -1,11 +1,26 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef __BATTLEGROUNDWS_H
 #define __BATTLEGROUNDWS_H
 
 #include "Battleground.h"
+#include "BattlegroundScore.h"
+#include "EventMap.h"
 
 enum BG_WS_Events
 {
@@ -15,18 +30,37 @@ enum BG_WS_Events
     BG_WS_EVENT_ALLIANCE_DROP_FLAG  = 4,
     BG_WS_EVENT_HORDE_DROP_FLAG     = 5,
     BG_WS_EVENT_BOTH_FLAGS_KEPT10   = 6,
-    BG_WS_EVENT_BOTH_FLAGS_KEPT15   = 7
+    BG_WS_EVENT_BOTH_FLAGS_KEPT15   = 7,
+    BG_WS_EVENT_DESPAWN_DOORS       = 8
 };
 
 enum BG_WS_TimerOrScore
 {
     BG_WS_MAX_TEAM_SCORE            = 3,
 
-    BG_WS_TOTAL_GAME_TIME           = 27*MINUTE*IN_MILLISECONDS,
-    BG_WS_FLAG_RESPAWN_TIME         = 23*IN_MILLISECONDS,
-    BG_WS_FLAG_DROP_TIME            = 10*IN_MILLISECONDS,
-    BG_WS_SPELL_FORCE_TIME          = 10*MINUTE*IN_MILLISECONDS,
-    BG_WS_SPELL_BRUTAL_TIME         = 15*MINUTE*IN_MILLISECONDS
+    BG_WS_TOTAL_GAME_TIME           = 27 * MINUTE * IN_MILLISECONDS,
+    BG_WS_FLAG_RESPAWN_TIME         = 23 * IN_MILLISECONDS,
+    BG_WS_FLAG_DROP_TIME            = 10 * IN_MILLISECONDS,
+    BG_WS_SPELL_FORCE_TIME          = 10 * MINUTE * IN_MILLISECONDS,
+    BG_WS_SPELL_BRUTAL_TIME         = 15 * MINUTE * IN_MILLISECONDS,
+    BG_WS_DOOR_DESPAWN_TIME         = 5 * IN_MILLISECONDS
+};
+
+enum BG_WS_BroadcastTexts
+{
+    BG_WS_TEXT_START_ONE_MINUTE         = 10015,
+    BG_WS_TEXT_START_HALF_MINUTE        = 10016,
+    BG_WS_TEXT_BATTLE_HAS_BEGUN         = 10014,
+
+    BG_WS_TEXT_CAPTURED_HORDE_FLAG      = 9801,
+    BG_WS_TEXT_CAPTURED_ALLIANCE_FLAG   = 9802,
+    BG_WS_TEXT_FLAGS_PLACED             = 9803,
+    BG_WS_TEXT_ALLIANCE_FLAG_PICKED_UP  = 9804,
+    BG_WS_TEXT_ALLIANCE_FLAG_DROPPED    = 9805,
+    BG_WS_TEXT_HORDE_FLAG_PICKED_UP     = 9807,
+    BG_WS_TEXT_HORDE_FLAG_DROPPED       = 9806,
+    BG_WS_TEXT_ALLIANCE_FLAG_RETURNED   = 9808,
+    BG_WS_TEXT_HORDE_FLAG_RETURNED      = 9809,
 };
 
 enum BG_WS_Sound
@@ -127,7 +161,6 @@ enum BG_WS_CreatureTypes
     BG_CREATURES_MAX_WS       = 2
 };
 
-
 enum BG_WS_Objectives
 {
     WS_OBJECTIVE_CAPTURE_FLAG   = 42,
@@ -136,73 +169,111 @@ enum BG_WS_Objectives
     WS_EVENT_START_BATTLE       = 8563
 };
 
-struct BattlegroundWGScore : public BattlegroundScore
+enum BG_WS_Trigger
 {
-    BattlegroundWGScore(Player* player): BattlegroundScore(player), FlagCaptures(0), FlagReturns(0) { }
-    ~BattlegroundWGScore() { }
-    uint32 FlagCaptures;
-    uint32 FlagReturns;
+    BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN           = 3646,
+    BG_WS_TRIGGER_HORDE_FLAG_SPAWN              = 3647,
 
-    uint32 GetAttr1() const final override { return FlagCaptures; }
-    uint32 GetAttr2() const final override { return FlagReturns; }
+    BG_WS_TRIGGER_ALLIANCE_ELIXIR_SPEED_SPAWN   = 3686,
+    BG_WS_TRIGGER_HORDE_ELIXIR_SPEED_SPAWN      = 3687,
+
+    BG_WS_TRIGGER_ALLIANCE_ELIXIR_REGEN_SPAWN   = 3706,
+    BG_WS_TRIGGER_HORDE_ELIXIR_REGEN_SPAWN      = 3708,
+
+    BG_WS_TRIGGER_ALLIANCE_ELIXIR_BERSERK_SPAWN = 3707,
+    BG_WS_TRIGGER_HORDE_ELIXIR_BERSERK_SPAWN    = 3709,
 };
 
-class BattlegroundWS : public Battleground
+struct BattlegroundWGScore final : public BattlegroundScore
 {
-    public:
-        /* Construction */
-        BattlegroundWS();
-        ~BattlegroundWS();
+    friend class BattlegroundWS;
 
-        /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
+protected:
+    BattlegroundWGScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
 
-        /* BG Flags */
-        uint64 GetFlagPickerGUID(TeamId teamId) const { return _flagKeepers[teamId];  }
-        void SetFlagPicker(uint64 guid, TeamId teamId) { _flagKeepers[teamId] = guid; }
-        void RespawnFlagAfterDrop(TeamId teamId);
-        uint8 GetFlagState(TeamId teamId) const { return _flagState[teamId]; }
+    void UpdateScore(uint32 type, uint32 value) override
+    {
+        switch (type)
+        {
+        case SCORE_FLAG_CAPTURES:   // Flags captured
+            FlagCaptures += value;
+            break;
+        case SCORE_FLAG_RETURNS:    // Flags returned
+            FlagReturns += value;
+            break;
+        default:
+            BattlegroundScore::UpdateScore(type, value);
+            break;
+        }
+    }
 
-        /* Battleground Events */
-        void EventPlayerDroppedFlag(Player* player);
-        void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject);
-        void EventPlayerCapturedFlag(Player* player);
+    void BuildObjectivesBlock(WorldPacket& data) final;
 
-        void RemovePlayer(Player* player);
-        void HandleAreaTrigger(Player* player, uint32 trigger);
-        void HandleKillPlayer(Player* player, Player* killer);
-        bool SetupBattleground();
-        void Init();
-        void EndBattleground(TeamId winnerTeamId);
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+    uint32 GetAttr1() const override { return FlagCaptures; }
+    uint32 GetAttr2() const override { return FlagReturns; }
 
-        void UpdateFlagState(TeamId teamId, uint32 value);
-        void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
-        void SetDroppedFlagGUID(uint64 guid, TeamId teamId) { _droppedFlagGUID[teamId] = guid; }
-        uint64 GetDroppedFlagGUID(TeamId teamId) const { return _droppedFlagGUID[teamId];}
-        void FillInitialWorldStates(WorldPacket& data);
-
-        /* Scorekeeping */
-        void AddPoints(TeamId teamId, uint32 points) { m_TeamScores[teamId] += points; }
-        
-        TeamId GetPrematureWinner();
-        uint32 GetMatchTime() const { return 1 + (BG_WS_TOTAL_GAME_TIME - GetStartTime()) / (MINUTE*IN_MILLISECONDS); }
-        uint32 GetAssaultSpellId() const;
-        void RemoveAssaultAuras();
-
-    private:
-        EventMap _bgEvents;
-
-        uint64 _flagKeepers[2];
-        uint64 _droppedFlagGUID[2];
-        uint8  _flagState[2];
-        TeamId _lastFlagCaptureTeam;
-        uint32 _reputationCapture;
-        uint32 _honorWinKills;
-        uint32 _honorEndKills;
-
-        void PostUpdateImpl(uint32 diff);
+    uint32 FlagCaptures = 0;
+    uint32 FlagReturns = 0;
 };
+
+class AC_GAME_API BattlegroundWS : public Battleground
+{
+public:
+    /* Construction */
+    BattlegroundWS();
+    ~BattlegroundWS() override;
+
+    /* inherited from BattlegroundClass */
+    void AddPlayer(Player* player) override;
+    void StartingEventCloseDoors() override;
+    void StartingEventOpenDoors() override;
+
+    /* BG Flags */
+    ObjectGuid GetFlagPickerGUID(TeamId teamId) const override { return _flagKeepers[teamId];  }
+    void SetFlagPicker(ObjectGuid guid, TeamId teamId) { _flagKeepers[teamId] = guid; }
+    void RespawnFlagAfterDrop(TeamId teamId);
+    uint8 GetFlagState(TeamId teamId) const { return _flagState[teamId]; }
+    void CheckFlagKeeperInArea(TeamId teamId);
+
+    /* Battleground Events */
+    void EventPlayerDroppedFlag(Player* player) override;
+    void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject) override;
+    void EventPlayerCapturedFlag(Player* player);
+
+    void RemovePlayer(Player* player) override;
+    void HandleAreaTrigger(Player* player, uint32 trigger) override;
+    void HandleKillPlayer(Player* player, Player* killer) override;
+    bool SetupBattleground() override;
+    void Init() override;
+    void EndBattleground(TeamId winnerTeamId) override;
+    GraveyardStruct const* GetClosestGraveyard(Player* player) override;
+
+    void UpdateFlagState(TeamId teamId, uint32 value);
+    bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
+    void SetDroppedFlagGUID(ObjectGuid guid, TeamId teamId) override { _droppedFlagGUID[teamId] = guid; }
+    ObjectGuid GetDroppedFlagGUID(TeamId teamId) const { return _droppedFlagGUID[teamId];}
+    void FillInitialWorldStates(WorldPacket& data) override;
+
+    /* Scorekeeping */
+    void AddPoints(TeamId teamId, uint32 points) { m_TeamScores[teamId] += points; }
+
+    TeamId GetPrematureWinner() override;
+    uint32 GetMatchTime() const { return 1 + (BG_WS_TOTAL_GAME_TIME - GetStartTime()) / (MINUTE * IN_MILLISECONDS); }
+    uint32 GetAssaultSpellId() const;
+    void RemoveAssaultAuras();
+
+private:
+    EventMap _bgEvents;
+
+    ObjectGuid _flagKeepers[2];
+    ObjectGuid _droppedFlagGUID[2];
+    uint8  _flagState[2];
+    TeamId _lastFlagCaptureTeam;
+    uint32 _reputationCapture;
+    uint32 _honorWinKills;
+    uint32 _honorEndKills;
+
+    void PostUpdateImpl(uint32 diff) override;
+};
+
 #endif

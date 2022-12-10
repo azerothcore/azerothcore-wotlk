@@ -1,0 +1,53 @@
+### TITLE
+## Type(Scope/Subscope): Commit ultra short explanation
+## |---- Write below the examples with a maximum of 50 characters ----|
+## Example 1: fix(DB/SAI): Missing spell to NPC Hogger
+## Example 2: fix(CORE/Raid): Phase 2 of Ragnaros
+## Example 3: feat(CORE/Commands): New GM command to do something
+
+
+### DESCRIPTION
+## Explain why this change is being made, what does it fix etc...
+## |---- Write below the examples with a maximum of 72 characters per lines ----|
+## Example: Hogger (id: 492) was not charging player when being engaged.
+
+
+## Provide links to any issue, commit, pull request or other resource
+## Example 1: Closes AzerothCore issue #23
+## Example 2: Ported from other project's commit (link)
+## Example 3: References taken from wowpedia / wowhead / wowwiki / https://wowgaming.altervista.org/aowow/
+
+
+### CO-AUTHOR(S)
+## If there are more authors they can be mentioned like this
+## Co-authored-by: name <name@example.com>
+
+
+## =======================================================
+##                     EXTRA INFOS
+## =======================================================
+## "Type" can be:
+##    feat     (new feature)
+##    fix      (bug fix)
+##    refactor (refactoring production code)
+##    style    (formatting, missing semi colons, etc; no code change)
+##    docs     (changes to documentation)
+##    test     (adding or refactoring tests; no production code change)
+##    chore    (updating bash scripts, git files etc; no production code change)
+## --------------------
+## Remember to
+##    Capitalize the subject line
+##    Use the imperative mood in the subject line
+##    Do not end the subject line with a period
+##    Separate subject from body with a blank line
+##    Use the body to explain what and why rather than how
+##    Can use multiple lines with "-" for bullet points in body
+## --------------------
+## More info here https://www.conventionalcommits.org/en/v1.0.0-beta.2/
+## =======================================================
+## "Scope" can be:
+##    CORE     (core related, c++)
+##    DB       (database related, sql)
+## =======================================================
+## "Subscope" is optional and depends on the nature of the commit.
+## =======================================================

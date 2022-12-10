@@ -1,16 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_CORPSE_H
 #define AZEROTHCORE_CORPSE_H
 
-#include "Object.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
 #include "LootMgr.h"
+#include "Object.h"
 
 enum CorpseType
 {
@@ -36,38 +47,41 @@ enum CorpseFlags
 
 class Corpse : public WorldObject, public GridObject<Corpse>
 {
-    public:
-        explicit Corpse(CorpseType type = CORPSE_BONES);
-        ~Corpse();
+public:
+    explicit Corpse(CorpseType type = CORPSE_BONES);
+    ~Corpse() override;
 
-        void AddToWorld();
-        void RemoveFromWorld();
+    void AddToWorld() override;
+    void RemoveFromWorld() override;
 
-        bool Create(uint32 guidlow, Map* map);
-        bool Create(uint32 guidlow, Player* owner);
+    void BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const override;
 
-        void SaveToDB();
-        bool LoadCorpseFromDB(uint32 guid, Field* fields);
+    bool Create(ObjectGuid::LowType guidlow);
+    bool Create(ObjectGuid::LowType guidlow, Player* owner);
 
-        void DeleteFromDB(SQLTransaction& trans);
+    void SaveToDB();
+    bool LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields);
 
-        uint64 GetOwnerGUID() const { return GetUInt64Value(CORPSE_FIELD_OWNER); }
+    void DeleteFromDB(CharacterDatabaseTransaction trans);
+    static void DeleteFromDB(ObjectGuid const ownerGuid, CharacterDatabaseTransaction trans);
 
-        time_t const& GetGhostTime() const { return m_time; }
-        void ResetGhostTime() { m_time = time(NULL); }
-        CorpseType GetType() const { return m_type; }
+    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(CORPSE_FIELD_OWNER); }
 
-        GridCoord const& GetGridCoord() const { return _gridCoord; }
-        void SetGridCoord(GridCoord const& gridCoord) { _gridCoord = gridCoord; }
+    [[nodiscard]] time_t const& GetGhostTime() const { return m_time; }
+    void ResetGhostTime();
+    [[nodiscard]] CorpseType GetType() const { return m_type; }
 
-        Loot loot;                                          // remove insignia ONLY at BG
-        Player* lootRecipient;
+    [[nodiscard]] CellCoord const& GetCellCoord() const { return _cellCoord; }
+    void SetCellCoord(CellCoord const& cellCoord) { _cellCoord = cellCoord; }
 
-        bool IsExpired(time_t t) const;
+    Loot loot;                                          // remove insignia ONLY at BG
+    Player* lootRecipient;
 
-    private:
-        CorpseType m_type;
-        time_t m_time;
-        GridCoord _gridCoord;                                    // gride for corpse position for fast search
+    [[nodiscard]] bool IsExpired(time_t t) const;
+
+private:
+    CorpseType m_type;
+    time_t m_time;
+    CellCoord _cellCoord;
 };
 #endif

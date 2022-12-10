@@ -1,13 +1,26 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __BATTLEGROUNDDS_H
 #define __BATTLEGROUNDDS_H
 
-#include "Battleground.h"
+#include "Arena.h"
+#include "Duration.h"
+#include "EventMap.h"
 
 enum BattlegroundDSObjectTypes
 {
@@ -22,7 +35,7 @@ enum BattlegroundDSObjectTypes
     BG_DS_OBJECT_MAX            = 8
 };
 
-enum BattlegroundDSObjects
+enum BattlegroundDSGameObjects
 {
     BG_DS_OBJECT_TYPE_DOOR_1    = 192642,
     BG_DS_OBJECT_TYPE_DOOR_2    = 192643,
@@ -50,61 +63,54 @@ enum BattlegroundDSSpells
     BG_DS_SPELL_FLUSH             = 57405, // Visual and target selector for the starting knockback from the pipe
     BG_DS_SPELL_FLUSH_KNOCKBACK   = 61698, // Knockback effect for previous spell (triggered, not need to be casted)
     BG_DS_SPELL_WATER_SPOUT       = 58873, // Knockback effect of the central waterfall
+    SPELL_WARL_DEMONIC_CIRCLE     = 48018  // Demonic Circle Summon
 };
 
 enum BattlegroundDSData
-{ // These values are NOT blizzlike... need the correct data!
-    BG_DS_WATERFALL_TIMER_MIN                    = 30000,
-    BG_DS_WATERFALL_TIMER_MAX                    = 60000,
-    BG_DS_WATERFALL_WARNING_DURATION             = 5000,
-    BG_DS_WATERFALL_DURATION                     = 30000,
-    BG_DS_WATERFALL_KNOCKBACK_TIMER              = 1500,
-
-    BG_DS_PIPE_KNOCKBACK_FIRST_DELAY             = 5000,
-    BG_DS_PIPE_KNOCKBACK_DELAY                   = 3000,
-    BG_DS_PIPE_KNOCKBACK_TOTAL_COUNT             = 2,
-
-    BG_DS_WATERFALL_STATUS_WARNING               = 1, // Water starting to fall, but no LoS Blocking nor movement blocking
-    BG_DS_WATERFALL_STATUS_ON                    = 2, // LoS and Movement blocking active
-    BG_DS_WATERFALL_STATUS_OFF                   = 3,
-};
-
-class BattlegroundDS : public Battleground
 {
-    public:
-        BattlegroundDS();
-        ~BattlegroundDS();
-
-        /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
-
-        void RemovePlayer(Player* player);
-        void HandleAreaTrigger(Player* player, uint32 trigger);
-        bool SetupBattleground();
-        void Init();
-        void FillInitialWorldStates(WorldPacket &d);
-        void HandleKillPlayer(Player* player, Player* killer);
-        bool HandlePlayerUnderMap(Player* player);
-    private:
-        uint32 _waterfallTimer;
-        uint8 _waterfallStatus;
-        uint32 _waterfallKnockbackTimer;
-        uint32 _pipeKnockBackTimer;
-        uint8 _pipeKnockBackCount;
-
-        void PostUpdateImpl(uint32 diff);
-    protected:
-        uint32 getWaterFallStatus() { return _waterfallStatus; };
-        void setWaterFallStatus(uint8 status) { _waterfallStatus = status; };
-        uint32 getWaterFallTimer() { return _waterfallTimer; };
-        void setWaterFallTimer(uint32 timer) { _waterfallTimer = timer; };
-        uint32 getWaterFallKnockbackTimer() { return _waterfallKnockbackTimer; };
-        void setWaterFallKnockbackTimer(uint32 timer) { _waterfallKnockbackTimer = timer; };
-        uint8 getPipeKnockBackCount() { return _pipeKnockBackCount; };
-        void setPipeKnockBackCount(uint8 count) { _pipeKnockBackCount = count; };
-        uint32 getPipeKnockBackTimer() { return _pipeKnockBackTimer; };
-        void setPipeKnockBackTimer(uint32 timer) { _pipeKnockBackTimer = timer; };
+    BG_DS_PIPE_KNOCKBACK_FIRST_DELAY    = 5000,
+    BG_DS_PIPE_KNOCKBACK_DELAY          = 3000,
+    BG_DS_PIPE_KNOCKBACK_TOTAL_COUNT    = 2,
 };
+
+// These values are NOT blizzlike... need the correct data!
+constexpr Seconds BG_DS_WATERFALL_TIMER_MIN = 30s;
+constexpr Seconds BG_DS_WATERFALL_TIMER_MAX = 60s;
+constexpr Seconds BG_DS_WATERFALL_WARNING_DURATION = 5s;
+constexpr Seconds BG_DS_WATERFALL_DURATION = 30s;
+constexpr Milliseconds BG_DS_WATERFALL_KNOCKBACK_TIMER = 1500ms;
+
+enum BattlegroundDSEvents
+{
+    BG_DS_EVENT_WATERFALL_WARNING       = 1, // Water starting to fall, but no LoS Blocking nor movement blocking
+    BG_DS_EVENT_WATERFALL_ON            = 2, // LoS and Movement blocking active
+    BG_DS_EVENT_WATERFALL_OFF           = 3,
+    BG_DS_EVENT_WATERFALL_KNOCKBACK     = 4,
+
+    BG_DS_EVENT_PIPE_KNOCKBACK          = 5
+};
+
+class AC_GAME_API BattlegroundDS : public Arena
+{
+public:
+    BattlegroundDS();
+
+    /* inherited from BattlegroundClass */
+    void StartingEventCloseDoors() override;
+    void StartingEventOpenDoors() override;
+
+    void HandleAreaTrigger(Player* player, uint32 trigger) override;
+    bool SetupBattleground() override;
+    void FillInitialWorldStates(WorldPacket& d) override;
+    bool HandlePlayerUnderMap(Player* player) override;
+
+private:
+    void PostUpdateImpl(uint32 diff) override;
+
+    uint32 _pipeKnockBackTimer;
+    uint8 _pipeKnockBackCount;
+
+    EventMap _events;
+};
+
 #endif

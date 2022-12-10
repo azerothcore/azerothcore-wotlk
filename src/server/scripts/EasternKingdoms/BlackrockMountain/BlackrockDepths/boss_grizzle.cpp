@@ -1,17 +1,35 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "blackrock_depths.h"
 
 enum Grizzle
 {
     SPELL_GROUNDTREMOR      = 6524,
-    SPELL_FRENZY            = 28371,
+    SPELL_FRENZY            = 8269,
     EMOTE_FRENZY_KILL       = 0
+};
+
+enum Timer
+{
+    TIMER_GROUNDTREMOR  = 10000,
+    TIMER_FRENZY        = 15000
 };
 
 class boss_grizzle : public CreatureScript
@@ -19,51 +37,63 @@ class boss_grizzle : public CreatureScript
 public:
     boss_grizzle() : CreatureScript("boss_grizzle") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_grizzleAI(creature);
+        return GetBlackrockDepthsAI<boss_grizzleAI>(creature);
     }
 
-    struct boss_grizzleAI : public ScriptedAI
+    struct boss_grizzleAI : public BossAI
     {
-        boss_grizzleAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_grizzleAI(Creature* creature) : BossAI(creature, DATA_GRIZZLE) {}
 
-        uint32 GroundTremor_Timer;
-        uint32 Frenzy_Timer;
+        uint32 nextTremorTime;
 
-        void Reset()
+        void EnterCombat(Unit* /*who*/) override
         {
-            GroundTremor_Timer = 12000;
-            Frenzy_Timer =0;
+            _EnterCombat();
+            events.ScheduleEvent(SPELL_GROUNDTREMOR, 0.2 * (int) TIMER_GROUNDTREMOR);
+            events.ScheduleEvent(SPELL_FRENZY, 0.2 * (int) TIMER_FRENZY);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
-
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
+            {
                 return;
+            }
+            events.Update(diff);
 
-            //GroundTremor_Timer
-            if (GroundTremor_Timer <= diff)
+            if (me->HasUnitState(UNIT_STATE_CASTING))
             {
-                DoCastVictim(SPELL_GROUNDTREMOR);
-                GroundTremor_Timer = 8000;
-            } else GroundTremor_Timer -= diff;
-
-            //Frenzy_Timer
-            if (HealthBelowPct(51))
-            {
-                if (Frenzy_Timer <= diff)
-                {
-                    DoCast(me, SPELL_FRENZY);
-                    Talk(EMOTE_FRENZY_KILL);
-
-                    Frenzy_Timer = 15000;
-                } else Frenzy_Timer -= diff;
+                return;
             }
 
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case SPELL_GROUNDTREMOR:
+                    if (me->GetDistance2d(me->GetVictim()) < 10.0f)
+                    {
+                        DoCastVictim(SPELL_GROUNDTREMOR);
+                        nextTremorTime = urand(TIMER_GROUNDTREMOR - 2000, TIMER_GROUNDTREMOR + 2000);
+                    }
+                    else
+                    {
+                        nextTremorTime = 0.3*urand(TIMER_GROUNDTREMOR - 2000, TIMER_GROUNDTREMOR + 2000);
+                    }
+                    events.ScheduleEvent(SPELL_GROUNDTREMOR, nextTremorTime);
+                    break;
+                case SPELL_FRENZY:
+                    DoCastSelf(SPELL_FRENZY);
+                    events.ScheduleEvent(SPELL_FRENZY, urand(TIMER_FRENZY - 2000, TIMER_FRENZY + 2000));
+                    Talk(EMOTE_FRENZY_KILL);
+                    break;
+                default:
+                    break;
+                }
+            }
             DoMeleeAttackIfReady();
         }
     };

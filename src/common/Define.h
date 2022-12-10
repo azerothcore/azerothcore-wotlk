@@ -1,80 +1,104 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_DEFINE_H
-#define TRINITY_DEFINE_H
-
-#include <cstdint>
-#include <cstddef>
-#include <sys/types.h>
-#include <ace/Basic_Types.h>
-#include <ace/ACE_export.h>
-#include <ace/Default_Constants.h>
+#ifndef ACORE_DEFINE_H
+#define ACORE_DEFINE_H
 
 #include "CompilerDefs.h"
+#include <cinttypes>
+#include <climits>
+#include <cstddef>
 
+#define ACORE_LITTLEENDIAN 0
+#define ACORE_BIGENDIAN    1
 
-
-#if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
-#define OS_WIN
+#if !defined(ACORE_ENDIAN)
+#  if defined (BOOST_BIG_ENDIAN)
+#    define ACORE_ENDIAN ACORE_BIGENDIAN
+#  else
+#    define ACORE_ENDIAN ACORE_LITTLEENDIAN
+#  endif
 #endif
 
-#define TRINITY_LITTLEENDIAN 0
-#define TRINITY_BIGENDIAN    1
-
-#if !defined(TRINITY_ENDIAN)
-#  if defined (ACE_BIG_ENDIAN)
-#    define TRINITY_ENDIAN TRINITY_BIGENDIAN
-#  else //ACE_BYTE_ORDER != ACE_BIG_ENDIAN
-#    define TRINITY_ENDIAN TRINITY_LITTLEENDIAN
-#  endif //ACE_BYTE_ORDER
-#endif //TRINITY_ENDIAN
-
-#if PLATFORM == PLATFORM_WINDOWS
-#  define TRINITY_PATH_MAX MAX_PATH
-#  ifndef DECLSPEC_NORETURN
-#    define DECLSPEC_NORETURN __declspec(noreturn)
-#  endif //DECLSPEC_NORETURN
-#  ifndef DECLSPEC_DEPRECATED
-#    define DECLSPEC_DEPRECATED __declspec(deprecated)
-#  endif //DECLSPEC_DEPRECATED
-#else //PLATFORM != PLATFORM_WINDOWS
-#  define TRINITY_PATH_MAX PATH_MAX
-#  define DECLSPEC_NORETURN
-#  define DECLSPEC_DEPRECATED
-#endif //PLATFORM
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+#  define ACORE_PATH_MAX MAX_PATH
+#  define _USE_MATH_DEFINES
+#else //AC_PLATFORM != AC_PLATFORM_WINDOWS
+#  define ACORE_PATH_MAX PATH_MAX
+#endif //AC_PLATFORM
 
 #if !defined(COREDEBUG)
-#  define TRINITY_INLINE inline
+#  define ACORE_INLINE inline
 #else //COREDEBUG
-#  if !defined(TRINITY_DEBUG)
-#    define TRINITY_DEBUG
-#  endif //TRINITY_DEBUG
-#  define TRINITY_INLINE
+#  if !defined(ACORE_DEBUG)
+#    define ACORE_DEBUG
+#  endif //ACORE_DEBUG
+#  define ACORE_INLINE
 #endif //!COREDEBUG
 
-#if COMPILER == COMPILER_GNU
-#  define ATTR_NORETURN __attribute__((noreturn))
+#if AC_COMPILER == AC_COMPILER_GNU
 #  define ATTR_PRINTF(F, V) __attribute__ ((format (printf, F, V)))
-#  define ATTR_DEPRECATED __attribute__((deprecated))
-#else //COMPILER != COMPILER_GNU
-#  define ATTR_NORETURN
+#else //AC_COMPILER != AC_COMPILER_GNU
 #  define ATTR_PRINTF(F, V)
-#  define ATTR_DEPRECATED
-#endif //COMPILER == COMPILER_GNU
+#endif //AC_COMPILER == AC_COMPILER_GNU
 
-#define UI64FMTD ACE_UINT64_FORMAT_SPECIFIER
-#define UI64LIT(N) ACE_UINT64_LITERAL(N)
+#ifdef ACORE_API_USE_DYNAMIC_LINKING
+#  if AC_COMPILER == AC_COMPILER_MICROSOFT
+#    define AC_API_EXPORT __declspec(dllexport)
+#    define AC_API_IMPORT __declspec(dllimport)
+#  elif AC_COMPILER == AC_COMPILER_GNU
+#    define AC_API_EXPORT __attribute__((visibility("default")))
+#    define AC_API_IMPORT
+#  else
+#    error compiler not supported!
+#  endif
+#else
+#  define AC_API_EXPORT
+#  define AC_API_IMPORT
+#endif
 
-#define SI64FMTD ACE_INT64_FORMAT_SPECIFIER
-#define SI64LIT(N) ACE_INT64_LITERAL(N)
+#ifdef ACORE_API_EXPORT_COMMON
+#  define AC_COMMON_API AC_API_EXPORT
+#else
+#  define AC_COMMON_API AC_API_IMPORT
+#endif
 
-#define SIZEFMTD ACE_SIZE_T_FORMAT_SPECIFIER
+#ifdef ACORE_API_EXPORT_DATABASE
+#  define AC_DATABASE_API AC_API_EXPORT
+#else
+#  define AC_DATABASE_API AC_API_IMPORT
+#endif
 
-#define UNUSED(x) (void)(x)
+#ifdef ACORE_API_EXPORT_SHARED
+#  define AC_SHARED_API AC_API_EXPORT
+#else
+#  define AC_SHARED_API AC_API_IMPORT
+#endif
+
+#ifdef ACORE_API_EXPORT_GAME
+#  define AC_GAME_API AC_API_EXPORT
+#else
+#  define AC_GAME_API AC_API_IMPORT
+#endif
+
+#define UI64LIT(N) UINT64_C(N)
+#define SI64LIT(N) INT64_C(N)
+
+#define STRING_VIEW_FMT_ARG(str) static_cast<int>((str).length()), (str).data()
 
 typedef std::int64_t int64;
 typedef std::int32_t int32;
@@ -85,4 +109,4 @@ typedef std::uint32_t uint32;
 typedef std::uint16_t uint16;
 typedef std::uint8_t uint8;
 
-#endif //TRINITY_DEFINE_H
+#endif //ACORE_DEFINE_H

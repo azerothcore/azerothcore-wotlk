@@ -1,0 +1,68 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Linux/Docker debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/azerothcore/env/dist/bin/worldserver",
+            "cwd": "/azerothcore",
+            "args": [],
+            "environment": [],
+            "externalConsole": false,
+            "sourceFileMap": {
+                "/azerothcore": "${workspaceFolder}"
+            },
+            "linux": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": false
+                    }
+                ]
+            }
+        },
+        {
+            "name": "(docker run) Pipe Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/azerothcore/env/dist/bin/worldserver",
+            "cwd": "/azerothcore",
+            "args": [],
+            "environment": [],
+            "externalConsole": true,
+            "pipeTransport": {
+                "debuggerPath": "/usr/bin/gdb",
+                "pipeProgram": "docker compose",
+                "pipeArgs": [
+                    "exec", "-T", "ac-worldserver", "sh", "-c"
+                ],
+                "pipeCwd": "${workspaceFolder}"
+            },
+            "sourceFileMap": {
+                "/azerothcore": "${workspaceFolder}"
+            },
+            "linux": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": false
+                    }
+                ]
+            },
+            "osx": {
+                "MIMode": "lldb"
+            },
+            "windows": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
+            }
+        }
+    ]
+}

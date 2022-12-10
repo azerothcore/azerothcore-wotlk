@@ -1,12 +1,25 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "trial_of_the_crusader.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "trial_of_the_crusader.h"
-#include "Player.h"
 
 enum MenuTexts
 {
@@ -21,17 +34,17 @@ class npc_announcer_toc10 : public CreatureScript
 public:
     npc_announcer_toc10() : CreatureScript("npc_announcer_toc10") { }
 
-    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if( !pCreature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) )
+        if(!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
-        InstanceScript* pInstance = pCreature->GetInstanceScript();
-        if( !pInstance )
+        InstanceScript* pInstance = creature->GetInstanceScript();
+        if(!pInstance)
             return true;
 
         uint32 gossipTextId = 0;
-        switch( pInstance->GetData(TYPE_INSTANCE_PROGRESS) )
+        switch(pInstance->GetData(TYPE_INSTANCE_PROGRESS))
         {
             case INSTANCE_PROGRESS_INITIAL:
                 gossipTextId = MSG_TESTED;
@@ -46,33 +59,33 @@ public:
                 gossipTextId = MSG_CRUSADERS;
                 break;
             case INSTANCE_PROGRESS_DONE:
-                pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 return true;
             default:
                 return true;
         }
 
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1337);
-        pPlayer->SEND_GOSSIP_MENU(gossipTextId, pCreature->GetGUID());
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+        SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*sender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 uiAction) override
     {
-        if( !pCreature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) )
+        if( !creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP) )
             return true;
 
-        InstanceScript* pInstance = pCreature->GetInstanceScript();
+        InstanceScript* pInstance = creature->GetInstanceScript();
         if( !pInstance )
             return true;
 
-        if( uiAction == GOSSIP_ACTION_INFO_DEF+1337 )
+        if( uiAction == GOSSIP_ACTION_INFO_DEF + 1337 )
         {
             pInstance->SetData(TYPE_ANNOUNCER_GOSSIP_SELECT, 0);
-            pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
-        pPlayer->CLOSE_GOSSIP_MENU();
+        CloseGossipMenuFor(player);
         return true;
     }
 };

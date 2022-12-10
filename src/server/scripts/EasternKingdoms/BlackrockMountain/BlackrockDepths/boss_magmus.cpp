@@ -1,11 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "blackrock_depths.h"
 
 enum Spells
 {
@@ -13,9 +25,12 @@ enum Spells
     SPELL_WARSTOMP                                         = 24375
 };
 
-enum Misc
+enum SpellTimers
 {
-    DATA_THRONE_DOOR                                       = 24 // not id or guid of doors but number of enum in blackrock_depths.h
+    SPELL_FIERYBURST_MIN = 4000,
+    SPELL_FIERYBURST_MAX = 8000,
+    SPELL_WARSTOMP_MIN   = 8000,
+    SPELL_WARSTOMP_MAX   = 12000
 };
 
 class boss_magmus : public CreatureScript
@@ -23,56 +38,57 @@ class boss_magmus : public CreatureScript
 public:
     boss_magmus() : CreatureScript("boss_magmus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_magmusAI(creature);
+        return GetBlackrockDepthsAI<boss_magmusAI>(creature);
     }
 
-    struct boss_magmusAI : public ScriptedAI
+    struct boss_magmusAI : public BossAI
     {
-        boss_magmusAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_magmusAI(Creature* creature) : BossAI(creature, TYPE_IRON_HALL) {}
 
-        uint32 FieryBurst_Timer;
-        uint32 WarStomp_Timer;
-
-        void Reset()
+        void Reset() override
         {
-            FieryBurst_Timer = 5000;
-            WarStomp_Timer =0;
+            _Reset();
+            instance->SetData(TYPE_IRON_HALL, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override
+        {
+            instance->SetData(TYPE_IRON_HALL, IN_PROGRESS);
+            _EnterCombat();
+            events.ScheduleEvent(SPELL_FIERYBURST, urand(SPELL_FIERYBURST_MIN, SPELL_FIERYBURST_MAX));
+            events.ScheduleEvent(SPELL_WARSTOMP, urand(SPELL_WARSTOMP_MIN, SPELL_WARSTOMP_MAX));
 
-        void UpdateAI(uint32 diff)
+        }
+
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
+            {
                 return;
+            }
+            events.Update(diff);
 
-            //FieryBurst_Timer
-            if (FieryBurst_Timer <= diff)
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                DoCastVictim(SPELL_FIERYBURST);
-                FieryBurst_Timer = 6000;
-            } else FieryBurst_Timer -= diff;
-
-            //WarStomp_Timer
-            if (HealthBelowPct(51))
-            {
-                if (WarStomp_Timer <= diff)
+                switch (eventId)
                 {
+                case SPELL_WARSTOMP:
                     DoCastVictim(SPELL_WARSTOMP);
-                    WarStomp_Timer = 8000;
-                } else WarStomp_Timer -= diff;
+                    events.ScheduleEvent(SPELL_WARSTOMP, urand(SPELL_WARSTOMP_MIN, SPELL_WARSTOMP_MAX));
+                    break;
+                case SPELL_FIERYBURST:
+                    DoCastVictim(SPELL_FIERYBURST);
+                    events.ScheduleEvent(SPELL_FIERYBURST, urand(SPELL_FIERYBURST_MIN, SPELL_FIERYBURST_MAX));
+                    break;
+                default:
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
-        }
-        // When he die open door to last chamber
-        void JustDied(Unit* killer)
-        {
-            if (InstanceScript* instance = killer->GetInstanceScript())
-                instance->HandleGameObject(instance->GetData64(DATA_THRONE_DOOR), true);
         }
     };
 };

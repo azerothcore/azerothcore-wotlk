@@ -1,0 +1,32 @@
+-- DB update 2022_02_11_04 -> 2022_02_12_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_02_11_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_02_11_04 2022_02_12_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1642354321277117900'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1642354321277117900');
+
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry` IN (19832,19873);
+INSERT INTO `conditions` VALUES
+(13,5,19832,0,0,31,0,3,12435,0,0,0,0,'','Possess targets Razorgore the Untamed'),
+(13,1,19873,0,0,31,0,5,177807,0,0,0,0,'','Destroy Egg targets Razorgore\'s Egg');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_02_12_00' WHERE sql_rev = '1642354321277117900';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

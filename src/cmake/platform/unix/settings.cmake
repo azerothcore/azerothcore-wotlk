@@ -1,3 +1,15 @@
+#
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+
 # Package overloads - Linux
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   if (NOT NOJEM)
@@ -40,5 +52,7 @@ elseif(CMAKE_C_COMPILER MATCHES "icc")
 elseif(CMAKE_C_COMPILER MATCHES "clang" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
   include(${CMAKE_SOURCE_DIR}/src/cmake/compiler/clang/settings.cmake)
 else()
-add_definitions(-D_BUILD_DIRECTIVE='"${CMAKE_BUILD_TYPE}"')
+  target_compile_definitions(acore-compile-option-interface
+    INTERFACE
+      -D_BUILD_DIRECTIVE="${CMAKE_BUILD_TYPE}")
 endif()

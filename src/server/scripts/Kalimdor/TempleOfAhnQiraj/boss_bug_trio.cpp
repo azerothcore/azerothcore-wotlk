@@ -1,328 +1,492 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-SDName: boss_kri, boss_yauj, boss_vem : The Bug Trio
-SD%Complete: 100
-SDComment:
-SDCategory: Temple of Ahn'Qiraj
-EndScriptData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "temple_of_ahnqiraj.h"
+#include "TaskScheduler.h"
 
 enum Spells
 {
-    SPELL_CLEAVE       = 26350,
-    SPELL_TOXIC_VOLLEY = 25812,
-    SPELL_POISON_CLOUD = 38718, //Only Spell with right dmg.
-    SPELL_ENRAGE       = 34624, //Changed cause 25790 is cast on gamers too. Same prob with old explosion of twin emperors.
+    SPELL_BLOODY_DEATH   = 25770,
+    SPELL_FULL_HEAL      = 17683,
 
-    SPELL_CHARGE       = 26561,
-    SPELL_KNOCKBACK    = 26027,
+    // Kri
+    SPELL_CLEAVE         = 26350,
+    SPELL_THRASH         = 3391,
+    SPELL_TOXIC_VOLLEY   = 25812,
+    SPELL_POISON_CLOUD   = 26590,
 
-    SPELL_HEAL         = 25807,
-    SPELL_FEAR         = 19408
+    // Vem
+    SPELL_CHARGE         = 26561,
+    SPELL_KNOCKBACK      = 18670,
+    SPELL_KNOCKDOWN      = 19128,
+    SPELL_VENGEANCE      = 25790,
+
+    // Yauj
+    SPELL_HEAL           = 25807,
+    SPELL_FEAR           = 26580,
+    SPELL_RAVAGE         = 3242,
+    SPELL_DISPEL         = 25808,
+
+    NPC_YAUJ_BROOD       = 15621
 };
 
-class boss_kri : public CreatureScript
+enum Misc
+{
+    ACTION_CONSUME       = 0,
+    ACTION_EXPLODE       = 1,
+
+    EMOTE_DEVOURED       = 0,
+
+    POINT_CONSUME        = 0,
+
+    VEM_WAYPOINT_PATH    = 876030
+};
+
+const Position resetPoint = { -8582.0f, 2047.0f, -1.62f }; // Taken from CMangos
+
+struct boss_bug_trio : public BossAI
 {
 public:
-    boss_kri() : CreatureScript("boss_kri") { }
+    boss_bug_trio(Creature* creature) : BossAI(creature, DATA_BUG_TRIO) { Reset(); }
 
-    CreatureAI* GetAI(Creature* creature) const
+    bool CheckInRoom() override
     {
-        return GetInstanceAI<boss_kriAI>(creature);
+        if (me->GetExactDist2d(resetPoint) <= 10.f)
+        {
+            EnterEvadeMode(EVADE_REASON_BOUNDARY);
+            return false;
+        }
+
+        return true;
     }
 
-    struct boss_kriAI : public ScriptedAI
+    void EnterCombatWithTrio(Unit* who)
     {
-        boss_kriAI(Creature* creature) : ScriptedAI(creature)
+        BossAI::EnterCombat(who);
+
+        if (Creature* vem = instance->GetCreature(DATA_VEM))
         {
-            instance = creature->GetInstanceScript();
+            if (vem->GetGUID() != me->GetGUID())
+            {
+                vem->GetAI()->AttackStart(who);
+            }
+        }
+        if (Creature* kri = instance->GetCreature(DATA_KRI))
+        {
+            if (kri->GetGUID() != me->GetGUID())
+            {
+                kri->GetAI()->AttackStart(who);
+            }
+        }
+        if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
+        {
+            if (yauj->GetGUID() != me->GetGUID())
+            {
+                yauj->GetAI()->AttackStart(who);
+            }
+        }
+    }
+
+    void EvadeAllBosses(EvadeReason why)
+    {
+        if (Creature* vem = instance->GetCreature(DATA_VEM))
+        {
+            if (vem->GetGUID() != me->GetGUID())
+            {
+                if (vem->IsAlive() && !vem->IsInEvadeMode())
+                    vem->AI()->EnterEvadeMode(why);
+                else
+                    vem->Respawn();
+            }
         }
 
-        InstanceScript* instance;
-
-        uint32 Cleave_Timer;
-        uint32 ToxicVolley_Timer;
-        uint32 Check_Timer;
-
-        bool VemDead;
-        bool Death;
-
-        void Reset()
+        if (Creature* kri = instance->GetCreature(DATA_KRI))
         {
-            Cleave_Timer = urand(4000, 8000);
-            ToxicVolley_Timer = urand(6000, 12000);
-            Check_Timer = 2000;
-
-            VemDead = false;
-            Death = false;
+            if (kri->GetGUID() != me->GetGUID())
+            {
+                if (kri->IsAlive() && !kri->IsInEvadeMode())
+                    kri->AI()->EnterEvadeMode(why);
+                else
+                    kri->Respawn();
+            }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
         {
+            if (yauj->GetGUID() != me->GetGUID())
+            {
+                if (yauj->IsAlive() && !yauj->IsInEvadeMode())
+                    yauj->AI()->EnterEvadeMode(why);
+                else
+                    yauj->Respawn();
+            }
+        }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_CONSUME && !_dying)
+        {
+            _isEating = true;
+            me->SetSpeed(MOVE_RUN, 45.f / 7.f); // From sniffs
+            me->SetReactState(REACT_PASSIVE);
+            _scheduler.DelayAll(6s);
         }
 
-        void JustDied(Unit* /*killer*/)
+        if (action == ACTION_EXPLODE && _dying)
         {
-            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
-                me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-
-            instance->SetData(DATA_BUG_TRIO_DEATH, 1);
+            DoCastSelf(SPELL_BLOODY_DEATH);
+            _dying = false;
         }
-        void UpdateAI(uint32 diff)
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE || id != POINT_CONSUME)
+            return;
+
+        me->GetMotionMaster()->MoveIdle();
+        me->SetSpeed(MOVE_RUN, 15.f/7.f); // From sniffs
+        DoCastSelf(SPELL_FULL_HEAL, true);
+        if (me->GetThreatMgr().GetThreatListSize())
+            DoResetThreatList();
+        if (Creature* dying = instance->GetCreature(_creatureDying))
         {
-            //Return since we have no target
-            if (!UpdateVictim())
+            dying->AI()->DoAction(ACTION_EXPLODE);
+            me->SetTarget(dying->GetGUID());
+        }
+
+        _scheduler.Schedule(2s, [this](TaskContext /*context*/)
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+            _isEating = false;
+            if (Unit* target = me->GetVictim())
+            {
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveChase(target);
+                AttackStart(target);
+            }
+        });
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        BossAI::EnterEvadeMode(why);
+        EvadeAllBosses(why);
+    }
+
+    void Reset() override
+    {
+        BossAI::Reset();
+        _scheduler.CancelAll();
+        _dying = false;
+        _isEating = false;
+        _creatureDying = 0;
+        instance->SetData(DATA_BUG_TRIO_DEATH, 0);
+        me->SetSpeed(MOVE_RUN, 15.f / 7.f); // From sniffs
+
+        if (me->GetEntry() == NPC_VEM)
+        {
+            me->GetMotionMaster()->MovePath(VEM_WAYPOINT_PATH, true);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim() || !CheckInRoom())
+            return;
+
+        _scheduler.Update(diff, [this]
+        {
+            if (!_dying && !_isEating)
+                DoMeleeAttackIfReady();
+        });
+    }
+
+    void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (_dying && who->GetGUID() != me->GetGUID())
+            damage = 0;
+
+        if (me->HealthBelowPctDamaged(0, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && !_dying)
+        {
+            damage = 0;
+            if (_isEating)
                 return;
 
-            //Cleave_Timer
-            if (Cleave_Timer <= diff)
+            _scheduler.CancelAll();
+            me->SetReactState(REACT_PASSIVE);
+            _dying = true;
+            float x, y, z;
+            // Move the other bugs to this bug position
+            if (Creature* vem = instance->GetCreature(DATA_VEM))
             {
-                DoCastVictim(SPELL_CLEAVE);
-                Cleave_Timer = urand(5000, 12000);
-            } else Cleave_Timer -= diff;
-
-            //ToxicVolley_Timer
-            if (ToxicVolley_Timer <= diff)
-            {
-                DoCastVictim(SPELL_TOXIC_VOLLEY);
-                ToxicVolley_Timer = urand(10000, 15000);
-            } else ToxicVolley_Timer -= diff;
-
-            if (!HealthAbovePct(5) && !Death)
-            {
-                DoCastVictim(SPELL_POISON_CLOUD);
-                Death = true;
-            }
-
-            if (!VemDead)
-            {
-                //Checking if Vem is dead. If yes we will enrage.
-                if (Check_Timer <= diff)
+                if (vem->GetGUID() != me->GetGUID())
                 {
-                    if (instance->GetData(DATA_VEMISDEAD))
+                    if (vem->IsAlive())
                     {
-                        DoCast(me, SPELL_ENRAGE);
-                        VemDead = true;
-                    }
-                    Check_Timer = 2000;
-                } else Check_Timer -=diff;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-};
-
-class boss_vem : public CreatureScript
-{
-public:
-    boss_vem() : CreatureScript("boss_vem") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetInstanceAI<boss_vemAI>(creature);
-    }
-
-    struct boss_vemAI : public ScriptedAI
-    {
-        boss_vemAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-        }
-
-        InstanceScript* instance;
-
-        uint32 Charge_Timer;
-        uint32 KnockBack_Timer;
-        uint32 Enrage_Timer;
-
-        bool Enraged;
-
-        void Reset()
-        {
-            Charge_Timer = urand(15000, 27000);
-            KnockBack_Timer = urand(8000, 20000);
-            Enrage_Timer = 120000;
-
-            Enraged = false;
-        }
-
-        void JustDied(Unit* /*killer*/)
-        {
-            instance->SetData(DATA_VEM_DEATH, 0);
-            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
-                me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-            instance->SetData(DATA_BUG_TRIO_DEATH, 1);
-        }
-
-        void EnterCombat(Unit* /*who*/)
-        {
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
-
-            //Charge_Timer
-            if (Charge_Timer <= diff)
-            {
-                Unit* target = NULL;
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                if (target)
-                {
-                    DoCast(target, SPELL_CHARGE);
-                    //me->SendMonsterMove(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, true, 1);
-                    AttackStart(target);
-                }
-
-                Charge_Timer = urand(8000, 16000);
-            } else Charge_Timer -= diff;
-
-            //KnockBack_Timer
-            if (KnockBack_Timer <= diff)
-            {
-                DoCastVictim(SPELL_KNOCKBACK);
-                if (DoGetThreat(me->GetVictim()))
-                    DoModifyThreatPercent(me->GetVictim(), -80);
-                KnockBack_Timer = urand(15000, 25000);
-            } else KnockBack_Timer -= diff;
-
-            //Enrage_Timer
-            if (!Enraged && Enrage_Timer <= diff)
-            {
-                DoCast(me, SPELL_ENRAGE);
-                Enraged = true;
-            } else Charge_Timer -= diff;
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-};
-
-class boss_yauj : public CreatureScript
-{
-public:
-    boss_yauj() : CreatureScript("boss_yauj") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetInstanceAI<boss_yaujAI>(creature);
-    }
-
-    struct boss_yaujAI : public ScriptedAI
-    {
-        boss_yaujAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-        }
-
-        InstanceScript* instance;
-
-        uint32 Heal_Timer;
-        uint32 Fear_Timer;
-        uint32 Check_Timer;
-
-        bool VemDead;
-
-        void Reset()
-        {
-            Heal_Timer = urand(25000, 40000);
-            Fear_Timer = urand(12000, 24000);
-            Check_Timer = 2000;
-
-            VemDead = false;
-        }
-
-        void JustDied(Unit* /*killer*/)
-        {
-            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
-                me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-            instance->SetData(DATA_BUG_TRIO_DEATH, 1);
-
-            for (uint8 i = 0; i < 10; ++i)
-            {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                {
-                    if (Creature* Summoned = me->SummonCreature(15621, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000))
-                        Summoned->AI()->AttackStart(target);
-                }
-            }
-        }
-
-        void EnterCombat(Unit* /*who*/)
-        {
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
-
-            //Fear_Timer
-            if (Fear_Timer <= diff)
-            {
-                DoCastVictim(SPELL_FEAR);
-                DoResetThreat();
-                Fear_Timer = 20000;
-            } else Fear_Timer -= diff;
-
-            //Casting Heal to other twins or herself.
-            if (Heal_Timer <= diff)
-            {
-                switch (urand(0, 2))
-                {
-                    case 0:
-                        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KRI)))
-                            DoCast(kri, SPELL_HEAL);
-                        break;
-                    case 1:
-                        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VEM)))
-                            DoCast(vem, SPELL_HEAL);
-                        break;
-                    case 2:
-                        DoCast(me, SPELL_HEAL);
-                        break;
-                }
-
-                Heal_Timer = 15000+rand()%15000;
-            } else Heal_Timer -= diff;
-
-            //Checking if Vem is dead. If yes we will enrage.
-            if (Check_Timer <= diff)
-            {
-                if (!VemDead)
-                {
-                    if (instance->GetData(DATA_VEMISDEAD))
-                    {
-                        DoCast(me, SPELL_ENRAGE);
-                        VemDead = true;
+                        vem->AI()->DoAction(ACTION_CONSUME);
+                        me->GetRandomContactPoint(vem, x, y, z);
+                        vem->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
                     }
                 }
-                Check_Timer = 2000;
-            } else Check_Timer -= diff;
-
-            DoMeleeAttackIfReady();
+                else _creatureDying = DATA_VEM;
+            }
+            if (Creature* kri = instance->GetCreature(DATA_KRI))
+            {
+                if (kri->GetGUID() != me->GetGUID())
+                {
+                    if (kri->IsAlive())
+                    {
+                        kri->AI()->DoAction(ACTION_CONSUME);
+                        me->GetRandomContactPoint(kri, x, y, z);
+                        kri->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
+                    }
+                }
+                else _creatureDying = DATA_KRI;
+            }
+            if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
+            {
+                if (yauj->GetGUID() != me->GetGUID())
+                {
+                    if (yauj->IsAlive())
+                    {
+                        yauj->AI()->DoAction(ACTION_CONSUME);
+                        me->GetRandomContactPoint(yauj, x, y, z);
+                        yauj->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
+                    }
+                }
+                else _creatureDying = DATA_YAUJ;
+            }
         }
-    };
+    }
 
+    void DoFinalSpell()
+    {
+        switch (me->GetEntry())
+        {
+            case NPC_KRI:
+                DoCastSelf(SPELL_POISON_CLOUD, true);
+                break;
+            case NPC_VEM:
+                DoCastSelf(SPELL_VENGEANCE, true);
+                break;
+            case NPC_YAUJ:
+                for (uint8 i = 0; i < 10; ++i)
+                {
+                    Position randomPos;
+                    me->GetRandomContactPoint(me, randomPos.m_positionX, randomPos.m_positionY, randomPos.m_positionZ);
+                    if (Creature* summon = me->SummonCreature(NPC_YAUJ_BROOD, randomPos))
+                        DoZoneInCombat(summon);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        instance->SetData(DATA_BUG_TRIO_DEATH, 1);
+        if (instance->GetData(DATA_BUG_TRIO_DEATH) < 3)
+        {
+            me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
+            DoFinalSpell();
+            Talk(EMOTE_DEVOURED);
+            me->DespawnOrUnsummon(3000);
+            return;
+        }
+
+        BossAI::JustDied(killer);
+    }
+
+    TaskScheduler _scheduler;
+    bool _dying;
+    bool _isEating;
+    static uint32 _creatureDying;
+};
+
+uint32 boss_bug_trio::_creatureDying = 0;
+
+struct boss_kri : public boss_bug_trio
+{
+    boss_kri(Creature* creature) : boss_bug_trio(creature)
+    {
+    }
+
+    void EnterCombat(Unit* who) override
+    {
+        EnterCombatWithTrio(who);
+
+        _scheduler.Schedule(7s, 18s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CLEAVE);
+            context.Repeat();
+        })
+        .Schedule(8s, 17s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_TOXIC_VOLLEY);
+            context.Repeat();
+        })
+        .Schedule(7s, 16s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_THRASH);
+            context.Repeat();
+        });
+    }
+};
+
+struct boss_vem : public boss_bug_trio
+{
+    boss_vem(Creature* creature) : boss_bug_trio(creature)
+    {
+    }
+
+    void EnterCombat(Unit* who) override
+    {
+        EnterCombatWithTrio(who);
+
+        _scheduler.Schedule(15s, 27s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* target) -> bool
+                {
+                    if (target->GetTypeId() != TYPEID_PLAYER)
+                        return false;
+                    if (me->IsWithinMeleeRange(target) || target == me->GetVictim())
+                        return false;
+                    if (!me->IsWithinLOS(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()))
+                        return false;
+
+                    return true;
+                }))
+            {
+                DoCast(target, SPELL_CHARGE);
+            }
+            context.Repeat();
+        })
+        .Schedule(10s, 24s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_KNOCKBACK);
+            context.Repeat();
+        })
+        .Schedule(10s, 23s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_KNOCKDOWN);
+            context.Repeat();
+        });
+    }
+};
+
+struct boss_yauj : public boss_bug_trio
+{
+    boss_yauj(Creature* creature) : boss_bug_trio(creature)
+    {
+    }
+
+    void EnterCombat(Unit* who) override
+    {
+        EnterCombatWithTrio(who);
+
+        _scheduler.Schedule(12100ms, [this](TaskContext context)
+        {
+            if (me->GetHealthPct() <= 93.f)
+            {
+                DoCastSelf(SPELL_HEAL);
+            }
+            else if (Unit* friendly = DoSelectLowestHpFriendly(100.f))
+            {
+                DoCast(friendly, SPELL_HEAL);
+            }
+            context.Repeat();
+        })
+        .Schedule(12s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_FEAR);
+            DoResetThreatList();
+            context.Repeat(20600ms);
+        })
+        .Schedule(11s, 14500ms, [this](TaskContext context)
+        {
+            if (DoCastVictim(SPELL_RAVAGE) == SPELL_CAST_OK)
+                context.Repeat(10s, 15s);
+            else
+                context.Repeat(1200ms);
+        })
+        .Schedule(10s, 30s, [this](TaskContext context)
+        {
+            std::list<Creature*> targets = DoFindFriendlyCC(50.f);
+            if (!targets.empty())
+            {
+                if (Creature* target = *(targets.begin()))
+                    me->CastSpell(target, SPELL_DISPEL);
+            }
+            context.Repeat(10s, 15s);
+        });
+    }
+};
+
+class spell_vem_knockback : public SpellScript
+{
+    PrepareSpellScript(spell_vem_knockback);
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+        {
+            if (Creature* cCaster = GetCaster()->ToCreature())
+            {
+                cCaster->GetThreatMgr().ModifyThreatByPercent(target, -80);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_vem_knockback::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_vem_vengeance : public SpellScript
+{
+    PrepareSpellScript(spell_vem_vengeance);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject const* target) -> bool
+            {
+                return target->GetEntry() != NPC_YAUJ && target->GetEntry() != NPC_VEM && target->GetEntry() != NPC_KRI;
+            });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_vem_vengeance::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
+    }
 };
 
 void AddSC_bug_trio()
 {
-    new boss_kri();
-    new boss_vem();
-    new boss_yauj();
+    RegisterTempleOfAhnQirajCreatureAI(boss_kri);
+    RegisterTempleOfAhnQirajCreatureAI(boss_vem);
+    RegisterTempleOfAhnQirajCreatureAI(boss_yauj);
+    RegisterSpellScript(spell_vem_knockback);
+    RegisterSpellScript(spell_vem_vengeance);
 }

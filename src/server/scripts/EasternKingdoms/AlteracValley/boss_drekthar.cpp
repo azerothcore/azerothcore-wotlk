@@ -1,9 +1,21 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "BattlegroundAV.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
@@ -42,29 +54,87 @@ public:
         uint32 FrenzyTimer;
         uint32 YellTimer;
         uint32 ResetTimer;
+        bool Attacked;
 
-        void Reset()
+        void Reset() override
         {
-            WhirlwindTimer    = urand(1 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-            Whirlwind2Timer   = urand(1 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-            KnockdownTimer    = 12 * IN_MILLISECONDS;
-            FrenzyTimer       = 6 * IN_MILLISECONDS;
-            ResetTimer        = 5 * IN_MILLISECONDS;
-            YellTimer         = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
+            WhirlwindTimer = urand(1 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
+            Whirlwind2Timer = urand(1 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
+            KnockdownTimer = 12 * IN_MILLISECONDS;
+            FrenzyTimer = 6 * IN_MILLISECONDS;
+            ResetTimer = 5 * IN_MILLISECONDS;
+            YellTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
+            Attacked = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(YELL_AGGRO);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             Reset();
             Talk(YELL_RESPAWN);
         }
 
-        void UpdateAI(uint32 diff)
+        void AttackStart(Unit* victim) override
+        {
+            ScriptedAI::AttackStart(victim);
+
+            if (!Attacked)
+            {
+                Attacked = true;
+
+                // Mini bosses should attack as well
+                if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+                {
+                    if (Battleground* bg = bgMap->GetBG())
+                    {
+                        for (uint8 i = AV_CPLACE_H_MARSHAL_ICE; i <= AV_CPLACE_H_MARSHAL_WTOWER; ++i)
+                        {
+                            if (Creature* marshall = bg->GetBGCreature(i))
+                            {
+                                if (marshall->IsAIEnabled && !marshall->GetVictim())
+                                {
+                                    marshall->AI()->AttackStart(victim);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            ScriptedAI::EnterEvadeMode(why);
+
+            if (Attacked)
+            {
+                Attacked = false;
+
+                // Evade mini bosses
+                if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+                {
+                    if (Battleground* bg = bgMap->GetBG())
+                    {
+                        for (uint8 i = AV_CPLACE_H_MARSHAL_ICE; i <= AV_CPLACE_H_MARSHAL_WTOWER; ++i)
+                        {
+                            if (Creature* marshall = bg->GetBGCreature(i))
+                            {
+                                if (marshall->IsAIEnabled && !marshall->IsInEvadeMode())
+                                {
+                                    marshall->AI()->EnterEvadeMode();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -73,48 +143,54 @@ public:
             {
                 DoCastVictim(SPELL_WHIRLWIND);
                 WhirlwindTimer =  urand(8 * IN_MILLISECONDS, 18 * IN_MILLISECONDS);
-            } else WhirlwindTimer -= diff;
+            }
+            else WhirlwindTimer -= diff;
 
             if (Whirlwind2Timer <= diff)
             {
                 DoCastVictim(SPELL_WHIRLWIND2);
                 Whirlwind2Timer = urand(7 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
-            } else Whirlwind2Timer -= diff;
+            }
+            else Whirlwind2Timer -= diff;
 
             if (KnockdownTimer <= diff)
             {
                 DoCastVictim(SPELL_KNOCKDOWN);
                 KnockdownTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-            } else KnockdownTimer -= diff;
+            }
+            else KnockdownTimer -= diff;
 
             if (FrenzyTimer <= diff)
             {
                 DoCastVictim(SPELL_FRENZY);
                 FrenzyTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
-            } else FrenzyTimer -= diff;
+            }
+            else FrenzyTimer -= diff;
 
             if (YellTimer <= diff)
             {
                 Talk(YELL_RANDOM);
                 YellTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
-            } else YellTimer -= diff;
+            }
+            else YellTimer -= diff;
 
             // check if creature is not outside of building
             if (ResetTimer <= diff)
             {
                 if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 50)
                 {
-                    EnterEvadeMode();
+                    ScriptedAI::EnterEvadeMode();
                     Talk(YELL_EVADE);
                 }
                 ResetTimer = 5 * IN_MILLISECONDS;
-            } else ResetTimer -= diff;
+            }
+            else ResetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_drektharAI(creature);
     }

@@ -1,150 +1,65 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_COMMON_H
 #define AZEROTHCORE_COMMON_H
 
-// config.h needs to be included 1st
-/// @todo this thingy looks like hack, but its not, need to
-// make separate header however, because It makes mess here.
-#ifdef HAVE_CONFIG_H
-// Remove Some things that we will define
-// This is in case including another config.h
-// before trinity config.h
-#ifdef PACKAGE
-#undef PACKAGE
-#endif //PACKAGE
-#ifdef PACKAGE_BUGREPORT
-#undef PACKAGE_BUGREPORT
-#endif //PACKAGE_BUGREPORT
-#ifdef PACKAGE_NAME
-#undef PACKAGE_NAME
-#endif //PACKAGE_NAME
-#ifdef PACKAGE_STRING
-#undef PACKAGE_STRING
-#endif //PACKAGE_STRING
-#ifdef PACKAGE_TARNAME
-#undef PACKAGE_TARNAME
-#endif //PACKAGE_TARNAME
-#ifdef PACKAGE_VERSION
-#undef PACKAGE_VERSION
-#endif //PACKAGE_VERSION
-#ifdef VERSION
-#undef VERSION
-#endif //VERSION
-
-# include "Config.h"
-
-#undef PACKAGE
-#undef PACKAGE_BUGREPORT
-#undef PACKAGE_NAME
-#undef PACKAGE_STRING
-#undef PACKAGE_TARNAME
-#undef PACKAGE_VERSION
-#undef VERSION
-#endif //HAVE_CONFIG_H
-
 #include "Define.h"
-
-#include "Dynamic/UnorderedMap.h"
-#include "Dynamic/UnorderedSet.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>
-#include <errno.h>
-#include <signal.h>
-#include <assert.h>
-
-#if PLATFORM == PLATFORM_WINDOWS
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
-#include <set>
-#include <list>
+#include <array>
+#include <memory>
 #include <string>
-#include <map>
-#include <queue>
-#include <sstream>
-#include <fstream>
-#include <algorithm>
-#include <vector>
+#include <utility>
 
-#include "Threading/LockedQueue.h"
-#include "Threading/Threading.h"
-
-#include <ace/Basic_Types.h>
-#include <ace/Guard_T.h>
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
-#include <ace/OS_NS_time.h>
-#include <ace/Stack_Trace.h>
-
-#if PLATFORM == PLATFORM_WINDOWS
-#  include <ace/config-all.h>
-// XP winver - needed to compile with standard leak check in MemoryLeaks.h
-// uncomment later if needed
-//#define _WIN32_WINNT 0x0501
-#  include <ws2tcpip.h>
-//#undef WIN32_WINNT
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+#include <ws2tcpip.h>
+#if AC_COMPILER == AC_COMPILER_INTEL
+#    if !defined(BOOST_ASIO_HAS_MOVE)
+#      define BOOST_ASIO_HAS_MOVE
+#    endif // !defined(BOOST_ASIO_HAS_MOVE)
+#  endif // if AC_COMPILER == AC_COMPILER_INTEL
 #else
-#  include <sys/types.h>
-#  include <sys/ioctl.h>
-#  include <sys/socket.h>
-#  include <netinet/in.h>
-#  include <unistd.h>
-#  include <netdb.h>
+#include <cstdlib>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 
-#if COMPILER == COMPILER_MICROSOFT
-
-#include <float.h>
-
-#define I32FMT "%08I32X"
-#define I64FMT "%016I64X"
-#define snprintf _snprintf
+#if AC_COMPILER == AC_COMPILER_MICROSOFT
 #define atoll _atoi64
-#define vsnprintf _vsnprintf
-#ifndef isfinite
-#define isfinite(X) _finite(X)
-#endif
 #define llabs _abs64
-
 #else
-
 #define stricmp strcasecmp
-#define strnicmp strncasecmp
-#define I32FMT "%08X"
-#define I64FMT "%016llX"
-
 #endif
-
-using namespace std;
-
-inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
-
-inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
-
-#define atol(a) strtoul( a, NULL, 10)
 
 #define STRINGIZE(a) #a
 
-enum TimeConstants
-{
-    MINUTE          = 60,
-    HOUR            = MINUTE*60,
-    DAY             = HOUR*24,
-    WEEK            = DAY*7,
-    MONTH           = DAY*30,
-    YEAR            = MONTH*12,
-    IN_MILLISECONDS = 1000
-};
+#define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
+
+// TimeConstants
+constexpr auto MINUTE = 60;
+constexpr auto HOUR = MINUTE * 60;
+constexpr auto DAY = HOUR * 24;
+constexpr auto WEEK = DAY * 7;
+constexpr auto MONTH = DAY * 30;
+constexpr auto YEAR = MONTH * 12;
+constexpr auto IN_MILLISECONDS = 1000;
 
 enum AccountTypes
 {
@@ -165,51 +80,31 @@ enum LocaleConstant
     LOCALE_zhTW = 5,
     LOCALE_esES = 6,
     LOCALE_esMX = 7,
-    LOCALE_ruRU = 8
+    LOCALE_ruRU = 8,
+
+    TOTAL_LOCALES
 };
 
-const uint8 TOTAL_LOCALES = 9;
 #define DEFAULT_LOCALE LOCALE_enUS
 
 #define MAX_LOCALES 8
 #define MAX_ACCOUNT_TUTORIAL_VALUES 8
 
-extern char const* localeNames[TOTAL_LOCALES];
+AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
 
-LocaleConstant GetLocaleByName(const std::string& name);
-void CleanStringForMysqlQuery(std::string& str);
-
-typedef std::vector<std::string> StringVector;
-
-// we always use stdlibc++ std::max/std::min, undefine some not C++ standard defines (Win API and some other platforms)
-#ifdef max
-#undef max
-#endif
-
-#ifdef min
-#undef min
-#endif
-
-#ifndef M_PI
-#define M_PI            3.14159265358979323846f
-#endif
+AC_COMMON_API LocaleConstant GetLocaleByName(const std::string& name);
+AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
 
 #define MAX_QUERY_LEN 32*1024
 
-#define TRINITY_GUARD(MUTEX, LOCK) \
-  ACE_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
-
-//! For proper implementation of multiple-read, single-write pattern, use
-//! ACE_RW_Mutex as underlying @MUTEX
-# define TRINITY_WRITE_GUARD(MUTEX, LOCK) \
-  ACE_Write_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
-
-//! For proper implementation of multiple-read, single-write pattern, use
-//! ACE_RW_Mutex as underlying @MUTEX
-# define TRINITY_READ_GUARD(MUTEX, LOCK) \
-  ACE_Read_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+namespace Acore
+{
+    template<class ArgumentType, class ResultType>
+    struct unary_function
+    {
+        typedef ArgumentType argument_type;
+        typedef ResultType result_type;
+    };
+}
 
 #endif

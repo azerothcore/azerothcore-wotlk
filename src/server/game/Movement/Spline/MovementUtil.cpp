@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "MoveSplineFlag.h"
@@ -17,8 +28,8 @@ namespace Movement
     float terminalVelocity = 60.148003f;
     float terminalSafefallVelocity = 7.0f;
 
-    const float terminal_length = float(terminalVelocity * terminalVelocity) / (2.0f * gravity);
-    const float terminal_safeFall_length = (terminalSafefallVelocity * terminalSafefallVelocity) / (2.0f * gravity);
+    const float terminal_length = float(terminalVelocity* terminalVelocity) / (2.0f * gravity);
+    const float terminal_safeFall_length = (terminalSafefallVelocity* terminalSafefallVelocity) / (2.0f * gravity);
     const float terminal_fallTime = float(terminalVelocity / gravity); // the time that needed to reach terminalVelocity
     const float terminal_safeFall_fallTime = float(terminalSafefallVelocity / gravity); // the time that needed to reach terminalVelocity with safefall
 
@@ -64,8 +75,8 @@ namespace Movement
         if (t_passed > terminal_time)
         {
             result = termVel * (t_passed - terminal_time) +
-                start_velocity * terminal_time +
-                gravity * terminal_time * terminal_time*0.5f;
+                     start_velocity * terminal_time +
+                     gravity * terminal_time * terminal_time * 0.5f;
         }
         else
             result = t_passed * (start_velocity + t_passed * gravity * 0.5f);
@@ -73,7 +84,7 @@ namespace Movement
         return result;
     }
 
-    #define STR(x) #x
+#define STR(x) #x
 
     char const* g_MovementFlag_names[] =
     {
@@ -165,11 +176,11 @@ namespace Movement
     };
 
     template<class Flags, int N>
-    void print_flags(Flags t, char const* (&names)[N], std::string& str)
+    void print_flags(Flags t, char const * (&names)[N], std::string& str)
     {
         for (int i = 0; i < N; ++i)
         {
-            if ((t & Flags(1 << i)) && names[i] != NULL)
+            if ((t & Flags(1 << i)) && names[i] != nullptr)
                 str.append(" ").append(names[i]);
         }
     }

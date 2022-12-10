@@ -1,19 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _AUCTION_HOUSE_MGR_H
 #define _AUCTION_HOUSE_MGR_H
 
-#include <ace/Singleton.h>
-
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "DBCStructure.h"
+#include "DatabaseEnv.h"
 #include "EventProcessor.h"
+#include "ObjectGuid.h"
 #include "WorldPacket.h"
+#include <unordered_map>
 
 class Item;
 class Player;
@@ -52,61 +63,92 @@ enum MailAuctionAnswers
     AUCTION_SALE_PENDING        = 6
 };
 
+enum AuctionHouses
+{
+    AUCTIONHOUSE_ALLIANCE       = 2,
+    AUCTIONHOUSE_HORDE          = 6,
+    AUCTIONHOUSE_NEUTRAL        = 7
+};
+
+enum AuctionSortOrder
+{
+    AUCTION_SORT_MINLEVEL       = 0,
+    AUCTION_SORT_RARITY         = 1,
+    AUCTION_SORT_BUYOUT         = 2,
+    AUCTION_SORT_TIMELEFT       = 3,
+    AUCTION_SORT_UNK4           = 4,
+    AUCTION_SORT_ITEM           = 5,
+    AUCTION_SORT_MINBIDBUY      = 6,
+    AUCTION_SORT_OWNER          = 7,
+    AUCTION_SORT_BID            = 8,
+    AUCTION_SORT_STACK          = 9,
+    AUCTION_SORT_BUYOUT_2       = 10,
+
+    AUCTION_SORT_MAX
+};
+
+struct AuctionSortInfo
+{
+    AuctionSortInfo()  = default;
+
+    AuctionSortOrder sortOrder{AUCTION_SORT_MAX};
+    bool isDesc{true};
+};
+
+typedef std::vector<AuctionSortInfo> AuctionSortOrderVector;
+
 struct AuctionEntry
 {
     uint32 Id;
-    uint32 auctioneer;                                      // creature low guid
-    uint32 item_guidlow;
+    uint8 houseId;
+    ObjectGuid item_guid;
     uint32 item_template;
     uint32 itemCount;
-    uint32 owner;
+    ObjectGuid owner;
     uint32 startbid;                                        //maybe useless
     uint32 bid;
     uint32 buyout;
     time_t expire_time;
-    uint32 bidder;
+    ObjectGuid bidder;
     uint32 deposit;                                         //deposit can be calculated only when creating auction
     AuctionHouseEntry const* auctionHouseEntry;             // in AuctionHouse.dbc
-    uint32 factionTemplateId;
 
     // helpers
-    uint32 GetHouseId() const { return auctionHouseEntry->houseId; }
-    uint32 GetHouseFaction() const { return auctionHouseEntry->faction; }
-    uint32 GetAuctionCut() const;
-    uint32 GetAuctionOutBid() const;
-    bool BuildAuctionInfo(WorldPacket & data) const;
-    void DeleteFromDB(SQLTransaction& trans) const;
-    void SaveToDB(SQLTransaction& trans) const;
+    [[nodiscard]] uint8 GetHouseId() const { return houseId; }
+    [[nodiscard]] uint32 GetAuctionCut() const;
+    [[nodiscard]] uint32 GetAuctionOutBid() const;
+    bool BuildAuctionInfo(WorldPacket& data) const;
+    void DeleteFromDB(CharacterDatabaseTransaction trans) const;
+    void SaveToDB(CharacterDatabaseTransaction trans) const;
     bool LoadFromDB(Field* fields);
-    bool LoadFromFieldList(Field* fields);
-    std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
-    static std::string BuildAuctionMailBody(uint32 lowGuid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut);
-
+    [[nodiscard]] std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
+    static std::string BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit = 0, uint32 cut = 0, uint32 moneyDelay = 0, uint32 eta = 0);
 };
 
 //this class is used as auctionhouse instance
 class AuctionHouseObject
 {
-  public:
+public:
     // Initialize storage
     AuctionHouseObject() { next = AuctionsMap.begin(); }
     ~AuctionHouseObject()
     {
-        for (AuctionEntryMap::iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
-            delete itr->second;
+        for (auto & itr : AuctionsMap)
+            delete itr.second;
     }
 
     typedef std::map<uint32, AuctionEntry*> AuctionEntryMap;
 
-    uint32 Getcount() const { return AuctionsMap.size(); }
+    [[nodiscard]] uint32 Getcount() const { return AuctionsMap.size(); }
 
-    AuctionEntryMap::iterator GetAuctionsBegin() {return AuctionsMap.begin();}
-    AuctionEntryMap::iterator GetAuctionsEnd() {return AuctionsMap.end();}
+    AuctionEntryMap::iterator GetAuctionsBegin() { return AuctionsMap.begin(); }
+    AuctionEntryMap::iterator GetAuctionsEnd() { return AuctionsMap.end(); }
+    AuctionEntryMap const& GetAuctions() { return AuctionsMap; }
 
-    AuctionEntry* GetAuction(uint32 id) const
+    [[nodiscard]] AuctionEntry* GetAuction(uint32 id) const
     {
         AuctionEntryMap::const_iterator itr = AuctionsMap.find(id);
-        return itr != AuctionsMap.end() ? itr->second : NULL;
+        return itr != AuctionsMap.end() ? itr->second : nullptr;
     }
 
     void AddAuction(AuctionEntry* auction);
@@ -118,11 +160,11 @@ class AuctionHouseObject
     void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
     void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
     bool BuildListAuctionItems(WorldPacket& data, Player* player,
-        std::wstring const& searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
-        uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
-        uint32& count, uint32& totalcount, uint8 getAll);
+                               std::wstring const& searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
+                               uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
+                               uint32& count, uint32& totalcount, uint8 getAll, AuctionSortOrderVector const& sortOrder);
 
-  private:
+private:
     AuctionEntryMap AuctionsMap;
 
     // storage for "next" auction item for next Update()
@@ -131,59 +173,58 @@ class AuctionHouseObject
 
 class AuctionHouseMgr
 {
-    friend class ACE_Singleton<AuctionHouseMgr, ACE_Null_Mutex>;
+private:
+    AuctionHouseMgr();
+    ~AuctionHouseMgr();
 
-    private:
-        AuctionHouseMgr();
-        ~AuctionHouseMgr();
+public:
+    typedef std::unordered_map<ObjectGuid, Item*> ItemMap;
 
-    public:
+    static AuctionHouseMgr* instance();
 
-        typedef UNORDERED_MAP<uint32, Item*> ItemMap;
+    AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
+    AuctionHouseObject* GetAuctionsMapByHouseId(uint8 auctionHouseId);
+    AuctionHouseObject* GetBidsMap(uint32 factionTemplateId);
 
-        AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
-        AuctionHouseObject* GetBidsMap(uint32 factionTemplateId);
+    Item* GetAItem(ObjectGuid itemGuid)
+    {
+        ItemMap::const_iterator itr = mAitems.find(itemGuid);
+        if (itr != mAitems.end())
+            return itr->second;
 
-        Item* GetAItem(uint32 id)
-        {
-            ItemMap::const_iterator itr = mAitems.find(id);
-            if (itr != mAitems.end())
-                return itr->second;
+        return nullptr;
+    }
 
-            return NULL;
-        }
+    //auction messages
+    void SendAuctionWonMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification = true, bool updateAchievementCriteria = true, bool sendMail = true);
+    void SendAuctionSalePendingMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail = true);
+    void SendAuctionSuccessfulMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification = true, bool updateAchievementCriteria = true, bool sendMail = true);
+    void SendAuctionExpiredMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification = true, bool sendMail = true);
+    void SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, CharacterDatabaseTransaction trans, bool sendNotification = true, bool sendMail = true);
+    void SendAuctionCancelledToBidderMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail = true);
 
-        //auction messages
-        void SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& trans);
-        void SendAuctionSalePendingMail(AuctionEntry* auction, SQLTransaction& trans);
-        void SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransaction& trans);
-        void SendAuctionExpiredMail(AuctionEntry* auction, SQLTransaction& trans);
-        void SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans);
-        void SendAuctionCancelledToBidderMail(AuctionEntry* auction, SQLTransaction& trans);
+    static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count);
+    static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
+    static AuctionHouseEntry const* GetAuctionHouseEntryFromHouse(uint8 houseId);
 
-        static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count);
-        static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
+public:
+    //load first auction items, because of check if item exists, when loading
+    void LoadAuctionItems();
+    void LoadAuctions();
 
-    public:
+    void AddAItem(Item* it);
+    bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false, CharacterDatabaseTransaction* trans = nullptr);
 
-        //load first auction items, because of check if item exists, when loading
-        void LoadAuctionItems();
-        void LoadAuctions();
+    void Update();
 
-        void AddAItem(Item* it);
-        bool RemoveAItem(uint32 id, bool deleteFromDB = false);
+private:
+    AuctionHouseObject mHordeAuctions;
+    AuctionHouseObject mAllianceAuctions;
+    AuctionHouseObject mNeutralAuctions;
 
-        void Update();
-
-    private:
-
-        AuctionHouseObject mHordeAuctions;
-        AuctionHouseObject mAllianceAuctions;
-        AuctionHouseObject mNeutralAuctions;
-
-        ItemMap mAitems;
+    ItemMap mAitems;
 };
 
-#define sAuctionMgr ACE_Singleton<AuctionHouseMgr, ACE_Null_Mutex>::instance()
+#define sAuctionMgr AuctionHouseMgr::instance()
 
 #endif

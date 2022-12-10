@@ -1,13 +1,26 @@
- /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "old_hillsbrad.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
 
 /*enum Erozion
 {
@@ -122,7 +135,7 @@ enum Events
     EVENT_SET_FACING            = 9,
     EVENT_KILL_ARMORER          = 10,
     EVENT_TALK_KILL_ARMORER     = 11,
-    
+
     EVENT_DRESSING_KNEEL        = 20,
     EVENT_DRESSING_ARMOR        = 21,
     EVENT_DRESSING_STAND        = 22,
@@ -174,7 +187,6 @@ enum Events
     EVENT_THRALL_TALK_6         = 90,
     EVENT_THRALL_RUN_AWAY       = 91,
     EVENT_TARETHA_TALK_2        = 92
-
 };
 
 class npc_thrall_old_hillsbrad : public CreatureScript
@@ -182,12 +194,12 @@ class npc_thrall_old_hillsbrad : public CreatureScript
 public:
     npc_thrall_old_hillsbrad() : CreatureScript("npc_thrall_old_hillsbrad") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_thrall_old_hillsbradAI>(creature);
+        return GetOldHillsbradAI<npc_thrall_old_hillsbradAI>(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         InstanceScript* instance = creature->GetInstanceScript();
         if (!instance)
@@ -206,18 +218,18 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32  /*action*/)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32  /*action*/) override
     {
         GossipMenuItemData const* gossipMenuItemData = player->PlayerTalkClass->GetGossipMenu().GetItemData(0);
         InstanceScript* instance = creature->GetInstanceScript();
         if (!instance || (gossipMenuItemData && gossipMenuItemData->GossipActionMenuId != 0))
             return false;
 
-        player->PlayerTalkClass->ClearMenus();
-        player->CLOSE_GOSSIP_MENU();
+        ClearGossipMenuFor(player);
+        CloseGossipMenuFor(player);
 
         creature->AI()->DoAction(instance->GetData(DATA_ESCORT_PROGRESS));
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         return true;
     }
 
@@ -228,7 +240,7 @@ public:
             instance = creature->GetInstanceScript();
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch (param)
             {
@@ -267,7 +279,7 @@ public:
             }
         }
 
-        void WaypointStart(uint32 waypointId)
+        void WaypointStart(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -277,7 +289,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -353,7 +365,7 @@ public:
 
                     SetEscortPaused(true);
                     SetRun(true);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     break;
                 case 64:
                     SetRun(false);
@@ -388,7 +400,7 @@ public:
                     SetEscortPaused(true);
                     SetRun(true);
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_TARETHA_MEET);
-                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                         Taretha->AI()->Talk(SAY_TARETHA_ESCAPED);
                     events.ScheduleEvent(EVENT_THRALL_TALK, 2000);
                     break;
@@ -401,7 +413,7 @@ public:
                     break;
                 case 103:
                     if (Creature* erozion = summons.GetCreatureWithEntry(NPC_EROZION))
-                        erozion->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        erozion->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_FINISHED);
                     me->SetVisible(false);
                     break;
@@ -420,7 +432,7 @@ public:
             me->SetSpeed(MOVE_RUN, SPEED_RUNNING);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             npc_escortAI::MovementInform(type, point);
             if (type == POINT_MOTION_TYPE && point == 0xFFFFFF /*POINT_LAST_POINT*/)
@@ -432,7 +444,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             combatEvents.Reset();
             combatEvents.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
@@ -449,39 +461,40 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             _mounted = false;
             events.Reset();
             combatEvents.Reset();
             summons.DespawnAll();
 
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             instance->SetData(DATA_THRALL_REPOSITION, 1);
-                
+
             uint32 data = instance->GetData(DATA_ESCORT_PROGRESS);
             if (data >= ENCOUNTER_PROGRESS_THRALL_ARMORED)
                 ReorderInstance(data);
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             Talk(SAY_RANDOM_KILL);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_INFINITE_SLAYER || summon->GetEntry() == NPC_INFINITE_SABOTEUR || summon->GetEntry() == NPC_INFINITE_DEFILER)
                 summon->GetMotionMaster()->MovePoint(10, 2634.25f, 672.01f, 54.445f);
 
             summons.Summon(summon);
         }
-        void SummonedCreatureDespawn(Creature* summon) { summons.Despawn(summon); }
-        void SummonedCreatureDies(Creature* summon, Unit*) { summons.Despawn(summon); }
 
-        void JustDied(Unit* killer)
+        void SummonedCreatureDespawn(Creature* summon) override { summons.Despawn(summon); }
+        void SummonedCreatureDies(Creature* summon, Unit*) override { summons.Despawn(summon); }
+
+        void JustDied(Unit* killer) override
         {
-            if (killer == me)
+            if (killer && killer == me)
                 return;
 
             summons.DespawnAll();
@@ -494,7 +507,7 @@ public:
                 me->SetRespawnTime(DAY);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -540,7 +553,7 @@ public:
                     me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, THRALL_WEAPON_ITEM);
                     break;
                 case EVENT_DRESSING_SHIELD:
-                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID+1, THRALL_SHIELD_ITEM);
+                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, THRALL_SHIELD_ITEM);
                     break;
                 case EVENT_DRESSING_TALK:
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_THRALL_ARMORED);
@@ -602,12 +615,12 @@ public:
                     break;
                 case EVENT_THRALL_TALK:
                     Talk(SAY_MEET_TARETHA);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     break;
                 case EVENT_SUMMON_CHRONO:
                     if (Creature* epoch = me->SummonCreature(NPC_EPOCH_HUNTER, 2640.49f, 696.15f, 64.31f, 4.51f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
-                        epoch->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                        epoch->SetImmuneToAll(true);
                         epoch->AI()->Talk(SAY_EPOCH_ENTER1);
                     }
                     break;
@@ -618,7 +631,7 @@ public:
                 case EVENT_TARETHA_FALL:
                     if (Creature* epoch = summons.GetCreatureWithEntry(NPC_EPOCH_HUNTER))
                         epoch->AI()->Talk(SAY_EPOCH_ENTER2);
-                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                     {
                         Taretha->CastSpell(Taretha, SPELL_SHADOW_SPIKE);
                         Taretha->SetStandState(UNIT_STAND_STATE_DEAD);
@@ -690,26 +703,26 @@ public:
                 case EVENT_CALL_EPOCH:
                     if (Creature* epoch = summons.GetCreatureWithEntry(NPC_EPOCH_HUNTER))
                     {
-                        epoch->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                        epoch->SetImmuneToAll(false);
                         epoch->GetMotionMaster()->MovePoint(0, *me, false, true);
                     }
                     break;
                 case EVENT_THRALL_FACE_TARETHA:
-                {
-                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                    if (!players.isEmpty())
-                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            if (Player* player = itr->GetSource())
-                                player->KilledMonsterCredit(20156, 0);
+                    {
+                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                        if (!players.IsEmpty())
+                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                                if (Player* player = itr->GetSource())
+                                    player->KilledMonsterCredit(20156);
 
-                    me->SetFacingTo(5.76f);
-                    break;
-                }
+                        me->SetFacingTo(5.76f);
+                        break;
+                    }
                 case EVENT_THRALL_TALK_4:
                     Talk(SAY_GREET_TARETHA);
                     break;
                 case EVENT_TARETHA_TALK_1:
-                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                         Taretha->AI()->Talk(SAY_TARETHA_TALK1);
                     break;
                 case EVENT_THRALL_TALK_5:
@@ -717,7 +730,7 @@ public:
                     break;
                 case EVENT_SUMMON_EROZION:
                     if (Creature* erozion = me->SummonCreature(NPC_EROZION, 2646.31f, 680.01f, 55.36f, 3.76f, TEMPSUMMON_MANUAL_DESPAWN))
-                        erozion->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                        erozion->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     break;
                 case EVENT_EROZION_TALK_1:
                     if (Creature* erozion = summons.GetCreatureWithEntry(NPC_EROZION))
@@ -746,12 +759,12 @@ public:
                     Talk(SAY_EVENT_COMPLETE);
                     break;
                 case EVENT_THRALL_RUN_AWAY:
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(true);
                     me->SetReactState(REACT_PASSIVE);
                     SetEscortPaused(false);
                     break;
                 case EVENT_TARETHA_TALK_2:
-                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                     {
                         Taretha->SetFacingTo(4.233f);
                         Taretha->AI()->Talk(SAY_TARETHA_TALK2);
@@ -760,7 +773,7 @@ public:
             }
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -794,20 +807,20 @@ public:
             Start(true, true);
             SetEscortPaused(true);
             SetDespawnAtEnd(false);
-            
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
+
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
             if (data < ENCOUNTER_PROGRESS_THRALL_ARMORED)
             {
                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
-                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID+1, 0);
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 0);
                 me->SetDisplayId(THRALL_MODEL_UNEQUIPPED);
             }
             else
             {
                 me->SetDisplayId(THRALL_MODEL_EQUIPPED);
                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, THRALL_WEAPON_ITEM);
-                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID+1, THRALL_SHIELD_ITEM);
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, THRALL_SHIELD_ITEM);
             }
 
             switch (data)
@@ -826,20 +839,20 @@ public:
                     SetNextWaypoint(61, false);
                     break;
                 case ENCOUNTER_PROGRESS_TARETHA_MEET:
-                    SetNextWaypoint(95, false);                    
-                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
+                    SetNextWaypoint(95, false);
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                         Taretha->SetStandState(UNIT_STAND_STATE_STAND);
                     break;
             }
         }
 
-        private:
-            InstanceScript* instance;
-            EventMap events;
-            EventMap combatEvents;
-            SummonList summons;
+    private:
+        InstanceScript* instance;
+        EventMap events;
+        EventMap combatEvents;
+        SummonList summons;
 
-            bool _mounted;
+        bool _mounted;
     };
 };
 
@@ -848,12 +861,12 @@ class npc_taretha : public CreatureScript
 public:
     npc_taretha() : CreatureScript("npc_taretha") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_tarethaAI>(creature);
+        return GetOldHillsbradAI<npc_tarethaAI>(creature);
     }
 
-    bool OnGossipHello(Player*  /*player*/, Creature*  /*creature*/)
+    bool OnGossipHello(Player*  /*player*/, Creature*  /*creature*/) override
     {
         return true;
     }
@@ -867,37 +880,36 @@ public:
 
         InstanceScript* instance;
 
-        void DoAction(int32  /*param*/)
+        void DoAction(int32 /*param*/) override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveAllAuras();
             Start(false, true);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (waypointId == 7)
             {
                 SetRun(false);
                 Talk(SAY_TARETHA_FREE);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                if (Creature* thrall = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_THRALL_GUID)))
+                if (Creature* thrall = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_THRALL_GUID)))
                     thrall->AI()->DoAction(me->GetEntry());
             }
             else if (waypointId == 9)
                 me->SetVisible(false);
         }
 
-        void Reset()
+        void Reset() override
         {
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->CastSpell(me, SPELL_SHADOW_PRISON, true);
         }
 
-        void AttackStart(Unit*) { }
-        void MoveInLineOfSight(Unit*) { }
+        void AttackStart(Unit*) override { }
+        void MoveInLineOfSight(Unit*) override { }
     };
-
 };
 
 void AddSC_old_hillsbrad()

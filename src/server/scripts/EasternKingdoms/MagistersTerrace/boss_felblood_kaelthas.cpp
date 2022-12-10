@@ -1,13 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "Opcodes.h"
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "magisters_terrace.h"
-#include "WorldPacket.h"
-#include "Opcodes.h"
 
 enum Says
 {
@@ -70,9 +81,9 @@ class boss_felblood_kaelthas : public CreatureScript
 public:
     boss_felblood_kaelthas() : CreatureScript("boss_felblood_kaelthas") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_felblood_kaelthasAI(creature);
+        return GetMagistersTerraceAI<boss_felblood_kaelthasAI>(creature);
     }
 
     struct boss_felblood_kaelthasAI : public ScriptedAI
@@ -89,16 +100,16 @@ public:
         SummonList summons;
         bool introSpeak;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
             instance->SetData(DATA_KAELTHAS_EVENT, NOT_STARTED);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 if (*itr == summon->GetGUID())
@@ -106,18 +117,18 @@ public:
             summons.Summon(summon);
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             instance->SetData(DATA_KAELTHAS_EVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             instance->SetData(DATA_KAELTHAS_EVENT, IN_PROGRESS);
             me->SetInCombatWithZone();
@@ -131,7 +142,7 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_SHOCK_BARRIER, 50000);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!introSpeak && me->IsWithinDistInMap(who, 40.0f) && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -143,15 +154,16 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
-                damage = me->GetHealth()-1;
+                damage = me->GetHealth() - 1;
                 if (me->isRegeneratingHealth())
                 {
                     me->SetRegeneratingHealth(false);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+                    me->SetImmuneToAll(true);
                     me->CombatStop();
                     me->SetReactState(REACT_PASSIVE);
                     LapseAction(ACTION_REMOVE_FLY);
@@ -161,7 +173,7 @@ public:
                 }
             }
         }
-        
+
         void LapseAction(uint8 action)
         {
             uint8 counter = 0;
@@ -170,11 +182,11 @@ public:
                 if (Player* player = itr->GetSource())
                 {
                     if (action == ACTION_TELEPORT_PLAYERS)
-                        me->CastSpell(player, SPELL_GRAVITY_LAPSE_PLAYER+counter, true);
+                        me->CastSpell(player, SPELL_GRAVITY_LAPSE_PLAYER + counter, true);
                     else if (action == ACTION_KNOCKUP)
-                        player->CastSpell(player, SPELL_GRAVITY_LAPSE_DOT, true, NULL, NULL, me->GetGUID());
+                        player->CastSpell(player, SPELL_GRAVITY_LAPSE_DOT, true, nullptr, nullptr, me->GetGUID());
                     else if (action == ACTION_ALLOW_FLY)
-                        player->CastSpell(player, SPELL_GRAVITY_LAPSE_FLY, true, NULL, NULL, me->GetGUID());
+                        player->CastSpell(player, SPELL_GRAVITY_LAPSE_FLY, true, nullptr, nullptr, me->GetGUID());
                     else if (action == ACTION_REMOVE_FLY)
                     {
                         player->RemoveAurasDueToSpell(SPELL_GRAVITY_LAPSE_FLY);
@@ -183,13 +195,13 @@ public:
                 }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
             {
                 case EVENT_INIT_COMBAT:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(false);
                     if (Unit* target = SelectTargetFromPlayerList(50.0f))
                         AttackStart(target);
                     return;
@@ -212,7 +224,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FIREBALL, urand(3000, 4500));
                     break;
                 case EVENT_SPELL_FLAMESTRIKE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         me->CastSpell(target, SPELL_FLAMESTRIKE_SUMMON, true);
                         Talk(SAY_FLAMESTRIKE);
@@ -221,7 +233,7 @@ public:
                     break;
                 case EVENT_SPELL_SHOCK_BARRIER:
                     me->CastSpell(me, SPELL_SHOCK_BARRIER, true);
-                    me->CastCustomSpell(SPELL_PYROBLAST, SPELLVALUE_MAX_TARGETS, 1, (Unit*)NULL, false);
+                    me->CastCustomSpell(SPELL_PYROBLAST, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     events.ScheduleEvent(EVENT_SPELL_SHOCK_BARRIER, 50000);
                     break;
                 case EVENT_SPELL_PHOENIX:
@@ -277,7 +289,6 @@ public:
                     break;
             }
 
-
             if (events.GetPhaseMask() == 0)
                 DoMeleeAttackIfReady();
         }
@@ -286,29 +297,29 @@ public:
 
 class spell_mt_phoenix_burn : public SpellScriptLoader
 {
-    public:
-        spell_mt_phoenix_burn() : SpellScriptLoader("spell_mt_phoenix_burn") { }
+public:
+    spell_mt_phoenix_burn() : SpellScriptLoader("spell_mt_phoenix_burn") { }
 
-        class spell_mt_phoenix_burn_SpellScript : public SpellScript
+    class spell_mt_phoenix_burn_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mt_phoenix_burn_SpellScript);
+
+        void HandleAfterCast()
         {
-            PrepareSpellScript(spell_mt_phoenix_burn_SpellScript);
-
-            void HandleAfterCast()
-            {
-                uint32 damage = CalculatePct(GetCaster()->GetMaxHealth(), 5);
-                Unit::DealDamage(GetCaster(), GetCaster(), damage);
-            }
-
-            void Register()
-            {
-                AfterCast += SpellCastFn(spell_mt_phoenix_burn_SpellScript::HandleAfterCast);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_mt_phoenix_burn_SpellScript();
+            uint32 damage = CalculatePct(GetCaster()->GetMaxHealth(), 5);
+            Unit::DealDamage(GetCaster(), GetCaster(), damage);
         }
+
+        void Register() override
+        {
+            AfterCast += SpellCastFn(spell_mt_phoenix_burn_SpellScript::HandleAfterCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_mt_phoenix_burn_SpellScript();
+    }
 };
 
 void AddSC_boss_felblood_kaelthas()

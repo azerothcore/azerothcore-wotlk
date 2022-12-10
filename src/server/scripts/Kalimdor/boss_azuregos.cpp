@@ -1,154 +1,234 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Azuregos
-SD%Complete: 90
-SDComment: Teleport not included, spell reflect not effecting dots (Core problem)
-SDCategory: Azshara
-EndScriptData */
-
-#include "ScriptMgr.h"
+#include "GameTime.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "TaskScheduler.h"
 
 enum Say
 {
-    SAY_TELEPORT            = 0
+    SAY_TELEPORT = 0,
+    SAY_AGGRO,
+    SAY_KILL,
 };
 
 enum Spells
 {
-    SPELL_MARKOFFROST       = 23182,
-    SPELL_MANASTORM         = 21097,
-    SPELL_CHILL             = 21098,
-    SPELL_FROSTBREATH       = 21099,
-    SPELL_REFLECT           = 22067,
-    SPELL_CLEAVE            = 8255,     //Perhaps not right ID
-    SPELL_ENRAGE            = 23537
+    SPELL_MARK_OF_FROST       = 23182,
+    SPELL_MARK_OF_FROST_AURA  = 23184,
+    SPELL_AURA_OF_FROST       = 23186,
+    SPELL_MANA_STORM          = 21097,
+    SPELL_CHILL               = 21098,
+    SPELL_FROST_BREATH        = 21099,
+    SPELL_REFLECT             = 22067,
+    SPELL_CLEAVE              = 19983,
+    SPELL_ARCANE_VACUUM       = 21147,
+    SPELL_ARCANE_VACUUM_TP    = 21150
 };
 
 class boss_azuregos : public CreatureScript
 {
 public:
-    boss_azuregos() : CreatureScript("boss_azuregos") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new boss_azuregosAI(creature);
-    }
+    boss_azuregos() : CreatureScript("boss_azuregos") { }
 
     struct boss_azuregosAI : public ScriptedAI
     {
-        boss_azuregosAI(Creature* creature) : ScriptedAI(creature) { }
-
-        uint32 MarkOfFrostTimer;
-        uint32 ManaStormTimer;
-        uint32 ChillTimer;
-        uint32 BreathTimer;
-        uint32 TeleportTimer;
-        uint32 ReflectTimer;
-        uint32 CleaveTimer;
-        uint32 EnrageTimer;
-        bool Enraged;
-
-        void Reset()
+        boss_azuregosAI(Creature* creature) : ScriptedAI(creature)
         {
-            MarkOfFrostTimer = 35000;
-            ManaStormTimer = urand(5000, 17000);
-            ChillTimer = urand(10000, 30000);
-            BreathTimer = urand(2000, 8000);
-            TeleportTimer = 30000;
-            ReflectTimer = urand(15000, 30000);
-            CleaveTimer = 7000;
-            EnrageTimer = 0;
-            Enraged = false;
+            _scheduler.SetValidator([this]
+                {
+                    return !me->HasUnitState(UNIT_STATE_CASTING);
+                });
         }
 
-        void EnterCombat(Unit* /*who*/) { }
-
-        void UpdateAI(uint32 diff)
+        void Reset() override
         {
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
-
-            if (TeleportTimer <= diff)
-            {
-                Talk(SAY_TELEPORT);
-                ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
-                ThreatContainer::StorageType::const_iterator i = threatlist.begin();
-                for (i = threatlist.begin(); i != threatlist.end(); ++i)
+            _scheduler.CancelAll();
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->RestoreFaction();
+            me->GetMap()->DoForAllPlayers([&](Player* p)
                 {
-                    Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
-                    if (unit && (unit->GetTypeId() == TYPEID_PLAYER))
+                    if (p->GetZoneId() == me->GetZoneId())
                     {
-                        DoTeleportPlayer(unit, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+3, unit->GetOrientation());
+                        p->RemoveAurasDueToSpell(SPELL_CHILL);
+                        p->RemoveAurasDueToSpell(SPELL_FROST_BREATH);
                     }
-                }
+                });
+        }
 
-                DoResetThreat();
-                TeleportTimer = 30000;
-            } else TeleportTimer -= diff;
-
-            //        //MarkOfFrostTimer
-            //        if (MarkOfFrostTimer <= diff)
-            //        {
-            //            DoCastVictim(SPELL_MARKOFFROST);
-            //            MarkOfFrostTimer = 25000;
-            //        } else MarkOfFrostTimer -= diff;
-
-            //ChillTimer
-            if (ChillTimer <= diff)
+        void KilledUnit(Unit* victim) override
+        {
+            if (victim && victim->GetTypeId() == TYPEID_PLAYER)
             {
-                DoCastVictim(SPELL_CHILL);
-                ChillTimer = urand(13000, 25000);
-            } else ChillTimer -= diff;
+                Talk(SAY_KILL);
+                victim->CastSpell(victim, SPELL_MARK_OF_FROST, true);
+            }
+        }
 
-            //BreathTimer
-            if (BreathTimer <= diff)
-            {
-                DoCastVictim(SPELL_FROSTBREATH);
-                BreathTimer = urand(10000, 15000);
-            } else BreathTimer -= diff;
+        void EnterCombat(Unit* /*who*/) override
+        {
+            DoCastSelf(SPELL_MARK_OF_FROST_AURA);
+            Talk(SAY_AGGRO);
 
-            //ManaStormTimer
-            if (ManaStormTimer <= diff)
-            {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_MANASTORM);
-                ManaStormTimer = urand(7500, 12500);
-            } else ManaStormTimer -= diff;
+            _scheduler
+                .Schedule(7s, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_CLEAVE);
+                    context.Repeat(7s);
+                })
+                .Schedule(5s, 17s, [this](TaskContext context)
+                {
+                    DoCastRandomTarget(SPELL_MANA_STORM);
+                    context.Repeat(7s, 13s);
+                })
+                .Schedule(10s, 30s, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_CHILL);
+                    context.Repeat(13s, 25s);
+                })
+                .Schedule(2s, 8s, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_FROST_BREATH);
+                    context.Repeat(10s, 15s);
+                })
+                .Schedule(30s, [this](TaskContext context)
+                {
+                    Talk(SAY_TELEPORT);
+                    DoCastAOE(SPELL_ARCANE_VACUUM);
+                    context.Repeat(30s);
+                })
+                .Schedule(15s, 30s, [this](TaskContext context)
+                {
+                    DoCastSelf(SPELL_REFLECT);
+                    context.Repeat(20s, 35s);
+                });
+        }
 
-            //ReflectTimer
-            if (ReflectTimer <= diff)
-            {
-                DoCast(me, SPELL_REFLECT);
-                ReflectTimer = urand(20000, 35000);
-            } else ReflectTimer -= diff;
+        void JustDied(Unit* /*killer*/) override
+        {
+            me->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST);
+            me->GetMap()->DoForAllPlayers([&](Player* p)
+                {
+                    if (p->GetZoneId() == me->GetZoneId())
+                    {
 
-            //CleaveTimer
-            if (CleaveTimer <= diff)
-            {
-                DoCastVictim(SPELL_CLEAVE);
-                CleaveTimer = 7000;
-            } else CleaveTimer -= diff;
+                        p->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST);
+                        p->RemoveAurasDueToSpell(SPELL_AURA_OF_FROST);
+                        p->RemoveAurasDueToSpell(SPELL_CHILL);
+                        p->RemoveAurasDueToSpell(SPELL_FROST_BREATH);
+                    }
+                });
 
-            //EnrageTimer
-            if (HealthBelowPct(26) && !Enraged)
+            me->SetRespawnTime(urand(2 * DAY, 3 * DAY));
+            me->SaveRespawnTime();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
             {
-                DoCast(me, SPELL_ENRAGE);
-                Enraged = true;
+                return;
             }
 
-            DoMeleeAttackIfReady();
+            _scheduler.Update(diff, [this]
+                {
+                    DoMeleeAttackIfReady();
+                });
         }
+
+        protected:
+            TaskScheduler _scheduler;
     };
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
+    {
+        CloseGossipMenuFor(player);
+        creature->SetFaction(FACTION_ENEMY);
+        creature->AI()->AttackStart(player);
+        return true;
+    }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new boss_azuregosAI(creature);
+    }
+};
+
+// Arcane Vacuum: 21147
+class spell_arcane_vacuum : public SpellScript
+{
+    PrepareSpellScript(spell_arcane_vacuum);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ARCANE_VACUUM_TP });
+    }
+
+    void HandleOnHit()
+    {
+        Unit* caster = GetCaster();
+        Unit* hitUnit = GetHitUnit();
+        if (caster && hitUnit && hitUnit->ToPlayer())
+        {
+            caster->GetThreatMgr().ModifyThreatByPercent(hitUnit, -100);
+            caster->CastSpell(hitUnit, SPELL_ARCANE_VACUUM_TP, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_arcane_vacuum::HandleOnHit);
+    }
+};
+
+// Mark of Frost - Triggered Spell
+class spell_mark_of_frost_freeze : public SpellScript
+{
+    PrepareSpellScript(spell_mark_of_frost_freeze);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MARK_OF_FROST, SPELL_AURA_OF_FROST });
+    }
+
+    void HandleOnHit()
+    {
+        Unit* caster = GetCaster();
+        Unit* hitUnit = GetHitUnit();
+        if (caster && hitUnit && hitUnit->HasAura(SPELL_MARK_OF_FROST) && !hitUnit->HasAura(SPELL_AURA_OF_FROST))
+        {
+            hitUnit->CastSpell(hitUnit, SPELL_AURA_OF_FROST, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_mark_of_frost_freeze::HandleOnHit);
+    }
 };
 
 void AddSC_boss_azuregos()
 {
     new boss_azuregos();
+    RegisterSpellScript(spell_arcane_vacuum);
+    RegisterSpellScript(spell_mark_of_frost_freeze);
 }

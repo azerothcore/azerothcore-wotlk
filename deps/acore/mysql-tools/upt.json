@@ -1,0 +1,11 @@
+{
+    "name": "udw/mysql-tools",
+    "dependencies": {
+    },
+    "devDependencies": {
+    },
+    "_comment_keep": "ensure we keep the right git repository configurations",
+    "keep": [
+        ".git/config"
+    ]
+}

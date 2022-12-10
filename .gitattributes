@@ -1,6 +1,5 @@
 # Auto detect text files and perform LF normalization
-* text=auto
-
+* text eol=lf
 
 # Whitespace rules
 # strict (no trailing, no tabs)

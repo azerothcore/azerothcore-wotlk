@@ -1,12 +1,26 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ChannelMgr.h"
+#include "Log.h"
 #include "Player.h"
 #include "World.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 ChannelMgr::~ChannelMgr()
 {
@@ -18,18 +32,20 @@ ChannelMgr::~ChannelMgr()
 
 ChannelMgr* ChannelMgr::forTeam(TeamId teamId)
 {
+    static ChannelMgr allianceChannelMgr(TEAM_ALLIANCE);
+    static ChannelMgr hordeChannelMgr(TEAM_HORDE);
+
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
-        return ACE_Singleton<AllianceChannelMgr, ACE_Null_Mutex>::instance();        // cross-faction
+        return &allianceChannelMgr;        // cross-faction
 
     if (teamId == TEAM_ALLIANCE)
-        return ACE_Singleton<AllianceChannelMgr, ACE_Null_Mutex>::instance();
+        return &allianceChannelMgr;
 
     if (teamId == TEAM_HORDE)
-        return ACE_Singleton<HordeChannelMgr, ACE_Null_Mutex>::instance();
+        return &hordeChannelMgr;
 
-    return NULL;
+    return nullptr;
 }
-
 
 void ChannelMgr::LoadChannels()
 {
@@ -37,50 +53,69 @@ void ChannelMgr::LoadChannels()
     uint32 count = 0;
 
     //                                                    0          1     2     3         4          5
-    QueryResult result = CharacterDatabase.PQuery("SELECT channelId, name, team, announce, ownership, password FROM channels WHERE team = %u ORDER BY channelId ASC", _teamId);
+    QueryResult result = CharacterDatabase.Query("SELECT channelId, name, team, announce, ownership, password FROM channels ORDER BY channelId ASC");
     if (!result)
     {
-        sLog->outString(">> Loaded 0 channels for %s", _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde");
-        sLog->outString();
+        LOG_WARN("server.loading", ">> Loaded 0 channels. DB table `channels` is empty.");
         return;
     }
 
+    std::vector<std::pair<std::string, uint32>> toDelete;
     do
     {
         Field* fields = result->Fetch();
-        if (!fields)
-            break;
 
-        uint32 channelDBId = fields[0].GetUInt32();
-        std::string channelName = fields[1].GetString();
-        std::string password = fields[5].GetString();
+        uint32 channelDBId = fields[0].Get<uint32>();
+        std::string channelName = fields[1].Get<std::string>();
+        TeamId team = TeamId(fields[2].Get<uint32>());
+        std::string password = fields[5].Get<std::string>();
+
         std::wstring channelWName;
-        Utf8toWStr(channelName, channelWName);
+        if (!Utf8toWStr(channelName, channelWName))
+        {
+            LOG_ERROR("server.loading", "Failed to load channel '{}' from database - invalid utf8 sequence? Deleted.", channelName);
+            toDelete.push_back({ channelName, team });
+            continue;
+        }
 
-        Channel* newChannel = new Channel(channelName, 0, channelDBId, TeamId(fields[2].GetUInt32()), fields[3].GetUInt8(), fields[4].GetUInt8());
+        ChannelMgr* mgr = forTeam(team);
+        if (!mgr)
+        {
+            LOG_ERROR("server.loading", "Failed to load custom chat channel '{}' from database - invalid team {}. Deleted.", channelName, team);
+            toDelete.push_back({ channelName, team });
+            continue;
+        }
+
+        Channel* newChannel = new Channel(channelName, 0, channelDBId, team, fields[3].Get<uint8>(), fields[4].Get<uint8>());
         newChannel->SetPassword(password);
-        channels[channelWName] = newChannel;
+        mgr->channels[channelWName] = newChannel;
 
-        if (QueryResult banResult = CharacterDatabase.PQuery("SELECT playerGUID, banTime FROM channels_bans WHERE channelId = %u", channelDBId))
+        if (QueryResult banResult = CharacterDatabase.Query("SELECT playerGUID, banTime FROM channels_bans WHERE channelId = {}", channelDBId))
         {
             do
             {
                 Field* banFields = banResult->Fetch();
                 if (!banFields)
                     break;
-                newChannel->AddBan(banFields[0].GetUInt32(), banFields[1].GetUInt32());     
-            }
-            while (banResult->NextRow());
+                newChannel->AddBan(ObjectGuid::Create<HighGuid::Player>(banFields[0].Get<uint32>()), banFields[1].Get<uint32>());
+            } while (banResult->NextRow());
         }
 
-        if (channelDBId > ChannelMgr::_channelIdMax) 
+        if (channelDBId > ChannelMgr::_channelIdMax)
             ChannelMgr::_channelIdMax = channelDBId;
         ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u channels for %s in %ums", count, _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde", GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    for (auto pair : toDelete)
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHANNEL);
+        stmt->SetData(0, pair.first);
+        stmt->SetData(1, pair.second);
+        CharacterDatabase.Execute(stmt);
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} channels in {}ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 Channel* ChannelMgr::GetJoinChannel(std::string const& name, uint32 channelId)
@@ -118,12 +153,11 @@ Channel* ChannelMgr::GetChannel(std::string const& name, Player* player, bool pk
             player->GetSession()->SendPacket(&data);
         }
 
-        return NULL;
+        return nullptr;
     }
 
     return i->second;
 }
-
 
 uint32 ChannelMgr::_channelIdMax = 0;
 ChannelMgr::ChannelRightsMap ChannelMgr::channels_rights;
@@ -137,8 +171,8 @@ void ChannelMgr::LoadChannelRights()
     QueryResult result = CharacterDatabase.Query("SELECT name, flags, speakdelay, joinmessage, delaymessage, moderators FROM channels_rights");
     if (!result)
     {
-        sLog->outString();
-        sLog->outString(">>  Loaded 0 Channel Rights!");
+        LOG_WARN("server.loading", ">> Loaded 0 Channel Rights!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -147,25 +181,28 @@ void ChannelMgr::LoadChannelRights()
     {
         Field* fields = result->Fetch();
         std::set<uint32> moderators;
-        const char* moderatorList = fields[5].GetCString();
-        if (moderatorList)
+        auto moderatorList = fields[5].Get<std::string_view>();
+
+        if (!moderatorList.empty())
         {
-            Tokenizer tokens(moderatorList, ' ');
-            for (Tokenizer::const_iterator i = tokens.begin(); i != tokens.end(); ++i)
+            for (auto const& itr : Acore::Tokenize(moderatorList, ' ', false))
             {
-                uint64 moderator_acc = atol(*i);
+                uint64 moderator_acc = Acore::StringTo<uint64>(itr).value_or(0);
+
                 if (moderator_acc && ((uint32)moderator_acc) == moderator_acc)
+                {
                     moderators.insert((uint32)moderator_acc);
+                }
             }
         }
 
-        SetChannelRightsFor(fields[0].GetString(), fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetString(), fields[4].GetString(), moderators);
+        SetChannelRightsFor(fields[0].Get<std::string>(), fields[1].Get<uint32>(), fields[2].Get<uint32>(), fields[3].Get<std::string>(), fields[4].Get<std::string>(), moderators);
 
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %d Channel Rights in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server.loading", ">> Loaded {} Channel Rights in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 const ChannelRights& ChannelMgr::GetChannelRightsFor(const std::string& name)

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TRINITYSERVER_MOVESPLINEINIT_ARGS_H
@@ -18,22 +29,21 @@ namespace Movement
 
     union FacingInfo
     {
-        struct {
+        struct
+        {
             float x, y, z;
         } f;
-        uint64  target;
-        float   angle;
+        uint64 target;
+        float angle;
 
         FacingInfo(float o) : angle(o) {}
         FacingInfo(uint64 t) : target(t) {}
-        FacingInfo() {}
+        FacingInfo() = default;
     };
 
     struct MoveSplineInitArgs
     {
-        MoveSplineInitArgs(size_t path_capacity = 16) : path_Idx_offset(0), velocity(0.f),
-            parabolic_amplitude(0.f), time_perc(0.f), splineId(0), initialOrientation(0.f),
-            HasVelocity(false), TransformForTransport(true)
+        MoveSplineInitArgs(size_t path_capacity = 16)
         {
             path.reserve(path_capacity);
         }
@@ -41,20 +51,20 @@ namespace Movement
         PointsArray path;
         FacingInfo facing;
         MoveSplineFlag flags;
-        int32 path_Idx_offset;
-        float velocity;
-        float parabolic_amplitude;
-        float time_perc;
-        uint32 splineId;
-        float initialOrientation;
-        bool HasVelocity;
-        bool TransformForTransport;
+        int32 path_Idx_offset{0};
+        float velocity{0.f};
+        float parabolic_amplitude{0.f};
+        float time_perc{0.f};
+        uint32 splineId{0};
+        float initialOrientation{0.f};
+        bool HasVelocity{false};
+        bool TransformForTransport{true};
 
         /** Returns true to show that the arguments were configured correctly and MoveSpline initialization will succeed. */
         bool Validate(Unit* unit) const;
 
     private:
-        bool _checkPathBounds() const;
+        [[nodiscard]] bool _checkPathBounds() const;
     };
 }
 

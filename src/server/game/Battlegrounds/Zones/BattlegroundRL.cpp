@@ -1,35 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlegroundRL.h"
+#include "ArenaScore.h"
 #include "Language.h"
-#include "Object.h"
-#include "ObjectMgr.h"
+#include "Log.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 BattlegroundRL::BattlegroundRL()
 {
     BgObjects.resize(BG_RL_OBJECT_MAX);
-
-    StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_1M;
-    StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
-    StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_15S;
-    StartDelayTimes[BG_STARTING_EVENT_FOURTH] = BG_START_DELAY_NONE;
-    //we must set messageIds
-    StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_ARENA_ONE_MINUTE;
-    StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_ARENA_THIRTY_SECONDS;
-    StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_ARENA_FIFTEEN_SECONDS;
-    StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_ARENA_HAS_BEGUN;
-}
-
-BattlegroundRL::~BattlegroundRL()
-{
-
 }
 
 void BattlegroundRL::StartingEventCloseDoors()
@@ -45,39 +40,6 @@ void BattlegroundRL::StartingEventOpenDoors()
 
     for (uint32 i = BG_RL_OBJECT_BUFF_1; i <= BG_RL_OBJECT_BUFF_2; ++i)
         SpawnBGObject(i, 60);
-}
-
-void BattlegroundRL::AddPlayer(Player* player)
-{
-    Battleground::AddPlayer(player);
-    PlayerScores[player->GetGUID()] = new BattlegroundScore(player);
-    Battleground::UpdateArenaWorldState();
-}
-
-void BattlegroundRL::RemovePlayer(Player* /*player*/)
-{
-    if (GetStatus() == STATUS_WAIT_LEAVE)
-        return;
-
-    UpdateArenaWorldState();
-    CheckArenaWinConditions();
-}
-
-void BattlegroundRL::HandleKillPlayer(Player* player, Player* killer)
-{
-    if (GetStatus() != STATUS_IN_PROGRESS)
-        return;
-
-    if (!killer)
-    {
-        sLog->outError("Killer player not found");
-        return;
-    }
-
-    Battleground::HandleKillPlayer(player, killer);
-
-    Battleground::UpdateArenaWorldState();
-    CheckArenaWinConditions();
 }
 
 bool BattlegroundRL::HandlePlayerUnderMap(Player* player)
@@ -131,31 +93,25 @@ void BattlegroundRL::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
-void BattlegroundRL::FillInitialWorldStates(WorldPacket &data)
+void BattlegroundRL::FillInitialWorldStates(WorldPacket& data)
 {
     data << uint32(0xbba) << uint32(1);           // 9
-    Battleground::UpdateArenaWorldState();
-}
-
-void BattlegroundRL::Init()
-{
-    //call parent's reset
-    Battleground::Init();
+    Arena::FillInitialWorldStates(data);
 }
 
 bool BattlegroundRL::SetupBattleground()
 {
     // gates
     if (!AddObject(BG_RL_OBJECT_DOOR_1, BG_RL_OBJECT_TYPE_DOOR_1, 1293.561f, 1601.938f, 31.60557f, -1.457349f, 0, 0, -0.6658813f, 0.7460576f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_RL_OBJECT_DOOR_2, BG_RL_OBJECT_TYPE_DOOR_2, 1278.648f, 1730.557f, 31.60557f, 1.684245f, 0, 0, 0.7460582f, 0.6658807f, RESPAWN_IMMEDIATELY)
-    // buffs
-        || !AddObject(BG_RL_OBJECT_BUFF_1, BG_RL_OBJECT_TYPE_BUFF_1, 1328.719971f, 1632.719971f, 36.730400f, -1.448624f, 0, 0, 0.6626201f, -0.7489557f, 120)
-        || !AddObject(BG_RL_OBJECT_BUFF_2, BG_RL_OBJECT_TYPE_BUFF_2, 1243.300049f, 1699.170044f, 34.872601f, -0.06981307f, 0, 0, 0.03489945f, -0.9993908f, 120)
-    // Arena Ready Marker
-        || !AddObject(BG_RL_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 1298.61f, 1598.59f, 31.62f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
-        || !AddObject(BG_RL_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 1273.71f, 1734.05f, 31.61f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
+            || !AddObject(BG_RL_OBJECT_DOOR_2, BG_RL_OBJECT_TYPE_DOOR_2, 1278.648f, 1730.557f, 31.60557f, 1.684245f, 0, 0, 0.7460582f, 0.6658807f, RESPAWN_IMMEDIATELY)
+            // buffs
+            || !AddObject(BG_RL_OBJECT_BUFF_1, BG_RL_OBJECT_TYPE_BUFF_1, 1328.719971f, 1632.719971f, 36.730400f, -1.448624f, 0, 0, 0.6626201f, -0.7489557f, 120)
+            || !AddObject(BG_RL_OBJECT_BUFF_2, BG_RL_OBJECT_TYPE_BUFF_2, 1243.300049f, 1699.170044f, 34.872601f, -0.06981307f, 0, 0, 0.03489945f, -0.9993908f, 120)
+            // Arena Ready Marker
+            || !AddObject(BG_RL_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 1298.61f, 1598.59f, 31.62f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
+            || !AddObject(BG_RL_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 1273.71f, 1734.05f, 31.61f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
     {
-        sLog->outErrorDb("BatteGroundRL: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundRL: Failed to spawn some object!");
         return false;
     }
 

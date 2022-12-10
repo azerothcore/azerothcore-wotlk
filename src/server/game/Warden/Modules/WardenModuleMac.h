@@ -1,13 +1,26 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _WARDEN_MODULE_MAC_H
 #define _WARDEN_MODULE_MAC_H
 
-uint8 Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data[9318] =
+#include <array>
+
+std::array<uint8, 9318> Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data =
 {
     0x07, 0x0C, 0x44, 0xCD, 0xC9, 0xFB, 0x99, 0xBC, 0x7C, 0x77, 0xDC, 0xE8, 0x8D, 0x07, 0xBE, 0x55,
     0x37, 0x5C, 0x84, 0x10, 0x23, 0xE1, 0x36, 0x5B, 0xF1, 0xBC, 0x60, 0xF3, 0x68, 0xBA, 0x60, 0x69,
@@ -594,7 +607,7 @@ uint8 Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data[9318] =
     0x43, 0x82, 0xAA, 0x0C, 0xEE, 0x1B
 };
 
-uint8 Module_0DBBF209A27B1E279A9FEC5C168A15F7_Key[16] =
+std::array<uint8, 16> Module_0DBBF209A27B1E279A9FEC5C168A15F7_Key =
 {
     0x5B, 0x27, 0x27, 0x01, 0x24, 0x56, 0xB4, 0xD4, 0x2D, 0xD0, 0x96, 0x77, 0x49, 0x51, 0xDC, 0x0A
 };

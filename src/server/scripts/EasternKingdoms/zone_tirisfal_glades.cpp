@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,9 +28,9 @@ go_mausoleum_door
 go_mausoleum_trigger
 EndContentData */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "Player.h"
 
 /*######
 ## npc_calvin_montague
@@ -29,8 +40,7 @@ enum Calvin
 {
     SAY_COMPLETE        = 0,
     SPELL_DRINK         = 2639,                             // possibly not correct spell (but iconId is correct)
-    QUEST_590           = 590,
-    FACTION_HOSTILE     = 168
+    QUEST_590           = 590
 };
 
 class npc_calvin_montague : public CreatureScript
@@ -38,18 +48,18 @@ class npc_calvin_montague : public CreatureScript
 public:
     npc_calvin_montague() : CreatureScript("npc_calvin_montague") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_590)
         {
-            creature->setFaction(FACTION_HOSTILE);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            creature->SetFaction(FACTION_ENEMY);
+            creature->SetImmuneToPC(false);
             CAST_AI(npc_calvin_montague::npc_calvin_montagueAI, creature->AI())->AttackStart(player);
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_calvin_montagueAI(creature);
     }
@@ -60,23 +70,23 @@ public:
 
         uint32 m_uiPhase;
         uint32 m_uiPhaseTimer;
-        uint64 m_uiPlayerGUID;
+        ObjectGuid m_uiPlayerGUID;
 
-        void Reset()
+        void Reset() override
         {
             m_uiPhase = 0;
             m_uiPhaseTimer = 5000;
-            m_uiPlayerGUID = 0;
+            m_uiPlayerGUID.Clear();
 
             me->RestoreFaction();
 
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            if (!me->IsImmuneToPC())
+                me->SetImmuneToPC(true);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void AttackedBy(Unit* pAttacker)
+        void AttackedBy(Unit* pAttacker) override
         {
             if (me->GetVictim() || me->IsFriendlyTo(pAttacker))
                 return;
@@ -84,7 +94,7 @@ public:
             AttackStart(pAttacker);
         }
 
-        void DamageTaken(Unit* pDoneBy, uint32 &uiDamage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* pDoneBy, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
         {
             if (!pDoneBy)
                 return;
@@ -94,17 +104,30 @@ public:
                 uiDamage = 0;
 
                 me->RestoreFaction();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetImmuneToPC(true);
                 me->CombatStop(true);
 
                 m_uiPhase = 1;
 
                 if (pDoneBy->GetTypeId() == TYPEID_PLAYER)
+                {
                     m_uiPlayerGUID = pDoneBy->GetGUID();
+                }
+                else if (pDoneBy->IsPet())
+                {
+                    if (Unit* owner = pDoneBy->GetOwner())
+                    {
+                        // not sure if this is needed.
+                        if (owner->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            m_uiPlayerGUID = owner->GetGUID();
+                        }
+                    }
+                }
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (m_uiPhase)
             {
@@ -145,65 +168,7 @@ public:
     };
 };
 
-/*######
-## go_mausoleum_door
-## go_mausoleum_trigger
-######*/
-
-enum Mausoleum
-{
-    QUEST_ULAG      = 1819,
-    NPC_ULAG        = 6390,
-    GO_TRIGGER      = 104593,
-    GO_DOOR         = 176594
-};
-
-class go_mausoleum_door : public GameObjectScript
-{
-public:
-    go_mausoleum_door() : GameObjectScript("go_mausoleum_door") { }
-
-    bool OnGossipHello(Player* player, GameObject* /*go*/)
-    {
-        if (player->GetQuestStatus(QUEST_ULAG) != QUEST_STATUS_INCOMPLETE)
-            return false;
-
-        if (!player->FindNearestCreature(NPC_ULAG, 50.0f))
-            if (GameObject* pTrigger = player->FindNearestGameObject(GO_TRIGGER, 30.0f))
-            {
-                pTrigger->SetGoState(GO_STATE_READY);
-                player->SummonCreature(NPC_ULAG, 2390.26f, 336.47f, 40.01f, 2.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
-                return false;
-            }
-
-        return false;
-    }
-};
-
-class go_mausoleum_trigger : public GameObjectScript
-{
-public:
-    go_mausoleum_trigger() : GameObjectScript("go_mausoleum_trigger") { }
-
-    bool OnGossipHello(Player* player, GameObject* go)
-    {
-        if (player->GetQuestStatus(QUEST_ULAG) != QUEST_STATUS_INCOMPLETE)
-            return false;
-
-        if (GameObject* pDoor = player->FindNearestGameObject(GO_DOOR, 30.0f))
-        {
-            go->SetGoState(GO_STATE_ACTIVE);
-            pDoor->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
-            return true;
-        }
-
-        return false;
-    }
-};
-
 void AddSC_tirisfal_glades()
 {
     new npc_calvin_montague();
-    new go_mausoleum_door();
-    new go_mausoleum_trigger();
 }

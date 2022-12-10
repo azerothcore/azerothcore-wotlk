@@ -1,13 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SC_SYSTEM_H
 #define SC_SYSTEM_H
 
 #include "ScriptMgr.h"
-#include <ace/Singleton.h>
 
 #define TEXT_SOURCE_RANGE -1000000                          //the amount of entries each text source has available
 
@@ -49,33 +60,34 @@ typedef std::vector<ScriptPointMove> ScriptPointVector;
 
 class SystemMgr
 {
-        friend class ACE_Singleton<SystemMgr, ACE_Null_Mutex>;
-        SystemMgr() {}
-        ~SystemMgr() {}
+    SystemMgr() {}
+    ~SystemMgr() {}
 
-    public:
-        typedef UNORDERED_MAP<uint32, ScriptPointVector> PointMoveMap;
+public:
+    static SystemMgr* instance();
 
-        //Database
-        void LoadScriptWaypoints();
+    typedef std::unordered_map<uint32, ScriptPointVector> PointMoveMap;
 
-        ScriptPointVector const& GetPointMoveList(uint32 creatureEntry) const
-        {
-            PointMoveMap::const_iterator itr = m_mPointMoveMap.find(creatureEntry);
+    //Database
+    void LoadScriptWaypoints();
 
-            if (itr == m_mPointMoveMap.end())
-                return _empty;
+    ScriptPointVector const& GetPointMoveList(uint32 creatureEntry) const
+    {
+        PointMoveMap::const_iterator itr = m_mPointMoveMap.find(creatureEntry);
 
-            return itr->second;
-        }
+        if (itr == m_mPointMoveMap.end())
+            return _empty;
 
-    protected:
-        PointMoveMap    m_mPointMoveMap;                    //coordinates for waypoints
+        return itr->second;
+    }
 
-    private:
-        static ScriptPointVector const _empty;
+protected:
+    PointMoveMap    m_mPointMoveMap;                    //coordinates for waypoints
+
+private:
+    static ScriptPointVector const _empty;
 };
 
-#define sScriptSystemMgr ACE_Singleton<SystemMgr, ACE_Null_Mutex>::instance()
+#define sScriptSystemMgr SystemMgr::instance()
 
 #endif

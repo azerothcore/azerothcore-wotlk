@@ -5,11 +5,7 @@ They will be git-ignored.
 
 Remember to use cmake macros inside your CMakeLists.txt to correctly add your scripts to the project solution.
 
-
 **/!\ BTW, we strongly suggest you to use our module system to create your custom powerful module instead of simple scripts.**
-
-
-
 
 ---------------------------
 

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _GUILDMGR_H
@@ -11,16 +22,16 @@
 
 class GuildMgr
 {
-    friend class ACE_Singleton<GuildMgr, ACE_Null_Mutex>;
-
 private:
     GuildMgr();
     ~GuildMgr();
 
 public:
-    Guild* GetGuildByLeader(uint64 guid) const;
+    static GuildMgr* instance();
+
+    Guild* GetGuildByLeader(ObjectGuid guid) const;
     Guild* GetGuildById(uint32 guildId) const;
-    Guild* GetGuildByName(std::string const& guildName) const;
+    Guild* GetGuildByName(std::string_view guildName) const;
     std::string GetGuildNameById(uint32 guildId) const;
 
     void LoadGuilds();
@@ -32,11 +43,11 @@ public:
 
     void ResetTimes();
 protected:
-    typedef UNORDERED_MAP<uint32, Guild*> GuildContainer;
+    typedef std::unordered_map<uint32, Guild*> GuildContainer;
     uint32 NextGuildId;
     GuildContainer GuildStore;
 };
 
-#define sGuildMgr ACE_Singleton<GuildMgr, ACE_Null_Mutex>::instance()
+#define sGuildMgr GuildMgr::instance()
 
 #endif
