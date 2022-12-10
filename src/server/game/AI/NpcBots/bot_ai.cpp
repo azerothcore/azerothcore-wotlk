@@ -12120,6 +12120,8 @@ inline float bot_ai::_getTotalBotStat(BotStatMods stat) const
                     break;
             }
             break;
+        default:
+            break;
     }
 
     return fval;
