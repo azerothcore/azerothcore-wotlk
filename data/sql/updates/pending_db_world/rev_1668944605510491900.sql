@@ -24,4 +24,4 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 
 DELETE FROM `waypoint_scripts` WHERE `id`=@CGUID*10;
 INSERT INTO `waypoint_scripts` VALUES
-(@CGUID*10,1,1,7,1,0,0,0,0,0,@CGUID);
+(@CGUID*10,2,1,7,0,0,0,0,0,0,@CGUID);
