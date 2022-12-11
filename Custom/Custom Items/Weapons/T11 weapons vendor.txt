@@ -116,6 +116,6 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 DELETE FROM `npc_vendor` WHERE `entry`=800007 AND `item`=91056 AND `ExtendedCost`=0;
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES (800007, 57, 91056, 0, 0, 0, 0);
 
--- Extended Cost - 2500 coins for T11
+-- Extended Cost - 2500 coins for T12
 -- Extended Cost ID = 3000
 update npc_vendor set ExtendedCost = 3000 where entry = 800007;
