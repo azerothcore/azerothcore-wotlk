@@ -3511,16 +3511,21 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 break;
             }
         case SMART_EVENT_FRIENDLY_MISSING_BUFF:
+        {
+            if (e.event.missingBuff.onlyInCombat && !me->IsEngaged())
             {
-                std::vector<Creature*> creatures;
-                DoFindFriendlyMissingBuff(creatures, float(e.event.missingBuff.radius), e.event.missingBuff.spell);
-
-                if (creatures.empty())
-                    return;
-
-                ProcessTimedAction(e, e.event.missingBuff.repeatMin, e.event.missingBuff.repeatMax, Acore::Containers::SelectRandomContainerElement(creatures));
-                break;
+                return;
             }
+
+            std::vector<Creature*> creatures;
+            DoFindFriendlyMissingBuff(creatures, float(e.event.missingBuff.radius), e.event.missingBuff.spell);
+
+            if (creatures.empty())
+                return;
+
+            ProcessTimedAction(e, e.event.missingBuff.repeatMin, e.event.missingBuff.repeatMax, Acore::Containers::SelectRandomContainerElement(creatures));
+            break;
+        }
         case SMART_EVENT_HAS_AURA:
             {
                 if (!me)

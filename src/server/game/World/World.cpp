@@ -942,6 +942,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_OBJECT_SPARKLES]      = sConfigMgr->GetOption<bool>("Visibility.ObjectSparkles", true);
 
+    m_bool_configs[CONFIG_LOW_LEVEL_REGEN_BOOST]      = sConfigMgr->GetOption<bool>("EnableLowLevelRegenBoost", true);
+
     m_bool_configs[CONFIG_OBJECT_QUEST_MARKERS] = sConfigMgr->GetOption<bool>("Visibility.ObjectQuestMarkers", true);
 
     m_int_configs[CONFIG_MAIL_DELIVERY_DELAY]   = sConfigMgr->GetOption<int32>("MailDeliveryDelay", HOUR);

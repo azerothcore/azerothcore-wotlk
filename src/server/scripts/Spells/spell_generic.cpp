@@ -4594,6 +4594,49 @@ class spell_gen_basic_campfire : public SpellScript
     }
 };
 
+// 34779 - Freezing Circle
+enum FreezingCircleSpells
+{
+    SPELL_FREEZING_CIRCLE_PIT_OF_SARON_NORMAL = 69574,
+    SPELL_FREEZING_CIRCLE_PIT_OF_SARON_HEROIC = 70276,
+    SPELL_FREEZING_CIRCLE                     = 34787,
+};
+
+class spell_freezing_circle : public SpellScript
+{
+    PrepareSpellScript(spell_freezing_circle);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_FREEZING_CIRCLE_PIT_OF_SARON_NORMAL,
+                SPELL_FREEZING_CIRCLE_PIT_OF_SARON_HEROIC,
+                SPELL_FREEZING_CIRCLE
+            });
+    }
+
+    void HandleDamage(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        uint32 spellId = 0;
+        Map* map = caster->GetMap();
+
+        if (map->IsDungeon())
+            spellId = map->IsHeroic() ? SPELL_FREEZING_CIRCLE_PIT_OF_SARON_HEROIC : SPELL_FREEZING_CIRCLE_PIT_OF_SARON_NORMAL;
+        else
+            spellId = SPELL_FREEZING_CIRCLE;
+
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+            SetHitDamage(spellInfo->Effects[EFFECT_0].CalcValue());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_freezing_circle::HandleDamage, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4732,4 +4775,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq20", SPELL_HIVEZARA_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq40", SPELL_VEKNISS_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
     RegisterSpellScript(spell_gen_basic_campfire);
+    RegisterSpellScript(spell_freezing_circle);
 }

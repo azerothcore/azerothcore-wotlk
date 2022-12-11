@@ -2484,6 +2484,15 @@ Rate.Pet.LevelXP = 0.05
 WaterBreath.Timer = 180000
 
 #
+#    EnableLowLevelRegenBoost
+#        Description: Greatly increase Health and Mana regen rates for players under level 15 (Added in patch 3.3)
+#        Default:     1 - Enabled
+#                     0 - Disabled
+#
+
+EnableLowLevelRegenBoost = 1
+
+#
 #    SkillGain.Crafting
 #    SkillGain.Defense
 #    SkillGain.Gathering
