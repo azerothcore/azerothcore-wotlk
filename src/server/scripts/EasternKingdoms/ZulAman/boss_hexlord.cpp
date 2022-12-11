@@ -625,7 +625,7 @@ public:
                     else
                     {
                         /**
-                         * @bug 
+                         * @bug
                          * Bugged
                          * //me->GetMotionMaster()->Clear();
                          * //me->GetMotionMaster()->MoveChase(target, 20);
