@@ -1,3 +1,4 @@
+-- DB update 2022_12_11_02 -> 2022_12_11_03
 -- Fix issue 13914
 DELETE FROM `quest_greeting_locale` WHERE `locale` IN ('esES', 'esMX') AND `ID` = 5638;
 INSERT INTO `quest_greeting_locale` (`ID`, `type`, `locale`, `Greeting`) VALUES 

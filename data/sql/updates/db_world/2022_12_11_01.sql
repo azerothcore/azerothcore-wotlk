@@ -1,3 +1,4 @@
+-- DB update 2022_12_11_00 -> 2022_12_11_01
 --
 UPDATE `creature` SET `position_x`=193.68, `position_y`=-425.001, `position_z`=43.536, `orientation`=4.910, `MovementType`=2 WHERE `id1`=18105;
 

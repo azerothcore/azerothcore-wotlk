@@ -1,3 +1,4 @@
+-- DB update 2022_12_11_01 -> 2022_12_11_02
 --
 UPDATE `creature` SET `MovementType`=2 WHERE `id1`=17882;
 
