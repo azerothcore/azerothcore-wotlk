@@ -51,7 +51,10 @@ const std::array<uint32, 3> entangleSpells = { SPELL_ENTANGLE_RIGHT, SPELL_ENTAN
 
 struct boss_fankriss : public BossAI
 {
-    boss_fankriss(Creature* creature) : BossAI(creature, DATA_FANKRISS) { }
+    boss_fankriss(Creature* creature) : BossAI(creature, DATA_FANKRISS)
+    {
+        me->m_CombatDistance = 80.f;
+    }
 
     void Reset() override
     {

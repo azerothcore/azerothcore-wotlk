@@ -91,7 +91,7 @@ public:
                         }
                         DoCast(me, SPELL_AVATAR);
                         me->SetReactState(REACT_PASSIVE);
-                        DoResetThreat();
+                        DoResetThreatList();
                         events.ScheduleEvent(EVENT_START_PURSUIT, 2s);
                         events.ScheduleEvent(EVENT_STOP_PURSUIT, 15s);
                         events.ScheduleEvent(EVENT_AVATAR, 45s, 50s);
@@ -104,14 +104,14 @@ public:
                         me->SetReactState(REACT_AGGRESSIVE);
                         if (Unit* pursuitTarget = ObjectAccessor::GetUnit(*me, _pursuitTargetGUID))
                         {
-                            me->GetThreatMgr().addThreat(pursuitTarget, 1000000.f);
+                            me->GetThreatMgr().AddThreat(pursuitTarget, 1000000.f);
                         }
                         break;
                     case EVENT_STOP_PURSUIT:
                         if (Unit* pursuitTarget = ObjectAccessor::GetUnit(*me, _pursuitTargetGUID))
                         {
                             _pursuitTargetGUID.Clear();
-                            me->GetThreatMgr().addThreat(pursuitTarget, -1000000.f);
+                            me->GetThreatMgr().AddThreat(pursuitTarget, -1000000.f);
                         }
                         break;
                     case EVENT_ENTANGLING_ROOTS:

@@ -49,10 +49,13 @@ enum kegThrowers
     SPELL_THROW_KEG                             = 43660,
     SPELL_RAM_AURA                              = 43883,
     SPELL_ADD_TOKENS                            = 44501,
-    SPELL_COOLDOWN_CHECKER                      = 43755,
+    SPELL_RAM_RACING_CROP                       = 44262,
+    SPELL_COOLDOWN_CHECKER                      = 44689,
     NPC_RAM_MASTER_RAY                          = 24497,
     NPC_NEILL_RAMSTEIN                          = 23558,
     KEG_KILL_CREDIT                             = 24337,
+    GOSSIP_NEIL                                 = 8953,
+    GOSSIP_RAY                                  = 8973
 };
 
 struct npc_brewfest_keg_thrower : public ScriptedAI
@@ -112,30 +115,21 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
         }
     }
 
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*uiSender*/, uint32 uiAction)
+    void sGossipSelect(Player* player, uint32 uiSender, uint32 uiAction) override
     {
-        switch (uiAction)
+        if (uiSender == GOSSIP_NEIL || uiSender == GOSSIP_RAY)
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                CloseGossipMenuFor(player);
-                player->AddSpellCooldown(SPELL_COOLDOWN_CHECKER, 0, 18 * HOUR * IN_MILLISECONDS);
-                player->CastSpell(player, 43883, true);
-                player->CastSpell(player, 44262, true);
-                break;
+            player->CastSpell(player, SPELL_COOLDOWN_CHECKER, true);
+            player->AddSpellCooldown(SPELL_COOLDOWN_CHECKER, 0, 18 * HOUR * IN_MILLISECONDS);
         }
-        return true;
-    }
 
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
+        if (uiAction != 4)
+        {
+            CloseGossipMenuFor(player);
 
-        if (!player->HasSpellCooldown(SPELL_COOLDOWN_CHECKER) && player->GetQuestRewardStatus(player->GetTeamId() == TEAM_ALLIANCE ? QUEST_THERE_AND_BACK_AGAIN_A : QUEST_THERE_AND_BACK_AGAIN_H))
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Do you have additional work?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, (creature->GetEntry() == NPC_NEILL_RAMSTEIN ? 8934 : 8976), creature->GetGUID());
-        return true;
+            player->CastSpell(player, SPELL_RAM_AURA, true);
+            player->CastSpell(player, SPELL_RAM_RACING_CROP, true);
+        }
     }
 };
 
@@ -294,6 +288,7 @@ enum darkIronAttack
     SPELL_DRUNKEN_MASTER                = 42696,
     SPELL_SUMMON_PLANS_A                = 48145,
     SPELL_SUMMON_PLANS_H                = 49318,
+    SPELL_WEAK_ALCOHOL                  = 42523,
 
     // Dark Irons
     SPELL_ATTACK_KEG                    = 42393,
@@ -1014,6 +1009,14 @@ class spell_brewfest_apple_trap : public SpellScript
 {
     PrepareSpellScript(spell_brewfest_apple_trap);
 
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::UnitAuraCheck(false, SPELL_RAM_FATIGUE));
+
+        if (targets.empty())
+            FinishCast(SPELL_FAILED_CASTER_AURASTATE);
+    }
+
     void HandleDummyEffect(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
@@ -1023,6 +1026,7 @@ class spell_brewfest_apple_trap : public SpellScript
 
     void Register() override
     {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_brewfest_apple_trap::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
         OnEffectHitTarget += SpellEffectFn(spell_brewfest_apple_trap::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
@@ -1271,6 +1275,8 @@ class spell_brewfest_toss_mug : public SpellScript
                 creature->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
             }
         }
+
+        caster->CastSpell(caster, SPELL_WEAK_ALCOHOL, true);
     }
 
     void Register() override
@@ -1771,7 +1777,7 @@ struct npc_coren_direbrew_sisters : public ScriptedAI
         })
         .Schedule(Seconds(2), [this](TaskContext mugChuck)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, -SPELL_HAS_DARK_BREWMAIDENS_BREW))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, true, -SPELL_HAS_DARK_BREWMAIDENS_BREW))
             {
                 DoCast(target, SPELL_CHUCK_MUG);
             }

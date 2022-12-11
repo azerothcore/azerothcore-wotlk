@@ -15,22 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: npc_anubisath_sentinel
-SD%Complete: 95
-SDComment: Shadow storm is not properly implemented in core it should only target ppl outside of melee range.
-SDCategory: Temple of Ahn'Qiraj
-EndScriptData */
-
-#include "Cell.h"
-#include "CellImpl.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "Spell.h"
-#include "WorldPacket.h"
+#include "SpellScript.h"
+#include "temple_of_ahnqiraj.h"
 
 enum Spells
 {
@@ -60,7 +49,8 @@ enum Spells
     SPELL_HEAL_BRETHEN                  = 26565,
     SPELL_ENRAGE                        = 8599,
 
-    TALK_ENRAGE                         = 0
+    TALK_ENRAGE                         = 0,
+    TALK_SHARE_BUFFS                    = 1
 };
 
 class npc_anubisath_sentinel : public CreatureScript
@@ -179,7 +169,7 @@ public:
         void AddSentinelsNear(Unit* /*nears*/)
         {
             std::list<Creature*> assistList;
-            me->GetCreatureListWithEntryInGrid(assistList, 15264, 70.0f);
+            me->GetCreatureListWithEntryInGrid(assistList, 15264, 100.0f);
 
             if (assistList.empty())
                 return;
@@ -286,6 +276,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
+            bool cast = false;
             for (int ni = 0; ni < 3; ++ni)
             {
                 Creature* sent = ObjectAccessor::GetCreature(*me, NearbyGUID[ni]);
@@ -293,8 +284,14 @@ public:
                     continue;
                 if (sent->isDead())
                     continue;
+                cast = true;
                 DoCast(sent, SPELL_HEAL_BRETHEN, true);
                 DoCast(sent, SPELL_TRANSFER_POWER, true);
+            }
+
+            if (cast)
+            {
+                Talk(TALK_SHARE_BUFFS);
             }
 
             DoCastSelf(SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK, true);
@@ -316,7 +313,46 @@ public:
     };
 };
 
+// 9347: Mortal Strike
+class spell_anubisath_mortal_strike : public AuraScript
+{
+    PrepareAuraScript(spell_anubisath_mortal_strike);
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+
+        if (Unit* target = GetUnitOwner()->GetVictim())
+            if (target->IsWithinDist(GetUnitOwner(), 5.f))
+                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_anubisath_mortal_strike::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+// 26626 (Server-side): Mana Burn Area
+class spell_mana_burn_area : public SpellScript
+{
+    PrepareSpellScript(spell_mana_burn_area);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, SPELL_MANAB, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_mana_burn_area::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_npc_anubisath_sentinel()
 {
     new npc_anubisath_sentinel();
+    RegisterSpellScript(spell_anubisath_mortal_strike);
+    RegisterSpellScript(spell_mana_burn_area);
 }

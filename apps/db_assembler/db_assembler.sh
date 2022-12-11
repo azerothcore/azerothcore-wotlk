@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+echo ----------------------------------------------------------------------------------------------- >&2
+echo ATTENTION: This tool is DEPRECATED. To assemble or update your DB, use the worldserver instead. >&2
+echo ----------------------------------------------------------------------------------------------- >&2
+
 set -e
 
 CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

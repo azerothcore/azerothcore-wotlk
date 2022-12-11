@@ -976,7 +976,7 @@ uint8 Aura::CalcMaxCharges(Unit* caster) const
 {
     uint32 maxProcCharges = m_spellInfo->ProcCharges;
     if (SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(GetId()))
-        maxProcCharges = procEntry->charges;
+        maxProcCharges = procEntry->Charges;
 
     if (caster)
         if (Player* modOwner = caster->GetSpellModOwner())
@@ -1450,6 +1450,26 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             else
                                 target->AddAura(74396, target);
                         }
+                        break;
+                    case 12494: // Frostbite, synchronise with Fingers of Frost
+                    {
+                        // Find Fingers of Frost
+                        if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_MAGE, 2947, EFFECT_0))
+                        {
+                            if (SpellInfo const* triggeringSpellInfo = GetTriggeredByAuraSpellInfo())
+                            {
+                                uint8 fbRank = sSpellMgr->GetSpellRank(triggeringSpellInfo->Id);
+                                uint8 fofRank = sSpellMgr->GetSpellRank(aurEff->GetId());
+                                uint8 chance = uint8(std::ceil(fofRank * fbRank * 16.6f));
+
+                                if (roll_chance_i(chance))
+                                {
+                                    caster->CastSpell(caster, aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+                                }
+                            }
+                        }
+                        break;
+                    }
                     default:
                         break;
                 }
@@ -1780,6 +1800,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 switch (GetId())
                 {
                     case 47788: // Guardian Spirit
+                    {
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;
                         if (caster->GetTypeId() != TYPEID_PLAYER)
@@ -1801,6 +1822,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             player->SendDirectMessage(&data);
                         }
                         break;
+                    }
+                    case 47585: // Dispersion (fixed bug invisible as a Shadow Priest)
+                    {
+                        if (target->IsMounted())
+                        {
+                            target->CastSpell(target, 53444, true);
+                        }
+                        break;
+                    }
                 }
                 break;
             case SPELLFAMILY_ROGUE:
@@ -2172,9 +2202,9 @@ bool Aura::IsProcOnCooldown() const
     return false;
 }
 
-void Aura::AddProcCooldown(uint32 /*msec*/)
+void Aura::AddProcCooldown(Milliseconds /*msec*/)
 {
-    //m_procCooldown = GameTime::GetGameTime().count() + msec;
+    //m_procCooldown = std:chrono::steady_clock::now() + msec;
 }
 
 void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo)
@@ -2195,7 +2225,7 @@ void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInf
     ASSERT(procEntry);
 
     // cooldowns should be added to the whole aura (see 51698 area aura)
-    AddProcCooldown(procEntry->cooldown);
+    AddProcCooldown(procEntry->Cooldown);
 }
 
 bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo) const
@@ -2284,16 +2314,16 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
 
 float Aura::CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const
 {
-    float chance = procEntry.chance;
+    float chance = procEntry.Chance;
     // calculate chances depending on unit with caster's data
     // so talents modifying chances and judgements will have properly calculated proc chance
     if (Unit* caster = GetCaster())
     {
         // calculate ppm chance if present and we're using weapon
-        if (eventInfo.GetDamageInfo() && procEntry.ratePerMinute != 0)
+        if (eventInfo.GetDamageInfo() && procEntry.ProcsPerMinute != 0)
         {
             uint32 WeaponSpeed = caster->GetAttackTime(eventInfo.GetDamageInfo()->GetAttackType());
-            chance = caster->GetPPMProcChance(WeaponSpeed, procEntry.ratePerMinute, GetSpellInfo());
+            chance = caster->GetPPMProcChance(WeaponSpeed, procEntry.ProcsPerMinute, GetSpellInfo());
         }
         // apply chance modifer aura, applies also to ppm chance (see improved judgement of light spell)
         if (Player* modOwner = caster->GetSpellModOwner())
@@ -2620,6 +2650,22 @@ bool Aura::CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventI
     return result;
 }
 
+bool Aura::CallScriptCheckAfterProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo)
+{
+    bool result = true;
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_CHECK_AFTER_PROC, aurApp);
+        std::list<AuraScript::CheckProcHandler>::iterator hookItrEnd = (*scritr)->DoCheckAfterProc.end(), hookItr = (*scritr)->DoCheckAfterProc.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            result &= hookItr->Call(*scritr, eventInfo);
+
+        (*scritr)->_FinishScriptCall();
+    }
+
+    return result;
+}
+
 bool Aura::CallScriptPrepareProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo)
 {
     bool prepare = true;
@@ -2877,15 +2923,20 @@ void DynObjAura::FillTargetMap(std::map<Unit*, uint8>& targets, Unit* /*caster*/
 
         for (UnitList::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
         {
-            // xinef: check z level and los dependence
             Unit* target = *itr;
-            float zLevel = GetDynobjOwner()->GetPositionZ();
-            if (target->GetPositionZ() + 3.0f < zLevel || target->GetPositionZ() - 5.0f > zLevel)
+
+            Optional<float> collisionHeight = { };
+            Optional<float> combatReach = { };
+            if (Unit* dynObjCaster = GetDynobjOwner()->GetCaster())
             {
-                if (!spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) && !spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) && !target->IsWithinLOSInMap(GetDynobjOwner()))
-                {
-                    continue;
-                }
+                collisionHeight = dynObjCaster->GetCollisionHeight();
+                combatReach = dynObjCaster->GetCombatReach();
+            }
+
+            if (!spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) && !spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) &&
+                !GetDynobjOwner()->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_ALL_CHECKS, collisionHeight, combatReach))
+            {
+                continue;
             }
 
             std::map<Unit*, uint8>::iterator existing = targets.find(*itr);

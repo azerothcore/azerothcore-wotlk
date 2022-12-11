@@ -840,9 +840,15 @@ public:
         return 0;
     }
 
-    [[nodiscard]] bool IsTavernAreaTrigger(uint32 Trigger_ID) const
+    [[nodiscard]] bool IsTavernAreaTrigger(uint32 triggerID, uint32 faction) const
     {
-        return _tavernAreaTriggerStore.find(Trigger_ID) != _tavernAreaTriggerStore.end();
+        auto itr = _tavernAreaTriggerStore.find(triggerID);
+        if (itr != _tavernAreaTriggerStore.end())
+        {
+            return (itr->second & faction) != 0;
+        }
+
+        return false;
     }
 
     [[nodiscard]] GossipText const* GetGossipText(uint32 Text_ID) const;
@@ -1448,7 +1454,7 @@ private:
 
     typedef std::unordered_map<uint32, GossipText> GossipTextContainer;
     typedef std::unordered_map<uint32, uint32> QuestAreaTriggerContainer;
-    typedef std::set<uint32> TavernAreaTriggerContainer;
+    typedef std::unordered_map<uint32, uint32> TavernAreaTriggerContainer;
 
     QuestAreaTriggerContainer _questAreaTriggerStore;
     TavernAreaTriggerContainer _tavernAreaTriggerStore;

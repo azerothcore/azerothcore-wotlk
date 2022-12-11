@@ -18,15 +18,19 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "blackrock_spire.h"
+#include "SpellScript.h"
 
 enum Spells
 {
-    SPELL_REND_MOUNTS               = 16167, // Change model
-    SPELL_CORROSIVE_ACID            = 16359, // Combat (self cast)
-    SPELL_FLAMEBREATH               = 16390, // Combat (Self cast)
-    SPELL_FREEZE                    = 16350, // Combat (Self cast)
-    SPELL_KNOCK_AWAY                = 10101, // Combat
-    SPELL_SUMMON_REND               = 16328  // Summons Rend near death
+    SPELL_REND_MOUNTS                 = 16167, // Change model
+    SPELL_CORROSIVE_ACID              = 16359, // Combat (self cast)
+    SPELL_FLAMEBREATH                 = 16390, // Combat (Self cast)
+    SPELL_FREEZE                      = 16350, // Combat (Self cast)
+    SPELL_KNOCK_AWAY                  = 10101, // Combat
+    SPELL_SUMMON_REND                 = 16328, // Summons Rend near death
+    SPELL_CHROMATIC_PROTECTION_FIRE   = 16373,
+    SPELL_CHROMATIC_PROTECTION_FROST  = 16392,
+    SPELL_CHROMATIC_PROTECTION_NATURE = 16391,
 };
 
 enum Misc
@@ -179,7 +183,64 @@ public:
     }
 };
 
+// 16372 - Chromatic Protection
+class spell_gyth_chromatic_protection : public AuraScript
+{
+    PrepareAuraScript(spell_gyth_chromatic_protection);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CORROSIVE_ACID, SPELL_FLAMEBREATH, SPELL_FREEZE });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            switch (spellInfo->Id)
+            {
+                case SPELL_CORROSIVE_ACID:
+                case SPELL_FLAMEBREATH:
+                case SPELL_FREEZE:
+                    return true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            switch (spellInfo->Id)
+            {
+                case SPELL_CORROSIVE_ACID:
+                    GetTarget()->CastSpell(GetTarget(), SPELL_CHROMATIC_PROTECTION_NATURE, true);
+                    break;
+                case SPELL_FLAMEBREATH:
+                    GetTarget()->CastSpell(GetTarget(), SPELL_CHROMATIC_PROTECTION_FIRE, true);
+                    break;
+                case SPELL_FREEZE:
+                    GetTarget()->CastSpell(GetTarget(), SPELL_CHROMATIC_PROTECTION_FROST, true);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gyth_chromatic_protection::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_boss_gyth()
 {
     new boss_gyth();
+    RegisterSpellScript(spell_gyth_chromatic_protection);
 }

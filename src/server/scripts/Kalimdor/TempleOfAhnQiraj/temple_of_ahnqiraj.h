@@ -75,14 +75,17 @@ enum Creatures
     NPC_VEKNILASH           = 15275,
     NPC_OURO                = 15517,
     NPC_OURO_SPAWNER        = 15957,
-    NPC_SARTURA             = 15516
+    NPC_SARTURA             = 15516,
+
+    NPC_QIRAJI_SLAYER       = 15250,
+    NPC_QIRAJI_MINDSLAYER   = 15246
 };
 
 enum ObjectsAQ40
 {
-    AQ40_DOOR_1             = 180634,
-    AQ40_DOOR_2             = 180635,
-    AQ40_DOOR_3             = 180636,
+    AQ40_DOOR_TE_ENTRANCE   = 180634,
+    AQ40_DOOR_TE_EXIT       = 180635,
+    AQ40_DOOR_SKERAM        = 180636,
     GO_CTHUN_GRASP          = 180745
 };
 

@@ -3,12 +3,11 @@
   "name": "ac-dev-server",
 
   // Update the 'dockerComposeFile' list if you have more compose files or use different names.
-  // The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
-  "dockerComposeFile": [
-    "../docker-compose.yml",
-    "../docker-compose.override.yml", // needed until this issue will be solved: https://github.com/microsoft/vscode-remote-release/issues/1080
-    "docker-compose.yml"
-  ],
+  // set an empty array to automatically solve
+  // the docker-compose files (including the .override.yml)
+  // https://github.com/microsoft/vscode-remote-release/issues/1080#issuecomment-824213014
+  // it requires vscode 1.57+
+  "dockerComposeFile": [],
   // The 'service' property is the name of the service for the container that VS Code should
   // use. Update this value and .devcontainer/docker-compose.yml to the real service name.
   "service": "ac-dev-server",
@@ -50,5 +49,5 @@
   // "postCreateCommand": "apt-get update && apt-get install -y curl",
 
   // Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
-  "remoteUser": "acore"
+  "remoteUser": "root"
 }

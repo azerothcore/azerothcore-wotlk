@@ -768,21 +768,24 @@ uint32 Condition::GetMaxAvailableConditionTargets()
     // returns number of targets which are available for given source type
     switch (SourceType)
     {
-    case CONDITION_SOURCE_TYPE_SMART_EVENT:
-        return 3;
-    case CONDITION_SOURCE_TYPE_SPELL:
-    case CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET:
-    case CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE:
-    case CONDITION_SOURCE_TYPE_VEHICLE_SPELL:
-    case CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT:
-    case CONDITION_SOURCE_TYPE_GOSSIP_MENU:
-    case CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION:
-    case CONDITION_SOURCE_TYPE_NPC_VENDOR:
-    case CONDITION_SOURCE_TYPE_SPELL_PROC:
-        return 2;
-    default:
-        return 1;
+        case CONDITION_SOURCE_TYPE_SMART_EVENT:
+            return 3;
+        case CONDITION_SOURCE_TYPE_SPELL:
+        case CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET:
+        case CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE:
+        case CONDITION_SOURCE_TYPE_VEHICLE_SPELL:
+        case CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT:
+        case CONDITION_SOURCE_TYPE_GOSSIP_MENU:
+        case CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION:
+        case CONDITION_SOURCE_TYPE_NPC_VENDOR:
+        case CONDITION_SOURCE_TYPE_SPELL_PROC:
+        case CONDITION_SOURCE_TYPE_CREATURE_VISIBILITY:
+            return 2;
+        default:
+            break;
     }
+
+    return 1;
 }
 
 ConditionMgr::ConditionMgr() {}
@@ -2302,11 +2305,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         break;
     case CONDITION_WORLD_STATE:
     {
-        if (!sWorld->getWorldState(cond->ConditionValue1))
-        {
-            LOG_ERROR("sql.sql", "World state condition has non existing world state in value1 ({}), skipped", cond->ConditionValue1);
-            return false;
-        }
         if (cond->ConditionValue3)
             LOG_ERROR("sql.sql", "World state condition has useless data in value3 ({})!", cond->ConditionValue3);
         break;

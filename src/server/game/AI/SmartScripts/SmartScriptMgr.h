@@ -124,7 +124,7 @@ enum SMART_EVENT
     SMART_EVENT_DEATH                    = 6,       // NONE
     SMART_EVENT_EVADE                    = 7,       // NONE
     SMART_EVENT_SPELLHIT                 = 8,       // SpellID, School, CooldownMin, CooldownMax
-    SMART_EVENT_RANGE                    = 9,       // MinDist, MaxDist, RepeatMin, RepeatMax
+    SMART_EVENT_RANGE                    = 9,       // minRange, maxRange, repeatMin, repeatMax, onlyFireOnRepeat
     SMART_EVENT_OOC_LOS                  = 10,      // HostilityMode, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
     SMART_EVENT_RESPAWN                  = 11,      // type, MapId, ZoneId
     SMART_EVENT_TARGET_HEALTH_PCT        = 12,      // HPMin%, HPMax%, RepeatMin, RepeatMax
@@ -222,6 +222,15 @@ struct SmartEvent
             uint32 repeatMin;
             uint32 repeatMax;
         } minMaxRepeat;
+
+        struct
+        {
+            uint32 minRange;
+            uint32 maxRange;
+            uint32 repeatMin;
+            uint32 repeatMax;
+            uint32 onlyFireOnRepeat;
+        } rangeRepeat;
 
         struct
         {
@@ -1398,8 +1407,9 @@ enum SMARTAI_TARGETS
     SMART_TARGET_PLAYER_WITH_AURA               = 201,  // spellId, negation, MaxDist, MinDist, set target.o to a number to random resize the list
     SMART_TARGET_RANDOM_POINT                   = 202,  // range, amount (for summoning creature), self als middle (0/1) else use xyz
     SMART_TARGET_ROLE_SELECTION                 = 203,  // Range Max, TargetMask (Tanks (1), Healer (2) Damage (4)), resize list
+    SMART_TARGET_SUMMONED_CREATURES             = 204,  // Entry
 
-    SMART_TARGET_AC_END                         = 204   // placeholder
+    SMART_TARGET_AC_END                         = 205   // placeholder
 };
 
 struct SmartTarget
@@ -1554,6 +1564,11 @@ struct SmartTarget
             uint32 distMax;
             uint32 distMin;
         } playerWithAura;
+
+        struct
+        {
+            uint32 entry;
+        } summonedCreatures;
 
         struct
         {
