@@ -2301,7 +2301,7 @@ public:
     void SendPetAIReaction(ObjectGuid guid);
     ///----------End of Pet responses methods----------
 
-    void propagateSpeedChange() { GetMotionMaster()->PropagateSpeedChange(); }
+    void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
 
     // reactive attacks
     void ClearAllReactives();
