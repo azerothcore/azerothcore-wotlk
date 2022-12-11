@@ -1,3 +1,4 @@
+-- DB update 2022_12_11_08 -> 2022_12_11_09
 --
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 20061);
 UPDATE `creature_template` SET `mechanic_immune_mask` = `mechanic_immune_mask`|1|64|1024 WHERE `entry` = 18044;
