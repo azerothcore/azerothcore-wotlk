@@ -159,6 +159,9 @@ public:
                     }
                     else if (state == FAIL)
                     {
+                        HandleGameObject(m_uiStageDoorLeftGUID, false);
+                        HandleGameObject(m_uiStageDoorRightGUID, false);
+                        HandleGameObject(m_uiCurtainGUID, false);
                         DoRespawnCreature(_barnesGUID, true);
                     }
                     break;
@@ -234,19 +237,6 @@ public:
                     break;
                 case GO_DUST_COVERED_CHEST:
                     DustCoveredChest = go->GetGUID();
-                    break;
-            }
-
-            switch (OperaEvent)
-            {
-                /// @todo Set Object visibilities for Opera based on performance
-                case EVENT_OZ:
-                    break;
-
-                case EVENT_HOOD:
-                    break;
-
-                case EVENT_RAJ:
                     break;
             }
         }
