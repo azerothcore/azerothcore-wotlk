@@ -6674,7 +6674,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
             case ITEM_MOD_BLOCK_VALUE:
                 HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(val), apply);
                 break;
-            // deprecated item mods
+            /// @deprecated item mods
             case ITEM_MOD_SPELL_HEALING_DONE:
             case ITEM_MOD_SPELL_DAMAGE_DONE:
                 break;
@@ -12937,8 +12937,11 @@ bool Player::CanUseBattlegroundObject(GameObject* gameobject) const
             return false;
     }
 
-    // BUG: sometimes when player clicks on flag in AB - client won't send gameobject_use, only gameobject_report_use packet
-    // Note: Mount, stealth and invisibility will be removed when used
+    /**
+     * @bug 
+     * sometimes when player clicks on flag in AB - client won't send gameobject_use, only gameobject_report_use packet
+     * Note: Mount, stealth and invisibility will be removed when used
+     */
     return (!isTotalImmune() &&                            // Damage immune
             !HasAura(SPELL_RECENTLY_DROPPED_FLAG) &&       // Still has recently held flag debuff
             IsAlive());                                    // Alive

@@ -2675,7 +2675,7 @@ void World::SendGMText(uint32 string_id, ...)
     va_end(ap);
 }
 
-/// DEPRECATED, only for debug purpose. Send a System Message to all players (except self if mentioned)
+/// @deprecated only for debug purpose. Send a System Message to all players (except self if mentioned)
 void World::SendGlobalText(const char* text, WorldSession* self)
 {
     WorldPacket data;

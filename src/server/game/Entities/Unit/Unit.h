@@ -1415,8 +1415,9 @@ public:
     [[nodiscard]] bool IsTotem() const { return m_unitTypeMask & UNIT_MASK_TOTEM; }
     [[nodiscard]] bool IsVehicle() const { return m_unitTypeMask & UNIT_MASK_VEHICLE; }
 
-    [[deprecated("Use GetLevel() instead")]] [[nodiscard]] uint8 getLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); } /// @todo Replace GetLevel() to GetLevel() in modules to remove this function
-    [[nodiscard]] uint8 GetLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
+    /// @deprecated Use GetLevel() instead!
+    [[nodiscard]] uint8 getLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
+    [[nodiscard]] uint8 GetLevel() const { return getLevel(); }
     uint8 getLevelForTarget(WorldObject const* /*target*/) const override { return GetLevel(); }
     void SetLevel(uint8 lvl, bool showLevelChange = true);
     [[nodiscard]] uint8 getRace(bool original = false) const;
