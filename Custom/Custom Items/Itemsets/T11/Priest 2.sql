@@ -26,7 +26,6 @@ INSERT INTO `item_template` (`entry`, `class`, `subclass`, `SoundOverrideSubclas
 -- Update values
 -- Itemset ID 1011
 -- all values up by 10% from T10,5
-update item_template set itemset = 1011 where entry in (81055, 81059, 81058, 81057, 81056);
 update item_template set stat_value1 = (stat_value1 * 1.2) where entry in (81055, 81059, 81058, 81057, 81056);
 update item_template set stat_value1 = (stat_value1 * 1.2) where entry in (81055, 81059, 81058, 81057, 81056);
 update item_template set stat_value2 = (stat_value2 * 1.2) where entry in (81055, 81059, 81058, 81057, 81056);
