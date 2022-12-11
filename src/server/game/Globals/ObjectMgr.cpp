@@ -9872,7 +9872,7 @@ void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint3
 {
     if (active)
     {
-        if (player->getLevel() < reqLevel)
+        if (player->GetLevel() < reqLevel)
             return;
 
         if (player->GetTotalPlayedTime() < reqPlayTime)
