@@ -12938,7 +12938,7 @@ bool Player::CanUseBattlegroundObject(GameObject* gameobject) const
     }
 
     /**
-     * @bug 
+     * @bug
      * sometimes when player clicks on flag in AB - client won't send gameobject_use, only gameobject_report_use packet
      * Note: Mount, stealth and invisibility will be removed when used
      */
