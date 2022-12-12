@@ -850,18 +850,24 @@ class spell_gen_fixate_aura : public AuraScript
 
 /* 64440 - Blade Warding
    64568 - Blood Reserve */
-class spell_gen_proc_above_75 : public AuraScript
+class spell_gen_proc_above_75 : public SpellScript
 {
-    PrepareAuraScript(spell_gen_proc_above_75);
+    PrepareSpellScript(spell_gen_proc_above_75);
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    SpellCastResult CheckLevel()
     {
-        return eventInfo.GetActor() && eventInfo.GetActor()->getLevel() >= 75;
+        Unit* caster = GetCaster();
+        if (caster->getLevel() < 75)
+        {
+            return SPELL_FAILED_LOWLEVEL;
+        }
+
+        return SPELL_CAST_OK;
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_gen_proc_above_75::CheckProc);
+        OnCheckCast += SpellCheckCastFn(spell_gen_proc_above_75::CheckLevel);
     }
 };
 
