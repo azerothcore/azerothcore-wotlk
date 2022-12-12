@@ -27,11 +27,11 @@ class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementG
 public:
     PointMovementGenerator(uint32 _id, float _x, float _y, float _z, float _speed = 0.0f, float orientation = 0.0f, const Movement::PointsArray* _path = nullptr,
         bool generatePath = false, bool forceDestination = false, ObjectGuid chargeTargetGUID = ObjectGuid::Empty)
-        : id(_id), _x(_x), _y(_y), _z(_z), speed(_speed), _orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination),
+        : id(_id), i_x(_x), i_y(_y), i_z(_z), speed(_speed), i_orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination),
         _chargeTargetGUID(chargeTargetGUID)
     {
         if (_path)
-            _precomputedPath = *_path;
+            m_precomputedPath = *_path;
     }
 
     void DoInitialize(T*);
@@ -41,18 +41,18 @@ public:
 
     void MovementInform(T*);
 
-    void unitSpeedChanged() { _recalculateSpeed = true; }
+    void unitSpeedChanged() { i_recalculateSpeed = true; }
 
     MovementGeneratorType GetMovementGeneratorType() { return POINT_MOTION_TYPE; }
 
-    bool GetDestination(float& x, float& y, float& z) const { x = _x; y = _y; z = _z; return true; }
+    bool GetDestination(float& x, float& y, float& z) const { x = i_x; y = i_y; z = i_z; return true; }
 private:
     uint32 id;
-    float _x, _y, _z;
+    float i_x, i_y, i_z;
     float speed;
-    float _orientation;
-    bool _recalculateSpeed;
-    Movement::PointsArray _precomputedPath;
+    float i_orientation;
+    bool i_recalculateSpeed;
+    Movement::PointsArray m_precomputedPath;
     bool _generatePath;
     bool _forceDestination;
     ObjectGuid _chargeTargetGUID;
@@ -72,14 +72,14 @@ public:
 class EffectMovementGenerator : public MovementGenerator
 {
 public:
-    explicit EffectMovementGenerator(uint32 Id) : _Id(Id) {}
+    explicit EffectMovementGenerator(uint32 Id) : m_Id(Id) {}
     void Initialize(Unit*) override {}
     void Finalize(Unit*) override;
     void Reset(Unit*) override {}
     bool Update(Unit*, uint32) override;
     MovementGeneratorType GetMovementGeneratorType() override { return EFFECT_MOTION_TYPE; }
 private:
-    uint32 _Id;
+    uint32 m_Id;
 };
 
 #endif

@@ -35,15 +35,15 @@ template<class T, class P>
 class PathMovementBase
 {
 public:
-    PathMovementBase() : i_path(), _currentNode(0) {}
-    PathMovementBase(P path) : i_path(path), _currentNode(0) {}
+    PathMovementBase() : i_path(), i_currentNode(0) {}
+    PathMovementBase(P path) : i_path(path), i_currentNode(0) {}
     virtual ~PathMovementBase() {};
 
-    uint32 GetCurrentNode() const { return _currentNode; }
+    uint32 GetCurrentNode() const { return i_currentNode; }
 
 protected:
     P i_path;
-    uint32 _currentNode;
+    uint32 i_currentNode;
 };
 
 template<class T>
@@ -104,7 +104,7 @@ class FlightPathMovementGenerator : public MovementGeneratorMedium< Player, Flig
     public:
         explicit FlightPathMovementGenerator(uint32 startNode = 0)
         {
-            _currentNode = startNode;
+            i_currentNode = startNode;
             _endGridX = 0.0f;
             _endGridY = 0.0f;
             _endMapId = 0;
@@ -119,9 +119,9 @@ class FlightPathMovementGenerator : public MovementGeneratorMedium< Player, Flig
 
         TaxiPathNodeList const& GetPath() { return i_path; }
         uint32 GetPathAtMapEnd() const;
-        bool HasArrived() const { return (_currentNode >= i_path.size()); }
+        bool HasArrived() const { return (i_currentNode >= i_path.size()); }
         void SetCurrentNodeAfterTeleport();
-        void SkipCurrentNode() { ++_currentNode; }
+        void SkipCurrentNode() { ++i_currentNode; }
         void DoEventIfAny(Player* player, TaxiPathNodeEntry const* node, bool departure);
 
         bool GetResetPos(Player*, float& x, float& y, float& z);
