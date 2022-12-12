@@ -2303,7 +2303,7 @@ public:
     void SendPetAIReaction(ObjectGuid guid);
     ///----------End of Pet responses methods----------
 
-    void propagateSpeedChange() { GetMotionMaster()->PropagateSpeedChange(); }
+    void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
 
     // reactive attacks
     void ClearAllReactives();
@@ -2334,7 +2334,7 @@ public:
     void CastPetAura(PetAura const* aura);
     bool IsPetAura(Aura const* aura);
 
-    [[nodiscard]] uint32 GetModelForForm(ShapeshiftForm form) const;
+    [[nodiscard]] uint32 GetModelForForm(ShapeshiftForm form, uint32 spellId) const;
     uint32 GetModelForTotem(PlayerTotemType totemType);
 
     // Redirect Threat
