@@ -1,0 +1,573 @@
+*** GOSSIP COMMANDS ***
+
+Item:GossipCreateMenu(100, player, 0);
+Item:GossipMenuAddItem((0, "Add text in here!", 1, 0));
+Item:GossipSendMenu(player);
+Item:GossipComplete();
+Item:GossipSendPOI(lua:State * L, Item * ptr);
+pUnit:GossipCreateMenu(100, player, 0);
+pUnit:GossipMenuAddItem(0, "Add text in here!", 1, 0);
+pUnit:GossipSendMenu(player);
+pUnit:GossipComplete();
+pUnit:GossipSendPOI(lua:State * L, Unit * ptr);
+GameObject:GossipCreateMenu(lua:State * L, GameObject * ptr);
+GameObject:GossipMenuAddItem(0, "Add text in here!", 1, 0);
+GameObject:GossipSendMenu(player);
+GameObject:GossipComplete();
+GameObject:GossipSendPOI(lua:State * L, GameObject * ptr);
+
+*** GET INFO COMMANDS ***
+
+pUnit:GetPlayerRace(VALUE)
+pUnit:GetCurrentSpellId(VALUE)
+pUnit:GetStanding(VALUE)
+pUnit:GetMainTank(VALUE)
+pUnit:GetAddTank(VALUE)
+pUnit:GetX(VALUE)
+pUnit:GetY(VALUE)
+pUnit:GetZ(VALUE)
+pUnit:GetO(VALUE)
+pUnit:GetTauntedBy(VALUE)
+pUnit:GetSoulLinkedWith(VALUE)
+pUnit:GetItemCount(VALUE)
+pUnit:GetName(VALUE)
+pUnit:GetHealthPct(VALUE)
+pUnit:GetManaPct(VALUE)
+pUnit:GetInstanceID(VALUE)
+pUnit:GetClosestPlayer(VALUE)
+pUnit:GetRandomPlayer(VALUE)
+pUnit:GetRandomFriend(VALUE)
+pUnit:GetUnitBySqlId(VALUE)
+pUnit:GetPlayerClass(VALUE)
+pUnit:GetHealth(VALUE)
+pUnit:GetMaxHealth(VALUE)
+pUnit:GetCreatureNearestCoords(VALUE)
+pUnit:GetGameObjectNearestCoords(x, y, z, o);
+pUnit:GetDistance(VALUE)
+pUnit:GetGUID(VALUE)
+pUnit:GetZoneId(lua_State *L, Unit * ptr);
+pUnit:GetMaxMana(VALUE)
+pUnit:GetMana(VALUE)
+pUnit:GetCurrentSpell(VALUE)
+pUnit:GetSpawnO(VALUE)
+pUnit:GetSpawnZ(VALUE)
+pUnit:GetSpawnY(VALUE)
+pUnit:GetSpawnX(VALUE)
+pUnit:GetInRangePlayersCount(VALUE)
+pUnit:GetUInt32Value(VALUE)
+pUnit:GetUInt64Value(VALUE)
+pUnit:GetFloatValue(VALUE)
+pUnit:GetAIState(VALUE)
+pUnit:GetCurrentSpell(VALUE)
+pUnit:GetInRangeGameObjects(VALUE)
+pUnit:GetInRangePlayers(VALUE)
+pUnit:GetAITargets(VALUE)
+pUnit:GetUnitByGUID(VALUE)
+pUnit:GetInRangeObjectsCount(VALUE)
+pUnit:GetAITargetsCount(VALUE)
+pUnit:GetUnitToFollow(VALUE)
+pUnit:GetNextTarget(VALUE)
+pUnit:GetPetOwner(VALUE)
+pUnit:GetEntry(VALUE)
+pUnit:GetFaction(pUnit:GetRandomPlayer(0));
+pUnit:GetThreatByPtr(VALUE)
+pUnit:GetInRangeFriends(VALUE)
+pUnit:GetPowerType(VALUE)
+pUnit:GetMapId(VALUE)
+pUnit:GetFactionStanding(VALUE)
+pUnit:GetPlayerLevel(VALUE)
+
+*** IS COMMANDS ***
+
+pUnit:IsPlayerAttacking(VALUE)
+pUnit:IsPlayerMoving(VALUE)
+pUnit:IsPlayerAtWar(VALUE)
+pUnit:IsPlayer(VALUE)
+pUnit:IsCreature(VALUE)
+pUnit:IsInCombat(VALUE)
+pUnit:IsAlive(VALUE)
+pUnit:IsDead(VALUE)
+pUnit:IsInWorld(VALUE)
+pUnit:IsCreatureMoving(lua_State * L, Unit * ptr );
+pUnit:IsFlying(VALUE)
+pUnit:IsInFront(VALUE)
+pUnit:IsInBack(VALUE)
+pUnit:IsPacified(VALUE)
+pUnit:IsFeared(VALUE)
+pUnit:IsStunned(VALUE)
+pUnit:HasInRangeObjects(VALUE)
+pUnit:IsInWater(VALUE)
+pUnit:IsInArc(VALUE)
+pUnit:IsPet(VALUE)
+pUnit:MoveFly(VALUE)
+pUnit:NoRespawn(VALUE)
+pUnit:HasItem(VALUE)
+pUnit:FlyCheat(VALUE)
+
+*** USEFUL COMMANDS ***   (pUnit ONES)
+
+pUnit:AdvanceSkill(VALUE)
+pUnit:AddSkill(VALUE)
+pUnit:RemoveSkill(VALUE)
+pUnit:PlaySpellVisual(VALUE)
+pUnit:RemoveThreatByPtr(VALUE)
+pUnit:EventCastSpell(VALUE)
+pUnit:AttackReaction(VALUE)
+pUnit:DismissPet(VALUE)
+pUnit:HandleEvent(VALUE)
+pUnit:SetMoveRunFlag(VALUE)
+pUnit:SendChatMessage(VALUE)
+pUnit:MoveTo(VALUE)
+pUnit:SetMovementType(VALUE)
+pUnit:CastSpell(VALUE)
+pUnit:CastSpellOnTarget(VALUE)
+pUnit:FullCastSpell(VALUE)
+pUnit:FullCastSpellOnTarget(VALUE)
+pUnit:SpawnGameObject(VALUE)
+pUnit:SpawnCreature(VALUE)
+pUnit:RegisterEvent(VALUE)
+pUnit:RemoveEvents(VALUE)
+pUnit:SendBroadcastMessage(VALUE)
+pUnit:SendAreaTriggerMessage(VALUE)
+pUnit:KnockBack(VALUE)
+pUnit:MarkQuestObjectiveAsComplete(VALUE)
+pUnit:LearnSpell(lua_State * L, Unit* ptr);
+pUnit:UnlearnSpell(VALUE)
+pUnit:HasFinishedQuest(VALUE)
+pUnit:ClearThreatList(VALUE)
+pUnit:ChangeTarget(VALUE)
+pUnit:Emote(VALUE)
+pUnit:Despawn(VALUE)
+pUnit:PlaySoundToSet(VALUE)
+pUnit:RemoveAura(VALUE)
+pUnit:StopMovement(VALUE)
+pUnit:AddItem(VALUE)
+pUnit:RemoveItem(VALUE)
+pUnit:CreateCustomWaypointMap(VALUE)
+pUnit:CreateWaypoint(VALUE)
+pUnit:DestroyCustomWaypointMap(VALUE)
+pUnit:MoveToWaypoint(VALUE)
+pUnit:TeleportUnit(VALUE)
+pUnit:ClearHateList(VALUE)
+pUnit:WipeHateList(VALUE)
+pUnit:WipeTargetList(VALUE)
+pUnit:WipeCurrentTarget(VALUE)
+pUnit:CastSpellAoF(VALUE)
+pUnit:RemoveAllAuras(Spell ID!);
+pUnit:StopChannel(VALUE)
+pUnit:ChannelSpell(VALUE)
+pUnit:ReturnToSpawnPoint(VALUE)
+pUnit:HasAura(VALUE)
+pUnit:Land(VALUE)
+pUnit:CancelSpell(VALUE)
+pUnit:Root(VALUE)
+pUnit:Unroot(VALUE)
+pUnit:CalcDistance(VALUE)
+pUnit:ModUInt32Value(VALUE)
+pUnit:ModFloatValue(VALUE)
+pUnit:SendData(VALUE)
+pUnit:InitPacket(VALUE)
+pUnit:AddDataToPacket(VALUE)
+pUnit:AddGuidDataToPacket(VALUE)
+pUnit:AdvanceQuestObjective(VALUE)
+pUnit:Heal(VALUE)
+pUnit:Energize(VALUE)
+pUnit:SendChatMessageAlternateEntry(VALUE)
+pUnit:SendChatMessageToPlayer(VALUE)
+pUnit:Strike(VALUE)
+pUnit:Kill(VALUE)
+pUnit:DealDamage(VALUE)
+pUnit:CreateGuardian(VALUE)
+pUnit:CalcToDistance(VALUE)
+pUnit:CalcAngle(VALUE)
+pUnit:CalcRadAngle(VALUE)
+pUnit:IsInvisible(VALUE)
+pUnit:IsInvincible(VALUE)
+pUnit:ResurrectPlayer(VALUE)
+pUnit:KickPlayer(VALUE)
+pUnit:CanCallForHelp(VALUE)
+pUnit:CallForHelpHp(VALUE)
+pUnit:RemoveFromWorld(VALUE)
+pUnit:SpellNonMeleeDamageLog(VALUE)
+pUnit:ModThreat(VALUE)
+pUnit:AddAssistTargets(VALUE)
+pUnit:RemoveAurasByMechanic(VALUE)
+pUnit:RemoveAurasType(VALUE)
+pUnit:AddAuraVisual(VALUE) 
+
+*** EVENT COMMANDS ***  (Quests and stuff like that)
+
+[QUEST EVENTS]
+	QUEST_EVENT_ON_ACCEPT			 = 1,
+	QUEST_EVENT_ON_COMPLETE 			= 2,
+	QUEST_EVENT_ON_CANCEL 			= 3,
+	QUEST_EVENT_GAMEOBJECT_ACTIVATE		 = 4,
+	QUEST_EVENT_ON_CREATURE_KILL 		 = 5,
+	QUEST_EVENT_ON_EXPLORE_AREA 			= 6,
+	QUEST_EVENT_ON_PLAYER_ITEMPICKUP 		= 7,
+	QUEST_EVENT_COUNT,
+[CREATURE EVENTS]
+	CREATURE_EVENT_ON_ENTER_COMBAT		= 1,
+	CREATURE_EVENT_ON_LEAVE_COMBAT		= 2,
+	CREATURE_EVENT_ON_TARGET_DIED		= 3,
+	CREATURE_EVENT_ON_DIED			= 4,
+	CREATURE_EVENT_ON_TARGET_PARRIED		= 5,
+	CREATURE_EVENT_ON_TARGET_DODGED		= 6,
+	CREATURE_EVENT_ON_TARGET_BLOCKED		= 7,
+	CREATURE_EVENT_ON_TARGET_CRIT_HIT		= 8,
+	CREATURE_EVENT_ON_PARRY		= 9,
+	CREATURE_EVENT_ON_DODGED		= 10,
+	CREATURE_EVENT_ON_BLOCKED		= 11,
+	CREATURE_EVENT_ON_CRIT_HIT		= 12,
+	CREATURE_EVENT_ON_HIT		= 13,
+	CREATURE_EVENT_ON_ASSIST_TARGET_DIED	= 14,
+	CREATURE_EVENT_ON_FEAR		= 15,
+	CREATURE_EVENT_ON_FLEE		= 16,
+	CREATURE_EVENT_ON_CALL_FOR_HELP	= 17,
+	CREATURE_EVENT_ON_LOAD		= 18,
+	CREATURE_EVENT_ON_REACH_WP		= 19,
+	CREATURE_EVENT_ON_LOOT_TAKEN	= 20,
+	CREATURE_EVENT_ON_AIUPDATE		= 21,
+	CREATURE_EVENT_ON_EMOTE		= 22,
+	CREATURE_EVENT_COUNT,
+[GAMEOBJECT EVENTS]
+	GAMEOBJECT_EVENT_ON_CREATE			= 1,
+	GAMEOBJECT_EVENT_ON_SPAWN			= 2,
+	GAMEOBJECT_EVENT_ON_LOOT_TAKEN		= 3,
+	GAMEOBJECT_EVENT_ON_USE			= 4,
+	GAMEOBJECT_EVENT_AIUPDATE			= 5,
+	GAMEOBJECT_EVENT_ON_DESPAWN		= 6,
+	GAMEOBJECT_EVENT_COUNT,
+[GOSSIP EVENTS]
+	GOSSIP_EVENT_ON_TALK			= 1,
+	GOSSIP_EVENT_ON_SELECT_OPTION	= 2,
+	GOSSIP_EVENT_ON_END            		 = 3,
+	GOSSIP_EVENT_COUNT,
+[RANDOM FLAGS]
+	RANDOM_ANY           			= 0,
+	RANDOM_IN_SHORTRANGE		 = 1,
+	RANDOM_IN_MIDRANGE   			= 2,
+	RANDOM_IN_LONGRANGE  		= 3,
+	RANDOM_WITH_MANA    			 = 4,
+	RANDOM_WITH_RAGE     			= 5,
+	RANDOM_WITH_ENERGY  			 = 6,
+	RANDOM_NOT_MAINTANK 			 = 7,
+	RANDOM_COUNT, 
+
+
+***  HOW TO USE ALL OF THESE COMMANDS!!!  MUST READ!!!! *** 
+(The ones bellow that don't have a discription next to them is because it has either been discribed above or it is pretty straight forward how to use)
+
+math.random(min, max) -- returns a random number between min and max. Best used as a variable
+Ex.______________________
+Choice=math.random(1,5)
+if (choice == 5) then
+     player:SendAreaTriggerMessage("You just won the lottery")
+end
+_________________________
+
+Gossip Commands
+Item:GossipCreateMenu(textid, player, 0)
+Item:GossipMenuAddItem(iconid, "name", intid, type);
+Item:GossipSendMenu(player);
+Item:GossipComplete(player);
+Item:GossipSendPOI(player, Xcoord, Ycoord, icon, flags, data, nameofPOI);
+Unit:GossipCreateMenu(textid, player, 0);
+Unit:GossipMenuAddItem(iconid, "name" intid, type);
+Unit:GossipSendMenu(player);
+Unit:GossipComplete(player);
+Unit:GossipSendPOI(player, Xcoord, Ycoord, icon, flags, data, nameofPOI);
+GameObject:GossipCreateMenu(textid, player, 0);
+GameObject:GossipMenuAddItem(iconid, "name", intid, type);
+GameObject:GossipSendMenu(player);
+GameObject:GossipComplete(player);
+GameObject:GossipSendPOI(player, Xcoord, Ycoord, icon, flags, data, nameofPOI);
+
+[NOTE] for GossipCreateMenu: textid, is the same id used in npc_textid, however you cannot have the same textid for 2 different menus.
+[NOTE] iconid = Icon next to the text in the menu list ingame. intid is a variable used in GossipSubMenu, type - 0 is regular, 1 = code(A prompt box pops up and you have to enter a new value for the variable 'code', doesn't work that good.)
+
+GET COMMANDS
+
+Unit:GetPlayerRace(); -- returns number based on race. [1=Human][2=Orc][3=Dwarf][4=NightElf][5=Undead][6=Tauren][7=Gnome][8=Troll][10=BloodElf][11=Draenei]
+Unit:GetCurrentSpellId(); -- Returns spell ID the target is currently casting
+Unit:GetStanding(lua_State * L, Unit * ptr);
+Unit:GetMainTank(lua_State * L, Unit * ptr);
+Unit:GetAddTank(lua_State * L, Unit * ptr);
+Unit:GetX(); -- Returns X Coordinate
+Unit:GetY(); -- Returns Y Coordinate
+Unit:GetZ(); -- Returns Z Coordinate
+Unit:GetO(); -- Returns Orientation
+Unit:GetTauntedBy(); -- returns player who taunted
+Unit:GetSoulLinkedWith(lua_State * L, Unit * ptr);
+Unit:GetItemCount(itemid); -- returns amount
+Unit:GetName(); -- returns Unit Name
+Unit:GetHealthPct(); -- Returns Units health betweeen 1 and 100
+Unit:GetManaPct(); -- Returns Units Mana between 1 and 100
+Unit:GetInstanceID(); -- returns instance id
+Unit:GetClosestPlayer(RandomFlag); -- Gets closest player; use Random Flags.
+Unit:GetRandomPlayer(RandomFlag); -- Gets random player; use Random Flags.
+Unit:GetRandomFriend(); -- Gets Random friend / player; use Random flags?.
+Unit:GetUnitBySqlId(); -- Gets another NPC by their SQLID
+Unit:GetPlayerClass(); -- Returns number based on class. [Warrior=1][Paladin=2][Hunter=3][Rogue=4][Priest=5][Deathknight=6][Shaman=7][Mage=8][Warlock=9][Druid=11]
+Unit:GetHealth(); -- Returns Units Current health
+Unit:GetMaxHealth(); -- Returns units Max health
+Unit:GetCreatureNearestCoords(x, y, z, NPCID);
+Unit:GetGameObjectNearestCoords(x, y, z, GOID);
+Unit:GetDistance(); -- Returns Distance. .debug rangecheck (Uses distance2dsq, 2 distance only.)
+Unit:GetGUID(); -- Returns GUID
+Unit:GetZoneId(); -- Returns GUID
+Unit:GetMaxMana(Value); -- Sets Max Mana
+Unit:GetMana(); -- Returns Current Mana
+Unit:GetCurrentSpell(); -- returns current spell id?
+Unit:GetSpawnO(); -- Returns Orientation of original Spawn
+Unit:GetSpawnZ(); -- Returns Z Coordinate of original Spawn
+Unit:GetSpawnY(); -- Returns Y Coordinate of original Spawn
+Unit:GetSpawnX(); -- Returns X coordinate of Original Spanw
+Unit:GetInRangePlayersCount(); -- Returns number based on amount of in range players.
+Unit:GetUInt32Value(lua_State * L, Unit * ptr);
+Unit:GetUInt64Value(lua_State * L, Unit * ptr);
+Unit:GetFloatValue(lua_State * L, Unit * ptr);
+Unit:GetAIState(lua_State * L, Unit * ptr);
+Unit:GetCurrentSpell(); -- same as others?
+Unit:GetInRangeGameObjects(); -- Returns Gameobjects in range in a Table (Cannot be used as a target)--\_____ Will get error "Unit Expected, got Nil"
+Unit:GetInRangePlayers(); -- Returns In range Players in a Table (Cannot be used as a target)----------/
+Unit:GetAITargets(lua_State * L, Unit * ptr);
+Unit:GetUnitByGUID(); -- Returns Unit by their Guid
+Unit:GetInRangeObjectsCount(); -- Returns a number based on amount of in range gameobjects
+Unit:GetAITargetsCount(lua_State * L, Unit * ptr);
+Unit:GetUnitToFollow(lua_State * L, Unit * ptr);
+Unit:GetNextTarget(); -- Gets next highest threat target.
+Unit:GetPetOwner(lua_State * L, Unit * ptr);
+Unit:GetEntry(); -- Returns npc entryid?
+Unit:GetFaction(); -- Returns NPC's faction
+Unit:GetThreatByPtr(lua_State * L, Unit * ptr);
+Unit:GetInRangeFriends(lua_State * L, Unit * ptr);
+Unit:GetPowerType(lua_State * L, Unit * ptr);
+Unit:GetMapId(); -- Returns Mapid
+Unit:GetFactionStanding(lua_State * L, Unit * ptr);
+Unit:GetPlayerLevel(); -- Returns playerlevel
+
+IS COMMANDS -- Will returns '1' or 'true' if true. Not sure what one.
+
+Unit:IsPlayerAttacking();
+Unit:IsPlayerMoving();
+Unit:IsPlayerAtWar(factionID);
+Unit:IsPlayer();
+Unit:IsCreature();
+Unit:IsInCombat();
+Unit:IsAlive();
+Unit:IsDead(l);
+Unit:IsInWorld();
+Unit:IsCreatureMoving();
+Unit:IsFlying();
+Unit:IsInFront();
+Unit:IsInBack();
+Unit:IsPacified();
+Unit:IsFeared();
+Unit:IsStunned();
+Unit:HasInRangeObjects();
+Unit:IsInWater();
+Unit:IsInArc();
+Unit:IsPet();
+Unit:MoveFly();
+Unit:NoRespawn();
+Unit:HasItem();
+Unit:FlyCheat();
+
+OTHER COMMANDS
+
+Unit:AdvanceSkill(skillid, amount);
+Unit:AddSkill(skillid);
+Unit:RemoveSkill(skillid);
+Unit:PlaySpellVisual(lua_State * L, Unit * ptr);
+Unit:RemoveThreatByPtr(lua_State * L, Unit * ptr);
+Unit:EventCastSpell(lua_State * L, Unit * ptr);
+Unit:AttackReaction(lua_State * L, Unit * ptr);
+Unit:DismissPet(lua_State * L, Unit * ptr);
+Unit:HandleEvent(lua_State * L, Unit * ptr);
+Unit:SetMoveRunFlag(lua_State * L, Unit * ptr);
+Unit:SendChatMessage(Language, Type, "Message"); -- Langage; what language message is in, type = what form message is in (say/yell/whisper), "message" = duh
+Unit:MoveTo(x, y, z, o); -- Once NPC gets to position i reccomend using Unit:SetFacing(Orientation) if O coordinate doesn't work.
+Unit:SetMovementType(lua_State * L, Unit * ptr);
+Unit:CastSpell(SpellID); -- Casts spell on Itself
+Unit:CastSpellOnTarget(spellID, target); -- Casts spell ID on a target with no casttime, mights till be bugged and cast on itself
+Unit:FullCastSpell(spellid); -- Fully casts a spell on itself / aoe spell
+Unit:FullCastSpellOnTarget(spellid, target); -- Full casts a spell on a target.
+Unit:SpawnGameObject(GOID, x, y, z, o, duration); -- self explanitory (set duration to 0 to keep gameobject spawned until server restart/shutdown
+Unit:SpawnCreature(NPCID, x, y, z, o, faction, duration); -- self explanitory (set duration to 0 to keep creatued spawned forever until server restart/shutdown)
+Unit:RegisterEvent("Event", Interval, IntervalCount); -- "Event"; event name, Interval; amount of time between registering the event again, IntervalCount; Amount of times to register the event.
+Unit:RemoveEvents(); -- Removes all events from the Unit
+Unit:SendBroadcastMessage("Text"); -- player only command, sends to chat box (player:SendBroadcastMessage("BroadcastMessageAppearsInTextBox"))
+Unit:SendAreaTriggerMessage(lua_State * L, Unit * ptr); -- player only command, sends across screen (player:SendAreaTriggerMessage("AreaTriggerMessageAppearsAcrossScreen"))
+Unit:KnockBack(dx, dy, affect1, affect2); -- Not sure, distancex, distancey, affects might be spell ID's?
+Unit:MarkQuestObjectiveAsComplete(lua_State * L, Unit * ptr); -- no clue
+Unit:LearnSpell(SpelLID); -- learns spellid, may be player only command
+Unit:UnlearnSpell(SpellID); -- Unlearns spellid, may be player only command
+Unit:HasFinishedQuest(QuestID); -- Returns true / 1 if true
+Unit:ClearThreatList(); -- Drops all agro, may even leave combat
+Unit:ChangeTarget(lua_State * L, Unit * ptr);
+Unit:Emote(emoteid, time);
+Unit:Despawn(despawntime, respawntime); -- despawntime = despawns in x miliseconds, respawntime = respawns in x miliseconds. (To Permanantly remove a creature spawned by another creature with no SQLID, use :RemoveFromWorld()
+Unit:PlaySoundToSet(SoundID);
+Unit:RemoveAura(SpellID);
+Unit:StopMovement(Time); -- time = Time in miliseconds
+Unit:AddItem(itemid, itemcount); -- playeronly command
+Unit:RemoveItem(itemid, itemcount); -- playeronly command
+Unit:CreateCustomWaypointMap(lua_State * L, Unit * ptr);
+Unit:CreateWaypoint(lua_State * L, Unit * ptr);
+Unit:DestroyCustomWaypointMap(lua_State * L, Unit * ptr);
+Unit:MoveToWaypoint(lua_State * L, Unit * ptr);
+Unit:TeleportUnit(map, x, y, z); -- Teleports player that clicked to location, not sure~ might teleport the Unit.
+Unit:ClearHateList(); -- Resets threat list, gets random target
+Unit:WipeHateList(); -- clears hate list, might leave combat
+Unit:WipeTargetList(lua_State * L, Unit * ptr);
+Unit:WipeCurrentTarget(lua_State * L, Unit * ptr);
+Unit:CastSpellAoF x, y, z, spellid); -- self explanitory
+Unit:RemoveAllAuras(); -- removes all auras, hostile and friendly
+Unit:StopChannel(); -- stops channeling
+Unit:ChannelSpell(spellid, target); -- channels spell on target?
+Unit:ReturnToSpawnPoint(); -- returns to spawn point
+Unit:HasAura(spellid); -- returns true or 1 if true.
+Unit:Land(); -- Unit removes 1024 flag of flying.
+Unit:CancelSpell(spellid); -- stops casting spell?
+Unit:Root(target); -- self
+Unit:Unroot(target); -- explanitory?
+Unit:CalcDistance(target); -- returns value based in yards?
+Unit:ModUInt32Value(lua_State * L, Unit * ptr);
+Unit:ModFloatValue(lua_State * L, Unit * ptr);
+Unit:SendData(lua_State * L, Unit * ptr);
+Unit:InitPacket(lua_State * L, Unit * ptr);
+Unit:AddDataToPacket(lua_State * L, Unit * ptr);
+Unit:AddGuidDataToPacket(lua_State * L, Unit * ptr);
+Unit:AdvanceQuestObjective(lua_State * L, Unit * ptr);
+Unit:Heal(lua_State * L, Unit * ptr);
+Unit:Energize(lua_State * L, Unit * ptr);
+Unit:SendChatMessageAlternateEntry(lua_State * L, Unit * ptr);
+Unit:SendChatMessageToPlayer(lua_State * L, Unit * ptr);
+Unit:Strike(lua_State * L, Unit * ptr);
+Unit:Kill(target);
+Unit:DealDamage(lua_State * L, Unit * ptr);
+Unit:CreateGuardian(lua_State * L, Unit * ptr);
+Unit:CalcToDistance(lua_State * L, Unit * ptr);
+Unit:CalcAngle(lua_State * L, Unit * ptr);
+Unit:CalcRadAngle(lua_State * L, Unit * ptr);
+Unit:IsInvisible(lua_State * L, Unit * ptr);
+Unit:IsInvincible(lua_State * L, Unit * ptr);
+Unit:ResurrectPlayer(player); -- player only command
+Unit:KickPlayer(lua_State * L, Unit * ptr);
+Unit:CanCallForHelp(lua_State * L, Unit * ptr);
+Unit:CallForHelpHp(lua_State * L, Unit * ptr);
+Unit:RemoveFromWorld(); -- Removes Unit From World (useful for npcs not saved to the Db {NPC spawned by other NPCS with no GUID})
+Unit:SpellNonMeleeDamageLog(lua_State * L, Unit * ptr);
+Unit:ModThreat(lua_State * L, Unit * ptr);
+Unit:AddAssistTargets(lua_State * L, Unit * ptr);
+Unit:RemoveAurasByMechanic(lua_State * L, Unit * ptr);
+Unit:RemoveAurasType(lua_State * L, Unit * ptr);
+Unit:AddAuraVisual(lua_State * L, Unit * ptr);
+
+SET COMMANDS
+
+Unit:SetPlayerStanding(lua_State * L, Unit * ptr);
+Unit:SetPlayerLevel(level); -- might not work
+Unit:SetPlayerAtWar(lua_State * L, Unit * ptr);
+Unit:SetCreatureName(lua_State * L, Unit * ptr);
+Unit:SetDeathState(lua_State * L, Unit * ptr);
+Unit:SetPowerType(lua_State * L, Unit * ptr);
+Unit:SetAttackTimer(time, duration);
+Unit:SetMana(Value); -- sets currnet mana
+Unit:SetMaxMana(Value);
+Unit:SetHealth(Value); -- sets current health
+Unit:SetMaxHealth(Value);
+Unit:SetFlying(); -- Sets NPC to fly.
+Unit:SetCombatCapable(1); --------\
+Unit:SetCombatMeleeCapable(1); ----\
+Unit:SetCombatRangedCapable(1); ----\_________ Set to 1 for Disableing Capableness, set to 0 to enable it again.
+Unit:SetCombatSpellCapable(1); -----/
+Unit:SetCombatTargetingCapable(1);-/
+Unit:SetNPCFlags(NPCFLAGS); -- sets npc flags
+Unit:SetModel(displayid); -- displayid
+Unit:SetScale(Scale); -- size
+Unit:SetFaction(faction); -- faction id
+Unit:SetStandState(lua_State * L, Unit * ptr);
+Unit:SetTauntedBy(lua_State * L, Unit * ptr);
+Unit:SetSoulLinkedWith(lua_State * L, Unit * ptr);
+Unit:SetInFront(lua_State * L, Unit * ptr);
+Unit:SetHealthPct(%); -- sets health Percent
+Unit:SetOutOfCombatRange(lua_State * L, Unit * ptr);
+Unit:ModifyRunSpeed(lua_State * L, Unit * ptr);
+Unit:ModifyWalkSpeed(lua_State * L, Unit * ptr);
+Unit:ModifyFlySpeed(lua_State * L, Unit * ptr);
+Unit:SetRotation(Orientation);
+Unit:SetOrientation(Orientation);
+Unit:SetUInt32Value(lua_State * L, Unit * ptr);
+Unit:SetUInt64Value(lua_State * L, Unit * ptr);
+Unit:SetFloatValue(lua_State * L, Unit * ptr);
+Unit:SetUnitToFollow(lua_State * L, Unit * ptr);
+Unit:SetNextTarget(lua_State * L, Unit * ptr);
+Unit:SetPetOwner(lua_State * L, Unit * ptr);
+Unit:SetFacing(lua_State * L, Unit * ptr);
+
+GAMEOBJECT LIST
+
+GET COMMANDS
+GameObject:GetName(lua_State * L, GameObject * ptr);
+GameObject:GetMapId(lua_State * L, GameObject * ptr);
+GameObject:GetCreatureNearestCoords(lua_State * L, GameObject * ptr);
+GameObject:GetGameObjectNearestCoords(lua_State *L, GameObject * ptr);
+GameObject:GetAreaID(lua_State * L, GameObject * ptr);
+GameObject:GetClosestPlayer(lua_State * L, GameObject * ptr);
+GameObject:GetZoneId(lua_State *L, GameObject * ptr);
+GameObject:GetItemCount(lua_State * L, GameObject * ptr);
+GameObject:GetSpawnX(lua_State * L, GameObject * ptr);
+GameObject:GetSpawnY(lua_State * L, GameObject * ptr);
+GameObject:GetSpawnZ(lua_State * L, GameObject * ptr);
+GameObject:GetSpawnO(lua_State * L, GameObject * ptr);
+GameObject:GetInRangePlayersCount(lua_State * L, GameObject * ptr);
+GameObject:GetEntry(lua_State * L, GameObject * ptr);
+GameObject:GetX(lua_State * L, GameObject * ptr);
+GameObject:GetY(lua_State * L, GameObject * ptr);
+GameObject:GetZ(lua_State * L, GameObject * ptr);
+GameObject:GetO(lua_State * L, GameObject * ptr);
+GameObject:GetInRangePlayers(lua_State * L, GameObject * ptr);
+GameObject:GetInRangeGameObjects(lua_State * L, GameObject * ptr);
+GameObject:GetInstanceID(lua_State * L, GameObject * ptr);
+GameObject:GetUInt64Value(lua_State * L, GameObject * ptr);
+GameObject:GetUInt32Value(lua_State * L, GameObject * ptr);
+GameObject:GetFloatValue(lua_State * L, GameObject * ptr);
+GameObject:GetGUID(lua_State * L, GameObject* ptr);
+
+OTHER COMMANDS
+GameObject:Teleport(lua_State * L, GameObject * ptr); -- player command, player:Teleport(map, x, y, z)
+GameObject:AddItem(lua_State * L, GameObject * ptr); -- player command, player:AddItem(itemid, itemcount)
+GameObject:Despawn(lua_State * L, GameObject * ptr);
+GameObject:IsInWorld(lua_State * L, GameObject * ptr);
+GameObject:IsInBack(lua_State * L, GameObject * ptr);
+GameObject:IsInFront(lua_State * L, GameObject * ptr);
+GameObject:PlaySoundToSet(lua_State * L, GameObject * ptr);
+GameObject:SpawnCreature(lua_State * L, GameObject * ptr);
+GameObject:SpawnGameObject(lua_State * L, GameObject * ptr);
+GameObject:CalcDistance(lua_State * L, GameObject * ptr);
+GameObject:SetOrientation(lua_State * L, GameObject * ptr);
+GameObject:RemoveFromWorld(lua_State * L, GameObject * ptr);
+GameObject:CalcRadAngle(lua_State * L, GameObject * ptr);
+GameObject:SetUInt32Value(lua_State * L, GameObject * ptr);
+GameObject:SetUInt64Value(lua_State * L, GameObject * ptr);
+GameObject:SetFloatValue(lua_State * L, GameObject * ptr);
+GameObject:ModUInt32Value(lua_State * L, GameObject * ptr);
+GameObject:CastSpell(lua_State * L, GameObject * ptr);
+GameObject:FullCastSpell(lua_State * L, GameObject * ptr);
+GameObject:CastSpellOnTarget(lua_State * L, GameObject * ptr);
+GameObject:FullCastSpellOnTarget(lua_State * L, GameObject * ptr);
+GameObjectvEventCastSpell(lua_State * L, GameObject * ptr);
+GameObject:GossipObjectCreateMenu(lua_State * L, GameObject * ptr);
+GameObject:GossipObjectMenuAddItem(lua_State * L, GameObject * ptr);
+GameObject:GossipObjectSendMenu(lua_State * L, GameObject * ptr);
+GameObject:GossipObjectComplete(lua_State * L, GameObject * ptr);
+GameObject:GossipObjectSendPOI(lua_State * L, GameObject * ptr);
+GameObject:ModUInt32Value(lua_State * L, GameObject * ptr);
+GameObject:ModFloatValue(lua_State * L, GameObject * ptr);
+GameObject:GetFloatValue(lua_State * L, GameObject * ptr);
+GameObject:InitPacket(lua_State * L, GameObject * ptr);
+GameObject:AddDataToPacket(lua_State * L, GameObject * ptr);
+GameObject:AddGuidDataToPacket(lua_State * L, GameObject * ptr);
+GameObject:SendData(lua_State * L, GameObject * ptr);
