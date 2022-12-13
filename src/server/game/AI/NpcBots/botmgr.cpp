@@ -688,6 +688,15 @@ bool BotMgr::HasBotClass(uint8 botclass) const
     return false;
 }
 
+bool BotMgr::HasBotWithSpec(uint8 spec, bool alive) const
+{
+    for (BotMap::const_iterator itr = _bots.cbegin(); itr != _bots.cend(); ++itr)
+        if (itr->second->GetBotAI()->GetSpec() == spec && (!alive || itr->second->IsAlive()))
+            return true;
+
+    return false;
+}
+
 bool BotMgr::HasBotPetType(uint32 petType) const
 {
     for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)

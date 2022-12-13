@@ -362,6 +362,9 @@ public:
             if (GC_Timer > diff || IAmFree() || IsCasting()) return false;
             if (!IsSpellReady(PW_SHIELD_1, diff)) return false;
             if (Rand() > 65 + 100 * (me->GetMap()->IsRaid())) return false;
+            if (me->GetLevel() >= 30 && _spec != BOT_SPEC_PRIEST_DISCIPLINE &&
+                master->GetBotMgr()->HasBotWithSpec(BOT_SPEC_PRIEST_DISCIPLINE))
+                return false;
 
             Group const* gr = master->GetGroup();
             Unit* u = master;
