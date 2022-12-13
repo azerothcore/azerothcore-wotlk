@@ -1,0 +1,1 @@
+INSERT INTO quest_offer_reward_locale (ID, locale, RewardText, VerifiedBuild) VALUES (1025, 'ruRU', 'Славная работа, $N. Спасибо тебе.', 18019);
