@@ -5040,8 +5040,8 @@ void ObjectMgr::LoadQuestLocales()
 
     _questLocaleStore.clear();                                // need for reload case
 
-    //                                               0   1       2      3        4           5        6              7               8               9               10
-    QueryResult result = WorldDatabase.Query("SELECT ID, locale, Title, Details, Objectives, EndText, CompletedText, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4 FROM quest_template_locale");
+    //                                               0   1       2         3                 4               5                6                   7               8               9               10
+    QueryResult result = WorldDatabase.Query("SELECT ID, Locale, LogTitle, QuestDescription, LogDescription, AreaDescription, QuestCompletionLog, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4 FROM quest_template_locale");
 
     if (!result)
         return;
