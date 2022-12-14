@@ -154,8 +154,18 @@ struct boss_jindo : public BossAI
 
     bool CanAIAttack(Unit const* target) const override
     {
-        if (me->GetThreatMgr().GetThreatListSize() > 1 && me->GetThreatMgr().GetOnlineContainer().getMostHated()->getTarget() == target)
-            return !target->HasAura(SPELL_HEX);
+        if (me->GetThreatMgr().GetThreatListSize() > 1)
+        {
+            ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
+            --lastRef;
+            if (Unit* lastTarget = (*lastRef)->getTarget())
+            {
+                if (lastTarget != target)
+                {
+                    return !target->HasAura(SPELL_HEX);
+                }
+            }
+        }
 
         return true;
     }

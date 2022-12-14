@@ -221,7 +221,7 @@ struct boss_ayamiss : public BossAI
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
-            DoResetThreat();
+            DoResetThreatList();
             _scheduler.CancelGroup(PHASE_AIR);
         }
 

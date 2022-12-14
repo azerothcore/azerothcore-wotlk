@@ -292,9 +292,7 @@ struct boss_ouro : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        //Return since we have no target
-        if (!UpdateVictim())
-            return;
+        UpdateVictim();
 
         _scheduler.Update(diff, [this]
             {
@@ -354,7 +352,7 @@ struct npc_dirt_mound : ScriptedAI
 
     void ChaseNewTarget()
     {
-        DoResetThreat();
+        DoResetThreatList();
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200.f, true))
         {
             me->AddThreat(target, 1000000.f);

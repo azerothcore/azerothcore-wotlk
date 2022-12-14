@@ -833,6 +833,9 @@ class spell_mage_master_of_elements : public AuraScript
     {
         PreventDefaultAction();
 
+        if (!_spellInfo)
+            return;
+
         if (Unit* target = GetTarget())
         {
             int32 mana = int32(_spellInfo->CalcPowerCost(target, eventInfo.GetSchoolMask()) / _ticksModifier);

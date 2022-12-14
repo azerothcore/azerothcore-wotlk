@@ -71,7 +71,7 @@ struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, b
 
             uint8 foundDuplicates = 0;
             for (std::vector<LootItem>::const_iterator itr = _loot.items.begin(); itr != _loot.items.end(); ++itr)
-                if (itr->itemid == item->itemid)
+                if (itr->itemid == item->itemid && itr->groupid == item->groupid)
                 {
                     ++foundDuplicates;
                     if (_proto->InventoryType == 0 && foundDuplicates == 3 && _proto->ItemId != 47242 /*Trophy of the Crusade*/) // Non-equippable items are limited to 3 drops
@@ -401,10 +401,11 @@ LootItem::LootItem(LootStoreItem const& li)
     is_underthreshold = 0;
     is_counted = 0;
     rollWinnerGUID = ObjectGuid::Empty;
+    groupid = li.groupid;
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter /*= false*/, bool allowQuestLoot /*= true*/, ObjectGuid source) const
+bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
 {
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
     if (!pProto)
@@ -418,7 +419,7 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(player), conditions))
     {
         // Master Looter can see conditioned recipes
-        if (!isGivenByMasterLooter && isMasterLooter)
+        if (isMasterLooter && follow_loot_rules && !is_underthreshold)
         {
             if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) || (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0))
             {
@@ -441,7 +442,7 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
     }
 
     // Master looter can see all items even if the character can't loot them
-    if (!isGivenByMasterLooter && isMasterLooter && allowQuestLoot)
+    if (isMasterLooter && follow_loot_rules && !is_underthreshold)
     {
         return true;
     }
@@ -660,26 +661,35 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
 
     QuestItemList* ql = new QuestItemList();
 
+    Player* lootOwner = (roundRobinPlayer) ? ObjectAccessor::FindPlayer(roundRobinPlayer) : player;
+
     for (uint8 i = 0; i < quest_items.size(); ++i)
     {
         LootItem& item = quest_items[i];
 
-        if (!item.is_looted && (item.AllowedForPlayer(player, false, false) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT ))))
+        // Quest item is not free for all and is already assigned to another player
+        // or player doesn't need it
+        if (item.is_blocked || !item.AllowedForPlayer(player, sourceWorldObjectGUID))
         {
-            ql->push_back(QuestItem(i));
-
-            // quest items get blocked when they first appear in a
-            // player's quest vector
-            //
-            // increase once if one looter only, looter-times if free for all
-            if (item.freeforall || !item.is_blocked)
-                ++unlootedCount;
-            if (!player->GetGroup() || (player->GetGroup()->GetLootMethod() != GROUP_LOOT && player->GetGroup()->GetLootMethod() != ROUND_ROBIN))
-                item.is_blocked = true;
-
-            if (items.size() + ql->size() == MAX_NR_LOOT_ITEMS)
-                break;
+            continue;
         }
+
+        // Player is not the loot owner, and loot owner still needs this quest item
+        if (!item.freeforall && lootOwner != player && item.AllowedForPlayer(lootOwner, sourceWorldObjectGUID))
+        {
+            continue;
+        }
+
+        ql->push_back(QuestItem(i));
+        ++unlootedCount;
+
+        if (!item.freeforall)
+        {
+            item.is_blocked = true;
+        }
+
+        if (items.size() + ql->size() == MAX_NR_LOOT_ITEMS)
+            break;
     }
     if (ql->empty())
     {
@@ -698,7 +708,8 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
     for (uint8 i = 0; i < items.size(); ++i)
     {
         LootItem& item = items[i];
-        if (!item.is_looted && !item.freeforall && (item.AllowedForPlayer(player, sourceWorldObjectGUID) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT ))))
+
+        if (!item.is_looted && !item.freeforall && item.AllowedForPlayer(player, sourceWorldObjectGUID))
         {
             item.AddAllowedLooter(player);
 
