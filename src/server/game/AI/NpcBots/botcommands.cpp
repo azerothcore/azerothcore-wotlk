@@ -306,6 +306,7 @@ public:
         {
             { "",           HandleNpcBotDeleteCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_DELETE,             Console::No  },
             { "id",         HandleNpcBotDeleteByIdCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DELETE,             Console::Yes },
+            { "free",       HandleNpcBotDeleteFreeCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DELETE,             Console::Yes },
         };
 
         static ChatCommandTable npcbotCommandTable =
@@ -1404,6 +1405,19 @@ public:
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ERASE);
 
         handler->PSendSysMessage("Npcbot %s successfully deleted", bot->GetName().c_str());
+        return true;
+    }
+
+    static bool HandleNpcBotDeleteFreeCommand(ChatHandler* handler)
+    {
+        uint32 count = 0;
+        for (uint32 creature_id : BotDataMgr::GetExistingNPCBotIds())
+            if (NpcBotData const* botData = BotDataMgr::SelectNpcBotData(creature_id))
+                if (botData->owner == 0)
+                    if (HandleNpcBotDeleteByIdCommand(handler, creature_id))
+                        ++count;
+
+        handler->PSendSysMessage("%u free npcbots deleted", count);
         return true;
     }
 
