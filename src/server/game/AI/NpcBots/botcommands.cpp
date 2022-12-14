@@ -302,6 +302,12 @@ public:
             { "spawned",    npcbotListSpawnedCommandTable                                                                           },
         };
 
+        static ChatCommandTable npcbotDeleteCommandTable =
+        {
+            { "",           HandleNpcBotDeleteCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_DELETE,             Console::No  },
+            { "id",         HandleNpcBotDeleteByIdCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DELETE,             Console::Yes },
+        };
+
         static ChatCommandTable npcbotCommandTable =
         {
             //{ "debug",      npcbotDebugCommandTable                                                                                 },
@@ -312,7 +318,7 @@ public:
             { "createnew",  HandleNpcBotCreateNewCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_CREATENEW,          Console::Yes },
             { "spawn",      HandleNpcBotSpawnCommand,               rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "move",       HandleNpcBotMoveCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_MOVE,               Console::No  },
-            { "delete",     HandleNpcBotDeleteCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_DELETE,             Console::No  },
+            { "delete",     npcbotDeleteCommandTable                                                                                },
             { "lookup",     HandleNpcBotLookupCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_LOOKUP,             Console::Yes },
             { "list",       npcbotListCommandTable                                                                                  },
             { "revive",     HandleNpcBotReviveCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_REVIVE,             Console::No  },
@@ -1342,7 +1348,62 @@ public:
 
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ERASE);
 
-        handler->SendSysMessage("Npcbot successfully deleted");
+        handler->PSendSysMessage("Npcbot %s successfully deleted", bot->GetName().c_str());
+        return true;
+    }
+
+    static bool HandleNpcBotDeleteByIdCommand(ChatHandler* handler, Optional<uint32> creature_id)
+    {
+        if (!creature_id)
+        {
+            handler->SendSysMessage(".npcbot delete id");
+            handler->SendSysMessage("Deletes npcbot spawn from world and DB using creature id");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Creature const* bot = BotDataMgr::FindBot(*creature_id);
+        if (!bot)
+        {
+            handler->PSendSysMessage("npcbot %u not found!", *creature_id);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* chr = !handler->IsConsole() ? handler->GetSession()->GetPlayer() : nullptr;
+        Player const* botowner = bot->GetBotOwner()->ToPlayer();
+
+        if (bot->GetBotAI()->HasRealEquipment())
+        {
+            ObjectGuid receiver =
+                botowner ? botowner->GetGUID() :
+                bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid(HighGuid::Player, 0, bot->GetBotAI()->GetBotOwnerGuid()) :
+                chr ? chr->GetGUID() : ObjectGuid::Empty;
+            if (receiver == ObjectGuid::Empty)
+            {
+                handler->PSendSysMessage("Cannot delete bot %s from console: has gear but no player to give it back to! Can only delete this bot in-game.", bot->GetName().c_str());
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+            if (!bot->GetBotAI()->UnEquipAll(receiver))
+            {
+                handler->PSendSysMessage("%s is unable to unequip some gear. Please remove equips before deleting bot!", bot->GetName().c_str());
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+        }
+
+        if (botowner)
+            botowner->GetBotMgr()->RemoveBot(bot->GetGUID(), BOT_REMOVE_DISMISS);
+
+        const_cast<Creature*>(bot)->CombatStop();
+        bot->GetBotAI()->Reset();
+        bot->GetBotAI()->canUpdate = false;
+        Creature::DeleteFromDB(bot->GetSpawnId());
+
+        BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ERASE);
+
+        handler->PSendSysMessage("Npcbot %s successfully deleted", bot->GetName().c_str());
         return true;
     }
 
