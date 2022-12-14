@@ -12600,6 +12600,24 @@ bool bot_ai::UnEquipAll(ObjectGuid::LowType receiver)
     return suc;
 }
 
+bool bot_ai::HasRealEquipment() const
+{
+    int8 id = 1;
+    EquipmentInfo const* einfo = sObjectMgr->GetEquipmentInfo(me->GetEntry(), id);
+    ASSERT(einfo, "Trying to call HasRealEquipment for bot with no equip info!");
+
+    for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
+    {
+        if (Item const* item = GetEquips(i))
+        {
+            if (i > BOT_SLOT_RANGED || einfo->ItemEntry[i] != item->GetEntry())
+                return true;
+        }
+    }
+
+    return false;
+}
+
 float bot_ai::GetAverageItemLevel() const
 {
     float sum = 0.f;

@@ -215,6 +215,7 @@ class bot_ai : public CreatureAI
         Item* GetEquipsByGuid(ObjectGuid itemGuid) const;
         uint32 GetEquipDisplayId(uint8 slot) const;
         bool UnEquipAll(ObjectGuid::LowType receiver);
+        bool HasRealEquipment() const;
         float GetAverageItemLevel() const;
 
         void CastBotItemCombatSpell(DamageInfo const& damageInfo);
