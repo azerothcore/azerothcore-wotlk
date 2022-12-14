@@ -695,6 +695,7 @@ class bot_ai : public CreatureAI
         };
 
         bool HasOrders() const { return !_orders.empty(); }
+        bool IsLastOrder(BotOrderTypes order_type, uint32 param1) const;
         std::size_t GetOrdersCount() const { return _orders.size(); }
         bool AddOrder(BotOrder&& order);
         void CancelOrder(BotOrder const& order);

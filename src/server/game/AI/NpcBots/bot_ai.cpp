@@ -5891,7 +5891,8 @@ bool bot_ai::IsSpellReady(uint32 basespell, uint32 diff, bool checkGCD) const
 
     BotSpellMap::const_iterator itr = _spells.find(basespell);
     return itr == _spells.end() ? true :
-        ((itr->second->enabled == true || IAmFree()) && itr->second->spellId != 0 && itr->second->cooldown <= diff);
+        ((itr->second->enabled == true || IAmFree() || IsLastOrder(BOT_ORDER_SPELLCAST, basespell)) &&
+            itr->second->spellId != 0 && itr->second->cooldown <= diff);
 }
 //Using first-rank spell as source, sets cooldown for current spell
 void bot_ai::SetSpellCooldown(uint32 basespell, uint32 msCooldown)
@@ -14413,6 +14414,28 @@ void bot_ai::_ProcessOrders()
             CancelOrder(order);
             return;
     }
+}
+bool bot_ai::IsLastOrder(BotOrderTypes order_type, uint32 param1) const
+{
+    if (!_orders.empty())
+    {
+        BotOrder const& order = _orders.front();
+        if (order_type == order._type)
+        {
+            switch (order_type)
+            {
+                case BOT_ORDER_SPELLCAST:
+                    if (order.params.spellCastParams.baseSpell == param1)
+                        return true;
+                    break;
+                default:
+                    LOG_ERROR("scripts", "bot_ai:_ProcessOrders: invalid order type {}!", uint32(order_type));
+                    break;
+            }
+        }
+    }
+
+    return false;
 }
 //VEHICLES
 //helpers
