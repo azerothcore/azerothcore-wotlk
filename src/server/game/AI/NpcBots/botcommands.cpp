@@ -1318,12 +1318,12 @@ public:
             return false;
         }
 
-        Player* botowner = bot->GetBotOwner()->ToPlayer();
+        Player const* botowner = bot->GetBotOwner()->ToPlayer();
 
-        ObjectGuid::LowType receiver =
-            botowner ? botowner->GetGUID().GetCounter() :
-            bot->GetBotAI()->GetBotOwnerGuid() != 0 ? bot->GetBotAI()->GetBotOwnerGuid() :
-            chr->GetGUID().GetCounter();
+        ObjectGuid receiver =
+            botowner ? botowner->GetGUID() :
+            bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid(HighGuid::Player, 0, bot->GetBotAI()->GetBotOwnerGuid()) :
+            chr->GetGUID();
         if (!bot->GetBotAI()->UnEquipAll(receiver))
         {
             handler->PSendSysMessage("%s is unable to unequip some gear. Please remove equips before deleting bot!", bot->GetName().c_str());
