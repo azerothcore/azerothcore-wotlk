@@ -1400,7 +1400,8 @@ public:
         const_cast<Creature*>(bot)->CombatStop();
         bot->GetBotAI()->Reset();
         bot->GetBotAI()->canUpdate = false;
-        Creature::DeleteFromDB(bot->GetSpawnId());
+        const_cast<Creature*>(bot)->DeleteFromDB();
+        const_cast<Creature*>(bot)->AddObjectToRemoveList();
 
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ERASE);
 
@@ -1859,7 +1860,7 @@ public:
                 GetBotClassNameAndColor(bot->GetBotClass(), bot_color_str, bot_class_str);
 
                 AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetBotAI()->GetLastZoneId() ? bot->GetBotAI()->GetLastZoneId() : bot->GetZoneId());
-                std::string zone_name = zone ? zone->AreaName[handler->GetSession() ? handler->GetSessionDbLocaleIndex() : 0] : "Unknown";
+                std::string zone_name = zone ? zone->area_name[handler->GetSession() ? handler->GetSessionDbLocaleIndex() : 0] : "Unknown";
 
                 ss << '\n' << counter << ") " << bot->GetEntry() << ": "
                     << bot->GetName() << " - |c" << bot_color_str << bot_class_str << "|r - "
