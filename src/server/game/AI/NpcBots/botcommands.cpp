@@ -1188,13 +1188,14 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotLookupCommand(ChatHandler* handler, Optional<uint8> botclass)
+    static bool HandleNpcBotLookupCommand(ChatHandler* handler, Optional<uint8> botclass, Optional <bool> unspawned)
     {
         //this is just a modified '.lookup creature' command
         if (!botclass)
         {
-            handler->SendSysMessage(".npcbot lookup #class");
+            handler->SendSysMessage(".npcbot lookup #class #[not_spawned_only]");
             handler->SendSysMessage("Looks up npcbots by #class, and returns all matches with their creature ID's");
+            handler->SendSysMessage("If #not_spawned_only is set to 1 shows only bots which don't exist in world");
             handler->PSendSysMessage("BOT_CLASS_WARRIOR = %u", uint32(BOT_CLASS_WARRIOR));
             handler->PSendSysMessage("BOT_CLASS_PALADIN = %u", uint32(BOT_CLASS_PALADIN));
             handler->PSendSysMessage("BOT_CLASS_HUNTER = %u", uint32(BOT_CLASS_HUNTER));
@@ -1233,8 +1234,6 @@ public:
         for (CreatureTemplateContainer::const_iterator itr = ctc->begin(); itr != ctc->end(); ++itr)
         {
             uint32 id = itr->second.Entry;
-            if (!BotDataMgr::SelectNpcBotExtras(id))
-                continue;
 
             if (id == BOT_ENTRY_MIRROR_IMAGE_BM)
                 continue;
@@ -1243,10 +1242,10 @@ public:
                 continue;
 
             NpcBotExtras const* _botExtras = BotDataMgr::SelectNpcBotExtras(id);
-            if (!_botExtras)
+            if (!_botExtras || _botExtras->bclass != botclass)
                 continue;
 
-            if (_botExtras->bclass != botclass)
+            if (unspawned && *unspawned && BotDataMgr::SelectNpcBotData(id))
                 continue;
 
             uint8 race = _botExtras->race;
