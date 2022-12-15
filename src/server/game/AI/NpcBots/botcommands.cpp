@@ -908,12 +908,9 @@ public:
         return false;
     }
 
-    static bool HandleNpcBotSendToCommand(ChatHandler* handler, Optional<std::string_view> name)
+    static bool HandleNpcBotSendToCommand(ChatHandler* handler, Optional<std::vector<std::string_view>> names)
     {
-        Player const* owner = handler->GetSession()->GetPlayer();
-        Unit const* target = handler->getSelectedCreature();
-
-        auto return_syntax = [chandler = handler]() -> bool {
+        static auto return_syntax = [](ChatHandler* chandler) -> bool {
             chandler->SendSysMessage("Syntax: .npcbot sendto");
             chandler->SendSysMessage("Makes selected bot wait 30 sec for your next DEST spell, assume that position and hold it");
             chandler->SendSysMessage("Select self to move ALL bots");
@@ -922,27 +919,50 @@ public:
             return false;
         };
 
-        auto return_success = [chandler = handler]() -> bool {
-            chandler->SendSysMessage("Your next dest spell will send bot(s) to position...");
+        static auto return_success = [](ChatHandler* chandler, Variant<std::string_view, uint32> name_or_count) -> bool {
+            if (name_or_count.holds_alternative<uint32>())
+                chandler->PSendSysMessage("Your next dest spell will send %u bot(s) to position...", name_or_count.get<uint32>());
+            else
+                chandler->PSendSysMessage("Your next dest spell will send %s to position...", name_or_count.get<std::string_view>().data());
             return true;
         };
 
-        if (!owner->HaveBot() || (!(target && target->ToCreature() && target->ToCreature()->IsNPCBot()) && !name))
+        Player const* owner = handler->GetSession()->GetPlayer();
+
+        if (!owner->HaveBot())
+            return return_syntax(handler);
+
+        if (!names || names->empty())
         {
-            if (owner->HaveBot() && (!target || target->GetGUID() == owner->GetGUID()))
+            Unit const* target = handler->getSelectedCreature();
+            Creature const* bot = target ? owner->GetBotMgr()->GetBot(target->GetGUID()) : nullptr;
+            if (bot && bot->IsAlive())
             {
-                owner->GetBotMgr()->SendBotAwaitState(BOT_AWAIT_SEND);
-                return return_success();
+                bot->GetBotAI()->SetBotAwaitState(BOT_AWAIT_SEND);
+                return return_success(handler, { bot->GetName() });
             }
-            return return_syntax();
+            return return_syntax(handler);
         }
 
-        Creature const* bot = (target && target->ToCreature()) ? owner->GetBotMgr()->GetBot(target->GetGUID()) : owner->GetBotMgr()->GetBotByName(*name);
-        if (!bot || !bot->IsAlive())
-            return return_syntax();
+        uint32 count = 0;
+        for (decltype(names)::value_type::value_type name : *names)
+        {
+            Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
+            if (bot && bot->IsAlive())
+            {
+                ++count;
+                bot->GetBotAI()->SetBotAwaitState(BOT_AWAIT_SEND);
+            }
+        }
 
-        bot->GetBotAI()->SetBotAwaitState(BOT_AWAIT_SEND);
-        return return_success();
+        if (count == 0)
+        {
+            handler->PSendSysMessage("Unable to send any of %u bots!", uint32(names->size()));
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        return return_success(handler, { count });
     }
 
     static bool HandleNpcBotRecallCommand(ChatHandler* handler)
