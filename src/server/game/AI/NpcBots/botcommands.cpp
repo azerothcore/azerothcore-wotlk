@@ -346,43 +346,6 @@ public:
         return commandTable;
     }
 
-    static bool HandleNpcBotSendToCommand(ChatHandler* handler, Optional<std::string_view> name)
-    {
-        Player const* owner = handler->GetSession()->GetPlayer();
-        Unit const* target = handler->getSelectedCreature();
-
-        auto return_syntax = [chandler = handler]() -> bool {
-            chandler->SendSysMessage("Syntax: .npcbot sendto");
-            chandler->SendSysMessage("Makes selected bot wait 30 sec for your next DEST spell, assume that position and hold it");
-            chandler->SendSysMessage("Select self to move ALL bots");
-            chandler->SendSysMessage("Max distance is 70 yds");
-            chandler->SetSentErrorMessage(true);
-            return false;
-        };
-
-        auto return_success = [chandler = handler]() -> bool {
-            chandler->SendSysMessage("Your next dest spell will send bot(s) to position...");
-            return true;
-        };
-
-        if (!owner->HaveBot() || (!(target && target->ToCreature() && target->ToCreature()->IsNPCBot()) && !name))
-        {
-            if (owner->HaveBot() && (!target || target->GetGUID() == owner->GetGUID()))
-            {
-                owner->GetBotMgr()->SendBotAwaitState(BOT_AWAIT_SEND);
-                return return_success();
-            }
-            return return_syntax();
-        }
-
-        Creature const* bot = (target && target->ToCreature()) ? owner->GetBotMgr()->GetBot(target->GetGUID()) : owner->GetBotMgr()->GetBotByName(*name);
-        if (!bot || !bot->IsAlive())
-            return return_syntax();
-
-        bot->GetBotAI()->SetBotAwaitState(BOT_AWAIT_SEND);
-        return return_success();
-    }
-
     static bool HandleNpcBotDebugStatesCommand(ChatHandler* handler)
     {
         Unit* target = handler->getSelectedUnit();
@@ -943,6 +906,43 @@ public:
         handler->SendSysMessage("You must select one of your bots or yourself");
         handler->SetSentErrorMessage(true);
         return false;
+    }
+
+    static bool HandleNpcBotSendToCommand(ChatHandler* handler, Optional<std::string_view> name)
+    {
+        Player const* owner = handler->GetSession()->GetPlayer();
+        Unit const* target = handler->getSelectedCreature();
+
+        auto return_syntax = [chandler = handler]() -> bool {
+            chandler->SendSysMessage("Syntax: .npcbot sendto");
+            chandler->SendSysMessage("Makes selected bot wait 30 sec for your next DEST spell, assume that position and hold it");
+            chandler->SendSysMessage("Select self to move ALL bots");
+            chandler->SendSysMessage("Max distance is 70 yds");
+            chandler->SetSentErrorMessage(true);
+            return false;
+        };
+
+        auto return_success = [chandler = handler]() -> bool {
+            chandler->SendSysMessage("Your next dest spell will send bot(s) to position...");
+            return true;
+        };
+
+        if (!owner->HaveBot() || (!(target && target->ToCreature() && target->ToCreature()->IsNPCBot()) && !name))
+        {
+            if (owner->HaveBot() && (!target || target->GetGUID() == owner->GetGUID()))
+            {
+                owner->GetBotMgr()->SendBotAwaitState(BOT_AWAIT_SEND);
+                return return_success();
+            }
+            return return_syntax();
+        }
+
+        Creature const* bot = (target && target->ToCreature()) ? owner->GetBotMgr()->GetBot(target->GetGUID()) : owner->GetBotMgr()->GetBotByName(*name);
+        if (!bot || !bot->IsAlive())
+            return return_syntax();
+
+        bot->GetBotAI()->SetBotAwaitState(BOT_AWAIT_SEND);
+        return return_success();
     }
 
     static bool HandleNpcBotRecallCommand(ChatHandler* handler)

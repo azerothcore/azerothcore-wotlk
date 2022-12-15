@@ -14429,7 +14429,7 @@ bool bot_ai::IsLastOrder(BotOrderTypes order_type, uint32 param1) const
                         return true;
                     break;
                 default:
-                    LOG_ERROR("scripts", "bot_ai:_ProcessOrders: invalid order type {}!", uint32(order_type));
+                    LOG_ERROR("scripts", "bot_ai:IsLastOrder: invalid order type {}!", uint32(order_type));
                     break;
             }
         }
