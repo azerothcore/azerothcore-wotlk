@@ -1,3 +1,4 @@
+-- DB update 2022_12_16_03 -> 2022_12_16_04
 --
 DELETE FROM `creature_onkill_reputation` WHERE `creature_id` IN (15233,15246,15247,15250,15252,15311,15312);
 INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`, `MaxStanding1`, `IsTeamAward1`, `RewOnKillRepValue1`, `MaxStanding2`, `IsTeamAward2`, `RewOnKillRepValue2`, `TeamDependent`) VALUES
