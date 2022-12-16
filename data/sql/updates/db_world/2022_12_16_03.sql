@@ -1,3 +1,4 @@
+-- DB update 2022_12_16_02 -> 2022_12_16_03
 UPDATE `quest_template_locale` SET `CompletedText` = 'Вернитесь к часовому Мелирии Ледяной Тени в Лесную Песнь, что в Ясеневом лесу.', `ObjectiveText1` = 'Изучите фолиант Мел\'Тандрис' WHERE `ID` = 1022 AND `locale` = 'ruRU';
 UPDATE `quest_template_locale` SET `CompletedText` = 'Вернитесь к веселому духу эльфийки крови на Руины Луносвета, что в Лесах Вечной Песни.' WHERE `ID` = 1011 AND `locale` = 'ruRU';
 UPDATE `quest_template_locale` SET `CompletedText` = 'Вернитесь к Кривокрону в Лесную Песнь, что в Ясеневом лесу.' WHERE `ID` = 9517 AND `locale` = 'ruRU';
