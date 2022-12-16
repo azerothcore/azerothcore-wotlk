@@ -1,3 +1,4 @@
+-- DB update 2022_12_14_00 -> 2022_12_16_00
 -- Delete old HFP Trash loot table
 DELETE FROM `creature_loot_template` WHERE `entry`=17370 AND `Comment` LIKE '%Hellfire Channeler%';
 DELETE FROM `creature_loot_template` WHERE `entry`=17259 AND `Comment` LIKE '%Bonechewer Hungerer%';
