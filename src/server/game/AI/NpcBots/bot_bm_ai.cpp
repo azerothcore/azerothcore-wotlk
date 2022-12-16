@@ -511,7 +511,8 @@ public:
                 if (!IAmFree())
                     master->GetBotMgr()->AddBot(illusion, false);
 
-                illusion->SetCreatorGUID(me->GetGUID()); //TempSummon* Map::SummonCreature()
+                illusion->SetCreator(master); //TempSummon* Map::SummonCreature()
+                illusion->SetOwnerGUID(me->GetGUID());
 
                 //copy visuals
                 //illusion->SetEntry(me->GetEntry());

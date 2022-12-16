@@ -3336,7 +3336,7 @@ bool bot_ai::IsInBotParty(Unit const* unit) const
     //Player-controlled creature case
     if (Creature const* cre = unit->ToCreature())
     {
-        ObjectGuid ownerGuid = unit->GetOwnerGUID();
+        ObjectGuid ownerGuid = unit->GetOwnerGUID() ? unit->GetOwnerGUID() : unit->GetCreatorGUID();
         if (!ownerGuid && unit->IsVehicle())
             ownerGuid = unit->GetCharmerGUID();
         //controlled by master
@@ -16243,8 +16243,8 @@ void bot_ai::OnBotEnterVehicle(Vehicle const* vehicle)
         if (seat->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
         {
             vehicle->GetBase()->SetFaction(master->GetFaction());
-            vehicle->GetBase()->SetOwnerGUID(master->GetGUID());
-            vehicle->GetBase()->SetCreatorGUID(master->GetGUID());
+            //vehicle->GetBase()->SetOwnerGUID(master->GetGUID());
+            vehicle->GetBase()->SetCreator(master);
             vehicle->GetBase()->SetUnitFlag(UNIT_FLAG_POSSESSED);
             vehicle->GetBase()->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             vehicle->GetBase()->SetByteValue(UNIT_FIELD_BYTES_2, 1, master->GetByteValue(UNIT_FIELD_BYTES_2, 1));
@@ -16310,8 +16310,8 @@ void bot_ai::OnBotExitVehicle(Vehicle const* vehicle)
             vehicle->GetBase()->SetControlledByPlayer(false);
             vehicle->GetBase()->RemoveCharmedBy(me);
             vehicle->GetBase()->RestoreFaction();
-            vehicle->GetBase()->SetOwnerGUID(ObjectGuid::Empty);
-            vehicle->GetBase()->SetCreatorGUID(ObjectGuid::Empty);
+            //vehicle->GetBase()->SetOwnerGUID(ObjectGuid::Empty);
+            vehicle->GetBase()->SetCreator(nullptr);
             vehicle->GetBase()->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             if (vehicle->GetBase()->GetTypeId() == TYPEID_UNIT)
                 vehicle->GetBase()->RemoveUnitFlag(UNIT_FLAG_POSSESSED);

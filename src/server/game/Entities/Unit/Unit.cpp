@@ -6328,6 +6328,12 @@ GameObject* Unit::GetFirstGameObjectById(uint32 id) const
 
     return nullptr;
 }
+
+void Unit::SetCreator(Unit* creator)
+{
+    SetCreatorGUID(creator ? creator->GetGUID() : ObjectGuid::Empty);
+    m_creator = creator;
+}
 //end npcbot
 
 void Unit::AddGameObject(GameObject* gameObj)
@@ -18546,9 +18552,9 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     Creature* creature = victim->ToCreature();
 
     //npcbot - loot recipient of bot's vehicle is owner
-    if (!player && killer && killer->IsVehicle() && killer->GetCharmerGUID().IsCreature() && killer->GetOwnerGUID().IsPlayer())
+    if (!player && killer && killer->IsVehicle() && killer->GetCharmerGUID().IsCreature() && killer->GetCreatorGUID().IsPlayer())
     {
-        if (Unit* uowner = killer->GetOwner())
+        if (Unit* uowner = killer->GetCreator())
             player = uowner->ToPlayer();
     }
     //end npcbot

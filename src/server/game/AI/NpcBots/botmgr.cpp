@@ -982,13 +982,13 @@ void BotMgr::CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype)
     //remove any summons
     bot->GetBotAI()->UnsummonAll();
 
-    ASSERT(bot->GetOwnerGUID() == _owner->GetGUID());
-    bot->SetOwnerGUID(ObjectGuid::Empty);
+    ASSERT(bot->GetCreatorGUID() == _owner->GetGUID());
+    //bot->SetOwnerGUID(ObjectGuid::Empty);
     //_owner->m_Controlled.erase(bot);
     bot->SetControlledByPlayer(false);
     //bot->RemoveUnitFlag(UNIT_FLAG_PVP_ATTACKABLE);
     bot->SetByteValue(UNIT_FIELD_BYTES_2, 1, 0);
-    bot->SetCreatorGUID(ObjectGuid::Empty);
+    bot->SetCreator(nullptr);
 
     Map* map = bot->FindMap();
     if (!map || map->IsDungeon())
@@ -1141,9 +1141,9 @@ BotAddResult BotMgr::AddBot(Creature* bot, bool takeMoney)
 
     _bots[bot->GetGUID()] = bot;
 
-    ASSERT(!bot->GetOwnerGUID());
-    bot->SetOwnerGUID(_owner->GetGUID());
-    bot->SetCreatorGUID(_owner->GetGUID()); //needed in case of FFAPVP
+    ASSERT(!bot->GetCreatorGUID());
+    //bot->SetOwnerGUID(_owner->GetGUID());
+    bot->SetCreator(_owner); //needed in case of FFAPVP
     //_owner->m_Controlled.insert(bot);
     bot->SetControlledByPlayer(true);
     bot->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
