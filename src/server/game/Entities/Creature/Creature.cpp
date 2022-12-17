@@ -1036,7 +1036,7 @@ void Creature::DoFleeToGetAssistance()
         if (!creature)
             //SetFeared(true, GetVictim()->GetGUID(), 0, sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY));
             //TODO: use 31365
-            SetControlled(true, UNIT_STATE_FLEEING);
+            SetControlled(true, UNIT_STATE_FLEEING, GetVictim());
         else
             GetMotionMaster()->MoveSeekAssistance(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ());
     }
