@@ -43,6 +43,13 @@
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
+#include <TaskScheduler.h>
+#include "Metric.h"
+
+namespace
+{
+    TaskScheduler kickScheduler;
+}
 
 // Zone Interval should be 1 second
 constexpr auto ZONE_UPDATE_INTERVAL = 1000;
@@ -419,6 +426,11 @@ void Player::Update(uint32 p_time)
         UpdateObjectVisibility(true, true);
         m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
+    }
+
+    {
+        METRIC_TIMER("player_update_time", METRIC_TAG("type", "Update kickScheduler"));
+        kickScheduler.Update(p_time);
     }
 }
 
@@ -2252,4 +2264,17 @@ void Player::ProcessTerrainStatusUpdate()
     }
     else
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWATER_INDARKWATER);
+}
+
+void Player::KickPlayer(std::string kickReasonStr, uint32 min_time, uint32 max_time)
+{
+    uint32 time = urand(min_time, max_time);
+    kickScheduler.Schedule(Seconds(10), [&](TaskContext /*context*/)
+        {
+            GetSession()->SendNotification(kickReasonStr.c_str());
+            kickScheduler.Schedule(Seconds(time), [&](TaskContext /*context*/)
+                {
+                    GetSession()->KickPlayer(kickReasonStr);
+                });
+        });
 }

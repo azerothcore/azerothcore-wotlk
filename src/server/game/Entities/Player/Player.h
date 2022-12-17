@@ -2575,6 +2575,8 @@ public:
 
     std::string GetDebugInfo() const override;
 
+    void KickPlayer(std::string kickReasonStr, uint32 min_time, uint32 max_time);
+
  protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;

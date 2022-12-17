@@ -107,6 +107,7 @@ public:
             { "save",              HandleSaveCommand,              SEC_PLAYER,             Console::No  },
             { "saveall",           HandleSaveAllCommand,           SEC_GAMEMASTER,         Console::Yes },
             { "kick",              HandleKickPlayerCommand,        SEC_GAMEMASTER,         Console::Yes },
+            { "kickdelay",         HandleKickDelayPlayerCommand,   SEC_GAMEMASTER,         Console::Yes },
             { "unstuck",           HandleUnstuckCommand,           SEC_GAMEMASTER,         Console::Yes },
             { "linkgrave",         HandleLinkGraveCommand,         SEC_ADMINISTRATOR,      Console::No  },
             { "neargrave",         HandleNearGraveCommand,         SEC_GAMEMASTER,         Console::No  },
@@ -1352,6 +1353,52 @@ public:
         }
 
         targetPlayer->GetSession()->KickPlayer("HandleKickPlayerCommand");
+
+        return true;
+    }
+
+    // kick player
+    static bool HandleKickDelayPlayerCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<std::string_view> reason, uint32 min_time, uint32 max_time)
+    {
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target || !target->IsConnected())
+        {
+            return false;
+        }
+
+        auto targetPlayer = target->GetConnectedPlayer();
+
+        if (handler->GetSession() && target->GetGUID() == handler->GetSession()->GetPlayer()->GetGUID())
+        {
+            handler->SendSysMessage(LANG_COMMAND_KICKSELF);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        // check online security
+        if (handler->HasLowerSecurity(targetPlayer))
+        {
+            return false;
+        }
+
+        std::string kickReasonStr = handler->GetAcoreString(LANG_NO_REASON);
+        if (reason && !reason->empty())
+        {
+            kickReasonStr = std::string{ *reason };
+        }
+
+        if (min_time < 0 || max_time < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        targetPlayer->KickPlayer(min_time, max_time, kickReasonStr);
 
         return true;
     }

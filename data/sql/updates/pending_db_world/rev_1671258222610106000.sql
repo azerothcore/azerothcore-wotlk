@@ -1,0 +1,3 @@
+--
+DELETE FROM `command` WHERE `name` = 'kickdelay';
+INSERT INTO `command` (`name`, `security`, `help`) VALUES ('kickdelay', 2, 'Syntax: .kickdelay [$charactername] [$reason] [$min_time] [$max_time]\r\n\r\nKick the given character with delay name from the world with or without reason. If no character name is provided then the selected player (except for yourself) will be kicked. If no reason is provided, default is \"No Reason\".');
