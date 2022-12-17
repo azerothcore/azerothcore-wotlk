@@ -11,7 +11,7 @@ DELETE FROM `gameobject` WHERE `map`=556 AND `id` IN (177203, 185554) AND `guid`
 SET @CGUID := 138600;
 SET @OGUID := 7278;
 
-DELETE FROM `creature` WHERE `map`=556 AND `guid` BETWEEN @CGUID+0 AND @CGUID+187;
+DELETE FROM `creature` WHERE `map`=556 AND `id1` IN (2914,3300,4075,4076,14881,18318,18319,18320,18321,18322,18323,18325,18326,18327,18328,18472,18473,18956,19428,19429,21891,21904,21931,22515,23035,23046,23057,23058,23134,23135,23136) AND `guid` BETWEEN @CGUID+0 AND @CGUID+187;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (@CGUID+0  , 2914 , 0, 0, 556, 3791, 3791, 3, 1, 0, 24.4151, 293.476, 25.1356, 1.97087, 84600, 5, 0, 0, 0, 1, 0, 0, 0, '', 43400),
 (@CGUID+1  , 2914 , 0, 0, 556, 3791, 3791, 3, 1, 0, -113.052, 281.853, 26.7507, 0.437267, 84600, 5, 0, 0, 0, 1, 0, 0, 0, '', 43400),
