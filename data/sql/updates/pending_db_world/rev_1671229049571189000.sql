@@ -1,0 +1,42 @@
+--
+[143] Position: X: 37.14149 Y: 19.298058 Z: 0.081814915
+[143] Orientation: 4.712376117706298828
+[143] [0] Points: X: 37.141617 Y: 29.180658 Z: 0.17421828
+[143] [1] Points: X: 37.141502 Y: 20.305258 Z: 0.09123234
+[143] [2] Points: X: 37.141388 Y: 11.429857 Z: 0.008246395
+[143] [3] Points: X: 37.141327 Y: 6.529172 Z: 0.007993373
+[143] [4] Points: X: 37.141327 Y: 6.529172 Z: 0.007993373
+[0] EmoteState: 375
+
+[139] Position: X: 39.978577 Y: 18.527546 Z: 0.03845433
+[139] Orientation: 4.631747245788574218
+[139] [0] Points: X: 40.18725 Y: 21.10956 Z: 0.17478779
+[139] [1] Points: X: 40.059547 Y: 19.529436 Z: 0.09135534
+[139] [2] Points: X: 39.931847 Y: 17.949312 Z: 0.007922882
+[139] [3] Points: X: 39.404964 Y: 11.429875 Z: 0.007973382
+[139] [4] Points: X: 38.857784 Y: 4.6592793 Z: 0.0073759896
+[139] [5] Points: X: 38.482487 Y: 0.015504386 Z: 0.006656774
+[139] [6] Points: X: 38.076687 Y: -5.005721 Z: 0.006604223
+[139] [7] Points: X: 38.076687 Y: -5.005721 Z: 0.006604223
+[0] EmoteState: 375
+
+[3] Position: X: 42.102856 Y: 37.979584 Z: 0.07392969
+[3] Orientation: 5.075811386108398437
+
+-- Pathing for Sethekk Initiate Entry: 18318
+SET @NPC := XXXXXX;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=42.102856,`position_y`=37.979584,`position_z`=0.07392969 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,45.314354,37.101177,0.0074783196,NULL,0,0,0,100,0),
+(@PATH,2,47.015766,25.06157,0.0074763903,NULL,0,0,0,100,0),
+(@PATH,3,47.217983,9.030255,0.0050247586,NULL,0,0,0,100,0),
+(@PATH,4,39.303646,0.663297,0.007095872,NULL,0,0,0,100,0),
+(@PATH,5,36.73842,10.677114,0.008318759,NULL,0,0,0,100,0),
+(@PATH,6,40.667316,20.894041,0.008027105,NULL,0,0,0,100,0),
+(@PATH,7,38.962692,30.885172,0.0074734767,NULL,0,0,0,100,0),
+(@PATH,8,39.64863,40.192886,0.0074779084,NULL,0,0,0,100,0);
+-- 0x203CA8458011E38000182C00000E236B .go xyz 45.314354 37.101177 0.0074783196
