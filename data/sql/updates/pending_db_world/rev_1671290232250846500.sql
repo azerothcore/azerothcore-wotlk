@@ -148,6 +148,9 @@ INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language
 
 DELETE FROM `waypoints` WHERE `entry` IN (1967100,1967101,1967102);
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
+(19666, 1, -68.40214, -19.7878, -0.9529961, 'Shadow Lord Xiraxis'),
+(19666, 2, -67.83204, -48.33409, -0.9552881, 'Shadow Lord Xiraxis'),
+(19666, 3, -67.78506, -75.71738, -0.9389226, 'Shadow Lord Xiraxis'),
 (1967100,1,-354.44296,-65.607796,-0.9741728,"Cryo-Engineer Sha'heen"),
 (1967100,2,-357.67813,-68.876816,-0.96592534,"Cryo-Engineer Sha'heen"),
 (1967100,3,-364.53583,-72.458565,-0.958762,"Cryo-Engineer Sha'heen"),
