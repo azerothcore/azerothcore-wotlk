@@ -1391,13 +1391,6 @@ public:
             kickReasonStr = std::string{ *reason };
         }
 
-        if (min_time < 0 || max_time < 0)
-        {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         targetPlayer->KickPlayer(kickReasonStr, min_time, max_time);
 
         return true;
