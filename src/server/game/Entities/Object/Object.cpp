@@ -1737,7 +1737,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
     // Creature scripts
     if (Creature const* cObj = obj->ToCreature())
     {
-        if (Player const* player = this->ToPlayer())
+        if (Player const* player = ToPlayer())
         {
             if (cObj->IsAIEnabled && !cObj->AI()->CanBeSeen(player))
             {
@@ -1745,8 +1745,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
             }
 
             ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_VISIBILITY, cObj->GetEntry());
-
-            if (!sConditionMgr->IsObjectMeetToConditions((WorldObject*)this, conditions))
+            if (!sConditionMgr->IsObjectMeetToConditions((WorldObject*)this, (WorldObject*)obj, conditions))
             {
                 return false;
             }
@@ -1755,8 +1754,12 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
     // Gameobject scripts
     if (GameObject const* goObj = obj->ToGameObject())
-        if (this->ToPlayer() && !goObj->AI()->CanBeSeen(this->ToPlayer()))
+    {
+        if (ToPlayer() && !goObj->AI()->CanBeSeen(ToPlayer()))
+        {
             return false;
+        }
+    }
 
     // pussywizard: arena spectator
     if (obj->GetTypeId() == TYPEID_PLAYER)

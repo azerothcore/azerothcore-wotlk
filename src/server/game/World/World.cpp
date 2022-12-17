@@ -313,14 +313,12 @@ void World::AddSession_(WorldSession* s)
 
     if (pLimit > 0 && Sessions >= pLimit && AccountMgr::IsPlayerAccount(s->GetSecurity()) && !s->CanSkipQueue() && !HasRecentlyDisconnected(s))
     {
-        AddQueuedPlayer (s);
+        AddQueuedPlayer(s);
         UpdateMaxSessionCounters();
         return;
     }
 
-    s->SendAuthResponse(AUTH_OK, true);
-
-    FinalizePlayerWorldSession(s);
+    s->InitializeSession();
 
     UpdateMaxSessionCounters();
 }
@@ -400,13 +398,7 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
     if ((!GetPlayerAmountLimit() || sessions < GetPlayerAmountLimit()) && !m_QueuedPlayer.empty())
     {
         WorldSession* pop_sess = m_QueuedPlayer.front();
-        pop_sess->SetInQueue(false);
-        pop_sess->ResetTimeOutTime(false);
-        pop_sess->SendAuthWaitQueue(0);
-        pop_sess->SendAccountDataTimes(GLOBAL_CACHE_MASK);
-
-        FinalizePlayerWorldSession(pop_sess);
-
+        pop_sess->InitializeSession();
         m_QueuedPlayer.pop_front();
 
         // update iter to point first queued socket or end() if queue is empty now
@@ -949,6 +941,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_GROUP_VISIBILITY]      = sConfigMgr->GetOption<int32>("Visibility.GroupMode", 1);
 
     m_bool_configs[CONFIG_OBJECT_SPARKLES]      = sConfigMgr->GetOption<bool>("Visibility.ObjectSparkles", true);
+
+    m_bool_configs[CONFIG_LOW_LEVEL_REGEN_BOOST]      = sConfigMgr->GetOption<bool>("EnableLowLevelRegenBoost", true);
 
     m_bool_configs[CONFIG_OBJECT_QUEST_MARKERS] = sConfigMgr->GetOption<bool>("Visibility.ObjectQuestMarkers", true);
 
@@ -3388,16 +3382,6 @@ uint32 World::GetNextWhoListUpdateDelaySecs()
     t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
 
     return uint32(std::ceil(t / 1000.0f));
-}
-
-void World::FinalizePlayerWorldSession(WorldSession* session)
-{
-    uint32 cacheVersion = sWorld->getIntConfig(CONFIG_CLIENTCACHE_VERSION);
-    sScriptMgr->OnBeforeFinalizePlayerWorldSession(cacheVersion);
-
-    session->SendAddonsInfo();
-    session->SendClientCacheVersion(cacheVersion);
-    session->SendTutorialsData();
 }
 
 CliCommandHolder::CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished)
