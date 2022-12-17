@@ -211,6 +211,11 @@ public:
             return;
         }
 
+        if (summon->GetEntry() == NPC_ONYXIAN_LAIR_GUARD && Phase < PHASE_AIRPHASE)
+        {
+            return;
+        }
+
         if (Unit* target = summon->SelectNearestTarget(300.0f))
         {
             summon->AI()->AttackStart(target);
