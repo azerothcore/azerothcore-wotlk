@@ -1,4 +1,6 @@
 --
+ALTER TABLE `creature_summon_groups` ADD COLUMN `Comment` varchar(255) NOT NULL DEFAULT '' AFTER `summonTime`;
+
 -- Some parts shown in https://www.youtube.com/watch?v=5xXlRJg9RXg
 UPDATE `creature_template` SET `RangeAttackTime` = 2000, `unit_flags` = 832 WHERE `entry` = 19666;
 
