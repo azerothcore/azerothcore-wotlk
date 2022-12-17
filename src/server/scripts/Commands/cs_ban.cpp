@@ -84,9 +84,16 @@ public:
             { "ip",             SEC_GAMEMASTER,  true,  &HandleBanIPCommand,                 "" }
         };
 
+        static ChatCommandTable banDelayCommandTable =
+        {
+            { "account",        SEC_GAMEMASTER,  true,  &HandleDelayBanAccountCommand,            "" },
+            { "ip",             SEC_GAMEMASTER,  true,  &HandleDelayBanIPCommand,                 "" }
+        };
+
         static ChatCommandTable commandTable =
         {
             { "ban",            SEC_GAMEMASTER,     true,  nullptr, "", banCommandTable },
+            { "bandelay",       SEC_GAMEMASTER,     true,  nullptr, "", banDelayCommandTable },
             { "baninfo",        SEC_GAMEMASTER,     true,  nullptr, "", baninfoCommandTable },
             { "banlist",        SEC_GAMEMASTER,     true,  nullptr, "", banlistCommandTable },
             { "unban",          SEC_ADMINISTRATOR,  true,  nullptr, "", unbanCommandTable }
@@ -98,6 +105,11 @@ public:
     static bool HandleBanAccountCommand(ChatHandler* handler, char const* args)
     {
         return HandleBanHelper(BAN_ACCOUNT, args, handler);
+    }
+
+    static bool HandleDelayBanAccountCommand(ChatHandler* handler, char const* args)
+    {
+        return HandleBanHelper(BAN_ACCOUNT, args, handler, true);
     }
 
     static bool HandleBanCharacterCommand(ChatHandler* handler, char const* args)
@@ -163,7 +175,12 @@ public:
         return HandleBanHelper(BAN_IP, args, handler);
     }
 
-    static bool HandleBanHelper(BanMode mode, char const* args, ChatHandler* handler)
+    static bool HandleDelayBanIPCommand(ChatHandler* handler, char const* args)
+    {
+        return HandleBanHelper(BAN_IP, args, handler, true);
+    }
+
+    static bool HandleBanHelper(BanMode mode, char const* args, ChatHandler* handler, bool delay = false)
     {
         if (!*args)
             return false;
@@ -180,6 +197,14 @@ public:
 
         char* reasonStr = strtok(nullptr, "");
         if (!reasonStr)
+            return false;
+
+        char* min_time = strtok(nullptr, " ");
+        if (delay && (!min_time || !atoi(min_time)))
+            return false;
+
+        char* max_time = strtok(nullptr, " ");
+        if (delay && (!max_time || !atoi(max_time)))
             return false;
 
         switch (mode)
@@ -211,14 +236,14 @@ public:
         switch (mode)
         {
             case BAN_ACCOUNT:
-                banReturn = sBan->BanAccount(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "");
+                banReturn = sBan->BanAccount(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, atoi(min_time), atoi(max_time));
                 break;
             case BAN_CHARACTER:
                 banReturn = sBan->BanAccountByPlayerName(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "");
                 break;
             case BAN_IP:
             default:
-                banReturn = sBan->BanIP(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "");
+                banReturn = sBan->BanIP(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, atoi(min_time), atoi(max_time));
                 break;
         }
 

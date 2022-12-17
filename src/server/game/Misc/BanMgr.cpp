@@ -33,7 +33,7 @@ BanMgr* BanMgr::instance()
 }
 
 /// Ban an account, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
-BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author)
+BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author, bool delay /* = false */, int min_time /* = 0 */, int max_time /* = 0 */)
 {
     if (AccountName.empty() || Duration.empty())
         return BAN_SYNTAX_ERROR;
@@ -69,16 +69,30 @@ BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& 
     trans->Append(stmt);
 
     if (WorldSession* session = sWorld->FindSession(AccountID))
+    {
         if (session->GetPlayerName() != Author)
-            session->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'");
+        {
+            if (delay)
+                session->GetPlayer()->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'", min_time, max_time);
+            else
+                session->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'");
+        }
+    }
 
     if (WorldSession* session = sWorld->FindOfflineSession(AccountID))
+    {
         if (session->GetPlayerName() != Author)
-            session->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
+        {
+            if (delay)
+                session->GetPlayer()->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'", min_time, max_time);
+            else
+                session->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
+        }
+    }
 
     LoginDatabase.CommitTransaction(trans);
 
-    if (sWorld->getBoolConfig(CONFIG_SHOW_BAN_IN_WORLD))
+    if (sWorld->getBoolConfig(CONFIG_SHOW_BAN_IN_WORLD) && !delay)
     {
         bool IsPermanetly = true;
 
@@ -161,7 +175,7 @@ BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::
 }
 
 /// Ban an IP address, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
-BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std::string const& Reason, std::string const& Author)
+BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std::string const& Reason, std::string const& Author, bool delay /* = false */, int min_time /* = 0 */, int max_time /* = 0 */)
 {
     if (IP.empty() || Duration.empty())
         return BAN_SYNTAX_ERROR;
@@ -180,7 +194,7 @@ BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std:
     stmt->SetData(3, Reason);
     LoginDatabase.Execute(stmt);
 
-    if (sWorld->getBoolConfig(CONFIG_SHOW_BAN_IN_WORLD))
+    if (sWorld->getBoolConfig(CONFIG_SHOW_BAN_IN_WORLD) && !delay)
     {
         bool IsPermanetly = true;
 
@@ -205,12 +219,26 @@ BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std:
         uint32 AccountID = fields[0].Get<uint32>();
 
         if (WorldSession* session = sWorld->FindSession(AccountID))
+        {
             if (session->GetPlayerName() != Author)
-                session->KickPlayer("Ban IP at condition 'FindSession(account)->GetPlayerName() != author'");
+            {
+                if (delay)
+                    session->GetPlayer()->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'", min_time, max_time);
+                else
+                    session->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'");
+            }
+        }
 
         if (WorldSession* session = sWorld->FindOfflineSession(AccountID))
+        {
             if (session->GetPlayerName() != Author)
-                session->KickPlayer("Ban IP at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
+            {
+                if (delay)
+                    session->GetPlayer()->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'", min_time, max_time);
+                else
+                    session->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
+            }
+        }
     } while (resultAccounts->NextRow());
 
     LoginDatabase.CommitTransaction(trans);

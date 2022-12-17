@@ -1398,7 +1398,7 @@ public:
             return false;
         }
 
-        targetPlayer->KickPlayer(min_time, max_time, kickReasonStr);
+        targetPlayer->KickPlayer(kickReasonStr, min_time, max_time);
 
         return true;
     }

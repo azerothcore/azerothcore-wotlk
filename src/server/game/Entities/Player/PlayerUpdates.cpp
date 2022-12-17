@@ -49,6 +49,7 @@
 namespace
 {
     TaskScheduler kickScheduler;
+    TaskScheduler banScheduler;
 }
 
 // Zone Interval should be 1 second
@@ -431,6 +432,11 @@ void Player::Update(uint32 p_time)
     {
         METRIC_TIMER("player_update_time", METRIC_TAG("type", "Update kickScheduler"));
         kickScheduler.Update(p_time);
+    }
+
+    {
+        METRIC_TIMER("player_update_time", METRIC_TAG("type", "Update banScheduler"));
+        banScheduler.Update(p_time);
     }
 }
 
@@ -2269,12 +2275,8 @@ void Player::ProcessTerrainStatusUpdate()
 void Player::KickPlayer(std::string kickReasonStr, uint32 min_time, uint32 max_time)
 {
     uint32 time = urand(min_time, max_time);
-    kickScheduler.Schedule(Seconds(10), [&](TaskContext /*context*/)
+    kickScheduler.Schedule(Seconds(time), [&](TaskContext /*context*/)
         {
-            GetSession()->SendNotification(kickReasonStr.c_str());
-            kickScheduler.Schedule(Seconds(time), [&](TaskContext /*context*/)
-                {
-                    GetSession()->KickPlayer(kickReasonStr);
-                });
+            GetSession()->KickPlayer(kickReasonStr);
         });
 }
