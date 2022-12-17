@@ -199,12 +199,12 @@ public:
         if (!reasonStr)
             return false;
 
-        char* min_time = strtok(nullptr, " ");
-        if (delay && (!min_time || !atoi(min_time)))
+        std::string_view min_time = strtok(nullptr, " ");
+        if (delay && (min_time.empty() || !Acore::StringTo<uint32>(min_time)))
             return false;
 
-        char* max_time = strtok(nullptr, " ");
-        if (delay && (!max_time || !atoi(max_time)))
+        std::string_view max_time = strtok(nullptr, " ");
+        if (delay && (max_time.empty() || !Acore::StringTo<uint32>(max_time)))
             return false;
 
         switch (mode)
