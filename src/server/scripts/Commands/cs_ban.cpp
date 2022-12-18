@@ -199,12 +199,8 @@ public:
         if (!reasonStr)
             return false;
 
-        std::string_view min_time = strtok(nullptr, " ");
-        if (delay && (min_time.empty() || !Acore::StringTo<int>(min_time)))
-            return false;
-
-        std::string_view max_time = strtok(nullptr, " ");
-        if (delay && (max_time.empty() || !Acore::StringTo<int>(max_time)))
+        std::string_view delay_time = strtok(nullptr, " ");
+        if (delay && (delay_time.empty() || !Acore::StringTo<int32>(delay_time)))
             return false;
 
         switch (mode)
@@ -236,14 +232,14 @@ public:
         switch (mode)
         {
             case BAN_ACCOUNT:
-                banReturn = sBan->BanAccount(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Acore::StringTo<int>(min_time).value_or(0), Acore::StringTo<int>(max_time).value_or(0));
+                banReturn = sBan->BanAccount(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Seconds(Acore::StringTo<int32>(delay_time).value_or(0)));
                 break;
             case BAN_CHARACTER:
                 banReturn = sBan->BanAccountByPlayerName(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "");
                 break;
             case BAN_IP:
             default:
-                banReturn = sBan->BanIP(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Acore::StringTo<int>(min_time).value_or(0), Acore::StringTo<int>(max_time).value_or(0));
+                banReturn = sBan->BanIP(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Seconds(Acore::StringTo<int32>(delay_time).value_or(0)));
                 break;
         }
 

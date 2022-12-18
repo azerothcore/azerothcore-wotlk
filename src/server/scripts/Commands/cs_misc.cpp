@@ -1358,11 +1358,11 @@ public:
     }
 
     // kick player
-    static bool HandleKickDelayPlayerCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<std::string_view> reason, uint32 min_time, uint32 max_time)
+    static bool HandleKickDelayPlayerCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<std::string_view> reason, std::string_view delay_time)
     {
         if (!target)
         {
-            target = PlayerIdentifier::FromTargetOrSelf(handler);
+            target = PlayerIdentifier::FromTarget(handler);
         }
 
         if (!target || !target->IsConnected())
@@ -1391,7 +1391,7 @@ public:
             kickReasonStr = std::string{ *reason };
         }
 
-        targetPlayer->KickPlayer(kickReasonStr, min_time, max_time);
+        targetPlayer->KickPlayer(kickReasonStr, Seconds(Acore::StringTo<int32>(delay_time).value_or(0)));
 
         return true;
     }

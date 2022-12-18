@@ -33,7 +33,7 @@ BanMgr* BanMgr::instance()
 }
 
 /// Ban an account, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
-BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author, bool delay /* = false */, int min_time /* = 0 */, int max_time /* = 0 */)
+BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author, bool delay /*= false*/, Seconds delay_time /*= 0s*/)
 {
     if (AccountName.empty() || Duration.empty())
         return BAN_SYNTAX_ERROR;
@@ -73,7 +73,7 @@ BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& 
         if (session->GetPlayerName() != Author)
         {
             if (delay)
-                session->GetPlayer()->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'", min_time, max_time);
+                session->GetPlayer()->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'", delay_time);
             else
                 session->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'");
         }
@@ -84,7 +84,7 @@ BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& 
         if (session->GetPlayerName() != Author)
         {
             if (delay)
-                session->GetPlayer()->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'", min_time, max_time);
+                session->GetPlayer()->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'", delay_time);
             else
                 session->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
         }
@@ -175,7 +175,7 @@ BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::
 }
 
 /// Ban an IP address, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
-BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std::string const& Reason, std::string const& Author, bool delay /* = false */, int min_time /* = 0 */, int max_time /* = 0 */)
+BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std::string const& Reason, std::string const& Author, bool delay /*= false*/, Seconds delay_time /*= 0s*/)
 {
     if (IP.empty() || Duration.empty())
         return BAN_SYNTAX_ERROR;
@@ -223,7 +223,7 @@ BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std:
             if (session->GetPlayerName() != Author)
             {
                 if (delay)
-                    session->GetPlayer()->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'", min_time, max_time);
+                    session->GetPlayer()->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'", delay_time);
                 else
                     session->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'");
             }
@@ -234,7 +234,7 @@ BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std:
             if (session->GetPlayerName() != Author)
             {
                 if (delay)
-                    session->GetPlayer()->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'", min_time, max_time);
+                    session->GetPlayer()->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'", delay_time);
                 else
                     session->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
             }
