@@ -2268,6 +2268,7 @@ void Player::ProcessTerrainStatusUpdate()
 
 void Player::KickPlayer(std::string kickReasonStr, Seconds delay_time)
 {
+    GetSession()->SendNotification("%s", kickReasonStr.c_str());
     kickScheduler.Schedule(delay_time, [&](TaskContext /*context*/)
         {
             GetSession()->KickPlayer(kickReasonStr);

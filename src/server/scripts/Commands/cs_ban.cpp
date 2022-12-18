@@ -195,13 +195,22 @@ public:
         if (!durationStr || !atoi(durationStr))
             return false;
 
-        char* reasonStr = strtok(nullptr, "");
+        char* reasonStr = strtok(nullptr, " ");
         if (!reasonStr)
             return false;
 
-        std::string_view delay_time = strtok(nullptr, " ");
-        if (delay && (delay_time.empty() || !Acore::StringTo<int32>(delay_time)))
-            return false;
+        int32 delay_time = 0;
+        if (delay)
+        {
+            std::string delay_string = strtok(nullptr, " ");
+            if (delay_string.empty() || Acore::StringTo<int32>(delay_string).value_or(0) < 0)
+            {
+                handler->SendSysMessage(LANG_BAD_VALUE);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+            delay_time = Acore::StringTo<int32>(delay_string).value_or(0);
+        }
 
         switch (mode)
         {
@@ -232,14 +241,14 @@ public:
         switch (mode)
         {
             case BAN_ACCOUNT:
-                banReturn = sBan->BanAccount(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Seconds(Acore::StringTo<int32>(delay_time).value_or(0)));
+                banReturn = sBan->BanAccount(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Seconds(delay_time));
                 break;
             case BAN_CHARACTER:
                 banReturn = sBan->BanAccountByPlayerName(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "");
                 break;
             case BAN_IP:
             default:
-                banReturn = sBan->BanIP(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Seconds(Acore::StringTo<int32>(delay_time).value_or(0)));
+                banReturn = sBan->BanIP(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Seconds(delay_time));
                 break;
         }
 
