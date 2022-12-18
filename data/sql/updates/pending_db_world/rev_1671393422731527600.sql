@@ -1,5 +1,7 @@
 SET @GUID := 100861;
 
+DELETE FROM `pool_creature` WHERE `guid` IN (151903, 151919, 151920) AND `pool_entry` IN (1076, 1081);
+
 -- Crippler (18689)
 -- Remove DISABLE_MOVE flag
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`&~4 WHERE (`entry` = 18689);
@@ -100,6 +102,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 ((@GUID+4)*10, 27, -3597.28, 4595.12, -20.5279);
 
 UPDATE `pool_template` SET `description`='Crippler (18689)' WHERE `entry`=1076;
+
 DELETE FROM `pool_creature` WHERE `pool_entry`=1076 AND `description`='Crippler (18689)';
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+0, 1076, 0, 'Crippler (18689)'),
@@ -289,10 +292,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 ((@GUID+9)*10, 22, 1850.35, 7146.59, 364.084),
 ((@GUID+9)*10, 23, 1835.89, 7151.59, 364.627);
 
-DELETE FROM `pool_template` WHERE `entry`=1110 AND `description`='Hemathion (18692)';
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (1110, 1, 'Hemathion (18692)');
+UPDATE `pool_template` SET `description`='Hemathion (18692)' WHERE `entry`=1081;
 
-DELETE FROM `pool_creature` WHERE `pool_entry`=1110 AND `description`='Hemathion (18692)';
+DELETE FROM `pool_creature` WHERE `pool_entry`=1081 AND `description`='Hemathion (18692)';
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
-(@GUID+8, 1110, 0, 'Hemathion (18692)'),
-(@GUID+9, 1110, 0, 'Hemathion (18692)');
+(@GUID+8, 1081, 0, 'Hemathion (18692)'),
+(@GUID+9, 1081, 0, 'Hemathion (18692)');
