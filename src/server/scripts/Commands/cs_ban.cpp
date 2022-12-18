@@ -202,8 +202,13 @@ public:
         int32 delay_time = 0;
         if (delay)
         {
-            std::string delay_string = strtok(nullptr, " ");
-            if (delay_string.empty() || Acore::StringTo<int32>(delay_string).value_or(0) < 0)
+            char* delay_char = strtok(nullptr, " ");
+            if (!delay_char)
+                return false;
+
+            std::string delay_string = delay_char;
+
+            if (Acore::StringTo<int32>(delay_string).value_or(0) < 0)
             {
                 handler->SendSysMessage(LANG_BAD_VALUE);
                 handler->SetSentErrorMessage(true);
