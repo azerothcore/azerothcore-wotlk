@@ -99,7 +99,6 @@ void Totem::InitSummon()
     // Some totems can have both instant effect and passive spell
     if (GetSpell(1))
     {
-        LOG_ERROR("sql.sql", "casting spell {}", GetSpell(1));
         CastSpell(this, GetSpell(1), true);
     }
 
