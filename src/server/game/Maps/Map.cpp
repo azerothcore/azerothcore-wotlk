@@ -2846,6 +2846,7 @@ void InstanceMap::InitVisibilityDistance()
         case 658: // Pit of Saron
             m_VisibleDistance = 150.0f;
             break;
+        case 531: // Ahn'Qiraj Temple
         case 615: // Obsidian Sanctum
         case 616: // Eye of Eternity
         case 603: // Ulduar
