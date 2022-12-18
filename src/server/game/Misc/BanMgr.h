@@ -19,6 +19,7 @@
 #define _BAN_MANAGER_H
 
 #include "Common.h"
+#include "Duration.h"
 
 /// Ban function return codes
 enum BanReturn
