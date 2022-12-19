@@ -52,6 +52,7 @@ void AddSC_boss_warlord_kalithresh();
 void AddSC_instance_steam_vault();
 void AddSC_boss_the_black_stalker();         //CR Underbog
 void AddSC_boss_ghazan();
+void AddSC_boss_swamplord_muselek();
 void AddSC_instance_the_underbog();
 void AddSC_boss_ahune();
 void AddSC_instance_the_slave_pens();
@@ -146,6 +147,7 @@ void AddOutlandScripts()
     AddSC_instance_steam_vault();
     AddSC_boss_the_black_stalker();         //CR Underbog
     AddSC_boss_ghazan();
+    AddSC_boss_swamplord_muselek();
     AddSC_instance_the_underbog();
     AddSC_boss_ahune();
     AddSC_instance_the_slave_pens();
