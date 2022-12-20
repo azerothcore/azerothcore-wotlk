@@ -1391,7 +1391,7 @@ public:
             kickReasonStr = std::string{ *reason };
         }
 
-        targetPlayer->DelayedKick(kickReasonStr, Seconds(Acore::StringTo<int32>(delayTime).value_or(0)), (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Server"));
+        targetPlayer->DelayedKick(kickReasonStr.c_str(), Seconds(Acore::StringTo<int32>(delayTime).value_or(0)), (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Server"));
 
         return true;
     }

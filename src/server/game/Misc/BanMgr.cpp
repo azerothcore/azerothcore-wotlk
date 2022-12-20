@@ -73,7 +73,7 @@ BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& 
         if (session->GetPlayerName() != Author)
         {
             if (delay)
-                session->GetPlayer()->DelayedBanAcc(Reason, delayTime, Duration, Author, AccountName);
+                session->GetPlayer()->DelayedBanAcc(Reason.c_str(), delayTime, Duration.c_str(), Author.c_str(), AccountName.c_str());
             else
                 session->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'");
         }
@@ -84,7 +84,7 @@ BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& 
         if (session->GetPlayerName() != Author)
         {
             if (delay)
-                session->GetPlayer()->DelayedBanAcc(Reason, delayTime, Duration, Author, AccountName);
+                session->GetPlayer()->DelayedBanAcc(Reason.c_str(), delayTime, Duration.c_str(), Author.c_str(), AccountName.c_str());
             else
                 session->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
         }
@@ -223,7 +223,7 @@ BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std:
             if (session->GetPlayerName() != Author)
             {
                 if (delay)
-                    session->GetPlayer()->DelayedBanIP(Reason, delayTime, Duration, Author, IP);
+                    session->GetPlayer()->DelayedBanIP(Reason.c_str(), delayTime, Duration.c_str(), Author.c_str(), IP.c_str());
                 else
                     session->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'");
             }
@@ -234,7 +234,7 @@ BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std:
             if (session->GetPlayerName() != Author)
             {
                 if (delay)
-                    session->GetPlayer()->DelayedBanIP(Reason, delayTime, Duration, Author, IP);
+                    session->GetPlayer()->DelayedBanIP(Reason.c_str(), delayTime, Duration.c_str(), Author.c_str(), IP.c_str());
                 else
                     session->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
             }
