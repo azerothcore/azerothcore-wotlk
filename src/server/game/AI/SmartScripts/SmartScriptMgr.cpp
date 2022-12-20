@@ -316,6 +316,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_DEATH:
         case SMART_EVENT_KILL:
         case SMART_EVENT_SUMMONED_UNIT:
+        case SMART_EVENT_SUMMONED_UNIT_DIES:
         case SMART_EVENT_SPELLHIT:
         case SMART_EVENT_SPELLHIT_TARGET:
         case SMART_EVENT_DAMAGED:
