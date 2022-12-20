@@ -2272,7 +2272,7 @@ void Player::DelayedKick(std::string reasonStr, Seconds delayTime, std::string k
         {
             if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
             {
-                sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, kickFrom, GetName(), reasonStr);
+                sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, kickFrom.c_str(), GetName().c_str(), reasonStr.c_str());
             }
 
             GetSession()->KickPlayer(reasonStr.c_str());
