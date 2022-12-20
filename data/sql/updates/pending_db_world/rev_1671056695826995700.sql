@@ -1,0 +1,2 @@
+--
+UPDATE `gameobject` SET `state`=1 WHERE `id` IN (183385, 1617, 1618, 1620) AND `guid` IN (104353, 104354, 10354, 10333, 10241);
