@@ -1056,12 +1056,14 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
     bot->GetBotAI()->canUpdate = true;
 }
 
-BotAddResult BotMgr::AddBot(Creature* bot, bool takeMoney)
+BotAddResult BotMgr::AddBot(Creature* bot)
 {
     ASSERT(bot->IsNPCBot());
     ASSERT(bot->GetBotAI() != nullptr);
 
-    bool temporary = bot->GetBotAI()->IsTempBot();
+    bool owned = bot->GetBotAI()->IsTempBot() || bot->GetBotAI()->GetBotOwnerGuid() == _owner->GetGUID().GetCounter();
+    uint8 owned_count = BotDataMgr::GetOwnedBotsCount(_owner->GetGUID());
+    uint8 class_count = BotDataMgr::GetOwnedBotsCount(_owner->GetGUID(), bot->GetClassMask());
 
     if (!_enableNpcBots)
     {
@@ -1084,25 +1086,17 @@ BotAddResult BotMgr::AddBot(Creature* bot, bool takeMoney)
         ch.PSendSysMessage(bot_ai::LocalizedNpcText(GetOwner(), BOT_TEXT_BOTADDFAIL_TELEPORTED).c_str(), bot->GetName().c_str());
         return BOT_ADD_BUSY;
     }
-    if (!temporary && _owner->GetNpcBotsCount() >= GetMaxNpcBots())
+    if (!owned && owned_count >= GetMaxNpcBots())
     {
         ChatHandler ch(_owner->GetSession());
         ch.PSendSysMessage(bot_ai::LocalizedNpcText(GetOwner(), BOT_TEXT_HIREFAIL_MAXBOTS).c_str(), GetMaxNpcBots());
         return BOT_ADD_MAX_EXCEED;
     }
-    if (!temporary && HaveBot() && _maxClassNpcBots)
+    if (!owned && _maxClassNpcBots && class_count >= _maxClassNpcBots)
     {
-        uint8 count = 0;
-        for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
-            if (itr->second->GetBotClass() == bot->GetBotClass())
-                ++count;
-
-        if (count >= _maxClassNpcBots)
-        {
-            ChatHandler ch(_owner->GetSession());
-            ch.PSendSysMessage(bot_ai::LocalizedNpcText(GetOwner(), BOT_TEXT_HIREFAIL_MAXCLASSBOTS).c_str(), count, _maxClassNpcBots);
-            return BOT_ADD_MAX_CLASS_EXCEED;
-        }
+        ChatHandler ch(_owner->GetSession());
+        ch.PSendSysMessage(bot_ai::LocalizedNpcText(GetOwner(), BOT_TEXT_HIREFAIL_MAXCLASSBOTS).c_str(), class_count, _maxClassNpcBots);
+        return BOT_ADD_MAX_CLASS_EXCEED;
     }
     //Map* curMap = _owner->GetMap();
     //if (!temporary && LimitBots(curMap))
@@ -1116,7 +1110,7 @@ BotAddResult BotMgr::AddBot(Creature* bot, bool takeMoney)
     //        return BOT_ADD_INSTANCE_LIMIT;
     //    }
     //}
-    if (!temporary && takeMoney)
+    if (!owned)
     {
         uint32 cost = GetNpcBotCost(_owner->GetLevel(), bot->GetBotClass());
         if (!_owner->HasEnoughMoney(cost))
@@ -1155,7 +1149,7 @@ BotAddResult BotMgr::AddBot(Creature* bot, bool takeMoney)
 
     bot->GetBotAI()->Reset();
 
-    if (!temporary)
+    if (!bot->GetBotAI()->IsTempBot())
     {
         bot->GetBotAI()->SetBotCommandState(BOT_COMMAND_FOLLOW, true);
         if (bot->GetBotAI()->HasRole(BOT_ROLE_PARTY))

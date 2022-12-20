@@ -709,3 +709,13 @@ std::vector<uint32> BotDataMgr::GetExistingNPCBotIds()
 
     return existing_ids;
 }
+
+uint8 BotDataMgr::GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask)
+{
+    uint8 count = 0;
+    for (decltype(_botsData)::value_type const& bdata : _botsData)
+        if (bdata.second->owner == owner_guid.GetCounter() && (!class_mask || !!(class_mask & (1u << (_botsExtras[bdata.first]->bclass - 1)))))
+            ++count;
+
+    return count;
+}

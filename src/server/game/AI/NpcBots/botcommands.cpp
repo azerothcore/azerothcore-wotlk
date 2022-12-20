@@ -2215,7 +2215,7 @@ public:
         if (!mgr)
             mgr = new BotMgr(owner);
 
-        if (mgr->AddBot(bot, false) == BOT_ADD_SUCCESS)
+        if (mgr->AddBot(bot) == BOT_ADD_SUCCESS)
         {
             handler->PSendSysMessage("%s is now your npcbot", bot->GetName().c_str());
             return true;
