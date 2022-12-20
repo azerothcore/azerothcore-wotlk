@@ -1,3 +1,4 @@
+-- 
 SET @GUID := 100861;
 
 DELETE FROM `pool_creature` WHERE `guid` IN (151903, 151919, 151920) AND `pool_entry` IN (1076, 1081);
