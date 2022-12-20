@@ -35,9 +35,9 @@ class BanMgr
 public:
     static BanMgr* instance();
 
-    BanReturn BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author, bool delay = false, Seconds delay_time = 0s);
+    BanReturn BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author, bool delay = false, Seconds delayTime = 0s);
     BanReturn BanAccountByPlayerName(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author);
-    BanReturn BanIP(std::string const& IP, std::string const& Duration, std::string const& Reason, std::string const& Author, bool delay = false, Seconds delay_time = 0s);
+    BanReturn BanIP(std::string const& IP, std::string const& Duration, std::string const& Reason, std::string const& Author, bool delay = false, Seconds delayTime = 0s);
     BanReturn BanCharacter(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author);
 
     bool RemoveBanAccount(std::string const& AccountName);

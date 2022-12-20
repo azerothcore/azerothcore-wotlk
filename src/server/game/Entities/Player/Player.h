@@ -2575,7 +2575,9 @@ public:
 
     std::string GetDebugInfo() const override;
 
-    void KickPlayer(std::string kickReasonStr, Seconds delay_time);
+    void DelayedKick(std::string reasonStr, Seconds delayTime, std::string kickFrom);
+    void DelayedBanAcc(std::string reasonStr, Seconds delayTime, std::string duration, std::string author, std::string accountName);
+    void DelayedBanIP(std::string reasonStr, Seconds delayTime, std::string duration, std::string author, std::string ip);
 
  protected:
     // Gamemaster whisper whitelist

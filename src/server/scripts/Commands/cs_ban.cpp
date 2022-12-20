@@ -199,22 +199,22 @@ public:
         if (!reasonStr)
             return false;
 
-        int32 delay_time = 0;
+        int32 delayTime = 0;
         if (delay)
         {
-            char* delay_char = strtok(nullptr, " ");
-            if (!delay_char)
+            char* delayChar = strtok(nullptr, " ");
+            if (!delayChar)
                 return false;
 
-            std::string delay_string = delay_char;
+            std::string delayString = delayChar;
 
-            if (Acore::StringTo<int32>(delay_string).value_or(0) < 0)
+            if (Acore::StringTo<int32>(delayString).value_or(0) < 0)
             {
                 handler->SendSysMessage(LANG_BAD_VALUE);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
-            delay_time = Acore::StringTo<int32>(delay_string).value_or(0);
+            delayTime = Acore::StringTo<int32>(delayString).value_or(0);
         }
 
         switch (mode)
@@ -246,14 +246,14 @@ public:
         switch (mode)
         {
             case BAN_ACCOUNT:
-                banReturn = sBan->BanAccount(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Seconds(delay_time));
+                banReturn = sBan->BanAccount(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Seconds(delayTime));
                 break;
             case BAN_CHARACTER:
                 banReturn = sBan->BanAccountByPlayerName(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "");
                 break;
             case BAN_IP:
             default:
-                banReturn = sBan->BanIP(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Seconds(delay_time));
+                banReturn = sBan->BanIP(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "", delay, Seconds(delayTime));
                 break;
         }
 

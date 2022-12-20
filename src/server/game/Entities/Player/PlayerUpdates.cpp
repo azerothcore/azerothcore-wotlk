@@ -2266,10 +2266,54 @@ void Player::ProcessTerrainStatusUpdate()
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWATER_INDARKWATER);
 }
 
-void Player::KickPlayer(std::string kickReasonStr, Seconds delay_time)
+void Player::DelayedKick(std::string reasonStr, Seconds delayTime, std::string kickFrom)
 {
-    kickScheduler.Schedule(delay_time, [&](TaskContext /*context*/)
+    kickScheduler.Schedule(delayTime, [&](TaskContext /*context*/)
         {
-            GetSession()->KickPlayer(kickReasonStr);
+            if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
+            {
+                sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, kickFrom.c_str(), GetName().c_str(), reasonStr.c_str());
+            }
+            GetSession()->KickPlayer(reasonStr.c_str());
+        });
+}
+
+void Player::DelayedBanAcc(std::string reasonStr, Seconds delayTime, std::string duration, std::string author, std::string accountName)
+{
+    kickScheduler.Schedule(delayTime, [&](TaskContext /*context*/)
+        {
+            if (sWorld->getBoolConfig(CONFIG_SHOW_BAN_IN_WORLD))
+            {
+                bool IsPermanetly = true;
+
+                if (TimeStringToSecs(duration) > 0)
+                    IsPermanetly = false;
+
+                if (!IsPermanetly)
+                    sWorld->SendWorldText(LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD, author.c_str(), accountName.c_str(), secsToTimeString(TimeStringToSecs(duration), true).c_str(), reasonStr.c_str());
+                else
+                    sWorld->SendWorldText(LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD, author.c_str(), accountName.c_str(), reasonStr.c_str());
+            }
+            GetSession()->KickPlayer(reasonStr.c_str());
+        });
+}
+
+void Player::DelayedBanIP(std::string reasonStr, Seconds delayTime, std::string duration, std::string author, std::string ip)
+{
+    kickScheduler.Schedule(delayTime, [&](TaskContext /*context*/)
+        {
+            if (sWorld->getBoolConfig(CONFIG_SHOW_BAN_IN_WORLD))
+            {
+                bool IsPermanetly = true;
+
+                if (TimeStringToSecs(duration) > 0)
+                    IsPermanetly = false;
+
+                if (IsPermanetly)
+                    sWorld->SendWorldText(LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD, author.c_str(), ip.c_str(), reasonStr.c_str());
+                else
+                    sWorld->SendWorldText(LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD, author.c_str(), ip.c_str(), secsToTimeString(TimeStringToSecs(duration), true).c_str(), reasonStr.c_str());
+            }
+            GetSession()->KickPlayer(reasonStr.c_str());
         });
 }
