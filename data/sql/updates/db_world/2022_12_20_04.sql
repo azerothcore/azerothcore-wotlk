@@ -1,3 +1,4 @@
+-- DB update 2022_12_20_03 -> 2022_12_20_04
 --
 -- Mulgore Zone Drops
 -- Squealear's Belt Should be 100% (Already Correct on AC)
