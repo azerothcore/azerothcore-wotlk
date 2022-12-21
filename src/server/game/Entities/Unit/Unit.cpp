@@ -11111,6 +11111,12 @@ Player* Unit::GetCharmerOrOwnerPlayerOrPlayerItself() const
 
 Player* Unit::GetAffectingPlayer() const
 {
+    //nocbot: affecting player is creator
+    if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBotOrPet())
+        if (Unit* creator = GetCreator())
+            return creator->ToPlayer();
+    //end npcbot
+
     if (!GetCharmerOrOwnerGUID())
         return const_cast<Unit*>(this)->ToPlayer();
 
