@@ -6793,7 +6793,8 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
             AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_MANAGE_ABILITIES), GOSSIP_SENDER_ABILITIES, GOSSIP_ACTION_INFO_DEF + 1);
             if (_botclass < BOT_CLASS_EX_START)
             {
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_MANAGE_TALENTS), GOSSIP_SENDER_SPEC, GOSSIP_ACTION_INFO_DEF + 1);
+                if (me->GetLevel() >= 10)
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_MANAGE_TALENTS), GOSSIP_SENDER_SPEC, GOSSIP_ACTION_INFO_DEF + 1);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_GIVE_CONSUMABLE), GOSSIP_SENDER_USEITEM, GOSSIP_ACTION_INFO_DEF + 1);
             }
 
