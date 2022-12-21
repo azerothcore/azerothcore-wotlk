@@ -1853,9 +1853,9 @@ public:
     //npcbot
     void SetControlledByPlayer(bool set) { m_ControlledByPlayer = set; }
     GameObject* GetFirstGameObjectById(uint32 id) const;
-        void SetCreator(Unit* creator);
-        Unit* GetCreator() const { return m_creator; }
-        Unit* m_creator = nullptr;
+    void SetCreator(Unit* creator);
+    Unit* GetCreator() const { return m_creator; }
+    Unit* m_creator = nullptr;
     //end npcbot
 
     [[nodiscard]] bool IsControlledByPlayer() const { return m_ControlledByPlayer; }
