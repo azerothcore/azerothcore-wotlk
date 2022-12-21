@@ -491,14 +491,14 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            Disperse(diff);
-
             if (!GlobalUpdate(diff))
                 return;
 
             DoVehicleActions(diff);
             if (!CanBotAttackOnVehicle())
                 return;
+
+            Disperse(diff);
 
             DoDevCheck(diff);
             DoShackCheck(diff);

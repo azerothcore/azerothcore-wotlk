@@ -588,15 +588,15 @@ public:
             else if (me->GetPowerType() == POWER_ENERGY)
                 getenergy();
 
-            CheckHibery(diff);
-            CheckBarkskin(diff);
-
             if (!GlobalUpdate(diff))
                 return;
 
             DoVehicleActions(diff);
             if (!CanBotAttackOnVehicle())
                 return;
+
+            CheckHibery(diff);
+            CheckBarkskin(diff);
 
             if (IsPotionReady())
             {

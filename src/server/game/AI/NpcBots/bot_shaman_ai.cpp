@@ -995,15 +995,15 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            CheckShamanisticRage(diff);
-            CheckThunderStorm(diff);
-
             if (!GlobalUpdate(diff))
                 return;
 
             DoVehicleActions(diff);
             if (!CanBotAttackOnVehicle())
                 return;
+
+            CheckShamanisticRage(diff);
+            CheckThunderStorm(diff);
 
             CheckHexy(diff);
             CheckEarthy(diff);

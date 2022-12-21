@@ -348,10 +348,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            CheckPoly(diff);
-            CheckBlink(diff);
-            CheckIceBlock(diff);
-
             if (!GlobalUpdate(diff))
                 return;
 
@@ -360,6 +356,10 @@ public:
                 return;
 
             CheckPots(diff);
+
+            CheckPoly(diff);
+            CheckBlink(diff);
+            CheckIceBlock(diff);
 
             CheckRacials(diff);
 
