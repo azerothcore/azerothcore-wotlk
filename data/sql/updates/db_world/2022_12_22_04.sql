@@ -1,3 +1,4 @@
+-- DB update 2022_12_22_03 -> 2022_12_22_04
 --
 -- Recipe: Super Mana Potion 30m
 UPDATE `npc_vendor` SET `incrtime`=1800 WHERE `entry` IN (18005, 19837) AND `item`=22907 AND `ExtendedCost`=0;
