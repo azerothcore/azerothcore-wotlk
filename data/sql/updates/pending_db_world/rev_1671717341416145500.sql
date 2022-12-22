@@ -131,7 +131,7 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (@PATH,34,-3030.8447,2940.8096,86.53926,NULL,60000, 'Bonechewer Messenger');
 -- 0x2044A0424014BF0000004600000B2867 .go xyz -2963.8152 3384.4705 -4.32232
 
-DELETE FROM `creature_Text` WHERE `creatureID`=21244;
+DELETE FROM `creature_text` WHERE `creatureID`=21244;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `Text`, `Type`, `Probability`, `BroadcastTextId`, `comment`) VALUES
 (21244, 0, 'Be on your guard! The enemy is on the prowl.', 12, 100, 18845, 'Bloodchewer Messenger'),
 (21244, 1, 'There they are!', 12, 100, 18846, 'Bloodchewer Messenger');
