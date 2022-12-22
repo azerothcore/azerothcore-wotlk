@@ -1,6 +1,7 @@
 --
 DELETE FROM `creature` WHERE `id1` IN (16772, 16810, 18583, 18595, 21244, 21245) AND `map`=530;
 DELETE FROM `creature_addon` WHERE (`guid` IN (57784));
+DELETE FROM `waypoint_data` WHERE `id`=577840;
 
 SET @CGUID := 126173;
 
