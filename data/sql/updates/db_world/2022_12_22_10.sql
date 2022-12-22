@@ -1,3 +1,4 @@
+-- DB update 2022_12_22_09 -> 2022_12_22_10
 --
 UPDATE `creature_onkill_reputation` SET `MaxStanding1` = 4, `MaxStanding2` = 4, `RewOnKillRepValue1` = 1, `RewOnKillRepValue2` = 1 WHERE (`creature_id` = 17540);
 
