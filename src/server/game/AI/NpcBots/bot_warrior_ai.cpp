@@ -929,7 +929,7 @@ public:
 
         void CheckShouts(uint32 diff)
         {
-            if (shoutCheckTimer > diff || GC_Timer > diff || Rand() > 35 || me->IsMounted() || IsCasting() ||
+            if (shoutCheckTimer > diff || GC_Timer > diff || Rand() > 35 || IAmFree() || me->IsMounted() || IsCasting() ||
                 (rage < rcost(BATTLE_SHOUT_1) && !IsSpellReady(BLOODRAGE_1, diff, false)))
                 return;
 
@@ -2126,7 +2126,7 @@ public:
             RefreshAura(FLURRY2, isFury && level >= 36 && level < 37 ? 1 : 0);
             RefreshAura(FLURRY1, isFury && level >= 35 && level < 36 ? 1 : 0);
             RefreshAura(FURIOUS_ATTACKS, isFury && level >= 45 ? 1 : 0);
-            RefreshAura(RAMPAGE, isFury && level >= 50 ? 1 : 0);
+            RefreshAura(RAMPAGE, !IAmFree() && isFury && level >= 50 ? 1 : 0);
             RefreshAura(BLOODSURGE, isFury && level >= 50 ? 1 : 0);
 
             RefreshAura(SHIELD_SPECIALIZATION, isProt && level >= 10 ? 1 : 0);

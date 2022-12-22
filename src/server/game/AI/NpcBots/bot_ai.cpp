@@ -1253,8 +1253,9 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
             std::list<Unit*> targets2;
             GetNearbyFriendlyTargetsList(targets2, 30);
             targets2.remove_if(BOTAI_PRED::BuffTargetExclude());
+            targets2.remove_if([](Unit const* unit) { return unit->GetTypeId() != TYPEID_PLAYER; });
             for (std::list<Unit*>::const_iterator itr = targets2.begin(); itr != targets2.end(); ++itr)
-                if (urand(1,100) <= 30 && BuffTarget(*itr, diff))
+                if (urand(1, 100) <= 30 && BuffTarget(*itr, diff))
                     return;
         }
 
@@ -6560,7 +6561,7 @@ bool bot_ai::Wait()
         return true;
 
     if (IAmFree())
-        waitTimer = me->IsInCombat() ? 500 : urand(750, 1250);
+        waitTimer = me->IsInCombat() ? 500 : ((__rand + 100) * 50);
     else if (!master->GetMap()->IsRaid())
         waitTimer = std::min<uint32>(uint32(50 * (master->GetNpcBotsCount() - 1) + __rand), 500);
     else
@@ -12870,7 +12871,7 @@ void bot_ai::ApplyRacials()
                 InitSpellMap(RaceSpellForClass(myrace, _botclass), true, false);
             break;
         case RACE_DRAENEI:
-            RefreshAura(6562); //Heroic Presence (28878 is not present)
+            RefreshAura(6562, uint8(!IAmFree())); //Heroic Presence (28878 is not present)
             RefreshAura(20579); //Shadow Resistance (universal since creatures do not lose cast time on damage anyways)
             if (firstspawn)
                 InitSpellMap(RaceSpellForClass(myrace, _botclass), true, false);
@@ -15326,7 +15327,7 @@ uint8 bot_ai::LivingVehiclesCount(uint32 entry) const
 //opponent unsafe
 bool bot_ai::GlobalUpdate(uint32 diff)
 {
-    if (BotDataMgr::AllBotsLoaded() == false)
+    if (!BotMgr::IsNpcBotModEnabled() || !BotDataMgr::AllBotsLoaded())
         return false;
 
     //db saves with cd

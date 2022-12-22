@@ -90,7 +90,7 @@ public:
             if (myType == BOT_PET_IMP)
             {
                 //hacked - confilct with soul link due to ownerGuid mismatch
-                if (IsSpellReady(BLOOD_PACT_1, diff, false) && (!me->HasAuraType(SPELL_AURA_230) ||
+                if (IsSpellReady(BLOOD_PACT_1, diff, false) && !IAmFree() && (!me->HasAuraType(SPELL_AURA_230) ||
                     me->GetAuraEffectsByType(SPELL_AURA_230).front()->GetAmount() < sSpellMgr->GetSpellInfo(GetSpell(BLOOD_PACT_1))->Effects[0].CalcValue()))
                 {
                     me->CastSpell(me, GetSpell(BLOOD_PACT_1), false);
@@ -155,10 +155,9 @@ public:
             else if (myType == BOT_PET_FELHUNTER)
             {
                 //hacked - confilct with soul link due to ownerGuid mismatch
-                if (IsSpellReady(FEL_INTELLIGENCE_1, diff, false) &&
-                    (IAmFree() ||
-                    (!petOwner->GetBotOwner()->GetBotMgr()->HasBotClass(BOT_CLASS_MAGE) &&
-                    !petOwner->GetBotOwner()->GetBotMgr()->HasBotClass(BOT_CLASS_PRIEST))))
+                if (IsSpellReady(FEL_INTELLIGENCE_1, diff, false) && !IAmFree() &&
+                    !petOwner->GetBotOwner()->GetBotMgr()->HasBotClass(BOT_CLASS_MAGE) &&
+                    !petOwner->GetBotOwner()->GetBotMgr()->HasBotClass(BOT_CLASS_PRIEST))
                 {
                     me->CastSpell(me, GetSpell(FEL_INTELLIGENCE_1), false);
                     //CastSpellExtraArgs args(true);

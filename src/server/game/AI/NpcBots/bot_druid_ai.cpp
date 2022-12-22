@@ -2766,7 +2766,7 @@ public:
             RefreshAura(NATURESGRACE, level >= 20 ? 1 : 0);
             RefreshAura(DREAMSTATE, isBala && level >= 35 ? 1 : 0);
             RefreshAura(BALANCE_OF_POWER, isBala && level >= 35 ? 1 : 0);
-            RefreshAura(IMPROVED_MOONKIN_FORM, isBala && level >= 40 ? 1 : 0);
+            RefreshAura(IMPROVED_MOONKIN_FORM, !IAmFree() && isBala && level >= 40 ? 1 : 0);
             RefreshAura(ECLIPSE, isBala && level >= 50 ? 1 : 0);
             RefreshAura(EARTH_AND_MOON, isBala && level >= 55 ? 1 : 0);
 

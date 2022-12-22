@@ -2549,7 +2549,7 @@ public:
             RefreshAura(ELEMENTAL_DEVASTATION2, isEnha && level >= 15 && level < 18 ? 1 : 0);
             RefreshAura(ELEMENTAL_DEVASTATION1, isEnha && level >= 12 && level < 15 ? 1 : 0);
             RefreshAura(ELEMENTAL_FOCUS, isElem && level >= 20 ? 1 : 0);
-            RefreshAura(ELEMENTAL_OATH, isElem && level >= 40 ? 1 : 0);
+            RefreshAura(ELEMENTAL_OATH, !IAmFree() && isElem && level >= 40 ? 1 : 0);
             //RefreshAura(STORM_EARTH_AND_FIRE, isElem && level >= 45 ? 1 : 0);
 
             RefreshAura(TOUGHNESS, level >= 25 ? 1 : 0);
@@ -2559,7 +2559,7 @@ public:
             RefreshAura(FLURRY2, isEnha && level >= 26 && level < 27 ? 1 : 0);
             RefreshAura(FLURRY1, isEnha && level >= 25 && level < 26 ? 1 : 0);
             RefreshAura(WEAPON_MASTERY, isEnha && level >= 30 ? 1 : 0);
-            RefreshAura(UNLEASHED_RAGE, isEnha && level >= 35 ? 1 : 0);
+            RefreshAura(UNLEASHED_RAGE, !IAmFree() && isEnha && level >= 35 ? 1 : 0);
             RefreshAura(IMPROVED_STORMSTRIKE, isEnha && level >= 40 ? 1 : 0);
             RefreshAura(STATIC_SHOCK, isEnha && level >= 41 ? 1 : 0);
             RefreshAura(EARTHEN_POWER, isEnha && level >= 50 ? 1 : 0);

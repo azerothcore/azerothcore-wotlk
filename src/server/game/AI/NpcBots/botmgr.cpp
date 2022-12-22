@@ -185,9 +185,6 @@ void BotMgr::Initialize()
 {
     LoadConfig();
 
-    if (!_enableNpcBots)
-        return;
-
     BotDataMgr::LoadNpcBots();
     BotDataMgr::LoadNpcBotGroupData();
 }

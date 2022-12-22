@@ -1933,7 +1933,7 @@ public:
             RefreshAura(MASTER_OF_SUBTLETY, isSubt && level >= 35 ? 1 : 0);
             RefreshAura(CHEAT_DEATH, isSubt && level >= 40 ? 1 : 0);
             RefreshAura(ENVELOPING_SHADOWS, isSubt && level >= 40 ? 1 : 0);
-            RefreshAura(TURN_THE_TABLES, isSubt && level >= 55 ? 1 : 0);
+            RefreshAura(TURN_THE_TABLES, !IAmFree() && isSubt && level >= 55 ? 1 : 0);
             //RefreshAura(HONOR_AMONG_THIEVES, isSubt && level >= 55 ? 1 : 0);
 
             RefreshAura(VIGOR_GLADIATOR, level >= 70 ? 1 : 0);

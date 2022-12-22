@@ -126,7 +126,7 @@ public:
 
             checkAuraTimer = 10000;
 
-            if (!me->HasAura(BRILLIANCE_AURA, me->GetGUID()))
+            if (!IAmFree() && !me->HasAura(BRILLIANCE_AURA, me->GetGUID()))
                 RefreshAura(BRILLIANCE_AURA);
         }
 

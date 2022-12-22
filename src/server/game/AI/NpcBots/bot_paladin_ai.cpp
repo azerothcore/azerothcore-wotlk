@@ -1140,7 +1140,7 @@ public:
 
         void CheckAura(uint32 diff)
         {
-            if (checkAuraTimer > diff || GC_Timer > diff || IsCasting() ||
+            if (checkAuraTimer > diff || GC_Timer > diff || IAmFree() || IsCasting() ||
                 /*me->GetExactDist(master) > 40 || me->IsMounted() || Feasting() || */Rand() > 20)
                 return;
 
@@ -2541,14 +2541,14 @@ public:
             RefreshAura(VINDICATION1, isRetr && level >= 20 && level < 25 ? 1 : 0);
             RefreshAura(CRUSADE, isRetr && level >= 25 ? 1 : 0);
             RefreshAura(TWO_HANDED_WEAPON_SPECIALIZATION, isRetr && level >= 30 ? 1 : 0);
-            RefreshAura(SANCTIFIED_RETRIBUTION, isRetr && level >= 30 ? 1 : 0);
+            RefreshAura(SANCTIFIED_RETRIBUTION, !IAmFree() && isRetr && level >= 30 ? 1 : 0);
             RefreshAura(VENGEANCE3, isRetr && level >= 40 ? 1 : 0);
             RefreshAura(VENGEANCE2, isRetr && level >= 37 && level < 40 ? 1 : 0);
             RefreshAura(VENGEANCE1, isRetr && level >= 35 && level < 37 ? 1 : 0);
             RefreshAura(DIVINE_PURPOSE, isRetr && level >= 35 ? 1 : 0);
             RefreshAura(JUDGEMENTS_OF_THE_WISE, isRetr && level >= 40 ? 1 : 0);
             RefreshAura(ART_OF_WAR, isRetr && level >= 40 ? 1 : 0);
-            RefreshAura(SWIFT_RETRIBUTION, isRetr && level >= 50 ? 1 : 0);
+            RefreshAura(SWIFT_RETRIBUTION, !IAmFree() && isRetr && level >= 50 ? 1 : 0);
             RefreshAura(SHEATH_OF_LIGHT3, isRetr && level >= 60 ? 1 : 0);
             RefreshAura(SHEATH_OF_LIGHT2, isRetr && level >= 55 && level < 60 ? 1 : 0);
             RefreshAura(SHEATH_OF_LIGHT1, isRetr && level >= 50 && level < 55 ? 1 : 0);

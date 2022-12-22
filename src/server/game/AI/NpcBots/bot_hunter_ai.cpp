@@ -252,7 +252,7 @@ public:
 
         void CheckAspects(uint32 diff)
         {
-            if (aspectTimer > diff || me->IsMounted() || Feasting() || IsCasting() || Rand() > 55)
+            if (aspectTimer > diff || IAmFree() || me->IsMounted() || Feasting() || IsCasting() || Rand() > 55)
                 return;
 
             aspectTimer = urand(5000, 10000);
@@ -714,7 +714,7 @@ public:
 
             CheckAspects(diff);
 
-            if (IsSpellReady(TRUESHOT_AURA_1, diff) && Rand() < 5 &&
+            if (IsSpellReady(TRUESHOT_AURA_1, diff) && !IAmFree() && Rand() < 5 &&
                 !me->GetAuraEffect(SPELL_AURA_MOD_RANGED_ATTACK_POWER_PCT, SPELLFAMILY_HUNTER, 0x0, 0x200000, 0x0, me->GetGUID()))
             {
                 if (doCast(me, GetSpell(TRUESHOT_AURA_1)))

@@ -1974,7 +1974,7 @@ bool bot_pet_ai::Wait()
         return true;
 
     if (IAmFree())
-        waitTimer = me->IsInCombat() ? 500 : urand(750, 1250);
+        waitTimer = me->IsInCombat() ? 500 : ((__rand + 100) * 50);
     else if (!me->GetMap()->IsRaid())
         waitTimer = std::min<uint32>(uint32(50 * (petOwner->GetBotOwner()->GetNpcBotsCount() - 1) + __rand + __rand), 500);
     else
@@ -2169,6 +2169,9 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
         LOG_ERROR("entities.unit", "botpet:GlobalUpdate(): no owner!");
         return false;
     }
+
+    if (!BotMgr::IsNpcBotModEnabled())
+        return false;
 
     ReduceCD(diff);
 

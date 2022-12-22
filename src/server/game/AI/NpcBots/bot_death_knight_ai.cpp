@@ -468,7 +468,7 @@ public:
 
         void CheckPresence(uint32 diff)
         {
-            if (presencetimer > diff || IsCasting() || Rand() > 30)
+            if (presencetimer > diff || IAmFree() || IsCasting() || Rand() > 30)
                 return;
 
             uint8 newpresence = IsTank() ? DEATH_KNIGHT_FROST_PRESENCE : DEATH_KNIGHT_BLOOD_PRESENCE;
@@ -584,7 +584,7 @@ public:
             Counter(diff);
 
             //HORN OF WINTER
-            if (IsSpellReady(HORN_OF_WINTER_1, diff) && Rand() < 25 &&
+            if (IsSpellReady(HORN_OF_WINTER_1, diff) && !IAmFree() && Rand() < 25 &&
                 ((me->IsInCombat() && runicpower <= 900) ||
                 !me->GetAuraEffect(SPELL_AURA_MOD_STAT, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x40000000, 0x0)))
             {
@@ -1842,7 +1842,7 @@ public:
             RefreshAura(BLOODY_VENGEANCE3, isBloo && level >= 62 ? 1 : 0);
             RefreshAura(BLOODY_VENGEANCE2, isBloo && level >= 61 && level < 62 ? 1 : 0);
             RefreshAura(BLOODY_VENGEANCE1, isBloo && level >= 60 && level < 61 ? 1 : 0);
-            RefreshAura(ABOMINATIONS_MIGHT, isBloo && level >= 60 ? 1 : 0);
+            RefreshAura(ABOMINATIONS_MIGHT, !IAmFree() && isBloo && level >= 60 ? 1 : 0);
             //RefreshAura(BLOODWORMS, isBloo && level >= 61 ? 1 : 0);
             RefreshAura(IMPROVED_BLOOD_PRESENCE, isBloo && level >= 61 ? 1 : 0);
             RefreshAura(WILL_OF_THE_NECROPOLIS, isBloo && level >= 63 ? 1 : 0);
@@ -1853,7 +1853,7 @@ public:
             RefreshAura(KILLING_MACHINE, isFros && level >= 58 ? 1 : 0);
             RefreshAura(CHILL_OF_THE_GRAVE, isFros && level >= 58 ? 1 : 0);
             RefreshAura(FRIGID_DREADPLATE, isFros && level >= 59 ? 1 : 0);
-            RefreshAura(IMPROVED_ICY_TALONS, isFros && level >= 60 ? 1 : 0);
+            RefreshAura(IMPROVED_ICY_TALONS, !IAmFree() && isFros && level >= 60 ? 1 : 0);
             RefreshAura(THREAT_OF_THASSARIAN, isFros && level >= 62 ? 1 : 0);
             RefreshAura(ACCLIMATION, isFros && level >= 63 ? 1 : 0);
 
