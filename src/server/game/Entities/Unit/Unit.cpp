@@ -14464,6 +14464,9 @@ void Unit::setDeathState(DeathState s, bool despawn)
         SetHealth(0);
         SetPower(getPowerType(), 0);
 
+        // Stop emote on death
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+
         // players in instance don't have ZoneScript, but they have InstanceScript
         if (ZoneScript* zoneScript = GetZoneScript() ? GetZoneScript() : (ZoneScript*)GetInstanceScript())
             zoneScript->OnUnitDeath(this);
