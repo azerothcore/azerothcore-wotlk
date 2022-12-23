@@ -254,6 +254,7 @@ public:
             { "stopfully",  HandleNpcBotCommandStopfullyCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_STOPFULLY,  Console::No  },
             { "follow",     HandleNpcBotCommandFollowCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_FOLLOW,     Console::No  },
             { "walk",       HandleNpcBotCommandWalkCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_WALK,       Console::No  },
+            { "nogossip",   HandleNpcBotCommandNoGossipCommand,     rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_WALK,       Console::No  },
         };
 
         static ChatCommandTable npcbotAttackDistanceCommandTable =
@@ -2082,6 +2083,35 @@ public:
         {
             owner->GetBotMgr()->SendBotCommandStateRemove(BOT_COMMAND_WALK);
             msg = "Bots' movement mode is set to 'RUN'";
+        }
+
+        handler->SendSysMessage(msg.c_str());
+        return true;
+    }
+
+    static bool HandleNpcBotCommandNoGossipCommand(ChatHandler* handler)
+    {
+        Player* owner = handler->GetSession()->GetPlayer();
+
+        if (!owner->HaveBot())
+        {
+            handler->SendSysMessage(".npcbot command nogossip");
+            handler->SendSysMessage("Toggles gossip availability for your npcbots");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::string msg;
+        bool isNoGossipEnabled = owner->GetBotMgr()->GetBotMap()->begin()->second->GetBotAI()->HasBotCommandState(BOT_COMMAND_NOGOSSIP);
+        if (!isNoGossipEnabled)
+        {
+            owner->GetBotMgr()->SendBotCommandState(BOT_COMMAND_NOGOSSIP);
+            msg = "Bots' gossip is DISABLED";
+        }
+        else
+        {
+            owner->GetBotMgr()->SendBotCommandStateRemove(BOT_COMMAND_NOGOSSIP);
+            msg = "Bots' gossip is ENABLED";
         }
 
         handler->SendSysMessage(msg.c_str());

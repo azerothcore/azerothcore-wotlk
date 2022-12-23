@@ -516,15 +516,16 @@ enum BotMovementType
     BOT_MOVE_CHASE
 };
 
-enum BotCommandStates
+enum BotCommandStates : uint32
 {
-    BOT_COMMAND_STAY                    = 0x01,
-    BOT_COMMAND_FOLLOW                  = 0x02,
-    BOT_COMMAND_ATTACK                  = 0x04,
-    BOT_COMMAND_COMBATRESET             = 0x08,
-    BOT_COMMAND_FULLSTOP                = 0x10,
-    BOT_COMMAND_ISSUED_ORDER            = 0x20,
-    BOT_COMMAND_WALK                    = 0x40,
+    BOT_COMMAND_STAY                    = 0x00000001,
+    BOT_COMMAND_FOLLOW                  = 0x00000002,
+    BOT_COMMAND_ATTACK                  = 0x00000004,
+    BOT_COMMAND_COMBATRESET             = 0x00000008,
+    BOT_COMMAND_FULLSTOP                = 0x00000010,
+    BOT_COMMAND_ISSUED_ORDER            = 0x00000020,
+    BOT_COMMAND_WALK                    = 0x00000040,
+    BOT_COMMAND_NOGOSSIP                = 0x00000080,
 
     BOT_COMMAND_MASK_UNCHASE            = BOT_COMMAND_STAY | BOT_COMMAND_FOLLOW | BOT_COMMAND_FULLSTOP,
     BOT_COMMAND_MASK_UNMOVING           = BOT_COMMAND_STAY | BOT_COMMAND_FULLSTOP | BOT_COMMAND_ISSUED_ORDER

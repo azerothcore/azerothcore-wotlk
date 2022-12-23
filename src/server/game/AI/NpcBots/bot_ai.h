@@ -106,15 +106,15 @@ class bot_ai : public CreatureAI
         bool CanRespawn() { return IAmFree(); }
         void BotMovement(BotMovementType type, Position const* pos, Unit* target = nullptr, bool generatePath = true) const;
         bool CanBotMoveVehicle() const;
-        void SetBotCommandState(uint8 st, bool force = false, Position* newpos = nullptr);
-        void RemoveBotCommandState(uint8 st);
-        bool HasBotCommandState(uint8 st) const { return (m_botCommandState & st); }
+        void SetBotCommandState(uint32 st, bool force = false, Position* newpos = nullptr);
+        void RemoveBotCommandState(uint32 st);
+        bool HasBotCommandState(uint32 st) const { return (_botCommandState & st); }
         void SetBotAwaitState(uint8 state);
         inline void RemoveBotAwaitState(uint8 state) { _botAwaitState &= ~state; }
         inline bool HasBotAwaitState(uint8 state) const { return !!(_botAwaitState & state); }
         void EventRemoveBotAwaitState(uint8 state);
         void AbortAwaitStateRemoval();
-        uint8 GetBotCommandState() const { return m_botCommandState; }
+        uint32 GetBotCommandState() const { return _botCommandState; }
         bool IsInBotParty(Unit const* unit) const;
         bool IsInBotParty(ObjectGuid guid) const;
         bool CanBotAttack(Unit const* target, int8 byspell = 0, bool secondary = false) const;
@@ -596,7 +596,7 @@ class bot_ai : public CreatureAI
         SpellInfo const* m_botSpellInfo;
         Position movepos, attackpos;
 
-        uint8 m_botCommandState;
+        uint32 _botCommandState;
         uint8 _botAwaitState;
 
         //stats
