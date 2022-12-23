@@ -1,7 +1,7 @@
 SET @GUID := 25068;
 
 -- Raging Fire-Soul (Mangos)
-DELETE FROM `creature` WHERE `id1` IN (22311,22311,22311,22311,22311,22311,22309,22309,22310,22310,22310,22310,22310,22310,18127,19402,19402,19402,18867) AND `guid` BETWEEN @GUID+0 AND @GUID+18;
+DELETE FROM `creature` WHERE `id1` IN (18127,18867,19402,22309,22310,22311) AND `guid` BETWEEN @GUID+0 AND @GUID+18;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`) VALUES
 (@GUID+0 , 22311, 530, 3518, 3636, 1, 0, -850.57, 6517.23, 172.649, 2.17004, 300, 5, 0, 0, 0, 1),
 (@GUID+1 , 22311, 530, 3518, 3636, 1, 0, -842.368, 6578.13, 172.678, 6.16071, 300, 5, 0, 0, 0, 1),
