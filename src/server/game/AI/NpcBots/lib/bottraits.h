@@ -4,6 +4,7 @@
 #include "botcommon.h"
 
 #include "Creature.h"
+#include "Log.h"
 #include "SpellAuraEffects.h"
 
 #include <array>
