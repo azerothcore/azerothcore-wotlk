@@ -1644,7 +1644,7 @@ void bot_ai::CureGroup(uint32 cureSpell, uint32 diff)
             std::list<Unit*> targets1;
             GetNearbyFriendlyTargetsList(targets1, 38);
             for (std::list<Unit*>::const_iterator itr = targets1.begin(); itr != targets1.end(); ++itr)
-                if (_canCureTarget(*itr, cureSpell))
+                if (((*itr)->IsPlayer() || (*itr)->ToPet()) && _canCureTarget(*itr, cureSpell))
                     cureTargets.push_back(*itr);
         }
 
