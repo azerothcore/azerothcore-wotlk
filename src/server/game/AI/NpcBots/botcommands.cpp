@@ -1987,7 +1987,7 @@ public:
         {
             Creature const* bot = BotDataMgr::FindBot(guid.GetEntry());
             std::string ccolor, cname;
-            GetBotClassNameAndColor(bot ? bot->GetBotClass() : BOT_CLASS_NONE, ccolor, cname);
+            GetBotClassNameAndColor(bot ? bot->GetBotClass() : uint8(BOT_CLASS_NONE), ccolor, cname);
             handler->PSendSysMessage("%s (%s)", bot ? bot->GetName().c_str() : "Unknown", "|c" + ccolor + cname + "|r");
         }
 
