@@ -1037,7 +1037,14 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
 
     _bots.erase(itr);
 
-    bot->GetBotAI()->ResetBotAI(removetype == BOT_REMOVE_DISMISS ? BOTAI_RESET_DISMISS : BOTAI_RESET_LOGOUT);
+    BotAIResetType resetType;
+    switch (removetype)
+    {
+        case BOT_REMOVE_DISMISS: resetType = BOTAI_RESET_DISMISS; break;
+        case BOT_REMOVE_UNBIND:  resetType = BOTAI_RESET_LOST;    break;
+        default:                 resetType = BOTAI_RESET_LOGOUT;  break;
+    }
+    bot->GetBotAI()->ResetBotAI(resetType);
 
     bot->SetFaction(bot->GetCreatureTemplate()->faction);
     bot->SetLevel(bot->GetCreatureTemplate()->minlevel);
@@ -1049,8 +1056,24 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &newOwner);
     }
 
-    bot->GetBotAI()->Reset();
+    if (removetype != BOT_REMOVE_UNBIND)
+        bot->GetBotAI()->Reset();
+
     bot->GetBotAI()->canUpdate = true;
+}
+
+void BotMgr::UnbindBot(ObjectGuid guid)
+{
+    Creature const* bot = GetBot(guid);
+    ASSERT(bot);
+
+    RemoveBot(guid, BOT_REMOVE_UNBIND);
+    bot->GetBotAI()->SetBotCommandState(BOT_COMMAND_UNBIND);
+}
+BotAddResult BotMgr::RebindBot(Creature* bot)
+{
+    bot->GetBotAI()->RemoveBotCommandState(BOT_COMMAND_UNBIND);
+    return AddBot(bot);
 }
 
 BotAddResult BotMgr::AddBot(Creature* bot)

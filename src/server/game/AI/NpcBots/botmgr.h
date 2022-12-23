@@ -35,6 +35,7 @@ enum BotRemoveType
     BOT_REMOVE_LOGOUT                   = 0,
     BOT_REMOVE_DISMISS                  = 1,
     BOT_REMOVE_UNSUMMON                 = 2,
+    BOT_REMOVE_UNBIND                   = 3,
     BOT_REMOVE_BY_DEFAULT               = BOT_REMOVE_LOGOUT
 };
 
@@ -166,7 +167,9 @@ class BotMgr
         void CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype = BOT_REMOVE_LOGOUT);
         void RemoveAllBots(uint8 removetype = BOT_REMOVE_LOGOUT);
         void RemoveBot(ObjectGuid guid, uint8 removetype = BOT_REMOVE_LOGOUT);
-        BotAddResult AddBot(Creature* bot);
+        void UnbindBot(ObjectGuid guid);
+        [[nodiscard]] BotAddResult RebindBot(Creature* bot);
+        [[nodiscard]] BotAddResult AddBot(Creature* bot);
         bool AddBotToGroup(Creature* bot);
         void RemoveBotFromBGQueue(Creature const* bot);
         bool RemoveBotFromGroup(Creature* bot);

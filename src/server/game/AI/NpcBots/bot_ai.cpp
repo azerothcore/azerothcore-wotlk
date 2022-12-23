@@ -1076,11 +1076,11 @@ void bot_ai::AbortAwaitStateRemoval()
 
 void bot_ai::SetBotCommandState(uint32 st, bool force, Position* newpos)
 {
-    if (!me->IsAlive())
-        return;
-
-    if (JumpingOrFalling())
-        return;
+    if (st != BOT_COMMAND_UNBIND)
+    {
+        if (!me->IsAlive() || JumpingOrFalling())
+            return;
+    }
 
     Vehicle* veh = me->GetVehicle();
     VehicleSeatEntry const* seat = veh ? veh->GetSeatForPassenger(me) : nullptr;
@@ -13417,6 +13417,8 @@ void bot_ai::FindMaster()
     if (!IAmFree())
         return;
     if (IsDuringTeleport())
+        return;
+    if (HasBotCommandState(BOT_COMMAND_UNBIND))
         return;
 
     if (Player* player = ObjectAccessor::FindPlayerByLowGUID(_ownerGuid))

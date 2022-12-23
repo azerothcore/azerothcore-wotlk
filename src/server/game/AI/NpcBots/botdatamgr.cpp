@@ -664,6 +664,34 @@ Creature const* BotDataMgr::FindBot(uint32 entry)
     }
     return nullptr;
 }
+Creature const* BotDataMgr::FindBot(std::string_view name, LocaleConstant loc)
+{
+    std::wstring wname;
+    if (Utf8toWStr(name, wname))
+    {
+        wstrToLower(wname);
+        std::shared_lock<std::shared_mutex> lock(*GetLock());
+        for (NpcBotRegistry::const_iterator ci = _existingBots.begin(); ci != _existingBots.end(); ++ci)
+        {
+            std::string basename = (*ci)->GetName();
+            if (CreatureLocale const* creatureInfo = sObjectMgr->GetCreatureLocale((*ci)->GetEntry()))
+            {
+                if (creatureInfo->Name.size() > loc && !creatureInfo->Name[loc].empty())
+                    basename = creatureInfo->Name[loc];
+            }
+
+            std::wstring wbname;
+            if (!Utf8toWStr(basename, wbname))
+                continue;
+
+            wstrToLower(wbname);
+            if (wbname == wname)
+                return *ci;
+        }
+    }
+
+    return nullptr;
+}
 
 NpcBotRegistry const& BotDataMgr::GetExistingNPCBots()
 {
