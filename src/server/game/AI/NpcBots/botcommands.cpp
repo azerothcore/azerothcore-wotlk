@@ -227,16 +227,16 @@ private:
     else if constexpr (std::is_same_v<E, PlayerVisuals::Features>)   return !F ? featm : featf
 
         constexpr bool F = G == GENDER_FEMALE;
-        if constexpr (R == RACE_HUMAN)         MV_PRED9(9,9, 11,14, 16,23, 9,  8,6);
-        if constexpr (R == RACE_DWARF)         MV_PRED9(8,8,   9,9, 15,18, 9, 10,5);
-        if constexpr (R == RACE_NIGHTELF)      MV_PRED9(8,8,   8,8, 11,11, 7,  5,9);
-        if constexpr (R == RACE_GNOME)         MV_PRED9(4,4,   6,6, 11,11, 8,  7,6);
-        if constexpr (R == RACE_DRAENEI)       MV_PRED9(13,13, 9,9, 13,15, 6,  7,6);
-        if constexpr (R == RACE_ORC)           MV_PRED9(8,8,   8,8, 11,12, 7, 10,6);
-        if constexpr (R == RACE_UNDEAD_PLAYER) MV_PRED9(5,5,   9,9, 14,14, 9, 16,7);
-        if constexpr (R == RACE_TAUREN)        MV_PRED9(18,10, 4,3, 12,11, 2,  6,4);
-        if constexpr (R == RACE_TROLL)         MV_PRED9(5,5,   4,5,   9,9, 9, 10,5);
-        if constexpr (R == RACE_BLOODELF)      MV_PRED9(9,9,   9,9, 15,18, 9, 9,10);
+        if constexpr (R == RACE_HUMAN)         { MV_PRED9(9,9, 11,14, 16,23, 9,  8,6); }
+        if constexpr (R == RACE_DWARF)         { MV_PRED9(8,8,   9,9, 15,18, 9, 10,5); }
+        if constexpr (R == RACE_NIGHTELF)      { MV_PRED9(8,8,   8,8, 11,11, 7,  5,9); }
+        if constexpr (R == RACE_GNOME)         { MV_PRED9(4,4,   6,6, 11,11, 8,  7,6); }
+        if constexpr (R == RACE_DRAENEI)       { MV_PRED9(13,13, 9,9, 13,15, 6,  7,6); }
+        if constexpr (R == RACE_ORC)           { MV_PRED9(8,8,   8,8, 11,12, 7, 10,6); }
+        if constexpr (R == RACE_UNDEAD_PLAYER) { MV_PRED9(5,5,   9,9, 14,14, 9, 16,7); }
+        if constexpr (R == RACE_TAUREN)        { MV_PRED9(18,10, 4,3, 12,11, 2,  6,4); }
+        if constexpr (R == RACE_TROLL)         { MV_PRED9(5,5,   4,5,   9,9, 9, 10,5); }
+        if constexpr (R == RACE_BLOODELF)      { MV_PRED9(9,9,   9,9, 15,18, 9, 9,10); }
 
 #undef MV_PRED9
         return 0;
