@@ -27,7 +27,16 @@ enum Spells
     SPELL_KNOCKAWAY           = 18813,
     SPELL_RAPTOR_STRIKE       = 31566,
     SPELL_MULTISHOT           = 34974,
-    SPELL_THROW_FREEZING_TRAP = 31946
+    SPELL_THROW_FREEZING_TRAP = 31946,
+    SPELL_AIMED_SHOT          = 31623,
+    SPELL_HUNTERS_MARK        = 31615
+};
+
+enum Text
+{
+    SAY_AGGRO     = 1,
+    SAY_KILL      = 2,
+    SAY_JUST_DIED = 3
 };
 
 enum Misc
@@ -43,6 +52,7 @@ struct boss_swamplord_muselek : public ScriptedAI
     void Reset() override
     {
         _scheduler.CancelAll();
+        _markTarget.Clear();
 
         _scheduler.SetValidator([this]
         {
@@ -62,8 +72,20 @@ struct boss_swamplord_muselek : public ScriptedAI
         }
     }
 
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_JUST_DIED);
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        Talk(SAY_KILL);
+    }
+
     void EnterCombat(Unit*) override
     {
+        Talk(SAY_AGGRO);
+
         _scheduler.Schedule(3s, [this](TaskContext context)
         {
             if (me->GetVictim() && !me->IsWithinRange(me->GetVictim(), 10.0f) && me->IsWithinLOSInMap(me->GetVictim()))
@@ -88,13 +110,31 @@ struct boss_swamplord_muselek : public ScriptedAI
             context.Repeat();
         }).Schedule(10s, 15s, [this](TaskContext context)
         {
-            me->InterruptNonMeleeSpells(false);
             DoCastVictim(SPELL_MULTISHOT);
             context.Repeat(20s, 30s);
         }).Schedule(4s, 8s, [this](TaskContext context)
         {
-            me->InterruptNonMeleeSpells(false);
             DoCastRandomTarget(SPELL_THROW_FREEZING_TRAP);
+            context.Repeat(12s, 16s);
+        }).Schedule(4s, 8s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+            {
+                _markTarget = target->GetGUID();
+                DoCastAOE(SPELL_HUNTERS_MARK);
+
+                _scheduler.Schedule(3s, [this, target](TaskContext)
+                {
+                    if (target)
+                    {
+                        me->GetMotionMaster()->MoveBackwards(target, 10.0f);
+                        DoCast(target, SPELL_AIMED_SHOT);
+                    }
+                });
+
+                context.Repeat(12s, 16s);
+            }
+
             context.Repeat(12s, 16s);
         });
     }
@@ -111,6 +151,7 @@ struct boss_swamplord_muselek : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
+    ObjectGuid _markTarget;
 };
 
 void AddSC_boss_swamplord_muselek()
