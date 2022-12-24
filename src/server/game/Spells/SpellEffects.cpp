@@ -3910,7 +3910,13 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             const char* gender = "his";
                             if (m_caster->getGender() > 0)
                                 gender = "her";
-                            sprintf(buf, "%s causually tosses %s [Worn Troll Dice]. One %u and one %u.", m_caster->GetName().c_str(), gender, urand(1, 6), urand(1, 6));
+                            sprintf(buf, "casually tosses %s [Worn Troll Dice].", gender);
+                            m_caster->TextEmote(buf);
+
+                            sprintf(buf, "rolls %u (1-6)", urand(1, 6));
+                            m_caster->TextEmote(buf);
+
+                            sprintf(buf, "rolls %u (1-6)", urand(1, 6));
                             m_caster->TextEmote(buf);
                             break;
                         }
