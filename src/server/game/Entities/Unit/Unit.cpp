@@ -9278,8 +9278,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                 }
             case SPELLFAMILY_SHAMAN:
                 {
+                    // Spore Cloud (from Petrified Lichen Guard)
+                    if (auraSpellInfo->Id == 32642)
+                    {
+                        trigger_spell_id = sSpellMgr->GetSpellWithRank(32643, auraSpellInfo->GetRank());
+                    }
                     // Lightning Shield (overwrite non existing triggered spell call in spell.dbc
-                    if (auraSpellInfo->SpellFamilyFlags[0] & 0x400)
+                    else if (auraSpellInfo->SpellFamilyFlags[0] & 0x400)
                     {
                         // Do not proc off from self-casted items
                         if (Spell const* spell = eventInfo.GetProcSpell())
