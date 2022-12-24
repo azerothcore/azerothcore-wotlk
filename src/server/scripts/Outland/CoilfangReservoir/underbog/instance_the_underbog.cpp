@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-    This placeholder for the instance is needed for dungeon finding to be able
-    to give credit after the boss defined in lastEncounterDungeon is killed.
-    Without it, the party doing random dungeon won't get satchel of spoils and
-    gets instead the deserter debuff.
-*/
-
 #include "InstanceScript.h"
 #include "Map.h"
 #include "ScriptMgr.h"
@@ -40,6 +33,36 @@ public:
     struct instance_the_underbog_InstanceMapScript : public InstanceScript
     {
         instance_the_underbog_InstanceMapScript(Map* map) : InstanceScript(map) { }
+
+        void OnCreatureCreate(Creature* creature) override
+        {
+            InstanceScript::OnCreatureCreate(creature);
+
+            switch (creature->GetEntry())
+            {
+                case NPC_GHAZAN:
+                    _ghazanGUID = creature->GetGUID();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        ObjectGuid GetGuidData(uint32 type) const override
+        {
+            switch (type)
+            {
+                case NPC_GHAZAN:
+                    return _ghazanGUID;
+                default:
+                    break;
+            }
+
+            return ObjectGuid::Empty;
+        }
+
+    private:
+        ObjectGuid _ghazanGUID;
     };
 };
 

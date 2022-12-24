@@ -811,7 +811,7 @@ void MotionMaster::MoveRotate(uint32 time, RotateDirection direction)
     Mutate(new RotateMovementGenerator(time, direction), MOTION_SLOT_ACTIVE);
 }
 
-void MotionMaster::PropagateSpeedChange()
+void MotionMaster::propagateSpeedChange()
 {
     /*Impl::container_type::iterator it = Impl::c.begin();
     for (; it != end(); ++it)
@@ -821,7 +821,7 @@ void MotionMaster::PropagateSpeedChange()
     for (int i = 0; i <= _top; ++i)
     {
         if (Impl[i])
-            Impl[i]->UnitSpeedChanged();
+            Impl[i]->unitSpeedChanged();
     }
 }
 
