@@ -26,6 +26,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 
@@ -2258,6 +2259,38 @@ public:
     }
 };
 
+// 47447 - Corrosive Spit
+class spell_dragonblight_corrosive_spit : public AuraScript
+{
+    PrepareAuraScript(spell_dragonblight_corrosive_spit);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->GetEffect(EFFECT_0).CalcValue()) });
+    }
+
+    void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTarget()->HasAura(aurEff->GetSpellInfo()->GetEffect(EFFECT_0).CalcValue()))
+            GetAura()->Remove();
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        if (GetTarget()->HasAura(aurEff->GetSpellInfo()->GetEffect(EFFECT_0).CalcValue()))
+        {
+            PreventDefaultAction();
+            GetAura()->Remove();
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_dragonblight_corrosive_spit::AfterApply, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dragonblight_corrosive_spit::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
 void AddSC_dragonblight()
 {
     // Ours
@@ -2287,4 +2320,6 @@ void AddSC_dragonblight()
     new spell_q12096_q12092_dummy();
     new spell_q12096_q12092_bark();
     new npc_torturer_lecraft();
+
+    RegisterSpellScript(spell_dragonblight_corrosive_spit);
 }
