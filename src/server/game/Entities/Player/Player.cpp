@@ -11152,6 +11152,35 @@ WorldLocation Player::GetStartPosition() const
     return WorldLocation(mapId, info->positionX, info->positionY, info->positionZ, 0);
 }
 
+bool Player::HaveAtClient(WorldObject const* u) const
+{
+    if (u == this)
+    {
+        return true;
+    }
+
+    // Motion Transports are always present in player's client
+    if (GameObject const* gameobject = u->ToGameObject())
+    {
+        if (gameobject->IsMotionTransport())
+        {
+            return true;
+        }
+    }
+
+    return m_clientGUIDs.find(u->GetGUID()) != m_clientGUIDs.end();
+}
+
+bool Player::HaveAtClient(ObjectGuid guid) const
+{
+    if (guid == GetGUID())
+    {
+        return true;
+    }
+
+    return m_clientGUIDs.find(guid) != m_clientGUIDs.end();
+}
+
 bool Player::IsNeverVisible() const
 {
     if (Unit::IsNeverVisible())
