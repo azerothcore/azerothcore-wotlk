@@ -4455,6 +4455,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_CASTER;
     });
 
+    // Swamplord Muselek - Hunter's Mark
+    ApplySpellFix({ 31615 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_TARGET_ENEMY;
+        spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_TARGET_ENEMY;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

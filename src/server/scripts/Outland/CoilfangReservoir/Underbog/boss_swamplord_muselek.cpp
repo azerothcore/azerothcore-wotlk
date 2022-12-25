@@ -82,13 +82,18 @@ struct boss_swamplord_muselek : public ScriptedAI
         Talk(SAY_KILL);
     }
 
-    void EnterCombat(Unit*) override
+    bool CanShootVictim()
+    {
+        return me->GetVictim() && !me->IsWithinRange(me->GetVictim(), 10.0f) && me->IsWithinLOSInMap(me->GetVictim());
+    }
+
+    void EnterCombat(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
 
         _scheduler.Schedule(3s, [this](TaskContext context)
         {
-            if (me->GetVictim() && !me->IsWithinRange(me->GetVictim(), 10.0f) && me->IsWithinLOSInMap(me->GetVictim()))
+            if (CanShootVictim())
             {
                 me->LoadEquipment(1, true);
                 DoCastVictim(SPELL_SHOOT);
@@ -114,25 +119,42 @@ struct boss_swamplord_muselek : public ScriptedAI
             context.Repeat(20s, 30s);
         }).Schedule(4s, 8s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_THROW_FREEZING_TRAP);
-            context.Repeat(12s, 16s);
-        }).Schedule(4s, 8s, [this](TaskContext context)
-        {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+            LOG_ERROR("sql.sql", "casting");
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, false, true))
             {
+                LOG_ERROR("sql.sql", "casting 2");
                 _markTarget = target->GetGUID();
-                DoCastAOE(SPELL_HUNTERS_MARK);
+                DoCastVictim(SPELL_THROW_FREEZING_TRAP);
 
                 _scheduler.Schedule(3s, [this, target](TaskContext)
                 {
                     if (target)
                     {
                         me->GetMotionMaster()->MoveBackwards(target, 10.0f);
-                        DoCast(target, SPELL_AIMED_SHOT);
+                        me->m_Events.AddEventAtOffset([this]()
+                        {
+                            if (Unit* marktarget = ObjectAccessor::GetUnit(*me, _markTarget))
+                            {
+                                DoCast(marktarget, SPELL_HUNTERS_MARK);
+                            }
+                        }, 3s);
                     }
                 });
 
-                context.Repeat(12s, 16s);
+                _scheduler.Schedule(5s, [this, target](TaskContext)
+                {
+                    if (target)
+                    {
+                        me->GetMotionMaster()->MoveBackwards(target, 10.0f);
+                        me->m_Events.AddEventAtOffset([this]()
+                        {
+                            if (Unit* marktarget = ObjectAccessor::GetUnit(*me, _markTarget))
+                            {
+                                DoCast(marktarget, SPELL_AIMED_SHOT);
+                            }
+                        }, 3s);
+                    }
+                });
             }
 
             context.Repeat(12s, 16s);
