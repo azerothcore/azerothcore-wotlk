@@ -1,3 +1,4 @@
+-- DB update 2022_12_25_05 -> 2022_12_25_06
 --
 DELETE FROM `creature` WHERE `id1` IN (16772, 16810, 18583, 18595, 21244, 21245) AND `map`=530;
 DELETE FROM `creature_addon` WHERE (`guid` IN (57784));

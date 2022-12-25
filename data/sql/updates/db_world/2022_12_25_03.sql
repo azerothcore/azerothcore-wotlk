@@ -1,3 +1,4 @@
+-- DB update 2022_12_25_02 -> 2022_12_25_03
 SET @GUID := 25068;
 
 -- Raging Fire-Soul (Mangos)
