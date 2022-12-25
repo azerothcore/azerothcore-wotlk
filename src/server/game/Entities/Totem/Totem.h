@@ -28,7 +28,7 @@ enum TotemType
 };
 // Some Totems cast spells that are not in creature DB
 
-enum TotemSpellIds : uint32
+enum class TotemSpellIds : uint32
 {
     SentryTotemSpell = 6495,
     FireTotemSpell   = 32062
