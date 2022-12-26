@@ -1,3 +1,4 @@
+-- DB update 2022_12_25_06 -> 2022_12_26_00
 --
 DELETE FROM `reference_loot_template` WHERE `Entry`=21887 AND `Item`=21887 AND `Comment`='Knothide Leather';
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Comment`) VALUES (21887, 21887, 'Knothide Leather');
