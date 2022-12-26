@@ -578,7 +578,12 @@ void PetAI::SpellHit(Unit* caster, SpellInfo const* spellInfo)
     {
         me->GetCharmInfo()->SetForcedSpell(0);
         me->GetCharmInfo()->SetForcedTargetGUID();
-        AttackStart(caster);
+
+        if (CanAttack(caster, spellInfo))
+        {
+            // Only chase if not commanded to stay or if stay but commanded to attack
+            DoAttack(caster, (!me->GetCharmInfo()->HasCommandState(COMMAND_STAY) || me->GetCharmInfo()->IsCommandAttack()));
+        }
     }
 }
 
@@ -709,6 +714,12 @@ bool PetAI::CanAttack(Unit* target, SpellInfo const* spellInfo)
     //  Pets attacking something (or chasing) should only switch targets if owner tells them to
     if (me->GetVictim() && me->GetVictim() != target)
     {
+        // Forced change target if it's taunt
+        if (spellInfo && spellInfo->HasAura(SPELL_AURA_MOD_TAUNT))
+        {
+            return true;
+        }
+
         // Check if our owner selected this target and clicked "attack"
         Unit* ownerTarget = nullptr;
         if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
