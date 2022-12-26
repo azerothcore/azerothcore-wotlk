@@ -10,6 +10,8 @@ rm /usr/local/bin/pydoc3 || true
 rm /usr/local/bin/pydoc3.10 || true
 rm /usr/local/bin/pydoc3.11 || true
 rm /usr/local/bin/python3 || true
+rm /usr/local/bin/python3.10 || true
+rm /usr/local/bin/python3.11 || true
 rm /usr/local/bin/python3-config || true
 ##########################################
 
