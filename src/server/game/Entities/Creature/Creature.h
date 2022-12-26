@@ -42,6 +42,21 @@ class CreatureGroup;
 
 #define MAX_VENDOR_ITEMS 150                                // Limitation in 3.x.x item count in SMSG_LIST_INVENTORY
 
+enum creatureRanks
+{
+    CREATURE_RANK_NORMAL = 0,
+    CREATURE_RANK_ELITE,
+    CREATURE_RANK_ELITE_RARE,
+    CREATURE_RANK_BOSS,
+    CREATURE_RANK_RARE
+};
+
+enum creatureEvents
+{
+    // Called on creature update every 2s in order to add missing players to the encounter
+    EVENT_BOSS_THREAT_PULSE
+};
+
 class Creature : public Unit, public GridObject<Creature>, public MovableMapObject
 {
 public:
@@ -117,6 +132,15 @@ public:
             return false;
 
         return GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_BOSS_MOB;
+    }
+
+    [[nodiscard]] bool isRaidBoss() const
+    {
+        if (IsPet() || IsPlayer()) { return false; }
+
+        if (!(GetMap()->IsRaid())) { return false; }
+
+        return GetCreatureTemplate()->rank == CREATURE_RANK_BOSS ? true : false;
     }
 
     [[nodiscard]] bool IsDungeonBoss() const;

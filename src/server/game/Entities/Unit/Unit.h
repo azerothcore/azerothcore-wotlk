@@ -18,6 +18,7 @@
 #ifndef __UNIT_H
 #define __UNIT_H
 
+#include "EventMap.h"
 #include "EventProcessor.h"
 #include "EnumFlag.h"
 #include "FollowerRefMgr.h"
@@ -1410,7 +1411,14 @@ public:
     [[nodiscard]] bool IsSummon() const { return m_unitTypeMask & UNIT_MASK_SUMMON; }
     [[nodiscard]] bool IsGuardian() const { return m_unitTypeMask & UNIT_MASK_GUARDIAN; }
     [[nodiscard]] bool IsControllableGuardian() const { return m_unitTypeMask & UNIT_MASK_CONTROLABLE_GUARDIAN; }
-    [[nodiscard]] bool IsPet() const { return m_unitTypeMask & UNIT_MASK_PET; }
+    [[nodiscard]] bool IsPet() const
+    {
+        if (m_unitTypeMask)
+        {
+            return m_unitTypeMask & UNIT_MASK_PET;
+        }
+        return false;
+    }
     [[nodiscard]] bool IsHunterPet() const { return m_unitTypeMask & UNIT_MASK_HUNTER_PET; }
     [[nodiscard]] bool IsTotem() const { return m_unitTypeMask & UNIT_MASK_TOTEM; }
     [[nodiscard]] bool IsVehicle() const { return m_unitTypeMask & UNIT_MASK_VEHICLE; }
@@ -2589,6 +2597,8 @@ private:
     uint32 _lastExtraAttackSpell;
     std::unordered_map<ObjectGuid /*guid*/, uint32 /*count*/> extraAttacksTargets;
     ObjectGuid _lastDamagedTargetGuid;
+
+    EventMap m_combatEvents;
 };
 
 namespace Acore
