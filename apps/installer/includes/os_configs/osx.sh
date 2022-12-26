@@ -1,4 +1,13 @@
-brew update || true
+##########################################
+## workaround for python upgrade issue https://github.com/actions/runner-images/issues/6817
+rm /usr/local/bin/2to3 || true
+rm /usr/local/bin/idle3 || true
+rm /usr/local/bin/pydoc3 || true
+rm /usr/local/bin/python3 || true
+rm /usr/local/bin/python3-config || true
+##########################################
+
+brew update
 
 ##########################################
 ## workaround for cmake already being installed in the github runners
