@@ -4,6 +4,8 @@ rm /usr/local/bin/2to3 || true
 rm /usr/local/bin/2to3-3.10 || true
 rm /usr/local/bin/2to3-3.11 || true
 rm /usr/local/bin/idle3 || true
+rm /usr/local/bin/idle3.10 || true
+rm /usr/local/bin/idle3.11 || true
 rm /usr/local/bin/pydoc3 || true
 rm /usr/local/bin/python3 || true
 rm /usr/local/bin/python3-config || true
