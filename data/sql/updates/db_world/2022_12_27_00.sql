@@ -1,3 +1,4 @@
+-- DB update 2022_12_26_00 -> 2022_12_27_00
 --
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 180524;
 
