@@ -83,7 +83,7 @@ void Totem::InitSummon()
 
     if (m_type == TOTEM_PASSIVE && GetSpell())
     {
-        if (GetUInt32Value(UNIT_CREATED_BY_SPELL) == TotemSpellIds::FireTotemSpell)
+        if (TotemSpellIds(GetUInt32Value(UNIT_CREATED_BY_SPELL)) == TotemSpellIds::FireTotemSpell)
         {
             m_Events.AddEventAtOffset([this]()
             {
@@ -146,7 +146,7 @@ void Totem::UnSummon(uint32 msTime)
 
         // Remove Sentry Totem Aura
         if (GetEntry() == SENTRY_TOTEM_ENTRY)
-            owner->RemoveAurasDueToSpell(TotemSpellIds::SentryTotemSpell);
+            owner->RemoveAurasDueToSpell((uint32)TotemSpellIds::SentryTotemSpell);
 
         //remove aura all party members too
         if (Player* player = owner->ToPlayer())
