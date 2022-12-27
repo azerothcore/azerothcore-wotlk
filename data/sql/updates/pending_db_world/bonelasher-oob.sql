@@ -1,1 +1,1 @@
-DELETE FROM `creature` WHERE `guid` = 66458;
+DELETE FROM `creature` WHERE `guid` IN (66458, 66459);
