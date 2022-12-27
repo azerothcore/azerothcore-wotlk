@@ -2537,7 +2537,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
     PlayerLevelInfo info;
     sObjectMgr->GetPlayerLevelInfo(getRace(true), getClass(), getLevel(), &info);
 
-    SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
+    uint32 maxPlayerLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+    sScriptMgr->OnSetMaxLevel(this, maxPlayerLevel);
+    SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, maxPlayerLevel);
     SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(getLevel()));
 
     // reset before any aura state sources (health set/aura apply)
@@ -10227,6 +10229,8 @@ void Player::ContinueTaxiFlight()
         RemoveAurasByType(SPELL_AURA_MOUNTED);
     }
 
+    SetCanTeleport(true);
+
     GetSession()->SendDoFlight(mountDisplayId, path, startNode);
 }
 
@@ -11148,6 +11152,35 @@ WorldLocation Player::GetStartPosition() const
     if (getClass() == CLASS_DEATH_KNIGHT && HasSpell(50977))
         return WorldLocation(0, 2352.0f, -5709.0f, 154.5f, 0.0f);
     return WorldLocation(mapId, info->positionX, info->positionY, info->positionZ, 0);
+}
+
+bool Player::HaveAtClient(WorldObject const* u) const
+{
+    if (u == this)
+    {
+        return true;
+    }
+
+    // Motion Transports are always present in player's client
+    if (GameObject const* gameobject = u->ToGameObject())
+    {
+        if (gameobject->IsMotionTransport())
+        {
+            return true;
+        }
+    }
+
+    return m_clientGUIDs.find(u->GetGUID()) != m_clientGUIDs.end();
+}
+
+bool Player::HaveAtClient(ObjectGuid guid) const
+{
+    if (guid == GetGUID())
+    {
+        return true;
+    }
+
+    return m_clientGUIDs.find(guid) != m_clientGUIDs.end();
 }
 
 bool Player::IsNeverVisible() const
