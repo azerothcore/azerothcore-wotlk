@@ -1,3 +1,4 @@
+-- DB update 2022_12_28_00 -> 2022_12_28_01
 -- Sniffed
 UPDATE `creature_template` SET `type_flags`=`type_flags`|134217856 WHERE (`entry` = 18240);
 UPDATE `creature_template_addon` SET `bytes1` = 0, `bytes2` = 1, `auras` = '31261' WHERE (`entry` = 18240);
