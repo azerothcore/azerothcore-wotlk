@@ -1,13 +1,13 @@
 DROP TABLE IF EXISTS `player_levelstats`;
 DROP TABLE IF EXISTS `player_classstats`;
 CREATE TABLE IF NOT EXISTS `player_classstats`  (
-  `class` tinyint unsigned NOT NULL,
-  `level` tinyint unsigned NOT NULL,
-  `str` int unsigned NOT NULL DEFAULT '0',
-  `agi` int unsigned NOT NULL DEFAULT '0',
-  `sta` int unsigned NOT NULL DEFAULT '0',
-  `inte` int unsigned NOT NULL DEFAULT '0',
-  `spi` int unsigned NOT NULL DEFAULT '0',
+  `class` TINYINT unsigned NOT NULL,
+  `level` TINYINT unsigned NOT NULL,
+  `str` INT unsigned NOT NULL DEFAULT '0',
+  `agi` INT unsigned NOT NULL DEFAULT '0',
+  `sta` INT unsigned NOT NULL DEFAULT '0',
+  `inte` INT unsigned NOT NULL DEFAULT '0',
+  `spi` INT unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`class`,`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores levels stats.';
 
@@ -816,12 +816,12 @@ INSERT INTO `player_classstats` (`class`, `level`, `str`, `agi`, `sta`, `inte`, 
 
 DROP TABLE IF EXISTS `player_racestats`;
 CREATE TABLE IF NOT EXISTS `player_racestats` (
-	`race` tinyint unsigned NOT NULL,
-	`str` int NOT NULL DEFAULT '0',
-	`agi` int NOT NULL DEFAULT '0',
-	`sta` int NOT NULL DEFAULT '0',
-	`inte` int NOT NULL DEFAULT '0',
-	`spi` int NOT NULL DEFAULT '0',
+	`race` TINYINT unsigned NOT NULL,
+	`str` INT NOT NULL DEFAULT '0',
+	`agi` INT NOT NULL DEFAULT '0',
+	`sta` INT NOT NULL DEFAULT '0',
+	`inte` INT NOT NULL DEFAULT '0',
+	`spi` INT NOT NULL DEFAULT '0',
 	PRIMARY KEY (`race`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores race stats.';
 
