@@ -13250,18 +13250,19 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
     }
 }
 
-void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
+LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg)
 {
     QuestItem* qitem = nullptr;
     QuestItem* ffaitem = nullptr;
     QuestItem* conditem = nullptr;
 
-    LootItem* item = loot->LootItemInSlot(lootSlot, this, &qitem, &ffaitem, &conditem);
+    msg = EQUIP_ERR_OK;
 
+    LootItem* item = loot->LootItemInSlot(lootSlot, this, &qitem, &ffaitem, &conditem);
     if (!item || item->is_looted)
     {
         SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
-        return;
+        return nullptr;
     }
 
     // Xinef: exploit protection, dont allow to loot normal items if player is not master loot and not below loot threshold
@@ -13270,31 +13271,31 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         if (!qitem && !ffaitem && !conditem)
         {
             SendLootRelease(GetLootGUID());
-            return;
+            return nullptr;
         }
 
     if (!item->AllowedForPlayer(this, loot->sourceWorldObjectGUID))
     {
         SendLootRelease(GetLootGUID());
-        return;
+        return nullptr;
     }
 
     // questitems use the blocked field for other purposes
     if (!qitem && item->is_blocked)
     {
         SendLootRelease(GetLootGUID());
-        return;
+        return nullptr;
     }
 
     // xinef: dont allow protected item to be looted by someone else
     if (item->rollWinnerGUID && item->rollWinnerGUID != GetGUID())
     {
         SendLootRelease(GetLootGUID());
-        return;
+        return nullptr;
     }
 
     ItemPosCountVec dest;
-    InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->itemid, item->count);
+    msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->itemid, item->count);
     if (msg == EQUIP_ERR_OK)
     {
         AllowedLooterSet looters = item->GetAllowedLooters();
@@ -13342,7 +13343,11 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         sScriptMgr->OnLootItem(this, newitem, item->count, this->GetLootGUID());
     }
     else
+    {
         SendEquipError(msg, nullptr, nullptr, item->itemid);
+    }
+
+    return item;
 }
 
 uint32 Player::CalculateTalentsPoints() const
