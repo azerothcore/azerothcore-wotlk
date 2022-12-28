@@ -3943,6 +3943,8 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
 
     CharacterDatabasePreparedStatement* stmt = nullptr;
 
+    bool deleted = true;
+
     switch (charDelete_method)
     {
         // Completely remove from the database
@@ -4237,11 +4239,24 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
             }
         default:
             LOG_ERROR("entities.player", "Player::DeleteFromDB: Unsupported delete method: {}.", charDelete_method);
+            deleted = false;
             return;
     }
 
+    if (deleted)
+    {
+        const CharacterCacheEntry* cache = sCharacterCache->GetCharacterCacheByGuid(playerGuid);
+        if (cache)
+        {
+            std::string name = cache->Name;
+            sCharacterCache->DeleteCharacterCacheEntry(playerGuid, name);
+        }
+    }
+
     if (updateRealmChars)
+    {
         sWorld->UpdateRealmCharCount(accountId);
+    }
 }
 
 /**
