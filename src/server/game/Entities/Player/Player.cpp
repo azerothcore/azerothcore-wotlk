@@ -13304,12 +13304,12 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg
         if (sConfigMgr->GetOption<bool>("AOE.LOOT.enable", true)) // AOE Loot
         {
             // SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr); prevents error already loot from spamming
-            return;
+            return nullptr;
         }
         else
         {
             SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
-            return;
+            return nullptr;
         }
     }
 
