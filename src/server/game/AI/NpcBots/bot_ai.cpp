@@ -9145,7 +9145,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             if (HasRole(BOT_ROLE_RANGED))
             {
                 AddGossipItemFor(player, !player->GetBotMgr()->GetBotAllowCombatPositioning() ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT,
-                    LocalizedNpcText(player, BOT_TEXT_DISABLE_COMBAT_POSITIONING) + "...", GOSSIP_SENDER_FORMATION_TOGGLE_COMBAT_POSITIONING, GOSSIP_ACTION_INFO_DEF + 2);
+                    LocalizedNpcText(player, BOT_TEXT_DISABLE_COMBAT_POSITIONING), GOSSIP_SENDER_FORMATION_TOGGLE_COMBAT_POSITIONING, GOSSIP_ACTION_INFO_DEF + 2);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_ATTACK_DISTANCE) + "...", GOSSIP_SENDER_FORMATION_ATTACK_DISTANCE, GOSSIP_ACTION_INFO_DEF + 3);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_ATTACK_ANGLE) + "...", GOSSIP_SENDER_FORMATION_ATTACK_ANGLE, GOSSIP_ACTION_INFO_DEF + 4);
             }
@@ -18335,8 +18335,8 @@ void bot_ai::InitBotCustomSpells()
         sinfo->SchoolMask = SPELL_SCHOOL_MASK_NATURE | SPELL_SCHOOL_MASK_ARCANE;
         sinfo->PreventionType = SPELL_PREVENTION_TYPE_SILENCE;
         sinfo->InterruptFlags = 0x9;
-        sinfo->SpellLevel = 3;
-        sinfo->BaseLevel = 3;
+        sinfo->SpellLevel = 4;
+        sinfo->BaseLevel = 4;
         sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(110); //750ms
         sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
         sinfo->RecoveryTime = 11000;
@@ -18355,9 +18355,9 @@ void bot_ai::InitBotCustomSpells()
         sinfo->Effects[0].RadiusEntry = nullptr;//sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50_YARDS);
         sinfo->Effects[0].BasePoints = 1;
         sinfo->Effects[0].DieSides = 49;
-        sinfo->Effects[0].BonusMultiplier = 2.f;
+        sinfo->Effects[0].BonusMultiplier = 0.f;
         sinfo->Effects[0].DamageMultiplier = 1.f;
-        sinfo->Effects[0].RealPointsPerLevel = 20.f;
+        sinfo->Effects[0].RealPointsPerLevel = 15.f;
         sinfo->Effects[0].ValueMultiplier = 1.f;
         //35) END FORKED LIGHTNING
 
@@ -18396,8 +18396,8 @@ void bot_ai::InitBotCustomSpells()
         sinfo->PreventionType = SPELL_PREVENTION_TYPE_PACIFY;
         sinfo->Dispel = DISPEL_NONE;
         sinfo->Mechanic = MECHANIC_NONE;
-        sinfo->SpellLevel = 3;
-        sinfo->BaseLevel = 3;
+        sinfo->SpellLevel = 4;
+        sinfo->BaseLevel = 4;
         sinfo->MaxTargetLevel = 0;
         sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(110); //750ms
         sinfo->RangeEntry = sSpellRangeStore.LookupEntry(35); //0-35 yds

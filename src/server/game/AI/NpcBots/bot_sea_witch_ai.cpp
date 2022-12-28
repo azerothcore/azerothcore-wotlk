@@ -194,7 +194,10 @@ public:
                 if (!me->IsInCombat() && baseId == TORNADO_1)
                     me->InterruptSpell(CURRENT_GENERIC_SPELL);
                 else if (baseId == FORKED_LIGHTNING_1 && (!me->GetVictim() || !me->HasInArc(float(M_PI) / 2.f, me->GetVictim())))
+                {
                     me->InterruptSpell(CURRENT_GENERIC_SPELL);
+                    SetSpellCooldown(FORKED_LIGHTNING_1, 500);
+                }
                 else if (_spell_preact && spell->GetTimer() < 400)
                 {
                     _spell_preact = false;
@@ -350,7 +353,7 @@ public:
         void ApplyClassDamageMultiplierSpell(int32& damage, SpellNonMeleeDamage& /*damageinfo*/, SpellInfo const* spellInfo, WeaponAttackType /*attackType*/, bool iscrit) const override
         {
             uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
-            //uint8 lvl = me->GetLevel();
+            uint8 lvl = me->GetLevel();
             float fdamage = float(damage);
             float flat_mod = 0.f;
 
@@ -368,6 +371,13 @@ public:
                 //so we should put here bonus damage mult /1.5
                 if (/*baseId == FROST_ARROW_1 || */baseId == FORKED_LIGHTNING_1)
                     pctbonus *= 1.33f;
+            }
+
+            if (baseId == FORKED_LIGHTNING_1)
+            {
+                constexpr float basecoef = 2.5f / 80.f;
+                float coef = basecoef * (lvl - 3);
+                fdamage += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * coef * me->CalculateDefaultCoefficient(spellInfo, SPELL_DIRECT_DAMAGE) * me->CalculateSpellpowerCoefficientLevelPenalty(spellInfo);
             }
 
             damage = int32(fdamage * pctbonus + flat_mod);
