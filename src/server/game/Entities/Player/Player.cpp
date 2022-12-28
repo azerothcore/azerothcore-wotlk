@@ -4240,7 +4240,7 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
             return;
     }
 
-    const CharacterCacheEntry* cache = sCharacterCache->GetCharacterCacheByGuid(playerGuid);
+    CharacterCacheEntry const* cache = sCharacterCache->GetCharacterCacheByGuid(playerGuid);
     if (cache)
     {
         std::string name = cache->Name;
