@@ -377,7 +377,7 @@ public:
             {
                 constexpr float basecoef = 2.5f / 80.f;
                 float coef = basecoef * (lvl - 3);
-                fdamage += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * coef * me->CalculateDefaultCoefficient(spellInfo, SPELL_DIRECT_DAMAGE) * me->CalculateSpellpowerCoefficientLevelPenalty(spellInfo);
+                fdamage += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * coef * me->CalculateDefaultCoefficient(spellInfo, SPELL_DIRECT_DAMAGE) * me->CalculateLevelPenalty(spellInfo);
             }
 
             damage = int32(fdamage * pctbonus + flat_mod);
