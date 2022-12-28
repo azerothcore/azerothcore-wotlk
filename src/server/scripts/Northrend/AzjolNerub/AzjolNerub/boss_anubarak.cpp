@@ -103,6 +103,7 @@ class boss_anub_arak : public CreatureScript
             {
                 Talk(SAY_DEATH);
                 BossAI::JustDied(killer);
+                me->NearTeleportTo(551.463928f, 256.23062f, 224.471542f, 1.52823f);
             }
 
             void KilledUnit(Unit*  /*victim*/) override
