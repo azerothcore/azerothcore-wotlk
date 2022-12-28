@@ -1073,11 +1073,7 @@ public:
         //player->CastSpell(player, SPELL_SUMMON_RIZZLE, false);
 
         if (Creature* creature = player->SummonCreature(NPC_RIZZLE, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
-        {
-            // no need casting spell blackjack, it's casted by script npc_rizzle_sprysprocket.
-            //creature->CastSpell(player, SPELL_BLACKJACK, false);
-            creature->AI()->AttackStart(player);
-        }
+            creature->CastSpell(player, SPELL_BLACKJACK, false);
 
         return false;
     }

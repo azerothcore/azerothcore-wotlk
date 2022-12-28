@@ -627,10 +627,7 @@ void Loot::FillNotNormalLootFor(Player* player)
         if (!item->is_looted && item->freeforall && item->AllowedForPlayer(player, sourceWorldObjectGUID))
             if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item->itemid))
                 if (proto->IsCurrencyToken())
-                {
-                    InventoryResult msg;
-                    player->StoreLootItem(i, this, msg);
-                }
+                    player->StoreLootItem(i, this);
     }
 }
 

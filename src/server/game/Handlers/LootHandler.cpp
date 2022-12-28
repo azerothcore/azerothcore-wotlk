@@ -147,16 +147,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         }
     }
 
-    InventoryResult msg;
-    LootItem* lootItem = player->StoreLootItem(lootSlot, loot, msg);
-    if (msg != EQUIP_ERR_OK && lguid.IsItem() && loot->loot_type != LOOT_CORPSE)
-    {
-        lootItem->is_looted = true;
-        loot->NotifyItemRemoved(lootItem->itemIndex);
-        loot->unlootedCount--;
-
-        player->SendItemRetrievalMail(lootItem->itemid, lootItem->count);
-    }
+    player->StoreLootItem(lootSlot, loot);
 
     // If player is removing the last LootItem, delete the empty container.
     if (loot->isLooted() && lguid.IsItem())
