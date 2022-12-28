@@ -313,14 +313,12 @@ void World::AddSession_(WorldSession* s)
 
     if (pLimit > 0 && Sessions >= pLimit && AccountMgr::IsPlayerAccount(s->GetSecurity()) && !s->CanSkipQueue() && !HasRecentlyDisconnected(s))
     {
-        AddQueuedPlayer (s);
+        AddQueuedPlayer(s);
         UpdateMaxSessionCounters();
         return;
     }
 
-    s->SendAuthResponse(AUTH_OK, true);
-
-    FinalizePlayerWorldSession(s);
+    s->InitializeSession();
 
     UpdateMaxSessionCounters();
 }
@@ -400,13 +398,7 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
     if ((!GetPlayerAmountLimit() || sessions < GetPlayerAmountLimit()) && !m_QueuedPlayer.empty())
     {
         WorldSession* pop_sess = m_QueuedPlayer.front();
-        pop_sess->SetInQueue(false);
-        pop_sess->ResetTimeOutTime(false);
-        pop_sess->SendAuthWaitQueue(0);
-        pop_sess->SendAccountDataTimes(GLOBAL_CACHE_MASK);
-
-        FinalizePlayerWorldSession(pop_sess);
-
+        pop_sess->InitializeSession();
         m_QueuedPlayer.pop_front();
 
         // update iter to point first queued socket or end() if queue is empty now
@@ -950,6 +942,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_OBJECT_SPARKLES]      = sConfigMgr->GetOption<bool>("Visibility.ObjectSparkles", true);
 
+    m_bool_configs[CONFIG_LOW_LEVEL_REGEN_BOOST]      = sConfigMgr->GetOption<bool>("EnableLowLevelRegenBoost", true);
+
     m_bool_configs[CONFIG_OBJECT_QUEST_MARKERS] = sConfigMgr->GetOption<bool>("Visibility.ObjectQuestMarkers", true);
 
     m_int_configs[CONFIG_MAIL_DELIVERY_DELAY]   = sConfigMgr->GetOption<int32>("MailDeliveryDelay", HOUR);
@@ -1384,7 +1378,7 @@ void World::LoadConfigSettings(bool reload)
     MMAP::MMapFactory::InitializeDisabledMaps();
 
     // Wintergrasp
-    m_bool_configs[CONFIG_WINTERGRASP_ENABLE]             = sConfigMgr->GetOption<bool>("Wintergrasp.Enable", false);
+    m_int_configs[CONFIG_WINTERGRASP_ENABLE]              = sConfigMgr->GetOption<int32>("Wintergrasp.Enable", 1);
     m_int_configs[CONFIG_WINTERGRASP_PLR_MAX]             = sConfigMgr->GetOption<int32>("Wintergrasp.PlayerMax", 100);
     m_int_configs[CONFIG_WINTERGRASP_PLR_MIN]             = sConfigMgr->GetOption<int32>("Wintergrasp.PlayerMin", 0);
     m_int_configs[CONFIG_WINTERGRASP_PLR_MIN_LVL]         = sConfigMgr->GetOption<int32>("Wintergrasp.PlayerMinLvl", 77);
@@ -3388,16 +3382,6 @@ uint32 World::GetNextWhoListUpdateDelaySecs()
     t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
 
     return uint32(std::ceil(t / 1000.0f));
-}
-
-void World::FinalizePlayerWorldSession(WorldSession* session)
-{
-    uint32 cacheVersion = sWorld->getIntConfig(CONFIG_CLIENTCACHE_VERSION);
-    sScriptMgr->OnBeforeFinalizePlayerWorldSession(cacheVersion);
-
-    session->SendAddonsInfo();
-    session->SendClientCacheVersion(cacheVersion);
-    session->SendTutorialsData();
 }
 
 CliCommandHolder::CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished)

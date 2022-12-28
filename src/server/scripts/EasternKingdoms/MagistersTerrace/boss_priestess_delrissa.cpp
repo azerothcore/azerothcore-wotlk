@@ -462,7 +462,7 @@ public:
             {
                 case EVENT_SPELL_VANISH:
                     me->CastSpell(me, SPELL_VANISH, false);
-                    DoResetThreat();
+                    DoResetThreatList();
                     if (Unit* unit = SelectTarget(SelectTargetMethod::Random, 0))
                         me->AddThreat(unit, 1000.0f);
 

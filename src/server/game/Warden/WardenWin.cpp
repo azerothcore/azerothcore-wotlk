@@ -31,7 +31,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include <openssl/md5.h>
 
 // GUILD is the shortest string that has no client validation (RAID only sends if in a raid group)
 static constexpr char _luaEvalPrefix[] = "local S,T,R=SendAddonMessage,function()";
@@ -97,9 +96,7 @@ static WorldIntConfigs GetMaxWardenChecksForType(uint8 type)
 
 WardenWin::WardenWin() : Warden(), _serverTicks(0) { }
 
-WardenWin::~WardenWin()
-{
-}
+WardenWin::~WardenWin() = default;
 
 void WardenWin::Init(WorldSession* session, SessionKey const& k)
 {
@@ -121,14 +118,14 @@ void WardenWin::Init(WorldSession* session, SessionKey const& k)
 
     _module = GetModuleForClient();
 
-    LOG_DEBUG("warden", "Module Key: {}", Acore::Impl::ByteArrayToHexStr(_module->Key, 16));
-    LOG_DEBUG("warden", "Module ID: {}", Acore::Impl::ByteArrayToHexStr(_module->Id, 16));
+    LOG_DEBUG("warden", "Module Key: {}", ByteArrayToHexStr(_module->Key));
+    LOG_DEBUG("warden", "Module ID: {}", ByteArrayToHexStr(_module->Id));
     RequestModule();
 }
 
 ClientWardenModule* WardenWin::GetModuleForClient()
 {
-    ClientWardenModule* mod = new ClientWardenModule;
+    auto mod = new ClientWardenModule;
 
     uint32 length = sizeof(Module.Module);
 
@@ -136,13 +133,10 @@ ClientWardenModule* WardenWin::GetModuleForClient()
     mod->CompressedSize = length;
     mod->CompressedData = new uint8[length];
     memcpy(mod->CompressedData, Module.Module, length);
-    memcpy(mod->Key, Module.ModuleKey, 16);
+    memcpy(mod->Key.data(), Module.ModuleKey, 16);
 
     // md5 hash
-    MD5_CTX ctx;
-    MD5_Init(&ctx);
-    MD5_Update(&ctx, mod->CompressedData, length);
-    MD5_Final((uint8*)&mod->Id, &ctx);
+    mod->Id = Acore::Crypto::MD5::GetDigestOf(mod->CompressedData, mod->CompressedSize);
 
     return mod;
 }
@@ -152,7 +146,7 @@ void WardenWin::InitializeModule()
     LOG_DEBUG("warden", "Initialize module");
 
     // Create packet structure
-    WardenInitModuleRequest Request;
+    WardenInitModuleRequest Request{};
     Request.Command1 = WARDEN_SMSG_MODULE_INITIALIZE;
     Request.Size1 = 20;
     Request.Unk1 = 1;
@@ -209,7 +203,7 @@ void WardenWin::RequestHash()
     LOG_DEBUG("warden", "Request hash");
 
     // Create packet structure
-    WardenHashRequest Request;
+    WardenHashRequest Request{};
     Request.Command = WARDEN_SMSG_HASH_REQUEST;
     memcpy(Request.Seed, _seed, 16);
 

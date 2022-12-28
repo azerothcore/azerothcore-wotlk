@@ -810,6 +810,7 @@ void SmartAI::KilledUnit(Unit* victim)
 void SmartAI::JustSummoned(Creature* creature)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT, creature);
+    GetScript()->AddCreatureSummon(creature->GetGUID());
 }
 
 void SmartAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
@@ -890,6 +891,7 @@ void SmartAI::DamageDealt(Unit* doneTo, uint32& damage, DamageEffectType /*damag
 void SmartAI::SummonedCreatureDespawn(Creature* unit)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMON_DESPAWNED, unit);
+    GetScript()->RemoveCreatureSummon(unit->GetGUID());
 }
 
 void SmartAI::CorpseRemoved(uint32& respawnDelay)

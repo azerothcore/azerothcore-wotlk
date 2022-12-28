@@ -582,6 +582,14 @@ void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid 
     });
 }
 
+void ScriptMgr::OnStoreNewItem(Player* player, Item* item, uint32 count)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnStoreNewItem(player, item, count);
+    });
+}
+
 void ScriptMgr::OnCreateItem(Player* player, Item* item, uint32 count)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -626,6 +634,14 @@ void ScriptMgr::OnFirstLogin(Player* player)
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnFirstLogin(player);
+    });
+}
+
+void ScriptMgr::OnSetMaxLevel(Player* player, uint32& maxPlayerLevel)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnSetMaxLevel(player, maxPlayerLevel);
     });
 }
 

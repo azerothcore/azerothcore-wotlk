@@ -835,7 +835,7 @@ public:
                     _flyTargetGUID.Clear();
                     me->RemoveAura(SPELL_LIGHTNING_TENDRILS);
                     me->RemoveAura(61883);
-                    DoResetThreat();
+                    DoResetThreatList();
                     break;
                 case EVENT_ENRAGE:
                     Talk(SAY_BRUNDIR_BERSERK);
