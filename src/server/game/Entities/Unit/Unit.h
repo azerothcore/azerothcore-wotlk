@@ -717,6 +717,12 @@ enum MeleeHitOutcome
     MELEE_HIT_GLANCING, MELEE_HIT_CRIT, MELEE_HIT_CRUSHING, MELEE_HIT_NORMAL
 };
 
+enum ExtraAttackSpells
+{
+    SPELL_SWORD_SPECIALIZATION   = 16459,
+    SPELL_HACK_AND_SLASH         = 66923
+};
+
 class DispelInfo
 {
 public:
@@ -2326,7 +2332,7 @@ public:
     void CastPetAura(PetAura const* aura);
     bool IsPetAura(Aura const* aura);
 
-    [[nodiscard]] uint32 GetModelForForm(ShapeshiftForm form) const;
+    [[nodiscard]] uint32 GetModelForForm(ShapeshiftForm form, uint32 spellId) const;
     uint32 GetModelForTotem(PlayerTotemType totemType);
 
     // Redirect Threat

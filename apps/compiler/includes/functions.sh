@@ -17,6 +17,8 @@ function comp_ccacheEnable() {
     export CCACHE_CPP2=${CCACHE_CPP2:-true} # optimization for clang
     export CCACHE_COMPRESS=${CCACHE_COMPRESS:-1}
     export CCACHE_COMPRESSLEVEL=${CCACHE_COMPRESSLEVEL:-9}
+    export CCACHE_COMPILERCHECK=${CCACHE_COMPILERCHECK:-content}
+    export CCACHE_LOGFILE=${CCACHE_LOGFILE:-"$CCACHE_DIR/cache.debug"}
     #export CCACHE_NODIRECT=true
 
     export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
@@ -106,6 +108,8 @@ function comp_compile() {
 
   cd $BUILDPATH
 
+  comp_ccacheEnable
+
   comp_ccacheResetStats
 
   time cmake --build . --config $CTYPE  -j $MTHREADS
@@ -136,16 +140,19 @@ function comp_compile() {
 
       cd $CWD
 
-      if [[ $DOCKER = 1 ]]; then
-        echo "Generating confs..."
-        cp -n "env/dist/etc/worldserver.conf.dockerdist" "${confDir}/worldserver.conf"
-        cp -n "env/dist/etc/authserver.conf.dockerdist" "${confDir}/authserver.conf"
-        cp -n "env/dist/etc/dbimport.conf.dockerdist" "${confDir}/dbimport.conf"
-      fi
       # set all aplications SUID bit
       echo "Setting permissions on binary files"
-      find "$AC_BINPATH_FULL" -type f -exec sudo chown root:root -- {} +
-      find "$AC_BINPATH_FULL" -type f -exec sudo chmod u+s  -- {} +
+      find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec sudo chown root:root -- {} +
+      find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec sudo chmod u+s  -- {} +
+
+      DOCKER_ETC_FOLDER=${DOCKER_ETC_FOLDER:-"env/dist/etc"}
+
+      if [[ $DOCKER = 1 && $DISABLE_DOCKER_CONF != 1 ]]; then
+        echo "Generating confs..."
+        cp -n "$DOCKER_ETC_FOLDER/worldserver.conf.dockerdist" "${confDir}/worldserver.conf"
+        cp -n "$DOCKER_ETC_FOLDER/authserver.conf.dockerdist" "${confDir}/authserver.conf"
+        cp -n "$DOCKER_ETC_FOLDER/dbimport.conf.dockerdist" "${confDir}/dbimport.conf"
+      fi
 
       echo "Done"
     ;;

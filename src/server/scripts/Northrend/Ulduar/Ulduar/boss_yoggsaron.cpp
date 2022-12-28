@@ -1511,7 +1511,7 @@ public:
         {
             if (who && damagetype == DIRECT_DAMAGE)
             {
-                DoResetThreat();
+                DoResetThreatList();
                 me->AddThreat(who, 100000);
                 AttackStart(who);
                 me->InterruptNonMeleeSpells(false);
@@ -1539,7 +1539,7 @@ public:
                 return;
 
             me->CastSpell(me, SPELL_DIMINISH_POWER, false);
-            DoResetThreat();
+            DoResetThreatList();
         }
     };
 };

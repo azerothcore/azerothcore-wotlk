@@ -156,7 +156,9 @@ enum eHallowsEndCandy
     SPELL_HALLOWS_END_CANDY_1               = 24924,
     SPELL_HALLOWS_END_CANDY_2               = 24925,
     SPELL_HALLOWS_END_CANDY_3               = 24926,
-    SPELL_HALLOWS_END_CANDY_4               = 24927,
+    SPELL_HALLOWS_END_CANDY_3_FEMALE        = 44742,
+    SPELL_HALLOWS_END_CANDY_3_MALE          = 44743,
+    SPELL_HALLOWS_END_CANDY_4               = 24927
 };
 
 class spell_hallows_end_candy : public SpellScript
@@ -168,13 +170,41 @@ class spell_hallows_end_candy : public SpellScript
         if (Player* target = GetHitPlayer())
         {
             uint32 spellId = SPELL_HALLOWS_END_CANDY_1 + urand(0, 3);
-            GetCaster()->CastSpell(target, spellId, true, nullptr);
+            GetCaster()->CastSpell(target, spellId, true);
         }
     }
 
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_hallows_end_candy::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_hallows_end_candy_pirate_costume : public AuraScript
+{
+    PrepareAuraScript(spell_hallows_end_candy_pirate_costume);
+
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->CastSpell(target, target->getGender() == GENDER_MALE ? SPELL_HALLOWS_END_CANDY_3_MALE : SPELL_HALLOWS_END_CANDY_3_FEMALE, true);
+        }
+    }
+
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->RemoveAurasDueToSpell(SPELL_HALLOWS_END_CANDY_3_MALE);
+            target->RemoveAurasDueToSpell(SPELL_HALLOWS_END_CANDY_3_FEMALE);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_hallows_end_candy_pirate_costume::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_SWIM_SPEED, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_hallows_end_candy_pirate_costume::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_INCREASE_SWIM_SPEED, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1426,6 +1456,7 @@ void AddSC_event_hallows_end_scripts()
     RegisterSpellScript(spell_hallows_end_trick);
     RegisterSpellScript(spell_hallows_end_trick_or_treat);
     RegisterSpellScript(spell_hallows_end_candy);
+    RegisterSpellScript(spell_hallows_end_candy_pirate_costume);
     RegisterSpellScript(spell_hallows_end_tricky_treat);
     RegisterSpellScriptWithArgs(spell_hallows_end_put_costume, "spell_hallows_end_pirate_costume", SPELL_PIRATE_COSTUME_MALE, SPELL_PIRATE_COSTUME_FEMALE);
     RegisterSpellScriptWithArgs(spell_hallows_end_put_costume, "spell_hallows_end_leper_costume", SPELL_LEPER_GNOME_COSTUME_MALE, SPELL_LEPER_GNOME_COSTUME_FEMALE);

@@ -316,6 +316,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_DEATH:
         case SMART_EVENT_KILL:
         case SMART_EVENT_SUMMONED_UNIT:
+        case SMART_EVENT_SUMMONED_UNIT_DIES:
         case SMART_EVENT_SPELLHIT:
         case SMART_EVENT_SPELLHIT_TARGET:
         case SMART_EVENT_DAMAGED:
@@ -413,6 +414,14 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
                  return false;
             }
             break;
+        case SMART_TARGET_SUMMONED_CREATURES:
+        {
+            if (e.target.summonedCreatures.entry && !IsCreatureValid(e, e.target.summonedCreatures.entry))
+            {
+                return false;
+            }
+            break;
+        }
         case SMART_TARGET_HOSTILE_SECOND_AGGRO:
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
         case SMART_TARGET_HOSTILE_RANDOM:

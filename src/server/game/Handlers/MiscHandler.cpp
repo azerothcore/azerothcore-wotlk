@@ -851,7 +851,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
 
     LOG_DEBUG("network", "UAD: type {}, time {}, decompressedSize {}", type, timestamp, decompressedSize);
 
-    if (type > NUM_ACCOUNT_DATA_TYPES)
+    if (type >= NUM_ACCOUNT_DATA_TYPES)
         return;
 
     if (decompressedSize == 0)                               // erase

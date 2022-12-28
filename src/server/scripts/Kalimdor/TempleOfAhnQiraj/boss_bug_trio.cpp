@@ -79,15 +79,29 @@ public:
 
     void EnterCombatWithTrio(Unit* who)
     {
+        BossAI::EnterCombat(who);
+
         if (Creature* vem = instance->GetCreature(DATA_VEM))
+        {
             if (vem->GetGUID() != me->GetGUID())
+            {
                 vem->GetAI()->AttackStart(who);
+            }
+        }
         if (Creature* kri = instance->GetCreature(DATA_KRI))
+        {
             if (kri->GetGUID() != me->GetGUID())
+            {
                 kri->GetAI()->AttackStart(who);
+            }
+        }
         if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
+        {
             if (yauj->GetGUID() != me->GetGUID())
+            {
                 yauj->GetAI()->AttackStart(who);
+            }
+        }
     }
 
     void EvadeAllBosses(EvadeReason why)
@@ -152,7 +166,7 @@ public:
         me->SetSpeed(MOVE_RUN, 15.f/7.f); // From sniffs
         DoCastSelf(SPELL_FULL_HEAL, true);
         if (me->GetThreatMgr().GetThreatListSize())
-            DoResetThreat();
+            DoResetThreatList();
         if (Creature* dying = instance->GetCreature(_creatureDying))
         {
             dying->AI()->DoAction(ACTION_EXPLODE);
@@ -405,7 +419,7 @@ struct boss_yauj : public boss_bug_trio
         .Schedule(12s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_FEAR);
-            DoResetThreat();
+            DoResetThreatList();
             context.Repeat(20600ms);
         })
         .Schedule(11s, 14500ms, [this](TaskContext context)
