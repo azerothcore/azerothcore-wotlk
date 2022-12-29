@@ -150,7 +150,7 @@ public:
 
 protected:
     bool AddObject(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o,
-        float rotation0, float rotation1, float rotation2, float rotation3);
+                                   float rotation0, float rotation1, float rotation2, float rotation3);
     bool AddCreature(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
 
     bool DelCreature(uint32 type);
@@ -223,7 +223,7 @@ public:
     virtual bool HandleOpenGo(Player* player, GameObject* go);
 
     // setup stuff
-    virtual bool SetupOutdoorPvP() { return true; }
+    virtual bool SetupOutdoorPvP() {return true;}
 
     void OnGameObjectCreate(GameObject* go) override;
     void OnGameObjectRemove(GameObject* go) override;
@@ -246,7 +246,7 @@ public:
     // awards rewards for player kill
     virtual void AwardKillBonus(Player* /*player*/) {}
 
-    uint32 GetTypeId() { return m_TypeId; }
+    uint32 GetTypeId() {return m_TypeId;}
 
     virtual bool HandleDropFlag(Player* player, uint32 spellId);
 
