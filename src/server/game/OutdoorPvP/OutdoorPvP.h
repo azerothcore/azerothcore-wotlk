@@ -138,8 +138,16 @@ public:
     bool SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o = 0,
                              float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
 
-    // the status of the objective
-    float m_value;
+    // Setter
+    void SetSlider(float slider)
+    {
+        m_value = std::clamp<float>(slider, m_minValue, m_maxValue);
+    }
+    // Getter
+    float GetSlider()
+    {
+        return m_value;
+    }
 
 protected:
     bool AddObject(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o,
@@ -161,6 +169,9 @@ protected:
 
     // maximum speed of capture
     float m_maxSpeed;
+
+    // the status of the objective
+    float m_value;
 
     TeamId m_team;
 
@@ -213,7 +224,7 @@ public:
     virtual bool HandleOpenGo(Player* player, GameObject* go);
 
     // setup stuff
-    virtual bool SetupOutdoorPvP() {return true;}
+    virtual bool SetupOutdoorPvP() { return true; }
 
     void OnGameObjectCreate(GameObject* go) override;
     void OnGameObjectRemove(GameObject* go) override;
@@ -236,7 +247,7 @@ public:
     // awards rewards for player kill
     virtual void AwardKillBonus(Player* /*player*/) {}
 
-    uint32 GetTypeId() {return m_TypeId;}
+    uint32 GetTypeId() { return m_TypeId; }
 
     virtual bool HandleDropFlag(Player* player, uint32 spellId);
 
