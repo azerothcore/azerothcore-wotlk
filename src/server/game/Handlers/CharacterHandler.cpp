@@ -658,7 +658,6 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     sCalendarMgr->RemoveAllPlayerEventsAndInvites(guid);
     Player::DeleteFromDB(guid.GetCounter(), GetAccountId(), true, false);
 
-    sCharacterCache->DeleteCharacterCacheEntry(guid, name);
     SendCharDelete(CHAR_DELETE_SUCCESS);
 }
 
