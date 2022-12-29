@@ -85,6 +85,7 @@ public:
 			player->DestroyItemCount(80060, 1, true, false);
 			player->DestroyItemCount(80061, 1, true, false);
 			player->DestroyItemCount(80062, 1, true, false);
+            player->DestroyItemCount(80085, 1, true, false);
 			player->DestroyItemCount(80090, 1, true, false);
             player->DestroyItemCount(300048, 1, true, false);
 			player->removeSpell(300118, SPEC_MASK_ALL, false);
