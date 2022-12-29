@@ -274,10 +274,10 @@ public:
     uint32 GetAliveGuardsCount();
     TeamId GetControllingFaction() const;
 
+protected:
     // called when a faction takes control
     void FactionTakeOver(TeamId teamId);
 
-protected:
     void DeSpawnNPCs();
     void DeSpawnGOs();
 
