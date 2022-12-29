@@ -138,6 +138,9 @@ public:
     bool SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o = 0,
                              float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
 
+    // the status of the objective
+    float m_value;
+
 protected:
     bool AddObject(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o,
                    float rotation0, float rotation1, float rotation2, float rotation3);
@@ -158,9 +161,6 @@ protected:
 
     // maximum speed of capture
     float m_maxSpeed;
-
-    // the status of the objective
-    float m_value;
 
     TeamId m_team;
 

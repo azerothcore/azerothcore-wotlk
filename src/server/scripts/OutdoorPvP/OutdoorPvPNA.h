@@ -274,10 +274,10 @@ public:
     uint32 GetAliveGuardsCount();
     TeamId GetControllingFaction() const;
 
-protected:
     // called when a faction takes control
     void FactionTakeOver(TeamId teamId);
 
+protected:
     void DeSpawnNPCs();
     void DeSpawnGOs();
 
@@ -323,6 +323,8 @@ public:
     void SendRemoveWorldStates(Player* player) override;
 
     void HandleKillImpl(Player* player, Unit* killed) override;
+
+    OPvPCapturePointNA* GetCapturePoint() { return m_obj; }
 
 private:
     OPvPCapturePointNA* m_obj;
