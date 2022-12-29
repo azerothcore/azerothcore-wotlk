@@ -565,9 +565,11 @@ bool OPvPCapturePointNA::Update(uint32 diff)
                 FactionTakeOver(m_ControllingFaction);
             m_RespawnTimer = NA_RESPAWN_TIME;
         }
-        else m_RespawnTimer -= diff;
+        else
+            m_RespawnTimer -= diff;
+        return OPvPCapturePoint::Update(diff);
     }
-    return OPvPCapturePoint::Update(diff);
+    return false;
 }
 
 void OPvPCapturePointNA::ChangeState()
