@@ -136,7 +136,7 @@ public:
     void AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entry = 0);
 
     bool SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o = 0,
-        float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
+                             float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
 
     void SetSlider(float slider)
     {
