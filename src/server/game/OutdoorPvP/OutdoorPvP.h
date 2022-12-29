@@ -141,7 +141,6 @@ public:
     // Setter
     void SetSlider(float slider)
     {
-        LOG_INFO("server", "min: {}, max: {}", m_minValue, m_maxValue);
         m_value = std::clamp<float>(slider, -m_maxValue, m_maxValue);
     }
     // Getter
