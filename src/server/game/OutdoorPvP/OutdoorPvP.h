@@ -150,7 +150,7 @@ public:
 
 protected:
     bool AddObject(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o,
-                                   float rotation0, float rotation1, float rotation2, float rotation3);
+                   float rotation0, float rotation1, float rotation2, float rotation3);
     bool AddCreature(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
 
     bool DelCreature(uint32 type);
