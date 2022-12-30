@@ -2394,6 +2394,10 @@ public:
         if (!mgr)
             mgr = new BotMgr(owner);
 
+        ObjectGuid::LowType guidlow = owner->GetGUID().GetCounter();
+        BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &guidlow);
+        bot->GetBotAI()->ReinitOwner();
+
         if (mgr->AddBot(bot) == BOT_ADD_SUCCESS)
         {
             handler->PSendSysMessage("%s is now your npcbot", bot->GetName().c_str());
