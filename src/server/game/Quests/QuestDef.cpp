@@ -398,9 +398,9 @@ void Quest::InitializeQueryData()
     queryData << GetPOIy();
     queryData << GetPointOpt();
 
-    queryData << GetTitle();
+    queryData << GetLogTitle();
     queryData << GetObjectives();
-    queryData << GetDetails();
+    queryData << GetDescription();
     queryData << GetAreaDescription();
     queryData << GetCompletedText();                                  // display in quest objectives window once all objectives are completed
 

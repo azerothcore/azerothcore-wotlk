@@ -6627,10 +6627,10 @@ void Player::PrettyPrintRequirementsQuestList(const std::vector<const Progressio
             continue;
         }
 
-        std::string questTitle = questTemplate->GetTitle();
+        std::string questTitle = questTemplate->GetLogTitle();
         if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(questTemplate->GetQuestId()))
         {
-            ObjectMgr::GetLocaleString(questLocale->Title, loc_idx, questTitle);
+            ObjectMgr::GetLocaleString(questLocale->LogTitle, loc_idx, questTitle);
         }
 
         std::stringstream stream;

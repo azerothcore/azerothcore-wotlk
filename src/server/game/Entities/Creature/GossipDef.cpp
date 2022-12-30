@@ -225,11 +225,11 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID)
             data << int32(quest->GetQuestLevel());
             data << uint32(quest->GetFlags()); // 3.3.3 quest flags
             data << uint8(quest->IsRepeatable() && !quest->IsDailyOrWeekly() && !quest->IsMonthly()); // 3.3.3 icon changes: blue question mark or yellow exclamation mark
-            std::string title = quest->GetTitle();
+            std::string title = quest->GetLogTitle();
 
             int32 locale = _session->GetSessionDbLocaleIndex();
             if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(questID))
-                ObjectMgr::GetLocaleString(localeData->Title, locale, title);
+                ObjectMgr::GetLocaleString(localeData->LogTitle, locale, title);
             data << title;
         }
     }
@@ -351,12 +351,12 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const
         if (Quest const* quest = sObjectMgr->GetQuestTemplate(questID))
         {
             ++count;
-            std::string title = quest->GetTitle();
+            std::string title = quest->GetLogTitle();
 
             LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
             if (localeConstant != LOCALE_enUS)
                 if (QuestLocale const* questTemplateLocale = sObjectMgr->GetQuestLocale(questID))
-                    ObjectMgr::GetLocaleString(questTemplateLocale->Title, localeConstant, title);
+                    ObjectMgr::GetLocaleString(questTemplateLocale->LogTitle, localeConstant, title);
 
             data << uint32(questID);
             data << uint32(questMenuItem.QuestIcon);
@@ -384,17 +384,17 @@ void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) con
 
 void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGUID, bool activateAccept) const
 {
-    std::string questTitle           = quest->GetTitle();
-    std::string questDetails         = quest->GetDetails();
+    std::string questTitle           = quest->GetLogTitle();
+    std::string questDetails         = quest->GetDescription();
     std::string questObjectives      = quest->GetObjectives();
     std::string questAreaDescription = quest->GetAreaDescription();
 
     int32 locale = _session->GetSessionDbLocaleIndex();
     if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
     {
-        ObjectMgr::GetLocaleString(localeData->Title, locale, questTitle);
-        ObjectMgr::GetLocaleString(localeData->Details, locale, questDetails);
-        ObjectMgr::GetLocaleString(localeData->Objectives, locale, questObjectives);
+        ObjectMgr::GetLocaleString(localeData->LogTitle, locale, questTitle);
+        ObjectMgr::GetLocaleString(localeData->QuestDescription, locale, questDetails);
+        ObjectMgr::GetLocaleString(localeData->LogDescription, locale, questObjectives);
         ObjectMgr::GetLocaleString(localeData->AreaDescription, locale, questAreaDescription);
     }
 
@@ -489,11 +489,11 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
 
 void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
 {
-    std::string questTitle           = quest->GetTitle();
-    std::string questDetails         = quest->GetDetails();
-    std::string questObjectives      = quest->GetObjectives();
+    std::string questLogTitle        = quest->GetLogTitle();
+    std::string questDescription     = quest->GetDescription();
+    std::string questLogDescription  = quest->GetObjectives();
     std::string questAreaDescription = quest->GetAreaDescription();
-    std::string questCompletedText   = quest->GetCompletedText();
+    std::string questCompletionLog   = quest->GetCompletedText();
 
     std::string questObjectiveText[QUEST_OBJECTIVES_COUNT];
     for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
@@ -502,11 +502,11 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     int32 locale = _session->GetSessionDbLocaleIndex();
     if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
     {
-        ObjectMgr::GetLocaleString(localeData->Title, locale, questTitle);
-        ObjectMgr::GetLocaleString(localeData->Details, locale, questDetails);
-        ObjectMgr::GetLocaleString(localeData->Objectives, locale, questObjectives);
+        ObjectMgr::GetLocaleString(localeData->LogTitle, locale, questLogTitle);
+        ObjectMgr::GetLocaleString(localeData->QuestDescription, locale, questDescription);
+        ObjectMgr::GetLocaleString(localeData->LogDescription, locale, questLogDescription);
         ObjectMgr::GetLocaleString(localeData->AreaDescription, locale, questAreaDescription);
-        ObjectMgr::GetLocaleString(localeData->CompletedText, locale, questCompletedText);
+        ObjectMgr::GetLocaleString(localeData->QuestCompletionLog, locale, questCompletionLog);
 
         for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
             ObjectMgr::GetLocaleString(localeData->ObjectiveText[i], locale, questObjectiveText[i]);
@@ -587,11 +587,11 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     data << float(quest->GetPOIy());
     data << uint32(quest->GetPointOpt());
 
-    data << questTitle;
-    data << questObjectives;
-    data << questDetails;
+    data << questLogTitle;
+    data << questLogDescription;
+    data << questDescription;
     data << questAreaDescription;
-    data << questCompletedText;                                 // display in quest objectives window once all objectives are completed
+    data << questCompletionLog;                                 // display in quest objectives window once all objectives are completed
 
     for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
     {
@@ -620,12 +620,12 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
 
 void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUID, bool enableNext) const
 {
-    std::string questTitle = quest->GetTitle();
+    std::string questTitle = quest->GetLogTitle();
     std::string RewardText = quest->GetOfferRewardText();
 
     int32 locale = _session->GetSessionDbLocaleIndex();
     if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
-        ObjectMgr::GetLocaleString(localeData->Title, locale, questTitle);
+        ObjectMgr::GetLocaleString(localeData->LogTitle, locale, questTitle);
 
     if (QuestOfferRewardLocale const* questOfferRewardLocale = sObjectMgr->GetQuestOfferRewardLocale(quest->GetQuestId()))
         ObjectMgr::GetLocaleString(questOfferRewardLocale->RewardText, locale, RewardText);
@@ -715,12 +715,12 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, ObjectGuid npcGU
     // We can always call to RequestItems, but this packet only goes out if there are actually
     // items.  Otherwise, we'll skip straight to the OfferReward
 
-    std::string questTitle = quest->GetTitle();
+    std::string questTitle = quest->GetLogTitle();
     std::string requestItemsText = quest->GetRequestItemsText();
 
     int32 locale = _session->GetSessionDbLocaleIndex();
     if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
-        ObjectMgr::GetLocaleString(localeData->Title, locale, questTitle);
+        ObjectMgr::GetLocaleString(localeData->LogTitle, locale, questTitle);
 
     if (QuestRequestItemsLocale const* questRequestItemsLocale = sObjectMgr->GetQuestRequestItemsLocale(quest->GetQuestId()))
         ObjectMgr::GetLocaleString(questRequestItemsLocale->CompletionText, locale, requestItemsText);

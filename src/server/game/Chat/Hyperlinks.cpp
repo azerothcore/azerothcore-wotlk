@@ -185,7 +185,7 @@ struct LinkValidator<LinkTags::quest>
         if (text.empty())
             return false;
 
-        if (text == data.Quest->GetTitle())
+        if (text == data.Quest->GetLogTitle())
             return true;
 
         QuestLocale const* locale = sObjectMgr->GetQuestLocale(data.Quest->GetQuestId());
@@ -197,7 +197,7 @@ struct LinkValidator<LinkTags::quest>
             if (i == DEFAULT_LOCALE)
                 continue;
 
-            std::string_view name = ObjectMgr::GetLocaleString(locale->Title, i);
+            std::string_view name = ObjectMgr::GetLocaleString(locale->LogTitle, i);
             if (!name.empty() && (text == name))
                 return true;
         }

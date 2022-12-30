@@ -5040,7 +5040,7 @@ void ObjectMgr::LoadQuestLocales()
 
     _questLocaleStore.clear();                                // need for reload case
 
-    //                                               0   1       2         3                 4               5                6                   7               8               9               10
+    //                                               0     1        2             3                4                5                 6                 7               8               9               10
     QueryResult result = WorldDatabase.Query("SELECT ID, Locale, LogTitle, QuestDescription, LogDescription, AreaDescription, QuestCompletionLog, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4 FROM quest_template_locale");
 
     if (!result)
@@ -5057,11 +5057,11 @@ void ObjectMgr::LoadQuestLocales()
             continue;
 
         QuestLocale& data = _questLocaleStore[ID];
-        AddLocaleString(fields[2].Get<std::string>(), locale, data.Title);
-        AddLocaleString(fields[3].Get<std::string>(), locale, data.Details);
-        AddLocaleString(fields[4].Get<std::string>(), locale, data.Objectives);
+        AddLocaleString(fields[2].Get<std::string>(), locale, data.LogTitle);
+        AddLocaleString(fields[3].Get<std::string>(), locale, data.QuestDescription);
+        AddLocaleString(fields[4].Get<std::string>(), locale, data.LogDescription);
         AddLocaleString(fields[5].Get<std::string>(), locale, data.AreaDescription);
-        AddLocaleString(fields[6].Get<std::string>(), locale, data.CompletedText);
+        AddLocaleString(fields[6].Get<std::string>(), locale, data.QuestCompletionLog);
 
         for (uint8 i = 0; i < 4; ++i)
             AddLocaleString(fields[i + 7].Get<std::string>(), locale, data.ObjectiveText[i]);

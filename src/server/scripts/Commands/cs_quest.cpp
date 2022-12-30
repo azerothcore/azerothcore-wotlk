@@ -83,7 +83,7 @@ public:
         {
             if (player->IsActiveQuest(entry))
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetLogTitle().c_str(), entry);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -101,7 +101,7 @@ public:
 
             if (result)
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetLogTitle().c_str(), entry);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -130,7 +130,7 @@ public:
             CharacterDatabase.Execute(stmt);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_ADD, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_ADD, quest->GetLogTitle().c_str(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -222,7 +222,7 @@ public:
             CharacterDatabase.CommitTransaction(trans);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_REMOVED, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_REMOVED, quest->GetLogTitle().c_str(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -352,7 +352,7 @@ public:
 
             if (!result)
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG, quest->GetTitle(), entry);
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG, quest->GetLogTitle(), entry);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -378,7 +378,7 @@ public:
             {
                 MailSender sender(MAIL_NORMAL, guid, MAIL_STATIONERY_GM);
                 // fill mail
-                MailDraft draft(quest->GetTitle(), std::string());
+                MailDraft draft(quest->GetLogTitle(), std::string());
 
                 for (auto const& itr : questItems)
                 {
@@ -491,7 +491,7 @@ public:
             CharacterDatabase.Execute(stmt);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_COMPLETE, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_COMPLETE, quest->GetLogTitle().c_str(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -614,7 +614,7 @@ public:
             {
                 MailSender sender(MAIL_NORMAL, guid, MAIL_STATIONERY_GM);
                 // fill mail
-                MailDraft draft(quest->GetTitle(), "This quest has been manually rewarded to you. This mail contains your quest rewards.");
+                MailDraft draft(quest->GetLogTitle(), "This quest has been manually rewarded to you. This mail contains your quest rewards.");
 
                 for (auto const& itr : questRewardItems)
                 {
@@ -739,7 +739,7 @@ public:
             CharacterDatabase.CommitTransaction(trans);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_REWARDED, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_REWARDED, quest->GetLogTitle().c_str(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }

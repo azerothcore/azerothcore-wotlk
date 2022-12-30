@@ -180,13 +180,13 @@ struct QuestLocale
 {
     QuestLocale() { ObjectiveText.resize(QUEST_OBJECTIVES_COUNT); }
 
-    std::vector<std::string> Title;
-    std::vector<std::string> Details;
-    std::vector<std::string> Objectives;
+    std::vector<std::string> LogTitle;
+    std::vector<std::string> QuestDescription;
+    std::vector<std::string> LogDescription;
     std::vector<std::string> OfferRewardText;
     std::vector<std::string> RequestItemsText;
     std::vector<std::string> AreaDescription;
-    std::vector<std::string> CompletedText;
+    std::vector<std::string> QuestCompletionLog;
     std::vector< std::vector<std::string> > ObjectiveText;
 };
 
@@ -255,8 +255,8 @@ public:
     [[nodiscard]] uint32 GetSrcItemId() const { return StartItem; }
     [[nodiscard]] uint32 GetSrcItemCount() const { return StartItemCount; }
     [[nodiscard]] uint32 GetSrcSpell() const { return SourceSpellid; }
-    [[nodiscard]] std::string const& GetTitle() const { return Title; }
-    [[nodiscard]] std::string const& GetDetails() const { return Details; }
+    [[nodiscard]] std::string const& GetLogTitle() const { return Title; }
+    [[nodiscard]] std::string const& GetDescription() const { return Details; }
     [[nodiscard]] std::string const& GetObjectives() const { return Objectives; }
     [[nodiscard]] std::string const& GetOfferRewardText() const { return OfferRewardText; }
     [[nodiscard]] std::string const& GetRequestItemsText() const { return RequestItemsText; }
