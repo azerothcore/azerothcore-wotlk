@@ -304,11 +304,20 @@ struct ScriptedAI : public CreatureAI
     //Plays music for all players in the zone (zone = true) or the area (zone = false)
     void DoPlayMusic(uint32 soundId, bool zone);
 
-    //Drops all threat to 0%. Does not remove players from the threat list
-    void DoResetThreat();
+    // Add specified amount of threat directly to victim (ignores redirection effects) - also puts victim in combat and engages them if necessary
+    void DoAddThreat(Unit* unit, float amount);
 
+    // Adds/removes the specified percentage from the specified victim's threat (to who, or me if not specified)
+    void DoModifyThreatByPercent(Unit* unit, int32 pct);
+
+    //Drops all threat to 0%. Does not remove players from the threat list
+    void DoResetThreat(Unit* unit);
+
+    // Resets the specified unit's threat list (me if not specified) - does not delete entries, just sets their threat to zero
+    void DoResetThreatList();
+
+    // Returns the threat level of victim towards who (or me if not specified)
     float DoGetThreat(Unit* unit);
-    void DoModifyThreatPercent(Unit* unit, int32 pct);
 
     //Teleports a player without dropping threat (only teleports to same map)
     void DoTeleportPlayer(Unit* unit, float x, float y, float z, float o);

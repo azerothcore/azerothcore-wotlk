@@ -1691,13 +1691,13 @@ WorldBossLevelDiff = 3
 #    Corpse.Decay.RAREELITE
 #    Corpse.Decay.WORLDBOSS
 #        Description: Time (in seconds) until creature corpse will decay if not looted or skinned.
-#        Default:     60   - (1 Minute, Corpse.Decay.NORMAL)
+#        Default:     300  - (5 Minutes, Corpse.Decay.NORMAL)
 #                     300  - (5 Minutes, Corpse.Decay.RARE)
 #                     300  - (5 Minutes, Corpse.Decay.ELITE)
 #                     300  - (5 Minutes, Corpse.Decay.RAREELITE)
 #                     3600 - (1 Hour, Corpse.Decay.WORLDBOSS)
 
-Corpse.Decay.NORMAL    = 60
+Corpse.Decay.NORMAL    = 300
 Corpse.Decay.RARE      = 300
 Corpse.Decay.ELITE     = 300
 Corpse.Decay.RAREELITE = 300
@@ -1707,9 +1707,9 @@ Corpse.Decay.WORLDBOSS = 3600
 #    Rate.Corpse.Decay.Looted
 #        Description: Multiplier for Corpse.Decay.* to configure how long creature corpses stay
 #                     after they have been looted.
-#         Default:    0.5
+#         Default:    1.0
 
-Rate.Corpse.Decay.Looted = 0.5
+Rate.Corpse.Decay.Looted = 1.0
 
 #
 #    Rate.Creature.Normal.Damage
@@ -2484,6 +2484,15 @@ Rate.Pet.LevelXP = 0.05
 WaterBreath.Timer = 180000
 
 #
+#    EnableLowLevelRegenBoost
+#        Description: Greatly increase Health and Mana regen rates for players under level 15 (Added in patch 3.3)
+#        Default:     1 - Enabled
+#                     0 - Disabled
+#
+
+EnableLowLevelRegenBoost = 1
+
+#
 #    SkillGain.Crafting
 #    SkillGain.Defense
 #    SkillGain.Gathering
@@ -2919,8 +2928,9 @@ Battleground.SpeedBuffRespawn = 150
 #
 #     Wintergrasp.Enable
 #         Description: Enable the Wintergrasp battlefield.
-#         Default:     0 - (Disabled)
-#                      1 - (Enabled, Experimental as of still being in development)
+#         Default:     1 - (Enabled, Experimental as of still being in development)
+#                      0 - (Battleground disabled, Wintergrasp world processing still occurs)
+#                      2 - (Disable all Wintergrasp processing)
 
 Wintergrasp.Enable = 1
 

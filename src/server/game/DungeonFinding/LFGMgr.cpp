@@ -269,7 +269,7 @@ namespace lfg
             // Recalculate locked dungeons
             for (LfgPlayerDataContainer::const_iterator it = PlayersStore.begin(); it != PlayersStore.end(); ++it)
                 if (Player* player = ObjectAccessor::FindConnectedPlayer(it->first))
-                    InitializeLockedDungeons(player);
+                    InitializeLockedDungeons(player, nullptr);
         }
     }
 
@@ -388,11 +388,10 @@ namespace lfg
 
        @param[in]     player Player we need to initialize the lock status map
     */
-    void LFGMgr::InitializeLockedDungeons(Player* player, uint8 level /* = 0 */)
+    void LFGMgr::InitializeLockedDungeons(Player* player, Group const* group)
     {
         ObjectGuid guid = player->GetGUID();
-        if (!level)
-            level = player->getLevel();
+        uint8 level = player->getLevel();
         uint8 expansion = player->GetSession()->Expansion();
         LfgDungeonSet const& dungeons = GetDungeonsByRandom(0);
         LfgLockMap lock;
@@ -429,12 +428,15 @@ namespace lfg
                 // Check required items
                 for (const ProgressionRequirement* itemRequirement : ar->items)
                 {
-                    if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == player->GetTeamId(true))
+                    if (!itemRequirement->checkLeaderOnly || !group || group->GetLeaderGUID() == player->GetGUID())
                     {
-                        if (!player->HasItemCount(itemRequirement->id, 1))
+                        if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == player->GetTeamId(true))
                         {
-                            lockData = LFG_LOCKSTATUS_MISSING_ITEM;
-                            break;
+                            if (!player->HasItemCount(itemRequirement->id, 1))
+                            {
+                                lockData = LFG_LOCKSTATUS_MISSING_ITEM;
+                                break;
+                            }
                         }
                     }
                 }
@@ -442,12 +444,15 @@ namespace lfg
                 //Check for quests
                 for (const ProgressionRequirement* questRequirement : ar->quests)
                 {
-                    if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == player->GetTeamId(true))
+                    if (!questRequirement->checkLeaderOnly || !group || group->GetLeaderGUID() == player->GetGUID())
                     {
-                        if (!player->GetQuestRewardStatus(questRequirement->id))
+                        if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == player->GetTeamId(true))
                         {
-                            lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
-                            break;
+                            if (!player->GetQuestRewardStatus(questRequirement->id))
+                            {
+                                lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
+                                break;
+                            }
                         }
                     }
                 }
@@ -461,12 +466,15 @@ namespace lfg
                 //Check if player has the required achievements
                 for (const ProgressionRequirement* achievementRequirement : ar->achievements)
                 {
-                    if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == player->GetTeamId(true))
+                    if (!achievementRequirement->checkLeaderOnly || !group || group->GetLeaderGUID() == player->GetGUID())
                     {
-                        if (!player->HasAchieved(achievementRequirement->id))
+                        if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == player->GetTeamId(true))
                         {
-                            lockData = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
-                            break;
+                            if (!player->HasAchieved(achievementRequirement->id))
+                            {
+                                lockData = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
+                                break;
+                            }
                         }
                     }
                 }

@@ -3738,6 +3738,25 @@ class spell_item_freeze_rookery_egg : public SpellScript
     }
 };
 
+// 9160 - Sleep
+class spell_item_green_whelp_armor : public AuraScript
+{
+    PrepareAuraScript(spell_item_green_whelp_armor);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetActor() && eventInfo.GetActor()->getLevel() <= 50)
+            return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_item_green_whelp_armor::CheckProc);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -3853,4 +3872,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_mirrens_drinking_hat);
     RegisterSpellScript(spell_item_snowman);
     RegisterSpellScript(spell_item_freeze_rookery_egg);
+    RegisterSpellScript(spell_item_green_whelp_armor);
 }

@@ -27,39 +27,39 @@ uint32 const EncounterCount = 12;
 
 enum KZDataTypes
 {
-    DATA_ATTUMEN = 0,
-    DATA_MOROES = 1,
-    DATA_MAIDEN = 2,
-    DATA_OPTIONAL_BOSS = 3,
-    DATA_OPERA_PERFORMANCE = 4,
-    DATA_CURATOR = 5,
-    DATA_ARAN = 6,
-    DATA_TERESTIAN = 7,
-    DATA_NETHERSPITE = 8,
-    DATA_CHESS = 9,
-    DATA_MALCHEZZAR = 10,
-    DATA_NIGHTBANE = 11,
-    DATA_SERVANT_QUARTERS = 12,
-    DATA_SELECTED_RARE = 13,
+    DATA_ATTUMEN                    = 0,
+    DATA_MOROES                     = 1,
+    DATA_MAIDEN                     = 2,
+    DATA_OPTIONAL_BOSS              = 3,
+    DATA_OPERA_PERFORMANCE          = 4,
+    DATA_CURATOR                    = 5,
+    DATA_ARAN                       = 6,
+    DATA_TERESTIAN                  = 7,
+    DATA_NETHERSPITE                = 8,
+    DATA_CHESS                      = 9,
+    DATA_MALCHEZZAR                 = 10,
+    DATA_NIGHTBANE                  = 11,
+    DATA_SERVANT_QUARTERS           = 12,
+    DATA_SELECTED_RARE              = 13,
+    DATA_OPERA_OZ_DEATHCOUNT        = 14,
+    DATA_KILREK                     = 15,
 
-    DATA_OPERA_OZ_DEATHCOUNT = 14,
+    MAX_ENCOUNTERS                  = 16,
 
-    DATA_KILREK = 15,
-    MAX_ENCOUNTERS = 16,
-    DATA_GO_CURTAINS = 18,
-    DATA_GO_STAGEDOORLEFT = 19,
-    DATA_GO_STAGEDOORRIGHT = 20,
-    DATA_GO_LIBRARY_DOOR = 21,
-    DATA_GO_MASSIVE_DOOR = 22,
-    DATA_GO_NETHER_DOOR = 23,
-    DATA_GO_GAME_DOOR = 24,
-    DATA_GO_GAME_EXIT_DOOR = 25,
-
-    DATA_IMAGE_OF_MEDIVH = 26,
-    DATA_MASTERS_TERRACE_DOOR_1 = 27,
-    DATA_MASTERS_TERRACE_DOOR_2 = 28,
-    DATA_GO_SIDE_ENTRANCE_DOOR = 29,
-    DATA_PRINCE = 30
+    DATA_GO_CURTAINS                = 18,
+    DATA_GO_STAGEDOORLEFT           = 19,
+    DATA_GO_STAGEDOORRIGHT          = 20,
+    DATA_GO_LIBRARY_DOOR            = 21,
+    DATA_GO_MASSIVE_DOOR            = 22,
+    DATA_GO_NETHER_DOOR             = 23,
+    DATA_GO_GAME_DOOR               = 24,
+    DATA_GO_GAME_EXIT_DOOR          = 25,
+    DATA_IMAGE_OF_MEDIVH            = 26,
+    DATA_MASTERS_TERRACE_DOOR_1     = 27,
+    DATA_MASTERS_TERRACE_DOOR_2     = 28,
+    DATA_GO_SIDE_ENTRANCE_DOOR      = 29,
+    DATA_PRINCE                     = 30,
+    DATA_SPAWN_OPERA_DECORATIONS    = 31
 };
 
 enum KZOperaEvents
@@ -95,18 +95,28 @@ enum KZMiscCreatures
 
 enum KZGameObjectIds
 {
-    GO_STAGE_CURTAIN = 183932,
-    GO_STAGE_DOOR_LEFT = 184278,
-    GO_STAGE_DOOR_RIGHT = 184279,
-    GO_PRIVATE_LIBRARY_DOOR = 184517,
-    GO_MASSIVE_DOOR = 185521,
-    GO_GAMESMAN_HALL_DOOR = 184276,
-    GO_GAMESMAN_HALL_EXIT_DOOR = 184277,
-    GO_NETHERSPACE_DOOR = 185134,
-    GO_MASTERS_TERRACE_DOOR = 184274,
-    GO_MASTERS_TERRACE_DOOR2 = 184280,
-    GO_SIDE_ENTRANCE_DOOR = 184275,
-    GO_DUST_COVERED_CHEST = 185119
+    GO_STAGE_CURTAIN                = 183932,
+    GO_STAGE_DOOR_LEFT              = 184278,
+    GO_STAGE_DOOR_RIGHT             = 184279,
+    GO_PRIVATE_LIBRARY_DOOR         = 184517,
+    GO_MASSIVE_DOOR                 = 185521,
+    GO_GAMESMAN_HALL_DOOR           = 184276,
+    GO_GAMESMAN_HALL_EXIT_DOOR      = 184277,
+    GO_NETHERSPACE_DOOR             = 185134,
+    GO_MASTERS_TERRACE_DOOR         = 184274,
+    GO_MASTERS_TERRACE_DOOR2        = 184280,
+    GO_SIDE_ENTRANCE_DOOR           = 184275,
+    GO_DUST_COVERED_CHEST           = 185119,
+
+     // Opera event stage decoration
+    GO_OZ_BACKDROP                  = 183442,
+    GO_OZ_HAY                       = 183496,
+    GO_HOOD_BACKDROP                = 183491,
+    GO_HOOD_TREE                    = 183492,
+    GO_HOOD_HOUSE                   = 183493,
+    GO_RAJ_BACKDROP                 = 183443,
+    GO_RAJ_MOON                     = 183494,
+    GO_RAJ_BALCONY                  = 183495
 };
 
 enum KZMisc

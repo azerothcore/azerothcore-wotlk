@@ -23,7 +23,7 @@
 
 namespace Acore::Crypto
 {
-    void GetRandomBytes(uint8* buf, size_t len);
+    AC_COMMON_API void GetRandomBytes(uint8* buf, size_t len);
 
     template <typename Container>
     void GetRandomBytes(Container& c)

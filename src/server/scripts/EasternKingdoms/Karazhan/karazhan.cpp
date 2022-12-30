@@ -269,6 +269,8 @@ public:
             }
 
             RaidWiped = false;
+
+            instance->SetData(DATA_SPAWN_OPERA_DECORATIONS, m_uiEventId);
         }
 
         void UpdateAI(uint32 diff) override
