@@ -1966,37 +1966,35 @@ public:
 
     static bool HandleNpcBotInfoCommand(ChatHandler* handler)
     {
-        Player* owner = handler->GetSession()->GetPlayer();
-        if (!owner->GetTarget())
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player->GetTarget())
         {
             handler->SendSysMessage(".npcbot info");
             handler->SendSysMessage("Lists NpcBots count of each class owned by selected player. You can use this on self and your party members");
             handler->SetSentErrorMessage(true);
             return false;
         }
-        Player* master = owner->GetSelectedPlayer();
+        Player* master = player->GetSelectedPlayer();
         if (!master)
         {
             handler->SendSysMessage("No player selected");
             handler->SetSentErrorMessage(true);
             return false;
         }
-        if (handler->HasLowerSecurity(master, ObjectGuid::Empty))
-        {
-            handler->SendSysMessage("Invalid target");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-        if (!master->HaveBot())
+        if (BotDataMgr::GetOwnedBotsCount(master->GetGUID()) == 0)
         {
             handler->PSendSysMessage("%s has no NpcBots!", master->GetName().c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
 
+        BotMgr* mgr = master->GetBotMgr();
+        if (!mgr)
+            mgr = new BotMgr(master);
+
         std::vector<ObjectGuid> guidvec;
         BotDataMgr::GetNPCBotGuidsByOwner(guidvec, master->GetGUID());
-        BotMap const* map = master->GetBotMgr()->GetBotMap();
+        BotMap const* map = mgr->GetBotMap();
         guidvec.erase(std::remove_if(std::begin(guidvec), std::end(guidvec),
             [bmap = map](ObjectGuid guid) { return bmap->find(guid) != bmap->end(); }
         ), std::end(guidvec));
@@ -2212,7 +2210,7 @@ public:
     {
         Player const* owner = handler->GetSession()->GetPlayer();
         Unit const* u = owner->GetSelectedUnit();
-        if (!owner->HaveBot() || (!u && !botname))
+        if ((!u && !botname) || BotDataMgr::GetOwnedBotsCount(owner->GetGUID()) == 0)
         {
             handler->SendSysMessage(".npcbot command rebind [#name]");
             handler->SendSysMessage("Re-binds selected/named unbound npcbot");
@@ -2220,8 +2218,12 @@ public:
             return false;
         }
 
+        BotMgr* mgr = owner->GetBotMgr();
+        if (!mgr)
+            mgr = new BotMgr(const_cast<Player*>(owner));
+
         Creature const* cre = (u && u->GetTypeId() == TYPEID_UNIT) ? u->ToCreature() : BotDataMgr::FindBot(*botname, owner->GetSession()->GetSessionDbLocaleIndex());
-        if (!cre || !cre->IsNPCBot() || owner->GetBotMgr()->GetBot(cre->GetGUID()) ||
+        if (!cre || !cre->IsNPCBot() || mgr->GetBot(cre->GetGUID()) ||
             !cre->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) ||
             BotDataMgr::SelectNpcBotData(cre->GetEntry())->owner != owner->GetGUID().GetCounter())
         {
@@ -2230,7 +2232,7 @@ public:
             return false;
         }
 
-        if (owner->GetBotMgr()->RebindBot(const_cast<Creature*>(cre)) != BOT_ADD_SUCCESS)
+        if (mgr->RebindBot(const_cast<Creature*>(cre)) != BOT_ADD_SUCCESS)
         {
             handler->SendSysMessage("Failed to re-bind bot for some reason!");
             handler->SetSentErrorMessage(true);
