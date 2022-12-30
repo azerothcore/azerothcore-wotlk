@@ -3540,8 +3540,8 @@ void ObjectMgr::LoadPlayerInfo()
     // Load playercreate
     {
         uint32 oldMSTime = getMSTime();
-        //                                                0     1      2    3        4          5           6
-        QueryResult result = WorldDatabase.Query("SELECT race, class, map, zone, position_x, position_y, position_z, orientation FROM playercreateinfo");
+        //                                                  0          1       2    3      4      5      6         7
+        QueryResult result = WorldDatabase.Query("SELECT RaceMask, ClassMask, Map, Zone, Pos_X, Pos_Y, Pos_Z, Orientation FROM playercreateinfo");
 
         if (!result)
         {
@@ -3557,65 +3557,65 @@ void ObjectMgr::LoadPlayerInfo()
             {
                 Field* fields = result->Fetch();
 
-                uint32 current_race  = fields[0].Get<uint8>();
-                uint32 current_class = fields[1].Get<uint8>();
-                uint32 mapId         = fields[2].Get<uint16>();
-                uint32 areaId        = fields[3].Get<uint32>(); // zone
-                float  positionX     = fields[4].Get<float>();
-                float  positionY     = fields[5].Get<float>();
-                float  positionZ     = fields[6].Get<float>();
-                float  orientation   = fields[7].Get<float>();
+                uint32 raceMask    = fields[0].Get<uint32>();
+                uint32 classMask   = fields[1].Get<uint32>();
+                uint32 mapId       = fields[2].Get<uint16>();
+                uint32 areaId      = fields[3].Get<uint32>(); // zone
+                float  positionX   = fields[4].Get<float>();
+                float  positionY   = fields[5].Get<float>();
+                float  positionZ   = fields[6].Get<float>();
+                float  orientation = fields[7].Get<float>();
+                ChrRacesEntry const* rEntry;
 
-                if (current_race >= MAX_RACES)
+                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
                 {
-                    LOG_ERROR("sql.sql", "Wrong race {} in `playercreateinfo` table, ignoring.", current_race);
+                    LOG_ERROR("sql.sql", "Wrong race mask {} in `playercreateinfo` table, ignoring.", raceMask);
                     continue;
                 }
 
-                ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(current_race);
-                if (!rEntry)
+                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
                 {
-                    LOG_ERROR("sql.sql", "Wrong race {} in `playercreateinfo` table, ignoring.", current_race);
-                    continue;
-                }
-
-                if (current_class >= MAX_CLASSES)
-                {
-                    LOG_ERROR("sql.sql", "Wrong class {} in `playercreateinfo` table, ignoring.", current_class);
-                    continue;
-                }
-
-                if (!sChrClassesStore.LookupEntry(current_class))
-                {
-                    LOG_ERROR("sql.sql", "Wrong class {} in `playercreateinfo` table, ignoring.", current_class);
+                    LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo` table, ignoring.", classMask);
                     continue;
                 }
 
                 // accept DB data only for valid position (and non instanceable)
                 if (!MapMgr::IsValidMapCoord(mapId, positionX, positionY, positionZ, orientation))
                 {
-                    LOG_ERROR("sql.sql", "Wrong home position for class {} race {} pair in `playercreateinfo` table, ignoring.", current_class, current_race);
+                    LOG_ERROR("sql.sql", "Wrong home position for class mask {} race mask {} pair in `playercreateinfo` table, ignoring.", classMask, raceMask);
                     continue;
                 }
 
                 if (sMapStore.LookupEntry(mapId)->Instanceable())
                 {
-                    LOG_ERROR("sql.sql", "Home position in instanceable map for class {} race {} pair in `playercreateinfo` table, ignoring.", current_class, current_race);
+                    LOG_ERROR("sql.sql", "Home position in instanceable map for class mask {} race mask {} pair in `playercreateinfo` table, ignoring.", classMask, raceMask);
                     continue;
                 }
 
                 PlayerInfo* info = new PlayerInfo();
-                info->mapId = mapId;
-                info->areaId = areaId;
-                info->positionX = positionX;
-                info->positionY = positionY;
-                info->positionZ = positionZ;
-                info->orientation = orientation;
-                info->displayId_m = rEntry->model_m;
-                info->displayId_f = rEntry->model_f;
-                _playerInfo[current_race][current_class] = info;
-
-                ++count;
+                for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
+                {
+                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    {
+                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
+                        {
+                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            {
+                                rEntry = sChrRacesStore.LookupEntry(raceIndex);
+                                info->mapId = mapId;
+                                info->areaId = areaId;
+                                info->positionX = positionX;
+                                info->positionY = positionY;
+                                info->positionZ = positionZ;
+                                info->orientation = orientation;
+                                info->displayId_m = rEntry->model_m;
+                                info->displayId_f = rEntry->model_f;
+                                _playerInfo[raceIndex][classIndex] = info;
+                                ++count;
+                            }
+                        }
+                    }
+                }
             } while (result->NextRow());
 
             LOG_INFO("server.loading", ">> Loaded {} Player Create Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -3627,8 +3627,8 @@ void ObjectMgr::LoadPlayerInfo()
     LOG_INFO("server.loading", "Loading Player Create Items Data...");
     {
         uint32 oldMSTime = getMSTime();
-        //                                                0     1      2       3
-        QueryResult result = WorldDatabase.Query("SELECT race, class, itemid, amount FROM playercreateinfo_item");
+        //                                                  0          1         2      3
+        QueryResult result = WorldDatabase.Query("SELECT RaceMask, ClassMask, ItemId, Amount FROM playercreateinfo_item");
 
         if (!result)
         {
@@ -3643,50 +3643,61 @@ void ObjectMgr::LoadPlayerInfo()
             {
                 Field* fields = result->Fetch();
 
-                uint32 current_race = fields[0].Get<uint8>();
-                if (current_race >= MAX_RACES)
-                {
-                    LOG_ERROR("sql.sql", "Wrong race {} in `playercreateinfo_item` table, ignoring.", current_race);
-                    continue;
-                }
-
-                uint32 current_class = fields[1].Get<uint8>();
-                if (current_class >= MAX_CLASSES)
-                {
-                    LOG_ERROR("sql.sql", "Wrong class {} in `playercreateinfo_item` table, ignoring.", current_class);
-                    continue;
-                }
-
+                uint32 raceMask = fields[0].Get<uint32>();
+                uint32 classMask = fields[1].Get<uint32>();
                 uint32 item_id = fields[2].Get<uint32>();
+                int32 amount = fields[3].Get<int32>();
+
+                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
+                {
+                    LOG_ERROR("sql.sql", "Wrong race mask {} in `playercreateinfo_item` table, ignoring.", raceMask);
+                    continue;
+                }
+
+                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                {
+                    LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo_item` table, ignoring.", classMask);
+                    continue;
+                }
 
                 if (!GetItemTemplate(item_id))
                 {
-                    LOG_ERROR("sql.sql", "Item id {} (race {} class {}) in `playercreateinfo_item` table but not listed in `item_template`, ignoring.", item_id, current_race, current_class);
+                    LOG_ERROR("sql.sql", "Item id {} (race mask {} class mask {}) in `playercreateinfo_item` table but not listed in `item_template`, ignoring.", item_id, raceMask, classMask);
                     continue;
                 }
-
-                int32 amount = fields[3].Get<int32>();
 
                 if (!amount)
                 {
-                    LOG_ERROR("sql.sql", "Item id {} (class {} race {}) have amount == 0 in `playercreateinfo_item` table, ignoring.", item_id, current_race, current_class);
+                    LOG_ERROR("sql.sql", "Item id {} (race mask {} class mask {}) have amount == 0 in `playercreateinfo_item` table, ignoring.", item_id, raceMask, classMask);
                     continue;
                 }
 
-                if (!current_race || !current_class)
+                for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
                 {
-                    uint32 min_race = current_race ? current_race : 1;
-                    uint32 max_race = current_race ? current_race + 1 : MAX_RACES;
-                    uint32 min_class = current_class ? current_class : 1;
-                    uint32 max_class = current_class ? current_class + 1 : MAX_CLASSES;
-                    for (uint32 r = min_race; r < max_race; ++r)
-                        for (uint32 c = min_class; c < max_class; ++c)
-                            PlayerCreateInfoAddItemHelper(r, c, item_id, amount);
-                }
-                else
-                    PlayerCreateInfoAddItemHelper(current_race, current_class, item_id, amount);
+                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    {
+                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
+                        {
+                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            {
+                                if (!raceIndex || !classIndex)
+                                {
+                                    uint32 min_race = raceIndex ? raceIndex : 1;
+                                    uint32 max_race = raceIndex ? raceIndex + 1 : MAX_RACES;
+                                    uint32 min_class = classIndex ? classIndex : 1;
+                                    uint32 max_class = classIndex ? classIndex + 1 : MAX_CLASSES;
+                                    for (uint32 r = min_race; r < max_race; ++r)
+                                        for (uint32 c = min_class; c < max_class; ++c)
+                                            PlayerCreateInfoAddItemHelper(r, c, item_id, amount);
+                                }
+                                else
+                                    PlayerCreateInfoAddItemHelper(raceIndex, classIndex, item_id, amount);
 
-                ++count;
+                                ++count;
+                            }
+                        }
+                    }
+                }
             } while (result->NextRow());
 
             LOG_INFO("server.loading", ">> Loaded {} Custom Player Create Items in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -3890,8 +3901,8 @@ void ObjectMgr::LoadPlayerInfo()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                0     1      2       3       4
-        QueryResult result = WorldDatabase.Query("SELECT race, class, button, action, type FROM playercreateinfo_action");
+        //                                                  0          1        2       3      4
+        QueryResult result = WorldDatabase.Query("SELECT RaceMask, ClassMask, Button, Action, Type FROM playercreateinfo_action");
 
         if (!result)
         {
@@ -3906,24 +3917,38 @@ void ObjectMgr::LoadPlayerInfo()
             {
                 Field* fields = result->Fetch();
 
-                uint32 current_race = fields[0].Get<uint8>();
-                if (current_race >= MAX_RACES)
+                uint32 raceMask = fields[0].Get<uint32>();
+                uint32 classMask = fields[1].Get<uint32>();
+                PlayerInfo* info;
+
+                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
                 {
-                    LOG_ERROR("sql.sql", "Wrong race {} in `playercreateinfo_action` table, ignoring.", current_race);
+                    LOG_ERROR("sql.sql", "Wrong race mask {} in `playercreateinfo_action` table, ignoring.", raceMask);
                     continue;
                 }
 
-                uint32 current_class = fields[1].Get<uint8>();
-                if (current_class >= MAX_CLASSES)
+                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
                 {
-                    LOG_ERROR("sql.sql", "Wrong class {} in `playercreateinfo_action` table, ignoring.", current_class);
+                    LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo_action` table, ignoring.", classMask);
                     continue;
                 }
 
-                if (PlayerInfo* info = _playerInfo[current_race][current_class])
-                    info->action.push_back(PlayerCreateInfoAction(fields[2].Get<uint16>(), fields[3].Get<uint32>(), fields[4].Get<uint16>()));
+                for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
+                {
+                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    {
+                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
+                        {
+                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            {
+                                info = _playerInfo[raceIndex][classIndex];
+                                info->action.push_back(PlayerCreateInfoAction(fields[2].Get<uint16>(), fields[3].Get<uint32>(), fields[4].Get<uint16>()));
 
-                ++count;
+                                ++count;
+                            }
+                        }
+                    }
+                }
             } while (result->NextRow());
 
             LOG_INFO("server.loading", ">> Loaded {} Player Create Actions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
