@@ -51,6 +51,7 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
+    float GetNativeObjectScale() const override;
     void SetObjectScale(float scale) override;
     void SetDisplayId(uint32 modelId) override;
 
