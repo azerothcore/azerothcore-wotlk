@@ -36,7 +36,8 @@ enum Spells
 
 enum Misc
 {
-    MAX_GROW_REPEAT         = 9
+    MAX_GROW_REPEAT         = 9,
+    EMOTE_ROARS             = 0
 };
 
 struct boss_hungarfen : public BossAI
@@ -49,6 +50,7 @@ struct boss_hungarfen : public BossAI
         {
             _foul_spores = true;
             me->AddUnitState(UNIT_STATE_ROOT);
+            Talk(EMOTE_ROARS);
             DoCastSelf(SPELL_FOUL_SPORES);
             _scheduler.DelayAll(11s);
             _scheduler.Schedule(11s, [this](TaskContext /*context*/)
@@ -63,12 +65,22 @@ struct boss_hungarfen : public BossAI
         BossAI::Reset();
         _foul_spores = false;
         _scheduler.CancelAll();
+        DoCastAOE(SPELL_DESPAWN_MUSHROOMS, true);
     }
 
     void EnterCombat(Unit* who) override
     {
-        // Placeholder
         BossAI::EnterCombat(who);
+
+        _scheduler.Schedule(10s, [this](TaskContext context)
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
+                {
+                    target->CastSpell(target, SPELL_SPAWN_MUSHROOMS, true);
+                }
+
+                context.Repeat();
+            });
     }
 
     void UpdateAI(uint32 diff) override
@@ -123,8 +135,46 @@ protected:
     TaskScheduler _scheduler;
 };
 
+class spell_spore_cloud : public AuraScript
+{
+    PrepareAuraScript(spell_spore_cloud);
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+
+        if (Unit* caster = GetCaster())
+            caster->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_spore_cloud::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_despawn_underbog_mushrooms : public SpellScript
+{
+    PrepareSpellScript(spell_despawn_underbog_mushrooms);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            if (Creature* cTarget = target->ToCreature())
+                if (cTarget->GetEntry() == NPC_UNDERBOG_MUSHROOM)
+                    cTarget->DespawnOrUnsummon();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_despawn_underbog_mushrooms::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_boss_hungarfen()
 {
     RegisterUnderbogCreatureAI(boss_hungarfen);
     RegisterUnderbogCreatureAI(npc_underbog_mushroom);
+    RegisterSpellScript(spell_spore_cloud);
+    RegisterSpellScript(spell_despawn_underbog_mushrooms);
 }

@@ -75,7 +75,7 @@ struct boss_the_black_stalker : public BossAI
         BossAI::JustSummoned(summon);
     }
 
-    void SummonedCreatureDies(Creature* summon, Unit* killer) override
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
     {
         summons.Despawn(summon);
         for (uint8 i = 0; i < 3; ++i)
