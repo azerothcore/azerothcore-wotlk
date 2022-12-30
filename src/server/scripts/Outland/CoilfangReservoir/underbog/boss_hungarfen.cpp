@@ -28,6 +28,7 @@ enum Spells
     SPELL_SPAWN_MUSHROOMS   = 31692,
     SPELL_DESPAWN_MUSHROOMS = 34874,
     SPELL_FOUL_SPORES       = 31673,
+    SPELL_ACID_GEYSER       = 38739,
 
     // Underbog Mushroom
     SPELL_SHRINK            = 31691,
@@ -73,7 +74,7 @@ struct boss_hungarfen : public BossAI
     {
         BossAI::EnterCombat(who);
 
-        _scheduler.Schedule(10s, [this](TaskContext context)
+        _scheduler.Schedule(IsHeroic() ? randtime(2400ms, 3600ms) : 10s, [this](TaskContext context)
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
                 {
@@ -82,6 +83,15 @@ struct boss_hungarfen : public BossAI
 
                 context.Repeat();
             });
+
+        if (IsHeroic())
+        {
+            _scheduler.Schedule(6s, [this](TaskContext context)
+                {
+                    DoCastAOE(SPELL_ACID_GEYSER);
+                    context.Repeat(8500ms, 11s);
+                });
+        }
     }
 
     void UpdateAI(uint32 diff) override
