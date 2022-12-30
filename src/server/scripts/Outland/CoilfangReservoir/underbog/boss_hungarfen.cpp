@@ -145,7 +145,13 @@ class spell_spore_cloud : public AuraScript
         PreventDefaultAction();
 
         if (Unit* caster = GetCaster())
-            caster->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+        {
+            if (InstanceScript* instance = caster->GetInstanceScript())
+            {
+                if (Creature* hungarfen = instance->GetCreature(DATA_HUNGARFEN))
+                    caster->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true, nullptr, nullptr, hungarfen->GetGUID());
+            }
+        }
     }
 
     void Register() override

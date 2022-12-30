@@ -22,6 +22,7 @@
 
 ObjectData const creatureData[] =
 {
+    { NPC_HUNGARFEN, DATA_HUNGARFEN }, 
     { NPC_GHAZAN, DATA_GHAZAN }
 };
 

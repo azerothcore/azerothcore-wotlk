@@ -34,8 +34,9 @@ enum Data
 
 enum NPCs
 {
-    NPC_GHAZAN            = 18105,
-    NPC_UNDERBOG_MUSHROOM = 17990
+    NPC_HUNGARFEN         = 17770,
+    NPC_UNDERBOG_MUSHROOM = 17990,
+    NPC_GHAZAN            = 18105
 };
 
 template <class AI, class T>
