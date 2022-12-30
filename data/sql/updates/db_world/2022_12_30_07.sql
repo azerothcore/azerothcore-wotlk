@@ -1,3 +1,4 @@
+-- DB update 2022_12_30_06 -> 2022_12_30_07
 --
 -- Deathknell Zone Drops
 UPDATE `creature_loot_template` SET `Chance`=80, `Comment`='Night Web Matriarch - Webbed Cloak' WHERE `Entry`=1688 AND `Item`=3261 AND `Reference`=0 AND `GroupId`=0;
