@@ -22,6 +22,16 @@
 
 #define TheUnderbogScriptName "instance_the_underbog"
 
+enum Data
+{
+    DATA_HUNGARFEN     = 0,
+    DATA_GHAZAN        = 1,
+    DATA_MUSELEK       = 2,
+    DATA_BLACK_STALKER = 3,
+
+    MAX_ENCOUNTERS     = 4
+};
+
 enum NPCs
 {
     NPC_GHAZAN      = 18105
