@@ -32,7 +32,7 @@ ALTER TABLE `playercreateinfo_item`
 	ADD INDEX `playercreateinfo_race_class_index` (`RaceMask`, `ClassMask`) USING BTREE;
 
 DELETE FROM `playercreateinfo`;
-INSERT INTO `playercreateinfo` (`RaceMask`, `ClassMask`, `Map`, `Zone`, `Pos_X`, `Pos_Y`, `Pos_Z`, `Orientation`) VALUES
+INSERT INTO `playercreateinfo` (`RaceMask`, `ClassMask`, `Map`, `Zone`, `Position_X`, `Position_Y`, `Position_Z`, `Orientation`) VALUES
 (1, 411, 0, 12, -8949.95, -132.493, 83.5312, 0),
 (2, 333, 1, 14, -618.518, -4251.67, 38.718, 0),
 (4, 31, 0, 1, -6240.32, 331.033, 382.758, 6.17716),
