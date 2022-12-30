@@ -1484,7 +1484,6 @@ void GameObject::Use(Unit* user)
     Unit* spellCaster = user;
     uint32 spellId = 0;
     bool triggered = false;
-    bool tmpfish = false;
 
     if (Player* playerUser = user->ToPlayer())
     {
@@ -1707,7 +1706,6 @@ void GameObject::Use(Unit* user)
                 // cast this spell later if provided
                 spellId = info->goober.spellId;
                 spellCaster = user;
-                tmpfish = true;
 
                 break;
             }
