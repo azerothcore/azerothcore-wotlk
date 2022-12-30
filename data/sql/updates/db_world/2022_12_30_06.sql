@@ -1,3 +1,4 @@
+-- DB update 2022_12_30_05 -> 2022_12_30_06
 --
 UPDATE `creature_loot_template` SET `GroupId`=1, `MinCount`=1, `MaxCount`=2 WHERE `entry`=35360 AND `Item`=1;
 DELETE FROM `creature_loot_template` WHERE `entry`=35360 AND `item` IN (3,4);
