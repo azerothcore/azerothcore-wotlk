@@ -336,6 +336,166 @@ public:
                 ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо выполнить задание [Освобождение Аркатрац]");
             }
         }
+
+        // проверка в Темный Лабиринт
+        if (newZone == 3789)
+        {
+            switch (player->getClass())
+            {
+            case CLASS_PALADIN:
+                if (player->HasItemCount(83005, 1) && player->HasItemCount(83006, 1) && player->HasItemCount(83009, 1) && player->HasItemCount(70816, 1) || player->HasItemCount(100506, 1) || player->IsGameMaster())
+                {
+                    if (!player->HasItemCount(100506, 1))
+                    {
+                        player->AddItem(100506, 1);
+                    }
+                }
+                else
+                {
+                    player->TeleportTo(530, -3613.614258f, 4932.460938f, -100.278839f, 2.277619f);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо иметь 3 вещи [Грудь, Руки, Ноги] из сета [Крепости Бурь] и хотя-бы одну [Сумку Захватчика]");
+                }
+                break;
+            case CLASS_WARRIOR:
+                if (player->HasItemCount(83000, 1) && player->HasItemCount(83001, 1) && player->HasItemCount(83003, 1) && player->HasItemCount(70816, 1) || player->HasItemCount(100506, 1) || player->IsGameMaster())
+                {
+                    if (!player->HasItemCount(100506, 1))
+                    {
+                        player->AddItem(100506, 1);
+                    }
+                }
+                else
+                {
+                    player->TeleportTo(530, -3613.614258f, 4932.460938f, -100.278839f, 2.277619f);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо иметь 3 вещи [Грудь, Руки, Ноги] из сета [Крепости Бурь] и хотя-бы одну [Сумку Захватчика]");
+                }
+                break;
+            case CLASS_HUNTER:
+                if (player->HasItemCount(81020, 1) && player->HasItemCount(81021, 1) && player->HasItemCount(81023, 1) && player->HasItemCount(70817, 1) || player->HasItemCount(100506, 1) || player->IsGameMaster())
+                {
+                    if (!player->HasItemCount(100506, 1))
+                    {
+                        player->AddItem(100506, 1);
+                    }
+                }
+                else
+                {
+                    player->TeleportTo(530, -3613.614258f, 4932.460938f, -100.278839f, 2.277619f);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо иметь 3 вещи [Грудь, Руки, Ноги] из сета [Крепости Бурь] и хотя-бы одну [Сумку Захватчика]");
+                }
+                break;
+            case CLASS_ROGUE:
+                if (player->HasItemCount(81040, 1) && player->HasItemCount(81041, 1) && player->HasItemCount(81043, 1) && player->HasItemCount(70817, 1) || player->HasItemCount(100506, 1) || player->IsGameMaster())
+                {
+                    if (!player->HasItemCount(100506, 1))
+                    {
+                        player->AddItem(100506, 1);
+                    }
+                }
+                else
+                {
+                    player->TeleportTo(530, -3613.614258f, 4932.460938f, -100.278839f, 2.277619f);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо иметь 3 вещи [Грудь, Руки, Ноги] из сета [Крепости Бурь] и хотя-бы одну [Сумку Захватчика]");
+                }
+                break;
+            case CLASS_PRIEST:
+                if (player->HasItemCount(81060, 1) && player->HasItemCount(81061, 1) && player->HasItemCount(81063, 1) && player->HasItemCount(70818, 1) || player->HasItemCount(100506, 1) || player->IsGameMaster())
+                {
+                    if (!player->HasItemCount(100506, 1))
+                    {
+                        player->AddItem(100506, 1);
+                    }
+                }
+                else
+                {
+                    player->TeleportTo(530, -3613.614258f, 4932.460938f, -100.278839f, 2.277619f);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо иметь 3 вещи [Грудь, Руки, Ноги] из сета [Крепости Бурь] и хотя-бы одну [Сумку Захватчика]");
+                }
+                break;
+            case CLASS_DEATH_KNIGHT:
+                if (player->HasItemCount(81015, 1) && player->HasItemCount(81016, 1) && player->HasItemCount(81018, 1) && player->HasItemCount(70816, 1) || player->HasItemCount(100506, 1) || player->IsGameMaster())
+                {
+                    if (!player->HasItemCount(100506, 1))
+                    {
+                        player->AddItem(100506, 1);
+                    }
+                }
+                else
+                {
+                    player->TeleportTo(530, -3613.614258f, 4932.460938f, -100.278839f, 2.277619f);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо иметь 3 вещи [Грудь, Руки, Ноги] из сета [Крепости Бурь] и хотя-бы одну [Сумку Захватчика]");
+                }
+                break;
+            case CLASS_SHAMAN:
+                if ((player->HasItemCount(81025, 1) && player->HasItemCount(81026, 1) && player->HasItemCount(81028, 1) && player->HasItemCount(70817, 1)) || (player->HasItemCount(81035, 1) && player->HasItemCount(81036, 1) && player->HasItemCount(81038, 1) && player->HasItemCount(70818, 1)) || player->HasItemCount(100506, 1) || player->GetSession()->GetSecurity())
+                {
+                    if (!player->HasItemCount(100506, 1))
+                    {
+                        player->AddItem(100506, 1);
+                    }
+                }
+                else
+                {
+                    player->TeleportTo(530, -3613.614258f, 4932.460938f, -100.278839f, 2.277619f);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо иметь 3 вещи [Грудь, Руки, Ноги] из сета [Крепости Бурь] и хотя-бы одну [Сумку Захватчика]");
+                }
+                break;
+            case CLASS_MAGE:
+                if (player->HasItemCount(81075, 1) && player->HasItemCount(81076, 1) && player->HasItemCount(81078, 1) && player->HasItemCount(70818, 1) || player->HasItemCount(100506, 1) || player->IsGameMaster())
+                {
+                    if (!player->HasItemCount(100506, 1))
+                    {
+                        player->AddItem(100506, 1);
+                    }
+                }
+                else
+                {
+                    player->TeleportTo(530, -3613.614258f, 4932.460938f, -100.278839f, 2.277619f);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо иметь 3 вещи [Грудь, Руки, Ноги] из сета [Крепости Бурь] и хотя-бы одну [Сумку Захватчика]");
+                }
+                break;
+            case CLASS_WARLOCK:
+                if (player->HasItemCount(81070, 1) && player->HasItemCount(81071, 1) && player->HasItemCount(81073, 1) && player->HasItemCount(70818, 1) || player->HasItemCount(100506, 1) || player->IsGameMaster())
+                {
+                    if (!player->HasItemCount(100506, 1))
+                    {
+                        player->AddItem(100506, 1);
+                    }
+                }
+                else
+                {
+                    player->TeleportTo(530, -3613.614258f, 4932.460938f, -100.278839f, 2.277619f);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо иметь 3 вещи [Грудь, Руки, Ноги] из сета [Крепости Бурь] и хотя-бы одну [Сумку Захватчика]");
+                }
+                break;
+            case CLASS_DRUID:
+                if ((player->HasItemCount(81045, 1) && player->HasItemCount(81046, 1) && player->HasItemCount(81048, 1) && player->HasItemCount(70817, 1)) || (player->HasItemCount(81050, 1) && player->HasItemCount(81051, 1) && player->HasItemCount(81053, 1) && player->HasItemCount(70818, 1)) || player->HasItemCount(100506, 1) || player->GetSession()->GetSecurity())
+                {
+                    if (!player->HasItemCount(100506, 1))
+                    {
+                        player->AddItem(100506, 1);
+                    }
+                }
+                else
+                {
+                    player->TeleportTo(530, -3613.614258f, 4932.460938f, -100.278839f, 2.277619f);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо иметь 3 вещи [Грудь, Руки, Ноги] из сета [Крепости Бурь] и хотя-бы одну [Сумку Захватчика]");
+                }
+                break;
+
+            default:
+                break;
+            }
+        }
+
+        // проверка ледяные залы
+        if (newArea == 4862)
+        {
+            if (!player->GetQuestRewardStatus(20405) || player->GetSession()->GetSecurity()) {
+                player->TeleportTo(571, 6233.549805f, 5767.120117f, -4.162460f, 0.696379f);
+                ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо выполнить задание [Доступ в Ледяные Залы]");
+            }
+        }
     }
 };
 
