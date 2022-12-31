@@ -6793,7 +6793,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         {
             Player* checkPlayer = this;
             std::vector<const ProgressionRequirement*>* missingAchievements = &missingPlayerAchievements;
-            if(achievementRequirement->checkLeaderOnly)
+            if (achievementRequirement->checkLeaderOnly)
             {
                 checkPlayer = partyLeader;
                 missingAchievements = &missingLeaderAchievements;
@@ -6859,15 +6859,20 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     //Just print out the requirements are not met
                     ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_NOT_MET);
                 }
-                else if(requirementPrintMode == 1)
+                else if (requirementPrintMode == 1)
                 {
                     //Blizzlike method of printing out the requirements
-                    if (missingLeaderQuests.size() && !missingLeaderQuests[0]->note.empty())
+                    if (missingPlayerQuests.size() && !missingPlayerQuests[0]->note.empty())
+                    {
+                        ChatHandler(GetSession()).PSendSysMessage("%s", missingPlayerQuests[0]->note.c_str());
+                    }
+                    else if (missingLeaderQuests.size() && !missingLeaderQuests[0]->note.empty())
                     {
                         ChatHandler(GetSession()).PSendSysMessage("%s", missingLeaderQuests[0]->note.c_str());
                     }
                     else if (mapDiff->hasErrorMessage)
-                    { // if (missingAchievement) covered by this case
+                    {
+                        // if (missingAchievement) covered by this case
                         SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
                     }
                     else if (missingPlayerItems.size())

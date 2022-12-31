@@ -131,7 +131,7 @@ enum SMART_EVENT
     SMART_EVENT_VICTIM_CASTING           = 13,      // RepeatMin, RepeatMax, spellid
     SMART_EVENT_FRIENDLY_HEALTH          = 14,      // HPDeficit, Radius, RepeatMin, RepeatMax
     SMART_EVENT_FRIENDLY_IS_CC           = 15,      // Radius, RepeatMin, RepeatMax
-    SMART_EVENT_FRIENDLY_MISSING_BUFF    = 16,      // SpellId, Radius, RepeatMin, RepeatMax
+    SMART_EVENT_FRIENDLY_MISSING_BUFF    = 16,      // SpellId, Radius, RepeatMin, RepeatMax, onlyInCombat
     SMART_EVENT_SUMMONED_UNIT            = 17,      // CreatureId(0 all), CooldownMin, CooldownMax
     SMART_EVENT_TARGET_MANA_PCT          = 18,      // ManaMin%, ManaMax%, RepeatMin, RepeatMax
     SMART_EVENT_ACCEPTED_QUEST           = 19,      // QuestID (0 = any), CooldownMin, CooldownMax
@@ -194,9 +194,14 @@ enum SMART_EVENT
     SMART_EVENT_DISTANCE_GAMEOBJECT      = 76,      // guid, entry, distance, repeat
     SMART_EVENT_COUNTER_SET              = 77,      // id, value, cooldownMin, cooldownMax
 
-    SMART_EVENT_TC_END                   = 78,
+    SMART_EVENT_SCENE_START              = 78,      // don't use on 3.3.5a
+    SMART_EVENT_SCENE_TRIGGER            = 79,      // don't use on 3.3.5a
+    SMART_EVENT_SCENE_CANCEL             = 80,      // don't use on 3.3.5a
+    SMART_EVENT_SCENE_COMPLETE           = 81,      // don't use on 3.3.5a
 
     SMART_EVENT_SUMMONED_UNIT_DIES       = 82,      // CreatureId(0 all), CooldownMin, CooldownMax
+
+    SMART_EVENT_TC_END                   = 83,
 
     /* AC Custom Events */
     SMART_EVENT_AC_START                 = 100,
@@ -301,6 +306,7 @@ struct SmartEvent
             uint32 radius;
             uint32 repeatMin;
             uint32 repeatMax;
+            uint32 onlyInCombat;
         } missingBuff;
 
         struct
