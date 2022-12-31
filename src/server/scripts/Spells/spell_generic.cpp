@@ -273,10 +273,10 @@ class spell_gen_reduced_above_60 : public SpellScript
     void RecalculateDamage()
     {
         if (Unit* target = GetHitUnit())
-            if (target->getLevel() > 60)
+            if (target->GetLevel() > 60)
             {
                 int32 damage = GetHitDamage();
-                AddPct(damage, -4 * int8(std::min(target->getLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
+                AddPct(damage, -4 * int8(std::min(target->GetLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
                 SetHitDamage(damage);
             }
     }
@@ -294,8 +294,8 @@ class spell_gen_reduced_above_60_aura : public AuraScript
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool&   /*canBeRecalculated*/)
     {
         if (Unit* owner = GetUnitOwner())
-            if (owner->getLevel() > 60)
-                AddPct(amount, -4 * int8(std::min(owner->getLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
+            if (owner->GetLevel() > 60)
+                AddPct(amount, -4 * int8(std::min(owner->GetLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
     }
 
     void Register() override
@@ -417,7 +417,7 @@ public:
     SpellCastResult CheckRequirement()
     {
         if (Unit* target = GetExplTargetUnit())
-            if (target->getLevel() >= _level)
+            if (target->GetLevel() >= _level)
                 return SPELL_FAILED_DONT_REPORT;
 
         return SPELL_CAST_OK;
@@ -587,8 +587,8 @@ class spell_gen_disabled_above_63 : public AuraScript
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool&   /*canBeRecalculated*/)
     {
         Unit* target = GetUnitOwner();
-        if (target->getLevel() <= 63)
-            amount = amount * target->getLevel() / 60;
+        if (target->GetLevel() <= 63)
+            amount = amount * target->GetLevel() / 60;
         else
             SetDuration(1);
     }
@@ -693,7 +693,7 @@ class spell_gen_use_spell_base_level_check : public SpellScript
 
     SpellCastResult CheckRequirement()
     {
-        if (GetCaster()->getLevel() < GetSpellInfo()->BaseLevel)
+        if (GetCaster()->GetLevel() < GetSpellInfo()->BaseLevel)
             return SPELL_FAILED_LEVEL_REQUIREMENT;
         return SPELL_CAST_OK;
     }
@@ -857,7 +857,7 @@ class spell_gen_proc_above_75 : public SpellScript
     SpellCastResult CheckLevel()
     {
         Unit* caster = GetCaster();
-        if (caster->getLevel() < 75)
+        if (caster->GetLevel() < 75)
         {
             return SPELL_FAILED_LOWLEVEL;
         }
@@ -934,8 +934,8 @@ class spell_gen_proc_reduced_above_60 : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         // Xinef: mostly its 33.(3)% reduce by 70 and 66.(6)% by 80
-        if (eventInfo.GetActor() && eventInfo.GetActor()->getLevel() > 60)
-            if (roll_chance_f((eventInfo.GetActor()->getLevel() - 60) * 3.33f))
+        if (eventInfo.GetActor() && eventInfo.GetActor()->GetLevel() > 60)
+            if (roll_chance_f((eventInfo.GetActor()->GetLevel() - 60) * 3.33f))
                 return false;
 
         return true;
