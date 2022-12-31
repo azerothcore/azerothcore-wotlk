@@ -10223,7 +10223,8 @@ void bot_ai::_autoLootCreatureItems(Player* receiver, Creature* creature, uint32
         {
             //TC_LOG_ERROR("scripts", "looting %s (%u), quality %u, threshold %u",
             //    itemProto->Name1.c_str(), itemProto->ItemId, itemProto->Quality, lootThreshold);
-            receiver->StoreLootItem(slot - 1, &creature->loot);
+            InventoryResult msg;
+            receiver->StoreLootItem(slot - 1, &creature->loot, msg);
         }
     }
 
@@ -10260,7 +10261,10 @@ void bot_ai::_autoLootCreatureItems(Player* receiver, Creature* creature, uint32
             uint8 qslot = uint8(creature->loot.items.size() + (qi - q_list->begin()));
 
             if (_canLootItemForPlayer(receiver, creature, qslot) && i->AllowedForPlayer(receiver, creature->GetGUID()))
-                receiver->StoreLootItem(qslot, &creature->loot);
+            {
+                InventoryResult msg;
+                receiver->StoreLootItem(qslot, &creature->loot, msg);
+            }
         }
     }
     if (creature->loot.isLooted())
