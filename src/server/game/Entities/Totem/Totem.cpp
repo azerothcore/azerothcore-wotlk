@@ -101,14 +101,28 @@ void Totem::InitSummon()
     Minion::InitSummon();
 
     if (m_type == TOTEM_PASSIVE && GetSpell())
-        CastSpell(this, GetSpell(), true);
+    {
+        if (TotemSpellIds(GetUInt32Value(UNIT_CREATED_BY_SPELL)) == TotemSpellIds::FireTotemSpell)
+        {
+            m_Events.AddEventAtOffset([this]()
+            {
+                CastSpell(this, GetSpell(), true);
+            }, 4s);
+        }
+        else
+        {
+            CastSpell(this, GetSpell(), true);
+        }
+    }
 
     // Some totems can have both instant effect and passive spell
-    if(GetSpell(1))
+    if (GetSpell(1))
+    {
         CastSpell(this, GetSpell(1), true);
+    }
 
     // xinef: this is better than the script, 100% sure to work
-    if(GetEntry() == SENTRY_TOTEM_ENTRY)
+    if (GetEntry() == SENTRY_TOTEM_ENTRY)
     {
         SetReactState(REACT_AGGRESSIVE);
         GetOwner()->CastSpell(this, 6277, true);
@@ -151,7 +165,7 @@ void Totem::UnSummon(uint32 msTime)
 
         // Remove Sentry Totem Aura
         if (GetEntry() == SENTRY_TOTEM_ENTRY)
-            owner->RemoveAurasDueToSpell(SENTRY_TOTEM_SPELLID);
+            owner->RemoveAurasDueToSpell(static_cast<uint32>(TotemSpellIds::SentryTotemSpell));
 
         //remove aura all party members too
         if (Player* player = owner->ToPlayer())

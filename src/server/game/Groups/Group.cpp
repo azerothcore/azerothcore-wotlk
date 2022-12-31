@@ -2354,6 +2354,11 @@ bool Group::IsCreated() const
     return GetMembersCount() > 0;
 }
 
+GroupType Group::GetGroupType() const
+{
+    return m_groupType;
+}
+
 ObjectGuid Group::GetLeaderGUID() const
 {
     return m_leaderGuid;
