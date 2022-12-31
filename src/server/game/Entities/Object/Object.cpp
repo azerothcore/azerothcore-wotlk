@@ -2361,7 +2361,7 @@ Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, uint3
     if (setLevel && (GetTypeId() == TYPEID_PLAYER || GetTypeId() == TYPEID_UNIT))
     {
         summon->SetFaction(((Unit*)this)->GetFaction());
-        summon->SetLevel(((Unit*)this)->getLevel());
+        summon->SetLevel(((Unit*)this)->GetLevel());
     }
 
     // Xinef: correctly set phase mask in case of gameobjects
