@@ -1,18 +1,18 @@
 DROP TABLE IF EXISTS `player_levelstats`;
-DROP TABLE IF EXISTS `player_classstats`;
-CREATE TABLE IF NOT EXISTS `player_classstats`  (
-  `class` TINYINT unsigned NOT NULL,
-  `level` TINYINT unsigned NOT NULL,
-  `str` INT unsigned NOT NULL DEFAULT '0',
-  `agi` INT unsigned NOT NULL DEFAULT '0',
-  `sta` INT unsigned NOT NULL DEFAULT '0',
-  `inte` INT unsigned NOT NULL DEFAULT '0',
-  `spi` INT unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`class`,`level`)
+DROP TABLE IF EXISTS `player_class_stats`;
+CREATE TABLE IF NOT EXISTS `player_class_stats`  (
+  `Class` TINYINT unsigned NOT NULL,
+  `Level` TINYINT unsigned NOT NULL,
+  `Strength` INT unsigned NOT NULL DEFAULT '0',
+  `Agility` INT unsigned NOT NULL DEFAULT '0',
+  `Stamina` INT unsigned NOT NULL DEFAULT '0',
+  `Intellect` INT unsigned NOT NULL DEFAULT '0',
+  `Spirit` INT unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`Class`,`Level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores levels stats.';
 
-DELETE FROM `player_classstats`;
-INSERT INTO `player_classstats` (`class`, `level`, `str`, `agi`, `sta`, `inte`, `spi`) VALUES
+DELETE FROM `player_class_stats`;
+INSERT INTO `player_class_stats` (`Class`, `Level`, `Strength`, `Agility`, `Stamina`, `Intellect`, `Spirit`) VALUES
 (1, 1, 23, 20, 22, 20, 20),
 (1, 2, 24, 21, 23, 20, 20),
 (1, 3, 25, 21, 24, 20, 21),
@@ -814,19 +814,19 @@ INSERT INTO `player_classstats` (`class`, `level`, `str`, `agi`, `sta`, `inte`, 
 (11, 79, 88, 81, 96, 141, 156),
 (11, 80, 89, 82, 98, 143, 159);
 
-DROP TABLE IF EXISTS `player_racestats`;
-CREATE TABLE IF NOT EXISTS `player_racestats` (
-	`race` TINYINT unsigned NOT NULL,
-	`str` INT NOT NULL DEFAULT '0',
-	`agi` INT NOT NULL DEFAULT '0',
-	`sta` INT NOT NULL DEFAULT '0',
-	`inte` INT NOT NULL DEFAULT '0',
-	`spi` INT NOT NULL DEFAULT '0',
-	PRIMARY KEY (`race`)
+DROP TABLE IF EXISTS `player_race_stats`;
+CREATE TABLE IF NOT EXISTS `player_race_stats` (
+	`Race` TINYINT unsigned NOT NULL,
+	`Strength` INT NOT NULL DEFAULT '0',
+	`Agility` INT NOT NULL DEFAULT '0',
+	`Stamina` INT NOT NULL DEFAULT '0',
+	`Intellect` INT NOT NULL DEFAULT '0',
+	`Spirit` INT NOT NULL DEFAULT '0',
+	PRIMARY KEY (`Race`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores race stats.';
 
-DELETE FROM `player_racestats`;
-INSERT INTO `player_racestats` (`race`, `str`, `agi`, `sta`, `inte`, `spi`) VALUES
+DELETE FROM `player_race_stats`;
+INSERT INTO `player_race_stats` (`Race`, `Strength`, `Agility`, `Stamina`, `Intellect`, `Spirit`) VALUES
 (1, 0, 0, 0, 0, 0),
 (2, 3, -3, 1, -3, 2),
 (3, 5, -4, 1, -1, -1),

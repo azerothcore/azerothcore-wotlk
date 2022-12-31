@@ -4025,12 +4025,12 @@ void ObjectMgr::LoadPlayerInfo()
 
         uint32 oldMSTime = getMSTime();
 
-        //                                                          0     1    2    3    4     5
-        QueryResult raceStatsResult  = WorldDatabase.Query("SELECT race, str, agi, sta, inte, spi FROM player_racestats");
+        //                                                          0       1         2        3         4        5
+        QueryResult raceStatsResult  = WorldDatabase.Query("SELECT Race, Strength, Agility, Stamina, Intellect, Spirit FROM player_race_stats");
 
         if (!raceStatsResult)
         {
-            LOG_WARN("server.loading", ">> Loaded 0 race stats definitions. DB table `player_racestats` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 race stats definitions. DB table `player_race_stats` is empty.");
             LOG_INFO("server.loading", " ");
             exit(1);
         }
@@ -4042,7 +4042,7 @@ void ObjectMgr::LoadPlayerInfo()
             uint32 current_race = fields[0].Get<uint8>();
             if (current_race >= MAX_RACES)
             {
-                LOG_ERROR("sql.sql", "Wrong race {} in `player_racestats` table, ignoring.", current_race);
+                LOG_ERROR("sql.sql", "Wrong race {} in `player_race_stats` table, ignoring.", current_race);
                 continue;
             }
 
@@ -4051,12 +4051,12 @@ void ObjectMgr::LoadPlayerInfo()
 
         } while (raceStatsResult->NextRow());
 
-        //                                                 0      1     2    3    4    5     6
-        QueryResult result = WorldDatabase.Query("SELECT class, level, str, agi, sta, inte, spi FROM player_classstats");
+        //                                                 0      1       2         3        4         5        6
+        QueryResult result = WorldDatabase.Query("SELECT Class, Level, Strength, Agility, Stamina, Intellect, Spirit FROM player_class_stats");
 
         if (!result)
         {
-            LOG_ERROR("server.loading", ">> Loaded 0 level stats definitions. DB table `player_classstats` is empty.");
+            LOG_ERROR("server.loading", ">> Loaded 0 level stats definitions. DB table `player_class_stats` is empty.");
             exit(1);
         }
 
@@ -4069,7 +4069,7 @@ void ObjectMgr::LoadPlayerInfo()
             uint32 current_class = fields[0].Get<uint8>();
             if (current_class >= MAX_CLASSES)
             {
-                LOG_ERROR("sql.sql", "Wrong class {} in `player_classstats` table, ignoring.", current_class);
+                LOG_ERROR("sql.sql", "Wrong class {} in `player_class_stats` table, ignoring.", current_class);
                 continue;
             }
 
@@ -4077,9 +4077,9 @@ void ObjectMgr::LoadPlayerInfo()
             if (current_level > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
             {
                 if (current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
-                    LOG_ERROR("sql.sql", "Wrong (> {}) level {} in `player_classstats` table, ignoring.", STRONG_MAX_LEVEL, current_level);
+                    LOG_ERROR("sql.sql", "Wrong (> {}) level {} in `player_class_stats` table, ignoring.", STRONG_MAX_LEVEL, current_level);
                 else
-                    LOG_DEBUG("sql.sql", "Unused (> MaxPlayerLevel in worldserver.conf) level {} in `player_levelstats` table, ignoring.", current_level);
+                    LOG_DEBUG("sql.sql", "Unused (> MaxPlayerLevel in worldserver.conf) level {} in `player_class_stats` table, ignoring.", current_level);
 
                 continue;
             }
