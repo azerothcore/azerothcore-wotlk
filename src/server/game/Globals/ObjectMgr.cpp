@@ -3567,13 +3567,13 @@ void ObjectMgr::LoadPlayerInfo()
                 float  orientation = fields[7].Get<float>();
                 ChrRacesEntry const* rEntry;
 
-                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
+                if (raceMask && !(raceMask & RACEMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong race mask {} in `playercreateinfo` table, ignoring.", raceMask);
                     continue;
                 }
 
-                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                if (classMask && !(classMask & CLASSMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo` table, ignoring.", classMask);
                     continue;
@@ -3595,11 +3595,11 @@ void ObjectMgr::LoadPlayerInfo()
                 PlayerInfo* info = new PlayerInfo();
                 for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
                 {
-                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    if (!raceMask || ((1 << (raceIndex - 1)) & raceMask))
                     {
                         for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
                         {
-                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            if (!classMask || ((1 << (classIndex - 1)) & classMask))
                             {
                                 rEntry = sChrRacesStore.LookupEntry(raceIndex);
                                 info->mapId = mapId;
@@ -3648,13 +3648,13 @@ void ObjectMgr::LoadPlayerInfo()
                 uint32 item_id = fields[2].Get<uint32>();
                 int32 amount = fields[3].Get<int32>();
 
-                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
+                if (raceMask && !(raceMask & RACEMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong race mask {} in `playercreateinfo_item` table, ignoring.", raceMask);
                     continue;
                 }
 
-                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                if (classMask && !(classMask & CLASSMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo_item` table, ignoring.", classMask);
                     continue;
@@ -3674,11 +3674,11 @@ void ObjectMgr::LoadPlayerInfo()
 
                 for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
                 {
-                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    if (!raceMask || ((1 << (raceIndex - 1)) & raceMask))
                     {
                         for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
                         {
-                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            if (!classMask || ((1 << (classIndex - 1)) & classMask))
                             {
                                 if (!raceIndex || !classIndex)
                                 {
@@ -3735,13 +3735,13 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
+                if (raceMask && !(raceMask & RACEMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong race mask {} in `playercreateinfo_skills` table, ignoring.", raceMask);
                     continue;
                 }
 
-                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                if (classMask && !(classMask & CLASSMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo_skills` table, ignoring.", classMask);
                     continue;
@@ -3755,11 +3755,11 @@ void ObjectMgr::LoadPlayerInfo()
 
                 for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
                 {
-                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    if (!raceMask || ((1 << (raceIndex - 1)) & raceMask))
                     {
                         for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
                         {
-                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            if (!classMask || ((1 << (classIndex - 1)) & classMask))
                             {
                                 if (!GetSkillRaceClassInfo(skill.SkillId, raceIndex, classIndex))
                                     continue;
@@ -3802,13 +3802,13 @@ void ObjectMgr::LoadPlayerInfo()
                 uint32 classMask = fields[1].Get<uint32>();
                 uint32 spellId = fields[2].Get<uint32>();
 
-                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
+                if (raceMask && !(raceMask & RACEMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong race mask {} in `playercreateinfo_spell_custom` table, ignoring.", raceMask);
                     continue;
                 }
 
-                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                if (classMask && !(classMask & CLASSMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo_spell_custom` table, ignoring.", classMask);
                     continue;
@@ -3816,11 +3816,11 @@ void ObjectMgr::LoadPlayerInfo()
 
                 for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
                 {
-                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    if (!raceMask || ((1 << (raceIndex - 1)) & raceMask))
                     {
                         for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
                         {
-                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            if (!classMask || ((1 << (classIndex - 1)) & classMask))
                             {
                                 if (PlayerInfo* info = _playerInfo[raceIndex][classIndex])
                                 {
@@ -3860,13 +3860,13 @@ void ObjectMgr::LoadPlayerInfo()
                 uint32 classMask = fields[1].Get<uint32>();
                 uint32 spellId   = fields[2].Get<uint32>();
 
-                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
+                if (raceMask && !(raceMask & RACEMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong race mask {} in `playercreateinfo_cast_spell` table, ignoring.", raceMask);
                     continue;
                 }
 
-                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                if (classMask && !(classMask & CLASSMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo_cast_spell` table, ignoring.", classMask);
                     continue;
@@ -3874,11 +3874,11 @@ void ObjectMgr::LoadPlayerInfo()
 
                 for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
                 {
-                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    if (!raceMask || ((1 << (raceIndex - 1)) & raceMask))
                     {
                         for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
                         {
-                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            if (!classMask || ((1 << (classIndex - 1)) & classMask))
                             {
                                 if (PlayerInfo* info = _playerInfo[raceIndex][classIndex])
                                 {
@@ -3921,13 +3921,13 @@ void ObjectMgr::LoadPlayerInfo()
                 uint32 classMask = fields[1].Get<uint32>();
                 PlayerInfo* info;
 
-                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
+                if (raceMask && !(raceMask & RACEMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong race mask {} in `playercreateinfo_action` table, ignoring.", raceMask);
                     continue;
                 }
 
-                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                if (classMask && !(classMask & CLASSMASK_ALL_PLAYABLE))
                 {
                     LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo_action` table, ignoring.", classMask);
                     continue;
@@ -3935,11 +3935,11 @@ void ObjectMgr::LoadPlayerInfo()
 
                 for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
                 {
-                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    if (!raceMask || ((1 << (raceIndex - 1)) & raceMask))
                     {
                         for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
                         {
-                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            if (!classMask || ((1 << (classIndex - 1)) & classMask))
                             {
                                 info = _playerInfo[raceIndex][classIndex];
                                 info->action.push_back(PlayerCreateInfoAction(fields[2].Get<uint16>(), fields[3].Get<uint32>(), fields[4].Get<uint16>()));
