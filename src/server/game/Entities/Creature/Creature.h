@@ -152,7 +152,7 @@ public:
 
     [[nodiscard]] uint32 GetShieldBlockValue() const override
     {
-        return (getLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
+        return (GetLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
     }
 
     [[nodiscard]] SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType /*attackType*/ = BASE_ATTACK, uint8 /*damageIndex*/ = 0) const override { return m_meleeDamageSchoolMask; }
