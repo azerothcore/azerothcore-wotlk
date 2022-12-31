@@ -3540,8 +3540,8 @@ void ObjectMgr::LoadPlayerInfo()
     // Load playercreate
     {
         uint32 oldMSTime = getMSTime();
-        //                                                  0          1       2    3      4      5      6         7
-        QueryResult result = WorldDatabase.Query("SELECT RaceMask, ClassMask, Map, Zone, Position_X, Position_Y, Position_Z, Orientation FROM playercreateinfo");
+        //                                                  0          1       2    3        4          5          6           7
+        QueryResult result = WorldDatabase.Query("SELECT RaceMask, ClassMask, Map, Zone, PositionX, PositionY, PositionZ, Orientation FROM playercreateinfo");
 
         if (!result)
         {

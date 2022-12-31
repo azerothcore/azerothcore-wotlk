@@ -3,10 +3,10 @@ ALTER TABLE `playercreateinfo`
 	CHANGE COLUMN `class` `ClassMask` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `RaceMask`,
 	CHANGE COLUMN `map` `Map` SMALLINT UNSIGNED NOT NULL DEFAULT '0' AFTER `ClassMask`,
 	CHANGE COLUMN `zone` `Zone` MEDIUMINT UNSIGNED NOT NULL DEFAULT '0' AFTER `Map`,
-	CHANGE COLUMN `position_x` `Position_X` FLOAT NOT NULL DEFAULT '0' AFTER `Zone`,
-	CHANGE COLUMN `position_y` `Position_Y` FLOAT NOT NULL DEFAULT '0' AFTER `Position_X`,
-	CHANGE COLUMN `position_z` `Position_Z` FLOAT NOT NULL DEFAULT '0' AFTER `Position_Y`,
-	CHANGE COLUMN `orientation` `Orientation` FLOAT NOT NULL DEFAULT '0' AFTER `Position_Z`,
+	CHANGE COLUMN `position_x` `PositionX` FLOAT NOT NULL DEFAULT '0' AFTER `Zone`,
+	CHANGE COLUMN `position_y` `PositionY` FLOAT NOT NULL DEFAULT '0' AFTER `PositionX`,
+	CHANGE COLUMN `position_z` `PositionZ` FLOAT NOT NULL DEFAULT '0' AFTER `PositionY`,
+	CHANGE COLUMN `orientation` `Orientation` FLOAT NOT NULL DEFAULT '0' AFTER `PositionZ`,
 	DROP PRIMARY KEY,
 	ADD PRIMARY KEY (`RaceMask`, `ClassMask`) USING BTREE;
 
@@ -32,7 +32,7 @@ ALTER TABLE `playercreateinfo_item`
 	ADD INDEX `playercreateinfo_race_class_index` (`RaceMask`, `ClassMask`) USING BTREE;
 
 DELETE FROM `playercreateinfo`;
-INSERT INTO `playercreateinfo` (`RaceMask`, `ClassMask`, `Map`, `Zone`, `Position_X`, `Position_Y`, `Position_Z`, `Orientation`) VALUES
+INSERT INTO `playercreateinfo` (`RaceMask`, `ClassMask`, `Map`, `Zone`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`) VALUES
 (1, 411, 0, 12, -8949.95, -132.493, 83.5312, 0),
 (2, 333, 1, 14, -618.518, -4251.67, 38.718, 0),
 (4, 31, 0, 1, -6240.32, 331.033, 382.758, 6.17716),
