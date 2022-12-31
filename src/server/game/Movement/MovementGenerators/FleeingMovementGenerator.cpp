@@ -36,6 +36,7 @@ void FleeingMovementGenerator<T>::DoInitialize(T* owner)
         return;
     }
 
+    owner->StopMoving();
     _path = nullptr;
     owner->SetUnitFlag(UNIT_FLAG_FLEEING);
     owner->AddUnitState(UNIT_STATE_FLEEING);
