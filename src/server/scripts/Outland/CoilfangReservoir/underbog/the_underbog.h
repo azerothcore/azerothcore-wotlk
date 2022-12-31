@@ -22,10 +22,17 @@
 
 #define TheUnderbogScriptName "instance_the_underbog"
 
+enum NPCs
+{
+    NPC_GHAZAN      = 18105
+};
+
 template <class AI, class T>
 inline AI* GetTheUnderbogAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TheUnderbogScriptName);
 }
+
+#define RegisterUnderbogCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTheUnderbogAI)
 
 #endif // the_underbog_h__

@@ -4441,6 +4441,20 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ExcludeTargetAuraSpell = 51120;
     });
 
+    // Slap!
+    ApplySpellFix({ 6754 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
+    // Summon Cauldron Stuff
+    ApplySpellFix({ 36549 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(28); // 5 seconds
+        spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_CASTER;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
