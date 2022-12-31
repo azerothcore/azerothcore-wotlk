@@ -4455,6 +4455,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_CASTER;
     });
 
+    // Hammer of Justice
+    // Sonic Burst
+    // Concussion Blow
+    ApplySpellFix({ 5589, 8281,13005, 22427 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
