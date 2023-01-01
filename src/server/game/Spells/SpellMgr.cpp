@@ -81,6 +81,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
                 // Screams of the Past
                 else if (spellproto->Id == 7074)
                     return DIMINISHING_NONE;
+                // Swoop
+                else if (spellproto->Id == 37012)
+                    return DIMINISHING_NONE;
                 break;
             }
         // Event spells
