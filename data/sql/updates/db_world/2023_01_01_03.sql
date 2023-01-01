@@ -1,3 +1,4 @@
+-- DB update 2023_01_01_02 -> 2023_01_01_03
 --
 DELETE FROM `smart_scripts` WHERE `entryorguid`=17826 AND `source_type`=0 AND `id`=15;
 INSERT INTO `smart_scripts` VALUES
