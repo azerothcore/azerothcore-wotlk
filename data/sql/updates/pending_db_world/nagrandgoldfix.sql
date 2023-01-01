@@ -9,3 +9,8 @@ UPDATE `creature_template` SET `mingold` = 407, `maxgold` = 1582 WHERE (`entry` 
 UPDATE `creature_template` SET `mingold` = 341, `maxgold` = 1716 WHERE (`entry` = 17138);
 UPDATE `creature_template` SET `mingold` = 457, `maxgold` = 1743 WHERE (`entry` = 18065);
 UPDATE `creature_template` SET `mingold` = 280, `maxgold` = 1639 WHERE (`entry` = 18037);
+UPDATE `creature_template` SET `mingold` = 323, `maxgold` = 1353 WHERE (`entry` = 18211);
+UPDATE `creature_template` SET `mingold` = 297, `maxgold` = 1703 WHERE (`entry` = 18202);
+UPDATE `creature_template` SET `mingold` = 107, `maxgold` = 459 WHERE (`entry` = 18207);
+UPDATE `creature_template` SET `mingold` = 497, `maxgold` = 1814 WHERE (`entry` = 18203);
+UPDATE `creature_template` SET `mingold` = 763, `maxgold` = 1101 WHERE (`entry` = 18204);
