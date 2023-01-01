@@ -1,3 +1,4 @@
+-- DB update 2023_01_01_01 -> 2023_01_01_02
 --
 DELETE FROM `prospecting_loot_template` WHERE (`Entry` = 23425);
 INSERT INTO `prospecting_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
