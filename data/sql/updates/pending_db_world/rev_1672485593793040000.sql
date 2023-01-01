@@ -78,7 +78,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2036302, 9, 7, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 91, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Caretaker Smithers - On Script - Play Emote 13'),
 (2036302, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Caretaker Smithers - On Script - Play Emote 13'),
 (2036302, 9, 9, 0, 0, 0, 100, 0, 2500, 2500, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Caretaker Smithers - On Script - Say Line 4'),
-(2036302, 9, 10, 0, 0, 0, 100, 0, 3400, 3400, 0, 0, 0, 91, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Caretaker Smithers - On Script - Play Emote 26');
+(2036302, 9, 10, 0, 0, 0, 100, 0, 3400, 3400, 0, 0, 0, 91, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Caretaker Smithers - On Script - Play Emote 26'),
 (2036302, 9, 11, 0, 0, 0, 100, 0, 3400, 3400, 0, 0, 0, 90, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Caretaker Smithers - On Script - Play Emote 26');
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 20363;
