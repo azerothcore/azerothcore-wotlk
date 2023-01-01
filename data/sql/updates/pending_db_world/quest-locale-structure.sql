@@ -1,5 +1,5 @@
 ALTER TABLE `quest_template_locale`
-	CHANGE COLUMN `locale` `Locale` VARCHAR(4) NOT NULL COLLATE 'utf8mb4_0900_ai_ci' AFTER `ID`,
+	CHANGE COLUMN `locale` `Locale` VARCHAR NOT NULL COLLATE 'utf8mb4_0900_ai_ci' AFTER `ID`,
 	CHANGE COLUMN `Title` `LogTitle` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci' AFTER `Locale`,
 	CHANGE COLUMN `Details` `QuestDescription` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci' AFTER `LogTitle`,
 	CHANGE COLUMN `Objectives` `LogDescription` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci' AFTER `QuestDescription`,
