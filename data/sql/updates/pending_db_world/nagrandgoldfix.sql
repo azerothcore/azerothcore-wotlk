@@ -14,3 +14,4 @@ UPDATE `creature_template` SET `mingold` = 297, `maxgold` = 1703 WHERE (`entry` 
 UPDATE `creature_template` SET `mingold` = 107, `maxgold` = 459 WHERE (`entry` = 18207);
 UPDATE `creature_template` SET `mingold` = 497, `maxgold` = 1814 WHERE (`entry` = 18203);
 UPDATE `creature_template` SET `mingold` = 763, `maxgold` = 1101 WHERE (`entry` = 18204);
+UPDATE `creature_template` SET `mingold` = 286, `maxgold` = 1940 WHERE (`entry` = 18043);
