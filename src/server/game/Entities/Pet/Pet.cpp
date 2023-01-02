@@ -1073,20 +1073,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 
-    //scale
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family);
-    if (cFamily && cFamily->minScale > 0.0f && petType == HUNTER_PET)
-    {
-        float scale;
-        if (GetLevel() >= cFamily->maxScaleLevel)
-            scale = 1.0f;
-        else if (GetLevel() <= cFamily->minScaleLevel)
-            scale = 0.5f;
-        else
-            scale = 0.5f + 0.5f * float(GetLevel() - cFamily->minScaleLevel) / float(cFamily->maxScaleLevel  - cFamily->minScaleLevel);
-
-        SetObjectScale(scale);
-    }
+    // scale
+    SetObjectScale(GetNativeObjectScale());
 
     // Resistance
     // xinef: hunter pets should not inherit template resistances
@@ -2438,6 +2426,25 @@ void Pet::FillPetInfo(PetStable::PetInfo* petInfo) const
 Player* Pet::GetOwner() const
 {
     return m_owner;
+}
+
+float Pet::GetNativeObjectScale() const
+{
+    CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(GetCreatureTemplate()->family);
+    if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
+    {
+        float scale;
+        if (GetLevel() >= creatureFamily->maxScaleLevel)
+            scale = creatureFamily->maxScale;
+        else if (GetLevel() <= creatureFamily->minScaleLevel)
+            scale = creatureFamily->minScale;
+        else
+            scale = creatureFamily->minScale + float(GetLevel() - creatureFamily->minScaleLevel) / creatureFamily->maxScaleLevel * (creatureFamily->maxScale - creatureFamily->minScale);
+
+        return scale;
+    }
+
+    return Guardian::GetNativeObjectScale();
 }
 
 std::string Pet::GenerateActionBarData() const
