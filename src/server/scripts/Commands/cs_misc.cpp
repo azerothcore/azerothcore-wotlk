@@ -1966,7 +1966,7 @@ public:
             accId             = playerTarget->GetSession()->GetAccountId();
             money             = playerTarget->GetMoney();
             totalPlayerTime   = playerTarget->GetTotalPlayedTime();
-            level             = playerTarget->getLevel();
+            level             = playerTarget->GetLevel();
             latency           = playerTarget->GetSession()->GetLatency();
             raceid            = playerTarget->getRace();
             classid           = playerTarget->getClass();

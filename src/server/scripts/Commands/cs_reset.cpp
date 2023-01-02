@@ -132,7 +132,7 @@ public:
         if (!HandleResetStatsOrLevelHelper(target))
             return false;
 
-        uint8 oldLevel = target->getLevel();
+        uint8 oldLevel = target->GetLevel();
 
         // set starting level
         uint32 startLevel = target->getClass() != CLASS_DEATH_KNIGHT
