@@ -2434,12 +2434,12 @@ float Pet::GetNativeObjectScale() const
     if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
     {
         float scale;
-        if (getLevel() >= creatureFamily->maxScaleLevel)
+        if (GetLevel() >= creatureFamily->maxScaleLevel)
             scale = creatureFamily->maxScale;
-        else if (getLevel() <= creatureFamily->minScaleLevel)
+        else if (GetLevel() <= creatureFamily->minScaleLevel)
             scale = creatureFamily->minScale;
         else
-            scale = creatureFamily->minScale + float(getLevel() - creatureFamily->minScaleLevel) / creatureFamily->maxScaleLevel * (creatureFamily->maxScale - creatureFamily->minScale);
+            scale = creatureFamily->minScale + float(GetLevel() - creatureFamily->minScaleLevel) / creatureFamily->maxScaleLevel * (creatureFamily->maxScale - creatureFamily->minScale);
 
         return scale;
     }
