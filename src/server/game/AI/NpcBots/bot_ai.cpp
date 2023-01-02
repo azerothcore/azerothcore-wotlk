@@ -3823,7 +3823,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
                 if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
                 {
                     if (unit->IsVisible() && unit->isTargetableForAttack(false) && me->IsValidAttackTarget(unit) &&
-                        (unit->IsInCombat() || me->IsInCombat()) && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
+                        (unit->IsInCombat() || me->IsInCombat() || master->IsInCombat()) && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
                     {
                         return { unit, unit };
                     }
@@ -3885,7 +3885,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
                 if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
                 {
                     if (unit->IsVisible() && unit->isTargetableForAttack(false) && me->IsValidAttackTarget(unit) &&
-                        (unit->IsInCombat() || me->IsInCombat()) && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
+                        (unit->IsInCombat() || me->IsInCombat() || master->IsInCombat()) && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
                     {
                         return { unit, unit };
                     }
@@ -3952,7 +3952,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
                     if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
                     {
                         if (unit->IsVisible() && unit->isTargetableForAttack(false) && me->IsValidAttackTarget(unit) &&
-                            (unit->IsInCombat() || me->IsInCombat()) && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
+                            (unit->IsInCombat() || me->IsInCombat() || master->IsInCombat()) && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
                         {
                             return { unit, unit };
                         }
