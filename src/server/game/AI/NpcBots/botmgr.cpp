@@ -1371,7 +1371,7 @@ std::string BotMgr::GetTargetIconString(uint8 icon) const
 {
     std::ostringstream ss;
     ss << "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_" << uint32(icon) << ":12|t";
-    if (icon - 1 < TargetIconNamesCacheSize)
+    if (size_t(icon - 1) < TargetIconNamesCacheSize)
         ss << _targetIconNamesCache[icon - 1];
 
     return ss.str();
