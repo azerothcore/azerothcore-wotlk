@@ -132,6 +132,14 @@ public:
                 BossAI::EnterEvadeMode();
         }
 
+        void SetData(uint32 type, uint32 data) override
+        {
+            if (type == 0 && data == 1)
+            {
+                summons.DoZoneInCombat(NPC_HELLFIRE_SENTRY);
+            }
+        }
+
         void UpdateAI(uint32  /*diff*/) override
         {
             if (!me->IsVisible() && summons.size() == 0)
@@ -265,6 +273,7 @@ public:
         void Reset() override
         {
             events.Reset();
+            _nazanCalled = false;
         }
 
         void EnterEvadeMode(EvadeReason /*why*/) override
@@ -288,9 +297,17 @@ public:
             }
         }
 
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        {
+            if (!_nazanCalled && me->HealthBelowPctDamaged(35, damage))
+            {
+                _nazanCalled = true;
+                me->CastSpell(me, SPELL_CALL_NAZAN, true);
+            }
+        }
+
         void JustDied(Unit*) override
         {
-            me->CastSpell(me, SPELL_CALL_NAZAN, true);
             Talk(SAY_DIE);
         }
 
@@ -316,6 +333,7 @@ public:
 
     private:
         EventMap events;
+        bool _nazanCalled;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

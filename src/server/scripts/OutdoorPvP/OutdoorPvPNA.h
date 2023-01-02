@@ -324,6 +324,8 @@ public:
 
     void HandleKillImpl(Player* player, Unit* killed) override;
 
+    OPvPCapturePointNA* GetCapturePoint() { return m_obj; }
+
 private:
     OPvPCapturePointNA* m_obj;
 };

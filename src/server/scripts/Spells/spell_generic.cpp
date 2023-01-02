@@ -273,10 +273,10 @@ class spell_gen_reduced_above_60 : public SpellScript
     void RecalculateDamage()
     {
         if (Unit* target = GetHitUnit())
-            if (target->getLevel() > 60)
+            if (target->GetLevel() > 60)
             {
                 int32 damage = GetHitDamage();
-                AddPct(damage, -4 * int8(std::min(target->getLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
+                AddPct(damage, -4 * int8(std::min(target->GetLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
                 SetHitDamage(damage);
             }
     }
@@ -294,8 +294,8 @@ class spell_gen_reduced_above_60_aura : public AuraScript
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool&   /*canBeRecalculated*/)
     {
         if (Unit* owner = GetUnitOwner())
-            if (owner->getLevel() > 60)
-                AddPct(amount, -4 * int8(std::min(owner->getLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
+            if (owner->GetLevel() > 60)
+                AddPct(amount, -4 * int8(std::min(owner->GetLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
     }
 
     void Register() override
@@ -417,7 +417,7 @@ public:
     SpellCastResult CheckRequirement()
     {
         if (Unit* target = GetExplTargetUnit())
-            if (target->getLevel() >= _level)
+            if (target->GetLevel() >= _level)
                 return SPELL_FAILED_DONT_REPORT;
 
         return SPELL_CAST_OK;
@@ -587,8 +587,8 @@ class spell_gen_disabled_above_63 : public AuraScript
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool&   /*canBeRecalculated*/)
     {
         Unit* target = GetUnitOwner();
-        if (target->getLevel() <= 63)
-            amount = amount * target->getLevel() / 60;
+        if (target->GetLevel() <= 63)
+            amount = amount * target->GetLevel() / 60;
         else
             SetDuration(1);
     }
@@ -693,7 +693,7 @@ class spell_gen_use_spell_base_level_check : public SpellScript
 
     SpellCastResult CheckRequirement()
     {
-        if (GetCaster()->getLevel() < GetSpellInfo()->BaseLevel)
+        if (GetCaster()->GetLevel() < GetSpellInfo()->BaseLevel)
             return SPELL_FAILED_LEVEL_REQUIREMENT;
         return SPELL_CAST_OK;
     }
@@ -850,18 +850,24 @@ class spell_gen_fixate_aura : public AuraScript
 
 /* 64440 - Blade Warding
    64568 - Blood Reserve */
-class spell_gen_proc_above_75 : public AuraScript
+class spell_gen_proc_above_75 : public SpellScript
 {
-    PrepareAuraScript(spell_gen_proc_above_75);
+    PrepareSpellScript(spell_gen_proc_above_75);
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    SpellCastResult CheckLevel()
     {
-        return eventInfo.GetActor() && eventInfo.GetActor()->getLevel() >= 75;
+        Unit* caster = GetCaster();
+        if (caster->GetLevel() < 75)
+        {
+            return SPELL_FAILED_LOWLEVEL;
+        }
+
+        return SPELL_CAST_OK;
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_gen_proc_above_75::CheckProc);
+        OnCheckCast += SpellCheckCastFn(spell_gen_proc_above_75::CheckLevel);
     }
 };
 
@@ -928,8 +934,8 @@ class spell_gen_proc_reduced_above_60 : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         // Xinef: mostly its 33.(3)% reduce by 70 and 66.(6)% by 80
-        if (eventInfo.GetActor() && eventInfo.GetActor()->getLevel() > 60)
-            if (roll_chance_f((eventInfo.GetActor()->getLevel() - 60) * 3.33f))
+        if (eventInfo.GetActor() && eventInfo.GetActor()->GetLevel() > 60)
+            if (roll_chance_f((eventInfo.GetActor()->GetLevel() - 60) * 3.33f))
                 return false;
 
         return true;
@@ -4594,6 +4600,49 @@ class spell_gen_basic_campfire : public SpellScript
     }
 };
 
+// 34779 - Freezing Circle
+enum FreezingCircleSpells
+{
+    SPELL_FREEZING_CIRCLE_PIT_OF_SARON_NORMAL = 69574,
+    SPELL_FREEZING_CIRCLE_PIT_OF_SARON_HEROIC = 70276,
+    SPELL_FREEZING_CIRCLE                     = 34787,
+};
+
+class spell_freezing_circle : public SpellScript
+{
+    PrepareSpellScript(spell_freezing_circle);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_FREEZING_CIRCLE_PIT_OF_SARON_NORMAL,
+                SPELL_FREEZING_CIRCLE_PIT_OF_SARON_HEROIC,
+                SPELL_FREEZING_CIRCLE
+            });
+    }
+
+    void HandleDamage(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        uint32 spellId = 0;
+        Map* map = caster->GetMap();
+
+        if (map->IsDungeon())
+            spellId = map->IsHeroic() ? SPELL_FREEZING_CIRCLE_PIT_OF_SARON_HEROIC : SPELL_FREEZING_CIRCLE_PIT_OF_SARON_NORMAL;
+        else
+            spellId = SPELL_FREEZING_CIRCLE;
+
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+            SetHitDamage(spellInfo->Effects[EFFECT_0].CalcValue());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_freezing_circle::HandleDamage, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4732,4 +4781,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq20", SPELL_HIVEZARA_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq40", SPELL_VEKNISS_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
     RegisterSpellScript(spell_gen_basic_campfire);
+    RegisterSpellScript(spell_freezing_circle);
 }
