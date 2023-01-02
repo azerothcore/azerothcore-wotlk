@@ -12701,6 +12701,8 @@ bool bot_ai::IsTank(Unit const* unit) const
                     if (itr->guid == unit->GetGUID())
                         return itr->flags & MEMBER_FLAG_MAINTANK;
             }
+            if (gr->isLFGGroup() && sLFGMgr->GetRoles(player->GetGUID()) & LANG_LFG_ROLE_TANK)
+                return true;
         }
     }
 
