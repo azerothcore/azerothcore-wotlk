@@ -1,3 +1,4 @@
+-- DB update 2023_01_02_02 -> 2023_01_02_03
 -- On spawn set the modelID to model 25749 to fix the golem model
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28882) AND (`source_type` = 0) AND (`id` IN (2));
