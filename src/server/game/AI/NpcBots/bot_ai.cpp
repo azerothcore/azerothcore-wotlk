@@ -170,6 +170,8 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature)
     _evadeMode = false;
     _atHome = true;
     _roleMask = 0;
+    _primaryIconTank = -1;
+    _primaryIconDamage = -1;
     haste = 0;
     hit = 0.f;
     parry = 0.f;
@@ -3811,9 +3813,30 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
 
     if (gr && IsOffTank())
     {
+        if (_primaryIconTank >= 0 && BotMgr::GetOffTankTargetIconFlags() & (1u << _primaryIconTank))
+        {
+            if (ObjectGuid guid = gr->GetTargetIcons()[_primaryIconTank])
+            {
+                if (mytar && mytar->GetGUID() == guid)
+                    return { mytar, mytar };
+
+                if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
+                {
+                    if (unit->IsVisible() && unit->isTargetableForAttack(false) && me->IsValidAttackTarget(unit) &&
+                        (unit->IsInCombat() || me->IsInCombat()) && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
+                    {
+                        return { unit, unit };
+                    }
+                }
+            }
+        }
+
         Unit* tankTar = nullptr;
         for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
         {
+            if (i == _primaryIconTank)
+                continue;
+
             if (BotMgr::GetOffTankTargetIconFlags() & GroupIconsFlags[i])
             {
                 if (ObjectGuid guid = gr->GetTargetIcons()[i])
@@ -3852,9 +3875,30 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
     }
     if (gr && IsTank())
     {
+        if (_primaryIconTank >= 0 && BotMgr::GetTankTargetIconFlags() & (1u << _primaryIconTank))
+        {
+            if (ObjectGuid guid = gr->GetTargetIcons()[_primaryIconTank])
+            {
+                if (mytar && mytar->GetGUID() == guid)
+                    return { mytar, mytar };
+
+                if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
+                {
+                    if (unit->IsVisible() && unit->isTargetableForAttack(false) && me->IsValidAttackTarget(unit) &&
+                        (unit->IsInCombat() || me->IsInCombat()) && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
+                    {
+                        return { unit, unit };
+                    }
+                }
+            }
+        }
+
         Unit* tankTar = nullptr;
         for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
         {
+            if (i == _primaryIconTank)
+                continue;
+
             if (BotMgr::GetTankTargetIconFlags() & GroupIconsFlags[i])
             {
                 if (ObjectGuid guid = gr->GetTargetIcons()[i])
@@ -3893,8 +3937,35 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
     }
     if (gr)
     {
+        if (_primaryIconDamage >= 0)
+        {
+            uint32 iconMask = BotMgr::GetDPSTargetIconFlags();
+            if (HasRole(BOT_ROLE_RANGED))
+                iconMask |= BotMgr::GetRangedDPSTargetIconFlags();
+            if (iconMask & (1u << _primaryIconDamage))
+            {
+                if (ObjectGuid guid = gr->GetTargetIcons()[_primaryIconDamage])
+                {
+                    if (mytar && mytar->GetGUID() == guid)
+                        return { mytar, mytar };
+
+                    if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
+                    {
+                        if (unit->IsVisible() && unit->isTargetableForAttack(false) && me->IsValidAttackTarget(unit) &&
+                            (unit->IsInCombat() || me->IsInCombat()) && (CanSeeEveryone() || (me->CanSeeOrDetect(unit) && unit->InSamePhase(me))))
+                        {
+                            return { unit, unit };
+                        }
+                    }
+                }
+            }
+        }
+
         for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
         {
+            if (i == _primaryIconDamage)
+                continue;
+
             if (ObjectGuid guid = gr->GetTargetIcons()[i])
             {
                 if (HasRole(BOT_ROLE_RANGED) && (BotMgr::GetRangedDPSTargetIconFlags() & GroupIconsFlags[i]))
@@ -9153,6 +9224,15 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             if (!HasRole(BOT_ROLE_TANK) && HasRole(BOT_ROLE_DPS | BOT_ROLE_HEAL))
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_ENGAGE_BEHAVIOR) + "...", GOSSIP_SENDER_ENGAGE_BEHAVIOR, GOSSIP_ACTION_INFO_DEF + 5);
 
+            if (player->GetGroup())
+            {
+                for (uint32 role = BOT_ROLE_TANK; !!(role & BOT_ROLE_MASK_MAIN); role <<= 1)
+                {
+                    if (role & (BOT_ROLE_TANK | BOT_ROLE_DPS) && HasRole(role))
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_PRIORITY_TARGET) + " (" + LocalizedNpcText(player, GetRoleString(role)) + ")...", GOSSIP_SENDER_PRIORITY_TARGET, uint32(GOSSIP_ACTION_INFO_DEF) + role);
+                }
+            }
+
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 6);
             break;
         }
@@ -9237,6 +9317,74 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 delaystr << LocalizedNpcText(player, BOT_TEXT_DELAY_HEALING_BY) << ": " << float(player->GetBotMgr()->GetEngageDelayHeal() / 1000.f) << LocalizedNpcText(player, BOT_TEXT_SECOND_SHORT);
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_CHAT, delaystr.str(),
                     GOSSIP_SENDER_ENGAGE_DELAY_SET_HEALING, GOSSIP_ACTION_INFO_DEF + 2, "", 0, true);
+            }
+
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 3);
+            break;
+        }
+        case GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK:
+        case GOSSIP_SENDER_PRIORITY_TARGET_SET_DPS:
+        {
+            Group const* gr = player->GetGroup();
+            if (!gr)
+                break;
+
+            uint32 role = sender - GOSSIP_SENDER_PRIORITY_TARGET;
+            int8 icon = decltype(icon)(action - GOSSIP_ACTION_INFO_DEF);
+
+            switch (role)
+            {
+                case BOT_ROLE_TANK:
+                    _primaryIconTank = icon;
+                    break;
+                case BOT_ROLE_DPS:
+                    _primaryIconDamage = icon;
+                    break;
+                default:
+                    break;
+            }
+
+            //break;
+            action = uint32(GOSSIP_ACTION_INFO_DEF) + role; //restore role value and return to the menu
+        }
+        [[fallthrough]];
+        case GOSSIP_SENDER_PRIORITY_TARGET:
+        {
+            Group const* gr = player->GetGroup();
+            if (!gr)
+                break;
+
+            subMenu = true;
+
+            uint32 role = action - GOSSIP_ACTION_INFO_DEF;
+            switch (role)
+            {
+                case BOT_ROLE_TANK:
+                    for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
+                    {
+                        bool prio = i == _primaryIconTank;
+                        ObjectGuid guid = gr->GetTargetIcons()[i];
+                        if (guid && BotMgr::GetTankTargetIconFlags() & GroupIconsFlags[i])
+                            AddGossipItemFor(player, prio ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, player->GetBotMgr()->GetTargetIconString(uint8(i + 1)), GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK, uint32(GOSSIP_ACTION_INFO_DEF) + uint32(i));
+                    }
+                    AddGossipItemFor(player, (_primaryIconTank == -1) ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK, uint32(GOSSIP_ACTION_INFO_DEF - 1));
+                    break;
+                case BOT_ROLE_DPS:
+                    for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
+                    {
+                        bool prio = i == _primaryIconDamage;
+                        ObjectGuid guid = gr->GetTargetIcons()[i];
+                        uint32 iconMask = BotMgr::GetDPSTargetIconFlags();
+                        if (HasRole(BOT_ROLE_RANGED))
+                            iconMask |= BotMgr::GetRangedDPSTargetIconFlags();
+                        if (guid && iconMask & GroupIconsFlags[i])
+                            AddGossipItemFor(player, prio ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, player->GetBotMgr()->GetTargetIconString(uint8(i + 1)), GOSSIP_SENDER_PRIORITY_TARGET_SET_DPS, uint32(GOSSIP_ACTION_INFO_DEF) + uint32(i));
+                    }
+                    AddGossipItemFor(player, (_primaryIconDamage == -1) ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_PRIORITY_TARGET_SET_DPS, uint32(GOSSIP_ACTION_INFO_DEF - 1));
+                    break;
+                default:
+                    BotWhisper("unknown role " + std::to_string(role));
+                    break;
             }
 
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 3);

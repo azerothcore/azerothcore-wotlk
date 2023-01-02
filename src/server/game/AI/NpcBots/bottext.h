@@ -391,7 +391,8 @@ enum BotTexts : uint32
     BOT_TEXT_DAMAGE_PER_MANA            = 70657, //"Damage per mana"
     BOT_TEXT_TRANSMOGRIFICATION         = 70658, //"Transmogrification..."
     BOT_TEXT_DISABLE_COMBAT_POSITIONING = 70659, //"DISABLE combat positioning"
-    //70660-70799 reserved for custom localization strings
+    BOT_TEXT_PRIORITY_TARGET            = 70660, //"Priority target"
+    //70661-70799 reserved for custom localization strings
 };
 
 #endif //BOTTEXT_H

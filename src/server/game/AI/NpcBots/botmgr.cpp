@@ -1367,6 +1367,27 @@ uint8 BotMgr::BotClassByClassName(std::string const& className)
     return BOT_CLASS_NONE;
 }
 
+std::string BotMgr::GetTargetIconString(uint8 icon) const
+{
+    std::ostringstream ss;
+    ss << "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_" << uint32(icon) << ":12|t";
+    if (icon - 1 < TargetIconNamesCacheSize)
+        ss << _targetIconNamesCache[icon - 1];
+
+    return ss.str();
+}
+void BotMgr::UpdateTargetIconName(uint8 id, std::string const& name)
+{
+    if (id >= TargetIconNamesCacheSize)
+        return;
+
+    _targetIconNamesCache[id] = name;
+}
+void BotMgr::ResetTargetIconNames()
+{
+    _targetIconNamesCache = {};
+}
+
 void BotMgr::ReviveAllBots()
 {
     for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)

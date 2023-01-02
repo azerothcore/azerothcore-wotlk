@@ -44,6 +44,7 @@
 
 //npcbot
 #include "botdatamgr.h"
+#include "botmgr.h"
 //end npcbot
 
 Roll::Roll(ObjectGuid _guid, LootItem const& li) : itemGUID(_guid), itemid(li.itemid),
@@ -1727,6 +1728,33 @@ void Group::SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid)
                 SetTargetIcon(i, ObjectGuid::Empty, ObjectGuid::Empty);
 
     m_targetIcons[id] = targetGuid;
+
+    //npcbot: name cache
+    bool need_cache_name = false;
+    Player const* setter = nullptr;
+    for (GroupReference const* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (itr->GetSource())
+        {
+            if (!need_cache_name && itr->GetSource()->GetBotMgr())
+                need_cache_name = true;
+            if (!setter && itr->GetSource()->GetGUID() == whoGuid)
+                setter = itr->GetSource();
+        }
+    }
+
+    if (need_cache_name && setter)
+    {
+        Unit const* newtarget = targetGuid ? ObjectAccessor::GetUnit(*setter, targetGuid) : nullptr;
+        std::string const& newname = newtarget ? newtarget->GetName() : "";
+        for (GroupReference const* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player const* member = itr->GetSource();
+            if (member && member->GetBotMgr())
+                member->GetBotMgr()->UpdateTargetIconName(id, newname);
+        }
+    }
+    //end npcbot
 
     WorldPacket data(MSG_RAID_TARGET_UPDATE, (1 + 8 + 1 + 8));
     data << uint8(0);                                       // set targets

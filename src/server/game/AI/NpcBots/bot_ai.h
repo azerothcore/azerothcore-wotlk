@@ -489,6 +489,7 @@ class bot_ai : public CreatureAI
 
         uint8 _botclass;
         uint8 _spec, _newspec;
+        int8 _primaryIconTank, _primaryIconDamage;
 
         BotVehicleStrats curVehStrat;
         uint8 vehcomboPoints;

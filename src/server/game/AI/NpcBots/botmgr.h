@@ -14,6 +14,8 @@ class DPSTracker;
 
 struct Position;
 
+constexpr size_t TargetIconNamesCacheSize = 8u; // Group.h TARGETICONCOUNT
+
 enum BotAddResult
 {
     BOT_ADD_DISABLED                    = 0x001,
@@ -153,6 +155,8 @@ class BotMgr
         static std::string GetNpcBotCostStr(uint8 level, uint8 botclass);
         static uint8 BotClassByClassName(std::string const& className);
 
+        std::string GetTargetIconString(uint8 icon) const;
+
         void OnTeleportFar(uint32 mapId, float x, float y, float z, float ori = 0.f);
         void OnOwnerSetGameMaster(bool on);
         void ReviveAllBots();
@@ -214,6 +218,9 @@ class BotMgr
         AoeSpotsVec const& GetAoeSpots() const { return _aoespots; }
         AoeSpotsVec& GetAoeSpots() { return _aoespots; }
 
+        void UpdateTargetIconName(uint8 id, std::string const& name);
+        void ResetTargetIconNames();
+
     private:
         static void _teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori = 0.f, bool quick = false);
         static void _reviveBot(Creature* bot, WorldLocation* dest = nullptr);
@@ -237,6 +244,8 @@ class BotMgr
         bool _quickrecall;
 
         AoeSpotsVec _aoespots;
+
+        std::array<std::string, TargetIconNamesCacheSize> _targetIconNamesCache;
 };
 
 void AddNpcBotScripts();
