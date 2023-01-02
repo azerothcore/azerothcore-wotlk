@@ -2889,7 +2889,7 @@ void Creature::AllLootRemovedFromCorpse()
     }
     else
     {
-        m_corpseRemoveTime -= diff;
+        m_corpseRemoveTime = now + uint32(m_corpseDelay * decayRate);
     }
 }
 
