@@ -1697,7 +1697,7 @@ WorldBossLevelDiff = 3
 #                     300  - (5 Minutes, Corpse.Decay.RAREELITE)
 #                     3600 - (1 Hour, Corpse.Decay.WORLDBOSS)
 
-Corpse.Decay.NORMAL    = 60
+Corpse.Decay.NORMAL    = 300
 Corpse.Decay.RARE      = 300
 Corpse.Decay.ELITE     = 300
 Corpse.Decay.RAREELITE = 300
@@ -1709,7 +1709,7 @@ Corpse.Decay.WORLDBOSS = 3600
 #                     after they have been looted.
 #         Default:    0.5
 
-Rate.Corpse.Decay.Looted = 0.5
+Rate.Corpse.Decay.Looted = 1.0
 
 #
 #    Rate.Creature.Normal.Damage
