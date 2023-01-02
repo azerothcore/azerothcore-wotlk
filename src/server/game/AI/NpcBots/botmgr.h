@@ -56,7 +56,7 @@ enum BotAttackAngle
 
 typedef std::unordered_map<ObjectGuid /*guid*/, Creature* /*bot*/> BotMap;
 
-class BotMgr
+class AC_GAME_API BotMgr
 {
     public:
         BotMgr(Player* const master);
