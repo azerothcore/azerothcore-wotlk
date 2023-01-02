@@ -2,7 +2,7 @@
 UPDATE `creature_template` SET `ScriptName` = 'boss_hungarfen', `AIName` = '' WHERE `entry` = 17770;
 UPDATE `creature_template` SET `ScriptName` = 'npc_underbog_mushroom', `AIName` = '', `scale` = 1, `faction` = 14, `speed_walk` = 1 WHERE `entry` = 17990;
 UPDATE `creature_template` SET `scale` = 1, `faction` = 14, `speed_walk` = 1 WHERE `entry` = 20189;
-UPDATE `creature_template` SET `mechanic_immune_mask` = `mechanic_immune_mask`|33554432 WHERE `entry` IN (17770, 20169);
+UPDATE `creature_template` SET `mechanic_immune_mask` = `mechanic_immune_mask`|33554432, `speed_walk` = 1, `speed_run` = 1.57143 WHERE `entry` IN (17770, 20169);
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 17770 AND `source_type` = 0;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 17990 AND `source_type` = 0;
