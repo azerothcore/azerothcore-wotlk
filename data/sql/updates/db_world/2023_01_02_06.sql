@@ -1,3 +1,4 @@
+-- DB update 2023_01_02_05 -> 2023_01_02_06
 --
 UPDATE `creature_template` SET `ScriptName` = 'boss_hungarfen', `AIName` = '' WHERE `entry` = 17770;
 UPDATE `creature_template` SET `ScriptName` = 'npc_underbog_mushroom', `AIName` = '', `scale` = 1, `faction` = 14, `speed_walk` = 1 WHERE `entry` = 17990;
