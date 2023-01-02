@@ -4166,7 +4166,7 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
     }
 
     LiquidStatus liquidStatus = GetLiquidData().Status;
-    bool isInWater = (liquidStatus & MAP_LIQUID_STATUS_SWIMMING) != 0;
+    bool isInWater = (liquidStatus & MAP_LIQUID_STATUS_IN_CONTACT) != 0;
 
     // In water or jumping in water
     if (isInWater || (liquidStatus == LIQUID_MAP_ABOVE_WATER && (IsFalling() || (ToPlayer() && ToPlayer()->IsFalling()))))
@@ -16590,18 +16590,14 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_ADD_FLAT_MODIFIER:
                     case SPELL_AURA_ADD_PCT_MODIFIER:
                     {
-                        if (SpellModifier* mod = triggeredByAura->GetSpellModifier())
+                        if (triggeredByAura->GetSpellModifier())
                         {
-                            if (mod->op == SPELLMOD_CASTING_TIME && mod->value < 0 && procSpell)
+                            // Do proc if mod is consumed by spell
+                            if (!procSpell || procSpell->m_appliedMods.find(i->aura) != procSpell->m_appliedMods.end())
                             {
-                                // Skip instant spells
-                                if (procSpellInfo->CalcCastTime() <= 0 || (procSpell->GetTriggeredCastFlags() & TRIGGERED_CAST_DIRECTLY) != 0)
-                                {
-                                    break;
-                                }
+                                takeCharges = true;
                             }
                         }
-                        takeCharges = true;
                         break;
                     }
                     default:
