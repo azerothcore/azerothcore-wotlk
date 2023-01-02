@@ -4251,27 +4251,27 @@ bool bot_ai::CheckAttackTarget()
             else if (me->IsInCombat())
                 Evade();
         }
+
+        return false;
     }
-    else
+
+    Unit* mytar = opponent ? opponent : disttarget;
+    //boss engage phase // CanHaveThreatList checks for typeid == UNIT
+    if (GetEngageTimer() > lastdiff)
+        return false;
+    else if (!IsTank() && mytar != me->GetVictim() && mytar->GetVictim() && mytar->CanHaveThreatList() &&
+        mytar->ToCreature()->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS && me->GetMap()->IsRaid())
     {
-        Unit* mytar = opponent ? opponent : disttarget;
-        //boss engage phase // CanHaveThreatList checks for typeid == UNIT
-        if (GetEngageTimer() > lastdiff)
+        uint32 threat = uint32(mytar->ToCreature()->GetThreatMgr().GetThreat(mytar->GetVictim()));
+        if (threat < std::min<uint32>(50000, mytar->GetVictim()->GetMaxHealth() / 2))
             return false;
-        else if (!IsTank() && mytar != me->GetVictim() && mytar->GetVictim() && mytar->CanHaveThreatList() &&
-            mytar->ToCreature()->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS && me->GetMap()->IsRaid())
-        {
-            uint32 threat = uint32(mytar->ToCreature()->GetThreatMgr().GetThreat(mytar->GetVictim()));
-            if (threat < std::min<uint32>(50000, mytar->GetVictim()->GetMaxHealth() / 2))
-                return false;
-        }
-
-        if (reset)
-            SetBotCommandState(BOT_COMMAND_COMBATRESET);//reset AttackStart()
-
-        if (mytar != me->GetVictim())
-            me->Attack(mytar, !ranged);
     }
+
+    if (reset)
+        SetBotCommandState(BOT_COMMAND_COMBATRESET);//reset AttackStart()
+
+    if (mytar != me->GetVictim())
+        me->Attack(mytar, !ranged);
 
     return true;
 }
