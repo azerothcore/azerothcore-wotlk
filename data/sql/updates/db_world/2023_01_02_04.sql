@@ -1,3 +1,4 @@
+-- DB update 2023_01_02_03 -> 2023_01_02_04
 DROP TABLE IF EXISTS `player_levelstats`;
 DROP TABLE IF EXISTS `player_class_stats`;
 CREATE TABLE IF NOT EXISTS `player_class_stats`  (
