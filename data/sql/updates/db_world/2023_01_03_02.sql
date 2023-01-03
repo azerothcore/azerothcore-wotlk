@@ -1,3 +1,4 @@
+-- DB update 2023_01_03_01 -> 2023_01_03_02
 -- XYZ:-11092.80 -1157.22 55.19 map 0
 DELETE FROM pool_gameobject WHERE guid IN (74125,74126,74127,74128,74129) AND pool_entry = 4505;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
