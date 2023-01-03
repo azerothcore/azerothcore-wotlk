@@ -4455,6 +4455,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_CASTER;
     });
 
+    // Fire Bomb DOT not removed in evade mode
+    ApplySpellFix({ 31961 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_EVADE;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
