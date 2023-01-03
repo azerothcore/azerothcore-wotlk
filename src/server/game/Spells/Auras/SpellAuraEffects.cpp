@@ -390,7 +390,7 @@ AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* cast
     CalculatePeriodicData();
 
     m_amount = CalculateAmount(caster);
-    m_casterLevel = caster ? caster->getLevel() : 0;
+    m_casterLevel = caster ? caster->GetLevel() : 0;
     m_applyResilience = caster && caster->CanApplyResilience();
     m_auraGroup = sSpellMgr->GetSpellGroup(GetId());
 
@@ -2349,16 +2349,12 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
     }
 }
 
-void AuraEffect::HandleAuraModScale(AuraApplication const* aurApp, uint8 mode, bool apply) const
+void AuraEffect::HandleAuraModScale(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
 {
     if (!(mode & AURA_EFFECT_HANDLE_CHANGE_AMOUNT_SEND_FOR_CLIENT_MASK))
         return;
 
-    Unit* target = aurApp->GetTarget();
-
-    float scale = target->GetObjectScale();
-    ApplyPercentModFloatVar(scale, float(GetAmount()), apply);
-    target->SetObjectScale(scale);
+    aurApp->GetTarget()->RecalculateObjectScale();
 }
 
 void AuraEffect::HandleAuraCloneCaster(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -6298,7 +6294,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     uint32 damage = std::max(GetAmount(), 0);
 
     // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
-    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage);
+    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage, GetSpellInfo());
 
     if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
     {
@@ -6410,7 +6406,7 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     uint32 damage = std::max(GetAmount(), 0);
 
     // Script Hook For HandlePeriodicHealthLeechAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
-    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage);
+    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage, GetSpellInfo());
 
     if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
         damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, GetEffIndex(), 0.0f, GetBase()->GetStackAmount());
@@ -6618,7 +6614,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     uint32 heal = uint32(damage);
 
     // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
-    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, heal);
+    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, heal, GetSpellInfo());
     sScriptMgr->ModifyHealReceived(target, caster, heal, GetSpellInfo());
 
     HealInfo healInfo(caster, target, heal, GetSpellInfo(), GetSpellInfo()->GetSchoolMask());

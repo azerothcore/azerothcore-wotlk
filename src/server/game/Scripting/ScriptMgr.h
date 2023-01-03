@@ -422,7 +422,7 @@ public:
 
     // Called when DoT's Tick Damage is being Dealt
     // Attacker can be nullptr if he is despawned while the aura still exists on target
-    virtual void ModifyPeriodicDamageAurasTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
+    virtual void ModifyPeriodicDamageAurasTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/, SpellInfo const* /*spellInfo*/) { }
 
     // Called when Melee Damage is being Dealt
     virtual void ModifyMeleeDamage(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
@@ -1223,6 +1223,8 @@ public:
     virtual void OnBeforeInitTalentForLevel(Player* /*player*/, uint8& /*level*/, uint32& /*talentPointsForLevel*/) { }
 
     virtual void OnFirstLogin(Player* /*player*/) { }
+
+    virtual void OnSetMaxLevel(Player* /*player*/, uint32& /*maxPlayerLevel*/) { }
 
     [[nodiscard]] virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, ObjectGuid /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
     virtual bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* /*player*/) { return false; }
@@ -2295,6 +2297,7 @@ public: /* PlayerScript */
     void OnAfterUpdateAttackPowerAndDamage(Player* player, float& level, float& base_attPower, float& attPowerMod, float& attPowerMultiplier, bool ranged);
     void OnBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
     void OnFirstLogin(Player* player);
+    void OnSetMaxLevel(Player* player, uint32& maxPlayerLevel);
     void OnPlayerCompleteQuest(Player* player, Quest const* quest);
     void OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType);
     bool CanJoinInBattlegroundQueue(Player* player, ObjectGuid BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
@@ -2434,7 +2437,7 @@ public: /* Scheduled scripts */
 public: /* UnitScript */
     void OnHeal(Unit* healer, Unit* reciever, uint32& gain);
     void OnDamage(Unit* attacker, Unit* victim, uint32& damage);
-    void ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage);
+    void ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage, SpellInfo const* spellInfo);
     void ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage);
     void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage, SpellInfo const* spellInfo);
     void ModifyHealReceived(Unit* target, Unit* healer, uint32& addHealth, SpellInfo const* spellInfo);
