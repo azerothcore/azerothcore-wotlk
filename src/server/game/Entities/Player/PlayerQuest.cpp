@@ -666,6 +666,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     {
         if (sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
         {
+            CombatStop();
             DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true, true);
         }
     }
