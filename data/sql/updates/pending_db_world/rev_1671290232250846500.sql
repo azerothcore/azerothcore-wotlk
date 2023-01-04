@@ -146,7 +146,7 @@ INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language
 (19666,1,0,"Your plan was a good one, Sha'heen, and you would have gotten away with it if not for one thing...",12,0,100,1,0,0,17243,0,"Shadow Lord Xiraxis"),
 (19666,2,0,"Never underestimate the other ethereal's greed!",12,0,100,15,0,0,17244,0,"Shadow Lord Xiraxis");
 
-DELETE FROM `waypoints` WHERE `entry` IN (1967100,1967101,1967102);
+DELETE FROM `waypoints` WHERE `entry` IN (19666,1967100,1967101,1967102);
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
 (19666, 1, -68.40214, -19.7878, -0.9529961, 'Shadow Lord Xiraxis'),
 (19666, 2, -67.83204, -48.33409, -0.9552881, 'Shadow Lord Xiraxis'),
