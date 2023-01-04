@@ -21,13 +21,13 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 20344);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (20344, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Reset - Set Event Phase 1'),
 (20344, 0, 1, 0, 60, 1, 100, 0, 120000, 120000, 120000, 120000, 0, 80, 2034400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 1)'),
-(20344, 0, 2, 0, 60, 2, 100, 0, 2800, 2800, 120000, 120000, 0, 80, 2034401, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 2)'),
-(20344, 0, 3, 0, 60, 4, 100, 0, 2800, 2800, 120000, 120000, 0, 80, 2034402, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 3)'),
-(20344, 0, 4, 0, 60, 8, 100, 0, 2800, 2800, 120000, 120000, 0, 80, 2034403, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 4)'),
-(20344, 0, 5, 0, 60, 16, 100, 0, 2800, 2800, 120000, 120000, 0, 80, 2034404, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 5)'),
-(20344, 0, 6, 0, 60, 32, 100, 0, 2800, 2800, 120000, 120000, 0, 80, 2034405, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 6)'),
-(20344, 0, 7, 0, 60, 64, 100, 0, 2800, 2800, 120000, 120000, 0, 80, 2034406, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 7)'),
-(20344, 0, 8, 0, 60, 128, 100, 0, 2800, 2800, 120000, 120000, 0, 80, 2034407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 8)');
+(20344, 0, 2, 0, 60, 2, 100, 0, 2800, 2800, 2800, 2800, 0, 80, 2034401, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 2)'),
+(20344, 0, 3, 0, 60, 4, 100, 0, 2800, 2800, 2800, 2800, 0, 80, 2034402, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 3)'),
+(20344, 0, 4, 0, 60, 8, 100, 0, 2800, 2800, 2800, 2800, 0, 80, 2034403, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 4)'),
+(20344, 0, 5, 0, 60, 16, 100, 0, 2800, 2800, 2800, 2800, 0, 80, 2034404, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 5)'),
+(20344, 0, 6, 0, 60, 32, 100, 0, 2800, 2800, 2800, 2800, 0, 80, 2034405, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 6)'),
+(20344, 0, 7, 0, 60, 64, 100, 0, 2800, 2800, 2800, 2800, 0, 80, 2034406, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 7)'),
+(20344, 0, 8, 0, 60, 128, 100, 0, 2800, 2800, 2800, 2800, 0, 80, 2034407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Update - Run Script (Phase 8)');
 
 DELETE FROM `smart_scripts` WHERE ((`entryorguid` BETWEEN 2034400 AND 2034407) AND (`source_type` = 9));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -37,47 +37,47 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2034400, 9, 3, 0, 0, 0, 100, 0, 5500, 5500, 0, 0, 0, 45, 1, 2, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Hal \'Which one?\''),
 (2034400, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 31, 2, 8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Set Phase Random Between 2-8'),
 
-(2034401, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
-(2034401, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
-(2034401, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
-(2034401, 9, 3, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
-(2034401, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034401, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034401, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
+(2034401, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
+(2034401, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
+(2034401, 9, 4, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
 
-(2034402, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
-(2034402, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
-(2034402, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
-(2034402, 9, 3, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
-(2034402, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034402, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034402, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
+(2034402, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
+(2034402, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
+(2034402, 9, 4, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
 
-(2034403, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 8 , 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
-(2034403, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 9 , 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
-(2034403, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
-(2034403, 9, 3, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
-(2034403, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034403, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034403, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 8 , 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
+(2034403, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 9 , 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
+(2034403, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
+(2034403, 9, 4, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
 
-(2034404, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 11, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
-(2034404, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 12, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
-(2034404, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 13, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
-(2034404, 9, 3, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
-(2034404, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034404, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034404, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 11, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
+(2034404, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 12, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
+(2034404, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 13, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
+(2034404, 9, 4, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
 
-(2034405, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 14, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
-(2034405, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
-(2034405, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 16, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
-(2034405, 9, 3, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
-(2034405, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034405, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034405, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 14, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
+(2034405, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
+(2034405, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 16, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
+(2034405, 9, 4, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
 
-(2034406, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 17, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
-(2034406, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 18, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
-(2034406, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 19, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
-(2034406, 9, 3, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
-(2034406, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034406, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034406, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 17, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
+(2034406, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 18, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
+(2034406, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 19, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
+(2034406, 9, 4, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
 
-(2034407, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
-(2034407, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 21, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
-(2034407, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 22, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
-(2034407, 9, 3, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line'),
-(2034407, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1');
+(2034407, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Restore Event Phase 1'),
+(2034407, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 1'),
+(2034407, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 21, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 2'),
+(2034407, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 22, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Say Part 3'),
+(2034407, 9, 4, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20342, 10, 0, 0, 0, 0, 0, 0, 'Nat Pagle - On Script - Trigger Closing Line');
 
 DELETE FROM `creature_text` WHERE `CreatureID`=20344;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`) VALUES
