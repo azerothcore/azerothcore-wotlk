@@ -216,7 +216,7 @@ void TempSummon::InitStats(uint32 duration)
         if (IsTrigger() && m_spells[0])
         {
             SetFaction(owner->GetFaction());
-            SetLevel(owner->getLevel());
+            SetLevel(owner->GetLevel());
             if (owner->GetTypeId() == TYPEID_PLAYER)
                 m_ControlledByPlayer = true;
         }
@@ -412,7 +412,7 @@ void Guardian::InitStats(uint32 duration)
 
     if (Unit* m_owner = GetOwner())
     {
-        InitStatsForLevel(m_owner->getLevel());
+        InitStatsForLevel(m_owner->GetLevel());
 
         if (m_owner->GetTypeId() == TYPEID_PLAYER && HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
             m_charmInfo->InitCharmCreateSpells();
@@ -450,7 +450,7 @@ Puppet::Puppet(SummonPropertiesEntry const* properties, ObjectGuid owner) : Mini
 void Puppet::InitStats(uint32 duration)
 {
     Minion::InitStats(duration);
-    SetLevel(GetOwner()->getLevel());
+    SetLevel(GetOwner()->GetLevel());
     SetReactState(REACT_PASSIVE);
 }
 

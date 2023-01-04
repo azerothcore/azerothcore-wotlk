@@ -52,7 +52,7 @@ struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
     // playerOnly: self explaining
     // withMainTank: allow current tank to be selected
     // aura: if 0: ignored, if > 0: the target shall have the aura, if < 0, the target shall NOT have the aura
-    DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, bool withMainTank, int32 aura) : me(unit), m_dist(dist), except(withMainTank ? me->GetThreatMgr().GetCurrentVictim() : nullptr), m_playerOnly(playerOnly), m_aura(aura) {}
+    DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, bool withMainTank, int32 aura) : me(unit), m_dist(dist), except(!withMainTank ? me->GetThreatMgr().GetCurrentVictim() : nullptr), m_playerOnly(playerOnly), m_aura(aura) {}
 
     bool operator()(Unit const* target) const
     {
