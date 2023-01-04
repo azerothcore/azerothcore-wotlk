@@ -1020,6 +1020,7 @@ public:
 
             CheckBloodlust(diff);
             BuffAndHealGroup(diff);
+            CheckEarthShield(diff);
             CureGroup(CURE_TOXINS, diff);
             CheckTotems(diff);
             CheckShield(diff);
@@ -1277,17 +1278,8 @@ public:
 
         bool BuffTarget(Unit* target, uint32 /*diff*/) override
         {
-            if (GetSpell(EARTH_SHIELD_1) && Earthy == false && IsTank(target) && (target == me || !IsTank()) &&
-                (target->IsInCombat() || !target->isMoving()) && Rand() < 35)
-            {
-                AuraEffect const* eShield = target->GetAuraEffect(SPELL_AURA_REDUCE_PUSHBACK, SPELLFAMILY_SHAMAN, 0x0, 0x400, 0x0);
-                bool cast = (!eShield || eShield->GetBase()->GetCharges() < 5 || eShield->GetBase()->GetDuration() < 30000);
-
-                if (cast && doCast(target, GetSpell(EARTH_SHIELD_1)))
-                    return true;
-            }
-
-            if (me->IsInCombat() && !master->GetMap()->IsRaid()) return false;
+            if (me->IsInCombat() && !master->GetMap()->IsRaid())
+                return false;
 
             if (target->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
             {
@@ -1309,6 +1301,74 @@ public:
                 }
             }
             return false;
+        }
+
+        void CheckEarthShield(uint32 diff)
+        {
+            if (!IsSpellReady(EARTH_SHIELD_1, diff) || IAmFree() || Earthy == true || Rand() > (65 - 45 * me->IsInCombat()))
+                return;
+
+            static auto can_affect = [](WorldObject const* o, Unit const* unit)
+            {
+                AuraEffect const* eShield = unit->GetAuraEffect(SPELL_AURA_REDUCE_PUSHBACK, SPELLFAMILY_SHAMAN, 0x0, 0x400, 0x0);
+                return (!eShield || eShield->GetBase()->GetCharges() < 5 || eShield->GetBase()->GetDuration() < 30000) && o->GetDistance(unit) < 40 && (unit->IsInCombat() || !unit->isMoving());
+            };
+
+            Group const* gr = master->GetGroup();
+            if (!gr)
+            {
+                Player* pl = master;
+
+                if (IsTank(pl) && can_affect(me, pl) && doCast(pl, GetSpell(EARTH_SHIELD_1)))
+                    return;
+
+                BotMap const* map = pl->GetBotMgr()->GetBotMap();
+                for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
+                {
+                    Unit* u = it->second;
+                    if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->InSamePhase(me))
+                        continue;
+
+                    if (IsTank(u))
+                    {
+                        if (can_affect(me, u))
+                        {
+                            if (doCast(u, GetSpell(EARTH_SHIELD_1)))
+                            {
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (GroupReference const* ref = gr->GetFirstMember(); ref != nullptr; ref = ref->next())
+                {
+                    Player* pl = ref->GetSource();
+                    if (!pl || !pl->IsInWorld() || me->GetMap() != pl->FindMap() || !pl->InSamePhase(me))
+                        continue;
+
+                    if (IsTank(pl) && can_affect(me, pl) && doCast(pl, GetSpell(EARTH_SHIELD_1)))
+                        return;
+
+                    if (!pl->HaveBot())
+                        continue;
+
+                    BotMap const* map = pl->GetBotMgr()->GetBotMap();
+                    for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
+                    {
+                        Unit* u = it->second;
+                        if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->InSamePhase(me))
+                            continue;
+                        if (IsTank(u) && can_affect(me, u) && doCast(u, GetSpell(EARTH_SHIELD_1)))
+                            return;
+                    }
+                }
+            }
+
+            if (can_affect(me, master) && doCast(master, GetSpell(EARTH_SHIELD_1)))
+                return;
         }
 
         void CheckDispel(uint32 diff)
