@@ -1,3 +1,4 @@
+-- DB update 2023_01_04_00 -> 2023_01_04_01
 -- Fix Positions
 UPDATE `creature` SET `position_x`=1735.767578125, `position_y`=1072.0616455078125, `position_z`=6.96295166015625, `orientation`=3.246312379837036132, `VerifiedBuild`=47187 WHERE `id1`=20342;
 UPDATE `creature` SET `position_x`=1735.560546875, `position_y`=1074.1854248046875, `position_z`=6.96295166015625, `orientation`=3.193952560424804687, `VerifiedBuild`=47187 WHERE `id1`=20342;
