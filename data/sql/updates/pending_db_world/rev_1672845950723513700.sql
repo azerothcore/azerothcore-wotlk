@@ -60,6 +60,53 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `
 (20401, 1, 0, 18158, 'I\'ll come back later.', 12, 0, 100, 1, 0, 0, 0, 'Frances Lin'),
 (20401, 2, 0, 18159, 'More grog?', 12, 0, 100, 1, 0, 0, 0, 'Frances Lin');
 
+-- Chef Jessen
+UPDATE `creature` SET `position_x`=1816.1407,`position_y`=1006.5959,`position_z`=11.672032, `orientation`=0.03490658476948738 WHERE `guid`=83695 AND `id1`=20378;
+
+DELETE FROM `creature_template_addon` WHERE (`entry` = 20378);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(20378, 0, 0, 0, 1, 0, 0, '');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20378;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 20378);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(20378, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Respawn - Set Event Phase 1'),
+(20378, 0, 1, 0, 60, 1, 100, 0, 1200, 1200, 1200, 1200, 0, 5, 36, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Update - Play Emote 36 (Phase 1)'),
+(20378, 0, 2, 0, 60, 0, 100, 0, 900000, 900000, 900000, 900000, 0, 80, 2037800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Update - Run Script'),
+(20378, 0, 3, 0, 58, 0, 100, 0, 3, 2037800, 0, 0, 0, 80, 2037801, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Waypoint Finished - Run Script'),
+(20378, 0, 4, 5, 58, 0, 100, 0, 2, 2037801, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0.03490658476948738, 'Chef Jessen - On Waypoint Finished - Set Orientation 0.03490658476948738'),
+(20378, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Waypoint Finished - Set Event Phase 1');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (2037800, 2037801));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2037800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Set Event Phase 2'),
+(2037800, 9, 1, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Say Line 0'),
+(2037800, 9, 2, 0, 0, 0, 100, 0, 3400, 3400, 0, 0, 0, 53, 0, 2037800, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Start Waypoint'),
+(2037801, 9, 0, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Say Line 1'),
+(2037801, 9, 1, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 20345, 10, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Set Orientation Closest Creature \'Commander Mograine\''),
+(2037801, 9, 2, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 1, 2, 0, 1, 0, 0, 0, 19, 20345, 10, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Say Line 2'),
+(2037801, 9, 3, 0, 0, 0, 100, 0, 3400, 3400, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 1.5707963705062866, 'Chef Jessen - In Combat - Set Orientation 1.5707963705062866'),
+(2037801, 9, 4, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Say Line 3'),
+(2037801, 9, 5, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Say Line 4'),
+(2037801, 9, 6, 0, 0, 0, 100, 0, 2200, 2200, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Play Emote 14'),
+(2037801, 9, 7, 0, 0, 0, 100, 0, 2500, 2500, 0, 0, 0, 53, 0, 2037801, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Start Waypoint');
+
+DELETE FROM `waypoints` WHERE `entry` IN (2037800, 2037801);
+INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`point_comment`) VALUES
+(2037800,1,1813.269,1010.926,11.675028,NULL,0,'Chef Jessen'),
+(2037800,2,1812.7063,1019.1864,11.685483,NULL,0,'Chef Jessen'),
+(2037800,3,1811.6666,1025.1326,11.685483,NULL,0,'Chef Jessen'),
+(2037801,1,1812.8987,1010.8238,11.674806,NULL,0,'Chef Jessen'),
+(2037801,2,1816.1407,1006.5959,11.672032,NULL,0,'Chef Jessen');
+
+DELETE FROM `creature_text` WHERE `CreatureID`=20378;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`) VALUES
+(20378, 0, 0, 18140, 'This is madness! I\'ve had enough! ENOUGH!', 12, 0, 100, 5, 0, 0, 0, 'Chef Jessen'),
+(20378, 1, 0, 18141, 'EVERYBODY LISTEN UP!', 12, 0, 100, 22, 0, 0, 0, 'Chef Jessen'),
+(20378, 2, 0, 18142, 'I\'m speakin\' to you too, mister fancy britches Mograine! SHUT YER YAP!', 12, 0, 100, 25, 0, 0, 0, 'Chef Jessen'),
+(20378, 3, 0, 18143, 'NOW, everybody in this bar is gonna keep the noise to a minimum or ol\' Jessen is gonna bust out his rollin\' pin and cleaver and go orc on all of ya! IS EVERYONE CLEAR?!!!', 12, 0, 100, 22, 0, 0, 0, 'Chef Jessen'),
+(20378, 4, 0, 18144, 'AAAAAAaaaarrrrgh!!!!! SHUT IT!', 12, 0, 100, 15, 0, 0, 0, 'Chef Jessen');
+
 -- Pathing for Herod the Bully Entry: 20360
 SET @NPC := (SELECT `guid` FROM `creature` WHERE `id1`=20360);
 SET @PATH := @NPC * 10;
@@ -182,6 +229,9 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 (20422, 0, 0, 0, 0, 133, 0, '');
 
 -- Zixil
+UPDATE `creature` SET `position_x`=1759.1192626953125,`position_y`=1052.12646484375,`position_z`=6.962950706481933593, `orientation`=3.700098037719726562, `VerifiedBuild`=47187 WHERE `guid`=83677 AND `id1`=20419;
+UPDATE `creature` SET `position_x`=1757.213623046875,`position_y`=1053.4556884765625,`position_z`=6.96295166015625, `orientation`=1.553343057632446289, `VerifiedBuild`=47187 WHERE `guid`=83676 AND `id1`=20420;
+
 DELETE FROM `creature_template_addon` WHERE (`entry` IN (20419, 20420));
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (20419, 0, 0, 0, 0, 233, 0, ''),
