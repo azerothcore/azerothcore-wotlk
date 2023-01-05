@@ -1,6 +1,3 @@
--- Making Domesticated Felboar skinnable
-UPDATE `creature_template` SET `skinloot` = 70068 WHERE (`entry` = 21195);
-
 -- Create a new skinning loot with right percentage
 INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Chance`) VALUES (70068, 21887, 80);
 INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Chance`, `MaxCount`) VALUES (70068, 25649, 20, 3);
