@@ -664,7 +664,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
     {
-        if (sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
+        if (const ItemTemplate* iProto = sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
         {
             if (IsInCombat() && iProto->InventoryType == INVTYPE_FINGER)
             {
