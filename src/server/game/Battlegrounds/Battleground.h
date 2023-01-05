@@ -454,7 +454,7 @@ public:
 
     void EndBattleground(PvPTeamId winnerTeamId);
 
-    // deprecated, need delete
+    /// @deprecated need delete
     virtual void EndBattleground(TeamId winnerTeamId)
     {
         EndBattleground(GetPvPTeamId(winnerTeamId));

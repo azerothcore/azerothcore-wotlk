@@ -65,7 +65,6 @@ public:
         {
             creature->CastSpell(player, SPELL_MARK_OF_BITE, true);
             player->KilledMonsterCredit(creature->GetEntry());
-            creature->DespawnOrUnsummon(1000);
         }
         else
         {

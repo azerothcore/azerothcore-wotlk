@@ -1916,10 +1916,10 @@ void GameObject::Use(Unit* user)
                     return;
 
                 //required lvl checks!
-                uint8 level = player->getLevel();
+                uint8 level = player->GetLevel();
                 if (level < info->meetingstone.minLevel)
                     return;
-                level = targetPlayer->getLevel();
+                level = targetPlayer->GetLevel();
                 if (level < info->meetingstone.minLevel)
                     return;
 
@@ -2107,7 +2107,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
 
     if (Unit* owner = GetOwner())
     {
-        trigger->SetLevel(owner->getLevel(), false);
+        trigger->SetLevel(owner->GetLevel(), false);
         trigger->SetFaction(owner->GetFaction());
         // needed for GO casts for proper target validation checks
         trigger->SetOwnerGUID(owner->GetGUID());
