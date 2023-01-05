@@ -7,7 +7,10 @@ INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Chance`) VALUES (70068, 
 UPDATE `creature_template` SET `skinloot`= 70068 WHERE (`entry` IN (21879, 21408, 21864, 21901, 21462, 21878, 21195, 20610, 20773, 18879, 20671, 20634, 18880, 20777));
 
 -- Create a new skinning loot with right percentage
-INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Chance`) VALUES (70069, 21887, 100);
+DELETE FROM `skinning_loot_template` WHERE (`Entry` = 70069) AND `Item` IN (21887, 35229);
+INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(70069, 21887, 0, 0, 0, 1, 1, 1, 1, 'Knothide Leather'),
+(70069, 35229, 0, 25, 1, 1, 0, 1, 1, 'Nether Residue');
 
 -- Creature with 100% Knothide Leather
 UPDATE `creature_template` SET `skinloot`= 70069 WHERE (`entry` IN (23501, 22181));
