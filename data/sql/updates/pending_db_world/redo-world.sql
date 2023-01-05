@@ -318,10 +318,6 @@ ALTER TABLE `battlemasterlist_dbc`
 ALTER TABLE `battlemaster_entry`
 	RENAME COLUMN `entry`						TO `Entry`,
 	RENAME COLUMN `bg_template`					TO `BattlegroundTemplate`;
-ALTER TABLE `broadcast_text`
-	RENAME COLUMN `SoundEntriesId`				TO `SoundEntriesID`;
-ALTER TABLE `broadcast_text_locale`
-	RENAME COLUMN `locale`						TO `Locale`;
 ALTER TABLE `charstartoutfit_dbc`
 	RENAME COLUMN `ItemID_1`					TO `ItemID1`,
 	RENAME COLUMN `ItemID_2`					TO `ItemID2`,

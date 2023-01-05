@@ -26,7 +26,6 @@ ALTER TABLE `account`
 ALTER TABLE `account_access`
 	RENAME COLUMN `id`					TO `ID`,
 	RENAME COLUMN `gmlevel`				TO `GMLevel`,
-	RENAME COLUMN `RealmID`				TO `RealmID`,
 	RENAME COLUMN `comment`				TO `Comment`;
 ALTER TABLE `account_banned`
 	RENAME COLUMN `id`					TO `ID`,
