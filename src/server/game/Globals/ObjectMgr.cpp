@@ -9261,14 +9261,14 @@ void ObjectMgr::LoadBroadcastTexts()
         {
             if (!sSoundEntriesStore.LookupEntry(bct.SoundEntriesId))
             {
-                LOG_DEBUG("misc", "BroadcastText (Id: {}) in table `broadcast_text` has SoundEntriesId {} but sound does not exist.", bct.Id, bct.SoundEntriesId);
+                LOG_DEBUG("misc", "BroadcastText (ID: {}) in table `broadcast_text` has SoundEntriesID {} but sound does not exist.", bct.Id, bct.SoundEntriesId);
                 bct.SoundEntriesId = 0;
             }
         }
 
         if (!GetLanguageDescByID(bct.LanguageID))
         {
-            LOG_DEBUG("misc", "BroadcastText (Id: {}) in table `broadcast_text` using Language {} but Language does not exist.", bct.Id, bct.LanguageID);
+            LOG_DEBUG("misc", "BroadcastText (ID: {}) in table `broadcast_text` using Language {} but Language does not exist.", bct.Id, bct.LanguageID);
             bct.LanguageID = LANG_UNIVERSAL;
         }
 
@@ -9276,7 +9276,7 @@ void ObjectMgr::LoadBroadcastTexts()
         {
             if (!sEmotesStore.LookupEntry(bct.EmoteId1))
             {
-                LOG_DEBUG("misc", "BroadcastText (Id: {}) in table `broadcast_text` has EmoteId1 {} but emote does not exist.", bct.Id, bct.EmoteId1);
+                LOG_DEBUG("misc", "BroadcastText (ID: {}) in table `broadcast_text` has EmoteID1 {} but emote does not exist.", bct.Id, bct.EmoteId1);
                 bct.EmoteId1 = 0;
             }
         }
@@ -9285,7 +9285,7 @@ void ObjectMgr::LoadBroadcastTexts()
         {
             if (!sEmotesStore.LookupEntry(bct.EmoteId2))
             {
-                LOG_DEBUG("misc", "BroadcastText (Id: {}) in table `broadcast_text` has EmoteId2 {} but emote does not exist.", bct.Id, bct.EmoteId2);
+                LOG_DEBUG("misc", "BroadcastText (ID: {}) in table `broadcast_text` has EmoteID2 {} but emote does not exist.", bct.Id, bct.EmoteId2);
                 bct.EmoteId2 = 0;
             }
         }
@@ -9294,7 +9294,7 @@ void ObjectMgr::LoadBroadcastTexts()
         {
             if (!sEmotesStore.LookupEntry(bct.EmoteId3))
             {
-                LOG_DEBUG("misc", "BroadcastText (Id: {}) in table `broadcast_text` has EmoteId3 {} but emote does not exist.", bct.Id, bct.EmoteId3);
+                LOG_DEBUG("misc", "BroadcastText (ID: {}) in table `broadcast_text` has EmoteID3 {} but emote does not exist.", bct.Id, bct.EmoteId3);
                 bct.EmoteId3 = 0;
             }
         }
@@ -9310,7 +9310,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
     uint32 oldMSTime = getMSTime();
 
     //                                               0   1       2         3
-    QueryResult result = WorldDatabase.Query("SELECT ID, locale, MaleText, FemaleText FROM broadcast_text_locale");
+    QueryResult result = WorldDatabase.Query("SELECT ID, Locale, MaleText, FemaleText FROM broadcast_text_locale");
 
     if (!result)
     {
@@ -9329,7 +9329,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
         BroadcastTextContainer::iterator bct = _broadcastTextStore.find(id);
         if (bct == _broadcastTextStore.end())
         {
-            LOG_ERROR("sql.sql", "BroadcastText (Id: {}) found in table `broadcast_text_locale` but does not exist in `broadcast_text`. Skipped!", id);
+            LOG_ERROR("sql.sql", "BroadcastText (ID: {}) found in table `broadcast_text_locale` but does not exist in `broadcast_text`. Skipped!", id);
             continue;
         }
 
