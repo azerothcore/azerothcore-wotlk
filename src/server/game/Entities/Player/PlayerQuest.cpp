@@ -666,7 +666,20 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     {
         if (sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
         {
-            CombatStop();
+            if (IsInCombat())
+            {
+                for (int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_BAG_END; ++i)
+                {
+                    if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                    {
+                        if (pItem->GetEntry() == quest->RequiredItemId[i])
+                        {
+                            CombatStop();
+                            break;
+                        }
+                    }
+                }
+            }
             DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true, true);
         }
     }
