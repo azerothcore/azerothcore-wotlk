@@ -215,12 +215,16 @@ bool OutdoorPvPNA::SetupOutdoorPvP()
     // add the zones affected by the pvp buff
     RegisterZone(NA_BUFF_ZONE);
     SetMapFromZone(NA_BUFF_ZONE);
-
+    
     // halaa
     m_obj = new OPvPCapturePointNA(this);
     if (!m_obj)
         return false;
     AddCapturePoint(m_obj);
+
+    //Remove linked graveyard at the server start to avoid players spawning in halaa
+    sGraveyard->RemoveGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, TEAM_ALLIANCE, false);
+    sGraveyard->RemoveGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, TEAM_HORDE, false);
 
     return true;
 }
@@ -230,6 +234,7 @@ void OutdoorPvPNA::HandlePlayerEnterZone(Player* player, uint32 zone)
     // add buffs
     if (player->GetTeamId() == m_obj->GetControllingFaction())
         player->CastSpell(player, NA_CAPTURE_BUFF, true);
+    //m_obj->HandlePlayerEnter(player);
     OutdoorPvP::HandlePlayerEnterZone(player, zone);
 }
 
@@ -438,6 +443,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateSouth = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_S);
+                player->UpdatePvP(true, true);
                 break;
             case NA_DESTROYED_ROOST_N:
                 del = NA_DESTROYED_ROOST_N;
@@ -448,6 +454,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateNorth = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_N);
+                player->UpdatePvP(true, true);
                 break;
             case NA_DESTROYED_ROOST_W:
                 del = NA_DESTROYED_ROOST_W;
@@ -458,6 +465,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateWest = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_W);
+                player->UpdatePvP(true, true);
                 break;
             case NA_DESTROYED_ROOST_E:
                 del = NA_DESTROYED_ROOST_E;
@@ -468,6 +476,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateEast = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_E);
+                player->UpdatePvP(true, true);
                 break;
             case NA_BOMB_WAGON_S:
                 del = NA_BOMB_WAGON_S;
@@ -478,6 +487,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateSouth = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_S);
+                player->UpdatePvP(true, true);
                 break;
             case NA_BOMB_WAGON_N:
                 del = NA_BOMB_WAGON_N;
@@ -488,6 +498,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateNorth = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_N);
+                player->UpdatePvP(true, true);
                 break;
             case NA_BOMB_WAGON_W:
                 del = NA_BOMB_WAGON_W;
@@ -498,6 +509,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateWest = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_W);
+                player->UpdatePvP(true, true);
                 break;
             case NA_BOMB_WAGON_E:
                 del = NA_BOMB_WAGON_E;
@@ -508,6 +520,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateEast = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_E);
+                player->UpdatePvP(true, true);
                 break;
             default:
                 return -1;
@@ -563,6 +576,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
             // in case they fail to do it, the guards are respawned, and they have to start again.
             if (m_ControllingFaction)
                 FactionTakeOver(m_ControllingFaction);
+
             m_RespawnTimer = NA_RESPAWN_TIME;
         }
         else
