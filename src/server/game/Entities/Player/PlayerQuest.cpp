@@ -666,19 +666,18 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     {
         if (sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
         {
-            if (IsInCombat())
+            if (IsInCombat() && iProto->InventoryType == INVTYPE_FINGER)
             {
-                for (int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_BAG_END; ++i)
-                {
-                    if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-                    {
-                        if (pItem->GetEntry() == quest->RequiredItemId[i])
-                        {
-                            CombatStop();
-                            break;
-                        }
-                    }
-                }
+                bool forceCombatStop = false;
+                if (Item* pItem1 = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FINGER1))
+                    if (pItem1->GetEntry() == quest->RequiredItemId[i])
+                        forceCombatStop = true;
+                if (!forceCombatStop)
+                    if (Item* pItem2 = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FINGER2))
+                        if (pItem2->GetEntry() == quest->RequiredItemId[i])
+                            forceCombatStop = true;
+                if (forceCombatStop)
+                    CombatStop();
             }
             DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true, true);
         }
