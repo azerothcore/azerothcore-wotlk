@@ -292,7 +292,7 @@ public:
 
     static bool HandleBanInfoHelper(uint32 accountId, char const* accountName, ChatHandler* handler)
     {
-        QueryResult result = LoginDatabase.Query("SELECT FROM_UNIXTIME(bandate, '%Y-%m-%d..%H:%i:%s') as bandate, unbandate-bandate, active, unbandate, banreason, bannedby FROM account_banned WHERE id = '{}' ORDER BY bandate ASC", accountId);
+        QueryResult result = LoginDatabase.Query("SELECT FROM_UNIXTIME(Bandate, '%Y-%m-%d..%H:%i:%s') as bandate, UnbanDate-BanDate, Active, UnbanDate, BanReason, BannedBy FROM account_banned WHERE ID = '{}' ORDER BY BanDate ASC", accountId);
         if (!result)
         {
             handler->PSendSysMessage(LANG_BANINFO_NOACCOUNTBAN, accountName);
@@ -382,9 +382,9 @@ public:
         LoginDatabase.EscapeString(IP);
         QueryResult result = LoginDatabase.Query("\
             SELECT \
-                ip, FROM_UNIXTIME(bandate, '%Y-%m-%d %H:%i:%s'), FROM_UNIXTIME(unbandate, '%Y-%m-%d %H:%i:%s'), \
-                IF (unbandate > UNIX_TIMESTAMP(), unbandate - UNIX_TIMESTAMP(), 0) AS timeRemaining, \
-                banreason, bannedby, unbandate - bandate = 0 AS permanent \
+                IP, FROM_UNIXTIME(BanDate, '%Y-%m-%d %H:%i:%s'), FROM_UNIXTIME(UnbanDate, '%Y-%m-%d %H:%i:%s'), \
+                IF (UnbanDate > UNIX_TIMESTAMP(), UnbanDate - UNIX_TIMESTAMP(), 0) AS timeRemaining, \
+                BanReason, BannedBy, UnbanDate - BanDate = 0 AS permanent \
             FROM ip_banned \
             WHERE ip = '{}' \
         ", IP);
@@ -446,7 +446,7 @@ public:
                 Field* fields = result->Fetch();
                 uint32 accountid = fields[0].Get<uint32>();
 
-                QueryResult banResult = LoginDatabase.Query("SELECT account.username FROM account, account_banned WHERE account_banned.id='{}' AND account_banned.id=account.id", accountid);
+                QueryResult banResult = LoginDatabase.Query("SELECT account.Username FROM account, account_banned WHERE account_banned.ID='{}' AND account_banned.ID=account.ID", accountid);
                 if (banResult)
                 {
                     Field* fields2 = banResult->Fetch();
@@ -476,7 +476,7 @@ public:
                     AccountMgr::GetName(accountId, accountName);
 
                 // No SQL injection. id is uint32.
-                QueryResult banInfo = LoginDatabase.Query("SELECT bandate, unbandate, bannedby, banreason FROM account_banned WHERE id = {} ORDER BY unbandate", accountId);
+                QueryResult banInfo = LoginDatabase.Query("SELECT BanDate, UnbanDate, BannedBy, BanReason FROM account_banned WHERE ID = {} ORDER BY UnbanDate", accountId);
                 if (banInfo)
                 {
                     Field* fields2 = banInfo->Fetch();

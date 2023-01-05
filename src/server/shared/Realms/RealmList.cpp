@@ -52,8 +52,8 @@ void RealmList::Close()
 
 void RealmList::LoadBuildInfo()
 {
-    //                                                              0             1              2              3      4                5                6
-    if (auto result = LoginDatabase.Query("SELECT majorVersion, minorVersion, bugfixVersion, hotfixVersion, build, winChecksumSeed, macChecksumSeed FROM build_info ORDER BY build ASC"))
+    //                                                 0             1              2              3          4           5                6
+    if (auto result = LoginDatabase.Query("SELECT MajorVersion, MinorVersion, BugfixVersion, HotfixVersion, Build, WinChecksumSeed, MacChecksumSeed FROM build_info ORDER BY Build ASC"))
     {
         for (auto const& fields : *result)
         {

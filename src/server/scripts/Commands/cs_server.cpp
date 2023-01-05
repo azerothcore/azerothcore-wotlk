@@ -119,7 +119,7 @@ public:
 
         {
             uint16 dbPort = 0;
-            if (QueryResult res = LoginDatabase.Query("SELECT port FROM realmlist WHERE id = {}", realm.Id.Realm))
+            if (QueryResult res = LoginDatabase.Query("SELECT Port FROM realmlist WHERE ID = {}", realm.Id.Realm))
                 dbPort = (*res)[0].Get<uint16>();
 
             if (dbPort)

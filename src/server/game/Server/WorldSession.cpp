@@ -148,14 +148,14 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     {
         m_Address = sock->GetRemoteIpAddress().to_string();
         ResetTimeOutTime(false);
-        LoginDatabase.Execute("UPDATE account SET online = 1 WHERE id = {};", GetAccountId()); // One-time query
+        LoginDatabase.Execute("UPDATE account SET Online = 1 WHERE ID = {};", GetAccountId()); // One-time query
     }
 }
 
 /// WorldSession destructor
 WorldSession::~WorldSession()
 {
-    LoginDatabase.Execute("UPDATE account SET totaltime = {} WHERE id = {}", GetTotalTime(), GetAccountId());
+    LoginDatabase.Execute("UPDATE account SET TotalTime = {} WHERE ID = {}", GetTotalTime(), GetAccountId());
 
     ///- unload player if not unloaded
     if (_player)
@@ -174,7 +174,7 @@ WorldSession::~WorldSession()
         delete packet;
 
     if (GetShouldSetOfflineInDB())
-        LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
+        LoginDatabase.Execute("UPDATE account SET Online = 0 WHERE ID = {};", GetAccountId());     // One-time query
 }
 
 std::string const& WorldSession::GetPlayerName() const

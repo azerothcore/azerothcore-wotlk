@@ -1541,7 +1541,7 @@ void World::SetInitialWorldSettings()
 
     uint32 realm_zone = getIntConfig(CONFIG_REALM_ZONE);
 
-    LoginDatabase.Execute("UPDATE realmlist SET icon = {}, timezone = {} WHERE id = '{}'", server_type, realm_zone, realm.Id.Realm);      // One-time query
+    LoginDatabase.Execute("UPDATE realmlist SET Icon = {}, Timezone = {} WHERE ID = '{}'", server_type, realm_zone, realm.Id.Realm);      // One-time query
 
     ///- Custom Hook for loading DB items
     sScriptMgr->OnLoadCustomDatabaseTable();
@@ -2021,7 +2021,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initialize Game Time and Timers");
     LOG_INFO("server.loading", " ");
 
-    LoginDatabase.Execute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES ({}, {}, 0, '{}')",
+    LoginDatabase.Execute("INSERT INTO Uptime (RealmID, StartTime, Uptime, Revision) VALUES ({}, {}, 0, '{}')",
                            realm.Id.Realm, uint32(GameTime::GetStartTime().count()), GitRevision::GetFullVersion());       // One-time query
 
     m_timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
@@ -2094,7 +2094,7 @@ void World::SetInitialWorldSettings()
     sWardenCheckMgr->LoadWardenOverrides();
 
     LOG_INFO("server.loading", "Deleting Expired Bans...");
-    LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate <= UNIX_TIMESTAMP() AND unbandate<>bandate");      // One-time query
+    LoginDatabase.Execute("DELETE FROM ip_banned WHERE UnbanDate <= UNIX_TIMESTAMP() AND UnbanDate<>BanDate");      // One-time query
 
     LOG_INFO("server.loading", "Calculate Next Daily Quest Reset Time...");
     InitDailyQuestResetTime();
