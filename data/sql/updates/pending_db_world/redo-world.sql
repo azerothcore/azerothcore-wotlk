@@ -1,4 +1,4 @@
-achievement_category_dbc`
+ALTER TABLE `achievement_category_dbc`
 	RENAME COLUMN `Name_Lang_enUS`	TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`	TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`	TO `Name-frFR`,
@@ -17,12 +17,12 @@ achievement_category_dbc`
 	RENAME COLUMN `Name_Lang_Unk`	TO `Name-Unk7`,
 	RENAME COLUMN `Name_Lang_Mask`	TO `NameMask`,
 	RENAME COLUMN `Ui_Order`		TO `UIOrder`;
-achievement_criteria_data`
+ALTER TABLE `achievement_criteria_data`
 	RENAME COLUMN `criteria_id`TO `CriteriaID`,
 	RENAME COLUMN `type`TO `Type`,
 	RENAME COLUMN `value1`TO `Value1`,
 	RENAME COLUMN `value2`TO `Value2`;
-achievement_criteria_dbc`
+ALTER TABLE `achievement_criteria_dbc`
 	RENAME COLUMN `Achievement_Id`TO `AchievementID`,
 	RENAME COLUMN `Asset_Id`TO `AssetID`,
 	RENAME COLUMN `Start_Event`TO `StartEvent`,
@@ -50,7 +50,7 @@ achievement_criteria_dbc`
 	RENAME COLUMN `Timer_Asset_Id`TO `TimerAssetID`,
 	RENAME COLUMN `Timer_Time`TO `TimerTime`,
 	RENAME COLUMN `Ui_Order`TO `UIOrder`;
-achievement_dbc`
+ALTER TABLE `achievement_dbc`
 	RENAME COLUMN `Instance_Id`TO `InstanceID`,
 	RENAME COLUMN `Title_Lang_enUS`TO `Title-enUS`,
 	RENAME COLUMN `Title_Lang_enGB`TO `Title-koKR`,
@@ -106,9 +106,9 @@ achievement_dbc`
 	RENAME COLUMN `Reward_Lang_Mask`TO `RewardMask`,
 	RENAME COLUMN `Minimum_Criteria`TO `MinimumCriteria`,
 	RENAME COLUMN `Shares_Criteria`TO `SharesCriteria`;
-achievement_reward_locale`
+ALTER TABLE `achievement_reward_locale`
 	RENAME COLUMN `Text`TO `Body`;
-acore_string`
+ALTER TABLE `acore_string`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `content_default`TO `ContentDefault`,
 	RENAME COLUMN `locale_koKR`TO `Locale-koKR`,
@@ -119,14 +119,14 @@ acore_string`
 	RENAME COLUMN `locale_esES`TO `Locale-esES`,
 	RENAME COLUMN `locale_esMX`TO `Locale-esMX`,
 	RENAME COLUMN `locale_ruRU`TO `Locale-ruRU`;
-areagroup_dbc`
+ALTER TABLE `areagroup_dbc`
 	RENAME COLUMN `AreaID_1`TO `AreaID1`,
 	RENAME COLUMN `AreaID_2`TO `AreaID2`,
 	RENAME COLUMN `AreaID_3`TO `AreaID3`,
 	RENAME COLUMN `AreaID_4`TO `AreaID4`,
 	RENAME COLUMN `AreaID_5`TO `AreaID5`,
 	RENAME COLUMN `AreaID_6`TO `AreaID6`;
-areapoi_dbc`
+ALTER TABLE `areapoi_dbc`
 	RENAME COLUMN `Icon_1`TO `Icon1`,
 	RENAME COLUMN `Icon_2`TO `Icon2`,
 	RENAME COLUMN `Icon_3`TO `Icon3`,
@@ -170,7 +170,7 @@ areapoi_dbc`
 	RENAME COLUMN `Description_Lang_itIT`TO `Description-Unk6`,
 	RENAME COLUMN `Description_Lang_Unk`TO `Description-Unk7`,
 	RENAME COLUMN `Description_Lang_Mask`TO `DescriptionMask`;
-areatable_dbc`
+ALTER TABLE `areatable_dbc`
 	RENAME COLUMN `AreaName_Lang_enUS`TO `AreaName-enUS`,
 	RENAME COLUMN `AreaName_Lang_enGB`TO `AreaName-koKR`,
 	RENAME COLUMN `AreaName_Lang_koKR`TO `AreaName-frFR`,
@@ -194,7 +194,7 @@ areatable_dbc`
 	RENAME COLUMN `LiquidTypeID_4`TO `LiquidTypeID4`,
 	RENAME COLUMN `Ambient_Multiplier`TO `AmbientMultiplier`,
 	RENAME COLUMN `Lightid`TO `LightID`;
-areatrigger`
+ALTER TABLE `areatrigger`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `map`TO `Map`,
 	RENAME COLUMN `x`TO `X`,
@@ -206,23 +206,26 @@ areatrigger`
 	RENAME COLUMN `height`TO `Height`,
 	RENAME COLUMN `orientation`TO `Orientation`,
 	RENAME TO `area_trigger`;
-areatrigger_involvedrelation`
+ALTER TABLE `areatrigger_involvedrelation`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `quest`TO `Quest`,
 	RENAME TO `area_trigger_involved_relation`;
-areatrigger_scripts`TO `area_trigger_scripts`,
+ALTER TABLE `areatrigger_scripts`
 	RENAME COLUMN `entry`TO `Entry`,
-areatrigger_tavern`TO `area_trigger_tavern`,
+	RENAME TO `area_trigger_scripts`;
+ALTER TABLE `areatrigger_tavern`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `name`TO `Name`,
 	RENAME COLUMN `faction`TO `Faction`,
-areatrigger_teleport`TO `area_trigger_teleport`,
+	RENAME TO `area_trigger_tavern`;
+ALTER TABLE `areatrigger_teleport`
 	RENAME COLUMN `target_map`TO `TargetMap`,
 	RENAME COLUMN `target_position_x`TO `TargetPositionX`,
 	RENAME COLUMN `target_position_y`TO `TargetPositionY`,
 	RENAME COLUMN `target_position_z`TO `TargetPositionZ`,
 	RENAME COLUMN `target_orientation`TO `TargetOrientation`,
-auctionhouse_dbc`,
+	RENAME TO `area_trigger_teleport`;
+ALTER TABLE `auctionhouse_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -239,8 +242,8 @@ auctionhouse_dbc`,
 	RENAME COLUMN `Name_Lang_ptBR`TO `Name-Unk5`,
 	RENAME COLUMN `Name_Lang_itIT`TO `Name-Unk6`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
-	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
-barbershopstyle_dbc`,
+	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`;
+ALTER TABLE `barbershopstyle_dbc`
 	RENAME COLUMN `DisplayName_Lang_enUS`TO `DisplayName-enUS`,
 	RENAME COLUMN `DisplayName_Lang_enGB`TO `DisplayName-koKR`,
 	RENAME COLUMN `DisplayName_Lang_koKR`TO `DisplayName-frFR`,
@@ -275,16 +278,16 @@ barbershopstyle_dbc`,
 	RENAME COLUMN `Description_Lang_itIT`TO `Description-Unk6`,
 	RENAME COLUMN `Description_Lang_Unk`TO `Description-Unk7`,
 	RENAME COLUMN `Description_Lang_Mask`TO `DescriptionMask`,
-	RENAME COLUMN `Cost_Modifier`TO `CostModifier`,
-battleground_template`,
+	RENAME COLUMN `Cost_Modifier`TO `CostModifier`;
+ALTER TABLE `battleground_template`
 	RENAME COLUMN `MinLvl`TO `MinLevel`,
 	RENAME COLUMN `MaxLvl`TO `MaxLevel`,
 	RENAME COLUMN `AllianceStartLoc`TO `StartPositionA`,
 	RENAME COLUMN `AllianceStartO`TO `StartOrientationA`,
 	RENAME COLUMN `HordeStartLoc`TO `StartPositionH`,
 	RENAME COLUMN `HordeStartO`TO `StartOrientationH`,
-	RENAME COLUMN `StartMaxDist`TO `MaxStartDistance`,
-battlemasterlist_dbc`,
+	RENAME COLUMN `StartMaxDist`TO `MaxStartDistance`;
+ALTER TABLE `battlemasterlist_dbc`
 	RENAME COLUMN `MapID_1`TO `MapID1`,
 	RENAME COLUMN `MapID_2`TO `MapID2`,
 	RENAME COLUMN `MapID_3`TO `MapID3`,
@@ -311,15 +314,15 @@ battlemasterlist_dbc`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
 	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
 	RENAME COLUMN `Minlevel`TO `MinLevel`,
-	RENAME COLUMN `Maxlevel`TO `MaxLevel`,
-battlemaster_entry`,
+	RENAME COLUMN `Maxlevel`TO `MaxLevel`;
+ALTER TABLE `battlemaster_entry`
 	RENAME COLUMN `entry`TO `Entry`,
-	RENAME COLUMN `bg_template`TO `BattlegroundTemplate`,
-broadcast_text`,
-	RENAME COLUMN `SoundEntriesId`TO `SoundEntriesID`,
-broadcast_text_locale`,
-	RENAME COLUMN `locale`TO `Locale`,
-charstartoutfit_dbc`,
+	RENAME COLUMN `bg_template`TO `BattlegroundTemplate`;
+ALTER TABLE `broadcast_text`
+	RENAME COLUMN `SoundEntriesId`TO `SoundEntriesID`;
+ALTER TABLE `broadcast_text_locale`
+	RENAME COLUMN `locale`TO `Locale`;
+ALTER TABLE `charstartoutfit_dbc`
 	RENAME COLUMN `ItemID_1`TO `ItemID1`,
 	RENAME COLUMN `ItemID_2`TO `ItemID2`,
 	RENAME COLUMN `ItemID_3`TO `ItemID3`,
@@ -391,8 +394,8 @@ charstartoutfit_dbc`,
 	RENAME COLUMN `InventoryType_21`TO `InventoryType21`,
 	RENAME COLUMN `InventoryType_22`TO `InventoryType22`,
 	RENAME COLUMN `InventoryType_23`TO `InventoryType23`,
-	RENAME COLUMN `InventoryType_24`TO `InventoryType24`,
-chartitles_dbc`,
+	RENAME COLUMN `InventoryType_24`TO `InventoryType24`;
+ALTER TABLE `chartitles_dbc`
 	RENAME COLUMN `Condition_ID`TO `ConditionID`,
 	RENAME COLUMN `Name_Lang_enUS`TO `MaleName-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `MaleName-koKR`,
@@ -428,8 +431,8 @@ chartitles_dbc`,
 	RENAME COLUMN `Name1_Lang_itIT`TO `FemaleName-Unk6`,
 	RENAME COLUMN `Name1_Lang_Unk`TO `FemaleName-Unk7`,
 	RENAME COLUMN `Name1_Lang_Mask`TO `FemaleNameMask`,
-	RENAME COLUMN `Mask_ID`TO `TitleMaskID`,
-chatchannels_dbc`,
+	RENAME COLUMN `Mask_ID`TO `TitleMaskID`;
+ALTER TABLE `chatchannels_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -463,8 +466,8 @@ chatchannels_dbc`,
 	RENAME COLUMN `Shortcut_Lang_ptBR`TO `Shortcut-Unk5`,
 	RENAME COLUMN `Shortcut_Lang_itIT`TO `Shortcut-Unk6`,
 	RENAME COLUMN `Shortcut_Lang_Unk`TO `Shortcut-Unk7`,
-	RENAME COLUMN `Shortcut_Lang_Mask`TO `ShortcutMask`,
-chrclasses_dbc`,
+	RENAME COLUMN `Shortcut_Lang_Mask`TO `ShortcutMask`;
+ALTER TABLE `chrclasses_dbc`
 	RENAME COLUMN `Field01`TO `FieldUnk`,
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
@@ -518,8 +521,8 @@ chrclasses_dbc`,
 	RENAME COLUMN `Name_Male_Lang_Unk`TO `MaleName-Unk7`,
 	RENAME COLUMN `Name_Male_Lang_Mask`TO `MaleNameMask`,
 	RENAME COLUMN `Filename`TO `FileName`,
-	RENAME COLUMN `Required_Expansion`TO `RequiredExpansion`,
-chrraces_dbc`,
+	RENAME COLUMN `Required_Expansion`TO `RequiredExpansion`;
+ALTER TABLE `chrraces_dbc`
 	RENAME COLUMN `MaleDisplayId`TO `MaleDisplayID`,
 	RENAME COLUMN `FemaleDisplayId`TO `FemaleDisplayID`,
 	RENAME COLUMN `ClientFilestring`TO `ClientFileString`,
@@ -576,15 +579,15 @@ chrraces_dbc`,
 	RENAME COLUMN `Name_Male_Lang_Mask`TO `MaleNameMask`,
 	RENAME COLUMN `FacialHairCustomization_1`TO `FacialHairCustomization1`,
 	RENAME COLUMN `FacialHairCustomization_2`TO `FacialHairCustomization2`,
-	RENAME COLUMN `Required_Expansion`TO `RequiredExpansion`,
-cinematiccamera_dbc`,
+	RENAME COLUMN `Required_Expansion`TO `RequiredExpansion`;
+ALTER TABLE `cinematiccamera_dbc`
 	RENAME COLUMN `model`TO `Model`,
 	RENAME COLUMN `soundEntry`TO `SoundEntry`,
 	RENAME COLUMN `locationX`TO `LocationX`,
 	RENAME COLUMN `locationY`TO `LocationY`,
 	RENAME COLUMN `locationZ`TO `LocationZ`,
-	RENAME COLUMN `rotation`TO `Rotation`,
-cinematicsequences_dbc`,
+	RENAME COLUMN `rotation`TO `Rotation`;
+ALTER TABLE `cinematicsequences_dbc`
 	RENAME COLUMN `Camera_1`TO `Camera1`,
 	RENAME COLUMN `Camera_2`TO `Camera2`,
 	RENAME COLUMN `Camera_3`TO `Camera3`,
@@ -592,16 +595,16 @@ cinematicsequences_dbc`,
 	RENAME COLUMN `Camera_5`TO `Camera5`,
 	RENAME COLUMN `Camera_6`TO `Camera6`,
 	RENAME COLUMN `Camera_7`TO `Camera7`,
-	RENAME COLUMN `Camera_8`TO `Camera8`,
-command`,
+	RENAME COLUMN `Camera_8`TO `Camera8`;
+ALTER TABLE `command`
 	RENAME COLUMN `name`TO `Name`,
 	RENAME COLUMN `security`TO `Security`,
-	RENAME COLUMN `help`TO `Help`,
-conditions`,
+	RENAME COLUMN `help`TO `Help`;
+ALTER TABLE `conditions`
 	RENAME COLUMN `SourceTypeOrReferenceId`TO `SourceTypeOrReferenceID`,
 	RENAME COLUMN `SourceId`TO `SourceID`,
-	RENAME COLUMN `ErrorTextId`TO `ErrorTextID`,
-creature`,
+	RENAME COLUMN `ErrorTextId`TO `ErrorTextID`;
+ALTER TABLE `creature`
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `id1`TO `ID1`,
 	RENAME COLUMN `id2`TO `ID2`,
@@ -623,14 +626,14 @@ creature`,
 	RENAME COLUMN `curmana`TO `CurrentMana`,
 	RENAME COLUMN `npcflag`TO `NPCFlag`,
 	RENAME COLUMN `unit_flags`TO `UnitFlags`,
-	RENAME COLUMN `dynamicflags`TO `DynamicFlags`,
-creaturedisplayinfoextra_dbc`,
-	RENAME COLUMN `BakeName`TO `Texture`,
-creaturedisplayinfo_dbc`,
+	RENAME COLUMN `dynamicflags`TO `DynamicFlags`;
+ALTER TABLE `creaturedisplayinfoextra_dbc`
+	RENAME COLUMN `BakeName`TO `Texture`;
+ALTER TABLE `creaturedisplayinfo_dbc`
 	RENAME COLUMN `TextureVariation_1`TO `TextureVariation1`,
 	RENAME COLUMN `TextureVariation_2`TO `TextureVariation2`,
-	RENAME COLUMN `TextureVariation_3`TO `TextureVariation3`,
-creaturefamily_dbc`,
+	RENAME COLUMN `TextureVariation_3`TO `TextureVariation3`;
+ALTER TABLE `creaturefamily_dbc`
 	RENAME COLUMN `SkillLine_1`TO `SkillLine1`,
 	RENAME COLUMN `SkillLine_2`TO `SkillLine2`,
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
@@ -649,8 +652,8 @@ creaturefamily_dbc`,
 	RENAME COLUMN `Name_Lang_ptBR`TO `Name-Unk5`,
 	RENAME COLUMN `Name_Lang_itIT`TO `Name-Unk6`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
-	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
-creaturespelldata_dbc`,
+	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`;
+ALTER TABLE `creaturespelldata_dbc`
 	RENAME COLUMN `Spells_1`TO `Spell1`,
 	RENAME COLUMN `Spells_2`TO `Spell2`,
 	RENAME COLUMN `Spells_3`TO `Spell3`,
@@ -658,8 +661,8 @@ creaturespelldata_dbc`,
 	RENAME COLUMN `Availability_1`TO `Availability1`,
 	RENAME COLUMN `Availability_2`TO `Availability2`,
 	RENAME COLUMN `Availability_3`TO `Availability3`,
-	RENAME COLUMN `Availability_4`TO `Availability4`,
-creaturetype_dbc`,
+	RENAME COLUMN `Availability_4`TO `Availability4`;
+ALTER TABLE `creaturetype_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -676,8 +679,8 @@ creaturetype_dbc`,
 	RENAME COLUMN `Name_Lang_ptBR`TO `Name-Unk5`,
 	RENAME COLUMN `Name_Lang_itIT`TO `Name-Unk6`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
-	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
-creature_addon`,
+	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`;
+ALTER TABLE `creature_addon`
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `path_id`TO `PathID`,
 	RENAME COLUMN `mount`TO `Mount`,
@@ -685,8 +688,8 @@ creature_addon`,
 	RENAME COLUMN `bytes2`TO `Bytes2`,
 	RENAME COLUMN `emote`TO `Emote`,
 	RENAME COLUMN `visibilityDistanceType`TO `VisibilityDistanceType`,
-	RENAME COLUMN `auras`TO `Auras`,
-creature_classlevelstats`TO `creature_class_level_stats`,
+	RENAME COLUMN `auras`TO `Auras`;
+ALTER TABLE `creature_classlevelstats`
 	RENAME COLUMN `level`TO `Level`,
 	RENAME COLUMN `class`TO `Class`,
 	RENAME COLUMN `basehp0`TO `BaseHP0`,
@@ -700,7 +703,9 @@ creature_classlevelstats`TO `creature_class_level_stats`,
 	RENAME COLUMN `damage_exp1`TO `DamageBase1`,
 	RENAME COLUMN `damage_exp2`TO `DamageBase2`,
 	RENAME COLUMN `comment`TO `Comment`,
-creature_formations`,
+	RENAME TO `creature_class_level_stats`;
+ALTER TABLE `creature_formations`
+	DROP CONSTRAINT `creature_formations_chk_1`,
 	RENAME COLUMN `leaderGUID`TO `LeaderGUID`,
 	RENAME COLUMN `memberGUID`TO `MemberGUID`,
 	RENAME COLUMN `dist`TO `Distance`,
@@ -708,26 +713,31 @@ creature_formations`,
 	RENAME COLUMN `groupAI`TO `GroupAI`,
 	RENAME COLUMN `point_1`TO `Point1`,
 	RENAME COLUMN `point_2`TO `Point2`,
-creature_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-creature_model_info`,
+	ADD CONSTRAINT `creature_formations_chk_1` CHECK ((`Distance` >= 0) and (`Angle` >= 0));
+ALTER TABLE `creature_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `creature_model_info`
 	RENAME COLUMN `DisplayID`TO `DisplayID1`,
-	RENAME COLUMN `DisplayID_Other_Gender`TO `DisplayID2`,
-creature_movement_override`,
-	RENAME COLUMN `SpawnId`TO `SpawnID`,
-creature_onkill_reputation`TO `creature_kill_reputation`,
+	RENAME COLUMN `DisplayID_Other_Gender`TO `DisplayID2`;
+ALTER TABLE `creature_movement_override`
+	RENAME COLUMN `SpawnId`TO `SpawnID`;
+ALTER TABLE `creature_onkill_reputation`
 	RENAME COLUMN `creature_id`TO `CreatureID`,
-creature_questender`TO `creature_quest_ender`,
+	RENAME TO `creature_kill_reputation`;
+ALTER TABLE `creature_questender`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `quest`TO `Quest`,
-creature_questitem`TO `creature_quest_item`,
+	RENAME TO `creature_quest_ender`;
+ALTER TABLE `creature_questitem`
 	RENAME COLUMN `CreatureEntry`TO `Entry`,
 	RENAME COLUMN `Idx`TO `Index`,
 	RENAME COLUMN `ItemId`TO `ItemID`,
-creature_queststarter`TO `creature_quest_starter`,
+	RENAME TO `creature_quest_item`;
+ALTER TABLE `creature_queststarter`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `quest`TO `Quest`,
-creature_summon_groups`,
+	RENAME TO `creature_quest_starter`;
+ALTER TABLE `creature_summon_groups`
 	RENAME COLUMN `summonerId`TO `SummonerID`,
 	RENAME COLUMN `groupId`TO `GroupID`,
 	RENAME COLUMN `entry`TO `Entry`,
@@ -736,8 +746,8 @@ creature_summon_groups`,
 	RENAME COLUMN `position_z`TO `PositionZ`,
 	RENAME COLUMN `orientation`TO `Orientation`,
 	RENAME COLUMN `summonType`TO `SummonType`,
-	RENAME COLUMN `summonTime`TO `SummonTime`,
-creature_template`,
+	RENAME COLUMN `summonTime`TO `SummonTime`;
+ALTER TABLE `creature_template`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `difficulty_entry_1`TO `DifficultyEntry1`,
 	RENAME COLUMN `difficulty_entry_2`TO `DifficultyEntry2`,
@@ -783,8 +793,8 @@ creature_template`,
 	RENAME COLUMN `movementId`TO `MovementID`,
 	RENAME COLUMN `mechanic_immune_mask`TO `MechanicImmuneMask`,
 	RENAME COLUMN `spell_school_immune_mask`TO `SpellSchoolImmuneMask`,
-	RENAME COLUMN `flags_extra`TO `FlagsExtra`,
-creature_template_addon`,
+	RENAME COLUMN `flags_extra`TO `FlagsExtra`;
+ALTER TABLE `creature_template_addon`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `path_id`TO `PathID`,
 	RENAME COLUMN `mount`TO `Mount`,
@@ -792,26 +802,26 @@ creature_template_addon`,
 	RENAME COLUMN `bytes2`TO `Bytes2`,
 	RENAME COLUMN `emote`TO `Emote`,
 	RENAME COLUMN `visibilityDistanceType`TO `VisibilityDistanceType`,
-	RENAME COLUMN `auras`TO `Auras`,
-creature_template_locale`,
+	RENAME COLUMN `auras`TO `Auras`;
+ALTER TABLE `creature_template_locale`
 	RENAME COLUMN `entry`TO `Entry`,
-	RENAME COLUMN `locale`TO `Locale`,
-creature_text`,
+	RENAME COLUMN `locale`TO `Locale`;
+ALTER TABLE `creature_text`
 	RENAME COLUMN `BroadcastTextId`TO `BroadcastTextID`,
-	RENAME COLUMN `comment`TO `Comment`,
-destructiblemodeldata_dbc`,
+	RENAME COLUMN `comment`TO `Comment`;
+ALTER TABLE `destructiblemodeldata_dbc`
 	RENAME COLUMN `Field17`TO `UnkField1`,
-	RENAME COLUMN `Field18`TO `UnkField2`,
-disables`,
+	RENAME COLUMN `Field18`TO `UnkField2`;
+ALTER TABLE `disables`
 	RENAME COLUMN `sourceType`TO `SourceType`,
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `flags`TO `Flags`,
 	RENAME COLUMN `params_0`TO `Params1`,
 	RENAME COLUMN `params_1`TO `Params2`,
-	RENAME COLUMN `comment`TO `Comment`,
-disenchant_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-dungeonencounter_dbc`,
+	RENAME COLUMN `comment`TO `Comment`;
+ALTER TABLE `disenchant_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `dungeonencounter_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -828,8 +838,8 @@ dungeonencounter_dbc`,
 	RENAME COLUMN `Name_Lang_ptBR`TO `Name-Unk5`,
 	RENAME COLUMN `Name_Lang_itIT`TO `Name-Unk6`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
-	RENAME COLUMN `Name_Lang_Mas`TO `NameMask`,
-dungeon_access_requirements`,
+	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`;
+ALTER TABLE `dungeon_access_requirements`
 	RENAME COLUMN `dungeon_access_id`TO `DungeonAccessID`,
 	RENAME COLUMN `requirement_type`TO `RequirementType`,
 	RENAME COLUMN `requirement_id`TO `RequirementID`,
@@ -837,16 +847,16 @@ dungeon_access_requirements`,
 	RENAME COLUMN `faction`TO `Faction`,
 	RENAME COLUMN `priority`TO `Priority`,
 	RENAME COLUMN `leader_only`TO `LeaderOnly`,
-	RENAME COLUMN `comment`TO `Comment`,
-dungeon_access_template`,
+	RENAME COLUMN `comment`TO `Comment`;
+ALTER TABLE `dungeon_access_template`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `map_id`TO `MapID`,
 	RENAME COLUMN `difficulty`TO `Difficulty`,
 	RENAME COLUMN `min_level`TO `MinLevel`,
 	RENAME COLUMN `max_level`TO `MaxLevel`,
 	RENAME COLUMN `min_avg_item_level`TO `MinAverageItemLevel`,
-	RENAME COLUMN `comment`TO `Comment`,
-durabilitycosts_dbc`,
+	RENAME COLUMN `comment`TO `Comment`;
+ALTER TABLE `durabilitycosts_dbc`
 	RENAME COLUMN `WeaponSubClassCost_1`TO `WeaponSubClassCost1`,
 	RENAME COLUMN `WeaponSubClassCost_2`TO `WeaponSubClassCost2`,
 	RENAME COLUMN `WeaponSubClassCost_3`TO `WeaponSubClassCost3`,
@@ -875,8 +885,8 @@ durabilitycosts_dbc`,
 	RENAME COLUMN `ArmorSubClassCost_5`TO `ArmorSubClassCost5`,
 	RENAME COLUMN `ArmorSubClassCost_6`TO `ArmorSubClassCost6`,
 	RENAME COLUMN `ArmorSubClassCost_7`TO `ArmorSubClassCost7`,
-	RENAME COLUMN `ArmorSubClassCost_8`TO `ArmorSubClassCost8`,
-emotestext_dbc`,
+	RENAME COLUMN `ArmorSubClassCost_8`TO `ArmorSubClassCost8`;
+ALTER TABLE `emotestext_dbc`
 	RENAME COLUMN `EmoteText_1`TO `EmoteText1`,
 	RENAME COLUMN `EmoteText_2`TO `EmoteText2`,
 	RENAME COLUMN `EmoteText_3`TO `EmoteText3`,
@@ -892,8 +902,8 @@ emotestext_dbc`,
 	RENAME COLUMN `EmoteText_13`TO `EmoteText13`,
 	RENAME COLUMN `EmoteText_14`TO `EmoteText14`,
 	RENAME COLUMN `EmoteText_15`TO `EmoteText15`,
-	RENAME COLUMN `EmoteText_16`TO `EmoteText16`,
-event_scripts`,
+	RENAME COLUMN `EmoteText_16`TO `EmoteText16`;
+ALTER TABLE `event_scripts`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `delay`TO `Delay`,
 	RENAME COLUMN `command`TO `Command`,
@@ -903,11 +913,12 @@ event_scripts`,
 	RENAME COLUMN `x`TO `X`,
 	RENAME COLUMN `y`TO `Y`,
 	RENAME COLUMN `z`TO `Z`,
-	RENAME COLUMN `o`TO `O`,
-exploration_basexp`TO `exploration_base_xp`,
+	RENAME COLUMN `o`TO `O`;
+ALTER TABLE `exploration_basexp`
 	RENAME COLUMN `level`TO `Level`,
 	RENAME COLUMN `basexp`TO `BaseXP`,
-factiontemplate_dbc`,
+	RENAME TO `exploration_base_xp`;
+ALTER TABLE `factiontemplate_dbc`
 	RENAME COLUMN `Enemies_1`TO `Enemy1`,
 	RENAME COLUMN `Enemies_2`TO `Enemy2`,
 	RENAME COLUMN `Enemies_3`TO `Enemy3`,
@@ -915,8 +926,8 @@ factiontemplate_dbc`,
 	RENAME COLUMN `Friend_1`TO `Friend1`,
 	RENAME COLUMN `Friend_2`TO `Friend2`,
 	RENAME COLUMN `Friend_3`TO `Friend3`,
-	RENAME COLUMN `Friend_4`TO `Friend4`,
-faction_dbc`,
+	RENAME COLUMN `Friend_4`TO `Friend4`;
+ALTER TABLE `faction_dbc`
 	RENAME COLUMN `ReputationRaceMask_1`TO `ReputationRaceMask1`,
 	RENAME COLUMN `ReputationRaceMask_2`TO `ReputationRaceMask2`,
 	RENAME COLUMN `ReputationRaceMask_3`TO `ReputationRaceMask3`,
@@ -971,10 +982,10 @@ faction_dbc`,
 	RENAME COLUMN `Description_Lang_ptBR`TO `Description-Unk5`,
 	RENAME COLUMN `Description_Lang_itIT`TO `Description-Unk6`,
 	RENAME COLUMN `Description_Lang_Unk`TO `Description-Unk7`,
-	RENAME COLUMN `Description_Lang_Mask`TO `DescriptionMask`,
-fishing_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-gameobject`,
+	RENAME COLUMN `Description_Lang_Mask`TO `DescriptionMask`;
+ALTER TABLE `fishing_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `gameobject`
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `map`TO `Map`,
@@ -992,16 +1003,16 @@ gameobject`,
 	RENAME COLUMN `rotation3`TO `Rotation4`,
 	RENAME COLUMN `spawntimesecs`TO `SpawnTimeSecs`,
 	RENAME COLUMN `animprogress`TO `AnimProgress`,
-	RENAME COLUMN `state`TO `State`,
-gameobjectartkit_dbc`,
+	RENAME COLUMN `state`TO `State`;
+ALTER TABLE `gameobjectartkit_dbc`
 	RENAME COLUMN `Texture_1`TO `Texture1`,
 	RENAME COLUMN `Texture_2`TO `Texture2`,
 	RENAME COLUMN `Texture_3`TO `Texture3`,
 	RENAME COLUMN `Attach_Model_1`TO `AttachModel1`,
 	RENAME COLUMN `Attach_Model_2`TO `AttachModel2`,
 	RENAME COLUMN `Attach_Model_3`TO `AttachModel3`,
-	RENAME COLUMN `Attach_Model_4`TO `AttachModel4`,
-gameobjectdisplayinfo_dbc`,
+	RENAME COLUMN `Attach_Model_4`TO `AttachModel4`;
+ALTER TABLE `gameobjectdisplayinfo_dbc`
 	RENAME COLUMN `Sound_1`TO `Sound1`,
 	RENAME COLUMN `Sound_2`TO `Sound2`,
 	RENAME COLUMN `Sound_3`TO `Sound3`,
@@ -1011,24 +1022,27 @@ gameobjectdisplayinfo_dbc`,
 	RENAME COLUMN `Sound_7`TO `Sound7`,
 	RENAME COLUMN `Sound_8`TO `Sound8`,
 	RENAME COLUMN `Sound_9`TO `Sound9`,
-	RENAME COLUMN `Sound_10`TO `Sound10`,
-gameobject_addon`,
+	RENAME COLUMN `Sound_10`TO `Sound10`;
+ALTER TABLE `gameobject_addon`
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `invisibilityType`TO `InvisibilityType`,
-	RENAME COLUMN `invisibilityValue`TO `InvisibilityValue`,
-gameobject_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-gameobject_questender`TO `gameobject_quest_ender`,
+	RENAME COLUMN `invisibilityValue`TO `InvisibilityValue`;
+ALTER TABLE `gameobject_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `gameobject_questender`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `quest`TO `Quest`,
-gameobject_questitem`TO `gameobject_quest_item`,
+	RENAME TO `gameobject_quest_ender`;
+ALTER TABLE `gameobject_questitem`
 	RENAME COLUMN `GameObjectEntry`TO `Entry`,
 	RENAME COLUMN `Idx`TO `Index`,
 	RENAME COLUMN `ItemId`TO `ItemID`,
-gameobject_queststarter`TO `gameobject_quest_starter`,
+	RENAME TO `gameobject_quest_item`;
+ALTER TABLE `gameobject_queststarter`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `quest`TO `Quest`,
-gameobject_template`,
+	RENAME TO `gameobject_quest_starter`;
+ALTER TABLE `gameobject_template`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `type`TO `Type`,
 	RENAME COLUMN `displayId`TO `DisplayID`,
@@ -1059,8 +1073,8 @@ gameobject_template`,
 	RENAME COLUMN `Data20`TO `Data21`,
 	RENAME COLUMN `Data21`TO `Data22`,
 	RENAME COLUMN `Data22`TO `Data23`,
-	RENAME COLUMN `Data23`TO `Data24`,
-gameobject_template_addon`,
+	RENAME COLUMN `Data23`TO `Data24`;
+ALTER TABLE `gameobject_template_addon`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `faction`TO `Faction`,
 	RENAME COLUMN `flags`TO `Flags`,
@@ -1069,14 +1083,13 @@ gameobject_template_addon`,
 	RENAME COLUMN `artkit0`TO `ArtKit1`,
 	RENAME COLUMN `artkit1`TO `ArtKit2`,
 	RENAME COLUMN `artkit2`TO `ArtKit3`,
-	RENAME COLUMN `artkit3`TO `ArtKit4`,
-gameobject_template_locale`,
+	RENAME COLUMN `artkit3`TO `ArtKit4`;
+ALTER TABLE `gameobject_template_locale`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `locale`TO `Locale`,
 	RENAME COLUMN `name`TO `Name`,
-	RENAME COLUMN `castBarCaption`TO `CastBarCaption`,
-	RENAME COLUMN `VerifiedBuild`,
-game_event`,
+	RENAME COLUMN `castBarCaption`TO `CastBarCaption`;
+ALTER TABLE `game_event`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
 	RENAME COLUMN `start_time`TO `StartTime`,
 	RENAME COLUMN `end_time`TO `EndTime`,
@@ -1086,77 +1099,79 @@ game_event`,
 	RENAME COLUMN `holidayStage`TO `HolidayStage`,
 	RENAME COLUMN `description`TO `Description`,
 	RENAME COLUMN `world_event`TO `WorldEvent`,
-	RENAME COLUMN `announce`TO `Announce`,
-game_event_arena_seasons`,
+	RENAME COLUMN `announce`TO `Announce`;
+ALTER TABLE `game_event_arena_seasons`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
-	RENAME COLUMN `season`TO `Season`,
-game_event_battleground_holiday`,
+	RENAME COLUMN `season`TO `Season`;
+ALTER TABLE `game_event_battleground_holiday`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
-	RENAME COLUMN `bgflag`TO `BattlegroundFlag`,
-game_event_condition`,
+	RENAME COLUMN `bgflag`TO `BattlegroundFlag`;
+ALTER TABLE `game_event_condition`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
 	RENAME COLUMN `condition_id`TO `ConditionID`,
 	RENAME COLUMN `req_num`TO `ReqNum`,
 	RENAME COLUMN `max_world_state_field`TO `MaxWorldStateField`,
 	RENAME COLUMN `done_world_state_field`TO `DoneWorldStateField`,
-	RENAME COLUMN `description`TO `Description`,
-game_event_creature`,
+	RENAME COLUMN `description`TO `Description`;
+ALTER TABLE `game_event_creature`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
-	RENAME COLUMN `guid`TO `GUID`,
-game_event_creature_quest`,
-	RENAME COLUMN `eventEntry`TO `EventEntry`,
-	RENAME COLUMN `id`TO `ID`,
-	RENAME COLUMN `quest`TO `Quest`,
-game_event_gameobject`,
-	RENAME COLUMN `eventEntry`TO `EventEntry`,
-	RENAME COLUMN `guid`TO `GUID`,
-game_event_gameobject_quest`,
+	RENAME COLUMN `guid`TO `GUID`;
+ALTER TABLE `game_event_creature_quest`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
 	RENAME COLUMN `id`TO `ID`,
-	RENAME COLUMN `quest`TO `Quest`,
-game_event_model_equip`,
+	RENAME COLUMN `quest`TO `Quest`;
+ALTER TABLE `game_event_gameobject`
+	RENAME COLUMN `eventEntry`TO `EventEntry`,
+	RENAME COLUMN `guid`TO `GUID`;
+ALTER TABLE `game_event_gameobject_quest`
+	RENAME COLUMN `eventEntry`TO `EventEntry`,
+	RENAME COLUMN `id`TO `ID`,
+	RENAME COLUMN `quest`TO `Quest`;
+ALTER TABLE `game_event_model_equip`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `modelid`TO `ModelID`,
-	RENAME COLUMN `equipment_id`TO `EquipmentID`,
-game_event_npcflag`TO `game_event_npc_flag`,
+	RENAME COLUMN `equipment_id`TO `EquipmentID`;
+ALTER TABLE `game_event_npcflag`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `npcflag`TO `NPCFlag`,
-game_event_npc_vendor`,
+	RENAME TO `game_event_npc_flag`;
+ALTER TABLE `game_event_npc_vendor`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `slot`TO `Slot`,
 	RENAME COLUMN `item`TO `Item`,
 	RENAME COLUMN `maxcount`TO `MaxCount`,
-	RENAME COLUMN `incrtime`TO `IncrTime`,
-game_event_pool`,
+	RENAME COLUMN `incrtime`TO `IncrTime`;
+ALTER TABLE `game_event_pool`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
-	RENAME COLUMN `pool_entry`TO `PoolEntry`,
-game_event_prerequisite`,
+	RENAME COLUMN `pool_entry`TO `PoolEntry`;
+ALTER TABLE `game_event_prerequisite`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
-	RENAME COLUMN `prerequisite_event`TO `PrerequisiteEvent`,
-game_event_quest_condition`,
+	RENAME COLUMN `prerequisite_event`TO `PrerequisiteEvent`;
+ALTER TABLE `game_event_quest_condition`
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
 	RENAME COLUMN `quest`TO `Quest`,
 	RENAME COLUMN `condition_id`TO `ConditionID`,
-	RENAME COLUMN `num`TO `Num`,
-game_event_seasonal_questrelation`TO `game_event_seasonal_quest_relation`,
+	RENAME COLUMN `num`TO `Num`;
+ALTER TABLE `game_event_seasonal_questrelation`
 	RENAME COLUMN `questId`TO `QuestID`,
 	RENAME COLUMN `eventEntry`TO `EventEntry`,
-game_graveyard`,
+	RENAME TO `game_event_seasonal_quest_relation`;
+ALTER TABLE `game_graveyard`
 	RENAME COLUMN `x`TO `X`,
 	RENAME COLUMN `y`TO `Y`,
-	RENAME COLUMN `z`TO `Z`,
-game_tele`,
+	RENAME COLUMN `z`TO `Z`;
+ALTER TABLE `game_tele`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `position_x`TO `PositionX`,
 	RENAME COLUMN `position_y`TO `PositionY`,
 	RENAME COLUMN `position_z`TO `PositionZ`,
 	RENAME COLUMN `orientation`TO `Orientation`,
 	RENAME COLUMN `map`TO `Map`,
-	RENAME COLUMN `name`TO `Name`,
-game_weather`,
+	RENAME COLUMN `name`TO `Name`;
+ALTER TABLE `game_weather`
 	RENAME COLUMN `zone`TO `Zone`,
 	RENAME COLUMN `spring_rain_chance`TO `SpringRainChance`,
 	RENAME COLUMN `spring_snow_chance`TO `SpringSnowChance`,
@@ -1169,15 +1184,15 @@ game_weather`,
 	RENAME COLUMN `fall_storm_chance`TO `FallStormChance`,
 	RENAME COLUMN `winter_rain_chance`TO `WinterRainChance`,
 	RENAME COLUMN `winter_snow_chance`TO `WinterSnowChance`,
-	RENAME COLUMN `winter_storm_chance`TO `WinterStormChance`,
-gemproperties_dbc`,
+	RENAME COLUMN `winter_storm_chance`TO `WinterStormChance`;
+ALTER TABLE `gemproperties_dbc`
 	RENAME COLUMN `Enchant_Id`TO `EnchantID`,
 	RENAME COLUMN `Maxcount_Inv`TO `MaxCountInv`,
-	RENAME COLUMN `Maxcount_Item`TO `MaxCountItem`,
-gossip_menu_option`,
+	RENAME COLUMN `Maxcount_Item`TO `MaxCountItem`;
+ALTER TABLE `gossip_menu_option`
 	RENAME COLUMN `OptionNpcFlag`TO `OptionNPCFlag`,
-	RENAME COLUMN `ActionPoiID`TO `ActionPOIID`,
-holidays_dbc`,
+	RENAME COLUMN `ActionPoiID`TO `ActionPOIID`;
+ALTER TABLE `holidays_dbc`
 	RENAME COLUMN `Duration_1`TO `Duration1`,
 	RENAME COLUMN `Duration_2`TO `Duration2`,
 	RENAME COLUMN `Duration_3`TO `Duration3`,
@@ -1224,24 +1239,24 @@ holidays_dbc`,
 	RENAME COLUMN `CalendarFlags_8`TO `CalendarFlags8`,
 	RENAME COLUMN `CalendarFlags_9`TO `CalendarFlags9`,
 	RENAME COLUMN `CalendarFlags_10`TO `CalendarFlags10`,
-	RENAME COLUMN `TextureFilename`TO `TextureFileName`,
-holiday_dates`,
+	RENAME COLUMN `TextureFilename`TO `TextureFileName`;
+ALTER TABLE `holiday_dates`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `date_id`TO `DateID`,
 	RENAME COLUMN `date_value`TO `DateValue`,
-	RENAME COLUMN `holiday_duration`TO `HolidayDuration`,
-instance_encounters`,
+	RENAME COLUMN `holiday_duration`TO `HolidayDuration`;
+ALTER TABLE `instance_encounters`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `creditType`TO `CreditType`,
 	RENAME COLUMN `creditEntry`TO `CreditEntry`,
 	RENAME COLUMN `lastEncounterDungeon`TO `LastEncounterDungeon`,
-	RENAME COLUMN `comment`TO `Comment`,
-instance_template`,
+	RENAME COLUMN `comment`TO `Comment`;
+ALTER TABLE `instance_template`
 	RENAME COLUMN `map`TO `Map`,
 	RENAME COLUMN `parent`TO `Parent`,
 	RENAME COLUMN `script`TO `Script`,
-	RENAME COLUMN `allowMount`TO `AllowMount`,
-itembagfamily_dbc`,
+	RENAME COLUMN `allowMount`TO `AllowMount`;
+ALTER TABLE `itembagfamily_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -1258,8 +1273,8 @@ itembagfamily_dbc`,
 	RENAME COLUMN `Name_Lang_ptBR`TO `Name-Unk5`,
 	RENAME COLUMN `Name_Lang_itIT`TO `Name-Unk6`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
-	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
-itemdisplayinfo_dbc`,
+	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`;
+ALTER TABLE `itemdisplayinfo_dbc`
 	RENAME COLUMN `ModelName_1`TO `ModelName1`,
 	RENAME COLUMN `ModelName_2`TO `ModelName2`,
 	RENAME COLUMN `ModelTexture_1`TO `ModelTexture1`,
@@ -1278,8 +1293,8 @@ itemdisplayinfo_dbc`,
 	RENAME COLUMN `Texture_5`TO `Texture5`,
 	RENAME COLUMN `Texture_6`TO `Texture6`,
 	RENAME COLUMN `Texture_7`TO `Texture7`,
-	RENAME COLUMN `Texture_8`TO `Texture8`,
-itemextendedcost_dbc`,
+	RENAME COLUMN `Texture_8`TO `Texture8`;
+ALTER TABLE `itemextendedcost_dbc`
 	RENAME COLUMN `ItemID_1`TO `ItemID1`,
 	RENAME COLUMN `ItemID_2`TO `ItemID2`,
 	RENAME COLUMN `ItemID_3`TO `ItemID3`,
@@ -1289,8 +1304,8 @@ itemextendedcost_dbc`,
 	RENAME COLUMN `ItemCount_2`TO `ItemCount2`,
 	RENAME COLUMN `ItemCount_3`TO `ItemCount3`,
 	RENAME COLUMN `ItemCount_4`TO `ItemCount4`,
-	RENAME COLUMN `ItemCount_5`TO `ItemCount5`,
-itemlimitcategory_dbc`,
+	RENAME COLUMN `ItemCount_5`TO `ItemCount5`;
+ALTER TABLE `itemlimitcategory_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -1307,8 +1322,8 @@ itemlimitcategory_dbc`,
 	RENAME COLUMN `Name_Lang_ptBR`TO `Name-Unk5`,
 	RENAME COLUMN `Name_Lang_itIT`TO `Name-Unk6`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
-	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
-itemrandomproperties_dbc`,
+	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`;
+ALTER TABLE `itemrandomproperties_dbc`
 	RENAME COLUMN `Enchantment_1`TO `Enchantment1`,
 	RENAME COLUMN `Enchantment_2`TO `Enchantment2`,
 	RENAME COLUMN `Enchantment_3`TO `Enchantment3`,
@@ -1330,8 +1345,8 @@ itemrandomproperties_dbc`,
 	RENAME COLUMN `Name_Lang_ptBR`TO `Name-Unk5`,
 	RENAME COLUMN `Name_Lang_itIT`TO `Name-Unk6`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
-	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
-itemrandomsuffix_dbc`,
+	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`;
+ALTER TABLE `itemrandomsuffix_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -1358,8 +1373,8 @@ itemrandomsuffix_dbc`,
 	RENAME COLUMN `AllocationPct_2`TO `AllocationPercent2`,
 	RENAME COLUMN `AllocationPct_3`TO `AllocationPercent3`,
 	RENAME COLUMN `AllocationPct_4`TO `AllocationPercent4`,
-	RENAME COLUMN `AllocationPct_5`TO `AllocationPercent5`,
-itemset_dbc`,
+	RENAME COLUMN `AllocationPct_5`TO `AllocationPercent5`;
+ALTER TABLE `itemset_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -1409,19 +1424,19 @@ itemset_dbc`,
 	RENAME COLUMN `SetThreshold_5`TO `SetThreshold5`,
 	RENAME COLUMN `SetThreshold_6`TO `SetThreshold6`,
 	RENAME COLUMN `SetThreshold_7`TO `SetThreshold7`,
-	RENAME COLUMN `SetThreshold_8`TO `SetThreshold8`,
-item_enchantment_template`,
+	RENAME COLUMN `SetThreshold_8`TO `SetThreshold8`;
+ALTER TABLE `item_enchantment_template`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `ench`TO `Enchantment`,
-	RENAME COLUMN `chance`TO `Chance`,
-item_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-item_set_names`,
+	RENAME COLUMN `chance`TO `Chance`;
+ALTER TABLE `item_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `item_set_names`
 	RENAME COLUMN `entry`TO `Entry`,
-	RENAME COLUMN `name`TO `Name`,
-item_set_names_locale`,
-	RENAME COLUMN `locale`TO `Locale`,
-item_template`,
+	RENAME COLUMN `name`TO `Name`;
+ALTER TABLE `item_set_names_locale`
+	RENAME COLUMN `locale`TO `Locale`;
+ALTER TABLE `item_template`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `class`TO `Class`,
 	RENAME COLUMN `subclass`TO `Subclass`,
@@ -1520,8 +1535,8 @@ item_template`,
 	RENAME COLUMN `HolidayId`TO `HolidayID`,
 	RENAME COLUMN `minMoneyLoot`TO `MinMoneyLoot`,
 	RENAME COLUMN `maxMoneyLoot`TO `MaxMoneyLoot`,
-	RENAME COLUMN `flagsCustom`TO `CustomFlags`,
-lfgdungeons_dbc`,
+	RENAME COLUMN `flagsCustom`TO `CustomFlags`;
+ALTER TABLE `lfgdungeons_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -1561,20 +1576,20 @@ lfgdungeons_dbc`,
 	RENAME COLUMN `Description_Lang_ptBR`TO `Description-Unk5`,
 	RENAME COLUMN `Description_Lang_itIT`TO `Description-Unk6`,
 	RENAME COLUMN `Description_Lang_Unk`TO `Description-Unk7`,
-	RENAME COLUMN `Description_Lang_Mask`TO `DescriptionMask`,
-lfg_dungeon_rewards`,
+	RENAME COLUMN `Description_Lang_Mask`TO `DescriptionMask`;
+ALTER TABLE `lfg_dungeon_rewards`
 	RENAME COLUMN `dungeonId`TO `DungeonID`,
 	RENAME COLUMN `maxLevel`TO `MaxLevel`,
 	RENAME COLUMN `firstQuestId`TO `FirstQuestID`,
-	RENAME COLUMN `otherQuestId`TO `OtherQuestID`,
-lfg_dungeon_template`,
+	RENAME COLUMN `otherQuestId`TO `OtherQuestID`;
+ALTER TABLE `lfg_dungeon_template`
 	RENAME COLUMN `dungeonId`TO `DungeonID`,
 	RENAME COLUMN `name`TO `Name`,
 	RENAME COLUMN `position_x`TO `PositionX`,
 	RENAME COLUMN `position_y`TO `PositionY`,
 	RENAME COLUMN `position_z`TO `PositionZ`,
-	RENAME COLUMN `orientation`TO `Orientation`,
-light_dbc`,
+	RENAME COLUMN `orientation`TO `Orientation`;
+ALTER TABLE `light_dbc`
 	RENAME COLUMN `LightParamsID_1`TO `LightParamsID1`,
 	RENAME COLUMN `LightParamsID_2`TO `LightParamsID2`,
 	RENAME COLUMN `LightParamsID_3`TO `LightParamsID3`,
@@ -1582,12 +1597,12 @@ light_dbc`,
 	RENAME COLUMN `LightParamsID_5`TO `LightParamsID5`,
 	RENAME COLUMN `LightParamsID_6`TO `LightParamsID6`,
 	RENAME COLUMN `LightParamsID_7`TO `LightParamsID7`,
-	RENAME COLUMN `LightParamsID_8`TO `LightParamsID8`,
-linked_respawn`,
+	RENAME COLUMN `LightParamsID_8`TO `LightParamsID8`;
+ALTER TABLE `linked_respawn`
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `linkedGuid`TO `LinkedGUID`,
-	RENAME COLUMN `linkType`TO `LinkType`,
-liquidtype_dbc`,
+	RENAME COLUMN `linkType`TO `LinkType`;
+ALTER TABLE `liquidtype_dbc`
 	RENAME COLUMN `FogDarkenintensity`TO `FogDarkenIntensity`,
 	RENAME COLUMN `AmbDarkenintensity`TO `AmbientDarkenIntensity`,
 	RENAME COLUMN `DirDarkenintensity`TO `DirDarkenIntensity`,
@@ -1620,8 +1635,8 @@ liquidtype_dbc`,
 	RENAME COLUMN `Int_1`TO `Int1`,
 	RENAME COLUMN `Int_2`TO `Int2`,
 	RENAME COLUMN `Int_3`TO `Int3`,
-	RENAME COLUMN `Int_4`TO `Int4`,
-lock_dbc`,
+	RENAME COLUMN `Int_4`TO `Int4`;
+ALTER TABLE `lock_dbc`
 	RENAME COLUMN `Type_1`TO `Type1`,
 	RENAME COLUMN `Type_2`TO `Type2`,
 	RENAME COLUMN `Type_3`TO `Type3`,
@@ -1653,8 +1668,8 @@ lock_dbc`,
 	RENAME COLUMN `Action_5`TO `Action5`,
 	RENAME COLUMN `Action_6`TO `Action6`,
 	RENAME COLUMN `Action_7`TO `Action7`,
-	RENAME COLUMN `Action_8`TO `Action8`,
-mailtemplate_dbc`,
+	RENAME COLUMN `Action_8`TO `Action8`;
+ALTER TABLE `mailtemplate_dbc`
 	RENAME COLUMN `Subject_Lang_enUS`TO `Subject-enUS`,
 	RENAME COLUMN `Subject_Lang_enGB`TO `Subject-koKR`,
 	RENAME COLUMN `Subject_Lang_koKR`TO `Subject-frFR`,
@@ -1688,15 +1703,15 @@ mailtemplate_dbc`,
 	RENAME COLUMN `Body_Lang_ptBR`TO `Body-Unk5`,
 	RENAME COLUMN `Body_Lang_itIT`TO `Body-Unk6`,
 	RENAME COLUMN `Body_Lang_Unk`TO `Body-Unk7`,
-	RENAME COLUMN `Body_Lang_Mask`TO `BodyMask`,
-mail_level_reward`,
+	RENAME COLUMN `Body_Lang_Mask`TO `BodyMask`;
+ALTER TABLE `mail_level_reward`
 	RENAME COLUMN `level`TO `Level`,
 	RENAME COLUMN `raceMask`TO `RaceMask`,
 	RENAME COLUMN `mailTemplateId`TO `MailTemplateID`,
-	RENAME COLUMN `senderEntry`TO `SenderEntry`,
-mail_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-mapdifficulty_dbc`,
+	RENAME COLUMN `senderEntry`TO `SenderEntry`;
+ALTER TABLE `mail_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `mapdifficulty_dbc`
 	RENAME COLUMN `Message_Lang_enUS`TO `Message-enUS`,
 	RENAME COLUMN `Message_Lang_enGB`TO `Message-koKR`,
 	RENAME COLUMN `Message_Lang_koKR`TO `Message-frFR`,
@@ -1714,8 +1729,8 @@ mapdifficulty_dbc`,
 	RENAME COLUMN `Message_Lang_itIT`TO `Message-Unk6`,
 	RENAME COLUMN `Message_Lang_Unk`TO `Message-Unk7`,
 	RENAME COLUMN `Message_Lang_Mask`TO `MessageMask`,
-	RENAME COLUMN `Difficultystring`TO `DifficultyString`,
-map_dbc`,
+	RENAME COLUMN `Difficultystring`TO `DifficultyString`;
+ALTER TABLE `map_dbc`
 	RENAME COLUMN `MapName_Lang_enUS`TO `MapName-enUS`,
 	RENAME COLUMN `MapName_Lang_enGB`TO `MapName-koKR`,
 	RENAME COLUMN `MapName_Lang_koKR`TO `MapName-frFR`,
@@ -1766,17 +1781,17 @@ map_dbc`,
 	RENAME COLUMN `MapDescription1_Lang_ptBR`TO `MapDescriptionH-Unk5`,
 	RENAME COLUMN `MapDescription1_Lang_itIT`TO `MapDescriptionH-Unk6`,
 	RENAME COLUMN `MapDescription1_Lang_Unk`TO `MapDescriptionH-Unk7`,
-	RENAME COLUMN `MapDescription1_Lang_Mask`TO `MapDescriptionHMask`,
-milling_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-movie_dbc`,
-	RENAME COLUMN `Filename`TO `FileName`,
-npc_spellclick_spells`,
+	RENAME COLUMN `MapDescription1_Lang_Mask`TO `MapDescriptionHMask`;
+ALTER TABLE `milling_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `movie_dbc`
+	RENAME COLUMN `Filename`TO `FileName`;
+ALTER TABLE `npc_spellclick_spells`
 	RENAME COLUMN `npc_entry`TO `NPCEntry`,
 	RENAME COLUMN `spell_id`TO `SpellID`,
 	RENAME COLUMN `cast_flags`TO `CastFlags`,
-	RENAME COLUMN `user_type`TO `UserType`,
-npc_text`,
+	RENAME COLUMN `user_type`TO `UserType`;
+ALTER TABLE `npc_text`
 	RENAME COLUMN `text0_0`TO `Text0_0`,
 	RENAME COLUMN `text0_1`TO `Text0_1`,
 	RENAME COLUMN `lang0`TO `Lang0`,
@@ -1848,17 +1863,17 @@ npc_text`,
 	RENAME COLUMN `em7_2`TO `Emote7_2`,
 	RENAME COLUMN `em7_3`TO `Emote7_3`,
 	RENAME COLUMN `em7_4`TO `Emote7_4`,
-	RENAME COLUMN `em7_5`TO `Emote7_5`,
-npc_vendor`,
+	RENAME COLUMN `em7_5`TO `Emote7_5`;
+ALTER TABLE `npc_vendor`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `slot`TO `Slot`,
 	RENAME COLUMN `item`TO `Item`,
 	RENAME COLUMN `maxcount`TO `MaxCount`,
-	RENAME COLUMN `incrtime`TO `IncrTime`,
-outdoorpvp_template`,
+	RENAME COLUMN `incrtime`TO `IncrTime`;
+ALTER TABLE `outdoorpvp_template`
 	RENAME COLUMN `TypeId`TO `TypeID`,
-	RENAME COLUMN `comment`TO `Comment`,
-overridespelldata_dbc`,
+	RENAME COLUMN `comment`TO `Comment`;
+ALTER TABLE `overridespelldata_dbc`
 	RENAME COLUMN `Spells_1`TO `Spells1`,
 	RENAME COLUMN `Spells_2`TO `Spells2`,
 	RENAME COLUMN `Spells_3`TO `Spells3`,
@@ -1868,10 +1883,10 @@ overridespelldata_dbc`,
 	RENAME COLUMN `Spells_7`TO `Spells7`,
 	RENAME COLUMN `Spells_8`TO `Spells8`,
 	RENAME COLUMN `Spells_9`TO `Spells9`,
-	RENAME COLUMN `Spells_10`TO `Spells10`,
-page_text_locale`,
-	RENAME COLUMN `locale`TO `Locale`,
-pet_levelstats`TO `pet_level_stats`,
+	RENAME COLUMN `Spells_10`TO `Spells10`;
+ALTER TABLE `page_text_locale`
+	RENAME COLUMN `locale`TO `Locale`;
+ALTER TABLE `pet_levelstats`
 	RENAME COLUMN `creature_entry`TO `CreatureEntry`,
 	RENAME COLUMN `level`TO `Level`,
 	RENAME COLUMN `hp`TO `Health`,
@@ -1884,14 +1899,15 @@ pet_levelstats`TO `pet_level_stats`,
 	RENAME COLUMN `spi`TO `Spirit`,
 	RENAME COLUMN `min_dmg`TO `MinDamage`,
 	RENAME COLUMN `max_dmg`TO `MaxDamage`,
-pet_name_generation`,
+	RENAME TO `pet_level_stats`;
+ALTER TABLE `pet_name_generation`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `word`TO `Word`,
 	RENAME COLUMN `entry`TO `Entry`,
-	RENAME COLUMN `half`TO `Half`,
-pickpocketing_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-playercreateinfo`,
+	RENAME COLUMN `half`TO `Half`;
+ALTER TABLE `pickpocketing_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `playercreateinfo`
 	RENAME COLUMN `race`TO `Race`,
 	RENAME COLUMN `class`TO `Class`,
 	RENAME COLUMN `map`TO `Map`,
@@ -1899,95 +1915,95 @@ playercreateinfo`,
 	RENAME COLUMN `position_x`TO `PositionX`,
 	RENAME COLUMN `position_y`TO `PositionY`,
 	RENAME COLUMN `position_z`TO `PositionZ`,
-	RENAME COLUMN `orientation`TO `Orientation`,
-playercreateinfo_action`,
+	RENAME COLUMN `orientation`TO `Orientation`;
+ALTER TABLE `playercreateinfo_action`
 	RENAME COLUMN `race`TO `Race`,
 	RENAME COLUMN `class`TO `Class`,
 	RENAME COLUMN `button`TO `Button`,
 	RENAME COLUMN `action`TO `Action`,
-	RENAME COLUMN `type`TO `Type`,
-playercreateinfo_cast_spell`,
+	RENAME COLUMN `type`TO `Type`;
+ALTER TABLE `playercreateinfo_cast_spell`
 	RENAME COLUMN `raceMask`TO `RaceMask`,
 	RENAME COLUMN `classMask`TO `ClassMask`,
 	RENAME COLUMN `spell`TO `Spell`,
-	RENAME COLUMN `note`TO `Comment`,
-playercreateinfo_item`,
+	RENAME COLUMN `note`TO `Comment`;
+ALTER TABLE `playercreateinfo_item`
 	RENAME COLUMN `race`TO `Race`,
 	RENAME COLUMN `class`TO `Class`,
 	RENAME COLUMN `itemid`TO `ItemID`,
 	RENAME COLUMN `amount`TO `Amount`,
-	RENAME COLUMN `Note`TO `Comment`,
-playercreateinfo_skills`,
+	RENAME COLUMN `Note`TO `Comment`;
+ALTER TABLE `playercreateinfo_skills`
 	RENAME COLUMN `raceMask`TO `RaceMask`,
 	RENAME COLUMN `classMask`TO `ClassMask`,
 	RENAME COLUMN `skill`TO `Skill`,
 	RENAME COLUMN `rank`TO `Rank`,
-	RENAME COLUMN `comment`TO `Comment`,
-playercreateinfo_spell_custom`,
+	RENAME COLUMN `comment`TO `Comment`;
+ALTER TABLE `playercreateinfo_spell_custom`
 	RENAME COLUMN `racemask`TO `RaceMask`,
 	RENAME COLUMN `classmask`TO `ClassMask`,
-	RENAME COLUMN `Note`TO `Comment`,
-player_classlevelstats`,
+	RENAME COLUMN `Note`TO `Comment`;
+ALTER TABLE `player_classlevelstats`
 	RENAME COLUMN `class`TO `Class`,
 	RENAME COLUMN `level`TO `Level`,
 	RENAME COLUMN `basehp`TO `BaseHP`,
-	RENAME COLUMN `basemana`TO `BaseMana`,
-player_factionchange_achievement`,
+	RENAME COLUMN `basemana`TO `BaseMana`;
+ALTER TABLE `player_factionchange_achievement`
 	RENAME COLUMN `alliance_id`TO `AllianceID`,
-	RENAME COLUMN `horde_id`TO `HordeID`,
-player_factionchange_items`,
-	RENAME COLUMN `alliance_id`TO `AllianceID`,
-	RENAME COLUMN `alliance_comment`TO `AllianceComment`,
-	RENAME COLUMN `horde_id`TO `HordeID`,
-	RENAME COLUMN `horde_comment`TO `HordeComment`,
-player_factionchange_quests`,
-	RENAME COLUMN `alliance_id`TO `AllianceID`,
-	RENAME COLUMN `horde_id`TO `HordeID`,
-player_factionchange_reputations`,
-	RENAME COLUMN `alliance_id`TO `AllianceID`,
-	RENAME COLUMN `horde_id`TO `HordeID`,
-player_factionchange_spells`,
+	RENAME COLUMN `horde_id`TO `HordeID`;
+ALTER TABLE `player_factionchange_items`
 	RENAME COLUMN `alliance_id`TO `AllianceID`,
 	RENAME COLUMN `alliance_comment`TO `AllianceComment`,
 	RENAME COLUMN `horde_id`TO `HordeID`,
-	RENAME COLUMN `horde_comment`TO `HordeComment`,
-player_factionchange_titles`,
+	RENAME COLUMN `horde_comment`TO `HordeComment`;
+ALTER TABLE `player_factionchange_quests`
+	RENAME COLUMN `alliance_id`TO `AllianceID`,
+	RENAME COLUMN `horde_id`TO `HordeID`;
+ALTER TABLE `player_factionchange_reputations`
+	RENAME COLUMN `alliance_id`TO `AllianceID`,
+	RENAME COLUMN `horde_id`TO `HordeID`;
+ALTER TABLE `player_factionchange_spells`
 	RENAME COLUMN `alliance_id`TO `AllianceID`,
 	RENAME COLUMN `alliance_comment`TO `AllianceComment`,
 	RENAME COLUMN `horde_id`TO `HordeID`,
-	RENAME COLUMN `horde_comment`TO `HordeComment`,
-player_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-points_of_interest_locale`,
-	RENAME COLUMN `locale`TO `Locale`,
-pool_creature`,
+	RENAME COLUMN `horde_comment`TO `HordeComment`;
+ALTER TABLE `player_factionchange_titles`
+	RENAME COLUMN `alliance_id`TO `AllianceID`,
+	RENAME COLUMN `alliance_comment`TO `AllianceComment`,
+	RENAME COLUMN `horde_id`TO `HordeID`,
+	RENAME COLUMN `horde_comment`TO `HordeComment`;
+ALTER TABLE `player_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `points_of_interest_locale`
+	RENAME COLUMN `locale`TO `Locale`;
+ALTER TABLE `pool_creature`
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `pool_entry`TO `PoolEntry`,
 	RENAME COLUMN `chance`TO `Chance`,
-	RENAME COLUMN `description`TO `Description`,
-pool_gameobject`,
+	RENAME COLUMN `description`TO `Description`;
+ALTER TABLE `pool_gameobject`
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `pool_entry`TO `PoolEntry`,
 	RENAME COLUMN `chance`TO `Chance`,
-	RENAME COLUMN `description`TO `Description`,
-pool_pool`,
+	RENAME COLUMN `description`TO `Description`;
+ALTER TABLE `pool_pool`
 	RENAME COLUMN `pool_id`TO `PoolID`,
 	RENAME COLUMN `mother_pool`TO `ParentPool`,
 	RENAME COLUMN `chance`TO `Chance`,
-	RENAME COLUMN `description`TO `Description`,
-pool_quest`,
+	RENAME COLUMN `description`TO `Description`;
+ALTER TABLE `pool_quest`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `pool_entry`TO `PoolEntry`,
-	RENAME COLUMN `description`TO `Description`,
-pool_template`,
+	RENAME COLUMN `description`TO `Description`;
+ALTER TABLE `pool_template`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `max_limit`TO `MaxLimit`,
-	RENAME COLUMN `description`TO `Description`,
-powerdisplay_dbc`,
-	RENAME COLUMN `GlobalstringBaseTag`TO `GlobalStringBaseTag`,
-prospecting_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-questfactionreward_dbc`,
+	RENAME COLUMN `description`TO `Description`;
+ALTER TABLE `powerdisplay_dbc`
+	RENAME COLUMN `GlobalstringBaseTag`TO `GlobalStringBaseTag`;
+ALTER TABLE `prospecting_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `questfactionreward_dbc`
 	RENAME COLUMN `Difficulty_1`TO `Difficulty1`,
 	RENAME COLUMN `Difficulty_2`TO `Difficulty2`,
 	RENAME COLUMN `Difficulty_3`TO `Difficulty3`,
@@ -1997,8 +2013,8 @@ questfactionreward_dbc`,
 	RENAME COLUMN `Difficulty_7`TO `Difficulty7`,
 	RENAME COLUMN `Difficulty_8`TO `Difficulty8`,
 	RENAME COLUMN `Difficulty_9`TO `Difficulty9`,
-	RENAME COLUMN `Difficulty_10`TO `Difficulty10`,
-questsort_dbc`,
+	RENAME COLUMN `Difficulty_10`TO `Difficulty10`;
+ALTER TABLE `questsort_dbc`
 	RENAME COLUMN `SortName_Lang_enUS`TO `SortName-enUS`,
 	RENAME COLUMN `SortName_Lang_enGB`TO `SortName-koKR`,
 	RENAME COLUMN `SortName_Lang_koKR`TO `SortName-frFR`,
@@ -2015,8 +2031,8 @@ questsort_dbc`,
 	RENAME COLUMN `SortName_Lang_ptBR`TO `SortName-Unk5`,
 	RENAME COLUMN `SortName_Lang_itIT`TO `SortName-Unk6`,
 	RENAME COLUMN `SortName_Lang_Unk`TO `SortName-Unk7`,
-	RENAME COLUMN `SortName_Lang_Mask`TO `SortNameMask`,
-questxp_dbc`,
+	RENAME COLUMN `SortName_Lang_Mask`TO `SortNameMask`;
+ALTER TABLE `questxp_dbc`
 	RENAME COLUMN `Difficulty_1`TO `Difficulty1`,
 	RENAME COLUMN `Difficulty_2`TO `Difficulty2`,
 	RENAME COLUMN `Difficulty_3`TO `Difficulty3`,
@@ -2026,25 +2042,25 @@ questxp_dbc`,
 	RENAME COLUMN `Difficulty_7`TO `Difficulty7`,
 	RENAME COLUMN `Difficulty_8`TO `Difficulty8`,
 	RENAME COLUMN `Difficulty_9`TO `Difficulty9`,
-	RENAME COLUMN `Difficulty_10`TO `Difficulty10`,
-quest_greeting`,
+	RENAME COLUMN `Difficulty_10`TO `Difficulty10`;
+ALTER TABLE `quest_greeting`
+	RENAME COLUMN `type`TO `Type`;
+ALTER TABLE `quest_greeting_locale`
 	RENAME COLUMN `type`TO `Type`,
-quest_greeting_locale`,
-	RENAME COLUMN `type`TO `Type`,
-	RENAME COLUMN `locale`TO `Locale`,
-quest_mail_sender`,
-	RENAME COLUMN `QuestId`TO `QuestID`,
-quest_offer_reward_locale`,
-	RENAME COLUMN `locale`TO `Locale`,
-quest_poi`,
+	RENAME COLUMN `locale`TO `Locale`;
+ALTER TABLE `quest_mail_sender`
+	RENAME COLUMN `QuestId`TO `QuestID`;
+ALTER TABLE `quest_offer_reward_locale`
+	RENAME COLUMN `locale`TO `Locale`;
+ALTER TABLE `quest_poi`
 	RENAME COLUMN `id`TO `ID`,
-	RENAME COLUMN `WorldMapAreaId`TO `WorldMapAreaID`,
-quest_poi_points`,
+	RENAME COLUMN `WorldMapAreaId`TO `WorldMapAreaID`;
+ALTER TABLE `quest_poi_points`
 	RENAME COLUMN `Idx1`TO `Index1`,
-	RENAME COLUMN `Idx2`TO `Index2`,
-quest_request_items_locale`,
-	RENAME COLUMN `locale`TO `Locale`,
-quest_template`,
+	RENAME COLUMN `Idx2`TO `Index2`;
+ALTER TABLE `quest_request_items_locale`
+	RENAME COLUMN `locale`TO `Locale`;
+ALTER TABLE `quest_template`
 	RENAME COLUMN `RequiredFactionId1`TO `RequiredFactionID1`,
 	RENAME COLUMN `RequiredFactionId2`TO `RequiredFactionID2`,
 	RENAME COLUMN `POIx`TO `POIX`,
@@ -2063,10 +2079,10 @@ quest_template`,
 	RENAME COLUMN `RequiredItemId4`TO `RequiredItemID4`,
 	RENAME COLUMN `RequiredItemId5`TO `RequiredItemID5`,
 	RENAME COLUMN `RequiredItemId6`TO `RequiredItemID6`,
-	RENAME COLUMN `Unknown0`TO `UnkField`,
-quest_template_locale`,
-	RENAME COLUMN `locale`TO `Locale`,
-randproppoints_dbc`,
+	RENAME COLUMN `Unknown0`TO `UnkField`;
+ALTER TABLE `quest_template_locale`
+	RENAME COLUMN `locale`TO `Locale`;
+ALTER TABLE `randproppoints_dbc`
 	RENAME COLUMN `Epic_1`TO `Epic1`,
 	RENAME COLUMN `Epic_2`TO `Epic2`,
 	RENAME COLUMN `Epic_3`TO `Epic3`,
@@ -2081,10 +2097,10 @@ randproppoints_dbc`,
 	RENAME COLUMN `Good_2`TO `Good2`,
 	RENAME COLUMN `Good_3`TO `Good3`,
 	RENAME COLUMN `Good_4`TO `Good4`,
-	RENAME COLUMN `Good_5`TO `Good5`,
-reference_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-reputation_reward_rate`,
+	RENAME COLUMN `Good_5`TO `Good5`;
+ALTER TABLE `reference_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `reputation_reward_rate`
 	RENAME COLUMN `faction`TO `Faction`,
 	RENAME COLUMN `quest_rate`TO `QuestRate`,
 	RENAME COLUMN `quest_daily_rate`TO `QuestDailyRate`,
@@ -2092,8 +2108,8 @@ reputation_reward_rate`,
 	RENAME COLUMN `quest_monthly_rate`TO `QuestMonthlyRate`,
 	RENAME COLUMN `quest_repeatable_rate`TO `QuestRepeatableRate`,
 	RENAME COLUMN `creature_rate`TO `CreatureRate`,
-	RENAME COLUMN `spell_rate`TO `SpellRate`,
-reputation_spillover_template`,
+	RENAME COLUMN `spell_rate`TO `SpellRate`;
+ALTER TABLE `reputation_spillover_template`
 	RENAME COLUMN `faction`TO `BaseFaction`,
 	RENAME COLUMN `faction1`TO `SpillFaction1`,
 	RENAME COLUMN `rate_1`TO `RepRate1`,
@@ -2106,8 +2122,8 @@ reputation_spillover_template`,
 	RENAME COLUMN `rank_3`TO `MaxRank3`,
 	RENAME COLUMN `faction4`TO `SpillFaction4`,
 	RENAME COLUMN `rate_4`TO `RepRate4`,
-	RENAME COLUMN `rank_4`TO `MaxRank4`,
-scalingstatdistribution_dbc`,
+	RENAME COLUMN `rank_4`TO `MaxRank4`;
+ALTER TABLE `scalingstatdistribution_dbc`
 	RENAME COLUMN `StatID_1`TO `StatID1`,
 	RENAME COLUMN `StatID_2`TO `StatID2`,
 	RENAME COLUMN `StatID_3`TO `StatID3`,
@@ -2128,21 +2144,21 @@ scalingstatdistribution_dbc`,
 	RENAME COLUMN `Bonus_8`TO `Bonus8`,
 	RENAME COLUMN `Bonus_9`TO `Bonus9`,
 	RENAME COLUMN `Bonus_10`TO `Bonus10`,
-	RENAME COLUMN `Maxlevel`TO `MaxLevel`,
-scalingstatvalues_dbc`,
-	RENAME COLUMN `Charlevel`TO `CharLevel`,
-script_waypoint`,
+	RENAME COLUMN `Maxlevel`TO `MaxLevel`;
+ALTER TABLE `scalingstatvalues_dbc`
+	RENAME COLUMN `Charlevel`TO `CharLevel`;
+ALTER TABLE `script_waypoint`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `pointid`TO `PointID`,
 	RENAME COLUMN `location_x`TO `LocationX`,
 	RENAME COLUMN `location_y`TO `LocationY`,
 	RENAME COLUMN `location_z`TO `LocationZ`,
 	RENAME COLUMN `waittime`TO `WaitTime`,
-	RENAME COLUMN `point_comment`TO `PointComment`,
-skilllineability_dbc`,
+	RENAME COLUMN `point_comment`TO `PointComment`;
+ALTER TABLE `skilllineability_dbc`
 	RENAME COLUMN `CharacterPoints_1`TO `CharacterPoints1`,
-	RENAME COLUMN `CharacterPoints_2`TO `CharacterPoints2`,
-skillline_dbc`,
+	RENAME COLUMN `CharacterPoints_2`TO `CharacterPoints2`;
+ALTER TABLE `skillline_dbc`
 	RENAME COLUMN `DisplayName_Lang_enUS`TO `DisplayName-enUS`,
 	RENAME COLUMN `DisplayName_Lang_enGB`TO `DisplayName-koKR`,
 	RENAME COLUMN `DisplayName_Lang_koKR`TO `DisplayName-frFR`,
@@ -2193,8 +2209,8 @@ skillline_dbc`,
 	RENAME COLUMN `AlternateVerb_Lang_ptBR`TO `AlternateVerb-Unk5`,
 	RENAME COLUMN `AlternateVerb_Lang_itIT`TO `AlternateVerb-Unk6`,
 	RENAME COLUMN `AlternateVerb_Lang_Unk`TO `AlternateVerb-Unk7`,
-	RENAME COLUMN `AlternateVerb_Lang_Mask`TO `AlternateVerbMask`,
-skilltiers_dbc`,
+	RENAME COLUMN `AlternateVerb_Lang_Mask`TO `AlternateVerbMask`;
+ALTER TABLE `skilltiers_dbc`
 	RENAME COLUMN `Cost_1`TO `Cost1`,
 	RENAME COLUMN `Cost_2`TO `Cost2`,
 	RENAME COLUMN `Cost_3`TO `Cost3`,
@@ -2226,28 +2242,28 @@ skilltiers_dbc`,
 	RENAME COLUMN `Value_13`TO `Value13`,
 	RENAME COLUMN `Value_14`TO `Value14`,
 	RENAME COLUMN `Value_15`TO `Value15`,
-	RENAME COLUMN `Value_16`TO `Value16`,
-skill_discovery_template`,
+	RENAME COLUMN `Value_16`TO `Value16`;
+ALTER TABLE `skill_discovery_template`
 	RENAME COLUMN `spellId`TO `SpellID`,
 	RENAME COLUMN `reqSpell`TO `ReqSpell`,
 	RENAME COLUMN `reqSkillValue`TO `ReqSkillValue`,
-	RENAME COLUMN `chance`TO `Chance`,
-skill_extra_item_template`,
+	RENAME COLUMN `chance`TO `Chance`;
+ALTER TABLE `skill_extra_item_template`
 	RENAME COLUMN `spellId`TO `SpellID`,
 	RENAME COLUMN `requiredSpecialization`TO `RequiredSpecialization`,
 	RENAME COLUMN `additionalCreateChance`TO `AdditionalCreateChance`,
-	RENAME COLUMN `additionalMaxNum`TO `AdditionalMaxNum`,
-skill_fishing_base_level`,
+	RENAME COLUMN `additionalMaxNum`TO `AdditionalMaxNum`;
+ALTER TABLE `skill_fishing_base_level`
 	RENAME COLUMN `entry`TO `Entry`,
-	RENAME COLUMN `skill`TO `Skill`,
-skill_perfect_item_template`,
+	RENAME COLUMN `skill`TO `Skill`;
+ALTER TABLE `skill_perfect_item_template`
 	RENAME COLUMN `spellId`TO `SpellID`,
 	RENAME COLUMN `requiredSpecialization`TO `RequiredSpecialization`,
 	RENAME COLUMN `perfectCreateChance`TO `PerfectCreateChance`,
-	RENAME COLUMN `perfectItemType`TO `PerfectItemType`,
-skinning_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-smart_scripts`,
+	RENAME COLUMN `perfectItemType`TO `PerfectItemType`;
+ALTER TABLE `skinning_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `smart_scripts`
 	RENAME COLUMN `entryorguid`TO `EntryOrGUID`,
 	RENAME COLUMN `source_type`TO `SourceType`,
 	RENAME COLUMN `id`TO `ID`,
@@ -2277,8 +2293,8 @@ smart_scripts`,
 	RENAME COLUMN `target_y`TO `TargetY`,
 	RENAME COLUMN `target_z`TO `TargetZ`,
 	RENAME COLUMN `target_o`TO `TargetO`,
-	RENAME COLUMN `comment`TO `Comment`,
-soundentries_dbc`,
+	RENAME COLUMN `comment`TO `Comment`;
+ALTER TABLE `soundentries_dbc`
 	RENAME COLUMN `File_1`TO `File1`,
 	RENAME COLUMN `File_2`TO `File2`,
 	RENAME COLUMN `File_3`TO `File3`,
@@ -2299,13 +2315,13 @@ soundentries_dbc`,
 	RENAME COLUMN `Freq_8`TO `Freq8`,
 	RENAME COLUMN `Freq_9`TO `Freq9`,
 	RENAME COLUMN `Freq_10`TO `Freq10`,
-	RENAME COLUMN `Volumefloat`TO `VolumeFloat`,
-spelldifficulty_dbc`,
+	RENAME COLUMN `Volumefloat`TO `VolumeFloat`;
+ALTER TABLE `spelldifficulty_dbc`
 	RENAME COLUMN `DifficultySpellID_1`TO `DifficultySpellID1`,
 	RENAME COLUMN `DifficultySpellID_2`TO `DifficultySpellID2`,
 	RENAME COLUMN `DifficultySpellID_3`TO `DifficultySpellID3`,
-	RENAME COLUMN `DifficultySpellID_4`TO `DifficultySpellID4`,
-spellfocusobject_dbc`,
+	RENAME COLUMN `DifficultySpellID_4`TO `DifficultySpellID4`;
+ALTER TABLE `spellfocusobject_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -2322,8 +2338,8 @@ spellfocusobject_dbc`,
 	RENAME COLUMN `Name_Lang_ptBR`TO `Name-Unk5`,
 	RENAME COLUMN `Name_Lang_itIT`TO `Name-Unk6`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
-	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
-spellitemenchantmentcondition_dbc`,
+	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`;
+ALTER TABLE `spellitemenchantmentcondition_dbc`
 	RENAME COLUMN `Lt_OperandType_1`TO `LeftOperandType1`,
 	RENAME COLUMN `Lt_OperandType_2`TO `LeftOperandType2`,
 	RENAME COLUMN `Lt_OperandType_3`TO `LeftOperandType3`,
@@ -2353,8 +2369,8 @@ spellitemenchantmentcondition_dbc`,
 	RENAME COLUMN `Logic_2`TO `Logic2`,
 	RENAME COLUMN `Logic_3`TO `Logic3`,
 	RENAME COLUMN `Logic_4`TO `Logic4`,
-	RENAME COLUMN `Logic_5`TO `Logic5`,
-spellitemenchantment_dbc`,
+	RENAME COLUMN `Logic_5`TO `Logic5`;
+ALTER TABLE `spellitemenchantment_dbc`
 	RENAME COLUMN `Effect_1`TO `Effect1`,
 	RENAME COLUMN `Effect_2`TO `Effect2`,
 	RENAME COLUMN `Effect_3`TO `Effect3`,
@@ -2385,8 +2401,8 @@ spellitemenchantment_dbc`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
 	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
 	RENAME COLUMN `Src_ItemID`TO `SourceItemID`,
-	RENAME COLUMN `Condition_Id`TO `ConditionID`,
-spellrange_dbc`,
+	RENAME COLUMN `Condition_Id`TO `ConditionID`;
+ALTER TABLE `spellrange_dbc`
 	RENAME COLUMN `RangeMin_1`TO `RangeMin1`,
 	RENAME COLUMN `RangeMin_2`TO `RangeMin2`,
 	RENAME COLUMN `RangeMax_1`TO `RangeMax1`,
@@ -2424,8 +2440,8 @@ spellrange_dbc`,
 	RENAME COLUMN `DisplayNameShort_Lang_ptBR`TO `DisplayNameShort-Unk5`,
 	RENAME COLUMN `DisplayNameShort_Lang_itIT`TO `DisplayNameShort-Unk6`,
 	RENAME COLUMN `DisplayNameShort_Lang_Unk`TO `DisplayNameShort-Unk7`,
-	RENAME COLUMN `DisplayNameShort_Lang_Mask`TO `DisplayNameShortMask`,
-spellshapeshiftform_dbc`,
+	RENAME COLUMN `DisplayNameShort_Lang_Mask`TO `DisplayNameShortMask`;
+ALTER TABLE `spellshapeshiftform_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -2454,8 +2470,8 @@ spellshapeshiftform_dbc`,
 	RENAME COLUMN `PresetSpellID_5`TO `PresetSpellID5`,
 	RENAME COLUMN `PresetSpellID_6`TO `PresetSpellID6`,
 	RENAME COLUMN `PresetSpellID_7`TO `PresetSpellID7`,
-	RENAME COLUMN `PresetSpellID_8`TO `PresetSpellID8`,
-spell_area`,
+	RENAME COLUMN `PresetSpellID_8`TO `PresetSpellID8`;
+ALTER TABLE `spell_area`
 	RENAME COLUMN `spell`TO `Spell`,
 	RENAME COLUMN `area`TO `Area`,
 	RENAME COLUMN `quest_start`TO `QuestStart`,
@@ -2465,18 +2481,18 @@ spell_area`,
 	RENAME COLUMN `gender`TO `Gender`,
 	RENAME COLUMN `autocast`TO `AutoCast`,
 	RENAME COLUMN `quest_start_status`TO `QuestStartStatus`,
-	RENAME COLUMN `quest_end_status`TO `QuestEndStatus`,
-spell_bonus_data`,
+	RENAME COLUMN `quest_end_status`TO `QuestEndStatus`;
+ALTER TABLE `spell_bonus_data`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `direct_bonus`TO `DirectBonus`,
 	RENAME COLUMN `dot_bonus`TO `DOTBonus`,
 	RENAME COLUMN `ap_bonus`TO `APBonus`,
 	RENAME COLUMN `ap_dot_bonus`TO `APDOTBonus`,
-	RENAME COLUMN `comments`TO `Comment`,
-spell_custom_attr`,
+	RENAME COLUMN `comments`TO `Comment`;
+ALTER TABLE `spell_custom_attr`
 	RENAME COLUMN `spell_id`TO `SpellID`,
-	RENAME COLUMN `attributes`TO `Attributes`,
-spell_dbc`,
+	RENAME COLUMN `attributes`TO `Attributes`;
+ALTER TABLE `spell_dbc`
 	RENAME COLUMN `Attributes`TO `Attributes0`,
 	RENAME COLUMN `AttributesEx`TO `Attributes1`,
 	RENAME COLUMN `AttributesEx2`TO `Attributes2`,
@@ -2647,40 +2663,40 @@ spell_dbc`,
 	RENAME COLUMN `RequiredTotemCategoryID_2`TO `RequiredTotemCategoryID2`,
 	RENAME COLUMN `EffectBonusMultiplier_1`TO `EffectBonusMultiplier1`,
 	RENAME COLUMN `EffectBonusMultiplier_2`TO `EffectBonusMultiplier2`,
-	RENAME COLUMN `EffectBonusMultiplier_3`TO `EffectBonusMultiplier3`,
-spell_enchant_proc_data`,
+	RENAME COLUMN `EffectBonusMultiplier_3`TO `EffectBonusMultiplier3`;
+ALTER TABLE `spell_enchant_proc_data`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `customChance`TO `CustomChance`,
-	RENAME COLUMN `procEx`TO `ProcEx`,
-spell_group`,
+	RENAME COLUMN `procEx`TO `ProcEx`;
+ALTER TABLE `spell_group`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `spell_id`TO `SpellID`,
-	RENAME COLUMN `special_flag`TO `SpecialFlags`,
-spell_group_stack_rules`,
+	RENAME COLUMN `special_flag`TO `SpecialFlags`;
+ALTER TABLE `spell_group_stack_rules`
 	RENAME COLUMN `group_id`TO `GroupID`,
 	RENAME COLUMN `stack_rule`TO `StackRule`,
-	RENAME COLUMN `description`TO `Comment`,
-spell_linked_spell`,
+	RENAME COLUMN `description`TO `Comment`;
+ALTER TABLE `spell_linked_spell`
 	RENAME COLUMN `spell_trigger`TO `SpellTrigger`,
 	RENAME COLUMN `spell_effect`TO `SpellEffect`,
 	RENAME COLUMN `type`TO `Type`,
-	RENAME COLUMN `comment`TO `Comment`,
-spell_loot_template`,
-	RENAME COLUMN `GroupId`TO `GroupID`,
-spell_mixology`,
+	RENAME COLUMN `comment`TO `Comment`;
+ALTER TABLE `spell_loot_template`
+	RENAME COLUMN `GroupId`TO `GroupID`;
+ALTER TABLE `spell_mixology`
 	RENAME COLUMN `entry`TO `Entry`,
-	RENAME COLUMN `pctMod`TO `PercentMod`,
-spell_pet_auras`,
+	RENAME COLUMN `pctMod`TO `PercentMod`;
+ALTER TABLE `spell_pet_auras`
 	RENAME COLUMN `spell`TO `Spell`,
 	RENAME COLUMN `effectId`TO `EffectID`,
 	RENAME COLUMN `pet`TO `Pet`,
-	RENAME COLUMN `aura`TO `Aura`,
-spell_proc`,
+	RENAME COLUMN `aura`TO `Aura`;
+ALTER TABLE `spell_proc`
 	RENAME COLUMN `SpellId`TO `SpellID`,
 	RENAME COLUMN `SpellFamilyMask0`TO `SpellFamilyMask1`,
 	RENAME COLUMN `SpellFamilyMask1`TO `SpellFamilyMask2`,
-	RENAME COLUMN `SpellFamilyMask2`TO `SpellFamilyMask3`,
-spell_proc_event`,
+	RENAME COLUMN `SpellFamilyMask2`TO `SpellFamilyMask3`;
+ALTER TABLE `spell_proc_event`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `SpellFamilyMask0`TO `SpellFamilyMask1`,
 	RENAME COLUMN `SpellFamilyMask1`TO `SpellFamilyMask2`,
@@ -2688,15 +2704,15 @@ spell_proc_event`,
 	RENAME COLUMN `procFlags`TO `ProcFlags`,
 	RENAME COLUMN `procEx`TO `ProcEx`,
 	RENAME COLUMN `procPhase`TO `ProcPhase`,
-	RENAME COLUMN `ppmRate`TO `PPMRate`,
-spell_ranks`,
+	RENAME COLUMN `ppmRate`TO `PPMRate`;
+ALTER TABLE `spell_ranks`
 	RENAME COLUMN `first_spell_id`TO `BaseSpellID`,
 	RENAME COLUMN `spell_id`TO `SpellID`,
-	RENAME COLUMN `rank`TO `Rank`,
-spell_required`,
+	RENAME COLUMN `rank`TO `Rank`;
+ALTER TABLE `spell_required`
 	RENAME COLUMN `spell_id`TO `SpellID`,
-	RENAME COLUMN `req_spell`TO `ReqSpell`,
-spell_scripts`,
+	RENAME COLUMN `req_spell`TO `ReqSpell`;
+ALTER TABLE `spell_scripts`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `effIndex`TO `EffectIndex`,
 	RENAME COLUMN `delay`TO `Delay`,
@@ -2707,15 +2723,15 @@ spell_scripts`,
 	RENAME COLUMN `x`TO `X`,
 	RENAME COLUMN `y`TO `Y`,
 	RENAME COLUMN `z`TO `Z`,
-	RENAME COLUMN `o`TO `O`,
-spell_script_names`,
-	RENAME COLUMN `spell_id`TO `SpellID`,
-spell_threat`,
+	RENAME COLUMN `o`TO `O`;
+ALTER TABLE `spell_script_names`
+	RENAME COLUMN `spell_id`TO `SpellID`;
+ALTER TABLE `spell_threat`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `flatMod`TO `FlatMod`,
 	RENAME COLUMN `pctMod`TO `PercentMod`,
-	RENAME COLUMN `apPctMod`TO `APPercentMod`,
-talenttab_dbc`,
+	RENAME COLUMN `apPctMod`TO `APPercentMod`;
+ALTER TABLE `talenttab_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -2732,8 +2748,8 @@ talenttab_dbc`,
 	RENAME COLUMN `Name_Lang_ptBR`TO `Name-Unk5`,
 	RENAME COLUMN `Name_Lang_itIT`TO `Name-Unk6`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
-	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
-talent_dbc`,
+	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`;
+ALTER TABLE `talent_dbc`
 	RENAME COLUMN `SpellRank_1`TO `SpellRank1`,
 	RENAME COLUMN `SpellRank_2`TO `SpellRank2`,
 	RENAME COLUMN `SpellRank_3`TO `SpellRank3`,
@@ -2750,8 +2766,8 @@ talent_dbc`,
 	RENAME COLUMN `PrereqRank_2`TO `PrereqRank2`,
 	RENAME COLUMN `PrereqRank_3`TO `PrereqRank3`,
 	RENAME COLUMN `CategoryMask_1`TO `CategoryMask1`,
-	RENAME COLUMN `CategoryMask_2`TO `CategoryMask2`,
-taxinodes_dbc`,
+	RENAME COLUMN `CategoryMask_2`TO `CategoryMask2`;
+ALTER TABLE `taxinodes_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -2770,12 +2786,12 @@ taxinodes_dbc`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
 	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
 	RENAME COLUMN `MountCreatureID_1`TO `MountCreatureID1`,
-	RENAME COLUMN `MountCreatureID_2`TO `MountCreatureID2`,
-taxipathnode_dbc`,
+	RENAME COLUMN `MountCreatureID_2`TO `MountCreatureID2`;
+ALTER TABLE `taxipathnode_dbc`
 	RENAME COLUMN `LocX`TO `LocationX`,
 	RENAME COLUMN `LocY`TO `LocationY`,
-	RENAME COLUMN `LocZ`TO `LocationZ`,
-totemcategory_dbc`,
+	RENAME COLUMN `LocZ`TO `LocationZ`;
+ALTER TABLE `totemcategory_dbc`
 	RENAME COLUMN `Name_Lang_enUS`TO `Name-enUS`,
 	RENAME COLUMN `Name_Lang_enGB`TO `Name-koKR`,
 	RENAME COLUMN `Name_Lang_koKR`TO `Name-frFR`,
@@ -2792,41 +2808,41 @@ totemcategory_dbc`,
 	RENAME COLUMN `Name_Lang_ptBR`TO `Name-Unk5`,
 	RENAME COLUMN `Name_Lang_itIT`TO `Name-Unk6`,
 	RENAME COLUMN `Name_Lang_Unk`TO `Name-Unk7`,
-	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`,
-transportanimation_dbc`,
+	RENAME COLUMN `Name_Lang_Mask`TO `NameMask`;
+ALTER TABLE `transportanimation_dbc`
 	RENAME COLUMN `PosX`TO `PositionX`,
 	RENAME COLUMN `PosY`TO `PositionY`,
-	RENAME COLUMN `PosZ`TO `PositionZ`,
-transportrotation_dbc`,
+	RENAME COLUMN `PosZ`TO `PositionZ`;
+ALTER TABLE `transportrotation_dbc`
 	RENAME COLUMN `RotX`TO `RotationX`,
 	RENAME COLUMN `RotY`TO `RotationY`,
 	RENAME COLUMN `RotZ`TO `RotationZ`,
-	RENAME COLUMN `RotW`TO `RotationW`,
-transports`,
+	RENAME COLUMN `RotW`TO `RotationW`;
+ALTER TABLE `transports`
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `entry`TO `Entry`,
-	RENAME COLUMN `name`TO `Name`,
-updates`,
+	RENAME COLUMN `name`TO `Name`;
+ALTER TABLE `updates`
 	RENAME COLUMN `name`TO `Name`,
 	RENAME COLUMN `hash`TO `Hash`,
 	RENAME COLUMN `state`TO `State`,
 	RENAME COLUMN `timestamp`TO `Timestamp`,
-	RENAME COLUMN `speed`TO `Duration`,
-updates_include`,
+	RENAME COLUMN `speed`TO `Duration`;
+ALTER TABLE `updates_include`
 	RENAME COLUMN `path`TO `Path`,
-	RENAME COLUMN `state`TO `State`,
-vehicleseat_dbc`,
+	RENAME COLUMN `state`TO `State`;
+ALTER TABLE `vehicleseat_dbc`
 	RENAME COLUMN `Flags`TO `FlagsA`,
-	RENAME COLUMN `UiSkin`TO `UISkin`,
-vehicle_accessory`,
+	RENAME COLUMN `UiSkin`TO `UISkin`;
+ALTER TABLE `vehicle_accessory`
 	RENAME COLUMN `guid`TO `GUID`,
 	RENAME COLUMN `accessory_entry`TO `AccessoryEntry`,
 	RENAME COLUMN `seat_id`TO `SeatID`,
 	RENAME COLUMN `minion`TO `Minion`,
 	RENAME COLUMN `description`TO `Description`,
 	RENAME COLUMN `summontype`TO `SummonType`,
-	RENAME COLUMN `summontimer`TO `SummonTimer`,
-vehicle_dbc`,
+	RENAME COLUMN `summontimer`TO `SummonTimer`;
+ALTER TABLE `vehicle_dbc`
 	RENAME COLUMN `SeatID_1`TO `SeatID1`,
 	RENAME COLUMN `SeatID_2`TO `SeatID2`,
 	RENAME COLUMN `SeatID_3`TO `SeatID3`,
@@ -2852,21 +2868,21 @@ vehicle_dbc`,
 	RENAME COLUMN `MsslTrgtImpactTexRadius`TO `MissileTargetImpactTextureRadius`,
 	RENAME COLUMN `PowerDisplayID_1`TO `PowerDisplayID1`,
 	RENAME COLUMN `PowerDisplayID_2`TO `PowerDisplayID2`,
-	RENAME COLUMN `PowerDisplayID_3`TO `PowerDisplayID3`,
-vehicle_template_accessory`,
+	RENAME COLUMN `PowerDisplayID_3`TO `PowerDisplayID3`;
+ALTER TABLE `vehicle_template_accessory`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `accessory_entry`TO `AccessoryEntry`,
 	RENAME COLUMN `seat_id`TO `SeatID`,
 	RENAME COLUMN `minion`TO `Minion`,
 	RENAME COLUMN `description`TO `Description`,
 	RENAME COLUMN `summontype`TO `SummonType`,
-	RENAME COLUMN `summontimer`TO `SummonTimer`,
-version`,
+	RENAME COLUMN `summontimer`TO `SummonTimer`;
+ALTER TABLE `version`
 	RENAME COLUMN `core_version`TO `CoreVersion`,
 	RENAME COLUMN `core_revision`TO `CoreRevision`,
 	RENAME COLUMN `db_version`TO `DBVersion`,
-	RENAME COLUMN `cache_id`TO `CacheID`,
-warden_checks`,
+	RENAME COLUMN `cache_id`TO `CacheID`;
+ALTER TABLE `warden_checks`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `type`TO `Type`,
 	RENAME COLUMN `data`TO `Data`,
@@ -2874,8 +2890,8 @@ warden_checks`,
 	RENAME COLUMN `address`TO `Address`,
 	RENAME COLUMN `length`TO `Length`,
 	RENAME COLUMN `result`TO `Result`,
-	RENAME COLUMN `comment`TO `Comment`,
-waypoints`,
+	RENAME COLUMN `comment`TO `Comment`;
+ALTER TABLE `waypoints`
 	RENAME COLUMN `entry`TO `Entry`,
 	RENAME COLUMN `pointid`TO `PointID`,
 	RENAME COLUMN `position_x`TO `PositionX`,
@@ -2883,8 +2899,8 @@ waypoints`,
 	RENAME COLUMN `position_z`TO `PositionZ`,
 	RENAME COLUMN `orientation`TO `Orientation`,
 	RENAME COLUMN `delay`TO `Delay`,
-	RENAME COLUMN `point_comment`TO `PointComment`,
-waypoint_data`,
+	RENAME COLUMN `point_comment`TO `PointComment`;
+ALTER TABLE `waypoint_data`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `point`TO `Point`,
 	RENAME COLUMN `position_x`TO `PositionX`,
@@ -2895,8 +2911,8 @@ waypoint_data`,
 	RENAME COLUMN `move_type`TO `MoveType`,
 	RENAME COLUMN `action`TO `Action`,
 	RENAME COLUMN `action_chance`TO `ActionChance`,
-	RENAME COLUMN `wpguid`TO `WaypointGUID`,
-waypoint_scripts`,
+	RENAME COLUMN `wpguid`TO `WaypointGUID`;
+ALTER TABLE `waypoint_scripts`
 	RENAME COLUMN `id`TO `ID`,
 	RENAME COLUMN `delay`TO `Delay`,
 	RENAME COLUMN `command`TO `Command`,
@@ -2907,8 +2923,8 @@ waypoint_scripts`,
 	RENAME COLUMN `y`TO `Y`,
 	RENAME COLUMN `z`TO `Z`,
 	RENAME COLUMN `o`TO `O`,
-	RENAME COLUMN `guid`TO `GUID`,
-wmoareatable_dbc`,
+	RENAME COLUMN `guid`TO `GUID`;
+ALTER TABLE `wmoareatable_dbc`
 	RENAME COLUMN `AreaName_Lang_enUS`TO `AreaName-enUS`,
 	RENAME COLUMN `AreaName_Lang_enGB`TO `AreaName-koKR`,
 	RENAME COLUMN `AreaName_Lang_koKR`TO `AreaName-frFR`,
@@ -2925,9 +2941,9 @@ wmoareatable_dbc`,
 	RENAME COLUMN `AreaName_Lang_ptBR`TO `AreaName-Unk5`,
 	RENAME COLUMN `AreaName_Lang_itIT`TO `AreaName-Unk6`,
 	RENAME COLUMN `AreaName_Lang_Unk`TO `AreaName-Unk7`,
-	RENAME COLUMN `AreaName_Lang_Mask`TO `AreaNameMask`,
-worldmapoverlay_dbc`,
+	RENAME COLUMN `AreaName_Lang_Mask`TO `AreaNameMask`;
+ALTER TABLE `worldmapoverlay_dbc`
 	RENAME COLUMN `AreaID_1`TO `AreaID1`,
 	RENAME COLUMN `AreaID_2`TO `AreaID2`,
 	RENAME COLUMN `AreaID_3`TO `AreaID3`,
-	RENAME COLUMN `AreaID_4`TO `AreaID4`,
+	RENAME COLUMN `AreaID_4`TO `AreaID4`;
