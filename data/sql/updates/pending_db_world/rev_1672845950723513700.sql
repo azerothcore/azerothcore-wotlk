@@ -1,6 +1,6 @@
 -- Pathing for Frances Lin Entry: 20401
 SET @NPC := 20401;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=1820.7647705078125,`position_y`=1016.41839599609375,`position_z`=11.68548202514648437, `orientation`=1.570796370506286621 WHERE `id1`=@NPC;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=1820.7647705078125,`position_y`=1016.41839599609375,`position_z`=11.68548202514648437, `orientation`=1.570796370506286621, `VerifiedBuild`=47187 WHERE `id1`=@NPC;
 DELETE FROM `waypoints` WHERE `entry`=@NPC;
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`point_comment`) VALUES
 (@NPC,1,1814.421,1016.1131,11.685482,NULL,0,'Frances Lin'),
@@ -61,7 +61,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `
 (20401, 2, 0, 18159, 'More grog?', 12, 0, 100, 1, 0, 0, 0, 'Frances Lin');
 
 -- Chef Jessen
-UPDATE `creature` SET `position_x`=1816.1407,`position_y`=1006.5959,`position_z`=11.672032, `orientation`=0.03490658476948738 WHERE `guid`=83695 AND `id1`=20378;
+UPDATE `creature` SET `position_x`=1816.1407,`position_y`=1006.5959,`position_z`=11.672032, `orientation`=0.03490658476948738, `VerifiedBuild`=47187 WHERE `guid`=83695 AND `id1`=20378;
 
 DELETE FROM `creature_template_addon` WHERE (`entry` = 20378);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
@@ -79,17 +79,17 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (2037800, 2037801));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2037800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Set Event Phase 2'),
-(2037800, 9, 1, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Say Line 0'),
-(2037800, 9, 2, 0, 0, 0, 100, 0, 3400, 3400, 0, 0, 0, 53, 0, 2037800, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Start Waypoint'),
-(2037801, 9, 0, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Say Line 1'),
-(2037801, 9, 1, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 20345, 10, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Set Orientation Closest Creature \'Commander Mograine\''),
-(2037801, 9, 2, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 1, 2, 0, 1, 0, 0, 0, 19, 20345, 10, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Say Line 2'),
-(2037801, 9, 3, 0, 0, 0, 100, 0, 3400, 3400, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 1.5707963705062866, 'Chef Jessen - In Combat - Set Orientation 1.5707963705062866'),
-(2037801, 9, 4, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Say Line 3'),
-(2037801, 9, 5, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Say Line 4'),
-(2037801, 9, 6, 0, 0, 0, 100, 0, 2200, 2200, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Play Emote 14'),
-(2037801, 9, 7, 0, 0, 0, 100, 0, 2500, 2500, 0, 0, 0, 53, 0, 2037801, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - In Combat - Start Waypoint');
+(2037800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Script - Set Event Phase 2'),
+(2037800, 9, 1, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Script - Say Line 0'),
+(2037800, 9, 2, 0, 0, 0, 100, 0, 3400, 3400, 0, 0, 0, 53, 0, 2037800, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Script - Start Waypoint'),
+(2037801, 9, 0, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Script - Say Line 1'),
+(2037801, 9, 1, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 20345, 10, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Script - Set Orientation Closest Creature \'Commander Mograine\''),
+(2037801, 9, 2, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 1, 2, 0, 1, 0, 0, 0, 19, 20345, 10, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Script - Say Line 2'),
+(2037801, 9, 3, 0, 0, 0, 100, 0, 3400, 3400, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 1.5707963705062866, 'Chef Jessen - On Script - Set Orientation 1.5707963705062866'),
+(2037801, 9, 4, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Script - Say Line 3'),
+(2037801, 9, 5, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Script - Say Line 4'),
+(2037801, 9, 6, 0, 0, 0, 100, 0, 2200, 2200, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Script - Play Emote 14'),
+(2037801, 9, 7, 0, 0, 0, 100, 0, 2500, 2500, 0, 0, 0, 53, 0, 2037801, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chef Jessen - On Script - Start Waypoint');
 
 DELETE FROM `waypoints` WHERE `entry` IN (2037800, 2037801);
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`point_comment`) VALUES
@@ -107,10 +107,64 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `
 (20378, 3, 0, 18143, 'NOW, everybody in this bar is gonna keep the noise to a minimum or ol\' Jessen is gonna bust out his rollin\' pin and cleaver and go orc on all of ya! IS EVERYONE CLEAR?!!!', 12, 0, 100, 22, 0, 0, 0, 'Chef Jessen'),
 (20378, 4, 0, 18144, 'AAAAAAaaaarrrrgh!!!!! SHUT IT!', 12, 0, 100, 15, 0, 0, 0, 'Chef Jessen');
 
+-- Citizen Pack 1
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (20428, 20429, 20430);
+UPDATE `creature` SET `position_x`=1819.1077,`position_y`=1088.4419,`position_z`=12.576075, `orientation`=2.39110112190246582, `VerifiedBuild`=47187 WHERE `guid`=83704 AND `id1`=20428;
+UPDATE `creature` SET `position_x`=1817.1642,`position_y`=1090.5482,`position_z`=12.359373, `orientation`=5.567600250244140625, `VerifiedBuild`=47187 WHERE `guid`=83705 AND `id1`=20429;
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -83704) AND (`source_type` = 0);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-83704, 0, 0, 0, 60, 0, 100, 0, 210000, 210000, 210000, 210000, 0, 80, 2042800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Update - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -83705);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-83705, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Data Set 1 1 - Say Line 0'),
+(-83705, 0, 1, 0, 38, 0, 100, 0, 1, 2, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Data Set 1 2 - Say Line 1');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2042800);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2042800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Script - Say Line 0'),
+(2042800, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 83705, 20429, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Script - Set Data 1 1'),
+(2042800, 9, 2, 0, 0, 0, 100, 0, 8200, 8200, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Script - Say Line 1'),
+(2042800, 9, 3, 0, 0, 0, 100, 0, 8600, 8600, 0, 0, 0, 45, 1, 2, 0, 0, 0, 0, 10, 83705, 20429, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Script - Set Data 1 2'),
+(2042800, 9, 4, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Script - Say Line 2');
+
+DELETE FROM `creature_text` WHERE `CreatureID` IN (20428, 20429, 20430);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`) VALUES
+(20428, 0, 0, 18201, 'These damned taxes are breaking my back. King Terenas must be losing his grip if he thinks all this reconstruction will boost the economy.', 12, 0, 100, 0, 0, 0, 0, 'Hillsbrad Citizen - Group 1'),
+(20429, 0, 0, 18202, 'He hasn\'t been the same since the War. It\'s like he aged and became an old man overnight. That son of his, though - he\'ll make a fine king one day. \n', 12, 0, 100, 0, 0, 0, 0, 'Hillsbrad Citizen - Group 1'),
+(20428, 1, 0, 18203, 'Prince Arthas? Please. Spends all his time chasing after Proudmoore\'s daughter, from what I hear. Boy\'s got more on his mind than affairs of state, I tell ya.\n', 12, 0, 100, 0, 0, 0, 0, 'Hillsbrad Citizen - Group 1'),
+(20429, 1, 0, 18204, 'I\'m not so sure. I\'ve heard that he\'s being trained as a paladin. Terenas hopes the Silver Hand can teach him some discipline. If anyone can set Arthas straight, it\'d be old Uther.', 12, 0, 100, 0, 0, 0, 0, 'Hillsbrad Citizen - Group 1'),
+(20428, 2, 0, 18205, 'Aye, that\'s true. Uther - now there\'s a real hero for the people.', 12, 0, 100, 0, 0, 0, 0, 'Hillsbrad Citizen - Group 1'),
+-- Citizen Pack 2
+(20429, 2, 0, 18206, 'So have you heard about Lieutenant Blackmoore\'s new gladiator? Some say he\'s unbeatable.', 12, 0, 100, 0, 0, 0, 0, 'Hillsbrad Citizen - Group 2'),
+(20430, 0, 0, 18207, 'Aye, I seen \'im fight. He\'s an orc - big as they come. Lost a week\'s wages bettin\' against that one. Won\'t make that mistake again!', 12, 0, 100, 0, 0, 0, 0, 'Hillsbrad Citizen - Group 2'),
+(20429, 3, 0, 18208, 'Win or lose, the Lieutenant must be crazy to keep a pet orc like that. Those ones can\'t be trusted. Animals, they are.\n', 12, 0, 100, 0, 0, 0, 0, 'Hillsbrad Citizen - Group 2'),
+(20430, 1, 0, 18209, 'True. True. Light help him if that monster ever gets free!', 12, 0, 100, 0, 0, 0, 0, 'Hillsbrad Citizen - Group 2');
+
+UPDATE `creature` SET `position_x`=1950.0758,`position_y`=1095.8552,`position_z`=26.906488, `orientation`=5.480333805084228515, `id1`=20429, `VerifiedBuild`=47187 WHERE `guid`=83631 AND `id1`=20428;
+UPDATE `creature` SET `position_x`=1950.908,`position_y`=1094.0271,`position_z`=26.906424, `orientation`=2.164208173751831054, `VerifiedBuild`=47187 WHERE `guid`=83632 AND `id1`=20430;
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -83631) AND (`source_type` = 0);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-83631, 0, 0, 0, 60, 0, 100, 0, 210000, 210000, 210000, 210000, 0, 80, 2042900, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Update - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -83632);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-83632, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Data Set 1 1 - Say Line 0'),
+(-83632, 0, 1, 0, 38, 0, 100, 0, 1, 2, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Data Set 1 2 - Say Line 1');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2042900);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2042900, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Script - Say Line 2'),
+(2042900, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 83632, 20430, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Script - Set Data 1 1'),
+(2042900, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Script - Say Line 3'),
+(2042900, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 45, 1, 2, 0, 0, 0, 0, 10, 83632, 20430, 0, 0, 0, 0, 0, 0, 'Hillsbrad Citizen - On Script - Set Data 1 2');
+
 -- Pathing for Herod the Bully Entry: 20360
 SET @NPC := (SELECT `guid` FROM `creature` WHERE `id1`=20360);
 SET @PATH := @NPC * 10;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=1763.9722,`position_y`=1068.7299,`position_z`=6.8648014 WHERE `guid`=@NPC;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=1763.9722,`position_y`=1068.7299,`position_z`=6.8648014, `VerifiedBuild`=47187 WHERE `guid`=@NPC;
 DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
@@ -150,8 +204,8 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 -- Pathing for Hillsbrad Citizen Entry: 20429
 SET @NPC := 83630;
 SET @PATH := @NPC * 10;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=2081.0735,`position_y`=1025.8383,`position_z`=32.678593 WHERE `guid`=@NPC;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=2081.0735,`position_y`=1025.8383,`position_z`=32.678593 WHERE `guid`=83629; -- Follower
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=2081.0735,`position_y`=1025.8383,`position_z`=32.678593, `VerifiedBuild`=47187 WHERE `guid`=@NPC;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=2081.0735,`position_y`=1025.8383,`position_z`=32.678593, `VerifiedBuild`=47187 WHERE `guid`=83629; -- Follower
 DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
@@ -206,13 +260,13 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (83630, 83629, 2.5, 270, 512, 0, 0);
 
 -- Stalvan Mistmantle
-UPDATE `creature` SET `position_x`=1805.0438232421875,`position_y`=1042.4078369140625,`position_z`=19.50431442260742187, `orientation`=4.642575740814208984 WHERE `guid`=83697 AND `id1`=20355;
+UPDATE `creature` SET `position_x`=1805.0438232421875,`position_y`=1042.4078369140625,`position_z`=19.50431442260742187, `orientation`=4.642575740814208984, `VerifiedBuild`=47187 WHERE `guid`=83697 AND `id1`=20355;
 DELETE FROM `creature_template_addon` WHERE (`entry` = 20355);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (20355, 0, 0, 3, 0, 0, 0, '14915');
 
 -- Taelan
-UPDATE `creature` SET `wander_distance`=7.5,`MovementType`=1 WHERE `guid`=83698 AND `id1`=20361;
+UPDATE `creature` SET `wander_distance`=7.5,`MovementType`=1, `VerifiedBuild`=47187 WHERE `guid`=83698 AND `id1`=20361;
 
 -- Kirin Tor Mages in Tavern
 SET @CGUID := 83699;
@@ -249,3 +303,63 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 20419);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (20419, 0, 0, 0, 60, 0, 100, 0, 40000, 60000, 40000, 60000, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Zixil - On Update - Say Line 0');
 
+-- Magistrate Henry Maleb
+SET @NPC := 83720;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=1815.9948,`position_y`=1128.528,`position_z`=14.708552, `VerifiedBuild`=47187 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,1815.9948,1128.528,14.708552,NULL,0,0,0,100,0),
+(@PATH,2,1815.9757,1121.9319,14.708552,NULL,0,0,0,100,0);
+
+-- Barkeep Kelly Position
+UPDATE `creature` SET `position_x`=1816.5262451171875,`position_y`=1016.9359130859375,`position_z`=11.77144527435302734, `orientation`=1.640609502792358398, `VerifiedBuild`=47187 WHERE `guid`=83693 AND `id1`=20377;
+
+-- Farmer Kent and Hillsbrad Farmers
+SET @CGUID := 83646;
+-- Delete extra spawns as well
+DELETE FROM `creature` WHERE `map`=560 AND `id1` IN (20368, 20433) AND `guid` BETWEEN @CGUID+0 AND @CGUID+10;
+INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
+(@CGUID+0, 20368, 560, 2367, 0, 3, 1, 0, 1852.9478759765625, 962.044921875, 12.03122329711914062, 1.954768776893615722, 7200, 0, 0, 2035, 0, 0, 0, 0, 0, 47187), -- 20368 (Area: 0 - Difficulty: 1)
+(@CGUID+1, 20433, 560, 2367, 0, 3, 1, 1, 1889.12548828125, 943.19989013671875, 11.92574310302734375, 0.575958669185638427, 7200, 0, 0, 2035, 0, 0, 0, 0, 0, 47187), -- 20433 (Area: 0 - Difficulty: 1)
+(@CGUID+2, 20433, 560, 2367, 0, 3, 1, 1, 1886.6531982421875, 949.830078125, 11.92574405670166015, 1.047197580337524414, 7200, 0, 0, 2035, 0, 0, 0, 0, 0, 47187), -- 20433 (Area: 0 - Difficulty: 1)
+(@CGUID+3, 20433, 560, 2367, 0, 3, 1, 1, 1880.808349609375, 934.74957275390625, 11.95547676086425781, 3.892084121704101562, 7200, 0, 0, 2035, 0, 0, 0, 0, 0, 47187), -- 20433 (Area: 0 - Difficulty: 1)
+(@CGUID+4, 20433, 560, 2367, 0, 3, 1, 1, 1874.0767822265625, 941.53289794921875, 11.92574310302734375, 4.049163818359375, 7200, 0, 0, 2035, 0, 0, 0, 0, 0, 47187), -- 20433 (Area: 0 - Difficulty: 1)
+(@CGUID+5, 20433, 560, 2367, 0, 3, 1, 1, 1861.648681640625, 949.70196533203125, 11.92574405670166015, 0.680678427219390869, 7200, 0, 0, 2035, 0, 0, 0, 0, 0, 47187), -- 20433 (Area: 0 - Difficulty: 1)
+(@CGUID+6, 20433, 560, 2367, 0, 3, 1, 1, 1861.728271484375, 937.4669189453125, 11.92574310302734375, 3.944444179534912109, 7200, 0, 0, 2035, 0, 0, 0, 0, 0, 47187), -- 20433 (Area: 0 - Difficulty: 1)
+(@CGUID+7, 20433, 560, 2367, 0, 3, 1, 1, 1847.504150390625, 934.8524169921875, 11.92574310302734375, 0.680678427219390869, 7200, 0, 0, 2035, 0, 0, 0, 0, 0, 47187); -- 20433 (Area: 0 - Difficulty: 1)
+
+DELETE FROM `creature_template_addon` WHERE (`entry` = 20433);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(20433, 0, 0, 0, 1, 173, 0, '');
+
+-- Bartolo Ginsetti (12y)
+UPDATE `creature` SET `position_x`=1875.5154,`position_y`=1087.656,`position_z`=17.860697, `orientation`=4.136430263519287109, `VerifiedBuild`=47187 WHERE `guid`=83723 AND `id1`=20365;
+
+DELETE FROM `creature_text` WHERE `CreatureID`=20365;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`) VALUES
+(20365, 0, 0, 18137, 'You there! Yes, you, peasant $g boy:girl;. Come quickly, I must tell you something... I must tell you about my greatness, lest such things are lost in the void!', 12, 0, 100, 25, 0, 0, 0, 'Bartolo Ginsetti'),
+(20365, 1, 0, 18138, 'Ooooh, YAH! Gaze upon my rippling musculature. Bask in the glow of my physique.', 12, 0, 100, 23, 0, 0, 0, 'Bartolo Ginsetti');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20365;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 20365);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(20365, 0, 0, 1, 10, 0, 100, 0, 0, 12, 60000, 60000, 1, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartolo Ginsetti - Within 0-12 Range Out of Combat LoS - Set Orientation Invoker'),
+(20365, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartolo Ginsetti - Within 0-12 Range Out of Combat LoS - Say Line 0'),
+(20365, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 67, 1, 6000, 6000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartolo Ginsetti - Within 0-12 Range Out of Combat LoS - Create Timed Event'),
+(20365, 0, 3, 0, 59, 0, 100, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartolo Ginsetti - On Timed Event 1 Triggered - Say Line 1');
+
+UPDATE `creature_template` SET `gossip_menu_id` = 8114, `npcflag` = 1 WHERE (`entry` = 20365);
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 8114) AND (`TextID` IN (10047)); -- This Gossip was missing but TextID existed
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(8114, 10047);
+
+-- Missing Objects (Tome of Scrying, Keg, Locked Chest)
+SET @OGUID := 15064;
+DELETE FROM `gameobject` WHERE `map`=560 AND `id` IN (184304, 184332, 180570) AND `guid` BETWEEN @OGUID+0 AND @OGUID+2;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
+(@OGUID+0, 184332, 560, 2367, 2367, 3, 1, 1819.0352783203125, 1023.3704833984375, 19.712646484375, 4.729844093322753906, 0, 0, -0.70090866088867187, 0.713251054286956787, 7200, 255, 1, 47213),
+(@OGUID+1, 180570, 560, 2367, 2367, 3, 1, 1808.4539794921875, 1022.86962890625, 13.71208763122558593, 1.518436193466186523, 0, 0, 0.6883544921875, 0.725374460220336914, 7200, 255, 1, 47213),
+(@OGUID+2, 184304, 560, 2367, 2367, 3, 1, 1720.5572509765625, 1017.81988525390625, 0.405580013990402221, 5.881760597229003906, 0, 0, -0.19936752319335937, 0.979924798011779785, 7200, 255, 1, 47213);
