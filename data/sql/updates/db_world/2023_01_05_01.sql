@@ -1,3 +1,4 @@
+-- DB update 2023_01_05_00 -> 2023_01_05_01
 -- Set correct spawn pos
 UPDATE `creature` SET `position_x`=1815.927978515625, `position_y`=1020.21331787109375, `position_z`=11.68548202514648437, `orientation`=4.817108631134033203, `equipment_id`=1, `VerifiedBuild`=47187 WHERE `id1`=20351;
 UPDATE `creature` SET `position_x`=1814.1473388671875, `position_y`=1018.730712890625, `position_z`=11.68548202514648437, `orientation`=6.2657318115234375, `equipment_id`=1, `VerifiedBuild`=47187 WHERE `id1`=20400;

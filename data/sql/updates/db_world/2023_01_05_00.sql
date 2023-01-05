@@ -1,3 +1,4 @@
+-- DB update 2023_01_04_02 -> 2023_01_05_00
 -- Pathing for Kel'Thuzad Entry: 20350
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=1777.6586,`position_y`=1058.5917,`position_z`=7.1008496 WHERE `id1`=20350; -- Kel'Thuzad
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=1777.6586,`position_y`=1058.5917,`position_z`=7.1008496 WHERE `id1`=20353; -- Helcular
