@@ -368,145 +368,93 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 UPDATE `creature` SET `wander_distance`=6,`MovementType`=1, `VerifiedBuild`=47187 WHERE `guid`=83724 AND `id1`=20441;
 
 -- Scarlet Children
-DELETE FROM `creature` WHERE `id1` IN (20357, 20358) AND `guid` IN (84016, 84017);
-
 SET @CGUID := 84064;
-DELETE FROM `creature` WHERE `map`=560 AND `id1` IN (20357, 20358, 20359, 20396) AND `guid` BETWEEN @CGUID+0 AND @CGUID+3;
+DELETE FROM `creature` WHERE `map`=560 AND `id1` IN (20357, 20358, 20359, 20396) AND `guid` BETWEEN @CGUID+0 AND @CGUID+2;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
-(@CGUID+0, 20357, 560, 2367, 0, 3, 1, 0, 1766.623, 1073.1769, 6.8648014, 6.204990863800048828, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 47187),
+(@CGUID+0, 20357, 560, 2367, 0, 3, 1, 0, 1766.623, 1073.1769, 6.8648014, 6.204990863800048828, 7200, 0, 0, 0, 0, 2, 0, 0, 0, 47187),
 (@CGUID+1, 20358, 560, 2367, 0, 3, 1, 0, 1766.623, 1073.1769, 6.8648014, 0.427894920110702514, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 47187),
-(@CGUID+2, 20359, 560, 2367, 0, 3, 1, 0, 1766.623, 1073.1769, 6.8648014, 6.183419704437255859, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 47187),
-(@CGUID+3, 20396, 560, 2367, 0, 3, 1, 0, 1766.623, 1073.1769, 6.8648014, 6.204990863800048828, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 47187);
+(@CGUID+2, 20359, 560, 2367, 0, 3, 1, 0, 1766.623, 1073.1769, 6.8648014, 6.183419704437255859, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 47187);
 
-DELETE FROM `waypoints` WHERE `entry`=2035700 AND `point_comment`='Sally Whitemane';
-INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`point_comment`) VALUES
-(2035700,1,1766.623,1073.1769,6.8648014,NULL,0,'Sally Whitemane'),
-(2035700,2,1763.7609,1059.1699,6.872983,NULL,0,'Sally Whitemane'),
-(2035700,3,1764.3131,1031.9971,6.872983,NULL,0,'Sally Whitemane'),
-(2035700,4,1769.7189,1015.6437,6.427197,NULL,0,'Sally Whitemane'),
-(2035700,5,1781.427,1015.7469,9.314404,NULL,0,'Sally Whitemane'),
-(2035700,6,1784.0868,1026.5377,10.612499,NULL,0,'Sally Whitemane'),
-(2035700,7,1786.029,1045.1888,9.896137,NULL,0,'Sally Whitemane'),
-(2035700,8,1787.9987,1059.0806,7.6214795,NULL,0,'Sally Whitemane'),
-(2035700,9,1815.3898,1060.277,10.641117,NULL,0,'Sally Whitemane'),
-(2035700,10,1829.5338,1058.778,13.859013,NULL,0,'Sally Whitemane'),
-(2035700,11,1836.428,1047.2233,14.894588,NULL,0,'Sally Whitemane'),
-(2035700,12,1838.2704,1026.9523,15.142665,NULL,0,'Sally Whitemane'),
-(2035700,13,1838.9581,1017.5668,15.270595,NULL,0,'Sally Whitemane'),
-(2035700,14,1842.7277,1008.9644,14.742396,NULL,0,'Sally Whitemane'),
-(2035700,15,1849.1177,1000.2745,15.083217,NULL,0,'Sally Whitemane'),
-(2035700,16,1863.4473,1006.9286,16.00668,NULL,0,'Sally Whitemane'),
-(2035700,17,1866.1174,1015.569,15.556972,NULL,0,'Sally Whitemane'),
-(2035700,18,1868.3208,1027.3716,15.498511,NULL,0,'Sally Whitemane'),
-(2035700,19,1869.6267,1037.2123,16.729485,NULL,0,'Sally Whitemane'),
-(2035700,20,1865.5181,1049.5011,15.335751,NULL,0,'Sally Whitemane'),
-(2035700,21,1867.5786,1060.357,16.225822,NULL,0,'Sally Whitemane'),
-(2035700,22,1878.767,1060.9973,17.684929,NULL,0,'Sally Whitemane'),
-(2035700,23,1897.9668,1053.58,17.920403,NULL,0,'Sally Whitemane'),
-(2035700,24,1905.4509,1045.5461,18.431456,NULL,0,'Sally Whitemane'),
-(2035700,25,1904.2731,1028.3635,19.276466,NULL,0,'Sally Whitemane'),
-(2035700,26,1904.4609,1016.3633,18.276466,NULL,0,'Sally Whitemane'),
-(2035700,27,1909.918,993.6586,15.845679,NULL,0,'Sally Whitemane'),
-(2035700,28,1918.1559,980.7051,17.270973,NULL,0,'Sally Whitemane'),
-(2035700,29,1927.6208,969.2012,17.91233,NULL,0,'Sally Whitemane'),
-(2035700,30,1935.2817,973.1046,19.765339,NULL,0,'Sally Whitemane'),
-(2035700,31,1947.6158,971.5432,21.53548,NULL,0,'Sally Whitemane'),
-(2035700,32,1958.584,970.6836,22.758991,NULL,0,'Sally Whitemane'),
-(2035700,33,1968.3883,971.84503,23.962679,NULL,0,'Sally Whitemane'),
-(2035700,34,1976.2941,978.701,25.267122,NULL,0,'Sally Whitemane'),
-(2035700,35,1971.8309,999.0618,28.299349,NULL,0,'Sally Whitemane'),
-(2035700,36,1968.9197,1011.7449,27.550247,NULL,0,'Sally Whitemane'),
-(2035700,37,1960.7737,1023.3538,25.96747,NULL,0,'Sally Whitemane'),
-(2035700,38,1950.8038,1033.8225,23.942024,NULL,0,'Sally Whitemane'),
-(2035700,39,1934.9801,1042.5717,22.137825,NULL,0,'Sally Whitemane'),
-(2035700,40,1918.8728,1048.3973,19.421812,NULL,0,'Sally Whitemane'),
-(2035700,41,1909.8624,1053.3057,18.460752,NULL,0,'Sally Whitemane'),
-(2035700,42,1909.7411,1063.2158,19.511656,NULL,0,'Sally Whitemane'),
-(2035700,43,1907.1688,1071.0006,21.172655,NULL,0,'Sally Whitemane'),
-(2035700,44,1911.3334,1086.1061,21.112108,NULL,0,'Sally Whitemane'),
-(2035700,45,1913.2205,1107.5017,20.97138,NULL,0,'Sally Whitemane'),
-(2035700,46,1903.625,1124.6158,18.734564,NULL,0,'Sally Whitemane'),
-(2035700,47,1893.4742,1135.568,18.443138,NULL,0,'Sally Whitemane'),
-(2035700,48,1874.9469,1136.4017,17.251,NULL,0,'Sally Whitemane'),
-(2035700,49,1864.8711,1128.6273,15.882499,NULL,0,'Sally Whitemane'),
-(2035700,50,1863.2114,1102.2101,17.787773,NULL,0,'Sally Whitemane'),
-(2035700,51,1857.6895,1086.4677,17.20242,NULL,0,'Sally Whitemane'),
-(2035700,52,1862.7196,1068.6813,15.936551,NULL,0,'Sally Whitemane'),
-(2035700,53,1842.51,1056.6361,14.976986,NULL,0,'Sally Whitemane'),
-(2035700,54,1824.3262,1064.956,12.36829,NULL,0,'Sally Whitemane'),
-(2035700,55,1828.1018,1088.4716,13.716602,NULL,0,'Sally Whitemane'),
-(2035700,56,1831.9336,1125.584,13.931124,NULL,0,'Sally Whitemane'),
-(2035700,57,1831.3356,1143.8278,11.518111,NULL,0,'Sally Whitemane'),
-(2035700,58,1793.192,1150.9938,10.930223,NULL,0,'Sally Whitemane'),
-(2035700,59,1766.386,1139.3741,11.0818,NULL,0,'Sally Whitemane'),
-(2035700,60,1768.2086,1114.6821,11.178861,NULL,0,'Sally Whitemane'),
-(2035700,61,1779.9342,1096.4996,12.219379,NULL,0,'Sally Whitemane'),
-(2035700,62,1780.1993,1076.44,10.655781,NULL,0,'Sally Whitemane');
+DELETE FROM `creature_formations` WHERE `memberGUID` IN (@CGUID+0, @CGUID+1, @CGUID+2) AND `leaderGUID`=@CGUID+0;
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
+(@CGUID+0, @CGUID+0, 0, 0, 0, 0, 0),
+(@CGUID+0, @CGUID+1, 2.5, 90, 512, 0, 0),
+(@CGUID+0, @CGUID+2, 2.5, 180, 512, 0, 0);
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (20357, 20358, 20359, 20396);
+DELETE FROM `creature_addon` WHERE (`guid` = @CGUID+0);
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+((@CGUID+0), (@CGUID+0)*10, 0, 0, 0, 0, 0, '');
+DELETE FROM `waypoint_data` WHERE `id`=(@CGUID+0)*10;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`move_type`) VALUES
+((@CGUID+0)*10,1,1766.623,1073.1769,6.8648014,NULL,1),
+((@CGUID+0)*10,2,1763.7609,1059.1699,6.872983,NULL,1),
+((@CGUID+0)*10,3,1764.3131,1031.9971,6.872983,NULL,1),
+((@CGUID+0)*10,4,1769.7189,1015.6437,6.427197,NULL,1),
+((@CGUID+0)*10,5,1781.427,1015.7469,9.314404,NULL,1),
+((@CGUID+0)*10,6,1784.0868,1026.5377,10.612499,NULL,1),
+((@CGUID+0)*10,7,1786.029,1045.1888,9.896137,NULL,1),
+((@CGUID+0)*10,8,1787.9987,1059.0806,7.6214795,NULL,1),
+((@CGUID+0)*10,9,1815.3898,1060.277,10.641117,NULL,1),
+((@CGUID+0)*10,10,1829.5338,1058.778,13.859013,NULL,1),
+((@CGUID+0)*10,11,1836.428,1047.2233,14.894588,NULL,1),
+((@CGUID+0)*10,12,1838.2704,1026.9523,15.142665,NULL,1),
+((@CGUID+0)*10,13,1838.9581,1017.5668,15.270595,NULL,1),
+((@CGUID+0)*10,14,1842.7277,1008.9644,14.742396,NULL,1),
+((@CGUID+0)*10,15,1849.1177,1000.2745,15.083217,NULL,1),
+((@CGUID+0)*10,16,1863.4473,1006.9286,16.00668,NULL,1),
+((@CGUID+0)*10,17,1866.1174,1015.569,15.556972,NULL,1),
+((@CGUID+0)*10,18,1868.3208,1027.3716,15.498511,NULL,1),
+((@CGUID+0)*10,19,1869.6267,1037.2123,16.729485,NULL,1),
+((@CGUID+0)*10,20,1865.5181,1049.5011,15.335751,NULL,1),
+((@CGUID+0)*10,21,1867.5786,1060.357,16.225822,NULL,1),
+((@CGUID+0)*10,22,1878.767,1060.9973,17.684929,NULL,1),
+((@CGUID+0)*10,23,1897.9668,1053.58,17.920403,NULL,1),
+((@CGUID+0)*10,24,1905.4509,1045.5461,18.431456,NULL,1),
+((@CGUID+0)*10,25,1904.2731,1028.3635,19.276466,NULL,1),
+((@CGUID+0)*10,26,1904.4609,1016.3633,18.276466,NULL,1),
+((@CGUID+0)*10,27,1909.918,993.6586,15.845679,NULL,1),
+((@CGUID+0)*10,28,1918.1559,980.7051,17.270973,NULL,1),
+((@CGUID+0)*10,29,1927.6208,969.2012,17.91233,NULL,1),
+((@CGUID+0)*10,30,1935.2817,973.1046,19.765339,NULL,1),
+((@CGUID+0)*10,31,1947.6158,971.5432,21.53548,NULL,1),
+((@CGUID+0)*10,32,1958.584,970.6836,22.758991,NULL,1),
+((@CGUID+0)*10,33,1968.3883,971.84503,23.962679,NULL,1),
+((@CGUID+0)*10,34,1976.2941,978.701,25.267122,NULL,1),
+((@CGUID+0)*10,35,1971.8309,999.0618,28.299349,NULL,1),
+((@CGUID+0)*10,36,1968.9197,1011.7449,27.550247,NULL,1),
+((@CGUID+0)*10,37,1960.7737,1023.3538,25.96747,NULL,1),
+((@CGUID+0)*10,38,1950.8038,1033.8225,23.942024,NULL,1),
+((@CGUID+0)*10,39,1934.9801,1042.5717,22.137825,NULL,1),
+((@CGUID+0)*10,40,1918.8728,1048.3973,19.421812,NULL,1),
+((@CGUID+0)*10,41,1909.8624,1053.3057,18.460752,NULL,1),
+((@CGUID+0)*10,42,1909.7411,1063.2158,19.511656,NULL,1),
+((@CGUID+0)*10,43,1907.1688,1071.0006,21.172655,NULL,1),
+((@CGUID+0)*10,44,1911.3334,1086.1061,21.112108,NULL,1),
+((@CGUID+0)*10,45,1913.2205,1107.5017,20.97138,NULL,1),
+((@CGUID+0)*10,46,1903.625,1124.6158,18.734564,NULL,1),
+((@CGUID+0)*10,47,1893.4742,1135.568,18.443138,NULL,1),
+((@CGUID+0)*10,48,1874.9469,1136.4017,17.251,NULL,1),
+((@CGUID+0)*10,49,1864.8711,1128.6273,15.882499,NULL,1),
+((@CGUID+0)*10,50,1863.2114,1102.2101,17.787773,NULL,1),
+((@CGUID+0)*10,51,1857.6895,1086.4677,17.20242,NULL,1),
+((@CGUID+0)*10,52,1862.7196,1068.6813,15.936551,NULL,1),
+((@CGUID+0)*10,53,1842.51,1056.6361,14.976986,NULL,1),
+((@CGUID+0)*10,54,1824.3262,1064.956,12.36829,NULL,1),
+((@CGUID+0)*10,55,1828.1018,1088.4716,13.716602,NULL,1),
+((@CGUID+0)*10,56,1831.9336,1125.584,13.931124,NULL,1),
+((@CGUID+0)*10,57,1831.3356,1143.8278,11.518111,NULL,1),
+((@CGUID+0)*10,58,1793.192,1150.9938,10.930223,NULL,1),
+((@CGUID+0)*10,59,1766.386,1139.3741,11.0818,NULL,1),
+((@CGUID+0)*10,60,1768.2086,1114.6821,11.178861,NULL,1),
+((@CGUID+0)*10,61,1779.9342,1096.4996,12.219379,NULL,1),
+((@CGUID+0)*10,62,1780.1993,1076.44,10.655781,NULL,1);
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 20357);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(20357, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 2035700, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - On Respawn - Start Waypoint'),
-(20357, 0, 1, 0, 60, 0, 100, 0, 360000, 480000, 360000, 480000, 0, 80, 2035700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - On Update - Run Script');
-
-(20357, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 54, 42069, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - In Combat - Pause Waypoint'),
-(20357, 0, 1, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 20358, 10, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - In Combat - Set Data 1 1 (Stop Following)'),
-(20357, 0, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 20359, 10, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - In Combat - Set Data 1 1 (Stop Following)'),
-(20357, 0, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 20396, 10, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - In Combat - Set Data 1 1 (Stop Following)'),
-(20357, 0, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - In Combat - Say Line 0'),
-(20357, 0, 5, 0, 0, 0, 100, 0, 3800, 3800, 0, 0, 0, 44, 1, 0, 0, 0, 0, 0, 19, 20396, 10, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - In Combat - Set Captured Critter Visible'),
-(20357, 0, 1, 0, 0, 0, 100, 0, 800, 800, 0, 0, 0, 45, 1, 2, 0, 0, 0, 0, 19, 20358, 10, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - In Combat - Set Data 1 2 (Face Critter)'),
-(20357, 0, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 2, 0, 0, 0, 0, 19, 20359, 10, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - In Combat - Set Data 1 2 (Face Critter)'),
-(20357, 0, 7, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - In Combat - Say Line 1'),
-(20357, 0, 8, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 45, 1, 3, 0, 0, 0, 0, 19, 20359, 10, 0, 0, 0, 0, 0, 0, 'Sally Whitemane - In Combat - Set Data 1 3 (Start Vishnas Script)'),
-
-
-(2035900, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Little Jimmy Vishnas - In Combat - Say Line 0'),
-(2035900, 0, 1, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Little Jimmy Vishnas - In Combat - Say Line 1'),
-(2035900, 0, 2, 0, 0, 0, 100, 0, 5800, 5800, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 20357, 10, 0, 0, 0, 0, 0, 0, 'Little Jimmy Vishnas - In Combat - Set Orientation \'Sally Whitemane\''),
-(2035900, 0, 3, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Little Jimmy Vishnas - In Combat - Say Line 2');
-
--- Pause for 4s
--- 17:03:18.440 Text: STOP! Intruders are in the castle! (Sally)
--- 17:03:22.252 Spawn Critter
--- 17:03:23.056 All face Critter
--- 17:03:24.489 Text: So you thought you could break into this palace of the Light and run away with our secrets! Vishas, interrogate this criminal at once! (Sally)
--- 17:03:30.570 Text: My pleasure, milady! (Vishnas)
--- 17:03:35.418 Text: Tell me everything, scum! Tell me or I'll rip the secrets from your flesh! (Vishnas)
--- 17:03:41.226 Vishnas Face Sally
--- 17:03:42.675 Text: It isn't talking, milady. I know it holds secrets! Naughty secrets!
--- 17:03:48.503 Sally face Mograine
--- 17:03:49.942 Text: My champion, destroy this monster! (Sally)
--- 17:03:57.223 Text: The infidel shall be purified, milady! (Mograine)
--- 17:04:00.853 Text: ARGH! It has struck a fatal blow! I have failed you... (Mograine)
--- 17:04:00.853 Text: %s staggers about as if he were mortally wounded. (Mograine)
--- 17:04:05.686 Text: Mograine has fallen! You shall pay for this treachery! Arise, my champion! Arise! (Sally)
--- 17:04:05.686 Text: %s pretends to cast a healing spell on Renault. (Sally)
--- 17:04:10.775 Mograine Face Sally //CUSTOM
--- 17:04:11.775 Text: At your side, milady! (Mograine)
--- 17:04:16.550 Text: We will attack as one! (Sally)
--- 17:04:19.997 All face Critter
--- 17:04:21.605 Critter cast 35137 on Self (hack)
--- 17:04:21.615 Critter cast 31261 on Self
--- 17:04:23.852 Text: The children cheer. (Sally)
--- 17:04:23.852 Text: We are victorious! (Sally)
--- 17:04:30.905 Resume
-
-DELETE FROM `creature_text` WHERE `CreatureID` IN (20357, 20358, 20359);
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`) VALUES
-(20357, 0, 0, 18013, 'STOP! Intruders are in the castle!', 12, 0, 100, 0, 0, 0, 0, 'Sally Whitemane'),
-(20357, 1, 0, 18014, 'So you thought you could break into this palace of the Light and run away with our secrets! Vishas, interrogate this criminal at once!', 12, 0, 100, 0, 0, 0, 0, 'Sally Whitemane'),
-(20357, 2, 0, 18019, 'My champion, destroy this monster!', 12, 0, 100, 0, 0, 0, 0, 'Sally Whitemane'),
-(20357, 3, 0, 18023, 'Mograine has fallen! You shall pay for this treachery! Arise, my champion! Arise!', 12, 0, 100, 0, 0, 0, 0, 'Sally Whitemane'),
-(20357, 4, 0, 18024, '%s pretends to cast a healing spell on Renault.', 16, 0, 100, 0, 0, 0, 0, 'Sally Whitemane'),
-(20357, 5, 0, 18027, 'We will attack as one!', 12, 0, 100, 0, 0, 0, 0, 'Sally Whitemane'),
-(20357, 6, 0, 18028, 'The children cheer.', 16, 0, 100, 0, 0, 0, 0, 'Sally Whitemane'),
-(20357, 7, 0, 18029, 'We are victorious!', 12, 0, 100, 0, 0, 0, 0, 'Sally Whitemane'),
-(20358, 0, 0, 18020, 'The infidel shall be purified, milady!', 12, 0, 100, 0, 0, 0, 0, 'Renault Mograine'),
-(20358, 1, 0, 18021, 'ARGH! It has struck a fatal blow! I have failed you...', 12, 0, 100, 0, 0, 0, 0, 'Renault Mograine'),
-(20358, 2, 0, 18022, '%s staggers about as if he were mortally wounded.', 16, 0, 100, 0, 0, 0, 0, 'Renault Mograine'),
-(20358, 3, 0, 18026, 'At your side, milady!', 12, 0, 100, 0, 0, 0, 0, 'Renault Mograine'),
-(20359, 0, 0, 18015, 'My pleasure, milady!', 12, 0, 100, 0, 0, 0, 0, 'Little Jimmy Vishnas'),
-(20359, 1, 0, 18016, 'Tell me everything, scum! Tell me or I\'ll rip the secrets from your flesh!', 12, 0, 100, 0, 0, 0, 0, 'Little Jimmy Vishnas'),
-(20359, 2, 0, 18017, 'It isn\'t talking, milady. I know it holds secrets! Naughty secrets!', 12, 0, 100, 0, 0, 0, 0, 'Little Jimmy Vishnas');
+-- Pentagram Children
+SET @CGUID := 83668;
+DELETE FROM `creature` WHERE `map`=560 AND `id1` IN (21341, 21342, 21343, 21344, 21345) AND `guid` BETWEEN @CGUID+0 AND @CGUID+4;
+INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
+(@CGUID+0, 21341, 560, 2367, 0, 3, 1, 0, 1820.913818359375, 951.32354736328125, 16.56865119934082031, 1.186823844909667968, 7200, 0, 0, 2035, 852, 0, 0, 0, 0, 47187),
+(@CGUID+1, 21343, 560, 2367, 0, 3, 1, 0, 1819.0341796875, 955.4219970703125, 16.11471748352050781, 5.672319889068603515, 7200, 0, 0, 2035, 852, 0, 0, 0, 0, 47187),
+(@CGUID+2, 21342, 560, 2367, 0, 3, 1, 0, 1824.5418701171875, 952.72003173828125, 16.35272789001464843, 2.792526721954345703, 7200, 0, 0, 2035, 852, 0, 0, 0, 0, 47187),
+(@CGUID+3, 21345, 560, 2367, 0, 3, 1, 0, 1824.8150634765625, 955.70928955078125, 16.31266593933105468, 3.769911050796508789, 7200, 0, 0, 2035, 852, 0, 0, 0, 0, 47187),
+(@CGUID+4, 21344, 560, 2367, 0, 3, 1, 0, 1821.304931640625, 957.28057861328125, 16.2471160888671875, 4.852015495300292968, 7200, 0, 0, 2035, 852, 0, 0, 0, 0, 47187);
