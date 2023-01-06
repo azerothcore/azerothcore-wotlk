@@ -215,7 +215,7 @@ bool OutdoorPvPNA::SetupOutdoorPvP()
     // add the zones affected by the pvp buff
     RegisterZone(NA_BUFF_ZONE);
     SetMapFromZone(NA_BUFF_ZONE);
-    
+
     // halaa
     m_obj = new OPvPCapturePointNA(this);
     if (!m_obj)
@@ -234,7 +234,6 @@ void OutdoorPvPNA::HandlePlayerEnterZone(Player* player, uint32 zone)
     // add buffs
     if (player->GetTeamId() == m_obj->GetControllingFaction())
         player->CastSpell(player, NA_CAPTURE_BUFF, true);
-    //m_obj->HandlePlayerEnter(player);
     OutdoorPvP::HandlePlayerEnterZone(player, zone);
 }
 
@@ -546,12 +545,35 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
 
 bool OPvPCapturePointNA::Update(uint32 diff)
 {
-    // let the controlling faction advance in phase
-    bool capturable = false;
-    if (m_ControllingFaction == TEAM_ALLIANCE && m_activePlayers[0].size() > m_activePlayers[1].size())
-        capturable = true;
-    else if (m_ControllingFaction == TEAM_HORDE && m_activePlayers[0].size() < m_activePlayers[1].size())
-        capturable = true;
+    float radius = ((float)m_capturePoint->GetGOInfo()->capturePoint.radius) - 40.0f;
+
+    for (uint32 team = 0; team < 2; ++team)
+    {
+        for (PlayerSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end();)
+        {
+            ObjectGuid playerGuid = *itr;
+            ++itr;
+
+            if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
+                if (!m_capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
+                    HandlePlayerLeave(player);
+        }
+    }
+
+    std::list<Player*> players;
+    Acore::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
+    Cell::VisitWorldObjects(m_capturePoint, searcher, radius);
+
+    for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
+    {
+        Player* const player = *itr;
+        if (player->IsOutdoorPvPActive())
+        {
+            if (m_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second)
+                HandlePlayerEnter(*itr);
+        }
+    }
 
     if (m_GuardCheckTimer < diff)
     {
@@ -562,27 +584,119 @@ bool OPvPCapturePointNA::Update(uint32 diff)
             m_GuardsAlive = cnt;
             if (m_GuardsAlive == 0)
                 m_capturable = true;
+            else
+                m_capturable = false;
             // update the guard count for the players in zone
             m_PvP->SendUpdateWorldState(NA_UI_GUARDS_LEFT, m_GuardsAlive);
         }
     }
     else m_GuardCheckTimer -= diff;
 
-    if (m_capturable || capturable)
-    {
-        if (m_RespawnTimer < diff)
+    if (m_capturable) {
+        if (m_RespawnTimer < diff && m_ControllingFaction != TEAM_NEUTRAL)
         {
             // if the guards have been killed, then the challenger has one hour to take over halaa.
             // in case they fail to do it, the guards are respawned, and they have to start again.
-            if (m_ControllingFaction)
-                FactionTakeOver(m_ControllingFaction);
-
             m_RespawnTimer = NA_RESPAWN_TIME;
         }
         else
             m_RespawnTimer -= diff;
-        return OPvPCapturePoint::Update(diff);
+
+        // get the difference of numbers
+        float fact_diff = ((float)m_activePlayers[0].size() - (float)m_activePlayers[1].size()) * diff / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL;
+        if (!fact_diff)
+            return false;
+
+        TeamId ChallengerId = TEAM_NEUTRAL;
+        float maxDiff = m_maxSpeed * diff;
+
+        if (fact_diff < 0)
+        {
+            // horde is in majority, but it's already horde-controlled -> no change
+            if (m_State == OBJECTIVESTATE_HORDE && m_value <= -m_maxValue)
+                return false;
+
+            if (fact_diff < -maxDiff)
+                fact_diff = -maxDiff;
+
+            ChallengerId = TEAM_HORDE;
+        }
+        else
+        {
+            // ally is in majority, but it's already ally-controlled -> no change
+            if (m_State == OBJECTIVESTATE_ALLIANCE && m_value >= m_maxValue)
+                return false;
+
+            if (fact_diff > maxDiff)
+                fact_diff = maxDiff;
+
+            ChallengerId = TEAM_ALLIANCE;
+        }
+
+        float oldValue = m_value;
+        TeamId oldTeam = m_team;
+
+        m_OldState = m_State;
+
+        m_value += fact_diff;
+
+        if (m_value < -m_minValue) // red
+        {
+            if (m_value < -m_maxValue)
+            {
+                m_value = -m_maxValue;
+                m_State = OBJECTIVESTATE_HORDE;
+                m_team = TEAM_HORDE;
+            } 
+            else
+            {
+                if (m_OldState == OBJECTIVESTATE_ALLIANCE || m_OldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE)
+                {
+                    m_State = OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE;
+                }
+                else
+                {
+                    m_State = OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE;
+                }
+            }
+        }
+        else //blue
+        {
+            if (m_value > m_maxValue)
+            {
+                m_value = m_maxValue;
+                m_State = OBJECTIVESTATE_ALLIANCE;
+                m_team = TEAM_ALLIANCE;
+            }
+            else
+            {
+                if (m_OldState == OBJECTIVESTATE_HORDE || m_OldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE)
+                {
+                    m_State = OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE;
+                }
+                else
+                {
+                    m_State = OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE;
+                }
+            }
+        }
+
+        if (m_value != oldValue)
+            SendChangePhase();
+
+        if (m_OldState != m_State)
+        {
+            if (oldTeam != m_team)
+            {
+                ChangeTeam(oldTeam);
+            }
+
+            ChangeState();
+            return true;
+        }
     }
+    else
+        SendUpdateWorldState(NA_UI_TOWER_SLIDER_DISPLAY, 0); //Point is not capturable so we hide the slider
     return false;
 }
 
@@ -596,12 +710,14 @@ void OPvPCapturePointNA::ChangeState()
             break;
         case OBJECTIVESTATE_ALLIANCE:
             m_HalaaState = HALAA_A;
-            FactionTakeOver(TEAM_ALLIANCE);
+            if (GetControllingFaction() != TEAM_ALLIANCE)
+                FactionTakeOver(TEAM_ALLIANCE);
             artkit = 2;
             break;
         case OBJECTIVESTATE_HORDE:
             m_HalaaState = HALAA_H;
-            FactionTakeOver(TEAM_HORDE);
+            if (GetControllingFaction() != TEAM_HORDE)
+                FactionTakeOver(TEAM_HORDE);
             artkit = 1;
             break;
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
