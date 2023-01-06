@@ -171,6 +171,14 @@ public:
             events.Reset();
         }
 
+        void JustDied(Unit* killer) override
+        {
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+
+            ScriptedAI::JustDied(killer);
+        }
+
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOrUnsummon(1);
@@ -196,6 +204,7 @@ public:
             {
                 Talk(EMOTE_NAZAN);
                 events.Reset();
+                me->SetReactState(REACT_PASSIVE);
                 me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 81.2f, false);
             }
         }
@@ -206,6 +215,9 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
+                Position land = me->GetPosition();
+                me->GetMotionMaster()->MoveLand(0, land, 8.5f);
+                me->SetReactState(REACT_AGGRESSIVE);
                 events.ScheduleEvent(EVENT_RESTORE_COMBAT, 0);
                 events.ScheduleEvent(EVENT_SPELL_CONE_OF_FIRE, 5000);
                 if (IsHeroic())
