@@ -164,7 +164,7 @@ void OPvPCapturePointNA::FactionTakeOver(TeamId teamId)
         m_PvP->SendUpdateWorldState(NA_UI_GUARDS_LEFT, m_GuardsAlive);
         sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_NA_CAPTURE_A));
     }
-    else
+    else if(teamId == TEAM_HORDE)
     {
         m_WyvernStateSouth = WYVERN_NEU_ALLIANCE;
         m_WyvernStateNorth = WYVERN_NEU_ALLIANCE;
@@ -545,6 +545,9 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
 
 bool OPvPCapturePointNA::Update(uint32 diff)
 {
+    if (!m_capturePoint)
+        return false;
+
     float radius = ((float)m_capturePoint->GetGOInfo()->capturePoint.radius) - 40.0f;
 
     for (uint32 team = 0; team < 2; ++team)
@@ -583,7 +586,11 @@ bool OPvPCapturePointNA::Update(uint32 diff)
         {
             m_GuardsAlive = cnt;
             if (m_GuardsAlive == 0)
+            {
                 m_capturable = true;
+                m_RespawnTimer = NA_RESPAWN_TIME;
+                //SEND MESSAGE TO LOCALDEFENSE
+            }
             else
                 m_capturable = false;
             // update the guard count for the players in zone
@@ -593,13 +600,25 @@ bool OPvPCapturePointNA::Update(uint32 diff)
     else m_GuardCheckTimer -= diff;
 
     if (m_capturable) {
-        if (m_RespawnTimer < diff && m_ControllingFaction != TEAM_NEUTRAL)
-        {
+        if (m_RespawnTimer < diff) {
             // if the guards have been killed, then the challenger has one hour to take over halaa.
             // in case they fail to do it, the guards are respawned, and they have to start again.
-            m_RespawnTimer = NA_RESPAWN_TIME;
+            if (GetControllingFaction() == TEAM_ALLIANCE) {
+                m_State = OBJECTIVESTATE_ALLIANCE;
+                m_value = m_maxValue;
+            }
+            else
+            {
+                m_State = OBJECTIVESTATE_HORDE;
+                m_value = -m_maxValue;
+            }
+            // we reset again the artkit, map icons, sliders and respawn Halaa for controller team
+            SendChangePhase();
+            ChangeState();
+            FactionTakeOver(GetControllingFaction());
+            return true;
         }
-        else
+        else if(GetControllingFaction() != TEAM_NEUTRAL)
             m_RespawnTimer -= diff;
 
         // get the difference of numbers
@@ -607,7 +626,6 @@ bool OPvPCapturePointNA::Update(uint32 diff)
         if (!fact_diff)
             return false;
 
-        TeamId ChallengerId = TEAM_NEUTRAL;
         float maxDiff = m_maxSpeed * diff;
 
         if (fact_diff < 0)
@@ -618,8 +636,6 @@ bool OPvPCapturePointNA::Update(uint32 diff)
 
             if (fact_diff < -maxDiff)
                 fact_diff = -maxDiff;
-
-            ChallengerId = TEAM_HORDE;
         }
         else
         {
@@ -629,8 +645,6 @@ bool OPvPCapturePointNA::Update(uint32 diff)
 
             if (fact_diff > maxDiff)
                 fact_diff = maxDiff;
-
-            ChallengerId = TEAM_ALLIANCE;
         }
 
         float oldValue = m_value;
@@ -642,13 +656,13 @@ bool OPvPCapturePointNA::Update(uint32 diff)
 
         if (m_value < -m_minValue) // red
         {
-            if (m_value < -m_maxValue)
+            if (m_value < -m_maxValue) //check if the m_value is lower than max, that means horde capped point
             {
                 m_value = -m_maxValue;
                 m_State = OBJECTIVESTATE_HORDE;
                 m_team = TEAM_HORDE;
             } 
-            else
+            else //then point is still in battle between teams
             {
                 if (m_OldState == OBJECTIVESTATE_ALLIANCE || m_OldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE)
                 {
@@ -662,13 +676,13 @@ bool OPvPCapturePointNA::Update(uint32 diff)
         }
         else //blue
         {
-            if (m_value > m_maxValue)
+            if (m_value > m_maxValue) //check if the m_value is bigger than max, that means alliance capped point
             {
                 m_value = m_maxValue;
                 m_State = OBJECTIVESTATE_ALLIANCE;
                 m_team = TEAM_ALLIANCE;
             }
-            else
+            else //then point is still in battle between teams
             {
                 if (m_OldState == OBJECTIVESTATE_HORDE || m_OldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE)
                 {
@@ -710,13 +724,13 @@ void OPvPCapturePointNA::ChangeState()
             break;
         case OBJECTIVESTATE_ALLIANCE:
             m_HalaaState = HALAA_A;
-            if (GetControllingFaction() != TEAM_ALLIANCE)
+            if (GetControllingFaction() != TEAM_ALLIANCE) //Using this to avoid if team recap a point to not spawn all NPCs until time is over
                 FactionTakeOver(TEAM_ALLIANCE);
             artkit = 2;
             break;
         case OBJECTIVESTATE_HORDE:
             m_HalaaState = HALAA_H;
-            if (GetControllingFaction() != TEAM_HORDE)
+            if (GetControllingFaction() != TEAM_HORDE) //Using this to avoid if team recap a point to not spawn all NPCs until time is over
                 FactionTakeOver(TEAM_HORDE);
             artkit = 1;
             break;
