@@ -1,3 +1,4 @@
+-- DB update 2023_01_06_00 -> 2023_01_06_01
 --
 -- Worn Stone Tokens are 100%
 UPDATE `creature_loot_template` SET `Chance`=100 WHERE `Item`=3714 AND `entry` IN (2271, 2272, 2358, 2415, 2628);

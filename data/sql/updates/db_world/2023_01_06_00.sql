@@ -1,3 +1,4 @@
+-- DB update 2023_01_05_02 -> 2023_01_06_00
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 3651 AND `OptionID` IN (0, 1, 2);
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 (3651, 0, 0, 'May I have another Dawn\'s Gambit, Betina?  I want to test it again...', 7198, 1, 1, 0, 0, 0, 0, '', 0, 0),
