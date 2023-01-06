@@ -24,6 +24,7 @@
 #include "Battleground.h"
 #include "GameTime.h"
 #include "Player.h"
+#include "Pet.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SkillDiscovery.h"
@@ -3757,6 +3758,26 @@ class spell_item_green_whelp_armor : public AuraScript
     }
 };
 
+// 37678 - elixir of shadows
+/// @todo Temporary fix until pet restrictions vs player restrictions are investigated
+class spell_item_elixir_of_shadows : public SpellScript
+{
+    PrepareSpellScript(spell_item_elixir_of_shadows);
+
+    void HandleEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            if (Pet* pet = player->GetPet())
+                pet->AddAura(37678 /*Elixir of Shadows*/, pet);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_item_elixir_of_shadows::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+        OnEffectHitTarget += SpellEffectFn(spell_item_elixir_of_shadows::HandleEffect, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -3873,4 +3894,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_snowman);
     RegisterSpellScript(spell_item_freeze_rookery_egg);
     RegisterSpellScript(spell_item_green_whelp_armor);
+    RegisterSpellScript(spell_item_elixir_of_shadows);
 }
