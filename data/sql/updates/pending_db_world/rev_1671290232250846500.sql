@@ -67,7 +67,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (1967105,9,1,0,0,0,100,0,1000,1000,0,0,0,66,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0.26179,"Cryo-Engineer Sha'heen - On Script - Set Orientation"),
 (1967105,9,2,0,0,0,100,0,0,0,0,0,0,17,233,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Cryo-Engineer Sha'heen - On Script - Set Emote State 233"),
 (1967105,9,3,0,0,0,100,0,0,0,0,0,0,1,6,0,0,0,0,0,12,1,0,0,0,0,0,0,0,"Cryo-Engineer Sha'heen - On Script - Say Line 6"),
-(1967105,9,4,0,0,0,100,0,0,0,0,0,0,107,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,"Cryo-Engineer Sha'heen - On Script - Summon Group 0"),
+(1967105,9,4,0,0,0,100,0,0,0,0,0,0,107,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,"Cryo-Engineer Sha'heen - On Script - Summon Group 0"),
 (1967105,9,5,0,0,0,100,0,5000,5000,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Cryo-Engineer Sha'heen - On Script - Set Emote State 0"),
 (1967105,9,6,0,0,0,100,0,0,0,0,0,0,1,7,0,0,0,0,0,12,1,0,0,0,0,0,0,0,"Cryo-Engineer Sha'heen - On Script - Say Line 7"),
 
