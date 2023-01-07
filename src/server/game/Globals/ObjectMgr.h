@@ -1265,11 +1265,17 @@ public:
     {
         uint32 typeIndex;
         if (type == TYPEID_UNIT)
+        {
             typeIndex = 0;
+        }
         else if (type == TYPEID_GAMEOBJECT)
+        {
             typeIndex = 1;
+        }
         else
+        {
             return nullptr;
+        }
 
         QuestGreetingLocaleContainer::const_iterator itr = _questGreetingLocaleStore.find(MAKE_PAIR32(typeIndex, id));
         if (itr == _questGreetingLocaleStore.end()) return nullptr;
