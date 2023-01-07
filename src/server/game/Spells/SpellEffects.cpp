@@ -3904,17 +3904,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             m_caster->TextEmote(buf);
                             break;
                         }
-                    // Roll 'dem Bones - Worn Troll Dice
-                    case 47776:
-                        {
-                            char buf[128];
-                            const char* gender = "his";
-                            if (m_caster->getGender() > 0)
-                                gender = "her";
-                            sprintf(buf, "%s causually tosses %s [Worn Troll Dice]. One %u and one %u.", m_caster->GetName().c_str(), gender, urand(1, 6), urand(1, 6));
-                            m_caster->TextEmote(buf);
-                            break;
-                        }
                     case 52173: // Coyote Spirit Despawn
                     case 60243: // Blood Parrot Despawn
                         if (unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->ToCreature()->IsSummon())
