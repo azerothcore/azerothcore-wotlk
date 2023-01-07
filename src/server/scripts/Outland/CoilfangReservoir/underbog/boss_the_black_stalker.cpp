@@ -249,7 +249,6 @@ class spell_the_black_stalker_magnetic_pull : public SpellScript
     }
 };
 
-
 void AddSC_boss_the_black_stalker()
 {
     RegisterUnderbogCreatureAI(boss_the_black_stalker);
