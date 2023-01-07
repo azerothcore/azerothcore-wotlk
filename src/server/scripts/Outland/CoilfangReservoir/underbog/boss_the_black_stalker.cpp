@@ -257,5 +257,4 @@ void AddSC_boss_the_black_stalker()
     RegisterSpellScript(spell_the_black_stalker_levitation_pulse);
     RegisterSpellScript(spell_the_black_stalker_someone_grab_me);
     RegisterSpellScript(spell_the_black_stalker_magnetic_pull);
-
 }
