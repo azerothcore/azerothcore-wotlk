@@ -1,3 +1,4 @@
+-- DB update 2023_01_07_02 -> 2023_01_07_03
 -- Immunities
 UPDATE `creature_template` SET `mechanic_immune_mask` = 6292 WHERE (`entry` = 18423);
 -- Spawn time
