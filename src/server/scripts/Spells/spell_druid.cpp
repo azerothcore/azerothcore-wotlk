@@ -68,6 +68,11 @@ enum DruidSpells
     SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS     = 70726,
 };
 
+enum DruidIcons
+{
+    SPELL_ICON_REVITALIZE                   = 2862
+};
+
 // 1178 - Bear Form (Passive)
 // 9635 - Dire Bear Form (Passive)
 class spell_dru_bear_form_passive : public AuraScript
@@ -221,6 +226,12 @@ class spell_dru_omen_of_clarity : public AuraScript
                 return !spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT);
             }
 
+            return false;
+        }
+
+        // Revitalize
+        if (spellInfo->SpellIconID == SPELL_ICON_REVITALIZE)
+        {
             return false;
         }
 

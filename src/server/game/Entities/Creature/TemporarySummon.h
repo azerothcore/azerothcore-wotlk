@@ -57,14 +57,19 @@ public:
     uint32 GetTimer() { return m_timer; }
     void SetTimer(uint32 t) { m_timer = t; }
 
+    void SetVisibleBySummonerOnly(bool visibleBySummonerOnly) { _visibleBySummonerOnly = visibleBySummonerOnly; }
+    [[nodiscard]] bool IsVisibleBySummonerOnly() const { return _visibleBySummonerOnly; }
+
     const SummonPropertiesEntry* const m_Properties;
 
     std::string GetDebugInfo() const override;
+
 private:
     TempSummonType m_type;
     uint32 m_timer;
     uint32 m_lifetime;
     ObjectGuid m_summonerGUID;
+    bool _visibleBySummonerOnly;
 };
 
 class Minion : public TempSummon

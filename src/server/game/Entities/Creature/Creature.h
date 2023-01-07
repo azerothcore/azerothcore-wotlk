@@ -56,6 +56,7 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
+    float GetNativeObjectScale() const override;
     void SetObjectScale(float scale) override;
     void SetDisplayId(uint32 modelId) override;
 
@@ -163,7 +164,7 @@ public:
     [[nodiscard]] uint32 GetShieldBlockValue() const override
     ;/*
     {
-        return (getLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
+        return (GetLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
     }
     */
 
