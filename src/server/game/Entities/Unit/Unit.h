@@ -1439,7 +1439,6 @@ public:
     [[nodiscard]] uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
 
     //npcbot: compatibility accessors
-    [[nodiscard]] inline uint8 GetLevel() const { return getLevel(); }
     [[nodiscard]] inline uint8 GetRace(bool original = false) const { return getRace(original); }
     [[nodiscard]] inline uint32 GetRaceMask() const { return getRaceMask(); }
     [[nodiscard]] inline uint8 GetClass() const { return getClass(); }
