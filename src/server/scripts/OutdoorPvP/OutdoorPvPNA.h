@@ -325,6 +325,8 @@ public:
 
     void SendRemoveWorldStates(Player* player) override;
 
+	OPvPCapturePointNA* GetCapturePoint() { return m_obj; }
+
     void HandleKillImpl(Player* player, Unit* killed) override;
 
 private:
