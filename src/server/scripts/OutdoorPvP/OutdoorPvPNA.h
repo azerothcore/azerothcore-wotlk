@@ -287,6 +287,9 @@ protected:
     void UpdateWyvernRoostWorldState(uint32 roost);
     void UpdateHalaaWorldState();
 
+    // Set the PvP Flag for a player
+    void FlagPlayerPvP(Player* player);
+
 private:
     bool m_capturable;
 
@@ -323,8 +326,6 @@ public:
     void SendRemoveWorldStates(Player* player) override;
 
     void HandleKillImpl(Player* player, Unit* killed) override;
-
-    OPvPCapturePointNA* GetCapturePoint() { return m_obj; }
 
 private:
     OPvPCapturePointNA* m_obj;
