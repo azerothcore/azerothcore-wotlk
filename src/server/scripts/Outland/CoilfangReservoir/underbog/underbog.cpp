@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureAI.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 #include "the_underbog.h"
 
 class spell_fungal_decay : public AuraScript
@@ -40,7 +42,52 @@ class spell_fungal_decay : public AuraScript
     }
 };
 
+enum UnderbatSpells
+{
+    SPELL_TENTACLE_LASH = 34171
+};
+
+struct npc_underbat : public ScriptedAI
+{
+    npc_underbat(Creature* c) : ScriptedAI(c) {}
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(2200ms, 6900ms, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
+            {
+                return u->IsAlive() && !u->IsPet() && me->IsWithinCombatRange(u, 20.f) && !me->HasInArc(M_PI, u);
+            }))
+            {
+                DoCast(target, SPELL_TENTACLE_LASH);
+            }
+            context.Repeat(5700ms, 9700ms);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff, [this]
+        {
+            DoMeleeAttackIfReady();
+        });
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 void AddSC_underbog()
 {
     RegisterSpellScript(spell_fungal_decay);
+    RegisterUnderbogCreatureAI(npc_underbat);
 }
