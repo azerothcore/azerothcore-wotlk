@@ -2361,22 +2361,32 @@ class spell_q12919_gymers_throw : public SpellScript
 #define QUEST_CROW_TRANSFORM 9718
 
 // spell 38776
-    class spell_q9718_crow_transform : public AuraScript
+class spell_q9718_crow_transform : public AuraScript
+{
+    PrepareAuraScript(spell_q9718_crow_transform)
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_q9718_crow_transform)
+        SetDuration(147000);
+    }
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetOwner())
         {
-            if(GetOwner())
-                if(Player* player = GetOwner()->ToPlayer())
-                    player->CompleteQuest(QUEST_CROW_TRANSFORM);
+            if (Player* player = GetOwner()->ToPlayer())
+            {
+                player->CompleteQuest(QUEST_CROW_TRANSFORM);
+            }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_q9718_crow_transform::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        }
-    };
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_q9718_crow_transform::HandleEffectApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectRemove += AuraEffectRemoveFn(spell_q9718_crow_transform::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
 
 enum QuestShyRotam
 {

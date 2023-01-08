@@ -72,12 +72,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ManaPerSecond = 0;
     });
 
-    // Evergrove Druid Transform Crow
-    ApplySpellFix({ 38776 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(4); // 120 seconds
-    });
-
     ApplySpellFix({
         63026, // Force Cast (HACK: Target shouldn't be changed)
         63137  // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
