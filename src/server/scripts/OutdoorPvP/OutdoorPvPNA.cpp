@@ -338,6 +338,12 @@ bool OutdoorPvPNA::Update(uint32 diff)
     return m_obj->Update(diff);
 }
 
+void OPvPCapturePointNA::FlagPlayerPvP(Player* player)
+{
+    player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
+    player->UpdatePvP(true, true);
+}
+
 bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameObject* /*go*/)
 {
     std::vector<uint32> nodes;
@@ -349,32 +355,28 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             nodes[0] = FlightPathStartNodes[NA_ROOST_N];
             nodes[1] = FlightPathEndNodes[NA_ROOST_N];
             player->ActivateTaxiPathTo(nodes);
-            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
-            player->UpdatePvP(true, true);
+            FlagPlayerPvP(player);
             retval = true;
             break;
         case NA_SPELL_FLY_SOUTH:
             nodes[0] = FlightPathStartNodes[NA_ROOST_S];
             nodes[1] = FlightPathEndNodes[NA_ROOST_S];
             player->ActivateTaxiPathTo(nodes);
-            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
-            player->UpdatePvP(true, true);
+            FlagPlayerPvP(player);
             retval = true;
             break;
         case NA_SPELL_FLY_WEST:
             nodes[0] = FlightPathStartNodes[NA_ROOST_W];
             nodes[1] = FlightPathEndNodes[NA_ROOST_W];
             player->ActivateTaxiPathTo(nodes);
-            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
-            player->UpdatePvP(true, true);
+            FlagPlayerPvP(player);
             retval = true;
             break;
         case NA_SPELL_FLY_EAST:
             nodes[0] = FlightPathStartNodes[NA_ROOST_E];
             nodes[1] = FlightPathEndNodes[NA_ROOST_E];
             player->ActivateTaxiPathTo(nodes);
-            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
-            player->UpdatePvP(true, true);
+            FlagPlayerPvP(player);
             retval = true;
             break;
         default:
@@ -442,7 +444,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateSouth = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_S);
-                player->UpdatePvP(true, true);
+                FlagPlayerPvP(player);
                 break;
             case NA_DESTROYED_ROOST_N:
                 del = NA_DESTROYED_ROOST_N;
@@ -453,7 +455,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateNorth = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_N);
-                player->UpdatePvP(true, true);
+                FlagPlayerPvP(player);
                 break;
             case NA_DESTROYED_ROOST_W:
                 del = NA_DESTROYED_ROOST_W;
@@ -464,7 +466,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateWest = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_W);
-                player->UpdatePvP(true, true);
+                FlagPlayerPvP(player);
                 break;
             case NA_DESTROYED_ROOST_E:
                 del = NA_DESTROYED_ROOST_E;
@@ -475,7 +477,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateEast = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_E);
-                player->UpdatePvP(true, true);
+                FlagPlayerPvP(player);
                 break;
             case NA_BOMB_WAGON_S:
                 del = NA_BOMB_WAGON_S;
@@ -486,7 +488,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateSouth = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_S);
-                player->UpdatePvP(true, true);
+                FlagPlayerPvP(player);
                 break;
             case NA_BOMB_WAGON_N:
                 del = NA_BOMB_WAGON_N;
@@ -497,7 +499,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateNorth = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_N);
-                player->UpdatePvP(true, true);
+                FlagPlayerPvP(player);
                 break;
             case NA_BOMB_WAGON_W:
                 del = NA_BOMB_WAGON_W;
@@ -508,7 +510,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateWest = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_W);
-                player->UpdatePvP(true, true);
+                FlagPlayerPvP(player);
                 break;
             case NA_BOMB_WAGON_E:
                 del = NA_BOMB_WAGON_E;
@@ -519,7 +521,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateEast = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_E);
-                player->UpdatePvP(true, true);
+                FlagPlayerPvP(player);
                 break;
             default:
                 return -1;
@@ -618,7 +620,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
             FactionTakeOver(GetControllingFaction());
             return true;
         }
-        else if(GetControllingFaction() != TEAM_NEUTRAL)
+        else if(GetControllingFaction() != TEAM_NEUTRAL) // Don't decrease the respawn timer if the team is not HORDE or ALLIANCE
             m_RespawnTimer -= diff;
 
         // get the difference of numbers
