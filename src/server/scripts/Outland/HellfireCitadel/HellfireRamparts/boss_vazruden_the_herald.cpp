@@ -196,6 +196,8 @@ public:
             {
                 Talk(EMOTE_NAZAN);
                 events.Reset();
+                me->SetReactState(REACT_PASSIVE);
+                me->InterruptNonMeleeSpells(true);
                 me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 81.2f, false);
             }
         }
@@ -206,8 +208,10 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                events.ScheduleEvent(EVENT_RESTORE_COMBAT, 0);
+                me->SetReactState(REACT_AGGRESSIVE);
+                events.ScheduleEvent(EVENT_RESTORE_COMBAT, 1);
                 events.ScheduleEvent(EVENT_SPELL_CONE_OF_FIRE, 5000);
+                events.ScheduleEvent(EVENT_SPELL_FIREBALL, 6000);
                 if (IsHeroic())
                     events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 10000);
             }
