@@ -414,12 +414,13 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
     }
 
     bool isMasterLooter = player->GetGroup() && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID();
+    bool itemVisibleForMasterLooter = !needs_quest && (!follow_loot_rules || !is_underthreshold);
 
     // DB conditions check
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(player), conditions))
     {
         // Master Looter can see conditioned recipes
-        if (isMasterLooter && (!follow_loot_rules || !is_underthreshold))
+        if (isMasterLooter && itemVisibleForMasterLooter)
         {
             if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) || (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0))
             {
@@ -442,7 +443,7 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
     }
 
     // Master looter can see all items even if the character can't loot them
-    if (isMasterLooter && (!follow_loot_rules || !is_underthreshold))
+    if (isMasterLooter && itemVisibleForMasterLooter)
     {
         return true;
     }
