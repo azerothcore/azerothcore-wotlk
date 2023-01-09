@@ -338,7 +338,7 @@ bool OutdoorPvPNA::Update(uint32 diff)
     return m_obj->Update(diff);
 }
 
-void OPvPCapturePointNA::FlagPlayerPvP(Player* player)
+void FlagPlayerPvP(Player* player)
 {
     player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
     player->UpdatePvP(true, true);
