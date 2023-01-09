@@ -72,11 +72,11 @@ struct BaseTable
 
 BaseTable const BaseTables[] =
 {
-    { "character_pet",           "id",      "owner",      GUID_TYPE_PET           },
-    { "mail",                    "id",      "receiver",   GUID_TYPE_MAIL          },
-    { "item_instance",           "guid",    "owner_guid", GUID_TYPE_ITEM          },
+    { "character_pet",           "ID",      "Owner",      GUID_TYPE_PET           },
+    { "mail",                    "ID",      "Receiver",   GUID_TYPE_MAIL          },
+    { "item_instance",           "GUID",    "OwnerGUID", GUID_TYPE_ITEM          },
 
-    { "character_equipmentsets", "setguid", "guid",       GUID_TYPE_EQUIPMENT_SET }
+    { "character_equipment_sets", "SetGUID", "GUID",       GUID_TYPE_EQUIPMENT_SET }
 };
 
 struct DumpTable
@@ -93,19 +93,19 @@ DumpTable const DumpTables[] =
     { "character_achievement_progress", DTT_CHAR_TABLE   },
     { "character_action",               DTT_CHAR_TABLE   },
     { "character_aura",                 DTT_CHAR_TABLE   },
-    { "character_declinedname",         DTT_CHAR_TABLE   },
-    { "character_equipmentsets",        DTT_EQSET_TABLE  },
+    { "character_declined_name",         DTT_CHAR_TABLE   },
+    { "character_equipment_sets",        DTT_EQSET_TABLE  },
     { "character_glyphs",               DTT_CHAR_TABLE   },
     { "character_homebind",             DTT_CHAR_TABLE   },
     { "character_inventory",            DTT_INVENTORY    },
     { "character_pet",                  DTT_PET          },
-    { "character_pet_declinedname",     DTT_PET          },
-    { "character_queststatus",          DTT_CHAR_TABLE   },
-    { "character_queststatus_daily",    DTT_CHAR_TABLE   },
-    { "character_queststatus_weekly",   DTT_CHAR_TABLE   },
-    { "character_queststatus_monthly",  DTT_CHAR_TABLE   },
-    { "character_queststatus_seasonal", DTT_CHAR_TABLE   },
-    { "character_queststatus_rewarded", DTT_CHAR_TABLE   },
+    { "character_pet_declined_name",     DTT_PET          },
+    { "character_quest_status",          DTT_CHAR_TABLE   },
+    { "character_quest_status_daily",    DTT_CHAR_TABLE   },
+    { "character_quest_status_weekly",   DTT_CHAR_TABLE   },
+    { "character_quest_status_monthly",  DTT_CHAR_TABLE   },
+    { "character_quest_status_seasonal", DTT_CHAR_TABLE   },
+    { "character_quest_status_rewarded", DTT_CHAR_TABLE   },
     { "character_reputation",           DTT_CHAR_TABLE   },
     { "character_skills",               DTT_CHAR_TABLE   },
     { "character_spell",                DTT_CHAR_TABLE   },
@@ -281,14 +281,14 @@ void PlayerDump::InitializeTables()
         switch (dumpTable.Type)
         {
         case DTT_CHARACTER:
-            MarkWhereField(t, "guid");
+            MarkWhereField(t, "GUID");
 
-            MarkDependentColumn(t, "guid", GUID_TYPE_CHAR);
-            MarkDependentColumn(t, "account", GUID_TYPE_ACCOUNT);
+            MarkDependentColumn(t, "GUID", GUID_TYPE_CHAR);
+            MarkDependentColumn(t, "Account", GUID_TYPE_ACCOUNT);
 
-            MarkDependentColumn(t, "deleteInfos_Account", GUID_TYPE_NULL);
-            MarkDependentColumn(t, "deleteInfos_Name", GUID_TYPE_NULL);
-            MarkDependentColumn(t, "deleteDate", GUID_TYPE_NULL);
+            MarkDependentColumn(t, "DeleteInfoAccount", GUID_TYPE_NULL);
+            MarkDependentColumn(t, "DeleteInfoName", GUID_TYPE_NULL);
+            MarkDependentColumn(t, "DeleteDate", GUID_TYPE_NULL);
             break;
         case DTT_CHAR_TABLE:
             MarkWhereField(t, "guid");
@@ -322,23 +322,23 @@ void PlayerDump::InitializeTables()
             MarkDependentColumn(t, "receiver", GUID_TYPE_CHAR);
             break;
         case DTT_MAIL_ITEM:
-            MarkWhereField(t, "mail_id");
+            MarkWhereField(t, "MailID");
 
-            MarkDependentColumn(t, "mail_id", GUID_TYPE_MAIL);
-            MarkDependentColumn(t, "item_guid", GUID_TYPE_ITEM);
-            MarkDependentColumn(t, "receiver", GUID_TYPE_CHAR);
+            MarkDependentColumn(t, "MailID", GUID_TYPE_MAIL);
+            MarkDependentColumn(t, "ItemGUID", GUID_TYPE_ITEM);
+            MarkDependentColumn(t, "Receiver", GUID_TYPE_CHAR);
             break;
         case DTT_ITEM:
-            MarkWhereField(t, "guid");
+            MarkWhereField(t, "GUID");
 
-            MarkDependentColumn(t, "guid", GUID_TYPE_ITEM);
-            MarkDependentColumn(t, "owner_guid", GUID_TYPE_CHAR);
+            MarkDependentColumn(t, "GUID", GUID_TYPE_ITEM);
+            MarkDependentColumn(t, "OwnerGUID", GUID_TYPE_CHAR);
             break;
         case DTT_ITEM_GIFT:
-            MarkWhereField(t, "item_guid");
+            MarkWhereField(t, "ItemGUID");
 
-            MarkDependentColumn(t, "guid", GUID_TYPE_CHAR);
-            MarkDependentColumn(t, "item_guid", GUID_TYPE_ITEM);
+            MarkDependentColumn(t, "GUID", GUID_TYPE_CHAR);
+            MarkDependentColumn(t, "ItemGUID", GUID_TYPE_ITEM);
             break;
         case DTT_PET:
             MarkWhereField(t, "owner");
@@ -678,8 +678,8 @@ bool PlayerDumpWriter::AppendTable(StringTransaction& trans, ObjectGuid::LowType
     case DTT_CHARACTER:
         if (result)
         {
-            // characters.deleteInfos_Account - if filled error
-            int32 index = GetColumnIndexByName(tableStruct, "deleteInfos_Account");
+            // characters.DeleteInfoAccount - if filled error
+            int32 index = GetColumnIndexByName(tableStruct, "DeleteInfoAccount");
             ASSERT(index != -1); // checked at startup
 
             if ((*result)[index].Get<uint32>())
@@ -916,25 +916,25 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
         {
         case DTT_CHARACTER:
         {
-            race = *Acore::StringTo<uint32>(GetColumn(ts, line, "race"));
-            playerClass = *Acore::StringTo<uint32>(GetColumn(ts, line, "class"));
-            gender = *Acore::StringTo<uint32>(GetColumn(ts, line, "gender"));
-            level = *Acore::StringTo<uint32>(GetColumn(ts, line, "level"));
+            race = *Acore::StringTo<uint32>(GetColumn(ts, line, "Race"));
+            playerClass = *Acore::StringTo<uint32>(GetColumn(ts, line, "Class"));
+            gender = *Acore::StringTo<uint32>(GetColumn(ts, line, "Gender"));
+            level = *Acore::StringTo<uint32>(GetColumn(ts, line, "Level"));
             if (name.empty())
             {
                 // generate a temporary name
                 std::string guidPart = Acore::StringFormat("%X", guid);
                 std::size_t maxCharsFromOriginalName = MAX_PLAYER_NAME - guidPart.length();
 
-                name = GetColumn(ts, line, "name").substr(0, maxCharsFromOriginalName) + guidPart;
+                name = GetColumn(ts, line, "Name").substr(0, maxCharsFromOriginalName) + guidPart;
 
-                // characters.at_login set to "rename on login"
-                if (!ChangeColumn(ts, line, "name", name))
+                // characters.AtLogin set to "rename on login"
+                if (!ChangeColumn(ts, line, "Name", name))
                     return DUMP_FILE_BROKEN;
-                if (!ChangeColumn(ts, line, "at_login", "1"))
+                if (!ChangeColumn(ts, line, "AtLogin", "1"))
                     return DUMP_FILE_BROKEN;
             }
-            else if (!ChangeColumn(ts, line, "name", name)) // characters.name
+            else if (!ChangeColumn(ts, line, "Name", name)) // characters.name
                 return DUMP_FILE_BROKEN;
             break;
         }

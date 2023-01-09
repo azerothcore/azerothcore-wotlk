@@ -451,7 +451,7 @@ uint32 UpdateFetcher::Apply(Path const& path) const
 
 void UpdateFetcher::UpdateEntry(AppliedFileEntry const& entry, uint32 const speed) const
 {
-    std::string const update = "REPLACE INTO `updates` (`name`, `hash`, `state`, `speed`) VALUES (\"" +
+    std::string const update = "REPLACE INTO `updates` (`Name`, `Hash`, `State`, `Duration`) VALUES (\"" +
                                entry.name + "\", \"" + entry.hash + "\", \'" + entry.GetStateAsString() + "\', " + std::to_string(speed) + ")";
 
     // Update database

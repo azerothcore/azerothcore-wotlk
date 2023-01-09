@@ -6396,7 +6396,7 @@ void Player::_LoadDailyQuestStatus(PreparedQueryResult result)
 
             if (quest_daily_idx >= PLAYER_MAX_DAILY_QUESTS)  // max amount with exist data in query
             {
-                LOG_ERROR("entities.player", "Player ({}) have more 25 daily quest records in `charcter_queststatus_daily`", GetGUID().ToString());
+                LOG_ERROR("entities.player", "Player ({}) have more 25 daily quest records in `charcter_quest_status_daily`", GetGUID().ToString());
                 break;
             }
 

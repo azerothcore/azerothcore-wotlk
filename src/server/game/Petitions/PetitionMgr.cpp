@@ -67,7 +67,7 @@ void PetitionMgr::LoadSignatures()
     uint32 oldMSTime = getMSTime();
     SignatureStore.clear();
 
-    QueryResult result = CharacterDatabase.Query("SELECT petitionguid, playerguid, player_account FROM petition_sign");
+    QueryResult result = CharacterDatabase.Query("SELECT PetitionGUID, PlayerGUID, PlayerAccount FROM petition_sign");
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 Petition signs!");

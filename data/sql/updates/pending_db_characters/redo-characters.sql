@@ -609,7 +609,7 @@ ALTER TABLE `instance_reset`
 	RENAME COLUMN `difficulty`				TO `Difficulty`,
 	RENAME COLUMN `resettime`				TO `ResetTime`;
 ALTER TABLE `instance_saved_go_state_data`
-	RENAME COLUMN `id`						TO `IP`,
+	RENAME COLUMN `id`						TO `ID`,
 	RENAME COLUMN `guid`					TO `GUID`,
 	RENAME COLUMN `state`					TO `State`;
 ALTER TABLE `item_instance`

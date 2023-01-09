@@ -6861,15 +6861,15 @@ void ObjectMgr::SetHighestGuids()
 
     // Cleanup other tables from not existed guids ( >= _hiItemGuid)
     CharacterDatabase.Execute("DELETE FROM character_inventory WHERE item >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());     // One-time query
-    CharacterDatabase.Execute("DELETE FROM mail_items WHERE item_guid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());         // One-time query
-    CharacterDatabase.Execute("DELETE FROM auctionhouse WHERE itemguid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());        // One-time query
-    CharacterDatabase.Execute("DELETE FROM guild_bank_item WHERE item_guid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());    // One-time query
+    CharacterDatabase.Execute("DELETE FROM mail_items WHERE ItemGUID >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());         // One-time query
+    CharacterDatabase.Execute("DELETE FROM auction_house WHERE ItemGUID >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());        // One-time query
+    CharacterDatabase.Execute("DELETE FROM guild_bank_item WHERE ItemGUID >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());    // One-time query
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
     if (result)
         GetGuidSequenceGenerator<HighGuid::Mo_Transport>().Set((*result)[0].Get<uint32>() + 1);
 
-    result = CharacterDatabase.Query("SELECT MAX(id) FROM auctionhouse");
+    result = CharacterDatabase.Query("SELECT MAX(ID) FROM auction_house");
     if (result)
         _auctionId = (*result)[0].Get<uint32>() + 1;
 
@@ -6881,11 +6881,11 @@ void ObjectMgr::SetHighestGuids()
     if (result)
         sArenaTeamMgr->SetNextArenaTeamId((*result)[0].Get<uint32>() + 1);
 
-    result = CharacterDatabase.Query("SELECT MAX(fight_id) FROM log_arena_fights");
+    result = CharacterDatabase.Query("SELECT MAX(FightID) FROM log_arena_fights");
     if (result)
         sArenaTeamMgr->SetLastArenaLogId((*result)[0].Get<uint32>());
 
-    result = CharacterDatabase.Query("SELECT MAX(setguid) FROM character_equipmentsets");
+    result = CharacterDatabase.Query("SELECT MAX(SetGUID) FROM character_equipment_sets");
     if (result)
         _equipmentSetGuid = (*result)[0].Get<uint64>() + 1;
 
@@ -9936,7 +9936,7 @@ void ObjectMgr::LoadMailServerTemplates()
     _serverMailStore.clear(); // for reload case
 
     //                                                    0     1           2              3         4         5        6             7       8             9          10      11
-    QueryResult result = CharacterDatabase.Query("SELECT `id`, `reqLevel`, `reqPlayTime`, `moneyA`, `moneyH`, `itemA`, `itemCountA`, `itemH`,`itemCountH`, `subject`, `body`, `active` FROM `mail_server_template`");
+    QueryResult result = CharacterDatabase.Query("SELECT `ID`, `RequiredLevel`, `RequiredPlayTime`, `MoneyAlliance`, `MoneyHorde`, `ItemAlliance`, `ItemCountAlliance`, `ItemHorde`,`ItemCountHorde`, `Subject`, `Body`, `Active` FROM `mail_server_template`");
     if (!result)
     {
         LOG_INFO("sql.sql", ">> Loaded 0 server mail rewards. DB table `mail_server_template` is empty.");
@@ -9969,37 +9969,37 @@ void ObjectMgr::LoadMailServerTemplates()
 
         if (servMail.reqLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has reqLevel {} but max level is {} for id {}, skipped.", servMail.reqLevel, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), servMail.id);
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has RequiredLevel {} but max level is {} for ID {}, skipped.", servMail.reqLevel, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), servMail.id);
             return;
         }
 
         if (servMail.moneyA > MAX_MONEY_AMOUNT || servMail.moneyH > MAX_MONEY_AMOUNT)
         {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has moneyA {} or moneyH {} larger than MAX_MONEY_AMOUNT {} for id {}, skipped.", servMail.moneyA, servMail.moneyH, MAX_MONEY_AMOUNT, servMail.id);
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has MoneyAlliance {} or MoneyHorde {} larger than MAX_MONEY_AMOUNT {} for ID {}, skipped.", servMail.moneyA, servMail.moneyH, MAX_MONEY_AMOUNT, servMail.id);
             return;
         }
 
         ItemTemplate const* itemTemplateA = sObjectMgr->GetItemTemplate(servMail.itemA);
         if (!itemTemplateA && servMail.itemA)
         {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemA {} for id {}, skipped.", servMail.itemA, servMail.id);
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in ItemAlliance {} for ID {}, skipped.", servMail.itemA, servMail.id);
             return;
         }
         ItemTemplate const* itemTemplateH = sObjectMgr->GetItemTemplate(servMail.itemH);
         if (!itemTemplateH && servMail.itemH)
         {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemH {} for id {}, skipped.", servMail.itemH, servMail.id);
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in ItemHorde {} for ID {}, skipped.", servMail.itemH, servMail.id);
             return;
         }
 
         if (!servMail.itemA && servMail.itemCountA)
         {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountA {} with no ItemA, set to 0", servMail.itemCountA);
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has ItemCountAlliance {} with no ItemAlliance, set to 0", servMail.itemCountA);
             servMail.itemCountA = 0;
         }
         if (!servMail.itemH && servMail.itemCountH)
         {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountH {} with no ItemH, set to 0", servMail.itemCountH);
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has ItemCountHorde {} with no ItemHorde, set to 0", servMail.itemCountH);
             servMail.itemCountH = 0;
         }
     } while (result->NextRow());

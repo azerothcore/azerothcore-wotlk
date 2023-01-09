@@ -1971,9 +1971,9 @@ void World::SetInitialWorldSettings()
     // pussywizard:
     LOG_INFO("server.loading", "Deleting Invalid Mail Items...");
     LOG_INFO("server.loading", " ");
-    CharacterDatabase.Execute("DELETE mi FROM mail_items mi LEFT JOIN item_instance ii ON mi.item_guid = ii.guid WHERE ii.guid IS NULL");
-    CharacterDatabase.Execute("DELETE mi FROM mail_items mi LEFT JOIN mail m ON mi.mail_id = m.id WHERE m.id IS NULL");
-    CharacterDatabase.Execute("UPDATE mail m LEFT JOIN mail_items mi ON m.id = mi.mail_id SET m.has_items=0 WHERE m.has_items<>0 AND mi.mail_id IS NULL");
+    CharacterDatabase.Execute("DELETE mi FROM mail_items mi LEFT JOIN item_instance ii ON mi.ItemGUID = ii.GUID WHERE ii.GUID IS NULL");
+    CharacterDatabase.Execute("DELETE mi FROM mail_items mi LEFT JOIN mail m ON mi.MailID = m.ID WHERE m.ID IS NULL");
+    CharacterDatabase.Execute("UPDATE mail m LEFT JOIN mail_items mi ON m.ID = mi.MailID SET m.HasItems=0 WHERE m.HasItems<>0 AND mi.MailID IS NULL");
 
     ///- Handle outdated emails (delete/return)
     LOG_INFO("server.loading", "Returning Old Mails...");
@@ -3306,11 +3306,11 @@ void World::LoadWorldStates()
 {
     uint32 oldMSTime = getMSTime();
 
-    QueryResult result = CharacterDatabase.Query("SELECT entry, value FROM worldstates");
+    QueryResult result = CharacterDatabase.Query("SELECT Entry, Value FROM world_states");
 
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 world states. DB table `worldstates` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 world states. DB table `world_states` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }

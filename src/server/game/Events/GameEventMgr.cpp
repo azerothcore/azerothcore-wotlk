@@ -310,7 +310,7 @@ void GameEventMgr::LoadFromDB()
         uint32 oldMSTime = getMSTime();
 
         //                                                       0       1        2
-        QueryResult result = CharacterDatabase.Query("SELECT eventEntry, state, next_start FROM game_event_save");
+        QueryResult result = CharacterDatabase.Query("SELECT EventEntry, State, NextStart FROM game_event_save");
 
         if (!result)
         {
@@ -725,7 +725,7 @@ void GameEventMgr::LoadFromDB()
         uint32 oldMSTime = getMSTime();
 
         //                                                      0           1         2
-        QueryResult result = CharacterDatabase.Query("SELECT eventEntry, condition_id, done FROM game_event_condition_save");
+        QueryResult result = CharacterDatabase.Query("SELECT EventEntry, ConditionID, Done FROM game_event_condition_save");
 
         if (!result)
         {

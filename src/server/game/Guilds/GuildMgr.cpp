@@ -139,10 +139,10 @@ void GuildMgr::LoadGuilds()
         uint32 oldMSTime = getMSTime();
 
         // Delete orphaned guild rank entries before loading the valid ones
-        CharacterDatabase.DirectExecute("DELETE gr FROM guild_rank gr LEFT JOIN guild g ON gr.guildId = g.guildId WHERE g.guildId IS NULL");
+        CharacterDatabase.DirectExecute("DELETE gr FROM guild_rank gr LEFT JOIN guild g ON gr.GuildID = g.GuildID WHERE g.GuildID IS NULL");
 
         //                                                         0    1      2       3                4
-        QueryResult result = CharacterDatabase.Query("SELECT guildid, rid, rname, rights, BankMoneyPerDay FROM guild_rank ORDER BY guildid ASC, rid ASC");
+        QueryResult result = CharacterDatabase.Query("SELECT GuildID, RankID, RankName, RankRights, BankMoneyPerDay FROM guild_rank ORDER BY GuildID ASC, RankID ASC");
 
         if (!result)
         {
@@ -177,13 +177,13 @@ void GuildMgr::LoadGuilds()
         CharacterDatabase.DirectExecute("DELETE gm FROM guild_member gm LEFT JOIN guild g ON gm.guildId = g.guildId WHERE g.guildId IS NULL");
         CharacterDatabase.DirectExecute("DELETE gm FROM guild_member_withdraw gm LEFT JOIN guild_member g ON gm.guid = g.guid WHERE g.guid IS NULL");
 
-        //           0        1         2     3      4        5       6       7       8       9       10
-        QueryResult result = CharacterDatabase.Query("SELECT guildid, gm.guid, `rank`, pnote, offnote, w.tab0, w.tab1, w.tab2, w.tab3, w.tab4, w.tab5, "
+        //                                                   0        1        2     3           4              5       6       7       8       9       10
+        QueryResult result = CharacterDatabase.Query("SELECT GuildID, gm.GUID, Rank, PlayerNote, OfficerNote, w.Tab0, w.Tab1, w.Tab2, w.Tab3, w.Tab4, w.Tab5, "
                           // 11        12      13       14       15        16      17         18
-                             "w.money, c.name, c.level, c.class, c.gender, c.zone, c.account, c.logout_time "
+                             "w.Money, c.Name, c.Level, c.Class, c.Gender, c.Zone, c.Account, c.LogoutTime "
                              "FROM guild_member gm "
-                             "LEFT JOIN guild_member_withdraw w ON gm.guid = w.guid "
-                             "LEFT JOIN characters c ON c.guid = gm.guid ORDER BY guildid ASC");
+                             "LEFT JOIN guild_member_withdraw w ON gm.GUID = w.GUID "
+                             "LEFT JOIN characters c ON c.GUID = gm.GUID ORDER BY GuildID ASC");
 
         if (!result)
         {
@@ -216,14 +216,14 @@ void GuildMgr::LoadGuilds()
         uint32 oldMSTime = getMSTime();
 
         // Delete orphaned guild bank right entries before loading the valid ones
-        CharacterDatabase.DirectExecute("DELETE gbr FROM guild_bank_right gbr LEFT JOIN guild g ON gbr.guildId = g.guildId WHERE g.guildId IS NULL");
+        CharacterDatabase.DirectExecute("DELETE gbr FROM guild_bank_rights gbr LEFT JOIN guild g ON gbr.GuildID = g.GuildID WHERE g.GuildID IS NULL");
 
         //      0        1      2    3        4
-        QueryResult result = CharacterDatabase.Query("SELECT guildid, TabId, rid, gbright, SlotPerDay FROM guild_bank_right ORDER BY guildid ASC, TabId ASC");
+        QueryResult result = CharacterDatabase.Query("SELECT GuildID, TabID, RankID, RightsFlags, SlotPerDay FROM guild_bank_rights ORDER BY GuildID ASC, TabID ASC");
 
         if (!result)
         {
-            LOG_WARN("server.loading", ">> Loaded 0 guild bank tab rights. DB table `guild_bank_right` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 guild bank tab rights. DB table `guild_bank_rights` is empty.");
             LOG_INFO("server.loading", " ");
         }
         else
@@ -250,14 +250,14 @@ void GuildMgr::LoadGuilds()
     {
         uint32 oldMSTime = getMSTime();
 
-        CharacterDatabase.DirectExecute("DELETE FROM guild_eventlog WHERE LogGuid > {}", sWorld->getIntConfig(CONFIG_GUILD_EVENT_LOG_COUNT));
+        CharacterDatabase.DirectExecute("DELETE FROM guild_event_log WHERE LogGUID > {}", sWorld->getIntConfig(CONFIG_GUILD_EVENT_LOG_COUNT));
 
         //          0        1        2          3            4            5        6
-        QueryResult result = CharacterDatabase.Query("SELECT guildid, LogGuid, EventType, PlayerGuid1, PlayerGuid2, NewRank, TimeStamp FROM guild_eventlog ORDER BY TimeStamp DESC, LogGuid DESC");
+        QueryResult result = CharacterDatabase.Query("SELECT GuildID, LogGUID, EventType, PlayerGUID1, PlayerGUID2, NewRank, TimeStamp FROM guild_event_log ORDER BY TimeStamp DESC, LogGUID DESC");
 
         if (!result)
         {
-            LOG_WARN("server.loading", ">> Loaded 0 guild event logs. DB table `guild_eventlog` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 guild event logs. DB table `guild_event_log` is empty.");
             LOG_INFO("server.loading", " ");
         }
         else
@@ -285,14 +285,14 @@ void GuildMgr::LoadGuilds()
         uint32 oldMSTime = getMSTime();
 
         // Remove log entries that exceed the number of allowed entries per guild
-        CharacterDatabase.DirectExecute("DELETE FROM guild_bank_eventlog WHERE LogGuid > {}", sWorld->getIntConfig(CONFIG_GUILD_BANK_EVENT_LOG_COUNT));
+        CharacterDatabase.DirectExecute("DELETE FROM guild_bank_event_log WHERE LogGUID > {}", sWorld->getIntConfig(CONFIG_GUILD_BANK_EVENT_LOG_COUNT));
 
         //          0        1      2        3          4           5            6               7          8
-        QueryResult result = CharacterDatabase.Query("SELECT guildid, TabId, LogGuid, EventType, PlayerGuid, ItemOrMoney, ItemStackCount, DestTabId, TimeStamp FROM guild_bank_eventlog ORDER BY TimeStamp DESC, LogGuid DESC");
+        QueryResult result = CharacterDatabase.Query("SELECT GuildID, TabID, LogGUID, EventType, PlayerGUID, ItemOrMoney, ItemStackCount, DestinationTabID, TimeStamp FROM guild_bank_event_log ORDER BY TimeStamp DESC, LogGUID DESC");
 
         if (!result)
         {
-            LOG_WARN("server.loading", ">> Loaded 0 guild bank event logs. DB table `guild_bank_eventlog` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 guild bank event logs. DB table `guild_bank_event_log` is empty.");
             LOG_INFO("server.loading", " ");
         }
         else
@@ -357,10 +357,10 @@ void GuildMgr::LoadGuilds()
         // Delete orphan guild bank items
         CharacterDatabase.DirectExecute("DELETE gbi FROM guild_bank_item gbi LEFT JOIN guild g ON gbi.guildId = g.guildId WHERE g.guildId IS NULL");
 
-        //          0            1                2      3         4        5      6             7                 8           9           10
-        QueryResult result = CharacterDatabase.Query("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, "
-                             //   11       12     13      14         15
-                             "guildid, TabId, SlotId, item_guid, itemEntry FROM guild_bank_item gbi INNER JOIN item_instance ii ON gbi.item_guid = ii.guid");
+        //                                                   0            1                2      3         4        5      6             7                 8           9           10
+        QueryResult result = CharacterDatabase.Query("SELECT CreatorGUID, GiftCreatorGUID, Count, Duration, Charges, Flags, Enchantments, RandomPropertyID, Durability, PlayedTime, Text, "
+                             //11      12     13      14        15
+                             "GuildID, TabID, SlotID, ItemGUID, ItemEntry FROM guild_bank_item gbi INNER JOIN item_instance ii ON gbi.ItemGUID = ii.GUID");
 
         if (!result)
         {

@@ -64,8 +64,8 @@ void CalendarMgr::LoadFromDB()
     _maxEventId = 0;
     _maxInviteId = 0;
 
-    //                                                       0   1        2      3            4     5        6          7      8
-    if (QueryResult result = CharacterDatabase.Query("SELECT id, creator, title, description, type, dungeon, eventtime, flags, time2 FROM calendar_events"))
+    //                                                       0   1        2      3            4     5        6           7      8
+    if (QueryResult result = CharacterDatabase.Query("SELECT ID, Creator, Title, Description, Type, Dungeon, EventTime1, Flags, EventTime2 FROM calendar_events"))
         do
         {
             Field* fields = result->Fetch();

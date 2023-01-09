@@ -34,7 +34,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     uint32 oldMSTime = getMSTime();
 
     // check flags which clean ups are necessary
-    QueryResult result = CharacterDatabase.Query("SELECT value FROM worldstates WHERE entry = {}", WS_CLEANING_FLAGS);
+    QueryResult result = CharacterDatabase.Query("SELECT Value FROM world_states WHERE Entry = {}", WS_CLEANING_FLAGS);
     if (!result)
         return;
 
@@ -59,7 +59,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     // NOTE: In order to have persistentFlags be set in worldstates for the next cleanup,
     // you need to define them at least once in worldstates.
     flags &= sWorld->getIntConfig(CONFIG_PERSISTENT_CHARACTER_CLEAN_FLAGS);
-    CharacterDatabase.DirectExecute("UPDATE worldstates SET value = {} WHERE entry = {}", flags, WS_CLEANING_FLAGS);
+    CharacterDatabase.DirectExecute("UPDATE world_states SET Value = {} WHERE Entry = {}", flags, WS_CLEANING_FLAGS);
 
     sWorld->SetCleaningFlags(flags);
 
@@ -152,5 +152,5 @@ void CharacterDatabaseCleaner::CleanCharacterTalent()
 
 void CharacterDatabaseCleaner::CleanCharacterQuestStatus()
 {
-    CharacterDatabase.DirectExecute("DELETE FROM character_queststatus WHERE status = 0");
+    CharacterDatabase.DirectExecute("DELETE FROM character_quest_status WHERE Status = 0");
 }
