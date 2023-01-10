@@ -215,8 +215,8 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature)
     _pvpKillsCount = 0;
     _playerKillsCount = 0;
 
-    for (uint8 i = 0; i != 6; ++i)
-        resistbonus[i] = 0;
+    for (uint8 i = SPELL_SCHOOL_HOLY; i != MAX_SPELL_SCHOOL; ++i)
+        resistbonus[i - 1] = 0;
 
     botPet = nullptr;
     canUpdate = true;
@@ -1043,6 +1043,24 @@ bool bot_ai::CanBotMoveVehicle() const
         return seat->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL;
 
     return false;
+}
+void bot_ai::MoveToSendPosition(Position const& mpos)
+{
+    EventRemoveBotAwaitState(BOT_AWAIT_SEND);
+    if (me->GetExactDist(mpos) <= 70.f && me->CanFreeMove())
+    {
+        SetBotCommandState(BOT_COMMAND_STAY);
+        BotMovement(BOT_MOVE_POINT, &mpos, nullptr, false);
+        if (botPet && botPet->CanFreeMove())
+        {
+            botPet->GetBotPetAI()->SetBotCommandState(BOT_COMMAND_STAY);
+            botPet->GetMotionMaster()->MovePoint(me->GetMapId(), mpos, false);
+        }
+        sendlastpos.Relocate(me);
+        BotWhisper("Moving to position!");
+    }
+    else
+        BotWhisper("Position is too far away!");
 }
 
 void bot_ai::SetBotAwaitState(uint8 state)
@@ -14152,22 +14170,8 @@ void bot_ai::OnBotOwnerSpellGo(Spell const* spell, bool ok)
 
     if (spell->m_targets.HasDst() && HasBotAwaitState(BOT_AWAIT_SEND) && (me->GetTransport() == master->GetTransport()))
     {
-        EventRemoveBotAwaitState(BOT_AWAIT_SEND);
-
         Position const* spell_dest = spell->m_targets.GetDstPos();
-        if (me->GetExactDist(spell_dest) <= 70.f)
-        {
-            SetBotCommandState(BOT_COMMAND_STAY);
-            BotMovement(BOT_MOVE_POINT, spell_dest, nullptr, false);
-            if (botPet)
-            {
-                botPet->GetBotPetAI()->SetBotCommandState(BOT_COMMAND_STAY);
-                botPet->GetMotionMaster()->MovePoint(me->GetMapId(), *spell_dest, false);
-            }
-            BotWhisper("Moving to position!");
-        }
-        else
-            BotWhisper("Position is too far away!");
+        MoveToSendPosition(*spell_dest);
     }
 
     if (master->GetVehicle() && me->GetVehicle() && !master->HasSpell(spellInfo->Id) && !spell->m_targets.GetGOTargetGUID())

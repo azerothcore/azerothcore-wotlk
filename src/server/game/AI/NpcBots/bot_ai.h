@@ -106,6 +106,8 @@ class bot_ai : public CreatureAI
         bool CanRespawn() { return IAmFree(); }
         void BotMovement(BotMovementType type, Position const* pos, Unit* target = nullptr, bool generatePath = true) const;
         bool CanBotMoveVehicle() const;
+        void MoveToSendPosition(Position const& mpos);
+        void MoveToLastSendPosition() { MoveToSendPosition(sendlastpos); }
         void SetBotCommandState(uint32 st, bool force = false, Position* newpos = nullptr);
         void RemoveBotCommandState(uint32 st);
         bool HasBotCommandState(uint32 st) const { return (_botCommandState & st); }
@@ -595,7 +597,7 @@ class bot_ai : public CreatureAI
 
         PlayerClassLevelInfo* _classinfo;
         SpellInfo const* m_botSpellInfo;
-        Position movepos, attackpos;
+        Position movepos, attackpos, sendlastpos;
 
         uint32 _botCommandState;
         uint8 _botAwaitState;
@@ -603,7 +605,7 @@ class bot_ai : public CreatureAI
         //stats
         float hit, parry, dodge, block, crit, dmg_taken_phy, dmg_taken_mag, armor_pen;
         uint32 expertise, spellpower, spellpen, defense, blockvalue;
-        int32 haste, resistbonus[6];
+        int32 haste, resistbonus[MAX_SPELL_SCHOOL - 1];
 
         //timers
         uint32 _reviveTimer, _powersTimer, _chaseTimer, _engageTimer, _potionTimer;

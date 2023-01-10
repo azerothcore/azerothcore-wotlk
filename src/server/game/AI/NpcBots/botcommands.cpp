@@ -459,6 +459,11 @@ public:
             { "free",       HandleNpcBotDeleteFreeCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DELETE,             Console::Yes },
         };
 
+        static ChatCommandTable npcbotSendToCommandTable =
+        {
+            { "",           HandleNpcBotSendToCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_SEND,               Console::No  },
+            { "last",       HandleNpcBotSendToLastCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SEND,               Console::No  },
+        };
         static ChatCommandTable npcbotCommandTable =
         {
             //{ "debug",      npcbotDebugCommandTable                                                                                 },
@@ -482,7 +487,7 @@ public:
             { "recall",     npcbotRecallCommandTable                                                                                },
             { "kill",       HandleNpcBotKillCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_KILL,               Console::No  },
             { "suicide",    HandleNpcBotKillCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_KILL,               Console::No  },
-            { "sendto",     HandleNpcBotSendToCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_SEND,               Console::No  },
+            { "sendto",     npcbotSendToCommandTable                                                                                },
             { "distance",   npcbotDistanceCommandTable                                                                              },
             { "order",      npcbotOrderCommandTable                                                                                 },
             { "vehicle",    npcbotVehicleCommandTable                                                                               },
@@ -1061,9 +1066,8 @@ public:
     static bool HandleNpcBotSendToCommand(ChatHandler* handler, Optional<std::vector<std::string_view>> names)
     {
         static auto return_syntax = [](ChatHandler* chandler) -> bool {
-            chandler->SendSysMessage("Syntax: .npcbot sendto");
-            chandler->SendSysMessage("Makes selected bot wait 30 sec for your next DEST spell, assume that position and hold it");
-            chandler->SendSysMessage("Select self to move ALL bots");
+            chandler->SendSysMessage("Syntax: .npcbot sendto [#names...]");
+            chandler->SendSysMessage("Makes selected/named bot(s) wait 30 sec for your next DEST spell, assume that position and hold it");
             chandler->SendSysMessage("Max distance is 70 yds");
             chandler->SetSentErrorMessage(true);
             return false;
@@ -1102,6 +1106,63 @@ public:
             {
                 ++count;
                 bot->GetBotAI()->SetBotAwaitState(BOT_AWAIT_SEND);
+            }
+        }
+
+        if (count == 0)
+        {
+            handler->PSendSysMessage("Unable to send any of %u bots!", uint32(names->size()));
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        return return_success(handler, { count });
+    }
+
+    static bool HandleNpcBotSendToLastCommand(ChatHandler* handler, Optional<std::vector<std::string_view>> names)
+    {
+        static auto return_syntax = [](ChatHandler* chandler) -> bool {
+            chandler->SendSysMessage("Syntax: .npcbot sendto last [#names...]");
+            chandler->SendSysMessage("Makes selected/named bot(s) assume previous position they were sent from");
+            chandler->SendSysMessage("This will cancel current sendto await state");
+            chandler->SendSysMessage("Max distance is 70 yds");
+            chandler->SetSentErrorMessage(true);
+            return false;
+        };
+
+        static auto return_success = [](ChatHandler* chandler, Variant<std::string_view, uint32> name_or_count) -> bool {
+            if (name_or_count.holds_alternative<uint32>())
+                chandler->PSendSysMessage("Moving %u bot(s) to previous position...", name_or_count.get<uint32>());
+            else
+                chandler->PSendSysMessage("Moving %s to previous position...", name_or_count.get<std::string_view>().data());
+            return true;
+        };
+
+        Player const* owner = handler->GetSession()->GetPlayer();
+
+        if (!owner->HaveBot())
+            return return_syntax(handler);
+
+        if (!names || names->empty())
+        {
+            Unit const* target = handler->getSelectedCreature();
+            Creature const* bot = target ? owner->GetBotMgr()->GetBot(target->GetGUID()) : nullptr;
+            if (bot && bot->IsAlive())
+            {
+                bot->GetBotAI()->MoveToLastSendPosition();
+                return return_success(handler, { bot->GetName() });
+            }
+            return return_syntax(handler);
+        }
+
+        uint32 count = 0;
+        for (decltype(names)::value_type::value_type name : *names)
+        {
+            Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
+            if (bot && bot->IsAlive())
+            {
+                ++count;
+                bot->GetBotAI()->MoveToLastSendPosition();
             }
         }
 
