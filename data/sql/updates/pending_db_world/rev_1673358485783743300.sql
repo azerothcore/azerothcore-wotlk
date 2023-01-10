@@ -1,4 +1,6 @@
 --
+SET @REFERENCE := 29569;
+
 DELETE FROM `item_loot_template` WHERE `Entry`=29569;
 INSERT INTO `item_loot_template` (`entry`, `item`, `Chance`, `groupid`, `mincount`, `maxcount`, `reference`, `comment`) VALUES
 (29569, 2931, 30, 1, 2, 5, 0, 'Strong Junkbox - Maiden\'s Anguish'),
@@ -14,9 +16,7 @@ INSERT INTO `item_loot_template` (`entry`, `item`, `Chance`, `groupid`, `mincoun
 (29569, 22829, 12, 0, 1, 1, 0, 'Strong Junkbox - Super Healing Potion'),
 (29569, 31331, 0.05, 0, 1, 1, 0, 'Strong Junkbox - The Night Blade'),
 (29569, 34622, 0.1, 0, 1, 1, 0, 'Strong Junkbox - Spinesever'),
-(29569, 29569, 50, 0, 1, 1, @REFERENCE, 'Strong Junkbox (Reference Table)');
-
-SET @REFERENCE := 29569;
+(29569, 1, 50, 0, 1, 1, @REFERENCE, 'Strong Junkbox (Reference Table)');
 
 DELETE FROM `reference_loot_template` WHERE `Entry`=@REFERENCE AND `Item` IN (24231,24232,24281,24282,27729);
 INSERT INTO `reference_loot_template` (`entry`, `item`, `Chance`, `groupid`, `mincount`, `maxcount`, `comment`) VALUES
