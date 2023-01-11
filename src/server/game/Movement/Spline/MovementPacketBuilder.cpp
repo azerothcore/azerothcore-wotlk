@@ -191,7 +191,7 @@ namespace Movement
 
             uint32 nodes = move_spline.getPath().size();
             data << nodes;
-            if (nodes > 0)
+            if (nodes)
             {
                 data.append<Vector3>(&move_spline.getPath()[0], nodes);
             }
