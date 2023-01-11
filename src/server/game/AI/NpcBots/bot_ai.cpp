@@ -1062,6 +1062,18 @@ void bot_ai::MoveToSendPosition(Position const& mpos)
     else
         BotWhisper("Position is too far away!");
 }
+void bot_ai::MoveToSendPosition(uint32 point_id)
+{
+    ASSERT(point_id < MAX_SEND_POINTS);
+
+    MoveToSendPosition(sendpos[point_id]);
+}
+void bot_ai::MarkSendPosition(uint32 point_id)
+{
+    ASSERT(point_id < MAX_SEND_POINTS);
+
+    sendpos[point_id].Relocate(me);
+}
 
 void bot_ai::SetBotAwaitState(uint8 state)
 {

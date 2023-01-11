@@ -538,6 +538,8 @@ enum BotAwaitStates
     BOT_AWAIT_SEND                      = 0x01
 };
 
+constexpr size_t MAX_SEND_POINTS = 5u;
+
 #define FROM_ARRAY(arr) arr, arr + sizeof(arr) / sizeof(arr[0])
 
 //Only non-persistent types are allowed
@@ -546,8 +548,8 @@ enum BotOrderTypes
     BOT_ORDER_NONE          = 0,
     BOT_ORDER_SPELLCAST     = 1
 };
-#define DEBUG_BOT_ORDERS 0
-#define MAX_BOT_ORDERS_QUEUE_SIZE 3
+constexpr bool DEBUG_BOT_ORDERS = false;
+constexpr size_t MAX_BOT_ORDERS_QUEUE_SIZE = 3u;
 
 enum BotVehicleStrats
 {
