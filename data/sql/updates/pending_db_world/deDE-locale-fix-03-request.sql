@@ -1,6 +1,6 @@
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (10, 224, 237, 334, 644, 645, 699, 1101, 1102, 1169, 1383, 4481, 4482, 4483, 4484, 4903, 5052, 5306, 5518, 5863, 5881, 7625, 7723, 9436) AND `locale` = 'deDE';
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
-(10, 'deDE', 'Nun, was habt Ihr für Neuigkeiten? Ihr seht aus, als hättet Ihr einiges durchgemacht... ist Kieselschliff am Leben?', 0,)
+(10, 'deDE', 'Nun, was habt Ihr für Neuigkeiten? Ihr seht aus, als hättet Ihr einiges durchgemacht... ist Kieselschliff am Leben?', 0),
 (224, 'deDE', 'Der Loch Modan wird belagert, $N! Wir sind auf jedes einsatzfähige Mitglied der Allianz angewiesen. Habt Ihr schon 10 Splittersteintroggs und 10 Späher der Splittersteintroggs getötet?', 0),
 (237, 'deDE', 'Wir brauchen mehr Zeit, $R. Ihr habt den Befehl, 10 Schädelhauer der Splittersteintroggs und 10 Seher der Splittersteintroggs zu töten. Setzt den Feind unter Druck, bis wir Verstärkung erhalten. Jetzt ist nicht die Zeit für Müßiggang.', 0),
 (334, 'deDE', 'Seid Ihr hier, um Kleidung zu kaufen?', 0),
