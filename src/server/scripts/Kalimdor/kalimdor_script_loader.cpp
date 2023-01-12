@@ -45,7 +45,6 @@ void AddSC_instance_culling_of_stratholme();
 void AddSC_boss_isalien();
 void AddSC_instance_dire_maul();             //Dire Maul
 void AddSC_instance_maraudon();              //Maraudon
-void AddSC_maraudon();
 void AddSC_boss_onyxia();                    //Onyxia's Lair
 void AddSC_instance_onyxias_lair();
 void AddSC_instance_ragefire_chasm();        //Ragefire Chasm
@@ -130,7 +129,6 @@ void AddKalimdorScripts()
     AddSC_boss_isalien();
     AddSC_instance_dire_maul();             //Dire Maul
     AddSC_instance_maraudon();              //Maraudon
-    AddSC_maraudon();
     AddSC_boss_onyxia();                    //Onyxia's Lair
     AddSC_instance_onyxias_lair();
     AddSC_instance_ragefire_chasm();        //Ragefire Chasm
