@@ -567,6 +567,12 @@ void WorldSession::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& 
     minimum = packet.Min;
     maximum = packet.Max;
 
+    /** error handling **/
+    if (minimum > maximum || maximum > 10000) // < 32768 for urand call
+    {
+        return;
+    }
+
     GetPlayer()->DoRandomRoll(minimum, maximum);
 }
 

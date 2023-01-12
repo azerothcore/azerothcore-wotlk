@@ -16047,7 +16047,7 @@ void Player::RemoveRestFlag(RestFlag restFlag)
 
 uint32 Player::DoRandomRoll(uint32 minimum, uint32 maximum)
 {
-    ASSERT(minimum <= maximum || maximum <= 10000);
+    ASSERT(minimum <= maximum);
 
     uint32 roll = urand(minimum, maximum);
 

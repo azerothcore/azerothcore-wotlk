@@ -2442,7 +2442,7 @@ float Pet::GetNativeObjectScale() const
             scale = creatureFamily->minScale + float(GetLevel() - creatureFamily->minScaleLevel) / creatureFamily->maxScaleLevel * (creatureFamily->maxScale - creatureFamily->minScale);
 
         if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
-            if (displayInfo->scale > 1.f)
+            if (displayInfo->scale > 1.f && GetCreatureTemplate()->IsExotic())
                 scale *= displayInfo->scale;
 
         return scale;
