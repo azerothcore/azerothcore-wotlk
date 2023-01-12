@@ -426,22 +426,22 @@ enum SummonPropGroup
 enum SummonPropFlags
 {
     SUMMON_PROP_FLAG_NONE                            = 0x00000000,          // 1342 spells in 3.0.3
-    SUMMON_PROP_FLAG_ATTACK_SUMMONER                 = 0x00000001,          // 75 spells in 3.0.3, something unfriendly                                                   TODO: Needs implementation
-    SUMMON_PROP_FLAG_ASSIST_COMBAT_SUMMON            = 0x00000002,          // 616 spells in 3.0.3, something friendly                                                    TODO: Needs implementation
-    SUMMON_PROP_FLAG_USE_LEVEL_OFFSET                = 0x00000004,          // 22 spells in 3.0.3, no idea...                                                             TODO: Needs implementation
-    SUMMON_PROP_FLAG_DESPAWN_ON_SUMMONER_DEATH       = 0x00000008,          // 49 spells in 3.0.3, some mounts                                                            TODO: Needs implementation
-    SUMMON_PROP_FLAG_ONLY_VISIBLE_TO_SUMMONER        = 0x00000010,          // 25 spells in 3.0.3, quest related?                                                         TODO: Needs implementation
-    SUMMON_PROP_FLAG_CANNOT_DISMISS_PET              = 0x00000020,          // 0 spells in 3.3.5, unused                                                                  TODO: Needs implementation
-    SUMMON_PROP_FLAG_USE_DEMON_TIMEOUT               = 0x00000040,          // 12 spells in 3.0.3, no idea                                                                TODO: Needs implementation
-    SUMMON_PROP_FLAG_UNLIMITED_SUMMONS               = 0x00000080,          // 4 spells in 3.0.3, no idea                                                                 TODO: Needs implementation
-    SUMMON_PROP_FLAG_USE_CREATURE_LEVEL              = 0x00000100,          // 51 spells in 3.0.3, no idea, many quest related                                            TODO: Needs implementation
-    SUMMON_PROP_FLAG_JOIN_SUMMONER_SPAWN_GROUP       = 0x00000200,          // 51 spells in 3.0.3, something defensive                                                    TODO: Needs implementation
-    SUMMON_PROP_FLAG_DO_NOT_TOGGLE                   = 0x00000400,          // 3 spells, requires something near?                                                         TODO: Needs implementation
-    SUMMON_PROP_FLAG_DESPAWN_WHEN_EXPIRED            = 0x00000800,          // 30 spells in 3.0.3, no idea                                                                TODO: Needs implementation
-    SUMMON_PROP_FLAG_USE_SUMMONER_FACTION            = 0x00001000,          // Lightwell, Jeeves, Gnomish Alarm-o-bot, Build vehicles(wintergrasp)                        TODO: Needs implementation
-    SUMMON_PROP_FLAG_DO_NOT_FOLLOW_MOUNTED_SUMMONER  = 0x00002000,          // Guides, player follows                                                                     TODO: Needs implementation
-    SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST               = 0x00004000,          // Force of Nature, Shadowfiend, Feral Spirit, Summon Water Elemental                         TODO: Needs implementation
-    SUMMON_PROP_FLAG_IGNORE_SUMMONER_PHASE           = 0x00008000,          // Light/Dark Bullet, Soul/Fiery Consumption, Twisted Visage, Twilight Whelp. Phase related?  TODO: Needs implementation
+    SUMMON_PROP_FLAG_ATTACK_SUMMONER                 = 0x00000001,          // NYI 75 spells in 3.0.3, something unfriendly
+    SUMMON_PROP_FLAG_ASSIST_COMBAT_SUMMON            = 0x00000002,          // NYI 616 spells in 3.0.3, something friendly
+    SUMMON_PROP_FLAG_USE_LEVEL_OFFSET                = 0x00000004,          // NYI 22 spells in 3.0.3, no idea...
+    SUMMON_PROP_FLAG_DESPAWN_ON_SUMMONER_DEATH       = 0x00000008,          // NYI 49 spells in 3.0.3, some mounts
+    SUMMON_PROP_FLAG_ONLY_VISIBLE_TO_SUMMONER        = 0x00000010,          // 25 spells in 3.0.3, quest related?
+    SUMMON_PROP_FLAG_CANNOT_DISMISS_PET              = 0x00000020,          // NYI 0 spells in 3.3.5, unused
+    SUMMON_PROP_FLAG_USE_DEMON_TIMEOUT               = 0x00000040,          // NYI 12 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNLIMITED_SUMMONS               = 0x00000080,          // NYI 4 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_USE_CREATURE_LEVEL              = 0x00000100,          // NYI 51 spells in 3.0.3, no idea, many quest related
+    SUMMON_PROP_FLAG_JOIN_SUMMONER_SPAWN_GROUP       = 0x00000200,          // NYI 51 spells in 3.0.3, something defensive
+    SUMMON_PROP_FLAG_DO_NOT_TOGGLE                   = 0x00000400,          // NYI 3 spells, requires something near?
+    SUMMON_PROP_FLAG_DESPAWN_WHEN_EXPIRED            = 0x00000800,          // NYI 30 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_USE_SUMMONER_FACTION            = 0x00001000,          // NYI Lightwell, Jeeves, Gnomish Alarm-o-bot, Build vehicles(wintergrasp)
+    SUMMON_PROP_FLAG_DO_NOT_FOLLOW_MOUNTED_SUMMONER  = 0x00002000,          // NYI Guides, player follows
+    SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST               = 0x00004000,          // NYI Force of Nature, Shadowfiend, Feral Spirit, Summon Water Elemental
+    SUMMON_PROP_FLAG_IGNORE_SUMMONER_PHASE           = 0x00008000,          // NYI Light/Dark Bullet, Soul/Fiery Consumption, Twisted Visage, Twilight Whelp. Phase related?
 };
 
 enum VehicleSeatFlags
