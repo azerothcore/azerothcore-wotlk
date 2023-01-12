@@ -727,7 +727,9 @@ public:
                         break;
                     case 8:
                         if (Creature* Plaguefist = GetClosestCreatureWithEntry(me, NPC_PLAGUEFIST, 85.0f))
+                        {
                             Plaguefist->AI()->Talk(SAY_PLAGUEFIST, player);
+                        }
                         break;
                     case 9:
                         Talk(SAY_EXEC_TIME, player);
