@@ -1072,8 +1072,10 @@ void BotMgr::UnbindBot(ObjectGuid guid)
 }
 BotAddResult BotMgr::RebindBot(Creature* bot)
 {
-    bot->GetBotAI()->RemoveBotCommandState(BOT_COMMAND_UNBIND);
-    return AddBot(bot);
+    BotAddResult res = AddBot(bot);
+    if (res == BOT_ADD_SUCCESS)
+        bot->GetBotAI()->RemoveBotCommandState(BOT_COMMAND_UNBIND);
+    return res;
 }
 
 BotAddResult BotMgr::AddBot(Creature* bot)
