@@ -1,5 +1,6 @@
 -- Delete useless spawn
 DELETE FROM `creature` WHERE `id1` = 3695 AND `guid` = 37101;
+DELETE FROM `creature_addon` WHERE `guid`=37101;
 
 -- Rebuild Waypoints, use correct entry numbering
 DELETE FROM `waypoints` WHERE `entry`=3695 AND `point_comment`='Grimclaw';
