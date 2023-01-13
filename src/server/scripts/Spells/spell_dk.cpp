@@ -496,8 +496,17 @@ class spell_dk_rune_of_the_fallen_crusader : public SpellScript
     {
         std::list<TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
         for (std::list<TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+        {
             if (ihit->targetGUID == GetCaster()->GetGUID())
+            {
+                //npcbot: get bot's crit
+                if (GetCaster()->GetGUID().IsCreature() && GetCaster()->ToCreature()->IsNPCBot())
+                    ihit->crit = roll_chance_f(GetCaster()->ToCreature()->GetCreatureCritChance());
+                else
+                //end npcbot
                 ihit->crit = roll_chance_f(GetCaster()->GetFloatValue(PLAYER_CRIT_PERCENTAGE));
+            }
+        }
     }
 
     void Register() override
