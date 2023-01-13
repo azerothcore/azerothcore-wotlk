@@ -569,7 +569,7 @@ public:
 
         void OnBotDamageDealt(Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType /*damagetype*/, SpellInfo const* /*spellInfo*/) override
         {
-            if (damage && victim && (cleanDamage->attackType == BASE_ATTACK || cleanDamage->attackType == OFF_ATTACK) &&
+            if (damage && victim && cleanDamage && (cleanDamage->attackType == BASE_ATTACK || cleanDamage->attackType == OFF_ATTACK) &&
                 victim->IsWithinCombatRange(me, ATTACK_DISTANCE))
             {
                 if (urand(0, 100) < 5)
