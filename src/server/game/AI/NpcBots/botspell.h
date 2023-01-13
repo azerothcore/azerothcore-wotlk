@@ -8,6 +8,9 @@ NpcBot System by Trickerer (onlysuffering@gmail.com)
 Original patch from: LordPsyan https://bitbucket.org/lordpsyan/trinitycore-patches/src/3b8b9072280e/Individual/11185-BOTS-NPCBots.patch
 */
 
+class SpellInfo;
+struct SpellProcEntry;
+
 enum BotSpells : uint32
 {
 //COMMON SPELLS
@@ -145,6 +148,25 @@ enum BotSpells : uint32
     SPELL_SHOOT_BOW                     = 41188,
   //unmodify
     SPELL_TORNADO_LIGHTNING_VISUAL      = 45869, //periodic, 1 sec
+
+    //SPELL_SUMMON_FELBLAZE_PREVISUAL     = 46350,//green splash impact head/torso
+
+//OTHER
+    BASE_MANA_SPHYNX                    = 400 * 5,
+    BASE_MANA_SPELLBREAKER              = 250 * 5,
+    BASE_MANA_NECROMANCER               = 400 * 5,
+    //base mana at 10
+    BASE_MANA_10_BM                     = 540 * 5,
+    BASE_MANA_10_ARCHMAGE               = 705 * 5,
+    BASE_MANA_10_DREADLORD              = 600 * 5,
+    BASE_MANA_10_DARK_RANGER            = 570 * 5,
+    BASE_MANA_10_SEA_WITCH              = 735 * 5,
+    //base mana at 1
+    BASE_MANA_1_BM                      = 240 * 5,
+    BASE_MANA_1_ARCHMAGE                = 285 * 5,
+    BASE_MANA_1_DREADLORD               = 270 * 5,
+    BASE_MANA_1_DARK_RANGER             = 225 * 5,
+    BASE_MANA_1_SEA_WITCH               = 330 * 5,
 };
 
 enum BotMountSpells : uint32
@@ -242,5 +264,10 @@ enum BotMountSpells : uint32
     BOT_MOUNT_FLY_HORDE_280_3           = 32296
 };
 constexpr std::size_t NUM_MOUNTS_PER_SPEED = 3;
+
+SpellInfo const* GetBotSpellInfoOverride(uint32 spellId);
+SpellInfo const* AssertBotSpellInfoOverride(uint32 spellId);
+SpellProcEntry const* GetBotSpellProceEntryOverride(uint32 spellId);
+void GenerateBotCustomSpells();
 
 #endif //_BOTSPELL_H

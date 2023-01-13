@@ -4167,10 +4167,4 @@ float Creature::GetBotAverageItemLevel() const
 {
     return bot_AI ? bot_AI->GetAverageItemLevel() : 0.0f;
 }
-
-//static
-bool Creature::IsBotCustomSpell(uint32 spellId)
-{
-    return bot_ai::IsBotCustomSpell(spellId);
-}
 //END NPCBOT

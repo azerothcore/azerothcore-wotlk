@@ -28,6 +28,7 @@
 
 //npcbot
 #include "botmgr.h"
+#include "botspell.h"
 //end npcbot
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
@@ -898,6 +899,12 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
 SpellInfo::~SpellInfo()
 {
     _UnloadImplicitTargetConditionLists();
+}
+
+SpellInfo const* SpellInfo::TryGetSpellInfoOverride(WorldObject const* caster) const
+{
+    SpellInfo const* spellInfoOverride = (caster && caster->GetGUID().IsCreature() && caster->ToCreature()->GetBotClass() >= BOT_CLASS_EX_START) ? GetBotSpellInfoOverride(Id) : nullptr;
+    return spellInfoOverride ? spellInfoOverride : this;
 }
 
 uint32 SpellInfo::GetCategory() const

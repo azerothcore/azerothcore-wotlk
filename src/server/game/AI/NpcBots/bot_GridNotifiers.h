@@ -548,9 +548,9 @@ class UndeadCCUnitCheck
                 return false;
             if (u->GetReactionTo(me) > REP_NEUTRAL)
                 return false;
-            if (u->IsImmunedToSpell(sSpellMgr->GetSpellInfo(m_spellId)))
+            if (u->IsImmunedToSpell(sSpellMgr->GetSpellInfo(m_spellId)->TryGetSpellInfoOverride(me)))
                 return false;
-            if (m_ai->IsPointedNoDPSTarget(u) && bot_ai::IsDamagingSpell(sSpellMgr->GetSpellInfo(m_spellId)))
+            if (m_ai->IsPointedNoDPSTarget(u) && bot_ai::IsDamagingSpell(sSpellMgr->GetSpellInfo(m_spellId)->TryGetSpellInfoOverride(me)))
                 return false;
 
             return true;
@@ -602,9 +602,9 @@ class RootUnitCheck
                 u->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_STUN, SPELLFAMILY_PALADIN, 0x4)/*repentance*/ ||
                 u->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_STUN, SPELLFAMILY_PRIEST, 0x40000000)/*shackle undead*/)
                 return false;
-            if (m_ai->IsPointedNoDPSTarget(u) && bot_ai::IsDamagingSpell(sSpellMgr->GetSpellInfo(m_spellId)))
+            if (m_ai->IsPointedNoDPSTarget(u) && bot_ai::IsDamagingSpell(sSpellMgr->GetSpellInfo(m_spellId)->TryGetSpellInfoOverride(me)))
                 return false;
-            if (!u->IsImmunedToSpell(sSpellMgr->GetSpellInfo(m_spellId)))
+            if (!u->IsImmunedToSpell(sSpellMgr->GetSpellInfo(m_spellId)->TryGetSpellInfoOverride(me)))
                 return true;
 
             return false;
@@ -676,7 +676,7 @@ class CastingUnitCheck
                     u->GetCreatureType() != CREATURE_TYPE_UNDEAD)
                     return false;
 
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(m_spell);
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(m_spell)->TryGetSpellInfoOverride(me);
                 if (u->IsImmunedToSpell(spellInfo))
                     return false;
 

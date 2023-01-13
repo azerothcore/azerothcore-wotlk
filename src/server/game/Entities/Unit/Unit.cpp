@@ -155,6 +155,9 @@ DamageInfo::DamageInfo(SpellNonMeleeDamage const& spellNonMeleeDamage, DamageEff
       , m_procEx(spellNonMeleeDamage.HitInfo)
       //end npcbot
 {
+    //npcbot: override spellInfo
+    const_cast<SpellInfo const*&>(m_spellInfo) = m_spellInfo->TryGetSpellInfoOverride(m_attacker);
+    //end npcbot
 }
 
 void DamageInfo::ModifyDamage(int32 amount)
@@ -1250,13 +1253,8 @@ SpellCastResult Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
-    //npcbot
-    if (Creature::IsBotCustomSpell(spellInfo->Id) && !(ToCreature() && (ToCreature()->IsNPCBot() || ToCreature()->IsNPCBotPet())))
-    {
-        LOG_ERROR("entities.unit", "CastSpell: NpcBot system custom spell {} by caster: {} {}), aborted. Please report",
-            spellInfo->Id, (GetTypeId() == TYPEID_PLAYER ? "player (GUID:" : "creature (Entry:"), (GetTypeId() == TYPEID_PLAYER ? GetGUID().ToString() : std::to_string(GetEntry())));
-        return SPELL_FAILED_SPELL_UNAVAILABLE;
-    }
+    //npcbot: try override
+    spellInfo = spellInfo->TryGetSpellInfoOverride(this);
     //end npcbot
 
     // TODO: this is a workaround - not needed anymore, but required for some scripts :(
@@ -1559,6 +1557,10 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss,
         LOG_DEBUG("entities.unit", "Unit::DealSpellDamage has wrong damageInfo");
         return;
     }
+
+    //npcbot: override spellInfo
+    spellProto = spellProto->TryGetSpellInfoOverride(damageInfo->attacker);
+    //end npcbot
 
     // Call default DealDamage
     CleanDamage cleanDamage(damageInfo->cleanDamage, damageInfo->absorb, BASE_ATTACK, MELEE_HIT_NORMAL);
@@ -19781,6 +19783,10 @@ Aura* Unit::AddAura(uint32 spellId, Unit* target)
     if (!spellInfo)
         return nullptr;
 
+    //npcbot: override spellInfo
+    spellInfo = spellInfo->TryGetSpellInfoOverride(this);
+    //end npcbot
+
     if (!target->IsAlive() && !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_DEAD_TARGET))
         return nullptr;
 
@@ -19907,6 +19913,11 @@ void Unit::ApplyResilience(Unit const* victim, float* crit, int32* damage, bool 
 float Unit::MeleeSpellMissChance(Unit const* victim, WeaponAttackType attType, int32 skillDiff, uint32 spellId) const
 {
     SpellInfo const* spellInfo = spellId ? sSpellMgr->GetSpellInfo(spellId) : nullptr;
+
+    //npcbot: override spellInfo
+    spellInfo = spellInfo ? spellInfo->TryGetSpellInfoOverride(this) : spellInfo;
+    //end npcbot
+
     if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR7_NO_ATTACK_MISS))
     {
         return 0.0f;

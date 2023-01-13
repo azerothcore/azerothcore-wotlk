@@ -462,8 +462,6 @@ public:
     Item* GetBotEquips(uint8 slot) const;
     Item* GetBotEquipsByGuid(ObjectGuid itemGuid) const;
     float GetBotAverageItemLevel() const;
-
-    static bool IsBotCustomSpell(uint32 spellId);
     //End NPCBots
 
 protected:

@@ -232,9 +232,6 @@ class bot_ai : public CreatureAI
         virtual void OnClassSpellStart(SpellInfo const* /*spellInfo*/) {}
         virtual void OnClassSpellGo(SpellInfo const* /*spell*/) {}
 
-        static void InitBotCustomSpells();
-        static bool IsBotCustomSpell(uint32 spellId);
-
         uint32 GetReviveTimer() const { return _reviveTimer; }
         void SetReviveTimer(uint32 newtime) { _reviveTimer = newtime; }
         void UpdateReviveTimer(uint32 diff);

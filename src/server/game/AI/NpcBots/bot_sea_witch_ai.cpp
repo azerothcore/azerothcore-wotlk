@@ -169,7 +169,7 @@ public:
                 if (!spell)
                     spell = target->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
 
-                if (spell && spell->GetTimer() > int32(sSpellMgr->GetSpellInfo(GetSpell(FORKED_LIGHTNING_1))->CalcCastTime() + 250))
+                if (spell && spell->GetTimer() > int32(AssertBotSpellInfoOverride(GetSpell(FORKED_LIGHTNING_1))->CalcCastTime() + 250))
                 {
                     me->SetFacingTo(me->GetAbsoluteAngle(target));
                     if (doCast(target, GetSpell(FORKED_LIGHTNING_1)))
@@ -279,7 +279,7 @@ public:
             {
                 //Frost Arrow / Autoshot
                 if (IsSpellReady(FROST_ARROW_1, diff) && me->GetPower(POWER_MANA) >= FROSTARROW_COST &&
-                    !mytar->IsImmunedToDamage(sSpellMgr->GetSpellInfo(FROST_ARROW_1)))
+                    !mytar->IsImmunedToDamage(AssertBotSpellInfoOverride(FROST_ARROW_1)))
                 {
                     if (doCast(mytar, GetSpell(FROST_ARROW_1)))
                         return;
@@ -739,7 +739,7 @@ public:
         void FillAbilitiesSpecifics(Player const* player, std::list<std::string> &specList) override
         {
             bool amount_is_mana = true;
-            float amount = sSpellMgr->AssertSpellInfo(MANA_SHIELD_1)->GetEffect(EFFECT_0).CalcValueMultiplier(me); //mana per damage
+            float amount = AssertBotSpellInfoOverride(MANA_SHIELD_1)->GetEffect(EFFECT_0).CalcValueMultiplier(me); //mana per damage
             if (amount < 1.0f)
             {
                 amount_is_mana = false;

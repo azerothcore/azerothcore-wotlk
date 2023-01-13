@@ -150,24 +150,6 @@ enum BotCommonValues
     SOUND_MISS_WHOOSH_2H                = 7081,
 
 //UNUSED
-    //SPELL_SUMMON_FELBLAZE_PREVISUAL     = 46350,//green splash impact head/torso
-
-//OTHER
-    BASE_MANA_SPHYNX                    = 400 * 5,
-    BASE_MANA_SPELLBREAKER              = 250 * 5,
-    BASE_MANA_NECROMANCER               = 400 * 5,
-    //base mana at 10
-    BASE_MANA_10_BM                     = 540 * 5,
-    BASE_MANA_10_ARCHMAGE               = 705 * 5,
-    BASE_MANA_10_DREADLORD              = 600 * 5,
-    BASE_MANA_10_DARK_RANGER            = 570 * 5,
-    BASE_MANA_10_SEA_WITCH              = 735 * 5,
-    //base mana at 1
-    BASE_MANA_1_BM                      = 240 * 5,
-    BASE_MANA_1_ARCHMAGE                = 285 * 5,
-    BASE_MANA_1_DREADLORD               = 270 * 5,
-    BASE_MANA_1_DARK_RANGER             = 225 * 5,
-    BASE_MANA_1_SEA_WITCH               = 330 * 5,
 
     //MAX_LOOT_ITEMS                      = 18 // Client limitation 3.3.5 code confirmed
 };

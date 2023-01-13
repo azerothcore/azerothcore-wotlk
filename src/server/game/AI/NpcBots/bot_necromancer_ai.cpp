@@ -151,7 +151,7 @@ public:
 
             _corpseExplosionCheckTimer = 500;
 
-            SpellInfo const* ceinfo = sSpellMgr->GetSpellInfo(GetSpell(CORPSE_EXPLOSION_1));
+            SpellInfo const* ceinfo = AssertBotSpellInfoOverride(GetSpell(CORPSE_EXPLOSION_1));
             float ceradius = ceinfo->GetEffect(EFFECT_0).RadiusEntry->RadiusMax;
             ApplyBotSpellRadiusMods(ceinfo, ceradius);
 

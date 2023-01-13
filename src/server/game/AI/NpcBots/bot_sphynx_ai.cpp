@@ -435,7 +435,7 @@ public:
             if (spellId == DEVOUR_MAGIC_1 && target->IsSummon() && target->GetUInt32Value(UNIT_CREATED_BY_SPELL) &&
                 !target->IsTotem() && me->GetReactionTo(target) <= REP_NEUTRAL)
             {
-                SpellInfo const* devInfo = sSpellMgr->GetSpellInfo(spellId);
+                SpellInfo const* devInfo = AssertBotSpellInfoOverride(spellId);
                 uint32 damage = std::min<uint32>(target->GetMaxHealth() / 2, me->GetMaxHealth() / 5 + me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC));
                 Unit::DealDamage(me, target, damage, nullptr, SPELL_DIRECT_DAMAGE, devInfo->GetSchoolMask(), devInfo);
                 OnBotDispelDealt(target, 1);
