@@ -2340,11 +2340,11 @@ Rate.Drop.Item.ReferencedAmount = 1
 #                     1 - (Rate.XP.Explore)
 #                     1 - (Rate.XP.Pet)
 
-Rate.XP.Kill      = 20
-Rate.XP.Quest     = 20
-Rate.XP.Quest.DF  = 20
-Rate.XP.Explore   = 20
-Rate.XP.Pet       = 20
+Rate.XP.Kill      = 30
+Rate.XP.Quest     = 30
+Rate.XP.Quest.DF  = 30
+Rate.XP.Explore   = 30
+Rate.XP.Pet       = 30
 
 #
 #    Rate.XP.BattlegroundKill...
