@@ -1,3 +1,4 @@
+-- DB update 2023_01_07_07 -> 2023_01_13_00
 -- Create a new skinning loot with right percentage
 DELETE FROM `skinning_loot_template` WHERE (`Entry` = 70068) AND (`Item` IN (21887, 25649, 35229));
 INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
