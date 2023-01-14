@@ -120,7 +120,7 @@ public:
                 else
                 {
                     sCharacterCache->AddCharacterCacheEntry(cPlayer->GetGUID(), cPlayer->GetSession()->GetAccountId(), cPlayer->GetName(),
-                        cPlayer->getGender(), cPlayer->getRace(), cPlayer->getClass(), cPlayer->getLevel());
+                        cPlayer->getGender(), cPlayer->getRace(), cPlayer->getClass(), cPlayer->GetLevel());
                 }
 
                 sCharacterCache->UpdateCharacterAccountId(cPlayer->GetGUID(), cPlayer->GetSession()->GetAccountId());

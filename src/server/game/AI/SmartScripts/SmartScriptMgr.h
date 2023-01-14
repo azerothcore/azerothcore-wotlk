@@ -534,7 +534,7 @@ enum SMART_ACTION
     SMART_ACTION_ACTIVATE_GOBJECT                   = 9,      //
     SMART_ACTION_RANDOM_EMOTE                       = 10,     // EmoteId1, EmoteId2, EmoteId3...
     SMART_ACTION_CAST                               = 11,     // SpellId, CastFlags, LimitTargets
-    SMART_ACTION_SUMMON_CREATURE                    = 12,     // CreatureID, summonType, duration in ms, attackInvoker, attackScriptOwner
+    SMART_ACTION_SUMMON_CREATURE                    = 12,     // CreatureID, summonType, duration in ms, attackInvoker, attackScriptOwner, flags(SmartActionSummonCreatureFlags)
     SMART_ACTION_THREAT_SINGLE_PCT                  = 13,     // Threat%
     SMART_ACTION_THREAT_ALL_PCT                     = 14,     // Threat%
     SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS    = 15,     // QuestID
@@ -696,6 +696,17 @@ enum SMART_ACTION
     SMART_ACTION_AC_END                             = 225,    // placeholder
 };
 
+enum class SmartActionSummonCreatureFlags
+{
+    None            = 0,
+    PersonalSpawn   = 1,
+    PreferUnit      = 2,
+
+    All = PersonalSpawn | PreferUnit
+};
+
+DEFINE_ENUM_FLAG(SmartActionSummonCreatureFlags);
+
 struct SmartAction
 {
     SMART_ACTION type;
@@ -820,6 +831,7 @@ struct SmartAction
             uint32 duration;
             SAIBool attackInvoker;
             uint32 attackScriptOwner;
+            uint32 flags; // SmartActionSummonCreatureFlags
         } summonCreature;
 
         struct
