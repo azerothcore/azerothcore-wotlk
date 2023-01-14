@@ -1250,7 +1250,7 @@ Motd = "欢迎进入开心魔兽，祝你开心每一天."
 
 #    PLEASE NOTE: another (hardcoded) text will appear below the MOTD:
 #
-#        "This server runs on AzerothCore www.azerothcore.org"
+#        "开心魔兽"
 #
 #    All the AzerothCore contributors, as well as its father projects (MaNGOS, TrinityCore, etc..),
 #    have worked for free to provide you this software. Please do not remove the credits.
