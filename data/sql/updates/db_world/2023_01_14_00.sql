@@ -1,3 +1,4 @@
+-- DB update 2023_01_13_00 -> 2023_01_14_00
 -- Pathing for Frances Lin Entry: 20401
 SET @NPC := 20401;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=1820.7647705078125,`position_y`=1016.41839599609375,`position_z`=11.68548202514648437, `orientation`=1.570796370506286621, `VerifiedBuild`=47187 WHERE `id1`=@NPC;
