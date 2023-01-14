@@ -458,3 +458,24 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+2, 21342, 560, 2367, 0, 3, 1, 0, 1824.5418701171875, 952.72003173828125, 16.35272789001464843, 2.792526721954345703, 7200, 0, 0, 2035, 852, 0, 0, 0, 0, 47187),
 (@CGUID+3, 21345, 560, 2367, 0, 3, 1, 0, 1824.8150634765625, 955.70928955078125, 16.31266593933105468, 3.769911050796508789, 7200, 0, 0, 2035, 852, 0, 0, 0, 0, 47187),
 (@CGUID+4, 21344, 560, 2367, 0, 3, 1, 0, 1821.304931640625, 957.28057861328125, 16.2471160888671875, 4.852015495300292968, 7200, 0, 0, 2035, 852, 0, 0, 0, 0, 47187);
+
+-- Tower Dialogue (2:20)
+UPDATE `creature` SET `position_x`=2335.805908203125,`position_y`=926.97698974609375,`position_z`=54.91743087768554687, `orientation`=4.625122547149658203, `VerifiedBuild`=47187 WHERE `guid`=83459 AND `id1`=20372;
+UPDATE `creature` SET `position_x`=2334.0234375,`position_y`=926.92645263671875,`position_z`=54.95403289794921875, `orientation`=4.834561824798583984, `VerifiedBuild`=47187 WHERE `guid`=83458 AND `id1`=20376;
+
+DELETE FROM `creature_text` WHERE `CreatureID` IN (20372, 20376);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`) VALUES
+(20376, 0, 0, 18160, 'Look at it, Jon. It\'s glorious!', 12, 0, 100, 5, 0, 0, 0, 'Jerry Carter'),
+(20372, 0, 0, 18161, 'Indeed. What better way to symbolize the bond of friendship and brotherhood between Tarren Mill and Southshore by erecting this tower at the halfway point between both towns. Brilliant!', 12, 0, 100, 1, 0, 0, 0, 'Jonathan Revah');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20376;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 20376);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(20376, 0, 0, 1, 60, 0, 100, 0, 140000, 140000, 140000, 140000, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Jerry Carter - On Update - Say Line 0'),
+(20376, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 67, 1, 3600, 3600, 0, 0, 100, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Jerry Carter - On Update - Create Timed Event'),
+(20376, 0, 2, 0, 59, 0, 100, 0, 1, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 83459, 20372, 0, 0, 0, 0, 0, 0, 'Jerry Carter - On Timed Event 1 Triggered - Set Data 1 1');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20372;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 20372);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(20372, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Jonathan Revah - On Data Set 1 1 - Say Line 0');
