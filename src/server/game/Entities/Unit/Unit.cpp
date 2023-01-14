@@ -1825,6 +1825,7 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
             if (fullBlockMask == ((1 << 0) | (1 << 1)))
             {
                 damageInfo->TargetState = VICTIMSTATE_BLOCKS;
+                damageInfo->procEx |= PROC_EX_FULL_BLOCK;
                 damageInfo->blocked_amount -= remainingBlock;
             }
             break;
@@ -1930,6 +1931,16 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
     else
     {
         damageInfo->HitInfo |= (tmpHitInfo[0] & HITINFO_PARTIAL_RESIST);
+    }
+
+    if (damageInfo->HitInfo & (HITINFO_PARTIAL_ABSORB | HITINFO_FULL_ABSORB))
+    {
+        damageInfo->procEx |= PROC_EX_ABSORB;
+    }
+
+    if (damageInfo->HitInfo & HITINFO_FULL_RESIST)
+    {
+        damageInfo->procEx |= PROC_EX_RESIST;
     }
 }
 
