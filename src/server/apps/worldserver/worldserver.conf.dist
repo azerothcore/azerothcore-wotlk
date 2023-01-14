@@ -1246,7 +1246,7 @@ FlashAtStart = 1
 #        Example:     "Welcome to John\'s Server@"
 #        Default:     "Welcome to an AzerothCore server."
 
-Motd = "Welcome to an AzerothCore server."
+Motd = "开心魔兽"
 
 #    PLEASE NOTE: another (hardcoded) text will appear below the MOTD:
 #
