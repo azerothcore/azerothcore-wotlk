@@ -128,6 +128,11 @@ public:
         return std::fmod(o, 2.0f * static_cast<float>(M_PI));
     }
 
+    std::vector<bool> GetInstanceIDs()
+    {
+        return _instanceIds;
+    }
+
     void DoDelayedMovesAndRemoves();
 
     Map::EnterState PlayerCannotEnter(uint32 mapid, Player* player, bool loginCheck = false);
