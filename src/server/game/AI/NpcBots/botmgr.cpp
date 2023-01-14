@@ -749,7 +749,7 @@ bool BotMgr::IsBeingResurrected(WorldObject const* corpse) const
 
 void BotMgr::_reviveBot(Creature* bot, WorldLocation* dest)
 {
-    if (bot->IsAlive())
+    if (bot->IsAlive() || !bot->IsInWorld())
         return;
 
     if (!bot->GetBotAI()->IAmFree())
