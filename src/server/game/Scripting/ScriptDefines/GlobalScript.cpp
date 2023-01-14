@@ -176,3 +176,11 @@ bool ScriptMgr::OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid sou
 
     return true;
 }
+
+void ScriptMgr::OnInstanceIdRemoved(uint32 instanceId)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnInstanceIdRemoved(instanceId);
+    });
+}
