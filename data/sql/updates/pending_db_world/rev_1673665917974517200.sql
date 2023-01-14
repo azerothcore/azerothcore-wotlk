@@ -179,6 +179,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 -- 0x20422046000236C000581A0002A0F8E1 .go xyz 1733.5542 626.4067 30.47107
 
 -- Pathing for Hillsbrad Peasant Entry: 2267
+-- 0x20422046000236C000581A000320F8E1 .go xyz 1781.5918 610.4517 30.47107
 SET @NPC := 11599;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=1781.5918,`position_y`=610.4517,`position_z`=30.47107 WHERE `guid`=@NPC;
@@ -196,4 +197,3 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,8,1763.7234,625.94617,30.47107,NULL,0,0,0,100,0),
 (@PATH,9,1772.4537,623.1462,30.47107,NULL,0,0,0,100,0),
 (@PATH,10,1776.1965,617.7515,30.47107,NULL,0,0,0,100,0);
--- 0x20422046000236C000581A000320F8E1 .go xyz 1781.5918 610.4517 30.47107
