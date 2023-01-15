@@ -24,7 +24,6 @@ EndScriptData */
 
 /* ContentData
 npc_unkor_the_ruthless
-npc_infested_root_walker
 npc_rotting_forest_rager
 npc_netherweb_victim
 npc_floon
@@ -447,38 +446,6 @@ public:
 };
 
 /*######
-## npc_infested_root_walker
-######*/
-
-class npc_infested_root_walker : public CreatureScript
-{
-public:
-    npc_infested_root_walker() : CreatureScript("npc_infested_root_walker") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_infested_root_walkerAI(creature);
-    }
-
-    struct npc_infested_root_walkerAI : public ScriptedAI
-    {
-        npc_infested_root_walkerAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override { }
-        void EnterCombat(Unit* /*who*/) override { }
-
-        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (done_by && done_by->GetTypeId() == TYPEID_PLAYER)
-                if (me->GetHealth() <= damage)
-                    if (rand() % 100 < 75)
-                        //Summon Wood Mites
-                        DoCast(me, 39130, true);
-        }
-    };
-};
-
-/*######
 ## npc_rotting_forest_rager
 ######*/
 
@@ -872,7 +839,6 @@ void AddSC_terokkar_forest()
 
     // Theirs
     new npc_unkor_the_ruthless();
-    new npc_infested_root_walker();
     new npc_rotting_forest_rager();
     new npc_floon();
     new npc_isla_starmane();

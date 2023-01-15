@@ -474,7 +474,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     SetSpeed(MOVE_FLIGHT, cinfo->speed_flight);
 
     // Will set UNIT_FIELD_BOUNDINGRADIUS and UNIT_FIELD_COMBATREACH
-    SetObjectScale(cinfo->scale);
+    SetObjectScale(GetNativeObjectScale());
 
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, cinfo->HoverHeight);
 
@@ -546,7 +546,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     }
 
     SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
-    CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(getLevel(), cInfo->unit_class);
+    CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), cInfo->unit_class);
     float armor = (float)stats->GenerateArmor(cInfo); // TODO: Why is this treated as uint32 when it's a float?
     SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, armor);
     SetModifierValue(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
@@ -1139,14 +1139,14 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
             break;
     }
 
-    LoadCreaturesAddon();
-
     uint32 displayID = GetNativeDisplayId();
     if (sObjectMgr->GetCreatureModelRandomGender(&displayID) && !IsTotem())                               // Cancel load if no model defined or if totem
     {
         SetDisplayId(displayID);
         SetNativeDisplayId(displayID);
     }
+
+    LoadCreaturesAddon();
 
     //! Need to be called after LoadCreaturesAddon - MOVEMENTFLAG_HOVER is set there
     m_positionZ += GetHoverHeight();
@@ -1213,7 +1213,7 @@ bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
 
 bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
 {
-    return player->getLevel() >= 10
+    return player->GetLevel() >= 10
            && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
            && player->getClass() == GetCreatureTemplate()->trainer_class;
 }
@@ -2031,11 +2031,15 @@ void Creature::Respawn(bool force)
         setDeathState(JUST_RESPAWNED);
 
         // MDic - Acidmanifesto
-        uint32 displayID = GetNativeDisplayId();
-        if (sObjectMgr->GetCreatureModelRandomGender(&displayID))                                             // Cancel load if no model defined
+        // Do not override transform auras
+        if (GetAuraEffectsByType(SPELL_AURA_TRANSFORM).empty())
         {
-            SetDisplayId(displayID);
-            SetNativeDisplayId(displayID);
+            uint32 displayID = GetNativeDisplayId();
+            if (sObjectMgr->GetCreatureModelRandomGender(&displayID))                                             // Cancel load if no model defined
+            {
+                SetDisplayId(displayID);
+                SetNativeDisplayId(displayID);
+            }
         }
 
         GetMotionMaster()->InitDefault();
@@ -2894,7 +2898,7 @@ uint8 Creature::getLevelForTarget(WorldObject const* target) const
     if (!isWorldBoss() || !target->ToUnit())
         return Unit::getLevelForTarget(target);
 
-    uint16 level = target->ToUnit()->getLevel() + sWorld->getIntConfig(CONFIG_WORLD_BOSS_LEVEL_DIFF);
+    uint16 level = target->ToUnit()->GetLevel() + sWorld->getIntConfig(CONFIG_WORLD_BOSS_LEVEL_DIFF);
     if (level < 1)
         return 1;
     if (level > 255)
@@ -3344,6 +3348,11 @@ void Creature::UpdateMovementFlags()
     }
 
     SetSwim(CanSwim() && Swim);
+}
+
+float Creature::GetNativeObjectScale() const
+{
+    return GetCreatureTemplate()->scale;
 }
 
 void Creature::SetObjectScale(float scale)

@@ -1071,9 +1071,10 @@ protected:
     uint32      m_respawnDelayTime;                     // (secs) if 0 then current GO state no dependent from timer
     uint32      m_despawnDelay;
     Seconds     m_despawnRespawnTime;                   // override respawn time after delayed despawn
+    Seconds     m_restockTime;
     LootState   m_lootState;
     bool        m_spawnedByDefault;
-    uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
+    uint32      m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
     // For traps this: spell casting cooldown, for doors/buttons: reset time.
     std::unordered_map<ObjectGuid, int32> m_SkillupList;
 

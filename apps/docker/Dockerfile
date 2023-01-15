@@ -45,7 +45,11 @@ RUN addgroup --gid $GROUP_ID acore && \
 
 # must be created to set the correct permissions on them
 RUN mkdir -p /azerothcore/env/dist/bin
-RUN mkdir -p /azerothcore/env/dist/data
+RUN mkdir -p /azerothcore/env/dist/data/Cameras
+RUN mkdir -p /azerothcore/env/dist/data/dbc
+RUN mkdir -p /azerothcore/env/dist/data/maps
+RUN mkdir -p /azerothcore/env/dist/data/mmaps
+RUN mkdir -p /azerothcore/env/dist/data/vmaps
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/temp
 RUN mkdir -p /azerothcore/env/dist/etc
@@ -59,10 +63,14 @@ RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 USER $DOCKER_USER
 
-# copy everything so we can work directly within the container
-# using tools such as vscode dev-container
-# NOTE: this folder is different by the /azerothcore (which is binded instead)
-COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
+# copy only necessary files for the acore dashboard
+COPY --chown=$DOCKER_USER:$DOCKER_USER apps /azerothcore/apps
+COPY --chown=$DOCKER_USER:$DOCKER_USER bin /azerothcore/bin
+COPY --chown=$DOCKER_USER:$DOCKER_USER conf /azerothcore/conf
+COPY --chown=$DOCKER_USER:$DOCKER_USER data /azerothcore/data
+COPY --chown=$DOCKER_USER:$DOCKER_USER deps /azerothcore/deps
+COPY --chown=$DOCKER_USER:$DOCKER_USER acore.json /azerothcore/acore.json
+COPY --chown=$DOCKER_USER:$DOCKER_USER acore.sh /azerothcore/acore.sh
 
 # Download deno and make sure the dashboard works
 RUN bash /azerothcore/acore.sh quit
@@ -78,6 +86,13 @@ WORKDIR /azerothcore
 FROM base as dev
 
 LABEL description="AC dev image for dev containers"
+
+USER $DOCKER_USER
+
+# copy everything so we can work directly within the container
+# using tools such as vscode dev-container
+# NOTE: this folder is different by the /azerothcore (which is binded instead)
+COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
 
 #================================================================
 #
@@ -115,26 +130,21 @@ RUN apt-get update && apt-get install -y dos2unix gdb gdbserver google-perftools
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
-# copy the sources from the host machine
-COPY --chown=$DOCKER_USER:$DOCKER_USER apps /azerothcore/apps
-COPY --chown=$DOCKER_USER:$DOCKER_USER bin /azerothcore/bin
-COPY --chown=$DOCKER_USER:$DOCKER_USER conf /azerothcore/conf
-COPY --chown=$DOCKER_USER:$DOCKER_USER data /azerothcore/data
-COPY --chown=$DOCKER_USER:$DOCKER_USER deps /azerothcore/deps
-COPY --chown=$DOCKER_USER:$DOCKER_USER acore.json /azerothcore/acore.json
-COPY --chown=$DOCKER_USER:$DOCKER_USER acore.sh /azerothcore/acore.sh
-
 # Correct permissions for non-root operations
 RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
 RUN chown -R $DOCKER_USER:$DOCKER_USER /run
 RUN chown -R $DOCKER_USER:$DOCKER_USER /opt
 
-RUN chown $DOCKER_USER:$DOCKER_USER /azerothcore
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=base /azerothcore /azerothcore
 
 USER $DOCKER_USER
 
 # must be created to avoid permissions errors
-RUN mkdir -p /azerothcore/env/dist/data
+RUN mkdir -p /azerothcore/env/dist/data/Cameras
+RUN mkdir -p /azerothcore/env/dist/data/dbc
+RUN mkdir -p /azerothcore/env/dist/data/maps
+RUN mkdir -p /azerothcore/env/dist/data/mmaps
+RUN mkdir -p /azerothcore/env/dist/data/vmaps
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc
 RUN mkdir -p /azerothcore/env/dist/bin
@@ -157,11 +167,15 @@ LABEL description="AC authserver image for local environment"
 
 CMD ./acore.sh run-authserver
 
+USER $DOCKER_USER
+
 FROM servicebase as worldserver-local
 
 LABEL description="AC worldserver image for local environment"
 
 CMD ./acore.sh run-worldserver
+
+USER $DOCKER_USER
 
 #================================================================
 #
@@ -171,12 +185,20 @@ CMD ./acore.sh run-worldserver
 FROM base as build
 
 ARG DOCKER_USER=acore
+USER $DOCKER_USER
 
 LABEL description="AC Image used by the build stage to generate production images"
 
 RUN mkdir -p /azerothcore/env/etc/
 
+# .git is needed by the compiler
+COPY --chown=$DOCKER_USER:$DOCKER_USER ./.git /azerothcore/.git
+COPY --chown=$DOCKER_USER:$DOCKER_USER ./CMakeLists.txt /azerothcore/CMakeLists.txt
+COPY --chown=$DOCKER_USER:$DOCKER_USER ./deps /azerothcore/deps
+COPY --chown=$DOCKER_USER:$DOCKER_USER ./src /azerothcore/src
+COPY --chown=$DOCKER_USER:$DOCKER_USER ./modules /azerothcore/modules
 # check if we have ccache files available outside
+RUN rm -rf /azerothcore/var/ccache/*
 COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker/ccache /azerothcore/var/ccache
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/dist/etc/authserver.conf.dockerdist
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
@@ -207,6 +229,7 @@ FROM authserver-local as authserver
 LABEL description="AC Production: authserver"
 
 ARG DOCKER_USER=acore
+USER $DOCKER_USER
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/authserver /azerothcore/env/dist/bin/authserver
@@ -222,6 +245,7 @@ FROM worldserver-local as worldserver
 LABEL description="AC Production: worldserver"
 
 ARG DOCKER_USER=acore
+USER $DOCKER_USER
 
 RUN mkdir -p /azerothcore/env/dist/bin/lua_scripts
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
@@ -255,12 +279,14 @@ RUN addgroup --gid $GROUP_ID acore && \
     passwd -d acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
+# ENV DATAPATH=/azerothcore/env/dist/data-temp
 ENV DATAPATH=/azerothcore/env/dist/data
 ENV DATAPATH_ZIP=/tmp/data.zip
 
+RUN mkdir -p "$DATAPATH"
+ARG CACHEBUST=1
+# RUN --mount=type=bind,target=/azerothcore-temp,readwrite --mount=type=cache,target=/azerothcore/env/dist/data-temp /azerothcore-temp/acore.sh client-data && cp -rT /azerothcore/env/dist/data-temp/ /azerothcore/env/dist/data && chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 RUN --mount=type=bind,target=/azerothcore-temp,readwrite /azerothcore-temp/acore.sh client-data && chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
-
-RUN apt-get remove --purge -y tzdata curl unzip && apt-get autoremove -y
 
 USER $DOCKER_USER
 
@@ -302,14 +328,14 @@ USER $DOCKER_USER
 
 WORKDIR /azerothcore/env/client/
 
+RUN mkdir -p /azerothcore/env/client/Cameras
 RUN mkdir -p /azerothcore/env/client/dbc
 RUN mkdir -p /azerothcore/env/client/maps
 RUN mkdir -p /azerothcore/env/client/mmaps
 RUN mkdir -p /azerothcore/env/client/vmaps
 
-# Need fix
-# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mapextractor /azerothcore/env/client/mapextractor
-# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator
-# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4assembler /azerothcore/env/client/vmap4assembler
-# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4extractor /azerothcore/env/client/vmap4extractor
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/map_extractor /azerothcore/env/client/map_extractor
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4_assembler /azerothcore/env/client/vmap4_assembler
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4_extractor /azerothcore/env/client/vmap4_extractor
 

@@ -491,7 +491,7 @@ namespace lfg
         /// Get leader of the group (using internal data)
         ObjectGuid GetLeader(ObjectGuid guid);
         /// Initializes locked dungeons for given player (called at login or level change)
-        void InitializeLockedDungeons(Player* player, uint8 level = 0);
+        void InitializeLockedDungeons(Player* player, Group const* group = nullptr);
         /// Sets player team
         void SetTeam(ObjectGuid guid, TeamId teamId);
         /// Sets player group

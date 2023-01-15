@@ -162,7 +162,7 @@ public:
                 case 2:
                 {
                     Talk(SAY_TURMOIL_1, summoner->ToPlayer());
-                    me->SetLevel(summoner->getLevel());
+                    me->SetLevel(summoner->GetLevel());
                     me->SetFaction(FACTION_MONSTER);
                     if (me->GetExactDist(summoner) < 50.0f)
                     {

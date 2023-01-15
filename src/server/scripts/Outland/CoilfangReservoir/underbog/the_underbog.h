@@ -22,10 +22,29 @@
 
 #define TheUnderbogScriptName "instance_the_underbog"
 
+enum Data
+{
+    DATA_HUNGARFEN        = 0,
+    DATA_GHAZAN           = 1,
+    DATA_MUSELEK          = 2,
+    DATA_BLACK_STALKER    = 3,
+
+    MAX_ENCOUNTERS        = 4
+};
+
+enum NPCs
+{
+    NPC_HUNGARFEN         = 17770,
+    NPC_UNDERBOG_MUSHROOM = 17990,
+    NPC_GHAZAN            = 18105
+};
+
 template <class AI, class T>
 inline AI* GetTheUnderbogAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TheUnderbogScriptName);
 }
+
+#define RegisterUnderbogCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTheUnderbogAI)
 
 #endif // the_underbog_h__

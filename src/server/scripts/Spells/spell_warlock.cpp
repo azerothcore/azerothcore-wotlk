@@ -62,7 +62,8 @@ enum WarlockSpells
     SPELL_WARLOCK_SIPHON_LIFE_HEAL                  = 63106,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
     SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1            = 18213,
-    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371
+    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371,
+    SPELL_WARLOCK_EYE_OF_KILROGG_FLY                = 58083
 };
 
 enum WarlockSpellIcons
@@ -84,16 +85,15 @@ class spell_warl_eye_of_kilrogg : public AuraScript
 
             // Glyph of Kilrogg
             if (player->HasAura(58081))
+            {
                 if (Unit* charm = player->GetCharm())
                 {
-                    charm->SetSpeed(MOVE_RUN, 2.14f, true);
                     if (charm->GetMapId() == 530 || charm->GetMapId() == 571)
                     {
-                        charm->SetCanFly(true);
-                        charm->SetSpeed(MOVE_FLIGHT, 2.14f, true);
-                        charm->SendMovementFlagUpdate();
+                        charm->CastSpell(charm, SPELL_WARLOCK_EYE_OF_KILROGG_FLY, true);
                     }
                 }
+            }
         }
     }
 

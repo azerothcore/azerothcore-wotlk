@@ -370,6 +370,15 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
+    // Stop emote on move
+    if (Player* plrMover = mover->ToPlayer())
+    {
+        if (plrMover->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_ONESHOT_NONE)
+        {
+            plrMover->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+        }
+    }
+
     if (!movementInfo.pos.IsPositionValid())
     {
         if (plrMover)
