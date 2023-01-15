@@ -4465,7 +4465,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         }
     });
     
-    // Fire Bomb DOT not removed in evade mode
+    // Fire Bomb (Halaa)
     ApplySpellFix({ 31961 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_EVADE;
