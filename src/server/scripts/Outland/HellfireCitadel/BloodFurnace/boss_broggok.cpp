@@ -44,18 +44,19 @@ public:
 
     struct boss_broggokAI : public ScriptedAI
     {
-        boss_broggokAI(Creature* creature) : ScriptedAI(creature)
+        boss_broggokAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
         }
 
         InstanceScript* instance;
-        EventMap events;
+        SummonList summons;
         bool canAttack;
 
         void Reset() override
         {
             events.Reset();
+            summons.DespawnAll();
 
             me->SetReactState(REACT_PASSIVE);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -73,10 +74,16 @@ public:
 
         void JustSummoned(Creature* summoned) override
         {
+            summons.Summon(summoned);
+
             summoned->SetFaction(FACTION_MONSTER_2);
-            summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            summoned->CastSpell(summoned, SPELL_POISON, false, 0, 0, me->GetGUID());
+            summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            summoned->CastSpell(summoned, SPELL_POISON, true, 0, 0, me->GetGUID());
+        }
+
+        void SummonedCreatureDespawn(Creature* summon) override
+        {
+            summons.Despawn(summon);
         }
 
         void UpdateAI(uint32 diff) override

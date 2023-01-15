@@ -67,7 +67,11 @@ function _switch() {
             DOCKER=1 denoRunFile "$AC_PATH_APPS/docker/docker-cmd.ts" "${@:2}"
             exit
             ;;
-        ""|"quit"|"14")
+        ""|"v"|"version"|"14")
+            denoRunFile "$AC_PATH_APPS/installer/main.ts" "version"
+            exit
+            ;;
+        ""|"quit"|"15")
             echo "Goodbye!"
             exit
             ;;

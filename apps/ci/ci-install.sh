@@ -14,14 +14,11 @@ CTOOLS=ON
 CSCRIPTPCH=OFF
 CCOREPCH=OFF
 CCUSTOMOPTIONS='-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror"'
-DB_CHARACTERS_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
-DB_AUTH_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
-DB_WORLD_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
 CONFIG_SH
 
 time sudo apt-get update -y
 # time sudo apt-get upgrade -y
-time sudo apt-get install -y git lsb-release sudo ccache
+time sudo apt-get install -y git lsb-release sudo
 time ./acore.sh install-deps
 
 case $COMPILER in

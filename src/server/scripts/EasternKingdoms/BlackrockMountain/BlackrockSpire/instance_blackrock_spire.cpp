@@ -846,7 +846,7 @@ public:
             if (Creature* creature = player->FindNearestCreature(NPC_SCARSHIELD_INFILTRATOR, 100.0f, true))
             {
                 bool transformHasStarted = creature->AI()->GetData(0) == 1;
-                if ((player->getLevel() < 57 || !player->HasItemCount(ITEM_UNADORNED_SEAL))  && !transformHasStarted)
+                if ((player->GetLevel() < 57 || !player->HasItemCount(ITEM_UNADORNED_SEAL))  && !transformHasStarted)
                 {
                     // Send whisper if not already sent
                     std::list<ObjectGuid>::iterator itr = std::find(whisperedTargets.begin(), whisperedTargets.end(), player->GetGUID());
@@ -876,7 +876,7 @@ public:
         {
             if (Creature* creature = player->FindNearestCreature(NPC_SCARSHIELD_INFILTRATOR, 100.0f, true))
             {
-                if (player->getLevel() >= 57 && player->HasItemCount(ITEM_UNADORNED_SEAL))
+                if (player->GetLevel() >= 57 && player->HasItemCount(ITEM_UNADORNED_SEAL))
                 {
                     creature->AI()->SetData(0, 1); // Start transform into Vaelan
                     return true;
