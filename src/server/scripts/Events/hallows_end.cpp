@@ -1326,7 +1326,7 @@ struct boss_headless_horseman_head : public ScriptedAI
             me->CastSpell(me, SPELL_THROW_HEAD_BACK, true);
             if (Unit* owner = GetOwner())
                 owner->RemoveAura(SPELL_HORSEMAN_IMMUNITY);
-            
+
             Talk(TALK_LOST_HEAD);
         }
     }
