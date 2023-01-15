@@ -1,3 +1,4 @@
+-- DB update 2023_01_14_01 -> 2023_01_15_00
 -- https://github.com/TrinityCore/TrinityCore/issues?page=2&q=label%3ABranch-3.3.5a+esES
 -- @Cerveciento Part 150 - 190
 -- PRS from TrinityCore @Cerveciento
