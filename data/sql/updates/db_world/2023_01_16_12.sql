@@ -1,3 +1,4 @@
+-- DB update 2023_01_16_11 -> 2023_01_16_12
 -- Hillsbrad Peasants
 DELETE FROM `creature` WHERE `map`=560 AND `id1` IN (2267, 20424) AND `guid` IN (11511,11559,11560,11561,11562,11563,11564,11565,11568,11569,11599,11600,11601); -- Delete old ones as well
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
