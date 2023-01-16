@@ -2231,7 +2231,7 @@ public:
         if (guidvec.empty())
             return true;
 
-        handler->PSendSysMessage("%u unbound bots:", uint32(guidvec.size()));
+        handler->PSendSysMessage("%u inactive bots:", uint32(guidvec.size()));
         for (ObjectGuid guid : guidvec)
         {
             Creature const* bot = BotDataMgr::FindBot(guid.GetEntry());
