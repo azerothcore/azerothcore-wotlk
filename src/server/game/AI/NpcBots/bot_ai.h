@@ -181,6 +181,7 @@ class bot_ai : public CreatureAI
         float GetBotCritChance() const { return crit; }
         float GetBotMissChance() const { return -hit; }
         float GetBotDamageTakenMod(bool magic) const { return magic ? dmg_taken_mag : dmg_taken_phy; }
+        float GetBotResilience() const { return resilience; }
         uint32 GetBotExpertise() const { return expertise; }
         uint32 GetBotSpellPenetration() const { return spellpen; }
         uint32 GetBotSpellPower() const { return spellpower; }
@@ -603,7 +604,7 @@ class bot_ai : public CreatureAI
         uint8 _botAwaitState;
 
         //stats
-        float hit, parry, dodge, block, crit, dmg_taken_phy, dmg_taken_mag, armor_pen;
+        float hit, parry, dodge, block, crit, dmg_taken_phy, dmg_taken_mag, armor_pen, resilience;
         uint32 expertise, spellpower, spellpen, defense, blockvalue;
         int32 haste, resistbonus[MAX_SPELL_SCHOOL - 1];
 

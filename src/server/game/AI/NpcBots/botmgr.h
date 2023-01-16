@@ -125,6 +125,7 @@ class AC_GAME_API BotMgr
         static void ApplyBotEffectValueMultiplierMods(Unit const* caster, SpellInfo const* spellInfo, SpellEffIndex effIndex, float& multiplier);
         static float GetBotDamageTakenMod(Creature const* bot, bool magic);
         static int32 GetBotStat(Creature const* bot, BotStatMods stat);
+        static float GetBotResilience(Creature const* botOrPet);
 
         void Update(uint32 diff);
 

@@ -1788,6 +1788,14 @@ int32 BotMgr::GetBotStat(Creature const* bot, BotStatMods stat)
     return bot->GetBotAI()->GetTotalBotStat(stat);
 }
 
+float BotMgr::GetBotResilience(Creature const* botOrPet)
+{
+    if (botOrPet->IsNPCBot())
+        return botOrPet->GetBotAI()->GetBotResilience();
+
+    return botOrPet->GetBotPetAI()->GetPetsOwner()->GetBotAI()->GetBotResilience();
+}
+
 float BotMgr::GetBotDamageModPhysical()
 {
     return _mult_dmg_physical;
