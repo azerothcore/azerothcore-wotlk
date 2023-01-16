@@ -754,15 +754,15 @@ void GenerateBotCustomSpells()
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(6); //100 yds
     sinfo->RecoveryTime = 0;
     sinfo->ExplicitTargetMask = TARGET_FLAG_UNIT;
-    sinfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED | SPELL_ATTR1_CANT_BE_REFLECTED;
-    sinfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+    sinfo->AttributesEx |= SPELL_ATTR1_NO_REDIRECTION | SPELL_ATTR1_NO_REFLECTION;
+    sinfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
 
-    sinfo->_effects[0].Effect = SPELL_EFFECT_DUMMY;
-    sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
-    sinfo->_effects[0].BasePoints = 1;
-    sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].BonusMultiplier = 0.f;
+    sinfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
+    sinfo->Effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+    sinfo->Effects[0].BasePoints = 1;
+    sinfo->Effects[0].DieSides = 0;
+    sinfo->Effects[0].RealPointsPerLevel = 0.f;
+    sinfo->Effects[0].BonusMultiplier = 0.f;
     //24.1) END STEAL MAGIC VISUAL
 
     //25) FEEDBACK
