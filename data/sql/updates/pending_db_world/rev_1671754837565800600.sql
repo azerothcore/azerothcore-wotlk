@@ -6,7 +6,7 @@ UPDATE `gameobject_template` SET `Data1` = 19414 WHERE (`entry` = 182583);
 UPDATE `gameobject_template` SET `Data2` = 0, `Data17` = 1 WHERE (`entry` = 182582);
 
 SET @OGUID := 152118;
-SET @POOL := 13335;
+SET @POOL := 13369;
 
 DELETE FROM `gameobject` WHERE `id` IN (182581, 182583); -- Deletes previous entries
 DELETE FROM `gameobject` WHERE `id`=183151 AND `guid`=24038; -- Delete bad campfire
