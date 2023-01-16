@@ -114,6 +114,7 @@ enum BotSpells : uint32
   //modify
     SPELL_STEAL_MAGIC                   = 30036, //used by Ethereal Spellfilcher
     SPELL_FEEDBACK                      = 32897,
+    SPELL_STEAL_MAGIC_VISUAL            = 11084, // "Shock"
   //unmodify
 //DARK RANGER
   //modify
