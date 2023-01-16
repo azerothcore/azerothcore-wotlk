@@ -1,3 +1,4 @@
+-- DB update 2023_01_16_09 -> 2023_01_16_10
 --
 -- PR from TrinityCore @Jildor
 UPDATE `item_template_locale` SET `Name`='Invernalia' WHERE `ID`=3819 AND `locale`='esES';
