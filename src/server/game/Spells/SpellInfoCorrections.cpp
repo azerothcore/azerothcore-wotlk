@@ -4454,12 +4454,15 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(28); // 5 seconds
         spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_CASTER;
     });
-
-    // Swamplord Muselek - Hunter's Mark
+    
+    // Hunter's Mark
     ApplySpellFix({ 31615 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_TARGET_ENEMY;
-        spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_TARGET_ENEMY;
+        for (uint8 index = EFFECT_0; index <= EFFECT_1; ++index)
+        {
+            spellInfo->Effects[index].TargetA = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->Effects[index].TargetB = 0;
+        }
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
