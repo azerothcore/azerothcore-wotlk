@@ -714,13 +714,13 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
 
         if (bot->IsNPCBot())
         {
-            NpcBotAppearanceData const* appearData = BotDataMgr::SelectNpcBotAppearance(unit->GetEntry());
+            NpcBotAppearanceData const* appearData = BotDataMgr::SelectNpcBotAppearance(bot->GetEntry());
 
             WorldPacket data(SMSG_MIRRORIMAGE_DATA, 68);
             data << guid;
-            data << uint32(unit->GetDisplayId());                                      // displayId
-            data << uint8(unit->GetRace());                                            // race
-            data << uint8(appearData ? appearData->gender : (uint8)unit->GetGender()); // gender
+            data << uint32(bot->GetDisplayId());                                       // displayId
+            data << uint8(bot->GetRace());                                             // race
+            data << uint8(appearData ? appearData->gender : (uint8)bot->GetGender());  // gender
             data << uint8(bot->GetBotAI()->GetPlayerClass());                          // class
             data << uint8(appearData ? appearData->skin : 0);                          // skin
             data << uint8(appearData ? appearData->face : 0);                          // face

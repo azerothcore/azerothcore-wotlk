@@ -17,7 +17,7 @@
 #include "TemporarySummon.h"
 /*
 Mage NpcBot (reworked by Trickerer onlysuffering@gmail.com)
-Complete - 90-95%
+Complete - 92-97%
 TODO: slow (pvp), mana shield
 */
 
@@ -481,6 +481,15 @@ public:
                             return;
                     }
                 }
+            }
+            //MIRROR IMAGE
+            if (IsSpellReady(MIRROR_IMAGE_1, diff) &&
+                (mytar->GetTypeId() == TYPEID_PLAYER ||
+                (mytar->GetTypeId() == TYPEID_UNIT && mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)) &&
+                Rand() < 25)
+            {
+                if (doCast(me, GetSpell(MIRROR_IMAGE_1)))
+                    return;
             }
             //CONES
             if (/*fbCasted && */(IsSpellReady(CONE_OF_COLD_1, diff) || IsSpellReady(DRAGON_BREATH_1, diff)) && Rand() < 65)
@@ -1686,6 +1695,7 @@ public:
             InitSpellMap(ICE_LANCE_1);
             InitSpellMap(FROST_WARD_1);
             InitSpellMap(FIRE_WARD_1);
+            InitSpellMap(MIRROR_IMAGE_1);
 
  /*Special*/InitSpellMap(CONJURE_MANA_GEM_1);
  /*Special*/InitSpellMap(MANA_GEM_1);
@@ -1796,6 +1806,7 @@ public:
                 case SLOW_FALL_1:
                 case CONJURE_MANA_GEM_1:
                 case SUMMON_WATER_ELEMENTAL_1:
+                case MIRROR_IMAGE_1:
                     return true;
                 case FROST_ARMOR_1:
                     return !GetSpell(ICE_ARMOR_1);
