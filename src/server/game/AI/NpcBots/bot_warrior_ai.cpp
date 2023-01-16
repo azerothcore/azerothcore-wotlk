@@ -1658,7 +1658,7 @@ public:
             }
         }
 
-        void ApplyClassEffectMods(WorldObject const* /*wtarget*/, SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
+        void ApplyClassEffectMods(SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
         {
             uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
             uint8 lvl = me->GetLevel();

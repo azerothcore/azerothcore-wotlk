@@ -120,7 +120,7 @@ class AC_GAME_API BotMgr
         static void OnBotOwnerExitVehicle(Player const* passenger, Vehicle const* vehicle);
         static void OnBotPartyEngage(Player const* owner);
         //mod hooks
-        static void ApplyBotEffectMods(Unit const* caster, Unit const* target, SpellInfo const* spellInfo, uint8 effIndex, float& value);
+        static void ApplyBotEffectMods(Unit const* caster, SpellInfo const* spellInfo, uint8 effIndex, float& value);
         static void ApplyBotThreatMods(Unit const* attacker, SpellInfo const* spellInfo, float& threat);
         static void ApplyBotEffectValueMultiplierMods(Unit const* caster, SpellInfo const* spellInfo, SpellEffIndex effIndex, float& multiplier);
         static float GetBotDamageTakenMod(Creature const* bot, bool magic);

@@ -4001,10 +4001,10 @@ void Creature::ApplyCreatureSpellChanceOfSuccessMods(SpellInfo const* spellInfo,
         bot_AI->ApplyBotSpellChanceOfSuccessMods(spellInfo, chance);
 }
 
-void Creature::ApplyCreatureEffectMods(WorldObject const* wtarget, SpellInfo const* spellInfo, uint8 effIndex, float& value) const
+void Creature::ApplyCreatureEffectMods(SpellInfo const* spellInfo, uint8 effIndex, float& value) const
 {
     if (bot_AI)
-        bot_AI->ApplyBotEffectMods(wtarget, spellInfo, effIndex, value);
+        bot_AI->ApplyBotEffectMods(spellInfo, effIndex, value);
 }
 
 void Creature::OnBotSummon(Creature* summon)

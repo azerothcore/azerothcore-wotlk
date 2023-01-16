@@ -424,7 +424,7 @@ public:
     void ApplyCreatureSpellRangeMods(SpellInfo const* spellInfo, float& maxrange) const;
     void ApplyCreatureSpellMaxTargetsMods(SpellInfo const* spellInfo, uint32& targets) const;
     void ApplyCreatureSpellChanceOfSuccessMods(SpellInfo const* spellInfo, float& chance) const;
-    void ApplyCreatureEffectMods(WorldObject const* wtarget, SpellInfo const* spellInfo, uint8 effIndex, float& value) const;
+    void ApplyCreatureEffectMods(SpellInfo const* spellInfo, uint8 effIndex, float& value) const;
     void OnBotSummon(Creature* summon);
     void OnBotDespawn(Creature* summon);
     void BotStopMovement();
