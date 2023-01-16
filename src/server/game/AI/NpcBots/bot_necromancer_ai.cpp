@@ -48,6 +48,9 @@ enum NecromancerSpecial
     CORPSE_EXPLOSION_COST   = 100 * 5,
     //ATTRACT_COST            = 200 * 5,
 
+    //get 80% mana back if casting on a skeleton
+    UNHOLY_FRENZY_REFUND    = UNHOLY_FRENZY_COST / 10 * 8,
+
     MAX_MINIONS             = 6,
 
     SPELL_SPAWN_ANIM        = 25035,
@@ -261,6 +264,20 @@ public:
             if (frenzy_pred_player(master))
                 target = master;
 
+            //minions
+            if (!target && HasRole(BOT_ROLE_DPS) && !_minions.empty())
+            {
+                for (Unit* minion : _minions)
+                {
+                    if (minion->GetVictim() && GetHealthPCT(minion) > 80 && me->GetDistance(minion) < 30 && !CCed(minion, true) &&
+                        !minion->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE))
+                    {
+                        target = minion;
+                        break;
+                    }
+                }
+            }
+
             //group (players + bots)
             if (!target)
             {
@@ -299,20 +316,6 @@ public:
 
                         if (target)
                             break;
-                    }
-                }
-            }
-
-            //minions
-            if (!target && HasRole(BOT_ROLE_DPS) && !_minions.empty())
-            {
-                for (Unit* minion : _minions)
-                {
-                    if (minion->GetVictim() && GetHealthPCT(minion) > 80 && me->GetDistance(minion) < 30 && !CCed(minion, true) &&
-                        !minion->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE))
-                    {
-                        target = minion;
-                        break;
                     }
                 }
             }
@@ -517,6 +520,15 @@ public:
                     {
                         target->CastSpell(target, SPELL_BLOODY_EXPLOSION, true);
                         target->SetDisplayId(MODEL_BLOODY_BONES);
+                    }
+                }
+
+                if (baseId == UNHOLY_FRENZY_1)
+                {
+                    if (target->GetEntry() == BOT_PET_NECROSKELETON && _minions.find(target) != _minions.end())
+                    {
+                        //get 80% mana back if casting on a skeleton
+                        me->EnergizeBySpell(me, UNHOLY_FRENZY_1, UNHOLY_FRENZY_REFUND, POWER_MANA);
                     }
                 }
 

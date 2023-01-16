@@ -96,7 +96,7 @@ public:
             if (IsSpellReady(BLOCKING_1, diff) && !me->getAttackers().empty() && Rand() < 25)
             {
                 me->CastSpell(me, GetSpell(BLOCKING_1), true);
-                SetSpellCooldown(TAUNT_1, std::numeric_limits<uint32>::max());
+                SetSpellCooldown(BLOCKING_1, std::numeric_limits<uint32>::max());
                 return;
             }
         }
