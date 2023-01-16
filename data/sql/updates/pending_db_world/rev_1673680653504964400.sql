@@ -675,3 +675,212 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@CGUID+6 , @CGUID+8 , 0, 0, 3, 0, 0),
 (@CGUID+3 , @CGUID+3 , 0, 0, 3, 0, 0),
 (@CGUID+3 , @CGUID+4 , 0, 0, 3, 0, 0);
+
+-- Tarren Mill Orchard
+UPDATE `creature` SET `position_x`=2549.044, `position_y`=667.6353, `position_z`=55.86316, `orientation`=1.65806281566619873 WHERE `id1`=18644 AND `guid`=83518; -- Correct coords
+DELETE FROM `creature` WHERE `guid`=83502 AND `id1`=18644; -- Remove extra spawn
+
+-- Pathing for Tarren Mill Peasant Entry: 18644
+SET @NPC := 83515;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=2554.9783,`position_y`=687.0314,`position_z`=55.451946 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,2554.9783,687.0314,55.451946,NULL,0,0,0,100,0),
+(@PATH,2,2561.218,690.67163,55.576946,NULL,0,0,0,100,0),
+(@PATH,3,2568.7146,690.6922,55.44298,NULL,0,0,0,100,0),
+(@PATH,4,2577.013,687.39465,55.180775,NULL,0,0,0,100,0),
+(@PATH,5,2580.7092,693.7745,55.180775,NULL,0,0,0,100,0),
+(@PATH,6,2571.8455,701.53064,55.263027,NULL,0,0,0,100,0),
+(@PATH,7,2561.5073,704.2067,55.388027,NULL,0,0,0,100,0),
+(@PATH,8,2561.4792,695.0597,55.701946,NULL,0,0,0,100,0),
+(@PATH,9,2561.5073,704.2067,55.388027,NULL,0,0,0,100,0),
+(@PATH,10,2571.8455,701.53064,55.263027,NULL,0,0,0,100,0),
+(@PATH,11,2580.7092,693.7745,55.180775,NULL,0,0,0,100,0),
+(@PATH,12,2577.013,687.39465,55.180775,NULL,0,0,0,100,0),
+(@PATH,13,2568.7146,690.6922,55.44298,NULL,0,0,0,100,0),
+(@PATH,14,2561.218,690.67163,55.576946,NULL,0,0,0,100,0);
+-- 0x204214460012350000618C0000233C55 .go xyz 2554.9783 687.0314 55.451946
+
+-- Pathing for Tarren Mill Peasant Entry: 18644
+SET @NPC := 83514;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=2543.1196,`position_y`=693.89404,`position_z`=55.326946 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,2543.1196,693.89404,55.326946,NULL,0,0,0,100,0),
+(@PATH,2,2553.9338,701.0461,55.513027,NULL,0,0,0,100,0),
+(@PATH,3,2561.695,698.33575,55.611004,NULL,0,0,0,100,0),
+(@PATH,4,2568.0493,694.85394,55.430775,NULL,0,0,0,100,0),
+(@PATH,5,2561.695,698.33575,55.611004,NULL,0,0,0,100,0),
+(@PATH,6,2553.9338,701.0461,55.513027,NULL,0,0,0,100,0);
+-- 0x204214460012350000618C0000233C56 .go xyz 2543.1196 693.89404 55.326946
+
+-- Pathing for Tarren Mill Peasant Entry: 18644
+SET @NPC := 83513;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=2581.023,`position_y`=719.0766,`position_z`=55.263027 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,2581.023,719.0766,55.263027,NULL,0,0,0,100,0),
+(@PATH,2,2575.6465,720.1748,55.263027,NULL,0,0,0,100,0),
+(@PATH,3,2571.326,717.3841,55.263027,NULL,0,0,0,100,0),
+(@PATH,4,2564.6213,715.7407,55.263027,NULL,0,0,0,100,0),
+(@PATH,5,2571.326,717.3841,55.263027,NULL,0,0,0,100,0),
+(@PATH,6,2575.6465,720.1748,55.263027,NULL,0,0,0,100,0);
+-- 0x204214460012350000618C0002233C55 .go xyz 2581.023 719.0766 55.263027
+
+UPDATE `creature` SET `position_x`=2579.1692,`position_y`=741.4955,`position_z`=55.263027 WHERE `guid`=83512;
+UPDATE `creature` SET `position_x`=2560.0842,`position_y`=735.0262,`position_z`=55.263027 WHERE `guid`=83505;
+UPDATE `creature` SET `position_x`=2533.39,`position_y`=698.4243,`position_z`=55.326946 WHERE `guid`=83504;
+UPDATE `creature` SET `position_x`=2540.1965,`position_y`=707.5806,`position_z`=55.388027 WHERE `guid`=83503;
+
+DELETE FROM `waypoints` WHERE `entry` BETWEEN 1864400 AND 1864411 AND `point_comment` LIKE 'Tarren Mill Peasant%';
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
+-- Farmer 1 Loop
+(1864400,1,2579.1692,741.4955,55.263027,NULL,0,'Tarren Mill Peasant 1 Loop'),
+(1864400,2,2567.516,739.04486,55.263027,NULL,0,'Tarren Mill Peasant 1 Loop'),
+(1864400,3,2559.5698,735.6041,55.263027,NULL,0,'Tarren Mill Peasant 1 Loop'),
+(1864400,4,2556.541,742.21185,55.263027,NULL,0,'Tarren Mill Peasant 1 Loop'),
+(1864400,5,2559.5698,735.6041,55.263027,NULL,0,'Tarren Mill Peasant 1 Loop'),
+(1864400,6,2567.516,739.04486,55.263027,NULL,0,'Tarren Mill Peasant 1 Loop'),
+(1864400,7,2573.79,744.6142,55.263027,NULL,0,'Tarren Mill Peasant 1 Loop'),
+(1864400,8,2577.3606,741.2238,55.263027,NULL,0,'Tarren Mill Peasant 1 Loop'),
+-- Loot
+(1864401,1,2580.7603,733.7795,55.263027,NULL,0,'Tarren Mill Peasant 1'),
+(1864401,2,2585.122,729.6559,55.540127,NULL,0,'Tarren Mill Peasant 1'),
+(1864401,3,2597.298,727.745,57.138027,NULL,0,'Tarren Mill Peasant 1'),
+(1864401,4,2610.7305,723.7787,56.300743,NULL,0,'Tarren Mill Peasant 1'),
+(1864401,5,2616.56,724.4365,55.667076,NULL,0,'Tarren Mill Peasant 1'),
+(1864401,6,2618.2258,722.1252,55.574547,NULL,0,'Tarren Mill Peasant 1'), -- Drop-Off
+
+(1864402,1,2605.0447,728.33813,56.99337,NULL,0,'Tarren Mill Peasant 1'),
+(1864402,2,2598.8342,729.49005,57.209316,NULL,0,'Tarren Mill Peasant 1'),
+(1864402,3,2591.6653,728.9743,56.325283,NULL,0,'Tarren Mill Peasant 1'),
+(1864402,4,2580.683,730.13214,55.263027,NULL,0,'Tarren Mill Peasant 1'),
+(1864402,5,2579.1692,741.4955,55.263027,NULL,0,'Tarren Mill Peasant 1'), -- Resume
+-- Farmer 2 Loop
+(1864403,1,2560.0842,735.0262,55.263027,NULL,0,'Tarren Mill Peasant 2 Loop'),
+(1864403,2,2554.5186,733.9661,55.263027,NULL,0,'Tarren Mill Peasant 2 Loop'),
+(1864403,3,2560.0842,735.0262,55.263027,NULL,0,'Tarren Mill Peasant 2 Loop'),
+(1864403,4,2566.1782,736.39594,55.263027,NULL,0,'Tarren Mill Peasant 2 Loop'),
+(1864403,5,2574.5671,741.9193,55.263027,NULL,0,'Tarren Mill Peasant 2 Loop'),
+(1864403,6,2566.1782,736.39594,55.263027,NULL,0,'Tarren Mill Peasant 2 Loop'),
+-- Loot 
+(1864404,1,2555.2058,743.61847,55.263027,NULL,0,'Tarren Mill Peasant 2'),
+(1864404,2,2558.5776,752.5052,55.263027,NULL,0,'Tarren Mill Peasant 2'),
+(1864404,3,2555.683,755.8353,55.781216,NULL,0,'Tarren Mill Peasant 2'),
+(1864404,4,2571.7463,764.7781,56.809902,NULL,0,'Tarren Mill Peasant 2'),
+(1864404,5,2604.645,742.22015,56.637325,NULL,0,'Tarren Mill Peasant 2'),
+(1864404,6,2604.1758,731.3882,56.774376,NULL,0,'Tarren Mill Peasant 2'),
+(1864404,7,2612.1719,718.78,56.88656,NULL,0,'Tarren Mill Peasant 2'),
+(1864404,8,2618.5593,716.9926,56.375286,NULL,0,'Tarren Mill Peasant 2'), -- Drop-Off
+
+(1864405,1,2596.1682,722.98474,56.936367,NULL,0,'Tarren Mill Peasant 2'),
+(1864405,2,2588.9414,729.4648,55.983974,NULL,0,'Tarren Mill Peasant 2'),
+(1864405,3,2579.839,729.3068,55.263027,NULL,0,'Tarren Mill Peasant 2'),
+(1864405,4,2572.823,726.1969,55.263027,NULL,0,'Tarren Mill Peasant 2'), -- Resume
+-- Farmer 3 Loop
+(1864406,1,2533.39,698.4243,55.326946,NULL,0,'Tarren Mill Peasant 3 Loop'),
+(1864406,2,2523.5632,692.62366,55.2429,NULL,0,'Tarren Mill Peasant 3 Loop'),
+(1864406,3,2518.5513,698.5561,55.2429,NULL,0,'Tarren Mill Peasant 3 Loop'),
+(1864406,4,2524.5872,708.29956,55.263027,NULL,0,'Tarren Mill Peasant 3 Loop'),
+(1864406,5,2536.4536,714.06866,55.263027,NULL,0,'Tarren Mill Peasant 3 Loop'),
+(1864406,6,2540.6436,708.1387,55.388027,NULL,0,'Tarren Mill Peasant 3 Loop'),
+-- Loot
+(1864407,1,2536.1128,682.46454,55.201946,NULL,0,'Tarren Mill Peasant 3'),
+(1864407,2,2547.97,682.8966,55.201946,NULL,0,'Tarren Mill Peasant 3'),
+(1864407,3,2566.0503,679.4231,55.201946,NULL,0,'Tarren Mill Peasant 3'),
+(1864407,4,2584.7163,689.2281,55.180775,NULL,0,'Tarren Mill Peasant 3'),
+(1864407,5,2593.8137,689.33344,55.500843,NULL,0,'Tarren Mill Peasant 3'),
+(1864407,6,2607.1274,689.22687,55.648727,NULL,0,'Tarren Mill Peasant 3'),
+(1864407,7,2606.8733,693.58124,55.648727,NULL,0,'Tarren Mill Peasant 3'),
+(1864407,8,2607.523,707.4654,56.708824,NULL,0,'Tarren Mill Peasant 3'),
+(1864407,9,2611.9263,718.2008,57.05526,NULL,0,'Tarren Mill Peasant 3'),
+(1864407,10,2615.432,719.9049,56.100426,NULL,0,'Tarren Mill Peasant 3'), -- Drop-Off
+
+(1864408,1,2586.529,711.44806,55.263027,NULL,0,'Tarren Mill Peasant 3'),
+(1864408,2,2566.7876,707.8689,55.263027,NULL,0,'Tarren Mill Peasant 3'),
+(1864408,3,2549.6401,712.89795,55.263027,NULL,0,'Tarren Mill Peasant 3'),
+(1864408,4,2541.9224,705.3675,55.388027,NULL,0,'Tarren Mill Peasant 3'),
+(1864408,5,2528.4304,703.2813,55.263027,NULL,0,'Tarren Mill Peasant 3'), -- Resume
+-- Farmer 4 Loop 
+(1864409,1,2540.1965,707.5806,55.388027,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,2,2537.2483,698.39526,55.326946,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,3,2547.0784,696.1814,55.451946,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,4,2558.412,702.44305,55.513027,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,5,2561.824,713.6516,55.263027,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,6,2558.412,702.44305,55.513027,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,7,2547.0784,696.1814,55.451946,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,8,2537.2483,698.39526,55.326946,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,9,2540.1965,707.5806,55.388027,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,10,2534.49,711.6807,55.298794,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,11,2526.2415,706.0055,55.263027,NULL,0,'Tarren Mill Peasant 4 Loop'),
+(1864409,12,2534.49,711.6807,55.298794,NULL,0,'Tarren Mill Peasant 4 Loop'),
+-- Farmer 4 Loot
+(1864410,1,2563.376,706.6429,55.278408,NULL,0,'Tarren Mill Peasant 4'),
+(1864410,2,2574.2478,707.0303,55.263027,NULL,0,'Tarren Mill Peasant 4'),
+(1864410,3,2584.5305,707.47,55.263027,NULL,0,'Tarren Mill Peasant 4'),
+(1864410,4,2588.7463,713.8691,55.263027,NULL,0,'Tarren Mill Peasant 4'),
+(1864410,5,2591.807,713.58954,55.54672,NULL,0,'Tarren Mill Peasant 4'),
+(1864410,6,2607.0369,706.183,56.400963,NULL,0,'Tarren Mill Peasant 4'),
+(1864410,7,2614.2766,708.18976,56.587364,NULL,0,'Tarren Mill Peasant 4'),
+(1864410,8,2620.3577,713.8734,56.323563,NULL,0,'Tarren Mill Peasant 4'), -- Drop-Off
+
+(1864411,1,2604.002,705.33185,56.162193,NULL,0,'Tarren Mill Peasant 4'),
+(1864411,2,2595.1753,695.5046,55.180775,NULL,0,'Tarren Mill Peasant 4'),
+(1864411,3,2589.2942,690.23413,55.180775,NULL,0,'Tarren Mill Peasant 4'),
+(1864411,4,2575.0344,685.8089,55.180775,NULL,0,'Tarren Mill Peasant 4'),
+(1864411,5,2561.4514,689.1116,55.576946,NULL,0,'Tarren Mill Peasant 4'),
+(1864411,6,2557.9626,696.91675,55.75944,NULL,0,'Tarren Mill Peasant 4'),
+(1864411,7,2539.3113,693.7178,55.326946,NULL,0,'Tarren Mill Peasant 4'),
+(1864411,8,2531.8923,704.2636,55.388027,NULL,0,'Tarren Mill Peasant 4'); -- Resume
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18644;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (18644, -83512, -83505, -83504, -83503));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-83512, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864400, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Respawn - Start Waypoint'),
+(-83512, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Respawn - Set Event Phase 1'),
+(-83512, 0, 2, 0, 58, 1, 10, 0, 0, 1864400, 0, 0, 0, 80, 1864400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint Finished - Run Script (Phase 1)'),
+(-83512, 0, 3, 0, 58, 1, 100, 0, 0, 1864400, 0, 0, 0, 53, 0, 1864400, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint Finished - Start Waypoint (Phase 1)'),
+(-83512, 0, 4, 0, 58, 0, 100, 0, 0, 1864401, 0, 0, 0, 80, 1864401, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint Finished - Run Script'),
+(-83512, 0, 5, 0, 58, 0, 100, 0, 0, 1864402, 0, 0, 0, 53, 0, 1864400, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint Finished - Start Waypoint'),
+(-83512, 0, 6, 0, 58, 2, 100, 0, 0, 1864400, 0, 0, 0, 53, 0, 1864401, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint Finished - Start Waypoint (Phase 2)'),
+
+(-83505, 0, 0, 1, 40, 0, 10, 0, 0, 1864403, 0, 0, 0, 11, 32617, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Any Waypoint Reached - Cast \'Serverside - Gold Peasant Transform\' (10% Chance)'),
+(-83505, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864404, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Any Waypoint Reached - Start Drop-Off'),
+(-83505, 0, 2, 0, 40, 0, 100, 0, 8, 1864404, 0, 0, 0, 67, 1, 5000, 5000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint 8 Reached - Create Timed Event'),
+(-83505, 0, 3, 4, 59, 0, 100, 0, 1, 0, 0, 0, 0, 28, 32617, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Timed Event 1 Triggered - Remove Aura \'Serverside - Gold Peasant Transform\''),
+(-83505, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864405, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Timed Event 1 Triggered - Start Waypoint'),
+(-83505, 0, 5, 0, 58, 0, 100, 0, 4, 1864405, 0, 0, 0, 53, 0, 1864403, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint Finished - Resume Loop'),
+(-83505, 0, 6, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864403, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Respawn - Start Loop'),
+
+(-83504, 0, 0, 1, 40, 0, 10, 0, 0, 1864406, 0, 0, 0, 11, 32617, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Any Waypoint Reached - Cast \'Serverside - Gold Peasant Transform\' (10% Chance)'),
+(-83504, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864407, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Any Waypoint Reached - Start Drop-Off'),
+(-83504, 0, 2, 0, 40, 0, 100, 0, 10, 1864407, 0, 0, 0, 67, 1, 5000, 5000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint 10 Reached - Create Timed Event'),
+(-83504, 0, 3, 4, 59, 0, 100, 0, 1, 0, 0, 0, 0, 28, 32617, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Timed Event 1 Triggered - Remove Aura \'Serverside - Gold Peasant Transform\''),
+(-83504, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864408, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Timed Event 1 Triggered - Start Waypoint'),
+(-83504, 0, 5, 0, 58, 0, 100, 0, 5, 1864408, 0, 0, 0, 53, 0, 1864406, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint Finished - Resume Loop'),
+(-83504, 0, 6, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864406, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Respawn - Start Loop'),
+
+(-83503, 0, 0, 1, 40, 0, 10, 0, 0, 1864409, 0, 0, 0, 11, 32617, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Any Waypoint Reached - Cast \'Serverside - Gold Peasant Transform\' (10% Chance)'),
+(-83503, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864410, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Any Waypoint Reached - Start Drop-Off'),
+(-83503, 0, 2, 0, 40, 0, 100, 0, 8, 1864410, 0, 0, 0, 67, 1, 5000, 5000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint 10 Reached - Create Timed Event'),
+(-83503, 0, 3, 4, 59, 0, 100, 0, 1, 0, 0, 0, 0, 28, 32617, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Timed Event 1 Triggered - Remove Aura \'Serverside - Gold Peasant Transform\''),
+(-83503, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864411, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Timed Event 1 Triggered - Start Waypoint'),
+(-83503, 0, 5, 0, 58, 0, 100, 0, 8, 1864411, 0, 0, 0, 53, 0, 1864409, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Waypoint Finished - Resume Loop'),
+(-83503, 0, 6, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864409, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Respawn - Start Loop');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1864400, 1864401));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1864400, 9, 0, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 11, 32617, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Script - Cast \'Serverside - Gold Peasant Transform\''),
+(1864400, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Script - Set Event Phase 2'),
+(1864401, 9, 0, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 28, 32617, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Script - Remove Aura \'Serverside - Gold Peasant Transform\''),
+(1864401, 9, 1, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 53, 0, 1864402, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Script - Start Waypoint'),
+(1864401, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Script - Set Event Phase 1');
