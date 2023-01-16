@@ -53,10 +53,10 @@ float constexpr NecromancerPetPositionAnglesByPosNumber[NECROMANCER_MAX_PET_POSI
 {
     0.f,
     float(M_PI),
-    float(M_PI) / 5.f * 1.f,
-    float(M_PI) / 5.f * 4.f,
-    float(M_PI) / 5.f * 2.f,
-    float(M_PI) / 5.f * 3.f
+    0.6283185f,//1*M_PI/5
+    2.5132741f,//4*M_PI/5
+    1.2566370f,//2*M_PI/5
+    1.8849555f //3*M_PI/5
 };
 
 extern uint8 GroupIconsFlags[TARGETICONCOUNT];
@@ -111,7 +111,7 @@ void bot_pet_ai::_calculatePos(Position& pos) const
 {
     float x,y,z;
     //destination
-    if (petOwner->GetTransport() || !petOwner->GetMotionMaster()->GetDestination(x, y, z))
+    if (!petOwner->GetMotionMaster()->GetDestination(x, y, z) || petOwner->GetTransport())
         petOwner->GetPosition(x, y, z);
     //relative angle
     float o = petOwner->GetOrientation() + PET_FOLLOW_ANGLE;

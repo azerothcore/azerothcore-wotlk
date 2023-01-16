@@ -411,22 +411,22 @@ public:
             }
         }
 
-        void ApplyClassDamageMultiplierSpell(int32& damage, SpellNonMeleeDamage& /*damageinfo*/, SpellInfo const* spellInfo, WeaponAttackType /*attackType*/, bool iscrit) const override
-        {
-            uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
-            //uint8 lvl = me->GetLevel();
-            float fdamage = float(damage);
+        //void ApplyClassDamageMultiplierSpell(int32& damage, SpellNonMeleeDamage& /*damageinfo*/, SpellInfo const* spellInfo, WeaponAttackType /*attackType*/, bool iscrit) const override
+        //{
+        //    uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
+        //    //uint8 lvl = me->GetLevel();
+        //    float fdamage = float(damage);
 
-            //apply bonus damage mods
-            float pctbonus = 1.0f;
-            if (iscrit)
-                pctbonus *= 1.333f;
+        //    //apply bonus damage mods
+        //    float pctbonus = 1.0f;
+        //    if (iscrit)
+        //        pctbonus *= 1.333f;
 
-            if (baseId == MAIN_ATTACK_1)
-                fdamage += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * (spellInfo->Effects[0].BonusMultiplier - 1.f) * me->CalculateDefaultCoefficient(spellInfo, SPELL_DIRECT_DAMAGE) * me->CalculateLevelPenalty(spellInfo);
+        //    if (baseId == MAIN_ATTACK_1)
+        //        fdamage += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * (spellInfo->_effects[0].BonusMultiplier - 1.f) * me->CalculateDefaultCoefficient(spellInfo, SPELL_DIRECT_DAMAGE) * me->CalculateSpellpowerCoefficientLevelPenalty(spellInfo);
 
-            damage = int32(fdamage * pctbonus);
-        }
+        //    damage = int32(fdamage * pctbonus);
+        //}
 
         void ApplyClassSpellRadiusMods(SpellInfo const* spellInfo, float& radius) const override
         {
@@ -442,18 +442,15 @@ public:
             radius = radius * pctbonus;
         }
 
-        void ApplyClassEffectMods(WorldObject const* wtarget, SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
+        void ApplyClassEffectMods(WorldObject const* /*wtarget*/, SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
         {
             uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
             //uint8 lvl = me->GetLevel();
             float pctbonus = 1.0f;
 
-            //Set damage for Unholy Frenzy: 45 sec 2% per second (out of average max health: bot and target)
+            //Set damage for Unholy Frenzy: 45 sec, 15 ticks, total damage is 125% if Necromancer's max health
             if (baseId == UNHOLY_FRENZY_1 && effIndex == EFFECT_1)
-            {
-                if (Unit const* target = wtarget ? wtarget->ToUnit() : nullptr)
-                    value = CalculatePct(float((target->GetMaxHealth() + me->GetMaxHealth()) / 2), 2.f);
-            }
+                value += (me->GetMaxHealth() * 1.25f) / std::max<uint32>(1, spellInfo->GetMaxTicks());
 
             value = value * pctbonus;
         }
