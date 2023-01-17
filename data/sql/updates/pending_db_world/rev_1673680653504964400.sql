@@ -67,6 +67,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 
 -- Delete Phil (shouldn't be there)
 DELETE FROM `creature` WHERE `id1`=21344 AND `guid`=84013;
+DELETE FROM `creature_addon` WHERE `guid`=84013;
+DELETE FROM `waypoint_data` WHERE `id`=840130;
 
 -- Jay and Julie
 DELETE FROM `creature_text` WHERE `CreatureID` IN (18655, 18656);
@@ -677,7 +679,7 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@CGUID+3 , @CGUID+4 , 0, 0, 3, 0, 0);
 
 -- Tarren Mill Orchard
-UPDATE `creature` SET `position_x`=2549.044, `position_y`=667.6353, `position_z`=55.86316, `orientation`=1.65806281566619873 WHERE `id1`=18644 AND `guid`=83518; -- Correct coords
+UPDATE `creature` SET `equipment_id`=1, `position_x`=2549.044, `position_y`=667.6353, `position_z`=55.86316, `orientation`=1.65806281566619873 WHERE `id1`=18644 AND `guid`=83518; -- Correct coords
 DELETE FROM `creature` WHERE `guid`=83502 AND `id1`=18644; -- Remove extra spawn
 
 -- Pathing for Tarren Mill Peasant Entry: 18644
@@ -720,28 +722,22 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,6,2553.9338,701.0461,55.513027,NULL,0,0,0,100,0);
 -- 0x204214460012350000618C0000233C56 .go xyz 2543.1196 693.89404 55.326946
 
--- Pathing for Tarren Mill Peasant Entry: 18644
-SET @NPC := 83513;
-SET @PATH := @NPC * 10;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=2581.023,`position_y`=719.0766,`position_z`=55.263027 WHERE `guid`=@NPC;
-DELETE FROM `creature_addon` WHERE `guid`=@NPC;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
-DELETE FROM `waypoint_data` WHERE `id`=@PATH;
-INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,2581.023,719.0766,55.263027,NULL,0,0,0,100,0),
-(@PATH,2,2575.6465,720.1748,55.263027,NULL,0,0,0,100,0),
-(@PATH,3,2571.326,717.3841,55.263027,NULL,0,0,0,100,0),
-(@PATH,4,2564.6213,715.7407,55.263027,NULL,0,0,0,100,0),
-(@PATH,5,2571.326,717.3841,55.263027,NULL,0,0,0,100,0),
-(@PATH,6,2575.6465,720.1748,55.263027,NULL,0,0,0,100,0);
--- 0x204214460012350000618C0002233C55 .go xyz 2581.023 719.0766 55.263027
+UPDATE `creature` SET `equipment_id`=1, `position_x`=2581.023,`position_y`=719.0766,`position_z`=55.263027 WHERE `guid`=83513 AND `id1`=18644;
+UPDATE `creature` SET `position_x`=2579.1692,`position_y`=741.4955,`position_z`=55.263027 WHERE `guid`=83512 AND `id1`=18644;
+UPDATE `creature` SET `position_x`=2560.0842,`position_y`=735.0262,`position_z`=55.263027 WHERE `guid`=83505 AND `id1`=18644;
+UPDATE `creature` SET `position_x`=2533.39,`position_y`=698.4243,`position_z`=55.326946 WHERE `guid`=83504 AND `id1`=18644;
+UPDATE `creature` SET `position_x`=2540.1965,`position_y`=707.5806,`position_z`=55.388027 WHERE `guid`=83503 AND `id1`=18644;
 
-UPDATE `creature` SET `position_x`=2579.1692,`position_y`=741.4955,`position_z`=55.263027 WHERE `guid`=83512;
-UPDATE `creature` SET `position_x`=2560.0842,`position_y`=735.0262,`position_z`=55.263027 WHERE `guid`=83505;
-UPDATE `creature` SET `position_x`=2533.39,`position_y`=698.4243,`position_z`=55.326946 WHERE `guid`=83504;
-UPDATE `creature` SET `position_x`=2540.1965,`position_y`=707.5806,`position_z`=55.388027 WHERE `guid`=83503;
+DELETE FROM `creature_addon` WHERE (`guid` = 83513);
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(83513, 0, 0, 0, 1, 0, 0, '');
 
-DELETE FROM `waypoints` WHERE `entry` BETWEEN 1864400 AND 1864411 AND `point_comment` LIKE 'Tarren Mill Peasant%';
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 18644);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(18644, 1, 1902, 0, 0, 0);
+
+
+DELETE FROM `waypoints` WHERE `entry` BETWEEN 1864400 AND 1864412 AND `point_comment` LIKE 'Tarren Mill Peasant%';
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
 -- Farmer 1 Loop
 (1864400,1,2579.1692,741.4955,55.263027,NULL,0,'Tarren Mill Peasant 1 Loop'),
@@ -840,7 +836,14 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1864411,5,2561.4514,689.1116,55.576946,NULL,0,'Tarren Mill Peasant 4'),
 (1864411,6,2557.9626,696.91675,55.75944,NULL,0,'Tarren Mill Peasant 4'),
 (1864411,7,2539.3113,693.7178,55.326946,NULL,0,'Tarren Mill Peasant 4'),
-(1864411,8,2531.8923,704.2636,55.388027,NULL,0,'Tarren Mill Peasant 4'); -- Resume
+(1864411,8,2531.8923,704.2636,55.388027,NULL,0,'Tarren Mill Peasant 4'), -- Resume
+-- Benjamin
+(1864412,1,2581.023,719.0766,55.263027,NULL,0,'Tarren Mill Peasant - \'Benjamin\''),
+(1864412,2,2575.6465,720.1748,55.263027,NULL,0,'Tarren Mill Peasant - \'Benjamin\''),
+(1864412,3,2571.326,717.3841,55.263027,NULL,0,'Tarren Mill Peasant - \'Benjamin\''),
+(1864412,4,2564.6213,715.7407,55.263027,NULL,0,'Tarren Mill Peasant - \'Benjamin\''),
+(1864412,5,2571.326,717.3841,55.263027,NULL,0,'Tarren Mill Peasant - \'Benjamin\''),
+(1864412,6,2575.6465,720.1748,55.263027,NULL,0,'Tarren Mill Peasant - \'Benjamin\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18644;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (18644, -83512, -83505, -83504, -83503));
@@ -884,3 +887,221 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1864401, 9, 0, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 28, 32617, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Script - Remove Aura \'Serverside - Gold Peasant Transform\''),
 (1864401, 9, 1, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 53, 0, 1864402, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Script - Start Waypoint'),
 (1864401, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Script - Set Event Phase 1');
+
+-- Horsehand
+SET @CGUID := 81629;
+DELETE FROM `creature` WHERE `id1`=18651 AND `guid`=83516 AND `map`=560; -- Delete Young Blanchy
+DELETE FROM `creature` WHERE `map`=560 AND `id1` IN (18646, 18650, 18651) AND `guid` BETWEEN @CGUID+0 AND @CGUID+3; -- Completely missing
+INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
+(@CGUID+0, 18646, 560, 2367, 0, 3, 1, 0, 2479.0908203125, 692.3310546875, 55.77042007446289062, 4.570368766784667968, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 47213), -- 18646 (Area: 0 - Difficulty: 1) (possible waypoints or random movement)
+(@CGUID+1, 18650, 560, 2367, 0, 3, 1, 0, 2479.018310546875, 689.60528564453125, 55.84677886962890625, 1.518436431884765625, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 47213), -- 18650 (Area: 0 - Difficulty: 1) (possible waypoints or random movement)
+(@CGUID+2, 18651, 560, 2367, 0, 3, 1, 0, 2476.16845703125, 689.820068359375, 55.86352157592773437, 1.518436431884765625, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 47213), -- 18651 (Area: 0 - Difficulty: 1)
+(@CGUID+3, 18650, 560, 2367, 0, 3, 1, 0, 2486.815185546875, 689.4571533203125, 55.80312728881835937, 1.65806281566619873, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 47213); -- 18650 (Area: 0 - Difficulty: 1)
+
+-- Tarren Mill Horse not selectable
+UPDATE `creature_template` SET `unit_flags`=`unit_flags`|33554432 WHERE (`entry` = 18650);
+
+DELETE FROM `waypoints` WHERE `entry` BETWEEN 1864600 AND 1864605 AND `point_comment` LIKE 'Tarren Mill Horsehand%';
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
+(1864600,1 ,2479.3347,692.8038,55.777363,NULL,0,'Tarren Mill Horsehand'), -- Why Hullo There Bessy
+(1864600,2 ,2497.5903,694.6655,55.507145,NULL,0,'Tarren Mill Horsehand'),
+(1864600,3 ,2508.3696,695.0302,55.6179,NULL,0,'Tarren Mill Horsehand'),
+(1864600,4 ,2512.1875,688.5702,55.6179,NULL,0,'Tarren Mill Horsehand'),
+(1864600,5 ,2519.5044,680.4515,55.214947,NULL,0,'Tarren Mill Horsehand'),
+(1864600,6 ,2535.386,679.16296,55.201946,NULL,0,'Tarren Mill Horsehand'),
+(1864600,7 ,2551.9036,684.32336,55.326946,NULL,0,'Tarren Mill Horsehand'),
+(1864600,8 ,2559.02,690.30817,55.576946,NULL,0,'Tarren Mill Horsehand'),
+(1864600,9 ,2561.9092,703.5271,55.513027,NULL,0,'Tarren Mill Horsehand'),
+(1864600,10,2570.4805,712.63684,55.263027,NULL,0,'Tarren Mill Horsehand'), -- Benjamin Scene
+
+(1864601,1,2568.8154,692.8856,55.430775,NULL,0,'Tarren Mill Horsehand'),
+(1864601,2,2566.0315,680.2294,55.201946,NULL,0,'Tarren Mill Horsehand'),
+(1864601,3,2557.4246,669.97614,54.998455,NULL,0,'Tarren Mill Horsehand'), -- Samuel Scene 1
+
+(1864602,1,2533.056,663.352,56.72725,NULL,0,'Tarren Mill Horsehand'),
+(1864602,2,2516.83,669.8787,55.160748,NULL,0,'Tarren Mill Horsehand'),
+(1864602,3,2503.2288,687.0233,55.61253,NULL,0,'Tarren Mill Horsehand'),
+(1864602,4,2502.0715,695.5172,55.6179,NULL,0,'Tarren Mill Horsehand'), -- Well, Bessy will enjoy this little snack.
+(1864602,5,2490.7253,702.2013,55.75494,NULL,0,'Tarren Mill Horsehand'),
+(1864602,6,2483.6494,701.97076,55.789215,NULL,0,'Tarren Mill Horsehand'),
+(1864602,7,2482.6987,697.5523,55.776123,NULL,0,'Tarren Mill Horsehand'),
+(1864602,8,2479.437,694.75226,55.78037,NULL,0,'Tarren Mill Horsehand'),
+(1864602,9,2479.0908,692.33105,55.77042,NULL,0,'Tarren Mill Horsehand'), -- Bessy feeding scene
+-- Bessy walk scene
+(1864603,1 ,2501.1394,695.277,55.50855,NULL,0,'Tarren Mill Horsehand'), -- Start follow
+(1864603,2 ,2507.5117,717.00446,56.152187,NULL,0,'Tarren Mill Horsehand'),
+(1864603,3 ,2514.1116,740.4205,57.56852,NULL,0,'Tarren Mill Horsehand'),
+(1864603,4 ,2529.063,757.9616,56.869667,NULL,0,'Tarren Mill Horsehand'),
+(1864603,5 ,2552.3213,768.6346,56.867096,NULL,0,'Tarren Mill Horsehand'),
+(1864603,6 ,2589.6414,766.45667,57.138027,NULL,0,'Tarren Mill Horsehand'),
+(1864603,7 ,2612.707,760.85333,56.349728,NULL,0,'Tarren Mill Horsehand'),
+(1864603,8 ,2641.679,754.33417,62.273674,NULL,0,'Tarren Mill Horsehand'),
+(1864603,9 ,2666.7095,760.21814,59.850464,NULL,0,'Tarren Mill Horsehand'),
+(1864603,10,2689.0032,752.82794,57.665894,NULL,0,'Tarren Mill Horsehand'),
+(1864603,11,2692.918,723.44745,58.688576,NULL,0,'Tarren Mill Horsehand'),
+(1864603,12,2694.5967,693.0447,59.233387,NULL,0,'Tarren Mill Horsehand'),
+(1864603,13,2694.4912,666.0449,57.32726,NULL,0,'Tarren Mill Horsehand'),
+(1864603,14,2697.691,625.08954,56.237213,NULL,0,'Tarren Mill Horsehand'),
+(1864603,15,2677.27,603.82336,56.32669,NULL,0,'Tarren Mill Horsehand'),
+(1864603,16,2637.6335,597.0508,56.71828,NULL,0,'Tarren Mill Horsehand'),
+(1864603,17,2593.4783,596.88165,57.024647,NULL,0,'Tarren Mill Horsehand'),
+(1864603,18,2586.7102,631.36255,56.463425,NULL,0,'Tarren Mill Horsehand'),
+(1864603,19,2563.7705,655.0138,55.498577,NULL,0,'Tarren Mill Horsehand'),
+(1864603,20,2537.4597,663.68176,56.850994,NULL,0,'Tarren Mill Horsehand'),
+(1864603,21,2512.957,669.44794,55.50059,NULL,0,'Tarren Mill Horsehand'),
+(1864603,22,2503.6145,694.1076,55.6179,NULL,0,'Tarren Mill Horsehand'),
+(1864603,23,2491.7158,694.3694,55.70834,NULL,0,'Tarren Mill Horsehand'),
+(1864603,24,2490.174,703.3407,55.762535,NULL,0,'Tarren Mill Horsehand'),
+(1864603,25,2484.9788,703.1712,55.787815,NULL,0,'Tarren Mill Horsehand'),
+(1864603,26,2483.582,697.5275,55.771133,NULL,0,'Tarren Mill Horsehand'),
+(1864603,27,2479.3347,692.8038,55.777363,NULL,0,'Tarren Mill Horsehand'), -- Stop Follow - "Good Girl, Bessy"
+
+(1864604,1,2501.3252,695.5871,55.509953,NULL,0,'Tarren Mill Horsehand'),
+(1864604,2,2513.346,676.75275,55.726665,NULL,0,'Tarren Mill Horsehand'),
+(1864604,3,2527.7207,669.7207,55.2429,NULL,0,'Tarren Mill Horsehand'),
+(1864604,4,2543.7249,667.5164,56.142498,NULL,0,'Tarren Mill Horsehand'), -- Samuel Scene 2
+
+(1864605,1 ,2579.3647,666.9944,55.66527,NULL,0,'Tarren Mill Horsehand'),
+(1864605,2 ,2598.6453,670.29254,56.680775,NULL,0,'Tarren Mill Horsehand'),
+(1864605,3 ,2617.4558,674.8602,55.1165,NULL,0,'Tarren Mill Horsehand'),
+(1864605,4 ,2631.4468,670.66766,54.398727,NULL,0,'Tarren Mill Horsehand'),
+(1864605,5 ,2638.2544,684.02594,54.851933,NULL,0,'Tarren Mill Horsehand'),
+(1864605,6 ,2640.072,703.36505,56.133114,NULL,0,'Tarren Mill Horsehand'),
+(1864605,7 ,2631.1082,719.3345,56.21261,NULL,0,'Tarren Mill Horsehand'),
+(1864605,8 ,2615.6003,732.1506,55.542076,NULL,0,'Tarren Mill Horsehand'),
+(1864605,9 ,2612.7505,750.8546,56.387325,NULL,0,'Tarren Mill Horsehand'),
+(1864605,10,2596.1355,760.049,57.289272,NULL,0,'Tarren Mill Horsehand'),
+(1864605,11,2563.9888,762.2899,56.587734,NULL,0,'Tarren Mill Horsehand'),
+(1864605,12,2552.7969,757.9541,56.388027,NULL,0,'Tarren Mill Horsehand'),
+(1864605,13,2541.6035,758.37823,57.125088,NULL,0,'Tarren Mill Horsehand'),
+(1864605,14,2524.9595,752.03613,57.630775,NULL,0,'Tarren Mill Horsehand'),
+(1864605,15,2513.0642,734.4457,57.44291,NULL,0,'Tarren Mill Horsehand'),
+(1864605,16,2507.1282,710.16986,55.888027,NULL,0,'Tarren Mill Horsehand'),
+(1864605,17,2505.3125,698.12213,55.6179,NULL,0,'Tarren Mill Horsehand'); -- End
+
+-- ON RESPAWN START WP
+DELETE FROM `creature_text` WHERE `CreatureID` IN (18644, 18646, 18650, 18651);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`) VALUES
+(18644, 0, 0, 15610, '%s grabs an apple from the tree.', 16, 0, 100, 0, 0, 0, 0, 'Tarren Mill Peasant'),
+(18644, 0, 1, 15628, '%s grumbles to himself while he works.', 16, 0, 100, 0, 0, 0, 0, 'Tarren Mill Peasant'),
+(18646, 0, 0, 15603, 'Why hullo there, Bessy. Its your turn for a walk today, isn\'t it?', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 0, 1, 15604, 'Poor Bessy, cooped up in this barn on such a hot day. Let me get a snack for you!', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 0, 2, 15605, 'Bessy is a hungry girl today, isn\'t she? Let me go get you an apple.', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 1, 0, 15606, 'Good day, Benjamin! Would you mind if I took an apple for Bessy?', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 1, 1, 15608, 'Hullo there, Benjamin! Mind if I snack an apple for Old Bessy?', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 1, 2, 15609, 'Benjamin, my old friend, think you could spare an apple for Bessy today?', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18644, 1, 0, 15627, 'Sure, go ahead and take one, there\'s plenty for all!', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Peasant'),
+(18646, 2, 0, 15610, '%s grabs an apple from the tree.', 16, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 3, 0, 15611, 'Thanks, Benjamin!', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 4, 0, 15612, 'Samuel, is that old wagon still breaking down on you? ', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 4, 1, 15613, 'That wagon break down on you again, Samuel?', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 4, 2, 15614, 'Such an old wagon, no wonder it broke down on you, Samuel. ', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18644, 2, 0, 15629, 'Aye, its still broken. Can\'t afford to buy a new one though.', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Peasant'),
+(18646, 5, 0, 15615, 'Well, I\'m sorry to hear that. I\'ll be by again later if you want a hand.', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 6, 0, 15616, 'Well, Bessy will enjoy this little snack.', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 7, 0, 15617, 'Here, Bessy, enjoy this apple while I get you ready. ', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 8, 1, 15618, '%s feeds Bessy the bright red apple.', 16, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18651, 0, 0, 15622, 'Young Blanchy stomps her foot jealously.', 16, 0, 100, 0, 0, 0, 0, 'Young Blanchy'),
+(18646, 9, 0, 15619, 'Now, now, Blanchy. Don\'t be jealous, you\'ll be going on a big adventure of your own, soon.', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 9, 1, 15620, 'Whoa, there, Blanchy, you can\'t be having any apples today. Tomorrow, we\'ll be taking you down to Southshore, where you\'ll take a boat way across the seas.', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 9, 2, 15621, 'Aww, Blanchy, don\'t worry, my brother in Westfall will take good care of you. I hear he\'s got a beautiful farm with lots of space for you to roam.', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 10, 0, 15623, 'Alright Bessy, let\'s get \'cha out for a walk here. Hut, hut!', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18646, 11, 0, 15624, 'Good girl, Bessy!', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18650, 0, 0, 15626, 'Bessy whinneys happily.', 16, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horse'),
+(18646, 12, 0, 15625, 'Any luck, Samuel?', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Horsehand'),
+(18644, 3, 0, 15630, 'Nay, its still broken. No luck at all, I suppose.', 12, 0, 100, 0, 0, 0, 0, 'Tarren Mill Peasant');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18644;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18644);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(18644, 0, 0, 0, 60, 0, 100, 0, 30000, 90000, 30000, 90000, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Update - Say Line 0');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18646;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18646);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(18646, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864600, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - On Respawn - Start Waypoint'),
+(18646, 0, 1, 0, 40, 0, 100, 0, 1, 1864600, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - On Waypoint 1 Reached - Say Line 0'),
+(18646, 0, 2, 0, 58, 0, 100, 0, 10, 1864600, 0, 0, 0, 80, 1864600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - On Waypoint Finished - Run Script'),
+(18646, 0, 3, 0, 58, 0, 100, 0, 3, 1864601, 0, 0, 0, 80, 1864601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - On Waypoint Finished - Run Script'),
+(18646, 0, 4, 0, 40, 0, 100, 0, 4, 1864602, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - On Waypoint 4 Reached - Say Line 6'),
+(18646, 0, 5, 0, 58, 0, 100, 0, 9, 1864602, 0, 0, 0, 80, 1864602, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - On Waypoint Finished - Run Script'),
+(18646, 0, 6, 0, 58, 0, 100, 0, 27, 1864603, 0, 0, 0, 80, 1864603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - On Waypoint Finished - Run Script'),
+(18646, 0, 7, 0, 58, 0, 100, 0, 4, 1864604, 0, 0, 0, 80, 1864604, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - On Waypoint Finished - Run Script'),
+(18646, 0, 8, 0, 40, 0, 100, 0, 17, 1864605, 0, 0, 0, 53, 0, 1864600, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - On Waypoint 17 Reached - Start Waypoint');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18651;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18651);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(18651, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Young Blanchy - On Data Set 1 1 - Say Line 0');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18650;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18650);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(18650, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 1, 180, 0, 0, 0, 0, 19, 18646, 10, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horse - On Data Set 1 1 - Start Follow Closest Creature \'Tarren Mill Horsehand\''),
+(18650, 0, 1, 2, 38, 0, 100, 0, 1, 2, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2479.018310546875, 689.6052856445312, 55.846778869628906, 1.5184364318847656, 'Tarren Mill Horse - On Data Set 1 2 - Move To Position'),
+(18650, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horse - On Data Set 1 2 - Say Line 0');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -83513);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-83513, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864412, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Respawn - Start Waypoint'),
+(-83513, 0, 1, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1864412, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Data Set 1 1 - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1864600);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1864600, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 83513, 18644, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Set Data 1 1'),
+(1864600, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 83513, 18644, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Set Orientation Closest Creature \'Tarren Mill Peasant\''),
+(1864600, 9, 2, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 1'),
+(1864600, 9, 3, 0, 0, 0, 100, 0, 5400, 5400, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 2'),
+(1864600, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 3'),
+(1864600, 9, 5, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 53, 0, 1864601, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Start Waypoint');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1864412);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1864412, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 54, 7000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - Actionlist - Pause Waypoint'),
+(1864412, 9, 1, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 18646, 25, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - Actionlist - Set Orientation Closest Creature \'Tarren Mill Horsehand\''),
+(1864412, 9, 2, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - Actionlist - Say Line 1');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -83518);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-83518, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 17, 173, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Respawn - Set Emote State 173'),
+(-83518, 0, 1, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 80, 1864413, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Data Set 2 1 - Run Script'),
+(-83518, 0, 2, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - On Data Set 2 2 - Say Line 3');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1864601);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1864601, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 2, 1, 0, 0, 0, 0, 19, 18644, 20, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Set Data 2 1'),
+(1864601, 9, 1, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 18644, 20, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Set Orientation Closest Creature \'Tarren Mill Peasant\''),
+(1864601, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 4'),
+(1864601, 9, 3, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 5'),
+(1864601, 9, 4, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 53, 0, 1864602, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Start Waypoint');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1864413);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1864413, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 18646, 25, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - Actionlist - Set Orientation Closest Creature \'Tarren Mill Horsehand\''),
+(1864413, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 17, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - Actionlist - Set Emote State 1'),
+(1864413, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - Actionlist - Say Line 2'),
+(1864413, 9, 3, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 1.6580628156661987, 'Tarren Mill Peasant - Actionlist - Set Orientation 1.6580628156661987'),
+(1864413, 9, 4, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 17, 173, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Peasant - Actionlist - Set Emote State 173');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1864602);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1864602, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 7'),
+(1864602, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 8'),
+(1864602, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 18651, 10, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Set Data 1 1'),
+(1864602, 9, 3, 0, 0, 0, 100, 0, 6400, 6400, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 18651, 10, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Set Orientation Closest Creature \'Young Blanchy\''),
+(1864602, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 9, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 9'),
+(1864602, 9, 5, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 10'),
+(1864602, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 18650, 5, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Set Data 1 1'),
+(1864602, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864603, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Start Waypoint');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1864603);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1864603, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 2, 0, 0, 0, 0, 19, 18650, 10, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Set Data 1 2'),
+(1864603, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 11, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 11'),
+(1864603, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1864604, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Start Waypoint');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1864604);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1864604, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 12, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Say Line 12'),
+(1864604, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 2, 2, 0, 0, 0, 0, 19, 18644, 10, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Set Data 2 2'),
+(1864604, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 53, 0, 1864605, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarren Mill Horsehand - Actionlist - Start Waypoint');
