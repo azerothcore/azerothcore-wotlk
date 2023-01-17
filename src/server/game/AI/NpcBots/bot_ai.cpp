@@ -14617,7 +14617,7 @@ bool bot_ai::HasAuraTypeWithValueAtLeast(AuraType auratype, int32 minvalue, Unit
 
     Unit::AuraEffectList const& mTotalAuraList = unit->GetAuraEffectsByType(auratype);
     for (Unit::AuraEffectList::const_iterator i = mTotalAuraList.begin(); i != mTotalAuraList.end(); ++i)
-        if (minvalue >= (*i)->GetAmount())
+        if ((*i)->GetAmount() >= minvalue)
             return true;
 
     return false;
