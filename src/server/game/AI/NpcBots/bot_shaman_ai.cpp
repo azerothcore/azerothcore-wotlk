@@ -2128,8 +2128,7 @@ public:
 
         void SummonBotPet(Unit* target)
         {
-            //if (botPet)
-            //    botPet->ToTempSummon()->UnSummon();
+            UnsummonWolves();
 
             uint32 entry = BOT_PET_SPIRIT_WOLF;
 
@@ -2205,17 +2204,23 @@ public:
             }
         }
 
-        void UnsummonAll() override
+        void UnsummonWolves()
         {
-            //if (botPet)
-            //    botPet->ToTempSummon()->UnSummon();
-
             for (uint8 i = 0; i != MAX_WOLVES; ++i)
             {
                 if (_wolves[i])
+                {
                     if (Unit* wo = ObjectAccessor::GetUnit(*me, _wolves[i]))
                         wo->ToTempSummon()->UnSummon();
+                    else
+                        _wolves[i] = ObjectGuid::Empty;
+                }
             }
+        }
+
+        void UnsummonAll() override
+        {
+            UnsummonWolves();
 
             for (uint8 i = 0; i != MAX_TOTEMS; ++i)
             {
