@@ -30,6 +30,10 @@ if [[ $APP_NAME != "authserver" ]]; then
 		echo "Logger.sql=4,Console Server"
 		echo "Logger.time.update=4,Console Server"
 		echo "Logger.module=4,Console Server"
+		# Some default values just to reduce the amount of "errors" in the logs
+		echo "MySQLExecutable = \"\""
+		echo "TempDir = \"\""
+		echo "SourceDirectory = \"\""
     } >> ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
 fi
 
@@ -41,6 +45,10 @@ if [[ $APP_NAME == "authserver" ]]; then
 		echo "Appender.Console=1,5,0,\"1 9 3 6 5 8\""
 		echo "Appender.Auth=2,5,0,Auth.log,w"
 		echo "Logger.root=4,Console Auth"
+		# Some default values just to reduce the amount of "errors" in the logs
+		echo "MySQLExecutable = \"\""
+		echo "TempDir = \"\""
+		echo "SourceDirectory = \"\""
 	} >> ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
 fi
 
