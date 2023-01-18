@@ -11,11 +11,20 @@ if [[ $APP_NAME != "authserver" ]]; then
     {
         echo "WorldDatabaseInfo     = \"localhost;3306;root;$MYSQL_ROOT_PASSWORD;acore_world\""
         echo "CharacterDatabaseInfo = \"localhost;3306;root;$MYSQL_ROOT_PASSWORD;acore_characters\""
+		echo "Updates.EnableDatabases = 7"
+		echo "RealmID = 1"
     } >> ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
+fi
+
+# loggers
+if [[ $APP_NAME == "authserver" ]]; then
+	{
+		echo "Updates.EnableDatabases = 1"
+	} >> ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
 fi
 
 if [[ $APP_NAME == "worldserver" ]]; then
     echo "DataDir = \"./data/\"" >> ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
-
+	
     git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git ./env/dist/$BIN_FOLDER/data
 fi
