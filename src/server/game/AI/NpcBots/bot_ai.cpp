@@ -16206,7 +16206,7 @@ void bot_ai::Evade()
     Position pos;
     GetHomePosition(mapid, &pos);
 
-    if (mapid != me->GetMapId() || _evadeCount >= 3 || me->GetDistance(pos) > 1000.f)
+    if (mapid != me->GetMapId() || _evadeCount >= 3 || me->GetDistance(pos) > float(SIZE_OF_GRIDS * 0.5f))
     {
         //TeleportHome();
 
