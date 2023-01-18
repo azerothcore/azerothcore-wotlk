@@ -34,6 +34,7 @@ if [[ $APP_NAME != "authserver" ]]; then
 		echo "MySQLExecutable = \"\""
 		echo "TempDir = \"\""
 		echo "SourceDirectory = \"\""
+		echo "Creatures.CustomIDs = \"\""
     } >> ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
 fi
 
