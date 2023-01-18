@@ -285,7 +285,7 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
         if (showLogs)
         {
             LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file.",
-                name, _filename, name, Acore::ToString(def));
+                name, _filename, name, def);
         }
 
         return def;
