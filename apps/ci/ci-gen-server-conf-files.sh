@@ -4,7 +4,7 @@ BIN_FOLDER=${3-"bin"}
 MYSQL_ROOT_PASSWORD=${4:-""}
 
 # copy dist files to conf files
-cp ./src/server/apps/$APP_NAME/$APP_NAME.conf.dist ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
+cp ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf.dist ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
 
 # replace login info
 sed -i "s/127.0.0.1;3306;acore;acore/localhost;3306;root;$MYSQL_ROOT_PASSWORD/" ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
