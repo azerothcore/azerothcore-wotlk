@@ -1,0 +1,127 @@
+version: '3.9'
+
+# extension field: https://docs.docker.com/compose/compose-file/compose-file-v3/#extension-fields
+x-networks: &networks
+  networks:
+    - ac-network
+
+x-build-params: &build-params
+  context: .
+  dockerfile: ./apps/docker/Dockerfile.production
+  args:
+    USER_ID: ${DOCKER_USER_ID:-1000}
+    GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+    DOCKER_USER: ${DOCKER_USER:-acore}
+
+services:
+  database:
+    <<: *networks
+    image: mysql:8.0
+    restart: unless-stopped
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+    ports:
+      - ${DOCKER_DB_EXTERNAL_PORT:-3306}:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DOCKER_DB_ROOT_PASSWORD:-password}
+    volumes:
+      - ${DOCKER_DB_DATA_VOL:-database}:/var/lib/mysql
+    healthcheck:
+      test: >
+        /usr/bin/mysql --user=root 
+        --password=$$MYSQL_ROOT_PASSWORD 
+        --execute "SHOW DATABASES;"
+      interval: 5s
+      timeout: 10s
+      retries: 40
+
+  worldserver:
+    tty: true
+    init: true
+    command: ./acore.sh run-worldserver
+    image: acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    restart: unless-stopped
+    env_file:
+      ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-root}
+    build:
+      target: worldserver
+      <<: *build-params
+    ports:
+      - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
+    volumes:
+      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_CLIENT_DATA:-client-data}:/azerothcore/env/dist/data:ro
+      - ${DOCKER_VOL_WORLDSERVER_CONF:-./env/docker/etc}:/azerothcore/env/dist/etc
+    depends_on:
+      database:
+        condition: service_healthy
+      db-import:
+        condition: service_completed_successfully
+      client-data-init:
+        condition: service_started
+
+  authserver:
+    init: true
+    tty: true
+    command: ./acore.sh run-authserver
+    image: acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    restart: unless-stopped
+    env_file:
+      ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-root}
+    build:
+      target: authserver
+      <<: *build-params
+    volumes:
+      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_WORLDSERVER_CONF:-./env/docker/etc}:/azerothcore/env/dist/etc
+    ports:
+      - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
+    depends_on:
+      database:
+        condition: service_healthy
+      db-import:
+        condition: service_completed_successfully
+
+
+  client-data-init:
+    image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    user: ${DOCKER_USER:-root}
+    build:
+      target: client-data
+      <<: *build-params
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+        # BUILDKIT_INLINE_CACHE: 1
+    volumes:
+      - ${DOCKER_VOL_CLIENT_DATA_PROD:-client-data}:/azerothcore/env/dist/data
+
+  tools:
+    image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    user: ${DOCKER_USER:-root}
+    build:
+      target: tools
+      <<: *build-params
+    working_dir: /azerothcore/env/client/
+    volumes:
+      # this is not the directory of the extracted data! It's the client folder used by the extractors
+      - ${DOCKER_AC_CLIENT_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
+
+  db-import:
+    build:
+      target: dbimport
+      <<: *build-params
+    image: acore/ac-wotlk-db-import:${DOCKER_IMAGE_TAG:-master}
+    command: ./env/dist/bin/dbimport
+
+volumes:
+  client-data:
+  database:
+
+
+networks:
+  ac-network:
