@@ -151,7 +151,7 @@ void Quest::LoadQuestDetails(Field* fields)
     for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
         DetailsEmoteDelay[i] = fields[5 + i].Get<uint32>();
 }
-
+// hello world
 void Quest::LoadQuestRequestItems(Field* fields)
 {
     EmoteOnComplete = fields[1].Get<uint16>();
