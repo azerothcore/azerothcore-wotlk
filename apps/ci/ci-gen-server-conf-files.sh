@@ -10,6 +10,6 @@ cp ./src/server/apps/$APP_NAME/$APP_NAME.conf.dist ./env/dist/$CONFIG_FOLDER/$AP
 sed -i "s/127.0.0.1;3306;acore;acore/localhost;3306;root;$MYSQL_ROOT_PASSWORD/" ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
 
 if [[ $APP_NAME == "worldserver" ]]; then
-    sed -i 's/DataDir = \"\"/DataDir = \".\/data"/' ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
+    sed -i 's/DataDir = \".\"/DataDir = \".\/data"/' ./env/dist/$CONFIG_FOLDER/$APP_NAME.conf
     git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git ./env/dist/$BIN_FOLDER/data
 fi
