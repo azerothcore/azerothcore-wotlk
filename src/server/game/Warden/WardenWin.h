@@ -81,6 +81,8 @@ public:
     void RequestHash() override;
     void HandleHashResult(ByteBuffer& buff) override;
     void RequestChecks() override;
+    uint16 RegisterPayload(std::string& payload) override;
+    void QueuePayload(uint16 payloadId) override;
     void HandleData(ByteBuffer& buff) override;
 
 private:
@@ -89,6 +91,10 @@ private:
 
     std::list<uint16> _CurrentChecks;
     std::list<uint16> _PendingChecks;
+
+    uint16 WardenPayloadOffset = 5000;
+    std::list<uint16> _QueuedPayloads;
+    std::unordered_map<uint16, WardenCheck> CachedChecks;
 };
 
 #endif // _WARDEN_WIN_H

@@ -81,7 +81,6 @@ public:
     void LoadWardenChecks();
     void LoadWardenOverrides();
 
-private:
     std::vector<WardenCheck> CheckStore;
     std::map<uint32, WardenCheckResult> CheckResultStore;
 };
