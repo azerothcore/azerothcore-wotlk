@@ -252,6 +252,18 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
     _initialized = true;
 }
 
+uint16 WardenWin::GetFreePayloadId()
+{
+    uint16 payloadId = _wardenPayloadOffset;
+        
+    while (CachedChecks.find(payloadId) != CachedChecks.end())
+    {
+        payloadId++;
+    }
+
+    return payloadId;
+}
+
 /**
 * Register a payload into cache and returns its payload id.
 * @param payload The payload to be stored in WardenWin::CachedChecks.
@@ -259,7 +271,7 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
 */
 uint16 WardenWin::RegisterPayload(std::string& payload)
 {
-    uint16 payloadId = _wardenPayloadOffset + CachedChecks.size();
+    uint16 payloadId = GetFreePayloadId();
 
     WardenCheck wCheck;
     wCheck.Type = LUA_EVAL_CHECK;
