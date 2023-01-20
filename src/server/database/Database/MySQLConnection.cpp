@@ -51,16 +51,16 @@ MySQLConnectionInfo::MySQLConnectionInfo(std::string_view infoString)
 MySQLConnection::MySQLConnection(MySQLConnectionInfo& connInfo) :
     m_reconnecting(false),
     m_prepareError(false),
-    m_queue(nullptr),
     m_Mysql(nullptr),
+    m_queue(nullptr),
     m_connectionInfo(connInfo),
     m_connectionFlags(CONNECTION_SYNCH) { }
 
 MySQLConnection::MySQLConnection(ProducerConsumerQueue<SQLOperation*>* queue, MySQLConnectionInfo& connInfo) :
     m_reconnecting(false),
     m_prepareError(false),
-    m_queue(queue),
     m_Mysql(nullptr),
+    m_queue(queue),
     m_connectionInfo(connInfo),
     m_connectionFlags(CONNECTION_ASYNC)
 {

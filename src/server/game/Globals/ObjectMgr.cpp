@@ -6229,7 +6229,6 @@ void ObjectMgr::LoadQuestGreetings()
     LOG_INFO("server.loading", " ");
 }
 
-/// @bug Does not load Locale greetings. See https://github.com/azerothcore/azerothcore-wotlk/issues/10913
 void ObjectMgr::LoadQuestGreetingsLocales()
 {
     uint32 oldMSTime = getMSTime();
