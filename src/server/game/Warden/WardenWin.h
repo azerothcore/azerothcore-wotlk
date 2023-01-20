@@ -92,7 +92,6 @@ private:
     std::list<uint16> _CurrentChecks;
     std::list<uint16> _PendingChecks;
 
-    uint16 WardenPayloadOffset = 5000;
     std::list<uint16> _QueuedPayloads;
     std::unordered_map<uint16, WardenCheck> CachedChecks;
 };
