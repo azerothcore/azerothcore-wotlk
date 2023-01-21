@@ -255,7 +255,7 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
 uint16 WardenWin::GetFreePayloadId()
 {
     uint16 payloadId = _wardenPayloadOffset;
-        
+
     while (CachedChecks.find(payloadId) != CachedChecks.end())
     {
         payloadId++;
@@ -298,7 +298,7 @@ bool WardenWin::UnregisterPayload(uint16 payloadId)
     {
         return false;
     }
-    
+
     CachedChecks.erase(payloadId);
     return true;
 }
