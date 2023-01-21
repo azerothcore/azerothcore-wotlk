@@ -27,6 +27,7 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "karazhan.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum Netherspite
 {
