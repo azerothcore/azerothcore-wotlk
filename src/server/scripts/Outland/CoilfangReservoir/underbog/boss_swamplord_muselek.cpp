@@ -119,10 +119,8 @@ struct boss_swamplord_muselek : public ScriptedAI
             context.Repeat(20s, 30s);
         }).Schedule(4s, 8s, [this](TaskContext context)
         {
-            LOG_ERROR("sql.sql", "casting");
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, false, true))
             {
-                LOG_ERROR("sql.sql", "casting 2");
                 _markTarget = target->GetGUID();
                 DoCastVictim(SPELL_THROW_FREEZING_TRAP);
 
@@ -166,9 +164,8 @@ struct boss_swamplord_muselek : public ScriptedAI
         if (!UpdateVictim())
             return;
 
-        _scheduler.Update();
-
-        DoMeleeAttackIfReady();
+        _scheduler.Update(diff,
+            std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
 
 private:
