@@ -29,6 +29,7 @@
 /.env*
 /apps/joiner
 /deps/deno
+/data/sql/custom/*
 
 /docker-compose.override.yml
 
