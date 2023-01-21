@@ -73,7 +73,18 @@ public:
                 case NPC_RELAY:
                     m_uiRelayGUID = creature->GetGUID();
                     break;
+                case NPC_BARNES:
+                    _barnesGUID = creature->GetGUID();
+                    if (GetBossState(DATA_OPERA_PERFORMANCE) != DONE && !creature->IsAlive())
+                    {
+                        creature->Respawn(true);
+                    }
+                    break;
+                default:
+                    break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -112,6 +123,11 @@ public:
                         }
                     }
                     break;
+                case NPC_HYAKISS_THE_LURKER:
+                case NPC_SHADIKITH_THE_GLIDER:
+                case NPC_ROKAD_THE_RAVAGER:
+                    SetBossState(DATA_OPTIONAL_BOSS, DONE);
+                    break;
                 default:
                     break;
             }
@@ -126,6 +142,17 @@ public:
                         ++OzDeathCount;
                     else if (data == IN_PROGRESS)
                         OzDeathCount = 0;
+                    break;
+                case DATA_SPAWN_OPERA_DECORATIONS:
+                {
+                    for (ObjectGuid const& guid : _operaDecorations[data - 1])
+                    {
+                        DoRespawnGameObject(guid, DAY);
+                    }
+
+                    break;
+                }
+                default:
                     break;
             }
         }
@@ -145,6 +172,13 @@ public:
                         if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
                             sideEntrance->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
+                    }
+                    else if (state == FAIL)
+                    {
+                        HandleGameObject(m_uiStageDoorLeftGUID, false);
+                        HandleGameObject(m_uiStageDoorRightGUID, false);
+                        HandleGameObject(m_uiCurtainGUID, false);
+                        DoRespawnCreature(_barnesGUID, true);
                     }
                     break;
                 case DATA_CHESS:
@@ -220,20 +254,25 @@ public:
                 case GO_DUST_COVERED_CHEST:
                     DustCoveredChest = go->GetGUID();
                     break;
+                case GO_OZ_BACKDROP:
+                case GO_OZ_HAY:
+                    _operaDecorations[EVENT_OZ - 1].push_back(go->GetGUID());
+                    break;
+                case GO_HOOD_BACKDROP:
+                case GO_HOOD_TREE:
+                case GO_HOOD_HOUSE:
+                    _operaDecorations[EVENT_HOOD - 1].push_back(go->GetGUID());
+                    break;
+                case GO_RAJ_BACKDROP:
+                case GO_RAJ_MOON:
+                case GO_RAJ_BALCONY:
+                    _operaDecorations[EVENT_RAJ - 1].push_back(go->GetGUID());
+                    break;
+                default:
+                    break;
             }
 
-            switch (OperaEvent)
-            {
-                /// @todo Set Object visibilities for Opera based on performance
-                case EVENT_OZ:
-                    break;
-
-                case EVENT_HOOD:
-                    break;
-
-                case EVENT_RAJ:
-                    break;
-            }
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         uint32 GetData(uint32 type) const override
@@ -315,6 +354,8 @@ public:
         ObjectGuid ImageGUID;
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;
+        ObjectGuid _barnesGUID;
+        GuidVector _operaDecorations[EVENT_RAJ];
     };
 };
 
