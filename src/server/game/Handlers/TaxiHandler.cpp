@@ -95,7 +95,8 @@ void WorldSession::SendTaxiMenu(Creature* unit)
         return;
 
     bool lastTaxiCheaterState = GetPlayer()->isTaxiCheater();
-    if (unit->GetEntry() == 29480) GetPlayer()->SetTaxiCheater(true); // Grimwing in Ebon Hold, special case. NOTE: Not perfect, Zul'Aman should not be included according to WoWhead, and I think taxicheat includes it.
+    if (unit->GetEntry() == 29480)
+        GetPlayer()->SetTaxiCheater(true); // Grimwing in Ebon Hold, special case. NOTE: Not perfect, Zul'Aman should not be included according to WoWhead, and I think taxicheat includes it.
 
     LOG_DEBUG("network", "WORLD: CMSG_TAXINODE_STATUS_QUERY {} ", curloc);
 
@@ -250,14 +251,10 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     // at this point only 1 node is expected (final destination)
     if (GetPlayer()->m_taxi.GetPath().size() != 1)
     {
-        return;
-    }
-
-    GetPlayer()->CleanupAfterTaxiFlight();
-    GetPlayer()->SetFallInformation(GameTime::GetGameTime().count(), GetPlayer()->GetPositionZ());
-    if (GetPlayer()->pvpInfo.IsHostile)
-    {
+        GetPlayer()->CleanupAfterTaxiFlight();
+        GetPlayer()->SetFallInformation(GameTime::GetGameTime().count(), GetPlayer()->GetPositionZ());
         GetPlayer()->CastSpell(GetPlayer(), 2479, true);
+        return;
     }
 }
 

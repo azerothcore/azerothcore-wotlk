@@ -248,12 +248,10 @@ void WorldSession::HandleMoveWorldportAck()
     GetPlayer()->GetZoneAndAreaId(newzone, newarea);
     GetPlayer()->UpdateZone(newzone, newarea);
 
-    // honorless target
-    if (GetPlayer()->pvpInfo.IsHostile)
-        GetPlayer()->CastSpell(GetPlayer(), 2479, true);
+    GetPlayer()->CastSpell(GetPlayer(), 2479 /*Honorless Target*/, true);
 
     // in friendly area
-    else if (GetPlayer()->IsPvP() && !GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_IN_PVP))
+    if (GetPlayer()->IsPvP() && !GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_IN_PVP))
         GetPlayer()->UpdatePvP(false, false);
 
     // resummon pet
@@ -308,12 +306,10 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
         // new zone
         if (old_zone != newzone)
         {
-            // honorless target
-            if (plMover->pvpInfo.IsHostile)
-                plMover->CastSpell(plMover, 2479, true);
+            plMover->CastSpell(plMover, 2479 /*Honorless Target*/, true);
 
             // in friendly area
-            else if (plMover->IsPvP() && !plMover->HasPlayerFlag(PLAYER_FLAGS_IN_PVP))
+            if (plMover->IsPvP() && !plMover->HasPlayerFlag(PLAYER_FLAGS_IN_PVP))
                 plMover->UpdatePvP(false, false);
         }
     }
