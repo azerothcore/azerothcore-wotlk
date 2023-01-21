@@ -2917,6 +2917,15 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         {
             m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_SUPRESS_TARGET_PROCS));
 
+            // Patch 3.0.8: All player spells which cause a creature to become aggressive to you will now also immediately cause the creature to be tapped.
+            if (Creature* creature = effectUnit->ToCreature())
+            {
+                if (!creature->hasLootRecipient() && m_caster->IsPlayer())
+                {
+                    creature->SetLootRecipient(m_caster);
+                }
+            }
+
             // Unsure if there are more spells that are not supposed to stop enemy from
             // regenerating HP from food, so for now it stays as an ID.
             const uint32 SPELL_PREMEDITATION = 14183;
