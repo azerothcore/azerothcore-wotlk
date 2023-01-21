@@ -55,7 +55,7 @@ class spell_allergies : public AuraScript
         amplitude = urand(10 * IN_MILLISECONDS, 60 * IN_MILLISECONDS);
     }
 
-    void Update(AuraEffect* effect)
+    void Update(AuraEffect* /*effect*/)
     {
         if (Unit* target = GetTarget())
         {
