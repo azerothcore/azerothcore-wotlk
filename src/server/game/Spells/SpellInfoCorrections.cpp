@@ -4454,6 +4454,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(28); // 5 seconds
         spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_CASTER;
     });
+
     // Hunter's Mark
     ApplySpellFix({ 31615 }, [](SpellInfo* spellInfo)
     {
