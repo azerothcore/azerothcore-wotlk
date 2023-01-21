@@ -106,7 +106,7 @@ echo "         4. Assemble only updates files"
 echo "         5. Exit"
 echo ""
 echo -e "\e[1;37m"
-read -p "         Choose a number from 1 to 3: " opcion
+read -p "         Choose a number from 1 to 5: " opcion
 
 case $opcion in
     1) all ;;
