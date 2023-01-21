@@ -48,7 +48,7 @@ Running and building with docker is simple:
 $ docker build -t acore/account-create .
 $ docker run \
     -e MYSQL_HOST=mysql \
-    -v mix_cache:/root/.cache/mix/installs
+    -v mix_cache:/root/.cache/mix/installs \
     acore/account-create
 ```
 
