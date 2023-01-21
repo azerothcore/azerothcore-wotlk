@@ -365,7 +365,7 @@ void WardenWin::RequestChecks()
             // Anchy: Custom payload should be loaded in if equal to over offset.
             if (!check && id >= WardenPayloadOffset)
             {
-                if(CachedChecks.find(id) != CachedChecks.end())
+                if (CachedChecks.find(id) != CachedChecks.end())
                     check = &CachedChecks.at(id);
             }
 
