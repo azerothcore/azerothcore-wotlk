@@ -13585,13 +13585,13 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
             }
         }
 
-        bool alreadyInCombat = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+        bool alreadyInCombat = IsInCombat();
 
         SetInCombatWith(victim);
         victim->SetInCombatWith(this);
 
         // Xinef: If pet started combat - put owner in combat
-        if (!alreadyInCombat && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT))
+        if (!alreadyInCombat && IsInCombat())
         {
             if (Unit* owner = GetOwner())
             {
