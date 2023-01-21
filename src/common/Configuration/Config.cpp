@@ -32,7 +32,6 @@ namespace
     std::vector<std::string> _args;
     std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
     std::mutex _configLock;
-    bool _usingDistConfig = false;
 
     // Check system configs like *server.conf*
     bool IsAppConfig(std::string_view fileName)
@@ -255,8 +254,8 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing property {} in all config files, at least the .dist file must contain: \"{} = {}\"",
-                name, name, Acore::ToString(def));
+            LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file.",
+                name, _filename, name, Acore::ToString(def));
         }
 
         return def;
@@ -285,8 +284,8 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing option {}, add \"{} = {}\"",
-                name, name, def);
+            LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file.",
+                name, _filename, name, def);
         }
 
         return def;
@@ -341,7 +340,7 @@ std::vector<std::string> ConfigMgr::GetKeysByString(std::string const& name)
 std::string const ConfigMgr::GetFilename()
 {
     std::lock_guard<std::mutex> lock(_configLock);
-    return _usingDistConfig ? _filename + ".dist" : _filename;
+    return _filename;
 }
 
 std::vector<std::string> const& ConfigMgr::GetArguments() const
@@ -377,16 +376,10 @@ void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::stri
 
 bool ConfigMgr::LoadAppConfigs(bool isReload /*= false*/)
 {
-    // #1 - Load init config file .conf.dist
-    if (!LoadInitial(_filename + ".dist", isReload))
+    // #1 - Load init config file .conf
+    if (!LoadInitial(_filename, isReload))
     {
         return false;
-    }
-
-    // #2 - Load .conf file
-    if (!LoadAdditionalFile(_filename, true, isReload))
-    {
-        _usingDistConfig = true;
     }
 
     return true;
