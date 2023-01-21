@@ -265,7 +265,7 @@ uint16 WardenWin::GetFreePayloadId()
 }
 
 /**
-* Register a payload into cache and returns its payload id.
+* @brief Register a payload into cache and returns its payload id.
 * @param payload The payload to be stored in WardenWin::CachedChecks.
 * @return uint16 The payload id for use with Warden::QueuePayload.
 */
@@ -288,7 +288,7 @@ uint16 WardenWin::RegisterPayload(std::string& payload)
 }
 
 /**
-* Unregister a payload from cache and return if successful.
+* @brief Unregister a payload from cache and return if successful.
 * @param payloadId The payload to removed from WardenWin::CachedChecks.
 * @return bool If the payloadId was present.
 */
@@ -304,7 +304,7 @@ bool WardenWin::UnregisterPayload(uint16 payloadId)
 }
 
 /**
-* Queue the payload into the normal warden checks.
+* @brief Queue the payload into the normal warden checks.
 * @param payloadId The payloadId to be queued.
 */
 void WardenWin::QueuePayload(uint16 payloadId)
@@ -313,7 +313,7 @@ void WardenWin::QueuePayload(uint16 payloadId)
 }
 
 /**
-* Force call RequestChecks() so they are sent immediately, this interrupts warden and breaks result.
+* @brief Force call RequestChecks() so they are sent immediately, this interrupts warden and breaks result.
 */
 void WardenWin::ForceChecks()
 {
