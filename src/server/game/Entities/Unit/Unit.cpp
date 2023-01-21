@@ -14687,6 +14687,16 @@ Unit* Creature::SelectVictim()
         return nullptr;
     }
 
+    // Last chance: creature group
+    if (CreatureGroup* group = GetFormation())
+    {
+        if (Unit* groupTarget = group->GetNewTargetForMember(this))
+        {
+            SetInFront(groupTarget);
+            return groupTarget;
+        }
+    }
+
     // enter in evade mode in other case
     AI()->EnterEvadeMode();
 
