@@ -253,7 +253,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     {
         GetPlayer()->CleanupAfterTaxiFlight();
         GetPlayer()->SetFallInformation(GameTime::GetGameTime().count(), GetPlayer()->GetPositionZ());
-        GetPlayer()->CastSpell(GetPlayer(), 2479, true);
+        GetPlayer()->CastSpell(GetPlayer(), 2479 /*Honorless Target*/, true);
         return;
     }
 }
