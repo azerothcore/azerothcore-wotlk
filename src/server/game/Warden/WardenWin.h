@@ -84,6 +84,7 @@ public:
     uint16 GetFreePayloadId();
     uint16 RegisterPayload(std::string& payload) override;
     void QueuePayload(uint16 payloadId) override;
+    void ForceChecks() override;
     void HandleData(ByteBuffer& buff) override;
 
 private:

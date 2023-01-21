@@ -115,6 +115,7 @@ public:
     virtual void HandleHashResult(ByteBuffer &buff) = 0;
     virtual uint16 RegisterPayload(std::string& payload) = 0;
     virtual void QueuePayload(uint16 payloadId) = 0;
+    virtual void ForceChecks() = 0;
     virtual void RequestChecks() = 0;
     virtual void HandleData(ByteBuffer &buff) = 0;
     bool ProcessLuaCheckResponse(std::string const& msg);
@@ -143,6 +144,7 @@ private:
     bool _dataSent;
     ClientWardenModule* _module;
     bool _initialized;
+    bool _interrupted;
 };
 
 #endif
