@@ -360,7 +360,7 @@ void WardenWin::RequestChecks()
     Acore::Containers::EraseIf(_PendingChecks,
         [this](uint16 id)
         {
-            const WardenCheck* check = sWardenCheckMgr->GetWardenDataById(id);
+            WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
 
             // Anchy: Custom payload should be loaded in if equal to over offset.
             if (!check && id >= WardenPayloadOffset)
