@@ -724,7 +724,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
             case DRIVER_CHECK:
             case MODULE_CHECK:
             {
-                const uint8 byte = 0xE9;
+                uint8 const byte = 0xE9;
                 if (memcmp(buff.contents() + buff.rpos(), &byte, sizeof(uint8)) != 0)
                 {
                     if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)

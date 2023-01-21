@@ -90,7 +90,7 @@ public:
     void ForceChecks() override;
     void HandleData(ByteBuffer& buff) override;
 
-    static uint16 const WardenPayloadOffset = 5000;
+    static uint16 constexpr WardenPayloadOffset = 5000;
 
 private:
     uint32 _serverTicks;
