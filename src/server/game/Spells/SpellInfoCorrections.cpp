@@ -4455,6 +4455,16 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_CASTER;
     });
 
+    // Hunter's Mark
+    ApplySpellFix({ 31615 }, [](SpellInfo* spellInfo)
+    {
+        for (uint8 index = EFFECT_0; index <= EFFECT_1; ++index)
+        {
+            spellInfo->Effects[index].TargetA = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->Effects[index].TargetB = 0;
+        }
+    });
+
     // Hammer of Justice
     // Sonic Burst
     // Concussion Blow
