@@ -82,7 +82,7 @@ public:
     void HandleHashResult(ByteBuffer& buff) override;
     void RequestChecks() override;
     uint16 GetFreePayloadId();
-    uint16 RegisterPayload(const std::string& payload) override;
+    uint16 RegisterPayload(std::string const& payload) override;
     bool UnregisterPayload(uint16 payloadId) override;
     void QueuePayload(uint16 payloadId) override;
     bool GetIsCheckInProgress() override;
@@ -90,7 +90,7 @@ public:
     void ForceChecks() override;
     void HandleData(ByteBuffer& buff) override;
 
-    static const uint16 WardenPayloadOffset = 5000;
+    static uint16 const WardenPayloadOffset = 5000;
 
 private:
     uint32 _serverTicks;

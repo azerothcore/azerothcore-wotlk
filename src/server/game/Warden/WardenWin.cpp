@@ -271,7 +271,7 @@ uint16 WardenWin::GetFreePayloadId()
 * @param payload The payload to be stored in WardenWin::CachedChecks.
 * @return uint16 The payload id for use with Warden::QueuePayload.
 */
-uint16 WardenWin::RegisterPayload(const std::string& payload)
+uint16 WardenWin::RegisterPayload(std::string const& payload)
 {
     uint16 payloadId = GetFreePayloadId();
 
