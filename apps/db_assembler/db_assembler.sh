@@ -53,35 +53,35 @@ invalid()
 
 createDirectory()
 {
-    cd ..
-    cd env/dist/
+    cd ../../env/dist
     if [ -d sql ]; then
         rm -rf sql
         mkdir sql
     else
         mkdir sql
     fi
+    cd ../../
 }
 
 baseFiles()
 {
-    assembler data/sql/base/db_auth/ env/sql/auth_base.sql
-    assembler data/sql/base/db_characters/ env/sql/characters_base.sql
-    assembler data/sql/base/db_world/ env/sql/world_base.sql
+    assembler data/sql/base/db_auth/ env/dist/sql/auth_base.sql
+    assembler data/sql/base/db_characters/ env/dist/sql/characters_base.sql
+    assembler data/sql/base/db_world/ env/dist/sql/world_base.sql
 }
 
 customFiles()
 {
-    assembler data/sql/custom/db_auth/ env/sql/auth_custom.sql
-    assembler data/sql/custom/db_characters/ env/sql/characters_custom.sql
-    assembler data/sql/custom/db_world/ env/sql/world_custom.sql
+    assembler data/sql/custom/db_auth/ env/dist/sql/auth_custom.sql
+    assembler data/sql/custom/db_characters/ env/dist/sql/characters_custom.sql
+    assembler data/sql/custom/db_world/ env/dist/sql/world_custom.sql
 }
 
 updatesFiles()
 {
-    assembler data/sql/updates/db_auth env/sql/auth_updates.sql
-    assembler data/sql/updates/db_characters env/sql/characters_updates.sql
-    assembler data/sql/updates/db_world env/sql/world_updates.sql
+    assembler data/sql/updates/db_auth env/dist/sql/auth_updates.sql
+    assembler data/sql/updates/db_characters env/dist/sql/characters_updates.sql
+    assembler data/sql/updates/db_world env/dist/sql/world_updates.sql
 }
 
 assembler()
@@ -94,8 +94,8 @@ assembler()
 clear
 echo ""
 echo -e "\e[1;37m"
-echo "         Remember that the files are generated in the env folder."
-echo "         That is in the root of the project. Just at the same height as src."
+echo "         Remember that the files are generated in the env/dist/sql folder."
+echo "         This tool is an alternative for those who prefer to execute SQL scripts manually."
 echo -e "\e[1;32m"
 echo "         ------  DB Assembler Version 1  ------"
 echo ""
