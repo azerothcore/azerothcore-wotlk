@@ -289,10 +289,6 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     if (unit->GetNpcFlags() == UNIT_NPC_FLAG_NONE)
         return;
 
-    // xinef: do not allow to open gossip when npc is in combat
-    if (unit->GetNpcFlags() == UNIT_NPC_FLAG_GOSSIP && unit->IsInCombat()) // should work on all flags?
-        return;
-
     // set faction visible if needed
     if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->GetFaction()))
         _player->GetReputationMgr().SetVisible(factionTemplateEntry);

@@ -4465,6 +4465,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         }
     });
 
+    // Game In Session
+    ApplySpellFix({ 39331 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

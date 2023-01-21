@@ -68,6 +68,7 @@ void AddSC_instance_karazhan();              //Karazhan
 void AddSC_boss_servant_quarters();
 void AddSC_boss_attumen();
 void AddSC_boss_curator();
+void AddSC_boss_chess_event();
 void AddSC_boss_maiden_of_virtue();
 void AddSC_boss_shade_of_aran();
 void AddSC_boss_malchezaar();
@@ -220,6 +221,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_servant_quarters();
     AddSC_boss_attumen();
     AddSC_boss_curator();
+    AddSC_boss_chess_event();
     AddSC_boss_maiden_of_virtue();
     AddSC_boss_shade_of_aran();
     AddSC_boss_malchezaar();

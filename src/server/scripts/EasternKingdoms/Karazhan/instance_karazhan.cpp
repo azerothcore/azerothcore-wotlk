@@ -52,6 +52,8 @@ public:
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
             OzDeathCount = 0;
             OptionalBossCount = 0;
+            _chessTeam = 0;
+            _chessGamePhase = CHESS_PHASE_NOT_STARTED;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -79,6 +81,27 @@ public:
                     {
                         creature->Respawn(true);
                     }
+                    break;
+                case NPC_PAWN_H:
+                case NPC_KNIGHT_H:
+                case NPC_QUEEN_H:
+                case NPC_BISHOP_H:
+                case NPC_ROOK_H:
+                case NPC_KING_H:
+                case NPC_PAWN_A:
+                case NPC_KNIGHT_A:
+                case NPC_QUEEN_A:
+                case NPC_BISHOP_A:
+                case NPC_ROOK_A:
+                case NPC_KING_A:
+                    _chessPiecesGUID.insert(creature->GetGUID());
+                    creature->SetHealth(creature->GetMaxHealth());
+                    break;
+                case NPC_CHESS_EVENT_MEDIVH_CHEAT_FIRES:
+                    _medivhCheatFiresGUID.insert(creature->GetGUID());
+                    break;
+                case NPC_ECHO_OF_MEDIVH:
+                    _echoOfMedivhGUID = creature->GetGUID();
                     break;
                 default:
                     break;
@@ -152,6 +175,71 @@ public:
 
                     break;
                 }
+                case DATA_CHESS_EVENT:
+                {
+                    switch (data)
+                    {
+                        case IN_PROGRESS:
+                            DoCastSpellOnPlayers(SPELL_GAME_IN_SESSION);
+                            break;
+                        case DONE:
+                        case FAIL:
+                        case NOT_STARTED:
+                        case SPECIAL:
+                            DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
+                            break;
+                        default:
+                            break;
+                    }                        
+                    break;
+                }
+                case CHESS_EVENT_TEAM:
+                    _chessTeam = data;
+                    break;
+                case DATA_CHESS_REINIT_PIECES:
+                    for (ObjectGuid const& chessPieceGUID : _chessPiecesGUID)
+                    {
+                        if (Creature* piece = instance->GetCreature(chessPieceGUID))
+                        {
+                            piece->RemoveCharmedBy(piece->GetCharmer());
+                            piece->AttackStop();
+                            piece->setDeathState(JUST_RESPAWNED);
+                            piece->SetHealth(piece->GetMaxHealth());
+                            float x, y, z, o;
+                            piece->GetHomePosition(x, y, z, o);
+                            piece->NearTeleportTo(x, y, z, o);
+                            piece->AI()->DoAction(ACTION_CHESS_PIECE_RESET_ORIENTATION);
+                            piece->RemoveAurasDueToSpell(SPELL_HAND_OF_MEDIVH);
+                            piece->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        }
+                    }
+
+                    for (ObjectGuid const& medivhCheatFireGUID : _medivhCheatFiresGUID)
+                    {
+                        if (Creature* fire = instance->GetCreature(medivhCheatFireGUID))
+                        {
+                            fire->DespawnOrUnsummon();
+                        }
+                    }
+
+                    _medivhCheatFiresGUID.clear();
+                    break;
+                case DATA_CHESS_CHECK_PIECES_ALIVE:
+                    for (ObjectGuid const& chessPieceGUID : _chessPiecesGUID)
+                    {
+                        if (Creature* piece = instance->GetCreature(chessPieceGUID))
+                        {
+                            if (!piece->IsAlive())
+                            {
+                                piece->setDeathState(JUST_RESPAWNED);
+                                piece->SetHealth(piece->GetMaxHealth());
+                            }
+                        }
+                    }
+                    break;
+                case DATA_CHESS_GAME_PHASE:
+                    _chessGamePhase = data;
+                    break;
                 default:
                     break;
             }
@@ -180,10 +268,6 @@ public:
                         HandleGameObject(m_uiCurtainGUID, false);
                         DoRespawnCreature(_barnesGUID, true);
                     }
-                    break;
-                case DATA_CHESS:
-                    if (state == DONE)
-                        DoRespawnGameObject(DustCoveredChest, DAY);
                     break;
                 default:
                     break;
@@ -283,6 +367,10 @@ public:
                     return OperaEvent;
                 case DATA_OPERA_OZ_DEATHCOUNT:
                     return OzDeathCount;
+                case CHESS_EVENT_TEAM:
+                    return _chessTeam;
+                case DATA_CHESS_GAME_PHASE:
+                    return _chessGamePhase;
             }
 
             return 0;
@@ -324,6 +412,10 @@ public:
                     return ImageGUID;
                 case DATA_NIGHTBANE:
                     return m_uiNightBaneGUID;
+                case DATA_ECHO_OF_MEDIVH:
+                    return _echoOfMedivhGUID;
+                case DATA_DUST_COVERED_CHEST:
+                    return DustCoveredChest;
             }
 
             return ObjectGuid::Empty;
@@ -333,8 +425,9 @@ public:
         uint32 OperaEvent;
         uint32 OzDeathCount;
         uint32 OptionalBossCount;
-        //uint32 m_auiEncounter[MAX_ENCOUNTERS];
-        //uint32 m_uiTeam;
+        uint32 _chessTeam;
+        uint32 _chessGamePhase;
+
         ObjectGuid m_uiCurtainGUID;
         ObjectGuid m_uiStageDoorLeftGUID;
         ObjectGuid m_uiStageDoorRightGUID;
@@ -342,20 +435,22 @@ public:
         ObjectGuid m_uiTerestianGUID;
         ObjectGuid m_uiMoroesGUID;
         ObjectGuid m_uiNightBaneGUID;
-        //ObjectGuid EchoOfMedivhGUID;
         ObjectGuid m_uiLibraryDoor;                                 // Door at Shade of Aran
         ObjectGuid m_uiMassiveDoor;                                 // Door at Netherspite
         ObjectGuid m_uiSideEntranceDoor;                            // Side Entrance
         ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
         ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
         ObjectGuid m_uiNetherspaceDoor;                             // Door at Malchezaar
-        //ObjectGuid m_uiServantsAccessDoor;                        // Door to Brocken Stair
         ObjectGuid MastersTerraceDoor[2];
         ObjectGuid ImageGUID;
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;
         ObjectGuid _barnesGUID;
+        ObjectGuid _echoOfMedivhGUID;
+
         GuidVector _operaDecorations[EVENT_RAJ];
+        GuidSet _chessPiecesGUID;
+        GuidSet _medivhCheatFiresGUID;
     };
 };
 
