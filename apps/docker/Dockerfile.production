@@ -101,7 +101,9 @@ RUN git clone \
 RUN --mount=type=cache,target=/azerothcore/var/ccache \
     bash apps/compiler/compiler.sh build
 
-# Base runtime for services
+#############################
+# Base runtime for services #
+#############################
 
 FROM skeleton as runtime
 
@@ -122,7 +124,7 @@ RUN apt update && \
     tini libmysqlclient21 \
     libboost-system1.7*.* libboost-filesystem1.7*.* \
     libboost-program-options1.7*.* libboost-iostreams1.7*.* \
-    libboost-regex1.7*.* && \
+    libboost-regex1.7*.* mysql-client && \
     rm -rf /var/lib/apt/lists/*
 
 RUN addgroup --gid $GROUP_ID $DOCKER_USER && \
@@ -133,6 +135,10 @@ RUN chown -R $DOCKER_USER:$DOCKER_USER /run /opt
 
 USER $DOCKER_USER
 
+###############
+# Auth Server #
+###############
+
 FROM runtime as authserver
 LABEL description "AzerothCore Auth Server"
 
@@ -142,6 +148,10 @@ USER $DOCKER_USER
 COPY --from=build /azerothcore/env/dist/bin/authserver /azerothcore/env/dist/bin/authserver
 
 CMD ["/startup.sh", "/azerothcore/env/dist/bin/authserver"]
+
+################
+# World Server #
+################
 
 FROM runtime as worldserver
 
@@ -154,6 +164,10 @@ COPY --from=build /azerothcore/env/dist/bin/worldserver /azerothcore/env/dist/bi
 
 CMD ["/startup.sh", "/azerothcore/env/dist/bin/worldserver"]
 
+##################
+# Map Extractors #
+##################
+
 FROM runtime as tools
 
 LABEL description "AzerothCore Tools"
@@ -163,15 +177,26 @@ USER $DOCKER_USER
 WORKDIR /azerothcore/env/client/
 
 RUN mkdir -pv /azerothcore/env/client/Cameras \
-             /azerothcore/env/client/dbc \
-             /azerothcore/env/client/maps \
-             /azerothcore/env/client/mmaps \
-             /azerothcore/env/client/vmaps
+              /azerothcore/env/client/dbc     \
+              /azerothcore/env/client/maps    \
+              /azerothcore/env/client/mmaps   \
+              /azerothcore/env/client/vmaps
 
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/map_extractor /azerothcore/env/client/map_extractor
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4_assembler /azerothcore/env/client/vmap4_assembler
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4_extractor /azerothcore/env/client/vmap4_extractor
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
+  /azerothcore/env/dist/bin/map_extractor /azerothcore/env/client/map_extractor
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
+  /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
+  /azerothcore/env/dist/bin/vmap4_assembler /azerothcore/env/client/vmap4_assembler
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
+  /azerothcore/env/dist/bin/vmap4_extractor /azerothcore/env/client/vmap4_extractor
+
+#############
+# DB Import #
+#############
 
 FROM runtime as dbimport
 
@@ -184,6 +209,10 @@ COPY --from=build /azerothcore/env/dist/bin/dbimport /azerothcore/env/dist/bin/d
 
 CMD /azerothcore/env/dist/bin/dbimport
 
+###############
+# Client Data #
+###############
+
 FROM skeleton as client-data
 ARG USER_ID=1000
 ARG GROUP_ID=1000
@@ -192,7 +221,7 @@ ARG DOCKER_USER=acore
 LABEL description="AzerothCore client-data"
 
 RUN apt update && \
-    apt install -y tzdata curl unzip && \
+    apt install -y curl unzip && \
     rm -rf /var/lib/apt/lists/*
 
 # set timezone environment variable
@@ -208,11 +237,12 @@ RUN addgroup --gid $GROUP_ID acore && \
     passwd -d acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-ENV DATAPATH=/azerothcore/env/dist/data
-ENV DATAPATH_ZIP=/tmp/data.zip
-
-RUN mkdir -p "$DATAPATH"
 ARG CACHEBUST=1
 USER $DOCKER_USER
-CMD /azerothcore-temp/acore.sh client-data 
+COPY --chown=$DOCKER_USER:$DOCKER_USER \
+  apps/docker/client-data.sh /azerothcore/apps/docker/client-data.sh
+
+RUN chmod +x /azerothcore/apps/docker/client-data.sh
+
+CMD /azerothcore/apps/docker/client-data.sh 
 
