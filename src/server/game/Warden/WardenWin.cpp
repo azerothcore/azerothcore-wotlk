@@ -317,8 +317,11 @@ void WardenWin::QueuePayload(uint16 payloadId)
 */
 void WardenWin::ForceChecks()
 {
-    if(_dataSent)
+    if (_dataSent)
+    {
         _interrupted = true;
+        _interruptCounter++;
+    }
 
     RequestChecks();
 }
@@ -779,7 +782,11 @@ void WardenWin::HandleData(ByteBuffer& buff)
     else
     {
         LOG_DEBUG("warden", "Warden was interrupted by ForceChecks, ignoring results.");
-        _interrupted = false;
+
+        _interruptCounter--;
+
+        if(_interruptCounter == 0)
+            _interrupted = false;
     }
 
     // Set hold off timer, minimum timer should at least be 1 second

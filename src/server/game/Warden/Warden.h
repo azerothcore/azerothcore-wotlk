@@ -146,6 +146,7 @@ private:
     ClientWardenModule* _module;
     bool _initialized;
     bool _interrupted;
+    uint32 _interruptCounter = 0;
 };
 
 #endif
