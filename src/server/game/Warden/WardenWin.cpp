@@ -366,7 +366,9 @@ void WardenWin::RequestChecks()
             if (!check && id >= WardenPayloadOffset)
             {
                 if (CachedChecks.find(id) != CachedChecks.end())
+                {
                     check = &CachedChecks.at(id);
+                }
             }
 
             if (!check)
@@ -728,13 +730,20 @@ void WardenWin::HandleData(ByteBuffer& buff)
                 if (memcmp(buff.contents() + buff.rpos(), &byte, sizeof(uint8)) != 0)
                 {
                     if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
+                    {
                         LOG_DEBUG("warden", "RESULT PAGE_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
+                    }
 
                     if (type == MODULE_CHECK)
+                    {
                         LOG_DEBUG("warden", "RESULT MODULE_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
+                    }
 
                     if (type == DRIVER_CHECK)
+                    {
                         LOG_DEBUG("warden", "RESULT DRIVER_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
+                    }
+
                     checkFailed = checkId;
                     buff.rpos(buff.rpos() + 1);
                     continue;
@@ -743,11 +752,17 @@ void WardenWin::HandleData(ByteBuffer& buff)
                 buff.rpos(buff.rpos() + 1);
 
                 if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
+                {
                     LOG_DEBUG("warden", "RESULT PAGE_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
+                }
                 else if (type == MODULE_CHECK)
+                {
                     LOG_DEBUG("warden", "RESULT MODULE_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
+                }
                 else if (type == DRIVER_CHECK)
+                {
                     LOG_DEBUG("warden", "RESULT DRIVER_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
+                }
                 break;
             }
             case LUA_EVAL_CHECK:
@@ -802,7 +817,9 @@ void WardenWin::HandleData(ByteBuffer& buff)
         _interruptCounter--;
 
         if (_interruptCounter == 0)
+        {
             _interrupted = false;
+        }
     }
 
     // Set hold off timer, minimum timer should at least be 1 second
