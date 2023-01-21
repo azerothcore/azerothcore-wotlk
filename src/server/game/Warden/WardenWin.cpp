@@ -801,7 +801,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
 
         _interruptCounter--;
 
-        if(_interruptCounter == 0)
+        if (_interruptCounter == 0)
             _interrupted = false;
     }
 
