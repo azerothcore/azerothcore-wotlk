@@ -288,6 +288,22 @@ uint16 WardenWin::RegisterPayload(std::string& payload)
 }
 
 /**
+* Unregister a payload from cache and return if successful.
+* @param payloadId The payload to removed from WardenWin::CachedChecks.
+* @return bool If the payloadId was present.
+*/
+bool WardenWin::UnregisterPayload(uint16 payloadId)
+{
+    if (CachedChecks.find(payloadId) == CachedChecks.end())
+    {
+        return false;
+    }
+    
+    CachedChecks.erase(payloadId);
+    return true;
+}
+
+/**
 * Queue the payload into the normal warden checks.
 * @param payloadId The payloadId to be queued.
 */
@@ -330,7 +346,8 @@ void WardenWin::RequestChecks()
             // Anchy: Custom payload should be loaded in if equal to over offset.
             if (!check && id >= _wardenPayloadOffset)
             {
-                check = &CachedChecks.at(id);
+                if(CachedChecks.find(id) != CachedChecks.end())
+                    check = &CachedChecks.at(id);
             }
 
             if (!check)

@@ -83,6 +83,7 @@ public:
     void RequestChecks() override;
     uint16 GetFreePayloadId();
     uint16 RegisterPayload(std::string& payload) override;
+    bool UnregisterPayload(uint16 payloadId) override;
     void QueuePayload(uint16 payloadId) override;
     void ForceChecks() override;
     void HandleData(ByteBuffer& buff) override;
