@@ -327,7 +327,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_ADD_ABILITY1:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1))
                         me->CastSpell(target, SPELL_GREATER_POLYMORPH, false);
                     events.ScheduleEvent(EVENT_ADD_ABILITY1, 20000);
                     break;
@@ -382,7 +382,7 @@ public:
             me->SetInCombatWithZone();
             instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
 
-            events.ScheduleEvent(EVENT_ADD_ABILITY1, 5000);
+            events.ScheduleEvent(EVENT_ADD_ABILITY1, 1);
             events.ScheduleEvent(EVENT_ADD_ABILITY2, 10000);
             events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
         }
