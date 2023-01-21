@@ -348,6 +348,9 @@ void WardenWin::RequestChecks()
                 if (checkType == WARDEN_CHECK_LUA_TYPE && !_QueuedPayloads.empty())
                 {
                     uint16 payloadId = _QueuedPayloads.front();
+
+                    LOG_DEBUG("warden", "Adding custom warden payload '{}' to CurrentChecks.", payloadId);
+
                     _QueuedPayloads.pop_front();
                     _CurrentChecks.push_front(payloadId);
 
