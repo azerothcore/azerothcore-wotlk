@@ -82,9 +82,11 @@ public:
     void HandleHashResult(ByteBuffer& buff) override;
     void RequestChecks() override;
     uint16 GetFreePayloadId();
-    uint16 RegisterPayload(std::string& payload) override;
+    uint16 RegisterPayload(const std::string& payload) override;
     bool UnregisterPayload(uint16 payloadId) override;
     void QueuePayload(uint16 payloadId) override;
+    bool GetIsCheckInProgress() override;
+    uint32 GetPayloadsInQueue() override;
     void ForceChecks() override;
     void HandleData(ByteBuffer& buff) override;
 

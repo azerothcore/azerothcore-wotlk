@@ -252,6 +252,10 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
     _initialized = true;
 }
 
+/**
+* @brief Finds a free payload id in WardenWin::CachedChecks.
+* @return uint16 The free payload id.
+*/
 uint16 WardenWin::GetFreePayloadId()
 {
     uint16 payloadId = _wardenPayloadOffset;
@@ -269,7 +273,7 @@ uint16 WardenWin::GetFreePayloadId()
 * @param payload The payload to be stored in WardenWin::CachedChecks.
 * @return uint16 The payload id for use with Warden::QueuePayload.
 */
-uint16 WardenWin::RegisterPayload(std::string& payload)
+uint16 WardenWin::RegisterPayload(const std::string& payload)
 {
     uint16 payloadId = GetFreePayloadId();
 
@@ -294,13 +298,7 @@ uint16 WardenWin::RegisterPayload(std::string& payload)
 */
 bool WardenWin::UnregisterPayload(uint16 payloadId)
 {
-    if (CachedChecks.find(payloadId) == CachedChecks.end())
-    {
-        return false;
-    }
-
-    CachedChecks.erase(payloadId);
-    return true;
+    return CachedChecks.erase(payloadId);
 }
 
 /**
@@ -326,9 +324,29 @@ void WardenWin::ForceChecks()
     RequestChecks();
 }
 
+/**
+* @brief Gets the warden check state.
+* @return The warden check state.
+*/
+bool WardenWin::GetIsCheckInProgress()
+{
+    return _checkInProgress;
+}
+
+/**
+* @brief Get the amount of payloads waiting in WardenWin::_QueuedPayloads.
+* @return The amount of payloads in queue.
+*/
+uint32 WardenWin::GetPayloadsInQueue()
+{
+    return _QueuedPayloads.size();
+}
+
 void WardenWin::RequestChecks()
 {
     LOG_DEBUG("warden", "Request data");
+
+    _checkInProgress = true;
 
     // If all checks were done, fill the todo list again
     for (uint8 i = 0; i < MAX_WARDEN_CHECK_TYPES; ++i)
@@ -792,4 +810,6 @@ void WardenWin::HandleData(ByteBuffer& buff)
     // Set hold off timer, minimum timer should at least be 1 second
     uint32 const holdOff = sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_CHECK_HOLDOFF);
     _checkTimer = (holdOff < 1 ? 1 : holdOff) * IN_MILLISECONDS;
+
+    _checkInProgress = false;
 }
