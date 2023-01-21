@@ -254,8 +254,8 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_ADD_ABILITY1:
-                    me->CastSpell(me->GetVictim(), SPELL_DARK_DECAY, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY1, 20000);
+                    DoCastVictim(SPELL_DARK_DECAY);
+                    events.ScheduleEvent(EVENT_ADD_ABILITY1, 7000);
                     break;
                 case EVENT_ADD_ABILITY2:
                     me->CastSpell(me, SPELL_SUMMON_WFH, false);
