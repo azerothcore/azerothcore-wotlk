@@ -249,7 +249,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     }
 
     // at this point only 1 node is expected (final destination)
-    if (GetPlayer()->m_taxi.GetPath().size() != 1)
+    if (!GetPlayer()->GetVehicle() && GetPlayer()->m_taxi.GetPath().size() != 1)
     {
         GetPlayer()->CleanupAfterTaxiFlight();
         GetPlayer()->SetFallInformation(GameTime::GetGameTime().count(), GetPlayer()->GetPositionZ());
