@@ -90,6 +90,8 @@ public:
     void ForceChecks() override;
     void HandleData(ByteBuffer& buff) override;
 
+    static const uint16 WardenPayloadOffset = 5000;
+
 private:
     uint32 _serverTicks;
     std::list<uint16> _ChecksTodo[MAX_WARDEN_CHECK_TYPES];
