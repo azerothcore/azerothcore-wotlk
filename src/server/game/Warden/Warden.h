@@ -114,8 +114,12 @@ public:
     virtual void RequestHash() = 0;
     virtual void HandleHashResult(ByteBuffer &buff) = 0;
     virtual uint16 RegisterPayload(std::string const& payload) = 0;
+    virtual bool RegisterPayload(std::string const& payload, uint16 payloadId, bool replace = false) = 0;
     virtual bool UnregisterPayload(uint16 payloadId) = 0;
+    virtual WardenCheck* GetPayloadById(uint16 payloadId) = 0;
     virtual void QueuePayload(uint16 payloadId) = 0;
+    virtual bool DequeuePayload(uint16 payloadId) = 0;
+    virtual void ClearQueuedPayloads() = 0;
     virtual void ForceChecks() = 0;
     virtual bool GetIsCheckInProgress() = 0;
     virtual uint32 GetPayloadsInQueue() = 0;

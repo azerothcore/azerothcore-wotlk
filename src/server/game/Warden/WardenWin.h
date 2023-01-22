@@ -83,8 +83,12 @@ public:
     void RequestChecks() override;
     uint16 GetFreePayloadId();
     uint16 RegisterPayload(std::string const& payload) override;
+    bool RegisterPayload(std::string const& payload, uint16 payloadId, bool replace = false) override;
     bool UnregisterPayload(uint16 payloadId) override;
+    WardenCheck* GetPayloadById(uint16 payloadId) override;
     void QueuePayload(uint16 payloadId) override;
+    bool DequeuePayload(uint16 payloadId) override;
+    void ClearQueuedPayloads() override;
     bool GetIsCheckInProgress() override;
     uint32 GetPayloadsInQueue() override;
     void ForceChecks() override;

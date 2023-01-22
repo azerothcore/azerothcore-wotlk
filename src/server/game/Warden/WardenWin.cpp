@@ -291,6 +291,41 @@ uint16 WardenWin::RegisterPayload(std::string const& payload)
 }
 
 /**
+* @brief Register a payload with id into cache and returns the result.
+* @param payload The payload to be stored in WardenWin::CachedChecks.
+* @param payloadId The payload id to be stored as the key in WardenWin::CachedChecks.
+* @param replace Whether the key should replace an existing entry value.
+* @return bool The payload insertion result. If exists it will return false, otherwise true.
+*/
+bool WardenWin::RegisterPayload(std::string const& payload, uint16 payloadId, bool replace)
+{
+    auto it = CachedChecks.find(payloadId);
+
+    if (it != CachedChecks.end() && !replace)
+    {
+        return false;
+    }
+
+    WardenCheck wCheck;
+    wCheck.Type = LUA_EVAL_CHECK;
+    wCheck.Str = payload;
+    wCheck.CheckId = payloadId;
+
+    std::string idStr = Acore::StringFormat("%04u", payloadId);
+    ASSERT(idStr.size() == 4);
+    std::copy(idStr.begin(), idStr.end(), wCheck.IdStr.begin());
+
+    if (replace)
+    {
+        CachedChecks.erase(payloadId);
+    }
+
+    CachedChecks.emplace(payloadId, wCheck);
+
+    return true;
+}
+
+/**
 * @brief Unregister a payload from cache and return if successful.
 * @param payloadId The payload to removed from WardenWin::CachedChecks.
 * @return bool If the payloadId was present.
@@ -301,12 +336,50 @@ bool WardenWin::UnregisterPayload(uint16 payloadId)
 }
 
 /**
+* @brief Get a payload by id from the WardenWin::CachedChecks.
+* @param payloadId The payload to fetched from WardenWin::CachedChecks.
+* @return WardenCheck* A pointer to the WardenCheck payload.
+*/
+WardenCheck* WardenWin::GetPayloadById(uint16 payloadId)
+{
+    auto it = CachedChecks.find(payloadId);
+
+    if (it != CachedChecks.end())
+    {
+        return &it->second;
+    }
+
+    return nullptr;
+}
+
+/**
 * @brief Queue the payload into the normal warden checks.
 * @param payloadId The payloadId to be queued.
 */
 void WardenWin::QueuePayload(uint16 payloadId)
 {
     _QueuedPayloads.push_back(payloadId);
+}
+
+/**
+* @brief Dequeue the payload from the WardenWin::_QueuedPayloads queue.
+* @param payloadId The payloadId to be dequeued.
+* @return bool If the payload was removed.
+*/
+bool WardenWin::DequeuePayload(uint16 payloadId)
+{
+    size_t const queueSize = _QueuedPayloads.size();
+    _QueuedPayloads.remove(payloadId);
+
+    return queueSize != _QueuedPayloads.size();
+}
+
+/**
+* @brief Clear the payloads from the WardenWin::_QueuedPayloads queue.
+*/
+void WardenWin::ClearQueuedPayloads()
+{
+    _QueuedPayloads.clear();
 }
 
 /**
