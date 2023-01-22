@@ -1,3 +1,4 @@
+-- DB update 2023_01_21_03 -> 2023_01_22_00
 -- Emote States
 DELETE FROM `creature_addon` WHERE (`guid` IN (138669, 138670, 138671, 138672));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
