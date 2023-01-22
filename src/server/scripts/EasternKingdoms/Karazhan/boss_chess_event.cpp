@@ -2063,7 +2063,7 @@ struct npc_chesspiece : public ScriptedAI
             }
         }
 
-        CloseGossipMenuFor(player); 
+        CloseGossipMenuFor(player);
     }
 
 private:
