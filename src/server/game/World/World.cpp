@@ -1279,6 +1279,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_LEAVE_GROUP_ON_LOGOUT] = sConfigMgr->GetOption<bool>("LeaveGroupOnLogout.Enabled", true);
 
+    m_bool_configs[CONFIG_QUEST_POI_ENABLED] = sConfigMgr->GetOption<bool>("QuestPOI.Enabled", true);
+
     m_int_configs[CONFIG_CHANGE_FACTION_MAX_MONEY] = sConfigMgr->GetOption<uint32>("ChangeFaction.MaxMoney", 0);
 
     ///- Read the "Data" directory from the config file
@@ -2675,7 +2677,7 @@ void World::SendGMText(uint32 string_id, ...)
     va_end(ap);
 }
 
-/// DEPRECATED, only for debug purpose. Send a System Message to all players (except self if mentioned)
+/// @deprecated only for debug purpose. Send a System Message to all players (except self if mentioned)
 void World::SendGlobalText(const char* text, WorldSession* self)
 {
     WorldPacket data;
