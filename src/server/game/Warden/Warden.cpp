@@ -305,6 +305,11 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
     return true;
 }
 
+WardenPayloadMgr* Warden::GetPayloadMgr()
+{
+    return &_payloadMgr;
+}
+
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
 {
     if (!_warden || recvData.empty())

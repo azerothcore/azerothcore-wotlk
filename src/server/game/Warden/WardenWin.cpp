@@ -63,7 +63,7 @@ static uint16 GetCheckPacketSize(WardenCheck const* check)
 
     uint16 size = 1;
 
-    if (check->CheckId >= WardenWin::WardenPayloadOffset && check->Type == LUA_EVAL_CHECK)
+    if (check->CheckId >= WardenPayloadMgr::WardenPayloadOffset && check->Type == LUA_EVAL_CHECK)
     {
         // Anchy: Custom payload has no prefix, midfix, postfix.
         size = size + (4 + 1);
@@ -251,135 +251,12 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
 }
 
 /**
-* @brief Finds a free payload id in WardenWin::CachedChecks.
-* @return uint16 The free payload id.
+* @brief Gets the warden check state.
+* @return The warden check state.
 */
-uint16 WardenWin::GetFreePayloadId()
+bool WardenWin::GetIsCheckInProgress()
 {
-    uint16 payloadId = WardenPayloadOffset;
-
-    auto it = CachedChecks.find(payloadId);
-    if (it != CachedChecks.end())
-    {
-        payloadId = std::prev(CachedChecks.end())->first + 1;
-    }
-
-    return payloadId;
-}
-
-/**
-* @brief Register a payload into cache and returns its payload id.
-* @param payload The payload to be stored in WardenWin::CachedChecks.
-* @return uint16 The payload id for use with Warden::QueuePayload.
-*/
-uint16 WardenWin::RegisterPayload(std::string const& payload)
-{
-    uint16 payloadId = GetFreePayloadId();
-
-    WardenCheck wCheck;
-    wCheck.Type = LUA_EVAL_CHECK;
-    wCheck.Str = payload;
-    wCheck.CheckId = payloadId;
-
-    std::string idStr = Acore::StringFormat("%04u", payloadId);
-    ASSERT(idStr.size() == 4);
-    std::copy(idStr.begin(), idStr.end(), wCheck.IdStr.begin());
-
-    CachedChecks.emplace(payloadId, wCheck);
-
-    return payloadId;
-}
-
-/**
-* @brief Register a payload with id into cache and returns the result.
-* @param payload The payload to be stored in WardenWin::CachedChecks.
-* @param payloadId The payload id to be stored as the key in WardenWin::CachedChecks.
-* @param replace Whether the key should replace an existing entry value.
-* @return bool The payload insertion result. If exists it will return false, otherwise true.
-*/
-bool WardenWin::RegisterPayload(std::string const& payload, uint16 payloadId, bool replace)
-{
-    auto it = CachedChecks.find(payloadId);
-
-    if (it != CachedChecks.end() && !replace)
-    {
-        return false;
-    }
-
-    WardenCheck wCheck;
-    wCheck.Type = LUA_EVAL_CHECK;
-    wCheck.Str = payload;
-    wCheck.CheckId = payloadId;
-
-    std::string idStr = Acore::StringFormat("%04u", payloadId);
-    ASSERT(idStr.size() == 4);
-    std::copy(idStr.begin(), idStr.end(), wCheck.IdStr.begin());
-
-    if (replace)
-    {
-        CachedChecks.erase(payloadId);
-    }
-
-    CachedChecks.emplace(payloadId, wCheck);
-
-    return true;
-}
-
-/**
-* @brief Unregister a payload from cache and return if successful.
-* @param payloadId The payload to removed from WardenWin::CachedChecks.
-* @return bool If the payloadId was present.
-*/
-bool WardenWin::UnregisterPayload(uint16 payloadId)
-{
-    return CachedChecks.erase(payloadId);
-}
-
-/**
-* @brief Get a payload by id from the WardenWin::CachedChecks.
-* @param payloadId The payload to fetched from WardenWin::CachedChecks.
-* @return WardenCheck* A pointer to the WardenCheck payload.
-*/
-WardenCheck* WardenWin::GetPayloadById(uint16 payloadId)
-{
-    auto it = CachedChecks.find(payloadId);
-
-    if (it != CachedChecks.end())
-    {
-        return &it->second;
-    }
-
-    return nullptr;
-}
-
-/**
-* @brief Queue the payload into the normal warden checks.
-* @param payloadId The payloadId to be queued.
-*/
-void WardenWin::QueuePayload(uint16 payloadId)
-{
-    _QueuedPayloads.push_back(payloadId);
-}
-
-/**
-* @brief Dequeue the payload from the WardenWin::_QueuedPayloads queue.
-* @param payloadId The payloadId to be dequeued.
-* @return bool If the payload was removed.
-*/
-bool WardenWin::DequeuePayload(uint16 payloadId)
-{
-    size_t const queueSize = _QueuedPayloads.size();
-    _QueuedPayloads.remove(payloadId);
-
-    return queueSize != _QueuedPayloads.size();
-}
-
-/**
-* @brief Clear the payloads from the WardenWin::_QueuedPayloads queue.
-*/
-void WardenWin::ClearQueuedPayloads()
-{
-    _QueuedPayloads.clear();
+    return _checkInProgress;
 }
 
 /**
@@ -394,24 +271,6 @@ void WardenWin::ForceChecks()
     }
 
     RequestChecks();
-}
-
-/**
-* @brief Gets the warden check state.
-* @return The warden check state.
-*/
-bool WardenWin::GetIsCheckInProgress()
-{
-    return _checkInProgress;
-}
-
-/**
-* @brief Get the amount of payloads waiting in WardenWin::_QueuedPayloads.
-* @return The amount of payloads in queue.
-*/
-uint32 WardenWin::GetPayloadsInQueue()
-{
-    return _QueuedPayloads.size();
 }
 
 void WardenWin::RequestChecks()
@@ -437,11 +296,11 @@ void WardenWin::RequestChecks()
             WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
 
             // Anchy: Custom payload should be loaded in if equal to over offset.
-            if (!check && id >= WardenPayloadOffset)
+            if (!check && id >= WardenPayloadMgr::WardenPayloadOffset)
             {
-                if (CachedChecks.find(id) != CachedChecks.end())
+                if (_payloadMgr.CachedChecks.find(id) != _payloadMgr.CachedChecks.end())
                 {
-                    check = &CachedChecks.at(id);
+                    check = &_payloadMgr.CachedChecks.at(id);
                 }
             }
 
@@ -468,13 +327,13 @@ void WardenWin::RequestChecks()
                 }
 
                 // Anchy: Load in any custom payloads if available.
-                if (checkType == WARDEN_CHECK_LUA_TYPE && !_QueuedPayloads.empty())
+                if (checkType == WARDEN_CHECK_LUA_TYPE && !_payloadMgr.QueuedPayloads.empty())
                 {
-                    uint16 payloadId = _QueuedPayloads.front();
+                    uint16 payloadId = _payloadMgr.QueuedPayloads.front();
 
                     LOG_DEBUG("warden", "Adding custom warden payload '{}' to CurrentChecks.", payloadId);
 
-                    _QueuedPayloads.pop_front();
+                    _payloadMgr.QueuedPayloads.pop_front();
                     _CurrentChecks.push_front(payloadId);
 
                     continue;
@@ -504,9 +363,9 @@ void WardenWin::RequestChecks()
             WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
 
             // Anchy: Custom payload should be loaded in if equal to over offset.
-            if (!check && checkId >= WardenPayloadOffset)
+            if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffset)
             {
-                check = &CachedChecks.at(checkId);
+                check = &_payloadMgr.CachedChecks.at(checkId);
             }
 
             if (!hasLuaChecks && check->Type == LUA_EVAL_CHECK)
@@ -548,9 +407,9 @@ void WardenWin::RequestChecks()
             WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
 
             // Anchy: Custom payload should be loaded in if equal to over offset.
-            if (!check && id >= WardenPayloadOffset)
+            if (!check && id >= WardenPayloadMgr::WardenPayloadOffset)
             {
-                check = &CachedChecks.at(id);
+                check = &_payloadMgr.CachedChecks.at(id);
             }
 
             // Remove nullptr if it snuck in from earlier check.
@@ -578,9 +437,9 @@ void WardenWin::RequestChecks()
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
 
         // Anchy: Custom payloads do not have prefix, midfix, postfix.
-        if (!check && checkId >= WardenPayloadOffset)
+        if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffset)
         {
-            check = &CachedChecks.at(checkId);
+            check = &_payloadMgr.CachedChecks.at(checkId);
 
             buff << uint8(check->Str.size());
             buff.append(check->Str.data(), check->Str.size());
@@ -623,9 +482,9 @@ void WardenWin::RequestChecks()
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
 
         // Anchy: Custom payload should be loaded in if equal to over offset.
-        if (!check && checkId >= WardenPayloadOffset)
+        if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffset)
         {
-            check = &CachedChecks.at(checkId);
+            check = &_payloadMgr.CachedChecks.at(checkId);
         }
 
         buff << uint8(check->Type ^ xorByte);
@@ -760,9 +619,9 @@ void WardenWin::HandleData(ByteBuffer& buff)
             WardenCheck const* rd = sWardenCheckMgr->GetWardenDataById(checkId);
 
             // Anchy: Custom payload should be loaded in if equal to over offset.
-            if (!rd && checkId >= WardenPayloadOffset)
+            if (!rd && checkId >= WardenPayloadMgr::WardenPayloadOffset)
             {
-                rd = &CachedChecks.at(checkId);
+                rd = &_payloadMgr.CachedChecks.at(checkId);
             }
 
             uint8 const type = rd->Type;
