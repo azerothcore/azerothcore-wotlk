@@ -1056,10 +1056,12 @@ void bot_ai::MoveToSendPosition(Position const& mpos)
     if (me->GetExactDist(mpos) <= 70.f && me->CanFreeMove())
     {
         SetBotCommandState(BOT_COMMAND_STAY);
+        me->InterruptNonMeleeSpells(true);
         BotMovement(BOT_MOVE_POINT, &mpos, nullptr, false);
         if (botPet && botPet->CanFreeMove())
         {
             botPet->GetBotPetAI()->SetBotCommandState(BOT_COMMAND_STAY);
+            botPet->InterruptNonMeleeSpells(true);
             botPet->GetMotionMaster()->MovePoint(me->GetMapId(), mpos, false);
         }
         sendlastpos.Relocate(me);
