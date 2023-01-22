@@ -4464,13 +4464,13 @@ void SpellMgr::LoadSpellInfoCorrections()
             spellInfo->Effects[index].TargetB = 0;
         }
     });
-    
+
     // Fire Bomb (Halaa)
     ApplySpellFix({ 31961 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_EVADE;
     });
-    
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
