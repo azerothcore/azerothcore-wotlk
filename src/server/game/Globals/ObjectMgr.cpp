@@ -6224,7 +6224,6 @@ void ObjectMgr::LoadQuestGreetings()
     LOG_INFO("server.loading", " ");
 }
 
-/// @bug Does not load Locale greetings. See https://github.com/azerothcore/azerothcore-wotlk/issues/10913
 void ObjectMgr::LoadQuestGreetingsLocales()
 {
     uint32 oldMSTime = getMSTime();
@@ -7743,6 +7742,13 @@ void ObjectMgr::LoadPointsOfInterest()
 
 void ObjectMgr::LoadQuestPOI()
 {
+    if (!sWorld->getBoolConfig(CONFIG_QUEST_POI_ENABLED))
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 quest POI definitions. Disabled by config.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
     uint32 oldMSTime = getMSTime();
 
     _questPOIStore.clear();                              // need for reload case
