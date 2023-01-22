@@ -337,7 +337,7 @@ public:
             }
 
             // If the quest requires money
-            int32 ReqOrRewMoney = quest->GetRewOrReqMoney(player->getLevel());
+            int32 ReqOrRewMoney = quest->GetRewOrReqMoney(player->GetLevel());
             if (ReqOrRewMoney < 0)
             {
                 player->ModifyMoney(-ReqOrRewMoney);

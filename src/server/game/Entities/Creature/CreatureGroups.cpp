@@ -200,6 +200,10 @@ void CreatureGroup::MemberEngagingTarget(Creature* member, Unit* target)
             return;
         }
     }
+    else if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_LEADER_ASSIST_MEMBER)))
+    {
+        return;
+    }
 
     for (auto const& itr : m_members)
     {
@@ -234,7 +238,14 @@ Unit* CreatureGroup::GetNewTargetForMember(Creature* member)
         return nullptr;
     }
 
-    if (member == m_leader && !(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_LEADER_ASSIST_MEMBER)))
+    if (member == m_leader)
+    {
+        if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_MEMBER_ASSIST_LEADER)))
+        {
+            return nullptr;
+        }
+    }
+    else if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_LEADER_ASSIST_MEMBER)))
     {
         return nullptr;
     }
