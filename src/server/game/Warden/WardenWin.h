@@ -100,7 +100,7 @@ private:
     std::list<uint16> _PendingChecks;
 
     std::list<uint16> _QueuedPayloads;
-    std::unordered_map<uint16, WardenCheck> CachedChecks;
+    std::map<uint16, WardenCheck> CachedChecks;
 };
 
 #endif // _WARDEN_WIN_H

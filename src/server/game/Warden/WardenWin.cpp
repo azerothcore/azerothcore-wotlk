@@ -258,9 +258,10 @@ uint16 WardenWin::GetFreePayloadId()
 {
     uint16 payloadId = WardenPayloadOffset;
 
-    while (CachedChecks.find(payloadId) != CachedChecks.end())
+    auto it = CachedChecks.find(payloadId);
+    if (it != CachedChecks.end())
     {
-        payloadId++;
+        payloadId = std::prev(CachedChecks.end())->first + 1;
     }
 
     return payloadId;
