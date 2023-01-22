@@ -769,25 +769,26 @@ bool bot_ai::doCast(Unit* victim, uint32 spellId, TriggerCastFlags flags)
     }
 
     //spells with cast time
-    if (me->isMoving() && !HasBotCommandState(BOT_COMMAND_ISSUED_ORDER) && !HasBotCommandState(BOT_COMMAND_STAY) &&
+    if (me->isMoving() && !(flags & TRIGGERED_CAST_DIRECTLY) && !(m_botSpellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING) &&
+        !m_botSpellInfo->IsAutoRepeatRangedSpell() &&
         ((m_botSpellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT)
         //autorepeat spells missing SPELL_INTERRUPT_FLAG_MOVEMENT
         || spellId == SHOOT_WAND
         //channeled spells missing SPELL_INTERRUPT_FLAG_MOVEMENT
         //Mind Flay (Rank 8)
         || spellId == 48155) &&
-        !(m_botSpellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING) && !m_botSpellInfo->IsAutoRepeatRangedSpell() &&
-        !(flags & TRIGGERED_CAST_DIRECTLY) && (m_botSpellInfo->IsChanneled() || m_botSpellInfo->CalcCastTime()))
+        (m_botSpellInfo->IsChanneled() || m_botSpellInfo->CalcCastTime()))
     {
-        if (JumpingOrFalling())
-            return false;
-        if (!me->GetVictim() && me->IsInWorld() && (me->GetMap()->IsRaid() || me->GetMap()->IsHeroic()))
-            return false;
-        if (!m_botSpellInfo->HasEffect(SPELL_EFFECT_HEAL) && Rand() > (IAmFree() ? 80 : 50))
-            return false;
+        if (!HasBotCommandState(BOT_COMMAND_ISSUED_ORDER))
+        {
+            if (JumpingOrFalling() || HasBotCommandState(BOT_COMMAND_STAY))
+                return false;
+            if (!me->GetVictim() && me->IsInWorld() && (me->GetMap()->IsRaid() || me->GetMap()->IsHeroic()))
+                return false;
+            if (!m_botSpellInfo->HasEffect(SPELL_EFFECT_HEAL) && Rand() > (IAmFree() ? 80 : 50))
+                return false;
+        }
 
-        //if (m_botSpellInfo->IsChanneled())
-        //    TC_LOG_ERROR("entities.player", "bot_ai::doCast(): spell %u interrupts movement", spellId);
         me->BotStopMovement();
     }
 

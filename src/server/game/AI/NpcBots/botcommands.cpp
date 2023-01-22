@@ -1098,7 +1098,7 @@ public:
         {
             Unit const* target = handler->getSelectedCreature();
             Creature const* bot = target ? owner->GetBotMgr()->GetBot(target->GetGUID()) : nullptr;
-            if (bot && bot->IsAlive())
+            if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
                 bot->GetBotAI()->SetBotAwaitState(BOT_AWAIT_SEND);
                 return return_success(handler, { bot->GetName() });
@@ -1110,7 +1110,7 @@ public:
         for (decltype(names)::value_type::value_type name : *names)
         {
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
-            if (bot && bot->IsAlive())
+            if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
                 ++count;
                 bot->GetBotAI()->SetBotAwaitState(BOT_AWAIT_SEND);
@@ -1155,7 +1155,7 @@ public:
         {
             Unit const* target = handler->getSelectedCreature();
             Creature const* bot = target ? owner->GetBotMgr()->GetBot(target->GetGUID()) : nullptr;
-            if (bot && bot->IsAlive())
+            if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
                 bot->GetBotAI()->MoveToLastSendPosition();
                 return return_success(handler, { bot->GetName() });
@@ -1167,7 +1167,7 @@ public:
         for (decltype(names)::value_type::value_type name : *names)
         {
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
-            if (bot && bot->IsAlive())
+            if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
                 ++count;
                 bot->GetBotAI()->MoveToLastSendPosition();
@@ -1268,7 +1268,7 @@ public:
         {
             Unit const* target = handler->getSelectedCreature();
             Creature const* bot = target ? owner->GetBotMgr()->GetBot(target->GetGUID()) : nullptr;
-            if (bot && bot->IsAlive())
+            if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
                 bot->GetBotAI()->MoveToSendPosition(*point_id - 1);
                 return return_success(handler, { bot->GetName() });
@@ -1280,7 +1280,7 @@ public:
         for (decltype(names)::value_type::value_type name : *names)
         {
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
-            if (bot && bot->IsAlive())
+            if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
                 ++count;
                 bot->GetBotAI()->MoveToSendPosition(*point_id - 1);
