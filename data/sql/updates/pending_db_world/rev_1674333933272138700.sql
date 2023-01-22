@@ -229,6 +229,7 @@ INSERT INTO `creature_text` VALUES
 (16816,16,0,'The halls of Karazhan shake, as the curse binding the doors of the Gamesman\'s Hall is lifted.',16,0,100,0,0,0,0,0,'Echo of Medivh - Event Ended');
 
 DELETE FROM `gossip_menu_option` WHERE `menuid` IN (8404,7413,8354,8345,8346,8347,8348,8349,8355,8362,8366,8367,8368);
+UPDATE `creature_template` SET `npcflag`=0 WHERE `entry` IN (17469,17211,21748,21664,21750,21683,21747,21682,21726,21160,21752,21684);
 
 UPDATE `creature_template` SET `flags_extra`=130 WHERE `entry` IN (17208,17305,17317,17316);
 

@@ -64,10 +64,9 @@ enum KZDataTypes
     // Chess Event
     CHESS_EVENT_TEAM                = 32,
     DATA_CHESS_REINIT_PIECES        = 33,
-    DATA_CHESS_CHECK_PIECES_ALIVE   = 34,
-    DATA_CHESS_GAME_PHASE           = 35,
-    DATA_ECHO_OF_MEDIVH             = 36,
-    DATA_DUST_COVERED_CHEST         = 37
+    DATA_CHESS_GAME_PHASE           = 34,
+    DATA_ECHO_OF_MEDIVH             = 35,
+    DATA_DUST_COVERED_CHEST         = 36
 };
 
 enum KZOperaEvents
@@ -172,6 +171,13 @@ enum KarazhanChessGamePhase
     CHESS_PHASE_PVE_FINISHED    = 4,
     CHESS_PHASE_PVP_WARMUP      = 5,
     CHESS_PHASE_INPROGRESS_PVP  = 6  // Get back to PVE_FINISHED after that
+};
+
+enum KarazhanChessGameFactions
+{
+    CHESS_FACTION_HORDE         = 1689,
+    CHESS_FACTION_ALLIANCE      = 1690,
+    CHESS_FACTION_BOTH          = 536
 };
 
 template <class AI, class T>

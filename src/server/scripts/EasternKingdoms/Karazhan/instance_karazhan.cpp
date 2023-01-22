@@ -52,8 +52,10 @@ public:
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
             OzDeathCount = 0;
             OptionalBossCount = 0;
-            _chessTeam = 0;
+
+            _chessTeam = TEAM_NEUTRAL;
             _chessGamePhase = CHESS_PHASE_NOT_STARTED;
+            _chessEvent = NOT_STARTED;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -177,18 +179,42 @@ public:
                 }
                 case DATA_CHESS_EVENT:
                 {
+                    _chessEvent = data;
+
                     switch (data)
                     {
                         case IN_PROGRESS:
-                            DoCastSpellOnPlayers(SPELL_GAME_IN_SESSION);
-                            break;
-                        case DONE:
-                        case FAIL:
-                        case NOT_STARTED:
                         case SPECIAL:
-                            DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
+                        {
+                            DoCastSpellOnPlayers(SPELL_GAME_IN_SESSION);
+                            for (ObjectGuid const& chessPieceGUID : _chessPiecesGUID)
+                            {
+                                if (Creature* piece = instance->GetCreature(chessPieceGUID))
+                                {
+                                    if (_chessTeam == TEAM_ALLIANCE)
+                                    {
+                                        if (piece->GetFaction() == CHESS_FACTION_ALLIANCE)
+                                        {
+                                            piece->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                                        }
+                                    }
+                                    else if (_chessTeam == TEAM_HORDE)
+                                    {
+                                        if (piece->GetFaction() == CHESS_FACTION_HORDE)
+                                        {
+                                            piece->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        piece->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                                    }
+                                }
+                            }
                             break;
+                        }
                         default:
+                            DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
                             break;
                     }                        
                     break;
@@ -201,16 +227,16 @@ public:
                     {
                         if (Creature* piece = instance->GetCreature(chessPieceGUID))
                         {
-                            piece->RemoveCharmedBy(piece->GetCharmer());
-                            piece->AttackStop();
+                            piece->RemoveAllAuras();
                             piece->setDeathState(JUST_RESPAWNED);
                             piece->SetHealth(piece->GetMaxHealth());
                             float x, y, z, o;
                             piece->GetHomePosition(x, y, z, o);
                             piece->NearTeleportTo(x, y, z, o);
                             piece->AI()->DoAction(ACTION_CHESS_PIECE_RESET_ORIENTATION);
-                            piece->RemoveAurasDueToSpell(SPELL_HAND_OF_MEDIVH);
-                            piece->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            piece->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            piece->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                            piece->AI()->Reset();
                         }
                     }
 
@@ -223,19 +249,6 @@ public:
                     }
 
                     _medivhCheatFiresGUID.clear();
-                    break;
-                case DATA_CHESS_CHECK_PIECES_ALIVE:
-                    for (ObjectGuid const& chessPieceGUID : _chessPiecesGUID)
-                    {
-                        if (Creature* piece = instance->GetCreature(chessPieceGUID))
-                        {
-                            if (!piece->IsAlive())
-                            {
-                                piece->setDeathState(JUST_RESPAWNED);
-                                piece->SetHealth(piece->GetMaxHealth());
-                            }
-                        }
-                    }
                     break;
                 case DATA_CHESS_GAME_PHASE:
                     _chessGamePhase = data;
@@ -371,6 +384,8 @@ public:
                     return _chessTeam;
                 case DATA_CHESS_GAME_PHASE:
                     return _chessGamePhase;
+                case DATA_CHESS_EVENT:
+                    return _chessEvent;
             }
 
             return 0;
@@ -427,6 +442,7 @@ public:
         uint32 OptionalBossCount;
         uint32 _chessTeam;
         uint32 _chessGamePhase;
+        uint32 _chessEvent;
 
         ObjectGuid m_uiCurtainGUID;
         ObjectGuid m_uiStageDoorLeftGUID;
