@@ -149,12 +149,9 @@ function comp_compile() {
         echo "Generating confs..."
         for dockerdist in "$DOCKER_ETC_FOLDER"/*.dockerdist; do
           base_conf="$(echo "$dockerdist" | rev | cut -f1 -d. --complement | rev)"
-          # Move configs from .conf.dockerdist to .conf.dist
-          conf_layer "$dockerdist" "$base_conf.dist" " # Copied from dockerdist"
-          conf_layer "$base_conf.user" "$base_conf.dist" " # Copied from user"
-          if ! cmp -s "$base_conf.dist" "$base_conf"; then
-            cp -v --backup --suffix ".$(date +%s)" "$base_conf.dist" "$base_conf"
-          fi
+          cp -nv "$base_conf.dist" "$base_conf"
+          # Move configs from .conf.dockerdist to .conf
+          conf_layer "$dockerdist" "$base_conf" " # Copied from dockerdist"
         done
       fi
 
