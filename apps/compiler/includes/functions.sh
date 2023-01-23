@@ -147,7 +147,6 @@ function comp_compile() {
 
       if [[ $DOCKER = 1 && $DISABLE_DOCKER_CONF != 1 ]]; then
         echo "Generating confs..."
-        set -x
         for dockerdist in "$DOCKER_ETC_FOLDER"/*.dockerdist; do
           base_conf="$(echo "$dockerdist" | rev | cut -f1 -d. --complement | rev)"
           # Move configs from .conf.dockerdist to .conf.dist
@@ -157,7 +156,6 @@ function comp_compile() {
             cp -v --backup --suffix ".$(date +%s)" "$base_conf.dist" "$base_conf"
           fi
         done
-        set +x
       fi
 
       echo "Done"
