@@ -94,7 +94,7 @@ assembler()
 clear
 echo ""
 echo -e "\e[1;33m"
-echo "   We do not recommend using this script."
+echo "   This is not the recommended update method."
 echo "   The best option is to enable updates in the configuration file."
 echo "   Remember that the files are generated in the env/dist/sql folder."
 echo "   This tool is an alternative for those who prefer to execute SQL scripts manually."
@@ -108,7 +108,7 @@ echo "   4. Assemble only updates files"
 echo "   5. Exit"
 echo ""
 echo -e "\e[1;37m"
-echo "   Choose a number from 1 to 5:"
+echo "Choose a number from 1 to 5:"
 read -r opcion
 
 case $opcion in
