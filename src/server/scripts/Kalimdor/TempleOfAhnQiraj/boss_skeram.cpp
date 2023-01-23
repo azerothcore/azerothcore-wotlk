@@ -134,6 +134,8 @@ struct boss_skeram : public BossAI
         {
             _JustDied();
             Talk(SAY_DEATH);
+            if (me->GetMap() && me->GetMap()->ToInstanceMap())
+                me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
         }
         else
             me->RemoveCorpse();
@@ -176,7 +178,7 @@ struct boss_skeram : public BossAI
                     break;
                 case EVENT_BLINK:
                     DoCast(me, BlinkSpells[urand(0, 2)]);
-                    DoResetThreat();
+                    DoResetThreatList();
                     events.ScheduleEvent(EVENT_BLINK, 10s, 30s);
                     break;
                 case EVENT_EARTH_SHOCK:
@@ -194,7 +196,7 @@ struct boss_skeram : public BossAI
                             DoTeleport(image);
                         }
                     }
-                    DoResetThreat();
+                    DoResetThreatList();
                     events.RescheduleEvent(EVENT_BLINK, 10s, 30s);
                     break;
                 case EVENT_INIT_IMAGE:

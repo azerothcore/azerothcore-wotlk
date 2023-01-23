@@ -19,6 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 
 enum Texts
 {
@@ -34,6 +35,13 @@ enum Spells
     SPELL_FULL_HEALTH       = 17683,
     SPELL_FIRE_NOVA_VISUAL  = 19823,
     SPELL_PLAY_DEAD_PACIFY  = 19951,    // Server side spell
+
+    // Lava Spawn
+    SPELL_FIREBALL          = 19391,
+    SPELL_SPLIT_1           = 19569,
+    SPELL_SPLIT_2           = 19570,
+
+    TALK_0                  = 0
 };
 
 // Serrated Bites timer may be wrong
@@ -207,10 +215,60 @@ public:
     }
 };
 
+struct npc_lava_spawn : public ScriptedAI
+{
+    npc_lava_spawn(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(15s, [this](TaskContext context)
+        {
+            std::list<Creature*> lavaSpawns;
+            me->GetCreatureListWithEntryInGrid(lavaSpawns, me->GetEntry(), 100.f);
+            if (lavaSpawns.size() < 16)
+            {
+                Talk(TALK_0);
+
+                DoCastSelf(SPELL_SPLIT_1, true);
+                DoCastSelf(SPELL_SPLIT_2, true);
+
+                me->DespawnOrUnsummon();
+            }
+            else
+            {
+                context.Repeat(15s);
+            }
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff);
+
+        DoSpellAttackIfReady(SPELL_FIREBALL);
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 void AddSC_molten_core()
 {
     // Creatures
     new npc_mc_core_hound();
+    RegisterCreatureAI(npc_lava_spawn);
 
     // Spells
     new spell_mc_play_dead();

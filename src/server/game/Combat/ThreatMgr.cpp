@@ -46,7 +46,7 @@ float ThreatCalcHelper::calcThreat(Unit* hatedUnit, float threat, SpellSchoolMas
                 return threat;
 
         if (Player* modOwner = hatedUnit->GetSpellModOwner())
-            modOwner->ApplySpellMod<SPELLMOD_THREAT>(threatSpell->Id, threat);
+            modOwner->ApplySpellMod(threatSpell->Id, SPELLMOD_THREAT, threat);
     }
 
     return hatedUnit->ApplyTotalThreatModifier(threat, schoolMask);
@@ -454,11 +454,27 @@ void ThreatMgr::AddThreat(Unit* victim, float threat, SpellSchoolMask schoolMask
 void ThreatMgr::DoAddThreat(Unit* victim, float threat)
 {
     uint32 redirectThreadPct = victim->GetRedirectThreatPercent();
+    Unit* redirectTarget = victim->GetRedirectThreatTarget();
+
+    // Personal Spawns from same summoner can aggro each other
+    if (TempSummon* tempSummonVictim = victim->ToTempSummon())
+    {
+        if (tempSummonVictim->IsVisibleBySummonerOnly())
+        {
+            if (!GetOwner()->ToTempSummon() ||
+                !GetOwner()->ToTempSummon()->IsVisibleBySummonerOnly() ||
+                tempSummonVictim->GetSummonerGUID() != GetOwner()->ToTempSummon()->GetSummonerGUID())
+            {
+                redirectThreadPct = 100;
+                redirectTarget = tempSummonVictim->GetSummonerUnit();
+            }
+        }
+    }
 
     // must check > 0.0f, otherwise dead loop
     if (threat > 0.0f && redirectThreadPct)
     {
-        if (Unit* redirectTarget = victim->GetRedirectThreatTarget())
+        if (redirectTarget)
         {
             float redirectThreat = CalculatePct(threat, redirectThreadPct);
             threat -= redirectThreat;

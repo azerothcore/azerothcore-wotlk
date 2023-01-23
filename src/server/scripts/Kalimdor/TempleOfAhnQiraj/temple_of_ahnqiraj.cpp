@@ -33,7 +33,7 @@ enum Spells
     SPELL_SHADOW_STORM                  = 26555,
     SPELL_THUNDERCLAP                   = 26554,
     SPELL_ENRAGE                        = 14204,
-    SPELL_EXPLODE                       = 25699,
+    SPELL_EXPLODE                       = 25698,
     SPELL_SUMMON_WARRIOR                = 17431,
     SPELL_SUMMON_SWARMGUARD             = 17430,
     SPELL_SUMMON_LARGE_OBSIDIAN_CHUNK   = 27630, // Server-side
@@ -47,7 +47,7 @@ enum Spells
 
     // Obsidian Eradicator
     SPELL_SHOCK_BLAST                   = 26458,
-    SPELL_DRAIN_MANA                    = 25671,
+    SPELL_DRAIN_MANA_ERADICATOR         = 25755,
     SPELL_DRAIN_MANA_VISUAL             = 26639,
 
     // Anubisath Warder
@@ -59,6 +59,7 @@ enum Spells
 
     // Obsidian Nullifier
     SPELL_NULLIFY                       = 26552,
+    SPELL_DRAIN_MANA_NULLIFIER          = 25671,
     SPELL_CLEAVE                        = 40504,
 
     // Qiraji Scorpion
@@ -242,14 +243,14 @@ struct npc_obsidian_eradicator : public ScriptedAI
     {
         _scheduler.CancelAll();
         me->SetPower(POWER_MANA, 0);
-        _targets.clear();
+        _targetGUIDs.clear();
     }
 
     void EnterCombat(Unit* /*who*/) override
     {
         _scheduler.Schedule(3500ms, [this](TaskContext context)
         {
-            if (_targets.empty())
+            if (_targetGUIDs.empty())
             {
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -258,22 +259,25 @@ struct npc_obsidian_eradicator : public ScriptedAI
                     {
                         if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
                         {
-                            _targets.push_back(player);
+                            _targetGUIDs.push_back(player->GetGUID());
                         }
                     }
                 }
 
-                Acore::Containers::RandomResize(_targets, 10);
+                Acore::Containers::RandomResize(_targetGUIDs, 10);
             }
 
-            for (Unit* target : _targets)
+            for (ObjectGuid guid : _targetGUIDs)
             {
-                DoCast(target, SPELL_DRAIN_MANA, true);
+                if (Unit* target = ObjectAccessor::GetUnit(*me, guid))
+                {
+                    DoCast(target, SPELL_DRAIN_MANA_ERADICATOR, true);
+                }
             }
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_SHOCK_BLAST, true);
+                DoCastAOE(SPELL_SHOCK_BLAST);
             }
 
             context.Repeat(3500ms);
@@ -293,7 +297,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
-    std::list<Player*> _targets;
+    GuidList _targetGUIDs;
 };
 
 struct npc_anubisath_warder : public ScriptedAI
@@ -375,14 +379,14 @@ struct npc_obsidian_nullifier : public ScriptedAI
     {
         _scheduler.CancelAll();
         me->SetPower(POWER_MANA, 0);
-        _targets.clear();
+        _targetGUIDs.clear();
     }
 
     void EnterCombat(Unit* /*who*/) override
     {
         _scheduler.Schedule(6s, [this](TaskContext context)
         {
-            if (_targets.empty())
+            if (_targetGUIDs.empty())
             {
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -391,22 +395,25 @@ struct npc_obsidian_nullifier : public ScriptedAI
                     {
                         if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
                         {
-                            _targets.push_back(player);
+                            _targetGUIDs.push_back(player->GetGUID());
                         }
                     }
                 }
 
-                Acore::Containers::RandomResize(_targets, 11);
+                Acore::Containers::RandomResize(_targetGUIDs, 11);
             }
 
-            for (Unit* target : _targets)
+            for (ObjectGuid guid : _targetGUIDs)
             {
-                DoCast(target, SPELL_DRAIN_MANA, true);
+                if (Unit* target = ObjectAccessor::GetUnit(*me, guid))
+                {
+                    DoCast(target, SPELL_DRAIN_MANA_NULLIFIER, true);
+                }
             }
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_NULLIFY, true);
+                DoCastAOE(SPELL_NULLIFY);
             }
 
             context.Repeat(6s);
@@ -431,7 +438,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
-    std::list<Player*> _targets;
+    GuidList _targetGUIDs;
 };
 
 struct npc_ahnqiraji_critter : public ScriptedAI
@@ -445,6 +452,19 @@ struct npc_ahnqiraji_critter : public ScriptedAI
         me->RestoreFaction();
 
         _scheduler.CancelAll();
+
+        // Don't attack nearby players randomly if they are the Twin's pet bugs.
+        if (CreatureData const* crData = me->GetCreatureData())
+        {
+            ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(crData->id1, me->GetSpawnId());
+            ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+
+            if (targetGuid.GetEntry() == NPC_VEKLOR)
+            {
+                return;
+            }
+        }
+
         _scheduler.Schedule(100ms, [this](TaskContext context)
         {
             if (Player* player = me->SelectNearestPlayer(10.f))

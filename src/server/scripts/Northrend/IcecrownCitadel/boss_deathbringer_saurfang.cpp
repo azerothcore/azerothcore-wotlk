@@ -465,7 +465,7 @@ public:
             switch (action)
             {
                 case ACTION_MARK_OF_THE_FALLEN_CHAMPION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, -SPELL_MARK_OF_THE_FALLEN_CHAMPION))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_MARK_OF_THE_FALLEN_CHAMPION))
                     {
                         ++_fallenChampionCastCount;
                         me->CastSpell(target, SPELL_MARK_OF_THE_FALLEN_CHAMPION, false);
@@ -750,8 +750,8 @@ public:
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready to go, High Overlord. The Lich King must fall!", 631, -ACTION_START_EVENT);
-            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+            AddGossipItemFor(player, 10953, 0, GOSSIP_SENDER_INFO, -ACTION_START_EVENT);
+            SendGossipMenuFor(player, player->GetGossipTextId(10953, creature), creature->GetGUID());
         }
 
         return true;
@@ -964,8 +964,8 @@ public:
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
         {
-            AddGossipItemFor(player, 0, "Let it begin...", 631, -ACTION_START_EVENT + 1);
-            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+            AddGossipItemFor(player, 10933, 0, GOSSIP_SENDER_INFO, -ACTION_START_EVENT + 1);
+            SendGossipMenuFor(player, player->GetGossipTextId(10933, creature), creature->GetGUID());
         }
 
         return true;
@@ -1061,7 +1061,7 @@ public:
         {
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
             SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_HIT_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
+            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
         }
 
         void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
@@ -1115,7 +1115,7 @@ public:
         {
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
             SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_HIT_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
+            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
         }
 
         void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
@@ -1404,41 +1404,6 @@ public:
     }
 };
 
-// 72176 - Blood Beast's Blood Link
-class spell_deathbringer_blood_beast_blood_link : public SpellScriptLoader
-{
-public:
-    spell_deathbringer_blood_beast_blood_link() : SpellScriptLoader("spell_deathbringer_blood_beast_blood_link") { }
-
-    class spell_deathbringer_blood_beast_blood_link_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_deathbringer_blood_beast_blood_link_AuraScript);
-
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            if (!sSpellMgr->GetSpellInfo(SPELL_BLOOD_LINK_DUMMY))
-                return false;
-            return true;
-        }
-
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-            eventInfo.GetProcTarget()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, 3, (Unit*)nullptr, true, nullptr, aurEff);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_beast_blood_link_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_deathbringer_blood_beast_blood_link_AuraScript();
-    }
-};
-
 void AddSC_boss_deathbringer_saurfang()
 {
     new boss_deathbringer_saurfang();
@@ -1453,5 +1418,4 @@ void AddSC_boss_deathbringer_saurfang()
     new spell_deathbringer_boiling_blood();
     new achievement_ive_gone_and_made_a_mess();
     new npc_icc_blood_beast();
-    new spell_deathbringer_blood_beast_blood_link();
 }

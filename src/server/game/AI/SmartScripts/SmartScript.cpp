@@ -859,7 +859,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_GROUPEVENTHAPPENS: Player {}, group credit for quest {}",
-                        unit->GetGUID().ToString(), e.action.quest.quest);
+                        player->GetGUID().ToString(), e.action.quest.quest);
                 }
 
                 // Special handling for vehicles
@@ -1267,9 +1267,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_SUMMON_CREATURE:
         {
-            WorldObject* summoner = GetBaseObject() ? GetBaseObject() : unit;
+            EnumFlag<SmartActionSummonCreatureFlags> flags(static_cast<SmartActionSummonCreatureFlags>(e.action.summonCreature.flags));
+            bool preferUnit = flags.HasFlag(SmartActionSummonCreatureFlags::PreferUnit);
+            WorldObject* summoner = preferUnit ? unit : Coalesce<WorldObject>(GetBaseObject(), unit);
             if (!summoner)
                 break;
+
+            bool personalSpawn = flags.HasFlag(SmartActionSummonCreatureFlags::PersonalSpawn);
 
             if (e.GetTargetType() == SMART_TARGET_RANDOM_POINT)
             {
@@ -1282,7 +1286,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         randomPoint = me->GetRandomPoint(me->GetPosition(), range);
                     else
                         randomPoint = me->GetRandomPoint(srcPos, range);
-                    if (Creature* summon = summoner->SummonCreature(e.action.summonCreature.creature, randomPoint, (TempSummonType)e.action.summonCreature.type, e.action.summonCreature.duration))
+                    if (Creature* summon = summoner->SummonCreature(e.action.summonCreature.creature, randomPoint, (TempSummonType)e.action.summonCreature.type, e.action.summonCreature.duration, 0, nullptr, personalSpawn))
                     {
                         if (unit && e.action.summonCreature.attackInvoker)
                             summon->AI()->AttackStart(unit);
@@ -1301,7 +1305,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 y += e.target.y;
                 z += e.target.z;
                 o += e.target.o;
-                if (Creature* summon = summoner->SummonCreature(e.action.summonCreature.creature, x, y, z, o, (TempSummonType)e.action.summonCreature.type, e.action.summonCreature.duration))
+                if (Creature* summon = summoner->SummonCreature(e.action.summonCreature.creature, x, y, z, o, (TempSummonType)e.action.summonCreature.type, e.action.summonCreature.duration, nullptr, personalSpawn))
                 {
                     if (e.action.summonCreature.attackInvoker == 2) // pussywizard: proper attackInvoker implementation
                         summon->AI()->AttackStart(unit);
@@ -1950,7 +1954,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
             }
 
-            if (!foundTarget && me && IsCreature(me))
+            if (!foundTarget && me && IsCreature(me) && me->IsAlive())
             {
                 if (e.action.moveRandom.distance)
                     me->GetMotionMaster()->MoveRandom(float(e.action.moveRandom.distance));
@@ -3334,6 +3338,24 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     }
                 }
             }
+            break;
+        }
+        case SMART_TARGET_SUMMONED_CREATURES:
+        {
+            if (me)
+            {
+                for (ObjectGuid const& guid : _summonList)
+                {
+                    if (!e.target.summonedCreatures.entry || guid.GetEntry() == e.target.summonedCreatures.entry)
+                    {
+                        if (Creature* creature = me->GetMap()->GetCreature(guid))
+                        {
+                            targets.push_back(creature);
+                        }
+                    }
+                }
+            }
+            break;
         }
         case SMART_TARGET_NONE:
         case SMART_TARGET_POSITION:
@@ -3493,16 +3515,21 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 break;
             }
         case SMART_EVENT_FRIENDLY_MISSING_BUFF:
+        {
+            if (e.event.missingBuff.onlyInCombat && !me->IsEngaged())
             {
-                std::vector<Creature*> creatures;
-                DoFindFriendlyMissingBuff(creatures, float(e.event.missingBuff.radius), e.event.missingBuff.spell);
-
-                if (creatures.empty())
-                    return;
-
-                ProcessTimedAction(e, e.event.missingBuff.repeatMin, e.event.missingBuff.repeatMax, Acore::Containers::SelectRandomContainerElement(creatures));
-                break;
+                return;
             }
+
+            std::vector<Creature*> creatures;
+            DoFindFriendlyMissingBuff(creatures, float(e.event.missingBuff.radius), e.event.missingBuff.spell);
+
+            if (creatures.empty())
+                return;
+
+            ProcessTimedAction(e, e.event.missingBuff.repeatMin, e.event.missingBuff.repeatMax, Acore::Containers::SelectRandomContainerElement(creatures));
+            break;
+        }
         case SMART_EVENT_HAS_AURA:
             {
                 if (!me)
@@ -4559,4 +4586,14 @@ bool SmartScript::IsInPhase(uint32 p) const
     }
 
     return ((1 << (mEventPhase - 1)) & p) != 0;
+}
+
+void SmartScript::AddCreatureSummon(ObjectGuid const& guid)
+{
+    _summonList.insert(guid);
+}
+
+void SmartScript::RemoveCreatureSummon(ObjectGuid const& guid)
+{
+    _summonList.erase(guid);
 }

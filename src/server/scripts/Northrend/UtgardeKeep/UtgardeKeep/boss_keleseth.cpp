@@ -197,7 +197,7 @@ public:
                     events.RepeatEvent(urand(4000, 5000));
                     break;
                 case EVENT_FROST_TOMB:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
                         if( !target->HasAura(SPELL_FROST_TOMB_AURA) )
                         {
                             Talk(SAY_FROST_TOMB_EMOTE, target);

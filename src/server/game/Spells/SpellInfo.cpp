@@ -414,7 +414,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
     // xinef: added basePointsPerLevel check
     if (caster && basePointsPerLevel != 0.0f)
     {
-        int32 level = int32(caster->getLevel());
+        int32 level = int32(caster->GetLevel());
         if (level > int32(_spellInfo->MaxLevel) && _spellInfo->MaxLevel > 0)
             level = int32(_spellInfo->MaxLevel);
         else if (level < int32(_spellInfo->BaseLevel))
@@ -458,7 +458,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
 
         // amount multiplication based on caster's level
         if (!caster->IsControlledByPlayer() &&
-                _spellInfo->SpellLevel && _spellInfo->SpellLevel != caster->getLevel() &&
+                _spellInfo->SpellLevel && _spellInfo->SpellLevel != caster->GetLevel() &&
                 !basePointsPerLevel && _spellInfo->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL))
         {
             bool canEffectScale = false;
@@ -502,7 +502,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             if (canEffectScale)
             {
                 GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(_spellInfo->SpellLevel - 1);
-                GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(caster->getLevel() - 1);
+                GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(caster->GetLevel() - 1);
                 if (spellScaler && casterScaler)
                     value *= casterScaler->ratio / spellScaler->ratio;
             }
@@ -524,7 +524,7 @@ float SpellEffectInfo::CalcValueMultiplier(Unit* caster, Spell* spell) const
 {
     float multiplier = ValueMultiplier;
     if (Player* modOwner = (caster ? caster->GetSpellModOwner() : nullptr))
-        modOwner->ApplySpellMod<SPELLMOD_VALUE_MULTIPLIER>(_spellInfo->Id, multiplier, spell);
+        modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_VALUE_MULTIPLIER, multiplier, spell);
     return multiplier;
 }
 
@@ -532,7 +532,7 @@ float SpellEffectInfo::CalcDamageMultiplier(Unit* caster, Spell* spell) const
 {
     float multiplier = DamageMultiplier;
     if (Player* modOwner = (caster ? caster->GetSpellModOwner() : nullptr))
-        modOwner->ApplySpellMod<SPELLMOD_DAMAGE_MULTIPLIER>(_spellInfo->Id, multiplier, spell);
+        modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_DAMAGE_MULTIPLIER, multiplier, spell);
     return multiplier;
 }
 
@@ -549,10 +549,10 @@ float SpellEffectInfo::CalcRadius(Unit* caster, Spell* spell) const
     float radius = RadiusEntry->RadiusMin;
     if (caster)
     {
-        radius += RadiusEntry->RadiusPerLevel * caster->getLevel();
+        radius += RadiusEntry->RadiusPerLevel * caster->GetLevel();
         radius = std::min(radius, RadiusEntry->RadiusMax);
         if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod<SPELLMOD_RADIUS>(_spellInfo->Id, radius, spell);
+            modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_RADIUS, radius, spell);
     }
 
     return radius;
@@ -831,7 +831,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     SpellVisual = spellEntry->SpellVisual;
     SpellIconID = spellEntry->SpellIconID;
     ActiveIconID = spellEntry->ActiveIconID;
-    Priority = spellEntry->SpellPriority;
+    SpellPriority = spellEntry->SpellPriority;
     SpellName = spellEntry->SpellName;
     Rank = spellEntry->Rank;
     MaxTargetLevel = spellEntry->MaxTargetLevel;
@@ -1268,26 +1268,6 @@ bool SpellInfo::IsAutoRepeatRangedSpell() const
     return AttributesEx2 & SPELL_ATTR2_AUTO_REPEAT;
 }
 
-bool SpellInfo::IsAffected(uint32 familyName, flag96 const& familyFlags) const
-{
-    if (!familyName)
-    {
-        return true;
-    }
-
-    if (familyName != SpellFamilyName)
-    {
-        return false;
-    }
-
-    if (familyFlags && !(familyFlags & SpellFamilyFlags))
-    {
-        return false;
-    }
-
-    return true;
-}
-
 bool SpellInfo::IsAffectedBySpellMods() const
 {
     return !(AttributesEx3 & SPELL_ATTR3_IGNORE_CASTER_MODIFIERS);
@@ -1312,7 +1292,15 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
         return true;
     }
 
-    return IsAffected(affectSpell->SpellFamilyName, mod->mask);
+    // False if affect_spell == nullptr or spellFamily not equal
+    if (affectSpell->SpellFamilyName != SpellFamilyName)
+        return false;
+
+    // true
+    if (mod->mask & SpellFamilyFlags)
+        return true;
+
+    return false;
 }
 
 bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
@@ -2323,7 +2311,7 @@ float SpellInfo::GetMaxRange(bool positive, Unit* caster, Spell* spell) const
         range = RangeEntry->RangeMax[0];
     if (caster)
         if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod<SPELLMOD_RANGE>(Id, range, spell);
+            modOwner->ApplySpellMod(Id, SPELLMOD_RANGE, range, spell);
     return range;
 }
 
@@ -2458,14 +2446,14 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
 
     // Apply cost mod by spell
     if (Player* modOwner = caster->GetSpellModOwner())
-        modOwner->ApplySpellMod<SPELLMOD_COST>(Id, powerCost, spell);
+        modOwner->ApplySpellMod(Id, SPELLMOD_COST, powerCost, spell);
 
     if (!caster->IsControlledByPlayer())
     {
         if (HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL))
         {
             GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(SpellLevel - 1);
-            GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(caster->getLevel() - 1);
+            GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(caster->GetLevel() - 1);
             if (spellScaler && casterScaler)
                 powerCost *= casterScaler->ratio / spellScaler->ratio;
         }
@@ -2737,6 +2725,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                             return true;
                         return false;
                     case SPELL_AURA_MOD_ROOT:
+                    case SPELL_AURA_MOD_FEAR:
                     case SPELL_AURA_MOD_SILENCE:
                     case SPELL_AURA_GHOST:
                     case SPELL_AURA_PERIODIC_LEECH:

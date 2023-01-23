@@ -89,10 +89,10 @@ typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
 #define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t, p)
 
 // Note: SPELLMOD_* values is aura types in fact
-enum SpellModType : uint8
+enum SpellModType
 {
-    SPELLMOD_FLAT         = SPELL_AURA_ADD_FLAT_MODIFIER,
-    SPELLMOD_PCT          = SPELL_AURA_ADD_PCT_MODIFIER
+    SPELLMOD_FLAT         = 107,                            // SPELL_AURA_ADD_FLAT_MODIFIER
+    SPELLMOD_PCT          = 108                             // SPELL_AURA_ADD_PCT_MODIFIER
 };
 
 // 2^n values, Player::m_isunderwater is a bitmask. These are Trinity internal values, they are never send to any client
@@ -180,9 +180,10 @@ enum TalentTree // talent tabs
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
-    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), mask(),  ownerAura(_ownerAura) {}
-    SpellModOp   op;
-    SpellModType type;
+    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(), ownerAura(_ownerAura) {}
+    SpellModOp   op   : 8;
+    SpellModType type : 8;
+    int16 charges     : 16;
     int32 value{0};
     flag96 mask;
     uint32 spellId{0};
@@ -191,7 +192,7 @@ struct SpellModifier
 
 typedef std::unordered_map<uint32, PlayerTalent*> PlayerTalentMap;
 typedef std::unordered_map<uint32, PlayerSpell*> PlayerSpellMap;
-typedef std::unordered_set<SpellModifier*> SpellModContainer;
+typedef std::list<SpellModifier*> SpellModList;
 
 typedef GuidList WhisperListContainer;
 
@@ -1120,7 +1121,7 @@ public:
     PlayerSocial* GetSocial() { return m_social; }
 
     PlayerTaxi m_taxi;
-    void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getRace(), getClass(), getLevel()); }
+    void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getRace(), getClass(), GetLevel()); }
     bool ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc = nullptr, uint32 spellid = 1);
     bool ActivateTaxiPathTo(uint32 taxi_path_id, uint32 spellid = 1);
     void CleanupAfterTaxiFlight();
@@ -1279,7 +1280,7 @@ public:
     bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count);
     void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false);
     void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false) { AutoStoreLoot(NULL_BAG, NULL_SLOT, loot_id, store, broadcast); }
-    void StoreLootItem(uint8 lootSlot, Loot* loot);
+    LootItem* StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg);
     void UpdateLootAchievements(LootItem* item, Loot* loot);
     void UpdateTitansGrip();
 
@@ -1315,7 +1316,7 @@ public:
     void DestroyZoneLimitedItem(bool update, uint32 new_zone);
     void SplitItem(uint16 src, uint16 dst, uint32 count);
     void SwapItem(uint16 src, uint16 dst);
-    void AddItemToBuyBackSlot(Item* pItem);
+    void AddItemToBuyBackSlot(Item* pItem, uint32 money);
     Item* GetItemFromBuyBackSlot(uint32 slot);
     void RemoveItemFromBuyBackSlot(uint32 slot, bool del);
     [[nodiscard]] uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END - KEYRING_SLOT_START; }
@@ -1387,7 +1388,7 @@ public:
     /***                    QUEST SYSTEM                   ***/
     /*********************************************************/
 
-    int32 GetQuestLevel(Quest const* quest) const { return quest && (quest->GetQuestLevel() > 0) ? quest->GetQuestLevel() : getLevel(); }
+    int32 GetQuestLevel(Quest const* quest) const { return quest && (quest->GetQuestLevel() > 0) ? quest->GetQuestLevel() : GetLevel(); }
 
     void PrepareQuestMenu(ObjectGuid guid);
     void SendPreparedQuest(ObjectGuid guid);
@@ -1676,7 +1677,7 @@ public:
     void BuildPlayerTalentsInfoData(WorldPacket* data);
     void BuildPetTalentsInfoData(WorldPacket* data);
     void SendTalentsInfoData(bool pet);
-    void LearnTalent(uint32 talentId, uint32 talentRank);
+    void LearnTalent(uint32 talentId, uint32 talentRank, bool command = false);
     void LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank);
 
     bool addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank);
@@ -1729,14 +1730,14 @@ public:
     SpellCooldowns&       GetSpellCooldownMap()       { return m_spellCooldowns; }
 
     void AddSpellMod(SpellModifier* mod, bool apply);
-    static bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
+    bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
     bool HasSpellMod(SpellModifier* mod, Spell* spell);
-    template <SpellModOp op, class T>
-    void ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell = nullptr) const;
+    template <class T>
+    void ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* spell = nullptr, bool temporaryPet = false);
+    void RemoveSpellMods(Spell* spell);
     void RestoreSpellMods(Spell* spell, uint32 ownerAuraId = 0, Aura* aura = nullptr);
     void RestoreAllSpellMods(uint32 ownerAuraId = 0, Aura* aura = nullptr);
-    static void ApplyModToSpell(SpellModifier* mod, Spell* spell);
-    static bool HasSpellModApplied(SpellModifier* mod, Spell* spell);
+    void DropModCharge(SpellModifier* mod, Spell* spell);
     void SetSpellModTakingSpell(Spell* spell, bool apply);
 
     [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
@@ -1905,7 +1906,7 @@ public:
     void UpdateRating(CombatRating cr);
     void UpdateAllRatings();
 
-    void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage) override;
+    void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex) override;
 
     void UpdateDefenseBonusesMod();
     inline void RecalculateRating(CombatRating cr) { ApplyRatingMod(cr, 0, true);}
@@ -2147,6 +2148,8 @@ public:
 
     void ResetAllPowers();
 
+    SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
+
     void _ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply);
     void _ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
     void _ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
@@ -2166,9 +2169,9 @@ public:
     void ApplyItemEquipSpell(Item* item, bool apply, bool form_change = false);
     void ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply, bool form_change = false);
     void UpdateEquipSpellsAtFormChange();
-    void CastItemCombatSpell(DamageInfo const& damageInfo);
-    void CastItemCombatSpell(DamageInfo const& damageInfo, Item* item, ItemTemplate const* proto);
+    void CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx);
     void CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
+    void CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto);
 
     void SendEquipmentSetList();
     void SetEquipmentSet(uint32 index, EquipmentSet eqset);
@@ -2317,6 +2320,7 @@ public:
     float m_homebindX;
     float m_homebindY;
     float m_homebindZ;
+    float m_homebindO;
 
     [[nodiscard]] WorldLocation GetStartPosition() const;
 
@@ -2327,8 +2331,8 @@ public:
     GuidUnorderedSet m_clientGUIDs;
     std::vector<Unit*> m_newVisible; // pussywizard
 
-    bool HaveAtClient(WorldObject const* u) const { return u == this || m_clientGUIDs.find(u->GetGUID()) != m_clientGUIDs.end(); }
-    [[nodiscard]] bool HaveAtClient(ObjectGuid guid) const { return guid == GetGUID() || m_clientGUIDs.find(guid) != m_clientGUIDs.end(); }
+    [[nodiscard]] bool HaveAtClient(WorldObject const* u) const;
+    [[nodiscard]] bool HaveAtClient(ObjectGuid guid) const;
 
     [[nodiscard]] bool IsNeverVisible() const override;
 
@@ -2479,6 +2483,7 @@ public:
     void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
     void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);
     void CompletedAchievement(AchievementEntry const* entry);
+    [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
 
     [[nodiscard]] bool HasTitle(uint32 bitIndex) const;
     bool HasTitle(CharTitlesEntry const* title) const { return HasTitle(title->bit_index); }
@@ -2551,7 +2556,7 @@ public:
     // mt maps
     [[nodiscard]] const PlayerTalentMap& GetTalentMap() const { return m_talents; }
     [[nodiscard]] uint32 GetNextSave() const { return m_nextSave; }
-    [[nodiscard]] SpellModContainer const& GetSpellModContainer(uint32 type) const { return m_spellMods[type]; }
+    [[nodiscard]] SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
 
     void SetServerSideVisibility(ServerSideVisibilityType type, AccountTypes sec);
     void SetServerSideVisibilityDetect(ServerSideVisibilityType type, AccountTypes sec);
@@ -2756,7 +2761,7 @@ public:
     uint32 m_baseHealthRegen;
     int32 m_spellPenetrationItemMod;
 
-    SpellModContainer m_spellMods[MAX_SPELLMOD];
+    SpellModList m_spellMods[MAX_SPELLMOD];
     //uint32 m_pad;
     //        Spell* m_spellModTakingSpell;  // Spell for which charges are dropped in spell::finish
 
@@ -2849,8 +2854,6 @@ public:
 
     bool m_needZoneUpdate;
 
-    [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
-
 private:
     // internal common parts for CanStore/StoreItem functions
     InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
@@ -2938,134 +2941,5 @@ private:
 
 void AddItemsSetItem(Player* player, Item* item);
 void RemoveItemsSetItem(Player* player, ItemTemplate const* proto);
-
-// "the bodies of template functions must be made available in a header file"
-template <SpellModOp op, class T>
-void Player::ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell) const
-{
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    if (!spellInfo)
-        return;
-
-    float totalmul = 1.f;
-    int32 totalflat = 0;
-
-    // Drop charges for triggering spells instead of triggered ones
-    if (m_spellModTakingSpell)
-        spell = m_spellModTakingSpell;
-
-    switch (op)
-    {
-        // special case, if a mod makes spell instant, only consume that mod
-        case SPELLMOD_CASTING_TIME:
-        {
-            SpellModifier* modInstantSpell = nullptr;
-            for (SpellModifier* mod : m_spellMods[SPELLMOD_CASTING_TIME])
-            {
-                if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-                {
-                    continue;
-                }
-
-                if (mod->type == SPELLMOD_PCT && basevalue < T(10000) && mod->value <= -100)
-                {
-                    modInstantSpell = mod;
-                    break;
-                }
-            }
-
-            if (modInstantSpell)
-            {
-                Player::ApplyModToSpell(modInstantSpell, spell);
-                basevalue = T(0);
-                return;
-            }
-            break;
-        }
-
-            // special case if two mods apply 100% critical chance, only consume one
-        case SPELLMOD_CRITICAL_CHANCE:
-        {
-            SpellModifier* modCritical = nullptr;
-            for (auto mod : m_spellMods[SPELLMOD_CRITICAL_CHANCE])
-            {
-                if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-                {
-                    continue;
-                }
-
-                if (mod->type == SPELLMOD_FLAT && mod->value >= 100)
-                {
-                    modCritical = mod;
-                    break;
-                }
-            }
-
-            if (modCritical)
-            {
-                Player::ApplyModToSpell(modCritical, spell);
-                basevalue = T(100);
-                return;
-            }
-            break;
-        }
-
-        default:
-            break;
-    }
-
-    for (auto mod : m_spellMods[op])
-    {
-        if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-            continue;
-
-        switch (mod->type)
-        {
-            case SPELLMOD_FLAT:
-                totalflat += mod->value;
-                break;
-            case SPELLMOD_PCT:
-            {
-                // skip percent mods for null basevalue (most important for spell mods with charges)
-                if (basevalue == T(0))
-                {
-                    continue;
-                }
-
-                // special case (skip > 10s spell casts for instant cast setting)
-                if (op == SPELLMOD_CASTING_TIME)
-                {
-                    if (mod->value <= -100 && basevalue >= T(10000))
-                    {
-                        continue;
-                    }
-                }
-
-                totalmul += CalculatePct(1.f, mod->value);
-                break;
-            }
-        }
-
-        /*// xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
-        else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
-            continue;
-        // xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
-        else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
-            continue;
-        // xinef: those two mods should be multiplicative (Glyph of Renew)
-        if (mod->op == SPELLMOD_DAMAGE || mod->op == SPELLMOD_DOT)
-            totalmul *= CalculatePct(1.0f, 100.0f + mod->value);
-        else
-            totalmul += CalculatePct(1.0f, mod->value);*/
-
-        Player::ApplyModToSpell(mod, spell);
-    }
-    float diff = 0.0f;
-    if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
-        diff = ((float)basevalue + totalflat) * (totalmul - 1.0f) + (float)totalflat;
-    else
-        diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
-    basevalue = T((float)basevalue + diff);
-}
 
 #endif
