@@ -135,8 +135,12 @@ if (WIN32)
     file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
     set(_OPENSSL_ROOT_PATHS
       "${_programfiles}/OpenSSL"
+      "${_programfiles}/OpenSSL-111-Win64"
+      "${_programfiles}/OpenSSL-11-Win64"
       "${_programfiles}/OpenSSL-Win64"
       "C:/OpenSSL/"
+      "C:/OpenSSL-111-Win64/"
+      "C:/OpenSSL-11-Win64/"
       "C:/OpenSSL-Win64/"
       )
   else()
@@ -149,8 +153,12 @@ if (WIN32)
     file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
     set(_OPENSSL_ROOT_PATHS
       "${_programfiles}/OpenSSL"
+      "${_programfiles}/OpenSSL-111-Win32"
+      "${_programfiles}/OpenSSL-11-Win32"
       "${_programfiles}/OpenSSL-Win32"
       "C:/OpenSSL/"
+      "C:/OpenSSL-111-Win32/"
+      "C:/OpenSSL-11-Win32/"
       "C:/OpenSSL-Win32/"
       )
   endif()
