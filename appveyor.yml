@@ -5,7 +5,7 @@ init:
 - ps: ''
 environment:
   BOOST_ROOT: C:\Libraries\boost_1_77_0
-  OPENSSL_ROOT_DIR: C:\OpenSSL-Win64
+  OPENSSL_ROOT_DIR: C:\OpenSSL-v111-Win64
   MYSQL_INCLUDE_DIR: C:\Program Files\MySQL\MySQL Server 5.7\include
   MYSQL_LIBRARY: C:\Program Files\MySQL\MySQL Server 5.7\lib
   MYSQL_ROOT: C:\Program Files\MySQL\MySQL Server 5.7
