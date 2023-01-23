@@ -93,20 +93,22 @@ assembler()
 
 clear
 echo ""
-echo -e "\e[1;37m"
-echo "         Remember that the files are generated in the env/dist/sql folder."
-echo "         This tool is an alternative for those who prefer to execute SQL scripts manually."
+echo -e "\e[1;33m"
+echo "   We do not recommend using this script."
+echo "   The best option is to enable updates in the configuration file."
+echo "   Remember that the files are generated in the env/dist/sql folder."
+echo "   This tool is an alternative for those who prefer to execute SQL scripts manually."
 echo -e "\e[1;32m"
-echo "         ------  DB Assembler Version 1  ------"
+echo "   ------  DB Assembler Version 1  ------"
 echo ""
-echo "         1. Assemble all SQL (Base, Custom and Updates)"
-echo "         2. Assemble only base files"
-echo "         3. Assemble only custom files"
-echo "         4. Assemble only updates files"
-echo "         5. Exit"
+echo "   1. Assemble all SQL (Base, Custom and Updates)"
+echo "   2. Assemble only base files"
+echo "   3. Assemble only custom files"
+echo "   4. Assemble only updates files"
+echo "   5. Exit"
 echo ""
 echo -e "\e[1;37m"
-read -p "         Choose a number from 1 to 5: " opcion
+read -p "   Choose a number from 1 to 5: " opcion
 
 case $opcion in
     1) all ;;
