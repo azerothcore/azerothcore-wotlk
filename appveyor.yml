@@ -1,0 +1,44 @@
+version: 1.0.{build}
+image: Visual Studio 2019
+clone_depth: 1
+init:
+- ps: ''
+environment:
+  BOOST_ROOT: C:\Libraries\boost_1_77_0
+  OPENSSL_ROOT_DIR: C:\OpenSSL-v111-Win64
+  MYSQL_INCLUDE_DIR: C:\Program Files\MySQL\MySQL Server 5.7\include
+  MYSQL_LIBRARY: C:\Program Files\MySQL\MySQL Server 5.7\lib
+  MYSQL_ROOT: C:\Program Files\MySQL\MySQL Server 5.7
+build_script:
+- cmd: >-
+    git config user.email "appveyor@build.bot" && git config user.name "AppVeyor"
+
+    md build && cd build
+
+    cmake -G"Visual Studio 16 2019" -A x64 -DOPENSSL_ROOT_DIR="C:/OpenSSL-v111-Win64" -DOPENSSL_INCLUDE_DIR="C:/OpenSSL-v111-Win64/include" -DOPENSSL_APPLINK_SOURCE="C:/OpenSSL-v111-Win64/include/openssl/applink.c" -DSSL_EAY_DEBUG="C:/OpenSSL-v111-Win64/lib/VC/libssl64MDd.lib" -DSSL_EAY_RELEASE="C:/OpenSSL-v111-Win64/lib/VC/libssl64MD.lib" -DLIB_EAY_DEBUG="C:/OpenSSL-v111-Win64/lib/VC/libcrypto64MDd.lib" -DLIB_EAY_RELEASE="C:/OpenSSL-v111-Win64/lib/VC/libcrypto64MD.lib" -DSCRIPTS=static -DMODULES=static -DTOOLS_BUILD=all -DCMAKE_CXX_FLAGS=" /DWIN32 /D_WINDOWS /W3 /GR /EHsc /WX /std:c++17" -DCMAKE_C_FLAGS="/DWIN32 /D_WINDOWS /W3 /WX" ..
+
+    "%programfiles(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\amd64\MsBuild.exe" /nologo /m:2 /p:Configuration=RelWithDebInfo /p:Platform="X64" /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" "AzerothCore.sln"
+
+    cd bin\RelWithDebInfo\
+
+    copy "C:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll" libmysql.dll
+
+    copy "%OPENSSL_ROOT_DIR%\libssl-1_1-x64.dll" libssl-1_1-x64.dll
+
+    copy "%OPENSSL_ROOT_DIR%\libcrypto-1_1-x64.dll" libcrypto-1_1-x64.dll
+
+    cd ..
+
+    7z a AzerothCoreWin64VS2019.zip .\RelWithDebInfo\*
+
+    del /F /Q /S "RelWithDebInfo\*.pdb" > NUL
+
+    7z a AzerothCoreWin64VS2019NoSymbols.zip .\RelWithDebInfo\*
+
+test: off
+artifacts:
+- path: build\bin\AzerothCoreWin64VS2019.zip
+  name: AzerothCoreWin64VS2019
+
+- path: build\bin\AzerothCoreWin64VS2019NoSymbols.zip
+  name: AzerothCoreWin64VS2019NoSymbols

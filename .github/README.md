@@ -1,21 +1,18 @@
 # ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 
-[![CodeFactor](https://www.codefactor.io/repository/github/azerothcore/azerothcore-wotlk/badge)](https://www.codefactor.io/repository/github/azerothcore/azerothcore-wotlk)
-[![core-build](https://github.com/azerothcore/azerothcore-wotlk/workflows/core-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/azerothcore-wotlk/actions?query=workflow%3Acore-build+branch%3Amaster+event%3Apush)
-[![core-modules-build](https://github.com/azerothcore/azerothcore-wotlk/workflows/core-modules-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/azerothcore-wotlk/actions?query=workflow%3Acore-modules-build+branch%3Amaster+event%3Apush)
-[![windows-build](https://github.com/azerothcore/azerothcore-wotlk/workflows/windows-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/azerothcore-wotlk/actions?query=workflow%3Awindows-build+branch%3Amaster+event%3Apush)
-[![macos-build](https://github.com/azerothcore/azerothcore-wotlk/workflows/macos-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/azerothcore-wotlk/actions?query=workflow%3Amacos-build+branch%3Amaster+event%3Apush)
-[![docker-build](https://github.com/azerothcore/azerothcore-wotlk/workflows/docker-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/azerothcore-wotlk/actions?query=workflow%3Adocker-build+branch%3Amaster+event%3Apush)
-[![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties "Put money on issues or get paid for fixing them")
-[![StackOverflow](http://img.shields.io/badge/stackoverflow-azerothcore-blue.svg)](https://stackoverflow.com/questions/tagged/azerothcore?sort=newest "Ask / browse questions here")
-[![Discord](https://img.shields.io/discord/217589275766685707.svg)](https://discord.gg/gkt4y2x "Our community hub on Discord")
+## Build Status
 
+3.3.5
+:------------:
+[![Build status](https://ci.appveyor.com/api/projects/status/9cd8gd9io83l3v14/branch/npcbots_3.3.5?svg=true)](https://ci.appveyor.com/project/trickerer/azerothcore-npcbots/branch/npcbots_3.3.5)
 
 ## Introduction
 
 AzerothCore (AC) is an open-source game-server application for World of Warcraft, currently supporting the 3.3.5a game version.
 
 It is written in C++ and is based on MaNGOS, TrinityCore and SunwellCore.
+
+[NPCBots](https://github.com/trickerer/Trinity-Bots) is AzerothCore mod.
 
 
 ## Why AzerothCore?
@@ -59,85 +56,31 @@ Our configuration file system allows the user to use a tiny configuration file f
 Not very far from its ancestor TrinityCore, most scripts can be adapted quite easily. For MaNGOS compatibility, it might require more knowledge but it shares a common base.
 
 
-## Philosophy
-
-Our main goal is to create a playable game server, offering a fully working game experience.
-
-Here are the main points we focus on:
-
-* Stability
-* Ease of use / Practicability
-* Playability (in-game content)
-* Customization
-* Community-driven software (check our discord)
-
-We also welcome new users (even non-English speaking users!) and help them learn/improve their skills (C++, SQL, Git, software collaboration, tutoring/wiki, etc...).
-
-Unlike other projects which focus more on the developer's side of things, we want users to be able to run their server with as few troubles as possible. All of our contributors run their private servers (local or public).
-
-That's why AzerothCore is easier to use, to maintain, to understand, to develop on, and to customize to suit your needs, than other emulators.
-
-In short, we focus on the **user experience (UX)**, whether it be the **player's experience**, the **developer's experience**, or the **administrator's experience**.
-
-
-## How to Thank us
-
-Being an open-source project, we rely on volunteers to pursue development. Here are ways to help us if you use AzerothCore:
-
-### Github Star
-
-Click on the "star this repository" button to help us gain more visibility on Github!
-
-### By contributing
-
-Check the **CONTRIBUTING** section below.
-
-### Financially :moneybag:
-
-You can support the AzerothCore by [donating](https://www.paypal.com/donate/?hosted_button_id=L69ANPSR8BJDU).
-The money will be used to pay freelance developers for more open-source fixes.
-
-### Advertising
-
-By talking about us on different platforms or to people who would like to get involved.
-
-
-## Contributing
-
-AzerothCore is a learning project, and there are lots of different ways to contribute to the project:
-
-* By [testing our fixes](http://www.azerothcore.org/wiki/How-to-test-a-PR) (we can teach you how to correctly use Git to help us but that will also help you out tremendously)
-* By developing directly to the core or the modules
-* By reporting bugs within the project
-* By [creating new modules](http://www.azerothcore.org/wiki/Create-a-Module)
-* By improving our wiki
-* By providing direct support to our community (on Discord, StackOverflow or specialized forums)
-* By making extra content (video tutorial for example)
-* By putting bounties on issues
-
-
-If you want to contribute to the project, you will find a lot of resources that will guide you in our wiki.
-
-Feel free to join us on [our Discord chat server](https://discord.gg/gkt4y2x) where we teach a lot of new people how to get started and who are now important contributors!
-
-<!-- TO UNCOMMENT LATER -->
-<!-- As we put a big emphasis on community, there are also special rewards for contributors such as reputation ranks (displayed in our Discord and our website), reputation badges (to display on your project/portfolio), premium software licenses, private modules access, private tools access and a lot of small private repositories access. -->
-
-
 ## Installation
 
 Installation instructions are available [here](http://www.azerothcore.org/wiki/Installation).
 
-We also have an auto-installation bash script [here](/apps/installer/main.sh) (*Warning: try it/analyze it before running it*).
-
-Dockerization of AzerothCore is fully supported, and we have various community-made tutorials (eg: AWS / Digital Ocean installation).
+NPCBots installation guide is available in the [NPCBots Readme](https://github.com/trickerer/Trinity-Bots#npcbot-mod-installation).
 
 
 ## Support
 
-Our self-made wiki probably has a lot of answers for you.
+AzerothCore self-made wiki probably has a lot of answers for you.
 
 For help requests, it is recommended to ask your question on [StackOverflow](https://stackoverflow.com/questions/tagged/azerothcore) and link it in [our chat](https://discordapp.com/channels/217589275766685707/284406375495368704).
+
+
+## Reporting issues
+
+NPCBots issues can be reported via the [Github issue tracker](https://github.com/trickerer/Trinity-Bots/issues/).
+
+Please take the time to review existing issues before submitting your own to
+prevent duplicates.
+
+
+## Submitting fixes
+
+C++ fixes are submitted as [pull requests](https://github.com/trickerer/Azerothcore-wotlk-with-NPCBots/pulls).
 
 
 ## Authors & Contributors
@@ -151,6 +94,8 @@ This project exists thanks to:
 
 
 ## Important Links
+
+- [NPCBots Readme](https://github.com/trickerer/Trinity-Bots/)
 
 - [Doxygen Documentation](https://www.azerothcore.org/pages/doxygen/index.html)
 
@@ -168,11 +113,3 @@ This project exists thanks to:
 
 - The new AzerothCore source components are released under the [GNU AGPL v3](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3)
 - The old sources based on MaNGOS/TrinityCore are released under the [GNU GPL v2](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2)
-
-
-## Special thanks
-
-[JetBrains](https://www.jetbrains.com/?from=AzerothCore) is providing free [open-source licenses](https://www.jetbrains.com/community/opensource/) to the AzerothCore developers.
-
-[![JetBrains](https://user-images.githubusercontent.com/75517/51205146-7f225c80-1905-11e9-82e0-835627be170d.png)](https://www.jetbrains.com/?from=AzerothCore)
-
