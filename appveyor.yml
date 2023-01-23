@@ -6,6 +6,12 @@ init:
 environment:
   BOOST_ROOT: C:\Libraries\boost_1_77_0
   OPENSSL_ROOT_DIR: C:\OpenSSL-v111-Win64
+  OPENSSL_INCLUDE_DIR: C:\OpenSSL-v111-Win64\include
+  OPENSSL_APPLINK_SOURCE: C:\OpenSSL-v111-Win64\include\openssl\applink.c
+  SSL_EAY_DEBUG: C:\OpenSSL-v111-Win64\lib\VC\libssl64MDd.lib
+  SSL_EAY_RELEASE: C:\OpenSSL-v111-Win64\lib\VC\libssl64MD.lib
+  LIB_EAY_DEBUG: C:\OpenSSL-v111-Win64\lib\VC\libcrypto64MDd.lib
+  LIB_EAY_RELEASE: C:\OpenSSL-v111-Win64\lib\VC\libcrypto64MD.lib
   MYSQL_INCLUDE_DIR: C:\Program Files\MySQL\MySQL Server 5.7\include
   MYSQL_LIBRARY: C:\Program Files\MySQL\MySQL Server 5.7\lib
   MYSQL_ROOT: C:\Program Files\MySQL\MySQL Server 5.7
