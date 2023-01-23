@@ -23,7 +23,6 @@
 !/env/docker/etc/
 /env/docker/etc/*
 !/env/docker/etc/*.conf.dockerdist
-!/env/docker/etc/*.conf.user
 !/env/docker/logs/.gitkeep
 /.env*
 /apps/joiner
