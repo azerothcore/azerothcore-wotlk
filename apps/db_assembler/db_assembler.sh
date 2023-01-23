@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_LOCATION=`pwd`
+CURRENT_LOCATION=$(pwd)
 
 cd $CURRENT_LOCATION
 
@@ -86,7 +86,7 @@ updatesFiles()
 
 assembler()
 {
-    if [[ `find $1 -type f -iname "*.sql" | wc -l` -gt 0 ]]; then
+    if [[ $(find $1 -type f -iname "*.sql" | wc -l) -gt 0 ]]; then
         cat $1/*.sql > $2
     fi
 }
@@ -108,7 +108,8 @@ echo "   4. Assemble only updates files"
 echo "   5. Exit"
 echo ""
 echo -e "\e[1;37m"
-read -p "   Choose a number from 1 to 5: " opcion
+echo "   Choose a number from 1 to 5:"
+read -r opcion
 
 case $opcion in
     1) all ;;
