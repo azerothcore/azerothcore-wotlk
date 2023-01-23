@@ -136,12 +136,12 @@ if (WIN32)
     set(_OPENSSL_ROOT_PATHS
       "${_programfiles}/OpenSSL"
       "${_programfiles}/OpenSSL-Win64"
-      "${_programfiles}/OpenSSL-11-Win64"
-      "${_programfiles}/OpenSSL-111-Win64"
+      "${_programfiles}/OpenSSL-v11-Win64"
+      "${_programfiles}/OpenSSL-v111-Win64"
       "C:/OpenSSL/"
       "C:/OpenSSL-Win64/"
-      "C:/OpenSSL-11-Win64/"
-      "C:/OpenSSL-111-Win64/"
+      "C:/OpenSSL-v11-Win64/"
+      "C:/OpenSSL-v111-Win64/"
       )
   else()
     set(_OPENSSL_MSI_INSTALL_GUID "A1EEC576-43B9-4E75-9E02-03DA542D2A38")
@@ -154,12 +154,12 @@ if (WIN32)
     set(_OPENSSL_ROOT_PATHS
       "${_programfiles}/OpenSSL"
       "${_programfiles}/OpenSSL-Win32"
-      "${_programfiles}/OpenSSL-11-Win32"
-      "${_programfiles}/OpenSSL-111-Win32"
+      "${_programfiles}/OpenSSL-v11-Win32"
+      "${_programfiles}/OpenSSL-v111-Win32"
       "C:/OpenSSL/"
       "C:/OpenSSL-Win32/"
-      "C:/OpenSSL-11-Win32/"
-      "C:/OpenSSL-111-Win32/"
+      "C:/OpenSSL-v11-Win32/"
+      "C:/OpenSSL-v111-Win32/"
       )
   endif()
   unset(_programfiles)
