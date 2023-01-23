@@ -1,3 +1,4 @@
+-- DB update 2023_01_22_00 -> 2023_01_23_00
 --
 DELETE FROM `quest_template_locale` WHERE `locale`='zhCN' AND `ID`= 3121;
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objectives`, `EndText`, `CompletedText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `VerifiedBuild`) VALUES
