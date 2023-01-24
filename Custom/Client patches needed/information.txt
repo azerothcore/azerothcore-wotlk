@@ -1,2 +1,3 @@
 Patch-A -> AllRaces All Classes
 Patch-B -> Custom Items
+Patch-S -> BG Slaveryvalley
