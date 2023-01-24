@@ -416,10 +416,10 @@ enum TotemCategoryType
 enum SummonPropGroup
 {
     SUMMON_PROP_GROUP_NONE           = 0,                   // 1160 spells in 3.0.3
-    SUMMON_PROP_GROUP_GUARDIAN       = 1,                   // 861 spells in 3.0.3                      TODO: Needs implementation
-    SUMMON_PROP_GROUP_PETS           = 2,                   // 52 spells in 3.0.3, pets mostly          TODO: Needs implementation
-    SUMMON_PROP_GROUP_CONTROLLABLE   = 3,                   // 13 spells in 3.0.3, mostly controllable  TODO: Needs implementation
-    SUMMON_PROP_GROUP_VEHICLE        = 4                    // 86 spells in 3.0.3, taxi/mounts          TODO: Needs implementation
+    SUMMON_PROP_GROUP_GUARDIAN       = 1,                   // NYI 861 spells in 3.0.3
+    SUMMON_PROP_GROUP_PETS           = 2,                   // NYI 52 spells in 3.0.3, pets mostly
+    SUMMON_PROP_GROUP_CONTROLLABLE   = 3,                   // NYI 13 spells in 3.0.3, mostly controllable
+    SUMMON_PROP_GROUP_VEHICLE        = 4                    // NYI 86 spells in 3.0.3, taxi/mounts
 };
 
 // SummonProperties.dbc, col 5
