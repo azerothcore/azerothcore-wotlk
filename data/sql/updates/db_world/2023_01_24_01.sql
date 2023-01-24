@@ -1,3 +1,4 @@
+-- DB update 2023_01_24_00 -> 2023_01_24_01
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (10, 224, 237, 334, 644, 645, 699, 1101, 1102, 1169, 1383, 4481, 4482, 4483, 4484, 4903, 5052, 5306, 5518, 5863, 5881, 7625, 7723, 9436) AND `locale` = 'deDE';
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (10, 'deDE', 'Nun, was habt Ihr für Neuigkeiten? Ihr seht aus, als hättet Ihr einiges durchgemacht... ist Kieselschliff am Leben?', 0),

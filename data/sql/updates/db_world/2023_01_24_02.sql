@@ -1,3 +1,4 @@
+-- DB update 2023_01_24_01 -> 2023_01_24_02
 DELETE FROM `gameobject_loot_template` WHERE `Entry`=19414 AND `Item`=25841;
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Chance`, `QuestRequired`, `Comment`) VALUES (19414, 25841, 0.1, 1, 'Draenei Vessel - Draenei Vessel (Empty)');
 -- chestLoot = 19414
