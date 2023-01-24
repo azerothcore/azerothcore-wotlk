@@ -1,3 +1,4 @@
+-- DB update 2023_01_16_05 -> 2023_01_16_06
 -- Delete useless spawn
 DELETE FROM `creature` WHERE `id1` = 3695 AND `guid` = 37101;
 DELETE FROM `creature_addon` WHERE `guid`=37101;

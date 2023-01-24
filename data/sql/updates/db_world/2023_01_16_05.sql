@@ -1,3 +1,4 @@
+-- DB update 2023_01_16_04 -> 2023_01_16_05
 --
 DELETE FROM `smart_scripts` WHERE `entryorguid`=17395 AND `source_type`=0 AND `id`=3;
 UPDATE `smart_scripts` SET `event_type`=0, `event_param1`=500, `event_param2`=500 WHERE `entryorguid`=17395 AND `source_type`=0 AND `id` IN (0,1);
