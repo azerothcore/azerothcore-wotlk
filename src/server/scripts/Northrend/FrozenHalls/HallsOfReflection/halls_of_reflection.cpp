@@ -1562,7 +1562,7 @@ public:
                         for (uint8 i = 3; i < PATH_WP_COUNT - 1; ++i)
                             path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
                         me->GetMotionMaster()->MoveSplinePath(&path);
-                        me->GetMotionMaster()->PropagateSpeedChange();
+                        me->GetMotionMaster()->propagateSpeedChange();
                         events.ScheduleEvent(EVENT_LK_SUMMON, 1000);
                     }
                     break;
