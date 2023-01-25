@@ -382,7 +382,7 @@ public:
             me->SetInCombatWithZone();
             instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
 
-            events.ScheduleEvent(EVENT_ADD_ABILITY1, 1);
+            events.ScheduleEvent(EVENT_ADD_ABILITY1, 1700);
             events.ScheduleEvent(EVENT_ADD_ABILITY2, 10000);
             events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
         }
