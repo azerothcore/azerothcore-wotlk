@@ -151,15 +151,21 @@ function comp_compile() {
         # Search for all configs under DOCKER_ETC_FOLDER
         for dockerdist in "$DOCKER_ETC_FOLDER"/*.dockerdist; do
           # Grab "base" conf. turns foo.conf.dockerdist into foo.conf
-          base_conf="$(echo "$dockerdist" | rev | cut -f1 -d. --complement | rev)"
+          baseConf="$(echo "$dockerdist" | rev | cut -f1 -d. --complement | rev)"
           # env/dist/etc/foo.conf becomes foo.conf
-          filename="$(basename $base_conf)"
+          filename="$(basename "$baseConf")"
+          # the dist files should be always found inside $confDir
+          # which may not be the same as DOCKER_ETC_FOLDER
+          distPath="$confDir/$filename.dist"
+          # if dist file doesn't exist, skip this iteration
+          [ ! -f "$distPath" ] && continue
+
           # replace params in foo.conf.dist with params in foo.conf.dockerdist
-          conf_layer "$dockerdist" "$base_conf.dist" " # Copied from dockerdist"
+          conf_layer "$dockerdist" "$distPath" " # Copied from dockerdist"
 
           # Copy modified dist file to $confDir/$filename
           # Don't overwrite foo.conf if it already exists.
-          cp --no-clobber --verbose "$base_conf.dist" "$confDir/$filename"
+          cp --no-clobber --verbose "$distPath" "$confDir/$filename"
         done
       fi
 
