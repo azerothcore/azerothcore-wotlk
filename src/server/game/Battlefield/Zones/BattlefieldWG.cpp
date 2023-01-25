@@ -406,7 +406,6 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         (*itr)->Save();
     }
 
-
     for (uint8 team = 0; team < 2; ++team)
     {
         for (GuidUnorderedSet::const_iterator itr = m_vehicles[team].begin(); itr != m_vehicles[team].end(); ++itr)
