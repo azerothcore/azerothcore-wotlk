@@ -1,3 +1,4 @@
+-- DB update 2023_01_25_02 -> 2023_01_25_03
 --
 -- Pathing for Caretaker Smithers Entry: 20363
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=1919.8694,`position_y`=1014.0391,`position_z`=20.042213 WHERE `id1`=20363;
