@@ -104,9 +104,7 @@ function comp_compile() {
 
   echo "Using $MTHREADS threads"
 
-  CWD=$(pwd)
-
-  cd $BUILDPATH
+  pushd "$BUILDPATH" >> /dev/null || exit 1
 
   comp_ccacheEnable
 
@@ -121,7 +119,7 @@ function comp_compile() {
     msys*)
       cmake --install . --config $CTYPE
 
-      cd $CWD
+      popd >> /dev/null || exit 1
 
       echo "Done"
       ;;
@@ -138,7 +136,7 @@ function comp_compile() {
       echo "Cmake install..."
       sudo cmake --install . --config $CTYPE
 
-      cd $CWD
+      popd >> /dev/null || exit 1
 
       # set all aplications SUID bit
       echo "Setting permissions on binary files"
@@ -149,13 +147,16 @@ function comp_compile() {
 
       if [[ $DOCKER = 1 && $DISABLE_DOCKER_CONF != 1 ]]; then
         echo "Generating confs..."
-        cp -n "$DOCKER_ETC_FOLDER/worldserver.conf.dockerdist" "${confDir}/worldserver.conf"
-        cp -n "$DOCKER_ETC_FOLDER/authserver.conf.dockerdist" "${confDir}/authserver.conf"
-        cp -n "$DOCKER_ETC_FOLDER/dbimport.conf.dockerdist" "${confDir}/dbimport.conf"
+        for dockerdist in "$DOCKER_ETC_FOLDER"/*.dockerdist; do
+          base_conf="$(echo "$dockerdist" | rev | cut -f1 -d. --complement | rev)"
+          cp -nv "$base_conf.dist" "$base_conf"
+          # Move configs from .conf.dockerdist to .conf
+          conf_layer "$dockerdist" "$base_conf" " # Copied from dockerdist"
+        done
       fi
 
       echo "Done"
-    ;;
+      ;;
   esac
 
   runHooks "ON_AFTER_BUILD"
@@ -169,4 +170,32 @@ function comp_build() {
 function comp_all() {
   comp_clean
   comp_build
+}
+
+# conf_layer FILENAME FILENAME
+# Layer the configuration parameters from the first argument onto the second argument
+function conf_layer() {
+  LAYER="$1"
+  BASE="$2"
+  COMMENT="$3"
+
+  grep -E "^[a-zA-Z\.0-9]+\s*=.*$" "$LAYER" \
+    | while read -r param
+      do
+        NOSPACE="$(tr -d '[:space:]' <<< "$param")"
+        KEY="$(cut -f1 -d= <<< "$NOSPACE")"
+        VAL="$(cut -f2 -d= <<< "$NOSPACE")"
+        # if key not in base or val not in line
+        if grep -qE "^$KEY" "$BASE" && ! grep -qE "^$KEY.*=.*$VAL" "$BASE"; then
+          # Replace line
+          # Prevent issues with shell quoting 
+          sed -i \
+            's,^'"$KEY"'.*,'"$KEY = $VAL$COMMENT"',g' \
+            "$BASE"
+        else
+          # insert line
+          echo "$KEY = $VAL$COMMENT" >> "$BASE"
+        fi
+      done
+  echo "Layered $LAYER onto $BASE"
 }
