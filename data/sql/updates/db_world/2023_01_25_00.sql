@@ -1,3 +1,4 @@
+-- DB update 2023_01_24_02 -> 2023_01_25_00
 -- Tarren Mill Fishermen
 SET @CGUID := 81626;
 DELETE FROM `creature` WHERE `map`=560 AND `id1`=18657 AND `guid` BETWEEN @CGUID+0 AND @CGUID+2; -- Completely missing
