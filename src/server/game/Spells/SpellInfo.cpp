@@ -2253,7 +2253,7 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
             {
                 // family flags 10 (Lightning), 42 (Earth), 37 (Water), proc shield from T2 8 pieces bonus
                 if (SpellFamilyFlags[1] & 0x420
-                        || SpellFamilyFlags[0] & 0x00000400
+                        || (SpellFamilyFlags[0] & 0x00000400 && HasAttribute(SPELL_ATTR1_NO_THREAT))
                         || Id == 23552)
                     return SPELL_SPECIFIC_ELEMENTAL_SHIELD;
 
