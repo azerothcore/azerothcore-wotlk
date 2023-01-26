@@ -147,11 +147,25 @@ function comp_compile() {
 
       if [[ $DOCKER = 1 && $DISABLE_DOCKER_CONF != 1 ]]; then
         echo "Generating confs..."
+
+        # Search for all configs under DOCKER_ETC_FOLDER
         for dockerdist in "$DOCKER_ETC_FOLDER"/*.dockerdist; do
-          base_conf="$(echo "$dockerdist" | rev | cut -f1 -d. --complement | rev)"
-          cp -nv "$base_conf.dist" "$base_conf"
-          # Move configs from .conf.dockerdist to .conf
-          conf_layer "$dockerdist" "$base_conf" " # Copied from dockerdist"
+          # Grab "base" conf. turns foo.conf.dockerdist into foo.conf
+          baseConf="$(echo "$dockerdist" | rev | cut -f1 -d. --complement | rev)"
+          # env/dist/etc/foo.conf becomes foo.conf
+          filename="$(basename "$baseConf")"
+          # the dist files should be always found inside $confDir
+          # which may not be the same as DOCKER_ETC_FOLDER
+          distPath="$confDir/$filename.dist"
+          # if dist file doesn't exist, skip this iteration
+          [ ! -f "$distPath" ] && continue
+
+          # replace params in foo.conf.dist with params in foo.conf.dockerdist
+          conf_layer "$dockerdist" "$distPath" " # Copied from dockerdist"
+
+          # Copy modified dist file to $confDir/$filename
+          # Don't overwrite foo.conf if it already exists.
+          cp --no-clobber --verbose "$distPath" "$confDir/$filename"
         done
       fi
 
@@ -179,13 +193,18 @@ function conf_layer() {
   BASE="$2"
   COMMENT="$3"
 
+  # Loop over all defined params in conf file
   grep -E "^[a-zA-Z\.0-9]+\s*=.*$" "$LAYER" \
     | while read -r param
       do
+        # remove spaces from param
+        # foo       = bar becomes foo=bar
         NOSPACE="$(tr -d '[:space:]' <<< "$param")"
+
+        # split into key and value
         KEY="$(cut -f1 -d= <<< "$NOSPACE")"
         VAL="$(cut -f2 -d= <<< "$NOSPACE")"
-        # if key not in base or val not in line
+        # if key in base and val not in line
         if grep -qE "^$KEY" "$BASE" && ! grep -qE "^$KEY.*=.*$VAL" "$BASE"; then
           # Replace line
           # Prevent issues with shell quoting 

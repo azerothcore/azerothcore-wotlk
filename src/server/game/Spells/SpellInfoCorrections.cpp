@@ -4465,6 +4465,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         }
     });
 
+    // Self Visual - Sleep Until Cancelled(DND)
+    ApplySpellFix({ 14915 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_SEATED;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
