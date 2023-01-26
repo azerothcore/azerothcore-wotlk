@@ -452,7 +452,7 @@ void ObjectMgr::LoadPetNamesLocales()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                  0     1      2    3 
+    //                                                  0     1      2    3
     QueryResult result = WorldDatabase.Query("SELECT locale, word, entry, half FROM pet_name_generation_locale");
 
     if (!result)
