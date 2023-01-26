@@ -2880,16 +2880,10 @@ void Creature::AllLootRemovedFromCorpse()
     float decayRate = sWorld->getRate(RATE_CORPSE_DECAY_LOOTED);
     uint32 diff = uint32((m_corpseRemoveTime - now) * decayRate);
 
-    m_respawnTime -= diff;
-
     // corpse skinnable, but without skinning flag, and then skinned, corpse will despawn next update
     if (loot.loot_type == LOOT_SKINNING)
     {
         m_corpseRemoveTime = GameTime::GetGameTime().count();
-    }
-    else
-    {
-        m_corpseRemoveTime = now + uint32(m_corpseDelay * decayRate);
     }
 }
 
