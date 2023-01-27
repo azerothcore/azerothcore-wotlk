@@ -208,22 +208,73 @@ void CreatureGroup::MemberEngagingTarget(Creature* member, Unit* target)
     for (auto const& itr : m_members)
     {
         Creature* pMember = itr.first;
-        if (m_leader) // avoid crash if leader was killed and reset.
-            LOG_DEBUG("entities.unit", "GROUP ATTACK: group instance id {} calls member instid {}", m_leader->GetInstanceId(), member->GetInstanceId());
-
-        //Skip one check
-        if (pMember == member)
+        if (!pMember)
+        {
             continue;
+        }
 
-        if (!pMember->IsAlive())
+        if (pMember == member || !pMember->IsAlive() || pMember->GetVictim())
+        {
             continue;
+        }
 
-        if (pMember->GetVictim())
+        if (pMember == m_leader && !(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_LEADER_ASSIST_MEMBER)))
+        {
             continue;
+        }
 
         if (pMember->IsValidAttackTarget(target) && pMember->AI())
+        {
             pMember->AI()->AttackStart(target);
+        }
     }
+}
+
+Unit* CreatureGroup::GetNewTargetForMember(Creature* member)
+{
+    uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()].groupAI;
+    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_ACQUIRE_NEW_TARGET_ON_EVADE)))
+    {
+        return nullptr;
+    }
+
+    if (member == m_leader)
+    {
+        if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_MEMBER_ASSIST_LEADER)))
+        {
+            return nullptr;
+        }
+    }
+    else if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_LEADER_ASSIST_MEMBER)))
+    {
+        return nullptr;
+    }
+
+    for (auto const& itr : m_members)
+    {
+        Creature* pMember = itr.first;
+        if (!pMember)
+        {
+            continue;
+        }
+
+        if (pMember == member || !pMember->IsAlive() || !pMember->GetVictim())
+        {
+            continue;
+        }
+
+        if (pMember == m_leader && !(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_MEMBER_ASSIST_LEADER)))
+        {
+            continue;
+        }
+
+        if (member->IsValidAttackTarget(pMember->GetVictim()))
+        {
+            return pMember->GetVictim();
+        }
+    }
+
+    return nullptr;
 }
 
 void CreatureGroup::MemberEvaded(Creature* member)

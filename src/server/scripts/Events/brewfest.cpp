@@ -438,7 +438,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
         if (Creature* herald = me->FindNearestCreature(NPC_DARK_IRON_HERALD, 100.0f))
         {
             char amount[500];
-            sprintf(amount, "We did it boys! Now back to the Grim Guzzler and we'll drink to the %u that were injured!", guzzlerCounter);
+            snprintf(amount, sizeof(amount), "We did it boys! Now back to the Grim Guzzler and we'll drink to the %u that were injured!", guzzlerCounter);
             herald->Yell(amount, LANG_UNIVERSAL);
         }
 
@@ -451,7 +451,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
         if (Creature* herald = me->FindNearestCreature(NPC_DARK_IRON_HERALD, 100.0f))
         {
             char amount[500];
-            sprintf(amount, "RETREAT!! We've already lost %u and we can't afford to lose any more!!", guzzlerCounter);
+            snprintf(amount, sizeof(amount), "RETREAT!! We've already lost %u and we can't afford to lose any more!!", guzzlerCounter);
             herald->Yell(amount, LANG_UNIVERSAL);
         }
 

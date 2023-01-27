@@ -562,6 +562,7 @@ void BossAI::_Reset()
     me->SetCombatPulseDelay(0);
     me->ResetLootMode();
     events.Reset();
+    scheduler.CancelAll();
     summons.DespawnAll();
     if (instance)
         instance->SetBossState(_bossId, NOT_STARTED);
@@ -570,6 +571,7 @@ void BossAI::_Reset()
 void BossAI::_JustDied()
 {
     events.Reset();
+    scheduler.CancelAll();
     summons.DespawnAll();
     if (instance)
     {
@@ -583,6 +585,7 @@ void BossAI::_EnterCombat()
     me->SetCombatPulseDelay(5);
     me->setActive(true);
     DoZoneInCombat();
+    ScheduleTasks();
     if (instance)
     {
         // bosses do not respawn, check only on enter combat

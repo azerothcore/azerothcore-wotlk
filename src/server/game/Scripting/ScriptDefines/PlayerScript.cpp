@@ -637,6 +637,14 @@ void ScriptMgr::OnFirstLogin(Player* player)
     });
 }
 
+void ScriptMgr::OnSetMaxLevel(Player* player, uint32& maxPlayerLevel)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnSetMaxLevel(player, maxPlayerLevel);
+    });
+}
+
 bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, ObjectGuid BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)

@@ -211,7 +211,7 @@ public:
             return;
         }
 
-        if (summon->GetEntry() == NPC_ONYXIAN_LAIR_GUARD && Phase != PHASE_LANDED)
+        if (summon->GetEntry() == NPC_ONYXIAN_LAIR_GUARD && Phase < PHASE_AIRPHASE)
         {
             return;
         }
@@ -221,8 +221,6 @@ public:
             summon->AI()->AttackStart(target);
             DoZoneInCombat(summon);
         }
-
-        summons.Summon(summon);
     }
 
     void MovementInform(uint32 type, uint32 id) override
