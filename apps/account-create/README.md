@@ -24,6 +24,7 @@ This script reads from environment variables in order to control which account i
 
 - `ACORE_USERNAME` Username for account, default "admin"
 - `ACORE_PASSWORD` Password for account, default "admin"
+- `ACORE_GM_LEVEL` GM Level for account, defailt 3
 - `MYSQL_DATABASE` Database name, default "acore_auth"
 - `MYSQL_USERNAME` MySQL username, default "root"
 - `MYSQL_PASSWORD` MySQL password, default "password"

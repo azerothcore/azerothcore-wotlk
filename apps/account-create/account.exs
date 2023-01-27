@@ -1,5 +1,13 @@
 #!/usr/bin/env elixir
 
+Application.start(:logger)
+require Logger
+
+# Constants
+default_credential     = "admin"
+default_gm_level       = "3"
+account_access_comment = "Managed via account-create script"
+
 # Execute this Elixir script with the below command
 #
 # $  ACORE_USERNAME=foo ACORE_PASSWORD=barbaz123 elixir account.exs
@@ -8,6 +16,7 @@
 #
 # ACORE_USERNAME - Username for account, default "admin"
 # ACORE_PASSWORD - Password for account, default "admin"
+# ACORE_GM_LEVEL - GM level for account 
 # MYSQL_DATABASE - Database name, default "acore_auth"
 # MYSQL_USERNAME - MySQL username, default "root"
 # MYSQL_PASSWORD - MySQL password, default "password"
@@ -19,67 +28,20 @@
 ]
 |> Mix.install()
 
-defmodule Account do
-  @n <<137, 75, 100, 94, 137, 225, 83, 91, 189, 173, 91, 139, 41, 6, 80, 83, 8, 1, 177, 142, 191,
-       191, 94, 143, 171, 60, 130, 135, 42, 62, 155, 183>>
-  @g <<7>>
-  @field_length 32
-
-  def generate_stored_values(username, password, salt \\ "") do
-    default_state()
-    |> generate_salt(salt)
-    |> calculate_x(username, password)
-    |> calculate_v()
-  end
-
-  def default_state() do
-    %{n: @n, g: @g}
-  end
-
-  def generate_salt(state, "") do
-    salt = :crypto.strong_rand_bytes(32)
-    Map.merge(state, %{salt: salt})
-  end
-
-  def generate_salt(state, salt) do
-    padded_salt = pad_binary(salt)
-    Map.merge(state, %{salt: padded_salt})
-  end
-
-  def calculate_x(state, username, password) do
-    hash = :crypto.hash(:sha, String.upcase(username) <> ":" <> String.upcase(password))
-    x = reverse(:crypto.hash(:sha, state.salt <> hash))
-    Map.merge(state, %{x: x, username: username})
-  end
-
-  def calculate_v(state) do
-    verifier =
-      :crypto.mod_pow(state.g, state.x, state.n)
-      |> reverse()
-      |> pad_binary()
-
-    Map.merge(state, %{verifier: verifier})
-  end
-
-  defp pad_binary(blob) do
-    pad = @field_length - byte_size(blob)
-    <<blob::binary, 0::pad*8>>
-  end
-
-  defp reverse(binary) do
-    binary
-    |> :binary.decode_unsigned(:big)
-    |> :binary.encode_unsigned(:little)
-  end
-end
+Code.require_file("srp.exs", Path.absname(__DIR__))
 
 username_lower =
-  System.get_env("ACORE_USERNAME", "admin")
-  |> tap(&IO.puts("Account to create: #{&1}"))
+  System.get_env("ACORE_USERNAME", default_credential)
+  |> tap(&Logger.info("Account to create: #{&1}"))
 
 username = String.upcase(username_lower)
 
-password = System.get_env("ACORE_PASSWORD", "admin")
+password = System.get_env("ACORE_PASSWORD", default_credential)
+
+gm_level = System.get_env("ACORE_GM_LEVEL", default_gm_level) |> String.to_integer()
+if Range.new(0, 3) |> Enum.member?(gm_level) |> Kernel.not do
+  Logger.info("Valid ACORE_GM_LEVEL values are 0, 1, 2, and 3. The given value was: #{gm_level}.")
+end
 
 {:ok, pid} =
   MyXQL.start_link(
@@ -91,11 +53,23 @@ password = System.get_env("ACORE_PASSWORD", "admin")
     hostname: System.get_env("MYSQL_HOST", "localhost")
   )
 
-IO.puts("MySQL connection created")
+Logger.info("MySQL connection created")
 
-%{salt: salt, verifier: verifier} = Account.generate_stored_values(username, password)
+Logger.info("Checking database for user #{username_lower}")
 
-IO.puts("New salt and verifier generated")
+{:ok, result} = MyXQL.query(pid, "SELECT salt FROM account WHERE username=?", [username])
+
+%{salt: salt, verifier: verifier} =
+  case result do
+    %{rows: [[salt | _] | _]} ->
+      Logger.info("Salt for #{username_lower} found in database")
+      Srp.generate_stored_values(username, password, salt)
+    _ -> 
+      Logger.info("Salt not found in database for #{username_lower}. Generating a new one")
+      Srp.generate_stored_values(username, password)
+  end
+
+Logger.info("New salt and verifier generated")
 
 result =
   MyXQL.query(
@@ -105,28 +79,46 @@ result =
       (`username`, `salt`, `verifier`)
     VALUES
       (?, ?, ?)
-    ON DUPLICATE KEY UPDATE salt=?, verifier=?
+    ON DUPLICATE KEY UPDATE verifier=?
     """,
-    [username, salt, verifier, salt, verifier]
+    [username, salt, verifier, verifier]
   )
 
 case result do
   {:error, %{message: message}} ->
     File.write("fail.log", message)
 
-    IO.puts(
+    Logger.info(
       "Account #{username_lower} failed to create. You can check the error message at fail.log."
     )
 
     exit({:shutdown, 1})
 
+  {:ok, %{num_rows: 1, last_insert_id: 0}} ->
+    Logger.info(
+      "Account #{username_lower} doesn't need to have its' password changed. You should be able to log in with that account"
+    )
+
   {:ok, %{num_rows: 1}} ->
-    IO.puts(
+    Logger.info(
       "Account #{username_lower} has been created. You should now be able to login with that account"
     )
 
   {:ok, %{num_rows: 2}} ->
-    IO.puts(
+    Logger.info(
       "Account #{username_lower} has had its' password reset. You should now be able to login with that account"
     )
 end
+
+{:ok, _} = 
+  MyXQL.query(
+    pid, 
+    """
+    INSERT INTO account_access
+      (`id`, `gmlevel`, `comment`)
+    VALUES
+      ((SELECT id FROM account WHERE username=?), ?, ?)
+    ON DUPLICATE KEY UPDATE gmlevel=?, comment=?
+    """, [username, gm_level, account_access_comment, gm_level, account_access_comment])
+
+Logger.info("GM Level for #{username_lower} set to #{gm_level}")
