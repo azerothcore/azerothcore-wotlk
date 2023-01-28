@@ -5,7 +5,7 @@ SET @MIDNIGHT          := 16151;
 SET @GMIDNIGHT         := 135159;
 
 DELETE FROM `creature_text` WHERE `entry` IN (@MIDNIGHT, @ATTUMEN_UNMOUNTED, @ATTUMEN_MOUNTED);
-INSERT INTO `creature_text` (`CreatureID`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+INSERT INTO `creature_text` (`CreatureID`, `GroupId`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (@ATTUMEN_UNMOUNTED, 0, 0, 'It was... inevitable.', 14, 0, 100, 0, 0, 9169, 13460, 0, 'attumen SAY_KILL1'),
 (@ATTUMEN_UNMOUNTED, 0, 1, 'Another trophy to add to my collection!', 14, 0, 100, 0, 0, 9300, 15333, 0,'attumen SAY_KILL2'),
 (@ATTUMEN_UNMOUNTED, 1, 0, 'Such easy sport.', 14, 0, 100, 0, 0, 9170, 0, 0,'attumen SAY_RANDOM1'),
