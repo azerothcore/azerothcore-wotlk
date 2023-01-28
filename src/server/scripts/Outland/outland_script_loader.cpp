@@ -50,7 +50,10 @@ void AddSC_boss_hydromancer_thespia();       //CR Steam Vault
 void AddSC_boss_mekgineer_steamrigger();
 void AddSC_boss_warlord_kalithresh();
 void AddSC_instance_steam_vault();
-void AddSC_boss_the_black_stalker();         //CR Underbog
+void AddSC_underbog();                       //CR Underbog
+void AddSC_boss_hungarfen();
+void AddSC_boss_ghazan();
+void AddSC_boss_the_black_stalker();
 void AddSC_instance_the_underbog();
 void AddSC_boss_ahune();
 void AddSC_instance_the_slave_pens();
@@ -143,7 +146,10 @@ void AddOutlandScripts()
     AddSC_boss_mekgineer_steamrigger();
     AddSC_boss_warlord_kalithresh();
     AddSC_instance_steam_vault();
-    AddSC_boss_the_black_stalker();         //CR Underbog
+    AddSC_underbog();                       //CR Underbog
+    AddSC_boss_hungarfen();
+    AddSC_boss_ghazan();
+    AddSC_boss_the_black_stalker();
     AddSC_instance_the_underbog();
     AddSC_boss_ahune();
     AddSC_instance_the_slave_pens();

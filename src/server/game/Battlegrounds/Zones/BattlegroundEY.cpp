@@ -472,6 +472,12 @@ void BattlegroundEY::EventTeamLostPoint(Player* player, uint32 point)
     UpdatePointsIcons(point);
     UpdatePointsCount();
     DelCreature(BG_EY_TRIGGER_FEL_REAVER + point);
+
+    _reviveEvents.AddEventAtOffset([this, point]()
+    {
+        RelocateDeadPlayers(BgCreatures[point]);
+        DelCreature(point);
+    }, 500ms);
 }
 
 void BattlegroundEY::EventTeamCapturedPoint(Player* player, TeamId teamId, uint32 point)
@@ -498,8 +504,6 @@ void BattlegroundEY::EventTeamCapturedPoint(Player* player, TeamId teamId, uint3
     }
 
     _capturePointInfo[point]._ownerTeamId = teamId;
-    if (BgCreatures[point])
-        DelCreature(point);
 
     GraveyardStruct const* sg = sGraveyard->GetGraveyard(m_CapturingPointTypes[point].GraveYardId);
     AddSpiritGuide(point, sg->x, sg->y, sg->z, 3.124139f, teamId);
