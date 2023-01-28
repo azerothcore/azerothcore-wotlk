@@ -1,3 +1,4 @@
+--
 DELETE FROM `gossip_menu_option` WHERE `MenuID` IN (6815) AND `OptionID`=4;
 DELETE FROM `gossip_menu_option` WHERE `MenuID` IN (6899) AND `OptionID` IN (1,2);
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `ActionMenuID`, `ActionPoiID`) VALUES 
