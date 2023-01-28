@@ -30,7 +30,7 @@
 #include <tmmintrin.h> /* for _mm_shuffle_epi8 and _mm_alignr_epi8 */
 #endif
 
-#if (defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64)) && defined(__XOP__) && (defined(__GNUC__) || defined(__clang__))
+#if defined(__x86_64__) && defined(__XOP__) && (defined(__GNUC__) || defined(__clang__))
 #include <x86intrin.h>
 #endif
 
