@@ -3096,7 +3096,7 @@ void AuraEffect::HandleModFear(AuraApplication const* aurApp, uint8 mode, bool a
 
     Unit* target = aurApp->GetTarget();
 
-    target->SetControlled(apply, UNIT_STATE_FLEEING);
+    target->SetControlled(apply, UNIT_STATE_FLEEING, GetCaster(), true);
 }
 
 void AuraEffect::HandleAuraModStun(AuraApplication const* aurApp, uint8 mode, bool apply) const

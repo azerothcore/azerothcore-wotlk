@@ -18131,7 +18131,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     }
 }
 
-void Unit::SetControlled(bool apply, UnitState state)
+void Unit::SetControlled(bool apply, UnitState state, Unit* source /*= nullptr*/, bool isFear /*= false*/)
 {
     if (apply)
     {
@@ -18164,7 +18164,7 @@ void Unit::SetControlled(bool apply, UnitState state)
                     ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
                     SendMeleeAttackStop();
                     // SendAutoRepeatCancel ?
-                    SetFeared(true);
+                    SetFeared(true, source, isFear);
                     CastStop(0, false);
                 }
                 break;
@@ -18234,7 +18234,21 @@ void Unit::SetControlled(bool apply, UnitState state)
             if (HasUnitState(UNIT_STATE_CONFUSED) || HasAuraType(SPELL_AURA_MOD_CONFUSE))
                 SetConfused(true);
             else if (HasUnitState(UNIT_STATE_FLEEING) || HasAuraType(SPELL_AURA_MOD_FEAR))
-                SetFeared(true);
+            {
+                bool isFear = false;
+                if (HasAuraType(SPELL_AURA_MOD_FEAR))
+                {
+                    isFear = true;
+                    source = ObjectAccessor::GetUnit(*this, GetAuraEffectsByType(SPELL_AURA_MOD_FEAR).front()->GetCasterGUID());
+                }
+
+                if (!source)
+                {
+                    source = getAttackerForHelper();
+                }
+
+                SetFeared(true, source, isFear);
+            }
         }
     }
 }
@@ -18369,19 +18383,12 @@ void Unit::DisableRotate(bool apply)
         RemoveUnitFlag(UNIT_FLAG_POSSESSED);
 }
 
-void Unit::SetFeared(bool apply)
+void Unit::SetFeared(bool apply, Unit* fearedBy /*= nullptr*/, bool isFear /*= false*/)
 {
     if (apply)
     {
         SetTarget();
-
-        Unit* caster = nullptr;
-        Unit::AuraEffectList const& fearAuras = GetAuraEffectsByType(SPELL_AURA_MOD_FEAR);
-        if (!fearAuras.empty())
-            caster = ObjectAccessor::GetUnit(*this, fearAuras.front()->GetCasterGUID());
-        if (!caster)
-            caster = getAttackerForHelper();
-        GetMotionMaster()->MoveFleeing(caster, fearAuras.empty() ? sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY) : 0);             // caster == nullptr processed in MoveFleeing
+        GetMotionMaster()->MoveFleeing(fearedBy, isFear ? 0 : sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY));
 
         if (GetTypeId() == TYPEID_PLAYER)
         {
