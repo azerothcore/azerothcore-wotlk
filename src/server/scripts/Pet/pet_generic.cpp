@@ -640,7 +640,7 @@ struct npc_pet_gen_plump_turkey : public PassiveAI
     {
         if (type == EFFECT_MOTION_TYPE && id == 1)
         {
-            Unit::Kill(me, me);
+            me->KillSelf();
             me->AddAura(SPELL_TURKEY_STARTS_TO_BURN, me);
         }
     }
