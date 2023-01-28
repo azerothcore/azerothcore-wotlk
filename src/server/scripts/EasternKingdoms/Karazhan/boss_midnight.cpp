@@ -92,7 +92,7 @@ public:
         {
             if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
             {
-                BossAI::DespawnAtEvade(Seconds(10), midnight);
+                midnight->DespawnOnEvade(10s);
             }
 
             me->DespawnOrUnsummon();
@@ -385,7 +385,7 @@ public:
 
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            BossAI::_DespawnAtEvade(Seconds(10));
+            me->DespawnOnEvade(10s);
         }
 
         void KilledUnit(Unit* /*victim*/) override
