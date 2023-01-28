@@ -19,6 +19,7 @@
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "Unit.h"
 #include "karazhan.h"
 
 enum Texts
