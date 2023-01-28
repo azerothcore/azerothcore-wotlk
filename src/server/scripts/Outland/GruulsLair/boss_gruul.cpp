@@ -91,7 +91,7 @@ struct boss_gruul : public BossAI
         events.ScheduleEvent(EVENT_GROUND_SLAM, 35000);
     }
 
-    void KilledUnit(Unit*  /*who*/) override
+    void KilledUnit(Unit* /*who*/) override
     {
         if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
         {
