@@ -1059,7 +1059,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             if (me && !me->isDead())
             {
-                Unit::Kill(me, me);
+                me->KillSelf();
                 LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_DIE: Creature {}", me->GetGUID().ToString());
             }
             break;

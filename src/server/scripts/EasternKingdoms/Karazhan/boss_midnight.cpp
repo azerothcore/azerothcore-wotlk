@@ -354,6 +354,26 @@ public:
             {
                 if (Unit* unit = ObjectAccessor::GetUnit(*me, _attumenGUID))
                     Talk(SAY_MIDNIGHT_KILL, unit);
+				
+                summon->SetHealth(summon->CountPctFromMaxHealth(_healthPct));
+                summon->CastSpell(summon, SPELL_SPAWN_SMOKE2, true);
+            }
+            else
+                summon->CastSpell(summon, SPELL_SPAWN_SMOKE1, true);
+        }
+
+        void SetData(uint32 type, uint32 /*data*/) override
+        {
+            if (type == DATA_ATTUMEN_READY)
+                events.ScheduleEvent(EVENT_SUMMON_ATTUMEN_MOUNTED, 0);
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+        {
+            if (summon->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED)
+            {
+                summons.clear();
+                me->KillSelf();
             }
         }
 
