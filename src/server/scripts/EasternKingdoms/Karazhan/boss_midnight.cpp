@@ -115,7 +115,7 @@ public:
             });
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             // Attumen does not die until he mounts Midnight, let health fall to 1 and prevent further damage.
             if (damage >= me->GetHealth() && _phase != PHASE_MOUNTED)
@@ -137,7 +137,8 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
-            if (summon->GetEntry() == NPC_ATTUMEN_MOUNTED)
+            if (summon->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED)
+            {
                 if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
                 {
                     if (midnight->GetHealth() > me->GetHealth())
@@ -148,6 +149,7 @@ public:
                     summon->AI()->DoZoneInCombat();
                     summon->AI()->SetGUID(_midnightGUID, NPC_MIDNIGHT);
                 }
+            }
 
             BossAI::JustSummoned(summon);
         }
@@ -157,7 +159,7 @@ public:
             if (summoner->GetEntry() == NPC_MIDNIGHT)
                 _phase = PHASE_ATTUMEN_ENGAGES;
 
-            if (summoner->GetEntry() == NPC_ATTUMEN_UNMOUNTED)
+            if (summoner->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN)
             {
                 _phase = PHASE_MOUNTED;
                 DoCastSelf(SPELL_SPAWN_SMOKE);
@@ -167,7 +169,7 @@ public:
                     Unit* target = nullptr;
                     std::vector<Unit*> target_list;
 
-                    for (auto* ref : me->GetThreatManager().GetUnsortedThreatList())
+                    for (auto* ref : me->GetThreatMgr().GetUnsortedThreatList())
                     {
                         target = ref->GetVictim();
                         if (target && !target->IsWithinDist(me, 8.00f, false) && target->IsWithinDist(me, 25.0f, false))
@@ -177,7 +179,7 @@ public:
                     }
 
                     if (!target_list.empty())
-                        target = Trinity::Containers::SelectRandomContainerElement(target_list);
+                        target = Acore::Containers::SelectRandomContainerElement(target_list);
 
                     DoCast(target, SPELL_CHARGE);
                     task.Repeat(Seconds(10), Seconds(25));
@@ -200,7 +202,7 @@ public:
             _JustDied();
         }
 
-        void SetGUID(ObjectGuid const& guid, int32 id) override
+        void SetGUID(ObjectGuid guid, int32 id) override
         {
             if (id == NPC_MIDNIGHT)
                 _midnightGUID = guid;
@@ -215,7 +217,7 @@ public:
                 std::bind(&BossAI::DoMeleeAttackIfReady, this));
         }
 
-        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Mechanic == MECHANIC_DISARM)
                 Talk(SAY_DISARMED);
@@ -298,7 +300,7 @@ public:
             me->SetReactState(REACT_DEFENSIVE);
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             // Midnight never dies, let health fall to 1 and prevent further damage.
             if (damage >= me->GetHealth())
@@ -319,7 +321,7 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
-            if (summon->GetEntry() == NPC_ATTUMEN_UNMOUNTED)
+            if (summon->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN)
             {
                 _attumenGUID = summon->GetGUID();
                 summon->AI()->SetGUID(me->GetGUID(), NPC_MIDNIGHT);
@@ -330,9 +332,9 @@ public:
             BossAI::JustSummoned(summon);
         }
 
-        void JustEngagedWith(Unit* who) override
+        void EnterCombat(Unit* who) override
         {
-            BossAI::JustEngagedWith(who);
+            BossAI::EnterCombat(who);
 
             scheduler.Schedule(Seconds(15), Seconds(25), [this](TaskContext task)
             {
@@ -415,6 +417,5 @@ void AddSC_boss_attumen()
 {
     new boss_midnight();
     new boss_attumen();
-    new boss_attumen_midnight();
     new spell_midnight_fixate();
 }
