@@ -1148,7 +1148,9 @@ enum AcoreStrings
 
     LANG_CMD_CHAR_CHANGE_ACC_SUCCESS    = 5083,
 
-    // Room for more strings    5083-9999
+    LANG_CMD_CAST_ERROR_CODE            = 5084,
+
+    // Room for more strings    5084-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
