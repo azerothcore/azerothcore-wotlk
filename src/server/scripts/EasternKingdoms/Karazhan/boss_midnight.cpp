@@ -20,36 +20,35 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "karazhan.h"
-#include "TaskScheduler.h"
 
 enum Texts
 {
-    SAY_KILL = 0,
-    SAY_RANDOM = 1,
-    SAY_DISARMED = 2,
-    SAY_MIDNIGHT_KILL = 3,
-    SAY_APPEAR = 4,
-    SAY_MOUNT = 5,
+    SAY_KILL           = 0,
+    SAY_RANDOM         = 1,
+    SAY_DISARMED       = 2,
+    SAY_MIDNIGHT_KILL  = 3,
+    SAY_APPEAR         = 4,
+    SAY_MOUNT          = 5,
 
-    SAY_DEATH = 3,
+    SAY_DEATH          = 3,
 
     // Midnight
     EMOTE_CALL_ATTUMEN = 0,
-    EMOTE_MOUNT_UP = 1
+    EMOTE_MOUNT_UP     = 1
 };
 
 enum Spells
 {
     // Attumen
-    SPELL_SHADOWCLEAVE = 29832,
-    SPELL_INTANGIBLE_PRESENCE = 29833,
-    SPELL_SPAWN_SMOKE = 10389,
-    SPELL_CHARGE = 29847,
+    SPELL_SHADOWCLEAVE           = 29832,
+    SPELL_INTANGIBLE_PRESENCE    = 29833,
+    SPELL_SPAWN_SMOKE            = 10389,
+    SPELL_CHARGE                 = 29847,
 
     // Midnight
-    SPELL_KNOCKDOWN = 29711,
-    SPELL_SUMMON_ATTUMEN = 29714,
-    SPELL_MOUNT = 29770,
+    SPELL_KNOCKDOWN              = 29711,
+    SPELL_SUMMON_ATTUMEN         = 29714,
+    SPELL_MOUNT                  = 29770,
     SPELL_SUMMON_ATTUMEN_MOUNTED = 29799
 };
 
@@ -87,7 +86,9 @@ public:
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
+            {
                 BossAI::DespawnAtEvade(Seconds(10), midnight);
+            }
 
             me->DespawnOrUnsummon();
         }
@@ -103,7 +104,9 @@ public:
             scheduler.Schedule(Seconds(25), Seconds(45), [this](TaskContext task)
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                {
                     DoCast(target, SPELL_INTANGIBLE_PRESENCE);
+                }
 
                 task.Repeat(Seconds(25), Seconds(45));
             });
@@ -119,14 +122,18 @@ public:
         {
             // Attumen does not die until he mounts Midnight, let health fall to 1 and prevent further damage.
             if (damage >= me->GetHealth() && _phase != PHASE_MOUNTED)
+            {
                 damage = me->GetHealth() - 1;
+            }
 
             if (_phase == PHASE_ATTUMEN_ENGAGES && me->HealthBelowPctDamaged(25, damage))
             {
                 _phase = PHASE_NONE;
 
                 if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
+                {
                     midnight->AI()->DoCastAOE(SPELL_MOUNT, true);
+                }
             }
         }
 
@@ -142,9 +149,13 @@ public:
                 if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
                 {
                     if (midnight->GetHealth() > me->GetHealth())
+                    {
                         summon->SetHealth(midnight->GetHealth());
+                    }
                     else
+                    {
                         summon->SetHealth(me->GetHealth());
+                    }
 
                     summon->AI()->DoZoneInCombat();
                     summon->AI()->SetGUID(_midnightGUID, NPC_MIDNIGHT);
@@ -157,7 +168,9 @@ public:
         void IsSummonedBy(Unit* summoner) override
         {
             if (summoner->GetEntry() == NPC_MIDNIGHT)
+            {
                 _phase = PHASE_ATTUMEN_ENGAGES;
+            }
 
             if (summoner->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN)
             {
@@ -179,7 +192,9 @@ public:
                     }
 
                     if (!target_list.empty())
+                    {
                         target = Acore::Containers::SelectRandomContainerElement(target_list);
+                    }
 
                     DoCast(target, SPELL_CHARGE);
                     task.Repeat(Seconds(10), Seconds(25));
@@ -197,7 +212,9 @@ public:
         {
             Talk(SAY_DEATH);
             if (Unit* midnight = ObjectAccessor::GetUnit(*me, _midnightGUID))
+            {
                 midnight->KillSelf();
+            }
 
             _JustDied();
         }
@@ -205,13 +222,17 @@ public:
         void SetGUID(ObjectGuid guid, int32 id) override
         {
             if (id == NPC_MIDNIGHT)
+            {
                 _midnightGUID = guid;
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() && _phase != PHASE_NONE)
+            {
                 return;
+            }
 
             scheduler.Update(diff,
                 std::bind(&BossAI::DoMeleeAttackIfReady, this));
@@ -304,7 +325,9 @@ public:
         {
             // Midnight never dies, let health fall to 1 and prevent further damage.
             if (damage >= me->GetHealth())
+            {
                 damage = me->GetHealth() - 1;
+            }
 
             if (_phase == PHASE_NONE && me->HealthBelowPctDamaged(95, damage))
             {
@@ -353,14 +376,18 @@ public:
             if (_phase == PHASE_ATTUMEN_ENGAGES)
             {
                 if (Unit* unit = ObjectAccessor::GetUnit(*me, _attumenGUID))
+                {
                     Talk(SAY_MIDNIGHT_KILL, unit);
+                }
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() || _phase == PHASE_MOUNTED)
+            {
                 return;
+            }
 
             scheduler.Update(diff,
                 std::bind(&BossAI::DoMeleeAttackIfReady, this));
