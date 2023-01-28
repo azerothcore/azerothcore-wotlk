@@ -99,7 +99,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void ScheduleTasks()
+        void ScheduleTasks() override
         {
             scheduler.Schedule(Seconds(15), Seconds(25), [this](TaskContext task)
             {
