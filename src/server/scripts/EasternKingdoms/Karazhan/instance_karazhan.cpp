@@ -216,7 +216,7 @@ public:
                         default:
                             DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
                             break;
-                    }                        
+                    }
                     break;
                 }
                 case CHESS_EVENT_TEAM:

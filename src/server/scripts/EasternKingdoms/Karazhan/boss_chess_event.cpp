@@ -16,7 +16,7 @@
  */
 
 #include "karazhan.h"
-#include "ObjectMgr.h" 
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -427,6 +427,8 @@ struct npc_echo_of_medivh : public ScriptedAI
                         case ORI_E:
                             orientations = { ORI_N, ORI_NE, ORI_SE, ORI_S };
                             break;
+                        default:
+                            break;
                     }
 
                     for (KarazhanChessOrientationType orient : orientations)
@@ -499,7 +501,7 @@ struct npc_echo_of_medivh : public ScriptedAI
                 float offset = 1.3f * (_deadCount[DEAD_ALLIANCE] % MAX_ROW);
                 float finalX = baseX + offset * deltaX + (_deadCount[DEAD_ALLIANCE] >= MAX_ROW ? 1 : 0) * extraX;
                 float finalY = baseY + offset * deltaY + (_deadCount[DEAD_ALLIANCE] >= MAX_ROW ? 1 : 0) * extraY;
-                piece->NearTeleportTo(finalX, finalY, 222.0f, orientations[ORI_SW]);
+                piece->NearTeleportTo(finalX, finalY, 221.0f, orientations[ORI_SW]);
                 ++_deadCount[DEAD_ALLIANCE];
 
                 piece->CombatStop();
@@ -521,7 +523,7 @@ struct npc_echo_of_medivh : public ScriptedAI
 
                 float finalX = baseX + offset * deltaX + (_deadCount[DEAD_HORDE] >= MAX_ROW ? 1 : 0) * extraX;
                 float finalY = baseY + offset * deltaY + (_deadCount[DEAD_HORDE] >= MAX_ROW ? 1 : 0) * extraY;
-                piece->NearTeleportTo(finalX, finalY, 222.0f, orientations[ORI_NE]);
+                piece->NearTeleportTo(finalX, finalY, 221.0f, orientations[ORI_NE]);
                 ++_deadCount[DEAD_HORDE];
 
                 piece->CombatStop();
@@ -1348,7 +1350,7 @@ struct npc_echo_of_medivh : public ScriptedAI
     }
 
     void sGossipHello(Player* player) override
-    { 
+    {
         uint32 chessPhase = _instance->GetData(DATA_CHESS_GAME_PHASE);
         switch (chessPhase)
         {
@@ -1368,7 +1370,7 @@ struct npc_echo_of_medivh : public ScriptedAI
     }
 
     void sGossipSelect(Player* player, uint32 /*sender*/, uint32 gossipListId) override
-    { 
+    {
         uint32 chessPhase = _instance->GetData(DATA_CHESS_GAME_PHASE);
         _instance->SetData(CHESS_EVENT_TEAM, chessPhase < CHESS_PHASE_PVE_FINISHED ? player->GetTeamId() : TEAM_NEUTRAL);
 
@@ -1935,20 +1937,21 @@ struct npc_chesspiece : public ScriptedAI
     }
 
     void sGossipHello(Player* player) override
-    { 
+    {
         uint32 chessPhase = _instance->GetData(DATA_CHESS_GAME_PHASE);
         if (player->GetTeamId() == TEAM_ALLIANCE && me->GetFaction() != CHESS_FACTION_ALLIANCE && chessPhase < CHESS_PHASE_PVE_FINISHED)
         {
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
             return;
         }
 
         if (player->GetTeamId() == TEAM_HORDE && me->GetFaction() != CHESS_FACTION_HORDE && chessPhase < CHESS_PHASE_PVE_FINISHED)
         {
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
             return;
         }
 
         bool ok = true;
-        uint32 textID = 0;
         switch (me->GetEntry())
         {
             case NPC_PAWN_H:
@@ -1978,55 +1981,12 @@ struct npc_chesspiece : public ScriptedAI
                 break;
         }
 
-        switch (me->GetEntry())
-        {
-            case NPC_PAWN_H:
-                textID = 20021;
-                break;
-            case NPC_PAWN_A:
-                textID = 20027;
-                break;
-            case NPC_KNIGHT_H:
-                textID = 20019;
-                break;
-            case NPC_KNIGHT_A:
-                textID = 20025;
-                break;
-            case NPC_QUEEN_H:
-                textID = 20017;
-                break;
-            case NPC_QUEEN_A:
-                textID = 20023;
-                break;
-            case NPC_BISHOP_H:
-                textID = 20018;
-                break;
-            case NPC_BISHOP_A:
-                textID = 20023;
-                break;
-            case NPC_ROOK_H:
-                textID = 20020;
-                break;
-            case NPC_ROOK_A:
-                textID = 20026;
-                break;
-            case NPC_KING_H:
-                textID = 20016;
-                break;
-            case NPC_KING_A:
-                textID = 20028;
-                break;
-            default:
-                textID = 8990;
-                break;
-        }
-
         if (ok && !player->HasAura(SPELL_RECENTLY_INGAME))
         {
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Control " + me->GetName(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
-        SendGossipMenuFor(player, textID, me->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
     }
 
     void sGossipSelect(Player* player, uint32 /*sender*/, uint32 gossipListId) override
@@ -2081,7 +2041,7 @@ private:
 
     bool _teamControlledByRaid;
 };
- 
+
 struct npc_chess_move_trigger : public ScriptedAI
 {
     npc_chess_move_trigger(Creature* creature) : ScriptedAI(creature)
