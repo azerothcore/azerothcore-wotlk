@@ -2097,22 +2097,24 @@ void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0*/, Seconds f
         ForcedDespawn(msTimeToDespawn.count(), forcedRespawnTimer);
 }
 
-void Creature::DespawnOnEvade()
+void Creature::DespawnOnEvade(Seconds respawnDelay)
 {
-    SetVisible(false);
     AI()->SummonedCreatureDespawnAll();
-}
 
-void Creature::RespawnOnEvade()
-{
-    SetVisible(true);
-    UpdateMovementFlags();
-    AI()->Reset();
-    AI()->JustReachedHome();
-    if (IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
+    if (respawnDelay < 2s)
     {
-        GetVehicleKit()->Reset(true);
+        LOG_WARN("entities.unit", "DespawnOnEvade called with delay of {} seconds, defaulting to 2.", respawnDelay.count());
+        respawnDelay = 2s;
     }
+
+    if (TempSummon* whoSummon = ToTempSummon())
+    {
+        LOG_WARN("entities.unit", "DespawnOnEvade called on a temporary summon.");
+        whoSummon->UnSummon();
+        return;
+    }
+
+    DespawnOrUnsummon(Milliseconds(0), respawnDelay);
 }
 
 void Creature::InitializeReactState()
