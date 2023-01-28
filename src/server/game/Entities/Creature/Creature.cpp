@@ -2103,7 +2103,7 @@ void Creature::DespawnOnEvade(Seconds respawnDelay)
 
     if (respawnDelay < 2s)
     {
-        LOG_WARN("entities.unit", "_DespawnAtEvade called with delay of {} seconds, defaulting to 2.", respawnDelay.count());
+        LOG_WARN("entities.unit", "DespawnOnEvade called with delay of {} seconds, defaulting to 2.", respawnDelay.count());
         respawnDelay = 2s;
     }
 
