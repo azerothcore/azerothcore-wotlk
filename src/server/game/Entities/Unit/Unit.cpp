@@ -20338,8 +20338,7 @@ public:
     AuraMunchingQueue(Unit& owner, ObjectGuid targetGUID, int32 basePoints, uint32 spellId, AuraEffect const* aurEff) :
         _owner(owner), _targetGUID(targetGUID), _basePoints(basePoints), _spellId(spellId)
     {
-        if (aurEff)
-            _aurEff = aurEff->GetBase()->GetDuration() > 400 ? aurEff : nullptr;
+        _aurEff = aurEff && aurEff->GetBase()->GetDuration() > 400 ? aurEff : nullptr;
     }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override

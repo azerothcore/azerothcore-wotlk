@@ -4466,7 +4466,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Revitalize
-    ApplySpellFix({ 48540, 48541, 48542, 48543 }, [](SpellInfo* spellInfo)
+    // Ignite
+    ApplySpellFix({ 48540, 48541, 48542, 48543, 12654 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
