@@ -340,7 +340,7 @@ public:
         {
             if (summon->GetEntry() == NPC_HARBINGER_SKYRISS)
             {
-                Unit::Kill(me, me);
+                me->KillSelf();
                 me->setActive(false);
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, DONE);
                 if (Creature* creature = summons.GetCreatureWithEntry(NPC_MILLHOUSE))

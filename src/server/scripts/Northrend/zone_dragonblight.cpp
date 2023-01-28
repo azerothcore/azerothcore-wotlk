@@ -1435,7 +1435,7 @@ public:
             else if (a == -2)
             {
                 me->CastSpell(me, SPELL_SAC_GHOUL_EXPLODE, true);
-                Unit::Kill(me, me);
+                me->KillSelf();
                 me->m_Events.KillAllEvents(true);
                 Deactivate();
             }
