@@ -83,6 +83,11 @@ public:
             BossAI::Reset();
         }
 
+        bool CanMeleeHit()
+        {
+            return me->GetVictim() && (me->GetVictim()->GetPositionZ() < 53.0f || me->GetVictim()->GetDistance(me->GetHomePosition()) < 50.0f);
+        }
+
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
@@ -234,6 +239,11 @@ public:
                 return;
             }
 
+            if (!CanMeleeHit())
+            {
+                BossAI::EnterEvadeMode(EvadeReason::EVADE_REASON_BOUNDARY);
+            }
+
             scheduler.Update(diff,
                 std::bind(&BossAI::DoMeleeAttackIfReady, this));
         }
@@ -241,7 +251,9 @@ public:
         void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Mechanic == MECHANIC_DISARM)
+            {
                 Talk(SAY_DISARMED);
+            }
 
             if (spellInfo->Id == SPELL_MOUNT)
             {
@@ -321,6 +333,11 @@ public:
             me->SetReactState(REACT_DEFENSIVE);
         }
 
+        bool CanMeleeHit()
+        {
+            return me->GetVictim() && (me->GetVictim()->GetPositionZ() < 53.0f || me->GetVictim()->GetDistance(me->GetHomePosition()) < 50.0f);
+        }
+
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             // Midnight never dies, let health fall to 1 and prevent further damage.
@@ -387,6 +404,11 @@ public:
             if (!UpdateVictim() || _phase == PHASE_MOUNTED)
             {
                 return;
+            }
+
+            if (!CanMeleeHit())
+            {
+                BossAI::EnterEvadeMode(EvadeReason::EVADE_REASON_BOUNDARY);
             }
 
             scheduler.Update(diff,
