@@ -1,3 +1,4 @@
+-- DB update 2023_01_28_05 -> 2023_01_28_06
 --
 
 DELETE FROM `creature_onkill_reputation` WHERE `creature_id` = 18413;

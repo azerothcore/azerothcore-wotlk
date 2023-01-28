@@ -1,3 +1,4 @@
+-- DB update 2023_01_28_02 -> 2023_01_28_03
 DELETE FROM `item_template_locale` WHERE `ID` = 11000 AND `locale` IN ('esES', 'esMX');
 INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `VerifiedBuild`) VALUES
 (11000, 'esES', 'Llave Sombratiniebla', 'Maestro de la llave de las Profundidades, Cortesía de F.F.F.', 0),
