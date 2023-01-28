@@ -16309,9 +16309,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         bool isTriggeredAtSpellProcEvent = IsTriggeredAtSpellProcEvent(target, triggerData.aura, attType, isVictim, active, triggerData.spellProcEvent, eventInfo);
 
         // AuraScript Hook
-        triggerData.aura->CallScriptCheckAfterProcHandlers(itr->second, eventInfo);
-
-        if (!isTriggeredAtSpellProcEvent)
+        if (!triggerData.aura->CallScriptAfterCheckProcHandlers(itr->second, eventInfo, isTriggeredAtSpellProcEvent))
         {
             continue;
         }
