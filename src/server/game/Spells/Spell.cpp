@@ -2918,11 +2918,14 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_SUPRESS_TARGET_PROCS));
 
             // Patch 3.0.8: All player spells which cause a creature to become aggressive to you will now also immediately cause the creature to be tapped.
-            if (Creature* creature = effectUnit->ToCreature())
+            if (effectUnit->IsInCombatWith(m_caster))
             {
-                if (!creature->hasLootRecipient() && m_caster->IsPlayer())
+                if (Creature* creature = effectUnit->ToCreature())
                 {
-                    creature->SetLootRecipient(m_caster);
+                    if (!creature->hasLootRecipient() && m_caster->IsPlayer())
+                    {
+                        creature->SetLootRecipient(m_caster);
+                    }
                 }
             }
 

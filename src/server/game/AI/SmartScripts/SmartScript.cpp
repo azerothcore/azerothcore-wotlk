@@ -859,7 +859,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_GROUPEVENTHAPPENS: Player {}, group credit for quest {}",
-                        unit->GetGUID().ToString(), e.action.quest.quest);
+                        player->GetGUID().ToString(), e.action.quest.quest);
                 }
 
                 // Special handling for vehicles
