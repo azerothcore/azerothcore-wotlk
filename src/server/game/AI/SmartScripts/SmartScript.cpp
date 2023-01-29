@@ -3207,13 +3207,23 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             // xinef: Get owner of owner
             if (e.target.owner.useCharmerOrOwner && !targets.empty())
             {
-                if (Unit* owner = targets.front()->ToUnit())
+                if (WorldObject* owner = targets.front())
                 {
                     targets.clear();
 
-                    if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->GetCharmerOrOwnerGUID()))
+                    if (owner->ToCreature())
                     {
-                        targets.push_back(base);
+                        if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->ToCreature()->GetCharmerOrOwnerGUID()))
+                        {
+                            targets.push_back(base);
+                        }
+                    }
+                    else
+                    {
+                        if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->ToGameObject()->GetOwnerGUID()))
+                        {
+                            targets.push_back(base);
+                        }
                     }
                 }
             }
