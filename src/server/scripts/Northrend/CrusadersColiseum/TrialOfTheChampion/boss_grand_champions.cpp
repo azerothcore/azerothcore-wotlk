@@ -654,7 +654,7 @@ public:
                 case SPELL_TRAMPLE_STUN:
                     {
                         char buffer[50];
-                        sprintf(buffer, "%s is trampled!", me->GetName().c_str());
+                        snprintf(buffer, sizeof(buffer), "%s is trampled!", me->GetName().c_str());
                         me->TextEmote(buffer);
                     }
                     break;

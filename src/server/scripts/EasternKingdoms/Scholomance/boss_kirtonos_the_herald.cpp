@@ -106,7 +106,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             events2.Reset();
             events2.ScheduleEvent(INTRO_1, 1000);
