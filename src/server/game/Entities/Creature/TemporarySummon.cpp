@@ -304,7 +304,6 @@ void TempSummon::UnSummon(uint32 msTime)
         return;
     }
 
-    Unit* owner = GetSummonerUnit();
 
     if (WorldObject* owner = GetSummoner())
     {
