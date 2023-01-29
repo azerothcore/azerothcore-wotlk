@@ -18,7 +18,6 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "TaskScheduler.h"
 #include "the_underbog.h"
 
 enum Spells
@@ -45,16 +44,16 @@ enum Misc
     RANGE_CHECK  = 2
 };
 
-struct boss_swamplord_muselek : public ScriptedAI
+struct boss_swamplord_muselek : public BossAI
 {
-    boss_swamplord_muselek(Creature* creature) : ScriptedAI(creature) { }
+    boss_swamplord_muselek(Creature* creature) : BossAI(creature, DATA_MUSELEK) { }
 
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
         _markTarget.Clear();
 
-        _scheduler.SetValidator([this]
+        scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
@@ -91,7 +90,7 @@ struct boss_swamplord_muselek : public ScriptedAI
     {
         Talk(SAY_AGGRO);
 
-        _scheduler.Schedule(3s, [this](TaskContext context)
+        scheduler.Schedule(3s, [this](TaskContext context)
         {
             if (CanShootVictim())
             {
@@ -124,7 +123,7 @@ struct boss_swamplord_muselek : public ScriptedAI
                 _markTarget = target->GetGUID();
                 DoCastVictim(SPELL_THROW_FREEZING_TRAP);
 
-                _scheduler.Schedule(3s, [this, target](TaskContext)
+                scheduler.Schedule(3s, [this, target](TaskContext)
                 {
                     if (target)
                     {
@@ -139,7 +138,7 @@ struct boss_swamplord_muselek : public ScriptedAI
                     }
                 });
 
-                _scheduler.Schedule(5s, [this, target](TaskContext)
+                scheduler.Schedule(5s, [this, target](TaskContext)
                 {
                     if (target)
                     {
@@ -164,12 +163,11 @@ struct boss_swamplord_muselek : public ScriptedAI
         if (!UpdateVictim())
             return;
 
-        _scheduler.Update(diff,
+        scheduler.Update(diff,
             std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
 
 private:
-    TaskScheduler _scheduler;
     ObjectGuid _markTarget;
 };
 
