@@ -171,7 +171,7 @@ public:
             BossAI::JustSummoned(summon);
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (summoner->GetEntry() == NPC_MIDNIGHT)
             {
