@@ -53,6 +53,7 @@ void AddSC_instance_steam_vault();
 void AddSC_underbog();                       //CR Underbog
 void AddSC_boss_hungarfen();
 void AddSC_boss_ghazan();
+void AddSC_boss_swamplord_muselek();
 void AddSC_boss_the_black_stalker();
 void AddSC_instance_the_underbog();
 void AddSC_boss_ahune();
@@ -149,6 +150,7 @@ void AddOutlandScripts()
     AddSC_underbog();                       //CR Underbog
     AddSC_boss_hungarfen();
     AddSC_boss_ghazan();
+    AddSC_boss_swamplord_muselek();
     AddSC_boss_the_black_stalker();
     AddSC_instance_the_underbog();
     AddSC_boss_ahune();
