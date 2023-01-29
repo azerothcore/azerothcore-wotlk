@@ -727,7 +727,7 @@ struct npc_pet_gen_fetch_ball : public NullCreatureAI
     uint32 checkTimer;
     ObjectGuid targetGUID;
 
-    void IsSummonedBy(Unit* summoner) override
+    void IsSummonedBy(WorldObject* summoner) override
     {
         if (!summoner)
             return;
