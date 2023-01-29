@@ -1,3 +1,4 @@
+-- DB update 2023_01_29_00 -> 2023_01_29_01
 --
 UPDATE `creature_onkill_reputation` SET `RewOnKillRepFaction1` = 942, `RewOnKillRepFaction2` = 0, `MaxStanding1` = 4, `RewOnKillRepValue1` = 7, `TeamDependent` = 0 WHERE `creature_id` = 17730;
 
