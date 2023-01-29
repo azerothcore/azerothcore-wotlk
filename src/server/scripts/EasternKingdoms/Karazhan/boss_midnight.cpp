@@ -134,7 +134,7 @@ public:
             if (summon->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED)
             {
                 summons.clear();
-                Unit::Kill(me, me);
+                me->KillSelf();
             }
         }
 

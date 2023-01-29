@@ -444,7 +444,7 @@ public:
             {
                 me->SetLootRecipient(me->GetOwner());
                 me->LowerPlayerDamageReq(me->GetMaxHealth());
-                Unit::Kill(me, me);
+                me->KillSelf();
                 deathTimer = 600000;
             }
             else

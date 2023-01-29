@@ -306,7 +306,7 @@ public:
             {
                 summons.DespawnEntry(_nefarianLeftTunnel);
                 summons.DespawnEntry(_nefarianRightTunnel);
-                Unit::Kill(me, me);
+                me->KillSelf();
             }
         }
 
