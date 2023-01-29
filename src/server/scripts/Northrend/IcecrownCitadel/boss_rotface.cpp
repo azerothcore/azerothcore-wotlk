@@ -358,13 +358,18 @@ public:
         EventMap events;
         InstanceScript* instance;
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
 
-            me->AddThreat(summoner, 500000.0f);
-            AttackStart(summoner);
+            if (summoner->GetTypeId() != TYPEID_UNIT)
+            {
+                return;
+            }
+
+            me->AddThreat(summoner->ToUnit(), 500000.0f);
+            AttackStart(summoner->ToUnit());
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -437,7 +442,7 @@ public:
         EventMap events;
         InstanceScript* instance;
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             if (Player* p = me->SelectNearestPlayer(100.0f))
                 AttackStart(p);

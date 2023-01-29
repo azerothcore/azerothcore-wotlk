@@ -320,7 +320,7 @@ public:
             }
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             std::list<Player*> playerOnQuestList;
             Acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);

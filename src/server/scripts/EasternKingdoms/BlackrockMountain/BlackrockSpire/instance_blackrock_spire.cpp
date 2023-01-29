@@ -981,7 +981,7 @@ public:
     {
         npc_vaelastrasz_the_redAI(Creature* creature) : CreatureAI(creature) { }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
             {
