@@ -7878,7 +7878,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
         if (loot_type == LOOT_PICKPOCKETING)
         {
-            if (loot->loot_type != LOOT_PICKPOCKETING)
+            if (!loot || loot->loot_type != LOOT_PICKPOCKETING)
             {
                 if (creature->CanGeneratePickPocketLoot())
                 {
