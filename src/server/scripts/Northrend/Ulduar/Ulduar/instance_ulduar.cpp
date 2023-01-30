@@ -24,6 +24,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "ulduar.h"
+#include "Config.h"
 
 class instance_ulduar : public InstanceMapScript
 {
@@ -166,6 +167,12 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
+            if (sConfigMgr->GetOption<bool>("IsOpenULD", true)==false)
+            {
+                player->TeleportTo(571, 5809.55, 503.975, 657.526, 2.38338);
+                return;
+            }
+
             // mimiron tram:
             instance->LoadGrid(2307.0f, 284.632f);
             if (GameObject* MimironTram = instance->GetGameObject(m_mimironTramGUID))

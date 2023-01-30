@@ -21,6 +21,7 @@
 #include "ScriptedCreature.h"
 #include "Vehicle.h"
 #include "trial_of_the_champion.h"
+#include "Config.h"
 
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
@@ -258,6 +259,13 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
+            if (sConfigMgr->GetOption<bool>("IsOpenTOCInstance", true) == false)
+            {
+                plr->TeleportTo(571, 5809.55, 503.975, 657.526, 2.38338);
+                return;
+            }
+
+
             if (DoNeedCleanup(plr))
             {
                 InstanceCleanup();

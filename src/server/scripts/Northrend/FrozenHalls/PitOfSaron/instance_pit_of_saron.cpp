@@ -19,6 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "pit_of_saron.h"
+#include "Config.h"
 
 class instance_pit_of_saron : public InstanceMapScript
 {
@@ -71,8 +72,14 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player*  /*plr*/) override
+        void OnPlayerEnter(Player*  plr) override
         {
+            if (sConfigMgr->GetOption<bool>("IsOpenPOSInstance", true) == false)
+            {
+                plr->TeleportTo(571, 5809.55, 503.975, 657.526, 2.38338);
+                return;
+            }
+
             instance->LoadGrid(LeaderIntroPos.GetPositionX(), LeaderIntroPos.GetPositionY());
             if (Creature* c = instance->GetCreature(GetGuidData(DATA_LEADER_FIRST_GUID)))
                 c->AI()->SetData(DATA_START_INTRO, 0);

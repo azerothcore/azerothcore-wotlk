@@ -18,6 +18,7 @@
 #include "MapMgr.h"
 #include "Transport.h"
 #include "halls_of_reflection.h"
+#include "Config.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -192,6 +193,16 @@ public:
             outroTimer = 0;
             outroStep = 0;
             T1 = nullptr;
+        }
+
+        void OnPlayerEnter(Player* plr) override
+        {
+            if (sConfigMgr->GetOption<bool>("IsOpenHORInstance", true) == false)
+            {
+                plr->TeleportTo(571, 5809.55, 503.975, 657.526, 2.38338);
+                return;
+            }
+     
         }
 
         bool IsEncounterInProgress() const override

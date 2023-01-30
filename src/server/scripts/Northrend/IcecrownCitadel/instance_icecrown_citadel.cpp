@@ -28,6 +28,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "icecrown_citadel.h"
+#include "Config.h"
 
 enum EventIds
 {
@@ -242,6 +243,12 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
+            if (sConfigMgr->GetOption<bool>("IsOpenICC", true) == false)
+            {
+                player->TeleportTo(571, 5809.55, 503.975, 657.526, 2.38338);
+                return;
+            }
+
             if (TeamIdInInstance == TEAM_NEUTRAL)
                 TeamIdInInstance = player->GetTeamId();
 

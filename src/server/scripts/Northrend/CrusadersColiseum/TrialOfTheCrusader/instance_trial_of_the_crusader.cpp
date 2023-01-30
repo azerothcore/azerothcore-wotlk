@@ -21,6 +21,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "trial_of_the_crusader.h"
+#include "Config.h"
 
 #define CLEANUP_CHECK_INTERVAL  5000
 std::map<uint32, bool> validDedicatedInsanityItems;
@@ -1395,6 +1396,12 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
+            if (sConfigMgr->GetOption<bool>("IsOpenTOCRaid", true) == false)
+            {
+                plr->TeleportTo(571, 5809.55, 503.975, 657.526, 2.38338);
+                return;
+            }
+
             if( instance->IsHeroic() )
             {
                 plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 1);
