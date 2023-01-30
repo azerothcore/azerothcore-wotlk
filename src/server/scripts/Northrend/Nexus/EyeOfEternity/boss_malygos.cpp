@@ -1201,15 +1201,14 @@ public:
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
-                                    if (pPlayer->IsAlive())
-                                        if(!pPlayer->GetVehicle())
-                                            guids.push_back(pPlayer->GetGUID());
-                                    
+                                    if (!pPlayer->IsAlive() || pPlayer->IsGameMaster())
+                                        continue;
+                                    guids.push_back(pPlayer->GetGUID());
                                 }
                         if (!guids.empty())
                             if (Player* plr = ObjectAccessor::GetPlayer(*me, guids.at(urand(0, guids.size() - 1))))
                                 me->CastSpell(plr, SPELL_SCION_ARCANE_BARRAGE);
-                        guids.clear();
+
                         events.RepeatEvent(urand(5000, 8000));
                     }
                     break;
