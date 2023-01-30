@@ -311,7 +311,7 @@ Creature* ObjectAccessor::GetSpawnedCreatureByDBGUID(uint32 mapId, uint64 guid)
 /**
  * @brief Get a spawned gameobject by DB `guid` column. MODULE USAGE ONLY - USE IT FOR CUSTOM CONTENT.
  *
- * @param uint32 mapId The map id where the creature is spawned.
+ * @param uint32 mapId The map id where the gameobject is spawned.
  * @param uint64 guid Database guid of the gameobject we are accessing.
  */
 GameObject* ObjectAccessor::GetSpawnedGameObjectByDBGUID(uint32 mapId, uint64 guid)
