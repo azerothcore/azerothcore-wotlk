@@ -269,11 +269,10 @@ void TempSummon::InitSummon()
                 owner->ToGameObject()->AI()->JustSummoned(this);
             }
         }
-    }
 
-    // Xinef: Allow to call this hook when npc is summoned by gameobject, in this case pass this as summoner to avoid possible null checks
-    if (IsAIEnabled)
-        AI()->IsSummonedBy(owner);
+        if (IsAIEnabled)
+            AI()->IsSummonedBy(owner);
+    }
 }
 
 void TempSummon::SetTempSummonType(TempSummonType type)
