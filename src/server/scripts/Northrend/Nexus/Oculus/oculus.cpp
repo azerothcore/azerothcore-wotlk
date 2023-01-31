@@ -30,6 +30,7 @@
 #include "Vehicle.h"
 #include <unordered_map>
 
+
 enum Drakes
 {
     SPELL_RIDE_RUBY_DRAKE_QUE               = 49463,
@@ -353,8 +354,8 @@ public:
         uint16 despawnTimer;
 
         void IsSummonedBy(WorldObject* summoner) override
-        {
-            if (summoner->GetTypeId() != TYPEID_UNIT)
+        {      
+            if (summoner->GetTypeId() != TYPEID_PLAYER)
             {
                 return;
             }
@@ -392,9 +393,10 @@ public:
 
         void PassengerBoarded(Unit* passenger, int8 /*seatid*/, bool add) override
         {
+           
             if (passenger->GetTypeId() != TYPEID_PLAYER)
                 return;
-
+           
             if (add)
             {
                 despawnTimer = 0;
@@ -765,7 +767,7 @@ public:
         void SetDest(SpellDestination& dest)
         {
             // Adjust effect summon position
-            Position const offset = { 0.0f, 0.0f, 12.0f, 0.0f };
+            Position const offset = { 0.0f, 0.0f, 12.0f, 0.0f };  //12.0f
             dest.RelocateOffset(offset);
         }
 
