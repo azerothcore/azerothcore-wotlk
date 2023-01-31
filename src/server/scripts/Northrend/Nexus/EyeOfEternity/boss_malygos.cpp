@@ -1207,7 +1207,7 @@ public:
                                         {
                                             guids.push_back(pPlayer->GetGUID());
                                         }
-                                    }         
+                                    }
                                 }
                         if (!guids.empty())
                             if (Player* plr = ObjectAccessor::GetPlayer(*me, guids.at(urand(0, guids.size() - 1))))
