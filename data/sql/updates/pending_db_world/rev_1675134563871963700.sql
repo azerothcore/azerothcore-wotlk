@@ -1,4 +1,4 @@
-DELETE FROM `game_event_creature` WHERE `eventEntry`=13 AND `guid` IN (247200, 247205, 247210, 247215);
+DELETE FROM `game_event_creature` WHERE `eventEntry`=13 AND `guid` IN (14461, 247200, 247205, 247210, 247215);
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 -- Elemental Invasions
 (13, 247200), -- Baron Charr
