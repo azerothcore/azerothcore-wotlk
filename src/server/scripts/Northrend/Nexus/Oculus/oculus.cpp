@@ -355,7 +355,7 @@ public:
 
         void IsSummonedBy(WorldObject* summoner) override
         {      
-            if (summoner->GetTypeId() != TYPEID_PLAYER)
+            if(summoner->GetTypeId() != TYPEID_PLAYER)
             {
                 return;
             }
@@ -767,7 +767,7 @@ public:
         void SetDest(SpellDestination& dest)
         {
             // Adjust effect summon position
-            Position const offset = { 0.0f, 0.0f, 12.0f, 0.0f };  //12.0f
+            Position const offset = { 0.0f, 0.0f, 12.0f, 0.0f };
             dest.RelocateOffset(offset);
         }
 
