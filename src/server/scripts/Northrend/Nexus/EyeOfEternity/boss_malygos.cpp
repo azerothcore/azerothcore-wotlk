@@ -1201,8 +1201,10 @@ public:
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
-                                    if (pPlayer->IsAlive()) {
-                                        if (!pPlayer->GetVehicle()) {
+                                    if (pPlayer->IsAlive())
+                                    {
+                                        if (!pPlayer->GetVehicle())
+                                        {
                                             guids.push_back(pPlayer->GetGUID());
                                         }
                                     }         
