@@ -1,5 +1,3 @@
-UPDATE `quest_details` SET `Emote1`='0' WHERE  `ID`=54;
-
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 197;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 19700);
