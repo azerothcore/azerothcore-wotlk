@@ -30,6 +30,7 @@
 #include "Vehicle.h"
 #include <unordered_map>
 
+
 enum Drakes
 {
     SPELL_RIDE_RUBY_DRAKE_QUE               = 49463,
@@ -354,11 +355,13 @@ public:
 
         void IsSummonedBy(WorldObject* summoner) override
         {
-            if (summoner->GetTypeId() != TYPEID_UNIT)
+         //   std::string_view text = "is run here!!!";
+           
+            if (summoner->GetTypeId() != TYPEID_PLAYER)
             {
                 return;
             }
-
+         //   LOG_INFO("server.worldserver", text);
             if (m_pInstance->GetBossState(DATA_EREGOS) == IN_PROGRESS)
                 if (Creature* eregos = me->FindNearestCreature(NPC_EREGOS, 450.0f, true))
                     eregos->DespawnOrUnsummon(); // On retail this kills abusive call of drake during engaged Eregos
@@ -392,9 +395,10 @@ public:
 
         void PassengerBoarded(Unit* passenger, int8 /*seatid*/, bool add) override
         {
+           
             if (passenger->GetTypeId() != TYPEID_PLAYER)
                 return;
-
+           
             if (add)
             {
                 despawnTimer = 0;
@@ -765,7 +769,7 @@ public:
         void SetDest(SpellDestination& dest)
         {
             // Adjust effect summon position
-            Position const offset = { 0.0f, 0.0f, 12.0f, 0.0f };
+            Position const offset = { 0.0f, 0.0f, 12.0f, 0.0f };  //12.0f
             dest.RelocateOffset(offset);
         }
 
