@@ -1,3 +1,4 @@
+-- DB update 2023_01_31_06 -> 2023_01_31_07
 UPDATE `creature_template` SET `speed_walk`=1, `speed_run`=1.14286 WHERE `entry`=16695;
 UPDATE `creature_template` SET `speed_walk`=1, `speed_run`=1.14286 WHERE `entry`=17716;
 UPDATE `creature_template` SET `speed_walk`=0.66667, `speed_run`=0.85714 WHERE `entry`=17391;
