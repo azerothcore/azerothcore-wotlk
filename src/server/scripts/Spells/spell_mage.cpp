@@ -787,9 +787,9 @@ class spell_mage_master_of_elements : public AuraScript
         return ValidateSpellInfo({ SPELL_MAGE_MASTER_OF_ELEMENTS_ENERGIZE });
     }
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
     {
-        if (!eventInfo.GetActor() || !eventInfo.GetActionTarget())
+        if (!isTriggeredAtSpellProcEvent || !eventInfo.GetActor() || !eventInfo.GetActionTarget())
         {
             return false;
         }
@@ -850,7 +850,7 @@ class spell_mage_master_of_elements : public AuraScript
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_mage_master_of_elements::CheckProc);
+        DoAfterCheckProc += AuraAfterCheckProcFn(spell_mage_master_of_elements::AfterCheckProc);
         OnEffectProc += AuraEffectProcFn(spell_mage_master_of_elements::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 
@@ -963,14 +963,14 @@ class spell_mage_fingers_of_frost_proc_aura : public AuraScript
         return true;
     }
 
-    bool CheckAfterProc(ProcEventInfo& eventInfo)
+    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
     {
         if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_CAST)
         {
             eventInfo.ResetProcChance();
         }
 
-        return true;
+        return isTriggeredAtSpellProcEvent;
     }
 
     void HandleOnEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
@@ -1013,7 +1013,7 @@ class spell_mage_fingers_of_frost_proc_aura : public AuraScript
     void Register()
     {
         DoCheckProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckProc);
-        DoCheckAfterProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckAfterProc);
+        DoAfterCheckProc += AuraAfterCheckProcFn(spell_mage_fingers_of_frost_proc_aura::AfterCheckProc);
         OnEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleOnEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
         AfterEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleAfterEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
