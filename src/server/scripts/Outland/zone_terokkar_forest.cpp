@@ -24,7 +24,6 @@ EndScriptData */
 
 /* ContentData
 npc_unkor_the_ruthless
-npc_rotting_forest_rager
 npc_netherweb_victim
 npc_floon
 npc_isla_starmane
@@ -446,38 +445,6 @@ public:
 };
 
 /*######
-## npc_rotting_forest_rager
-######*/
-
-class npc_rotting_forest_rager : public CreatureScript
-{
-public:
-    npc_rotting_forest_rager() : CreatureScript("npc_rotting_forest_rager") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_rotting_forest_ragerAI(creature);
-    }
-
-    struct npc_rotting_forest_ragerAI : public ScriptedAI
-    {
-        npc_rotting_forest_ragerAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override { }
-        void EnterCombat(Unit* /*who*/) override { }
-
-        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (done_by && done_by->GetTypeId() == TYPEID_PLAYER)
-                if (me->GetHealth() <= damage)
-                    if (rand() % 100 < 75)
-                        //Summon Lots of Wood Mights
-                        DoCast(me, 39134, true);
-        }
-    };
-};
-
-/*######
 ## npc_floon
 ######*/
 
@@ -839,7 +806,6 @@ void AddSC_terokkar_forest()
 
     // Theirs
     new npc_unkor_the_ruthless();
-    new npc_rotting_forest_rager();
     new npc_floon();
     new npc_isla_starmane();
     new go_skull_pile();
