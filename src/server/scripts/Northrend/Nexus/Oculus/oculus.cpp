@@ -353,7 +353,7 @@ public:
         uint16 despawnTimer;
 
         void IsSummonedBy(WorldObject* summoner) override
-        {      
+        {
             if (summoner->GetTypeId() != TYPEID_PLAYER)
             {
                 return;
@@ -391,7 +391,7 @@ public:
         }
 
         void PassengerBoarded(Unit* passenger, int8 /*seatid*/, bool add) override
-        {  
+        {
             if (passenger->GetTypeId() != TYPEID_PLAYER)
                 return;
             if (add)
