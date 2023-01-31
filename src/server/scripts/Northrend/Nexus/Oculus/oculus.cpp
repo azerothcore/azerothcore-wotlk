@@ -30,7 +30,6 @@
 #include "Vehicle.h"
 #include <unordered_map>
 
-
 enum Drakes
 {
     SPELL_RIDE_RUBY_DRAKE_QUE               = 49463,
@@ -392,8 +391,7 @@ public:
         }
 
         void PassengerBoarded(Unit* passenger, int8 /*seatid*/, bool add) override
-        {
-           
+        {  
             if (passenger->GetTypeId() != TYPEID_PLAYER)
                 return;
             if (add)
