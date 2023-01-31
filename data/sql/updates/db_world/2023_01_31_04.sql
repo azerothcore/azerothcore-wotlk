@@ -1,3 +1,4 @@
+-- DB update 2023_01_31_03 -> 2023_01_31_04
 -- Coilskar Sire (19768)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19768;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19768);

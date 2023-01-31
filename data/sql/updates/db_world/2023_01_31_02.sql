@@ -1,3 +1,4 @@
+-- DB update 2023_01_31_01 -> 2023_01_31_02
 --
 UPDATE `creature_text` SET `BroadcastTextId`=37088 WHERE `CreatureID`=36993 AND `GroupID`=6 AND `ID`=0;
 UPDATE `creature_text` SET `BroadcastTextId`=37089 WHERE `CreatureID`=36993 AND `GroupID`=9 AND `ID`=0;

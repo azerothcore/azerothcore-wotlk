@@ -1,3 +1,4 @@
+-- DB update 2023_01_31_00 -> 2023_01_31_01
 --
 ALTER TABLE `creature_summon_groups` ADD COLUMN `Comment` varchar(255) NOT NULL DEFAULT '' AFTER `summonTime`;
 
