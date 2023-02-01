@@ -24,7 +24,7 @@ class at_quagmirran_lair : public AreaTriggerScript
 public:
     at_quagmirran_lair() : AreaTriggerScript("at_quagmirran_lair") {}
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {

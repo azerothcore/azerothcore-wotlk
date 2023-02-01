@@ -32,9 +32,9 @@ public:
     SmartScript();
     ~SmartScript();
 
-    void OnInitialize(WorldObject* obj, AreaTrigger const* at = nullptr);
+    void OnInitialize(WorldObject* obj, AreaTriggerEntry const* at = nullptr);
     void GetScript();
-    void FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at);
+    void FillScript(SmartAIEventList e, WorldObject* obj, AreaTriggerEntry const* at);
 
     void ProcessEventsFor(SMART_EVENT e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, SpellInfo const* spell = nullptr, GameObject* gob = nullptr);
     void ProcessEvent(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, SpellInfo const* spell = nullptr, GameObject* gob = nullptr);
@@ -249,7 +249,8 @@ private:
     ObjectGuid meOrigGUID;
     GameObject* go;
     ObjectGuid goOrigGUID;
-    AreaTrigger const* trigger;
+    Player* atPlayer;
+    AreaTriggerEntry const* trigger;
     SmartScriptType mScriptType;
     uint32 mEventPhase;
 

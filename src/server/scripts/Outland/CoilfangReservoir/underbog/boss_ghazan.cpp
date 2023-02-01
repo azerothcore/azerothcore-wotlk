@@ -165,7 +165,7 @@ class at_underbog_ghazan : public OnlyOnceAreaTriggerScript
 public:
     at_underbog_ghazan() : OnlyOnceAreaTriggerScript("at_underbog_ghazan") {}
 
-    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {

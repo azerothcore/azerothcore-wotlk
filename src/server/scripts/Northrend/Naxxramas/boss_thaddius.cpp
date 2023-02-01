@@ -748,7 +748,7 @@ class at_thaddius_entrance : public AreaTriggerScript
 public:
     at_thaddius_entrance() : AreaTriggerScript("at_thaddius_entrance") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
     {
         InstanceScript* instance = player->GetInstanceScript();
         if (!instance || instance->GetData(DATA_HAD_THADDIUS_GREET) || instance->GetBossState(BOSS_THADDIUS) == DONE)

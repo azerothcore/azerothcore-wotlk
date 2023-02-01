@@ -276,7 +276,7 @@ class at_trigger_the_beast_movement : public AreaTriggerScript
 public:
     at_trigger_the_beast_movement() : AreaTriggerScript("at_trigger_the_beast_movement") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*at*/) override
     {
         if (player->IsGameMaster())
         {
@@ -302,7 +302,7 @@ class at_the_beast_room : public AreaTriggerScript
 public:
     at_the_beast_room() : AreaTriggerScript("at_the_beast_room") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*at*/) override
     {
         if (player->IsGameMaster())
         {

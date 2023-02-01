@@ -24,6 +24,7 @@ char constexpr AchievementCriteriafmt[] = "niiiiiiiixxxxxxxxxxxxxxxxxiiiix";
 char constexpr AreaTableEntryfmt[] = "niiiixxxxxissssssssssssssssxiiiiixxx";
 char constexpr AreaGroupEntryfmt[] = "niiiiiii";
 char constexpr AreaPOIEntryfmt[] = "niiiiiiiiiiifffixixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxix";
+char constexpr AreaTriggerEntryfmt[] = "niffffffff";
 char constexpr AuctionHouseEntryfmt[] = "niiixxxxxxxxxxxxxxxxx";
 char constexpr BankBagSlotPricesEntryfmt[] = "ni";
 char constexpr BarberShopStyleEntryfmt[] = "nixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxiii";

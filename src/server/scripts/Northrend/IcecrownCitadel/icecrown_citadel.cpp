@@ -2268,7 +2268,7 @@ class at_icc_saurfang_portal : public AreaTriggerScript
 public:
     at_icc_saurfang_portal() : AreaTriggerScript("at_icc_saurfang_portal") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
     {
         InstanceScript* instance = player->GetInstanceScript();
         if (!instance || instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE)
@@ -2311,7 +2311,7 @@ class at_icc_shutdown_traps : public AreaTriggerScript
 public:
     at_icc_shutdown_traps() : AreaTriggerScript("at_icc_shutdown_traps") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             instance->SetData(DATA_COLDFLAME_JETS, DONE);
@@ -2324,7 +2324,7 @@ class at_icc_start_blood_quickening : public AreaTriggerScript
 public:
     at_icc_start_blood_quickening() : AreaTriggerScript("at_icc_start_blood_quickening") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             instance->SetData(DATA_BLOOD_QUICKENING_STATE, IN_PROGRESS);
@@ -2337,7 +2337,7 @@ class at_icc_start_frostwing_gauntlet : public AreaTriggerScript
 public:
     at_icc_start_frostwing_gauntlet() : AreaTriggerScript("at_icc_start_frostwing_gauntlet") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_SISTER_SVALNA) != DONE)
@@ -3729,7 +3729,7 @@ class at_icc_gauntlet_event : public AreaTriggerScript
 public:
     at_icc_gauntlet_event() : AreaTriggerScript("at_icc_gauntlet_event") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_SINDRAGOSA_GAUNTLET) == NOT_STARTED && !player->IsGameMaster())
@@ -3744,7 +3744,7 @@ class at_icc_putricide_trap : public AreaTriggerScript
 public:
     at_icc_putricide_trap() : AreaTriggerScript("at_icc_putricide_trap") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetData(DATA_PUTRICIDE_TRAP_STATE) == NOT_STARTED && !player->IsGameMaster())
@@ -3759,7 +3759,7 @@ class at_icc_spire_frostwyrm : public OnlyOnceAreaTriggerScript
 public:
     at_icc_spire_frostwyrm() : OnlyOnceAreaTriggerScript("at_icc_spire_frostwyrm") { }
 
-    bool _OnTrigger(Player* player, AreaTrigger const* areaTrigger) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* areaTrigger) override
     {
         if (player->GetInstanceScript()->GetPersistentData(DATA_SPIRE_FROSTWYRM) != DONE)
         {
@@ -3767,11 +3767,11 @@ public:
             const Position posHordeWyrm = { -375.538879f, 2120.774658f, 242.256775f, 3.714352f };
             const Position posAllianceWyrm = { -361.154358f, 2305.821289f, 244.771713f, 2.704335f };
 
-            bool hordeSide = areaTrigger->entry == HORDE_AREATRIGGER || areaTrigger->entry == HORDE_AREATRIGGER + 1;
+            bool hordeSide = areaTrigger->ID == HORDE_AREATRIGGER || areaTrigger->ID == HORDE_AREATRIGGER + 1;
 
             if (Creature* frostwyrm = player->SummonCreature(NPC_SPIRE_FROSTWYRM, hordeSide ? posHordeWyrm : posAllianceWyrm))
             {
-                frostwyrm->AI()->DoAction(areaTrigger->entry);
+                frostwyrm->AI()->DoAction(areaTrigger->ID);
             }
         }
 

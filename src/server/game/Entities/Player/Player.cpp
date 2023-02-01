@@ -2155,22 +2155,22 @@ void Player::SetInWater(bool apply)
     getHostileRefMgr().updateThreatTables();
 }
 
-bool Player::IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta) const
+bool Player::IsInAreaTriggerRadius(AreaTriggerEntry const* trigger, float delta) const
 {
-    if (!trigger || GetMapId() != trigger->map)
+    if (!trigger || GetMapId() != trigger->ContinentID)
         return false;
 
-    if (trigger->radius > 0)
+    if (trigger->Radius > 0.0f)
     {
         // if we have radius check it
-        float dist = GetDistance(trigger->x, trigger->y, trigger->z);
-        if (dist > trigger->radius + delta)
+        float dist = GetDistance(trigger->Pos.X, trigger->Pos.Y, trigger->Pos.Z);
+        if (dist > trigger->Radius + delta)
             return false;
     }
     else
     {
-        Position center(trigger->x, trigger->y, trigger->z, trigger->orientation);
-        if (!IsWithinBox(center, trigger->length / 2 + delta, trigger->width / 2 + delta, trigger->height / 2 + delta))
+        Position center(trigger->Pos.X, trigger->Pos.Y, trigger->Pos.Z, trigger->BoxYaw);
+        if (!IsWithinBox(center, trigger->BoxLength / 2.0f + delta, trigger->BoxWidth / 2.0f + delta, trigger->BoxHeight / 2.0f + delta))
             return false;
     }
 

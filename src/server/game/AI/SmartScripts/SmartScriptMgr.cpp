@@ -187,7 +187,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
                     }
                 case SMART_SCRIPT_TYPE_AREATRIGGER:
                     {
-                        if (!sObjectMgr->GetAreaTrigger((uint32)temp.entryOrGuid))
+                    if (!sAreaTriggerStore.LookupEntry((uint32)temp.entryOrGuid))
                         {
                             LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: AreaTrigger entry ({}) does not exist, skipped loading.", uint32(temp.entryOrGuid));
                             continue;

@@ -380,9 +380,9 @@ AreaTriggerScript::AreaTriggerScript(const char* name)
     ScriptRegistry<AreaTriggerScript>::AddScript(this);
 }
 
-bool OnlyOnceAreaTriggerScript::OnTrigger(Player* player, AreaTrigger const* trigger)
+bool OnlyOnceAreaTriggerScript::OnTrigger(Player* player, AreaTriggerEntry const* trigger)
 {
-    uint32 const triggerId = trigger->entry;
+    uint32 const triggerId = trigger->ID;
     if (InstanceScript* instance = player->GetInstanceScript())
     {
         if (instance->IsAreaTriggerDone(triggerId))
@@ -394,7 +394,7 @@ bool OnlyOnceAreaTriggerScript::OnTrigger(Player* player, AreaTrigger const* tri
             instance->MarkAreaTriggerDone(triggerId);
         }
     }
-    return _OnTrigger(player, trigger);
+    return OnTrigger(player, trigger);
 }
 
 void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(InstanceScript* script, uint32 triggerId)

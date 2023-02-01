@@ -806,7 +806,7 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when the area trigger is activated by a player.
-    [[nodiscard]] virtual bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
+    [[nodiscard]] virtual bool OnTrigger(Player* /*player*/, AreaTriggerEntry const* /*trigger*/) { return false; }
 };
 
 class OnlyOnceAreaTriggerScript : public AreaTriggerScript
@@ -814,10 +814,9 @@ class OnlyOnceAreaTriggerScript : public AreaTriggerScript
     using AreaTriggerScript::AreaTriggerScript;
 
 public:
-    [[nodiscard]] bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) override;
+    [[nodiscard]] bool OnTrigger(Player* /*player*/, AreaTriggerEntry const* /*trigger*/) override;
 
 protected:
-    virtual bool _OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) = 0;
     void ResetAreaTriggerDone(InstanceScript* /*instance*/, uint32 /*triggerId*/);
     void ResetAreaTriggerDone(Player const* /*player*/, AreaTrigger const* /*trigger*/);
 };
@@ -2034,7 +2033,7 @@ public:
     virtual void OnWeatherChange(Weather* /*weather*/, WeatherState /*state*/, float /*grade*/) { }
 
     // Called when the area trigger is activated by a player.
-    [[nodiscard]] virtual bool CanAreaTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
+    [[nodiscard]] virtual bool CanAreaTrigger(Player* /*player*/, AreaTriggerEntry const* /*trigger*/) { return false; }
 };
 
 // Manages registration, loading, and execution of scripts.
@@ -2170,7 +2169,7 @@ public: /* GameObjectScript */
     void OnGameObjectRemoveWorld(GameObject* go);
 
 public: /* AreaTriggerScript */
-    bool OnAreaTrigger(Player* player, AreaTrigger const* trigger);
+    bool OnAreaTrigger(Player* player, AreaTriggerEntry const* trigger);
 
 public: /* BattlegroundScript */
     Battleground* CreateBattleground(BattlegroundTypeId typeId);

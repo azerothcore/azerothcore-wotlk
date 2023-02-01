@@ -570,6 +570,18 @@ struct AreaPOIEntry
     //uint32 val2;              //53
 };
 
+struct AreaTriggerEntry
+{
+    uint32 ID;                                              // 0
+    uint32 ContinentID;                                     // 1
+    DBCPosition3D Pos;                                      // 2-4
+    float Radius;                                           // 5
+    float BoxLength;                                        // 6
+    float BoxWidth;                                         // 7
+    float BoxHeight;                                        // 8
+    float BoxYaw;                                           // 9
+};
+
 struct AuctionHouseEntry
 {
     uint32    houseId;                                      // 0 index
@@ -643,6 +655,7 @@ struct ChatChannelsEntry
 {
     uint32  ChannelID;                                      // 0
     uint32  flags;                                          // 1
+    //uint32 FactionGroup;                                  // 2
     char const*   pattern[16];                              // 3-18
     // 19 string flags, unused
     //char const*       name[16];                           // 20-35 unused

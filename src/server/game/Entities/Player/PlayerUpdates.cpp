@@ -277,8 +277,8 @@ void Player::Update(uint32 p_time)
             // supposed to be in one
             if (HasRestFlag(REST_FLAG_IN_TAVERN))
             {
-                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-                if (!atEntry || !IsInAreaTriggerRadius(atEntry, 5.f))
+                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(GetInnTriggerId());
+                if (!atEntry || !IsInAreaTriggerRadius(atEntry, 5.0f))
                 {
                     RemoveRestFlag(REST_FLAG_IN_TAVERN);
                 }

@@ -222,7 +222,7 @@ class at_zulgurub_entrance_speech : public OnlyOnceAreaTriggerScript
 public:
     at_zulgurub_entrance_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_entrance_speech") {}
 
-    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
@@ -249,7 +249,7 @@ class at_zulgurub_bridge_speech : public OnlyOnceAreaTriggerScript
 public:
     at_zulgurub_bridge_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_bridge_speech") {}
 
-    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
@@ -275,7 +275,7 @@ class at_zulgurub_temple_speech : public OnlyOnceAreaTriggerScript
 public:
     at_zulgurub_temple_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_temple_speech") {}
 
-    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
@@ -301,7 +301,7 @@ class at_zulgurub_bloodfire_pit_speech : public OnlyOnceAreaTriggerScript
 public:
     at_zulgurub_bloodfire_pit_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_bloodfire_pit_speech") {}
 
-    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
@@ -327,7 +327,7 @@ class at_zulgurub_edge_of_madness_speech : public OnlyOnceAreaTriggerScript
 public:
     at_zulgurub_edge_of_madness_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_edge_of_madness_speech") {}
 
-    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {

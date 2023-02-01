@@ -1098,7 +1098,7 @@ public:
 
     [[nodiscard]] bool IsInWater() const override { return m_isInWater; }
     [[nodiscard]] bool IsFalling() const;
-    bool IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta = 0.f) const;
+    bool IsInAreaTriggerRadius(AreaTriggerEntry const* trigger, float delta = 0.f) const;
 
     void SendInitialPacketsBeforeAddToMap();
     void SendInitialPacketsAfterAddToMap();

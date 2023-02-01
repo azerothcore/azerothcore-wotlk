@@ -891,7 +891,7 @@ public:
     [[nodiscard]] AreaTriggerTeleport const* GetGoBackTrigger(uint32 Map) const;
     [[nodiscard]] AreaTriggerTeleport const* GetMapEntranceTrigger(uint32 Map) const;
 
-    uint32 GetAreaTriggerScriptId(uint32 trigger_id);
+    uint32 GetAreaTriggerScriptId(uint32 trigger_id) const;
     SpellScriptsBounds GetSpellScriptsBounds(uint32 spell_id);
 
     [[nodiscard]] RepRewardRate const* GetRepRewardRate(uint32 factionId) const
@@ -1061,7 +1061,6 @@ public:
 
     void LoadGossipText();
 
-    void LoadAreaTriggers();
     void LoadAreaTriggerTeleports();
     void LoadAccessRequirements();
     void LoadQuestAreaTriggers();

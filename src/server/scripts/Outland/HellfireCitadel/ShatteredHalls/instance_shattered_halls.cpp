@@ -247,7 +247,7 @@ class at_shattered_halls_execution : public AreaTriggerScript
 public:
     at_shattered_halls_execution() : AreaTriggerScript("at_shattered_halls_execution") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
     {
         if (InstanceScript* instanceScript = player->GetInstanceScript())
             instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);

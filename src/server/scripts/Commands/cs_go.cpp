@@ -224,14 +224,14 @@ public:
 
     static bool HandleGoTriggerCommand(ChatHandler* handler, Variant<Hyperlink<areatrigger>, uint32> areaTriggerId)
     {
-        AreaTrigger const* at = sObjectMgr->GetAreaTrigger(areaTriggerId);
+        AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(areaTriggerId);
         if (!at)
         {
             handler->PSendSysMessage(LANG_COMMAND_GOAREATRNOTFOUND, uint32(areaTriggerId));
             handler->SetSentErrorMessage(true);
             return false;
         }
-        return DoTeleport(handler, { at->x, at->y, at->z }, at->map);
+        return DoTeleport(handler, { at->Pos.X, at->Pos.Y, at->Pos.Z }, at->ContinentID);
     }
 
     //teleport at coordinates

@@ -733,7 +733,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         return;
     }
 
-    AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(triggerId);
+    AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(triggerId);
     if (!atEntry)
     {
         LOG_DEBUG("network", "HandleAreaTriggerOpcode: Player '{}' ({}) send unknown (by DBC) Area Trigger ID:{}",
@@ -746,7 +746,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (!player->IsInAreaTriggerRadius(atEntry, isTavernAreatrigger ? 5.f : 0.f))
     {
         LOG_DEBUG("network", "HandleAreaTriggerOpcode: Player {} ({}) too far (trigger map: {} player map: {}), ignore Area Trigger ID: {}",
-                       player->GetName(), player->GetGUID().ToString(), atEntry->map, player->GetMapId(), triggerId);
+                       player->GetName(), player->GetGUID().ToString(), atEntry->ContinentID, player->GetMapId(), triggerId);
         return;
     }
 
@@ -764,7 +764,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (isTavernAreatrigger)
     {
         // set resting flag we are in the inn
-        player->SetRestFlag(REST_FLAG_IN_TAVERN, atEntry->entry);
+        player->SetRestFlag(REST_FLAG_IN_TAVERN, atEntry->ID);
 
         if (sWorld->IsFFAPvPRealm())
         {

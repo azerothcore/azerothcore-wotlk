@@ -1262,15 +1262,15 @@ class SmartTrigger : public AreaTriggerScript
 public:
     SmartTrigger() : AreaTriggerScript("SmartTrigger") {}
 
-    bool OnTrigger(Player* player, AreaTrigger const* trigger) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* trigger) override
     {
         if (!player->IsAlive())
             return false;
 
-        LOG_DEBUG("sql.sql", "AreaTrigger {} is using SmartTrigger script", trigger->entry);
+        LOG_DEBUG("sql.sql", "AreaTrigger {} is using SmartTrigger script", trigger->ID);
         SmartScript script;
         script.OnInitialize(nullptr, trigger);
-        script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->entry);
+        script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->ID);
         return true;
     }
 };

@@ -385,14 +385,6 @@ public:
         return true;
     }
 
-    static bool HandleReloadAreaTriggerCommand(ChatHandler* handler)
-    {
-        LOG_INFO("server.loading", "Re-Loading Area Trigger definitions...");
-        sObjectMgr->LoadAreaTriggers();
-        handler->SendGlobalGMSysMessage("DB table `areatrigger` reloaded.");
-        return true;
-    }
-
     static bool HandleReloadAreaTriggerTeleportCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Area Trigger teleport definitions...");

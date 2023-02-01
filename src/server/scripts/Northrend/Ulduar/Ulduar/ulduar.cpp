@@ -444,7 +444,7 @@ public:
     {
     }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/) override
     {
         if (player->IsAlive())
             if (uint32 questId = (player->GetMap()->Is25ManRaid() ? 13816 : 13607 /*QUEST_CELESTIAL_PLANETARIUM*/))

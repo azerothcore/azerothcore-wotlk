@@ -177,7 +177,7 @@ void BattlegroundWS::CheckFlagKeeperInArea(TeamId teamId)
     }
 
     uint32 triggerId = teamId == TEAM_ALLIANCE ? BG_WS_TRIGGER_HORDE_FLAG_SPAWN : BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN;
-    AreaTrigger const* areaTrigger = sObjectMgr->GetAreaTrigger(triggerId);
+    AreaTriggerEntry const* areaTrigger = sAreaTriggerStore.LookupEntry(triggerId);
     if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(teamId)))
     {
         if (areaTrigger && player->IsInAreaTriggerRadius(areaTrigger))

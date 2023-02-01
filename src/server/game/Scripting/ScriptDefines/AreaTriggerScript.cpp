@@ -18,7 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-bool ScriptMgr::OnAreaTrigger(Player* player, AreaTrigger const* trigger)
+bool ScriptMgr::OnAreaTrigger(Player* player, AreaTriggerEntry const* trigger)
 {
     ASSERT(player);
     ASSERT(trigger);
@@ -33,6 +33,6 @@ bool ScriptMgr::OnAreaTrigger(Player* player, AreaTrigger const* trigger)
         return false;
     }
 
-    auto tempScript = ScriptRegistry<AreaTriggerScript>::GetScriptById(sObjectMgr->GetAreaTriggerScriptId(trigger->entry));
+    auto tempScript = ScriptRegistry<AreaTriggerScript>::GetScriptById(sObjectMgr->GetAreaTriggerScriptId(trigger->ID));
     return tempScript ? tempScript->OnTrigger(player, trigger) : false;
 }

@@ -4257,7 +4257,7 @@ void SmartScript::OnUpdate(uint32 const diff)
     }
 }
 
-void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at)
+void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTriggerEntry const* at)
 {
     (void)at; // ensure that the variable is referenced even if extra logs are disabled in order to pass compiler checks
 
@@ -4267,7 +4267,7 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger c
             LOG_DEBUG("sql.sql", "SmartScript: EventMap for Entry {} is empty but is using SmartScript.", obj->GetEntry());
 
         if (at)
-            LOG_DEBUG("sql.sql", "SmartScript: EventMap for AreaTrigger {} is empty but is using SmartScript.", at->entry);
+            LOG_DEBUG("sql.sql", "SmartScript: EventMap for AreaTrigger {} is empty but is using SmartScript.", at->ID);
         return;
     }
     for (SmartAIEventList::iterator i = e.begin(); i != e.end(); ++i)
@@ -4311,12 +4311,12 @@ void SmartScript::GetScript()
     }
     else if (trigger)
     {
-        e = sSmartScriptMgr->GetScript((int32)trigger->entry, mScriptType);
+        e = sSmartScriptMgr->GetScript((int32)trigger->ID, mScriptType);
         FillScript(e, nullptr, trigger);
     }
 }
 
-void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
+void SmartScript::OnInitialize(WorldObject* obj, AreaTriggerEntry const* at)
 {
     if (obj)//handle object based scripts
     {
@@ -4332,20 +4332,25 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
                 go = obj->ToGameObject();
                 LOG_DEBUG("sql.sql", "SmartScript::OnInitialize: source is GameObject {}", go->GetEntry());
                 break;
+            case TYPEID_PLAYER:
+                if (at)
+                {
+                    mScriptType = SMART_SCRIPT_TYPE_AREATRIGGER;
+                    trigger = at;
+                    atPlayer = obj->ToPlayer();
+                    LOG_DEBUG("sql.sql", "SmartScript::OnInitialize: source is AreaTrigger {}, triggered by player {}", trigger->ID, atPlayer->GetGUID().ToString().c_str());
+                }
+                else
+                    LOG_ERROR("sql.sql", "SmartScript::OnInitialize: !WARNING! Player TypeID is only allowed for AreaTriggers");
+                break;
             default:
-                LOG_ERROR("scripts.ai.sai", "SmartScript::OnInitialize: Unhandled TypeID !WARNING!");
+                LOG_ERROR("sql.sql", "SmartScript::OnInitialize: Unhandled TypeID !WARNING!");
                 return;
         }
     }
-    else if (at)
-    {
-        mScriptType = SMART_SCRIPT_TYPE_AREATRIGGER;
-        trigger = at;
-        LOG_DEBUG("sql.sql", "SmartScript::OnInitialize: source is AreaTrigger {}", trigger->entry);
-    }
     else
     {
-        LOG_ERROR("scripts.ai.sai", "SmartScript::OnInitialize: !WARNING! Initialized objects are nullptr.");
+        LOG_ERROR("sql.sql", "SmartScript::OnInitialize: !WARNING! Initialized objects are nullptr.");
         return;
     }
 

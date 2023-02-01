@@ -157,11 +157,11 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
         {
             case TEAM_ALLIANCE:
                 {
-                    AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_A);
+                    AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(SI_AREATRIGGER_A);
                     if (atEntry)
                     {
                         // 5.0f is safe-distance
-                        if (player->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
+                        if (player->GetDistance(atEntry->Pos.X, atEntry->Pos.Y, atEntry->Pos.Z) > 5.0f + atEntry->Radius)
                         {
                             // he dropped it further, summon mound
                             GameObject* go = sObjectMgr->IsGameObjectStaticTransport(SI_SILITHYST_MOUND) ? new StaticTransport() : new GameObject();
@@ -191,11 +191,11 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
                 break;
             case TEAM_HORDE:
                 {
-                    AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_H);
+                    AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(SI_AREATRIGGER_H);
                     if (atEntry)
                     {
                         // 5.0f is safe-distance
-                        if (player->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
+                        if (player->GetDistance(atEntry->Pos.X, atEntry->Pos.Y, atEntry->Pos.Z) > 5.0f + atEntry->Radius)
                         {
                             // he dropped it further, summon mound
                             GameObject* go = sObjectMgr->IsGameObjectStaticTransport(SI_SILITHYST_MOUND) ? new StaticTransport() : new GameObject();

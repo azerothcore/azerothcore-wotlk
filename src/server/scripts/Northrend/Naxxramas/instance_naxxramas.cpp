@@ -1188,7 +1188,7 @@ class at_naxxramas_hub_portal : public AreaTriggerScript
 public:
     at_naxxramas_hub_portal() : AreaTriggerScript("at_naxxramas_hub_portal") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/) override
     {
         if (player->IsAlive() && !player->IsInCombat())
         {

@@ -989,7 +989,7 @@ class at_cthun_stomach_exit : public AreaTriggerScript
 public:
     at_cthun_stomach_exit() : AreaTriggerScript("at_cthun_stomach_exit") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
@@ -1038,7 +1038,7 @@ class at_cthun_center : public AreaTriggerScript
 public:
     at_cthun_center() : AreaTriggerScript("at_cthun_center") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
