@@ -7006,7 +7006,11 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
             continue;
 
         // Spells that should stay on the caster after removing the item.
-        constexpr std::array<int32, 1> spellExceptions = { /*Electromagnetic Gigaflux Reactivator*/ 11826 };
+        constexpr std::array<int32, 2> spellExceptions =
+        {
+            /*Electromagnetic Gigaflux Reactivator*/ 11826,
+            /*Book of the Damned - Summon Skeleton*/ 17490
+        };
         const auto found = std::find(std::begin(spellExceptions), std::end(spellExceptions), spellData.SpellId);
 
         // wrong triggering type
