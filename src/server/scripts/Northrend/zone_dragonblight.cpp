@@ -670,7 +670,7 @@ public:
         me->DespawnOrUnsummon(3s, 0s);
     }
 
-    void IsSummonedBy(Unit* summoner) override
+    void IsSummonedBy(WorldObject* summoner) override
     {
         me->SetFacingToObject(summoner);
         Position pos = summoner->GetPosition();
@@ -1435,7 +1435,7 @@ public:
             else if (a == -2)
             {
                 me->CastSpell(me, SPELL_SAC_GHOUL_EXPLODE, true);
-                Unit::Kill(me, me);
+                me->KillSelf();
                 me->m_Events.KillAllEvents(true);
                 Deactivate();
             }
@@ -1677,7 +1677,7 @@ public:
             return 5;
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -1689,7 +1689,7 @@ public:
             summoner->ToPlayer()->SendDirectMessage(&data);
 
             if (id == 1)
-                if (Aura* aura = summoner->GetAura(47189)) // Transform Aura
+                if (Aura* aura = summoner->ToUnit()->GetAura(47189)) // Transform Aura
                     aura->SetDuration(aura->GetDuration() - MINUTE * IN_MILLISECONDS);
         }
     };

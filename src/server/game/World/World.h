@@ -167,24 +167,24 @@ public:
     bool KickSession(uint32 id) override;
     /// Get the number of current active sessions
     void UpdateMaxSessionCounters() override;
-    [[nodiscard]] const SessionMap& GetAllSessions() const override { return m_sessions; }
-    [[nodiscard]] uint32 GetActiveAndQueuedSessionCount() const override { return m_sessions.size(); }
-    [[nodiscard]] uint32 GetActiveSessionCount() const override { return m_sessions.size() - m_QueuedPlayer.size(); }
-    [[nodiscard]] uint32 GetQueuedSessionCount() const override { return m_QueuedPlayer.size(); }
+    [[nodiscard]] const SessionMap& GetAllSessions() const override { return _sessions; }
+    [[nodiscard]] uint32 GetActiveAndQueuedSessionCount() const override { return _sessions.size(); }
+    [[nodiscard]] uint32 GetActiveSessionCount() const override { return _sessions.size() - _queuedPlayer.size(); }
+    [[nodiscard]] uint32 GetQueuedSessionCount() const override { return _queuedPlayer.size(); }
     /// Get the maximum number of parallel sessions on the server since last reboot
-    [[nodiscard]] uint32 GetMaxQueuedSessionCount() const override { return m_maxQueuedSessionCount; }
-    [[nodiscard]] uint32 GetMaxActiveSessionCount() const override { return m_maxActiveSessionCount; }
+    [[nodiscard]] uint32 GetMaxQueuedSessionCount() const override { return _maxQueuedSessionCount; }
+    [[nodiscard]] uint32 GetMaxActiveSessionCount() const override { return _maxActiveSessionCount; }
     /// Get number of players
-    [[nodiscard]] inline uint32 GetPlayerCount() const override { return m_PlayerCount; }
-    [[nodiscard]] inline uint32 GetMaxPlayerCount() const override { return m_MaxPlayerCount; }
+    [[nodiscard]] inline uint32 GetPlayerCount() const override { return _playerCount; }
+    [[nodiscard]] inline uint32 GetMaxPlayerCount() const override { return _maxPlayerCount; }
 
     /// Increase/Decrease number of players
     inline void IncreasePlayerCount() override
     {
-        m_PlayerCount++;
-        m_MaxPlayerCount = std::max(m_MaxPlayerCount, m_PlayerCount);
+        _playerCount++;
+        _maxPlayerCount = std::max(_maxPlayerCount, _playerCount);
     }
-    inline void DecreasePlayerCount() override { m_PlayerCount--; }
+    inline void DecreasePlayerCount() override { _playerCount--; }
 
     Player* FindPlayerInZone(uint32 zone) override;
 
@@ -195,13 +195,13 @@ public:
     void SetClosed(bool val) override;
 
     /// Security level limitations
-    [[nodiscard]] AccountTypes GetPlayerSecurityLimit() const override { return m_allowedSecurityLevel; }
+    [[nodiscard]] AccountTypes GetPlayerSecurityLimit() const override { return _allowedSecurityLevel; }
     void SetPlayerSecurityLimit(AccountTypes sec) override;
     void LoadDBAllowedSecurityLevel() override;
 
     /// Active session server limit
-    void SetPlayerAmountLimit(uint32 limit) override { m_playerLimit = limit; }
-    [[nodiscard]] uint32 GetPlayerAmountLimit() const override { return m_playerLimit; }
+    void SetPlayerAmountLimit(uint32 limit) override { _playerLimit = limit; }
+    [[nodiscard]] uint32 GetPlayerAmountLimit() const override { return _playerLimit; }
 
     //player Queue
     typedef std::list<WorldSession*> Queue;
@@ -212,24 +212,24 @@ public:
 
     /// \todo Actions on m_allowMovement still to be implemented
     /// Is movement allowed?
-    [[nodiscard]] bool getAllowMovement() const override { return m_allowMovement; }
+    [[nodiscard]] bool getAllowMovement() const override { return _allowMovement; }
     /// Allow/Disallow object movements
-    void SetAllowMovement(bool allow) override { m_allowMovement = allow; }
+    void SetAllowMovement(bool allow) override { _allowMovement = allow; }
 
     /// Set the string for new characters (first login)
-    void SetNewCharString(std::string const& str) override { m_newCharString = str; }
+    void SetNewCharString(std::string const& str) override { _newCharString = str; }
     /// Get the string for new characters (first login)
-    [[nodiscard]] std::string const& GetNewCharString() const override { return m_newCharString; }
+    [[nodiscard]] std::string const& GetNewCharString() const override { return _newCharString; }
 
-    [[nodiscard]] LocaleConstant GetDefaultDbcLocale() const override { return m_defaultDbcLocale; }
+    [[nodiscard]] LocaleConstant GetDefaultDbcLocale() const override { return _defaultDbcLocale; }
 
     /// Get the path where data (dbc, maps) are stored on disk
-    [[nodiscard]] std::string const& GetDataPath() const override { return m_dataPath; }
+    [[nodiscard]] std::string const& GetDataPath() const override { return _dataPath; }
 
     /// Next daily quests and random bg reset time
-    [[nodiscard]] Seconds GetNextDailyQuestsResetTime() const override { return m_NextDailyQuestReset; }
-    [[nodiscard]] Seconds GetNextWeeklyQuestsResetTime() const override { return m_NextWeeklyQuestReset; }
-    [[nodiscard]] Seconds GetNextRandomBGResetTime() const override { return m_NextRandomBGReset; }
+    [[nodiscard]] Seconds GetNextDailyQuestsResetTime() const override { return _nextDailyQuestReset; }
+    [[nodiscard]] Seconds GetNextWeeklyQuestsResetTime() const override { return _nextWeeklyQuestReset; }
+    [[nodiscard]] Seconds GetNextRandomBGResetTime() const override { return _nextRandomBGReset; }
 
     /// Get the maximum skill level a player can reach
     [[nodiscard]] uint16 GetConfigMaxSkillValue() const override
@@ -253,60 +253,60 @@ public:
     void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) override;
 
     /// Are we in the middle of a shutdown?
-    [[nodiscard]] bool IsShuttingDown() const override { return m_ShutdownTimer > 0; }
-    [[nodiscard]] uint32 GetShutDownTimeLeft() const override { return m_ShutdownTimer; }
+    [[nodiscard]] bool IsShuttingDown() const override { return _shutdownTimer > 0; }
+    [[nodiscard]] uint32 GetShutDownTimeLeft() const override { return _shutdownTimer; }
     void ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason = std::string()) override;
     void ShutdownCancel() override;
     void ShutdownMsg(bool show = false, Player* player = nullptr, const std::string& reason = std::string()) override;
-    static uint8 GetExitCode() { return m_ExitCode; }
-    static void StopNow(uint8 exitcode) { m_stopEvent = true; m_ExitCode = exitcode; }
-    static bool IsStopped() { return m_stopEvent; }
+    static uint8 GetExitCode() { return _exitCode; }
+    static void StopNow(uint8 exitcode) { _stopEvent = true; _exitCode = exitcode; }
+    static bool IsStopped() { return _stopEvent; }
 
     void Update(uint32 diff) override;
 
     void UpdateSessions(uint32 diff) override;
     /// Set a server rate (see #Rates)
-    void setRate(Rates rate, float value) override { rate_values[rate] = value; }
+    void setRate(Rates rate, float value) override { _rate_values[rate] = value; }
     /// Get a server rate (see #Rates)
-    [[nodiscard]] float getRate(Rates rate) const override { return rate_values[rate]; }
+    [[nodiscard]] float getRate(Rates rate) const override { return _rate_values[rate]; }
 
     /// Set a server configuration element (see #WorldConfigs)
     void setBoolConfig(WorldBoolConfigs index, bool value) override
     {
         if (index < BOOL_CONFIG_VALUE_COUNT)
-            m_bool_configs[index] = value;
+            _bool_configs[index] = value;
     }
 
     /// Get a server configuration element (see #WorldConfigs)
     [[nodiscard]] bool getBoolConfig(WorldBoolConfigs index) const override
     {
-        return index < BOOL_CONFIG_VALUE_COUNT ? m_bool_configs[index] : false;
+        return index < BOOL_CONFIG_VALUE_COUNT ? _bool_configs[index] : false;
     }
 
     /// Set a server configuration element (see #WorldConfigs)
     void setFloatConfig(WorldFloatConfigs index, float value) override
     {
         if (index < FLOAT_CONFIG_VALUE_COUNT)
-            m_float_configs[index] = value;
+            _float_configs[index] = value;
     }
 
     /// Get a server configuration element (see #WorldConfigs)
     [[nodiscard]] float getFloatConfig(WorldFloatConfigs index) const override
     {
-        return index < FLOAT_CONFIG_VALUE_COUNT ? m_float_configs[index] : 0;
+        return index < FLOAT_CONFIG_VALUE_COUNT ? _float_configs[index] : 0;
     }
 
     /// Set a server configuration element (see #WorldConfigs)
     void setIntConfig(WorldIntConfigs index, uint32 value) override
     {
         if (index < INT_CONFIG_VALUE_COUNT)
-            m_int_configs[index] = value;
+            _int_configs[index] = value;
     }
 
     /// Get a server configuration element (see #WorldConfigs)
     [[nodiscard]] uint32 getIntConfig(WorldIntConfigs index) const override
     {
-        return index < INT_CONFIG_VALUE_COUNT ? m_int_configs[index] : 0;
+        return index < INT_CONFIG_VALUE_COUNT ? _int_configs[index] : 0;
     }
 
     void setWorldState(uint32 index, uint64 value) override;
@@ -321,32 +321,32 @@ public:
     void KickAllLess(AccountTypes sec) override;
 
     // for max speed access
-    static float GetMaxVisibleDistanceOnContinents()    { return m_MaxVisibleDistanceOnContinents; }
-    static float GetMaxVisibleDistanceInInstances()     { return m_MaxVisibleDistanceInInstances;  }
-    static float GetMaxVisibleDistanceInBGArenas()      { return m_MaxVisibleDistanceInBGArenas;   }
+    static float GetMaxVisibleDistanceOnContinents()    { return _maxVisibleDistanceOnContinents; }
+    static float GetMaxVisibleDistanceInInstances()     { return _maxVisibleDistanceInInstances;  }
+    static float GetMaxVisibleDistanceInBGArenas()      { return _maxVisibleDistanceInBGArenas;   }
 
     // our: needed for arena spectator subscriptions
     uint32 GetNextWhoListUpdateDelaySecs() override;
 
     void ProcessCliCommands() override;
-    void QueueCliCommand(CliCommandHolder* commandHolder) override { cliCmdQueue.add(commandHolder); }
+    void QueueCliCommand(CliCommandHolder* commandHolder) override { _cliCmdQueue.add(commandHolder); }
 
     void ForceGameEventUpdate() override;
 
     void UpdateRealmCharCount(uint32 accid) override;
 
-    [[nodiscard]] LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const override { if (m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
+    [[nodiscard]] LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const override { if (_availableDbcLocaleMask & (1 << locale)) return locale; else return _defaultDbcLocale; }
 
     // used World DB version
     void LoadDBVersion() override;
-    [[nodiscard]] char const* GetDBVersion() const override { return m_DBVersion.c_str(); }
+    [[nodiscard]] char const* GetDBVersion() const override { return _dbVersion.c_str(); }
 
     void LoadAutobroadcasts() override;
 
     void UpdateAreaDependentAuras() override;
 
-    [[nodiscard]] uint32 GetCleaningFlags() const override { return m_CleaningFlags; }
-    void   SetCleaningFlags(uint32 flags) override { m_CleaningFlags = flags; }
+    [[nodiscard]] uint32 GetCleaningFlags() const override { return _cleaningFlags; }
+    void   SetCleaningFlags(uint32 flags) override { _cleaningFlags = flags; }
     void   ResetEventSeasonalQuests(uint16 event_id) override;
 
     [[nodiscard]] std::string const& GetRealmName() const override { return _realmName; } // pussywizard
@@ -372,76 +372,76 @@ protected:
     void CalendarDeleteOldEvents();
     void ResetGuildCap();
 private:
-    static std::atomic_long m_stopEvent;
-    static uint8 m_ExitCode;
-    uint32 m_ShutdownTimer;
-    uint32 m_ShutdownMask;
+    static std::atomic_long _stopEvent;
+    static uint8 _exitCode;
+    uint32 _shutdownTimer;
+    uint32 _shutdownMask;
 
-    uint32 m_CleaningFlags;
+    uint32 _cleaningFlags;
 
-    bool m_isClosed;
+    bool _isClosed;
 
-    IntervalTimer m_timers[WUPDATE_COUNT];
-    Seconds mail_expire_check_timer;
+    IntervalTimer _timers[WUPDATE_COUNT];
+    Seconds _mail_expire_check_timer;
 
-    SessionMap m_sessions;
-    SessionMap m_offlineSessions;
+    SessionMap _sessions;
+    SessionMap _offlineSessions;
     typedef std::unordered_map<uint32, time_t> DisconnectMap;
-    DisconnectMap m_disconnects;
-    uint32 m_maxActiveSessionCount;
-    uint32 m_maxQueuedSessionCount;
-    uint32 m_PlayerCount;
-    uint32 m_MaxPlayerCount;
+    DisconnectMap _disconnects;
+    uint32 _maxActiveSessionCount;
+    uint32 _maxQueuedSessionCount;
+    uint32 _playerCount;
+    uint32 _maxPlayerCount;
 
-    std::string m_newCharString;
+    std::string _newCharString;
 
-    float rate_values[MAX_RATES];
-    uint32 m_int_configs[INT_CONFIG_VALUE_COUNT];
-    bool m_bool_configs[BOOL_CONFIG_VALUE_COUNT];
-    float m_float_configs[FLOAT_CONFIG_VALUE_COUNT];
+    float _rate_values[MAX_RATES];
+    uint32 _int_configs[INT_CONFIG_VALUE_COUNT];
+    bool _bool_configs[BOOL_CONFIG_VALUE_COUNT];
+    float _float_configs[FLOAT_CONFIG_VALUE_COUNT];
     typedef std::map<uint32, uint64> WorldStatesMap;
-    WorldStatesMap m_worldstates;
-    uint32 m_playerLimit;
-    AccountTypes m_allowedSecurityLevel;
-    LocaleConstant m_defaultDbcLocale;                     // from config for one from loaded DBC locales
-    uint32 m_availableDbcLocaleMask;                       // by loaded DBC
+    WorldStatesMap _worldstates;
+    uint32 _playerLimit;
+    AccountTypes _allowedSecurityLevel;
+    LocaleConstant _defaultDbcLocale;                     // from config for one from loaded DBC locales
+    uint32 _availableDbcLocaleMask;                       // by loaded DBC
     void DetectDBCLang();
-    bool m_allowMovement;
-    std::string m_dataPath;
+    bool _allowMovement;
+    std::string _dataPath;
 
     // for max speed access
-    static float m_MaxVisibleDistanceOnContinents;
-    static float m_MaxVisibleDistanceInInstances;
-    static float m_MaxVisibleDistanceInBGArenas;
+    static float _maxVisibleDistanceOnContinents;
+    static float _maxVisibleDistanceInInstances;
+    static float _maxVisibleDistanceInBGArenas;
 
     std::string _realmName;
 
     // CLI command holder to be thread safe
-    LockedQueue<CliCommandHolder*> cliCmdQueue;
+    LockedQueue<CliCommandHolder*> _cliCmdQueue;
 
     // next daily quests and random bg reset time
-    Seconds m_NextDailyQuestReset;
-    Seconds m_NextWeeklyQuestReset;
-    Seconds m_NextMonthlyQuestReset;
-    Seconds m_NextRandomBGReset;
-    Seconds m_NextCalendarOldEventsDeletionTime;
-    Seconds m_NextGuildReset;
+    Seconds _nextDailyQuestReset;
+    Seconds _nextWeeklyQuestReset;
+    Seconds _nextMonthlyQuestReset;
+    Seconds _nextRandomBGReset;
+    Seconds _nextCalendarOldEventsDeletionTime;
+    Seconds _nextGuildReset;
 
     //Player Queue
-    Queue m_QueuedPlayer;
+    Queue _queuedPlayer;
 
     // sessions that are added async
     void AddSession_(WorldSession* s);
-    LockedQueue<WorldSession*> addSessQueue;
+    LockedQueue<WorldSession*> _addSessQueue;
 
     // used versions
-    std::string m_DBVersion;
+    std::string _dbVersion;
 
     typedef std::map<uint8, std::string> AutobroadcastsMap;
-    AutobroadcastsMap m_Autobroadcasts;
+    AutobroadcastsMap _autobroadcasts;
 
     typedef std::map<uint8, uint8> AutobroadcastsWeightMap;
-    AutobroadcastsWeightMap m_AutobroadcastsWeights;
+    AutobroadcastsWeightMap _autobroadcastsWeights;
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;
