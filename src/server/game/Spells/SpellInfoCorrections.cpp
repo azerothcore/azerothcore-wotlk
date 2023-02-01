@@ -334,12 +334,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Attributes &= ~SPELL_ATTR0_NOT_SHAPESHIFTED;   // with this spell atrribute aura can be stacked several times
     });
 
-    // Nether Portal - Perseverence
-    ApplySpellFix({ 30421 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_2].BasePoints += 30000;
-    });
-
     // Natural shapeshifter
     ApplySpellFix({ 16834, 16835 }, [](SpellInfo* spellInfo)
     {
