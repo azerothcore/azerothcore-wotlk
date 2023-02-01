@@ -1183,17 +1183,15 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     const_cast<CreatureTemplate*>(cInfo)->DamageModifier *= Creature::_GetDamageMod(cInfo->rank);
 
     // Hack for modules
-    std::vector<uint32> CustomCreatures;
-    std::string stringCreatureIds(sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", ""));
-    for (std::string_view id : Acore::Tokenize(stringCreatureIds, ',', false))
-    {
-        uint32 entry = Acore::StringTo<uint32>(id).value_or(0);
-        CustomCreatures.emplace_back(entry);
-    }
+    std::string stringCreatureIds = sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "");
+    std::vector<std::string_view> CustomCreatures = Acore::Tokenize(stringCreatureIds, ' ', false);
 
     for (auto const& itr : CustomCreatures)
     {
-        if (cInfo->Entry == itr)
+        if (itr.empty())
+            continue;
+
+        if (cInfo->Entry == Acore::StringTo<uint32>(itr).value())
             return;
     }
 
