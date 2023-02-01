@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `recovery_item` (
   `Count` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id`),
   KEY `idx_guid` (`Guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_characters.recovery_item: ~0 rows (approximately)
 DELETE FROM `recovery_item`;
