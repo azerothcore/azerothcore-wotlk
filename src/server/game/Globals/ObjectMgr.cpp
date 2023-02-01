@@ -841,6 +841,20 @@ void ObjectMgr::LoadCreatureTemplateAddons()
     LOG_INFO("server.loading", " ");
 }
 
+void ObjectMgr::LoadCreatureCustomIDs()
+{
+    _creatureCustomIDsStore.clear();
+
+    // Hack for modules
+    std::string stringCreatureIds = sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "");
+    std::vector<std::string_view> CustomCreatures = Acore::Tokenize(stringCreatureIds, ' ', false);
+
+    for (auto itr : CustomCreatures)
+    {
+        _creatureCustomIDsStore.emplace(Acore::StringTo<uint32>(itr).value());
+    }
+}
+
 void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 {
     if (!cInfo)
@@ -1183,15 +1197,9 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     const_cast<CreatureTemplate*>(cInfo)->DamageModifier *= Creature::_GetDamageMod(cInfo->rank);
 
     // Hack for modules
-    std::string stringCreatureIds = sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "");
-    std::vector<std::string_view> CustomCreatures = Acore::Tokenize(stringCreatureIds, ' ', false);
-
-    for (auto const& itr : CustomCreatures)
+    for (auto itr : _creatureCustomIDsStore)
     {
-        if (itr.empty())
-            continue;
-
-        if (cInfo->Entry == Acore::StringTo<uint32>(itr).value())
+        if (cInfo->Entry == itr.first)
             return;
     }
 
@@ -1201,7 +1209,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     }
     else if ((!cInfo->GossipMenuId && (cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP)) && !(cInfo->flags_extra & CREATURE_FLAG_EXTRA_MODULE))
     {
-        LOG_INFO("sql.sql", "Creature (Entry: {}) has npcflag UNIT_NPC_FLAG_GOSSIP (1), but gossip menu is unassigned.", cInfo->Entry);
+        LOG_ERROR("sql.sql", "Creature (Entry: {}) has npcflag UNIT_NPC_FLAG_GOSSIP (1), but gossip menu is unassigned.", cInfo->Entry);
     }
 }
 
