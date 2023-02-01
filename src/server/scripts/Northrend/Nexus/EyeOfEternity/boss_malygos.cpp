@@ -1212,7 +1212,7 @@ public:
                         if (!guids.empty())
                             if (Player* plr = ObjectAccessor::GetPlayer(*me, guids.at(urand(0, guids.size() - 1))))
                                 me->CastSpell(plr, SPELL_SCION_ARCANE_BARRAGE);
-                        guids.clear();
+
                         events.RepeatEvent(urand(5000, 8000));
                     }
                     break;
