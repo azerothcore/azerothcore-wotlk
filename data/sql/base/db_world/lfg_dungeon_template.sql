@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `lfg_dungeon_template` (
   `orientation` float NOT NULL DEFAULT '0',
   `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`dungeonId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table acore_world.lfg_dungeon_template: 22 rows
 DELETE FROM `lfg_dungeon_template`;
