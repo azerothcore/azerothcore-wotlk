@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `creature_questitem` (
   `ItemId` int unsigned NOT NULL DEFAULT '0',
   `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`CreatureEntry`,`Idx`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.creature_questitem: 4,416 rows
 DELETE FROM `creature_questitem`;

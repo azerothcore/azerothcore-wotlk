@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `uptime` (
   `maxplayers` smallint unsigned NOT NULL DEFAULT '0',
   `revision` varchar(255) NOT NULL DEFAULT 'AzerothCore',
   PRIMARY KEY (`realmid`,`starttime`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Uptime system';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Uptime system';
 
 -- Dumping data for table acore_auth.uptime: ~4 rows (approximately)
 DELETE FROM `uptime`;

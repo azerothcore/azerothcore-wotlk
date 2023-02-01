@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS `reserved_name`;
 CREATE TABLE IF NOT EXISTS `reserved_name` (
   `name` varchar(12) NOT NULL DEFAULT '',
   PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player Reserved Names';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player Reserved Names';
 
 -- Dumping data for table acore_characters.reserved_name: ~0 rows (approximately)
 DELETE FROM `reserved_name`;

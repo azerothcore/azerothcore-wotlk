@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `waypoints` (
   `delay` int unsigned NOT NULL DEFAULT '0',
   `point_comment` text,
   PRIMARY KEY (`entry`,`pointid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Creature waypoints';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Creature waypoints';
 
 -- Dumping data for table acore_world.waypoints: 12,560 rows
 DELETE FROM `waypoints`;

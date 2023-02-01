@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `character_settings` (
   `source` varchar(40) NOT NULL,
   `data` text,
   PRIMARY KEY (`guid`,`source`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player Settings';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Player Settings';
 
 -- Dumping data for table acore_characters.character_settings: 0 rows
 DELETE FROM `character_settings`;

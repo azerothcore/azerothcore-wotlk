@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `character_pet_declinedname` (
   `prepositional` varchar(12) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `owner_key` (`owner`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_characters.character_pet_declinedname: ~0 rows (approximately)
 DELETE FROM `character_pet_declinedname`;

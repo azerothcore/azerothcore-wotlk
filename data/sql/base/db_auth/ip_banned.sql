@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `ip_banned` (
   `bannedby` varchar(50) NOT NULL DEFAULT '[Console]',
   `banreason` varchar(255) NOT NULL DEFAULT 'no reason',
   PRIMARY KEY (`ip`,`bandate`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Banned IPs';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Banned IPs';
 
 -- Dumping data for table acore_auth.ip_banned: ~0 rows (approximately)
 DELETE FROM `ip_banned`;

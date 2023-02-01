@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `player_factionchange_items` (
   `horde_id` int unsigned NOT NULL,
   `horde_comment` text NOT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.player_factionchange_items: 1,395 rows
 DELETE FROM `player_factionchange_items`;

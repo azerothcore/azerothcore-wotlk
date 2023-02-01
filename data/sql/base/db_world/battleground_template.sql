@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `battleground_template` (
   `ScriptName` char(64) NOT NULL DEFAULT '',
   `Comment` char(38) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.battleground_template: 13 rows
 DELETE FROM `battleground_template`;

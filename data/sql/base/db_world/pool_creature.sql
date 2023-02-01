@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `pool_creature` (
   PRIMARY KEY (`guid`),
   KEY `idx_guid` (`guid`),
   CONSTRAINT `pool_creature_chk_1` CHECK ((`chance` >= 0))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.pool_creature: 1,437 rows
 DELETE FROM `pool_creature`;

@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `pet_levelstats` (
   `min_dmg` int unsigned NOT NULL DEFAULT '0',
   `max_dmg` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`creature_entry`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci PACK_KEYS=0 COMMENT='Stores pet levels stats.';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
 
 -- Dumping data for table acore_world.pet_levelstats: 2,720 rows
 DELETE FROM `pet_levelstats`;

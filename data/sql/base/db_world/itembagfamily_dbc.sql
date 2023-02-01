@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `itembagfamily_dbc` (
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
   `Name_Lang_Mask` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.itembagfamily_dbc: 0 rows
 DELETE FROM `itembagfamily_dbc`;

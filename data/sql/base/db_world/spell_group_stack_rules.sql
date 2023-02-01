@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `spell_group_stack_rules` (
   `stack_rule` tinyint NOT NULL DEFAULT '0',
   `description` varchar(150) NOT NULL DEFAULT '',
   PRIMARY KEY (`group_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.spell_group_stack_rules: 37 rows
 DELETE FROM `spell_group_stack_rules`;

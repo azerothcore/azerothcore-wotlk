@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `player_factionchange_quests` (
   PRIMARY KEY (`alliance_id`,`horde_id`),
   UNIQUE KEY `alliance_uniq` (`alliance_id`),
   UNIQUE KEY `horde_uniq` (`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.player_factionchange_quests: 293 rows
 DELETE FROM `player_factionchange_quests`;

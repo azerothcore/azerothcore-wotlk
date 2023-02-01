@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `spell_required` (
   `spell_id` mediumint NOT NULL DEFAULT '0',
   `req_spell` mediumint NOT NULL DEFAULT '0',
   PRIMARY KEY (`spell_id`,`req_spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Spell Additinal Data';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell Additinal Data';
 
 -- Dumping data for table acore_world.spell_required: 50 rows
 DELETE FROM `spell_required`;

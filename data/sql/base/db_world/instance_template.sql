@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `instance_template` (
   `script` varchar(128) NOT NULL DEFAULT '',
   `allowMount` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`map`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.instance_template: 85 rows
 DELETE FROM `instance_template`;

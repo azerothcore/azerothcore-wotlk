@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `game_event_seasonal_questrelation` (
   `eventEntry` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Entry of the game event',
   PRIMARY KEY (`questId`,`eventEntry`),
   KEY `idx_quest` (`questId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
 -- Dumping data for table acore_world.game_event_seasonal_questrelation: 690 rows
 DELETE FROM `game_event_seasonal_questrelation`;

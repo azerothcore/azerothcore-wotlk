@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `game_event_quest_condition` (
   `condition_id` mediumint unsigned NOT NULL DEFAULT '0',
   `num` float DEFAULT '0',
   PRIMARY KEY (`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.game_event_quest_condition: 0 rows
 DELETE FROM `game_event_quest_condition`;

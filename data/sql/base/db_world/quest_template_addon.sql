@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `quest_template_addon` (
   `ProvidedItemCount` tinyint unsigned NOT NULL DEFAULT '0',
   `SpecialFlags` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.quest_template_addon: 9,464 rows
 DELETE FROM `quest_template_addon`;
