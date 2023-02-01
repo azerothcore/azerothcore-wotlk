@@ -308,10 +308,10 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     }
 
     // prevent character creating Expansion race without Expansion account
-    if (raceEntry->expansion > Expansion())
+    if (raceEntry->RequiredExpansion > Expansion())
     {
         SendCharCreate(CHAR_CREATE_EXPANSION);
-        LOG_ERROR("network.opcode", "Expansion {} account:[{}] tried to Create character with expansion {} race ({})", Expansion(), GetAccountId(), raceEntry->expansion, createInfo->Race);
+        LOG_ERROR("network.opcode", "Expansion {} account:[{}] tried to Create character with expansion {} race ({})", Expansion(), GetAccountId(), raceEntry->RequiredExpansion, createInfo->Race);
         return;
     }
 
@@ -325,6 +325,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
     if (AccountMgr::IsPlayerAccount(GetSecurity()))
     {
+        if (raceEntry->Alliance == CHRRACES_ALLIANCE_TYPE_NOT_PLAYABLE || raceEntry->HasFlag(CHRRACES_FLAGS_NOT_PLAYABLE))
+        {
+            LOG_ERROR("network", "Race ({}) was not playable but requested while creating new char for account (ID: {}): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
+            SendCharCreate(CHAR_CREATE_DISABLED);
+            return;
+        }
+
         uint32 raceMaskDisabled = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_DISABLED_RACEMASK);
         if ((1 << (createInfo->Race - 1)) & raceMaskDisabled)
         {
@@ -871,7 +878,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             if (cEntry->CinematicSequence)
                 pCurrChar->SendCinematicStart(cEntry->CinematicSequence);
             else if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->getRace()))
-                pCurrChar->SendCinematicStart(rEntry->CinematicSequence);
+                pCurrChar->SendCinematicStart(rEntry->CinematicSequenceID);
 
             // send new char string if not empty
             if (!sWorld->GetNewCharString().empty())

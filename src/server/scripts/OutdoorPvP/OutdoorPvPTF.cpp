@@ -134,6 +134,11 @@ void OutdoorPvPTF::ResetZoneToTeamControlled(TeamId team)
         m_HordeTowersControlled = 0;
         m_AllianceTowersControlled = 0;
         break;
+    case HORDE_FACTION:
+    case ALLIANCE_FACTION:
+    {
+        break;
+    }
     }
 
     for (auto& [guid, tower] : m_capturePoints)
@@ -164,6 +169,11 @@ void OPvPCapturePointTF::ResetToTeamControlled(TeamId team)
         m_OldState = OBJECTIVESTATE_NEUTRAL;
         m_team = TEAM_NEUTRAL;
         break;
+    case HORDE_FACTION:
+    case ALLIANCE_FACTION:
+        {
+            break;
+        }
     }
 
     m_value = 0.0f;

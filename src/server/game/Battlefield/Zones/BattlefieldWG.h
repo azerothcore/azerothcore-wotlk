@@ -1506,6 +1506,11 @@ struct WGWorkshop
                     teamControl = team;
                     break;
                 }
+            case HORDE_FACTION:
+            case ALLIANCE_FACTION:
+                {
+                    break;
+                }
         }
 
         if (!init)
