@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `creature_formations` (
   `point_2` smallint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`memberGUID`),
   CONSTRAINT `creature_formations_chk_1` CHECK (((`dist` >= 0) and (`angle` >= 0)))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.creature_formations: 3,873 rows
 DELETE FROM `creature_formations`;

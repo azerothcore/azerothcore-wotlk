@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `areagroup_dbc` (
   `AreaID_6` int NOT NULL DEFAULT '0',
   `NextAreaID` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.areagroup_dbc: 0 rows
 DELETE FROM `areagroup_dbc`;

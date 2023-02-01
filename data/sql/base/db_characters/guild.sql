@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `guild` (
   `createdate` int unsigned NOT NULL DEFAULT '0',
   `BankMoney` bigint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guildid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guild System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild System';
 
 -- Dumping data for table acore_characters.guild: ~0 rows (approximately)
 DELETE FROM `guild`;

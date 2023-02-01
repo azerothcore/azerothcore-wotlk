@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `dungeon_access_requirements` (
   `leader_only` tinyint NOT NULL DEFAULT '0' COMMENT '0 = check the requirement for the player trying to enter, 1 = check the requirement for the party leader',
   `comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`dungeon_access_id`,`requirement_type`,`requirement_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid';
 
 -- Dumping data for table acore_world.dungeon_access_requirements: 35 rows
 DELETE FROM `dungeon_access_requirements`;

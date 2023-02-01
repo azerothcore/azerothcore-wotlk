@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `spell_enchant_proc_data` (
   `procEx` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`),
   CONSTRAINT `spell_enchant_proc_data_chk_1` CHECK ((`PPMChance` >= 0))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='Spell enchant proc data';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Spell enchant proc data';
 
 -- Dumping data for table acore_world.spell_enchant_proc_data: 42 rows
 DELETE FROM `spell_enchant_proc_data`;

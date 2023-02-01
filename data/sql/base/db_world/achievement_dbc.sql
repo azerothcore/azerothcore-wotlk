@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `achievement_dbc` (
   `Minimum_Criteria` int NOT NULL DEFAULT '0',
   `Shares_Criteria` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for table acore_world.achievement_dbc: 3 rows
 DELETE FROM `achievement_dbc`;

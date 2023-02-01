@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `skillraceclassinfo_dbc` (
   `SkillTierID` int NOT NULL DEFAULT '0',
   `SkillCostIndex` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.skillraceclassinfo_dbc: 0 rows
 DELETE FROM `skillraceclassinfo_dbc`;

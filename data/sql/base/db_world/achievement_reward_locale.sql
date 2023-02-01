@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `achievement_reward_locale` (
   `Subject` text,
   `Text` text,
   PRIMARY KEY (`ID`,`Locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 -- Dumping data for table acore_world.achievement_reward_locale: ~229 rows (approximately)
 DELETE FROM `achievement_reward_locale`;

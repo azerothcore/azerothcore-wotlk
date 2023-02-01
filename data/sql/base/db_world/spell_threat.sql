@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `spell_threat` (
   `pctMod` float NOT NULL DEFAULT '1' COMMENT 'threat multiplier for damage/healing',
   `apPctMod` float NOT NULL DEFAULT '0' COMMENT 'additional threat bonus from attack power',
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 
 -- Dumping data for table acore_world.spell_threat: 107 rows
 DELETE FROM `spell_threat`;

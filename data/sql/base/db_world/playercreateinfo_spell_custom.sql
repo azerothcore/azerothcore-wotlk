@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `playercreateinfo_spell_custom` (
   `Spell` mediumint unsigned NOT NULL DEFAULT '0',
   `Note` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`racemask`,`classmask`,`Spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.playercreateinfo_spell_custom: 0 rows
 DELETE FROM `playercreateinfo_spell_custom`;

@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `creature_model_info` (
   `Gender` tinyint unsigned NOT NULL DEFAULT '2',
   `DisplayID_Other_Gender` mediumint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`DisplayID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Creature System (Model related info)';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Creature System (Model related info)';
 
 -- Dumping data for table acore_world.creature_model_info: 24,143 rows
 DELETE FROM `creature_model_info`;

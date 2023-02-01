@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `spell_linked_spell` (
   `type` tinyint unsigned NOT NULL DEFAULT '0',
   `comment` text NOT NULL,
   UNIQUE KEY `trigger_effect_type` (`spell_trigger`,`spell_effect`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Spell System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Spell System';
 
 -- Dumping data for table acore_world.spell_linked_spell: 578 rows
 DELETE FROM `spell_linked_spell`;

@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
   `checked` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_receiver` (`receiver`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Mail System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Mail System';
 
 -- Dumping data for table acore_characters.mail: ~0 rows (approximately)
 DELETE FROM `mail`;

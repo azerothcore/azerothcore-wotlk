@@ -138,4 +138,6 @@ inline AI* GetKarazhanAI(T* obj)
     return GetInstanceAI<AI>(obj, KarazhanScriptName);
 }
 
+#define RegisterKarazhanCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetKarazhanAI)
+
 #endif

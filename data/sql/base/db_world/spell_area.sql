@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `spell_area` (
   `quest_start_status` int NOT NULL DEFAULT '64',
   `quest_end_status` int NOT NULL DEFAULT '11',
   PRIMARY KEY (`spell`,`area`,`quest_start`,`aura_spell`,`racemask`,`gender`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.spell_area: 697 rows
 DELETE FROM `spell_area`;

@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `light_dbc` (
   `LightParamsID_7` int NOT NULL DEFAULT '0',
   `LightParamsID_8` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.light_dbc: 0 rows
 DELETE FROM `light_dbc`;

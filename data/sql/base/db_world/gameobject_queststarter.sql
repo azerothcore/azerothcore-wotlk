@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_queststarter` (
   `id` mediumint unsigned NOT NULL DEFAULT '0',
   `quest` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.gameobject_queststarter: 455 rows
 DELETE FROM `gameobject_queststarter`;

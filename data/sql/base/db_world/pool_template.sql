@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `pool_template` (
   `max_limit` int unsigned NOT NULL DEFAULT '0' COMMENT 'Max number of objects (0) is no limit',
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.pool_template: 4,990 rows
 DELETE FROM `pool_template`;

@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `instance_reset` (
   `resettime` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`mapid`,`difficulty`),
   KEY `difficulty` (`difficulty`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_characters.instance_reset: ~71 rows (approximately)
 DELETE FROM `instance_reset`;

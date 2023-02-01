@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `log_arena_fights` (
   `loser_tr_change` smallint NOT NULL,
   `currOnline` int unsigned NOT NULL,
   PRIMARY KEY (`fight_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_characters.log_arena_fights: 0 rows
 DELETE FROM `log_arena_fights`;

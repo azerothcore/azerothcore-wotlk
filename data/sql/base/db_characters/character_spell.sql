@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `character_spell` (
   `spell` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
   `specMask` tinyint unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`guid`,`spell`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
 -- Dumping data for table acore_characters.character_spell: ~0 rows (approximately)
 DELETE FROM `character_spell`;

@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `npc_spellclick_spells` (
   `cast_flags` tinyint unsigned NOT NULL COMMENT 'first bit defines caster: 1=player, 0=creature; second bit defines target, same mapping as caster bit',
   `user_type` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'relation with summoner: 0-no 1-friendly 2-raid 3-party player can click',
   PRIMARY KEY (`npc_entry`,`spell_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.npc_spellclick_spells: 330 rows
 DELETE FROM `npc_spellclick_spells`;

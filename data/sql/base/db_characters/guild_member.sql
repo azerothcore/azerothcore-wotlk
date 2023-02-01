@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `guild_member` (
   UNIQUE KEY `guid_key` (`guid`),
   KEY `guildid_key` (`guildid`),
   KEY `guildid_rank_key` (`guildid`,`rank`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guild System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild System';
 
 -- Dumping data for table acore_characters.guild_member: ~0 rows (approximately)
 DELETE FROM `guild_member`;

@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `character_aura` (
   `remainTime` int NOT NULL DEFAULT '0',
   `remainCharges` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`casterGuid`,`itemGuid`,`spell`,`effectMask`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
 -- Dumping data for table acore_characters.character_aura: ~0 rows (approximately)
 DELETE FROM `character_aura`;
