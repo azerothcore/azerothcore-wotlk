@@ -108,7 +108,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 }
                 UpdateWorldState();
                 // reward player, xinef: has no effect on characters above level 70
-                if (player->getLevel() < 70)
+                if (player->GetLevel() < 70)
                     player->CastSpell(player, SI_TRACES_OF_SILITHYST, true);
                 // add 19 honor
                 player->RewardHonor(nullptr, 1, 19);
@@ -134,7 +134,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 }
                 UpdateWorldState();
                 // reward player, xinef: has no effect on characters above level 70
-                if (player->getLevel() < 70)
+                if (player->GetLevel() < 70)
                     player->CastSpell(player, SI_TRACES_OF_SILITHYST, true);
                 // add 19 honor
                 player->RewardHonor(nullptr, 1, 19);

@@ -9,8 +9,11 @@
 /env/docker/*
 !/env/docker/bin/.gitkeep
 !/env/docker/data/.gitkeep
+!/env/docker/etc/
+/env/docker/etc/*
 !/env/docker/etc/authserver.conf.dockerdist
 !/env/docker/etc/worldserver.conf.dockerdist
+!/env/docker/etc/dbimport.conf.dockerdist
 !/env/docker/logs/.gitkeep
 /.env*
 .idea

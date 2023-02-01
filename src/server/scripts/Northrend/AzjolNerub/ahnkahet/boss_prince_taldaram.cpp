@@ -119,7 +119,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         }
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Replace sphere instantly if sphere is summoned after prince death
         if (instance->GetBossState(DATA_PRINCE_TALDARAM) != IN_PROGRESS)
@@ -411,7 +411,7 @@ struct boss_taldaram : public BossAI
                 {
                     //Count alive players
                     uint8 count = 0;
-                    std::list<HostileReference*> const t_list = me->GetThreatMgr().getThreatList();
+                    std::list<HostileReference*> const t_list = me->GetThreatMgr().GetThreatList();
                     if (!t_list.empty())
                     {
                         for (HostileReference const* reference : t_list)

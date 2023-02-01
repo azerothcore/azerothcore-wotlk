@@ -1121,7 +1121,7 @@ public:
     PlayerSocial* GetSocial() { return m_social; }
 
     PlayerTaxi m_taxi;
-    void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getRace(), getClass(), getLevel()); }
+    void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getRace(), getClass(), GetLevel()); }
     bool ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc = nullptr, uint32 spellid = 1);
     bool ActivateTaxiPathTo(uint32 taxi_path_id, uint32 spellid = 1);
     void CleanupAfterTaxiFlight();
@@ -1280,7 +1280,7 @@ public:
     bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count);
     void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false);
     void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false) { AutoStoreLoot(NULL_BAG, NULL_SLOT, loot_id, store, broadcast); }
-    void StoreLootItem(uint8 lootSlot, Loot* loot);
+    LootItem* StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg);
     void UpdateLootAchievements(LootItem* item, Loot* loot);
     void UpdateTitansGrip();
 
@@ -1316,7 +1316,7 @@ public:
     void DestroyZoneLimitedItem(bool update, uint32 new_zone);
     void SplitItem(uint16 src, uint16 dst, uint32 count);
     void SwapItem(uint16 src, uint16 dst);
-    void AddItemToBuyBackSlot(Item* pItem);
+    void AddItemToBuyBackSlot(Item* pItem, uint32 money);
     Item* GetItemFromBuyBackSlot(uint32 slot);
     void RemoveItemFromBuyBackSlot(uint32 slot, bool del);
     [[nodiscard]] uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END - KEYRING_SLOT_START; }
@@ -1388,7 +1388,7 @@ public:
     /***                    QUEST SYSTEM                   ***/
     /*********************************************************/
 
-    int32 GetQuestLevel(Quest const* quest) const { return quest && (quest->GetQuestLevel() > 0) ? quest->GetQuestLevel() : getLevel(); }
+    int32 GetQuestLevel(Quest const* quest) const { return quest && (quest->GetQuestLevel() > 0) ? quest->GetQuestLevel() : GetLevel(); }
 
     void PrepareQuestMenu(ObjectGuid guid);
     void SendPreparedQuest(ObjectGuid guid);
@@ -1677,7 +1677,7 @@ public:
     void BuildPlayerTalentsInfoData(WorldPacket* data);
     void BuildPetTalentsInfoData(WorldPacket* data);
     void SendTalentsInfoData(bool pet);
-    void LearnTalent(uint32 talentId, uint32 talentRank);
+    void LearnTalent(uint32 talentId, uint32 talentRank, bool command = false);
     void LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank);
 
     bool addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank);
@@ -1732,7 +1732,8 @@ public:
     void AddSpellMod(SpellModifier* mod, bool apply);
     bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
     bool HasSpellMod(SpellModifier* mod, Spell* spell);
-    template <class T> T ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* spell = nullptr, bool temporaryPet = false);
+    template <class T>
+    void ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* spell = nullptr, bool temporaryPet = false);
     void RemoveSpellMods(Spell* spell);
     void RestoreSpellMods(Spell* spell, uint32 ownerAuraId = 0, Aura* aura = nullptr);
     void RestoreAllSpellMods(uint32 ownerAuraId = 0, Aura* aura = nullptr);
@@ -1905,7 +1906,7 @@ public:
     void UpdateRating(CombatRating cr);
     void UpdateAllRatings();
 
-    void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage) override;
+    void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex) override;
 
     void UpdateDefenseBonusesMod();
     inline void RecalculateRating(CombatRating cr) { ApplyRatingMod(cr, 0, true);}
@@ -2147,6 +2148,8 @@ public:
 
     void ResetAllPowers();
 
+    SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
+
     void _ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply);
     void _ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
     void _ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
@@ -2317,6 +2320,7 @@ public:
     float m_homebindX;
     float m_homebindY;
     float m_homebindZ;
+    float m_homebindO;
 
     [[nodiscard]] WorldLocation GetStartPosition() const;
 
@@ -2327,8 +2331,8 @@ public:
     GuidUnorderedSet m_clientGUIDs;
     std::vector<Unit*> m_newVisible; // pussywizard
 
-    bool HaveAtClient(WorldObject const* u) const { return u == this || m_clientGUIDs.find(u->GetGUID()) != m_clientGUIDs.end(); }
-    [[nodiscard]] bool HaveAtClient(ObjectGuid guid) const { return guid == GetGUID() || m_clientGUIDs.find(guid) != m_clientGUIDs.end(); }
+    [[nodiscard]] bool HaveAtClient(WorldObject const* u) const;
+    [[nodiscard]] bool HaveAtClient(ObjectGuid guid) const;
 
     [[nodiscard]] bool IsNeverVisible() const override;
 
@@ -2479,6 +2483,7 @@ public:
     void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
     void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);
     void CompletedAchievement(AchievementEntry const* entry);
+    [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
 
     [[nodiscard]] bool HasTitle(uint32 bitIndex) const;
     bool HasTitle(CharTitlesEntry const* title) const { return HasTitle(title->bit_index); }
@@ -2849,8 +2854,6 @@ public:
 
     bool m_needZoneUpdate;
 
-    [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
-
 private:
     // internal common parts for CanStore/StoreItem functions
     InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
@@ -2939,131 +2942,4 @@ private:
 void AddItemsSetItem(Player* player, Item* item);
 void RemoveItemsSetItem(Player* player, ItemTemplate const* proto);
 
-// "the bodies of template functions must be made available in a header file"
-template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* spell, bool temporaryPet)
-{
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    if (!spellInfo)
-    {
-        return 0;
-    }
-
-    float totalmul = 1.0f;
-    int32 totalflat = 0;
-
-    auto calculateSpellMod = [&](SpellModifier* mod)
-    {
-        // xinef: temporary pets cannot use charged mods of owner, needed for mirror image QQ they should use their own auras
-        if (temporaryPet && mod->charges != 0)
-        {
-            return;
-        }
-
-        if (mod->type == SPELLMOD_FLAT)
-        {
-            // xinef: do not allow to consume more than one 100% crit increasing spell
-            if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
-            {
-                return;
-            }
-
-            int32 flatValue = mod->value;
-
-            // SPELL_MOD_THREAT - divide by 100 (in packets we send threat * 100)
-            if (mod->op == SPELLMOD_THREAT)
-            {
-                flatValue /= 100;
-            }
-
-            totalflat += flatValue;
-        }
-        else if (mod->type == SPELLMOD_PCT)
-        {
-            // skip percent mods for null basevalue (most important for spell mods with charges)
-            if (basevalue == T(0) || totalmul == 0.0f)
-            {
-                return;
-            }
-
-            // special case (skip > 10sec spell casts for instant cast setting)
-            if (mod->op == SPELLMOD_CASTING_TIME && basevalue >= T(10000) && mod->value <= -100)
-            {
-                return;
-            }
-            // xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
-            else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
-            {
-                return;
-            }
-            // xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
-            else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
-            {
-                return;
-            }
-
-            // xinef: those two mods should be multiplicative (Glyph of Renew)
-            if (mod->op == SPELLMOD_DAMAGE || mod->op == SPELLMOD_DOT)
-            {
-                totalmul *= CalculatePct(1.0f, 100.0f + mod->value);
-            }
-            else
-            {
-                totalmul += CalculatePct(1.0f, mod->value);
-            }
-        }
-
-        DropModCharge(mod, spell);
-    };
-
-    // Drop charges for triggering spells instead of triggered ones
-    if (m_spellModTakingSpell)
-    {
-        spell = m_spellModTakingSpell;
-    }
-
-    SpellModifier* chargedMod = nullptr;
-    for (auto mod : m_spellMods[op])
-    {
-        // Charges can be set only for mods with auras
-        if (!mod->ownerAura)
-        {
-            ASSERT(!mod->charges);
-        }
-
-        if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-        {
-            continue;
-        }
-
-        if (mod->ownerAura->IsUsingCharges())
-        {
-            if (!chargedMod || (chargedMod->ownerAura->GetSpellInfo()->SpellPriority < mod->ownerAura->GetSpellInfo()->SpellPriority))
-            {
-                chargedMod = mod;
-            }
-
-            continue;
-        }
-
-        calculateSpellMod(mod);
-    }
-
-    if (chargedMod)
-    {
-        calculateSpellMod(chargedMod);
-    }
-
-    float diff = 0.0f;
-    if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
-    {
-        diff = ((float)basevalue + totalflat) * (totalmul - 1.0f) + (float)totalflat;
-    }
-    else
-    {
-        diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
-    }
-
-    basevalue = T((float)basevalue + diff);
-    return T(diff);
-}
 #endif

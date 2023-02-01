@@ -523,7 +523,7 @@ void Guild::BankTab::SendText(Guild const* guild, WorldSession* session) const
 void Guild::Member::SetStats(Player* player)
 {
     m_name      = player->GetName();
-    m_level     = player->getLevel();
+    m_level     = player->GetLevel();
     m_class     = player->getClass();
     m_gender    = player->getGender();
     m_zoneId    = player->GetZoneId();
@@ -1672,7 +1672,7 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
 
     if (amount > 10 * GOLD)     // receiver_acc = Guild id, receiver_name = Guild name
         CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"(guild members: {}, new amount: {}, leader guid low: {}, sender level: {})\", NOW(), {})",
-            session->GetAccountId(), player->GetGUID().GetCounter(), player->GetName(), session->GetRemoteAddress(), GetId(), GetName(), amount, GetMemberCount(), GetTotalBankMoney(), GetLeaderGUID().GetCounter(), player->getLevel(), 3);
+            session->GetAccountId(), player->GetGUID().GetCounter(), player->GetName(), session->GetRemoteAddress(), GetId(), GetName(), amount, GetMemberCount(), GetTotalBankMoney(), GetLeaderGUID().GetCounter(), player->GetLevel(), 3);
 }
 
 bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool repair)
@@ -1716,7 +1716,7 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
 
     if (amount > 10 * GOLD)     // sender_acc = 0 (guild has no account), sender_guid = Guild id, sender_name = Guild name
         CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"(guild, members: {}, new amount: {}, leader guid low: {}, withdrawer level: {})\", NOW(), {})",
-            0, GetId(), GetName(), session->GetRemoteAddress(), session->GetAccountId(), player->GetName(), amount, GetMemberCount(), GetTotalBankMoney(), GetLeaderGUID().GetCounter(), player->getLevel(), 4);
+            0, GetId(), GetName(), session->GetRemoteAddress(), session->GetAccountId(), player->GetName(), amount, GetMemberCount(), GetTotalBankMoney(), GetLeaderGUID().GetCounter(), player->GetLevel(), 4);
 
     std::string aux = Acore::Impl::ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
     _BroadcastEvent(GE_BANK_MONEY_SET, ObjectGuid::Empty, aux.c_str());
@@ -1798,8 +1798,14 @@ void Guild::SendBankTabData(WorldSession* session, uint8 tabId, bool sendAllSlot
         _SendBankContent(session, tabId, sendAllSlots);
 }
 
-void Guild::SendBankTabsInfo(WorldSession* session, bool sendAllSlots /*= false*/) const
+void Guild::SendBankTabsInfo(WorldSession* session, bool sendAllSlots /*= false*/)
 {
+    Member* member = GetMember(session->GetPlayer()->GetGUID());
+    if (!member)
+        return;
+
+    member->SubscribeToGuildBankUpdatePackets();
+
     _SendBankList(session, 0, sendAllSlots);
 }
 
@@ -1809,11 +1815,16 @@ void Guild::SendBankTabText(WorldSession* session, uint8 tabId) const
         tab->SendText(this, session);
 }
 
-void Guild::SendPermissions(WorldSession* session) const
+void Guild::SendPermissions(WorldSession* session)
 {
-    Member const* member = GetMember(session->GetPlayer()->GetGUID());
+    Member* member = GetMember(session->GetPlayer()->GetGUID());
     if (!member)
         return;
+
+    // We are unsubscribing here since it is the only reliable way to handle /reload from player as
+    // GuildPermissionsQuery is sent on each reload, and we don't want to send partial changes while client
+    // doesn't know the full state
+    member->UnsubscribeFromGuildBankUpdatePackets();
 
     uint8 rankId = member->GetRankId();
 
@@ -1856,8 +1867,6 @@ void Guild::SendLoginInfo(WorldSession* session)
     session->SendPacket(motd.Write());
 
     LOG_DEBUG("guild", "SMSG_GUILD_EVENT [{}] MOTD", session->GetPlayerInfo());
-
-    SendBankTabsInfo(session);
 
     Player* player = session->GetPlayer();
 
@@ -2878,13 +2887,17 @@ void Guild::_SendBankList(WorldSession* session /* = nullptr*/, uint8 tabId /*= 
         LOG_DEBUG("guild", "SMSG_GUILD_BANK_LIST [{}]: TabId: {}, FullSlots: {}, slots: {}",
                      session->GetPlayerInfo(), tabId, sendAllSlots, packet.WithdrawalsRemaining);
     }
-    else /// @todo - Probably this is just sent to session + those that have sent CMSG_GUILD_BANKER_ACTIVATE
+    else
     {
         packet.Write();
         for (auto const& [guid, member] : m_members)
         {
+            if (!member.ShouldReceiveBankPartialUpdatePackets())
+                continue;
+
             if (!_MemberHasTabRights(member.GetGUID(), tabId, GUILD_BANK_RIGHT_VIEW_TAB))
                 continue;
+
             Player* player = member.FindPlayer();
             if (!player)
                 continue;

@@ -767,7 +767,7 @@ public:
                 me->RemoveAllAuras();
             }
             DoZoneInCombat();
-            DoResetThreat();
+            DoResetThreatList();
             if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
             {
                 if (!next)

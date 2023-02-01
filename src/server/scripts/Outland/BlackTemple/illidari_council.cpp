@@ -205,7 +205,7 @@ public:
                     if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                         if (member->IsAlive())
                             Unit::Kill(me, member);
-                Unit::Kill(me, me);
+                me->KillSelf();
             }
         }
 
@@ -553,7 +553,7 @@ public:
                     me->CastSpell(me, SPELL_VANISH_OUT, false);
                     break;
                 case EVENT_SPELL_ENRAGE:
-                    DoResetThreat();
+                    DoResetThreatList();
                     if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDARI_COUNCIL)))
                         council->GetAI()->DoAction(ACTION_ENRAGE);
                     break;

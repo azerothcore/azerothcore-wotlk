@@ -432,6 +432,11 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
         std::function<void(PreparedQueryResult)> finalizeCharacterCreation = [this, createInfo](PreparedQueryResult result)
         {
+            if (!sScriptMgr->CanAccountCreateCharacter(GetAccountId(), createInfo->Race, createInfo->Class))
+            {
+                SendCharCreate(CHAR_CREATE_DISABLED);
+                return;
+            }
             bool haveSameRace = false;
             uint32 heroicReqLevel = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER);
             bool hasHeroicReqLevel = (heroicReqLevel == 0);
@@ -576,7 +581,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                 {
                     LOG_INFO("entities.player.character", "Account: {} (IP: {}) Create Character: {} {}", GetAccountId(), GetRemoteAddress(), newChar->GetName(), newChar->GetGUID().ToString());
                     sScriptMgr->OnPlayerCreate(newChar.get());
-                    sCharacterCache->AddCharacterCacheEntry(newChar->GetGUID(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->getRace(), newChar->getClass(), newChar->getLevel());
+                    sCharacterCache->AddCharacterCacheEntry(newChar->GetGUID(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->getRace(), newChar->getClass(), newChar->GetLevel());
                     SendCharCreate(CHAR_CREATE_SUCCESS);
                 }
                 else
@@ -653,7 +658,8 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     sCalendarMgr->RemoveAllPlayerEventsAndInvites(guid);
     Player::DeleteFromDB(guid.GetCounter(), GetAccountId(), true, false);
 
-    sCharacterCache->DeleteCharacterCacheEntry(guid, name);
+    sWorld->UpdateRealmCharCount(GetAccountId());
+
     SendCharDelete(CHAR_DELETE_SUCCESS);
 }
 
@@ -888,7 +894,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         if (at)
             pCurrChar->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, pCurrChar->GetOrientation());
         else
-            pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->GetOrientation());
+            pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->m_homebindO);
     }
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
@@ -949,7 +955,11 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
     // Set FFA PvP for non GM in non-rest mode
     if (sWorld->IsFFAPvPRealm() && !pCurrChar->IsGameMaster() && !pCurrChar->HasPlayerFlag(PLAYER_FLAGS_RESTING))
-        pCurrChar->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        if (!pCurrChar->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
+        {
+            sScriptMgr->OnFfaPvpStateUpdate(pCurrChar,true);
+            pCurrChar->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        }
 
     if (pCurrChar->HasPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP))
     {
@@ -1037,7 +1047,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
     std::string IP_str = GetRemoteAddress();
     LOG_INFO("entities.player", "Account: {} (IP: {}) Login Character:[{}] ({}) Level: {}",
-                  GetAccountId(), IP_str, pCurrChar->GetName(), pCurrChar->GetGUID().ToString(), pCurrChar->getLevel());
+                  GetAccountId(), IP_str, pCurrChar->GetName(), pCurrChar->GetGUID().ToString(), pCurrChar->GetLevel());
 
     if (!pCurrChar->IsStandState() && !pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
         pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
@@ -2335,6 +2345,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             stmt->SetData(3, loc.GetPositionX());
             stmt->SetData(4, loc.GetPositionY());
             stmt->SetData(5, loc.GetPositionZ());
+            stmt->SetData(6, loc.GetOrientation());
             trans->Append(stmt);
 
             Player::SavePositionInDB(loc, zoneId, factionChangeInfo->Guid, trans);

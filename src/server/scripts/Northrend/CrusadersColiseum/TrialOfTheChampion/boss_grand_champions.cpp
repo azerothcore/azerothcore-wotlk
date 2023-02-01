@@ -654,7 +654,7 @@ public:
                 case SPELL_TRAMPLE_STUN:
                     {
                         char buffer[50];
-                        sprintf(buffer, "%s is trampled!", me->GetName().c_str());
+                        snprintf(buffer, sizeof(buffer), "%s is trampled!", me->GetName().c_str());
                         me->TextEmote(buffer);
                     }
                     break;
@@ -927,7 +927,7 @@ public:
                             Player* player = itr->GetSource();
                             if( player && me->IsInRange(player, 8.0f, 25.0f, false) )
                             {
-                                DoResetThreat();
+                                DoResetThreatList();
                                 me->AddThreat(player, 5.0f);
                                 me->CastSpell(player, SPELL_INTERCEPT, false);
                                 break;

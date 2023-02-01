@@ -196,7 +196,7 @@ public:
     // and some dependant problems fixed before it can replace old proc system (for example cooldown handling)
     // currently proc system functionality is implemented in Unit::ProcDamageAndSpell
     bool IsProcOnCooldown() const;
-    void AddProcCooldown(uint32 msec);
+    void AddProcCooldown(Milliseconds msec);
     bool IsUsingCharges() const { return m_isUsingCharges; }
     void SetUsingCharges(bool val) { m_isUsingCharges = val; }
     void PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo);
@@ -226,6 +226,7 @@ public:
 
     // Spell Proc Hooks
     bool CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
+    bool CallScriptAfterCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent);
     bool CallScriptPrepareProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     bool CallScriptProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     void CallScriptAfterProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);

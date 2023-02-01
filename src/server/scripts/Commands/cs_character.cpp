@@ -72,6 +72,7 @@ public:
             { "customize",      HandleCharacterCustomizeCommand,        SEC_GAMEMASTER, Console::Yes },
             { "changefaction",  HandleCharacterChangeFactionCommand,    SEC_GAMEMASTER, Console::Yes },
             { "changerace",     HandleCharacterChangeRaceCommand,       SEC_GAMEMASTER, Console::Yes },
+            { "changeaccount",  HandleCharacterChangeAccountCommand,    SEC_ADMINISTRATOR, Console::Yes },
             { "check",          characterCheckCommandTable },
             { "erase",          HandleCharacterEraseCommand,            SEC_CONSOLE,    Console::Yes },
             { "deleted",        characterDeletedCommandTable },
@@ -381,6 +382,8 @@ public:
             {
                 target->SetName(newName);
 
+                ObjectAccessor::UpdatePlayerNameMapReference(player->GetName(), target);
+
                 if (WorldSession* session = target->GetSession())
                     session->KickPlayer("HandleCharacterRenameCommand GM Command renaming character");
             }
@@ -434,7 +437,7 @@ public:
         if (!player)
             return false;
 
-        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
+        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->GetLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
 
         if (newlevel < 1)
             return false;                                       // invalid level
@@ -759,7 +762,7 @@ public:
         if (!player)
             return false;
 
-        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
+        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->GetLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
         int16 newlevel = static_cast<int16>(oldlevel) + level;
 
         if (newlevel < 1)
@@ -1057,6 +1060,55 @@ public:
         }
 
         handler->PSendSysMessage("--------------------------------------");
+        return true;
+    }
+
+    static bool HandleCharacterChangeAccountCommand(ChatHandler* handler, std::string accountName, Optional<PlayerIdentifier> player)
+    {
+        if (!player)
+        {
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!player)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (uint32 accountId = AccountMgr::GetId(accountName))
+        {
+            if (AccountMgr::GetCharactersCount(accountId) >= 10)
+            {
+                handler->PSendSysMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, accountName, accountId);
+                handler->SetSentErrorMessage(true);
+                return true;
+            }
+
+            if (CharacterCacheEntry const* cache = sCharacterCache->GetCharacterCacheByName(player->GetName()))
+            {
+                std::string accName;
+                AccountMgr::GetName(cache->AccountId, accName);
+                handler->PSendSysMessage(LANG_CMD_CHAR_CHANGE_ACC_SUCCESS, player->GetName(), player->GetGUID().GetCounter(), accName, cache->AccountId, accountName, accountId);
+            }
+
+            if (player->IsConnected())
+            {
+                player->GetConnectedPlayer()->GetSession()->KickPlayer("CMD char changeaccount");
+            }
+
+            CharacterDatabase.Query("UPDATE characters SET account = {} WHERE guid = {}", accountId, player->GetGUID().GetCounter());
+            sCharacterCache->UpdateCharacterAccountId(player->GetGUID(), accountId);
+
+        }
+        else
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+            handler->SetSentErrorMessage(true);
+            return true;
+        }
+
         return true;
     }
 };

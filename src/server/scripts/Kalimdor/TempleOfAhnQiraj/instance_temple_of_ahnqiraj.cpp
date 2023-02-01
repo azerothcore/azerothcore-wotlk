@@ -15,20 +15,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
 ObjectData const creatureData[] =
 {
+    { NPC_VEM, DATA_VEM },
+    { NPC_KRI, DATA_KRI },
+    { NPC_YAUJ, DATA_YAUJ },
     { NPC_SARTURA, DATA_SARTURA },
     { NPC_CTHUN, DATA_CTHUN },
     { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
+    { NPC_OURO, DATA_OURO },
     { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER },
     { NPC_MASTERS_EYE, DATA_MASTERS_EYE },
     { NPC_VEKLOR, DATA_VEKLOR },
-    { NPC_VEKNILASH, DATA_VEKNILASH }
+    { NPC_VEKNILASH, DATA_VEKNILASH },
+    { NPC_VISCIDUS, DATA_VISCIDUS }
+};
+
+DoorData const doorData[] =
+{
+    { AQ40_DOOR_SKERAM,      DATA_SKERAM,        DOOR_TYPE_PASSAGE },
+    { AQ40_DOOR_TE_ENTRANCE, DATA_TWIN_EMPERORS, DOOR_TYPE_ROOM },
+    { AQ40_DOOR_TE_EXIT,     DATA_TWIN_EMPERORS, DOOR_TYPE_PASSAGE },
+    { 0,                     0,                  DOOR_TYPE_ROOM}
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
@@ -45,22 +60,19 @@ public:
     {
         instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            LoadObjectData(creatureData, nullptr);
-            doorGUIDs.fill(ObjectGuid::Empty);
             SetBossNumber(MAX_BOSS_NUMBER);
+            LoadObjectData(creatureData, nullptr);
+            LoadDoorData(doorData);
         }
 
         ObjectGuid SkeramGUID;
-        ObjectGuid VemGUID;
-        ObjectGuid KriGUID;
-        ObjectGuid YaujGUID;
-        ObjectGuid ViscidusGUID;
         ObjectGuid CThunGUID;
         GuidVector CThunGraspGUIDs;
-        std::array<ObjectGuid, 3> doorGUIDs;
 
         uint32 BugTrioDeathCount;
         uint32 CthunPhase;
+
+        TaskScheduler scheduler;
 
         void Initialize() override
         {
@@ -74,22 +86,6 @@ public:
             {
                 case NPC_SKERAM:
                     SkeramGUID = creature->GetGUID();
-                    if (!creature->IsAlive())
-                    {
-                        HandleGameObject(doorGUIDs[2], true);
-                    }
-                    break;
-                case NPC_VEM:
-                    VemGUID = creature->GetGUID();
-                    break;
-                case NPC_KRI:
-                    KriGUID = creature->GetGUID();
-                    break;
-                case NPC_YAUJ:
-                    YaujGUID = creature->GetGUID();
-                    break;
-                case NPC_VISCIDUS:
-                    ViscidusGUID = creature->GetGUID();
                     break;
                 case NPC_OURO_SPAWNER:
                     if (GetBossState(DATA_OURO) != DONE)
@@ -123,29 +119,6 @@ public:
         {
             switch (go->GetEntry())
             {
-                case AQ40_DOOR_1:
-                    doorGUIDs[0] = go->GetGUID();
-                    break;
-                case AQ40_DOOR_2:
-                    doorGUIDs[1] = go->GetGUID();
-                    if (Creature* veklor = GetCreature(DATA_VEKLOR))
-                    {
-                        if (!veklor->IsAlive())
-                        {
-                            HandleGameObject(go->GetGUID(), true);
-                        }
-                    }
-                    break;
-                case AQ40_DOOR_3:
-                    doorGUIDs[2] = go->GetGUID();
-                    if (Creature* skeram = instance->GetCreature(SkeramGUID))
-                    {
-                        if (!skeram->IsAlive())
-                        {
-                            HandleGameObject(go->GetGUID(), true);
-                        }
-                    }
-                    break;
                 case GO_CTHUN_GRASP:
                     CThunGraspGUIDs.push_back(go->GetGUID());
                     if (Creature* CThun = instance->GetCreature(CThunGUID))
@@ -161,6 +134,37 @@ public:
             }
 
             InstanceScript::OnGameObjectCreate(go);
+        }
+
+        void OnUnitDeath(Unit* unit) override
+        {
+            switch (unit->GetEntry())
+            {
+                case NPC_QIRAJI_SLAYER:
+                case NPC_QIRAJI_MINDSLAYER:
+                    if (Creature* creature = unit->ToCreature())
+                    {
+                        if (CreatureGroup* formation = creature->GetFormation())
+                        {
+                            scheduler.Schedule(100ms, [formation](TaskContext /*context*/)
+                            {
+                                if (!formation->IsAnyMemberAlive(true))
+                                {
+                                    if (Creature* leader = formation->GetLeader())
+                                    {
+                                        if (leader->IsAlive())
+                                        {
+                                            leader->AI()->SetData(0, 1);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         uint32 GetData(uint32 type) const override
@@ -182,20 +186,6 @@ public:
             {
                 case DATA_SKERAM:
                     return SkeramGUID;
-                case DATA_VEM:
-                    return VemGUID;
-                case DATA_KRI:
-                    return KriGUID;
-                case DATA_YAUJ:
-                    return YaujGUID;
-                case DATA_VISCIDUS:
-                    return ViscidusGUID;
-                case AQ40_DOOR_1:
-                    return doorGUIDs[0];
-                case AQ40_DOOR_2:
-                    return doorGUIDs[1];
-                case AQ40_DOOR_3:
-                    return doorGUIDs[2];
             }
             return ObjectGuid::Empty;
         }
@@ -247,6 +237,11 @@ public:
             }
 
             return true;
+        }
+
+        void Update(uint32 diff) override
+        {
+            scheduler.Update(diff);
         }
     };
 };

@@ -320,7 +320,7 @@ public:
             {
                 Talk(SAY_YSONDRE_SUMMON_DRUIDS);
 
-                auto const& attackers = me->GetThreatMgr().getThreatList();
+                auto const& attackers = me->GetThreatMgr().GetThreatList();
                 uint8 attackersCount = 0;
 
                 for (const auto attacker : attackers)
@@ -459,13 +459,18 @@ public:
         {
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
 
+            if (summoner->GetTypeId() != TYPEID_UNIT)
+            {
+                return;
+            }
+
             _summonerGuid = summoner->GetGUID();
-            me->GetMotionMaster()->MoveFollow(summoner, 0.0f, 0.0f);
+            me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), 0.0f, 0.0f);
         }
 
         void MovementInform(uint32 moveType, uint32 data) override

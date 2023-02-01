@@ -709,6 +709,13 @@ public:
             DoZoneInCombat();
         }
 
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_CRONE_DEATH);
@@ -891,6 +898,13 @@ public:
             me->DespawnOrUnsummon();
         }
 
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
             DoPlaySoundToSet(me, SOUND_WOLF_DEATH);
@@ -915,7 +929,7 @@ public:
                         DoCast(target, SPELL_LITTLE_RED_RIDING_HOOD, true);
                         TempThreat = DoGetThreat(target);
                         if (TempThreat)
-                            DoModifyThreatPercent(target, -100);
+                            DoModifyThreatByPercent(target, -100);
                         HoodGUID = target->GetGUID();
                         me->AddThreat(target, 1000000.0f);
                         ChaseTimer = 20000;
@@ -930,7 +944,7 @@ public:
                     {
                         HoodGUID.Clear();
                         if (DoGetThreat(target))
-                            DoModifyThreatPercent(target, -100);
+                            DoModifyThreatByPercent(target, -100);
                         me->AddThreat(target, TempThreat);
                         TempThreat = 0;
                     }
@@ -1138,6 +1152,13 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override;
 
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+        }
+
         void JustDied(Unit*) override
         {
             Talk(SAY_JULIANNE_DEATH02);
@@ -1285,6 +1306,13 @@ public:
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);
+        }
+
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
         }
 
         void JustDied(Unit* /*killer*/) override

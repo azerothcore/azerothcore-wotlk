@@ -1344,7 +1344,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             break;
         case TARGET_DEST_HOME:
             if (Player* playerCaster = m_caster->ToPlayer())
-                dest = SpellDestination(playerCaster->m_homebindX, playerCaster->m_homebindY, playerCaster->m_homebindZ, playerCaster->GetOrientation(), playerCaster->m_homebindMapId);
+                dest = SpellDestination(playerCaster->m_homebindX, playerCaster->m_homebindY, playerCaster->m_homebindZ, playerCaster->m_homebindO, playerCaster->m_homebindMapId);
             break;
         case TARGET_DEST_DB:
             if (SpellTargetPosition const* st = sSpellMgr->GetSpellTargetPosition(m_spellInfo->Id, effIndex))
@@ -1468,7 +1468,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                                 }
                                 tstZ = beforewaterz;
                                 srange = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX));
-                                //TC_LOG_ERROR("server", "(start was from land) step in water , number of cycle = %i , distance of step = %f, total path = %f, Z = %f", j, srange, totalpath, tstZ);
+                                //LOG_ERROR("spells", "(start was from land) step in water , number of cycle = {} , distance of step = {}, total path = {}, Z = {}", j, srange, totalpath, tstZ);
                             }
                         }
                         else if (map->IsInWater(phasemask, tstX, tstY, tstZ, collisionHeight))
@@ -1481,13 +1481,13 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                             if (inwater && (fabs(tstZ - ground) < 2.0f))
                             {
                                 wcol = true;
-                                //TC_LOG_ERROR("server", "step in water with collide and use standart check (for continue way after possible collide), number of cycle = %i ", j);
+                                //LOG_ERROR("spells", "step in water with collide and use standart check (for continue way after possible collide), number of cycle = {} ", j);
                             }
 
                             // if (j < 2)
-                            //    TC_LOG_ERROR("server", "(start in water) step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                            //    LOG_ERROR("spells", "(start in water) step in water, number of cycle = {} , distance of step = {}, total path = {}", j, srange, totalpath);
                             // else
-                            //    TC_LOG_ERROR("server", "step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                            //    LOG_ERROR("spells", "step in water, number of cycle = {} , distance of step = {}, total path = {}", j, srange, totalpath);
                         }
 
                         bool IsInWater = map->IsInWater(phasemask, tstX, tstY, tstZ, collisionHeight);
@@ -1505,11 +1505,11 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                             //distance of rays, will select the shortest in 3D
                             srange1 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ1 - prevZ) * (tstZ1 - prevZ));
-                            //TC_LOG_ERROR("server", "step = %i, distance of ray1 = %f", j, srange1);
+                            //LOG_ERROR("spells", "step = {}, distance of ray1 = {}", j, srange1);
                             srange2 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ2 - prevZ) * (tstZ2 - prevZ));
-                            //TC_LOG_ERROR("server", "step = %i, distance of ray2 = %f", j, srange2);
+                            //LOG_ERROR("spells", "step = {}, distance of ray2 = {}", j, srange2);
                             srange3 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ3 - prevZ) * (tstZ3 - prevZ));
-                            //TC_LOG_ERROR("server", "step = %i, distance of ray3 = %f", j, srange3);
+                            //LOG_ERROR("spells", "step = {}, distance of ray3 = {}", j, srange3);
 
                             if (srange1 < srange2)
                             {
@@ -1527,7 +1527,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                                 srange = srange2;
                             }
 
-                            //TC_LOG_ERROR("server", "step on ground, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                            //LOG_ERROR("spells", "step on ground, number of cycle = {} , distance of step = {}, total path = {}", j, srange, totalpath);
                         }
 
                         destx = tstX;
@@ -1539,7 +1539,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         if (totalpath > distance)
                         {
                             overdistance = totalpath - distance;
-                            //TC_LOG_ERROR("server", "total path > than distance in 3D , need to move back a bit for save distance, total path = %f, overdistance = %f", totalpath, overdistance);
+                            //LOG_ERROR("spells", "total path > than distance in 3D , need to move back a bit for save distance, total path = {}, overdistance = {}", totalpath, overdistance);
                         }
 
                         bool col = VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(mapid, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
@@ -1553,14 +1553,14 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                             {
                                 destx = prevX + overdistance * cos(pos.GetOrientation());
                                 desty = prevY + overdistance * sin(pos.GetOrientation());
-                                //TC_LOG_ERROR("server", "(collision) collision occured 1");
+                                //LOG_ERROR("spells", "(collision) collision occured 1");
                             }
                             else
                             {
                                 // move back a bit
                                 destx = tstX - (0.6 * cos(pos.GetOrientation()));
                                 desty = tstY - (0.6 * sin(pos.GetOrientation()));
-                                //TC_LOG_ERROR("server", "(collision) collision occured 2");
+                                //LOG_ERROR("spells", "(collision) collision occured 2");
                             }
 
                             // highest available point
@@ -1584,13 +1584,12 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                             if (inwater && destz < prevZ && !wcol)
                                 destz = prevZ;
-                            //TC_LOG_ERROR("server", "(collision) destZ rewrited in prevZ");
+                            //LOG_ERROR("spells", "(collision) destZ rewrited in prevZ");
 
                             break;
                         }
                         // we have correct destz now
                     }
-                    //}
 
                     lastpos.Relocate(destx, desty, destz, pos.GetOrientation());
                     dest = SpellDestination(lastpos);
@@ -1613,7 +1612,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     lastpos.Relocate(destx, desty, z, pos.GetOrientation());
                     dest = SpellDestination(lastpos);
                     //float range = sqrt((desty - pos.GetPositionY())*(desty - pos.GetPositionY()) + (destx - pos.GetPositionX())*(destx - pos.GetPositionX()));
-                    //TC_LOG_ERROR("server", "Blink number 2, in falling but at a hight, distance of blink = %f", range);
+                    //LOG_ERROR("spells", "Blink number 2, in falling but at a hight, distance of blink = {}", range);
                 }
                 break;
             }
@@ -2397,7 +2396,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
             if (m_auraScaleMask && ihit->effectMask == m_auraScaleMask && m_caster != target)
             {
                 SpellInfo const* auraSpell = m_spellInfo->GetFirstRankSpell();
-                if (uint32(target->getLevel() + 10) >= auraSpell->SpellLevel)
+                if (uint32(target->GetLevel() + 10) >= auraSpell->SpellLevel)
                     ihit->scaleAura = true;
             }
 
@@ -2420,7 +2419,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     if (m_auraScaleMask && targetInfo.effectMask == m_auraScaleMask && m_caster != target)
     {
         SpellInfo const* auraSpell = m_spellInfo->GetFirstRankSpell();
-        if (uint32(target->getLevel() + 10) >= auraSpell->SpellLevel)
+        if (uint32(target->GetLevel() + 10) >= auraSpell->SpellLevel)
             targetInfo.scaleAura = true;
     }
 
@@ -2429,9 +2428,11 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     // Calculate hit result
     if (m_originalCaster)
     {
-        targetInfo.missCondition = m_originalCaster->SpellHitResult(target, m_spellInfo, m_canReflect);
+        targetInfo.missCondition = m_originalCaster->SpellHitResult(target, this, m_canReflect);
         if (m_skipCheck && targetInfo.missCondition != SPELL_MISS_IMMUNE)
+        {
             targetInfo.missCondition = SPELL_MISS_NONE;
+        }
     }
     else
         targetInfo.missCondition = SPELL_MISS_EVADE; //SPELL_MISS_NONE;
@@ -2459,7 +2460,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     if (targetInfo.missCondition == SPELL_MISS_REFLECT)
     {
         // Calculate reflected spell result on caster
-        targetInfo.reflectResult = m_caster->SpellHitResult(m_caster, m_spellInfo, m_canReflect);
+        targetInfo.reflectResult = m_caster->SpellHitResult(m_caster, this, m_canReflect);
 
         if (targetInfo.reflectResult == SPELL_MISS_REFLECT)     // Impossible reflect again, so simply deflect spell
             targetInfo.reflectResult = SPELL_MISS_PARRY;
@@ -2916,6 +2917,18 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         {
             m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_SUPRESS_TARGET_PROCS));
 
+            // Patch 3.0.8: All player spells which cause a creature to become aggressive to you will now also immediately cause the creature to be tapped.
+            if (effectUnit->IsInCombatWith(m_caster))
+            {
+                if (Creature* creature = effectUnit->ToCreature())
+                {
+                    if (!creature->hasLootRecipient() && m_caster->IsPlayer())
+                    {
+                        creature->SetLootRecipient(m_caster);
+                    }
+                }
+            }
+
             // Unsure if there are more spells that are not supposed to stop enemy from
             // regenerating HP from food, so for now it stays as an ID.
             const uint32 SPELL_PREMEDITATION = 14183;
@@ -2972,8 +2985,10 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         return SPELL_MISS_EVADE;
 
     // For delayed spells immunity may be applied between missile launch and hit - check immunity for that case
-    if (m_spellInfo->Speed && ((m_damage > 0 && unit->IsImmunedToDamage(m_spellInfo)) || unit->IsImmunedToSchool(m_spellInfo) || unit->IsImmunedToSpell(m_spellInfo)))
+    if (m_spellInfo->Speed && ((m_damage > 0 && unit->IsImmunedToDamage(this)) || unit->IsImmunedToSchool(this) || unit->IsImmunedToSpell(m_spellInfo, this)))
+    {
         return SPELL_MISS_IMMUNE;
+    }
 
     // disable effects to which unit is immune
     SpellMissInfo returnVal = SPELL_MISS_IMMUNE;
@@ -3102,7 +3117,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         int32 basePoints[3];
         if (scaleAura)
         {
-            aurSpellInfo = m_spellInfo->GetAuraRankForLevel(unitTarget->getLevel());
+            aurSpellInfo = m_spellInfo->GetAuraRankForLevel(unitTarget->GetLevel());
             ASSERT(aurSpellInfo);
             for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             {
@@ -3259,31 +3274,23 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
         {
             if (CanExecuteTriggersOnHit(effMask, i->triggeredByAura) && roll_chance_i(i->chance))
             {
+                m_caster->CastSpell(unit, i->triggeredSpell->Id, true);
                 LOG_DEBUG("spells.aura", "Spell {} triggered spell {} by SPELL_AURA_ADD_TARGET_TRIGGER aura", m_spellInfo->Id, i->triggeredSpell->Id);
 
                 // SPELL_AURA_ADD_TARGET_TRIGGER auras shouldn't trigger auras without duration
                 // set duration of current aura to the triggered spell
                 if (i->triggeredSpell->GetDuration() == -1)
                 {
-                    // get duration from aura-only once
-                    if (!_duration)
-                    {
-                        Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
-                        _duration = aur ? aur->GetDuration() : -1;
-                    }
-
                     if (Aura* triggeredAur = unit->GetAura(i->triggeredSpell->Id, m_caster->GetGUID()))
                     {
-                        triggeredAur->SetDuration(std::max(triggeredAur->GetDuration(), _duration));
+                        // get duration from aura-only once
+                        if (!_duration)
+                        {
+                            Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
+                            _duration = aur ? aur->GetDuration() : -1;
+                        }
+                        triggeredAur->SetDuration(_duration);
                     }
-                    else
-                    {
-                        m_caster->CastCustomSpell(i->triggeredSpell->Id, SPELLVALUE_AURA_DURATION, _duration, unit, true);
-                    }
-                }
-                else
-                {
-                    m_caster->CastSpell(unit, i->triggeredSpell, true);
                 }
             }
         }
@@ -3979,6 +3986,20 @@ void Spell::_cast(bool skipCheck)
     if (modOwner)
         modOwner->SetSpellModTakingSpell(this, true);
 
+    bool resetAttackTimers = IsAutoActionResetSpell() && !m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS);
+    if (resetAttackTimers)
+    {
+        Unit::AuraEffectList const& vIgnoreReset = m_caster->GetAuraEffectsByType(SPELL_AURA_IGNORE_MELEE_RESET);
+        for (Unit::AuraEffectList::const_iterator i = vIgnoreReset.begin(); i != vIgnoreReset.end(); ++i)
+        {
+            if ((*i)->IsAffectedOnSpell(m_spellInfo))
+            {
+                resetAttackTimers = false;
+                break;
+            }
+        }
+    }
+
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
     if ((m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled())/* xinef: we dont need this || m_spellInfo->Id == 14157*/)
     {
@@ -4011,38 +4032,23 @@ void Spell::_cast(bool skipCheck)
         handle_immediate();
     }
 
-    if (IsAutoActionResetSpell())
+    if (resetAttackTimers)
     {
-        bool found = false;
-        Unit::AuraEffectList const& vIgnoreReset = m_caster->GetAuraEffectsByType(SPELL_AURA_IGNORE_MELEE_RESET);
-        for (Unit::AuraEffectList::const_iterator i = vIgnoreReset.begin(); i != vIgnoreReset.end(); ++i)
+        if (m_casttime == 0 && m_spellInfo->CalcCastTime())
         {
-            if ((*i)->IsAffectedOnSpell(m_spellInfo))
-            {
-                found = true;
-                break;
-            }
+            resetAttackTimers = false;
         }
 
-        if (!found && !m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS))
+        if (resetAttackTimers)
         {
-            bool allow = true;
-            if (m_casttime == 0 && m_spellInfo->CalcCastTime())
+            m_caster->resetAttackTimer(BASE_ATTACK);
+
+            if (m_caster->haveOffhandWeapon())
             {
-                allow = false;
+                m_caster->resetAttackTimer(OFF_ATTACK);
             }
 
-            if (allow)
-            {
-                m_caster->resetAttackTimer(BASE_ATTACK);
-
-                if (m_caster->haveOffhandWeapon())
-                {
-                    m_caster->resetAttackTimer(OFF_ATTACK);
-                }
-
-                m_caster->resetAttackTimer(RANGED_ATTACK);
-            }
+            m_caster->resetAttackTimer(RANGED_ATTACK);
         }
     }
 
@@ -6103,7 +6109,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!learn_spellproto)
                         return SPELL_FAILED_NOT_KNOWN;
 
-                    if (m_spellInfo->SpellLevel > pet->getLevel())
+                    if (m_spellInfo->SpellLevel > pet->GetLevel())
                         return SPELL_FAILED_LOWLEVEL;
 
                     break;
@@ -6125,7 +6131,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (!learn_spellproto)
                             return SPELL_FAILED_NOT_KNOWN;
 
-                        if (m_spellInfo->SpellLevel > pet->getLevel())
+                        if (m_spellInfo->SpellLevel > pet->GetLevel())
                             return SPELL_FAILED_LOWLEVEL;
                     }
                     break;
@@ -6246,7 +6252,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     uint32 skill = creature->GetCreatureTemplate()->GetRequiredLootSkill();
 
                     int32 skillValue = m_caster->ToPlayer()->GetSkillValue(skill);
-                    int32 TargetLevel = m_targets.GetUnitTarget()->getLevel();
+                    int32 TargetLevel = m_targets.GetUnitTarget()->GetLevel();
                     int32 ReqValue = (skillValue < 100 ? (TargetLevel - 10) * 10 : TargetLevel * 5);
                     if (ReqValue > skillValue)
                         return SPELL_FAILED_LOW_CASTLEVEL;
@@ -6625,7 +6631,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_CANT_BE_CHARMED;
 
                         int32 damage = CalculateSpellDamage(i, target);
-                        if (damage && int32(target->getLevel()) > damage)
+                        if (damage && int32(target->GetLevel()) > damage)
                             return SPELL_FAILED_HIGHLEVEL;
                     }
 
@@ -7892,7 +7898,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             if (target->GetCharmerGUID())
                 return false;
             if (int32 damage = CalculateSpellDamage(eff, target))
-                if ((int32)target->getLevel() > damage)
+                if ((int32)target->GetLevel() > damage)
                     return false;
             break;
         default:
@@ -7964,7 +7970,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 return false;
             if (m_caster->ToPlayer()->GetSession()->GetRecruiterId() != target->ToPlayer()->GetSession()->GetAccountId() && target->ToPlayer()->GetSession()->IsARecruiter())
                 return false;
-            if (target->ToPlayer()->getLevel() >= sWorld->getIntConfig(CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL))
+            if (target->ToPlayer()->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL))
                 return false;
             break;
         default: // normal case
@@ -8766,6 +8772,7 @@ void Spell::PrepareTriggersExecutedOnHit()
             HitTriggerSpell spellTriggerInfo;
             spellTriggerInfo.triggeredSpell = spellInfo;
             spellTriggerInfo.triggeredByAura = auraSpellInfo;
+            spellTriggerInfo.triggeredByEffIdx = (*i)->GetEffIndex();
             spellTriggerInfo.chance = chance * (*i)->GetBase()->GetStackAmount();
             m_hitTriggerSpells.push_back(spellTriggerInfo);
         }

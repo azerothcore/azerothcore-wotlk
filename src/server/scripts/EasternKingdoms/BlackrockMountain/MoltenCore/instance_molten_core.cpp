@@ -163,7 +163,7 @@ public:
 
                         if (GetBossState(linkedBossObjData[i].bossId) == DONE)
                         {
-                            go->DespawnOrUnsummon();
+                            go->DespawnOrUnsummon(0ms, Seconds(WEEK));
                         }
                         else
                         {
@@ -190,7 +190,7 @@ public:
 
                         if (GetBossState(linkedBossObjData[i].bossId) == DONE)
                         {
-                            go->SetGoState(GO_STATE_ACTIVE);
+                            go->UseDoorOrButton(WEEK * IN_MILLISECONDS);
                         }
                         else
                         {
@@ -250,7 +250,11 @@ public:
 
             if (bossId == DATA_MAJORDOMO_EXECUTUS && state == DONE)
             {
-                DoRespawnGameObject(_cacheOfTheFirelordGUID, 7 * DAY);
+                if (GameObject* cache = instance->GetGameObject(_cacheOfTheFirelordGUID))
+                {
+                    cache->SetRespawnTime(7 * DAY);
+                    cache->SetLootRecipient(instance);
+                }
             }
             else if (bossId == DATA_GOLEMAGG)
             {
@@ -310,13 +314,13 @@ public:
             {
                 if (GameObject* circle = instance->GetGameObject(_circlesGUIDs[bossId]))
                 {
-                    circle->DespawnOrUnsummon();
+                    circle->DespawnOrUnsummon(0ms, Seconds(WEEK));
                     _circlesGUIDs[bossId].Clear();
                 }
 
                 if (GameObject* rune = instance->GetGameObject(_runesGUIDs[bossId]))
                 {
-                    rune->SetGoState(GO_STATE_ACTIVE);
+                    rune->UseDoorOrButton(WEEK * IN_MILLISECONDS);
                     _runesGUIDs[bossId].Clear();
                 }
 

@@ -592,7 +592,7 @@ public:
             {
                 checkTimer = 3000;
                 me->SetInCombatWithZone();
-                ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
+                ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
                 if (!threatList.empty())
                     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                         if (Unit* target = (*itr)->getTarget())
@@ -977,7 +977,7 @@ public:
                 ScriptedAI::AttackStart(who);
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             if (Creature* valithria = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER)))
                 AttackStart(valithria);

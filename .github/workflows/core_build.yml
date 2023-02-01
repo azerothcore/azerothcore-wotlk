@@ -21,7 +21,7 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.compiler }}
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v2
       - name: Cache
@@ -42,7 +42,9 @@ jobs:
         run: bash bin/acore-db-pendings
       - name: Build
         run: source ./apps/ci/ci-compile.sh
-      - name: Dry run
+      - name: Dry run authserver
+        run: source ./apps/ci/ci-dry-run.sh authserver
+      - name: Dry run worldserver
         run: source ./apps/ci/ci-dry-run.sh worldserver
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh

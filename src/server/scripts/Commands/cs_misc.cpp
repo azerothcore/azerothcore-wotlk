@@ -1399,7 +1399,7 @@ public:
 
         if (location->empty() || *location == "inn")
         {
-            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
             return true;
         }
 
@@ -1966,7 +1966,7 @@ public:
             accId             = playerTarget->GetSession()->GetAccountId();
             money             = playerTarget->GetMoney();
             totalPlayerTime   = playerTarget->GetTotalPlayedTime();
-            level             = playerTarget->getLevel();
+            level             = playerTarget->GetLevel();
             latency           = playerTarget->GetSession()->GetLatency();
             raceid            = playerTarget->getRace();
             classid           = playerTarget->getClass();

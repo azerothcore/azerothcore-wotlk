@@ -149,7 +149,7 @@ class spell_dk_raise_ally : public SpellScript
             if (Unit* ghoul = unitTarget->GetCharm())
             {
                 //health, mana, armor and resistance
-                PetLevelInfo const* pInfo = sObjectMgr->GetPetLevelInfo(ghoul->GetEntry(), ghoul->getLevel());
+                PetLevelInfo const* pInfo = sObjectMgr->GetPetLevelInfo(ghoul->GetEntry(), ghoul->GetLevel());
                 if (pInfo)                                      // exist in DB
                 {
                     ghoul->SetCreateHealth(pInfo->health);
@@ -159,8 +159,8 @@ class spell_dk_raise_ally : public SpellScript
                         ghoul->SetCreateStat(Stats(stat), float(pInfo->stats[stat]));
                 }
 
-                ghoul->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(ghoul->getLevel() - (ghoul->getLevel() / 4)));
-                ghoul->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(ghoul->getLevel() + (ghoul->getLevel() / 4)));
+                ghoul->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(ghoul->GetLevel() - (ghoul->GetLevel() / 4)));
+                ghoul->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(ghoul->GetLevel() + (ghoul->GetLevel() / 4)));
 
                 // Avoidance, Night of the Dead
                 if (Aura* aur = ghoul->AddAura(62137, ghoul))
@@ -648,10 +648,13 @@ class spell_dk_dancing_rune_weapon : public AuraScript
         {
             target = player->GetMeleeHitRedirectTarget(target);
             CalcDamageInfo damageInfo;
-            player->CalculateMeleeDamage(target, 0, &damageInfo, eventInfo.GetDamageInfo()->GetAttackType());
-            Unit::DealDamageMods(target, damageInfo.damage, &damageInfo.absorb);
+            player->CalculateMeleeDamage(target, &damageInfo, eventInfo.GetDamageInfo()->GetAttackType());
+            for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+            {
+                Unit::DealDamageMods(target, damageInfo.damages[i].damage, &damageInfo.damages[i].absorb);
+                damageInfo.damages[i].damage /= 2.0f;
+            }
             damageInfo.attacker = dancingRuneWeapon;
-            damageInfo.damage /= 2.0f;
             dancingRuneWeapon->SendAttackStateUpdate(&damageInfo);
             dancingRuneWeapon->DealMeleeDamage(&damageInfo, true);
         }

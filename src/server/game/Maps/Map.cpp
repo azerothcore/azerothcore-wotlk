@@ -1269,7 +1269,7 @@ void Map::RemoveAllPlayers()
             {
                 // this is happening for bg
                 LOG_ERROR("maps", "Map::UnloadAll: player {} is still in map {} during unload, this should not happen!", player->GetName(), GetId());
-                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
             }
         }
     }
@@ -2853,6 +2853,9 @@ void InstanceMap::InitVisibilityDistance()
         case 631: // Icecrown Citadel
         case 724: // Ruby Sanctum
             m_VisibleDistance = 200.0f;
+            break;
+        case 531: // Ahn'Qiraj Temple
+            m_VisibleDistance = 300.0f;
             break;
     }
 }

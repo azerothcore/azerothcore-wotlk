@@ -306,7 +306,8 @@ public: // pussywizard: public class Member
             m_class(0),
             m_flags(GUILDMEMBER_STATUS_NONE),
             m_accountId(0),
-            m_rankId(rankId)
+            m_rankId(rankId),
+            receiveGuildBankUpdatePackets(false)
         {
         }
 
@@ -353,6 +354,10 @@ public: // pussywizard: public class Member
 
         inline Player* FindPlayer() const { return ObjectAccessor::FindConnectedPlayer(m_guid); }
 
+        void SubscribeToGuildBankUpdatePackets() { receiveGuildBankUpdatePackets = true; }
+        void UnsubscribeFromGuildBankUpdatePackets() { receiveGuildBankUpdatePackets = false; }
+        [[nodiscard]] bool ShouldReceiveBankPartialUpdatePackets() const { return receiveGuildBankUpdatePackets; }
+
     private:
         uint32 m_guildId;
         // Fields from characters table
@@ -371,6 +376,8 @@ public: // pussywizard: public class Member
         std::string m_officerNote;
 
         std::array<int32, GUILD_BANK_MAX_TABS + 1> m_bankWithdraw = {};
+
+        bool receiveGuildBankUpdatePackets;
     };
 
     // pussywizard: public GetMember
@@ -718,10 +725,10 @@ public:
     void SendInfo(WorldSession* session) const;
     void SendEventLog(WorldSession* session) const;
     void SendBankLog(WorldSession* session, uint8 tabId) const;
-    void SendBankTabsInfo(WorldSession* session, bool showTabs = false) const;
+    void SendBankTabsInfo(WorldSession* session, bool showTabs = false);
     void SendBankTabData(WorldSession* session, uint8 tabId, bool sendAllSlots) const;
     void SendBankTabText(WorldSession* session, uint8 tabId) const;
-    void SendPermissions(WorldSession* session) const;
+    void SendPermissions(WorldSession* session);
     void SendMoneyInfo(WorldSession* session) const;
     void SendLoginInfo(WorldSession* session);
 

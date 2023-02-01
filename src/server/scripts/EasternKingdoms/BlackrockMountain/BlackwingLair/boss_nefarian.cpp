@@ -306,7 +306,7 @@ public:
             {
                 summons.DespawnEntry(_nefarianLeftTunnel);
                 summons.DespawnEntry(_nefarianRightTunnel);
-                Unit::Kill(me, me);
+                me->KillSelf();
             }
         }
 
@@ -679,7 +679,7 @@ struct boss_nefarian : public BossAI
                 case EVENT_CLASSCALL:
                     if (classesPresent.empty())
                     {
-                        for (auto& ref : me->GetThreatMgr().getThreatList())
+                        for (auto& ref : me->GetThreatMgr().GetThreatList())
                         {
                             if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
                             {
@@ -871,7 +871,7 @@ struct npc_corrupted_totem : public ScriptedAI
         }
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         me->SetInCombatWithZone();
 
@@ -942,7 +942,7 @@ struct npc_drakonid_spawner : public ScriptedAI
         }
     }
 
-    void IsSummonedBy(Unit* summoner) override
+    void IsSummonedBy(WorldObject* summoner) override
     {
         DoCastSelf(SPELL_SPAWN_DRAKONID_GEN);
         _scheduler.Schedule(10s, 60s, [this](TaskContext /*context*/)

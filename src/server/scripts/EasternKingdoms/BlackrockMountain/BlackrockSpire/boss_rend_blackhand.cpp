@@ -174,7 +174,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             Talk(EMOTE_BLACKHAND_DISMOUNT);
         }
@@ -253,6 +253,7 @@ public:
                     {
                         case EVENT_START_1:
                             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, IN_PROGRESS);
+                            instance->SetData(DATA_VAELASTRASZ, NOT_STARTED);
 
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_0);

@@ -35,6 +35,7 @@
 #include "IoContext.h"
 #include "Log.h"
 #include "MySQLThreading.h"
+#include "OpenSSLCrypto.h"
 #include "ProcessPriority.h"
 #include "RealmList.h"
 #include "SecretMgr.h"
@@ -96,9 +97,13 @@ int main(int argc, char** argv)
         []()
         {
             LOG_INFO("server.authserver", "> Using configuration file       {}", sConfigMgr->GetFilename());
-            LOG_INFO("server.authserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            LOG_INFO("server.authserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
             LOG_INFO("server.authserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         });
+
+    OpenSSLCrypto::threadsSetup();
+
+    std::shared_ptr<void> opensslHandle(nullptr, [](void*) { OpenSSLCrypto::threadsCleanup(); });
 
     // authserver PID file creation
     std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");

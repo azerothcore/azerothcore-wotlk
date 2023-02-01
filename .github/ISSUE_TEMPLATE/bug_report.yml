@@ -15,6 +15,7 @@ body:
         Description of the problem or issue here.
         Include entries of affected creatures / items / quests / spells etc.
         If this is a crash, post the crashlog (upload to https://gist.github.com/) and include the link here.
+        Never upload files! Use GIST for text and YouTube for videos!
     validations:
       required: true
   - type: textarea

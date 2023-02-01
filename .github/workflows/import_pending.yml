@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
     runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v2
         with:

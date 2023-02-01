@@ -104,10 +104,10 @@ public:
                 if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
                 {
                     if( !p->HasAura(SPELL_FROST_TOMB_AURA) )
-                        Unit::Kill(me, me);
+                        me->KillSelf();
                 }
                 else
-                    Unit::Kill(me, me);
+                    me->KillSelf();
             }
         }
     };
@@ -197,7 +197,7 @@ public:
                     events.RepeatEvent(urand(4000, 5000));
                     break;
                 case EVENT_FROST_TOMB:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
                         if( !target->HasAura(SPELL_FROST_TOMB_AURA) )
                         {
                             Talk(SAY_FROST_TOMB_EMOTE, target);
@@ -294,7 +294,7 @@ public:
             if( pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
             {
                 if( me->IsAlive() )
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                 return;
             }
 
