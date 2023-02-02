@@ -68,6 +68,9 @@ uint16 WardenPayloadMgr::RegisterPayload(const std::string& payload)
 */
 bool WardenPayloadMgr::RegisterPayload(std::string const& payload, uint16 payloadId, bool replace)
 {
+    //Payload id should be over or equal to the offset to prevent conflicts.
+    ASSERT(payloadId >= WardenPayloadMgr::WardenPayloadOffset);
+
     auto it = CachedChecks.find(payloadId);
 
     if (it != CachedChecks.end() && !replace)
