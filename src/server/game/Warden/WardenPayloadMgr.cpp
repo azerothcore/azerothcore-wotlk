@@ -21,10 +21,6 @@
 
 WardenPayloadMgr::WardenPayloadMgr() { }
 
-/**
-* @brief Finds a free payload id in WardenPayloadMgr::CachedChecks.
-* @return uint16 The free payload id.
-*/
 uint16 WardenPayloadMgr::GetFreePayloadId()
 {
     uint16 payloadId = WardenPayloadOffset;
@@ -37,11 +33,6 @@ uint16 WardenPayloadMgr::GetFreePayloadId()
     return payloadId;
 }
 
-/**
-* @brief Register a payload into cache and returns its payload id.
-* @param payload The payload to be stored in WardenPayloadMgr::CachedChecks.
-* @return uint16 The payload id for use with WardenPayloadMgr::QueuePayload.
-*/
 uint16 WardenPayloadMgr::RegisterPayload(const std::string& payload)
 {
     uint16 payloadId = GetFreePayloadId();
@@ -60,13 +51,6 @@ uint16 WardenPayloadMgr::RegisterPayload(const std::string& payload)
     return payloadId;
 }
 
-/**
-* @brief Register a payload with id into cache and returns the result.
-* @param payload The payload to be stored in WardenPayloadMgr::CachedChecks.
-* @param payloadId The payload id to be stored as the key in WardenPayloadMgr::CachedChecks.
-* @param replace Whether the key should replace an existing entry value.
-* @return bool The payload insertion result. If exists it will return false, otherwise true.
-*/
 bool WardenPayloadMgr::RegisterPayload(std::string const& payload, uint16 payloadId, bool replace)
 {
     //Payload id should be over or equal to the offset to prevent conflicts.
@@ -98,21 +82,11 @@ bool WardenPayloadMgr::RegisterPayload(std::string const& payload, uint16 payloa
     return true;
 }
 
-/**
-* @brief Unregister a payload from cache and return if successful.
-* @param payloadId The payload to removed from WardenPayloadMgr::CachedChecks.
-* @return bool If the payloadId was present.
-*/
 bool WardenPayloadMgr::UnregisterPayload(uint16 payloadId)
 {
     return CachedChecks.erase(payloadId);
 }
 
-/**
-* @brief Get a payload by id from the WardenPayloadMgr::CachedChecks.
-* @param payloadId The payload to fetched from WardenPayloadMgr::CachedChecks.
-* @return WardenCheck* A pointer to the WardenCheck payload.
-*/
 WardenCheck* WardenPayloadMgr::GetPayloadById(uint16 payloadId)
 {
     auto it = CachedChecks.find(payloadId);
@@ -125,10 +99,6 @@ WardenCheck* WardenPayloadMgr::GetPayloadById(uint16 payloadId)
     return nullptr;
 }
 
-/**
-* @brief Queue the payload into the normal warden checks.
-* @param payloadId The payloadId to be queued.
-*/
 void WardenPayloadMgr::QueuePayload(uint16 payloadId, bool pushToFront)
 {
     auto it = CachedChecks.find(payloadId);
@@ -150,11 +120,6 @@ void WardenPayloadMgr::QueuePayload(uint16 payloadId, bool pushToFront)
     }
 }
 
-/**
-* @brief Dequeue the payload from the WardenPayloadMgr::QueuedPayloads queue.
-* @param payloadId The payloadId to be dequeued.
-* @return bool If the payload was removed.
-*/
 bool WardenPayloadMgr::DequeuePayload(uint16 payloadId)
 {
     size_t const queueSize = QueuedPayloads.size();
@@ -163,27 +128,16 @@ bool WardenPayloadMgr::DequeuePayload(uint16 payloadId)
     return queueSize != QueuedPayloads.size();
 }
 
-/**
-* @brief Clear the payloads from the WardenPayloadMgr::QueuedPayloads queue.
-*/
 void WardenPayloadMgr::ClearQueuedPayloads()
 {
     QueuedPayloads.clear();
 }
 
-/**
-* @brief Get the amount of payloads waiting in WardenPayloadMgr::QueuedPayloads.
-* @return The amount of payloads in queue.
-*/
 uint32 WardenPayloadMgr::GetPayloadCountInQueue()
 {
     return QueuedPayloads.size();
 }
 
-/**
-* @brief Get payloads waiting in WardenPayloadMgr::QueuedPayloads.
-* @return The payloads in queue.
-*/
 std::list<uint16>* WardenPayloadMgr::GetPayloadsInQueue()
 {
     return &QueuedPayloads;

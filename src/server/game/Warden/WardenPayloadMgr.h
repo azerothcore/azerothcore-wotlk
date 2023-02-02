@@ -21,20 +21,81 @@
 #include "WardenCheckMgr.h"
 #include <list>
 
+ /**
+ * @class WardenPayloadMgr
+ * @brief The WardenPayloadMgr is responsible for maintaining custom payloads used by modules.
+ */
 class WardenPayloadMgr
 {
 public:
     WardenPayloadMgr();
 
+    /**
+    * @brief Finds a free payload id in WardenPayloadMgr::CachedChecks.
+    * @return uint16 The free payload id.
+    */
     uint16 GetFreePayloadId();
+
+    /**
+    * @brief Register a payload into cache and returns its payload id.
+    * @param payload The payload to be stored in WardenPayloadMgr::CachedChecks.
+    * @return uint16 The payload id for use with WardenPayloadMgr::QueuePayload.
+    */
     uint16 RegisterPayload(const std::string& payload);
+
+    /**
+    * @brief Register a payload into cache with a custom id and returns the result.
+    * @param payload The payload to be stored in WardenPayloadMgr::CachedChecks.
+    * @param payloadId The payload id to be stored as the key in WardenPayloadMgr::CachedChecks.
+    * @note It's a good idea to keep the value for payloadId between 9000-9999 for self defined payloads as they're the least likely occupied ids.
+    * @param replace Whether the key should replace an existing entry value.
+    * @return bool The payload insertion result. If exists it will return false, otherwise true.
+    */
     bool RegisterPayload(std::string const& payload, uint16 payloadId, bool replace = false);
+
+    /**
+    * @brief Unregister a payload from cache and return if successful.
+    * @param payloadId The payload to removed from WardenPayloadMgr::CachedChecks.
+    * @return bool If the payloadId was present.
+    */
     bool UnregisterPayload(uint16 payloadId);
+
+    /**
+    * @brief Get a payload by id from the WardenPayloadMgr::CachedChecks.
+    * @param payloadId The payload to fetched from WardenPayloadMgr::CachedChecks.
+    * @return WardenCheck* A pointer to the WardenCheck payload.
+    */
     WardenCheck* GetPayloadById(uint16 payloadId);
+
+    /**
+    * @brief Queue the payload into the normal warden checks.
+    * @param payloadId The payloadId to be queued.
+    * @param pushToFront If payload should be pushed to the front queue.
+    */
     void QueuePayload(uint16 payloadId, bool pushToFront = false);
+
+    /**
+    * @brief Dequeue the payload from the WardenPayloadMgr::QueuedPayloads queue.
+    * @param payloadId The payloadId to be dequeued.
+    * @return bool If the payload was removed.
+    */
     bool DequeuePayload(uint16 payloadId);
+
+    /**
+    * @brief Clear the payloads from the WardenPayloadMgr::QueuedPayloads queue.
+    */
     void ClearQueuedPayloads();
+
+    /**
+    * @brief Get the amount of payloads waiting in WardenPayloadMgr::QueuedPayloads.
+    * @return The amount of payloads in queue.
+    */
     uint32 GetPayloadCountInQueue();
+
+    /**
+    * @brief Get payloads waiting in WardenPayloadMgr::QueuedPayloads.
+    * @return The payloads in queue.
+    */
     std::list<uint16>* GetPayloadsInQueue();
 
     static uint16 constexpr WardenPayloadOffset = 5000;
