@@ -162,7 +162,16 @@ void WardenPayloadMgr::ClearQueuedPayloads()
 * @brief Get the amount of payloads waiting in WardenPayloadMgr::QueuedPayloads.
 * @return The amount of payloads in queue.
 */
-uint32 WardenPayloadMgr::GetPayloadsInQueue()
+uint32 WardenPayloadMgr::GetPayloadCountInQueue()
 {
     return QueuedPayloads.size();
+}
+
+/**
+* @brief Get payloads waiting in WardenPayloadMgr::QueuedPayloads.
+* @return The payloads in queue.
+*/
+std::list<uint16>* WardenPayloadMgr::GetPayloadsInQueue()
+{
+    return &QueuedPayloads;
 }

@@ -36,7 +36,8 @@ public:
     void QueuePayload(uint16 payloadId, bool pushToFront = false);
     bool DequeuePayload(uint16 payloadId);
     void ClearQueuedPayloads();
-    uint32 GetPayloadsInQueue();
+    uint32 GetPayloadCountInQueue();
+    std::list<uint16>* GetPayloadsInQueue();
 
     static uint16 constexpr WardenPayloadOffset = 5000;
     static uint32 constexpr WardenPayloadCheckType = 139;
