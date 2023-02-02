@@ -46,7 +46,7 @@ uint16 WardenPayloadMgr::RegisterPayload(const std::string& payload)
     uint16 payloadId = GetFreePayloadId();
 
     WardenCheck wCheck;
-    wCheck.Type = _luaCheckType;
+    wCheck.Type = WardenPayloadMgr::WardenPayloadCheckType;
     wCheck.Str = payload;
     wCheck.CheckId = payloadId;
 
@@ -76,7 +76,7 @@ bool WardenPayloadMgr::RegisterPayload(std::string const& payload, uint16 payloa
     }
 
     WardenCheck wCheck;
-    wCheck.Type = _luaCheckType;
+    wCheck.Type = WardenPayloadMgr::WardenPayloadCheckType;
     wCheck.Str = payload;
     wCheck.CheckId = payloadId;
 

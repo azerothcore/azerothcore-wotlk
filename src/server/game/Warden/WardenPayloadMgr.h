@@ -39,12 +39,10 @@ public:
     uint32 GetPayloadsInQueue();
 
     static uint16 constexpr WardenPayloadOffset = 5000;
+    static uint32 constexpr WardenPayloadCheckType = 139;
 
     std::list<uint16> QueuedPayloads;
     std::map<uint16, WardenCheck> CachedChecks;
-
-private:
-    uint32 const _luaCheckType = 139;
 };
 
 #endif // _WARDEN_PAYLOAD_MGR_H
