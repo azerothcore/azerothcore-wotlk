@@ -1,7 +1,6 @@
 #include "bot_ai.h"
 #include "bpet_ai.h"
 #include "ScriptMgr.h"
-#include "TemporarySummon.h"
 /*
 Deathknight NpcBot Pets (by Trickerer onlysuffering@gmail.com)
 Complete - 25%

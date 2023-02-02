@@ -627,7 +627,7 @@ public:
             else
                 me->GetNearPoint(me, spos.m_positionX, spos.m_positionY, spos.m_positionZ, 0.f, 10.f, 0.f);
 
-            Creature* myPet = me->SummonCreature(BOT_PET_TORNADO, spos, TEMPSUMMON_MANUAL_DESPAWN);
+            Creature* myPet = me->SummonCreature(BOT_PET_TORNADO, spos, TEMPSUMMON_CORPSE_DESPAWN);
             myPet->SetCreator(master);
             myPet->SetOwnerGUID(me->GetGUID());
             myPet->SetFaction(master->GetFaction());

@@ -40,7 +40,7 @@ public:
         void KilledUnit(Unit* u) override { bot_pet_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_pet_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_pet_ai::MoveInLineOfSight(u); }
-        void JustDied(Unit* u) override { canUpdate = false; me->ToTempSummon()->UnSummon(3000); bot_pet_ai::JustDied(u); }
+        void JustDied(Unit* u) override { bot_pet_ai::JustDied(u); }
         void DoNonCombatActions(uint32 /*diff*/) { }
 
         void StartAttack(Unit* u, bool force = false)
@@ -75,7 +75,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if ((liveTimer += diff) >= ELEMENTAL_DURATION)
+            if ((liveTimer += diff) >= uint32(IAmFree() ? (1 * HOUR * IN_MILLISECONDS) : ELEMENTAL_DURATION))
             {
                 canUpdate = false;
                 me->ToTempSummon()->UnSummon(1);

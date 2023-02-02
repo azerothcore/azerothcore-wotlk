@@ -16,6 +16,7 @@ enum ArchmagePetBaseSpells
 
 enum ArchmagePetSpecial
 {
+    ELEMENTAL_DURATION      = 60000 //1 min
 };
 
 class archmage_pet_bot : public CreatureScript
@@ -48,6 +49,13 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if ((liveTimer += diff) >= uint32(IAmFree() ? (1 * HOUR * IN_MILLISECONDS) : ELEMENTAL_DURATION))
+            {
+                canUpdate = false;
+                me->setDeathState(JUST_DIED);
+                return;
+            }
+
             if (!GlobalUpdate(diff))
                 return;
 
@@ -132,6 +140,7 @@ public:
         }
 
     private:
+        uint32 liveTimer;
     };
 };
 

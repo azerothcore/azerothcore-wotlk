@@ -59,7 +59,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            //infernal death & unsummon
             if ((liveTimer += diff) >= INFERNAL_DURATION)
             {
                 canUpdate = false;

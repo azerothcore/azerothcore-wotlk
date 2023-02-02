@@ -6,7 +6,6 @@
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
 #include "Player.h"
-#include "TemporarySummon.h"
 /*
 Warlock NpcBot Pets (by Trickerer onlysuffering@gmail.com)
 Complete - 100%

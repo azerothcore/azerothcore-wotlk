@@ -51,7 +51,7 @@ public:
         void KilledUnit(Unit* u) override { bot_pet_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_pet_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_pet_ai::MoveInLineOfSight(u); }
-        void JustDied(Unit* u) override { canUpdate = false; me->ToTempSummon()->UnSummon(1); bot_pet_ai::JustDied(u); }
+        void JustDied(Unit* u) override { bot_pet_ai::JustDied(u); }
 
         void DoPetActions(uint32 diff)
         {

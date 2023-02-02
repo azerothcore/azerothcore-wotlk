@@ -3,7 +3,6 @@
 #include "bpet_ai.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "TemporarySummon.h"
 /*
 Dark Ranger NpcBot Pets (by Trickerer onlysuffering@gmail.com)
 Notes:
@@ -46,7 +45,7 @@ public:
         void KilledUnit(Unit* u) override { bot_pet_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_pet_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_pet_ai::MoveInLineOfSight(u); }
-        void JustDied(Unit* u) override { canUpdate = false; me->ToTempSummon()->UnSummon(1000); bot_pet_ai::JustDied(u); }
+        void JustDied(Unit* u) override { bot_pet_ai::JustDied(u); }
         void DoNonCombatActions(uint32 /*diff*/) { }
 
         void StartAttack(Unit* u, bool force = false)
@@ -74,7 +73,6 @@ public:
             {
                 canUpdate = false;
                 me->setDeathState(JUST_DIED);
-                me->ToTempSummon()->UnSummon(1000);
                 return;
             }
 

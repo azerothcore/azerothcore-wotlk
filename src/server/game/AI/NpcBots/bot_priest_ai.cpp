@@ -1825,7 +1825,7 @@ public:
             //Position pos;
 
             //15 sec duration
-            Creature* myPet = me->SummonCreature(entry, *me, TEMPSUMMON_MANUAL_DESPAWN);
+            Creature* myPet = me->SummonCreature(entry, *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             //me->GetNearPoint(myPet, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 0, 2, me->GetOrientation());
             //myPet->GetMotionMaster()->MovePoint(me->GetMapId(), pos);
             myPet->SetCreator(master);
@@ -1840,7 +1840,7 @@ public:
             botPet = myPet;
 
             myPet->Attack(target, true);
-            if (!HasBotCommandState(BOT_COMMAND_STAY))
+            if (!HasBotCommandState(BOT_COMMAND_MASK_UNCHASE))
                 myPet->GetMotionMaster()->MoveChase(target);
         }
 
