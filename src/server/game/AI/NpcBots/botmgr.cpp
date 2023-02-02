@@ -976,6 +976,8 @@ void BotMgr::CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype)
 
     //remove any summons
     bot->GetBotAI()->UnsummonAll();
+    bot->AttackStop();
+    bot->CombatStopWithPets(true);
 
     ASSERT(bot->GetCreatorGUID() == _owner->GetGUID());
     //bot->SetOwnerGUID(ObjectGuid::Empty);
