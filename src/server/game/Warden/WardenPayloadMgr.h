@@ -18,8 +18,6 @@
 #ifndef _WARDEN_PAYLOAD_MGR_H
 #define _WARDEN_PAYLOAD_MGR_H
 
-#include "StringFormat.h"
-#include "Errors.h"
 #include "WardenCheckMgr.h"
 #include <list>
 
