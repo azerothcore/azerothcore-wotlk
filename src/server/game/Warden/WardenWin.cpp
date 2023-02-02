@@ -65,7 +65,7 @@ static uint16 GetCheckPacketSize(WardenCheck const* check)
 
     if (check->CheckId >= WardenPayloadMgr::WardenPayloadOffset && check->Type == LUA_EVAL_CHECK)
     {
-        // Anchy: Custom payload has no prefix, midfix, postfix.
+        // Custom payload has no prefix, midfix, postfix.
         size = size + (4 + 1);
     }
     else
@@ -289,13 +289,13 @@ void WardenWin::RequestChecks()
     _serverTicks = GameTime::GetGameTimeMS().count();
     _CurrentChecks.clear();
 
-    // Anchy: Erase any nullptrs.
+    // Erase any nullptrs.
     Acore::Containers::EraseIf(_PendingChecks,
         [this](uint16 id)
         {
             WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
 
-            // Anchy: Custom payload should be loaded in if equal to over offset.
+            // Custom payload should be loaded in if equal to over offset.
             if (!check && id >= WardenPayloadMgr::WardenPayloadOffset)
             {
                 if (_payloadMgr.CachedChecks.find(id) != _payloadMgr.CachedChecks.end())
@@ -326,7 +326,7 @@ void WardenWin::RequestChecks()
                     break;
                 }
 
-                // Anchy: Load in any custom payloads if available.
+                // Load in any custom payloads if available.
                 if (checkType == WARDEN_CHECK_LUA_TYPE && !_payloadMgr.QueuedPayloads.empty())
                 {
                     uint16 payloadId = _payloadMgr.QueuedPayloads.front();
@@ -362,7 +362,7 @@ void WardenWin::RequestChecks()
         {
             WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
 
-            // Anchy: Custom payload should be loaded in if equal to over offset.
+            // Custom payload should be loaded in if equal to over offset.
             if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffset)
             {
                 check = &_payloadMgr.CachedChecks.at(checkId);
@@ -406,7 +406,7 @@ void WardenWin::RequestChecks()
         {
             WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
 
-            // Anchy: Custom payload should be loaded in if equal to over offset.
+            // Custom payload should be loaded in if equal to over offset.
             if (!check && id >= WardenPayloadMgr::WardenPayloadOffset)
             {
                 check = &_payloadMgr.CachedChecks.at(id);
@@ -436,7 +436,7 @@ void WardenWin::RequestChecks()
     {
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
 
-        // Anchy: Custom payloads do not have prefix, midfix, postfix.
+        // Custom payloads do not have prefix, midfix, postfix.
         if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffset)
         {
             check = &_payloadMgr.CachedChecks.at(checkId);
@@ -481,7 +481,7 @@ void WardenWin::RequestChecks()
     {
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
 
-        // Anchy: Custom payload should be loaded in if equal to over offset.
+        // Custom payload should be loaded in if equal to over offset.
         if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffset)
         {
             check = &_payloadMgr.CachedChecks.at(checkId);
@@ -618,7 +618,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
         {
             WardenCheck const* rd = sWardenCheckMgr->GetWardenDataById(checkId);
 
-            // Anchy: Custom payload should be loaded in if equal to over offset.
+            // Custom payload should be loaded in if equal to over offset.
             if (!rd && checkId >= WardenPayloadMgr::WardenPayloadOffset)
             {
                 rd = &_payloadMgr.CachedChecks.at(checkId);
