@@ -130,6 +130,15 @@ WardenCheck* WardenPayloadMgr::GetPayloadById(uint16 payloadId)
 */
 void WardenPayloadMgr::QueuePayload(uint16 payloadId, bool pushToFront)
 {
+    auto it = CachedChecks.find(payloadId);
+
+    //Do not queue a payload if there is no payload matching the payloadId.
+    if (it == CachedChecks.end())
+    {
+        LOG_DEBUG("warden", "Failed to queue payload id '{}' as it does not exist in CachedChecks.", payloadId);
+        return;
+    }
+
     if (pushToFront)
     {
         QueuedPayloads.push_front(payloadId);
