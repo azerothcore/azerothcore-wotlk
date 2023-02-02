@@ -125,9 +125,16 @@ WardenCheck* WardenPayloadMgr::GetPayloadById(uint16 payloadId)
 * @brief Queue the payload into the normal warden checks.
 * @param payloadId The payloadId to be queued.
 */
-void WardenPayloadMgr::QueuePayload(uint16 payloadId)
+void WardenPayloadMgr::QueuePayload(uint16 payloadId, bool pushToFront)
 {
-    QueuedPayloads.push_back(payloadId);
+    if (pushToFront)
+    {
+        QueuedPayloads.push_front(payloadId);
+    }
+    else
+    {
+        QueuedPayloads.push_back(payloadId);
+    }
 }
 
 /**

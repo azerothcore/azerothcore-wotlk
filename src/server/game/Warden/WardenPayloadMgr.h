@@ -33,7 +33,7 @@ public:
     bool RegisterPayload(std::string const& payload, uint16 payloadId, bool replace = false);
     bool UnregisterPayload(uint16 payloadId);
     WardenCheck* GetPayloadById(uint16 payloadId);
-    void QueuePayload(uint16 payloadId);
+    void QueuePayload(uint16 payloadId, bool pushToFront = false);
     bool DequeuePayload(uint16 payloadId);
     void ClearQueuedPayloads();
     uint32 GetPayloadsInQueue();
