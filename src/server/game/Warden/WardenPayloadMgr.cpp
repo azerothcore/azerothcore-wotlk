@@ -107,7 +107,7 @@ void WardenPayloadMgr::QueuePayload(uint16 payloadId, bool pushToFront)
     //Do not queue a payload if there is no payload matching the payloadId.
     if (it == CachedChecks.end())
     {
-        LOG_DEBUG("warden", "Failed to queue payload id '{}' as it does not exist in CachedChecks.", payloadId);
+        LOG_ERROR("warden", "Failed to queue payload id '{}' as it does not exist in CachedChecks.", payloadId);
         return;
     }
 
