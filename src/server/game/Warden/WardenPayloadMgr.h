@@ -75,7 +75,7 @@ public:
     * bool result = payloadMgr->RegisterPayload("message('Hello World!');", 5000, false);
     * if(result)
     * {
-    *   payloadMgr->QueuePayload(payloadId);
+    *   payloadMgr->QueuePayload(5000);
     * }
     * @endcode
     */
