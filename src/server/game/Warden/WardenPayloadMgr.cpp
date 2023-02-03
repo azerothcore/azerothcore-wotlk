@@ -30,7 +30,7 @@ uint16 WardenPayloadMgr::GetFreePayloadId()
     {
         payloadId++;
 
-        if (payloadId == WardenPayloadMgr::WardenPayloadOffsetMax)
+        if (payloadId >= WardenPayloadMgr::WardenPayloadOffsetMax)
         {
             LOG_WARN("warden", "Max warden payload id of '{}' reached!", WardenPayloadMgr::WardenPayloadOffsetMax);
             break;
