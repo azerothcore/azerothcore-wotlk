@@ -63,7 +63,7 @@ static uint16 GetCheckPacketSize(WardenCheck const* check)
 
     uint16 size = 1;
 
-    if (check->CheckId >= WardenPayloadMgr::WardenPayloadOffset && check->Type == LUA_EVAL_CHECK)
+    if (check->CheckId >= WardenPayloadMgr::WardenPayloadOffsetMin && check->Type == LUA_EVAL_CHECK)
     {
         // Custom payload has no prefix, midfix, postfix.
         size = size + (4 + 1);
@@ -296,7 +296,7 @@ void WardenWin::RequestChecks()
             WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
 
             // Custom payload should be loaded in if equal to over offset.
-            if (!check && id >= WardenPayloadMgr::WardenPayloadOffset)
+            if (!check && id >= WardenPayloadMgr::WardenPayloadOffsetMin)
             {
                 if (_payloadMgr.CachedChecks.find(id) != _payloadMgr.CachedChecks.end())
                 {
@@ -363,7 +363,7 @@ void WardenWin::RequestChecks()
             WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
 
             // Custom payload should be loaded in if equal to over offset.
-            if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffset)
+            if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffsetMin)
             {
                 check = &_payloadMgr.CachedChecks.at(checkId);
             }
@@ -407,7 +407,7 @@ void WardenWin::RequestChecks()
             WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
 
             // Custom payload should be loaded in if equal to over offset.
-            if (!check && id >= WardenPayloadMgr::WardenPayloadOffset)
+            if (!check && id >= WardenPayloadMgr::WardenPayloadOffsetMin)
             {
                 check = &_payloadMgr.CachedChecks.at(id);
             }
@@ -437,7 +437,7 @@ void WardenWin::RequestChecks()
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
 
         // Custom payloads do not have prefix, midfix, postfix.
-        if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffset)
+        if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffsetMin)
         {
             check = &_payloadMgr.CachedChecks.at(checkId);
 
@@ -482,7 +482,7 @@ void WardenWin::RequestChecks()
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
 
         // Custom payload should be loaded in if equal to over offset.
-        if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffset)
+        if (!check && checkId >= WardenPayloadMgr::WardenPayloadOffsetMin)
         {
             check = &_payloadMgr.CachedChecks.at(checkId);
         }
@@ -619,7 +619,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
             WardenCheck const* rd = sWardenCheckMgr->GetWardenDataById(checkId);
 
             // Custom payload should be loaded in if equal to over offset.
-            if (!rd && checkId >= WardenPayloadMgr::WardenPayloadOffset)
+            if (!rd && checkId >= WardenPayloadMgr::WardenPayloadOffsetMin)
             {
                 rd = &_payloadMgr.CachedChecks.at(checkId);
             }

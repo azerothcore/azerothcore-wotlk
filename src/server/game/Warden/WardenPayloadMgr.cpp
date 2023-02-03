@@ -24,7 +24,7 @@ WardenPayloadMgr::WardenPayloadMgr() { }
 
 uint16 WardenPayloadMgr::GetFreePayloadId()
 {
-    uint16 payloadId = WardenPayloadOffset;
+    uint16 payloadId = WardenPayloadOffsetMin;
 
     while (CachedChecks.find(payloadId) != CachedChecks.end())
     {
@@ -56,9 +56,9 @@ uint16 WardenPayloadMgr::RegisterPayload(const std::string& payload)
 bool WardenPayloadMgr::RegisterPayload(std::string const& payload, uint16 payloadId, bool replace)
 {
     //Payload id should be over or equal to the offset to prevent conflicts.
-    if (payloadId < WardenPayloadMgr::WardenPayloadOffset)
+    if (payloadId < WardenPayloadMgr::WardenPayloadOffsetMin)
     {
-        LOG_ERROR("warden", "Tried to register payloadId lower than '{}'.", WardenPayloadMgr::WardenPayloadOffset);
+        LOG_ERROR("warden", "Tried to register payloadId lower than '{}'.", WardenPayloadMgr::WardenPayloadOffsetMin);
         return false;
     }
 
