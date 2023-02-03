@@ -38,16 +38,10 @@ uint16 WardenPayloadMgr::RegisterPayload(const std::string& payload)
 {
     uint16 payloadId = GetFreePayloadId();
 
-    WardenCheck wCheck;
-    wCheck.Type = WardenPayloadMgr::WardenPayloadCheckType;
-    wCheck.Str = payload;
-    wCheck.CheckId = payloadId;
-
-    std::string idStr = Acore::StringFormat("%04u", payloadId);
-    ASSERT(idStr.size() == 4);
-    std::copy(idStr.begin(), idStr.end(), wCheck.IdStr.begin());
-
-    CachedChecks.emplace(payloadId, wCheck);
+    if (!RegisterPayload(payload, payloadId, false))
+    {
+        LOG_ERROR("warden", "Failed to register free payload id '{}'.", payloadId);
+    }
 
     return payloadId;
 }
