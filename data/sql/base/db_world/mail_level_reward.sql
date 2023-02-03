@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `mail_level_reward` (
   `mailTemplateId` mediumint unsigned NOT NULL DEFAULT '0',
   `senderEntry` mediumint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`level`,`raceMask`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Mail System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Mail System';
 
 -- Dumping data for table acore_world.mail_level_reward: 24 rows
 DELETE FROM `mail_level_reward`;

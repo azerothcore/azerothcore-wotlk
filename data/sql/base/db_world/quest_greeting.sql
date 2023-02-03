@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `quest_greeting` (
   `Greeting` text,
   `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`ID`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.quest_greeting: 206 rows
 DELETE FROM `quest_greeting`;

@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `character_glyphs` (
   `glyph5` smallint unsigned DEFAULT '0',
   `glyph6` smallint unsigned DEFAULT '0',
   PRIMARY KEY (`guid`,`talentGroup`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_characters.character_glyphs: ~0 rows (approximately)
 DELETE FROM `character_glyphs`;

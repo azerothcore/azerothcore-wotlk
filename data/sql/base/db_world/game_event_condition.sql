@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `game_event_condition` (
   `done_world_state_field` smallint unsigned NOT NULL DEFAULT '0',
   `description` varchar(25) NOT NULL DEFAULT '',
   PRIMARY KEY (`eventEntry`,`condition_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.game_event_condition: 0 rows
 DELETE FROM `game_event_condition`;

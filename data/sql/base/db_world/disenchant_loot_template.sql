@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `disenchant_loot_template` (
   `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
   `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Loot System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
 -- Dumping data for table acore_world.disenchant_loot_template: 124 rows
 DELETE FROM `disenchant_loot_template`;

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `spell_mixology` (
   `entry` mediumint unsigned NOT NULL,
   `pctMod` float NOT NULL DEFAULT '30' COMMENT 'bonus multiplier',
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 
 -- Dumping data for table acore_world.spell_mixology: 21 rows
 DELETE FROM `spell_mixology`;

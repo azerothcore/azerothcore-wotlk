@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `npc_trainer` (
   `ReqLevel` tinyint unsigned NOT NULL DEFAULT '0',
   `ReqSpell` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`SpellID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.npc_trainer: 4,971 rows
 DELETE FROM `npc_trainer`;

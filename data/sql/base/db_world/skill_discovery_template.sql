@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `skill_discovery_template` (
   `reqSkillValue` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'skill points requirement',
   `chance` float NOT NULL DEFAULT '0' COMMENT 'chance to discover',
   PRIMARY KEY (`spellId`,`reqSpell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Skill Discovery System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Skill Discovery System';
 
 -- Dumping data for table acore_world.skill_discovery_template: 347 rows
 DELETE FROM `skill_discovery_template`;

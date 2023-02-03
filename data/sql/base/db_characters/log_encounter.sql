@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `log_encounter` (
   `creditType` tinyint unsigned NOT NULL,
   `creditEntry` int unsigned NOT NULL,
   `playersInfo` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_characters.log_encounter: 0 rows
 DELETE FROM `log_encounter`;

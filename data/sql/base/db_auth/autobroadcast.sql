@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `autobroadcast` (
   `weight` tinyint unsigned DEFAULT '1',
   `text` longtext NOT NULL,
   PRIMARY KEY (`id`,`realmid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_auth.autobroadcast: ~0 rows (approximately)
 DELETE FROM `autobroadcast`;

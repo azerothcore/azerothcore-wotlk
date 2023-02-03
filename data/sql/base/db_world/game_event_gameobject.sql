@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `game_event_gameobject` (
   `eventEntry` tinyint NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
   `guid` int unsigned NOT NULL,
   PRIMARY KEY (`guid`,`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.game_event_gameobject: 21,709 rows
 DELETE FROM `game_event_gameobject`;

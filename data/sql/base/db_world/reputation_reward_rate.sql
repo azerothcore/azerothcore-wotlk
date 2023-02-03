@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `reputation_reward_rate` (
   `creature_rate` float NOT NULL DEFAULT '1',
   `spell_rate` float NOT NULL DEFAULT '1',
   PRIMARY KEY (`faction`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.reputation_reward_rate: 14 rows
 DELETE FROM `reputation_reward_rate`;

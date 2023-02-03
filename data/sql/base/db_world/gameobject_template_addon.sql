@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_template_addon` (
   `artkit2` int NOT NULL DEFAULT '0',
   `artkit3` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.gameobject_template_addon: 21,493 rows
 DELETE FROM `gameobject_template_addon`;

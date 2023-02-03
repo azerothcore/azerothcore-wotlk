@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `realmlist` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_name` (`name`),
   CONSTRAINT `realmlist_chk_1` CHECK ((`population` >= 0))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Realm System';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='Realm System';
 
 -- Dumping data for table acore_auth.realmlist: ~0 rows (approximately)
 DELETE FROM `realmlist`;

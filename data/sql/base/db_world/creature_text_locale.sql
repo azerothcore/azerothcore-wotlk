@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `creature_text_locale` (
   `Locale` varchar(4) NOT NULL,
   `Text` text,
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`,`Locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 -- Dumping data for table acore_world.creature_text_locale: ~14,241 rows (approximately)
 DELETE FROM `creature_text_locale`;

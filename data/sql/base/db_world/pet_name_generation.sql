@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `pet_name_generation` (
   `entry` mediumint unsigned NOT NULL DEFAULT '0',
   `half` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.pet_name_generation: 313 rows
 DELETE FROM `pet_name_generation`;

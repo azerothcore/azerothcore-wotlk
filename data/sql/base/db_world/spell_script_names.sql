@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `spell_script_names` (
   `spell_id` int NOT NULL,
   `ScriptName` char(64) NOT NULL,
   UNIQUE KEY `spell_id` (`spell_id`,`ScriptName`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.spell_script_names: 2,086 rows
 DELETE FROM `spell_script_names`;

@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `skilllineability_dbc` (
   `CharacterPoints_1` int NOT NULL DEFAULT '0',
   `CharacterPoints_2` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.skilllineability_dbc: 0 rows
 DELETE FROM `skilllineability_dbc`;

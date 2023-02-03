@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `gossip_menu` (
   `MenuID` smallint unsigned NOT NULL DEFAULT '0',
   `TextID` mediumint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`MenuID`,`TextID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.gossip_menu: 5,954 rows
 DELETE FROM `gossip_menu`;

@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `reputation_spillover_template` (
   `rate_4` float NOT NULL DEFAULT '0',
   `rank_4` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`faction`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='Reputation spillover reputation gain';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Reputation spillover reputation gain';
 
 -- Dumping data for table acore_world.reputation_spillover_template: 26 rows
 DELETE FROM `reputation_spillover_template`;

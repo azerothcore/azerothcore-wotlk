@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `item_set_names_locale` (
   `Name` text,
   `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`ID`,`locale`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for table acore_world.item_set_names_locale: 14,850 rows
 DELETE FROM `item_set_names_locale`;

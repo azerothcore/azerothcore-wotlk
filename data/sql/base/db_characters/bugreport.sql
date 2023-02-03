@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `bugreport` (
   `type` longtext NOT NULL,
   `content` longtext NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Debug System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Debug System';
 
 -- Dumping data for table acore_characters.bugreport: ~0 rows (approximately)
 DELETE FROM `bugreport`;
