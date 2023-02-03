@@ -30,10 +30,10 @@ uint16 WardenPayloadMgr::GetFreePayloadId()
     {
         payloadId++;
 
-        if (payloadId >= WardenPayloadMgr::WardenPayloadOffsetMax)
+        if (payloadId > WardenPayloadMgr::WardenPayloadOffsetMax)
         {
-            LOG_WARN("warden", "Max warden payload id of '{}' reached!", WardenPayloadMgr::WardenPayloadOffsetMax);
-            break;
+            LOG_ERROR("warden", "Max warden payload id of '{}' passed!", WardenPayloadMgr::WardenPayloadOffsetMax);
+            return 0;
         }
     }
 
@@ -44,9 +44,10 @@ uint16 WardenPayloadMgr::RegisterPayload(const std::string& payload)
 {
     uint16 payloadId = GetFreePayloadId();
 
-    if (!RegisterPayload(payload, payloadId, false))
+    if (!payloadId || !RegisterPayload(payload, payloadId, false))
     {
-        LOG_ERROR("warden", "Failed to register free payload id '{}'.", payloadId);
+        LOG_ERROR("warden", "Failed to register payload.");
+        return 0;
     }
 
     return payloadId;
@@ -55,12 +56,16 @@ uint16 WardenPayloadMgr::RegisterPayload(const std::string& payload)
 bool WardenPayloadMgr::RegisterPayload(std::string const& payload, uint16 payloadId, bool replace)
 {
     //Payload id should be over or equal to the offset to prevent conflicts.
-    ASSERT(payloadId >= WardenPayloadMgr::WardenPayloadOffset);
+    if (payloadId < WardenPayloadMgr::WardenPayloadOffset)
+    {
+        LOG_ERROR("warden", "Tried to register payloadId lower than '{}'.", WardenPayloadMgr::WardenPayloadOffset);
+        return false;
+    }
 
     auto it = CachedChecks.find(payloadId);
-
     if (it != CachedChecks.end() && !replace)
     {
+        LOG_ERROR("warden", "Payload Id '{}' already exists in CachedChecks.", payloadId);
         return false;
     }
 

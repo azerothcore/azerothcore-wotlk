@@ -39,7 +39,7 @@ public:
     /**
     * @brief Register a payload into cache and returns its payload id.
     * @param payload The payload to be stored in WardenPayloadMgr::CachedChecks.
-    * @return uint16 The payload id for use with WardenPayloadMgr::QueuePayload.
+    * @return uint16 The payload id for use with WardenPayloadMgr::QueuePayload. Returns 0 if it failed to register.
     */
     uint16 RegisterPayload(const std::string& payload);
 
