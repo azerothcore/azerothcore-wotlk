@@ -29,6 +29,12 @@ uint16 WardenPayloadMgr::GetFreePayloadId()
     while (CachedChecks.find(payloadId) != CachedChecks.end())
     {
         payloadId++;
+
+        if (payloadId == WardenPayloadMgr::WardenPayloadOffsetMax)
+        {
+            LOG_WARN("warden", "Max warden payload id of '{}' reached!", WardenPayloadMgr::WardenPayloadOffsetMax);
+            break;
+        }
     }
 
     return payloadId;

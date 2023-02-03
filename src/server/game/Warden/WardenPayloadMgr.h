@@ -99,6 +99,7 @@ public:
     std::list<uint16>* GetPayloadsInQueue();
 
     static uint16 constexpr WardenPayloadOffset = 5000;
+    static uint16 constexpr WardenPayloadOffsetMax = 9999;
     static uint32 constexpr WardenPayloadCheckType = 139;
 
     std::list<uint16> QueuedPayloads;
