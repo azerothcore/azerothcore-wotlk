@@ -363,7 +363,9 @@ public:
                         if (!riftKeeper || !riftKeeper->IsAlive())
                         {
                             if (instance)
-                                instance->SetData(DATA_RIFT_KILLED, 1);
+                            {
+                                instance->SetGuidData(DATA_RIFT_KILLED, me->GetGUID());
+                            }
 
                             me->DespawnOrUnsummon(0);
                             break;

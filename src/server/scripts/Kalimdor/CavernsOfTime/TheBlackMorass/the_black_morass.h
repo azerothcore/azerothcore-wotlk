@@ -83,7 +83,10 @@ enum Misc
     SPELL_RIFT_CHANNEL                  = 31387,
 
     EVENT_NEXT_PORTAL                   = 1,
-    EVENT_SUMMON_KEEPER                 = 2,
+    EVENT_SUMMON_KEEPER_1               = 2,
+    EVENT_SUMMON_KEEPER_2               = 3,
+    EVENT_SUMMON_KEEPER_3               = 4,
+    EVENT_SUMMON_KEEPER_4               = 5,
 
     ACTION_OUTRO                        = 1
 };
