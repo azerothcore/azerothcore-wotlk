@@ -43,6 +43,10 @@
 #include "Vehicle.h"
 #include "Weather.h"
 
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 union u_map_magic
 {
     char asChar[4];
@@ -588,6 +592,9 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     //obj->SetMap(this);
     obj->AddToWorld();
 
+    //npcbot: do not add bots to transport (handled inside AI)
+    if (!obj->IsNPCBotOrPet())
+    //end npcbot
     if (checkTransport)
         if (!(obj->GetTypeId() == TYPEID_GAMEOBJECT && obj->ToGameObject()->IsTransport())) // dont add transport to transport ;d
             if (Transport* transport = GetTransportForPos(obj->GetPhaseMask(), obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj))
@@ -2737,7 +2744,26 @@ uint32 Map::GetPlayersCountExceptGMs() const
     uint32 count = 0;
     for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
         if (!itr->GetSource()->IsGameMaster())
+        //npcbot - count npcbots as group members (event if not in group)
+        {
+            if (itr->GetSource()->HaveBot() && BotMgr::LimitBots(this))
+            {
+                ++count;
+                BotMap const* botmap = itr->GetSource()->GetBotMgr()->GetBotMap();
+                for (BotMap::const_iterator itr = botmap->begin(); itr != botmap->end(); ++itr)
+                {
+                    Creature* cre = itr->second;
+                    if (!cre || !cre->IsInWorld() || cre->FindMap() != this || cre->IsTempBot())
+                        continue;
+                    ++count;
+                }
+                continue;
+            }
+        //end npcbot
             ++count;
+        //npcbot
+        }
+        //end npcbot
     return count;
 }
 

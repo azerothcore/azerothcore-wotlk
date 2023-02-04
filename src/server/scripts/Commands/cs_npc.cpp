@@ -213,6 +213,16 @@ public:
         if (!sObjectMgr->GetCreatureTemplate(id))
             return false;
 
+        //npcbot
+        CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(id);
+        if (cinfo && ((cinfo->flags_extra & CREATURE_FLAG_EXTRA_NPCBOT) || (cinfo->flags_extra & CREATURE_FLAG_EXTRA_NPCBOT_PET)))
+        {
+            handler->PSendSysMessage("You tried to spawn creature %u, which is part of NPCBots mod. To spawn bots use '.npcbot spawn' instead.", uint32(id));
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        //end npcbot
+
         Player* chr = handler->GetSession()->GetPlayer();
         float x = chr->GetPositionX();
         float y = chr->GetPositionY();
@@ -397,6 +407,15 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
+
+        //npcbot
+        if (unit->IsNPCBotOrPet())
+        {
+            handler->SendSysMessage("Selected creature has botAI assigned, use '.npcbot delete' instead");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        //end npcbot
 
         // Delete the creature
         unit->CombatStop();
@@ -755,6 +774,17 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
+
+        //npcbot
+        CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(creature->GetEntry());
+        ASSERT(ct);
+        if ((ct->flags_extra & (CREATURE_FLAG_EXTRA_NPCBOT | CREATURE_FLAG_EXTRA_NPCBOT_PET)) != 0)
+        {
+            handler->PSendSysMessage("creature %u (id %u) is a part of NPCBots mod. Use '.npcbot move' instead", lowguid, creature->GetEntry());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        //end npcbot
 
         float x = handler->GetSession()->GetPlayer()->GetPositionX();
         float y = handler->GetSession()->GetPlayer()->GetPositionY();

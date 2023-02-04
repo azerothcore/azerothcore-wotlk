@@ -192,6 +192,9 @@ public:
     bool   Create(Player* leader);
     bool   LoadGroupFromDB(Field* field);
     void   LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles);
+    //npcbot
+    void LoadCreatureMemberFromDB(uint32 entry, uint8 memberFlags, uint8 subgroup, uint8 roles);
+    //end npcbot
     bool   AddInvite(Player* player);
     void   RemoveInvite(Player* player);
     void   RemoveAllInvites();
@@ -321,6 +324,10 @@ public:
     DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
     void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
     void DoForAllMembers(std::function<void(Player*)> const& worker);
+
+    //npcbots
+    ObjectGuid const* GetTargetIcons() const { return m_targetIcons; }
+    //end npcbots
 
 protected:
     void _homebindIfInstance(Player* player);

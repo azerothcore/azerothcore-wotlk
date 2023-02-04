@@ -31,6 +31,13 @@
 #include "ScriptMgr.h"
 #include <unordered_map>
 
+//npcbot
+//non-PCH
+#include "Creature.h"
+#include "botmgr.h"
+#include "botdatamgr.h"
+//end npcbot
+
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
 /*********************************************************/
@@ -180,6 +187,27 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* group, Battle
             m_QueuedPlayers[member->GetGUID()] = ginfo;
             ginfo->Players.emplace(member->GetGUID());
         });
+        //npcbot: queue bots (bg only)
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player const* member = itr->GetSource();
+            if (!member)
+                continue;   // this should never happen
+            if (arenaTeamId || !member->HaveBot())
+                continue;
+
+            BotMap const* map = member->GetBotMgr()->GetBotMap();
+            for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
+            {
+                Creature const* bot = itr->second;
+                if (!bot || !group->IsMember(bot->GetGUID()))
+                    continue;
+
+                m_QueuedPlayers[bot->GetGUID()] = ginfo;
+                ginfo->Players.emplace(bot->GetGUID());
+            }
+        }
+        //end npcbot
     }
     else
     {
@@ -332,6 +360,24 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
             at->SaveToDB();
         }
     }
+
+    //npcbot: removing bot: return
+    if (!guid.IsPlayer())
+        return;
+
+    //npcbot: remove player's bots if queued
+    if (!groupInfo->Players.empty())
+    {
+        std::vector<ObjectGuid> botguids;
+        botguids.reserve(BotMgr::GetMaxNpcBots() / 2);
+        BotDataMgr::GetNPCBotGuidsByOwner(botguids, guid);
+        for (std::vector<ObjectGuid>::const_iterator ci = botguids.begin(); ci != botguids.end() && !groupInfo->Players.empty(); ++ci)
+        {
+            if (m_QueuedPlayers.find(*ci) != m_QueuedPlayers.end())
+                RemovePlayer(*ci, decreaseInvitedCount);
+        }
+    }
+    //end npcbot
 
     // remove group queue info no players left
     if (groupInfo->Players.empty())
@@ -1208,6 +1254,16 @@ void BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg,
     // loop through the players
     for (auto const& itr : ginfo->Players)
     {
+        //npcbot: invite bots
+        if (itr.IsCreature())
+        {
+            bg->IncreaseInvitedCount(ginfo->teamId);
+            LOG_DEBUG("bg.battleground", "Battleground: invited NPCBot {} to BG instance {} bgtype {}",
+                itr.ToString().c_str(), bg->GetInstanceID(), bg->GetBgTypeID());
+            continue;
+        }
+        //end npcbot
+
         // get the player
         Player* player = ObjectAccessor::FindConnectedPlayer(itr);
         if (!player)

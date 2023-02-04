@@ -399,7 +399,7 @@ enum WeaponAttackType
     MAX_ATTACK
 };
 
-enum CombatRating
+enum CombatRating : uint8
 {
     CR_WEAPON_SKILL             = 0,
     CR_DEFENSE_SKILL            = 1,
@@ -775,6 +775,10 @@ private:
     // amalgamation constructor (used for proc)
     DamageInfo(DamageInfo const& dmg1, DamageInfo const& dmg2);
 
+    //npcbot
+    uint32 m_procEx = 0;
+    //end npcbot
+
 public:
     explicit DamageInfo(Unit* _attacker, Unit* _victim, uint32 _damage, SpellInfo const* _spellInfo, SpellSchoolMask _schoolMask, DamageEffectType _damageType, uint32 cleanDamage = 0);
     explicit DamageInfo(CalcDamageInfo const& dmgInfo); // amalgamation wrapper
@@ -798,6 +802,10 @@ public:
     [[nodiscard]] uint32 GetBlock() const { return m_block; };
 
     [[nodiscard]] uint32 GetUnmitigatedDamage() const;
+
+    //npcbot
+    [[nodiscard]] uint32 GetHitMask() const { return m_procEx; }
+    //end npcbot
 };
 
 class HealInfo
@@ -1349,6 +1357,9 @@ public:
     [[nodiscard]] bool IsWithinRange(Unit const* obj, float dist) const;
     bool IsWithinCombatRange(Unit const* obj, float dist2compare) const;
     bool IsWithinMeleeRange(Unit const* obj, float dist = 0.f) const;
+    //npcbot: TC method transfer
+    bool IsWithinMeleeRangeAt(Position const& pos, Unit const* obj) const;
+    //end npcbot
     float GetMeleeRange(Unit const* target) const;
     virtual SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const = 0;
     bool GetRandomContactPoint(Unit const* target, float& x, float& y, float& z, bool force = false) const;
@@ -1426,6 +1437,17 @@ public:
     [[nodiscard]] uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
     [[nodiscard]] uint32 getClassMask() const { return 1 << (getClass() - 1); }
     [[nodiscard]] uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
+
+    //npcbot: compatibility accessors
+    [[nodiscard]] inline uint8 GetRace(bool original = false) const { return getRace(original); }
+    [[nodiscard]] inline uint32 GetRaceMask() const { return getRaceMask(); }
+    [[nodiscard]] inline uint8 GetClass() const { return getClass(); }
+    [[nodiscard]] inline uint32 GetClassMask() const { return getClassMask(); }
+    [[nodiscard]] inline uint8 GetGender() const { return getGender(); }
+    inline void SetPowerType(Powers power) { setPowerType(power); }
+    [[nodiscard]] inline Powers GetPowerType() const { return getPowerType(); }
+    [[nodiscard]] uint8 GetStandState() const { return getStandState(); }
+    //end npcbot
 
     [[nodiscard]] float GetStat(Stats stat) const { return float(GetUInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat)); }
     void SetStat(Stats stat, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat, val); }
@@ -1810,7 +1832,12 @@ public:
     [[nodiscard]] bool IsAlive() const { return (m_deathState == ALIVE); };
     [[nodiscard]] bool isDying() const { return (m_deathState == JUST_DIED); };
     [[nodiscard]] bool isDead() const { return (m_deathState == DEAD || m_deathState == CORPSE); };
+    //npcbot
+    /*
     DeathState getDeathState() { return m_deathState; };
+    */
+    DeathState getDeathState() const { return m_deathState; };
+    //end npcbot
     virtual void setDeathState(DeathState s, bool despawn = false);           // overwrited in Creature/Player/Pet
 
     [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(UNIT_FIELD_SUMMONEDBY); }
@@ -1826,6 +1853,14 @@ public:
     [[nodiscard]] ObjectGuid GetPetGUID() const { return m_SummonSlot[SUMMON_SLOT_PET]; }
     void SetCritterGUID(ObjectGuid guid) { SetGuidValue(UNIT_FIELD_CRITTER, guid); }
     [[nodiscard]] ObjectGuid GetCritterGUID() const { return GetGuidValue(UNIT_FIELD_CRITTER); }
+
+    //npcbot
+    void SetControlledByPlayer(bool set) { m_ControlledByPlayer = set; }
+    GameObject* GetFirstGameObjectById(uint32 id) const;
+    void SetCreator(Unit* creator);
+    Unit* GetCreator() const { return m_creator; }
+    Unit* m_creator = nullptr;
+    //end npcbot
 
     [[nodiscard]] bool IsControlledByPlayer() const { return m_ControlledByPlayer; }
     [[nodiscard]] bool IsCreatedByPlayer() const { return m_CreatedByPlayer; }
@@ -2228,7 +2263,12 @@ public:
 
     void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, SpellImmuneBlockType blockType = SPELL_BLOCK_TYPE_ALL);
     void ApplySpellDispelImmunity(SpellInfo const* spellProto, DispelType type, bool apply);
+    //npcbot
+    /*
     virtual bool IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell = nullptr);
+    */
+    virtual bool IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell = nullptr) const;
+    //end npcbot
     // redefined in Creature
     [[nodiscard]] bool IsImmunedToDamage(SpellSchoolMask meleeSchoolMask) const;
     [[nodiscard]] bool IsImmunedToDamage(SpellInfo const* spellInfo) const;
@@ -2426,7 +2466,14 @@ public:
         (void)forceSendToSpectator;
     }
 
+    //npcbot
+    /*
+    //end npcbot
     [[nodiscard]] bool CanApplyResilience() const { return m_applyResilience; }
+    //npcbot
+    */
+    [[nodiscard]] bool CanApplyResilience() const;
+    //end npcbot
 
     void PetSpellFail(SpellInfo const* spellInfo, Unit* target, uint32 result);
 
@@ -2440,6 +2487,10 @@ public:
 
     // Movement info
     Movement::MoveSpline* movespline;
+
+    //npcbot: TC method transfer
+    bool IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType auraType, int32 effectAmount, uint8 auraEffectMask, bool removeOtherAuraApplications = false);
+    //end npcbot
 
     virtual void Talk(std::string_view text, ChatMsg msgType, Language language, float textRange, WorldObject const* target);
     virtual void Say(std::string_view text, Language language, WorldObject const* target = nullptr);
@@ -2466,6 +2517,11 @@ public:
     [[nodiscard]] bool CanNotReachTarget() const;
 
     bool m_cannotReachTarget;
+
+    //npcbot
+    bool HasReactive(ReactiveType reactive) const { return m_reactiveTimer[reactive] > 0; }
+    void ClearReactive(ReactiveType reactive);
+    //end npcbot
 
 protected:
     explicit Unit (bool isWorldObject);

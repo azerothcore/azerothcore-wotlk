@@ -29,6 +29,10 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+// npcbot
+#include "botmgr.h"
+//end npcbot
+
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_SPLIT_ITEM");
@@ -1089,6 +1093,15 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
         {
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(item->item))
             {
+                // npcbot
+                if (_player->HaveBot())
+                {
+                    if (!(itemTemplate->AllowableClass & (_player->GetClassMask() | _player->GetBotMgr()->GetAllNpcBotsClassMask())) &&
+                        itemTemplate->Bonding == BIND_WHEN_PICKED_UP && !_player->IsGameMaster())
+                        continue;
+                }
+                else
+                // end npcbot
                 if (!(itemTemplate->AllowableClass & _player->getClassMask()) && itemTemplate->Bonding == BIND_WHEN_PICKED_UP && !_player->IsGameMaster())
                 {
                     continue;

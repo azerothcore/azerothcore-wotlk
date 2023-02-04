@@ -190,6 +190,14 @@ hyjal_trashAI::hyjal_trashAI(Creature* creature) : npc_escortAI(creature)
 
 void hyjal_trashAI::DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask)
 {
+    //npcbot:
+    if (done_by && done_by->IsNPCBotOrPet())
+    {
+        damageTaken += damage;
+        instance->SetData(DATA_RAIDDAMAGE, damage);
+    }
+    else
+    //end npcbot
     if (done_by && (done_by->GetTypeId() == TYPEID_PLAYER || done_by->IsPet()))
     {
         damageTaken += damage;
