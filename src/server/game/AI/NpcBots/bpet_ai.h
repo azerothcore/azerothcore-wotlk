@@ -33,7 +33,7 @@ class bot_pet_ai : public CreatureAI
         void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellSchoolMask /*schoolMask*/) override { }
         //void ReceiveEmote(Player* player, uint32 emote);
         uint32 GetData(uint32 data) const override;
-        void IsSummonedBy(Unit* summoner) override;
+        void IsSummonedBy(WorldObject* summoner) override;
 
         Creature* GetPetsOwner() const { return petOwner; }
 
