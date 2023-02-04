@@ -672,12 +672,7 @@ typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
 typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
-struct CreatureCustomID
-{
-    uint32 entry{ 0 };
-};
-
-typedef std::unordered_map<uint32, CreatureCustomID> CreatureCustomIDsContainer;
+typedef std::vector<uint32> CreatureCustomIDsStore;
 
 enum SkillRangeType
 {
@@ -1564,7 +1559,6 @@ private:
     CreatureDataContainer _creatureDataStore;
     CreatureTemplateContainer _creatureTemplateStore;
     std::vector<CreatureTemplate*> _creatureTemplateStoreFast; // pussywizard
-    CreatureCustomIDsContainer _creatureCustomIDsStore;
     CreatureModelContainer _creatureModelStore;
     CreatureAddonContainer _creatureAddonStore;
     CreatureAddonContainer _creatureTemplateAddonStore;
