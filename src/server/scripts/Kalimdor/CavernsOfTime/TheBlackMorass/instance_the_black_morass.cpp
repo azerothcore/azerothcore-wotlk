@@ -115,6 +115,7 @@ public:
                 case NPC_INFINITE_CRONOMANCER:
                 case NPC_INFINITE_EXECUTIONER:
                 case NPC_INFINITE_VANQUISHER:
+                case NPC_DP_BEAM_STALKER:
                     encounterNPCs.insert(creature->GetGUID());
                     break;
             }
@@ -139,6 +140,7 @@ public:
                 case NPC_INFINITE_CRONOMANCER:
                 case NPC_INFINITE_EXECUTIONER:
                 case NPC_INFINITE_VANQUISHER:
+                case NPC_DP_BEAM_STALKER:
                     encounterNPCs.erase(creature->GetGUID());
                     break;
             }
@@ -360,6 +362,7 @@ public:
                                 case NPC_TIME_RIFT:
                                 case NPC_DP_EMITTER_STALKER:
                                 case NPC_DP_CRYSTAL_STALKER:
+                                case NPC_DP_BEAM_STALKER:
                                     if (Creature* creature = instance->GetCreature(guid))
                                     {
                                         creature->DespawnOrUnsummon();
