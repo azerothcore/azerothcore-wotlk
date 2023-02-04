@@ -189,7 +189,7 @@ public:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 55.0f, true) )
                     {
                         char buffer[100];
-                        sprintf(buffer, "Eadric the Pure targets %s with the Hammer of the Righteous!", target->GetName().c_str());
+                        snprintf(buffer, sizeof(buffer), "Eadric the Pure targets %s with the Hammer of the Righteous!", target->GetName().c_str());
                         me->TextEmote(buffer, nullptr, true);
                         Talk(TEXT_EADRIC_HAMMER);
                         me->CastSpell(target, SPELL_HAMMER_JUSTICE, true);

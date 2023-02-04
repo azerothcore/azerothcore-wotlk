@@ -174,7 +174,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             Talk(EMOTE_BLACKHAND_DISMOUNT);
         }

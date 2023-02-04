@@ -86,7 +86,7 @@ public:
             BossAI::EnterEvadeMode(why);
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             events.ScheduleEvent(EVENT_SUMMONED_1, 1000);
         }

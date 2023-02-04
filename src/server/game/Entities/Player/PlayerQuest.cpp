@@ -944,7 +944,7 @@ bool Player::SatisfyQuestSkill(Quest const* qInfo, bool msg) const
         return true;
 
     // check skill value
-    if (GetSkillValue(skill) < qInfo->GetRequiredSkillValue())
+    if (GetBaseSkillValue(skill) < qInfo->GetRequiredSkillValue())
     {
         if (msg)
             SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
