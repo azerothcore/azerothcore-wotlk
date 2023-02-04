@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.quest_money_reward
+-- Dumping structure for table acore_world.quest_money_reward
 DROP TABLE IF EXISTS `quest_money_reward`;
 CREATE TABLE IF NOT EXISTS `quest_money_reward` (
   `Level` int NOT NULL DEFAULT '0',
@@ -29,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `quest_money_reward` (
   PRIMARY KEY (`Level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.quest_money_reward: 80 rows
+-- Dumping data for table acore_world.quest_money_reward: 80 rows
 DELETE FROM `quest_money_reward`;
 /*!40000 ALTER TABLE `quest_money_reward` DISABLE KEYS */;
 INSERT INTO `quest_money_reward` (`Level`, `Money0`, `Money1`, `Money2`, `Money3`, `Money4`, `Money5`, `Money6`, `Money7`, `Money8`, `Money9`) VALUES
@@ -115,6 +117,7 @@ INSERT INTO `quest_money_reward` (`Level`, `Money0`, `Money1`, `Money2`, `Money3
 	(80, 0, 7400, 19000, 37000, 58000, 74000, 148000, 222000, 296000, 0);
 /*!40000 ALTER TABLE `quest_money_reward` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

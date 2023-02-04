@@ -94,6 +94,11 @@ USER $DOCKER_USER
 # NOTE: this folder is different by the /azerothcore (which is binded instead)
 COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
 
+# Needed if we use the dev image without linking any external folder (e.g. acore-docker)
+COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/dist/etc/authserver.conf.dockerdist
+COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
+COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/dbimport.conf.dockerdist /azerothcore/env/dist/etc/dbimport.conf.dockerdist
+
 #================================================================
 #
 # SERVICE BASE: prepare the OS for the production-ready services

@@ -19,6 +19,7 @@
 #include "Chat.h"
 #include "ConditionMgr.h"
 #include "DBCStores.h"
+#include "LootMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
@@ -1777,11 +1778,13 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
                         if (targetCreature->hasLootRecipient() && !targetCreature->isTappedBy(caster->ToPlayer()))
                             return SPELL_FAILED_CANT_CAST_ON_TAPPED;
 
-                if (AttributesCu & SPELL_ATTR0_CU_PICKPOCKET)
+                if (HasAttribute(SPELL_ATTR0_CU_PICKPOCKET))
                 {
-                    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+                    Creature const* targetCreature = unitTarget->ToCreature();
+                    if (!targetCreature)
                         return SPELL_FAILED_BAD_TARGETS;
-                    else if ((unitTarget->GetCreatureTypeMask() & CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD) == 0)
+
+                    if (!LootTemplates_Pickpocketing.HaveLootFor(targetCreature->GetCreatureTemplate()->pickpocketLootId))
                         return SPELL_FAILED_TARGET_NO_POCKETS;
                 }
 
@@ -2253,7 +2256,7 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
             {
                 // family flags 10 (Lightning), 42 (Earth), 37 (Water), proc shield from T2 8 pieces bonus
                 if (SpellFamilyFlags[1] & 0x420
-                        || SpellFamilyFlags[0] & 0x00000400
+                        || (SpellFamilyFlags[0] & 0x00000400 && HasAttribute(SPELL_ATTR1_NO_THREAT))
                         || Id == 23552)
                     return SPELL_SPECIFIC_ELEMENTAL_SHIELD;
 

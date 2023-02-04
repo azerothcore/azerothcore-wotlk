@@ -1919,6 +1919,7 @@ void Player::Regenerate(Powers power)
     addvalue += m_powerFraction[power];
     uint32 integerValue = uint32(std::fabs(addvalue));
 
+    bool forcedUpdate = false;
     if (addvalue < 0.0f)
     {
         if (curValue > integerValue)
@@ -1930,24 +1931,33 @@ void Player::Regenerate(Powers power)
         {
             curValue = 0;
             m_powerFraction[power] = 0;
+            forcedUpdate = true;
         }
     }
     else
     {
         curValue += integerValue;
 
-        if (curValue > maxValue)
+        if (curValue >= maxValue)
         {
             curValue = maxValue;
             m_powerFraction[power] = 0;
+            forcedUpdate = true;
         }
         else
+        {
             m_powerFraction[power] = addvalue - integerValue;
+        }
     }
-    if (m_regenTimerCount >= 2000)
-        SetPower(power, curValue);
+
+    if (m_regenTimerCount >= 2000 || forcedUpdate)
+    {
+        SetPower(power, curValue, true, true);
+    }
     else
+    {
         UpdateUInt32Value(static_cast<uint16>(UNIT_FIELD_POWER1) + power, curValue);
+    }
 }
 
 void Player::RegenerateHealth()
@@ -2239,21 +2249,17 @@ void Player::SetGMVisible(bool on)
 
     if (on)
     {
-        if (HasAura(VISUAL_AURA))
-            RemoveAurasDueToSpell(VISUAL_AURA);
-
-        m_ExtraFlags &= ~PLAYER_EXTRA_GM_INVISIBLE;         //remove flag
+        RemoveAurasDueToSpell(VISUAL_AURA);
+        m_ExtraFlags &= ~PLAYER_EXTRA_GM_INVISIBLE;
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
+
+        getHostileRefMgr().setOnlineOfflineState(false);
+        CombatStopWithPets();
     }
     else
     {
         AddAura(VISUAL_AURA, this);
-
-        m_ExtraFlags |= PLAYER_EXTRA_GM_INVISIBLE;          //add flag
-
-        SetAcceptWhispers(false);
-        SetGameMaster(true);
-
+        m_ExtraFlags |= PLAYER_EXTRA_GM_INVISIBLE;
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
     }
 }
@@ -7872,7 +7878,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
         if (loot_type == LOOT_PICKPOCKETING)
         {
-            if (loot->loot_type != LOOT_PICKPOCKETING)
+            if (!loot || loot->loot_type != LOOT_PICKPOCKETING)
             {
                 if (creature->CanGeneratePickPocketLoot())
                 {
