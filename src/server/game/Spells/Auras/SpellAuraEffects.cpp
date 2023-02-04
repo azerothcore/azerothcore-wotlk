@@ -2129,6 +2129,11 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         }
 
         // Update crit chance for feral forms
+        //npcbot: skip bots (handled inside AI)
+        if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsNPCBotOrPet())
+        {}
+        else
+        //end npcbot
         switch (form)
         {
             case FORM_CAT:
