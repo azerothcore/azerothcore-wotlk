@@ -79,6 +79,7 @@ enum CreatureIds
 
     NPC_DP_EMITTER_STALKER              = 18582,
     NPC_DP_CRYSTAL_STALKER              = 18553,
+    NPC_DP_BEAM_STALKER                 = 18555
 };
 
 enum Misc
