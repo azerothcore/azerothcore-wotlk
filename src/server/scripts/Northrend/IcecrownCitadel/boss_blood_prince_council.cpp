@@ -1369,7 +1369,7 @@ public:
         float _groundZ;
         bool exploded;
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
             {

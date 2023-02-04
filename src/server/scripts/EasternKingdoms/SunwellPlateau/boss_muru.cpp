@@ -299,7 +299,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SINGULARITY_DEATH:
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                     break;
                 case EVENT_START_BLACK_HOLE:
                     me->RemoveAurasDueToSpell(SPELL_BLACK_HOLE_SUMMON_VISUAL2);

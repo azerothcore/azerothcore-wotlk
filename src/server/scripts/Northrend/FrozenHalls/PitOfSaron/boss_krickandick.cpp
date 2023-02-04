@@ -450,7 +450,7 @@ public:
                         }
                     }
                     me->setActive(false);
-                    Unit::Kill(me, me);
+                    me->KillSelf();
 
                     break;
             }

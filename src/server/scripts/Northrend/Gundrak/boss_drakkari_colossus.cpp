@@ -170,7 +170,7 @@ public:
         {
             summons.Despawn(summon);
             if (summon->GetEntry() == NPC_DRAKKARI_ELEMENTAL)
-                Unit::Kill(me, me);
+                me->KillSelf();
         }
 
         void SummonedCreatureDespawn(Creature* summon) override

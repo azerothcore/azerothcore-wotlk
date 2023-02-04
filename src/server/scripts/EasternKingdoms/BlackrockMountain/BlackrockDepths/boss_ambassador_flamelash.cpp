@@ -219,10 +219,15 @@ public:
     {
         npc_burning_spiritAI(Creature* creature) : ScriptedAI(creature) {}
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
+            if (summoner->GetTypeId() != TYPEID_UNIT)
+            {
+                return;
+            }
+
             _flamelasherGUID = summoner->GetGUID();
-            me->GetMotionMaster()->MoveFollow(summoner, 0.f, 0.f);
+            me->GetMotionMaster()->MoveFollow(summoner->ToCreature(), 0.f, 0.f);
         }
 
         void EnterEvadeMode(EvadeReason /*why*/) override
