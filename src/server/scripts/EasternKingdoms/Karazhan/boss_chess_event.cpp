@@ -1043,16 +1043,12 @@ struct npc_echo_of_medivh : public ScriptedAI
         switch (orientation)
         {
             case ORI_W:
-                orientation = RAND(ORI_SW, ORI_NW);
-                break;
             case ORI_N:
-                orientation = RAND(ORI_NW, ORI_NE);
+                orientation = ORI_NW;
                 break;
             case ORI_S:
-                orientation = RAND(ORI_SE, ORI_SW);
-                break;
             case ORI_E:
-                orientation = RAND(ORI_SE, ORI_NE);
+                orientation = ORI_SE;
                 break;
             default:
                 break;
@@ -1422,7 +1418,7 @@ struct npc_chesspiece : public ScriptedAI
 
         _currentOrientation = GetDefaultOrientationForTeam();
 
-        _nextMoveTimer = urand(3 * IN_MILLISECONDS, 19 * IN_MILLISECONDS);
+        _nextMoveTimer = urand(8 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
 
         InitializeCombatSpellsByEntry();
 
@@ -1473,7 +1469,7 @@ struct npc_chesspiece : public ScriptedAI
 
             if (!_nextMoveTimer)
             {
-                _nextMoveTimer = urand(4 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
+                _nextMoveTimer = urand(10 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
             }
 
             if (Creature* medivh = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_ECHO_OF_MEDIVH)))
@@ -1622,6 +1618,7 @@ struct npc_chesspiece : public ScriptedAI
         {
             case ACTION_CHESS_PIECE_RESET_ORIENTATION:
                 _currentOrientation = GetDefaultOrientationForTeam();
+                _nextMoveTimer = urand(8 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
                 break;
             default:
                 break;
@@ -1715,7 +1712,7 @@ struct npc_chesspiece : public ScriptedAI
             {
                 if (_combatSpellTimer <= diff)
                 {
-                    _combatSpellTimer = _combatSpellTimerBase + urand(3 * IN_MILLISECONDS, 9 * IN_MILLISECONDS);
+                    _combatSpellTimer = _combatSpellTimerBase + (_teamControlledByRaid ? urand(6 * IN_MILLISECONDS, 12 * IN_MILLISECONDS) : urand(3 * IN_MILLISECONDS, 6 * IN_MILLISECONDS));
 
                     switch (me->GetEntry())
                     {
@@ -1775,7 +1772,7 @@ struct npc_chesspiece : public ScriptedAI
             {
                 if (_combatSpellTimer2 <= diff)
                 {
-                    _combatSpellTimer2 = _combatSpellTimerBase2 + urand(3 * IN_MILLISECONDS, 9 * IN_MILLISECONDS);
+                    _combatSpellTimer2 = _combatSpellTimerBase2 + (_teamControlledByRaid ? urand(6 * IN_MILLISECONDS, 12 * IN_MILLISECONDS) : urand(3 * IN_MILLISECONDS, 6 * IN_MILLISECONDS));
 
                     switch (me->GetEntry())
                     {
@@ -1926,7 +1923,7 @@ struct npc_chesspiece : public ScriptedAI
                         me->SetFacingTo(orientations[_currentOrientation]);
                         if (!_nextMoveTimer)
                         {
-                            _nextMoveTimer = urand(4 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
+                            _nextMoveTimer = urand(10 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
                         }
                     }
                 }
