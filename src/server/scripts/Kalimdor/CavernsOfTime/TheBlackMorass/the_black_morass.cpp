@@ -21,33 +21,8 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 
-enum medivhSays
-{
-    SAY_ENTER                   = 0,
-    SAY_DEATH                   = 5,
-    SAY_WIN                     = 6,
-    SAY_ORCS_ENTER              = 7,
-
-    SAY_ORCS_ANSWER             = 0
-};
-
-enum medivhSpells
-{
-    SPELL_MANA_SHIELD           = 31635,
-    SPELL_MEDIVH_CHANNEL        = 31556,
-    SPELL_BLACK_CRYSTAL         = 32563,
-    SPELL_PORTAL_CRYSTALS       = 32564,
-    SPELL_BANISH_PURPLE         = 32566,
-    SPELL_BANISH_GREEN          = 32567,
-
-    SPELL_CORRUPT               = 31326,
-    SPELL_CORRUPT_AEONUS        = 37853,
-};
-
 enum medivhMisc
 {
-    NPC_DP_EMITTER_STALKER      = 18582,
-    NPC_DP_CRYSTAL_STALKER      = 18553,
     NPC_SHADOW_COUNCIL_ENFORCER = 17023,
     GO_DARK_PORTAL              = 185103,
 
@@ -123,7 +98,11 @@ public:
             me->CastSpell(me, SPELL_MANA_SHIELD, true);
 
             if (instance && instance->GetData(TYPE_AEONUS) != DONE)
+            {
                 me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
+            }
+
+            me->SetImmuneToNPC(false);
         }
 
         void JustSummoned(Creature* summon) override
@@ -160,7 +139,7 @@ public:
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 20.0f))
             {
-                Talk(SAY_ENTER);
+                Talk(SAY_MEDIV_ENTER);
                 if (instance)
                     instance->SetData(DATA_MEDIVH, 1);
 
@@ -194,7 +173,6 @@ public:
         {
             me->SetRespawnTime(DAY);
             events.Reset();
-            Talk(SAY_DEATH);
         }
 
         void UpdateAI(uint32 diff) override
@@ -221,7 +199,7 @@ public:
                     break;
                 case EVENT_OUTRO_1:
                     me->SetFacingTo(6.21f);
-                    Talk(SAY_WIN);
+                    Talk(SAY_MEDIV_WIN);
                     events.ScheduleEvent(EVENT_OUTRO_2, 17000);
                     break;
                 case EVENT_OUTRO_2:
@@ -245,14 +223,14 @@ public:
                     events.ScheduleEvent(EVENT_OUTRO_7, 7000);
                     break;
                 case EVENT_OUTRO_7:
-                    Talk(SAY_ORCS_ENTER);
+                    Talk(SAY_MEDIV_ORCS_ENTER);
                     events.ScheduleEvent(EVENT_OUTRO_8, 7000);
                     break;
                 case EVENT_OUTRO_8:
                     if (Creature* cr = me->FindNearestCreature(NPC_SHADOW_COUNCIL_ENFORCER, 20.0f))
                     {
                         cr->SetFacingTo(3.07f);
-                        cr->AI()->Talk(SAY_ORCS_ANSWER);
+                        cr->AI()->Talk(SAY_MEDIV_ORCS_ANSWER);
                     }
                     break;
             }
