@@ -318,7 +318,7 @@ public:
 
         EventMap events;
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             events.ScheduleEvent(1, 450);
             events.ScheduleEvent(2, 12000);
@@ -404,24 +404,29 @@ public:
             DoAction(-1337);
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
 
-            if (Vehicle* v = summoner->GetVehicle())
+            if (summoner->GetTypeId() != TYPEID_UNIT)
+            {
+                return;
+            }
+
+            if (Vehicle* v = summoner->ToUnit()->GetVehicle())
                 if (Unit* u = v->GetBase())
                     if (u->GetEntry() == NPC_BONE_SPIKE && u->GetTypeId() == TYPEID_UNIT)
                         u->ToCreature()->AI()->DoAction(-1337);
 
-            ObjectGuid petGUID = summoner->GetPetGUID();
-            summoner->SetPetGUID(ObjectGuid::Empty);
-            me->CastSpell(summoner, SPELL_IMPALED, true);
-            summoner->CastSpell(me, SPELL_RIDE_VEHICLE, true);
+            ObjectGuid petGUID = summoner->ToUnit()->GetPetGUID();
+            summoner->ToUnit()->SetPetGUID(ObjectGuid::Empty);
+            me->CastSpell(summoner->ToUnit(), SPELL_IMPALED, true);
+            summoner->ToUnit()->CastSpell(me, SPELL_RIDE_VEHICLE, true);
             //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);
-            summoner->SetPetGUID(petGUID);
-            summoner->GetMotionMaster()->Clear();
-            summoner->StopMoving();
+            summoner->ToUnit()->SetPetGUID(petGUID);
+            summoner->ToUnit()->GetMotionMaster()->Clear();
+            summoner->ToUnit()->StopMoving();
             events.ScheduleEvent(1, 8000);
             hasTrappedUnit = true;
         }

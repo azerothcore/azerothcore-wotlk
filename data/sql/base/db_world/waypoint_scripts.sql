@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.waypoint_scripts
+-- Dumping structure for table acore_world.waypoint_scripts
 DROP TABLE IF EXISTS `waypoint_scripts`;
 CREATE TABLE IF NOT EXISTS `waypoint_scripts` (
   `id` int unsigned NOT NULL DEFAULT '0',
@@ -29,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `waypoint_scripts` (
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.waypoint_scripts: 584 rows
+-- Dumping data for table acore_world.waypoint_scripts: 589 rows
 DELETE FROM `waypoint_scripts`;
 /*!40000 ALTER TABLE `waypoint_scripts` DISABLE KEYS */;
 INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES
@@ -616,9 +618,15 @@ INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2
 	(6, 7, 0, 0, 0, 16100, 0, 0, 0, 0, 18),
 	(6, 7, 1, 1, 0, 0, 0, 0, 0, 0, 19),
 	(8, 4, 0, 0, 0, 19593, 0, 0, 0, 0, 9),
-	(7, 4, 0, 0, 0, 19592, 0, 0, 0, 0, 8);
+	(7, 4, 0, 0, 0, 19592, 0, 0, 0, 0, 8),
+	(491, 0, 15, 33422, 1, 0, 0, 0, 0, 0, 18559),
+	(492, 0, 15, 32754, 1, 0, 0, 0, 0, 0, 18560),
+	(493, 0, 15, 32930, 1, 0, 0, 0, 0, 0, 18561),
+	(1383230, 2, 1, 7, 0, 0, 0, 0, 0, 0, 138323),
+	(494, 0, 18, 0, 0, 0, 0, 0, 0, 0, 21931);
 /*!40000 ALTER TABLE `waypoint_scripts` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
