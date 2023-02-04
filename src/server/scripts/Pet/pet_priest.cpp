@@ -65,6 +65,11 @@ struct npc_pet_pri_shadowfiend : public PetAI
 
         if (Unit* target = me->SelectNearestTarget(15.0f))
             AttackStart(target);
+        if (Unit* ownertarget = me->GetOwner()->ToPlayer()->GetSelectedUnit())
+        {
+            AttackStart(ownertarget);
+            DoMeleeAttackIfReady();
+        }
     }
 
     void JustDied(Unit* /*killer*/) override

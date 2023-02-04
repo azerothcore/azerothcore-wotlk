@@ -130,6 +130,8 @@ struct npc_pet_mage_mirror_image : CasterAI
             }
 
         me->m_Events.AddEvent(new DeathEvent(*me), me->m_Events.CalculateTime(29500));
+        //选择第一目标
+        MySelectNextTarget();
     }
 
     // Do not reload Creature templates on evade mode enter - prevent visual lost

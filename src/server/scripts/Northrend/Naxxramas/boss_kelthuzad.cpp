@@ -338,8 +338,27 @@ public:
             }
         }
 
+        //检测是否在房间内
+        bool IsInRoom(Unit* who)
+        {
+            if (who->GetPositionX() > 3783 || who->GetPositionX() < 3631 || who->GetPositionY() > -5028 || who->GetPositionY() < -5185)
+            {
+                if (who->GetGUID() == me->GetGUID())
+                    EnterEvadeMode(EVADE_REASON_BOUNDARY);
+
+                return false;
+            }
+            return true;
+        }
+        //检测是否在房间内
+
         void UpdateAI(uint32 diff) override
         {
+            //调用检测
+            if (!IsInRoom(me))
+                return;
+            //调用检测
+
             if (!UpdateVictim())
                 return;
 
