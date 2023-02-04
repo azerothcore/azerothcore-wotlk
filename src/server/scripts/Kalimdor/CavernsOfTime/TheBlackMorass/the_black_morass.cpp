@@ -16,7 +16,9 @@
  */
 
 #include "the_black_morass.h"
+#include "Group.h"
 #include "MoveSplineInit.h"
+#include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
@@ -64,8 +66,14 @@ enum medivhMisc
     EVENT_OUTRO_5               = 14,
     EVENT_OUTRO_6               = 15,
     EVENT_OUTRO_7               = 16,
-    EVENT_OUTRO_8               = 17
+    EVENT_OUTRO_8               = 17,
+
+    FACTION_KEEPERS_OF_TIME     = 989
 };
+
+static std::vector<uint32> firstWave = { NPC_INFINITE_ASSASIN, NPC_INFINITE_WHELP, NPC_INFINITE_CRONOMANCER };
+static std::vector<uint32> secondWave = { NPC_INFINITE_EXECUTIONER, NPC_INFINITE_CRONOMANCER, NPC_INFINITE_WHELP, NPC_INFINITE_ASSASIN };
+static std::vector<uint32> thirdWave = { NPC_INFINITE_EXECUTIONER, NPC_INFINITE_VANQUISHER, NPC_INFINITE_CRONOMANCER, NPC_INFINITE_ASSASIN  };
 
 class NpcRunToHome : public BasicEvent
 {
@@ -299,15 +307,40 @@ public:
         EventMap events;
         InstanceScript* instance;
         ObjectGuid riftKeeperGUID;
+        std::vector<uint32> waveMobs;
+        uint8 waveMobIndex;
+        std::unordered_map<uint32, GuidSet> summonedWaveMobs;
+        uint8 summonedWavesCount;
 
         void Reset() override
         {
-            if (instance && instance->GetData(DATA_RIFT_NUMBER) >= 18)
+            if (instance)
             {
-                me->DespawnOrUnsummon(30000);
-                return;
+                uint32 riftNumer = instance->GetData(DATA_RIFT_NUMBER);
+                if (riftNumer >= 18)
+                {
+                    me->DespawnOrUnsummon(30000);
+                    return;
+                }
+                else
+                {
+                    if (riftNumer < 6)
+                    {
+                        waveMobs = firstWave;
+                    }
+                    else if (riftNumer < 12)
+                    {
+                        waveMobs = secondWave;
+                    }
+                    else
+                    {
+                        waveMobs = thirdWave;
+                    }
+                }
             }
 
+            waveMobIndex = 0;
+            summonedWavesCount = 0;
             events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 16000);
             events.ScheduleEvent(EVENT_CHECK_DEATH, 8000);
         }
@@ -334,9 +367,49 @@ public:
                 }
         }
 
+        void JustSummoned(Creature* summon) override
+        {
+            summonedWaveMobs[summonedWavesCount].insert(summon->GetGUID());
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* killer) override
+        {
+            for (auto& itr : summonedWaveMobs)
+                if (itr.second.find(summon->GetGUID()) != itr.second.end())
+                {
+                    itr.second.erase(summon->GetGUID());
+                    if (itr.second.empty() && itr.first != summonedWavesCount)
+                    {
+                        float repAmount = me->GetMap()->IsHeroic() ? 3.f : 2.f;
+                        if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        {
+                            if (Group* group = player->GetGroup())
+                            {
+                                for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
+                                {
+                                    if (Player* member = groupRef->GetSource())
+                                    {
+                                        if (member->IsInMap(player))
+                                        {
+                                            member->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(FACTION_KEEPERS_OF_TIME), repAmount, true, REP_NEUTRAL);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(FACTION_KEEPERS_OF_TIME), repAmount, true, REP_NEUTRAL);
+                            }
+                        }
+                    }
+
+                    break;
+                }
+        }
+
         void DoSelectSummon()
         {
-            uint32 entry = RAND(NPC_INFINITE_ASSASIN, NPC_INFINITE_WHELP, NPC_INFINITE_CRONOMANCER, NPC_INFINITE_EXECUTIONER, NPC_INFINITE_VANQUISHER);
+            uint32 entry = waveMobs[waveMobIndex];
             if (entry == NPC_INFINITE_WHELP)
             {
                 DoSummonAtRift(entry);
@@ -345,6 +418,12 @@ public:
             }
             else
                 DoSummonAtRift(entry);
+
+            if (++waveMobIndex >= waveMobs.size())
+            {
+                waveMobIndex = 0;
+                ++summonedWavesCount;
+            }
         }
 
         void UpdateAI(uint32 diff) override
