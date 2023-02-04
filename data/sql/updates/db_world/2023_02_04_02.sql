@@ -1,3 +1,4 @@
+-- DB update 2023_02_04_01 -> 2023_02_04_02
 -- fix 6899 gossip_menu_option
 DELETE FROM `gossip_menu_option` WHERE `MenuID`=6899;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES 
