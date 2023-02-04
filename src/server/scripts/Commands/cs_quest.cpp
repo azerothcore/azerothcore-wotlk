@@ -52,6 +52,27 @@ public:
         return commandTable;
     }
 
+    static void _LocalizeQuest(std::string &questTitle, uint32 entry, uint32 loc)
+    {
+        std::wstring wnamepart;
+
+        QuestLocale const* questInfo = sObjectMgr->GetQuestLocale(entry);
+        if (!questInfo)
+            return;
+
+        if (questInfo->Title.size() > loc && !questInfo->Title[loc].empty())
+        {
+            const std::string title = questInfo->Title[loc];
+            if (Utf8FitTo(title, wnamepart))
+                questTitle = title;
+        }
+    }
+
+    static void _LocalizeQuest(Player const* forPlayer, std::string &questTitle, uint32 entry)
+    {
+        _LocalizeQuest(questTitle, entry, forPlayer->GetSession()->GetSessionDbLocaleIndex());
+    }
+
     static bool HandleQuestAdd(ChatHandler* handler, Quest const* quest, Optional<PlayerIdentifier> playerTarget)
     {
         if (!playerTarget)
@@ -68,6 +89,8 @@ public:
 
         uint32 entry = quest->GetQuestId();
 
+        std::string questTitle = quest->GetTitle();
+
         // check item starting quest (it can work incorrectly if added without item in inventory)
         ItemTemplateContainer const* itc = sObjectMgr->GetItemTemplateStore();
         ItemTemplateContainer::const_iterator result = find_if(itc->begin(), itc->end(), Finder<uint32, ItemTemplate>(entry, &ItemTemplate::StartQuest));
@@ -81,9 +104,10 @@ public:
 
         if (Player* player = playerTarget->GetConnectedPlayer())
         {
+            _LocalizeQuest(player, questTitle, entry);
             if (player->IsActiveQuest(entry))
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, questTitle.c_str(), entry);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -96,12 +120,13 @@ public:
         }
         else
         {
+            _LocalizeQuest(questTitle, entry, LOCALE_zhCN);
             ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
             QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
 
             if (result)
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, questTitle.c_str(), entry);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -130,7 +155,7 @@ public:
             CharacterDatabase.Execute(stmt);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_ADD, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_ADD, questTitle.c_str(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -158,8 +183,11 @@ public:
             return false;
         }
 
+        std::string questTitle = quest->GetTitle();
+
         if (Player* player = playerTarget->GetConnectedPlayer())
         {
+            _LocalizeQuest(player, questTitle, entry);
             // remove all quest entries for 'entry' from quest log
             for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
             {
@@ -184,6 +212,7 @@ public:
         }
         else
         {
+            _LocalizeQuest(questTitle, entry, LOCALE_zhCN);
             ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -222,7 +251,7 @@ public:
             CharacterDatabase.CommitTransaction(trans);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_REMOVED, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_REMOVED, questTitle.c_str(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -243,8 +272,11 @@ public:
 
         uint32 entry = quest->GetQuestId();
 
+        std::string questTitle = quest->GetTitle();
+
         if (Player* player = playerTarget->GetConnectedPlayer())
         {
+            _LocalizeQuest(player, questTitle, entry);
             // If player doesn't have the quest
             if (player->GetQuestStatus(entry) == QUEST_STATUS_NONE)
             {
@@ -347,12 +379,13 @@ public:
         }
         else
         {
+            _LocalizeQuest(questTitle, entry, LOCALE_zhCN);
             ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
             QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
 
             if (!result)
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG, quest->GetTitle(), entry);
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG, questTitle.c_str(), entry);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -378,7 +411,7 @@ public:
             {
                 MailSender sender(MAIL_NORMAL, guid, MAIL_STATIONERY_GM);
                 // fill mail
-                MailDraft draft(quest->GetTitle(), std::string());
+                MailDraft draft(questTitle, std::string());
 
                 for (auto const& itr : questItems)
                 {
@@ -491,7 +524,7 @@ public:
             CharacterDatabase.Execute(stmt);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_COMPLETE, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_COMPLETE, questTitle.c_str(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -512,8 +545,11 @@ public:
 
         uint32 entry = quest->GetQuestId();
 
+        std::string questTitle = quest->GetTitle();
+
         if (Player* player = playerTarget->GetConnectedPlayer())
         {
+            _LocalizeQuest(player, questTitle, entry);
             // If player doesn't have the quest
             if (player->GetQuestStatus(entry) != QUEST_STATUS_COMPLETE)
             {
@@ -526,6 +562,7 @@ public:
         }
         else
         {
+            _LocalizeQuest(questTitle, entry, LOCALE_zhCN);
             // Achievement criteria updates correctly the next time a quest is rewarded.
             // Titles are already awarded correctly the next time they login (only one quest awards title - 11549).
             // Rewarded talent points (Death Knights) and spells (e.g Druid forms) are also granted on login.
@@ -614,7 +651,7 @@ public:
             {
                 MailSender sender(MAIL_NORMAL, guid, MAIL_STATIONERY_GM);
                 // fill mail
-                MailDraft draft(quest->GetTitle(), "This quest has been manually rewarded to you. This mail contains your quest rewards.");
+                MailDraft draft(questTitle, "这个任务已被手动奖励给你。这封邮件包含你的任务奖励。");
 
                 for (auto const& itr : questRewardItems)
                 {
@@ -739,7 +776,7 @@ public:
             CharacterDatabase.CommitTransaction(trans);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_REWARDED, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_REWARDED, questTitle.c_str(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }

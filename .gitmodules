@@ -1,6 +1,42 @@
 [submodule "deps/git-subrepo"]
 	path = deps/git-subrepo
 	url = https://github.com/ingydotnet/git-subrepo.git
+[submodule "modules/mod-account-achievements"]
+	path = modules/mod-account-achievements
+	url = git@github.com:AlvinZhu/mod-account-achievements.git
+[submodule "modules/mod-ah-bot"]
+	path = modules/mod-ah-bot
+	url = https://github.com/azerothcore/mod-ah-bot.git
+[submodule "modules/mod-autobalance"]
+	path = modules/mod-autobalance
+	url = git@github.com:AlvinZhu/mod-autobalance.git
+[submodule "modules/mod-eluna"]
+	path = modules/mod-eluna
+	url = https://github.com/azerothcore/mod-eluna.git
 [submodule "modules/mod-playerbots"]
 	path = modules/mod-playerbots
-	url = https://github.com/ZhengPeiRu21/mod-playerbots.git
+	url = git@github.com:AlvinZhu/mod-playerbots.git
+[submodule "modules/mod-anticheat"]
+	path = modules/mod-anticheat
+	url = git@github.com:AlvinZhu/mod-anticheat.git
+[submodule "modules/mod-weekend-xp"]
+	path = modules/mod-weekend-xp
+	url = git@github.com:AlvinZhu/mod-weekend-xp.git
+[submodule "modules/mod-cfbg"]
+	path = modules/mod-cfbg
+	url = git@github.com:AlvinZhu/mod-cfbg.git
+[submodule "modules/mod-transmog"]
+	path = modules/mod-transmog
+	url = git@github.com:AlvinZhu/mod-transmog.git
+[submodule "modules/mod-individual-progression"]
+	path = modules/mod-individual-progression
+	url = git@github.com:AlvinZhu/mod-individual-progression.git
+[submodule "modules/mod-bg-set-level"]
+	path = modules/mod-bg-set-level
+	url = git@github.com:AlvinZhu/mod-bg-set-level.git
+[submodule "modules/mod-reagent-bank-account"]
+	path = modules/mod-reagent-bank-account
+	url = git@github.com:AlvinZhu/mod-reagent-bank-account.git
+[submodule "modules/mod-challenge-modes"]
+	path = modules/mod-challenge-modes
+	url = git@github.com:AlvinZhu/mod-challenge-modes.git

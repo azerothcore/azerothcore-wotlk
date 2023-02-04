@@ -200,22 +200,22 @@ public:
                     switch (quest)
                     {
                         case QUEST_BFV_FALLEN_HEROES:
-                            me->Yell("$N has defeated the fallen heroes of Valhalas battles past. This is only a beginning, but it will suffice.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("$N击败了过去瓦哈拉斯之战中的堕落英雄。这只是一个开始，但已经足够了。", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_DARK_MASTER:
-                            me->Yell("Khit'rix the Dark Master has been defeated by $N and his band of companions. Let the next challenge be issued!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("黑暗主宰西塔利克斯被$N和他的伙伴们打败了。让我们发出下一个挑战！", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_SIGRID:
-                            me->Yell("$N has defeated Sigrid Iceborn for a second time. Well, this time he did it with the help of his friends, but a win is a win!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("$N再次击败了齐格莉德·冰魂。好吧，这次他是在朋友的帮助下做到的，但是赢了就是赢了！", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_CARNAGE:
-                            me->Yell("The horror known as Carnage is no more. Could it be that $N is truly worthy of battle in Valhalas? We shall see.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("被称为卡纳基的恐怖已经不复存在。 难道$N真的值得在瓦哈拉斯一战？ 我们将会看到。", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_THANE:
-                            me->Yell("Thane Banahogg the Deathblow has fallen to $N and his fighting companions. He has but one challenge ahead of him. Who will it be?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("“死亡一击”领主巴纳霍格已落入$N和他的战斗伙伴手中。 他面前只剩下一项挑战。 会是谁？", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_FINAL:
-                            me->Yell("The unthinkable has happened... $N has slain Prince Sandoval!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("不可思议的事情发生了……$N杀死了萨杜瓦尔王子！", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                     }
                     player->GroupEventHappens(quest, player);
@@ -250,27 +250,27 @@ public:
                         {
                             case QUEST_BFV_FALLEN_HEROES:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->Yell("$N and comrades in arms have chosen to accept honorable combat within the sacred confines of Valhalas.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->Yell("$N和战友们选择在瓦哈拉斯的神圣范围内接受光荣的战斗。", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_DARK_MASTER:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->Yell("$N has accepted the challenge of Khit'rix the Dark Master. May the gods show mercy upon him for Khit'rix surely will not.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->Yell("$N已经接受了黑暗主宰西塔利克斯的挑战。愿诸神怜悯他，因为西塔利克斯肯定不会。", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_SIGRID:
                                 PrepareSummons();
-                                me->TextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", nullptr, true);
+                                me->TextEmote("在瓦哈拉斯上空盘旋, 齐格莉德·冰魂过来寻求她的复仇!", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->Yell("From the bowels of the Underhalls comes Carnage. Brave and foolish $N has accepted the challenge. $N and his group stand ready to face the monstrosity.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->Yell("来自地下大厅深处的卡纳基. 勇敢而愚蠢的$N接受了挑战。 $N 和他的团队随时准备面对这个怪物。", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_THANE:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->Yell("Thane Banahogg returns to Valhalas for the first time in ages to prove that the vrykul are the only beings worthy to fight within its sacred ring. Will $N prove him wrong?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->Yell("领主巴纳霍格多年来第一次回到瓦哈拉斯，以证明维库人是唯一值得在其神圣战斗环内战斗的生物。$N会证明他错了吗？", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_FINAL:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->Yell("From the depths of Icecrown Citadel, one of the Lich King's chosen comes to put an end to the existence of $N and his friends.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->Yell("从冰冠堡垒的深处，一位巫妖王的天选者前来终结 $N 和他的朋友们的存在。", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                         }
 
@@ -283,21 +283,21 @@ public:
                         switch (currentQuest)
                         {
                             case QUEST_BFV_FALLEN_HEROES:
-                                me->Yell("There can only be one outcome to such a battle: death for one side or the other. Let $n prove himself upon the bones of these outsiders who have fallen before!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                me->TextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", nullptr, true);
+                                me->Yell("这样一场战斗只能有一个结果：一方死亡或另一方死亡。让$n在这些曾经倒下的局外人的尸骨上证明自己！", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->TextEmote("瓦哈拉斯的堕落英雄从地下再次现身战斗！", nullptr, true);
                                 break;
                             case QUEST_BFV_DARK_MASTER:
-                                me->TextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", nullptr, true);
+                                me->TextEmote("黑暗主宰西塔利克斯从东南方向掠过瓦哈拉斯！", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
-                                me->TextEmote("Lumbering in from the south, the smell of Carnage precedes him!", nullptr, true);
+                                me->TextEmote("从南方缓缓而来，卡纳基的气息扑面而来！", nullptr, true);
                                 break;
                             case QUEST_BFV_THANE:
-                                me->TextEmote("Thane Banahogg appears upon the overlook to the southeast!", nullptr, true);
+                                me->TextEmote("领主巴纳霍格出现在东南方的瞭望台上！", nullptr, true);
                                 break;
                             case QUEST_BFV_FINAL:
-                                me->Yell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL);
-                                me->TextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", nullptr, true);
+                                me->Yell("尤顿海姆的勇士们，我向你们介绍，鲜血王子萨杜瓦尔！", LANG_UNIVERSAL);
+                                me->TextEmote("没有警告，萨杜瓦尔王子神奇地出现在瓦哈拉斯！", nullptr, true);
                                 break;
                         }
 
@@ -306,13 +306,13 @@ public:
                     }
                 case EVENT_VALHALAS_THIRD:
                     {
-                        me->Yell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                        me->Yell("在打败他的过程中，他和他的战斗伙伴证明了自己配得上在这个维库人荣誉的最神圣之地战斗。", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                         events.ScheduleEvent(EVENT_VALHALAS_THIRD + 2, 7000);
                         break;
                     }
                 case EVENT_VALHALAS_THIRD+2:
                     {
-                        me->Yell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID2));
+                        me->Yell("向$N致敬，瓦哈拉斯的冠军！", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID2));
                         break;
                     }
                 case EVENT_VALHALAS_CHECK_PLAYER:
@@ -347,22 +347,22 @@ public:
         switch (quest->GetQuestId())
         {
             case QUEST_BFV_FALLEN_HEROES:
-                creature->Say("Valhalas is yours to win or die in, $N. But whatever you do, stay within the bounds of the arena. To flee is to lose and be dishonored.", LANG_UNIVERSAL, player);
+                creature->Say("瓦哈拉斯是你的胜利或死亡，$N。但无论你做什么，都要留在竞技场的范围内。 逃跑就是失败和耻辱。", LANG_UNIVERSAL, player);
                 break;
             case QUEST_BFV_DARK_MASTER:
-                creature->Say("Prepare yourself. Khit'rix will be entering Valhalas from the southeast. Remember, do not leave the ring or you will lose the battle.", LANG_UNIVERSAL, player);
+                creature->Say("做好准备。西塔利克斯将从东南方进入瓦哈拉斯。 记住，不要离开这个环，否则你会输掉这场战斗。", LANG_UNIVERSAL, player);
                 break;
             case QUEST_BFV_SIGRID:
-                creature->Yell("Sigrid Iceborn has returned to the heights of Jotunheim to prove herself against $N. When last they met, $N bester her in personal combat. Let us see the outcome of this match.", LANG_UNIVERSAL, player);
+                creature->Yell("格莉德·冰魂已经回到了尤顿海姆的巅峰，以证明自己可以对抗$N。他们上一次见面时，$N在个人战斗中打败了她。让我们看看这场比赛的结果吧。", LANG_UNIVERSAL, player);
                 break;
             case QUEST_BFV_CARNAGE:
-                creature->Say("Carnage is coming! Remember, no matter what you do, do NOT leave the battle ring or I will disqualify you and your group.", LANG_UNIVERSAL);
+                creature->Say("卡纳基来了！记住，无论你做什么，都不要离开战斗环，否则我会取消你和你的团队的资格。", LANG_UNIVERSAL);
                 break;
             case QUEST_BFV_THANE:
-                creature->Say("Look to the southeast and you will see the thane upon the platform near Gjonner the Merciless when he shows himself. Let him come down. Stay within the ring of Valhalas.", LANG_UNIVERSAL);
+                creature->Say("向东南方向看，当他出现时，您会在残忍的亚纳尔近的平台上看到领主。让他下来。待在瓦哈拉斯之环内。", LANG_UNIVERSAL);
                 break;
             case QUEST_BFV_FINAL:
-                creature->Say("It's too late to run now. Do not leave the ring. Die bravely, $N!", LANG_UNIVERSAL);
+                creature->Say("现在跑已经来不及了。不要离开这个环。勇敢地死去，$N！", LANG_UNIVERSAL);
                 break;
         }
 
@@ -1328,7 +1328,7 @@ public:
             if (Unit* passenger = kit->GetPassenger(SEAT_ENGINEERING))
                 if (init && !passenger->HasAura(SPELL_BURNING))
                 {
-                    me->TextEmote("Your Vehicle is burning!", GetSummoner(), true);
+                    me->TextEmote("你的载具着火了！", GetSummoner(), true);
                     passenger->AddAura(SPELL_BURNING, passenger);
                 }
 

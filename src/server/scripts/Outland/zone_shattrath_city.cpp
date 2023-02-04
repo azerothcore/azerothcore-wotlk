@@ -41,7 +41,7 @@ EndContentData */
 ## npc_raliq_the_drunk
 ######*/
 
-#define GOSSIP_RALIQ            "You owe Sim'salabim money. Hand them over or die!"
+#define GOSSIP_RALIQ            "你欠萨萨拉比姆的钱。把钱交出来，否则就得死!"
 
 enum Raliq
 {
@@ -257,7 +257,7 @@ public:
 # npc_zephyr
 ######*/
 
-#define GOSSIP_HZ "Take me to the Caverns of Time."
+#define GOSSIP_HZ "送我去时光之穴。"
 
 class npc_zephyr : public CreatureScript
 {
@@ -439,8 +439,8 @@ enum Ishanah
     POWER_WORLD_SHIELD             = 22187
 };
 
-#define ISANAH_GOSSIP_1 "Who are the Sha'tar?"
-#define ISANAH_GOSSIP_2 "Isn't Shattrath a draenei city? Why do you allow others here?"
+#define ISANAH_GOSSIP_1 "沙塔尔是谁？"
+#define ISANAH_GOSSIP_2 "沙塔斯不是一座德莱尼的城市嘛？为什么允许其他人在这儿？"
 
 class npc_ishanah : public CreatureScript
 {

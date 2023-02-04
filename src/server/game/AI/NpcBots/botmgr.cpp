@@ -1358,7 +1358,25 @@ uint8 BotMgr::BotClassByClassName(std::string const& className)
         { "necromancer", BOT_CLASS_NECROMANCER },
         { "necro", BOT_CLASS_NECROMANCER },
         { "seawitch", BOT_CLASS_SEA_WITCH },
-        { "sea_witch", BOT_CLASS_SEA_WITCH }
+        { "sea_witch", BOT_CLASS_SEA_WITCH },
+        { "战士", BOT_CLASS_WARRIOR },
+        { "圣骑士", BOT_CLASS_PALADIN },
+        { "猎人", BOT_CLASS_HUNTER },
+        { "潜行者", BOT_CLASS_ROGUE },
+        { "牧师", BOT_CLASS_PRIEST },
+        { "死亡骑士", BOT_CLASS_DEATH_KNIGHT },
+        { "萨满祭司", BOT_CLASS_SHAMAN },
+        { "法师", BOT_CLASS_MAGE },
+        { "术士", BOT_CLASS_WARLOCK },
+        { "德鲁伊", BOT_CLASS_DRUID },
+        { "剑圣", BOT_CLASS_BM },
+        { "毁灭者", BOT_CLASS_SPHYNX },
+        { "大法师", BOT_CLASS_ARCHMAGE },
+        { "恐惧魔王", BOT_CLASS_DREADLORD },
+        { "破法者", BOT_CLASS_SPELLBREAKER },
+        { "黑暗游侠", BOT_CLASS_DARK_RANGER },
+        { "死灵法师", BOT_CLASS_NECROMANCER },
+        { "海妖", BOT_CLASS_SEA_WITCH }
     };
 
     //std::transform(className.begin(), className.end(), className.begin(), std::tolower);

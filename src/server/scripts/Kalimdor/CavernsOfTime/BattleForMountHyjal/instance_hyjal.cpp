@@ -37,7 +37,7 @@ EndScriptData */
 4 - Archimonde event
 */
 
-#define YELL_EFFORTS        "All of your efforts have been in vain, for the draining of the World Tree has already begun. Soon the heart of your world will beat no more."
+#define YELL_EFFORTS        "你所有的努力都白费了，因为世界树的枯竭已经开始了。很快，你们世界的心脏将不再跳动。"
 
 class instance_hyjal : public InstanceMapScript
 {

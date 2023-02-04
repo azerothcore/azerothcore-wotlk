@@ -34,18 +34,18 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "hyjalAI.h"
 
-#define GOSSIP_ITEM_BEGIN_ALLY      "My companions and I are with you, Lady Proudmoore."
-#define GOSSIP_ITEM_ANETHERON       "We are ready for whatever Archimonde might send our way, Lady Proudmoore."
+#define GOSSIP_ITEM_BEGIN_ALLY      "我和我的伙伴们将与您并肩作战，普罗德摩尔女士。"
+#define GOSSIP_ITEM_ANETHERON       "我们已经准备好对付阿克蒙德的任何爪牙了，普罗德摩尔女士。"
 
-#define GOSSIP_ITEM_BEGIN_HORDE     "I am with you, Thrall."
-#define GOSSIP_ITEM_AZGALOR         "We have nothing to fear."
+#define GOSSIP_ITEM_BEGIN_HORDE     "我与你并肩作战，萨尔。"
+#define GOSSIP_ITEM_AZGALOR         "我们无所畏惧。"
 
-#define GOSSIP_ITEM_RETREAT         "We can't keep this up. Let's retreat!"
+#define GOSSIP_ITEM_RETREAT         "我们不能再这样下去了。我们撤退吧！"
 
-#define GOSSIP_ITEM_TYRANDE         "Aid us in defending Nordrassil"
+#define GOSSIP_ITEM_TYRANDE         "帮助我们保卫诺达希尔"
 #define ITEM_TEAR_OF_GODDESS        24494
 
-#define GOSSIP_ITEM_GM1             "[GM] Toggle Debug Timers"
+#define GOSSIP_ITEM_GM1             "[GM] 切换调试计时器"
 
 class npc_jaina_proudmoore : public CreatureScript
 {

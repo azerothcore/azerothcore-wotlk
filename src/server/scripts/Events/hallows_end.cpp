@@ -1006,7 +1006,7 @@ struct boss_headless_horseman : public ScriptedAI
     void JustDied(Unit*  /*killer*/) override
     {
         summons.DespawnAll();
-        me->Say("This end have I reached before. What new adventure lies in store?", LANG_UNIVERSAL);
+        me->Say("这个结局我以前已经达到过了。有什么新的冒险即将到来？", LANG_UNIVERSAL);
         me->PlayDirectSound(SOUND_DEATH);
         std::list<Creature*> unitList;
         me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
@@ -1020,7 +1020,7 @@ struct boss_headless_horseman : public ScriptedAI
 
     void KilledUnit(Unit*  /*who*/) override
     {
-        me->Yell("Your body lies beaten, battered and broken. Let my curse be your own, fate has spoken.", LANG_UNIVERSAL);
+        me->Yell("你的身体躺在被殴打的地方，遍体鳞伤，支离破碎。让我的诅咒成为你自己的，命运已经说话了。", LANG_UNIVERSAL);
         me->PlayDirectSound(SOUND_SLAY);
     }
 
@@ -1052,7 +1052,7 @@ struct boss_headless_horseman : public ScriptedAI
             events.CancelEvent(EVENT_HORSEMAN_WHIRLWIND);
             events.CancelEvent(EVENT_HORSEMAN_CONFLAGRATION);
             events.CancelEvent(EVENT_SUMMON_PUMPKIN);
-            me->Yell("Here's my body, fit and pure! Now, your blackened souls I'll cure!", LANG_UNIVERSAL);
+            me->Yell("这是我的身体，健康而纯洁!现在，我将治愈你们黑暗的灵魂!", LANG_UNIVERSAL);
 
             if (phase == 1)
                 events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6000);
@@ -1152,23 +1152,23 @@ struct boss_headless_horseman : public ScriptedAI
                     switch (talkCount)
                     {
                         case 1:
-                            player->Say("Horseman rise...", LANG_UNIVERSAL);
+                            player->Say("骑士崛起...", LANG_UNIVERSAL);
                             break;
                         case 2:
-                            player->Say("Your time is nigh...", LANG_UNIVERSAL);
+                            player->Say("你的时间到了...", LANG_UNIVERSAL);
                             if (Creature* trigger = me->SummonTrigger(1765.28f, 1347.46f, 17.5514f, 0.0f, 15 * IN_MILLISECONDS))
                                 trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
                             break;
                         case 3:
                             me->GetMotionMaster()->MovePath(236820, false);
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
-                            player->Say("You felt death once...", LANG_UNIVERSAL);
-                            me->Say("It is over, your search is done. Let fate choose now, the righteous one.", LANG_UNIVERSAL);
+                            player->Say("你曾经感受过死亡...", LANG_UNIVERSAL);
+                            me->Say("一切都结束了，你的寻找已经完成。现在让命运来选择，正义的人。", LANG_UNIVERSAL);
                             me->PlayDirectSound(SOUND_AGGRO);
                             break;
                         case 4:
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_MEDIUM, true);
-                            player->Say("Now, know demise!", LANG_UNIVERSAL);
+                            player->Say("现在，感受毁灭吧!", LANG_UNIVERSAL);
                             talkCount = 0;
                             return; // pop and return, skip repeat
                     }
@@ -1220,7 +1220,7 @@ struct boss_headless_horseman : public ScriptedAI
                     {
                         me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
                         target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
-                        me->Say("Harken, cur! Tis you I spurn! Now feel... the burn!", LANG_UNIVERSAL, target);
+                        me->Say("哈肯，坏蛋！我拒绝的是你！现在感觉……燃烧！", LANG_UNIVERSAL, target);
                     }
 
                     events.RepeatEvent(12500);
@@ -1236,7 +1236,7 @@ struct boss_headless_horseman : public ScriptedAI
                     }
                     else
                     {
-                        me->Say("Soldiers arise, stand and fight! Bring victory at last to this fallen knight!", LANG_UNIVERSAL);
+                        me->Say("战士们起来，站起来，战斗！为这位倒下的骑士带来最后的胜利!", LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_SPROUT);
                         events.RepeatEvent(15000);
                         talkCount = 0;

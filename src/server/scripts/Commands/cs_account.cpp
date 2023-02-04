@@ -500,7 +500,7 @@ public:
                 }
                 else
                 {
-                    handler->PSendSysMessage("No IP2Location information - account not locked");
+                    handler->PSendSysMessage("没有 IP2Location 信息 - 帐户未锁定");
                     handler->SetSentErrorMessage(true);
                     return false;
                 }

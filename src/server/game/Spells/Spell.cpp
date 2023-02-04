@@ -7459,7 +7459,8 @@ SpellCastResult Spell::CheckItems()
             else
                 totems -= 1;
         }
-        if (totems != 0)
+        //npcbot-alvin
+        if (totems != 0 && !(m_originalCaster && m_originalCaster->GetTypeId() == TYPEID_UNIT && m_originalCaster->ToCreature()->IsNPCBot()))
             return SPELL_FAILED_TOTEMS;                         //0x7C
 
         // Check items for TotemCategory  (items presence in inventory)

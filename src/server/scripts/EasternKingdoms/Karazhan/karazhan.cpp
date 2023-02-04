@@ -61,20 +61,20 @@ enum Creatures
 # npc_barnesAI
 ######*/
 
-#define GOSSIP_READY        "I'm not an actor."
+#define GOSSIP_READY        "我不是演员。"
 
-#define SAY_READY           "Splendid, I'm going to get the audience ready. Break a leg!"
-#define SAY_OZ_INTRO1       "Finally, everything is in place. Are you ready for your big stage debut?"
-#define OZ_GOSSIP1          "I'm not an actor."
-#define SAY_OZ_INTRO2       "Don't worry, you'll be fine. You look like a natural!"
-#define OZ_GOSSIP2          "Ok, I'll give it a try, then."
+#define SAY_READY           "太棒了，我要让观众做好准备。打断一条腿！"
+#define SAY_OZ_INTRO1       "最后，一切就绪。你准备好迎接你的大舞台首秀了吗？"
+#define OZ_GOSSIP1          "我不是演员。"
+#define SAY_OZ_INTRO2       "别担心，你会没事的。你看起来很自然！"
+#define OZ_GOSSIP2          "好的，那我试试看。"
 
-#define SAY_RAJ_INTRO1      "The romantic plays are really tough, but you'll do better this time. You have TALENT. Ready?"
-#define RAJ_GOSSIP1         "I've never been more ready."
+#define SAY_RAJ_INTRO1      "浪漫的戏剧真的很难，但这次你会做得更好。你有天赋。准备好？"
+#define RAJ_GOSSIP1         "我从未像现在这样准备好。"
 
-#define OZ_GM_GOSSIP1       "[GM] Change event to EVENT_OZ"
-#define OZ_GM_GOSSIP2       "[GM] Change event to EVENT_HOOD"
-#define OZ_GM_GOSSIP3       "[GM] Change event to EVENT_RAJ"
+#define OZ_GM_GOSSIP1       "[GM] 将事件更改为 EVENT_OZ"
+#define OZ_GM_GOSSIP2       "[GM] 将事件更改为 EVENT_HOOD"
+#define OZ_GM_GOSSIP3       "[GM] 将事件更改为 EVENT_RAJ"
 
 struct Dialogue
 {
@@ -410,15 +410,15 @@ public:
 # npc_image_of_medivh
 ####*/
 
-#define SAY_DIALOG_MEDIVH_1         "You've got my attention, dragon. You'll find I'm not as easily scared as the villagers below."
-#define SAY_DIALOG_ARCANAGOS_2      "Your dabbling in the arcane has gone too far, Medivh. You've attracted the attention of powers beyond your understanding. You must leave Karazhan at once!"
-#define SAY_DIALOG_MEDIVH_3         "You dare challenge me at my own dwelling? Your arrogance is astounding, even for a dragon!"
-#define SAY_DIALOG_ARCANAGOS_4      "A dark power seeks to use you, Medivh! If you stay, dire days will follow. You must hurry, we don't have much time!"
-#define SAY_DIALOG_MEDIVH_5         "I do not know what you speak of, dragon... but I will not be bullied by this display of insolence. I'll leave Karazhan when it suits me!"
-#define SAY_DIALOG_ARCANAGOS_6      "You leave me no alternative. I will stop you by force if you won't listen to reason!"
-#define EMOTE_DIALOG_MEDIVH_7       "begins to cast a spell of great power, weaving his own essence into the magic."
-#define SAY_DIALOG_ARCANAGOS_8      "What have you done, wizard? This cannot be! I'm burning from... within!"
-#define SAY_DIALOG_MEDIVH_9         "He should not have angered me. I must go... recover my strength now..."
+#define SAY_DIALOG_MEDIVH_1         "你引起了我的注意，巨龙。你会发现我不像下面的村民那么容易害怕。"
+#define SAY_DIALOG_ARCANAGOS_2      "你对奥术的涉猎太过分了，麦迪文。你已经引起了你无法理解的力量的注意。你必须立刻离开卡拉赞！"
+#define SAY_DIALOG_MEDIVH_3         "敢到我家挑战？你的狂妄，就算是巨龙，也是惊人的！"
+#define SAY_DIALOG_ARCANAGOS_4      "一股黑暗力量想要利用你，麦迪文！如果你留下来，可怕的日子将会接踵而至。你必须快点，我们的时间不多了！"
+#define SAY_DIALOG_MEDIVH_5         "我不知道你在说什么，巨龙……但我不会被这种无礼的表现所欺负。我会在适合我的时候离开卡拉赞！"
+#define SAY_DIALOG_ARCANAGOS_6      "你让我别无选择。不听道理我就强行拦住你！"
+#define EMOTE_DIALOG_MEDIVH_7       "开始施展强大的法术，将自己的精华融入法术之中。"
+#define SAY_DIALOG_ARCANAGOS_8      "你做了什么，巫师？这不可能！我从……内心燃烧！"
+#define SAY_DIALOG_MEDIVH_9         "他不应该激怒我。我得走了……现在恢复体力……"
 
 //static float MedivPos[4] = {-11161.49f, -1902.24f, 91.48f, 1.94f};
 static float ArcanagosPos[4] = {-11169.75f, -1881.48f, 107.39f, 4.83f};

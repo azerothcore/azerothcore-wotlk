@@ -92,7 +92,7 @@ public:
         {
             if (Creature* cr = go->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
             {
-                cr->Yell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL);
+                cr->Yell("我的宝藏！你不能从塔尔特克那里偷东西，愚蠢的大舌头叛徒。塔尔特克和讨厌的龙要杀了你！你真傻", LANG_UNIVERSAL);
                 cr->AI()->AttackStart(pPlayer);
             }
         }
@@ -1093,7 +1093,7 @@ enum DalaranCrystal
     QUEST_TELE_CRYSTAL_FLAG     = 12845
 };
 
-#define GO_TELE_TO_DALARAN_CRYSTAL_FAILED   "This teleport crystal cannot be used until the teleport crystal in Dalaran has been used at least once."
+#define GO_TELE_TO_DALARAN_CRYSTAL_FAILED   "在达拉然的传送水晶至少使用一次之前，无法使用此传送水晶。"
 
 class go_tele_to_dalaran_crystal : public GameObjectScript
 {
@@ -1194,9 +1194,9 @@ public:
 
 #define GOSSIP_BASHIR_CRYSTALFORGE_TEXT 31100
 #define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_TEXT_RETURN 31101
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1 "Purchase 1 Unstable Flask of the Sorcerer for the cost of 10 Apexis Shards"
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5 "Purchase 5 Unstable Flask of the Sorcerer for the cost of 50 Apexis Shards"
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN "Use the bashir crystalforge to make another purchase."
+#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1 "以 10 个埃匹希斯碎片的价格购买 1 个不稳定的巫师合剂"
+#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5 "以 50 个埃匹希斯碎片的价格购买 5 个不稳定的巫师合剂"
+#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN "使用巴什伊尔水晶熔炉进行另一次购买。"
 
 enum BashirCrystalforge
 {
@@ -1592,8 +1592,8 @@ public:
 ## go_amberpine_outhouse
 ######*/
 
-#define GOSSIP_USE_OUTHOUSE "Use the outhouse."
-#define GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND "Quest item Anderhol's Slider Cider not found."
+#define GOSSIP_USE_OUTHOUSE "上厕所。"
+#define GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND "未找到任务物品安德霍尔的泻药"
 
 enum AmberpineOuthouse
 {

@@ -1297,9 +1297,9 @@ public:
         if (player->GetQuestStatus(QUEST_DIMENSIUS_DEVOURING) == QUEST_STATUS_INCOMPLETE)
         {
             if (!creature->AI()->GetData(1))
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Let's move out.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "我们出去吧！", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             else
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Let's start the battle.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "让我们开始战斗吧。", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
         }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
@@ -1617,7 +1617,7 @@ enum ProfessorDabiriData
     QUEST_ON_NETHERY_WINGS  = 10438,
 };
 
-#define GOSSIP_ITEM "I need a new phase distruptor, Professor"
+#define GOSSIP_ITEM "我需要一个新的相位干扰器，教授"
 
 class npc_professor_dabiri : public CreatureScript
 {

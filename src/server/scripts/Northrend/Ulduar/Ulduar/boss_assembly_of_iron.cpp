@@ -761,8 +761,8 @@ public:
                     if (me->GetDistance2d(flyTarget) >= 6)
                     {
                         //float speed = me->GetDistance(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ()+15) / (1500.0f * 0.001f);
-                        me->SendMonsterMove(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
-                        me->SetPosition(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ(), flyTarget->GetOrientation());
+                        //me->SendMonsterMove(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
+                        me->SetPosition(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ() + 15, flyTarget->GetOrientation());
                     }
                 }
             }
@@ -807,8 +807,19 @@ public:
                         me->SetReactState(REACT_PASSIVE);
                         me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                         me->SetUnitFlag(UNIT_FLAG_STUNNED);
-                        me->SendMonsterMove(oldVictim->GetPositionX(), oldVictim->GetPositionY(), oldVictim->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
-
+                        //me->SendMonsterMove(oldVictim->GetPositionX(), oldVictim->GetPositionY(), oldVictim->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
+                        me->SetCanFly(true);
+                        Position moveposition = oldVictim->GetPosition();
+                        moveposition.m_positionZ += 5;
+                        me->GetMotionMaster()->MovePoint(0, moveposition);
+                        events.DelayEvents(500);
+                        moveposition.m_positionZ += 5;
+                        me->GetMotionMaster()->MovePoint(0, moveposition);
+                        events.DelayEvents(500);
+                        moveposition.m_positionZ += 5;
+                        me->GetMotionMaster()->MovePoint(0, moveposition);
+                        events.DelayEvents(500);
+                        
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
                         me->CastSpell(me, 61883, true);
                         events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);

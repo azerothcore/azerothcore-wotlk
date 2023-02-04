@@ -158,13 +158,13 @@ enum ThrallWarchief
 
 const Position heraldOfThrallPos = { -462.404f, -2637.68f, 96.0656f, 5.8606f };
 
-#define GOSSIP_HTW "Please share your wisdom with me, Warchief."
-#define GOSSIP_STW1 "What discoveries?"
-#define GOSSIP_STW2 "Usurper?"
-#define GOSSIP_STW3 "With all due respect, Warchief - why not allow them to be destroyed? Does this not strengthen our position?"
-#define GOSSIP_STW4 "I... I did not think of it that way, Warchief."
-#define GOSSIP_STW5 "I live only to serve, Warchief! My life is empty and meaningless without your guidance."
-#define GOSSIP_STW6 "Of course, Warchief!"
+#define GOSSIP_HTW "战争之王，请将你的智慧与我共享。"
+#define GOSSIP_STW1 "有什么发现？"
+#define GOSSIP_STW2 "篡位者？"
+#define GOSSIP_STW3 "恕我直言，统帅大人--为什么不消灭他们？难道这不会巩固我们的地位吗？"
+#define GOSSIP_STW4 "我……我可不这样想，战争之王。"
+#define GOSSIP_STW5 "我活着就是为了为战争之王服务！没有你的指导，我的生活将空虚而无意义。"
+#define GOSSIP_STW6 "遵命，酋长！"
 
 /// @todo verify abilities/timers
 class npc_thrall_warchief : public CreatureScript

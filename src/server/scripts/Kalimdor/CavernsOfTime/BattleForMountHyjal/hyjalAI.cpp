@@ -38,7 +38,7 @@ enum Spawns
     SPAWN_NEAR_TOWER    = 2,
 };
 
-#define YELL_HURRY  "Hurry, we don't have much time"
+#define YELL_HURRY  "快点，我们没有太多时间"
 
 // Locations for summoning gargoyls and frost wyrms in special cases
 float SpawnPointSpecial[3][3] =

@@ -37,11 +37,11 @@ EndContentData */
 ## npc_braug_dimspirit
 ######*/
 
-#define GOSSIP_HBD1 "Ysera"
-#define GOSSIP_HBD2 "Neltharion"
-#define GOSSIP_HBD3 "Nozdormu"
-#define GOSSIP_HBD4 "Alexstrasza"
-#define GOSSIP_HBD5 "Malygos"
+#define GOSSIP_HBD1 "伊瑟拉"
+#define GOSSIP_HBD2 "奈萨里奥"
+#define GOSSIP_HBD3 "诺兹多姆"
+#define GOSSIP_HBD4 "阿莱克斯塔萨"
+#define GOSSIP_HBD5 "玛里苟斯"
 
 class npc_braug_dimspirit : public CreatureScript
 {

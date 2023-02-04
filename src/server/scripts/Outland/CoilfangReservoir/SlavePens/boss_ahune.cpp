@@ -162,19 +162,19 @@ public:
                 case EVENT_INVOKER_SAY_1:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
                     {
-                        plr->Say("The Ice Stone has melted!", LANG_UNIVERSAL);
+                        plr->Say("冰石融化了！", LANG_UNIVERSAL);
                         plr->CastSpell(plr, SPELL_MAKE_BONFIRE, true);
                     }
                     events.RescheduleEvent(EVENT_INVOKER_SAY_2, 2000);
                     break;
                 case EVENT_INVOKER_SAY_2:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
-                        plr->Say("Ahune, your strength grows no more!", LANG_UNIVERSAL);
+                        plr->Say("埃霍恩，你的力量不再增长了！", LANG_UNIVERSAL);
                     events.RescheduleEvent(EVENT_INVOKER_SAY_3, 2000);
                     break;
                 case EVENT_INVOKER_SAY_3:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
-                        plr->Say("Your frozen reign will not come to pass!", LANG_UNIVERSAL);
+                        plr->Say("你冻结的统治不会实现！", LANG_UNIVERSAL);
                     break;
                 case EVENT_ATTACK:
                     events.Reset();
@@ -336,7 +336,7 @@ public:
         if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
             return true;
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Disturb the stone and summon Lord Ahune.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "扰乱石头并召唤埃霍恩领主。", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
         SendGossipMenuFor(player, GOSSIP_TEXT_ID, go->GetGUID());
         return true;
     }

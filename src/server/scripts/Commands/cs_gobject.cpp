@@ -68,6 +68,22 @@ public:
         return commandTable;
     }
 
+    static void LocalizeGameObject(const int localeIndex, std::string &gameobjectName, uint32 entry)
+    {
+        std::wstring wnamepart;
+
+        GameObjectLocale const* gameObjectInfo = sObjectMgr->GetGameObjectLocale(entry);
+        if (!gameObjectInfo)
+            return;
+
+        if (gameObjectInfo->Name.size() > localeIndex && !gameObjectInfo->Name[localeIndex].empty())
+        {
+            const std::string title = gameObjectInfo->Name[localeIndex];
+            if (Utf8FitTo(title, wnamepart))
+                gameobjectName = title;
+        }
+    }
+
     static bool HandleGameObjectActivateCommand(ChatHandler* handler, GameObjectSpawnId guidLow)
     {
         GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
@@ -149,8 +165,9 @@ public:
 
         /// @todo is it really necessary to add both the real and DB table guid here ?
         sObjectMgr->AddGameobjectToGrid(guidLow, sObjectMgr->GetGOData(guidLow));
-
-        handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, uint32(objectId), objectInfo->name.c_str(), guidLow, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        std::string name = objectInfo->name;
+        LocalizeGameObject(handler->GetSessionDbLocaleIndex(), name, objectInfo->entry);
+        handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, uint32(objectId), name.c_str(), guidLow, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
         return true;
     }
 
@@ -276,8 +293,9 @@ public:
         }
 
         GameObject* target = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
-
-        handler->PSendSysMessage(LANG_GAMEOBJECT_DETAIL, guidLow, objectInfo->name.c_str(), guidLow, id, x, y, z, mapId, o, phase);
+        std::string name = objectInfo->name;
+        LocalizeGameObject(handler->GetSessionDbLocaleIndex(), name, objectInfo->entry);
+        handler->PSendSysMessage(LANG_GAMEOBJECT_DETAIL, guidLow, name.c_str(), guidLow, id, x, y, z, mapId, o, phase);
 
         if (target)
         {
@@ -362,7 +380,9 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, object->GetSpawnId(), object->GetGOInfo()->name.c_str(), object->GetSpawnId());
+        std::string name = object->GetGOInfo()->name;
+        LocalizeGameObject(handler->GetSessionDbLocaleIndex(), name, object->GetEntry());
+        handler->PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, object->GetSpawnId(), name.c_str(), object->GetSpawnId());
         return true;
     }
 
@@ -418,8 +438,9 @@ public:
             delete object;
             return false;
         }
-
-        handler->PSendSysMessage(LANG_COMMAND_MOVEOBJMESSAGE, object->GetSpawnId(), object->GetGOInfo()->name.c_str(), object->GetSpawnId());
+        std::string name = object->GetGOInfo()->name;
+        LocalizeGameObject(handler->GetSessionDbLocaleIndex(), name, object->GetEntry());
+        handler->PSendSysMessage(LANG_COMMAND_MOVEOBJMESSAGE, object->GetSpawnId(), name.c_str(), object->GetSpawnId());
         return true;
     }
 
@@ -484,8 +505,9 @@ public:
 
                 if (!gameObjectInfo)
                     continue;
-
-                handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gameObjectInfo->name.c_str(), x, y, z, mapId, "", "");
+                std::string name = gameObjectInfo->name;
+                LocalizeGameObject(handler->GetSessionDbLocaleIndex(), name, gameObjectInfo->entry);
+                handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, name.c_str(), x, y, z, mapId, "", "");
 
                 ++count;
             } while (result->NextRow());
@@ -535,6 +557,7 @@ public:
         type = gameObjectInfo->type;
         displayId = gameObjectInfo->displayId;
         name = gameObjectInfo->name;
+        LocalizeGameObject(handler->GetSessionDbLocaleIndex(), name, gameObjectInfo->entry);
         if (type == GAMEOBJECT_TYPE_CHEST)
             lootId = gameObjectInfo->chest.lootId;
         else if (type == GAMEOBJECT_TYPE_FISHINGHOLE)

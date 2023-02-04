@@ -207,16 +207,16 @@ struct npc_brewfest_bark_trigger : public ScriptedAI
                     switch (urand(0, 3))
                     {
                         case 0:
-                            str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " and drink for the horde!";
+                            str = "加入你的兄弟姐妹们一起与" + std::string(questId == QUEST_BARK_FOR_DROHN ? "德罗恩酿酒厂的酿酒师们" : "塔卡里的巫毒酒宣传员") + "为部落干杯！";
                             break;
                         case 1:
-                            str = "If you think an orc can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + ", only at Brewfest!";
+                            str = "如果你认为兽人可以打得很厉害，那就看看他们的酒，它打得更厉害！亲自去找" + std::string(questId == QUEST_BARK_FOR_DROHN ? "德罗恩酿酒厂的酿酒师们" : "塔卡里的巫毒酒宣传员") + "看看, 只有在美酒节的时候才行!";
                             break;
                         case 2:
-                            str = "Celebrate Brewfest with orcs that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " at Brewfest!";
+                            str = "与懂得什么是好酒的兽人一起庆祝美酒节！在美酒节上找" + std::string(questId == QUEST_BARK_FOR_DROHN ? "德罗恩酿酒厂的酿酒师们" : "塔卡里的巫毒酒宣传员") + "！";
                             break;
                         case 3:
-                            str = std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + "  knows how to party hard! Check them out at Brewfest!";
+                            str = std::string(questId == QUEST_BARK_FOR_DROHN ? "德罗恩酿酒厂的酿酒师们" : "塔卡里的巫毒酒宣传员") + "知道如何尽情狂欢！在美酒节看看他们！";
                             break;
                     }
                     break;
@@ -227,16 +227,16 @@ struct npc_brewfest_bark_trigger : public ScriptedAI
                     switch (urand(0, 3))
                     {
                         case 0:
-                            str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " and drink for the alliance!";
+                            str = "加入你的兄弟姐妹们一起与" + std::string(questId == QUEST_BARK_FOR_BARLEY ? "麦酒家族" : "雷酒家族") + "为联盟干杯！";
                             break;
                         case 1:
-                            str = "If you think an dwarf can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + ", only at Brewfest!";
+                            str = "如果你认为矮人可以打得很厉害，那就看看他们的酒，它打得更厉害！亲自去找" + std::string(questId == QUEST_BARK_FOR_BARLEY ? "麦酒家族" : "雷酒家族") + "看看, 只有在美酒节的时候才行!";
                             break;
                         case 2:
-                            str = "Celebrate Brewfest with dwarves that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " at Brewfest!";
+                            str = "与知道什么是好酒的矮人一起庆祝美酒节！在美酒节上找" + std::string(questId == QUEST_BARK_FOR_BARLEY ? "麦酒家族" : "雷酒家族") + "！";
                             break;
                         case 3:
-                            str = std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + "  knows how to party hard! Check them out at Brewfest!";
+                            str = std::string(questId == QUEST_BARK_FOR_BARLEY ? "麦酒家族" : "雷酒家族") + "知道如何尽情狂欢！在美酒节看看他们！";
                             break;
                     }
                     break;
@@ -416,16 +416,16 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                     if (thrown == 3)
                     {
                         thrown = 0;
-                        sayer->Say("SOMEONE TRY THIS SUPER BREW!", LANG_UNIVERSAL);
+                        sayer->Say("快来试试这款超级啤酒吧！", LANG_UNIVERSAL);
                         //sayer->CastSpell(sayer, SPELL_CREATE_SUPER_BREW, true);
                         sayer->SummonCreature(NPC_SUPER_BREW_TRIGGER, sayer->GetPositionX() + 15 * cos(sayer->GetOrientation()), sayer->GetPositionY() + 15 * std::sin(sayer->GetOrientation()), sayer->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
                     }
                     else
                     {
                         if (urand(0, 1))
-                            sayer->Say("Chug and chuck! Chug and chuck!", LANG_UNIVERSAL);
+                            sayer->Say("咕噜咕噜！咕噜咕噜！", LANG_UNIVERSAL);
                         else
-                            sayer->Say("Down the free brew and pelt the Guzzlers with your mug!", LANG_UNIVERSAL);
+                            sayer->Say("倒下免费的啤酒，用你的杯子冲向酒鬼！", LANG_UNIVERSAL);
                     }
 
                     break;
@@ -451,7 +451,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
         if (Creature* herald = me->FindNearestCreature(NPC_DARK_IRON_HERALD, 100.0f))
         {
             char amount[500];
-            snprintf(amount, sizeof(amount), "RETREAT!! We've already lost %u and we can't afford to lose any more!!", guzzlerCounter);
+            snprintf(amount, sizeof(amount), "撤退！！我们已经失去了 %u，我们不能再失去了！！", guzzlerCounter);
             herald->Yell(amount, LANG_UNIVERSAL);
         }
 
@@ -705,19 +705,19 @@ struct npc_dark_iron_guzzler : public ScriptedAI
             switch (urand(0, 4))
             {
                 case 0:
-                    me->Say("Drink it all boys!", LANG_UNIVERSAL);
+                    me->Say("把它喝光吧，孩子们", LANG_UNIVERSAL);
                     break;
                 case 1:
-                    me->Say("DRINK! BRAWL! DRINK! BRAWL!", LANG_UNIVERSAL);
+                    me->Say("喝！争吵！喝！争吵！", LANG_UNIVERSAL);
                     break;
                 case 2:
-                    me->Say("Did someone say, \"Free Brew\"?", LANG_UNIVERSAL);
+                    me->Say("有人说过“免费啤酒”吗？", LANG_UNIVERSAL);
                     break;
                 case 3:
-                    me->Say("No one expects the Dark Iron dwarves!", LANG_UNIVERSAL);
+                    me->Say("没有人会想到黑铁矮人！", LANG_UNIVERSAL);
                     break;
                 case 4:
-                    me->Say("It's not a party without some crashers!", LANG_UNIVERSAL);
+                    me->Say("没有一些不速之客就不是派对！", LANG_UNIVERSAL);
                     break;
             }
         }

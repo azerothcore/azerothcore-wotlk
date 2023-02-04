@@ -116,7 +116,7 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                     {
                         me->CastSpell(target, SPELL_VOID_SHIFT, false);
-                        me->Whisper("Gaze... into the void.", LANG_UNIVERSAL, target->ToPlayer());
+                        me->Whisper("凝视……虚空。", LANG_UNIVERSAL, target->ToPlayer());
                     }
                     events.RepeatEvent(urand(18000, 22000));
                     break;

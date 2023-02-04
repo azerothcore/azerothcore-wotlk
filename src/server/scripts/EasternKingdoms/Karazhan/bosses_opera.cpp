@@ -812,7 +812,7 @@ enum RedRidingHood
     CREATURE_BIG_BAD_WOLF           = 17521,
 };
 
-#define GOSSIP_GRANDMA          "What phat lewtz you have grandmother?"
+#define GOSSIP_GRANDMA          "你的祖母真是个混蛋！"
 
 class npc_grandmother : public CreatureScript
 {

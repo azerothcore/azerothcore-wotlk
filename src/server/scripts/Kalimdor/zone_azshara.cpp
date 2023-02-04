@@ -147,7 +147,7 @@ enum RizzleSprysprocketData
     MSG_ESCAPE_NOTICE               = 3
 };
 
-#define GOSSIP_GET_MOONSTONE "Hand over the Southfury moonstone and I'll let you go."
+#define GOSSIP_GET_MOONSTONE "交出南国之怒月亮石，我就放你走。"
 
 Position const WPs[58] =
 {

@@ -481,8 +481,8 @@ public:
 ## npc_floon
 ######*/
 
-#define GOSSIP_FLOON1           "You owe Sim'salabim money. Hand them over or die!"
-#define GOSSIP_FLOON2           "Hand over the money or die...again!"
+#define GOSSIP_FLOON1           "你欠萨萨拉比姆的钱。把钱交出来，否则就得死!"
+#define GOSSIP_FLOON2           "把钱交出来，否则就得死...再一次!"
 
 enum Floon
 {
@@ -732,10 +732,10 @@ public:
 /*######
 ## go_skull_pile
 ######*/
-#define GOSSIP_S_DARKSCREECHER_AKKARAI         "Summon Darkscreecher Akkarai"
-#define GOSSIP_S_KARROG         "Summon Karrog"
-#define GOSSIP_S_GEZZARAK_THE_HUNTRESS         "Summon Gezzarak the Huntress"
-#define GOSSIP_S_VAKKIZ_THE_WINDRAGER         "Summon Vakkiz the Windrager"
+#define GOSSIP_S_DARKSCREECHER_AKKARAI         "召唤黑暗尖啸者阿克卡莱"
+#define GOSSIP_S_KARROG         "召唤卡尔洛格"
+#define GOSSIP_S_GEZZARAK_THE_HUNTRESS         "召唤猎手吉萨拉克"
+#define GOSSIP_S_VAKKIZ_THE_WINDRAGER         "召唤风怒者瓦克奇斯"
 
 class go_skull_pile : public GameObjectScript
 {

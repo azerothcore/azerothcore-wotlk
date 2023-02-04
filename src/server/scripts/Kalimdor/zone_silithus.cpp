@@ -579,6 +579,7 @@ public:
                     case 60:
                         Talk(ANACHRONOS_SAY_10, player);
                         me->GetMotionMaster()->MoveCharge(-8113.46f, 1524.16f, 2.89f, 4);
+                        player->CompleteQuest(QUEST_A_PAWN_ON_THE_ETERNAL_BOARD);
                         break;
                     case 61:
                         me->GetMotionMaster()->MoveCharge(-8057.1f, 1470.32f, 2.61f, 6);

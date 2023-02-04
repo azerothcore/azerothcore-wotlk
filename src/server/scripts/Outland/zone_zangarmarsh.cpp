@@ -126,8 +126,8 @@ public:
 ## npcs_ashyen_and_keleth
 ######*/
 
-#define GOSSIP_ITEM_BLESS_ASH     "Grant me your mark, wise ancient."
-#define GOSSIP_ITEM_BLESS_KEL     "Grant me your mark, mighty ancient."
+#define GOSSIP_ITEM_BLESS_ASH     "赐予我你的印记吧，睿智的古树。"
+#define GOSSIP_ITEM_BLESS_KEL     "赐予我你的印记吧，强大的古树。"
 
 enum AshyenAndKeleth
 {
@@ -243,7 +243,7 @@ public:
 ## npc_cooshcoosh
 ######*/
 
-#define GOSSIP_COOSH            "You owe Sim'salabim money. Hand them over or die!"
+#define GOSSIP_COOSH            "你欠萨萨拉比姆的钱。把钱交出来，否则就得死!"
 
 enum Cooshhooosh
 {
@@ -322,9 +322,9 @@ public:
 ## npc_elder_kuruti
 ######*/
 
-#define GOSSIP_ITEM_KUR1 "Greetings, elder. It is time for your people to end their hostility towards the draenei and their allies."
-#define GOSSIP_ITEM_KUR2 "I did not mean to deceive you, elder. The draenei of Telredor thought to approach you in a way that would seem familiar to you."
-#define GOSSIP_ITEM_KUR3 "I will tell them. Farewell, elder."
+#define GOSSIP_ITEM_KUR1 "你好，长者。该和你的人民一起取消对德莱尼及其盟友的敌意了。"
+#define GOSSIP_ITEM_KUR2 "我不是有意欺骗你的，长老。泰雷多尔的德莱尼想用这种可能和你们有点像的方式接近你们。"
+#define GOSSIP_ITEM_KUR3 "我会转告他们的。再见，长老。"
 
 class npc_elder_kuruti : public CreatureScript
 {
@@ -485,8 +485,8 @@ public:
 ## npc_timothy_daniels
 ######*/
 
-#define GOSSIP_TIMOTHY_DANIELS_ITEM1    "Specialist, eh? Just what kind of specialist are you, anyway?"
-#define GOSSIP_TEXT_BROWSE_POISONS      "Let me browse your reagents and poison supplies."
+#define GOSSIP_TIMOTHY_DANIELS_ITEM1    "专家，嗯？那么你是哪一方面的专家？"
+#define GOSSIP_TEXT_BROWSE_POISONS      "让我看看你的材料和毒药补给。"
 
 enum Timothy
 {

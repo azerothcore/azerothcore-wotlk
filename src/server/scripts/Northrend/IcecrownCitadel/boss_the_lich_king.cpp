@@ -833,7 +833,7 @@ public:
                     _bFordringMustFallYell = true;
                     if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     {
-                        tirion->Yell("The Lich King must fall!", LANG_UNIVERSAL);
+                        tirion->Yell("巫妖王必须死！", LANG_UNIVERSAL);
                         tirion->PlayDirectSound(17389);
                     }
                 }

@@ -484,7 +484,7 @@ public:
             events.ScheduleEvent(EVENT_SARA_P1_SUMMON, 0, 0, EVENT_PHASE_ONE);
             events.SetPhase(EVENT_PHASE_ONE);
 
-            me->Yell("The time to strike at the head of the beast will soon be upon us! Focus your anger and hatred on his minions!", LANG_UNIVERSAL);
+            me->Yell("攻击这头野兽要害的时刻即将来临！将你们的愤怒和仇恨倾泻到它的爪牙身上！", LANG_UNIVERSAL);
             me->PlayDirectSound(SARA_AGGRO);
             me->setActive(true);
         }
@@ -584,12 +584,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->Yell(_secondPhase ? "Tremble, mortals, before the coming of the end!" : "Yes! YES! Show them no mercy! Give no pause to your attacks!", LANG_UNIVERSAL);
+                me->Yell(_secondPhase ? "战栗吧，凡人们，末日就要来临了！" : "对！没错！不要手下留情！不要停止攻击！", LANG_UNIVERSAL);
                 me->PlayDirectSound(_secondPhase ? SARA_P2_CAST2 : SARA_P1_CAST1);
             }
             else
             {
-                me->Yell(_secondPhase ? "Suffocate upon your own hate!" : "Let hatred and rage guide your blows!", LANG_UNIVERSAL);
+                me->Yell(_secondPhase ? "被你们自己的仇恨吞噬吧！" : "让仇恨和愤怒指引你们战斗吧！", LANG_UNIVERSAL);
                 me->PlayDirectSound(_secondPhase ? SARA_P2_CAST1 : SARA_P1_CAST2);
             }
         }
@@ -601,12 +601,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->Yell("Could they have been saved?", LANG_UNIVERSAL);
+                me->Yell("他们没救了吗？", LANG_UNIVERSAL);
                 me->PlayDirectSound(SARA_P1_KILL2);
             }
             else
             {
-                me->Yell("Powerless to act...", LANG_UNIVERSAL);
+                me->Yell("毫无力量……", LANG_UNIVERSAL);
                 me->PlayDirectSound(SARA_P1_KILL1);
             }
         }
@@ -676,7 +676,7 @@ public:
 
             // Illusion shatters (param - stun time)
             WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, "Illusion shatters and a path to the central chamber opens!");
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, "幻象破碎，通往中央大厅的道路打开了!");
             me->SendMessageToSetInRange(&data, 500, false);
 
             uint32 timer = events.GetNextEventTime(EVENT_SARA_P2_OPEN_PORTALS);
@@ -706,7 +706,7 @@ public:
                         cr->SetVisible(false);
 
                     _p2TalkTimer++;
-                    me->Yell("I am the lucid dream.", LANG_UNIVERSAL);
+                    me->Yell("我是清醒的梦境。", LANG_UNIVERSAL);
                     me->PlayDirectSound(SARA_P2_START);
                 }
                 return;
@@ -747,18 +747,18 @@ public:
                 {
                     EntryCheckPredicate pred(NPC_OMINOUS_CLOUD);
                     summons.DoAction(ACTION_UNSUMMON_CLOUDS, pred);
-                    me->Yell("The monster in your nightmares.", LANG_UNIVERSAL);
+                    me->Yell("你们噩梦中的怪物。", LANG_UNIVERSAL);
                     _p2TalkTimer = 20000;
                 }
                 else if (_p2TalkTimer >= 25000 && _p2TalkTimer < 40000)
                 {
                     summons.DespawnEntry(NPC_OMINOUS_CLOUD);
-                    me->Yell("The fiend of a thousand faces.", LANG_UNIVERSAL);
+                    me->Yell("千面的恶魔。", LANG_UNIVERSAL);
                     _p2TalkTimer = 40000;
                 }
                 else if (_p2TalkTimer >= 44500 && _p2TalkTimer < 60000)
                 {
-                    me->Yell("Cower before my true form.", LANG_UNIVERSAL);
+                    me->Yell("在我的真正形态面前颤抖吧。", LANG_UNIVERSAL);
                     _p2TalkTimer = 60000;
                 }
                 else if (_p2TalkTimer >= 64000)
@@ -1079,7 +1079,7 @@ public:
             summons.DespawnAll();
             events.Reset();
 
-            me->Yell("Your fate is sealed. The end of days is finally upon you and ALL who inhabit this miserable little seedling. Uulwi ifis halahs gag erh'ongg w'ssh.", LANG_UNIVERSAL);
+            me->Yell("你们的命运早已注定。末日即将降临于这个可笑而渺小的世界，你们所有人都要灭亡。Uulwi ifis halahs gag erh'ongg w'ssh.", LANG_UNIVERSAL);
             me->PlayDirectSound(YS_P3_DEATH);
 
             if (m_pInstance)
@@ -1116,11 +1116,11 @@ public:
             }
             else if (param == ACTION_YOGG_SARON_START_YELL)
             {
-                me->Yell("BOW DOWN BEFORE THE GOD OF DEATH!", LANG_UNIVERSAL);
+                me->Yell("在死亡之神的面前屈服吧！", LANG_UNIVERSAL);
             }
             else if (param == ACTION_YOGG_SARON_OPEN_PORTAL_YELL)
             {
-                me->Yell("MADNESS WILL CONSUME YOU!", LANG_UNIVERSAL);
+                me->Yell("疯狂将把你彻底吞噬！", LANG_UNIVERSAL);
                 me->PlayDirectSound(YS_OPEN_PORTALS);
             }
             else if (param == ACTION_YOGG_SARON_START_P3)
@@ -1135,7 +1135,7 @@ public:
                 events.ScheduleEvent(EVENT_YS_SUMMON_GUARDIAN, 0);
                 _thirdPhase = true;
 
-                me->Yell("Look upon the true face of death and know that your end comes soon!", LANG_UNIVERSAL);
+                me->Yell("凝视死亡的真正面孔吧，你们的末日就要来了！", LANG_UNIVERSAL);
                 me->PlayDirectSound(YS_P3_START);
             }
             else if (param == ACTION_YOGG_SARON_HARD_MODE)
@@ -1181,14 +1181,14 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_YS_LUNATIC_GAZE:
-                    me->Yell("Hoohehehahahaha... AHAHAHAHAHAHA!", LANG_UNIVERSAL);
+                    me->Yell("呼呵呵哈哈哈哈... 啊哈哈哈哈哈哈!", LANG_UNIVERSAL);
                     me->PlayDirectSound(YS_P3_LUNATIC_GAZE);
                     me->CastSpell(me, SPELL_LUNATIC_GAZE_YS, true);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_YS_DEAFENING_ROAR:
-                    me->TextEmote("Yogg-Saron opens his mouth wide!", nullptr, true);
-                    me->Yell("Eternal suffering awaits!", LANG_UNIVERSAL);
+                    me->TextEmote("尤格-萨隆张大了他的嘴!", nullptr, true);
+                    me->Yell("永恒的痛苦在等待着你！", LANG_UNIVERSAL);
                     me->PlayDirectSound(YS_P3_DEAFENING_ROAR);
                     me->CastSpell(me, SPELL_DEAFENING_ROAR, false);
                     events.RepeatEvent(50000);
@@ -1978,19 +1978,19 @@ public:
                     case 1:
                         if (Creature* cr = me->FindNearestCreature(NPC_IMMOLATED_CHAMPION, 50))
                             _championGUID = cr->GetGUID();
-                        Say("Your resilience is admirable.", ObjectGuid::Empty, false, LK_1);
+                        Say("你的执着真是令人钦佩。", ObjectGuid::Empty, false, LK_1);
                         NextStep(7000);
                         break;
                     case 2:
-                        Say("Arrrrrrgh!", _championGUID, true, IC_1);
+                        Say("啊啊啊！", _championGUID, true, IC_1);
                         NextStep(6000);
                         break;
                     case 3:
-                        Say("I'm not afraid of you!", _championGUID, false, IC_2);
+                        Say("我不怕你！", _championGUID, false, IC_2);
                         NextStep(6500);
                         break;
                     case 4:
-                        Say("I will break you as I broke him.", ObjectGuid::Empty, false, LK_2);
+                        Say("我会毁灭你……就像我毁灭了他那样！", ObjectGuid::Empty, false, LK_2);
                         NextStep(7500);
                         break;
                     case 5:
@@ -1998,7 +1998,7 @@ public:
                         NextStep(5000);
                         break;
                     case 6:
-                        Say("He will learn... no king rules forever; only death is eternal!", _yoggGUID, false, YS_V3_2);
+                        Say("他会明白……没有谁可以永远坐在王位上，只有死亡才是永恒的！", _yoggGUID, false, YS_V3_2);
                         _running = false;
                         break;
                 }
@@ -2092,7 +2092,7 @@ public:
                     case 1:
                         if (Creature* cr = me->FindNearestCreature(NPC_GARONA, 50))
                             _garonaGUID = cr->GetGUID();
-                        Say("Bad news sire. The clans are united under Blackhand in this assault. They will stand together until Stormwind has fallen.", _garonaGUID, false, GAR_1);
+                        Say("坏消息，陛下。兽人氏族在黑手的统一指挥下发起了攻击。他们会一致作战，直到暴风城沦陷。", _garonaGUID, false, GAR_1);
                         NextStep(2000);
                         break;
                     case 2:
@@ -2100,11 +2100,11 @@ public:
                         NextStep(6500);
                         break;
                     case 3:
-                        Say("Gul'dan is bringing up his warlocks by nightfall. Until then, the Blackrock clan will be trying to take the Eastern Wall.", _garonaGUID, false, GAR_3);
+                        Say("古尔丹和他的术士们将在晚上抵达。在那之前，黑石氏族会集中火力攻打东面的城墙。", _garonaGUID, false, GAR_3);
                         NextStep(11000);
                         break;
                     case 4:
-                        Say("A thousand deaths... or one murder.", _yoggGUID, false, YS_V1_1);
+                        Say("被无情地杀戮……", _yoggGUID, false, YS_V1_1);
                         NextStep(2500);
                         break;
                     case 5:
@@ -2112,15 +2112,15 @@ public:
                         NextStep(2500);
                         break;
                     case 6:
-                        Say("We will hold until the reinforcements come. As long as men with stout hearts are manning the walls and throne Stormwind will hold.", ObjectGuid::Empty, false, LL_1);
+                        Say("我们要坚守阵地，等待援军到达。只要勇敢的将士仍在保卫城墙和王庭，暴风城就不会沦陷。", ObjectGuid::Empty, false, LL_1);
                         NextStep(10000);
                         break;
                     case 7:
-                        Say("The orc leaders agree with your assessment.", _garonaGUID, false, GAR_4);
+                        Say("部落的领袖同意你的看法。", _garonaGUID, false, GAR_4);
                         NextStep(5000);
                         break;
                     case 8:
-                        Say("Your petty quarrels only make me stronger!", _yoggGUID, false, YS_V1_3);
+                        Say("你们微不足道的抵抗只能让我变得更加强大。", _yoggGUID, false, YS_V1_3);
                         _running = false;
                         break;
                 }
@@ -2210,25 +2210,25 @@ public:
                         NextStep(5000);
                         break;
                     case 1:
-                        Say("It is done... All have been given that which must be given. I now seal the Dragon Soul forever...", ObjectGuid::Empty, false, NEL_1);
+                        Say("完成了。大家都付出了自己该付出的。现在，我将永远封印巨龙之魂。", ObjectGuid::Empty, false, NEL_1);
                         NextStep(10000);
                         break;
                     case 2:
                         if (Creature* cr = me->FindNearestCreature(NPC_YSERA, 50))
-                            Say("That terrible glow... should that be?", cr->GetGUID(), false, YSE_1);
+                            Say("这可怕的光芒……难道是……？", cr->GetGUID(), false, YSE_1);
                         NextStep(4000);
                         break;
                     case 3:
-                        Say("For it to be as it must, yes.", ObjectGuid::Empty, false, NEL_2);
+                        Say("是的。必须这样。", ObjectGuid::Empty, false, NEL_2);
                         NextStep(4000);
                         break;
                     case 4:
                         if (Creature* cr = me->FindNearestCreature(NPC_MALYGOS, 50))
-                            Say("It is a weapon like no other. It must be like no other.", cr->GetGUID(), false, MAL_1);
+                            Say("这是一件与众不同的武器。一件绝无仅有的武器。", cr->GetGUID(), false, MAL_1);
                         NextStep(8000);
                         break;
                     case 5:
-                        Say("His brood learned their lesson before too long, you shall soon learn yours!", _yoggGUID, false, YS_V2_1);
+                        Say("他的族群没用多久就得到了教训。你们也快了！", _yoggGUID, false, YS_V2_1);
                         _running = false;
                         break;
                 }
@@ -2290,7 +2290,7 @@ public:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
                         {
                             me->PlayDirectSound(15760, player);
-                            me->Whisper("Destroy them minion, your master commands it!", LANG_UNIVERSAL, player);
+                            me->Whisper("摧毁他们的爪牙，你的主人命令你这样做！", LANG_UNIVERSAL, player);
                         }
                         break;
                     }
@@ -2696,7 +2696,7 @@ public:
 
             Unit* caster = GetCaster();
             caster->PlayDirectSound(VOYS_INSANE1, target);
-            caster->Whisper("Your will is no longer you own...", LANG_UNIVERSAL, target);
+            caster->Whisper("你的意志不再是你自己的...", LANG_UNIVERSAL, target);
             caster->CastSpell(target, SPELL_INSANE1, true);
             target->CastSpell(target, SPELL_INSANE2, true);
         }

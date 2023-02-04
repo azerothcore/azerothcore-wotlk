@@ -95,7 +95,7 @@ public:
         else
         {
             MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */);
-            MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed.");
+            MailDraft draft("重新找回的物品", "我们在扭曲的时空找回了一件丢失的物品，并发现它是你的。$B$B请在附件里查收上述物品");
 
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -324,8 +324,8 @@ public:
 
                 MailSender sender(MAIL_NORMAL, guid, MAIL_STATIONERY_GM);
                 // fill mail
-                std::string msg = "Your item " + item->Name1 + " has been removed and the used currency restored. This mail contains any items used as currency.";
-                MailDraft   draft("Item Refund", msg);
+                std::string msg = "你的物品 " + item->Name1 + " 已被删除并退还使用的货币。此邮件包含任何用作货币的物品。";
+                MailDraft   draft("物品退款", msg);
 
                 uint8 count      = 0;
                 bool  foundItems = false;

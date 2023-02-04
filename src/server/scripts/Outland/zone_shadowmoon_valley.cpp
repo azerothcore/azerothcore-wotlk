@@ -733,8 +733,8 @@ public:
 ## npc_flanis_swiftwing_and_kagrosh
 ######*/
 
-#define GOSSIP_HSK1 "Take Flanis's Pack"
-#define GOSSIP_HSK2 "Take Kagrosh's Pack"
+#define GOSSIP_HSK1 "拿走弗兰尼斯的背包"
+#define GOSSIP_HSK2 "拿走卡格罗什的背包"
 
 class npcs_flanis_swiftwing_and_kagrosh : public CreatureScript
 {

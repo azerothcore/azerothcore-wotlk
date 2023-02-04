@@ -60,48 +60,48 @@ there is no difference here (except that default text is chosen with `gameobject
 # gossip item and box texts
 ###*/
 
-#define GOSSIP_LEARN_POTION         "Please teach me how to become a Master of Potions, Lauranna"
-#define GOSSIP_UNLEARN_POTION       "I wish to unlearn Potion Mastery"
-#define GOSSIP_LEARN_TRANSMUTE      "Please teach me how to become a Master of Transmutations, Zarevhi"
-#define GOSSIP_UNLEARN_TRANSMUTE    "I wish to unlearn Transmutation Mastery"
-#define GOSSIP_LEARN_ELIXIR         "Please teach me how to become a Master of Elixirs, Lorokeem"
-#define GOSSIP_UNLEARN_ELIXIR       "I wish to unlearn Elixir Mastery"
+#define GOSSIP_LEARN_POTION         "请教我如何成为药水大师，劳兰娜"
+#define GOSSIP_UNLEARN_POTION       "我希望遗忘药水专精"
+#define GOSSIP_LEARN_TRANSMUTE      "请教我如何成为转化大师，萨雷维"
+#define GOSSIP_UNLEARN_TRANSMUTE    "我希望遗忘转化专精"
+#define GOSSIP_LEARN_ELIXIR         "请教我如何成为药剂大师，罗罗基姆"
+#define GOSSIP_UNLEARN_ELIXIR       "我希望遗忘药剂专精"
 
-#define BOX_UNLEARN_ALCHEMY_SPEC    "Do you really want to unlearn your alchemy specialty and lose all associated recipes? \n Cost: "
+#define BOX_UNLEARN_ALCHEMY_SPEC    "你真的想忘记你的炼金专精并失去所有相关的图纸吗？ \n 费用："
 
-#define GOSSIP_WEAPON_LEARN         "Please teach me how to become a Weaponsmith"
-#define GOSSIP_WEAPON_UNLEARN       "I wish to unlearn the art of Weaponsmithing"
-#define GOSSIP_ARMOR_LEARN          "Please teach me how to become a Armorsmith"
-#define GOSSIP_ARMOR_UNLEARN        "I wish to unlearn the art of Armorsmithing"
+#define GOSSIP_WEAPON_LEARN         "请教我如何成为武器锻造师"
+#define GOSSIP_WEAPON_UNLEARN       "我想忘记武器锻造之道"
+#define GOSSIP_ARMOR_LEARN          "请教我如何成为护甲铸造师"
+#define GOSSIP_ARMOR_UNLEARN        "我想忘记护甲铸造之道"
 
-#define GOSSIP_UNLEARN_SMITH_SPEC   "I wish to unlearn my blacksmith specialty"
-#define BOX_UNLEARN_ARMORORWEAPON   "Do you really want to unlearn your blacksmith specialty and lose all associated recipes? \n Cost: "
+#define GOSSIP_UNLEARN_SMITH_SPEC   "我希望遗忘锻造专精"
+#define BOX_UNLEARN_ARMORORWEAPON   "你真的想忘记你的锻造专精并失去所有相关的图纸吗？ \n 费用："
 
-#define GOSSIP_LEARN_HAMMER         "Please teach me how to become a Hammersmith, Lilith"
-#define GOSSIP_UNLEARN_HAMMER       "I wish to unlearn Hammersmithing"
-#define GOSSIP_LEARN_AXE            "Please teach me how to become a Axesmith, Kilram"
-#define GOSSIP_UNLEARN_AXE          "I wish to unlearn Axesmithing"
-#define GOSSIP_LEARN_SWORD          "Please teach me how to become a Swordsmith, Seril"
-#define GOSSIP_UNLEARN_SWORD        "I wish to unlearn Swordsmithing"
+#define GOSSIP_LEARN_HAMMER         "请教我如何成为铸锤师，莉莉丝"
+#define GOSSIP_UNLEARN_HAMMER       "我想要遗忘铸锤专精"
+#define GOSSIP_LEARN_AXE            "请教我如何成为铸斧师，基尔拉姆"
+#define GOSSIP_UNLEARN_AXE          "我想要遗忘铸斧专精"
+#define GOSSIP_LEARN_SWORD          "请教我如何成为铸剑师，瑟里尔"
+#define GOSSIP_UNLEARN_SWORD        "我想要遗忘铸剑专精"
 
-#define BOX_UNLEARN_WEAPON_SPEC     "Do you really want to unlearn your weaponsmith specialty and lose all associated recipes? \n Cost: "
+#define BOX_UNLEARN_WEAPON_SPEC     "你真的想忘记你的武器锻造专精并失去所有相关的图纸吗？ \n 费用："
 
-#define GOSSIP_LEARN_SPELLFIRE      "Please teach me how to become a Spellcloth tailor"
-#define GOSSIP_UNLEARN_SPELLFIRE    "I wish to unlearn Spellfire Tailoring"
-#define GOSSIP_LEARN_MOONCLOTH      "Please teach me how to become a Mooncloth tailor"
-#define GOSSIP_UNLEARN_MOONCLOTH    "I wish to unlearn Mooncloth Tailoring"
-#define GOSSIP_LEARN_SHADOWEAVE     "Please teach me how to become a Shadoweave tailor"
-#define GOSSIP_UNLEARN_SHADOWEAVE   "I wish to unlearn Shadoweave Tailoring"
+#define GOSSIP_LEARN_SPELLFIRE      "请教我如何成为魔焰裁缝"
+#define GOSSIP_UNLEARN_SPELLFIRE    "我想要遗忘魔焰裁缝专精"
+#define GOSSIP_LEARN_MOONCLOTH      "请教我如何成为月布裁缝"
+#define GOSSIP_UNLEARN_MOONCLOTH    "我想要遗忘月布裁缝专精"
+#define GOSSIP_LEARN_SHADOWEAVE     "请教我如何成为暗纹裁缝"
+#define GOSSIP_UNLEARN_SHADOWEAVE   "我想要遗忘暗纹裁缝专精"
 
-#define BOX_UNLEARN_TAILOR_SPEC     "Do you really want to unlearn your tailoring specialty and lose all associated recipes? \n Cost: "
+#define BOX_UNLEARN_TAILOR_SPEC     "你真的想忘记你的裁缝专精并失去所有相关的图纸吗？ \n 费用："
 
-#define GOSSIP_LEARN_GOBLIN         "I am absolutely certain that i want to learn Goblin engineering"
-#define GOSSIP_LEARN_GNOMISH        "I am absolutely certain that i want to learn Gnomish engineering"
-#define GOSSIP_UNLEARN_GOBLIN       "I wish to unlearn Goblin engineering"
-#define GOSSIP_UNLEARN_GNOMISH      "I wish to unlearn Gnomish engineering"
+#define GOSSIP_LEARN_GOBLIN         "我绝对确定我想学习地精工程学"
+#define GOSSIP_LEARN_GNOMISH        "我绝对确定我想学习侏儒工程学"
+#define GOSSIP_UNLEARN_GOBLIN       "我想忘掉地精工程学"
+#define GOSSIP_UNLEARN_GNOMISH      "我想忘掉侏儒工程学"
 
-#define BOX_UNLEARN_ENGIN_SPEC     "Do you really want to unlearn your engineering specialty and lose all associated recipes? \n Cost: "
-#define BOX_LEARN_ENGIN_SPEC     "Do you really want to learn this engineering specialty? \n Cost: "
+#define BOX_UNLEARN_ENGIN_SPEC     "你真的想忘记你的工程学专精并失去所有相关的图纸吗？ \n 费用："
+#define BOX_LEARN_ENGIN_SPEC     "你真的想学这个工程学专精吗？ \n 费用："
 
 /*###
 # spells defines
@@ -877,9 +877,9 @@ enum EngineeringTrinkets
     SPELL_TO_TOSHLEY            = 36955,
 };
 
-#define GOSSIP_ITEM_ZAP         "This Dimensional Imploder sounds dangerous! How can I make one?"
-#define GOSSIP_ITEM_JHORDY      "I must build a beacon for this marvelous device!"
-#define GOSSIP_ITEM_KABLAM      "[PH] Unknown"
+#define GOSSIP_ITEM_ZAP         "空间撕裂器听上去很危险！我怎么才能做一个呢？"
+#define GOSSIP_ITEM_JHORDY      "我必须为这个不可思议的装置制作一个信标！"
+#define GOSSIP_ITEM_KABLAM      "空间撕裂器听上去很危险！我怎么才能做一个呢？"
 
 class npc_engineering_tele_trinket : public CreatureScript
 {

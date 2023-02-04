@@ -1516,24 +1516,24 @@ enum Sayge
     SPELL_FORTUNE  = 23765  // faire fortune
 };
 
-#define GOSSIP_HELLO_SAYGE          "Yes"
-#define GOSSIP_SENDACTION_SAYGE1    "Slay the Man"
-#define GOSSIP_SENDACTION_SAYGE2    "Turn him over to liege"
-#define GOSSIP_SENDACTION_SAYGE3    "Confiscate the corn"
-#define GOSSIP_SENDACTION_SAYGE4    "Let him go and have the corn"
-#define GOSSIP_SENDACTION_SAYGE5    "Execute your friend painfully"
-#define GOSSIP_SENDACTION_SAYGE6    "Execute your friend painlessly"
-#define GOSSIP_SENDACTION_SAYGE7    "Let your friend go"
-#define GOSSIP_SENDACTION_SAYGE8    "Confront the diplomat"
-#define GOSSIP_SENDACTION_SAYGE9    "Show not so quiet defiance"
-#define GOSSIP_SENDACTION_SAYGE10   "Remain quiet"
-#define GOSSIP_SENDACTION_SAYGE11   "Speak against your brother openly"
-#define GOSSIP_SENDACTION_SAYGE12   "Help your brother in"
-#define GOSSIP_SENDACTION_SAYGE13   "Keep your brother out without letting him know"
-#define GOSSIP_SENDACTION_SAYGE14   "Take credit, keep gold"
-#define GOSSIP_SENDACTION_SAYGE15   "Take credit, share the gold"
-#define GOSSIP_SENDACTION_SAYGE16   "Let the knight take credit"
-#define GOSSIP_SENDACTION_SAYGE17   "Thanks"
+#define GOSSIP_HELLO_SAYGE          "什么事"
+#define GOSSIP_SENDACTION_SAYGE1    "杀人"
+#define GOSSIP_SENDACTION_SAYGE2    "把他交给主人"
+#define GOSSIP_SENDACTION_SAYGE3    "没收玉米"
+#define GOSSIP_SENDACTION_SAYGE4    "让他去吃玉米"
+#define GOSSIP_SENDACTION_SAYGE5    "痛苦地处决你的朋友"
+#define GOSSIP_SENDACTION_SAYGE6    "毫无痛苦地处决你的朋友"
+#define GOSSIP_SENDACTION_SAYGE7    "放开你的朋友"
+#define GOSSIP_SENDACTION_SAYGE8    "与外交官对质"
+#define GOSSIP_SENDACTION_SAYGE9    "表现出不那么安静的蔑视"
+#define GOSSIP_SENDACTION_SAYGE10   "保持安静"
+#define GOSSIP_SENDACTION_SAYGE11   "公开反对你的兄弟"
+#define GOSSIP_SENDACTION_SAYGE12   "帮助你的兄弟进来"
+#define GOSSIP_SENDACTION_SAYGE13   "把你的兄弟关在外面，别让他知道"
+#define GOSSIP_SENDACTION_SAYGE14   "邀功，保留黄金"
+#define GOSSIP_SENDACTION_SAYGE15   "邀功，分享黄金"
+#define GOSSIP_SENDACTION_SAYGE16   "让骑士立功"
+#define GOSSIP_SENDACTION_SAYGE17   "谢谢"
 
 class npc_sayge : public CreatureScript
 {
@@ -1699,12 +1699,12 @@ public:
 # npc_wormhole
 ######*/
 
-#define GOSSIP_ENGINEERING1   "Borean Tundra"
-#define GOSSIP_ENGINEERING2   "Howling Fjord"
-#define GOSSIP_ENGINEERING3   "Sholazar Basin"
-#define GOSSIP_ENGINEERING4   "Icecrown"
-#define GOSSIP_ENGINEERING5   "Storm Peaks"
-#define GOSSIP_ENGINEERING6   "Underground..."
+#define GOSSIP_ENGINEERING1   "北风苔原"
+#define GOSSIP_ENGINEERING2   "嚎风峡湾"
+#define GOSSIP_ENGINEERING3   "索拉查盆地"
+#define GOSSIP_ENGINEERING4   "冰冠冰川"
+#define GOSSIP_ENGINEERING5   "风暴峭壁"
+#define GOSSIP_ENGINEERING6   "地下……"
 
 enum WormholeSpells
 {
@@ -1878,15 +1878,15 @@ enum LockSmith
     SPELL_ESSENCE_INFUSED_MOONSTONE       = 40173,
 };
 
-#define GOSSIP_LOST_ARCATRAZ_KEY                "I've lost my key to the Arcatraz."
-#define GOSSIP_LOST_SHADOWFORGE_KEY             "I've lost my key to the Blackrock Depths."
-#define GOSSIP_LOST_SKELETON_KEY                "I've lost my key to the Scholomance."
-#define GOSSIP_LOST_SHATTERED_HALLS_KEY         "I've lost my key to the Shattered Halls."
-#define GOSSIP_LOST_THE_MASTERS_KEY             "I've lost my key to the Karazhan."
-#define GOSSIP_LOST_VIOLET_HOLD_KEY             "I've lost my key to the Violet Hold."
-#define GOSSIP_LOST_ESSENCE_INFUSED_MOONSTONE   "I've lost my Essence-Infused Moonstone."
-#define GOSSIP_LOST_KEY_TO_THE_FOCUSING_IRIS    "I've lost my Key to the Focusing Iris."
-#define GOSSIP_LOST_HC_KEY_TO_THE_FOCUSING_IRIS "I've lost my Heroic Key to the Focusing Iris."
+#define GOSSIP_LOST_ARCATRAZ_KEY                "我丢了禁魔监狱的钥匙。"
+#define GOSSIP_LOST_SHADOWFORGE_KEY             "我丢了黑石深渊的钥匙。"
+#define GOSSIP_LOST_SKELETON_KEY                "我丢了通往通灵学院的钥匙。"
+#define GOSSIP_LOST_SHATTERED_HALLS_KEY         "我丢了破碎大厅的钥匙。"
+#define GOSSIP_LOST_THE_MASTERS_KEY             "我丢了破碎大厅的钥匙。"
+#define GOSSIP_LOST_VIOLET_HOLD_KEY             "我丢了紫罗兰监狱的钥匙。"
+#define GOSSIP_LOST_ESSENCE_INFUSED_MOONSTONE   "我丢失了我的灌注精华的月亮石。"
+#define GOSSIP_LOST_KEY_TO_THE_FOCUSING_IRIS    "我丢失了聚焦之虹的钥匙。"
+#define GOSSIP_LOST_HC_KEY_TO_THE_FOCUSING_IRIS "我丢失了英雄聚焦之虹的钥匙。"
 
 class npc_locksmith : public CreatureScript
 {
@@ -1989,8 +1989,8 @@ public:
 ######*/
 
 #define GOSSIP_TEXT_EXP         14736
-#define GOSSIP_XP_OFF           "I no longer wish to gain experience."
-#define GOSSIP_XP_ON            "I wish to start gaining experience again."
+#define GOSSIP_XP_OFF           "我不再希望获得经验值。"
+#define GOSSIP_XP_ON            "我希望重新开始获得经验值。"
 
 class npc_experience : public CreatureScript
 {

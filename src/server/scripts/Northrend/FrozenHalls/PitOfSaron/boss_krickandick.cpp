@@ -40,7 +40,7 @@ enum Yells
     EMOTE_ICK_POISON                    = 33,
 };
 
-#define EMOTE_ICK_CHASING               "%s is chasing you!"
+#define EMOTE_ICK_CHASING               "%s在追你！"
 
 enum Spells
 {

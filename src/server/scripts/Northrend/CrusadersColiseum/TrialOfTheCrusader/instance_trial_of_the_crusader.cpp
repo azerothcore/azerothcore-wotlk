@@ -881,7 +881,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
                         {
-                            c->Yell("Banished to the Nether!", LANG_UNIVERSAL);
+                            c->Yell("被逐入虚空吧！", LANG_UNIVERSAL);
                             c->PlayDirectSound(16146, 0);
                             if( Creature* f = instance->GetCreature(NPC_FizzlebangGUID) )
                             {

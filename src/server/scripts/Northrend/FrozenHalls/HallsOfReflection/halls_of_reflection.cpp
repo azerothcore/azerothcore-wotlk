@@ -107,16 +107,16 @@ public:
         {
             QuestStatus status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_DELIVRANCE_FROM_THE_PIT_H2 : QUEST_DELIVRANCE_FROM_THE_PIT_A2);
             if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
-                AddGossipItemFor(player, 0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, 0, "你能移除这把剑吗？", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             // once last quest is completed, she offers this shortcut of the starting event
             status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_WRATH_OF_THE_LICH_KING_H2 : QUEST_WRATH_OF_THE_LICH_KING_A2);
             if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
             {
                 if (creature->GetEntry() == NPC_SYLVANAS_PART1)
-                    AddGossipItemFor(player, 0, "Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, 0, "黑暗女王，我似乎听到了阿尔萨斯的声音。无论您要做什么，请快点。", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 else
-                    AddGossipItemFor(player, 0, "My Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, 0, "女士，我听到阿尔萨斯的声音了。无论你在做什么，请快点。", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             }
         }
 

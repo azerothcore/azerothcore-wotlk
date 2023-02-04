@@ -65,7 +65,7 @@ public:
                 return true;
         }
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "我们准备好了！", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
         SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
         return true;
     }

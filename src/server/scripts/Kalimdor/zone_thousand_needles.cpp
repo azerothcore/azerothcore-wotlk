@@ -207,7 +207,7 @@ public:
 # npc_plucky
 ######*/
 
-#define GOSSIP_P    "Please tell me the Phrase.."
+#define GOSSIP_P    "请告诉我暗号.."
 
 enum Plucky
 {

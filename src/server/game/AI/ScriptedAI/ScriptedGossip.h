@@ -22,8 +22,8 @@
 #include "QuestDef.h"
 
 // Gossip Item Text
-#define GOSSIP_TEXT_BROWSE_GOODS        "I'd like to browse your goods."
-#define GOSSIP_TEXT_TRAIN               "Train me!"
+#define GOSSIP_TEXT_BROWSE_GOODS        "我想浏览一下你的商品。"
+#define GOSSIP_TEXT_TRAIN               "训练我!"
 
 enum eTradeskill
 {

@@ -251,7 +251,7 @@ public:
                 case EVENT_ANNOUNCER_SAY_ZOMBIE:
                     if( pInstance && !summons.empty() )
                         if( Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()) )
-                            ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL);
+                            ghoul->Yell("[僵尸] .... . 大脑 ....", LANG_UNIVERSAL);
 
                     break;
                 case EVENT_SPELL_PLAGUE_STRIKE:

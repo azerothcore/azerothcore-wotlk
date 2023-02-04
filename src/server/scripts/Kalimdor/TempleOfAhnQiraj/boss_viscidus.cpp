@@ -218,9 +218,12 @@ struct boss_viscidus : public BossAI
         SpellSchoolMask spellSchoolMask = spellInfo->GetSchoolMask();
         if (spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON && spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_WEAPON_WAND))
         {
-            if (Item* pItem = caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK))
-            {
-                spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
+            // npcbot-alvin
+            if (!(caster && caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())){
+                if (Item* pItem = caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK))
+                {
+                    spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
+                }
             }
         }
 
