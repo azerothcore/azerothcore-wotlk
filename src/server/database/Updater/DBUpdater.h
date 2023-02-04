@@ -71,6 +71,7 @@ public:
 
     static inline std::string GetConfigEntry();
     static inline std::string GetTableName();
+    static std::string GetSourceDirectory();
     static std::string GetBaseFilesDirectory();
     static bool IsEnabled(uint32 const updateMask);
     static BaseLocation GetBaseLocationType();

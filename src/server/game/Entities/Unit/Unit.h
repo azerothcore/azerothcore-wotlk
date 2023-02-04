@@ -1498,6 +1498,7 @@ public:
 
     ReputationRank GetReactionTo(Unit const* target, bool checkOriginalFaction = false) const;
     ReputationRank GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, Unit const* target) const;
+    static ReputationRank GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, FactionTemplateEntry const* targetFactionTemplateEntry);
 
     bool IsHostileTo(Unit const* unit) const;
     [[nodiscard]] bool IsHostileToPlayers() const;
@@ -1743,6 +1744,7 @@ public:
     Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
     void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
     void SendPlaySpellVisual(uint32 id);
+    void SendPlaySpellVisual(ObjectGuid guid, uint32 id);
     void SendPlaySpellImpact(ObjectGuid guid, uint32 id);
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, uint32 spellId, uint32 cooldown);
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns const& cooldowns);
@@ -2460,6 +2462,10 @@ public:
     [[nodiscard]] bool CanRestoreMana(SpellInfo const* spellInfo) const;
 
     std::string GetDebugInfo() const override;
+    void SetCannotReachTargetUnit(bool target, bool isChase);
+    [[nodiscard]] bool CanNotReachTarget() const;
+
+    bool m_cannotReachTarget;
 
 protected:
     explicit Unit (bool isWorldObject);

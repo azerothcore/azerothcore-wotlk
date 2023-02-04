@@ -63,6 +63,8 @@ PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundB
 
 CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, uint8 gender);
 
+CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color);
+
 LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty);
 LFGDungeonEntry const* GetZoneLFGDungeonEntry(std::string const& zoneName, LocaleConstant locale);
 
@@ -71,6 +73,8 @@ uint32 GetDefaultMapLight(uint32 mapId);
 typedef std::unordered_multimap<uint32, SkillRaceClassInfoEntry const*> SkillRaceClassInfoMap;
 typedef std::pair<SkillRaceClassInfoMap::iterator, SkillRaceClassInfoMap::iterator> SkillRaceClassInfoBounds;
 SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_);
+
+EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint32 race, uint32 gender);
 
 extern DBCStorage <AchievementEntry>             sAchievementStore;
 extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;
@@ -84,6 +88,7 @@ extern DBCStorage <BarberShopStyleEntry>         sBarberShopStyleStore;
 extern DBCStorage <BattlemasterListEntry>        sBattlemasterListStore;
 extern DBCStorage <ChatChannelsEntry>            sChatChannelsStore;
 extern DBCStorage <CharStartOutfitEntry>         sCharStartOutfitStore;
+extern DBCStorage <CharSectionsEntry>            sCharSectionsStore;
 extern DBCStorage <CharTitlesEntry>              sCharTitlesStore;
 extern DBCStorage <ChrClassesEntry>              sChrClassesStore;
 extern DBCStorage <ChrRacesEntry>                sChrRacesStore;
@@ -102,6 +107,7 @@ extern DBCStorage <DurabilityCostsEntry>         sDurabilityCostsStore;
 extern DBCStorage <DurabilityQualityEntry>       sDurabilityQualityStore;
 extern DBCStorage <EmotesEntry>                  sEmotesStore;
 extern DBCStorage <EmotesTextEntry>              sEmotesTextStore;
+extern DBCStorage <EmotesTextSoundEntry>         sEmotesTextSoundStore;
 extern DBCStorage <FactionEntry>                 sFactionStore;
 extern DBCStorage <FactionTemplateEntry>         sFactionTemplateStore;
 extern DBCStorage <GameObjectArtKitEntry>        sGameObjectArtKitStore;

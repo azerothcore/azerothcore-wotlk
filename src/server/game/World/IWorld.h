@@ -593,6 +593,9 @@ public:
     [[nodiscard]] virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
     [[nodiscard]] virtual char const* GetDBVersion() const = 0;
+#ifdef MOD_PLAYERBOTS
+    [[nodiscard]] virtual char const* GetPlayerbotsDBRevision() const = 0;
+#endif
     virtual void LoadAutobroadcasts() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;
@@ -601,6 +604,7 @@ public:
     [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;
+    virtual SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback) = 0;
 };
 
 #endif //AZEROTHCORE_IWORLD_H

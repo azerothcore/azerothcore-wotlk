@@ -670,7 +670,7 @@ enum PlayerSlots
 
 #define INVENTORY_SLOT_BAG_0    255
 
-enum EquipmentSlots                                         // 19 slots
+enum EquipmentSlots : uint32                                 // 19 slots
 {
     EQUIPMENT_SLOT_START        = 0,
     EQUIPMENT_SLOT_HEAD         = 0,
@@ -2574,6 +2574,8 @@ public:
     // Settings
     [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
     void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
+
+    void ResetSpeakTimers();
 
     std::string GetDebugInfo() const override;
 

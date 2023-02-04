@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DatabaseEnv.h"
+#include "ScriptMgr.h"
+#include "ScriptMgrMacros.h"
 
-DatabaseWorkerPool<WorldDatabaseConnection> WorldDatabase;
-DatabaseWorkerPool<CharacterDatabaseConnection> CharacterDatabase;
-DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabase;
-
-#ifdef MOD_PLAYERBOTS
-DatabaseWorkerPool<PlayerbotsDatabaseConnection> PlayerbotsDatabase;
-#endif
+void ScriptMgr::OnMetricLogging()
+{
+    ExecuteScript<MetricScript>([&](MetricScript* script)
+    {
+        script->OnMetricLogging();
+    });
+}

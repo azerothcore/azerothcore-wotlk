@@ -213,10 +213,21 @@ public:
         handler->PSendSysMessage("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[defaultLocale], availableLocales.c_str());
 
         handler->PSendSysMessage("Using World DB: %s", sWorld->GetDBVersion());
+#ifdef MOD_PLAYERBOTS
+        handler->PSendSysMessage("Using Playerbots DB Revision: %s", sWorld->GetPlayerbotsDBRevision());
+#endif
 
         handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
         handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
+
+        if (Acore::Module::GetEnableModulesList().empty())
+            handler->SendSysMessage("No modules enabled");
+        else
+            handler->SendSysMessage("> List enable modules:");
+#ifdef MOD_PLAYERBOTS
+        handler->PSendSysMessage("PlayerbotsDatabase queue size: %zu", PlayerbotsDatabase.QueueSize());
+#endif
 
         if (Acore::Module::GetEnableModulesList().empty())
             handler->SendSysMessage("No modules enabled");

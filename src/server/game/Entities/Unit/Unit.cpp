@@ -10193,15 +10193,32 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
         }
     }
 
+    return GetFactionReactionTo(factionTemplateEntry, targetFactionTemplateEntry);
+}
+
+ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, FactionTemplateEntry const* targetFactionTemplateEntry)
+{
     // common faction based check
     if (factionTemplateEntry->IsHostileTo(*targetFactionTemplateEntry))
+    {
         return REP_HOSTILE;
+    }
+
     if (factionTemplateEntry->IsFriendlyTo(*targetFactionTemplateEntry))
+    {
         return REP_FRIENDLY;
+    }
+
     if (targetFactionTemplateEntry->IsFriendlyTo(*factionTemplateEntry))
+    {
         return REP_FRIENDLY;
+    }
+
     if (factionTemplateEntry->factionFlags & FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS)
+    {
         return REP_HOSTILE;
+    }
+
     // neutral by default
     return REP_NEUTRAL;
 }
@@ -18096,6 +18113,8 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             }
         }
 
+        sScriptMgr->OnPlayerbotCheckKillTask(player, victim);
+
         // Dungeon specific stuff, only applies to players killing creatures
         if (creature->GetInstanceId())
         {
@@ -19054,11 +19073,23 @@ void Unit::SendPlaySpellVisual(uint32 id)
     SendMessageToSet(&data, true);
 }
 
+void Unit::SendPlaySpellVisual(ObjectGuid guid, uint32 id)
+{
+    WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
+    data << guid;
+    data << uint32(id); // SpellVisualKit.dbc index
+    SendMessageToSet(&data, true);
+}
+
 void Unit::SendPlaySpellImpact(ObjectGuid guid, uint32 id)
 {
     WorldPacket data(SMSG_PLAY_SPELL_IMPACT, 8 + 4);
     data << guid;       // target
     data << uint32(id); // SpellVisualKit.dbc index
+
+    if (IsPlayer())
+        ToPlayer()->SendDirectMessage(&data);
+    else
     SendMessageToSet(&data, true);
 }
 
@@ -21426,4 +21457,19 @@ std::string Unit::GetDebugInfo() const
         << " UnitMovementFlags: " << GetUnitMovementFlags() << " ExtraUnitMovementFlags: " << GetExtraUnitMovementFlags()
         << " Class: " << std::to_string(getClass());
     return sstr.str();
+}
+
+void Unit::SetCannotReachTargetUnit(bool cannotReach, bool isChase)
+{
+    if (cannotReach == m_cannotReachTarget)
+    {
+        return;
+    }
+
+    m_cannotReachTarget = cannotReach;
+}
+
+bool Unit::CanNotReachTarget() const
+{
+    return m_cannotReachTarget;
 }

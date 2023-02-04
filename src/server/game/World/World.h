@@ -341,6 +341,9 @@ public:
     void LoadDBVersion() override;
     [[nodiscard]] char const* GetDBVersion() const override { return _dbVersion.c_str(); }
 
+#ifdef MOD_PLAYERBOTS
+    [[nodiscard]] char const* GetPlayerbotsDBRevision() const override { return m_PlayerbotsDBRevision.c_str(); }
+#endif
     void LoadAutobroadcasts() override;
 
     void UpdateAreaDependentAuras() override;
@@ -371,6 +374,9 @@ protected:
     void ResetRandomBG();
     void CalendarDeleteOldEvents();
     void ResetGuildCap();
+
+    SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback) override;
+
 private:
     static std::atomic_long _stopEvent;
     static uint8 _exitCode;
@@ -436,6 +442,9 @@ private:
 
     // used versions
     std::string _dbVersion;
+#ifdef MOD_PLAYERBOTS
+    std::string m_PlayerbotsDBRevision;
+#endif
 
     typedef std::map<uint8, std::string> AutobroadcastsMap;
     AutobroadcastsMap _autobroadcasts;
@@ -445,6 +454,7 @@ private:
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;
+    AsyncCallbackProcessor<SQLQueryHolderCallback> _queryHolderProcessor;
 
     /**
      * @brief Executed when a World Session is being finalized. Be it from a normal login or via queue popping.
