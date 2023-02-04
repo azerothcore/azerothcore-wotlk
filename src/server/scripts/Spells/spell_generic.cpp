@@ -2364,7 +2364,7 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
     bool Load() override
     {
         //npcbot
-        if (GetCaster() && GetCaster()->GetTypeId() == TYPEID_UNIT && GetCaster()->ToCreature()->IsNPCBot() && GetOwner()->GetTypeId() == TYPEID_UNIT)
+        if (GetCaster() && GetCaster()->IsNPCBot() && GetOwner()->GetTypeId() == TYPEID_UNIT)
             return true;
         //end npcbot
         return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetTypeId() == TYPEID_UNIT;
@@ -3509,7 +3509,7 @@ class spell_gen_tournament_pennant : public AuraScript
     bool Load() override
     {
         //npcbot
-        if (GetCaster() && GetCaster()->GetTypeId() == TYPEID_UNIT && GetCaster()->ToCreature()->IsNPCBot())
+        if (GetCaster() && GetCaster()->IsNPCBot())
             return true;
         //end npcbot
 

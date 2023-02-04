@@ -785,7 +785,7 @@ class spell_dru_rip : public AuraScript
     {
         Unit* caster = GetCaster();
         //npcbot
-        if (caster && caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+        if (caster && caster->IsNPCBot())
             return true;
         //end npcbot
         return caster && caster->GetTypeId() == TYPEID_PLAYER;
@@ -798,7 +798,7 @@ class spell_dru_rip : public AuraScript
         if (Unit* caster = GetCaster())
         {
             //npcbot
-            if (caster && caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+            if (caster && caster->IsNPCBot())
             {
                 uint8 botcp = caster->ToCreature()->GetCreatureComboPoints();
                 // Idol of Feral Shadows. Can't be handled as SpellMod due its dependency from CPs
@@ -1077,7 +1077,7 @@ class spell_dru_t10_restoration_4p_bonus : public SpellScript
     bool Load() override
     {
         //npcbot
-        if (GetCaster()->GetTypeId() == TYPEID_UNIT && GetCaster()->ToCreature()->IsNPCBot())
+        if (GetCaster()->IsNPCBot())
             return true;
         //end npcbot
         return GetCaster()->GetTypeId() == TYPEID_PLAYER;

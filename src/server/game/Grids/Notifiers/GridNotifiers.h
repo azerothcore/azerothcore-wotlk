@@ -1494,7 +1494,7 @@ namespace Acore
                 player = u->GetOwner()->ToPlayer();
             }
             //npcbot: find bot owner
-            else if (u->GetTypeId() == TYPEID_UNIT && u->ToCreature()->IsNPCBotOrPet() && !u->ToCreature()->IsFreeBot())
+            else if (u->IsNPCBotOrPet() && !u->ToCreature()->IsFreeBot())
                 player = u->ToCreature()->GetBotOwner();
             //end npcbot
 

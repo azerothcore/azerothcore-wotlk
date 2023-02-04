@@ -807,7 +807,7 @@ public:
             if (IsTempBot())
                 if (me->GetCreatorGUID().IsCreature())
                     if (Unit* bot = ObjectAccessor::GetUnit(*me, me->GetCreatorGUID()))
-                        if (bot->ToCreature()->IsNPCBot())
+                        if (bot->IsNPCBot())
                             bot->ToCreature()->OnBotDespawn(me);
 
             bot_ai::JustDied(u);

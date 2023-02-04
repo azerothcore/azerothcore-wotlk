@@ -1922,7 +1922,7 @@ void bot_ai::_listAuras(Player const* player, Unit const* unit) const
     botstring << unit->GetName() << " (" << LocalizedNpcText(player, BOT_TEXT_CLASS) << ": " << uint32(bot_pet_player_class) << "), ";
     if (unit->GetTypeId() == TYPEID_PLAYER)
         botstring << LocalizedNpcText(player, BOT_TEXT_PLAYER);
-    else if (unit->GetTypeId() == TYPEID_UNIT && unit->ToCreature()->IsNPCBot())
+    else if (unit->IsNPCBot())
     {
         bot_ai const* ai = unit->ToCreature()->GetBotAI();
         botstring << LocalizedNpcText(player, BOT_TEXT_MASTER) << ": ";
@@ -5496,7 +5496,7 @@ bool bot_ai::IsPotionSpell(uint32 spellId) const
 //bool bot_ai::InDuel(Unit const* target) const
 //{
 //    if (!target) return false;
-//    bool isbot = target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsNPCBot();
+//    bool isbot = target->IsNPCBot();
 //    Player const* player = target->GetTypeId() == TYPEID_PLAYER ? target->ToPlayer() : isbot ? target->ToCreature()->GetBotOwner()->ToPlayer() : nullptr;
 //    if (!player)
 //    {

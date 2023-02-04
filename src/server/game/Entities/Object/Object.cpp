@@ -1091,7 +1091,7 @@ void WorldObject::setActive(bool on)
         return;
 
     //npcbot: bots should never be removed from active
-    if (on == false && GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+    if (on == false && IsNPCBot())
         return;
     //end npcbot
 
@@ -1885,7 +1885,7 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool che
     WorldObject const* seer = this;
 
     //npcbot: master's invisibility should not affect bots' sight
-    if (!(GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot()))
+    if (!IsNPCBot())
     //end npcbot
     // Pets don't have detection, they use the detection of their masters
     if (Unit const* thisUnit = ToUnit())
@@ -2203,7 +2203,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             break;
         case UNIT_MASK_TOTEM:
             //npcbot: totem emul step 1
-            if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->ToCreature()->IsNPCBot())
+            if (summoner && summoner->IsNPCBot())
                 summon = new Totem(properties, summoner->ToCreature()->GetBotOwner()->GetGUID());
             else
             //end npcbot
@@ -2224,7 +2224,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     }
 
     //npcbot: totem emul step 2
-    if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->ToCreature()->IsNPCBot())
+    if (summoner && summoner->IsNPCBot())
     {
         summon->SetFaction(summoner->ToCreature()->GetFaction());
         summon->SetPvP(summoner->ToCreature()->IsPvP());
@@ -2256,7 +2256,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     summon->InitSummon();
 
     //npcbot: totem emul step 3
-    if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->ToCreature()->IsNPCBot())
+    if (summoner && summoner->IsNPCBot())
         summoner->ToCreature()->OnBotSummon(summon);
     //end npcbot
 

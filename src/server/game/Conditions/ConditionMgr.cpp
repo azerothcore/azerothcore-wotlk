@@ -68,7 +68,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         if (Unit* unit = object->ToUnit())
         {
             //npcbot
-            if (object->GetTypeId() == TYPEID_UNIT && object->ToCreature()->IsNPCBot())
+            if (object->IsNPCBot())
                 condMeets = true;
             else
             //end npcbot
@@ -87,7 +87,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         if (Unit* unit = object->ToUnit())
         {
             //npcbot
-            if (object->GetTypeId() == TYPEID_UNIT && object->ToCreature()->IsNPCBot())
+            if (object->IsNPCBot())
                 condMeets = true; //for now
             else
             //end npcbot
@@ -106,8 +106,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         if (Unit* unit = object->ToUnit())
         {
             //npcbot
-            if (object->GetTypeId() == TYPEID_UNIT && object->ToCreature()->IsNPCBot() &&
-                object->ToCreature()->GetBotAI() && !object->ToCreature()->IsFreeBot())
+            if (object->IsNPCBot() && object->ToCreature()->GetBotAI() && !object->ToCreature()->IsFreeBot())
             {
                 if (FactionEntry const* faction = sFactionStore.LookupEntry(ConditionValue1))
                    condMeets = (ConditionValue2 & (1 << object->ToCreature()->GetBotOwner()->GetReputationMgr().GetRank(faction)));
@@ -129,7 +128,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         if (Unit* unit = object->ToUnit())
         {
             //npcbot
-            if (object->GetTypeId() == TYPEID_UNIT && object->ToCreature()->IsNPCBot())
+            if (object->IsNPCBot())
                 condMeets = true;
             else
             //end npcbot
@@ -145,8 +144,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         if (Unit* unit = object->ToUnit())
         {
             //npcbot
-            if (object->GetTypeId() == TYPEID_UNIT && object->ToCreature()->IsNPCBot() &&
-                object->ToCreature()->GetBotAI() && !object->ToCreature()->IsFreeBot())
+            if (object->IsNPCBot() && object->ToCreature()->GetBotAI() && !object->ToCreature()->IsFreeBot())
                 condMeets = object->ToCreature()->GetBotOwner()->GetTeamId() == ConditionValue1;
             else
             //end npcbot
@@ -176,7 +174,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         if (Unit* unit = object->ToUnit())
         {
             //npcbot
-            if (object->GetTypeId() == TYPEID_UNIT && object->ToCreature()->IsNPCBot())
+            if (object->IsNPCBot())
                 condMeets = object->ToCreature()->GetGender() == ConditionValue1;
             else
             //end npcbot
@@ -192,7 +190,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         if (Unit* unit = object->ToUnit())
         {
             //npcbot
-            if (object->GetTypeId() == TYPEID_UNIT && object->ToCreature()->IsNPCBot())
+            if (object->IsNPCBot())
                 condMeets = true;
             else
             //end npcbot

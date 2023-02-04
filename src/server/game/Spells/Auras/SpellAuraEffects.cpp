@@ -946,7 +946,7 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                         case 57073:
                         case 61830:
                             //npcbot
-                            if (caster && caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+                            if (caster && caster->IsNPCBot())
                             {
                                 if (AuraEffect* aurEff = GetBase()->GetEffect(EFFECT_0))
                                 {
@@ -2053,7 +2053,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
             case FORM_BERSERKERSTANCE:
                 {
                     //npcbot: skip this, handled inside class ai
-                    if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsNPCBot())
+                    if (target->IsNPCBot())
                         break;
                     //end npcbot
                     uint32 Rage_val = 0;
@@ -2118,7 +2118,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         if (!target->CanUseAttackType(BASE_ATTACK))
         {
             //npcbot: skip bots (handled inside AI)
-            if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsNPCBotOrPet())
+            if (target->IsNPCBotOrPet())
             {}
             else
             //end npcbot
@@ -2130,7 +2130,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
 
         // Update crit chance for feral forms
         //npcbot: skip bots (handled inside AI)
-        if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsNPCBotOrPet())
+        if (target->IsNPCBotOrPet())
         {}
         else
         //end npcbot
@@ -3074,8 +3074,7 @@ void AuraEffect::HandleAuraModTotalThreat(AuraApplication const* aurApp, uint8 m
     Unit* target = aurApp->GetTarget();
 
     //npcbot: handle for bots
-    if (target->IsAlive() && target->GetTypeId() == TYPEID_UNIT &&
-        target->ToCreature()->IsNPCBotOrPet())
+    if (target->IsAlive() && target->IsNPCBotOrPet())
     {
         Unit* caster = GetCaster();
         if (caster && caster->IsAlive())

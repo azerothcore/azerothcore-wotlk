@@ -67,7 +67,7 @@ struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
 
         if (m_playerOnly && (target->GetTypeId() != TYPEID_PLAYER))
             //npcbot: allow to target bots
-            //if (!(target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsNPCBot()))
+            //if (!(target->IsNPCBot()))
             //end npcbot
             return false;
 

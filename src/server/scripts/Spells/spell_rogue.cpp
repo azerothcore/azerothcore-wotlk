@@ -161,7 +161,7 @@ class spell_rog_cheat_death : public AuraScript
     {
         absorbChance = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
         //npcbot
-        if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT && GetUnitOwner()->ToCreature()->IsNPCBot())
+        if (GetUnitOwner()->IsNPCBot())
             return true;
         //end npcbot
         return GetUnitOwner()->ToPlayer();
@@ -586,7 +586,7 @@ class spell_rog_rupture : public AuraScript
     {
         Unit* caster = GetCaster();
         //npcbot
-        if (caster && caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+        if (caster && caster->IsNPCBot())
             return true;
         //end npcbot
         return caster && caster->GetTypeId() == TYPEID_PLAYER;

@@ -447,7 +447,7 @@ void MotionTransport::UnloadNonStaticPassengers()
             continue;
         }
         //npcbot: do not unload bots
-        if ((*itr)->GetTypeId() == TYPEID_UNIT && (*itr)->ToCreature()->IsNPCBotOrPet())
+        if ((*itr)->IsNPCBotOrPet())
         {
             ++itr;
             continue;
@@ -564,7 +564,7 @@ void MotionTransport::DelayedTeleportTransport()
         {
             case TYPEID_UNIT:
                 //npcbot: do not add bots to transport (handled inside AI)
-                if (obj->ToCreature()->IsNPCBotOrPet())
+                if (obj->IsNPCBotOrPet())
                     break;
                 //end npcbot
                 _passengers.erase(obj);

@@ -500,7 +500,7 @@ class spell_dk_rune_of_the_fallen_crusader : public SpellScript
             if (ihit->targetGUID == GetCaster()->GetGUID())
             {
                 //npcbot: get bot's crit
-                if (GetCaster()->GetGUID().IsCreature() && GetCaster()->ToCreature()->IsNPCBot())
+                if (GetCaster()->IsNPCBot())
                     ihit->crit = roll_chance_f(GetCaster()->ToCreature()->GetCreatureCritChance());
                 else
                 //end npcbot

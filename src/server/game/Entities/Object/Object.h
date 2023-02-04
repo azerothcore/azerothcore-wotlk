@@ -191,6 +191,12 @@ public:
     // FG: some hacky helpers
     void ForceValuesUpdateAtIndex(uint32);
 
+    //npcbot
+    virtual bool IsNPCBot() const { return false; }
+    virtual bool IsNPCBotPet() const { return false; }
+    virtual bool IsNPCBotOrPet() const { return false; }
+    //end npcbot
+
     [[nodiscard]] inline bool IsPlayer() const { return GetTypeId() == TYPEID_PLAYER; }
     Player* ToPlayer() { if (GetTypeId() == TYPEID_PLAYER) return reinterpret_cast<Player*>(this); else return nullptr; }
     [[nodiscard]] Player const* ToPlayer() const { if (GetTypeId() == TYPEID_PLAYER) return (Player const*)((Player*)this); else return nullptr; }

@@ -644,7 +644,7 @@ public:
                 {
                     u = *itr;
                     if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->IsAlive() ||
-                        u->isType(TYPEMASK_PLAYER) || !u->ToCreature()->IsNPCBot() || u->ToCreature()->IsTempBot() ||
+                        u->isType(TYPEMASK_PLAYER) || !u->IsNPCBot() || u->ToCreature()->IsTempBot() ||
                         IsTank(u) || me->GetDistance(u) > 30)
                         continue;
                     if (HOPTarget(u, diff))
@@ -738,7 +738,7 @@ public:
                 {
                     u = *itr;
                     if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->IsAlive() ||
-                        u->isType(TYPEMASK_PLAYER) || (!u->IsPet() && !u->ToCreature()->IsNPCBot()) ||
+                        u->isType(TYPEMASK_PLAYER) || (!u->IsPet() && !u->IsNPCBot()) ||
                         u->ToCreature()->IsTempBot() || me->GetDistance(u) > 30)
                         continue;
                     if (HOFTarget(u, diff))

@@ -531,7 +531,7 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
 
     //npcbot: blademaser only (disabled)
     /*
-    if (_owner->GetTypeId() == TYPEID_UNIT && _owner->ToCreature()->IsNPCBot())
+    if (_owner->IsNPCBot())
     {
         Movement::MoveSplineInit init(_owner);
         init.MoveTo(x, y, z, false);

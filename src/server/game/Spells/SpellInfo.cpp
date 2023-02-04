@@ -463,7 +463,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             pointsPerComboPoint = 2500.f;
         }
         //npcbot: bonus amount from combo points and specific mods
-        if (caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+        if (caster->IsNPCBot())
         {
             if (uint8 comboPoints = caster->ToCreature()->GetCreatureComboPoints())
                 value += pointsPerComboPoint * comboPoints;
@@ -558,7 +558,7 @@ float SpellEffectInfo::CalcValueMultiplier(Unit* caster, Spell* spell) const
         modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_VALUE_MULTIPLIER, multiplier, spell);
 
     //npcbot - apply bot spell effect value mult mods
-    if (caster && caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+    if (caster && caster->IsNPCBot())
         BotMgr::ApplyBotEffectValueMultiplierMods(caster->ToCreature(), _spellInfo, SpellEffIndex(_effIndex), multiplier);
     //end npcbot
 
@@ -592,7 +592,7 @@ float SpellEffectInfo::CalcRadius(Unit* caster, Spell* spell) const
             modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_RADIUS, radius, spell);
 
         //npcbot - apply bot spell radius mods
-        if (caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBotOrPet())
+        if (caster->IsNPCBotOrPet())
             caster->ToCreature()->ApplyCreatureSpellRadiusMods(_spellInfo, radius);
         //end npcbot
     }
@@ -1897,7 +1897,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     // corpseOwner and unit specific target checks
     if (AttributesEx3 & SPELL_ATTR3_ONLY_ON_PLAYER && !unitTarget->ToPlayer())
         //npcbot: allow to target bots
-        if (!(unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->ToCreature()->IsNPCBot()))
+        if (!unitTarget->IsNPCBot())
         //end npcbot
         return SPELL_FAILED_TARGET_NOT_PLAYER;
 
@@ -2513,7 +2513,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
     }
 
     //npcbot - apply bot spell cost mods
-    if (powerCost > 0 && caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+    if (powerCost > 0 && caster->IsNPCBot())
         caster->ToCreature()->ApplyCreatureSpellCostMods(this, powerCost);
     //end npcbot
 

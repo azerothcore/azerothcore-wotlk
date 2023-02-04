@@ -709,7 +709,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
         Creature const* bot = unit->ToCreature();
         if (!bot->IsNPCBot() && unit->HasAuraType(SPELL_AURA_CLONE_CASTER))
             if (Unit const* creator = unit->GetAuraEffectsByType(SPELL_AURA_CLONE_CASTER).front()->GetCaster())
-                if (creator->GetTypeId() == TYPEID_UNIT && creator->ToCreature()->IsNPCBot())
+                if (creator->IsNPCBot())
                     bot = creator->ToCreature();
 
         if (bot->IsNPCBot())

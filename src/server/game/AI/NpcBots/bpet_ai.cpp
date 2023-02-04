@@ -1252,7 +1252,7 @@ bool bot_pet_ai::IsInBotParty(Unit const* unit) const
             return false;
 
         return
-            (unit->GetTypeId() == TYPEID_PLAYER || unit->ToCreature()->IsPet() || unit->ToCreature()->IsNPCBot() || unit->ToCreature()->IsNPCBotPet()) &&
+            (unit->GetTypeId() == TYPEID_PLAYER || unit->ToCreature()->IsPet() || unit->IsNPCBotOrPet()) &&
             (unit->GetFaction() == me->GetFaction() ||
             (me->GetReactionTo(unit) >= REP_FRIENDLY && unit->GetReactionTo(me) >= REP_FRIENDLY));
     }
