@@ -1,3 +1,4 @@
+-- DB update 2023_02_04_02 -> 2023_02_04_03
 DELETE FROM `game_event_creature` WHERE `eventEntry`=13;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 -- Elemental Invasions
