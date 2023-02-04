@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.graveyard_zone
+-- Dumping structure for table acore_world.graveyard_zone
 DROP TABLE IF EXISTS `graveyard_zone`;
 CREATE TABLE IF NOT EXISTS `graveyard_zone` (
   `ID` mediumint unsigned NOT NULL DEFAULT '0',
@@ -22,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `graveyard_zone` (
   PRIMARY KEY (`ID`,`GhostZone`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Trigger System';
 
--- Dumpar data för tabell acore_world.graveyard_zone: 703 rows
+-- Dumping data for table acore_world.graveyard_zone: 704 rows
 DELETE FROM `graveyard_zone`;
 /*!40000 ALTER TABLE `graveyard_zone` DISABLE KEYS */;
 INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
@@ -727,10 +729,12 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(1682, 4820, 0, 'Icecrown Glacier, Citadel GY'),
 	(852, 1537, 469, 'Dun Morogh, Gates of Ironforge - Ironforge'),
 	(1256, 209, 0, 'Silverpine Forest, South GY - Silverpine Forest'),
-	(101, 135, 469, 'Frostmane Hold, Kharanos GY - Dun Morogh'),
-	(1409, 1497, 469, 'Tirisfal Glades - Undercity - Alliance');
+	(1471, 135, 469, 'Frostmane Hold, Kharanos GY - Dun Morogh'),
+	(1409, 1497, 469, 'Tirisfal Glades - Undercity - Alliance'),
+	(1471, 211, 469, 'Dun Morogh, Iceflow Lake - Dun Morogh');
 /*!40000 ALTER TABLE `graveyard_zone` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -112,12 +112,15 @@ public:
             {
                 Talk(SAY_OGRE_DEATH);
                 if (actionId == MAX_ADD_NUMBER)
-                    me->SetLootMode(1);
+                {
+                    me->AddLootMode(1);
+                }
             }
             else if (actionId == MAX_ADD_NUMBER)
             {
+                me->AddLootMode(1);
                 me->loot.clear();
-                me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1, me);
+                me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, me->GetLootMode(), me);
                 me->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
                 _JustDied();
             }

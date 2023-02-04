@@ -398,7 +398,7 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_KILL_SELF:
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                     break;
                 case EVENT_REBIRTH:
                     me->SetVisible(true);

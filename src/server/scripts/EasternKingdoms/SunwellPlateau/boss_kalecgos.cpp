@@ -263,7 +263,7 @@ public:
                     break;
                 case EVENT_TALK_GOOD_5:
                     me->SetVisible(false);
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                     break;
                 case EVENT_TALK_BAD_1:
                     me->SetReactState(REACT_PASSIVE);

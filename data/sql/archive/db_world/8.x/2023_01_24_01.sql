@@ -1,0 +1,27 @@
+-- DB update 2023_01_24_00 -> 2023_01_24_01
+DELETE FROM `quest_request_items_locale` WHERE `ID` IN (10, 224, 237, 334, 644, 645, 699, 1101, 1102, 1169, 1383, 4481, 4482, 4483, 4484, 4903, 5052, 5306, 5518, 5863, 5881, 7625, 7723, 9436) AND `locale` = 'deDE';
+INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
+(10, 'deDE', 'Nun, was habt Ihr für Neuigkeiten? Ihr seht aus, als hättet Ihr einiges durchgemacht... ist Kieselschliff am Leben?', 0),
+(224, 'deDE', 'Der Loch Modan wird belagert, $N! Wir sind auf jedes einsatzfähige Mitglied der Allianz angewiesen. Habt Ihr schon 10 Splittersteintroggs und 10 Späher der Splittersteintroggs getötet?', 0),
+(237, 'deDE', 'Wir brauchen mehr Zeit, $R. Ihr habt den Befehl, 10 Schädelhauer der Splittersteintroggs und 10 Seher der Splittersteintroggs zu töten. Setzt den Feind unter Druck, bis wir Verstärkung erhalten. Jetzt ist nicht die Zeit für Müßiggang.', 0),
+(334, 'deDE', 'Seid Ihr hier, um Kleidung zu kaufen?', 0),
+(644, 'deDE', 'Ihr seid zurückgekehrt, $N. Ist die Linie des Ignaeus Trollbann zerbrochen?', 0),
+(645, 'deDE', 'Gravuren auf dem Stein auf der Oberseite von Trollbanns Grabmal zeichnen genau die glühenden Linien des Siegelzeichens von Ignaeus nach...', 0),
+(699, 'deDE', 'Guter Met, ein warmes Feuer, eine Armee von Orcs, ein Arsenal von Waffen... das ist alles, was wir hier draußen entlang der Küste brauchen. Ich bedauere nicht, dass ich hier draußen bin und Steinard bewache, aber es wäre nett, wenn wir eines Tages mal einen Bau oder zumindest einen Turm hätten.', 0),
+(1101, 'deDE', 'Solange Charlga Klingenflanke im Kral der Klingenhauer Truppen rekrutiert, ist dieses Land in großer Gefahr.', 0),
+(1102, 'deDE', 'Sobald ich weiß, dass die elenden Bestien des Krals der Klingenhauer aus ihrem elenden Unterschlupf vertrieben wurden, kann ich in Frieden ruhen, in dem Wissen, dass Rache geübt wurde. $B$BHabt Ihr die Stacheleber aus dem Kral vertrieben? Bringt Ihr mir gute Neuigkeiten in Form von Klingenflankes Herz?', 0),
+(1169, 'deDE', 'Mit den Herzen und Zungen versengter Nachkommen der Armee der schwarzen Großdrachen kann ich herausfinden, welche elende Bestie ihre Brut in unsere Heimat einführte. Wenn wir mehr über unsere Angreifer wissen, können wir versuchen, sie ein für allemal zu vernichten und die Steinbrecherfeste zurückzuerobern.$B$BNatürlich wird es an sich schon eine epische Aufgabe sein, Mok\'Morokk zu überzeugen, dass er seine fette, träge Masse aus diesem Dreckloch hebt...', 0),
+(1383, 'deDE', 'Dieser Spitzel in Steinard wird bestimmt ganz... offen... wenn er mein Spezialserum getrunken hat. Ha-ha!$B$BDie erforderlichen Zutaten sind nicht leicht zu beschaffen. Schattenpanther kommen im Sumpf häufig vor, aber genug Herzen für unsere Zwecke zu beschaffen, kann schwierig sein. Und der Morastlord kann so eine heikle Bestie sein.$B$BWas den Tiefschreitertumor angeht, die sind schrecklich schwer zu finden. Aber die chemische Reaktion, die ich damit auslösen kann, ist unübertroffen.', 0),
+(4481, 'deDE', 'Für jedes Ding auf dieser Welt gilt es, einen Preis zu bezahlen. Und der Preis für den speziellen Gegenstand, den Ihr wünscht, beläuft sich auf dreißig Goldstücke.$B$BSelbstverständlich werde ich den Großteil der Komponenten, die Ihr eingesammelt habt, für mich selbst zurückbehalten. Doch sorgt Euch nicht, Ihr sollt Euren Plunder erhalten.', 0),
+(4482, 'deDE', 'Dreißig Goldstücke, $R. Dreißig Goldstücke und die benötigten Komponenten.', 0),
+(4483, 'deDE', 'Wenn es Widerstandsfähigkeit ist, die Ihr wünscht, so benötige ich dreißig Goldstücke.', 0),
+(4484, 'deDE', 'Vergeudet meine Zeit nicht, $R. Gebt mir das, was ich benötige. Dreißig Goldstücke und die Komponenten.', 0),
+(4903, 'deDE', '<Kriegsherr Bluthauer salutiert vor Euch.>', 0),
+(5052, 'deDE', 'Unsere Stämme finden sich in den dornigen Gegenden des Brachlandes zusammen <schnaubt>, da sie heilige Orte sind, aber keiner ist so heilig wie der Kral und die Hügel der Klingenhauer. Agammagans Körper bildet die Gesamtheit des Klingenhauer <schnaubt>, aber die Hügel sind besonders geschützt, da der Eingang aus seinem großen Maul gefertigt ist! <schnaubt> Er wird die mit Haut und Haar verschlingen, die ihm nicht treu ergeben sind, und ihre Körper ausspucken, nachdem er sie zerkaut hat! <schnaubt>$B$BAgammagan hat seinen Körper zurückgelassen, um uns zu schützen, und er gibt uns von seinem Geist, damit wir ihn schützen können. <schnaubt>', 0),
+(5306, 'deDE', 'Die Legende besagt, dass Vosh\'gajins Schlangenstein eine Axt mit einer einzigen Anwendung 1000 Jahre lang messerscharf machen würde!', 0),
+(5518, 'deDE', 'Von allen Zutaten die ich für die Herstellung des Anzugs brauche, ist das Ogergerbemittel sicherlich am schwersten zu beschaffen; doch eine Etage höher sollte noch etwas zu finden sein. Ok, ist schwer zu sagen, wenn einen diese Gefangenenkugel hier festhält...$B$BNa egal, bringt mir die benötigten Sachen und ich mache Euch einen so guten Ogeranzug, das Hauptmann Krombruch Euch für einen seiner Oger hält.', 0),
+(5863, 'deDE', 'Ich bin so besorgt! Bitte seid vorsichtig!', 0),
+(5881, 'deDE', 'Ihr habt Nachricht von Maggran Erdbinder?', 0),
+(7625, 'deDE', 'Wahrt Ihr schon in Jaedenar, $N? Habt Ihr den Sternenstaub von Lord Schattenfluch bekommen?', 0),
+(7723, 'deDE', 'Habt Ihr Ihnen eine Tracht Prügel verpasst?', 0),
+(9436, 'deDE', 'Enttäuscht mich nicht, $N. Wenn wir die Magie der Blutskalpe für unsere Zwecke einsetzen können, kann mein Volk vielleicht die Amanibedrohung auslöschen.', 0);

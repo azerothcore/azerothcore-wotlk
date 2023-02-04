@@ -760,7 +760,7 @@ public:
             data << uint32(SPELL_BOOM);
             me->SendMessageToSet(&data, false);
 
-            Unit::Kill(me, me);
+            me->KillSelf();
 
             // Visual only seems to work if the instant kill event is delayed or the spell itself is delayed
             // Casting done from player and caster source has the same targetinfo flags,
