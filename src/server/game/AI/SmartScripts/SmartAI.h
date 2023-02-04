@@ -274,6 +274,12 @@ public:
     void EventInform(uint32 eventId) override;
     void SpellHit(Unit* unit, SpellInfo const* spellInfo) override;
 
+    // Called when the gameobject summon successfully other creature
+    void JustSummoned(Creature* creature) override;
+
+    // Called when a summoned creature dissapears (UnSummoned)
+    void SummonedCreatureDespawn(Creature* unit) override;
+
     // Called when a summoned unit dies
     void SummonedCreatureDies(Creature* summon, Unit* killer) override;
 
