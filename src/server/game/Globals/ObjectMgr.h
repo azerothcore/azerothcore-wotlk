@@ -1207,7 +1207,7 @@ public:
     }
 
     [[nodiscard]] GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
-    [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
+    [[nodiscard]] GameObjectData const* GetGameObjectData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
         if (itr == _gameObjectDataStore.end()) return nullptr;

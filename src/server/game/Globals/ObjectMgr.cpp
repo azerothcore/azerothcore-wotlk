@@ -1356,7 +1356,7 @@ void ObjectMgr::LoadGameObjectAddons()
 
         ObjectGuid::LowType guid = fields[0].Get<uint32>();
 
-        const GameObjectData* goData = GetGOData(guid);
+        const GameObjectData* goData = GetGameObjectData(guid);
         if (!goData)
         {
             LOG_ERROR("sql.sql", "GameObject (GUID: {}) does not exist but has a record in `gameobject_addon`", guid);
@@ -1791,7 +1791,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    const GameObjectData* master = GetGOData(linkedGuidLow);
+                    const GameObjectData* master = GetGameObjectData(linkedGuidLow);
                     if (!master)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (linkedGuid) {} not found in gameobject table", linkedGuidLow);
@@ -1820,7 +1820,7 @@ void ObjectMgr::LoadLinkedRespawn()
                 }
             case GO_TO_GO:
                 {
-                    const GameObjectData* slave = GetGOData(guidLow);
+                    const GameObjectData* slave = GetGameObjectData(guidLow);
                     if (!slave)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (guid) {} not found in gameobject table", guidLow);
@@ -1828,7 +1828,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    const GameObjectData* master = GetGOData(linkedGuidLow);
+                    const GameObjectData* master = GetGameObjectData(linkedGuidLow);
                     if (!master)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (linkedGuid) {} not found in gameobject table", linkedGuidLow);
@@ -1857,7 +1857,7 @@ void ObjectMgr::LoadLinkedRespawn()
                 }
             case GO_TO_CREATURE:
                 {
-                    const GameObjectData* slave = GetGOData(guidLow);
+                    const GameObjectData* slave = GetGameObjectData(guidLow);
                     if (!slave)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (guid) {} not found in gameobject table", guidLow);
@@ -5253,7 +5253,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
 
             case SCRIPT_COMMAND_RESPAWN_GAMEOBJECT:
                 {
-                    GameObjectData const* data = GetGOData(tmp.RespawnGameobject.GOGuid);
+                    GameObjectData const* data = GetGameObjectData(tmp.RespawnGameobject.GOGuid);
                     if (!data)
                     {
                         LOG_ERROR("sql.sql", "Table `{}` has invalid gameobject (GUID: {}) in SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id {}",
@@ -5304,7 +5304,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
             case SCRIPT_COMMAND_OPEN_DOOR:
             case SCRIPT_COMMAND_CLOSE_DOOR:
                 {
-                    GameObjectData const* data = GetGOData(tmp.ToggleDoor.GOGuid);
+                    GameObjectData const* data = GetGameObjectData(tmp.ToggleDoor.GOGuid);
                     if (!data)
                     {
                         LOG_ERROR("sql.sql", "Table `{}` has invalid gameobject (GUID: {}) in {} for script id {}",
@@ -7903,7 +7903,7 @@ void ObjectMgr::DeleteCreatureData(ObjectGuid::LowType guid)
 void ObjectMgr::DeleteGOData(ObjectGuid::LowType guid)
 {
     // remove mapid*cellid -> guid_set map
-    GameObjectData const* data = GetGOData(guid);
+    GameObjectData const* data = GetGameObjectData(guid);
     if (data)
         RemoveGameobjectFromGrid(guid, data);
 
