@@ -52,8 +52,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (21136,0,1,'Death to the Last Guardian!',12,0,100,0,0,0,15171,0,'Infinite Chronomancer'),
 (21136,0,2,'We will not fail!',12,0,100,0,0,0,23332,0,'Infinite Chronomancer');
 
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`=2 WHERE `creature_id`=21136;
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`=3 WHERE `creature_id`=22165;
+DELETE FROM `creature_onkill_reputation` WHERE `creature_id` IN (21136,22165);
 
 -- Infinite Executioner
 UPDATE `creature_template` SET `difficulty_entry_1`=20742 WHERE `entry`=18994;
@@ -86,8 +85,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (21138,0,1,'We will not be stopped!',12,0,100,0,0,0,15166,0,'Infinite Executioner'),
 (21138,0,2,'Your efforts... are in vain.',12,0,100,0,0,0,15168,0,'Infinite Executioner');
 
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`=2 WHERE `creature_id`=21138;
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`=3 WHERE `creature_id`=22166;
+DELETE FROM `creature_onkill_reputation` WHERE `creature_id` IN (21138,22166);
 
 -- Infinite Vanquisher
 UPDATE `creature_template` SET `difficulty_entry_1`=20743 WHERE `entry`=18995;
@@ -111,8 +109,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (21139,0,1,'Death to the Last Guardian!',12,0,100,0,0,0,15171,0,'Infinite Vanquisher'),
 (21139,0,2,'We will not fail!',12,0,100,0,0,0,23332,0,'Infinite Vanquisher');
 
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`=2 WHERE `creature_id`=21139;
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`=3 WHERE `creature_id`=22168;
+DELETE FROM `creature_onkill_reputation` WHERE `creature_id` IN (21139,22168);
 
 -- Conditions
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=22 AND `SourceEntry` IN (17835,17892,18994,18995,21136,21137,21138,21139);
