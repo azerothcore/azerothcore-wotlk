@@ -498,9 +498,9 @@ public:
                         }
 
                         if (_baronRunTime > 0)
-                            events.ScheduleEvent(EVENT_BARON_TIME, 60000);
+                            events.ScheduleEvent(EVENT_BARON_TIME, 60s);
                         else
-                            events.ScheduleEvent(EVENT_EXECUTE_PRISONER, 0);
+                            events.ScheduleEvent(EVENT_EXECUTE_PRISONER, 0ms);
 
                         SaveToDB();
                         break;
@@ -518,7 +518,7 @@ public:
                                     Unit::Kill(baron, ysida);
                             }
                             else
-                                events.ScheduleEvent(EVENT_EXECUTE_PRISONER, 1000);
+                                events.ScheduleEvent(EVENT_EXECUTE_PRISONER, 1s);
                         }
                         break;
                     }
@@ -540,7 +540,7 @@ public:
                                         return;
                                     }
 
-                        events.ScheduleEvent(EVENT_FORCE_SLAUGHTER_EVENT, 3000);
+                        events.ScheduleEvent(EVENT_FORCE_SLAUGHTER_EVENT, 3s);
                         break;
                     }
                 case EVENT_SPAWN_BLACK_GUARD:

@@ -217,7 +217,7 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
 Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_lootRecipientGroup(0),
     m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500),
-    m_transportCheckTimer(1000), lootPickPocketRestoreTime(0),  m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
+    m_transportCheckTimer(1000), lootPickPocketRestoreTime(0), m_combatPulseTime(0), m_combatPulseDelay(0), m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_regenPower(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
     m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_detectionDistance(20.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr), _lastDamagedTime(nullptr), m_cannotReachTimer(0),
@@ -716,6 +716,24 @@ void Creature::Update(uint32 diff)
 
                 // xinef: update combat state, if npc is not in combat - return to spawn correctly by calling EnterEvadeMode
                 SelectVictim();
+            }
+
+            // if periodic combat pulse is enabled and we are both in combat and in a dungeon, do this now
+            if (m_combatPulseDelay > 0 && IsInCombat() && GetMap()->IsDungeon())
+            {
+                if (diff > m_combatPulseTime)
+                    m_combatPulseTime = 0;
+                else
+                    m_combatPulseTime -= diff;
+
+                if (m_combatPulseTime == 0)
+                {
+                    if (AI())
+                        AI()->DoZoneInCombat();
+                    else
+                        SetInCombatWithZone();
+                    m_combatPulseTime = m_combatPulseDelay * IN_MILLISECONDS;
+                }
             }
 
             // periodic check to see if the creature has passed an evade boundary
