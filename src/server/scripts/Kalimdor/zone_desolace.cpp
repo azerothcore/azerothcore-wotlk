@@ -101,7 +101,7 @@ public:
             _faction = 35;
             headNorth = true;
             me->setActive(true);
-            events.ScheduleEvent(EVENT_RESTART_ESCORT, 0);
+            events.ScheduleEvent(EVENT_RESTART_ESCORT, 0ms);
         }
 
         void JustRespawned() override
@@ -383,7 +383,7 @@ public:
                         break;
                     }
                 case 282:
-                    events.ScheduleEvent(EVENT_RESTART_ESCORT, 1000);
+                    events.ScheduleEvent(EVENT_RESTART_ESCORT, 1s);
                     break;
             }
         }
