@@ -140,7 +140,6 @@ public:
                 case NPC_INFINITE_CRONOMANCER:
                 case NPC_INFINITE_EXECUTIONER:
                 case NPC_INFINITE_VANQUISHER:
-                case NPC_DP_BEAM_STALKER:
                     encounterNPCs.erase(creature->GetGUID());
                     break;
             }
@@ -193,11 +192,29 @@ public:
                         Events.RescheduleEvent(EVENT_NEXT_PORTAL, 4000);
                     break;
                 case DATA_MEDIVH:
+                {
                     DoUpdateWorldState(WORLD_STATE_BM, 1);
                     DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
                     DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
                     Events.RescheduleEvent(EVENT_NEXT_PORTAL, 3000);
+
+                    for (ObjectGuid const& guid : encounterNPCs)
+                    {
+                        if (guid.GetEntry() == NPC_DP_BEAM_STALKER)
+                        {
+                            if (Creature* creature = instance->GetCreature(guid))
+                            {
+                                if (!creature->IsAlive())
+                                {
+                                    creature->Respawn(true);
+                                }
+                            }
+                            break;
+                        }
+                    }
+
                     break;
+                }
                 case DATA_DAMAGE_SHIELD:
                 {
                     if (_shieldPercent <= 0)
