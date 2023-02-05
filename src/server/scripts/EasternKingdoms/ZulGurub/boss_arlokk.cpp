@@ -259,7 +259,7 @@ public:
                         me->RemoveAura(SPELL_SUPER_INVIS);
                         me->RemoveAura(SPELL_VANISH);
                         events.ScheduleEvent(EVENT_RAVAGE, 10s, 14s, 0, PHASE_TWO);
-                        events.ScheduleEvent(EVENT_TRANSFORM_BACK, 30s, 40s), 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_TRANSFORM_BACK, 30s, 40s, 0, PHASE_TWO);
                         events.SetPhase(PHASE_TWO);
                         me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
                         break;
