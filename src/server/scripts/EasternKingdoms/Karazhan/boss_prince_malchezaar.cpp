@@ -363,7 +363,6 @@ struct boss_malchezaar : public BossAI
     }
 };
 
-
 struct npc_netherspite_infernal : public ScriptedAI
 {
     npc_netherspite_infernal(Creature* creature) : ScriptedAI(creature), point(nullptr) { }
