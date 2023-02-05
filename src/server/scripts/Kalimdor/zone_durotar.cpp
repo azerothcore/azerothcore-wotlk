@@ -161,16 +161,19 @@ public:
             _events.ScheduleEvent(EVENT_NOSUMMON, 50000);
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
-            if (summoner->GetTypeId() != TYPEID_PLAYER || !summoner->GetVehicle())
-                return;
-
-            _tigerGuid = summoner->GetVehicle()->GetBase()->GetGUID();
-            if (Unit* tiger = ObjectAccessor::GetUnit(*me, _tigerGuid))
+            if (Player* player = summoner->ToPlayer())
             {
-                me->AddThreat(tiger, 500000.0f);
-                DoCast(me, SPELL_FURIOUS_BITE);
+                if (Vehicle* vehicle = player->GetVehicle())
+                {
+                    _tigerGuid = vehicle->GetBase()->GetGUID();
+                    if (Unit* tiger = ObjectAccessor::GetUnit(*me, _tigerGuid))
+                    {
+                        me->AddThreat(tiger, 500000.0f);
+                        DoCast(me, SPELL_FURIOUS_BITE);
+                    }
+                }
             }
         }
 

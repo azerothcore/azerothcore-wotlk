@@ -132,7 +132,7 @@ struct boss_jarien : public BossAI
         _Reset();
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         Talk(SAY_JARIEN_ON_SUMMON_0);
 
@@ -257,7 +257,7 @@ struct boss_sothos : public BossAI
         _Reset();
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         _scheduler.Schedule(12s, [this](TaskContext /*context*/)
             {

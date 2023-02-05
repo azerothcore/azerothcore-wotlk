@@ -217,7 +217,7 @@ struct npc_shade_of_jindo : public ScriptedAI
 {
     npc_shade_of_jindo(Creature* creature) : ScriptedAI(creature) { }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         DoZoneInCombat();
         DoCastSelf(SPELL_SHADE_OF_JINDO_PASSIVE, true);

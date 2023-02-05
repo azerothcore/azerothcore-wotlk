@@ -119,7 +119,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         }
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Replace sphere instantly if sphere is summoned after prince death
         if (instance->GetBossState(DATA_PRINCE_TALDARAM) != IN_PROGRESS)
