@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `skill_perfect_item_template` (
   `perfectCreateChance` float NOT NULL DEFAULT '0' COMMENT 'chance to create the perfect item instead',
   `perfectItemType` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'perfect item type to create instead',
   PRIMARY KEY (`spellId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Crafting Perfection System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Crafting Perfection System';
 
 -- Dumping data for table acore_world.skill_perfect_item_template: 72 rows
 DELETE FROM `skill_perfect_item_template`;

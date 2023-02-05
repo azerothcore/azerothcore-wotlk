@@ -828,7 +828,7 @@ public:
     void Update(uint32 p_time) override;
     [[nodiscard]] GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
     [[nodiscard]] GameObjectTemplateAddon const* GetTemplateAddon() const;
-    [[nodiscard]] GameObjectData const* GetGOData() const { return m_goData; }
+    [[nodiscard]] GameObjectData const* GetGameObjectData() const { return m_goData; }
     [[nodiscard]] GameObjectValue const* GetGOValue() const { return &m_goValue; }
 
     [[nodiscard]] bool IsTransport() const;

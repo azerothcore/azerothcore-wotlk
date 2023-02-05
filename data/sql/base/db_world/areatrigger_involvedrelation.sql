@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_involvedrelation` (
   `id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
   `quest` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Trigger System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';
 
 -- Dumping data for table acore_world.areatrigger_involvedrelation: 59 rows
 DELETE FROM `areatrigger_involvedrelation`;

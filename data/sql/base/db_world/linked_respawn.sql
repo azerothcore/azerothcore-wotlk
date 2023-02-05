@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `linked_respawn` (
   `linkedGuid` int unsigned NOT NULL COMMENT 'master creature',
   `linkType` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`linkType`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='Creature Respawn Link System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Creature Respawn Link System';
 
 -- Dumping data for table acore_world.linked_respawn: 5,749 rows
 DELETE FROM `linked_respawn`;

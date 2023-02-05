@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `updates` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'timestamp when the query was applied.',
   `speed` int unsigned NOT NULL DEFAULT '0' COMMENT 'time the query takes to apply in ms.',
   PRIMARY KEY (`name`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='List of all applied updates in this database.';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='List of all applied updates in this database.';
 
 -- Dumping data for table acore_characters.updates: 57 rows
 DELETE FROM `updates`;

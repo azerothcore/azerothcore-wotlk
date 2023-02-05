@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `log_money` (
   `topic` text NOT NULL,
   `date` datetime NOT NULL,
   `type` tinyint NOT NULL COMMENT '1=COD,2=AH,3=GB DEPOSIT,4=GB WITHDRAW,5=MAIL,6=TRADE'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_characters.log_money: 0 rows
 DELETE FROM `log_money`;

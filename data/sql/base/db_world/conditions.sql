@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `conditions` (
   `ScriptName` char(64) NOT NULL DEFAULT '',
   `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Condition System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Condition System';
 
 -- Dumping data for table acore_world.conditions: 14,884 rows
 DELETE FROM `conditions`;

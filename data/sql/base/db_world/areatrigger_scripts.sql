@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_scripts` (
   `entry` mediumint NOT NULL,
   `ScriptName` char(64) NOT NULL,
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.areatrigger_scripts: 138 rows
 DELETE FROM `areatrigger_scripts`;

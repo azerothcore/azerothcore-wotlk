@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `game_tele` (
   `map` smallint unsigned NOT NULL DEFAULT '0',
   `name` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1492 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tele Command';
+) ENGINE=MyISAM AUTO_INCREMENT=1492 DEFAULT CHARSET=utf8mb4 COMMENT='Tele Command';
 
 -- Dumping data for table acore_world.game_tele: 1,491 rows
 DELETE FROM `game_tele`;

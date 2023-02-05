@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `acore_string` (
   `locale_esMX` text,
   `locale_ruRU` text,
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.acore_string: 1,153 rows
 DELETE FROM `acore_string`;

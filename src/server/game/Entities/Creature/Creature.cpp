@@ -648,15 +648,22 @@ void Creature::Update(uint32 diff)
 
                 ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
                 time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
-                if (!linkedRespawntime)             // Can respawn
+
+                CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(GetEntry());
+
+                if (!linkedRespawntime || (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)))             // Can respawn
                     Respawn();
                 else                                // the master is dead
                 {
                     ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
                     if (targetGuid == dbtableHighGuid) // if linking self, never respawn (check delayed to next day)
+                    {
                         SetRespawnTime(DAY);
+                    }
                     else
+                    {
                         m_respawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE); // else copy time from master and add a little
+                    }
                     SaveRespawnTime(); // also save to DB immediately
                 }
             }

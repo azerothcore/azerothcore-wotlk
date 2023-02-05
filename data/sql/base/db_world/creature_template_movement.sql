@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_movement` (
   `Random` tinyint unsigned DEFAULT NULL,
   `InteractionPauseTimer` int unsigned DEFAULT NULL COMMENT 'Time (in milliseconds) during which creature will not move after interaction with player',
   PRIMARY KEY (`CreatureId`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.creature_template_movement: 4,440 rows
 DELETE FROM `creature_template_movement`;

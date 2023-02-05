@@ -1697,6 +1697,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Creature Model Based Info Data...");
     sObjectMgr->LoadCreatureModelInfo();
 
+    LOG_INFO("server.loading", "Loading Creature Custom IDs Config...");
+    sObjectMgr->LoadCreatureCustomIDs();
+
     LOG_INFO("server.loading", "Loading Creature Templates...");
     sObjectMgr->LoadCreatureTemplates();
 
@@ -3130,20 +3133,9 @@ void World::InitCalendarOldEventsDeletionTime()
     Seconds currentDeletionTime = Seconds(getWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME));
     Seconds nextDeletionTime = currentDeletionTime > 0s ? currentDeletionTime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR)));
 
-    // If the reset time saved in the worldstate is before now it means the server was offline when the reset was supposed to occur.
-    // In this case we set the reset time in the past and next world update will do the reset and schedule next one in the future.
-    if (currentDeletionTime < GameTime::GetGameTime())
-    {
-        _nextCalendarOldEventsDeletionTime = nextDeletionTime - 1_days;
-    }
-    else
-    {
-        _nextCalendarOldEventsDeletionTime = nextDeletionTime;
-    }
-
     if (currentDeletionTime == 0s)
     {
-        sWorld->setWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, _nextCalendarOldEventsDeletionTime.count());
+        sWorld->setWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, nextDeletionTime.count());
     }
 }
 
@@ -3254,7 +3246,7 @@ void World::CalendarDeleteOldEvents()
 {
     LOG_INFO("server.worldserver", "Calendar deletion of old events.");
 
-    _nextCalendarOldEventsDeletionTime += 1_days;
+    _nextCalendarOldEventsDeletionTime = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR)));
     sWorld->setWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, _nextCalendarOldEventsDeletionTime.count());
     sCalendarMgr->DeleteOldEvents();
 }

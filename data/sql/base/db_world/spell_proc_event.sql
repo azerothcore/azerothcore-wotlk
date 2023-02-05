@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `spell_proc_event` (
   `CustomChance` float NOT NULL DEFAULT '0',
   `Cooldown` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.spell_proc_event: 813 rows
 DELETE FROM `spell_proc_event`;

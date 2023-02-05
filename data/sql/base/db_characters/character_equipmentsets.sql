@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `character_equipmentsets` (
   PRIMARY KEY (`setguid`),
   UNIQUE KEY `idx_set` (`guid`,`setguid`,`setindex`),
   KEY `Idx_setindex` (`setindex`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_characters.character_equipmentsets: ~0 rows (approximately)
 DELETE FROM `character_equipmentsets`;

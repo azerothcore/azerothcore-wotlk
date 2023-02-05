@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `script_waypoint` (
   `waittime` int unsigned NOT NULL DEFAULT '0' COMMENT 'waittime in millisecs',
   `point_comment` text,
   PRIMARY KEY (`entry`,`pointid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Script Creature waypoints';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Script Creature waypoints';
 
 -- Dumping data for table acore_world.script_waypoint: 2,388 rows
 DELETE FROM `script_waypoint`;

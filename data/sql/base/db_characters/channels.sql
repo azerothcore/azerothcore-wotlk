@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `channels` (
   `password` varchar(32) DEFAULT NULL,
   `lastUsed` int unsigned NOT NULL,
   PRIMARY KEY (`channelId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Channel System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Channel System';
 
 -- Dumping data for table acore_characters.channels: ~0 rows (approximately)
 DELETE FROM `channels`;

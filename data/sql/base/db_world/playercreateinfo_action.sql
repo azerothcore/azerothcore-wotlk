@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `playercreateinfo_action` (
   `type` smallint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`race`,`class`,`button`),
   KEY `playercreateinfo_race_class_index` (`race`,`class`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.playercreateinfo_action: 283 rows
 DELETE FROM `playercreateinfo_action`;

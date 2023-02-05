@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_addon` (
   `invisibilityType` tinyint unsigned NOT NULL DEFAULT '0',
   `invisibilityValue` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.gameobject_addon: 32 rows
 DELETE FROM `gameobject_addon`;

@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `transports` (
   `ScriptName` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`guid`),
   UNIQUE KEY `idx_entry` (`entry`)
-) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Transports';
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Transports';
 
 -- Dumping data for table acore_world.transports: 20 rows
 DELETE FROM `transports`;

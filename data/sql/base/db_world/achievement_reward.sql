@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `achievement_reward` (
   `Body` text,
   `MailTemplateID` mediumint unsigned DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Loot System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
 -- Dumping data for table acore_world.achievement_reward: 103 rows
 DELETE FROM `achievement_reward`;

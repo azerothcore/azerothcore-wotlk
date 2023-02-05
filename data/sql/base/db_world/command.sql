@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `command` (
   `security` tinyint unsigned NOT NULL DEFAULT '0',
   `help` longtext,
   PRIMARY KEY (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Chat System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Chat System';
 
 -- Dumping data for table acore_world.command: 585 rows
 DELETE FROM `command`;

@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `player_loot_template` (
   `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
   `Comment` text,
   PRIMARY KEY (`Entry`,`Item`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Loot System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Loot System';
 
 -- Dumping data for table acore_world.player_loot_template: 20 rows
 DELETE FROM `player_loot_template`;

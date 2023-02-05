@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `spellitemenchantmentcondition_dbc` (
   `Logic_4` tinyint unsigned NOT NULL DEFAULT '0',
   `Logic_5` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.spellitemenchantmentcondition_dbc: 0 rows
 DELETE FROM `spellitemenchantmentcondition_dbc`;

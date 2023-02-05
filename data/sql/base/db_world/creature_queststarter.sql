@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `creature_queststarter` (
   `id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
   `quest` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Creature System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Creature System';
 
 -- Dumping data for table acore_world.creature_queststarter: 7,497 rows
 DELETE FROM `creature_queststarter`;
