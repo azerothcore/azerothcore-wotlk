@@ -23,6 +23,7 @@
 #include "CreatureAIImpl.h"
 #include "InstanceScript.h"
 #include "EventMap.h"
+#include "TaskScheduler.h"
 
 #define CAST_AI(a, b)   (dynamic_cast<a*>(b))
 
@@ -437,6 +438,8 @@ public:
 
     InstanceScript* const instance;
 
+    bool CanRespawn() override;
+
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
     void SummonedCreatureDespawnAll() override;
@@ -448,6 +451,8 @@ public:
     // note: You must re-schedule the event within this method if the event
     // is supposed to run more than once
     virtual void ExecuteEvent(uint32 /*eventId*/) { }
+
+    virtual void ScheduleTasks() { }
 
     void Reset() override { _Reset(); }
     void EnterCombat(Unit* /*who*/) override { _EnterCombat(); }
@@ -464,6 +469,7 @@ protected:
 
     EventMap events;
     SummonList summons;
+    TaskScheduler scheduler;
 
 private:
     uint32 const _bossId;

@@ -1456,7 +1456,7 @@ public:
     {
         npc_living_infernoAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             me->SetInCombatWithZone();
             me->CastSpell(me, SPELL_BLAZING_AURA, true);
