@@ -96,7 +96,7 @@ public:
         {
             events.Reset();
             events.ScheduleEvent(EVENT_CHARGE_TARGET, 2s, 12s);
-            events.ScheduleEvent(EVENT_CLEAVE, 1s,11s);
+            events.ScheduleEvent(EVENT_CLEAVE, 1s, 11s);
             events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, 2s);
             events.ScheduleEvent(EVENT_WHIRLWIND, 5s, 20s);
             events.ScheduleEvent(EVENT_ENRAGE, 5s, 20s);
