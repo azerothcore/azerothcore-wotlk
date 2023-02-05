@@ -107,7 +107,7 @@ public:
             switch (type)
             {
                 case DATA_STATUES:
-                    _events.ScheduleEvent(DATA_STATUES, 0);
+                    _events.ScheduleEvent(DATA_STATUES, 0ms);
                     break;
                 case DATA_DEFENDER_KILLED:
                     ++_defendersKilled;

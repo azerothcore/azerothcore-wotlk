@@ -61,11 +61,11 @@ struct boss_jindo : public BossAI
     void EnterCombat(Unit* who) override
     {
         BossAI::EnterCombat(who);
-        events.ScheduleEvent(EVENT_BRAIN_WASH_TOTEM, 20000);
-        events.ScheduleEvent(EVENT_POWERFULL_HEALING_WARD, 16000);
-        events.ScheduleEvent(EVENT_HEX, 8000);
-        events.ScheduleEvent(EVENT_DELUSIONS_OF_JINDO, 10000);
-        events.ScheduleEvent(EVENT_TELEPORT, 5000);
+        events.ScheduleEvent(EVENT_BRAIN_WASH_TOTEM, 20s);
+        events.ScheduleEvent(EVENT_POWERFULL_HEALING_WARD, 16s);
+        events.ScheduleEvent(EVENT_HEX, 8s);
+        events.ScheduleEvent(EVENT_DELUSIONS_OF_JINDO, 10s);
+        events.ScheduleEvent(EVENT_TELEPORT, 5s);
 
         Talk(SAY_AGGRO);
 
@@ -125,24 +125,24 @@ struct boss_jindo : public BossAI
             {
             case EVENT_BRAIN_WASH_TOTEM:
                 DoCastSelf(SPELL_BRAIN_WASH_TOTEM);
-                events.ScheduleEvent(EVENT_BRAIN_WASH_TOTEM, urand(18000, 26000));
+                events.ScheduleEvent(EVENT_BRAIN_WASH_TOTEM, 18s, 26s);
                 break;
             case EVENT_POWERFULL_HEALING_WARD:
                 DoCastSelf(SPELL_POWERFULL_HEALING_WARD, true);
-                events.ScheduleEvent(EVENT_POWERFULL_HEALING_WARD, urand(14000, 20000));
+                events.ScheduleEvent(EVENT_POWERFULL_HEALING_WARD, 14s, 20s);
                 break;
             case EVENT_HEX:
                 if (me->GetThreatMgr().GetThreatListSize() > 1)
                     DoCastVictim(SPELL_HEX, true);
-                events.ScheduleEvent(EVENT_HEX, urand(12000, 20000));
+                events.ScheduleEvent(EVENT_HEX, 12s, 20s);
                 break;
             case EVENT_DELUSIONS_OF_JINDO:
                 DoCastRandomTarget(SPELL_DELUSIONS_OF_JINDO);
-                events.ScheduleEvent(EVENT_DELUSIONS_OF_JINDO, urand(4000, 12000));
+                events.ScheduleEvent(EVENT_DELUSIONS_OF_JINDO, 4s, 12s);
                 break;
             case EVENT_TELEPORT:
                 DoCastRandomTarget(SPELL_BANISH);
-                events.ScheduleEvent(EVENT_TELEPORT, urand(15000, 23000));
+                events.ScheduleEvent(EVENT_TELEPORT, 15s, 23s);
                 break;
             default:
                 break;
