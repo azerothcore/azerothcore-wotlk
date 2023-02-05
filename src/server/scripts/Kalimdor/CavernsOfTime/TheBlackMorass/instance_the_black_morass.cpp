@@ -220,7 +220,7 @@ public:
                                     medivh->AI()->Talk(SAY_MEDIV_DEATH);
                                 }
 
-                                Events.ScheduleEvent(EVENT_WIPE_1, 4000);
+                                Events.ScheduleEvent(EVENT_WIPE_1, 4s);
 
                                 for (ObjectGuid const& guid : encounterNPCs)
                                 {
@@ -347,7 +347,7 @@ public:
                     {
                         medivh->RemoveAllAuras();
                     }
-                    Events.ScheduleEvent(EVENT_WIPE_2, 500);
+                    Events.ScheduleEvent(EVENT_WIPE_2, 500ms);
                     break;
                 case EVENT_WIPE_2:
                     if (Creature* medivh = instance->GetCreature(_medivhGUID))
@@ -373,7 +373,7 @@ public:
                             }
                         }
                     }
-                    Events.ScheduleEvent(EVENT_WIPE_3, 2000);
+                    Events.ScheduleEvent(EVENT_WIPE_3, 2s);
                     break;
                 case EVENT_WIPE_3:
                 {
