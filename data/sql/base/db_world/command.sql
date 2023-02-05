@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.command
+-- Dumping structure for table acore_world.command
 DROP TABLE IF EXISTS `command`;
 CREATE TABLE IF NOT EXISTS `command` (
   `name` varchar(50) NOT NULL DEFAULT '',
@@ -21,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `command` (
   PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Chat System';
 
--- Dumpar data för tabell acore_world.command: 583 rows
+-- Dumping data for table acore_world.command: 585 rows
 DELETE FROM `command`;
 /*!40000 ALTER TABLE `command` DISABLE KEYS */;
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
@@ -607,9 +609,12 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('deserter bg remove', 3, 'Syntax: .deserter bg remove $playerName \n\n Removes the bg deserter debuff from a player or your target.'),
 	('deserter bg remove all', 3, 'Syntax: .deserter bg remove all <$maxDuration>\r\n Removes the bg deserter debuff from all online and offline players.\nOptional $maxDuration sets the maximum duration to be removed. Use a timestring like "1h45m". "-1" for any duration. Default: 15m'),
 	('debug play visual', 3, 'Syntax: .debug play visual #visualid\r\nPlay spell visual with #visualid.\n#visualid refers to the ID from SpellVisualKit.dbc'),
-	('npc guid', 1, 'Syntax: .npc guid\r\n\r\nDisplays GUID, faction, NPC flags, Entry ID, Model ID for selected creature.');
+	('npc guid', 1, 'Syntax: .npc guid\r\n\r\nDisplays GUID, faction, NPC flags, Entry ID, Model ID for selected creature.'),
+	('go creature id', 1, 'Syntax: .go creature id #creature_entry\nTeleports you to the given creature entry.'),
+	('character changeaccount', 3, 'Syntax: .character changeaccount $NewAccountName $Name.\nMoves the specified character to the provided account. \nKicks the player if the character is online.');
 /*!40000 ALTER TABLE `command` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
