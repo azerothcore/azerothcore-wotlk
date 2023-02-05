@@ -841,6 +841,9 @@ void ObjectMgr::LoadCreatureTemplateAddons()
     LOG_INFO("server.loading", " ");
 }
 
+/**
+ * @brief Load config option Creatures.CustomIDs into Store
+ */
 void ObjectMgr::LoadCreatureCustomIDs()
 {
     // Hack for modules
