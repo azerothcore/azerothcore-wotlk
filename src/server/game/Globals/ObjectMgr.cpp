@@ -841,6 +841,21 @@ void ObjectMgr::LoadCreatureTemplateAddons()
     LOG_INFO("server.loading", " ");
 }
 
+/**
+ * @brief Load config option Creatures.CustomIDs into Store
+ */
+void ObjectMgr::LoadCreatureCustomIDs()
+{
+    // Hack for modules
+    std::string stringCreatureIds = sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "");
+    std::vector<std::string_view> CustomCreatures = Acore::Tokenize(stringCreatureIds, ',', false);
+
+    for (auto itr : CustomCreatures)
+    {
+        _creatureCustomIDsStore.push_back(Acore::StringTo<uint32>(itr).value());
+    }
+}
+
 void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 {
     if (!cInfo)
@@ -1183,15 +1198,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     const_cast<CreatureTemplate*>(cInfo)->DamageModifier *= Creature::_GetDamageMod(cInfo->rank);
 
     // Hack for modules
-    std::vector<uint32> CustomCreatures;
-    std::string stringCreatureIds(sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", ""));
-    for (std::string_view id : Acore::Tokenize(stringCreatureIds, ',', false))
-    {
-        uint32 entry = Acore::StringTo<uint32>(id).value_or(0);
-        CustomCreatures.emplace_back(entry);
-    }
-
-    for (auto const& itr : CustomCreatures)
+    for (auto itr : _creatureCustomIDsStore)
     {
         if (cInfo->Entry == itr)
             return;
