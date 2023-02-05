@@ -391,7 +391,7 @@ public:
             else if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
                 startPath = true;
             else if (type == EFFECT_MOTION_TYPE && pointId == me->GetEntry())
-                Unit::Kill(me, me);
+                me->KillSelf();
         }
 
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override

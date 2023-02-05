@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.areatrigger_scripts
+-- Dumping structure for table acore_world.areatrigger_scripts
 DROP TABLE IF EXISTS `areatrigger_scripts`;
 CREATE TABLE IF NOT EXISTS `areatrigger_scripts` (
   `entry` mediumint NOT NULL,
@@ -20,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_scripts` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.areatrigger_scripts: 131 rows
+-- Dumping data for table acore_world.areatrigger_scripts: 138 rows
 DELETE FROM `areatrigger_scripts`;
 /*!40000 ALTER TABLE `areatrigger_scripts` DISABLE KEYS */;
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
@@ -154,9 +156,17 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(4052, 'at_battleguard_sartura'),
 	(3956, 'at_zulgurub_bridge_speech'),
 	(3961, 'at_zulgurub_bloodfire_pit_speech'),
-	(3962, 'at_zulgurub_edge_of_madness_speech');
+	(3962, 'at_zulgurub_edge_of_madness_speech'),
+	(4047, 'at_twin_emperors'),
+	(4033, 'at_cthun_stomach_exit'),
+	(4036, 'at_cthun_center'),
+	(1986, 'near_scarshield_infiltrator'),
+	(1946, 'at_scarshield_infiltrator'),
+	(4156, 'at_naxxramas_hub_portal'),
+	(4302, 'at_underbog_ghazan');
 /*!40000 ALTER TABLE `areatrigger_scripts` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

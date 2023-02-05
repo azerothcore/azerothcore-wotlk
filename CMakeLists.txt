@@ -71,7 +71,7 @@ FOREACH(subdir ${sub_DIRS})
         continue()
     endif()
 
-    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
+    STRING(REPLACE "${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
     if(EXISTS "${subdir}/CMakeLists.txt")
         add_subdirectory("${subdir_rel}")
     endif()

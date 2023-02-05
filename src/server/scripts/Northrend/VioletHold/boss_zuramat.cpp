@@ -246,7 +246,7 @@ public:
                         if (s->IsAlive())
                             good = true;
                 if (!good)
-                    Unit::Kill(me, me);
+                    me->KillSelf();
             }
             else
                 checkTimer -= diff;

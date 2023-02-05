@@ -57,7 +57,7 @@ public:
     {
         boss_gahzrankaAI(Creature* creature) : BossAI(creature, DATA_GAHZRANKA) { }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
         }
@@ -130,7 +130,7 @@ class spell_gahzranka_slam : public SpellScript
     {
         if (Unit* caster = GetCaster())
         {
-            _wipeThreat = targets.size() < caster->GetThreatMgr().GetThreatListSize();;
+            _wipeThreat = targets.size() < caster->GetThreatMgr().GetThreatListSize();
         }
     }
 

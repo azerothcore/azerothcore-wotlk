@@ -474,7 +474,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     SetSpeed(MOVE_FLIGHT, cinfo->speed_flight);
 
     // Will set UNIT_FIELD_BOUNDINGRADIUS and UNIT_FIELD_COMBATREACH
-    SetObjectScale(cinfo->scale);
+    SetObjectScale(GetNativeObjectScale());
 
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, cinfo->HoverHeight);
 
@@ -546,7 +546,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     }
 
     SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
-    CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(getLevel(), cInfo->unit_class);
+    CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), cInfo->unit_class);
     float armor = (float)stats->GenerateArmor(cInfo); // TODO: Why is this treated as uint32 when it's a float?
     SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, armor);
     SetModifierValue(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
@@ -648,15 +648,22 @@ void Creature::Update(uint32 diff)
 
                 ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
                 time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
-                if (!linkedRespawntime)             // Can respawn
+
+                CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(GetEntry());
+
+                if (!linkedRespawntime || (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)))             // Can respawn
                     Respawn();
                 else                                // the master is dead
                 {
                     ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
                     if (targetGuid == dbtableHighGuid) // if linking self, never respawn (check delayed to next day)
+                    {
                         SetRespawnTime(DAY);
+                    }
                     else
+                    {
                         m_respawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE); // else copy time from master and add a little
+                    }
                     SaveRespawnTime(); // also save to DB immediately
                 }
             }
@@ -1036,7 +1043,7 @@ void Creature::DoFleeToGetAssistance()
         if (!creature)
             //SetFeared(true, GetVictim()->GetGUID(), 0, sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY));
             //TODO: use 31365
-            SetControlled(true, UNIT_STATE_FLEEING);
+            SetControlled(true, UNIT_STATE_FLEEING, GetVictim());
         else
             GetMotionMaster()->MoveSeekAssistance(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ());
     }
@@ -1213,7 +1220,7 @@ bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
 
 bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
 {
-    return player->getLevel() >= 10
+    return player->GetLevel() >= 10
            && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
            && player->getClass() == GetCreatureTemplate()->trainer_class;
 }
@@ -2097,22 +2104,24 @@ void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0*/, Seconds f
         ForcedDespawn(msTimeToDespawn.count(), forcedRespawnTimer);
 }
 
-void Creature::DespawnOnEvade()
+void Creature::DespawnOnEvade(Seconds respawnDelay)
 {
-    SetVisible(false);
     AI()->SummonedCreatureDespawnAll();
-}
 
-void Creature::RespawnOnEvade()
-{
-    SetVisible(true);
-    UpdateMovementFlags();
-    AI()->Reset();
-    AI()->JustReachedHome();
-    if (IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
+    if (respawnDelay < 2s)
     {
-        GetVehicleKit()->Reset(true);
+        LOG_WARN("entities.unit", "DespawnOnEvade called with delay of {} seconds, defaulting to 2.", respawnDelay.count());
+        respawnDelay = 2s;
     }
+
+    if (TempSummon* whoSummon = ToTempSummon())
+    {
+        LOG_WARN("entities.unit", "DespawnOnEvade called on a temporary summon.");
+        whoSummon->UnSummon();
+        return;
+    }
+
+    DespawnOrUnsummon(Milliseconds(0), respawnDelay);
 }
 
 void Creature::InitializeReactState()
@@ -2898,7 +2907,7 @@ uint8 Creature::getLevelForTarget(WorldObject const* target) const
     if (!isWorldBoss() || !target->ToUnit())
         return Unit::getLevelForTarget(target);
 
-    uint16 level = target->ToUnit()->getLevel() + sWorld->getIntConfig(CONFIG_WORLD_BOSS_LEVEL_DIFF);
+    uint16 level = target->ToUnit()->GetLevel() + sWorld->getIntConfig(CONFIG_WORLD_BOSS_LEVEL_DIFF);
     if (level < 1)
         return 1;
     if (level > 255)
@@ -3348,6 +3357,11 @@ void Creature::UpdateMovementFlags()
     }
 
     SetSwim(CanSwim() && Swim);
+}
+
+float Creature::GetNativeObjectScale() const
+{
+    return GetCreatureTemplate()->scale;
 }
 
 void Creature::SetObjectScale(float scale)
