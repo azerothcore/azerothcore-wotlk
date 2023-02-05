@@ -172,9 +172,12 @@ struct npc_invisible_tractor_beam_source : public NullCreatureAI
 {
     npc_invisible_tractor_beam_source(Creature* creature) : NullCreatureAI(creature) { }
 
-    void IsSummonedBy(Unit* summoner) override
+    void IsSummonedBy(WorldObject* summoner) override
     {
-        DoCast(summoner, SPELL_TRACTOR_BEAM_PULL, true);
+        if (Unit* summonerUnit = summoner->ToUnit())
+        {
+            DoCast(summonerUnit, SPELL_TRACTOR_BEAM_PULL, true);
+        }
     }
 };
 
@@ -310,8 +313,8 @@ class spell_gruul_shatter_effect : public SpellScript
 
 void AddSC_boss_gruul()
 {
-    RegisterGruulsLairCreatureAI(boss_gruul);
-    RegisterGruulsLairCreatureAI(npc_invisible_tractor_beam_source);
+    RegisterGruulsLairAI(boss_gruul);
+    RegisterGruulsLairAI(npc_invisible_tractor_beam_source);
 
     RegisterSpellScript(spell_gruul_ground_slam);
     RegisterSpellScript(spell_tractor_beam_creator);
