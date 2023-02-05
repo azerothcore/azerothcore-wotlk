@@ -1456,7 +1456,7 @@ struct npc_chesspiece : public ScriptedAI
     {
     }
 
-    void MovementInform(uint32 movementType, uint32 pointId) override
+    void MovementInform(uint32 movementType, uint32 /*pointId*/) override
     {
         if (movementType != POINT_MOTION_TYPE)
         {
