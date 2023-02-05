@@ -75,7 +75,12 @@ enum CreatureIds
     NPC_INFINITE_WHELP                  = 21818,
     NPC_INFINITE_CRONOMANCER            = 17892,
     NPC_INFINITE_EXECUTIONER            = 18994,
-    NPC_INFINITE_VANQUISHER             = 18995
+    NPC_INFINITE_VANQUISHER             = 18995,
+
+    NPC_INFINITE_ASSASIN_2              = 21137,
+    NPC_INFINITE_CRONOMANCER_2          = 21136,
+    NPC_INFINITE_EXECUTIONER_2          = 21138,
+    NPC_INFINITE_VANQUISHER_2           = 21139
 };
 
 enum Misc
