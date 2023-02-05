@@ -225,7 +225,7 @@ public:
             // Prevent EvadeMode
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             // Let Zarithrian count as summoner. _instance cant be null since we got GetRubySanctumAI
             if (Creature* zarithrian = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_GENERAL_ZARITHRIAN)))

@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.creature_queststarter
+-- Dumping structure for table acore_world.creature_queststarter
 DROP TABLE IF EXISTS `creature_queststarter`;
 CREATE TABLE IF NOT EXISTS `creature_queststarter` (
   `id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
@@ -20,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `creature_queststarter` (
   PRIMARY KEY (`id`,`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Creature System';
 
--- Dumpar data för tabell acore_world.creature_queststarter: 7 462 rows
+-- Dumping data for table acore_world.creature_queststarter: 7,497 rows
 DELETE FROM `creature_queststarter`;
 /*!40000 ALTER TABLE `creature_queststarter` DISABLE KEYS */;
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
@@ -141,6 +143,7 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(311, 269),
 	(311, 323),
 	(313, 94),
+	(313, 249),
 	(328, 1860),
 	(328, 1919),
 	(332, 141),
@@ -3454,6 +3457,7 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(15534, 8613),
 	(15534, 8614),
 	(15535, 8615),
+	(15535, 8616),
 	(15540, 8507),
 	(15540, 8731),
 	(15540, 8800),
@@ -3511,15 +3515,42 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(15612, 8732),
 	(15624, 8734),
 	(15693, 8745),
+	(15700, 8851),
+	(15700, 8852),
+	(15700, 8853),
+	(15700, 8854),
+	(15700, 8855),
+	(15701, 8846),
+	(15701, 8847),
+	(15701, 8848),
+	(15701, 8849),
+	(15701, 8850),
 	(15702, 8792),
 	(15703, 8793),
 	(15704, 8794),
 	(15707, 8795),
 	(15709, 8797),
+	(15731, 8811),
+	(15731, 8819),
 	(15732, 8827),
 	(15732, 8828),
 	(15732, 8860),
 	(15732, 8861),
+	(15733, 8812),
+	(15733, 8820),
+	(15734, 8813),
+	(15734, 8821),
+	(15735, 8814),
+	(15735, 8822),
+	(15736, 8815),
+	(15736, 8823),
+	(15737, 8816),
+	(15737, 8824),
+	(15738, 8815),
+	(15738, 8826),
+	(15738, 8842),
+	(15739, 8818),
+	(15739, 8825),
 	(15761, 8818),
 	(15761, 8826),
 	(15761, 8844),
@@ -4735,6 +4766,7 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(19935, 11105),
 	(19935, 11106),
 	(19935, 13432),
+	(19942, 10259),
 	(20066, 10267),
 	(20066, 10268),
 	(20066, 10311),
@@ -5043,6 +5075,10 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(21955, 10686),
 	(21955, 11095),
 	(21962, 10706),
+	(21968, 10693),
+	(21968, 10698),
+	(21969, 10699),
+	(21969, 10700),
 	(21983, 10717),
 	(21983, 10747),
 	(21984, 10614),
@@ -7271,6 +7307,7 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(34481, 14168),
 	(34482, 14177),
 	(34483, 14171),
+	(34484, 14169),
 	(34644, 14028),
 	(34653, 14064),
 	(34654, 14065),
@@ -7488,6 +7525,7 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(40429, 26034);
 /*!40000 ALTER TABLE `creature_queststarter` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

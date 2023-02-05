@@ -294,7 +294,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
