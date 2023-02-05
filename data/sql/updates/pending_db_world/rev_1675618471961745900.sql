@@ -1,9 +1,8 @@
---
 -- Infinite Assasin
 UPDATE `creature_template` SET `difficulty_entry_1`=20740 WHERE `entry`=17835;
 UPDATE `creature_template` SET `faction`=1720, `MovementType`=1 WHERE `entry`=20740;
 
-UPDATE `creature_template` SET `difficulty_entry_1`=22164, `speed_run`=1.78571, `AiName`='SmartAI' WHERE `entry`=21137;
+UPDATE `creature_template` SET `difficulty_entry_1`=22164, `AiName`='SmartAI' WHERE `entry`=21137;
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`=17835 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -31,8 +30,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (21137,0,1,'Our time has come!',12,0,100,0,0,0,15163,0,'Infinite Assassin'),
 (21137,0,2,'The wizard will fall!',12,0,100,0,0,0,15164,0,'Infinite Assassin');
 
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`=2 WHERE `creature_id`=21137;
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`=3 WHERE `creature_id`=22164;
+UPDATE `creature_onkill_reputation` SET `creature_id`=17835, `RewOnKillRepValue1`=2 WHERE `creature_id`=21137;
+UPDATE `creature_onkill_reputation` SET `creature_id`=20740, `RewOnKillRepValue1`=3 WHERE `creature_id`=22164;
 
 -- Infinite Chronomancer
 UPDATE `creature_template` SET `AiName`='SmartAI' WHERE `entry`=21136;
@@ -113,7 +112,7 @@ DELETE FROM `creature_onkill_reputation` WHERE `creature_id` IN (21139,22168);
 
 -- Conditions
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=22 AND `SourceEntry` IN (17835,17892,18994,18995,21136,21137,21138,21139);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+INSERT INTO`conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) values
 (22,7,17835,0,0,29,1,15608,20,0,0,0,0,'','SAI "Corrupt Medivh" requires Medivh in 20yd'),
 (22,6,17892,0,0,29,1,15608,20,0,0,0,0,'','SAI "Corrupt Medivh" requires Medivh in 20yd'),
 (22,6,18994,0,0,29,1,15608,20,0,0,0,0,'','SAI "Corrupt Medivh" requires Medivh in 20yd'),
