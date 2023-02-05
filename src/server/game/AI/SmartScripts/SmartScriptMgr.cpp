@@ -1227,7 +1227,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 }
 
-                if (e.event.distance.guid != 0 && !sObjectMgr->GetGOData(e.event.distance.guid))
+                if (e.event.distance.guid != 0 && !sObjectMgr->GetGameObjectData(e.event.distance.guid))
                 {
                     LOG_ERROR("sql.sql", "SmartAIMgr: Event SMART_EVENT_DISTANCE_GAMEOBJECT using invalid gameobject guid {}, skipped.", e.event.distance.guid);
                     return false;

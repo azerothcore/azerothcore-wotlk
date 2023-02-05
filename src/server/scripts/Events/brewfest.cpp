@@ -733,7 +733,7 @@ struct npc_dark_iron_guzzler : public ScriptedAI
         if (me->IsAlive() && spellInfo->Id == SPELL_PLAYER_MUG)
         {
             me->CastSpell(me, SPELL_MUG_BOUNCE_BACK, true);
-            Unit::Kill(me, me);
+            me->KillSelf();
             me->CastSpell(me, SPELL_REPORT_DEATH, true);
         }
     }
@@ -795,7 +795,7 @@ struct npc_brewfest_super_brew_trigger : public ScriptedAI
             {
                 player->CastSpell(player, SPELL_DRUNKEN_MASTER, true);
                 me->RemoveAllGameObjects();
-                Unit::Kill(me, me);
+                me->KillSelf();
             }
         }
     }
@@ -1809,7 +1809,7 @@ struct npc_direbrew_minion : public ScriptedAI
         DoZoneInCombat();
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         if (Creature* coren = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_COREN)))
         {

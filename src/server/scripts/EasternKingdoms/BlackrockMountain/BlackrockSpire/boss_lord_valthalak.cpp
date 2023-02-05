@@ -69,7 +69,7 @@ public:
             frenzy15 = false;
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             StartTalking(TALK_SUMMON, 8 * IN_MILLISECONDS);
         }

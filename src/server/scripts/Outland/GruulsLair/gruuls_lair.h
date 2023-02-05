@@ -55,6 +55,6 @@ inline AI* GetGruulsLairAI(T* obj)
     return GetInstanceAI<AI>(obj, GruulsLairScriptName);
 }
 
-#define RegisterGruulsLairCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetGruulsLairAI)
+#define RegisterGruulsLairAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetGruulsLairAI)
 
 #endif // GRUULS_LAIR_H_

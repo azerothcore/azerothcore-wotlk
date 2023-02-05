@@ -121,7 +121,7 @@ public:
             }
             else if (summons.size() == 0)
             {
-                Unit::Kill(me, me);
+                me->KillSelf();
             }
         }
 

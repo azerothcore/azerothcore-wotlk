@@ -128,7 +128,7 @@ public:
             if (pInstance->GetData(DATA_INSTANCE_PROGRESS) < INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED)
                 return;
 
-            Unit::Kill(me, me); // for bk scene, die after knockback
+            me->KillSelf(); // for bk scene, die after knockback
         }
 
         void UpdateAI(uint32 /*diff*/) override { }

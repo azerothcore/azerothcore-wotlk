@@ -387,9 +387,14 @@ public:
         int room;
         Unit* Gandling;
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
-            Gandling = summoner;
+            if (summoner->GetTypeId() != TYPEID_UNIT)
+            {
+                return;
+            }
+
+            Gandling = summoner->ToCreature();
             if (instance)
             {
                 room = Gandling->GetAI()->GetData(GANDLING_ROOM_TO_USE); // it's set just before my spawn
