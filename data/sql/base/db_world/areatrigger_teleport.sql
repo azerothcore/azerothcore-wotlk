@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.areatrigger_teleport
+-- Dumping structure for table acore_world.areatrigger_teleport
 DROP TABLE IF EXISTS `areatrigger_teleport`;
 CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
   `ID` mediumint unsigned NOT NULL DEFAULT '0',
@@ -26,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
   FULLTEXT KEY `name` (`Name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';
 
--- Dumpar data för tabell acore_world.areatrigger_teleport: 274 rows
+-- Dumping data for table acore_world.areatrigger_teleport: 273 rows
 DELETE FROM `areatrigger_teleport`;
 /*!40000 ALTER TABLE `areatrigger_teleport` DISABLE KEYS */;
 INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES
@@ -143,7 +145,6 @@ INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position
 	(4151, 'The Shattered Halls (Entrance)', 540, -40.8716, -19.7538, -13.8065, 1.11133),
 	(4152, 'The Blood Furnace (Entrance)', 542, -3.9967, 14.6363, -44.8009, 4.88748),
 	(4153, 'Magtheridon\'s Lair (Entrance)', 544, 187.843, 35.9232, 67.9252, 4.79879),
-	(4156, 'Naxxramas (to frostwyrm lair)', 533, 3500.87, -5339.03, 145, 1.34),
 	(4297, 'Hellfire Ramparts (Exit)', 530, -360.671, 3071.9, -15.0977, 5.14274),
 	(4304, 'Hellfire Ramparts - Omor Exit Target', 530, -233.33, 3199.71, -50, 0.785398),
 	(4311, 'Battle Of Mount Hyjal, Alliance Base (Entrance)', 534, 4954, -1886.2, 1326, 0.13),
@@ -306,6 +307,7 @@ INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position
 	(5872, 'The Ruby Sanctum (Exit)', 571, 3604.23, 192.083, -110.821, 2.195);
 /*!40000 ALTER TABLE `areatrigger_teleport` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

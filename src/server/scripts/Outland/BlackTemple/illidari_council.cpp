@@ -205,7 +205,7 @@ public:
                     if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                         if (member->IsAlive())
                             Unit::Kill(me, member);
-                Unit::Kill(me, me);
+                me->KillSelf();
             }
         }
 

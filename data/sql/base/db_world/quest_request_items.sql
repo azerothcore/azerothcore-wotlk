@@ -1,29 +1,31 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.quest_request_items
+-- Dumping structure for table acore_world.quest_request_items
 DROP TABLE IF EXISTS `quest_request_items`;
 CREATE TABLE IF NOT EXISTS `quest_request_items` (
   `ID` mediumint unsigned NOT NULL DEFAULT '0',
   `EmoteOnComplete` smallint unsigned NOT NULL DEFAULT '0',
   `EmoteOnIncomplete` smallint unsigned NOT NULL DEFAULT '0',
   `CompletionText` text,
-  `VerifiedBuild` int NOT NULL DEFAULT '0',
+  `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.quest_request_items: 7 757 rows
+-- Dumping data for table acore_world.quest_request_items: 7,757 rows
 DELETE FROM `quest_request_items`;
 /*!40000 ALTER TABLE `quest_request_items` DISABLE KEYS */;
 INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`, `CompletionText`, `VerifiedBuild`) VALUES
@@ -3580,13 +3582,13 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(8501, 0, 0, 'You wish to tell me something, $N?', 12340),
 	(8502, 0, 0, 'You have something to tell me, $C?', 12340),
 	(8503, 1, 0, 'It\'s not true! I\'d never skim any stranglekelp off the top of the stacks here. One might be tempted to though considering that it\'s practically a panacea of utilitarian usefulness. *cough* You don\'t happen to have that stranglekelp we discussed earlier?', 12340),
-	(8504, 1, 0, '', 12340),
+	(8504, 1, 0, 'Well hello again there... what was it? Ah yes, $N! Come to see if I still need more stranglekelp have you? Well, it\'s your lucky day, because the answer to that very important question is a very affirmative YES! Think you could gather up twenty more?', 12340),
 	(8505, 1, 0, 'Do you have the purple lotus herbs that I requested?', 12340),
-	(8506, 1, 0, '', 12340),
+	(8506, 1, 0, 'Welcome back $c. Our collection grows, but even now we have a need for additional purple lotus. If it is still within your power to gather more of the herb, I entreat you to do so and return them to me here.', 12340),
 	(8507, 0, 0, 'You\'ll find Captain Blackanvil\'s force stationed outside Hive\'Zora.  Talk to his lieutenant, Janela Stouthammer, if you can\'t find him.', 12340),
 	(8508, 6, 6, 'I take it you want those papers signed, $Glad:lass;?', 12340),
 	(8509, 1, 0, 'What\'s that? Speak up, $C! Have you got that shipment of Arthas\' Tears I asked for?', 12340),
-	(8510, 1, 0, '', 12340),
+	(8510, 1, 0, 'Ok, so it looks like I still need more Arthas\' Tears. I would imagine that you will be able to find them in the general location that you gathered them up for me last time. The quicker we get these, the faster we can start up the offensive against the forces at Ahn\'Qiraj.$B$BYou gonna help us out again $c?', 12340),
 	(8511, 1, 0, '$C, I do so hope that\'s the light leather you promised.', 12340),
 	(8512, 1, 0, 'Good to see you again, $N. It does appear that we need more light leather for the creation of the various war materiels. If you would bring me a stack of ten, that would be just perfect.', 12340),
 	(8513, 1, 0, 'Yes sir, I remember you. Is that the medium leather you have with you there?', 12340),
@@ -3603,7 +3605,7 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(8524, 1, 0, 'I\'m willing to lay odds that you\'ve returned with all of that rainbow fin albacore we were talking about before, right, $C?', 12340),
 	(8525, 1, 0, 'What! You again? Well I\'ll be a monkey\'s uncle... except that I\'m a $R. Slicky Gastronome to be precise! So you\'re back to help out again, eh? Well, I can\'t say as I blame you. Don\'t you just love the smell of all of that food? <drool>$B$BEnough loitering! Get out there and bring me back more rainbow fin albacore!', 12340),
 	(8526, 1, 0, 'So do you have all of that roast raptor yet?', 12340),
-	(8527, 1, 0, '', 12340),
+	(8527, 1, 0, 'Hi again $c. I can tell you\'re very excited about all of this. So I suppose you want to bring me another twenty roast raptor. Great. Well you do that. I guess I\'ll see you when you get back.', 12340),
 	(8528, 1, 0, 'I am confident that you are returning so soon with the spotted yellowtail we discussed.', 12340),
 	(8529, 1, 0, 'If you\'re still willing I\'d like to send you back out to bring in another haul of spotted yellowtail, $N. I\'d imagine with the expertise you gained the first time out that this catch should be much faster and easier. Are you game?', 12340),
 	(8532, 1, 0, 'I hope that\'s the twenty copper bars you have there with you, $C.', 12340),
@@ -3624,7 +3626,7 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(8547, 1, 0, 'Greetings!  It is a pleasure to meet you!$B$BI see you have a special voucher.  Give it to me and I will offer you something in exchange.', 12340),
 	(8548, 0, 0, 'It\'s in our best interest to keep our most loyal allies well geared, $N.', 12340),
 	(8549, 1, 0, 'Go now, $C. Seek out $N.', 12340),
-	(8550, 1, 0, '', 12340),
+	(8550, 1, 0, 'Hello again, $N. I am glad that you wish to speak to me once more concerning our neverending need for peacebloom. The war effort continues, and with it our production of potions and elixirs to aid in the battles to come. Will you help us again, $C? I am in need of the same amount of peacebloom as before, so if you can gather it up and return it to me here I would be most grateful. Of course, if you already have it on your person, I will be more than happy to accept it from you now.', 12340),
 	(8551, 0, 0, 'Ahoy, $N! Did you find Gorlash? That chest was my favorite, and it has a hidden compartment that held my greatest treasures!', 12340),
 	(8552, 6, 6, 'Hello. Do you have business with me? ', 12340),
 	(8553, 1, 0, NULL, 12340),
@@ -3654,7 +3656,7 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(8578, 1, 0, 'The Molten Core, eh? I hope my goggles are still in one piece!', 12340),
 	(8579, 1, 0, '', 12340),
 	(8580, 1, 0, 'Are you done collecting those samples? We could lose Noggle any minute now!', 12340),
-	(8581, 1, 0, '', 12340),
+	(8581, 1, 0, 'Pele\'keiki know you come to help. Bring many firebloom and make him very happy. Pele\'keiki might make big bombs with firebloom. Drop them on insects from his bat over Ahn\'Qiraj when war come. But Pele\'keiki need more firebloom, $C!$B$BYou gonna bring Pele\'keiki that firebloom, real quick now. Come back with at least as much as last time, and Pele\'keiki be pleased.', 12340),
 	(8582, 1, 0, 'Have you found the Ambassador, $N? Is he dead?$B$BWe cannot afford to allow the Scourge to take a foothold on Kalimdor. They are enough of a threat to our own borders to have to deal with them on two fronts.$B$BThe only optimistic sign from the events you\'ve told me about is that the crone seemed uncorrupted. She must know deep in her spirit that the Scourge may bring great power, but that the Barrens would not truly be hers if she were to agree to their deal.', 12340),
 	(8583, 1, 0, 'In fact it does appear that we are in need of even more purple lotus, $c. While my own studies have yet to determine a new useful application for the herb, there are tried and true methodologies yet to be employed.$B$BI need you to once again go out into the field and collect at least twenty purple lotus samples. Return them to me here.', 0),
 	(8584, 1, 0, '', 12340),
@@ -3674,22 +3676,22 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(8598, 1, 0, 'Say, what\'s the matter?', 12340),
 	(8599, 1, 0, 'You smell like fish!', 12340),
 	(8600, 1, 0, 'It couldn\'t possibly be taking you this long to slice off ten rugged leather for me! Perhaps you should sharpen your skinning knife? Or, perhaps I am mistaken and you have them there in your pack?', 12340),
-	(8601, 1, 0, '', 12340),
+	(8601, 1, 0, 'Preparations for the impending war at Ahn\'Qiraj are proceeding, $C. However, to ensure that we do not fall behind, or at least that I am not the one that causes us to fall behind, I want for you to bring back another stack of rugged leather. Your prompt attention to this matter will be greatly appreciated, $N.', 12340),
 	(8602, 1, 0, 'Have you collected the components I require?', 12340),
 	(8603, 1, 0, 'At his dwelling in Ahn\'Qiraj, dread C\'Thun awaits in slumber.', 12340),
 	(8604, 1, 0, 'The dredge strikers are a serious threat and must be dealt with quickly!', 12340),
-	(8605, 1, 0, '', 12340),
+	(8605, 1, 0, 'Good to see you again, $C. We are still working on preparations here for the war effort, and I can still use all of the help that you can give in gathering up wool bandaging. Any assistance at all will be greatly appreciated. I only hope that our efforts will be good enough. I\'ve lost too many noble souls on the battlefields of yesterday to not do everything in my power to see to it that doesn\'t happen again.', 12340),
 	(8606, 1, 0, '', 12340),
 	(8607, 1, 0, 'Do not fail and make me look bad, $C! Return here as quickly as possible with the mageweave bandages we discussed.', 12340),
-	(8608, 1, 0, '', 12340),
+	(8608, 1, 0, 'You returned? Interesting. As you can see I am still collecting for the Ahn\'Qiraj \'war effort\'. Which means that I need you to once again go out and collect a stack of mageweave bandages for me. I look forward to your return, $C.', 12340),
 	(8609, 1, 0, 'Did you get the venom?', 12340),
-	(8610, 1, 0, '', 12340),
+	(8610, 1, 0, 'Ever does the time grow nearer when we shall launch ourselves headlong into the conflagration at Ahn\'Qiraj, priest. But first we must gather our strength and prepare so that we can survive the onslaught of the insects and their masters.$B$BIf you are here again, then surely you wish to make another contribution of runecloth bandages to the war effort? Please do so as soon as you can and return to me once more.', 12340),
 	(8611, 1, 0, 'The sprite darters can be dangerous critters when provoked. Be careful when dealing with them, $C. And be even more careful of any night elves in the area. The pestering fools tend to hold up in the forests also.$B$BWhen you\'ve gotten enough of the wings, let me know, I\'ll be sure to reward you well!', 12340),
-	(8612, 1, 0, '', 12340),
+	(8612, 1, 0, 'As you can see, $C, we still need to pack away more food for the soldiers. I don\'t know if you\'ve ever been in a war before, but once you get past the initial shock of the battlefield, you can get pretty hungry. You did a good job last time, so I expect that you\'ll do as well, if not a little quicker, in getting me another stack of those lean wolf steaks.', 12340),
 	(8613, 1, 0, 'The sprite darters can be dangerous critters when provoked. Be careful when dealing with them, $C. And be even more careful of any night elves in the area. The pestering fools tend to hold up in the forests also.$B$BWhen you\'ve gotten enough of the wings, let me know, I\'ll be sure to reward you well!', 12340),
-	(8614, 1, 0, '', 12340),
+	(8614, 1, 0, 'So as you can see, we still be needin\' a lot of the fishies. The combatants in the upcomin\' Ahn\'Qiraj War gonna be needin\' a lot to eat, so I needin\' to get all the spotted yellowtail that I can. You catch \'em, cook \'em, and bringin\' \'em back to me here, and I be givin\' you thanks, and the thanks of the Horde.', 12340),
 	(8615, 1, 0, 'The sprite darters can be dangerous critters when provoked. Be careful when dealing with them, $C. And be even more careful of any night elves in the area. The pestering fools tend to hold up in the forests also.$B$BWhen you\'ve gotten enough of the wings, let me know, I\'ll be sure to reward you well!', 12340),
-	(8616, 1, 0, '', 12340),
+	(8616, 1, 0, 'The last batch of baked salmon that you donated to the war effort looked very delicious, $C. I must admit that I was tempted to take a few for myself. As you can tell, we have not yet reached our quota here. I am hoping you have returned because you have another stack of baked salmon with you.', 12340),
 	(8619, 1, 0, NULL, 12340),
 	(8620, 1, 0, 'I put my pants on just like you - one leg at a time. Except when my pants are on, I make arcanite buoys. Arcanite buoys, baby!', 12340),
 	(8621, 1, 0, 'You\'ve acquired the items I requested, $n?', 12340),
@@ -3873,22 +3875,22 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(8808, 0, 0, 'You have something for me, $n?', 12340),
 	(8809, 0, 0, 'You have something for me, $n?', 12340),
 	(8810, 0, 0, 'You have something for me, $n?', 12340),
-	(8811, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Stormwind.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
-	(8812, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Ironforge.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
-	(8813, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Darnassus.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
-	(8814, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with the Gnomeregan exiles.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
+	(8811, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Darnassus.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
+	(8812, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with the Gnomeregan exiles.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
+	(8813, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Ironforge.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
+	(8814, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Stormwind.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
 	(8815, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Orgrimmar.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
-	(8816, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Undercity.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
-	(8817, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Thunder Bluff.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
-	(8818, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with the Darkspear tribe.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
-	(8819, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Stormwind. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
-	(8820, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Ironforge. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
-	(8821, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Darnassus. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
-	(8822, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with the Gnomeregan exiles. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
+	(8816, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with the Darkspear tribe.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
+	(8817, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Undercity.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
+	(8818, 0, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with Thunder Bluff.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so. We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
+	(8819, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Darnassus. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
+	(8820, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with the Gnomeregan exiles. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
+	(8821, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Ironforge. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
+	(8822, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Stormwind. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
 	(8823, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Orgrimmar. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
-	(8824, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Undercity. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
+	(8824, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with the Darkspear tribe. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
 	(8825, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Thunder Bluff. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
-	(8826, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with the Darkspear tribe. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
+	(8826, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Undercity. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
 	(8827, 1, 0, NULL, 12340),
 	(8828, 1, 0, NULL, 12340),
 	(8829, 0, 0, 'You have something for me, $n?', 12340),
@@ -3908,16 +3910,16 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(8843, 0, 0, 'I accept commendation signets from adventurers who have received them in the line of duty. For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with Thunder Bluff. I also accept single tokens, but at a much reduced rate of recognition. We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
 	(8844, 1, 0, 'For those adventurers who have but a single commendation signet, I\'ll exchange it for a small amount of recognition with the Darkspear tribe.$B$BPlease bear in mind that it is better to hand over a stack of ten signets at once; your efforts will receive greater recognition in doing so.  We offer a single signet exchange as a service for those who don\'t have enough for a full stack of ten.$B$BWith that being said, I stand ready to assist you if you still wish to hand in a single signet.', 12340),
 	(8845, 1, 0, 'I accept commendation signets from adventurers who have received them in the line of duty.  For each set of ten that you hand to me, I\'ll make sure that you receive a significant acknowledgement of your deeds with the Darkspear tribe.  I also accept single tokens, but at a much reduced rate of recognition.  We are much more interested in greater feats of duty, though no feat will be ignored.$B$BWith that said, I\'ll gladly take your signets if you are ready to hand in a set.', 12340),
-	(8846, 1, 0, NULL, 12340),
-	(8847, 1, 0, NULL, 12340),
-	(8848, 1, 0, NULL, 12340),
-	(8849, 1, 0, NULL, 12340),
-	(8850, 1, 0, NULL, 12340),
-	(8851, 1, 0, NULL, 12340),
-	(8852, 1, 0, NULL, 12340),
-	(8853, 1, 0, NULL, 12340),
-	(8854, 1, 0, NULL, 12340),
-	(8855, 1, 0, NULL, 12340),
+	(8846, 1, 0, 'Ah, here for additional supplies for yourself, are you?  Well, I can certainly understand the need for additional materiel... just take a look around if you need any proof. $B$BI\'ll issue you some additional supplies, but you\'ll need to give me an appropriate number of commendation signets in exchange.  You won\'t receive any recognition for surrendering the signets in this manner, but you might find something useful that will help keep you alive when battle is finally upon us.', 12340),
+	(8847, 1, 0, 'Ah, here for additional supplies for yourself, are you?  Well, I can certainly understand the need for additional materiel... just take a look around if you need any proof. $B$BI\'ll issue you some additional supplies, but you\'ll need to give me an appropriate number of commendation signets in exchange.  You won\'t receive any recognition for surrendering the signets in this manner, but you might find something useful that will help keep you alive when battle is finally upon us.', 12340),
+	(8848, 1, 0, 'Ah, here for additional supplies for yourself, are you?  Well, I can certainly understand the need for additional materiel... just take a look around if you need any proof. $B$BI\'ll issue you some additional supplies, but you\'ll need to give me an appropriate number of commendation signets in exchange.  You won\'t receive any recognition for surrendering the signets in this manner, but you might find something useful that will help keep you alive when battle is finally upon us.', 12340),
+	(8849, 1, 0, 'Ah, here for additional supplies for yourself, are you?  Well, I can certainly understand the need for additional materiel... just take a look around if you need any proof. $B$BI\'ll issue you some additional supplies, but you\'ll need to give me an appropriate number of commendation signets in exchange.  You won\'t receive any recognition for surrendering the signets in this manner, but you might find something useful that will help keep you alive when battle is finally upon us.', 12340),
+	(8850, 1, 0, 'Ah, here for additional supplies for yourself, are you?  Well, I can certainly understand the need for additional materiel... just take a look around if you need any proof. $B$BI\'ll issue you some additional supplies, but you\'ll need to give me an appropriate number of commendation signets in exchange.  You won\'t receive any recognition for surrendering the signets in this manner, but you might find something useful that will help keep you alive when battle is finally upon us.', 12340),
+	(8851, 1, 0, 'Ah, here for additional supplies for yourself, are you?  Well, I can certainly understand the need for additional materiel... just take a look around if you need any proof. $B$BI\'ll issue you some additional supplies, but you\'ll need to give me an appropriate number of commendation signets in exchange.  You won\'t receive any recognition for surrendering the signets in this manner, but you might find something useful that will help keep you alive when battle is finally upon us.', 12340),
+	(8852, 1, 0, 'Ah, here for additional supplies for yourself, are you?  Well, I can certainly understand the need for additional materiel... just take a look around if you need any proof. $B$BI\'ll issue you some additional supplies, but you\'ll need to give me an appropriate number of commendation signets in exchange.  You won\'t receive any recognition for surrendering the signets in this manner, but you might find something useful that will help keep you alive when battle is finally upon us.', 12340),
+	(8853, 1, 0, 'Ah, here for additional supplies for yourself, are you?  Well, I can certainly understand the need for additional materiel... just take a look around if you need any proof. $B$BI\'ll issue you some additional supplies, but you\'ll need to give me an appropriate number of commendation signets in exchange.  You won\'t receive any recognition for surrendering the signets in this manner, but you might find something useful that will help keep you alive when battle is finally upon us.', 12340),
+	(8854, 1, 0, 'Ah, here for additional supplies for yourself, are you?  Well, I can certainly understand the need for additional materiel... just take a look around if you need any proof. $B$BI\'ll issue you some additional supplies, but you\'ll need to give me an appropriate number of commendation signets in exchange.  You won\'t receive any recognition for surrendering the signets in this manner, but you might find something useful that will help keep you alive when battle is finally upon us.', 12340),
+	(8855, 1, 0, 'Ah, here for additional supplies for yourself, are you?  Well, I can certainly understand the need for additional materiel... just take a look around if you need any proof. $B$BI\'ll issue you some additional supplies, but you\'ll need to give me an appropriate number of commendation signets in exchange.  You won\'t receive any recognition for surrendering the signets in this manner, but you might find something useful that will help keep you alive when battle is finally upon us.', 12340),
 	(8857, 1, 0, 'Yes? What have you got there?', 12340),
 	(8858, 0, 0, 'Hmmm...', 12340),
 	(8859, 0, 0, 'You look a bit heavy in the boots, friend.', 12340),
@@ -4446,7 +4448,7 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(9444, 6, 6, 'It is done, then?  Uther\'s Tomb is defiled?', 12340),
 	(9446, 1, 0, 'Aren\'t you supposed to be walking to Uther\'s Tomb with Anchorite Truuen?', 12340),
 	(9447, 0, 0, 'You\'ve returned, $N.  Is your task complete?', 12340),
-	(9448, 1, 1, 'You are doing the right thing, hunter. The Lost Ones have suffered so much already. They shouldn\'t have to suffer this further indignity.', 12340),
+	(9448, 1, 1, 'You are doing the right thing, $c. The Lost Ones have suffered so much already. They shouldn\'t have to suffer this further indignity.', 0),
 	(9449, 1, 0, NULL, 12340),
 	(9450, 1, 0, NULL, 12340),
 	(9451, 6, 6, 'Together, the Broken and the draenei will regain a deeper understanding of the mysteries that the elements hold.$B$BHave you returned with that which is necessary for the creation of your earth totem?', 12340),
@@ -5549,8 +5551,8 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(10707, 1, 0, 'You\'ve returned, $N.', 12340),
 	(10708, 1, 0, NULL, 12340),
 	(10709, 1, 0, '', 12340),
-	(10710, 1, 0, 'Don\'t worry, Mitharan! Worry never got anyone anywhere!', 12340),
-	(10711, 1, 0, 'What? You don\'t want to perform the experiment? Don\'t fret, Domme! I\'m behind you all the way!', 12340),
+	(10710, 1, 0, 'Don\'t worry, $n! Worry never got anyone anywhere!', 0),
+	(10711, 1, 0, 'What? You don\'t want to perform the experiment? Don\'t fret, $n! I\'m behind you all the way!', 0),
 	(10712, 1, 0, 'Hello hello! My clo-... I mean, my cousin Tally told me you\'d be dropping in. Do you have something for me?', 12340),
 	(10713, 1, 0, 'Have you protected the trees? Are the hewers cut down?', 12340),
 	(10714, 1, 0, 'What have you learned, $N?', 12340),
@@ -7786,6 +7788,7 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(25444, 0, 0, 'Ya helpin\' with da frogs or not?', 12340);
 /*!40000 ALTER TABLE `quest_request_items` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

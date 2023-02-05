@@ -3566,7 +3566,7 @@ public:
                     events.ScheduleEvent(EVENT_GAUNTLET_PHASE3, 0);
                 }
                 else
-                    Unit::Kill(me, me);
+                    me->KillSelf();
             }
         }
 
