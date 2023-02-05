@@ -304,7 +304,7 @@ public:
 private:
     enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST, PROGRESS_RESET };
     void SendAchievementEarned(AchievementEntry const* achievement) const;
-    void SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const;
+    void SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, Seconds timeElapsed, bool timedCompleted) const;
     void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype = PROGRESS_SET);
     void CompletedCriteriaFor(AchievementEntry const* achievement);
     bool IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement);

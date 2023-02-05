@@ -394,9 +394,9 @@ void npc_escortAI::OnPossess(bool apply)
 }
 */
 
-void npc_escortAI::AddWaypoint(uint32 id, float x, float y, float z, uint32 waitTime)
+void npc_escortAI::AddWaypoint(uint32 id, float x, float y, float z, Milliseconds waitTime)
 {
-    Escort_Waypoint t(id, x, y, z, waitTime);
+    Escort_Waypoint t(id, x, y, z, waitTime.count());
 
     WaypointList.push_back(t);
 
