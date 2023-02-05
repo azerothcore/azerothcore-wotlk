@@ -849,7 +849,7 @@ void ObjectMgr::LoadCreatureCustomIDs()
 
     for (auto itr : CustomCreatures)
     {
-        CreatureCustomIDsStore.insert(CreatureCustomIDsStore.begin(), Acore::StringTo<uint32>(itr).value());
+        _creatureCustomIDsStore.push_back(Acore::StringTo<uint32>(itr).value());
     }
 }
 
@@ -1195,7 +1195,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     const_cast<CreatureTemplate*>(cInfo)->DamageModifier *= Creature::_GetDamageMod(cInfo->rank);
 
     // Hack for modules
-    for (auto itr : CreatureCustomIDsStore)
+    for (auto itr : _creatureCustomIDsStore)
     {
         if (cInfo->Entry == itr)
             return;
