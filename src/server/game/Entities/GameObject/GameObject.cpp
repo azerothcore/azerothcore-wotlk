@@ -1040,7 +1040,7 @@ void GameObject::SaveToDB(bool saveAddon /*= false*/)
 {
     // this should only be used when the gameobject has already been loaded
     // preferably after adding to map, because mapid may not be valid otherwise
-    GameObjectData const* data = sObjectMgr->GetGOData(m_spawnId);
+    GameObjectData const* data = sObjectMgr->GetGameObjectData(m_spawnId);
     if (!data)
     {
         LOG_ERROR("entities.gameobject", "GameObject::SaveToDB failed, cannot get gameobject data!");
@@ -1120,7 +1120,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
 
 bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap)
 {
-    GameObjectData const* data = sObjectMgr->GetGOData(spawnId);
+    GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
 
     if (!data)
     {
@@ -1442,7 +1442,7 @@ void GameObject::UseDoorOrButton(uint32 time_to_restore, bool alternative /* = f
 void GameObject::SetGoArtKit(uint8 kit)
 {
     SetByteValue(GAMEOBJECT_BYTES_1, 2, kit);
-    GameObjectData* data = const_cast<GameObjectData*>(sObjectMgr->GetGOData(m_spawnId));
+    GameObjectData* data = const_cast<GameObjectData*>(sObjectMgr->GetGameObjectData(m_spawnId));
     if (data)
         data->artKit = kit;
 }
@@ -1453,10 +1453,10 @@ void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType l
     if (go)
     {
         go->SetGoArtKit(artkit);
-        data = go->GetGOData();
+        data = go->GetGameObjectData();
     }
     else if (lowguid)
-        data = sObjectMgr->GetGOData(lowguid);
+        data = sObjectMgr->GetGameObjectData(lowguid);
 
     if (data)
         const_cast<GameObjectData*>(data)->artKit = artkit;
@@ -2194,7 +2194,7 @@ void GameObject::EventInform(uint32 eventId)
 
 uint32 GameObject::GetScriptId() const
 {
-    if (GameObjectData const* gameObjectData = GetGOData())
+    if (GameObjectData const* gameObjectData = GetGameObjectData())
         if (uint32 scriptId = gameObjectData->ScriptId)
             return scriptId;
 
@@ -2483,7 +2483,7 @@ void GameObject::SetGoState(GOState state)
         // startOpen determines whether we are going to add or remove the LoS on activation
         /*bool startOpen = (GetGoType() == GAMEOBJECT_TYPE_DOOR || GetGoType() == GAMEOBJECT_TYPE_BUTTON ? GetGOInfo()->door.startOpen : false);
 
-        if (GetGOData() && GetGOData()->go_state == GO_STATE_READY)
+        if (GetGameObjectData() && GetGameObjectData()->go_state == GO_STATE_READY)
             startOpen = !startOpen;
 
         if (state == GO_STATE_ACTIVE || state == GO_STATE_ACTIVE_ALTERNATIVE)
@@ -2887,7 +2887,7 @@ void GameObject::GetRespawnPosition(float& x, float& y, float& z, float* ori /* 
 {
     if (m_spawnId)
     {
-        if (GameObjectData const* data = sObjectMgr->GetGOData(m_spawnId))
+        if (GameObjectData const* data = sObjectMgr->GetGameObjectData(m_spawnId))
         {
             x = data->posX;
             y = data->posY;

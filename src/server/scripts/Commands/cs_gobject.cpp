@@ -164,7 +164,7 @@ public:
         }
 
         /// @todo is it really necessary to add both the real and DB table guid here ?
-        sObjectMgr->AddGameobjectToGrid(guidLow, sObjectMgr->GetGOData(guidLow));
+        sObjectMgr->AddGameobjectToGrid(guidLow, sObjectMgr->GetGameObjectData(guidLow));
         std::string name = objectInfo->name;
         LocalizeGameObject(handler->GetSessionDbLocaleIndex(), name, objectInfo->entry);
         handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, uint32(objectId), name.c_str(), guidLow, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
@@ -422,9 +422,9 @@ public:
         object->Relocate(pos);
 
         // update which cell has this gameobject registered for loading
-        sObjectMgr->RemoveGameobjectFromGrid(guidLow, object->GetGOData());
+        sObjectMgr->RemoveGameobjectFromGrid(guidLow, object->GetGameObjectData());
         object->SaveToDB();
-        sObjectMgr->AddGameobjectToGrid(guidLow, object->GetGOData());
+        sObjectMgr->AddGameobjectToGrid(guidLow, object->GetGameObjectData());
 
         // Generate a completely new spawn with new guid
         // 3.3.5a client caches recently deleted objects and brings them back to life
@@ -531,7 +531,7 @@ public:
         if (isGuid || data.holds_alternative<Hyperlink<gameobject>>())
         {
             spawnId = *data;
-            GameObjectData const* spawnData = sObjectMgr->GetGOData(spawnId);
+            GameObjectData const* spawnData = sObjectMgr->GetGameObjectData(spawnId);
             if (!spawnData)
             {
                 handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, spawnId);

@@ -1598,6 +1598,9 @@ public:
 
     // Called when checking if a player can see the creature loot
     virtual bool OnAllowedForPlayerLootCheck(Player const* /*player*/, ObjectGuid /*source*/) { return false; };
+
+    // Called when instance id is removed from database (e.g. instance reset)
+    virtual void OnInstanceIdRemoved(uint32 /*instanceId*/) { }
 };
 
 class BGScript : public ScriptObject
@@ -2470,6 +2473,7 @@ public: /* GlobalScript */
     bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val);
     void OnLoadSpellCustomAttr(SpellInfo* spell);
     bool OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid source);
+    void OnInstanceIdRemoved(uint32 instanceId);
 
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
