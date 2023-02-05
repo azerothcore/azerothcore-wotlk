@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `gossip_menu_option` (
   `BoxBroadcastTextID` mediumint NOT NULL DEFAULT '0',
   `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`MenuID`,`OptionID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.gossip_menu_option: 4,518 rows
 DELETE FROM `gossip_menu_option`;

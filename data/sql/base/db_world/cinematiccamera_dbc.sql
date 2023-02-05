@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `cinematiccamera_dbc` (
   `locationZ` float NOT NULL DEFAULT '0',
   `rotation` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='Cinematic camera DBC';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Cinematic camera DBC';
 
 -- Dumping data for table acore_world.cinematiccamera_dbc: 0 rows
 DELETE FROM `cinematiccamera_dbc`;

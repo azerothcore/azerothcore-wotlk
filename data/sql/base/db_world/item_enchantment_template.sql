@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `item_enchantment_template` (
   `chance` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`,`ench`),
   CONSTRAINT `item_enchantment_template_chk_1` CHECK ((`chance` >= 0))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Item Random Enchantment System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Item Random Enchantment System';
 
 -- Dumping data for table acore_world.item_enchantment_template: 28,606 rows
 DELETE FROM `item_enchantment_template`;

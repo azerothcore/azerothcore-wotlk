@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `gm_ticket` (
   `needMoreHelp` tinyint unsigned NOT NULL DEFAULT '0',
   `resolvedBy` int NOT NULL DEFAULT '0' COMMENT '-1 Resolved by Console, >0 GUID of GM',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
 -- Dumping data for table acore_characters.gm_ticket: ~0 rows (approximately)
 DELETE FROM `gm_ticket`;

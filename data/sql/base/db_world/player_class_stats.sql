@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `player_class_stats` (
   `Intellect` int unsigned NOT NULL DEFAULT '0',
   `Spirit` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`Class`,`Level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci PACK_KEYS=0 COMMENT='Stores levels stats.';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores levels stats.';
 
 -- Dumping data for table acore_world.player_class_stats: 746 rows
 DELETE FROM `player_class_stats`;

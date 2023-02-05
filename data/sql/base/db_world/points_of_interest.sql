@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `points_of_interest` (
   `Importance` mediumint unsigned NOT NULL DEFAULT '0',
   `Name` text NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.points_of_interest: 463 rows
 DELETE FROM `points_of_interest`;

@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `playercreateinfo_cast_spell` (
   `classMask` int unsigned NOT NULL DEFAULT '0',
   `spell` mediumint unsigned NOT NULL DEFAULT '0',
   `note` varchar(255) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.playercreateinfo_cast_spell: 2 rows
 DELETE FROM `playercreateinfo_cast_spell`;

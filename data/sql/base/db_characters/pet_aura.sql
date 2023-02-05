@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `pet_aura` (
   `remainTime` int NOT NULL DEFAULT '0',
   `remainCharges` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`casterGuid`,`spell`,`effectMask`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Pet System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Pet System';
 
 -- Dumping data for table acore_characters.pet_aura: ~0 rows (approximately)
 DELETE FROM `pet_aura`;

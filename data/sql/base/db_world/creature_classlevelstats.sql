@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `creature_classlevelstats` (
   `damage_exp2` float NOT NULL DEFAULT '0',
   `comment` text,
   PRIMARY KEY (`level`,`class`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.creature_classlevelstats: 400 rows
 DELETE FROM `creature_classlevelstats`;

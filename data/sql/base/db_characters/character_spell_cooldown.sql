@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `character_spell_cooldown` (
   `time` int unsigned NOT NULL DEFAULT '0',
   `needSend` tinyint unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`guid`,`spell`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_characters.character_spell_cooldown: ~0 rows (approximately)
 DELETE FROM `character_spell_cooldown`;

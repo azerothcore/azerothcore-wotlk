@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `spell_ranks` (
   `rank` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`first_spell_id`,`rank`),
   UNIQUE KEY `spell_id` (`spell_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Spell Rank Data';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell Rank Data';
 
 -- Dumping data for table acore_world.spell_ranks: 3,502 rows
 DELETE FROM `spell_ranks`;

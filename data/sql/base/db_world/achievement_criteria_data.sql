@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `achievement_criteria_data` (
   `value2` mediumint unsigned NOT NULL DEFAULT '0',
   `ScriptName` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`criteria_id`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Achievment system';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Achievment system';
 
 -- Dumping data for table acore_world.achievement_criteria_data: 2,789 rows
 DELETE FROM `achievement_criteria_data`;

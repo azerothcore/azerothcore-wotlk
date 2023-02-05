@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `game_weather` (
   `winter_storm_chance` tinyint unsigned NOT NULL DEFAULT '25',
   `ScriptName` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`zone`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Weather System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Weather System';
 
 -- Dumping data for table acore_world.game_weather: 35 rows
 DELETE FROM `game_weather`;

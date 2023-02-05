@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `dungeon_access_template` (
   `comment` varchar(255) DEFAULT NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic',
   PRIMARY KEY (`id`),
   KEY `FK_dungeon_access_template__instance_template` (`map_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='Dungeon/raid access template and single requirements';
+) ENGINE=MyISAM AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Dungeon/raid access template and single requirements';
 
 -- Dumping data for table acore_world.dungeon_access_template: 121 rows
 DELETE FROM `dungeon_access_template`;

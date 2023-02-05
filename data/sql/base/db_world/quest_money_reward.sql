@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `quest_money_reward` (
   `Money8` int NOT NULL DEFAULT '0',
   `Money9` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`Level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.quest_money_reward: 80 rows
 DELETE FROM `quest_money_reward`;

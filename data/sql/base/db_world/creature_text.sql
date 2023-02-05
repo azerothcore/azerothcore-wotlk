@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `creature_text` (
   `comment` varchar(255) DEFAULT '',
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`),
   CONSTRAINT `creature_text_chk_1` CHECK ((`Probability` >= 0))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table acore_world.creature_text: 18,300 rows
 DELETE FROM `creature_text`;
