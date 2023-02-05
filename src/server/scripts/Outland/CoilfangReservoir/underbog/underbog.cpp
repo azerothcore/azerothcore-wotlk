@@ -57,7 +57,7 @@ class spell_allergies : public AuraScript
 
     void Update(AuraEffect* /*effect*/)
     {
-        if (Unit* target = GetTarget())
+        if (Unit* target = GetUnitOwner())
         {
             target->CastSpell(target, SPELL_SNEEZE, true);
         }
