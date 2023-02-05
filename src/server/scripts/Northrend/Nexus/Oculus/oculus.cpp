@@ -394,6 +394,7 @@ public:
         {
             if (passenger->GetTypeId() != TYPEID_PLAYER)
                 return;
+
             if (add)
             {
                 despawnTimer = 0;
