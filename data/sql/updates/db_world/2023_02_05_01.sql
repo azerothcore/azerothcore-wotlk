@@ -1,3 +1,4 @@
+-- DB update 2023_02_05_00 -> 2023_02_05_01
 DELETE FROM `creature_text` WHERE `CreatureID` IN (29032,29061,29065,29067,29068,29070,29071,29072,29073,29074,29053);
 INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES 
 (29032, 0, 0, "Come to finish the job, have you?", 12, 0, 100, 0, 0, 0, 29286, 0, 'Malar Bravehorn - SAY_EXEC_START'),
