@@ -1,137 +1,47 @@
-#syntax=docker/dockerfile:1.2
+ARG TZ=Etc/UTC
+ARG UBUNTU_VERSION=20.04
 
-#================================================================
-#
-# DEV: Stage used for the development environment
-#      and the locally built services
-#
-#=================================================================
+# Create Directory tree
+FROM ubuntu:$UBUNTU_VERSION as skeleton
 
-FROM ubuntu:20.04 as base
-ARG USER_ID=1000
-ARG GROUP_ID=1000
-ARG DOCKER_USER=acore
-
-LABEL description="AC base image for dev containers"
-
-# List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-
-ENV DOCKER=1
-
-# set timezone environment variable
-ENV TZ=Etc/UTC
-
-# set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
+RUN mkdir -pv /azerothcore/apps                  \
+              /azerothcore/bin                   \
+              /azerothcore/conf                  \
+              /azerothcore/data                  \
+              /azerothcore/deps                  \
+              /azerothcore/env                   \
+              /azerothcore/modules               \
+              /azerothcore/src                   \
+              /azerothcore/var                   \
+              /azerothcore/apps/docker           \
+              /azerothcore/env/dist/bin          \
+              /azerothcore/env/dist/data/Cameras \
+              /azerothcore/env/dist/data/dbc     \
+              /azerothcore/env/dist/data/maps    \
+              /azerothcore/env/dist/data/mmaps   \
+              /azerothcore/env/dist/data/vmaps   \
+              /azerothcore/env/dist/logs         \
+              /azerothcore/env/dist/temp         \
+              /azerothcore/env/dist/etc          \
+              /azerothcore/env/etc               \
+              /azerothcore/var/build/obj         \
+              /azerothcore/var/ccache
 
-# Do not use acore dashboard to install
-# since it's not cacheable by docker
-RUN apt-get update && apt-get install -y gdb gdbserver git dos2unix lsb-core sudo curl unzip \
-  make cmake clang libmysqlclient-dev \
-  libboost-system1.7*-dev libboost-filesystem1.7*-dev libboost-program-options1.7*-dev libboost-iostreams1.7*-dev \
-  build-essential libtool cmake-data openssl libgoogle-perftools-dev google-perftools \
-  libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
-  libncurses5-dev ccache \
-  && rm -rf /var/lib/apt/lists/*
+RUN apt update && \
+    apt install -y tzdata ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-# change timezone in container
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone && \
-    dpkg-reconfigure --frontend noninteractive tzdata
+# Build Applications
 
-# Create a non-root user
-RUN addgroup --gid $GROUP_ID $DOCKER_USER && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID $DOCKER_USER && \
-    passwd -d $DOCKER_USER && \
-    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+FROM skeleton as build
 
-# must be created to set the correct permissions on them
-RUN mkdir -p \
-    /azerothcore/env/dist/bin \
-    /azerothcore/env/dist/data/Cameras \
-    /azerothcore/env/dist/data/dbc \
-    /azerothcore/env/dist/data/maps \
-    /azerothcore/env/dist/data/mmaps \
-    /azerothcore/env/dist/data/vmaps \
-    /azerothcore/env/dist/logs \
-    /azerothcore/env/dist/temp \
-    /azerothcore/env/dist/etc \
-    /azerothcore/var/build/obj
+ARG TZ
+ARG CTOOLS_BUILD=all
 
-# Correct permissions for non-root operations
-RUN chown -R $DOCKER_USER:$DOCKER_USER \
-      /azerothcore \
-      /home/acore \
-      /run \
-      /opt
 
-USER $DOCKER_USER
-
-# copy only necessary files for the acore dashboard
-COPY --chown=$DOCKER_USER:$DOCKER_USER apps /azerothcore/apps
-COPY --chown=$DOCKER_USER:$DOCKER_USER bin /azerothcore/bin
-COPY --chown=$DOCKER_USER:$DOCKER_USER conf /azerothcore/conf
-COPY --chown=$DOCKER_USER:$DOCKER_USER data /azerothcore/data
-COPY --chown=$DOCKER_USER:$DOCKER_USER deps /azerothcore/deps
-COPY --chown=$DOCKER_USER:$DOCKER_USER acore.json /azerothcore/acore.json
-COPY --chown=$DOCKER_USER:$DOCKER_USER acore.sh /azerothcore/acore.sh
-
-# Download deno and make sure the dashboard works
-RUN bash /azerothcore/acore.sh quit
-
-WORKDIR /azerothcore
-
-#================================================================
-#
-# Dev: create dev server image
-#
-#=================================================================
-
-FROM base as dev
-
-LABEL description="AC dev image for dev containers"
-
-USER $DOCKER_USER
-
-# copy everything so we can work directly within the container
-# using tools such as vscode dev-container
-# NOTE: this folder is different by the /azerothcore (which is binded instead)
-COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
-
-# Needed if we use the dev image without linking any external folder (e.g. acore-docker)
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/dist/etc/authserver.conf.dockerdist
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/dbimport.conf.dockerdist /azerothcore/env/dist/etc/dbimport.conf.dockerdist
-
-#================================================================
-#
-# BUILD: compile sources
-#
-#=================================================================
-FROM base as build
-
-ARG DOCKER_USER=acore
-USER $DOCKER_USER
-
-LABEL description="AC Image used by the build stage to generate production images"
-
-RUN mkdir -p /azerothcore/env/etc/
-
-# .git is needed by the compiler
-COPY --chown=$DOCKER_USER:$DOCKER_USER ./.git /azerothcore/.git
-COPY --chown=$DOCKER_USER:$DOCKER_USER ./CMakeLists.txt /azerothcore/CMakeLists.txt
-COPY --chown=$DOCKER_USER:$DOCKER_USER ./deps /azerothcore/deps
-COPY --chown=$DOCKER_USER:$DOCKER_USER ./src /azerothcore/src
-COPY --chown=$DOCKER_USER:$DOCKER_USER ./modules /azerothcore/modules
-# check if we have ccache files available outside
-RUN rm -rf /azerothcore/var/ccache/*
-COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker/ccache /azerothcore/var/ccache
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/dist/etc/authserver.conf.dockerdist
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/dbimport.conf.dockerdist /azerothcore/env/dist/etc/dbimport.conf.dockerdist
-
-# install eluna
-RUN git clone --depth=1 --branch=master https://github.com/azerothcore/mod-eluna.git /azerothcore/modules/mod-eluna
+ENV TZ=$TZ
+ENV DEBIAN_FRONTEND=noninteractive
 
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
@@ -139,8 +49,200 @@ ENV AC_CCACHE=true
 ENV CCACHE_CPP2=true
 ENV CSCRIPTPCH=OFF
 ENV CCOREPCH=OFF
-ENV CTOOLS_BUILD=all
-# ENV CTOOLS_BUILD=maps-only
+ENV CTOOLS_BUILD=$CTOOLS_BUILD
 ENV CSCRIPTS=static
 
-RUN bash apps/docker/docker-build-prod.sh
+WORKDIR /azerothcore
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone && \
+    dpkg-reconfigure --frontend noninteractive tzdata
+
+RUN apt update && \
+    apt install -y \
+      gdb gdbserver git dos2unix \
+      lsb-core sudo curl unzip \
+      make cmake clang libmysqlclient-dev \
+      libboost-system1.7*-dev libboost-filesystem1.7*-dev \
+      libboost-program-options1.7*-dev libboost-iostreams1.7*-dev \
+      build-essential libtool cmake-data openssl \
+      libgoogle-perftools-dev google-perftools \
+      libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev \
+      libbz2-dev mysql-client \
+      libncurses5-dev ccache && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY acore.json acore.json
+COPY apps/docker/config-docker.sh apps/docker/config-docker.sh
+COPY apps/compiler apps/compiler
+COPY apps/bash_shared apps/bash_shared
+COPY apps/startup-scripts apps/startup-scripts
+COPY bin bin
+COPY conf conf
+COPY data data
+COPY deps deps
+COPY CMakeLists.txt CMakeLists.txt
+COPY deps deps
+COPY src src
+COPY modules modules
+COPY .git /azerothcore/.git
+
+COPY  env/docker/etc/authserver.conf.dockerdist env/dist/etc/authserver.conf.dockerdist
+COPY  env/docker/etc/worldserver.conf.dockerdist env/dist/etc/worldserver.conf.dockerdist
+COPY  env/docker/etc/dbimport.conf.dockerdist env/dist/etc/dbimport.conf.dockerdist
+
+RUN git clone \
+    --depth=1 \
+    --branch=master \
+    https://github.com/azerothcore/mod-eluna.git \
+    modules/mod-eluna
+
+
+RUN --mount=type=cache,target=/azerothcore/var/ccache \
+    bash apps/compiler/compiler.sh build
+
+#############################
+# Base runtime for services #
+#############################
+
+FROM skeleton as runtime
+
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG DOCKER_USER=acore
+ARG TZ Etc/UTC
+
+ENV TZ $TZ
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone && \
+    dpkg-reconfigure --frontend noninteractive tzdata
+
+RUN apt update && \
+    apt install -y \ 
+    tini libmysqlclient21 \
+    libboost-system1.7*.* libboost-filesystem1.7*.* \
+    libboost-program-options1.7*.* libboost-iostreams1.7*.* \
+    libboost-regex1.7*.* mysql-client && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN addgroup --gid $GROUP_ID $DOCKER_USER && \
+    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID $DOCKER_USER && \
+    passwd -d $DOCKER_USER
+
+RUN chown -R $DOCKER_USER:$DOCKER_USER /run /opt
+
+USER $DOCKER_USER
+
+###############
+# Auth Server #
+###############
+
+FROM runtime as authserver
+LABEL description "AzerothCore Auth Server"
+
+WORKDIR /azerothcore
+
+USER $DOCKER_USER
+COPY --from=build /azerothcore/env/dist/bin/authserver /azerothcore/env/dist/bin/authserver
+
+CMD ["/startup.sh", "/azerothcore/env/dist/bin/authserver"]
+
+################
+# World Server #
+################
+
+FROM runtime as worldserver
+
+LABEL description "AzerothCore World Server"
+
+WORKDIR /azerothcore
+
+USER $DOCKER_USER
+COPY --from=build /azerothcore/env/dist/bin/worldserver /azerothcore/env/dist/bin/worldserver
+
+CMD ["/startup.sh", "/azerothcore/env/dist/bin/worldserver"]
+
+##################
+# Map Extractors #
+##################
+
+FROM runtime as tools
+
+LABEL description "AzerothCore Tools"
+
+USER $DOCKER_USER
+
+WORKDIR /azerothcore/env/client/
+
+RUN mkdir -pv /azerothcore/env/client/Cameras \
+              /azerothcore/env/client/dbc     \
+              /azerothcore/env/client/maps    \
+              /azerothcore/env/client/mmaps   \
+              /azerothcore/env/client/vmaps
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
+  /azerothcore/env/dist/bin/map_extractor /azerothcore/env/client/map_extractor
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
+  /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
+  /azerothcore/env/dist/bin/vmap4_assembler /azerothcore/env/client/vmap4_assembler
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
+  /azerothcore/env/dist/bin/vmap4_extractor /azerothcore/env/client/vmap4_extractor
+
+#############
+# DB Import #
+#############
+
+FROM runtime as dbimport
+
+LABEL description "AzerothCore Database Import tool"
+
+WORKDIR /azerothcore
+
+USER $DOCKER_USER
+COPY --from=build /azerothcore/env/dist/bin/dbimport /azerothcore/env/dist/bin/dbimport
+
+CMD /azerothcore/env/dist/bin/dbimport
+
+###############
+# Client Data #
+###############
+
+FROM skeleton as client-data
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG DOCKER_USER=acore
+
+LABEL description="AzerothCore client-data"
+
+RUN apt update && \
+    apt install -y curl unzip && \
+    rm -rf /var/lib/apt/lists/*
+
+# set timezone environment variable
+ENV TZ=Etc/UTC
+
+# set noninteractive mode so tzdata doesn't ask to set timezone on install
+ENV DEBIAN_FRONTEND=noninteractive
+
+COPY apps apps
+
+RUN addgroup --gid $GROUP_ID acore && \
+    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
+    passwd -d acore && \
+    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+ARG CACHEBUST=1
+USER $DOCKER_USER
+COPY --chown=$DOCKER_USER:$DOCKER_USER \
+  apps/docker/client-data.sh /azerothcore/apps/docker/client-data.sh
+
+RUN chmod +x /azerothcore/apps/docker/client-data.sh
+
+CMD /azerothcore/apps/docker/client-data.sh 
+

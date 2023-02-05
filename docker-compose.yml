@@ -84,8 +84,9 @@ services:
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
     build:
-      target: dev
       <<: *build-params
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile
     security_opt:
       - seccomp:unconfined
     env_file:
@@ -112,8 +113,9 @@ services:
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
     build:
-      target: dev
       <<: *build-params
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile
     security_opt:
       - seccomp:unconfined
     env_file:
