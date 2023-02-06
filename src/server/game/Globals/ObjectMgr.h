@@ -698,6 +698,7 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 #define MAX_CHANNEL_NAME         50                         // pussywizard
 
 bool normalizePlayerName(std::string& name);
+#define SPAWNGROUP_MAP_UNSET 0xFFFFFFFF
 
 struct LanguageDesc
 {
@@ -1355,8 +1356,8 @@ public:
     void RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData const* data);
     void AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data);
     void RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectData const* data);
-    uint32 AddGameObjectData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0, float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
-    uint32 AddCreatureData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
+    ObjectGuid::LowType AddGameObjectData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0, float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
+    ObjectGuid::LowType AddCreatureData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
 
     // reserved names
     void LoadReservedPlayersNames();

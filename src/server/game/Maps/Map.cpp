@@ -1057,7 +1057,7 @@ void Map::RemoveFromMap(MotionTransport* obj, bool remove)
     {
         // if option set then object already saved at this moment
         if (!sWorld->getBoolConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATELY))
-            obj->SaveRespawnTime();
+            obj->SaveRespawnTime(0);    // @todo - need to remove parameter
         DeleteFromWorld(obj);
     }
 }
@@ -2787,7 +2787,7 @@ void Map::DoRespawn(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 gr
     }
 }
 
-void Map::Respawn(RespawnInfo* info, bool force, SQLTransaction dbTrans)
+void Map::Respawn(RespawnInfo* info, bool force, CharacterDatabaseTransaction dbTrans)
 {
     if (!force && !CheckRespawn(info))
     {
@@ -2806,9 +2806,9 @@ void Map::Respawn(RespawnInfo* info, bool force, SQLTransaction dbTrans)
     DoRespawn(type, spawnId, gridId);
 }
 
-void Map::Respawn(RespawnVector& respawnData, bool force, SQLTransaction dbTrans)
+void Map::Respawn(RespawnVector& respawnData, bool force, CharacterDatabaseTransaction dbTrans)
 {
-    SQLTransaction trans = dbTrans ? dbTrans : CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = dbTrans ? dbTrans : CharacterDatabase.BeginTransaction();
     for (RespawnInfo* info : respawnData)
         Respawn(info, force, trans);
     if (!dbTrans)
@@ -2890,9 +2890,9 @@ void Map::DeleteRespawnInfo(RespawnInfo* info)
     delete info;
 }
 
-void Map::RemoveRespawnTime(RespawnInfo* info, bool doRespawn, SQLTransaction dbTrans)
+void Map::RemoveRespawnTime(RespawnInfo* info, bool doRespawn, CharacterDatabaseTransaction dbTrans)
 {
-    PreparedStatement* stmt;
+    CharacterDatabasePreparedStatement* stmt;
     switch (info->type)
     {
     case SPAWN_TYPE_CREATURE:
@@ -2905,9 +2905,9 @@ void Map::RemoveRespawnTime(RespawnInfo* info, bool doRespawn, SQLTransaction db
         ASSERT(false, "Invalid respawninfo type %u for spawnid %u map %u", uint32(info->type), info->spawnId, GetId());
         return;
     }
-    stmt->setUInt32(0, info->spawnId);
-    stmt->setUInt16(1, GetId());
-    stmt->setUInt32(2, GetInstanceId());
+    stmt->SetData(0, info->spawnId);
+    stmt->SetData(1, GetId());
+    stmt->SetData(2, GetInstanceId());
     CharacterDatabase.ExecuteOrAppend(dbTrans, stmt);
 
     if (doRespawn)
@@ -2916,9 +2916,9 @@ void Map::RemoveRespawnTime(RespawnInfo* info, bool doRespawn, SQLTransaction db
         DeleteRespawnInfo(info);
 }
 
-void Map::RemoveRespawnTime(RespawnVector& respawnData, bool doRespawn, SQLTransaction dbTrans)
+void Map::RemoveRespawnTime(RespawnVector& respawnData, bool doRespawn, CharacterDatabaseTransaction dbTrans)
 {
-    SQLTransaction trans = dbTrans ? dbTrans : CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = dbTrans ? dbTrans : CharacterDatabase.BeginTransaction();
     for (RespawnInfo* info : respawnData)
         RemoveRespawnTime(info, doRespawn, trans);
     if (!dbTrans)
@@ -3729,7 +3729,7 @@ void Map::UpdateIteratorBack(Player* player)
         m_mapRefIter = m_mapRefIter->nocheck_prev();
 }
 
-void Map::SaveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 entry, time_t respawnTime, uint32 zoneId, uint32 gridId, bool writeDB, bool replace, SQLTransaction dbTrans)
+void Map::SaveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 entry, time_t respawnTime, uint32 zoneId, uint32 gridId, bool writeDB, bool replace, CharacterDatabaseTransaction dbTrans)
 {
     if (!respawnTime)
     {
@@ -3755,26 +3755,17 @@ void Map::SaveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId, uin
         SaveRespawnTimeDB(type, spawnId, ri.respawnTime, dbTrans); // might be different from original respawn time if we didn't replace
 }
 
-void Map::SaveRespawnTimeDB(SpawnObjectType type, ObjectGuid::LowType spawnId, time_t respawnTime, SQLTransaction dbTrans)
+void Map::SaveRespawnTimeDB(SpawnObjectType type, ObjectGuid::LowType spawnId, time_t respawnTime, CharacterDatabaseTransaction dbTrans)
 {
+    // CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction(); -> is it neeeded ?
+    
     // Just here for support of compatibility mode
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement((type == SPAWN_TYPE_GAMEOBJECT) ? CHAR_REP_GO_RESPAWN : CHAR_REP_CREATURE_RESPAWN);
-    stmt->setUInt32(0, spawnId);
-    stmt->setUInt64(1, uint64(respawnTime));
-    stmt->setUInt16(2, GetId());
-    stmt->setUInt32(3, GetInstanceId());
-    CharacterDatabase.ExecuteOrAppend(dbTrans, stmt);
-}
-
-void Map::RemoveGORespawnTime(ObjectGuid::LowType spawnId)
-{
-    _goRespawnTimes.erase(spawnId);
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GO_RESPAWN);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement((type == SPAWN_TYPE_GAMEOBJECT) ? CHAR_REP_GO_RESPAWN : CHAR_REP_CREATURE_RESPAWN);
     stmt->SetData(0, spawnId);
-    stmt->SetData(1, GetId());
-    stmt->SetData(2, GetInstanceId());
-    CharacterDatabase.Execute(stmt);
+    stmt->SetData(1, uint64(respawnTime));
+    stmt->SetData(2, GetId());
+    stmt->SetData(3, GetInstanceId());
+    CharacterDatabase.ExecuteOrAppend(dbTrans, stmt);
 }
 
 void Map::LoadRespawnTimes()
@@ -3790,8 +3781,8 @@ void Map::LoadRespawnTimes()
             ObjectGuid::LowType lowguid = fields[0].Get<uint32>();
             uint32 respawnTime = fields[1].Get<uint32>();
 
-            if (CreatureData const* cdata = sObjectMgr->GetCreatureData(loguid))
-                SaveRespawnTime(SPAWN_TYPE_CREATURE, loguid, cdata->id, time_t(respawnTime), GetZoneId(cdata->spawnPoint), Acore::ComputeGridCoord(cdata->spawnPoint.GetPositionX(), cdata->spawnPoint.GetPositionY()).GetId(), false);
+            if (CreatureData const* cdata = sObjectMgr->GetCreatureData(lowguid))
+                SaveRespawnTime(SPAWN_TYPE_CREATURE, lowguid, cdata->id, time_t(respawnTime), GetZoneId(cdata->spawnPoint), Acore::ComputeGridCoord(cdata->spawnPoint.GetPositionX(), cdata->spawnPoint.GetPositionY()).GetId(), false);
         } while (result->NextRow());
     }
 
@@ -3806,8 +3797,8 @@ void Map::LoadRespawnTimes()
             ObjectGuid::LowType lowguid = fields[0].Get<uint32>();
             uint32 respawnTime = fields[1].Get<uint32>();
 
-            if (GameObjectData const* godata = sObjectMgr->GetGameObjectData(loguid))
-                SaveRespawnTime(SPAWN_TYPE_GAMEOBJECT, loguid, godata->id, time_t(respawnTime), GetZoneId(godata->spawnPoint), Acore::ComputeGridCoord(godata->spawnPoint.GetPositionX(), godata->spawnPoint.GetPositionY()).GetId(), false);
+            if (GameObjectData const* godata = sObjectMgr->GetGameObjectData(lowguid))
+                SaveRespawnTime(SPAWN_TYPE_GAMEOBJECT, lowguid, godata->id, time_t(respawnTime), GetZoneId(godata->spawnPoint), Acore::ComputeGridCoord(godata->spawnPoint.GetPositionX(), godata->spawnPoint.GetPositionY()).GetId(), false);
         } while (result->NextRow());
     }
 }

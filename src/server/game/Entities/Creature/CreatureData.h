@@ -369,6 +369,7 @@ struct CreatureData : public SpawnData
     uint32 curhealth = 0;
     uint32 curmana = 0;
     uint8 movementType = 0;
+    float wander_distance = 0.0f;
     uint32 npcflag = 0;
     uint32 unit_flags = 0;
     uint32 dynamicflags = 0;

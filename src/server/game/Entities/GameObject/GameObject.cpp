@@ -619,24 +619,16 @@ void GameObject::Update(uint32 diff)
                         time_t now = GameTime::GetGameTime().count();
                         if (m_respawnTime <= now)            // timer expired
                         {
-                            ObjectGuid dbtableHighGuid(HighGuid::GameObject,
-                                                       GetEntry(), m_spawnId);
-                            time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(
-                                    dbtableHighGuid);
+                            ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::GameObject>(GetEntry(), m_spawnId);
+                            time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                             if (linkedRespawntime)             // Can't respawn, the master is dead
                             {
-                                ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(
-                                        dbtableHighGuid);
-                                if (targetGuid ==
-                                    dbtableHighGuid) // if linking self, never respawn
+                                ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+                                if (targetGuid == dbtableHighGuid) // if linking self, never respawn (check delayed to next day)
                                     SetRespawnTime(WEEK);
                                 else
-                                    m_respawnTime =
-                                            (now > linkedRespawntime ? now
-                                                                     : linkedRespawntime) +
-                                            urand(5,
-                                                  MINUTE); // else copy time from master and add a little
-                                SaveRespawnTime(0, false); // also save to DB immediately  //@todo - remove parameters
+                                    m_respawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE); // else copy time from master and add a little
+                                SaveRespawnTime(0); // also save to DB immediately
                                 return;
                             }
 
@@ -648,15 +640,13 @@ void GameObject::Update(uint32 diff)
                             {
                                 case GAMEOBJECT_TYPE_FISHINGNODE:   //  can't fish now
                                 {
-                                    Unit *caster = GetOwner();
-                                    if (caster &&
-                                        caster->GetTypeId() == TYPEID_PLAYER) {
-                                        caster->ToPlayer()->RemoveGameObject(
-                                                this, false);
+                                    Unit* caster = GetOwner();
+                                    if (caster && caster->GetTypeId() == TYPEID_PLAYER)
+                                    {
+                                        caster->ToPlayer()->RemoveGameObject(this, false);
 
                                         WorldPacket data(SMSG_FISH_ESCAPED, 0);
-                                        caster->ToPlayer()->GetSession()->SendPacket(
-                                                &data);
+                                        caster->ToPlayer()->GetSession()->SendPacket(&data);
                                     }
                                     // can be delete
                                     m_lootState = GO_JUST_DEACTIVATED;
@@ -670,7 +660,7 @@ void GameObject::Update(uint32 diff)
                                     break;
                                 case GAMEOBJECT_TYPE_FISHINGHOLE:
                                     // Initialize a new max fish count on respawn
-                                    m_goValue.FishingHole.MaxOpens = urand(GetGOInfo()->fishinghole.minSuccessOpens,GetGOInfo()->fishinghole.maxSuccessOpens);
+                                    m_goValue.FishingHole.MaxOpens = urand(GetGOInfo()->fishinghole.minSuccessOpens, GetGOInfo()->fishinghole.maxSuccessOpens);
                                     break;
                                 default:
                                     break;
@@ -690,7 +680,7 @@ void GameObject::Update(uint32 diff)
                             // respawn timer
                             uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
                             if (poolid)
-                                sPoolMgr->UpdatePool<GameObject>(poolid,m_spawnId);
+                                sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
                             else
                                 GetMap()->AddToMap(this);
                         }
@@ -1108,13 +1098,10 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     if (!data.spawnId)
         data.spawnId = m_spawnId;
     ASSERT(data.spawnId == m_spawnId);
-    data.spawnPoint.WorldRelocate(this);
+    
     data.id = GetEntry();
+    data.spawnPoint.WorldRelocate(this);
     data.phaseMask = phaseMask;
-    data.posX = GetPositionX();
-    data.posY = GetPositionY();
-    data.posZ = GetPositionZ();
-    data.orientation = GetOrientation();
     data.rotation = m_localRotation;
     data.spawntimesecs = m_spawnedByDefault ? m_respawnDelayTime : -(int32)m_respawnDelayTime;
     data.animprogress = GetGoAnimProgress();
@@ -1234,7 +1221,7 @@ bool GameObject::DeleteFromDB(ObjectGuid::LowType spawnId)
 
     CharacterDatabaseTransaction charTrans = CharacterDatabase.BeginTransaction();
 
-    sMapMgr->DoForAllMapsWithMapId(data->mapid,
+    sMapMgr->DoForAllMapsWithMapId(data->spawnPoint.GetMapId(),
         [spawnId, charTrans](Map* map) -> void
         {
             // despawn all active objects, and remove their respawns
@@ -1243,7 +1230,7 @@ bool GameObject::DeleteFromDB(ObjectGuid::LowType spawnId)
         toUnload.push_back(pair.second);
     for (GameObject* obj : toUnload)
         map->AddObjectToRemoveList(obj);
-    map->RemoveRespawnTime(SPAWN_TYPE_GAMEOBJECT, spawnId, charTrans);
+    map->RemoveRespawnTime(SPAWN_TYPE_GAMEOBJECT, spawnId, false, charTrans);
         }
     );
 
@@ -1256,41 +1243,16 @@ bool GameObject::DeleteFromDB(ObjectGuid::LowType spawnId)
 
     // ... and the database
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT);
-    stmt->setUInt32(0, spawnId);
+    stmt->SetData(0, spawnId);
     trans->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_SPAWNGROUP_MEMBER);
-    stmt->setUInt8(0, uint8(SPAWN_TYPE_GAMEOBJECT));
-    stmt->setUInt32(1, spawnId);
+    stmt->SetData(0, uint8(SPAWN_TYPE_GAMEOBJECT));
+    stmt->SetData(1, spawnId);
     trans->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_EVENT_GAMEOBJECT);
-    //stmt->SetData(0, m_spawnId);
-    stmt->setUInt32(0, spawnId);
-    trans->Append(stmt);
-
-    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_LINKED_RESPAWN);
-    stmt->setUInt32(0, spawnId);
-    stmt->setUInt32(1, LINKED_RESPAWN_GO_TO_GO);
-    trans->Append(stmt);
-
-    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_LINKED_RESPAWN);
-    stmt->setUInt32(0, spawnId);
-    stmt->setUInt32(1, LINKED_RESPAWN_GO_TO_CREATURE);
-    trans->Append(stmt);
-
-    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_LINKED_RESPAWN_MASTER);
-    stmt->setUInt32(0, spawnId);
-    stmt->setUInt32(1, LINKED_RESPAWN_GO_TO_GO);
-    trans->Append(stmt);
-
-    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_LINKED_RESPAWN_MASTER);
-    stmt->setUInt32(0, spawnId);
-    stmt->setUInt32(1, LINKED_RESPAWN_CREATURE_TO_GO);
-    trans->Append(stmt);
-
-    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT_ADDON);
-    stmt->setUInt32(0, spawnId);
+    stmt->SetData(0, spawnId);
     trans->Append(stmt);
 
     WorldDatabase.CommitTransaction(trans);

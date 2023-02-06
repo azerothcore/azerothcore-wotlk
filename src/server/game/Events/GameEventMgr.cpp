@@ -1338,7 +1338,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
             // Spawn if necessary (loaded grids only)
             Map* map = sMapMgr->CreateBaseMap(data->spawnPoint.GetMapId());
             // We use spawn coords to spawn
-            if (!map->Instanceable() && map->IsGridLoaded(data->spawnPoint.GetMapId())
+            if (!map->Instanceable() && map->IsGridLoaded(data->spawnPoint.GetMapId()))
             {
                 Creature* creature = new Creature;
                 if (!creature->LoadFromDB(*itr, map, true, false))
@@ -1412,7 +1412,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         {
             sObjectMgr->RemoveCreatureFromGrid(*itr, data);
 
-            sMapMgr->DoForAllMapsWithMapId(data->mapid, [&itr](Map* map)
+            sMapMgr->DoForAllMapsWithMapId(data->spawnPoint.GetMapId(), [&itr](Map* map)
             {
                 auto creatureBounds = map->GetCreatureBySpawnIdStore().equal_range(*itr);
                 for (auto itr2 = creatureBounds.first; itr2 != creatureBounds.second;)

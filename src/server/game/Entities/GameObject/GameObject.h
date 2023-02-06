@@ -24,6 +24,7 @@
 #include "LootMgr.h"
 #include "Object.h"
 #include "SharedDefines.h"
+#include "SpawnData.h"
 #include "Unit.h"
 #include <array>
 
@@ -767,25 +768,14 @@ enum class GameObjectActions : uint32
     SetTapList,                     // Set Tap List
 };
 
-// from `gameobject`
-struct GameObjectData
+// `gameobject` table
+struct GameObjectData : public SpawnData
 {
-    explicit GameObjectData()  = default;
-    uint32 id{0};                                              // entry in gamobject_template
-    uint16 mapid{0};
-    uint32 phaseMask{0};
-    float posX{0.0f};
-    float posY{0.0f};
-    float posZ{0.0f};
-    float orientation{0.0f};
-    G3D::Quat rotation;
-    int32  spawntimesecs{0};
-    uint32 ScriptId;
-    uint32 animprogress{0};
-    GOState go_state{GO_STATE_ACTIVE};
-    uint8 spawnMask{0};
-    uint8 artKit{0};
-    bool dbData{true};
+    GameObjectData() : SpawnData(SPAWN_TYPE_GAMEOBJECT) { }
+    QuaternionData rotation;
+    uint32 animprogress = 0;
+    GOState goState = GO_STATE_ACTIVE;
+    uint8 artKit = 0;
 };
 
 typedef std::vector<uint32> GameObjectQuestItemList;
@@ -824,6 +814,7 @@ public:
     uint32 GetDynamicFlags() const override { return GetUInt32Value(GAMEOBJECT_DYNAMIC); }
     void ReplaceAllDynamicFlags(uint32 flag) override { SetUInt32Value(GAMEOBJECT_DYNAMIC, flag); }
 
+    //@todo need to fix params as TC
     virtual bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0, bool dynamic = false, ObjectGuid::LowType spawnid = 0);
     void Update(uint32 p_time) override;
     [[nodiscard]] GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
