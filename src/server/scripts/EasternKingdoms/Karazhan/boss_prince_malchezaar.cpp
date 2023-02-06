@@ -34,7 +34,7 @@ enum Spells
 {
     SPELL_ENFEEBLE        = 30843,
     SPELL_ENFEEBLE_EFFECT = 41624,
-    SPELL_SHADOWNOVA      = 30852,
+    SPELL_SHADOW_NOVA     = 30852,
     SPELL_SW_PAIN         = 30854,
     SPELL_THRASH_PASSIVE  = 12787,
     SPELL_SUNDER_ARMOR    = 30901,
@@ -52,6 +52,19 @@ enum creatures
     INFERNAL_MODEL_INVISIBLE = 11686,
     SPELL_INFERNAL_RELAY     = 33814,   // 30835,
     EQUIP_ID_AXE             = 33542
+};
+
+enum EventGroups
+{
+    GROUP_ENFEEBLE,
+    GROUP_SHADOW_NOVA,
+};
+
+enum Phases
+{
+    PHASE_ONE   = 1,
+    PHASE_TWO   = 2,
+    PHASE_THREE = 3
 };
 
 struct InfernalPoint
@@ -87,32 +100,16 @@ struct boss_malchezaar : public BossAI
 {
     boss_malchezaar(Creature* creature) : BossAI(creature, DATA_MALCHEZZAR) { }
 
-    uint32 EnfeebleTimer;
-    uint32 EnfeebleResetTimer;
-    uint32 ShadowNovaTimer;
-    uint32 SWPainTimer;
-    uint32 SunderArmorTimer;
-    uint32 AmplifyDamageTimer;
-    uint32 InfernalTimer;
-    uint32 InfernalCleanupTimer;
-    uint32 phase;
-    uint32 enfeeble_health[5];
-    ObjectGuid enfeeble_targets[5];
-
-    GuidVector infernals;
-    std::vector<InfernalPoint*> positions;
-
     void Initialize()
     {
         EnfeebleTimer = 30000;
         EnfeebleResetTimer = 38000;
-        ShadowNovaTimer = 35500;
         SWPainTimer = 20000;
         InfernalCleanupTimer = 47000;
         AmplifyDamageTimer = 5000;
         SunderArmorTimer = urand(5000, 10000);
         InfernalTimer = 40000;
-        phase = 1;
+        _phase = 1;
         clearweapons();
         positions.clear();
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
@@ -149,6 +146,33 @@ struct boss_malchezaar : public BossAI
         Talk(SAY_AGGRO);
         DoZoneInCombat();
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
+
+        scheduler.Schedule(30s, [this](TaskContext context)
+        {
+            EnfeebleHealthEffect();
+
+            scheduler.Schedule(9s, [this](TaskContext)
+            {
+                EnfeebleResetHealth();
+            });
+
+            context.SetGroup(GROUP_ENFEEBLE);
+            scheduler.DelayGroup(GROUP_SHADOW_NOVA, 5s);
+            context.Repeat();
+        }).Schedule(35500ms, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_SHADOW_NOVA);
+            context.SetGroup(GROUP_SHADOW_NOVA);
+            context.Repeat();
+        });
+    }
+
+    void DamageTaken(Unit* /*done_by*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (me->HealthBelowPctDamaged(60, damage) && _phase == PHASE_ONE)
+        {
+            Phase2();
+        }
     }
 
     void SummonAxes()
@@ -237,7 +261,7 @@ struct boss_malchezaar : public BossAI
     void Phase2()
     {
         me->InterruptNonMeleeSpells(false);
-        phase = 2;
+        _phase = 2;
         DoCast(me, SPELL_EQUIP_AXES);
         Talk(SAY_AXE_TOSS1);
         DoCast(me, SPELL_THRASH_AURA, true);
@@ -251,7 +275,7 @@ struct boss_malchezaar : public BossAI
     {
         me->RemoveAurasDueToSpell(SPELL_THRASH_AURA);
         Talk(SAY_AXE_TOSS2);
-        phase = 3;
+        _phase = 3;
         clearweapons();
         SummonAxes();
         AmplifyDamageTimer = urand(20000, 30000);
@@ -262,27 +286,20 @@ struct boss_malchezaar : public BossAI
         if (!UpdateVictim())
             return;
 
-        if (EnfeebleResetTimer && EnfeebleResetTimer <= diff) // Let's not forget to reset that
-        {
-            EnfeebleResetHealth();
-            EnfeebleResetTimer = 0;
-        }
-        else EnfeebleResetTimer -= diff;
-
         if (InfernalTimer <= diff)
         {
             SummonInfernal();
-            InfernalTimer = phase == 3 ? 14500 : 44500;    // 15 secs in phase 3, 45 otherwise
+            InfernalTimer = _phase == 3 ? 14500 : 44500;    // 15 secs in phase 3, 45 otherwise
         }
         else InfernalTimer -= diff;
 
-        if (phase != 2)
+        if (_phase != 2)
         {
             if (SWPainTimer <= diff)
             {
 
                 // if phase == 1 target the tank, otherwise anyone but the tank
-                Unit* target = phase == 1
+                Unit* target = _phase == 1
                     ? me->GetVictim()
                     : SelectTarget(SelectTargetMethod::Random, 1, 100, true);
 
@@ -297,15 +314,7 @@ struct boss_malchezaar : public BossAI
                 SWPainTimer -= diff;
         }
 
-        if (ShadowNovaTimer <= diff)
-        {
-            DoCast(SPELL_SHADOWNOVA);
-            ShadowNovaTimer = 35500;
-        }
-        else
-            ShadowNovaTimer -= diff;
-
-        if (phase == 1)
+        if (_phase == 1)
         {
             if (HealthBelowPct(60))
             {
@@ -313,7 +322,7 @@ struct boss_malchezaar : public BossAI
             }
         }
 
-        if (phase == 2)
+        if (_phase == 2)
         {
             if (SunderArmorTimer <= diff)
             {
@@ -329,7 +338,7 @@ struct boss_malchezaar : public BossAI
             }
         }
 
-        if (phase == 3)
+        if (_phase == 3)
         {
             if (AmplifyDamageTimer <= diff)
             {
@@ -347,20 +356,24 @@ struct boss_malchezaar : public BossAI
             }
         }
 
-        if (phase != 3)
-        {
-            if (EnfeebleTimer <= diff)
-            {
-                EnfeebleHealthEffect();
-                EnfeebleTimer = 30000;
-                ShadowNovaTimer = 5000;
-                EnfeebleResetTimer = 9000;
-            }
-            else EnfeebleTimer -= diff;
-        }
-
-        DoMeleeAttackIfReady();
+        scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
+
+    private:
+        uint32 EnfeebleTimer;
+        uint32 EnfeebleResetTimer;
+        uint32 SWPainTimer;
+        uint32 SunderArmorTimer;
+        uint32 AmplifyDamageTimer;
+        uint32 InfernalTimer;
+        uint32 InfernalCleanupTimer;
+        uint32 _phase;
+        uint32 enfeeble_health[5];
+        ObjectGuid enfeeble_targets[5];
+
+        GuidVector infernals;
+        std::vector<InfernalPoint*> positions;
 };
 
 struct npc_netherspite_infernal : public ScriptedAI
