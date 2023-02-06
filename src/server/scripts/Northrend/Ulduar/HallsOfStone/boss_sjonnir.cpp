@@ -502,7 +502,7 @@ public:
                             if ((*itr)->GetGUID() != me->GetGUID() && (*itr)->IsAlive() && me->IsAlive())
                                 if (Creature* is = me->SummonCreature(NPC_IRON_SLUDGE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000))
                                 {
-                                    Unit::Kill(me, me);
+                                    me->KillSelf();
                                     Unit::Kill(*itr, *itr);
                                     is->SetInCombatWithZone();
                                     break;
