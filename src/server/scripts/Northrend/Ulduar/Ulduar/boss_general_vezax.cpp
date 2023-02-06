@@ -412,7 +412,7 @@ public:
                     vezax->AI()->DoAction(1);
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             Talk(SAY_EMOTE_VAPORS);
         }

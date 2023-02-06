@@ -176,3 +176,16 @@ bool ScriptMgr::OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid sou
 
     return true;
 }
+
+/**
+ * @brief Called when an instance Id is deleted, usually because it expired or no players are bound to it anymore.
+ *
+ * @param instanceId The unique id of the instance
+ */
+void ScriptMgr::OnInstanceIdRemoved(uint32 instanceId)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnInstanceIdRemoved(instanceId);
+    });
+}

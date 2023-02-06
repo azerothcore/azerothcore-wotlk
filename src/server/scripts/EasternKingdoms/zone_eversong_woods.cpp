@@ -41,7 +41,7 @@ struct npc_partygoer_pather : public ScriptedAI
 
     void Reset() override
     {
-        _events.ScheduleEvent(EVENT_RANDOM_ACTION_PATHER, urand(11000, 14000));
+        _events.ScheduleEvent(EVENT_RANDOM_ACTION_PATHER, 11s, 14s);
     }
 
     void PathEndReached(uint32 /*pathId*/) override
@@ -50,7 +50,7 @@ struct npc_partygoer_pather : public ScriptedAI
         if (_path > 594444)
             _path = 594440;
 
-        _events.ScheduleEvent(EVENT_RANDOM_ACTION_PATHER, urand(11000,14000));
+        _events.ScheduleEvent(EVENT_RANDOM_ACTION_PATHER, 11s, 14s);
     }
 
     void UpdateAI(uint32 diff) override
@@ -72,35 +72,35 @@ struct npc_partygoer_pather : public ScriptedAI
                 {
                     case 1:
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        _events.ScheduleEvent(EVENT_PATH, 11000);
+                        _events.ScheduleEvent(EVENT_PATH, 11s);
                         break;
                     case 2:
                         me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                        _events.ScheduleEvent(EVENT_PATH, 11000);
+                        _events.ScheduleEvent(EVENT_PATH, 11s);
                         break;
                     case 3:
                         me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
-                        _events.ScheduleEvent(EVENT_PATH, 11000);
+                        _events.ScheduleEvent(EVENT_PATH, 11s);
                         break;
                     case 4:
                         me->LoadEquipment(urand(1, 2));
                         me->HandleEmoteCommand(EMOTE_ONESHOT_EAT_NO_SHEATHE);
-                        _events.ScheduleEvent(EVENT_REMOVE_EQUIPMENT_PATHER, 4000);
+                        _events.ScheduleEvent(EVENT_REMOVE_EQUIPMENT_PATHER, 4s);
                         break;
                     case 5:
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DANCE);
-                        _events.ScheduleEvent(EVENT_STOP_DANCING_PATHER, 6000);
+                        _events.ScheduleEvent(EVENT_STOP_DANCING_PATHER, 6s);
                         break;
                 }
                 break;
             }
             case EVENT_REMOVE_EQUIPMENT_PATHER:
                 me->LoadEquipment(0, true);
-                _events.ScheduleEvent(EVENT_PATH, 8000);
+                _events.ScheduleEvent(EVENT_PATH, 8s);
                 break;
             case EVENT_STOP_DANCING_PATHER:
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                _events.ScheduleEvent(EVENT_PATH, 5000);
+                _events.ScheduleEvent(EVENT_PATH, 5s);
                 break;
             break;
             }
@@ -160,48 +160,48 @@ struct npc_partygoer : public ScriptedAI
                 {
                 case 1:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                    _events.ScheduleEvent(EVENT_RANDOM_ACTION, urand(13000, 20000));
+                    _events.ScheduleEvent(EVENT_RANDOM_ACTION, 13s, 20s);
                     break;
                 case 2:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                    _events.ScheduleEvent(EVENT_RANDOM_ACTION, urand(13000, 20000));
+                    _events.ScheduleEvent(EVENT_RANDOM_ACTION, 13s, 20s);
                     break;
                 case 3:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
-                    _events.ScheduleEvent(EVENT_RANDOM_ACTION, urand(13000, 20000));
+                    _events.ScheduleEvent(EVENT_RANDOM_ACTION, 13s, 20s);
                     break;
                 case 4:
                     me->LoadEquipment(urand(1, 2));
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EAT_NO_SHEATHE);
-                    _events.ScheduleEvent(EVENT_REMOVE_EQUIPMENT, 4000);
+                    _events.ScheduleEvent(EVENT_REMOVE_EQUIPMENT, 4s);
                     break;
                 case 5:
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DANCE);
-                    _events.ScheduleEvent(EVENT_STOP_DANCING, urand(8000, 16000));
+                    _events.ScheduleEvent(EVENT_STOP_DANCING, 8s, 16s);
                     break;
                 case 6:
                     if (GameObject* launcher = me->FindNearestGameObject(GO_FIREWORKS_LAUNCHER, 20.0f))
                         me->SetFacingToObject(launcher);
-                    _events.ScheduleEvent(EVENT_THROW_FIREWORKS, 1000);
+                    _events.ScheduleEvent(EVENT_THROW_FIREWORKS, 1s);
                     break;
                 }
                 break;
             }
             case EVENT_REMOVE_EQUIPMENT:
                 me->LoadEquipment(0, true);
-                _events.ScheduleEvent(EVENT_RANDOM_ACTION, urand(10000, 20000));
+                _events.ScheduleEvent(EVENT_RANDOM_ACTION, 10s, 20s);
                 break;
             case EVENT_STOP_DANCING:
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                _events.ScheduleEvent(EVENT_RANDOM_ACTION, urand(10000, 20000));
+                _events.ScheduleEvent(EVENT_RANDOM_ACTION, 10s, 20s);
                 break;
             case EVENT_THROW_FIREWORKS:
                 me->CastSpell(me, 26295);
-                _events.ScheduleEvent(EVENT_RESET_FACING, 3000);
+                _events.ScheduleEvent(EVENT_RESET_FACING, 3s);
                 break;
             case EVENT_RESET_FACING:
                 me->SetFacingTo(_facing);
-                _events.ScheduleEvent(EVENT_RANDOM_ACTION, urand(12000, 20000));
+                _events.ScheduleEvent(EVENT_RANDOM_ACTION, 12s, 20s);
                 break;
             }
         }

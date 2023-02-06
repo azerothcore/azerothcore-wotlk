@@ -1292,19 +1292,24 @@ public:
             return nullptr;
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
 
-            summoner->CastSpell(summoner, SPELL_WAITING_FOR_A_BOMBER, true);
-            summoner->CastSpell(summoner, SPELL_FLIGHT_ORDERS, true);
+            if (summoner->GetTypeId() != TYPEID_UNIT)
+            {
+                return;
+            }
+
+            summoner->ToUnit()->CastSpell(summoner->ToUnit(), SPELL_WAITING_FOR_A_BOMBER, true);
+            summoner->ToUnit()->CastSpell(summoner->ToUnit(), SPELL_FLIGHT_ORDERS, true);
             events.ScheduleEvent(EVENT_START_FLIGHT, 0);
             events.ScheduleEvent(EVENT_TAKE_PASSENGER, 3000);
             me->SetCanFly(true);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
             me->SetSpeed(MOVE_FLIGHT, 0.1f);
-            me->SetFaction(summoner->GetFaction());
+            me->SetFaction(summoner->ToUnit()->GetFaction());
         }
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
@@ -2129,7 +2134,7 @@ public:
 
         EventMap events;
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
