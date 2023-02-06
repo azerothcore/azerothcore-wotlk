@@ -32,6 +32,11 @@ class GameObjectAI;
 class Transport;
 class StaticTransport;
 class MotionTransport;
+class OPvPCapturePoint;
+class Unit;
+class GameObjectModel;
+
+struct TransportAnimation;
 
 typedef void(*goEventFlag)(Player*, GameObject*, Battleground*);
 
@@ -39,8 +44,9 @@ typedef void(*goEventFlag)(Player*, GameObject*, Battleground*);
 typedef std::unordered_map<uint32, GameObjectTemplate> GameObjectTemplateContainer;
 typedef std::unordered_map<uint32, GameObjectTemplateAddon> GameObjectTemplateAddonContainer;
 
-class OPvPCapturePoint;
-struct TransportAnimation;
+typedef std::unordered_map<uint32, GameObjectAddon> GameObjectAddonContainer;
+typedef std::vector<uint32> GameObjectQuestItemList;
+typedef std::unordered_map<uint32, GameObjectQuestItemList> GameObjectQuestItemMap;
 
 union GameObjectValue
 {
@@ -67,18 +73,6 @@ union GameObjectValue
         uint32 MaxHealth;
     } Building;
 };
-
-typedef std::unordered_map<uint32, GameObjectAddon> GameObjectAddonContainer;
-
-// client side GO show states
-enum GOState
-{
-    GO_STATE_ACTIVE             = 0,                        // show in world as used and not reset (closed door open)
-    GO_STATE_READY              = 1,                        // show in world as ready (closed door close)
-    GO_STATE_ACTIVE_ALTERNATIVE = 2                         // show in world as used in alt way and not reset (closed door open by cannon fire)
-};
-
-#define MAX_GO_STATE              3
 
 enum class GameObjectActions : uint32
 {
@@ -109,9 +103,6 @@ enum class GameObjectActions : uint32
     SetTapList,                     // Set Tap List
 };
 
-typedef std::vector<uint32> GameObjectQuestItemList;
-typedef std::unordered_map<uint32, GameObjectQuestItemList> GameObjectQuestItemMap;
-
 // For containers:  [GO_NOT_READY]->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED->GO_READY        -> ...
 // For bobber:      GO_NOT_READY  ->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED-><deleted>
 // For door(closed):[GO_NOT_READY]->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED->GO_READY(close) -> ...
@@ -123,9 +114,6 @@ enum LootState
     GO_ACTIVATED,
     GO_JUST_DEACTIVATED
 };
-
-class Unit;
-class GameObjectModel;
 
 // 5 sec for bobber catch
 #define FISHING_BOBBER_READY_TIME 5
