@@ -572,6 +572,7 @@ void BossAI::_Reset()
     if (!me->IsAlive())
         return;
 
+    me->SetCombatPulseDelay(0);
     me->ResetLootMode();
     events.Reset();
     scheduler.CancelAll();
@@ -594,6 +595,7 @@ void BossAI::_JustDied()
 
 void BossAI::_EnterCombat()
 {
+    me->SetCombatPulseDelay(5);
     me->setActive(true);
     DoZoneInCombat();
     ScheduleTasks();
