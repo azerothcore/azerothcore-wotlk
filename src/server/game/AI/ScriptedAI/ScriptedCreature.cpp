@@ -576,7 +576,7 @@ void BossAI::_Reset()
     events.Reset();
     scheduler.CancelAll();
     summons.DespawnAll();
-    if (instance)
+    if (instance && instance->GetBossState(_bossId) != DONE)
         instance->SetBossState(_bossId, NOT_STARTED);
 }
 
@@ -662,6 +662,30 @@ void BossAI::UpdateAI(uint32 diff)
     }
 
     DoMeleeAttackIfReady();
+}
+
+void BossAI::_DespawnAtEvade(Seconds delayToRespawn /*= 30s*/, Creature* who /*= nullptr*/)
+{
+    if (delayToRespawn < 2s)
+    {
+        LOG_ERROR("scripts.ai", "BossAI::_DespawnAtEvade: called with delay of {} seconds, defaulting to 2 (me: {}})", delayToRespawn.count(), me->GetGUID().ToString().c_str());
+        delayToRespawn = 2s;
+    }
+
+    if (!who)
+        who = me;
+
+    if (TempSummon* whoSummon = who->ToTempSummon())
+    {
+        LOG_WARN("scripts.ai", "BossAI::_DespawnAtEvade: called on a temporary summon (who: {})", who->GetGUID().ToString().c_str());
+        whoSummon->UnSummon();
+        return;
+    }
+
+    who->DespawnOrUnsummon(0s, delayToRespawn);
+
+    if (instance && who == me)
+        instance->SetBossState(_bossId, FAIL);
 }
 
 // WorldBossAI - for non-instanced bosses

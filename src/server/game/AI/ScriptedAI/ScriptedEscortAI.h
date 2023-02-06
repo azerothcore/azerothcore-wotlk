@@ -96,7 +96,7 @@ public:
     void SetEscortPaused(bool on);
 
     bool HasEscortState(uint32 escortState) { return (m_uiEscortState & escortState); }
-    bool IsEscorted() override { return (m_uiEscortState & STATE_ESCORT_ESCORTING); }
+    bool IsEscorted() override { return !m_uiPlayerGUID.IsEmpty(); }
 
     void SetMaxPlayerDistance(float newMax) { MaxPlayerDistance = newMax; }
     float GetMaxPlayerDistance() { return MaxPlayerDistance; }

@@ -23,6 +23,7 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "ObjectMgr.h"
+#include "ScriptMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
 
@@ -97,19 +98,22 @@ void AddObjectHelper(CellCoord& cell, GameObjectMapType& m, uint32& count, Map* 
 }
 
 template <class T>
-void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefMgr<T>& m, uint32& count, Map* map)
+void LoadHelper(CellGuidSet const& guid_set, CellCoord &cell, GridRefMgr<T> &m, uint32 &count, Map* map)
 {
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
-        T* obj = new T;
+        // Don't spawn at all if there's a respawn timer
         ObjectGuid::LowType guid = *i_guid;
+        if (!map->ShouldBeSpawnedOnGridLoad<T>(guid))
+            continue;
 
-        if (!obj->LoadFromDB(guid, map))
+        T* obj = new T;
+        //LOG_INFO("misc", "DEBUG: LoadHelper from table: %s for (guid: %u) Loading", table, guid);
+        if (!obj->LoadFromDB(guid, map, false, false))
         {
             delete obj;
             continue;
         }
-
         AddObjectHelper(cell, m, count, map, obj);
     }
 }
@@ -123,7 +127,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefMgr<GameObj
         GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
         GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
 
-        if (!obj->LoadFromDB(guid, map))
+        if (!obj->LoadFromDB(guid, map, false, false))
         {
             delete obj;
             continue;

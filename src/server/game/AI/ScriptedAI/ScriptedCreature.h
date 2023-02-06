@@ -458,12 +458,13 @@ public:
     void EnterCombat(Unit* /*who*/) override { _EnterCombat(); }
     void JustDied(Unit* /*killer*/) override { _JustDied(); }
     void JustReachedHome() override { _JustReachedHome(); }
-
+    
 protected:
     void _Reset();
     void _EnterCombat();
     void _JustDied();
     void _JustReachedHome() { me->setActive(false); }
+    void _DespawnAtEvade(Seconds delayToRespawn = 30s, Creature* who = nullptr);
 
     void TeleportCheaters();
 
