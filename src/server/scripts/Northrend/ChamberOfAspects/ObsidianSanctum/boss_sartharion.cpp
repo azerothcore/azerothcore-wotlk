@@ -465,6 +465,7 @@ public:
                     {
                         if (!IsTargetInBounds(me->GetVictim()))
                         {
+                            me->SetFullHealth();
                             EnterEvadeMode();
                         }
                         else
@@ -618,14 +619,14 @@ public:
             summons.RemoveNotExisting();
             Talk(WHISPER_LAVA_CHURN);
             extraEvents.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 2000);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 9000);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 14000);
 
             // Send wave from left
             if (lastLavaSide == LAVA_RIGHT_SIDE)
             {
                 for (uint8 i = 0; i < MAX_LEFT_LAVA_TSUNAMIS; ++i)
                 {
-                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3208.44f, 580.0f - (i * 50.0f), 55.8f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3208.44f, 580.0f - (i * 50.0f), 55.8f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 16000);
                 }
 
                 lastLavaSide = LAVA_LEFT_SIDE;
@@ -635,7 +636,7 @@ public:
             {
                 for (uint8 i = 0; i < MAX_RIGHT_LAVA_TSUNAMIS; ++i)
                 {
-                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3283.44f, 555.0f - (i * 50.0f), 55.8f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3283.44f, 555.0f - (i * 50.0f), 57.8f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 16000);
                 }
 
                 lastLavaSide = LAVA_RIGHT_SIDE;
@@ -874,7 +875,7 @@ struct boss_sartharion_dragonAI : public BossAI
                 Talk(SAY_TENEBRON_DEATH);
                 if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
                 {
-                    instance->SetBossState(DATA_SHADRON, DONE);
+                    instance->SetBossState(DATA_TENEBRON, DONE);
                 }
                 break;
             }
