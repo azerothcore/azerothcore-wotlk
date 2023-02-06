@@ -1,3 +1,4 @@
+-- DB update 2023_02_05_01 -> 2023_02_06_00
 -- Use properly sniffed IMMUNE_TO_PC instead of NON_ATTACKABLE, Cannot Turn
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`|256&~2, `unit_flags2`=`unit_flags2`|32768 WHERE (`entry` = 17838);
 -- Dark Portal Black Crystal Invisible Stalker (18553)
