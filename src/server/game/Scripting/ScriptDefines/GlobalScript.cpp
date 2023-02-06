@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
@@ -187,5 +188,21 @@ void ScriptMgr::OnInstanceIdRemoved(uint32 instanceId)
     ExecuteScript<GlobalScript>([&](GlobalScript* script)
     {
         script->OnInstanceIdRemoved(instanceId);
+    });
+}
+
+/**
+ * @brief Called when any raid boss has their state updated (e.g. pull, reset, kill).
+ *
+ * @param id The id of the boss in the instance
+ * @param newState The new boss state to be applied to this boss
+ * @param oldState The previously assigned state of this boss
+ * @param instance A pointer to the map object
+ */
+void ScriptMgr::OnBeforeSetBossState(uint32 id, EncounterState newState, EncounterState oldState, Map* instance)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnBeforeSetBossState(id, newState, oldState, instance);
     });
 }
