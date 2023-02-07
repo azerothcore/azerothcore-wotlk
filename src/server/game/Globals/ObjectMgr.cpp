@@ -2278,7 +2278,7 @@ uint32 ObjectMgr::AddGameObjectData(uint32 entry, uint32 mapId, float x, float y
 
     GameObjectData& data = NewOrExistGameObjectData(spawnId);
     data.id             = entry;
-    data.spawnPoint.WorldRelocate(mapId, pos);
+    data.spawnPoint.WorldRelocate(mapId, x, y, z, o);
     data.rotation.x     = rotation0;
     data.rotation.y     = rotation1;
     data.rotation.z     = rotation2;
@@ -2330,7 +2330,7 @@ uint32 ObjectMgr::AddCreatureData(uint32 entry, uint32 mapId, float x, float y, 
     data.id1 = entry;
     data.id2 = 0;
     data.id3 = 0;
-    data.spawnPoint.WorldRelocate(mapId, pos);
+    data.spawnPoint.WorldRelocate(mapId, x, y, z, o);
     data.displayid = 0;
     data.equipmentId = 0;
     data.spawntimesecs = spawntimedelay;
@@ -2513,8 +2513,8 @@ void ObjectMgr::LoadGameObjects()
 
         if (sWorld->getBoolConfig(CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA))
         {
-            uint32 zoneId = sMapMgr->GetZoneId(data.phaseMask, data.mapid, data.posX, data.posY, data.posZ);
-            uint32 areaId = sMapMgr->GetAreaId(data.phaseMask, data.mapid, data.posX, data.posY, data.posZ);
+            uint32 zoneId = sMapMgr->GetZoneId(data.phaseMask, data.spawnPoint);
+            uint32 areaId = sMapMgr->GetAreaId(data.phaseMask, data.spawnPoint);
 
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_GAMEOBJECT_ZONE_AREA_DATA);
 
