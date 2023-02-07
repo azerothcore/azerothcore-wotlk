@@ -227,10 +227,7 @@ public:
                 CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
                 data.id1 = id;
                 data.phaseMask = chr->GetPhaseMaskForSpawn();
-                data.posX = chr->GetTransOffsetX();
-                data.posY = chr->GetTransOffsetY();
-                data.posZ = chr->GetTransOffsetZ();
-                data.orientation = chr->GetTransOffsetO();
+                
 
                 Creature* creature = trans->CreateNPCPassenger(guid, &data);
 
@@ -241,7 +238,7 @@ public:
             }
 
         Creature* creature = new Creature();
-        if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
+        if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(), id, 0, { x, y, z, o }))
         {
             delete creature;
             return false;
@@ -256,7 +253,7 @@ public:
         creature->CleanupsBeforeDelete();
         delete creature;
         creature = new Creature();
-        if (!creature->LoadCreatureFromDB(spawnId, map, true, false, true))
+        if (!creature->LoadFromDB(spawnId, map, true, false))  //@todo - need to check
         {
             delete creature;
             return false;
@@ -748,7 +745,7 @@ public:
             return false;
         }
 
-        if (handler->GetSession()->GetPlayer()->GetMapId() != data->mapid)
+        if (handler->GetSession()->GetPlayer()->GetMapId() != data->spawnPoint.GetMapId())
         {
             handler->PSendSysMessage(LANG_COMMAND_CREATUREATSAMEMAP, lowguid);
             handler->SetSentErrorMessage(true);
@@ -764,10 +761,10 @@ public:
         {
             if (CreatureData const* data = sObjectMgr->GetCreatureData(creature->GetSpawnId()))
             {
-                const_cast<CreatureData*>(data)->posX = x;
-                const_cast<CreatureData*>(data)->posY = y;
-                const_cast<CreatureData*>(data)->posZ = z;
-                const_cast<CreatureData*>(data)->orientation = o;
+                const_cast<CreatureData*>(data)->spawnPoint.GetPositionX();
+                const_cast<CreatureData*>(data)->spawnPoint.GetPositionX();
+                const_cast<CreatureData*>(data)->spawnPoint.GetPositionZ();
+                const_cast<CreatureData*>(data)->spawnPoint.GetOrientation();
             }
 
             creature->SetPosition(x, y, z, o);
