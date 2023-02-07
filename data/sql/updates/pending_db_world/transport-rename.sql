@@ -11,7 +11,7 @@ UPDATE `transports` SET `name` = 'Menethil Harbor, Wetlands and Valgarde, Howlin
 UPDATE `transports` SET `name` = 'Undercity, Tirisfal Glades and Vengeance Landing, Howling Fjord (Zeppelin, Horde ("Cloudkisser"))' WHERE `entry` = 181689;
 UPDATE `transports` SET `name` = 'Orgrimmar, Durotar and Warsong Hold, Borean Tundra (Zeppelin, Horde ("The Mighty Wind"))' WHERE `entry` = 186238;
 UPDATE `transports` SET `name` = 'Westguard Keep, Howling Fjord and Shattered Straits, Howling Fjord (Zeppelin, Alliance)' WHERE `entry` = 186371;
-UPDATE `transports` SET `name` = 'Garvan\'s Reef (Boat, Unboardable ("Sister Mercy"))' WHERE `entry` = 187038;
+UPDATE `transports` SET `name` = 'Garvan\'s Reef (Boat, Neutral ("Sister Mercy"))' WHERE `entry` = 187038;
 UPDATE `transports` SET `name` = 'Unu\'pe, Borean Tundra and Moa\'ki Harbor, Dragonblight (Turtle, Neutral ("Walker of Waves"))' WHERE `entry` = 187568;
 UPDATE `transports` SET `name` = 'Kamagua, Howling Fjord and Moa\'ki Harbor, Dragonblight (Turtle, Neutral ("Green Island"))' WHERE `entry` = 188511;
 UPDATE `transports` SET `name` = 'Valiance Keep, Borean Tundra and Stormwind Harbor (Boat, Alliance ("The Kraken"))' WHERE `entry` = 190536;
