@@ -434,20 +434,26 @@ namespace lfg
             else if (ar)
             {
                 // Check required items
+                // If there are multiple items, only one of them is required. for example: Blessed Medallion of Karabor
+                uint32 itemlockData = 0;
+                if (!(ar->items.empty()))
+                    itemlockData = LFG_LOCKSTATUS_MISSING_ITEM;
                 for (const ProgressionRequirement* itemRequirement : ar->items)
                 {
                     if (!itemRequirement->checkLeaderOnly || !group || group->GetLeaderGUID() == player->GetGUID())
                     {
                         if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == player->GetTeamId(true))
                         {
-                            if (!player->HasItemCount(itemRequirement->id, 1))
+                            if (player->HasItemCount(itemRequirement->id, 1))
                             {
-                                lockData = LFG_LOCKSTATUS_MISSING_ITEM;
+                                itemlockData = 0;
                                 break;
                             }
                         }
                     }
                 }
+                if (itemlockData == LFG_LOCKSTATUS_MISSING_ITEM)
+                    lockData = LFG_LOCKSTATUS_MISSING_ITEM;
 
                 //Check for quests
                 for (const ProgressionRequirement* questRequirement : ar->quests)

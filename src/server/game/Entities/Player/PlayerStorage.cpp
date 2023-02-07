@@ -6765,6 +6765,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         }
 
         //Check all items
+        // If there are multiple items, only one of them is required. for example: Blessed Medallion of Karabor
         std::vector<const ProgressionRequirement*> missingPlayerItems;
         std::vector<const ProgressionRequirement*> missingLeaderItems;
         for (const ProgressionRequirement* itemRequirement : ar->items)
@@ -6782,6 +6783,11 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 if (!checkPlayer->HasItemCount(itemRequirement->id, 1))
                 {
                     missingItems->push_back(itemRequirement);
+                }
+                else
+                {
+                    missingItems->clear();
+                    break;
                 }
             }
         }
@@ -6877,7 +6883,12 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     }
                     else if (missingPlayerItems.size())
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, sObjectMgr->GetItemTemplate(missingPlayerItems[0]->id)->Name1.c_str());
+                        int loc_idx = GetSession()->GetSessionDbLocaleIndex();
+                        const ItemTemplate *temp = sObjectMgr->GetItemTemplate(missingPlayerItems[0]->id);
+                        std::string name = temp->Name1;
+                        if (ItemLocale const* il = sObjectMgr->GetItemLocale(temp->ItemId))
+                            ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, name.c_str());
                     }
                     else if (LevelMin)
                     {
