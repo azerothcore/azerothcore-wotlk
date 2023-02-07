@@ -1458,7 +1458,7 @@ public:
      */
     virtual void OnQuestAbandon(Player* /*player*/, uint32 /*questId*/) { }
 
-    virtual void OnPlayerResetsInstances(Player * /*player*/, uint8 /*method*/, bool /*isRaid*/)
+    virtual void OnPlayerResetsInstances(ObjectGuid /*guid*/, uint8 /*method*/, bool /*isRaid*/)
     {}
 
     // Passive Anticheat System
@@ -2391,7 +2391,7 @@ public: /* PlayerScript */
     void OnPlayerEnterCombat(Player* player, Unit* enemy);
     void OnPlayerLeaveCombat(Player* player);
     void OnQuestAbandon(Player* player, uint32 questId);
-    void OnPlayerResetsInstances(Player *player, uint8 method, bool isRaid);
+    void OnPlayerResetsInstances(ObjectGuid guid, uint8 method, bool isRaid);
 
     // Anti cheat
     void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);

@@ -322,9 +322,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
             break;
     }
 
-    Player* player = ObjectAccessor::FindConnectedPlayer(guid);
-
-    sScriptMgr->OnPlayerResetsInstances(player, method, isRaid);
+    sScriptMgr->OnPlayerResetsInstances(guid, method, isRaid);
 }
 
 void Player::SendResetInstanceSuccess(uint32 MapId)

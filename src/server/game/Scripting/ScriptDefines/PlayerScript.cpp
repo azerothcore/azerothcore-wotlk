@@ -1527,10 +1527,10 @@ void ScriptMgr::OnQuestAbandon(Player* player, uint32 questId)
     });
 }
 
-void ScriptMgr::OnPlayerResetsInstances(Player *player, uint8 method, bool isRaid)
+void ScriptMgr::OnPlayerResetsInstances(ObjectGuid guid, uint8 method, bool isRaid)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript *script) {
-        script->OnPlayerResetsInstances(player, method, isRaid);
+        script->OnPlayerResetsInstances(guid, method, isRaid);
     });
 }
 
