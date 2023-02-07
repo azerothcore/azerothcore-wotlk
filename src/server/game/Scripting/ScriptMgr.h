@@ -471,6 +471,22 @@ public:
     virtual void OnUnitDeath(Unit* /*unit*/, Unit* /*killer*/) { }
 };
 
+class ThreatScript : public ScriptObject
+{
+protected:
+    ThreatScript(const char *name, bool addToScripts = true);
+
+public:
+    virtual void OnAddThreat(Unit * /*victim*/, float /*threat*/)
+    {}
+
+    virtual void OnRemoveHostileReferenceFromThreatContainer(HostileReference * /*victim*/)
+    {}
+
+    virtual void OnAddHostileReferenceToThreatContainer(HostileReference * /*victim*/)
+    {}
+};
+
 class MovementHandlerScript : public ScriptObject
 {
 protected:
@@ -1442,6 +1458,9 @@ public:
      */
     virtual void OnQuestAbandon(Player* /*player*/, uint32 /*questId*/) { }
 
+    virtual void OnPlayerResetsInstances(Player * /*player*/, uint8 /*method*/, bool /*isRaid*/)
+    {}
+
     // Passive Anticheat System
     virtual void AnticheatSetSkipOnePacketForASH(Player* /*player*/, bool /*apply*/) { }
     virtual void AnticheatSetCanFlybyServer(Player* /*player*/, bool /*apply*/) { }
@@ -1932,6 +1951,9 @@ public:
      * @param cmdStr Contains information about the command name
      */
     [[nodiscard]] virtual bool CanExecuteCommand(ChatHandler& /*handler*/, std::string_view /*cmdStr*/) { return true; }
+
+    virtual void OnExecuteCommand(ChatHandler & /*handler*/, std::string /*command*/, std::string /*arguments*/)
+    {}
 };
 
 class DatabaseScript : public ScriptObject
@@ -2369,6 +2391,7 @@ public: /* PlayerScript */
     void OnPlayerEnterCombat(Player* player, Unit* enemy);
     void OnPlayerLeaveCombat(Player* player);
     void OnQuestAbandon(Player* player, uint32 questId);
+    void OnPlayerResetsInstances(Player *player, uint8 method, bool isRaid);
 
     // Anti cheat
     void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
@@ -2461,6 +2484,11 @@ public: /* UnitScript */
     void OnUnitEnterEvadeMode(Unit* unit, uint8 why);
     void OnUnitEnterCombat(Unit* unit, Unit* victim);
     void OnUnitDeath(Unit* unit, Unit* killer);
+
+public: /* ThreatScript */
+    void OnAddThreat(Unit *victim, float threat);
+    void OnRemoveHostileReferenceFromThreatContainer(HostileReference *hostileRef);
+    void OnAddHostileReferenceToThreatContainer(HostileReference *hostileRef);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
@@ -2574,6 +2602,7 @@ public: /* CommandSC */
 
     void OnHandleDevCommand(Player* player, bool& enable);
     bool CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
+    void OnExecuteCommand(ChatHandler &handler, std::string command, std::string arguments);
 
 public: /* DatabaseScript */
 

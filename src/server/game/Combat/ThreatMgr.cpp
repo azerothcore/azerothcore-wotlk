@@ -21,6 +21,7 @@
 #include "Map.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
@@ -407,6 +408,20 @@ HostileReference* ThreatContainer::SelectNextVictim(Creature* attacker, HostileR
     return currentRef;
 }
 
+void ThreatContainer::remove(HostileReference *hostileRef)
+{
+    iThreatList.remove(hostileRef);
+
+    sScriptMgr->OnRemoveHostileReferenceFromThreatContainer(hostileRef);
+}
+
+void ThreatContainer::addReference(HostileReference *hostileRef)
+{
+    iThreatList.push_back(hostileRef);
+
+    sScriptMgr->OnAddHostileReferenceToThreatContainer(hostileRef);
+}
+
 //============================================================
 //=================== ThreatMgr ==========================
 //============================================================
@@ -436,6 +451,8 @@ void ThreatMgr::clearReferences()
 
 void ThreatMgr::AddThreat(Unit* victim, float threat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
 {
+    sScriptMgr->OnAddThreat(victim, threat);
+
     if (!ThreatCalcHelper::isValidProcess(victim, iOwner, threatSpell))
         return;
 

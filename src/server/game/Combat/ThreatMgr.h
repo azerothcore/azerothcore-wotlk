@@ -177,15 +177,9 @@ public:
     [[nodiscard]] StorageType const& GetThreatList() const { return iThreatList; }
 
 private:
-    void remove(HostileReference* hostileRef)
-    {
-        iThreatList.remove(hostileRef);
-    }
+    void remove(HostileReference* hostileRef);
 
-    void addReference(HostileReference* hostileRef)
-    {
-        iThreatList.push_back(hostileRef);
-    }
+    void addReference(HostileReference* hostileRef);
 
     void clearReferences();
 

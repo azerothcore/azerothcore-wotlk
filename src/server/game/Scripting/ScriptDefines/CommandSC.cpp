@@ -40,3 +40,10 @@ bool ScriptMgr::CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr)
 
     return true;
 }
+
+void ScriptMgr::OnExecuteCommand(ChatHandler &handler, std::string command, std::string arguments)
+{
+    ExecuteScript<CommandSC>([&](CommandSC *script) {
+        script->OnExecuteCommand(handler, command, arguments);
+    });
+}
