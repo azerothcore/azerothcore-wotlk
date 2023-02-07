@@ -412,9 +412,9 @@ public:
         {
             Talk(SAY_MO_AGGRO);
             me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
-            events.ScheduleEvent(EVENT_PULL_CATHEDRAL, 1000); // Has to be done via event, otherwise mob aggroing Mograine DOES NOT aggro the room
-            events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, urand(1000, 5000));
-            events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, urand(6000, 11000));
+            events.ScheduleEvent(EVENT_PULL_CATHEDRAL, 1s); // Has to be done via event, otherwise mob aggroing Mograine DOES NOT aggro the room
+            events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 1s, 5s);
+            events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 6s, 11s);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -487,8 +487,8 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
                     me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
                     me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);
-                    events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, urand(1000, 5000));
-                    events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, urand(6000, 11000));
+                    events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 1s, 5s);
+                    events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 6s, 11s);
                     if (me->GetVictim())
                         me->GetMotionMaster()->MoveChase(me->GetVictim());
                     heal = true;
@@ -509,11 +509,11 @@ public:
                 {
                     case EVENT_SPELL_CRUSADER_STRIKE:
                         me->CastSpell(me->GetVictim(), SPELL_CRUSADER_STRIKE, true);
-                        events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 10000);
+                        events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 10s);
                         break;
                     case EVENT_SPELL_HAMMER_OF_JUSTICE:
                         me->CastSpell(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE, true);
-                        events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 60000);
+                        events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 60s);
                         break;
                     case EVENT_PULL_CATHEDRAL:
                         PullCathedral();
@@ -568,9 +568,9 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_WH_INTRO);
-            events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, urand(1000, 3000));
-            events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 6000);
-            events.ScheduleEvent(EVENT_SPELL_HEAL, 9000);
+            events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1s, 3s);
+            events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 6s);
+            events.ScheduleEvent(EVENT_SPELL_HEAL, 9s);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -652,11 +652,11 @@ public:
                 {
                     case EVENT_SPELL_POWER_WORLD_SHIELD:
                         me->CastSpell(me, SPELL_POWER_WORD_SHIELD, false);
-                        events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 15000);
+                        events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 15s);
                         break;
                     case EVENT_SPELL_HOLY_SMITE:
                         me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, false);
-                        events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6000);
+                        events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6s);
                         break;
                     case EVENT_SPELL_HEAL:
                         me->CastSpell(me, SPELL_HEAL, false);
