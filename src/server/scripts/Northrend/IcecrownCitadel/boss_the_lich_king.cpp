@@ -2339,7 +2339,7 @@ public:
             }
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             // player is the spellcaster so register summon manually
             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
@@ -3121,10 +3121,15 @@ public:
         EventMap _events;
         InstanceScript* _instance;
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
+
+            if (summoner->GetTypeId() != TYPEID_UNIT)
+            {
+                return;
+            }
 
             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
             {
@@ -3134,13 +3139,13 @@ public:
                 path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), 843.0f));
                 me->GetMotionMaster()->MoveSplinePath(&path);
 
-                ObjectGuid petGUID = summoner->GetPetGUID();
-                summoner->SetPetGUID(ObjectGuid::Empty);
-                summoner->StopMoving();
-                me->CastSpell(summoner, SPELL_HARVEST_SOUL_VEHICLE, true);
+                ObjectGuid petGUID = summoner->ToUnit()->GetPetGUID();
+                summoner->ToUnit()->SetPetGUID(ObjectGuid::Empty);
+                summoner->ToUnit()->StopMoving();
+                me->CastSpell(summoner->ToUnit(), SPELL_HARVEST_SOUL_VEHICLE, true);
                 //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);
-                summoner->SendMovementFlagUpdate(true);
-                summoner->SetPetGUID(petGUID);
+                summoner->ToUnit()->SendMovementFlagUpdate(true);
+                summoner->ToUnit()->SetPetGUID(petGUID);
                 _events.Reset();
                 _events.ScheduleEvent(EVENT_MOVE_TO_LICH_KING, 1000);
                 _events.ScheduleEvent(EVENT_TELEPORT, 6250);
@@ -3652,7 +3657,7 @@ public:
 
         uint16 timer;
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             float destX, destY, destZ;
             me->GetPosition(destX, destY);

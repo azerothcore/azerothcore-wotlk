@@ -119,7 +119,7 @@ public:
 
     static bool HandleGoGameObjectSpawnIdCommand(ChatHandler* handler, uint32 spawnId)
     {
-        GameObjectData const* spawnpoint = sObjectMgr->GetGOData(spawnId);
+        GameObjectData const* spawnpoint = sObjectMgr->GetGameObjectData(spawnId);
         if (!spawnpoint)
         {
             handler->SendSysMessage(LANG_COMMAND_GOOBJNOTFOUND);

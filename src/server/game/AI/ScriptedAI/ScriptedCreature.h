@@ -438,6 +438,8 @@ public:
 
     InstanceScript* const instance;
 
+    bool CanRespawn() override;
+
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
     void SummonedCreatureDespawnAll() override;

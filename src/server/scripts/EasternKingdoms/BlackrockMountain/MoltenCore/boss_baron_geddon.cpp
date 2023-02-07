@@ -63,9 +63,9 @@ public:
         void EnterCombat(Unit* /*attacker*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_INFERNO, urand(13000, 15000));
-            events.ScheduleEvent(EVENT_IGNITE_MANA, urand(7000, 19000));
-            events.ScheduleEvent(EVENT_LIVING_BOMB, urand(11000, 16000));
+            events.ScheduleEvent(EVENT_INFERNO, 13s, 15s);
+            events.ScheduleEvent(EVENT_IGNITE_MANA, 7s, 19s);
+            events.ScheduleEvent(EVENT_LIVING_BOMB, 11s, 16s);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override

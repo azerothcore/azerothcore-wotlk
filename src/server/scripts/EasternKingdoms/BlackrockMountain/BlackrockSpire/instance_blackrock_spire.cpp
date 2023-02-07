@@ -351,7 +351,7 @@ public:
                     if (data == AREATRIGGER_DRAGONSPIRE_HALL)
                     {
                         if (GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE)
-                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_STORE, 1000);
+                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_STORE, 1s);
                     }
                     break;
                 case DATA_SOLAKAR_FLAMEWREATH:
@@ -360,7 +360,7 @@ public:
                         case IN_PROGRESS:
                             if (SolakarState == NOT_STARTED)
                             {
-                                Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500);
+                                Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500ms);
                             }
                             break;
                         case FAIL:
@@ -556,12 +556,12 @@ public:
                 {
                     case EVENT_DARGONSPIRE_ROOM_STORE:
                         Dragonspireroomstore();
-                        Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3000);
+                        Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3s);
                         break;
                     case EVENT_DARGONSPIRE_ROOM_CHECK:
                         Dragonspireroomcheck();
                         if ((GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE))
-                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3000);
+                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3s);
                         break;
                     case EVENT_SOLAKAR_WAVE:
                         SummonSolakarWave(CurrentSolakarWave);
@@ -981,7 +981,7 @@ public:
     {
         npc_vaelastrasz_the_redAI(Creature* creature) : CreatureAI(creature) { }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
             {

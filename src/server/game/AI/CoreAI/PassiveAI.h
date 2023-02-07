@@ -80,7 +80,7 @@ class TriggerAI : public NullCreatureAI
 {
 public:
     explicit TriggerAI(Creature* c) : NullCreatureAI(c) {}
-    void IsSummonedBy(Unit* summoner) override;
+    void IsSummonedBy(WorldObject* summoner) override;
 
     static int32 Permissible(Creature const* creature);
 };
