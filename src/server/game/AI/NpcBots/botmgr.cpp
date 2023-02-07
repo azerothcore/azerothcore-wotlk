@@ -87,6 +87,24 @@ float _mult_dmg_physical;
 float _mult_dmg_spell;
 float _mult_healing;
 float _mult_hp;
+float _mult_dmg_warrior;
+float _mult_dmg_paladin;
+float _mult_dmg_hunter;
+float _mult_dmg_rogue;
+float _mult_dmg_priest;
+float _mult_dmg_deathknight;
+float _mult_dmg_shaman;
+float _mult_dmg_mage;
+float _mult_dmg_warlock;
+float _mult_dmg_druid;
+float _mult_dmg_blademaster;
+float _mult_dmg_obsidiandestroyer;
+float _mult_dmg_archmage;
+float _mult_dmg_dreadlord;
+float _mult_dmg_spellbreaker;
+float _mult_dmg_darkranger;
+float _mult_dmg_necromancer;
+float _mult_dmg_seawitch;
 
 bool __firstload = true;
 
@@ -217,6 +235,24 @@ void BotMgr::LoadConfig(bool reload)
     _mult_dmg_spell                 = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Spell", 1.0f);
     _mult_healing                   = sConfigMgr->GetFloatDefault("NpcBot.Mult.Healing", 1.0f);
     _mult_hp                        = sConfigMgr->GetFloatDefault("NpcBot.Mult.HP", 1.0f);
+    _mult_dmg_warrior               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Warrior", 1.0f);
+    _mult_dmg_paladin               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Paladin", 1.0f);
+    _mult_dmg_hunter                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Hunter", 1.0f);
+    _mult_dmg_rogue                 = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Rogue", 1.0f);
+    _mult_dmg_priest                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Priest", 1.0f);
+    _mult_dmg_deathknight           = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.DeathKnight", 1.0f);
+    _mult_dmg_shaman                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Shaman", 1.0f);
+    _mult_dmg_mage                  = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Mage", 1.0f);
+    _mult_dmg_warlock               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Warlock", 1.0f);
+    _mult_dmg_druid                 = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Druid", 1.0f);
+    _mult_dmg_blademaster           = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Blademaster", 1.0f);
+    _mult_dmg_obsidiandestroyer     = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.ObsidianDestroyer", 1.0f);
+    _mult_dmg_archmage              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Archmage", 1.0f);
+    _mult_dmg_dreadlord             = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Dreadlord", 1.0f);
+    _mult_dmg_spellbreaker          = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.SpellBreaker", 1.0f);
+    _mult_dmg_darkranger            = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.DarkRanger", 1.0f);
+    _mult_dmg_necromancer           = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Necromancer", 1.0f);
+    _mult_dmg_seawitch              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.SeaWitch", 1.0f);
     _enableNpcBotsDungeons          = sConfigMgr->GetBoolDefault("NpcBot.Enable.Dungeon", true);
     _enableNpcBotsRaids             = sConfigMgr->GetBoolDefault("NpcBot.Enable.Raid", false);
     _enableNpcBotsBGs               = sConfigMgr->GetBoolDefault("NpcBot.Enable.BG", false);
@@ -1813,4 +1849,49 @@ float BotMgr::GetBotHealingMod()
 float BotMgr::GetBotHPMod()
 {
     return _mult_hp;
+}
+
+float BotMgr::GetBotDamageModByClass(uint8 botclass)
+{
+    switch (botclass)
+    {
+        case BOT_CLASS_WARRIOR:
+            return _mult_dmg_warrior;
+        case BOT_CLASS_PALADIN:
+            return _mult_dmg_paladin;
+        case BOT_CLASS_HUNTER:
+            return _mult_dmg_hunter;
+        case BOT_CLASS_ROGUE:
+            return _mult_dmg_rogue;
+        case BOT_CLASS_PRIEST:
+            return _mult_dmg_priest;
+        case BOT_CLASS_DEATH_KNIGHT:
+            return _mult_dmg_deathknight;
+        case BOT_CLASS_SHAMAN:
+            return _mult_dmg_shaman;
+        case BOT_CLASS_MAGE:
+            return _mult_dmg_mage;
+        case BOT_CLASS_WARLOCK:
+            return _mult_dmg_warlock;
+        case BOT_CLASS_DRUID:
+            return _mult_dmg_druid;
+        case BOT_CLASS_BM:
+            return _mult_dmg_blademaster;
+        case BOT_CLASS_SPHYNX:
+            return _mult_dmg_obsidiandestroyer;
+        case BOT_CLASS_ARCHMAGE:
+            return _mult_dmg_archmage;
+        case BOT_CLASS_DREADLORD:
+            return _mult_dmg_dreadlord;
+        case BOT_CLASS_SPELLBREAKER:
+            return _mult_dmg_spellbreaker;
+        case BOT_CLASS_DARK_RANGER:
+            return _mult_dmg_darkranger;
+        case BOT_CLASS_NECROMANCER:
+            return _mult_dmg_necromancer;
+        case BOT_CLASS_SEA_WITCH:
+            return _mult_dmg_seawitch;
+        default:
+            return 1.0;
+    }
 }
