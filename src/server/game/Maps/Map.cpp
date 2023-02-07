@@ -1055,9 +1055,6 @@ void Map::RemoveFromMap(MotionTransport* obj, bool remove)
 
     if (remove)
     {
-        // if option set then object already saved at this moment
-        if (!sWorld->getBoolConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATELY))
-            obj->SaveRespawnTime(0);    // @todo - need to remove parameter
         DeleteFromWorld(obj);
     }
 }

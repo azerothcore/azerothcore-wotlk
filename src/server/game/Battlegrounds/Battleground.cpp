@@ -1511,7 +1511,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
     }
 
     Creature* creature = new Creature();
-    if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, 0, x, y, z, o))
+    if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, 0, { x, y, z, o }))
     {
         LOG_ERROR("bg.battleground", "Battleground::AddCreature: cannot create creature (entry: {}) for BG (map: {}, instance id: {})!",
                        entry, m_MapId, m_InstanceID);

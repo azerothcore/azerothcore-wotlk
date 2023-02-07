@@ -458,7 +458,7 @@ public:
     void EnterCombat(Unit* /*who*/) override { _EnterCombat(); }
     void JustDied(Unit* /*killer*/) override { _JustDied(); }
     void JustReachedHome() override { _JustReachedHome(); }
-    
+
 protected:
     void _Reset();
     void _EnterCombat();

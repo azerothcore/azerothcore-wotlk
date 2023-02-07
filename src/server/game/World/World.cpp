@@ -1066,7 +1066,6 @@ void World::LoadConfigSettings(bool reload)
         _int_configs[CONFIG_MAX_OVERSPEED_PINGS] = 2;
     }
 
-    _bool_configs[CONFIG_SAVE_RESPAWN_TIME_IMMEDIATELY] = sConfigMgr->GetOption<bool>("SaveRespawnTimeImmediately", true);
     _bool_configs[CONFIG_WEATHER]                       = sConfigMgr->GetOption<bool>("ActivateWeather", true);
 
     _int_configs[CONFIG_DISABLE_BREATHING] = sConfigMgr->GetOption<int32>("DisableWaterBreath", SEC_CONSOLE);

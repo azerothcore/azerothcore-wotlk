@@ -1978,11 +1978,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
                 m_respawnTime = time(nullptr) + respawnDelay;
         }
 
-        // always save boss respawn time at death to prevent crash cheating
-        if (GetMap()->IsDungeon() || isWorldBoss() || GetCreatureTemplate()->rank >= CREATURE_ELITE_ELITE)
-            SaveRespawnTime();
-        else if (!m_respawnCompatibilityMode)
-            SaveRespawnTime(0); //@todo - Need to check param
+        SaveRespawnTime();
 
         SetTarget();                // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
         ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);

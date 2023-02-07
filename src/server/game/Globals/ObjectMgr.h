@@ -1207,21 +1207,15 @@ public:
             return &itr->second;
         return nullptr;
     }
-    SpawnData const* GetSpawnData(SpawnObjectType type, ObjectGuid::LowType spawnId) const
+    SpawnData const* GetSpawnData(SpawnObjectType type, ObjectGuid::LowType guid)
     {
-        if (!SpawnData::TypeHasData(type))
-            return nullptr;
-        switch (type)
-        {
-        case SPAWN_TYPE_CREATURE:
-            return GetCreatureData(spawnId);
-        case SPAWN_TYPE_GAMEOBJECT:
-            return reinterpret_cast<const SpawnData*>(GetGameObjectData(
-                spawnId));
-        default:
+        if (type == SPAWN_TYPE_CREATURE)
+            return GetCreatureData(guid);
+        else if (type == SPAWN_TYPE_GAMEOBJECT)
+            return GetGameObjectData(guid);
+        else
             ASSERT(false, "Invalid spawn object type %u", uint32(type));
-            return nullptr;
-        }
+        return nullptr;
     }
     void OnDeleteSpawnData(SpawnData const* data);
     [[nodiscard]] CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
