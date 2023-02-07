@@ -1,3 +1,4 @@
+-- DB update 2023_02_06_00 -> 2023_02_07_00
 -- Correct Sa'at Position
 UPDATE `creature` SET `position_x`=-1547.0618896484375, `position_y`=7113.6328125, `position_z`=32.81885528564453125, `orientation`=6.230825424194335937 WHERE `id1`=20201 AND `guid`=31754;
 -- Correct Medivh Position
