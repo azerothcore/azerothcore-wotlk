@@ -772,7 +772,7 @@ enum class GameObjectActions : uint32
 struct GameObjectData : public SpawnData
 {
     GameObjectData() : SpawnData(SPAWN_TYPE_GAMEOBJECT) { }
-    QuaternionData rotation;
+    G3D::Quat rotation;
     uint32 animprogress = 0;
     GOState goState = GO_STATE_ACTIVE;
     uint8 artKit = 0;

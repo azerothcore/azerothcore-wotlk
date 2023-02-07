@@ -364,7 +364,7 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool destroyForNearbyPlayers)
 
         // Should get removed later, just keep "compatibility" with scripts
         if (setSpawnTime)
-            m_respawnTime = std::max<time_t>(GameTime::GetGameTime() + respawnDelay, m_respawnTime);
+            m_respawnTime = std::max<time_t>(time(nullptr) + respawnDelay, m_respawnTime);  // @todo: Need to pass time(nullptr) -> GameTime::GetGameTime()
 
         // if corpse was removed during falling, the falling will continue and override relocation to respawn position
         if (IsFalling())
@@ -401,7 +401,7 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool destroyForNearbyPlayers)
         if (setSpawnTime)
         {
             uint32 respawnDelay = m_respawnDelay;
-            m_respawnTime = std::max<time_t>(GameTime::GetGameTime() + respawnDelay, m_respawnTime);
+            m_respawnTime = std::max<time_t>(time(nullptr) + respawnDelay, m_respawnTime);    // @todo: Need to pass time(nullptr) -> GameTime::GetGameTime()
 
             SaveRespawnTime();
         }
@@ -672,13 +672,6 @@ void Creature::Update(uint32 diff)
             time_t now = GameTime::GetGameTime().count();
             if (m_respawnTime <= now)
             {
-                // Delay respawn if spawn group is not active
-                if (m_creatureData && !GetMap()->IsSpawnGroupActive(m_creatureData->spawnGroupData->groupId))
-                {
-                    m_respawnTime = now + urand(4, 7);
-                    break; // Will be rechecked on next Update call after delay expires
-                }
-
                 ObjectGuid dbtableHighGuid(HighGuid::Unit, GetEntry(), m_spawnId);
                 time_t linkedRespawnTime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                 if (!linkedRespawnTime)             // Can respawn
@@ -1736,13 +1729,6 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, 
     // Add to world
     uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
 
-    // Is the creature script objecting to us spawning? If yes, delay by a little bit (then re-check in ::Update)
-    if (!m_respawnCompatibilityMode && !m_respawnTime && !sScriptMgr->CanSpawn(spawnId, data->id, data, map))
-    {
-        SaveRespawnTime(urand(4, 7));
-        return false;
-    }
-
     if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, data->id, data->spawnPoint, data, 0U, !m_respawnCompatibilityMode))
         return false;
 
@@ -1762,7 +1748,7 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, 
         {
             float tz = map->GetHeight(GetPhaseMask(), data->spawnPoint, true, MAX_FALL_DISTANCE);
             if (data->spawnPoint.GetPositionZ() - tz > 0.1f && Acore::IsValidMapCoord(tz))
-                Relocate(data->spawnPoint.GetPositionX(), data->Acore.GetPositionY(), tz);
+                Relocate(data->spawnPoint.GetPositionX(), data->spawnPoint.GetPositionY(), tz);
         }
     }
 
@@ -2073,7 +2059,6 @@ void Creature::Respawn(bool force)
         {
             LOG_DEBUG("entities.unit", "Respawning creature %s (%s)", GetName().c_str(), GetGUID().ToString().c_str());
             m_respawnTime = 0;
-            ResetPickPocketRefillTimer();
             loot.clear();
 
             if (m_originalEntry != GetEntry())
@@ -2090,7 +2075,7 @@ void Creature::Respawn(bool force)
                 SetNativeDisplayId(displayID);
             }
 
-            GetMotionMaster()->InitializeDefault();
+            GetMotionMaster()->Initialize();
 
             // Re-initialize reactstate that could be altered by movementgenerators
             InitializeReactState();
@@ -2098,7 +2083,7 @@ void Creature::Respawn(bool force)
             if (UnitAI* ai = AI()) // reset the AI to be sure no dirty or uninitialized values will be used till next tick
                 ai->Reset();
 
-            m_triggerJustAppeared = true;
+            TriggerJustRespawned = true;   //delay event to next tick so all creatures are created on the map before processing
 
             uint32 poolid = GetSpawnId() ? sPoolMgr->IsPartOfAPool<Creature>(GetSpawnId()) : 0;
             if (poolid)
@@ -2110,7 +2095,7 @@ void Creature::Respawn(bool force)
     {
         if (m_spawnId)
         {
-            GetMap()->Respawn(SPAWN_TYPE_CREATURE, m_spawnId);
+            GetMap()->Respawn(SPAWN_TYPE_CREATURE, m_spawnId, true);
             CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
             // Respawn check if spawn has 2 entries
             if (data->id2)
@@ -2136,7 +2121,7 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
 {
     if (timeMSToDespawn)
     {
-        m_Events.AddEvent(new ForcedDespawnDelayEvent(*this, forceRespawnTimer), m_Events.CalculateTime(Milliseconds(timeMSToDespawn)));
+        m_Events.AddEvent(new ForcedDespawnDelayEvent(*this, forceRespawnTimer), m_Events.CalculateTime(timeMSToDespawn));
         return;
     }
 
@@ -2625,11 +2610,7 @@ void Creature::SaveRespawnTime(uint32 forceDelay)
 
     if (m_respawnCompatibilityMode)
     {
-        RespawnInfo ri;
-        ri.type = SPAWN_TYPE_CREATURE;
-        ri.spawnId = m_spawnId;
-        ri.respawnTime = m_respawnTime;
-        GetMap()->SaveRespawnInfoDB(ri);
+        GetMap()->SaveRespawnTimeDB(SPAWN_TYPE_CREATURE, m_spawnId, m_respawnTime);
         return;
     }
 
