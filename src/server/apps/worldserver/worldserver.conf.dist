@@ -4222,6 +4222,32 @@ NpcBot.Mult.Healing         = 1.0
 NpcBot.Mult.HP              = 1.0
 
 #
+#    NpcBot.Mult.Damage.<Class>
+#        Description: Multipliers for bots' damage by class. Allows to balance dps between bot classes.
+#        Default:     1.0
+#        Minimum:     0.1
+#        Maximum:    10.0
+
+NpcBot.Mult.Damage.Warrior           = 1.0
+NpcBot.Mult.Damage.Paladin           = 1.0
+NpcBot.Mult.Damage.Hunter            = 1.0
+NpcBot.Mult.Damage.Rogue             = 1.0
+NpcBot.Mult.Damage.Priest            = 1.0
+NpcBot.Mult.Damage.DeathKnight       = 1.0
+NpcBot.Mult.Damage.Shaman            = 1.0
+NpcBot.Mult.Damage.Mage              = 1.0
+NpcBot.Mult.Damage.Warlock           = 1.0
+NpcBot.Mult.Damage.Druid             = 1.0
+NpcBot.Mult.Damage.Blademaster       = 1.0
+NpcBot.Mult.Damage.ObsidianDestroyer = 1.0
+NpcBot.Mult.Damage.Archmage          = 1.0
+NpcBot.Mult.Damage.Dreadlord         = 1.0
+NpcBot.Mult.Damage.SpellBreaker      = 1.0
+NpcBot.Mult.Damage.DarkRanger        = 1.0
+NpcBot.Mult.Damage.Necromancer       = 1.0
+NpcBot.Mult.Damage.SeaWitch          = 1.0
+
+#
 #    NpcBot.Enable.Dungeon
 #    NpcBot.Enable.Raid
 #    NpcBot.Enable.BG
