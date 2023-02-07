@@ -211,6 +211,21 @@ public:
         InstanceScript* pInstance;
         uint8 _phase;
 
+        bool IsInRoom()
+        {
+            if (me->GetExactDist(1586.6f, 119.3f, 427.2f) > 86.0f)
+            {
+                const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                    if (Player* p = itr->GetSource())
+                        if (p->IsAlive() && !p->IsGameMaster() && p->GetExactDist(1586.6f, 119.3f, 427.2f) < 200.0f && !p->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
+                            Unit::Kill(me, p); //秒杀BUG玩家
+                EnterEvadeMode();
+                return false;
+            }
+            return true;
+        }
+
         void Reset() override
         {
             me->SetLootMode(0);
@@ -330,6 +345,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (!IsInRoom())
+                return;
+
             if (!UpdateVictim())
                 return;
 
@@ -402,6 +420,21 @@ public:
         SummonList summons;
         EventMap events;
         uint8 _phase;
+
+        bool IsInRoom()
+        {
+            if (me->GetExactDist(1586.6f, 119.3f, 427.2f) > 86.0f)
+            {
+                const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                    if (Player* p = itr->GetSource())
+                        if (p->IsAlive() && !p->IsGameMaster() && p->GetExactDist(1586.6f, 119.3f, 427.2f) < 200.0f && !p->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
+                            Unit::Kill(me, p); //秒杀BUG玩家
+                EnterEvadeMode();
+                return false;
+            }
+            return true;
+        }
 
         void Reset() override
         {
@@ -499,6 +532,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (!IsInRoom())
+                return;
+
             if (!UpdateVictim())
                 return;
 
@@ -616,6 +652,21 @@ public:
         uint32 _channelTimer;
 
         bool _stunnedAchievement;
+
+        bool IsInRoom()
+        {
+            if (me->GetExactDist(1586.6f, 119.3f, 427.2f) > 86.0f)
+            {
+                const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                    if (Player* p = itr->GetSource())
+                        if (p->IsAlive() && !p->IsGameMaster() && p->GetExactDist(1586.6f, 119.3f, 427.2f) < 200.0f && !p->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
+                            Unit::Kill(me, p); //秒杀BUG玩家
+                EnterEvadeMode();
+                return false;
+            }
+            return true;
+        }
 
         void Reset() override
         {
@@ -739,6 +790,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (!IsInRoom())
+                return;
+
             if (!me->IsInCombat() && me->GetReactState() == REACT_AGGRESSIVE)
             {
                 _channelTimer += diff;
@@ -760,9 +814,9 @@ public:
                 {
                     if (me->GetDistance2d(flyTarget) >= 6)
                     {
-                        //float speed = me->GetDistance(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ()+15) / (1500.0f * 0.001f);
-                        //me->SendMonsterMove(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
-                        me->SetPosition(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ() + 15, flyTarget->GetOrientation());
+                        float speed = me->GetDistance(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ()+15.0f) / (1500.0f * 0.001f);
+                        me->MonsterMoveWithSpeed(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ()+15.0f, speed);
+                        me->SetPosition(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ(), flyTarget->GetOrientation());
                     }
                 }
             }
@@ -807,19 +861,7 @@ public:
                         me->SetReactState(REACT_PASSIVE);
                         me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                         me->SetUnitFlag(UNIT_FLAG_STUNNED);
-                        //me->SendMonsterMove(oldVictim->GetPositionX(), oldVictim->GetPositionY(), oldVictim->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
-                        me->SetCanFly(true);
-                        Position moveposition = oldVictim->GetPosition();
-                        moveposition.m_positionZ += 5;
-                        me->GetMotionMaster()->MovePoint(0, moveposition);
-                        events.DelayEvents(500);
-                        moveposition.m_positionZ += 5;
-                        me->GetMotionMaster()->MovePoint(0, moveposition);
-                        events.DelayEvents(500);
-                        moveposition.m_positionZ += 5;
-                        me->GetMotionMaster()->MovePoint(0, moveposition);
-                        events.DelayEvents(500);
-                        
+                        me->GetMotionMaster()->MoveTakeoff(4, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, 10.0f);
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
                         me->CastSpell(me, 61883, true);
                         events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);
@@ -827,7 +869,8 @@ public:
                     }
                 case EVENT_LIGHTNING_LAND:
                     {
-                        float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
+                        //float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
+                    float speed = 10.0f;
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                         _flyPhase = false;
                         events.ScheduleEvent(EVENT_LAND_LAND, 1000);
