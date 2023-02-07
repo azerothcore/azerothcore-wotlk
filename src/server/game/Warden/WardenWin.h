@@ -81,7 +81,7 @@ public:
     void RequestHash() override;
     void HandleHashResult(ByteBuffer& buff) override;
     void RequestChecks() override;
-    bool GetIsCheckInProgress() override;
+    bool IsCheckInProgress() override;
     void ForceChecks() override;
     void HandleData(ByteBuffer& buff) override;
 

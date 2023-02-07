@@ -254,7 +254,7 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
 * @brief Gets the warden check state.
 * @return The warden check state.
 */
-bool WardenWin::GetIsCheckInProgress()
+bool WardenWin::IsCheckInProgress()
 {
     return _checkInProgress;
 }
