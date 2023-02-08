@@ -34,6 +34,7 @@ struct Position
     Position(Position&&) = default;
     Position& operator=(const Position&) = default;
     Position& operator=(Position&&) = default;
+    Position(Position const& loc) { Relocate(loc); }
 
     struct PositionXYStreamer
     {
@@ -140,7 +141,7 @@ struct Position
         o = m_orientation;
     }
 
-    [[nodiscard]] Position GetPosition() const { return *this; }
+    Position GetPosition() const { return *this; }
 
     Position::PositionXYZStreamer PositionXYZStream()
     {
@@ -253,7 +254,6 @@ public:
     void WorldRelocate(WorldLocation const& loc) { m_mapId = loc.GetMapId(); Relocate(loc); }
     void WorldRelocate(WorldLocation const* loc) { m_mapId = loc->GetMapId(); Relocate(loc); }
     void WorldRelocate(uint32 mapId, Position const& pos) { m_mapId = mapId; Relocate(pos); }
-
     void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
     {
         m_mapId = mapId;

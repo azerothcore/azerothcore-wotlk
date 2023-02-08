@@ -59,7 +59,7 @@ public:
 
     [[nodiscard]] bool isVendorWithIconSpeak() const;
 
-    //@todo - Remove classic coords(x,y,z,o), to keep only Position
+    ///@todo - Remove classic coords(x,y,z,o), to keep only Position
     bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr, bool dynamic = false);
     bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, Position const& pos, const CreatureData* data = nullptr, bool dynamic = false);
 

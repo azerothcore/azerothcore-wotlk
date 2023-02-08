@@ -1143,7 +1143,7 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
 
     //! Relocate before CreateFromProto, to initialize coords and allow
     //! returning correct zone id for selecting OutdoorPvP/Battlefield script
-    Relocate(x, y,z, ang);
+    Relocate(x, y, z, ang);
 
     if (!IsPositionValid())
     {
@@ -1967,7 +1967,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
         uint32 respawnDelay = m_respawnDelay;
         if (uint32 scalingMode = sWorld->getIntConfig(CONFIG_RESPAWN_DYNAMICMODE))
             GetMap()->ApplyDynamicModeRespawnScaling(this, m_spawnId, respawnDelay, scalingMode);
-        // @todo remove the boss respawn time hack in a dynspawn follow-up once we have creature groups in instances
+        /// @todo remove the boss respawn time hack in a dynspawn follow-up once we have creature groups in instances
         if (m_respawnCompatibilityMode)
         {
             if (IsDungeonBoss() && !m_respawnDelay)
