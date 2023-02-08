@@ -170,6 +170,19 @@ public:
             {
                 me->CastSpell(me, SPELL_BANISH, true);
                 events.Reset();
+                if (me->GetMap()->GetPlayers().getSize() == 1)
+                {
+                    if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
+                    {
+                        Sath->RemoveAllAuras();
+                        Sath->GetMotionMaster()->MovementExpired();
+                        Sath->CombatStop();
+                        Sath->SetReactState(REACT_AGGRESSIVE);
+                        Sath->SelectNearbyTarget();
+                        Sath->NearTeleportTo(1696.20f, 915.0f, DRAGON_REALM_Z, Sath->GetOrientation());
+                    }
+                }
+
             }
             else if (param == ACTION_SATH_BANISH)
                 sathBanished = true;
@@ -191,7 +204,8 @@ public:
                     Sath->RemoveAllAuras();
                     Sath->GetMotionMaster()->MovementExpired();
                     Sath->SetReactState(REACT_PASSIVE);
-                    Sath->NearTeleportTo(1696.20f, 915.0f, DRAGON_REALM_Z, Sath->GetOrientation());
+                    if (me->GetMap()->GetPlayers().getSize() > 1)
+                        Sath->NearTeleportTo(1696.20f, 915.0f, DRAGON_REALM_Z, Sath->GetOrientation());
                 }
             }
         }
@@ -317,7 +331,8 @@ public:
                     events.ScheduleEvent(EVENT_WILD_MAGIC, 20000);
                     break;
                 case EVENT_SPECTRAL_BLAST:
-                    me->CastSpell(me, SPELL_SPECTRAL_BLAST, false);
+                    if (me->GetMap()->GetPlayers().getSize() > 1)
+                        me->CastSpell(me, SPELL_SPECTRAL_BLAST, false);
                     events.ScheduleEvent(EVENT_SPECTRAL_BLAST, urand(15000, 25000));
                     break;
                 case EVENT_CHECK_POS:
@@ -405,7 +420,7 @@ public:
 
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!who || who->GetEntry() != NPC_SATHROVARR)
+            if (!who || who->GetEntry() != NPC_SATHROVARR || (me->GetMap()->GetPlayers().getSize() == 1))
                 damage = 0;
         }
 
@@ -507,7 +522,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return target->GetPositionZ() < 50.0f;
+            return target->GetPositionZ() < 50.0f || me->GetMap()->GetPlayers().getSize() == 1;
         }
 
         void Reset() override
