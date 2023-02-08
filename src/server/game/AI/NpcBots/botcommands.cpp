@@ -1349,12 +1349,12 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-        if (owner->GetBotMgr()->IsPartyInCombat() && (owner->IsPvP() || owner->IsFFAPvP()))
-        {
-            handler->GetSession()->SendNotification("在PvP战斗中你不能这样做");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
+//        if (owner->GetBotMgr()->IsPartyInCombat() && (owner->IsPvP() || owner->IsFFAPvP()))
+//        {
+//            handler->GetSession()->SendNotification("在PvP战斗中你不能这样做");
+//            handler->SetSentErrorMessage(true);
+//            return false;
+//        }
 
         owner->GetBotMgr()->RecallAllBots(true);
         return true;
