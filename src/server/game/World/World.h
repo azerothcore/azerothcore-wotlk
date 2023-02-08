@@ -355,8 +355,8 @@ public:
     void RemoveOldCorpses() override;
     void TriggerGuidWarning() override;
     void TriggerGuidAlert() override;
-    static bool IsGuidWarning() { return _guidWarn; }
-    static bool IsGuidAlert() { return _guidAlert; }
+    bool IsGuidWarning() const override { return _guidWarn; }
+    bool IsGuidAlert() const override { return _guidAlert; }
 
 protected:
     void _UpdateGameTime();
@@ -460,8 +460,8 @@ private:
 
     std::mutex _guidAlertLock;
 
-    static bool _guidWarn;
-    static bool _guidAlert;
+    bool _guidWarn;
+    bool _guidAlert;
     uint32 _warnDiff;
     time_t _warnShutdownTime;
 

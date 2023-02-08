@@ -613,6 +613,8 @@ public:
     virtual void RemoveOldCorpses() = 0;
     virtual void TriggerGuidWarning() = 0;
     virtual void TriggerGuidAlert() = 0;
+    virtual bool IsGuidWarning() const = 0;
+    virtual bool IsGuidAlert() const = 0;
 };
 
 #endif //AZEROTHCORE_IWORLD_H

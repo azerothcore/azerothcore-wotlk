@@ -227,7 +227,6 @@ public:
                 CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
                 data.id1 = id;
                 data.phaseMask = chr->GetPhaseMaskForSpawn();
-                
 
                 Creature* creature = trans->CreateNPCPassenger(guid, &data);
 

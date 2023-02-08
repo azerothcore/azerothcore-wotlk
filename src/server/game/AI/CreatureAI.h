@@ -140,6 +140,8 @@ public:
 
     // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
     virtual void AttackedBy(Unit* /*attacker*/) {}
+
+    // Should return true if the NPC is currently being escorted
     virtual bool IsEscorted() { return false; }
 
     // Called when creature is spawned or respawned (for reseting variables)

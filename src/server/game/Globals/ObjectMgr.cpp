@@ -8167,7 +8167,7 @@ void ObjectMgr::DeleteCreatureData(ObjectGuid::LowType guid)
     {
         RemoveCreatureFromGrid(guid, data);
         OnDeleteSpawnData(data);
-    }  
+    }
 
     _creatureDataStore.erase(guid);
 }
@@ -8181,7 +8181,6 @@ void ObjectMgr::DeleteGameObjectData(ObjectGuid::LowType guid)
         RemoveGameobjectFromGrid(guid, data);
         OnDeleteSpawnData(data);
     }
-        
 
     _gameObjectDataStore.erase(guid);
 }

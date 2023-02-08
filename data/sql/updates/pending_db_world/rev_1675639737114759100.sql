@@ -183,11 +183,12 @@ INSERT INTO `spawn_group` (`groupId`, `spawnType`, `spawnId`) VALUES
 (3, 0, 202337),
 (3, 0, 2017),
 (3, 0, 132683);
+
 -- remove potential duplicates
 DELETE FROM `spawn_group` WHERE `groupId` != 3 AND `spawnType`=0 AND `spawnId` IN (SELECT `spawnId` FROM (SELECT `spawnId` FROM `spawn_group` WHERE `groupId`=3  AND `spawnType`=0) as `temp`);
 DELETE FROM `spawn_group` WHERE `groupId` != 4 AND `spawnType`=1 AND `spawnId` IN (SELECT `spawnId` FROM (SELECT `spawnId` FROM `spawn_group` WHERE `groupId`=4  AND `spawnType`=1) as `temp`);
 
--- Update trinity strings for various cs_list strings, to support showing spawn ID and guid.
+-- Update Acore strings for various cs_list strings, to support showing spawn ID and guid.
 UPDATE `acore_string`
 SET `content_default` = '%d (Entry: %d) - |cffffffff|Hgameobject:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r %s %s'
 WHERE `entry` = 517;

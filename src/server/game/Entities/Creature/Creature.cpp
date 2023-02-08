@@ -3755,6 +3755,14 @@ uint32 Creature::GetPlayerDamageReq() const
     return _playerDamageReq;
 }
 
+bool Creature::IsEscorted() const
+{
+    if (!IsAIEnabled)
+        return false;
+
+    return AI()->IsEscorted();
+}
+
 std::string Creature::GetDebugInfo() const
 {
     std::stringstream sstr;

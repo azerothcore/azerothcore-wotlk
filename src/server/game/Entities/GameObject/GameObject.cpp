@@ -1088,7 +1088,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     if (!data.spawnId)
         data.spawnId = m_spawnId;
     ASSERT(data.spawnId == m_spawnId);
-    
+
     data.id = GetEntry();
     data.spawnPoint.WorldRelocate(this);
     data.phaseMask = phaseMask;

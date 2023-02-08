@@ -3754,8 +3754,6 @@ void Map::SaveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId, uin
 
 void Map::SaveRespawnTimeDB(SpawnObjectType type, ObjectGuid::LowType spawnId, time_t respawnTime, CharacterDatabaseTransaction dbTrans)
 {
-    // CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction(); -> is it neeeded ?
-    
     // Just here for support of compatibility mode
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement((type == SPAWN_TYPE_GAMEOBJECT) ? CHAR_REP_GO_RESPAWN : CHAR_REP_CREATURE_RESPAWN);
     stmt->SetData(0, spawnId);

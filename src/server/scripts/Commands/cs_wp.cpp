@@ -707,7 +707,7 @@ public:
                     wpCreature2->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
                     // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
                     //TODO: Should we first use "Create" then use "LoadFromDB"?
-                    if (!wpCreature2->LoadFromDB(wpCreature2->GetSpawnId(), map, true, false))  
+                    if (!wpCreature2->LoadFromDB(wpCreature2->GetSpawnId(), map, true, false))
                     {
                         handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
                         delete wpCreature2;

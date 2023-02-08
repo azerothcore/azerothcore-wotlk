@@ -391,7 +391,7 @@ public:
 
     void ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration);
 
-    bool IsEscorted(bool onlyIfActive = true) const;
+    bool IsEscorted() const;
 
     std::string GetDebugInfo() const override;
 
