@@ -1211,18 +1211,16 @@ bool GameObject::DeleteFromDB(ObjectGuid::LowType spawnId)
 
     CharacterDatabaseTransaction charTrans = CharacterDatabase.BeginTransaction();
 
-    sMapMgr->DoForAllMapsWithMapId(data->spawnPoint.GetMapId(),
-        [spawnId, charTrans](Map* map) -> void
+    sMapMgr->DoForAllMapsWithMapId(data->spawnPoint.GetMapId(), [spawnId, charTrans](Map* map)
         {
             // despawn all active objects, and remove their respawns
             std::vector<GameObject*> toUnload;
-    for (auto const& pair : Acore::Containers::MapEqualRange(map->GetGameObjectBySpawnIdStore(), spawnId))
-        toUnload.push_back(pair.second);
-    for (GameObject* obj : toUnload)
-        map->AddObjectToRemoveList(obj);
-    map->RemoveRespawnTime(SPAWN_TYPE_GAMEOBJECT, spawnId, false, charTrans);
-        }
-    );
+            for (auto const& pair : Acore::Containers::MapEqualRange(map->GetGameObjectBySpawnIdStore(), spawnId))
+                toUnload.push_back(pair.second);
+            for (GameObject* obj : toUnload)
+                map->AddObjectToRemoveList(obj);
+            map->RemoveRespawnTime(SPAWN_TYPE_GAMEOBJECT, spawnId, false, charTrans);
+        });
 
     // delete data from memory
     sObjectMgr->DeleteGameObjectData(spawnId);
