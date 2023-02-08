@@ -614,18 +614,18 @@ public:
                         go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     me->SetWalk(true);
                     if (me->GetCreatureData())
-                        me->GetMotionMaster()->MovePoint(0, me->GetCreatureData()->posX, me->GetCreatureData()->posY, me->GetCreatureData()->posZ);
+                        me->GetMotionMaster()->MovePoint(0, me->GetCreatureData()->spawnPoint.GetPositionX(), me->GetCreatureData()->spawnPoint.GetPositionY(), me->GetCreatureData()->spawnPoint.GetPositionZ());
                     if (Creature* c = me->FindNearestCreature(NPC_THERON, 60.0f, true))
                     {
                         c->SetWalk(true);
                         if (c->GetCreatureData())
-                            c->GetMotionMaster()->MovePoint(0, c->GetCreatureData()->posX, c->GetCreatureData()->posY, c->GetCreatureData()->posZ);
+                            c->GetMotionMaster()->MovePoint(0, c->GetCreatureData()->spawnPoint.GetPositionX(), c->GetCreatureData()->spawnPoint.GetPositionY(), c->GetCreatureData()->spawnPoint.GetPositionZ());
                     }
                     if (Creature* c = me->FindNearestCreature(NPC_AURIC, 60.0f, true))
                     {
                         c->SetWalk(true);
                         if (c->GetCreatureData())
-                            c->GetMotionMaster()->MovePoint(0, c->GetCreatureData()->posX, c->GetCreatureData()->posY, c->GetCreatureData()->posZ);
+                            c->GetMotionMaster()->MovePoint(0, c->GetCreatureData()->spawnPoint.GetPositionX(), c->GetCreatureData()->spawnPoint.GetPositionY(), c->GetCreatureData()->spawnPoint.GetPositionZ());
                     }
                     break;
             }

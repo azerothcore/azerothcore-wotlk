@@ -343,7 +343,7 @@ public:
         }
 
         if (CreatureData const* data = creature->GetCreatureData())
-            creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
+            creature->SetPosition(data->spawnPoint.GetPositionX(), data->spawnPoint.GetPositionY(), data->spawnPoint.GetPositionZ(), data->spawnPoint.GetOrientation());
         creature->DespawnOrUnsummon();
 
         creature->SetRespawnTime(5);

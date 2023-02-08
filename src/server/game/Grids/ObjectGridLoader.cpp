@@ -103,12 +103,9 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord &cell, GridRefMgr<T> &m, 
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
         // Don't spawn at all if there's a respawn timer
-        ObjectGuid::LowType guid = *i_guid;
-        if (!map->ShouldBeSpawnedOnGridLoad<T>(guid))
-            continue;
-
         T* obj = new T;
-        //LOG_INFO("misc", "DEBUG: LoadHelper from table: %s for (guid: %u) Loading", table, guid);
+        ObjectGuid::LowType guid = *i_guid;
+
         if (!obj->LoadFromDB(guid, map, false, false))
         {
             delete obj;

@@ -36,35 +36,35 @@ CREATE TEMPORARY TABLE `creature_temp_group`
 INSERT INTO `creature_temp_group`
 SELECT `guid`
 FROM `creature` C
-         INNER JOIN `creature_questitem` ON `CreatureEntry` = C.`id`
+         INNER JOIN `creature_questitem` ON `CreatureEntry` = C.`id1`
 WHERE `spawntimesecs` < 1800
   AND `map` IN (0, 1, 530, 571);
 
 INSERT INTO `creature_temp_group`
 SELECT `guid`
 FROM `creature` C
-         INNER JOIN `quest_template` ON `RequiredNpcOrGo1` = C.`id`
+         INNER JOIN `quest_template` ON `RequiredNpcOrGo1` = C.`id1`
 WHERE `spawntimesecs` < 1800
   AND `map` IN (0, 1, 530, 571);
 
 INSERT INTO `creature_temp_group`
 SELECT `guid`
 FROM `creature` C
-         INNER JOIN `quest_template` ON `RequiredNpcOrGo2` = C.`id`
+         INNER JOIN `quest_template` ON `RequiredNpcOrGo2` = C.`id1`
 WHERE `spawntimesecs` < 1800
   AND `map` IN (0, 1, 530, 571);
 
 INSERT INTO `creature_temp_group`
 SELECT `guid`
 FROM `creature` C
-         INNER JOIN `quest_template` ON `RequiredNpcOrGo3` = C.`id`
+         INNER JOIN `quest_template` ON `RequiredNpcOrGo3` = C.`id1`
 WHERE `spawntimesecs` < 1800
   AND `map` IN (0, 1, 530, 571);
 
 INSERT INTO `creature_temp_group`
 SELECT `guid`
 FROM `creature` C
-         INNER JOIN `quest_template` ON `RequiredNpcOrGo4` = C.`id`
+         INNER JOIN `quest_template` ON `RequiredNpcOrGo4` = C.`id1`
 WHERE `spawntimesecs` < 1800
   AND `map` IN (0, 1, 530, 571);
 
@@ -204,7 +204,7 @@ UPDATE `acore_string`
 SET `content_default` = '%d - %s X:%f Y:%f Z:%f MapId:%d %s %s'
 WHERE `entry` = 1110;
 
--- Add new trinity strings for extra npc/gobject info lines
+-- Add new Acore strings for extra npc/gobject info lines
 DELETE FROM `acore_string` WHERE `entry` BETWEEN 5070 AND 5082;
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (5070, 'Spawn group: %s (ID: %u, Flags: %u, Active: %u)'),
@@ -223,7 +223,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 
 -- Add new NPC/Gameobject commands
 DELETE FROM `command` WHERE `name` IN ('npc spawngroup', 'npc despawngroup', 'gobject spawngroup', 'gobject despawngroup', 'list respawns');
-INSERT INTO `command` (`name`, `permission`, `help`) VALUES
+INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('npc spawngroup', 3, 'Syntax: .npc spawngroup $groupId [ignorerespawn] [force]'),
 ('npc despawngroup', 3, 'Syntax: .npc despawngroup $groupId [removerespawntime]'),
 ('gobject spawngroup', 3, 'Syntax: .gobject spawngroup $groupId [ignorerespawn] [force]'),
