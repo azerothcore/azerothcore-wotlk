@@ -1731,9 +1731,6 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, 
     m_spawnId = spawnId;
     m_respawnCompatibilityMode = ((data->spawnGroupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE) != 0);
 
-    // Add to world
-    uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
-
     if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, data->id, 0U, data->spawnPoint, data, !m_respawnCompatibilityMode))
         return false;
 

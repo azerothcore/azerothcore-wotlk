@@ -269,7 +269,7 @@ void npc_escortAI::UpdateAI(uint32 diff)
                         {
                             me->GetMap()->RemoveRespawnTime(SPAWN_TYPE_CREATURE, me->GetSpawnId(), true);
                             me->DespawnOrUnsummon();
-                        }  
+                        }
                     }
                 }
 
