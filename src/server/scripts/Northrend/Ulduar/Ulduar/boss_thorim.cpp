@@ -50,10 +50,13 @@ enum ThorimSpells
     SPELL_SIF_TRANSFORM                     = 64778,
     SPELL_SIF_CHANNEL_HOLOGRAM              = 64324,
     SPELL_FROSTBOLT                         = 62601,
+    SPELL_FROSTBOLT_10                      = 62583,
     SPELL_FROSTBOLT_VALLEY                  = 62604,
+    SPELL_FROSTBOLT_VALLEY_10               = 62580,
     SPELL_BLIZZARD_10                       = 62577,
     SPELL_BLIZZARD_25                       = 62603,
     SPELL_FROST_NOVA                        = 62605,
+    SPELL_FROST_NOVA_10                     = 62597,
 
     // DARK RUNE ACOLYTE
     SPELL_GREATER_HEAL_10                   = 62334,
@@ -467,6 +470,12 @@ public:
                 if (t->GetTeamId() == TEAM_HORDE)
                     _isAlly = false;
 
+            const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                if (Player* p = itr->GetSource())
+                    if (!p->IsGameMaster() && p->GetExactDist(2227.6055f, -381.212555f, 412.133575f) < 140.5f && (p->GetExactDist(2170.8400f, -262.182f, 419.361f) > 33.6f || p->GetPositionZ() > 430))
+                        p->TeleportTo(603, 2075.286621, -106.205582, 412.298859, 5.607742); //传送BUG玩家
+
             SpawnAllNPCs();
 
             CloseDoors();
@@ -556,6 +565,9 @@ public:
                 if (Player* player = GetArenaPlayer())
                     me->AddThreat(player, 1000.0f);
             }
+
+            if (who && who->GetPositionZ() > 430 && who->GetTypeId() == TYPEID_PLAYER)
+                damage = 0;
 
             if (damage >= me->GetHealth())
             {
@@ -862,7 +874,7 @@ public:
                     events.ScheduleEvent(EVENT_SIF_BLIZZARD, 15000);
                     break;
                 case EVENT_SIF_FROSTBOLT_VALLEY:
-                    me->CastSpell(me, SPELL_FROSTBOLT_VALLEY, false);
+                    me->CastSpell(me, Is25ManRaid() ? SPELL_FROSTBOLT_VALLEY : SPELL_FROSTBOLT_VALLEY_10, false);
                     events.RepeatEvent(13000);
                     return;
                 case EVENT_SIF_BLIZZARD:
@@ -878,7 +890,7 @@ public:
                     return;
                 case EVENT_SIF_FROST_NOVA_CAST:
                     _allowCast = true;
-                    me->CastSpell(me, SPELL_FROST_NOVA, false);
+                    me->CastSpell(me, Is25ManRaid() ? SPELL_FROST_NOVA : SPELL_FROST_NOVA_10, false);
                     return;
             }
 
@@ -886,7 +898,7 @@ public:
             if (_allowCast)
                 if (Player* target = SelectTargetFromPlayerList(70))
                 {
-                    me->CastSpell(target, SPELL_FROSTBOLT, false);
+                    me->CastSpell(target, Is25ManRaid() ? SPELL_FROSTBOLT : SPELL_FROSTBOLT_10, false);
                     me->StopMoving();
                 }
         }
