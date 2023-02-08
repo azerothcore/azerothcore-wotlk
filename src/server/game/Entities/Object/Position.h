@@ -30,7 +30,6 @@ struct Position
     Position(float x = 0, float y = 0, float z = 0, float o = 0)
             : m_positionX(x), m_positionY(y), m_positionZ(z), m_orientation(NormalizeOrientation(o)) { }
 
-    Position(Position const& loc) { Relocate(loc); }
     /* requried as of C++ 11 */
     Position(Position&&) = default;
     Position& operator=(const Position&) = default;
@@ -250,9 +249,6 @@ public:
 
     WorldLocation(uint32 mapId, Position const& position)
             : Position(position), m_mapId(mapId) { }
-
-    WorldLocation(WorldLocation const& loc)
-        : Position(loc), m_mapId(loc.GetMapId()) { }
 
     void WorldRelocate(WorldLocation const& loc) { m_mapId = loc.GetMapId(); Relocate(loc); }
     void WorldRelocate(WorldLocation const* loc) { m_mapId = loc->GetMapId(); Relocate(loc); }

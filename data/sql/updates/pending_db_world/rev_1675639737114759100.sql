@@ -229,4 +229,5 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('npc despawngroup', 3, 'Syntax: .npc despawngroup $groupId [removerespawntime]'),
 ('gobject spawngroup', 3, 'Syntax: .gobject spawngroup $groupId [ignorerespawn] [force]'),
 ('gobject despawngroup', 3, 'Syntax: .gobject despawngroup $groupId [removerespawntime]'),
-('list respawns', 3, 'Syntax: .list respawns [distance] Lists all pending respawns within <distance> yards, or within current zone if not specified.');--
+('list respawns', 3, 'Syntax: .list respawns [distance] Lists all pending respawns within <distance> yards, or within current zone if not specified.');
+
