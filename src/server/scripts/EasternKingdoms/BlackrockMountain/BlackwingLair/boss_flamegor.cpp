@@ -83,7 +83,7 @@ public:
                     case EVENT_FRENZY:
                         Talk(EMOTE_FRENZY);
                         DoCast(me, SPELL_FRENZY);
-                        events.ScheduleEvent(EVENT_FRENZY, 10s, 80s);
+                        events.ScheduleEvent(EVENT_FRENZY, 8s, 10s);
                         break;
                 }
 
