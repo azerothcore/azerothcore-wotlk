@@ -1121,6 +1121,11 @@ void Creature::Motion_Initialize()
 
 bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, Position const& pos, const CreatureData* data, bool dynamic)
 {
+    return Create(guidlow, map, phaseMask, Entry, vehId, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), data, dynamic);
+};
+
+bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data, bool dynamic)
+{
     ASSERT(map);
     SetMap(map);
     SetPhaseMask(phaseMask, false);
@@ -1138,11 +1143,11 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
 
     //! Relocate before CreateFromProto, to initialize coords and allow
     //! returning correct zone id for selecting OutdoorPvP/Battlefield script
-    Relocate(pos);
+    Relocate(x, y,z, ang);
 
     if (!IsPositionValid())
     {
-        LOG_ERROR("entities.unit", "Creature::Create(): given coordinates for creature (guidlow {}, entry {}) are not valid (X: {}, Y: {}, Z: {}, O: {})", guidlow, Entry, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
+        LOG_ERROR("entities.unit", "Creature::Create(): given coordinates for creature (guidlow {}, entry {}) are not valid (X: {}, Y: {}, Z: {}, O: {})", guidlow, Entry, x, y, z, ang);
         return false;
     }
 

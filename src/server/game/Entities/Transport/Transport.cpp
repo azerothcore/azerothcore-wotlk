@@ -778,6 +778,11 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     return true;
 }
 
+bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, Position const& pos, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
+{
+    return Create(guidlow, name_id, map, phaseMask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), rotation, animprogress,go_state, artKit);
+};
+
 void StaticTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
 {
     while (!_passengers.empty())
