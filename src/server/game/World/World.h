@@ -353,10 +353,10 @@ public:
     void SetRealmName(std::string name) override { _realmName = name; } // pussywizard
 
     void RemoveOldCorpses() override;
-    void TriggerGuidWarning();
-    void TriggerGuidAlert();
-    bool IsGuidWarning() { return _guidWarn; }
-    bool IsGuidAlert() { return _guidAlert; }
+    void TriggerGuidWarning() override;
+    void TriggerGuidAlert() override;
+    static bool IsGuidWarning() { return _guidWarn; }
+    static bool IsGuidAlert() { return _guidAlert; }
 
 protected:
     void _UpdateGameTime();
@@ -460,8 +460,8 @@ private:
 
     std::mutex _guidAlertLock;
 
-    bool _guidWarn;
-    bool _guidAlert;
+    static bool _guidWarn;
+    static bool _guidAlert;
     uint32 _warnDiff;
     time_t _warnShutdownTime;
 
