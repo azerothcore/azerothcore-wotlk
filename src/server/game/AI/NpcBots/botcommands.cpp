@@ -1372,12 +1372,12 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-//        if (owner->GetBotMgr()->IsPartyInCombat() && (owner->IsPvP() || owner->IsFFAPvP()))
-//        {
-//            handler->GetSession()->SendNotification("在PvP战斗中你不能这样做");
-//            handler->SetSentErrorMessage(true);
-//            return false;
-//        }
+        if (owner->GetBotMgr()->IsPartyInCombat() && (owner->IsPvP() || owner->IsFFAPvP()))
+        {
+            handler->GetSession()->SendNotification("在PvP战斗中你不能这样做");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         owner->GetBotMgr()->RecallAllBots(true);
         return true;
@@ -2204,7 +2204,7 @@ public:
             [bmap = map](ObjectGuid guid) { return bmap->find(guid) != bmap->end(); }
         ), std::end(guidvec));
 
-        handler->PSendSysMessage("拥有 NPCBots: %u", master->GetName().c_str());
+        handler->PSendSysMessage("列出 %s 的 NpcBots", master->GetName().c_str());
         handler->PSendSysMessage("拥有 NPCBots: %u(已激活: %u)", uint32(guidvec.size() + map->size()), uint32(map->size()));
 
         for (uint8 i = BOT_CLASS_WARRIOR; i != BOT_CLASS_END; ++i)
