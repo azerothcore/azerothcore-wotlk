@@ -1150,7 +1150,22 @@ enum AcoreStrings
 
     LANG_CMD_CAST_ERROR_CODE            = 5084,
 
-    // Room for more strings    5084-9999
+    // Strings added for dynamic_spawning
+    LANG_SPAWNINFO_GROUP_ID             = 5085,
+    LANG_SPAWNINFO_COMPATIBILITY_MODE   = 5086,
+    LANG_SPAWNINFO_GUIDINFO             = 5087,
+    LANG_SPAWNINFO_SPAWNID_LOCATION     = 5088,
+    LANG_SPAWNINFO_DISTANCEFROMPLAYER   = 5089,
+    LANG_SPAWNGROUP_BADGROUP            = 5090,
+    LANG_SPAWNGROUP_SPAWNCOUNT          = 5091,
+    LANG_LIST_RESPAWNS_RANGE            = 5092,
+    LANG_LIST_RESPAWNS_ZONE             = 5092,
+    LANG_LIST_RESPAWNS_LISTHEADER       = 5093,
+    LANG_LIST_RESPAWNS_OVERDUE          = 5094,
+    LANG_LIST_RESPAWNS_CREATURES        = 5095,
+    LANG_LIST_RESPAWNS_GAMEOBJECTS      = 5096,
+
+    // Room for more strings    5097-6603
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

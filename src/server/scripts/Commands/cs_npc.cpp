@@ -214,10 +214,6 @@ public:
             return false;
 
         Player* chr = handler->GetSession()->GetPlayer();
-        float x = chr->GetPositionX();
-        float y = chr->GetPositionY();
-        float z = chr->GetPositionZ();
-        float o = chr->GetOrientation();
         Map* map = chr->GetMap();
 
         if (Transport* tt = chr->GetTransport())
@@ -225,8 +221,10 @@ public:
             {
                 ObjectGuid::LowType guid = sObjectMgr->GenerateCreatureSpawnId();
                 CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
+                data.spawnId = guid;
                 data.id1 = id;
                 data.phaseMask = chr->GetPhaseMaskForSpawn();
+                data.spawnPoint.Relocate(chr->GetTransOffsetX(), chr->GetTransOffsetY(), chr->GetTransOffsetZ(), chr->GetTransOffsetO());
 
                 Creature* creature = trans->CreateNPCPassenger(guid, &data);
 
@@ -237,7 +235,7 @@ public:
             }
 
         Creature* creature = new Creature();
-        if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(), id, 0, { x, y, z, o }))
+        if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(), id, 0, *chr))
         {
             delete creature;
             return false;
@@ -252,7 +250,7 @@ public:
         creature->CleanupsBeforeDelete();
         delete creature;
         creature = new Creature();
-        if (!creature->LoadFromDB(spawnId, map, true, false))  //@todo - need to check
+        if (!creature->LoadFromDB(spawnId, map, true, true))
         {
             delete creature;
             return false;
@@ -384,19 +382,24 @@ public:
 
     static bool HandleNpcDeleteCommand(ChatHandler* handler)
     {
-        Creature* unit = handler->getSelectedCreature();
+        Creature* creature = handler->getSelectedCreature();
 
-        if (!unit || unit->IsPet() || unit->IsTotem())
+        if (!creature || creature->IsPet() || creature->IsTotem())
         {
             handler->SendSysMessage(LANG_SELECT_CREATURE);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        // Delete the creature
-        unit->CombatStop();
-        unit->DeleteFromDB();
-        unit->AddObjectToRemoveList();
+        if (TempSummon* summon = creature->ToTempSummon())
+            summon->UnSummon();
+        else
+        {
+            // Delete the creature
+            creature->CombatStop();
+            creature->DeleteFromDB();
+            creature->AddObjectToRemoveList();
+        }
 
         handler->SendSysMessage(LANG_COMMAND_DELCREATMESSAGE);
 
@@ -601,13 +604,20 @@ public:
             id3 = cData->id3;
         }
 
-        int64 curRespawnDelay = target->GetRespawnTimeEx() - GameTime::GetGameTime().count();
+        int64 curRespawnDelay = target->GetRespawnCompatibilityMode() ? target->GetRespawnTimeEx() - GameTime::GetGameTime().count() : target->GetMap()->GetCreatureRespawnTime(target->GetSpawnId()) - GameTime::GetGameTime().count();
+
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), true);
 
         handler->PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetSpawnId(), target->GetGUID().GetCounter(), entry, id1, id2, id3, displayid, nativeid, faction, npcflags);
+        if (target->GetCreatureData() && target->GetCreatureData()->spawnGroupData->groupId)
+        {
+            if (SpawnGroupTemplateData const* groupData = target->GetCreatureData()->spawnGroupData)
+                handler->PSendSysMessage(LANG_SPAWNINFO_GROUP_ID, groupData->name.c_str(), groupData->groupId, groupData->flags, groupData->isActive);
+        }
+        handler->PSendSysMessage(LANG_SPAWNINFO_COMPATIBILITY_MODE, target->GetRespawnCompatibilityMode());
         handler->PSendSysMessage(LANG_NPCINFO_LEVEL, target->GetLevel());
         handler->PSendSysMessage(LANG_NPCINFO_EQUIPMENT, target->GetCurrentEquipmentId(), target->GetOriginalEquipmentId());
         handler->PSendSysMessage(LANG_NPCINFO_HEALTH, target->GetCreateHealth(), target->GetMaxHealth(), target->GetHealth());
@@ -734,6 +744,11 @@ public:
         if (!creature)
             return false;
 
+        Player const* player = handler->GetSession()->GetPlayer();
+
+        if (!player)
+            return false;
+
         ObjectGuid::LowType lowguid = creature->GetSpawnId();
 
         CreatureData const* data = sObjectMgr->GetCreatureData(lowguid);
@@ -751,22 +766,10 @@ public:
             return false;
         }
 
-        float x = handler->GetSession()->GetPlayer()->GetPositionX();
-        float y = handler->GetSession()->GetPlayer()->GetPositionY();
-        float z = handler->GetSession()->GetPlayer()->GetPositionZ();
-        float o = handler->GetSession()->GetPlayer()->GetOrientation();
-
         if (creature)
         {
-            if (CreatureData const* data = sObjectMgr->GetCreatureData(creature->GetSpawnId()))
-            {
-                const_cast<CreatureData*>(data)->spawnPoint.GetPositionX();
-                const_cast<CreatureData*>(data)->spawnPoint.GetPositionX();
-                const_cast<CreatureData*>(data)->spawnPoint.GetPositionZ();
-                const_cast<CreatureData*>(data)->spawnPoint.GetOrientation();
-            }
-
-            creature->SetPosition(x, y, z, o);
+            sObjectMgr->NewOrExistCreatureData(creature->GetSpawnId()).spawnPoint.Relocate(*player);
+            creature->UpdatePosition(*player);
             creature->GetMotionMaster()->Initialize();
 
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
@@ -777,10 +780,10 @@ public:
         }
 
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_POSITION);
-        stmt->SetData(0, x);
-        stmt->SetData(1, y);
-        stmt->SetData(2, z);
-        stmt->SetData(3, o);
+        stmt->SetData(0, player->GetPositionX());
+        stmt->SetData(1, player->GetPositionY());
+        stmt->SetData(2, player->GetPositionZ());
+        stmt->SetData(3, player->GetOrientation());
         stmt->SetData(4, lowguid);
 
         WorldDatabase.Execute(stmt);

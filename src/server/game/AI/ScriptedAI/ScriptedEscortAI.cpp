@@ -266,8 +266,10 @@ void npc_escortAI::UpdateAI(uint32 diff)
                     else
                     {
                         if (sWorld->getBoolConfig(CONFIG_RESPAWN_DYNAMIC_ESCORTNPC))
+                        {
                             me->GetMap()->RemoveRespawnTime(SPAWN_TYPE_CREATURE, me->GetSpawnId(), true);
                             me->DespawnOrUnsummon();
+                        }  
                     }
                 }
 
