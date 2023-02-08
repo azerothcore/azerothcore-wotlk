@@ -2743,19 +2743,7 @@ bool Map::CheckRespawn(RespawnInfo* info)
         info->respawnTime = 0;
         return false;
     }
-
-    /*
-    * @todo - Remove this look PR from Treeston
-    // if we're a creature, see if the script objects to us spawning
-    if (info->type == SPAWN_TYPE_CREATURE)
-    {
-        if (!sScriptMgr->CanSpawn(info->spawnId, info->entry, sObjectMgr->GetCreatureData(info->spawnId), this))
-        { // if a script blocks our respawn, schedule next check in a little bit
-            info->respawnTime = time(NULL) + urand(4, 7);
-            return false;
-        }
-    }
-    return true;*/
+    return true;
 }
 
 void Map::DoRespawn(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 gridId)
