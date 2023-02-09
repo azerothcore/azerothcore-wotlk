@@ -1,3 +1,4 @@
+-- DB update 2023_02_07_00 -> 2023_02_09_00
 --
 UPDATE `npc_vendor` SET `incrtime`=3600 WHERE `entry`=19575 AND `item`=23771 AND `ExtendedCost`=0;
 UPDATE `npc_vendor` SET `incrtime`=3600 WHERE `entry`=19575 AND `item`=23783 AND `ExtendedCost`=0;
