@@ -1,7 +1,7 @@
 --
 
 DELETE FROM `creature` WHERE `guid` IN (125917, 125918, 125920, 125921) AND `id1` = 18766; -- Pool of Souls
-INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `npcflag`, `MovementType`) VALUES
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `npcflag`, `MovementType`) VALUES
 (125917, 18766, 558, 3, 1, 0, 113.589, -132.944, -139.589, 2.72271, 7200, 0, 0, 1, 0, 0, 0),
 (125918, 18766, 558, 3, 1, 0, 40.7895, -191.962, -139.589, 3.89208, 7200, 0, 0, 1, 0, 0, 0),
 (125920, 18766, 558, 3, 1, 0, 113.81, -191.401, -139.589, 2.9147, 7200, 0, 0, 1, 0, 0, 0),
