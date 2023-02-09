@@ -1,6 +1,6 @@
 --
 
-UPDATE `creature` SET `id1`=40607, WHERE `guid`=133917 AND `id1` = 34084;
+UPDATE `creature` SET `id1`=40607 WHERE `guid`=133917 AND `id1` = 34084;
 DELETE FROM `npc_vendor` WHERE `entry`=40607;
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
 (40607, 0, 40787, 0, 0, 2959, 0),
