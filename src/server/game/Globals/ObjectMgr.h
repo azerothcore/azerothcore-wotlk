@@ -672,6 +672,8 @@ typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
 typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
+typedef std::vector<uint32> CreatureCustomIDsContainer;
+
 enum SkillRangeType
 {
     SKILL_RANGE_LANGUAGE,                                   // 300..300
@@ -1021,6 +1023,7 @@ public:
     void LoadCreatureTemplateAddons();
     void LoadCreatureTemplateResistances();
     void LoadCreatureTemplateSpells();
+    void LoadCreatureCustomIDs();
     void CheckCreatureTemplate(CreatureTemplate const* cInfo);
     void CheckCreatureMovement(char const* table, uint64 id, CreatureMovementData& creatureMovement);
     void LoadGameObjectQuestItems();
@@ -1208,7 +1211,7 @@ public:
     }
 
     [[nodiscard]] GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
-    [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
+    [[nodiscard]] GameObjectData const* GetGameObjectData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
         if (itr == _gameObjectDataStore.end()) return nullptr;
@@ -1264,7 +1267,21 @@ public:
     }
     [[nodiscard]] QuestGreetingLocale const* GetQuestGreetingLocale(TypeID type, uint32 id) const
     {
-        QuestGreetingLocaleContainer::const_iterator itr = _questGreetingLocaleStore.find(MAKE_PAIR32(type, id));
+        uint32 typeIndex;
+        if (type == TYPEID_UNIT)
+        {
+            typeIndex = 0;
+        }
+        else if (type == TYPEID_GAMEOBJECT)
+        {
+            typeIndex = 1;
+        }
+        else
+        {
+            return nullptr;
+        }
+
+        QuestGreetingLocaleContainer::const_iterator itr = _questGreetingLocaleStore.find(MAKE_PAIR32(typeIndex, id));
         if (itr == _questGreetingLocaleStore.end()) return nullptr;
         return &itr->second;
     }
@@ -1542,6 +1559,7 @@ private:
     CellObjectGuids _emptyCellObjectGuids;
     CreatureDataContainer _creatureDataStore;
     CreatureTemplateContainer _creatureTemplateStore;
+    CreatureCustomIDsContainer _creatureCustomIDsStore;
     std::vector<CreatureTemplate*> _creatureTemplateStoreFast; // pussywizard
     CreatureModelContainer _creatureModelStore;
     CreatureAddonContainer _creatureAddonStore;

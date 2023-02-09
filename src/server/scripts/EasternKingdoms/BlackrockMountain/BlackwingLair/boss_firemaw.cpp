@@ -46,9 +46,9 @@ public:
         {
             BossAI::EnterCombat(who);
 
-            events.ScheduleEvent(EVENT_SHADOWFLAME, 18000);
-            events.ScheduleEvent(EVENT_WINGBUFFET, 30000);
-            events.ScheduleEvent(EVENT_FLAMEBUFFET, 5000);
+            events.ScheduleEvent(EVENT_SHADOWFLAME, 18s);
+            events.ScheduleEvent(EVENT_WINGBUFFET, 30s);
+            events.ScheduleEvent(EVENT_FLAMEBUFFET, 5s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -67,17 +67,17 @@ public:
                 {
                     case EVENT_SHADOWFLAME:
                         DoCastVictim(SPELL_SHADOWFLAME);
-                        events.ScheduleEvent(EVENT_SHADOWFLAME, urand(15000, 25000));
+                        events.ScheduleEvent(EVENT_SHADOWFLAME, 15s, 25s);
                         break;
                     case EVENT_WINGBUFFET:
                         DoCastVictim(SPELL_WINGBUFFET);
                         if (DoGetThreat(me->GetVictim()))
                             DoModifyThreatByPercent(me->GetVictim(), -75);
-                        events.ScheduleEvent(EVENT_WINGBUFFET, 30000);
+                        events.ScheduleEvent(EVENT_WINGBUFFET, 30s);
                         break;
                     case EVENT_FLAMEBUFFET:
                         DoCastVictim(SPELL_FLAMEBUFFET);
-                        events.ScheduleEvent(EVENT_FLAMEBUFFET, 5000);
+                        events.ScheduleEvent(EVENT_FLAMEBUFFET, 5s);
                         break;
                 }
 

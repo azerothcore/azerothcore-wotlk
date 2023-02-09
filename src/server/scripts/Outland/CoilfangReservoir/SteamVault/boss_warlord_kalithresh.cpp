@@ -172,7 +172,7 @@ public:
                 {
                     if (Creature* kali = me->FindNearestCreature(NPC_WARLORD_KALITHRESH, 100.0f))
                         kali->CastSpell(kali, SPELL_WARLORDS_RAGE_PROC, true);
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                 }
             }
         }

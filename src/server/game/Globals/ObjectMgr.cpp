@@ -188,7 +188,7 @@ std::string GetScriptCommandName(ScriptCommands command)
         default:
             {
                 char sz[32];
-                sprintf(sz, "Unknown command: %d", command);
+                snprintf(sz, sizeof(sz), "Unknown command: %d", command);
                 res = sz;
                 break;
             }
@@ -199,7 +199,7 @@ std::string GetScriptCommandName(ScriptCommands command)
 std::string ScriptInfo::GetDebugInfo() const
 {
     char sz[256];
-    sprintf(sz, "%s ('%s' script id: %u)", GetScriptCommandName(command).c_str(), GetScriptsTableNameByType(type).c_str(), id);
+    snprintf(sz, sizeof(sz), "%s ('%s' script id: %u)", GetScriptCommandName(command).c_str(), GetScriptsTableNameByType(type).c_str(), id);
     return std::string(sz);
 }
 
@@ -841,6 +841,21 @@ void ObjectMgr::LoadCreatureTemplateAddons()
     LOG_INFO("server.loading", " ");
 }
 
+/**
+ * @brief Load config option Creatures.CustomIDs into Store
+ */
+void ObjectMgr::LoadCreatureCustomIDs()
+{
+    // Hack for modules
+    std::string stringCreatureIds = sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "");
+    std::vector<std::string_view> CustomCreatures = Acore::Tokenize(stringCreatureIds, ',', false);
+
+    for (auto itr : CustomCreatures)
+    {
+        _creatureCustomIDsStore.push_back(Acore::StringTo<uint32>(itr).value());
+    }
+}
+
 void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 {
     if (!cInfo)
@@ -1183,15 +1198,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     const_cast<CreatureTemplate*>(cInfo)->DamageModifier *= Creature::_GetDamageMod(cInfo->rank);
 
     // Hack for modules
-    std::vector<uint32> CustomCreatures;
-    std::string stringCreatureIds(sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", ""));
-    for (std::string_view id : Acore::Tokenize(stringCreatureIds, ',', false))
-    {
-        uint32 entry = Acore::StringTo<uint32>(id).value_or(0);
-        CustomCreatures.emplace_back(entry);
-    }
-
-    for (auto const& itr : CustomCreatures)
+    for (auto itr : _creatureCustomIDsStore)
     {
         if (cInfo->Entry == itr)
             return;
@@ -1356,7 +1363,7 @@ void ObjectMgr::LoadGameObjectAddons()
 
         ObjectGuid::LowType guid = fields[0].Get<uint32>();
 
-        const GameObjectData* goData = GetGOData(guid);
+        const GameObjectData* goData = GetGameObjectData(guid);
         if (!goData)
         {
             LOG_ERROR("sql.sql", "GameObject (GUID: {}) does not exist but has a record in `gameobject_addon`", guid);
@@ -1791,7 +1798,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    const GameObjectData* master = GetGOData(linkedGuidLow);
+                    const GameObjectData* master = GetGameObjectData(linkedGuidLow);
                     if (!master)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (linkedGuid) {} not found in gameobject table", linkedGuidLow);
@@ -1820,7 +1827,7 @@ void ObjectMgr::LoadLinkedRespawn()
                 }
             case GO_TO_GO:
                 {
-                    const GameObjectData* slave = GetGOData(guidLow);
+                    const GameObjectData* slave = GetGameObjectData(guidLow);
                     if (!slave)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (guid) {} not found in gameobject table", guidLow);
@@ -1828,7 +1835,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    const GameObjectData* master = GetGOData(linkedGuidLow);
+                    const GameObjectData* master = GetGameObjectData(linkedGuidLow);
                     if (!master)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (linkedGuid) {} not found in gameobject table", linkedGuidLow);
@@ -1857,7 +1864,7 @@ void ObjectMgr::LoadLinkedRespawn()
                 }
             case GO_TO_CREATURE:
                 {
-                    const GameObjectData* slave = GetGOData(guidLow);
+                    const GameObjectData* slave = GetGameObjectData(guidLow);
                     if (!slave)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (guid) {} not found in gameobject table", guidLow);
@@ -3991,19 +3998,19 @@ void ObjectMgr::LoadPlayerInfo()
 
             PlayerClassInfo* pClassInfo = _playerClassInfo[class_];
 
-            // fatal error if no level 1 data
-            if (!pClassInfo->levelInfo || pClassInfo->levelInfo[0].basehealth == 0)
+            // fatal error if no initial level data
+            if (!pClassInfo->levelInfo || (pClassInfo->levelInfo[sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL) - 1].basehealth == 0 && class_ != CLASS_DEATH_KNIGHT) || (pClassInfo->levelInfo[sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL) - 1].basehealth == 0 && class_ == CLASS_DEATH_KNIGHT))
             {
-                LOG_ERROR("sql.sql", "Class {} Level 1 does not have health/mana data!", class_);
+                LOG_ERROR("sql.sql", "Class {} initial level does not have health/mana data!", class_);
                 exit(1);
             }
 
             // fill level gaps
             for (uint8 level = 1; level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL); ++level)
             {
-                if (pClassInfo->levelInfo[level].basehealth == 0)
+                if ((pClassInfo->levelInfo[level].basehealth == 0 && class_ != CLASS_DEATH_KNIGHT) || (level >= sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL) && pClassInfo->levelInfo[level].basehealth == 0 && class_ == CLASS_DEATH_KNIGHT))
                 {
-                    LOG_ERROR("sql.sql", "Class {} Level {} does not have health/mana data. Using stats data of level {}.", class_, level + 1, level);
+                    LOG_ERROR("sql.sql", "Class {} level {} does not have health/mana data. Using stats data of level {}.", class_, level + 1, level);
                     pClassInfo->levelInfo[level] = pClassInfo->levelInfo[level - 1];
                 }
             }
@@ -4016,15 +4023,47 @@ void ObjectMgr::LoadPlayerInfo()
     // Loading levels data (class/race dependent)
     LOG_INFO("server.loading", "Loading Player Create Level Stats Data...");
     {
+        struct RaceStats
+        {
+            int16 StatModifier[MAX_STATS];
+        };
+
+        std::array<RaceStats, MAX_RACES> raceStatModifiers;
+
         uint32 oldMSTime = getMSTime();
 
-        //                                                 0     1      2      3    4    5    6    7
-        QueryResult result  = WorldDatabase.Query("SELECT race, class, level, str, agi, sta, inte, spi FROM player_levelstats");
+        //                                                          0       1         2        3         4        5
+        QueryResult raceStatsResult  = WorldDatabase.Query("SELECT Race, Strength, Agility, Stamina, Intellect, Spirit FROM player_race_stats");
+
+        if (!raceStatsResult)
+        {
+            LOG_WARN("server.loading", ">> Loaded 0 race stats definitions. DB table `player_race_stats` is empty.");
+            LOG_INFO("server.loading", " ");
+            exit(1);
+        }
+
+        do
+        {
+            Field* fields = raceStatsResult->Fetch();
+
+            uint32 current_race = fields[0].Get<uint8>();
+            if (current_race >= MAX_RACES)
+            {
+                LOG_ERROR("sql.sql", "Wrong race {} in `player_race_stats` table, ignoring.", current_race);
+                continue;
+            }
+
+            for (uint32 i = 0; i < MAX_STATS; ++i)
+                raceStatModifiers[current_race].StatModifier[i] = fields[i + 1].Get<int16>();
+
+        } while (raceStatsResult->NextRow());
+
+        //                                                 0      1       2         3        4         5        6
+        QueryResult result = WorldDatabase.Query("SELECT Class, Level, Strength, Agility, Stamina, Intellect, Spirit FROM player_class_stats");
 
         if (!result)
         {
-            LOG_WARN("server.loading", ">> Loaded 0 level stats definitions. DB table `player_levelstats` is empty.");
-            LOG_INFO("server.loading", " ");
+            LOG_ERROR("server.loading", ">> Loaded 0 level stats definitions. DB table `player_class_stats` is empty.");
             exit(1);
         }
 
@@ -4034,41 +4073,35 @@ void ObjectMgr::LoadPlayerInfo()
         {
             Field* fields = result->Fetch();
 
-            uint32 current_race = fields[0].Get<uint8>();
-            if (current_race >= MAX_RACES)
-            {
-                LOG_ERROR("sql.sql", "Wrong race {} in `player_levelstats` table, ignoring.", current_race);
-                continue;
-            }
-
-            uint32 current_class = fields[1].Get<uint8>();
+            uint32 current_class = fields[0].Get<uint8>();
             if (current_class >= MAX_CLASSES)
             {
-                LOG_ERROR("sql.sql", "Wrong class {} in `player_levelstats` table, ignoring.", current_class);
+                LOG_ERROR("sql.sql", "Wrong class {} in `player_class_stats` table, ignoring.", current_class);
                 continue;
             }
 
-            uint32 current_level = fields[2].Get<uint8>();
+            uint32 current_level = fields[1].Get<uint8>();
             if (current_level > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
             {
                 if (current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
-                    LOG_ERROR("sql.sql", "Wrong (> {}) level {} in `player_levelstats` table, ignoring.", STRONG_MAX_LEVEL, current_level);
+                    LOG_ERROR("sql.sql", "Wrong (> {}) level {} in `player_class_stats` table, ignoring.", STRONG_MAX_LEVEL, current_level);
                 else
-                {
-                    LOG_DEBUG("sql.sql", "Unused (> MaxPlayerLevel in worldserver.conf) level {} in `player_levelstats` table, ignoring.", current_level);
-                    ++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
-                }
+                    LOG_DEBUG("sql.sql", "Unused (> MaxPlayerLevel in worldserver.conf) level {} in `player_class_stats` table, ignoring.", current_level);
+
                 continue;
             }
 
-            if (PlayerInfo* info = _playerInfo[current_race][current_class])
+            for (std::size_t race = 0; race < raceStatModifiers.size(); ++race)
             {
-                if (!info->levelInfo)
-                    info->levelInfo = new PlayerLevelInfo[sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)];
+                if (PlayerInfo* info = _playerInfo[race][current_class])
+                {
+                    if (!info->levelInfo)
+                        info->levelInfo = new PlayerLevelInfo[sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)];
 
-                PlayerLevelInfo& levelInfo = info->levelInfo[current_level - 1];
-                for (uint8 i = 0; i < MAX_STATS; i++)
-                    levelInfo.stats[i] = fields[i + 3].Get<uint32>();
+                    PlayerLevelInfo& levelInfo = info->levelInfo[current_level - 1];
+                    for (int i = 0; i < MAX_STATS; ++i)
+                        levelInfo.stats[i] = fields[i + 2].Get<uint16>() + raceStatModifiers[race].StatModifier[i];
+                }
             }
 
             ++count;
@@ -4099,19 +4132,19 @@ void ObjectMgr::LoadPlayerInfo()
                 if (sWorld->getIntConfig(CONFIG_EXPANSION) < EXPANSION_WRATH_OF_THE_LICH_KING && class_ == CLASS_DEATH_KNIGHT)
                     continue;
 
-                // fatal error if no level 1 data
-                if (!info->levelInfo || info->levelInfo[0].stats[0] == 0)
+                // fatal error if no initial level data
+                if (!info->levelInfo || (info->levelInfo[sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL) - 1].stats[0] == 0 && class_ != CLASS_DEATH_KNIGHT) || (info->levelInfo[sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL) - 1].stats[0] == 0 && class_ == CLASS_DEATH_KNIGHT))
                 {
-                    LOG_ERROR("sql.sql", "Race {} Class {} Level 1 does not have stats data!", race, class_);
+                    LOG_ERROR("sql.sql", "Race {} class {} initial level does not have stats data!", race, class_);
                     exit(1);
                 }
 
                 // fill level gaps
                 for (uint8 level = 1; level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL); ++level)
                 {
-                    if (info->levelInfo[level].stats[0] == 0)
+                    if ((info->levelInfo[level].stats[0] == 0 && class_ != CLASS_DEATH_KNIGHT) || (level >= sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL) && info->levelInfo[level].stats[0] == 0 && class_ == CLASS_DEATH_KNIGHT))
                     {
-                        LOG_ERROR("sql.sql", "Race {} Class {} Level {} does not have stats data. Using stats data of level {}.", race, class_, level + 1, level);
+                        LOG_ERROR("sql.sql", "Race {} class {} level {} does not have stats data. Using stats data of level {}.", race, class_, level + 1, level);
                         info->levelInfo[level] = info->levelInfo[level - 1];
                     }
                 }
@@ -4176,7 +4209,7 @@ void ObjectMgr::LoadPlayerInfo()
             }
         }
 
-        LOG_INFO("server.loading", ">> Loaded {} Xp For Level Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} XP For Level Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
 }
@@ -5227,7 +5260,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
 
             case SCRIPT_COMMAND_RESPAWN_GAMEOBJECT:
                 {
-                    GameObjectData const* data = GetGOData(tmp.RespawnGameobject.GOGuid);
+                    GameObjectData const* data = GetGameObjectData(tmp.RespawnGameobject.GOGuid);
                     if (!data)
                     {
                         LOG_ERROR("sql.sql", "Table `{}` has invalid gameobject (GUID: {}) in SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id {}",
@@ -5278,7 +5311,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
             case SCRIPT_COMMAND_OPEN_DOOR:
             case SCRIPT_COMMAND_CLOSE_DOOR:
                 {
-                    GameObjectData const* data = GetGOData(tmp.ToggleDoor.GOGuid);
+                    GameObjectData const* data = GetGameObjectData(tmp.ToggleDoor.GOGuid);
                     if (!data)
                     {
                         LOG_ERROR("sql.sql", "Table `{}` has invalid gameobject (GUID: {}) in {} for script id {}",
@@ -7716,6 +7749,13 @@ void ObjectMgr::LoadPointsOfInterest()
 
 void ObjectMgr::LoadQuestPOI()
 {
+    if (!sWorld->getBoolConfig(CONFIG_QUEST_POI_ENABLED))
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 quest POI definitions. Disabled by config.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
     uint32 oldMSTime = getMSTime();
 
     _questPOIStore.clear();                              // need for reload case
@@ -7870,7 +7910,7 @@ void ObjectMgr::DeleteCreatureData(ObjectGuid::LowType guid)
 void ObjectMgr::DeleteGOData(ObjectGuid::LowType guid)
 {
     // remove mapid*cellid -> guid_set map
-    GameObjectData const* data = GetGOData(guid);
+    GameObjectData const* data = GetGameObjectData(guid);
     if (data)
         RemoveGameobjectFromGrid(guid, data);
 
@@ -9872,7 +9912,7 @@ void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint3
 {
     if (active)
     {
-        if (player->getLevel() < reqLevel)
+        if (player->GetLevel() < reqLevel)
             return;
 
         if (player->GetTotalPlayedTime() < reqPlayTime)

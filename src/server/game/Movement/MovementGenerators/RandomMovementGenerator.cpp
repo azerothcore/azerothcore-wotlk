@@ -36,7 +36,7 @@ RandomMovementGenerator<Creature>::~RandomMovementGenerator()
 }
 
 template<>
-void RandomMovementGenerator<Creature>::SetRandomLocation(Creature* creature)
+void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 {
     if (creature->_moveState != MAP_OBJECT_CELL_MOVE_NONE)
         return;
@@ -134,6 +134,11 @@ void RandomMovementGenerator<Creature>::SetRandomLocation(Creature* creature)
         }
         else // ground
         {
+            if (!_pathGenerator)
+                _pathGenerator = new PathGenerator(creature);
+            else
+                _pathGenerator->Clear();
+
             bool result = _pathGenerator->CalculatePath(x, y, levelZ, false);
             if (result && !(_pathGenerator->GetPathType() & PATHFIND_NOPATH))
             {
@@ -252,8 +257,6 @@ void RandomMovementGenerator<Creature>::DoInitialize(Creature* creature)
         }
     }
 
-    if (!_pathGenerator)
-        _pathGenerator = new PathGenerator(creature);
     creature->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
 }
 
@@ -292,7 +295,7 @@ bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint3
     {
         _nextMoveTime.Update(diff);
         if (_nextMoveTime.Passed())
-            SetRandomLocation(creature);
+            _setRandomLocation(creature);
     }
     return true;
 }

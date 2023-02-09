@@ -2860,6 +2860,9 @@ void InstanceMap::InitVisibilityDistance()
         case 724: // Ruby Sanctum
             m_VisibleDistance = 200.0f;
             break;
+        case 531: // Ahn'Qiraj Temple
+            m_VisibleDistance = 300.0f;
+            break;
     }
 }
 

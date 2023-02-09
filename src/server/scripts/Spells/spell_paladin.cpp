@@ -337,7 +337,7 @@ private:
             uint32 defenseSkillValue = victim->GetDefenseSkillValue();
             // Max heal when defense skill denies critical hits from raid bosses
             // Formula: max defense at level + 140 (raiting from gear)
-            uint32 reqDefForMaxHeal = victim->getLevel() * 5 + 140;
+            uint32 reqDefForMaxHeal = victim->GetLevel() * 5 + 140;
             float pctFromDefense = (defenseSkillValue >= reqDefForMaxHeal)
                                     ? 1.0f
                                     : float(defenseSkillValue) / float(reqDefForMaxHeal);

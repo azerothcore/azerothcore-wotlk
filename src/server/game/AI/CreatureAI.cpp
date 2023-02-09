@@ -29,21 +29,6 @@
 #include "Language.h"
 #include "ZoneScript.h"
 
-class PhasedRespawn : public BasicEvent
-{
-public:
-    PhasedRespawn(Creature& owner) : BasicEvent(), _owner(owner) {}
-
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
-    {
-        _owner.RespawnOnEvade();
-        return true;
-    }
-
-private:
-    Creature& _owner;
-};
-
 //Disable CreatureAI when charmed
 void CreatureAI::OnCharmed(bool /*apply*/)
 {
@@ -226,7 +211,6 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
     if (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET))
     {
         me->DespawnOnEvade();
-        me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(20000));
     }
 
     sScriptMgr->OnUnitEnterEvadeMode(me, why);
