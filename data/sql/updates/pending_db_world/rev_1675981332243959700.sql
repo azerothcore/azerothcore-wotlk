@@ -2,7 +2,7 @@
 
 UPDATE `creature_template` SET `unit_flags`=33587968 WHERE `entry` IN (19416); -- Ancient Draenei Spirit
 DELETE FROM `creature` WHERE `guid` IN (83823,83824,83825,83826,83827,83828,83829,83830,83831,83832,83833,83834,83835,83836,83837,83838,83839,83840,83841,83842,83843,83844,83845,83846,83847,83848,83849,83850,83851,83852,83853,83854,83855,83856,83857,83858) AND `id1` = 19416;
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`,`equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
+INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`,`equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
 (83823, 19416, 530, 3519, 3688, 1, 1, 0, -3387.172, 5177.652, -95.4726, 1.396263, 120, 0, 0, 0, 0, 0, 0, 0, 0, 14545), -- 19416 (Area: 3688 - Difficulty: 0)
 (83824, 19416, 530, 3519, 3688, 1, 1, 0, -3330.136, 5182.805, -88.44417, 1.58825, 120, 0, 0, 0, 0, 0, 0, 0, 0, 14545), -- 19416 (Area: 3688 - Difficulty: 0)
 (83825, 19416, 530, 3519, 3688, 1, 1, 0, -3383.71, 5192.255, -97.12683, 3.822271, 120, 0, 0, 0, 0, 0, 0, 0, 0, 14545), -- 19416 (Area: 3688 - Difficulty: 0)
