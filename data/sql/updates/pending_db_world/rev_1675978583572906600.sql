@@ -1,11 +1,5 @@
 --
 
--- Delete old records of the event
-SET @OLDEVENT := 32;
-
-DELETE FROM `game_event` WHERE `eventEntry` = @OLDEVENT;
-DELETE FROM `game_event_creature` WHERE  `eventEntry` = @OLDEVENT;
-
 -- Implement L70ETC Concert
 SET @CGUID := 124091; -- Needs 13 consecutive guids
 SET @ANNOUNCEVENT := 81; -- Event for Announces from Shattrath Saul
