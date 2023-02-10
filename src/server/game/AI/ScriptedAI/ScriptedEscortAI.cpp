@@ -462,16 +462,13 @@ void npc_escortAI::SetRun(bool on)
 void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false */, ObjectGuid playerGUID /* = ObjectGuid::Empty */, Quest const* quest /* = nullptr */, bool instantRespawn /* = false */, bool canLoopPath /* = false */, bool resetWaypoints /* = true */)
 {
     // Queue respawn from the point it starts
-    if (Map* map = me->GetMap())
+    if (CreatureData const* cdata = me->GetCreatureData())
     {
-        if (CreatureData const* cdata = me->GetCreatureData())
-        {
-            if (sWorld->getBoolConfig(CONFIG_RESPAWN_DYNAMIC_ESCORTNPC) && (cdata->spawnGroupData->flags & SPAWNGROUP_FLAG_ESCORTQUESTNPC))
-                me->SaveRespawnTime(me->GetRespawnDelay());
-        }
+        if (sWorld->getBoolConfig(CONFIG_RESPAWN_DYNAMIC_ESCORTNPC) && (cdata->spawnGroupData->flags & SPAWNGROUP_FLAG_ESCORTQUESTNPC))
+            me->SaveRespawnTime(me->GetRespawnDelay());
     }
 
-    if (me->GetVictim())
+    if (me->IsEngaged())
     {
         LOG_ERROR("entities.unit.ai", "ERROR: EscortAI (script: {}, creature entry: {}) attempts to Start while in combat", me->GetScriptName(), me->GetEntry());
         return;

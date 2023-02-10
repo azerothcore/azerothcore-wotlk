@@ -1720,16 +1720,20 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, 
     }
 
     CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
+
     if (!data)
     {
         LOG_ERROR("sql.sql", "Creature (SpawnId: {}) not found in table `creature`, can't load. ", spawnId);
         return false;
     }
 
-    // xinef: this has to be assigned before Create function, properly loads equipment id from DB
-    m_creatureData = data;
     m_spawnId = spawnId;
+
+    // this has to be assigned before Create function, properly loads equipment id from DB
     m_respawnCompatibilityMode = ((data->spawnGroupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE) != 0);
+    m_creatureData = data;
+    m_wanderDistance = data->wander_distance;
+    m_respawnDelay = data->spawntimesecs;
 
     if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, data->id, 0U, data->spawnPoint, data, !m_respawnCompatibilityMode))
         return false;
@@ -1737,12 +1741,10 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, 
     //We should set first home position, because then AI calls home movement
     SetHomePosition(data->spawnPoint);
 
-    m_wanderDistance = data->wander_distance;
-
-    m_respawnDelay = data->spawntimesecs;
     m_deathState = ALIVE;
 
     m_respawnTime  = GetMap()->GetCreatureRespawnTime(m_spawnId);
+
     if (m_respawnTime)                          // respawn on Update
     {
         m_deathState = DEAD;
