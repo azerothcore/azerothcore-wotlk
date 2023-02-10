@@ -1089,7 +1089,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
         data.spawnId = m_spawnId;
     ASSERT(data.spawnId == m_spawnId);
 
-    data.id = GetEntry();
+    data.id1 = GetEntry();
     data.spawnPoint.WorldRelocate(this);
     data.phaseMask = phaseMask;
     data.rotation = m_localRotation;
@@ -1151,7 +1151,7 @@ bool GameObject::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap
         return false;
     }
 
-    uint32 entry = data->id;
+    uint32 entry = data->id1;
     //uint32 map_id = data->mapid;                          // already used before call
     uint32 phaseMask = data->phaseMask;
 

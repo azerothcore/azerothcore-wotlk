@@ -1735,7 +1735,7 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, 
     m_wanderDistance = data->wander_distance;
     m_respawnDelay = data->spawntimesecs;
 
-    if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, data->id, 0U, data->spawnPoint, data, !m_respawnCompatibilityMode))
+    if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, data->id1, 0U, data->spawnPoint, data, !m_respawnCompatibilityMode))
         return false;
 
     //We should set first home position, because then AI calls home movement
@@ -2098,6 +2098,7 @@ void Creature::Respawn(bool force)
             GetMap()->RemoveRespawnTime(SPAWN_TYPE_CREATURE, m_spawnId, true);
             CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
             // Respawn check if spawn has 2 entries
+            // @todo -  Check that doesn't break Dynamic spanwn
             if (data->id2)
             {
                 uint32 entry = GetRandomId(data->id1, data->id2, data->id3);

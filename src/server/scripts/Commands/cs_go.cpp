@@ -464,7 +464,7 @@ public:
         GameObjectData const* spawnpoint = nullptr;
         for (auto const& pair : sObjectMgr->GetAllGameObjectData())
         {
-            if (pair.second.id != entry)
+            if (pair.second.id1 != entry)
             {
                 continue;
             }

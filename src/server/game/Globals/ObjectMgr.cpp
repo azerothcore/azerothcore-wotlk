@@ -1823,7 +1823,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     }
 
                     guid = ObjectGuid::Create<HighGuid::Unit>(slave->id1, guidLow);
-                    linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
+                    linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id1, linkedGuidLow);
                     break;
                 }
             case GO_TO_GO:
@@ -1859,8 +1859,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id, guidLow);
-                    linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
+                    guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id1, guidLow);
+                    linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id1, linkedGuidLow);
                     break;
                 }
             case GO_TO_CREATURE:
@@ -1896,7 +1896,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id, guidLow);
+                    guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id1, guidLow);
                     linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id1, linkedGuidLow);
                     break;
                 }
@@ -2078,7 +2078,7 @@ void ObjectMgr::LoadCreatures()
     {
         Field* fields = result->Fetch();
 
-        ObjectGuid::LowType spawnId     = fields[0].Get<uint32>();
+        ObjectGuid::LowType spawnId     = fields[0].Get<uint32>();  ///@todo - Better rename: spawnId to guid
         uint32 id1                      = fields[1].Get<uint32>();
         uint32 id2                      = fields[2].Get<uint32>();
         uint32 id3                      = fields[3].Get<uint32>();
@@ -2277,7 +2277,7 @@ uint32 ObjectMgr::AddGameObjectData(uint32 entry, uint32 mapId, float x, float y
     ObjectGuid::LowType spawnId = GenerateGameObjectSpawnId();
 
     GameObjectData& data = NewOrExistGameObjectData(spawnId);
-    data.id             = entry;
+    data.id1            = entry;
     data.spawnPoint.WorldRelocate(mapId, x, y, z, o);
     data.rotation.x     = rotation0;
     data.rotation.y     = rotation1;
@@ -2298,7 +2298,7 @@ uint32 ObjectMgr::AddGameObjectData(uint32 entry, uint32 mapId, float x, float y
     // We use spawn coords to spawn
     if (!map->Instanceable() && map->IsGridLoaded(data.spawnPoint))
     {
-        GameObject* go = sObjectMgr->IsGameObjectStaticTransport(data.id) ? new StaticTransport() : new GameObject();
+        GameObject* go = sObjectMgr->IsGameObjectStaticTransport(data.id1) ? new StaticTransport() : new GameObject();
         if (!go->LoadFromDB(spawnId, map, true))
         {
             LOG_DEBUG("maps", "AddGameObjectData: dbguid {} entry {} map {} pos {}}", spawnId, entry, mapId, data.spawnPoint.ToString());
@@ -2431,7 +2431,7 @@ void ObjectMgr::LoadGameObjects()
         GameObjectData& data = _gameObjectDataStore[guid];
 
         data.spawnId        = guid;
-        data.id             = entry;
+        data.id1             = entry;
         data.spawnPoint.WorldRelocate(fields[2].Get<uint16>(), fields[3].Get<float>(), fields[4].Get<float>(), fields[5].Get<float>(), fields[6].Get<float>());
         data.rotation.x     = fields[7].Get<float>();
         data.rotation.y     = fields[8].Get<float>();
@@ -2446,13 +2446,13 @@ void ObjectMgr::LoadGameObjects()
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.spawnPoint.GetMapId());
         if (!mapEntry)
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) spawned on a non-existed map (Id: {}), skip", guid, data.id, data.spawnPoint.GetMapId());
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) spawned on a non-existed map (Id: {}), skip", guid, data.id1, data.spawnPoint.GetMapId());
             continue;
         }
 
         if (data.spawntimesecs == 0 && gInfo->IsDespawnAtAction())
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `spawntimesecs` (0) value, but the gameobejct is marked as despawnable at action.", guid, data.id);
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `spawntimesecs` (0) value, but the gameobejct is marked as despawnable at action.", guid, data.id1);
         }
 
         data.animprogress   = fields[12].Get<uint8>();
@@ -2461,7 +2461,7 @@ void ObjectMgr::LoadGameObjects()
         uint32 go_state     = fields[13].Get<uint8>();
         if (go_state >= MAX_GO_STATE)
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid `state` ({}) value, skip", guid, data.id, go_state);
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid `state` ({}) value, skip", guid, data.id1, go_state);
             continue;
         }
         data.goState       = GOState(go_state);
@@ -2469,7 +2469,7 @@ void ObjectMgr::LoadGameObjects()
         data.spawnMask      = fields[14].Get<uint8>();
 
         if (!IsTransportMap(data.spawnPoint.GetMapId()) && data.spawnMask & ~spawnMasks[data.spawnPoint.GetMapId()])
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.spawnPoint.GetMapId());
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id1, data.spawnMask, data.spawnPoint.GetMapId());
 
         data.phaseMask      = fields[15].Get<uint32>();
         int16 gameEvent     = fields[16].Get<int8>();
@@ -2477,37 +2477,37 @@ void ObjectMgr::LoadGameObjects()
 
         if (data.rotation.x < -1.0f || data.rotation.x > 1.0f)
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationX ({}) value, skip", guid, data.id, data.rotation.x);
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationX ({}) value, skip", guid, data.id1, data.rotation.x);
             continue;
         }
 
         if (data.rotation.y < -1.0f || data.rotation.y > 1.0f)
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationY ({}) value, skip", guid, data.id, data.rotation.y);
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationY ({}) value, skip", guid, data.id1, data.rotation.y);
             continue;
         }
 
         if (data.rotation.z < -1.0f || data.rotation.z > 1.0f)
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationZ ({}) value, skip", guid, data.id, data.rotation.z);
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationZ ({}) value, skip", guid, data.id1, data.rotation.z);
             continue;
         }
 
         if (data.rotation.w < -1.0f || data.rotation.w > 1.0f)
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationW ({}) value, skip", guid, data.id, data.rotation.w);
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationW ({}) value, skip", guid, data.id1, data.rotation.w);
             continue;
         }
 
         if (!MapMgr::IsValidMapCoord(data.spawnPoint))
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid coordinates, skip", guid, data.id);
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid coordinates, skip", guid, data.id1);
             continue;
         }
 
         if (data.phaseMask == 0)
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id1);
             data.phaseMask = 1;
         }
 
@@ -5406,11 +5406,11 @@ void ObjectMgr::LoadScripts(ScriptsType type)
                         continue;
                     }
 
-                    GameObjectTemplate const* info = GetGameObjectTemplate(data->id);
+                    GameObjectTemplate const* info = GetGameObjectTemplate(data->id1);
                     if (!info)
                     {
                         LOG_ERROR("sql.sql", "Table `{}` has gameobject with invalid entry (GUID: {} Entry: {}) in SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id {}",
-                                         tableName, tmp.RespawnGameobject.GOGuid, data->id, tmp.id);
+                                         tableName, tmp.RespawnGameobject.GOGuid, data->id1, tmp.id);
                         continue;
                     }
 
@@ -5457,11 +5457,11 @@ void ObjectMgr::LoadScripts(ScriptsType type)
                         continue;
                     }
 
-                    GameObjectTemplate const* info = GetGameObjectTemplate(data->id);
+                    GameObjectTemplate const* info = GetGameObjectTemplate(data->id1);
                     if (!info)
                     {
                         LOG_ERROR("sql.sql", "Table `{}` has gameobject with invalid entry (GUID: {} Entry: {}) in {} for script id {}",
-                                         tableName, tmp.ToggleDoor.GOGuid, data->id, GetScriptCommandName(tmp.command), tmp.id);
+                                         tableName, tmp.ToggleDoor.GOGuid, data->id1, GetScriptCommandName(tmp.command), tmp.id);
                         continue;
                     }
 

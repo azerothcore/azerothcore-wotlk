@@ -516,7 +516,7 @@ public:
                 handler->SetSentErrorMessage(true);
                 return false;
             }
-            entry = spawnData->id;
+            entry = spawnData->id1;
             gameObject = handler->GetObjectFromPlayerMapByDbGuid(spawnId);
         }
         else

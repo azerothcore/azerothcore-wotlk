@@ -3765,7 +3765,7 @@ void Map::LoadRespawnTimes()
             uint32 respawnTime = fields[1].Get<uint32>();
 
             if (CreatureData const* cdata = sObjectMgr->GetCreatureData(lowguid))
-                SaveRespawnTime(SPAWN_TYPE_CREATURE, lowguid, cdata->id, time_t(respawnTime), GetZoneId(cdata->phaseMask, cdata->spawnPoint), Acore::ComputeGridCoord(cdata->spawnPoint.GetPositionX(), cdata->spawnPoint.GetPositionY()).GetId(), false);
+                SaveRespawnTime(SPAWN_TYPE_CREATURE, lowguid, cdata->id1, time_t(respawnTime), GetZoneId(cdata->phaseMask, cdata->spawnPoint), Acore::ComputeGridCoord(cdata->spawnPoint.GetPositionX(), cdata->spawnPoint.GetPositionY()).GetId(), false);
         } while (result->NextRow());
     }
 
@@ -3781,7 +3781,7 @@ void Map::LoadRespawnTimes()
             uint32 respawnTime = fields[1].Get<uint32>();
 
             if (GameObjectData const* godata = sObjectMgr->GetGameObjectData(lowguid))
-                SaveRespawnTime(SPAWN_TYPE_GAMEOBJECT, lowguid, godata->id, time_t(respawnTime), GetZoneId(godata->phaseMask, godata->spawnPoint), Acore::ComputeGridCoord(godata->spawnPoint.GetPositionX(), godata->spawnPoint.GetPositionY()).GetId(), false);
+                SaveRespawnTime(SPAWN_TYPE_GAMEOBJECT, lowguid, godata->id1, time_t(respawnTime), GetZoneId(godata->phaseMask, godata->spawnPoint), Acore::ComputeGridCoord(godata->spawnPoint.GetPositionX(), godata->spawnPoint.GetPositionY()).GetId(), false);
         } while (result->NextRow());
     }
 }

@@ -61,7 +61,9 @@ struct SpawnData
 {
     SpawnObjectType const type;
     uint32 spawnId = 0;
-    uint32 id = 0; // entry in respective _template table
+    uint32 id1 = 0; // entry in respective _template table
+    uint32 id2 = 0; // For creatures only
+    uint32 id3 = 0; // For creatures only
     WorldLocation spawnPoint;
     uint32 phaseMask = 0;
     int32 spawntimesecs = 0;

@@ -364,7 +364,7 @@ GameObject* MotionTransport::CreateGOPassenger(ObjectGuid::LowType guid, GameObj
 {
     Map* map = GetMap();
     GameObject* go = new GameObject();
-    ASSERT(!sObjectMgr->IsGameObjectStaticTransport(data->id));
+    ASSERT(!sObjectMgr->IsGameObjectStaticTransport(data->id1));
 
     if (!go->LoadFromDB(guid, map, false))
     {

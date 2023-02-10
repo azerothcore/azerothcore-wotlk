@@ -416,7 +416,7 @@ void PoolGroup<GameObject>::Spawn1Object(PoolObject* obj)
         // We use current coords to unspawn, not spawn coords since creature can have changed grid
         if (!map->Instanceable() && map->IsGridLoaded(data->spawnPoint))
         {
-            GameObject* pGameobject = sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
+            GameObject* pGameobject = sObjectMgr->IsGameObjectStaticTransport(data->id1) ? new StaticTransport() : new GameObject();
             //LOG_DEBUG("pool", "Spawning gameobject {}", guid);
             if (!pGameobject->LoadFromDB(obj->guid, map, false))
             {
@@ -701,7 +701,7 @@ void PoolMgr::LoadFromDB()
                     continue;
                 }
 
-                GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(data->id);
+                GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(data->id1);
                 if (goinfo->type != GAMEOBJECT_TYPE_CHEST &&
                         goinfo->type != GAMEOBJECT_TYPE_GOOBER &&
                         goinfo->type != GAMEOBJECT_TYPE_FISHINGHOLE)

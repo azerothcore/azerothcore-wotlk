@@ -359,15 +359,16 @@ typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfo
 struct CreatureData : public SpawnData
 {
     CreatureData() : SpawnData(SPAWN_TYPE_CREATURE) { }
-    uint32 displayid = 0;
-    int8 equipmentId = 0;
-    float wander_distance{ 0.0f };
-    uint32 curhealth = 0;
-    uint32 curmana = 0;
-    uint8 movementType = 0;
-    uint32 npcflag = 0;
-    uint32 unit_flags = 0;
-    uint32 dynamicflags = 0;
+    uint32 displayid        = 0;
+    int8 equipmentId        = 0;
+    float wander_distance   = 0.0f;
+    uint32 currentwaypoint  = 0;
+    uint32 curhealth        = 0;
+    uint32 curmana          = 0;
+    uint8 movementType      = 0;
+    uint32 npcflag          = 0;
+    uint32 unit_flags       = 0;
+    uint32 dynamicflags     = 0;
 };
 
 struct CreatureModelInfo

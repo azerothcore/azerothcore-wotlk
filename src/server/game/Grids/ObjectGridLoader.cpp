@@ -122,7 +122,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefMgr<GameObj
     {
         ObjectGuid::LowType guid = *i_guid;
         GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
-        GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
+        GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id1) ? new StaticTransport() : new GameObject();
 
         if (!obj->LoadFromDB(guid, map, false, false))
         {
