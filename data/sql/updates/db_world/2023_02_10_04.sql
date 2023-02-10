@@ -1,3 +1,4 @@
+-- DB update 2023_02_10_03 -> 2023_02_10_04
 --
 
 DELETE FROM `creature` WHERE `guid` IN (104173, 104174, 104175);
