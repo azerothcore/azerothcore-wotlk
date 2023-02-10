@@ -10,7 +10,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 (126052, 19382, 530, 1, 1, 0, -4076.25, 2220.12, 152.366, 5.04713, 300, 0, 0, 6986, 0, 0, 2),
 (1158, 19382, 530, 1, 1, 0, -4108.75, 2120.99, 165.498, 5.35342, 300, 0, 0, 6986, 0, 0, 2);
 
-DELETE FROM `creature_addon` WHERE `guid` IN (125922, 125927, 125930, 125931, 125932, 126052, 126091);
+DELETE FROM `creature_addon` WHERE `guid` IN (125922, 125927, 125930, 125931, 125932, 126052, 126091, 1158);
 INSERT INTO `creature_addon` (`guid`, `path_id`) VALUES
 (125922,1259220),
 (125927,1259270),
