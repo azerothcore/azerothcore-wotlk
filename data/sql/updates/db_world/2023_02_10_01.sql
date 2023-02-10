@@ -1,3 +1,4 @@
+-- DB update 2023_02_10_00 -> 2023_02_10_01
 --
 
 UPDATE `smart_scripts` SET `target_type`=21, `target_param1`=30 WHERE `entryorguid` IN (2832700) AND `source_type`=9 AND `id` IN (0,1,2);

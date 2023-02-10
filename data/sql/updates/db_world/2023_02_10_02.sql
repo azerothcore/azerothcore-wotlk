@@ -1,3 +1,4 @@
+-- DB update 2023_02_10_01 -> 2023_02_10_02
 --
 
 UPDATE `creature` SET `id1`=40607 WHERE `guid`=133917 AND `id1` = 34084;
