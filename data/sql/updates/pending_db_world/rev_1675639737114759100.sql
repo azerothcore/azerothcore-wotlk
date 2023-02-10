@@ -75,7 +75,6 @@ FROM `creature_temp_group`;
 DROP TABLE `creature_temp_group`;
 
 -- Create gameobject dynamic spawns group (gameobjects with quest items, or subjects of quests with less than 30min spawn time)
-
 DROP TABLE IF EXISTS `gameobject_temp_group`;
 CREATE TEMPORARY TABLE `gameobject_temp_group`
 (
@@ -188,3 +187,45 @@ INSERT INTO `spawn_group` (`groupId`, `spawnType`, `spawnId`) VALUES
 DELETE FROM `spawn_group` WHERE `groupId` != 3 AND `spawnType`=0 AND `spawnId` IN (SELECT `spawnId` FROM (SELECT `spawnId` FROM `spawn_group` WHERE `groupId`=3  AND `spawnType`=0) as `temp`);
 DELETE FROM `spawn_group` WHERE `groupId` != 4 AND `spawnType`=1 AND `spawnId` IN (SELECT `spawnId` FROM (SELECT `spawnId` FROM `spawn_group` WHERE `groupId`=4  AND `spawnType`=1) as `temp`);
 
+-- Add new NPC/Gameobject commands
+DELETE FROM `command` WHERE `name` IN ('npc spawngroup', 'npc despawngroup', 'gobject spawngroup', 'gobject despawngroup', 'list respawns');
+INSERT INTO `command` (`name`, `security`, `help`) VALUES
+('npc spawngroup', 3, 'Syntax: .npc spawngroup $groupId [ignorerespawn] [force]'),
+('npc despawngroup', 3, 'Syntax: .npc despawngroup $groupId [removerespawntime]'),
+('gobject spawngroup', 3, 'Syntax: .gobject spawngroup $groupId [ignorerespawn] [force]'),
+('gobject despawngroup', 3, 'Syntax: .gobject despawngroup $groupId [removerespawntime]'),
+('list respawns', 3, 'Syntax: .list respawns [distance] Lists all pending respawns within <distance> yards, or within current zone if not specified.');
+
+-- Update Acore strings for various cs_list strings, to support showing spawn ID and guid.
+UPDATE `acore_string`
+SET `content_default` = '%d (Entry: %d) - |cffffffff|Hgameobject:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r %s %s'
+WHERE `entry` = 517;
+
+UPDATE `acore_string`
+SET `content_default` = '%d - |cffffffff|Hcreature:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r %s %s'
+WHERE `entry` = 515;
+
+UPDATE `acore_string`
+SET `content_default` = '%d - %s X:%f Y:%f Z:%f MapId:%d %s %s'
+WHERE `entry` = 1111;
+
+UPDATE `acore_string`
+SET `content_default` = '%d - %s X:%f Y:%f Z:%f MapId:%d %s %s'
+WHERE `entry` = 1110;
+
+-- Add new Acore strings for extra npc/gobject info lines
+DELETE FROM `acore_string` WHERE `entry` BETWEEN 5087 AND 5099;
+INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
+(5087, 'Spawn group: %s (ID: %u, Flags: %u, Active: %u)'),
+(5088, 'Compatibility Mode: %u'),
+(5089, 'GUID: %s'),
+(5090, 'SpawnID: %u, location (%f, %f, %f)'),
+(5091, 'Distance from player %f'),
+(5092, 'Spawn group %u not found'),
+(5093, 'Spawned a total of %zu objects:'),
+(5094, 'Listing %s respawns within %uyd'),
+(5095, 'Listing %s respawns for %s (zone %u)'),
+(5096, 'SpawnID | Entry | GridXY| Zone | Respawn time (Full)'),
+(5097, 'overdue'),
+(5098, 'creatures'),
+(5099, 'gameobjects');

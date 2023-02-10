@@ -40,6 +40,10 @@ using namespace Acore::ChatCommands;
 using GameObjectSpawnId = Variant<Hyperlink<gameobject>, ObjectGuid::LowType>;
 using GameObjectEntry = Variant<Hyperlink<gameobject_entry>, uint32>;
 
+// definitions are over in cs_npc.cpp
+bool HandleNpcSpawnGroup(ChatHandler* handler, char const* args);
+bool HandleNpcDespawnGroup(ChatHandler* handler, char const* args);
+
 class gobject_commandscript : public CommandScript
 {
 public:
@@ -49,17 +53,19 @@ public:
     {
         static ChatCommandTable gobjectCommandTable =
         {
-            { "activate",  HandleGameObjectActivateCommand, SEC_GAMEMASTER,    Console::No },
-            { "delete",    HandleGameObjectDeleteCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "info",      HandleGameObjectInfoCommand,     SEC_MODERATOR,     Console::No },
-            { "move",      HandleGameObjectMoveCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "near",      HandleGameObjectNearCommand,     SEC_MODERATOR,     Console::No },
-            { "target",    HandleGameObjectTargetCommand,   SEC_MODERATOR,     Console::No },
-            { "turn",      HandleGameObjectTurnCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "add temp",  HandleGameObjectAddTempCommand,  SEC_GAMEMASTER,    Console::No },
-            { "add",       HandleGameObjectAddCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "set phase", HandleGameObjectSetPhaseCommand, SEC_ADMINISTRATOR, Console::No },
-            { "set state", HandleGameObjectSetStateCommand, SEC_ADMINISTRATOR, Console::No }
+            { "activate",     HandleGameObjectActivateCommand, SEC_GAMEMASTER,    Console::No },
+            { "delete",       HandleGameObjectDeleteCommand,   SEC_ADMINISTRATOR, Console::No },
+            { "info",         HandleGameObjectInfoCommand,     SEC_MODERATOR,     Console::No },
+            { "move",         HandleGameObjectMoveCommand,     SEC_ADMINISTRATOR, Console::No },
+            { "near",         HandleGameObjectNearCommand,     SEC_MODERATOR,     Console::No },
+            { "target",       HandleGameObjectTargetCommand,   SEC_MODERATOR,     Console::No },
+            { "turn",         HandleGameObjectTurnCommand,     SEC_ADMINISTRATOR, Console::No },
+            { "add temp",     HandleGameObjectAddTempCommand,  SEC_GAMEMASTER,    Console::No },
+            { "add",          HandleGameObjectAddCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "spawngroup",   HandleNpcSpawnGroup,             SEC_GAMEMASTER,    Console::No },
+            { "despawngroup", HandleNpcDespawnGroup,           SEC_GAMEMASTER,    Console::No },
+            { "set phase",    HandleGameObjectSetPhaseCommand, SEC_ADMINISTRATOR, Console::No },
+            { "set state",    HandleGameObjectSetStateCommand, SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -540,10 +546,35 @@ public:
         else if (type == GAMEOBJECT_TYPE_FISHINGHOLE)
             lootId = gameObjectInfo->fishinghole.lootId;
 
+        // If we have a real object, send some info about it
+        if (gameObject)
+        {
+            handler->PSendSysMessage(LANG_SPAWNINFO_GUIDINFO, gameObject->GetGUID().ToString().c_str());
+            handler->PSendSysMessage(LANG_SPAWNINFO_SPAWNID_LOCATION, gameObject->GetSpawnId(), gameObject->GetPositionX(), gameObject->GetPositionY(), gameObject->GetPositionZ());
+            if (Player* player = handler->GetSession()->GetPlayer())
+            {
+                Position playerPos = player->GetPosition();
+                float dist = gameObject->GetExactDist(&playerPos);
+                handler->PSendSysMessage(LANG_SPAWNINFO_DISTANCEFROMPLAYER, dist);
+            }
+        }
+
         handler->PSendSysMessage(LANG_GOINFO_ENTRY, entry);
         handler->PSendSysMessage(LANG_GOINFO_TYPE, type);
         handler->PSendSysMessage(LANG_GOINFO_LOOTID, lootId);
         handler->PSendSysMessage(LANG_GOINFO_DISPLAYID, displayId);
+
+        if (WorldObject* object = handler->getSelectedObject())
+        {
+            if (object->ToGameObject() && object->ToGameObject()->GetGameObjectData() && object->ToGameObject()->GetGameObjectData()->spawnGroupData->groupId)
+            {
+                SpawnGroupTemplateData const* groupData = object->ToGameObject()->GetGameObjectData()->spawnGroupData;
+                handler->PSendSysMessage(LANG_SPAWNINFO_GROUP_ID, groupData->name.c_str(), groupData->groupId, groupData->flags, groupData->isActive);
+            }
+            if (object->ToGameObject())
+                handler->PSendSysMessage(LANG_SPAWNINFO_COMPATIBILITY_MODE, object->ToGameObject()->GetRespawnCompatibilityMode());
+        }
+
         if (gameObject)
         {
             handler->PSendSysMessage("LootMode: %u", gameObject->GetLootMode());
