@@ -834,7 +834,7 @@ public:
                         _actionEvents.ScheduleEvent(EVENT_KAYLAAN_RESSURECTION, 1000);
                         break;
                     case EVENT_KAYLAAN_RESSURECTION:
-                        if (GetCreature(KAYLAAN_THE_LOST))
+                        if (GetCreature(KAYLAAN_THE_LOST) && GetCreature(ISHANAH_HIGH_PRIESTESS))
                             kaylaan->CastSpell(ishanah, REDEMPTION);
                         _actionEvents.ScheduleEvent(EVENT_ISHANAH_IS_BACK_AGAIN, 11000);
                         break;
