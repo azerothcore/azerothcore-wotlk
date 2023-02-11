@@ -148,7 +148,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data) override
+        void SetData(uint32 type, uint32 /*data*/) override
         {
             switch (type)
             {
