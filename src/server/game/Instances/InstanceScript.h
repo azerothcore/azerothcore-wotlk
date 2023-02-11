@@ -278,7 +278,7 @@ protected:
     void UpdateDoorState(GameObject* door);
     void UpdateMinionState(Creature* minion, EncounterState state);
 
-    std::string LoadBossState(char const* data);
+    void LoadBossState(char const* data);
     std::string GetBossSaveData();
 private:
     static void LoadObjectData(ObjectData const* creatureData, ObjectInfoMap& objectInfo);

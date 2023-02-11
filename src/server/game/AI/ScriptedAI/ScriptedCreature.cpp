@@ -554,11 +554,25 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
         SetBoundary(instance->GetBossBoundary(bossId));
 }
 
+bool BossAI::CanRespawn()
+{
+    if (instance)
+    {
+        if (instance->GetBossState(_bossId) == DONE)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void BossAI::_Reset()
 {
     if (!me->IsAlive())
         return;
 
+    me->SetCombatPulseDelay(0);
     me->ResetLootMode();
     events.Reset();
     scheduler.CancelAll();
@@ -581,6 +595,7 @@ void BossAI::_JustDied()
 
 void BossAI::_EnterCombat()
 {
+    me->SetCombatPulseDelay(5);
     me->setActive(true);
     DoZoneInCombat();
     ScheduleTasks();
