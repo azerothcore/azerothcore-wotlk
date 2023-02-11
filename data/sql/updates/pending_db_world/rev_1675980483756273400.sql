@@ -14,4 +14,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `creature_template_addon` WHERE `entry`= 20316;
 INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES
-(20316, "35841 35850"); -- Raging Soul
+(20316, '35841 35850'); -- Raging Soul
