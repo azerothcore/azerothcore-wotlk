@@ -226,6 +226,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetImmuneToPC(false);
             me->SetReactState(REACT_PASSIVE);
             secondPhase = false;
@@ -258,6 +259,7 @@ public:
             events.ScheduleEvent(EVENT_INTRO_3, 9000);
             events.ScheduleEvent(EVENT_INTRO_4, 14000);
             me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             events.ScheduleEvent(EVENT_SUMMON_ADDS, 30000);
             events.ScheduleEvent(EVENT_CHECK_PLAYERS, 120000);
             if (pInstance)
@@ -278,9 +280,11 @@ public:
             summons.Summon(summon);
             if (gateOpened)
             {
+                Unit* target = summon->SelectNearestTarget(100.0f);
+                AttackStart(target);
                 summons.DoZoneInCombat();
             }
-            else if (Unit* target = me->SelectNearestTarget(50.0f))
+            else if (Unit* target = summon->SelectNearestTarget(50.0f))
             {
                 AttackStart(target);
                 DoZoneInCombat();
@@ -487,8 +491,10 @@ public:
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->SetImmuneToPC(false);
                         me->RemoveAllAuras();
+                        me->CallForHelp(100.0f);
                         summons.DoZoneInCombat();
                         events.ScheduleEvent(EVENT_SHADOW_BOLT, 1000);
                         events.ScheduleEvent(EVENT_HARVEST_SOUL, urand(5000, 15000));
@@ -540,6 +546,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetNoCallAssistance(false);
             events.Reset();
+            me->SetInCombatWithZone();
         }
 
         void EnterCombat(Unit*  /*who*/) override
@@ -613,6 +620,9 @@ public:
         {
             events.Update(diff);
             if (me->GetUnitState() == UNIT_STATE_CASTING)
+                return;
+
+            if (!UpdateVictim())
                 return;
 
             switch (events.ExecuteEvent())
