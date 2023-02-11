@@ -40,9 +40,19 @@ void CreatureAI::OnCharmed(bool /*apply*/)
 AISpellInfoType* UnitAI::AISpellInfo;
 AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; }
 
-void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/)
+void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Milliseconds delay /*= 0s*/)
 {
-    sCreatureTextMgr->SendChat(me, id, target);
+    if (delay > Seconds::zero())
+    {
+        me->m_Events.AddEventAtOffset([this, id, target]()
+        {
+            sCreatureTextMgr->SendChat(me, id, target);
+        }, delay);
+    }
+    else
+    {
+        sCreatureTextMgr->SendChat(me, id, target);
+    }
 }
 
 inline bool IsValidCombatTarget(Creature* source, Player* target)
