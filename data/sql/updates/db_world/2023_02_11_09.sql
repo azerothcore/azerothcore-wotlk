@@ -9,7 +9,7 @@ Table structure for table `pet_name_generation_locale` */
 
 DROP TABLE IF EXISTS `pet_name_generation_locale`;
 CREATE TABLE `pet_name_generation_locale` (
-  `id` mediumint unsigned NOT NULL AUTO_INCREMENT,
+  `id` mediumint unsigned NOT NULL,
   `locale` varchar(4) NOT NULL,
   `word` tinytext NOT NULL,
   `entry` mediumint unsigned NOT NULL DEFAULT '0',
