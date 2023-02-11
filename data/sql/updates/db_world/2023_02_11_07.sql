@@ -1,3 +1,4 @@
+-- DB update 2023_02_11_06 -> 2023_02_11_07
 --
 -- Karazhan Image of Medivh (17651) and Image of Arcanagos (17652) missing creature text
 DELETE FROM `creature_text` WHERE `CreatureID` IN (17651,17652);
