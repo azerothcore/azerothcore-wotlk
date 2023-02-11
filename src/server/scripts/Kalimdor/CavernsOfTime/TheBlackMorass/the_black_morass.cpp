@@ -387,16 +387,32 @@ public:
     {
         PrepareAuraScript(spell_black_morass_corrupt_medivh_AuraScript);
 
+        bool Load() override
+        {
+            _ticks = 0;
+            return true;
+        }
+
         void PeriodicTick(AuraEffect const* /*aurEff*/)
         {
-            if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
-                instance->SetData(DATA_DAMAGE_SHIELD, 1);
+            if (++_ticks >= 3)
+            {
+                _ticks = 0;
+
+                if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
+                {
+                    instance->SetData(DATA_DAMAGE_SHIELD, m_scriptSpellId == SPELL_CORRUPT_AEONUS ? 2 : 1);
+                }
+            }
         }
 
         void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_morass_corrupt_medivh_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
+
+    private:
+        uint8 _ticks = 0;
     };
 
     AuraScript* GetAuraScript() const override
