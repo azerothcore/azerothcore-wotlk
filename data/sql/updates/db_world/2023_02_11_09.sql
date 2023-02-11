@@ -9,13 +9,13 @@ Table structure for table `pet_name_generation_locale` */
 
 DROP TABLE IF EXISTS `pet_name_generation_locale`;
 CREATE TABLE `pet_name_generation_locale` (
-  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `id` mediumint unsigned NOT NULL AUTO_INCREMENT,
   `locale` varchar(4) NOT NULL,
   `word` tinytext NOT NULL,
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `half` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `half` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+);
 
 INSERT INTO `pet_name_generation_locale` (`id`, `locale`, `word`, `entry`, `half`) VALUES (261, 'esES', 'piedras', 26125, 1),
 (262, 'esES', 'rocas', 26125, 1),
@@ -123,4 +123,3 @@ INSERT INTO `pet_name_generation_locale` (`id`, `locale`, `word`, `entry`, `half
 (311, 'esMX', 'Captura', 26125, 0),
 (312, 'esMX', 'Bebe', 26125, 0),
 (313, 'esMX', 'Rebana', 26125, 0);
-
