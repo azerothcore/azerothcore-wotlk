@@ -1313,79 +1313,80 @@ public:
         handler->PSendSysMessage("LinkGUID '%u' added to creature with DBTableGUID: '%u'", linkguid, creature->GetSpawnId());
         return true;
     }
+
+    static bool HandleNpcSpawnGroup(ChatHandler* handler, std::vector<Variant<uint32, EXACT_SEQUENCE("force"), EXACT_SEQUENCE("ignorerespawn")>> const& opts)
+    {
+        if (opts.empty())
+            return false;
+
+        bool ignoreRespawn = false;
+        bool force = false;
+        uint32 groupId = 0;
+
+        // Decode arguments
+        for (auto const& variant : opts)
+        {
+            switch (variant.index())
+            {
+            case 0:
+                groupId = variant.get<uint32>();
+                break;
+            case 1:
+                force = true;
+                break;
+            case 2:
+                ignoreRespawn = true;
+                break;
+            }
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+
+        std::vector <WorldObject*> creatureList;
+        if (!sObjectMgr->SpawnGroupSpawn(groupId, player->GetMap(), ignoreRespawn, force, &creatureList))
+        {
+            handler->PSendSysMessage(LANG_SPAWNGROUP_BADGROUP, groupId);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        handler->PSendSysMessage(LANG_SPAWNGROUP_SPAWNCOUNT, creatureList.size());
+
+        return true;
+    }
+
+
+    static bool HandleNpcDespawnGroup(ChatHandler* handler, std::vector<Variant<uint32, EXACT_SEQUENCE("removerespawntime")>> const& opts)
+    {
+        if (opts.empty())
+            return false;
+
+        bool deleteRespawnTimes = false;
+        uint32 groupId = 0;
+
+        // Decode arguments
+        for (auto const& variant : opts)
+        {
+            if (variant.holds_alternative<uint32>())
+                groupId = variant.get<uint32>();
+            else
+                deleteRespawnTimes = true;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!sObjectMgr->SpawnGroupDespawn(groupId, player->GetMap(), deleteRespawnTimes))
+        {
+            handler->PSendSysMessage(LANG_SPAWNGROUP_BADGROUP, groupId);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        return true;
+    }
 };
 
-bool HandleNpcSpawnGroup(ChatHandler* handler, std::vector<Variant<uint32, EXACT_SEQUENCE("force"), EXACT_SEQUENCE("ignorerespawn")>> const& opts)
-{
-    if (opts.empty())
-        return false;
 
-    bool ignoreRespawn = false;
-    bool force = false;
-    uint32 groupId = 0;
-
-    // Decode arguments
-    for (auto const& variant : opts)
-    {
-        switch (variant.index())
-        {
-        case 0:
-            groupId = variant.get<uint32>();
-            break;
-        case 1:
-            force = true;
-            break;
-        case 2:
-            ignoreRespawn = true;
-            break;
-        }
-    }
-
-    Player* player = handler->GetSession()->GetPlayer();
-
-    std::vector <WorldObject*> creatureList;
-    if (!sObjectMgr->SpawnGroupSpawn(groupId, player->GetMap(), ignoreRespawn, force, &creatureList))
-    {
-        handler->PSendSysMessage(LANG_SPAWNGROUP_BADGROUP, groupId);
-        handler->SetSentErrorMessage(true);
-        return false;
-    }
-
-    handler->PSendSysMessage(LANG_SPAWNGROUP_SPAWNCOUNT, creatureList.size());
-
-    return true;
-}
-
-
-bool HandleNpcDespawnGroup(ChatHandler* handler, std::vector<Variant<uint32, EXACT_SEQUENCE("removerespawntime")>> const& opts)
-{
-    if (opts.empty())
-        return false;
-
-    bool deleteRespawnTimes = false;
-    uint32 groupId = 0;
-
-    // Decode arguments
-    for (auto const& variant : opts)
-    {
-        if (variant.holds_alternative<uint32>())
-            groupId = variant.get<uint32>();
-        else
-            deleteRespawnTimes = true;
-    }
-
-    Player* player = handler->GetSession()->GetPlayer();
-
-    if (!sObjectMgr->SpawnGroupDespawn(groupId, player->GetMap(), deleteRespawnTimes))
-    {
-        handler->PSendSysMessage(LANG_SPAWNGROUP_BADGROUP, groupId);
-        handler->SetSentErrorMessage(true);
-        return false;
-    }
-    handler->PSendSysMessage("Despawned a total of %zu objects.", n);
-
-    return true;
-}
 
 
 void AddSC_npc_commandscript()
