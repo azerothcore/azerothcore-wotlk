@@ -41,8 +41,8 @@ using GameObjectSpawnId = Variant<Hyperlink<gameobject>, ObjectGuid::LowType>;
 using GameObjectEntry = Variant<Hyperlink<gameobject_entry>, uint32>;
 
 // definitions are over in cs_npc.cpp
-bool HandleNpcSpawnGroup(ChatHandler* handler, char const* args);
-bool HandleNpcDespawnGroup(ChatHandler* handler, char const* args);
+bool HandleNpcSpawnGroup(ChatHandler* handler, std::vector<Variant<uint32, EXACT_SEQUENCE("force"), EXACT_SEQUENCE("ignorerespawn")>> const& opts);
+bool HandleNpcDespawnGroup(ChatHandler* handler, std::vector<Variant<uint32, EXACT_SEQUENCE("removerespawntime")>> const& opts);
 
 class gobject_commandscript : public CommandScript
 {
