@@ -42,4 +42,4 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 
 DELETE FROM `creature_template_addon` WHERE `entry` IN (19416);
 INSERT INTO `creature_template_addon` (`entry`, `bytes1`, `bytes2`, `auras`) VALUES
-(19416,0,1,"32648");
+(19416, 0, 1, '32648');
