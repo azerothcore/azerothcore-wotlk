@@ -448,6 +448,42 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
     LOG_INFO("server.loading", ">> Loaded {} Gossip Menu Option Locale Strings in {} ms", (uint32)_gossipMenuItemsLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
+void ObjectMgr::LoadPetNamesLocales()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                                  0     1      2    3
+    QueryResult result = WorldDatabase.Query("SELECT locale, word, entry, half FROM pet_name_generation_locale");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 pet name locales parts. DB table `pet_name_generation_locale` is empty!");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        LocaleConstant locale = GetLocaleByName(fields[0].Get<std::string>());
+        std::string word = fields[1].Get<std::string>();
+
+        uint32 entry = fields[2].Get<uint32>();
+        bool half = fields[3].Get<bool>();
+        std::pair<uint32, LocaleConstant> pairkey = std::make_pair(entry, locale);
+        if (half)
+            _petHalfLocaleName1[pairkey].push_back(word);
+        else
+            _petHalfLocaleName0[pairkey].push_back(word);
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Pet Name Locales Parts in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
 void ObjectMgr::LoadPointOfInterestLocales()
 {
     uint32 oldMSTime = getMSTime();
@@ -7400,6 +7436,19 @@ void ObjectMgr::LoadPetNumber()
 
     LOG_INFO("server.loading", ">> Loaded The Max Pet Number: {} in {} ms", _hiPetNumber - 1, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+std::string ObjectMgr::GeneratePetNameLocale(uint32 entry, LocaleConstant locale)
+{
+    std::vector<std::string>& list0 = _petHalfLocaleName0[std::make_pair(entry, locale)];
+    std::vector<std::string>& list1 = _petHalfLocaleName1[std::make_pair(entry, locale)];
+
+    if (list0.empty() || list1.empty())
+    {
+       return GeneratePetName(entry);
+    }
+
+    return *(list0.begin() + urand(0, list0.size() - 1)) + *(list1.begin() + urand(0, list1.size() - 1));
 }
 
 std::string ObjectMgr::GeneratePetName(uint32 entry)
