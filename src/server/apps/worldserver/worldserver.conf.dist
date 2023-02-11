@@ -3821,6 +3821,14 @@ QuestPOI.Enabled = 1
 ChangeFaction.MaxMoney = 0
 
 #
+#     Pet.RankMod.Health
+#        Description: Allows pet health to be modified by rank health rates (set in config)
+#        Default:     1 - Enabled
+#                     0 - Disabled
+
+Pet.RankMod.Health = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
