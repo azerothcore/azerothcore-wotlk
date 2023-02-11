@@ -73,8 +73,8 @@ public:
         {
             _EnterCombat();
             DoCastSelf(SPELL_SEPARATION_ANXIETY, true);
-            events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15000);
-            events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10000);
+            events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15s);
+            events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10s);
             massEruptionTimer = 600000; // 10 mins
         }
 
