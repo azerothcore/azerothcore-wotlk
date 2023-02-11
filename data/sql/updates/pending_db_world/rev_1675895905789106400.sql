@@ -770,7 +770,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `creature_text` WHERE `CreatureID`=17994;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `Text`, `Type`, `Probability`, `Emote`, `BroadcastTextId`, `comment`) VALUES
 (17994, 0, 'Do as I say, Fly!', 12, 100, 25, 16783, 'Bloodwarder Falconer'),
-(17994, 1, 'Kill $n!', 12, 100, 0, 17624, 'Bloodwarder Falconer');
+(17994, 1, 'Kill $n!', 14, 100, 0, 17624, 'Bloodwarder Falconer');
 
 -- Sunseeker Researcher
 DELETE FROM `waypoints` WHERE `point_comment`='Sunseeker Researcher' AND `entry` BETWEEN 1842100 AND 1842101;
