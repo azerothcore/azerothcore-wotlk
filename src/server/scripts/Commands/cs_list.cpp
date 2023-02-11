@@ -58,7 +58,6 @@ public:
             { "creature", HandleListCreatureCommand,    SEC_MODERATOR, Console::Yes },
             { "item",     HandleListItemCommand,        SEC_MODERATOR, Console::Yes },
             { "object",   HandleListObjectCommand,      SEC_MODERATOR, Console::Yes },
-            { "respawns", HandleListRespawnsCommand,    SEC_MODERATOR, Console::No  },
             { "auras",    listAurasCommandTable },
         };
         static ChatCommandTable commandTable =
@@ -537,71 +536,6 @@ public:
     {
         AreaTableEntry const* zoneEntry = sAreaTableStore.LookupEntry(zoneId);
         return zoneEntry ? zoneEntry->area_name[locale] : "<unknown zone>";
-    }
-
-    static bool HandleListRespawnsCommand(ChatHandler* handler, char const* args)
-    {
-        // We need a player
-        Player const* player = handler->GetSession()->GetPlayer();
-        if (!player)
-            return false;
-        // And we need a map
-        Map const* map = player->GetMap();
-        if (!map)
-            return false;
-
-        uint32 range = 0;
-        if (*args)
-            range = atoi((char*)args);
-
-        RespawnVector respawns;
-        LocaleConstant locale = handler->GetSession()->GetSessionDbcLocale();
-        char const* stringOverdue = sObjectMgr->GetAcoreString(LANG_LIST_RESPAWNS_OVERDUE, locale);
-        char const* stringCreature = sObjectMgr->GetAcoreString(LANG_LIST_RESPAWNS_CREATURES, locale);
-        char const* stringGameobject = sObjectMgr->GetAcoreString(LANG_LIST_RESPAWNS_GAMEOBJECTS, locale);
-
-        uint32 zoneId = player->GetZoneId();
-        if (range)
-            handler->PSendSysMessage(LANG_LIST_RESPAWNS_RANGE, stringCreature, range);
-        else
-            handler->PSendSysMessage(LANG_LIST_RESPAWNS_ZONE, stringCreature, GetZoneName(zoneId, handler->GetSessionDbcLocale()), zoneId);
-        handler->PSendSysMessage(LANG_LIST_RESPAWNS_LISTHEADER);
-        map->GetRespawnInfo(respawns, SPAWN_TYPEMASK_CREATURE, range ? 0 : zoneId);
-        for (RespawnInfo* ri : respawns)
-        {
-            CreatureData const* data = sObjectMgr->GetCreatureData(ri->spawnId);
-            if (!data)
-                continue;
-            if (range && !player->IsInDist(data->spawnPoint, range))
-                continue;
-            uint32 gridY = ri->gridId / MAX_NUMBER_OF_GRIDS;
-            uint32 gridX = ri->gridId % MAX_NUMBER_OF_GRIDS;
-
-            std::string respawnTime = ri->respawnTime > time(NULL) ? secsToTimeString(uint64(ri->respawnTime - time(NULL)), true) : stringOverdue;
-            handler->PSendSysMessage("%u | %u | [%02u,%02u] | %s (%u) | %s", ri->spawnId, ri->entry, gridX, gridY, GetZoneName(ri->zoneId, handler->GetSessionDbcLocale()), ri->zoneId, data->spawnGroupData->isActive ? respawnTime.c_str() : "inactive");
-        }
-
-        respawns.clear();
-        if (range)
-            handler->PSendSysMessage(LANG_LIST_RESPAWNS_RANGE, stringGameobject, range);
-        else
-            handler->PSendSysMessage(LANG_LIST_RESPAWNS_ZONE, stringGameobject, GetZoneName(zoneId, handler->GetSessionDbcLocale()), zoneId);
-        handler->PSendSysMessage(LANG_LIST_RESPAWNS_LISTHEADER);
-        map->GetRespawnInfo(respawns, SPAWN_TYPEMASK_GAMEOBJECT, range ? 0 : zoneId);
-        for (RespawnInfo* ri : respawns)
-        {
-            GameObjectData const* data = sObjectMgr->GetGameObjectData(ri->spawnId);
-            if (!data)
-                continue;
-            if (range && !player->IsInDist(data->spawnPoint, range))
-                continue;
-            uint32 gridY = ri->gridId / MAX_NUMBER_OF_GRIDS;
-            uint32 gridX = ri->gridId % MAX_NUMBER_OF_GRIDS;
-
-            std::string respawnTime = ri->respawnTime > time(NULL) ? secsToTimeString(uint64(ri->respawnTime - time(NULL)), true) : stringOverdue;
-            handler->PSendSysMessage("%u | %u | [% 02u, % 02u] | %s (%u) | %s", ri->spawnId, ri->entry, gridX, gridY, GetZoneName(ri->zoneId, handler->GetSessionDbcLocale()), ri->zoneId, data->spawnGroupData->isActive ? respawnTime.c_str() : "inactive");
-        }
-        return true;
     }
 };
 

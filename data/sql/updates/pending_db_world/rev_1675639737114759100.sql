@@ -194,7 +194,6 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('npc despawngroup', 3, 'Syntax: .npc despawngroup $groupId [removerespawntime]'),
 ('gobject spawngroup', 3, 'Syntax: .gobject spawngroup $groupId [ignorerespawn] [force]'),
 ('gobject despawngroup', 3, 'Syntax: .gobject despawngroup $groupId [removerespawntime]'),
-('list respawns', 3, 'Syntax: .list respawns [distance] Lists all pending respawns within <distance> yards, or within current zone if not specified.');
 
 -- Update Acore strings for various cs_list strings, to support showing spawn ID and guid.
 UPDATE `acore_string`
@@ -223,9 +222,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (5091, 'Distance from player %f'),
 (5092, 'Spawn group %u not found'),
 (5093, 'Spawned a total of %zu objects:'),
-(5094, 'Listing %s respawns within %uyd'),
-(5095, 'Listing %s respawns for %s (zone %u)'),
-(5096, 'SpawnID | Entry | GridXY| Zone | Respawn time (Full)'),
-(5097, 'overdue'),
-(5098, 'creatures'),
-(5099, 'gameobjects');
+(5094, 'SpawnID | Entry | GridXY| Zone | Respawn time (Full)'),
+(5095, 'overdue'),
+(5096, 'creatures'),
+(5097, 'gameobjects');

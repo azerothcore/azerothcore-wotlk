@@ -1338,9 +1338,9 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_QUEST_POI_ENABLED] = sConfigMgr->GetOption<bool>("QuestPOI.Enabled", true);
 
     _int_configs[CONFIG_CHANGE_FACTION_MAX_MONEY] = sConfigMgr->GetOption<uint32>("ChangeFaction.MaxMoney", 0);
-    
+
     _bool_configs[CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH] = sConfigMgr->GetOption<bool>("Pet.RankMod.Health", true);
-    
+
     // Respawn Settings
     _int_configs[CONFIG_RESPAWN_MINCHECKINTERVALMS] = sConfigMgr->GetOption<int32>("Respawn.MinCheckIntervalMS", 5000);
     _int_configs[CONFIG_RESPAWN_DYNAMICMODE] = sConfigMgr->GetOption<int32>("Respawn.DynamicMode", 0);

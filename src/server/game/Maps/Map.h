@@ -815,42 +815,42 @@ private:
     void AddRespawnInfo(RespawnInfo& info, bool replace = false);
     void DeleteRespawnInfo();
     void DeleteRespawnInfo(RespawnInfo* info);
-        void DeleteRespawnInfo(RespawnVector& toDelete)
-        {
-            for (RespawnInfo* info : toDelete)
-                DeleteRespawnInfo(info);
-            toDelete.clear();
-        }
-        void DeleteRespawnInfo(SpawnObjectTypeMask types, uint32 zoneId = 0)
-        {
-            RespawnVector v;
-            GetRespawnInfo(v, types, zoneId);
-            if (!v.empty())
-                DeleteRespawnInfo(v);
-        }
-        void DeleteRespawnInfo(SpawnObjectType type, ObjectGuid::LowType spawnId)
-        {
-            if (RespawnInfo* info = GetRespawnInfo(type, spawnId))
-                DeleteRespawnInfo(info);
-        }
+    void DeleteRespawnInfo(RespawnVector& toDelete)
+    {
+        for (RespawnInfo* info : toDelete)
+            DeleteRespawnInfo(info);
+        toDelete.clear();
+    }
+    void DeleteRespawnInfo(SpawnObjectTypeMask types, uint32 zoneId = 0)
+    {
+        RespawnVector v;
+        GetRespawnInfo(v, types, zoneId);
+        if (!v.empty())
+            DeleteRespawnInfo(v);
+    }
+    void DeleteRespawnInfo(SpawnObjectType type, ObjectGuid::LowType spawnId)
+    {
+        if (RespawnInfo* info = GetRespawnInfo(type, spawnId))
+            DeleteRespawnInfo(info);
+    }
 
 public:
     void GetRespawnInfo(RespawnVector& respawnData, SpawnObjectTypeMask types, uint32 zoneId = 0) const;
     RespawnInfo* GetRespawnInfo(SpawnObjectType type, ObjectGuid::LowType spawnId) const;
     void RemoveRespawnTime(RespawnInfo* info, bool doRespawn = false, CharacterDatabaseTransaction dbTrans = nullptr);
     void RemoveRespawnTime(RespawnVector& respawnData, bool doRespawn = false, CharacterDatabaseTransaction dbTrans = nullptr);
-        void RemoveRespawnTime(SpawnObjectTypeMask types = SPAWN_TYPEMASK_ALL, uint32 zoneId = 0, bool doRespawn = false, CharacterDatabaseTransaction dbTrans = nullptr)
-        {
-            RespawnVector v;
-            GetRespawnInfo(v, types, zoneId);
-            if (!v.empty())
-                RemoveRespawnTime(v, doRespawn, dbTrans);
-        }
-        void RemoveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId, bool doRespawn = false, CharacterDatabaseTransaction dbTrans = nullptr)
-        {
-            if (RespawnInfo* info = GetRespawnInfo(type, spawnId))
-                RemoveRespawnTime(info, doRespawn, dbTrans);
-        }
+    void RemoveRespawnTime(SpawnObjectTypeMask types = SPAWN_TYPEMASK_ALL, uint32 zoneId = 0, bool doRespawn = false, CharacterDatabaseTransaction dbTrans = nullptr)
+    {
+        RespawnVector v;
+        GetRespawnInfo(v, types, zoneId);
+        if (!v.empty())
+            RemoveRespawnTime(v, doRespawn, dbTrans);
+    }
+    void RemoveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId, bool doRespawn = false, CharacterDatabaseTransaction dbTrans = nullptr)
+    {
+        if (RespawnInfo* info = GetRespawnInfo(type, spawnId))
+            RemoveRespawnTime(info, doRespawn, dbTrans);
+    }
 
 private:
     // Type specific code for add/remove to/from grid
