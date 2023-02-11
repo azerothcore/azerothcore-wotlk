@@ -32,23 +32,23 @@ enum PrinceSay
 
 enum Spells
 {
-    SPELL_ENFEEBLE        = 30843,
-    SPELL_ENFEEBLE_EFFECT = 41624,
-    SPELL_SHADOW_NOVA     = 30852,
-    SPELL_SW_PAIN         = 30854,
-    SPELL_THRASH_PASSIVE  = 12787,
-    SPELL_SUNDER_ARMOR    = 30901,
-    SPELL_THRASH_AURA     = 12787,
-    SPELL_EQUIP_AXES      = 30857,
-    SPELL_AMPLIFY_DAMAGE  = 39095,
-    SPELL_CLEAVE          = 30131,
-    SPELL_HELLFIRE        = 30859,
+    SPELL_ENFEEBLE         = 30843,
+    SPELL_ENFEEBLE_EFFECT  = 41624,
+    SPELL_SHADOW_NOVA      = 30852,
+    SPELL_SHADOW_WORD_PAIN = 30854,
+    SPELL_THRASH_PASSIVE   = 12787,
+    SPELL_SUNDER_ARMOR     = 30901,
+    SPELL_THRASH_AURA      = 12787,
+    SPELL_EQUIP_AXES       = 30857,
+    SPELL_AMPLIFY_DAMAGE   = 39095,
+    SPELL_CLEAVE           = 30131,
+    SPELL_HELLFIRE         = 30859,
 };
 
 enum creatures
 {
-    NETHERSPITE_INFERNAL     = 17646,
-    MALCHEZARS_AXE           = 17650,
+    NPC_NETHERSPITE_INFERNAL     = 17646,
+    NPC_MALCHEZARS_AXE           = 17650,
     INFERNAL_MODEL_INVISIBLE = 11686,
     SPELL_INFERNAL_RELAY     = 33814,   // 30835,
     EQUIP_ID_AXE             = 33542
@@ -58,6 +58,7 @@ enum EventGroups
 {
     GROUP_ENFEEBLE,
     GROUP_SHADOW_NOVA,
+    GROUP_SHADOW_WORD_PAIN,
 };
 
 enum Phases
@@ -102,13 +103,6 @@ struct boss_malchezaar : public BossAI
 
     void Initialize()
     {
-        EnfeebleTimer = 30000;
-        EnfeebleResetTimer = 38000;
-        SWPainTimer = 20000;
-        InfernalCleanupTimer = 47000;
-        AmplifyDamageTimer = 5000;
-        SunderArmorTimer = urand(5000, 10000);
-        InfernalTimer = 40000;
         _phase = 1;
         clearweapons();
         positions.clear();
@@ -135,7 +129,7 @@ struct boss_malchezaar : public BossAI
     {
         Talk(SAY_DEATH);
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
-        if (Creature* Axe = me->FindNearestCreature(MALCHEZARS_AXE, 100.0f))
+        if (Creature* Axe = me->FindNearestCreature(NPC_MALCHEZARS_AXE, 100.0f))
         {
             Axe->DespawnOrUnsummon();
         }
@@ -164,6 +158,32 @@ struct boss_malchezaar : public BossAI
             DoCastAOE(SPELL_SHADOW_NOVA);
             context.SetGroup(GROUP_SHADOW_NOVA);
             context.Repeat();
+        }).Schedule(40s, [this](TaskContext context)
+        {
+            Position pos =  me->GetRandomNearPosition(40.0);;
+
+            if (Creature* RELAY = me->FindNearestCreature(NPC_RELAY, 100.0f))
+            {
+                Creature* infernal = RELAY->SummonCreature(NPC_NETHERSPITE_INFERNAL, pos, TEMPSUMMON_TIMED_DESPAWN, 180000);
+
+                if (infernal)
+                {
+                    infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
+                    infernal->SetFaction(me->GetFaction());
+                    infernals.push_back(infernal->GetGUID());
+                    infernal->SetControlled(true, UNIT_STATE_ROOT);
+                    RELAY->AI()->DoCast(infernal, SPELL_INFERNAL_RELAY);
+                }
+            }
+
+            context.Repeat(_phase == PHASE_THREE ? 15s : 45s);
+
+            Talk(SAY_SUMMON);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_SHADOW_WORD_PAIN);
+            context.SetGroup(GROUP_SHADOW_WORD_PAIN);
+            context.Repeat();
         });
     }
 
@@ -171,13 +191,43 @@ struct boss_malchezaar : public BossAI
     {
         if (me->HealthBelowPctDamaged(60, damage) && _phase == PHASE_ONE)
         {
-            Phase2();
-        }
-    }
+            me->InterruptNonMeleeSpells(false);
+            _phase = 2;
+            DoCast(me, SPELL_EQUIP_AXES);
+            Talk(SAY_AXE_TOSS1);
+            DoCast(me, SPELL_THRASH_AURA, true);
+            SetEquipmentSlots(false, EQUIP_ID_AXE, EQUIP_ID_AXE, EQUIP_NO_CHANGE);
+            me->SetCanDualWield(true);
+            me->SetAttackTime(OFF_ATTACK, (me->GetAttackTime(BASE_ATTACK) * 150) / 100);
 
-    void SummonAxes()
-    {
-        me->SummonCreature(MALCHEZARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+            scheduler.Schedule(5s, 10s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_SUNDER_ARMOR);
+                context.Repeat();
+            });
+
+            scheduler.CancelGroup(GROUP_SHADOW_WORD_PAIN);
+        }
+        else if (me->HealthBelowPctDamaged(30, damage) && _phase == PHASE_TWO)
+        {
+            me->RemoveAurasDueToSpell(SPELL_THRASH_AURA);
+            Talk(SAY_AXE_TOSS2);
+            _phase = PHASE_THREE;
+            clearweapons();
+
+            me->SummonCreature(NPC_MALCHEZARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+
+            scheduler.Schedule(20s, 30s, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_AMPLIFY_DAMAGE, 1);
+                context.Repeat();
+            }).Schedule(20s, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN);
+                context.SetGroup(GROUP_SHADOW_WORD_PAIN);
+                context.Repeat();
+            });;
+        }
     }
 
     void EnfeebleHealthEffect()
@@ -228,146 +278,16 @@ struct boss_malchezaar : public BossAI
         }
     }
 
-    void SummonInfernal()
-    {
-        Position pos;
-
-        if ((me->GetMapId() == 532))
-        {
-            pos = me->GetRandomNearPosition(40.0);
-        }
-        else
-        {
-            InfernalPoint* point = Acore::Containers::SelectRandomContainerElement(positions);
-            pos.Relocate(point->x, point->y, INFERNAL_Z, frand(0.0f, float(M_PI * 2)));
-        }
-
-        if (Creature* RELAY = me->FindNearestCreature(NPC_RELAY, 100.0f))
-        {
-            Creature* infernal = RELAY->SummonCreature(NETHERSPITE_INFERNAL, pos, TEMPSUMMON_TIMED_DESPAWN, 180000);
-
-            if (infernal)
-            {
-                infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
-                infernal->SetFaction(me->GetFaction());
-                infernals.push_back(infernal->GetGUID());
-                infernal->SetControlled(true, UNIT_STATE_ROOT);
-                RELAY->AI()->DoCast(infernal, SPELL_INFERNAL_RELAY);
-            }
-        }
-        Talk(SAY_SUMMON);
-    }
-
-    void Phase2()
-    {
-        me->InterruptNonMeleeSpells(false);
-        _phase = 2;
-        DoCast(me, SPELL_EQUIP_AXES);
-        Talk(SAY_AXE_TOSS1);
-        DoCast(me, SPELL_THRASH_AURA, true);
-        SetEquipmentSlots(false, EQUIP_ID_AXE, EQUIP_ID_AXE, EQUIP_NO_CHANGE);
-        me->SetCanDualWield(true);
-        me->SetAttackTime(OFF_ATTACK, (me->GetAttackTime(BASE_ATTACK) * 150) / 100);
-        SunderArmorTimer = urand(5000, 10000);
-    }
-
-    void Phase3()
-    {
-        me->RemoveAurasDueToSpell(SPELL_THRASH_AURA);
-        Talk(SAY_AXE_TOSS2);
-        _phase = 3;
-        clearweapons();
-        SummonAxes();
-        AmplifyDamageTimer = urand(20000, 30000);
-    }
-
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
             return;
-
-        if (InfernalTimer <= diff)
-        {
-            SummonInfernal();
-            InfernalTimer = _phase == 3 ? 14500 : 44500;    // 15 secs in phase 3, 45 otherwise
-        }
-        else InfernalTimer -= diff;
-
-        if (_phase != 2)
-        {
-            if (SWPainTimer <= diff)
-            {
-
-                // if phase == 1 target the tank, otherwise anyone but the tank
-                Unit* target = _phase == 1
-                    ? me->GetVictim()
-                    : SelectTarget(SelectTargetMethod::Random, 1, 100, true);
-
-                if (target)
-                {
-                    DoCast(target, SPELL_SW_PAIN);
-                }
-
-                SWPainTimer = 20000;
-            }
-            else
-                SWPainTimer -= diff;
-        }
-
-        if (_phase == 1)
-        {
-            if (HealthBelowPct(60))
-            {
-                Phase2();
-            }
-        }
-
-        if (_phase == 2)
-        {
-            if (SunderArmorTimer <= diff)
-            {
-                DoCast(SPELL_SUNDER_ARMOR);
-                SunderArmorTimer = urand(5000, 10000);
-            }
-            else
-                SunderArmorTimer -= diff;
-
-            if (HealthBelowPct(30))
-            {
-                Phase3();
-            }
-        }
-
-        if (_phase == 3)
-        {
-            if (AmplifyDamageTimer <= diff)
-            {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
-
-                if (target)
-                {
-                    DoCast(target, SPELL_AMPLIFY_DAMAGE);
-                    AmplifyDamageTimer = urand(20000, 30000);
-                }
-            }
-            else
-            {
-                AmplifyDamageTimer -= diff;
-            }
-        }
 
         scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
 
     private:
-        uint32 EnfeebleTimer;
-        uint32 EnfeebleResetTimer;
-        uint32 SWPainTimer;
-        uint32 SunderArmorTimer;
-        uint32 AmplifyDamageTimer;
-        uint32 InfernalTimer;
-        uint32 InfernalCleanupTimer;
         uint32 _phase;
         uint32 enfeeble_health[5];
         ObjectGuid enfeeble_targets[5];
