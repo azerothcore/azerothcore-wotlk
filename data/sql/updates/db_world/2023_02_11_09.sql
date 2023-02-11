@@ -9,11 +9,11 @@ Table structure for table `pet_name_generation_locale` */
 
 DROP TABLE IF EXISTS `pet_name_generation_locale`;
 CREATE TABLE `pet_name_generation_locale` (
-  `id` mediumint unsigned NOT NULL,
-  `locale` varchar(4) NOT NULL,
-  `word` tinytext NOT NULL,
-  `entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `half` tinyint unsigned NOT NULL DEFAULT '0',
+  `ID` mediumint unsigned NOT NULL,
+  `Locale` varchar(4) NOT NULL,
+  `Word` tinytext NOT NULL,
+  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `Half` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`locale`)
 );
 
