@@ -127,12 +127,9 @@ struct boss_malchezaar : public BossAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        _JustDied();
         Talk(SAY_DEATH);
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
-        if (Creature* Axe = me->FindNearestCreature(NPC_MALCHEZARS_AXE, 100.0f))
-        {
-            Axe->DespawnOrUnsummon();
-        }
     }
 
     void EnterCombat(Unit* /*who*/) override
