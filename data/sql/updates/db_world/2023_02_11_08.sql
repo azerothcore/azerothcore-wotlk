@@ -1,3 +1,4 @@
+-- DB update 2023_02_11_07 -> 2023_02_11_08
 --
 
 UPDATE `creature_template` SET `unit_flags`=33587968 WHERE `entry` IN (19416); -- Ancient Draenei Spirit
