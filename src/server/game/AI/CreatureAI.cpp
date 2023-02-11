@@ -40,6 +40,13 @@ void CreatureAI::OnCharmed(bool /*apply*/)
 AISpellInfoType* UnitAI::AISpellInfo;
 AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; }
 
+/**
+ * @brief Causes the creature to talk/say the text assigned to their entry in the `creature_text` database table.
+ *
+ * @param uint8 id Creature entry.
+ * @param WorldObject target The target of the speech, in case it has elements such as $n, where the target's name will be referrenced.
+ * @param Milliseconds delay Delay until the creature says the text line. Creatures will talk immediately by default.
+ */
 void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Milliseconds delay /*= 0s*/)
 {
     if (delay > Seconds::zero())
