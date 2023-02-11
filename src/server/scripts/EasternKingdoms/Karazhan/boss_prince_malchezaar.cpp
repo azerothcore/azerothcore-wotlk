@@ -190,9 +190,9 @@ struct boss_malchezaar : public BossAI
         {
             me->InterruptNonMeleeSpells(false);
             _phase = 2;
-            DoCast(me, SPELL_EQUIP_AXES);
+            DoCastSelf( SPELL_EQUIP_AXES);
             Talk(SAY_AXE_TOSS1);
-            DoCast(me, SPELL_THRASH_AURA, true);
+            DoCastSelf( SPELL_THRASH_AURA, true);
             SetEquipmentSlots(false, EQUIP_ID_AXE, EQUIP_ID_AXE, EQUIP_NO_CHANGE);
             me->SetCanDualWield(true);
             me->SetAttackTime(OFF_ATTACK, (me->GetAttackTime(BASE_ATTACK) * 150) / 100);
@@ -229,65 +229,57 @@ struct boss_malchezaar : public BossAI
 
     void EnfeebleHealthEffect()
     {
-        SpellInfo const* info = sSpellMgr->GetSpellInfo(SPELL_ENFEEBLE_EFFECT);
-        if (!info)
-            return;
-
-        ThreatContainer::StorageType const& t_list = me->GetThreatMgr().GetThreatList();
+        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
         std::vector<Unit*> targets;
 
-        if (t_list.empty())
+        if (threatList.empty())
             return;
 
         //begin + 1, so we don't target the one with the highest threat
-        ThreatContainer::StorageType::const_iterator itr = t_list.begin();
+        ThreatContainer::StorageType::const_iterator itr = threatList.begin();
         std::advance(itr, 1);
-        for (; itr != t_list.end(); ++itr) //store the threat list in a different container
+        for (auto threatRef : threatList) //store the threat list in a different container
+        {
             if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                if (target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
-                    targets.push_back(target);
-
-        //cut down to size if we have more than 5 targets
-        while (targets.size() > 5)
-            targets.erase(targets.begin() + rand() % targets.size());
-
-        uint32 i = 0;
-        for (std::vector<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter, ++i)
-            if (Unit* target = *iter)
             {
-                enfeeble_targets[i] = target->GetGUID();
-                enfeeble_health[i] = target->GetHealth();
+                if (target->IsAlive() && target->IsPlayer())
+                {
+                    targets.push_back(target);
+                }
+            }
+        }
 
-                me->CastSpell(target, SPELL_ENFEEBLE, true, 0, 0, me->GetGUID());
+        Acore::Containers::RandomResize(targets, 5);
+
+        for (auto const& target : targets)
+        {
+            if (target)
+            {
+                _enfeebleTargets[target->GetGUID()] = target->GetHealth();
+
+                me->CastSpell(target, SPELL_ENFEEBLE, true);
                 target->SetHealth(1);
             }
+        }
     }
 
     void EnfeebleResetHealth()
     {
-        for (uint8 i = 0; i < 5; ++i)
+        for (auto targets : _enfeebleTargets)
         {
-            Unit* target = ObjectAccessor::GetUnit(*me, enfeeble_targets[i]);
-            if (target && target->IsAlive())
-                target->SetHealth(enfeeble_health[i]);
-            enfeeble_targets[i].Clear();
-            enfeeble_health[i] = 0;
+            if (Unit* target = ObjectAccessor::GetUnit(*me, targets.first))
+            {
+                if (target->IsAlive())
+                {
+                    target->SetHealth(targets.second);
+                }
+            }
         }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff,
-            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
 
     private:
         uint32 _phase;
-        uint32 enfeeble_health[5];
-        ObjectGuid enfeeble_targets[5];
+        std::map<ObjectGuid, uint32> _enfeebleTargets;
 
         GuidVector infernals;
         std::vector<InfernalPoint*> positions;
