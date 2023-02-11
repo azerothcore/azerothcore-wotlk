@@ -12,6 +12,7 @@ DELETE FROM `linked_respawn` WHERE `linkedguid` IN (82986,83076,82987,82989,8299
 -- Delete old condition
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=34156 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=0 AND `ConditionValue1`=3 AND `ConditionValue2`=18721 AND `ConditionValue3`=0;
 
+-- Adds all creatures
 SET @CGUID := 147000;
 
 DELETE FROM `creature` WHERE `map`=553 AND `id1` IN (17975,17976,17977,17978,17980,17993,17994,18155,18404,18405,18419,18420,18421,18422,18587,19486,19505,19507,19508,19509,19511,19512,19513,19555,19557,19598,19608,19633,19843,19865) AND `guid` BETWEEN @CGUID+0 AND @CGUID+187;
@@ -426,13 +427,97 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,19,161.58592,402.9305,-5.386437,NULL,0,0,0,100,0);
 -- 0x2041DC452011FD8000099800028E350E .go xyz 161.58592 402.9305 -5.386437
 
--- Botanist and Greater Frayer formations
-DELETE FROM `creature_formations` WHERE `leaderGUID` IN (@CGUID+61, @CGUID+62) AND `memberGUID` IN (@CGUID+61, @CGUID+62, @CGUID+144, @CGUID+145);
+-- Pathing for High Botanist Freywinn Entry: 17975
+SET @NPC := @CGUID+0;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,69,3, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,116.32591,455.5696,-4.941401,3.385938644409179687,15000,0,0,100,0),
+(@PATH,2,120.16402,450.68173,-4.894922,4.555309295654296875,15000,0,0,100,0);
+-- 0x2041DC4520118DC000099800000E350E .go xyz 116.32591 455.5696 -4.941401
+
+-- Pathing for Nethervine Inciter Entry: 19511
+SET @NPC := @CGUID+121;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=1.63937,`position_y`=482.49994,`position_z`=-5.534588 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,1.63937,482.49994,-5.534588,NULL,0,0,0,100,0),
+(@PATH,2,-6.525395,482.93228,-5.4948173,NULL,0,0,0,100,0),
+(@PATH,3,-13.819373,488.85602,-5.425375,NULL,0,0,0,100,0),
+(@PATH,4,-17.635359,496.55002,-5.3706923,NULL,0,0,0,100,0),
+(@PATH,5,-16.294327,503.0782,-5.324291,NULL,0,0,0,100,0),
+(@PATH,6,-6.525395,482.93228,-5.4948173,NULL,0,0,0,100,0);
+-- 0x2041DC4520130DC000099800000E350E .go xyz 1.63937 482.49994 -5.534588
+
+-- Pathing for Nethervine Inciter Entry: 19511
+SET @NPC := @CGUID+122;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-10.506299,`position_y`=509.9379,`position_z`=-5.275531 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-10.506299,509.9379,-5.275531,NULL,0,0,0,100,0),
+(@PATH,2,-10.811854,498.69476,-5.355443,NULL,0,0,0,100,0),
+(@PATH,3,2.500325,493.41788,-5.4415383,NULL,0,0,0,100,0),
+(@PATH,4,15.093162,496.89648,-5.4699764,NULL,0,0,0,100,0),
+(@PATH,5,2.500325,493.41788,-5.4415383,NULL,0,0,0,100,0),
+(@PATH,6,-10.811854,498.69476,-5.355443,NULL,0,0,0,100,0);
+-- 0x2041DC4520130DC000099800008E350E .go xyz -10.506299 509.9379 -5.275531
+
+-- Pathing for Nethervine Inciter Entry: 19511
+SET @NPC := @CGUID+123;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-21.582249,`position_y`=517.7063,`position_z`=-6.475253 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-21.582249,517.7063,-6.475253,NULL,0,0,0,100,0),
+(@PATH,2,-9.34382,516.5084,-5.6364603,NULL,0,0,0,100,0),
+(@PATH,3,4.990617,518.1604,-7.1384296,NULL,0,0,0,100,0),
+(@PATH,4,19.445581,526.3201,-11.257864,NULL,0,0,0,100,0),
+(@PATH,5,23.91135,540.4265,-18.37715,NULL,0,0,0,100,0),
+(@PATH,6,18.103956,548.5428,-18.29796,NULL,0,0,0,100,0),
+(@PATH,7,-1.83314,553.56354,-18.135887,NULL,0,0,0,100,0),
+(@PATH,8,-17.958172,553.2923,-18.191553,NULL,0,0,0,100,0),
+(@PATH,9,-30.428175,550.3372,-18.304739,NULL,0,0,0,100,0),
+(@PATH,10,-43.321644,544.68585,-18.359991,NULL,0,0,0,100,0),
+(@PATH,11,-46.765606,533.5467,-15.893292,NULL,0,0,0,100,0),
+(@PATH,12,-37.181698,524.0293,-10.164318,NULL,0,0,0,100,0);
+-- 0x2041DC4520130DC000099800038E350E .go xyz -21.582249 517.7063 -6.475253
+
+-- Pathing for Nethervine Inciter Entry: 19511
+SET @NPC := @CGUID+124;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-29.17254,`position_y`=568.2135,`position_z`=-17.990519 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-29.17254,568.2135,-17.990519,NULL,0,0,0,100,0),
+(@PATH,2,-11.505647,559.82526,-18.09619,NULL,0,0,0,100,0),
+(@PATH,3,13.711286,556.805,-18.137554,NULL,0,0,0,100,0),
+(@PATH,4,34.537453,554.1877,-18.282408,NULL,0,0,0,100,0),
+(@PATH,5,13.711286,556.805,-18.137554,NULL,0,0,0,100,0),
+(@PATH,6,-11.505647,559.82526,-18.09619,NULL,0,0,0,100,0);
+-- 0x2041DC4520130DC000099800010E350E .go xyz -29.17254 568.2135 -17.990519
+
+-- Patrol formations
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (@CGUID+61, @CGUID+62, @CGUID+123) AND `memberGUID` IN (@CGUID+61, @CGUID+62, @CGUID+123, @CGUID+128, @CGUID+144, @CGUID+145);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
 (@CGUID+61, @CGUID+61, 0, 0, 3),
 (@CGUID+61, @CGUID+144, 3, 180, 515),
 (@CGUID+62, @CGUID+62, 0, 0, 3),
-(@CGUID+62, @CGUID+145, 3, 180, 515);
+(@CGUID+62, @CGUID+145, 3, 180, 515),
+(@CGUID+123, @CGUID+123, 0, 0, 3),
+(@CGUID+123, @CGUID+128, 3.5, 90, 515);
 
 -- SmartAI for Sunseeker Botanist
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18422);
@@ -544,7 +629,44 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `spell_target_position` SET `PositionX`=102.702, `PositionY`=489.666, `PositionZ`=-6.74601 WHERE `ID` IN (34183, 34185);
 UPDATE `spell_target_position` SET `PositionX`=158.252, `PositionY`=435.927, `PositionZ`=-6.78686 WHERE `ID` IN (34183, 34185);
 
--- Bloodwarder Falconer
+-- Bloodwarder Falconer and Bloodfalcons
+DELETE FROM `waypoints` WHERE `point_comment`='Bloodfalcon' AND `entry` BETWEEN 1815500 AND 1815504;
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
+(1815500,1,-12.859056,292.17502,-0.47123554,NULL,'Bloodfalcon'),
+(1815500,2,-4.634653,291.63293,0.8281061,NULL,'Bloodfalcon'),
+(1815500,3,-3.132143,288.05878,0.97123027,NULL,'Bloodfalcon'),
+(1815500,4,-12.779606,283.8108,-0.5313738,NULL,'Bloodfalcon'),
+(1815500,5,-23.234816,285.8802,-1.8473223,NULL,'Bloodfalcon'),
+(1815500,6,-29.06995,287.01328,-1.8473244,NULL,'Bloodfalcon'),
+(1815500,7,-28.19163,288.61743,-1.8473233,NULL,'Bloodfalcon'),
+(1815501,1,-32.633892,313.6926,-2.9892433,NULL,'Bloodfalcon'),
+(1815501,2,-36.44413,294.66745,-1.8473231,NULL,'Bloodfalcon'),
+(1815501,3,-42.860966,291.474,-1.8473233,NULL,'Bloodfalcon'),
+(1815501,4,-42.836784,283.74088,-1.8473245,NULL,'Bloodfalcon'),
+(1815501,5,-29.824219,283.9159,-1.8473248,NULL,'Bloodfalcon'),
+(1815501,6,-29.392775,291.65842,-1.8473237,NULL,'Bloodfalcon'),
+(1815501,7,-36.823017,294.92844,-1.847323,NULL,'Bloodfalcon'),
+(1815502,1,-30.482723,259.80405,-3.4442947,NULL,'Bloodfalcon'),
+(1815502,2,-36.03879,280.80167,-1.8473252,NULL,'Bloodfalcon'),
+(1815502,3,-30.454828,284.31418,-1.8473248,NULL,'Bloodfalcon'),
+(1815502,4,-30.297646,292.20926,-1.8473235,NULL,'Bloodfalcon'),
+(1815502,5,-36.54842,295.91965,-1.8473228,NULL,'Bloodfalcon'),
+(1815502,6,-43.99062,283.76346,-1.8473245,NULL,'Bloodfalcon'),
+(1815502,7,-36.486675,280.83936,-1.8473252,NULL,'Bloodfalcon'),
+(1815503,1,85.99113,289.54016,-5.441046,NULL,'Bloodfalcon'),
+(1815503,2,79.673256,286.72223,-5.466302,NULL,'Bloodfalcon'),
+(1815503,3,77.98022,270.55414,-5.47999,NULL,'Bloodfalcon'),
+(1815503,4,84.07146,264.81665,-5.459437,NULL,'Bloodfalcon'),
+(1815503,5,92.041145,267.70798,-5.4278765,NULL,'Bloodfalcon'),
+(1815503,6,99.9794,272.1951,-6.95119,NULL,'Bloodfalcon'),
+(1815503,7,100.84679,280.37253,-6.861873,NULL,'Bloodfalcon'),
+(1815504,1,106.60388,296.39322,-6.722094,NULL,'Bloodfalcon'),
+(1815504,2,114.86026,296.71304,-5.403351,NULL,'Bloodfalcon'),
+(1815504,3,120.55673,289.947,-5.4101934,NULL,'Bloodfalcon'),
+(1815504,4,119.758934,278.0228,-5.4230533,NULL,'Bloodfalcon'),
+(1815504,5,114.74198,276.31375,-6.958809,NULL,'Bloodfalcon'),
+(1815504,6,109.52783,279.67487,-6.901642,NULL,'Bloodfalcon');
+
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 17994);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (17994, 0, 0, 1, 0, 0, 100, 512, 2000, 4000, 15000, 15000, 0, 64, 1, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Store Targetlist'),
@@ -558,7 +680,7 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (-(@CG
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-(@CGUID+27), 0, 0, 1, 0, 0, 100, 512, 2000, 4000, 15000, 15000, 0, 64, 1, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Store Targetlist'),
 (-(@CGUID+27), 0, 1, 2, 61, 0, 100, 512, 0, 0, 0, 0, 0, 11, 34852, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Cast \'Call of the Falcon\''),
-(-(@CGUID+27), 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Say Line 0'),
+(-(@CGUID+27), 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Say Line 1'),
 (-(@CGUID+27), 0, 3, 0, 0, 0, 100, 0, 4000, 6000, 22000, 25000, 0, 11, 31567, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Cast \'Deterrence\''),
 (-(@CGUID+27), 0, 4, 0, 0, 0, 100, 0, 8000, 10000, 15000, 20000, 0, 11, 34879, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Cast \'Multi-Shot\''),
 (-(@CGUID+27), 0, 5, 0, 2, 0, 100, 0, 0, 5, 10000, 10000, 0, 11, 32908, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - Between 0-5% Health - Cast \'Wing Clip\''),
@@ -569,7 +691,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 (-(@CGUID+28), 0, 0, 1, 0, 0, 100, 512, 2000, 4000, 15000, 15000, 0, 64, 1, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Store Targetlist'),
 (-(@CGUID+28), 0, 1, 2, 61, 0, 100, 512, 0, 0, 0, 0, 0, 11, 34852, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Cast \'Call of the Falcon\''),
-(-(@CGUID+28), 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Say Line 0'),
+(-(@CGUID+28), 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Say Line 1'),
 (-(@CGUID+28), 0, 3, 0, 0, 0, 100, 0, 4000, 6000, 22000, 25000, 0, 11, 31567, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Cast \'Deterrence\''),
 (-(@CGUID+28), 0, 4, 0, 0, 0, 100, 0, 8000, 10000, 15000, 20000, 0, 11, 34879, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - In Combat - Cast \'Multi-Shot\''),
 (-(@CGUID+28), 0, 5, 0, 2, 0, 100, 0, 0, 5, 10000, 10000, 0, 11, 32908, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Falconer - Between 0-5% Health - Cast \'Wing Clip\''),
@@ -647,55 +769,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `creature_text` WHERE `CreatureID`=17994;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `Text`, `Type`, `Probability`, `Emote`, `BroadcastTextId`, `comment`) VALUES
-(17994, 0, 'Do as I say, Fly!', 12, 100, 25, 16783, 'Bloodwarder Falconer');
+(17994, 0, 'Do as I say, Fly!', 12, 100, 25, 16783, 'Bloodwarder Falconer'),
+(17994, 1, 'Kill $n!', 12, 100, 0, 17624, 'Bloodwarder Falconer');
 
-DELETE FROM `waypoints` WHERE `point_comment`='Bloodfalcon' AND `entry` BETWEEN 1815500 AND 1815504;
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
--- Blood Falcons wander 3y
--- 147033 just wanders
--- 147029
-(1815500,1,-12.859056,292.17502,-0.47123554,NULL,'Bloodfalcon'),
-(1815500,2,-4.634653,291.63293,0.8281061,NULL,'Bloodfalcon'),
-(1815500,3,-3.132143,288.05878,0.97123027,NULL,'Bloodfalcon'),
-(1815500,4,-12.779606,283.8108,-0.5313738,NULL,'Bloodfalcon'),
-(1815500,5,-23.234816,285.8802,-1.8473223,NULL,'Bloodfalcon'),
-(1815500,6,-29.06995,287.01328,-1.8473244,NULL,'Bloodfalcon'),
-(1815500,7,-28.19163,288.61743,-1.8473233,NULL,'Bloodfalcon'),
--- 147031
-(1815501,1,-32.633892,313.6926,-2.9892433,NULL,'Bloodfalcon'),
-(1815501,2,-36.44413,294.66745,-1.8473231,NULL,'Bloodfalcon'),
-(1815501,3,-42.860966,291.474,-1.8473233,NULL,'Bloodfalcon'),
-(1815501,4,-42.836784,283.74088,-1.8473245,NULL,'Bloodfalcon'),
-(1815501,5,-29.824219,283.9159,-1.8473248,NULL,'Bloodfalcon'),
-(1815501,6,-29.392775,291.65842,-1.8473237,NULL,'Bloodfalcon'),
-(1815501,7,-36.823017,294.92844,-1.847323,NULL,'Bloodfalcon'),
--- 147034
-(1815502,1,-30.482723,259.80405,-3.4442947,NULL,'Bloodfalcon'),
-(1815502,2,-36.03879,280.80167,-1.8473252,NULL,'Bloodfalcon'),
-(1815502,3,-30.454828,284.31418,-1.8473248,NULL,'Bloodfalcon'),
-(1815502,4,-30.297646,292.20926,-1.8473235,NULL,'Bloodfalcon'),
-(1815502,5,-36.54842,295.91965,-1.8473228,NULL,'Bloodfalcon'),
-(1815502,6,-43.99062,283.76346,-1.8473245,NULL,'Bloodfalcon'),
-(1815502,7,-36.486675,280.83936,-1.8473252,NULL,'Bloodfalcon'),
--- 147030
-(1815503,1,85.99113,289.54016,-5.441046,NULL,'Bloodfalcon'),
-(1815503,2,79.673256,286.72223,-5.466302,NULL,'Bloodfalcon'),
-(1815503,3,77.98022,270.55414,-5.47999,NULL,'Bloodfalcon'),
-(1815503,4,84.07146,264.81665,-5.459437,NULL,'Bloodfalcon'),
-(1815503,5,92.041145,267.70798,-5.4278765,NULL,'Bloodfalcon'),
-(1815503,6,99.9794,272.1951,-6.95119,NULL,'Bloodfalcon'),
-(1815503,7,100.84679,280.37253,-6.861873,NULL,'Bloodfalcon'),
--- 147032
-(1815504,1,106.60388,296.39322,-6.722094,NULL,'Bloodfalcon'),
-(1815504,2,114.86026,296.71304,-5.403351,NULL,'Bloodfalcon'),
-(1815504,3,120.55673,289.947,-5.4101934,NULL,'Bloodfalcon'),
-(1815504,4,119.758934,278.0228,-5.4230533,NULL,'Bloodfalcon'),
-(1815504,5,114.74198,276.31375,-6.958809,NULL,'Bloodfalcon'),
-(1815504,6,109.52783,279.67487,-6.901642,NULL,'Bloodfalcon');
-
+-- Sunseeker Researcher
 DELETE FROM `waypoints` WHERE `point_comment`='Sunseeker Researcher' AND `entry` BETWEEN 1842100 AND 1842101;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
--- Sunseeker Researcher
 -- Go
 (1842100,1,158.66127,492.3432,-4.393021,NULL,'Sunseeker Researcher'),
 (1842100,2,156.15257,489.36734,-4.8574643,NULL,'Sunseeker Researcher'),
@@ -712,11 +791,6 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1842101,6,158.17474,496.27377,-3.8682454,NULL,'Sunseeker Researcher'),
 (1842101,7,159.99934,499.248,-2.3276987,NULL,'Sunseeker Researcher'),
 (1842101,8,164.13808,501.65262,-2.169621,0.418879032135009765,'Sunseeker Researcher');
-
-DELETE FROM `creature_text` WHERE `CreatureID`=18421;
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `Text`, `Type`, `Probability`, `Emote`, `BroadcastTextId`, `comment`) VALUES
-(18421, 0, 'High Botanist?', 12, 100, 6, 16942, 'Sunseeker Researcher'),
-(18421, 1, '%s sighs.', 16, 100, 0, 16944, 'Sunseeker Researcher');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -(@CGUID+58));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -739,93 +813,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1842100, 9, 4, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunseeker Researcher - Actionlist - Say Line 1'),
 (1842100, 9, 5, 0, 0, 0, 100, 0, 2200, 2200, 0, 0, 0, 53, 0, 1842101, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunseeker Researcher - Actionlist - Start Waypoint');
 
--- Pathing for High Botanist Freywinn Entry: 17975
-SET @NPC := @CGUID+0;
-SET @PATH := @NPC * 10;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
-DELETE FROM `creature_addon` WHERE `guid`=@NPC;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,69,3, '');
-DELETE FROM `waypoint_data` WHERE `id`=@PATH;
-INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,116.32591,455.5696,-4.941401,3.385938644409179687,15000,0,0,100,0),
-(@PATH,2,120.16402,450.68173,-4.894922,4.555309295654296875,15000,0,0,100,0);
--- 0x2041DC4520118DC000099800000E350E .go xyz 116.32591 455.5696 -4.941401
-
--- Pathing for Nethervine Inciter Entry: 19511
-SET @NPC := @CGUID+121;
-SET @PATH := @NPC * 10;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=1.63937,`position_y`=482.49994,`position_z`=-5.534588 WHERE `guid`=@NPC;
-DELETE FROM `creature_addon` WHERE `guid`=@NPC;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
-DELETE FROM `waypoint_data` WHERE `id`=@PATH;
-INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,1.63937,482.49994,-5.534588,NULL,0,0,0,100,0),
-(@PATH,2,-6.525395,482.93228,-5.4948173,NULL,0,0,0,100,0),
-(@PATH,3,-13.819373,488.85602,-5.425375,NULL,0,0,0,100,0),
-(@PATH,4,-17.635359,496.55002,-5.3706923,NULL,0,0,0,100,0),
-(@PATH,5,-16.294327,503.0782,-5.324291,NULL,0,0,0,100,0),
-(@PATH,6,-6.525395,482.93228,-5.4948173,NULL,0,0,0,100,0);
--- 0x2041DC4520130DC000099800000E350E .go xyz 1.63937 482.49994 -5.534588
-
--- Pathing for Nethervine Inciter Entry: 19511
-SET @NPC := @CGUID+122;
-SET @PATH := @NPC * 10;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-10.506299,`position_y`=509.9379,`position_z`=-5.275531 WHERE `guid`=@NPC;
-DELETE FROM `creature_addon` WHERE `guid`=@NPC;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
-DELETE FROM `waypoint_data` WHERE `id`=@PATH;
-INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,-10.506299,509.9379,-5.275531,NULL,0,0,0,100,0),
-(@PATH,2,-10.811854,498.69476,-5.355443,NULL,0,0,0,100,0),
-(@PATH,3,2.500325,493.41788,-5.4415383,NULL,0,0,0,100,0),
-(@PATH,4,15.093162,496.89648,-5.4699764,NULL,0,0,0,100,0),
-(@PATH,5,2.500325,493.41788,-5.4415383,NULL,0,0,0,100,0),
-(@PATH,6,-10.811854,498.69476,-5.355443,NULL,0,0,0,100,0);
--- 0x2041DC4520130DC000099800008E350E .go xyz -10.506299 509.9379 -5.275531
-
--- Pathing for Nethervine Inciter Entry: 19511
-SET @NPC := @CGUID+123;
-SET @PATH := @NPC * 10;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-21.582249,`position_y`=517.7063,`position_z`=-6.475253 WHERE `guid`=@NPC;
-DELETE FROM `creature_addon` WHERE `guid`=@NPC;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
-DELETE FROM `waypoint_data` WHERE `id`=@PATH;
-INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,-21.582249,517.7063,-6.475253,NULL,0,0,0,100,0),
-(@PATH,2,-9.34382,516.5084,-5.6364603,NULL,0,0,0,100,0),
-(@PATH,3,4.990617,518.1604,-7.1384296,NULL,0,0,0,100,0),
-(@PATH,4,19.445581,526.3201,-11.257864,NULL,0,0,0,100,0),
-(@PATH,5,23.91135,540.4265,-18.37715,NULL,0,0,0,100,0),
-(@PATH,6,18.103956,548.5428,-18.29796,NULL,0,0,0,100,0),
-(@PATH,7,-1.83314,553.56354,-18.135887,NULL,0,0,0,100,0),
-(@PATH,8,-17.958172,553.2923,-18.191553,NULL,0,0,0,100,0),
-(@PATH,9,-30.428175,550.3372,-18.304739,NULL,0,0,0,100,0),
-(@PATH,10,-43.321644,544.68585,-18.359991,NULL,0,0,0,100,0),
-(@PATH,11,-46.765606,533.5467,-15.893292,NULL,0,0,0,100,0),
-(@PATH,12,-37.181698,524.0293,-10.164318,NULL,0,0,0,100,0);
--- 0x2041DC4520130DC000099800038E350E .go xyz -21.582249 517.7063 -6.475253
-
--- Pathing for Nethervine Inciter Entry: 19511
-SET @NPC := @CGUID+124;
-SET @PATH := @NPC * 10;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-29.17254,`position_y`=568.2135,`position_z`=-17.990519 WHERE `guid`=@NPC;
-DELETE FROM `creature_addon` WHERE `guid`=@NPC;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
-DELETE FROM `waypoint_data` WHERE `id`=@PATH;
-INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,-29.17254,568.2135,-17.990519,NULL,0,0,0,100,0),
-(@PATH,2,-11.505647,559.82526,-18.09619,NULL,0,0,0,100,0),
-(@PATH,3,13.711286,556.805,-18.137554,NULL,0,0,0,100,0),
-(@PATH,4,34.537453,554.1877,-18.282408,NULL,0,0,0,100,0),
-(@PATH,5,13.711286,556.805,-18.137554,NULL,0,0,0,100,0),
-(@PATH,6,-11.505647,559.82526,-18.09619,NULL,0,0,0,100,0);
--- 0x2041DC4520130DC000099800010E350E .go xyz -29.17254 568.2135 -17.990519
-
--- Nethervine Inciter and Reaper Patrol
-DELETE FROM `creature_formations` WHERE `leaderGUID` IN (@CGUID+123) AND `memberGUID` IN (@CGUID+123, @CGUID+128);
-INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
-(@CGUID+123, @CGUID+123, 0, 0, 3),
-(@CGUID+123, @CGUID+128, 3.5, 90, 515);
+DELETE FROM `creature_text` WHERE `CreatureID`=18421;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `Text`, `Type`, `Probability`, `Emote`, `BroadcastTextId`, `comment`) VALUES
+(18421, 0, 'High Botanist?', 12, 100, 6, 16942, 'Sunseeker Researcher'),
+(18421, 1, '%s sighs.', 16, 100, 0, 16944, 'Sunseeker Researcher');
 
 -- Sunseeker Channeler
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (34156, 34200, 34221));
@@ -915,6 +906,22 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1950504, 9, 0, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 11, 34222, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunseeker Channeler - Actionlist - Cast \'Sunseeker Blessing\''),
 (1950504, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 53, 0, 1950503, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunseeker Channeler - Actionlist - Start Waypoint');
 
+-- Satyrs cast 34173 on self when hit by 34200 or 34222
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19511);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(19511, 0, 0, 0, 0, 0, 100, 0, 7000, 10000, 20000, 24000, 0, 11, 34616, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Inciter - In Combat - Cast \'Deadly Poison\''),
+(19511, 0, 1, 0, 0, 0, 100, 0, 1000, 3000, 30000, 34000, 0, 11, 34615, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Inciter - In Combat - Cast \'Mind-numbing Poison\''),
+(19511, 0, 2, 0, 0, 0, 100, 0, 2000, 10000, 15000, 24000, 0, 11, 30621, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Inciter - In Combat - Cast \'Kidney Shot\''),
+(19511, 0, 3, 0, 8, 0, 100, 0, 34222, 0, 1200, 1200, 0, 11, 34173, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Inciter - On Spellhit \'Sunseeker Blessing\' - Cast \'Sunseeker Blessing\''),
+(19511, 0, 4, 0, 8, 0, 100, 0, 34200, 0, 1200, 1200, 0, 11, 34173, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Inciter - On Spellhit \'Crystal Channel\' - Cast \'Sunseeker Blessing\'');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19512);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(19512, 0, 0, 0, 1, 0, 50, 0, 5000, 20000, 30000, 30000, 0, 11, 34156, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Reaper - Out of Combat - Cast \'Crystal Channel\''),
+(19512, 0, 1, 0, 0, 0, 100, 0, 2000, 6000, 10000, 15000, 0, 11, 15284, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Reaper - In Combat - Cast \'Cleave\''),
+(19512, 0, 2, 0, 8, 0, 100, 0, 34222, 0, 1200, 1200, 0, 11, 34173, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Inciter - On Spellhit \'Sunseeker Blessing\' - Cast \'Sunseeker Blessing\''),
+(19512, 0, 3, 0, 8, 0, 100, 0, 34200, 0, 1200, 1200, 0, 11, 34173, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Inciter - On Spellhit \'Crystal Channel\' - Cast \'Sunseeker Blessing\'');
+
 -- Dead Gene-Splicers
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 19507) AND (`source_type` = 0) AND (`id` IN (2));
 
@@ -935,7 +942,7 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 
 DELETE FROM `waypoints` WHERE `point_comment`='Bloodwarder Protector' AND `entry` BETWEEN 1799300 AND 1799313;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
--- @CGUID+19 - Group 1
+-- @CGUID+19
 (1799300,1,5.7746835,59.15512,-5.463491,NULL,'Bloodwarder Protector'),
 (1799300,2,3.708891,59.154926,-5.5573835,NULL,'Bloodwarder Protector'),
 (1799300,3,1.6430982,59.15473,-5.651276,NULL,'Bloodwarder Protector'),
@@ -955,7 +962,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1799301,7,-2.3097265,47.710815,-5.508974,NULL,'Bloodwarder Protector'),
 (1799301,8,-2.28679,46.5602,-5.6193786,NULL,'Bloodwarder Protector'),
 (1799301,9,-5.080652,46.597015,-5.6218123,4.817108631134033,'Bloodwarder Protector'),
--- @CGUID+22 - Group 2
+-- @CGUID+22
 (1799302,1,11.51519,97.85166,-5.4874277,NULL,'Bloodwarder Protector'),
 (1799302,2,8.475217,99.61279,-5.5540433,NULL,'Bloodwarder Protector'),
 (1799302,3,5.435243,101.373924,-5.620659,NULL,'Bloodwarder Protector'),
@@ -971,7 +978,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1799303,5,-2.998425,104.28745,-5.6285086,NULL,'Bloodwarder Protector'),
 (1799303,6,-2.998425,104.28745,-5.6285086,NULL,'Bloodwarder Protector'),
 (1799303,7,-2.644504,89.42896,-5.659579,4.817108631134033,'Bloodwarder Protector'),
--- @CGUID+20 - Group 3
+-- @CGUID+20
 (1799304,1,2.362805,147.59216,-5.540365,NULL,'Bloodwarder Protector'),
 (1799304,2,1.4508866,134.90887,-5.5403733,NULL,'Bloodwarder Protector'),
 (1799304,3,4.29729,131.94543,-5.540382,4.729842185974121093,'Bloodwarder Protector'),
@@ -979,7 +986,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1799305,1,-4.11074,148.59384,-5.5403647,NULL,'Bloodwarder Protector'),
 (1799305,2,-2.929497,133.55092,-5.5403686,NULL,'Bloodwarder Protector'),
 (1799305,3,-5.799148,131.35872,-5.5403614,4.729842185974121093,'Bloodwarder Protector'),
--- @CGUID+18 0x2041DC452011924000099800000E350E - Group 5
+-- @CGUID+18
 (1799306,1 ,32.371803,285.14008,-5.3366117,NULL,'Bloodwarder Protector'),
 (1799306,2 ,32.621803,287.14008,-5.3366117,NULL,'Bloodwarder Protector'),
 (1799306,3 ,30.121803,287.14008,-5.3366117,NULL,'Bloodwarder Protector'),
@@ -990,7 +997,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1799306,8 ,20.110651,286.30273,-1.8092577,NULL,'Bloodwarder Protector'),
 (1799306,9 ,17.292475,284.6513,-1.4869981,NULL,'Bloodwarder Protector'),
 (1799306,10,16.271194,284.02432,-1.5828131,3.071779489517211914,'Bloodwarder Protector'),
--- @CGUID+06 0x2041DC452011924000099800090E350E
+-- @CGUID+06
 (1799307,1,33.169704,289.29724,-5.1912584,NULL,'Bloodwarder Protector'),
 (1799307,2,32.669704,289.29724,-5.1912584,NULL,'Bloodwarder Protector'),
 (1799307,3,29.669704,289.29724,-5.1912584,NULL,'Bloodwarder Protector'),
@@ -1000,14 +1007,14 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1799307,7,21.091858,289.26254,-1.8203477,NULL,'Bloodwarder Protector'),
 (1799307,8,17.260101,291.32886,-1.6820656,NULL,'Bloodwarder Protector'),
 (1799307,9,16.016445,291.94034,-1.5188627,3.071779489517211914,'Bloodwarder Protector'),
--- @CGUID+26 0x2041DC452011924000099800008E350E - Group 4
+-- @CGUID+26
 (1799308,1,-2.520844,231.52274,-5.540374,NULL,'Bloodwarder Protector'),
 (1799308,2,-2.5827603,229.59877,-5.270405,NULL,'Bloodwarder Protector'),
 (1799308,3,-2.8327603,226.59877,-5.270405,NULL,'Bloodwarder Protector'),
 (1799308,4,-3.3327603,216.09877,-5.270405,NULL,'Bloodwarder Protector'),
 (1799308,5,-3.372449,213.47765,-5.5403595,NULL,'Bloodwarder Protector'),
 (1799308,6,-7.061299,213.17163,-5.54035,4.729842185974121093,'Bloodwarder Protector'),
--- @CGUID+25 0x2041DC452011924000099800068E350E
+-- @CGUID+25
 (1799309,1,1.560038,230.91458,-5.540377,NULL,'Bloodwarder Protector'),
 (1799309,2,1.6776221,229.287,-5.2722683,NULL,'Bloodwarder Protector'),
 (1799309,3,1.6776221,226.287,-5.2722683,NULL,'Bloodwarder Protector'),
@@ -1015,14 +1022,13 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1799309,5,1.471469,212.70377,-5.540376,NULL,'Bloodwarder Protector'),
 (1799309,6,1.6818352,213.04912,-5.290371,NULL,'Bloodwarder Protector'),
 (1799309,7,6.880586,213.50626,-5.5403757,4.729842185974121093,'Bloodwarder Protector'),
--- @CGUID+5 - Steward Group
+-- @CGUID+5
 (1799310,1,75.063675,286.6582,-5.2814426,NULL,'Bloodwarder Protector'),
 (1799310,2,74.063675,286.6582,-5.2814426,NULL,'Bloodwarder Protector'),
 (1799310,3,71.063675,286.4082,-5.5314426,NULL,'Bloodwarder Protector'),
 (1799310,4,64.313675,285.9082,-5.5314426,NULL,'Bloodwarder Protector'),
 (1799310,5,57.563675,285.1582,-5.5314426,NULL,'Bloodwarder Protector'),
 (1799310,6,47.614925,284.43405,-5.670856,3.071779489517211914,'Bloodwarder Protector'),
--- FaceDirection: 3.071779489517211914
 -- @CGUID+7
 (1799311,1,74.85999,290.37897,-5.275877,NULL,'Bloodwarder Protector'),
 (1799311,2,74.10999,290.37897,-5.275877,NULL,'Bloodwarder Protector'),
@@ -1031,19 +1037,18 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1799311,5,63.359993,290.37897,-5.525877,NULL,'Bloodwarder Protector'),
 (1799311,6,50.859993,291.87897,-5.525877,NULL,'Bloodwarder Protector'),
 (1799311,7,47.417965,291.92233,-5.670514,3.071779489517211914,'Bloodwarder Protector'),
--- FaceDirection: 3.071779489517211914
--- Suicider Left: Get out of here, there are too many of them! Escape while you can! (0)
+-- Suicider Left
 (1799312,1,-161.20561,391.88025,-17.6449,NULL,'Bloodwarder Protector'),
 (1799312,2,-162.18033,409.83426,-17.708645,NULL,'Bloodwarder Protector'),
 (1799312,3,-162.64375,427.75867,-17.793741,NULL,'Bloodwarder Protector'),
--- Suicider Right: Help! Someone help us! (1)
+-- Suicider Right
 (1799313,1,-166.55185,392.07892,-17.679216,NULL,'Bloodwarder Protector'),
 (1799313,2,-168.30185,403.07892,-17.679216,NULL,'Bloodwarder Protector'),
 (1799313,3,-169.05185,407.07892,-17.429216,NULL,'Bloodwarder Protector'),
 (1799313,4,-169.05185,409.32892,-17.429216,NULL,'Bloodwarder Protector'),
 (1799313,5,-171.43996,422.89474,-17.744581,NULL,'Bloodwarder Protector');
 
--- @CGUID+35 0x2041DC452011F90000099800018E350E
+-- @CGUID+35
 DELETE FROM `waypoints` WHERE `point_comment`='Bloodwarder Steward' AND `entry` BETWEEN 1840400 AND 1840401;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
 (1840400,1,77.12443,287.8911,-5.4754553,NULL,'Bloodwarder Steward'),
@@ -1052,7 +1057,6 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1840400,4,71.08272,287.98236,-5.516903,NULL,'Bloodwarder Steward'),
 (1840400,5,64.83272,287.98236,-5.516903,NULL,'Bloodwarder Steward'),
 (1840400,6,60.832714,287.73236,-5.516903,NULL,'Bloodwarder Steward'),
--- Emote ID: 5 (OneShotExclamation)
 -- Repeat
 (1840401,1,50.185688,282.52002,-5.6333885,NULL,'Bloodwarder Steward'),
 (1840401,2,50.01569,292.96957,-5.647004,NULL,'Bloodwarder Steward');
@@ -1211,6 +1215,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+15), 0, 3, 4, 11, 0, 100, 512, 0, 0, 0, 0, 0, 18, 33555200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Protector - On Initialize - Set Flags Immune To Players & Immune To NPC\'s & Not Selectable'),
 (-(@CGUID+15), 0, 4, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 121, 90, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Protector - On Initialize - Set Sight Distance');
 
+-- Addons for EmoteState and StandStates
 DELETE FROM `creature_addon` WHERE `guid` IN (@CGUID+45,@CGUID+48,@CGUID+50,@CGUID+53,@CGUID+55,@CGUID+57,@CGUID+59,@CGUID+60,@CGUID+63,@CGUID+64,@CGUID+83,@CGUID+87,@CGUID+108,@CGUID+109,@CGUID+110,@CGUID+113,@CGUID+114,@CGUID+116,@CGUID+117,@CGUID+118,@CGUID+119,@CGUID+178);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (@CGUID+45 , 0, 0, 8, 0, 0, 0, NULL),
@@ -1236,6 +1241,7 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (@CGUID+119, 0, 0, 0, 1, 69, 0, NULL),
 (@CGUID+178, 0, 0, 8, 0, 0, 0, NULL);
 
+-- Addons for Bytes2
 DELETE FROM `creature_template_addon` WHERE (`entry` IN (17993,17994,18404,18420,18421,18422,19486,19508,19509,19511,19512,19843));
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (17993, 0, 0, 0, 1, 0, 0, ''),
@@ -1251,6 +1257,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 (19512, 0, 0, 0, 1, 0, 0, ''),
 (19843, 0, 0, 0, 1, 0, 0, '');
 
+-- Static Formations
 DELETE FROM `creature_formations` WHERE `groupAI`=3 AND `leaderGUID` IN (@CGUID+05,@CGUID+06,@CGUID+08,@CGUID+10,@CGUID+12,@CGUID+16,@CGUID+19,@CGUID+20,@CGUID+22,@CGUID+27,@CGUID+28,@CGUID+43,@CGUID+44,@CGUID+45,@CGUID+46,@CGUID+51,@CGUID+52,@CGUID+53,@CGUID+54,@CGUID+55,@CGUID+59,@CGUID+65,@CGUID+66,@CGUID+91,@CGUID+92,@CGUID+108,@CGUID+109,@CGUID+110,@CGUID+111,@CGUID+120,@CGUID+126,@CGUID+133,@CGUID+135,@CGUID+136,@CGUID+146,@CGUID+156,@CGUID+166) AND `memberGUID` IN (@CGUID+19,@CGUID+21,@CGUID+22,@CGUID+23,@CGUID+20,@CGUID+24,@CGUID+44,@CGUID+50,@CGUID+176,@CGUID+45,@CGUID+47,@CGUID+177,@CGUID+43,@CGUID+48,@CGUID+179,@CGUID+46,@CGUID+49,@CGUID+178,@CGUID+27,@CGUID+34,@CGUID+31,@CGUID+29,@CGUID+06,@CGUID+18,@CGUID+05,@CGUID+07,@CGUID+35,@CGUID+28,@CGUID+30,@CGUID+32,@CGUID+33,@CGUID+08,@CGUID+09,@CGUID+36,@CGUID+10,@CGUID+11,@CGUID+37,@CGUID+12,@CGUID+13,@CGUID+38,@CGUID+53,@CGUID+143,@CGUID+60,@CGUID+83,@CGUID+54,@CGUID+84,@CGUID+87,@CGUID+146,@CGUID+63,@CGUID+57,@CGUID+88,@CGUID+86,@CGUID+55,@CGUID+147,@CGUID+64,@CGUID+56,@CGUID+85,@CGUID+51,@CGUID+68,@CGUID+69,@CGUID+67,@CGUID+72,@CGUID+70,@CGUID+75,@CGUID+71,@CGUID+73,@CGUID+59,@CGUID+89,@CGUID+66,@CGUID+149,@CGUID+52,@CGUID+74,@CGUID+80,@CGUID+76,@CGUID+78,@CGUID+77,@CGUID+79,@CGUID+81,@CGUID+82,@CGUID+91,@CGUID+93,@CGUID+92,@CGUID+94,@CGUID+111,@CGUID+112,@CGUID+115,@CGUID+120,@CGUID+125,@CGUID+130,@CGUID+131,@CGUID+126,@CGUID+132,@CGUID+129,@CGUID+127,@CGUID+110,@CGUID+154,@CGUID+118,@CGUID+119,@CGUID+155,@CGUID+109,@CGUID+113,@CGUID+117,@CGUID+151,@CGUID+150,@CGUID+108,@CGUID+152,@CGUID+153,@CGUID+114,@CGUID+116,@CGUID+16,@CGUID+17,@CGUID+136,@CGUID+186,@CGUID+138,@CGUID+187,@CGUID+135,@CGUID+137,@CGUID+185,@CGUID+184,@CGUID+133,@CGUID+183,@CGUID+182,@CGUID+134,@CGUID+65,@CGUID+148,@CGUID+166,@CGUID+168,@CGUID+170,@CGUID+171,@CGUID+172,@CGUID+173,@CGUID+174,@CGUID+175,@CGUID+169,@CGUID+167,@CGUID+156,@CGUID+161,@CGUID+160,@CGUID+164,@CGUID+158,@CGUID+157,@CGUID+162,@CGUID+163,@CGUID+165,@CGUID+159);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
 (@CGUID+19, @CGUID+19, 0, 0, 3),
@@ -1398,3 +1405,34 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@CGUID+156, @CGUID+163, 0, 0, 3),
 (@CGUID+156, @CGUID+165, 0, 0, 3),
 (@CGUID+156, @CGUID+159, 0, 0, 3);
+
+-- Gameobjects
+SET @OGUID := 105183;
+SET @POOL := 8353;
+
+DELETE FROM `gameobject` WHERE `map`=553 AND `id` IN (181270, 181279, 181271, 181277) AND `guid` BETWEEN @OGUID+0 AND @OGUID+12;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
+(@OGUID+0 , 181270, 553, 3847, 3847, 3, 1, 41.4327, 356.078, -26.0174, 1.8675, 0, 0, 0.803857, 0.594823, 86400, 255, 1, '', 48001),
+(@OGUID+1 , 181270, 553, 3847, 3847, 3, 1, 9.8574, 418.206, -27.5923, 5.20108, 0, 0, -0.515038, 0.857168, 86400, 255, 1, '', 48001),
+(@OGUID+2 , 181270, 553, 3847, 3847, 3, 1, 63.4501, 427.082, -25.5068, 0.541051, 0, 0, 0.267238, 0.963631, 86400, 255, 1, '', 48001),
+(@OGUID+3 , 181279, 553, 3847, 3847, 3, 1, -0.459927, 256.711, -4.35613, 3.82227, 0, 0, -0.942641, 0.333808, 86400, 255, 1, '', 48001),
+(@OGUID+4 , 181271, 553, 3847, 3847, 3, 1, 0.634392, 165.962, -3.67233, 3.76991, 0, 0, -0.951056, 0.309017, 86400, 255, 1, '', 48001),
+(@OGUID+5 , 181270, 553, 3847, 3847, 3, 1, 93.4825, 371.747, -27.3115, 4.92183, 0, 0, -0.62932, 0.777146, 86400, 255, 1, '', 48001),
+(@OGUID+6 , 181270, 553, 3847, 3847, 3, 1, 173.042, 388.688, -3.90029, 4.79966, 0, 0, -0.67559, 0.737278, 86400, 255, 1, '', 48001),
+(@OGUID+7 , 181271, 553, 3847, 3847, 3, 1, 155.018, 409.847, -3.52534, 6.19592, 0, 0, -0.0436192, 0.999048, 86400, 255, 1, '', 48001),
+(@OGUID+8 , 181279, 553, 3847, 3847, 3, 1, 115.816, 450.617, -3.82386, 0.279252, 0, 0, 0.139173, 0.990268, 86400, 255, 1, '', 48001),
+(@OGUID+9 , 181271, 553, 3847, 3847, 3, 1, -22.2003, 502.644, -4.84003, 0.314158, 0, 0, 0.156434, 0.987688, 86400, 255, 1, '', 48001),
+(@OGUID+10, 181277, 553, 3847, 3847, 3, 1, -165.293, 495.911, -15.0749, 4.39823, 0, 0, -0.809016, 0.587786, 86400, 255, 1, '', 48001),
+(@OGUID+11, 181270, 553, 3847, 3847, 3, 1, -154.192, 523.518, -16.0193, 3.35105, 0, 0, -0.994521, 0.104536, 86400, 255, 1, '', 48001),
+(@OGUID+12, 181279, 553, 3847, 3847, 3, 1, 169.234, 504.449, 0.050639, 2.32129, 0, 0, 0.91706, 0.39875, 86400, 255, 1, '', 48001);
+
+DELETE FROM `pool_gameobject` WHERE `guid` IN (@OGUID+0,@OGUID+1,@OGUID+2,@OGUID+5) AND `pool_entry`=@POOL AND `description`='Felweed - The Botanica';
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
+(@OGUID+0, @POOL, 0, 'Felweed - The Botanica'),
+(@OGUID+1, @POOL, 0, 'Felweed - The Botanica'),
+(@OGUID+2, @POOL, 0, 'Felweed - The Botanica'),
+(@OGUID+5, @POOL, 0, 'Felweed - The Botanica');
+
+DELETE FROM `pool_template` WHERE `entry`=@POOL AND `description`='The Botanica - Felweed';
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(@POOL, 1, 'The Botanica - Felweed');
