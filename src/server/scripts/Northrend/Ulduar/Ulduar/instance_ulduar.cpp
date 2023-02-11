@@ -1140,6 +1140,37 @@ public:
                     if (m_algalonTimer)
                     {
                         _events.RepeatEvent(60000);
+
+                        if (Creature* algalon = instance->GetCreature(m_uiAlgalonGUID))
+                        {
+                            LOG_ERROR("module", "奥尔加隆存活,跳过召唤");
+                        }
+                        else
+                        {
+                            if (m_algalonTimer && (m_algalonTimer <= 60 || m_algalonTimer == TIMER_ALGALON_TO_SUMMON))
+                            {
+                                TempSummon* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonLandPos);
+                                LOG_ERROR("module", "奥尔加隆召唤完成");
+                                if (!algalon)
+                                    return;
+
+                                if (m_algalonTimer <= 60)
+                                {
+                                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 60000);
+                                    algalon->AI()->DoAction(ACTION_INIT_ALGALON);
+                                }
+                                else // if (m_algalonTimer = TIMER_ALGALON_TO_SUMMON)
+                                {
+                                    m_algalonTimer = TIMER_ALGALON_SUMMONED;
+                                    algalon->SetImmuneToPC(false);
+                                }
+                            }
+                            else
+                            {
+                                LOG_ERROR("module", "奥尔加隆挑战超时,跳过召唤");
+                            }
+                        }
+
                         return;
                     }
 
