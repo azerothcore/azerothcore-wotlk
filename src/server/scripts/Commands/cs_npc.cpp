@@ -1313,88 +1313,87 @@ public:
         handler->PSendSysMessage("LinkGUID '%u' added to creature with DBTableGUID: '%u'", linkguid, creature->GetSpawnId());
         return true;
     }
-
-    static bool HandleNpcSpawnGroup(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        bool ignoreRespawn = false;
-        bool force = false;
-        uint32 groupId = 0;
-
-        // Decode arguments
-        char* arg = strtok((char*)args, " ");
-        while (arg)
-        {
-            std::string thisArg = arg;
-            std::transform(thisArg.begin(), thisArg.end(), thisArg.begin(), ::tolower);
-            if (thisArg == "ignorerespawn")
-                ignoreRespawn = true;
-            else if (thisArg == "force")
-                force = true;
-            else if (thisArg.empty() || !(std::count_if(thisArg.begin(), thisArg.end(), ::isdigit) == (int)thisArg.size()))
-                return false;
-            else
-                groupId = atoi(thisArg.c_str());
-
-            arg = strtok(NULL, " ");
-        }
-
-        Player* player = handler->GetSession()->GetPlayer();
-
-        std::vector <WorldObject*> creatureList;
-        if (!sObjectMgr->SpawnGroupSpawn(groupId, player->GetMap(), ignoreRespawn, force, &creatureList))
-        {
-            handler->PSendSysMessage(LANG_SPAWNGROUP_BADGROUP, groupId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        handler->PSendSysMessage(LANG_SPAWNGROUP_SPAWNCOUNT, creatureList.size());
-        for (WorldObject* obj : creatureList)
-            handler->PSendSysMessage("%s (%s)", obj->GetName(), obj->GetGUID().ToString().c_str());
-
-        return true;
-    }
-
-    static bool HandleNpcDespawnGroup(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        bool deleteRespawnTimes = false;
-        uint32 groupId = 0;
-
-        // Decode arguments
-        char* arg = strtok((char*)args, " ");
-        while (arg)
-        {
-            std::string thisArg = arg;
-            std::transform(thisArg.begin(), thisArg.end(), thisArg.begin(), ::tolower);
-            if (thisArg == "removerespawntime")
-                deleteRespawnTimes = true;
-            else if (thisArg.empty() || !(std::count_if(thisArg.begin(), thisArg.end(), ::isdigit) == (int)thisArg.size()))
-                return false;
-            else
-                groupId = atoi(thisArg.c_str());
-
-            arg = strtok(nullptr, " ");
-        }
-
-        Player* player = handler->GetSession()->GetPlayer();
-
-        if (!sObjectMgr->SpawnGroupDespawn(groupId, player->GetMap(), deleteRespawnTimes))
-        {
-            handler->PSendSysMessage(LANG_SPAWNGROUP_BADGROUP, groupId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        return true;
-    }
 };
 
+bool HandleNpcSpawnGroup(ChatHandler* handler, char const* args)
+{
+    if (!*args)
+        return false;
+
+    bool ignoreRespawn = false;
+    bool force = false;
+    uint32 groupId = 0;
+
+    // Decode arguments
+    char* arg = strtok((char*)args, " ");
+    while (arg)
+    {
+        std::string thisArg = arg;
+        std::transform(thisArg.begin(), thisArg.end(), thisArg.begin(), ::tolower);
+        if (thisArg == "ignorerespawn")
+            ignoreRespawn = true;
+        else if (thisArg == "force")
+            force = true;
+        else if (thisArg.empty() || !(std::count_if(thisArg.begin(), thisArg.end(), ::isdigit) == (int)thisArg.size()))
+            return false;
+        else
+            groupId = atoi(thisArg.c_str());
+
+        arg = strtok(NULL, " ");
+    }
+
+    Player* player = handler->GetSession()->GetPlayer();
+
+    std::vector <WorldObject*> creatureList;
+    if (!sObjectMgr->SpawnGroupSpawn(groupId, player->GetMap(), ignoreRespawn, force, &creatureList))
+    {
+        handler->PSendSysMessage(LANG_SPAWNGROUP_BADGROUP, groupId);
+        handler->SetSentErrorMessage(true);
+        return false;
+    }
+
+    handler->PSendSysMessage(LANG_SPAWNGROUP_SPAWNCOUNT, creatureList.size());
+    for (WorldObject* obj : creatureList)
+        handler->PSendSysMessage("%s (%s)", obj->GetName(), obj->GetGUID().ToString().c_str());
+
+    return true;
+}
+
+bool HandleNpcDespawnGroup(ChatHandler* handler, char const* args)
+{
+    if (!*args)
+        return false;
+
+    bool deleteRespawnTimes = false;
+    uint32 groupId = 0;
+
+    // Decode arguments
+    char* arg = strtok((char*)args, " ");
+    while (arg)
+    {
+        std::string thisArg = arg;
+        std::transform(thisArg.begin(), thisArg.end(), thisArg.begin(), ::tolower);
+        if (thisArg == "removerespawntime")
+            deleteRespawnTimes = true;
+        else if (thisArg.empty() || !(std::count_if(thisArg.begin(), thisArg.end(), ::isdigit) == (int)thisArg.size()))
+            return false;
+        else
+            groupId = atoi(thisArg.c_str());
+
+        arg = strtok(nullptr, " ");
+    }
+
+    Player* player = handler->GetSession()->GetPlayer();
+
+    if (!sObjectMgr->SpawnGroupDespawn(groupId, player->GetMap(), deleteRespawnTimes))
+    {
+        handler->PSendSysMessage(LANG_SPAWNGROUP_BADGROUP, groupId);
+        handler->SetSentErrorMessage(true);
+        return false;
+    }
+
+    return true;
+}
 
 void AddSC_npc_commandscript()
 {
