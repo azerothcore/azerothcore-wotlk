@@ -193,7 +193,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('npc spawngroup', 3, 'Syntax: .npc spawngroup $groupId [ignorerespawn] [force]'),
 ('npc despawngroup', 3, 'Syntax: .npc despawngroup $groupId [removerespawntime]'),
 ('gobject spawngroup', 3, 'Syntax: .gobject spawngroup $groupId [ignorerespawn] [force]'),
-('gobject despawngroup', 3, 'Syntax: .gobject despawngroup $groupId [removerespawntime]'),
+('gobject despawngroup', 3, 'Syntax: .gobject despawngroup $groupId [removerespawntime]');
 
 -- Update Acore strings for various cs_list strings, to support showing spawn ID and guid.
 UPDATE `acore_string`
@@ -213,7 +213,7 @@ SET `content_default` = '%d - %s X:%f Y:%f Z:%f MapId:%d %s %s'
 WHERE `entry` = 1110;
 
 -- Add new Acore strings for extra npc/gobject info lines
-DELETE FROM `acore_string` WHERE `entry` BETWEEN 5087 AND 5099;
+DELETE FROM `acore_string` WHERE `entry` BETWEEN 5087 AND 5097;
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (5087, 'Spawn group: %s (ID: %u, Flags: %u, Active: %u)'),
 (5088, 'Compatibility Mode: %u'),
