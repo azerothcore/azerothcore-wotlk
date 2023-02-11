@@ -234,7 +234,7 @@ public:
 
                                 if (medivh->IsAIEnabled)
                                 {
-                                    medivh->AI()->Talk(SAY_MEDIV_DEATH);
+                                    medivh->AI()->Talk(SAY_MEDIVH_DEATH);
                                 }
 
                                 Events.ScheduleEvent(EVENT_WIPE_1, 4s);

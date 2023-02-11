@@ -139,7 +139,7 @@ public:
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 20.0f))
             {
-                Talk(SAY_MEDIV_ENTER);
+                Talk(SAY_MEDIVH_ENTER);
                 if (instance)
                     instance->SetData(DATA_MEDIVH, 1);
 
@@ -199,7 +199,7 @@ public:
                     break;
                 case EVENT_OUTRO_1:
                     me->SetFacingTo(6.21f);
-                    Talk(SAY_MEDIV_WIN);
+                    Talk(SAY_MEDIVH_WIN);
                     events.ScheduleEvent(EVENT_OUTRO_2, 17000);
                     break;
                 case EVENT_OUTRO_2:
@@ -223,14 +223,14 @@ public:
                     events.ScheduleEvent(EVENT_OUTRO_7, 7000);
                     break;
                 case EVENT_OUTRO_7:
-                    Talk(SAY_MEDIV_ORCS_ENTER);
+                    Talk(SAY_MEDIVH_ORCS_ENTER);
                     events.ScheduleEvent(EVENT_OUTRO_8, 7000);
                     break;
                 case EVENT_OUTRO_8:
                     if (Creature* cr = me->FindNearestCreature(NPC_SHADOW_COUNCIL_ENFORCER, 20.0f))
                     {
                         cr->SetFacingTo(3.07f);
-                        cr->AI()->Talk(SAY_MEDIV_ORCS_ANSWER);
+                        cr->AI()->Talk(SAY_MEDIVH_ORCS_ANSWER);
                     }
                     break;
             }

@@ -98,12 +98,12 @@ enum Misc
 
 enum medivhSays
 {
-    SAY_MEDIV_ENTER                     = 0,
-    SAY_MEDIV_DEATH                     = 5,
-    SAY_MEDIV_WIN                       = 6,
-    SAY_MEDIV_ORCS_ENTER                = 7,
+    SAY_MEDIVH_ENTER                    = 0,
+    SAY_MEDIVH_DEATH                    = 5,
+    SAY_MEDIVH_WIN                      = 6,
+    SAY_MEDIVH_ORCS_ENTER               = 7,
 
-    SAY_MEDIV_ORCS_ANSWER               = 0
+    SAY_MEDIVH_ORCS_ANSWER              = 0
 };
 
 enum medivhSpells
