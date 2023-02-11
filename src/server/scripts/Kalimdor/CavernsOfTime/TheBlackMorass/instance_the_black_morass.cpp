@@ -48,8 +48,8 @@ public:
         GuidSet encounterNPCs;
         uint32 encounters[MAX_ENCOUNTER];
         ObjectGuid _medivhGUID;
-        uint8  _currentRift;
-        uint8  _shieldPercent;
+        uint8 _currentRift;
+        int8 _shieldPercent;
 
         void Initialize() override
         {
@@ -144,7 +144,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32  /*data*/) override
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -187,10 +187,19 @@ public:
                     Events.RescheduleEvent(EVENT_NEXT_PORTAL, 3000);
                     break;
                 case DATA_DAMAGE_SHIELD:
-                    --_shieldPercent;
+                {
+                    _shieldPercent -= data;
+                    if (_shieldPercent < 0)
+                    {
+                        _shieldPercent = 0;
+                    }
+
                     DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
+
                     if (!_shieldPercent)
+                    {
                         if (Creature* medivh = instance->GetCreature(_medivhGUID))
+                        {
                             if (medivh->IsAlive())
                             {
                                 Unit::Kill(medivh, medivh);
@@ -198,10 +207,17 @@ public:
                                 // Xinef: delete all spawns
                                 GuidSet eCopy = encounterNPCs;
                                 for (ObjectGuid const& guid : eCopy)
+                                {
                                     if (Creature* creature = instance->GetCreature(guid))
+                                    {
                                         creature->DespawnOrUnsummon();
+                                    }
+                                }
                             }
+                        }
+                    }
                     break;
+                }
             }
         }
 
