@@ -453,7 +453,7 @@ void ObjectMgr::LoadPetNamesLocales()
     uint32 oldMSTime = getMSTime();
 
     //                                                  0     1      2    3
-    QueryResult result = WorldDatabase.Query("SELECT locale, word, entry, half FROM pet_name_generation_locale");
+    QueryResult result = WorldDatabase.Query("SELECT Locale, Word, Entry, Half FROM pet_name_generation_locale");
 
     if (!result)
     {
@@ -474,9 +474,13 @@ void ObjectMgr::LoadPetNamesLocales()
         bool half = fields[3].Get<bool>();
         std::pair<uint32, LocaleConstant> pairkey = std::make_pair(entry, locale);
         if (half)
+        {
             _petHalfLocaleName1[pairkey].push_back(word);
+        }
         else
+        {
             _petHalfLocaleName0[pairkey].push_back(word);
+        }
         ++count;
     } while (result->NextRow());
 
