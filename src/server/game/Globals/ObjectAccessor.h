@@ -83,6 +83,8 @@ namespace ObjectAccessor
     Player* FindPlayerByLowGUID(ObjectGuid::LowType lowguid);
     Player* FindConnectedPlayer(ObjectGuid const guid);
     Player* FindPlayerByName(std::string const& name, bool checkInWorld = true);
+    Creature* GetSpawnedCreatureByDBGUID(uint32 mapId, uint64 guid);
+    GameObject* GetSpawnedGameObjectByDBGUID(uint32 mapId, uint64 guid);
 
     // when using this, you must use the hashmapholder's lock
     HashMapHolder<Player>::MapType const& GetPlayers();

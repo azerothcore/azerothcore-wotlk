@@ -59,10 +59,10 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, urand(6000, 20000));
-            events.ScheduleEvent(EVENT_INSPIRE, urand(7000, 10000));
-            events.ScheduleEvent(EVENT_KNOCKDOWN, 6000);
-            events.ScheduleEvent(EVENT_FLAMESPEAR, 2000);
+            events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, 6s, 20s);
+            events.ScheduleEvent(EVENT_INSPIRE, 7s, 10s);
+            events.ScheduleEvent(EVENT_KNOCKDOWN, 6s);
+            events.ScheduleEvent(EVENT_FLAMESPEAR, 2s);
         }
 
         void ExecuteEvent(uint32 eventId) override
@@ -130,10 +130,10 @@ public:
 
         void EnterCombat(Unit* /*victim*/) override
         {
-            events.ScheduleEvent(EVENT_DARK_STRIKE, urand(4000, 7000));
-            events.ScheduleEvent(EVENT_DARK_MENDING, urand(15000, 30000));
-            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(2000, 4000));
-            events.ScheduleEvent(EVENT_IMMOLATE, urand(3500, 6000));
+            events.ScheduleEvent(EVENT_DARK_STRIKE, 4s, 7s);
+            events.ScheduleEvent(EVENT_DARK_MENDING, 15s, 30s);
+            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 2s, 4s);
+            events.ScheduleEvent(EVENT_IMMOLATE, 3500ms, 6000ms);
         }
 
         void UpdateAI(uint32 diff) override

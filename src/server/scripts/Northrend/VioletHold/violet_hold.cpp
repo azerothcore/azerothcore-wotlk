@@ -1173,21 +1173,6 @@ public:
     }
 };
 
-class go_violet_hold_gate_lever : public GameObjectScript
-{
-public:
-    go_violet_hold_gate_lever() : GameObjectScript("go_violet_hold_gate_lever") { }
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        if (GameObject* gate = go->GetMap()->GetGameObject(ObjectGuid::Create<HighGuid::GameObject>(193019, 61606)))
-            if (gate->getLootState() == GO_READY)
-                gate->UseDoorOrButton(0, false, player);
-
-        return false;
-    }
-};
-
 void AddSC_violet_hold()
 {
     new go_vh_activation_crystal();
@@ -1205,5 +1190,4 @@ void AddSC_violet_hold()
     new npc_azure_stalker();
 
     new spell_destroy_door_seal();
-    new go_violet_hold_gate_lever();
 }

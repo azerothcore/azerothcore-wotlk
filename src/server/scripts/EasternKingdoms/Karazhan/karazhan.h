@@ -90,7 +90,8 @@ enum KZMiscCreatures
     NPC_DREADBEAST = 16177,
     NPC_SHADOWBEAST = 16176,
     NPC_KILREK = 17229,
-    NPC_RELAY = 17645
+    NPC_RELAY = 17645,
+    NPC_BARNES = 16812
 };
 
 enum KZGameObjectIds
@@ -136,5 +137,7 @@ inline AI* GetKarazhanAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, KarazhanScriptName);
 }
+
+#define RegisterKarazhanCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetKarazhanAI)
 
 #endif

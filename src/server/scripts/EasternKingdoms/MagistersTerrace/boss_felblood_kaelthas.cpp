@@ -206,7 +206,7 @@ public:
                         AttackStart(target);
                     return;
                 case EVENT_FINISH_TALK:
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                     return;
             }
 
