@@ -64,9 +64,7 @@ enum medivhMisc
     EVENT_OUTRO_5               = 14,
     EVENT_OUTRO_6               = 15,
     EVENT_OUTRO_7               = 16,
-    EVENT_OUTRO_8               = 17,
-
-    FACTION_KEEPERS_OF_TIME     = 989
+    EVENT_OUTRO_8               = 17
 };
 
 static std::vector<uint32> firstWave = { NPC_INFINITE_ASSASIN, NPC_INFINITE_WHELP, NPC_INFINITE_CRONOMANCER };
@@ -380,8 +378,8 @@ public:
                         case NPC_INFINITE_ASSASIN:
                             entry = NPC_INFINITE_ASSASIN_2;
                             break;
-                        case NPC_INFINITE_CRONOMANCER:
-                            entry = NPC_INFINITE_CRONOMANCER_2;
+                        case NPC_INFINITE_CHRONOMANCER:
+                            entry = NPC_INFINITE_CHRONOMANCER_2;
                             break;
                         case NPC_INFINITE_EXECUTIONER:
                             entry = NPC_INFINITE_EXECUTIONER_2;

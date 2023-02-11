@@ -112,7 +112,7 @@ DELETE FROM `creature_onkill_reputation` WHERE `creature_id` IN (21139,22168);
 
 -- Conditions
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=22 AND `SourceEntry` IN (17835,17892,18994,18995,21136,21137,21138,21139);
-INSERT INTO`conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) values
+INSERT INTO`conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22,7,17835,0,0,29,1,15608,20,0,0,0,0,'','SAI "Corrupt Medivh" requires Medivh in 20yd'),
 (22,6,17892,0,0,29,1,15608,20,0,0,0,0,'','SAI "Corrupt Medivh" requires Medivh in 20yd'),
 (22,6,18994,0,0,29,1,15608,20,0,0,0,0,'','SAI "Corrupt Medivh" requires Medivh in 20yd'),
