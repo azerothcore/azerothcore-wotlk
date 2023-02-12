@@ -94,7 +94,7 @@ class spell_zereketh_seed_of_corruption: public AuraScript
         return ValidateSpellInfo({ SPELL_CORRUPTION_PROC });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
         uint32 val = GetSpellInfo()->GetEffect(EFFECT_1).BasePoints;
