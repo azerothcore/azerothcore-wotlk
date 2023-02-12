@@ -60,6 +60,11 @@ enum Phases
     PHASE_MOUNTED
 };
 
+enum Actions
+{
+    ACTION_SET_MIDNIGHT_PHASE,
+};
+
 class boss_attumen : public CreatureScript
 {
 public:
@@ -74,14 +79,12 @@ public:
 
         void Initialize()
         {
-            _midnightGUID.Clear();
             _phase = PHASE_NONE;
         }
 
         void Reset() override
         {
             Initialize();
-            BossAI::Reset();
         }
 
         bool CanMeleeHit()
@@ -89,11 +92,11 @@ public:
             return me->GetVictim() && (me->GetVictim()->GetPositionZ() < 53.0f || me->GetVictim()->GetDistance(me->GetHomePosition()) < 50.0f);
         }
 
-        void EnterEvadeMode(EvadeReason /*why*/) override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
+            if (Creature* midnight = instance->GetCreature(DATA_MIDNIGHT))
             {
-                midnight->DespawnOnEvade(10s);
+                midnight->AI()->EnterEvadeMode(why);
             }
 
             me->DespawnOrUnsummon();
@@ -136,7 +139,7 @@ public:
             {
                 _phase = PHASE_NONE;
 
-                if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
+                if (Creature* midnight = instance->GetCreature(DATA_MIDNIGHT))
                 {
                     midnight->AI()->DoCastAOE(SPELL_MOUNT, true);
                 }
@@ -152,7 +155,7 @@ public:
         {
             if (summon->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED)
             {
-                if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
+                if (Creature* midnight = instance->GetCreature(DATA_MIDNIGHT))
                 {
                     if (midnight->GetHealth() > me->GetHealth())
                     {
@@ -164,7 +167,6 @@ public:
                     }
 
                     summon->AI()->DoZoneInCombat();
-                    summon->AI()->SetGUID(_midnightGUID, NPC_MIDNIGHT);
                 }
             }
 
@@ -217,7 +219,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-            if (Unit* midnight = ObjectAccessor::GetUnit(*me, _midnightGUID))
+            if (Creature* midnight = instance->GetCreature(DATA_MIDNIGHT))
             {
                 midnight->KillSelf();
             }
@@ -225,19 +227,14 @@ public:
             _JustDied();
         }
 
-        void SetGUID(ObjectGuid guid, int32 id) override
-        {
-            if (id == NPC_MIDNIGHT)
-            {
-                _midnightGUID = guid;
-            }
-        }
-
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() && _phase != PHASE_NONE)
+            if (_phase != PHASE_NONE)
             {
-                return;
+                if (!UpdateVictim())
+                {
+                    return;
+                }
             }
 
             if (!CanMeleeHit())
@@ -258,11 +255,12 @@ public:
 
             if (spellInfo->Id == SPELL_MOUNT)
             {
-                if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
+                if (Creature* midnight = instance->GetCreature(DATA_MIDNIGHT))
                 {
                     _phase = PHASE_NONE;
                     scheduler.CancelAll();
 
+                    midnight->AI()->DoAction(ACTION_SET_MIDNIGHT_PHASE);
                     midnight->AttackStop();
                     midnight->RemoveAllAttackers();
                     midnight->SetReactState(REACT_PASSIVE);
@@ -277,13 +275,12 @@ public:
 
                     scheduler.Schedule(Seconds(1), [this](TaskContext task)
                     {
-                        if (Creature* midnight = ObjectAccessor::GetCreature(*me, _midnightGUID))
+                        if (Creature* midnight = instance->GetCreature(DATA_MIDNIGHT))
                         {
                             if (me->IsWithinDist2d(midnight, 5.0f))
                             {
                                 DoCastAOE(SPELL_SUMMON_ATTUMEN_MOUNTED);
-                                me->SetVisible(false);
-                                me->GetMotionMaster()->Clear();
+                                me->DespawnOrUnsummon(1s, 0s);
                                 midnight->SetVisible(false);
                             }
                             else
@@ -299,7 +296,6 @@ public:
         }
 
     private:
-        ObjectGuid _midnightGUID;
         uint8 _phase;
     };
 
@@ -316,19 +312,10 @@ public:
 
     struct boss_midnightAI : public BossAI
     {
-        boss_midnightAI(Creature* creature) : BossAI(creature, DATA_ATTUMEN)
-        {
-            Initialize();
-        }
-
-        void Initialize()
-        {
-            _phase = PHASE_NONE;
-        }
+        boss_midnightAI(Creature* creature) : BossAI(creature, DATA_ATTUMEN), _phase(PHASE_NONE) { }
 
         void Reset() override
         {
-            Initialize();
             BossAI::Reset();
             me->SetVisible(true);
             me->SetReactState(REACT_DEFENSIVE);
@@ -364,13 +351,19 @@ public:
         {
             if (summon->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN)
             {
-                _attumenGUID = summon->GetGUID();
-                summon->AI()->SetGUID(me->GetGUID(), NPC_MIDNIGHT);
                 summon->AI()->AttackStart(me->GetVictim());
                 summon->AI()->Talk(SAY_APPEAR);
             }
 
             BossAI::JustSummoned(summon);
+        }
+
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_SET_MIDNIGHT_PHASE)
+            {
+                _phase = PHASE_MOUNTED;
+            }
         }
 
         void EnterCombat(Unit* who) override
@@ -387,29 +380,33 @@ public:
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOnEvade(10s);
+            _phase = PHASE_NONE;
         }
 
         void KilledUnit(Unit* /*victim*/) override
         {
             if (_phase == PHASE_ATTUMEN_ENGAGES)
             {
-                if (Unit* unit = ObjectAccessor::GetUnit(*me, _attumenGUID))
+                if (Creature* attumen = instance->GetCreature(DATA_ATTUMEN))
                 {
-                    Talk(SAY_MIDNIGHT_KILL, unit);
+                    Talk(SAY_MIDNIGHT_KILL, attumen);
                 }
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() || _phase == PHASE_MOUNTED)
+            if (_phase != PHASE_MOUNTED)
             {
-                return;
-            }
+                if (!UpdateVictim())
+                {
+                    return;
+                }
 
-            if (!CanMeleeHit())
-            {
-                BossAI::EnterEvadeMode(EvadeReason::EVADE_REASON_BOUNDARY);
+                if (!CanMeleeHit())
+                {
+                    BossAI::EnterEvadeMode(EvadeReason::EVADE_REASON_BOUNDARY);
+                }
             }
 
             scheduler.Update(diff,
@@ -417,7 +414,6 @@ public:
         }
 
     private:
-        ObjectGuid _attumenGUID;
         uint8 _phase;
     };
 

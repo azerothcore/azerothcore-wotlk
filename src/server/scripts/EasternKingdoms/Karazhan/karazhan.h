@@ -59,7 +59,8 @@ enum KZDataTypes
     DATA_MASTERS_TERRACE_DOOR_2     = 28,
     DATA_GO_SIDE_ENTRANCE_DOOR      = 29,
     DATA_PRINCE                     = 30,
-    DATA_SPAWN_OPERA_DECORATIONS    = 31
+    DATA_SPAWN_OPERA_DECORATIONS    = 31,
+    DATA_MIDNIGHT                   = 32
 };
 
 enum KZOperaEvents
