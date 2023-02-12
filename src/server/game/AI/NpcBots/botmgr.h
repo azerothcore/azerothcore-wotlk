@@ -14,7 +14,7 @@ class DPSTracker;
 
 struct Position;
 
-enum CurrentSpellTypes : uint8;
+enum CurrentSpellTypes;
 
 constexpr size_t TargetIconNamesCacheSize = 8u; // Group.h TARGETICONCOUNT
 

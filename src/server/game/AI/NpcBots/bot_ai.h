@@ -57,6 +57,7 @@ class bot_ai : public CreatureAI
         //void EnterEvadeMode(EvadeReason/* why*/ = EVADE_REASON_OTHER) override { }
         //void LeavingWorld() override { }
         void OnSpellStart(SpellInfo const* spellInfo) override { OnBotSpellStart(spellInfo); }
+        bool CanRespawn() override { return IAmFree(); }
 
         virtual void OnBotSummon(Creature* /*summon*/) {}
         virtual void OnBotDespawn(Creature* /*summon*/) {}
@@ -103,7 +104,6 @@ class bot_ai : public CreatureAI
         void CommonTimers(uint32 diff);
         void ResetBotAI(uint8 resetType);
         void KillEvents(bool force);
-        bool CanRespawn() { return IAmFree(); }
         void BotMovement(BotMovementType type, Position const* pos, Unit* target = nullptr, bool generatePath = true) const;
         bool CanBotMoveVehicle() const;
         void MoveToSendPosition(uint32 point_id);
