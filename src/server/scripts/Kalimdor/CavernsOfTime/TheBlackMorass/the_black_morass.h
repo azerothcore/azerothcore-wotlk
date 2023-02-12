@@ -22,6 +22,8 @@
 #include "PassiveAI.h"
 #include "SpellScript.h"
 
+#define DataHeader "TBM"
+
 #define TheBlackMorassScriptName "instance_the_black_morass"
 
 enum DataTypes
@@ -93,5 +95,7 @@ inline AI* GetTheBlackMorassAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TheBlackMorassScriptName);
 }
+
+#define RegisterTheBlackMorassCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTheBlackMorassAI)
 
 #endif

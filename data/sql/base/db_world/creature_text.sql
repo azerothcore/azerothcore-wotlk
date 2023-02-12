@@ -7683,7 +7683,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 	(19610, 8, 0, 'Don\'t worry. It\'s an improvement!', 12, 0, 100, 11, 0, 0, 20286, 0, 'Irradiated Worker'),
 	(19616, 0, 0, '%s howls in response to Malukaz\'s call.', 16, 0, 100, 0, 0, 0, 17051, 0, 'Terokkar Wolf Spirit'),
 	(19616, 1, 0, '%s expresses its approval.', 16, 0, 100, 0, 0, 0, 17086, 0, 'Terokkar Wolf Spirit'),
-	(19622, 0, 0, 'Energy. Power. My people are addicted to it... a dependence made manifest after the Sunwell was destroyed. Welcome to the future. A pity you are too late to stop it. No one can stop me now! Selama ashal\'anore!', 14, 0, 100, 0, 0, 11256, 20195, 0, 'kaelthas SAY_INTRO'),
+	(19622, 0, 0, 'Energy. Power. My people are addicted to it... a dependence made manifest after the Sunwell was destroyed. Welcome to the future. A pity you are too late to stop it. No one can stop me now! Selama ashal\'anore!', 14, 0, 100, 0, 0, 11256, 20195, 0, 'kaelthas SAY_INTRO');
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 	(19622, 1, 0, 'Capernian will see to it that your stay here is a short one.', 14, 0, 100, 0, 0, 11257, 19004, 0, 'kaelthas SAY_INTRO_CAPERNIAN'),
 	(19622, 2, 0, 'Well done, you have proven worthy to test your skills against my master engineer, Telonicus.', 14, 0, 100, 0, 0, 11258, 19005, 0, 'kaelthas SAY_INTRO_TELONICUS'),
 	(19622, 3, 0, 'Let us see how your nerves hold up against the Darkener, Thaladred! ', 14, 0, 100, 0, 0, 11259, 19006, 0, 'kaelthas SAY_INTRO_THALADRED'),
@@ -10037,8 +10038,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 	(24199, 0, 0, '%s loses all self control and begins to attack friend and foe alike!', 16, 0, 100, 0, 0, 0, 23081, 0, 'Plagued Dragonflayer Handler'),
 	(24200, 0, 0, 'Dalronn! See if you can muster the nerve to join my attack!', 14, 0, 100, 0, 0, 13229, 29531, 0, 'skarvald YELL_SKARVALD_AGGRO'),
 	(24200, 1, 0, 'Not... over... yet.', 14, 0, 100, 0, 0, 13230, 29534, 0, 'skarvald YELL_SKARVALD_DAL_DIED'),
-	(24200, 2, 0, 'A warrior\'s death.', 14, 0, 100, 0, 0, 13231, 29535, 0, 'skarvald YELL_SKARVALD_SKA_DIEDFIRST');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+	(24200, 2, 0, 'A warrior\'s death.', 14, 0, 100, 0, 0, 13231, 29535, 0, 'skarvald YELL_SKARVALD_SKA_DIEDFIRST'),
 	(24200, 3, 0, 'Jarggn olkt!', 14, 0, 100, 0, 0, 13232, 29532, 0, 'skarvald YELL_SKARVALD_KILL'),
 	(24200, 4, 0, 'Pfagh! What sort of necromancer lets death stop him? I knew you were worthless!', 14, 0, 100, 0, 0, 13233, 29533, 0, 'skarvald YELL_SKARVALD_DAL_DIEDFIRST'),
 	(24201, 0, 0, 'By all means, don\'t assess the situation, you halfwit! Just jump into the fray!', 14, 0, 100, 0, 0, 13199, 29527, 0, 'dalronn YELL_DALRONN_AGGRO'),
@@ -14497,7 +14497,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 	(30243, 0, 4, 'Sniveling pig!', 12, 0, 100, 0, 0, 14394, 30504, 0, 'Njorndar Spear-Sister'),
 	(30243, 0, 5, 'Ugglin oo bjorr!', 12, 0, 100, 0, 0, 14395, 30505, 0, 'Njorndar Spear-Sister'),
 	(30243, 0, 6, 'You come to die!', 12, 0, 100, 0, 0, 14392, 30502, 0, 'Njorndar Spear-Sister'),
-	(30243, 0, 7, 'Die, maggot!', 12, 0, 100, 0, 0, 14391, 30501, 0, 'Njorndar Spear-Sister'),
+	(30243, 0, 7, 'Die, maggot!', 12, 0, 100, 0, 0, 14391, 30501, 0, 'Njorndar Spear-Sister');
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 	(30243, 0, 8, 'Haraak foln!', 12, 0, 100, 0, 0, 14396, 30506, 0, 'Njorndar Spear-Sister'),
 	(30243, 0, 9, 'Your entrails will make a fine necklace.', 12, 0, 100, 0, 0, 14386, 30500, 0, 'Njorndar Spear-Sister'),
 	(30243, 0, 10, 'Die, maggot!', 12, 0, 100, 0, 0, 14387, 30501, 0, 'Njorndar Spear-Sister'),

@@ -78,7 +78,7 @@ public:
     {
         instance_blackwing_lair_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            //SetHeaders(DataHeader);
+            SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, objectData);
@@ -229,7 +229,7 @@ public:
                         for (ObjectGuid const& guid : EggList)
                         {
                             // Eggs should be destroyed instead
-                            // @todo: after dynamic spawns
+                           /// @todo: after dynamic spawns
                             if (GameObject* egg = instance->GetGameObject(guid))
                             {
                                 egg->SetPhaseMask(2, true);
@@ -432,52 +432,15 @@ public:
             }
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "B W L " << GetBossSaveData() << NefarianLeftTunnel << ' ' << NefarianRightTunnel;
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
+            data >> NefarianLeftTunnel;
+            data >> NefarianRightTunnel;
         }
 
-        void Load(char const* data) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!data)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(data);
-
-            char dataHead1, dataHead2, dataHead3;
-
-            std::istringstream loadStream(data);
-            loadStream >> dataHead1 >> dataHead2 >> dataHead3;
-
-            if (dataHead1 == 'B' && dataHead2 == 'W' && dataHead3 == 'L')
-            {
-                for (uint32 i = 0; i < EncounterCount; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState == FAIL || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
-
-                loadStream >> NefarianLeftTunnel;
-                loadStream >> NefarianRightTunnel;
-            }
-            else
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-            }
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << NefarianLeftTunnel << ' ' << NefarianRightTunnel;
         }
 
     protected:
