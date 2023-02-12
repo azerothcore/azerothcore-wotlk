@@ -162,15 +162,13 @@ struct boss_malchezaar : public BossAI
 
             if (Creature* RELAY = me->FindNearestCreature(NPC_RELAY, 100.0f))
             {
-                Creature* infernal = RELAY->SummonCreature(NPC_NETHERSPITE_INFERNAL, pos, TEMPSUMMON_TIMED_DESPAWN, 180000);
-
-                if (infernal)
+                if (Creature* infernal = RELAY->SummonCreature(NPC_NETHERSPITE_INFERNAL, pos, TEMPSUMMON_TIMED_DESPAWN, 180000))
                 {
                     infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
                     infernal->SetFaction(me->GetFaction());
-                    infernals.push_back(infernal->GetGUID());
                     infernal->SetControlled(true, UNIT_STATE_ROOT);
                     RELAY->AI()->DoCast(infernal, SPELL_INFERNAL_RELAY);
+                    summons.Summon(infernal);
                 }
             }
 
@@ -265,8 +263,6 @@ struct boss_malchezaar : public BossAI
     private:
         uint32 _phase;
         std::map<ObjectGuid, uint32> _enfeebleTargets;
-
-        GuidVector infernals;
         std::vector<InfernalPoint*> positions;
 };
 
