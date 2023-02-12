@@ -4,25 +4,35 @@
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
 
+set -x
+
+
 # Begin env variables for configuration
 #
 # Config for this script. Only matters if you're using SAFE_WORLDSERVER
+SAFE_WORLDSERVER=${SAFE_WORLDSERVER:-}
+ACORE_SKIP_CREATE_ACCOUNT="${ACORE_SKIP_CREATE_ACCOUNT:-}"
 ACORE_GM_LEVEL="${ACORE_GM_LEVEL:-3}"
 ACORE_USERNAME="${ACORE_USERNAME:-admin}"
-ACORE_PASSWORD="${ACORE_USERNAME:-}"
-#
+ACORE_PASSWORD="${ACORE_PASSWORD:-admin}"
+[ grep -qE  "[^a-zA-Z0-9]" <<< "$ACORE_PASSWORD" ] && \
+  echo "ACORE_PASSWORD is not alphanumeric. ACORE_PASSWORD should only be letters and numbers. Exiting..." && \
+  exit 1
+PIPE_NAME="/azerothcore/worldserver-stdin"
+
 # Config for the application itself
+
 MYSQL_HOST="${MYSQL_HOST:-ac-database}"
 MYSQL_USER="${MYSQL_USER:-root}"
 MYSQL_PASSWORD="${MYSQL_PASSWORD:-azerothcore}"
 MYSQL_PORT="${MYSQL_PORT:-3306}"
 # End env variables for configuration
 
-# Apply variables to conf
 
 function send_worldserver_command {
-  command="$1"
-  screen -S worldserver -p 0 -X stuff $"$command\r"
+  local command="$1"
+  echo "$command" > "$PIPE_NAME"
+  echo > "$PIPE_NAME"
 }
 
 function safe_shutdown {
@@ -34,29 +44,29 @@ function safe_shutdown {
 #==============================================================================#
 EOF
   send_worldserver_command "server shutdown 5s 0"
+
+  wait "$(cat "/azerothcore/worldserver.pid")" 
 }
 
-# Ok, you're logging the screen to a file
-# What if it gets too big?
-function logfile_prune {
-  (
-    while true; do
-      sleep 3600
-      truncate -s <1M screenlog.0
-    done
-  ) &
-}
-
-PROGRAM="$@"
+CMD="${CMD:=$@}"
 
 # Install configs
 
-cp -avn env/ref/etc/* env/dist/etc
+conf="/azerothcore/env/dist/etc/$ACORE_COMPONENT.conf" 
 
-if [ -z "${SAFE_WORLDSERVER:-}" ] && \
+[ -f "$conf" ] && \
+  # Substitute the configuration with environment variables
+  envsubst < "$conf" > "$conf.new" && \
+  mv "$conf.new" "$conf"
+
+if [ -n "$SAFE_WORLDSERVER" ] && \
    [ "$ACORE_COMPONENT" == "worldserver" ] && \
-   [ "$PROGRAM" =~ ".*/?$ACORE_COMPONENT" ] ; then
-  trap safe_shutdown SIGTERM SIGINT SIGQUIT SIGHUP ERR
+   grep -q "$ACORE_COMPONENT" "$CMD" ; then
+  trap safe_shutdown SIGTERM SIGINT SIGQUIT
+
+  tmpfile=$(mktemp -u)
+  mkfifo "$tmpfile"
+  ln -snf "$tmpfile" $PIPE_NAME
 
   cat << EOF 
 #==============================================================================#
@@ -64,7 +74,7 @@ if [ -z "${SAFE_WORLDSERVER:-}" ] && \
 #
 # Be aware:
 #   - You CANNOT use the worldserver console.
-#   - All commands must be performed over SOAP or telnet.
+#   - All commands must be performed over SOAP, telnet, or by sending them to the named pipe.
 #
 # Please see [ https://www.azerothcore.org/wiki/remote-access ] for further info.
 #==============================================================================#
@@ -73,34 +83,22 @@ EOF
   # Make the password safe for stdout
   HIDDEN_PASS=$(tr '[:print:]' '*' <<< "$ACORE_PASSWORD")
 
-  # Spit worldserver output to the screen
-  touch "screenlog.0"
-  (tail -f "screenlog.0" | sed "s/$ACORE_PASSWORD/$HIDDEN_PASS/") &
+  # Start the worldserver
+  "$CMD" < \
+    "$PIPE_NAME" | sed "s/$ACORE_PASSWORD/$HIDDEN_PASS/" &
 
-  # Start the worldserver in a screen
-  screen -AmDSL worldserver "${AC_WORLDSERVER_BINARY:-$PROGRAM}" &
-
-  PROGRAM_PID="$!"
-
-
-  until grep -q "World Initialized" screenlog.0; do
-    cat << EOF
-#==============================================================================#
-#
-# Waiting for the WorldServer to Initialize 
-#
-#==============================================================================#
-EOF
-    sleep 3
+  until [ -f "/azerothcore/worldserver.pid" ]; do
+    echo "Waiting on the worldserver to start"
+    echo > "$PIPE_NAME"
+    sleep 1
   done
 
-  printf "Creating account\n"
-
-  send_worldserver_command "account create $ACORE_USERNAME $ACORE_PASSWORD"
-  send_worldserver_command "account set gmlevel $ACORE_USERNAME $ACORE_GM_LEVEL -1"
-
-  logfile_prune
-  wait "$PROGRAM_PID"
+  if [[ -z "$ACORE_SKIP_CREATE_ACCOUNT" ]]; then
+    send_worldserver_command "account create $ACORE_USERNAME $ACORE_PASSWORD"
+    send_worldserver_command "account set gmlevel $ACORE_USERNAME $ACORE_GM_LEVEL -1"
+  fi
+  
+  wait "$(cat "/azerothcore/worldserver.pid")"
 else 
-  exec $PROGRAM
+  exec $CMD
 fi
