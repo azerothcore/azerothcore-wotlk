@@ -500,32 +500,6 @@ bool Map::EnsureGridLoaded(const Cell& cell)
     return false;
 }
 
-/*
-* Probbly useless, AC doesn't have the same grid system than TC
-void Map::GridMarkNoUnload(uint32 x, uint32 y)
-{
-    // First make sure this grid is loaded
-    float gX = ((float(x) - 0.5f - CENTER_GRID_ID) * SIZE_OF_GRIDS) + (CENTER_GRID_OFFSET * 2);
-    float gY = ((float(y) - 0.5f - CENTER_GRID_ID) * SIZE_OF_GRIDS) + (CENTER_GRID_OFFSET * 2);
-    Cell cell = Cell(gX, gY);
-    EnsureGridLoaded(cell);
-
-    // Mark as don't unload
-    NGridType* grid = getNGrid(x, y);
-    grid->setUnloadExplicitLock(true);
-}
-
-void Map::GridUnmarkNoUnload(uint32 x, uint32 y)
-{
-    // If grid is loaded, clear unload lock
-    if (IsGridLoaded(GridCoord(x, y)))
-    {
-        NGridType* grid = getNGrid(x, y);
-        grid->setUnloadExplicitLock(false);
-    }
-}
-*/
-
 void Map::LoadGrid(float x, float y)
 {
     EnsureGridLoaded(Cell(x, y));

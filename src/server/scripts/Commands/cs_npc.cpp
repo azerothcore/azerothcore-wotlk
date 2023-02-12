@@ -1355,7 +1355,6 @@ public:
         return true;
     }
 
-
     static bool HandleNpcDespawnGroup(ChatHandler* handler, std::vector<Variant<uint32, EXACT_SEQUENCE("removerespawntime")>> const& opts)
     {
         if (opts.empty())
@@ -1385,9 +1384,6 @@ public:
         return true;
     }
 };
-
-
-
 
 void AddSC_npc_commandscript()
 {

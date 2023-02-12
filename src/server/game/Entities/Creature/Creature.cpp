@@ -364,7 +364,7 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool destroyForNearbyPlayers)
 
         // Should get removed later, just keep "compatibility" with scripts
         if (setSpawnTime)
-            m_respawnTime = std::max<time_t>(time(nullptr) + respawnDelay, m_respawnTime);  // @todo: Need to pass time(nullptr) -> GameTime::GetGameTime()
+            m_respawnTime = std::max<time_t>(time(nullptr) + respawnDelay, m_respawnTime);  /// @todo: Need to pass time(nullptr) -> GameTime::GetGameTime()
 
         // if corpse was removed during falling, the falling will continue and override relocation to respawn position
         if (IsFalling())
@@ -2036,8 +2036,6 @@ void Creature::setDeathState(DeathState s, bool despawn)
         ResetPlayerDamageReq();
         SetCannotReachTarget();
         CreatureTemplate const* cinfo = GetCreatureTemplate();
-        // Xinef: npc run by default
-        //SetWalk(true);
 
         // pussywizard:
         if (HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
@@ -2116,7 +2114,7 @@ void Creature::Respawn(bool force)
             GetMap()->RemoveRespawnTime(SPAWN_TYPE_CREATURE, m_spawnId, true);
             CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
             // Respawn check if spawn has 2 entries
-            // @todo -  Check that doesn't break Dynamic spanwn
+            /// @todo -  Check that doesn't break Dynamic spanwn
             if (data->id2)
             {
                 uint32 entry = GetRandomId(data->id1, data->id2, data->id3);

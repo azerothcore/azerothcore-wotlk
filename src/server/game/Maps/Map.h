@@ -411,8 +411,6 @@ public:
     void LoadGrid(float x, float y);
     void LoadAllCells();
     bool UnloadGrid(NGridType& ngrid);
-    //void GridMarkNoUnload(uint32 x, uint32 y);
-    //void GridUnmarkNoUnload(uint32 x, uint32 y);
     virtual void UnloadAll();
 
     [[nodiscard]] uint32 GetId() const { return i_mapEntry->MapID; }

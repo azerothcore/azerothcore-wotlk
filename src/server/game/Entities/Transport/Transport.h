@@ -114,7 +114,7 @@ public:
     StaticTransport();
     ~StaticTransport() override;
 
-    //@todo - Remove classic coords(x,y,z,o), to keep only Position
+    /// @todo - Remove classic coords(x,y,z,o), to keep only Position
     bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
     bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, Position const& pos, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
 

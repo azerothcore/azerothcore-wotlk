@@ -662,7 +662,6 @@ public:
         return true;
     }
 
-
     static bool HandleGameObjectDespawnGroup(ChatHandler* handler, std::vector<Variant<uint32, EXACT_SEQUENCE("removerespawntime")>> const& opts)
     {
         if (opts.empty())
