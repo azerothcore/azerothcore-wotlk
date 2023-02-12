@@ -477,7 +477,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
     {
         uint8 result;
         buff >> result;
-        // TODO: test it.
+        /// @todo: test it.
         if (result == 0x00)
         {
             LOG_DEBUG("warden", "TIMING CHECK FAIL result 0x00");
