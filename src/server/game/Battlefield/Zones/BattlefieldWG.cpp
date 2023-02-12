@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// @todo: Implement proper support for vehicle+player teleportation
-// @todo: Use spell victory/defeat in wg instead of RewardMarkOfHonor() && RewardHonor
-// @todo: Add proper implement of achievement
+/// @todo: Implement proper support for vehicle+player teleportation
+/// @todo: Use spell victory/defeat in wg instead of RewardMarkOfHonor() && RewardHonor
+/// @todo: Add proper implement of achievement
 
 #include "BattlefieldWG.h"
 #include "GameTime.h"
