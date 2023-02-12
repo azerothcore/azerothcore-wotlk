@@ -640,9 +640,18 @@ World.RealmAvailability = 1
 
 StrictPlayerNames = 0
 
+#
+#   StrictPlayerNames.Reserved
+#       Description: Use the Reserved Filter from DBC.
+#                    Prevents players from creating characters with profanity names.
+#       Default:     1 - Enabled
+#                    0 - Disabled
 
+StrictPlayerNames.Reserved = 1
+
+#
 #   StrictPlayerNames.Profanity
-#       Description: Use the Profanity Filter.
+#       Description: Use the Profanity Filter from DBC.
 #                    Prevents players from creating characters with profanity names.
 #       Default:     1 - Enabled
 #                    0 - Disabled

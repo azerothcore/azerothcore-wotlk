@@ -121,6 +121,7 @@ MapDifficultyMap sMapDifficultyMap;
 
 DBCStorage <MovieEntry> sMovieStore(MovieEntryfmt);
 
+DBCStorage <NamesReservedEntry> sNamesReservedStore(NamesReservedfmt);
 DBCStorage <NamesProfanityEntry> sNamesProfanityStore(NamesProfanityfmt);
 
 DBCStorage <OverrideSpellDataEntry> sOverrideSpellDataStore(OverrideSpellDatafmt);
@@ -332,6 +333,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sMapStore,                             "Map.dbc",                              "map_dbc");
     LOAD_DBC(sMapDifficultyStore,                   "MapDifficulty.dbc",                    "mapdifficulty_dbc");
     LOAD_DBC(sMovieStore,                           "Movie.dbc",                            "movie_dbc");
+    LOAD_DBC(sNamesReservedStore,                   "NamesReserved.dbc",                    "namesreserved_dbc");
     LOAD_DBC(sNamesProfanityStore,                  "NamesProfanity.dbc",                   "namesprofanity_dbc");
     LOAD_DBC(sOverrideSpellDataStore,               "OverrideSpellData.dbc",                "overridespelldata_dbc");
     LOAD_DBC(sPowerDisplayStore,                    "PowerDisplay.dbc",                     "powerdisplay_dbc");

@@ -8171,24 +8171,56 @@ bool isValidString(std::wstring wstr, uint32 strictMask, bool numericOrSpace, bo
 uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
 {
     std::wstring wname;
+
+    // Check for invalid characters
     if (!Utf8toWStr(name, wname))
         return CHAR_NAME_INVALID_CHARACTER;
 
+    // Check for too long name
     if (wname.size() > MAX_PLAYER_NAME)
         return CHAR_NAME_TOO_LONG;
 
+    // Check for too short name
     uint32 minName = sWorld->getIntConfig(CONFIG_MIN_PLAYER_NAME);
     if (wname.size() < minName)
         return CHAR_NAME_TOO_SHORT;
 
+    // Check for mixed languagues
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_PLAYER_NAMES);
     if (!isValidString(wname, strictMask, false, create))
         return CHAR_NAME_MIXED_LANGUAGES;
 
+    // Check for three consecutive letters
     wstrToLower(wname);
     for (size_t i = 2; i < wname.size(); ++i)
         if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
             return CHAR_NAME_THREE_CONSECUTIVE;
+
+    // Check Reserved Name from Database
+    if (sObjectMgr->IsReservedName(name))
+    {
+        return CHAR_NAME_RESERVED;
+    }
+
+    // Check for Reserved Name from DBC
+    if (sWorld->getBoolConfig(CONFIG_STRICT_PLAYER_NAMES_RESERVED))
+    {
+        for (NamesReservedEntry const* reservedStore : sNamesReservedStore)
+        {
+            std::wstring PatternString;
+
+            Utf8toWStr(reservedStore->Pattern, PatternString);
+
+            boost::algorithm::replace_all(PatternString, "\\<", "");
+            boost::algorithm::replace_all(PatternString, "\\>", "");
+
+            int stringCompare = wname.compare(PatternString);
+            if (stringCompare == 0)
+            {
+                return CHAR_NAME_RESERVED;
+            }
+        }
+    }
 
     // Check for Profanity
     if (sWorld->getBoolConfig(CONFIG_STRICT_PLAYER_NAMES_PROFANITY))
