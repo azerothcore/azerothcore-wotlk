@@ -1,5 +1,5 @@
 --
-UPDATE `creature_template` SET `ScriptName` = "npc_chesspiece" WHERE `entry` IN (17469,17211,21748,21664,21750,21683,21747,21682,21726,21160,21752,21684);
+UPDATE `creature_template` SET `ScriptName` = "npc_chesspiece", `flags_extra`=`flags_extra`|0x01000000 WHERE `entry` IN (17469,17211,21748,21664,21750,21683,21747,21682,21726,21160,21752,21684);
 UPDATE `creature_template` SET `ScriptName` = "npc_echo_of_medivh" WHERE `entry`=16816;
 UPDATE `creature_template` SET `ScriptName` = "npc_chess_move_trigger", `flags_extra`=130 WHERE `entry`=22519;
 
@@ -9,7 +9,7 @@ DELETE FROM `creature_template_addon` WHERE `entry`=22521;
 INSERT INTO `creature_template_addon` (`entry`,`bytes2`,`auras`) VALUES
 (22521,1,'39383');
 
-UPDATE creature_template SET `flags_extra` = 130 WHERE `entry` = 22521;
+UPDATE `creature_template` SET `flags_extra` = 130 WHERE `entry` = 22521;
 
 DELETE FROM `creature_template_spell` WHERE `CreatureID` IN (21684,21683,21682,21664,21160,17211,21752,21750,21747,21748,21726,17469);
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
