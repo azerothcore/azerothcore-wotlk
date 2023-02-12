@@ -7878,7 +7878,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
         if (loot_type == LOOT_PICKPOCKETING)
         {
-            if (loot->loot_type != LOOT_PICKPOCKETING)
+            if (!loot || loot->loot_type != LOOT_PICKPOCKETING)
             {
                 if (creature->CanGeneratePickPocketLoot())
                 {
@@ -8827,7 +8827,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
         // Generate a new name for the newly summoned ghoul
         if (pet->IsPetGhoul())
         {
-            std::string new_name = sObjectMgr->GeneratePetName(entry);
+            std::string new_name = sObjectMgr->GeneratePetNameLocale(entry, GetSession()->GetSessionDbLocaleIndex());
             if (!new_name.empty())
                 pet->SetName(new_name);
         }

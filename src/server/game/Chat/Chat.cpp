@@ -650,7 +650,7 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& gu
 
                 ObjectGuid::LowType lowguid = (uint32)atol(idS);
 
-                if (sObjectMgr->GetGOData(lowguid))
+                if (sObjectMgr->GetGameObjectData(lowguid))
                     return lowguid;
                 else
                     return 0;

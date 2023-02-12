@@ -13778,9 +13778,9 @@ bool Unit::isTargetableForAttack(bool checkFakeDeath, Unit const* byWho) const
     return !HasUnitState(UNIT_STATE_UNATTACKABLE) && (!checkFakeDeath || !HasUnitState(UNIT_STATE_DIED));
 }
 
-bool Unit::IsValidAttackTarget(Unit const* target) const
+bool Unit::IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell) const
 {
-    return _IsValidAttackTarget(target, nullptr);
+    return _IsValidAttackTarget(target, bySpell);
 }
 
 // function based on function Unit::CanAttack from 13850 client
@@ -17852,6 +17852,13 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         isRewardAllowed = creature->IsDamageEnoughForLootingAndReward();
         if (!isRewardAllowed)
             creature->SetLootRecipient(nullptr);
+
+        // Call creature just died function
+        if (CreatureAI* ai = creature->AI())
+        {
+            ai->JustDied(killer);
+            sScriptMgr->OnUnitDeath(creature, killer);
+        }
     }
 
     // pussywizard: remade this if section (player is on the same map
@@ -18073,13 +18080,6 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         // Call KilledUnit for creatures, this needs to be called after the lootable flag is set
         if (killer && killer->GetTypeId() == TYPEID_UNIT && killer->IsAIEnabled)
             killer->ToCreature()->AI()->KilledUnit(victim);
-
-        // Call creature just died function
-        if (CreatureAI* ai = creature->AI())
-        {
-            ai->JustDied(killer);
-            sScriptMgr->OnUnitDeath(creature, killer);
-        }
 
         if (TempSummon* summon = creature->ToTempSummon())
         {

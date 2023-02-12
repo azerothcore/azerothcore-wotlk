@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.gossip_menu_option
+-- Dumping structure for table acore_world.gossip_menu_option
 DROP TABLE IF EXISTS `gossip_menu_option`;
 CREATE TABLE IF NOT EXISTS `gossip_menu_option` (
   `MenuID` smallint unsigned NOT NULL DEFAULT '0',
@@ -28,11 +30,11 @@ CREATE TABLE IF NOT EXISTS `gossip_menu_option` (
   `BoxMoney` int unsigned NOT NULL DEFAULT '0',
   `BoxText` text,
   `BoxBroadcastTextID` mediumint NOT NULL DEFAULT '0',
-  `VerifiedBuild` smallint NOT NULL DEFAULT '0',
+  `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`MenuID`,`OptionID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.gossip_menu_option: 4 480 rows
+-- Dumping data for table acore_world.gossip_menu_option: 4,518 rows
 DELETE FROM `gossip_menu_option`;
 /*!40000 ALTER TABLE `gossip_menu_option` DISABLE KEYS */;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
@@ -1558,7 +1560,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(5483, 1, 0, 'Barnil, I seem to have misplaced Chapter II.', 9019, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(5483, 2, 0, 'Barnil, I seem to have misplaced Chapter III.', 9020, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(5483, 3, 0, 'Barnil, I seem to have misplaced Chapter IV.', 9021, 1, 1, 0, 0, 0, 0, '', 0, 0),
-	(5502, 0, 0, 'Raene, I lost Dartol\'s Rod of Transformation.', 9025, 1, 1, 0, 0, 0, 0, '', 0, 0),
+	(5502, 0, 0, 'Raene, I lost Dartol\'s Rod of Transformation.', 9025, 1, 1, 5501, 0, 0, 0, '', 0, 0),
 	(5602, 0, 0, 'Thank you, Ironbark. We are ready for you to open the door.', 0, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(5630, 0, 0, 'Larion, I want to help you fight these pests!', 9138, 1, 1, 5631, 0, 0, 0, '', 0, 0),
 	(5665, 0, 3, 'Train me.', 3266, 5, 16, 0, 0, 0, 0, '', 0, 0),
@@ -1780,8 +1782,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(6628, 0, 3, 'I am interested in warlock training.', 2544, 5, 16, 0, 0, 0, 0, '', 0, 0),
 	(6628, 1, 0, 'I wish to unlearn my talents.', 62295, 16, 16, 4461, 0, 0, 0, '', 0, 0),
 	(6628, 2, 0, 'Learn about Dual Talent Specialization.', 33762, 20, 1, 10371, 0, 0, 0, '', 0, 0),
-	(6644, 0, 0, 'Teleport me to the lair of the Twin Emperors, please.', 12849, 0, 0, 0, 0, 0, 0, NULL, 0, 28153),
-	(6644, 1, 0, 'Please teleport me to the final chamber.', 12851, 0, 0, 0, 0, 0, 0, NULL, 0, 28153),
+	(6644, 0, 0, 'Teleport me to the lair of the Twin Emperors, please.', 12849, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
 	(6647, 0, 3, 'I would like to train further in the ways of the Light.', 5299, 5, 16, 7938, 0, 0, 0, '', 0, 0),
 	(6647, 1, 0, 'I wish to unlearn my talents.', 62295, 16, 16, 0, 0, 0, 0, '', 0, 0),
 	(6647, 2, 2, 'Purchase a Dual Talent Specialization', 33765, 18, 16, 10373, 0, 0, 10000000, 'Are you sure you wish to purchase a Dual Talent Specialization?', 0, 0),
@@ -2707,11 +2708,10 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(8917, 0, 0, 'So, how does a dwarf like you end up in a place like this?', 22609, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8918, 0, 0, 'I have misplaced my worg disguise.', 23068, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8932, 0, 0, 'Thanks for the concern, but we intend to explore Zul\'Aman.', 23238, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
-	(8934, 0, 0, 'Do you still need some help shipping kegs from Kharanos?', 0, 1, 1, 8953, 0, 0, 0, '', 0, 0),
+	(8934, 4, 0, 'Do you still need some help shipping kegs from Kharanos?', 0, 1, 1, 8953, 0, 0, 0, '', 0, 0),
 	(8934, 1, 0, 'May I have another racing ram?', 74294, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8934, 2, 0, 'May I have another racing ram?', 74294, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8934, 3, 0, 'May I have another racing ram?', 74294, 1, 1, 0, 0, 0, 0, '', 0, 0),
-	(8934, 4, 0, 'I want to race for tokens!', 0, 1, 1, 0, 0, 0, 0, '', 0, -1),
 	(8953, 0, 0, 'I\'m ready to work for you today!  Give me the good stuff!', 23378, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8954, 0, 0, 'Sir, I need another flying machine...', 24951, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8955, 0, 0, 'I have another question.', 62310, 1, 1, 8783, 0, 0, 0, '', 0, 0),
@@ -2737,7 +2737,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(8976, 1, 0, 'May I have another racing ram?', 74294, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8976, 2, 0, 'May I have another racing ram?', 74294, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8976, 3, 0, 'May I have another racing ram?', 74294, 1, 1, 0, 0, 0, 0, '', 0, 0),
-	(8976, 4, 0, 'I want to race for tokens!', 0, 1, 1, 0, 0, 0, 0, '', 0, -1),
+	(8976, 4, 0, 'Do you still need some help moving kegs from the crash site near Razor Hill?', 23546, 1, 1, 8973, 0, 0, 0, '', 0, -1),
 	(8982, 0, 0, 'Um... what was that?', 23568, 1, 1, 8983, 0, 0, 0, '', 0, 0),
 	(8991, 0, 0, 'Official Explorers\' League business, McGoyver. Take me to the Explorers\' League Outpost!', 23686, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8991, 1, 0, 'Official Explorers\' League business, McGoyver. Take me to the Explorers\' League Outpost!', 23686, 1, 1, 0, 0, 0, 0, '', 0, 0),
@@ -4515,9 +4515,50 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(2387, 0, 0, 'Um... sorry to bother you, but could I see Goodsteel\'s ledger again... if you\'re not using it.', 5410, 1, 1, 2386, 0, 0, 0, NULL, 0, 0),
 	(5065, 1, 0, 'I desire this eternal quintessence, Duke Hydraxis.', 12363, 1, 2, 0, 0, 0, 0, '', 0, 0),
 	(7048, 0, 1, 'Let me see your goods', 0, 3, 128, 0, 0, 0, 0, '', 0, 0),
-	(7048, 1, 0, 'Let\'s find out.', 0, 1, 1, 0, 0, 0, 0, '', 0, 0);
+	(7048, 1, 0, 'Let\'s find out.', 0, 1, 1, 0, 0, 0, 0, '', 0, 0),
+	(6644, 1, 0, 'Please teleport me to the final chamber.', 12851, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
+	(8973, 0, 0, 'Im ready to work for you today!  Give me that ram!', 23545, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
+	(10311, 0, 1, 'I want to browse your goods', 3370, 3, 128, 0, 0, 0, 0, '', 0, 0),
+	(6529, 0, 0, 'Baristolth, I have lost my badge and require a replacement.', 10679, 1, 1, 0, 0, 0, 0, '', 0, 0),
+	(3651, 0, 0, 'May I have another Dawn\'s Gambit, Betina?  I want to test it again...', 7198, 1, 1, 0, 0, 0, 0, '', 0, 0),
+	(3651, 1, 0, 'Betina, I\'d like a replacement Seal of the Dawn please!', 10458, 1, 1, 0, 0, 0, 0, '', 0, 0),
+	(3651, 2, 0, 'Betina, I\'d like a replacement Rune of the Dawn please!', 10462, 1, 1, 0, 0, 0, 0, '', 0, 0),
+	(2849, 0, 0, 'The auction house', 0, 1, 1, 2827, 318, 0, 0, '', 0, 0),
+	(2849, 1, 0, 'The bank', 4888, 1, 1, 2822, 319, 0, 0, '', 0, 0),
+	(2849, 2, 0, 'Barber', 45376, 1, 1, 10020, 320, 0, 0, '', 0, 0),
+	(2849, 3, 0, 'The bat handler', 6790, 1, 1, 2823, 321, 0, 0, '', 0, 0),
+	(2849, 4, 0, 'The battlemaster', 0, 1, 1, 8225, 322, 0, 0, '', 0, 0),
+	(2849, 5, 0, 'The guild master', 0, 1, 1, 2824, 323, 0, 0, '', 0, 0),
+	(2849, 6, 0, 'The inn', 4893, 1, 1, 2825, 324, 0, 0, '', 0, 0),
+	(2849, 7, 0, 'Locksmith', 33141, 1, 1, 10261, 325, 0, 0, '', 0, 0),
+	(2849, 8, 0, 'The mailbox', 0, 1, 1, 2826, 326, 0, 0, '', 0, 0),
+	(2849, 9, 0, 'The stable master', 8521, 1, 1, 4906, 327, 0, 0, '', 0, 0),
+	(2849, 10, 0, 'The weapon master', 0, 1, 1, 3726, 328, 0, 0, '', 0, 0),
+	(2849, 11, 0, 'The zeppelin master', 0, 1, 1, 2828, 329, 0, 0, '', 0, 0),
+	(2849, 12, 0, 'A class trainer', 6792, 1, 1, 2848, 0, 0, 0, '', 0, 0),
+	(2849, 13, 0, 'A profession trainer', 6793, 1, 1, 2847, 0, 0, 0, '', 0, 0),
+	(2847, 0, 0, 'Alchemy', 52058, 1, 1, 2834, 336, 0, 0, NULL, 0, NULL),
+	(2847, 1, 0, 'Blacksmithing', 51346, 1, 1, 2835, 337, 0, 0, NULL, 0, NULL),
+	(2847, 2, 0, 'Cooking', 45763, 1, 1, 2836, 338, 0, 0, NULL, 0, NULL),
+	(2847, 3, 0, 'Enchanting', 52063, 1, 1, 2837, 339, 0, 0, NULL, 0, NULL),
+	(2847, 4, 0, 'Engineering', 51347, 1, 1, 2838, 340, 0, 0, NULL, 0, NULL),
+	(2847, 5, 0, 'First Aid', 52066, 1, 1, 2839, 341, 0, 0, NULL, 0, NULL),
+	(2847, 6, 0, 'Fishing', 45767, 1, 1, 2840, 342, 0, 0, NULL, 0, NULL),
+	(2847, 7, 0, 'Herbalism', 45768, 1, 1, 2841, 343, 0, 0, NULL, 0, NULL),
+	(2847, 8, 0, 'Inscription', 48811, 1, 1, 10019, 344, 0, 0, NULL, 0, NULL),
+	(2847, 9, 0, 'Leatherworking', 52071, 1, 1, 2842, 345, 0, 0, NULL, 0, NULL),
+	(2847, 10, 0, 'Mining', 51348, 1, 1, 2843, 347, 0, 0, NULL, 0, NULL),
+	(2847, 11, 0, 'Skinning', 52076, 1, 1, 2844, 346, 0, 0, NULL, 0, NULL),
+	(2847, 12, 0, 'Tailoring', 52077, 1, 1, 2845, 348, 0, 0, NULL, 0, NULL),
+	(2848, 0, 0, 'Mage', 45404, 1, 1, 2821, 331, 0, 0, NULL, 0, NULL),
+	(2848, 1, 0, 'Paladin', 48028, 1, 1, 8165, 330, 0, 0, NULL, 0, NULL),
+	(2848, 2, 0, 'Priest', 45405, 1, 1, 2829, 332, 0, 0, NULL, 0, NULL),
+	(2848, 3, 0, 'Rogue', 45406, 1, 1, 2830, 333, 0, 0, NULL, 0, NULL),
+	(2848, 4, 0, 'Warlock', 45407, 1, 1, 2832, 334, 0, 0, NULL, 0, NULL),
+	(2848, 5, 0, 'Warrior', 45408, 1, 1, 2833, 335, 0, 0, NULL, 0, NULL);
 /*!40000 ALTER TABLE `gossip_menu_option` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

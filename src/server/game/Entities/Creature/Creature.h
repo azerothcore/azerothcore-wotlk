@@ -283,6 +283,14 @@ public:
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelay; }
     void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }
 
+    uint32 GetCombatPulseDelay() const { return m_combatPulseDelay; }
+    void SetCombatPulseDelay(uint32 delay) // (secs) interval at which the creature pulses the entire zone into combat (only works in dungeons)
+    {
+        m_combatPulseDelay = delay;
+        if (m_combatPulseTime == 0 || m_combatPulseTime > delay)
+            m_combatPulseTime = delay;
+    }
+
     [[nodiscard]] float GetWanderDistance() const { return m_wanderDistance; }
     void SetWanderDistance(float dist) { m_wanderDistance = dist; }
 
@@ -408,6 +416,8 @@ protected:
     uint32 m_boundaryCheckTime;                         // (msecs) remaining time for next evade boundary check
     uint16 m_transportCheckTimer;
     uint32 lootPickPocketRestoreTime;
+    uint32 m_combatPulseTime;                           // (msecs) remaining time for next zone-in-combat pulse
+    uint32 m_combatPulseDelay;
 
     ReactStates m_reactState;                           // for AI, not charmInfo
     void RegenerateHealth();
