@@ -229,7 +229,7 @@ public:
                         for (ObjectGuid const& guid : EggList)
                         {
                             // Eggs should be destroyed instead
-                            // @todo: after dynamic spawns
+                           /// @todo: after dynamic spawns
                             if (GameObject* egg = instance->GetGameObject(guid))
                             {
                                 egg->SetPhaseMask(2, true);
