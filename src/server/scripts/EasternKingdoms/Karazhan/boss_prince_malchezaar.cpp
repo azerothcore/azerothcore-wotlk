@@ -118,6 +118,7 @@ struct boss_malchezaar : public BossAI
     void Reset() override
     {
         Initialize();
+        _Reset();
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -135,7 +136,7 @@ struct boss_malchezaar : public BossAI
     void EnterCombat(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
-        DoZoneInCombat();
+        _EnterCombat();
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
 
         scheduler.Schedule(30s, [this](TaskContext context)
@@ -229,29 +230,13 @@ struct boss_malchezaar : public BossAI
 
     void EnfeebleHealthEffect()
     {
-        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
-        std::vector<Unit*> targets;
+        std::list<Unit*> targetList;
+        SelectTargetList(targetList, 5, SelectTargetMethod::Random, 1, [&](Unit* u) { return u->IsAlive() && u->IsPlayer(); });
 
-        if (threatList.empty())
+        if (targetList.empty())
             return;
 
-        //begin + 1, so we don't target the one with the highest threat
-        ThreatContainer::StorageType::const_iterator itr = threatList.begin();
-        std::advance(itr, 1);
-        for (auto threatRef : threatList) //store the threat list in a different container
-        {
-            if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-            {
-                if (target->IsAlive() && target->IsPlayer())
-                {
-                    targets.push_back(target);
-                }
-            }
-        }
-
-        Acore::Containers::RandomResize(targets, 5);
-
-        for (auto const& target : targets)
+        for (auto const& target : targetList)
         {
             if (target)
             {
