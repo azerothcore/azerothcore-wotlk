@@ -1,3 +1,4 @@
+-- DB update 2023_02_12_03 -> 2023_02_12_04
 --
 DELETE FROM `creature_text` WHERE `CreatureID`=18405;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Probability`, `Emote`, `BroadcastTextId`, `comment`) VALUES
