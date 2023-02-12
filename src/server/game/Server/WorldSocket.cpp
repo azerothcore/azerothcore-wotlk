@@ -385,7 +385,10 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
     }
 
     // Our Idle timer will reset on any non PING opcodes on login screen, allowing us to catch people idling.
-    _worldSession->ResetTimeOutTime(false);
+    if (packetToQueue->GetOpcode() != CMSG_WARDEN_DATA)
+    {
+        _worldSession->ResetTimeOutTime(false);
+    }
 
     // Copy the packet to the heap before enqueuing
     _worldSession->QueuePacket(packetToQueue);

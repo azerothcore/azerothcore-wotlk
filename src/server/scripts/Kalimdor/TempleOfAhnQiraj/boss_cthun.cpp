@@ -323,7 +323,7 @@ struct boss_eye_of_cthun : public BossAI
                             me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
                             me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
                             me->InterruptNonMeleeSpells(false);
-                            ScheduleTasks();
+                            ScheduleTask();
                         }
                         else
                             tasker.Repeat(1s);
