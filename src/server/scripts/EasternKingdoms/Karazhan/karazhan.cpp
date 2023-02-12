@@ -61,20 +61,17 @@ enum Creatures
 # npc_barnesAI
 ######*/
 
-#define GOSSIP_READY        "我不是演员。"
+enum Misc
+{
+    OZ_GOSSIP1_MID = 7421, // I'm not an actor.
+    OZ_GOSSIP1_OID = 0,
+    OZ_GOSSIP2_MID = 7422, // Ok, I'll give it a try, then.
+    OZ_GOSSIP2_OID = 0,
+};
 
-#define SAY_READY           "太棒了，我要让观众做好准备。打断一条腿！"
-#define SAY_OZ_INTRO1       "最后，一切就绪。你准备好迎接你的大舞台首秀了吗？"
-#define OZ_GOSSIP1          "我不是演员。"
-#define SAY_OZ_INTRO2       "别担心，你会没事的。你看起来很自然！"
-#define OZ_GOSSIP2          "好的，那我试试看。"
-
-#define SAY_RAJ_INTRO1      "浪漫的戏剧真的很难，但这次你会做得更好。你有天赋。准备好？"
-#define RAJ_GOSSIP1         "我从未像现在这样准备好。"
-
-#define OZ_GM_GOSSIP1       "[GM] 将事件更改为 EVENT_OZ"
-#define OZ_GM_GOSSIP2       "[GM] 将事件更改为 EVENT_HOOD"
-#define OZ_GM_GOSSIP3       "[GM] 将事件更改为 EVENT_RAJ"
+#define OZ_GM_GOSSIP1       "[GM] Change event to EVENT_OZ"
+#define OZ_GM_GOSSIP2       "[GM] Change event to EVENT_HOOD"
+#define OZ_GM_GOSSIP3       "[GM] Change event to EVENT_RAJ"
 
 struct Dialogue
 {
@@ -343,12 +340,11 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, OZ_GOSSIP2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, OZ_GOSSIP2_MID, OZ_GOSSIP2_OID, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, 8971, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
-                pBarnesAI->m_uiEventId = urand(EVENT_OZ, EVENT_RAJ);
                 pBarnesAI->StartEvent();
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
@@ -375,7 +371,7 @@ public:
             // Check for death of Moroes and if opera event is not done already
             if (instance->GetBossState(DATA_MOROES) == DONE &&  instance->GetBossState(DATA_OPERA_PERFORMANCE) != DONE)
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, OZ_GOSSIP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, OZ_GOSSIP1_MID, OZ_GOSSIP1_OID, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
                 if (player->IsGameMaster())
                 {
@@ -410,15 +406,18 @@ public:
 # npc_image_of_medivh
 ####*/
 
-#define SAY_DIALOG_MEDIVH_1         "你引起了我的注意，巨龙。你会发现我不像下面的村民那么容易害怕。"
-#define SAY_DIALOG_ARCANAGOS_2      "你对奥术的涉猎太过分了，麦迪文。你已经引起了你无法理解的力量的注意。你必须立刻离开卡拉赞！"
-#define SAY_DIALOG_MEDIVH_3         "敢到我家挑战？你的狂妄，就算是巨龙，也是惊人的！"
-#define SAY_DIALOG_ARCANAGOS_4      "一股黑暗力量想要利用你，麦迪文！如果你留下来，可怕的日子将会接踵而至。你必须快点，我们的时间不多了！"
-#define SAY_DIALOG_MEDIVH_5         "我不知道你在说什么，巨龙……但我不会被这种无礼的表现所欺负。我会在适合我的时候离开卡拉赞！"
-#define SAY_DIALOG_ARCANAGOS_6      "你让我别无选择。不听道理我就强行拦住你！"
-#define EMOTE_DIALOG_MEDIVH_7       "开始施展强大的法术，将自己的精华融入法术之中。"
-#define SAY_DIALOG_ARCANAGOS_8      "你做了什么，巫师？这不可能！我从……内心燃烧！"
-#define SAY_DIALOG_MEDIVH_9         "他不应该激怒我。我得走了……现在恢复体力……"
+enum MedivhTexts
+{
+    SAY_DIALOG_MEDIVH_1    = 0,
+    SAY_DIALOG_ARCANAGOS_2 = 0,
+    SAY_DIALOG_MEDIVH_3    = 1,
+    SAY_DIALOG_ARCANAGOS_4 = 1,
+    SAY_DIALOG_MEDIVH_5    = 2,
+    SAY_DIALOG_ARCANAGOS_6 = 2,
+    EMOTE_DIALOG_MEDIVH_7  = 3,
+    SAY_DIALOG_ARCANAGOS_8 = 3,
+    SAY_DIALOG_MEDIVH_9    = 4
+};
 
 //static float MedivPos[4] = {-11161.49f, -1902.24f, 91.48f, 1.94f};
 static float ArcanagosPos[4] = {-11169.75f, -1881.48f, 107.39f, 4.83f};
@@ -488,25 +487,25 @@ public:
             switch(nextStep)
             {
                 case 1:
-                    me->Yell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL);
+                    Talk(SAY_DIALOG_MEDIVH_1);
                     return 10000;
                 case 2:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->Yell(SAY_DIALOG_ARCANAGOS_2, LANG_UNIVERSAL);
+                        arca->AI()->Talk(SAY_DIALOG_ARCANAGOS_2);
                     return 20000;
                 case 3:
-                    me->Yell(SAY_DIALOG_MEDIVH_3, LANG_UNIVERSAL);
+                    Talk(SAY_DIALOG_MEDIVH_3);
                     return 10000;
                 case 4:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->Yell(SAY_DIALOG_ARCANAGOS_4, LANG_UNIVERSAL);
+                        arca->AI()->Talk(SAY_DIALOG_ARCANAGOS_4);
                     return 20000;
                 case 5:
-                    me->Yell(SAY_DIALOG_MEDIVH_5, LANG_UNIVERSAL);
+                    Talk(SAY_DIALOG_MEDIVH_5);
                     return 20000;
                 case 6:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->Yell(SAY_DIALOG_ARCANAGOS_6, LANG_UNIVERSAL);
+                        arca->AI()->Talk(SAY_DIALOG_ARCANAGOS_6);
 
                     ATimer = 5500;
                     MTimer = 6600;
@@ -527,7 +526,7 @@ public:
                     return 1000;
                 case 11:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->Yell(SAY_DIALOG_ARCANAGOS_8, LANG_UNIVERSAL);
+                        arca->AI()->Talk(SAY_DIALOG_ARCANAGOS_8);
                     return 5000;
                 case 12:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
@@ -538,7 +537,7 @@ public:
                     }
                     return 10000;
                 case 13:
-                    me->Yell(SAY_DIALOG_MEDIVH_9, LANG_UNIVERSAL);
+                    Talk(SAY_DIALOG_MEDIVH_9);
                     return 10000;
                 case 14:
                     if (me->GetMap()->IsDungeon())
