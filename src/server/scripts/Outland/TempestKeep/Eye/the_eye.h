@@ -24,6 +24,8 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
+#define DataHeader "TE"
+
 #define TheEyeScriptName "instance_the_eye"
 
 enum EyeData
