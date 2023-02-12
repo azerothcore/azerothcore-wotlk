@@ -9,6 +9,7 @@
 #include "bottext.h"
 #include "bpet_ai.h"
 #include "Chat.h"
+#include "CombatPackets.h"
 #include "Config.h"
 #include "GroupMgr.h"
 #include "GridNotifiers.h"
@@ -1660,6 +1661,16 @@ int32 BotMgr::GetHPSTaken(Unit const* unit) const
     //    TC_LOG_ERROR("entities.player", "BotMgr:GetHPSTaken(): %s got %i)", unit->GetName().c_str(), amount);
 
     return amount;
+}
+
+void BotMgr::OnBotSpellInterrupt(Unit const* caster, CurrentSpellTypes spellType)
+{
+    if (spellType == CURRENT_AUTOREPEAT_SPELL)
+    {
+        WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, caster->GetPackGUID().size());
+        data << caster->GetPackGUID();
+        caster->SendMessageToSet(&data, true);
+    }
 }
 
 void BotMgr::OnBotSpellGo(Unit const* caster, Spell const* spell, bool ok)
