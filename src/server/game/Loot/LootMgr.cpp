@@ -1457,7 +1457,7 @@ float LootTemplate::LootGroup::TotalChance() const
 void LootTemplate::LootGroup::Verify(LootStore const& lootstore, uint32 id, uint8 group_id) const
 {
     float chance = RawTotalChance();
-    if (chance > 101.0f)                                    // TODO: replace with 100% when DBs will be ready
+    if (chance > 101.0f)                                    /// @todo: replace with 100% when DBs will be ready
     {
         LOG_ERROR("sql.sql", "Table '{}' entry {} group {} has total chance > 100% ({})", lootstore.GetName(), id, group_id, chance);
     }
@@ -1807,7 +1807,7 @@ void LootTemplate::Verify(LootStore const& lootstore, uint32 id) const
         if (Groups[i])
             Groups[i]->Verify(lootstore, id, i + 1);
 
-    // TODO: References validity checks
+    /// @todo: References validity checks
 }
 
 void LootTemplate::CheckLootRefs(LootTemplateMap const& store, LootIdSet* ref_set) const

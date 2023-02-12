@@ -200,7 +200,7 @@ public:
                     break;
                 case EVENT_HADRONOX_MOVE4:
                     me->CastSpell(me, SPELL_WEB_FRONT_DOORS, true);
-                    [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                    [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                 case EVENT_HADRONOX_MOVE1:
                 case EVENT_HADRONOX_MOVE2:
                 case EVENT_HADRONOX_MOVE3:
