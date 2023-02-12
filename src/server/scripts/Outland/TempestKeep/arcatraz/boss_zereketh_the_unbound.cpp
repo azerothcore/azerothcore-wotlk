@@ -112,7 +112,6 @@ class spell_zereketh_seed_of_corruption: public AuraScript
     }
 };
 
-
 void AddSC_boss_zereketh_the_unbound()
 {
     RegisterArcatrazCreatureAI(boss_zereketh_the_unbound);
