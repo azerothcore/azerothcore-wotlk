@@ -106,6 +106,7 @@ struct boss_malchezaar : public BossAI
         _phase = 1;
         clearweapons();
         positions.clear();
+        instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
     void clearweapons()
@@ -129,12 +130,14 @@ struct boss_malchezaar : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
+        instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
     void EnterCombat(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         _EnterCombat();
+        instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
 
         scheduler.Schedule(30s, [this](TaskContext context)
         {

@@ -25,12 +25,6 @@
 #include "SpellScript.h"
 #include "karazhan.h"
 
-DoorData const doorData[] =
-{
-    { DATA_GO_NETHER_DOOR,  DATA_MALCHEZZAR,  DOOR_TYPE_ROOM },
-    { 0,                0,  DOOR_TYPE_ROOM,                  } // END
-};
-
 const Position OptionalSpawn[] =
 {
     { -10960.981445f, -1940.138428f, 46.178097f, 4.12f }, // Hyakiss the Lurker
@@ -58,7 +52,6 @@ public:
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
             OzDeathCount = 0;
             OptionalBossCount = 0;
-            LoadDoorData(doorData);
         }
 
         void OnCreatureCreate(Creature* creature) override
