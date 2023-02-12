@@ -8238,7 +8238,7 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
     if (wname.size() < minName)
         return CHAR_NAME_TOO_SHORT;
 
-    // Check for mixed languagues
+    // Check for mixed languages
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_PLAYER_NAMES);
     if (!isValidString(wname, strictMask, false, create))
         return CHAR_NAME_MIXED_LANGUAGES;
