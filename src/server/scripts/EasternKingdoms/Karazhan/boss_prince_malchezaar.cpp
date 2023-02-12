@@ -313,7 +313,6 @@ struct npc_netherspite_infernal : public ScriptedAI
 
     private:
         TaskScheduler _scheduler;
-        InfernalPoint* point;
 };
 
 struct npc_malchezaar_axe : public ScriptedAI
