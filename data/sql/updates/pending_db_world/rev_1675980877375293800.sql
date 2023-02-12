@@ -1,6 +1,6 @@
 --
 
-DELETE FROM `creature` WHERE `guid` IN (125922, 125927, 125930, 125931, 125932, 126052, 1158); -- Wildhammer Gryphon Rider
+DELETE FROM `creature` WHERE `guid` IN (125922, 125927, 125930, 125931, 125932, 126052, 1158) AND `id1`=19382; -- Wildhammer Gryphon Rider
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `npcflag`, `MovementType`) VALUES
 (125922, 19382, 530, 1, 1, 0, -4051.94, 2241.56, 162.544, 0.216896, 300, 0, 0, 6986, 0, 0, 2),
 (125927, 19382, 530, 1, 1, 0, -3899.48, 2238.93, 153.799, 6.19141, 300, 0, 0, 6986, 0, 0, 2),
