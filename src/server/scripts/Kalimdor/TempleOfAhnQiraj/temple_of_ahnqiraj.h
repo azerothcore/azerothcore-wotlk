@@ -44,7 +44,6 @@ enum DataTypes
     DATA_OURO_SPAWNER       = 14,
     DATA_VEKLOR             = 15,
     DATA_VEKNILASH          = 16,
-    DATA_CTHUN_PHASE        = 17,
     DATA_EYE_OF_CTHUN       = 18,
     DATA_MASTERS_EYE        = 19
 };

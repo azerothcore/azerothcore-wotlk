@@ -24,18 +24,18 @@
 
 ObjectData const creatureData[] =
 {
-    { NPC_VEM, DATA_VEM },
-    { NPC_KRI, DATA_KRI },
-    { NPC_YAUJ, DATA_YAUJ },
-    { NPC_SARTURA, DATA_SARTURA },
-    { NPC_CTHUN, DATA_CTHUN },
+    { NPC_VEM,          DATA_VEM          },
+    { NPC_KRI,          DATA_KRI          },
+    { NPC_YAUJ,         DATA_YAUJ         },
+    { NPC_SARTURA,      DATA_SARTURA      },
+    { NPC_CTHUN,        DATA_CTHUN        },
     { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
-    { NPC_OURO, DATA_OURO },
+    { NPC_OURO,         DATA_OURO         },
     { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER },
-    { NPC_MASTERS_EYE, DATA_MASTERS_EYE },
-    { NPC_VEKLOR, DATA_VEKLOR },
-    { NPC_VEKNILASH, DATA_VEKNILASH },
-    { NPC_VISCIDUS, DATA_VISCIDUS }
+    { NPC_MASTERS_EYE,  DATA_MASTERS_EYE  },
+    { NPC_VEKLOR,       DATA_VEKLOR       },
+    { NPC_VEKNILASH,    DATA_VEKNILASH    },
+    { NPC_VISCIDUS,     DATA_VISCIDUS     }
 };
 
 DoorData const doorData[] =
@@ -66,28 +66,15 @@ public:
             LoadDoorData(doorData);
         }
 
-        ObjectGuid SkeramGUID;
-        ObjectGuid CThunGUID;
-        GuidVector CThunGraspGUIDs;
-
-        uint32 BugTrioDeathCount;
-        uint32 CthunPhase;
-
-        TaskScheduler scheduler;
-
         void Initialize() override
         {
             BugTrioDeathCount = 0;
-            CthunPhase = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
-                case NPC_SKERAM:
-                    SkeramGUID = creature->GetGUID();
-                    break;
                 case NPC_OURO_SPAWNER:
                     if (GetBossState(DATA_OURO) != DONE)
                         creature->Respawn();
@@ -97,7 +84,6 @@ public:
                         creature->Respawn(true);
                     break;
                 case NPC_CTHUN:
-                    CThunGUID = creature->GetGUID();
                     if (!creature->IsAlive())
                     {
                         for (ObjectGuid const& guid : CThunGraspGUIDs)
@@ -122,7 +108,7 @@ public:
             {
                 case GO_CTHUN_GRASP:
                     CThunGraspGUIDs.push_back(go->GetGUID());
-                    if (Creature* CThun = instance->GetCreature(CThunGUID))
+                    if (Creature* CThun = GetCreature(DATA_CTHUN))
                     {
                         if (!CThun->IsAlive())
                         {
@@ -163,6 +149,15 @@ public:
                         }
                     }
                     break;
+                case NPC_CTHUN:
+                    for (ObjectGuid const& guid : CThunGraspGUIDs)
+                    {
+                        if (GameObject* cthunGrasp = instance->GetGameObject(guid))
+                        {
+                            cthunGrasp->DespawnOrUnsummon(1s);
+                        }
+                    }
+                    break;
                 default:
                     break;
             }
@@ -174,21 +169,8 @@ public:
             {
                 case DATA_BUG_TRIO_DEATH:
                     return BugTrioDeathCount;
-
-                case DATA_CTHUN_PHASE:
-                    return CthunPhase;
             }
             return 0;
-        }
-
-        ObjectGuid GetGuidData(uint32 identifier) const override
-        {
-            switch (identifier)
-            {
-                case DATA_SKERAM:
-                    return SkeramGUID;
-            }
-            return ObjectGuid::Empty;
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -200,19 +182,6 @@ public:
                         ++BugTrioDeathCount;
                     else
                         BugTrioDeathCount = 0;
-                    break;
-                case DATA_CTHUN_PHASE:
-                    CthunPhase = data;
-                    if (data == PHASE_CTHUN_DONE)
-                    {
-                        for (ObjectGuid const& guid : CThunGraspGUIDs)
-                        {
-                            if (GameObject* cthunGrasp = instance->GetGameObject(guid))
-                            {
-                                cthunGrasp->DespawnOrUnsummon(1s);
-                            }
-                        }
-                    }
                     break;
                 default:
                     break;
@@ -244,33 +213,15 @@ public:
         {
             scheduler.Update(diff);
         }
+
+    private:
+        GuidVector CThunGraspGUIDs;
+        uint32 BugTrioDeathCount;
+        TaskScheduler scheduler;
     };
-};
-
-// 4052, At Battleguard Sartura
-class at_battleguard_sartura : public AreaTriggerScript
-{
-public:
-    at_battleguard_sartura() : AreaTriggerScript("at_battleguard_sartura") { }
-
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
-    {
-        if (InstanceScript* instance = player->GetInstanceScript())
-        {
-            if (Creature* sartura = instance->GetCreature(DATA_SARTURA))
-            {
-                if (sartura->IsAlive())
-                {
-                    sartura->SetInCombatWith(player);
-                }
-            }
-        }
-        return true;
-    }
 };
 
 void AddSC_instance_temple_of_ahnqiraj()
 {
     new instance_temple_of_ahnqiraj();
-    new at_battleguard_sartura();
 }
