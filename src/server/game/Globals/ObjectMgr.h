@@ -691,6 +691,8 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 #define MAX_CHARTER_NAME         24                         // max allowed by client name length
 #define MAX_CHANNEL_NAME         50                         // pussywizard
 
+bool ReservedNames(std::wstring& name);
+bool ProfanityNames(std::wstring& name);
 bool normalizePlayerName(std::string& name);
 
 struct LanguageDesc
