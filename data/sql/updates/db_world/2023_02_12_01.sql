@@ -1,3 +1,4 @@
+-- DB update 2023_02_12_00 -> 2023_02_12_01
 --
 DROP TABLE IF EXISTS `namesreserved_dbc`;
 CREATE TABLE `namesreserved_dbc` (
