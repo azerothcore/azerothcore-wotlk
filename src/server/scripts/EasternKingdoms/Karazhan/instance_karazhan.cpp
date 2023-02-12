@@ -46,6 +46,7 @@ public:
     {
         instance_karazhan_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
