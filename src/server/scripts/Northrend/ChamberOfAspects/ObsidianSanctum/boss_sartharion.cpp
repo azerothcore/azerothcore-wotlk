@@ -1305,7 +1305,7 @@ public:
 
                     if (Creature* acolyte = me->SummonCreature((isCalledBySartharion ? NPC_ACOLYTE_OF_SHADRON : NPC_DISCIPLE_OF_SHADRON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
                     {
-                        // TODO: inpect JustSummoned
+                        /// @todo: inpect JustSummoned
                         summons.Summon(acolyte);
                         acolyte->SetPhaseMask(16, true);
                     }

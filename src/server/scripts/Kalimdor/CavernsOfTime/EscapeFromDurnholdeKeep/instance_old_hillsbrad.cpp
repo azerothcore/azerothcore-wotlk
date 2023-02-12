@@ -251,7 +251,7 @@ public:
                         {
                             drake->AI()->Talk(0);
                         }
-                        [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                        [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                     }
                 case EVENT_THRALL_REPOSITION:
                     {
