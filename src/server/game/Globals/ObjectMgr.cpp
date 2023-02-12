@@ -205,6 +205,13 @@ std::string ScriptInfo::GetDebugInfo() const
     return std::string(sz);
 }
 
+/**
+ * @name ReservedNames
+ * @brief Checks NamesReserved.dbc for reserved names
+ *
+ * @param name Name to check for match in NamesReserved.dbc
+ * @return true/false
+ */
 bool ReservedNames(std::wstring& name)
 {
     for (NamesReservedEntry const* reservedStore : sNamesReservedStore)
@@ -226,6 +233,13 @@ bool ReservedNames(std::wstring& name)
     return false;
 };
 
+/**
+ * @name ProfanityNames
+ * @brief Checks NamesProfanity.dbc for reserved names
+ *
+ * @param name Name to check for match in NamesProfanity.dbc
+ * @return true/false
+ */
 bool ProfanityNames(std::wstring& name)
 {
     for (NamesProfanityEntry const* profanityStore : sNamesProfanityStore)
