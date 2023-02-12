@@ -718,9 +718,9 @@ void World::LoadConfigSettings(bool reload)
     else
         _int_configs[CONFIG_REALM_ZONE] = sConfigMgr->GetOption<int32>("RealmZone", REALM_ZONE_DEVELOPMENT);
 
+    _bool_configs[CONFIG_STRICT_NAMES_RESERVED]               = sConfigMgr->GetOption<bool>  ("StrictNames.Reserved", true);
+    _bool_configs[CONFIG_STRICT_NAMES_PROFANITY]              = sConfigMgr->GetOption<bool>  ("StrictNames.Profanity", true);
     _int_configs[CONFIG_STRICT_PLAYER_NAMES]                  = sConfigMgr->GetOption<int32> ("StrictPlayerNames",  0);
-    _bool_configs[CONFIG_STRICT_PLAYER_NAMES_RESERVED]        = sConfigMgr->GetOption<bool>  ("StrictPlayerNames.Reserved", true);
-    _bool_configs[CONFIG_STRICT_PLAYER_NAMES_PROFANITY]       = sConfigMgr->GetOption<bool>  ("StrictPlayerNames.Profanity", true);
     _int_configs[CONFIG_STRICT_CHARTER_NAMES]                 = sConfigMgr->GetOption<int32> ("StrictCharterNames", 0);
     _int_configs[CONFIG_STRICT_CHANNEL_NAMES]                 = sConfigMgr->GetOption<int32> ("StrictChannelNames", 0);
     _int_configs[CONFIG_STRICT_PET_NAMES]                     = sConfigMgr->GetOption<int32> ("StrictPetNames",     0);

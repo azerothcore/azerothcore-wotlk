@@ -205,6 +205,48 @@ std::string ScriptInfo::GetDebugInfo() const
     return std::string(sz);
 }
 
+bool ReservedNames(std::wstring& name)
+{
+    for (NamesReservedEntry const* reservedStore : sNamesReservedStore)
+    {
+        std::wstring PatternString;
+
+        Utf8toWStr(reservedStore->Pattern, PatternString);
+
+        boost::algorithm::replace_all(PatternString, "\\<", "");
+        boost::algorithm::replace_all(PatternString, "\\>", "");
+
+        int stringCompare = name.compare(PatternString);
+        if (stringCompare == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+bool ProfanityNames(std::wstring& name)
+{
+    for (NamesProfanityEntry const* profanityStore : sNamesProfanityStore)
+    {
+        std::wstring PatternString;
+
+        Utf8toWStr(profanityStore->Pattern, PatternString);
+
+        boost::algorithm::replace_all(PatternString, "\\<", "");
+        boost::algorithm::replace_all(PatternString, "\\>", "");
+
+        int stringCompare = name.compare(PatternString);
+        if (stringCompare == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool normalizePlayerName(std::string& name)
 {
     if (name.empty())
@@ -8256,42 +8298,20 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
     }
 
     // Check for Reserved Name from DBC
-    if (sWorld->getBoolConfig(CONFIG_STRICT_PLAYER_NAMES_RESERVED))
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_RESERVED))
     {
-        for (NamesReservedEntry const* reservedStore : sNamesReservedStore)
+        if (ReservedNames(wname))
         {
-            std::wstring PatternString;
-
-            Utf8toWStr(reservedStore->Pattern, PatternString);
-
-            boost::algorithm::replace_all(PatternString, "\\<", "");
-            boost::algorithm::replace_all(PatternString, "\\>", "");
-
-            int stringCompare = wname.compare(PatternString);
-            if (stringCompare == 0)
-            {
-                return CHAR_NAME_RESERVED;
-            }
+            return CHAR_NAME_RESERVED;
         }
     }
 
     // Check for Profanity
-    if (sWorld->getBoolConfig(CONFIG_STRICT_PLAYER_NAMES_PROFANITY))
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_PROFANITY))
     {
-        for (NamesProfanityEntry const* profanityStore : sNamesProfanityStore)
+        if (ProfanityNames(wname))
         {
-            std::wstring PatternString;
-
-            Utf8toWStr(profanityStore->Pattern, PatternString);
-
-            boost::algorithm::replace_all(PatternString, "\\<", "");
-            boost::algorithm::replace_all(PatternString, "\\>", "");
-
-            int stringCompare = wname.compare(PatternString);
-            if (stringCompare == 0)
-            {
-                return CHAR_NAME_PROFANE;
-            }
+            return CHAR_NAME_PROFANE;
         }
     }
 
@@ -8310,6 +8330,24 @@ bool ObjectMgr::IsValidCharterName(std::string_view name)
     uint32 minName = sWorld->getIntConfig(CONFIG_MIN_CHARTER_NAME);
     if (wname.size() < minName)
         return false;
+
+    // Check for Reserved Name from DBC
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_RESERVED))
+    {
+        if (ReservedNames(wname))
+        {
+            return false;
+        }
+    }
+
+    // Check for Profanity
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_PROFANITY))
+    {
+        if (ProfanityNames(wname))
+        {
+            return false;
+        }
+    }
 
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_CHARTER_NAMES);
 
@@ -8346,6 +8384,24 @@ PetNameInvalidReason ObjectMgr::CheckPetName(std::string_view name)
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_PET_NAMES);
     if (!isValidString(wname, strictMask, false))
         return PET_NAME_MIXED_LANGUAGES;
+
+    // Check for Reserved Name from DBC
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_RESERVED))
+    {
+        if (ReservedNames(wname))
+        {
+            return PET_NAME_RESERVED;
+        }
+    }
+
+    // Check for Profanity
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_PROFANITY))
+    {
+        if (ProfanityNames(wname))
+        {
+            return PET_NAME_PROFANE;
+        }
+    }
 
     return PET_NAME_SUCCESS;
 }
