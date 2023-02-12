@@ -22,6 +22,8 @@
 #include "CreatureAIImpl.h"
 #include "SpellScript.h"
 
+#define DataHeader "ZF"
+
 #define ZFScriptName "instance_zulfarrak"
 
 enum ZulFarrakCreatures

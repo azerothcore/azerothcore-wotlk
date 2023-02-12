@@ -20,6 +20,7 @@
 
 #include "CreatureAIImpl.h"
 
+#define DataHeader "AQT"
 #define TempleOfAhnQirajScriptName "instance_temple_of_ahnqiraj"
 
 enum DataTypes

@@ -21,6 +21,8 @@
 #include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
 
+#define DataHeader "FOS"
+
 #define ForgeOfSoulsScriptName "instance_forge_of_souls"
 
 enum Data

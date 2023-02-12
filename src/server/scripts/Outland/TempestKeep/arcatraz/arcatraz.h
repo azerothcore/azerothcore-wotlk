@@ -23,6 +23,8 @@
 #include "Player.h"
 #include "SpellScript.h"
 
+#define DataHeader "AZ"
+
 #define ArcatrazScriptName "instance_arcatraz"
 
 enum DataTypes

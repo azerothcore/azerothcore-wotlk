@@ -60,6 +60,7 @@ public:
     {
         instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_BOSS_NUMBER);
             LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);

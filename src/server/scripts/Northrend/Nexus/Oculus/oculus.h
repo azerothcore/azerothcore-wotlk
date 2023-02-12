@@ -23,6 +23,8 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
+#define DataHeader "OC"
+
 #define OculusScriptName "instance_oculus"
 
 Position const VerdisaPOS = { 949.056f, 1032.97f, 359.967f, 1.035795f };
