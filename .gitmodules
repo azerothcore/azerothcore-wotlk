@@ -40,3 +40,6 @@
 [submodule "modules/mod-challenge-modes"]
 	path = modules/mod-challenge-modes
 	url = git@github.com:AlvinZhu/mod-challenge-modes.git
+[submodule "modules/mod-synthesize-trainer"]
+	path = modules/mod-synthesize-trainer
+	url = git@github.com:AlvinZhu/mod-synthesize-trainer.git

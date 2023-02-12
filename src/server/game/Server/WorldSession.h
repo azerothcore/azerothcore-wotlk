@@ -1109,6 +1109,9 @@ public:                                                 // opcodes handlers
         return _isBot;
     }
 
+    void SendTrainerList(ObjectGuid guid, uint32 npcspelli);
+    void SendTrainerList(ObjectGuid guid, std::string const& strTitle, uint32 npcspelli);
+
 private:
     void ProcessQueryCallbacks();
 
