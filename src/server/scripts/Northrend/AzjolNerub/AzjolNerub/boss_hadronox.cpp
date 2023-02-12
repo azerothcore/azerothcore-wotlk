@@ -155,6 +155,21 @@ public:
             return false;
         }
 
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            if ((!who || !who->IsControlledByPlayer()) && me->HealthBelowPct(70))
+            {
+                if (me->HealthBelowPctDamaged(5, damage))
+                {
+                    damage = 0;
+                }
+                else
+                {
+                    damage *= (me->GetHealthPct() - 5.0f) / 65.0f;
+                }
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())

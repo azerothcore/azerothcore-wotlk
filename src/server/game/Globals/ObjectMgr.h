@@ -672,6 +672,8 @@ typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
 typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
+typedef std::vector<uint32> CreatureCustomIDsContainer;
+
 enum SkillRangeType
 {
     SKILL_RANGE_LANGUAGE,                                   // 300..300
@@ -1020,6 +1022,7 @@ public:
     void LoadCreatureTemplateAddons();
     void LoadCreatureTemplateResistances();
     void LoadCreatureTemplateSpells();
+    void LoadCreatureCustomIDs();
     void CheckCreatureTemplate(CreatureTemplate const* cInfo);
     void CheckCreatureMovement(char const* table, uint64 id, CreatureMovementData& creatureMovement);
     void LoadGameObjectQuestItems();
@@ -1072,6 +1075,7 @@ public:
     void LoadPetLevelInfo();
     void LoadExplorationBaseXP();
     void LoadPetNames();
+    void LoadPetNamesLocales();
     void LoadPetNumber();
     void LoadFishingBaseSkillLevel();
     void ChangeFishingBaseSkillLevel(uint32 entry, int32 skill);
@@ -1095,6 +1099,7 @@ public:
     void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell);
 
     std::string GeneratePetName(uint32 entry);
+    std::string GeneratePetNameLocale(uint32 entry, LocaleConstant locale);
     uint32 GetBaseXP(uint8 level);
     [[nodiscard]] uint32 GetXPForLevel(uint8 level) const;
 
@@ -1207,7 +1212,7 @@ public:
     }
 
     [[nodiscard]] GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
-    [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
+    [[nodiscard]] GameObjectData const* GetGameObjectData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
         if (itr == _gameObjectDataStore.end()) return nullptr;
@@ -1546,6 +1551,9 @@ private:
     typedef std::map<uint32, std::vector<std::string>> HalfNameContainer;
     HalfNameContainer _petHalfName0;
     HalfNameContainer _petHalfName1;
+    typedef std::map<std::pair<uint32, LocaleConstant>, std::vector<std::string>> HalfNameContainerLocale;
+    HalfNameContainerLocale _petHalfLocaleName0;
+    HalfNameContainerLocale _petHalfLocaleName1;
 
     typedef std::unordered_map<uint32, ItemSetNameEntry> ItemSetNameContainer;
     ItemSetNameContainer _itemSetNameStore;
@@ -1555,6 +1563,7 @@ private:
     CellObjectGuids _emptyCellObjectGuids;
     CreatureDataContainer _creatureDataStore;
     CreatureTemplateContainer _creatureTemplateStore;
+    CreatureCustomIDsContainer _creatureCustomIDsStore;
     std::vector<CreatureTemplate*> _creatureTemplateStoreFast; // pussywizard
     CreatureModelContainer _creatureModelStore;
     CreatureAddonContainer _creatureAddonStore;

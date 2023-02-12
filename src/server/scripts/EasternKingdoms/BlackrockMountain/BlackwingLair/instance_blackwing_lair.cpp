@@ -241,7 +241,7 @@ public:
                     switch (state)
                     {
                         case FAIL:
-                            _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15 * 60 * IN_MILLISECONDS); //15min
+                            _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15min);
                             [[fallthrough]];
                         case NOT_STARTED:
                             if (Creature* nefarian = instance->GetCreature(nefarianGUID))
@@ -270,7 +270,7 @@ public:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
                         break;
                     case IN_PROGRESS:
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45s);
                         EggEvent = data;
                         EggCount = 0;
                         addsCount.fill(0);
@@ -305,7 +305,7 @@ public:
                                 razor->RemoveAurasDueToSpell(19832); // MindControl
                                 DoRemoveAurasDueToSpellOnPlayers(19832);
                             }
-                            _events.ScheduleEvent(EVENT_RAZOR_PHASE_TWO, 1000);
+                            _events.ScheduleEvent(EVENT_RAZOR_PHASE_TWO, 1s);
                             _events.CancelEvent(EVENT_RAZOR_SPAWN);
                         }
                         break;
