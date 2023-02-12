@@ -55,6 +55,7 @@ public:
     {
         boss_omor_the_unscarredAI(Creature* creature) : BossAI(creature, DATA_OMOR_THE_UNSCARRED)
         {
+            SetCombatMovement(false);
         }
 
         void Reset() override
