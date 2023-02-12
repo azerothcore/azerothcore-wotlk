@@ -640,6 +640,15 @@ World.RealmAvailability = 1
 
 StrictPlayerNames = 0
 
+
+#   StrictPlayerNames.Profanity
+#       Description: Use the Profanity Filter.
+#                    Prevents players from creating characters with profanity names.
+#       Default:     1 - Enabled
+#                    0 - Disabled
+
+StrictPlayerNames.Profanity = 1
+
 #
 #    StrictCharterNames
 #        Description: Limit guild/arena team charter names to language specific symbol set.

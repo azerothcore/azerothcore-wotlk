@@ -26,6 +26,7 @@
 #include "Config.h"
 #include "Containers.h"
 #include "DatabaseEnv.h"
+#include "DBCStructure.h"
 #include "DisableMgr.h"
 #include "GameObjectAIFactory.h"
 #include "GameEventMgr.h"
@@ -53,6 +54,7 @@
 #include "World.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
+#include <boost/algorithm/string.hpp>
 
 ScriptMapMap sSpellScripts;
 ScriptMapMap sEventScripts;
@@ -8187,6 +8189,26 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
     for (size_t i = 2; i < wname.size(); ++i)
         if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
             return CHAR_NAME_THREE_CONSECUTIVE;
+
+    // Check for Profanity
+    if (sWorld->getBoolConfig(CONFIG_STRICT_PLAYER_NAMES_PROFANITY))
+    {
+        for (NamesProfanityEntry const* profanityStore : sNamesProfanityStore)
+        {
+            std::wstring PatternString;
+
+            Utf8toWStr(profanityStore->Pattern, PatternString);
+
+            boost::algorithm::replace_all(PatternString, "\\<", "");
+            boost::algorithm::replace_all(PatternString, "\\>", "");
+
+            int stringCompare = wname.compare(PatternString);
+            if (stringCompare == 0)
+            {
+                return CHAR_NAME_PROFANE;
+            }
+        }
+    }
 
     return CHAR_NAME_SUCCESS;
 }
