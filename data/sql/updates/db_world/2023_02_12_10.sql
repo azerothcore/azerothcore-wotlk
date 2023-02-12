@@ -1,3 +1,4 @@
+-- DB update 2023_02_12_09 -> 2023_02_12_10
 --
 ALTER TABLE `creature_formations`
 	CHANGE COLUMN `dist` `dist` FLOAT NOT NULL DEFAULT '0' AFTER `memberGUID`,

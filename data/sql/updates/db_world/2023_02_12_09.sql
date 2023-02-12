@@ -1,3 +1,4 @@
+-- DB update 2023_02_12_08 -> 2023_02_12_09
 --
 
 DELETE FROM `creature` WHERE `guid` IN (125922, 125927, 125930, 125931, 125932, 126052, 1158) AND `id1`=19382; -- Wildhammer Gryphon Rider
