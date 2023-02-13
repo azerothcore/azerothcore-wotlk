@@ -56,6 +56,7 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             memset(&Encounter, 0, sizeof(Encounter));
 
             brannAchievement = false;
@@ -242,42 +243,22 @@ public:
                 SaveToDB();
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "H O S " << Encounter[0] << ' ' << Encounter[1] << ' ' << Encounter[2] << ' ' << Encounter[3] << ' ' << Encounter[4];
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
+            data >> Encounter[0];
+            data >> Encounter[1];
+            data >> Encounter[2];
+            data >> Encounter[3];
+            data >> Encounter[4];
         }
 
-        void Load(const char* strIn) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!strIn)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(strIn);
-
-            char dataHead1, dataHead2, dataHead3;
-
-            std::istringstream loadStream(strIn);
-            loadStream >> dataHead1 >> dataHead2 >> dataHead3;
-
-            if (dataHead1 == 'H' && dataHead2 == 'O' && dataHead3 == 'S')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                {
-                    loadStream >> Encounter[i];
-                    if( Encounter[i] == IN_PROGRESS )
-                        Encounter[i] = NOT_STARTED;
-                }
-            }
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << Encounter[0] << ' '
+                << Encounter[1] << ' '
+                << Encounter[2] << ' '
+                << Encounter[3] << ' '
+                << Encounter[4] << ' ';
         }
     };
 };

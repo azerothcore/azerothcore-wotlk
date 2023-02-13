@@ -2179,7 +2179,7 @@ void SpellMgr::LoadEnchantCustomAttr()
         if (!spellInfo)
             continue;
 
-        // TODO: find a better check
+        /// @todo: find a better check
         // Xinef: commented second part, fixes warlock enchants like firestone, spellstone
         if (!spellInfo->HasAttribute(SPELL_ATTR2_ENCHANT_OWN_ITEM_ONLY)/* || !spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFTED)*/)
             continue;
@@ -3029,7 +3029,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                     spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_HEALTH_FUNNEL ||
                                     spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DUMMY)
                                 continue;
-                            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                            [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                         default:
                             if (spellInfo->Effects[j].CalcValue() || ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) && !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES)))
                                 if (spellInfo->Id != 69649 && spellInfo->Id != 71056 && spellInfo->Id != 71057 && spellInfo->Id != 71058 && spellInfo->Id != 73061 && spellInfo->Id != 73062 && spellInfo->Id != 73063 && spellInfo->Id != 73064) // Sindragosa Frost Breath

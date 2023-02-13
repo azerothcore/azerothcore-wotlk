@@ -346,7 +346,7 @@ class spell_ahn_kahet_swarmer_aura : public SpellScript
             }
             else if (_targetCount)
             {
-                // TODO: move spell id to enum
+                /// @todo: move spell id to enum
                 caster->CastCustomSpell(SPELL_SWARM, SPELLVALUE_AURA_STACK, _targetCount, caster, true);
                 if (Aura *aur = caster->GetAura(SPELL_SWARM))
                 {

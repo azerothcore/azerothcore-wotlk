@@ -27,6 +27,8 @@
 #include "Player.h"
 #include "SpellScript.h"
 
+#define DataHeader "RS"
+
 #define RubySanctumScriptName "instance_ruby_sanctum"
 
 enum DataTypes

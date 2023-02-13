@@ -627,6 +627,24 @@ RealmZone = 1
 World.RealmAvailability = 1
 
 #
+#   StrictNames.Reserved
+#       Description: Use the Reserved Filter from DBC.
+#                    Prevents Player, Pet & Charter names from containing reserved names.
+#       Default:     1 - Enabled
+#                    0 - Disabled
+
+StrictNames.Reserved = 1
+
+#
+#   StrictNames.Profanity
+#       Description: Use the Profanity Filter from DBC.
+#                    Prevents Player, Pet & Charter names from containing profanity.
+#       Default:     1 - Enabled
+#                    0 - Disabled
+
+StrictNames.Profanity = 1
+
+#
 #    StrictPlayerNames
 #        Description: Limit player name to language specific symbol set. Prevents character
 #                     creation and forces rename request if not allowed symbols are used
@@ -3819,6 +3837,14 @@ QuestPOI.Enabled = 1
 #        Example:     If set to 10000, the maximum amount of money allowed on the character would be 1 gold.
 
 ChangeFaction.MaxMoney = 0
+
+#
+#     Pet.RankMod.Health
+#        Description: Allows pet health to be modified by rank health rates (set in config)
+#        Default:     1 - Enabled
+#                     0 - Disabled
+
+Pet.RankMod.Health = 1
 
 #
 ###################################################################################################

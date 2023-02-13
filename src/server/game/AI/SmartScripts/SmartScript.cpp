@@ -3367,6 +3367,33 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             }
             break;
         }
+        case SMART_TARGET_INSTANCE_STORAGE:
+        {
+            if (InstanceScript* instance = GetBaseObject()->GetInstanceScript())
+            {
+                if (e.target.instanceStorage.type == 1)
+                {
+                    if (Creature* creature = instance->GetCreature(e.target.instanceStorage.index))
+                    {
+                        targets.push_back(creature);
+                    }
+                }
+                else if (e.target.instanceStorage.type == 2)
+                {
+                    if (GameObject* go = instance->GetGameObject(e.target.instanceStorage.index))
+                    {
+                        targets.push_back(go);
+                    }
+                }
+            }
+            else
+            {
+                LOG_ERROR("scripts.ai.sai", "SMART_TARGET_INSTANCE_STORAGE: Entry {} SourceType {} Event {} Action {} Target {} called outside an instance map.",
+                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+            }
+
+            break;
+        }
         case SMART_TARGET_NONE:
         case SMART_TARGET_POSITION:
         default:

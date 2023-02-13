@@ -161,7 +161,7 @@ enum GuildEvents
     GE_RANK_DELETED                     = 11,
     GE_SIGNED_ON                        = 12,
     GE_SIGNED_OFF                       = 13,
-    GE_GUILDBANKBAGSLOTS_CHANGED        = 14,   /// TODO: Sent when items are moved in gbank - all players with bank open will send tab query
+    GE_GUILDBANKBAGSLOTS_CHANGED        = 14,   /// @todo: Sent when items are moved in gbank - all players with bank open will send tab query
     GE_BANK_TAB_PURCHASED               = 15,
     GE_BANK_TAB_UPDATED                 = 16,
     GE_BANK_MONEY_SET                   = 17,

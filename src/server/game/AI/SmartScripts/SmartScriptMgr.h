@@ -641,22 +641,22 @@ enum SMART_ACTION
     SMART_ACTION_SET_CORPSE_DELAY                   = 116,    // timer
     SMART_ACTION_DISABLE_EVADE                      = 117,    // 0/1 (1 = disabled, 0 = enabled)
     SMART_ACTION_GO_SET_GO_STATE                    = 118,    // state
-    SMART_ACTION_SET_CAN_FLY                        = 119,    // TODO: NOT SUPPORTED YET
-    SMART_ACTION_REMOVE_AURAS_BY_TYPE               = 120,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_SET_CAN_FLY                        = 119,    /// @todo: NOT SUPPORTED YET
+    SMART_ACTION_REMOVE_AURAS_BY_TYPE               = 120,    /// @todo: NOT SUPPORTED YET
     SMART_ACTION_SET_SIGHT_DIST                     = 121,    // sightDistance
     SMART_ACTION_FLEE                               = 122,    // fleeTime
     SMART_ACTION_ADD_THREAT                         = 123,    // +threat, -threat
     SMART_ACTION_LOAD_EQUIPMENT                     = 124,    // id
     SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT         = 125,    // id min range, id max range
     SMART_ACTION_REMOVE_ALL_GAMEOBJECTS             = 126,
-    SMART_ACTION_REMOVE_MOVEMENT                    = 127,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_REMOVE_MOVEMENT                    = 127,    /// @todo: NOT SUPPORTED YET
     SMART_ACTION_PLAY_ANIMKIT                       = 128,    // don't use on 3.3.5a
     SMART_ACTION_SCENE_PLAY                         = 129,    // don't use on 3.3.5a
     SMART_ACTION_SCENE_CANCEL                       = 130,    // don't use on 3.3.5a
-    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    // TODO: NOT SUPPORTED YET
-    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // TODO: NOT SUPPORTED YET
-    SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    // TODO: NOT SUPPORTED YET
-    // SMART_ACTION_INVOKER_CAST                    = 134,    // TODO: solve name conflicts
+    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    /// @todo: NOT SUPPORTED YET
+    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    /// @todo: NOT SUPPORTED YET
+    SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    /// @todo: NOT SUPPORTED YET
+    // SMART_ACTION_INVOKER_CAST                    = 134,    /// @todo: solve name conflicts
     SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry, cinematic
     SMART_ACTION_SET_MOVEMENT_SPEED                 = 136,    // movementType, speedInteger, speedFraction
 
@@ -1426,6 +1426,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_RANDOM_POINT                   = 202,  // range, amount (for summoning creature), self als middle (0/1) else use xyz
     SMART_TARGET_ROLE_SELECTION                 = 203,  // Range Max, TargetMask (Tanks (1), Healer (2) Damage (4)), resize list
     SMART_TARGET_SUMMONED_CREATURES             = 204,  // Entry
+    SMART_TARGET_INSTANCE_STORAGE               = 205,  // Instance data index, Type (creature (1), gameobject (2))
 
     SMART_TARGET_AC_END                         = 205   // placeholder
 };
@@ -1595,6 +1596,12 @@ struct SmartTarget
             uint32 param3;
             uint32 param4;
         } raw;
+
+        struct
+        {
+            uint32 index;
+            uint32 type;
+        } instanceStorage;
     };
 };
 
