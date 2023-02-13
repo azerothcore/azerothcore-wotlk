@@ -21,6 +21,8 @@
 #include "Chat.h"
 #include "CreatureAIImpl.h"
 
+#define DataHeader "POS"
+
 #define PitOfSaronScriptName "instance_pit_of_saron"
 
 enum DataTypes

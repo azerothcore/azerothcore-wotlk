@@ -31,6 +31,7 @@ public:
     {
         instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap), canSaveBossStates(false)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
             teldaramSpheres.fill(NOT_STARTED);
         }
@@ -172,62 +173,18 @@ public:
             return ObjectGuid::Empty;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            // Encounter states
-            saveStream << "A K " << GetBossSaveData();
-
-            // Extra data
-            saveStream << teldaramSpheres[0] << ' ' << teldaramSpheres[1];
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(const char* in) override
-        {
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'A' && dataHead2 == 'K')
-            {
-                // Encounter states
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                    {
-                        tmpState = NOT_STARTED;
-                    }
-
-                    SetBossState(i, EncounterState(tmpState));
-                }
-
-                // Extra data
-                loadStream >> teldaramSpheres[0] >> teldaramSpheres[1];
-            }
-            else
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
+            data >> teldaramSpheres[0];
+            data >> teldaramSpheres[1];
 
             canSaveBossStates = true;
-            OUT_LOAD_INST_DATA_COMPLETE;
+        }
+
+        void WriteSaveDataMore(std::ostringstream& data) override
+        {
+            data << teldaramSpheres[0] << ' '
+                << teldaramSpheres[1];
         }
 
     private:

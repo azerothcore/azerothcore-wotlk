@@ -572,6 +572,28 @@ class spell_nullify : public AuraScript
     }
 };
 
+// 4052, At Battleguard Sartura
+class at_battleguard_sartura : public AreaTriggerScript
+{
+public:
+    at_battleguard_sartura() : AreaTriggerScript("at_battleguard_sartura") { }
+
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (Creature* sartura = instance->GetCreature(DATA_SARTURA))
+            {
+                if (sartura->IsAlive())
+                {
+                    sartura->SetInCombatWith(player);
+                }
+            }
+        }
+        return true;
+    }
+};
+
 void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
@@ -582,4 +604,5 @@ void AddSC_temple_of_ahnqiraj()
     RegisterTempleOfAhnQirajCreatureAI(npc_ahnqiraji_critter);
     RegisterSpellScript(spell_aggro_drones);
     RegisterSpellScript(spell_nullify);
+    new at_battleguard_sartura();
 }

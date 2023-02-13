@@ -33,6 +33,7 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             _gongPhase = 0;
             _firesState = 0;
         }
@@ -70,27 +71,15 @@ public:
             SaveToDB();
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            std::ostringstream saveStream;
-            saveStream << "R D " << _gongPhase << ' ' << _firesState;
-            return saveStream.str();
+            data >> _gongPhase;
+            data >> _firesState;
         }
 
-        void Load(const char* str) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!str)
-                return;
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'R' && dataHead2 == 'D')
-            {
-                loadStream >> _gongPhase;
-                loadStream >> _firesState;
-            }
+            data << _gongPhase << ' ' << _firesState;
         }
 
     private:

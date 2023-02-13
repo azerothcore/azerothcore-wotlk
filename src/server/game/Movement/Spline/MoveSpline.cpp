@@ -147,7 +147,7 @@ namespace Movement
             spline.initLengths(init);
         }
 
-        // TODO: what to do in such cases? problem is in input data (all points are at same coords)
+        /// @todo: what to do in such cases? problem is in input data (all points are at same coords)
         if (spline.length() < minimal_duration)
         {
             spline.set_length(spline.last(), spline.isCyclic() ? 1000 : 1);
