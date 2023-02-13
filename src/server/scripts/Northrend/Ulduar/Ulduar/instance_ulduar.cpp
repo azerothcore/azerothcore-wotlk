@@ -714,6 +714,21 @@ public:
                         m_hodirHardmodeChest.Clear();
                     }
                     break;
+                case TYPE_HODIR_HM_RESET:
+                    if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
+                    {
+                        LOG_ERROR("module", "发现宝箱未损坏,跳过");
+                        break;
+                    }
+                    if (m_auiEncounter[TYPE_HODIR] != DONE)
+                    {
+                        if (Creature* hodir = instance->GetCreature(m_uiHodirGUID))
+                        {
+                            LOG_ERROR("module", "发现宝箱损坏,重新召唤");
+                            SpawnHodirChests(instance->GetDifficulty(), hodir);
+                        }
+                    }
+                    break;
                 case TYPE_WATCHERS:
                     m_auiEncounter[type] |= 1 << data;
                     break;

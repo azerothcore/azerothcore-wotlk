@@ -653,7 +653,8 @@ public:
                 case BOSS_SAPPHIRON:
                     if (!AreAllWingsCleared())
                     {
-                        return false;
+                        //开奥杜尔后删除下层boss击杀要求
+                        //return false;
                     }
                     break;
                 default:

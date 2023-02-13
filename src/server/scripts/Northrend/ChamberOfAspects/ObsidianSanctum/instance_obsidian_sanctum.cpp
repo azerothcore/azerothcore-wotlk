@@ -48,11 +48,11 @@ public:
 
         bool IsEncounterInProgress() const override
         {
-            for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-            {
-                if (GetBossState(i) == IN_PROGRESS)
-                    return true;
-            }
+            //for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+            //{
+            //    if (GetBossState(i) == IN_PROGRESS)
+            //        return true;
+            //}
 
             return false;
         }

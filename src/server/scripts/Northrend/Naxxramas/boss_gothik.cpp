@@ -252,6 +252,7 @@ public:
 
         void EnterCombat(Unit* who) override
         {
+            LOG_ERROR("module", "收割者战斗开始");
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             Talk(SAY_INTRO_1);
