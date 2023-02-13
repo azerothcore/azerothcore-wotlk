@@ -70,7 +70,7 @@ void CombatAI::JustDied(Unit* killer)
 
 /**
  * @brief Called for reaction when initially engaged
- * 
+ *
  * @param who Who 'me' Engaged combat with
  */
 void CombatAI::JustEngagedWith(Unit* who)
@@ -121,7 +121,7 @@ void CasterAI::InitializeAI()
 
 /**
  * @brief Called for reaction when initially engaged
- * 
+ *
  * @param who Who 'me' Engaged combat with
  */
 void CasterAI::JustEngagedWith(Unit* who)

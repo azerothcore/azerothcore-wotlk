@@ -342,7 +342,7 @@ public:
 
     /**
      * @brief Called when the unit leaves combat
-     * 
+     *
      * @todo Never invoked right now. Preparation for Combat Threat refactor
      */
     virtual void JustExitedCombat() { }
