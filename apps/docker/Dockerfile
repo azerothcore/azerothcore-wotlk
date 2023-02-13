@@ -144,7 +144,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 RUN apt update && \
     apt install -y \ 
       libmysqlclient21 libreadline8 \
-      # Get envsubst and expect
       gettext-base expect mysql-client && \
     rm -rf /var/lib/apt/lists/*
 
