@@ -363,7 +363,7 @@ public:
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_STATIC_DISRUPTION:
-                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MinDistance, 0, 0, true))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0, true))
                         me->CastSpell(pTarget, SPELL_STATIC_DISRUPTION, false);
 
                     events.RepeatEvent(urand(20000, 40000));
