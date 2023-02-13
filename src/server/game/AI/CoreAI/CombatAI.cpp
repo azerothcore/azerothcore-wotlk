@@ -68,6 +68,11 @@ void CombatAI::JustDied(Unit* killer)
             me->CastSpell(killer, *i, true);
 }
 
+/**
+ * @brief Called for reaction when initially engaged
+ * 
+ * @param who Who 'me' Engaged combat with
+ */
 void CombatAI::JustEngagedWith(Unit* who)
 {
     for (SpellVct::iterator i = spells.begin(); i != spells.end(); ++i)
@@ -114,6 +119,11 @@ void CasterAI::InitializeAI()
         m_attackDist = MELEE_RANGE;
 }
 
+/**
+ * @brief Called for reaction when initially engaged
+ * 
+ * @param who Who 'me' Engaged combat with
+ */
 void CasterAI::JustEngagedWith(Unit* who)
 {
     if (spells.empty())

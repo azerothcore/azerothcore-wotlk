@@ -332,11 +332,19 @@ public:
             targetList.resize(num);
     }
 
-    // Called when the unit enters combat
-    // (NOTE: Creature engage logic should NOT be here, but in JustEngagedWith, which happens once threat is established!)
+    /**
+     * @brief Called when the unit enters combat
+     * (NOTE: Creature engage logic should NOT be here, but in JustEngagedWith, which happens once threat is established!)
+     *
+     * @todo Never invoked right now. Preparation for Combat Threat refactor
+     */
     virtual void JustEnteredCombat(Unit* /*who*/) { }
 
-    // Called when the unit leaves combat
+    /**
+     * @brief Called when the unit leaves combat
+     * 
+     * @todo Never invoked right now. Preparation for Combat Threat refactor
+     */
     virtual void JustExitedCombat() { }
 
     // Called at any Damage to any victim (before damage apply)

@@ -116,7 +116,9 @@ public:
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
-    // Called for reaction when initially engaged
+    /**
+     * @brief Called for reaction when initially engaged
+     */
     virtual void JustEngagedWith(Unit* /*who*/) {}
 
     // Called when the creature is killed
