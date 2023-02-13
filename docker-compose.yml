@@ -201,7 +201,7 @@ services:
       ac-db-import:
         condition: service_completed_successfully
       ac-client-data:
-        condition: service_started
+        condition: service_completed_successfully
     stop_grace_period: 1m
 
   ac-authserver:

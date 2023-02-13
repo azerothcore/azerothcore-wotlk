@@ -4,7 +4,14 @@ ARG UBUNTU_VERSION=20.04
 # Create Directory tree
 FROM ubuntu:$UBUNTU_VERSION as skeleton
 
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG DOCKER_USER=acore
+
 ENV DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /azerothcore
+
 RUN mkdir -pv /azerothcore/apps                  \
               /azerothcore/bin                   \
               /azerothcore/conf                  \
@@ -31,6 +38,11 @@ RUN mkdir -pv /azerothcore/apps                  \
 RUN apt update && \
     apt install -y tzdata ca-certificates && \
     rm -rf /var/lib/apt/lists/*
+
+RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
+    useradd -d /azerothcore --uid "$USER_ID"  --gid "$GROUP_ID"  "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    chown -R "$DOCKER_USER:$DOCKER_USER" /azerothcore
 
 # Build Applications
 
@@ -115,9 +127,6 @@ RUN --mount=type=cache,target=/azerothcore/var/ccache \
 
 FROM skeleton as runtime
 
-ARG USER_ID=1000
-ARG GROUP_ID=1000
-ARG DOCKER_USER=acore
 ARG TZ Etc/UTC
 
 ENV TZ $TZ
@@ -135,10 +144,6 @@ RUN apt update && \
       # Get envsubst and expect
       gettext-base expect mysql-client && \
     rm -rf /var/lib/apt/lists/*
-
-RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
-    useradd -d /azerothcore --uid "$USER_ID"  --gid "$GROUP_ID"  "$DOCKER_USER" && \
-    passwd -d $DOCKER_USER
 
 COPY apps/docker/entrypoint.sh /entrypoint.sh
 
@@ -248,9 +253,6 @@ CMD /azerothcore/env/dist/bin/dbimport
 ###############
 
 FROM skeleton as client-data
-ARG USER_ID=1000
-ARG GROUP_ID=1000
-ARG DOCKER_USER=acore
 
 LABEL description="AzerothCore client-data"
 
@@ -258,23 +260,15 @@ RUN apt update && \
     apt install -y curl unzip && \
     rm -rf /var/lib/apt/lists/*
 
-# set timezone environment variable
-ENV TZ=Etc/UTC
-
-# set noninteractive mode so tzdata doesn't ask to set timezone on install
-ENV DEBIAN_FRONTEND=noninteractive
-
 COPY --chown=$DOCKER_USER:$DOCKER_USER apps apps
 
-RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
-    useradd -d /azerothcore --uid "$USER_ID"  --gid "$GROUP_ID"  "$DOCKER_USER" && \
-    passwd -d "$DOCKER_USER"
-
-ARG CACHEBUST=1
-USER $DOCKER_USER
 COPY --chown=$DOCKER_USER:$DOCKER_USER \
   apps/docker/client-data.sh /azerothcore/apps/docker/client-data.sh
 
 RUN chmod +x /azerothcore/apps/docker/client-data.sh
+
+VOLUME /azerothcore/env/dist/data
+
+USER $DOCKER_USER
 
 CMD /azerothcore/apps/docker/client-data.sh 
