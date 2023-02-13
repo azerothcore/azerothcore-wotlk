@@ -45,16 +45,15 @@ struct boss_zereketh_the_unbound : public BossAI
         });
     }
 
-<<<<<<< Updated upstream
     void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
         Talk(SAY_DEATH);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(6s, [this](TaskContext context)
@@ -62,18 +61,6 @@ struct boss_zereketh_the_unbound : public BossAI
             DoCastRandomTarget(SPELL_VOID_ZONE, 0, 60.0f);
             context.Repeat(15s);
         }).Schedule(10s, [this](TaskContext context)
-=======
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            _JustEngagedWith();
-            events.ScheduleEvent(EVENT_VOID_ZONE, 6000);
-            events.ScheduleEvent(EVENT_SHADOW_NOVA, 10000);
-            events.ScheduleEvent(EVENT_SEED_OF_CORRUPTION, 16000);
-            Talk(SAY_AGGRO);
-        }
-
-        void KilledUnit(Unit* victim) override
->>>>>>> Stashed changes
         {
             DoCastAOE(SPELL_SHADOW_NOVA);
             if (roll_chance_i(50))
