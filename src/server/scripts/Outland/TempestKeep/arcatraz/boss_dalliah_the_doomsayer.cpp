@@ -77,9 +77,9 @@ struct boss_dalliah_the_doomsayer : public BossAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
         if (Creature* soccothrates = instance->GetCreature(DATA_SOCCOTHRATES))
