@@ -189,6 +189,7 @@ function comp_all() {
 # conf_layer FILENAME FILENAME
 # Layer the configuration parameters from the first argument onto the second argument
 function conf_layer() {
+  set -x
   LAYER="$1"
   BASE="$2"
   COMMENT="$3"
@@ -197,15 +198,14 @@ function conf_layer() {
   grep -E "^[a-zA-Z\.0-9]+\s*=.*$" "$LAYER" \
     | while read -r param
       do
-        # remove spaces from param
-        # foo       = bar becomes foo=bar
-        NOSPACE="$(tr -d '[:space:]' <<< "$param")"
-
         # split into key and value
-        KEY="$(cut -f1 -d= <<< "$NOSPACE")"
-        VAL="$(cut -f2 -d= <<< "$NOSPACE")"
+        # KEY is basically everything between beginning of line and =
+        # Need to remove extra spaces
+        KEY="$(cut -f1 -d= <<< "$param" | tr -d '[:space:]')"
+        # VAL can have spaces in it, but we can clean it up to remove trailing and leading whitespace
+        VAL="$(cut -f2 -d= <<< "$param" | grep -oE "^[^#]+" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
         # if key in base and val not in line
-        if grep -qE "^$KEY" "$BASE" && ! grep -qE "^$KEY.*=.*$VAL" "$BASE"; then
+        if grep -qE "^$KEY" "$BASE" && ! grep -qE "^$KEY\s*=\s*$VAL" "$BASE"  ; then
           # Replace line
           # Prevent issues with shell quoting 
           sed -i \
@@ -217,4 +217,5 @@ function conf_layer() {
         fi
       done
   echo "Layered $LAYER onto $BASE"
+  set +x
 }
