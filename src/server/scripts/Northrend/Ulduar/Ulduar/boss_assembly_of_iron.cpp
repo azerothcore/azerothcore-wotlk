@@ -363,7 +363,7 @@ public:
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_STATIC_DISRUPTION:
-                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MinDistance, 0, 0, true))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0, true))
                         me->CastSpell(pTarget, SPELL_STATIC_DISRUPTION, false);
 
                     events.RepeatEvent(urand(20000, 40000));
@@ -856,8 +856,7 @@ public:
                     }
                 case EVENT_LIGHTNING_LAND:
                     {
-                        //float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
-                    float speed = 10.0f;
+                        float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                         events.ScheduleEvent(EVENT_LAND_LAND, 1000);
                         break;
