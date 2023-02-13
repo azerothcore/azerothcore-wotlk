@@ -751,6 +751,11 @@ public:
                         Position exitPos = me->GetPosition();
                         me->_ExitVehicle(&exitPos);
                         me->AttackStop();
+                        //结束后不可选中与攻击
+                        me->SetFaction(FACTION_FRIENDLY);
+                        me->SetImmuneToAll(true);
+                        me->SetReactState(REACT_PASSIVE);
+
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_TALK);
                         me->GetMotionMaster()->Clear();
                         summons.DoAction(1337); // despawn summons of summons
@@ -1474,6 +1479,7 @@ public:
                         spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
                         spinningUpTimer = 1500;
                         me->SetFacingTo(angle);
+                        p->CastSpell(p, 34400, true);//临时增加光柱显示
                         me->CastSpell(p, SPELL_SPINNING_UP, true);
                         if (Unit* vehicle = me->GetVehicleBase())
                         {
