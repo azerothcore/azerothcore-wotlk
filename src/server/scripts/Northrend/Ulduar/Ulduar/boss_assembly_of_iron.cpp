@@ -814,8 +814,8 @@ public:
                 {
                     if (me->GetDistance2d(flyTarget) >= 6)
                     {
-                        float speed = me->GetDistance(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ()+15.0f) / (1500.0f * 0.001f);
-                        me->MonsterMoveWithSpeed(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ()+15.0f, speed);
+                        //float speed = me->GetDistance(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ()+15) / (1500.0f * 0.001f);
+                        me->SendMonsterMove(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
                         me->SetPosition(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ(), flyTarget->GetOrientation());
                     }
                 }
@@ -861,7 +861,8 @@ public:
                         me->SetReactState(REACT_PASSIVE);
                         me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                         me->SetUnitFlag(UNIT_FLAG_STUNNED);
-                        me->GetMotionMaster()->MoveTakeoff(4, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, 10.0f);
+                        me->SendMonsterMove(oldVictim->GetPositionX(), oldVictim->GetPositionY(), oldVictim->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
+
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
                         me->CastSpell(me, 61883, true);
                         events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);
@@ -869,8 +870,7 @@ public:
                     }
                 case EVENT_LIGHTNING_LAND:
                     {
-                        //float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
-                    float speed = 10.0f;
+                        float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                         _flyPhase = false;
                         events.ScheduleEvent(EVENT_LAND_LAND, 1000);
