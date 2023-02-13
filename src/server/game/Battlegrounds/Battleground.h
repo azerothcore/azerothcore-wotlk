@@ -525,7 +525,7 @@ public:
     void HandleTriggerBuff(GameObject* gameObject);
     void SetHoliday(bool is_holiday);
 
-    /// @todo: make this protected:
+    // TODO: make this protected:
     typedef GuidVector BGObjects;
     typedef GuidVector BGCreatures;
     BGObjects BgObjects;

@@ -95,7 +95,7 @@ private:
 
     static std::string FormatInfluxDBTagValue(std::string const& value);
 
-    /// @todo: should format TagKey and FieldKey too in the same way as TagValue
+    // ToDo: should format TagKey and FieldKey too in the same way as TagValue
 
 public:
     Metric();

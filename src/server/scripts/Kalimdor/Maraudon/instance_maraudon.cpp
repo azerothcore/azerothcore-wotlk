@@ -32,7 +32,6 @@ public:
 
         void Initialize() override
         {
-            SetHeaders(DataHeader);
             memset(&_encounters, 0, sizeof(_encounters));
         }
 
@@ -60,14 +59,30 @@ public:
                 SaveToDB();
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> _encounters[0];
+            std::ostringstream saveStream;
+            saveStream << "M A " << _encounters[0];
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << _encounters[0];
+            if (!in)
+                return;
+
+            char dataHead1, dataHead2;
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2;
+            if (dataHead1 == 'M' && dataHead2 == 'A')
+            {
+                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                {
+                    loadStream >> _encounters[i];
+                    if (_encounters[i] == IN_PROGRESS)
+                        _encounters[i] = NOT_STARTED;
+                }
+            }
         }
 
     private:

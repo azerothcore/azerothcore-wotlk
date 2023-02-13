@@ -84,7 +84,6 @@ public:
 
         void Initialize() override
         {
-            SetHeaders(DataHeader);
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             CLEANED = false;
             EncounterStatus = NOT_STARTED;
@@ -638,26 +637,57 @@ public:
             return false;
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
+        {
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << "V H " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << uiFirstBoss << ' ' << uiSecondBoss;
+            str_data = saveStream.str();
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return str_data;
+        }
+
+        void Load(const char* in) override
         {
             EncounterStatus = NOT_STARTED;
             CLEANED = false;
             events.Reset();
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0);
 
-            data >> m_auiEncounter[0];
-            data >> m_auiEncounter[1];
-            data >> m_auiEncounter[2];
-            data >> uiFirstBoss;
-        }
+            if (!in)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
-        {
-            data << m_auiEncounter[0] << ' '
-                << m_auiEncounter[1] << ' '
-                << m_auiEncounter[2] << ' '
-                << uiFirstBoss << ' '
-                << uiSecondBoss << ' ';
+            OUT_LOAD_INST_DATA(in);
+
+            char dataHead1, dataHead2;
+            uint32 data0, data1, data2, data3, data4;
+
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1 >> data2 >> data3 >> data4;
+
+            if (dataHead1 == 'V' && dataHead2 == 'H')
+            {
+                m_auiEncounter[0] = data0;
+                m_auiEncounter[1] = data1;
+                m_auiEncounter[2] = data2;
+                uiFirstBoss = data3;
+                uiSecondBoss = data4;
+
+                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                    if (m_auiEncounter[i] == IN_PROGRESS)
+                        m_auiEncounter[i] = NOT_STARTED;
+
+                if (m_auiEncounter[MAX_ENCOUNTER - 1] == DONE)
+                    EncounterStatus = DONE;
+            }
+            else OUT_LOAD_INST_DATA_FAIL;
+
+            OUT_LOAD_INST_DATA_COMPLETE;
         }
     };
 };

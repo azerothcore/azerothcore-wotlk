@@ -60,7 +60,6 @@ public:
     {
         instance_stratholme_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            SetHeaders(DataHeader);
         }
 
         void Initialize() override
@@ -345,36 +344,37 @@ public:
             SaveToDB();
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> _baronRunProgress;
-            data >> _baronRunTime;
-            data >> _zigguratState1;
-            data >> _zigguratState2;
-            data >> _zigguratState3;
-            data >> _slaughterProgress;
-            data >> _postboxesOpened;
-
-            if (_baronRunTime)
-            {
-                events.ScheduleEvent(EVENT_BARON_TIME, 60000);
-            }
-
-            if (_slaughterProgress > 0 && _slaughterProgress < 4)
-            {
-                events.ScheduleEvent(EVENT_FORCE_SLAUGHTER_EVENT, 5000);
-            }
+            std::ostringstream saveStream;
+            saveStream << "S T " << _baronRunProgress << ' ' << _baronRunTime << ' ' << _zigguratState1 << ' ' << _zigguratState2 << ' ' << _zigguratState3 << ' ' << _slaughterProgress << ' ' << _postboxesOpened;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << _baronRunProgress << ' '
-                << _baronRunTime << ' '
-                << _zigguratState1 << ' '
-                << _zigguratState2 << ' '
-                << _zigguratState3 << ' '
-                << _slaughterProgress << ' '
-                << _postboxesOpened;
+            if (!in)
+                return;
+
+            char dataHead1, dataHead2;
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2;
+            if (dataHead1 == 'S' && dataHead2 == 'T')
+            {
+                loadStream >> _baronRunProgress;
+                loadStream >> _baronRunTime;
+                loadStream >> _zigguratState1;
+                loadStream >> _zigguratState2;
+                loadStream >> _zigguratState3;
+                loadStream >> _slaughterProgress;
+                loadStream >> _postboxesOpened;
+            }
+
+            if (_baronRunTime > 0)
+                events.ScheduleEvent(EVENT_BARON_TIME, 60000);
+
+            if (_slaughterProgress > 0 && _slaughterProgress < 4)
+                events.ScheduleEvent(EVENT_FORCE_SLAUGHTER_EVENT, 5000);
         }
 
         uint32 GetData(uint32 type) const override

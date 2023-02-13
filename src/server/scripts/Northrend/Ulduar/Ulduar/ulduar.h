@@ -24,8 +24,6 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 
-#define DataHeader "UU"
-
 #define UlduarScriptName "instance_ulduar"
 
 enum UlduarEncounters

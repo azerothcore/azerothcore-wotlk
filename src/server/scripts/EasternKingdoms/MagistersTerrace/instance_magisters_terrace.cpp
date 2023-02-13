@@ -26,10 +26,7 @@ public:
 
     struct instance_magisters_terrace_InstanceMapScript : public InstanceScript
     {
-        instance_magisters_terrace_InstanceMapScript(Map* map) : InstanceScript(map)
-        {
-            SetHeaders(DataHeader);
-        }
+        instance_magisters_terrace_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
         uint32 Encounter[MAX_ENCOUNTER];
 
@@ -153,17 +150,39 @@ public:
             }
         }
 
-        // @todo: Use BossStates. This is for code compatibility
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> Encounter[1];
-            data >> Encounter[2];
-            data >> Encounter[3];
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << Encounter[0] << ' ' << Encounter[1] << ' ' << Encounter[2] << ' ' << Encounter[3];
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* str) override
         {
-            data << Encounter[0] << ' ' << Encounter[1] << ' ' << Encounter[2] << ' ' << Encounter[3];
+            if (!str)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(str);
+
+            std::istringstream loadStream(str);
+
+            for (uint32 i = 0; i < MAX_ENCOUNTER; ++i)
+            {
+                uint32 tmpState;
+                loadStream >> tmpState;
+                if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                    tmpState = NOT_STARTED;
+                SetData(i, tmpState);
+            }
+
+            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
         ObjectGuid GetGuidData(uint32 identifier) const override

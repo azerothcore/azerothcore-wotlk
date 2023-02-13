@@ -29,9 +29,12 @@ public:
     {
         instance_auchenai_crypts_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
         }
+
+        void Load(char const* data) override { LoadBossState(data); }
+
+        std::string GetSaveData() override { return DataHeader + GetBossSaveData(); }
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

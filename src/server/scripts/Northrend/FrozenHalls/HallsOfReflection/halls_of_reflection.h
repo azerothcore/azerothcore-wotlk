@@ -28,8 +28,6 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
-#define DataHeader "HOR"
-
 #define HallsOfReflectionScriptName "instance_halls_of_reflection"
 
 enum Data

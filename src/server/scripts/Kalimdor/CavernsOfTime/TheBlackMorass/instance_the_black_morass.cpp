@@ -25,10 +25,10 @@
 
 const Position PortalLocation[4] =
 {
-    { -2030.8318f, 7024.9443f, 23.071817f, 3.14159f },
-    { -1961.7335f, 7029.5280f, 21.811401f, 2.12931f },
-    { -1887.6950f, 7106.5570f, 22.049500f, 4.95673f },
-    { -1930.9106f, 7183.5970f, 23.007639f, 3.59537f }
+    {-2041.06f, 7042.08f, 29.99f, 1.30f},
+    {-1968.18f, 7042.11f, 21.93f, 2.12f},
+    {-1885.82f, 7107.36f, 22.32f, 3.07f},
+    {-1928.11f, 7175.95f, 22.11f, 3.44f}
 };
 
 class instance_the_black_morass : public InstanceMapScript
@@ -48,12 +48,11 @@ public:
         GuidSet encounterNPCs;
         uint32 encounters[MAX_ENCOUNTER];
         ObjectGuid _medivhGUID;
-        uint8 _currentRift;
-        int8 _shieldPercent;
+        uint8  _currentRift;
+        uint8  _shieldPercent;
 
         void Initialize() override
         {
-            SetHeaders(DataHeader);
             memset(&encounters, 0, sizeof(encounters));
             _currentRift = 0;
             _shieldPercent = 100;
@@ -145,7 +144,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data) override
+        void SetData(uint32 type, uint32  /*data*/) override
         {
             switch (type)
             {
@@ -188,19 +187,10 @@ public:
                     Events.RescheduleEvent(EVENT_NEXT_PORTAL, 3000);
                     break;
                 case DATA_DAMAGE_SHIELD:
-                {
-                    _shieldPercent -= data;
-                    if (_shieldPercent < 0)
-                    {
-                        _shieldPercent = 0;
-                    }
-
+                    --_shieldPercent;
                     DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
-
                     if (!_shieldPercent)
-                    {
                         if (Creature* medivh = instance->GetCreature(_medivhGUID))
-                        {
                             if (medivh->IsAlive())
                             {
                                 Unit::Kill(medivh, medivh);
@@ -208,17 +198,10 @@ public:
                                 // Xinef: delete all spawns
                                 GuidSet eCopy = encounterNPCs;
                                 for (ObjectGuid const& guid : eCopy)
-                                {
                                     if (Creature* creature = instance->GetCreature(guid))
-                                    {
                                         creature->DespawnOrUnsummon();
-                                    }
-                                }
                             }
-                        }
-                    }
                     break;
-                }
             }
         }
 
@@ -328,18 +311,40 @@ public:
             }
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> encounters[0];
-            data >> encounters[1];
-            data >> encounters[2];
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << "B M " << encounters[0] << ' ' << encounters[1] << ' ' << encounters[2];
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << encounters[0] << ' '
-                << encounters[1] << ' '
-                << encounters[2] << ' ';
+            if (!in)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(in);
+
+            char dataHead1, dataHead2;
+
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2;
+            if (dataHead1 == 'B' && dataHead2 == 'M')
+            {
+                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                    loadStream >> encounters[i];
+            }
+            else
+                OUT_LOAD_INST_DATA_FAIL;
+
+            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     protected:

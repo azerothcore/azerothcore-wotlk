@@ -19,8 +19,6 @@
 #define DEF_BRD_H
 
 #include "CreatureAIImpl.h"
-
-#define DataHeader "BRD"
 #define BRDScriptName "instance_blackrock_depths"
 
 enum FactionIds

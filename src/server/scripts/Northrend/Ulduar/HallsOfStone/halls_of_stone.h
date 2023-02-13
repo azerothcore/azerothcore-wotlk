@@ -20,8 +20,6 @@
 
 #include "CreatureAIImpl.h"
 
-#define DataHeader "HOS"
-
 #define HallsOfStoneScriptName "instance_halls_of_stone"
 
 enum Encounter

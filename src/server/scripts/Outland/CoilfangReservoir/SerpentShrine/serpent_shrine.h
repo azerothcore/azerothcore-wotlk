@@ -25,8 +25,6 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
-#define DataHeader "SS"
-
 #define SerpentShrineScriptName "instance_serpent_shrine"
 
 enum DataTypes

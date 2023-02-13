@@ -19,7 +19,7 @@
 
 Battleground* ScriptMgr::CreateBattleground(BattlegroundTypeId /*typeId*/)
 {
-    /// @todo: Implement script-side battlegrounds.
+    // TODO: Implement script-side battlegrounds.
     ABORT();
     return nullptr;
 }

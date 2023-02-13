@@ -31,7 +31,6 @@ public:
     {
         instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap), canSaveBossStates(false)
         {
-            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
             teldaramSpheres.fill(NOT_STARTED);
         }
@@ -173,18 +172,62 @@ public:
             return ObjectGuid::Empty;
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> teldaramSpheres[0];
-            data >> teldaramSpheres[1];
+            OUT_SAVE_INST_DATA;
 
-            canSaveBossStates = true;
+            std::ostringstream saveStream;
+            // Encounter states
+            saveStream << "A K " << GetBossSaveData();
+
+            // Extra data
+            saveStream << teldaramSpheres[0] << ' ' << teldaramSpheres[1];
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << teldaramSpheres[0] << ' '
-                << teldaramSpheres[1];
+            if (!in)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(in);
+
+            char dataHead1, dataHead2;
+
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2;
+
+            if (dataHead1 == 'A' && dataHead2 == 'K')
+            {
+                // Encounter states
+                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                    {
+                        tmpState = NOT_STARTED;
+                    }
+
+                    SetBossState(i, EncounterState(tmpState));
+                }
+
+                // Extra data
+                loadStream >> teldaramSpheres[0] >> teldaramSpheres[1];
+            }
+            else
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            canSaveBossStates = true;
+            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     private:

@@ -37,9 +37,10 @@ public:
     {
         instance_the_slave_pens_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            SetHeaders(DataHeader);
             counter = DATA_FLAMECALLER_000;
         }
+
+        void Load(char const* /*data*/) override { LoadBossState(DataHeader); }
 
         void OnCreatureCreate(Creature* creature) override
         {

@@ -26,8 +26,6 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
-#define DataHeader "NEX"
-
 #define NexusScriptName "instance_nexus"
 
 enum eTypes

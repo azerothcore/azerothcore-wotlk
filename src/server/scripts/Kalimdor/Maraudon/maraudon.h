@@ -18,8 +18,6 @@
 #ifndef DEF_MARAUDON_H
 #define DEF_MARAUDON_H
 
-#define DataHeader "MA"
-
 enum DataTypes
 {
     TYPE_NOXXION                = 0,

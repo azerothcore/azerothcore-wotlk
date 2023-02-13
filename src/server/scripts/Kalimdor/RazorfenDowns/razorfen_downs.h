@@ -21,8 +21,6 @@
 #include "CreatureAIImpl.h"
 #include "PassiveAI.h"
 
-#define DataHeader "RFD"
-
 #define RazorfenDownsScriptName "instance_razorfen_downs"
 
 enum CreatureIds

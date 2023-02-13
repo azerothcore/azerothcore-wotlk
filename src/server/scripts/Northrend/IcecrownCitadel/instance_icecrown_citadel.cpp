@@ -197,7 +197,6 @@ public:
             LichKingRandomWhisperTimer = 120 * IN_MILLISECONDS;
             DarkwhisperElevatorTimer = 3000;
 
-            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
@@ -1577,54 +1576,73 @@ public:
             }
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> HeroicAttempts;
+            OUT_SAVE_INST_DATA;
 
-            uint32 temp = 0;
-            data >> temp;
+            std::ostringstream saveStream;
+            saveStream << "I C " << GetBossSaveData() << HeroicAttempts << ' '
+                       << ColdflameJetsState << ' ' << BloodQuickeningState << ' ' << BloodQuickeningMinutes << ' ' << WeeklyQuestId10 << ' ' << PutricideEventProgress << ' '
+                       << uint32(LichKingHeroicAvailable ? 1 : 0) << ' ' << BloodPrinceTrashCount << ' ' << uint32(IsBuffAvailable ? 1 : 0);
 
-            if (temp == IN_PROGRESS)
-            {
-                ColdflameJetsState = NOT_STARTED;
-            }
-            else
-            {
-                ColdflameJetsState = temp ? DONE : NOT_STARTED;
-            }
-
-            data >> temp;
-            data >> BloodQuickeningState;
-            data >> BloodQuickeningMinutes;
-
-            if (BloodQuickeningState == IN_PROGRESS)
-            {
-                Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 60000);
-                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
-                DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
-            }
-
-            data >> WeeklyQuestId10;
-            data >> PutricideEventProgress;
-            PutricideEventProgress &= ~PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS;
-            data >> temp;
-            LichKingHeroicAvailable = !!temp;
-            data >> BloodPrinceTrashCount;
-            data >> temp;
-            SetData(DATA_BUFF_AVAILABLE, !!temp);
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* str) override
         {
-            data << HeroicAttempts << ' '
-                << ColdflameJetsState << ' '
-                << BloodQuickeningState << ' '
-                << BloodQuickeningMinutes << ' '
-                << WeeklyQuestId10 << ' '
-                << PutricideEventProgress << ' '
-                << uint32(LichKingHeroicAvailable ? 1 : 0) << ' '
-                << BloodPrinceTrashCount << ' '
-                << uint32(IsBuffAvailable ? 1 : 0);
+            if (!str)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(str);
+
+            char dataHead1, dataHead2;
+
+            std::istringstream loadStream(str);
+            loadStream >> dataHead1 >> dataHead2;
+
+            if (dataHead1 == 'I' && dataHead2 == 'C')
+            {
+                for (uint32 i = 0; i < MAX_ENCOUNTERS; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState == FAIL || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    SetBossState(i, EncounterState(tmpState));
+                }
+
+                loadStream >> HeroicAttempts;
+
+                uint32 temp = 0;
+                loadStream >> temp;
+                ColdflameJetsState = temp ? DONE : NOT_STARTED;
+
+                loadStream >> BloodQuickeningState;
+                loadStream >> BloodQuickeningMinutes;
+                if (BloodQuickeningState == IN_PROGRESS)
+                {
+                    Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 60000);
+                    DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
+                    DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
+                }
+
+                loadStream >> WeeklyQuestId10;
+                loadStream >> PutricideEventProgress;
+                PutricideEventProgress &= ~PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS;
+                loadStream >> temp;
+                LichKingHeroicAvailable = !!temp;
+                loadStream >> BloodPrinceTrashCount;
+                loadStream >> temp;
+                SetData(DATA_BUFF_AVAILABLE, !!temp);
+            }
+            else
+                OUT_LOAD_INST_DATA_FAIL;
+
+            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
         void Update(uint32 diff) override

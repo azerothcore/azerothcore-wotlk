@@ -35,7 +35,6 @@ public:
 
         void Initialize() override
         {
-            SetHeaders(DataHeader);
             memset(&_encounters, 0, sizeof(_encounters));
             _requiredDeaths = 0;
         }
@@ -112,24 +111,30 @@ public:
                 SaveToDB();
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> _encounters[0];
-            data >> _encounters[1];
-            data >> _encounters[2];
-            data >> _encounters[3];
-            data >> _encounters[4];
-            data >> _encounters[5];
+            std::ostringstream saveStream;
+            saveStream << "B L " << _encounters[0] << ' ' << _encounters[1] << ' ' << _encounters[2] << ' ' << _encounters[3] << ' ' << _encounters[4] << ' ' << _encounters[5];
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << _encounters[0] << ' '
-                << _encounters[1] << ' '
-                << _encounters[2] << ' '
-                << _encounters[3] << ' '
-                << _encounters[4] << ' '
-                << _encounters[5];
+            if (!in)
+                return;
+
+            char dataHead1, dataHead2;
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2;
+            if (dataHead1 == 'B' && dataHead2 == 'L')
+            {
+                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                {
+                    loadStream >> _encounters[i];
+                    if (_encounters[i] == IN_PROGRESS)
+                        _encounters[i] = NOT_STARTED;
+                }
+            }
         }
 
         bool IsFireEventDone()

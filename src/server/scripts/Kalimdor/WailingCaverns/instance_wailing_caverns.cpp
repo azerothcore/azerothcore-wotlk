@@ -91,22 +91,30 @@ public:
             return 0;
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> _encounters[0];
-            data >> _encounters[1];
-            data >> _encounters[2];
-            data >> _encounters[3];
-            data >> _encounters[4];
+            std::ostringstream saveStream;
+            saveStream << "W C " << _encounters[0] << ' ' << _encounters[1] << ' ' << _encounters[2] << ' ' << _encounters[3] << ' ' << _encounters[4];
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << _encounters[0] << ' '
-                << _encounters[1] << ' '
-                << _encounters[2] << ' '
-                << _encounters[3] << ' '
-                << _encounters[4] << ' ';
+            if (!in)
+                return;
+
+            char dataHead1, dataHead2;
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2;
+            if (dataHead1 == 'W' && dataHead2 == 'C')
+            {
+                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                {
+                    loadStream >> _encounters[i];
+                    if (_encounters[i] == IN_PROGRESS)
+                        _encounters[i] = NOT_STARTED;
+                }
+            }
         }
 
     private:

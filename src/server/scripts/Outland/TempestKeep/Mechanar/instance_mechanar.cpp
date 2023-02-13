@@ -36,7 +36,6 @@ public:
     {
         instance_mechanar_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
             LoadDoorData(doorData);
 
@@ -193,19 +192,60 @@ public:
             }
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        bool SetBossState(uint32 type, EncounterState state) override
         {
-            data >> _passageEncounter;
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
 
-            if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
-            {
-                _passageEncounter = ENCOUNTER_PASSAGE_PHASE6;
-            }
+            return true;
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        std::string GetSaveData() override
         {
-            data << _passageEncounter;
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            // Xinef: no space needed
+            saveStream << "M E " << GetBossSaveData() << _passageEncounter;
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
+        }
+
+        void Load(const char* str) override
+        {
+            if (!str)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(str);
+
+            char dataHead1, dataHead2;
+
+            std::istringstream loadStream(str);
+            loadStream >> dataHead1 >> dataHead2;
+
+            if (dataHead1 == 'M' && dataHead2 == 'E')
+            {
+                for (uint32 i = 0; i < MAX_ENCOUNTER; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    SetBossState(i, EncounterState(tmpState));
+                }
+
+                loadStream >> _passageEncounter;
+                if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
+                    _passageEncounter = ENCOUNTER_PASSAGE_PHASE6;
+            }
+            else
+                OUT_LOAD_INST_DATA_FAIL;
+
+            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     private:

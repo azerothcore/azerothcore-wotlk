@@ -648,7 +648,6 @@ void BossAI::UpdateAI(uint32 diff)
     }
 
     events.Update(diff);
-    scheduler.Update(diff);
 
     if (me->HasUnitState(UNIT_STATE_CASTING))
     {

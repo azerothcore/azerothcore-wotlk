@@ -20,7 +20,6 @@
 
 #include "CreatureAIImpl.h"
 
-#define DataHeader "ZA"
 #define ZulAmanScriptName "instance_zulaman"
 
 enum DataTypes

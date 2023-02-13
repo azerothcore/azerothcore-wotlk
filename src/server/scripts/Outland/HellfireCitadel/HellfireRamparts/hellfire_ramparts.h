@@ -21,7 +21,6 @@
 #include "CreatureAIImpl.h"
 #include "SpellScript.h"
 
-#define DataHeader "HR"
 #define HellfireRampartsScriptName "instance_hellfire_ramparts"
 
 enum DataTypes

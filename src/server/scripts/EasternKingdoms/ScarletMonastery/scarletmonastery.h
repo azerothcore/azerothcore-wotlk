@@ -20,8 +20,6 @@
 
 #include "CreatureAIImpl.h"
 
-#define DataHeader "SM"
-
 #define ScarletMonasteryScriptName "instance_scarlet_monastery"
 
 template <class AI, class T>

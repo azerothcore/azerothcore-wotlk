@@ -22,7 +22,6 @@
 #include "AuthDefines.h"
 #include "ByteBuffer.h"
 #include "WardenCheckMgr.h"
-#include "WardenPayloadMgr.h"
 #include <array>
 
 enum WardenOpcodes
@@ -114,8 +113,6 @@ public:
     virtual void InitializeModule() = 0;
     virtual void RequestHash() = 0;
     virtual void HandleHashResult(ByteBuffer &buff) = 0;
-    virtual bool IsCheckInProgress() = 0;
-    virtual void ForceChecks() = 0;
     virtual void RequestChecks() = 0;
     virtual void HandleData(ByteBuffer &buff) = 0;
     bool ProcessLuaCheckResponse(std::string const& msg);
@@ -132,11 +129,8 @@ public:
     // If no check is passed, the default action from config is executed
     void ApplyPenalty(uint16 checkId, std::string const& reason);
 
-    WardenPayloadMgr* GetPayloadMgr();
-
 private:
     WorldSession* _session;
-    WardenPayloadMgr _payloadMgr;
     uint8 _inputKey[16];
     uint8 _outputKey[16];
     uint8 _seed[16];
@@ -147,9 +141,6 @@ private:
     bool _dataSent;
     ClientWardenModule* _module;
     bool _initialized;
-    bool _interrupted;
-    bool _checkInProgress;
-    uint32 _interruptCounter = 0;
 };
 
 #endif

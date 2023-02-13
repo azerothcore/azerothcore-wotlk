@@ -33,7 +33,6 @@ public:
     {
         instance_sunken_temple_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            SetHeaders(DataHeader);
         }
 
         void Initialize() override
@@ -169,22 +168,33 @@ public:
             }
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> _encounters[0];
-            data >> _encounters[1];
-            data >> _encounters[2];
-            data >> _statuePhase;
-            data >> _defendersKilled;
+            std::ostringstream saveStream;
+            saveStream << "T A " << _encounters[0] << ' ' << _encounters[1] << ' ' << _encounters[2] << ' ' << _statuePhase << ' ' << _defendersKilled;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << _encounters[0] << ' '
-                << _encounters[1] << ' '
-                << _encounters[2] << ' '
-                << _statuePhase << ' '
-                << _defendersKilled;
+            if (!in)
+                return;
+
+            char dataHead1, dataHead2;
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2;
+            if (dataHead1 == 'T' && dataHead2 == 'A')
+            {
+                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                {
+                    loadStream >> _encounters[i];
+                    if (_encounters[i] == IN_PROGRESS)
+                        _encounters[i] = NOT_STARTED;
+                }
+
+                loadStream >> _statuePhase;
+                loadStream >> _defendersKilled;
+            }
         }
 
     private:

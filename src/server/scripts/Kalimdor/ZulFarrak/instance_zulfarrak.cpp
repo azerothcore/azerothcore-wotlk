@@ -133,7 +133,6 @@ public:
 
         void Initialize() override
         {
-            SetHeaders(DataHeader);
             GahzrillaSummoned = NOT_STARTED;
 
             PyramidPhase = 0;
@@ -441,15 +440,27 @@ public:
             }
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> PyramidPhase;
-            data >> GahzrillaSummoned;
+            std::ostringstream saveStream;
+            saveStream << "Z F " << PyramidPhase << ' ' << GahzrillaSummoned;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* str) override
         {
-            data << PyramidPhase << ' ' << GahzrillaSummoned;
+            if (!str)
+                return;
+
+            char dataHead1, dataHead2;
+            std::istringstream loadStream(str);
+            loadStream >> dataHead1 >> dataHead2;
+
+            if (dataHead1 == 'Z' && dataHead2 == 'F')
+            {
+                loadStream >> PyramidPhase;
+                loadStream >> GahzrillaSummoned;
+            }
         }
     };
 };

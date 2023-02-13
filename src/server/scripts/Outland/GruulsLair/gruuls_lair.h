@@ -22,8 +22,6 @@
 #include "CreatureAIImpl.h"
 #include "SpellAuraEffects.h"
 
-#define DataHeader "GL"
-
 #define GruulsLairScriptName "instance_gruuls_lair"
 
 enum DataTypes

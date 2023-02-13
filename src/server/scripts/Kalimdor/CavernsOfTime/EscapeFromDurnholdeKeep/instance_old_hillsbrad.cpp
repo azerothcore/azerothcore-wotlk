@@ -53,7 +53,6 @@ public:
 
         void Initialize() override
         {
-            SetHeaders(DataHeader);
             _encounterProgress = 0;
             _barrelCount = 0;
             _attemptsCount = 0;
@@ -252,7 +251,7 @@ public:
                         {
                             drake->AI()->Talk(0);
                         }
-                        [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                        [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                     }
                 case EVENT_THRALL_REPOSITION:
                     {
@@ -299,15 +298,42 @@ public:
                 instance->LoadGrid(thrallPositions[i].GetPositionX(), thrallPositions[i].GetPositionY());
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> _encounterProgress;
-            data >> _attemptsCount;
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << "O H " << _encounterProgress << ' ' << _attemptsCount;
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << _encounterProgress << ' ' << _attemptsCount;
+            if (!in)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(in);
+
+            char dataHead1, dataHead2;
+            uint32 data0, data1;
+
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1;
+
+            if (dataHead1 == 'O' && dataHead2 == 'H')
+            {
+                _encounterProgress = data0;
+                _attemptsCount = data1;
+            }
+            else
+                OUT_LOAD_INST_DATA_FAIL;
+
+            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     private:

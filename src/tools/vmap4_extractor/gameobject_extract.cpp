@@ -107,7 +107,7 @@ void ExtractGameobjectModels()
         }
         else if (!strcmp(ch_ext, ".mdl"))
         {
-            /// @todo: extract .mdl files, if needed
+            // TODO: extract .mdl files, if needed
             continue;
         }
         else //if (!strcmp(ch_ext, ".mdx") || !strcmp(ch_ext, ".m2"))

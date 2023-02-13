@@ -20,8 +20,6 @@
 
 #include "CreatureAIImpl.h"
 
-#define DataHeader "DML"
-
 constexpr auto DMScriptName = "instance_dire_maul";
 
 enum DataTypes

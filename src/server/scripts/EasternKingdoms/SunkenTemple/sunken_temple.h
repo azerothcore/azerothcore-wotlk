@@ -18,8 +18,6 @@
 #ifndef DEF_SUNKEN_TEMPLE_H
 #define DEF_SUNKEN_TEMPLE_H
 
-#define DataHeader "STR"
-
 enum DataTypes
 {
     DATA_STATUES                = 10,

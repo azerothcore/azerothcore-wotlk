@@ -211,15 +211,30 @@ public:
             return 0;
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> _kirtonosState;
-            data >> _miniBosses;
+            std::ostringstream saveStream;
+            saveStream << "S O " << _kirtonosState << ' ' << _miniBosses;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* str) override
         {
-            data << _kirtonosState << ' ' << _miniBosses;
+            if (!str)
+                return;
+
+            char dataHead1, dataHead2;
+            std::istringstream loadStream(str);
+            loadStream >> dataHead1 >> dataHead2;
+
+            if (dataHead1 == 'S' && dataHead2 == 'O')
+            {
+                loadStream >> _kirtonosState;
+                loadStream >> _miniBosses;
+
+                if (_kirtonosState == IN_PROGRESS)
+                    _kirtonosState = NOT_STARTED;
+            }
         }
 
     protected:

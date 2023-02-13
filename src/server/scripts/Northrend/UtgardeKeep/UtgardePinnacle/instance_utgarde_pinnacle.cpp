@@ -57,7 +57,6 @@ public:
 
         void Initialize() override
         {
-            SetHeaders(DataHeader);
             SkadiHits        = 0;
             SkadiInRange     = 0;
 
@@ -193,20 +192,43 @@ public:
             OUT_SAVE_INST_DATA_COMPLETE;
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> Encounters[0];
-            data >> Encounters[1];
-            data >> Encounters[2];
-            data >> Encounters[3];
+            std::ostringstream saveStream;
+            saveStream << "U P " << Encounters[0] << ' ' << Encounters[1] << ' ' << Encounters[2] << ' ' << Encounters[3];
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << Encounters[0] << ' '
-                << Encounters[1] << ' '
-                << Encounters[2] << ' '
-                << Encounters[3];
+            if (!in)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(in);
+
+            char dataHead1, dataHead2;
+            uint16 data0, data1, data2, data3;
+
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1 >> data2 >> data3;
+
+            if (dataHead1 == 'U' && dataHead2 == 'P')
+            {
+                Encounters[0] = data0;
+                Encounters[1] = data1;
+                Encounters[2] = data2;
+                Encounters[3] = data3;
+
+                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                    if (Encounters[i] == IN_PROGRESS)
+                        Encounters[i] = NOT_STARTED;
+            }
+            else OUT_LOAD_INST_DATA_FAIL;
+
+            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
         uint32 GetData(uint32 type) const override

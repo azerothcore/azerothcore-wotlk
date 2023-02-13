@@ -18,8 +18,6 @@
 #ifndef BFD_H_
 #define BFD_H_
 
-#define DataHeader "BFD"
-
 enum Data
 {
     TYPE_GELIHAST               = 0,

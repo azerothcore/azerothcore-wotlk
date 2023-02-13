@@ -64,7 +64,6 @@ public:
     {
         explicit instance_naxxramas_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
-            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             for (auto& i : HeiganEruption)
                 i.clear();
@@ -1121,14 +1120,55 @@ public:
             return ObjectGuid::Empty;
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> immortalAchievement;
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << "N X X " << GetBossSaveData() << ' ' << immortalAchievement;
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << immortalAchievement;
+            if (!in)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(in);
+
+            char dataHead1, dataHead2, dataHead3;
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2 >> dataHead3;
+
+            if (dataHead1 == 'N' && dataHead2 == 'X' && dataHead3 == 'X')
+            {
+                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS)
+                    {
+                        tmpState = NOT_STARTED;
+                    }
+                    if (i == BOSS_HORSEMAN && tmpState == DONE)
+                    {
+                        _horsemanLoadDoneState = true;
+                    }
+                    SetBossState(i, EncounterState(tmpState));
+                }
+                loadStream >> immortalAchievement;
+
+                OUT_LOAD_INST_DATA_COMPLETE;
+            }
+            else
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+            }
         }
     };
 };

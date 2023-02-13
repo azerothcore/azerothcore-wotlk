@@ -20,8 +20,6 @@
 
 #include "CreatureAIImpl.h"
 
-#define DataHeader "OH"
-
 #define OldHillsbradScriptName "instance_old_hillsbrad"
 
 enum DataIds

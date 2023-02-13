@@ -20,8 +20,6 @@
 
 #include "CreatureAIImpl.h"
 
-#define DataHeader "GNO"
-
 #define GnomereganScriptName "instance_gnomeregan"
 
 template <class AI, class T>

@@ -499,7 +499,7 @@ void Puppet::Update(uint32 time)
         if (!IsAlive())
         {
             UnSummon();
-            /// @todo: why long distance .die does not remove it
+            // TODO: why long distance .die does not remove it
         }
     }
 }

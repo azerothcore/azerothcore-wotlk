@@ -28,7 +28,6 @@ public:
     {
         instance_deadmines_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            SetHeaders(DataHeader);
         }
 
         void Initialize() override

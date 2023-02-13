@@ -23,7 +23,6 @@
 #include "Player.h"
 #include "SpellScript.h"
 
-#define DataHeader "MT"
 #define MTScriptName "instance_magisters_terrace"
 
 enum MTData

@@ -51,7 +51,6 @@ public:
 
         void Initialize() override
         {
-            SetHeaders(DataHeader);
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
             volkhanAchievement = false;
@@ -173,20 +172,50 @@ public:
             SaveToDB();
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        std::string GetSaveData() override
         {
-            data >> m_auiEncounter[0];
-            data >> m_auiEncounter[1];
-            data >> m_auiEncounter[2];
-            data >> m_auiEncounter[3];
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << "H L " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' '
+                       << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' ' << m_auiEncounter[4];
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
         }
 
-        void WriteSaveDataMore(std::ostringstream& data) override
+        void Load(const char* in) override
         {
-            data << m_auiEncounter[0] << ' '
-                << m_auiEncounter[1] << ' '
-                << m_auiEncounter[2] << ' '
-                << m_auiEncounter[3] << ' ';
+            if (!in)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(in);
+
+            char dataHead1, dataHead2;
+            uint32 data0, data1, data2, data3, data4;
+
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1 >> data2 >> data3 >> data4;
+
+            if (dataHead1 == 'H' && dataHead2 == 'L')
+            {
+                m_auiEncounter[0] = data0;
+                m_auiEncounter[1] = data1;
+                m_auiEncounter[2] = data2;
+                m_auiEncounter[3] = data3;
+                m_auiEncounter[4] = data4;
+
+                for (uint8 i = 0; i < TYPE_LOKEN_INTRO; ++i)
+                    if (m_auiEncounter[i] == IN_PROGRESS)
+                        m_auiEncounter[i] = NOT_STARTED;
+
+                OUT_LOAD_INST_DATA_COMPLETE;
+            }
+            else
+                OUT_LOAD_INST_DATA_FAIL;
         }
 
         uint32 GetData(uint32 uiType) const override

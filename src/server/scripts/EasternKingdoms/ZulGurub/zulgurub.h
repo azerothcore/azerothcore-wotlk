@@ -22,8 +22,6 @@
 
 uint32 const EncounterCount = 13;
 
-#define DataHeader "ZG"
-
 #define ZGScriptName "instance_zulgurub"
 
 enum DataTypes

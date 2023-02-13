@@ -159,7 +159,7 @@ public:
         return true;
     }
 
-    /// @todo - move item to other slot
+    // TODO - move item to other slot
     static bool HandleItemMoveCommand(ChatHandler* handler, uint8 srcSlot, uint8 dstSlot)
     {
         if (srcSlot == dstSlot)

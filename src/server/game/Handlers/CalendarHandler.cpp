@@ -152,7 +152,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     data << uint32(boundCounter);
     data.append(dataBuffer);
 
-    /// @todo: Fix this, how we do know how many and what holidays to send?
+    // TODO: Fix this, how we do know how many and what holidays to send?
     data << uint32(sGameEventMgr->modifiedHolidays.size());
     for (uint32 entry : sGameEventMgr->modifiedHolidays)
     {

@@ -131,7 +131,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         DoCastSelf(SPELL_FLAME_SPHERE_SPAWN_EFFECT);
         DoCastSelf(SPELL_FLAME_SPHERE_VISUAL);
 
-        /// @todo: replace with DespawnOrUnsummon
+        // TODO: replace with DespawnOrUnsummon
         uiDespawnTimer = 13000;
     }
 
@@ -490,7 +490,7 @@ private:
     }
 };
 
-// @todo: Turn into new script type when Gossips have been updated
+// TODO: Turn into new script type when Gossips have been updated
 class go_prince_taldaram_sphere : public GameObjectScript
 {
 public:

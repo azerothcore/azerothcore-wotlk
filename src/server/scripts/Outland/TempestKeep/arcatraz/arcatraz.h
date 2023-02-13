@@ -23,8 +23,6 @@
 #include "Player.h"
 #include "SpellScript.h"
 
-#define DataHeader "AZ"
-
 #define ArcatrazScriptName "instance_arcatraz"
 
 enum DataTypes
@@ -72,17 +70,10 @@ enum SpellIds
     SPELL_SOUL_STEAL                        = 36782
 };
 
-enum Texts
-{
-    SAY_RIVAL_DIED = 6 // Soccothrates & Delliah
-};
-
 template <class AI, class T>
 inline AI* GetArcatrazAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, ArcatrazScriptName);
 }
-
-#define RegisterArcatrazCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetArcatrazAI)
 
 #endif // ARCATRAZ_H

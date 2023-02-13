@@ -103,6 +103,6 @@ TEST(FormulasTest, Gain)
 {
     auto worldMock = new WorldMock();
     sWorld.reset((worldMock));
-    /// @todo: create mocks of Player and Creature
+    // TODO: create mocks of Player and Creature
     // Gain(nullptr, nullptr);
 }
