@@ -863,6 +863,7 @@ public:
                     }
                 case EVENT_LAND_LAND:
                     me->SetCanFly(false);
+                    me->SetHover(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetDisableGravity(false);
                     if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
