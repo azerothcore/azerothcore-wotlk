@@ -58,7 +58,7 @@ void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlag
 
 void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 {
-    // TODO: add targets.read() check
+    /// @todo: add targets.read() check
     Player* pUser = _player;
 
     // ignore for remote control state
@@ -384,7 +384,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
                 }
             }
 
-            // TODO: Preparation for #23204
+            /// @todo: Preparation for #23204
             // allow casting of spells triggered by clientside periodic trigger auras
             /*
              if (caster->HasAuraTypeWithTriggerSpell(SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT, spellId))
@@ -651,7 +651,7 @@ void WorldSession::HandleSpellClick(WorldPacket& recvData)
     if (!unit)
         return;
 
-    // TODO: Unit::SetCharmedBy: 28782 is not in world but 0 is trying to charm it! -> crash
+    /// @todo: Unit::SetCharmedBy: 28782 is not in world but 0 is trying to charm it! -> crash
     if (!unit->IsInWorld())
         return;
 

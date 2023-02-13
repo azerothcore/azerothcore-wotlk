@@ -93,7 +93,7 @@ struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
 };
 
 // Target selector for spell casts checking range, auras and attributes
-// TODO: Add more checks from Spell::CheckCast
+/// @todo: Add more checks from Spell::CheckCast
 struct SpellTargetSelector : public Acore::unary_function<Unit*, bool>
 {
 public:

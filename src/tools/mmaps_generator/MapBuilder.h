@@ -104,7 +104,7 @@ namespace MMAP
         dtNavMeshParams m_navMeshParams;
     };
 
-    // ToDo: move this to its own file. For now it will stay here to keep the changes to a minimum, especially in the cpp file
+    /// @todo: move this to its own file. For now it will stay here to keep the changes to a minimum, especially in the cpp file
     class MapBuilder;
     class TileBuilder
     {
