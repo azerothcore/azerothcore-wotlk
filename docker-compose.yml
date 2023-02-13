@@ -66,7 +66,7 @@ services:
     build:
       <<: *build-params
       target: dev
-      dockerfile: ./apps/docker/Dockerfile
+      dockerfile: ./apps/docker/dev-server.Dockerfile
     security_opt:
       - seccomp:unconfined
     env_file:
@@ -95,7 +95,7 @@ services:
     build:
       <<: *build-params
       target: dev
-      dockerfile: ./apps/docker/Dockerfile
+      dockerfile: ./apps/docker/dev-server.Dockerfile
       cache_from:
         - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     security_opt:
