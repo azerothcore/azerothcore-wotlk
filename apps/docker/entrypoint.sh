@@ -6,7 +6,6 @@ set -euo pipefail
 
 set -x
 
-
 # Begin env variables for configuration
 #
 # Config for this script. Only matters if you're using SAFE_WORLDSERVER
@@ -22,35 +21,17 @@ PIPE_NAME="/azerothcore/worldserver-stdin"
 
 # Config for the application itself
 
-MYSQL_HOST="${MYSQL_HOST:-ac-database}"
-MYSQL_USER="${MYSQL_USER:-root}"
-MYSQL_PASSWORD="${MYSQL_PASSWORD:-azerothcore}"
-MYSQL_PORT="${MYSQL_PORT:-3306}"
+export MYSQL_HOST="${MYSQL_HOST:-ac-database}"
+export MYSQL_USER="${MYSQL_USER:-root}"
+export MYSQL_PASSWORD="${MYSQL_PASSWORD:-azerothcore}"
+export MYSQL_PORT="${MYSQL_PORT:-3306}"
 # End env variables for configuration
-
-
-function send_worldserver_command {
-  local command="$1"
-  echo "$command" > "$PIPE_NAME"
-  echo > "$PIPE_NAME"
-}
-
-function safe_shutdown {
-  cat << EOF 
-#==============================================================================#
-#
-# Shutting down the WorldServer
-#
-#==============================================================================#
-EOF
-  send_worldserver_command "server shutdown 5s 0"
-
-  wait "$(cat "/azerothcore/worldserver.pid")" 
-}
 
 CMD="${CMD:=$@}"
 
-# Install configs
+# Template env vars into configs
+
+cp -rn /azerothcore/env/ref/etc/* /azerothcore/env/dist/etc
 
 conf="/azerothcore/env/dist/etc/$ACORE_COMPONENT.conf" 
 
@@ -62,43 +43,23 @@ conf="/azerothcore/env/dist/etc/$ACORE_COMPONENT.conf"
 if [ -n "$SAFE_WORLDSERVER" ] && \
    [ "$ACORE_COMPONENT" == "worldserver" ] && \
    grep -q "$ACORE_COMPONENT" "$CMD" ; then
-  trap safe_shutdown SIGTERM SIGINT SIGQUIT
-
-  tmpfile=$(mktemp -u)
-  mkfifo "$tmpfile"
-  ln -snf "$tmpfile" $PIPE_NAME
-
   cat << EOF 
 #==============================================================================#
 # You are using SAFE_WORLDSERVER mode.
 #
 # Be aware:
 #   - You CANNOT use the worldserver console.
-#   - All commands must be performed over SOAP, telnet, or by sending them to the named pipe.
+#   - All commands must be performed over SOAP or telnet.
 #
 # Please see [ https://www.azerothcore.org/wiki/remote-access ] for further info.
 #==============================================================================#
 EOF
 
-  # Make the password safe for stdout
-  HIDDEN_PASS=$(tr '[:print:]' '*' <<< "$ACORE_PASSWORD")
-
-  # Start the worldserver
-  "$CMD" < \
-    "$PIPE_NAME" | sed "s/$ACORE_PASSWORD/$HIDDEN_PASS/" &
-
-  until [ -f "/azerothcore/worldserver.pid" ]; do
-    echo "Waiting on the worldserver to start"
-    echo > "$PIPE_NAME"
-    sleep 1
-  done
-
-  if [[ -z "$ACORE_SKIP_CREATE_ACCOUNT" ]]; then
-    send_worldserver_command "account create $ACORE_USERNAME $ACORE_PASSWORD"
-    send_worldserver_command "account set gmlevel $ACORE_USERNAME $ACORE_GM_LEVEL -1"
-  fi
-  
-  wait "$(cat "/azerothcore/worldserver.pid")"
+  exec env \
+       ACORE_USERNAME=$ACORE_USERNAME \
+       ACORE_PASSWORD=$ACORE_PASSWORD \
+       ACORE_GM_LEVEL=$ACORE_GM_LEVEL \
+       /azerothcore/worldserver.exp
 else 
   exec $CMD
 fi

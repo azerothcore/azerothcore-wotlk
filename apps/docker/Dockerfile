@@ -38,6 +38,7 @@ FROM skeleton as build
 
 ARG TZ
 ARG CTOOLS_BUILD=all
+ARG INSTALL_ELUNA=true
 
 
 ENV TZ=$TZ
@@ -51,6 +52,8 @@ ENV CSCRIPTPCH=OFF
 ENV CCOREPCH=OFF
 ENV CTOOLS_BUILD=$CTOOLS_BUILD
 ENV CSCRIPTS=static
+ENV CSCRIPTS_DEFAULT_LINKAGE=static
+ENV CMODULES=static
 
 WORKDIR /azerothcore
 
@@ -58,16 +61,19 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
     dpkg-reconfigure --frontend noninteractive tzdata
 
-RUN apt update && \
+# This is a lot of packages to download
+# We're going to benefit from caching apt packages
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean && \
+    apt update && \
     apt install -y \
-      gdb gdbserver git dos2unix \
-      lsb-core sudo curl unzip \
+      git lsb-core curl unzip sudo \
       make cmake clang libmysqlclient-dev \
-      libboost-system1.7*-dev libboost-filesystem1.7*-dev \
-      libboost-program-options1.7*-dev libboost-iostreams1.7*-dev \
+      libboost-system-dev libboost-filesystem-dev \
+      libboost-program-options-dev libboost-iostreams-dev \
       build-essential libtool cmake-data openssl \
-      libgoogle-perftools-dev google-perftools \
-      libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev \
+      libssl-dev libmysql++-dev libreadline-dev zlib1g-dev \
       libbz2-dev mysql-client \
       libncurses5-dev ccache && \
     rm -rf /var/lib/apt/lists/*
@@ -80,7 +86,6 @@ COPY apps/startup-scripts apps/startup-scripts
 COPY bin bin
 COPY conf conf
 COPY data data
-COPY deps deps
 COPY CMakeLists.txt CMakeLists.txt
 COPY deps deps
 COPY src src
@@ -91,15 +96,18 @@ COPY  env/docker/etc/authserver.conf.dockerdist env/dist/etc/authserver.conf.doc
 COPY  env/docker/etc/worldserver.conf.dockerdist env/dist/etc/worldserver.conf.dockerdist
 COPY  env/docker/etc/dbimport.conf.dockerdist env/dist/etc/dbimport.conf.dockerdist
 
-RUN git clone \
-    --depth=1 \
-    --branch=master \
-    https://github.com/azerothcore/mod-eluna.git \
-    modules/mod-eluna
+RUN if [ "$INSTALL_ELUNA" = "true" ]; then \
+    git clone \
+      --depth=1 \
+      --branch=master \
+      https://github.com/azerothcore/mod-eluna.git \
+      modules/mod-eluna; \
+    fi
 
+ARG CACHEBUST=1
 
 RUN --mount=type=cache,target=/azerothcore/var/ccache \
-    bash apps/compiler/compiler.sh build
+    DOCKER=1 bash apps/compiler/compiler.sh build
 
 #############################
 # Base runtime for services #
@@ -114,6 +122,8 @@ ARG TZ Etc/UTC
 
 ENV TZ $TZ
 ENV DEBIAN_FRONTEND=noninteractive
+ENV ACORE_COMPONENT=undefined
+ENV DOCKER=1
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
@@ -121,19 +131,29 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 
 RUN apt update && \
     apt install -y \ 
-    tini libmysqlclient21 \
-    libboost-system1.7*.* libboost-filesystem1.7*.* \
-    libboost-program-options1.7*.* libboost-iostreams1.7*.* \
-    libboost-regex1.7*.* mysql-client && \
+      libmysqlclient21 libreadline8 \
+      # Get envsubst and screen
+      gettext-base expect mysql-client && \
     rm -rf /var/lib/apt/lists/*
 
-RUN addgroup --gid $GROUP_ID $DOCKER_USER && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID $DOCKER_USER && \
+RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
+    useradd -d /azerothcore --uid "$USER_ID"  --gid "$GROUP_ID"  "$DOCKER_USER" && \
     passwd -d $DOCKER_USER
 
-RUN chown -R $DOCKER_USER:$DOCKER_USER /run /opt
+COPY apps/docker/entrypoint.sh /entrypoint.sh
+
+RUN chmod -v +x /entrypoint.sh
+
+COPY --from=build /azerothcore/env/dist/etc/ /azerothcore/env/ref/etc/
+
+RUN chown -R $DOCKER_USER:$DOCKER_USER \
+      /azerothcore \
+      /run \
+      /opt
 
 USER $DOCKER_USER
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 ###############
 # Auth Server #
@@ -142,12 +162,15 @@ USER $DOCKER_USER
 FROM runtime as authserver
 LABEL description "AzerothCore Auth Server"
 
-WORKDIR /azerothcore
+ENV ACORE_COMPONENT=authserver
 
-USER $DOCKER_USER
-COPY --from=build /azerothcore/env/dist/bin/authserver /azerothcore/env/dist/bin/authserver
+COPY --chown=$DOCKER_USER:$DOCKER_USER \
+     --from=build \
+     /azerothcore/env/dist/bin/authserver /azerothcore/env/dist/bin/authserver
 
-CMD ["/startup.sh", "/azerothcore/env/dist/bin/authserver"]
+VOLUME /azerothcore/env/dist/etc
+
+CMD ["/azerothcore/env/dist/bin/authserver"]
 
 ################
 # World Server #
@@ -157,12 +180,18 @@ FROM runtime as worldserver
 
 LABEL description "AzerothCore World Server"
 
-WORKDIR /azerothcore
+ENV ACORE_COMPONENT=worldserver
 
-USER $DOCKER_USER
-COPY --from=build /azerothcore/env/dist/bin/worldserver /azerothcore/env/dist/bin/worldserver
+COPY --chown=$DOCKER_USER:$DOCKER_USER \
+     apps/docker/worldserver.exp /azerothcore/worldserver.exp
 
-CMD ["/startup.sh", "/azerothcore/env/dist/bin/worldserver"]
+COPY --chown=$DOCKER_USER:$DOCKER_USER \
+     --from=build \
+     /azerothcore/env/dist/bin/worldserver /azerothcore/env/dist/bin/worldserver
+
+VOLUME /azerothcore/env/dist/etc
+
+CMD ["/azerothcore/env/dist/bin/worldserver"]
 
 ##################
 # Map Extractors #
@@ -171,8 +200,6 @@ CMD ["/startup.sh", "/azerothcore/env/dist/bin/worldserver"]
 FROM runtime as tools
 
 LABEL description "AzerothCore Tools"
-
-USER $DOCKER_USER
 
 WORKDIR /azerothcore/env/client/
 
@@ -202,10 +229,15 @@ FROM runtime as dbimport
 
 LABEL description "AzerothCore Database Import tool"
 
-WORKDIR /azerothcore
-
 USER $DOCKER_USER
-COPY --from=build /azerothcore/env/dist/bin/dbimport /azerothcore/env/dist/bin/dbimport
+
+ENV ACORE_COMPONENT=dbimport
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER\
+     --from=build \
+     /azerothcore/env/dist/bin/dbimport /azerothcore/env/dist/bin/dbimport
+
+VOLUME /azerothcore/env/dist/etc
 
 CMD /azerothcore/env/dist/bin/dbimport
 
@@ -230,12 +262,11 @@ ENV TZ=Etc/UTC
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
 
-COPY apps apps
+COPY --chown=$DOCKER_USER:$DOCKER_USER apps apps
 
-RUN addgroup --gid $GROUP_ID acore && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
-    passwd -d acore && \
-    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
+    useradd -d /azerothcore --uid "$USER_ID"  --gid "$GROUP_ID"  "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER"
 
 ARG CACHEBUST=1
 USER $DOCKER_USER
@@ -245,4 +276,3 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER \
 RUN chmod +x /azerothcore/apps/docker/client-data.sh
 
 CMD /azerothcore/apps/docker/client-data.sh 
-
