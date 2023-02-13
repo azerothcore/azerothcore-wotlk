@@ -22,6 +22,8 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
+#define DataHeader "DTK"
+
 #define DraktharonKeepScriptName "instance_drak_tharon_keep"
 
 enum Data

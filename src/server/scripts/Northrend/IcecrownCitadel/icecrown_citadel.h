@@ -32,6 +32,8 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 
+#define DataHeader "IC"
+
 #define ICCScriptName "instance_icecrown_citadel"
 
 uint32 const WeeklyNPCs = 9;
