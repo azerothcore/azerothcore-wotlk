@@ -55,7 +55,6 @@ public:
         }
 
         uint32 _auiEncounter[MAX_ENCOUNTER];
-        ObjectGuid _bossGUIDs[2];
         ObjectGuid _doorGUIDs[6];
         ObjectGuid _prisonGUIDs[4];
 
@@ -71,17 +70,9 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch (creature->GetEntry())
+            if (creature->GetEntry() == NPC_NASCENT_FEL_ORC)
             {
-                case NPC_THE_MAKER:
-                    _bossGUIDs[DATA_THE_MAKER] = creature->GetGUID();
-                    break;
-                case NPC_KELIDAN:
-                    _bossGUIDs[DATA_KELIDAN] = creature->GetGUID();
-                    break;
-                case NPC_NASCENT_FEL_ORC:
-                    StorePrisoner(creature);
-                    break;
+                StorePrisoner(creature);
             }
 
             InstanceScript::OnCreatureCreate(creature);
@@ -125,11 +116,6 @@ public:
         {
             switch (data)
             {
-                case DATA_THE_MAKER:
-                case DATA_BROGGOK:
-                case DATA_KELIDAN:
-                    return _bossGUIDs[data];
-
                 case DATA_DOOR1:
                 case DATA_DOOR2:
                 case DATA_DOOR3:
