@@ -189,7 +189,6 @@ function comp_all() {
 # conf_layer FILENAME FILENAME
 # Layer the configuration parameters from the first argument onto the second argument
 function conf_layer() {
-  set -x
   LAYER="$1"
   BASE="$2"
   COMMENT="$3"
@@ -217,5 +216,4 @@ function conf_layer() {
         fi
       done
   echo "Layered $LAYER onto $BASE"
-  set +x
 }

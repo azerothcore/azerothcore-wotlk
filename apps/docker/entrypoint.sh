@@ -4,8 +4,6 @@
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
 
-set -x
-
 # Begin env variables for configuration
 #
 # Config for this script. Only matters if you're using SAFE_WORLDSERVER
