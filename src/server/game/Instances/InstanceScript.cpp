@@ -138,6 +138,17 @@ void InstanceScript::LoadBossBoundaries(const BossBoundaryData& data)
             bosses[entry.bossId].boundary.push_back(entry.boundary);
 }
 
+void InstanceScript::SetHeaders(std::string const& dataHeaders)
+{
+    for (char header : dataHeaders)
+    {
+        if (isalpha(header))
+        {
+            headers.push_back(header);
+        }
+    }
+}
+
 void InstanceScript::LoadMinionData(const MinionData* data)
 {
     while (data->entry)
@@ -344,28 +355,87 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
     return false;
 }
 
-void InstanceScript::LoadBossState(const char* data)
+void InstanceScript::Load(const char* data)
 {
     if (!data)
+    {
+        OUT_LOAD_INST_DATA_FAIL;
         return;
+    }
+
+    OUT_LOAD_INST_DATA(data);
 
     std::istringstream loadStream(data);
-    uint32 buff;
+
+    if (ReadSaveDataHeaders(loadStream))
+    {
+        ReadSaveDataBossStates(loadStream);
+        ReadSaveDataMore(loadStream);
+    }
+    else
+        OUT_LOAD_INST_DATA_FAIL;
+
+    OUT_LOAD_INST_DATA_COMPLETE;
+}
+
+bool InstanceScript::ReadSaveDataHeaders(std::istringstream& data)
+{
+    for (char header : headers)
+    {
+        char buff;
+        data >> buff;
+
+        if (header != buff)
+            return false;
+    }
+
+    return true;
+}
+
+void InstanceScript::ReadSaveDataBossStates(std::istringstream& data)
+{
     uint32 bossId = 0;
     for (std::vector<BossInfo>::iterator i = bosses.begin(); i != bosses.end(); ++i, ++bossId)
     {
-        loadStream >> buff;
+        uint32 buff;
+        data >> buff;
+        if (buff == IN_PROGRESS || buff == FAIL || buff == SPECIAL)
+            buff = NOT_STARTED;
+
         if (buff < TO_BE_DECIDED)
-            SetBossState(bossId, (EncounterState)buff);
+            SetBossState(bossId, EncounterState(buff));
     }
 }
 
-std::string InstanceScript::GetBossSaveData()
+std::string InstanceScript::GetSaveData()
 {
+    OUT_SAVE_INST_DATA;
+
     std::ostringstream saveStream;
-    for (std::vector<BossInfo>::iterator i = bosses.begin(); i != bosses.end(); ++i)
-        saveStream << (uint32)i->state << ' ';
+
+    WriteSaveDataHeaders(saveStream);
+    WriteSaveDataBossStates(saveStream);
+    WriteSaveDataMore(saveStream);
+
+    OUT_SAVE_INST_DATA_COMPLETE;
+
     return saveStream.str();
+}
+
+void InstanceScript::WriteSaveDataHeaders(std::ostringstream& data)
+{
+    for (char header : headers)
+    {
+        data << header << ' ';
+    }
+}
+
+void InstanceScript::WriteSaveDataBossStates(std::ostringstream& data)
+{
+    for (BossInfo const& bossInfo : bosses)
+    {
+        data << uint32(bossInfo.state) << ' ';
+    }
 }
 
 void InstanceScript::DoUseDoorOrButton(ObjectGuid uiGuid, uint32 uiWithRestoreTime, bool bUseAlternativeState)

@@ -1,0 +1,6 @@
+-- DB update 2023_02_12_09 -> 2023_02_12_10
+--
+ALTER TABLE `creature_formations`
+	CHANGE COLUMN `dist` `dist` FLOAT NOT NULL DEFAULT '0' AFTER `memberGUID`,
+	CHANGE COLUMN `angle` `angle` FLOAT NOT NULL DEFAULT '0' AFTER `dist`,
+	CHANGE COLUMN `groupAI` `groupAI` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `angle`;

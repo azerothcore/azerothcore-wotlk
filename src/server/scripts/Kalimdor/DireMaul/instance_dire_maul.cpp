@@ -30,6 +30,7 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             _eastWingProgress = 0;
             _westWingProgress = 0;
             _pylonsState = 0;
@@ -144,29 +145,22 @@ public:
             return 0;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            std::ostringstream saveStream;
-            saveStream << "D M " << _eastWingProgress << ' ' << _westWingProgress << ' ' << _pylonsState << ' ' << _northWingProgress << ' ' << _northWingBosses;
-            return saveStream.str();
+            data >> _eastWingProgress;
+            data >> _westWingProgress;
+            data >> _pylonsState;
+            data >> _northWingProgress;
+            data >> _northWingBosses;
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-                return;
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2;
-            if (dataHead1 == 'D' && dataHead2 == 'M')
-            {
-                loadStream >> _eastWingProgress;
-                loadStream >> _westWingProgress;
-                loadStream >> _pylonsState;
-                loadStream >> _northWingProgress;
-                loadStream >> _northWingBosses;
-            }
+            data << _eastWingProgress << ' '
+                << _westWingProgress << ' '
+                << _pylonsState << ' '
+                << _northWingProgress << ' '
+                << _northWingBosses;
         }
 
     private:

@@ -23,6 +23,8 @@
 
 #define TheBotanicaScriptName "instance_the_botanica"
 
+#define DataHeader "BC"
+
 enum DataTypes
 {
     DATA_COMMANDER_SARANNIS             = 0,
