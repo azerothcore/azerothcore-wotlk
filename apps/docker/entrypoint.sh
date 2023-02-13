@@ -12,10 +12,9 @@ ACORE_SKIP_CREATE_ACCOUNT="${ACORE_SKIP_CREATE_ACCOUNT:-}"
 ACORE_GM_LEVEL="${ACORE_GM_LEVEL:-3}"
 ACORE_USERNAME="${ACORE_USERNAME:-admin}"
 ACORE_PASSWORD="${ACORE_PASSWORD:-admin}"
-[ grep -qE  "[^a-zA-Z0-9]" <<< "$ACORE_PASSWORD" ] && \
+grep -qE  "[^a-zA-Z0-9]" <<< "$ACORE_PASSWORD" && \
   echo "ACORE_PASSWORD is not alphanumeric. ACORE_PASSWORD should only be letters and numbers. Exiting..." && \
   exit 1
-PIPE_NAME="/azerothcore/worldserver-stdin"
 
 # Config for the application itself
 
@@ -40,7 +39,7 @@ conf="/azerothcore/env/dist/etc/$ACORE_COMPONENT.conf"
 
 if [ -n "$SAFE_WORLDSERVER" ] && \
    [ "$ACORE_COMPONENT" == "worldserver" ] && \
-   grep -q "$ACORE_COMPONENT" "$CMD" ; then
+   grep -q "$ACORE_COMPONENT" <<< "$CMD" ; then
   cat << EOF 
 #==============================================================================#
 # You are using SAFE_WORLDSERVER mode.
@@ -54,9 +53,9 @@ if [ -n "$SAFE_WORLDSERVER" ] && \
 EOF
 
   exec env \
-       ACORE_USERNAME=$ACORE_USERNAME \
-       ACORE_PASSWORD=$ACORE_PASSWORD \
-       ACORE_GM_LEVEL=$ACORE_GM_LEVEL \
+       ACORE_USERNAME="$ACORE_USERNAME" \
+       ACORE_PASSWORD="$ACORE_PASSWORD" \
+       ACORE_GM_LEVEL="$ACORE_GM_LEVEL" \
        /azerothcore/worldserver.exp
 else 
   exec $CMD

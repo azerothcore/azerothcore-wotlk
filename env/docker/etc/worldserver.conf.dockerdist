@@ -22,8 +22,6 @@ CharacterDatabaseInfo = "$MYSQL_HOST;$MYSQL_PORT;$MYSQL_USER;$MYSQL_PASSWORD;aco
 # Disable idle connections automatic kick since it doesn't work well on macOS + Docker
 CloseIdleConnections = 0
 
-PidFile = "/azerothcore/worldserver.pid"
-
 # We don't need to worry about logging to a file; docker manages that for us
 # Need to escape commas and spaces for config file layering
 Appender.Server=1\,0\,0\,"1 9 3 6 5 8"
