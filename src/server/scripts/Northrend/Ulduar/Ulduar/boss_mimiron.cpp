@@ -1384,6 +1384,8 @@ public:
                 {
                     float angle = (spinningUpOrientation * 2 * M_PI) / 100.0f;
                     me->SetFacingTo(angle);
+                    if (Unit* vehicle = me->GetVehicleBase())
+                        vehicle->SetFacingTo(angle);
 
                     spinningUpTimer = 0;
                 }
@@ -1479,10 +1481,10 @@ public:
                         spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
                         spinningUpTimer = 1500;
                         me->SetFacingTo(angle);
-                        p->CastSpell(p, 34400, true);//临时增加光柱显示
                         me->CastSpell(p, SPELL_SPINNING_UP, true);
                         if (Unit* vehicle = me->GetVehicleBase())
                         {
+                            vehicle->SetFacingTo(angle);
                             vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
                             vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
                         }
@@ -1950,7 +1952,7 @@ public:
         void Reset() override
         {
             me->SetCanFly(true);
-            me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            me->AddUnitMovementFlag(MOVEMENTFLAG_ASCENDING);
             me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         }
 
