@@ -385,7 +385,7 @@ public:
         void ScheduleNextEvent(uint32 currentEvent, uint32 time);
         void SummonNextWave();
         void ReorderInstance(uint32 data);
-        void EnterCombat(Unit* /*who*/) override ;
+        void JustEngagedWith(Unit* /*who*/) override ;
         void SendNextWave(uint32 entry);
         void SpawnTimeRift();
 
@@ -1232,7 +1232,7 @@ void npc_arthas::npc_arthasAI::SummonNextWave()
         me->SummonCreature(/*entry*/(uint32)WavesLocations[tableId][i][0], WavesLocations[tableId][i][1], WavesLocations[tableId][i][2], WavesLocations[tableId][i][3], WavesLocations[tableId][i][4]);
 }
 
-void npc_arthas::npc_arthasAI::EnterCombat(Unit* /*who*/)
+void npc_arthas::npc_arthasAI::JustEngagedWith(Unit* /*who*/)
 {
     DoCast(me, SPELL_ARTHAS_AURA);
 

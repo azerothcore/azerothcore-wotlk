@@ -283,11 +283,11 @@ struct boss_ouro : public BossAI
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         Emerge();
 
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
     }
 
     void UpdateAI(uint32 diff) override
@@ -335,7 +335,7 @@ struct npc_dirt_mound : ScriptedAI
             _ouroHealth = data;
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
         _scheduler.Schedule(30s, [this](TaskContext /*context*/)

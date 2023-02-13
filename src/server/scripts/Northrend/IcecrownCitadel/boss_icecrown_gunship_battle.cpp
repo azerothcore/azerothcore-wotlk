@@ -770,7 +770,7 @@ public:
             _events.ScheduleEvent(EVENT_INTRO_H_4, 39200);
         }
 
-        void EnterCombat(Unit* /*target*/) override
+        void JustEngagedWith(Unit* /*target*/) override
         {
             if (_instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE && !me->HasAura(SPELL_FRIENDLY_BOSS_DAMAGE_MOD))
                 me->CastSpell(me, SPELL_FRIENDLY_BOSS_DAMAGE_MOD, true);
@@ -1106,7 +1106,7 @@ public:
             _events.ScheduleEvent(EVENT_INTRO_A_5, 45000);
         }
 
-        void EnterCombat(Unit* /*target*/) override
+        void JustEngagedWith(Unit* /*target*/) override
         {
             if (_instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE && !me->HasAura(SPELL_FRIENDLY_BOSS_DAMAGE_MOD))
                 me->CastSpell(me, SPELL_FRIENDLY_BOSS_DAMAGE_MOD, true);
@@ -1658,7 +1658,7 @@ public:
         {
         }
 
-        void EnterCombat(Unit*  /*target*/) override
+        void JustEngagedWith(Unit*  /*target*/) override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_BLADESTORM, urand(13000, 18000));

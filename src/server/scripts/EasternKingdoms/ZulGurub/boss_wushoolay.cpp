@@ -49,9 +49,9 @@ public:
     {
         boss_wushoolayAI(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS) { }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_LIGHTNING_CLOUD, 7s, 15s);
             events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 12s, 16s);
             events.ScheduleEvent(EVENT_FORKED_LIGHTNING, 8s, 12s);

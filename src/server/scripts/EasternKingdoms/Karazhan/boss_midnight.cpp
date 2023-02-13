@@ -366,8 +366,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
+<<<<<<< Updated upstream
             BossAI::EnterCombat(who);
 
             scheduler.Schedule(Seconds(15), Seconds(25), [this](TaskContext task)
@@ -381,6 +382,12 @@ public:
         {
             me->DespawnOnEvade(10s);
             _phase = PHASE_NONE;
+=======
+            BossAI::JustEngagedWith(who);
+            events.ScheduleEvent(EVENT_CHECK_HEALTH_95, 0);
+            events.ScheduleEvent(EVENT_SPELL_KNOCKDOWN, 6000);
+            DoZoneInCombat();
+>>>>>>> Stashed changes
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -423,6 +430,227 @@ public:
     }
 };
 
+<<<<<<< Updated upstream
+=======
+class boss_attumen : public CreatureScript
+{
+public:
+    boss_attumen() : CreatureScript("boss_attumen") { }
+
+    struct boss_attumenAI : public ScriptedAI
+    {
+        boss_attumenAI(Creature* creature) : ScriptedAI(creature)
+        {
+        }
+
+        void Reset() override
+        {
+            _events.Reset();
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            Talk(SAY_ATTUMEN1_APPEAR);
+            _events.ScheduleEvent(EVENT_CHECK_HEALTH_25, 0);
+            _events.ScheduleEvent(EVENT_SPELL_SHADOW_CLEAVE, 6000);
+            _events.ScheduleEvent(EVENT_SPELL_INTANGIBLE_PRESENCE, 15000);
+            _events.ScheduleEvent(EVENT_RANDOM_YELL, urand(25000, 45000));
+        }
+
+        void KilledUnit(Unit* /*victim*/) override
+        {
+            if (_events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            {
+                _events.ScheduleEvent(EVENT_KILL_TALK, 5000);
+                Talk(SAY_ATTUMEN_KILL);
+            }
+        }
+
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Mechanic == MECHANIC_DISARM && _events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            {
+                _events.ScheduleEvent(EVENT_KILL_TALK, 5000);
+                Talk(SAY_ATTUMEN_DISARM);
+            }
+            else if (spellInfo->Id == SPELL_MOUNT_TARGET_ATTUMEN)
+            {
+                me->CastSpell(me, SPELL_MOUNT_TARGET_MIDNIGHT, true);
+            }
+        }
+
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_MOUNT_TARGET_MIDNIGHT)
+            {
+                Talk(SAY_ATTUMEN1_MOUNT);
+                _events.Reset();
+                me->GetMotionMaster()->MovePoint(POINT_MOVE_TO_MIDNIGHT, target->GetPositionX() + 2.0f * cos(target->GetAngle(me)), target->GetPositionY() + 2.0f * std::sin(target->GetAngle(me)), target->GetPositionZ() + 0.2f, true, true, MOTION_SLOT_CONTROLLED);
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 point) override
+        {
+            if (type == POINT_MOTION_TYPE && point == POINT_MOVE_TO_MIDNIGHT)
+            {
+                if (TempSummon* summon = me->ToTempSummon())
+                    if (Unit* midnight = summon->GetSummonerUnit())
+                        midnight->GetAI()->SetData(DATA_ATTUMEN_READY, 0);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            _events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (_events.ExecuteEvent())
+            {
+                case EVENT_SPELL_SHADOW_CLEAVE:
+                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_CLEAVE, false);
+                    _events.ScheduleEvent(EVENT_SPELL_SHADOW_CLEAVE, urand(9000, 14000));
+                    break;
+                case EVENT_SPELL_INTANGIBLE_PRESENCE:
+                    me->CastSpell(me->GetVictim(), SPELL_INTANGIBLE_PRESENCE, false);
+                    _events.ScheduleEvent(EVENT_SPELL_INTANGIBLE_PRESENCE, 30000);
+                    break;
+                case EVENT_RANDOM_YELL:
+                    Talk(SAY_ATTUMEN_RANDOM);
+                    _events.ScheduleEvent(EVENT_RANDOM_YELL, urand(30000, 70000));
+                    break;
+                case EVENT_CHECK_HEALTH_25:
+                    if (me->HealthBelowPct(25))
+                    {
+                        me->CastSpell(me, SPELL_MOUNT_TARGET_MIDNIGHT, true);
+                        break;
+                    }
+                    _events.ScheduleEvent(EVENT_CHECK_HEALTH_25, 500);
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        EventMap _events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetKarazhanAI<boss_attumenAI>(creature);
+    }
+};
+
+class boss_attumen_midnight : public CreatureScript
+{
+public:
+    boss_attumen_midnight() : CreatureScript("boss_attumen_midnight") { }
+
+    struct boss_attumen_midnightAI : public ScriptedAI
+    {
+        boss_attumen_midnightAI(Creature* creature) : ScriptedAI(creature)
+        {
+        }
+
+        void Reset() override
+        {
+            _events.Reset();
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            _events.ScheduleEvent(EVENT_SPELL_SHADOW_CLEAVE, 6000);
+            _events.ScheduleEvent(EVENT_SPELL_INTANGIBLE_PRESENCE, 15000);
+            _events.ScheduleEvent(EVENT_RANDOM_YELL, urand(25000, 45000));
+            _events.ScheduleEvent(EVENT_SPELL_CHARGE, 20000);
+            _events.ScheduleEvent(EVENT_SPELL_KNOCKDOWN, 11000);
+        }
+
+        void KilledUnit(Unit* /*victim*/) override
+        {
+            if (_events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            {
+                _events.ScheduleEvent(EVENT_KILL_TALK, 5000);
+                Talk(SAY_ATTUMEN_KILL);
+            }
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_ATTUMEN2_DEATH);
+        }
+
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Mechanic == MECHANIC_DISARM && _events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            {
+                _events.ScheduleEvent(EVENT_KILL_TALK, 5000);
+                Talk(SAY_ATTUMEN_DISARM);
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 point) override
+        {
+            if (type == POINT_MOTION_TYPE && point == POINT_MOVE_TO_MIDNIGHT)
+            {
+                if (TempSummon* summon = me->ToTempSummon())
+                    if (Unit* midnight = summon->GetSummonerUnit())
+                        midnight->GetAI()->SetData(DATA_ATTUMEN_READY, 0);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            _events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (_events.ExecuteEvent())
+            {
+                case EVENT_SPELL_SHADOW_CLEAVE:
+                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_CLEAVE, false);
+                    _events.ScheduleEvent(EVENT_SPELL_SHADOW_CLEAVE, urand(9000, 14000));
+                    break;
+                case EVENT_SPELL_INTANGIBLE_PRESENCE:
+                    me->CastSpell(me->GetVictim(), SPELL_INTANGIBLE_PRESENCE, false);
+                    _events.ScheduleEvent(EVENT_SPELL_INTANGIBLE_PRESENCE, 30000);
+                    break;
+                case EVENT_RANDOM_YELL:
+                    Talk(SAY_ATTUMEN_RANDOM);
+                    _events.ScheduleEvent(EVENT_RANDOM_YELL, urand(30000, 70000));
+                    break;
+                case EVENT_SPELL_CHARGE:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 24.0f, true))
+                        me->CastSpell(target, SPELL_CHARGE_MIDNIGHT, false);
+                    _events.ScheduleEvent(EVENT_SPELL_CHARGE, 20000);
+                    break;
+                case EVENT_SPELL_KNOCKDOWN:
+                    me->CastSpell(me->GetVictim(), SPELL_KNOCKDOWN, false);
+                    _events.ScheduleEvent(EVENT_SPELL_KNOCKDOWN, 20000);
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        EventMap _events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetKarazhanAI<boss_attumen_midnightAI>(creature);
+    }
+};
+
+>>>>>>> Stashed changes
 class spell_midnight_fixate : public SpellScriptLoader
 {
 public:

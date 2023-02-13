@@ -110,9 +110,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events2.Reset();
             events.ScheduleEvent(EVENT_FELFIRE_SHOCK, urand(12000, 14000));
             events.ScheduleEvent(EVENT_KNOCK_AWAY, urand(11000, 12000));

@@ -128,7 +128,7 @@ class boss_anub_arak : public CreatureScript
                 instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
             }
 
-            void EnterCombat(Unit* ) override
+            void JustEngagedWith(Unit* ) override
             {
                 Talk(SAY_AGGRO);
                 instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
@@ -160,7 +160,7 @@ class boss_anub_arak : public CreatureScript
                 switch (uint32 eventId = events.ExecuteEvent())
                 {
                     case EVENT_CLOSE_DOORS:
-                        _EnterCombat();
+                        _JustEngagedWith();
                         break;
                     case EVENT_CARRION_BEETELS:
                         me->CastSpell(me, SPELL_CARRION_BEETLES, false);

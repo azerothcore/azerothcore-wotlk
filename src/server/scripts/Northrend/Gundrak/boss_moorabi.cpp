@@ -81,10 +81,10 @@ public:
             events2.ScheduleEvent(EVENT_PHANTOM, 21000);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->CastSpell(me, SPELL_MOJO_FRENZY, true);
 
             events.ScheduleEvent(EVENT_GROUND_TREMOR, 18000);

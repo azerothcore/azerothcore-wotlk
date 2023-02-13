@@ -121,9 +121,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
 
             _scheduler.CancelAll();
             _scheduler.Schedule(4s, [this](TaskContext context) {
@@ -306,7 +306,7 @@ public:
             });
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _scheduler.Schedule(1s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SHIELD);
@@ -391,7 +391,7 @@ public:
             });
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _scheduler.Schedule(13s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SWEEPINGSTRIKES);

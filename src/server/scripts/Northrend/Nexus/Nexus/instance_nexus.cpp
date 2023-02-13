@@ -194,7 +194,7 @@ public:
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             _allowDeath = me->GetInstanceScript()->GetBossState(DATA_ORMOROK_EVENT) == DONE;
         }

@@ -64,9 +64,9 @@ public:
     {
         boss_warmastervooneAI(Creature* creature) : BossAI(creature, DATA_WARMASTER_VOONE) { }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
 
             events.SetPhase(PHASE_BRAWLER);
             events.ScheduleEvent(EVENT_THRASH, 3s, GROUP_BRAWLER, PHASE_BRAWLER);

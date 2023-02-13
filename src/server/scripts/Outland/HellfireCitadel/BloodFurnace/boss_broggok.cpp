@@ -49,7 +49,108 @@ struct boss_broggok : public BossAI
         _EnterCombat();
     }
 
+<<<<<<< Updated upstream
     void JustSummoned(Creature* summoned) override
+=======
+        InstanceScript* instance;
+        SummonList summons;
+        bool canAttack;
+
+        void Reset() override
+        {
+            events.Reset();
+            summons.DespawnAll();
+
+            me->SetReactState(REACT_PASSIVE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetImmuneToAll(true);
+            canAttack = false;
+
+            if (instance)
+                instance->SetData(DATA_BROGGOK, NOT_STARTED);
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            Talk(SAY_AGGRO);
+        }
+
+        void JustSummoned(Creature* summoned) override
+        {
+            summons.Summon(summoned);
+
+            summoned->SetFaction(FACTION_MONSTER_2);
+            summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            summoned->CastSpell(summoned, SPELL_POISON, true, 0, 0, me->GetGUID());
+        }
+
+        void SummonedCreatureDespawn(Creature* summon) override
+        {
+            summons.Despawn(summon);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim() || !canAttack)
+                return;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_SPELL_SLIME:
+                    me->CastSpell(me->GetVictim(), SPELL_SLIME_SPRAY, false);
+                    events.RepeatEvent(urand(7000, 12000));
+                    break;
+                case EVENT_SPELL_BOLT:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        me->CastSpell(target, SPELL_POISON_BOLT, false);
+                    events.RepeatEvent(urand(6000, 11000));
+                    break;
+                case EVENT_SPELL_POISON:
+                    me->CastSpell(me, SPELL_POISON_CLOUD, false);
+                    events.RepeatEvent(20000);
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (instance)
+            {
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR4), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR5), true);
+                instance->SetData(DATA_BROGGOK, DONE);
+            }
+        }
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+                case ACTION_PREPARE_BROGGOK:
+                    me->SetInCombatWithZone();
+                    break;
+                case ACTION_ACTIVATE_BROGGOK:
+                    events.ScheduleEvent(EVENT_SPELL_SLIME, 10000);
+                    events.ScheduleEvent(EVENT_SPELL_POISON, 5000);
+                    events.ScheduleEvent(EVENT_SPELL_BOLT, 7000);
+
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToAll(false);
+                    canAttack = true;
+                    break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+>>>>>>> Stashed changes
     {
         summons.Summon(summoned);
 

@@ -59,13 +59,13 @@ struct boss_ghazan : public BossAI
         BossAI::Reset();
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         events.ScheduleEvent(EVENT_ACID_BREATH, 3s);
         events.ScheduleEvent(EVENT_ACID_SPIT, 1s);
         events.ScheduleEvent(EVENT_TAIL_SWEEP, DUNGEON_MODE<Milliseconds>(5900ms, 10s));
 
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
     }
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override

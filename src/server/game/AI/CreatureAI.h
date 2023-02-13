@@ -117,7 +117,7 @@ public:
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
     // Called for reaction when initially engaged
-    virtual void EnterCombat(Unit* /*victim*/) {}
+    virtual void JustEngagedWith(Unit* /*who*/) {}
 
     // Called when the creature is killed
     virtual void JustDied(Unit* /*killer*/) {}

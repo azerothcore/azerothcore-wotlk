@@ -198,7 +198,7 @@ public:
 
         void JustReachedHome() override { me->setActive(false); }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             events.ScheduleEvent(EVENT_ENRAGE, 600000, 0, 0);

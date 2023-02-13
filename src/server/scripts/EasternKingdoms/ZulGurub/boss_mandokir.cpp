@@ -184,9 +184,9 @@ public:
             instance->SaveToDB();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_OVERPOWER, 1s);
             events.ScheduleEvent(EVENT_MORTAL_STRIKE, 14s, 28s);
             events.ScheduleEvent(EVENT_WHIRLWIND, 24s, 30s);
@@ -537,9 +537,9 @@ public:
             reviveGUID.Clear();
         }
 
-        void EnterCombat(Unit* victim) override
+        void JustEngagedWith(Unit* who) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             _scheduler.Schedule(6s, 12s, [this](TaskContext context)
@@ -672,7 +672,7 @@ struct npc_vilebranch_speaker : public ScriptedAI
         _scheduler.CancelAll();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler
             .Schedule(2s, 4s, [this](TaskContext context)

@@ -120,10 +120,10 @@ public:
             activeRifts++;
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             activeRifts = 0;
             events.SetTimer(45000);

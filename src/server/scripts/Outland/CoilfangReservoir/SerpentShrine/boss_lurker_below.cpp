@@ -116,7 +116,7 @@ public:
                 me->Attack(who, true);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPELL_WHIRL, 18000);
             events.ScheduleEvent(EVENT_SPELL_SPOUT, 45000);

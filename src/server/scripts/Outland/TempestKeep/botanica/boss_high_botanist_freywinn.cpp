@@ -49,9 +49,9 @@ struct boss_high_botanist_freywinn : public BossAI
 {
     boss_high_botanist_freywinn(Creature* creature) : BossAI(creature, DATA_HIGH_BOTANIST_FREYWINN) { }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(6s, [this](TaskContext context)

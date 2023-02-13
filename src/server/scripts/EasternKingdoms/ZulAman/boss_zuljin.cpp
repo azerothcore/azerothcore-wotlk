@@ -201,7 +201,7 @@ public:
             //me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             instance->SetData(DATA_ZULJINEVENT, IN_PROGRESS);
 
@@ -580,7 +580,7 @@ public:
 
         void Reset() override { }
 
-        void EnterCombat(Unit* /*target*/) override { }
+        void JustEngagedWith(Unit* /*target*/) override { }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
