@@ -132,7 +132,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 RUN apt update && \
     apt install -y \ 
       libmysqlclient21 libreadline8 \
-      # Get envsubst and screen
+      # Get envsubst and expect
       gettext-base expect mysql-client && \
     rm -rf /var/lib/apt/lists/*
 
@@ -150,6 +150,8 @@ RUN chown -R $DOCKER_USER:$DOCKER_USER \
       /azerothcore \
       /run \
       /opt
+
+ENV PATH="/azerothcore/env/dist/bin:$PATH"
 
 USER $DOCKER_USER
 
