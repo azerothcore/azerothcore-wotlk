@@ -38,11 +38,7 @@ shellCommandFactory(
 shellCommandFactory(
   "build",
   "Build the authserver and worldserver",
-  [
-    "docker compose --profile local --profile dev --profile dev-build build --parallel",
-    "docker image prune -f",
-    "docker compose run --rm --no-deps ac-dev-build bash apps/docker/docker-build-dev.sh",
-  ],
+  ["docker compose --profile app build"],
   env
 );
 
@@ -60,9 +56,7 @@ shellCommandFactory(
   "build:nocache",
   "Build the authserver and worldserver without docker cache",
   [
-    "docker compose --profile local --profile dev --profile dev-build build --no-cache --parallel",
-    "docker image prune -f",
-    "docker compose run --rm --no-deps ac-dev-build bash apps/docker/docker-build-dev.sh",
+    "docker compose --profile app build --no-cache",
   ],
   env
 );
@@ -70,39 +64,42 @@ shellCommandFactory(
 shellCommandFactory(
   "clean:build",
   "Clean build files",
-  [
-    "docker image prune -f",
-    `docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler clean`,
-    `docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler ccacheClean`,
-  ],
+  ["docker builder prune -af"],
   env
 );
 
 shellCommandFactory(
   "client-data",
   "Download client data inside the ac-data volume",
-  ["docker compose run --rm --no-deps ac-dev-server bash acore.sh client-data"],
+  ["docker compose --profile app up --no-deps ac-client-data"],
   env
 );
 
 shellCommandFactory(
   "dev:up",
   "Start the dev server container in background",
-  ["docker compose up -d ac-dev-server"],
+  ["docker compose --profile dev up -d ac-dev-server"],
   env
 );
 
 shellCommandFactory(
   "dev:build",
   "Build using the dev server",
-  ["docker compose run --rm ac-dev-server bash acore.sh compiler build"],
+  ["docker compose --profile dev run --rm ac-dev-server bash acore.sh compiler build"],
+  env
+);
+
+shellCommandFactory(
+  "dev:pull",
+  "Pull remote images of dev server",
+  ["docker compose --profile dev pull"],
   env
 );
 
 shellCommandFactory(
   "dev:dash [args...]",
   "Execute acore dashboard within a running ac-dev-server",
-  ["docker compose run --rm ac-dev-server bash acore.sh"],
+  ["docker compose --profile dev run --rm ac-dev-server bash acore.sh"],
   env
 );
 
@@ -110,37 +107,9 @@ shellCommandFactory(
   "dev:shell [args...]",
   "Open an interactive shell within the dev server",
   [
-    "docker compose up -d ac-dev-server",
-    "docker compose exec ac-dev-server bash",
+    "docker compose --profile dev up -d ac-dev-server",
+    "docker compose --profile dev exec ac-dev-server bash",
   ],
-  env
-);
-
-shellCommandFactory(
-  "prod:build",
-  "[TEST ONLY] Build producion services",
-  ["docker compose --profile prod build --parallel", "docker image prune -f"],
-  env
-);
-
-shellCommandFactory(
-  "prod:pull",
-  "[TEST ONLY] Pull production services from the remote registry",
-  ["docker compose --profile prod pull"],
-  env
-);
-
-shellCommandFactory(
-  "prod:up",
-  "[TEST ONLY] Start production services (foreground)",
-  ["docker compose --profile prod-app up"],
-  env
-);
-
-shellCommandFactory(
-  "prod:up:d",
-  "[TEST ONLY] Start production services (background)",
-  ["docker compose --profile prod-app up -d"],
   env
 );
 

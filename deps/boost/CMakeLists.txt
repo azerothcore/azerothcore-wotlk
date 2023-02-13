@@ -23,6 +23,10 @@ if(WIN32)
   set(Boost_USE_STATIC_RUNTIME     OFF)
 endif()
 
+if(DEFINED ENV{DOCKER})
+  set(Boost_USE_STATIC_LIBS ON)
+endif()
+
 include (CheckCXXSourceCompiles)
 
 if (WIN32)

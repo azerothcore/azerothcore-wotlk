@@ -17852,6 +17852,13 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         isRewardAllowed = creature->IsDamageEnoughForLootingAndReward();
         if (!isRewardAllowed)
             creature->SetLootRecipient(nullptr);
+
+        // Call creature just died function
+        if (CreatureAI* ai = creature->AI())
+        {
+            ai->JustDied(killer);
+            sScriptMgr->OnUnitDeath(creature, killer);
+        }
     }
 
     // pussywizard: remade this if section (player is on the same map
