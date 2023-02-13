@@ -1,6 +1,8 @@
+---
 version: '3.9'
 
-# extension field: https://docs.docker.com/compose/compose-file/compose-file-v3/#extension-fields
+# extension field:
+# https://docs.docker.com/compose/compose-file/compose-file-v3/#extension-fields
 x-networks: &networks
   networks:
     - ac-network
