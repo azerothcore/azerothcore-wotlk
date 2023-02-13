@@ -121,9 +121,9 @@ struct boss_high_king_maulgar : public BossAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
         events.ScheduleEvent(EVENT_ARCING_SMASH, 6s);
@@ -209,7 +209,7 @@ struct boss_olm_the_summoner : public ScriptedAI
             me->GetMotionMaster()->MoveChase(who, 25.0f);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         me->SetInCombatWithZone();
         instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
@@ -275,7 +275,7 @@ struct boss_kiggler_the_crazed : public ScriptedAI
         instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         me->SetInCombatWithZone();
         instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
@@ -342,7 +342,7 @@ struct boss_blindeye_the_seer : public ScriptedAI
         instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         me->SetInCombatWithZone();
         instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
@@ -412,7 +412,7 @@ struct boss_krosh_firehand : public ScriptedAI
             me->GetMotionMaster()->MoveChase(who, 25.0f);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         me->SetInCombatWithZone();
         instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);

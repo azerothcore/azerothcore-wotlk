@@ -444,7 +444,7 @@ public:
 
         void Reset() override {}
 
-        void EnterCombat(Unit* /*who*/) override {}
+        void JustEngagedWith(Unit* /*who*/) override {}
 
         void AttackStart(Unit* /*who*/) override {}
 
@@ -656,7 +656,7 @@ public:
             me->AddAura(1908, me);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
         }
 
@@ -756,7 +756,7 @@ public:
             Initialize();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->AddAura(1908, me);
             Battleshout_timer = 1000;

@@ -237,14 +237,14 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*attacker*/) override
+        void JustEngagedWith(Unit* /*attacker*/) override
         {
             if (!events.IsInPhase(PHASE_COMBAT))
             {
                 return;
             }
 
-            _EnterCombat();
+            _JustEngagedWith();
             DoCastAOE(SPELL_SEPARATION_ANXIETY);
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);

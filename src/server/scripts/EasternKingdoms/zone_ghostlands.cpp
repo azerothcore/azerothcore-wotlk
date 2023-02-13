@@ -168,7 +168,7 @@ struct npc_sentinel_leader : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _events.ScheduleEvent(EVENT_SINISTER_STRIKE, 5s, 9s);
         _events.ScheduleEvent(EVENT_BACKSTAB, 3s, 5s);
@@ -317,7 +317,7 @@ struct npc_sentinel_infiltrator : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _events.ScheduleEvent(EVENT_GOUGE2, 9s, 15s);
         _events.ScheduleEvent(EVENT_BACKSTAB2, 3s, 5s);

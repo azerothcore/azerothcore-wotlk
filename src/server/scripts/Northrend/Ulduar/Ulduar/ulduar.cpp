@@ -230,7 +230,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(1, 2000); // checking Separation Anxiety, Charged Sphere

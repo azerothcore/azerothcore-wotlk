@@ -140,9 +140,9 @@ public:
             me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_COLOSSUS_MIGHTY_BLOW, 10000);
             events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_1, 1000);
             events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_2, 1000);
@@ -276,7 +276,7 @@ public:
             Talk(EMOTE_ALTAR);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
         }
 

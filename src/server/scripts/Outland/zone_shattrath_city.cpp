@@ -477,7 +477,7 @@ public:
 
         EventMap _events;
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             AttackStart(who);
             _events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 2000);

@@ -67,9 +67,9 @@ public:
             BossAI::Reset();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             SchedulePhase(false);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 900000);

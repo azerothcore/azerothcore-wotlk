@@ -520,7 +520,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             if (battleStarted != ENCOUNTER_STATE_FIGHT)
                 return;

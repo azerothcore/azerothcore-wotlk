@@ -65,7 +65,7 @@ public:
             targetEgg = nullptr;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(SPELL_HATCH_EGG, 1s);
         }
@@ -181,9 +181,9 @@ public:
             DoZoneInCombat(nullptr, 100.0f);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(SPELL_WAR_STOMP, 17s, 20s);
             resetTimer = 0;
         }

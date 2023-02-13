@@ -79,9 +79,9 @@ struct boss_gruul : public BossAI
         _caveInTimer = 29000;
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
         events.ScheduleEvent(EVENT_GROWTH, 30000);

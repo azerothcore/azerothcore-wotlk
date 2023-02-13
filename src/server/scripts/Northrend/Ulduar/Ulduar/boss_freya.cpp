@@ -474,7 +474,7 @@ public:
 
         void JustReachedHome() override { me->setActive(false); }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             me->setActive(true);
             me->SetInCombatWithZone();
@@ -698,7 +698,7 @@ public:
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_STONEBARK_FISTS_OF_STONE, 40000);
             events.ScheduleEvent(EVENT_STONEBARK_GROUND_TREMOR, 5000);
@@ -794,7 +794,7 @@ public:
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_BRIGHTLEAF_FLUX, 10000);
             events.ScheduleEvent(EVENT_BRIGHTLEAF_SOLAR_FLARE, 5000);
@@ -905,7 +905,7 @@ public:
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_IRONBRANCH_IMPALE, 10000);
             events.ScheduleEvent(EVENT_IRONBRANCH_IRON_ROOT, 15000);
@@ -1114,7 +1114,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             if (me->GetEntry() == NPC_ANCIENT_CONSERVATOR)
             {

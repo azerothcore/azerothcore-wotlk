@@ -81,9 +81,9 @@ public:
                 ++_raptorCount;
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             _raptorCount = 0;
 
             events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 33000);

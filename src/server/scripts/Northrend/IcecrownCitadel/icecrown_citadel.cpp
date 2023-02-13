@@ -1037,7 +1037,7 @@ public:
                     }
         }
 
-        void EnterCombat(Unit* /*attacker*/) override
+        void JustEngagedWith(Unit* /*attacker*/) override
         {
             if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
             {
@@ -1046,7 +1046,7 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 return;
             }
-            _EnterCombat();
+            _JustEngagedWith();
             me->LowerPlayerDamageReq(me->GetMaxHealth());
             if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
             {
@@ -1241,7 +1241,7 @@ public:
         }
     }
 
-    void EnterCombat(Unit* /*target*/) override
+    void JustEngagedWith(Unit* /*target*/) override
     {
         if (IsUndead)
             DoZoneInCombat();
@@ -1627,7 +1627,7 @@ public:
                 ScriptedAI::AttackStart(victim);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->InterruptNonMeleeSpells(false);
             me->CallForHelp(8.5f);
@@ -2576,7 +2576,7 @@ public:
         void Reset() override { events.Reset(); }
         void AttackStart(Unit* who) override { AttackStartCaster(who, 20.0f); }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(1, urand(5000, 15000));
@@ -2643,7 +2643,7 @@ public:
         void Reset() override { events.Reset(); }
         void AttackStart(Unit* who) override { AttackStartCaster(who, 20.0f); }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(1, urand(5000, 10000));
@@ -2697,7 +2697,7 @@ public:
         void Reset() override { events.Reset(); }
         void AttackStart(Unit* who) override { AttackStartCaster(who, 20.0f); }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(1, urand(5000, 15000));
@@ -2758,7 +2758,7 @@ public:
         void Reset() override { events.Reset(); }
         void AttackStart(Unit* who) override { AttackStartCaster(who, 20.0f); }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(1, urand(5000, 15000));
@@ -2825,7 +2825,7 @@ public:
 
         void Reset() override { events.Reset(); summons.DespawnAll(); }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
             summons.DespawnAll();
@@ -3361,7 +3361,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->CallForHelp(15.0f);
         }

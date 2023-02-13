@@ -82,7 +82,7 @@ public:
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_INCITE, 20000);

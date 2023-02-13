@@ -258,7 +258,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.ScheduleEvent(EVENT_CHECK_RAGE, 2000);
             events.ScheduleEvent(EVENT_BRUTAL_STRIKE, 6000);

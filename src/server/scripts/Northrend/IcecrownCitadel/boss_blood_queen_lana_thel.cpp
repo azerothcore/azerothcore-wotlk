@@ -168,7 +168,7 @@ public:
                 instance->SetBossState(DATA_BLOOD_QUEEN_LANA_THEL, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (!instance->CheckRequiredBosses(DATA_BLOOD_QUEEN_LANA_THEL, who->ToPlayer()) || !me->IsVisible())
             {

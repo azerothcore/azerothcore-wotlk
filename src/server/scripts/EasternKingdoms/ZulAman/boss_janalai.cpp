@@ -175,7 +175,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             instance->SetData(DATA_JANALAIEVENT, IN_PROGRESS);
 
@@ -451,7 +451,7 @@ public:
                 DoCast(me, SPELL_FIRE_BOMB_DUMMY, true);
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void AttackStart(Unit* /*who*/) override { }
 
@@ -524,7 +524,7 @@ public:
             return num == 0;   // if num == 0, no more templist
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
         void AttackStart(Unit* /*who*/) override { }
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
@@ -618,7 +618,7 @@ public:
             me->SetDisableGravity(true);
         }
 
-        void EnterCombat(Unit* /*who*/) override {/*DoZoneInCombat();*/ }
+        void JustEngagedWith(Unit* /*who*/) override {/*DoZoneInCombat();*/ }
 
         void UpdateAI(uint32 diff) override
         {

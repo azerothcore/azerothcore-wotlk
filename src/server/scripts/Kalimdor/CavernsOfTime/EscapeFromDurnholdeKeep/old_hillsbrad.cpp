@@ -444,7 +444,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             combatEvents.Reset();
             combatEvents.ScheduleEvent(EVENT_CHECK_HEALTH, 500);

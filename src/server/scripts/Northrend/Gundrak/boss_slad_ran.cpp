@@ -102,10 +102,10 @@ public:
                 _achievement = false;
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_POISON_NOVA, 10000);
             events.ScheduleEvent(EVENT_POWERFULL_BITE, 3000);

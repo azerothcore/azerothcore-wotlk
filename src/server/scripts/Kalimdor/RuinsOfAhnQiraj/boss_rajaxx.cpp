@@ -86,9 +86,9 @@ struct boss_rajaxx : public BossAI
         });
     }
 
-    void EnterCombat(Unit* /*victim*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         events.ScheduleEvent(EVENT_DISARM, 10s);
         events.ScheduleEvent(EVENT_THUNDERCRASH, 12s);
     }
@@ -219,7 +219,7 @@ struct npc_general_andorov : public npc_escortAI
         _summons.Summon(summon);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         events.ScheduleEvent(EVENT_BASH, 8s, 11s);
         events.ScheduleEvent(EVENT_COMMAND_AURA, 1s, 3s);

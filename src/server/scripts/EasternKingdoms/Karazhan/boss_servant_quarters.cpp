@@ -70,7 +70,7 @@ struct boss_servant_quarters : public BossAI
             me->DespawnOrUnsummon(1);
     }
 
-    void EnterCombat(Unit*  /*who*/) override
+    void JustEngagedWith(Unit*  /*who*/) override
     {
         me->setActive(true);
         if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)

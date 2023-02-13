@@ -59,9 +59,9 @@ public:
             _Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_ARCANE_RESONANCE, 20000);
             events.ScheduleEvent(EVENT_ARCANE_DEVASTATION, 10000);
