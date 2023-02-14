@@ -16565,7 +16565,8 @@ void bot_ai::AfterBotOwnerEnterVehicle()
             //    break;
             case CREATURE_TOC5_WARHORSE:
             case CREATURE_TOC5_BATTLEWORG:
-                me->CastSpell(veh, 67830); //Ride Vehicle
+                //me->CastSpell(veh, 67830); //Ride Vehicle
+                me->EnterVehicleUnattackable(veh);
                 break;
             default:
                 me->EnterVehicle(veh);
@@ -16611,6 +16612,7 @@ Unit* bot_ai::SpawnVehicle(uint32 creEntry, uint32 vehEntry)
         me->GetClosePoint(x, y, z, me->GetCombatReach());
         vc = new TempSummon(nullptr, me->GetGUID(), false);
         ASSERT(vc->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, master->GetPhaseMask(), creEntry, vehEntry, x,y,z,o));
+        vc->ClearZoneScript();
         vc->SetTempSummonType(TEMPSUMMON_CORPSE_DESPAWN);
         vc->InitStats(0);
         ASSERT(map->AddToMap(vc->ToCreature()));
@@ -16629,6 +16631,7 @@ Unit* bot_ai::SpawnVehicle(uint32 creEntry, uint32 vehEntry)
         me->GetTransport()->CalculatePassengerPosition(x, y, z, &o);
         vc = new TempSummon(nullptr, me->GetGUID(), false);
         ASSERT(vc->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, master->GetPhaseMask(), creEntry, vehEntry, x,y,z,o));
+        vc->ClearZoneScript();
 
         //vc->SetTransport(me->GetTransport());
         //vc->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
