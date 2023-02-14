@@ -1514,7 +1514,7 @@ public:
                 //level * 3 based on in-game tooltip and spellwork (BasePoints = 2000 + Level * 4,00)
                 int32 damage = spell->Effects[0].CalcValue(me);
                 int32 manaGain = damage;
-                damage += int32(me->GetLevel() * 3);
+                //damage += int32(me->GetLevel() * 3);
                 manaGain += 0.5f * me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC);
 
                 //Life Tap (id: 28830)
