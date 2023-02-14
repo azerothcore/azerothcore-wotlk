@@ -150,6 +150,9 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -(@CGUI
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-(@CGUID+78), 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 36393, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Invis Deathforge Caster - On Reset - Cast \'Deathforge Summon Visual\'');
 
+-- Delete old SAI
+DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (-84858,-84858,-84857,-84857,-84856,-84856,-84855,-84855,-84854,-84854);
+
 -- Formations
 DELETE FROM `creature_formations` WHERE `memberGUID` IN (@CGUID+23,@CGUID+62,@CGUID+32,@CGUID+68,@CGUID+24,@CGUID+63,@CGUID+25,@CGUID+64,@CGUID+22,@CGUID+61,@CGUID+27,@CGUID+65);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
@@ -361,6 +364,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 -- 0x2030FC4240134A8000392800016AA0E7 .go xyz -3420.1304 2282.9092 33.51472
 
 -- Pathing for Deathforge Tinkerer Entry: 19754
+-- 0x2030FC4240134A8000392800006AA0E7 .go xyz -3412.3855 2280.988 33.848083
 SET @NPC := @CGUID+5;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-3412.3855,`position_y`=2280.988,`position_z`=33.848083 WHERE `guid`=@NPC;
@@ -385,4 +389,3 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,15,-3426.0977,2255.3433,33.588165,NULL,0,1,0,100,0),
 (@PATH,16,-3419.7566,2260.3987,33.625275,NULL,0,1,0,100,0),
 (@PATH,17,-3414.0315,2270.5618,33.757763,NULL,0,1,0,100,0);
--- 0x2030FC4240134A8000392800006AA0E7 .go xyz -3412.3855 2280.988 33.848083
