@@ -1088,6 +1088,14 @@ public:
 
             data >> C_of_Ulduar_MASK;
             data >> m_mageBarrier;
+
+            for (uint8 i = 0; i < (MAX_ENCOUNTER - 1); ++i)
+            {
+                if (m_auiEncounter[i] == IN_PROGRESS)
+                {
+                    m_auiEncounter[i] = NOT_STARTED;
+                }
+            }
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override
