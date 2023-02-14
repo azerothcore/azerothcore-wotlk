@@ -1093,7 +1093,7 @@ public:
             {
                 if (m_auiEncounter[i] == IN_PROGRESS)
                 {
-                    m_auiEncounter[i] == NOT_STARTED;
+                    m_auiEncounter[i] = NOT_STARTED;
                 }
             }
         }
