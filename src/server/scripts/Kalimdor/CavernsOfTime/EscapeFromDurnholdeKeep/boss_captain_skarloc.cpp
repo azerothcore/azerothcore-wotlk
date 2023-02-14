@@ -149,7 +149,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->CastSpell(me, SPELL_DEVOTION_AURA, true);
 

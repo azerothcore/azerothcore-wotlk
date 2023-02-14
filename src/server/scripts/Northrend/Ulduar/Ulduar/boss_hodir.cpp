@@ -269,7 +269,7 @@ public:
                 SpawnHelpers();
         }
 
-        void EnterCombat(Unit*  /*pWho*/) override
+        void JustEngagedWith(Unit*  /*pWho*/) override
         {
             LOG_ERROR("module", "霍迪尔之战开始");
             me->CastSpell(me, SPELL_BITING_COLD_BOSS_AURA, true);

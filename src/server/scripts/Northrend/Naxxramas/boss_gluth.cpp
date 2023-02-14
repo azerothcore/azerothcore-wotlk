@@ -110,9 +110,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_MORTAL_WOUND, 10000);
             events.ScheduleEvent(EVENT_ENRAGE, 22000);

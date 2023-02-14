@@ -125,7 +125,7 @@ public:
                 creature->DespawnOrUnsummon();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->setActive(true);
             events.Reset();

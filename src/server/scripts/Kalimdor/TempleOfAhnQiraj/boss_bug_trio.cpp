@@ -79,7 +79,7 @@ public:
 
     void EnterCombatWithTrio(Unit* who)
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
 
         if (Creature* vem = instance->GetCreature(DATA_VEM))
         {
@@ -331,7 +331,7 @@ struct boss_kri : public boss_bug_trio
     {
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         EnterCombatWithTrio(who);
 
@@ -359,7 +359,7 @@ struct boss_vem : public boss_bug_trio
     {
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         EnterCombatWithTrio(who);
 
@@ -400,7 +400,7 @@ struct boss_yauj : public boss_bug_trio
     {
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         EnterCombatWithTrio(who);
 

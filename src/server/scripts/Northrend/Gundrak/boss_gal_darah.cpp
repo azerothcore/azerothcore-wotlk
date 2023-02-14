@@ -111,10 +111,10 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             ScheduleEvents(true);
             me->RemoveAurasDueToSpell(SPELL_START_VISUAL);

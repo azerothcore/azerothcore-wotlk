@@ -147,7 +147,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (!instance->CheckRequiredBosses(DATA_ROTFACE, who->ToPlayer()))
             {
@@ -891,7 +891,7 @@ public:
             summons.DespawnAll();
         }
 
-        void EnterCombat(Unit* /*target*/) override
+        void JustEngagedWith(Unit* /*target*/) override
         {
             me->setActive(true);
             events.ScheduleEvent(EVENT_DECIMATE, urand(20000, 25000));

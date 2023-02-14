@@ -76,9 +76,9 @@ public:
             BossAI::Reset();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_ECK_BERSERK, urand(60000, 90000));
             events.ScheduleEvent(EVENT_ECK_BITE, 5000);
             events.ScheduleEvent(EVENT_ECK_SPIT, 10000);

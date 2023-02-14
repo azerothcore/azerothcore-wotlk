@@ -94,7 +94,7 @@ public:
             npc_escortAI::JustRespawned();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
             {

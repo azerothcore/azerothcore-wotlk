@@ -156,7 +156,7 @@ public:
                 pInstance->SetData(DATA_KELESETH, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_SHADOWBOLT, 0);

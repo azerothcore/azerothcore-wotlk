@@ -175,7 +175,7 @@ public:
                 summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);

@@ -113,10 +113,10 @@ public:
             Talk(EMOTE_DEATH);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             LOG_ERROR("module", "跳舞机开始");
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
             if (pInstance)

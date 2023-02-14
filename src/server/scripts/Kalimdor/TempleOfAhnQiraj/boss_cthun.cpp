@@ -181,10 +181,10 @@ struct boss_eye_of_cthun : public BossAI
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         ScheduleTask(true);
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         _beamTarget = who->GetGUID();
     }
 
@@ -404,7 +404,7 @@ struct boss_cthun : public BossAI
         scheduler.CancelAll();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
     }
@@ -639,7 +639,7 @@ struct npc_eye_tentacle : public ScriptedAI
             });
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
     }
@@ -701,7 +701,7 @@ struct npc_claw_tentacle : public ScriptedAI
             });
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
 
@@ -770,7 +770,7 @@ struct npc_giant_claw_tentacle : public ScriptedAI
             });
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
         ScheduleTasks();
@@ -927,7 +927,7 @@ struct npc_giant_eye_tentacle : public ScriptedAI
             });
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
     }

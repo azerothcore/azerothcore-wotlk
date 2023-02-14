@@ -86,9 +86,9 @@ public:
             me->SetVisible(true);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->CastSpell(me, SPELL_NEGATIVE_ENERGY, true);
             me->CastSpell(me, SPELL_SUMMON_BLOOD_ELVES_PERIODIC, true);
             me->CastSpell(me, SPELL_OPEN_PORTAL_PERIODIC, true);
@@ -186,7 +186,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPAWN_BLACK_HOLE, 15000);
             events.ScheduleEvent(EVENT_SPAWN_DARKNESS, 10000);

@@ -657,7 +657,7 @@ public:
             hasTarget = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
         void JustDied(Unit* /*slayer*/) override;
 
         void UpdateAI(uint32 diff) override

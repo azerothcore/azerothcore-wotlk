@@ -406,7 +406,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             if (me->GetEntry() == NPC_RISEN_JAEREN || me->GetEntry() == NPC_RISEN_ARELAS)

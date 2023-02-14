@@ -132,7 +132,7 @@ struct boss_jeklik : public BossAI
         BossAI::EnterEvadeMode(why);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
@@ -147,7 +147,7 @@ struct boss_jeklik : public BossAI
     {
         me->SetHover(false);
         me->SetDisableGravity(false);
-        _EnterCombat();
+        _JustEngagedWith();
         SetCombatMovement(true);
         me->SetReactState(REACT_AGGRESSIVE);
         events.SetPhase(PHASE_ONE);
@@ -285,7 +285,7 @@ struct npc_batrider : public ScriptedAI
         me->AddUnitState(UNIT_STATE_ROOT);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.Schedule(2s, [this](TaskContext context)
         {

@@ -250,10 +250,10 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             LOG_ERROR("module", "收割者战斗开始");
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
             Talk(SAY_INTRO_1);
             events.ScheduleEvent(EVENT_INTRO_2, 4000);
@@ -550,7 +550,7 @@ public:
             me->SetInCombatWithZone();
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             switch (me->GetEntry())
             {

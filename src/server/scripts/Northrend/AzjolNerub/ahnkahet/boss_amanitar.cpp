@@ -114,7 +114,7 @@ struct boss_amanitar : public BossAI
         mushroomsSummoned = false;
     }
 
-    void EnterCombat(Unit* /*attacker*/) override
+    void JustEngagedWith(Unit* /*attacker*/) override
     {
         events.ScheduleEvent(EVENT_ROOTS, urand(5000, 9000));
         events.ScheduleEvent(EVENT_BASH, urand(10000, 14000));
@@ -243,7 +243,7 @@ struct npc_amanitar_mushrooms : public ScriptedAI
     }
 
     // Disabled events
-    void EnterCombat(Unit* /*who*/) override {}
+    void JustEngagedWith(Unit* /*who*/) override {}
     void AttackStart(Unit* /*victim*/) override {}
     void EnterEvadeMode(EvadeReason /*why*/) override {}
 

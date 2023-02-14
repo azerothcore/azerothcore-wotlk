@@ -176,7 +176,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_CHANGE_POS, 0);
             events.ScheduleEvent(EVENT_SPELL_FIREBALL, 5000);
@@ -286,7 +286,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_AGGRO_TALK, 5000);
             events.ScheduleEvent(EVENT_SPELL_REVENGE, 4000);

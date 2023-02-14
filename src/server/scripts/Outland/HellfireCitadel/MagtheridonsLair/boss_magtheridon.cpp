@@ -134,10 +134,10 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events2.Reset();
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_EMOTE1, 0);
             events.ScheduleEvent(EVENT_EMOTE2, 60000);
             events.ScheduleEvent(EVENT_EMOTE3, 120000);

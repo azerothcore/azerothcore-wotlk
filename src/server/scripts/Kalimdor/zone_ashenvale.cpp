@@ -88,7 +88,7 @@ public:
             _isBrazierExtinguished = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             if (Player* player = GetPlayerForEscort())
                 if (HasEscortState(STATE_ESCORT_PAUSED))

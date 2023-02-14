@@ -65,10 +65,10 @@ public:
             _targetGUID.Clear();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SUMMON1, 10000);
             events.ScheduleEvent(EVENT_SUMMON2, 25000);

@@ -83,10 +83,10 @@ public:
             BossAI::Reset();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_ORMOROK_CRYSTAL_SPIKES, 12000);
             events.ScheduleEvent(EVENT_ORMOROK_TRAMPLE, 10000);

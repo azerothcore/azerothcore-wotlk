@@ -81,7 +81,7 @@ public:
                 pInstance->SetData(BOSS_KRYSTALLUS, NOT_STARTED);
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_BOULDER, 8000);

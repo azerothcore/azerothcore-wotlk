@@ -79,9 +79,9 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
             events.ScheduleEvent(EVENT_SPELL_HATEFUL_BOLT, 10000);

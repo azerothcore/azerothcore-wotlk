@@ -147,7 +147,7 @@ public:
             ++HelpersKilled;
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
             summons.DoZoneInCombat();
@@ -336,7 +336,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         ScriptedAI::EnterEvadeMode(why);
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
             if (delrissa->IsAlive() && !delrissa->IsEngaged())
@@ -434,9 +434,9 @@ public:
     {
         boss_kagani_nightstrikeAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            boss_priestess_lackey_commonAI::EnterCombat(who);
+            boss_priestess_lackey_commonAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SPELL_GOUGE, 5500);
             events.ScheduleEvent(EVENT_SPELL_KICK, 9000);
@@ -534,10 +534,10 @@ public:
     {
         boss_ellris_duskhallowAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             me->CastSpell(me, SPELL_SUMMON_IMP, false);
-            boss_priestess_lackey_commonAI::EnterCombat(who);
+            boss_priestess_lackey_commonAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 3000);
             events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 1000);
@@ -612,9 +612,9 @@ public:
     {
         boss_eramas_brightblazeAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            boss_priestess_lackey_commonAI::EnterCombat(who);
+            boss_priestess_lackey_commonAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SPELL_KNOCKDOWN, 6000);
             events.ScheduleEvent(EVENT_SPELL_SNAP_KICK, 3000);
@@ -686,9 +686,9 @@ public:
     {
         boss_yazzaiAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            boss_priestess_lackey_commonAI::EnterCombat(who);
+            boss_priestess_lackey_commonAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SPELL_POLYMORPH, 1000);
             events.ScheduleEvent(EVENT_SPELL_ICE_BLOCK, 1000);
@@ -794,9 +794,9 @@ public:
     {
         boss_warlord_salarisAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            boss_priestess_lackey_commonAI::EnterCombat(who);
+            boss_priestess_lackey_commonAI::JustEngagedWith(who);
             me->CastSpell(me, SPELL_BATTLE_SHOUT, false);
 
             events.ScheduleEvent(EVENT_SPELL_DISARM, 6000);
@@ -886,9 +886,9 @@ public:
             me->SummonCreature(NPC_SLIVER, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            boss_priestess_lackey_commonAI::EnterCombat(who);
+            boss_priestess_lackey_commonAI::JustEngagedWith(who);
             me->CastSpell(me, SPELL_FREEZING_TRAP, true);
 
             events.ScheduleEvent(EVENT_SPELL_AIMED_SHOT, 8000);
@@ -976,9 +976,9 @@ public:
         uint32 Healing_Wave_Timer;
 //        uint32 Frost_Shock_Timer;
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            boss_priestess_lackey_commonAI::EnterCombat(who);
+            boss_priestess_lackey_commonAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SPELL_TOTEM1, 2000);
             events.ScheduleEvent(EVENT_SPELL_TOTEM2, 4000);
@@ -1067,9 +1067,9 @@ public:
     {
         boss_zelfanAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            boss_priestess_lackey_commonAI::EnterCombat(who);
+            boss_priestess_lackey_commonAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SPELL_DRAGON_GUN, 20000);
             events.ScheduleEvent(EVENT_SPELL_ROCKET_LAUNCH, 7000);

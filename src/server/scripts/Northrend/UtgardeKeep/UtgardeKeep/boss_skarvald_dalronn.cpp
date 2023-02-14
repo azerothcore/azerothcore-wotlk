@@ -117,7 +117,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SHARVALD_CHARGE, 5000);
@@ -285,7 +285,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SHADOW_BOLT, 1000);

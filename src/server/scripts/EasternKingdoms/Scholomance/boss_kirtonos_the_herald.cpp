@@ -85,7 +85,7 @@ public:
         EventMap events2;
         InstanceScript* instance;
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             TransformsCount = 0;
 

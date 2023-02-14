@@ -126,7 +126,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16000);
@@ -258,7 +258,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, urand(9000, 12000));
@@ -632,7 +632,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             switch( me->GetEntry() )
             {

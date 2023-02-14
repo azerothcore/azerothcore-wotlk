@@ -52,9 +52,9 @@ public:
     {
         boss_nethermancer_sepethreaAI(Creature* creature) : BossAI(creature, DATA_NETHERMANCER_SEPRETHREA) { }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_FROST_ATTACK, 6000);
             events.ScheduleEvent(EVENT_ARCANE_BLAST, 14000);
             events.ScheduleEvent(EVENT_DRAGONS_BREATH, 18000);
@@ -158,7 +158,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, true);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_SPELL_FIRE_TAIL, 500);
             events.ScheduleEvent(EVENT_SPELL_INFERNO, urand(10000, 20000));

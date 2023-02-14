@@ -204,9 +204,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.SetPhase(PHASE_EMERGED);
             ScheduleCombatEvents();
         }
@@ -481,7 +481,7 @@ public:
             events.RescheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30s, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_HAND_OF_RAGNAROS, 25s, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_LAVA_BURST, 10s, PHASE_EMERGED, PHASE_EMERGED);
-            events.RescheduleEvent(EVENT_SUBMERGE, 18s, PHASE_EMERGED, PHASE_EMERGED);
+            events.RescheduleEvent(EVENT_SUBMERGE, 180s, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_MIGHT_OF_RAGNAROS, 11s, PHASE_EMERGED, PHASE_EMERGED);
         }
 

@@ -695,7 +695,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 5000);
             events.ScheduleEvent(EVENT_CIRCLE_OF_DESTRUCTION, 8000);
@@ -794,7 +794,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_FIREBALL, 3000);
             events.ScheduleEvent(EVENT_FLAMESTRIKE, 6000);
@@ -941,7 +941,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SHADOW_STEP, 4000);
             events.ScheduleEvent(EVENT_DEADLY_POISON, 6000);
@@ -1039,7 +1039,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPECTRAL_STRIKE, 5000);
             events.ScheduleEvent(EVENT_SHIELD_BASH, 6000);
@@ -1125,7 +1125,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_CURSED_ARROW, 10000);
             events.ScheduleEvent(EVENT_FROST_TRAP, 15000);
@@ -1201,7 +1201,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_FROSTSWORN_GENERAL_AGGRO);
             events.ScheduleEvent(EVENT_ACTIVATE_REFLECTIONS, 8000);
@@ -1280,7 +1280,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_BALEFUL_STRIKE, urand(4000, 7000));
         }
@@ -1886,7 +1886,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(1, 10000);
             events.ScheduleEvent(2, 4500);
@@ -1955,7 +1955,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(1, 5000);
         }

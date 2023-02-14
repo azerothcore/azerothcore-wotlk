@@ -787,7 +787,7 @@ void SmartAI::JustReachedHome()
     mJustReset = false;
 }
 
-void SmartAI::EnterCombat(Unit* enemy)
+void SmartAI::JustEngagedWith(Unit* enemy)
 {
     // Xinef: Interrupt channeled spells
     if (IsAIControlled())

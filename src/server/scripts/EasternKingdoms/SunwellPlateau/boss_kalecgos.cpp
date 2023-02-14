@@ -202,9 +202,9 @@ public:
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_ARCANE_BUFFET, 6000);
             events.ScheduleEvent(EVENT_FROST_BREATH, 15000);
             events.ScheduleEvent(EVENT_WILD_MAGIC, 10000);
@@ -411,7 +411,7 @@ public:
                 damage = 0;
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
@@ -525,7 +525,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_SATH_AGGRO);
         }

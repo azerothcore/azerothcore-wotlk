@@ -107,9 +107,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_SPELL_INCINERATE, 24000);
             events.ScheduleEvent(EVENT_SPELL_DOOM_BLOSSOM, 10000);
             events.ScheduleEvent(EVENT_SPELL_CRUSHING_SHADOWS, 17000);

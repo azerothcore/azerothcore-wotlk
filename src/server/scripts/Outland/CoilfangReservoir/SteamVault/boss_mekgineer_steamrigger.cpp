@@ -82,7 +82,7 @@ public:
                 Talk(SAY_SLAY);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_SHRINK, 20000);

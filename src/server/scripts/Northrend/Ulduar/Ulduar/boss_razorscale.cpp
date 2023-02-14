@@ -205,7 +205,7 @@ public:
                 me->GetMotionMaster()->MoveChase(who);
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             me->SetInCombatWithZone();
             events.Reset();

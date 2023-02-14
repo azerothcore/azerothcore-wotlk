@@ -183,7 +183,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*Who*/) override
+        void JustEngagedWith(Unit* /*Who*/) override
         {
             Talk(SAY_RANDOMAGGRO);
         }
@@ -231,7 +231,7 @@ public:
 
         void Reset() override { }
 
-        void EnterCombat(Unit* Who) override
+        void JustEngagedWith(Unit* Who) override
         {
             if (Creature* Emily = GetClosestCreatureWithEntry(me, NPC_EMILY, 50.0f))
             {
@@ -548,7 +548,7 @@ public:
         me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         events.ScheduleEvent(EVENT_CLEAVE, urand(1000, 7000));
         events.ScheduleEvent(EVENT_HAMSTRING, urand(5000, 12000));
