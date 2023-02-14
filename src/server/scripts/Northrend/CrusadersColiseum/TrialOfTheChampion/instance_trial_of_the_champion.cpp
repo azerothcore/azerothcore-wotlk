@@ -25,7 +25,7 @@
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
 
-/* 
+/*
     Missing dialog/RP (already populated in DB) && spawns (can use ToC25 locations?) for:
 
     Garrosh Hellscream 34995
