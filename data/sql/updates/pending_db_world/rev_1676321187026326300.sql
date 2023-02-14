@@ -117,7 +117,7 @@ DELETE FROM `creature_addon` WHERE `guid` IN (@CGUID+15, @CGUID+16, @CGUID+81,@C
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES
 (@CGUID+15,0,0,0,0,0,0, '31261'),
 (@CGUID+16,0,0,0,0,0,0, '31261'),
-(@CGUID+81,0,0,0,0,0,1, '30540'),
+(@CGUID+81,0,0,0,0,0,2, '30540'),
 (@CGUID+82,0,0,0,0,0,2, '');
 
 -- Cooling Infernal Flags
