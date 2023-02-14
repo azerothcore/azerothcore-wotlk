@@ -113,7 +113,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 -- 0x2030FC4240134B0000392800016AA0E7 .go xyz -3479.9746 2202.5378 33.05405
 
 -- GUID auras
-DELETE FROM `creature_addon` WHERE `guid` IN (@CGUID+15, @CGUID+16, @CGUID+81,@CGUID+82);
+DELETE FROM `creature_addon` WHERE `guid` IN (@CGUID+15, @CGUID+16, @CGUID+81,@CGUID+82,86493);
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES
 (@CGUID+15,0,0,0,0,0,0, '31261'),
 (@CGUID+16,0,0,0,0,0,0, '31261'),
