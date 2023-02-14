@@ -78,184 +78,164 @@ const uint32 GuestEntries[6] =
     19876,
 };
 
-class boss_moroes : public CreatureScript
+struct boss_moroes : public BossAI
 {
-public:
-    boss_moroes() : CreatureScript("boss_moroes") { }
-
-    struct boss_moroesAI : public BossAI
+    boss_moroes(Creature* creature) : BossAI(creature, DATA_MOROES)
     {
-        boss_moroesAI(Creature* creature) : BossAI(creature, DATA_MOROES)
+        _activeGuests = 0;
+    }
+
+    void InitializeAI() override
+    {
+        BossAI::InitializeAI();
+        InitializeGuests();
+    }
+
+    void JustReachedHome() override
+    {
+        BossAI::JustReachedHome();
+        InitializeGuests();
+    }
+
+    void InitializeGuests()
+    {
+        if (!me->IsAlive())
+            return;
+
+        if (_activeGuests == 0)
         {
-            _activeGuests = 0;
-            instance = creature->GetInstanceScript();
+            _activeGuests |= 0x3F;
+            uint8 rand1 = RAND(0x01, 0x02, 0x04);
+            uint8 rand2 = RAND(0x08, 0x10, 0x20);
+            _activeGuests &= ~(rand1 | rand2);
         }
 
-        InstanceScript* instance;
+        for (uint8 i = 0; i < MAX_GUEST_COUNT; ++i)
+            if ((1 << i) & _activeGuests)
+                me->SummonCreature(GuestEntries[i], GuestsPosition[summons.size()], TEMPSUMMON_MANUAL_DESPAWN);
 
-        void InitializeAI() override
+        _events2.Reset();
+        _events2.ScheduleEvent(EVENT_GUEST_TALK, 10s);
+    }
+
+    void Reset() override
+    {
+        BossAI::Reset();
+        DoCastSelf(SPELL_DUAL_WIELD, true);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+
+        events.ScheduleEvent(EVENT_SPELL_VANISH, 30s);
+        events.ScheduleEvent(EVENT_SPELL_BLIND, 20s);
+        events.ScheduleEvent(EVENT_SPELL_GOUGE, 13s);
+        events.ScheduleEvent(EVENT_CHECK_HEALTH, 5s);
+        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 10min);
+
+        _events2.Reset();
+        me->CallForHelp(20.0f);
+        DoZoneInCombat();
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
         {
-            BossAI::InitializeAI();
-            InitializeGuests();
+            Talk(SAY_KILL);
+            events.ScheduleEvent(EVENT_KILL_TALK, 5s);
+        }
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        Talk(SAY_DEATH);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GARROTE);
+    }
+
+    Creature* GetRandomGuest()
+    {
+        std::list<Creature*> guestList;
+        for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
+            if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
+                guestList.push_back(summon);
+
+        return Acore::Containers::SelectRandomContainerElement(guestList);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events2.Update(diff);
+        switch (_events2.ExecuteEvent())
+        {
+        case EVENT_GUEST_TALK:
+            if (Creature* guest = GetRandomGuest())
+                guest->AI()->Talk(SAY_GUEST);
+            _events2.Repeat(5s);
+            break;
+        case EVENT_GUEST_TALK2:
+            Talk(SAY_OUT_OF_COMBAT);
+            _events2.Repeat(1min, 2min);
+            break;
         }
 
-        void JustReachedHome() override
-        {
-            BossAI::JustReachedHome();
-            InitializeGuests();
-        }
+        if (!UpdateVictim())
+            return;
 
-        void InitializeGuests()
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            if (!me->IsAlive())
+            case EVENT_CHECK_HEALTH:
+                if (me->HealthBelowPct(31))
+                {
+                    DoCastSelf(SPELL_FRENZY, true);
+                    break;
+                }
+                events.Repeat(1s);
+                break;
+            case EVENT_SPELL_ENRAGE:
+                DoCastSelf(SPELL_BERSERK, true);
+                break;
+            case EVENT_SPELL_BLIND:
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 10.0f, true))
+                {
+                    DoCast(target, SPELL_BLIND);
+                }
+                events.Repeat(25s, 40s);
+                break;
+            case EVENT_SPELL_GOUGE:
+                DoCastVictim(SPELL_GOUGE);
+                events.Repeat(25s, 40s);
                 return;
-
-            if (_activeGuests == 0)
-            {
-                _activeGuests |= 0x3F;
-                uint8 rand1 = RAND(0x01, 0x02, 0x04);
-                uint8 rand2 = RAND(0x08, 0x10, 0x20);
-                _activeGuests &= ~(rand1 | rand2);
-            }
-
-            for (uint8 i = 0; i < MAX_GUEST_COUNT; ++i)
-                if ((1 << i) & _activeGuests)
-                    me->SummonCreature(GuestEntries[i], GuestsPosition[summons.size()], TEMPSUMMON_MANUAL_DESPAWN);
-
-            _events2.Reset();
-            _events2.ScheduleEvent(EVENT_GUEST_TALK, 10000);
-        }
-
-        void Reset() override
-        {
-            BossAI::Reset();
-            me->CastSpell(me, SPELL_DUAL_WIELD, true);
-        }
-
-        void EnterCombat(Unit* who) override
-        {
-            BossAI::EnterCombat(who);
-            Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_SPELL_VANISH, 30000);
-            events.ScheduleEvent(EVENT_SPELL_BLIND, 20000);
-            events.ScheduleEvent(EVENT_SPELL_GOUGE, 13000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 5000);
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
-
-            _events2.Reset();
-            me->CallForHelp(20.0f);
-            DoZoneInCombat();
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-            {
-                Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 5000);
-            }
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            summons.clear();
-            BossAI::JustDied(killer);
-            Talk(SAY_DEATH);
-            instance->SetBossState(DATA_MOROES, DONE);
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GARROTE);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-        }
-
-        Creature* GetRandomGuest()
-        {
-            std::list<Creature*> guestList;
-            for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
-                if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
-                    guestList.push_back(summon);
-
-            return Acore::Containers::SelectRandomContainerElement(guestList);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events2.Update(diff);
-            switch (_events2.ExecuteEvent())
-            {
-                case EVENT_GUEST_TALK:
-                    if (Creature* guest = GetRandomGuest())
-                        guest->AI()->Talk(SAY_GUEST);
-                    _events2.ScheduleEvent(EVENT_GUEST_TALK2, 5000);
-                    break;
-                case EVENT_GUEST_TALK2:
-                    Talk(SAY_OUT_OF_COMBAT);
-                    _events2.ScheduleEvent(EVENT_GUEST_TALK, urand(60000, 120000));
-                    break;
-            }
-
-            if (!UpdateVictim())
+            case EVENT_SPELL_VANISH:
+                events.DelayEvents(9s);
+                events.SetPhase(1);
+                DoCastSelf(SPELL_VANISH);
+                events.Repeat(30s);
+                events.ScheduleEvent(EVENT_SPELL_GARROTE, 5s, 7s);
                 return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(31))
-                    {
-                        me->CastSpell(me, SPELL_FRENZY, true);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-                    break;
-                case EVENT_SPELL_ENRAGE:
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    break;
-                case EVENT_SPELL_BLIND:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 10.0f, true))
-                        me->CastSpell(target, SPELL_BLIND, false);
-                    events.ScheduleEvent(EVENT_SPELL_BLIND, urand(25000, 40000));
-                    break;
-                case EVENT_SPELL_GOUGE:
-                    me->CastSpell(me->GetVictim(), SPELL_GOUGE, false);
-                    events.ScheduleEvent(EVENT_SPELL_GOUGE, urand(25000, 40000));
-                    return;
-                case EVENT_SPELL_VANISH:
-                    events.DelayEvents(9000);
-                    events.SetPhase(1);
-                    me->CastSpell(me, SPELL_VANISH, false);
-                    events.ScheduleEvent(EVENT_SPELL_VANISH, 30000);
-                    events.ScheduleEvent(EVENT_SPELL_GARROTE, urand(5000, 7000));
-                    return;
-                case EVENT_SPELL_GARROTE:
-                    Talk(SAY_SPECIAL);
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                        target->CastSpell(target, SPELL_GARROTE, true);
-                    me->CastSpell(me, SPELL_VANISH_TELEPORT, false);
-                    events.SetPhase(0);
-                    break;
-            }
-
-            // Xinef: not in vanish
-            if (events.GetPhaseMask() == 0)
-                DoMeleeAttackIfReady();
+            case EVENT_SPELL_GARROTE:
+                Talk(SAY_SPECIAL);
+                DoCastRandomTarget(SPELL_GARROTE, 0, 100.0f, true, true);
+                DoCastSelf(SPELL_VANISH_TELEPORT);
+                events.SetPhase(0);
+                break;
         }
+
+        // Xinef: not in vanish
+        if (events.GetPhaseMask() == 0)
+            DoMeleeAttackIfReady();
+    }
 
     private:
         EventMap _events2;
         uint8 _activeGuests;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetKarazhanAI<boss_moroesAI>(creature);
-    }
 };
 
 class spell_moroes_vanish : public SpellScriptLoader
@@ -293,6 +273,6 @@ public:
 
 void AddSC_boss_moroes()
 {
-    new boss_moroes();
+    RegisterKarazhanCreatureAI(boss_moroes);
     new spell_moroes_vanish();
 }

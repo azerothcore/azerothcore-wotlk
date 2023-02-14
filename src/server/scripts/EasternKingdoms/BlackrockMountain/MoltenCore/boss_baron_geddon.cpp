@@ -60,12 +60,12 @@ public:
             armageddonCasted = false;
         }
 
-        void EnterCombat(Unit* /*attacker*/) override
+        void JustEngagedWith(Unit* /*attacker*/) override
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_INFERNO, urand(13000, 15000));
-            events.ScheduleEvent(EVENT_IGNITE_MANA, urand(7000, 19000));
-            events.ScheduleEvent(EVENT_LIVING_BOMB, urand(11000, 16000));
+            _JustEngagedWith();
+            events.ScheduleEvent(EVENT_INFERNO, 13s, 15s);
+            events.ScheduleEvent(EVENT_IGNITE_MANA, 7s, 19s);
+            events.ScheduleEvent(EVENT_LIVING_BOMB, 11s, 16s);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
@@ -95,7 +95,7 @@ public:
                 }
                 case EVENT_IGNITE_MANA:
                 {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_IGNITE_MANA))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_IGNITE_MANA))
                     {
                         DoCast(target, SPELL_IGNITE_MANA);
                     }

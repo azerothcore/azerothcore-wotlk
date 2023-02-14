@@ -96,9 +96,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             PullChamberAdds();
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_POISON_CLOUD, 15000);
@@ -177,7 +177,7 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_MUTATING_INJECTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, -SPELL_MUTATING_INJECTION))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, true, -SPELL_MUTATING_INJECTION))
                     {
                         me->CastSpell(target, SPELL_MUTATING_INJECTION, false);
                     }

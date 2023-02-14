@@ -294,7 +294,7 @@ public:
                 BossAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Position homePos = me->GetHomePosition();
             if (!instance->CheckRequiredBosses(DATA_PROFESSOR_PUTRICIDE, who->ToPlayer()) || me->GetExactDist2d(&homePos) > 10.0f || !me->IsVisible()) // check home position because during festergut/rotface fight, trigger missile after their death can trigger putricide combat
@@ -548,7 +548,7 @@ public:
                 case EVENT_SLIME_PUDDLE:
                     {
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, 2, SelectTargetMethod::Random, 0.0f, true);
+                        SelectTargetList(targets, 2, SelectTargetMethod::Random, 0, 0.0f, true);
                         if (!targets.empty())
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                 me->CastSpell(*itr, SPELL_SLIME_PUDDLE_TRIGGER, true);
@@ -634,7 +634,7 @@ public:
                     if (Is25ManRaid())
                     {
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, MalleableGooSelector(me), (IsHeroic() ? 3 : 2), SelectTargetMethod::Random);
+                        SelectTargetList(targets, (IsHeroic() ? 3 : 2), SelectTargetMethod::Random, 0, MalleableGooSelector(me));
 
                         if (!targets.empty())
                         {
@@ -756,7 +756,7 @@ public:
             targetGUID = guid;
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
             if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))

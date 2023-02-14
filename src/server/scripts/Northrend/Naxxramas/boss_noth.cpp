@@ -166,9 +166,9 @@ public:
             ScriptedAI::EnterEvadeMode(why);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
             StartGroundPhase();
             if (pInstance)
@@ -254,7 +254,7 @@ public:
                     StartBalconyPhase();
                     break;
                 case EVENT_BLINK:
-                    DoResetThreat();
+                    DoResetThreatList();
                     me->CastSpell(me, RAID_MODE(SPELL_CRIPPLE_10, SPELL_CRIPPLE_25), false);
                     me->CastSpell(me, SPELL_BLINK, true);
                     Talk(EMOTE_BLINK);

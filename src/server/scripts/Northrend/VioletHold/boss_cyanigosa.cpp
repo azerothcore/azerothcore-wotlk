@@ -82,7 +82,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
             Talk(SAY_AGGRO);
@@ -123,7 +123,7 @@ public:
                     break;
                 case EVENT_SPELL_ARCANE_VACUUM:
                     me->CastSpell((Unit*)nullptr, SPELL_ARCANE_VACUUM, false);
-                    DoResetThreat();
+                    DoResetThreatList();
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->setAttackTimer(BASE_ATTACK, 3000);
                     events.RepeatEvent(30000);

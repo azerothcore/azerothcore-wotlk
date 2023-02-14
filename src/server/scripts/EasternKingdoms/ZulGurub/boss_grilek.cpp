@@ -61,9 +61,9 @@ public:
             BossAI::Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_AVATAR, 20s, 30s);
             events.ScheduleEvent(EVENT_GROUND_TREMOR, 15s, 25s);
             events.ScheduleEvent(EVENT_ENTANGLING_ROOTS, 5s, 15s);
@@ -91,7 +91,7 @@ public:
                         }
                         DoCast(me, SPELL_AVATAR);
                         me->SetReactState(REACT_PASSIVE);
-                        DoResetThreat();
+                        DoResetThreatList();
                         events.ScheduleEvent(EVENT_START_PURSUIT, 2s);
                         events.ScheduleEvent(EVENT_STOP_PURSUIT, 15s);
                         events.ScheduleEvent(EVENT_AVATAR, 45s, 50s);

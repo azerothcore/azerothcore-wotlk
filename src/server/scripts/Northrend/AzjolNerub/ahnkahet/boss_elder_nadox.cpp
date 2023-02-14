@@ -89,9 +89,9 @@ struct boss_elder_nadox : public BossAI
         respectYourElders = true;
     }
 
-    void EnterCombat(Unit * /*who*/) override
+    void JustEngagedWith(Unit * /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
         events.ScheduleEvent(EVENT_SWARMER, 10000);
@@ -346,7 +346,7 @@ class spell_ahn_kahet_swarmer_aura : public SpellScript
             }
             else if (_targetCount)
             {
-                // TODO: move spell id to enum
+                /// @todo: move spell id to enum
                 caster->CastCustomSpell(SPELL_SWARM, SPELLVALUE_AURA_STACK, _targetCount, caster, true);
                 if (Aura *aur = caster->GetAura(SPELL_SWARM))
                 {

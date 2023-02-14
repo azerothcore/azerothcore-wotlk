@@ -209,25 +209,29 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     // we just need to remove/normalize paths between 2 adjacent points
     if (startFarFromPoly || endFarFromPoly)
     {
-        bool buildShotrcut = false;
+        bool buildShortcut = false;
 
-        bool isUnderWaterStart = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight());
-        bool isUnderWaterEnd = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight());
-        bool isFarUnderWater = startFarFromPoly ? isUnderWaterStart : isUnderWaterEnd;
+        auto liquidDataStart = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
+        auto liquidDataEnd = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
 
+        bool startUnderWaterEndInWater = liquidDataStart.Status == LIQUID_MAP_UNDER_WATER &&
+                                         (liquidDataEnd.Status & MAP_LIQUID_STATUS_IN_CONTACT) != 0;
+        bool startInWaterEndUnderWater = (liquidDataStart.Status & MAP_LIQUID_STATUS_IN_CONTACT) != 0 &&
+                                         liquidDataEnd.Status == LIQUID_MAP_UNDER_WATER;
+        bool waterPath = startUnderWaterEndInWater || startInWaterEndUnderWater;
         Unit const* _sourceUnit = _source->ToUnit();
 
         if (_sourceUnit)
         {
-            bool isUnderWater = (_sourceUnit->CanSwim() && isUnderWaterStart && isUnderWaterEnd) || (isFarUnderWater && _useRaycast);
+            bool isWater = (_sourceUnit->CanSwim() && waterPath);
 
-            if (isUnderWater || _sourceUnit->CanFly() || (_sourceUnit->IsFalling() && endPos.z < startPos.z))
+            if (isWater || _sourceUnit->CanFly() || (_sourceUnit->IsFalling() && endPos.z < startPos.z))
             {
-                buildShotrcut = true;
+                buildShortcut = true;
             }
         }
 
-        if (buildShotrcut)
+        if (buildShortcut)
         {
             BuildShortcut();
             _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
@@ -236,8 +240,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
             return;
         }
-
-        if (!isFarUnderWater)
+        else
         {
             float closestPoint[VERTEX_SIZE];
             // we may want to use closestPointOnPolyBoundary instead
@@ -679,12 +682,11 @@ void PathGenerator::UpdateFilter()
 
 NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
 {
-    LiquidData data;
     LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), x, y, z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
     if (liquidData.Status == LIQUID_MAP_NO_WATER)
         return NAV_GROUND;
 
-    switch (data.Flags)
+    switch (liquidData.Flags)
     {
         case MAP_LIQUID_TYPE_WATER:
         case MAP_LIQUID_TYPE_OCEAN:

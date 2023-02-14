@@ -121,7 +121,7 @@ public:
             }
             else if (summons.size() == 0)
             {
-                Unit::Kill(me, me);
+                me->KillSelf();
             }
         }
 
@@ -130,6 +130,14 @@ public:
             summons.Despawn(summon);
             if (summon->GetEntry() != NPC_HELLFIRE_SENTRY)
                 BossAI::EnterEvadeMode();
+        }
+
+        void SetData(uint32 type, uint32 data) override
+        {
+            if (type == 0 && data == 1)
+            {
+                summons.DoZoneInCombat(NPC_HELLFIRE_SENTRY);
+            }
         }
 
         void UpdateAI(uint32  /*diff*/) override
@@ -168,7 +176,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_CHANGE_POS, 0);
             events.ScheduleEvent(EVENT_SPELL_FIREBALL, 5000);
@@ -188,6 +196,8 @@ public:
             {
                 Talk(EMOTE_NAZAN);
                 events.Reset();
+                me->SetReactState(REACT_PASSIVE);
+                me->InterruptNonMeleeSpells(true);
                 me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 81.2f, false);
             }
         }
@@ -198,8 +208,10 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                events.ScheduleEvent(EVENT_RESTORE_COMBAT, 0);
+                me->SetReactState(REACT_AGGRESSIVE);
+                events.ScheduleEvent(EVENT_RESTORE_COMBAT, 1);
                 events.ScheduleEvent(EVENT_SPELL_CONE_OF_FIRE, 5000);
+                events.ScheduleEvent(EVENT_SPELL_FIREBALL, 6000);
                 if (IsHeroic())
                     events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 10000);
             }
@@ -265,6 +277,7 @@ public:
         void Reset() override
         {
             events.Reset();
+            _nazanCalled = false;
         }
 
         void EnterEvadeMode(EvadeReason /*why*/) override
@@ -273,7 +286,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_AGGRO_TALK, 5000);
             events.ScheduleEvent(EVENT_SPELL_REVENGE, 4000);
@@ -288,9 +301,17 @@ public:
             }
         }
 
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        {
+            if (!_nazanCalled && me->HealthBelowPctDamaged(35, damage))
+            {
+                _nazanCalled = true;
+                me->CastSpell(me, SPELL_CALL_NAZAN, true);
+            }
+        }
+
         void JustDied(Unit*) override
         {
-            me->CastSpell(me, SPELL_CALL_NAZAN, true);
             Talk(SAY_DIE);
         }
 
@@ -316,6 +337,7 @@ public:
 
     private:
         EventMap events;
+        bool _nazanCalled;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

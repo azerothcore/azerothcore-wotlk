@@ -87,7 +87,7 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
                 InvitePlayerToWar(player);
             else // No more vacant places
             {
-                // TODO: Send a packet to announce it to player
+                /// @todo: Send a packet to announce it to player
                 m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + (player->IsGameMaster() ? 30 * MINUTE : 10);
                 InvitePlayerToQueue(player);
             }
@@ -273,7 +273,7 @@ void Battlefield::InvitePlayerToWar(Player* player)
     if (!player)
         return;
 
-    // TODO : needed ?
+    /// @todo : needed ?
     if (player->IsInFlight())
         return;
 
@@ -284,7 +284,7 @@ void Battlefield::InvitePlayerToWar(Player* player)
     }
 
     // If the player does not match minimal level requirements for the battlefield, kick him
-    if (player->getLevel() < m_MinLevel)
+    if (player->GetLevel() < m_MinLevel)
     {
         if (m_PlayersWillBeKick[player->GetTeamId()].count(player->GetGUID()) == 0)
             m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + 10;

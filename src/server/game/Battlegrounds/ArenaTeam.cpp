@@ -455,7 +455,7 @@ void ArenaTeam::Roster(WorldSession* session)
         sCharacterCache->GetCharacterNameByGuid(itr->Guid, tempName);
         data << tempName;                                  // member name
         data << uint32((itr->Guid == GetCaptain() ? 0 : 1));// captain flag 0 captain 1 member
-        data << uint8((player ? player->getLevel() : 0));           // unknown, level?
+        data << uint8((player ? player->GetLevel() : 0));           // unknown, level?
         data << uint8(itr->Class);                         // class
         data << uint32(itr->WeekGames);                    // played this week
         data << uint32(itr->WeekWins);                     // wins this week
@@ -751,7 +751,7 @@ int32 ArenaTeam::GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won 
     // Calculate the rating modification
     float mod;
 
-    // TODO: Replace this hack with using the confidence factor (limiting the factor to 2.0f)
+    /// @todo: Replace this hack with using the confidence factor (limiting the factor to 2.0f)
     if (won)
     {
         if (ownRating < 1300)

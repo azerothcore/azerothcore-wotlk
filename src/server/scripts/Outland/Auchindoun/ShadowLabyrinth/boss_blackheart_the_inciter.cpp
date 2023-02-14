@@ -82,7 +82,7 @@ public:
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_INCITE, 20000);
@@ -124,7 +124,7 @@ public:
                                 me->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
                         }
 
-                        DoResetThreat();
+                        DoResetThreatList();
                         InciteChaos = true;
                         events.DelayEvents(15000);
                         events.RepeatEvent(40000);

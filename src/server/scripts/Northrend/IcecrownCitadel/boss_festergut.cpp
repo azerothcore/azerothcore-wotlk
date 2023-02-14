@@ -108,7 +108,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (!instance->CheckRequiredBosses(DATA_FESTERGUT, who->ToPlayer()))
             {
@@ -235,7 +235,7 @@ public:
                     {
                         std::list<Unit*> targets;
                         uint32 minTargets = RAID_MODE<uint32>(3, 8, 3, 8);
-                        SelectTargetList(targets, minTargets, SelectTargetMethod::Random, -5.0f, true);
+                        SelectTargetList(targets, minTargets, SelectTargetMethod::Random, 0, -5.0f, true);
                         float minDist = 0.0f;
                         if (targets.size() >= minTargets)
                             minDist = -5.0f;
@@ -435,7 +435,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*target*/) override
+        void JustEngagedWith(Unit* /*target*/) override
         {
             me->setActive(true);
             me->CastSpell(me, SPELL_PLAGUE_STENCH, true);

@@ -49,7 +49,8 @@ enum Spells
     SPELL_HEAL_BRETHEN                  = 26565,
     SPELL_ENRAGE                        = 8599,
 
-    TALK_ENRAGE                         = 0
+    TALK_ENRAGE                         = 0,
+    TALK_SHARE_BUFFS                    = 1
 };
 
 class npc_anubisath_sentinel : public CreatureScript
@@ -250,7 +251,7 @@ public:
             me->AddAura(id, me);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (gatherOthersWhenAggro)
                 GetOtherSentinels(who);
@@ -275,6 +276,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
+            bool cast = false;
             for (int ni = 0; ni < 3; ++ni)
             {
                 Creature* sent = ObjectAccessor::GetCreature(*me, NearbyGUID[ni]);
@@ -282,8 +284,14 @@ public:
                     continue;
                 if (sent->isDead())
                     continue;
+                cast = true;
                 DoCast(sent, SPELL_HEAL_BRETHEN, true);
                 DoCast(sent, SPELL_TRANSFER_POWER, true);
+            }
+
+            if (cast)
+            {
+                Talk(TALK_SHARE_BUFFS);
             }
 
             DoCastSelf(SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK, true);

@@ -83,7 +83,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_CLEAVE, 5000);
             events.ScheduleEvent(EVENT_SANDBREATH, 20000);

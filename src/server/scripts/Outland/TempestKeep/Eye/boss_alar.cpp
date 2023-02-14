@@ -117,9 +117,9 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_SWITCH_PLATFORM, 0);
         }
 

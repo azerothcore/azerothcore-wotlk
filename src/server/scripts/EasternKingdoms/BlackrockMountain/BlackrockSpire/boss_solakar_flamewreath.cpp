@@ -65,9 +65,9 @@ public:
             targetEgg = nullptr;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(SPELL_HATCH_EGG, 1000);
+            events.ScheduleEvent(SPELL_HATCH_EGG, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -138,7 +138,7 @@ public:
                 targetPosition = me->GetPosition();
                 DoCast(SPELL_HATCH_EGG);
                 targetEgg = nullptr;
-                events.ScheduleEvent(SPELL_HATCH_EGG, urand(6000, 8000));
+                events.ScheduleEvent(SPELL_HATCH_EGG, 6s, 8s);
             }
             else if (!me->HasUnitState(UNIT_STATE_CASTING)  && !targetEgg)
             {
@@ -181,10 +181,10 @@ public:
             DoZoneInCombat(nullptr, 100.0f);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
-            events.ScheduleEvent(SPELL_WAR_STOMP, urand(17000, 20000));
+            _JustEngagedWith();
+            events.ScheduleEvent(SPELL_WAR_STOMP, 17s, 20s);
             resetTimer = 0;
         }
 
@@ -200,7 +200,7 @@ public:
             {
                 case SPELL_WAR_STOMP:
                     DoCastVictim(SPELL_WAR_STOMP);
-                    events.ScheduleEvent(SPELL_WAR_STOMP, urand(17000, 20000));
+                    events.ScheduleEvent(SPELL_WAR_STOMP, 17s, 20s);
                     break;
 
                 default:

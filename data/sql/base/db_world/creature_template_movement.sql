@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.creature_template_movement
+-- Dumping structure for table acore_world.creature_template_movement
 DROP TABLE IF EXISTS `creature_template_movement`;
 CREATE TABLE IF NOT EXISTS `creature_template_movement` (
   `CreatureId` int unsigned NOT NULL DEFAULT '0',
@@ -26,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_movement` (
   PRIMARY KEY (`CreatureId`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.creature_template_movement: 4 412 rows
+-- Dumping data for table acore_world.creature_template_movement: 4,440 rows
 DELETE FROM `creature_template_movement`;
 /*!40000 ALTER TABLE `creature_template_movement` DISABLE KEYS */;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
@@ -564,7 +566,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(15218, 0, 0, 1, 0, 0, 0, NULL),
 	(14495, 0, 0, 1, 0, 0, 0, NULL),
 	(16218, 0, 0, 1, 0, 0, 0, NULL),
-	(15963, 1, 1, 1, 0, 0, 0, NULL),
+	(15963, 2, 1, 1, 0, 0, 0, NULL),
 	(36024, 1, 1, 1, 1, 0, 0, NULL),
 	(14449, 0, 0, 1, 0, 0, 0, NULL),
 	(16899, 0, 0, 1, 0, 0, 0, NULL),
@@ -3104,7 +3106,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(20054, 1, 1, 0, 0, 0, 0, NULL),
 	(20055, 1, 1, 0, 0, 0, 0, NULL),
 	(20058, 1, 1, 0, 0, 0, 0, NULL),
-	(20061, 1, 1, 0, 1, 0, 0, NULL),
+	(20061, 1, 1, 0, 1, NULL, NULL, NULL),
 	(20075, 1, 1, 0, 0, 0, 0, NULL),
 	(20080, 1, 1, 0, 0, 0, 0, NULL),
 	(20081, 1, 1, 0, 0, 0, 0, NULL),
@@ -4439,11 +4441,40 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(22441, 1, 0, 1, 0, 0, 0, NULL),
 	(8276, 1, 0, 1, 0, 0, 0, NULL),
 	(15514, 1, 1, 0, 1, 0, 0, NULL),
-	(15802, 1, 0, 0, 1, 0, 0, 0),
+	(21221, 1, 0, 0, 1, 0, 0, 0),
 	(15546, 1, 0, 1, NULL, 0, 0, NULL),
-	(15369, 1, 0, 1, NULL, 0, 0, NULL);
+	(15369, 1, 0, 1, NULL, 0, 0, NULL),
+	(8964, 1, 0, 2, 0, 0, 0, NULL),
+	(15727, 1, 0, 0, 1, 0, 0, 0),
+	(15925, 0, 0, 0, 1, 0, 0, 0),
+	(15728, 1, 0, 0, 1, 0, 0, 0),
+	(15334, 1, 0, 0, 1, 0, 0, 0),
+	(15802, 1, 0, 0, 1, 0, 0, 0),
+	(15725, 1, 0, 0, 1, 0, 0, 0),
+	(15726, 1, 0, 0, 1, 0, 0, 0),
+	(15589, 1, 0, 0, 1, 0, 0, 0),
+	(15901, 1, 0, 0, 1, 0, 0, 0),
+	(33608, 1, 0, 0, 1, 0, 0, 0),
+	(33609, 1, 0, 0, 1, 0, 0, 0),
+	(33610, 1, 0, 0, 1, 0, 0, 0),
+	(33611, 1, 0, 0, 1, 0, 0, 0),
+	(33612, 1, 0, 0, 1, 0, 0, 0),
+	(33613, 1, 0, 0, 1, 0, 0, 0),
+	(33614, 1, 0, 0, 1, 0, 0, 0),
+	(33615, 1, 0, 0, 1, 0, 0, 0),
+	(33616, 1, 0, 0, 1, 0, 0, 0),
+	(33617, 1, 0, 0, 1, 0, 0, 0),
+	(33618, 1, 0, 0, 1, 0, 0, 0),
+	(33619, 1, 0, 0, 1, 0, 0, 0),
+	(33621, 1, 0, 0, 1, 0, 0, 0),
+	(33623, 1, 0, 0, 1, 0, 0, 0),
+	(3460602, 0, 1, 1, 0, 0, 0, NULL),
+	(3460603, 0, 1, 1, 0, 0, 0, NULL),
+	(17990, 0, 0, 0, 1, 0, 0, NULL),
+	(20189, 0, 0, 0, 1, 0, 0, NULL);
 /*!40000 ALTER TABLE `creature_template_movement` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

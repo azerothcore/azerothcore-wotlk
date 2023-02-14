@@ -627,6 +627,24 @@ RealmZone = 1
 World.RealmAvailability = 1
 
 #
+#   StrictNames.Reserved
+#       Description: Use the Reserved Filter from DBC.
+#                    Prevents Player, Pet & Charter names from containing reserved names.
+#       Default:     1 - Enabled
+#                    0 - Disabled
+
+StrictNames.Reserved = 1
+
+#
+#   StrictNames.Profanity
+#       Description: Use the Profanity Filter from DBC.
+#                    Prevents Player, Pet & Charter names from containing profanity.
+#       Default:     1 - Enabled
+#                    0 - Disabled
+
+StrictNames.Profanity = 1
+
+#
 #    StrictPlayerNames
 #        Description: Limit player name to language specific symbol set. Prevents character
 #                     creation and forces rename request if not allowed symbols are used
@@ -2484,6 +2502,15 @@ Rate.Pet.LevelXP = 0.05
 WaterBreath.Timer = 180000
 
 #
+#    EnableLowLevelRegenBoost
+#        Description: Greatly increase Health and Mana regen rates for players under level 15 (Added in patch 3.3)
+#        Default:     1 - Enabled
+#                     0 - Disabled
+#
+
+EnableLowLevelRegenBoost = 1
+
+#
 #    SkillGain.Crafting
 #    SkillGain.Defense
 #    SkillGain.Gathering
@@ -2919,8 +2946,9 @@ Battleground.SpeedBuffRespawn = 150
 #
 #     Wintergrasp.Enable
 #         Description: Enable the Wintergrasp battlefield.
-#         Default:     0 - (Disabled)
-#                      1 - (Enabled, Experimental as of still being in development)
+#         Default:     1 - (Enabled, Experimental as of still being in development)
+#                      0 - (Battleground disabled, Wintergrasp world processing still occurs)
+#                      2 - (Disable all Wintergrasp processing)
 
 Wintergrasp.Enable = 1
 
@@ -3794,6 +3822,14 @@ JoinBGAndLFG.Enable = 0
 LeaveGroupOnLogout.Enabled = 1
 
 #
+#   QuestPOI.Enabled
+#        Description: Show points of interest on the map
+#        Default:     1 - Enabled
+#                     0 - Disabled
+
+QuestPOI.Enabled = 1
+
+#
 #     ChangeFaction.MaxMoney
 #        Description: Maximum amount of gold allowed on the character to perform a faction change.
 #        Default:     0 - Disabled
@@ -3801,6 +3837,14 @@ LeaveGroupOnLogout.Enabled = 1
 #        Example:     If set to 10000, the maximum amount of money allowed on the character would be 1 gold.
 
 ChangeFaction.MaxMoney = 0
+
+#
+#     Pet.RankMod.Health
+#        Description: Allows pet health to be modified by rank health rates (set in config)
+#        Default:     1 - Enabled
+#                     0 - Disabled
+
+Pet.RankMod.Health = 1
 
 #
 ###################################################################################################

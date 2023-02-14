@@ -384,11 +384,35 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
     return apSpell[urand(0, spellCount - 1)];
 }
 
-void ScriptedAI::DoResetThreat()
+void ScriptedAI::DoAddThreat(Unit* unit, float amount)
+{
+    if (!unit)
+        return;
+
+    me->GetThreatMgr().AddThreat(unit, amount);
+}
+
+void ScriptedAI::DoModifyThreatByPercent(Unit* unit, int32 pct)
+{
+    if (!unit)
+        return;
+
+    me->GetThreatMgr().ModifyThreatByPercent(unit, pct);
+}
+
+void ScriptedAI::DoResetThreat(Unit* unit)
+{
+    if (!unit)
+        return;
+
+    me->GetThreatMgr().ResetThreat(unit);
+}
+
+void ScriptedAI::DoResetThreatList()
 {
     if (!me->CanHaveThreatList() || me->GetThreatMgr().isThreatListEmpty())
     {
-        LOG_ERROR("entities.unit.ai", "DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = {})", me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "DoResetThreatList called for creature that either cannot have threat list or has empty threat list (me entry = {})", me->GetEntry());
         return;
     }
 
@@ -399,14 +423,8 @@ float ScriptedAI::DoGetThreat(Unit* unit)
 {
     if (!unit)
         return 0.0f;
-    return me->GetThreatMgr().GetThreat(unit);
-}
 
-void ScriptedAI::DoModifyThreatPercent(Unit* unit, int32 pct)
-{
-    if (!unit)
-        return;
-    me->GetThreatMgr().ModifyThreatByPercent(unit, pct);
+    return me->GetThreatMgr().GetThreat(unit);
 }
 
 void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o)
@@ -536,13 +554,28 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
         SetBoundary(instance->GetBossBoundary(bossId));
 }
 
+bool BossAI::CanRespawn()
+{
+    if (instance)
+    {
+        if (instance->GetBossState(_bossId) == DONE)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void BossAI::_Reset()
 {
     if (!me->IsAlive())
         return;
 
+    me->SetCombatPulseDelay(0);
     me->ResetLootMode();
     events.Reset();
+    scheduler.CancelAll();
     summons.DespawnAll();
     if (instance)
         instance->SetBossState(_bossId, NOT_STARTED);
@@ -551,6 +584,7 @@ void BossAI::_Reset()
 void BossAI::_JustDied()
 {
     events.Reset();
+    scheduler.CancelAll();
     summons.DespawnAll();
     if (instance)
     {
@@ -559,10 +593,12 @@ void BossAI::_JustDied()
     }
 }
 
-void BossAI::_EnterCombat()
+void BossAI::_JustEngagedWith()
 {
+    me->SetCombatPulseDelay(5);
     me->setActive(true);
     DoZoneInCombat();
+    ScheduleTasks();
     if (instance)
     {
         // bosses do not respawn, check only on enter combat
@@ -612,6 +648,7 @@ void BossAI::UpdateAI(uint32 diff)
     }
 
     events.Update(diff);
+    scheduler.Update(diff);
 
     if (me->HasUnitState(UNIT_STATE_CASTING))
     {
@@ -653,7 +690,7 @@ void WorldBossAI::_JustDied()
     summons.DespawnAll();
 }
 
-void WorldBossAI::_EnterCombat()
+void WorldBossAI::_JustEngagedWith()
 {
     Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
     if (target)

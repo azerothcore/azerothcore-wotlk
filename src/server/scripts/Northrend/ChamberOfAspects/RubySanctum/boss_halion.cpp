@@ -294,9 +294,9 @@ public:
             BossAI::JustReachedHome();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
             instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, 1);
 
@@ -399,7 +399,7 @@ public:
                     events.ScheduleEvent(EVENT_METEOR_STRIKE, 40000);
                     break;
                 case EVENT_FIERY_COMBUSTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, -SPELL_TWILIGHT_REALM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, true, -SPELL_TWILIGHT_REALM))
                         me->CastSpell(target, SPELL_FIERY_COMBUSTION, false);
                     events.ScheduleEvent(EVENT_FIERY_COMBUSTION, 25000);
                     break;
@@ -459,7 +459,7 @@ public:
             me->SetReactState(REACT_DEFENSIVE);
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_CLEAVE, urand(8000, 10000));
@@ -542,7 +542,7 @@ public:
                     _events.ScheduleEvent(EVENT_BREATH, urand(10000, 12000));
                     break;
                 case EVENT_SOUL_CONSUMPTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, SPELL_TWILIGHT_REALM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, true, SPELL_TWILIGHT_REALM))
                         me->CastSpell(target, SPELL_SOUL_CONSUMPTION, false);
                     _events.ScheduleEvent(EVENT_SOUL_CONSUMPTION, 20000);
                     break;
@@ -1456,7 +1456,7 @@ public:
     {
         npc_living_infernoAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             me->SetInCombatWithZone();
             me->CastSpell(me, SPELL_BLAZING_AURA, true);

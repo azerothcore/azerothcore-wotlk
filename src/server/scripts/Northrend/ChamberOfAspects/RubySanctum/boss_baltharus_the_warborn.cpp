@@ -158,10 +158,10 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->InterruptNonMeleeSpells(false);
 
             events.ScheduleEvent(EVENT_CLEAVE, 11000);
@@ -224,7 +224,7 @@ public:
                     break;
                 case EVENT_ENERVATING_BRAND:
                     for (uint8 i = 0; i < RAID_MODE<uint8>(2, 4, 2, 4); i++)
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true, -SPELL_ENERVATING_BRAND))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true, true, -SPELL_ENERVATING_BRAND))
                             me->CastSpell(target, SPELL_ENERVATING_BRAND, true);
                     events.ScheduleEvent(EVENT_ENERVATING_BRAND, 26000);
                     break;
@@ -282,7 +282,7 @@ public:
         {
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_CLEAVE, urand(5000, 10000));
@@ -311,7 +311,7 @@ public:
                     break;
                 case EVENT_ENERVATING_BRAND:
                     for (uint8 i = 0; i < RAID_MODE<uint8>(4, 10, 4, 10); i++)
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true, -SPELL_ENERVATING_BRAND))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true, true, -SPELL_ENERVATING_BRAND))
                             me->CastSpell(target, SPELL_ENERVATING_BRAND, true);
                     _events.ScheduleEvent(EVENT_ENERVATING_BRAND, 26000);
                     break;

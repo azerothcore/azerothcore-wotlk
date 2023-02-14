@@ -290,12 +290,12 @@ public:
                 timer = 600000; // clear playerGUIDs after 10 minutes if no one initiates a duel
                 me->GetMotionMaster()->MoveFollow(caster, 2.0f, 0.0f);
 
-                events.ScheduleEvent(EVENT_SPEAK, 3000);
-                events.ScheduleEvent(EVENT_SPEAK + 1, 7000);
-                events.ScheduleEvent(EVENT_SPEAK + 2, 8000);
-                events.ScheduleEvent(EVENT_SPEAK + 3, 9000);
-                events.ScheduleEvent(EVENT_SPEAK + 4, 10000);
-                events.ScheduleEvent(EVENT_SPEAK + 5, 11000);
+                events.ScheduleEvent(EVENT_SPEAK, 3s);
+                events.ScheduleEvent(EVENT_SPEAK + 1, 7s);
+                events.ScheduleEvent(EVENT_SPEAK + 2, 8s);
+                events.ScheduleEvent(EVENT_SPEAK + 3, 9s);
+                events.ScheduleEvent(EVENT_SPEAK + 4, 10s);
+                events.ScheduleEvent(EVENT_SPEAK + 5, 11s);
             }
         }
 
@@ -308,8 +308,8 @@ public:
                 else if (damage >= me->GetHealth())
                 {
                     damage = 0;
-                    events.ScheduleEvent(EVENT_DUEL_LOST, 2000);
-                    events.ScheduleEvent(EVENT_DUEL_LOST + 1, 6000);
+                    events.ScheduleEvent(EVENT_DUEL_LOST, 2s);
+                    events.ScheduleEvent(EVENT_DUEL_LOST + 1, 6s);
                     _duelGUID.Clear();
                     _duelInProgress = 0;
 
@@ -491,8 +491,8 @@ public:
             ScriptedAI::InitializeAI();
             me->SetReactState(REACT_PASSIVE);
 
-            events.ScheduleEvent(EVENT_GHOUL_EMOTE, 1);
-            events.ScheduleEvent(EVENT_GHOUL_RESTORE_STATE, 3500);
+            events.ScheduleEvent(EVENT_GHOUL_EMOTE, 1ms);
+            events.ScheduleEvent(EVENT_GHOUL_RESTORE_STATE, 3500ms);
         }
 
         void OwnerAttackedBy(Unit* attacker) override
@@ -504,7 +504,7 @@ public:
         void SetGUID(ObjectGuid guid, int32) override
         {
             gothikGUID = guid;
-            events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3000);
+            events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3s);
             me->GetMotionMaster()->Clear(false);
         }
 
@@ -535,7 +535,7 @@ public:
                     me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                     if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                         me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, frand(0.0f, 2 * M_PI));
-                    events.ScheduleEvent(EVENT_GHOUL_CHECK_COMBAT, 1000);
+                    events.ScheduleEvent(EVENT_GHOUL_CHECK_COMBAT, 1s);
                     return;
                 case EVENT_GHOUL_CHECK_COMBAT:
                     if (!me->IsInCombat())
@@ -748,12 +748,12 @@ public:
             me->LoadEquipment(0, true);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_ICY_TOUCH, 1000, GCD_CAST);
-            events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 3000, GCD_CAST);
-            events.ScheduleEvent(EVENT_BLOOD_STRIKE, 2000, GCD_CAST);
-            events.ScheduleEvent(EVENT_DEATH_COIL, 5000, GCD_CAST);
+            events.ScheduleEvent(EVENT_ICY_TOUCH, 1s, GCD_CAST);
+            events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 3s, GCD_CAST);
+            events.ScheduleEvent(EVENT_BLOOD_STRIKE, 2s, GCD_CAST);
+            events.ScheduleEvent(EVENT_DEATH_COIL, 5s, GCD_CAST);
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -866,22 +866,22 @@ public:
                             case EVENT_ICY_TOUCH:
                                 DoCastVictim(SPELL_ICY_TOUCH);
                                 events.DelayEvents(1000, GCD_CAST);
-                                events.ScheduleEvent(EVENT_ICY_TOUCH, 5000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_ICY_TOUCH, 5s, GCD_CAST);
                                 break;
                             case EVENT_PLAGUE_STRIKE:
                                 DoCastVictim(SPELL_PLAGUE_STRIKE);
                                 events.DelayEvents(1000, GCD_CAST);
-                                events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 5000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 5s, GCD_CAST);
                                 break;
                             case EVENT_BLOOD_STRIKE:
                                 DoCastVictim(SPELL_BLOOD_STRIKE);
                                 events.DelayEvents(1000, GCD_CAST);
-                                events.ScheduleEvent(EVENT_BLOOD_STRIKE, 5000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_BLOOD_STRIKE, 5s, GCD_CAST);
                                 break;
                             case EVENT_DEATH_COIL:
                                 DoCastVictim(SPELL_DEATH_COIL);
                                 events.DelayEvents(1000, GCD_CAST);
-                                events.ScheduleEvent(EVENT_DEATH_COIL, 5000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_DEATH_COIL, 5s, GCD_CAST);
                                 break;
                         }
                     }

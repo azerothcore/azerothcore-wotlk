@@ -307,10 +307,10 @@ public:
             events.ScheduleEvent(EVENT_LIGHTNING_WAVE, 12000);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_YSONDRE_AGGRO);
-            WorldBossAI::EnterCombat(who);
+            WorldBossAI::JustEngagedWith(who);
         }
 
         // Summon druid spirits on 75%, 50% and 25% health
@@ -412,10 +412,10 @@ public:
             me->RemoveAurasDueToSpell(SPELL_SHADOW_BOLT_WHIRL);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_LETHON_AGGRO);
-            WorldBossAI::EnterCombat(who);
+            WorldBossAI::JustEngagedWith(who);
             DoCastSelf(SPELL_SHADOW_BOLT_WHIRL, true);
         }
 
@@ -459,13 +459,18 @@ public:
         {
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
 
+            if (summoner->GetTypeId() != TYPEID_UNIT)
+            {
+                return;
+            }
+
             _summonerGuid = summoner->GetGUID();
-            me->GetMotionMaster()->MoveFollow(summoner, 0.0f, 0.0f);
+            me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), 0.0f, 0.0f);
         }
 
         void MovementInform(uint32 moveType, uint32 data) override
@@ -534,10 +539,10 @@ public:
             emerald_dragonAI::KilledUnit(who);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_EMERISS_AGGRO);
-            WorldBossAI::EnterCombat(who);
+            WorldBossAI::JustEngagedWith(who);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -625,10 +630,10 @@ public:
             events.ScheduleEvent(EVENT_BELLOWING_ROAR, 30000);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_TAERAR_AGGRO);
-            emerald_dragonAI::EnterCombat(who);
+            emerald_dragonAI::JustEngagedWith(who);
         }
 
         void SummonedCreatureDies(Creature* /*summon*/, Unit*) override

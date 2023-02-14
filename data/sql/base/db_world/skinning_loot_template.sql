@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.skinning_loot_template
+-- Dumping structure for table acore_world.skinning_loot_template
 DROP TABLE IF EXISTS `skinning_loot_template`;
 CREATE TABLE IF NOT EXISTS `skinning_loot_template` (
   `Entry` mediumint unsigned NOT NULL DEFAULT '0',
@@ -28,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `skinning_loot_template` (
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
--- Dumpar data för tabell acore_world.skinning_loot_template: 1 873 rows
+-- Dumping data for table acore_world.skinning_loot_template: 1,880 rows
 DELETE FROM `skinning_loot_template`;
 /*!40000 ALTER TABLE `skinning_loot_template` DISABLE KEYS */;
 INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -228,7 +230,7 @@ INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 	(2759, 4304, 0, 14.094, 0, 1, 1, 1, 2, 'Hematus - Thick Leather'),
 	(2759, 8170, 0, 79.1946, 0, 1, 1, 1, 2, 'Hematus - Rugged Leather'),
 	(2759, 8171, 0, 6.7114, 0, 1, 1, 1, 1, 'Hematus - Rugged Hide'),
-	(2831, 4234, 0, 100, 0, 1, 1, 1, 1, 'Giant Buzzard - Heavy Leather'),
+	(21723, 21887, 0, 100, 0, 1, 0, 1, 1, 'Blackwind Sabercat - Knothide Leather'),
 	(2850, 4234, 0, 50, 0, 1, 1, 1, 1, 'Broken Tooth - Heavy Leather'),
 	(2850, 4304, 0, 40.9091, 0, 1, 1, 1, 1, 'Broken Tooth - Thick Leather'),
 	(2850, 8169, 0, 9.0909, 0, 1, 1, 1, 1, 'Broken Tooth - Thick Hide'),
@@ -1904,9 +1906,17 @@ INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 	(3124, 2318, 0, 10, 0, 1, 1, 1, 1, 'Light Leather'),
 	(3124, 2934, 0, 88, 0, 1, 1, 1, 1, 'Ruined Leather Scraps'),
 	(14887, 15412, 0, 60, 0, 1, 1, 5, 8, ''),
-	(14887, 20381, 0, 40, 0, 1, 1, 3, 5, '');
+	(14887, 20381, 0, 40, 0, 1, 1, 3, 5, ''),
+	(21723, 35229, 0, 25, 1, 1, 0, 1, 1, 'Blackwind Sabercat - Nether Residue'),
+	(21723, 1, 21887, 10, 0, 1, 0, 1, 1, 'Blackwind Sabercat - Knothide Leather (Reference Table)'),
+	(70068, 21887, 0, 80, 0, 1, 1, 1, 1, 'Knothide Leather'),
+	(70068, 25649, 0, 0, 0, 1, 1, 2, 3, 'Knothide Leather Scraps'),
+	(70068, 35229, 0, 25, 1, 1, 0, 1, 1, 'Nether Residue'),
+	(70069, 21887, 0, 0, 0, 1, 1, 1, 1, 'Knothide Leather'),
+	(70069, 35229, 0, 25, 1, 1, 0, 1, 1, 'Nether Residue');
 /*!40000 ALTER TABLE `skinning_loot_template` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

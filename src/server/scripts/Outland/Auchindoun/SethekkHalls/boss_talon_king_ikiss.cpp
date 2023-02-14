@@ -83,7 +83,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -229,7 +229,7 @@ public:
                 me->RemoveAurasDueToSpell(SPELL_BANISH_SELF);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_SCREECH, 14000);

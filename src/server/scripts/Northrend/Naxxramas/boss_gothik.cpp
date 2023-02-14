@@ -249,9 +249,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
             Talk(SAY_INTRO_1);
             events.ScheduleEvent(EVENT_INTRO_2, 4000);
@@ -542,7 +542,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             switch (me->GetEntry())
             {

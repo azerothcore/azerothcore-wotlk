@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.creature_text_locale
+-- Dumping structure for table acore_world.creature_text_locale
 DROP TABLE IF EXISTS `creature_text_locale`;
 CREATE TABLE IF NOT EXISTS `creature_text_locale` (
   `CreatureID` mediumint unsigned NOT NULL DEFAULT '0',
@@ -23,9 +25,8 @@ CREATE TABLE IF NOT EXISTS `creature_text_locale` (
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`,`Locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
--- Dumpar data för tabell acore_world.creature_text_locale: ~14 705 rows (ungefär)
+-- Dumping data for table acore_world.creature_text_locale: ~14,464 rows (approximately)
 DELETE FROM `creature_text_locale`;
-/*!40000 ALTER TABLE `creature_text_locale` DISABLE KEYS */;
 INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
 	(6, 0, 0, 'zhCN', '不许抢走我的蜡烛！'),
 	(6, 0, 1, 'zhCN', '呀呀呀！我要逃走！'),
@@ -3592,6 +3593,8 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 	(16993, 3, 0, 'zhCN', '你听见什么了吗？'),
 	(16993, 4, 0, 'zhCN', '终于到了猎鹰岗哨！现在，我的……？天哪！我的背包找不到了！这可怎么办……'),
 	(16993, 5, 0, 'zhCN', '你休想阻止我到达猎鹰岗哨！'),
+	(17000, 0, 0, 'esES', '¡Estúpidos! ¿Queréis repudiar la presencia de mi padre? ¡La muerte os espera, mortales!'),
+	(17000, 0, 0, 'esMX', '¡Estúpidos! ¿Queréis repudiar la presencia de mi padre? ¡La muerte os espera, mortales!'),
 	(17007, 0, 0, 'zhCN', '我必须马上见到主人！'),
 	(17007, 0, 1, 'zhCN', '主人在哪儿？'),
 	(17007, 0, 2, 'zhCN', '主人去哪儿了？'),
@@ -10024,10 +10027,10 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 	(28715, 0, 2, 'zhCN', '欢迎！'),
 	(28715, 0, 3, 'zhCN', '你需要什么，可以直接告诉我，$c。'),
 	(28715, 0, 4, 'zhCN', '你好。我能帮上什么忙吗？'),
-	(28715, 0, 5, 'zhCN', '你好。'),
-	(28715, 0, 6, 'zhCN', '欢迎。'),
-	(28717, 0, 0, 'zhCN', '朋友，我已经占领了这里的部分土地，但这仅仅是个开始！');
+	(28715, 0, 5, 'zhCN', '你好。');
 INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
+	(28715, 0, 6, 'zhCN', '欢迎。'),
+	(28717, 0, 0, 'zhCN', '朋友，我已经占领了这里的部分土地，但这仅仅是个开始！'),
 	(28717, 1, 0, 'zhCN', '自以为是的北伐军挡住了我们前进的道路。他们注定会失败！'),
 	(28717, 2, 0, 'zhCN', '很快，一切都将属于巫妖王！'),
 	(28717, 3, 0, 'zhCN', '达卡莱巨魔在破坏他们的土地！他们很快就会失去这一切……很快。'),
@@ -10972,6 +10975,8 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 	(29120, 3, 2, 'zhCN', '疫病降临'),
 	(29120, 4, 0, 'zhCN', 'Auum na-l ak-k-k-k，isshhh。'),
 	(29120, 4, 1, 'zhCN', '靠上来，我的兄弟们，享用他们的血肉！'),
+	(29120, 5, 0, 'esES', 'Yo fuí el Rey de este Imperio, hace mucho. En vida yo era un campeón. En la muerte regresé como conquistador. Ahora vuelvo a proteger el Reino. Irónico ¿Verdad?'),
+	(29120, 5, 0, 'esMX', 'Yo fuí el Rey de este Imperio, hace mucho. En vida yo era un campeón. En la muerte regresé como conquistador. Ahora vuelvo a proteger el Reino. Irónico ¿Verdad?'),
 	(29120, 5, 0, 'zhCN', '许久以前，我曾是这个帝国之王，我曾经活得像是个勇士，但死后却以征服者的姿态归来。如今，我再次守护着这个王国，很讽刺，对吧？'),
 	(29173, 0, 0, 'zhCN', '天灾军团的士兵们，做好准备！你们马上就可以向银色黎明倾泻怒火了！'),
 	(29173, 1, 0, 'zhCN', '大地即将崩裂，天空也要为之哭泣！很快，艾泽拉斯那悲戚的血泪就会降下！'),
@@ -12144,7 +12149,11 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 	(32149, 0, 4, 'zhCN', '我的噩梦终于结束了？'),
 	(32162, 0, 0, 'zhCN', '你以为自己能从我手里夺得这座壁垒的控制权吗？'),
 	(32162, 1, 0, 'zhCN', '我觉得你做不到。傲慢的家伙，你战败之后，我会将你的尸体用尖刺钉起来，为其他“英雄”做个示范！'),
+	(32169, 0, 0, 'esES', '¡Se necesitan refuerzos para combatir en el campo de batalla de Conquista del Invierno! He abierto un portal para viajar rápido al campo de batalla en el Enclave de Plata.'),
+	(32169, 0, 0, 'esMX', '¡Se necesitan refuerzos para combatir en el campo de batalla de Conquista del Invierno! He abierto un portal para viajar rápido al campo de batalla en el Enclave de Plata.'),
 	(32169, 0, 0, 'zhCN', '勇士们，冬拥湖需要增援，我已经打开了一个直接到达冬拥湖的传送门！'),
+	(32170, 0, 0, 'esES', '¡La batalla por el control de la Fortaleza de Conquista del Invierno comenzará en 5 minutos! ¡Preparaos para la batalla!'),
+	(32170, 0, 0, 'esMX', '¡La batalla por el control de la Fortaleza de Conquista del Invierno comenzará en 5 minutos! ¡Prepárense para la batalla!'),
 	(32170, 0, 0, 'zhCN', '冬拥湖的战斗将于5分钟后开始，请做好准备！'),
 	(32184, 0, 0, 'zhCN', '不速之客！你们以为自己能偷偷地溜进我的王国吗？'),
 	(32184, 1, 0, 'zhCN', '我必须承认……我早已预知你们的到来。希望你们能找到安息地……适合你们的安息地。'),
@@ -14733,8 +14742,8 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 	(61021, 1, 0, 'zhCN', '我们也许势单力薄，索克雷萨，但是我们有着强大的信念。有些东西你是永远都不会懂的。现在机会已经给过你了，准备迎接你的末日吧！'),
 	(61021, 2, 0, 'zhCN', '怎么……你怎么能？！'),
 	(61021, 3, 0, 'zhCN', '索克雷萨蒙蔽了你的心灵，凯兰恩！这些话不是你的本意！我还记得你孩提时我训练你的情景。你的意志向来那么坚强！');
-/*!40000 ALTER TABLE `creature_text_locale` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

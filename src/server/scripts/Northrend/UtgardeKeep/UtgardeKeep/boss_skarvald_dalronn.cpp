@@ -117,7 +117,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SHARVALD_CHARGE, 5000);
@@ -198,7 +198,7 @@ public:
                 case EVENT_SHARVALD_CHARGE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, (IsHeroic() ? 100.0f : 30.0f), true))
                     {
-                        ScriptedAI::DoResetThreat();
+                        DoResetThreatList();
                         me->AddThreat(target, 10000.0f);
                         me->CastSpell(target, SPELL_CHARGE, false);
                     }
@@ -285,7 +285,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SHADOW_BOLT, 1000);

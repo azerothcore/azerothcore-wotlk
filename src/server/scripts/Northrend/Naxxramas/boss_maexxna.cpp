@@ -108,9 +108,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_WEB_WRAP, 20000);
             events.ScheduleEvent(EVENT_WEB_SPRAY, 40000);
@@ -201,7 +201,7 @@ public:
                     Talk(EMOTE_WEB_WRAP);
                     for (uint8 i = 0; i < RAID_MODE(1, 2); ++i)
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0, true, -SPELL_WEB_WRAP))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0, true, true, -SPELL_WEB_WRAP))
                         {
                             target->RemoveAura(RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25));
                             uint8 pos = urand(0, 2);

@@ -68,7 +68,12 @@ void CombatAI::JustDied(Unit* killer)
             me->CastSpell(killer, *i, true);
 }
 
-void CombatAI::EnterCombat(Unit* who)
+/**
+ * @brief Called for reaction when initially engaged
+ *
+ * @param who Who 'me' Engaged combat with
+ */
+void CombatAI::JustEngagedWith(Unit* who)
 {
     for (SpellVct::iterator i = spells.begin(); i != spells.end(); ++i)
     {
@@ -114,7 +119,12 @@ void CasterAI::InitializeAI()
         m_attackDist = MELEE_RANGE;
 }
 
-void CasterAI::EnterCombat(Unit* who)
+/**
+ * @brief Called for reaction when initially engaged
+ *
+ * @param who Who 'me' Engaged combat with
+ */
+void CasterAI::JustEngagedWith(Unit* who)
 {
     if (spells.empty())
         return;
@@ -228,7 +238,7 @@ TurretAI::TurretAI(Creature* c) : CreatureAI(c)
 
 bool TurretAI::CanAIAttack(Unit const* /*who*/) const
 {
-    // TODO: use one function to replace it
+    /// @todo: use one function to replace it
     if (!me->IsWithinCombatRange(me->GetVictim(), me->m_CombatDistance)
             || (m_minRange && me->IsWithinCombatRange(me->GetVictim(), m_minRange)))
         return false;

@@ -11,7 +11,7 @@ const program = new Command();
 const env = {
   COMPOSE_DOCKER_CLI_BUILD: "1",
   DOCKER_BUILDKIT: "1",
-  BUILDKIT_INLINE_CACHE: "1",
+  // BUILDKIT_INLINE_CACHE: "1",
 };
 
 const MIN_COMPOSE_VERSION = "2.0.0";
@@ -39,9 +39,19 @@ shellCommandFactory(
   "build",
   "Build the authserver and worldserver",
   [
-    "docker compose --profile local build --parallel",
+    "docker compose --profile local --profile dev --profile dev-build build --parallel",
     "docker image prune -f",
-    "docker compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
+    "docker compose run --rm --no-deps ac-dev-build bash apps/docker/docker-build-dev.sh",
+  ],
+  env
+);
+
+shellCommandFactory(
+  "pull",
+  "Pull build and local images",
+  [
+    "docker compose --profile local --profile dev --profile dev-build pull --parallel",
+    "docker image prune -f",
   ],
   env
 );
@@ -50,20 +60,9 @@ shellCommandFactory(
   "build:nocache",
   "Build the authserver and worldserver without docker cache",
   [
-    "docker compose --profile local build --no-cache --parallel",
+    "docker compose --profile local --profile dev --profile dev-build build --no-cache --parallel",
     "docker image prune -f",
-    "docker compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
-  ],
-  env
-);
-
-shellCommandFactory(
-  "build:compile",
-  "Run the compilation process only, without rebuilding all docker images",
-  [
-    "docker compose build --parallel ac-build",
-    "docker image prune -f",
-    "docker compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
+    "docker compose run --rm --no-deps ac-dev-build bash apps/docker/docker-build-dev.sh",
   ],
   env
 );
@@ -73,7 +72,8 @@ shellCommandFactory(
   "Clean build files",
   [
     "docker image prune -f",
-    `docker compose run --rm ac-build bash acore.sh compiler clean`,
+    `docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler clean`,
+    `docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler ccacheClean`,
   ],
   env
 );
@@ -81,7 +81,7 @@ shellCommandFactory(
 shellCommandFactory(
   "client-data",
   "Download client data inside the ac-data volume",
-  ["docker compose run --rm ac-build bash acore.sh client-data"],
+  ["docker compose run --rm --no-deps ac-dev-server bash acore.sh client-data"],
   env
 );
 
@@ -94,7 +94,7 @@ shellCommandFactory(
 
 shellCommandFactory(
   "dev:build",
-  "Build using the dev server, it uses volumes to compile which can be faster on linux & WSL",
+  "Build using the dev server",
   ["docker compose run --rm ac-dev-server bash acore.sh compiler build"],
   env
 );
@@ -118,28 +118,28 @@ shellCommandFactory(
 
 shellCommandFactory(
   "prod:build",
-  "Build producion services",
+  "[TEST ONLY] Build producion services",
   ["docker compose --profile prod build --parallel", "docker image prune -f"],
   env
 );
 
 shellCommandFactory(
   "prod:pull",
-  "Pull production services from the remote registry",
+  "[TEST ONLY] Pull production services from the remote registry",
   ["docker compose --profile prod pull"],
   env
 );
 
 shellCommandFactory(
   "prod:up",
-  "Start production services (foreground)",
+  "[TEST ONLY] Start production services (foreground)",
   ["docker compose --profile prod-app up"],
   env
 );
 
 shellCommandFactory(
   "prod:up:d",
-  "Start production services (background)",
+  "[TEST ONLY] Start production services (background)",
   ["docker compose --profile prod-app up -d"],
   env
 );
@@ -176,7 +176,7 @@ program
     }
 
     services.pop();
-    services = services.slice(2);
+    services = services.slice(1);
 
     res.close(); // Don't forget to close it
 
@@ -304,8 +304,6 @@ async function checkDockerVersion() {
 }
 
 async function main() {
-  // Handle it however you like
-  // e.g. display usage
   while (true) {
     const version = await checkDockerVersion();
     if (version !== true) {

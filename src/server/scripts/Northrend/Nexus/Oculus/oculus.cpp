@@ -352,8 +352,13 @@ public:
         bool JustSummoned;
         uint16 despawnTimer;
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
+            if (summoner->GetTypeId() != TYPEID_PLAYER)
+            {
+                return;
+            }
+
             if (m_pInstance->GetBossState(DATA_EREGOS) == IN_PROGRESS)
                 if (Creature* eregos = me->FindNearestCreature(NPC_EREGOS, 450.0f, true))
                     eregos->DespawnOrUnsummon(); // On retail this kills abusive call of drake during engaged Eregos
@@ -363,13 +368,13 @@ public:
             switch (me->GetEntry())
             {
                 case NPC_RUBY_DRAKE:
-                    me->CastSpell(summoner, SPELL_RIDE_RUBY_DRAKE_QUE);
+                    me->CastSpell(summoner->ToUnit(), SPELL_RIDE_RUBY_DRAKE_QUE);
                     break;
                 case NPC_EMERALD_DRAKE:
-                    me->CastSpell(summoner, SPELL_RIDE_EMERALD_DRAKE_QUE);
+                    me->CastSpell(summoner->ToUnit(), SPELL_RIDE_EMERALD_DRAKE_QUE);
                     break;
                 case NPC_AMBER_DRAKE:
-                    me->CastSpell(summoner, SPELL_RIDE_AMBER_DRAKE_QUE);
+                    me->CastSpell(summoner->ToUnit(), SPELL_RIDE_AMBER_DRAKE_QUE);
                     break;
                 default:
                     return;
@@ -497,7 +502,7 @@ public:
 
         void Reset() override {}
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoCast(IsHeroic() ? H_SPELL_EMPOWERING_BLOWS : SPELL_EMPOWERING_BLOWS);
         }

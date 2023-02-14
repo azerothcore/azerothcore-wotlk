@@ -78,9 +78,9 @@ struct boss_buru : public BossAI
             respawn ? egg->Respawn() : Unit::Kill(me, egg);
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         me->AddThreat(who, 1000000.f);
         Talk(EMOTE_TARGET, who);
         DoCastSelf(SPELL_THORNS);
@@ -120,7 +120,7 @@ struct boss_buru : public BossAI
         events.ScheduleEvent(EVENT_GATHERING_SPEED, 2s);
         if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.f, true))
         {
-            DoResetThreat();
+            DoResetThreatList();
             AttackStart(victim);
             me->AddThreat(victim, 1000000.f);
             Talk(EMOTE_TARGET, victim);
@@ -143,7 +143,7 @@ struct boss_buru : public BossAI
             events.Reset();
             _phase = PHASE_TRANSFORM;
             instance->SetData(DATA_BURU_PHASE, _phase);
-            DoResetThreat();
+            DoResetThreatList();
             events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2s);
             DoCastSelf(SPELL_BURU_TRANSFORM);
         }
@@ -193,7 +193,7 @@ struct npc_buru_egg : public ScriptedAI
         me->SetControlled(true, UNIT_STATE_STUNNED);
     }
 
-    void EnterCombat(Unit* attacker) override
+    void JustEngagedWith(Unit* attacker) override
     {
         if (Creature* buru = _instance->GetCreature(DATA_BURU))
         {

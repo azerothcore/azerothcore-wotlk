@@ -321,10 +321,10 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_FRENZY, 40000);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             summons.DespawnAll();
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             ScheduleNormalEvents(1);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 25 * MINUTE * IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_SUMMON_MINIONS, 1000);

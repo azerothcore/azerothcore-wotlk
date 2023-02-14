@@ -15,27 +15,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_the_black_stalker
-SD%Complete: 95
-SDComment: Timers may be incorrect
-SDCategory: Coilfang Resevoir, Underbog
-EndScriptData */
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "the_underbog.h"
 
+/*
+How levitation sequence works: boss casts Levitate and it triggers a chain of spells, target(any target, player or pet, any position in
+threat list) eventually gets pulled towards by randomly selected trigger. Then target becomes protected from Pull Towards by Suspension
+aura which is triggered every 1 sec up to 4 times. Since it has stun mechanic, diminishing returns cuts off its duration every cast in
+half (20 > 10 > 5 > 0). Eventually player becomes immune to Suspension and vulnerable to another pull towards.
+Whole levitate sequence is designed to pull player towards up to 3 times. Usually it works like this: player gets pulled towards,
+gets protected by Suspension from Pull Towards next 2 times. If player is unlucky, boss can cast Levitate on same player again, in that case
+player can be pulled towards 2 times in a row without any protection from fall damage by Suspension(case from sniffs).
+However currently diminishing returns affects Suspension after first cast, its duration is 10 instead of 20 seconds and player will be
+immune to 4th cast. That allows to pull player towards when levitation sequence ends. Levitation sequence has sensetive design and looks
+like lack of delays between packets makes it work differently too.
+Of course as was said above player can be pulled towards 2 times in a row but that looks like a rare case.
+*/
+
 enum eBlackStalker
 {
     SPELL_LEVITATE                  = 31704,
-    SPELL_SUSPENSION                = 31719,
-    SPELL_LEVITATION_PULSE          = 31701,
-    SPELL_MAGNETIC_PULL             = 31705,
     SPELL_CHAIN_LIGHTNING           = 31717,
     SPELL_STATIC_CHARGE             = 31715,
     SPELL_SUMMON_SPORE_STRIDER      = 38755,
+
+    SPELL_LEVITATION_PULSE          = 31701,
+    SPELL_SOMEONE_GRAB_ME           = 31702,
+    SPELL_MAGNETIC_PULL             = 31703,
+    SPELL_SUSPENSION_PRIMER         = 31720,
+    SPELL_SUSPENSION                = 31719,
 
     EVENT_LEVITATE                  = 1,
     EVENT_SPELL_CHAIN               = 2,
@@ -48,173 +58,180 @@ enum eBlackStalker
     ENTRY_SPORE_STRIDER             = 22299
 };
 
-class boss_the_black_stalker : public CreatureScript
+struct boss_the_black_stalker : public BossAI
 {
-public:
-    boss_the_black_stalker() : CreatureScript("boss_the_black_stalker") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_the_black_stalker(Creature* creature) : BossAI(creature, DATA_BLACK_STALKER)
     {
-        return GetTheUnderbogAI<boss_the_black_stalkerAI>(creature);
     }
 
-    struct boss_the_black_stalkerAI : public ScriptedAI
+    void JustEngagedWith(Unit* who) override
     {
-        boss_the_black_stalkerAI(Creature* creature) : ScriptedAI(creature), summons(me)
-        {
-        }
+        events.ScheduleEvent(EVENT_LEVITATE, urand(8000, 12000));
+        events.ScheduleEvent(EVENT_SPELL_CHAIN, 6000);
+        events.ScheduleEvent(EVENT_SPELL_STATIC, 10000);
+        events.ScheduleEvent(EVENT_CHECK, 5000);
+        if (IsHeroic())
+            events.ScheduleEvent(EVENT_SPELL_SPORES, urand(10000, 15000));
 
-        EventMap events;
-        SummonList summons;
-        ObjectGuid lTarget;
+        BossAI::JustEngagedWith(who);
+    }
 
-        void Reset() override
-        {
-            events.Reset();
-            summons.DespawnAll();
-            lTarget.Clear();
-        }
+    void JustSummoned(Creature* summon) override
+    {
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+            summon->AI()->AttackStart(target);
+        else if (me->GetVictim())
+            summon->AI()->AttackStart(me->GetVictim());
 
-        void EnterCombat(Unit*) override
-        {
-            events.ScheduleEvent(EVENT_LEVITATE, 12000);
-            events.ScheduleEvent(EVENT_SPELL_CHAIN, 6000);
-            events.ScheduleEvent(EVENT_SPELL_STATIC, 10000);
-            events.ScheduleEvent(EVENT_CHECK, 5000);
-            if (IsHeroic())
-                events.ScheduleEvent(EVENT_SPELL_SPORES, urand(10000, 15000));
-        }
+        BossAI::JustSummoned(summon);
+    }
 
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
-                summon->AI()->AttackStart(target);
-            else if (me->GetVictim())
-                summon->AI()->AttackStart(me->GetVictim());
-        }
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+    {
+        summons.Despawn(summon);
+        for (uint8 i = 0; i < 3; ++i)
+            me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
+    }
 
-        void SummonedCreatureDies(Creature* summon, Unit*) override
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            summons.Despawn(summon);
-            for (uint8 i = 0; i < 3; ++i)
+            case EVENT_CHECK:
+                float x, y, z, o;
+                me->GetHomePosition(x, y, z, o);
+                if (!me->IsWithinDist3d(x, y, z, 60))
+                {
+                    EnterEvadeMode();
+                    return;
+                }
+                events.RepeatEvent(5000);
+                break;
+            case EVENT_SPELL_SPORES:
                 me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
+                events.RepeatEvent(urand(10000, 15000));
+                break;
+            case EVENT_SPELL_CHAIN:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                    me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
+                events.RepeatEvent(9000);
+                break;
+            case EVENT_SPELL_STATIC:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30, true))
+                    me->CastSpell(target, SPELL_STATIC_CHARGE, false);
+                events.RepeatEvent(10000);
+                break;
+            case EVENT_LEVITATE:
+                DoCastSelf(SPELL_LEVITATE);
+                events.RepeatEvent(urand(18000, 24000));
+                break;
         }
 
-        void JustDied(Unit*) override
-        {
-            summons.DespawnAll();
-        }
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
 
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_CHECK:
-                    float x, y, z, o;
-                    me->GetHomePosition(x, y, z, o);
-                    if (!me->IsWithinDist3d(x, y, z, 60))
-                    {
-                        EnterEvadeMode();
-                        return;
-                    }
-                    events.RepeatEvent(5000);
-                    break;
-                case EVENT_SPELL_SPORES:
-                    me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
-                    events.RepeatEvent(urand(10000, 15000));
-                    break;
-                case EVENT_SPELL_CHAIN:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
-                    events.DelayEvents(3000);
-                    events.RepeatEvent(9000);
-                    break;
-                case EVENT_SPELL_STATIC:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30, true))
-                        me->CastSpell(target, SPELL_STATIC_CHARGE, false);
-                    events.RepeatEvent(10000);
-                    break;
-                case EVENT_LEVITATE:
-                    events.RepeatEvent(15000);
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
-                    {
-                        me->CastSpell(target, SPELL_LEVITATE, false);
-                        lTarget = target->GetGUID();
-                        events.DelayEvents(5000);
-                        events.ScheduleEvent(EVENT_LEVITATE_TARGET_1, 2000);
-                    }
-                    break;
-                case EVENT_LEVITATE_TARGET_1:
-                    if (Unit* target = ObjectAccessor::GetUnit(*me, lTarget))
-                    {
-                        if (!target->HasAura(SPELL_LEVITATE))
-                            lTarget.Clear();
-                        else
-                        {
-                            target->CastSpell(target, SPELL_MAGNETIC_PULL, true);
-                            events.ScheduleEvent(EVENT_LEVITATE_TARGET_2, 1500);
-                        }
-                    }
-                    break;
-                case EVENT_LEVITATE_TARGET_2:
-                    if (Unit* target = ObjectAccessor::GetUnit(*me, lTarget))
-                    {
-                        if (!target->HasAura(SPELL_LEVITATE))
-                            lTarget.Clear();
-                        else
-                        {
-                            target->AddAura(SPELL_SUSPENSION, target);
-                            lTarget.Clear();
-                        }
-                    }
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
-class spell_gen_allergies : public SpellScriptLoader
+// 31704 - Levitate
+class spell_the_black_stalker_levitate : public SpellScript
 {
-public:
-    spell_gen_allergies() : SpellScriptLoader("spell_gen_allergies") { }
+    PrepareSpellScript(spell_the_black_stalker_levitate);
 
-    class spell_gen_allergies_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_gen_allergies_AuraScript);
+        return ValidateSpellInfo({ SPELL_LEVITATION_PULSE });
+    }
 
-        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-        {
-            isPeriodic = true;
-            amplitude = urand(10 * IN_MILLISECONDS, 200 * IN_MILLISECONDS);
-        }
-
-        void Update(AuraEffect*  /*effect*/)
-        {
-            SetDuration(0);
-        }
-
-        void Register() override
-        {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_allergies_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_allergies_AuraScript::Update, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_gen_allergies_AuraScript();
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_LEVITATION_PULSE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_the_black_stalker_levitate::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 31701 - Levitation Pulse
+class spell_the_black_stalker_levitation_pulse : public SpellScript
+{
+    PrepareSpellScript(spell_the_black_stalker_levitation_pulse);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SOMEONE_GRAB_ME });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetCaster(), SPELL_SOMEONE_GRAB_ME, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_the_black_stalker_levitation_pulse::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 31702 - Someone Grab Me
+class spell_the_black_stalker_someone_grab_me : public SpellScript
+{
+    PrepareSpellScript(spell_the_black_stalker_someone_grab_me);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGNETIC_PULL, SPELL_SUSPENSION });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster()->HasAura(SPELL_SUSPENSION))
+            GetHitUnit()->CastSpell(GetCaster(), SPELL_MAGNETIC_PULL);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_the_black_stalker_someone_grab_me::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 31703 - Magnetic Pull
+class spell_the_black_stalker_magnetic_pull : public SpellScript
+{
+    PrepareSpellScript(spell_the_black_stalker_magnetic_pull);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUSPENSION_PRIMER });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_SUSPENSION_PRIMER, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_the_black_stalker_magnetic_pull::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_boss_the_black_stalker()
 {
-    new boss_the_black_stalker();
-    new spell_gen_allergies();
+    RegisterUnderbogCreatureAI(boss_the_black_stalker);
+    RegisterSpellScript(spell_the_black_stalker_levitate);
+    RegisterSpellScript(spell_the_black_stalker_levitation_pulse);
+    RegisterSpellScript(spell_the_black_stalker_someone_grab_me);
+    RegisterSpellScript(spell_the_black_stalker_magnetic_pull);
 }

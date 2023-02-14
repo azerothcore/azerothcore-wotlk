@@ -406,7 +406,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             if (me->GetEntry() == NPC_RISEN_JAEREN || me->GetEntry() == NPC_RISEN_ARELAS)
@@ -429,7 +429,7 @@ public:
             {
                 case SPELL_CLAW_N:
                 case SPELL_CLAW_H:
-                    DoResetThreat();
+                    DoResetThreatList();
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                     {
                         me->AddThreat(target, 100.0f);

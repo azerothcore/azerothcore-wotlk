@@ -51,6 +51,7 @@ public:
     {
         instance_ruby_sanctum_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
@@ -183,6 +184,13 @@ public:
 
             switch (type)
             {
+                case DATA_HALION_INTRO_DONE:
+                    if (state != DONE)
+                    {
+                        SetBossState(DATA_HALION_INTRO1, NOT_STARTED);
+                        SetBossState(DATA_HALION_INTRO2, NOT_STARTED);
+                    }
+                    break;
                 case DATA_SAVIANA_RAGEFIRE:
                 case DATA_BALTHARUS_THE_WARBORN:
                     if (GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE && GetBossState(DATA_SAVIANA_RAGEFIRE) == DONE)
@@ -208,62 +216,11 @@ public:
             return true;
         }
 
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "R S " << GetBossSaveData();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
         void FillInitialWorldStates(WorldPacket& data) override
         {
             data << uint32(WORLDSTATE_CORPOREALITY_MATERIAL) << uint32(50);
             data << uint32(WORLDSTATE_CORPOREALITY_TWILIGHT) << uint32(50);
             data << uint32(WORLDSTATE_CORPOREALITY_TOGGLE) << uint32(0);
-        }
-
-        void Load(char const* str) override
-        {
-            if (!str)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(str);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'R' && dataHead2 == 'S')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-
-                    SetBossState(i, EncounterState(tmpState));
-                }
-
-                // Xinef: additional check
-                if (GetBossState(DATA_HALION_INTRO_DONE) != DONE)
-                {
-                    SetBossState(DATA_HALION_INTRO1, NOT_STARTED);
-                    SetBossState(DATA_HALION_INTRO2, NOT_STARTED);
-                }
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     protected:

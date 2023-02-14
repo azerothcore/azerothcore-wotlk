@@ -109,9 +109,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_NECROTIC_AURA, 10000);
             events.ScheduleEvent(EVENT_DEATHBLOOM, 5000);

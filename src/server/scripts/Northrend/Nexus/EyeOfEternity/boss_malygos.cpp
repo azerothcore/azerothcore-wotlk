@@ -323,7 +323,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             DoZoneInCombat();
@@ -1087,7 +1087,7 @@ public:
         EventMap events;
         uint16 timer;
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             DoZoneInCombat();
             events.Reset();
@@ -1201,9 +1201,13 @@ public:
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
-                                    if (!pPlayer->IsAlive() || pPlayer->IsGameMaster())
-                                        continue;
-                                    guids.push_back(pPlayer->GetGUID());
+                                    if (pPlayer->IsAlive())
+                                    {
+                                        if (!pPlayer->GetVehicle())
+                                        {
+                                            guids.push_back(pPlayer->GetGUID());
+                                        }
+                                    }
                                 }
                         if (!guids.empty())
                             if (Player* plr = ObjectAccessor::GetPlayer(*me, guids.at(urand(0, guids.size() - 1))))
@@ -1505,7 +1509,7 @@ public:
                 {
                     uint8 i = 0;
                     std::list<Unit*> drakes;
-                    c->AI()->SelectTargetList(drakes, (c->GetMap()->GetSpawnMode() == 0 ? 1 : 3), SelectTargetMethod::Random, 0.0f, false, 57403 /*only drakes have this aura*/);
+                    c->AI()->SelectTargetList(drakes, (c->GetMap()->GetSpawnMode() == 0 ? 1 : 3), SelectTargetMethod::Random, 0, 0.0f, false, true, 57403 /*only drakes have this aura*/);
                     for (std::list<Unit*>::iterator itr = drakes.begin(); itr != drakes.end() && i < 3; ++itr)
                     {
                         DrakeGUID[i++] = (*itr)->GetGUID();

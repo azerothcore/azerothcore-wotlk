@@ -201,7 +201,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->setActive(true);
             events.Reset();
@@ -465,7 +465,7 @@ public:
                 }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }
@@ -767,7 +767,7 @@ public:
                 me->RemoveAllAuras();
             }
             DoZoneInCombat();
-            DoResetThreat();
+            DoResetThreatList();
             if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
             {
                 if (!next)

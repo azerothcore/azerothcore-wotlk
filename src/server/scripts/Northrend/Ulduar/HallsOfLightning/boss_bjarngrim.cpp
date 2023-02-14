@@ -166,7 +166,7 @@ public:
                 m_pInstance->SetData(TYPE_BJARNGRIM, NOT_STARTED);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -395,7 +395,7 @@ public:
                 BjarngrimGUID.Clear();
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_ARC_WELD, 2000);
             events.ScheduleEvent(EVENT_RENEW_STEEL, 10000 + rand() % 1000);

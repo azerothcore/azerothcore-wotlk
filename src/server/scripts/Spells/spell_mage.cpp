@@ -591,7 +591,7 @@ class spell_mage_ice_barrier_aura : public spell_mage_incanters_absorbtion_base_
 {
     PrepareAuraScript(spell_mage_ice_barrier_aura);
 
-    // TODO: Rework
+    /// @todo: Rework
     static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
     {
         // +80.68% from sp bonus
@@ -627,7 +627,7 @@ class spell_mage_ice_barrier : public SpellScript
 {
     PrepareSpellScript(spell_mage_ice_barrier);
 
-    // TODO: Rework
+    /// @todo: Rework
     static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
     {
         // +80.68% from sp bonus
@@ -787,13 +787,14 @@ class spell_mage_master_of_elements : public AuraScript
         return ValidateSpellInfo({ SPELL_MAGE_MASTER_OF_ELEMENTS_ENERGIZE });
     }
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
     {
-        _spellInfo = eventInfo.GetSpellInfo();
-        if (!_spellInfo || !eventInfo.GetActor() || !eventInfo.GetActionTarget())
+        if (!isTriggeredAtSpellProcEvent || !eventInfo.GetActor() || !eventInfo.GetActionTarget())
         {
             return false;
         }
+
+        _spellInfo = eventInfo.GetSpellInfo();
 
         bool selectCaster = false;
         // Triggered spells cost no mana so we need triggering spellInfo
@@ -802,6 +803,13 @@ class spell_mage_master_of_elements : public AuraScript
             _spellInfo = triggeredByAuraSpellInfo;
             selectCaster = true;
         }
+
+        if (!_spellInfo)
+        {
+            return false;
+        }
+
+        _ticksModifier = 1;
 
         // If spell is periodic, mana amount is divided by tick number
         if (eventInfo.GetTriggerAuraEffectIndex() >= EFFECT_0)
@@ -812,35 +820,43 @@ class spell_mage_master_of_elements : public AuraScript
                 {
                     if (AuraEffect const* aurEff = target->GetAuraEffect(_spellInfo->Id, eventInfo.GetTriggerAuraEffectIndex(), caster->GetGUID()))
                     {
-                        ticksModifier = aurEff->GetTotalTicks();
+                        _ticksModifier = std::max(1, aurEff->GetTotalTicks());
                     }
                 }
             }
         }
 
-        return _spellInfo; // eventInfo.GetSpellInfo()
+        return true;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        int32 mana = int32(_spellInfo->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask()) / ticksModifier);
-        mana = CalculatePct(mana, aurEff->GetAmount());
+        if (!_spellInfo)
+            return;
 
-        if (mana > 0)
-            GetTarget()->CastCustomSpell(SPELL_MAGE_MASTER_OF_ELEMENTS_ENERGIZE, SPELLVALUE_BASE_POINT0, mana, GetTarget(), true, nullptr, aurEff);
+        if (Unit* target = GetTarget())
+        {
+            int32 mana = int32(_spellInfo->CalcPowerCost(target, eventInfo.GetSchoolMask()) / _ticksModifier);
+            mana = CalculatePct(mana, aurEff->GetAmount());
+
+            if (mana > 0)
+            {
+                target->CastCustomSpell(SPELL_MAGE_MASTER_OF_ELEMENTS_ENERGIZE, SPELLVALUE_BASE_POINT0, mana, target, true, nullptr, aurEff);
+            }
+        }
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_mage_master_of_elements::CheckProc);
+        DoAfterCheckProc += AuraAfterCheckProcFn(spell_mage_master_of_elements::AfterCheckProc);
         OnEffectProc += AuraEffectProcFn(spell_mage_master_of_elements::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 
 private:
     SpellInfo const* _spellInfo = nullptr;
-    uint8 ticksModifier = 1;
+    uint8 _ticksModifier = 0;
 };
 
 enum SilvermoonPolymorph
@@ -947,14 +963,14 @@ class spell_mage_fingers_of_frost_proc_aura : public AuraScript
         return true;
     }
 
-    bool CheckAfterProc(ProcEventInfo& eventInfo)
+    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
     {
         if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_CAST)
         {
             eventInfo.ResetProcChance();
         }
 
-        return true;
+        return isTriggeredAtSpellProcEvent;
     }
 
     void HandleOnEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
@@ -997,7 +1013,7 @@ class spell_mage_fingers_of_frost_proc_aura : public AuraScript
     void Register()
     {
         DoCheckProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckProc);
-        DoCheckAfterProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckAfterProc);
+        DoAfterCheckProc += AuraAfterCheckProcFn(spell_mage_fingers_of_frost_proc_aura::AfterCheckProc);
         OnEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleOnEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
         AfterEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleAfterEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }

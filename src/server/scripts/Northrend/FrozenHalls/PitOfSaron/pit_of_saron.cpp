@@ -141,7 +141,7 @@ public:
                                 n2->GetMotionMaster()->MovePoint(1, NecrolytePos2);
                                 n2->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                             }
-                            // TODO This spell check is invalid
+                            /// @todo This spell check is invalid
                             //                            if (SPELL_NECROLYTE_CHANNELING)
                             //                            {
                             n1->RemoveAura(SPELL_NECROLYTE_CHANNELING);
@@ -410,7 +410,7 @@ public:
                 {
                     isInvincible = true;
 
-                    // TODO This spell check is invalid
+                    /// @todo This spell check is invalid
                     //                    if (SPELL_NECROLYTE_CHANNELING)
                     me->CastSpell(me, SPELL_NECROLYTE_CHANNELING, false);
 
@@ -432,9 +432,9 @@ public:
                 me->SetFacingTo(M_PI);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            // TODO This spell check is invalid
+            /// @todo This spell check is invalid
             //            if (SPELL_NECROLYTE_CHANNELING)
             me->RemoveAura(SPELL_NECROLYTE_CHANNELING);
             events.Reset();
@@ -1297,48 +1297,6 @@ public:
     }
 };
 
-class npc_frostbite_invisible_stalker : public CreatureScript
-{
-public:
-    npc_frostbite_invisible_stalker() : CreatureScript("npc_frostbite_invisible_stalker") { }
-
-    struct npc_frostbite_invisible_stalkerAI: public NullCreatureAI
-    {
-        npc_frostbite_invisible_stalkerAI(Creature* creature) : NullCreatureAI(creature)
-        {
-            timer = 3500;
-            for (uint8 i = 0; i < 3; ++i)
-            {
-                me->SetOrientation(i * M_PI / 3);
-                me->CastSpell(me, 34740, true);
-                me->CastSpell(me, 34746, true);
-            }
-        }
-
-        uint16 timer;
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (timer)
-            {
-                if (timer <= diff)
-                {
-                    int32 dmg = 2200;
-                    me->CastCustomSpell(me, 34779, 0, &dmg, 0, true);
-                    timer = 0;
-                }
-                else
-                    timer -= diff;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetPitOfSaronAI<npc_frostbite_invisible_stalkerAI>(creature);
-    }
-};
-
 class spell_pos_empowered_blizzard : public SpellScriptLoader
 {
 public:
@@ -1574,7 +1532,6 @@ void AddSC_pit_of_saron()
     new npc_pos_martin_or_gorkun_second();
     new npc_pos_freed_slave();
     new npc_pos_leader_second();
-    new npc_frostbite_invisible_stalker();
 
     new spell_pos_empowered_blizzard();
     new spell_pos_slave_trigger_closest();

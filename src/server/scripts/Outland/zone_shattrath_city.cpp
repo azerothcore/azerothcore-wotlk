@@ -407,7 +407,7 @@ public:
             }
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
@@ -477,7 +477,7 @@ public:
 
         EventMap _events;
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             AttackStart(who);
             _events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 2000);

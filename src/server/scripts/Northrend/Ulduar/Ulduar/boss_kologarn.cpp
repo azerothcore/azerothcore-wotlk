@@ -377,7 +377,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_KOLOGARN, IN_PROGRESS);

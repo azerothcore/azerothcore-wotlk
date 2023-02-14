@@ -541,7 +541,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
             Initialize();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (me->IsValidAttackTarget(who))
             {
@@ -770,7 +770,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
         }
 
@@ -1077,7 +1077,7 @@ public:
             m_uiTimer = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void AttackStart(Unit* /*who*/) override { }
 
@@ -2011,7 +2011,7 @@ public:
 
         void Reset() override {}
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _events.ScheduleEvent(EVENT_DEFLECTION, 10000, 20000);
             _events.ScheduleEvent(EVENT_SOUL_BLAST, 4000, 6000);

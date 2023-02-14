@@ -105,9 +105,9 @@ public:
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
             events.ScheduleEvent(EVENT_SPELL_TIDAL_WAVE, 10000);

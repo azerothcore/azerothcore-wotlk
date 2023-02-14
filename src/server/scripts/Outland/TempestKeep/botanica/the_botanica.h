@@ -23,6 +23,8 @@
 
 #define TheBotanicaScriptName "instance_the_botanica"
 
+#define DataHeader "BC"
+
 enum DataTypes
 {
     DATA_COMMANDER_SARANNIS             = 0,
@@ -57,5 +59,7 @@ inline AI* GetTheBotanicaAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TheBotanicaScriptName);
 }
+
+#define RegisterTheBotanicaCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTheBotanicaAI)
 
 #endif

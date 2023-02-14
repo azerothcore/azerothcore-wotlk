@@ -28,7 +28,7 @@
 #include "SpellScript.h"
 #include "TaskScheduler.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -156,7 +156,9 @@ enum eHallowsEndCandy
     SPELL_HALLOWS_END_CANDY_1               = 24924,
     SPELL_HALLOWS_END_CANDY_2               = 24925,
     SPELL_HALLOWS_END_CANDY_3               = 24926,
-    SPELL_HALLOWS_END_CANDY_4               = 24927,
+    SPELL_HALLOWS_END_CANDY_3_FEMALE        = 44742,
+    SPELL_HALLOWS_END_CANDY_3_MALE          = 44743,
+    SPELL_HALLOWS_END_CANDY_4               = 24927
 };
 
 class spell_hallows_end_candy : public SpellScript
@@ -168,13 +170,41 @@ class spell_hallows_end_candy : public SpellScript
         if (Player* target = GetHitPlayer())
         {
             uint32 spellId = SPELL_HALLOWS_END_CANDY_1 + urand(0, 3);
-            GetCaster()->CastSpell(target, spellId, true, nullptr);
+            GetCaster()->CastSpell(target, spellId, true);
         }
     }
 
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_hallows_end_candy::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_hallows_end_candy_pirate_costume : public AuraScript
+{
+    PrepareAuraScript(spell_hallows_end_candy_pirate_costume);
+
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->CastSpell(target, target->getGender() == GENDER_MALE ? SPELL_HALLOWS_END_CANDY_3_MALE : SPELL_HALLOWS_END_CANDY_3_FEMALE, true);
+        }
+    }
+
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->RemoveAurasDueToSpell(SPELL_HALLOWS_END_CANDY_3_MALE);
+            target->RemoveAurasDueToSpell(SPELL_HALLOWS_END_CANDY_3_FEMALE);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_hallows_end_candy_pirate_costume::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_SWIM_SPEED, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_hallows_end_candy_pirate_costume::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_INCREASE_SWIM_SPEED, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -568,7 +598,7 @@ struct npc_hallows_end_soh : public ScriptedAI
     int32 pos;
     TaskScheduler scheduler;
 
-    void EnterCombat(Unit*) override
+    void JustEngagedWith(Unit*) override
     {
         scheduler.Schedule(6s, [this](TaskContext context)
         {
@@ -649,10 +679,10 @@ struct npc_hallows_end_soh : public ScriptedAI
             unitList.push_back((*itr)->GetGUID());
         }
 
-        events.ScheduleEvent(1, 3000);
-        events.ScheduleEvent(2, 25000);
-        events.ScheduleEvent(2, 43000);
-        events.ScheduleEvent(3, 63000);
+        events.ScheduleEvent(1, 3s);
+        events.ScheduleEvent(2, 25s);
+        events.ScheduleEvent(2, 43s);
+        events.ScheduleEvent(3, 63s);
 
         me->SetReactState(REACT_PASSIVE);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -1004,7 +1034,7 @@ struct boss_headless_horseman : public ScriptedAI
         if (spellInfo->Id == SPELL_SUMMONING_RHYME_TARGET)
         {
             playerGUID = target->GetGUID();
-            events.ScheduleEvent(EVENT_HH_PLAYER_TALK, 2000);
+            events.ScheduleEvent(EVENT_HH_PLAYER_TALK, 2s);
         }
     }
 
@@ -1025,9 +1055,9 @@ struct boss_headless_horseman : public ScriptedAI
             me->Yell("Here's my body, fit and pure! Now, your blackened souls I'll cure!", LANG_UNIVERSAL);
 
             if (phase == 1)
-                events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6000);
+                events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6s);
             else if (phase == 2)
-                events.ScheduleEvent(EVENT_SUMMON_PUMPKIN, 6000);
+                events.ScheduleEvent(EVENT_SUMMON_PUMPKIN, 6s);
         }
     }
 
@@ -1044,15 +1074,15 @@ struct boss_headless_horseman : public ScriptedAI
 
                 me->SetInCombatWithZone();
                 inFight = true;
-                events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500);
-                events.ScheduleEvent(EVENT_HORSEMAN_CLEAVE, 7000);
+                events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500ms);
+                events.ScheduleEvent(EVENT_HORSEMAN_CLEAVE, 7s);
             }
         }
     }
 
     Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : nullptr; }
 
-    void EnterCombat(Unit*) override { me->SetInCombatWithZone(); }
+    void JustEngagedWith(Unit*) override { me->SetInCombatWithZone(); }
     void MoveInLineOfSight(Unit*  /*who*/) override {}
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -1079,8 +1109,8 @@ struct boss_headless_horseman : public ScriptedAI
                 if (phase < 2)
                     phase++;
 
-                events.ScheduleEvent(EVENT_HORSEMAN_WHIRLWIND, 6000);
-                events.ScheduleEvent(EVENT_HORSEMAN_CHECK_HEALTH, 1000);
+                events.ScheduleEvent(EVENT_HORSEMAN_WHIRLWIND, 6s);
+                events.ScheduleEvent(EVENT_HORSEMAN_CHECK_HEALTH, 1s);
             }
         }
     }
@@ -1426,6 +1456,7 @@ void AddSC_event_hallows_end_scripts()
     RegisterSpellScript(spell_hallows_end_trick);
     RegisterSpellScript(spell_hallows_end_trick_or_treat);
     RegisterSpellScript(spell_hallows_end_candy);
+    RegisterSpellScript(spell_hallows_end_candy_pirate_costume);
     RegisterSpellScript(spell_hallows_end_tricky_treat);
     RegisterSpellScriptWithArgs(spell_hallows_end_put_costume, "spell_hallows_end_pirate_costume", SPELL_PIRATE_COSTUME_MALE, SPELL_PIRATE_COSTUME_FEMALE);
     RegisterSpellScriptWithArgs(spell_hallows_end_put_costume, "spell_hallows_end_leper_costume", SPELL_LEPER_GNOME_COSTUME_MALE, SPELL_LEPER_GNOME_COSTUME_FEMALE);

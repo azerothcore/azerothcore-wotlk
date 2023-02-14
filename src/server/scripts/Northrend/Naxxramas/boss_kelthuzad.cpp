@@ -296,9 +296,9 @@ public:
                 AttackStart(who);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             Talk(SAY_SUMMON_MINIONS);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->RemoveAllAttackers();
@@ -427,7 +427,7 @@ public:
                 case EVENT_CHAINS:
                     for (uint8 i = 0; i < 3; ++i)
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true, -SPELL_CHAINS_OF_KELTHUZAD))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true, true, -SPELL_CHAINS_OF_KELTHUZAD))
                         {
                             me->CastSpell(target, SPELL_CHAINS_OF_KELTHUZAD, true);
                         }
@@ -601,7 +601,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             me->SetInCombatWithZone();
             if (me->GetEntry() == NPC_UNSTOPPABLE_ABOMINATION)

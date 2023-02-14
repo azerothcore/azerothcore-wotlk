@@ -103,7 +103,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, urand(10000, 30000));
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_SNOBOLLED, 1500);
@@ -256,7 +256,7 @@ public:
             PlayerGUID.Clear();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->setActive(true);
             events.Reset();
@@ -527,7 +527,7 @@ struct boss_jormungarAI : public ScriptedAI
             events.RescheduleEvent(EVENT_SUBMERGE, urand(45000, 50000));
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         me->setActive(true);
         ScheduleEvents();
@@ -593,7 +593,7 @@ struct boss_jormungarAI : public ScriptedAI
                     }
                     me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
                     me->StopMovingOnCurrentPos();
-                    DoResetThreat();
+                    DoResetThreatList();
 
                     events.RescheduleEvent(EVENT_EMERGE, 6000);
                 }
@@ -798,7 +798,7 @@ public:
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->setActive(true);
             events.Reset();

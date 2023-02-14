@@ -35,8 +35,6 @@ enum Spells
     SPELL_SUMMON_FIENDISH_HOUND = 30707,
     SPELL_TREACHEROUS_AURA      = 30695,
     SPELL_DEMONIC_SHIELD        = 31901,
-    SPELL_ORBITAL_STRIKE        = 30637,
-    SPELL_SHADOW_WHIP           = 30638
 };
 
 enum Misc
@@ -45,9 +43,7 @@ enum Misc
     EVENT_SUMMON2               = 2,
     EVENT_TREACHEROUS_AURA      = 3,
     EVENT_DEMONIC_SHIELD        = 4,
-    EVENT_KILL_TALK             = 5,
-    EVENT_ORBITAL_STRIKE        = 6,
-    EVENT_SHADOW_WHIP           = 7
+    EVENT_KILL_TALK             = 5
 };
 
 class boss_omor_the_unscarred : public CreatureScript
@@ -59,6 +55,7 @@ public:
     {
         boss_omor_the_unscarredAI(Creature* creature) : BossAI(creature, DATA_OMOR_THE_UNSCARRED)
         {
+            SetCombatMovement(false);
         }
 
         void Reset() override
@@ -68,16 +65,15 @@ public:
             _targetGUID.Clear();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SUMMON1, 10000);
             events.ScheduleEvent(EVENT_SUMMON2, 25000);
             events.ScheduleEvent(EVENT_TREACHEROUS_AURA, 6000);
             events.ScheduleEvent(EVENT_DEMONIC_SHIELD, 1000);
-            events.ScheduleEvent(EVENT_ORBITAL_STRIKE, 20000);
         }
 
         void KilledUnit(Unit*) override
@@ -136,23 +132,6 @@ public:
                     }
                     else
                         events.ScheduleEvent(EVENT_DEMONIC_SHIELD, 1000);
-                    break;
-                case EVENT_ORBITAL_STRIKE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 15.0f, true))
-                    {
-                        _targetGUID = target->GetGUID();
-                        me->CastSpell(target, SPELL_ORBITAL_STRIKE, false);
-                        events.DelayEvents(5000);
-                        events.ScheduleEvent(EVENT_SHADOW_WHIP, 4000);
-                        me->GetMotionMaster()->Clear();
-                    }
-                    events.ScheduleEvent(EVENT_ORBITAL_STRIKE, 20000);
-                    break;
-                case EVENT_SHADOW_WHIP:
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
-                        me->CastSpell(target, SPELL_SHADOW_WHIP, false);
-                    _targetGUID.Clear();
                     break;
             }
 

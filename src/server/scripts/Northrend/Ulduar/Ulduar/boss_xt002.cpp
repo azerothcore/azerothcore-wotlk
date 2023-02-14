@@ -198,7 +198,7 @@ public:
 
         void JustReachedHome() override { me->setActive(false); }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             events.ScheduleEvent(EVENT_ENRAGE, 600000, 0, 0);
@@ -760,7 +760,7 @@ public:
             data << uint32(SPELL_BOOM);
             me->SendMessageToSet(&data, false);
 
-            Unit::Kill(me, me);
+            me->KillSelf();
 
             // Visual only seems to work if the instant kill event is delayed or the spell itself is delayed
             // Casting done from player and caster source has the same targetinfo flags,

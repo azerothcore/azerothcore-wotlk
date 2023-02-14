@@ -264,7 +264,7 @@ public:
                 SpawnHelpers();
         }
 
-        void EnterCombat(Unit*  /*pWho*/) override
+        void JustEngagedWith(Unit*  /*pWho*/) override
         {
             me->CastSpell(me, SPELL_BITING_COLD_BOSS_AURA, true);
             SmallIcicles(true);

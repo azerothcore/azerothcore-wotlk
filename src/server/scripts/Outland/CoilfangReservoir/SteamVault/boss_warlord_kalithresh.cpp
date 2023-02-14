@@ -68,7 +68,7 @@ public:
                 instance->SetData(TYPE_WARLORD_KALITHRESH, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_REFLECTION, 10000);
@@ -172,7 +172,7 @@ public:
                 {
                     if (Creature* kali = me->FindNearestCreature(NPC_WARLORD_KALITHRESH, 100.0f))
                         kali->CastSpell(kali, SPELL_WARLORDS_RAGE_PROC, true);
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                 }
             }
         }

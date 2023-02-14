@@ -72,7 +72,7 @@ public:
             events2.ScheduleEvent(EVENT_SPAWN_INVADERS, 30000);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             events.ScheduleEvent(EVENT_SPELL_INFECTED_WOUND, urand(6000, 10000));
             events.ScheduleEvent(EVENT_SPELL_CRUSH, urand(3000, 5000));

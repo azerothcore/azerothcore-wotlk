@@ -137,7 +137,7 @@ public:
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.RescheduleEvent(EVENT_HADRONOX_ACID, 10000);
             events.RescheduleEvent(EVENT_HADRONOX_LEECH, 4000);
@@ -153,6 +153,21 @@ public:
                     return true;
 
             return false;
+        }
+
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            if ((!who || !who->IsControlledByPlayer()) && me->HealthBelowPct(70))
+            {
+                if (me->HealthBelowPctDamaged(5, damage))
+                {
+                    damage = 0;
+                }
+                else
+                {
+                    damage *= (me->GetHealthPct() - 5.0f) / 65.0f;
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -185,7 +200,7 @@ public:
                     break;
                 case EVENT_HADRONOX_MOVE4:
                     me->CastSpell(me, SPELL_WEB_FRONT_DOORS, true);
-                    [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                    [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                 case EVENT_HADRONOX_MOVE1:
                 case EVENT_HADRONOX_MOVE2:
                 case EVENT_HADRONOX_MOVE3:
@@ -254,7 +269,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             if (me->ToTempSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())

@@ -119,7 +119,7 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_MILL_CHECK_HEALTH, 1000);
             events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30000);
@@ -340,7 +340,7 @@ public:
         {
             if (summon->GetEntry() == NPC_HARBINGER_SKYRISS)
             {
-                Unit::Kill(me, me);
+                me->KillSelf();
                 me->setActive(false);
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, DONE);
                 if (Creature* creature = summons.GetCreatureWithEntry(NPC_MILLHOUSE))
@@ -354,7 +354,7 @@ public:
 
         void MoveInLineOfSight(Unit*) override { }
         void AttackStart(Unit*) override { }
-        void EnterCombat(Unit*) override { }
+        void JustEngagedWith(Unit*) override { }
 
         void JustDied(Unit*) override
         {

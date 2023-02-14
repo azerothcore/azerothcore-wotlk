@@ -48,9 +48,9 @@ public:
 
         uint32 nextTremorTime;
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(SPELL_GROUNDTREMOR, 0.2 * (int) TIMER_GROUNDTREMOR);
             events.ScheduleEvent(SPELL_FRENZY, 0.2 * (int) TIMER_FRENZY);
         }
