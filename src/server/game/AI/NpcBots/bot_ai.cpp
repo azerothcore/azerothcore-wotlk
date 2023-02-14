@@ -14053,7 +14053,7 @@ bool bot_ai::StartAttack(Unit const* u, bool force)
     return true;
 }
 
-void bot_ai::EnterCombat(Unit* u)
+void bot_ai::JustEngagedWith(Unit* u)
 {
     _atHome = false;
 

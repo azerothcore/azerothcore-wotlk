@@ -49,7 +49,7 @@ class bot_ai : public CreatureAI
         void JustDied(Unit*) override;
         void KilledUnit(Unit* u) override;
         void AttackStart(Unit* u) override;
-        void EnterCombat(Unit* u) override;
+        void JustEngagedWith(Unit* u) override;
         void MoveInLineOfSight(Unit* u) override;
         void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) override;
         //void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo*/) override { }

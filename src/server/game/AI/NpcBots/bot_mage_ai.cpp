@@ -208,7 +208,7 @@ public:
             return bot_ai::doCast(victim, spellId);
         }
 
-        void EnterCombat(Unit* u) override { canFrostWard = false; canFireWard = false; bot_ai::EnterCombat(u); }
+        void JustEngagedWith(Unit* u) override { canFrostWard = false; canFireWard = false; bot_ai::JustEngagedWith(u); }
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
