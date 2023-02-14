@@ -148,9 +148,9 @@ enum eNpcs
     NPC_TIRION                                      = 33628, // Possibly wrong npc here, 34996 had already populated creature_text (from ToC25) that matches. Needs a sniff to confirm.
 
     // NYI - Missing spawns for Toc5 (map 650), ToC25 probably matches positions, needs a sniff to confirm.
-    // Argent Raid Spectator - FX 
+    // Argent Raid Spectator - FX
     // Horde
-    NPC_SPECTATOR_HORDE                             = 34883, 
+    NPC_SPECTATOR_HORDE                             = 34883,
     NPC_SPECTATOR_BELF                              = 34904,
     NPC_SPECTATOR_TAUREN                            = 34903,
     NPC_SPECTATOR_TROLL                             = 34902,
@@ -199,7 +199,7 @@ enum eTexts
     // Announcers: Alliance Announcer - Arelas Brightstar && Horde Announcer - Jaeren Sunsworn
     SAY_EADRIC_INTRO_ANNOUNCER                      = 0,
     SAY_JAEREN_PALETRESS_INTRO                      = 1,
-    SAY_GRAND_CHAMPIONS_INTRO_1                     = 2, 
+    SAY_GRAND_CHAMPIONS_INTRO_1                     = 2,
     SAY_GRAND_CHAMPIONS_INTRO_DAWNSINGER            = 3, // Boltspark
     SAY_GRAND_CHAMPIONS_INTRO_ZULTORE               = 4, // Jaelyne
     SAY_GRAND_CHAMPIONS_INTRO_SKULLCRUSHER          = 5, // Jacob
