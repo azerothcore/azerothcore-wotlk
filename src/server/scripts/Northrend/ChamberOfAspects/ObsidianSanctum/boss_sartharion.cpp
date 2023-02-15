@@ -278,7 +278,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* pWho) override
+        void JustEngagedWith(Unit* pWho) override
         {
             if (pWho && !IsTargetInBounds(pWho))
             {
@@ -286,7 +286,7 @@ public:
                 return;
             }
 
-            _EnterCombat();
+            _JustEngagedWith();
             DoCastSelf(SPELL_SARTHARION_PYROBUFFET, true);
             Talk(SAY_SARTHARION_AGGRO);
 
@@ -808,7 +808,7 @@ struct boss_sartharion_dragonAI : public BossAI
         BossAI::JustSummoned(summon);
     }
 
-    void EnterCombat(Unit* /*who*/) final
+    void JustEngagedWith(Unit* /*who*/) final
     {
         me->setActive(true);
         DoZoneInCombat();

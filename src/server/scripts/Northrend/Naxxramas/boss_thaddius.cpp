@@ -240,9 +240,9 @@ public:
             summons.Summon(cr);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
             summons.DoZoneInCombat(NPC_FEUGEN);
             summons.DoZoneInCombat(NPC_STALAGG);
@@ -414,7 +414,7 @@ public:
             ScriptedAI::EnterEvadeMode(why);
         }
 
-        void EnterCombat(Unit* pWho) override
+        void JustEngagedWith(Unit* pWho) override
         {
             me->SetInCombatWithZone();
             if (Creature* cr = me->FindNearestCreature(NPC_TESLA_COIL, 150.f, true))
@@ -738,7 +738,7 @@ public:
         npc_teslaAI(Creature* creature) : ScriptedAI(creature) { }
         void EnterEvadeMode(EvadeReason /*why*/) override { } // never stop casting due to evade
         void UpdateAI(uint32 /*diff*/) override { } // never do anything unless told
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
         void DamageTaken(Unit* /*who*/, uint32& damage, DamageEffectType, SpellSchoolMask) override { damage = 0; } // no, you can't kill it
     };
 };

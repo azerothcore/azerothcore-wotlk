@@ -58,9 +58,9 @@ struct boss_jindo : public BossAI
 {
     boss_jindo(Creature* creature) : BossAI(creature, DATA_JINDO) { }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         events.ScheduleEvent(EVENT_BRAIN_WASH_TOTEM, 20s);
         events.ScheduleEvent(EVENT_POWERFULL_HEALING_WARD, 16s);
         events.ScheduleEvent(EVENT_HEX, 8s);
@@ -187,7 +187,7 @@ struct npc_healing_ward : public ScriptedAI
         _scheduler.CancelAll();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.
             Schedule(2s, [this](TaskContext context)
@@ -237,7 +237,7 @@ struct npc_shade_of_jindo : public ScriptedAI
             });
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.
             Schedule(1s, [this](TaskContext context)

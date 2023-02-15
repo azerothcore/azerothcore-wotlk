@@ -137,7 +137,7 @@ public:
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.RescheduleEvent(EVENT_HADRONOX_ACID, 10000);
             events.RescheduleEvent(EVENT_HADRONOX_LEECH, 4000);
@@ -269,7 +269,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             if (me->ToTempSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())

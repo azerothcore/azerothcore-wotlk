@@ -52,9 +52,9 @@ public:
             _conflagrateThreat = 0.0f;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_FLAMESTRIKE, 6s);
             events.ScheduleEvent(EVENT_CLEAVE, 8s);
             events.ScheduleEvent(EVENT_CONFLAGRATION, 15s);
