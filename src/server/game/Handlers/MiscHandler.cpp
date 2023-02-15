@@ -481,6 +481,12 @@ void WorldSession::HandlePlayerLogoutOpcode(WorldPackets::Character::PlayerLogou
 
 void WorldSession::HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& /*logoutCancel*/)
 {
+    LOG_ERROR("sql", "Recieved opcode HandleLogoutCancelOpcode");
+
+    // Player have already logged out serverside, too late to cancel
+    if (!GetPlayer())
+        return;
+
     SetLogoutStartTime(0);
 
     SendPacket(WorldPackets::Character::LogoutCancelAck().Write());
