@@ -554,19 +554,6 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
         SetBoundary(instance->GetBossBoundary(bossId));
 }
 
-bool BossAI::CanRespawn()
-{
-    if (instance)
-    {
-        if (instance->GetBossState(_bossId) == DONE)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 void BossAI::_Reset()
 {
     if (!me->IsAlive())
