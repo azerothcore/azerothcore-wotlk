@@ -2381,8 +2381,9 @@ public:
             return GetCaster()->GetTypeId() == TYPEID_UNIT;
         }
 
-        void CheckEnergy()
+        void PowerGain()
         {
+            GetCaster()->SetPower(POWER_ENERGY, GetCaster()->GetPower(POWER_ENERGY) + urand(6, 10));
             if (GetCaster()->GetPower(POWER_ENERGY) >= 100)
             {
                 GetCaster()->CastSpell(GetCaster(), SPELL_OVERHEAT, true);
@@ -2394,7 +2395,7 @@ public:
 
         void Register() override
         {
-            AfterHit += SpellHitFn(spell_igb_cannon_blast_SpellScript::CheckEnergy);
+            OnCast += SpellCastFn(spell_igb_cannon_blast_SpellScript::PowerGain);
         }
     };
 

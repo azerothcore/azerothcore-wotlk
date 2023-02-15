@@ -4458,6 +4458,13 @@ void SpellMgr::LoadSpellInfoCorrections()
             spellInfo->Effects[index].TargetB = 0;
         }
     });
+    // Cannon Blast ICC Horde an Alliance GUn
+
+    ApplySpellFix({ 69399, 70172 }, [](SpellInfo* spellInfo)
+        {
+            //set spellefect power gain of cannon to 0 , to handle it in spellscript
+            spellInfo->Effects[EFFECT_1].Effect = 0;
+        });
 
     // Self Visual - Sleep Until Cancelled(DND)
     ApplySpellFix({ 14915 }, [](SpellInfo* spellInfo)
