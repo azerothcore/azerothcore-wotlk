@@ -127,7 +127,7 @@ public:
         instance->SetData(DATA_BONED_ACHIEVEMENT, uint32(true));
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         me->setActive(true);

@@ -43,9 +43,9 @@ public:
     {
         boss_gehennasAI(Creature* creature) : BossAI(creature, DATA_GEHENNAS) {}
 
-        void EnterCombat(Unit* /*attacker*/) override
+        void JustEngagedWith(Unit* /*attacker*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_GEHENNAS_CURSE, 6s, 9s);
             events.ScheduleEvent(EVENT_RAIN_OF_FIRE, 10s);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, 3s, 5s);

@@ -1297,6 +1297,11 @@ void WorldSession::InitWarden(SessionKey const& k, std::string const& os)
     }
 }
 
+Warden* WorldSession::GetWarden()
+{
+    return &(*_warden);
+}
+
 bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) const
 {
     uint32 maxPacketCounterAllowed = GetMaxPacketCounterAllowed(p.GetOpcode());

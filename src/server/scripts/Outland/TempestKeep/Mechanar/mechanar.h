@@ -24,6 +24,8 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
+#define DataHeader "MR"
+
 #define MechanarScriptName "instance_mechanar"
 
 enum DataTypes

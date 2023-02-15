@@ -22,6 +22,8 @@
 #include "PassiveAI.h"
 #include "SpellScript.h"
 
+#define DataHeader "TBM"
+
 #define TheBlackMorassScriptName "instance_the_black_morass"
 
 enum DataTypes

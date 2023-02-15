@@ -53,6 +53,7 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             memset(&encounters, 0, sizeof(encounters));
             _currentRift = 0;
             _shieldPercent = 100;
@@ -327,40 +328,18 @@ public:
             }
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "B M " << encounters[0] << ' ' << encounters[1] << ' ' << encounters[2];
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
+            data >> encounters[0];
+            data >> encounters[1];
+            data >> encounters[2];
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2;
-            if (dataHead1 == 'B' && dataHead2 == 'M')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                    loadStream >> encounters[i];
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << encounters[0] << ' '
+                << encounters[1] << ' '
+                << encounters[2] << ' ';
         }
 
     protected:

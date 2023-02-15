@@ -211,30 +211,15 @@ public:
             return 0;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            std::ostringstream saveStream;
-            saveStream << "S O " << _kirtonosState << ' ' << _miniBosses;
-            return saveStream.str();
+            data >> _kirtonosState;
+            data >> _miniBosses;
         }
 
-        void Load(const char* str) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!str)
-                return;
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'S' && dataHead2 == 'O')
-            {
-                loadStream >> _kirtonosState;
-                loadStream >> _miniBosses;
-
-                if (_kirtonosState == IN_PROGRESS)
-                    _kirtonosState = NOT_STARTED;
-            }
+            data << _kirtonosState << ' ' << _miniBosses;
         }
 
     protected:
@@ -395,7 +380,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             originalDisplayId = me->GetDisplayId();
 

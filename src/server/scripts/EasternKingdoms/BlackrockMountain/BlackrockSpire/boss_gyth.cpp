@@ -70,9 +70,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
 
             events.ScheduleEvent(EVENT_CORROSIVE_ACID, 8s, 16s);
             events.ScheduleEvent(EVENT_FREEZE, 8s, 16s);
