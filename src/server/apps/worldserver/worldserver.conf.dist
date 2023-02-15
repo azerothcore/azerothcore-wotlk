@@ -3758,6 +3758,15 @@ ICC.Buff.Horde    = 73822
 ICC.Buff.Alliance = 73828
 
 #
+#   Naxx.Sapphiron.Requirement
+#       Description: Enable/Disable requirement of having to kill all quater final bosses to be able to start Sapphiron encounter.
+#       Default:        0 - Disabled (Patch 3.3.0)
+#                       1 - Enabled
+#
+
+Naxx.Sapphiron.Requirement = 0
+
+#
 #     Item.SetItemTradeable
 #        Description: Enabled/Disabled trading BoP items among raid members.
 #        Default:     1  - (Set BoP items tradeable timer to 2 hours)

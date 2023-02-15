@@ -641,6 +641,30 @@ public:
             return 0;
         }
 
+        bool AreAllWingsCleared() const
+        {
+            return (GetBossState(BOSS_MAEXXNA) == DONE) && (GetBossState(BOSS_LOATHEB) == DONE) && (GetBossState(BOSS_THADDIUS) == DONE) && (GetBossState(BOSS_HORSEMAN) == DONE);
+        }
+
+        bool CheckRequiredBosses(uint32 bossId, Player const* /* player */) const override
+        {
+            switch (bossId)
+            {
+                case BOSS_SAPPHIRON:
+                    if (sWorld->getBoolConfig(CONFIG_NAXX_SAPPHIRON_REQUIREMENT)) // Disabled by disabled, require all end quatter bosses to be killed in order to be able to start Sapphiron.
+                    {
+                        if (!AreAllWingsCleared())
+                        {
+                            return false;
+                        }
+                        break;
+                    }
+                default:
+                    break;
+            }
+            return true;
+        }
+
         bool SetBossState(uint32 bossId, EncounterState state) override
         {
             // pull all the trash if not killed
