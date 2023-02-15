@@ -20,8 +20,8 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+12, 19759, 530, 3520, 3748, 1, 1, 0, -3448.43, 2240.86, 33.7625, 2.36354, 300, 5, 1, 0, 0, 48001),
 (@CGUID+13, 19759, 530, 3520, 3748, 1, 1, 0, -3555.51, 2190.91, 30.1227, 5.32783, 300, 4, 1, 0, 0, 48001),
 (@CGUID+14, 19759, 530, 3520, 3748, 1, 1, 0, -3418.07, 2255.31, 33.6775, 2.97726, 300, 5, 1, 0, 0, 48001),
-(@CGUID+15, 19760, 530, 3520, 3748, 1, 1, 0, -3475.41, 2170.14, 32.8636, 5.41052, 300, 0, 0, 0, 0, 48001),
-(@CGUID+16, 19760, 530, 3520, 3748, 1, 1, 0, -3483.61, 2201.5, 32.8564, 5.06145, 300, 0, 0, 0, 0, 48001),
+(@CGUID+15, 19760, 530, 3520, 3748, 1, 1, 0, -3475.41, 2170.14, 32.8636, 5.41052, 300, 0, 0, 33554432, 0, 48001),
+(@CGUID+16, 19760, 530, 3520, 3748, 1, 1, 0, -3483.61, 2201.5, 32.8564, 5.06145, 300, 0, 0, 33554432, 0, 48001),
 (@CGUID+17, 19760, 530, 3520, 3748, 1, 1, 0, -3554.93, 2140.11, 24.1701, 5.76413, 300, 8, 1, 0, 0, 48001),
 (@CGUID+22, 20872, 530, 3520, 3748, 1, 1, 1, -3291.68, 1923.85, 143.069, 5.06823, 300, 0, 0, 0, 0, 48001),
 (@CGUID+23, 20872, 530, 3520, 3748, 1, 1, 1, -3223.39, 1961.9, 109.363, 4.30813, 300, 0, 0, 0, 0, 48001),
@@ -144,14 +144,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21210;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 21210);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21210, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 36384, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Invis Deathforge Caster - On Reset - Cast \'Skartax Purple Beam\'');
+(21210, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 36384, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Invis Deathforge Caster - On Reset - Cast \'Skartax Purple Beam\''),
+(21210, 0, 1, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Invis Deathforge Caster - On Data Set 1 1 - Despawn Instant');
 -- GUID-Specific
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -(@CGUID+78));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-(@CGUID+78), 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 36393, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Invis Deathforge Caster - On Reset - Cast \'Deathforge Summon Visual\'');
+(-(@CGUID+78), 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 36393, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Invis Deathforge Caster - On Reset - Cast \'Deathforge Summon Visual\''),
+(-(@CGUID+78), 0, 1, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Invis Deathforge Caster - On Data Set 1 1 - Despawn Instant');
 
 -- Delete old SAI
-DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (-84858,-84858,-84857,-84857,-84856,-84856,-84855,-84855,-84854,-84854);
+DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (-84858,-84857,-84856,-84855,-84854);
 
 -- Formations
 DELETE FROM `creature_formations` WHERE `memberGUID` IN (@CGUID+23,@CGUID+62,@CGUID+32,@CGUID+68,@CGUID+24,@CGUID+63,@CGUID+25,@CGUID+64,@CGUID+22,@CGUID+61,@CGUID+27,@CGUID+65);
