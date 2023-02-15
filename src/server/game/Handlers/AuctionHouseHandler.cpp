@@ -271,14 +271,14 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             AH->houseId = AUCTIONHOUSE_NEUTRAL;
         else
         {
-            CreatureData const* auctioneerData = sObjectMgr->GetCreatureData(creature->GetSpawnId());
-            if (!auctioneerData)
-            {
-                LOG_ERROR("network.opcode", "Data for auctioneer not found ({})", auctioneer.ToString());
-                return;
-            }
+//            CreatureData const* auctioneerData = sObjectMgr->GetCreatureData(creature->GetSpawnId());
+//            if (!auctioneerData)
+//            {
+//                LOG_ERROR("network.opcode", "Data for auctioneer not found ({})", auctioneer.ToString());
+//                return;
+//            }
 
-            CreatureTemplate const* auctioneerInfo = sObjectMgr->GetCreatureTemplate(auctioneerData->id1);
+            CreatureTemplate const* auctioneerInfo = creature->GetCreatureTemplate();
             if (!auctioneerInfo)
             {
                 LOG_ERROR("network.opcode", "Non existing auctioneer ({})", auctioneer.ToString());
