@@ -252,7 +252,7 @@ public:
                     if( pInstance && !summons.empty() )
                         if( Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()) )
                             if (urand(0, 1))
-                                ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL); // Multiple variations + not always happening, from video sources, needs sniff?
+                                ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL); // @todo: Multiple variations + not always happening, from video sources, needs sniff to transition from DB.
                     break;
                 case EVENT_SPELL_PLAGUE_STRIKE:
                     if( me->GetVictim() )

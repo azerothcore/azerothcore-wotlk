@@ -23,8 +23,8 @@
 
 enum Texts
 {
-    NPC_TEXT_NOT_MOUNTED_H = 15043,  //Horde text
-    NPC_TEXT_NOT_MOUNTED_A = 14757,  //Alliance text
+    NPC_TEXT_NOT_MOUNTED_H = 15043,  // Horde text
+    NPC_TEXT_NOT_MOUNTED_A = 14757,  // Alliance text
 
     NPC_TEXT_CHALLENGE_1   = 14688,
     NPC_TEXT_CHALLENGE_2   = 14737,
