@@ -651,7 +651,7 @@ public:
             switch (bossId)
             {
                 case BOSS_SAPPHIRON:
-                    if (sWorld->getBoolConfig(CONFIG_NAXX_SAPPHIRON_REQUIREMENT)) // Disabled by disabled, require all end quatter bosses to be killed in order to be able to start Sapphiron.
+                    if (sWorld->getBoolConfig(CONFIG_NAXX_SAPPHIRON_REQUIREMENT)) // Disabled by default, require all end quatter bosses to be killed in order to be able to start Sapphiron.
                     {
                         if (!AreAllWingsCleared())
                         {
