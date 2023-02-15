@@ -641,28 +641,6 @@ public:
             return 0;
         }
 
-        bool AreAllWingsCleared() const
-        {
-            return (GetBossState(BOSS_MAEXXNA) == DONE) && (GetBossState(BOSS_LOATHEB) == DONE) && (GetBossState(BOSS_THADDIUS) == DONE) && (GetBossState(BOSS_HORSEMAN) == DONE);
-        }
-
-        bool CheckRequiredBosses(uint32 bossId, Player const* /* player */) const override
-        {
-            switch (bossId)
-            {
-                case BOSS_SAPPHIRON:
-                    if (!AreAllWingsCleared())
-                    {
-                        //开奥杜尔后删除下层boss击杀要求
-                        //return false;
-                    }
-                    break;
-                default:
-                    break;
-            }
-            return true;
-        }
-
         bool SetBossState(uint32 bossId, EncounterState state) override
         {
             // pull all the trash if not killed
