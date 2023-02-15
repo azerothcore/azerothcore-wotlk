@@ -665,7 +665,7 @@ void Creature::Update(uint32 diff)
         {
             if (!m_respawnCompatibilityMode)
             {
-                LOG_ERROR("entities.unit", "Creature %s in wrong state: DEAD (3)", GetGUID().ToString().c_str());
+                LOG_ERROR("entities.unit", "Creature ({}) in wrong state: DEAD (3)", GetGUID().ToString());
                 break;
             }
 
@@ -2073,7 +2073,7 @@ void Creature::Respawn(bool force)
 
         if (getDeathState() == DEAD)
         {
-            LOG_DEBUG("entities.unit", "Respawning creature %s (%s)", GetName().c_str(), GetGUID().ToString().c_str());
+            LOG_DEBUG("entities.unit", "Respawning creature {} ({})", GetName(), GetGUID().ToString());
             m_respawnTime = 0;
             loot.clear();
 
