@@ -260,7 +260,7 @@ public:
                         {
                             c->AI()->Talk(SAY_SINCLARI_COMPLETE);
                             c->DespawnOrUnsummon();
-                            c->SetRespawnTime(3); 
+                            c->SetRespawnTime(3);
                         }
                     }
                     SaveToDB();
