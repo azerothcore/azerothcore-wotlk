@@ -78,11 +78,10 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         uint32 gossipmenuid = 0;
+        gossipmenuid = creature->GetCreatureTemplate()->GossipMenuId;
 
         switch (creature->GetEntry())
         {
-            gossipmenuid = creature->GetCreatureTemplate()->GossipMenuId;
-
             case NPC_NETHER_DRAKE:
                 if (player->GetQuestStatus(QUEST_NETHERY_WINGS) == QUEST_STATUS_INCOMPLETE && player->HasItemCount(ITEM_DISRUPTOR))
                     AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
