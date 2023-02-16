@@ -1,3 +1,4 @@
+-- DB update 2023_02_16_03 -> 2023_02_16_04
 -- Ghostriders of Karabor (Counter-Clockwise Group)
 SET @GUID := 77821;
 
