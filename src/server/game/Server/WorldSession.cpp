@@ -353,9 +353,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         LogUnprocessedTail(packet);
                     }
                     else
-                    processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
+                        processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
                 }
-
 
                 // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
                 break;
