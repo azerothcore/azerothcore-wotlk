@@ -1,3 +1,4 @@
+-- DB update 2023_02_16_00 -> 2023_02_16_01
 -- Remove all of the same Ids, remove non-combat pet, remove mines
 DELETE FROM `creature` WHERE `id1` IN (19754,19756,19757,19759,19760,20872,20878,20887,21080,21207,21210,21211,21725,22024,18381,22315) AND `map`=530;
 

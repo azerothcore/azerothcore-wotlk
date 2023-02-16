@@ -1,3 +1,4 @@
+-- DB update 2023_02_16_02 -> 2023_02_16_03
 -- Delete all previous spawns
 DELETE FROM `creature` WHERE `id1`=21815;
 DELETE FROM `creature_addon` WHERE `guid` BETWEEN 76347 AND 76376;

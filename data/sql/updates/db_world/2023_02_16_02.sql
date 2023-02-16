@@ -1,3 +1,4 @@
+-- DB update 2023_02_16_01 -> 2023_02_16_02
 -- Delete all old spawns
 DELETE FROM `creature` WHERE `id1` IN (21788, 21795);
 
