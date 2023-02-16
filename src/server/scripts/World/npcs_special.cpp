@@ -1699,11 +1699,11 @@ public:
 # npc_wormhole
 ######*/
 
-#define GOSSIP_ENGINEERING1   "Borean Tundra"
-#define GOSSIP_ENGINEERING2   "Howling Fjord"
-#define GOSSIP_ENGINEERING3   "Sholazar Basin"
-#define GOSSIP_ENGINEERING4   "Icecrown"
-#define GOSSIP_ENGINEERING5   "Storm Peaks"
+#define GOSSIP_ENGINEERING1   "北风苔原"
+#define GOSSIP_ENGINEERING2   "嚎风峡湾"
+#define GOSSIP_ENGINEERING3   "索拉查盆地"
+#define GOSSIP_ENGINEERING4   "冰冠冰川"
+#define GOSSIP_ENGINEERING5   "风暴峭壁"
 #define GOSSIP_ENGINEERING6   "Underground..."
 
 enum WormholeSpells
