@@ -451,9 +451,13 @@ public:
                 case EVENT_START_ENCOUNTER:
                     {
                         if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
+                        {
                             c->AI()->Talk(SAY_SINCLARI_DOOR_LOCK);
+                        }
                         if (Creature* c = instance->GetCreature(NPC_DoorSealGUID))
+                        {
                             c->RemoveAllAuras(); // just to be sure...
+                        }
                         GateHealth = 100;
                         HandleGameObject(GO_MainGateGUID, false);
                         DoUpdateWorldState(WORLD_STATE_VH_SHOW, 1);
