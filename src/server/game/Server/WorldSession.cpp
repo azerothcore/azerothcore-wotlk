@@ -340,18 +340,22 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                                     "Player {} is currently not in world yet.", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), GetPlayerInfo());
                     }
                 }
-                else if (_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
+                else if (_player->IsInWorld())
                 {
-                    if (!sScriptMgr->CanPacketReceive(this, *packet))
+                    if (AntiDOS.EvaluateOpcode(*packet, currentTime))
                     {
-                        break;
-                    }
+                        if (!sScriptMgr->CanPacketReceive(this, *packet))
+                        {
+                            break;
+                        }
 
-                    opHandle->Call(this, *packet);
-                    LogUnprocessedTail(packet);
-                }
-                else
+                        opHandle->Call(this, *packet);
+                        LogUnprocessedTail(packet);
+                    }
+                    else
                     processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
+                }
+
 
                 // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
                 break;
