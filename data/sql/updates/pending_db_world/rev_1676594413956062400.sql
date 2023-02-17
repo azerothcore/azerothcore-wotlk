@@ -120,12 +120,12 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (249250, 23, 489.114, 3523.57, 65.8445),
 (249250, 24, 468.23, 3526.64, 63.9368);
 
-DELETE FROM `pool_template` WHERE `entry`=1115 AND `description` LIKE 'Vorakem Doomspeaker (18679)';
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (1115, 1, 'Vorakem Doomspeaker (18679)');
+DELETE FROM `pool_template` WHERE `entry`=1085 AND `description` LIKE '%Vorakem%';
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (1085, 1, 'Vorakem Doomspeaker (18679)');
 
-DELETE FROM `pool_creature` WHERE `pool_entry`=1115 AND `description` LIKE 'Vorakem Doomspeaker (18679)';
+DELETE FROM `pool_creature` WHERE `pool_entry`=1085 AND `description` LIKE '%Vorakem%';
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
-(24922, 1115, 0, 'Vorakem Doomspeaker (18679)'),
-(24923, 1115, 0, 'Vorakem Doomspeaker (18679)'),
-(24924, 1115, 0, 'Vorakem Doomspeaker (18679)'),
-(24925, 1115, 0, 'Vorakem Doomspeaker (18679)');
+(24922, 1085, 0, 'Vorakem Doomspeaker (18679)'),
+(24923, 1085, 0, 'Vorakem Doomspeaker (18679)'),
+(24924, 1085, 0, 'Vorakem Doomspeaker (18679)'),
+(24925, 1085, 0, 'Vorakem Doomspeaker (18679)');
