@@ -1,12 +1,3 @@
--- Infected Kodo Beast - add missing ability, Stampede.
-DELETE FROM `creature_template_spell` WHERE `CreatureID`=25596;
-INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
-(25596, 0, 45876, 12340),
-(25596, 1, 45877, 12340);
-
--- Column Ornament - disable gravity, previously falling to the ground.
-UPDATE `creature_template_movement` SET `Flight` = 1 WHERE `Flight` = 0 AND `CreatureId` = 29754;
-
 -- Dragonmaw Bonewarder - spawn Skeleton on reset
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1057;
 
@@ -23,7 +14,3 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 6412;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 6412);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (6412, 0, 0, 0, 6, 0, 100, 513, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skeleton - On Just Died - Despawn In 1000 ms (No Repeat)');
-
--- Reply-Code Alpha - All Is Well That Ends Well 10 & 25 - Remove requirement for sigil quest completion.
-UPDATE `quest_template_addon` SET `PrevQuestID` = 0 WHERE (`ID` = 13631); -- Normal (10m)
-UPDATE `quest_template_addon` SET `PrevQuestID` = 0 WHERE (`ID` = 13819); -- Heroic (25m)
