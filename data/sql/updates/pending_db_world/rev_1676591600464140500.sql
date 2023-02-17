@@ -73,12 +73,12 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (249210, 13, -1100.46, 2210.16, 30.2365),
 (249210, 14, -1140.56, 2206.97, 40.1512);
 
-DELETE FROM `pool_template` WHERE `entry`=1115 AND `description`='Mekthorg the Wild (18677)';
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (1115, 1, 'Mekthorg the Wild (18677)');
+DELETE FROM `pool_template` WHERE `entry`=1082 AND `description` LIKE '%Mekthorg%';
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (1082, 1, 'Mekthorg the Wild (18677)');
 
-DELETE FROM `pool_creature` WHERE `pool_entry`=1115 AND `description`='Mekthorg the Wild (18677)';
+DELETE FROM `pool_creature` WHERE `pool_entry`=1082 AND `description` LIKE '%Mekthorg%';
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
-(24918, 1115, 0, 'Mekthorg the Wild (18677)'),
-(24919, 1115, 0, 'Mekthorg the Wild (18677)'),
-(24920, 1115, 0, 'Mekthorg the Wild (18677)'),
-(24921, 1115, 0, 'Mekthorg the Wild (18677)');
+(24918, 1082, 0, 'Mekthorg the Wild (18677)'),
+(24919, 1082, 0, 'Mekthorg the Wild (18677)'),
+(24920, 1082, 0, 'Mekthorg the Wild (18677)'),
+(24921, 1082, 0, 'Mekthorg the Wild (18677)');
