@@ -37,7 +37,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `equipment_id`, `position_x`, `pos
 (@CGUID+7, 20932, 530, 0, 2817.23, 2929.54, 130.138, 2.32736, 39600, 2),
 (@CGUID+8, 20932, 530, 0, 4788.54, 3503.49, 119.851, 3.12453, 50400, 2);
 
-DELETE FROM `creature_addon` WHERE (`guid` IN (@CGUID+0,@CGUID+1,@CGUID+2,@CGUID+3,@CGUID+4,@CGUID+5,@CGUID+6,@CGUID+7,@CGUID+8));
+DELETE FROM `creature_addon` WHERE (`guid` IN (@CGUID+0,@CGUID+1,@CGUID+2,@CGUID+3,@CGUID+4,@CGUID+5,@CGUID+6,@CGUID+7,@CGUID+8,86860));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (@CGUID+0, (@CGUID+0)*10, 0, 0, 1, 0, 0, ''),
 (@CGUID+1, (@CGUID+1)*10, 0, 0, 1, 0, 0, ''),
@@ -49,7 +49,7 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (@CGUID+7, (@CGUID+7)*10, 0, 0, 1, 0, 0, ''),
 (@CGUID+8, (@CGUID+8)*10, 0, 0, 1, 0, 0, '');
 
-DELETE FROM `waypoint_data` WHERE `id` IN ((@CGUID+0)*10,(@CGUID+1)*10,(@CGUID+2)*10,(@CGUID+3)*10,(@CGUID+4)*10,(@CGUID+5)*10,(@CGUID+6)*10,(@CGUID+7)*10,(@CGUID+8)*10);
+DELETE FROM `waypoint_data` WHERE `id` IN ((@CGUID+0)*10,(@CGUID+1)*10,(@CGUID+2)*10,(@CGUID+3)*10,(@CGUID+4)*10,(@CGUID+5)*10,(@CGUID+6)*10,(@CGUID+7)*10,(@CGUID+8)*10,868600);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`) VALUES
 -- Chief Engineer Lorthander
 ((@CGUID+0)*10, 1, 4081.08, 4001.03, 119.01),
