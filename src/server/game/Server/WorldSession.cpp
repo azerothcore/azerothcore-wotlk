@@ -121,6 +121,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     m_inQueue(false),
     m_playerLoading(false),
     m_playerLogout(false),
+    m_playerRecentlyLogout(false),
     m_playerSave(false),
     m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()),
     m_sessionDbLocaleIndex(locale),
@@ -326,28 +327,48 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             case STATUS_LOGGEDIN:
                 if (!_player)
                 {
-                    // pussywizard: such packets were sent to do something for a character that has already logged out, skip them
-                }
-                else if (!_player->IsInWorld())
-                {
-                    // pussywizard: such packets may do something important and the player is just being teleported, move to the end of the queue
-                    // pussywizard: previously such were skipped, so leave it as it is xD proper code below if we wish to change that
-
-                    // pussywizard: requeue only important packets not related to maps (PROCESS_THREADUNSAFE)
-                    /*if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
+                    // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
+                    //! If player didn't log out a while ago, it means packets are being sent while the server does not recognize
+                    //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
+                    if (!m_playerRecentlyLogout)
                     {
-                        if (!firstDelayedPacket)
-                            firstDelayedPacket = packet;
+                        requeuePackets.push_back(packet);
                         deletePacket = false;
                         QueuePacket(packet);
-                    }*/
-                }
-                else if (_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
-                {
-                    if (!sScriptMgr->CanPacketReceive(this, *packet))
-                    {
-                        break;
+
+                        LOG_DEBUG("network", "Re-enqueueing packet with opcode %s with with status STATUS_LOGGEDIN. "
+                                    "Player {} is currently not in world yet.", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), GetPlayerInfo());
                     }
+                }
+                else if (_player->IsInWorld())
+                {
+                    if (AntiDOS.EvaluateOpcode(*packet, currentTime))
+                    {
+                        if (!sScriptMgr->CanPacketReceive(this, *packet))
+                        {
+                            break;
+                        }
+
+                        opHandle->Call(this, *packet);
+                        LogUnprocessedTail(packet);
+                    }
+                    else
+                        processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
+                }
+
+                // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
+                break;
+            case STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT:
+                if (!_player && !m_playerRecentlyLogout) // There's a short delay between _player = null and m_playerRecentlyLogout = true during logout
+                {
+                    LogUnexpectedOpcode(packet, "STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT",
+                            "the player has not logged in yet and not recently logout");
+                }
+                else if (AntiDOS.EvaluateOpcode(*packet, currentTime))
+                {
+                    // not expected _player or must checked in packet hanlder
+                    if (!sScriptMgr->CanPacketReceive(this, *packet))
+                        break;
 
                     opHandle->Call(this, *packet);
                     LogUnprocessedTail(packet);
@@ -372,6 +393,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             case STATUS_AUTHED:
                 if (m_inQueue) // prevent cheating
                     break;
+
+                // some auth opcodes can be recieved before STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT opcodes
+                // however when we recieve CMSG_CHAR_ENUM we are surely no longer during the logout process.
+                if (packet->GetOpcode() == CMSG_CHAR_ENUM)
+                    m_playerRecentlyLogout = false;
 
                 if (AntiDOS.EvaluateOpcode(*packet, currentTime))
                 {
@@ -714,6 +740,7 @@ void WorldSession::LogoutPlayer(bool save)
 
     m_playerLogout = false;
     m_playerSave = false;
+    m_playerRecentlyLogout = true;
     SetLogoutStartTime(0);
 }
 
@@ -1261,6 +1288,8 @@ void WorldSession::SendAddonsInfo()
 void WorldSession::SetPlayer(Player* player)
 {
     _player = player;
+
+    // set m_GUID that can be used while player loggined and later until m_playerRecentlyLogout not reset
     if (_player)
         m_GUIDLow = _player->GetGUID().GetCounter();
 }
