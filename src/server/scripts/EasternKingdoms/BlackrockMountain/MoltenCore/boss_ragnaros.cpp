@@ -204,9 +204,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.SetPhase(PHASE_EMERGED);
             ScheduleCombatEvents();
         }

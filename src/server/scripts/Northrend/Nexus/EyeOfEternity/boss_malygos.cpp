@@ -323,7 +323,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
             DoZoneInCombat();
@@ -1087,7 +1087,7 @@ public:
         EventMap events;
         uint16 timer;
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             DoZoneInCombat();
             events.Reset();

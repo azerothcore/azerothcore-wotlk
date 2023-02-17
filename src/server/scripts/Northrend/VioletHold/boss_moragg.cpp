@@ -70,7 +70,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
             me->CastSpell(me, SPELL_RAY_OF_SUFFERING, true);

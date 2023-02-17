@@ -77,10 +77,10 @@ public:
             aGuids.clear();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             me->CastSpell(me, SPELL_INTENSE_COLD, true);
             events.ScheduleEvent(EVENT_CRYSTALFIRE_BREATH, 14000);

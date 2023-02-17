@@ -715,7 +715,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_DRP_CHARGE, 10000);
             events.ScheduleEvent(EVENT_DRP_CLEAVE, 7000);
@@ -773,7 +773,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_DRS_LIGHTNING_BOLD, 5000);
             events.ScheduleEvent(EVENT_DRS_SHADOW_WORD_PAIN, 12000);
@@ -828,7 +828,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_IGC_CRUSH, 6000);
             events.ScheduleEvent(EVENT_IGC_GROUND_SMASH, 4000);
