@@ -4458,7 +4458,7 @@ void SpellMgr::LoadSpellInfoCorrections()
             spellInfo->Effects[index].TargetB = 0;
         }
     });
-   
+
      // Cannon Blast ICC Horde an Alliance GUn
     ApplySpellFix({ 69399, 70172 }, [](SpellInfo* spellInfo)
     {
