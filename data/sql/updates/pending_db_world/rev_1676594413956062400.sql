@@ -131,4 +131,4 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 (24925, 1085, 0, 'Vorakem Doomspeaker (18679)');
 
 -- It's another rare with DISABLE_MOVE added to it
-UPDATE `creature_template` SET `unit_flags`=`unit_flags`&~0 WHERE (`entry` = 18679);
+UPDATE `creature_template` SET `unit_flags`=`unit_flags`&~4 WHERE (`entry` = 18679);
