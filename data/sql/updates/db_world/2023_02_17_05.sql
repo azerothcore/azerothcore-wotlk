@@ -8,8 +8,9 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (25598, 184738, 530, 3520, 3944, 1, 1, -4547.79541015625, 1018.7100830078125, 10.07028961181640625, 3.900815248489379882, -0.02837467193603515, -0.0582284927368164, -0.92608070373535156, 0.371724128723144531, 120, 255, 1, 48069);
 
 -- New Creatures
-SET @GUID := 24904;
+SET @CGUID := 100050;
 
+DELETE FROM `creature` WHERE `id1` IN (21797, 22395, 21872, 22417);
 DELETE FROM `creature` WHERE `id1` IN (21797, 22395, 21872, 22417) AND `guid` BETWEEN @CGUID+0 AND @CGUID+4;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
 (@CGUID+0, 21797, 530, 3520, 3944, 1, 1, 0, -4543.6923828125, 1022.35357666015625, 9.979041099548339843, 3.874630928039550781, 120, 0, 0, 10175, 5325, 0, 0, 0, 0, 48069),
