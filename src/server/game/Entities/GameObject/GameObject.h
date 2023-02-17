@@ -103,31 +103,6 @@ enum class GameObjectActions : uint32
     SetTapList,                     // Set Tap List
 };
 
-// from `gameobject`
-struct GameObjectData
-{
-    explicit GameObjectData()  = default;
-    ObjectGuid::LowType spawnId{0};
-    uint32 id{0};                                              // entry in gamobject_template
-    uint16 mapid{0};
-    uint32 phaseMask{0};
-    float posX{0.0f};
-    float posY{0.0f};
-    float posZ{0.0f};
-    float orientation{0.0f};
-    G3D::Quat rotation;
-    int32  spawntimesecs{0};
-    uint32 ScriptId;
-    uint32 animprogress{0};
-    GOState go_state{GO_STATE_ACTIVE};
-    uint8 spawnMask{0};
-    uint8 artKit{0};
-    bool dbData{true};
-};
-
-typedef std::vector<uint32> GameObjectQuestItemList;
-typedef std::unordered_map<uint32, GameObjectQuestItemList> GameObjectQuestItemMap;
-
 // For containers:  [GO_NOT_READY]->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED->GO_READY        -> ...
 // For bobber:      GO_NOT_READY  ->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED-><deleted>
 // For door(closed):[GO_NOT_READY]->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED->GO_READY(close) -> ...
