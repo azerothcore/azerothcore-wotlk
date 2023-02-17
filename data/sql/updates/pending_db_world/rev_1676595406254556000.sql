@@ -107,13 +107,13 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (249300, 22, -1725.05, 8021.35, -103.23),
 (249300, 23, -1756.38, 8043.37, -100.979);
 
-DELETE FROM `pool_template` WHERE `entry`=1115 AND `description`='Goretooth (17144)';
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (1115, 1, 'Goretooth (17144)');
+DELETE FROM `pool_template` WHERE `entry`=1080 AND `description` LIKE '%Goretooth%';
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (1080, 1, 'Goretooth (17144)');
 
-DELETE FROM `pool_creature` WHERE `pool_entry`=1115 AND `description`='Goretooth (17144)';
+DELETE FROM `pool_creature` WHERE `pool_entry`=1080 AND `description` LIKE '%Goretooth%';
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
-(24926, 1115, 0, 'Goretooth (17144)'),
-(24927, 1115, 0, 'Goretooth (17144)'),
-(24928, 1115, 0, 'Goretooth (17144)'),
-(24929, 1115, 0, 'Goretooth (17144)'),
-(24930, 1115, 0, 'Goretooth (17144)');
+(24926, 1080, 0, 'Goretooth (17144)'),
+(24927, 1080, 0, 'Goretooth (17144)'),
+(24928, 1080, 0, 'Goretooth (17144)'),
+(24929, 1080, 0, 'Goretooth (17144)'),
+(24930, 1080, 0, 'Goretooth (17144)');
