@@ -1,3 +1,4 @@
+-- DB update 2023_02_17_01 -> 2023_02_17_02
 --
 -- Searing Gorge Dark Iron Pillow spawns for quest http://www.wowhead.com/quest=7702 retail:28057
 SET @OGUID    := 24970;

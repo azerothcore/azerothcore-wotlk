@@ -1,3 +1,4 @@
+-- DB update 2023_02_16_04 -> 2023_02_17_00
 --
 DELETE FROM `creature` WHERE `id1`=17144;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`) VALUES
