@@ -1,3 +1,4 @@
+-- DB update 2023_02_17_10 -> 2023_02_17_11
 -- Authored-by: Tony931023 <tony931023@gmail.com>
 UPDATE `quest_template_locale` SET `Objectives` = 'Encuentra y mata al Coleccionista y vuelve junto al alguacil Dughan con la sortija del coleccionista.' WHERE `ID` = 147 AND `locale` IN ('esES','esMX'); 
 UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con: Alguacil Dughan. Zona: Aserradero de la Vega del Este, Bosque de Elwynn.' WHERE `ID` = 147 AND `locale` IN ('esES','esMX');
