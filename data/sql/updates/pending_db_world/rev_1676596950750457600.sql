@@ -77,7 +77,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14635, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 88, 1463500, 1463509, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Sleepy Dark Iron  - On Just Spawned - Run Random Script'),
 (14635, 0, 1, 0, 38, 0, 100, 1, 1, 1, 0, 0, 1, 0, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Sleepy Dark Iron  - On Data set - Say'),
 (14635, 0, 2, 0, 52, 0, 100, 0, 0, 14635, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Sleepy Dark Iron  - On text over - Say'),
-(14636, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chambermaid Pillaclencher - On Just Summoned - Say Line 0'),
+(14636, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Chambermaid Pillaclencher - On Just Spawned - Say'),
 (14636, 0, 1, 0, 6, 0, 100, 0, 0, 0, 0, 0, 11, 23408, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Chambermaid Pillaclencher - On Death - Cast Drop Pillow DND'),
 (14636, 0, 2, 0, 9, 0, 100, 0, 0, 40, 3000, 15000, 11, 23416, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Chambermaid Pillaclencher - On Range - Cast Pillow Fight'),
 (14636, 0, 3, 0, 0, 0, 100, 0, 5000, 9000, 15000, 18000, 11, 23417, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Chambermaid Pillaclencher - IC - Cast Smother'),
