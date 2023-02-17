@@ -334,6 +334,7 @@ public:
 
     bool PlayerLoading() const { return m_playerLoading; }
     bool PlayerLogout() const { return m_playerLogout; }
+    bool PlayerRecentlyLoggedOut() const { return m_playerRecentlyLogout; }
     bool PlayerLogoutWithSave() const { return m_playerLogout && m_playerSave; }
 
     void ReadAddonsInfo(ByteBuffer& data);
@@ -1139,7 +1140,7 @@ private:
     // characters who failed on Player::BuildEnumData shouldn't login
     GuidSet _legitCharacters;
 
-    ObjectGuid::LowType m_GUIDLow;
+    ObjectGuid::LowType m_GUIDLow;                     // set logined or recently logout player (while m_playerRecentlyLogout set)
     Player* _player;
     std::shared_ptr<WorldSocket> m_Socket;
     std::string m_Address;
@@ -1160,6 +1161,7 @@ private:
     bool m_inQueue;                                     // session wait in auth.queue
     bool m_playerLoading;                               // code processed in LoginPlayer
     bool m_playerLogout;                                // code processed in LogoutPlayer
+    bool m_playerRecentlyLogout;
     bool m_playerSave;
     LocaleConstant m_sessionDbcLocale;
     LocaleConstant m_sessionDbLocaleIndex;
