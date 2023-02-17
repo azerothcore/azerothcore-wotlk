@@ -1,3 +1,4 @@
+-- DB update 2023_02_17_04 -> 2023_02_17_05
 -- Delete old stuff
 DELETE FROM `creature` WHERE `id1` IN (21797, 22395, 21872, 22417) AND `guid` IN (86139, 78730, 78756, 78757, 76573);
 
