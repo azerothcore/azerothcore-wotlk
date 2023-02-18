@@ -45,16 +45,18 @@ enum Misc
 
 struct boss_swamplord_muselek : public BossAI
 {
-    boss_swamplord_muselek(Creature* creature) : BossAI(creature, DATA_MUSELEK) { }
-
-    void Reset() override
+    boss_swamplord_muselek(Creature* creature) : BossAI(creature, DATA_MUSELEK)
     {
-        _Reset();
-
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
+    }
+
+    void Reset() override
+    {
+        _Reset();
+        _canChase = true;
     }
 
     void AttackStart(Unit* victim) override
@@ -98,7 +100,7 @@ struct boss_swamplord_muselek : public BossAI
                 DoCastVictim(SPELL_SHOOT);
                 me->GetMotionMaster()->Clear();
             }
-            else
+            else if (_canChase)
             {
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
             }
@@ -121,13 +123,19 @@ struct boss_swamplord_muselek : public BossAI
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, false, true))
             {
                 _markTarget = target->GetGUID();
+                _canChase = false;
                 DoCastVictim(SPELL_THROW_FREEZING_TRAP);
 
                 scheduler.Schedule(3s, [this, target](TaskContext)
                 {
                     if (target && me->GetVictim())
                     {
-                        me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
+                        if (me->IsWithinMeleeRange(me->GetVictim()))
+                        {
+                            me->GetMotionMaster()->Clear();
+                            me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
+                        }
+
                         me->m_Events.AddEventAtOffset([this]()
                         {
                             if (Unit* marktarget = ObjectAccessor::GetUnit(*me, _markTarget))
@@ -146,7 +154,9 @@ struct boss_swamplord_muselek : public BossAI
                         {
                             if (Unit* marktarget = ObjectAccessor::GetUnit(*me, _markTarget))
                             {
+                                scheduler.DelayAll(5s);
                                 DoCast(marktarget, SPELL_AIMED_SHOT);
+                                _canChase = true;
                             }
                         }, 3s);
                     }
@@ -159,6 +169,7 @@ struct boss_swamplord_muselek : public BossAI
 
 private:
     ObjectGuid _markTarget;
+    bool _canChase;
 };
 
 void AddSC_boss_swamplord_muselek()
