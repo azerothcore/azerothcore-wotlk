@@ -1,0 +1,4 @@
+--
+UPDATE `command` SET `help`='Syntax: .server set motd $realmId $MOTD\r\n\r\nSet server Message of the day for the specified realm.' WHERE  `name`='server set motd';
+
+UPDATE `acore_string` SET `content_default`='Message of the day in realm %i changed to:\r\n%s', `locale_deDE`='Nachricht des Tages in Realm %i wurde geändert zu:\r\n%s', `locale_zhCN`='每日消息更改为 in realm %i:\r\n%s' WHERE `entry`=1101;
