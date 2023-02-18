@@ -116,6 +116,7 @@ public:
                 case NPC_INFINITE_CRONOMANCER:
                 case NPC_INFINITE_EXECUTIONER:
                 case NPC_INFINITE_VANQUISHER:
+                case NPC_DP_BEAM_STALKER:
                     encounterNPCs.insert(creature->GetGUID());
                     break;
             }
@@ -150,26 +151,36 @@ public:
             switch (type)
             {
                 case TYPE_AEONUS:
+                {
+                    encounters[type] = DONE;
+                    SaveToDB();
+
+                    if (Creature* medivh = instance->GetCreature(_medivhGUID))
                     {
-                        encounters[type] = DONE;
-                        SaveToDB();
-
-                        if (Creature* medivh = instance->GetCreature(_medivhGUID))
-                            medivh->AI()->DoAction(ACTION_OUTRO);
-
-                        Map::PlayerList const& players = instance->GetPlayers();
-                        if (!players.IsEmpty())
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                if (Player* player = itr->GetSource())
-                                {
-                                    if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
-                                        player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
-
-                                    if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
-                                        player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
-                                }
-                        break;
+                        medivh->AI()->DoAction(ACTION_OUTRO);
                     }
+
+                    Map::PlayerList const& players = instance->GetPlayers();
+                    if (!players.IsEmpty())
+                    {
+                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                        {
+                            if (Player* player = itr->GetSource())
+                            {
+                                if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
+                                {
+                                    player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
+                                }
+
+                                if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
+                                {
+                                    player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
                 case TYPE_CHRONO_LORD_DEJA:
                 case TYPE_TEMPORUS:
                     encounters[type] = DONE;
@@ -182,13 +193,36 @@ public:
                         Events.RescheduleEvent(EVENT_NEXT_PORTAL, 4000);
                     break;
                 case DATA_MEDIVH:
+                {
                     DoUpdateWorldState(WORLD_STATE_BM, 1);
                     DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
                     DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
                     Events.RescheduleEvent(EVENT_NEXT_PORTAL, 3000);
+
+                    for (ObjectGuid const& guid : encounterNPCs)
+                    {
+                        if (guid.GetEntry() == NPC_DP_BEAM_STALKER)
+                        {
+                            if (Creature* creature = instance->GetCreature(guid))
+                            {
+                                if (!creature->IsAlive())
+                                {
+                                    creature->Respawn(true);
+                                }
+                            }
+                            break;
+                        }
+                    }
+
                     break;
+                }
                 case DATA_DAMAGE_SHIELD:
                 {
+                    if (_shieldPercent <= 0)
+                    {
+                        return;
+                    }
+
                     _shieldPercent -= data;
                     if (_shieldPercent < 0)
                     {
@@ -203,15 +237,20 @@ public:
                         {
                             if (medivh->IsAlive())
                             {
-                                Unit::Kill(medivh, medivh);
+                                medivh->SetImmuneToNPC(true);
 
-                                // Xinef: delete all spawns
-                                GuidSet eCopy = encounterNPCs;
-                                for (ObjectGuid const& guid : eCopy)
+                                if (medivh->IsAIEnabled)
+                                {
+                                    medivh->AI()->Talk(SAY_MEDIVH_DEATH);
+                                }
+
+                                Events.ScheduleEvent(EVENT_WIPE_1, 4s);
+
+                                for (ObjectGuid const& guid : encounterNPCs)
                                 {
                                     if (Creature* creature = instance->GetCreature(guid))
                                     {
-                                        creature->DespawnOrUnsummon();
+                                        creature->InterruptNonMeleeSpells(true);
                                     }
                                 }
                             }
@@ -219,6 +258,8 @@ public:
                     }
                     break;
                 }
+                default:
+                    break;
             }
         }
 
@@ -324,6 +365,54 @@ public:
                     break;
                 case EVENT_SUMMON_KEEPER:
                     SummonPortalKeeper();
+                    break;
+                case EVENT_WIPE_1:
+                    if (Creature* medivh = instance->GetCreature(_medivhGUID))
+                    {
+                        medivh->RemoveAllAuras();
+                    }
+                    Events.ScheduleEvent(EVENT_WIPE_2, 500ms);
+                    break;
+                case EVENT_WIPE_2:
+                    if (Creature* medivh = instance->GetCreature(_medivhGUID))
+                    {
+                        medivh->KillSelf(false);
+
+                        GuidSet encounterNPCSCopy = encounterNPCs;
+                        for (ObjectGuid const& guid : encounterNPCSCopy)
+                        {
+                            switch (guid.GetEntry())
+                            {
+                                case NPC_TIME_RIFT:
+                                case NPC_DP_EMITTER_STALKER:
+                                case NPC_DP_CRYSTAL_STALKER:
+                                case NPC_DP_BEAM_STALKER:
+                                    if (Creature* creature = instance->GetCreature(guid))
+                                    {
+                                        creature->DespawnOrUnsummon();
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    Events.ScheduleEvent(EVENT_WIPE_3, 2s);
+                    break;
+                case EVENT_WIPE_3:
+                {
+                    GuidSet encounterNPCSCopy = encounterNPCs;
+                    for (ObjectGuid const& guid : encounterNPCSCopy)
+                    {
+                        if (Creature* creature = instance->GetCreature(guid))
+                        {
+                            creature->CastSpell(creature, SPELL_TELEPORT_VISUAL, true);
+                            creature->DespawnOrUnsummon(1200ms, 0s);
+                        }
+                    }
+                    break;
+                }
+                default:
                     break;
             }
         }
