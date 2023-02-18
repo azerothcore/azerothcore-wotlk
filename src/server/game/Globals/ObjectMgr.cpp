@@ -26,6 +26,7 @@
 #include "Config.h"
 #include "Containers.h"
 #include "DatabaseEnv.h"
+#include "DBCStructure.h"
 #include "DisableMgr.h"
 #include "GameObjectAIFactory.h"
 #include "GameEventMgr.h"
@@ -53,6 +54,7 @@
 #include "World.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
+#include <boost/algorithm/string.hpp>
 
 ScriptMapMap sSpellScripts;
 ScriptMapMap sEventScripts;
@@ -201,6 +203,62 @@ std::string ScriptInfo::GetDebugInfo() const
     char sz[256];
     snprintf(sz, sizeof(sz), "%s ('%s' script id: %u)", GetScriptCommandName(command).c_str(), GetScriptsTableNameByType(type).c_str(), id);
     return std::string(sz);
+}
+
+/**
+ * @name ReservedNames
+ * @brief Checks NamesReserved.dbc for reserved names
+ *
+ * @param name Name to check for match in NamesReserved.dbc
+ * @return true/false
+ */
+bool ReservedNames(std::wstring& name)
+{
+    for (NamesReservedEntry const* reservedStore : sNamesReservedStore)
+    {
+        std::wstring PatternString;
+
+        Utf8toWStr(reservedStore->Pattern, PatternString);
+
+        boost::algorithm::replace_all(PatternString, "\\<", "");
+        boost::algorithm::replace_all(PatternString, "\\>", "");
+
+        int stringCompare = name.compare(PatternString);
+        if (stringCompare == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+/**
+ * @name ProfanityNames
+ * @brief Checks NamesProfanity.dbc for reserved names
+ *
+ * @param name Name to check for match in NamesProfanity.dbc
+ * @return true/false
+ */
+bool ProfanityNames(std::wstring& name)
+{
+    for (NamesProfanityEntry const* profanityStore : sNamesProfanityStore)
+    {
+        std::wstring PatternString;
+
+        Utf8toWStr(profanityStore->Pattern, PatternString);
+
+        boost::algorithm::replace_all(PatternString, "\\<", "");
+        boost::algorithm::replace_all(PatternString, "\\>", "");
+
+        int stringCompare = name.compare(PatternString);
+        if (stringCompare == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool normalizePlayerName(std::string& name)
@@ -446,6 +504,46 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Gossip Menu Option Locale Strings in {} ms", (uint32)_gossipMenuItemsLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadPetNamesLocales()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                                  0     1      2    3
+    QueryResult result = WorldDatabase.Query("SELECT Locale, Word, Entry, Half FROM pet_name_generation_locale");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 pet name locales parts. DB table `pet_name_generation_locale` is empty!");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        LocaleConstant locale = GetLocaleByName(fields[0].Get<std::string>());
+        std::string word = fields[1].Get<std::string>();
+
+        uint32 entry = fields[2].Get<uint32>();
+        bool half = fields[3].Get<bool>();
+        std::pair<uint32, LocaleConstant> pairkey = std::make_pair(entry, locale);
+        if (half)
+        {
+            _petHalfLocaleName1[pairkey].push_back(word);
+        }
+        else
+        {
+            _petHalfLocaleName0[pairkey].push_back(word);
+        }
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Pet Name Locales Parts in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void ObjectMgr::LoadPointOfInterestLocales()
@@ -7402,6 +7500,19 @@ void ObjectMgr::LoadPetNumber()
     LOG_INFO("server.loading", " ");
 }
 
+std::string ObjectMgr::GeneratePetNameLocale(uint32 entry, LocaleConstant locale)
+{
+    std::vector<std::string>& list0 = _petHalfLocaleName0[std::make_pair(entry, locale)];
+    std::vector<std::string>& list1 = _petHalfLocaleName1[std::make_pair(entry, locale)];
+
+    if (list0.empty() || list1.empty())
+    {
+       return GeneratePetName(entry);
+    }
+
+    return *(list0.begin() + urand(0, list0.size() - 1)) + *(list1.begin() + urand(0, list1.size() - 1));
+}
+
 std::string ObjectMgr::GeneratePetName(uint32 entry)
 {
     std::vector<std::string>& list0 = _petHalfName0[entry];
@@ -8169,24 +8280,54 @@ bool isValidString(std::wstring wstr, uint32 strictMask, bool numericOrSpace, bo
 uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
 {
     std::wstring wname;
+
+    // Check for invalid characters
     if (!Utf8toWStr(name, wname))
         return CHAR_NAME_INVALID_CHARACTER;
 
+    // Check for too long name
     if (wname.size() > MAX_PLAYER_NAME)
         return CHAR_NAME_TOO_LONG;
 
+    // Check for too short name
     uint32 minName = sWorld->getIntConfig(CONFIG_MIN_PLAYER_NAME);
     if (wname.size() < minName)
         return CHAR_NAME_TOO_SHORT;
 
+    // Check for mixed languages
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_PLAYER_NAMES);
     if (!isValidString(wname, strictMask, false, create))
         return CHAR_NAME_MIXED_LANGUAGES;
 
+    // Check for three consecutive letters
     wstrToLower(wname);
     for (size_t i = 2; i < wname.size(); ++i)
         if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
             return CHAR_NAME_THREE_CONSECUTIVE;
+
+    // Check Reserved Name from Database
+    if (sObjectMgr->IsReservedName(name))
+    {
+        return CHAR_NAME_RESERVED;
+    }
+
+    // Check for Reserved Name from DBC
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_RESERVED))
+    {
+        if (ReservedNames(wname))
+        {
+            return CHAR_NAME_RESERVED;
+        }
+    }
+
+    // Check for Profanity
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_PROFANITY))
+    {
+        if (ProfanityNames(wname))
+        {
+            return CHAR_NAME_PROFANE;
+        }
+    }
 
     return CHAR_NAME_SUCCESS;
 }
@@ -8203,6 +8344,24 @@ bool ObjectMgr::IsValidCharterName(std::string_view name)
     uint32 minName = sWorld->getIntConfig(CONFIG_MIN_CHARTER_NAME);
     if (wname.size() < minName)
         return false;
+
+    // Check for Reserved Name from DBC
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_RESERVED))
+    {
+        if (ReservedNames(wname))
+        {
+            return false;
+        }
+    }
+
+    // Check for Profanity
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_PROFANITY))
+    {
+        if (ProfanityNames(wname))
+        {
+            return false;
+        }
+    }
 
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_CHARTER_NAMES);
 
@@ -8239,6 +8398,24 @@ PetNameInvalidReason ObjectMgr::CheckPetName(std::string_view name)
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_PET_NAMES);
     if (!isValidString(wname, strictMask, false))
         return PET_NAME_MIXED_LANGUAGES;
+
+    // Check for Reserved Name from DBC
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_RESERVED))
+    {
+        if (ReservedNames(wname))
+        {
+            return PET_NAME_RESERVED;
+        }
+    }
+
+    // Check for Profanity
+    if (sWorld->getBoolConfig(CONFIG_STRICT_NAMES_PROFANITY))
+    {
+        if (ProfanityNames(wname))
+        {
+            return PET_NAME_PROFANE;
+        }
+    }
 
     return PET_NAME_SUCCESS;
 }

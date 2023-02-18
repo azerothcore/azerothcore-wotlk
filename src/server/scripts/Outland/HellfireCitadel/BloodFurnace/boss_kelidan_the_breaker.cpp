@@ -301,8 +301,9 @@ public:
 
         Creature* GetKelidan()
         {
-            if (me->GetInstanceScript())
-                return ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_KELIDAN));
+            if (InstanceScript* instance = me->GetInstanceScript())
+                return instance->GetCreature(DATA_KELIDAN);
+
             return nullptr;
         }
 

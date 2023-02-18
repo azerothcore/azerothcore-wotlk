@@ -704,7 +704,7 @@ void SmartAI::MoveInLineOfSight(Unit* who)
     if (me->HasReactState(REACT_PASSIVE) || AssistPlayerInCombatAgainst(who))
         return;
 
-    if (me->CanStartAttack(who))
+    if (me->HasReactState(REACT_AGGRESSIVE) && me->CanStartAttack(who))
     {
         if (me->HasUnitState(UNIT_STATE_DISTRACTED))
         {
@@ -811,6 +811,20 @@ void SmartAI::JustSummoned(Creature* creature)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT, creature);
     GetScript()->AddCreatureSummon(creature->GetGUID());
+
+    if (me->IsEngaged() && !creature->IsInEvadeMode())
+    {
+        if (Unit* victim = me->GetVictim())
+        {
+            creature->SetInCombatWith(victim);
+            victim->SetInCombatWith(creature);
+
+            if (creature->CanHaveThreatList())
+            {
+                creature->AddThreat(victim, 0.0f);
+            }
+        }
+    }
 }
 
 void SmartAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)

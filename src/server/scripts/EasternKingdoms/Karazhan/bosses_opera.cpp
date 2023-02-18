@@ -201,6 +201,7 @@ public:
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
                     AggroTimer = 0;
                 }
                 else
@@ -400,6 +401,7 @@ public:
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
                     AggroTimer = 0;
                 }
                 else
@@ -512,6 +514,7 @@ public:
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
                     AggroTimer = 0;
                 }
                 else
@@ -626,6 +629,7 @@ public:
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
                     AggroTimer = 0;
                 }
                 else

@@ -1175,7 +1175,7 @@ void WorldSession::ReadAddonsInfo(ByteBuffer& data)
                 LOG_DEBUG("network", "ADDON: {} (0x{:x}) was not known, saving...", addon.Name, addon.CRC);
             }
 
-            // TODO: Find out when to not use CRC/pubkey, and other possible states.
+            /// @todo: Find out when to not use CRC/pubkey, and other possible states.
             m_addonsList.push_back(addon);
         }
 
@@ -1230,7 +1230,7 @@ void WorldSession::SendAddonsInfo()
                 data.append(addonPublicKey, sizeof(addonPublicKey));
             }
 
-            data << uint32(0);                              // TODO: Find out the meaning of this.
+            data << uint32(0);                              /// @todo: Find out the meaning of this.
         }
 
         uint8 unk3 = 0;                                     // 0 is sent here
@@ -1295,6 +1295,11 @@ void WorldSession::InitWarden(SessionKey const& k, std::string const& os)
         // _warden = new WardenMac();
         // _warden->Init(this, k);
     }
+}
+
+Warden* WorldSession::GetWarden()
+{
+    return &(*_warden);
 }
 
 bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) const

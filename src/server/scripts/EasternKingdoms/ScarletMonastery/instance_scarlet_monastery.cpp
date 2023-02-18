@@ -66,7 +66,10 @@ public:
 
     struct instance_scarlet_monastery_InstanceMapScript : public InstanceScript
     {
-        instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map) {}
+        instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders(DataHeader);
+        }
 
         void OnPlayerEnter(Player* player) override
         {
@@ -777,7 +780,7 @@ public:
                 return true;
             case 16:
                 SendGossipMenuFor(player, 100116, creature->GetGUID());
-                // todo: we need to play these 3 emote in sequence, we play only the last one right now.
+                /// @todo: we need to play these 3 emote in sequence, we play only the last one right now.
                 creature->HandleEmoteCommand(274);
                 creature->HandleEmoteCommand(1);
                 creature->HandleEmoteCommand(397);
