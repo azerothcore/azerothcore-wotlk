@@ -89,7 +89,6 @@ struct boss_talon_king_ikiss : public BossAI
         {
             DoCastAOE(SPELL_ARCANE_VOLLEY);
             context.Repeat(7s, 12s);
-            events.RepeatEvent(urand(7000, 12000));
         }).Schedule(8s, [this](TaskContext context)
         {
             IsHeroic() ? DoCastRandomTarget(SPELL_POLYMORPH) : DoCastMaxThreat(SPELL_POLYMORPH);
