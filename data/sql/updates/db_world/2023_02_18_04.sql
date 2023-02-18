@@ -1,3 +1,4 @@
+-- DB update 2023_02_18_03 -> 2023_02_18_04
 -- Dragonmaw Bonewarder - spawn Skeleton on reset
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1057;
 
