@@ -856,8 +856,8 @@ public:
                     }
                 case EVENT_LIGHTNING_LAND:
                     {
-                        float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
-                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
+                        //float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
+                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 10.0f);
                         events.ScheduleEvent(EVENT_LAND_LAND, 1000);
                         break;
                     }
