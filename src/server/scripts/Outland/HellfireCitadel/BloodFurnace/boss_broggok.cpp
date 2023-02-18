@@ -29,126 +29,63 @@ enum eEnums
     SPELL_POISON_CLOUD      = 30916,
     SPELL_POISON_BOLT       = 30917,
     SPELL_POISON            = 30914,
-
-    EVENT_SPELL_SLIME       = 1,
-    EVENT_SPELL_POISON      = 2,
-    EVENT_SPELL_BOLT        = 3
 };
 
-class boss_broggok : public CreatureScript
+struct boss_broggok : public BossAI
 {
-public:
-    boss_broggok() : CreatureScript("boss_broggok")
+    boss_broggok(Creature* creature) : BossAI(creature, DATA_BROGGOK) { }
+
+    void Reset() override
     {
+        _Reset();
+        me->SetReactState(REACT_PASSIVE);
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->SetImmuneToAll(true);
     }
 
-    struct boss_broggokAI : public ScriptedAI
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        boss_broggokAI(Creature* creature) : ScriptedAI(creature), summons(me)
-        {
-            instance = creature->GetInstanceScript();
-        }
+        Talk(SAY_AGGRO);
+        _JustEngagedWith();
+    }
 
-        InstanceScript* instance;
-        SummonList summons;
-        bool canAttack;
-
-        void Reset() override
-        {
-            events.Reset();
-            summons.DespawnAll();
-
-            me->SetReactState(REACT_PASSIVE);
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->SetImmuneToAll(true);
-            canAttack = false;
-
-            if (instance)
-                instance->SetData(DATA_BROGGOK, NOT_STARTED);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-        }
-
-        void JustSummoned(Creature* summoned) override
-        {
-            summons.Summon(summoned);
-
-            summoned->SetFaction(FACTION_MONSTER_2);
-            summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-            summoned->CastSpell(summoned, SPELL_POISON, true, 0, 0, me->GetGUID());
-        }
-
-        void SummonedCreatureDespawn(Creature* summon) override
-        {
-            summons.Despawn(summon);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim() || !canAttack)
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_SLIME:
-                    me->CastSpell(me->GetVictim(), SPELL_SLIME_SPRAY, false);
-                    events.RepeatEvent(urand(7000, 12000));
-                    break;
-                case EVENT_SPELL_BOLT:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_POISON_BOLT, false);
-                    events.RepeatEvent(urand(6000, 11000));
-                    break;
-                case EVENT_SPELL_POISON:
-                    me->CastSpell(me, SPELL_POISON_CLOUD, false);
-                    events.RepeatEvent(20000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (instance)
-            {
-                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR4), true);
-                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR5), true);
-                instance->SetData(DATA_BROGGOK, DONE);
-            }
-        }
-
-        void DoAction(int32 action) override
-        {
-            switch (action)
-            {
-                case ACTION_PREPARE_BROGGOK:
-                    me->SetInCombatWithZone();
-                    break;
-                case ACTION_ACTIVATE_BROGGOK:
-                    events.ScheduleEvent(EVENT_SPELL_SLIME, 10000);
-                    events.ScheduleEvent(EVENT_SPELL_POISON, 5000);
-                    events.ScheduleEvent(EVENT_SPELL_BOLT, 7000);
-
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetImmuneToAll(false);
-                    canAttack = true;
-                    break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustSummoned(Creature* summoned) override
     {
-        return GetBloodFurnaceAI<boss_broggokAI>(creature);
+        summons.Summon(summoned);
+
+        summoned->SetFaction(FACTION_MONSTER_2);
+        summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+        summoned->CastSpell(summoned, SPELL_POISON, true, 0, 0, me->GetGUID());
+    }
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
+        {
+            case ACTION_PREPARE_BROGGOK:
+                me->SetInCombatWithZone();
+                instance->SetBossState(DATA_BROGGOK, IN_PROGRESS);
+                break;
+            case ACTION_ACTIVATE_BROGGOK:
+                scheduler.Schedule(10s, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_SLIME_SPRAY);
+                    context.Repeat(7s, 12s);
+                }).Schedule(5s, [this](TaskContext context)
+                {
+                    DoCastRandomTarget(SPELL_POISON_BOLT);
+                    context.Repeat(6s, 11s);
+                }).Schedule(7s, [this](TaskContext context)
+                {
+                    DoCastSelf(SPELL_POISON_CLOUD);
+                    context.Repeat(20s);
+                });
+
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(false);
+                break;
+        }
     }
 };
 
@@ -160,12 +97,16 @@ public:
     bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
         if (InstanceScript* instance = go->GetInstanceScript())
-            if (instance->GetData(DATA_BROGGOK) != DONE && instance->GetData(DATA_BROGGOK) != IN_PROGRESS)
-                if (Creature* broggok = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_BROGGOK)))
+        {
+            if (instance->GetBossState(DATA_BROGGOK) == NOT_STARTED)
+            {
+                if (Creature* broggok = instance->GetCreature(DATA_BROGGOK))
                 {
                     instance->SetData(DATA_BROGGOK, IN_PROGRESS);
                     broggok->AI()->DoAction(ACTION_PREPARE_BROGGOK);
                 }
+            }
+        }
 
         go->UseDoorOrButton();
         return false;
@@ -173,46 +114,35 @@ public:
 };
 
 // 30914, 38462 - Poison (Broggok)
-class spell_broggok_poison_cloud : public SpellScriptLoader
+class spell_broggok_poison_cloud : public AuraScript
 {
-public:
-    spell_broggok_poison_cloud() : SpellScriptLoader("spell_broggok_poison_cloud") { }
+    PrepareAuraScript(spell_broggok_poison_cloud);
 
-    class spell_broggok_poison_cloud_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* spellInfo) override
     {
-        PrepareAuraScript(spell_broggok_poison_cloud_AuraScript);
+        if (!sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell))
+            return false;
+        return true;
+    }
 
-        bool Validate(SpellInfo const* spellInfo) override
-        {
-            if (!sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell))
-                return false;
-            return true;
-        }
-
-        void PeriodicTick(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-
-            uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-            int32 mod = int32(((float(aurEff->GetTickNumber()) / aurEff->GetTotalTicks()) * 0.9f + 0.1f) * 10000 * 2 / 3);
-            GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_RADIUS_MOD, mod, (Unit*)nullptr, TRIGGERED_FULL_MASK, nullptr, aurEff);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_broggok_poison_cloud_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void PeriodicTick(AuraEffect const* aurEff)
     {
-        return new spell_broggok_poison_cloud_AuraScript();
+        PreventDefaultAction();
+
+        uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
+        int32 mod = int32(((float(aurEff->GetTickNumber()) / aurEff->GetTotalTicks()) * 0.9f + 0.1f) * 10000 * 2 / 3);
+        GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_RADIUS_MOD, mod, (Unit*)nullptr, TRIGGERED_FULL_MASK, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_broggok_poison_cloud::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
 void AddSC_boss_broggok()
 {
-    new boss_broggok();
+    RegisterBloodFurnaceCreatureAI(boss_broggok);
     new go_broggok_lever();
-    new spell_broggok_poison_cloud();
+    RegisterSpellScript(spell_broggok_poison_cloud);
 }

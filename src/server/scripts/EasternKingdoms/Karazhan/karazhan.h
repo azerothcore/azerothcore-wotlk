@@ -59,7 +59,8 @@ enum KZDataTypes
     DATA_MASTERS_TERRACE_DOOR_2     = 28,
     DATA_GO_SIDE_ENTRANCE_DOOR      = 29,
     DATA_PRINCE                     = 30,
-    DATA_SPAWN_OPERA_DECORATIONS    = 31
+    DATA_SPAWN_OPERA_DECORATIONS    = 31,
+    DATA_MIDNIGHT                   = 32
 };
 
 enum KZOperaEvents
@@ -71,27 +72,28 @@ enum KZOperaEvents
 
 enum KZMiscCreatures
 {
-    NPC_HYAKISS_THE_LURKER = 16179,
-    NPC_ROKAD_THE_RAVAGER = 16181,
-    NPC_SHADIKITH_THE_GLIDER = 16180,
-    NPC_TERESTIAN_ILLHOOF = 15688,
-    NPC_MOROES = 15687,
-    NPC_ATTUMEN_THE_HUNTSMAN = 15550,
+    NPC_HYAKISS_THE_LURKER           = 16179,
+    NPC_ROKAD_THE_RAVAGER            = 16181,
+    NPC_SHADIKITH_THE_GLIDER         = 16180,
+    NPC_TERESTIAN_ILLHOOF            = 15688,
+    NPC_MOROES                       = 15687,
+    NPC_ATTUMEN_THE_HUNTSMAN         = 15550,
     NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED = 16152,
-    NPC_NIGHTBANE = 17225,
+    NPC_MIDNIGHT                     = 16151,
+    NPC_NIGHTBANE                    = 17225,
 
     // Trash
-    NPC_COLDMIST_WIDOW = 16171,
-    NPC_COLDMIST_STALKER = 16170,
-    NPC_SHADOWBAT = 16173,
-    NPC_VAMPIRIC_SHADOWBAT = 16175,
-    NPC_GREATER_SHADOWBAT = 16174,
-    NPC_PHASE_HOUND = 16178,
-    NPC_DREADBEAST = 16177,
-    NPC_SHADOWBEAST = 16176,
-    NPC_KILREK = 17229,
-    NPC_RELAY = 17645,
-    NPC_BARNES = 16812
+    NPC_COLDMIST_WIDOW               = 16171,
+    NPC_COLDMIST_STALKER             = 16170,
+    NPC_SHADOWBAT                    = 16173,
+    NPC_VAMPIRIC_SHADOWBAT           = 16175,
+    NPC_GREATER_SHADOWBAT            = 16174,
+    NPC_PHASE_HOUND                  = 16178,
+    NPC_DREADBEAST                   = 16177,
+    NPC_SHADOWBEAST                  = 16176,
+    NPC_KILREK                       = 17229,
+    NPC_RELAY                        = 17645,
+    NPC_BARNES                       = 16812
 };
 
 enum KZGameObjectIds
@@ -137,5 +139,7 @@ inline AI* GetKarazhanAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, KarazhanScriptName);
 }
+
+#define RegisterKarazhanCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetKarazhanAI)
 
 #endif

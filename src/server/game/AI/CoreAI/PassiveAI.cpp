@@ -69,7 +69,7 @@ void PossessedAI::KilledUnit(Unit*  /*victim*/)
     //    victim->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
 }
 
-void CritterAI::EnterCombat(Unit* who)
+void CritterAI::JustEngagedWith(Unit* who)
 {
     if (!me->HasUnitState(UNIT_STATE_FLEEING))
     {
@@ -103,7 +103,7 @@ int32 CritterAI::Permissible(Creature const* creature)
     return PERMIT_BASE_NO;
 }
 
-void TriggerAI::IsSummonedBy(Unit* summoner)
+void TriggerAI::IsSummonedBy(WorldObject* summoner)
 {
     if (me->m_spells[0])
         me->CastSpell(me, me->m_spells[0], false, 0, 0, summoner ? summoner->GetGUID() : ObjectGuid::Empty);

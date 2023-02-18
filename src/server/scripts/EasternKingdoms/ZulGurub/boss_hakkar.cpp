@@ -110,23 +110,23 @@ public:
             _JustDied();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_BLOOD_SIPHON, 90000);
-            events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, 25000);
-            events.ScheduleEvent(EVENT_CAUSE_INSANITY, 17000);
-            events.ScheduleEvent(EVENT_ENRAGE, 600000);
+            _JustEngagedWith();
+            events.ScheduleEvent(EVENT_BLOOD_SIPHON, 90s);
+            events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, 25s);
+            events.ScheduleEvent(EVENT_CAUSE_INSANITY, 17s);
+            events.ScheduleEvent(EVENT_ENRAGE, 1min);
             if (instance->GetBossState(DATA_JEKLIK) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 21000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 21s);
             if (instance->GetBossState(DATA_VENOXIS) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, 14000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, 14s);
             if (instance->GetBossState(DATA_MARLI) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 15000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 15s);
             if (instance->GetBossState(DATA_THEKAL) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 10000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 10s);
             if (instance->GetBossState(DATA_ARLOKK) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 18000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 18s);
             Talk(SAY_AGGRO);
         }
 
@@ -153,11 +153,11 @@ public:
                 {
                     case EVENT_BLOOD_SIPHON:
                         DoCastAOE(SPELL_BLOOD_SIPHON, true);
-                        events.ScheduleEvent(EVENT_BLOOD_SIPHON, 90000);
+                        events.ScheduleEvent(EVENT_BLOOD_SIPHON, 90s);
                         break;
                     case EVENT_CORRUPTED_BLOOD:
                         DoCastVictim(SPELL_CORRUPTED_BLOOD, true);
-                        events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, urand(30000, 45000));
+                        events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, 30s, 40s);
                         break;
                     case EVENT_CAUSE_INSANITY:
                         if (me->GetThreatMgr().GetThreatListSize() > 1)
@@ -167,20 +167,20 @@ public:
                                 DoCast(victim, SPELL_CAUSE_INSANITY);
                             }
                         }
-                        events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
+                        events.ScheduleEvent(EVENT_CAUSE_INSANITY, 35s, 40s);
                         break;
                     case EVENT_ENRAGE:
                         if (!me->HasAura(SPELL_ENRAGE))
                             DoCastSelf(SPELL_ENRAGE);
-                        events.ScheduleEvent(EVENT_ENRAGE, 90000);
+                        events.ScheduleEvent(EVENT_ENRAGE, 90s);
                         break;
                     case EVENT_ASPECT_OF_JEKLIK:
                         DoCastVictim(SPELL_ASPECT_OF_JEKLIK, true);
-                        events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 24000);
+                        events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 24s);
                         break;
                     case EVENT_ASPECT_OF_VENOXIS:
                         DoCastVictim(SPELL_ASPECT_OF_VENOXIS, true);
-                        events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, urand(16000, 18000));
+                        events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, 16s, 18s);
                         break;
                     case EVENT_ASPECT_OF_MARLI:
                         if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.f, true))
@@ -188,11 +188,11 @@ public:
                             DoCast(victim, SPELL_ASPECT_OF_MARLI, true);
                             me->GetThreatMgr().ModifyThreatByPercent(victim, -100.f);
                         }
-                        events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 45000);
+                        events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 45s);
                         break;
                     case EVENT_ASPECT_OF_THEKAL:
                         DoCastVictim(SPELL_ASPECT_OF_THEKAL, true);
-                        events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 15000);
+                        events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 15s);
                         break;
                     case EVENT_ASPECT_OF_ARLOKK:
                         if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.f, true))
@@ -200,7 +200,7 @@ public:
                             DoCast(victim, SPELL_ASPECT_OF_ARLOKK, true);
                             me->GetThreatMgr().ModifyThreatByPercent(victim, -100.f);
                         }
-                        events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, urand(10000, 15000));
+                        events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 10s, 15s);
                         break;
                     default:
                         break;

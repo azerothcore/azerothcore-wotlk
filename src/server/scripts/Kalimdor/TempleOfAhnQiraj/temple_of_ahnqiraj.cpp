@@ -82,7 +82,7 @@ struct npc_anubisath_defender : public ScriptedAI
         _enraged = false;
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoCastSelf(urand(0, 1) ? SPELL_SHADOW_FROST_REFLECT : SPELL_FIRE_ARCANE_REFLECT, true);
 
@@ -191,7 +191,7 @@ struct npc_vekniss_stinger : public ScriptedAI
         _scheduler.CancelAll();
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         DoCast(who ,who->HasAura(SPELL_VEKNISS_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
 
@@ -246,7 +246,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
         _targetGUIDs.clear();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.Schedule(3500ms, [this](TaskContext context)
         {
@@ -311,7 +311,7 @@ struct npc_anubisath_warder : public ScriptedAI
         _scheduler.CancelAll();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         if (urand(0, 1))
         {
@@ -382,7 +382,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
         _targetGUIDs.clear();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.Schedule(6s, [this](TaskContext context)
         {
@@ -479,7 +479,7 @@ struct npc_ahnqiraji_critter : public ScriptedAI
         });
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.CancelAll();
 
@@ -572,6 +572,28 @@ class spell_nullify : public AuraScript
     }
 };
 
+// 4052, At Battleguard Sartura
+class at_battleguard_sartura : public AreaTriggerScript
+{
+public:
+    at_battleguard_sartura() : AreaTriggerScript("at_battleguard_sartura") { }
+
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (Creature* sartura = instance->GetCreature(DATA_SARTURA))
+            {
+                if (sartura->IsAlive())
+                {
+                    sartura->SetInCombatWith(player);
+                }
+            }
+        }
+        return true;
+    }
+};
+
 void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
@@ -582,4 +604,5 @@ void AddSC_temple_of_ahnqiraj()
     RegisterTempleOfAhnQirajCreatureAI(npc_ahnqiraji_critter);
     RegisterSpellScript(spell_aggro_drones);
     RegisterSpellScript(spell_nullify);
+    new at_battleguard_sartura();
 }

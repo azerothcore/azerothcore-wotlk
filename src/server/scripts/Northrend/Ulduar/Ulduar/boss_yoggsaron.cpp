@@ -666,7 +666,7 @@ public:
                 summons.DespawnEntry(NPC_FREYA_KEEPER);
                 summons.DespawnEntry(NPC_THORIM_KEEPER);
                 summons.DespawnEntry(NPC_SANITY_WELL);
-                Unit::Kill(me, me);
+                me->KillSelf();
                 return;
             }
 

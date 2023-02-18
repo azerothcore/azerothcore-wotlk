@@ -718,6 +718,8 @@ void World::LoadConfigSettings(bool reload)
     else
         _int_configs[CONFIG_REALM_ZONE] = sConfigMgr->GetOption<int32>("RealmZone", REALM_ZONE_DEVELOPMENT);
 
+    _bool_configs[CONFIG_STRICT_NAMES_RESERVED]               = sConfigMgr->GetOption<bool>  ("StrictNames.Reserved", true);
+    _bool_configs[CONFIG_STRICT_NAMES_PROFANITY]              = sConfigMgr->GetOption<bool>  ("StrictNames.Profanity", true);
     _int_configs[CONFIG_STRICT_PLAYER_NAMES]                  = sConfigMgr->GetOption<int32> ("StrictPlayerNames",  0);
     _int_configs[CONFIG_STRICT_CHARTER_NAMES]                 = sConfigMgr->GetOption<int32> ("StrictCharterNames", 0);
     _int_configs[CONFIG_STRICT_CHANNEL_NAMES]                 = sConfigMgr->GetOption<int32> ("StrictChannelNames", 0);
@@ -1282,6 +1284,8 @@ void World::LoadConfigSettings(bool reload)
 
     _int_configs[CONFIG_CHANGE_FACTION_MAX_MONEY] = sConfigMgr->GetOption<uint32>("ChangeFaction.MaxMoney", 0);
 
+    _bool_configs[CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH] = sConfigMgr->GetOption<bool>("Pet.RankMod.Health", true);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
@@ -1632,6 +1636,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadPageTextLocales();
     sObjectMgr->LoadGossipMenuItemsLocales();
     sObjectMgr->LoadPointOfInterestLocales();
+    sObjectMgr->LoadPetNamesLocales();
 
     sObjectMgr->SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
     LOG_INFO("server.loading", ">> Localization Strings loaded in {} ms", GetMSTimeDiffToNow(oldMSTime));
@@ -1696,6 +1701,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Creature Model Based Info Data...");
     sObjectMgr->LoadCreatureModelInfo();
+
+    LOG_INFO("server.loading", "Loading Creature Custom IDs Config...");
+    sObjectMgr->LoadCreatureCustomIDs();
 
     LOG_INFO("server.loading", "Loading Creature Templates...");
     sObjectMgr->LoadCreatureTemplates();
@@ -3130,20 +3138,9 @@ void World::InitCalendarOldEventsDeletionTime()
     Seconds currentDeletionTime = Seconds(getWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME));
     Seconds nextDeletionTime = currentDeletionTime > 0s ? currentDeletionTime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR)));
 
-    // If the reset time saved in the worldstate is before now it means the server was offline when the reset was supposed to occur.
-    // In this case we set the reset time in the past and next world update will do the reset and schedule next one in the future.
-    if (currentDeletionTime < GameTime::GetGameTime())
-    {
-        _nextCalendarOldEventsDeletionTime = nextDeletionTime - 1_days;
-    }
-    else
-    {
-        _nextCalendarOldEventsDeletionTime = nextDeletionTime;
-    }
-
     if (currentDeletionTime == 0s)
     {
-        sWorld->setWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, _nextCalendarOldEventsDeletionTime.count());
+        sWorld->setWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, nextDeletionTime.count());
     }
 }
 
@@ -3254,7 +3251,7 @@ void World::CalendarDeleteOldEvents()
 {
     LOG_INFO("server.worldserver", "Calendar deletion of old events.");
 
-    _nextCalendarOldEventsDeletionTime += 1_days;
+    _nextCalendarOldEventsDeletionTime = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR)));
     sWorld->setWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, _nextCalendarOldEventsDeletionTime.count());
     sCalendarMgr->DeleteOldEvents();
 }

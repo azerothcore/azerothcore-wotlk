@@ -252,7 +252,7 @@ public:
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             ScheduleEvents();
             Talk(FLAME_LEVIATHAN_SAY_AGGRO);

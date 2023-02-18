@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.quest_poi
+-- Dumping structure for table acore_world.quest_poi
 DROP TABLE IF EXISTS `quest_poi`;
 CREATE TABLE IF NOT EXISTS `quest_poi` (
   `QuestID` int unsigned NOT NULL DEFAULT '0',
@@ -23,12 +25,12 @@ CREATE TABLE IF NOT EXISTS `quest_poi` (
   `Floor` int unsigned NOT NULL DEFAULT '0',
   `Priority` int unsigned NOT NULL DEFAULT '0',
   `Flags` int unsigned NOT NULL DEFAULT '0',
-  `VerifiedBuild` smallint DEFAULT '0',
+  `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`QuestID`,`id`),
   KEY `idx` (`QuestID`,`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.quest_poi: 18 771 rows
+-- Dumping data for table acore_world.quest_poi: 18,771 rows
 DELETE FROM `quest_poi`;
 /*!40000 ALTER TABLE `quest_poi` DISABLE KEYS */;
 INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAreaId`, `Floor`, `Priority`, `Flags`, `VerifiedBuild`) VALUES
@@ -131,9 +133,9 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(29, 0, 10, 1, 241, 0, 0, 3, 0),
 	(29, 1, -1, 1, 241, 0, 0, 1, 0),
 	(29, 2, 16, 1, 241, 0, 1, 3, 0),
-	(30, 0, -1, 1, 241, 0, 0, 1, 0),
+	(30, 0, -1, 1, 17, 0, 0, 1, 0),
 	(30, 1, 11, 0, 21, 0, 0, 1, 0),
-	(30, 2, 10, 1, 42, 0, 0, 1, 0),
+	(30, 2, 10, 1, 17, 0, 0, 1, 0),
 	(31, 0, -1, 1, 9, 0, 0, 1, 0),
 	(32, 0, -1, 1, 321, 0, 0, 1, 0),
 	(33, 0, 4, 0, 30, 0, 0, 3, 0),
@@ -671,7 +673,7 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(271, 1, -1, 0, 35, 0, 0, 1, 0),
 	(272, 0, -1, 1, 241, 0, 0, 1, 0),
 	(272, 1, 10, 1, 42, 0, 0, 1, 0),
-	(272, 2, 11, 0, 21, 0, 0, 1, 0),
+	(272, 2, 11, 0, 40, 0, 0, 1, 0),
 	(273, 0, 16, 0, 35, 0, 0, 1, 0),
 	(273, 1, -1, 0, 35, 0, 0, 1, 0),
 	(274, 0, -1, 0, 35, 0, 0, 1, 0),
@@ -18806,6 +18808,7 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(6662, 1, -1, 0, 0, 0, 0, 0, 0);
 /*!40000 ALTER TABLE `quest_poi` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

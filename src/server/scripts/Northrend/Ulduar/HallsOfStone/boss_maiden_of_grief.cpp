@@ -78,7 +78,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.ScheduleEvent(EVENT_STORM, 5000);
             events.ScheduleEvent(EVENT_SHOCK, 26000 + rand() % 6000);

@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.event_scripts
+-- Dumping structure for table acore_world.event_scripts
 DROP TABLE IF EXISTS `event_scripts`;
 CREATE TABLE IF NOT EXISTS `event_scripts` (
   `id` mediumint unsigned NOT NULL DEFAULT '0',
@@ -27,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `event_scripts` (
   `o` float NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.event_scripts: 452 rows
+-- Dumping data for table acore_world.event_scripts: 468 rows
 DELETE FROM `event_scripts`;
 /*!40000 ALTER TABLE `event_scripts` DISABLE KEYS */;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES
@@ -447,7 +449,7 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 	(15003, 0, 10, 23261, 300000, 0, 3845.31, 5220.04, 295.412, 0),
 	(15002, 0, 10, 23281, 300000, 0, 4176.5, 5452.21, 291.923, 0),
 	(15004, 0, 10, 23061, 300000, 0, 2060.6, 7418.53, 391.098, 0),
-	(19030, 0, 10, 1706, 6000000, 0, -8644.22, 1328.58, 5.54, 5.18),
+	(10301, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
 	(14739, 0, 10, 23019, 500000, 0, 3535.11, 5590.63, 0.385938, 0.785398),
 	(14462, 0, 10, 22448, 300000, 0, 3688, 5353, 25, 0),
 	(14462, 0, 10, 20555, 300000, 0, 3703.51, 5387.74, -4.37, 5.9),
@@ -482,9 +484,26 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 	(18481, 1, 10, 28279, 30000, 0, 5230.02, 5771.1, -56.9605, 1.71042),
 	(18481, 1, 10, 28279, 30000, 0, 5199.84, 5789.27, -62.4512, 2.77507),
 	(18481, 1, 10, 28279, 30000, 0, 5215.57, 5799.32, -68.9914, 3.19395),
-	(18481, 1, 10, 28279, 30000, 0, 5221.6, 5749.74, -63.7595, 3.54301);
+	(18481, 1, 10, 28279, 30000, 0, 5221.6, 5749.74, -63.7595, 3.54301),
+	(10302, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(16395, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(16396, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(16397, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(16398, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(16399, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(16400, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(16401, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(16402, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(16522, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(19030, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(19031, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(19032, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(19033, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(19123, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
+	(19124, 0, 16, 5495, 2, 0, 0, 0, 0, 0);
 /*!40000 ALTER TABLE `event_scripts` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

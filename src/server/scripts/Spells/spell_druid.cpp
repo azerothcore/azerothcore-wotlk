@@ -207,6 +207,12 @@ class spell_dru_omen_of_clarity : public AuraScript
             return false;
         }
 
+        // Don't proc on crafting items.
+        if (spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM))
+        {
+            return false;
+        }
+
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
         {
             return spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING) || spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE);

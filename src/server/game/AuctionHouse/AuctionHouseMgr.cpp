@@ -220,7 +220,7 @@ AuctionHouseMgr::AuctionHouseMgr()
 
 AuctionHouseMgr::~AuctionHouseMgr()
 {
-    for (ItemMap::iterator itr = mAitems.begin(); itr != mAitems.end(); ++itr)
+    for (ItemMap::iterator itr = _mAitems.begin(); itr != _mAitems.end(); ++itr)
         delete itr->second;
 }
 
@@ -233,35 +233,35 @@ AuctionHouseMgr* AuctionHouseMgr::instance()
 AuctionHouseObject* AuctionHouseMgr::GetAuctionsMap(uint32 factionTemplateId)
 {
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
-        return &mNeutralAuctions;
+        return &_neutralAuctions;
 
     // team have linked auction houses
     FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(factionTemplateId);
     if (!u_entry)
-        return &mNeutralAuctions;
+        return &_neutralAuctions;
     else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)
-        return &mAllianceAuctions;
+        return &_allianceAuctions;
     else if (u_entry->ourMask & FACTION_MASK_HORDE)
-        return &mHordeAuctions;
+        return &_hordeAuctions;
 
-    return &mNeutralAuctions;
+    return &_neutralAuctions;
 }
 
 AuctionHouseObject* AuctionHouseMgr::GetAuctionsMapByHouseId(uint8 auctionHouseId)
 {
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
-        return &mNeutralAuctions;
+        return &_neutralAuctions;
 
     switch(auctionHouseId)
     {
         case AUCTIONHOUSE_ALLIANCE:
-            return &mAllianceAuctions;
+            return &_allianceAuctions;
         case AUCTIONHOUSE_HORDE:
-            return &mHordeAuctions;
+            return &_hordeAuctions;
             break;
     }
 
-    return &mNeutralAuctions;
+    return &_neutralAuctions;
 
 }
 
@@ -479,12 +479,12 @@ void AuctionHouseMgr::LoadAuctionItems()
     uint32 oldMSTime = getMSTime();
 
     // need to clear in case we are reloading
-    if (!mAitems.empty())
+    if (!_mAitems.empty())
     {
-        for (ItemMap::iterator itr = mAitems.begin(); itr != mAitems.end(); ++itr)
+        for (ItemMap::iterator itr = _mAitems.begin(); itr != _mAitems.end(); ++itr)
             delete itr->second;
 
-        mAitems.clear();
+        _mAitems.clear();
     }
 
     // data needs to be at first place for Item::LoadFromDB
@@ -571,14 +571,14 @@ void AuctionHouseMgr::LoadAuctions()
 void AuctionHouseMgr::AddAItem(Item* it)
 {
     ASSERT(it);
-    ASSERT(mAitems.find(it->GetGUID()) == mAitems.end());
-    mAitems[it->GetGUID()] = it;
+    ASSERT(_mAitems.find(it->GetGUID()) == _mAitems.end());
+    _mAitems[it->GetGUID()] = it;
 }
 
 bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB, CharacterDatabaseTransaction* trans /*= nullptr*/)
 {
-    ItemMap::iterator i = mAitems.find(itemGuid);
-    if (i == mAitems.end())
+    ItemMap::iterator i = _mAitems.find(itemGuid);
+    if (i == _mAitems.end())
         return false;
 
     if (deleteFromDB)
@@ -588,16 +588,16 @@ bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB, Charac
         i->second->SaveToDB(*trans);
     }
 
-    mAitems.erase(i);
+    _mAitems.erase(i);
     return true;
 }
 
 void AuctionHouseMgr::Update()
 {
     sScriptMgr->OnBeforeAuctionHouseMgrUpdate();
-    mHordeAuctions.Update();
-    mAllianceAuctions.Update();
-    mNeutralAuctions.Update();
+    _hordeAuctions.Update();
+    _allianceAuctions.Update();
+    _neutralAuctions.Update();
 }
 
 AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTemplateId)
@@ -632,13 +632,13 @@ void AuctionHouseObject::AddAuction(AuctionEntry* auction)
 {
     ASSERT(auction);
 
-    AuctionsMap[auction->Id] = auction;
+    _auctionsMap[auction->Id] = auction;
     sScriptMgr->OnAuctionAdd(this, auction);
 }
 
 bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction)
 {
-    bool wasInMap = !!AuctionsMap.erase(auction->Id);
+    bool wasInMap = !!_auctionsMap.erase(auction->Id);
 
     sScriptMgr->OnAuctionRemove(this, auction);
 
@@ -655,12 +655,12 @@ void AuctionHouseObject::Update()
     ///- Handle expired auctions
 
     // If storage is empty, no need to update. next == nullptr in this case.
-    if (AuctionsMap.empty())
+    if (_auctionsMap.empty())
         return;
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    for (AuctionEntryMap::iterator itr, iter = AuctionsMap.begin(); iter != AuctionsMap.end(); )
+    for (AuctionEntryMap::iterator itr, iter = _auctionsMap.begin(); iter != _auctionsMap.end(); )
     {
         itr = iter++;
         AuctionEntry* auction = (*itr).second;
@@ -696,7 +696,7 @@ void AuctionHouseObject::Update()
 
 void AuctionHouseObject::BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount)
 {
-    for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
+    for (AuctionEntryMap::const_iterator itr = _auctionsMap.begin(); itr != _auctionsMap.end(); ++itr)
     {
         AuctionEntry* Aentry = itr->second;
         if (Aentry && Aentry->bidder == player->GetGUID())
@@ -711,7 +711,7 @@ void AuctionHouseObject::BuildListBidderItems(WorldPacket& data, Player* player,
 
 void AuctionHouseObject::BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount)
 {
-    for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
+    for (AuctionEntryMap::const_iterator itr = _auctionsMap.begin(); itr != _auctionsMap.end(); ++itr)
     {
         AuctionEntry* Aentry = itr->second;
         if (Aentry && Aentry->owner == player->GetGUID())
@@ -752,7 +752,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
         int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
         int locdbc_idx = player->GetSession()->GetSessionDbcLocale();
 
-        for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
+        for (AuctionEntryMap::const_iterator itr = _auctionsMap.begin(); itr != _auctionsMap.end(); ++itr)
         {
             if (!AsyncAuctionListingMgr::IsAuctionListingAllowed())                                                    // pussywizard: World::Update is waiting for us...
             {

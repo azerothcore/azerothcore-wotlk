@@ -75,11 +75,11 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 5000);
-            events.ScheduleEvent(EVENT_SPELL_NET, 10000);
+            events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 5s);
+            events.ScheduleEvent(EVENT_SPELL_NET, 10s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -146,11 +146,11 @@ public:
             {
             case EVENT_SPELL_SUNDER_ARMOR:
                 me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
-                events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 15000);
+                events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 15s);
                 break;
             case EVENT_SPELL_NET:
                 me->CastSpell(me->GetVictim(), SPELL_NET, false);
-                events.ScheduleEvent(EVENT_SPELL_NET, 25000);
+                events.ScheduleEvent(EVENT_SPELL_NET, 25s);
                 break;
             }
 
@@ -329,7 +329,7 @@ public:
 
         void Reset() override {}
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (urand(0, 1))
                 Talk(SAY_REM_AGGRO, who);
@@ -469,7 +469,7 @@ public:
                             me->SetFaction(FACTION_FRIENDLY);
                             me->GetMotionMaster()->MoveFollow(player, 1.0f, PET_FOLLOW_ANGLE - (PET_FOLLOW_ANGLE / 4));
                             _events.Reset();
-                            _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1000);
+                            _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1s);
                             player->KilledMonsterCredit(NPC_CAPTURED_RABID_THISTLE_BEAR);
                             me->DespawnOrUnsummon(240000);
                         }
@@ -496,7 +496,7 @@ public:
                         {
                             me->DespawnOrUnsummon();
                         }
-                        _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1000);
+                        _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1s);
                         break;
                 }
             }
@@ -568,7 +568,7 @@ public:
                 {
                     _bearGUID      = bear->GetGUID();
                     _scriptRunning = true;
-                    _events.ScheduleEvent(EVENT_POST_QUEST_ONE, 1000);
+                    _events.ScheduleEvent(EVENT_POST_QUEST_ONE, 1s);
                 }
             }
         }
@@ -586,14 +586,14 @@ public:
                             Talk(SAY_BE_CLEANSED);
                             me->CastSpell(bear, SPELL_THARNARIUMS_HEAL);
                         }
-                        _events.ScheduleEvent(EVENT_POST_QUEST_TWO, 4000);
+                        _events.ScheduleEvent(EVENT_POST_QUEST_TWO, 4s);
                         break;
                     case EVENT_POST_QUEST_TWO:
                         if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
                         {
                             bear->SetUInt32Value(UNIT_FIELD_BYTES_1, 7);
                         }
-                        _events.ScheduleEvent(EVENT_POST_QUEST_THREE, 1000);
+                        _events.ScheduleEvent(EVENT_POST_QUEST_THREE, 1s);
                         break;
                     case EVENT_POST_QUEST_THREE:
                         if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
