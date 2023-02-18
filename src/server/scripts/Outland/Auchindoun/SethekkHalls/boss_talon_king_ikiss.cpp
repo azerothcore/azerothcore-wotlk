@@ -116,7 +116,7 @@ struct boss_talon_king_ikiss : public BossAI
         }
     }
 
-    virtual void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         if (!_manaShield && me->HealthBelowPctDamaged(20, damage))
         {
