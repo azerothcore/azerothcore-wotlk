@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.player_classlevelstats
+-- Dumping structure for table acore_world.player_classlevelstats
 DROP TABLE IF EXISTS `player_classlevelstats`;
 CREATE TABLE IF NOT EXISTS `player_classlevelstats` (
   `class` tinyint unsigned NOT NULL,
@@ -22,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `player_classlevelstats` (
   PRIMARY KEY (`class`,`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores levels stats.';
 
--- Dumpar data för tabell acore_world.player_classlevelstats: 800 rows
+-- Dumping data for table acore_world.player_classlevelstats: 746 rows
 DELETE FROM `player_classlevelstats`;
 /*!40000 ALTER TABLE `player_classlevelstats` DISABLE KEYS */;
 INSERT INTO `player_classlevelstats` (`class`, `level`, `basehp`, `basemana`) VALUES
@@ -426,60 +428,6 @@ INSERT INTO `player_classlevelstats` (`class`, `level`, `basehp`, `basemana`) VA
 	(5, 78, 6028, 3615),
 	(5, 79, 6477, 3739),
 	(5, 80, 6960, 3863),
-	(6, 1, 22, 0),
-	(6, 2, 27, 0),
-	(6, 3, 32, 0),
-	(6, 4, 37, 0),
-	(6, 5, 42, 0),
-	(6, 6, 47, 0),
-	(6, 7, 52, 0),
-	(6, 8, 58, 0),
-	(6, 9, 64, 0),
-	(6, 10, 70, 0),
-	(6, 11, 77, 0),
-	(6, 12, 84, 0),
-	(6, 13, 92, 0),
-	(6, 14, 100, 0),
-	(6, 15, 117, 0),
-	(6, 16, 127, 0),
-	(6, 17, 138, 0),
-	(6, 18, 150, 0),
-	(6, 19, 163, 0),
-	(6, 20, 177, 0),
-	(6, 21, 192, 0),
-	(6, 22, 208, 0),
-	(6, 23, 225, 0),
-	(6, 24, 239, 0),
-	(6, 25, 258, 0),
-	(6, 26, 278, 0),
-	(6, 27, 299, 0),
-	(6, 28, 321, 0),
-	(6, 29, 344, 0),
-	(6, 30, 368, 0),
-	(6, 31, 393, 0),
-	(6, 32, 419, 0),
-	(6, 33, 446, 0),
-	(6, 34, 474, 0),
-	(6, 35, 503, 0),
-	(6, 36, 533, 0),
-	(6, 37, 564, 0),
-	(6, 38, 596, 0),
-	(6, 39, 629, 0),
-	(6, 40, 698, 0),
-	(6, 41, 698, 0),
-	(6, 42, 734, 0),
-	(6, 43, 771, 0),
-	(6, 44, 809, 0),
-	(6, 45, 849, 0),
-	(6, 46, 891, 0),
-	(6, 47, 935, 0),
-	(6, 48, 981, 0),
-	(6, 49, 1029, 0),
-	(6, 50, 1079, 0),
-	(6, 51, 1131, 0),
-	(6, 52, 1185, 0),
-	(6, 53, 1241, 0),
-	(6, 54, 1299, 0),
 	(6, 55, 1359, 0),
 	(6, 56, 1421, 0),
 	(6, 57, 1485, 0),
@@ -828,6 +776,7 @@ INSERT INTO `player_classlevelstats` (`class`, `level`, `basehp`, `basemana`) VA
 	(11, 80, 7417, 3496);
 /*!40000 ALTER TABLE `player_classlevelstats` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -313,7 +313,7 @@ public:
                 }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000);
             _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000);
@@ -415,7 +415,7 @@ public:
                     me->SetHomePosition(me->GetPosition());
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             AttackStart(who);
             _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1000);
@@ -498,7 +498,7 @@ public:
                     me->SetHomePosition(me->GetPosition());
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _events.ScheduleEvent(EVENT_SPELL_DEMORALIZING_SHOUT, 1000);
             _events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, urand(2500, 4000));
@@ -648,7 +648,7 @@ public:
                 karja->GetAI()->DoAction(RESET_DEATHBLOW_EVENT);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             combatEvents.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, 20000);
             combatEvents.ScheduleEvent(EVENT_SPELL_BACKLASH, 4000);
@@ -834,7 +834,7 @@ public:
                         _actionEvents.ScheduleEvent(EVENT_KAYLAAN_RESSURECTION, 1000);
                         break;
                     case EVENT_KAYLAAN_RESSURECTION:
-                        if (GetCreature(KAYLAAN_THE_LOST))
+                        if (GetCreature(KAYLAAN_THE_LOST) && GetCreature(ISHANAH_HIGH_PRIESTESS))
                             kaylaan->CastSpell(ishanah, REDEMPTION);
                         _actionEvents.ScheduleEvent(EVENT_ISHANAH_IS_BACK_AGAIN, 11000);
                         break;
@@ -870,13 +870,13 @@ public:
 
                         // Engage combat with Socrethar
                         if (GetCreature(ADYEN_THE_LIGHTBRINGER))
-                            adyen->AI()->EnterCombat(me);
+                            adyen->AI()->JustEngagedWith(me);
                         if (GetCreature(EXARCH_ORELIS))
-                            orelis->AI()->EnterCombat(me);
+                            orelis->AI()->JustEngagedWith(me);
                         if (GetCreature(ANCHORITE_KARJA))
-                            karja->AI()->EnterCombat(me);
+                            karja->AI()->JustEngagedWith(me);
                         if (GetCreature(ISHANAH_HIGH_PRIESTESS))
-                            ishanah->AI()->EnterCombat(me);
+                            ishanah->AI()->JustEngagedWith(me);
                         break;
                 }
             }
@@ -941,7 +941,7 @@ public:
         bool second_waypath_done = false;
         bool adyen_dead = false, karja_dead = false, orelis_dead = false;
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 2000);
             _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 3000);
@@ -1212,7 +1212,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             SummonsAction(who);
         }
@@ -1382,7 +1382,7 @@ public:
             isEvent = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void JustSummoned(Creature* summoned) override
         {
@@ -1713,7 +1713,7 @@ public:
                 me->UpdateEntry(NPC_PHASE_HUNTER_ENTRY);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 PlayerGUID = who->GetGUID();

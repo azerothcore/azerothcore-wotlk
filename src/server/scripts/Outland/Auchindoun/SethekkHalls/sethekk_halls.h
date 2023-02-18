@@ -33,7 +33,7 @@ enum eIds
     NPC_VOICE_OF_THE_RAVEN_GOD  = 21851,
     NPC_ANZU                    = 23035,
 
-    GO_IKISS_DOOR               = 177203,
+    GO_IKISS_DOOR               = 183398,
     GO_THE_TALON_KINGS_COFFER   = 187372
 };
 

@@ -136,7 +136,7 @@ public:
                 instance->SetData(DATA_GRANDMASTERVORPILEVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             summonPortals();
@@ -253,7 +253,7 @@ public:
                     me->AddAura(DUNGEON_MODE(SPELL_EMPOWERING_SHADOWS_N, SPELL_EMPOWERING_SHADOWS_H), Vorpil);
                     Vorpil->ModifyHealth(int32(Vorpil->CountPctFromMaxHealth(4)));
                     me->CastSpell(me, SPELL_SHADOW_NOVA, true);
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                     return;
                 }
 

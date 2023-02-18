@@ -20,12 +20,17 @@
 
 #include "blake2-impl.h"
 
+#if defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64)
 #include <emmintrin.h>
+#elif defined(__aarch64__) || defined(_M_ARM64)
+#include "sse2neon.h"
+#endif
+
 #if defined(__SSSE3__)
 #include <tmmintrin.h> /* for _mm_shuffle_epi8 and _mm_alignr_epi8 */
 #endif
 
-#if defined(__XOP__) && (defined(__GNUC__) || defined(__clang__))
+#if defined(__x86_64__) && defined(__XOP__) && (defined(__GNUC__) || defined(__clang__))
 #include <x86intrin.h>
 #endif
 

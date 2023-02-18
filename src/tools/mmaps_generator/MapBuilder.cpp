@@ -384,7 +384,7 @@ namespace MMAP
             return;
         }
 
-        // ToDo: delete the old tile as the user clearly wants to rebuild it
+        /// @todo: delete the old tile as the user clearly wants to rebuild it
 
         TileBuilder tileBuilder = TileBuilder(this, m_skipLiquid, m_bigBaseUnit, m_debugOutput);
         tileBuilder.buildTile(mapID, tileX, tileY, navMesh);
@@ -763,7 +763,7 @@ namespace MMAP
         delete[] tiles;
 
         // set polygons as walkable
-        // TODO: special flags for DYNAMIC polygons, ie surfaces that can be turned on and off
+        /// @todo: special flags for DYNAMIC polygons, ie surfaces that can be turned on and off
         for (int i = 0; i < iv.polyMesh->npolys; ++i)
             if (iv.polyMesh->areas[i] & RC_WALKABLE_AREA)
                 iv.polyMesh->flags[i] = iv.polyMesh->areas[i];

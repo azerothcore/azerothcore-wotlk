@@ -320,9 +320,9 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ASPHYXIATION);
         }
 
-        void EnterCombat(Unit* victim) override
+        void JustEngagedWith(Unit* who) override
         {
-            if (!instance->CheckRequiredBosses(DATA_SINDRAGOSA, victim->ToPlayer()) || !me->IsVisible())
+            if (!instance->CheckRequiredBosses(DATA_SINDRAGOSA, who->ToPlayer()) || !me->IsVisible())
             {
                 EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
@@ -1594,7 +1594,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->CastSpell(me, SPELL_FROST_AURA_RIMEFANG, true);
         }
@@ -1785,7 +1785,7 @@ public:
                 _events.ScheduleEvent(EVENT_WHELP_FROST_BLAST, urand(3000, 6000));
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (me->GetEntry() == NPC_FROSTWARDEN_HANDLER)
             {

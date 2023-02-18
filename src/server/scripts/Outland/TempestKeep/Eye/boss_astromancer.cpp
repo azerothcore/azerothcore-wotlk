@@ -102,10 +102,10 @@ public:
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->CallForHelp(105.0f);
 
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);

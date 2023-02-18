@@ -121,13 +121,13 @@ public:
             _events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _events.ScheduleEvent(EVENT_FADE, 30000);
-            _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 20000);
-            _events.ScheduleEvent(EVENT_BLACK_ARROW, 15000);
-            _events.ScheduleEvent(EVENT_SHOOT, 8000);
-            _events.ScheduleEvent(EVENT_MULTI_SHOT, 10000);
+            _events.ScheduleEvent(EVENT_FADE, 30s);
+            _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 20s);
+            _events.ScheduleEvent(EVENT_BLACK_ARROW, 15s);
+            _events.ScheduleEvent(EVENT_SHOOT, 8s);
+            _events.ScheduleEvent(EVENT_MULTI_SHOT, 10s);
         }
 
         void SetGUID(ObjectGuid guid, int32 type) override
@@ -143,8 +143,8 @@ public:
                 for (uint8 i = 0; i < 4; ++i)
                     me->SummonCreature(NPC_HIGHBORNE_LAMENTER, HighborneLoc[i][0], HighborneLoc[i][1], HIGHBORNE_LOC_Y, HighborneLoc[i][2], TEMPSUMMON_TIMED_DESPAWN, 160000);
 
-                _events.ScheduleEvent(EVENT_LAMENT_OF_THE_HIGHBORN, 2000);
-                _events.ScheduleEvent(EVENT_SUNSORROW_WHISPER, 10000);
+                _events.ScheduleEvent(EVENT_LAMENT_OF_THE_HIGHBORN, 2s);
+                _events.ScheduleEvent(EVENT_SUNSORROW_WHISPER, 10s);
             }
         }
 
@@ -181,26 +181,26 @@ public:
                         if (Unit* victim = me->GetVictim())
                             if (me->GetDistance(victim) > 10.0f)
                                 DoCast(victim, SPELL_MULTI_SHOT);
-                        _events.ScheduleEvent(EVENT_FADE, urand(30000, 35000));
+                        _events.ScheduleEvent(EVENT_FADE, 30s,  35s);
                         break;
                     case EVENT_SUMMON_SKELETON:
                         DoCast(me, SPELL_SUMMON_SKELETON);
-                        _events.ScheduleEvent(EVENT_SUMMON_SKELETON, urand(20000, 30000));
+                        _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 20s, 30s);
                         break;
                     case EVENT_BLACK_ARROW:
                         if (Unit* victim = me->GetVictim())
                             DoCast(victim, SPELL_BLACK_ARROW);
-                        _events.ScheduleEvent(EVENT_BLACK_ARROW, urand(15000, 20000));
+                        _events.ScheduleEvent(EVENT_BLACK_ARROW, 15s, 20s);
                         break;
                     case EVENT_SHOOT:
                         if (Unit* victim = me->GetVictim())
                             DoCast(victim, SPELL_SHOT);
-                        _events.ScheduleEvent(EVENT_SHOOT, urand(8000, 10000));
+                        _events.ScheduleEvent(EVENT_SHOOT, 8s, 10s);
                         break;
                     case EVENT_MULTI_SHOT:
                         if (Unit* victim = me->GetVictim())
                             DoCast(victim, SPELL_MULTI_SHOT);
-                        _events.ScheduleEvent(EVENT_MULTI_SHOT, urand(10000, 13000));
+                        _events.ScheduleEvent(EVENT_MULTI_SHOT, 10s, 13s);
                         break;
                     case EVENT_LAMENT_OF_THE_HIGHBORN:
                         if (!me->HasAura(SPELL_SYLVANAS_CAST))
@@ -214,7 +214,7 @@ public:
                         else
                         {
                             DoSummon(NPC_HIGHBORNE_BUNNY, me, 10.0f, 3000, TEMPSUMMON_TIMED_DESPAWN);
-                            _events.ScheduleEvent(EVENT_LAMENT_OF_THE_HIGHBORN, 2000);
+                            _events.ScheduleEvent(EVENT_LAMENT_OF_THE_HIGHBORN, 2s);
                         }
                         break;
                     case EVENT_SUNSORROW_WHISPER:
@@ -273,7 +273,7 @@ public:
             EventCast = true;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -1041,10 +1041,10 @@ public:
                 step = 0;
                 phaseTimer = 0;
                 jainaGUID.Clear();
-                _events.ScheduleEvent(EVENT_WHIRLWIND, 5 * IN_MILLISECONDS);
-                _events.ScheduleEvent(EVENT_HEROIC_LEAP, 10 * IN_MILLISECONDS);
-                _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2 * IN_MILLISECONDS);
-                _events.ScheduleEvent(EVENT_WRYNN_BUFF, 2 * IN_MILLISECONDS);
+                _events.ScheduleEvent(EVENT_WHIRLWIND, 5s);
+                _events.ScheduleEvent(EVENT_HEROIC_LEAP, 10s);
+                _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2s);
+                _events.ScheduleEvent(EVENT_WRYNN_BUFF, 2s);
                 me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
 
                 if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
@@ -2043,11 +2043,11 @@ public:
                 {
                     case EVENT_WHIRLWIND:
                         DoCast(me, SPELL_WHIRLWIND);
-                        _events.ScheduleEvent(EVENT_WHIRLWIND, 20 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_WHIRLWIND, 20s);
                         break;
                     case EVENT_HEROIC_LEAP:
                         DoCastVictim(SPELL_HEROIC_LEAP);
-                        _events.ScheduleEvent(EVENT_HEROIC_LEAP, urand(15, 30) * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_HEROIC_LEAP, 15s, 30s);
                         break;
                     case EVENT_AGGRO_JAINA:
                         if (me->GetVictim())
@@ -2058,11 +2058,11 @@ public:
                             }
                         }
                         DoCast(me, SPELL_THUNDER);
-                        _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2s);
                         break;
                     case EVENT_WRYNN_BUFF:
                         DoCast(me, SPELL_WRYNN_BUFF);
-                        _events.ScheduleEvent(EVENT_WRYNN_BUFF, 10 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_WRYNN_BUFF, 10s);
                         break;
                     default:
                         break;
@@ -2099,9 +2099,9 @@ public:
         {
             me->SetCorpseDelay(1);
             me->SetRespawnTime(1);
-            _events.ScheduleEvent(EVENT_FIREBALL, 1 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_BLIZZARD, 8 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_ELEMENTAL, 30 * IN_MILLISECONDS);
+            _events.ScheduleEvent(EVENT_FIREBALL, 1s);
+            _events.ScheduleEvent(EVENT_BLIZZARD, 8s);
+            _events.ScheduleEvent(EVENT_ELEMENTAL, 30s);
             me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
             me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
         }
@@ -2123,15 +2123,15 @@ public:
                     case EVENT_FIREBALL:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_FIREBALL);
-                        _events.ScheduleEvent(EVENT_FIREBALL, 3 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_FIREBALL, 3s);
                         break;
                     case EVENT_BLIZZARD:
                         DoCast(SPELL_BLIZZARD);
-                        _events.ScheduleEvent(EVENT_BLIZZARD, 15 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_BLIZZARD, 15s);
                         break;
                     case EVENT_ELEMENTAL:
                         DoCast(SPELL_ELEMENTALS);
-                        _events.ScheduleEvent(EVENT_ELEMENTAL, 90 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_ELEMENTAL, 90s);
                         break;
                     default:
                         break;
@@ -2173,8 +2173,8 @@ public:
 
         void Reset() override
         {
-            _events.ScheduleEvent(EVENT_INFEST, 2 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_BLIGHT_BREATH, 7.5 * IN_MILLISECONDS);
+            _events.ScheduleEvent(EVENT_INFEST, 2s);
+            _events.ScheduleEvent(EVENT_BLIGHT_BREATH, 750ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -2194,11 +2194,11 @@ public:
                     case EVENT_INFEST:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
                             DoCast(target, SPELL_INGEST);
-                        _events.ScheduleEvent(EVENT_INFEST, 20 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_INFEST, 20s);
                         break;
                     case EVENT_BLIGHT_BREATH:
                         DoCast(SPELL_BLIGHT_BREATH);
-                        _events.ScheduleEvent(EVENT_BLIGHT_BREATH, 15 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_BLIGHT_BREATH, 15s);
                         break;
                     default:
                         break;
@@ -2382,11 +2382,11 @@ public:
                 step = 0;
                 phaseTimer = 0;
                 sylvanasfollowGUID.Clear();
-                _events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 3 * IN_MILLISECONDS);
-                _events.ScheduleEvent(EVENT_LAVA_BURST, 5 * IN_MILLISECONDS);
-                _events.ScheduleEvent(EVENT_THUNDER, 8 * IN_MILLISECONDS);
-                _events.ScheduleEvent(EVENT_AGGRO_SYLVANAS, 2 * IN_MILLISECONDS);
-                _events.ScheduleEvent(EVENT_THRALL_BUFF, 2 * IN_MILLISECONDS);
+                _events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 3s);
+                _events.ScheduleEvent(EVENT_LAVA_BURST, 5s);
+                _events.ScheduleEvent(EVENT_THUNDER, 8s);
+                _events.ScheduleEvent(EVENT_AGGRO_SYLVANAS, 2s);
+                _events.ScheduleEvent(EVENT_THRALL_BUFF, 2s);
 
                 if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
                 {
@@ -3929,25 +3929,25 @@ public:
                 {
                     case EVENT_CHAIN_LIGHTNING:
                         DoCastVictim(SPELL_CHAIN_LIGHTNING);
-                        _events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, urand(5, 8) * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 5s, 8s);
                         break;
                     case EVENT_LAVA_BURST:
                         DoCastVictim(SPELL_LAVA_BURST);
-                        _events.ScheduleEvent(EVENT_LAVA_BURST, urand(3, 5) * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_LAVA_BURST, 3s, 5s);
                         break;
                     case EVENT_THUNDER:
                         DoCast(me, SPELL_THUNDER);
-                        _events.ScheduleEvent(EVENT_THUNDER, 15 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_THUNDER, 15s);
                         break;
                     case EVENT_AGGRO_SYLVANAS:
                         if (me->GetVictim())
                             if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
                                 sylvanas->AI()->AttackStart(me->GetVictim());
-                        _events.ScheduleEvent(EVENT_AGGRO_SYLVANAS, 2 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_AGGRO_SYLVANAS, 2s);
                         break;
                     case EVENT_THRALL_BUFF:
                         DoCast(me, SPELL_THRALL_BUFF);
-                        _events.ScheduleEvent(EVENT_THRALL_BUFF, 10 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_THRALL_BUFF, 10s);
                         break;
                     default:
                         break;
@@ -3994,12 +3994,12 @@ public:
         {
             me->SetCorpseDelay(1);
             me->SetRespawnTime(1);
-            _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 20 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_BLACK_ARROW, 15 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_SHOOT, 5 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_MULTI_SHOT, 6 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_SHRIEK_OF_HIGHBORN, 3 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_SYLVANAS_BUFF, 1 * IN_MILLISECONDS);
+            _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 20s);
+            _events.ScheduleEvent(EVENT_BLACK_ARROW, 15s);
+            _events.ScheduleEvent(EVENT_SHOOT, 5s);
+            _events.ScheduleEvent(EVENT_MULTI_SHOT, 6s);
+            _events.ScheduleEvent(EVENT_SHRIEK_OF_HIGHBORN, 3s);
+            _events.ScheduleEvent(EVENT_SYLVANAS_BUFF, 1s);
             me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WRYNN_BUFF, true);
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_INCREASE_SPEED, true);
         }
@@ -4025,26 +4025,26 @@ public:
                 {
                     case EVENT_SUMMON_SKELETON:
                         DoCast(me, SPELL_SUMMON_SKELETON);
-                        _events.ScheduleEvent(EVENT_SUMMON_SKELETON, urand(20, 30) * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 20s, 30s);
                         break;
                     case EVENT_BLACK_ARROW:
                         if (Unit* victim = me->GetVictim())
                             DoCast(victim, SPELL_BLACK_ARROW);
-                        _events.ScheduleEvent(EVENT_BLACK_ARROW, urand(6, 9) * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_BLACK_ARROW,6s, 9s);
                         break;
                     case EVENT_SHOOT:
                         if (Unit* victim = me->GetVictim())
                             DoCast(victim, SPELL_SHOT);
-                        _events.ScheduleEvent(EVENT_SHOOT, urand(5, 10) * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_SHOOT, 5s, 10s);
                         break;
                     case EVENT_MULTI_SHOT:
                         if (Unit* victim = me->GetVictim())
                             DoCast(victim, SPELL_MULTI_SHOT);
-                        _events.ScheduleEvent(EVENT_MULTI_SHOT, urand(10, 13) * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_MULTI_SHOT, 10s, 13s);
                         break;
                     case EVENT_SHRIEK_OF_HIGHBORN:
                         DoCastVictim(SPELL_SHRIEK_OF_HIGHBORN);
-                        _events.ScheduleEvent(EVENT_SHRIEK_OF_HIGHBORN, 3 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_SHRIEK_OF_HIGHBORN, 3s);
                         break;
                     case EVENT_SYLVANAS_BUFF:
                         DoCast(me, SPELL_SYLVANAS_BUFF, true);
