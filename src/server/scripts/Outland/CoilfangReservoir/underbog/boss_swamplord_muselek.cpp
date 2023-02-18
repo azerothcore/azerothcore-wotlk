@@ -118,7 +118,7 @@ struct boss_swamplord_muselek : public BossAI
         {
             DoCastVictim(SPELL_MULTISHOT);
             context.Repeat(20s, 30s);
-        }).Schedule(4s, 8s, [this](TaskContext context)
+        }).Schedule(30s, 40s, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, false, true))
             {
