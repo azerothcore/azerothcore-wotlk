@@ -59,7 +59,7 @@ struct boss_talon_king_ikiss : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_spoken && who->GetTypeId() == TYPEID_PLAYER)
+        if (!_spoken && who->IsPlayer())
         {
             Talk(SAY_INTRO);
             _spoken = true;
