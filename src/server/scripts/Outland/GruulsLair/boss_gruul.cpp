@@ -271,7 +271,11 @@ class spell_gruul_shatter : public SpellScript
         if (Unit* target = GetHitUnit())
         {
             target->RemoveAurasDueToSpell(SPELL_STONED);
-            target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
+
+            if (target->IsPlayer())
+            {
+                target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
+            }
         }
     }
 

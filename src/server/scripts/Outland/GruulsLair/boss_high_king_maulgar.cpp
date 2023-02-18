@@ -249,8 +249,7 @@ struct boss_olm_the_summoner : public ScriptedAI
                 events.ScheduleEvent(EVENT_ADD_ABILITY2, 30s);
                 break;
             case EVENT_ADD_ABILITY3:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    me->CastSpell(target, SPELL_DEATH_COIL, false);
+                DoCastRandomTarget(SPELL_DEATH_COIL);
                 events.ScheduleEvent(EVENT_ADD_ABILITY3, 20s);
                 break;
         }
@@ -308,16 +307,15 @@ struct boss_kiggler_the_crazed : public ScriptedAI
                 events.ScheduleEvent(EVENT_ADD_ABILITY1, 20s);
                 break;
             case EVENT_ADD_ABILITY2:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
-                    me->CastSpell(target, SPELL_LIGHTNING_BOLT, false);
+                DoCastVictim(SPELL_LIGHTNING_BOLT);
                 events.ScheduleEvent(EVENT_ADD_ABILITY2, 1500ms);
                 break;
             case EVENT_ADD_ABILITY3:
-                me->CastSpell(me->GetVictim(), SPELL_ARCANE_SHOCK, false);
+                DoCastVictim(SPELL_ARCANE_SHOCK);
                 events.ScheduleEvent(EVENT_ADD_ABILITY3, 20s);
                 break;
             case EVENT_ADD_ABILITY4:
-                me->CastSpell(me, SPELL_ARCANE_EXPLOSION, false);
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
                 events.ScheduleEvent(EVENT_ADD_ABILITY4, 30s);
                 break;
         }
@@ -369,12 +367,14 @@ struct boss_blindeye_the_seer : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ADD_ABILITY1:
-                me->CastSpell(me, SPELL_GREATER_PW_SHIELD, false);
+                DoCastSelf(SPELL_GREATER_PW_SHIELD);
                 events.ScheduleEvent(EVENT_ADD_ABILITY1, 30s);
                 break;
             case EVENT_ADD_ABILITY2:
                 if (Unit* target = DoSelectLowestHpFriendly(60.0f, 50000))
-                    me->CastSpell(target, SPELL_HEAL, false);
+                {
+                    DoCast(target, SPELL_HEAL);
+                }
                 events.ScheduleEvent(EVENT_ADD_ABILITY2, 25s);
                 break;
             case EVENT_ADD_ABILITY3:
@@ -439,15 +439,15 @@ struct boss_krosh_firehand : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ADD_ABILITY1:
-                me->CastSpell(me->GetVictim(), SPELL_GREATER_FIREBALL, false);
+                DoCastVictim(SPELL_GREATER_FIREBALL);
                 events.ScheduleEvent(EVENT_ADD_ABILITY1, 3500ms);
                 break;
             case EVENT_ADD_ABILITY2:
-                me->CastSpell(me, SPELL_SPELLSHIELD, false);
+                DoCastSelf(SPELL_SPELLSHIELD);
                 events.ScheduleEvent(EVENT_ADD_ABILITY2, 40s);
                 break;
             case EVENT_ADD_ABILITY3:
-                me->CastSpell(me, SPELL_BLAST_WAVE, false);
+                DoCastAOE(SPELL_BLAST_WAVE);
                 events.ScheduleEvent(EVENT_ADD_ABILITY3, 20s);
                 break;
         }
