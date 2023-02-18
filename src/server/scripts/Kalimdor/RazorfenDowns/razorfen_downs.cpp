@@ -95,7 +95,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (channeling)
                 Talk(SAY_WATCH_OUT, who);

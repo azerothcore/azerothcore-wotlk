@@ -96,7 +96,7 @@ public:
     [[nodiscard]] bool HasReactState(ReactStates state) const { return (m_reactState == state); }
     void InitializeReactState();
 
-    ///// TODO RENAME THIS!!!!!
+    ///// @todo RENAME THIS!!!!!
     bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
     bool isCanTrainingAndResetTalentsOf(Player* player) const;
     [[nodiscard]] bool IsValidTrainerForPlayer(Player* player, uint32* npcFlags = nullptr) const;

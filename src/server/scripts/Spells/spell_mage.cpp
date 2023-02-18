@@ -591,7 +591,7 @@ class spell_mage_ice_barrier_aura : public spell_mage_incanters_absorbtion_base_
 {
     PrepareAuraScript(spell_mage_ice_barrier_aura);
 
-    // TODO: Rework
+    /// @todo: Rework
     static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
     {
         // +80.68% from sp bonus
@@ -627,7 +627,7 @@ class spell_mage_ice_barrier : public SpellScript
 {
     PrepareSpellScript(spell_mage_ice_barrier);
 
-    // TODO: Rework
+    /// @todo: Rework
     static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
     {
         // +80.68% from sp bonus

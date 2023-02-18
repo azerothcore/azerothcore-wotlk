@@ -32,7 +32,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
     if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || unit->IsMovementPreventedByCasting())
     {
         // the next line is to ensure that a new spline is created in DoUpdate() once the unit is no longer rooted/stunned
-        // todo: rename this flag to something more appropriate since it is set to true even without speed change now.
+        /// @todo: rename this flag to something more appropriate since it is set to true even without speed change now.
         i_recalculateSpeed = true;
         return;
     }

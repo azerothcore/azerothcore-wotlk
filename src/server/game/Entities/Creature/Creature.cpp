@@ -50,7 +50,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -557,7 +557,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), cInfo->unit_class);
-    float armor = (float)stats->GenerateArmor(cInfo); // TODO: Why is this treated as uint32 when it's a float?
+    float armor = (float)stats->GenerateArmor(cInfo); /// @todo: Why is this treated as uint32 when it's a float?
     SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, armor);
     SetModifierValue(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
     SetModifierValue(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FIRE]));
@@ -1605,7 +1605,7 @@ void Creature::SelectLevel(bool changelevel)
     SetMaxPower(POWER_MANA, mana);                          //MAX Mana
     SetPower(POWER_MANA, mana);
 
-    // TODO: set UNIT_FIELD_POWER*, for some creature class case (energy, etc)
+    /// @todo: set UNIT_FIELD_POWER*, for some creature class case (energy, etc)
 
     SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
     SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, (float)mana);

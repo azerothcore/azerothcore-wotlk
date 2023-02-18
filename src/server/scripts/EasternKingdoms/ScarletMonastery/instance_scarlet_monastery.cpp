@@ -66,7 +66,10 @@ public:
 
     struct instance_scarlet_monastery_InstanceMapScript : public InstanceScript
     {
-        instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map) {}
+        instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders(DataHeader);
+        }
 
         void OnPlayerEnter(Player* player) override
         {
@@ -408,7 +411,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_MO_AGGRO);
             me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
@@ -565,7 +568,7 @@ public:
             instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_WH_INTRO);
             events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1s, 3s);
@@ -777,7 +780,7 @@ public:
                 return true;
             case 16:
                 SendGossipMenuFor(player, 100116, creature->GetGUID());
-                // todo: we need to play these 3 emote in sequence, we play only the last one right now.
+                /// @todo: we need to play these 3 emote in sequence, we play only the last one right now.
                 creature->HandleEmoteCommand(274);
                 creature->HandleEmoteCommand(1);
                 creature->HandleEmoteCommand(397);

@@ -119,7 +119,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -487,7 +487,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.Reset();
             if (me->GetEntry() == 28961) // NPC_TITANIUM_SIEGEBREAKER

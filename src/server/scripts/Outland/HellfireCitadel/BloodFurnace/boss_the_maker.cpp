@@ -59,7 +59,7 @@ public:
             instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), true);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_EXPLODING, 6000);

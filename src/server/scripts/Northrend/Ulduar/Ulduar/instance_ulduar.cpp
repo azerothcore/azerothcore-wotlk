@@ -40,6 +40,7 @@ public:
         instance_ulduar_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
             Initialize();
+            SetHeaders(DataHeader);
             // 0: 10 man difficulty
             // 1: 25 man difficulty
             m_difficulty = (pMap->Is25ManRaid() ? 0 : 1);
@@ -1056,69 +1057,54 @@ public:
                 }
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
+            data >> m_auiEncounter[0];
+            data >> m_auiEncounter[1];
+            data >> m_auiEncounter[3];
+            data >> m_auiEncounter[4];
+            data >> m_auiEncounter[5];
+            data >> m_auiEncounter[6];
+            data >> m_auiEncounter[7];
+            data >> m_auiEncounter[8];
+            data >> m_auiEncounter[9];
+            data >> m_auiEncounter[10];
+            data >> m_auiEncounter[11];
+            data >> m_auiEncounter[12];
+            data >> m_auiEncounter[13];
+            data >> m_auiEncounter[14];
+            data >> m_conspeedatoryAttempt;
+            data >> m_unbrokenAchievement;
+            data >> m_algalonTimer;
 
-            std::ostringstream saveStream;
-            saveStream << "U U " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' '
-                       << m_auiEncounter[4] << ' ' << m_auiEncounter[5] << ' ' << m_auiEncounter[6] << ' ' << m_auiEncounter[7] << ' '
-                       << m_auiEncounter[8] << ' ' << m_auiEncounter[9] << ' ' << m_auiEncounter[10] << ' ' << m_auiEncounter[11] << ' '
-                       << m_auiEncounter[12] << ' ' << m_auiEncounter[13] << ' ' << m_auiEncounter[14] << ' ' << m_conspeedatoryAttempt << ' '
-                       << m_unbrokenAchievement << ' ' << m_algalonTimer << ' ' << C_of_Ulduar_MASK << ' ' << m_mageBarrier;
+            if (m_algalonTimer == TIMER_ALGALON_SUMMONED)
+                m_algalonTimer = TIMER_ALGALON_TO_SUMMON;
 
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
+            if (m_algalonTimer && m_algalonTimer <= 60 && GetData(TYPE_ALGALON) != DONE)
+            {
+                DoUpdateWorldState(WORLD_STATE_ALGALON_TIMER_ENABLED, 1);
+                DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, m_algalonTimer);
+            }
+
+            data >> C_of_Ulduar_MASK;
+            data >> m_mageBarrier;
+
+            for (uint8 i = 0; i < (MAX_ENCOUNTER - 1); ++i)
+            {
+                if (m_auiEncounter[i] == IN_PROGRESS)
+                {
+                    m_auiEncounter[i] = NOT_STARTED;
+                }
+            }
         }
 
-        void Load(const char* strIn) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!strIn)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(strIn);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(strIn);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'U' && dataHead2 == 'U')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                {
-                    loadStream >> m_auiEncounter[i];
-
-                    if (m_auiEncounter[i] == IN_PROGRESS && i != TYPE_WATCHERS)
-                        m_auiEncounter[i] = NOT_STARTED;
-                }
-
-                // Achievements
-                loadStream >> m_conspeedatoryAttempt;
-                loadStream >> m_unbrokenAchievement;
-
-                // Algalon
-                loadStream >> m_algalonTimer;
-                if (m_algalonTimer == TIMER_ALGALON_SUMMONED)
-                    m_algalonTimer = TIMER_ALGALON_TO_SUMMON;
-
-                if (m_algalonTimer && m_algalonTimer <= 60 && GetData(TYPE_ALGALON) != DONE)
-                {
-                    DoUpdateWorldState(WORLD_STATE_ALGALON_TIMER_ENABLED, 1);
-                    DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, m_algalonTimer);
-                }
-
-                // achievement Conqueror/Champion of Ulduar
-                loadStream >> C_of_Ulduar_MASK;
-
-                //Base Camp - Mage Barrier status
-                loadStream >> m_mageBarrier;
-            }
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' '
+                << m_auiEncounter[4] << ' ' << m_auiEncounter[5] << ' ' << m_auiEncounter[6] << ' ' << m_auiEncounter[7] << ' '
+                << m_auiEncounter[8] << ' ' << m_auiEncounter[9] << ' ' << m_auiEncounter[10] << ' ' << m_auiEncounter[11] << ' '
+                << m_auiEncounter[12] << ' ' << m_auiEncounter[13] << ' ' << m_auiEncounter[14] << ' ' << m_conspeedatoryAttempt << ' '
+                << m_unbrokenAchievement << ' ' << m_algalonTimer << ' ' << C_of_Ulduar_MASK << ' ' << m_mageBarrier;
         }
 
         void Update(uint32 diff) override

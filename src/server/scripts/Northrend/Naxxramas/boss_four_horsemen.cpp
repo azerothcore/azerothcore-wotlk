@@ -295,9 +295,9 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             if (movementPhase == MOVE_PHASE_NONE)
             {
                 Talk(SAY_AGGRO);

@@ -593,7 +593,7 @@ void BossAI::_JustDied()
     }
 }
 
-void BossAI::_EnterCombat()
+void BossAI::_JustEngagedWith()
 {
     me->SetCombatPulseDelay(5);
     me->setActive(true);
@@ -648,6 +648,7 @@ void BossAI::UpdateAI(uint32 diff)
     }
 
     events.Update(diff);
+    scheduler.Update(diff);
 
     if (me->HasUnitState(UNIT_STATE_CASTING))
     {
@@ -689,7 +690,7 @@ void WorldBossAI::_JustDied()
     summons.DespawnAll();
 }
 
-void WorldBossAI::_EnterCombat()
+void WorldBossAI::_JustEngagedWith()
 {
     Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
     if (target)

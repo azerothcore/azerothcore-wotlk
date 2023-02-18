@@ -870,7 +870,7 @@ class spell_dk_anti_magic_shell_raid : public AuraScript
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // TODO: this should absorb limited amount of damage, but no info on calculation formula
+        /// @todo: this should absorb limited amount of damage, but no info on calculation formula
         amount = -1;
 
         SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);

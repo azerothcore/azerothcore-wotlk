@@ -148,14 +148,14 @@ public:
     //On creation, NOT load.
     virtual void Initialize() {}
 
-    //On load
-    virtual void Load(char const* data) { LoadBossState(data); }
+    // On load
+    virtual void Load(char const* data);
 
     //Called when creature is Looted
     virtual void CreatureLooted(Creature* /*creature*/, LootType) {}
 
-    //When save is needed, this function generates the data
-    virtual std::string GetSaveData() { return GetBossSaveData(); }
+    // When save is needed, this function generates the data
+    virtual std::string GetSaveData();
 
     void SaveToDB();
 
@@ -262,6 +262,7 @@ public:
     // Allows to perform particular actions
     virtual void DoAction(int32 /*action*/) {}
 protected:
+    void SetHeaders(std::string const& dataHeaders);
     void SetBossNumber(uint32 number) { bosses.resize(number); }
     void LoadBossBoundaries(BossBoundaryData const& data);
     void LoadDoorData(DoorData const* data);
@@ -278,11 +279,18 @@ protected:
     void UpdateDoorState(GameObject* door);
     void UpdateMinionState(Creature* minion, EncounterState state);
 
-    void LoadBossState(char const* data);
-    std::string GetBossSaveData();
+    // Instance Load and Save
+    bool ReadSaveDataHeaders(std::istringstream& data);
+    void ReadSaveDataBossStates(std::istringstream& data);
+    virtual void ReadSaveDataMore(std::istringstream& /*data*/) { }
+    void WriteSaveDataHeaders(std::ostringstream& data);
+    void WriteSaveDataBossStates(std::ostringstream& data);
+    virtual void WriteSaveDataMore(std::ostringstream& /*data*/) { }
+
 private:
     static void LoadObjectData(ObjectData const* creatureData, ObjectInfoMap& objectInfo);
 
+    std::vector<char> headers;
     std::vector<BossInfo> bosses;
     DoorInfoMap doors;
     MinionInfoMap minions;

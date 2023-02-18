@@ -1258,7 +1258,7 @@ SpellCastResult Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const
     spellInfo = spellInfo->TryGetSpellInfoOverride(this);
     //end npcbot
 
-    // TODO: this is a workaround - not needed anymore, but required for some scripts :(
+    /// @todo: this is a workaround - not needed anymore, but required for some scripts :(
     if (!originalCaster && triggeredByAura)
     {
         originalCaster = triggeredByAura->GetCasterGUID();
@@ -1568,7 +1568,7 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss,
     Unit::DealDamage(this, victim, damageInfo->damage, &cleanDamage, SPELL_DIRECT_DAMAGE, SpellSchoolMask(damageInfo->schoolMask), spellProto, durabilityLoss, false, spell);
 }
 
-// TODO for melee need create structure as in
+// @todo for melee need create structure as in
 void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, WeaponAttackType attackType, const bool sittingVictim)
 {
     damageInfo->attacker         = this;
@@ -2088,7 +2088,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
 
             Unit::DealDamageMods(this, damage, &absorb);
 
-            // TODO: Move this to a packet handler
+            /// @todo: Move this to a packet handler
             WorldPacket data(SMSG_SPELLDAMAGESHIELD, (8 + 8 + 4 + 4 + 4 + 4));
             data << victim->GetGUID();
             data << GetGUID();
@@ -3631,7 +3631,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
         return SPELL_MISS_IMMUNE;
 
     // All positive spells can`t miss
-    // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
+    /// @todo: client not show miss log for this spells - so need find info for this in dbc and use it!
     if ((spell->IsPositive() || spell->HasEffect(SPELL_EFFECT_DISPEL))
             && (!IsHostileTo(victim))) // prevent from affecting enemy by "positive" spell
         return SPELL_MISS_NONE;
@@ -3699,7 +3699,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, Spell const* spell, bool CanRef
     }
 
     // All positive spells can`t miss
-    // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
+    /// @todo: client not show miss log for this spells - so need find info for this in dbc and use it!
     if ((spellInfo->IsPositive() || spellInfo->HasEffect(SPELL_EFFECT_DISPEL))
         && (!IsHostileTo(victim))) // prevent from affecting enemy by "positive" spell
     {
@@ -6887,7 +6887,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                             target = this;
                             if (roll_chance_i(10))
-                                ToPlayer()->Say("This is Madness!", LANG_UNIVERSAL); // TODO: It should be moved to database, shouldn't it?
+                                ToPlayer()->Say("This is Madness!", LANG_UNIVERSAL); /// @todo: It should be moved to database, shouldn't it?
                             break;
                         }
                     // Sunwell Exalted Caster Neck (??? neck)
@@ -7837,7 +7837,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 //end npcbot
 
-                [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
             }
         case SPELLFAMILY_ROGUE:
             {
@@ -8816,7 +8816,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Mark of Blood
                 if (dummySpell->Id == 49005)
                 {
-                    // TODO: need more info (cooldowns/PPM)
+                    /// @todo: need more info (cooldowns/PPM)
                     triggered_spell_id = 61607;
                     break;
                 }
@@ -9953,7 +9953,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 
                 target = this;
                 trigger_spell_id = 22588;
-                [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
             }
         // Bonus Healing (Crystal Spire of Karabor mace)
         case 40971:
@@ -11395,7 +11395,7 @@ void Unit::SetCharm(Unit* charm, bool apply)
                 LOG_FATAL("entities.unit", "Player {} is trying to charm unit {}, but it already has a charmed unit {}", GetName(), charm->GetEntry(), GetCharmGUID().ToString());
 
             charm->m_ControlledByPlayer = true;
-            // TODO: maybe we can use this flag to check if controlled by player
+            /// @todo: maybe we can use this flag to check if controlled by player
             charm->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
         }
         else
@@ -12744,7 +12744,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
             {
                 return 100.0f;
             }
-            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+            [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case SPELL_DAMAGE_CLASS_RANGED:
             {
                 // flat aura mods
@@ -12810,7 +12810,7 @@ uint32 Unit::SpellCriticalDamageBonus(Unit const* caster, SpellInfo const* spell
     {
         case SPELL_DAMAGE_CLASS_MELEE:                      // for melee based spells is 100%
         case SPELL_DAMAGE_CLASS_RANGED:
-            // TODO: write here full calculation for melee/ranged spells
+            /// @todo: write here full calculation for melee/ranged spells
             crit_bonus += damage;
             break;
         default:
@@ -12848,7 +12848,7 @@ uint32 Unit::SpellCriticalHealingBonus(Unit const* caster, SpellInfo const* spel
     {
         case SPELL_DAMAGE_CLASS_MELEE:                      // for melee based spells is 100%
         case SPELL_DAMAGE_CLASS_RANGED:
-            // TODO: write here full calculation for melee/ranged spells
+            /// @todo: write here full calculation for melee/ranged spells
             crit_bonus = damage;
             break;
         default:
@@ -14324,7 +14324,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
         if (enemy)
         {
             if (IsAIEnabled)
-                creature->AI()->EnterCombat(enemy);
+                creature->AI()->JustEngagedWith(enemy);
 
             if (creature->GetFormation())
                 creature->GetFormation()->MemberEngagingTarget(creature, enemy);
@@ -15575,7 +15575,7 @@ void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32& castTime, Spell* 
 
     // called from caster
     if (Player* modOwner = GetSpellModOwner())
-        // TODO:(MadAgos) Eventually check and delete the bool argument
+        /// @todo:(MadAgos) Eventually check and delete the bool argument
         modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_CASTING_TIME, castTime, spell, bool(modOwner != this && !IsPet()));
     //npcbot - apply bot spell cast time mods
     if (castTime > 0 && IsNPCBot())
@@ -18895,7 +18895,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         {
             Map* instanceMap = creature->GetMap();
             //Player* creditedPlayer = GetCharmerOrOwnerPlayerOrPlayerItself();
-            // TODO: do instance binding anyway if the charmer/owner is offline
+            /// @todo: do instance binding anyway if the charmer/owner is offline
 
             if (instanceMap->IsDungeon() && player)
                 if (instanceMap->IsRaidOrHeroicDungeon())
@@ -19342,7 +19342,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     AttackStop();
 
     // Xinef: dont reset threat and combat, put them on offline list, moved down after faction changes
-    //  CombatStop(); // TODO: CombatStop(true) may cause crash (interrupt spells)
+    //  CombatStop(); /// @todo: CombatStop(true) may cause crash (interrupt spells)
     //  DeleteThreatList();
 
     Player* playerCharmer = charmer->ToPlayer();

@@ -96,7 +96,7 @@ class boss_archavon : public CreatureScript
                 ScriptedAI::AttackStart(who);
             }
 
-            void EnterCombat(Unit* /*who*/) override
+            void JustEngagedWith(Unit* /*who*/) override
             {
                 events.ScheduleEvent(EVENT_ROCK_SHARDS, 15000);
                 events.ScheduleEvent(EVENT_CHOKING_CLOUD, 30000);

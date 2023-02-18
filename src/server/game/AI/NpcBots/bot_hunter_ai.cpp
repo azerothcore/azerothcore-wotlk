@@ -243,7 +243,7 @@ public:
             GetInPosition(force, u);
         }
 
-        void EnterCombat(Unit* u) override { aspectTimer = 0; bot_ai::EnterCombat(u); }
+        void JustEngagedWith(Unit* u) override { aspectTimer = 0; bot_ai::JustEngagedWith(u); }
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
