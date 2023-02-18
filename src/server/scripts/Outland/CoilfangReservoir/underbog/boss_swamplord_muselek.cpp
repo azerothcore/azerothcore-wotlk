@@ -125,9 +125,9 @@ struct boss_swamplord_muselek : public BossAI
 
                 scheduler.Schedule(3s, [this, target](TaskContext)
                 {
-                    if (target)
+                    if (target && me->GetVictim())
                     {
-                        me->GetMotionMaster()->MoveBackwards(target, 10.0f);
+                        me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
                         me->m_Events.AddEventAtOffset([this]()
                         {
                             if (Unit* marktarget = ObjectAccessor::GetUnit(*me, _markTarget))
@@ -142,7 +142,6 @@ struct boss_swamplord_muselek : public BossAI
                 {
                     if (target)
                     {
-                        me->GetMotionMaster()->MoveBackwards(target, 10.0f);
                         me->m_Events.AddEventAtOffset([this]()
                         {
                             if (Unit* marktarget = ObjectAccessor::GetUnit(*me, _markTarget))
