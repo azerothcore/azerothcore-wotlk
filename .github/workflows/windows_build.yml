@@ -1,10 +1,12 @@
 name: windows-build
 on:
   push:
-    branches:
-      - 'master'
-  pull_request:
-    types: ['labeled', 'opened', 'synchronize', 'reopened']
+    tags:        
+      - '**'
+  #   branches:
+  #     - 'master'
+  # pull_request:
+  #   types: ['labeled', 'opened', 'synchronize', 'reopened']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -25,7 +27,10 @@ jobs:
       && !github.event.pull_request.draft
       && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Configure OS
         shell: bash
         env:
@@ -38,6 +43,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
+          export CCUSTOMOPTIONS=" -DMODULE_MOD-INDIVIDUAL-PROGRESSION=disabled"
           export CTOOLS_BUILD=all
           ./acore.sh compiler build
       - name: Dry run authserver
