@@ -17,7 +17,6 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
 #include "the_underbog.h"
 
 enum Spells
@@ -50,8 +49,7 @@ struct boss_swamplord_muselek : public BossAI
 
     void Reset() override
     {
-        scheduler.CancelAll();
-        _markTarget.Clear();
+        _Reset();
 
         scheduler.SetValidator([this]
         {
@@ -73,6 +71,7 @@ struct boss_swamplord_muselek : public BossAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        _JustDied();
         Talk(SAY_JUST_DIED);
     }
 
@@ -86,8 +85,9 @@ struct boss_swamplord_muselek : public BossAI
         return me->GetVictim() && !me->IsWithinRange(me->GetVictim(), 10.0f) && me->IsWithinLOSInMap(me->GetVictim());
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(3s, [this](TaskContext context)
@@ -156,15 +156,6 @@ struct boss_swamplord_muselek : public BossAI
 
             context.Repeat(12s, 16s);
         });
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff,
-            std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
 
 private:
