@@ -113,10 +113,9 @@ public:
             Talk(EMOTE_DEATH);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            LOG_ERROR("module", "跳舞机开始");
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
             if (pInstance)
@@ -141,8 +140,7 @@ public:
                 DoZoneInCombat();
                 events.ScheduleEvent(EVENT_DISRUPTION, urand(12000, 15000));
                 events.ScheduleEvent(EVENT_DECEPIT_FEVER, 17000);
-                //停用跳舞机
-                //events.ScheduleEvent(EVENT_ERUPT_SECTION, 15000);
+                events.ScheduleEvent(EVENT_ERUPT_SECTION, 15000);
                 events.ScheduleEvent(EVENT_SWITCH_PHASE, 90000);
             }
             else // if (phase == PHASE_FAST_DANCE)
@@ -155,8 +153,7 @@ public:
                 me->CastSpell(me, SPELL_TELEPORT_SELF, false);
                 me->SetFacingTo(2.40f);
                 events.ScheduleEvent(EVENT_PLAGUE_CLOUD, 1000);
-                //停用跳舞机
-                //events.ScheduleEvent(EVENT_ERUPT_SECTION, 7000);
+                events.ScheduleEvent(EVENT_ERUPT_SECTION, 7000);
                 events.ScheduleEvent(EVENT_SWITCH_PHASE, 45000);
             }
             events.ScheduleEvent(EVENT_SAFETY_DANCE, 5000);
@@ -164,18 +161,11 @@ public:
 
         bool IsInRoom(Unit* who)
         {
-            if (who->GetPositionX() > 2814 || who->GetPositionX() < 2723 || who->GetPositionY() > -3641 || who->GetPositionY() < -3730)
+            if (who->GetPositionX() > 2826 || who->GetPositionX() < 2723 || who->GetPositionY() > -3641 || who->GetPositionY() < -3736)
             {
-                return false;
-            }
-            return true;
-        }
+                if (who->GetGUID() == me->GetGUID())
+                    EnterEvadeMode();
 
-        bool IsInRoomBoss()
-        {
-            if (me->GetPositionX() > 2814 || me->GetPositionX() < 2723 || me->GetPositionY() > -3641 || me->GetPositionY() < -3730)
-            {
-                EnterEvadeMode();
                 return false;
             }
             return true;
@@ -183,7 +173,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!IsInRoomBoss())
+            if (!IsInRoom(me))
                 return;
 
             if (!UpdateVictim())

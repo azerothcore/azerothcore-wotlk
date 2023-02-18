@@ -56,9 +56,9 @@ public:
     {
         boss_sulfuronAI(Creature* creature) : BossAI(creature, DATA_SULFURON) {}
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, 6s, 20s);
             events.ScheduleEvent(EVENT_INSPIRE, 7s, 10s);
             events.ScheduleEvent(EVENT_KNOCKDOWN, 6s);
@@ -128,7 +128,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_DARK_STRIKE, 4s, 7s);
             events.ScheduleEvent(EVENT_DARK_MENDING, 15s, 30s);

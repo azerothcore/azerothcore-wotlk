@@ -432,7 +432,7 @@ public:
                 me->SetFacingTo(M_PI);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             /// @todo This spell check is invalid
             //            if (SPELL_NECROLYTE_CHANNELING)

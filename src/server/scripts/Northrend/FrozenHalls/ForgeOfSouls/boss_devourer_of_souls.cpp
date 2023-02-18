@@ -116,7 +116,7 @@ public:
             return 0;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_FACE_AGGRO);
             DoZoneInCombat();

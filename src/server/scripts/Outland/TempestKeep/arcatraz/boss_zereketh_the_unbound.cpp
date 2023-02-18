@@ -51,9 +51,9 @@ struct boss_zereketh_the_unbound : public BossAI
         Talk(SAY_DEATH);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(6s, [this](TaskContext context)

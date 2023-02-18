@@ -111,9 +111,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
             events.ScheduleEvent(EVENT_CLEAVE, 9000);
@@ -213,7 +213,7 @@ public:
             Start(true, true);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_BLAST_NOVA, urand(20000, 30000));

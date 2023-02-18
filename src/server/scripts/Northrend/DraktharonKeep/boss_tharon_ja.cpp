@@ -90,10 +90,10 @@ public:
             me->CastSpell(me, SPELL_CLEAR_GIFT, true);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 5000);
             events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(14000, 18000));
             events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, urand(8000, 10000));

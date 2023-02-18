@@ -121,7 +121,7 @@ public:
             _events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _events.ScheduleEvent(EVENT_FADE, 30s);
             _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 20s);
@@ -273,7 +273,7 @@ public:
             EventCast = true;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {

@@ -69,7 +69,7 @@ public:
             me->RestoreFaction();
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             if (roll_chance_i(33))
                 Talk(SAY_AGGRO);
@@ -433,7 +433,7 @@ public:
             uiStage_timer = 3000;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_TREE2);
             me->Dismount();
@@ -526,7 +526,7 @@ public:
             uiValroth_Smite_timer = 1000;
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_VALROTH_AGGRO);
             DoCast(who, SPELL_VALROTH_SMITE);

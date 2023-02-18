@@ -43,10 +43,10 @@ struct boss_broggok : public BossAI
         me->SetImmuneToAll(true);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
-        _EnterCombat();
+        _JustEngagedWith();
     }
 
     void JustSummoned(Creature* summoned) override

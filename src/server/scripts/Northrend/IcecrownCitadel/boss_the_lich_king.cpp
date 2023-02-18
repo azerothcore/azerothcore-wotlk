@@ -669,7 +669,7 @@ public:
             me->PlayDirectSound(17374);
         }
 
-        void EnterCombat(Unit* target) override
+        void JustEngagedWith(Unit* target) override
         {
             if (!instance->CheckRequiredBosses(DATA_THE_LICH_KING, target->ToPlayer()) || !me->IsVisible())
             {

@@ -336,7 +336,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
 
     // DARK IRON ATTACK EVENT
     void MoveInLineOfSight(Unit*  /*who*/) override {}
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
 
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
@@ -560,7 +560,7 @@ struct npc_dark_iron_attack_mole_machine : public ScriptedAI
 {
     npc_dark_iron_attack_mole_machine(Creature* creature) : ScriptedAI(creature) { }
 
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
     void MoveInLineOfSight(Unit*) override {}
     void AttackStart(Unit*) override {}
 
@@ -618,7 +618,7 @@ struct npc_dark_iron_guzzler : public ScriptedAI
     ObjectGuid targetGUID;
     bool attacking;
 
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
     void MoveInLineOfSight(Unit*) override {}
     void AttackStart(Unit*) override {}
 
@@ -768,7 +768,7 @@ struct npc_brewfest_super_brew_trigger : public ScriptedAI
     npc_brewfest_super_brew_trigger(Creature* creature) : ScriptedAI(creature) { }
 
     uint32 timer;
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
     void MoveInLineOfSight(Unit*  /*who*/) override
     {
     }
@@ -1758,7 +1758,7 @@ struct npc_coren_direbrew_sisters : public ScriptedAI
         return ObjectGuid::Empty;
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoCastSelf(SPELL_PORT_TO_COREN);
 
@@ -1845,10 +1845,10 @@ struct npc_direbrew_antagonist : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_ANTAGONIST_COMBAT, who);
-        ScriptedAI::EnterCombat(who);
+        ScriptedAI::JustEngagedWith(who);
     }
 };
 

@@ -129,9 +129,9 @@ public:
             return true;
         }
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
 
             events.ScheduleEvent(EVENT_CLEAVE, 15s);
             events.ScheduleEvent(EVENT_STOMP, 35s);

@@ -455,7 +455,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             Talk(SAY_DRAKURU_3);
             events.ScheduleEvent(EVENT_BETRAYAL_SHADOW_BOLT, 2000);

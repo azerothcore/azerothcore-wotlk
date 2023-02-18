@@ -92,7 +92,7 @@ public:
             return summons.GetCreatureWithEntry(NPC_RIGHT_HEAD);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->SummonCreature(NPC_LEFT_HEAD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
             me->SummonCreature(NPC_RIGHT_HEAD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
@@ -104,7 +104,7 @@ public:
                 events2.ScheduleEvent(aggroYell, 3000);
             }
 
-            _EnterCombat();
+            _JustEngagedWith();
 
             events.ScheduleEvent(EVENT_SPELL_FEAR, 8000);
             events.ScheduleEvent(EVENT_SPELL_BURNING_MAUL, 25000);

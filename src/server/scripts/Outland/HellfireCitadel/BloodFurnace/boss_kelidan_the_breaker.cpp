@@ -99,7 +99,7 @@ public:
                 instance->SetData(DATA_KELIDAN, NOT_STARTED);
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPELL_VOLLEY, 1000);
             events.ScheduleEvent(EVENT_SPELL_CORRUPTION, 5000);
@@ -307,7 +307,7 @@ public:
             return nullptr;
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             if (Creature* kelidan = GetKelidan())
                 kelidan->AI()->DoAction(ACTION_CHANNELER_ENGAGED);
