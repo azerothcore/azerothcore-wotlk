@@ -386,6 +386,7 @@ public:
                         case 6:
                             Talk(SAY_BREAKOUT10);
                             SetEscortPaused(false);
+                            me->DespawnOrUnsummon();//强制刷新
                             break;
                     }
 
