@@ -22,7 +22,7 @@
 
 #define DataHeaders "SH"
 
-constexpr uint32 EncounterCount = 3;
+uint32 constexpr EncounterCount = 3;
 
 #define SethekkHallsScriptName "instance_sethekk_halls"
 
