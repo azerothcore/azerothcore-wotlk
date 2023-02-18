@@ -93,7 +93,7 @@ struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
 };
 
 // Target selector for spell casts checking range, auras and attributes
-// TODO: Add more checks from Spell::CheckCast
+/// @todo: Add more checks from Spell::CheckCast
 struct SpellTargetSelector : public Acore::unary_function<Unit*, bool>
 {
 public:
@@ -331,6 +331,21 @@ public:
         else
             targetList.resize(num);
     }
+
+    /**
+     * @brief Called when the unit enters combat
+     * (NOTE: Creature engage logic should NOT be here, but in JustEngagedWith, which happens once threat is established!)
+     *
+     * @todo Never invoked right now. Preparation for Combat Threat refactor
+     */
+    virtual void JustEnteredCombat(Unit* /*who*/) { }
+
+    /**
+     * @brief Called when the unit leaves combat
+     *
+     * @todo Never invoked right now. Preparation for Combat Threat refactor
+     */
+    virtual void JustExitedCombat() { }
 
     // Called at any Damage to any victim (before damage apply)
     virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/) { }

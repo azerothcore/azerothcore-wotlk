@@ -74,7 +74,7 @@ struct AchievementCriteriaEntry
     union
     {
         // ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE          = 0
-        // TODO: also used for player deaths..
+        /// @todo: also used for player deaths..
         struct
         {
             uint32  creatureID;                             // 3
@@ -286,14 +286,14 @@ struct AchievementCriteriaEntry
         // ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA           = 43
         struct
         {
-            // TODO: This rank is _NOT_ the index from AreaTable.dbc
+            /// @todo: This rank is _NOT_ the index from AreaTable.dbc
             uint32  areaReference;                          // 3
         } explore_area;
 
         // ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK               = 44
         struct
         {
-            // TODO: This rank is _NOT_ the index from CharTitles.dbc
+            /// @todo: This rank is _NOT_ the index from CharTitles.dbc
             uint32  rank;                                   // 3
         } own_rank;
 
@@ -326,7 +326,7 @@ struct AchievementCriteriaEntry
         } visit_barber;
 
         // ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM        = 49
-        // TODO: where is the required itemlevel stored?
+        /// @todo: where is the required itemlevel stored?
         struct
         {
             uint32  itemSlot;                               // 3
@@ -361,7 +361,7 @@ struct AchievementCriteriaEntry
         } hk_race;
 
         // ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE               = 54
-        // TODO: where is the information about the target stored?
+        /// @todo: where is the information about the target stored?
         struct
         {
             uint32  emoteID;                                // 3 enum TextEmotes
@@ -412,7 +412,7 @@ struct AchievementCriteriaEntry
         } use_gameobject;
 
         // ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL       = 70
-        // TODO: are those special criteria stored in the dbc or do we have to add another sql table?
+        /// @todo: are those special criteria stored in the dbc or do we have to add another sql table?
         struct
         {
             uint32  unused;                                 // 3
@@ -1375,6 +1375,20 @@ struct MovieEntry
     uint32      Id;                                         // 0 index
     //char const*       filename;                           // 1
     //uint32      unk2;                                     // 2 always 100
+};
+
+struct NamesReservedEntry
+{
+    //uint32         ID;                                    // 0
+    char const*      Pattern;                               // 1
+    //uint32         Language;                              // 2
+};
+
+struct NamesProfanityEntry
+{
+    //uint32         ID;                                    // 0
+    char const*      Pattern;                               // 1
+    //uint32         Language;                              // 2
 };
 
 #define MAX_OVERRIDE_SPELL 10

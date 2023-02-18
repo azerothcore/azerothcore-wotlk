@@ -43,16 +43,16 @@ struct boss_maiden_of_virtue : public BossAI
 {
     boss_maiden_of_virtue(Creature* creature) : BossAI(creature, DATA_MAIDEN) { }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         DoCastAOE(SPELL_HOLY_GROUND, true);
-        events.ScheduleEvent(EVENT_SPELL_REPENTANCE, 25000);
-        events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, 8000);
-        events.ScheduleEvent(EVENT_SPELL_HOLY_WRATH, 15000);
-        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
+        events.ScheduleEvent(EVENT_SPELL_REPENTANCE, 25s);
+        events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, 8s);
+        events.ScheduleEvent(EVENT_SPELL_HOLY_WRATH, 15s);
+        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 10min);
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -60,7 +60,7 @@ struct boss_maiden_of_virtue : public BossAI
         if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
         {
             Talk(SAY_SLAY);
-            events.ScheduleEvent(EVENT_KILL_TALK, 5000);
+            events.ScheduleEvent(EVENT_KILL_TALK, 5s);
         }
     }
 
@@ -84,15 +84,15 @@ struct boss_maiden_of_virtue : public BossAI
             case EVENT_SPELL_REPENTANCE:
                 DoCastAOE(SPELL_REPENTANCE, true);
                 Talk(SAY_REPENTANCE);
-                events.ScheduleEvent(EVENT_SPELL_REPENTANCE, urand(25000, 35000));
+                events.Repeat(25s, 35s);
                 break;
             case EVENT_SPELL_HOLY_FIRE:
                 DoCastRandomTarget(SPELL_HOLY_FIRE, 0, 50.0f);
-                events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, urand(8000, 18000));
+                events.Repeat(8s, 18s);
                 break;
             case EVENT_SPELL_HOLY_WRATH:
                 DoCastRandomTarget(SPELL_HOLY_WRATH, 0, 80.0f);
-                events.ScheduleEvent(EVENT_SPELL_HOLY_WRATH, urand(20000, 25000));
+                events.Repeat(20s, 25s);
                 break;
             case EVENT_SPELL_ENRAGE:
                 DoCastSelf(SPELL_BERSERK, true);

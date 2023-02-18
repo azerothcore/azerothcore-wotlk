@@ -37,9 +37,9 @@ CREATE TABLE IF NOT EXISTS `creaturedisplayinfoextra_dbc` (
   `NPCItemDisplay10` int unsigned NOT NULL DEFAULT '0',
   `NPCItemDisplay11` int unsigned NOT NULL DEFAULT '0',
   `Flags` int unsigned NOT NULL DEFAULT '0',
-  `BakeName` varchar(100) NOT NULL,
+  `BakeName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table acore_world.creaturedisplayinfoextra_dbc: 0 rows
 DELETE FROM `creaturedisplayinfoextra_dbc`;

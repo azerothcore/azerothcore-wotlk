@@ -26,6 +26,13 @@ DoorData const doorData[] =
     { 0,                                        0,                  DOOR_TYPE_ROOM } // END
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_DALLIAH,      DATA_DALLIAH          },
+    { NPC_SOCCOTHRATES, DATA_SOCCOTHRATES     },
+    { NPC_MELLICHAR,    DATA_WARDEN_MELLICHAR }
+};
+
 class instance_arcatraz : public InstanceMapScript
 {
 public:
@@ -35,24 +42,10 @@ public:
     {
         instance_arcatraz_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUTER);
             LoadDoorData(doorData);
-        }
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_DALLIAH:
-                    DalliahGUID = creature->GetGUID();
-                    break;
-                case NPC_SOCCOTHRATES:
-                    SoccothratesGUID = creature->GetGUID();
-                    break;
-                case NPC_MELLICHAR:
-                    MellicharGUID = creature->GetGUID();
-                    break;
-            }
+            LoadObjectData(creatureData, nullptr);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -86,19 +79,6 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_CONTAINMENT_CORE_SECURITY_FIELD_ALPHA:
-                case GO_CONTAINMENT_CORE_SECURITY_FIELD_BETA:
-                    AddDoor(go, false);
-                    break;
-                default:
-                    break;
-            }
-        }
-
         void SetData(uint32 type, uint32 data) override
         {
             switch (type)
@@ -110,25 +90,16 @@ public:
                 case DATA_WARDEN_5:
                     if (data < FAIL)
                         HandleGameObject(StasisPodGUIDs[type - DATA_WARDEN_1], data == IN_PROGRESS);
-                    if (Creature* warden = instance->GetCreature(MellicharGUID))
+                    if (Creature* warden = GetCreature(DATA_WARDEN_MELLICHAR))
                         warden->AI()->SetData(type, data);
                     break;
             }
-        }
-
-        uint32 GetData(uint32  /*type*/) const override
-        {
-            return 0;
         }
 
         ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
             {
-                case DATA_DALLIAH:
-                    return DalliahGUID;
-                case DATA_SOCCOTHRATES:
-                    return SoccothratesGUID;
                 case DATA_WARDENS_SHIELD:
                     return WardensShieldGUID;
             }
@@ -154,54 +125,8 @@ public:
             return true;
         }
 
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "A Z " << GetBossSaveData();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(char const* str) override
-        {
-            if (!str)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(str);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'A' && dataHead2 == 'Z')
-            {
-                for (uint32 i = 0; i < MAX_ENCOUTER; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
-        }
-
     protected:
-        ObjectGuid DalliahGUID;
-        ObjectGuid SoccothratesGUID;
         ObjectGuid StasisPodGUIDs[5];
-        ObjectGuid MellicharGUID;
         ObjectGuid WardensShieldGUID;
     };
 

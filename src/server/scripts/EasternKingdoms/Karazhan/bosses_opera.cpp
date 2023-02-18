@@ -158,7 +158,7 @@ public:
             Initialize();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_DOROTHEE_AGGRO);
             DoZoneInCombat();
@@ -201,6 +201,7 @@ public:
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
                     AggroTimer = 0;
                 }
                 else
@@ -262,7 +263,7 @@ public:
             YipTimer = 10000;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }
@@ -357,7 +358,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_STRAWMAN_AGGRO);
             DoZoneInCombat();
@@ -400,6 +401,7 @@ public:
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
                     AggroTimer = 0;
                 }
                 else
@@ -465,7 +467,7 @@ public:
             RustCount   = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_TINHEAD_AGGRO);
             DoZoneInCombat();
@@ -512,6 +514,7 @@ public:
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
                     AggroTimer = 0;
                 }
                 else
@@ -596,7 +599,7 @@ public:
             ScriptedAI::AttackStart(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_ROAR_AGGRO);
             DoZoneInCombat();
@@ -626,6 +629,7 @@ public:
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
                     AggroTimer = 0;
                 }
                 else
@@ -703,7 +707,7 @@ public:
             Talk(SAY_CRONE_SLAY);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_CRONE_AGGRO);
             DoZoneInCombat();
@@ -771,7 +775,7 @@ public:
             MoveTimer = 1000;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void MoveInLineOfSight(Unit* /*who*/) override
 
@@ -882,7 +886,7 @@ public:
             IsChasing = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_WOLF_AGGRO);
             DoZoneInCombat();
@@ -1114,7 +1118,7 @@ public:
             RomuloDead = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }
@@ -1284,7 +1288,7 @@ public:
             //LOG_ERROR("scripts", "boss_romuloAI: DamageTaken reach end of code, that should not happen.");
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
             Talk(SAY_ROMULO_AGGRO);
