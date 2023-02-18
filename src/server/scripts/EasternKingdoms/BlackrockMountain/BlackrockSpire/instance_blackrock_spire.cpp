@@ -85,6 +85,7 @@ public:
 
         instance_blackrock_spireMapScript(InstanceMap* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadMinionData(minionData);
             LoadDoorData(doorData);
@@ -351,7 +352,7 @@ public:
                     if (data == AREATRIGGER_DRAGONSPIRE_HALL)
                     {
                         if (GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE)
-                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_STORE, 1000);
+                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_STORE, 1s);
                     }
                     break;
                 case DATA_SOLAKAR_FLAMEWREATH:
@@ -360,7 +361,7 @@ public:
                         case IN_PROGRESS:
                             if (SolakarState == NOT_STARTED)
                             {
-                                Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500);
+                                Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500ms);
                             }
                             break;
                         case FAIL:
@@ -556,12 +557,12 @@ public:
                 {
                     case EVENT_DARGONSPIRE_ROOM_STORE:
                         Dragonspireroomstore();
-                        Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3000);
+                        Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3s);
                         break;
                     case EVENT_DARGONSPIRE_ROOM_CHECK:
                         Dragonspireroomcheck();
                         if ((GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE))
-                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3000);
+                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3s);
                         break;
                     case EVENT_SOLAKAR_WAVE:
                         SummonSolakarWave(CurrentSolakarWave);
@@ -670,50 +671,6 @@ public:
                 if (GameObject* door3 = instance->GetGameObject(go_emberseerin))
                     HandleGameObject(ObjectGuid::Empty, true, door3);
             }
-        }
-
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "B S " << GetBossSaveData();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(const char* strIn) override
-        {
-            if (!strIn)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(strIn);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(strIn);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'B' && dataHead2 == 'S')
-            {
-                for (uint8 i = 0; i < EncounterCount; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-
-                    SetBossState(i, EncounterState(tmpState));
-                }
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     protected:

@@ -80,7 +80,7 @@ public:
     void JustReachedHome() override;
 
     // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
-    void EnterCombat(Unit* enemy) override;
+    void JustEngagedWith(Unit* enemy) override;
 
     // Called for reaction at stopping attack at no attackers or targets
     void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override;
@@ -273,6 +273,12 @@ public:
     void OnStateChanged(uint32 state, Unit* unit) override;
     void EventInform(uint32 eventId) override;
     void SpellHit(Unit* unit, SpellInfo const* spellInfo) override;
+
+    // Called when the gameobject summon successfully other creature
+    void JustSummoned(Creature* creature) override;
+
+    // Called when a summoned creature dissapears (UnSummoned)
+    void SummonedCreatureDespawn(Creature* unit) override;
 
     // Called when a summoned unit dies
     void SummonedCreatureDies(Creature* summon, Unit* killer) override;

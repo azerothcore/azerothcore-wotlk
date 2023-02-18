@@ -269,11 +269,10 @@ void TempSummon::InitSummon()
                 owner->ToGameObject()->AI()->JustSummoned(this);
             }
         }
-    }
 
-    // Xinef: Allow to call this hook when npc is summoned by gameobject, in this case pass this as summoner to avoid possible null checks
-    if (IsAIEnabled)
-        AI()->IsSummonedBy(owner);
+        if (IsAIEnabled)
+            AI()->IsSummonedBy(owner);
+    }
 }
 
 void TempSummon::SetTempSummonType(TempSummonType type)
@@ -500,7 +499,7 @@ void Puppet::Update(uint32 time)
         if (!IsAlive())
         {
             UnSummon();
-            // TODO: why long distance .die does not remove it
+            /// @todo: why long distance .die does not remove it
         }
     }
 }

@@ -22,6 +22,8 @@
 
 #include "CreatureAIImpl.h"
 
+#define DataHeader "VIO"
+
 #define VioletHoldScriptName "instance_violet_hold"
 
 enum Creatures

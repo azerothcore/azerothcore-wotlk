@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.prospecting_loot_template
+-- Dumping structure for table acore_world.prospecting_loot_template
 DROP TABLE IF EXISTS `prospecting_loot_template`;
 CREATE TABLE IF NOT EXISTS `prospecting_loot_template` (
   `Entry` mediumint unsigned NOT NULL DEFAULT '0',
@@ -28,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `prospecting_loot_template` (
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
--- Dumpar data för tabell acore_world.prospecting_loot_template: 36 rows
+-- Dumping data for table acore_world.prospecting_loot_template: 37 rows
 DELETE FROM `prospecting_loot_template`;
 /*!40000 ALTER TABLE `prospecting_loot_template` DISABLE KEYS */;
 INSERT INTO `prospecting_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -58,18 +60,20 @@ INSERT INTO `prospecting_loot_template` (`Entry`, `Item`, `Reference`, `Chance`,
 	(10620, 12799, 0, 15, 0, 1, 1, 1, 2, 'Large Opal'),
 	(10620, 12800, 0, 15, 0, 1, 1, 1, 2, 'Azerothian Diamond'),
 	(23424, 1, 1000, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
+	(23425, 3, 13001, 15, 0, 1, 1, 1, 1, '(ReferenceTable)'),
+	(23425, 2, 13002, 24, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(23425, 1, 13001, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
-	(23425, 2, 13002, 10, 0, 1, 1, 1, 1, '(ReferenceTable)'),
-	(23425, 24243, 0, 100, 0, 1, 0, 1, 1, 'Adamantite Powder'),
 	(36909, 1, 1001, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(36910, 1, 13005, 20, 0, 1, 0, 1, 1, '(ReferenceTable)'),
 	(36910, 2, 1002, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(36910, 3, 1003, 75, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(36910, 46849, 0, 75, 0, 1, 0, 1, 1, 'Titanium Powder'),
 	(36912, 1, 1003, 85, 0, 1, 0, 1, 1, '(ReferenceTable)'),
-	(36912, 2, 1004, 100, 0, 1, 1, 1, 1, '(ReferenceTable)');
+	(36912, 2, 1004, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
+	(23425, 24243, 0, 100, 0, 1, 0, 1, 1, 'Adamantite Powder');
 /*!40000 ALTER TABLE `prospecting_loot_template` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

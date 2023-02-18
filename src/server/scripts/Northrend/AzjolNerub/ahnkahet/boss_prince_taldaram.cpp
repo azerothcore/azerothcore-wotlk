@@ -131,7 +131,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         DoCastSelf(SPELL_FLAME_SPHERE_SPAWN_EFFECT);
         DoCastSelf(SPELL_FLAME_SPHERE_VISUAL);
 
-        // TODO: replace with DespawnOrUnsummon
+        /// @todo: replace with DespawnOrUnsummon
         uiDespawnTimer = 13000;
     }
 
@@ -320,9 +320,9 @@ struct boss_taldaram : public BossAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
         ScheduleCombatEvents();
 
@@ -490,7 +490,7 @@ private:
     }
 };
 
-// TODO: Turn into new script type when Gossips have been updated
+/// @todo: Turn into new script type when Gossips have been updated
 class go_prince_taldaram_sphere : public GameObjectScript
 {
 public:

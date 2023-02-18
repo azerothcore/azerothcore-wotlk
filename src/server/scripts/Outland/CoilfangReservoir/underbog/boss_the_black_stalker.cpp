@@ -64,7 +64,7 @@ struct boss_the_black_stalker : public BossAI
     {
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         events.ScheduleEvent(EVENT_LEVITATE, urand(8000, 12000));
         events.ScheduleEvent(EVENT_SPELL_CHAIN, 6000);
@@ -73,7 +73,7 @@ struct boss_the_black_stalker : public BossAI
         if (IsHeroic())
             events.ScheduleEvent(EVENT_SPELL_SPORES, urand(10000, 15000));
 
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
     }
 
     void JustSummoned(Creature* summon) override
@@ -139,28 +139,6 @@ struct boss_the_black_stalker : public BossAI
             return;
 
         DoMeleeAttackIfReady();
-    }
-};
-
-class spell_gen_allergies : public AuraScript
-{
-    PrepareAuraScript(spell_gen_allergies);
-
-    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-    {
-        isPeriodic = true;
-        amplitude = urand(10 * IN_MILLISECONDS, 200 * IN_MILLISECONDS);
-    }
-
-    void Update(AuraEffect*  /*effect*/)
-    {
-        SetDuration(0);
-    }
-
-    void Register() override
-    {
-        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_allergies::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_allergies::Update, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -252,7 +230,6 @@ class spell_the_black_stalker_magnetic_pull : public SpellScript
 void AddSC_boss_the_black_stalker()
 {
     RegisterUnderbogCreatureAI(boss_the_black_stalker);
-    RegisterSpellScript(spell_gen_allergies);
     RegisterSpellScript(spell_the_black_stalker_levitate);
     RegisterSpellScript(spell_the_black_stalker_levitation_pulse);
     RegisterSpellScript(spell_the_black_stalker_someone_grab_me);

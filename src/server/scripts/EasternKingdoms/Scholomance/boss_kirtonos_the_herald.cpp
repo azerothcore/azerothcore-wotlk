@@ -85,14 +85,14 @@ public:
         EventMap events2;
         InstanceScript* instance;
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             TransformsCount = 0;
 
             events.Reset();
-            events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 2000);
-            events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 6000);
-            events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 20000);
+            events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 2s);
+            events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 6s);
+            events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 20s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -109,7 +109,7 @@ public:
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             events2.Reset();
-            events2.ScheduleEvent(INTRO_1, 1000);
+            events2.ScheduleEvent(INTRO_1, 1s);
             me->SetDisableGravity(true);
             me->SetReactState(REACT_PASSIVE);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -120,11 +120,11 @@ public:
         {
             if (type == WAYPOINT_MOTION_TYPE && id == POINT_KIRTONOS_LAND)
             {
-                events2.ScheduleEvent(INTRO_2, 1500);
-                events2.ScheduleEvent(INTRO_3, 2500);
-                events2.ScheduleEvent(INTRO_4, 5500);
-                events2.ScheduleEvent(INTRO_5, 6500);
-                events2.ScheduleEvent(INTRO_6, 11500);
+                events2.ScheduleEvent(INTRO_2, 1500ms);
+                events2.ScheduleEvent(INTRO_3, 2500ms);
+                events2.ScheduleEvent(INTRO_4, 5500ms);
+                events2.ScheduleEvent(INTRO_5, 6500ms);
+                events2.ScheduleEvent(INTRO_6, 11500ms);
             }
         }
 
@@ -179,27 +179,27 @@ public:
             {
                 case EVENT_SWOOP:
                     me->CastSpell(me->GetVictim(), SPELL_SWOOP, false);
-                    events.ScheduleEvent(EVENT_SWOOP, 15000);
+                    events.ScheduleEvent(EVENT_SWOOP, 15s);
                     break;
                 case EVENT_WING_FLAP:
                     me->CastSpell(me, SPELL_WING_FLAP, false);
-                    events.ScheduleEvent(EVENT_WING_FLAP, 13000);
+                    events.ScheduleEvent(EVENT_WING_FLAP, 13s);
                     break;
                 case EVENT_PIERCE_ARMOR:
                     me->CastSpell(me->GetVictim(), SPELL_PIERCE_ARMOR, false);
-                    events.ScheduleEvent(EVENT_PIERCE_ARMOR, 12000);
+                    events.ScheduleEvent(EVENT_PIERCE_ARMOR, 12s);
                     break;
                 case EVENT_DISARM:
                     me->CastSpell(me->GetVictim(), SPELL_DISARM, false);
-                    events.ScheduleEvent(EVENT_DISARM, 11000);
+                    events.ScheduleEvent(EVENT_DISARM, 11s);
                     break;
                 case EVENT_SHADOW_BOLT_VOLLEY:
                     me->CastSpell(me, SPELL_SHADOW_BOLT_VOLLEY, false);
-                    events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 10000);
+                    events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 10s);
                     break;
                 case EVENT_CURSE_OF_TONGUES:
                     me->CastSpell(me, SPELL_CURSE_OF_TONGUES, false);
-                    events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 20000);
+                    events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 20s);
                     break;
                 case EVENT_DOMINATE_MIND:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 20.0f, true))
@@ -213,10 +213,10 @@ public:
                     if (me->HasAura(SPELL_KIRTONOS_TRANSFORM))
                     {
                         events.Reset();
-                        events.ScheduleEvent(EVENT_SWOOP, 4000);
-                        events.ScheduleEvent(EVENT_WING_FLAP, 7000);
-                        events.ScheduleEvent(EVENT_PIERCE_ARMOR, 11000);
-                        events.ScheduleEvent(EVENT_DISARM, 15000);
+                        events.ScheduleEvent(EVENT_SWOOP, 4s);
+                        events.ScheduleEvent(EVENT_WING_FLAP, 7s);
+                        events.ScheduleEvent(EVENT_PIERCE_ARMOR, 11s);
+                        events.ScheduleEvent(EVENT_DISARM, 15s);
                         // show shape-shift animation before aura removal
                         me->CastSpell(me, SPELL_TRANSFORM_VISUAL, true);
                         me->RemoveAura(SPELL_KIRTONOS_TRANSFORM);
@@ -225,19 +225,19 @@ public:
                     else
                     {
                         events.Reset();
-                        events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 2000);
-                        events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 6000);
-                        events.ScheduleEvent(EVENT_WING_FLAP, 13000);
+                        events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 2s);
+                        events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 6s);
+                        events.ScheduleEvent(EVENT_WING_FLAP, 13s);
                         me->CastSpell(me, SPELL_KIRTONOS_TRANSFORM, true);
                         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_KIRTONOS_STAFF));
                         // Schedule Dominate Mind on every 2nd caster transform
                         if ((TransformsCount - 2) % 4 == 0)
                         {
-                            events.ScheduleEvent(EVENT_DOMINATE_MIND, urand(4000, 8000));
+                            events.ScheduleEvent(EVENT_DOMINATE_MIND, 4s, 8s);
                         }
                     }
 
-                    events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 20000);
+                    events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 20s);
                     break;
             }
 

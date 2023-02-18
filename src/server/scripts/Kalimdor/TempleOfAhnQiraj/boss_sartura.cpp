@@ -74,9 +74,9 @@ struct boss_sartura : public BossAI
         me->SetReactState(REACT_AGGRESSIVE);
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 12s, 22s);
         events.ScheduleEvent(EVENT_SPELL_BERSERK, 10min);
@@ -181,7 +181,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
         me->SetReactState(REACT_AGGRESSIVE);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 6s, 10s);
         events.ScheduleEvent(EVENT_GUARD_KNOCKBACK, 12s, 16s);

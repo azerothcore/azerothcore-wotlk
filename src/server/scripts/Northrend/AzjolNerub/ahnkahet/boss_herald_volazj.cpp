@@ -112,9 +112,9 @@ struct boss_volazj : public BossAI
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
         events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
         events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);

@@ -101,6 +101,7 @@ enum eEnums
     EVENT_LIGHTNING_TENDRILS    = 24,
     EVENT_LIGHTNING_LAND        = 25,
     EVENT_LAND_LAND             = 26,
+    EVENT_LIGHTNING_FLIGHT      = 27,
 
     EVENT_ENRAGE                = 30
 };
@@ -228,7 +229,7 @@ public:
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (pInstance)
                 pInstance->SetData(TYPE_ASSEMBLY, IN_PROGRESS);
@@ -424,7 +425,7 @@ public:
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             me->InterruptNonMeleeSpells(false);
             me->setActive(true);
@@ -611,7 +612,6 @@ public:
         EventMap events;
         InstanceScript* pInstance;
         uint32 _phase;
-        bool _flyPhase;
         ObjectGuid _flyTargetGUID;
         uint32 _channelTimer;
 
@@ -624,7 +624,6 @@ public:
 
             _channelTimer = 0;
             _phase = 0;
-            _flyPhase = false;
             _flyTargetGUID.Clear();
             _stunnedAchievement = true;
 
@@ -643,7 +642,7 @@ public:
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             me->InterruptNonMeleeSpells(false);
             me->setActive(true);
@@ -754,19 +753,6 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (_flyPhase)
-            {
-                if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
-                {
-                    if (me->GetDistance2d(flyTarget) >= 6)
-                    {
-                        //float speed = me->GetDistance(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ()+15) / (1500.0f * 0.001f);
-                        me->SendMonsterMove(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
-                        me->SetPosition(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ(), flyTarget->GetOrientation());
-                    }
-                }
-            }
-
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -796,34 +782,34 @@ public:
                         events.DelayEvents(18000);
                         Talk(SAY_BRUNDIR_FLIGHT);
 
-                        _flyPhase = true;
                         Unit* oldVictim = me->GetVictim();
                         _flyTargetGUID = oldVictim->GetGUID();
                         me->SetRegeneratingHealth(false);
                         me->SetDisableGravity(true);
+                        me->SetHover(true);
 
                         me->CombatStop();
                         me->StopMoving();
                         me->SetReactState(REACT_PASSIVE);
                         me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                         me->SetUnitFlag(UNIT_FLAG_STUNNED);
-                        me->SendMonsterMove(oldVictim->GetPositionX(), oldVictim->GetPositionY(), oldVictim->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
 
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
                         me->CastSpell(me, 61883, true);
                         events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);
+                        events.ScheduleEvent(EVENT_LIGHTNING_FLIGHT, 1s);
                         break;
                     }
                 case EVENT_LIGHTNING_LAND:
                     {
                         float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
-                        _flyPhase = false;
                         events.ScheduleEvent(EVENT_LAND_LAND, 1000);
                         break;
                     }
                 case EVENT_LAND_LAND:
                     me->SetCanFly(false);
+                    me->SetHover(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetDisableGravity(false);
                     if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
@@ -836,10 +822,18 @@ public:
                     me->RemoveAura(SPELL_LIGHTNING_TENDRILS);
                     me->RemoveAura(61883);
                     DoResetThreatList();
+                    events.CancelEvent(EVENT_LIGHTNING_FLIGHT);
                     break;
                 case EVENT_ENRAGE:
                     Talk(SAY_BRUNDIR_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
+                    break;
+                case EVENT_LIGHTNING_FLIGHT:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                    {
+                        me->GetMotionMaster()->MovePoint(0, *target);
+                    }
+                    events.ScheduleEvent(EVENT_LIGHTNING_FLIGHT, 6s);
                     break;
             }
 

@@ -491,11 +491,10 @@ void Vehicle::RemovePassenger(Unit* unit)
     if (_me->IsFlying() && !_me->GetInstanceId() && unit->GetTypeId() == TYPEID_PLAYER && !(unit->ToPlayer()->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT) && _me->GetEntry() != 30275 /*NPC_WILD_WYRM*/)
         _me->CastSpell(unit, VEHICLE_SPELL_PARACHUTE, true);
 
-    bool isCreature = _me->GetTypeId() == TYPEID_UNIT;
-    if (isCreature && _me->ToCreature()->IsAIEnabled)
+    if (_me->GetTypeId() == TYPEID_UNIT && _me->ToCreature()->IsAIEnabled)
         _me->ToCreature()->AI()->PassengerBoarded(unit, seat->first, false);
 
-    if (isCreature)
+    if (_me && _me->GetTypeId() == TYPEID_UNIT)
         sScriptMgr->OnRemovePassenger(this, unit);
 }
 

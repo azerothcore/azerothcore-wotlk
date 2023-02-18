@@ -117,9 +117,9 @@ public:
             events.Reset();
             summons.DespawnAll();
 
-            events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
-            events.ScheduleEvent(EVENT_SUMMON_ARCHERS, 4000);
-            events.ScheduleEvent(EVENT_SUMMON_PEASANTS, 8000);
+            events.ScheduleEvent(EVENT_CHECK_PLAYER, 1s);
+            events.ScheduleEvent(EVENT_SUMMON_ARCHERS, 4s);
+            events.ScheduleEvent(EVENT_SUMMON_PEASANTS, 8s);
         }
 
         bool CanBeSeen(Player const* player) override

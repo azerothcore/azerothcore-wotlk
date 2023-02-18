@@ -74,15 +74,15 @@ public:
             StartTalking(TALK_SUMMON, 8 * IN_MILLISECONDS);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             Talk(TALK_AGGRO);
 
             events.SetPhase(EVENT_PHASE_FIGHT);
-            events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, urand(6 * IN_MILLISECONDS, 8 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
-            events.ScheduleEvent(EVENT_SHADOW_WRATH, urand(9 * IN_MILLISECONDS, 18 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
+            events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, 6s, 8s, 0, EVENT_PHASE_FIGHT);
+            events.ScheduleEvent(EVENT_SHADOW_WRATH, 9s, 18s, 0, EVENT_PHASE_FIGHT);
         }
 
         void JustDied(Unit* killer) override
@@ -130,7 +130,7 @@ public:
             {
                 frenzy15 = true;
 
-                events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(12 * IN_MILLISECONDS, 19 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
+                events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 12s, 19s, 0, EVENT_PHASE_FIGHT);
 
                 StartTalking(TALK_15_HP, 5 * IN_MILLISECONDS);
             }
@@ -159,15 +159,15 @@ public:
                         break;
                     case EVENT_SUMMON_SPECTRAL_ASSASSIN:
                         DoCast(me, SPELL_SUMMON_SPECTRAL_ASSASSIN);
-                        events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, urand(30 * IN_MILLISECONDS, 35 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
+                        events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, 30s, 35s, 0, EVENT_PHASE_FIGHT);
                         break;
                     case EVENT_SHADOW_BOLT_VOLLEY:
                         DoCastVictim(SPELL_SHADOW_BOLT_VOLLEY);
-                        events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(4 * IN_MILLISECONDS, 6 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
+                        events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 4s, 6s, 0, EVENT_PHASE_FIGHT);
                         break;
                     case EVENT_SHADOW_WRATH:
                         DoCastVictim(SPELL_SHADOW_WRATH);
-                        events.ScheduleEvent(EVENT_SHADOW_WRATH, urand(19 * IN_MILLISECONDS, 24 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
+                        events.ScheduleEvent(EVENT_SHADOW_WRATH, 19s, 24s, 0, EVENT_PHASE_FIGHT);
                         break;
                     default:
                         break;

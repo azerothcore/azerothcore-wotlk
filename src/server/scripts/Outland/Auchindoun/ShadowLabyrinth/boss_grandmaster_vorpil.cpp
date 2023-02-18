@@ -136,7 +136,7 @@ public:
                 instance->SetData(DATA_GRANDMASTERVORPILEVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             summonPortals();

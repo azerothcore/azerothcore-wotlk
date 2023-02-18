@@ -31,7 +31,7 @@ public:
     // Open database. It must be openened before it can be used.
     bool open();
 
-    // TODO: Add a close function?
+    /// @todo: Add a close function?
 
     // Database exceptions
     class Exception

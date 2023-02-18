@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
@@ -175,4 +176,34 @@ bool ScriptMgr::OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid sou
     }
 
     return true;
+}
+
+/**
+ * @brief Called when an instance Id is deleted, usually because it expired or no players are bound to it anymore.
+ *
+ * @param instanceId The unique id of the instance
+ */
+void ScriptMgr::OnInstanceIdRemoved(uint32 instanceId)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnInstanceIdRemoved(instanceId);
+    });
+}
+
+/**
+ * @brief Called when any raid boss has their state updated (e.g. pull, reset, kill).
+ * @details Careful checks for old- and newState are required, since it can fire multiple times and not only when combat starts/ends.
+ *
+ * @param id The id of the boss in the [instance]
+ * @param newState The new boss state to be applied to this boss
+ * @param oldState The previously assigned state of this boss
+ * @param instance A pointer to the [map] object of the instance
+ */
+void ScriptMgr::OnBeforeSetBossState(uint32 id, EncounterState newState, EncounterState oldState, Map* instance)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnBeforeSetBossState(id, newState, oldState, instance);
+    });
 }

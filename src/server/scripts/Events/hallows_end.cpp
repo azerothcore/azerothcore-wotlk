@@ -28,7 +28,7 @@
 #include "SpellScript.h"
 #include "TaskScheduler.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -598,7 +598,7 @@ struct npc_hallows_end_soh : public ScriptedAI
     int32 pos;
     TaskScheduler scheduler;
 
-    void EnterCombat(Unit*) override
+    void JustEngagedWith(Unit*) override
     {
         scheduler.Schedule(6s, [this](TaskContext context)
         {
@@ -679,10 +679,10 @@ struct npc_hallows_end_soh : public ScriptedAI
             unitList.push_back((*itr)->GetGUID());
         }
 
-        events.ScheduleEvent(1, 3000);
-        events.ScheduleEvent(2, 25000);
-        events.ScheduleEvent(2, 43000);
-        events.ScheduleEvent(3, 63000);
+        events.ScheduleEvent(1, 3s);
+        events.ScheduleEvent(2, 25s);
+        events.ScheduleEvent(2, 43s);
+        events.ScheduleEvent(3, 63s);
 
         me->SetReactState(REACT_PASSIVE);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -1034,7 +1034,7 @@ struct boss_headless_horseman : public ScriptedAI
         if (spellInfo->Id == SPELL_SUMMONING_RHYME_TARGET)
         {
             playerGUID = target->GetGUID();
-            events.ScheduleEvent(EVENT_HH_PLAYER_TALK, 2000);
+            events.ScheduleEvent(EVENT_HH_PLAYER_TALK, 2s);
         }
     }
 
@@ -1055,9 +1055,9 @@ struct boss_headless_horseman : public ScriptedAI
             me->Yell("Here's my body, fit and pure! Now, your blackened souls I'll cure!", LANG_UNIVERSAL);
 
             if (phase == 1)
-                events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6000);
+                events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6s);
             else if (phase == 2)
-                events.ScheduleEvent(EVENT_SUMMON_PUMPKIN, 6000);
+                events.ScheduleEvent(EVENT_SUMMON_PUMPKIN, 6s);
         }
     }
 
@@ -1074,15 +1074,15 @@ struct boss_headless_horseman : public ScriptedAI
 
                 me->SetInCombatWithZone();
                 inFight = true;
-                events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500);
-                events.ScheduleEvent(EVENT_HORSEMAN_CLEAVE, 7000);
+                events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500ms);
+                events.ScheduleEvent(EVENT_HORSEMAN_CLEAVE, 7s);
             }
         }
     }
 
     Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : nullptr; }
 
-    void EnterCombat(Unit*) override { me->SetInCombatWithZone(); }
+    void JustEngagedWith(Unit*) override { me->SetInCombatWithZone(); }
     void MoveInLineOfSight(Unit*  /*who*/) override {}
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -1109,8 +1109,8 @@ struct boss_headless_horseman : public ScriptedAI
                 if (phase < 2)
                     phase++;
 
-                events.ScheduleEvent(EVENT_HORSEMAN_WHIRLWIND, 6000);
-                events.ScheduleEvent(EVENT_HORSEMAN_CHECK_HEALTH, 1000);
+                events.ScheduleEvent(EVENT_HORSEMAN_WHIRLWIND, 6s);
+                events.ScheduleEvent(EVENT_HORSEMAN_CHECK_HEALTH, 1s);
             }
         }
     }
