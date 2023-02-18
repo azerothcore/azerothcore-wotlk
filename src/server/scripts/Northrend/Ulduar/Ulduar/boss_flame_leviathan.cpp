@@ -401,6 +401,7 @@ public:
                 case EVENT_POSITION_CHECK:
                     if (me->GetPositionX() > 450 || me->GetPositionX() < 120)
                     {
+                        me->SetFullHealth();
                         EnterEvadeMode();
                         return;
                     }
