@@ -42,9 +42,9 @@ public:
     {
         boss_lucifronAI(Creature* creature) : BossAI(creature, DATA_LUCIFRON) {}
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_IMPENDING_DOOM, 6s, 11s);
             events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 11s, 14s);
             events.ScheduleEvent(EVENT_SHADOW_SHOCK, 5s);

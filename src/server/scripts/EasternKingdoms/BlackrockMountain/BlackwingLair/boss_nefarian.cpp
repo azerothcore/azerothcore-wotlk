@@ -352,7 +352,7 @@ public:
 
         void BeginEvent()
         {
-            _EnterCombat();
+            _JustEngagedWith();
 
             Talk(SAY_GAMESBEGIN_2);
 
@@ -552,7 +552,7 @@ struct boss_nefarian : public BossAI
         classesPresent.clear();
     }
 
-    void EnterCombat(Unit* /*who*/) override {}
+    void JustEngagedWith(Unit* /*who*/) override {}
 
     void JustDied(Unit* /*killer*/) override
     {

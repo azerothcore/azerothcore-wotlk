@@ -75,7 +75,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 5s);
@@ -329,7 +329,7 @@ public:
 
         void Reset() override {}
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (urand(0, 1))
                 Talk(SAY_REM_AGGRO, who);

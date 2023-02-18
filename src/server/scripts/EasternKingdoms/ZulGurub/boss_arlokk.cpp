@@ -115,9 +115,9 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 7s, 9s, 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_GOUGE, 12s, 15s, 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_SUMMON_PROWLERS, 6s, 0, PHASE_ALL);
@@ -341,7 +341,7 @@ public:
             _events.ScheduleEvent(EVENT_ATTACK, 6000);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->GetMotionMaster()->Clear(false);
             me->RemoveAura(SPELL_SNEAK_RANK_1_1);

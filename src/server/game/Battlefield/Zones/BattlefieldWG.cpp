@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// TODO: Implement proper support for vehicle+player teleportation
-// TODO: Use spell victory/defeat in wg instead of RewardMarkOfHonor() && RewardHonor
-// TODO: Add proper implement of achievement
+/// @todo: Implement proper support for vehicle+player teleportation
+/// @todo: Use spell victory/defeat in wg instead of RewardMarkOfHonor() && RewardHonor
+/// @todo: Add proper implement of achievement
 
 #include "BattlefieldWG.h"
 #include "GameTime.h"
@@ -864,7 +864,7 @@ void BattlefieldWG::OnPlayerJoinWar(Player* player)
 
 void BattlefieldWG::OnPlayerLeaveWar(Player* player)
 {
-    // Remove all aura from WG // TODO: false we can go out of this zone on retail and keep Rank buff, remove on end of WG
+    // Remove all aura from WG /// @todo: false we can go out of this zone on retail and keep Rank buff, remove on end of WG
     if (!player->GetSession()->PlayerLogout())
     {
         if (player->GetVehicle())                              // Remove vehicle of player if he go out.

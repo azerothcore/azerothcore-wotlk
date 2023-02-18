@@ -72,9 +72,9 @@ public:
             _JustDied();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             me->AddAura(SPELL_THRASH, me);
             events.ScheduleEvent(EVENT_FROSTBREATH, 8s);
             events.ScheduleEvent(EVENT_MASSIVEGEYSER, 25s);

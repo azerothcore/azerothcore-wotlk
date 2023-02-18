@@ -787,7 +787,7 @@ void SmartAI::JustReachedHome()
     mJustReset = false;
 }
 
-void SmartAI::EnterCombat(Unit* enemy)
+void SmartAI::JustEngagedWith(Unit* enemy)
 {
     // Xinef: Interrupt channeled spells
     if (IsAIControlled())
@@ -811,6 +811,20 @@ void SmartAI::JustSummoned(Creature* creature)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT, creature);
     GetScript()->AddCreatureSummon(creature->GetGUID());
+
+    if (me->IsEngaged() && !creature->IsInEvadeMode())
+    {
+        if (Unit* victim = me->GetVictim())
+        {
+            creature->SetInCombatWith(victim);
+            victim->SetInCombatWith(creature);
+
+            if (creature->CanHaveThreatList())
+            {
+                creature->AddThreat(victim, 0.0f);
+            }
+        }
+    }
 }
 
 void SmartAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
