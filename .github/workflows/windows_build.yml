@@ -24,8 +24,6 @@ jobs:
       BOOST_ROOT: C:\local\boost_1_79_0
     if: |
       github.repository == 'AlvinZhu/azerothcore-wotlk'
-      && !github.event.pull_request.draft
-      && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v2
