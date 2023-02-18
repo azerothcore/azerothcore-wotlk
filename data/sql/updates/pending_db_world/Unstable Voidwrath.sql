@@ -1,4 +1,3 @@
- -- Unstable Voidwraith smart ai
 SET @ENTRY := 18869;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
