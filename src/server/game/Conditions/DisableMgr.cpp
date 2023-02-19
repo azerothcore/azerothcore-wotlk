@@ -44,7 +44,7 @@ namespace DisableMgr
 
         DisableMap m_DisableMap;
 
-        uint8 MAX_DISABLE_TYPES = 10;
+        uint8 MAX_DISABLE_TYPES = 11;
     }
 
     void LoadDisables()
@@ -258,6 +258,8 @@ namespace DisableMgr
                         }
                         break;
                     }
+                    case DISABLE_TYPE_LOOT:
+                        break;
                 default:
                     break;
             }
