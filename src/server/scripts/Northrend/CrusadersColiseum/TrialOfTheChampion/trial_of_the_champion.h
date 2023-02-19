@@ -147,7 +147,7 @@ enum eNpcs
     NPC_RISEN_ARELAS                                = 35564,
     NPC_TIRION                                      = 33628, // Possibly wrong npc here, 34996 had already populated creature_text (from ToC25) that matches. Needs a sniff to confirm.
 
-    // @todo: Argent Raid Spectator - FX - Missing spawns for Toc5 (map 650), ToC25 probably matches positions, needs a sniff to confirm.
+    /// @todo: Argent Raid Spectator - FX - Missing spawns for Toc5 (map 650), ToC25 probably matches positions, needs a sniff to confirm.
     // Horde
     NPC_SPECTATOR_HORDE                             = 34883,
     NPC_SPECTATOR_BELF                              = 34904,

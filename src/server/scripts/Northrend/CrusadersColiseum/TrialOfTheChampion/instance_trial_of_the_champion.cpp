@@ -25,16 +25,16 @@
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
 
-/*
-    @todo: Missing dialog/RP (already populated in DB) && spawns (can use ToC25 locations?) for:
-
-    Garrosh Hellscream 34995
-    King Varian Wrynn 34990
-    Lady Jaina Proudmoore 34992 (missing in DB)
-    Thrall 34994
-
-    And possibly NPC_TIRION 33628 is wrong (should be 34996, from ToC25, needs a sniff to confirm, check .h)
-*/
+/**
+ *  @todo: Missing dialog/RP (already populated in DB) && spawns (can use ToC25 locations?) for:
+ *
+ *    Garrosh Hellscream 34995
+ *    King Varian Wrynn 34990
+ *   Lady Jaina Proudmoore 34992 (missing in DB)
+ *   Thrall 34994
+ *
+ *  And possibly NPC_TIRION 33628 is wrong (should be 34996, from ToC25, needs a sniff to confirm, check .h)
+ */
 
 class Group;
 
@@ -778,7 +778,7 @@ public:
             if (!shortver)
                 if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                 {
-                    announcer->AI()->Talk(TEXT_ID); // @todo: Missing Argent Raid Spectator cheers.
+                    announcer->AI()->Talk(TEXT_ID); /// @todo: Missing Argent Raid Spectator cheers.
                 }
         }
 
