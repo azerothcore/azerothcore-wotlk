@@ -129,6 +129,8 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     m_TutorialsChanged(false),
     recruiterId(recruiter),
     isRecruiter(isARecruiter),
+    expireTime(60000), // 1 min after socket loss, session is deleted
+    forceExit(false),
     m_currentVendorEntry(0),
     _calendarEventCreationCooldown(0),
     _addonMessageReceiveCount(0),
@@ -140,7 +142,6 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
 
     _offlineTime = 0;
     _kicked = false;
-    _shouldSetOfflineInDB = true;
 
     _timeSyncNextCounter = 0;
     _timeSyncTimer = 0;
@@ -174,8 +175,7 @@ WorldSession::~WorldSession()
     while (_recvQueue.next(packet))
         delete packet;
 
-    if (GetShouldSetOfflineInDB())
-        LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
+    LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
 }
 
 std::string const& WorldSession::GetPlayerName() const
@@ -332,7 +332,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
                     if (!m_playerRecentlyLogout)
                     {
-                        // requeuePackets.push_back(packet);
+                        requeuePackets.push_back(packet);
                         deletePacket = false;
 
                         LOG_DEBUG("network", "Re-enqueueing packet with opcode {} with with status STATUS_LOGGEDIN. "
@@ -512,13 +512,15 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             if (GetPlayer() && _warden)
                 _warden->Update(diff);
 
-            m_Socket = nullptr;
+            expireTime -= expireTime > diff ? diff : expireTime;
+            if (expireTime < diff || forceExit || !GetPlayer())
+            {
+                m_Socket = nullptr;
+            }
         }
 
         if (!m_Socket)
-        {
-            return false;
-        }
+            return false;                                       //Will remove this session from the world session map
     }
 
     return true;

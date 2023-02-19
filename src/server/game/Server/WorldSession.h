@@ -1066,8 +1066,6 @@ public:                                                 // opcodes handlers
     uint32 GetOfflineTime() const { return _offlineTime; }
     bool IsKicked() const { return _kicked; }
     void SetKicked(bool val) { _kicked = val; }
-    void SetShouldSetOfflineInDB(bool val) { _shouldSetOfflineInDB = val; }
-    bool GetShouldSetOfflineInDB() const { return _shouldSetOfflineInDB; }
     bool IsSocketClosed() const;
 
     /*
@@ -1172,12 +1170,13 @@ private:
     AddonsList m_addonsList;
     uint32 recruiterId;
     bool isRecruiter;
+    uint32 expireTime;
+    bool forceExit;
     LockedQueue<WorldPacket*> _recvQueue;
     uint32 m_currentVendorEntry;
     ObjectGuid m_currentBankerGUID;
     uint32 _offlineTime;
     bool _kicked;
-    bool _shouldSetOfflineInDB;
     // Packets cooldown
     time_t _calendarEventCreationCooldown;
 
