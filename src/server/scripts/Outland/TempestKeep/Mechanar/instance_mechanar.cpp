@@ -46,11 +46,6 @@ public:
             _passageGUIDs.clear();
         }
 
-        void Initialize() override
-        {
-            _passageEncounter = GetPersistentData(DATA_INDEX_PASSAGE_ENCOUNTER);
-        }
-
         void OnGameObjectCreate(GameObject* gameObject) override
         {
             switch (gameObject->GetEntry())
