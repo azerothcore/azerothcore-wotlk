@@ -70,7 +70,7 @@ namespace DisableMgr
         do
         {
             fields = result->Fetch();
-            DisableType type = DisableType(fields[0].Get<uint32>());
+            uint32 type = fields[0].Get<uint32>();
             if (type >= MAX_DISABLE_TYPES)
             {
                 LOG_ERROR("sql.sql", "Invalid type {} specified in `disables` table, skipped.", type);
@@ -258,8 +258,6 @@ namespace DisableMgr
                     }
                     case DISABLE_TYPE_LOOT:
                         break;
-                    case MAX_DISABLE_TYPES: // Addresses compile warning on Unix...
-                        continue;
                 default:
                     break;
             }
