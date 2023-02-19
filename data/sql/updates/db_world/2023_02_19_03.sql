@@ -1,3 +1,4 @@
+-- DB update 2023_02_19_02 -> 2023_02_19_03
 --
 DELETE FROM `waypoints` WHERE `entry`=17848;
 
