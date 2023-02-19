@@ -1,8 +1,4 @@
-/*
-	SAI Script for Earthmender Wilda and Escape from Coilskar Cistern Quest
-		IT SHOULD USE SPELL 35937 (Summon Ambush) INSTEAD
-		Spell is not scripted
-*/
+-- 
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`|32768, `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 21027);
 
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 21027);
@@ -213,3 +209,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2102903, 9, 3, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 60, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Water Spirit - Actionlist - Set Fly Off'),
 (2102903, 9, 4, 0, 0, 0, 100, 0, 800, 800, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Water Spirit - Actionlist - Say Line 0'),
 (2102903, 9, 5, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 29, 2, 180, 0, 0, 0, 0, 10, 25119, 21027, 0, 0, 0, 0, 0, 0, 'Captured Water Spirit - Actionlist - Start Follow Closest Creature \'Earthmender Wilda\'');
+
+-- Fix for serverside spell
+UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 64, `EffectBasePoints_1` = 1 WHERE `ID` = 35937;
