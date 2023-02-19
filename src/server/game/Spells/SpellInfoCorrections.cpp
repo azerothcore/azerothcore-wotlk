@@ -4459,10 +4459,10 @@ void SpellMgr::LoadSpellInfoCorrections()
         }
     });
 
-     // Cannon Blast ICC Horde an Alliance GUn
+     // Horde an Alliance Gunship-Fight, fix for the Cannon-Blast. Gaining power on shot and not on hit
     ApplySpellFix({ 69399, 70172 }, [](SpellInfo* spellInfo)
     {
-        //set spellefect power gain of cannon to 0 , to handle it in spellscript
+        //Dsiable spelleffect 1 "power/rage gain", to handle it in spellscript
         spellInfo->Effects[EFFECT_1].Effect = 0;
     });
 
