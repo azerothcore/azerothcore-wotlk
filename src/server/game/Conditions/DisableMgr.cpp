@@ -303,9 +303,9 @@ namespace DisableMgr
 
     bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags)
     {
-        if (type < MAX_DISABLE_TYPES)
+        if (type > MAX_DISABLE_TYPES)
         {
-            LOG_ERROR("server", "Disables::IsDisabledFor() called with unknown disable type {}, entry {}, flags {}", type, entry, flags);
+            LOG_ERROR("server", "Disables::IsDisabledFor() called with unknown disable type {}, entry {}, flags {}.", type, entry, flags);
             return false;
         }
 
