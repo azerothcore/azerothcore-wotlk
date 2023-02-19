@@ -144,7 +144,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2102703, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Earthmender Wilda - Actionlist - Set Reactstate Aggressive'),
 
 (2102704, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 6, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Earthmender Wilda - Actionlist - Say Line 6'),
-(2102704, 9, 1, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 53, 0, 2102702, 6000, 10451, 0, 2, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Earthmender Wilda - Actionlist - Start Waypoint'),
+(2102704, 9, 1, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 53, 0, 2102702, 0, 10451, 6000, 2, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Earthmender Wilda - Actionlist - Start Waypoint'),
 
 (2102705, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 7, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Earthmender Wilda - Actionlist - Say Line 7'),
 (2102705, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 2, 2, 0, 0, 0, 0, 9, 21029, 0, 100, 0, 0, 0, 0, 0, 'Earthmender Wilda - Actionlist - Set Data 2 2'),
