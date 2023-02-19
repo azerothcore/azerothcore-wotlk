@@ -90,10 +90,13 @@ enum Misc
     SPELL_TELEPORT_VISUAL               = 7791,
 
     EVENT_NEXT_PORTAL                   = 1,
-    EVENT_SUMMON_KEEPER                 = 2,
-    EVENT_WIPE_1                        = 3,
-    EVENT_WIPE_2                        = 4,
-    EVENT_WIPE_3                        = 5,
+    EVENT_SUMMON_KEEPER_1               = 2,
+    EVENT_SUMMON_KEEPER_2               = 3,
+    EVENT_SUMMON_KEEPER_3               = 4,
+    EVENT_SUMMON_KEEPER_4               = 5,
+    EVENT_WIPE_1                        = 6,
+    EVENT_WIPE_2                        = 7,
+    EVENT_WIPE_3                        = 8,
 
     ACTION_OUTRO                        = 1
 };

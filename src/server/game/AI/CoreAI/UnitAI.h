@@ -375,6 +375,9 @@ public:
     SpellCastResult DoCastAOE(uint32 spellId, bool triggered = false);
     SpellCastResult DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false);
 
+    // Cast spell on the top threat target, which may not be the current victim.
+    SpellCastResult DoCastMaxThreat(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false);
+
     float DoGetSpellMaxRange(uint32 spellId, bool positive = false);
 
     void DoMeleeAttackIfReady();
