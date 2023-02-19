@@ -43,6 +43,8 @@ namespace DisableMgr
         typedef std::map<DisableType, DisableTypeMap> DisableMap;
 
         DisableMap m_DisableMap;
+
+        uint8 MAX_DISABLE_TYPES = 11;
     }
 
     void LoadDisables()
@@ -70,7 +72,7 @@ namespace DisableMgr
         do
         {
             fields = result->Fetch();
-            uint32 type = fields[0].Get<uint32>();
+            DisableType type = DisableType(fields[0].Get<uint32>());
             if (type >= MAX_DISABLE_TYPES)
             {
                 LOG_ERROR("sql.sql", "Invalid type {} specified in `disables` table, skipped.", type);
@@ -258,11 +260,13 @@ namespace DisableMgr
                     }
                     case DISABLE_TYPE_LOOT:
                         break;
+                    case MAX_DISABLE_TYPES: // Addresses compile warning on Unix...
+                        continue;
                 default:
                     break;
             }
 
-            m_DisableMap[DisableType(type)].insert(DisableTypeMap::value_type(entry, data));
+            m_DisableMap[type].insert(DisableTypeMap::value_type(entry, data));
             ++total_count;
         } while (result->NextRow());
 
