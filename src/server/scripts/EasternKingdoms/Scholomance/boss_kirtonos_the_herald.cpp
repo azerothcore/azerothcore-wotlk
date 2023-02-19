@@ -118,22 +118,18 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data) override
+        void DoAction(int32 action) override
         {
-            // Serves only to start the movement event, the boss doesn't really need to store data.
-            if (type == DATA_KIRTONOS_THE_HERALD)
+            if (action == IN_PROGRESS)
             {
-                if (data == IN_PROGRESS)
-                {
-                    events2.Reset();
-                    events2.ScheduleEvent(INTRO_1, 1s);
-                    me->SetCanFly(true);
-                    me->SetDisableGravity(true);
-                    me->SendMovementFlagUpdate();
-                    me->SetReactState(REACT_PASSIVE);
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetImmuneToAll(true); // for some reason he aggroes if we don't have this.
-                }
+                events2.Reset();
+                events2.ScheduleEvent(INTRO_1, 1s);
+                me->SetCanFly(true);
+                me->SetDisableGravity(true);
+                me->SendMovementFlagUpdate();
+                me->SetReactState(REACT_PASSIVE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(true); // for some reason he aggroes if we don't have this.
             }
         }
 
