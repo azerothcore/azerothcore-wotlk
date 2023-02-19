@@ -43,8 +43,6 @@ namespace DisableMgr
         typedef std::map<DisableType, DisableTypeMap> DisableMap;
 
         DisableMap m_DisableMap;
-
-        uint8 MAX_DISABLE_TYPES = 11;
     }
 
     void LoadDisables()
@@ -305,7 +303,12 @@ namespace DisableMgr
 
     bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags)
     {
-        ASSERT(type < MAX_DISABLE_TYPES);
+        if (type < MAX_DISABLE_TYPES)
+        {
+            LOG_ERROR("server", "Disables::IsDisabledFor() called with unknown disable type {}, entry {}, flags {}", type, entry, flags);
+            return false;
+        }
+
         if (m_DisableMap[type].empty())
             return false;
 
