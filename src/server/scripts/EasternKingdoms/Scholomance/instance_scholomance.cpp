@@ -133,7 +133,7 @@ public:
                             {
                                 if (Creature* kirtonos = instance->SummonCreature(NPC_KIRTONOS, KirtonosSpawn))
                                 {
-                                    kirtonos ->AI()->SetData(DATA_KIRTONOS_THE_HERALD, IN_PROGRESS); // Set the status of the boss to start the event
+                                    kirtonos->AI()->DoAction(IN_PROGRESS);
                                 }
                                 if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
                                 {
