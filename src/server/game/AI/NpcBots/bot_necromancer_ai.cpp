@@ -372,6 +372,8 @@ public:
             CheckRaiseDead(diff);
             CheckUnholyFrenzy(diff);
 
+            CheckUsableItems(diff);
+
             Attack(diff);
         }
 

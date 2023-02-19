@@ -566,6 +566,8 @@ public:
             if (!CheckAttackTarget())
                 return;
 
+            CheckUsableItems(diff);
+
             Attack(diff);
         }
 

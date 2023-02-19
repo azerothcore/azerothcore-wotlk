@@ -266,6 +266,14 @@ enum BotMountSpells : uint32
 };
 constexpr std::size_t NUM_MOUNTS_PER_SPEED = 3;
 
+enum BotItemUseSpellTargeting : uint8
+{
+    BOT_ITEM_USE_SPELL_TARGET_NONE         = 0,
+    BOT_ITEM_USE_SPELL_TARGET_SELF         = 1,
+    BOT_ITEM_USE_SPELL_TARGET_ATTACKTARGET = 2,
+    BOT_ITEM_USE_SPELL_TARGET_ALLY         = 3
+};
+
 SpellInfo const* GetBotSpellInfoOverride(uint32 spellId);
 SpellInfo const* AssertBotSpellInfoOverride(uint32 spellId);
 SpellProcEntry const* GetBotSpellProceEntryOverride(uint32 spellId);

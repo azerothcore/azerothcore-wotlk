@@ -749,6 +749,8 @@ public:
             CheckFlare(diff);
             CheckReadiness(diff);
 
+            CheckUsableItems(diff);
+
             DoRangedAttack(diff);
         }
 

@@ -287,6 +287,8 @@ public:
             if (ProcessImmediateNonAttackTarget())
                 return;
 
+            CheckUsableItems(diff);
+
             CheckSprint(diff);
             CheckCloakOfShadows(diff);
             CheckVanish(diff);

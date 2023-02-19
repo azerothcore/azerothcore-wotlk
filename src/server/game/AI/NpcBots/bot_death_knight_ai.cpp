@@ -611,6 +611,8 @@ public:
             if (!CheckAttackTarget())
                 return;
 
+            CheckUsableItems(diff);
+
             DoNormalAttack(diff);
         }
 
