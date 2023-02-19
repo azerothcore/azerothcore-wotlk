@@ -414,6 +414,11 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
         return false;
     }
 
+    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_LOOT, itemid, nullptr))
+    {
+        return false;
+    }
+
     bool isMasterLooter = player->GetGroup() && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID();
     bool itemVisibleForMasterLooter = !needs_quest && (!follow_loot_rules || !is_underthreshold);
 
@@ -429,11 +434,6 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
             }
         }
 
-        return false;
-    }
-
-    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_LOOT, itemid, nullptr))
-    {
         return false;
     }
 
