@@ -260,8 +260,6 @@ namespace DisableMgr
                     }
                     case DISABLE_TYPE_LOOT:
                         break;
-                    case MAX_DISABLE_TYPES: // Addresses compile warning on Unix...
-                        continue;
                 default:
                     break;
             }
