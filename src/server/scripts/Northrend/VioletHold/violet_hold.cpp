@@ -24,8 +24,8 @@
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 
-// @todo: Missing Sinclari Trigger announcements (32204) Look at its creature_text for more info.
-// @todo: Activation Crystals (go_vh_activation_crystal) (193611) are spammable, should be a 1 time use per crystal.
+/// @todo: Missing Sinclari Trigger announcements (32204) Look at its creature_text for more info.
+/// @todo: Activation Crystals (go_vh_activation_crystal) (193611) are spammable, should be a 1 time use per crystal.
 
 enum Texts
 {
