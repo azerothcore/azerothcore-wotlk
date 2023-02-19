@@ -1,3 +1,4 @@
+-- DB update 2023_02_19_07 -> 2023_02_19_08
 -- 
 DELETE FROM `gameobject_queststarter` WHERE (`quest` = 2954) AND (`id` IN (142343));
 INSERT INTO `gameobject_queststarter` (`id`, `quest`) VALUES
