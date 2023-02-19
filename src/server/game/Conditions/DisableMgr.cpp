@@ -262,7 +262,7 @@ namespace DisableMgr
                     break;
             }
 
-            m_DisableMap[type].insert(DisableTypeMap::value_type(entry, data));
+            m_DisableMap[DisableType(type)].insert(DisableTypeMap::value_type(entry, data));
             ++total_count;
         } while (result->NextRow());
 
