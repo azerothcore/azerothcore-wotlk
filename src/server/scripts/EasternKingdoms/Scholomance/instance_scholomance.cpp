@@ -131,7 +131,11 @@ public:
                             // summon kirtonos and close door
                             if (_kirtonosState == NOT_STARTED)
                             {
-                                instance->SummonCreature(NPC_KIRTONOS, KirtonosSpawn);
+                                TempSummon* sum = instance->SummonCreature(NPC_KIRTONOS, KirtonosSpawn);
+                                if(sum)
+                                {
+                                    sum->AI()->SetData(DATA_KIRTONOS_THE_HERALD, IN_PROGRESS); // Set the status of the boss to start the event
+                                }
                                 if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
                                 {
                                     gate->SetGoState(GO_STATE_READY);
