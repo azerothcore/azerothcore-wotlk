@@ -213,6 +213,8 @@ public:
             if (!CheckAttackTarget())
                 return;
 
+            CheckUsableItems(diff);
+
             CheckSleep(diff);
 
             Attack(diff);

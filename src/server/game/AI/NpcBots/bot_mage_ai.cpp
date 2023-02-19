@@ -397,6 +397,8 @@ public:
             if (me->HasInvisibilityAura())
                 return;
 
+            CheckUsableItems(diff);
+
             DoNormalAttack(diff);
         }
 

@@ -398,6 +398,8 @@ public:
                 return;
             }
 
+            CheckUsableItems(diff);
+
             Attack(diff);
         }
 

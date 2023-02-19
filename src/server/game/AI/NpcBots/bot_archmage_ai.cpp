@@ -170,6 +170,8 @@ public:
             if (IsCasting())
                 return;
 
+            CheckUsableItems(diff);
+
             Attack(diff);
         }
 
