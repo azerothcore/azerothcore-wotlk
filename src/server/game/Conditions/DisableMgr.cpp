@@ -307,7 +307,7 @@ namespace DisableMgr
     {
         if (type > MAX_DISABLE_TYPES)
         {
-            LOG_ERROR("server", "Disables::IsDisabledFor() called with unknown disable type {}, entry {}, flags {}.", type, entry, flags);
+            LOG_ERROR("server", "Disables::IsDisabledFor() called with unknown disable type {}!  (entry {}, flags {}).", type, entry, flags);
             return false;
         }
 
