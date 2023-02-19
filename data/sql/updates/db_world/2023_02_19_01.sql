@@ -1,3 +1,4 @@
+-- DB update 2023_02_19_00 -> 2023_02_19_01
 -- Add Burning Spikes to Domesticated Helboar
 UPDATE `creature_template_addon` SET `bytes2` = 0, `auras` = '33908' WHERE (`entry` = 21195);
 
