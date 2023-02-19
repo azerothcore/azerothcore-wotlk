@@ -389,6 +389,8 @@ namespace DisableMgr
                 return true;
             case DISABLE_TYPE_GAME_EVENT:
                 return true;
+            case DISABLE_TYPE_LOOT:
+                return true;
         }
 
         return false;

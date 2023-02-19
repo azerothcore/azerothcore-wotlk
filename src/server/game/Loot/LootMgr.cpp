@@ -17,6 +17,7 @@
 
 #include "LootMgr.h"
 #include "Containers.h"
+#include "DisableMgr.h"
 #include "Group.h"
 #include "Log.h"
 #include "ObjectMgr.h"
@@ -428,6 +429,11 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
             }
         }
 
+        return false;
+    }
+
+    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_LOOT, itemid, nullptr))
+    {
         return false;
     }
 
