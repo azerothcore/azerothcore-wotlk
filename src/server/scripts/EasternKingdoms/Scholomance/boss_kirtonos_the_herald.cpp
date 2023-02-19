@@ -106,16 +106,6 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void IsSummonedBy(WorldObject* /*summoner*/) override
-        {
-            events2.Reset();
-            events2.ScheduleEvent(INTRO_1, 1s);
-            me->SetDisableGravity(true);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->SetImmuneToAll(true); // for some reason he aggroes if we don't have this.
-        }
-
         void MovementInform(uint32 type, uint32 id) override
         {
             if (type == WAYPOINT_MOTION_TYPE && id == POINT_KIRTONOS_LAND)
@@ -125,6 +115,21 @@ public:
                 events2.ScheduleEvent(INTRO_4, 5500ms);
                 events2.ScheduleEvent(INTRO_5, 6500ms);
                 events2.ScheduleEvent(INTRO_6, 11500ms);
+            }
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == IN_PROGRESS)
+            {
+                events2.Reset();
+                events2.ScheduleEvent(INTRO_1, 1s);
+                me->SetCanFly(true);
+                me->SetDisableGravity(true);
+                me->SendMovementFlagUpdate();
+                me->SetReactState(REACT_PASSIVE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(true); // for some reason he aggroes if we don't have this.
             }
         }
 
@@ -148,6 +153,7 @@ public:
                     me->SetCanFly(false);
                     me->SetDisableGravity(false);
                     me->CastSpell(me, SPELL_KIRTONOS_TRANSFORM, true);
+                    me->SendMovementFlagUpdate();
                     break;
                 case INTRO_5:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
