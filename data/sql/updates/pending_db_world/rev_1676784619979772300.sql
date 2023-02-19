@@ -1,6 +1,6 @@
 /*
 	SAI Script for Earthmender Wilda and Escape from Coilskar Cistern Quest
-		SUMMON IS HACKED. IT SHOULD USE SPELL 35937 (Summon Ambush) INSTEAD
+		IT SHOULD USE SPELL 35937 (Summon Ambush) INSTEAD
 		Spell is not scripted
 */
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`|32768, `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 21027);
