@@ -1954,7 +1954,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(uint32 text, uint32 id)
+        void Say(uint8 text, uint32 id)
         {
             Creature* creature = me->FindNearestCreature(id, 50);
             if (!creature)
@@ -2041,7 +2041,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(uint32 text, uint32 id)
+        void Say(uint8 text, uint32 id)
         {
             Creature* creature = me->FindNearestCreature(id, 50);
             if (!creature)
@@ -2136,7 +2136,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(uint32 text, uint32 id)
+        void Say(uint8 text, uint32 id)
         {
             Creature* creature = me->FindNearestCreature(id, 50);
             if (!creature)
