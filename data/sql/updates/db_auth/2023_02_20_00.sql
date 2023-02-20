@@ -1,3 +1,4 @@
+-- DB update 2023_01_31_00 -> 2023_02_20_00
 --
 DROP TABLE IF EXISTS `motd`;
 CREATE TABLE `motd` (

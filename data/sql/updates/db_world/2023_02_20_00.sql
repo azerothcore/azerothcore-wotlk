@@ -1,3 +1,4 @@
+-- DB update 2023_02_19_11 -> 2023_02_20_00
 --
 DELETE FROM `command` WHERE `name` = 'reload motd';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
