@@ -1170,8 +1170,6 @@ private:
     AddonsList m_addonsList;
     uint32 recruiterId;
     bool isRecruiter;
-    uint32 expireTime;
-    bool forceExit;
     LockedQueue<WorldPacket*> _recvQueue;
     uint32 m_currentVendorEntry;
     ObjectGuid m_currentBankerGUID;

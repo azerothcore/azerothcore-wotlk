@@ -129,8 +129,6 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     m_TutorialsChanged(false),
     recruiterId(recruiter),
     isRecruiter(isARecruiter),
-    expireTime(60000), // 1 min after socket loss, session is deleted
-    forceExit(false),
     m_currentVendorEntry(0),
     _calendarEventCreationCooldown(0),
     _addonMessageReceiveCount(0),
@@ -512,11 +510,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             if (GetPlayer() && _warden)
                 _warden->Update(diff);
 
-            expireTime -= expireTime > diff ? diff : expireTime;
-            if (expireTime < diff || forceExit || !GetPlayer())
-            {
-                m_Socket = nullptr;
-            }
+            m_Socket = nullptr;
         }
 
         if (!m_Socket)
