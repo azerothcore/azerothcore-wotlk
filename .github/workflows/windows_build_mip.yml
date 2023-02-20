@@ -26,7 +26,7 @@ jobs:
       github.repository == 'AlvinZhu/azerothcore-wotlk'
     steps:
       - name: Checkout repository and submodules
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Configure OS
@@ -64,7 +64,7 @@ jobs:
           cp "/c/tools/mysql/current/lib/libmysql.dll" "env/dist"
           cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "env/dist"
           cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "env/dist"
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: windows-2022-MSVC17-release
           path: env/dist
