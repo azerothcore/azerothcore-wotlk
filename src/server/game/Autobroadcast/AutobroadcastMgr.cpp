@@ -111,18 +111,19 @@ void AutobroadcastMgr::SendAutobroadcasts()
         msg = _autobroadcasts[urand(0, _autobroadcasts.size())];
     }
 
-    if (_announceType == AnnounceType::World)
+    switch (_announceType)
     {
+    case AnnounceType::World:
         SendWorldAnnouncement(msg);
-    }
-    else if (_announceType == AnnounceType::Notification)
-    {
+        break;
+    case AnnounceType::Notification:
         SendNotificationAnnouncement(msg);
-    }
-    else if (_announceType == AnnounceType::Both)
-    {
+        break;
+    case AnnounceType::Both:
         SendWorldAnnouncement(msg);
         SendNotificationAnnouncement(msg);
+    default:
+        break;
     }
 
     LOG_DEBUG("autobroadcast", "AutobroadcastMgr::SendAutobroadcasts: '{}'", msg);
