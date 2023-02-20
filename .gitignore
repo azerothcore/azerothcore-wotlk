@@ -93,3 +93,4 @@ local.properties
 /*
 !modules
 !/src/server/game/util
+modules/mod-eluna
