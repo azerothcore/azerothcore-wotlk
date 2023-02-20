@@ -514,7 +514,9 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         }
 
         if (!m_Socket)
+        {
             return false;                                       //Will remove this session from the world session map
+        }
     }
 
     return true;

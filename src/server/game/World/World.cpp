@@ -2953,7 +2953,6 @@ void World::UpdateSessions(uint32 diff)
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
                 _disconnects[pSession->GetAccountId()] = GameTime::GetGameTime().count();
             _sessions.erase(itr);
-
             delete pSession;
         }
     }
