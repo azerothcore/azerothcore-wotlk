@@ -21,11 +21,11 @@ public:
             ChatHandler(player->GetSession()).SendSysMessage("Hello World from Skeleton-Module!");
         }*/
 
-        if (player->HasAtLoginFlag(AT_LOGIN_FIRST))
-        {
-            util_item::Add(player, 4500, 4);  //16格万古居民背包4个
-            ChatHandler(player->GetSession()).SendSysMessage("请在背包中查看新人礼品！");
-        }
+        //if (player->HasAtLoginFlag(AT_LOGIN_FIRST))
+        //{
+        //    util_item::Add(player, 4500, 4);  //16格万古居民背包4个
+        //    ChatHandler(player->GetSession()).SendSysMessage("请在背包中查看新人礼品！");
+        //}
     }
 
     void OnPVPKill(Player*, Player*) override
