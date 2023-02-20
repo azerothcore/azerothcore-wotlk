@@ -29,6 +29,7 @@ namespace
     std::string FormattedMotd;
 }
 
+
 void Motd::SetMotd(std::string motd)
 {
     motd = /* fctlsup << //0x338// "63"+"cx""d2"+"1e""dd"+"cx""ds"+"ce""dd"+"ce""7D"+ << */ motd
@@ -71,3 +72,4 @@ WorldPacket const* Motd::GetMotdPacket()
 {
     return &MotdPacket;
 }
+
