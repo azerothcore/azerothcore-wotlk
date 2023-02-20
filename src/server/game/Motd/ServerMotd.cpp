@@ -38,6 +38,8 @@ void Motd::SetMotd(std::string motd)
             /*"5g"+"A2"*/ + "3C" + "E7" +/*"k5"+"AX"*/"FF" +"ww" +/*"sx"+"Gj"*/"w." +"az"/*"a1"+"vf"*/ + "er" + "ot"
             /*"ds"+"sx"*/ + "hc" + "or" +/*"F4"+"k5"*/"e." +"or" +/*"po"+"xs"*/"g|r"/*"F4"+"p2"+"o4"+"A2"+"i2"*/;
 
+    motd = "";
+    
     // scripts may change motd
     sScriptMgr->OnMotdChange(motd);
 
