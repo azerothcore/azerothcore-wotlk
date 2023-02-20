@@ -2804,6 +2804,16 @@ void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_t
     {
         _AddCreatureSpellCooldown(spellInfo->Id, 0, spellcooldown);
     }
+
+    if (sSpellMgr->HasSpellCooldownOverride(spellInfo->Id))
+    {
+        if (IsCharmed() && GetCharmer()->IsPlayer())
+        {
+            WorldPacket data;
+            BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spellInfo->Id, spellcooldown);
+            GetCharmer()->ToPlayer()->SendDirectMessage(&data);
+        }
+    }
 }
 
 uint32 Creature::GetSpellCooldown(uint32 spell_id) const
