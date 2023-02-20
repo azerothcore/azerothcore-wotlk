@@ -326,7 +326,7 @@ struct npc_time_rift : public NullCreatureAI
                     Creature* riftKeeper = ObjectAccessor::GetCreature(*me, _riftKeeperGUID);
                     if (!riftKeeper || !riftKeeper->IsAlive())
                     {
-                        _instance->SetData(DATA_RIFT_KILLED, 1);
+                        _instance->SetGuidData(DATA_RIFT_KILLED, me->GetGUID());
 
                         me->DespawnOrUnsummon(0);
                         break;
