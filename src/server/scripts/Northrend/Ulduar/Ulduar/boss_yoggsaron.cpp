@@ -1209,7 +1209,7 @@ public:
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_YS_DEAFENING_ROAR:
-                    Talk(SAY_YOGG_SARON_DEAFENING_ROAR);                    
+                    Talk(SAY_YOGG_SARON_DEAFENING_ROAR);
                     Talk(EMOTE_YOGG_SARON_DEAFENING_ROAR);
                     me->CastSpell(me, SPELL_DEAFENING_ROAR, false);
                     events.RepeatEvent(50000);
