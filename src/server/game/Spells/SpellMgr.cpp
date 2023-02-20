@@ -3460,7 +3460,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
         if (sSpellMgr->HasSpellCooldownOverride(spellInfo->Id))
         {
             SpellCooldownOverride spellOverride = sSpellMgr->GetSpellCooldownOverride(spellInfo->Id);
-            LOG_ERROR("sql.sql", "Correcting {}", spellInfo->Id);
+
             if (spellInfo->RecoveryTime != spellOverride.RecoveryTime)
             {
                 spellInfo->RecoveryTime = spellOverride.RecoveryTime;
