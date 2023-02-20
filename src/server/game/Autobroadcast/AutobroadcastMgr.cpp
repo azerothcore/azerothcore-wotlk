@@ -50,7 +50,7 @@ void AutobroadcastMgr::LoadAutobroadcasts()
 
     if (_announceType < AnnounceType::World || _announceType > AnnounceType::Both)
     {
-        LOG_ERROR("autobroadcast", "AutobroadcastMgr: Config option AutoBroadcast.Center set to not allowed value {}. Set to default value 0", (int8)_announceType);
+        LOG_ERROR("autobroadcast", "AutobroadcastMgr::LoadAutobroadcasts: Config option AutoBroadcast.Center set to not allowed value {}. Set to default value 0", (int8)_announceType);
         _announceType = AnnounceType::World;
     }
 
@@ -125,7 +125,7 @@ void AutobroadcastMgr::SendAutobroadcasts()
         SendNotificationAnnouncement(msg);
     }
 
-    LOG_DEBUG("autobroadcast", "AutoBroadcast: '{}'", msg);
+    LOG_DEBUG("autobroadcast", "AutobroadcastMgr::SendAutobroadcasts: '{}'", msg);
 }
 
 void AutobroadcastMgr::SendWorldAnnouncement(std::string_view msg)
