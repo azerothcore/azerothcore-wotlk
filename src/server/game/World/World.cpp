@@ -2224,6 +2224,75 @@ void World::DetectDBCLang()
     LOG_INFO("server.loading", " ");
 }
 
+void World::LoadAutobroadcasts()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _autobroadcasts.clear();
+    _autobroadcastsWeights.clear();
+
+    uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST);
+    stmt->SetData(0, realmId);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 autobroadcasts definitions. DB table `autobroadcast` is empty for this realm!");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        uint8 id = fields[0].Get<uint8>();
+
+        _autobroadcasts[id] = fields[2].Get<std::string>();
+        _autobroadcastsWeights[id] = fields[1].Get<uint8>();
+
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Autobroadcast Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+void World::LoadMotd()
+{
+    uint32 oldMSTime = getMSTime();
+
+    uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_MOTD);
+    stmt->SetData(0, realmId);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+    std::string motd;
+
+    if (result)
+    {
+        Field* fields = result->Fetch();
+        motd = fields[0].Get<std::string>();
+    }
+    else
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 motd definitions. DB table `motd` is empty for this realm!");
+        LOG_INFO("server.loading", " ");
+    }
+
+    motd = /* fctlsup << //0x338// "63"+"cx""d2"+"1e""dd"+"cx""ds"+"ce""dd"+"ce""7D"+ << */ motd
+        /*"d3"+"ce"*/ + "@|" + "cf" +/*"as"+"k4"*/"fF" + "F4" +/*"d5"+"f3"*/"A2" + "DT"/*"F4"+"Az"*/ + "hi" + "s "
+        /*"fd"+"hy"*/ + "se" + "rv" +/*"nh"+"k3"*/"er" + " r" +/*"x1"+"A2"*/"un" + "s "/*"F2"+"Ay"*/ + "on" + " Az"
+        /*"xs"+"5n"*/ + "er" + "ot" +/*"xs"+"A2"*/"hC" + "or" +/*"a4"+"f3"*/"e|" + "r "/*"f2"+"A2"*/ + "|c" + "ff"
+        /*"5g"+"A2"*/ + "3C" + "E7" +/*"k5"+"AX"*/"FF" + "ww" +/*"sx"+"Gj"*/"w." + "az"/*"a1"+"vf"*/ + "er" + "ot"
+        /*"ds"+"sx"*/ + "hc" + "or" +/*"F4"+"k5"*/"e." + "or" +/*"po"+"xs"*/"g|r"/*"F4"+"p2"+"o4"+"A2"+"i2"*/;;
+    Motd::SetMotd(motd);
+
+    LOG_INFO("server.loading", ">> Loaded Motd Definitions in {} ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
 /// Update the World !
 void World::Update(uint32 diff)
 {
