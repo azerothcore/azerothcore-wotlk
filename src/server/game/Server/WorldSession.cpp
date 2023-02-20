@@ -330,7 +330,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
                     if (!m_playerRecentlyLogout)
                     {
-                        requeuePackets.push_back(packet);
+                        // requeuePackets.push_back(packet);
                         deletePacket = false;
 
                         LOG_DEBUG("network", "Re-enqueueing packet with opcode {} with with status STATUS_LOGGEDIN. "
