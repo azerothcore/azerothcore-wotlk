@@ -190,6 +190,9 @@ public:
                     }
 
                     commanderMograine->AI()->Talk(TALK_MOGRAINE_ASHBRBINGER_INTRO);
+                    if (GameObject* chapelDoor = player->FindNearestGameObject(DOOR_CHAPEL, 4000.0f)) {
+                        instance->DoUseDoorOrButton(chapelDoor->GetGUID());
+                    }
                     return true;
                 }
             }
