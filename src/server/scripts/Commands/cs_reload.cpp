@@ -32,6 +32,7 @@ EndScriptData */
 #include "LFGMgr.h"
 #include "Language.h"
 #include "MapMgr.h"
+#include "ServerMotd.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
@@ -80,6 +81,7 @@ public:
             { "areatrigger_tavern",            HandleReloadAreaTriggerTavernCommand,          SEC_ADMINISTRATOR, Console::Yes },
             { "areatrigger_teleport",          HandleReloadAreaTriggerTeleportCommand,        SEC_ADMINISTRATOR, Console::Yes },
             { "autobroadcast",                 HandleReloadAutobroadcastCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "motd",                          HandleReloadMotdCommand,                       SEC_ADMINISTRATOR, Console::Yes },
             { "broadcast_text",                HandleReloadBroadcastTextCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "battleground_template",         HandleReloadBattlegroundTemplate,              SEC_ADMINISTRATOR, Console::Yes },
             { "command",                       HandleReloadCommandCommand,                    SEC_ADMINISTRATOR, Console::Yes },
@@ -209,6 +211,7 @@ public:
         HandleReloadVehicleTemplateAccessoryCommand(handler);
 
         HandleReloadAutobroadcastCommand(handler);
+        HandleReloadMotdCommand(handler);
         HandleReloadBroadcastTextCommand(handler);
         HandleReloadBattlegroundTemplate(handler);
         return true;
@@ -400,6 +403,15 @@ public:
         LOG_INFO("server.loading", "Re-Loading Autobroadcasts...");
         sWorld->LoadAutobroadcasts();
         handler->SendGlobalGMSysMessage("DB table `autobroadcast` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadMotdCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading Motd...");
+        sWorld->LoadMotd();
+        handler->SendGlobalGMSysMessage("DB table `motd` reloaded.");
+        handler->SendGlobalSysMessage(Motd::GetMotd());
         return true;
     }
 
