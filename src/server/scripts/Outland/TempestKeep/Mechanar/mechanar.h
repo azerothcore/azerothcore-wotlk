@@ -70,6 +70,12 @@ enum SpellIds
     SPELL_TELEPORT_VISUAL               = 35517
 };
 
+enum DataIndex
+{
+    DATA_INDEX_PASSAGE_ENCOUNTER = 0,
+    MAX_DATA_INDEXES
+};
+
 template <class AI, class T>
 inline AI* GetMechanarAI(T* obj)
 {
