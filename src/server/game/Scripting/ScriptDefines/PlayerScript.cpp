@@ -606,7 +606,6 @@ void ScriptMgr::OnQuestRewardItem(Player* player, Item* item, uint32 count)
     });
 }
 
-
 bool ScriptMgr::CanPlaceAuctionBid(Player* player, AuctionEntry* auction)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript *script)
