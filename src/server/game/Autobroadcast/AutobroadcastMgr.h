@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _AUTOBROADCAST_MANAGER_H_
-#define _AUTOBROADCAST_MANAGER_H_
+#ifndef _AUTOBROADCASTMGR_H_
+#define _AUTOBROADCASTMGR_H_
 
 #include "Common.h"
 #include <map>
@@ -51,4 +51,4 @@ private:
 
 #define sAutobroadcastMgr AutobroadcastMgr::instance()
 
-#endif // _AUTOBROADCAST_MANAGER_H_
+#endif // _AUTOBROADCASTMGR_H_
