@@ -36,6 +36,10 @@ enum AshbringerEventMisc
     NPC_FAIRBANKS                   =   4542,
     NPC_COMMANDER_MOGRAINE          =   3976,
     NPC_INQUISITOR_WHITEMANE        =   3977,
+    DELAY_MS_KNEEL_MIN              =   1000,
+    DELAY_MS_KNEEL_MAX              =   3000,
+    DELAY_MS_TALK_MIN               =   1000,
+    DELAY_MS_TALK_MAX               =   2000,
     DOOR_CHAPEL                     =   104591,
     DOOR_HIGH_INQUISITOR_ID         =   104600,
     TALK_MOGRAINE_ASHBRBINGER_INTRO =   6,
@@ -234,13 +238,22 @@ public:
                 {
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
-                        Talk(SAY_WELCOME, player);
                         me->SetFaction(FACTION_FRIENDLY);
-                        me->SetSheath(SHEATH_STATE_UNARMED);
-                        me->SetFacingToObject(player);
-                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        me->StopMoving();
                         me->AddAura(SPELL_AURA_MOD_ROOT, me);
                         me->CastSpell(me, SPELL_AURA_MOD_ROOT, true);
+                        me->SetStandState(UNIT_STAND_STATE_STAND);
+                        me->SetFacingToObject(player);
+                        Milliseconds delayKneel(urand(DELAY_MS_KNEEL_MIN, DELAY_MS_KNEEL_MAX));
+
+                        me->m_Events.AddEventAtOffset([this, player]()
+                        {
+                            me->SetSheath(SHEATH_STATE_UNARMED);
+                            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            Milliseconds delayTalk(urand(DELAY_MS_TALK_MIN, DELAY_MS_TALK_MAX));
+                            Talk(SAY_WELCOME, player, delayTalk);
+                        }, delayKneel);
+
                         SayAshbringer = true;
                     }
                 }
