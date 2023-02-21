@@ -236,6 +236,9 @@ public:
     CreatureBoundary const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : nullptr; }
     BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; }
 
+    uint32 GetPersistentData(uint32 index) const { return index < persistentData.size() ? persistentData[index] : 0; };
+    void StorePersistentData(uint32 index, uint32 data);
+
     // Achievement criteria additional requirements check
     // NOTE: not use this if same can be checked existed requirement types from AchievementCriteriaRequirementType
     virtual bool CheckAchievementCriteriaMeet(uint32 /*criteria_id*/, Player const* /*source*/, Unit const* /*target*/ = nullptr, uint32 /*miscvalue1*/ = 0);
@@ -264,6 +267,7 @@ public:
 protected:
     void SetHeaders(std::string const& dataHeaders);
     void SetBossNumber(uint32 number) { bosses.resize(number); }
+    void SetPersistentDataCount(uint32 number) { persistentData.resize(number); }
     void LoadBossBoundaries(BossBoundaryData const& data);
     void LoadDoorData(DoorData const* data);
     void LoadMinionData(MinionData const* data);
@@ -282,9 +286,11 @@ protected:
     // Instance Load and Save
     bool ReadSaveDataHeaders(std::istringstream& data);
     void ReadSaveDataBossStates(std::istringstream& data);
+    void ReadSavePersistentData(std::istringstream& data);
     virtual void ReadSaveDataMore(std::istringstream& /*data*/) { }
     void WriteSaveDataHeaders(std::ostringstream& data);
     void WriteSaveDataBossStates(std::ostringstream& data);
+    void WritePersistentData(std::ostringstream& data);
     virtual void WriteSaveDataMore(std::ostringstream& /*data*/) { }
 
 private:
@@ -292,6 +298,7 @@ private:
 
     std::vector<char> headers;
     std::vector<BossInfo> bosses;
+    std::vector<uint32> persistentData;
     DoorInfoMap doors;
     MinionInfoMap minions;
     ObjectInfoMap _creatureInfo;

@@ -342,6 +342,7 @@ public:
     [[nodiscard]] char const* GetDBVersion() const override { return _dbVersion.c_str(); }
 
     void LoadAutobroadcasts() override;
+    void LoadMotd() override;
 
     void UpdateAreaDependentAuras() override;
 
