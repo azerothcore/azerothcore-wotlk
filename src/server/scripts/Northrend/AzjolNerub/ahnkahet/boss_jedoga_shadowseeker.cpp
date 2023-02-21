@@ -385,7 +385,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 if (!summons.empty())
                 {
                     sacraficeTarget_GUID = Acore::Containers::SelectRandomContainerElement(summons);
-                    if (Creature* volunteer = ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
+                    if (ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
                     {
                         events.ScheduleEvent(EVENT_JEDGA_START_RITUAL, 3000, 0, PHASE_RITUAL);
                     }
