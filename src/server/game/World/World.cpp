@@ -290,7 +290,6 @@ void World::AddSession_(WorldSession* s)
             {
                 WorldSession* tmp = iter->second;
                 _offlineSessions.erase(iter);
-                tmp->SetShouldSetOfflineInDB(false);
                 delete tmp;
             }
             oldSession->SetOfflineTime(GameTime::GetGameTime().count());
@@ -298,7 +297,6 @@ void World::AddSession_(WorldSession* s)
         }
         else
         {
-            oldSession->SetShouldSetOfflineInDB(false); // pussywizard: don't set offline in db because new session for that acc is already created
             delete oldSession;
         }
     }
@@ -2975,7 +2973,6 @@ void World::UpdateSessions(uint32 diff)
             {
                 WorldSession* tmp = iter->second;
                 _offlineSessions.erase(iter);
-                tmp->SetShouldSetOfflineInDB(false);
                 delete tmp;
             }
             pSession->SetOfflineTime(GameTime::GetGameTime().count());
@@ -2991,8 +2988,6 @@ void World::UpdateSessions(uint32 diff)
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
                 _disconnects[pSession->GetAccountId()] = GameTime::GetGameTime().count();
             _sessions.erase(itr);
-            if (_offlineSessions.find(pSession->GetAccountId()) != _offlineSessions.end()) // pussywizard: don't set offline in db because offline session for that acc is present (character is in world)
-                pSession->SetShouldSetOfflineInDB(false);
             delete pSession;
         }
     }
@@ -3009,8 +3004,6 @@ void World::UpdateSessions(uint32 diff)
         if (!pSession->GetPlayer() || pSession->GetOfflineTime() + 60 < currTime || pSession->IsKicked())
         {
             _offlineSessions.erase(itr);
-            if (_sessions.find(pSession->GetAccountId()) != _sessions.end())
-                pSession->SetShouldSetOfflineInDB(false); // pussywizard: don't set offline in db because new session for that acc is already created
             delete pSession;
         }
     }
