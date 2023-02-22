@@ -16,3 +16,8 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 (33552, 3, 0, 'zhCN', 'Yrr n\'lyeth... shuul anagg!'),
 (33552, 4, 0, 'zhCN', '他会明白……没有谁可以永远坐在王位上，只有死亡才是永恒的！'),
 (33552, 5, 0, 'zhCN', '他的族群没用多久就得到了教训。你们也快了！');
+
+-- Death Orb (Death Ray)
+DELETE FROM `creature_template_movement` WHERE `CreatureId` = 33882;
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(33882, 1, 0, 0, 0, 0, 0, 0);

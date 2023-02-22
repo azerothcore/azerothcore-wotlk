@@ -570,7 +570,7 @@ public:
             }
         }
 
-        void SummonDeathOrbs() /// @todo: Death Orbs (beams) should move, currently stay in one place.
+        void SummonDeathOrbs()
         {
             for (uint8 i = 0; i < 4; ++i)
             {
