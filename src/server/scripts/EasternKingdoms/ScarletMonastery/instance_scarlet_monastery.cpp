@@ -239,9 +239,9 @@ public:
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
                         me->SetFaction(FACTION_FRIENDLY);
+                        me->GetMotionMaster()->Clear(); // stop patrolling
+                        me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->AddAura(SPELL_AURA_MOD_ROOT, me);
-                        me->CastSpell(me, SPELL_AURA_MOD_ROOT, true);
                         me->SetStandState(UNIT_STAND_STATE_STAND);
                         me->SetFacingToObject(player);
                         Milliseconds delayKneel(urand(DELAY_MS_KNEEL_MIN, DELAY_MS_KNEEL_MAX));
