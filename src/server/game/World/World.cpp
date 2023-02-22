@@ -26,6 +26,7 @@
 #include "ArenaTeamMgr.h"
 #include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
+#include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
 #include "CalendarMgr.h"
@@ -1987,7 +1988,7 @@ void World::SetInitialWorldSettings()
 
     ///- Load AutoBroadCast
     LOG_INFO("server.loading", "Loading Autobroadcasts...");
-    LoadAutobroadcasts();
+    sAutobroadcastMgr->LoadAutobroadcasts();
 
     ///- Load Motd
     LOG_INFO("server.loading", "Loading MotD...");
@@ -2221,42 +2222,6 @@ void World::DetectDBCLang()
     LOG_INFO("server.loading", " ");
 }
 
-void World::LoadAutobroadcasts()
-{
-    uint32 oldMSTime = getMSTime();
-
-    _autobroadcasts.clear();
-    _autobroadcastsWeights.clear();
-
-    uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST);
-    stmt->SetData(0, realmId);
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-
-    if (!result)
-    {
-        LOG_WARN("server.loading", ">> Loaded 0 autobroadcasts definitions. DB table `autobroadcast` is empty for this realm!");
-        LOG_INFO("server.loading", " ");
-        return;
-    }
-
-    uint32 count = 0;
-
-    do
-    {
-        Field* fields = result->Fetch();
-        uint8 id = fields[0].Get<uint8>();
-
-        _autobroadcasts[id] = fields[2].Get<std::string>();
-        _autobroadcastsWeights[id] = fields[1].Get<uint8>();
-
-        ++count;
-    } while (result->NextRow());
-
-    LOG_INFO("server.loading", ">> Loaded {} Autobroadcast Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
-}
-
 void World::LoadMotd()
 {
     uint32 oldMSTime = getMSTime();
@@ -2449,7 +2414,7 @@ void World::Update(uint32 diff)
         {
             METRIC_TIMER("world_update_time", METRIC_TAG("type", "Send autobroadcast"));
             _timers[WUPDATE_AUTOBROADCAST].Reset();
-            SendAutoBroadcast();
+            sAutobroadcastMgr->SendAutobroadcasts();
         }
     }
 
@@ -3026,68 +2991,6 @@ void World::ProcessCliCommands()
             command->m_commandFinished(callbackArg, !handler.HasSentErrorMessage());
         delete command;
     }
-}
-
-void World::SendAutoBroadcast()
-{
-    if (_autobroadcasts.empty())
-        return;
-
-    uint32 weight = 0;
-    AutobroadcastsWeightMap selectionWeights;
-
-    std::string msg;
-
-    for (AutobroadcastsWeightMap::const_iterator it = _autobroadcastsWeights.begin(); it != _autobroadcastsWeights.end(); ++it)
-    {
-        if (it->second)
-        {
-            weight += it->second;
-            selectionWeights[it->first] = it->second;
-        }
-    }
-
-    if (weight)
-    {
-        uint32 selectedWeight = urand(0, weight - 1);
-        weight = 0;
-        for (AutobroadcastsWeightMap::const_iterator it = selectionWeights.begin(); it != selectionWeights.end(); ++it)
-        {
-            weight += it->second;
-            if (selectedWeight < weight)
-            {
-                msg = _autobroadcasts[it->first];
-                break;
-            }
-        }
-    }
-    else
-        msg = _autobroadcasts[urand(0, _autobroadcasts.size())];
-
-    uint32 abcenter = sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER);
-
-    if (abcenter == 0)
-    {
-        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
-    }
-
-    else if (abcenter == 1)
-    {
-        WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
-        data << msg;
-        sWorld->SendGlobalMessage(&data);
-    }
-
-    else if (abcenter == 2)
-    {
-        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
-
-        WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
-        data << msg;
-        sWorld->SendGlobalMessage(&data);
-    }
-
-    LOG_DEBUG("server.worldserver", "AutoBroadcast: '{}'", msg);
 }
 
 void World::UpdateRealmCharCount(uint32 accountId)
