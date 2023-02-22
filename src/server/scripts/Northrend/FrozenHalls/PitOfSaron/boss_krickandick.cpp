@@ -32,7 +32,7 @@ enum Yells
     EMOTE_ICK_POISON_NOVA               = 0,
     EMOTE_ICK_CHASE                     = 1,
 
-    // Krick 
+    // Krick
     SAY_AGGRO                           = 0,
     SAY_SLAY                            = 1,
     SAY_BARRAGE_1                       = 2,
