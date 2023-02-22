@@ -225,7 +225,7 @@ public:
                 {
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
-                        Talk(SAY_WELCOME);
+                        Talk(SAY_WELCOME, player);
                         me->SetFaction(FACTION_FRIENDLY);
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->SetFacingToObject(player);
