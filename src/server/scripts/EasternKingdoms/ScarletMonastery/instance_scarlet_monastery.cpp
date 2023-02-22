@@ -36,7 +36,9 @@ enum AshbringerEventMisc
     NPC_FAIRBANKS                   =   4542,
     NPC_COMMANDER_MOGRAINE          =   3976,
     NPC_INQUISITOR_WHITEMANE        =   3977,
+    DOOR_CHAPEL                     =   104591,
     DOOR_HIGH_INQUISITOR_ID         =   104600,
+    TALK_MOGRAINE_ASHBRBINGER_INTRO =   6,
 };
 
 enum DataTypes
@@ -69,48 +71,6 @@ public:
         instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetHeaders(DataHeader);
-        }
-
-        void OnPlayerEnter(Player* player) override
-        {
-            if (player->HasAura(AURA_OF_ASHBRINGER))
-            {
-                std::list<Creature*> ScarletList;
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MYRIDON, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_DEFENDER, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CENTURION, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_SORCERER, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_WIZARD, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_ABBOT, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MONK, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAMPION, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAPLAIN, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_COMMANDER_MOGRAINE, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 4000.0f);
-                if (!ScarletList.empty())
-                    for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++) (*itr)->SetFaction(FACTION_FRIENDLY);
-            }
-        }
-
-        void OnPlayerAreaUpdate(Player* player, uint32 /*oldArea*/, uint32 /*newArea*/) override
-        {
-            if (player->HasAura(AURA_OF_ASHBRINGER))
-            {
-                std::list<Creature*> ScarletList;
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MYRIDON, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_DEFENDER, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CENTURION, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_SORCERER, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_WIZARD, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_ABBOT, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MONK, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAMPION, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAPLAIN, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_COMMANDER_MOGRAINE, 4000.0f);
-                player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 4000.0f);
-                if (!ScarletList.empty())
-                    for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++) (*itr)->SetFaction(FACTION_FRIENDLY);
-            }
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -190,6 +150,52 @@ public:
         ObjectGuid WhitemaneGUID;
         uint32 encounter;
     };
+};
+
+class at_scarlet_monastery_cathedral_entrance : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_scarlet_monastery_cathedral_entrance() : OnlyOnceAreaTriggerScript("at_scarlet_monastery_cathedral_entrance") {}
+
+    bool _OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (player->HasAura(AURA_OF_ASHBRINGER))
+            {
+                Creature* commanderMograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE));
+                if (commanderMograine)
+                {
+                    std::list<Creature*> ScarletList;
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MYRIDON, 4000.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_DEFENDER, 4000.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CENTURION, 4000.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_SORCERER, 4000.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_WIZARD, 4000.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_ABBOT, 4000.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MONK, 4000.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAMPION, 4000.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAPLAIN, 4000.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 4000.0f);
+
+
+                    ScarletList.push_back(commanderMograine);
+
+                    if (!ScarletList.empty())
+                    {
+                        for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++)
+                        {
+                            (*itr)->SetFaction(FACTION_FRIENDLY);
+                        }
+                    }
+
+                    commanderMograine->AI()->Talk(TALK_MOGRAINE_ASHBRBINGER_INTRO);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 };
 
 enum ScarletMonasteryTrashMisc
@@ -409,7 +415,6 @@ public:
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
                         me->SetFacingToObject(player);
-                        // me->Yell(12389, LANG_UNIVERSAL, player); // Doesn't exist
                         SayAshbringer = true;
                     }
 
@@ -838,4 +843,5 @@ void AddSC_instance_scarlet_monastery()
     new npc_fairbanks();
     new npc_mograine();
     new boss_high_inquisitor_whitemane();
+    new at_scarlet_monastery_cathedral_entrance();
 }
