@@ -163,7 +163,6 @@ public:
     [[nodiscard]] WorldSession* FindOfflineSession(uint32 id) const override;
     [[nodiscard]] WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const override;
     void AddSession(WorldSession* s) override;
-    void SendAutoBroadcast() override;
     bool KickSession(uint32 id) override;
     /// Get the number of current active sessions
     void UpdateMaxSessionCounters() override;
@@ -343,7 +342,6 @@ public:
 #ifdef MOD_PLAYERBOTS
     [[nodiscard]] char const* GetPlayerbotsDBRevision() const override { return m_PlayerbotsDBRevision.c_str(); }
 #endif
-    void LoadAutobroadcasts() override;
     void LoadMotd() override;
 
     void UpdateAreaDependentAuras() override;
@@ -445,12 +443,6 @@ private:
 #ifdef MOD_PLAYERBOTS
     std::string m_PlayerbotsDBRevision;
 #endif
-
-    typedef std::map<uint8, std::string> AutobroadcastsMap;
-    AutobroadcastsMap _autobroadcasts;
-
-    typedef std::map<uint8, uint8> AutobroadcastsWeightMap;
-    AutobroadcastsWeightMap _autobroadcastsWeights;
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;
