@@ -1,3 +1,4 @@
+-- DB update 2023_02_23_00 -> 2023_02_23_01
 --
 DROP TABLE IF EXISTS `spell_cooldown_overrides`;
 CREATE TABLE `spell_cooldown_overrides` (
