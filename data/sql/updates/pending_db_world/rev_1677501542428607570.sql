@@ -133,3 +133,13 @@ SET @MOGRAINE_BROADCAST_ID := 12389;
 
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
      (@MOGRAINE_ID, 6, 0, (SELECT `MaleText` FROM `broadcast_text` WHERE `ID`=@MOGRAINE_BROADCAST_ID), 14, 0, 100.0, 0, 0, 0, @MOGRAINE_BROADCAST_ID, 3,'Ashbringer event intro yell');
+
+-- --
+-- Commander Mograine's talk upon being approached by player
+
+SET @MOGRAINE_APPROACH_BROADCAST_ID := 12390;
+SET @MOGRAINE_APPROACH_TEXT := (SELECT `MaleText` FROM `broadcast_text` WHERE `ID`=@MOGRAINE_APPROACH_BROADCAST_ID);
+
+UPDATE `creature_text`
+    SET `Text` = @MOGRAINE_APPROACH_TEXT, `BroadcastTextId` = @MOGRAINE_APPROACH_BROADCAST_ID
+    WHERE `GroupID` = 3 AND `ID` = 0 AND `CreatureID` = @MOGRAINE_ID;
