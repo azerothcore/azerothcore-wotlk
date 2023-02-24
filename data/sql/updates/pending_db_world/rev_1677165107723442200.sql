@@ -168,7 +168,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20132, 0, 2, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 18538, 50, 0, 0, 0, 0, 0, 0, 'Socrethar - On Data Set 3 3 - Set Orientation Closest Creature \'Ishanah\''),
 (20132, 0, 3, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 80, 2013201, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - On Data Set 4 4 - Run Script'),
 (20132, 0, 4, 0, 38, 0, 100, 0, 5, 5, 0, 0, 0, 80, 2013202, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - On Data Set 5 5 - Run Script'),
-(20794, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 53, 0, 2079400, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Data Set 1 1 - Start Waypoint'),
+(20794, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 53, 0, 2079400, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Data Set 1 1 - Start Waypoint'),
 (20794, 0, 1, 0, 58, 0, 100, 0, 4, 2079400, 0, 0, 0, 80, 2079400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Waypoint Finished - Run Script'),
 (20794, 0, 2, 0, 2, 0, 100, 1, 0, 25, 0, 0, 0, 80, 2079401, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Between 0-25% Health - Run Script (No Repeat)'),
 (20794, 0, 3, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 18538, 50, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Data Set 2 2 - Set Orientation Closest Creature \'Ishanah\''),
@@ -186,8 +186,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1853700, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1853700, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Adyen the Lightwarden - Actionlist - Start Waypoint'),
 (1946601, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 495, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - Actionlist - Set Faction 495'),
 (1946601, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 29, 2, 120, 0, 0, 0, 0, 19, 18537, 15, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - Actionlist - Start Follow Closest Creature \'Adyen the Lightwarden\''),
-(1946701, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 495, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - Actionlist - Set Faction 495'),
-(1946701, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 29, 2, 240, 0, 0, 0, 0, 19, 18537, 15, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - Actionlist - Start Follow Closest Creature \'Adyen the Lightwarden\''),
+(1946601, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 19, 512, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - Actionlist - Remove Flags Immune To NPC\'s'),
+(1946701, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 495, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Karja - Actionlist - Set Faction 495'),
+(1946701, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 29, 2, 240, 0, 0, 0, 0, 19, 18537, 15, 0, 0, 0, 0, 0, 0, 'Anchorite Karja - Actionlist - Start Follow Closest Creature \'Adyen the Lightwarden\''),
+(1946701, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 19, 512, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Karja - Actionlist - Remove Flags Immune To NPC\'s'),
 (2013200, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 18537, 40, 0, 0, 0, 0, 0, 0, 'Socrethar - Actionlist - Say Line 0 (Adyen the Lightwarden)'),
 (2013200, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - Actionlist - Say Line 0 (Socrethar)'),
 (2013200, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 19, 18537, 40, 0, 0, 0, 0, 0, 0, 'Socrethar - Actionlist - Say Line 1 (Adyen the Lightwarden)'),
@@ -197,7 +199,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2079400, 9, 0, 0, 0, 0, 100, 0, 600, 600, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Actionlist - Set Flag Standstate Kneel'),
 (2079400, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 19, 18537, 40, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Actionlist - Say Line 2 (Adyen the Lightwarden)'),
 (2079400, 9, 2, 0, 0, 0, 100, 0, 3400, 3400, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Actionlist - Set Flag Standstate Stand Up'),
-(2079400, 9, 3, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 53, 0, 2079401, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Actionlist - Start Waypoint'),
+(2079400, 9, 3, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 53, 0, 2079401, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Actionlist - Start Waypoint'),
 (2079400, 9, 4, 0, 0, 0, 100, 0, 2200, 2200, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 18537, 40, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Actionlist - Set Orientation Closest Creature \'Adyen the Lightwarden\''),
 (2079400, 9, 5, 0, 0, 0, 100, 0, 3800, 3800, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Actionlist - Say Line 0 (Self)'),
 (2079400, 9, 6, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Actionlist - Say Line 1 (Self)'),
@@ -239,3 +241,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2013202, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 11, 35600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - Actionlist - Cast \'Wrath of Socrethar\''),
 (2013202, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s'),
 (2013202, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 18538, 50, 0, 0, 0, 0, 0, 0, 'Socrethar - Actionlist - Start Attacking');
+
+-- Remove Civilian flag
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`&~2 WHERE (`entry` IN (19466, 19467, 18538, 18537));
