@@ -477,7 +477,10 @@ public:
 
         void KilledUnit(Unit* /*victim*/) override
         {
-            Talk(SAY_MO_KILL);
+            // Don't yell on death during Ashbringer event
+            if (!SayAshbringer) {
+                Talk(SAY_MO_KILL);
+            }
         }
 
         void SpellHit(Unit* /*who*/, SpellInfo const* spell) override
