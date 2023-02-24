@@ -116,7 +116,7 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (23491, 0, 0, 19466, 4804.807, 3775.562, 210.6171, 5.532693862915039062, 6, 60000, 'Deathblow to the Legion - Orelis'),
 (23491, 0, 0, 19467, 4803.6367, 3773.8438, 210.61761, 5.602506637573242187, 6, 60000, 'Deathblow to the Legion - Karja');
 
--- Adyen Gossip
+-- Gossips
 DELETE FROM `gossip_menu` WHERE (`MenuID` = 8117);
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 (8117, 10051),
@@ -126,12 +126,25 @@ DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 8117);
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 (8117, 0, 0, 'I\'m ready, Adyen.', 18591, 1, 1, 0, 0, 0, 0, '', 0, 0);
 
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` IN (14, 15)) AND (`SourceGroup` = 8117);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` IN (14, 15)) AND (`SourceGroup` IN (7735, 8117));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+-- Adyen Gossip
 (14, 8117, 10051, 0, 0, 23, 1, 3742, 0, 0, 1, 0, 0, '', 'Show text when outside Socrethar\'s Seat'),
 (14, 8117, 10210, 0, 0, 23, 1, 3742, 0, 0, 0, 0, 0, '', 'Show text when inside Socrethar\'s Seat'),
 (15, 8117, 0, 0, 0, 23, 1, 3742, 0, 0, 0, 0, 0, '', 'Show gossip option only when inside Socrethar\'s Seat'),
-(15, 8117, 0, 0, 0, 29, 1, 20132, 200, 0, 0, 0, 0, '', 'Show gossip option only when Socrethar is alive.');
+(15, 8117, 0, 0, 0, 29, 1, 20132, 200, 0, 0, 0, 0, '', 'Show gossip option only when Socrethar is alive.'),
+(15, 8117, 0, 0, 0, 29, 1, 20794, 200, 0, 1, 0, 0, '', 'Show gossip option only when Kaylaan hasn\'t spawned.'),
+(15, 8117, 0, 0, 0, 9, 0, 10409, 0, 0, 0, 0, 0, '', 'Show gossip option only if player has quest \'Deathblow to the Legion\''),
+-- Ishanah Gossip
+(14, 7735, 9457, 0, 0, 23, 1, 3703, 0, 0, 0, 0, 0, '', 'Show text only when inside Shattrath.'),
+(15, 7735, 0, 0, 0, 23, 1, 3703, 0, 0, 0, 0, 0, '', 'Show gossip option only when inside Shattrath.'),
+(15, 7735, 1, 0, 0, 23, 1, 3703, 0, 0, 0, 0, 0, '', 'Show gossip option only when inside Shattrath.');
+
+-- SAI Conditions
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` = 23491);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 1, 23491, 0, 0, 29, 1, 18537, 200, 0, 1, 0, 0, '', 'Do not spawn Socrethar Event group if there is already one spawned within 200y.'),
+(22, 1, 23491, 0, 0, 29, 1, 20794, 200, 0, 1, 0, 0, '', 'Do not spawn Socrethar Event group if Kaylaan has already spawned within 200y.');
 
 -- Spell Conditions
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (35598, 35599, 35600));
@@ -171,6 +184,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18538, 0, 3, 0, 40, 0, 100, 0, 18, 1853800, 0, 0, 0, 80, 1853800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Waypoint 18 Reached - Run Script'),
 (18538, 0, 4, 0, 8, 0, 100, 0, 35598, 0, 0, 0, 0, 11, 29266, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Spellhit \'Wrath of Socrethar\' - Cast \'Permanent Feign Death\''), -- Yes, these are sniffed
 (18538, 0, 5, 0, 8, 0, 100, 0, 35599, 0, 0, 0, 0, 28, 29266, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Spellhit \'Resurrection\' - Remove Aura \'Permanent Feign Death\''),
+(18538, 0, 6, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 39, 50, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Aggro - Call For Help'),
 (19466, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - On Just Summoned - Set Npc Flag '),
 (19466, 0, 1, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1946601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - On Data Set 1 1 - Run Script'),
 (19467, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Karja - On Just Summoned - Set Npc Flag '),
@@ -180,6 +194,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20132, 0, 2, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 18538, 50, 0, 0, 0, 0, 0, 0, 'Socrethar - On Data Set 3 3 - Set Orientation Closest Creature \'Ishanah\''),
 (20132, 0, 3, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 80, 2013201, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - On Data Set 4 4 - Run Script'),
 (20132, 0, 4, 0, 38, 0, 100, 0, 5, 5, 0, 0, 0, 80, 2013202, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - On Data Set 5 5 - Run Script'),
+(20132, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 11, 35762, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - On Just Died - Cast \'Serverside - Socrethar Quest Credit\''),
+(20132, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 82, 3, 0, 0, 0, 0, 0, 19, 18538, 100, 0, 0, 0, 0, 0, 0, 'Socrethar - On Just Died - Add Npc Flags Gossip & Questgiver to Ishanah'),
+(20132, 0, 7, 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 60000, 0, 0, 0, 0, 0, 19, 20794, 100, 0, 0, 0, 0, 0, 0, 'Socrethar - On Just Died - Cleanup Event'),
+(20132, 0, 8, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 60000, 0, 0, 0, 0, 0, 19, 18537, 100, 0, 0, 0, 0, 0, 0, 'Socrethar - On Just Died - Cleanup Event'),
+(20132, 0, 9, 10, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 150000, 0, 0, 0, 0, 0, 19, 18538, 100, 0, 0, 0, 0, 0, 0, 'Socrethar - On Just Died - Cleanup Event'),
+(20132, 0, 10, 11, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 60000, 0, 0, 0, 0, 0, 19, 19466, 100, 0, 0, 0, 0, 0, 0, 'Socrethar - On Just Died - Cleanup Event'),
+(20132, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 60000, 0, 0, 0, 0, 0, 19, 19467, 100, 0, 0, 0, 0, 0, 0, 'Socrethar - On Just Died - Cleanup Event'),
 (20794, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 53, 0, 2079400, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Data Set 1 1 - Start Waypoint'),
 (20794, 0, 1, 0, 58, 0, 100, 0, 4, 2079400, 0, 0, 0, 80, 2079400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Waypoint Finished - Run Script'),
 (20794, 0, 2, 0, 2, 0, 100, 1, 0, 25, 0, 0, 0, 80, 2079401, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Between 0-25% Health - Run Script (No Repeat)'),
@@ -254,5 +275,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2013202, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s'),
 (2013202, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 18538, 50, 0, 0, 0, 0, 0, 0, 'Socrethar - Actionlist - Start Attacking');
 
--- Remove Civilian flag
-UPDATE `creature_template` SET `flags_extra`=`flags_extra`&~2 WHERE (`entry` IN (19466, 19467, 18538, 18537));
+-- Remove Civilian flag, Add IMMUNE_TO_PLAYERS instead
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`&~2, `unit_flags`=`unit_flags`|256 WHERE (`entry` IN (19466, 19467, 18538, 18537));
