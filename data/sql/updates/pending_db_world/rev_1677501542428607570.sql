@@ -79,7 +79,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 -- event
 
 UPDATE `creature_text`
-    SET `Text` = @SAVE_THIS_WORLD_TEXT, `BroadcastTextId` = @SAVE_THIS_WORLD_BROADCAST_ID, `Type` = 12
+    SET `Text` = @SAVE_THIS_WORLD_TEXT, `BroadcastTextId` = @SAVE_THIS_WORLD_BROADCAST_ID
     WHERE `GroupID` = @RP_TEXTS_GROUP_ID AND `ID` = @SAVE_THIS_WORLD_ID
     AND `CreatureID` in (@SORCERER_ID, @DEFENDER_ID, @CHAPLAIN_ID, @CENTURION_ID, @CHAMPION_ID, @MONK_ID);
 
