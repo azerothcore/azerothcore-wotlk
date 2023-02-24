@@ -250,8 +250,11 @@ public:
                         {
                             me->SetSheath(SHEATH_STATE_UNARMED);
                             me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                            Milliseconds delayTalk(urand(DELAY_MS_TALK_MIN, DELAY_MS_TALK_MAX));
-                            Talk(SAY_WELCOME, player, delayTalk);
+
+                            if (urand(0, 1)) {
+                                Milliseconds delayTalk(urand(DELAY_MS_TALK_MIN, DELAY_MS_TALK_MAX));
+                                Talk(SAY_WELCOME, player, delayTalk);
+                            }
                         }, delayKneel);
 
                         SayAshbringer = true;
