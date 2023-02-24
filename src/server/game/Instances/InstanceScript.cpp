@@ -351,6 +351,17 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
     return false;
 }
 
+void InstanceScript::StorePersistentData(uint32 index, uint32 data)
+{
+    if (index > persistentData.size())
+    {
+        LOG_ERROR("scripts", "InstanceScript::StorePersistentData() index larger than storage size. Index: {} Size: {} Data: {}.", index, persistentData.size(), data);
+        return;
+    }
+
+    persistentData[index] = data;
+}
+
 void InstanceScript::Load(const char* data)
 {
     if (!data)
@@ -366,6 +377,7 @@ void InstanceScript::Load(const char* data)
     if (ReadSaveDataHeaders(loadStream))
     {
         ReadSaveDataBossStates(loadStream);
+        ReadSavePersistentData(loadStream);
         ReadSaveDataMore(loadStream);
     }
     else
@@ -403,6 +415,14 @@ void InstanceScript::ReadSaveDataBossStates(std::istringstream& data)
     }
 }
 
+void InstanceScript::ReadSavePersistentData(std::istringstream& data)
+{
+    for (uint32 i = 0; i < persistentData.size(); ++i)
+    {
+        data >> persistentData[i];
+    }
+}
+
 std::string InstanceScript::GetSaveData()
 {
     OUT_SAVE_INST_DATA;
@@ -411,6 +431,7 @@ std::string InstanceScript::GetSaveData()
 
     WriteSaveDataHeaders(saveStream);
     WriteSaveDataBossStates(saveStream);
+    WritePersistentData(saveStream);
     WriteSaveDataMore(saveStream);
 
     OUT_SAVE_INST_DATA_COMPLETE;
@@ -431,6 +452,14 @@ void InstanceScript::WriteSaveDataBossStates(std::ostringstream& data)
     for (BossInfo const& bossInfo : bosses)
     {
         data << uint32(bossInfo.state) << ' ';
+    }
+}
+
+void InstanceScript::WritePersistentData(std::ostringstream& data)
+{
+    for (auto const& entry : persistentData)
+    {
+        data << entry << ' ';
     }
 }
 

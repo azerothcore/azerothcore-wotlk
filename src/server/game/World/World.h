@@ -163,7 +163,6 @@ public:
     [[nodiscard]] WorldSession* FindOfflineSession(uint32 id) const override;
     [[nodiscard]] WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const override;
     void AddSession(WorldSession* s) override;
-    void SendAutoBroadcast() override;
     bool KickSession(uint32 id) override;
     /// Get the number of current active sessions
     void UpdateMaxSessionCounters() override;
@@ -341,7 +340,7 @@ public:
     void LoadDBVersion() override;
     [[nodiscard]] char const* GetDBVersion() const override { return _dbVersion.c_str(); }
 
-    void LoadAutobroadcasts() override;
+    void LoadMotd() override;
 
     void UpdateAreaDependentAuras() override;
 
@@ -436,12 +435,6 @@ private:
 
     // used versions
     std::string _dbVersion;
-
-    typedef std::map<uint8, std::string> AutobroadcastsMap;
-    AutobroadcastsMap _autobroadcasts;
-
-    typedef std::map<uint8, uint8> AutobroadcastsWeightMap;
-    AutobroadcastsWeightMap _autobroadcastsWeights;
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;
