@@ -1,17 +1,21 @@
 -- Form Rhok'delar and Lok'delar at once
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger`=23192;
-INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES (23192, 24872, 0, 'Forming Rhok\'delar and Lok\'delar once ');
+INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES (23192, 24872, 0, 'Form Rhok\'delar and Lok\'delar at once ');
 
--- Gossip_menu_option conditions (QUEST_REWARDED & _ITEM)
--- Require both quests 7636(Stave of the Ancients) & 7635(A Proper String) to be rewarded & the item to not be in inventory or bank (deleted/unobtained).
+-- Gossip_menu_option (30201) conditions (QUEST_REWARDED & _ITEM)
+-- Require both quests 7636(Stave of the Ancients) & 7635(A Proper String) to be rewarded, to not have either Sinew or Rune and to not have either Bow or Stave.
 DELETE FROM `conditions` WHERE `SourceGroup` = 30201;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(15, 30201, 0, 0, 0, 8, 0, 7636, 0, 0, 0, 0, 0, '', '(AND) Require quest 7636(Stave of the Ancients) to be rewarded to show gossip_menu_option.'),
-(15, 30201, 0, 0, 0, 8, 0, 7635, 0, 0, 0, 0, 0, '', '(AND) Require quest 7635(A Proper String) to be rewarded to show gossip_menu_option.'),
+(15, 30201, 0, 0, 0, 8, 0, 7636, 0, 0, 0, 0, 0, '', '(AND) Require quest 7636(Stave of the Ancients) to be rewarded.'),
+(15, 30201, 0, 0, 0, 8, 0, 7635, 0, 0, 0, 0, 0, '', '(AND) Require quest 7635(A Proper String) to be rewarded.'),
 (15, 30201, 0, 0, 0, 2, 0, 18713, 1, 1, 1, 0, 0, '', '(AND) Require item 18713(Rhok\'delar) to not be in inventory or bank.'),
-(15, 30201, 1, 0, 0, 8, 0, 7636, 0, 0, 0, 0, 0, '', '(AND) Require quest 7636(Stave of the Ancients) to be rewarded to show gossip_menu_option.'),
-(15, 30201, 1, 0, 0, 8, 0, 7635, 0, 0, 0, 0, 0, '', '(AND) Require quest 7635(A Proper String) to be rewarded to show gossip_menu_option.'),
-(15, 30201, 1, 0, 0, 2, 0, 18715, 1, 1, 1, 0, 0, '', '(AND) Require item 18715(Lok\'delar) to not be in inventory or bank.');
+(15, 30201, 0, 0, 0, 2, 0, 18707, 1, 1, 1, 0, 0, '', '(AND) Require item 18707(Ancient Rune Etched Stave) to not be in inventory or bank.'),
+(15, 30201, 0, 0, 0, 2, 0, 18724, 1, 1, 1, 0, 0, '', '(AND) Require item 18724(Enchanted Black Dragon Sinew) to not be in inventory or bank.'),
+(15, 30201, 1, 0, 0, 8, 0, 7636, 0, 0, 0, 0, 0, '', '(AND) Require quest 7636(Stave of the Ancients) to be rewarded.'),
+(15, 30201, 1, 0, 0, 8, 0, 7635, 0, 0, 0, 0, 0, '', '(AND) Require quest 7635(A Proper String) to be rewarded.'),
+(15, 30201, 1, 0, 0, 2, 0, 18715, 1, 1, 1, 0, 0, '', '(AND) Require item 18715(Lok\'delar) to not be in inventory or bank.'),
+(15, 30201, 1, 0, 0, 2, 0, 18707, 1, 1, 1, 0, 0, '', '(AND) Require item 18707(Ancient Rune Etched Stave) to not be in inventory or bank.'),
+(15, 30201, 1, 0, 0, 2, 0, 18724, 1, 1, 1, 0, 0, '', '(AND) Require item 18724(Enchanted Black Dragon Sinew) to not be in inventory or bank.');
 
 -- Vartus the Ancient 
 DELETE FROM `gossip_menu_option` WHERE `MenuID`=30201 OR `MenuID`=30201;
