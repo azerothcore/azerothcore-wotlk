@@ -39,8 +39,13 @@ SET @TAKE_ME_TEXT := (SELECT `FemaleText` FROM `broadcast_text` WHERE `ID`=@TAKE
 
 UPDATE `creature_text`
     SET `GroupID` = 1
-    WHERE `GroupID` = 0 AND `CreatureID` = @WIZARD_ID
-    AND `ID` IN (0, 1, 2, 3);
+    WHERE `GroupID` = @RP_TEXTS_GROUP_ID AND `CreatureID` = @WIZARD_ID AND `Language` = 7
+    AND `ID` IN (@SAVE_THIS_WORLD_ID, @IT_BEGINS_ID, @ASHBRINGER_ID, @KNEEL_BEFORE_ID);
+
+-- For reapplicability
+DELETE FROM `creature_text`
+    WHERE `GroupID` = @RP_TEXTS_GROUP_ID AND `CreatureID` = @WIZARD_ID
+    AND `ID` IN (@SAVE_THIS_WORLD_ID, @IT_BEGINS_ID, @ASHBRINGER_ID, @KNEEL_BEFORE_ID);
 
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
      (@WIZARD_ID, @RP_TEXTS_GROUP_ID, @SAVE_THIS_WORLD_ID, @SAVE_THIS_WORLD_TEXT, 12, 0, 100.0, 0, 0, 0, @SAVE_THIS_WORLD_BROADCAST_ID, 0, ''),
@@ -54,12 +59,17 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 
 UPDATE `creature_text`
     SET `GroupID` = 2
-    WHERE `GroupID` = 0 AND `CreatureID` = @MYRMIDON_ID
-    AND `ID` = 0;
+    WHERE `GroupID` = @RP_TEXTS_GROUP_ID AND `CreatureID` = @MYRMIDON_ID AND `Type` = 16
+    AND `ID` = @SAVE_THIS_WORLD_ID;
 
 UPDATE `smart_scripts`
     SET `action_param1` = 2, `comment` = 'Scarlet Myrmidon - Between 0-40% Health - Say Line 2' -- TODO: Verify this on video
-    WHERE (`entryorguid` = 4295) AND (`source_type` = 0) AND (`id` = 2);
+    WHERE (`entryorguid` = @MYRMIDON_ID) AND (`source_type` = 0) AND (`id` = 2);
+
+-- For reapplicability
+DELETE FROM `creature_text`
+    WHERE `GroupID` = @RP_TEXTS_GROUP_ID AND `CreatureID` = @MYRMIDON_ID
+    AND `ID` = @SAVE_THIS_WORLD_ID;
 
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
      (@MYRMIDON_ID, @RP_TEXTS_GROUP_ID, @SAVE_THIS_WORLD_ID, @SAVE_THIS_WORLD_TEXT, 12, 0, 100.0, 0, 0, 0, @SAVE_THIS_WORLD_BROADCAST_ID, 0, '');
@@ -72,6 +82,11 @@ UPDATE `creature_text`
     SET `Text` = @SAVE_THIS_WORLD_TEXT, `BroadcastTextId` = @SAVE_THIS_WORLD_BROADCAST_ID, `Type` = 12
     WHERE `GroupID` = @RP_TEXTS_GROUP_ID AND `ID` = @SAVE_THIS_WORLD_ID
     AND `CreatureID` in (@SORCERER_ID, @DEFENDER_ID, @CHAPLAIN_ID, @CENTURION_ID, @CHAMPION_ID, @MONK_ID);
+
+-- For reapplicability
+DELETE FROM `creature_text`
+    WHERE `GroupID` = @RP_TEXTS_GROUP_ID AND `CreatureID` = @ABBOT_ID
+    AND `ID` = @SAVE_THIS_WORLD_ID;
 
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
      (@ABBOT_ID, @RP_TEXTS_GROUP_ID, @SAVE_THIS_WORLD_ID, @SAVE_THIS_WORLD_TEXT, 12, 0, 100.0, 0, 0, 0, @SAVE_THIS_WORLD_BROADCAST_ID, 0, '');
@@ -108,6 +123,11 @@ SET @UNWORTHY_ID := 6;
 SET @UNWORTHY_BROADCAST_ID := 12380;
 SET @UNWORTHY_TEXT := (SELECT `FemaleText` FROM `broadcast_text` WHERE `ID`=@UNWORTHY_BROADCAST_ID);
 
+-- For reapplicability
+DELETE FROM `creature_text`
+    WHERE `GroupID` = @RP_TEXTS_GROUP_ID AND `ID` = @UNWORTHY_ID
+    AND `CreatureID` in (@SORCERER_ID, @MYRMIDON_ID, @DEFENDER_ID, @CHAPLAIN_ID, @WIZARD_ID, @CENTURION_ID, @CHAMPION_ID, @ABBOT_ID, @MONK_ID);
+
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
      (@SORCERER_ID, @RP_TEXTS_GROUP_ID, @UNWORTHY_ID, @UNWORTHY_TEXT, 12, 0, 100.0, 0, 0, 0, @UNWORTHY_BROADCAST_ID, 0, ''),
      (@MYRMIDON_ID, @RP_TEXTS_GROUP_ID, @UNWORTHY_ID, @UNWORTHY_TEXT, 12, 0, 100.0, 0, 0, 0, @UNWORTHY_BROADCAST_ID, 0, ''),
@@ -121,6 +141,9 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 
 -- --
 -- Set up area trigger for event intro
+-- For reapplicability
+DELETE FROM `areatrigger_scripts`
+    WHERE `entry` = 4089;
 
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
      (4089, 'at_scarlet_monastery_cathedral_entrance');
@@ -130,6 +153,10 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 
 SET @MOGRAINE_ID := 3976;
 SET @MOGRAINE_BROADCAST_ID := 12389;
+
+-- For reapplicability
+DELETE FROM `creature_text`
+    WHERE `GroupID` = 6 AND `ID` = 0 AND `CreatureID` = @MOGRAINE_ID;
 
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
      (@MOGRAINE_ID, 6, 0, (SELECT `MaleText` FROM `broadcast_text` WHERE `ID`=@MOGRAINE_BROADCAST_ID), 14, 0, 100.0, 0, 0, 0, @MOGRAINE_BROADCAST_ID, 3,'Ashbringer event intro yell');
