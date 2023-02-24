@@ -2411,67 +2411,137 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotCommandReBindCommand(ChatHandler* handler, Optional<std::string_view> botname)
+    static bool HandleNpcBotCommandReBindCommand(ChatHandler* handler, Optional<std::vector<std::string>> names)
     {
-        Player const* owner = handler->GetSession()->GetPlayer();
-        Unit const* u = owner->GetSelectedUnit();
-        if ((!u && !botname) || BotDataMgr::GetOwnedBotsCount(owner->GetGUID()) == 0)
-        {
-            handler->SendSysMessage(".npcbot command rebind [#name]");
-            handler->SendSysMessage("Re-binds selected/named unbound npcbot");
-            handler->SetSentErrorMessage(true);
+        static auto return_syntax = [](ChatHandler* chandler) -> bool {
+            chandler->SendSysMessage(".npcbot command rebind [#names...]");
+            chandler->SendSysMessage("Re-binds selected/named unbound npcbot");
+            chandler->SetSentErrorMessage(true);
             return false;
-        }
+        };
+
+        static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
+            if (name_or_count.holds_alternative<uint32>())
+                chandler->PSendSysMessage("Successfully re-bound %u bot(s)", name_or_count.get<uint32>());
+            else
+                chandler->PSendSysMessage("Successfully re-bound %s", name_or_count.get<std::string>().c_str());
+            return true;
+        };
+
+        Player const* owner = handler->GetSession()->GetPlayer();
+
+        if (!owner->HaveBot())
+            return return_syntax(handler);
 
         BotMgr* mgr = owner->GetBotMgr();
         if (!mgr)
             mgr = new BotMgr(const_cast<Player*>(owner));
 
-        Creature const* cre = (u && u->GetTypeId() == TYPEID_UNIT) ? u->ToCreature() : BotDataMgr::FindBot(*botname, owner->GetSession()->GetSessionDbLocaleIndex());
-        if (!cre || !cre->IsNPCBot() || mgr->GetBot(cre->GetGUID()) ||
-            !cre->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) ||
-            BotDataMgr::SelectNpcBotData(cre->GetEntry())->owner != owner->GetGUID().GetCounter())
+        if (!names || names->empty())
         {
-            handler->SendSysMessage("Must target your unbound npcbot");
+            Creature const* bot = handler->getSelectedCreature();
+            if (bot && bot->IsNPCBot() && !mgr->GetBot(bot->GetGUID()) && bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) &&
+                BotDataMgr::SelectNpcBotData(bot->GetEntry())->owner == owner->GetGUID().GetCounter())
+            {
+                if (mgr->RebindBot(const_cast<Creature*>(bot)) != BOT_ADD_SUCCESS)
+                {
+                    handler->PSendSysMessage("Failed to re-bind %s for some reason!", bot->GetName().c_str());
+                    handler->SetSentErrorMessage(true);
+                    return false;
+                }
+                return return_success(handler, { bot->GetName() });
+            }
+            return return_syntax(handler);
+        }
+
+        uint32 count = 0;
+        for (decltype(names)::value_type::value_type name : *names)
+        {
+            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
+                if (name[i] == '_')
+                    name[i] = ' ';
+
+            Creature const* bot = BotDataMgr::FindBot(name, owner->GetSession()->GetSessionDbLocaleIndex());
+            if (bot && bot->IsNPCBot() && !mgr->GetBot(bot->GetGUID()) && bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) &&
+                BotDataMgr::SelectNpcBotData(bot->GetEntry())->owner == owner->GetGUID().GetCounter())
+            {
+                if (mgr->RebindBot(const_cast<Creature*>(bot)) != BOT_ADD_SUCCESS)
+                {
+                    handler->PSendSysMessage("Failed to re-bind %s for some reason!", name.c_str());
+                    handler->SetSentErrorMessage(true);
+                    continue;
+                }
+                ++count;
+            }
+        }
+
+        if (count == 0)
+        {
+            handler->PSendSysMessage("Unable to re-bind any of %u bots!", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (mgr->RebindBot(const_cast<Creature*>(cre)) != BOT_ADD_SUCCESS)
-        {
-            handler->SendSysMessage("Failed to re-bind bot for some reason!");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        handler->PSendSysMessage("%s successfully re-bound", cre->GetName().c_str());
-        return true;
+        return return_success(handler, { count });
     }
 
-    static bool HandleNpcBotCommandUnBindCommand(ChatHandler* handler, Optional<std::string_view> botname)
+    static bool HandleNpcBotCommandUnBindCommand(ChatHandler* handler, Optional<std::vector<std::string>> names)
     {
+        static auto return_syntax = [](ChatHandler* chandler) -> bool {
+            chandler->SendSysMessage(".npcbot command unbind [#names...]");
+            chandler->SendSysMessage("Frees selected/named npcbot(s) temporarily. The bot will return to home location and wait until re-bound");
+            chandler->SetSentErrorMessage(true);
+            return false;
+        };
+
+        static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
+            if (name_or_count.holds_alternative<uint32>())
+                chandler->PSendSysMessage("Successfully unbound %u bot(s)", name_or_count.get<uint32>());
+            else
+                chandler->PSendSysMessage("Successfully unbound %s", name_or_count.get<std::string>().c_str());
+            return true;
+        };
+
         Player const* owner = handler->GetSession()->GetPlayer();
-        Unit const* u = owner->GetSelectedUnit();
-        if (!owner->HaveBot() || (!u && !botname))
+
+        if (!owner->HaveBot())
+            return return_syntax(handler);
+
+        if (!names || names->empty())
         {
-            handler->SendSysMessage(".npcbot command unbind [#name]");
-            handler->SendSysMessage("Frees selected/named npcbot temporarily. The bot will return to home location and wait until re-bound");
+            Unit const* target = handler->getSelectedCreature();
+            Creature const* bot = target ? owner->GetBotMgr()->GetBot(target->GetGUID()) : nullptr;
+            if (bot && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND))
+            {
+                owner->GetBotMgr()->UnbindBot(bot->GetGUID());
+                return return_success(handler, { bot->GetName() });
+            }
+            return return_syntax(handler);
+        }
+
+        uint32 count = 0;
+        for (decltype(names)::value_type::value_type name : *names)
+        {
+            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
+                if (name[i] == '_')
+                    name[i] = ' ';
+
+            Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
+            if (bot && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND))
+            {
+                ++count;
+                owner->GetBotMgr()->UnbindBot(bot->GetGUID());
+            }
+        }
+
+        if (count == 0)
+        {
+            handler->PSendSysMessage("Unable to unbind any of %u bots!", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        Creature const* cre = (u && u->GetTypeId() == TYPEID_UNIT) ? u->ToCreature() : owner->GetBotMgr()->GetBotByName(*botname);
-        if (!cre || !cre->IsNPCBot() || !owner->GetBotMgr()->GetBot(cre->GetGUID()) ||
-            cre->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND))
-        {
-            handler->SendSysMessage("Must target your active npcbot");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        owner->GetBotMgr()->UnbindBot(cre->GetGUID());
-        handler->PSendSysMessage("%s successfully unbound", cre->GetName().c_str());
-        return true;
+        return return_success(handler, { count });
     }
 
     static bool HandleNpcBotRemoveCommand(ChatHandler* handler)
