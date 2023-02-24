@@ -714,7 +714,7 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotOrderCastCommand(ChatHandler* handler, Optional<std::string_view> bot_name, Optional<std::string> spell_name, Optional<std::string_view> target_token)
+    static bool HandleNpcBotOrderCastCommand(ChatHandler* handler, Optional<std::string> bot_name, Optional<std::string> spell_name, Optional<std::string_view> target_token)
     {
         Player* owner = handler->GetSession()->GetPlayer();
         if (!owner->HaveBot() || !bot_name || !spell_name)
@@ -728,6 +728,10 @@ public:
             if ((*spell_name)[i] == '_')
                 (*spell_name)[i] = ' ';
 
+        for (std::decay_t<decltype(*bot_name)>::size_type i = 0u; i < bot_name->size(); ++i)
+            if ((*bot_name)[i] == '_')
+                (*bot_name)[i] = ' ';
+
         auto canBotUseSpell = [=](Creature const* tbot, uint32 bspell) {
             //we ignore GCD for now
             return bspell && (tbot->GetBotAI()->GetSpellCooldown(bspell) <= tbot->GetBotAI()->GetLastDiff());
@@ -739,7 +743,7 @@ public:
         {
             if (!bot->IsInWorld())
             {
-                handler->PSendSysMessage("NPCBot %s 不存在!", *bot_name);
+                handler->PSendSysMessage("NPCBot %s 不存在!", bot_name->c_str());
                 return true;
             }
             if (!bot->IsAlive())
@@ -772,10 +776,10 @@ public:
             //    }
             //}
 
-            uint8 bot_class = BotMgr::BotClassByClassName(std::string(class_name));
+            uint8 bot_class = BotMgr::BotClassByClassName(class_name);
             if (bot_class == BOT_CLASS_NONE)
             {
-                handler->PSendSysMessage("未知NPCBot名字或职业 %s!", std::string(class_name).c_str());
+                handler->PSendSysMessage("未知NPCBot名字或职业 %s!", class_name.c_str());
                 return true;
             }
 
@@ -1094,7 +1098,7 @@ public:
         return false;
     }
 
-    static bool HandleNpcBotSendToCommand(ChatHandler* handler, Optional<std::vector<std::string_view>> names)
+    static bool HandleNpcBotSendToCommand(ChatHandler* handler, Optional<std::vector<std::string>> names)
     {
         static auto return_syntax = [](ChatHandler* chandler) -> bool {
             chandler->SendSysMessage("Syntax: .npcbot sendto #names...");
@@ -1104,11 +1108,11 @@ public:
             return false;
         };
 
-        static auto return_success = [](ChatHandler* chandler, Variant<std::string_view, uint32> name_or_count) -> bool {
+        static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("你的下一个目标法术将把%u个NPCBots传送到位置...", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("你的下一个目标法术将把%s传送到位置...", name_or_count.get<std::string_view>().data());
+                chandler->PSendSysMessage("你的下一个目标法术将把%s传送到位置...", name_or_count.get<std::string>().c_str());
             return true;
         };
 
@@ -1132,6 +1136,10 @@ public:
         uint32 count = 0;
         for (decltype(names)::value_type::value_type name : *names)
         {
+            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
+                if (name[i] == '_')
+                    name[i] = ' ';
+
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
             if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
@@ -1150,7 +1158,7 @@ public:
         return return_success(handler, { count });
     }
 
-    static bool HandleNpcBotSendToLastCommand(ChatHandler* handler, Optional<std::vector<std::string_view>> names)
+    static bool HandleNpcBotSendToLastCommand(ChatHandler* handler, Optional<std::vector<std::string>> names)
     {
         static auto return_syntax = [](ChatHandler* chandler) -> bool {
             chandler->SendSysMessage("Syntax: .npcbot sendto last #names...");
@@ -1161,11 +1169,11 @@ public:
             return false;
         };
 
-        static auto return_success = [](ChatHandler* chandler, Variant<std::string_view, uint32> name_or_count) -> bool {
+        static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("传送%u 个NPCBots到前一个位置...", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("传送 %s 到前一个位置...", name_or_count.get<std::string_view>().data());
+                chandler->PSendSysMessage("传送 %s 到前一个位置...", name_or_count.get<std::string>().c_str());
             return true;
         };
 
@@ -1189,6 +1197,10 @@ public:
         uint32 count = 0;
         for (decltype(names)::value_type::value_type name : *names)
         {
+            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
+                if (name[i] == '_')
+                    name[i] = ' ';
+
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
             if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
@@ -1207,21 +1219,21 @@ public:
         return return_success(handler, { count });
     }
 
-    static bool HandleNpcBotSendToPointSetCommand(ChatHandler* handler, Optional<uint32> point_id, Optional<std::vector<std::string_view>> names)
+    static bool HandleNpcBotSendToPointSetCommand(ChatHandler* handler, Optional<uint32> point_id, Optional<std::vector<std::string>> names)
     {
         static auto return_syntax = [](ChatHandler* chandler) -> bool {
             chandler->SendSysMessage("Syntax: .npcbot sendto point set #number #names...");
-            chandler->SendSysMessage("Marks selected/named bots' current position as send point by #number");
-            chandler->PSendSysMessage("Point number must be in range 1 ... %u", uint32(MAX_SEND_POINTS));
+            chandler->SendSysMessage("通过编号#number 将选定/给定名字的NPCBots的当前位置标记为传送点");
+            chandler->PSendSysMessage("传送点编号必须在 1 ... %u 范围内", uint32(MAX_SEND_POINTS));
             chandler->SetSentErrorMessage(true);
             return false;
         };
 
-        static auto return_success = [&](ChatHandler* chandler, Variant<std::string_view, uint32> name_or_count) -> bool {
+        static auto return_success = [&](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
-                chandler->PSendSysMessage("Marked send point %u for %u bot(s)", *point_id, name_or_count.get<uint32>());
+                chandler->PSendSysMessage("标记传送点 %u 给 %u 个NPCBots", *point_id, name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Marked send point %u for %s", *point_id, name_or_count.get<std::string_view>().data());
+                chandler->PSendSysMessage("标记传送点 %u 给 %s", *point_id, name_or_count.get<std::string>().c_str());
             return true;
         };
 
@@ -1245,6 +1257,10 @@ public:
         uint32 count = 0;
         for (decltype(names)::value_type::value_type name : *names)
         {
+            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
+                if (name[i] == '_')
+                    name[i] = ' ';
+
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
             if (bot && bot->IsAlive())
             {
@@ -1255,7 +1271,7 @@ public:
 
         if (count == 0)
         {
-            handler->PSendSysMessage("Unable to mark send point for any of %u bots!", uint32(names->size()));
+            handler->PSendSysMessage("无法为任何 %u 个NPCBots标记传送点！", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1263,22 +1279,22 @@ public:
         return return_success(handler, { count });
     }
 
-    static bool HandleNpcBotSendToPointCommand(ChatHandler* handler, Optional<uint32> point_id, Optional<std::vector<std::string_view>> names)
+    static bool HandleNpcBotSendToPointCommand(ChatHandler* handler, Optional<uint32> point_id, Optional<std::vector<std::string>> names)
     {
         static auto return_syntax = [](ChatHandler* chandler) -> bool {
             chandler->SendSysMessage("Syntax: .npcbot sendto point #number #names...");
-            chandler->SendSysMessage("Makes selected/named bot(s) assume previously set point by #number");
-            chandler->SendSysMessage("This will cancel current sendto await state");
-            chandler->SendSysMessage("Max distance is 70 yds");
+            chandler->SendSysMessage("使选定/给定名字的NPCBots移动到先前由#number 设置的点");
+            chandler->SendSysMessage("这将取消当前传送等待状态");
+            chandler->SendSysMessage("最大距离为 70 码");
             chandler->SetSentErrorMessage(true);
             return false;
         };
 
-        static auto return_success = [&](ChatHandler* chandler, Variant<std::string_view, uint32> name_or_count) -> bool {
+        static auto return_success = [&](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
-                chandler->PSendSysMessage("Moving %u bot(s) to point %u...", name_or_count.get<uint32>(), *point_id);
+                chandler->PSendSysMessage("移动 %u 个NPCBots到传送点 %u...", name_or_count.get<uint32>(), *point_id);
             else
-                chandler->PSendSysMessage("Moving %s to point %u...", name_or_count.get<std::string_view>().data(), *point_id);
+                chandler->PSendSysMessage("移动 %s 到传送点 %u...", name_or_count.get<std::string>().c_str(), *point_id);
             return true;
         };
 
@@ -1302,6 +1318,10 @@ public:
         uint32 count = 0;
         for (decltype(names)::value_type::value_type name : *names)
         {
+            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
+                if (name[i] == '_')
+                    name[i] = ' ';
+
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
             if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
@@ -1312,7 +1332,7 @@ public:
 
         if (count == 0)
         {
-            handler->PSendSysMessage("Unable to send any of %u bots!", uint32(names->size()));
+            handler->PSendSysMessage("无法移动 %u 个NPCBots", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1869,7 +1889,7 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotCreateNewCommand(ChatHandler* handler, Optional<std::string_view> name, Optional<uint8> bclass, Optional<uint8> race, Optional<uint8> gender, Optional<uint8> skin, Optional<uint8> face, Optional<uint8> hairstyle, Optional<uint8> haircolor, Optional<uint8> features, Optional<uint8> soundset)
+    static bool HandleNpcBotCreateNewCommand(ChatHandler* handler, Optional<std::string> name, Optional<uint8> bclass, Optional<uint8> race, Optional<uint8> gender, Optional<uint8> skin, Optional<uint8> face, Optional<uint8> hairstyle, Optional<uint8> haircolor, Optional<uint8> features, Optional<uint8> soundset)
     {
         static auto const ret_err = [](ChatHandler* handler, bool report_ranges = false) {
             if (report_ranges)
@@ -1898,6 +1918,10 @@ public:
 
         if (!bclass || !name)
             return ret_err(handler, name && *name == "ranges");
+
+        for (std::decay_t<decltype(*name)>::size_type i = 0u; i < name->size(); ++i)
+            if ((*name)[i] == '_')
+                (*name)[i] = ' ';
 
         bool const can_change_appearance = (*bclass < BOT_CLASS_EX_START || *bclass == BOT_CLASS_ARCHMAGE);
 
@@ -2412,67 +2436,137 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotCommandReBindCommand(ChatHandler* handler, Optional<std::string_view> botname)
+    static bool HandleNpcBotCommandReBindCommand(ChatHandler* handler, Optional<std::vector<std::string>> names)
     {
-        Player const* owner = handler->GetSession()->GetPlayer();
-        Unit const* u = owner->GetSelectedUnit();
-        if ((!u && !botname) || BotDataMgr::GetOwnedBotsCount(owner->GetGUID()) == 0)
-        {
-            handler->SendSysMessage(".npcbot command rebind [#name]");
-            handler->SendSysMessage("重新绑定选定的/指定名字的未绑定的NPCBot");
-            handler->SetSentErrorMessage(true);
+        static auto return_syntax = [](ChatHandler* chandler) -> bool {
+            chandler->SendSysMessage(".npcbot command rebind [#names...]");
+            chandler->SendSysMessage("重新绑定选定的/指定名字的未绑定的NPCBot");
+            chandler->SetSentErrorMessage(true);
             return false;
-        }
+        };
+
+        static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
+            if (name_or_count.holds_alternative<uint32>())
+                chandler->PSendSysMessage("Successfully re-bound %u bot(s)", name_or_count.get<uint32>());
+            else
+                chandler->PSendSysMessage("Successfully re-bound %s", name_or_count.get<std::string>().c_str());
+            return true;
+        };
+
+        Player const* owner = handler->GetSession()->GetPlayer();
+
+        if (!owner->HaveBot())
+            return return_syntax(handler);
 
         BotMgr* mgr = owner->GetBotMgr();
         if (!mgr)
             mgr = new BotMgr(const_cast<Player*>(owner));
 
-        Creature const* cre = (u && u->GetTypeId() == TYPEID_UNIT) ? u->ToCreature() : BotDataMgr::FindBot(*botname, owner->GetSession()->GetSessionDbLocaleIndex());
-        if (!cre || !cre->IsNPCBot() || mgr->GetBot(cre->GetGUID()) ||
-            !cre->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) ||
-            BotDataMgr::SelectNpcBotData(cre->GetEntry())->owner != owner->GetGUID().GetCounter())
+        if (!names || names->empty())
         {
-            handler->SendSysMessage("必须选定你的未绑定的NPCBot");
+            Creature const* bot = handler->getSelectedCreature();
+            if (bot && bot->IsNPCBot() && !mgr->GetBot(bot->GetGUID()) && bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) &&
+                BotDataMgr::SelectNpcBotData(bot->GetEntry())->owner == owner->GetGUID().GetCounter())
+            {
+                if (mgr->RebindBot(const_cast<Creature*>(bot)) != BOT_ADD_SUCCESS)
+                {
+                    handler->PSendSysMessage("由于某种原因，重新绑定 %s 失败了!", bot->GetName().c_str());
+                    handler->SetSentErrorMessage(true);
+                    return false;
+                }
+                return return_success(handler, { bot->GetName() });
+            }
+            return return_syntax(handler);
+        }
+
+        uint32 count = 0;
+        for (decltype(names)::value_type::value_type name : *names)
+        {
+            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
+                if (name[i] == '_')
+                    name[i] = ' ';
+
+            Creature const* bot = BotDataMgr::FindBot(name, owner->GetSession()->GetSessionDbLocaleIndex());
+            if (bot && bot->IsNPCBot() && !mgr->GetBot(bot->GetGUID()) && bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) &&
+                BotDataMgr::SelectNpcBotData(bot->GetEntry())->owner == owner->GetGUID().GetCounter())
+            {
+                if (mgr->RebindBot(const_cast<Creature*>(bot)) != BOT_ADD_SUCCESS)
+                {
+                    handler->PSendSysMessage("由于某种原因，重新绑定 %s 失败了!", name.c_str());
+                    handler->SetSentErrorMessage(true);
+                    continue;
+                }
+                ++count;
+            }
+        }
+
+        if (count == 0)
+        {
+            handler->PSendSysMessage("无法重新绑定 %u 个NPCBots中的任何一个!", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (mgr->RebindBot(const_cast<Creature*>(cre)) != BOT_ADD_SUCCESS)
-        {
-            handler->SendSysMessage("由于某种原因，重新绑定NPCBot失败了!");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        handler->PSendSysMessage("%s成功重新绑定", cre->GetName().c_str());
-        return true;
+        return return_success(handler, { count });
     }
 
-    static bool HandleNpcBotCommandUnBindCommand(ChatHandler* handler, Optional<std::string_view> botname)
+    static bool HandleNpcBotCommandUnBindCommand(ChatHandler* handler, Optional<std::vector<std::string>> names)
     {
+        static auto return_syntax = [](ChatHandler* chandler) -> bool {
+            chandler->SendSysMessage(".npcbot command unbind [#names...]");
+            chandler->SendSysMessage("暂时释放选定/给定名字的NPCBots。机器人将返回原位并等待重新绑定");
+            chandler->SetSentErrorMessage(true);
+            return false;
+        };
+
+        static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
+            if (name_or_count.holds_alternative<uint32>())
+                chandler->PSendSysMessage("成功解绑 %u 个NPCBots", name_or_count.get<uint32>());
+            else
+                chandler->PSendSysMessage("成功解绑 %s", name_or_count.get<std::string>().c_str());
+            return true;
+        };
+
         Player const* owner = handler->GetSession()->GetPlayer();
-        Unit const* u = owner->GetSelectedUnit();
-        if (!owner->HaveBot() || (!u && !botname))
+
+        if (!owner->HaveBot())
+            return return_syntax(handler);
+
+        if (!names || names->empty())
         {
-            handler->SendSysMessage(".npcbot command unbind [#name]");
-            handler->SendSysMessage("暂时释放被选中/指定名字的NPCBot。该NPCBot将返回原地，并等待重新绑定。");
+            Unit const* target = handler->getSelectedCreature();
+            Creature const* bot = target ? owner->GetBotMgr()->GetBot(target->GetGUID()) : nullptr;
+            if (bot && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND))
+            {
+                owner->GetBotMgr()->UnbindBot(bot->GetGUID());
+                return return_success(handler, { bot->GetName() });
+            }
+            return return_syntax(handler);
+        }
+
+        uint32 count = 0;
+        for (decltype(names)::value_type::value_type name : *names)
+        {
+            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
+                if (name[i] == '_')
+                    name[i] = ' ';
+
+            Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
+            if (bot && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND))
+            {
+                ++count;
+                owner->GetBotMgr()->UnbindBot(bot->GetGUID());
+            }
+        }
+
+        if (count == 0)
+        {
+            handler->PSendSysMessage("无法解除绑定 %u 个NPCBots中的任何一个!", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        Creature const* cre = (u && u->GetTypeId() == TYPEID_UNIT) ? u->ToCreature() : owner->GetBotMgr()->GetBotByName(*botname);
-        if (!cre || !cre->IsNPCBot() || !owner->GetBotMgr()->GetBot(cre->GetGUID()) ||
-            cre->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND))
-        {
-            handler->SendSysMessage("必须选定你的已绑定的NPCBot");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        owner->GetBotMgr()->UnbindBot(cre->GetGUID());
-        handler->PSendSysMessage("%s成功解除绑定", cre->GetName().c_str());
-        return true;
+        return return_success(handler, { count });
     }
 
     static bool HandleNpcBotRemoveCommand(ChatHandler* handler)
