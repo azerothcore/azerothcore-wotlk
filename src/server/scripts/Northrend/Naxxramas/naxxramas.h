@@ -25,7 +25,7 @@
 
 #define NaxxramasScriptName "instance_naxxramas"
 
-enum Encouters
+enum Encounters
 {
     BOSS_PATCHWERK                 = 0,
     BOSS_GROBBULUS                 = 1,
