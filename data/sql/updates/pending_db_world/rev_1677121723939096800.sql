@@ -84,5 +84,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2179701, 9, 4, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ancient Shadowmoon Spirit - Actionlist - Say Line 1'),
 (2179701, 9, 5, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 53, 1, 21867, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ancient Shadowmoon Spirit - Actionlist - Start Waypoint');
 
--- Cleanup Chain of Shadows Script (Unused DATA)
+-- Cleanup Chain of Shadows Script
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 21876) AND (`source_type` = 0) AND (`id` IN (3));
