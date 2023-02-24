@@ -18,7 +18,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (15, 30201, 1, 0, 0, 2, 0, 18724, 1, 1, 1, 0, 0, '', '(AND) Require item 18724(Enchanted Black Dragon Sinew) to not be in inventory or bank.');
 
 -- Vartus the Ancient 
-DELETE FROM `gossip_menu_option` WHERE `MenuID`=30201 OR `MenuID`=30201;
+DELETE FROM `gossip_menu_option` WHERE `MenuID`=30201;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 (30201, 0, 0, 'Greetings, ancient one. I have done all that has been asked of me. I now ask that you grant me Rhok\'delar.', 10784, 1, 1, 0, 0, 0, 0, '', 0, 0),
 (30201, 1, 0, 'Greetings, ancient one. I have done all that has been asked of me. I now ask that you grant me Lok\'delar.', 10785, 1, 1, 0, 0, 0, 0, '', 0, 0);
