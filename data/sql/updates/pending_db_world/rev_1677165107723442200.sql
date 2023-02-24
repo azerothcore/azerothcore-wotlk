@@ -86,12 +86,24 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (2079401,1,4940.221,3847.4336,211.49857,NULL,'Kaylaan the Lost'), -- Stand by Socrethar
 (2079402,1,4938.0044,3834.3682,211.35002,NULL,'Kaylaan the Lost'), -- Stand by Ishanah
 -- Ishanah
-(1853800,1,4894.203,3814.9324,205.52324,NULL,'Ishanah'),
-(1853800,2,4909.8877,3824.375,211.50648,NULL,'Ishanah'),
-(1853800,3,4923.284,3827.5364,211.48683,NULL,'Ishanah'),
-(1853800,4,4933.633,3830.1167,211.43718,NULL,'Ishanah'),
-(1853800,5,4935.647,3831.1455,211.39305,NULL,'Ishanah'),
-(1853800,6,4937.065,3832.6042,211.42769,NULL,'Ishanah');
+(1853800,1 ,4881.5283,3806.9114,199.50269,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,2 ,4883.5283,3808.6614,199.50269,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,3 ,4885.7783,3810.4114,199.50269,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,4 ,4889.5283,3812.4114,202.75269,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,5 ,4894.203,3814.9324,205.52324,NULL,'Ishanah'),
+(1853800,6 ,4898.7446,3817.81,208.48784,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,7 ,4907.2446,3822.81,211.73784,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,8 ,4909.8877,3824.375,211.50648,NULL,'Ishanah'),
+(1853800,9 ,4910.0957,3824.607,211.6725,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,10,4919.0957,3826.607,211.6725,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,11,4919.5957,3826.607,211.6725,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,12,4922.5957,3827.357,211.6725,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,13,4923.284,3827.5364,211.48683,NULL,'Ishanah'),
+(1853800,14,4926.301,3828.2864,211.71806,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,15,4932.801,3829.7864,211.71806,NULL,'Ishanah - Decomposed Waypoint'),
+(1853800,16,4933.633,3830.1167,211.43718,NULL,'Ishanah'),
+(1853800,17,4935.647,3831.1455,211.39305,NULL,'Ishanah'),
+(1853800,18,4937.065,3832.6042,211.42769,NULL,'Ishanah');
 
 -- Spawning Event
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23491);
@@ -153,10 +165,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18537, 0, 4, 5, 58, 0, 100, 0, 7, 1853700, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 71631, 20132, 0, 0, 0, 0, 0, 0, 'Adyen the Lightwarden - On Waypoint Finished - Set Data 1 1 on Socrethar (Request Event Start)'),
 (18537, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 10, 71631, 20132, 0, 0, 0, 0, 0, 0, 'Adyen the Lightwarden - On Waypoint Finished - Send Target List to Socrethar'),
 (18537, 0, 6, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 39, 30, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Adyen the Lightwarden - On Aggro - Call For Help'),
-(18538, 0, 0, 1, 38, 0, 100, 0, 1, 1, 0, 0, 0, 53, 1, 1853800, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Data Set 1 1 - Start Waypoint'),
+(18538, 0, 0, 1, 38, 0, 100, 0, 1, 1, 0, 0, 0, 53, 1, 1853800, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Data Set 1 1 - Start Waypoint'),
 (18538, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 83, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Data Set 1 1 - Remove Npc Flags Gossip & Questgiver'),
 (18538, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 2, 250, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Data Set 1 1 - Set Faction 250'),
-(18538, 0, 3, 0, 40, 0, 100, 0, 6, 1853800, 0, 0, 0, 80, 1853800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Waypoint 6 Reached - Run Script'),
+(18538, 0, 3, 0, 40, 0, 100, 0, 18, 1853800, 0, 0, 0, 80, 1853800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Waypoint 18 Reached - Run Script'),
 (18538, 0, 4, 0, 8, 0, 100, 0, 35598, 0, 0, 0, 0, 11, 29266, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Spellhit \'Wrath of Socrethar\' - Cast \'Permanent Feign Death\''), -- Yes, these are sniffed
 (18538, 0, 5, 0, 8, 0, 100, 0, 35599, 0, 0, 0, 0, 28, 29266, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Spellhit \'Resurrection\' - Remove Aura \'Permanent Feign Death\''),
 (19466, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - On Just Summoned - Set Npc Flag '),
