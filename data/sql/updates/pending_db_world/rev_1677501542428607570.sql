@@ -303,3 +303,15 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
      (@CHAMPION_ID, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - On Aggro - Say Line 1'),
      (@ABBOT_ID, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - On Aggro - Say Line 1'),
      (@MONK_ID, 0, 1, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - On Aggro - Say Line 1');
+
+-- --
+-- And it seems that the yell Mograine does when he kills a player is broken.
+-- Let's fix that too.
+
+SET @MOGRAINE_UNWORTHY_GROUP_ID = 1;
+SET @MOGRAINE_UNWORTHY_BROADCAST_ID = 6197;
+SET @MOGRAINE_UNWORTHY_TEXT = (SELECT `MaleText` FROM `broadcast_text` WHERE `ID`=@MOGRAINE_UNWORTHY_BROADCAST_ID);
+
+UPDATE `creature_text`
+    SET `Text` = @MOGRAINE_UNWORTHY_TEXT, `BroadcastTextId` = @MOGRAINE_UNWORTHY_BROADCAST_ID
+    WHERE `GroupID` = @MOGRAINE_UNWORTHY_GROUP_ID AND `ID` = 0 AND `CreatureID` = @MOGRAINE_ID;
