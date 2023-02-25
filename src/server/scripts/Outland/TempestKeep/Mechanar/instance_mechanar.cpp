@@ -36,7 +36,9 @@ public:
     {
         instance_mechanar_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            SetPersistentDataCount(MAX_DATA_INDEXES);
             LoadDoorData(doorData);
 
             _passageEncounter = 0;
@@ -148,7 +150,8 @@ public:
                                     DoSummonAction(creature, player);
                             }
                         }
-                        _passageEncounter++;
+
+                        StorePersistentData(DATA_INDEX_PASSAGE_ENCOUNTER, _passageEncounter++);
                         SaveToDB();
                     }
                 }
@@ -185,67 +188,22 @@ public:
                             if (Creature* creature = instance->GetCreature(_pathaleonGUID))
                                 creature->AI()->DoAction(1);
                         }
-                        _passageEncounter++;
+
+                        StorePersistentData(DATA_INDEX_PASSAGE_ENCOUNTER, _passageEncounter++);
                         SaveToDB();
                     }
                 }
             }
         }
 
-        bool SetBossState(uint32 type, EncounterState state) override
+        void ReadSaveDataMore(std::istringstream& /*data*/) override
         {
-            if (!InstanceScript::SetBossState(type, state))
-                return false;
+            _passageEncounter = GetPersistentData(DATA_INDEX_PASSAGE_ENCOUNTER);
 
-            return true;
-        }
-
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            // Xinef: no space needed
-            saveStream << "M E " << GetBossSaveData() << _passageEncounter;
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(const char* str) override
-        {
-            if (!str)
+            if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
             {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
+                _passageEncounter = ENCOUNTER_PASSAGE_PHASE6;
             }
-
-            OUT_LOAD_INST_DATA(str);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'M' && dataHead2 == 'E')
-            {
-                for (uint32 i = 0; i < MAX_ENCOUNTER; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
-
-                loadStream >> _passageEncounter;
-                if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
-                    _passageEncounter = ENCOUNTER_PASSAGE_PHASE6;
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     private:

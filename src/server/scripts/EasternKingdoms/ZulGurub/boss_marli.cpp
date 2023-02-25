@@ -122,9 +122,9 @@ struct boss_marli : public BossAI
         Talk(SAY_DEATH);
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         events.ScheduleEvent(EVENT_SPAWN_START_SPIDERS, 1s, 0, PHASE_ONE);
         Talk(SAY_AGGRO);
     }
@@ -253,7 +253,7 @@ struct npc_spawn_of_marli : public ScriptedAI
         _scheduler.CancelAll();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.Schedule(4s, [this](TaskContext context)
         {

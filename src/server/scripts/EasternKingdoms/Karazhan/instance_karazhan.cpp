@@ -32,6 +32,12 @@ const Position OptionalSpawn[] =
     { -10899.903320f, -2085.573730f, 49.474449f, 1.38f }  // Rokad the Ravager
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN  },
+    { NPC_MIDNIGHT,             DATA_MIDNIGHT }
+};
+
 class instance_karazhan : public InstanceMapScript
 {
 public:
@@ -46,7 +52,9 @@ public:
     {
         instance_karazhan_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
+            LoadObjectData(creatureData, nullptr);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);

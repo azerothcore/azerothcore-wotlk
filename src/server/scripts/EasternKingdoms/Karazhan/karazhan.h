@@ -60,13 +60,14 @@ enum KZDataTypes
     DATA_GO_SIDE_ENTRANCE_DOOR      = 29,
     DATA_PRINCE                     = 30,
     DATA_SPAWN_OPERA_DECORATIONS    = 31,
+    DATA_MIDNIGHT                   = 32,
 
     // Chess Event
-    CHESS_EVENT_TEAM                = 32,
-    DATA_CHESS_REINIT_PIECES        = 33,
-    DATA_CHESS_GAME_PHASE           = 34,
-    DATA_ECHO_OF_MEDIVH             = 35,
-    DATA_DUST_COVERED_CHEST         = 36
+    CHESS_EVENT_TEAM                = 33,
+    DATA_CHESS_REINIT_PIECES        = 34,
+    DATA_CHESS_GAME_PHASE           = 35,
+    DATA_ECHO_OF_MEDIVH             = 36,
+    DATA_DUST_COVERED_CHEST         = 37
 };
 
 enum KZOperaEvents
@@ -85,6 +86,7 @@ enum KZCreatures
     NPC_MOROES                          = 15687,
     NPC_ATTUMEN_THE_HUNTSMAN            = 15550,
     NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED    = 16152,
+    NPC_MIDNIGHT                        = 16151,
     NPC_NIGHTBANE                       = 17225,
 
     // Trash

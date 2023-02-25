@@ -92,7 +92,7 @@ public:
             ScriptedAI::AttackStart(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->CastSpell(me, SPELL_FROZEN_MALLET, true);
 
@@ -180,7 +180,7 @@ public:
             me->CastSpell(me, SPELL_FROZEN_ORB_DMG, true);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->SetInCombatWithZone();
         }

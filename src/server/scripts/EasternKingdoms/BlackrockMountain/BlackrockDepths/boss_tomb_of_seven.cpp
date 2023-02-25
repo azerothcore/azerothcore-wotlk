@@ -191,7 +191,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _events.ScheduleEvent(EVENT_SPELL_SHADOWBOLTVOLLEY, 10s);
             _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 18s);

@@ -96,9 +96,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             PullChamberAdds();
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_POISON_CLOUD, 15000);

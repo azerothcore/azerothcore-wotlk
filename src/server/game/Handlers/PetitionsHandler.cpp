@@ -91,7 +91,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     }
     else
     {
-        // TODO: find correct opcode
+        /// @todo: find correct opcode
         if (_player->GetLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         {
             SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", _player->GetName(), ERR_ARENA_TEAM_TARGET_TOO_LOW_S);

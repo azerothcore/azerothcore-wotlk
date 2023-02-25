@@ -70,9 +70,9 @@ struct boss_hungarfen : public BossAI
         DoCastAOE(SPELL_DESPAWN_MUSHROOMS, true);
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
 
         _scheduler.Schedule(IsHeroic() ? randtime(2400ms, 3600ms) : 10s, [this](TaskContext context)
             {
