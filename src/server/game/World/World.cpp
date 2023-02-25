@@ -1582,6 +1582,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading SpellInfo Store...");
     sSpellMgr->LoadSpellInfoStore();
 
+    LOG_INFO("server.loading", "Loading Spell Cooldown Overrides...");
+    sSpellMgr->LoadSpellCooldownOverrides();
+
     LOG_INFO("server.loading", "Loading SpellInfo Data Corrections...");
     sSpellMgr->LoadSpellInfoCorrections();
 
