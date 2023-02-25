@@ -426,7 +426,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (who && who->GetDistance2d(me) < 15.0f)
+            if (who && who->GetDistance2d(me) < 3.0f)
                 if (Player* player = who->ToPlayer())
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
