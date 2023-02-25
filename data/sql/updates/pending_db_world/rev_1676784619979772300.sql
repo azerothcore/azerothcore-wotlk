@@ -211,4 +211,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2102903, 9, 5, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 29, 2, 180, 0, 0, 0, 0, 10, 25119, 21027, 0, 0, 0, 0, 0, 0, 'Captured Water Spirit - Actionlist - Start Follow Closest Creature \'Earthmender Wilda\'');
 
 -- Fix for serverside spell
-UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 64, `EffectBasePoints_1` = 1 WHERE `ID` = 35937;
+UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 64, `EffectBasePoints_1` = 0 WHERE `ID` = 35937;
