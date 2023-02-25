@@ -132,19 +132,19 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (14, 8117, 10051, 0, 0, 23, 1, 3742, 0, 0, 1, 0, 0, '', 'Show text when outside Socrethar\'s Seat'),
 (14, 8117, 10210, 0, 0, 23, 1, 3742, 0, 0, 0, 0, 0, '', 'Show text when inside Socrethar\'s Seat'),
 (15, 8117, 0, 0, 0, 23, 1, 3742, 0, 0, 0, 0, 0, '', 'Show gossip option only when inside Socrethar\'s Seat'),
-(15, 8117, 0, 0, 0, 29, 1, 20132, 200, 0, 0, 0, 0, '', 'Show gossip option only when Socrethar is alive.'),
-(15, 8117, 0, 0, 0, 29, 1, 20794, 200, 0, 1, 0, 0, '', 'Show gossip option only when Kaylaan hasn\'t spawned.'),
+(15, 8117, 0, 0, 0, 29, 1, 20132, 200, 0, 0, 0, 0, '', 'Show gossip option only when Socrethar is alive'),
+(15, 8117, 0, 0, 0, 29, 1, 20794, 200, 0, 1, 0, 0, '', 'Show gossip option only when Kaylaan hasn\'t spawned'),
 (15, 8117, 0, 0, 0, 9, 0, 10409, 0, 0, 0, 0, 0, '', 'Show gossip option only if player has quest \'Deathblow to the Legion\''),
 -- Ishanah Gossip
-(14, 7735, 9457, 0, 0, 23, 1, 3703, 0, 0, 0, 0, 0, '', 'Show text only when inside Shattrath.'),
-(15, 7735, 0, 0, 0, 23, 1, 3703, 0, 0, 0, 0, 0, '', 'Show gossip option only when inside Shattrath.'),
-(15, 7735, 1, 0, 0, 23, 1, 3703, 0, 0, 0, 0, 0, '', 'Show gossip option only when inside Shattrath.');
+(14, 7735, 9457, 0, 0, 23, 1, 3703, 0, 0, 0, 0, 0, '', 'Show text only when inside Shattrath'),
+(15, 7735, 0, 0, 0, 23, 1, 3703, 0, 0, 0, 0, 0, '', 'Show gossip option only when inside Shattrath'),
+(15, 7735, 1, 0, 0, 23, 1, 3703, 0, 0, 0, 0, 0, '', 'Show gossip option only when inside Shattrath');
 
 -- SAI Conditions
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` = 23491);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 1, 23491, 0, 0, 29, 1, 18537, 200, 0, 1, 0, 0, '', 'Do not spawn Socrethar Event group if there is already one spawned within 200y.'),
-(22, 1, 23491, 0, 0, 29, 1, 20794, 200, 0, 1, 0, 0, '', 'Do not spawn Socrethar Event group if Kaylaan has already spawned within 200y.');
+(22, 1, 23491, 0, 0, 29, 1, 18537, 200, 0, 1, 0, 0, '', 'Do not spawn Socrethar Event group if there is already one spawned within 200y'),
+(22, 1, 23491, 0, 0, 29, 1, 20794, 200, 0, 1, 0, 0, '', 'Do not spawn Socrethar Event group if Kaylaan has already spawned within 200y');
 
 -- Spell Conditions
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (35598, 35599, 35600));
@@ -178,6 +178,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18537, 0, 4, 5, 58, 0, 100, 0, 7, 1853700, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 71631, 20132, 0, 0, 0, 0, 0, 0, 'Adyen the Lightwarden - On Waypoint Finished - Set Data 1 1 on Socrethar (Request Event Start)'),
 (18537, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 10, 71631, 20132, 0, 0, 0, 0, 0, 0, 'Adyen the Lightwarden - On Waypoint Finished - Send Target List to Socrethar'),
 (18537, 0, 6, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 39, 30, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Adyen the Lightwarden - On Aggro - Call For Help'),
+(18537, 0, 7, 0, 0, 0, 100, 0, 0, 3500, 2000, 7500, 0, 11, 14518, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Adyen the Lightwarden - In Combat - Cast \'Crusader Strike\''),
+(18537, 0, 8, 0, 0, 0, 100, 0, 15000, 40000, 20000, 60000, 0, 11, 13005, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Adyen the Lightwarden - In Combat - Cast \'Hammer of Justice\''),
 (18538, 0, 0, 1, 38, 0, 100, 0, 1, 1, 0, 0, 0, 53, 1, 1853800, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Data Set 1 1 - Start Waypoint'),
 (18538, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 83, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Data Set 1 1 - Remove Npc Flags Gossip & Questgiver'),
 (18538, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 2, 250, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Data Set 1 1 - Set Faction 250'),
@@ -185,10 +187,18 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18538, 0, 4, 0, 8, 0, 100, 0, 35598, 0, 0, 0, 0, 11, 29266, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Spellhit \'Wrath of Socrethar\' - Cast \'Permanent Feign Death\''), -- Yes, these are sniffed
 (18538, 0, 5, 0, 8, 0, 100, 0, 35599, 0, 0, 0, 0, 28, 29266, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Spellhit \'Resurrection\' - Remove Aura \'Permanent Feign Death\''),
 (18538, 0, 6, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 39, 50, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - On Aggro - Call For Help'),
+(18538, 0, 7, 0, 0, 0, 100, 0, 0, 3500, 2500, 7500, 0, 11, 15238, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - In Combat - Cast \'Holy Smite\''),
+(18538, 0, 8, 0, 14, 0, 100, 0, 5000, 40, 30000, 60000, 0, 11, 35096, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - Friendly At 5000 Health - Cast \'Greater Heal\''),
+(18538, 0, 9, 0, 14, 0, 100, 0, 3000, 40, 45000, 75000, 0, 11, 22187, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ishanah - Friendly At 3000 Health - Cast \'Power Word: Shield\''),
 (19466, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - On Just Summoned - Set Npc Flag '),
 (19466, 0, 1, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1946601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - On Data Set 1 1 - Run Script'),
+(19466, 0, 2, 0, 0, 0, 100, 0, 0, 3500, 15000, 21000, 0, 11, 29426, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - In Combat - Cast \'Heroic Strike\''),
+(19466, 0, 3, 0, 0, 0, 100, 0, 10000, 15000, 30000, 30000, 0, 11, 16509, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - In Combat - Cast \'Rend\''),
+(19466, 0, 4, 0, 0, 0, 100, 0, 7500, 21000, 20000, 45000, 0, 11, 13730, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - In Combat - Cast \'Demoralizing Shout\''),
 (19467, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Karja - On Just Summoned - Set Npc Flag '),
 (19467, 0, 1, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1946701, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Karja - On Data Set 1 1 - Run Script'),
+(19467, 0, 2, 0, 0, 0, 100, 0, 3500, 10000, 7500, 15000, 0, 11, 9734, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Karja - In Combat - Cast \'Holy Smite\''),
+(19467, 0, 3, 0, 14, 0, 100, 0, 4000, 40, 15000, 30000, 0, 11, 35096, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Karja - Friendly At 4000 Health - Cast \'Greater Heal\''),
 (20132, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 2013200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - On Data Set 1 1 - Run Script'),
 (20132, 0, 1, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 11, 35596, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - On Data Set 2 2 - Cast \'Power of the Legion\''),
 (20132, 0, 2, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 18538, 50, 0, 0, 0, 0, 0, 0, 'Socrethar - On Data Set 3 3 - Set Orientation Closest Creature \'Ishanah\''),
@@ -201,13 +211,21 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20132, 0, 9, 10, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 150000, 0, 0, 0, 0, 0, 19, 18538, 100, 0, 0, 0, 0, 0, 0, 'Socrethar - On Just Died - Cleanup Event'),
 (20132, 0, 10, 11, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 60000, 0, 0, 0, 0, 0, 19, 19466, 100, 0, 0, 0, 0, 0, 0, 'Socrethar - On Just Died - Cleanup Event'),
 (20132, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 60000, 0, 0, 0, 0, 0, 19, 19467, 100, 0, 0, 0, 0, 0, 0, 'Socrethar - On Just Died - Cleanup Event'),
+(20132, 0, 12, 0, 23, 0, 100, 0, 37539, 0, 3600, 3600, 0, 11, 37539, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - On Missing Aura \'Nether Protection\' - Cast \'Nether Protection\''),
+(20132, 0, 13, 0, 0, 0, 100, 0, 2500, 7500, 15000, 25000, 0, 11, 15496, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - In Combat - Cast \'Cleave\''),
+(20132, 0, 14, 0, 0, 0, 100, 0, 10000, 15000, 40000, 60000, 0, 11, 37538, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - In Combat - Cast \'Anti-Magic Shield\''),
+(20132, 0, 15, 0, 0, 0, 100, 0, 17000, 24000, 10000, 35000, 0, 11, 28448, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - In Combat - Cast \'Shadow Bolt Volley\''),
+(20132, 0, 16, 0, 0, 0, 100, 0, 30000, 40000, 30000, 40000, 0, 11, 37540, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - In Combat - Cast \'Fireball Barrage\''),
+(20132, 0, 17, 0, 0, 0, 100, 0, 30000, 45000, 35000, 50000, 0, 11, 37537, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Socrethar - In Combat - Cast \'Backlash\''),
 (20794, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 53, 0, 2079400, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Data Set 1 1 - Start Waypoint'),
 (20794, 0, 1, 0, 58, 0, 100, 0, 4, 2079400, 0, 0, 0, 80, 2079400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Waypoint Finished - Run Script'),
 (20794, 0, 2, 0, 2, 0, 100, 1, 0, 25, 0, 0, 0, 80, 2079401, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - Between 0-25% Health - Run Script (No Repeat)'),
 (20794, 0, 3, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 18538, 50, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Data Set 2 2 - Set Orientation Closest Creature \'Ishanah\''),
 (20794, 0, 4, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Data Set 3 3 - Set Flag Standstate Kneel'),
 (20794, 0, 5, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 80, 2079402, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Data Set 4 4 - Run Script'),
-(20794, 0, 6, 0, 8, 0, 100, 0, 35600, 0, 0, 0, 0, 11, 29266, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Spellhit \'Wrath of Socrethar\' - Cast \'Permanent Feign Death\'');
+(20794, 0, 6, 0, 8, 0, 100, 0, 35600, 0, 0, 0, 0, 11, 29266, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - On Spellhit \'Wrath of Socrethar\' - Cast \'Permanent Feign Death\''),
+(20794, 0, 7, 0, 0, 0, 100, 0, 2500, 7500, 3500, 8500, 0, 11, 37552, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - In Combat - Cast \'Burning Light\''),
+(20794, 0, 8, 0, 0, 0, 100, 0, 8000, 12000, 12000, 21000, 0, 11, 37553, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan the Lost - In Combat - Cast \'Consecration\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1853700, 1946601, 1946701, 2013200, 2079400, 2079401, 1853800, 2013201, 2079402, 2013202));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
