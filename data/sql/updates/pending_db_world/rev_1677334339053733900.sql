@@ -177,8 +177,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20561, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Withered Corpse - On Spellhit \'Protectorate Igniter\' - Kill Target'),
 (20561, 0, 3, 4, 10, 0, 100, 1, 0, 4, 0, 0, 1, 11, 35309, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Withered Corpse - Within 0-4 Range Out of Combat LoS - Cast \'Bloody Explosion\''),
 (20561, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 36, 20335, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Withered Corpse - Within 0-4 Range Out of Combat LoS - Update Template To \'Parasitic Fleshbeast\''),
-(20561, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 28, 31261, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Withered Corpse - Within 0-4 Range Out of Combat LoS - Remove Aura \'Permanent Feign Death (Root)\' (No Repeat)'),
-(20561, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Withered Corpse - Within 0-4 Range Out of Combat LoS - Set Event Phase 1 (No Repeat)'),
-(20561, 0, 7, 0, 1, 1, 100, 1, 60000, 60000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Withered Corpse - Out of Combat - Despawn Instant (Phase 1) (No Repeat)');
+(20561, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 28, 31261, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Withered Corpse - Within 0-4 Range Out of Combat LoS - Remove Aura \'Permanent Feign Death (Root)\' (No Repeat)');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2056100);
