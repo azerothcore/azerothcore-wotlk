@@ -329,7 +329,7 @@ public:
  *
  * @todo: Actual emote and BroadcastTextId need to be sniffed. Probably the entire event to begin with....
  * There is a possibility that the unused texts are chosen by random for specific parts of the speech. (making it look like they are preset, when in fact, they are not)
- * 
+ *
  */
 
 enum ApparitionMisc
