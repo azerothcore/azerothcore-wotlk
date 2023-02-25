@@ -340,7 +340,7 @@ public:
             switch (uiSteps)
             {
                 case 1:
-                    me->GetMotionMaster()->MovePoint(0, 1152.039795f, 1398.405518f, 32.527878f);
+                    me->SetFacingTo(3.13f);
                     return 2 * IN_MILLISECONDS;
                 case 2:
                     me->SetSheath(SHEATH_STATE_UNARMED);
