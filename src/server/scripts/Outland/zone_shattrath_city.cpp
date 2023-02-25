@@ -86,18 +86,26 @@ public:
         {
             m_uiNormFaction = creature->GetFaction();
         }
-
+        uint32 Drink_Timer = 5000;
         uint32 m_uiNormFaction;
         uint32 Uppercut_Timer;
 
         void Reset() override
         {
+            Drink_Timer = 5000;
             Uppercut_Timer = 5000;
             me->RestoreFaction();
         }
 
         void UpdateAI(uint32 diff) override
         {
+            if (!me->IsInCombat() && Drink_Timer <= diff)
+            {
+                me->HandleEmoteCommand(7);
+                Drink_Timer = 5000;
+            }
+            else Drink_Timer -= diff;
+
             if (!UpdateVictim())
                 return;
 
