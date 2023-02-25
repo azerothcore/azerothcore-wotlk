@@ -564,6 +564,7 @@ struct npc_echo_of_medivh : public ScriptedAI
                         _instance->DoRespawnGameObject(_instance->GetGuidData(DATA_DUST_COVERED_CHEST), DAY);
                         Talk(TALK_EVENT_ENDED);
                         ended = true;
+                        _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
                     }
                     else if (_instance->GetData(DATA_CHESS_EVENT) == SPECIAL)
                     {
@@ -571,6 +572,7 @@ struct npc_echo_of_medivh : public ScriptedAI
                         _instance->SetData(DATA_CHESS_REINIT_PIECES, 0);
                         _instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_PVE_FINISHED);
                         ended = true;
+                        _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
                     }
                     break;
                 default:
@@ -631,12 +633,14 @@ struct npc_echo_of_medivh : public ScriptedAI
                         Talk(TALK_EVENT_ENDED);
                         _instance->DoRespawnGameObject(_instance->GetGuidData(DATA_DUST_COVERED_CHEST), DAY);
                         ended = true;
+                        _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
                     }
                     else if (_instance->GetData(DATA_CHESS_EVENT) == SPECIAL)
                     {
                         _instance->SetData(DATA_CHESS_EVENT, DONE);
                         _instance->SetData(DATA_CHESS_REINIT_PIECES, 0);
                         _instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_PVE_FINISHED);
+                        _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
                         ended = true;
                     }
                     break;
@@ -688,6 +692,7 @@ struct npc_echo_of_medivh : public ScriptedAI
                     _instance->SetData(DATA_CHESS_EVENT, DONE);
                     _instance->SetData(DATA_CHESS_REINIT_PIECES, 0);
                     _instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_PVE_FINISHED);
+                    _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
                     break;
             }
 
@@ -1386,10 +1391,16 @@ struct npc_echo_of_medivh : public ScriptedAI
                 _instance->SetData(DATA_CHESS_REINIT_PIECES, 0);
                 _deadCount.fill(0);
                 if (_instance->GetData(DATA_CHESS_EVENT) == IN_PROGRESS)
+                {
                     _instance->SetData(DATA_CHESS_EVENT, NOT_STARTED);
+                    _instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_NOT_STARTED);
+                }
                 else if (_instance->GetData(DATA_CHESS_EVENT) == SPECIAL)
+                {
                     _instance->SetData(DATA_CHESS_EVENT, DONE);
-                _instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_NOT_STARTED);
+                    _instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_PVE_FINISHED);
+                }
+                _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
                 break;
             case MEDIVH_GOSSIP_START_PVP:
                 _instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_PVP_WARMUP);
