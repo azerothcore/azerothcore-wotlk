@@ -170,3 +170,136 @@ SET @MOGRAINE_APPROACH_TEXT := (SELECT `MaleText` FROM `broadcast_text` WHERE `I
 UPDATE `creature_text`
     SET `Text` = @MOGRAINE_APPROACH_TEXT, `BroadcastTextId` = @MOGRAINE_APPROACH_BROADCAST_ID
     WHERE `GroupID` = 3 AND `ID` = 0 AND `CreatureID` = @MOGRAINE_ID;
+
+-- --
+-- And while I am doing this, fix the non-Ashbringer texts for the NPCs too,
+-- some of them exist in the DB but there's no script to say them, some of
+-- them are missing, and Centurion says Ashbringer texts on aggro.
+--
+-- Speaking of Centurion, its smart script that says the Ashbringer texts on
+-- aggro was used as the basis for the scripts for saying the correct on
+-- aggro texts for all of these NPCs.
+-- Scarlet Wizard has the texts -> copy the texts from Wizard's creature_text.
+
+-- Move Abbot's emote to a different group.
+
+SET @COMBAT_TEXTS_GROUP_ID = 1;
+
+UPDATE `creature_text`
+    SET `GroupID` = 2
+    WHERE `GroupID` = @COMBAT_TEXTS_GROUP_ID AND `CreatureID` = @ABBOT_ID AND `Type` = 16
+    AND `ID` = 0;
+
+UPDATE `smart_scripts`
+    SET `action_param1` = 2, `comment` = 'Scarlet Abbot - Between 0-40% Health - Say Line 2'
+    WHERE (`entryorguid` = @ABBOT_ID) AND (`source_type` = 0) AND (`id` = 4);
+
+-- Add missing texts
+
+SET @TAINT_SCOURGE_ID = 0;
+SET @TAINT_SCOURGE_BROADCAST_ID = (SELECT `BroadcastTextId` FROM `creature_text`
+                                    WHERE `CreatureID` = @WIZARD_ID
+                                    AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
+                                    AND `ID` = @TAINT_SCOURGE_ID);
+SET @TAINT_SCOURGE_TEXT = (SELECT `Text` FROM `creature_text`
+                            WHERE `CreatureID` = @WIZARD_ID
+                            AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
+                            AND `ID` = @TAINT_SCOURGE_ID);
+
+DELETE FROM `creature_text`
+    WHERE `GroupID` = @COMBAT_TEXTS_GROUP_ID AND `ID` = @TAINT_SCOURGE_ID
+    AND `CreatureID` IN (@SORCERER_ID, @DEFENDER_ID, @CHAPLAIN_ID, @CENTURION_ID, @CHAMPION_ID, @ABBOT_ID, @MONK_ID);
+
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+     (@SORCERER_ID, @COMBAT_TEXTS_GROUP_ID, @TAINT_SCOURGE_ID, @TAINT_SCOURGE_TEXT, 12, 7, 25.0, 0, 0, 0, @TAINT_SCOURGE_BROADCAST_ID, 0, 'Scarlet Sorcerer'),
+     (@DEFENDER_ID, @COMBAT_TEXTS_GROUP_ID, @TAINT_SCOURGE_ID, @TAINT_SCOURGE_TEXT, 12, 7, 25.0, 0, 0, 0, @TAINT_SCOURGE_BROADCAST_ID, 0, 'Scarlet Defender'),
+     (@CHAPLAIN_ID, @COMBAT_TEXTS_GROUP_ID, @TAINT_SCOURGE_ID, @TAINT_SCOURGE_TEXT, 12, 7, 25.0, 0, 0, 0, @TAINT_SCOURGE_BROADCAST_ID, 0, 'Scarlet Chaplain'),
+     (@CENTURION_ID, @COMBAT_TEXTS_GROUP_ID, @TAINT_SCOURGE_ID, @TAINT_SCOURGE_TEXT, 12, 7, 25.0, 0, 0, 0, @TAINT_SCOURGE_BROADCAST_ID, 0, 'Scarlet Centurion'),
+     (@CHAMPION_ID, @COMBAT_TEXTS_GROUP_ID, @TAINT_SCOURGE_ID, @TAINT_SCOURGE_TEXT, 12, 7, 25.0, 0, 0, 0, @TAINT_SCOURGE_BROADCAST_ID, 0, 'Scarlet Champion'),
+     (@ABBOT_ID, @COMBAT_TEXTS_GROUP_ID, @TAINT_SCOURGE_ID, @TAINT_SCOURGE_TEXT, 12, 7, 25.0, 0, 0, 0, @TAINT_SCOURGE_BROADCAST_ID, 0, 'Scarlet Abbot'),
+     (@MONK_ID, @COMBAT_TEXTS_GROUP_ID, @TAINT_SCOURGE_ID, @TAINT_SCOURGE_TEXT, 12, 7, 25.0, 0, 0, 0, @TAINT_SCOURGE_BROADCAST_ID, 0, 'Scarlet Monk');
+
+SET @NO_ESCAPE_ID = 1;
+SET @NO_ESCAPE_BROADCAST_ID = (SELECT `BroadcastTextId` FROM `creature_text`
+                                WHERE `CreatureID` = @WIZARD_ID
+                                AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
+                                AND `ID` = @NO_ESCAPE_ID);
+SET @NO_ESCAPE_TEXT = (SELECT `Text` FROM `creature_text`
+                        WHERE `CreatureID` = @WIZARD_ID
+                        AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
+                        AND `ID` = @NO_ESCAPE_ID);
+
+DELETE FROM `creature_text`
+    WHERE `GroupID` = @COMBAT_TEXTS_GROUP_ID AND `ID` = @NO_ESCAPE_ID
+    AND `CreatureID` IN (@SORCERER_ID, @DEFENDER_ID, @CHAPLAIN_ID, @CENTURION_ID, @CHAMPION_ID, @ABBOT_ID, @MONK_ID);
+
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+     (@SORCERER_ID, @COMBAT_TEXTS_GROUP_ID, @NO_ESCAPE_ID, @NO_ESCAPE_TEXT, 12, 7, 25.0, 0, 0, 0, @NO_ESCAPE_BROADCAST_ID, 0, 'Scarlet Sorcerer'),
+     (@DEFENDER_ID, @COMBAT_TEXTS_GROUP_ID, @NO_ESCAPE_ID, @NO_ESCAPE_TEXT, 12, 7, 25.0, 0, 0, 0, @NO_ESCAPE_BROADCAST_ID, 0, 'Scarlet Defender'),
+     (@CHAPLAIN_ID, @COMBAT_TEXTS_GROUP_ID, @NO_ESCAPE_ID, @NO_ESCAPE_TEXT, 12, 7, 25.0, 0, 0, 0, @NO_ESCAPE_BROADCAST_ID, 0, 'Scarlet Chaplain'),
+     (@CENTURION_ID, @COMBAT_TEXTS_GROUP_ID, @NO_ESCAPE_ID, @NO_ESCAPE_TEXT, 12, 7, 25.0, 0, 0, 0, @NO_ESCAPE_BROADCAST_ID, 0, 'Scarlet Centurion'),
+     (@CHAMPION_ID, @COMBAT_TEXTS_GROUP_ID, @NO_ESCAPE_ID, @NO_ESCAPE_TEXT, 12, 7, 25.0, 0, 0, 0, @NO_ESCAPE_BROADCAST_ID, 0, 'Scarlet Champion'),
+     (@ABBOT_ID, @COMBAT_TEXTS_GROUP_ID, @NO_ESCAPE_ID, @NO_ESCAPE_TEXT, 12, 7, 25.0, 0, 0, 0, @NO_ESCAPE_BROADCAST_ID, 0, 'Scarlet Abbot'),
+     (@MONK_ID, @COMBAT_TEXTS_GROUP_ID, @NO_ESCAPE_ID, @NO_ESCAPE_TEXT, 12, 7, 25.0, 0, 0, 0, @NO_ESCAPE_BROADCAST_ID, 0, 'Scarlet Monk');
+
+SET @LIGHT_CONDEMNS_ID = 2;
+SET @LIGHT_CONDEMNS_BROADCAST_ID = (SELECT `BroadcastTextId` FROM `creature_text`
+                                        WHERE `CreatureID` = @WIZARD_ID
+                                        AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
+                                        AND `ID` = @LIGHT_CONDEMNS_ID);
+SET @LIGHT_CONDEMNS_TEXT = (SELECT `Text` FROM `creature_text`
+                                WHERE `CreatureID` = @WIZARD_ID
+                                AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
+                                AND `ID` = @LIGHT_CONDEMNS_ID);
+
+DELETE FROM `creature_text`
+    WHERE `GroupID` = @COMBAT_TEXTS_GROUP_ID AND `ID` = @LIGHT_CONDEMNS_ID
+    AND `CreatureID` IN (@SORCERER_ID, @DEFENDER_ID, @CHAPLAIN_ID, @CENTURION_ID, @CHAMPION_ID, @ABBOT_ID, @MONK_ID);
+
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+     (@SORCERER_ID, @COMBAT_TEXTS_GROUP_ID, @LIGHT_CONDEMNS_ID, @LIGHT_CONDEMNS_TEXT, 12, 7, 25.0, 0, 0, 0, @LIGHT_CONDEMNS_BROADCAST_ID, 0, 'Scarlet Sorcerer'),
+     (@DEFENDER_ID, @COMBAT_TEXTS_GROUP_ID, @LIGHT_CONDEMNS_ID, @LIGHT_CONDEMNS_TEXT, 12, 7, 25.0, 0, 0, 0, @LIGHT_CONDEMNS_BROADCAST_ID, 0, 'Scarlet Defender'),
+     (@CHAPLAIN_ID, @COMBAT_TEXTS_GROUP_ID, @LIGHT_CONDEMNS_ID, @LIGHT_CONDEMNS_TEXT, 12, 7, 25.0, 0, 0, 0, @LIGHT_CONDEMNS_BROADCAST_ID, 0, 'Scarlet Chaplain'),
+     (@CENTURION_ID, @COMBAT_TEXTS_GROUP_ID, @LIGHT_CONDEMNS_ID, @LIGHT_CONDEMNS_TEXT, 12, 7, 25.0, 0, 0, 0, @LIGHT_CONDEMNS_BROADCAST_ID, 0, 'Scarlet Centurion'),
+     (@CHAMPION_ID, @COMBAT_TEXTS_GROUP_ID, @LIGHT_CONDEMNS_ID, @LIGHT_CONDEMNS_TEXT, 12, 7, 25.0, 0, 0, 0, @LIGHT_CONDEMNS_BROADCAST_ID, 0, 'Scarlet Champion'),
+     (@ABBOT_ID, @COMBAT_TEXTS_GROUP_ID, @LIGHT_CONDEMNS_ID, @LIGHT_CONDEMNS_TEXT, 12, 7, 25.0, 0, 0, 0, @LIGHT_CONDEMNS_BROADCAST_ID, 0, 'Scarlet Abbot'),
+     (@MONK_ID, @COMBAT_TEXTS_GROUP_ID, @LIGHT_CONDEMNS_ID, @LIGHT_CONDEMNS_TEXT, 12, 7, 25.0, 0, 0, 0, @LIGHT_CONDEMNS_BROADCAST_ID, 0, 'Scarlet Monk');
+
+SET @SMITE_WICKED_ID = 3;
+SET @SMITE_WICKED_BROADCAST_ID = (SELECT `BroadcastTextId` FROM `creature_text`
+                                    WHERE `CreatureID` = @WIZARD_ID
+                                    AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
+                                    AND `ID` = @SMITE_WICKED_ID);
+SET @SMITE_WICKED_TEXT = (SELECT `Text` FROM `creature_text`
+                            WHERE `CreatureID` = @WIZARD_ID
+                            AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
+                            AND `ID` = @SMITE_WICKED_ID);
+
+DELETE FROM `creature_text`
+    WHERE `GroupID` = @COMBAT_TEXTS_GROUP_ID AND `ID` = @SMITE_WICKED_ID
+    AND `CreatureID` IN (@SORCERER_ID, @DEFENDER_ID, @CHAPLAIN_ID, @CENTURION_ID, @CHAMPION_ID, @ABBOT_ID, @MONK_ID);
+
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+     (@SORCERER_ID, @COMBAT_TEXTS_GROUP_ID, @SMITE_WICKED_ID, @SMITE_WICKED_TEXT, 12, 7, 25.0, 0, 0, 0, @SMITE_WICKED_BROADCAST_ID, 0, 'Scarlet Sorcerer'),
+     (@DEFENDER_ID, @COMBAT_TEXTS_GROUP_ID, @SMITE_WICKED_ID, @SMITE_WICKED_TEXT, 12, 7, 25.0, 0, 0, 0, @SMITE_WICKED_BROADCAST_ID, 0, 'Scarlet Defender'),
+     (@CHAPLAIN_ID, @COMBAT_TEXTS_GROUP_ID, @SMITE_WICKED_ID, @SMITE_WICKED_TEXT, 12, 7, 25.0, 0, 0, 0, @SMITE_WICKED_BROADCAST_ID, 0, 'Scarlet Chaplain'),
+     (@CENTURION_ID, @COMBAT_TEXTS_GROUP_ID, @SMITE_WICKED_ID, @SMITE_WICKED_TEXT, 12, 7, 25.0, 0, 0, 0, @SMITE_WICKED_BROADCAST_ID, 0, 'Scarlet Centurion'),
+     (@CHAMPION_ID, @COMBAT_TEXTS_GROUP_ID, @SMITE_WICKED_ID, @SMITE_WICKED_TEXT, 12, 7, 25.0, 0, 0, 0, @SMITE_WICKED_BROADCAST_ID, 0, 'Scarlet Champion'),
+     (@ABBOT_ID, @COMBAT_TEXTS_GROUP_ID, @SMITE_WICKED_ID, @SMITE_WICKED_TEXT, 12, 7, 25.0, 0, 0, 0, @SMITE_WICKED_BROADCAST_ID, 0, 'Scarlet Abbot'),
+     (@MONK_ID, @COMBAT_TEXTS_GROUP_ID, @SMITE_WICKED_ID, @SMITE_WICKED_TEXT, 12, 7, 25.0, 0, 0, 0, @SMITE_WICKED_BROADCAST_ID, 0, 'Scarlet Monk');
+
+-- Add smart scripts to say the combat lines
+
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN (@SORCERER_ID, @MYRMIDON_ID, @WIZARD_ID, @CHAMPION_ID, @ABBOT_ID, @CENTURION_ID) AND (`source_type` = 0) AND (`id` = 0);
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN (@DEFENDER_ID, @CHAPLAIN_ID, @MONK_ID) AND (`source_type` = 0) AND (`id` = 1);
+
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+     (@SORCERER_ID, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Sorcerer - On Aggro - Say Line 1'),
+     (@MYRMIDON_ID, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - On Aggro - Say Line 1'),
+     (@DEFENDER_ID, 0, 1, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender - On Aggro - Say Line 1'),
+     (@CHAPLAIN_ID, 0, 1, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - On Aggro - Say Line 1'),
+     (@WIZARD_ID, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - On Aggro - Say Line 1'),
+     (@CENTURION_ID, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - On Aggro - Say Line 1'),
+     (@CHAMPION_ID, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - On Aggro - Say Line 1'),
+     (@ABBOT_ID, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - On Aggro - Say Line 1'),
+     (@MONK_ID, 0, 1, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - On Aggro - Say Line 1');
