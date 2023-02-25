@@ -371,17 +371,24 @@ public:
                         summon->CastSpell(summon, SPELL_GROW, true);
                     return;
                 case NPC_GAS_CLOUD:
+                {
+                    Creature* pissbacke = summon->ToCreature();
                     // no possible aura seen in sniff adding the aurastate
                     summon->ModifyAuraState(AURA_STATE_UNKNOWN22, true);
                     summon->CastSpell(summon, SPELL_GASEOUS_BLOAT_PROC, true);
                     summon->SetReactState(REACT_PASSIVE);
                     break;
+                }
                 case NPC_VOLATILE_OOZE:
+                {
                     // no possible aura seen in sniff adding the aurastate
+                    Creature* pissbacke = summon->ToCreature();
+                    
                     summon->ModifyAuraState(AURA_STATE_UNKNOWN19, true);
                     summon->CastSpell(summon, SPELL_OOZE_ERUPTION_SEARCH_PERIODIC, true);
                     summon->SetReactState(REACT_PASSIVE);
                     break;
+                }
                 case NPC_CHOKING_GAS_BOMB:
                     summon->CastSpell(summon, SPELL_CHOKING_GAS_BOMB_PERIODIC, true);
                     summon->CastSpell(summon, SPELL_CHOKING_GAS_EXPLOSION_TRIGGER, true);
