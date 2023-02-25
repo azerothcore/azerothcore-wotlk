@@ -601,7 +601,7 @@ void BattlegroundSA::DefendersPortalTeleport(GameObject* portal, Player* plr)
     plr->TeleportTo( plr->GetMapId(), SOTADefPortalDest[portal_num][0], SOTADefPortalDest[portal_num][1], SOTADefPortalDest[portal_num][2], SOTADefPortalDest[portal_num][3], TELE_TO_SPELL );
 }
 
-void BattlegroundSA::EventPlayerDamagedGO(Player* /*player*/, GameObject* go, uint32 eventType)
+void BattlegroundSA::EventPlayerDamagedGO(Player* player, GameObject* go, uint32 eventType)
 {
     if (!go || !go->GetGOInfo())
         return;
@@ -620,7 +620,7 @@ void BattlegroundSA::EventPlayerDamagedGO(Player* /*player*/, GameObject* go, ui
         if (go->GetGOInfo()->building.destroyedEvent == 19837)
             SendWarningToAll(LANG_BG_SA_CHAMBER_BREACHED);
         else
-            SendWarningToAll(LANG_BG_SA_WAS_DESTROYED, go->GetGOInfo()->name.c_str());
+            SendWarningToAll(LANG_BG_SA_WAS_DESTROYED, go->GetNameForLocaleIdx(player->GetSession()->GetSessionDbLocaleIndex()).c_str());
 
         uint32 i = GetGateIDFromEntry(go->GetEntry());
         switch (i)
@@ -655,7 +655,7 @@ void BattlegroundSA::EventPlayerDamagedGO(Player* /*player*/, GameObject* go, ui
     }
 
     if (eventType == go->GetGOInfo()->building.damageEvent)
-        SendWarningToAll(LANG_BG_SA_IS_UNDER_ATTACK, go->GetGOInfo()->name.c_str());
+        SendWarningToAll(LANG_BG_SA_IS_UNDER_ATTACK, go->GetNameForLocaleIdx(player->GetSession()->GetSessionDbLocaleIndex()).c_str());
 }
 
 void BattlegroundSA::HandleKillUnit(Creature* creature, Player* killer)
