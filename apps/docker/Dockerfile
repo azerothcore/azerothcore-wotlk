@@ -21,7 +21,9 @@ RUN mkdir -pv /azerothcore/apps                  \
               /azerothcore/modules               \
               /azerothcore/src                   \
               /azerothcore/var                   \
+              /azerothcore/apps/bash_shared      \
               /azerothcore/apps/docker           \
+              /azerothcore/apps/startup-scripts  \
               /azerothcore/env/dist/bin          \
               /azerothcore/env/dist/data/Cameras \
               /azerothcore/env/dist/data/dbc     \
@@ -55,6 +57,7 @@ ARG INSTALL_ELUNA=true
 
 ENV TZ=$TZ
 ENV DEBIAN_FRONTEND=noninteractive
+ARG SKIP_INSTALL_DENO=true
 
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
@@ -141,7 +144,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 RUN apt update && \
     apt install -y \ 
       libmysqlclient21 libreadline8 \
-      # Get envsubst and expect
       gettext-base expect mysql-client && \
     rm -rf /var/lib/apt/lists/*
 
