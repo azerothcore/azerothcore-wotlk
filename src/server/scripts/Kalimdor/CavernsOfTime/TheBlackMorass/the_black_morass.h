@@ -77,17 +77,51 @@ enum CreatureIds
     NPC_INFINITE_WHELP                  = 21818,
     NPC_INFINITE_CRONOMANCER            = 17892,
     NPC_INFINITE_EXECUTIONER            = 18994,
-    NPC_INFINITE_VANQUISHER             = 18995
+    NPC_INFINITE_VANQUISHER             = 18995,
+
+    NPC_DP_EMITTER_STALKER              = 18582,
+    NPC_DP_CRYSTAL_STALKER              = 18553,
+    NPC_DP_BEAM_STALKER                 = 18555
 };
 
 enum Misc
 {
     SPELL_RIFT_CHANNEL                  = 31387,
+    SPELL_TELEPORT_VISUAL               = 7791,
 
     EVENT_NEXT_PORTAL                   = 1,
-    EVENT_SUMMON_KEEPER                 = 2,
+    EVENT_SUMMON_KEEPER_1               = 2,
+    EVENT_SUMMON_KEEPER_2               = 3,
+    EVENT_SUMMON_KEEPER_3               = 4,
+    EVENT_SUMMON_KEEPER_4               = 5,
+    EVENT_WIPE_1                        = 6,
+    EVENT_WIPE_2                        = 7,
+    EVENT_WIPE_3                        = 8,
 
     ACTION_OUTRO                        = 1
+};
+
+enum medivhSays
+{
+    SAY_MEDIVH_ENTER                    = 0,
+    SAY_MEDIVH_DEATH                    = 5,
+    SAY_MEDIVH_WIN                      = 6,
+    SAY_MEDIVH_ORCS_ENTER               = 7,
+
+    SAY_MEDIVH_ORCS_ANSWER              = 0
+};
+
+enum medivhSpells
+{
+    SPELL_MANA_SHIELD           = 31635,
+    SPELL_MEDIVH_CHANNEL        = 31556,
+    SPELL_BLACK_CRYSTAL         = 32563,
+    SPELL_PORTAL_CRYSTALS       = 32564,
+    SPELL_BANISH_PURPLE         = 32566,
+    SPELL_BANISH_GREEN          = 32567,
+
+    SPELL_CORRUPT               = 31326,
+    SPELL_CORRUPT_AEONUS        = 37853,
 };
 
 template <class AI, class T>

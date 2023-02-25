@@ -68,9 +68,9 @@ struct boss_moam : public BossAI
         me->SetRegeneratingPower(false);
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         Talk(EMOTE_AGGRO);
         events.ScheduleEvent(EVENT_STONE_PHASE, 90s);
         events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 9s);

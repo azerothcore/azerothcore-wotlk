@@ -320,9 +320,9 @@ struct boss_taldaram : public BossAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
         ScheduleCombatEvents();
 
@@ -490,7 +490,7 @@ private:
     }
 };
 
-// @todo: Turn into new script type when Gossips have been updated
+/// @todo: Turn into new script type when Gossips have been updated
 class go_prince_taldaram_sphere : public GameObjectScript
 {
 public:

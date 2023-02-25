@@ -13675,7 +13675,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
         if (enemy)
         {
             if (IsAIEnabled)
-                creature->AI()->EnterCombat(enemy);
+                creature->AI()->JustEngagedWith(enemy);
 
             if (creature->GetFormation())
                 creature->GetFormation()->MemberEngagingTarget(creature, enemy);
@@ -15876,6 +15876,24 @@ bool CharmInfo::AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates new
         if (!PetActionBar[i].GetAction() && PetActionBar[i].IsActionBarForSpell())
         {
             SetActionBar(i, spell_id, newstate == ACT_DECIDE ? spellInfo->IsAutocastable() ? ACT_DISABLED : ACT_PASSIVE : newstate);
+
+            if (_unit->GetCharmer() && _unit->GetCharmer()->IsPlayer())
+            {
+                if (Creature* creature = _unit->ToCreature())
+                {
+                    // Processing this packet needs to be delayed
+                    _unit->m_Events.AddEventAtOffset([creature, spell_id]()
+                    {
+                        if (uint32 cooldown = creature->GetSpellCooldown(spell_id))
+                        {
+                            WorldPacket data;
+                            creature->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spell_id, cooldown);
+                            creature->GetCharmer()->ToPlayer()->SendDirectMessage(&data);
+                        }
+                    }, 500ms);
+                }
+            }
+
             return true;
         }
     }
@@ -17852,13 +17870,6 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         isRewardAllowed = creature->IsDamageEnoughForLootingAndReward();
         if (!isRewardAllowed)
             creature->SetLootRecipient(nullptr);
-
-        // Call creature just died function
-        if (CreatureAI* ai = creature->AI())
-        {
-            ai->JustDied(killer);
-            sScriptMgr->OnUnitDeath(creature, killer);
-        }
     }
 
     // pussywizard: remade this if section (player is on the same map
@@ -18080,6 +18091,13 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         // Call KilledUnit for creatures, this needs to be called after the lootable flag is set
         if (killer && killer->GetTypeId() == TYPEID_UNIT && killer->IsAIEnabled)
             killer->ToCreature()->AI()->KilledUnit(victim);
+
+        // Call creature just died function
+        if (CreatureAI* ai = creature->AI())
+        {
+            ai->JustDied(killer);
+            sScriptMgr->OnUnitDeath(creature, killer);
+        }
 
         if (TempSummon* summon = creature->ToTempSummon())
         {

@@ -60,9 +60,9 @@ public:
             armageddonCasted = false;
         }
 
-        void EnterCombat(Unit* /*attacker*/) override
+        void JustEngagedWith(Unit* /*attacker*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_INFERNO, 13s, 15s);
             events.ScheduleEvent(EVENT_IGNITE_MANA, 7s, 19s);
             events.ScheduleEvent(EVENT_LIVING_BOMB, 11s, 16s);

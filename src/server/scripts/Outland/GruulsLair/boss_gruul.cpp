@@ -79,9 +79,9 @@ struct boss_gruul : public BossAI
         _caveInTimer = 29000;
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
         events.ScheduleEvent(EVENT_GROWTH, 30000);
@@ -271,7 +271,11 @@ class spell_gruul_shatter : public SpellScript
         if (Unit* target = GetHitUnit())
         {
             target->RemoveAurasDueToSpell(SPELL_STONED);
-            target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
+
+            if (target->IsPlayer())
+            {
+                target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
+            }
         }
     }
 

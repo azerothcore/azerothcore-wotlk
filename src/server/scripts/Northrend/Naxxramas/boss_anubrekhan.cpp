@@ -157,9 +157,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->CallForHelp(30.0f);
             Talk(SAY_AGGRO);
             if (pInstance)
