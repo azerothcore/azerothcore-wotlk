@@ -38,34 +38,28 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `position_x`, 
 (111111, 23491, 530, 3523, 3742, 4819.2363, 3775.88, 210.25194, 5.515240192413330078, 120, 48069);
 
 -- Adyen (18537)
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 18537);
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` IN (
+18537, -- Adyen the Lightwarden
+18538, -- Ishanah
+19466, -- Exarch Orelis
+19467, -- Anchorite Karja
+20132, -- Socrethar
+20794, -- Kaylaan the Lost
+23491  -- Socrethar Event Trigger
+));
 
 -- Orelis (19466)
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19466);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -69725);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-69725, 0, 0, 0, 1, 0, 100, 512, 0, 30000, 180000, 240000, 0, 80, 1946600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Exarch Orelis - OOC - Run Script');
 
 -- Karja (19467)
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 19467);
 UPDATE `creature_template_addon` SET `bytes1` = 0, `bytes2` = 1 WHERE (`entry` = 19467);
 DELETE FROM `creature_addon` WHERE (`guid` = 69727);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (69727, 0, 0, 6, 4097, 0, 0, NULL);
 
--- Kaylaan (20794)
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 20794);
-
--- Ishanah (18538)
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 18538);
-
--- Socrethar (20132)
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 20132);
-
 UPDATE `creature` SET `position_x`=4946.936, `position_y`=3849.2083, `position_z`=211.5767, `orientation`=3.892084121704101562, `VerifiedBuild`=48069 WHERE `id1`=20132;
-
--- Socrethar Event Trigger (23491)
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 23491);
 
 -- Waypoints
 DELETE FROM `waypoints` WHERE `entry` IN (1853700, 2079400, 2079401, 2079402, 1853800, 1853801);
@@ -85,7 +79,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (2079400,4,4941.726,3852.1892,211.46687,NULL,'Kaylaan the Lost'), -- Kneel
 (2079401,1,4940.221,3847.4336,211.49857,NULL,'Kaylaan the Lost'), -- Stand by Socrethar
 (2079402,1,4938.0044,3834.3682,211.35002,NULL,'Kaylaan the Lost'), -- Stand by Ishanah
--- Ishanah
+-- Ishanah - The Decomposed Waypoints are to avoid floating/flying. If in the future movement is changed then they could be safely removed
 (1853800,1 ,4881.5283,3806.9114,199.50269,NULL,'Ishanah - Decomposed Waypoint'),
 (1853800,2 ,4883.5283,3808.6614,199.50269,NULL,'Ishanah - Decomposed Waypoint'),
 (1853800,3 ,4885.7783,3810.4114,199.50269,NULL,'Ishanah - Decomposed Waypoint'),
@@ -152,17 +146,6 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (13, 1, 35598, 0, 0, 31, 0, 3, 18538, 0, 0, 0, 0, '', 'Wrath of Socrethar (35598) targets Ishanah'),
 (13, 1, 35599, 0, 0, 31, 0, 3, 18538, 0, 0, 0, 0, '', 'Resurrection (35599) targets Ishanah'),
 (13, 1, 35600, 0, 0, 31, 0, 3, 20794, 0, 0, 0, 0, '', 'Wrath of Socrethar (35600) targets Kaylaan the Lost');
-
--- if Adyen is not alive
-
--- show gossip if socrethar is alive, Area is Socrethar's Seat
-
--- Condition for Adyen script to only play if Socrethar is alive
-
--- DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` = 184604);
--- INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
--- (22, 1, 184604, 1, 0, 9, 0, 10409, 0, 0, 0, 0, 0, '', 'Only request spawn if player has quest \'Deathblow to the Legion\''),
--- (22, 1, 184604, 1, 0, 28, 0, 10409, 0, 0, 1, 0, 0, '', 'Only request spawn if player has not completed quest \'Deathblow to the Legion\'');
 
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 184604;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 184604);
