@@ -340,7 +340,7 @@ enum ApparitionMisc
     EMOTE_CHEER             = 71,
     EMOTE_GNOLL_CHEER       = 1,
 
-    // Apparition 
+    // Apparition
     SAY_APPA_INTRO          = 0,
     SAY_APPA_OUTRO          = 14,
 
