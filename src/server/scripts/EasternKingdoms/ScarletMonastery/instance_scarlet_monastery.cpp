@@ -356,7 +356,6 @@ public:
                 case 5:
                     mograine->StopMovingOnCurrentPos();
                     mograine->AI()->Talk(0);
-                    mograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
                     return 4 * IN_MILLISECONDS;
                 case 6:
                     me->SetStandState(UNIT_STAND_STATE_STAND);

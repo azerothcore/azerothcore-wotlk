@@ -331,3 +331,31 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16440) AND (`source_type` = 0
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
      (@HIGHLORD_MOGRAINE_ID, 0, 1, 2, 40, 0, 100, 0, 5, 0, 0, 0, 0, 103, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Highlord Mograine Transform - On Waypoint 5 Reached - Set Rooted On'),
      (@HIGHLORD_MOGRAINE_ID, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 3976, 0, 0, 0, 0, 0, 0, 0, 'Highlord Mograine Transform - On Waypoint 5 Reached - Set Orientation Closest Creature \'Scarlet Commander Mograine\'');
+
+-- --
+-- Update Highlord Mograine's texts with broadcast IDs and move some of his
+-- emotes from code to data.
+
+SET @EMOTE_POINT := 25;
+SET @EMOTE_TALK := 1;
+
+SET @TEXT_RENAULT_GROUP_ID := 0;
+SET @TEXT_RENAULT_BROADCAST_ID := 12469;
+
+SET @TEXT_BETRAYAL_GROUP_ID := 1;
+SET @TEXT_BETRAYAL_BROADCAST_ID := 12471;
+
+SET @TEXT_FORGIVEN_GROUP_ID := 2;
+SET @TEXT_FORGIVEN_BROADCAST_ID := 12473;
+
+UPDATE `creature_text`
+    SET `BroadcastTextId` = @TEXT_RENAULT_BROADCAST_ID, `Emote` = @EMOTE_POINT
+    WHERE `GroupID` = @TEXT_RENAULT_GROUP_ID AND `ID` = 0 AND `CreatureID` = @HIGHLORD_MOGRAINE_ID;
+
+UPDATE `creature_text`
+    SET `BroadcastTextId` = @TEXT_BETRAYAL_BROADCAST_ID, `Emote` = @EMOTE_TALK
+    WHERE `GroupID` = @TEXT_BETRAYAL_GROUP_ID AND `ID` = 0 AND `CreatureID` = @HIGHLORD_MOGRAINE_ID;
+
+UPDATE `creature_text`
+    SET `BroadcastTextId` = @TEXT_FORGIVEN_BROADCAST_ID
+    WHERE `GroupID` = @TEXT_FORGIVEN_GROUP_ID AND `ID` = 0 AND `CreatureID` = @HIGHLORD_MOGRAINE_ID;
