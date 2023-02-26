@@ -1304,6 +1304,8 @@ bool Player::SatisfyQuestSeasonal(Quest const* qInfo, bool /*msg*/) const
     if (!qInfo->IsSeasonal() || m_seasonalquests.empty())
         return true;
 
+
+    // cppcheck-suppress mismatchingContainers
     Player::SeasonalEventQuestMap::iterator itr = ((Player*)this)->m_seasonalquests.find(qInfo->GetEventIdForQuest());
 
     if (itr == m_seasonalquests.end() || itr->second.empty())

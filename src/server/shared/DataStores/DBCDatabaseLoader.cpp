@@ -121,8 +121,10 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     ASSERT(newRecords == result->GetRowCount());
 
     // insert new records to index table
-    for (uint32 i = 0; i < newRecords; ++i)
+    for (uint32 i = 0; i < newRecords; ++i) {
+        // cppcheck-suppress autoVariables
         indexTable[newIndexes[i]] = &dataTable[i * _recordSize];
+    }
 
     records = indexTableSize;
 
