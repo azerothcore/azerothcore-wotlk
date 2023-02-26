@@ -436,9 +436,6 @@ public:
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
                         me->SetFaction(FACTION_FRIENDLY);
-                        me->SetSheath(SHEATH_STATE_UNARMED);
-                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        me->SetFacingToObject(player);
                         playerWhoStartedAshbringer = player;
                         SayAshbringer = true;
                     }
