@@ -378,13 +378,13 @@ public:
                 case 12:
                     me->SetSheath(SHEATH_STATE_UNARMED);
                     Talk(5);
-                    return 2 * IN_MILLISECONDS;
+                    return 4 * IN_MILLISECONDS;
                 case 13:
                     mograine->CastSpell(me, SPELL_FORGIVENESS, false);
-                    return 1 * IN_MILLISECONDS;
+                    return 1.8 * IN_MILLISECONDS;
                 case 14:
                     mograine->CastSpell(me, SPELL_COSMETIC_CHAIN, true);
-                    return 0.5 * IN_MILLISECONDS;
+                    return 1.8 * IN_MILLISECONDS;
                 case 15:
                     mograine->AI()->Talk(2);
                     mograine->DespawnOrUnsummon(3 * IN_MILLISECONDS);
