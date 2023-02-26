@@ -747,21 +747,6 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::Objec
     }
 }
 
-void Map::UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone)
-{
-    // Nothing to do if no change
-    if (oldZone == newZone)
-        return;
-
-    if (oldZone != MAP_INVALID_ZONE)
-    {
-        uint32& oldZoneCount = _zonePlayerCountMap[oldZone];
-        ASSERT(oldZoneCount, "A player left zone %u (went to %u) - but there were no players in the zone!", oldZone, newZone);
-        --oldZoneCount;
-    }
-    ++_zonePlayerCountMap[newZone];
-}
-
 void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 {
     if (t_diff)
