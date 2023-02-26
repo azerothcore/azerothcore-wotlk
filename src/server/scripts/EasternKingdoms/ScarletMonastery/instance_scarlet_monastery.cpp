@@ -382,15 +382,15 @@ public:
                     return 4 * IN_MILLISECONDS;
                 case 13:
                     mograine->CastSpell(me, SPELL_FORGIVENESS, false);
-                    return 1.8 * IN_MILLISECONDS;
+                    return 1.2 * IN_MILLISECONDS;
                 case 14:
                     mograine->CastSpell(me, SPELL_COSMETIC_CHAIN, true);
-                    return 1.8 * IN_MILLISECONDS;
+                    return 0;
                 case 15:
                     mograine->AI()->Talk(2);
-                    mograine->DespawnOrUnsummon(3 * IN_MILLISECONDS);
+                    mograine->DespawnOrUnsummon(5 * IN_MILLISECONDS);
                     mograine->Kill(me, me, true);
-                    return 0;
+                    return 10 * IN_MILLISECONDS;
                 default:
                     if(mograine)
                         mograine->DespawnOrUnsummon(0);
