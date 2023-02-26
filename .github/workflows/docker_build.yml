@@ -52,15 +52,13 @@ jobs:
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          version="AzerothCore Rev. $(jq -r '.version' < acore.json)"
-          DOCKER_IMAGE_TAG=$version docker compose --profile dev build
+          DOCKER_IMAGE_TAG="$(jq -r '.version' < acore.json)" docker compose --profile dev build
 
       - name: Deploy Dev
         if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
         run: |
           docker compose --profile dev push
-          version="AzerothCore Rev. $(jq -r '.version' < acore.json)"
-          DOCKER_IMAGE_TAG=$version docker compose --profile dev push
+          DOCKER_IMAGE_TAG="$(jq -r '.version' < acore.json)"  docker compose --profile dev push
 
   docker-build-n-deploy-prod:
     strategy:
@@ -111,8 +109,7 @@ jobs:
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
           docker compose --profile app build
-          version="AzerothCore Rev. $(jq -r '.version' < acore.json)"
-          DOCKER_IMAGE_TAG=$version ./acore.sh docker build
+          DOCKER_IMAGE_TAG="$(jq -r '.version' < acore.json)" ./acore.sh docker build
           # create the container to allow the copy right after
           docker compose create ac-build
           docker compose cp ac-build:/azerothcore/var/ccache var/docker/
@@ -121,8 +118,7 @@ jobs:
         if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
         run: |
           docker compose --profile app push
-          version="AzerothCore Rev. $(jq -r '.version' < acore.json)"
-          DOCKER_IMAGE_TAG=$version docker compose --profile app push
+          DOCKER_IMAGE_TAG="$(jq -r '.version' < acore.json)" docker compose --profile app push
 
 
   dispatch-acore-docker:
