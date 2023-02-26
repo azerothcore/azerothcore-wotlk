@@ -17,9 +17,12 @@ jobs:
   cpp-check:
     strategy:
       fail-fast: false
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     name: cpp check
     steps:
       - uses: actions/checkout@v2
       - name: cpp check
-        run: cppcheck --force --inline-suppr src/server/scripts/
+        run: |
+          sudo apt update -y
+          sudo apt install -y cppcheck
+          cppcheck --force --inline-suppr src/server/scripts/
