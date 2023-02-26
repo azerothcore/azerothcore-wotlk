@@ -1,0 +1,25 @@
+name: cpp-check
+on:
+  push:
+    branches:
+      - "master"
+    paths:
+      - src/server/scripts/**
+      - "!README.md"
+      - "!docs/**"
+  pull_request:
+    paths:
+      - src/server/scripts/**
+      - "!README.md"
+      - "!docs/**"
+
+jobs:
+  cpp-check:
+    strategy:
+      fail-fast: false
+    runs-on: self-hosted
+    name: cpp check
+    steps:
+      - uses: actions/checkout@v2
+      - name: cpp check
+        run: cppcheck --force --inline-suppr src/server/scripts/
