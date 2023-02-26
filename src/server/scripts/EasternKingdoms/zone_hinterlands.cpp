@@ -51,7 +51,7 @@ enum Rinji
 
 struct LocationXYZ
 {
-    float posX, posY, posZ;
+    float x, y, z;
 };
 
 LocationXYZ AmbushSpawn[] =
