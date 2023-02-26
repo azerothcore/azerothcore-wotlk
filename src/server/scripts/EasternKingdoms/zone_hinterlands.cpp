@@ -54,7 +54,6 @@ struct LocationXYZ
     float posX, posY, posZ;
 };
 
-
 LocationXYZ AmbushSpawn[] =
 {
     { 191.296204f, -2839.329346f, 107.388f },
