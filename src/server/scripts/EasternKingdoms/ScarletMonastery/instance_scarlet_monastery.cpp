@@ -365,22 +365,28 @@ public:
                     return 4 * IN_MILLISECONDS;
                 case 8:
                     mograine->AI()->Talk(1);
-                    return 11 * IN_MILLISECONDS;
+                    return 3.7 * IN_MILLISECONDS;
                 case 9:
-                    mograine->HandleEmoteCommand(EMOTE_ONESHOT_BATTLE_ROAR);
-                    return 4 * IN_MILLISECONDS;
+                    mograine->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    return 3.7 * IN_MILLISECONDS;
                 case 10:
+                    mograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                    return 2.3 * IN_MILLISECONDS;
+                case 11:
+                    mograine->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                    return 5.6 * IN_MILLISECONDS;
+                case 12:
                     me->SetSheath(SHEATH_STATE_UNARMED);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     Talk(5);
                     return 2 * IN_MILLISECONDS;
-                case 11:
+                case 13:
                     mograine->CastSpell(me, SPELL_FORGIVENESS, false);
                     return 1 * IN_MILLISECONDS;
-                case 12:
+                case 14:
                     mograine->CastSpell(me, SPELL_COSMETIC_CHAIN, true);
                     return 0.5 * IN_MILLISECONDS;
-                case 13:
+                case 15:
                     mograine->AI()->Talk(2);
                     mograine->DespawnOrUnsummon(3 * IN_MILLISECONDS);
                     mograine->Kill(me, me, true);
@@ -499,7 +505,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             timer = timer - diff;
-            if (SayAshbringer && step < 15)
+            if (SayAshbringer && step < 17)
             {
                 if (timer <= 0)
                 {
