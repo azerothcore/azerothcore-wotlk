@@ -4471,7 +4471,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
-    // Yogg-Saron - Death Orb - Death Ray Warning Visual & Death Ray Damage Visual
+    // Death Ray Warning Visual, Death Ray Damage Visual
     ApplySpellFix({ 63882, 63886 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
