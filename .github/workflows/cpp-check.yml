@@ -25,7 +25,6 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt install -y cppcheck
-          cppcheck --force --inline-suppr modules/
           cppcheck --force --inline-suppr \
             -i src/server/game/Achievements/AchievementMgr.cpp \
             -i src/server/game/AuctionHouse/AuctionHouseMgr.cpp \
