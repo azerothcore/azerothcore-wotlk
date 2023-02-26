@@ -380,3 +380,12 @@ SET @FORGIVE_ME_BROADCAST_ID := 12472;
 UPDATE `creature_text`
     SET `BroadcastTextId` = @FORGIVE_ME_BROADCAST_ID, `Emote` = @EMOTE_BEG
     WHERE `GroupID` = @FORGIVE_ME_GROUP_ID AND `ID` = 0 AND `CreatureID` = @MOGRAINE_ID;
+
+SET @EMOTE_QUESTION := 6;
+
+SET @BUT_HOW_GROUP_ID := 4;
+SET @BUT_HOW_BROADCAST_ID := 12470;
+
+UPDATE `creature_text`
+    SET `BroadcastTextId` = @BUT_HOW_BROADCAST_ID, `Emote` = @EMOTE_QUESTION
+    WHERE `GroupID` = @BUT_HOW_GROUP_ID AND `ID` = 0 AND `CreatureID` = @MOGRAINE_ID;
