@@ -352,7 +352,7 @@ public:
                 case 4:
                     me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1065.130737f, 1399.350586f, 30.763723f, 6.282961f, TEMPSUMMON_TIMED_DESPAWN, 400000)->SetName("Highlord Mograine");
                     me->FindNearestCreature(NPC_HIGHLORD_MOGRAINE, 200.0f)->SetFaction(FACTION_FRIENDLY);
-                    return 30 * IN_MILLISECONDS;
+                    return 35 * IN_MILLISECONDS;
                 case 5:
                     mograine->StopMovingOnCurrentPos();
                     mograine->AI()->Talk(0);
