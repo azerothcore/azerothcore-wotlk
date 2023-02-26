@@ -22,10 +22,6 @@ UPDATE `creature_text` SET `Type`=12, `Emote`=15 WHERE `CreatureID`=18402 AND `G
 
 UPDATE `creature` SET `spawntimesecs`=1 WHERE `guid`=48191 AND `id1`=18069;
 
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 19) AND (`SourceEntry` = 9977);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(19, 0, 9977, 0, 0, 29, 0, 18069, 50, 0, 0, 0, 0, '', 'Only show \'The Ring of Blood: The Final Challenge\' if Mogor is alive');
-
 -- Text for Mogor and Gurgthock
 DELETE FROM `creature_text` WHERE `CreatureID` IN (18069, 18471);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -176,8 +172,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1847115, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 10, 48191, 18069, 0, 0, 0, 0, 0, 0, 'Gurgthock - Mogor Start Script - Send Target 1'),
 -- Mogor Success
 (1847116, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 12, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Gurgthock - Mogor Success Script - Say Line 12'),
-(1847116, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gurgthock - Mogor Success Script - Add Npc Flags Questgiver'),
-(1847116, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 15, 9977, 0, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Gurgthock - Mogor Success Script - Quest Credit \'The Ring of Blood: The Final Challenge\''),
+(1847116, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 15, 9977, 0, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Gurgthock - Mogor Success Script - Quest Credit \'The Ring of Blood: The Final Challenge\''),
+(1847116, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gurgthock - Mogor Success Script - Add Npc Flags Questgiver'),
 -- Mogor Failure
 (1847117, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 13, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Gurgthock - Mogor Failure Script - Say Line 13'),
 (1847117, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gurgthock - Mogor Failure Script - Add Npc Flags Questgiver'),
@@ -255,15 +251,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18069, 0, 3, 0, 0, 0, 100, 0, 3400, 9400, 13200, 26400, 0, 11, 18975, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - In Combat - Cast \'Summon Ice Totem\''),
 (18069, 0, 5, 0, 2, 0, 100, 1, 0, 1, 1200, 1200, 0, 80, 1806902, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Between 0-1% Health - Run Script (No Repeat)'),
 (18069, 0, 4, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1806900, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Data Set 1 1 - Run Script'),
-(18069, 0, 6, 7, 1, 0, 100, 0, 45000, 45000, 45000, 45000, 0, 45, 17, 17, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - Out of Combat - Set Data 17 17 - Failure Event'),
-(18069, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Out of Combat - Despawn Instant - Failure Event'),
-(18069, 0, 8, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 16, 16, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - On Just Died - Set Data 16 16 - Success Event'),
-(18069, 0, 9, 0, 58, 0, 100, 0, 17, 1806900, 0, 0, 0, 80, 1806901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Waypoint Finished - Run Script');
-
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` = 18069);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 7, 18069, 0, 0, 29, 1, 18471, 30, 0, 1, 0, 0, '', 'Mogor (Ring of Blood) can only initiate Failure Event if he is sufficiently far away from Gurgthock'),
-(22, 8, 18069, 0, 0, 29, 1, 18471, 30, 0, 1, 0, 0, '', 'Mogor (Ring of Blood) can only initiate Failure Event if he is sufficiently far away from Gurgthock');
+-- (18069, 0, 6, 7, 1, 0, 100, 0, 45000, 45000, 45000, 45000, 0, 45, 17, 17, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - Out of Combat - Set Data 17 17 - Failure Event'), -- Does not work. Event seems to be queued until the condition (near Gurgthock) is passed
+-- (18069, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Out of Combat - Despawn Instant - Failure Event'),
+(18069, 0, 6, 7, 7, 0, 100, 0, 0, 0, 0, 0, 0, 45, 17, 17, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - On Evade - Set Data 17 17 - Failure Event'), -- This is where I gave up. Should be a timer but it did not work with OOC timers or event phases in cases of reset
+(18069, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Evade - Despawn Instant - Failure Event'),
+(18069, 0, 8, 9, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 16, 16, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - On Just Died - Set Data 16 16 - Success Event'),
+(18069, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Just Died - Despawn In 5000 ms'),
+(18069, 0, 10, 0, 58, 0, 100, 0, 17, 1806900, 0, 0, 0, 80, 1806901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Waypoint Finished - Run Script');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1806900, 1806901, 1806902));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -288,11 +282,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1806902, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Start Attacking'),
 (1806902, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 6, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Say Line 6'),
 (1806902, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Reset Invincibility Hp');
-
--- 16:27:54.820 Dead
--- 16:28:00.929 Revive
--- 16:28:03.392 Remove Dead
--- 16:28:04.592 Cast 28747
 
 DELETE FROM `waypoints` WHERE `entry`=18069; -- Delete old one
 DELETE FROM `waypoints` WHERE `entry`=1806900 AND `point_comment`='Mogor';
