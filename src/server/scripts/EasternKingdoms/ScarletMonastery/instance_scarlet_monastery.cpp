@@ -377,7 +377,6 @@ public:
                     return 5.6 * IN_MILLISECONDS;
                 case 12:
                     me->SetSheath(SHEATH_STATE_UNARMED);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     Talk(5);
                     return 2 * IN_MILLISECONDS;
                 case 13:

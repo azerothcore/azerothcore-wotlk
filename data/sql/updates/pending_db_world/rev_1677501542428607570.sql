@@ -367,3 +367,16 @@ UPDATE `creature_text`
 UPDATE `creature_text`
     SET `BroadcastTextId` = @TEXT_FORGIVEN_BROADCAST_ID
     WHERE `GroupID` = @TEXT_FORGIVEN_GROUP_ID AND `ID` = 0 AND `CreatureID` = @HIGHLORD_MOGRAINE_ID;
+
+-- --
+-- Move Commander Mograine's emote to creature_text and play the correct
+-- emote (he used to kneel).
+
+SET @EMOTE_BEG := 20;
+
+SET @FORGIVE_ME_GROUP_ID := 5;
+SET @FORGIVE_ME_BROADCAST_ID := 12472;
+
+UPDATE `creature_text`
+    SET `BroadcastTextId` = @FORGIVE_ME_BROADCAST_ID, `Emote` = @EMOTE_BEG
+    WHERE `GroupID` = @FORGIVE_ME_GROUP_ID AND `ID` = 0 AND `CreatureID` = @MOGRAINE_ID;
