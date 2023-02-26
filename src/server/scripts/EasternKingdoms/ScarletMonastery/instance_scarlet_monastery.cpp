@@ -359,10 +359,12 @@ public:
                     return 4 * IN_MILLISECONDS;
                 case 6:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    return 2 * IN_MILLISECONDS;
-                case 7:
-                    Talk(4);
+                    me->SetSheath(SHEATH_STATE_UNARMED);
+                    Talk(4, 2s);
                     return 4 * IN_MILLISECONDS;
+                case 7:
+                    me->SetSheath(SHEATH_STATE_MELEE);
+                    return 2 * IN_MILLISECONDS;
                 case 8:
                     mograine->AI()->Talk(1);
                     return 3.7 * IN_MILLISECONDS;
@@ -376,7 +378,6 @@ public:
                     mograine->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                     return 5.6 * IN_MILLISECONDS;
                 case 12:
-                    me->SetSheath(SHEATH_STATE_UNARMED);
                     Talk(5);
                     return 4 * IN_MILLISECONDS;
                 case 13:
