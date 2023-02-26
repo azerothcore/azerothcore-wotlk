@@ -251,16 +251,19 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18069);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (18069, 0, 0, 0, 9, 0, 100, 0, 0, 30, 6000, 8000, 0, 11, 16033, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Within 0-30 Range - Cast \'Chain Lightning\''),
 (18069, 0, 1, 0, 9, 0, 100, 0, 0, 20, 8000, 18000, 0, 11, 39529, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Within 0-20 Range - Cast \'Flame Shock\''),
-(18069, 0, 2, 0, 2, 1, 100, 1, 0, 60, 0, 0, 0, 11, 15982, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Between 0-60% Health - Cast \'Healing Wave\' (Phase 1) (No Repeat)'),
-(18069, 0, 3, 0, 2, 2, 100, 0, 0, 50, 15000, 15000, 0, 11, 15982, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Between 0-50% Health - Cast \'Healing Wave\' (Phase 2)'),
-(18069, 0, 4, 0, 0, 0, 100, 0, 3400, 9400, 13200, 26400, 0, 11, 18975, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - In Combat - Cast \'Summon Ice Totem\''),
-(18069, 0, 5, 0, 2, 1, 100, 1, 0, 1, 1200, 1200, 0, 80, 1806902, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Between 0-1% Health - Run Script (Phase 1) (No Repeat)'),
-(18069, 0, 6, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1806900, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Data Set 1 1 - Run Script'),
-(18069, 0, 7, 8, 1, 3, 100, 0, 30000, 30000, 30000, 30000, 0, 45, 17, 17, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - Out of Combat - Set Data 17 17 (Phases 1 & 2) (No Repeat)'),
-(18069, 0, 8, 0, 61, 3, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Out of Combat - Despawn Instant (No Repeat)'),
-(18069, 0, 9, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 16, 16, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - On Just Died - Set Data 16 16'),
-(18069, 0, 10, 0, 58, 0, 100, 0, 17, 1806900, 0, 0, 0, 80, 1806901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Waypoint Finished - Run Script'),
-(18069, 0, 11, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Evade - Set Event Phase 1');
+(18069, 0, 2, 0, 2, 0, 100, 0, 0, 50, 15000, 15000, 0, 11, 15982, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Between 0-50% Health - Cast \'Healing Wave\''),
+(18069, 0, 3, 0, 0, 0, 100, 0, 3400, 9400, 13200, 26400, 0, 11, 18975, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - In Combat - Cast \'Summon Ice Totem\''),
+(18069, 0, 5, 0, 2, 0, 100, 1, 0, 1, 1200, 1200, 0, 80, 1806902, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Between 0-1% Health - Run Script (No Repeat)'),
+(18069, 0, 4, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1806900, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Data Set 1 1 - Run Script'),
+(18069, 0, 6, 7, 1, 0, 100, 0, 45000, 45000, 45000, 45000, 0, 45, 17, 17, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - Out of Combat - Set Data 17 17 - Failure Event'),
+(18069, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Out of Combat - Despawn Instant - Failure Event'),
+(18069, 0, 8, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 16, 16, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - On Just Died - Set Data 16 16 - Success Event'),
+(18069, 0, 9, 0, 58, 0, 100, 0, 17, 1806900, 0, 0, 0, 80, 1806901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Waypoint Finished - Run Script');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` = 18069);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 7, 18069, 0, 0, 29, 1, 18471, 30, 0, 1, 0, 0, '', 'Mogor (Ring of Blood) can only initiate Failure Event if he is sufficiently far away from Gurgthock'),
+(22, 8, 18069, 0, 0, 29, 1, 18471, 30, 0, 1, 0, 0, '', 'Mogor (Ring of Blood) can only initiate Failure Event if he is sufficiently far away from Gurgthock');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1806900, 1806901, 1806902));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -275,19 +278,21 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1806901, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Set Reactstate Aggressive'),
 (1806901, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Start Attacking Stored Target'),
 
-(1806902, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 11, 12141, 50, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Force Despawn \'Ice Totem\''),
-(1806902, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Set \'UNIT_STAND_STATE_DEAD\''),
-(1806902, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Stop Combat'),
-(1806902, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Remove All Auras'),
-(1806902, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33686272, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Set Unit Flags'),
-(1806902, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Set Invincibility HP Level To 0'),
-(1806902, 9, 6, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 11, 32343, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Cast Spell \'Revive Self\''),
-(1806902, 9, 7, 0, 0, 0, 100, 0, 2500, 2500, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Say Line 6'),
-(1806902, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 19, 33686272, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Remove Unit Flags'),
-(1806902, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Remove \'UNIT_STAND_STATE_DEAD\''),
-(1806902, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Start Attacking Stored Target'),
-(1806902, 9, 11, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 11, 28747, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Cast \'Frenzy\''),
-(1806902, 9, 12, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Script - Set Phase 2');
+(1806902, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 11, 12141, 50, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Despawn Instant'),
+(1806902, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Missing comment for action_type 27'),
+(1806902, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Remove All Auras'),
+(1806902, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 11, 31261, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Cast \'Permanent Feign Death (Root)\''),
+(1806902, 9, 4, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 11, 32343, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Cast \'Revive Self\''),
+(1806902, 9, 5, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Remove All Auras'),
+(1806902, 9, 6, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 11, 28747, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Cast \'Frenzy\''),
+(1806902, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Start Attacking'),
+(1806902, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 6, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Say Line 6'),
+(1806902, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Actionlist - Reset Invincibility Hp');
+
+-- 16:27:54.820 Dead
+-- 16:28:00.929 Revive
+-- 16:28:03.392 Remove Dead
+-- 16:28:04.592 Cast 28747
 
 DELETE FROM `waypoints` WHERE `entry`=18069; -- Delete old one
 DELETE FROM `waypoints` WHERE `entry`=1806900 AND `point_comment`='Mogor';
