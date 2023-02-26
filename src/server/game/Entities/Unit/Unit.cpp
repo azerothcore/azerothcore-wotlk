@@ -3424,7 +3424,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool CanReflect)
 {
     // Check for immune
-    if (victim->IsImmunedToSpell(spell))
+    if (victim->IsImmunedToSpell(spell, this))
         return SPELL_MISS_IMMUNE;
 
     // All positive spells can`t miss
@@ -3490,7 +3490,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, Spell const* spell, bool CanRef
     SpellInfo const* spellInfo = spell->GetSpellInfo();
 
     // Check for immune
-    if (victim->IsImmunedToSpell(spellInfo, spell))
+    if (victim->IsImmunedToSpell(spellInfo, this, spell))
     {
         return SPELL_MISS_IMMUNE;
     }
@@ -12829,7 +12829,7 @@ bool Unit::IsImmunedToDamageOrSchool(SpellInfo const* spellInfo) const
     return IsImmunedToDamage(spellInfo) || IsImmunedToSchool(spellInfo);
 }
 
-bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
+bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit* caster, Spell const* spell)
 {
     if (!spellInfo)
         return false;
@@ -12879,7 +12879,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
             continue;
 
         // Xinef: if target is immune to one effect, and the spell has transform aura - it is immune to whole spell
-        if (IsImmunedToSpellEffect(spellInfo, i))
+        if (IsImmunedToSpellEffect(spellInfo, i, caster))
         {
             if (spellInfo->HasAura(SPELL_AURA_TRANSFORM))
                 return true;
@@ -12919,7 +12919,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
     return false;
 }
 
-bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const
+bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit* /*caster*/) const
 {
     if (!spellInfo || !spellInfo->Effects[index].IsEffect())
         return false;
@@ -19036,14 +19036,14 @@ Aura* Unit::AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target)
     if (!spellInfo)
         return nullptr;
 
-    if (target->IsImmunedToSpell(spellInfo))
+    if (target->IsImmunedToSpell(spellInfo, this))
         return nullptr;
 
     for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
         if (!(effMask & (1 << i)))
             continue;
-        if (target->IsImmunedToSpellEffect(spellInfo, i))
+        if (target->IsImmunedToSpellEffect(spellInfo, i, this))
             effMask &= ~(1 << i);
     }
 

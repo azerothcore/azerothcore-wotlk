@@ -1196,7 +1196,7 @@ class spell_hun_lock_and_load : public AuraScript
         {
             if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW))
             {
-                return !target->IsImmunedToSpell(triggerSpell);
+                return !target->IsImmunedToSpell(triggerSpell, GetCaster());
             }
         }
 

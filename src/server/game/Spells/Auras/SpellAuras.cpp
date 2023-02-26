@@ -613,7 +613,7 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
             if (IsArea())
                 for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
                 {
-                    if ((existing->second & (1 << effIndex)) && existing->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex))
+                    if ((existing->second & (1 << effIndex)) && existing->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex, caster))
                         existing->second &= ~(1 << effIndex);
                 }
 
@@ -655,11 +655,11 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
         // check target immunities
         for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
         {
-            if ((itr->second & (1 << effIndex)) && itr->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex))
+            if ((itr->second & (1 << effIndex)) && itr->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex, caster))
                 itr->second &= ~(1 << effIndex);
         }
         if (!itr->second
-                || itr->first->IsImmunedToSpell(GetSpellInfo())
+                || itr->first->IsImmunedToSpell(GetSpellInfo(), caster)
                 || !CanBeAppliedOn(itr->first))
             addUnit = false;
 

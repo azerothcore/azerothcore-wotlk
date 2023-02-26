@@ -100,7 +100,8 @@ public:
         void MySelectNextTarget()
         {
             Unit* owner = me->GetOwner();
-            if (owner && owner->GetTypeId() == TYPEID_PLAYER && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(51963)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
+            if (owner && owner->GetTypeId() == TYPEID_PLAYER && (!me->GetVictim() ||
+                me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(51963), me) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
             {
                 Unit* selection = owner->ToPlayer()->GetSelectedUnit();
                 if (selection && selection != me->GetVictim() && me->IsValidAttackTarget(selection))

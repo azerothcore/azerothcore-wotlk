@@ -2226,7 +2226,7 @@ public:
 
     void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, SpellImmuneBlockType blockType = SPELL_BLOCK_TYPE_ALL);
     void ApplySpellDispelImmunity(SpellInfo const* spellProto, DispelType type, bool apply);
-    virtual bool IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell = nullptr);
+    virtual bool IsImmunedToSpell(SpellInfo const* spellInfo, Unit* caster, Spell const* spell = nullptr);
     // redefined in Creature
     [[nodiscard]] bool IsImmunedToDamage(SpellSchoolMask meleeSchoolMask) const;
     [[nodiscard]] bool IsImmunedToDamage(SpellInfo const* spellInfo) const;
@@ -2236,7 +2236,7 @@ public:
     [[nodiscard]] bool IsImmunedToSchool(Spell const* spell) const;
     [[nodiscard]] bool IsImmunedToDamageOrSchool(SpellSchoolMask meleeSchoolMask) const;
     bool IsImmunedToDamageOrSchool(SpellInfo const* spellInfo) const;
-    virtual bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const;
+    virtual bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit* caster) const;
     // redefined in Creature
     static bool IsDamageReducedByArmor(SpellSchoolMask damageSchoolMask, SpellInfo const* spellInfo = nullptr, uint8 effIndex = MAX_SPELL_EFFECTS);
     static uint32 CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, const uint32 damage, SpellInfo const* spellInfo, uint8 attackerLevel = 0, WeaponAttackType attackType = MAX_ATTACK);

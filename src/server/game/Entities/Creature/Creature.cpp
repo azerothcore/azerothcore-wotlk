@@ -2187,7 +2187,7 @@ void Creature::LoadSpellTemplateImmunity()
     }
 }
 
-bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
+bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo, Unit* caster, Spell const* spell)
 {
     if (!spellInfo)
         return false;
@@ -2201,7 +2201,7 @@ bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
     // the check of mechanic immunity on DB (tested) because GetCreatureTemplate()->MechanicImmuneMask and m_spellImmune[IMMUNITY_MECHANIC] don't have same data.
     bool immunedToAllEffects = true;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        if (spellInfo->Effects[i].IsEffect() && !IsImmunedToSpellEffect(spellInfo, i))
+        if (spellInfo->Effects[i].IsEffect() && !IsImmunedToSpellEffect(spellInfo, i, caster))
         {
             immunedToAllEffects = false;
             break;
@@ -2209,10 +2209,10 @@ bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
     if (immunedToAllEffects)
         return true;
 
-    return Unit::IsImmunedToSpell(spellInfo, spell);
+    return Unit::IsImmunedToSpell(spellInfo, caster, spell);
 }
 
-bool Creature::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const
+bool Creature::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit* caster) const
 {
     // Xinef: this should exclude self casts...
     if (spellInfo->Effects[index].Mechanic > MECHANIC_NONE && HasMechanicTemplateImmunity(1 << (spellInfo->Effects[index].Mechanic - 1)))
@@ -2221,7 +2221,7 @@ bool Creature::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) 
     if (GetCreatureTemplate()->type == CREATURE_TYPE_MECHANICAL && spellInfo->Effects[index].Effect == SPELL_EFFECT_HEAL)
         return true;
 
-    return Unit::IsImmunedToSpellEffect(spellInfo, index);
+    return Unit::IsImmunedToSpellEffect(spellInfo, index, caster);
 }
 
 SpellInfo const* Creature::reachWithSpellAttack(Unit* victim)

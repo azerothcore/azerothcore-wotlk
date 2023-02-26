@@ -1342,7 +1342,7 @@ class spell_dk_death_grip : public SpellScript
             {
                 caster->CastSpell(target, 49560, true);
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(1766); // Rogue kick
-                if (!target->IsImmunedToSpellEffect(spellInfo, EFFECT_0))
+                if (!target->IsImmunedToSpellEffect(spellInfo, EFFECT_0, caster))
                     target->InterruptNonMeleeSpells(true);
             }
         }
@@ -1360,7 +1360,7 @@ class spell_dk_death_grip : public SpellScript
                 if (target != GetCaster())
                 {
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(1766); // Rogue kick
-                    if (!target->IsImmunedToSpellEffect(spellInfo, EFFECT_0))
+                    if (!target->IsImmunedToSpellEffect(spellInfo, EFFECT_0, GetCaster()))
                         target->InterruptNonMeleeSpells(false, 0, false);
                 }
 

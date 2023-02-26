@@ -2381,7 +2381,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
     // Check for effect immune skip if immuned
     for (uint32 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
-        if (target->IsImmunedToSpellEffect(m_spellInfo, effIndex))
+        if (target->IsImmunedToSpellEffect(m_spellInfo, effIndex, m_caster))
             effectMask &= ~(1 << effIndex);
 
     ObjectGuid targetGUID = target->GetGUID();
@@ -2985,7 +2985,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         return SPELL_MISS_EVADE;
 
     // For delayed spells immunity may be applied between missile launch and hit - check immunity for that case
-    if (m_spellInfo->Speed && ((m_damage > 0 && unit->IsImmunedToDamage(this)) || unit->IsImmunedToSchool(this) || unit->IsImmunedToSpell(m_spellInfo, this)))
+    if (m_spellInfo->Speed && ((m_damage > 0 && unit->IsImmunedToDamage(this)) || unit->IsImmunedToSchool(this) || unit->IsImmunedToSpell(m_spellInfo, m_caster, this)))
     {
         return SPELL_MISS_IMMUNE;
     }
@@ -2996,7 +2996,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
     {
         if (effectMask & (1 << effectNumber))
         {
-            if (unit->IsImmunedToSpellEffect(m_spellInfo, effectNumber))
+            if (unit->IsImmunedToSpellEffect(m_spellInfo, effectNumber, m_caster))
                 effectMask &= ~(1 << effectNumber);
             // Xinef: Buggs out polymorph
             // Xinef: And this is checked in MagicSpellHitResult, why we check resistance twice?

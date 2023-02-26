@@ -82,7 +82,7 @@ class spell_warr_mocking_blow : public SpellScript
     void HandleOnHit()
     {
         if (Unit* target = GetHitUnit())
-            if (target->IsImmunedToSpellEffect(GetSpellInfo(), EFFECT_1))
+            if (target->IsImmunedToSpellEffect(GetSpellInfo(), EFFECT_1, GetCaster()))
                 SetHitDamage(0);
     }
 

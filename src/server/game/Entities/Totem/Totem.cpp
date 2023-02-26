@@ -171,7 +171,7 @@ void Totem::UnSummon(uint32 msTime)
     AddObjectToRemoveList();
 }
 
-bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const
+bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit* caster) const
 {
     // xinef: immune to all positive spells, except of stoneclaw totem absorb and sentry totem bind sight
     // totems positive spells have unit_caster target
@@ -180,6 +180,12 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) con
             spellInfo->IsPositive() && spellInfo->Effects[index].TargetA.GetTarget() != TARGET_UNIT_CASTER &&
             spellInfo->Effects[index].TargetA.GetCheckType() != TARGET_CHECK_ENTRY && spellInfo->Id != 55277 && spellInfo->Id != 6277)
         return true;
+
+    // Immuned to other area raid auras
+    if (spellInfo->IsPositive() && spellInfo->Effects[index].IsAreaAuraEffect() && caster != this && IsFriendlyTo(caster))
+    {
+        return true;
+    }
 
     // Cyclone shouldn't be casted on totems
     if (spellInfo->Id == SPELL_CYCLONE)
@@ -200,5 +206,5 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) con
             break;
     }
 
-    return Creature::IsImmunedToSpellEffect(spellInfo, index);
+    return Creature::IsImmunedToSpellEffect(spellInfo, index, caster);
 }
