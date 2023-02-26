@@ -7,7 +7,7 @@ set -euo pipefail
 # Begin env variables for configuration
 #
 # Config for this script. Only matters if you're using SAFE_WORLDSERVER
-SAFE_WORLDSERVER=${SAFE_WORLDSERVER:-}
+SAFE_WORLDSERVER="${SAFE_WORLDSERVER:-}"
 ACORE_SKIP_CREATE_ACCOUNT="${ACORE_SKIP_CREATE_ACCOUNT:-}"
 ACORE_GM_LEVEL="${ACORE_GM_LEVEL:-3}"
 ACORE_USERNAME="${ACORE_USERNAME:-admin}"
@@ -28,7 +28,7 @@ CMD="${CMD:=$@}"
 
 # Template env vars into configs
 
-cp -rn /azerothcore/env/ref/etc/* /azerothcore/env/dist/etc
+cp -rvn /azerothcore/env/ref/etc/* /azerothcore/env/dist/etc
 
 conf="/azerothcore/env/dist/etc/$ACORE_COMPONENT.conf" 
 

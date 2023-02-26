@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1-labs
+
 ARG TZ=Etc/UTC
 ARG UBUNTU_VERSION=20.04
 
@@ -82,7 +84,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
     --mount=target=/var/cache/apt,type=cache,sharing=locked \
     rm -f /etc/apt/apt.conf.d/docker-clean && \
     apt update && \
-    apt install -y \
+    apt install -y --no-install-recommends \
       git lsb-core curl unzip sudo \
       make cmake clang libmysqlclient-dev \
       libboost-system-dev libboost-filesystem-dev \
@@ -93,23 +95,8 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
       libncurses5-dev ccache && \
     rm -rf /var/lib/apt/lists/*
 
-COPY acore.json acore.json
-COPY apps/docker/config-docker.sh apps/docker/config-docker.sh
-COPY apps/compiler apps/compiler
-COPY apps/bash_shared apps/bash_shared
-COPY apps/startup-scripts apps/startup-scripts
-COPY bin bin
-COPY conf conf
-COPY data data
-COPY CMakeLists.txt CMakeLists.txt
-COPY deps deps
-COPY src src
-COPY modules modules
-COPY .git /azerothcore/.git
-
-COPY  env/docker/etc/authserver.conf.dockerdist env/dist/etc/authserver.conf.dockerdist
-COPY  env/docker/etc/worldserver.conf.dockerdist env/dist/etc/worldserver.conf.dockerdist
-COPY  env/docker/etc/dbimport.conf.dockerdist env/dist/etc/dbimport.conf.dockerdist
+COPY . .
+COPY env/docker env/dist
 
 RUN if [ "$INSTALL_ELUNA" = "true" ]; then \
     git clone \
@@ -121,7 +108,8 @@ RUN if [ "$INSTALL_ELUNA" = "true" ]; then \
 
 ARG CACHEBUST=1
 
-RUN --mount=type=cache,target=/azerothcore/var/ccache \
+RUN --mount=type=cache,target=/azerothcore/var/ \
+    git config --global --add safe.directory /azerothcore && \
     DOCKER=1 bash apps/compiler/compiler.sh build
 
 #############################
@@ -148,10 +136,15 @@ RUN apt update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY apps/docker/entrypoint.sh /entrypoint.sh
+COPY acore.json acore.json 
 
 RUN chmod -v +x /entrypoint.sh
 
+# Create a separate dir with the configs. 
+# The entrypoint will move these to env/dist/etc and template them with env variables
 COPY --from=build /azerothcore/env/dist/etc/ /azerothcore/env/ref/etc/
+
+VOLUME /azerothcore/env/dist/etc
 
 RUN chown -R $DOCKER_USER:$DOCKER_USER \
       /azerothcore \
@@ -177,7 +170,6 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER \
      --from=build \
      /azerothcore/env/dist/bin/authserver /azerothcore/env/dist/bin/authserver
 
-VOLUME /azerothcore/env/dist/etc
 
 CMD ["/azerothcore/env/dist/bin/authserver"]
 
