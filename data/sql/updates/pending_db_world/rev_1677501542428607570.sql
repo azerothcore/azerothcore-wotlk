@@ -389,3 +389,159 @@ SET @BUT_HOW_BROADCAST_ID := 12470;
 UPDATE `creature_text`
     SET `BroadcastTextId` = @BUT_HOW_BROADCAST_ID, `Emote` = @EMOTE_QUESTION
     WHERE `GroupID` = @BUT_HOW_GROUP_ID AND `ID` = 0 AND `CreatureID` = @MOGRAINE_ID;
+
+-- --
+-- Use sniffed data for Fairbanks's gossip texts
+
+-- 1
+SET @CURSE_LIFTED_BROADCAST_ID := 12480;
+SET @CURSE_LIFTED_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                            WHERE `ID`=@CURSE_LIFTED_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@CURSE_LIFTED_TEXT, BroadcastTextID0=@CURSE_LIFTED_BROADCAST_ID
+    WHERE ID=100100;
+
+-- 2
+SET @YOU_DONT_KNOW_BROADCAST_ID := 12482;
+SET @YOU_DONT_KNOW_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                WHERE `ID`=@YOU_DONT_KNOW_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@YOU_DONT_KNOW_TEXT, BroadcastTextID0=@YOU_DONT_KNOW_BROADCAST_ID
+    WHERE ID=100101;
+
+-- 3
+SET @AYE_HIGHLORD_BROADCAST_ID := 12484;
+SET @AYE_HIGHLORD_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                            WHERE `ID`=@AYE_HIGHLORD_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@AYE_HIGHLORD_TEXT, BroadcastTextID0=@AYE_HIGHLORD_BROADCAST_ID
+    WHERE ID=100102;
+
+-- 4
+SET @CRUSADE_WAS_NOBLE_BROADCAST_ID := 12486;
+SET @CRUSADE_WAS_NOBLE_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                    WHERE `ID`=@CRUSADE_WAS_NOBLE_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@CRUSADE_WAS_NOBLE_TEXT, BroadcastTextID0=@CRUSADE_WAS_NOBLE_BROADCAST_ID
+    WHERE ID=100103;
+
+-- 5
+SET @HIGHLORD_LYNCHPIN_BROADCAST_ID := 12488;
+SET @HIGHLORD_LYNCHPIN_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                    WHERE `ID`=@HIGHLORD_LYNCHPIN_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@HIGHLORD_LYNCHPIN_TEXT, BroadcastTextID0=@HIGHLORD_LYNCHPIN_BROADCAST_ID
+    WHERE ID=100104;
+
+-- 6
+SET @ONLY_WAY_BROADCAST_ID := 12490;
+SET @ONLY_WAY_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                        WHERE `ID`=@ONLY_WAY_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@ONLY_WAY_TEXT, BroadcastTextID0=@ONLY_WAY_BROADCAST_ID
+    WHERE ID=100105;
+
+-- 7
+SET @FAIRBANKS_NODS_BROADCAST_ID := 12492;
+SET @FAIRBANKS_NODS_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                WHERE `ID`=@FAIRBANKS_NODS_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@FAIRBANKS_NODS_TEXT, BroadcastTextID0=@FAIRBANKS_NODS_BROADCAST_ID
+    WHERE ID=100106;
+
+-- 8
+SET @FAIRBANKS_TABARD_BROADCAST_ID := 12494;
+SET @FAIRBANKS_TABARD_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                WHERE `ID`=@FAIRBANKS_TABARD_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@FAIRBANKS_TABARD_TEXT, BroadcastTextID0=@FAIRBANKS_TABARD_BROADCAST_ID
+    WHERE ID=100107;
+
+-- 9
+SET @ASHBRINGER_FOOL_BROADCAST_ID := 12496;
+SET @ASHBRINGER_FOOL_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                WHERE `ID`=@ASHBRINGER_FOOL_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@ASHBRINGER_FOOL_TEXT, BroadcastTextID0=@ASHBRINGER_FOOL_BROADCAST_ID
+    WHERE ID=100108;
+
+-- 10
+SET @NOT_ENOUGH_BROADCAST_ID := 12498;
+SET @NOT_ENOUGH_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                            WHERE `ID`=@NOT_ENOUGH_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@NOT_ENOUGH_TEXT, BroadcastTextID0=@NOT_ENOUGH_BROADCAST_ID
+    WHERE ID=100109;
+
+-- 11
+SET @FAIRBANKS_SHAKES_HEAD_BROADCAST_ID := 12500;
+SET @FAIRBANKS_SHAKES_HEAD_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                        WHERE `ID`=@FAIRBANKS_SHAKES_HEAD_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@FAIRBANKS_SHAKES_HEAD_TEXT, BroadcastTextID0=@FAIRBANKS_SHAKES_HEAD_BROADCAST_ID
+    WHERE ID=100110;
+
+-- 12
+SET @FEIGN_DEATH_BROADCAST_ID := 12502;
+SET @FEIGN_DEATH_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                            WHERE `ID`=@FEIGN_DEATH_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@FEIGN_DEATH_TEXT, BroadcastTextID0=@FEIGN_DEATH_BROADCAST_ID
+    WHERE ID=100111;
+
+-- 13
+SET @BOY_PICKED_UP_BROADCAST_ID := 12504;
+SET @BOY_PICKED_UP_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                WHERE `ID`=@BOY_PICKED_UP_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@BOY_PICKED_UP_TEXT, BroadcastTextID0=@BOY_PICKED_UP_BROADCAST_ID
+    WHERE ID=100112;
+
+-- 14
+SET @BLADE_AND_MOGRAINE_BROADCAST_ID := 12506;
+SET @BLADE_AND_MOGRAINE_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                    WHERE `ID`=@BLADE_AND_MOGRAINE_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@BLADE_AND_MOGRAINE_TEXT, BroadcastTextID0=@BLADE_AND_MOGRAINE_BROADCAST_ID
+    WHERE ID=100113;
+
+-- 15
+SET @DISMAY_LESSER_BROADCAST_ID := 12508;
+SET @DISMAY_LESSER_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                WHERE `ID`=@DISMAY_LESSER_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@DISMAY_LESSER_TEXT, BroadcastTextID0=@DISMAY_LESSER_BROADCAST_ID
+    WHERE ID=100114;
+
+-- 16
+SET @BLADE_BEYOND_SAVING_BROADCAST_ID := 12510;
+SET @BLADE_BEYOND_SAVING_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                    WHERE `ID`=@BLADE_BEYOND_SAVING_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@BLADE_BEYOND_SAVING_TEXT, BroadcastTextID0=@BLADE_BEYOND_SAVING_BROADCAST_ID
+    WHERE ID=100115;
+
+-- 17
+SET @THE_OTHER_LIVES_BROADCAST_ID := 12512;
+SET @THE_OTHER_LIVES_TEXT := (SELECT `MaleText` FROM `broadcast_text`
+                                WHERE `ID`=@THE_OTHER_LIVES_BROADCAST_ID);
+
+UPDATE acore_world.npc_text
+    SET text0_0=@THE_OTHER_LIVES_TEXT, BroadcastTextID0=@THE_OTHER_LIVES_BROADCAST_ID
+    WHERE ID=100116;
