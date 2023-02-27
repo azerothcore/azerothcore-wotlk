@@ -136,7 +136,7 @@ struct boss_malchezaar : public BossAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
-        _EnterCombat();
+        _JustEngagedWith();
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
 
         scheduler.Schedule(30s, [this](TaskContext context)
