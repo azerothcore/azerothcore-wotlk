@@ -4,7 +4,7 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 
 -- Gossip_menu_option (30201) conditions (QUEST_REWARDED & _ITEM)
 -- Require both quests 7636(Stave of the Ancients) & 7635(A Proper String) to be rewarded, to not have either Sinew or Rune and to not have either Bow or Stave.
-DELETE FROM `conditions` WHERE `SourceGroup` = 30201;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 30201;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (15, 30201, 0, 0, 0, 8, 0, 7636, 0, 0, 0, 0, 0, '', '(AND) Require quest 7636(Stave of the Ancients) to be rewarded.'),
 (15, 30201, 0, 0, 0, 8, 0, 7635, 0, 0, 0, 0, 0, '', '(AND) Require quest 7635(A Proper String) to be rewarded.'),
