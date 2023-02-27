@@ -33,4 +33,4 @@ jobs:
             -i src/server/game/Entities/GameObject/GameObject.cpp \
             -i src/server/game/Entities/Pet/Pet.cpp \
             -i src/server/game/Entities/Player/Player.cpp \
-            src/server/game/World/World.cpp
+            src/
