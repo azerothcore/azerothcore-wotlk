@@ -545,3 +545,199 @@ SET @THE_OTHER_LIVES_TEXT := (SELECT `MaleText` FROM `broadcast_text`
 UPDATE acore_world.npc_text
     SET text0_0=@THE_OTHER_LIVES_TEXT, BroadcastTextID0=@THE_OTHER_LIVES_BROADCAST_ID
     WHERE ID=100116;
+
+
+-- --
+-- Player gossip options when talking to Fairbanks
+
+-- 1
+SET @WHATS_GOING_ON_MENU_ID := 5873;
+SET @WHATS_GOING_ON_BROADCAST_ID := 12481;
+SET @WHATS_GOING_ON_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                                WHERE `ID`=@WHATS_GOING_ON_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+    WHERE `MenuID` = @WHATS_GOING_ON_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+     (@WHATS_GOING_ON_MENU_ID,0,0,@WHATS_GOING_ON_TEXT,@WHATS_GOING_ON_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 2
+SET @MOGRAINE_QUESTION_GOSSIP_MENU_ID := 5874;
+SET @MOGRAINE_QUESTION_GOSSIP_BROADCAST_ID := 12483;
+SET @MOGRAINE_QUESTION_GOSSIP_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                                        WHERE `ID`=@MOGRAINE_QUESTION_GOSSIP_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+    WHERE `MenuID` = @MOGRAINE_QUESTION_GOSSIP_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+     (@MOGRAINE_QUESTION_GOSSIP_MENU_ID,0,0,@MOGRAINE_QUESTION_GOSSIP_TEXT,@MOGRAINE_QUESTION_GOSSIP_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 3
+SET @WDYM_MENU_ID := 5875;
+SET @WDYM_BROADCAST_ID := 12485;
+SET @WDYM_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                    WHERE `ID`=@WDYM_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @WDYM_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@WDYM_MENU_ID,0,0,@WDYM_TEXT,@WDYM_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 4
+SET @DONT_UNDERSTAND_MENU_ID := 5876;
+SET @DONT_UNDERSTAND_BROADCAST_ID := 12487;
+SET @DONT_UNDERSTAND_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                                WHERE `ID`=@DONT_UNDERSTAND_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @DONT_UNDERSTAND_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@DONT_UNDERSTAND_MENU_ID,0,0,@DONT_UNDERSTAND_TEXT,@DONT_UNDERSTAND_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 5
+SET @INCREDIBLE_STORY_MENU_ID := 5877;
+SET @INCREDIBLE_STORY_BROADCAST_ID := 12489;
+SET @INCREDIBLE_STORY_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                                WHERE `ID`=@INCREDIBLE_STORY_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @INCREDIBLE_STORY_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@INCREDIBLE_STORY_MENU_ID,0,0,@INCREDIBLE_STORY_TEXT,@INCREDIBLE_STORY_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 6
+SET @YOU_MEAN_MENU_ID := 5878;
+SET @YOU_MEAN_BROADCAST_ID := 12491;
+SET @YOU_MEAN_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                         WHERE `ID`=@YOU_MEAN_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @YOU_MEAN_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@YOU_MEAN_MENU_ID,0,0,@YOU_MEAN_TEXT,@YOU_MEAN_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 7
+SET @HOW_DO_YOU_KNOW_MENU_ID := 5879;
+SET @HOW_DO_YOU_KNOW_BROADCAST_ID := 12493;
+SET @HOW_DO_YOU_KNOW_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                                WHERE `ID`=@HOW_DO_YOU_KNOW_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @HOW_DO_YOU_KNOW_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@HOW_DO_YOU_KNOW_MENU_ID,0,0,@HOW_DO_YOU_KNOW_TEXT,@HOW_DO_YOU_KNOW_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 8
+SET @A_THOUSAND_MENU_ID := 5880;
+SET @A_THOUSAND_BROADCAST_ID := 12495;
+SET @A_THOUSAND_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                            WHERE `ID`=@A_THOUSAND_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @A_THOUSAND_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@A_THOUSAND_MENU_ID,0,0,@A_THOUSAND_TEXT,@A_THOUSAND_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 9
+SET @YET_WHAT_MENU_ID := 5881;
+SET @YET_WHAT_BROADCAST_ID := 12497;
+SET @YET_WHAT_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                         WHERE `ID`=@YET_WHAT_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @YET_WHAT_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@YET_WHAT_MENU_ID,0,0,@YET_WHAT_TEXT,@YET_WHAT_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 10
+SET @DID_HE_MENU_ID := 5882;
+SET @DID_HE_BROADCAST_ID := 12499;
+SET @DID_HE_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                        WHERE `ID`=@DID_HE_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @DID_HE_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@DID_HE_MENU_ID,0,0,@DID_HE_TEXT,@DID_HE_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 11
+SET @CONTINUE_PLEASE_MENU_ID := 5883;
+SET @CONTINUE_PLEASE_BROADCAST_ID := 12501;
+SET @CONTINUE_PLEASE_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                                WHERE `ID`=@CONTINUE_PLEASE_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @CONTINUE_PLEASE_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@CONTINUE_PLEASE_MENU_ID,0,0,@CONTINUE_PLEASE_TEXT,@CONTINUE_PLEASE_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 12
+SET @YOU_MEAN_MENU_ID := 5884;
+SET @YOU_MEAN_BROADCAST_ID := 12503;
+SET @YOU_MEAN_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                        WHERE `ID`=@YOU_MEAN_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @YOU_MEAN_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@YOU_MEAN_MENU_ID,0,0,@YOU_MEAN_TEXT,@YOU_MEAN_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 13
+SET @YOU_WERE_RIGHT_MENU_ID := 5885;
+SET @YOU_WERE_RIGHT_BROADCAST_ID := 12505;
+SET @YOU_WERE_RIGHT_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                                WHERE `ID`=@YOU_WERE_RIGHT_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @YOU_WERE_RIGHT_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@YOU_WERE_RIGHT_MENU_ID,0,0,@YOU_WERE_RIGHT_TEXT,@YOU_WERE_RIGHT_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 14
+SET @AND_YOU_DID_MENU_ID := 5886;
+SET @AND_YOU_DID_BROADCAST_ID := 12507;
+SET @AND_YOU_DID_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                            WHERE `ID`=@AND_YOU_DID_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @AND_YOU_DID_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@AND_YOU_DID_MENU_ID,0,0,@AND_YOU_DID_TEXT,@AND_YOU_DID_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 15
+SET @BLADE_REDEMPTION_MENU_ID := 5887;
+SET @BLADE_REDEMPTION_BROADCAST_ID := 12509;
+SET @BLADE_REDEMPTION_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                                WHERE `ID`=@BLADE_REDEMPTION_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @BLADE_REDEMPTION_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@BLADE_REDEMPTION_MENU_ID,0,0,@BLADE_REDEMPTION_TEXT,@BLADE_REDEMPTION_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- 16
+SET @BUT_SON_DEAD_MENU_ID := 5888;
+SET @BUT_SON_DEAD_BROADCAST_ID := 12511;
+SET @BUT_SON_DEAD_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
+                            WHERE `ID`=@BUT_SON_DEAD_BROADCAST_ID);
+
+DELETE FROM `gossip_menu_option`
+   WHERE `MenuID` = @BUT_SON_DEAD_MENU_ID AND `OptionID` = 0;
+
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+    (@BUT_SON_DEAD_MENU_ID,0,0,@BUT_SON_DEAD_TEXT,@BUT_SON_DEAD_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
