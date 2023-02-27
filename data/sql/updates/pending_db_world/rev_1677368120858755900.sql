@@ -22,9 +22,24 @@ UPDATE `creature_text` SET `Type`=12, `Emote`=15 WHERE `CreatureID`=18402 AND `G
 
 UPDATE `creature` SET `spawntimesecs`=1 WHERE `guid`=48191 AND `id1`=18069;
 
+-- Add Boss immunities to challengers
+UPDATE `creature_template` SET `mechanic_immune_mask` = 650854271 WHERE (`entry` IN (18398, 18399, 18400, 18401, 18402));
+
+-- Skra'gath Text
+DELETE FROM `creature_text` WHERE `CreatureID`=18401;
+INSERT INTO `creature_text` (`CreatureID`, `BroadcastTextId`, `GroupID`, `ID`, `Text`, `Type`, `comment`) VALUES
+(18401, 15472, 0, 0, 'Closer... Come closer... See what the void brings!', 14, 'Skra\'gath'),
+(18401, 17110, 1, 0, '%s absorbs the holy energy of the attack.', 16, 'Skra\'gath'),
+(18401, 17105, 2, 0, '%s absorbs the fire energy of the attack.', 16, 'Skra\'gath'),
+(18401, 17107, 3, 0, '%s absorbs the nature energy of the attack.', 16, 'Skra\'gath'),
+(18401, 17106, 4, 0, '%s absorbs the frost energy of the attack.', 16, 'Skra\'gath'),
+(18401, 17108, 5, 0, '%s absorbs the shadow energy of the attack.', 16, 'Skra\'gath'),
+(18401, 17109, 6, 0, '%s absorbs the arcane energy of the attack.', 16, 'Skra\'gath');
+
 -- Text for Mogor and Gurgthock
-DELETE FROM `creature_text` WHERE `CreatureID` IN (18069, 18471);
+DELETE FROM `creature_text` WHERE `CreatureID` IN (18069, 18398, 18471);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(18398, 0, 0, 'Brokentoe prepares to charge.', 41, 0, 100, 0, 0, 0, 15438, 0, 'Brokentoe'),
 (18069, 0, 0, '%s goes into a frenzy!', 16, 0, 100, 0, 0, 0, 38630, 0, 'Mogor'),
 (18069, 1, 0, 'Dat was poop! Mogor could put up much better fight den dat!', 14, 0, 100, 15, 0, 0, 15470, 0, 'Mogor'),
 (18069, 2, 0, 'Mogor not impressed! Skra\'gath wuz made of da air and shadow! Soft like da squishy orcies!', 14, 0, 100, 15, 0, 0, 15474, 0, 'Mogor'),
@@ -185,9 +200,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18398, 0, 1, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Brokentoe - On Just Died - Set Data 1 1 on Gurgthock'),
 (18398, 0, 2, 3, 1, 0, 100, 1, 30000, 30000, 0, 0, 0, 45, 2, 2, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Brokentoe - Out of Combat - Set Data 2 2 on Gurgthock (No Repeat)'),
 (18398, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brokentoe - Out of Combat - Despawn Instant (No Repeat)'),
+(18398, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 'Brokentoe - On Aggro - Say Line 0'),
 
 (18399, 0, 0, 0, 0, 0, 100, 0, 1000, 1000, 2000, 2000, 0, 11, 14873, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Murkblood Twin - In Combat - Cast \'Sinister Strike\''),
-(18399, 0, 1, 0, 0, 0, 100, 0, 5000, 6000, 11000, 12000, 0, 11, 15691, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Murkblood Twin - In Combat - Cast \'Eviscerate\''),
+(18399, 0, 1, 0, 0, 0, 100, 0, 5000, 6000, 11000, 12000, 0, 11, 15692, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Murkblood Twin - In Combat - Cast \'Eviscerate\''),
 (18399, 0, 2, 0, 0, 0, 100, 0, 8000, 9000, 15000, 16000, 0, 11, 32319, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Murkblood Twin - In Combat - Cast \'Mutilate\''),
 (18399, 0, 3, 0, 6, 0, 100, 1, 0, 0, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Murkblood Twin - On Just Died - Add to Counter for Victory Event'),
 (18399, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 39, 25, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Murkblood Twin - On Aggro - Call For Help'),
@@ -209,15 +225,35 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 (18401, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 11, 29299, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Respawn - Cast \'Draining Touch\''),
 (18401, 0, 1, 0, 0, 0, 100, 0, 6000, 9000, 24000, 27000, 0, 11, 16429, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - In Combat - Cast \'Piercing Shadow\''),
-(18401, 0, 2, 0, 9, 0, 100, 0, 0, 5, 16000, 19000, 0, 11, 32324, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - Within 0-5 Range - Cast \'Shadow Burst\''),
+(18401, 0, 2, 8, 9, 0, 100, 0, 0, 5, 16000, 19000, 0, 11, 32324, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - Within 0-5 Range - Cast \'Shadow Burst\''),
 (18401, 0, 3, 0, 0, 0, 100, 0, 12000, 15000, 33000, 37000, 0, 11, 32322, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - In Combat - Cast \'Dark Shriek\''),
 (18401, 0, 4, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 10, 10, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Just Died - Set Data 10 10'),
 (18401, 0, 5, 6, 1, 0, 100, 1, 30000, 30000, 0, 0, 0, 45, 11, 11, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Skra\'gath - Out of Combat - Set Data 11 11 (No Repeat)'),
 (18401, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - Out of Combat - Despawn Instant (No Repeat)'),
 (18401, 0, 7, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1840100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Data Set 1 1 - Run Script'),
+(18401, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 14, 0, 100, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - After Shadow Burst - Wipe All Threat'),
+(18401, 0, 9 , 10, 8, 1, 100, 0, 0, 2, 0, 0, 0, 11, 34336, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Holy\' - Cast \'Damage Reduction: Holy\' (Phase 1)'),
+(18401, 0, 10, 11, 61, 1, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Holy\' - Say Line 1 (Phase 1)'),
+(18401, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Holy\' - Set Event Phase 0 (Phase 1)'),
+(18401, 0, 12, 13, 8, 1, 100, 0, 0, 4, 0, 0, 0, 11, 34333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Fire\' - Cast \'Damage Reduction: Fire\' (Phase 1)'),
+(18401, 0, 13, 14, 61, 1, 100, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Fire\' - Say Line 2 (Phase 1)'),
+(18401, 0, 14, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Holy\' - Set Event Phase 0 (Phase 1)'),
+(18401, 0, 15, 16, 8, 1, 100, 0, 0, 8, 0, 0, 0, 11, 34335, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Nature\' - Cast \'Damage Reduction: Nature\' (Phase 1)'),
+(18401, 0, 16, 17, 61, 1, 100, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Nature\' - Say Line 3 (Phase 1)'),
+(18401, 0, 17, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Holy\' - Set Event Phase 0 (Phase 1)'),
+(18401, 0, 18, 19, 8, 1, 100, 0, 0, 16, 0, 0, 0, 11, 34334, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Frost\' - Cast \'Damage Reduction: Frost\' (Phase 1)'),
+(18401, 0, 19, 20, 61, 1, 100, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Frost\' - Say Line 4 (Phase 1)'),
+(18401, 0, 20, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Holy\' - Set Event Phase 0 (Phase 1)'),
+(18401, 0, 21, 22, 8, 1, 100, 0, 0, 32, 0, 0, 0, 11, 34338, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Shadow\' - Cast \'Damage Reduction: Shadow\' (Phase 1)'),
+(18401, 0, 22, 23, 61, 1, 100, 0, 0, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Shadow\' - Say Line 5 (Phase 1)'),
+(18401, 0, 23, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Holy\' - Set Event Phase 0 (Phase 1)'),
+(18401, 0, 24, 25, 8, 1, 100, 0, 0, 64, 0, 0, 0, 11, 34331, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Arcane\' - Cast \'Damage Reduction: Arcane\' (Phase 1)'),
+(18401, 0, 25, 26, 61, 1, 100, 0, 0, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Arcane\' - Say Line 6 (Phase 1)'),
+(18401, 0, 26, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Spellhit \'Holy\' - Set Event Phase 0 (Phase 1)'),
+(18401, 0, 27, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skra\'gath - On Aggro - Set Event Phase 1'),
 
 (18402, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 31403, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warmaul Champion - On Aggro - Cast \'Battle Shout\''),
-(18402, 0, 1, 0, 9, 0, 100, 0, 8, 25, 23000, 25000, 0, 11, 32323, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Warmaul Champion - Within 8-25 Range - Cast \'Charge\''),
+(18402, 0, 1, 0, 9, 0, 100, 0, 8, 25, 23000, 25000, 0, 11, 32323, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Warmaul Champion - Within 8-25 Range - Cast \'Charge\''),
 (18402, 0, 2, 0, 0, 0, 100, 0, 3000, 4000, 14000, 17000, 0, 11, 15708, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Warmaul Champion - In Combat - Cast \'Mortal Strike\''),
 (18402, 0, 3, 0, 9, 0, 100, 0, 0, 5, 9000, 13000, 0, 11, 17963, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Warmaul Champion - Within 0-5 Range - Cast \'Sundering Cleave\''),
 (18402, 0, 4, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 13, 13, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Warmaul Champion - On Just Died - Set Data 13 13'),
@@ -248,7 +284,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18069, 0, 0, 0, 9, 0, 100, 0, 0, 30, 6000, 8000, 0, 11, 16033, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Within 0-30 Range - Cast \'Chain Lightning\''),
 (18069, 0, 1, 0, 9, 0, 100, 0, 0, 20, 8000, 18000, 0, 11, 39529, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Within 0-20 Range - Cast \'Flame Shock\''),
 (18069, 0, 2, 0, 2, 0, 100, 0, 0, 50, 15000, 15000, 0, 11, 15982, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Between 0-50% Health - Cast \'Healing Wave\''),
-(18069, 0, 3, 0, 0, 0, 100, 0, 3400, 9400, 13200, 26400, 0, 11, 18975, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - In Combat - Cast \'Summon Ice Totem\''),
+(18069, 0, 3, 0, 0, 0, 100, 0, 3400, 6400, 13200, 26400, 0, 11, 18975, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - In Combat - Cast \'Summon Ice Totem\''),
 (18069, 0, 5, 0, 2, 0, 100, 1, 0, 1, 1200, 1200, 0, 80, 1806902, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - Between 0-1% Health - Run Script (No Repeat)'),
 (18069, 0, 4, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1806900, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Data Set 1 1 - Run Script'),
 -- (18069, 0, 6, 7, 1, 0, 100, 0, 45000, 45000, 45000, 45000, 0, 45, 17, 17, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - Out of Combat - Set Data 17 17 - Failure Event'), -- Does not work. Event seems to be queued until the condition (near Gurgthock) is passed
