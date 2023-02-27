@@ -151,7 +151,7 @@ public:
             me->setActive(false);
         }
 
-        void EnterCombat(Unit*  /*pWho*/) override
+        void JustEngagedWith(Unit*  /*pWho*/) override
         {
             me->setActive(true);
             me->SetInCombatWithZone();

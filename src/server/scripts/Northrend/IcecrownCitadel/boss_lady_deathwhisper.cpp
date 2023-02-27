@@ -265,7 +265,7 @@ public:
                 me->GetMotionMaster()->MoveChase(victim);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (!instance->CheckRequiredBosses(DATA_LADY_DEATHWHISPER, who->ToPlayer()))
             {
@@ -716,7 +716,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override { DoZoneInCombat(); }
+        void JustEngagedWith(Unit*  /*who*/) override { DoZoneInCombat(); }
 
         void UpdateAI(uint32 diff) override
         {
@@ -829,7 +829,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override { DoZoneInCombat(); }
+        void JustEngagedWith(Unit*  /*who*/) override { DoZoneInCombat(); }
 
         void UpdateAI(uint32 diff) override
         {
@@ -1041,7 +1041,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
             Talk(SAY_DARNAVAN_AGGRO);

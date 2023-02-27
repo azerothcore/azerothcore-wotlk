@@ -51,7 +51,7 @@ public:
 
         boss_draganthaurissanAI(Creature* creature) : BossAI(creature, DATA_EMPEROR){}
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             if (hasYelled != 5)
             {

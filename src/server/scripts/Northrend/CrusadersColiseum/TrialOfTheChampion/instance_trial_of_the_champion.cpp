@@ -39,7 +39,11 @@ public:
 
     struct instance_trial_of_the_champion_InstanceMapScript : public InstanceScript
     {
-        instance_trial_of_the_champion_InstanceMapScript(Map* pMap) : InstanceScript(pMap) { Initialize(); }
+        instance_trial_of_the_champion_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
+        {
+            SetHeaders(DataHeader);
+            Initialize();
+        }
 
         bool CLEANED;
         TeamId TeamIdInInstance;

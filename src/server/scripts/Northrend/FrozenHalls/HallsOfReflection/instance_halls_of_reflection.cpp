@@ -126,7 +126,10 @@ public:
 
     struct instance_halls_of_reflection_InstanceMapScript : public InstanceScript
     {
-        instance_halls_of_reflection_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {};
+        instance_halls_of_reflection_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
+        {
+            SetHeaders(DataHeader);
+        };
 
         uint32 EncounterMask;
         TeamId TeamIdInInstance;
@@ -705,42 +708,15 @@ public:
             return ObjectGuid::Empty;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "H R " << EncounterMask;
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
+            data >> EncounterMask;
+            BatteredHiltStatus = (EncounterMask & (1 << DATA_BATTERED_HILT)) ? BHSF_FINISHED : BHSF_NONE;
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-            uint32 data0;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> data0;
-
-            if (dataHead1 == 'H' && dataHead2 == 'R')
-            {
-                EncounterMask = data0;
-                BatteredHiltStatus = (EncounterMask & (1 << DATA_BATTERED_HILT)) ? BHSF_FINISHED : BHSF_NONE;
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << EncounterMask;
         }
 
         void OnUnitDeath(Unit* unit) override

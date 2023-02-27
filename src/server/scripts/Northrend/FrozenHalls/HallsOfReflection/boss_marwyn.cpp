@@ -69,7 +69,7 @@ public:
                 pInstance->SetData(DATA_MARWYN, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->SetImmuneToAll(false);
 

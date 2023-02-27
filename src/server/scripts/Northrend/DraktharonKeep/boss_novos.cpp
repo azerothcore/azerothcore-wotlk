@@ -117,10 +117,10 @@ public:
 
         void MoveInLineOfSight(Unit*  /*who*/) override { }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SUMMON_FETID_TROLL, 3000);
             events.ScheduleEvent(EVENT_SUMMON_SHADOWCASTER, 9000);

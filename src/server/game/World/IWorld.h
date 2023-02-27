@@ -179,6 +179,8 @@ enum WorldBoolConfigs
     CONFIG_OBJECT_SPARKLES,
     CONFIG_LOW_LEVEL_REGEN_BOOST,
     CONFIG_OBJECT_QUEST_MARKERS,
+    CONFIG_STRICT_NAMES_RESERVED,
+    CONFIG_STRICT_NAMES_PROFANITY,
     CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH,
     BOOL_CONFIG_VALUE_COUNT
 };
@@ -595,6 +597,7 @@ public:
     virtual void LoadDBVersion() = 0;
     [[nodiscard]] virtual char const* GetDBVersion() const = 0;
     virtual void LoadAutobroadcasts() = 0;
+    virtual void LoadMotd() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;
     virtual void   SetCleaningFlags(uint32 flags) = 0;

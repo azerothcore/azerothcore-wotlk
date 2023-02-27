@@ -133,7 +133,7 @@ struct boss_malchezaar : public BossAI
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         _EnterCombat();
@@ -270,7 +270,7 @@ struct npc_netherspite_infernal : public ScriptedAI
 {
     npc_netherspite_infernal(Creature* creature) : ScriptedAI(creature) { }
 
-    void EnterCombat(Unit* /*who*/) override { }
+    void JustEngagedWith(Unit* /*who*/) override { }
     void MoveInLineOfSight(Unit* /*who*/) override { }
 
     void UpdateAI(uint32 diff) override
@@ -310,9 +310,6 @@ struct npc_netherspite_infernal : public ScriptedAI
     {
         damage = 0;
     }
-
-    private:
-        TaskScheduler _scheduler;
 };
 
 struct npc_malchezaar_axe : public ScriptedAI
@@ -327,7 +324,7 @@ struct npc_malchezaar_axe : public ScriptedAI
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
         _scheduler.Schedule(7500ms, [this](TaskContext context)

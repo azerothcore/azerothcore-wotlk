@@ -826,7 +826,7 @@ void GameEventMgr::LoadFromDB()
                 Field* fields = result->Fetch();
 
                 uint32 questId  = fields[0].Get<uint32>();
-                uint32 eventEntry = fields[1].Get<uint32>(); // TODO: Change to uint8
+                uint32 eventEntry = fields[1].Get<uint32>(); /// @todo: Change to uint8
 
                 Quest* questTemplate = const_cast<Quest*>(sObjectMgr->GetQuestTemplate(questId));
 

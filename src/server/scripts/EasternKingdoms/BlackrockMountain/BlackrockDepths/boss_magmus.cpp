@@ -45,10 +45,10 @@ public:
             instance->SetData(TYPE_IRON_HALL, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             instance->SetData(TYPE_IRON_HALL, IN_PROGRESS);
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(SPELL_WARSTOMP, 8s, 12s);
             events.ScheduleEvent(SPELL_FIERYBURST, 4s, 8s);
         }

@@ -76,7 +76,7 @@ public:
                 instance->SetData(DATA_MURMUREVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPELL_SONIC_BOOM, 30000);
             events.ScheduleEvent(EVENT_SPELL_MURMURS_TOUCH, urand(8000, 20000));

@@ -82,13 +82,13 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (who->GetEntry() == NPC_MADRIGOSA)
                 return;
 
             Talk(YELL_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SPELL_SLASH, 11000);
             events.ScheduleEvent(EVENT_SPELL_STOMP, 30000);

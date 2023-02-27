@@ -43,9 +43,9 @@ struct boss_maiden_of_virtue : public BossAI
 {
     boss_maiden_of_virtue(Creature* creature) : BossAI(creature, DATA_MAIDEN) { }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         DoCastAOE(SPELL_HOLY_GROUND, true);

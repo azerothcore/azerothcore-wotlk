@@ -64,7 +64,7 @@ struct boss_the_black_stalker : public BossAI
     {
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         events.ScheduleEvent(EVENT_LEVITATE, urand(8000, 12000));
         events.ScheduleEvent(EVENT_SPELL_CHAIN, 6000);
@@ -73,7 +73,7 @@ struct boss_the_black_stalker : public BossAI
         if (IsHeroic())
             events.ScheduleEvent(EVENT_SPELL_SPORES, urand(10000, 15000));
 
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
     }
 
     void JustSummoned(Creature* summon) override
