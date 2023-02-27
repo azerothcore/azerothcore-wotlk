@@ -310,6 +310,9 @@ struct npc_netherspite_infernal : public ScriptedAI
     {
         damage = 0;
     }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 struct npc_malchezaar_axe : public ScriptedAI
