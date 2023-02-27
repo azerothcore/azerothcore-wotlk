@@ -1,3 +1,4 @@
+-- DB update 2023_02_27_01 -> 2023_02_27_02
 --
 
 DELETE FROM `creature_loot_template` WHERE `entry`= 18201 AND `Item`= 22787;
