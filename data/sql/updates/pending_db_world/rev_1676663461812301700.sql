@@ -5,4 +5,4 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 (25596, 1, 45877, 12340);
 
 -- Column Ornament - disable gravity, previously falling to the ground.
-UPDATE `creature_template_movement` SET `Flight` = 1 WHERE `Flight` = 0 AND `CreatureId` = 29754;
+UPDATE `creature_template_movement` SET `Flight` = 1 WHERE `CreatureId` = 29754;
