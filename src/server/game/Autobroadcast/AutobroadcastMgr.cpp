@@ -136,8 +136,7 @@ void AutobroadcastMgr::SendWorldAnnouncement(std::string msg)
 
 void AutobroadcastMgr::SendNotificationAnnouncement(std::string msg)
 {
-   // cppcheck-suppress invalidLifetime
-   WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
+    WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
     data << msg.data();
     sWorld->SendGlobalMessage(&data);
 }
