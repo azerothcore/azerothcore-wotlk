@@ -1008,7 +1008,7 @@ public:
                     break;
                 }
 
-            if (target != nullptr)
+            if (target)
             {
                 if (Aura* aura = target->GetAura(uint32(GetSpellInfo()->Effects[stage].CalcValue())))
                     if (aura->GetOwner() == target) // avoid assert(false) at any cost
