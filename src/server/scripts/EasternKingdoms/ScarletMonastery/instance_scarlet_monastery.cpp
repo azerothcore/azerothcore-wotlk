@@ -745,7 +745,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_1, 0, GOSSIP_SENDER_MAIN, 1);
+        AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         SendGossipMenuFor(player, 100100, creature->GetGUID());
         return true;
     }
@@ -756,82 +756,82 @@ public:
 
         switch (uiAction)
         {
-            case 1:
+            case GOSSIP_ACTION_INFO_DEF:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_2, 0, GOSSIP_SENDER_MAIN, 2);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 100101, creature->GetGUID());
                 return true;
-            case 2:
+            case GOSSIP_ACTION_INFO_DEF + 1:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_3, 0, GOSSIP_SENDER_MAIN, 3);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, 100102, creature->GetGUID());
                 return true;
-            case 3:
+            case GOSSIP_ACTION_INFO_DEF + 2:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_4, 0, GOSSIP_SENDER_MAIN, 4);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_4, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 SendGossipMenuFor(player, 100103, creature->GetGUID());
                 return true;
-            case 4:
+            case GOSSIP_ACTION_INFO_DEF + 3:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_5, 0, GOSSIP_SENDER_MAIN, 5);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_5, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 SendGossipMenuFor(player, 100104, creature->GetGUID());
                 return true;
-            case 5:
+            case GOSSIP_ACTION_INFO_DEF + 4:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_6, 0, GOSSIP_SENDER_MAIN, 6);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_6, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, 100105, creature->GetGUID());
                 return true;
-            case 6:
+            case GOSSIP_ACTION_INFO_DEF + 5:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_7, 0, GOSSIP_SENDER_MAIN, 7);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_7, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
                 SendGossipMenuFor(player, 100106, creature->GetGUID());
                 return true;
-            case 7:
+            case GOSSIP_ACTION_INFO_DEF + 6:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_8, 0, GOSSIP_SENDER_MAIN, 8);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_8, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
                 SendGossipMenuFor(player, 100107, creature->GetGUID());
                 return true;
-            case 8:
+            case GOSSIP_ACTION_INFO_DEF + 7:
                 creature->HandleEmoteCommand(5);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_9, 0, GOSSIP_SENDER_MAIN, 9);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_9, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
                 SendGossipMenuFor(player, 100108, creature->GetGUID());
                 return true;
-            case 9:
+            case GOSSIP_ACTION_INFO_DEF + 8:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_10, 0, GOSSIP_SENDER_MAIN, 10);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_10, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
                 SendGossipMenuFor(player, 100109, creature->GetGUID());
                 return true;
-            case 10:
+            case GOSSIP_ACTION_INFO_DEF + 9:
                 creature->HandleEmoteCommand(274);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_11, 0, GOSSIP_SENDER_MAIN, 11);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_11, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
                 SendGossipMenuFor(player, 100110, creature->GetGUID());
                 return true;
-            case 11:
+            case GOSSIP_ACTION_INFO_DEF + 10:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_12, 0, GOSSIP_SENDER_MAIN, 12);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_12, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
                 SendGossipMenuFor(player, 100111, creature->GetGUID());
                 return true;
-            case 12:
+            case GOSSIP_ACTION_INFO_DEF + 11:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_13, 0, GOSSIP_SENDER_MAIN, 13);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_13, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
                 SendGossipMenuFor(player, 100112, creature->GetGUID());
                 return true;
-            case 13:
+            case GOSSIP_ACTION_INFO_DEF + 12:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_14, 0, GOSSIP_SENDER_MAIN, 14);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_14, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
                 SendGossipMenuFor(player, 100113, creature->GetGUID());
                 return true;
-            case 14:
+            case GOSSIP_ACTION_INFO_DEF + 13:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_15, 0, GOSSIP_SENDER_MAIN, 15);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_15, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
                 SendGossipMenuFor(player, 100114, creature->GetGUID());
                 return true;
-            case 15:
+            case GOSSIP_ACTION_INFO_DEF + 14:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_16, 0, GOSSIP_SENDER_MAIN, 16);
+                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_16, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
                 SendGossipMenuFor(player, 100115, creature->GetGUID());
                 return true;
-            case 16:
+            case GOSSIP_ACTION_INFO_DEF + 15:
                 SendGossipMenuFor(player, 100116, creature->GetGUID());
                 /// @todo: we need to play these 3 emote in sequence, we play only the last one right now.
                 creature->HandleEmoteCommand(274);
