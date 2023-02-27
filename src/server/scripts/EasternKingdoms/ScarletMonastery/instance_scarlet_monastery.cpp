@@ -773,6 +773,16 @@ public:
                 return true;
             case GOSSIP_ACTION_INFO_DEF + 3:
                 creature->HandleEmoteCommand(1);
+                creature->m_Events.AddEventAtOffset([creature]()
+                {
+                    creature->HandleEmoteCommand(EMOTE_ONESHOT_YES);
+                }, 2500ms);
+
+                creature->m_Events.AddEventAtOffset([creature]()
+                {
+                    creature->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                }, 5000ms);
+
                 AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_5, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 SendGossipMenuFor(player, 100104, creature->GetGUID());
                 return true;
