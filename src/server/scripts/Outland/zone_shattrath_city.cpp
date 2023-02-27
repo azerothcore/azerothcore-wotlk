@@ -115,7 +115,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
 
-            _scheduler.Update(diff, [this] { });
+            _scheduler.Update(diff);
 
             if (!UpdateVictim())
                 return;
