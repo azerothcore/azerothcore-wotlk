@@ -4,12 +4,12 @@ on:
     branches:
       - "master"
     paths:
-      - src/server/scripts/**
+      - src/**
       - "!README.md"
       - "!docs/**"
   pull_request:
     paths:
-      - src/server/scripts/**
+      - src/**
       - "!README.md"
       - "!docs/**"
 
@@ -33,5 +33,4 @@ jobs:
             -i src/server/game/Entities/GameObject/GameObject.cpp \
             -i src/server/game/Entities/Pet/Pet.cpp \
             -i src/server/game/Entities/Player/Player.cpp \
-            -i src/server/game/World/World.cpp \
-            src/
+            src/server/game/World/World.cpp
