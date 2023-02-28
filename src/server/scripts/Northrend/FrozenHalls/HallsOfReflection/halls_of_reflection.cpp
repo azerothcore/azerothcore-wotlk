@@ -84,6 +84,15 @@ enum Events
     EVENT_INTRO_END_SET,
 };
 
+enum Gossips
+{
+    GOSSIP_MENU_SYLVANAS      = 10950,
+    GOSISP_MENU_JAINA         = 11031,
+
+    GOSSIP_OPTION_START       = 0,
+    GOSSIP_OPTION_START_SKIP  = 1,
+};
+
 class npc_hor_leader : public CreatureScript
 {
 public:
@@ -107,27 +116,19 @@ public:
         {
             QuestStatus status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_DELIVRANCE_FROM_THE_PIT_H2 : QUEST_DELIVRANCE_FROM_THE_PIT_A2);
             if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
-                AddGossipItemFor(player, 0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                {
+                    AddGossipItemFor(player, creature->GetEntry() == NPC_SYLVANAS_PART1 ? GOSSIP_MENU_SYLVANAS : GOSISP_MENU_JAINA, GOSSIP_OPTION_START, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                }
 
             // once last quest is completed, she offers this shortcut of the starting event
             status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_WRATH_OF_THE_LICH_KING_H2 : QUEST_WRATH_OF_THE_LICH_KING_A2);
             if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
             {
-                if (creature->GetEntry() == NPC_SYLVANAS_PART1)
-                    AddGossipItemFor(player, 0, "Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                else
-                    AddGossipItemFor(player, 0, "My Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, creature->GetEntry() == NPC_SYLVANAS_PART1 ? GOSSIP_MENU_SYLVANAS : GOSISP_MENU_JAINA, GOSSIP_OPTION_START_SKIP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             }
         }
 
-        if (creature->GetEntry() == NPC_SYLVANAS_PART1)
-        {
-            SendGossipMenuFor(player, 15215, creature->GetGUID());
-        }
-        else if (creature->GetEntry() == NPC_JAINA_PART1)
-        {
-            SendGossipMenuFor(player, 15339, creature->GetGUID());
-        }
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
     }
@@ -1555,7 +1556,7 @@ public:
                 case EVENT_LK_REMORSELESS_WINTER:
                     {
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
-                        Talk(SAY_LK_IW_1_SUMMON);
+                        Talk(SAY_LK_WINTER);
                         me->CastSpell(me, SPELL_REMORSELESS_WINTER, true);
                         Movement::PointsArray path;
                         path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
@@ -1755,7 +1756,7 @@ public:
                             if (Player* p = itr->GetSource())
                                 p->KilledMonsterCredit(me->GetEntry()); // for quest
 
-                        Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_LEAVE : SAY_SYLVANAS_LEAVE);
+                        Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_AGGRO : SAY_SYLVANA_AGGRO);
                         me->GetMotionMaster()->MovePoint(0, LeaderEscapePos);
                         events.ScheduleEvent(EVENT_ADD_GOSSIP, 8000);
                     }
@@ -1797,11 +1798,9 @@ public:
                                 textId = SAY_SYLVANAS_IW_4;
                                 break;
                             case 5:
-                                textId = SAY_SYLVANAS_END;
+                                textId = (me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_TRAP : SAY_SYLVANA_TRAP);
                                 break;
                         }
-                        if (me->GetEntry() == NPC_JAINA_PART2)
-                            textId += 10;
                         Talk(textId);
                         if (currentStopPoint <= 4)
                             me->CastSpell((Unit*)nullptr, (me->GetEntry() == NPC_JAINA_PART2 ? SPELL_DESTROY_WALL_JAINA : SPELL_DESTROY_WALL_SYLVANAS), false);
@@ -1813,7 +1812,7 @@ public:
                     }
                     break;
                 case EVENT_SAY_OPENING:
-                    Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OPENING : SAY_SYLVANAS_OPENING);
+                    Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_ESCAPE_01 : SAY_SYLVANA_ESCAPE_01);
                     break;
             }
         }
