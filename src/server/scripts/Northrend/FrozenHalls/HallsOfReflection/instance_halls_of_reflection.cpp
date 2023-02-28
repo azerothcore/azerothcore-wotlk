@@ -38,7 +38,6 @@ public:
                 break;
             case 2:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_HALT);
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, 3), _owner.m_Events.CalculateTime(2000));
                 break;
             case 3:
                 _owner.CastSpell((Unit*)nullptr, 69966, true);
@@ -616,7 +615,7 @@ public:
                                     {
                                         quel->AI()->Talk(EMOTE_QUEL_SPAWN);
                                     }
-                                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 3), c->m_Events.CalculateTime(1500));
+                                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 3), c->m_Events.CalculateTime(3500));
                                 }
                                 break;
                             case 4:
