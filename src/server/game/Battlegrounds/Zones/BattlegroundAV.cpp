@@ -407,7 +407,7 @@ void BattlegroundAV::PostUpdateImpl(uint32 diff)
                     Creature* creature = GetBGCreature(AV_CPLACE_MAX + 61);
                     if (creature)
                     {
-                        std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 0, 0, DEFAULT_LOCALE);
+                        std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 0, 0, LOCALE_zhCN);
                         YellToAll(creature, creatureText.c_str(), LANG_COMMON);
                     }
                 }
@@ -417,7 +417,7 @@ void BattlegroundAV::PostUpdateImpl(uint32 diff)
                     Creature* creature = GetBGCreature(AV_CPLACE_MAX + 59); //TODO: make the captains a dynamic creature
                     if (creature)
                     {
-                        std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 2, 0, DEFAULT_LOCALE);
+                        std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 2, 0, LOCALE_zhCN);
                         YellToAll(creature, creatureText.c_str(), LANG_ORCISH);
                     }
                 }
@@ -741,7 +741,7 @@ void BattlegroundAV::ChangeMineOwner(uint8 mine, TeamId teamId, bool initial)
         {
             if (Creature* creature = GetBGCreature(AV_CPLACE_MINE_S_3))
             {
-                std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 0, 0, DEFAULT_LOCALE);
+                std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 0, 0, LOCALE_zhCN);
                 YellToAll(creature, creatureText.c_str(), LANG_UNIVERSAL);
             }
         }
