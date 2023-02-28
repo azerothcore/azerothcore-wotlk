@@ -44,7 +44,7 @@ public:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_REALIZE);
                 if (InstanceScript* instance = _owner.GetInstanceScript())
                     instance->SetData(DATA_BATTERED_HILT, 4);
-                if (Creature* quel = _owner.FindNearestCreature(NPC_QUEL_DELAR, 50)) 
+                if (Creature* quel = _owner.FindNearestCreature(NPC_QUEL_DELAR, 50))
                 {
                     quel->AI()->Talk(EMOTE_QUEL_SPAWN);
                 }
@@ -69,7 +69,7 @@ public:
                 {
                     instance->SetData(DATA_BATTERED_HILT, 7);
                 }
-                if (Creature* quel = _owner.FindNearestCreature(NPC_QUEL_DELAR, 50)) 
+                if (Creature* quel = _owner.FindNearestCreature(NPC_QUEL_DELAR, 50))
                 {
                     quel->AI()->Talk(EMOTE_QUEL_PREPARE);
                 }

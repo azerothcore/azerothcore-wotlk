@@ -124,7 +124,7 @@ enum BatteredHiltStatusFlags
 #define MAX_DIST_FROM_CENTER_TO_START 40.0f
 
 enum hYells
-{ 
+{
     // Part 1
     // Alliance
     SAY_JAINA_INTRO_1                             = 0,
@@ -226,7 +226,7 @@ enum hYells
     SAY_FIRE_ALLY                                 = 0,
     SAY_ONBOARD_ALLY                              = 1,
 
-    // Battered Hilt - Quest: The Halls Of Reflection 
+    // Battered Hilt - Quest: The Halls Of Reflection
     // Uther
     SAY_BATTERED_HILT_HALT                        = 16,
     EMOTE_QUEL_SPAWN                              = 0, // "Quel'Delar leeps to life in the presence of Frostmourne!"
