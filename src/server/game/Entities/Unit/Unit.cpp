@@ -21372,7 +21372,6 @@ bool Unit::CanRestoreMana(SpellInfo const* spellInfo) const
         case 47755: // Rapture
         case 54425: // Improved Felhunter
         case 57319: // Blessing of Sanctuary
-        case 57961: // Water Shield (hit)
         case 63337: // Saronite Vapors (regenerate mana)
         case 63375: // Improved stormstrike
         case 64372: // Lifebloom
