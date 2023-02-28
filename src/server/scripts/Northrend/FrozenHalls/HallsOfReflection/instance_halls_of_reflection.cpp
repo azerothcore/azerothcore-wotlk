@@ -40,10 +40,14 @@ public:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_HALT);
                 break;
             case 3:
-                _owner.CastSpell((Unit*)nullptr, 69966, true);
+                _owner.CastSpell((Unit*)nullptr, SPELL_SUMMON_EVIL_QUEL, true);
                 _owner.AI()->Talk(SAY_BATTERED_HILT_REALIZE);
                 if (InstanceScript* instance = _owner.GetInstanceScript())
                     instance->SetData(DATA_BATTERED_HILT, 4);
+                if (Creature* quel = _owner.FindNearestCreature(NPC_QUEL_DELAR, 50)) 
+                {
+                    quel->AI()->Talk(EMOTE_QUEL_SPAWN);
+                }
                 _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, 4), _owner.m_Events.CalculateTime(3500));
                 break;
             case 4:
@@ -611,11 +615,7 @@ public:
                                 BatteredHiltStatus |= BHSF_THROWN;
                                 if (Creature* c = instance->GetCreature(NPC_UtherGUID))
                                 {
-                                    if (Creature* quel = instance->GetCreature(NPC_QuelDelarGUID))
-                                    {
-                                        quel->AI()->Talk(EMOTE_QUEL_SPAWN);
-                                    }
-                                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 3), c->m_Events.CalculateTime(3500));
+                                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 3), c->m_Events.CalculateTime(5500));
                                 }
                                 break;
                             case 4:

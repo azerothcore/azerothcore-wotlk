@@ -225,9 +225,9 @@ enum hYells
     // Battered Hilt - Quest: The Halls Of Reflection 
     // Uther
     SAY_BATTERED_HILT_HALT                        = 16,
-    EMOTE_QUEL_SPAWN                              = 0,
+    EMOTE_QUEL_SPAWN                              = 0, // "Quel'Delar leeps to life in the presence of Frostmourne!"
     SAY_BATTERED_HILT_REALIZE                     = 17,
-    EMOTE_QUEL_PREPARE                            = 1,
+    EMOTE_QUEL_PREPARE                            = 1, // "Quel'Delar prepares to attack!"
     SAY_BATTERED_HILT_OUTRO1                      = 18,
     SAY_BATTERED_HILT_OUTRO2                      = 19,
     SAY_BATTERED_HILT_OUTRO3                      = 20,
@@ -289,6 +289,9 @@ enum hMisc
     SPELL_SUMMON_LUMBERING_ABOMINATION            = 69835,
     SPELL_GUNSHIP_CANNON_FIRE_PERIODIC            = 70017,
     SPELL_ACHIEVEMENT_CHECK                       = 72830,
+
+    // Battered Hilt - Summon Quel'Delar
+    SPELL_SUMMON_EVIL_QUEL                        = 69966,
 };
 
 const uint32 allowedCompositions[8][5] =
