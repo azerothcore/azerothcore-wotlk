@@ -85,7 +85,7 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 -- Uther the Lightbringer
 DELETE FROM `creature_text` WHERE `CreatureID`=37225;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(37225, 0, 0, 'Jaina! Could it truly be you?', 14, 0, 100, 0, 0, 16666, 37603, 0, 'Uther SAY_UTHER_INTRO_A2_1'),
+(37225, 0, 0, 'Jaina! Could it truly be you?', 12, 0, 100, 0, 0, 16666, 37603, 0, 'Uther SAY_UTHER_INTRO_A2_1'),
 (37225, 1, 0, 'Jaina, you haven\'t much time. The Lich King sees what the sword sees. He will be here shortly. ', 12, 0, 100, 0, 0, 16667, 37604, 0, 'Uther SAY_UTHER_INTRO_A2_2'),
 (37225, 2, 0, 'No, girl. Arthas is not here. Arthas is merely a presence within the Lich King\'s mind. A dwindling presence...', 12, 0, 100, 0, 0, 16668, 37605, 0, 'Uther SAY_UTHER_INTRO_A2_3'),
 (37225, 3, 0, 'Jaina, listen to me. You must destroy the Lich King. You cannot reason with him. He will kill you and your allies and raise you all as powerful soldiers of the Scourge.', 12, 0, 100, 0, 0, 16669, 37606, 0, 'Uther SAY_UTHER_INTRO_A2_4'),
@@ -287,3 +287,66 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 (36955, 6, 0, 'zhCN', '这……这是死路！我们别无选择，只能战斗。准备迎战，英雄们，这是我们最后的阵地。'),
 (36955, 7, 0, 'zhCN', '原谅我，英雄们。我应该听乌瑟尔的。我……我只是希望能够，能够看他最后一眼。对不起。'),
 (36955, 8, 0, 'zhCN', '我们知道该怎么做了。我会把这个消息带给瓦里安国王和弗丁大人。');
+
+-- Wave mobs - Ghostly Priest, Phantom Mage, Shadowy Mercenary, Spectral Footman, Tortured Rifleman
+SET @PRIEST := 38175;
+SET @MAGE := 38172;
+SET @MERC := 38177;
+SET @FOOTMAN := 38173;
+SET @RIFLEMAN := 38176;
+
+DELETE FROM `creature_text` WHERE `CreatureID` IN (@PRIEST, @MAGE, @MERC, @FOOTMAN, @RIFLEMAN);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(@PRIEST, 0, 0, 'All serve the master in death.', 12, 0, 100, 0, 0, 0, 38527, 0, 'Priest SAY_WAVE_DEATH_1'),
+(@PRIEST, 0, 1, 'Our souls will never be freed.', 12, 0, 100, 0, 0, 0, 38529, 0, 'Priest SAY_WAVE_DEATH_2'),
+(@PRIEST, 0, 2, 'Our torment is eternal.', 12, 0, 100, 0, 0, 0, 38525, 0, 'Priest SAY_WAVE_DEATH_3'),
+(@PRIEST, 0, 3, 'This is but a brief repose...', 12, 0, 100, 0, 0, 0, 38528, 0, 'Priest SAY_WAVE_DEATH_4'),
+(@PRIEST, 0, 4, 'This is not our final rest.', 12, 0, 100, 0, 0, 0, 38526, 0, 'Priest SAY_WAVE_DEATH_5'),
+(@MAGE, 0, 0, 'All serve the master in death.', 12, 0, 100, 0, 0, 0, 38527, 0, 'Mage SAY_WAVE_DEATH_1'),
+(@MAGE, 0, 1, 'Our souls will never be freed.', 12, 0, 100, 0, 0, 0, 38529, 0, 'Mage SAY_WAVE_DEATH_2'),
+(@MAGE, 0, 2, 'Our torment is eternal.', 12, 0, 100, 0, 0, 0, 38525, 0, 'Mage SAY_WAVE_DEATH_3'),
+(@MAGE, 0, 3, 'This is but a brief repose...', 12, 0, 100, 0, 0, 0, 38528, 0, 'Mage SAY_WAVE_DEATH_4'),
+(@MAGE, 0, 4, 'This is not our final rest.', 12, 0, 100, 0, 0, 0, 38526, 0, 'Mage SAY_WAVE_DEATH_5'),
+(@MERC, 0, 0, 'All serve the master in death.', 12, 0, 100, 0, 0, 0, 38527, 0, 'Mercenary SAY_WAVE_DEATH_1'),
+(@MERC, 0, 1, 'Our souls will never be freed.', 12, 0, 100, 0, 0, 0, 38529, 0, 'Mercenary SAY_WAVE_DEATH_2'),
+(@MERC, 0, 2, 'Our torment is eternal.', 12, 0, 100, 0, 0, 0, 38525, 0, 'Mercenary SAY_WAVE_DEATH_3'),
+(@MERC, 0, 3, 'This is but a brief repose...', 12, 0, 100, 0, 0, 0, 38528, 0, 'Mercenary SAY_WAVE_DEATH_4'),
+(@MERC, 0, 4, 'This is not our final rest.', 12, 0, 100, 0, 0, 0, 38526, 0, 'Mercenary SAY_WAVE_DEATH_5'),
+(@FOOTMAN, 0, 0, 'All serve the master in death.', 12, 0, 100, 0, 0, 0, 38527, 0, 'Footman SAY_WAVE_DEATH_1'),
+(@FOOTMAN, 0, 1, 'Our souls will never be freed.', 12, 0, 100, 0, 0, 0, 38529, 0, 'Footman SAY_WAVE_DEATH_2'),
+(@FOOTMAN, 0, 2, 'Our torment is eternal.', 12, 0, 100, 0, 0, 0, 38525, 0, 'Footman SAY_WAVE_DEATH_3'),
+(@FOOTMAN, 0, 3, 'This is but a brief repose...', 12, 0, 100, 0, 0, 0, 38528, 0, 'Footman SAY_WAVE_DEATH_4'),
+(@FOOTMAN, 0, 4, 'This is not our final rest.', 12, 0, 100, 0, 0, 0, 38526, 0, 'Footman SAY_WAVE_DEATH_5'),
+(@RIFLEMAN, 0, 0, 'All serve the master in death.', 12, 0, 100, 0, 0, 0, 38527, 0, 'Rifleman SAY_WAVE_DEATH_1'),
+(@RIFLEMAN, 0, 1, 'Our souls will never be freed.', 12, 0, 100, 0, 0, 0, 38529, 0, 'Rifleman SAY_WAVE_DEATH_2'),
+(@RIFLEMAN, 0, 2, 'Our torment is eternal.', 12, 0, 100, 0, 0, 0, 38525, 0, 'Rifleman SAY_WAVE_DEATH_3'),
+(@RIFLEMAN, 0, 3, 'This is but a brief repose...', 12, 0, 100, 0, 0, 0, 38528, 0, 'Rifleman SAY_WAVE_DEATH_4'),
+(@RIFLEMAN, 0, 4, 'This is not our final rest.', 12, 0, 100, 0, 0, 0, 38526, 0, 'Rifleman SAY_WAVE_DEATH_5');
+
+DELETE FROM `creature_text_locale` WHERE `CreatureID` IN (@PRIEST, @MAGE, @MERC, @FOOTMAN, @RIFLEMAN) AND `Locale`='zhCN';
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
+(@PRIEST, 0, 0, 'zhCN', '死后仍为主人效命。'),
+(@PRIEST, 0, 1, 'zhCN', '我们的灵魂将永无宁日。'),
+(@PRIEST, 0, 2, 'zhCN', '我们永远无法摆脱折磨。'),
+(@PRIEST, 0, 3, 'zhCN', '这只不过是暂时的休息…。'),
+(@PRIEST, 0, 4, 'zhCN', '最终的胜利还没有到来。'),
+(@MAGE, 0, 0, 'zhCN', '死后仍为主人效命。'),
+(@MAGE, 0, 1, 'zhCN', '我们的灵魂将永无宁日。'),
+(@MAGE, 0, 2, 'zhCN', '我们永远无法摆脱折磨。'),
+(@MAGE, 0, 3, 'zhCN', '这只不过是暂时的休息…。'),
+(@MAGE, 0, 4, 'zhCN', '最终的胜利还没有到来。'),
+(@MERC, 0, 0, 'zhCN', '死后仍为主人效命。'),
+(@MERC, 0, 1, 'zhCN', '我们的灵魂将永无宁日。'),
+(@MERC, 0, 2, 'zhCN', '我们永远无法摆脱折磨。'),
+(@MERC, 0, 3, 'zhCN', '这只不过是暂时的休息…。'),
+(@MERC, 0, 4, 'zhCN', '最终的胜利还没有到来。'),
+(@FOOTMAN, 0, 0, 'zhCN', '死后仍为主人效命。'),
+(@FOOTMAN, 0, 1, 'zhCN', '我们的灵魂将永无宁日。'),
+(@FOOTMAN, 0, 2, 'zhCN', '我们永远无法摆脱折磨。'),
+(@FOOTMAN, 0, 3, 'zhCN', '这只不过是暂时的休息…。'),
+(@FOOTMAN, 0, 4, 'zhCN', '最终的胜利还没有到来。'),
+(@RIFLEMAN, 0, 0, 'zhCN', '死后仍为主人效命。'),
+(@RIFLEMAN, 0, 1, 'zhCN', '我们的灵魂将永无宁日。'),
+(@RIFLEMAN, 0, 2, 'zhCN', '我们永远无法摆脱折磨。'),
+(@RIFLEMAN, 0, 3, 'zhCN', '这只不过是暂时的休息…。'),
+(@RIFLEMAN, 0, 4, 'zhCN', '最终的胜利还没有到来。');

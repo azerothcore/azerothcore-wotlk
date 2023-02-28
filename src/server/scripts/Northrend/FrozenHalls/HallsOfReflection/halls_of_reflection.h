@@ -68,12 +68,13 @@ enum Creatures
     NPC_DARK_RANGER_LORALEN                       = 37779,
     NPC_ARCHMAGE_KORELN                           = 37582,
 
+    // Wave mobs
+    NPC_WAVE_PRIEST                               = 38175,
+    NPC_WAVE_MAGE                                 = 38172,
+    NPC_PHANTOM_HALLUCINATION                     = 38567, // Doesn't talk
     NPC_WAVE_MERCENARY                            = 38177,
     NPC_WAVE_FOOTMAN                              = 38173,
     NPC_WAVE_RIFLEMAN                             = 38176,
-    NPC_WAVE_PRIEST                               = 38175,
-    NPC_WAVE_MAGE                                 = 38172,
-    NPC_PHANTOM_HALLUCINATION                     = 38567,
 
     NPC_FROSTSWORN_GENERAL                        = 36723,
     NPC_SPIRITUAL_REFLECTION                      = 37068,
@@ -174,6 +175,9 @@ enum hYells
 
     SAY_JAINA_INTRO_END                           = 11,
     SAY_SYLVANAS_INTRO_END                        = 8,
+
+    // Wave mobs
+    SAY_WAVE_DEATH                                = 0,
 
     // Frostsworn General - Big add after Falrick and Marwyn
     SAY_FROSTSWORN_GENERAL_AGGRO                  = 0,

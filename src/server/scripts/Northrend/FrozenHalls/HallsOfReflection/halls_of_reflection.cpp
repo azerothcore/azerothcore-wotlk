@@ -704,6 +704,14 @@ public:
             events.ScheduleEvent(EVENT_DARK_MENDING, 8000);
         }
 
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (!urand(0,9))
+                {
+                    Talk(SAY_WAVE_DEATH);
+                }
+        }
+
         void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
@@ -802,6 +810,14 @@ public:
             events.ScheduleEvent(EVENT_FROSTBOLT, 9000);
             events.ScheduleEvent(EVENT_CHAINS_OF_ICE, 12000);
             events.ScheduleEvent(EVENT_HALLUCINATION, 40000);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (!urand(0,9))
+                {
+                    Talk(SAY_WAVE_DEATH);
+                }
         }
 
         void AttackStart(Unit* who) override
@@ -950,6 +966,14 @@ public:
             events.ScheduleEvent(EVENT_KIDNEY_SHOT, 5000);
         }
 
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (!urand(0,9))
+                {
+                    Talk(SAY_WAVE_DEATH);
+                }
+        }
+
         void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
@@ -1047,6 +1071,14 @@ public:
             events.ScheduleEvent(EVENT_TORTURED_ENRAGE, 15000);
         }
 
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (!urand(0,9))
+                {
+                    Talk(SAY_WAVE_DEATH);
+                }
+        }
+
         void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
@@ -1131,6 +1163,14 @@ public:
             events.ScheduleEvent(EVENT_CURSED_ARROW, 10000);
             events.ScheduleEvent(EVENT_FROST_TRAP, 15000);
             events.ScheduleEvent(EVENT_ICE_SHOT, 15000);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (!urand(0,9))
+                {
+                    Talk(SAY_WAVE_DEATH);
+                }
         }
 
         void AttackStart(Unit* who) override
@@ -1543,7 +1583,7 @@ public:
                         me->CastSpell((Unit*)nullptr, SPELL_FURY_OF_FROSTMOURNE, false);
                     }
                     break;
-                case EVENT_LK_START_FOLLOWING:
+                case EVENT_LK_START_FOLLOWING: /// @todo: LK Moves too fast at the begining and too slow after and the leaders (Sylvana/Jaina) should be running instead of walking.
                     {
                         me->SetSpeed(MOVE_RUN, 9.0f / 7.0f);
                         Movement::PointsArray path;
