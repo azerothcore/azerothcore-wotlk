@@ -132,4 +132,4 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 (36794, 7, 0, 'zhCN', '奴仆们，消灭那些闯入者！');
 
 -- Sindragosa (NullCreature) - fix air walking
-UPDATE `creature_template_movement` SET `Flight` = 2 WHERE `CreatureId` = 37755 AND `Flight` = 0;
+UPDATE `creature_template_movement` SET `Flight` = 2 WHERE `CreatureId` = 37755;
