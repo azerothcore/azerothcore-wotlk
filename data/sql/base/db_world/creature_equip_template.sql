@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.creature_equip_template
+-- Dumping structure for table acore_world.creature_equip_template
 DROP TABLE IF EXISTS `creature_equip_template`;
 CREATE TABLE IF NOT EXISTS `creature_equip_template` (
   `CreatureID` mediumint unsigned NOT NULL DEFAULT '0',
@@ -20,11 +22,11 @@ CREATE TABLE IF NOT EXISTS `creature_equip_template` (
   `ItemID1` mediumint unsigned NOT NULL DEFAULT '0',
   `ItemID2` mediumint unsigned NOT NULL DEFAULT '0',
   `ItemID3` mediumint unsigned NOT NULL DEFAULT '0',
-  `VerifiedBuild` smallint DEFAULT '0',
+  `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`CreatureID`,`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.creature_equip_template: 10 759 rows
+-- Dumping data for table acore_world.creature_equip_template: 10,762 rows
 DELETE FROM `creature_equip_template`;
 /*!40000 ALTER TABLE `creature_equip_template` DISABLE KEYS */;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
@@ -2145,7 +2147,7 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(4214, 1, 2179, 5285, 0, 18019),
 	(4215, 1, 2180, 0, 0, 18019),
 	(4216, 1, 6233, 0, 0, 18019),
-	(4217, 1, 5600, 5600, 0, 18019),
+	(4217, 1, 5600, 0, 0, 18019),
 	(4218, 1, 5293, 0, 0, 18019),
 	(4219, 1, 3494, 3494, 0, 18019),
 	(4220, 1, 3696, 0, 0, 18019),
@@ -6578,7 +6580,7 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(20344, 1, 1117, 0, 0, 18019),
 	(20361, 1, 14082, 0, 0, 18019),
 	(20362, 1, 25688, 0, 0, 18019),
-	(20363, 1, 1117, 0, 0, 18019),
+	(20363, 1, 1485, 0, 0, 18019),
 	(20374, 1, 24012, 0, 0, 18019),
 	(20378, 1, 2827, 3351, 0, 18019),
 	(20381, 1, 27407, 24331, 0, 18019),
@@ -8074,7 +8076,7 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(26073, 1, 2200, 12870, 0, 18019),
 	(26075, 1, 12854, 12855, 0, 18019),
 	(26076, 1, 2200, 12870, 0, 18019),
-	(26081, 1, 851, 0, 0, 18019),
+	(26081, 1, 19022, 0, 0, 18019),
 	(26084, 1, 3367, 0, 0, 18019),
 	(26085, 1, 3335, 0, 0, 18019),
 	(26089, 1, 34552, 0, 0, 18019),
@@ -10787,9 +10789,13 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(18488, 3, 27850, 27851, 0, 0),
 	(18488, 4, 27852, 0, 0, 0),
 	(17056, 2, 2202, 0, 0, 0),
-	(15951, 2, 12751, 0, 0, 0);
+	(15951, 2, 12751, 0, 0, 0),
+	(20351, 1, 2704, 0, 0, 0),
+	(20400, 1, 2704, 0, 0, 0),
+	(18644, 1, 1902, 0, 0, 0);
 /*!40000 ALTER TABLE `creature_equip_template` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

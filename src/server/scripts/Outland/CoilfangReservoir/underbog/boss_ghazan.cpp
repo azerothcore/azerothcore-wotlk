@@ -35,9 +35,9 @@ enum eBlackStalker
     ACTION_MOVE_TO_PLATFORM         = 1
 };
 
-struct boss_ghazan : public ScriptedAI
+struct boss_ghazan : public BossAI
 {
-    boss_ghazan(Creature* creature) : ScriptedAI(creature)
+    boss_ghazan(Creature* creature) : BossAI(creature, DATA_GHAZAN)
     {
     }
 
@@ -50,19 +50,22 @@ struct boss_ghazan : public ScriptedAI
 
     void Reset() override
     {
-        events.Reset();
         _enraged = false;
         if (!_reachedPlatform)
         {
             _movedToPlatform = false;
         }
+
+        BossAI::Reset();
     }
 
-    void EnterCombat(Unit*) override
+    void JustEngagedWith(Unit* who) override
     {
         events.ScheduleEvent(EVENT_ACID_BREATH, 3s);
         events.ScheduleEvent(EVENT_ACID_SPIT, 1s);
         events.ScheduleEvent(EVENT_TAIL_SWEEP, DUNGEON_MODE<Milliseconds>(5900ms, 10s));
+
+        BossAI::JustEngagedWith(who);
     }
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
@@ -106,6 +109,8 @@ struct boss_ghazan : public ScriptedAI
         {
             me->GetMotionMaster()->MoveRandom(12.f);
         }
+
+        BossAI::JustReachedHome();
     }
 
     void UpdateAI(uint32 diff) override
@@ -164,7 +169,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
-            if (Creature* ghazan = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_GHAZAN)))
+            if (Creature* ghazan = instance->GetCreature(DATA_GHAZAN))
             {
                 ghazan->AI()->DoAction(ACTION_MOVE_TO_PLATFORM);
                 return true;

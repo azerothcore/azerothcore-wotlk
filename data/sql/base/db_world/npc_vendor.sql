@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.npc_vendor
+-- Dumping structure for table acore_world.npc_vendor
 DROP TABLE IF EXISTS `npc_vendor`;
 CREATE TABLE IF NOT EXISTS `npc_vendor` (
   `entry` mediumint unsigned NOT NULL DEFAULT '0',
@@ -21,12 +23,12 @@ CREATE TABLE IF NOT EXISTS `npc_vendor` (
   `maxcount` tinyint unsigned NOT NULL DEFAULT '0',
   `incrtime` int unsigned NOT NULL DEFAULT '0',
   `ExtendedCost` mediumint unsigned NOT NULL DEFAULT '0',
-  `VerifiedBuild` smallint DEFAULT '0',
+  `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`entry`,`item`,`ExtendedCost`),
   KEY `slot` (`slot`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Npc System';
 
--- Dumpar data för tabell acore_world.npc_vendor: 37 606 rows
+-- Dumping data for table acore_world.npc_vendor: 37,603 rows
 DELETE FROM `npc_vendor`;
 /*!40000 ALTER TABLE `npc_vendor` DISABLE KEYS */;
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
@@ -15584,8 +15586,8 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(18005, 0, 3372, 0, 0, 0, 0),
 	(18005, 0, 8925, 0, 0, 0, 0),
 	(18005, 0, 18256, 0, 0, 0, 0),
-	(18005, 0, 22902, 1, 43200, 0, 0),
-	(18005, 0, 22907, 1, 43200, 0, 0),
+	(18005, 0, 22902, 1, 1800, 0, 0),
+	(18005, 0, 22907, 1, 1800, 0, 0),
 	(18005, 0, 22909, 1, 43200, 0, 0),
 	(18005, 0, 40411, 0, 0, 0, 0),
 	(18006, 0, 2892, 0, 0, 0, 0),
@@ -15705,7 +15707,7 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(18017, 0, 22147, 0, 0, 0, 0),
 	(18017, 0, 22148, 0, 0, 0, 0),
 	(18017, 0, 22901, 1, 9000, 0, 0),
-	(18017, 0, 22902, 1, 9000, 0, 0),
+	(18017, 0, 22902, 1, 1800, 0, 0),
 	(18017, 0, 37201, 0, 0, 0, 0),
 	(18018, 0, 6256, 0, 0, 0, 0),
 	(18018, 0, 6365, 1, 43200, 0, 0),
@@ -17432,8 +17434,8 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(19521, 0, 8343, 0, 0, 0, 0),
 	(19521, 0, 10290, 0, 0, 0, 0),
 	(19521, 0, 14341, 0, 0, 0, 0),
-	(19521, 0, 21900, 1, 43200, 0, 0),
-	(19521, 0, 21901, 1, 43200, 0, 0),
+	(19521, 0, 21900, 1, 1800, 0, 0),
+	(19521, 0, 21901, 1, 1800, 0, 0),
 	(19521, 0, 38426, 0, 0, 0, 0),
 	(19526, 0, 30749, 0, 0, 0, 0),
 	(19526, 0, 30750, 0, 0, 0, 0),
@@ -17882,7 +17884,7 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(19837, 0, 13444, 2, 43200, 0, 0),
 	(19837, 0, 13446, 1, 43200, 0, 0),
 	(19837, 0, 18256, 0, 0, 0, 0),
-	(19837, 0, 22907, 1, 43200, 0, 0),
+	(19837, 0, 22907, 1, 1800, 0, 0),
 	(19837, 0, 22909, 1, 43200, 0, 0),
 	(19837, 0, 22911, 1, 9000, 0, 0),
 	(19837, 0, 40411, 0, 0, 0, 0),
@@ -18681,8 +18683,8 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(20916, 0, 27860, 0, 0, 0, 0),
 	(20916, 0, 28399, 0, 0, 0, 0),
 	(20916, 0, 29448, 0, 0, 0, 0),
-	(20916, 0, 31674, 1, 43200, 0, 0),
-	(20916, 0, 31675, 1, 43200, 0, 0),
+	(20916, 0, 31674, 1, 300, 0, 0),
+	(20916, 0, 31675, 1, 600, 0, 0),
 	(20917, 0, 30749, 0, 0, 0, 0),
 	(20917, 0, 30750, 0, 0, 0, 0),
 	(20917, 0, 30751, 0, 0, 0, 0),
@@ -20516,8 +20518,6 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(24495, 0, 33968, 0, 0, 2274, 0),
 	(24495, 0, 33969, 0, 0, 2274, 0),
 	(24495, 0, 34008, 0, 0, 2275, 0),
-	(24495, 0, 37599, 0, 0, 2276, 0),
-	(24495, 0, 37737, 0, 0, 2276, 0),
 	(24495, 0, 37737, 0, 0, 2397, 0),
 	(24495, 0, 37750, 0, 0, 2398, 0),
 	(24495, 0, 37816, 0, 0, 2399, 0),
@@ -21866,13 +21866,12 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(25977, 0, 34407, 0, 0, 2317, 0),
 	(25977, 0, 34408, 0, 0, 2318, 0),
 	(25977, 0, 34409, 0, 0, 2319, 0),
-	(26081, 0, 2880, 0, 0, 0, 0),
+	(26081, 4, 18567, 0, 0, 0, 0),
+	(26081, 1, 5956, 0, 0, 0, 0),
+	(26081, 5, 3857, 0, 0, 0, 0),
+	(26081, 3, 3466, 0, 0, 0, 0),
 	(26081, 0, 2901, 0, 0, 0, 0),
-	(26081, 0, 3466, 0, 0, 0, 0),
-	(26081, 0, 3857, 0, 0, 0, 0),
-	(26081, 0, 5956, 0, 0, 0, 0),
-	(26081, 0, 10858, 1, 120, 0, 0),
-	(26081, 0, 18567, 0, 0, 0, 0),
+	(26081, 2, 2880, 0, 0, 0, 0),
 	(26089, 0, 32785, 0, 0, 2347, 0),
 	(26089, 0, 32786, 0, 0, 2347, 0),
 	(26089, 0, 32787, 0, 0, 2347, 0),
@@ -30031,11 +30030,11 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(33238, 0, 17038, 0, 0, 0, 0),
 	(33238, 0, 21177, 0, 0, 0, 0),
 	(33238, 0, 21835, 0, 0, 0, 0),
-	(33238, 0, 22053, 0, 0, 0, 0);
-INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
+	(33238, 0, 22053, 0, 0, 0, 0),
 	(33238, 0, 22148, 0, 0, 0, 0),
 	(33238, 0, 28056, 0, 0, 0, 0),
-	(33238, 0, 29013, 0, 0, 0, 0),
+	(33238, 0, 29013, 0, 0, 0, 0);
+INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
 	(33238, 0, 29014, 0, 0, 0, 0),
 	(33238, 0, 33443, 0, 0, 0, 0),
 	(33238, 0, 33449, 0, 0, 0, 0),
@@ -37641,6 +37640,7 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(40160, 0, 54798, 0, 0, 2986, 0);
 /*!40000 ALTER TABLE `npc_vendor` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

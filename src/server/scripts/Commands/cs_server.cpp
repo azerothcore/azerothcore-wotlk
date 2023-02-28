@@ -498,10 +498,40 @@ public:
     }
 
     // Define the 'Message of the day' for the realm
-    static bool HandleServerSetMotdCommand(ChatHandler* handler, std::string motd)
+    static bool HandleServerSetMotdCommand(ChatHandler* handler, std::string realmId, Tail motd)
     {
-        Motd::SetMotd(motd);
-        handler->PSendSysMessage(LANG_MOTD_NEW, motd);
+        std::wstring wMotd   = std::wstring();
+        std::string  strMotd = std::string();
+
+        if (realmId.empty())
+        {
+            return false;
+        }
+
+        if (motd.empty())
+        {
+            return false;
+        }
+
+        if (!Utf8toWStr(motd, wMotd))
+        {
+            return false;
+        }
+
+        if (!WStrToUtf8(wMotd, strMotd))
+        {
+            return false;
+        }
+
+        LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_MOTD);
+        stmt->SetData(0, Acore::StringTo<int32>(realmId).value());
+        stmt->SetData(1, strMotd);
+        trans->Append(stmt);
+        LoginDatabase.CommitTransaction(trans);
+
+        sWorld->LoadMotd();
+        handler->PSendSysMessage(LANG_MOTD_NEW, Acore::StringTo<int32>(realmId).value(), strMotd);
         return true;
     }
 

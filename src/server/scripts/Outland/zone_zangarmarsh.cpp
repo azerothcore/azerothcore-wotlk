@@ -65,7 +65,6 @@ public:
         {
             creature->CastSpell(player, SPELL_MARK_OF_BITE, true);
             player->KilledMonsterCredit(creature->GetEntry());
-            creature->DespawnOrUnsummon(1000);
         }
         else
         {
@@ -105,7 +104,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             _spoken = 2;
         }
@@ -274,7 +273,7 @@ public:
                 me->SetFaction(m_uiNormFaction);
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
