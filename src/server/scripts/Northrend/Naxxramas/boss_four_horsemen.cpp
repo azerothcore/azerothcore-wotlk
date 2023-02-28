@@ -420,7 +420,6 @@ public:
                 if (damage)
                 {
                     caster->CastCustomSpell(SPELL_MARK_DAMAGE, SPELLVALUE_BASE_POINT0, damage, GetTarget());
-                    caster->GetThreatMgr().ModifyThreatByPercent(GetTarget(), -50);
                 }
             }
         }
