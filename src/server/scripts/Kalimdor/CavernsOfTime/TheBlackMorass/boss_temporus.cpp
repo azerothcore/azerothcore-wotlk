@@ -34,14 +34,6 @@ enum Enums
     SPELL_BANISH_DRAGON_HELPER  = 31550
 };
 
-enum Events
-{
-    EVENT_HASTEN                = 1,
-    EVENT_MORTAL_WOUND          = 2,
-    EVENT_WING_BUFFET           = 3,
-    EVENT_SPELL_REFLECTION      = 4
-};
-
 class boss_temporus : public CreatureScript
 {
 public:
@@ -49,49 +41,70 @@ public:
 
     struct boss_temporusAI : public ScriptedAI
     {
-        boss_temporusAI(Creature* creature) : ScriptedAI(creature) { }
-
-        EventMap events;
-
-        void OwnTalk(uint32 id)
+        boss_temporusAI(Creature* creature) : ScriptedAI(creature)
         {
-            if (me->GetEntry() == NPC_TEMPORUS)
-                Talk(id);
+            instance = creature->GetInstanceScript();
+            _scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
         }
+
+        InstanceScript* instance;
 
         void Reset() override
         {
-            events.Reset();
+            _scheduler.CancelAll();
         }
 
         void InitializeAI() override
         {
-            OwnTalk(SAY_ENTER);
+            Talk(SAY_ENTER);
             ScriptedAI::InitializeAI();
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_HASTEN, 12000);
-            events.ScheduleEvent(EVENT_MORTAL_WOUND, 5000);
-            events.ScheduleEvent(EVENT_WING_BUFFET, 20000);
             if (IsHeroic())
-                events.ScheduleEvent(EVENT_SPELL_REFLECTION, 28000);
+            {
+                _scheduler.Schedule(30s, [this](TaskContext context)
+                {
+                    DoCast(SPELL_REFLECT);
+                    context.Repeat(30s);
+                });
+            }
 
-            OwnTalk(SAY_AGGRO);
+            /* Timers need to be clarified with Gultask */
+            _scheduler
+                .Schedule(10s, [this](TaskContext context)
+            {
+                DoCast(SPELL_HASTEN);
+                context.Repeat(20s);
+            })
+                .Schedule(7s, 10s, [this](TaskContext context)
+            {
+                DoCast(SPELL_WING_BUFFET);
+                context.Repeat(20s, 26s);
+            })
+                .Schedule(4s, 10s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_MORTAL_WOUND);
+                context.Repeat(4s, 10s);
+            });
+
+            Talk(SAY_AGGRO);
         }
 
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
-                OwnTalk(SAY_SLAY);
+                Talk(SAY_SLAY);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            OwnTalk(SAY_DEATH);
-            if (InstanceScript* instance = me->GetInstanceScript())
-                instance->SetData(TYPE_TEMPORUS, DONE);
+            Talk(SAY_DEATH);
+            instance->SetData(TYPE_TEMPORUS, DONE);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -100,7 +113,7 @@ public:
             {
                 if (me->IsWithinDistInMap(who, 20.0f))
                 {
-                    OwnTalk(SAY_BANISH);
+                    Talk(SAY_BANISH);
                     me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
                     return;
                 }
@@ -114,32 +127,14 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+            _scheduler.Update(diff, [this]
             {
-                case EVENT_HASTEN:
-                    me->CastSpell(me, SPELL_HASTEN, false);
-                    events.ScheduleEvent(EVENT_HASTEN, 20000);
-                    break;
-                case EVENT_MORTAL_WOUND:
-                    me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
-                    events.ScheduleEvent(EVENT_MORTAL_WOUND, 10000);
-                    break;
-                case EVENT_WING_BUFFET:
-                    me->CastSpell(me, SPELL_WING_BUFFET, false);
-                    events.ScheduleEvent(EVENT_WING_BUFFET, 20000);
-                    break;
-                case EVENT_SPELL_REFLECTION:
-                    me->CastSpell(me, SPELL_REFLECT, false);
-                    events.ScheduleEvent(EVENT_SPELL_REFLECTION, 30000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
+            });
         }
+
+    protected:
+        TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

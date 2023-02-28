@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "the_black_morass.h"
+#include "TaskScheduler.h"
 
 enum Enums
 {
@@ -36,14 +37,6 @@ enum Enums
     SPELL_BANISH_DRAGON_HELPER  = 31550
 };
 
-enum Events
-{
-    EVENT_SANDBREATH            = 1,
-    EVENT_TIMESTOP              = 2,
-    EVENT_FRENZY                = 3,
-    EVENT_CLEAVE                = 4
-};
-
 class boss_aeonus : public CreatureScript
 {
 public:
@@ -54,14 +47,17 @@ public:
         boss_aeonusAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
+            _scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
         }
 
-        EventMap events;
         InstanceScript* instance;
 
         void Reset() override
         {
-            events.Reset();
+            _scheduler.CancelAll();
         }
 
         void JustReachedHome() override
@@ -85,10 +81,31 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_CLEAVE, 5000);
-            events.ScheduleEvent(EVENT_SANDBREATH, 20000);
-            events.ScheduleEvent(EVENT_TIMESTOP, 15000);
-            events.ScheduleEvent(EVENT_FRENZY, 30000);
+
+            /* Timers need to be clarified with Gultask */
+
+            _scheduler
+                .Schedule(5s, 15s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_CLEAVE);
+                context.Repeat(15s, 25s);
+            })
+                .Schedule(30s, 35, [this](TaskContext context)
+            {
+                Talk(EMOTE_FRENZY);
+                DoCastSelf(SPELL_ENRAGE);
+                context.Repeat(30s, 35s);
+            })
+                .Schedule(10s, 30s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_SAND_BREATH);
+                context.Repeat(10s, 30s);
+            })
+                .Schedule(15s, 30s, [this](TaskContext context)
+            {
+                DoCast(SPELL_TIME_STOP);
+                context.Repeat(15s, 30s);
+            });
 
             Talk(SAY_AGGRO);
         }
@@ -125,33 +142,16 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
+            //if (me->HasUnitState(UNIT_STATE_CASTING))
+            //    return;
 
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_CLEAVE:
-                    me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
-                    events.ScheduleEvent(EVENT_CLEAVE, 10000);
-                    break;
-                case EVENT_SANDBREATH:
-                    me->CastSpell(me->GetVictim(), SPELL_SAND_BREATH, false);
-                    events.ScheduleEvent(EVENT_SANDBREATH, 20000);
-                    break;
-                case EVENT_TIMESTOP:
-                    me->CastSpell(me, SPELL_TIME_STOP, false);
-                    events.ScheduleEvent(EVENT_TIMESTOP, 25000);
-                    break;
-                case EVENT_FRENZY:
-                    Talk(EMOTE_FRENZY);
-                    me->CastSpell(me, SPELL_ENRAGE, false);
-                    events.ScheduleEvent(EVENT_FRENZY, 30000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
+            _scheduler.Update(diff, [this] {
+                DoMeleeAttackIfReady();
+            });
         }
+
+        protected:
+            TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

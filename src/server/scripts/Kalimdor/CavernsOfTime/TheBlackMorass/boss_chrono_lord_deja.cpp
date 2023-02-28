@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "the_black_morass.h"
+#include "TaskScheduler.h"
 
 enum Enums
 {
@@ -35,14 +36,6 @@ enum Enums
     SPELL_BANISH_DRAGON_HELPER  = 31550,
 };
 
-enum Events
-{
-    EVENT_ARCANE_BLAST          = 1,
-    EVENT_TIME_LAPSE            = 2,
-    EVENT_ARCANE_DISCHARGE      = 3,
-    EVENT_ATTRACTION            = 4
-};
-
 class boss_chrono_lord_deja : public CreatureScript
 {
 public:
@@ -50,36 +43,59 @@ public:
 
     struct boss_chrono_lord_dejaAI : public ScriptedAI
     {
-        boss_chrono_lord_dejaAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_chrono_lord_dejaAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = creature->GetInstanceScript();
+            _scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+        }
 
-        EventMap events;
+        InstanceScript* instance;
 
         void Reset() override
         {
-            events.Reset();
-        }
-
-        void OwnTalk(uint32 id)
-        {
-            if (me->GetEntry() == NPC_CHRONO_LORD_DEJA)
-                Talk(id);
+            _scheduler.CancelAll();
         }
 
         void InitializeAI() override
         {
-            OwnTalk(SAY_ENTER);
+            Talk(SAY_ENTER);
             ScriptedAI::InitializeAI();
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_ARCANE_BLAST, 10000);
-            events.ScheduleEvent(EVENT_TIME_LAPSE, 15000);
-            events.ScheduleEvent(EVENT_ARCANE_DISCHARGE, 25000);
-            if (IsHeroic())
-                events.ScheduleEvent(EVENT_ATTRACTION, 20000);
 
-            OwnTalk(SAY_AGGRO);
+            if (IsHeroic())
+            {
+                _scheduler.Schedule(25s, 50s, [this](TaskContext context)
+                {
+                    DoCastAOE(SPELL_ATTRACTION);
+                    context.Repeat(25s, 50s);
+                });
+            }
+
+            /* Timers need to be clarified with Gultask */
+            _scheduler
+                .Schedule(15s, 50s, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_ARCANE_BLAST);
+                    context.Repeat(15s, 50s);
+                })
+                .Schedule(14s, 42s, [this](TaskContext context)
+                {
+                    DoCast(SPELL_TIME_LAPSE);
+                    context.Repeat(14s, 42s);
+                })
+                .Schedule(12s, 35s, [this](TaskContext context)
+                {
+                    DoCastAOE(SPELL_ARCANE_DISCHARGE);
+                    context.Repeat(14s, 42s);
+                });
+
+                Talk(SAY_AGGRO);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -88,7 +104,7 @@ public:
             {
                 if (me->IsWithinDistInMap(who, 20.0f))
                 {
-                    OwnTalk(SAY_BANISH);
+                    Talk(SAY_BANISH);
                     me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
                     return;
                 }
@@ -100,14 +116,13 @@ public:
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
-                OwnTalk(SAY_SLAY);
+                Talk(SAY_SLAY);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            OwnTalk(SAY_DEATH);
-            if (InstanceScript* instance = me->GetInstanceScript())
-                instance->SetData(TYPE_CHRONO_LORD_DEJA, DONE);
+            Talk(SAY_DEATH);
+            instance->SetData(TYPE_CHRONO_LORD_DEJA, DONE);
         }
 
         void UpdateAI(uint32 diff) override
@@ -115,32 +130,15 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
+            //if (me->HasUnitState(UNIT_STATE_CASTING))
+            //    return;
 
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ARCANE_BLAST:
-                    me->CastSpell(me->GetVictim(), SPELL_ARCANE_BLAST, false);
-                    events.ScheduleEvent(EVENT_ARCANE_BLAST, 20000);
-                    break;
-                case EVENT_TIME_LAPSE:
-                    me->CastSpell(me, SPELL_TIME_LAPSE, false);
-                    events.ScheduleEvent(EVENT_TIME_LAPSE, 20000);
-                    break;
-                case EVENT_ARCANE_DISCHARGE:
-                    me->CastSpell(me, SPELL_ARCANE_DISCHARGE, false);
-                    events.ScheduleEvent(EVENT_ARCANE_DISCHARGE, 25000);
-                    break;
-                case EVENT_ATTRACTION:
-                    me->CastSpell(me, SPELL_ATTRACTION, false);
-                    events.ScheduleEvent(EVENT_ATTRACTION, 30000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
+            _scheduler.Update(diff, [this] {
+                DoMeleeAttackIfReady();
+            });
         }
+    protected:
+        TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
