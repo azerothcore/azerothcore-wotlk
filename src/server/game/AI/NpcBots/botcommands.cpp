@@ -1821,10 +1821,10 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         Creature* creature = handler->getSelectedCreature();
 
-        if (!creature && !creVal)
+        if ((!creature && !creVal) || player->GetMap()->Instanceable())
         {
             handler->SendSysMessage(".npcbot move");
-            handler->SendSysMessage("Moves npcbot to your location");
+            handler->SendSysMessage("Moves npcbot to your location. World maps only");
             handler->SendSysMessage("Syntax: .npcbot move [#ID]");
             handler->SetSentErrorMessage(true);
             return false;
