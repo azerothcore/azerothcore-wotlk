@@ -420,7 +420,6 @@ public:
                         }
                     }
                 }
-                
                 ObjectGuid petGUID = summonerUnit->GetPetGUID();
                 summonerUnit->SetPetGUID(ObjectGuid::Empty);
                 me->CastSpell(summonerUnit, SPELL_IMPALED, true);
