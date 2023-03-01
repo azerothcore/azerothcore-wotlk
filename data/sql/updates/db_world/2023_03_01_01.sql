@@ -1,3 +1,4 @@
+-- DB update 2023_03_01_00 -> 2023_03_01_01
 -- Delete hack fix
 UPDATE `gameobject_template` SET `Data1` = 0 WHERE (`entry` = 182583);
 
