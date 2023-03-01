@@ -50,8 +50,8 @@ struct boss_chrono_lord_deja : public BossAI
 
     void InitializeAI() override
     {
-        Talk(SAY_ENTER);
         ScriptedAI::InitializeAI();
+        Talk(SAY_ENTER);
     }
 
     void JustEngagedWith(Unit* /*who*/) override

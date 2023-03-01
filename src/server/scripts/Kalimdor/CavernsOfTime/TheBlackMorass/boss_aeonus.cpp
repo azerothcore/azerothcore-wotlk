@@ -62,8 +62,8 @@ struct boss_aeonus : public BossAI
 
     void InitializeAI() override
     {
-        Talk(SAY_ENTER);
         ScriptedAI::InitializeAI();
+        Talk(SAY_ENTER);
 
         if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
         {
