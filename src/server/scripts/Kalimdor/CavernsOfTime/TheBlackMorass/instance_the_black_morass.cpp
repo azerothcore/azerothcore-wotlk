@@ -55,6 +55,7 @@ public:
         void Initialize() override
         {
             SetHeaders(DataHeader);
+            SetBossNumber(MAX_ENCOUNTER);
             memset(&encounters, 0, sizeof(encounters));
             _currentRift = 0;
             _shieldPercent = 100;
