@@ -1,3 +1,4 @@
+-- DB update 2023_03_01_03 -> 2023_03_01_04
 -- Delete old custom creature_template entries
 DELETE FROM `creature_template` WHERE `entry` IN (
 61021, -- Adyen the Lightwarden

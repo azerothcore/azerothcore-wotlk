@@ -1,3 +1,4 @@
+-- DB update 2023_03_01_01 -> 2023_03_01_02
 --
 UPDATE `gameobject` SET `spawntimesecs`=180 WHERE `id`=184948;
 
