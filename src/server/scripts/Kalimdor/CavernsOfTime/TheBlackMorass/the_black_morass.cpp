@@ -91,7 +91,7 @@ struct npc_medivh_bm : public ScriptedAI
         events.Reset();
         me->CastSpell(me, SPELL_MANA_SHIELD, true);
 
-        if (_instance->GetData(TYPE_AEONUS) != DONE)
+        if (_instance->GetData(DATA_AEONUS) != DONE)
         {
             me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
         }
@@ -126,7 +126,7 @@ struct npc_medivh_bm : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!events.Empty() || _instance->GetData(TYPE_AEONUS) == DONE)
+        if (!events.Empty() || _instance->GetData(DATA_AEONUS) == DONE)
         {
             return;
         }

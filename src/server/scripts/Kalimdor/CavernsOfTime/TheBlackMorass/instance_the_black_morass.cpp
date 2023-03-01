@@ -90,7 +90,7 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (instance->GetPlayersCountExceptGMs() <= 1 && GetData(TYPE_AEONUS) != DONE)
+            if (instance->GetPlayersCountExceptGMs() <= 1 && GetData(DATA_AEONUS) != DONE)
                 CleanupInstance();
 
             player->SendUpdateWorldState(WORLD_STATE_BM, _currentRift > 0 ? 1 : 0);
@@ -154,7 +154,7 @@ public:
         {
             switch (type)
             {
-                case TYPE_AEONUS:
+                case DATA_AEONUS:
                 {
                     encounters[type] = DONE;
                     SaveToDB();
@@ -185,8 +185,8 @@ public:
                     }
                     break;
                 }
-                case TYPE_CHRONO_LORD_DEJA:
-                case TYPE_TEMPORUS:
+                case DATA_CHRONO_LORD_DEJA:
+                case DATA_TEMPORUS:
                 {
                     GuidSet eCopy = encounterNPCs;
                     for (ObjectGuid const& guid : eCopy)
@@ -298,9 +298,9 @@ public:
         {
             switch (type)
             {
-                case TYPE_CHRONO_LORD_DEJA:
-                case TYPE_TEMPORUS:
-                case TYPE_AEONUS:
+                case DATA_CHRONO_LORD_DEJA:
+                case DATA_TEMPORUS:
+                case DATA_AEONUS:
                     return encounters[type];
                 case DATA_SHIELD_PERCENT:
                     return _shieldPercent;
@@ -366,10 +366,10 @@ public:
             switch (_currentRift)
             {
                 case 6:
-                    entry = GetData(TYPE_CHRONO_LORD_DEJA) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_CHRONO_LORD : -NPC_CHRONO_LORD_DEJA) : NPC_CHRONO_LORD_DEJA;
+                    entry = GetData(DATA_CHRONO_LORD_DEJA) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_CHRONO_LORD : -NPC_CHRONO_LORD_DEJA) : NPC_CHRONO_LORD_DEJA;
                     break;
                 case 12:
-                    entry = GetData(TYPE_TEMPORUS) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_TIMEREAVER : -NPC_TEMPORUS) : NPC_TEMPORUS;
+                    entry = GetData(DATA_TEMPORUS) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_TIMEREAVER : -NPC_TEMPORUS) : NPC_TEMPORUS;
                     break;
                 case 18:
                     entry = NPC_AEONUS;

@@ -18,7 +18,6 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "the_black_morass.h"
-#include "TaskScheduler.h"
 
 enum Enums
 {
@@ -37,130 +36,113 @@ enum Enums
     SPELL_BANISH_DRAGON_HELPER  = 31550
 };
 
-class boss_aeonus : public CreatureScript
+struct boss_aeonus : public BossAI
 {
-public:
-    boss_aeonus() : CreatureScript("boss_aeonus") { }
-
-    struct boss_aeonusAI : public ScriptedAI
+    boss_aeonus(Creature* creature) : BossAI(creature, DATA_AEONUS) 
     {
-        boss_aeonusAI(Creature* creature) : ScriptedAI(creature)
+        instance = creature->GetInstanceScript();
+        scheduler.SetValidator([this]
         {
-            instance = creature->GetInstanceScript();
-            _scheduler.SetValidator([this]
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    InstanceScript* instance;
+
+    void JustReachedHome() override
+    {
+        if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
+        {
+            if (me->GetDistance2d(medivh) < 20.0f)
             {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-        }
-
-        InstanceScript* instance;
-
-        void Reset() override
-        {
-            _scheduler.CancelAll();
-        }
-
-        void JustReachedHome() override
-        {
-            if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
-                if (me->GetDistance2d(medivh) < 20.0f)
-                    me->CastSpell(me, SPELL_CORRUPT_MEDIVH, false);
-        }
-
-        void InitializeAI() override
-        {
-            Talk(SAY_ENTER);
-            ScriptedAI::InitializeAI();
-
-            if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
-            {
-                me->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(medivh->GetAngle(me)), medivh->GetPositionY() + 14.0f * std::sin(medivh->GetAngle(me)), medivh->GetPositionZ(), me->GetAngle(medivh));
-                me->GetMotionMaster()->MoveTargetedHome();
+                DoCast(me, SPELL_CORRUPT_MEDIVH, false);
             }
         }
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
+    void InitializeAI() override
+    {
+        Talk(SAY_ENTER);
+        ScriptedAI::InitializeAI();
+
+        if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
         {
-
-            /* Timers need to be clarified with Gultask */
-
-            _scheduler
-                .Schedule(5s, 15s, [this](TaskContext context)
-            {
-                DoCastVictim(SPELL_CLEAVE);
-                context.Repeat(15s, 25s);
-            })
-                .Schedule(30s, 35, [this](TaskContext context)
-            {
-                Talk(EMOTE_FRENZY);
-                DoCastSelf(SPELL_ENRAGE);
-                context.Repeat(30s, 35s);
-            })
-                .Schedule(10s, 30s, [this](TaskContext context)
-            {
-                DoCastVictim(SPELL_SAND_BREATH);
-                context.Repeat(10s, 30s);
-            })
-                .Schedule(15s, 30s, [this](TaskContext context)
-            {
-                DoCast(SPELL_TIME_STOP);
-                context.Repeat(15s, 30s);
-            });
-
-            Talk(SAY_AGGRO);
+            me->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(medivh->GetAngle(me)), medivh->GetPositionY() + 14.0f * std::sin(medivh->GetAngle(me)), medivh->GetPositionZ(), me->GetAngle(medivh));
+            me->GetMotionMaster()->MoveTargetedHome();
         }
+    }
 
-        void MoveInLineOfSight(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+
+        /* Timers need to be clarified with Gultask */
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+
+        scheduler.Schedule(5s, 15s, [this](TaskContext context)
         {
-            if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
+            DoCastVictim(SPELL_CLEAVE);
+            context.Repeat(15s, 25s);
+        })
+        .Schedule(30s, 35, [this](TaskContext context)
+        {
+            Talk(EMOTE_FRENZY);
+            DoCastSelf(SPELL_ENRAGE);
+            context.Repeat(30s, 35s);
+        })
+        .Schedule(10s, 30s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_SAND_BREATH);
+            context.Repeat(10s, 30s);
+        })
+        .Schedule(15s, 30s, [this](TaskContext context)
+        {
+            DoCast(SPELL_TIME_STOP);
+            context.Repeat(15s, 30s);
+        });
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
+        {
+            if (me->IsWithinDistInMap(who, 20.0f))
             {
-                if (me->IsWithinDistInMap(who, 20.0f))
-                {
-                    Talk(SAY_BANISH);
-                    me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
-                    return;
-                }
-            }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            instance->SetData(TYPE_AEONUS, DONE);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
+                Talk(SAY_BANISH);
+                DoCast(me, SPELL_BANISH_DRAGON_HELPER, true);
                 return;
-
-            //if (me->HasUnitState(UNIT_STATE_CASTING))
-            //    return;
-
-            _scheduler.Update(diff, [this] {
-                DoMeleeAttackIfReady();
-            });
+            }
         }
 
-        protected:
-            TaskScheduler _scheduler;
-    };
+        ScriptedAI::MoveInLineOfSight(who);
+    }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustDied(Unit* /*killer*/) override
     {
-        return GetTheBlackMorassAI<boss_aeonusAI>(creature);
+        _JustDied();
+        Talk(SAY_DEATH);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer())
+        {
+            Talk(SAY_SLAY);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff, [this] {
+            DoMeleeAttackIfReady();
+        });
     }
 };
 
 void AddSC_boss_aeonus()
 {
-    new boss_aeonus();
+    RegisterTheBlackMorassCreatureAI(boss_aeonus);
 }

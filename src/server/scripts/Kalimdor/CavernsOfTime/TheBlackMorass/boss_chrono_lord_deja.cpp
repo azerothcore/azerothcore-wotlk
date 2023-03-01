@@ -18,7 +18,6 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "the_black_morass.h"
-#include "TaskScheduler.h"
 
 enum Enums
 {
@@ -36,118 +35,98 @@ enum Enums
     SPELL_BANISH_DRAGON_HELPER  = 31550,
 };
 
-class boss_chrono_lord_deja : public CreatureScript
+struct boss_chrono_lord_deja : public BossAI
 {
-public:
-    boss_chrono_lord_deja() : CreatureScript("boss_chrono_lord_deja") { }
-
-    struct boss_chrono_lord_dejaAI : public ScriptedAI
+    boss_chrono_lord_deja(Creature* creature) : BossAI(creature, DATA_CHRONO_LORD_DEJA)
     {
-        boss_chrono_lord_dejaAI(Creature* creature) : ScriptedAI(creature)
+        instance = creature->GetInstanceScript();
+        scheduler.SetValidator([this]
         {
-            instance = creature->GetInstanceScript();
-            _scheduler.SetValidator([this]
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    InstanceScript* instance;
+
+    void InitializeAI() override
+    {
+        Talk(SAY_ENTER);
+        ScriptedAI::InitializeAI();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+
+        if (IsHeroic())
+        {
+            scheduler.Schedule(25s, 50s, [this](TaskContext context)
             {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
+                DoCastAOE(SPELL_ATTRACTION);
+                context.Repeat(25s, 50s);
             });
         }
 
-        InstanceScript* instance;
-
-        void Reset() override
+        /* Timers need to be clarified with Gultask */
+        scheduler.Schedule(15s, 50s, [this](TaskContext context)
         {
-            _scheduler.CancelAll();
-        }
-
-        void InitializeAI() override
+            DoCastVictim(SPELL_ARCANE_BLAST);
+            context.Repeat(15s, 50s);
+        })
+        .Schedule(14s, 42s, [this](TaskContext context)
         {
-            Talk(SAY_ENTER);
-            ScriptedAI::InitializeAI();
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
+            DoCast(SPELL_TIME_LAPSE);
+            context.Repeat(14s, 42s);
+        })
+        .Schedule(12s, 35s, [this](TaskContext context)
         {
+            DoCastAOE(SPELL_ARCANE_DISCHARGE);
+            context.Repeat(14s, 42s);
+        });
+    }
 
-            if (IsHeroic())
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
+        {
+            if (me->IsWithinDistInMap(who, 20.0f))
             {
-                _scheduler.Schedule(25s, 50s, [this](TaskContext context)
-                {
-                    DoCastAOE(SPELL_ATTRACTION);
-                    context.Repeat(25s, 50s);
-                });
-            }
-
-            /* Timers need to be clarified with Gultask */
-            _scheduler
-                .Schedule(15s, 50s, [this](TaskContext context)
-                {
-                    DoCastVictim(SPELL_ARCANE_BLAST);
-                    context.Repeat(15s, 50s);
-                })
-                .Schedule(14s, 42s, [this](TaskContext context)
-                {
-                    DoCast(SPELL_TIME_LAPSE);
-                    context.Repeat(14s, 42s);
-                })
-                .Schedule(12s, 35s, [this](TaskContext context)
-                {
-                    DoCastAOE(SPELL_ARCANE_DISCHARGE);
-                    context.Repeat(14s, 42s);
-                });
-
-                Talk(SAY_AGGRO);
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
-            {
-                if (me->IsWithinDistInMap(who, 20.0f))
-                {
-                    Talk(SAY_BANISH);
-                    me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
-                    return;
-                }
-            }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            instance->SetData(TYPE_CHRONO_LORD_DEJA, DONE);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
+                Talk(SAY_BANISH);
+                DoCast(me, SPELL_BANISH_DRAGON_HELPER, true);
                 return;
-
-            //if (me->HasUnitState(UNIT_STATE_CASTING))
-            //    return;
-
-            _scheduler.Update(diff, [this] {
-                DoMeleeAttackIfReady();
-            });
+            }
         }
-    protected:
-        TaskScheduler _scheduler;
-    };
 
-    CreatureAI* GetAI(Creature* creature) const override
+        ScriptedAI::MoveInLineOfSight(who);
+    }
+
+    void KilledUnit(Unit* victim) override
     {
-        return GetTheBlackMorassAI<boss_chrono_lord_dejaAI>(creature);
+        if (victim->IsPlayer())
+        {
+            Talk(SAY_SLAY);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff, [this] {
+            DoMeleeAttackIfReady();
+        });
     }
 };
 
 void AddSC_boss_chrono_lord_deja()
 {
-    new boss_chrono_lord_deja();
+    RegisterTheBlackMorassCreatureAI(boss_chrono_lord_deja);
 }

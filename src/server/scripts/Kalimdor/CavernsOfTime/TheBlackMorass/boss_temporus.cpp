@@ -31,119 +31,104 @@ enum Enums
     SPELL_MORTAL_WOUND          = 31464,
     SPELL_WING_BUFFET           = 31475,
     SPELL_REFLECT               = 38592,
+    SPELL_CORRUPT_MEDIVH        = 37853,
     SPELL_BANISH_DRAGON_HELPER  = 31550
 };
 
-class boss_temporus : public CreatureScript
+
+struct boss_temporus : public BossAI
 {
-public:
-    boss_temporus() : CreatureScript("boss_temporus") { }
-
-    struct boss_temporusAI : public ScriptedAI
+    boss_temporus(Creature* creature) : BossAI(creature, DATA_TEMPORUS)
     {
-        boss_temporusAI(Creature* creature) : ScriptedAI(creature)
+        instance = creature->GetInstanceScript();
+        scheduler.SetValidator([this]
         {
-            instance = creature->GetInstanceScript();
-            _scheduler.SetValidator([this]
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    InstanceScript* instance;
+
+    void InitializeAI() override
+    {
+        Talk(SAY_ENTER);
+        ScriptedAI::InitializeAI();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+
+        if (IsHeroic())
+        {
+            scheduler.Schedule(30s, [this](TaskContext context)
             {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
+                DoCast(SPELL_REFLECT);
+                context.Repeat(30s);
             });
         }
 
-        InstanceScript* instance;
-
-        void Reset() override
+        /* Timers need to be clarified with Gultask */
+        scheduler.Schedule(10s, [this](TaskContext context)
         {
-            _scheduler.CancelAll();
+            DoCast(SPELL_HASTEN);
+            context.Repeat(20s);
+        })
+        .Schedule(7s, 10s, [this](TaskContext context)
+        {
+            DoCast(SPELL_WING_BUFFET);
+            context.Repeat(20s, 26s);
+        })
+        .Schedule(4s, 10s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_MORTAL_WOUND);
+            context.Repeat(4s, 10s);
+        });
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer())
+        {
+            Talk(SAY_SLAY);
         }
+    }
 
-        void InitializeAI() override
-        {
-            Talk(SAY_ENTER);
-            ScriptedAI::InitializeAI();
-        }
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
         {
-            if (IsHeroic())
+            if (me->IsWithinDistInMap(who, 20.0f))
             {
-                _scheduler.Schedule(30s, [this](TaskContext context)
-                {
-                    DoCast(SPELL_REFLECT);
-                    context.Repeat(30s);
-                });
-            }
-
-            /* Timers need to be clarified with Gultask */
-            _scheduler
-                .Schedule(10s, [this](TaskContext context)
-            {
-                DoCast(SPELL_HASTEN);
-                context.Repeat(20s);
-            })
-                .Schedule(7s, 10s, [this](TaskContext context)
-            {
-                DoCast(SPELL_WING_BUFFET);
-                context.Repeat(20s, 26s);
-            })
-                .Schedule(4s, 10s, [this](TaskContext context)
-            {
-                DoCastVictim(SPELL_MORTAL_WOUND);
-                context.Repeat(4s, 10s);
-            });
-
-            Talk(SAY_AGGRO);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            instance->SetData(TYPE_TEMPORUS, DONE);
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
-            {
-                if (me->IsWithinDistInMap(who, 20.0f))
-                {
-                    Talk(SAY_BANISH);
-                    me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
-                    return;
-                }
-            }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
+                Talk(SAY_BANISH);
+                DoCast(me, SPELL_BANISH_DRAGON_HELPER, true);
                 return;
-
-            _scheduler.Update(diff, [this]
-            {
-                DoMeleeAttackIfReady();
-            });
+            }
         }
 
-    protected:
-        TaskScheduler _scheduler;
-    };
+        ScriptedAI::MoveInLineOfSight(who);
+    }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void UpdateAI(uint32 diff) override
     {
-        return GetTheBlackMorassAI<boss_temporusAI>(creature);
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff, [this]
+        {
+            DoMeleeAttackIfReady();
+        });
     }
 };
 
 void AddSC_boss_temporus()
 {
-    new boss_temporus();
+    RegisterTheBlackMorassCreatureAI(boss_temporus);
 }

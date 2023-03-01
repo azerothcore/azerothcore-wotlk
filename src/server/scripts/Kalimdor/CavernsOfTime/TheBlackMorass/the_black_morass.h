@@ -28,9 +28,9 @@
 
 enum DataTypes
 {
-    TYPE_CHRONO_LORD_DEJA               = 0,
-    TYPE_TEMPORUS                       = 1,
-    TYPE_AEONUS                         = 2,
+    DATA_CHRONO_LORD_DEJA               = 0,
+    DATA_TEMPORUS                       = 1,
+    DATA_AEONUS                         = 2,
     MAX_ENCOUNTER                       = 3,
 
     DATA_MEDIVH                         = 10,
