@@ -5780,8 +5780,8 @@ SpellCastResult Spell::CheckCast(bool strict)
             //TC_LOG_ERROR("spells", "%s has cd of %u on %s", m_caster->GetName().c_str(), m_caster->ToCreature()->GetCreatureSpellCooldownDelay(m_spellInfo->Id), m_spellInfo->SpellName[0]);
             if (m_triggeredByAuraSpell)
                 return SPELL_FAILED_DONT_REPORT;
-            else
-                return SPELL_FAILED_NOT_READY;
+            //else
+            //    return SPELL_FAILED_NOT_READY;
         }
         //end npcbot
     }
