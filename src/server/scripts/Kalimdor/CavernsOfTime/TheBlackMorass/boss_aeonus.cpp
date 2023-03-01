@@ -38,7 +38,7 @@ enum Enums
 
 struct boss_aeonus : public BossAI
 {
-    boss_aeonus(Creature* creature) : BossAI(creature, DATA_AEONUS) 
+    boss_aeonus(Creature* creature) : BossAI(creature, DATA_AEONUS)
     {
         instance = creature->GetInstanceScript();
         scheduler.SetValidator([this]
