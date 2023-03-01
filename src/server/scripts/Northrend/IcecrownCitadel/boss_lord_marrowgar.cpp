@@ -423,7 +423,7 @@ public:
                 
                 ObjectGuid petGUID = summonerUnit->GetPetGUID();
                 summonerUnit->SetPetGUID(ObjectGuid::Empty);
-                me->CastSpell(summoner->ToUnit(), SPELL_IMPALED, true);
+                me->CastSpell(summonerUnit, SPELL_IMPALED, true);
                 summonerUnit->CastSpell(me, SPELL_RIDE_VEHICLE, true);
                 //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);
                 summonerUnit->SetPetGUID(petGUID);
