@@ -2148,12 +2148,14 @@ uint32 Spell::GetSearcherTypeMask(SpellTargetObjectTypes objType, ConditionList*
     if (!m_spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_DEAD_TARGET))
         retMask &= ~GRID_MAP_TYPE_MASK_CORPSE;
     if (m_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
+    {
         //npcbot: do not exclude creatures, see WorldObjectSpellNearbyTargetCheck, WorldObjectSpellAreaTargetCheck
         if (retMask & GRID_MAP_TYPE_MASK_CREATURE)
             retMask &= GRID_MAP_TYPE_MASK_CORPSE | GRID_MAP_TYPE_MASK_PLAYER | GRID_MAP_TYPE_MASK_CREATURE;
         else
         //end npcbot
         retMask &= GRID_MAP_TYPE_MASK_CORPSE | GRID_MAP_TYPE_MASK_PLAYER;
+    }
     if (m_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_GHOSTS))
         retMask &= GRID_MAP_TYPE_MASK_PLAYER;
 
