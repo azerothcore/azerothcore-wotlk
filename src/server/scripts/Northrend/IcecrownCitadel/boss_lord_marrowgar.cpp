@@ -410,7 +410,7 @@ public:
                 return;
             if (Unit* summonerUnit = summoner->ToUnit())
             {
-                if (Vehicle* v = summoner->ToUnit()->GetVehicle())
+                if (Vehicle* v = summonerUnit->GetVehicle())
                 {
                     if (Unit* u = v->GetBase())
                     {
