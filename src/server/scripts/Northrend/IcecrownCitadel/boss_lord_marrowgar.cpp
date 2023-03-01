@@ -408,27 +408,29 @@ public:
         {
             if (!summoner)
                 return;
-
-            if (summoner->GetTypeId() != TYPEID_UNIT)
+            if (Unit* summonerUnit = summoner->ToUnit())
             {
-                return;
+                if (Vehicle* v = summonerUnit->GetVehicle())
+                {
+                    if (Unit* u = v->GetBase())
+                    {
+                        if (u->GetEntry() == NPC_BONE_SPIKE && u->GetTypeId() == TYPEID_UNIT)
+                        {
+                            u->ToCreature()->AI()->DoAction(-1337);
+                        }
+                    }
+                }
+                ObjectGuid petGUID = summonerUnit->GetPetGUID();
+                summonerUnit->SetPetGUID(ObjectGuid::Empty);
+                me->CastSpell(summonerUnit, SPELL_IMPALED, true);
+                summonerUnit->CastSpell(me, SPELL_RIDE_VEHICLE, true);
+                //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);
+                summonerUnit->SetPetGUID(petGUID);
+                summonerUnit->GetMotionMaster()->Clear();
+                summonerUnit->StopMoving();
+                events.ScheduleEvent(1, 8000);
+                hasTrappedUnit = true;
             }
-
-            if (Vehicle* v = summoner->ToUnit()->GetVehicle())
-                if (Unit* u = v->GetBase())
-                    if (u->GetEntry() == NPC_BONE_SPIKE && u->GetTypeId() == TYPEID_UNIT)
-                        u->ToCreature()->AI()->DoAction(-1337);
-
-            ObjectGuid petGUID = summoner->ToUnit()->GetPetGUID();
-            summoner->ToUnit()->SetPetGUID(ObjectGuid::Empty);
-            me->CastSpell(summoner->ToUnit(), SPELL_IMPALED, true);
-            summoner->ToUnit()->CastSpell(me, SPELL_RIDE_VEHICLE, true);
-            //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);
-            summoner->ToUnit()->SetPetGUID(petGUID);
-            summoner->ToUnit()->GetMotionMaster()->Clear();
-            summoner->ToUnit()->StopMoving();
-            events.ScheduleEvent(1, 8000);
-            hasTrappedUnit = true;
         }
 
         void UpdateAI(uint32 diff) override
