@@ -408,7 +408,6 @@ public:
         {
             if (!summoner)
                 return;
-                
             if (Unit* summonerUnit = summoner->ToUnit())
             {
                 if (Vehicle* v = summoner->ToUnit()->GetVehicle())
