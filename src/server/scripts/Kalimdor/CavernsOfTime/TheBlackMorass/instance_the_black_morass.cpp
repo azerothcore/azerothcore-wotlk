@@ -23,7 +23,8 @@
 #include "TemporarySummon.h"
 #include "the_black_morass.h"
 
-const Position PortalLocation[4] =
+#define MAX_PORTAL_LOCATIONS 4
+const Position PortalLocation[MAX_PORTAL_LOCATIONS] =
 {
     { -2030.8318f, 7024.9443f, 23.071817f, 3.14159f },
     { -1961.7335f, 7029.5280f, 21.811401f, 2.12931f },
@@ -58,6 +59,7 @@ public:
             _currentRift = 0;
             _shieldPercent = 100;
             encounterNPCs.clear();
+            _timerToNextBoss = 0;
         }
 
         void CleanupInstance()
@@ -65,6 +67,8 @@ public:
             Events.Reset();
             _currentRift = 0;
             _shieldPercent = 100;
+
+            _usedRiftPostions.fill(ObjectGuid::Empty);
 
             instance->LoadGrid(-2023.0f, 7121.0f);
             if (Creature* medivh = instance->GetCreature(_medivhGUID))
@@ -116,6 +120,7 @@ public:
                 case NPC_INFINITE_CRONOMANCER:
                 case NPC_INFINITE_EXECUTIONER:
                 case NPC_INFINITE_VANQUISHER:
+                case NPC_DP_BEAM_STALKER:
                     encounterNPCs.insert(creature->GetGUID());
                     break;
             }
@@ -150,45 +155,105 @@ public:
             switch (type)
             {
                 case TYPE_AEONUS:
+                {
+                    encounters[type] = DONE;
+                    SaveToDB();
+
+                    if (Creature* medivh = instance->GetCreature(_medivhGUID))
                     {
-                        encounters[type] = DONE;
-                        SaveToDB();
-
-                        if (Creature* medivh = instance->GetCreature(_medivhGUID))
-                            medivh->AI()->DoAction(ACTION_OUTRO);
-
-                        Map::PlayerList const& players = instance->GetPlayers();
-                        if (!players.IsEmpty())
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                if (Player* player = itr->GetSource())
-                                {
-                                    if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
-                                        player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
-
-                                    if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
-                                        player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
-                                }
-                        break;
+                        medivh->AI()->DoAction(ACTION_OUTRO);
                     }
+
+                    Map::PlayerList const& players = instance->GetPlayers();
+                    if (!players.IsEmpty())
+                    {
+                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                        {
+                            if (Player* player = itr->GetSource())
+                            {
+                                if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
+                                {
+                                    player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
+                                }
+
+                                if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
+                                {
+                                    player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
                 case TYPE_CHRONO_LORD_DEJA:
                 case TYPE_TEMPORUS:
+                {
+                    GuidSet eCopy = encounterNPCs;
+                    for (ObjectGuid const& guid : eCopy)
+                    {
+                        if (Creature* creature = instance->GetCreature(guid))
+                        {
+                            switch (creature->GetEntry())
+                            {
+                                case NPC_RIFT_KEEPER_WARLOCK:
+                                case NPC_RIFT_KEEPER_MAGE:
+                                case NPC_RIFT_LORD:
+                                case NPC_RIFT_LORD_2:
+                                case NPC_TIME_RIFT:
+                                    creature->DespawnOrUnsummon();
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
                     encounters[type] = DONE;
-                    Events.RescheduleEvent(EVENT_NEXT_PORTAL, 60000);
+
+                    if (!_timerToNextBoss || _timerToNextBoss > 30 * IN_MILLISECONDS)
+                    {
+                        Events.RescheduleEvent(EVENT_NEXT_PORTAL, 30 * IN_MILLISECONDS);
+                    }
+                    else
+                    {
+                        Events.RescheduleEvent(EVENT_NEXT_PORTAL, _timerToNextBoss);
+                    }
                     Events.SetPhase(1);
                     SaveToDB();
+                    _timerToNextBoss = (instance->IsHeroic() ? 300 : 150) * IN_MILLISECONDS;
                     break;
-                case DATA_RIFT_KILLED:
-                    if (!Events.IsInPhase(1))
-                        Events.RescheduleEvent(EVENT_NEXT_PORTAL, 4000);
-                    break;
+                }
                 case DATA_MEDIVH:
+                {
                     DoUpdateWorldState(WORLD_STATE_BM, 1);
                     DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
                     DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
                     Events.RescheduleEvent(EVENT_NEXT_PORTAL, 3000);
+                    _timerToNextBoss = (instance->IsHeroic() ? 300 : 150) * IN_MILLISECONDS;
+
+                    for (ObjectGuid const& guid : encounterNPCs)
+                    {
+                        if (guid.GetEntry() == NPC_DP_BEAM_STALKER)
+                        {
+                            if (Creature* creature = instance->GetCreature(guid))
+                            {
+                                if (!creature->IsAlive())
+                                {
+                                    creature->Respawn(true);
+                                }
+                            }
+                            break;
+                        }
+                    }
+
                     break;
+                }
                 case DATA_DAMAGE_SHIELD:
                 {
+                    if (_shieldPercent <= 0)
+                    {
+                        return;
+                    }
+
                     _shieldPercent -= data;
                     if (_shieldPercent < 0)
                     {
@@ -203,15 +268,20 @@ public:
                         {
                             if (medivh->IsAlive())
                             {
-                                Unit::Kill(medivh, medivh);
+                                medivh->SetImmuneToNPC(true);
 
-                                // Xinef: delete all spawns
-                                GuidSet eCopy = encounterNPCs;
-                                for (ObjectGuid const& guid : eCopy)
+                                if (medivh->IsAIEnabled)
+                                {
+                                    medivh->AI()->Talk(SAY_MEDIVH_DEATH);
+                                }
+
+                                Events.ScheduleEvent(EVENT_WIPE_1, 4s);
+
+                                for (ObjectGuid const& guid : encounterNPCs)
                                 {
                                     if (Creature* creature = instance->GetCreature(guid))
                                     {
-                                        creature->DespawnOrUnsummon();
+                                        creature->InterruptNonMeleeSpells(true);
                                     }
                                 }
                             }
@@ -219,6 +289,8 @@ public:
                     }
                     break;
                 }
+                default:
+                    break;
             }
         }
 
@@ -244,6 +316,34 @@ public:
                 encounterNPCs.insert(data);
             else if (type == DATA_DELETED_NPC)
                 encounterNPCs.erase(data);
+            else if (type == DATA_RIFT_KILLED)
+            {
+                if (!Events.IsInPhase(1))
+                {
+                    uint8 emptySpots = 0;
+                    for (uint8 i = 0; i < MAX_PORTAL_LOCATIONS; ++i)
+                    {
+                        if (!_usedRiftPostions[i])
+                        {
+                            ++emptySpots;
+                        }
+
+                        if (_usedRiftPostions[i] == data)
+                        {
+                            _usedRiftPostions[i].Clear();
+                        }
+                    }
+
+                    if (emptySpots >= MAX_PORTAL_LOCATIONS - 1)
+                    {
+                        Events.RescheduleEvent(EVENT_NEXT_PORTAL, 4000);
+                    }
+                    else if (!emptySpots)
+                    {
+                        Events.RescheduleEvent(EVENT_NEXT_PORTAL, (_currentRift >= 13 ? 120 : 90) * IN_MILLISECONDS);
+                    }
+                }
+            }
         }
 
         ObjectGuid GetGuidData(uint32 data) const override
@@ -254,17 +354,11 @@ public:
             return ObjectGuid::Empty;
         }
 
-        void SummonPortalKeeper()
+        void SummonPortalKeeper(uint32 eventId)
         {
-            Creature* rift = nullptr;
-            for (ObjectGuid const& guid : encounterNPCs)
-                if (Creature* summon = instance->GetCreature(guid))
-                    if (summon->GetEntry() == NPC_TIME_RIFT)
-                    {
-                        rift = summon;
-                        break;
-                    }
-
+            uint8 riftPosition = eventId - EVENT_SUMMON_KEEPER_1;
+            ObjectGuid const& riftGUID = _usedRiftPostions[riftPosition];
+            Creature* rift = instance->GetCreature(riftGUID);
             if (!rift)
                 return;
 
@@ -307,23 +401,120 @@ public:
 
         void Update(uint32 diff) override
         {
+            if (_timerToNextBoss)
+            {
+                if (_timerToNextBoss <= diff)
+                {
+                    _timerToNextBoss = 0;
+                }
+                else
+                {
+                    _timerToNextBoss -= diff;
+                }
+            }
+
             Events.Update(diff);
-            switch (Events.ExecuteEvent())
+
+            uint32 eventId = Events.ExecuteEvent();
+            switch (eventId)
             {
                 case EVENT_NEXT_PORTAL:
-                    ++_currentRift;
-                    DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
-                    Events.ScheduleEvent(EVENT_SUMMON_KEEPER, 6000);
-                    Events.SetPhase(0);
-
+                {
                     if (instance->GetCreature(_medivhGUID))
                     {
-                        uint8 position = (_currentRift - 1) % 4;
-                        instance->SummonCreature(NPC_TIME_RIFT, PortalLocation[position]);
+                        uint8 position = MAX_PORTAL_LOCATIONS;
+
+                        std::vector<uint8> possibleSpots;
+                        for (uint8 i = 0; i < MAX_PORTAL_LOCATIONS; ++i)
+                        {
+                            if (!_usedRiftPostions[i])
+                            {
+                                possibleSpots.push_back(i);
+                            }
+                        }
+
+                        if (!possibleSpots.empty())
+                        {
+                            position = Acore::Containers::SelectRandomContainerElement(possibleSpots);
+                        }
+
+                        if (position < MAX_PORTAL_LOCATIONS)
+                        {
+                            ++_currentRift;
+                            DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
+                            Events.ScheduleEvent(EVENT_SUMMON_KEEPER_1 + position, 6000);
+                            Events.SetPhase(0);
+
+                            if (Creature* rift = instance->SummonCreature(NPC_TIME_RIFT, PortalLocation[position]))
+                            {
+                                _usedRiftPostions[position] = rift->GetGUID();
+
+                                for (uint8 i = 0; i < MAX_PORTAL_LOCATIONS; ++i)
+                                {
+                                    if (!_usedRiftPostions[i])
+                                    {
+                                        Events.RescheduleEvent(EVENT_NEXT_PORTAL, (_currentRift >= 13 ? 120 : 90) * IN_MILLISECONDS);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
                     break;
-                case EVENT_SUMMON_KEEPER:
-                    SummonPortalKeeper();
+                }
+                case EVENT_SUMMON_KEEPER_1:
+                case EVENT_SUMMON_KEEPER_2:
+                case EVENT_SUMMON_KEEPER_3:
+                case EVENT_SUMMON_KEEPER_4:
+                    SummonPortalKeeper(eventId);
+                    break;
+                case EVENT_WIPE_1:
+                    if (Creature* medivh = instance->GetCreature(_medivhGUID))
+                    {
+                        medivh->RemoveAllAuras();
+                    }
+                    Events.ScheduleEvent(EVENT_WIPE_2, 500ms);
+                    break;
+                case EVENT_WIPE_2:
+                    if (Creature* medivh = instance->GetCreature(_medivhGUID))
+                    {
+                        medivh->KillSelf(false);
+
+                        GuidSet encounterNPCSCopy = encounterNPCs;
+                        for (ObjectGuid const& guid : encounterNPCSCopy)
+                        {
+                            switch (guid.GetEntry())
+                            {
+                                case NPC_TIME_RIFT:
+                                case NPC_DP_EMITTER_STALKER:
+                                case NPC_DP_CRYSTAL_STALKER:
+                                case NPC_DP_BEAM_STALKER:
+                                    if (Creature* creature = instance->GetCreature(guid))
+                                    {
+                                        creature->DespawnOrUnsummon();
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    Events.ScheduleEvent(EVENT_WIPE_3, 2s);
+                    break;
+                case EVENT_WIPE_3:
+                {
+                    GuidSet encounterNPCSCopy = encounterNPCs;
+                    for (ObjectGuid const& guid : encounterNPCSCopy)
+                    {
+                        if (Creature* creature = instance->GetCreature(guid))
+                        {
+                            creature->CastSpell(creature, SPELL_TELEPORT_VISUAL, true);
+                            creature->DespawnOrUnsummon(1200ms, 0s);
+                        }
+                    }
+                    break;
+                }
+                default:
                     break;
             }
         }
@@ -344,6 +535,8 @@ public:
 
     protected:
         EventMap Events;
+        std::array<ObjectGuid, MAX_PORTAL_LOCATIONS> _usedRiftPostions;
+        uint32 _timerToNextBoss;
     };
 };
 
