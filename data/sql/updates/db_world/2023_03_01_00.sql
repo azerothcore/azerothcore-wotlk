@@ -1,3 +1,4 @@
+-- DB update 2023_02_28_00 -> 2023_03_01_00
 -- Bonechewer Messenger
 UPDATE `smart_scripts` SET `action_param6`=2 WHERE `source_type`=0 AND `entryorguid`=21244 AND `id`=0;
 -- Coilskar Cistern
