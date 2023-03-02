@@ -1445,6 +1445,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invoker cast action, but event does not provide any invoker!", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
                 return false;
             }
+            break;
         case SMART_ACTION_CAST:
         case SMART_ACTION_CROSS_CAST:
             if (!IsSpellValid(e, e.action.crossCast.spell))
