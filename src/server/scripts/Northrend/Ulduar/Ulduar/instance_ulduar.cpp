@@ -1076,6 +1076,7 @@ public:
         {
             data >> m_auiEncounter[0];
             data >> m_auiEncounter[1];
+            data >> m_auiEncounter[2];
             data >> m_auiEncounter[3];
             data >> m_auiEncounter[4];
             data >> m_auiEncounter[5];
