@@ -69,7 +69,6 @@ struct boss_temporus : public BossAI
             });
         }
 
-        /* Timers need to be clarified with Gultask */
         scheduler.Schedule(10s, [this](TaskContext context)
         {
             DoCast(SPELL_HASTEN);

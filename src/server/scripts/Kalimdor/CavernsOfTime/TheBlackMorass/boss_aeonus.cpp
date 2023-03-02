@@ -63,19 +63,18 @@ struct boss_aeonus : public BossAI
     void InitializeAI() override
     {
         ScriptedAI::InitializeAI();
-        Talk(SAY_ENTER);
 
         if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
         {
             me->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(medivh->GetAngle(me)), medivh->GetPositionY() + 14.0f * std::sin(medivh->GetAngle(me)), medivh->GetPositionZ(), me->GetAngle(medivh));
             me->GetMotionMaster()->MoveTargetedHome();
         }
+
+        Talk(SAY_ENTER);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-
-        /* Timers need to be clarified with Gultask */
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 
@@ -84,7 +83,7 @@ struct boss_aeonus : public BossAI
             DoCastVictim(SPELL_CLEAVE);
             context.Repeat(15s, 25s);
         })
-        .Schedule(30s, 35, [this](TaskContext context)
+        .Schedule(1200ms, [this](TaskContext context)
         {
             Talk(EMOTE_FRENZY);
             DoCastSelf(SPELL_ENRAGE);
@@ -95,7 +94,7 @@ struct boss_aeonus : public BossAI
             DoCastVictim(SPELL_SAND_BREATH);
             context.Repeat(10s, 30s);
         })
-        .Schedule(15s, 30s, [this](TaskContext context)
+        .Schedule(1ms, [this](TaskContext context)
         {
             DoCast(SPELL_TIME_STOP);
             context.Repeat(15s, 30s);

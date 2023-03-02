@@ -68,7 +68,6 @@ struct boss_chrono_lord_deja : public BossAI
             });
         }
 
-        /* Timers need to be clarified with Gultask */
         scheduler.Schedule(15s, 50s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_ARCANE_BLAST);
@@ -82,7 +81,7 @@ struct boss_chrono_lord_deja : public BossAI
         .Schedule(12s, 35s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_ARCANE_DISCHARGE);
-            context.Repeat(14s, 42s);
+            context.Repeat(12s, 35s);
         });
     }
 
