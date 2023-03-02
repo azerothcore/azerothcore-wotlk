@@ -106,7 +106,9 @@ public:
         bool SetBossState(uint32 bossId, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(bossId, state))
+            {
                 return false;
+            }
 
             if (bossId == DATA_HYDROMANCER_THESPIA && state == DONE)
             {
