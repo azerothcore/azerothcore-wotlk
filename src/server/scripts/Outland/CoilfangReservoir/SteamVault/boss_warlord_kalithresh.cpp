@@ -139,7 +139,6 @@ struct npc_naga_distiller : public NullCreatureAI
     }
 };
 
-
 void AddSC_boss_warlord_kalithresh()
 {
     RegisterSteamvaultCreatureAI(boss_warlord_kalithresh);
