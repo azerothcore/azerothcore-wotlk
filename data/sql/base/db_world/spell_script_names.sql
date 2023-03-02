@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.spell_script_names
+-- Dumping structure for table acore_world.spell_script_names
 DROP TABLE IF EXISTS `spell_script_names`;
 CREATE TABLE IF NOT EXISTS `spell_script_names` (
   `spell_id` int NOT NULL,
@@ -20,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `spell_script_names` (
   UNIQUE KEY `spell_id` (`spell_id`,`ScriptName`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.spell_script_names: 2 042 rows
+-- Dumping data for table acore_world.spell_script_names: 2,086 rows
 DELETE FROM `spell_script_names`;
 /*!40000 ALTER TABLE `spell_script_names` DISABLE KEYS */;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
@@ -62,6 +64,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(-47509, 'spell_pri_divine_aegis'),
 	(-47230, 'spell_warl_fel_synergy'),
 	(-44546, 'spell_mage_brain_freeze'),
+	(-44543, 'spell_mage_fingers_of_frost_proc_aura'),
 	(-44457, 'spell_mage_living_bomb'),
 	(-44450, 'spell_mage_burnout_trigger'),
 	(-44449, 'spell_mage_burnout'),
@@ -134,6 +137,10 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(694, 'spell_warr_mocking_blow'),
 	(698, 'spell_warl_ritual_of_summoning'),
 	(781, 'spell_hun_disengage'),
+	(802, 'spell_mutate_explode_bug'),
+	(804, 'spell_mutate_explode_bug'),
+	(818, 'spell_gen_basic_campfire'),
+	(921, 'spell_rog_pickpocket'),
 	(1038, 'spell_pal_hand_of_salvation'),
 	(1090, 'spell_item_magic_dust'),
 	(1178, 'spell_dru_bear_form_passive'),
@@ -173,7 +180,9 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(8593, 'spell_symbol_of_life_dummy'),
 	(8856, 'spell_q1846_bending_shinbone'),
 	(8913, 'spell_q55_sacred_cleansing'),
+	(9160, 'spell_item_green_whelp_armor'),
 	(9204, 'spell_gen_hate_to_zero'),
+	(9347, 'spell_anubisath_mortal_strike'),
 	(9634, 'spell_dru_feral_swiftness'),
 	(9635, 'spell_dru_bear_form_passive'),
 	(9712, 'spell_q2203_thaumaturgy_channel'),
@@ -213,7 +222,12 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(15366, 'spell_gen_disabled_above_63'),
 	(15600, 'spell_gen_proc_reduced_above_60'),
 	(15712, 'spell_item_linken_boomerang'),
+	(15748, 'spell_item_freeze_rookery_egg'),
+	(15958, 'spell_q4735_collect_rookery_egg'),
 	(15998, 'spell_gen_despawn_self'),
+	(16028, 'spell_item_freeze_rookery_egg'),
+	(16349, 'spell_blackrock_spire_call_of_vaelastrasz'),
+	(16372, 'spell_gyth_chromatic_protection'),
 	(16414, 'spell_item_wraith_scythe_drain_life'),
 	(16589, 'spell_item_noggenfogger_elixir'),
 	(16796, 'spell_q5056_summon_shy_rotam'),
@@ -297,6 +311,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(21708, 'spell_gen_visual_dummy_stun'),
 	(21737, 'spell_gen_periodic_knock_away'),
 	(21809, 'spell_gen_random_target32'),
+	(21848, 'spell_item_snowman'),
 	(21908, 'spell_ragnaros_lava_burst_randomizer'),
 	(22247, 'spell_suppression_aura'),
 	(22276, 'spell_gen_elemental_shield'),
@@ -350,6 +365,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(23881, 'spell_warr_bloodthirst'),
 	(23970, 'spell_batrider_bomb'),
 	(23989, 'spell_hun_readiness'),
+	(24019, 'spell_axe_flurry'),
 	(24083, 'spell_hatch_eggs'),
 	(24084, 'spell_marli_transform'),
 	(24110, 'spell_enveloping_webs'),
@@ -377,10 +393,13 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(24751, 'spell_hallows_end_trick_or_treat'),
 	(24778, 'spell_dream_fog_sleep'),
 	(24834, 'spell_shadow_bolt_whirl'),
+	(24905, 'spell_dru_moonkin_form_passive_proc'),
+	(24926, 'spell_hallows_end_candy_pirate_costume'),
 	(24930, 'spell_hallows_end_candy'),
 	(24983, 'spell_gen_baby_murloc_passive'),
 	(24984, 'spell_gen_baby_murloc'),
 	(25042, 'spell_mark_of_nature'),
+	(25153, 'spell_aggro_drones'),
 	(25177, 'spell_crystal_weakness'),
 	(25178, 'spell_crystal_weakness'),
 	(25180, 'spell_crystal_weakness'),
@@ -391,6 +410,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(25371, 'spell_consume_aq20'),
 	(25373, 'spell_gen_10pct_count_pct_from_max_hp'),
 	(25599, 'spell_rajaxx_thundercrash'),
+	(25671, 'spell_drain_mana'),
 	(25676, 'spell_moam_mana_drain_filter'),
 	(25684, 'spell_moam_summon_mana_fiends'),
 	(25711, 'spell_ayamiss_swarmer_start_loop'),
@@ -405,7 +425,12 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(25860, 'spell_item_reindeer_transformation'),
 	(25899, 'spell_gen_damage_reduction_aura'),
 	(25899, 'spell_pal_blessing_of_sanctuary'),
+	(25938, 'spell_explode_trigger'),
 	(25952, 'spell_gen_despawn_self'),
+	(26029, 'spell_cthun_dark_glare'),
+	(26052, 'spell_huhuran_poison_bolt'),
+	(26077, 'spell_itch_aq40'),
+	(26180, 'spell_huhuran_poison_bolt'),
 	(26180, 'spell_huhuran_wyvern_sting'),
 	(26192, 'spell_skeram_arcane_explosion'),
 	(26218, 'spell_winter_veil_mistletoe'),
@@ -413,6 +438,12 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(26374, 'spell_gen_elune_candle'),
 	(26400, 'spell_item_arcane_shroud'),
 	(26465, 'spell_item_mercurial_shield'),
+	(26476, 'spell_cthun_digestive_acid'),
+	(26546, 'spell_aq_shadow_storm'),
+	(26552, 'spell_nullify'),
+	(26555, 'spell_aq_shadow_storm'),
+	(26584, 'spell_summon_toxin_slime'),
+	(26626, 'spell_mana_burn_area'),
 	(26678, 'spell_item_create_heart_candy'),
 	(27539, 'spell_gen_obsidian_armor'),
 	(27686, 'spell_razelikh_teleport_group'),
@@ -467,6 +498,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(30105, 'spell_hun_tame_beast'),
 	(30205, 'spell_gen_visual_dummy_stun'),
 	(30410, 'spell_magtheridon_shadow_grasp'),
+	(30421, 'spell_nether_portal_perseverence'),
 	(30458, 'spell_item_nigh_invulnerability'),
 	(30505, 'spell_tsh_shadow_bolt'),
 	(30507, 'spell_item_poultryizer'),
@@ -492,9 +524,14 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(31447, 'spell_mark_of_kazrogal'),
 	(31687, 'spell_mage_summon_water_elemental'),
 	(31696, 'spell_q12943_shadow_vault_decree'),
+	(31701, 'spell_the_black_stalker_levitation_pulse'),
+	(31702, 'spell_the_black_stalker_someone_grab_me'),
+	(31703, 'spell_the_black_stalker_magnetic_pull'),
+	(31704, 'spell_the_black_stalker_levitate'),
 	(31789, 'spell_pal_righteous_defense'),
 	(31884, 'spell_pal_avenging_wrath'),
 	(31984, 'spell_finger_of_death'),
+	(32065, 'spell_fungal_decay'),
 	(32111, 'spell_red_sky_effect'),
 	(32146, 'spell_q9874_liquid_fire'),
 	(32182, 'spell_sha_heroism'),
@@ -520,6 +557,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(34074, 'spell_hun_ascpect_of_the_viper'),
 	(34098, 'spell_gen_clear_debuffs'),
 	(34133, 'spell_alar_ember_blast'),
+	(34168, 'spell_spore_cloud'),
 	(34201, 'spell_botanica_shift_form'),
 	(34229, 'spell_alar_flame_quills'),
 	(34246, 'spell_dru_idol_lifebloom'),
@@ -529,8 +567,10 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(34439, 'spell_warl_unstable_affliction'),
 	(34477, 'spell_hun_misdirection'),
 	(34719, 'spell_midnight_fixate'),
+	(34779, 'spell_freezing_circle'),
 	(34803, 'spell_commander_sarannis_summon_reinforcements'),
 	(34852, 'spell_botanica_call_of_the_falcon'),
+	(34874, 'spell_despawn_underbog_mushrooms'),
 	(34902, 'spell_hun_generic_scaling'),
 	(34903, 'spell_hun_generic_scaling'),
 	(34904, 'spell_hun_generic_scaling'),
@@ -604,6 +644,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(37641, 'spell_leotheras_whirlwind'),
 	(37674, 'spell_leotheras_chaos_blast'),
 	(37676, 'spell_leotheras_insidious_whisper'),
+	(37678, 'spell_item_elixir_of_shadows'),
 	(37705, 'spell_item_eye_of_gruul_healing_discount'),
 	(37716, 'spell_leotheras_demon_link'),
 	(37727, 'spell_gen_charmed_unit_spell_cooldown'),
@@ -922,6 +963,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(47691, 'spell_direbrew_summon_mole_machine_target_picker'),
 	(47710, 'spell_boss_magus_telestra_summon_telestra_clones'),
 	(47764, 'spell_boss_magus_telestra_gravity_well'),
+	(47776, 'spell_item_worn_troll_dice'),
 	(47788, 'spell_pri_guardian_spirit'),
 	(47911, 'spell_gen_charmed_unit_spell_cooldown'),
 	(47948, 'spell_pri_pain_and_suffering_proc'),
@@ -935,7 +977,10 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(48266, 'spell_dk_presence'),
 	(48277, 'spell_svala_ritual_strike'),
 	(48310, 'spell_transitus_shield_beam'),
+	(48363, 'spell_q12237_rescue_villager'),
+	(48388, 'spell_call_wintergarde_gryphon'),
 	(48391, 'spell_dru_owlkin_frenzy'),
+	(48397, 'spell_q12237_drop_off_villager'),
 	(48425, 'spell_gen_select_target_count_7_1'),
 	(48504, 'spell_dru_living_seed_proc'),
 	(48522, 'spell_q12243_fire_upon_the_waters'),
@@ -1501,8 +1546,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(64414, 'spell_load_into_catapult'),
 	(64415, 'spell_item_valanyr_hammer_of_ancient_kings'),
 	(64440, 'spell_gen_blade_warding'),
-	(64440, 'spell_gen_proc_above_75'),
 	(64440, 'spell_item_blade_ward_enchant'),
+	(64441, 'spell_gen_proc_above_75'),
 	(64443, 'spell_algalon_big_bang'),
 	(64445, 'spell_algalon_remove_phase'),
 	(64465, 'spell_yogg_saron_shadow_beacon'),
@@ -1510,8 +1555,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(64482, 'spell_orbital_supports'),
 	(64507, 'spell_gen_break_shield'),
 	(64555, 'spell_yogg_saron_insane_periodic_trigger'),
-	(64568, 'spell_gen_proc_above_75'),
 	(64568, 'spell_item_blood_draining_enchant'),
+	(64579, 'spell_gen_proc_above_75'),
 	(64584, 'spell_algalon_big_bang'),
 	(64590, 'spell_gen_break_shield'),
 	(64591, 'spell_gen_mounted_charge'),
@@ -2018,6 +2063,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(74341, 'spell_the_lich_king_summon_spirit_bomb'),
 	(74342, 'spell_the_lich_king_summon_spirit_bomb'),
 	(74343, 'spell_the_lich_king_summon_spirit_bomb'),
+	(74396, 'spell_mage_fingers_of_frost_proc'),
 	(74445, 'spell_the_lich_king_cast_back_to_caster'),
 	(74452, 'spell_saviana_conflagration_init'),
 	(74455, 'spell_saviana_conflagration_throwback'),
@@ -2068,6 +2114,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(100101, 'spell_valkyr_ball_periodic_dummy');
 /*!40000 ALTER TABLE `spell_script_names` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

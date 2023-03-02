@@ -1,30 +1,31 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.points_of_interest_locale
+-- Dumping structure for table acore_world.points_of_interest_locale
 DROP TABLE IF EXISTS `points_of_interest_locale`;
 CREATE TABLE IF NOT EXISTS `points_of_interest_locale` (
   `ID` mediumint unsigned NOT NULL DEFAULT '0',
   `locale` varchar(4) NOT NULL,
   `Name` text,
-  `VerifiedBuild` smallint DEFAULT '0',
+  `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`ID`,`locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
--- Dumpar data för tabell acore_world.points_of_interest_locale: ~2 524 rows (ungefär)
+-- Dumping data for table acore_world.points_of_interest_locale: ~2,524 rows (approximately)
 DELETE FROM `points_of_interest_locale`;
-/*!40000 ALTER TABLE `points_of_interest_locale` DISABLE KEYS */;
 INSERT INTO `points_of_interest_locale` (`ID`, `locale`, `Name`, `VerifiedBuild`) VALUES
 	(1, 'deDE', 'Gasthaus Zur Höhle des Löwen', 0),
 	(1, 'esES', 'Posada Orgullo de León', 0),
@@ -2550,8 +2551,8 @@ INSERT INTO `points_of_interest_locale` (`ID`, `locale`, `Name`, `VerifiedBuild`
 	(453, 'esMX', 'Club de la Cerveza del Mes, Orgrimmar', 0),
 	(453, 'frFR', 'Le club de la Bière du mois, Orgrimmar', 0),
 	(453, 'zhCN', '每月美酒俱乐部，奥格瑞玛', 0);
-/*!40000 ALTER TABLE `points_of_interest_locale` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

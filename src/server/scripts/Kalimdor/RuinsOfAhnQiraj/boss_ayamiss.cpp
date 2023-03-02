@@ -20,7 +20,6 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "ruins_of_ahnqiraj.h"
-#include "TaskScheduler.h"
 
 enum Spells
 {
@@ -88,7 +87,7 @@ struct boss_ayamiss : public BossAI
         _phase = PHASE_AIR;
         _enraged = false;
         SetCombatMovement(false);
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
         me->SetReactState(REACT_AGGRESSIVE);
     }
 
@@ -129,7 +128,7 @@ struct boss_ayamiss : public BossAI
 
             }, 1s);
 
-            _scheduler.Schedule(5s, 8s, [this](TaskContext context) {
+            scheduler.Schedule(5s, 8s, [this](TaskContext context) {
                 DoCastVictim(SPELL_LASH);
                 context.Repeat(8s, 15s);
             }).Schedule(16s, [this](TaskContext context)
@@ -140,9 +139,9 @@ struct boss_ayamiss : public BossAI
         }
     }
 
-    void ScheduleTasks()
+    void ScheduleTasks() override
     {
-        _scheduler.Schedule(20s, 30s, [this](TaskContext context)
+        scheduler.Schedule(20s, 30s, [this](TaskContext context)
         {
             DoCastSelf(SPELL_STINGER_SPRAY);
             context.Repeat(15s, 20s);
@@ -202,9 +201,9 @@ struct boss_ayamiss : public BossAI
         BossAI::EnterEvadeMode(why);
     }
 
-    void EnterCombat(Unit* attacker) override
+    void JustEngagedWith(Unit* attacker) override
     {
-        BossAI::EnterCombat(attacker);
+        BossAI::JustEngagedWith(attacker);
         me->SetCanFly(true);
         me->SetDisableGravity(true);
         me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
@@ -222,7 +221,7 @@ struct boss_ayamiss : public BossAI
             me->SetDisableGravity(false);
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
             DoResetThreatList();
-            _scheduler.CancelGroup(PHASE_AIR);
+            scheduler.CancelGroup(PHASE_AIR);
         }
 
         if (!_enraged && me->HealthBelowPctDamaged(20, damage))
@@ -238,14 +237,13 @@ struct boss_ayamiss : public BossAI
         if (!UpdateVictim())
             return;
 
-        _scheduler.Update(diff,
+        scheduler.Update(diff,
             std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
 private:
     GuidList _swarmers;
     uint8 _phase;
     bool _enraged;
-    TaskScheduler _scheduler;
     Position homePos;
 };
 

@@ -268,7 +268,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     case CONDITION_LEVEL:
     {
         if (Unit* unit = object->ToUnit())
-            condMeets = CompareValues(static_cast<ComparisionType>(ConditionValue2), static_cast<uint32>(unit->getLevel()), ConditionValue1);
+            condMeets = CompareValues(static_cast<ComparisionType>(ConditionValue2), static_cast<uint32>(unit->GetLevel()), ConditionValue1);
         break;
     }
     case CONDITION_DRUNKENSTATE:
@@ -2163,7 +2163,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             }
             if (cond->ConditionValue3)
             {
-                if (GameObjectData const* goData = sObjectMgr->GetGOData(cond->ConditionValue3))
+                if (GameObjectData const* goData = sObjectMgr->GetGameObjectData(cond->ConditionValue3))
                 {
                     if (cond->ConditionValue2 && goData->id != cond->ConditionValue2)
                     {

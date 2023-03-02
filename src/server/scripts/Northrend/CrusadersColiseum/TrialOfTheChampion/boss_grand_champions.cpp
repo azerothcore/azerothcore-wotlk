@@ -212,7 +212,7 @@ public:
                 m_ConditionsTimer -= diff;
         }
         void AttackStart(Unit*  /*who*/) override {}
-        void EnterCombat(Unit*  /*who*/) override {}
+        void JustEngagedWith(Unit*  /*who*/) override {}
     };
 };
 
@@ -243,7 +243,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_MOUNT_CHARGE, urand(2500, 4000));
@@ -407,7 +407,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             if( pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED )
                 me->CallForHelp(100.0f);
@@ -654,7 +654,7 @@ public:
                 case SPELL_TRAMPLE_STUN:
                     {
                         char buffer[50];
-                        sprintf(buffer, "%s is trampled!", me->GetName().c_str());
+                        snprintf(buffer, sizeof(buffer), "%s is trampled!", me->GetName().c_str());
                         me->TextEmote(buffer);
                     }
                     break;

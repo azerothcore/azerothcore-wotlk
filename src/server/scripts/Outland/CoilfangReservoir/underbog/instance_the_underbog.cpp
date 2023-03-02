@@ -20,6 +20,12 @@
 #include "ScriptMgr.h"
 #include "the_underbog.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_HUNGARFEN, DATA_HUNGARFEN },
+    { NPC_GHAZAN, DATA_GHAZAN }
+};
+
 class instance_the_underbog : public InstanceMapScript
 {
 public:
@@ -34,35 +40,11 @@ public:
     {
         instance_the_underbog_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void OnCreatureCreate(Creature* creature) override
+        void Initialize() override
         {
-            InstanceScript::OnCreatureCreate(creature);
-
-            switch (creature->GetEntry())
-            {
-                case NPC_GHAZAN:
-                    _ghazanGUID = creature->GetGUID();
-                    break;
-                default:
-                    break;
-            }
+            SetBossNumber(MAX_ENCOUNTERS);
+            LoadObjectData(creatureData, nullptr);
         }
-
-        ObjectGuid GetGuidData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case NPC_GHAZAN:
-                    return _ghazanGUID;
-                default:
-                    break;
-            }
-
-            return ObjectGuid::Empty;
-        }
-
-    private:
-        ObjectGuid _ghazanGUID;
     };
 };
 

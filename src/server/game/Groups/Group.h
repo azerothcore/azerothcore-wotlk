@@ -214,6 +214,7 @@ public:
     bool isBFGroup()   const;
     bool isBGGroup()   const;
     bool IsCreated()   const;
+    GroupType GetGroupType() const;
     ObjectGuid GetLeaderGUID() const;
     Player* GetLeader();
     ObjectGuid GetGUID() const;

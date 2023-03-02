@@ -748,7 +748,7 @@ public:
                     {
                         if (quest->IsAutoComplete())
                             result2 = DIALOG_STATUS_REWARD_REP;
-                        else if (player->getLevel() <= (player->GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF)))
+                        else if (player->GetLevel() <= (player->GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF)))
                         {
                             if (quest->IsDaily())
                                 result2 = DIALOG_STATUS_AVAILABLE_REP;
@@ -1047,7 +1047,7 @@ public:
             PreventHitDefaultEffect(effIndex);
             Player* target = GetHitPlayer();
             Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-            if (!wintergrasp || !target || target->getLevel() < 75 || (wintergrasp->GetDefenderTeam() != target->GetTeamId()))
+            if (!wintergrasp || !target || target->GetLevel() < 75 || (wintergrasp->GetDefenderTeam() != target->GetTeamId()))
                 return;
 
             target->CastSpell(target, SPELL_TELEPORT_TO_FORTRESS, true);

@@ -81,7 +81,7 @@ public:
             summons.DespawnAll();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
@@ -246,7 +246,7 @@ public:
                         if (s->IsAlive())
                             good = true;
                 if (!good)
-                    Unit::Kill(me, me);
+                    me->KillSelf();
             }
             else
                 checkTimer -= diff;

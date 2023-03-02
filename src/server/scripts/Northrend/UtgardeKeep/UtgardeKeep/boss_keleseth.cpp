@@ -104,10 +104,10 @@ public:
                 if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
                 {
                     if( !p->HasAura(SPELL_FROST_TOMB_AURA) )
-                        Unit::Kill(me, me);
+                        me->KillSelf();
                 }
                 else
-                    Unit::Kill(me, me);
+                    me->KillSelf();
             }
         }
     };
@@ -156,7 +156,7 @@ public:
                 pInstance->SetData(DATA_KELESETH, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_SHADOWBOLT, 0);
@@ -294,7 +294,7 @@ public:
             if( pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
             {
                 if( me->IsAlive() )
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                 return;
             }
 

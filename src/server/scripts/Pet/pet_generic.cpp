@@ -640,7 +640,7 @@ struct npc_pet_gen_plump_turkey : public PassiveAI
     {
         if (type == EFFECT_MOTION_TYPE && id == 1)
         {
-            Unit::Kill(me, me);
+            me->KillSelf();
             me->AddAura(SPELL_TURKEY_STARTS_TO_BURN, me);
         }
     }
@@ -727,7 +727,7 @@ struct npc_pet_gen_fetch_ball : public NullCreatureAI
     uint32 checkTimer;
     ObjectGuid targetGUID;
 
-    void IsSummonedBy(Unit* summoner) override
+    void IsSummonedBy(WorldObject* summoner) override
     {
         if (!summoner)
             return;

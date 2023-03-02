@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.holiday_dates
+-- Dumping structure for table acore_world.holiday_dates
 DROP TABLE IF EXISTS `holiday_dates`;
 CREATE TABLE IF NOT EXISTS `holiday_dates` (
   `id` int unsigned NOT NULL,
@@ -22,9 +24,8 @@ CREATE TABLE IF NOT EXISTS `holiday_dates` (
   PRIMARY KEY (`id`,`date_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumpar data för tabell acore_world.holiday_dates: ~156 rows (ungefär)
+-- Dumping data for table acore_world.holiday_dates: ~156 rows (approximately)
 DELETE FROM `holiday_dates`;
-/*!40000 ALTER TABLE `holiday_dates` DISABLE KEYS */;
 INSERT INTO `holiday_dates` (`id`, `date_id`, `date_value`, `holiday_duration`) VALUES
 	(181, 6, 220708864, 0),
 	(181, 7, 238354432, 0),
@@ -182,8 +183,8 @@ INSERT INTO `holiday_dates` (`id`, `date_id`, `date_value`, `holiday_duration`) 
 	(423, 13, 387022848, 0),
 	(423, 14, 403800064, 0),
 	(423, 15, 420560896, 0);
-/*!40000 ALTER TABLE `holiday_dates` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
