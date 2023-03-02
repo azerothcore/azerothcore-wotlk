@@ -189,7 +189,7 @@ enum DruidSpecial
 static const uint32 Druid_spells_damage_arr[] =
 { FAERIE_FIRE_FERAL_1, CLAW_1, FEROCIOUS_BITE_1, MAIM_1, MANGLE_CAT_1, POUNCE_1, RAKE_1, RAVAGE_1, RIP_1, SHRED_1,
 SWIPE_CAT_1, LACERATE_1, MANGLE_BEAR_1, MAUL_1,SWIPE_BEAR_1, ENTANGLING_ROOTS_1, HURRICANE_1, INSECT_SWARM_1,
-MOONFIRE_1, STARFALL_1, STARFIRE_1, TYPHOON_1, THORNS_1, WRATH_1 };
+WRATH_1, MOONFIRE_1, STARFALL_1, STARFIRE_1, TYPHOON_1, THORNS_1 };
 
 static const uint32 Druid_spells_cc_arr[] =
 { BASH_1, CYCLONE_1, ENTANGLING_ROOTS_1, FERAL_CHARGE_BEAR_1, HIBERNATE_1, MAIM_1, POUNCE_1, TYPHOON_1 };
@@ -220,19 +220,19 @@ public:
         return new bot_druid_ai(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         return creature->GetBotAI()->OnGossipHello(player, 0);
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
         if (bot_ai* ai = creature->GetBotAI())
             return ai->OnGossipSelect(player, creature, sender, action);
         return true;
     }
 
-    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code)
+    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code) override
     {
         if (bot_ai* ai = creature->GetBotAI())
             return ai->OnGossipSelectCode(player, creature, sender, action, code);
