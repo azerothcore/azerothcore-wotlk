@@ -124,6 +124,8 @@ public:
                     panel->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 }
             }
+
+            return true;
         }
     };
 
