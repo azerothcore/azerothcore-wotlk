@@ -1,3 +1,4 @@
+-- DB update 2023_03_01_07 -> 2023_03_02_00
 -- Gurthock Gossip
 DELETE FROM `gossip_menu` WHERE (`MenuID` = 7699);
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
