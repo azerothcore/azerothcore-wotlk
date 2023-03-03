@@ -35,7 +35,8 @@ enum steamVault
     MAX_ENCOUNTER                       = 3,
 
     DATA_ACCESS_PANEL_HYDROMANCER       = 4,
-    DATA_ACCESS_PANEL_MEKGINEER         = 5
+    DATA_ACCESS_PANEL_MEKGINEER         = 5,
+    DATA_MAIN_CHAMBERS_DOOR             = 6
 };
 
 enum steamVaultNPCGO

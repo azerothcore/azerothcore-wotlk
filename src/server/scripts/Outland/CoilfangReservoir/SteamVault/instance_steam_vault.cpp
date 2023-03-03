@@ -43,6 +43,14 @@ public:
                 }
             }
 
+            if (instance->GetBossState(DATA_HYDROMANCER_THESPIA) == DONE && instance->GetBossState(DATA_MEKGINEER_STEAMRIGGER) == DONE)
+            {
+                if (GameObject* mainGate = instance->GetGameObject(DATA_MAIN_CHAMBERS_DOOR))
+                {
+                    instance->HandleGameObject(ObjectGuid::Empty, true, mainGate);
+                }
+            }
+
             return true;
         }
 
@@ -58,7 +66,8 @@ ObjectData const creatureData[] =
 ObjectData const objectData[] =
 {
     { GO_ACCESS_PANEL_HYDRO, DATA_ACCESS_PANEL_HYDROMANCER },
-    { GO_ACCESS_PANEL_MEK,   DATA_ACCESS_PANEL_MEKGINEER   }
+    { GO_ACCESS_PANEL_MEK,   DATA_ACCESS_PANEL_MEKGINEER   },
+    { GO_MAIN_CHAMBERS_DOOR, DATA_MAIN_CHAMBERS_DOOR       }
 };
 
 class instance_steam_vault : public InstanceMapScript
@@ -75,17 +84,12 @@ public:
             LoadObjectData(creatureData, objectData);
         }
 
-        ObjectGuid MainChambersDoor;
-        ObjectGuid AccessPanelHydro;
-        ObjectGuid AccessPanelMek;
-
         void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
                 case GO_MAIN_CHAMBERS_DOOR:
-                    MainChambersDoor = go->GetGUID();
-                    if (GetBossState(DATA_HYDROMANCER_THESPIA) == SPECIAL && GetBossState(DATA_MEKGINEER_STEAMRIGGER) == SPECIAL)
+                    if (GetBossState(DATA_HYDROMANCER_THESPIA) == DONE && GetBossState(DATA_MEKGINEER_STEAMRIGGER) == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_ACCESS_PANEL_HYDRO:
@@ -101,6 +105,8 @@ public:
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
             }
+
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         bool SetBossState(uint32 bossId, EncounterState state) override
