@@ -807,7 +807,7 @@ struct npc_pet_darting_hatchling : public NullCreatureAI
         {
             return;
         }
-        
+
         checkTimer += diff;
         if (checkTimer >= 2000)
         {
