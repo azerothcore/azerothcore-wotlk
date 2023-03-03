@@ -3433,7 +3433,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     pet->SetHealth(pet->GetMaxHealth());
 
     // generate new name for summon pet
-    std::string new_name = sObjectMgr->GeneratePetName(petentry);
+    std::string new_name = sObjectMgr->GeneratePetNameLocale(petentry, sWorld->GetDefaultDbcLocale());
     if (!new_name.empty())
         pet->SetName(new_name);
 
