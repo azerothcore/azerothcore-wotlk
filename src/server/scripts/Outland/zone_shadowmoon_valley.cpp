@@ -18,7 +18,7 @@
 /* ScriptData
 SDName: Shadowmoon_Valley
 SD%Complete: 100
-SDComment: Quest support: 10519, 10583, 10601, 10804, 10854, 10458, 10481, 10480, 10781, 10451. Vendor Drake Dealer Hurlunk.
+SDComment: Quest support: 10519, 10583, 10601, 10804, 10854, 10458, 10481, 10480, 10781. Vendor Drake Dealer Hurlunk.
 SDCategory: Shadowmoon Valley
 EndScriptData */
 
@@ -29,7 +29,6 @@ npc_drake_dealer_hurlunk
 npcs_flanis_swiftwing_and_kagrosh
 npc_karynaku
 npc_oronok_tornheart
-npc_earthmender_wilda
 npc_torloth_the_magnificent
 npc_illidari_spawn
 npc_lord_illidan_stormrage
@@ -809,176 +808,6 @@ public:
 
         return true;
     }
-};
-
-/*####
-# npc_earthmender_wilda
-####*/
-
-enum Earthmender
-{
-    SAY_WIL_START               = 0,
-    SAY_WIL_AGGRO               = 1,
-    SAY_WIL_PROGRESS1           = 2,
-    SAY_WIL_PROGRESS2           = 3,
-    SAY_WIL_FIND_EXIT           = 4,
-    SAY_WIL_JUST_AHEAD          = 5,
-    SAY_WIL_END                 = 6,
-
-    SPELL_CHAIN_LIGHTNING       = 16006,
-    SPELL_EARTHBING_TOTEM       = 15786,
-    SPELL_FROST_SHOCK           = 12548,
-    SPELL_HEALING_WAVE          = 12491,
-
-    QUEST_ESCAPE_COILSCAR       = 10451,
-    NPC_COILSKAR_ASSASSIN       = 21044
-};
-
-class npc_earthmender_wilda : public CreatureScript
-{
-public:
-    npc_earthmender_wilda() : CreatureScript("npc_earthmender_wilda") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_ESCAPE_COILSCAR)
-        {
-            creature->AI()->Talk(SAY_WIL_START, player);
-            creature->SetFaction(FACTION_EARTHEN_RING); //guessed
-
-            if (npc_earthmender_wildaAI* pEscortAI = CAST_AI(npc_earthmender_wilda::npc_earthmender_wildaAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest);
-        }
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_earthmender_wildaAI(creature);
-    }
-
-    struct npc_earthmender_wildaAI : public npc_escortAI
-    {
-        npc_earthmender_wildaAI(Creature* creature) : npc_escortAI(creature) { }
-
-        uint32 m_uiHealingTimer;
-
-        void Reset() override
-        {
-            m_uiHealingTimer = 0;
-        }
-
-        void WaypointReached(uint32 waypointId) override
-        {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
-            {
-                case 13:
-                    Talk(SAY_WIL_PROGRESS1, player);
-                    DoSpawnAssassin();
-                    break;
-                case 14:
-                    DoSpawnAssassin();
-                    break;
-                case 15:
-                    Talk(SAY_WIL_FIND_EXIT, player);
-                    break;
-                case 19:
-                    DoRandomSay();
-                    break;
-                case 20:
-                    DoSpawnAssassin();
-                    break;
-                case 26:
-                    DoRandomSay();
-                    break;
-                case 27:
-                    DoSpawnAssassin();
-                    break;
-                case 33:
-                    DoRandomSay();
-                    break;
-                case 34:
-                    DoSpawnAssassin();
-                    break;
-                case 37:
-                    DoRandomSay();
-                    break;
-                case 38:
-                    DoSpawnAssassin();
-                    break;
-                case 39:
-                    Talk(SAY_WIL_JUST_AHEAD, player);
-                    break;
-                case 43:
-                    DoRandomSay();
-                    break;
-                case 44:
-                    DoSpawnAssassin();
-                    break;
-                case 50:
-                    Talk(SAY_WIL_END, player);
-                    player->GroupEventHappens(QUEST_ESCAPE_COILSCAR, me);
-                    break;
-            }
-        }
-
-        void JustSummoned(Creature* summoned) override
-        {
-            if (summoned->GetEntry() == NPC_COILSKAR_ASSASSIN)
-                summoned->AI()->AttackStart(me);
-        }
-
-        //this is very unclear, random say without no real relevance to script/event
-        void DoRandomSay()
-        {
-            Talk(SAY_WIL_PROGRESS2);
-        }
-
-        void DoSpawnAssassin()
-        {
-            //unknown where they actually appear
-            DoSummon(NPC_COILSKAR_ASSASSIN, me, 15.0f, 5000, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT);
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            //don't always use
-            if (rand() % 5)
-                return;
-
-            //only aggro text if not player
-            if (who->GetTypeId() != TYPEID_PLAYER)
-            {
-                //appears to be random
-                if (urand(0, 1))
-                    Talk(SAY_WIL_AGGRO);
-            }
-        }
-
-        void UpdateAI(uint32 uiDiff) override
-        {
-            npc_escortAI::UpdateAI(uiDiff);
-
-            if (!UpdateVictim())
-                return;
-
-            /// @todo add more abilities
-            if (!HealthAbovePct(30))
-            {
-                if (m_uiHealingTimer <= uiDiff)
-                {
-                    DoCast(me, SPELL_HEALING_WAVE);
-                    m_uiHealingTimer = 15000;
-                }
-                else
-                    m_uiHealingTimer -= uiDiff;
-            }
-        }
-    };
 };
 
 /*#####
@@ -1821,7 +1650,6 @@ void AddSC_shadowmoon_valley()
     new npc_drake_dealer_hurlunk();
     new npcs_flanis_swiftwing_and_kagrosh();
     new npc_karynaku();
-    new npc_earthmender_wilda();
     new npc_lord_illidan_stormrage();
     new go_crystal_prison();
     new npc_illidari_spawn();
