@@ -1,3 +1,4 @@
+-- DB update 2023_03_04_02 -> 2023_03_04_03
 -- Pit of Saron - Fix order, add missing creature_text and remove duplicates from original sniffs.
 -- Forgemaster Garfrost 
 DELETE FROM `creature_text` WHERE `CreatureID`=36494;

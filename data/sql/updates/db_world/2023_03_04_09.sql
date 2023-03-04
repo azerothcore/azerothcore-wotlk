@@ -1,3 +1,4 @@
+-- DB update 2023_03_04_08 -> 2023_03_04_09
 -- Halls of Reflection - remove the used duplicates (no broadcastid) and add missing texts.
 -- Marwyn
 DELETE FROM `creature_text` WHERE `CreatureID`=38113;

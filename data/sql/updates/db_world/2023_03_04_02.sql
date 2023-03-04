@@ -1,3 +1,4 @@
+-- DB update 2023_03_04_01 -> 2023_03_04_02
 -- Rift Spawn (Mage Quest NPC)
 DELETE FROM `creature_text` WHERE `CreatureID`=6492;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES

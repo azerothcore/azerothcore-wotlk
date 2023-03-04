@@ -1,3 +1,4 @@
+-- DB update 2023_03_04_11 -> 2023_03_04_12
 -- Sayge - fix wrong gossip_option (was npc_text)
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 6210 AND `OptionID` = 0;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES

@@ -1,3 +1,4 @@
+-- DB update 2023_03_04_15 -> 2023_03_04_16
 --
 DELETE FROM `reference_loot_template` WHERE `Entry` IN (24740, 24741) AND `Item` IN (27925,27946,27980,27981,27985,27986,27776,27838,27875,27936,27948);
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES

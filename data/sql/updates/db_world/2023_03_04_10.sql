@@ -1,3 +1,4 @@
+-- DB update 2023_03_04_09 -> 2023_03_04_10
 -- Falthir the Sightless, add 8143 (Rogue revered neck quest)
 DELETE FROM `creature_queststarter` WHERE `id` = 14905 AND `quest` = 8143;
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES (14905, 8143);
