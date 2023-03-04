@@ -21,10 +21,10 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 
-#define GOSSIP_START_EVENT1a "I am ready."
-#define GOSSIP_START_EVENT1b "I am ready. However I'd like to skip the pageantry."
-#define GOSSIP_START_EVENT2  "I'm ready for the next challenge."
-#define GOSSIP_START_EVENT3  "I'm ready."
+#define GOSSIP_START_EVENT1a "我准备好了."
+#define GOSSIP_START_EVENT1b "我准备好了. 另外请跳过介绍."
+#define GOSSIP_START_EVENT2  "我准备好接受下一个挑战了."
+#define GOSSIP_START_EVENT3  "我准备好了."
 
 class npc_announcer_toc5 : public CreatureScript
 {
