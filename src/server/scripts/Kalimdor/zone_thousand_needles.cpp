@@ -377,6 +377,24 @@ public:
     };
 };
 
+enum Robotron
+{
+    SPELL_SUMMON_ROBOT = 30009
+};
+
+struct npc_robotron_3000 : public ScriptedAI
+{
+    npc_robotron_3000(Creature* creature) : ScriptedAI(creature) { }
+
+    void OnCharmed(bool apply) override
+    {
+        if (!apply)
+        {
+            me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_SUMMON_ROBOT);
+        }
+    }
+};
+
 void AddSC_thousand_needles()
 {
     new npc_lakota_windsong();
@@ -384,4 +402,5 @@ void AddSC_thousand_needles()
     new npc_plucky();
     new npc_enraged_panther();
     new go_panther_cage();
+    RegisterCreatureAI(npc_robotron_3000);
 }
