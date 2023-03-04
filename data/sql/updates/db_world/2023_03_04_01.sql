@@ -6,4 +6,4 @@ INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
 
 UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 64 WHERE `ID` IN (34810, 34817, 34818, 34819);
 
-UPDATE `creature_addon` SET `auras` = '34792 19818' WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id1` = 17976);
+UPDATE `creature_addon` SET `auras` = '34792 19818' WHERE `guid` = 147001;
