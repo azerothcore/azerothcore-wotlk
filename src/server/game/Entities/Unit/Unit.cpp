@@ -18890,7 +18890,6 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         if (CreatureAI* ai = creature->AI())
         {
             ai->JustDied(killer);
-            sScriptMgr->OnUnitDeath(creature, killer);
         }
 
         if (TempSummon* summon = creature->ToTempSummon())
@@ -18980,6 +18979,8 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             //end npcbot
         }
     }
+
+    sScriptMgr->OnUnitDeath(victim, killer);
 }
 
 void Unit::SetControlled(bool apply, UnitState state, Unit* source /*= nullptr*/, bool isFear /*= false*/)
