@@ -46,7 +46,7 @@ struct boss_commander_sarannis : public BossAI
 {
     boss_commander_sarannis(Creature* creature) : BossAI(creature, DATA_COMMANDER_SARANNIS), _summoned(false) { }
 
-    void Reset()
+    void Reset() override
     {
         _Reset();
         _summoned = false;
