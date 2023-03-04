@@ -430,6 +430,12 @@ private:
     bool _isHeroic;
 };
 
+struct HealthCheckEventData
+{
+    uint8 healthPct;
+    std::function<void()> exec;
+};
+
 class BossAI : public ScriptedAI
 {
 public:
@@ -440,11 +446,14 @@ public:
 
     bool CanRespawn() override;
 
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
     void SummonedCreatureDespawnAll() override;
 
     void UpdateAI(uint32 diff) override;
+
+    void SetHealthCheckEvent(uint32 healthPct, std::function<void()> exec);
 
     // Hook used to execute events scheduled into EventMap without the need
     // to override UpdateAI
@@ -464,6 +473,7 @@ protected:
     void _JustEngagedWith();
     void _JustDied();
     void _JustReachedHome() { me->setActive(false); }
+    [[nodiscard]] bool _ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const;
 
     void TeleportCheaters();
 
@@ -473,6 +483,7 @@ protected:
 
 private:
     uint32 const _bossId;
+    std::list<HealthCheckEventData> _healthCheckEvents;
 };
 
 class WorldBossAI : public ScriptedAI

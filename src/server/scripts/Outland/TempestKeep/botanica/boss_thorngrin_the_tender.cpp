@@ -44,8 +44,6 @@ enum Events
     EVENT_SACRIFICE             = 1,
     EVENT_HELLFIRE              = 2,
     EVENT_ENRAGE                = 3,
-    EVENT_HEALTH_CHECK_50       = 4,
-    EVENT_HEALTH_CHECK_20       = 5
 };
 
 class boss_thorngrin_the_tender : public CreatureScript
@@ -64,6 +62,12 @@ public:
         void Reset() override
         {
             _Reset();
+            SetHealthCheckEvent(20, [&]() {
+                Talk(SAY_20_PERCENT_HP);
+            });
+            SetHealthCheckEvent(50, [&]() {
+                Talk(SAY_50_PERCENT_HP);
+            });
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -83,8 +87,6 @@ public:
             events.ScheduleEvent(EVENT_SACRIFICE, 6000);
             events.ScheduleEvent(EVENT_HELLFIRE, 18000);
             events.ScheduleEvent(EVENT_ENRAGE, 15000);
-            events.ScheduleEvent(EVENT_HEALTH_CHECK_50, 500);
-            events.ScheduleEvent(EVENT_HEALTH_CHECK_20, 500);
         }
 
         void KilledUnit(Unit* victim) override
@@ -128,22 +130,6 @@ public:
                     Talk(EMOTE_ENRAGE);
                     me->CastSpell(me, SPELL_ENRAGE, false);
                     events.ScheduleEvent(EVENT_ENRAGE, 30000);
-                    break;
-                case EVENT_HEALTH_CHECK_50:
-                    if (me->HealthBelowPct(50))
-                    {
-                        Talk(SAY_50_PERCENT_HP);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_HEALTH_CHECK_50, 500);
-                    break;
-                case EVENT_HEALTH_CHECK_20:
-                    if (me->HealthBelowPct(20))
-                    {
-                        Talk(SAY_20_PERCENT_HP);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_HEALTH_CHECK_20, 500);
                     break;
             }
 
