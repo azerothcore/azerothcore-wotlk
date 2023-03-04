@@ -574,7 +574,12 @@ void WardenWin::HandleData(ByteBuffer& buff)
     if (Length != (buff.size() - buff.rpos()))
     {
         buff.rfinish();
-        ApplyPenalty(0, "Failed size checks in HandleData");
+
+        if (!_interrupted)
+        {
+            ApplyPenalty(0, "Failed size checks in HandleData");
+        }
+
         return;
     }
 
@@ -582,7 +587,12 @@ void WardenWin::HandleData(ByteBuffer& buff)
     {
         buff.rpos(buff.wpos());
         LOG_DEBUG("warden", "CHECKSUM FAIL");
-        ApplyPenalty(0, "Failed checksum in HandleData");
+
+        if (!_interrupted)
+        {
+            ApplyPenalty(0, "Failed checksum in HandleData");
+        }
+
         return;
     }
 
