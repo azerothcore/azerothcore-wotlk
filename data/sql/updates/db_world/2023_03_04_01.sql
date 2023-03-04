@@ -1,3 +1,4 @@
+-- DB update 2023_03_04_00 -> 2023_03_04_01
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` = 34799 AND `ScriptName` = 'spell_commander_sarannis_arcane_devastation';
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
