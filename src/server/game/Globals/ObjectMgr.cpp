@@ -8204,6 +8204,81 @@ void ObjectMgr::AddReservedPlayerName(std::string const& name)
     }
 }
 
+void ObjectMgr::LoadProfanityPlayersNames()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _profanityNamesStore.clear();                                // need for reload case
+
+    QueryResult result = CharacterDatabase.Query("SELECT name FROM profanity_name");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 profanity player names. DB table `profanity_name` is empty!");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+
+    Field* fields;
+    do
+    {
+        fields = result->Fetch();
+        std::string name = fields[0].Get<std::string>();
+
+        std::wstring wstr;
+        if (!Utf8toWStr (name, wstr))
+        {
+            LOG_ERROR("sql.sql", "Table `profanity_name` have invalid name: {}", name);
+            continue;
+        }
+
+        wstrToLower(wstr);
+
+        _profanityNamesStore.insert(wstr);
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} profanity player names in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+bool ObjectMgr::IsProfanityName(std::string_view name) const
+{
+    // pussywizard
+    if (name.size() >= 2 && (name[name.size() - 2] == 'G' || name[name.size() - 2] == 'g') && (name[name.size() - 1] == 'M' || name[name.size() - 1] == 'm'))
+        return true;
+
+    std::wstring wstr;
+    if (!Utf8toWStr (name, wstr))
+        return false;
+
+    wstrToLower(wstr);
+
+    return _profanityNamesStore.find(wstr) != _profanityNamesStore.end();
+}
+
+void ObjectMgr::AddProfanityPlayerName(std::string const& name)
+{
+    if (!IsProfanityName(name))
+    {
+        std::wstring wstr;
+        if (!Utf8toWStr(name, wstr))
+        {
+            LOG_ERROR("server", "Could not add invalid name to profanity player names: {}", name);
+            return;
+        }
+        wstrToLower(wstr);
+
+        _profanityNamesStore.insert(wstr);
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PROFANITY_PLAYER_NAME);
+        stmt->SetData(0, name);
+        CharacterDatabase.Execute(stmt);
+    }
+}
+
 enum LanguageType
 {
     LT_BASIC_LATIN    = 0x0000,
@@ -8309,6 +8384,11 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
     if (sObjectMgr->IsReservedName(name))
     {
         return CHAR_NAME_RESERVED;
+    }
+
+    if (sObjectMgr->IsProfanityName(name))
+    {
+        return CHAR_NAME_PROFANE;
     }
 
     // Check for Reserved Name from DBC
