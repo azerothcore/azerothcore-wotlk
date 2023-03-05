@@ -805,7 +805,6 @@ class spell_warl_life_tap : public SpellScript
         return SPELL_FAILED_FIZZLE;
     }
 
-
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_warl_life_tap::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
