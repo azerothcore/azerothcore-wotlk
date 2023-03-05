@@ -50,9 +50,13 @@ struct boss_aeonus : public BossAI
 
     void JustReachedHome() override
     {
-        if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
+        if (Creature* medivh = instance->GetCreature(DATA_MEDIVH))
+        {
             if (me->GetDistance2d(medivh) < 20.0f)
+            {
                 me->CastSpell(me, SPELL_CORRUPT_MEDIVH, false);
+            }
+        }
     }
 
     void InitializeAI() override
@@ -60,7 +64,7 @@ struct boss_aeonus : public BossAI
         Talk(SAY_ENTER);
         ScriptedAI::InitializeAI();
 
-        if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
+        if (Creature* medivh = instance->GetCreature(DATA_MEDIVH))
         {
             me->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(medivh->GetAngle(me)), medivh->GetPositionY() + 14.0f * std::sin(medivh->GetAngle(me)), medivh->GetPositionZ(), me->GetAngle(medivh));
             me->GetMotionMaster()->MoveTargetedHome();
