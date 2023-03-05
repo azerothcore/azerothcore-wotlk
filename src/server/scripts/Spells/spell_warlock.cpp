@@ -773,7 +773,7 @@ class spell_warl_life_tap : public SpellScript
         if (Unit* target = GetHitUnit())
         {
             int32 spellEffect = GetEffectValue();
-            int32 damage = spellEffect + (caster->GetStat(STAT_SPIRIT) * 1.5f);
+            int32 damage = spellEffect;
             int32 mana = int32(spellEffect + (caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.5f));
             
             // Shouldn't Appear in Combat Log
@@ -800,7 +800,7 @@ class spell_warl_life_tap : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        if ((int32(GetCaster()->GetHealth()) > int32(GetSpellInfo()->Effects[EFFECT_0].CalcValue() + (GetCaster()->GetStat(STAT_SPIRIT) * 1.5f))))
+        if ((int32(GetCaster()->GetHealth()) > int32(GetSpellInfo()->Effects[EFFECT_0].CalcValue())))
             return SPELL_CAST_OK;
         return SPELL_FAILED_FIZZLE;
     }
