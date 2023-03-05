@@ -113,7 +113,7 @@ struct boss_laj : public BossAI
             {
                 Talk(EMOTE_SUMMON);
                 DoCastAOE(SPELL_SUMMON_LASHER_1, true);
-                DoCastAOE(SPELL_SUMMON_LASHER_1, true);
+                DoCastAOE(SPELL_SUMMON_FLAYER_1, true);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->ResumeChasingVictim();
             });
