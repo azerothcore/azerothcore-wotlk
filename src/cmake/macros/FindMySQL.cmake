@@ -67,7 +67,6 @@ if (_MySQL_use_pkgconfig)
         INTERFACE "PkgConfig::${_mysql_target}")
     endif ()
   endif ()
-
   unset(_mysql_target)
 else ()
   set(_MySQL_paths)
@@ -87,6 +86,8 @@ else ()
   find_path(MYSQL_INCLUDE_DIR
     NAMES mysql.h
     PATHS
+      ${MYSQL_ADD_INCLUDE_PATH}
+      "C:/tools/mysql/current/include" # chocolatey package
       "C:/Program Files/MySQL/include"
       "C:/MySQL/include"
       ${_MySQL_paths}
@@ -96,6 +97,8 @@ else ()
   find_library(MYSQL_LIBRARY
     NAMES libmariadb mysql libmysql mysqlclient
     PATHS
+      ${MYSQL_ADD_LIBRARIES_PATH}
+      "C:/tools/mysql/current/lib" # chocolatey package
       "C:/Program Files/MySQL/lib"
       "C:/MySQL/lib/debug"
       ${_MySQL_paths}
