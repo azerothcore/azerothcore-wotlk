@@ -18,15 +18,6 @@ Provides the following variables:
   * A `MySQL::MySQL` imported target.
 #]==]
 
-# No .pc files are shipped with MySQL on Windows.
-set(_MySQL_use_pkgconfig 0)
-if (NOT WIN32)
-  find_package(PkgConfig)
-  if (PkgConfig_FOUND)
-    set(_MySQL_use_pkgconfig 1)
-  endif ()
-endif ()
-
 # Set allowed MySQL and MariaDB versions
 set(_MySQL_mariadb_versions 10.5 10.6)
 set(_MySQL_versions 5.7 8.0)
@@ -38,6 +29,15 @@ set(_MySQL_min_version 5.7)
 # Set Max allowed MySQL and MariaDB versions
 set(_MySQL_mariadb_max_version 10.6)
 set(_MySQL_max_version 8.0)
+
+# No .pc files are shipped with MySQL on Windows.
+set(_MySQL_use_pkgconfig 0)
+if (NOT WIN32)
+  find_package(PkgConfig)
+  if (PkgConfig_FOUND)
+    set(_MySQL_use_pkgconfig 1)
+  endif ()
+endif ()
 
 if (_MySQL_use_pkgconfig)
   pkg_check_modules(_libmariadb "libmariadb" QUIET IMPORTED_TARGET)
