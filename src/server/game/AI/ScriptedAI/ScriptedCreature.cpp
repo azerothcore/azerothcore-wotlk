@@ -675,7 +675,7 @@ void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*
     {
         _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
         {
-            return _ProccessHealthCheckEvent(data.healthPct, damage, data.exec);
+            return _ProccessHealthCheckEvent(data._healthPct, damage, data._exec);
         });
     }
 }

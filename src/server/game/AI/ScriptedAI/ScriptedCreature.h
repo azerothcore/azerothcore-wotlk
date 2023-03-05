@@ -432,8 +432,10 @@ private:
 
 struct HealthCheckEventData
 {
-    uint8 healthPct;
-    std::function<void()> exec;
+    HealthCheckEventData(uint8 healthPct, std::function<void()> exec) : _healthPct(_healthPct), _exec(_exec) { };
+
+    uint8 _healthPct;
+    std::function<void()> _exec;
 };
 
 class BossAI : public ScriptedAI
