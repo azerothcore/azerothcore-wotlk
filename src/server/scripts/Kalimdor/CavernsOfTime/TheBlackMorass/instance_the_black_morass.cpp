@@ -468,6 +468,7 @@ public:
                 else
                 {
                     summon->SetReactState(REACT_DEFENSIVE);
+                    _scheduler.CancelGroup(CONTEXT_GROUP_RIFTS);
                 }
             }
         }
