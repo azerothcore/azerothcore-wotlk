@@ -80,17 +80,6 @@ public:
             }
         }
 
-        void DespawnAllPortalCreatures()
-        {
-            for (ObjectGuid const& guid : _encounterNPCs)
-            {
-                if (Creature* creature = instance->GetCreature(guid))
-                {
-                    creature->DespawnOrUnsummon();
-                }
-            }
-        }
-
         bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
