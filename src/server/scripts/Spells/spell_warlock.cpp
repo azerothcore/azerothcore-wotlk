@@ -773,11 +773,10 @@ class spell_warl_life_tap : public SpellScript
         if (Unit* target = GetHitUnit())
         {
             int32 spellEffect = GetEffectValue();
-            int32 damage = spellEffect;
             int32 mana = int32(spellEffect + (caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.5f));
 
             // Shouldn't Appear in Combat Log
-            target->ModifyHealth(-damage);
+            target->ModifyHealth(-spellEffect);
 
             // Improved Life Tap mod
             if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_IMPROVED_LIFE_TAP, 0))
