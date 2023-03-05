@@ -91,7 +91,9 @@ enum Misc
     SPELL_RIFT_CHANNEL                  = 31387,
     SPELL_TELEPORT_VISUAL               = 7791,
 
-    ACTION_OUTRO                        = 1
+    ACTION_OUTRO                        = 1,
+
+    CONTEXT_GROUP_RIFTS                 = 1
 };
 
 enum medivhSays

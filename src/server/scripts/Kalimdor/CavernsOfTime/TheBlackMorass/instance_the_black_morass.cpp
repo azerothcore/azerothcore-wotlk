@@ -65,11 +65,12 @@ public:
             _currentRift = 0;
             _shieldPercent = 100;
 
-            _riftPositions.clear();
+            _availableRiftPositions.clear();
+            _scheduler.CancelAll();
 
             for (Position const& pos : PortalLocation)
             {
-                _riftPositions.push_back(pos);
+                _availableRiftPositions.push_back(pos);
             }
 
             instance->LoadGrid(-2023.0f, 7121.0f);
@@ -167,15 +168,17 @@ public:
 
         void ScheduleNextPortal(Milliseconds time)
         {
+            _scheduler.CancelGroup(CONTEXT_GROUP_RIFTS);
+
             _scheduler.Schedule(time, [this](TaskContext context)
             {
                 if (GetCreature(DATA_MEDIVH))
                 {
                     Position spawnPos;
-                    if (!_riftPositions.empty())
+                    if (!_availableRiftPositions.empty())
                     {
-                        spawnPos = Acore::Containers::SelectRandomContainerElement(_riftPositions);
-                        _riftPositions.remove(spawnPos);
+                        spawnPos = Acore::Containers::SelectRandomContainerElement(_availableRiftPositions);
+                        _availableRiftPositions.remove(spawnPos);
 
                         DoUpdateWorldState(WORLD_STATE_BM_RIFT, ++_currentRift);
 
@@ -185,10 +188,25 @@ public:
                             {
                                 SummonPortalKeeper(rift);
                             });
+                        }
 
+                        // Here we check if we have available rift spots.
+                        // If there are spots available, spawn a rift instantly.
+                        if (!_availableRiftPositions.empty())
+                        {
                             context.Repeat((_currentRift >= 13 ? 2min : 90s));
                         }
+                        else
+                        {
+                            context.Repeat(3s);
+                        }
                     }
+                    else
+                    {
+                        context.Repeat(3s);
+                    }
+
+                    context.SetGroup(CONTEXT_GROUP_RIFTS);
                 }
             });
         }
@@ -225,15 +243,20 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_TIME_RIFT:
-                    _riftPositions.push_back(creature->GetHomePosition());
+                    _availableRiftPositions.push_back(creature->GetHomePosition());
 
-                    if (!_riftPositions.empty())
+                    if (GetBossState(DATA_AEONUS) != DONE)
                     {
-                        ScheduleNextPortal(4s);
-                    }
-                    else
-                    {
-                        ScheduleNextPortal((_currentRift >= 13 ? 2min : 90s));
+                        // Here we check if we have available rift spots.
+                        // If there are spots available, spawn a rift instantly.
+                        if (!_availableRiftPositions.empty())
+                        {
+                            ScheduleNextPortal(4s);
+                        }
+                        else
+                        {
+                            ScheduleNextPortal((_currentRift >= 13 ? 2min : 90s));
+                        }
                     }
 
                 case NPC_CHRONO_LORD_DEJA:
@@ -464,7 +487,7 @@ public:
         }
 
     protected:
-        std::list<Position> _riftPositions;
+        std::list<Position> _availableRiftPositions;
         uint32 _timerToNextBoss;
         GuidSet _encounterNPCs;
         uint8 _currentRift;
