@@ -27,17 +27,15 @@
 
 enum Yells
 {
-    SAY_AGGRO                       = 14,
-    SAY_SLAY_1                      = 15,
-    SAY_DEATH                       = 17,
-    SAY_FORGE_1                     = 18,
-    SAY_FORGE_2                     = 19,
-
-    SAY_BOULDER_HIT                 = 16,
-    EMOTE_DEEP_FREEZE               = 23,
+    SAY_AGGRO                       = 0,
+    SAY_HP_66                       = 1,
+    SAY_HP_33                       = 2,
+    SAY_DEATH                       = 3,
+    SAY_SLAY                        = 4,
+    SAY_BOULDER_HIT                 = 5,
+    WHISPER_BOULDER                 = 6,
+    EMOTE_DEEP_FREEZE               = 7,
 };
-
-#define EMOTE_THROW_SARONITE        "%s hurls a massive saronite boulder at you!"
 
 enum MiscData
 {
@@ -158,14 +156,14 @@ public:
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->CastSpell(me, SPELL_FORGE_BLADE, false);
-                Talk(SAY_FORGE_1);
+                Talk(SAY_HP_66);
             }
             else if (phase == 2)
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->RemoveAurasDueToSpell(SPELL_FORGE_BLADE);
                 me->CastSpell(me, SPELL_FORGE_MACE, false);
-                Talk(SAY_FORGE_2);
+                Talk(SAY_HP_33);
             }
         }
 
@@ -244,9 +242,7 @@ public:
                     bCanSayBoulderHit = true;
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true))
                     {
-                        WorldPacket data;
-                        ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, EMOTE_THROW_SARONITE);
-                        target->ToPlayer()->GetSession()->SendPacket(&data);
+                        Talk(WHISPER_BOULDER, target);
                         me->CastSpell(target, SPELL_THROW_SARONITE, false);
                     }
                     events.RepeatEvent(urand(12500, 20000));
@@ -286,7 +282,7 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY_1);
+                Talk(SAY_SLAY);
         }
 
         void EnterEvadeMode(EvadeReason why) override

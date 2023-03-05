@@ -22,14 +22,13 @@
 
 enum Texts
 {
-    SAY_AGGRO                           = 53,
-    SAY_SLAY_1                          = 54,
-    SAY_SLAY_2                          = 55,
-    SAY_DEATH                           = 56,
-    SAY_MARK                            = 57,
-    SAY_SMASH                           = 58,
-    EMOTE_RIMEFANG_ICEBOLT              = 59,
-    EMOTE_SMASH                         = 60,
+    SAY_AGGRO                           = 2,
+    SAY_SLAY                            = 3,
+    SAY_DEATH                           = 4,
+    SAY_MARK                            = 5,
+    EMOTE_MARK                          = 6,
+    SAY_DARK_MIGHT                      = 7,
+    EMOTE_DARK_MIGHT                    = 8,
 };
 
 enum Spells
@@ -166,8 +165,8 @@ public:
                     events.RepeatEvent(3000);
                     break;
                 case EVENT_SPELL_UNHOLY_POWER:
-                    Talk(SAY_SMASH);
-                    Talk(EMOTE_SMASH);
+                    Talk(SAY_DARK_MIGHT);
+                    Talk(EMOTE_DARK_MIGHT);
                     me->CastSpell(me, SPELL_UNHOLY_POWER, false);
 
                     events.ScheduleEvent(EVENT_SPELL_FORCEFUL_SMASH, urand(40000, 48000));
@@ -188,7 +187,7 @@ public:
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
                         {
                             Talk(SAY_MARK);
-                            c->AI()->Talk(EMOTE_RIMEFANG_ICEBOLT, target);
+                            Talk(EMOTE_MARK, target);
                             c->CastSpell(target, RIMEFANG_SPELL_HOARFROST, false);
                         }
                     events.RepeatEvent(25000);
@@ -211,7 +210,7 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
-                Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
+                Talk(SAY_SLAY);
         }
 
         bool CanAIAttack(Unit const* who) const override
