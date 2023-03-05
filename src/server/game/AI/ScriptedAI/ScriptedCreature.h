@@ -432,7 +432,7 @@ private:
 
 struct HealthCheckEventData
 {
-    HealthCheckEventData(uint8 healthPct, std::function<void()> exec) : _healthPct(_healthPct), _exec(_exec) { };
+    HealthCheckEventData(uint8 healthPct, std::function<void()> exec) : _healthPct(healthPct), _exec(exec) { };
 
     uint8 _healthPct;
     std::function<void()> _exec;
