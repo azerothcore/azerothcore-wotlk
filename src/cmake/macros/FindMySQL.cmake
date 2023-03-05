@@ -84,7 +84,7 @@ else ()
   endforeach ()
   unset(_MySQL_version)
 
-  find_path(MySQL_INCLUDE_DIR
+  find_path(MYSQL_INCLUDE_DIR
     NAMES mysql.h
     PATHS
       "C:/Program Files/MySQL/include"
@@ -92,8 +92,8 @@ else ()
       ${_MySQL_paths}
     PATH_SUFFIXES include include/mysql
     DOC "Location of mysql.h")
-  mark_as_advanced(MySQL_INCLUDE_DIR)
-  find_library(MySQL_LIBRARY
+  mark_as_advanced(MYSQL_INCLUDE_DIR)
+  find_library(MYSQL_LIBRARY
     NAMES libmariadb mysql libmysql mysqlclient
     PATHS
       "C:/Program Files/MySQL/lib"
@@ -101,20 +101,20 @@ else ()
       ${_MySQL_paths}
     PATH_SUFFIXES lib lib/opt
     DOC "Location of the mysql library")
-  mark_as_advanced(MySQL_LIBRARY)
+  mark_as_advanced(MYSQL_LIBRARY)
 
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(MySQL
-    REQUIRED_VARS MySQL_INCLUDE_DIR MySQL_LIBRARY)
+    REQUIRED_VARS MYSQL_INCLUDE_DIR MYSQL_LIBRARY)
 
   if (MySQL_FOUND)
-    set(MYSQL_INCLUDE_DIRS "${MySQL_INCLUDE_DIR}")
-    set(MYSQL_LIBRARIES "${MySQL_LIBRARY}")
+    set(MYSQL_INCLUDE_DIRS "${MYSQL_INCLUDE_DIR}")
+    set(MYSQL_LIBRARIES "${MYSQL_LIBRARY}")
     if (NOT TARGET MySQL::MySQL)
       add_library(MySQL::MySQL UNKNOWN IMPORTED)
       set_target_properties(MySQL::MySQL PROPERTIES
-      IMPORTED_LOCATION "${MySQL_LIBRARY}"
-        INTERFACE_INCLUDE_DIRECTORIES "${MySQL_INCLUDE_DIR}")
+      IMPORTED_LOCATION "${MYSQL_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${MYSQL_INCLUDE_DIR}")
     endif ()
   endif ()
 endif ()
