@@ -62,10 +62,10 @@ public:
         void Reset() override
         {
             _Reset();
-            SetHealthCheckEvent(20, [&]() {
+            ScheduleHealthCheckEvent(20, [&]() {
                 Talk(SAY_20_PERCENT_HP);
             });
-            SetHealthCheckEvent(50, [&]() {
+            ScheduleHealthCheckEvent(50, [&]() {
                 Talk(SAY_50_PERCENT_HP);
             });
         }

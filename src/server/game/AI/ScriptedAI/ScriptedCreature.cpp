@@ -686,7 +686,7 @@ void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*
  * @param healthPct The health percent at which the code will be executed.
  * @param exec The fuction to be executed.
  */
-void BossAI::SetHealthCheckEvent(uint32 healthPct, std::function<void()> exec)
+void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec)
 {
     _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec));
 };
