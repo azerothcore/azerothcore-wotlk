@@ -114,22 +114,6 @@ else ()
     PATH_SUFFIXES lib lib/opt
     DOC "Location of the mysql library")
   mark_as_advanced(MYSQL_LIBRARY)
-  find_library(MYSQL_EXTRA_LIBRARIES
-    NAMES z zlib
-    PATHS
-      /usr/lib
-      /usr/local/lib
-    DOC "if more libraries are necessary to link in a MySQL client (typically zlib), specify them here.")
-  mark_as_advanced(MYSQL_EXTRA_LIBRARIES)
-  find_program(MYSQL_EXECUTABLE mysql
-    PATHS
-      ${MYSQL_CONFIG_PREFER_PATH}
-      /usr/local/mysql/bin/
-      /usr/local/bin/
-      /usr/bin/
-    DOC
-      "path to your mysql binary.")
-  mark_as_advanced(MYSQL_EXECUTABLE)
 
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(MySQL
