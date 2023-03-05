@@ -75,8 +75,7 @@ public:
             instance->LoadGrid(-2023.0f, 7121.0f);
             if (Creature* medivh = GetCreature(DATA_MEDIVH))
             {
-                medivh->DespawnOrUnsummon();
-                medivh->SetRespawnTime(3);
+                medivh->DespawnOrUnsummon(0ms, 3s);
             }
         }
 
