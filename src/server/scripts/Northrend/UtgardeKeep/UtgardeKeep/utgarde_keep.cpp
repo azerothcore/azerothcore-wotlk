@@ -181,7 +181,7 @@ public:
                         break;
                     case EVENT_KNOCKAWAY:
                         DoCast(SPELL_KNOCK_AWAY);
-                        _events.ScheduleEvent(EVENT_KNOCKAWAY, 700ms, 8500ms);
+                        _events.ScheduleEvent(EVENT_KNOCKAWAY, 7000ms, 8500ms);
                         break;
                     default:
                         break;

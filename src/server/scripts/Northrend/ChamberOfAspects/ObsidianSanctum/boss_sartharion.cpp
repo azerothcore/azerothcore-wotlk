@@ -298,7 +298,7 @@ public:
             // Extra events
             extraEvents.ScheduleEvent(EVENT_SARTHARION_SUMMON_LAVA, 20s);
             extraEvents.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 5s);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_BERSERK, 900s);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_BERSERK, 15min);
             extraEvents.ScheduleEvent(EVENT_SARTHARION_BOUNDARY, 250ms);
 
             // Store dragons

@@ -697,7 +697,7 @@ public:
                     break;
                 case EVENT_PRIESTESS_SPELL_FOUNTAIN_OF_LIGHT:
                     me->CastSpell((Unit*)nullptr, SPELL_FOUNTAIN_OF_LIGHT, false);
-                    events.Repeat(25s, 45s);
+                    events.Repeat(35s, 45s);
                     break;
                 case EVENT_PRIESTESS_SPELL_MIND_CONTROL_H:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
