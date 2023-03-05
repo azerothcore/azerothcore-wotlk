@@ -13,8 +13,8 @@
 #[==[
 Provides the following variables:
 
-  * `MySQL_INCLUDE_DIRS`: Include directories necessary to use MySQL.
-  * `MySQL_LIBRARIES`: Libraries necessary to use MySQL.
+  * `MYSQL_INCLUDE_DIRS`: Include directories necessary to use MySQL.
+  * `MYSQL_LIBRARIES`: Libraries necessary to use MySQL.
   * A `MySQL::MySQL` imported target.
 #]==]
 
@@ -26,6 +26,18 @@ if (NOT WIN32)
     set(_MySQL_use_pkgconfig 1)
   endif ()
 endif ()
+
+# Set allowed MySQL and MariaDB versions
+set(_MySQL_mariadb_versions 10.5 10.6)
+set(_MySQL_versions 5.7 8.0)
+
+# Set Min allowed MySQL and MariaDB versions
+set(_MySQL_mariadb_min_version 10.5)
+set(_MySQL_min_version 5.7)
+
+# Set Max allowed MySQL and MariaDB versions
+set(_MySQL_mariadb_max_version 10.6)
+set(_MySQL_max_version 8.0)
 
 if (_MySQL_use_pkgconfig)
   pkg_check_modules(_libmariadb "libmariadb" QUIET IMPORTED_TARGET)
@@ -41,36 +53,23 @@ if (_MySQL_use_pkgconfig)
       endif ()
     else ()
       set(_mysql_target "_mariadb")
-      if (_mariadb_VERSION VERSION_LESS 10.4)
-        get_property(_include_dirs
-          TARGET    "PkgConfig::_mariadb"
-          PROPERTY  "INTERFACE_INCLUDE_DIRECTORIES")
-        # Remove "${prefix}/mariadb/.." from the interface since it breaks other
-        # projects.
-        list(FILTER _include_dirs EXCLUDE REGEX "\\.\\.")
-        set_property(TARGET "PkgConfig::_mariadb"
-          PROPERTY
-            "INTERFACE_INCLUDE_DIRECTORIES" "${_include_dirs}")
-        unset(_include_dirs)
-      endif ()
     endif ()
   endif ()
 
   set(MySQL_FOUND 0)
   if (_mysql_target)
     set(MySQL_FOUND 1)
-    set(MySQL_INCLUDE_DIRS ${${_mysql_target}_INCLUDE_DIRS})
-    set(MySQL_LIBRARIES ${${_mysql_target}_LINK_LIBRARIES})
+    set(MYSQL_INCLUDE_DIRS ${${_mysql_target}_INCLUDE_DIRS})
+    set(MYSQL_LIBRARIES ${${_mysql_target}_LINK_LIBRARIES})
     if (NOT TARGET MySQL::MySQL)
       add_library(MySQL::MySQL INTERFACE IMPORTED)
       target_link_libraries(MySQL::MySQL
         INTERFACE "PkgConfig::${_mysql_target}")
     endif ()
   endif ()
+
   unset(_mysql_target)
 else ()
-  set(_MySQL_mariadb_versions 10.5 10.6)
-  set(_MySQL_versions 5.7 8.0)
   set(_MySQL_paths)
   foreach (_MySQL_version IN LISTS _MySQL_mariadb_versions)
     list(APPEND _MySQL_paths
@@ -84,8 +83,6 @@ else ()
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server ${_MySQL_version};Location]")
   endforeach ()
   unset(_MySQL_version)
-  unset(_MySQL_versions)
-  unset(_MySQL_mariadb_versions)
 
   find_path(MySQL_INCLUDE_DIR
     NAMES mysql.h
@@ -111,8 +108,8 @@ else ()
     REQUIRED_VARS MySQL_INCLUDE_DIR MySQL_LIBRARY)
 
   if (MySQL_FOUND)
-    set(MySQL_INCLUDE_DIRS "${MySQL_INCLUDE_DIR}")
-    set(MySQL_LIBRARIES "${MySQL_LIBRARY}")
+    set(MYSQL_INCLUDE_DIRS "${MySQL_INCLUDE_DIR}")
+    set(MYSQL_LIBRARIES "${MySQL_LIBRARY}")
     if (NOT TARGET MySQL::MySQL)
       add_library(MySQL::MySQL UNKNOWN IMPORTED)
       set_target_properties(MySQL::MySQL PROPERTIES
@@ -121,4 +118,23 @@ else ()
     endif ()
   endif ()
 endif ()
+
+if (_libmariadb_FOUND)
+  if (_mariadb_VERSION VERSION_LESS _MySQL_mariadb_min_version OR _mariadb_VERSION VERSION_GREATER _MySQL_mariadb_max_version)
+    message(FATAL_ERROR "Using unsupported MariaDB version! Supported versions ${_MySQL_mariadb_versions}")
+  endif ()
+endif ()
+
+if (_mysql_FOUND)
+  if (_mysql_version VERSION_LESS _MySQL_min_version OR _mysql_version VERSION_GREATER _MySQL_max_version)
+    message(FATAL_ERROR "Using unsupported MySQL version! Supported versions ${_MySQL_versions}")
+  endif ()
+endif ()
+
 unset(_MySQL_use_pkgconfig)
+unset(_MySQL_versions)
+unset(_MySQL_mariadb_versions)
+unset(_MySQL_mariadb_min_version)
+unset(_MySQL_mariadb_max_version)
+unset(_MySQL_min_version)
+unset(_MySQL_max_version)
