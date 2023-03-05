@@ -101,8 +101,6 @@ struct npc_medivh_bm : public ScriptedAI
 
     void JustSummoned(Creature* summon) override
     {
-        _instance->SetGuidData(DATA_SUMMONED_NPC, summon->GetGUID());
-
         if (summon->GetEntry() == NPC_DP_CRYSTAL_STALKER)
         {
             summon->DespawnOrUnsummon(25000);
@@ -117,11 +115,6 @@ struct npc_medivh_bm : public ScriptedAI
             init.SetCyclic();
             init.Launch();
         }
-    }
-
-    void SummonedCreatureDespawn(Creature* summon) override
-    {
-        _instance->SetGuidData(DATA_DELETED_NPC, summon->GetGUID());
     }
 
     void MoveInLineOfSight(Unit* who) override

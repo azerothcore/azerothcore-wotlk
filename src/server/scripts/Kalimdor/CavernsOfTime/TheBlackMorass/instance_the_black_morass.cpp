@@ -416,18 +416,6 @@ public:
             return 0;
         }
 
-        void SetGuidData(uint32 type, ObjectGuid data) override
-        {
-            if (type == DATA_SUMMONED_NPC)
-            {
-                _encounterNPCs.insert(data);
-            }
-            else if (type == DATA_DELETED_NPC)
-            {
-                _encounterNPCs.erase(data);
-            }
-        }
-
         void SummonPortalKeeper(Creature* rift)
         {
             if (!rift)
