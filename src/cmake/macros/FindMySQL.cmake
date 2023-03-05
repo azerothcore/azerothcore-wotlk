@@ -87,6 +87,11 @@ else ()
   find_path(MYSQL_INCLUDE_DIR
     NAMES mysql.h
     PATHS
+      /usr/include
+      /usr/include/mysql
+      /usr/local/include
+      /usr/local/include/mysql
+      /usr/local/mysql/include
       "C:/Program Files/MySQL/include"
       "C:/MySQL/include"
       ${_MySQL_paths}
@@ -96,6 +101,11 @@ else ()
   find_library(MYSQL_LIBRARY
     NAMES libmariadb mysql libmysql mysqlclient
     PATHS
+      /usr/lib
+      /usr/lib/mysql
+      /usr/local/lib
+      /usr/local/lib/mysql
+      /usr/local/mysql/lib
       "C:/Program Files/MySQL/lib"
       "C:/MySQL/lib/debug"
       ${_MySQL_paths}
