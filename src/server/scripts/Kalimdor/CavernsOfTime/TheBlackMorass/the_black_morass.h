@@ -24,7 +24,7 @@
 
 #define DataHeader "TBM"
 
-uint32 const EncounterCount = 2;
+uint32 const EncounterCount = 3;
 
 #define TheBlackMorassScriptName "instance_the_black_morass"
 

@@ -59,10 +59,9 @@ struct boss_aeonus : public BossAI
         }
     }
 
-    void InitializeAI() override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         Talk(SAY_ENTER);
-        ScriptedAI::InitializeAI();
 
         if (Creature* medivh = instance->GetCreature(DATA_MEDIVH))
         {

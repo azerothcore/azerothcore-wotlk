@@ -23,8 +23,7 @@
 #include "TemporarySummon.h"
 #include "the_black_morass.h"
 
-#define MAX_PORTAL_LOCATIONS 4
-const Position PortalLocation[MAX_PORTAL_LOCATIONS] =
+const Position PortalLocation[4] =
 {
     { -2030.8318f, 7024.9443f, 23.071817f, 3.14159f },
     { -1961.7335f, 7029.5280f, 21.811401f, 2.12931f },
@@ -258,7 +257,7 @@ public:
                             ScheduleNextPortal((_currentRift >= 13 ? 2min : 90s));
                         }
                     }
-
+                    [[fallthrough]];
                 case NPC_CHRONO_LORD_DEJA:
                 case NPC_INFINITE_CHRONO_LORD:
                 case NPC_TEMPORUS:
@@ -390,6 +389,8 @@ public:
                                                     creature->DespawnOrUnsummon(1200ms, 0s);
                                                 }
                                             }
+
+                                            _scheduler.CancelAll();
                                         });
                                     });
                                 });
@@ -465,7 +466,9 @@ public:
                     rift->CastSpell(summon, SPELL_RIFT_CHANNEL, false);
                 }
                 else
+                {
                     summon->SetReactState(REACT_DEFENSIVE);
+                }
             }
         }
 
