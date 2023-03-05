@@ -1,3 +1,4 @@
+-- DB update 2023_03_05_04 -> 2023_03_05_05
 --
 UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 64, `EffectBasePoints_1` = 0 WHERE `ID` = 39111;
 

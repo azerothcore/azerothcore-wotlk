@@ -1,3 +1,4 @@
+-- DB update 2023_03_05_02 -> 2023_03_05_03
 -- Emberstrife add SAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10321;
 
