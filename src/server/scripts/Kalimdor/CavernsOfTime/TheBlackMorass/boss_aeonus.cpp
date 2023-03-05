@@ -44,123 +44,101 @@ enum Events
     EVENT_CLEAVE                = 4
 };
 
-class boss_aeonus : public CreatureScript
+struct boss_aeonus : public BossAI
 {
-public:
-    boss_aeonus() : CreatureScript("boss_aeonus") { }
+    boss_aeonus(Creature* creature) : BossAI(creature, DATA_AEONUS) { }
 
-    struct boss_aeonusAI : public ScriptedAI
+    void JustReachedHome() override
     {
-        boss_aeonusAI(Creature* creature) : ScriptedAI(creature)
+        if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
+            if (me->GetDistance2d(medivh) < 20.0f)
+                me->CastSpell(me, SPELL_CORRUPT_MEDIVH, false);
+    }
+
+    void InitializeAI() override
+    {
+        Talk(SAY_ENTER);
+        ScriptedAI::InitializeAI();
+
+        if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
         {
-            instance = creature->GetInstanceScript();
+            me->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(medivh->GetAngle(me)), medivh->GetPositionY() + 14.0f * std::sin(medivh->GetAngle(me)), medivh->GetPositionZ(), me->GetAngle(medivh));
+            me->GetMotionMaster()->MoveTargetedHome();
         }
+    }
 
-        EventMap events;
-        InstanceScript* instance;
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        events.ScheduleEvent(EVENT_CLEAVE, 5000);
+        events.ScheduleEvent(EVENT_SANDBREATH, 20000);
+        events.ScheduleEvent(EVENT_TIMESTOP, 15000);
+        events.ScheduleEvent(EVENT_FRENZY, 30000);
 
-        void Reset() override
+        Talk(SAY_AGGRO);
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
         {
-            events.Reset();
-        }
-
-        void JustReachedHome() override
-        {
-            if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
-                if (me->GetDistance2d(medivh) < 20.0f)
-                    me->CastSpell(me, SPELL_CORRUPT_MEDIVH, false);
-        }
-
-        void InitializeAI() override
-        {
-            Talk(SAY_ENTER);
-            ScriptedAI::InitializeAI();
-
-            if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
+            if (me->IsWithinDistInMap(who, 20.0f))
             {
-                me->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(medivh->GetAngle(me)), medivh->GetPositionY() + 14.0f * std::sin(medivh->GetAngle(me)), medivh->GetPositionZ(), me->GetAngle(medivh));
-                me->GetMotionMaster()->MoveTargetedHome();
+                Talk(SAY_BANISH);
+                me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
+                return;
             }
         }
 
-        void JustEngagedWith(Unit* /*who*/) override
+        ScriptedAI::MoveInLineOfSight(who);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
+        _JustDied();
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+            Talk(SAY_SLAY);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            events.ScheduleEvent(EVENT_CLEAVE, 5000);
+        case EVENT_CLEAVE:
+            me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
+            events.ScheduleEvent(EVENT_CLEAVE, 10000);
+            break;
+        case EVENT_SANDBREATH:
+            me->CastSpell(me->GetVictim(), SPELL_SAND_BREATH, false);
             events.ScheduleEvent(EVENT_SANDBREATH, 20000);
-            events.ScheduleEvent(EVENT_TIMESTOP, 15000);
+            break;
+        case EVENT_TIMESTOP:
+            me->CastSpell(me, SPELL_TIME_STOP, false);
+            events.ScheduleEvent(EVENT_TIMESTOP, 25000);
+            break;
+        case EVENT_FRENZY:
+            Talk(EMOTE_FRENZY);
+            me->CastSpell(me, SPELL_ENRAGE, false);
             events.ScheduleEvent(EVENT_FRENZY, 30000);
-
-            Talk(SAY_AGGRO);
+            break;
         }
 
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
-            {
-                if (me->IsWithinDistInMap(who, 20.0f))
-                {
-                    Talk(SAY_BANISH);
-                    me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
-                    return;
-                }
-            }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            instance->SetData(TYPE_AEONUS, DONE);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_CLEAVE:
-                    me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
-                    events.ScheduleEvent(EVENT_CLEAVE, 10000);
-                    break;
-                case EVENT_SANDBREATH:
-                    me->CastSpell(me->GetVictim(), SPELL_SAND_BREATH, false);
-                    events.ScheduleEvent(EVENT_SANDBREATH, 20000);
-                    break;
-                case EVENT_TIMESTOP:
-                    me->CastSpell(me, SPELL_TIME_STOP, false);
-                    events.ScheduleEvent(EVENT_TIMESTOP, 25000);
-                    break;
-                case EVENT_FRENZY:
-                    Talk(EMOTE_FRENZY);
-                    me->CastSpell(me, SPELL_ENRAGE, false);
-                    events.ScheduleEvent(EVENT_FRENZY, 30000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetTheBlackMorassAI<boss_aeonusAI>(creature);
+        DoMeleeAttackIfReady();
     }
 };
 
 void AddSC_boss_aeonus()
 {
-    new boss_aeonus();
+    RegisterTheBlackMorassCreatureAI(boss_aeonus);
 }

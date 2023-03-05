@@ -107,7 +107,7 @@ public:
         {
             OwnTalk(SAY_DEATH);
             if (InstanceScript* instance = me->GetInstanceScript())
-                instance->SetData(TYPE_CHRONO_LORD_DEJA, DONE);
+                instance->SetBossState(DATA_CHRONO_LORD_DEJA, DONE);
         }
 
         void UpdateAI(uint32 diff) override

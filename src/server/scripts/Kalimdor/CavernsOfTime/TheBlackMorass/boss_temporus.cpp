@@ -91,7 +91,7 @@ public:
         {
             OwnTalk(SAY_DEATH);
             if (InstanceScript* instance = me->GetInstanceScript())
-                instance->SetData(TYPE_TEMPORUS, DONE);
+                instance->SetBossState(DATA_TEMPORUS, DONE);
         }
 
         void MoveInLineOfSight(Unit* who) override
