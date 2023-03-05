@@ -775,7 +775,7 @@ class spell_warl_life_tap : public SpellScript
             int32 spellEffect = GetEffectValue();
             int32 damage = spellEffect;
             int32 mana = int32(spellEffect + (caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.5f));
-            
+
             // Shouldn't Appear in Combat Log
             target->ModifyHealth(-damage);
 
