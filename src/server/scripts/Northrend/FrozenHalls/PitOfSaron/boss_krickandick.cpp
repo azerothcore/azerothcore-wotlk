@@ -28,19 +28,18 @@
 
 enum Yells
 {
-    SAY_AGGRO                           = 24,
-    SAY_SLAY_1                          = 25,
-    SAY_SLAY_2                          = 26,
-    SAY_ORDER_STOP                      = 27,
-    SAY_ORDER_BLOW                      = 28,
-    SAY_TARGET_1                        = 29,
-    SAY_TARGET_2                        = 30,
-    SAY_TARGET_3                        = 31,
-    EMOTE_KRICK_MINES                   = 32,
-    EMOTE_ICK_POISON                    = 33,
-};
+    // Ick
+    EMOTE_ICK_POISON_NOVA               = 0,
+    EMOTE_ICK_CHASE                     = 1,
 
-#define EMOTE_ICK_CHASING               "%s is chasing you!"
+    // Krick
+    SAY_AGGRO                           = 0,
+    SAY_SLAY                            = 1,
+    SAY_BARRAGE_1                       = 2,
+    SAY_BARRAGE_2                       = 3,
+    SAY_POISON_NOVA                     = 4,
+    SAY_CHASE                           = 5,
+};
 
 enum Spells
 {
@@ -119,11 +118,7 @@ public:
                 return;
             if (spell->Id == SPELL_PURSUIT && target->GetTypeId() == TYPEID_PLAYER)
             {
-                WorldPacket data;
-
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, EMOTE_ICK_CHASING);
-                target->ToPlayer()->GetSession()->SendPacket(&data);
-
+                Talk(EMOTE_ICK_CHASE, target);
                 AttackStart(target);
                 me->SetReactState(REACT_PASSIVE);
                 events.RescheduleEvent(EVENT_SET_REACT_AGGRESSIVE, 12000);
@@ -222,23 +217,23 @@ public:
                     {
                         case 0: // Pursuit
                             if (Creature* k = GetKrick())
-                                k->AI()->Talk(RAND(SAY_TARGET_1, SAY_TARGET_2, SAY_TARGET_3));
+                                k->AI()->Talk(SAY_CHASE);
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 70.0f, true))
                                 me->CastSpell(target, SPELL_PURSUIT, false);
                             break;
                         case 1: // Poison Nova
                             if (Creature* k = GetKrick())
                             {
-                                k->AI()->Talk(SAY_ORDER_BLOW);
-                                Talk(EMOTE_ICK_POISON);
+                                k->AI()->Talk(SAY_POISON_NOVA);
+                                Talk(EMOTE_ICK_POISON_NOVA);
                             }
                             me->CastSpell(me, SPELL_POISON_NOVA, false);
                             break;
                         case 2: // Explosive Barrage
                             if (Creature* k = GetKrick())
                             {
-                                k->AI()->Talk(SAY_ORDER_STOP);
-                                k->AI()->Talk(EMOTE_KRICK_MINES);
+                                k->AI()->Talk(SAY_BARRAGE_1);
+                                k->AI()->Talk(SAY_BARRAGE_2);
                                 k->InterruptNonMeleeSpells(false);
                                 me->InterruptNonMeleeSpells(false);
                                 k->CastSpell(k, SPELL_EXPLOSIVE_BARRAGE_KRICK, false);
@@ -270,7 +265,7 @@ public:
 
             if (who->GetTypeId() == TYPEID_PLAYER)
                 if (Creature* k = GetKrick())
-                    k->AI()->Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
+                    k->AI()->Talk(SAY_SLAY);
         }
 
         void JustSummoned(Creature*  /*summon*/) override
