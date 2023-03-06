@@ -492,15 +492,15 @@ public:
             events.Reset();
             if (me->GetEntry() == 28961) // NPC_TITANIUM_SIEGEBREAKER
             {
-                events.ScheduleEvent(EVENT_PIERCING_HOWL, 10s, + 15s);
+                events.ScheduleEvent(EVENT_PIERCING_HOWL, 10s, 25s);
                 events.ScheduleEvent(EVENT_PENETRATING_STRIKE, 5s, 10s);
-                events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 20s, 25s);
+                events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 20s, 28s);
                 events.ScheduleEvent(EVENT_BLADE_TURNING, 12s);
             }
             else
             {
-                events.ScheduleEvent(EVENT_THROW, 10s, 15s);
-                events.ScheduleEvent(EVENT_DEADLY_THROW, 15s, 20s);
+                events.ScheduleEvent(EVENT_THROW, 10s, 25s);
+                events.ScheduleEvent(EVENT_DEADLY_THROW, 15s, 30s);
                 events.ScheduleEvent(EVENT_DEFLECTION, 15s);
             }
         }
@@ -542,7 +542,7 @@ public:
             {
                 case EVENT_PIERCING_HOWL:
                     me->CastSpell(me->GetVictim(), SPELL_PIERCING_HOWL, false);
-                    events.Repeat(10s, 12s);
+                    events.Repeat(10s, 25s);
                     break;
                 case EVENT_PENETRATING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_PENETRATING_STRIKE, false);
@@ -550,7 +550,7 @@ public:
                     break;
                 case EVENT_FRIGHTENING_SHOUT:
                     me->CastSpell(me->GetVictim(), SPELL_FRIGHTENING_SHOUT, false);
-                    events.Repeat(20s, 25s);
+                    events.Repeat(20s, 28s);
                     break;
                 case EVENT_BLADE_TURNING:
                     me->CastSpell(me->GetVictim(), me->GetMap()->IsHeroic() ? SPELL_BLADE_TURNING_H : SPELL_BLADE_TURNING_N, false);
@@ -558,11 +558,11 @@ public:
                     break;
                 case EVENT_THROW:
                     me->CastSpell(SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0), me->GetMap()->IsHeroic() ? SPELL_THROW_H : SPELL_THROW_N, true);
-                    events.Repeat(10s, 15s);
+                    events.Repeat(10s, 25s);
                     break;
                 case EVENT_DEADLY_THROW:
                     me->CastSpell(SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0), me->GetMap()->IsHeroic() ? SPELL_DEADLY_THROW_H : SPELL_DEADLY_THROW_N, true);
-                    events.Repeat(15s, 20s);
+                    events.Repeat(15s, 30s);
                     break;
                 case EVENT_DEFLECTION:
                     me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_DEFLECTION_H : SPELL_DEFLECTION_N, false);

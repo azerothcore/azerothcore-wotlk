@@ -166,10 +166,10 @@ public:
             Talk(SAY_AGGRO);
 
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
-            events.ScheduleEvent(EVENT_SHIELD, 14s);
-            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 6s);
+            events.ScheduleEvent(EVENT_SHIELD, 14s, 19s);
+            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 6s, 12s);
             events.ScheduleEvent(EVENT_STATIC_CHARGE, 24s);
-            events.ScheduleEvent(EVENT_LIGHTNING_RING, 25000ms);
+            events.ScheduleEvent(EVENT_LIGHTNING_RING, 25s, 31s);
             events.ScheduleEvent(EVENT_SUMMON, 20s);
             events.ScheduleEvent(EVENT_SUMMON, 21s + 500ms);
             events.ScheduleEvent(EVENT_SUMMON_SPEACH, 20s);
@@ -246,7 +246,7 @@ public:
                 case EVENT_SHIELD:
                     {
                         me->CastSpell(me, DUNGEON_MODE(SPELL_LIGHTNING_SHIELD, SPELL_LIGHTNING_SHIELD_H), false);
-                        events.Repeat(14s);
+                        events.Repeat(14s, 19s);
                         break;
                     }
                 case EVENT_CHAIN_LIGHTNING:
@@ -254,7 +254,7 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, DUNGEON_MODE(SPELL_CHAIN_LIGHTNING, SPELL_CHAIN_LIGHTNING_H), false);
 
-                        events.Repeat(6s);
+                        events.Repeat(6s, 12s);
                         break;
                     }
                 case EVENT_STATIC_CHARGE:
@@ -268,7 +268,7 @@ public:
                 case EVENT_LIGHTNING_RING:
                     {
                         me->CastSpell(me, DUNGEON_MODE(SPELL_LIGHTNING_RING, SPELL_LIGHTNING_RING_H), false);
-                        events.Repeat(25s);
+                        events.Repeat(25s, 31s);
                         events.DelayEvents(10s); // Channel duration
                         break;
                     }

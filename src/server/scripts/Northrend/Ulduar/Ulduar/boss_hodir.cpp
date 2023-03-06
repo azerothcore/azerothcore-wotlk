@@ -488,7 +488,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_FREEZE, false);
                     }
-                    events.RescheduleEvent(EVENT_FREEZE, 1);
+                    events.RescheduleEvent(EVENT_FREEZE, 17s, 20s);
                     break;
             }
 

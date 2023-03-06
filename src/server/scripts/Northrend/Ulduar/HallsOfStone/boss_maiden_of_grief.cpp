@@ -81,8 +81,8 @@ public:
         void JustEngagedWith(Unit*  /*who*/) override
         {
             events.ScheduleEvent(EVENT_STORM, 5s);
-            events.ScheduleEvent(EVENT_SHOCK, 26s);
-            events.ScheduleEvent(EVENT_PILLAR, 12s);
+            events.ScheduleEvent(EVENT_SHOCK, 26s, 32s);
+            events.ScheduleEvent(EVENT_PILLAR, 12s, 20s);
             events.ScheduleEvent(EVENT_PARTING, 8s);
 
             Talk(SAY_AGGRO);
@@ -116,7 +116,7 @@ public:
                         me->CastSpell(me->GetVictim(), DUNGEON_MODE(SHOCK_OF_SORROW, SHOCK_OF_SORROW_H), false);
                         Talk(SAY_STUN);
 
-                        events.Repeat(16s);
+                        events.Repeat(16s, 22s);
                         break;
                     }
                 case EVENT_PILLAR:
@@ -124,7 +124,7 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), false);
 
-                        events.Repeat(12s);
+                        events.Repeat(12s, 20s);
                         break;
                     }
                 case EVENT_PARTING:
@@ -132,7 +132,7 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, PARTING_SORROW, false);
 
-                        events.Repeat(6s);
+                        events.Repeat(6s, 16s);
                         break;
                     }
             }

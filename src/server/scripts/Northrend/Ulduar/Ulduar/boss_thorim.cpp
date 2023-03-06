@@ -1672,7 +1672,7 @@ public:
                     break;
                 case EVENT_DR_EVOKER_RS:
                     me->CastSpell(me, SPELL_RUNIC_SHIELD, false);
-                    events.Repeat(1s);
+                    events.Repeat(10s);
                     break;
                 case EVENT_DR_CHAMPION_CH:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))

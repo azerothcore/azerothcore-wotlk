@@ -190,13 +190,13 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_BALL_LIGHTNING_H : SPELL_BALL_LIGHTNING_N, false);
 
-                    events.Repeat(10s, 15s);
+                    events.Repeat(10s, 11s);
                     break;
                 case EVENT_STATIC_OVERLOAD:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_H : SPELL_STATIC_OVERLOAD_N, false);
 
-                    events.Repeat(5s, 10s);
+                    events.Repeat(5s, 6s);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(HealthCheck))

@@ -197,7 +197,7 @@ public:
             events.RescheduleEvent(EVENT_BERSERK, 10min);
             if ((me->GetEntry() != NPC_LADY_BLAUMEUX && me->GetEntry() != NPC_SIR_ZELIEK))
             {
-                events.RescheduleEvent(EVENT_PRIMARY_SPELL, 10s);
+                events.RescheduleEvent(EVENT_PRIMARY_SPELL, 10s, 15s);
             }
             else
             {

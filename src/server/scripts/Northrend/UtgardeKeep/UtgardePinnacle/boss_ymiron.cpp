@@ -249,7 +249,7 @@ public:
                 case EVENT_YMIRON_FETID_ROT:
                     {
                         me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_FETID_ROT_H : SPELL_FETID_ROT_N, false);
-                        events.Repeat(10s, 15s);
+                        events.Repeat(10s, 13s);
                         break;
                     }
                 case EVENT_YMIRON_DARK_SLASH:

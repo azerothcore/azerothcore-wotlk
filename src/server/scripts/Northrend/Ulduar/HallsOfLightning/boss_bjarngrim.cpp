@@ -319,19 +319,19 @@ public:
                 ///////////////////////////////////////////////////////
                 case EVENT_BJARNGRIM_REFLECTION:
                     me->CastSpell(me, SPELL_BJARNGRIM_REFLETION, true);
-                    events.Repeat(8s);
+                    events.Repeat(8s, 9s);
                     break;
                 case EVENT_BJARNGRIM_PUMMEL:
                     me->CastSpell(me->GetVictim(), SPELL_PUMMEL, false);
-                    events.Repeat(10s);
+                    events.Repeat(10s, 11s);
                     break;
                 case EVENT_BJARNGRIM_KNOCK:
                     me->CastSpell(me, SPELL_KNOCK_AWAY, false);
-                    events.Repeat(20s);
+                    events.Repeat(20s, 21s);
                     break;
                 case EVENT_BJARNGRIM_IRONFORM:
                     me->CastSpell(me, SPELL_IRONFORM, true);
-                    events.Repeat(18s);
+                    events.Repeat(18s, 23s);
                     break;
 
                 ///////////////////////////////////////////////////////
@@ -361,7 +361,7 @@ public:
                     break;
                 case EVENT_BJARNGRIM_SLAM:
                     me->CastSpell(me->GetVictim(), SPELL_SLAM, false);
-                    events.Repeat(10s);
+                    events.Repeat(10s, 12s);
                     break;
             }
 
@@ -398,7 +398,7 @@ public:
         void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_ARC_WELD, 2s);
-            events.ScheduleEvent(EVENT_RENEW_STEEL, 10s);
+            events.ScheduleEvent(EVENT_RENEW_STEEL, 10s, 11s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -423,7 +423,7 @@ public:
                         if (bjarngrim->IsAlive())
                             me->CastSpell(bjarngrim, me->GetMap()->IsHeroic() ? SPELL_RENEW_STEEL_H : SPELL_RENEW_STEEL_N, true);
 
-                    events.Repeat(10s, 15s);
+                    events.Repeat(10s, 14s);
                     break;
             }
 

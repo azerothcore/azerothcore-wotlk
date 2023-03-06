@@ -125,24 +125,24 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, DUNGEON_MODE(BOULDER_TOSS, BOULDER_TOSS_H), false);
 
-                        events.Repeat(5s);
+                        events.Repeat(5s, 7s);
                         break;
                     }
                 case EVENT_GROUND_SPIKE:
                     {
                         me->CastSpell(me->GetVictim(), GROUND_SPIKE_H, false); // current enemy target
-                        events.Repeat(8s);
+                        events.Repeat(8s, 11s);
                         break;
                     }
                 case EVENT_STOMP:
                     {
                         me->CastSpell(me, DUNGEON_MODE(STOMP, STOMP_H), false);
-                        events.Repeat(13s);
+                        events.Repeat(13s, 18s);
                         break;
                     }
                 case EVENT_GROUND_SLAM:
                     {
-                        events.Repeat(10s);
+                        events.Repeat(10s, 13s);
                         me->CastSpell(me->GetVictim(), GROUND_SLAM, true);
                         events.DelayEvents(10s);
                         events.RescheduleEvent(EVENT_SHATTER, 8s);
