@@ -16500,7 +16500,7 @@ void bot_ai::TeleportHome()
     GetHomePosition(mapid, &pos);
 
     Map* map = sMapMgr->CreateBaseMap(mapid);
-    ASSERT(!map->Instanceable(), map->GetDebugInfo());
+    ASSERT(map && !map->Instanceable());
     BotMgr::TeleportBot(me, map, &pos);
 
     spawned = false;
