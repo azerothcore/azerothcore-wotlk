@@ -36,14 +36,6 @@ enum Enums
     SPELL_BANISH_DRAGON_HELPER  = 31550
 };
 
-enum Events
-{
-    EVENT_SANDBREATH            = 1,
-    EVENT_TIMESTOP              = 2,
-    EVENT_FRENZY                = 3,
-    EVENT_CLEAVE                = 4
-};
-
 struct boss_aeonus : public BossAI
 {
     boss_aeonus(Creature* creature) : BossAI(creature, DATA_AEONUS) { }
@@ -54,7 +46,7 @@ struct boss_aeonus : public BossAI
         {
             if (me->GetDistance2d(medivh) < 20.0f)
             {
-                me->CastSpell(me, SPELL_CORRUPT_MEDIVH, false);
+                DoCastAOE(SPELL_CORRUPT_MEDIVH);
             }
         }
     }
@@ -72,12 +64,26 @@ struct boss_aeonus : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        events.ScheduleEvent(EVENT_CLEAVE, 5000);
-        events.ScheduleEvent(EVENT_SANDBREATH, 20000);
-        events.ScheduleEvent(EVENT_TIMESTOP, 15000);
-        events.ScheduleEvent(EVENT_FRENZY, 30000);
-
         Talk(SAY_AGGRO);
+
+        scheduler.Schedule(5s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CLEAVE);
+            context.Repeat(10s);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_SAND_BREATH);
+            context.Repeat(20s);
+        }).Schedule(15s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_TIME_STOP);
+            context.Repeat(25s);
+        }).Schedule(30s, [this](TaskContext context)
+        {
+            Talk(EMOTE_FRENZY);
+            DoCastSelf(SPELL_ENRAGE);
+            context.Repeat(30s);
+        });
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -87,7 +93,7 @@ struct boss_aeonus : public BossAI
             if (me->IsWithinDistInMap(who, 20.0f))
             {
                 Talk(SAY_BANISH);
-                me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
+                DoCastAOE(SPELL_BANISH_DRAGON_HELPER, true);
                 return;
             }
         }
@@ -103,41 +109,10 @@ struct boss_aeonus : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
-            Talk(SAY_SLAY);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
+        if (victim->IsPlayer())
         {
-        case EVENT_CLEAVE:
-            me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
-            events.ScheduleEvent(EVENT_CLEAVE, 10000);
-            break;
-        case EVENT_SANDBREATH:
-            me->CastSpell(me->GetVictim(), SPELL_SAND_BREATH, false);
-            events.ScheduleEvent(EVENT_SANDBREATH, 20000);
-            break;
-        case EVENT_TIMESTOP:
-            me->CastSpell(me, SPELL_TIME_STOP, false);
-            events.ScheduleEvent(EVENT_TIMESTOP, 25000);
-            break;
-        case EVENT_FRENZY:
-            Talk(EMOTE_FRENZY);
-            me->CastSpell(me, SPELL_ENRAGE, false);
-            events.ScheduleEvent(EVENT_FRENZY, 30000);
-            break;
+            Talk(SAY_SLAY);
         }
-
-        DoMeleeAttackIfReady();
     }
 };
 
