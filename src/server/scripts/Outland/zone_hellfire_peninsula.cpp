@@ -396,12 +396,13 @@ public:
     {
         go_beaconAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
 
+        std::list<Creature*> creatureList;
+
         void OnStateChanged(uint32 state, Unit*  /*unit*/) override
         {
-            std::list<Creature*> creatureList;
-            me->GetCreaturesWithEntryInRange(creatureList, 40, NPC_STONESCHYE_WHELP);
             if (state == GO_ACTIVATED)
             {
+                me->GetCreaturesWithEntryInRange(creatureList, 40, NPC_STONESCHYE_WHELP);
                 {
                     uint8 i = 0;
                     for (Creature* whelp : creatureList)
