@@ -92,6 +92,9 @@ void WorldSession::HandleMoveWorldportAck()
     if (!newMap || newMap->CannotEnter(GetPlayer(), false))
     {
         LOG_ERROR("network.opcode", "Map {} could not be created for player {}, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUID().ToString());
+        GetPlayer()->ResetMap();
+        GetPlayer()->SetMap(oldMap);
+        GetPlayer()->GetMap()->AddPlayerToMap(GetPlayer());
         GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->m_homebindO);
         return;
     }
