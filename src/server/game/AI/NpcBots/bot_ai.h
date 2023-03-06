@@ -9,6 +9,7 @@
 #include "Position.h"
 
 #include <tuple>
+#include <unordered_set>
 
 /*
 NpcBot System by Trickerer (onlysuffering@gmail.com)
@@ -43,7 +44,7 @@ class bot_ai : public CreatureAI
 
         bool canUpdate;
 
-        void InitializeAI() override { Reset(); }
+        void InitializeAI() override;
         //void Reset() override { }
 
         void JustDied(Unit*) override;
@@ -154,6 +155,15 @@ class bot_ai : public CreatureAI
         bool IsInHeroicOrRaid() const;
 
         bool IAmFree() const;
+
+        //wandering bots
+        bool IsWanderer() const { return _wanderer; }
+        void SetWanderer() { if (IAmFree()) _wanderer = true; }
+        uint32 GetTravelNodeCur() const { return _travel_node_cur; }
+        uint32 GetTravelNodeLast() const { return _travel_node_last; }
+        void SetTravelNodeCur(uint32 nodeId) { _travel_node_cur = nodeId; }
+        void SetTravelNodeLast(uint32 nodeId) { _travel_node_last = nodeId; }
+        uint32 GetNextTravelNode(Position& pos) const;
 
         static bool CCed(Unit const* target, bool root = false);
 
@@ -556,13 +566,15 @@ class bot_ai : public CreatureAI
         void _autoLootCreatureItems(Player* receiver, Creature* creature, uint32 lootQualityMask, uint32 lootThreshold) const;
         void _autoLootCreature(Creature* creature);
 
+        bool _canGenerateEquipmentInSlot(uint8 slot, bool empty_only = false) const;
         bool _canUseOffHand() const;
         bool _canUseRanged() const;
         bool _canUseRelic() const;
-        bool _canEquip(Item const* newItem, uint8 slot, bool ignoreItemLevel = false) const;
+        bool _canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItemLevel, Item const* newItem = nullptr) const;
         bool _unequip(uint8 slot, ObjectGuid receiver);
         bool _equip(uint8 slot, Item* newItem, ObjectGuid receiver);
         bool _resetEquipment(uint8 slot, ObjectGuid receiver);
+        void _generateGear();
 
         void _castBotItemUseSpell(Item const* item, SpellCastTargets const& targets/*, uint8 cast_count = 0, uint32 glyphIndex = 0*/);
 
@@ -595,13 +607,13 @@ class bot_ai : public CreatureAI
         float _getRatingMultiplier(CombatRating cr) const;
 
         float _getStatScore(uint8 stat) const;
-        float _getItemGearScore(Item const* item, uint8 forslot) const;
+        float _getItemGearScore(ItemTemplate const* iproto, uint8 forslot, Item const* item) const;
 
         void _saveStats();
 
         PlayerClassLevelInfo* _classinfo;
         SpellInfo const* m_botSpellInfo;
-        Position movepos, attackpos, sendlastpos;
+        Position homepos, movepos, attackpos, sendlastpos;
         Position sendpos[MAX_SEND_POINTS];
 
         uint32 _botCommandState;
@@ -618,6 +630,7 @@ class bot_ai : public CreatureAI
         uint32 _wmoAreaUpdateTimer;
         uint32 waitTimer;
         uint32 itemsAutouseTimer;
+        uint32 evadeDelayTimer;
         //save timers
         uint32 _saveDisabledSpellsTimer;
 
@@ -634,6 +647,13 @@ class bot_ai : public CreatureAI
         bool firstspawn;
         bool _evadeMode;
         bool _atHome;
+
+        //wandering bots
+        bool _wanderer;
+        uint8 _baseLevel;
+        uint32 _travel_node_last;
+        uint32 _travel_node_cur;
+        std::unordered_set<BotEquipSlot> _equipsSlotsToGenerate;
 
         float _energyFraction;
 

@@ -14502,7 +14502,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
 
     //npcbot: CvC case fix for bots
     if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) &&
-        (IsNPCBotOrPet() || target->IsNPCBotOrPet()))
+        ((IsNPCBotOrPet() && !ToCreature()->IsFreeBot()) || (target->IsNPCBotOrPet() && !target->ToCreature()->IsFreeBot())))
         return GetReactionTo(target) <= REP_NEUTRAL || target->GetReactionTo(this) <= REP_NEUTRAL;
     //end npcbot
 

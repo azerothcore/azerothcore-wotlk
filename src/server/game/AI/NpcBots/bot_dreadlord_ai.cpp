@@ -164,7 +164,7 @@ public:
 
             checkAuraTimer = 10000;
 
-            if (!IAmFree() && !me->HasAura(VAMPIRIC_AURA, me->GetGUID()))
+            if (!me->HasAura(VAMPIRIC_AURA, me->GetGUID()))
                 RefreshAura(VAMPIRIC_AURA);
         }
 

@@ -128,6 +128,7 @@ public:
 
         void Reset() override
         {
+            liveTimer = 0;
         }
 
         void InitPetSpells() override

@@ -95,6 +95,7 @@ class AC_GAME_API BotMgr
         static uint8 GetNoDPSTargetIconFlags();
         static uint32 GetBaseUpdateDelay();
         static uint32 GetOwnershipExpireTime();
+        static uint32 GetDesiredWanderingBotsCount();
         static float GetBotStatLimitDodge();
         static float GetBotStatLimitParry();
         static float GetBotStatLimitBlock();

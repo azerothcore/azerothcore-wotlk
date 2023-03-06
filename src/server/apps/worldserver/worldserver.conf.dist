@@ -4462,6 +4462,17 @@ NpcBot.OwnershipExpireTime = 0
 #                     0 - (Disabled)
 
 NpcBot.EnrageOnDismiss = 1
+ 
+#
+#    NpcBot.DesiredWanderingBotsCount
+#        Description: Number of free wandering bots to generate. Wandering bots, well, wander
+#                     around the map looking for trouble. Names and visuals are cloned from
+#                     existing non-spawned bots. Wandering bots aren't saved in DB.
+#        Note:        Wandering bots keep grids loaded, increasing CPU and memory usage.
+#        Note2:       You must have at least this number of non-spawned bots in creature_template.
+#        Default:     0  - (Disabled)
+
+NpcBot.DesiredWanderingBotsCount = 0
 
 #
 ###################################################################################################

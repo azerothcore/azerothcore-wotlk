@@ -1974,7 +1974,7 @@ bool bot_pet_ai::Wait()
         return true;
 
     if (IAmFree())
-        waitTimer = me->IsInCombat() ? 500 : ((__rand + 100) * 50);
+        waitTimer = me->IsInCombat() ? 500 : ((__rand + 100) * 20);
     else if (!me->GetMap()->IsRaid())
         waitTimer = std::min<uint32>(uint32(50 * (petOwner->GetBotOwner()->GetNpcBotsCount() - 1) + __rand + __rand), 500);
     else
@@ -2101,6 +2101,7 @@ void bot_pet_ai::IsSummonedBy(WorldObject* summoner)
     myType = me->GetEntry();
     //myType = petOwner->GetBotAI()->GetAIMiscValue(BOTAI_MISC_PET_TYPE);
     //ASSERT(myType);
+    me->setActive(true);
     ASSERT(!me->GetBotAI());
     ASSERT(!me->GetBotPetAI());
     me->SetBotPetAI(this);
