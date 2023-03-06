@@ -21,11 +21,11 @@
 #include "ScriptMgr.h"
 #include "old_hillsbrad.h"
 
-const Position instancePositions[INSTANCE_POSITIONS_COUNT] =
+static Position const instancePositions[INSTANCE_POSITIONS_COUNT] =
 {
-    {2188.18f, 228.90f, 53.025f, 1.77f},    // Orcs Gather Point 1
-    {2103.23f, 93.55f, 53.096f, 3.78f},     // Orcs Gather Point 2
-    {2128.43f, 71.01f, 64.42f, 1.74f}       // Lieutenant Drake Summon Position
+    { 2188.18f, 228.90f, 53.025f, 1.77f },    // Orcs Gather Point 1
+    { 2103.23f, 93.550f, 53.096f, 3.78f },    // Orcs Gather Point 2
+    { 2172.76f, 149.54f, 87.981f, 4.19f }     // Lieutenant Drake Summon Position
 };
 
 const Position thrallPositions[THRALL_POSITIONS_COUNT] =
@@ -248,11 +248,8 @@ public:
                 case EVENT_SUMMON_LIEUTENANT:
                     {
                         instance->LoadGrid(instancePositions[2].GetPositionX(), instancePositions[2].GetPositionY());
-                        if (Creature* drake = instance->SummonCreature(NPC_LIEUTENANT_DRAKE, instancePositions[2]))
-                        {
-                            drake->AI()->Talk(0);
-                        }
-                        [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                        instance->SummonCreature(NPC_LIEUTENANT_DRAKE, instancePositions[2]);
+                        break;
                     }
                 case EVENT_THRALL_REPOSITION:
                     {
