@@ -837,7 +837,7 @@ public:
                     break;
                 case EVENT_SCENE_0+2:
                     DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_MOVE_STRAIGHT, -27);
-                    DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_DESPAWN, 20s);
+                    DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_DESPAWN, 20000);
                     events.ScheduleEvent(EVENT_SCENE_0 + 3, 2s);
                     break;
                 case EVENT_SCENE_0+3:
