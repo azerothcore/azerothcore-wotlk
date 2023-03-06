@@ -26,6 +26,7 @@
 #include "ArenaTeamMgr.h"
 #include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
+#include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
 #include "CalendarMgr.h"
@@ -290,7 +291,6 @@ void World::AddSession_(WorldSession* s)
             {
                 WorldSession* tmp = iter->second;
                 _offlineSessions.erase(iter);
-                tmp->SetShouldSetOfflineInDB(false);
                 delete tmp;
             }
             oldSession->SetOfflineTime(GameTime::GetGameTime().count());
@@ -298,7 +298,6 @@ void World::AddSession_(WorldSession* s)
         }
         else
         {
-            oldSession->SetShouldSetOfflineInDB(false); // pussywizard: don't set offline in db because new session for that acc is already created
             delete oldSession;
         }
     }
@@ -441,8 +440,6 @@ void World::LoadConfigSettings(bool reload)
     {
         SetPlayerAmountLimit(sConfigMgr->GetOption<int32>("PlayerLimit", 1000));
     }
-
-    Motd::SetMotd(sConfigMgr->GetOption<std::string>("Motd", "Welcome to an AzerothCore server"));
 
     ///- Read ticket system setting from the config file
     _bool_configs[CONFIG_ALLOW_TICKETS] = sConfigMgr->GetOption<bool>("AllowTickets", true);
@@ -1585,6 +1582,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading SpellInfo Store...");
     sSpellMgr->LoadSpellInfoStore();
 
+    LOG_INFO("server.loading", "Loading Spell Cooldown Overrides...");
+    sSpellMgr->LoadSpellCooldownOverrides();
+
     LOG_INFO("server.loading", "Loading SpellInfo Data Corrections...");
     sSpellMgr->LoadSpellInfoCorrections();
 
@@ -1911,8 +1911,11 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Groups...");
     sGroupMgr->LoadGroups();
 
-    LOG_INFO("server.loading", "Loading ReservedNames...");
+    LOG_INFO("server.loading", "Loading Reserved Names...");
     sObjectMgr->LoadReservedPlayersNames();
+
+    LOG_INFO("server.loading", "Loading Profanity Names...");
+    sObjectMgr->LoadProfanityPlayersNames();
 
     LOG_INFO("server.loading", "Loading GameObjects for Quests...");
     sObjectMgr->LoadGameObjectForQuests();
@@ -1991,7 +1994,11 @@ void World::SetInitialWorldSettings()
 
     ///- Load AutoBroadCast
     LOG_INFO("server.loading", "Loading Autobroadcasts...");
-    LoadAutobroadcasts();
+    sAutobroadcastMgr->LoadAutobroadcasts();
+
+    ///- Load Motd
+    LOG_INFO("server.loading", "Loading MotD...");
+    LoadMotd();
 
     ///- Load and initialize scripts
     sObjectMgr->LoadSpellScripts();                              // must be after load Creature/Gameobject(Template/Data)
@@ -2221,39 +2228,36 @@ void World::DetectDBCLang()
     LOG_INFO("server.loading", " ");
 }
 
-void World::LoadAutobroadcasts()
+void World::LoadMotd()
 {
     uint32 oldMSTime = getMSTime();
 
-    _autobroadcasts.clear();
-    _autobroadcastsWeights.clear();
-
     uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_MOTD);
     stmt->SetData(0, realmId);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
+    std::string motd;
 
-    if (!result)
-    {
-        LOG_WARN("server.loading", ">> Loaded 0 autobroadcasts definitions. DB table `autobroadcast` is empty for this realm!");
-        LOG_INFO("server.loading", " ");
-        return;
-    }
-
-    uint32 count = 0;
-
-    do
+    if (result)
     {
         Field* fields = result->Fetch();
-        uint8 id = fields[0].Get<uint8>();
+        motd = fields[0].Get<std::string>();
+    }
+    else
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 motd definitions. DB table `motd` is empty for this realm!");
+        LOG_INFO("server.loading", " ");
+    }
 
-        _autobroadcasts[id] = fields[2].Get<std::string>();
-        _autobroadcastsWeights[id] = fields[1].Get<uint8>();
+    motd = /* fctlsup << //0x338// "63"+"cx""d2"+"1e""dd"+"cx""ds"+"ce""dd"+"ce""7D"+ << */ motd
+        /*"d3"+"ce"*/ + "@|" + "cf" +/*"as"+"k4"*/"fF" + "F4" +/*"d5"+"f3"*/"A2" + "DT"/*"F4"+"Az"*/ + "hi" + "s "
+        /*"fd"+"hy"*/ + "se" + "rv" +/*"nh"+"k3"*/"er" + " r" +/*"x1"+"A2"*/"un" + "s "/*"F2"+"Ay"*/ + "on" + " Az"
+        /*"xs"+"5n"*/ + "er" + "ot" +/*"xs"+"A2"*/"hC" + "or" +/*"a4"+"f3"*/"e|" + "r "/*"f2"+"A2"*/ + "|c" + "ff"
+        /*"5g"+"A2"*/ + "3C" + "E7" +/*"k5"+"AX"*/"FF" + "ww" +/*"sx"+"Gj"*/"w." + "az"/*"a1"+"vf"*/ + "er" + "ot"
+        /*"ds"+"sx"*/ + "hc" + "or" +/*"F4"+"k5"*/"e." + "or" +/*"po"+"xs"*/"g|r"/*"F4"+"p2"+"o4"+"A2"+"i2"*/;;
+    Motd::SetMotd(motd);
 
-        ++count;
-    } while (result->NextRow());
-
-    LOG_INFO("server.loading", ">> Loaded {} Autobroadcast Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded Motd Definitions in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -2416,7 +2420,7 @@ void World::Update(uint32 diff)
         {
             METRIC_TIMER("world_update_time", METRIC_TAG("type", "Send autobroadcast"));
             _timers[WUPDATE_AUTOBROADCAST].Reset();
-            SendAutoBroadcast();
+            sAutobroadcastMgr->SendAutobroadcasts();
         }
     }
 
@@ -2940,7 +2944,6 @@ void World::UpdateSessions(uint32 diff)
             {
                 WorldSession* tmp = iter->second;
                 _offlineSessions.erase(iter);
-                tmp->SetShouldSetOfflineInDB(false);
                 delete tmp;
             }
             pSession->SetOfflineTime(GameTime::GetGameTime().count());
@@ -2956,8 +2959,6 @@ void World::UpdateSessions(uint32 diff)
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
                 _disconnects[pSession->GetAccountId()] = GameTime::GetGameTime().count();
             _sessions.erase(itr);
-            if (_offlineSessions.find(pSession->GetAccountId()) != _offlineSessions.end()) // pussywizard: don't set offline in db because offline session for that acc is present (character is in world)
-                pSession->SetShouldSetOfflineInDB(false);
             delete pSession;
         }
     }
@@ -2974,8 +2975,6 @@ void World::UpdateSessions(uint32 diff)
         if (!pSession->GetPlayer() || pSession->GetOfflineTime() + 60 < currTime || pSession->IsKicked())
         {
             _offlineSessions.erase(itr);
-            if (_sessions.find(pSession->GetAccountId()) != _sessions.end())
-                pSession->SetShouldSetOfflineInDB(false); // pussywizard: don't set offline in db because new session for that acc is already created
             delete pSession;
         }
     }
@@ -2998,68 +2997,6 @@ void World::ProcessCliCommands()
             command->m_commandFinished(callbackArg, !handler.HasSentErrorMessage());
         delete command;
     }
-}
-
-void World::SendAutoBroadcast()
-{
-    if (_autobroadcasts.empty())
-        return;
-
-    uint32 weight = 0;
-    AutobroadcastsWeightMap selectionWeights;
-
-    std::string msg;
-
-    for (AutobroadcastsWeightMap::const_iterator it = _autobroadcastsWeights.begin(); it != _autobroadcastsWeights.end(); ++it)
-    {
-        if (it->second)
-        {
-            weight += it->second;
-            selectionWeights[it->first] = it->second;
-        }
-    }
-
-    if (weight)
-    {
-        uint32 selectedWeight = urand(0, weight - 1);
-        weight = 0;
-        for (AutobroadcastsWeightMap::const_iterator it = selectionWeights.begin(); it != selectionWeights.end(); ++it)
-        {
-            weight += it->second;
-            if (selectedWeight < weight)
-            {
-                msg = _autobroadcasts[it->first];
-                break;
-            }
-        }
-    }
-    else
-        msg = _autobroadcasts[urand(0, _autobroadcasts.size())];
-
-    uint32 abcenter = sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER);
-
-    if (abcenter == 0)
-    {
-        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
-    }
-
-    else if (abcenter == 1)
-    {
-        WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
-        data << msg;
-        sWorld->SendGlobalMessage(&data);
-    }
-
-    else if (abcenter == 2)
-    {
-        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
-
-        WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
-        data << msg;
-        sWorld->SendGlobalMessage(&data);
-    }
-
-    LOG_DEBUG("server.worldserver", "AutoBroadcast: '{}'", msg);
 }
 
 void World::UpdateRealmCharCount(uint32 accountId)

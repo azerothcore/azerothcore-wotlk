@@ -22,33 +22,8 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 
-enum medivhSays
-{
-    SAY_ENTER                   = 0,
-    SAY_DEATH                   = 5,
-    SAY_WIN                     = 6,
-    SAY_ORCS_ENTER              = 7,
-
-    SAY_ORCS_ANSWER             = 0
-};
-
-enum medivhSpells
-{
-    SPELL_MANA_SHIELD           = 31635,
-    SPELL_MEDIVH_CHANNEL        = 31556,
-    SPELL_BLACK_CRYSTAL         = 32563,
-    SPELL_PORTAL_CRYSTALS       = 32564,
-    SPELL_BANISH_PURPLE         = 32566,
-    SPELL_BANISH_GREEN          = 32567,
-
-    SPELL_CORRUPT               = 31326,
-    SPELL_CORRUPT_AEONUS        = 37853,
-};
-
 enum medivhMisc
 {
-    NPC_DP_EMITTER_STALKER      = 18582,
-    NPC_DP_CRYSTAL_STALKER      = 18553,
     NPC_SHADOW_COUNCIL_ENFORCER = 17023,
     GO_DARK_PORTAL              = 185103,
 
@@ -116,16 +91,16 @@ struct npc_medivh_bm : public ScriptedAI
         events.Reset();
         me->CastSpell(me, SPELL_MANA_SHIELD, true);
 
-        if (_instance->GetData(TYPE_AEONUS) != DONE)
+        if (_instance->GetBossState(DATA_AEONUS) != DONE)
         {
             me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
         }
+
+        me->SetImmuneToNPC(false);
     }
 
     void JustSummoned(Creature* summon) override
     {
-        _instance->SetGuidData(DATA_SUMMONED_NPC, summon->GetGUID());
-
         if (summon->GetEntry() == NPC_DP_CRYSTAL_STALKER)
         {
             summon->DespawnOrUnsummon(25000);
@@ -142,21 +117,16 @@ struct npc_medivh_bm : public ScriptedAI
         }
     }
 
-    void SummonedCreatureDespawn(Creature* summon) override
-    {
-        _instance->SetGuidData(DATA_DELETED_NPC, summon->GetGUID());
-    }
-
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!events.Empty() || _instance->GetData(TYPE_AEONUS) == DONE)
+        if (!events.Empty() || _instance->GetBossState(DATA_AEONUS) == DONE)
         {
             return;
         }
 
         if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 20.0f))
         {
-            Talk(SAY_ENTER);
+            Talk(SAY_MEDIVH_ENTER);
             _instance->SetData(DATA_MEDIVH, 1);
 
             me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
@@ -189,7 +159,6 @@ struct npc_medivh_bm : public ScriptedAI
     {
         me->SetRespawnTime(DAY);
         events.Reset();
-        Talk(SAY_DEATH);
     }
 
     void UpdateAI(uint32 diff) override
@@ -216,7 +185,7 @@ struct npc_medivh_bm : public ScriptedAI
                 break;
             case EVENT_OUTRO_1:
                 me->SetFacingTo(6.21f);
-                Talk(SAY_WIN);
+                Talk(SAY_MEDIVH_WIN);
                 events.ScheduleEvent(EVENT_OUTRO_2, 17000);
                 break;
             case EVENT_OUTRO_2:
@@ -240,14 +209,14 @@ struct npc_medivh_bm : public ScriptedAI
                 events.ScheduleEvent(EVENT_OUTRO_7, 7000);
                 break;
             case EVENT_OUTRO_7:
-                Talk(SAY_ORCS_ENTER);
+                Talk(SAY_MEDIVH_ORCS_ENTER);
                 events.ScheduleEvent(EVENT_OUTRO_8, 7000);
                 break;
             case EVENT_OUTRO_8:
                 if (Creature* cr = me->FindNearestCreature(NPC_SHADOW_COUNCIL_ENFORCER, 20.0f))
                 {
                     cr->SetFacingTo(3.07f);
-                    cr->AI()->Talk(SAY_ORCS_ANSWER);
+                    cr->AI()->Talk(SAY_MEDIVH_ORCS_ANSWER);
                 }
                 break;
         }
@@ -298,9 +267,12 @@ struct npc_time_rift : public NullCreatureAI
         events.ScheduleEvent(EVENT_CHECK_DEATH, 8000);
     }
 
-    void SetGUID(ObjectGuid guid, int32) override
+    void JustSummoned(Creature* creature) override
     {
-        _riftKeeperGUID = guid;
+        if (creature->GetEntry() != NPC_AEONUS)
+        {
+            _riftKeeperGUID = creature->GetGUID();
+        }
     }
 
     void DoSummonAtRift(uint32 entry)
@@ -308,16 +280,15 @@ struct npc_time_rift : public NullCreatureAI
         Position pos = me->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
 
         if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 150000))
-            if (_instance)
+        {
+            if (Creature* medivh = _instance->GetCreature(DATA_MEDIVH))
             {
-                if (Unit* medivh = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_MEDIVH)))
-                {
-                    float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
-                    summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * std::sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
-                    summon->GetMotionMaster()->MoveTargetedHome(true);
-                    summon->SetReactState(REACT_DEFENSIVE);
-                }
+                float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
+                summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * std::sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
+                summon->GetMotionMaster()->MoveTargetedHome(true);
+                summon->SetReactState(REACT_DEFENSIVE);
             }
+        }
     }
 
     void DoSelectSummon()
@@ -350,8 +321,6 @@ struct npc_time_rift : public NullCreatureAI
                     Creature* riftKeeper = ObjectAccessor::GetCreature(*me, _riftKeeperGUID);
                     if (!riftKeeper || !riftKeeper->IsAlive())
                     {
-                        _instance->SetData(DATA_RIFT_KILLED, 1);
-
                         me->DespawnOrUnsummon(0);
                         break;
                     }

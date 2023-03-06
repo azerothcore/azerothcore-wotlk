@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "sethekk_halls.h"
 
 enum TailonkingIkiss
@@ -26,308 +27,150 @@ enum TailonkingIkiss
     SAY_SLAY                    = 2,
     SAY_DEATH                   = 3,
     EMOTE_ARCANE_EXP            = 4,
+};
 
+enum Spells
+{
     SPELL_BLINK                 = 38194,
     SPELL_BLINK_TELEPORT        = 38203,
     SPELL_MANA_SHIELD           = 38151,
     SPELL_ARCANE_BUBBLE         = 9438,
     SPELL_SLOW                  = 35032,
-    SPELL_POLYMORPH_N           = 38245, // Difficulty data
-    SPELL_POLYMORPH_H           = 43309,
-    SPELL_ARCANE_VOLLEY_N       = 35059, // Difficulty data
-    SPELL_ARCANE_VOLLEY_H       = 40424,
-    SPELL_ARCANE_EXPLOSION_N    = 38197, // Difficulty data
-    SPELL_ARCANE_EXPLOSION_H    = 40425,
-
-    EVENT_SPELL_BLINK           = 1,
-    EVENT_SPELL_POLYMORPH       = 2,
-    EVENT_SPELL_SLOW            = 3,
-    EVENT_SPELL_ARCANE_VOLLEY   = 4,
-    EVENT_SPELL_ARCANE_EXPLO    = 5,
-    EVENT_HEALTH_CHECK          = 6,
-    EVENT_SPELL_BLINK_2         = 7
+    SPELL_POLYMORPH             = 38245,
+    SPELL_ARCANE_VOLLEY         = 35059,
+    SPELL_ARCANE_EXPLOSION      = 38197,
 };
 
-class boss_talon_king_ikiss : public CreatureScript
+struct boss_talon_king_ikiss : public BossAI
 {
-public:
-    boss_talon_king_ikiss() : CreatureScript("boss_talon_king_ikiss") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_talon_king_ikiss(Creature* creature) : BossAI(creature, DATA_IKISS), _spoken(false), _manaShield(false)
     {
-        return GetSethekkHallsAI<boss_talon_king_ikissAI>(creature);
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
-    struct boss_talon_king_ikissAI : public ScriptedAI
+    void Reset() override
     {
-        boss_talon_king_ikissAI(Creature* creature) : ScriptedAI(creature)
+        _Reset();
+        _spoken = false;
+        _manaShield = false;
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_spoken && who->IsPlayer())
         {
+            Talk(SAY_INTRO);
+            _spoken = true;
         }
 
-        EventMap events;
+        ScriptedAI::MoveInLineOfSight(who);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+
+        scheduler.Schedule(35s, [this](TaskContext context)
+        {
+            me->InterruptNonMeleeSpells(false);
+            DoCastAOE(SPELL_BLINK);
+            Talk(EMOTE_ARCANE_EXP);
+            context.Repeat(35s, 40s);
+
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
+            });
+        }).Schedule(5s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_ARCANE_VOLLEY);
+            context.Repeat(7s, 12s);
+        }).Schedule(8s, [this](TaskContext context)
+        {
+            IsHeroic() ? DoCastRandomTarget(SPELL_POLYMORPH) : DoCastMaxThreat(SPELL_POLYMORPH);
+            context.Repeat(15s, 17500ms);
+        });
+
+        if (IsHeroic())
+        {
+            scheduler.Schedule(15s, 25s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_SLOW);
+                context.Repeat(15s, 30s);
+            });
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
+
+        if (GameObject* coffer = instance->GetGameObject(DATA_GO_TALON_KING_COFFER))
+        {
+            coffer->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE | GO_FLAG_INTERACT_COND);
+        }
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (!_manaShield && me->HealthBelowPctDamaged(20, damage))
+        {
+            DoCast(me, SPELL_MANA_SHIELD);
+            _manaShield = true;
+        }
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if (urand(0, 1))
+            Talk(SAY_SLAY);
+    }
+
+    private:
         bool _spoken;
-
-        void Reset() override
-        {
-            _spoken = false;
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!_spoken && who->GetTypeId() == TYPEID_PLAYER)
-            {
-                Talk(SAY_INTRO);
-                _spoken = true;
-            }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_SPELL_BLINK, 35000);
-            events.ScheduleEvent(EVENT_SPELL_ARCANE_VOLLEY, 5000);
-            events.ScheduleEvent(EVENT_SPELL_POLYMORPH, 8000);
-            events.ScheduleEvent(EVENT_HEALTH_CHECK, 2000);
-            if (IsHeroic())
-                events.ScheduleEvent(EVENT_SPELL_SLOW, urand(15000, 25000));
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-
-            if (InstanceScript* instance = me->GetInstanceScript())
-                instance->SetData(DATA_IKISSDOOREVENT, DONE);
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            if (urand(0, 1))
-                Talk(SAY_SLAY);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_ARCANE_VOLLEY:
-                    me->CastSpell(me, SPELL_ARCANE_VOLLEY_N, false);
-                    events.RepeatEvent(urand(7000, 12000));
-                    break;
-                case EVENT_SPELL_POLYMORPH:
-                    if (Unit* target = (IsHeroic() ? SelectTarget(SelectTargetMethod::Random, 0) : SelectTarget(SelectTargetMethod::MaxThreat, 1)))
-                        me->CastSpell(target, SPELL_POLYMORPH_N, false);
-                    events.RepeatEvent(urand(15000, 17500));
-                    break;
-                case EVENT_SPELL_SLOW:
-                    me->CastSpell(me, SPELL_SLOW, false);
-                    events.RepeatEvent(urand(15000, 30000));
-                    break;
-                case EVENT_HEALTH_CHECK:
-                    if (me->HealthBelowPct(20))
-                    {
-                        me->CastSpell(me, SPELL_MANA_SHIELD, false);
-                        return;
-                    }
-                    events.RepeatEvent(1000);
-                    break;
-                case EVENT_SPELL_BLINK:
-                    Talk(EMOTE_ARCANE_EXP);
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    {
-                        me->CastSpell(target, SPELL_BLINK, false);
-                        me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
-
-                        DoCast(target, SPELL_BLINK_TELEPORT);
-                    }
-                    events.RepeatEvent(urand(35000, 40000));
-                    events.DelayEvents(500);
-                    events.ScheduleEvent(EVENT_SPELL_BLINK_2, 0);
-                    return;
-                case EVENT_SPELL_BLINK_2:
-                    me->CastSpell(me, SPELL_ARCANE_EXPLOSION_N, false);
-                    me->CastSpell(me, SPELL_ARCANE_BUBBLE, true);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        bool _manaShield;
 };
 
-enum Anzu
+// 38194 - Blink
+class spell_talon_king_ikiss_blink : public SpellScript
 {
-    SAY_ANZU_INTRO1             = 0,
-    SAY_ANZU_INTRO2             = 1,
-    SAY_SUMMON                  = 2,
+    PrepareSpellScript(spell_talon_king_ikiss_blink);
 
-    SPELL_PARALYZING_SCREECH    = 40184,
-    SPELL_SPELL_BOMB            = 40303,
-    SPELL_CYCLONE               = 40321,
-    SPELL_BANISH_SELF           = 42354,
-    SPELL_SHADOWFORM            = 40973,
-
-    EVENT_SPELL_SCREECH         = 1,
-    EVENT_SPELL_BOMB            = 2,
-    EVENT_SPELL_CYCLONE         = 3,
-    EVENT_ANZU_HEALTH1          = 4,
-    EVENT_ANZU_HEALTH2          = 5
-};
-
-class boss_anzu : public CreatureScript
-{
-public:
-    boss_anzu() : CreatureScript("boss_anzu") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return GetSethekkHallsAI<boss_anzuAI>(creature);
+        return sSpellMgr->GetSpellInfo(SPELL_BLINK);
     }
 
-    struct boss_anzuAI : public ScriptedAI
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        boss_anzuAI(Creature* creature) : ScriptedAI(creature), summons(me)
+        uint8 maxSize = 1;
+        if (targets.size() > maxSize)
         {
-            talkTimer = 1;
-            me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
-            me->AddAura(SPELL_SHADOWFORM, me);
+            Acore::Containers::RandomResize(targets, maxSize);
         }
+    }
 
-        EventMap events;
-        SummonList summons;
-        uint32 talkTimer;
+    void HandleDummyHitTarget(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        GetHitUnit()->CastSpell(GetCaster(), SPELL_BLINK_TELEPORT, true);
+    }
 
-        void Reset() override
-        {
-            summons.DespawnAll();
-            if (InstanceScript* instance = me->GetInstanceScript())
-                if (instance->GetData(TYPE_ANZU_ENCOUNTER) != DONE)
-                    instance->SetData(TYPE_ANZU_ENCOUNTER, NOT_STARTED);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            summon->AI()->AttackStart(me->GetVictim());
-        }
-
-        void SummonedCreatureDies(Creature* summon, Unit*) override
-        {
-            summons.Despawn(summon);
-            summons.RemoveNotExisting();
-            if (summons.empty())
-                me->RemoveAurasDueToSpell(SPELL_BANISH_SELF);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_SCREECH, 14000);
-            events.ScheduleEvent(EVENT_SPELL_BOMB, 5000);
-            events.ScheduleEvent(EVENT_SPELL_CYCLONE, 8000);
-            events.ScheduleEvent(EVENT_ANZU_HEALTH1, 2000);
-            events.ScheduleEvent(EVENT_ANZU_HEALTH2, 2001);
-
-            if (InstanceScript* instance = me->GetInstanceScript())
-                instance->SetData(TYPE_ANZU_ENCOUNTER, IN_PROGRESS);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (InstanceScript* instance = me->GetInstanceScript())
-                instance->SetData(TYPE_ANZU_ENCOUNTER, DONE);
-        }
-
-        void SummonBroods()
-        {
-            Talk(SAY_SUMMON);
-            me->CastSpell(me, SPELL_BANISH_SELF, true);
-            for (uint8 i = 0; i < 5; ++i)
-                me->SummonCreature(23132 /*NPC_BROOD_OF_ANZU*/, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * std::sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (talkTimer)
-            {
-                talkTimer += diff;
-                if (talkTimer >= 1000 && talkTimer < 10000)
-                {
-                    Talk(SAY_ANZU_INTRO1);
-                    talkTimer = 10000;
-                }
-                else if (talkTimer >= 16000)
-                {
-                    me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                    me->RemoveAurasDueToSpell(SPELL_SHADOWFORM);
-                    Talk(SAY_ANZU_INTRO2);
-                    talkTimer = 0;
-                }
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_SCREECH:
-                    me->CastSpell(me, SPELL_PARALYZING_SCREECH, false);
-                    events.RepeatEvent(23000);
-                    events.DelayEvents(3000);
-                    break;
-                case EVENT_SPELL_BOMB:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, SPELL_SPELL_BOMB, false);
-                    events.RepeatEvent(urand(16000, 24500));
-                    events.DelayEvents(3000);
-                    break;
-                case EVENT_SPELL_CYCLONE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 45.0f, true))
-                        me->CastSpell(target, SPELL_CYCLONE, false);
-                    events.RepeatEvent(urand(22000, 27000));
-                    events.DelayEvents(3000);
-                    break;
-                case EVENT_ANZU_HEALTH1:
-                    if (me->HealthBelowPct(66))
-                    {
-                        SummonBroods();
-                        events.DelayEvents(10000);
-                        return;
-                    }
-                    events.RepeatEvent(1000);
-                    break;
-                case EVENT_ANZU_HEALTH2:
-                    if (me->HealthBelowPct(33))
-                    {
-                        SummonBroods();
-                        events.DelayEvents(10000);
-                        return;
-                    }
-                    events.RepeatEvent(1000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_talon_king_ikiss_blink::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_talon_king_ikiss_blink::HandleDummyHitTarget, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
 };
 
 void AddSC_boss_talon_king_ikiss()
 {
-    new boss_talon_king_ikiss();
-    new boss_anzu();
+    RegisterSethekkHallsCreatureAI(boss_talon_king_ikiss);
+    RegisterSpellScript(spell_talon_king_ikiss_blink);
 }

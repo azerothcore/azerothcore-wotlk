@@ -19,12 +19,11 @@
 
 enum Yells
 {
-    SAY_AGGRO                                     = 50,
-    SAY_SLAY_1                                    = 51,
-    SAY_SLAY_2                                    = 52,
-    SAY_DEATH                                     = 53,
-    SAY_IMPENDING_DESPAIR                         = 54,
-    SAY_DEFILING_HORROR                           = 55,
+    SAY_AGGRO                                     = 0,
+    SAY_SLAY                                      = 1,
+    SAY_DEATH                                     = 2,
+    SAY_IMPENDING_DESPAIR                         = 3,
+    SAY_DEFILING_HORROR                           = 4,
 };
 
 enum Spells
@@ -161,7 +160,7 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
-                Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
+                Talk(SAY_SLAY);
         }
 
         void EnterEvadeMode(EvadeReason why) override
