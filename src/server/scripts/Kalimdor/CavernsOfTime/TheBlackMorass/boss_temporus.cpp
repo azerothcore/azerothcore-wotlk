@@ -34,14 +34,6 @@ enum Enums
     SPELL_BANISH_DRAGON_HELPER  = 31550
 };
 
-enum Events
-{
-    EVENT_HASTEN                = 1,
-    EVENT_MORTAL_WOUND          = 2,
-    EVENT_WING_BUFFET           = 3,
-    EVENT_SPELL_REFLECTION      = 4
-};
-
 struct boss_temporus : public BossAI
 {
     boss_temporus(Creature* creature) : BossAI(creature, DATA_TEMPORUS) { }
@@ -60,19 +52,40 @@ struct boss_temporus : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        events.ScheduleEvent(EVENT_HASTEN, 12000);
-        events.ScheduleEvent(EVENT_MORTAL_WOUND, 5000);
-        events.ScheduleEvent(EVENT_WING_BUFFET, 20000);
+        _JustEngagedWith();
+
+        scheduler.Schedule(12s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_HASTEN);
+            context.Repeat(20s);
+        }).Schedule(5s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_MORTAL_WOUND);
+            context.Repeat(10s);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_WING_BUFFET);
+            context.Repeat(20s);
+        });
+
         if (IsHeroic())
-            events.ScheduleEvent(EVENT_SPELL_REFLECTION, 28000);
+        {
+            scheduler.Schedule(28s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_REFLECT);
+                context.Repeat(30s);
+            });
+        }
 
         OwnTalk(SAY_AGGRO);
     }
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
+        {
             OwnTalk(SAY_SLAY);
+        }
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -94,38 +107,6 @@ struct boss_temporus : public BossAI
         }
 
         ScriptedAI::MoveInLineOfSight(who);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_HASTEN:
-            me->CastSpell(me, SPELL_HASTEN, false);
-            events.ScheduleEvent(EVENT_HASTEN, 20000);
-            break;
-        case EVENT_MORTAL_WOUND:
-            me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
-            events.ScheduleEvent(EVENT_MORTAL_WOUND, 10000);
-            break;
-        case EVENT_WING_BUFFET:
-            me->CastSpell(me, SPELL_WING_BUFFET, false);
-            events.ScheduleEvent(EVENT_WING_BUFFET, 20000);
-            break;
-        case EVENT_SPELL_REFLECTION:
-            me->CastSpell(me, SPELL_REFLECT, false);
-            events.ScheduleEvent(EVENT_SPELL_REFLECTION, 30000);
-            break;
-        }
-
-        DoMeleeAttackIfReady();
     }
 };
 
