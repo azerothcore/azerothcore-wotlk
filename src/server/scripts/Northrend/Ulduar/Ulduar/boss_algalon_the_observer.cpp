@@ -806,7 +806,7 @@ public:
                     break;
                 case EVENT_CHECK_HERALD_ITEMS:
                     if (!DoCheckHeraldOfTheTitans())
-                        events.RepeatEvent(5s);
+                        events.Repeat(5s);
                     break;
             }
 

@@ -1199,7 +1199,7 @@ public:
                     break;
                 case EVENT_YS_SUMMON_GUARDIAN:
                     SummonImmortalGuardian();
-                    events.RepeatEvent(10s);
+                    events.Repeat(10s);
                     break;
             }
         }
