@@ -271,8 +271,8 @@ public:
             me->resetAttackTimer(BASE_ATTACK);
             DoAction(ACTION_REMOVE_INVOCATION);
             events.Reset();
-            events.ScheduleEvent(EVENT_BERSERK, 600000);
-            events.ScheduleEvent(EVENT_SHADOW_RESONANCE, urand(10000, 15000));
+            events.ScheduleEvent(EVENT_BERSERK, 10min);
+            events.ScheduleEvent(EVENT_SHADOW_RESONANCE, 10s, 15s);
             if (IsHeroic())
                 me->AddAura(SPELL_SHADOW_PRISON, me);
         }
@@ -412,7 +412,7 @@ public:
                 case EVENT_SHADOW_RESONANCE:
                     Talk(SAY_KELESETH_SPECIAL);
                     me->CastSpell(me, SPELL_SHADOW_RESONANCE, false);
-                    events.ScheduleEvent(EVENT_SHADOW_RESONANCE, urand(10000, 15000));
+                    events.ScheduleEvent(EVENT_SHADOW_RESONANCE, 10s, 15s);
                     break;
             }
 
@@ -530,9 +530,9 @@ public:
 
             DoAction(ACTION_REMOVE_INVOCATION);
             events.Reset();
-            events.ScheduleEvent(EVENT_BERSERK, 600000);
-            events.ScheduleEvent(EVENT_GLITTERING_SPARKS, urand(12000, 15000));
-            events.ScheduleEvent(EVENT_CONJURE_FLAME, 20000);
+            events.ScheduleEvent(EVENT_BERSERK, 10min);
+            events.ScheduleEvent(EVENT_GLITTERING_SPARKS, 12s, 15s);
+            events.ScheduleEvent(EVENT_CONJURE_FLAME, 20s);
             if (IsHeroic())
                 me->AddAura(SPELL_SHADOW_PRISON, me);
         }
@@ -684,18 +684,18 @@ public:
                     break;
                 case EVENT_GLITTERING_SPARKS:
                     me->CastSpell(me->GetVictim(), SPELL_GLITTERING_SPARKS, false);
-                    events.ScheduleEvent(EVENT_GLITTERING_SPARKS, urand(15000, 25000));
+                    events.ScheduleEvent(EVENT_GLITTERING_SPARKS, 15s, 25s);
                     break;
                 case EVENT_CONJURE_FLAME:
                     if (_isEmpowered)
                     {
                         me->CastSpell(me, SPELL_CONJURE_EMPOWERED_FLAME, false);
-                        events.ScheduleEvent(EVENT_CONJURE_FLAME, 15000);
+                        events.ScheduleEvent(EVENT_CONJURE_FLAME, 15s);
                     }
                     else
                     {
                         me->CastSpell(me, SPELL_CONJURE_FLAME, false);
-                        events.ScheduleEvent(EVENT_CONJURE_FLAME, urand(20000, 25000));
+                        events.ScheduleEvent(EVENT_CONJURE_FLAME, 20s, 25s);
                     }
                     Talk(SAY_TALDARAM_SPECIAL);
                     break;
@@ -821,10 +821,10 @@ public:
             invocationOrder[1] = RAND(DATA_PRINCE_KELESETH_GUID, DATA_PRINCE_TALDARAM_GUID);
             invocationOrder[2] = DATA_PRINCE_KELESETH_GUID + DATA_PRINCE_TALDARAM_GUID - invocationOrder[1];
 
-            events.ScheduleEvent(EVENT_BERSERK, 600000);
-            events.ScheduleEvent(EVENT_KINETIC_BOMB, urand(18000, 24000));
-            events.ScheduleEvent(EVENT_SHOCK_VORTEX, urand(15000, 20000));
-            events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 45000);
+            events.ScheduleEvent(EVENT_BERSERK, 10min);
+            events.ScheduleEvent(EVENT_KINETIC_BOMB, 18s, 24s);
+            events.ScheduleEvent(EVENT_SHOCK_VORTEX, 15s, 20s);
+            events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 45s);
             if (IsHeroic())
             {
                 me->AddAura(SPELL_SHADOW_PRISON, me);
@@ -1011,7 +1011,7 @@ public:
                         current->CastSpell((Unit*)nullptr, visualSpellId, true);
                         next->AI()->Talk(1);
                     }
-                    events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 46000);
+                    events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 46s);
                     break;
                 case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
@@ -1023,20 +1023,20 @@ public:
                         me->CastSpell(target, SPELL_KINETIC_BOMB_TARGET, false);
                         Talk(SAY_VALANAR_SPECIAL);
                     }
-                    events.ScheduleEvent(EVENT_KINETIC_BOMB, me->GetMap()->Is25ManRaid() ? 20500 : 30500);
+                    events.ScheduleEvent(EVENT_KINETIC_BOMB, me->GetMap()->Is25ManRaid() ? 20s + 500ms : 30s + 500ms);
                     break;
                 case EVENT_SHOCK_VORTEX:
                     if (_isEmpowered)
                     {
                         me->CastSpell(me, SPELL_EMPOWERED_SHOCK_VORTEX, false);
                         Talk(EMOTE_VALANAR_SHOCK_VORTEX);
-                        events.ScheduleEvent(EVENT_SHOCK_VORTEX, 30000);
+                        events.ScheduleEvent(EVENT_SHOCK_VORTEX, 30s);
                     }
                     else
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                             me->CastSpell(target, SPELL_SHOCK_VORTEX, false);
-                        events.ScheduleEvent(EVENT_SHOCK_VORTEX, urand(18000, 23000));
+                        events.ScheduleEvent(EVENT_SHOCK_VORTEX, 18s, 23s);
                     }
                     break;
             }
@@ -1109,7 +1109,7 @@ public:
             _introDone = true;
             Talk(SAY_INTRO_1);
             _events.SetPhase(1);
-            _events.ScheduleEvent(EVENT_INTRO_1, 14000);
+            _events.ScheduleEvent(EVENT_INTRO_1, 14s);
             // summon a visual trigger
             if (Creature* summon = DoSummon(NPC_FLOATING_TRIGGER, triggerPos, 15000, TEMPSUMMON_TIMED_DESPAWN))
             {
@@ -1383,7 +1383,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _events.RescheduleEvent(EVENT_BOMB_DESPAWN, 60000);
+            _events.RescheduleEvent(EVENT_BOMB_DESPAWN, 1min);
             me->SetWalk(true);
             exploded = false;
 
@@ -1400,7 +1400,7 @@ public:
             if (action == SPELL_KINETIC_BOMB_EXPLOSION)
             {
                 exploded = true;
-                _events.RescheduleEvent(EVENT_BOMB_DESPAWN, 1000);
+                _events.RescheduleEvent(EVENT_BOMB_DESPAWN, 1s);
             }
             else if (action == ACTION_KINETIC_BOMB_JUMP)
             {
@@ -1410,7 +1410,7 @@ public:
                     me->StopMoving();
                     me->GetMotionMaster()->MoveCharge(_x, _y, me->GetPositionZ() + 60.0f, me->GetSpeed(MOVE_RUN));
                 }
-                _events.RescheduleEvent(EVENT_CONTINUE_FALLING, 3000);
+                _events.RescheduleEvent(EVENT_CONTINUE_FALLING, 3s);
             }
         }
 

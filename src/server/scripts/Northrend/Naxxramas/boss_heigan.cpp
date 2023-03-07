@@ -138,10 +138,10 @@ public:
                 me->CastStop();
                 me->SetReactState(REACT_AGGRESSIVE);
                 DoZoneInCombat();
-                events.ScheduleEvent(EVENT_DISRUPTION, urand(12000, 15000));
-                events.ScheduleEvent(EVENT_DECEPIT_FEVER, 17000);
-                events.ScheduleEvent(EVENT_ERUPT_SECTION, 15000);
-                events.ScheduleEvent(EVENT_SWITCH_PHASE, 90000);
+                events.ScheduleEvent(EVENT_DISRUPTION, 12s, 15s);
+                events.ScheduleEvent(EVENT_DECEPIT_FEVER, 17s);
+                events.ScheduleEvent(EVENT_ERUPT_SECTION, 15s);
+                events.ScheduleEvent(EVENT_SWITCH_PHASE, 90s);
             }
             else // if (phase == PHASE_FAST_DANCE)
             {
@@ -152,11 +152,11 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->CastSpell(me, SPELL_TELEPORT_SELF, false);
                 me->SetFacingTo(2.40f);
-                events.ScheduleEvent(EVENT_PLAGUE_CLOUD, 1000);
-                events.ScheduleEvent(EVENT_ERUPT_SECTION, 7000);
-                events.ScheduleEvent(EVENT_SWITCH_PHASE, 45000);
+                events.ScheduleEvent(EVENT_PLAGUE_CLOUD, 1s);
+                events.ScheduleEvent(EVENT_ERUPT_SECTION, 7s);
+                events.ScheduleEvent(EVENT_SWITCH_PHASE, 45s);
             }
-            events.ScheduleEvent(EVENT_SAFETY_DANCE, 5000);
+            events.ScheduleEvent(EVENT_SAFETY_DANCE, 5s);
         }
 
         bool IsInRoom(Unit* who)
@@ -185,11 +185,11 @@ public:
             {
                 case EVENT_DISRUPTION:
                     me->CastSpell(me, SPELL_SPELL_DISRUPTION, false);
-                    events.RepeatEvent(10000);
+                    events.Repeat(10s);
                     break;
                 case EVENT_DECEPIT_FEVER:
                     me->CastSpell(me, RAID_MODE(SPELL_DECREPIT_FEVER_10, SPELL_DECREPIT_FEVER_25), false);
-                    events.RepeatEvent(urand(22000, 25000));
+                    events.Repeat(22s, 25s);
                     break;
                 case EVENT_PLAGUE_CLOUD:
                     me->CastSpell(me, SPELL_PLAGUE_CLOUD, false);
@@ -223,7 +223,7 @@ public:
                     {
                         Talk(SAY_TAUNT);
                     }
-                    events.RepeatEvent(currentPhase == PHASE_SLOW_DANCE ? 10000 : 4000);
+                    events.Repeat(currentPhase == PHASE_SLOW_DANCE ? 10s : 4s);
                     break;
                 case EVENT_SAFETY_DANCE:
                     {
@@ -237,7 +237,7 @@ public:
                                 return;
                             }
                         }
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         return;
                     }
             }
