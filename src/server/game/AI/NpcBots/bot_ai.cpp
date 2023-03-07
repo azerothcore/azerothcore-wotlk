@@ -16119,6 +16119,14 @@ bool bot_ai::GlobalUpdate(uint32 diff)
     if (!me->IsAlive())
         return false;
 
+    if (!me->IsInWorld())
+    {
+        if (IAmFree())
+            LOG_ERROR("scripts", "bot_ai::GlobalUpdate is called for free bot not in world: {} ({}) class {} level {}",
+                me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()));
+        return;
+    }
+
     if (doHealth)
     {
         doHealth = false;
