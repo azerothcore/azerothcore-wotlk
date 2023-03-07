@@ -197,7 +197,7 @@ public:
                     summons.Summon(cr);
                     cr->SetDisableGravity(true);
                     cr->GetMotionMaster()->MovePoint(0, 275.4f, -453, 110); // ROOM CENTER
-                    events.RescheduleEvent(EVENT_UNFREEZE_MONSTER, 10000);
+                    events.RescheduleEvent(EVENT_UNFREEZE_MONSTER, 10s);
                     me->SetInCombatWithZone();
                     me->SetControlled(true, UNIT_STATE_STUNNED);
                 }
@@ -205,9 +205,9 @@ public:
             else if (param == ACTION_MINIBOSS_DIED)
             {
                 if (Counter > (IsHeroic() ? 3 : 1))
-                    events.RescheduleEvent(EVENT_PALEHOOF_START, 3000);
+                    events.RescheduleEvent(EVENT_PALEHOOF_START, 3s);
                 else
-                    events.RescheduleEvent(EVENT_UNFREEZE_MONSTER, 3000);
+                    events.RescheduleEvent(EVENT_UNFREEZE_MONSTER, 3s);
             }
         }
         void JustEngagedWith(Unit*  /*pWho*/) override
@@ -246,7 +246,7 @@ public:
                                 Counter++;
                                 miniBoss->AI()->DoAction(ACTION_UNFREEZE);
                                 orb->CastSpell(miniBoss, SPELL_AWAKEN_SUBBOSS, true);
-                                events.ScheduleEvent(EVENT_UNFREEZE_MONSTER2, 6000);
+                                events.ScheduleEvent(EVENT_UNFREEZE_MONSTER2, 6s);
                             }
                             else
                                 EnterEvadeMode();
@@ -272,7 +272,7 @@ public:
                         if (Creature* orb = ObjectAccessor::GetCreature(*me, OrbGUID))
                         {
                             orb->CastSpell(me, SPELL_AWAKEN_SUBBOSS, true);
-                            events.ScheduleEvent(EVENT_PALEHOOF_START2, 6000);
+                            events.ScheduleEvent(EVENT_PALEHOOF_START2, 6s);
                         }
                         break;
                     }
@@ -288,15 +288,15 @@ public:
                         // SETINCOMBATWITHZONE
 
                         // schedule combat events
-                        events.ScheduleEvent(EVENT_PALEHOOF_WITHERING_ROAR, 10000);
-                        events.ScheduleEvent(EVENT_PALEHOOF_IMPALE, 12000);
-                        events.ScheduleEvent(EVENT_PALEHOOF_ARCING_SMASH, 15000);
+                        events.ScheduleEvent(EVENT_PALEHOOF_WITHERING_ROAR, 10s);
+                        events.ScheduleEvent(EVENT_PALEHOOF_IMPALE, 12s);
+                        events.ScheduleEvent(EVENT_PALEHOOF_ARCING_SMASH, 15s);
                         break;
                     }
                 case EVENT_PALEHOOF_WITHERING_ROAR:
                     {
                         me->CastSpell(me, IsHeroic() ? SPELL_WITHERING_ROAR_H : SPELL_WITHERING_ROAR_N, false);
-                        events.RepeatEvent(8000 + rand() % 4000);
+                        events.Repeat(8s, 12s);
                         break;
                     }
                 case EVENT_PALEHOOF_IMPALE:
@@ -304,13 +304,13 @@ public:
                         if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_IMPALE_H : SPELL_IMPALE_N, false);
 
-                        events.RepeatEvent(8000 + rand() % 4000);
+                        events.Repeat(8s, 12s);
                         break;
                     }
                 case EVENT_PALEHOOF_ARCING_SMASH:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_ARCING_SMASH, false);
-                        events.RepeatEvent(13000 + rand() % 4000);
+                        events.Repeat(13s, 17s);
                         break;
                     }
             }
@@ -381,9 +381,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
-                events.ScheduleEvent(EVENT_JORMUNGAR_ACID_SPIT, 3000);
-                events.ScheduleEvent(EVENT_JORMUNGAR_ACID_SPLATTER, 12000);
-                events.ScheduleEvent(EVENT_JORMUNGAR_POISON_BREATH, 10000);
+                events.ScheduleEvent(EVENT_JORMUNGAR_ACID_SPIT, 3s);
+                events.ScheduleEvent(EVENT_JORMUNGAR_ACID_SPLATTER, 12s);
+                events.ScheduleEvent(EVENT_JORMUNGAR_POISON_BREATH, 10s);
             }
             else if (param == ACTION_DESPAWN_ADDS)
                 summons.DespawnAll();
@@ -418,7 +418,7 @@ public:
                         if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, SPELL_ACID_SPIT, false);
 
-                        events.RepeatEvent(2000 + rand() % 2000);
+                        events.Repeat(2s, 4s);
                         break;
                     }
                 case EVENT_JORMUNGAR_ACID_SPLATTER:
@@ -436,7 +436,7 @@ public:
                                 pJormungarWorm->SetInCombatWithZone();
                             }
                         }
-                        events.RepeatEvent(10000 + rand() % 4000);
+                        events.Repeat(10s, 15s);
                         break;
                     }
                 case EVENT_JORMUNGAR_POISON_BREATH:
@@ -444,7 +444,7 @@ public:
                         if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_POISON_BREATH_H : SPELL_POISON_BREATH_N, false);
 
-                        events.RepeatEvent(8000 + rand() % 4000);
+                        events.Repeat(8s, 12s);
                         break;
                     }
             }
@@ -507,9 +507,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
-                events.ScheduleEvent(EVENT_RHINO_STOMP, 3000);
-                events.ScheduleEvent(EVENT_RHINO_GORE, 12000);
-                events.ScheduleEvent(EVENT_RHINO_WOUND, 10000);
+                events.ScheduleEvent(EVENT_RHINO_STOMP, 3s);
+                events.ScheduleEvent(EVENT_RHINO_GORE, 12s);
+                events.ScheduleEvent(EVENT_RHINO_WOUND, 10s);
             }
         }
 
@@ -540,13 +540,13 @@ public:
                 case EVENT_RHINO_STOMP:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_STOMP, false);
-                        events.RepeatEvent(8000 + rand() % 4000);
+                        events.Repeat(8s, 12s);
                         break;
                     }
                 case EVENT_RHINO_GORE:
                     {
                         me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_GORE_H : SPELL_GORE_N, false);
-                        events.RepeatEvent(13000 + rand() % 4000);
+                        events.Repeat(13s, 17s);
                         break;
                     }
                 case EVENT_RHINO_WOUND:
@@ -554,7 +554,7 @@ public:
                         if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_GRIEVOUS_WOUND_H : SPELL_GRIEVOUS_WOUND_N, false);
 
-                        events.RepeatEvent(18000 + rand() % 4000);
+                        events.Repeat(18s, 22s);
                         break;
                     }
             }
@@ -617,9 +617,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
-                events.ScheduleEvent(EVENT_FURBOLG_CHAIN, 3000);
-                events.ScheduleEvent(EVENT_FURBOLG_CRAZED, 12000);
-                events.ScheduleEvent(EVENT_FURBOLG_ROAR, 10000);
+                events.ScheduleEvent(EVENT_FURBOLG_CHAIN, 3s);
+                events.ScheduleEvent(EVENT_FURBOLG_CRAZED, 12s);
+                events.ScheduleEvent(EVENT_FURBOLG_ROAR, 10s);
             }
         }
 
@@ -650,19 +650,19 @@ public:
                 case EVENT_FURBOLG_CHAIN:
                     {
                         me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_CHAIN_LIGHTING_H : SPELL_CHAIN_LIGHTING_N, false);
-                        events.RepeatEvent(4000 + rand() % 3000);
+                        events.Repeat(4s, 7s);
                         break;
                     }
                 case EVENT_FURBOLG_CRAZED:
                     {
                         me->CastSpell(me, SPELL_CRAZED, false);
-                        events.RepeatEvent(8000 + rand() % 4000);
+                        events.Repeat(8s, 12s);
                         break;
                     }
                 case EVENT_FURBOLG_ROAR:
                     {
                         me->CastSpell(me, SPELL_TERRIFYING_ROAR, false);
-                        events.RepeatEvent(10000 + rand() % 5000);
+                        events.Repeat(10s, 15s);
                         break;
                     }
             }
@@ -725,9 +725,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
-                events.ScheduleEvent(EVENT_WORGEN_MORTAL, 3000);
-                events.ScheduleEvent(EVENT_WORGEN_ENRAGE1, 12000);
-                events.ScheduleEvent(EVENT_WORGEN_ENRAGE2, 10000);
+                events.ScheduleEvent(EVENT_WORGEN_MORTAL, 3s);
+                events.ScheduleEvent(EVENT_WORGEN_ENRAGE1, 12s);
+                events.ScheduleEvent(EVENT_WORGEN_ENRAGE2, 10s);
             }
         }
 
@@ -758,19 +758,19 @@ public:
                 case EVENT_WORGEN_MORTAL:
                     {
                         me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_MORTAL_WOUND_H : SPELL_MORTAL_WOUND_N, false);
-                        events.RepeatEvent(4000 + rand() % 3000);
+                        events.Repeat(4s, 7s);
                         break;
                     }
                 case EVENT_WORGEN_ENRAGE1:
                     {
                         me->CastSpell(me, SPELL_ENRAGE_1, false);
-                        events.RepeatEvent(15000);
+                        events.Repeat(15s);
                         break;
                     }
                 case EVENT_WORGEN_ENRAGE2:
                     {
                         me->CastSpell(me, SPELL_ENRAGE_2, false);
-                        events.RepeatEvent(10000);
+                        events.Repeat(10s);
                         break;
                     }
             }

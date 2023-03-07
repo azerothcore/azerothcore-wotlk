@@ -76,8 +76,8 @@ public:
             me->CastSpell(me, SPELL_RAY_OF_SUFFERING, true);
             me->CastSpell(me, SPELL_RAY_OF_PAIN, true);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_CORROSIVE_SALIVA, urand(4000, 6000));
-            events.RescheduleEvent(EVENT_SPELL_OPTIC_LINK, urand(10000, 11000));
+            events.RescheduleEvent(EVENT_SPELL_CORROSIVE_SALIVA, 4s, 6s);
+            events.RescheduleEvent(EVENT_SPELL_OPTIC_LINK, 10s, 11s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -96,16 +96,16 @@ public:
                     break;
                 case EVENT_SPELL_CORROSIVE_SALIVA:
                     me->CastSpell(me->GetVictim(), SPELL_CORROSIVE_SALIVA, false);
-                    events.RepeatEvent(urand(8000, 10000));
+                    events.Repeat(8s, 10s);
                     break;
                 case EVENT_SPELL_OPTIC_LINK:
                     if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 40.0f, true))
                     {
                         me->CastSpell(target, SPELL_OPTIC_LINK, false);
-                        events.RepeatEvent(urand(18000, 21000));
+                        events.Repeat(18s, 21s);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
             }
 

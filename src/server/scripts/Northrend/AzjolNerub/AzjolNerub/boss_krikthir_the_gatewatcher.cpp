@@ -105,17 +105,17 @@ public:
 
             if (events.Empty() && who->GetPositionZ() < 785.0f)
             {
-                events2.ScheduleEvent(EVENT_KRIK_START_WAVE, 10000);
-                events2.ScheduleEvent(EVENT_KRIK_START_WAVE, 40000);
-                events2.ScheduleEvent(EVENT_KRIK_START_WAVE, 70000);
-                events2.ScheduleEvent(EVENT_KRIK_ENTER_COMBAT, 100000);
-                events2.ScheduleEvent(EVENT_KRIK_CHECK_EVADE, 5000);
+                events2.ScheduleEvent(EVENT_KRIK_START_WAVE, 10s);
+                events2.ScheduleEvent(EVENT_KRIK_START_WAVE, 40s);
+                events2.ScheduleEvent(EVENT_KRIK_START_WAVE, 70s);
+                events2.ScheduleEvent(EVENT_KRIK_ENTER_COMBAT, 100s);
+                events2.ScheduleEvent(EVENT_KRIK_CHECK_EVADE, 5s);
 
-                events.ScheduleEvent(EVENT_KRIK_HEALTH_CHECK, 1000);
-                events.ScheduleEvent(EVENT_KRIK_MIND_FLAY, 13000);
-                events.ScheduleEvent(EVENT_KRIK_SUMMON, 17000);
-                events.ScheduleEvent(EVENT_KRIK_CURSE, 8000);
-                events.ScheduleEvent(EVENT_CALL_ADDS, 1000);
+                events.ScheduleEvent(EVENT_KRIK_HEALTH_CHECK, 1s);
+                events.ScheduleEvent(EVENT_KRIK_MIND_FLAY, 13s);
+                events.ScheduleEvent(EVENT_KRIK_SUMMON, 17s);
+                events.ScheduleEvent(EVENT_KRIK_CURSE, 8s);
+                events.ScheduleEvent(EVENT_CALL_ADDS, 1s);
                 me->setActive(true);
             }
         }
@@ -145,7 +145,7 @@ public:
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
                 Talk(SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
             }
         }
 
@@ -178,7 +178,7 @@ public:
                         EnterEvadeMode();
                         return;
                     }
-                    events2.ScheduleEvent(EVENT_KRIK_CHECK_EVADE, 5000);
+                    events2.ScheduleEvent(EVENT_KRIK_CHECK_EVADE, 5s);
                     break;
             }
 
@@ -197,21 +197,21 @@ public:
                         me->CastSpell(me, SPELL_FRENZY, true);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_KRIK_HEALTH_CHECK, 1000);
+                    events.ScheduleEvent(EVENT_KRIK_HEALTH_CHECK, 1s);
                     break;
                 case EVENT_KRIK_SUMMON:
                     Talk(SAY_SWARM);
                     me->CastSpell(me, SPELL_SWARM, false);
-                    events.ScheduleEvent(EVENT_KRIK_SUMMON, 20000);
+                    events.ScheduleEvent(EVENT_KRIK_SUMMON, 20s);
                     break;
                 case EVENT_KRIK_MIND_FLAY:
                     me->CastSpell(me->GetVictim(), SPELL_MIND_FLAY, false);
-                    events.ScheduleEvent(EVENT_KRIK_MIND_FLAY, 15000);
+                    events.ScheduleEvent(EVENT_KRIK_MIND_FLAY, 15s);
                     break;
                 case EVENT_KRIK_CURSE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         me->CastSpell(target, SPELL_CURSE_OF_FATIGUE, true);
-                    events.ScheduleEvent(EVENT_KRIK_CURSE, 10000);
+                    events.ScheduleEvent(EVENT_KRIK_CURSE, 10s);
                     break;
                 case EVENT_CALL_ADDS:
                     summons.DoZoneInCombat();

@@ -71,11 +71,11 @@ public:
         {
             DoZoneInCombat();
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_FIREBOLT, 1000);
-            events.RescheduleEvent(EVENT_SPELL_FLAME_BREATH, 5000);
-            events.RescheduleEvent(EVENT_SPELL_LAVA_BURN, 10000);
+            events.RescheduleEvent(EVENT_SPELL_FIREBOLT, 1s);
+            events.RescheduleEvent(EVENT_SPELL_FLAME_BREATH, 5s);
+            events.RescheduleEvent(EVENT_SPELL_LAVA_BURN, 10s);
             if (IsHeroic())
-                events.RescheduleEvent(EVENT_SPELL_CAUTERIZING_FLAMES, 3000);
+                events.RescheduleEvent(EVENT_SPELL_CAUTERIZING_FLAMES, 3s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -94,19 +94,19 @@ public:
                     break;
                 case EVENT_SPELL_FIREBOLT:
                     me->CastSpell(me->GetVictim(), SPELL_FIREBOLT, false);
-                    events.RepeatEvent(urand(5000, 13000));
+                    events.Repeat(5s, 13s);
                     break;
                 case EVENT_SPELL_FLAME_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_FLAME_BREATH, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     break;
                 case EVENT_SPELL_LAVA_BURN:
                     me->CastSpell(me->GetVictim(), SPELL_LAVA_BURN, false);
-                    events.RepeatEvent(urand(14000, 20000));
+                    events.Repeat(14s, 20s);
                     break;
                 case EVENT_SPELL_CAUTERIZING_FLAMES:
                     me->CastSpell((Unit*)nullptr, SPELL_FLAME_BREATH, false);
-                    events.RepeatEvent(urand(10000, 16000));
+                    events.Repeat(10s, 16s);
                     break;
             }
 

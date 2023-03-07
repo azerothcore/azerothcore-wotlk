@@ -117,9 +117,9 @@ public:
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_ARC_LIGHTNING, 10000);
-            events.ScheduleEvent(EVENT_SHOCKWAVE, 3000);
-            events.ScheduleEvent(EVENT_LIGHTNING_NOVA, 15000);
+            events.ScheduleEvent(EVENT_ARC_LIGHTNING, 10s);
+            events.ScheduleEvent(EVENT_SHOCKWAVE, 3s);
+            events.ScheduleEvent(EVENT_LIGHTNING_NOVA, 15s);
 
             if (m_pInstance)
             {
@@ -222,15 +222,15 @@ public:
                         HealthCheck -= 25;
                     }
 
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     break;
                 case EVENT_LIGHTNING_NOVA:
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     me->CastSpell(me, SPELL_LIGHTNING_NOVA_VISUAL, true);
                     me->CastSpell(me, SPELL_LIGHTNING_NOVA_THUNDERS, true);
 
-                    events.DelayEvents(5001);
-                    events.ScheduleEvent(EVENT_AURA_REMOVE, me->GetMap()->IsHeroic() ? 4000 : 5000);
+                    events.DelayEvents(5s);
+                    events.ScheduleEvent(EVENT_AURA_REMOVE, me->GetMap()->IsHeroic() ? 4s : 5s);
 
                     me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_LIGHTNING_NOVA_H : SPELL_LIGHTNING_NOVA_N, false);
                     break;
@@ -241,7 +241,7 @@ public:
                     if (Unit* target = SelectTargetFromPlayerList(100, SPELL_ARC_LIGHTNING))
                         me->CastSpell(target, SPELL_ARC_LIGHTNING, false);
 
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     break;
                 case EVENT_AURA_REMOVE:
                     me->RemoveAura(SPELL_LIGHTNING_NOVA_THUNDERS);

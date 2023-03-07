@@ -36,7 +36,6 @@ public:
     MOCK_METHOD(WorldSession*, FindOfflineSession, (uint32 id), (const));
     MOCK_METHOD(WorldSession*, FindOfflineSessionForCharacterGUID, (ObjectGuid::LowType guidLow),(const));
     MOCK_METHOD(void, AddSession, (WorldSession* s), ());
-    MOCK_METHOD(void, SendAutoBroadcast, ());
     MOCK_METHOD(bool, KickSession, (uint32 id), ());
     MOCK_METHOD(void, UpdateMaxSessionCounters, ());
     MOCK_METHOD(const SessionMap&, GetAllSessions, (), (const));
@@ -112,7 +111,7 @@ public:
     MOCK_METHOD(LocaleConstant, GetAvailableDbcLocale, (LocaleConstant locale), (const));
     MOCK_METHOD(void, LoadDBVersion, ());
     MOCK_METHOD(char const *, GetDBVersion, (), (const));
-    MOCK_METHOD(void, LoadAutobroadcasts, ());
+    MOCK_METHOD(void, LoadMotd, ());
     MOCK_METHOD(void, UpdateAreaDependentAuras, ());
     MOCK_METHOD(uint32, GetCleaningFlags, (), (const));
     MOCK_METHOD(void, SetCleaningFlags, (uint32 flags), ());

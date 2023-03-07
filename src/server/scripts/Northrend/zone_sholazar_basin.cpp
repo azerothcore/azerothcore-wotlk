@@ -156,12 +156,12 @@ public:
         {
             Talk(SAY_ARTRUIS_AGGRO);
             me->CastSpell(me, SPELL_ARTRUIS_ICY_VEINS, true);
-            events.RescheduleEvent(EVENT_CAST_FROST_BOLT, 4000);
-            events.RescheduleEvent(EVENT_CAST_FROST_NOVA, 15000);
-            events.RescheduleEvent(EVENT_CAST_ICE_LANCE, 8500);
-            events.RescheduleEvent(EVENT_CAST_ICY_VEINS, 30000);
-            events.RescheduleEvent(EVENT_ARTRUIS_HP_CHECK, 1000);
-            events.RescheduleEvent(EVENT_ARTRUIS_TALK1, 6000);
+            events.RescheduleEvent(EVENT_CAST_FROST_BOLT, 4s);
+            events.RescheduleEvent(EVENT_CAST_FROST_NOVA, 15s);
+            events.RescheduleEvent(EVENT_CAST_ICE_LANCE, 8500ms);
+            events.RescheduleEvent(EVENT_CAST_ICY_VEINS, 30s);
+            events.RescheduleEvent(EVENT_ARTRUIS_HP_CHECK, 1s);
+            events.RescheduleEvent(EVENT_ARTRUIS_TALK1, 6s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -204,7 +204,7 @@ public:
                             minion->AddThreat(me, 100000.0f);
                             minion->AI()->AttackStart(me);
                             minion->DespawnOrUnsummon(900000);
-                            events.RescheduleEvent(EVENT_ARTRUIS_TALK3, 5000);
+                            events.RescheduleEvent(EVENT_ARTRUIS_TALK3, 5s);
                         }
                     }
                 }
@@ -231,11 +231,11 @@ public:
                         SummonsAction(ACTION_BIND_MINIONS);
                         break;
                     }
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     break;
                 case EVENT_ARTRUIS_TALK1:
                     Talk(SAY_ARTRUIS_TALK_1);
-                    events.RescheduleEvent(EVENT_ARTRUIS_TALK2, 10000);
+                    events.RescheduleEvent(EVENT_ARTRUIS_TALK2, 10s);
                     break;
                 case EVENT_ARTRUIS_TALK2:
                     Talk(SAY_ARTRUIS_TALK_2);
@@ -245,19 +245,19 @@ public:
                     break;
                 case EVENT_CAST_FROST_BOLT:
                     me->CastSpell(me->GetVictim(), SPELL_ARTRUIS_FROSTBOLT, false);
-                    events.RepeatEvent(4000);
+                    events.Repeat(4s);
                     break;
                 case EVENT_CAST_ICE_LANCE:
                     me->CastSpell(me->GetVictim(), SPELL_ARTRUIS_ICE_LANCE, false);
-                    events.RepeatEvent(8500);
+                    events.Repeat(8500ms);
                     break;
                 case EVENT_CAST_FROST_NOVA:
                     me->CastSpell(me, SPELL_ARTRUIS_FROST_NOVA, false);
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 case EVENT_CAST_ICY_VEINS:
                     me->CastSpell(me, SPELL_ARTRUIS_ICY_VEINS, false);
-                    events.RepeatEvent(30000);
+                    events.Repeat(30s);
                     break;
             }
         }
