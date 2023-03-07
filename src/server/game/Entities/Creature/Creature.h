@@ -407,7 +407,7 @@ public:
     std::string GetDebugInfo() const override;
 
     //NPCBots
-    bool LoadBotCreatureFromDB(uint32 guid, Map* map, bool addToMap = true);
+    bool LoadBotCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool generated = false, uint32 entry = 0, Position* pos = nullptr);
     Player* GetBotOwner() const;
     Unit* GetBotsPet() const;
     bool IsNPCBot() const override;

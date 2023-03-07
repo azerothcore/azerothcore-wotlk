@@ -768,8 +768,7 @@ BotDataVerificationResult NPCBotsDump::VerifyWriteData(uint32 entry) const
     if (!botData)
         return BOT_DATA_NOT_EXIST;
 
-    int8 id = 1;
-    EquipmentInfo const* deinfo = sObjectMgr->GetEquipmentInfo(entry, id);
+    EquipmentInfo const* deinfo = BotDataMgr::GetBotEquipmentInfo(entry);
     if (!deinfo)
     {
         LOG_ERROR("scripts", "NPCBotsDump::AppendBotCreatureData creature {} is not found in `creature_equip_template` table!", entry);
@@ -902,8 +901,7 @@ void NPCBotsDump::AppendBotEquipsData(BotStringTransaction* trans, uint32 entry)
     NpcBotData const* botData = BotDataMgr::SelectNpcBotData(entry);
     ASSERT(botData);
 
-    int8 id = 1;
-    EquipmentInfo const* deinfo = sObjectMgr->GetEquipmentInfo(entry, id);
+    EquipmentInfo const* deinfo = BotDataMgr::GetBotEquipmentInfo(entry);
     ASSERT(deinfo);
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NPCBOT_EQUIP_BY_ITEM_INSTANCE);

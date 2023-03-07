@@ -1091,7 +1091,7 @@ void WorldObject::setActive(bool on)
         return;
 
     //npcbot: bots should never be removed from active
-    if (on == false && IsNPCBot())
+    if (on == false && IsNPCBotOrPet())
         return;
     //end npcbot
 
