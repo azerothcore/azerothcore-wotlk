@@ -577,6 +577,7 @@ void BossAI::_Reset()
     events.Reset();
     scheduler.CancelAll();
     summons.DespawnAll();
+    _healthCheckEvents.clear();
     if (instance)
         instance->SetBossState(_bossId, NOT_STARTED);
 }
@@ -586,6 +587,7 @@ void BossAI::_JustDied()
     events.Reset();
     scheduler.CancelAll();
     summons.DespawnAll();
+    _healthCheckEvents.clear();
     if (instance)
     {
         instance->SetBossState(_bossId, DONE);
@@ -665,6 +667,39 @@ void BossAI::UpdateAI(uint32 diff)
     }
 
     DoMeleeAttackIfReady();
+}
+
+void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+{
+    if (!_healthCheckEvents.empty())
+    {
+        _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
+        {
+            return _ProccessHealthCheckEvent(data._healthPct, damage, data._exec);
+        });
+    }
+}
+
+/**
+ * @brief Executes a function once the creature reaches the defined health point percent.
+ *
+ * @param healthPct The health percent at which the code will be executed.
+ * @param exec The fuction to be executed.
+ */
+void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec)
+{
+    _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec));
+};
+
+bool BossAI::_ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const
+{
+    if (me->HealthBelowPctDamaged(healthPct, damage))
+    {
+        exec();
+        return true;
+    }
+
+    return false;
 }
 
 // WorldBossAI - for non-instanced bosses

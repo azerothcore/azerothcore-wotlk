@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "AuctionHouseMgr.h"
+#include "AutobroadcastMgr.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
 #include "CreatureTextMgr.h"
@@ -142,6 +143,7 @@ public:
             { "quest_template",                HandleReloadQuestTemplateCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "reference_loot_template",       HandleReloadLootTemplatesReferenceCommand,     SEC_ADMINISTRATOR, Console::Yes },
             { "reserved_name",                 HandleReloadReservedNameCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "profanity_name",                HandleReloadProfanityNameCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "reputation_reward_rate",        HandleReloadReputationRewardRateCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "reputation_spillover_template", HandleReloadReputationRewardRateCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "skill_discovery_template",      HandleReloadSkillDiscoveryTemplateCommand,     SEC_ADMINISTRATOR, Console::Yes },
@@ -203,6 +205,7 @@ public:
         HandleReloadMailServerTemplateCommand(handler);
         HandleReloadCommandCommand(handler);
         HandleReloadReservedNameCommand(handler);
+        HandleReloadProfanityNameCommand(handler);
         HandleReloadAcoreStringCommand(handler);
         HandleReloadGameTeleCommand(handler);
         HandleReloadCreatureMovementOverrideCommand(handler);
@@ -401,7 +404,7 @@ public:
     static bool HandleReloadAutobroadcastCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Autobroadcasts...");
-        sWorld->LoadAutobroadcasts();
+        sAutobroadcastMgr->LoadAutobroadcasts();
         handler->SendGlobalGMSysMessage("DB table `autobroadcast` reloaded.");
         return true;
     }
@@ -778,9 +781,17 @@ public:
 
     static bool HandleReloadReservedNameCommand(ChatHandler* handler)
     {
-        LOG_INFO("server.loading", "Loading ReservedNames... (`reserved_name`)");
+        LOG_INFO("server.loading", "Re-Loading `reserved_player` Table!");
         sObjectMgr->LoadReservedPlayersNames();
-        handler->SendGlobalGMSysMessage("DB table `reserved_name` (player reserved names) reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `reserved_name` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadProfanityNameCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading `profanity_player` Table!");
+        sObjectMgr->LoadProfanityPlayersNames();
+        handler->SendGlobalGMSysMessage("DB table `profanity_player` reloaded.");
         return true;
     }
 

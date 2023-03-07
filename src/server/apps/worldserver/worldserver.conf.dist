@@ -3931,6 +3931,7 @@ Logger.module=4,Console Server
 #Logger.addon=4,Console Server
 #Logger.ahbot=4,Console Server
 #Logger.auctionHouse=4,Console Server
+#Logger.autobroadcast=4, Console Server
 #Logger.bg.arena=4,Console Server
 #Logger.bg.battlefield=4,Console Server
 #Logger.bg.battleground=4,Console Server

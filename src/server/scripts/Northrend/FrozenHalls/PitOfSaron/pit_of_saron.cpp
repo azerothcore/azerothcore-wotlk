@@ -175,7 +175,7 @@ public:
 
                     events.RescheduleEvent(7, 5000);
                     break;
-                case 7:
+                case 7: /// @todo: (Initial RP, when zoning in the instance) is not complete.
                     if (pInstance)
                     {
                         if (Creature* n1 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_NECROLYTE_1_GUID)))
@@ -929,7 +929,7 @@ public:
             if (pInstance)
                 if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
                 {
-                    c->AI()->Talk(SAY_PREFIGHT_1);
+                    c->AI()->Talk(SAY_BOSS_TYRANNUS_INTRO_1);
                     c->SetImmuneToPC(false);
                     c->SetReactState(REACT_AGGRESSIVE);
                     //c->ClearUnitState(UNIT_STATE_ONVEHICLE);
@@ -1034,7 +1034,7 @@ public:
                 case 3:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
-                            c->AI()->Talk(SAY_PREFIGHT_2);
+                            c->AI()->Talk(SAY_BOSS_TYRANNUS_INTRO_2);
 
                     me->SetFacingTo(5.26f);
                     me->SetOrientation(5.26f);
@@ -1203,7 +1203,9 @@ public:
                     break;
                 case 1:
                     if (me->GetEntry() == NPC_JAINA_PART2)
+                    {
                         Talk(SAY_JAINA_OUTRO_3);
+                    }
                     break;
                 case 6:
                     me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);

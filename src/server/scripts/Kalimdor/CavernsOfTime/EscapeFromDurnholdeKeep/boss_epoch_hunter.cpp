@@ -21,10 +21,10 @@
 
 enum EpochHunter
 {
-    SAY_AGGRO                   = 3,
-    SAY_SLAY                    = 4,
-    SAY_BREATH                  = 5,
-    SAY_DEATH                   = 6,
+    SAY_AGGRO                   = 5,
+    SAY_SLAY                    = 6,
+    SAY_BREATH                  = 7,
+    SAY_DEATH                   = 8,
 
     SPELL_SAND_BREATH           = 31914,
     SPELL_IMPENDING_DEATH       = 31916,
