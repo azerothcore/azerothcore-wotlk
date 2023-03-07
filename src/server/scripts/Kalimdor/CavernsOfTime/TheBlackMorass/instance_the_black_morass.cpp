@@ -190,23 +190,18 @@ public:
                         }
 
                         // Here we check if we have available rift spots.
-                        // If there are spots available, spawn a rift instantly.
                         if (!_availableRiftPositions.empty())
                         {
                             context.Repeat((_currentRift >= 13 ? 2min : 90s));
                         }
                         else
                         {
-                            context.Repeat(3s);
+                            context.Repeat(4s);
                         }
                     }
-                    else
-                    {
-                        context.Repeat(3s);
-                    }
-
-                    context.SetGroup(CONTEXT_GROUP_RIFTS);
                 }
+
+                context.SetGroup(CONTEXT_GROUP_RIFTS);
             });
         }
 
@@ -242,21 +237,20 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_TIME_RIFT:
-                    _availableRiftPositions.push_back(creature->GetHomePosition());
-
-                    if (GetBossState(DATA_AEONUS) != DONE)
+                    if (GetBossState(DATA_AEONUS) == TO_BE_DECIDED)
                     {
                         // Here we check if we have available rift spots.
-                        // If there are spots available, spawn a rift instantly.
                         if (!_availableRiftPositions.empty())
-                        {
-                            ScheduleNextPortal(4s);
-                        }
-                        else
                         {
                             ScheduleNextPortal((_currentRift >= 13 ? 2min : 90s));
                         }
+                        else
+                        {
+                            ScheduleNextPortal(4s);
+                        }
                     }
+
+                    _availableRiftPositions.push_back(creature->GetHomePosition());
                     [[fallthrough]];
                 case NPC_CHRONO_LORD_DEJA:
                 case NPC_INFINITE_CHRONO_LORD:
