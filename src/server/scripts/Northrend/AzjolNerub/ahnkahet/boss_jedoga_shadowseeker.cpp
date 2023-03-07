@@ -387,7 +387,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                     sacraficeTarget_GUID = Acore::Containers::SelectRandomContainerElement(summons);
                     if (ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
                     {
-                        events.ScheduleEvent(EVENT_JEDGA_START_RITUAL, 3000, 0, PHASE_RITUAL);
+                        events.ScheduleEvent(EVENT_JEDGA_START_RITUAL, 3s, 0, PHASE_RITUAL);
                     }
                     // Something failed, let players continue but do not grant achievement
                     else
