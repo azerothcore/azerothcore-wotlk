@@ -920,14 +920,14 @@ public:
 
         void InitWaypoint()
         {
-            AddWaypoint(1, 2135, -304, 438.24f, 0);
-            AddWaypoint(2, 2132, -441, 438.24f, 0);
-            AddWaypoint(3, 2167, -442, 438.24f, 0);
-            AddWaypoint(4, 2227, -432, 412.18f, 0);
-            AddWaypoint(5, 2227, -263, 412.17f, 0);
-            AddWaypoint(6, 2179, -262, 414.7f, 0);
-            AddWaypoint(7, 2169, -261, 419.3f, 0);
-            AddWaypoint(8, 2110, -251, 419.42f, 0);
+            AddWaypoint(1, 2135, -304, 438.24f, 0ms);
+            AddWaypoint(2, 2132, -441, 438.24f, 0ms);
+            AddWaypoint(3, 2167, -442, 438.24f, 0ms);
+            AddWaypoint(4, 2227, -432, 412.18f, 0ms);
+            AddWaypoint(5, 2227, -263, 412.17f, 0ms);
+            AddWaypoint(6, 2179, -262, 414.7f, 0ms);
+            AddWaypoint(7, 2169, -261, 419.3f, 0ms);
+            AddWaypoint(8, 2110, -251, 419.42f, 0ms);
         }
 
         void Reset() override
@@ -1005,14 +1005,14 @@ public:
 
         void InitWaypoint()
         {
-            AddWaypoint(1, 2104.6f, -268.5f, 419.4f, 0);
-            AddWaypoint(2, 2104.3f, -256.3f, 419.4f, 0);
-            AddWaypoint(3, 2109.3f, -246.4f, 419.4f, 0);
-            AddWaypoint(4, 2117.9f, -238.6f, 419.4f, 0);
-            AddWaypoint(5, 2128.8f, -232.1f, 419.4f, 0);
-            AddWaypoint(6, 2151.9f, -237.5f, 419.4f, 0);
-            AddWaypoint(7, 2164.9f, -256.3f, 419.4f, 0);
-            AddWaypoint(8, 2161.5f, -280.0f, 419.4f, 0);
+            AddWaypoint(1, 2104.6f, -268.5f, 419.4f, 0ms);
+            AddWaypoint(2, 2104.3f, -256.3f, 419.4f, 0ms);
+            AddWaypoint(3, 2109.3f, -246.4f, 419.4f, 0ms);
+            AddWaypoint(4, 2117.9f, -238.6f, 419.4f, 0ms);
+            AddWaypoint(5, 2128.8f, -232.1f, 419.4f, 0ms);
+            AddWaypoint(6, 2151.9f, -237.5f, 419.4f, 0ms);
+            AddWaypoint(7, 2164.9f, -256.3f, 419.4f, 0ms);
+            AddWaypoint(8, 2161.5f, -280.0f, 419.4f, 0ms);
         }
 
         void Reset() override

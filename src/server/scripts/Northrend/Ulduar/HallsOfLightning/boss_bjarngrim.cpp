@@ -123,20 +123,20 @@ public:
             m_pInstance = creature->GetInstanceScript();
 
             // Init waypoints
-            AddWaypoint(1, 1262.18f, 99.3f, 33.5f, 0);
-            AddWaypoint(2, 1281.6f, 99.5f, 33.5f, 0);
-            AddWaypoint(3, 1311.7f, 99.4f, 40.1f, 0);
-            AddWaypoint(4, 1332.5f, 99.7f, 40.18f, 0);
-            AddWaypoint(5, 1311.7f, 99.4f, 40.1f, 0);
-            AddWaypoint(6, 1281.6f, 99.5f, 33.5f, 0);
-            AddWaypoint(7, 1262.18f, 99.3f, 33.5f, 0);
-            AddWaypoint(8, 1262, -26.9f, 33.5f, 0);
-            AddWaypoint(9, 1281.2f, -26.8f, 33.5f, 0);
-            AddWaypoint(10, 1311.3f, -26.9f, 40.03f, 0);
-            AddWaypoint(11, 1332, -26.6f, 40.18f, 0);
-            AddWaypoint(12, 1311.3f, -26.9f, 40.03f, 0);
-            AddWaypoint(13, 1281.2f, -26.8f, 33.5f, 0);
-            AddWaypoint(14, 1262, -26.9f, 33.5f, 0);
+            AddWaypoint(1, 1262.18f, 99.3f, 33.5f, 0ms);
+            AddWaypoint(2, 1281.6f, 99.5f, 33.5f, 0ms);
+            AddWaypoint(3, 1311.7f, 99.4f, 40.1f, 0ms);
+            AddWaypoint(4, 1332.5f, 99.7f, 40.18f, 0ms);
+            AddWaypoint(5, 1311.7f, 99.4f, 40.1f, 0ms);
+            AddWaypoint(6, 1281.6f, 99.5f, 33.5f, 0ms);
+            AddWaypoint(7, 1262.18f, 99.3f, 33.5f, 0ms);
+            AddWaypoint(8, 1262, -26.9f, 33.5f, 0ms);
+            AddWaypoint(9, 1281.2f, -26.8f, 33.5f, 0ms);
+            AddWaypoint(10, 1311.3f, -26.9f, 40.03f, 0ms);
+            AddWaypoint(11, 1332, -26.6f, 40.18f, 0ms);
+            AddWaypoint(12, 1311.3f, -26.9f, 40.03f, 0ms);
+            AddWaypoint(13, 1281.2f, -26.8f, 33.5f, 0ms);
+            AddWaypoint(14, 1262, -26.9f, 33.5f, 0ms);
 
             Start(true, false, ObjectGuid::Empty, nullptr, false, true);
         }

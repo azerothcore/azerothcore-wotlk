@@ -2091,7 +2091,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     progress->changed = true;
     progress->date = GameTime::GetGameTime().count(); // set the date to the latest update.
 
-    uint32 timeElapsed = 0;
+    Seconds timeElapsed = 0s;
     bool timedCompleted = false;
 
     if (entry->timeLimit)
@@ -2099,7 +2099,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
         // has to exist else we wouldn't be here
         timedCompleted = IsCompletedCriteria(entry, sAchievementStore.LookupEntry(entry->referredAchievement));
         // Client expects this in packet
-        timeElapsed = entry->timeLimit - (timedIter->second / IN_MILLISECONDS);
+        timeElapsed = Seconds(entry->timeLimit - (timedIter->second / IN_MILLISECONDS));
 
         // Remove the timer, we wont need it anymore
         if (timedCompleted)
