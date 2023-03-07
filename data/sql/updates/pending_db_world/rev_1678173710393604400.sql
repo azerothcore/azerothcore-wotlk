@@ -8,4 +8,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21925, 0, 0, 1, 54, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of Sathal - On Just Summoned - Start Attacking'),
 (21925, 0, 1, 0, 61, 0, 100, 257, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of Sathal - On Just Summoned - Say Line 0 (No Repeat/Reset)'),
 (21925, 0, 2, 0, 0, 0, 100, 0, 2300, 3000, 8700, 9000, 0, 11, 12471, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of Sathal - In Combat - Cast \'Shadow Bolt\''),
-(21925, 0, 3, 0, 2, 0, 100, 1, 20, 80, 0, 0, 0, 11, 34017, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of Sathal - Between 20-80% Health - Cast \'Rain of Chaos\' (No Repeat)');
+(21925, 0, 3, 0, 0, 0, 100, 0, 6000, 12000, 12000, 17000, 0, 11, 34017, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of Sathal - In Combat - Cast \'Rain of Chaos\'');
