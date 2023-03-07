@@ -1582,6 +1582,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading SpellInfo Store...");
     sSpellMgr->LoadSpellInfoStore();
 
+    LOG_INFO("server.loading", "Loading Spell Cooldown Overrides...");
+    sSpellMgr->LoadSpellCooldownOverrides();
+
     LOG_INFO("server.loading", "Loading SpellInfo Data Corrections...");
     sSpellMgr->LoadSpellInfoCorrections();
 
@@ -1908,8 +1911,11 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Groups...");
     sGroupMgr->LoadGroups();
 
-    LOG_INFO("server.loading", "Loading ReservedNames...");
+    LOG_INFO("server.loading", "Loading Reserved Names...");
     sObjectMgr->LoadReservedPlayersNames();
+
+    LOG_INFO("server.loading", "Loading Profanity Names...");
+    sObjectMgr->LoadProfanityPlayersNames();
 
     LOG_INFO("server.loading", "Loading GameObjects for Quests...");
     sObjectMgr->LoadGameObjectForQuests();

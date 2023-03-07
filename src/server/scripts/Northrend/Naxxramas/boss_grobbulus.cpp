@@ -101,9 +101,9 @@ public:
             BossAI::JustEngagedWith(who);
             PullChamberAdds();
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_POISON_CLOUD, 15000);
-            events.ScheduleEvent(EVENT_MUTATING_INJECTION, 20000);
-            events.ScheduleEvent(EVENT_SLIME_SPRAY, 10000);
+            events.ScheduleEvent(EVENT_POISON_CLOUD, 15s);
+            events.ScheduleEvent(EVENT_MUTATING_INJECTION, 20s);
+            events.ScheduleEvent(EVENT_SLIME_SPRAY, 10s);
             events.ScheduleEvent(EVENT_BERSERK, RAID_MODE(720000, 540000));
         }
 
@@ -166,7 +166,7 @@ public:
             {
                 case EVENT_POISON_CLOUD:
                     me->CastSpell(me, SPELL_POISON_CLOUD, true);
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
@@ -174,7 +174,7 @@ public:
                 case EVENT_SLIME_SPRAY:
                     Talk(EMOTE_SLIME);
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SLIME_SPRAY_10, SPELL_SLIME_SPRAY_25), false);
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 case EVENT_MUTATING_INJECTION:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, true, -SPELL_MUTATING_INJECTION))

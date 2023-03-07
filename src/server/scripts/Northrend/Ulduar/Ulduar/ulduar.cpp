@@ -233,9 +233,9 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
-            events.ScheduleEvent(1, 2000); // checking Separation Anxiety, Charged Sphere
-            events.ScheduleEvent(2, urand(5000, 8000)); // Forked Lightning
-            events.ScheduleEvent(3, (me->GetEntry() == 33722 ? 20000 : 50000)); // Summon Charged Sphere
+            events.ScheduleEvent(1, 2s); // checking Separation Anxiety, Charged Sphere
+            events.ScheduleEvent(2, 5s, 8s); // Forked Lightning
+            events.ScheduleEvent(3, (me->GetEntry() == 33722 ? 20s : 50s)); // Summon Charged Sphere
             if (Creature* c = me->FindNearestCreature((me->GetEntry() == 33722 ? 33699 : 33722), 30.0f, true))
                 otherGUID = c->GetGUID();
             else
@@ -276,16 +276,16 @@ public:
                         if (c->IsSummon())
                             if (c->ToTempSummon()->GetSummonerGUID() != me->GetGUID())
                                 me->CastSpell(me, 63528, true);
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 case 2:
                     me->CastSpell(me->GetVictim(), 63541, false);
-                    events.RepeatEvent(urand(10000, 14000));
+                    events.Repeat(10s, 14s);
                     break;
                 case 3:
                     if (!me->HasAura(63630))
                         me->CastSpell(me, 63527, false);
-                    events.RepeatEvent(60000);
+                    events.Repeat(1min);
                     break;
             }
 
@@ -318,9 +318,9 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(1, urand(5000, 8000)); // Flame Spray
-            events.ScheduleEvent(2, urand(3000, 6000)); // Machine Gun
-            events.ScheduleEvent(3, 1000); // Charged Leap
+            events.ScheduleEvent(1, 5s, 8s); // Flame Spray
+            events.ScheduleEvent(2, 3s, 6s); // Machine Gun
+            events.ScheduleEvent(3, 1s); // Charged Leap
         }
 
         void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/) override
@@ -383,11 +383,11 @@ public:
                         break;
                     case 1:
                         me->CastSpell(me->GetVictim(), RAID_MODE(64717, 65241), false);
-                        events.RepeatEvent(urand(15000, 25000));
+                        events.Repeat(15s, 25s);
                         break;
                     case 2:
                         me->CastSpell(me->GetVictim(), RAID_MODE(64776, 65240), false);
-                        events.RepeatEvent(urand(10000, 15000));
+                        events.Repeat(10s, 15s);
                         break;
                     case 3:
                         {
@@ -395,10 +395,10 @@ public:
                             if (dist > 10.0f && dist < 40.0f)
                             {
                                 me->CastSpell(me->GetVictim(), 64779, false);
-                                events.RepeatEvent(25000);
+                                events.Repeat(25s);
                             }
                             else
-                                events.RepeatEvent(3000);
+                                events.Repeat(3s);
                         }
                         break;
                 }

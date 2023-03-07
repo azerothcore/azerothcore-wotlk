@@ -91,7 +91,7 @@ struct npc_medivh_bm : public ScriptedAI
         events.Reset();
         me->CastSpell(me, SPELL_MANA_SHIELD, true);
 
-        if (_instance->GetData(TYPE_AEONUS) != DONE)
+        if (_instance->GetBossState(DATA_AEONUS) != DONE)
         {
             me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
         }
@@ -101,8 +101,6 @@ struct npc_medivh_bm : public ScriptedAI
 
     void JustSummoned(Creature* summon) override
     {
-        _instance->SetGuidData(DATA_SUMMONED_NPC, summon->GetGUID());
-
         if (summon->GetEntry() == NPC_DP_CRYSTAL_STALKER)
         {
             summon->DespawnOrUnsummon(25000);
@@ -119,14 +117,9 @@ struct npc_medivh_bm : public ScriptedAI
         }
     }
 
-    void SummonedCreatureDespawn(Creature* summon) override
-    {
-        _instance->SetGuidData(DATA_DELETED_NPC, summon->GetGUID());
-    }
-
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!events.Empty() || _instance->GetData(TYPE_AEONUS) == DONE)
+        if (!events.Empty() || _instance->GetBossState(DATA_AEONUS) == DONE)
         {
             return;
         }
@@ -274,9 +267,12 @@ struct npc_time_rift : public NullCreatureAI
         events.ScheduleEvent(EVENT_CHECK_DEATH, 8000);
     }
 
-    void SetGUID(ObjectGuid guid, int32) override
+    void JustSummoned(Creature* creature) override
     {
-        _riftKeeperGUID = guid;
+        if (creature->GetEntry() != NPC_AEONUS && _riftKeeperGUID.IsEmpty())
+        {
+            _riftKeeperGUID = creature->GetGUID();
+        }
     }
 
     void DoSummonAtRift(uint32 entry)
@@ -284,16 +280,15 @@ struct npc_time_rift : public NullCreatureAI
         Position pos = me->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
 
         if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 150000))
-            if (_instance)
+        {
+            if (Creature* medivh = _instance->GetCreature(DATA_MEDIVH))
             {
-                if (Unit* medivh = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_MEDIVH)))
-                {
-                    float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
-                    summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * std::sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
-                    summon->GetMotionMaster()->MoveTargetedHome(true);
-                    summon->SetReactState(REACT_DEFENSIVE);
-                }
+                float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
+                summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * std::sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
+                summon->GetMotionMaster()->MoveTargetedHome(true);
+                summon->SetReactState(REACT_DEFENSIVE);
             }
+        }
     }
 
     void DoSelectSummon()
@@ -326,8 +321,6 @@ struct npc_time_rift : public NullCreatureAI
                     Creature* riftKeeper = ObjectAccessor::GetCreature(*me, _riftKeeperGUID);
                     if (!riftKeeper || !riftKeeper->IsAlive())
                     {
-                        _instance->SetGuidData(DATA_RIFT_KILLED, me->GetGUID());
-
                         me->DespawnOrUnsummon(0);
                         break;
                     }

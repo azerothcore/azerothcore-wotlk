@@ -49,18 +49,18 @@ enum Rinji
     GO_RINJI_CAGE           = 142036
 };
 
-struct Location
+struct LocationXYZ
 {
-    float posX, posY, posZ;
+    float x, y, z;
 };
 
-Location AmbushSpawn[] =
+LocationXYZ AmbushSpawn[] =
 {
     { 191.296204f, -2839.329346f, 107.388f },
     { 70.972466f,  -2848.674805f, 109.459f }
 };
 
-Location AmbushMoveTo[] =
+LocationXYZ AmbushMoveTo[] =
 {
     { 166.630386f, -2824.780273f, 108.153f },
     { 70.886589f,  -2874.335449f, 116.675f }
@@ -118,12 +118,12 @@ public:
             if (!_first)
                 spawnId = 1;
 
-            me->SummonCreature(NPC_RANGER, AmbushSpawn[spawnId].posX, AmbushSpawn[spawnId].posY, AmbushSpawn[spawnId].posZ, 0.0f,
+            me->SummonCreature(NPC_RANGER, AmbushSpawn[spawnId].x, AmbushSpawn[spawnId].y, AmbushSpawn[spawnId].z, 0.0f,
                                TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
 
             for (int i = 0; i < 2; ++i)
             {
-                me->SummonCreature(NPC_OUTRUNNER, AmbushSpawn[spawnId].posX, AmbushSpawn[spawnId].posY, AmbushSpawn[spawnId].posZ, 0.0f,
+                me->SummonCreature(NPC_OUTRUNNER, AmbushSpawn[spawnId].x, AmbushSpawn[spawnId].y, AmbushSpawn[spawnId].z, 0.0f,
                                    TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
             }
         }
@@ -131,7 +131,7 @@ public:
         void JustSummoned(Creature* summoned) override
         {
             summoned->SetWalk(false);
-            summoned->GetMotionMaster()->MovePoint(0, AmbushMoveTo[spawnId].posX, AmbushMoveTo[spawnId].posY, AmbushMoveTo[spawnId].posZ);
+            summoned->GetMotionMaster()->MovePoint(0, AmbushMoveTo[spawnId].x, AmbushMoveTo[spawnId].y, AmbushMoveTo[spawnId].z);
         }
 
         void sQuestAccept(Player* player, Quest const* quest) override
