@@ -277,7 +277,7 @@ public:
                         }
                     }
                     reviveTimer = 0;
-                    events.ScheduleEvent(EVENT_THADDIUS_INIT, 750);
+                    events.ScheduleEvent(EVENT_THADDIUS_INIT, 750ms);
                 }
                 return;
             }
@@ -324,7 +324,7 @@ public:
                         go->SetGoState(GO_STATE_READY);
                     }
                     me->CastSpell(me, SPELL_THADDIUS_VISUAL_LIGHTNING, true);
-                    events.ScheduleEvent(EVENT_THADDIUS_ENTER_COMBAT, 1000);
+                    events.ScheduleEvent(EVENT_THADDIUS_ENTER_COMBAT, 1s);
                     break;
                 }
                 case EVENT_THADDIUS_ENTER_COMBAT:
@@ -332,21 +332,21 @@ public:
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    events.ScheduleEvent(EVENT_THADDIUS_CHAIN_LIGHTNING, 14000);
-                    events.ScheduleEvent(EVENT_THADDIUS_BERSERK, 360000);
-                    events.ScheduleEvent(EVENT_THADDIUS_POLARITY_SHIFT, 30000);
-                    events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 5000);
+                    events.ScheduleEvent(EVENT_THADDIUS_CHAIN_LIGHTNING, 14s);
+                    events.ScheduleEvent(EVENT_THADDIUS_BERSERK, 6min);
+                    events.ScheduleEvent(EVENT_THADDIUS_POLARITY_SHIFT, 30s);
+                    events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 5s);
                     return;
                 case EVENT_THADDIUS_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
                 case EVENT_THADDIUS_CHAIN_LIGHTNING:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_CHAIN_LIGHTNING_10, SPELL_CHAIN_LIGHTNING_25), false);
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 case EVENT_THADDIUS_POLARITY_SHIFT:
                     me->CastSpell(me, SPELL_POLARITY_SHIFT, false);
-                    events.RepeatEvent(30000);
+                    events.Repeat(30s);
                     break;
                 case EVENT_ALLOW_BALL_LIGHTNING:
                     ballLightningEnabled = true;
@@ -423,19 +423,19 @@ public:
             }
             if (me->GetEntry() == NPC_STALAGG)
             {
-                events.ScheduleEvent(EVENT_MINION_POWER_SURGE, 10000);
+                events.ScheduleEvent(EVENT_MINION_POWER_SURGE, 10s);
                 Talk(SAY_STAL_AGGRO);
             }
             else
             {
-                events.ScheduleEvent(EVENT_MINION_STATIC_FIELD, 5000);
+                events.ScheduleEvent(EVENT_MINION_STATIC_FIELD, 5s);
                 Talk(SAY_FEUG_AGGRO);
             }
-            events.ScheduleEvent(EVENT_MINION_CHECK_DISTANCE, 5000);
+            events.ScheduleEvent(EVENT_MINION_CHECK_DISTANCE, 5s);
 
             if (me->GetEntry() == NPC_STALAGG) // This event needs synchronisation, called for stalagg only
             {
-                events.ScheduleEvent(EVENT_MINION_MAGNETIC_PULL, 20000);
+                events.ScheduleEvent(EVENT_MINION_MAGNETIC_PULL, 20s);
             }
             if (pInstance)
             {
@@ -538,14 +538,14 @@ public:
             {
                 case EVENT_MINION_POWER_SURGE:
                     me->CastSpell(me, RAID_MODE(SPELL_POWER_SURGE_10, SPELL_POWER_SURGE_25), false);
-                    events.RepeatEvent(19000);
+                    events.Repeat(19s);
                     break;
                 case EVENT_MINION_STATIC_FIELD:
                     me->CastSpell(me, RAID_MODE(SPELL_STATIC_FIELD_10, SPELL_STATIC_FIELD_25), false);
-                    events.RepeatEvent(3000);
+                    events.Repeat(3s);
                     break;
                 case EVENT_MINION_MAGNETIC_PULL:
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     if (pInstance)
                     {
                         if (Creature* feugen = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FEUGEN_BOSS)))
@@ -587,7 +587,7 @@ public:
                                 cr->CastStop(SPELL_TESLA_SHOCK);
                                 cr->CastSpell(target, SPELL_TESLA_SHOCK, true);
                             }
-                            events.RepeatEvent(1500);
+                            events.Repeat(1500ms);
                             break;
                         }
                         else
@@ -596,7 +596,7 @@ public:
                             cr->CastSpell(cr, me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN, false);
                         }
                     }
-                    events.RepeatEvent(5000);
+                    events.Repeat(5s);
                     break;
             }
             DoMeleeAttackIfReady();
