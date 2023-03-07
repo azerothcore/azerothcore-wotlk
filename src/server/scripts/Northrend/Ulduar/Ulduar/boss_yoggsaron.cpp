@@ -2224,7 +2224,7 @@ public:
                     if (Creature* yogg = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON)))
                         yogg->AI()->DoAction(ACTION_FAILED_DRIVE_ME_CRAZY);
 
-                events.ScheduleEvent(40, 2000);
+                events.ScheduleEvent(40, 2s);
                 _targets.push_back(target->GetGUID());
             }
         }
