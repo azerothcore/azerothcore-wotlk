@@ -116,11 +116,11 @@ public:
             BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_CLEAVE, 9000);
-            events.ScheduleEvent(EVENT_INTIDMDATING_ROAR, 14000);
-            events.ScheduleEvent(EVENT_SUMMON_ADDS1, 18000);
+            events.ScheduleEvent(EVENT_CLEAVE, 9s);
+            events.ScheduleEvent(EVENT_INTIDMDATING_ROAR, 14s);
+            events.ScheduleEvent(EVENT_SUMMON_ADDS1, 18s);
             if (Is25ManRaid())
-                events.ScheduleEvent(EVENT_SUMMON_ADDS2, 20000);
+                events.ScheduleEvent(EVENT_SUMMON_ADDS2, 20s);
         }
 
         void JustSummoned(Creature* summon) override
@@ -139,7 +139,7 @@ public:
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
                 Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
             }
         }
 
@@ -160,22 +160,22 @@ public:
                         stalker1->CastSpell(stalker1, SPELL_SUMMON_FLAMECALLER, false);
                     if (Creature* stalker2 = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ZARITHRIAN_SPAWN_STALKER_2)))
                         stalker2->CastSpell(stalker2, SPELL_SUMMON_FLAMECALLER, false);
-                    events.ScheduleEvent(EVENT_SUMMON_ADDS1, 40000);
+                    events.ScheduleEvent(EVENT_SUMMON_ADDS1, 40s);
                     break;
                 case EVENT_SUMMON_ADDS2:
                     if (Creature* stalker1 = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ZARITHRIAN_SPAWN_STALKER_1)))
                         stalker1->CastSpell(stalker1, SPELL_SUMMON_FLAMECALLER, false);
                     if (Creature* stalker2 = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ZARITHRIAN_SPAWN_STALKER_2)))
                         stalker2->CastSpell(stalker2, SPELL_SUMMON_FLAMECALLER, false);
-                    events.ScheduleEvent(EVENT_SUMMON_ADDS2, 40000);
+                    events.ScheduleEvent(EVENT_SUMMON_ADDS2, 40s);
                     break;
                 case EVENT_INTIDMDATING_ROAR:
                     me->CastSpell(me, SPELL_INTIMIDATING_ROAR, false);
-                    events.ScheduleEvent(EVENT_INTIDMDATING_ROAR, 30000);
+                    events.ScheduleEvent(EVENT_INTIDMDATING_ROAR, 30s);
                     break;
                 case EVENT_CLEAVE:
                     me->CastSpell(me->GetVictim(), SPELL_CLEAVE_ARMOR, false);
-                    events.ScheduleEvent(EVENT_CLEAVE, 15000);
+                    events.ScheduleEvent(EVENT_CLEAVE, 15s);
                     break;
             }
 
@@ -216,8 +216,8 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             _events.Reset();
-            _events.ScheduleEvent(EVENT_BLAST_NOVA, urand(20000, 30000));
-            _events.ScheduleEvent(EVENT_LAVA_GOUT, 5000);
+            _events.ScheduleEvent(EVENT_BLAST_NOVA, 20s, 30s);
+            _events.ScheduleEvent(EVENT_LAVA_GOUT, 5s);
         }
 
         void EnterEvadeMode(EvadeReason /*why*/) override
@@ -265,18 +265,18 @@ public:
             {
                 case EVENT_BLAST_NOVA:
                     DoCastAOE(SPELL_BLAST_NOVA);
-                    _events.ScheduleEvent(EVENT_BLAST_NOVA, urand(20000, 30000));
+                    _events.ScheduleEvent(EVENT_BLAST_NOVA, 20s, 30s);
                     break;
                 case EVENT_LAVA_GOUT:
                     if (_lavaGoutCount >= 3)
                     {
                         _lavaGoutCount = 0;
-                        _events.ScheduleEvent(EVENT_LAVA_GOUT, 8000);
+                        _events.ScheduleEvent(EVENT_LAVA_GOUT, 8s);
                         break;
                     }
                     DoCastVictim(SPELL_LAVA_GOUT);
                     _lavaGoutCount++;
-                    _events.ScheduleEvent(EVENT_LAVA_GOUT, 1500);
+                    _events.ScheduleEvent(EVENT_LAVA_GOUT, 1500ms);
                     break;
             }
 

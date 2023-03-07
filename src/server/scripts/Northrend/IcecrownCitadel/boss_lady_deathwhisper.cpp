@@ -279,13 +279,13 @@ public:
 
             events.Reset();
             events.SetPhase(PHASE_ONE);
-            events.ScheduleEvent(EVENT_BERSERK, 600000);
-            events.ScheduleEvent(EVENT_SPELL_DEATH_AND_DECAY, 10000);
+            events.ScheduleEvent(EVENT_BERSERK, 10min);
+            events.ScheduleEvent(EVENT_SPELL_DEATH_AND_DECAY, 10s);
             if (GetDifficulty() != RAID_DIFFICULTY_10MAN_NORMAL)
-                events.ScheduleEvent(EVENT_SPELL_DOMINATE_MIND_25, 30000);
-            events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 2000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_SUMMON_WAVE_P1, 5000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_EMPOWER_CULTIST, urand(20000, 30000), 0, PHASE_ONE);
+                events.ScheduleEvent(EVENT_SPELL_DOMINATE_MIND_25, 30s);
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 2s, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_SUMMON_WAVE_P1, 5s, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_EMPOWER_CULTIST, 20s, 30s, 0, PHASE_ONE);
 
             Talk(SAY_AGGRO);
             me->RemoveAurasDueToSpell(SPELL_SHADOW_CHANNELING);
@@ -315,15 +315,15 @@ public:
                 me->SetPower(POWER_MANA, 0);
                 me->RemoveAurasDueToSpell(SPELL_MANA_BARRIER);
                 events.SetPhase(PHASE_TWO);
-                events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, urand(10000, 12000), 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_SPELL_FROSTBOLT_VOLLEY, urand(19000, 21000), 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_SPELL_TOUCH_OF_INSIGNIFICANCE, urand(6000, 9000), 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_SPELL_SUMMON_SHADE, urand(12000, 15000), 0, PHASE_TWO);
+                events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, 10s, 12s, 0, PHASE_TWO);
+                events.ScheduleEvent(EVENT_SPELL_FROSTBOLT_VOLLEY, 19s, 21s, 0, PHASE_TWO);
+                events.ScheduleEvent(EVENT_SPELL_TOUCH_OF_INSIGNIFICANCE, 6s, 9s, 0, PHASE_TWO);
+                events.ScheduleEvent(EVENT_SPELL_SUMMON_SHADE, 12s, 15s, 0, PHASE_TWO);
                 if (IsHeroic())
                 {
                     me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
-                    events.ScheduleEvent(EVENT_SUMMON_WAVE_P2, 45000, 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SUMMON_WAVE_P2, 45s, 0, PHASE_TWO);
                 }
             }
         }
@@ -367,7 +367,7 @@ public:
                 case EVENT_SPELL_DEATH_AND_DECAY:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_DEATH_AND_DECAY, false);
-                    events.RepeatEvent(urand(22000, 30000));
+                    events.Repeat(22s, 30s);
                     break;
                 case EVENT_SPELL_DOMINATE_MIND_25:
                     {
@@ -404,37 +404,37 @@ public:
                             me->CastSpell(target, SPELL_DOMINATE_MIND_25, true);
                         }
 
-                        events.RepeatEvent(urand(40000, 45000));
+                        events.Repeat(40s, 45s);
                     }
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_SHADOW_BOLT, false);
-                    events.RepeatEvent(2100);
+                    events.Repeat(2100ms);
                     break;
                 case EVENT_SUMMON_WAVE_P1:
                     SummonWaveP1();
-                    events.RepeatEvent(IsHeroic() ? 45000 : 60000);
+                    events.Repeat(IsHeroic() ? 45s : 60s);
                     break;
                 case EVENT_EMPOWER_CULTIST:
                     EmpowerCultist();
-                    events.RepeatEvent(urand(18000, 25000));
+                    events.Repeat(18s, 25s);
                     break;
                 case EVENT_SPELL_FROSTBOLT:
                     me->CastSpell(me->GetVictim(), SPELL_FROSTBOLT, false);
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     break;
                 case EVENT_SPELL_FROSTBOLT_VOLLEY:
                     me->CastSpell((Unit*)nullptr, SPELL_FROSTBOLT_VOLLEY, false);
-                    events.RepeatEvent(urand(13000, 15000));
+                    events.Repeat(13s, 15s);
                     break;
                 case EVENT_SPELL_TOUCH_OF_INSIGNIFICANCE:
                     me->CastSpell(me->GetVictim(), SPELL_TOUCH_OF_INSIGNIFICANCE, false);
-                    events.RepeatEvent(urand(6000, 9000));
+                    events.Repeat(6s, 9s);
                     break;
                 case EVENT_SUMMON_WAVE_P2:
                     SummonWaveP2();
-                    events.RepeatEvent(45000);
+                    events.Repeat(45s);
                     break;
                 case EVENT_SPELL_SUMMON_SHADE:
                     {
@@ -450,7 +450,7 @@ public:
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                 me->CastSpell(*itr, SPELL_SUMMON_SHADE, true);
                     }
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     break;
             }
 
@@ -556,12 +556,12 @@ public:
                 _introDone = true;
                 Talk(SAY_INTRO_1);
                 events.SetPhase(PHASE_INTRO);
-                events.ScheduleEvent(EVENT_INTRO_2, 11000, 0, PHASE_INTRO);
-                events.ScheduleEvent(EVENT_INTRO_3, 21000, 0, PHASE_INTRO);
-                events.ScheduleEvent(EVENT_INTRO_4, 31500, 0, PHASE_INTRO);
-                events.ScheduleEvent(EVENT_INTRO_5, 39500, 0, PHASE_INTRO);
-                events.ScheduleEvent(EVENT_INTRO_6, 48500, 0, PHASE_INTRO);
-                events.ScheduleEvent(EVENT_INTRO_7, 58000, 0, PHASE_INTRO);
+                events.ScheduleEvent(EVENT_INTRO_2, 11s, 0, PHASE_INTRO);
+                events.ScheduleEvent(EVENT_INTRO_3, 21s, 0, PHASE_INTRO);
+                events.ScheduleEvent(EVENT_INTRO_4, 31s + 500ms, 0, PHASE_INTRO);
+                events.ScheduleEvent(EVENT_INTRO_5, 39s + 500ms, 0, PHASE_INTRO);
+                events.ScheduleEvent(EVENT_INTRO_6, 48s + 500ms, 0, PHASE_INTRO);
+                events.ScheduleEvent(EVENT_INTRO_7, 58s, 0, PHASE_INTRO);
             }
         }
 
@@ -680,9 +680,9 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_FANATIC_NECROTIC_STRIKE, urand(10000, 12000));
-            events.ScheduleEvent(EVENT_SPELL_FANATIC_SHADOW_CLEAVE, urand(14000, 16000));
-            events.ScheduleEvent(EVENT_SPELL_FANATIC_VAMPIRIC_MIGHT, urand(20000, 27000));
+            events.ScheduleEvent(EVENT_SPELL_FANATIC_NECROTIC_STRIKE, 10s, 12s);
+            events.ScheduleEvent(EVENT_SPELL_FANATIC_SHADOW_CLEAVE, 14s, 16s);
+            events.ScheduleEvent(EVENT_SPELL_FANATIC_VAMPIRIC_MIGHT, 20s, 27s);
         }
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -711,7 +711,7 @@ public:
                 case SPELL_DARK_MARTYRDOM_FANATIC_25N:
                 case SPELL_DARK_MARTYRDOM_FANATIC_25H:
                     ApplyMechanicImmune(me, false);
-                    events.ScheduleEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM, 5); // Visual purposes only.
+                    events.ScheduleEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM, 5ms); // Visual purposes only.
                     break;
             }
         }
@@ -732,15 +732,15 @@ public:
             {
                 case EVENT_SPELL_FANATIC_NECROTIC_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_NECROTIC_STRIKE, false);
-                    events.RepeatEvent(urand(11000, 13000));
+                    events.Repeat(11s, 13s);
                     break;
                 case EVENT_SPELL_FANATIC_SHADOW_CLEAVE:
                     me->CastSpell(me->GetVictim(), SPELL_SHADOW_CLEAVE, false);
-                    events.RepeatEvent(urand(9500, 11000));
+                    events.Repeat(9500ms, 11s);
                     break;
                 case EVENT_SPELL_FANATIC_VAMPIRIC_MIGHT:
                     me->CastSpell(me, SPELL_VAMPIRIC_MIGHT, false);
-                    events.RepeatEvent(urand(20000, 27000));
+                    events.Repeat(20s, 27s);
                     break;
                 case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
@@ -763,7 +763,7 @@ public:
                     me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();
-                    events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
+                    events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6s);
                     break;
             }
 
@@ -792,10 +792,10 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_ADHERENT_FROST_FEVER, urand(10000, 12000));
-            events.ScheduleEvent(EVENT_SPELL_ADHERENT_DEATHCHILL, urand(14000, 16000));
-            events.ScheduleEvent(EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR, urand(14000, 16000));
-            events.ScheduleEvent(EVENT_SPELL_ADHERENT_SHROUD_OF_THE_OCCULT, urand(32000, 39000));
+            events.ScheduleEvent(EVENT_SPELL_ADHERENT_FROST_FEVER, 10s, 12s);
+            events.ScheduleEvent(EVENT_SPELL_ADHERENT_DEATHCHILL, 14s, 16s);
+            events.ScheduleEvent(EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR, 14s, 16s);
+            events.ScheduleEvent(EVENT_SPELL_ADHERENT_SHROUD_OF_THE_OCCULT, 32s, 39s);
         }
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -824,7 +824,7 @@ public:
                 case SPELL_DARK_MARTYRDOM_ADHERENT_25N:
                 case SPELL_DARK_MARTYRDOM_ADHERENT_25H:
                     ApplyMechanicImmune(me, false);
-                    events.ScheduleEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM, 5); // Visual purposes only.
+                    events.ScheduleEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM, 5ms); // Visual purposes only.
                     break;
             }
         }
@@ -845,23 +845,23 @@ public:
             {
                 case EVENT_SPELL_ADHERENT_FROST_FEVER:
                     me->CastSpell(me->GetVictim(), SPELL_FROST_FEVER, false);
-                    events.RepeatEvent(urand(9000, 13000));
+                    events.Repeat(9s, 13s);
                     break;
                 case EVENT_SPELL_ADHERENT_DEATHCHILL:
                     if (me->GetEntry() == NPC_EMPOWERED_ADHERENT)
                         me->CastSpell(me->GetVictim(), SPELL_DEATHCHILL_BLAST, false);
                     else
                         me->CastSpell(me->GetVictim(), SPELL_DEATHCHILL_BOLT, false);
-                    events.RepeatEvent(urand(9000, 13000));
+                    events.Repeat(9s, 13s);
                     break;
                 case EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                         me->CastSpell(target, SPELL_CURSE_OF_TORPOR, false);
-                    events.RepeatEvent(urand(9000, 13000));
+                    events.Repeat(9s, 13s);
                     break;
                 case EVENT_SPELL_ADHERENT_SHROUD_OF_THE_OCCULT:
                     me->CastSpell(me, SPELL_SHORUD_OF_THE_OCCULT, false);
-                    events.RepeatEvent(urand(27000, 32000));
+                    events.Repeat(27s, 32s);
                     break;
                 case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
@@ -884,7 +884,7 @@ public:
                     me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();
-                    events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
+                    events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6s);
                     break;
                 default:
                     break;
@@ -1008,10 +1008,10 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_DARNAVAN_BLADESTORM, 10000);
-            events.ScheduleEvent(EVENT_DARNAVAN_INTIMIDATING_SHOUT, urand(20000, 25000));
-            events.ScheduleEvent(EVENT_DARNAVAN_MORTAL_STRIKE, urand(25000, 30000));
-            events.ScheduleEvent(EVENT_DARNAVAN_SUNDER_ARMOR, urand(5000, 8000));
+            events.ScheduleEvent(EVENT_DARNAVAN_BLADESTORM, 10s);
+            events.ScheduleEvent(EVENT_DARNAVAN_INTIMIDATING_SHOUT, 20s, 25s);
+            events.ScheduleEvent(EVENT_DARNAVAN_MORTAL_STRIKE, 25s, 30s);
+            events.ScheduleEvent(EVENT_DARNAVAN_SUNDER_ARMOR, 5s, 8s);
             _canCharge = true;
             _canShatter = true;
         }
@@ -1061,7 +1061,7 @@ public:
             {
                 me->CastSpell(me->GetVictim(), SPELL_SHATTERING_THROW, false);
                 _canShatter = false;
-                events.ScheduleEvent(EVENT_DARNAVAN_SHATTERING_THROW, 30000);
+                events.ScheduleEvent(EVENT_DARNAVAN_SHATTERING_THROW, 30s);
                 return;
             }
 
@@ -1069,7 +1069,7 @@ public:
             {
                 me->CastSpell(me->GetVictim(), SPELL_CHARGE, false);
                 _canCharge = false;
-                events.ScheduleEvent(EVENT_DARNAVAN_CHARGE, 20000);
+                events.ScheduleEvent(EVENT_DARNAVAN_CHARGE, 20s);
                 return;
             }
 
@@ -1077,25 +1077,25 @@ public:
             {
                 case EVENT_DARNAVAN_BLADESTORM:
                     me->CastSpell((Unit*)nullptr, SPELL_BLADESTORM, false);
-                    events.RepeatEvent(urand(90000, 100000));
+                    events.Repeat(90s, 100s);
                     break;
                 case EVENT_DARNAVAN_CHARGE:
                     _canCharge = true;
                     break;
                 case EVENT_DARNAVAN_INTIMIDATING_SHOUT:
                     me->CastSpell((Unit*)nullptr, SPELL_INTIMIDATING_SHOUT, false);
-                    events.RepeatEvent(urand(90000, 120000));
+                    events.Repeat(90s, 120s);
                     break;
                 case EVENT_DARNAVAN_MORTAL_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
-                    events.RepeatEvent(urand(15000, 30000));
+                    events.Repeat(15s, 30s);
                     break;
                 case EVENT_DARNAVAN_SHATTERING_THROW:
                     _canShatter = true;
                     break;
                 case EVENT_DARNAVAN_SUNDER_ARMOR:
                     me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
-                    events.RepeatEvent(urand(3000, 7000));
+                    events.Repeat(3s, 7s);
                     break;
                 default:
                     break;

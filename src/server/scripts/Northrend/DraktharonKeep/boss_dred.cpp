@@ -86,15 +86,15 @@ public:
             BossAI::JustEngagedWith(who);
             _raptorCount = 0;
 
-            events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 33000);
-            events.ScheduleEvent(EVENT_SPELL_GRIEVOUS_BITE, 20000);
-            events.ScheduleEvent(EVENT_SPELL_MANGLING_SLASH, 18500);
-            events.ScheduleEvent(EVENT_SPELL_FEARSOME_ROAR, urand(10000, 20000));
-            events.ScheduleEvent(EVENT_SPELL_PIERCING_SLASH, 17000);
+            events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 33s);
+            events.ScheduleEvent(EVENT_SPELL_GRIEVOUS_BITE, 20s);
+            events.ScheduleEvent(EVENT_SPELL_MANGLING_SLASH, 18s + 500ms);
+            events.ScheduleEvent(EVENT_SPELL_FEARSOME_ROAR, 10s, 20s);
+            events.ScheduleEvent(EVENT_SPELL_PIERCING_SLASH, 17s);
             if (IsHeroic())
             {
-                events.ScheduleEvent(EVENT_MENACING_CLAW, 21000);
-                events.ScheduleEvent(EVENT_SPELL_RAPTOR_CALL, urand(20000, 25000));
+                events.ScheduleEvent(EVENT_MENACING_CLAW, 21s);
+                events.ScheduleEvent(EVENT_SPELL_RAPTOR_CALL, 20s, 25s);
             }
         }
 
@@ -111,27 +111,27 @@ public:
             {
                 case EVENT_SPELL_BELLOWING_ROAR:
                     me->CastSpell(me, SPELL_BELLOWING_ROAR, false);
-                    events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 40000);
+                    events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 40s);
                     break;
                 case EVENT_SPELL_GRIEVOUS_BITE:
                     me->CastSpell(me->GetVictim(), SPELL_GRIEVOUS_BITE, false);
-                    events.ScheduleEvent(EVENT_SPELL_GRIEVOUS_BITE, 20000);
+                    events.ScheduleEvent(EVENT_SPELL_GRIEVOUS_BITE, 20s);
                     break;
                 case EVENT_SPELL_MANGLING_SLASH:
                     me->CastSpell(me->GetVictim(), SPELL_MANGLING_SLASH, false);
-                    events.ScheduleEvent(EVENT_SPELL_MANGLING_SLASH, 20000);
+                    events.ScheduleEvent(EVENT_SPELL_MANGLING_SLASH, 20s);
                     break;
                 case EVENT_SPELL_FEARSOME_ROAR:
                     me->CastSpell(me, SPELL_FEARSOME_ROAR, false);
-                    events.ScheduleEvent(EVENT_SPELL_FEARSOME_ROAR, 17000);
+                    events.ScheduleEvent(EVENT_SPELL_FEARSOME_ROAR, 17s);
                     break;
                 case EVENT_SPELL_PIERCING_SLASH:
                     me->CastSpell(me->GetVictim(), SPELL_PIERCING_SLASH, false);
-                    events.ScheduleEvent(EVENT_SPELL_PIERCING_SLASH, 20000);
+                    events.ScheduleEvent(EVENT_SPELL_PIERCING_SLASH, 20s);
                     break;
                 case EVENT_SPELL_RAPTOR_CALL:
                     me->CastSpell(me, SPELL_RAPTOR_CALL, false);
-                    events.ScheduleEvent(EVENT_SPELL_RAPTOR_CALL, 20000);
+                    events.ScheduleEvent(EVENT_SPELL_RAPTOR_CALL, 20s);
                     break;
                 case EVENT_MENACING_CLAW:
                     Talk(SAY_CLAW_EMOTE);
@@ -141,7 +141,7 @@ public:
                         me->AttackerStateUpdate(me->GetVictim());
                     if (me->GetVictim())
                         me->AttackerStateUpdate(me->GetVictim());
-                    events.ScheduleEvent(EVENT_MENACING_CLAW, 20000);
+                    events.ScheduleEvent(EVENT_MENACING_CLAW, 20s);
                     break;
             }
 

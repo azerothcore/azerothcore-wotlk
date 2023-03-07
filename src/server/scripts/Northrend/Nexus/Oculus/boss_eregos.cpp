@@ -129,10 +129,10 @@ public:
 
             shiftNumber = 0;
 
-            events.RescheduleEvent(EVENT_SPELL_ARCANE_BARRAGE, 0);
-            events.RescheduleEvent(EVENT_SPELL_ARCANE_VOLLEY, 5000);
-            events.RescheduleEvent(EVENT_SPELL_ENRAGED_ASSAULT, 35000);
-            events.RescheduleEvent(EVENT_SUMMON_WHELPS, 40000);
+            events.RescheduleEvent(EVENT_SPELL_ARCANE_BARRAGE, 0ms);
+            events.RescheduleEvent(EVENT_SPELL_ARCANE_VOLLEY, 5s);
+            events.RescheduleEvent(EVENT_SPELL_ENRAGED_ASSAULT, 35s);
+            events.RescheduleEvent(EVENT_SUMMON_WHELPS, 40s);
         }
 
         void JustDied(Unit*  /*killer*/) override
@@ -153,7 +153,7 @@ public:
             if( shiftNumber <= uint32(1) && uint32(me->GetHealth() * 100 / me->GetMaxHealth()) <= uint32(60 - shiftNumber * 40) )
             {
                 ++shiftNumber;
-                events.RescheduleEvent(EVENT_SPELL_PLANAR_SHIFT, 0);
+                events.RescheduleEvent(EVENT_SPELL_PLANAR_SHIFT, 0ms);
             }
         }
 
@@ -194,21 +194,21 @@ public:
                 case EVENT_SPELL_ARCANE_BARRAGE:
                     if( Unit* v = me->GetVictim() )
                         me->CastSpell(v, SPELL_ARCANE_BARRAGE, false);
-                    events.RepeatEvent(2500);
+                    events.Repeat(2500ms);
                     break;
                 case EVENT_SPELL_ARCANE_VOLLEY:
                     me->CastSpell(me, SPELL_ARCANE_VOLLEY, false);
-                    events.RepeatEvent(8000);
+                    events.Repeat(8s);
                     break;
                 case EVENT_SPELL_ENRAGED_ASSAULT:
                     Talk(SAY_ENRAGE);
                     me->CastSpell(me, SPELL_ENRAGED_ASSAULT, false);
-                    events.RepeatEvent(35000);
+                    events.Repeat(35s);
                     break;
                 case EVENT_SUMMON_WHELPS:
                     for( uint8 i = 0; i < 5; ++i )
                         events.ScheduleEvent(EVENT_SUMMON_SINGLE_WHELP, urand(0, 8000));
-                    events.RepeatEvent(40000);
+                    events.Repeat(40s);
                     break;
                 case EVENT_SUMMON_SINGLE_WHELP:
                     {
