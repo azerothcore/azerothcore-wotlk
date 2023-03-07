@@ -252,7 +252,8 @@ public:
                 case EVENT_SUMMON_VOLCANO:
                     Talk(EMOTE_INFERNAL_ERUPTION);
                     Talk(SAY_INFERNAL_ERUPTION);
-                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOLCANO, false);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                        target->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOLCANO, false);
 
                     events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 60000);
                     break;

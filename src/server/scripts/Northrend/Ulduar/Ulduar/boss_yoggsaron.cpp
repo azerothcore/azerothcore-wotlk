@@ -857,7 +857,7 @@ public:
                     me->SetOrientation(M_PI);
                     me->SetDisplayId(SARA_TRANSFORM_MODEL);
 
-                    me->SendMonsterMove(me->GetPositionX(), me->GetPositionY(), 355, 2000, SPLINEFLAG_FLYING);
+                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
                     me->SetPosition(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
 
                     SpawnTentacle(NPC_CRUSHER_TENTACLE);
