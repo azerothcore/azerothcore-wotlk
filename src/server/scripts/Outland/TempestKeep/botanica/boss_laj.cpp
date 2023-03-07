@@ -48,109 +48,86 @@ enum Misc
     MODEL_FIRE                 = 13110,
     MODEL_FROST                = 14112,
     MODEL_NATURE               = 14214,
-
-    EVENT_ALERGIC_REACTION      = 1,
-    EVENT_TRANSFORM             = 2,
-    EVENT_TELEPORT              = 3,
-    EVENT_SUMMON                = 4
 };
 
-class boss_laj : public CreatureScript
+struct LajTransformData
 {
-public:
-    boss_laj() : CreatureScript("boss_laj") { }
+    uint32 spellId;
+    uint32 modelId;
+};
 
-    struct boss_lajAI : public BossAI
+LajTransformData const LajTransform[5] =
+{
+    { SPELL_DAMAGE_IMMUNE_SHADOW, MODEL_DEFAULT },
+    { SPELL_DAMAGE_IMMUNE_ARCANE, MODEL_ARCANE  },
+    { SPELL_DAMAGE_IMMUNE_FIRE,   MODEL_FIRE    },
+    { SPELL_DAMAGE_IMMUNE_FROST,  MODEL_FROST   },
+    { SPELL_DAMAGE_IMMUNE_NATURE, MODEL_NATURE  }
+};
+
+struct boss_laj : public BossAI
+{
+    boss_laj(Creature* creature) : BossAI(creature, DATA_LAJ) { }
+
+    void Reset() override
     {
-        boss_lajAI(Creature* creature) : BossAI(creature, DATA_LAJ) { }
+        _Reset();
+        me->SetDisplayId(MODEL_DEFAULT);
+        _lastTransform = LajTransform[0];
+        DoCastSelf(SPELL_DAMAGE_IMMUNE_SHADOW, true);
 
-        void Reset() override
+        if (_transformContainer.empty())
         {
-            _Reset();
-            me->SetDisplayId(MODEL_DEFAULT);
-            _lastTransform = SPELL_DAMAGE_IMMUNE_SHADOW;
-            me->CastSpell(me, SPELL_DAMAGE_IMMUNE_SHADOW, true);
-        }
-
-        void DoTransform()
-        {
-            me->RemoveAurasDueToSpell(_lastTransform);
-
-            switch (_lastTransform = RAND(SPELL_DAMAGE_IMMUNE_SHADOW, SPELL_DAMAGE_IMMUNE_FIRE, SPELL_DAMAGE_IMMUNE_FROST, SPELL_DAMAGE_IMMUNE_NATURE, SPELL_DAMAGE_IMMUNE_ARCANE))
+            for (auto const& val : LajTransform)
             {
-                case SPELL_DAMAGE_IMMUNE_SHADOW:
-                    me->SetDisplayId(MODEL_DEFAULT);
-                    break;
-                case SPELL_DAMAGE_IMMUNE_ARCANE:
-                    me->SetDisplayId(MODEL_ARCANE);
-                    break;
-                case SPELL_DAMAGE_IMMUNE_FIRE:
-                    me->SetDisplayId(MODEL_FIRE);
-                    break;
-                case SPELL_DAMAGE_IMMUNE_FROST:
-                    me->SetDisplayId(MODEL_FROST);
-                    break;
-                case SPELL_DAMAGE_IMMUNE_NATURE:
-                    me->SetDisplayId(MODEL_NATURE);
-                    break;
+                _transformContainer.push_back(val);
             }
-
-            me->CastSpell(me, _lastTransform, true);
         }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            _JustEngagedWith();
-
-            events.ScheduleEvent(EVENT_ALERGIC_REACTION, 5000);
-            events.ScheduleEvent(EVENT_TRANSFORM, 30000);
-            events.ScheduleEvent(EVENT_TELEPORT, 20000);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ALERGIC_REACTION:
-                    me->CastSpell(me->GetVictim(), SPELL_ALLERGIC_REACTION, false);
-                    events.ScheduleEvent(EVENT_ALERGIC_REACTION, 25000);
-                    break;
-                case EVENT_TELEPORT:
-                    me->CastSpell(me, SPELL_TELEPORT_SELF, false);
-                    events.ScheduleEvent(EVENT_SUMMON, 2500);
-                    events.ScheduleEvent(EVENT_TELEPORT, 30000);
-                    break;
-                case EVENT_SUMMON:
-                    Talk(EMOTE_SUMMON);
-                    me->CastSpell(me, SPELL_SUMMON_LASHER_1, true);
-                    me->CastSpell(me, SPELL_SUMMON_FLAYER_1, true);
-                    break;
-                case EVENT_TRANSFORM:
-                    DoTransform();
-                    events.ScheduleEvent(EVENT_TRANSFORM, 35000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    private:
-        uint32 _lastTransform;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetTheBotanicaAI<boss_lajAI>(creature);
     }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+
+        scheduler.Schedule(5s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_ALLERGIC_REACTION);
+            context.Repeat(25s);
+        }).Schedule(30s, [this](TaskContext context)
+        {
+            me->RemoveAurasDueToSpell(_lastTransform.spellId);
+            _lastTransform = Acore::Containers::SelectRandomContainerElementIf(_transformContainer, [&](LajTransformData data) -> bool
+            {
+                return data.spellId != _lastTransform.spellId;
+            });
+            me->SetDisplayId(_lastTransform.modelId);
+            DoCastSelf(_lastTransform.spellId, true);
+            context.Repeat(35s);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_TELEPORT_SELF);
+            me->SetReactState(REACT_PASSIVE);
+            me->GetMotionMaster()->Clear();
+
+            scheduler.Schedule(2500ms, [this](TaskContext)
+            {
+                Talk(EMOTE_SUMMON);
+                DoCastAOE(SPELL_SUMMON_LASHER_1, true);
+                DoCastAOE(SPELL_SUMMON_FLAYER_1, true);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->ResumeChasingVictim();
+            });
+
+            context.Repeat(30s);
+        });
+    }
+
+private:
+    LajTransformData _lastTransform;
+    std::vector<LajTransformData> _transformContainer;
 };
 
 void AddSC_boss_laj()
 {
-    new boss_laj();
+    RegisterTheBotanicaCreatureAI(boss_laj);
 }

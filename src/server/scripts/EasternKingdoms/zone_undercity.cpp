@@ -748,12 +748,11 @@ enum Worldstates
     WORLD_STATE_FAIL_H = 3878
 };
 
-struct Location
-{
+struct LocationXYZO {
     float x, y, z, o;
 };
 
-static Location AllianceSpawn[] =
+static LocationXYZO AllianceSpawn[] =
 {
     { 1603.97f, 718.02f, 65.10f, 0  }, // guardian // sewers
     { 1604.78f, 657.22f, 40.80f, 0  }, // wave 1
@@ -788,7 +787,7 @@ static Location AllianceSpawn[] =
     { 1307.92f, 395.53f, -63.24f, 4.472f },
 };
 
-static Location AllianceWP[] =
+static LocationXYZO AllianceWP[] =
 {
     { 1737.06f, 734.176f, 48.8f, 0      }, // Jaina sewers UNUSED
     { 1682.92f, 730.89f, 76.84f, 0      }, // UNUSED
@@ -802,12 +801,12 @@ static Location AllianceWP[] =
     { 1300.75f, 347.39f, -65.02f, 0     }, // jaina throne room
 };
 
-static Location HordeSpawn[] =
+static LocationXYZO HordeSpawn[] =
 {
     { 1581.94f, 383.22f, -62.22f, 0 } // Khanok
 };
 
-static Location ThrallSpawn[] =
+static LocationXYZO ThrallSpawn[] =
 {
     // Vortex
     { 1880.0001f, 237.8242f, 59.472f, 3.060f  },

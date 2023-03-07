@@ -145,16 +145,17 @@ enum eSpells
 *** INTRO:
 ************/
 
-enum eIntroTexts
+// Tyrannus speaker - NPC_TYRANNUS_EVENT
+enum eIntroTexts // Before Cave
 {
-    SAY_TYRANNUS_INTRO_1                        = 1,
+    SAY_TYRANNUS_INTRO_1                        = 4,
     SAY_JAINA_INTRO_1                           = 2,
     SAY_SYLVANAS_INTRO_1                        = 3,
-    SAY_TYRANNUS_INTRO_2                        = 4,
-    SAY_TYRANNUS_INTRO_3                        = 5,
+    SAY_TYRANNUS_INTRO_2                        = 5,
+    SAY_TYRANNUS_INTRO_3                        = 6,
     SAY_JAINA_INTRO_2                           = 6,
     SAY_SYLVANAS_INTRO_2                        = 7,
-    SAY_TYRANNUS_INTRO_4                        = 8,
+    SAY_TYRANNUS_INTRO_4                        = 7,
     SAY_JAINA_INTRO_3                           = 9,
     SAY_JAINA_INTRO_4                           = 10,
     SAY_SYLVANAS_INTRO_3                        = 11,
@@ -206,7 +207,7 @@ const ChampionPosition introPositions[] =
 enum eFBSTexts
 {
     SAY_GENERAL_GARFROST                        = 21,
-    SAY_TYRANNUS_GARFROST                       = 20,
+    SAY_TYRANNUS_GARFROST                       = 0,
 };
 
 const Position FBSSpawnPos = {695.685f, -118.825f, 513.877f, 3 * M_PI / 2};
@@ -240,18 +241,18 @@ const Position SBSTyrannusStartPos = {781.127f, 265.825f, 552.31f, 0.0f};
 const Position SBSLeaderStartPos = {772.716f, 111.517f, 510.81f, 0.0f};
 const Position SBSLeaderEndPos = {823.2f, -4.4497f, 509.49f, 0.86f};
 
-enum eSBSTexts
+enum eSBSTexts // Ick outro
 {
-    SAY_OUTRO_KRICK_1                           = 35,
+    SAY_OUTRO_KRICK_1                           = 6,
     SAY_JAINA_KRICK_1                           = 36,
     SAY_SYLVANAS_KRICK_1                        = 37,
-    SAY_OUTRO_KRICK_2                           = 38,
+    SAY_OUTRO_KRICK_2                           = 7,
     SAY_JAINA_KRICK_2                           = 39,
     SAY_SYLVANAS_KRICK_2                        = 40,
-    SAY_OUTRO_KRICK_3                           = 41,
-    SAY_TYRANNUS_KRICK_1                        = 42,
-    SAY_OUTRO_KRICK_4                           = 43,
-    SAY_TYRANNUS_KRICK_2                        = 44,
+    SAY_OUTRO_KRICK_3                           = 8,
+    SAY_TYRANNUS_KRICK_1                        = 0,
+    SAY_OUTRO_KRICK_4                           = 9,
+    SAY_TYRANNUS_KRICK_2                        = 1,
     SAY_JAINA_KRICK_3                           = 45,
     SAY_SYLVANAS_KRICK_3                        = 46,
 };
@@ -266,9 +267,9 @@ const Position PTSTyrannusWaitPos3 = {1117.93f, -125.16f, 760.34f, 0.10f};
 
 enum ePTSTexts
 {
-    SAY_TYRANNUS_AMBUSH_1                       = 47,
-    SAY_TYRANNUS_AMBUSH_2                       = 48,
-    SAY_TYRANNUS_TRAP_TUNNEL                    = 49,
+    SAY_TYRANNUS_AMBUSH_1                       = 2, // NPC_TYRANNUS_EVENT
+    SAY_TYRANNUS_AMBUSH_2                       = 3, // NPC_TYRANNUS_EVENT
+    SAY_TYRANNUS_TRAP_TUNNEL                    = 1, // NPC_TYRANNUS_VOICE
 };
 
 /************
@@ -313,10 +314,9 @@ const TSPosition TSData[] =
 
 enum eTSTexts
 {
-    SAY_PREFIGHT_1                              = 50,
+    SAY_BOSS_TYRANNUS_INTRO_1                   = 0,
     SAY_GENERAL_HORDE_TRASH                     = 51,
-    SAY_PREFIGHT_2                              = 52,
-    SAY_PREFIGHT_AGGRO                          = 53,
+    SAY_BOSS_TYRANNUS_INTRO_2                   = 1,
 
     SAY_GENERAL_HORDE_OUTRO_1                   = 61,
     SAY_GENERAL_OUTRO_2                         = 62,

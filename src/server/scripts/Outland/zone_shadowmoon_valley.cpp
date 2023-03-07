@@ -870,13 +870,13 @@ static Location SpawnLocation[] =
     {-4627.1240f, 1378.8752f, 139.9f, 2.544f} //Torloth The Magnificent
 };
 
-struct WaveData
+struct WaveDataCreature
 {
     uint8 SpawnCount, UsedSpawnPoint;
     uint32 CreatureId, SpawnTimer, YellTimer;
 };
 
-static WaveData WavesInfo[] =
+static WaveDataCreature WavesInfo[] =
 {
     {9, 0, 22075, 10000, 7000},   //Illidari Soldier
     {2, 9, 22074, 10000, 7000},   //Illidari Mind Breaker

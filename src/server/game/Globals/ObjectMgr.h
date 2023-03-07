@@ -1355,6 +1355,11 @@ public:
     [[nodiscard]] bool IsReservedName(std::string_view name) const;
     void AddReservedPlayerName(std::string const& name);
 
+    // profanity names
+    void LoadProfanityPlayersNames();
+    [[nodiscard]] bool IsProfanityName(std::string_view name) const;
+    void AddProfanityPlayerName(std::string const& name);
+
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string_view name, bool create = false);
     static PetNameInvalidReason CheckPetName(std::string_view name);
@@ -1525,6 +1530,10 @@ private:
     //character reserved names
     typedef std::set<std::wstring> ReservedNamesContainer;
     ReservedNamesContainer _reservedNamesStore;
+
+    //character profanity names
+    typedef std::set<std::wstring> ProfanityNamesContainer;
+    ReservedNamesContainer _profanityNamesStore;
 
     GameTeleContainer _gameTeleStore;
 

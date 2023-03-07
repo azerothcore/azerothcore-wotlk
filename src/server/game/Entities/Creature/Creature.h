@@ -404,6 +404,12 @@ public:
 
     void ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration);
 
+    /**
+     * @brief Helper to resume chasing current victim.
+     *
+     * */
+    void ResumeChasingVictim() { GetMotionMaster()->MoveChase(GetVictim()); };
+
     std::string GetDebugInfo() const override;
 
     //NPCBots
