@@ -14,7 +14,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (7167, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Polly - On Spellhit \'Polly Eats the E.C.A.C.\' - Set Faction 35 (No Repeat)'),
 (7167, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Polly - On Spellhit \'Polly Eats the E.C.A.C.\' - Set Home Position (No Repeat)'),
 (7167, 0, 5, 6, 52, 0, 100, 513, 0, 7167, 0, 0, 0, 12, 7168, 4, 60000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Polly - On Text 0 Over - Summon Creature \'Polly\' (No Repeat)'),
-(7167, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Polly - On Text 0 Over - Despawn Instant (No Repeat)');
+(7167, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Polly - On Text 0 Over - Despawn Instant (No Repeat)'),
+(7167, 0, 7, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Polly - On Just Summoned - Say Line 1');
 
 -- Polly (after E.C.A.C)
 DELETE FROM `creature_text` WHERE `CreatureID`=7168;
