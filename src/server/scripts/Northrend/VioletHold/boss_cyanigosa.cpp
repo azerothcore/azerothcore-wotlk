@@ -87,12 +87,12 @@ public:
             DoZoneInCombat();
             Talk(SAY_AGGRO);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_ARCANE_VACUUM, 30000);
-            events.RescheduleEvent(EVENT_SPELL_BLIZZARD, urand(5000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_TAIL_SWEEP, urand(15000, 20000));
-            events.RescheduleEvent(EVENT_SPELL_UNCONTROLLABLE_ENERGY, urand(5000, 8000));
+            events.RescheduleEvent(EVENT_SPELL_ARCANE_VACUUM, 30s);
+            events.RescheduleEvent(EVENT_SPELL_BLIZZARD, 5s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_TAIL_SWEEP, 15s, 20s);
+            events.RescheduleEvent(EVENT_SPELL_UNCONTROLLABLE_ENERGY, 5s, 8s);
             if (IsHeroic())
-                events.RescheduleEvent(EVENT_SPELL_MANA_DESTRUCTION, 20000);
+                events.RescheduleEvent(EVENT_SPELL_MANA_DESTRUCTION, 20s);
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
@@ -126,8 +126,8 @@ public:
                     DoResetThreatList();
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->setAttackTimer(BASE_ATTACK, 3000);
-                    events.RepeatEvent(30000);
-                    events.ScheduleEvent(EVENT_UNROOT, 3000);
+                    events.Repeat(30s);
+                    events.ScheduleEvent(EVENT_UNROOT, 3s);
                     break;
                 case EVENT_UNROOT:
                     me->SetControlled(false, UNIT_STATE_ROOT);
@@ -136,20 +136,20 @@ public:
                 case EVENT_SPELL_BLIZZARD:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true))
                         me->CastSpell(target, SPELL_BLIZZARD, false);
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 case EVENT_SPELL_MANA_DESTRUCTION:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_MANA_DESTRUCTION, false);
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 case EVENT_SPELL_TAIL_SWEEP:
                     me->CastSpell(me->GetVictim(), SPELL_TAIL_SWEEP, false);
-                    events.RepeatEvent(urand(15000, 20000));
+                    events.Repeat(15s, 20s);
                     break;
                 case EVENT_SPELL_UNCONTROLLABLE_ENERGY:
                     me->CastSpell(me->GetVictim(), SPELL_UNCONTROLLABLE_ENERGY, false);
-                    events.RepeatEvent(urand(20000, 25000));
+                    events.Repeat(20s, 25s);
                     break;
             }
 

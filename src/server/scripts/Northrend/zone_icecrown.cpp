@@ -15,17 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Icecrown
-SD%Complete: 100
-SDComment: Quest support: 12807
-SDCategory: Icecrown
-EndScriptData */
-
-/* ContentData
-npc_arete
-EndContentData */
-
 #include "CombatAI.h"
 #include "MoveSplineInit.h"
 #include "PassiveAI.h"
@@ -178,8 +167,8 @@ public:
 
         void StartBattle(ObjectGuid guid, uint32 questId)
         {
-            events.ScheduleEvent(EVENT_VALHALAS_FIRST, 6000);
-            events.ScheduleEvent(EVENT_VALHALAS_CHECK_PLAYER, 30000);
+            events.ScheduleEvent(EVENT_VALHALAS_FIRST, 6s);
+            events.ScheduleEvent(EVENT_VALHALAS_CHECK_PLAYER, 30s);
             currentQuest = questId;
             playerGUID = guid;
         }
@@ -223,7 +212,7 @@ public:
                 playerGUID2 = playerGUID;
                 EnterEvadeMode();
                 if (quest == QUEST_BFV_FINAL)
-                    events.ScheduleEvent(EVENT_VALHALAS_THIRD, 7000);
+                    events.ScheduleEvent(EVENT_VALHALAS_THIRD, 7s);
             }
             else
             {
@@ -249,11 +238,11 @@ public:
                         switch (currentQuest)
                         {
                             case QUEST_BFV_FALLEN_HEROES:
-                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
+                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8s);
                                 me->Yell("$N and comrades in arms have chosen to accept honorable combat within the sacred confines of Valhalas.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_DARK_MASTER:
-                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
+                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8s);
                                 me->Yell("$N has accepted the challenge of Khit'rix the Dark Master. May the gods show mercy upon him for Khit'rix surely will not.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_SIGRID:
@@ -261,15 +250,15 @@ public:
                                 me->TextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
-                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
+                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8s);
                                 me->Yell("From the bowels of the Underhalls comes Carnage. Brave and foolish $N has accepted the challenge. $N and his group stand ready to face the monstrosity.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_THANE:
-                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
+                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8s);
                                 me->Yell("Thane Banahogg returns to Valhalas for the first time in ages to prove that the vrykul are the only beings worthy to fight within its sacred ring. Will $N prove him wrong?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_FINAL:
-                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
+                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8s);
                                 me->Yell("From the depths of Icecrown Citadel, one of the Lich King's chosen comes to put an end to the existence of $N and his friends.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                         }
@@ -307,7 +296,7 @@ public:
                 case EVENT_VALHALAS_THIRD:
                     {
                         me->Yell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                        events.ScheduleEvent(EVENT_VALHALAS_THIRD + 2, 7000);
+                        events.ScheduleEvent(EVENT_VALHALAS_THIRD + 2, 7s);
                         break;
                     }
                 case EVENT_VALHALAS_THIRD+2:
@@ -328,7 +317,7 @@ public:
                         if (fail)
                             EnterEvadeMode();
 
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
             }
@@ -486,7 +475,7 @@ public:
             _landgrenSoulGUID.Clear();
 
             events.Reset();
-            events.RescheduleEvent(EVENT_START, 1000);
+            events.RescheduleEvent(EVENT_START, 1s);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->SetWalk(true);
             me->SetImmuneToAll(true);
@@ -508,7 +497,7 @@ public:
 
                         float o = cr->GetAngle(me);
                         me->GetMotionMaster()->MovePoint(1, cr->GetPositionX() + cos(o) * 3, cr->GetPositionY() + std::sin(o) * 3, cr->GetPositionZ());
-                        events.RescheduleEvent(EVENT_SOUL_COAX, 5000);
+                        events.RescheduleEvent(EVENT_SOUL_COAX, 5s);
                     }
                     else
                         me->DespawnOrUnsummon(1);
@@ -516,7 +505,7 @@ public:
                 case EVENT_SOUL_COAX:
                     Talk(SAY_ARETE_1);
                     me->CastSpell(me, SPELL_SOUL_COAX, false);
-                    events.ScheduleEvent(EVENT_SUMMON_SOUL, 8000);
+                    events.ScheduleEvent(EVENT_SUMMON_SOUL, 8s);
                     break;
                 case EVENT_SUMMON_SOUL:
                     if (Creature* cr = ObjectAccessor::GetCreature(*me, _landgrenGUID))
@@ -526,7 +515,7 @@ public:
                         _landgrenSoulGUID = soul->GetGUID();
                         soul->SetVisible(false);
                     }
-                    events.ScheduleEvent(EVENT_SOUL_FLY, 3000);
+                    events.ScheduleEvent(EVENT_SOUL_FLY, 3s);
                     break;
                 case EVENT_SOUL_FLY:
                     if (Creature* soul = ObjectAccessor::GetCreature(*me, _landgrenSoulGUID))
@@ -539,7 +528,7 @@ public:
                         init.Launch();
                         soul->CastSpell(soul, 64462, true); // Drown
                     }
-                    events.ScheduleEvent(EVENT_SCENE_1, 6000);
+                    events.ScheduleEvent(EVENT_SCENE_1, 6s);
                     break;
                 case EVENT_SCENE_1:
                     if (Creature* soul = ObjectAccessor::GetCreature(*me, _landgrenSoulGUID))
@@ -548,43 +537,43 @@ public:
                         soul->CastSpell(soul, 64462, true); // Drown
                         soul->AI()->Talk(SAY_SOUL_0);
                     }
-                    events.ScheduleEvent(EVENT_SCENE_2, 5000);
+                    events.ScheduleEvent(EVENT_SCENE_2, 5s);
                     break;
                 case EVENT_SCENE_2:
                     Talk(SAY_ARETE_2);
-                    events.ScheduleEvent(EVENT_SCENE_3, 5000);
+                    events.ScheduleEvent(EVENT_SCENE_3, 5s);
                     break;
                 case EVENT_SCENE_3:
                     if (Creature* soul = ObjectAccessor::GetCreature(*me, _landgrenSoulGUID))
                         soul->AI()->Talk(SAY_SOUL_1);
-                    events.ScheduleEvent(EVENT_SCENE_4, 3000);
+                    events.ScheduleEvent(EVENT_SCENE_4, 3s);
                     break;
                 case EVENT_SCENE_4:
                     if (Creature* soul = ObjectAccessor::GetCreature(*me, _landgrenSoulGUID))
                         me->CastSpell(soul, SPELL_SOUL_WRACK, false);
                     Talk(SAY_ARETE_3);
-                    events.ScheduleEvent(EVENT_SCENE_5, 6000);
+                    events.ScheduleEvent(EVENT_SCENE_5, 6s);
                     break;
                 case EVENT_SCENE_5:
                     if (Creature* soul = ObjectAccessor::GetCreature(*me, _landgrenSoulGUID))
                         soul->AI()->Talk(SAY_SOUL_2);
                     me->InterruptNonMeleeSpells(false);
-                    events.ScheduleEvent(EVENT_SCENE_6, 4000);
+                    events.ScheduleEvent(EVENT_SCENE_6, 4s);
                     break;
                 case EVENT_SCENE_6:
                     Talk(SAY_ARETE_4);
-                    events.ScheduleEvent(EVENT_SCENE_7, 4000);
+                    events.ScheduleEvent(EVENT_SCENE_7, 4s);
                     break;
                 case EVENT_SCENE_7:
                     if (Creature* soul = ObjectAccessor::GetCreature(*me, _landgrenSoulGUID))
                         soul->AI()->Talk(SAY_SOUL_3);
-                    events.ScheduleEvent(EVENT_SCENE_8, 8000);
+                    events.ScheduleEvent(EVENT_SCENE_8, 8s);
                     break;
                 case EVENT_SCENE_8:
                     if (Creature* soul = ObjectAccessor::GetCreature(*me, _landgrenSoulGUID))
                         me->CastSpell(soul, SPELL_SOUL_WRACK, false);
                     Talk(SAY_ARETE_5);
-                    events.ScheduleEvent(EVENT_SCENE_9, 6000);
+                    events.ScheduleEvent(EVENT_SCENE_9, 6s);
                     break;
                 case EVENT_SCENE_9:
                     if (Creature* soul = ObjectAccessor::GetCreature(*me, _landgrenSoulGUID))
@@ -592,7 +581,7 @@ public:
                         soul->AI()->Talk(SAY_SOUL_4);
                         soul->DespawnOrUnsummon(2000);
                     }
-                    events.ScheduleEvent(EVENT_SCENE_10, 3000);
+                    events.ScheduleEvent(EVENT_SCENE_10, 3s);
                     break;
                 case EVENT_SCENE_10:
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_QUESTGIVER);
@@ -716,7 +705,7 @@ public:
         void SetData(uint32 type, uint32 data) override
         {
             if (type == 1 && data == 1)
-                events.ScheduleEvent(EVENT_SCENE_0 + 30, 10000);
+                events.ScheduleEvent(EVENT_SCENE_0 + 30, 10s);
         }
 
         void DoAction(int32 param) override
@@ -782,11 +771,11 @@ public:
                     }
                 case 17:
                     SetEscortPaused(true);
-                    events.ScheduleEvent(EVENT_START_SCENE, 7000);
+                    events.ScheduleEvent(EVENT_START_SCENE, 7s);
                     break;
                 case 19:
                     SetEscortPaused(true);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 8, 5000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 8, 5s);
                     break;
             }
         }
@@ -835,78 +824,78 @@ public:
                     me->SummonCreature(NPC_CHOSEN_ZEALOT, 6161.26f, 2700.05f, 573.92f, 2.04f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
 
                     DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_MOVE_STRAIGHT, 27);
-                    events.ScheduleEvent(EVENT_SCENE_0, 30000);
+                    events.ScheduleEvent(EVENT_SCENE_0, 30s);
                     break;
                 case EVENT_SCENE_0:
                     DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_STAND_STATE, UNIT_STAND_STATE_KNEEL);
                     me->SummonGameObject(GO_FROZEN_HEART, 6132.38f, 2760.76f, 574.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 180);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 1, 10000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 1, 10s);
                     break;
                 case EVENT_SCENE_0+1:
                     DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_STAND_STATE, UNIT_STAND_STATE_STAND);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 2, 2000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 2, 2s);
                     break;
                 case EVENT_SCENE_0+2:
                     DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_MOVE_STRAIGHT, -27);
                     DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_DESPAWN, 20000);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 3, 2000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 3, 2s);
                     break;
                 case EVENT_SCENE_0+3:
                     Talk(3);
                     if (Creature* cr = me->SummonCreature(NPC_TIRION_LICH_KING, 6161.26f, 2700.05f, 573.92f, 2.04f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS))
                         cr->GetMotionMaster()->MovePoint(2, 6131.93f, 2756.84f, 573.92f);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 4, 4000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 4, 4s);
                     break;
                 case EVENT_SCENE_0+4:
                     Talk(4);
                     me->SetFacingTo(4.42f);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 5, 25000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 5, 25s);
                     break;
                 case EVENT_SCENE_0+5:
                     DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_ORIENTATION, 11);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 6, 4000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 6, 4s);
                     break;
                 case EVENT_SCENE_0+6:
                     DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_TALK, 0);
                     me->LoadEquipment(2, true);
                     SetEscortPaused(false);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 7, 6000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 7, 6s);
                     break;
                 case EVENT_SCENE_0+7:
                     DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_TALK, 1);
                     break;
                 case EVENT_SCENE_0+8:
                     Talk(5);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 9, 5000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 9, 5s);
                     break;
                 case EVENT_SCENE_0+9:
                     DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_TALK, 2);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 10, 11000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 10, 11s);
                     break;
                 case EVENT_SCENE_0+10:
                     Talk(6);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 11, 6000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 11, 6s);
                     break;
                 case EVENT_SCENE_0+11:
                     DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_TALK, 3);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 12, 7000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 12, 7s);
                     break;
                 case EVENT_SCENE_0+12:
                     DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_TALK, 4);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 13, 5000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 13, 5s);
                     break;
                 case EVENT_SCENE_0+13:
                     Talk(7);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 14, 14000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 14, 14s);
                     break;
                 case EVENT_SCENE_0+14:
                     Talk(8);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 15, 3000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 15, 3s);
                     break;
                 case EVENT_SCENE_0+15:
                     {
                         me->CastSpell(me, SPELL_TIRION_SMASH_HEART, true);
-                        events.ScheduleEvent(EVENT_SCENE_0 + 16, 1200);
+                        events.ScheduleEvent(EVENT_SCENE_0 + 16, 1200ms);
                         uint8 i = 0;
                         for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr, ++i)
                             if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
@@ -924,18 +913,18 @@ public:
                     DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_TALK, 5);
                     if (GameObject* go = me->FindNearestGameObject(GO_FROZEN_HEART, 20.0f))
                         go->Delete();
-                    events.ScheduleEvent(EVENT_SCENE_0 + 17, 2000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 17, 2s);
                     break;
                 case EVENT_SCENE_0+17:
                     DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_STAND_STATE, UNIT_STAND_STATE_KNEEL);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 170, 3000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 170, 3s);
                     break;
                 case EVENT_SCENE_0+170:
                     DoSummonAction(NPC_DISGUISED_CRUSADER, ACTION_SUMMON_ORIENTATION, 500);
                     DoSummonAction(NPC_DISGUISED_CRUSADER, ACTION_SUMMON_EMOTE, EMOTE_STATE_READY2H);
                     if (Creature* cr = me->FindNearestCreature(NPC_DISGUISED_CRUSADER, 10.0f))
                         cr->AI()->Talk(0);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 18, 1000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 18, 1s);
                     break;
                 case EVENT_SCENE_0+18:
                     {
@@ -962,12 +951,12 @@ public:
                             }
                         }
 
-                        events.ScheduleEvent(EVENT_SCENE_0 + 19, 3000);
+                        events.ScheduleEvent(EVENT_SCENE_0 + 19, 3s);
                         break;
                     }
                 case EVENT_SCENE_0+19:
                     me->SummonCreatureGroup(1);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 20, 3700);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 20, 3700ms);
                     break;
                 case EVENT_SCENE_0+20:
                     {
@@ -1008,23 +997,23 @@ public:
                                     summon->GetMotionMaster()->MovePoint(6, 6138.36f + frand(-2.0f, 2.0f), 2749.25f + frand(-2.0f, 2.0f), 573.92f);
                             }
 
-                    events.ScheduleEvent(EVENT_SCENE_0 + 310, 4000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 310, 4s);
                     break;
                 case EVENT_SCENE_0+310:
                     DoSummonAction(NPC_TIRION_MOGRAINE, ACTION_SUMMON_TALK, 0);
                     DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_STAND_STATE, UNIT_STAND_STATE_STAND);
                     me->SummonGameObject(GO_ESCAPE_PORTAL, 6133.83f, 2757.24f, 573.914f, 1.97f, 0.0f, 0.0f, 0.0f, 0.0f, 60);
                     me->CastSpell(me, SPELL_TIRIONS_GAMBIT_CREDIT, true);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 31, 6000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 31, 6s);
                     DoSummonAction(NPC_DISGUISED_CRUSADER, ACTION_SUMMON_EMOTE, EMOTE_ONESHOT_NONE);
                     break;
                 case EVENT_SCENE_0+31:
                     DoSummonAction(NPC_TIRION_THASSARIAN, ACTION_SUMMON_TALK, 1);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 32, 7000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 32, 7s);
                     break;
                 case EVENT_SCENE_0+32:
                     DoSummonAction(NPC_TIRION_MOGRAINE, ACTION_SUMMON_TALK, 1);
-                    events.ScheduleEvent(EVENT_SCENE_0 + 33, 7000);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 33, 7s);
                     break;
                 case EVENT_SCENE_0+33:
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -1380,8 +1369,8 @@ public:
                         }
 
                         me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-                        events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 60000);
-                        events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 5000);
+                        events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 1min);
+                        events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 5s);
                         break;
                     }
                 case EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE:
@@ -1406,7 +1395,7 @@ public:
                         else // Heal
                             me->ModifyHealth(2000);
 
-                        events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 4000);
+                        events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 4s);
                         break;
                     }
                 case EVENT_SYNCHRONIZE_SHIELDS:
@@ -1430,7 +1419,7 @@ public:
                         if (!playerPresent)
                             me->DespawnOrUnsummon(1);
                     }
-                    events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 1000);
+                    events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 1s);
                     break;
                 case EVENT_SPREAD_FIRE:
                     break;
@@ -1630,7 +1619,7 @@ public:
             }
 
             events.Reset();
-            events.ScheduleEvent(EVENT_DUMMY_RECAST_DEFEND, 5000);
+            events.ScheduleEvent(EVENT_DUMMY_RECAST_DEFEND, 5s);
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -1644,7 +1633,7 @@ public:
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
-            events.RescheduleEvent(EVENT_DUMMY_RESET, 10000);
+            events.RescheduleEvent(EVENT_DUMMY_RESET, 10s);
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -1701,13 +1690,13 @@ public:
                             }
                     }
                     isVulnerable = false;
-                    events.ScheduleEvent(EVENT_DUMMY_RECAST_DEFEND, 5000);
+                    events.ScheduleEvent(EVENT_DUMMY_RECAST_DEFEND, 5s);
                     break;
                 case EVENT_DUMMY_RESET:
                     if (UpdateVictim())
                     {
                         EnterEvadeMode(EVADE_REASON_OTHER);
-                        events.ScheduleEvent(EVENT_DUMMY_RESET, 10000);
+                        events.ScheduleEvent(EVENT_DUMMY_RESET, 10s);
                     }
                     break;
             }
@@ -1847,7 +1836,7 @@ public:
             me->SetRegeneratingHealth(false);
             DoCast(SPELL_THREAT_PULSE);
             Talk(BANNER_SAY);
-            events.ScheduleEvent(EVENT_SPAWN, 3000);
+            events.ScheduleEvent(EVENT_SPAWN, 3s);
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }
@@ -1908,14 +1897,14 @@ public:
                             guidMason[2] = Mason3->GetGUID();
                             Mason3->GetMotionMaster()->MovePoint(0, Mason3Pos[1]);
                         }
-                        events.ScheduleEvent(EVENT_INTRO_1, 15000);
+                        events.ScheduleEvent(EVENT_INTRO_1, 15s);
                     }
                     break;
                 case EVENT_INTRO_1:
                     {
                         if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
                             Dalfors->AI()->Talk(DALFORS_SAY_PRE_1);
-                        events.ScheduleEvent(EVENT_INTRO_2, 5000);
+                        events.ScheduleEvent(EVENT_INTRO_2, 5s);
                     }
                     break;
                 case EVENT_INTRO_2:
@@ -1925,7 +1914,7 @@ public:
                             Dalfors->SetFacingTo(6.215f);
                             Dalfors->AI()->Talk(DALFORS_SAY_PRE_2);
                         }
-                        events.ScheduleEvent(EVENT_INTRO_3, 5000);
+                        events.ScheduleEvent(EVENT_INTRO_3, 5s);
                     }
                     break;
                 case EVENT_INTRO_3:
@@ -1965,8 +1954,8 @@ public:
                             Mason3->GetMotionMaster()->MovePoint(0, Mason3Pos[2]);
                             Mason3->SetHomePosition(Mason3Pos[2]);
                         }
-                        events.ScheduleEvent(EVENT_START_FIGHT, 5000);
-                        events.ScheduleEvent(EVENT_MASON_ACTION, 15000);
+                        events.ScheduleEvent(EVENT_START_FIGHT, 5s);
+                        events.ScheduleEvent(EVENT_MASON_ACTION, 15s);
                     }
                     break;
                 case EVENT_MASON_ACTION:
@@ -1994,7 +1983,7 @@ public:
                             LK->AI()->Talk(LK_TALK_1);
                         if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
                             Dalfors->AI()->Talk(DALFORS_SAY_START);
-                        events.ScheduleEvent(EVENT_WAVE_SPAWN, 1000);
+                        events.ScheduleEvent(EVENT_WAVE_SPAWN, 1s);
                     }
                     break;
                 case EVENT_WAVE_SPAWN:
@@ -2044,9 +2033,9 @@ public:
                         PhaseCount++;
 
                         if (PhaseCount < 8)
-                            events.ScheduleEvent(EVENT_WAVE_SPAWN, urand(10000, 20000));
+                            events.ScheduleEvent(EVENT_WAVE_SPAWN, 10s, 20s);
                         else
-                            events.ScheduleEvent(EVENT_HALOF, urand(10000, 20000));
+                            events.ScheduleEvent(EVENT_HALOF, 10s, 20s);
                     }
                     break;
                 case EVENT_HALOF:
@@ -2091,7 +2080,7 @@ public:
                         Summons.DespawnEntry(NPC_HALOF_THE_DEATHBRINGER);
                         if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
                             Dalfors->AI()->Talk(DALFORS_YELL_FINISHED);
-                        events.ScheduleEvent(EVENT_ENDED, 10000);
+                        events.ScheduleEvent(EVENT_ENDED, 10s);
                     }
         }
     };
@@ -2179,7 +2168,7 @@ public:
                     break;
                 case SPELL_RIDE:
                     DoCastAOE(SPELL_PING_BUNNY);
-                    events.ScheduleEvent(EVENT_FLY_AWAY, 100);
+                    events.ScheduleEvent(EVENT_FLY_AWAY, 100ms);
                     break;
             }
         }
