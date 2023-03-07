@@ -39,7 +39,7 @@ public:
 
         static ChatCommandTable commandTable =
         {
-            //{ "gear", gearCommandTable }
+            { "gear", gearCommandTable },
             { "gs",   HandleGearStatsCommand,  SEC_PLAYER,     Console::No }
         };
 
