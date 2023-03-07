@@ -57,36 +57,13 @@ public:
     {
         boss_lieutenant_drakeAI(Creature* creature) : ScriptedAI(creature)
         {
-            pathPoints.clear();
-            WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
-            if (!path || path->empty())
-                return;
-
-            pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-            uint32 wpCounter = 1;
-            WPPath::const_iterator itr;
-            while ((itr = path->find(wpCounter++)) != path->end())
-            {
-                WayPoint* wp = itr->second;
-                pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
-            }
         }
 
         void InitializeAI() override
         {
-            ScriptedAI::InitializeAI();
-            //Talk(SAY_ENTER);
-            JustReachedHome();
-        }
-
-        void JustReachedHome() override
-        {
-            me->SetWalk(true);
-            Movement::MoveSplineInit init(me);
-            init.MovebyPath(pathPoints);
-            init.SetCyclic();
-            init.Launch();
+            runSecondPath = false;
+            pathId = me->GetEntry() * 10;
+            me->GetMotionMaster()->MovePath(pathId, false);
         }
 
         void Reset() override
@@ -118,8 +95,38 @@ public:
                 instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_DRAKE_KILLED);
         }
 
+        void MovementInform(uint32 type, uint32 point) override
+        {
+            if (type != WAYPOINT_MOTION_TYPE)
+            {
+                return;
+            }
+
+            if (pathId == me->GetEntry() * 10)
+            {
+                switch (point)
+                {
+                    case 7:
+                        Talk(SAY_ENTER);
+                        break;
+                    case 10:
+                        pathId = (me->GetEntry() * 10) + 1;
+                        runSecondPath = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
+            if (runSecondPath)
+            {
+                runSecondPath = false;
+                me->GetMotionMaster()->MovePath(pathId, true);
+            }
+
             if (!UpdateVictim())
                 return;
 
@@ -161,7 +168,8 @@ public:
 
     private:
         EventMap events;
-        Movement::PointsArray pathPoints;
+        uint32 pathId;
+        bool runSecondPath;
     };
 };
 

@@ -2725,6 +2725,48 @@ void SpellMgr::LoadSpellInfoStore()
     LOG_INFO("server.loading", " ");
 }
 
+void SpellMgr::LoadSpellCooldownOverrides()
+{
+    uint32 oldMSTime = getMSTime();
+
+    mSpellCooldownOverrideMap.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT Id, RecoveryTime, CategoryRecoveryTime, StartRecoveryTime, StartRecoveryCategory FROM spell_cooldown_overrides");
+
+    uint32 count = 0;
+
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            SpellCooldownOverride spellCooldown;
+            uint32 spellId = fields[0].Get<uint32>();
+            spellCooldown.RecoveryTime = fields[1].Get<uint32>();
+            spellCooldown.CategoryRecoveryTime = fields[2].Get<uint32>();
+            spellCooldown.StartRecoveryTime = fields[3].Get<uint32>();
+            spellCooldown.StartRecoveryCategory = fields[4].Get<uint32>();
+            mSpellCooldownOverrideMap[spellId] = spellCooldown;
+
+            ++count;
+        } while (result->NextRow());
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} Spell Cooldown Overrides entries in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+bool SpellMgr::HasSpellCooldownOverride(uint32 spellId) const
+{
+    return mSpellCooldownOverrideMap.find(spellId) != mSpellCooldownOverrideMap.end();
+}
+
+SpellCooldownOverride SpellMgr::GetSpellCooldownOverride(uint32 spellId) const
+{
+    auto range = mSpellCooldownOverrideMap.find(spellId);
+    return range->second;
+}
+
 void SpellMgr::UnloadSpellInfoStore()
 {
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
@@ -3412,9 +3454,35 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 }
             }
         }
-       spellInfo->_InitializeExplicitTargetMask();
 
-       sScriptMgr->OnLoadSpellCustomAttr(spellInfo);
+        spellInfo->_InitializeExplicitTargetMask();
+
+        if (sSpellMgr->HasSpellCooldownOverride(spellInfo->Id))
+        {
+            SpellCooldownOverride spellOverride = sSpellMgr->GetSpellCooldownOverride(spellInfo->Id);
+
+            if (spellInfo->RecoveryTime != spellOverride.RecoveryTime)
+            {
+                spellInfo->RecoveryTime = spellOverride.RecoveryTime;
+            }
+
+            if (spellInfo->CategoryRecoveryTime != spellOverride.CategoryRecoveryTime)
+            {
+                spellInfo->CategoryRecoveryTime = spellOverride.CategoryRecoveryTime;
+            }
+
+            if (spellInfo->StartRecoveryTime != spellOverride.StartRecoveryTime)
+            {
+                spellInfo->RecoveryTime = spellOverride.RecoveryTime;
+            }
+
+            if (spellInfo->StartRecoveryCategory != spellOverride.StartRecoveryCategory)
+            {
+                spellInfo->RecoveryTime = spellOverride.RecoveryTime;
+            }
+        }
+
+        sScriptMgr->OnLoadSpellCustomAttr(spellInfo);
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells

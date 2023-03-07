@@ -1078,7 +1078,7 @@ public:
 
         bool GossipSelect(Player* player, uint32 sender, uint32 action) override
         {
-            Seconds respawnTimer = 0s;
+            Seconds respawnTimer{};
             player->PlayerTalkClass->SendCloseGossip();
 
             Creature* lastSpawn = ObjectAccessor::GetCreature(*me, _creatureGuid);

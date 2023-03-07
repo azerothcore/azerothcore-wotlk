@@ -38,6 +38,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            SetPersistentDataCount(MAX_DATA_INDEXES);
             LoadDoorData(doorData);
 
             _passageEncounter = 0;
@@ -149,7 +150,8 @@ public:
                                     DoSummonAction(creature, player);
                             }
                         }
-                        _passageEncounter++;
+
+                        StorePersistentData(DATA_INDEX_PASSAGE_ENCOUNTER, _passageEncounter++);
                         SaveToDB();
                     }
                 }
@@ -186,26 +188,22 @@ public:
                             if (Creature* creature = instance->GetCreature(_pathaleonGUID))
                                 creature->AI()->DoAction(1);
                         }
-                        _passageEncounter++;
+
+                        StorePersistentData(DATA_INDEX_PASSAGE_ENCOUNTER, _passageEncounter++);
                         SaveToDB();
                     }
                 }
             }
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
+        void ReadSaveDataMore(std::istringstream& /*data*/) override
         {
-            data >> _passageEncounter;
+            _passageEncounter = GetPersistentData(DATA_INDEX_PASSAGE_ENCOUNTER);
 
             if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
             {
                 _passageEncounter = ENCOUNTER_PASSAGE_PHASE6;
             }
-        }
-
-        void WriteSaveDataMore(std::ostringstream& data) override
-        {
-            data << _passageEncounter;
         }
 
     private:
