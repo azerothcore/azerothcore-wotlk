@@ -135,7 +135,7 @@ public:
                     break;
                 case EVENT_MENACING_CLAW:
                     Talk(SAY_CLAW_EMOTE);
-                    me->setAttackTimer(BASE_ATTACK, 2000);
+                    me->setAttackTimer(BASE_ATTACK, 2s);
                     me->AttackerStateUpdate(me->GetVictim());
                     if (me->GetVictim())
                         me->AttackerStateUpdate(me->GetVictim());

@@ -419,7 +419,7 @@ class spell_midsummer_fling_torch : public SpellScript
                 {
                     //target->CastSpell(target, 46711, true); // Set Flag: all torch returning quests are complete
                     target->CastSpell(target, (target->GetTeamId() ? 46654 : 46081), true); // Quest completion
-                    aur->SetDuration(1);
+                    aur->SetDuration(1ms);
                     return;
                 }
             }

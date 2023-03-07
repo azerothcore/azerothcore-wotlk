@@ -128,10 +128,12 @@ public:
     time_t GetApplyTime() const { return m_applyTime; }
     int32 GetMaxDuration() const { return m_maxDuration; }
     void SetMaxDuration(int32 duration) { m_maxDuration = duration; }
+    void SetMaxDuration(Milliseconds duration) { SetMaxDuration(duration.count()); }
     int32 CalcMaxDuration() const { return CalcMaxDuration(GetCaster()); }
     int32 CalcMaxDuration(Unit* caster) const;
     int32 GetDuration() const { return m_duration; }
     void SetDuration(int32 duration, bool withMods = false);
+    void SetDuration(Milliseconds duration, bool withMods = false) { SetDuration(duration.count(), withMods); }
     void RefreshDuration(bool withMods = false);
     void RefreshTimers(bool periodicReset = false);
     void RefreshTimersWithMods();

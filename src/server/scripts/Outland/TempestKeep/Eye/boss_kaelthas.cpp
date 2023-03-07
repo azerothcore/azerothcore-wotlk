@@ -677,7 +677,7 @@ public:
                     break;
                 case EVENT_SPELL_GRAVITY_LAPSE:
                     events.DelayEvents(30000);
-                    me->setAttackTimer(BASE_ATTACK, 30000);
+                    me->setAttackTimer(BASE_ATTACK, 30s);
                     events.ScheduleEvent(EVENT_SPELL_GRAVITY_LAPSE, 90000);
                     events.ScheduleEvent(EVENT_GRAVITY_LAPSE_END, 32000);
                     events.ScheduleEvent(EVENT_SPELL_SHOCK_BARRIER, 20000);

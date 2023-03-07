@@ -264,7 +264,7 @@ public:
             else if (me->isAttackReady(BASE_ATTACK))
             {
                 me->CastSpell(me->GetVictim(), SPELL_CHAOS_BLAST, false);
-                me->setAttackTimer(BASE_ATTACK, 2000);
+                me->setAttackTimer(BASE_ATTACK, 2s);
             }
         }
     };

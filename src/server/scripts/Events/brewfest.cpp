@@ -107,7 +107,7 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
                         if (diff > 10) // aura applied later
                             return;
 
-                        aur->SetDuration(aur->GetDuration() + 30000);
+                        aur->SetDuration(Milliseconds(aur->GetDuration()) + 30s);
                         player->CastSpell(player, SPELL_ADD_TOKENS, true);
                     }
                 }
@@ -2038,7 +2038,7 @@ class spell_direbrew_disarm : public AuraScript
         if (Aura* aura = GetTarget()->GetAura(SPELL_DIREBREW_DISARM_GROW))
         {
             aura->SetStackAmount(aura->GetStackAmount() + 1);
-            aura->SetDuration(aura->GetDuration() - 1500);
+            aura->SetDuration(Milliseconds(aura->GetDuration()) - 15s);
         }
     }
 

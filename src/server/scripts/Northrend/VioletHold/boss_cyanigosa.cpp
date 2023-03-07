@@ -125,9 +125,9 @@ public:
                     me->CastSpell((Unit*)nullptr, SPELL_ARCANE_VACUUM, false);
                     DoResetThreatList();
                     me->SetControlled(true, UNIT_STATE_ROOT);
-                    me->setAttackTimer(BASE_ATTACK, 3000);
+                    me->setAttackTimer(BASE_ATTACK, 3s);
                     events.RepeatEvent(30000);
-                    events.ScheduleEvent(EVENT_UNROOT, 3000);
+                    events.ScheduleEvent(EVENT_UNROOT, 3s);
                     break;
                 case EVENT_UNROOT:
                     me->SetControlled(false, UNIT_STATE_ROOT);

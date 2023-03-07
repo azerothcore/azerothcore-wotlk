@@ -481,7 +481,7 @@ public:
         {
             if (spellInfo->Id == SPELL_THROW_PORTAL_CRYSTAL)
                 if (Aura* aura = target->AddAura(SPELL_ARTHAS_PORTAL, target))
-                    aura->SetDuration(48000);
+                    aura->SetDuration(48s);
         }
 
         void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
@@ -515,7 +515,7 @@ public:
                     if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
                         player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
                     if (Aura* aur = me->AddAura(SPELL_BLIGHT_FOG, me))
-                        aur->SetDuration(22000);
+                        aur->SetDuration(22s);
                     break;
                 case EVENT_BETRAYAL_4:
                     Talk(SAY_DRAKURU_5);

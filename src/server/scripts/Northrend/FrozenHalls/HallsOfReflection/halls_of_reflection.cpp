@@ -281,7 +281,7 @@ public:
                         pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                         pUther->SetVisible(true);
                         if (Aura* a = pUther->AddAura(SPELL_SHADOWMOURNE_VISUAL, pUther))
-                            a->SetDuration(8000);
+                            a->SetDuration(8s);
                     }
                     events.ScheduleEvent(EVENT_INTRO_A2_5, 2000);
                     break;
@@ -375,7 +375,7 @@ public:
                         pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                         pUther->SetVisible(true);
                         if (Aura* a = pUther->AddAura(SPELL_SHADOWMOURNE_VISUAL, pUther))
-                            a->SetDuration(8000);
+                            a->SetDuration(8s);
                     }
                     events.ScheduleEvent(EVENT_INTRO_H2_5, 2000);
                     break;
@@ -512,7 +512,7 @@ public:
                         {
                             pFalric->GetMotionMaster()->MovePoint(0, FalricMovePos);
                             if (Aura* a = pFalric->AddAura(SPELL_SHADOWMOURNE_VISUAL, pFalric))
-                                a->SetDuration(8000);
+                                a->SetDuration(8s);
                         }
                     }
                     if (Creature* pMarwyn = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MARWYN)))
@@ -524,7 +524,7 @@ public:
                         {
                             pMarwyn->GetMotionMaster()->MovePoint(0, MarwynMovePos);
                             if (Aura* a = pMarwyn->AddAura(SPELL_SHADOWMOURNE_VISUAL, pMarwyn))
-                                a->SetDuration(8000);
+                                a->SetDuration(8s);
                         }
                     }
 

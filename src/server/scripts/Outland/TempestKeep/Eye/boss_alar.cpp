@@ -160,7 +160,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->CastSpell(me, SPELL_EMBER_BLAST, true);
 
-                    me->setAttackTimer(BASE_ATTACK, 16000);
+                    me->setAttackTimer(BASE_ATTACK, 16s);
                     events.Reset();
                     events.ScheduleEvent(EVENT_RELOCATE_MIDDLE, 8000);
                     events.ScheduleEvent(EVENT_MOVE_TO_PHASE_2, 12000);
@@ -179,7 +179,7 @@ public:
             }
 
             if (id == POINT_PLATFORM)
-                me->setAttackTimer(BASE_ATTACK, 1000);
+                me->setAttackTimer(BASE_ATTACK, 1s);
             else if (id == POINT_QUILL)
                 events.ScheduleEvent(EVENT_START_QUILLS, 1000);
             else if (id == POINT_DIVE)
@@ -236,7 +236,7 @@ public:
                         platform = (platform + 1) % 4;
                         events.ScheduleEvent(EVENT_SWITCH_PLATFORM, 30000);
                     }
-                    me->setAttackTimer(BASE_ATTACK, 20000);
+                    me->setAttackTimer(BASE_ATTACK, 20s);
                     break;
                 case EVENT_START_QUILLS:
                     me->CastSpell(me, SPELL_FLAME_QUILLS, false);
@@ -276,7 +276,7 @@ public:
                     me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
                     events.ScheduleEvent(EVENT_SPELL_DIVE_BOMB, 30000);
                     events.DelayEvents(15000);
-                    me->setAttackTimer(BASE_ATTACK, 20000);
+                    me->setAttackTimer(BASE_ATTACK, 20s);
                     break;
                 case EVENT_START_DIVE:
                     me->CastSpell(me, SPELL_DIVE_BOMB_VISUAL, false);

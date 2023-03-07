@@ -160,7 +160,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_BLINDING_LIGHT, 40000);
                     break;
                 case EVENT_SPAWN_PORTALS:
-                    me->setAttackTimer(BASE_ATTACK, 21000);
+                    me->setAttackTimer(BASE_ATTACK, 21s);
                     me->SetModelVisible(false);
                     events.ScheduleEvent(EVENT_SPAWN_PORTALS, 50000);
                     events.DelayEvents(21000);

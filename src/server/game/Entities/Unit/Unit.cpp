@@ -7359,6 +7359,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             break;
                         }
                     // Glyph of Shred
+                    /// @todo: refactor for std::chrono
                     case 54815:
                         {
                             if (!target)

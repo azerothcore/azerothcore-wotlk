@@ -96,7 +96,7 @@ public:
             if (param == ACTION_START_EVENT)
             {
                 me->SetReactState(REACT_AGGRESSIVE);
-                me->setAttackTimer(BASE_ATTACK, 6000);
+                me->setAttackTimer(BASE_ATTACK, 6s);
                 me->SetVisible(true);
                 me->UpdateObjectVisibility(true);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -169,7 +169,7 @@ public:
                         me->SummonCreature(i < 6 ? NPC_COILFANG_AMBUSHER : NPC_COILFANG_GUARDIAN, positions[i].GetPositionX(), positions[i].GetPositionY(), positions[i].GetPositionZ(), positions[i].GetAngle(me), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                     break;
                 case EVENT_PHASE_1:
-                    me->setAttackTimer(BASE_ATTACK, 6000);
+                    me->setAttackTimer(BASE_ATTACK, 6s);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 

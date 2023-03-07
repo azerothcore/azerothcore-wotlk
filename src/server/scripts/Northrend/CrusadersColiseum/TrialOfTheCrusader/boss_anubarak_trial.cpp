@@ -349,7 +349,7 @@ public:
                     {
                         Talk(SAY_EMERGE);
                         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        me->setAttackTimer(BASE_ATTACK, 3000);
+                        me->setAttackTimer(BASE_ATTACK, 3s);
                         me->RemoveAura(SPELL_SUBMERGE);
                         me->CastSpell(me, SPELL_EMERGE, false);
                         events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, urand(5000, 8000));
