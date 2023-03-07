@@ -11999,8 +11999,8 @@ void bot_ai::_generateGear()
                         return;
                     }
 
-                    LOG_ERROR("scripts", "bot_ai::_generateGear: Bot {} ({}) equipped item {} ({}), slot {}! Left: {}",
-                        me->GetName().c_str(), me->GetEntry(), itemId, proto->Name1.c_str(), uint32(slot), uint32(_equipsSlotsToGenerate.size() - 1));
+                    // LOG_ERROR("scripts", "bot_ai::_generateGear: Bot {} ({}) equipped item {} ({}), slot {}! Left: {}",
+                    //     me->GetName().c_str(), me->GetEntry(), itemId, proto->Name1.c_str(), uint32(slot), uint32(_equipsSlotsToGenerate.size() - 1));
 
                     if (slot != BOT_SLOT_OFFHAND && proto->Class == ITEM_CLASS_WEAPON && proto->InventoryType == INVTYPE_2HWEAPON &&
                         !_canUseOffHand() && _equipsSlotsToGenerate.count(BOT_SLOT_OFFHAND) != 0)
@@ -12021,8 +12021,8 @@ void bot_ai::_generateGear()
         itemId = next_item_id(itemId, me->GetEntry());
     }
 
-    if (_equipsSlotsToGenerate.empty())
-        LOG_ERROR("scripts", "bot_ai::_generateGear: Bot {} ({}) gear generation complete!", me->GetName().c_str(), me->GetEntry());
+    // if (_equipsSlotsToGenerate.empty())
+    //     LOG_ERROR("scripts", "bot_ai::_generateGear: Bot {} ({}) gear generation complete!", me->GetName().c_str(), me->GetEntry());
 }
 
 void bot_ai::ApplyItemBonuses(uint8 slot)
@@ -13997,7 +13997,7 @@ void bot_ai::InitEquips()
                 gss << " " << uint32(i);
             }
         }
-        LOG_ERROR("scripts", gss.str().c_str());
+        // LOG_ERROR("scripts", gss.str().c_str());
     }
     else
     {
@@ -16873,8 +16873,8 @@ void bot_ai::Evade()
 
     if (IsWanderer())
     {
-        LOG_ERROR("scripts", "Bot {} ({}) wandered from node {} to {} ({}), trying to get next node...",
-            me->GetName().c_str(), me->GetEntry(), _travel_node_last, _travel_node_cur, homepos.ToString().c_str());
+        // LOG_ERROR("scripts", "Bot {} ({}) wandered from node {} to {} ({}), trying to get next node...",
+        //     me->GetName().c_str(), me->GetEntry(), _travel_node_last, _travel_node_cur, homepos.ToString().c_str());
         uint32 nextNodeId = GetNextTravelNode(homepos);
         if (!nextNodeId)
         {
@@ -16886,8 +16886,8 @@ void bot_ai::Evade()
         _travel_node_last = _travel_node_cur;
         _travel_node_cur = nextNodeId;
         std::string nodeName = BotDataMgr::GetWanderMapNodeName(me->GetMapId(), nextNodeId);
-        LOG_ERROR("scripts", "Bot {} ({}) next node {} ('{}'), {}, dist {} yd!",
-            me->GetName().c_str(), me->GetEntry(), nextNodeId, nodeName.c_str(), homepos.ToString().c_str(), me->GetExactDist(homepos));
+        // LOG_ERROR("scripts", "Bot {} ({}) next node {} ('{}'), {}, dist {} yd!",
+        //     me->GetName().c_str(), me->GetEntry(), nextNodeId, nodeName.c_str(), homepos.ToString().c_str(), me->GetExactDist(homepos));
     }
 }
 //TeleportHome() ONLY CALLED THROUGH EVENTPROCESSOR
