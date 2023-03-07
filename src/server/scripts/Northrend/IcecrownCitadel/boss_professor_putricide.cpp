@@ -1008,9 +1008,12 @@ public:
                     break;
                 }
 
-            if (Aura* aura = target->GetAura(uint32(GetSpellInfo()->Effects[stage].CalcValue())))
-                if (aura->GetOwner() == target) // avoid assert(false) at any cost
-                    aura->UpdateOwner(5000, target); // update whole aura so previous periodic ticks before refreshed by new one
+            if (target)
+            {
+                if (Aura* aura = target->GetAura(uint32(GetSpellInfo()->Effects[stage].CalcValue())))
+                    if (aura->GetOwner() == target) // avoid assert(false) at any cost
+                        aura->UpdateOwner(5000, target); // update whole aura so previous periodic ticks before refreshed by new one
+            }
 
             GetCaster()->CastSpell(target, uint32(GetSpellInfo()->Effects[stage].CalcValue()), true, nullptr, nullptr, GetCaster()->GetGUID());
         }
