@@ -1338,6 +1338,7 @@ SpellCastResult Unit::CastCustomSpell(uint32 spellId, CustomSpellValues const& v
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
     {
+        if (spellId != 7614)
         LOG_ERROR("entities.unit", "CastSpell: unknown spell {} by caster {}", spellId, GetGUID().ToString());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
@@ -3842,13 +3843,15 @@ float Unit::GetUnitParryChance() const
     {
         if (ToCreature()->isWorldBoss())
             chance = 13.4f; // + 0.6 by skill diff
-        else if (GetCreatureType() == CREATURE_TYPE_HUMANOID)
+        else if (GetCreatureType() == CREATURE_TYPE_HUMANOID) {
             //npcbot - custom parry chance instead of bunch of auras
-            if (IsNPCBot())
+            if (IsNPCBot()) {
                 chance = ToCreature()->GetCreatureParryChance();
-            else
-            //end npcbot
-            chance = 5.0f;
+            } else {
+                //end npcbot
+                chance = 5.0f;
+            }
+        }
 
         // Xinef: if aura is present, type should not matter
         chance += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);

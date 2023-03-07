@@ -795,8 +795,8 @@ bool bot_ai::doCast(Unit* victim, uint32 spellId, TriggerCastFlags flags)
         !m_botSpellInfo->HasEffect(SPELL_EFFECT_RESURRECT_NEW) &&
         !m_botSpellInfo->HasEffect(SPELL_EFFECT_SELF_RESURRECT))
     {
-        LOG_ERROR("entities.player", "bot_ai::doCast(): {} (bot class {}) tried to cast spell {} on a dead target {}",
-            me->GetName().c_str(), _botclass, spellId, victim->GetName().c_str());
+//        LOG_ERROR("entities.player", "bot_ai::doCast(): {} (bot class {}) tried to cast spell {} on a dead target {}",
+//            me->GetName().c_str(), _botclass, spellId, victim->GetName().c_str());
         //return false;
     }
 
