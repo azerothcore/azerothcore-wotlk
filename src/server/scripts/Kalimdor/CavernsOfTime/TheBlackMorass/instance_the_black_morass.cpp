@@ -447,7 +447,7 @@ public:
 
         void Update(uint32 diff) override
         {
-            _scheduler.Update();
+            _scheduler.Update(diff);
         }
 
     protected:
