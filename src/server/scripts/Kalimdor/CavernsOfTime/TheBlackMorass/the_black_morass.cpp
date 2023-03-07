@@ -269,7 +269,7 @@ struct npc_time_rift : public NullCreatureAI
 
     void JustSummoned(Creature* creature) override
     {
-        if (creature->GetEntry() != NPC_AEONUS)
+        if (creature->GetEntry() != NPC_AEONUS && _riftKeeperGUID.IsEmpty())
         {
             _riftKeeperGUID = creature->GetGUID();
         }

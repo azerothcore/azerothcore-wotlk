@@ -56,7 +56,6 @@ public:
             _currentRift = 0;
             _shieldPercent = 100;
             _encounterNPCs.clear();
-            _timerToNextBoss = 0;
         }
 
         void CleanupInstance()
@@ -114,6 +113,8 @@ public:
                     case DATA_CHRONO_LORD_DEJA:
                     case DATA_TEMPORUS:
                     {
+                        _scheduler.RescheduleGroup(CONTEXT_GROUP_RIFTS, 2min + 30s);
+
                         for (ObjectGuid const& guid : _encounterNPCs)
                         {
                             if (Creature* creature = instance->GetCreature(guid))
@@ -132,17 +133,6 @@ public:
                                 }
                             }
                         }
-
-                        if (!_timerToNextBoss || _timerToNextBoss > 30 * IN_MILLISECONDS)
-                        {
-                            ScheduleNextPortal(30s);
-                        }
-                        else
-                        {
-                            ScheduleNextPortal(Milliseconds(_timerToNextBoss));
-                        }
-
-                        _timerToNextBoss = (instance->IsHeroic() ? 300 : 150) * IN_MILLISECONDS;
                         break;
                     }
                     default:
@@ -190,13 +180,16 @@ public:
                         }
 
                         // Here we check if we have available rift spots.
-                        if (!_availableRiftPositions.empty())
+                        if (_currentRift < 18)
                         {
-                            context.Repeat((_currentRift >= 13 ? 2min : 90s));
-                        }
-                        else
-                        {
-                            context.Repeat(4s);
+                            if (!_availableRiftPositions.empty())
+                            {
+                                context.Repeat((_currentRift >= 13 ? 2min : 90s));
+                            }
+                            else
+                            {
+                                context.Repeat(4s);
+                            }
                         }
                     }
                 }
@@ -237,10 +230,9 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_TIME_RIFT:
-                    if (GetBossState(DATA_AEONUS) == TO_BE_DECIDED)
+                    if (_currentRift < 18)
                     {
-                        // Here we check if we have available rift spots.
-                        if (!_availableRiftPositions.empty())
+                        if (!_availableRiftPositions.empty() && _availableRiftPositions.size() < 3)
                         {
                             ScheduleNextPortal((_currentRift >= 13 ? 2min : 90s));
                         }
@@ -284,8 +276,6 @@ public:
                     DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
 
                     ScheduleNextPortal(3s);
-
-                    _timerToNextBoss = (instance->IsHeroic() ? 300 : 150) * IN_MILLISECONDS;
 
                     for (ObjectGuid const& guid : _encounterNPCs)
                     {
@@ -457,24 +447,11 @@ public:
 
         void Update(uint32 diff) override
         {
-            if (_timerToNextBoss)
-            {
-                if (_timerToNextBoss <= diff)
-                {
-                    _timerToNextBoss = 0;
-                }
-                else
-                {
-                    _timerToNextBoss -= diff;
-                }
-            }
-
             _scheduler.Update();
         }
 
     protected:
         std::list<Position> _availableRiftPositions;
-        uint32 _timerToNextBoss;
         GuidSet _encounterNPCs;
         uint8 _currentRift;
         int8 _shieldPercent;
