@@ -1,3 +1,4 @@
+-- DB update 2023_03_07_06 -> 2023_03_07_07
 -- Sindragosa (NullCreature)
 DELETE FROM `creature_template_movement` WHERE `CreatureId` = 37755;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES

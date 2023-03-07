@@ -1,3 +1,4 @@
+-- DB update 2023_03_07_03 -> 2023_03_07_04
 -- SFK Valentine
 DELETE FROM `game_event_gameobject` WHERE `eventEntry` = 8 AND `guid` IN (9755,9764,9776,9814,9815,9816,9817,9818,9819,9827,9831,9832,9835,9836,9821,9823,9834,9837,9775,9788,9820,9822,9824,9825,9826,9829);
 INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES

@@ -1,3 +1,4 @@
+-- DB update 2023_03_07_00 -> 2023_03_07_01
 -- Wailing Caverns - Serpentbloom Snake
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 3680;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 3680;
