@@ -89,7 +89,7 @@ public:
         }
 
         handler->PSendSysMessage("英雄本/PT新三试炼进本需要180装等,H艾卓/H试炼/H洪炉/H矿坑200装等,倒T大厅219装等");
-        handler->PSendSysMessage("玩家: %s 平均装等为: |cff00ffff%u|r", player->GetPlayerName().c_str(),(int16)player->GetAverageItemLevelForDF());
+        handler->PSendSysMessage("玩家: %s 平均装等为: |cff00ffff%f|r", player->GetPlayerName().c_str(),player->GetAverageItemLevelForDF());
 
         if (sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE))
         {
