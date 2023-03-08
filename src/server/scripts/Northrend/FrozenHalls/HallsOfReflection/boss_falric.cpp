@@ -76,9 +76,9 @@ public:
         {
             me->SetImmuneToAll(false);
 
-            events.ScheduleEvent(EVENT_QUIVERING_STRIKE, 5000);
-            events.ScheduleEvent(EVENT_IMPENDING_DESPAIR, 11000);
-            events.ScheduleEvent(EVENT_DEFILING_HORROR, 20000);
+            events.ScheduleEvent(EVENT_QUIVERING_STRIKE, 5s);
+            events.ScheduleEvent(EVENT_IMPENDING_DESPAIR, 11s);
+            events.ScheduleEvent(EVENT_DEFILING_HORROR, 20s);
         }
 
         void DoAction(int32 a) override
@@ -115,7 +115,7 @@ public:
             {
                 case EVENT_QUIVERING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_QUIVERING_STRIKE, false);
-                    events.ScheduleEvent(EVENT_QUIVERING_STRIKE, 5000);
+                    events.ScheduleEvent(EVENT_QUIVERING_STRIKE, 5s);
                     break;
                 case EVENT_IMPENDING_DESPAIR:
                     if (Unit* target = SelectTargetFromPlayerList(45.0f, 0, true))
@@ -123,15 +123,15 @@ public:
                         Talk(SAY_IMPENDING_DESPAIR);
                         me->CastSpell(target, SPELL_IMPENDING_DESPAIR, false);
                     }
-                    events.ScheduleEvent(EVENT_IMPENDING_DESPAIR, 12000);
+                    events.ScheduleEvent(EVENT_IMPENDING_DESPAIR, 12s);
                     break;
                 case EVENT_DEFILING_HORROR:
                     Talk(SAY_DEFILING_HORROR);
                     me->CastSpell((Unit*)nullptr, SPELL_DEFILING_HORROR, false);
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     events.DelayEventsToMax(5000, 0);
-                    events.ScheduleEvent(EVENT_UNROOT, 4000);
-                    events.ScheduleEvent(EVENT_DEFILING_HORROR, 20000);
+                    events.ScheduleEvent(EVENT_UNROOT, 4s);
+                    events.ScheduleEvent(EVENT_DEFILING_HORROR, 20s);
                     break;
                 case EVENT_UNROOT:
                     me->SetControlled(false, UNIT_STATE_ROOT);
