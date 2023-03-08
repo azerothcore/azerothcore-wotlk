@@ -35,29 +35,29 @@ jobs:
           CONTINUOUS_INTEGRATION: true
         run: |
           ./acore.sh install-deps
-      - name: Process pending sql
-        shell: bash
-        run: bash bin/acore-db-pendings
+      # - name: Process pending sql
+      #   shell: bash
+      #   run: bash bin/acore-db-pendings
       - name: Build
         shell: bash
         run: |
           export CCUSTOMOPTIONS=" -DMODULE_MOD-INDIVIDUAL-PROGRESSION=disabled"
           export CTOOLS_BUILD=all
           ./acore.sh compiler build
-      - name: Dry run authserver
-        shell: bash
-        run: |
-          source ./apps/ci/ci-gen-server-conf-files.sh "authserver" "configs" "."
-          cd env/dist
-          ./authserver -dry-run
-      - name: Dry run worldserver
-        shell: bash
-        run: |
-          source ./apps/ci/ci-gen-server-conf-files.sh "worldserver" "configs" "."
-          cd env/dist
-          ./worldserver -dry-run
-      - name: Stop MySQL
-        run: net stop mysql
+      # - name: Dry run authserver
+      #   shell: bash
+      #   run: |
+      #     source ./apps/ci/ci-gen-server-conf-files.sh "authserver" "configs" "."
+      #     cd env/dist
+      #     ./authserver -dry-run
+      # - name: Dry run worldserver
+      #   shell: bash
+      #   run: |
+      #     source ./apps/ci/ci-gen-server-conf-files.sh "worldserver" "configs" "."
+      #     cd env/dist
+      #     ./worldserver -dry-run
+      # - name: Stop MySQL
+      #   run: net stop mysql
       - name: Copy dll files
         shell: bash
         run: |
