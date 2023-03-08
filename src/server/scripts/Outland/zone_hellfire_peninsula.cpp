@@ -407,7 +407,7 @@ public:
                     uint8 i = 0;
                     for (Creature* whelp : creatureList)
                     {
-                        if (whelp->IsAlive() && !whelp->IsInCombat())
+                        if (whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
                         {
                             float o = i * 9; i++;
                             whelp->GetMotionMaster()->MovePoint(0, me->GetPositionX() + urand(3, 4) * cos(o) , me->GetPositionY() + urand(3, 4) * sin(o), me->GetPositionZ());
@@ -420,7 +420,7 @@ public:
                 {
                     for (Creature* whelp : creatureList)
                     {
-                        if (whelp->IsAlive() && !whelp->IsInCombat())
+                        if (whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
                         {
                             whelp->GetMotionMaster()->MoveTargetedHome();
                         }
