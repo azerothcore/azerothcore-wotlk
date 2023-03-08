@@ -280,7 +280,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 {
                     DoCastSelf(SPELL_GIFT_OF_THE_HERALD, true);
                 }
-                events.ScheduleEvent(EVENT_JEDOGA_MOVE_DOWN, 1000, 0, PHASE_RITUAL);
+                events.ScheduleEvent(EVENT_JEDOGA_MOVE_DOWN, 1s, 0, PHASE_RITUAL);
                 break;
             }
         }
@@ -299,7 +299,7 @@ struct boss_jedoga_shadowseeker : public BossAI
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
             events.SetPhase(PHASE_RITUAL);
-            events.ScheduleEvent(EVENT_JEDOGA_PREPARE_RITUAL, 1000, 0, PHASE_RITUAL);
+            events.ScheduleEvent(EVENT_JEDOGA_PREPARE_RITUAL, 1s, 0, PHASE_RITUAL);
             ritualTriggered = true;
             return;
         }
@@ -405,7 +405,7 @@ struct boss_jedoga_shadowseeker : public BossAI
             {
                 me->SetFacingTo(5.66f);
                 DoCastSelf(SPELL_HOVER_FALL);
-                events.ScheduleEvent(EVENT_JEDOGA_MOVE_UP, 1000, 0, PHASE_RITUAL);
+                events.ScheduleEvent(EVENT_JEDOGA_MOVE_UP, 1s, 0, PHASE_RITUAL);
                 break;
             }
             case POINT_INITIAL:
@@ -461,7 +461,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 case EVENT_JEDOGA_CYCLONE:
                 {
                     DoCastSelf(DUNGEON_MODE(SPELL_CYCLONE_STRIKE, SPELL_CYCLONE_STRIKE_H), false);
-                    events.RepeatEvent(urand(10000, 14000));
+                    events.Repeat(10s, 14s);
                     break;
                 }
                 case EVENT_JEDOGA_LIGHTNING_BOLT:
@@ -470,7 +470,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                     {
                         DoCast(pTarget, DUNGEON_MODE(SPELL_LIGHTNING_BOLT, SPELL_LIGHTNING_BOLT_H), false);
                     }
-                    events.RepeatEvent(urand(11000, 15000));
+                    events.Repeat(11s, 15s);
                     break;
                 }
                 case EVENT_JEDOGA_THUNDERSHOCK:
@@ -480,7 +480,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                         DoCast(pTarget, DUNGEON_MODE(SPELL_THUNDERSHOCK, SPELL_THUNDERSHOCK_H), false);
                     }
 
-                    events.RepeatEvent(urand(16000, 22000));
+                    events.Repeat(16s, 22s);
                     break;
                 }
                 // Ritual phase
@@ -534,9 +534,9 @@ private:
     void ReschedulleCombatEvents()
     {
         events.SetPhase(PHASE_NORMAL);
-        events.RescheduleEvent(EVENT_JEDOGA_CYCLONE, 3000, 0, PHASE_NORMAL);
-        events.RescheduleEvent(EVENT_JEDOGA_LIGHTNING_BOLT, 7000, 0, PHASE_NORMAL);
-        events.RescheduleEvent(EVENT_JEDOGA_THUNDERSHOCK, 12000, 0, PHASE_NORMAL);
+        events.RescheduleEvent(EVENT_JEDOGA_CYCLONE, 3s, 0, PHASE_NORMAL);
+        events.RescheduleEvent(EVENT_JEDOGA_LIGHTNING_BOLT, 7s, 0, PHASE_NORMAL);
+        events.RescheduleEvent(EVENT_JEDOGA_THUNDERSHOCK, 12s, 0, PHASE_NORMAL);
     }
 
     void DespawnOOCSummons()
@@ -592,7 +592,7 @@ struct npc_twilight_volunteer : public ScriptedAI
             Talk(SAY_CHOSEN);
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
-            events.ScheduleEvent(EVENT_RITUAL_BEGIN_MOVE, 1500);
+            events.ScheduleEvent(EVENT_RITUAL_BEGIN_MOVE, 1500ms);
         }
     }
 

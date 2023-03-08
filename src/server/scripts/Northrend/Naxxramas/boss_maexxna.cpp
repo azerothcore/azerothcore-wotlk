@@ -112,12 +112,12 @@ public:
         {
             BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_WEB_WRAP, 20000);
-            events.ScheduleEvent(EVENT_WEB_SPRAY, 40000);
-            events.ScheduleEvent(EVENT_POISON_SHOCK, 10000);
-            events.ScheduleEvent(EVENT_NECROTIC_POISON, 5000);
-            events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
-            events.ScheduleEvent(EVENT_SUMMON_SPIDERLINGS, 30000);
+            events.ScheduleEvent(EVENT_WEB_WRAP, 20s);
+            events.ScheduleEvent(EVENT_WEB_SPRAY, 40s);
+            events.ScheduleEvent(EVENT_POISON_SHOCK, 10s);
+            events.ScheduleEvent(EVENT_NECROTIC_POISON, 5s);
+            events.ScheduleEvent(EVENT_HEALTH_CHECK, 1s);
+            events.ScheduleEvent(EVENT_SUMMON_SPIDERLINGS, 30s);
             if (pInstance)
             {
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_MAEXXNA_GATE)))
@@ -171,15 +171,15 @@ public:
                 case EVENT_WEB_SPRAY:
                     Talk(EMOTE_WEB_SPRAY);
                     me->CastSpell(me, RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25), true);
-                    events.RepeatEvent(40000);
+                    events.Repeat(40s);
                     break;
                 case EVENT_POISON_SHOCK:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_POISON_SHOCK_10, SPELL_POISON_SHOCK_25), false);
-                    events.RepeatEvent(10000);
+                    events.Repeat(10s);
                     break;
                 case EVENT_NECROTIC_POISON:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_NECROTIC_POISON_10, SPELL_NECROTIC_POISON_25), false);
-                    events.RepeatEvent(30000);
+                    events.Repeat(30s);
                     break;
                 case EVENT_SUMMON_SPIDERLINGS:
                     Talk(EMOTE_SPIDERS);
@@ -187,7 +187,7 @@ public:
                     {
                         me->SummonCreature(NPC_MAEXXNA_SPIDERLING, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
                     }
-                    events.RepeatEvent(40000);
+                    events.Repeat(40s);
                     break;
                 case EVENT_HEALTH_CHECK:
                     if (me->GetHealthPct() < 30)
@@ -195,7 +195,7 @@ public:
                         me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
                         break;
                     }
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     break;
                 case EVENT_WEB_WRAP:
                     Talk(EMOTE_WEB_WRAP);
@@ -212,7 +212,7 @@ public:
                             }
                         }
                     }
-                    events.RepeatEvent(40000);
+                    events.Repeat(40s);
                     break;
             }
             DoMeleeAttackIfReady();

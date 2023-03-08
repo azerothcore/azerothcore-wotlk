@@ -24,13 +24,15 @@
 
 #define DataHeader "TBM"
 
+uint32 const EncounterCount = 3;
+
 #define TheBlackMorassScriptName "instance_the_black_morass"
 
 enum DataTypes
 {
-    TYPE_CHRONO_LORD_DEJA               = 0,
-    TYPE_TEMPORUS                       = 1,
-    TYPE_AEONUS                         = 2,
+    DATA_CHRONO_LORD_DEJA               = 0,
+    DATA_TEMPORUS                       = 1,
+    DATA_AEONUS                         = 2,
     MAX_ENCOUNTER                       = 3,
 
     DATA_MEDIVH                         = 10,
@@ -89,13 +91,9 @@ enum Misc
     SPELL_RIFT_CHANNEL                  = 31387,
     SPELL_TELEPORT_VISUAL               = 7791,
 
-    EVENT_NEXT_PORTAL                   = 1,
-    EVENT_SUMMON_KEEPER                 = 2,
-    EVENT_WIPE_1                        = 3,
-    EVENT_WIPE_2                        = 4,
-    EVENT_WIPE_3                        = 5,
+    ACTION_OUTRO                        = 1,
 
-    ACTION_OUTRO                        = 1
+    CONTEXT_GROUP_RIFTS                 = 1
 };
 
 enum medivhSays
