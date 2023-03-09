@@ -490,26 +490,29 @@ public:
                 }
             }
 
-            //Vanish (no GCD)
-            if (IsSpellReady(VANISH_1, diff, false) && !stealthed && !shadowdance && !IsTank() && Rand() < 45 && !me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE))
+            if (mytar->IsControlledByPlayer() || me->GetHealthPct() < 25.f)
             {
-                bool cast = false;
-                //case 1: restealth for opener
-                if (!hasnormalstun && duration < 500 && me->IsInCombat() && dist <= 5)
-                    cast = true;
-                //case 2: evade casted spell
-                if (!cast)
+                //Vanish (no GCD)
+                if (IsSpellReady(VANISH_1, diff, false) && !stealthed && !shadowdance && !IsTank() && Rand() < 45 && !me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE))
                 {
-                    if (Spell const* spell = mytar->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                    bool cast = false;
+                    //case 1: restealth for opener
+                    if (!hasnormalstun && duration < 500 && me->IsInCombat() && dist <= 5)
+                        cast = true;
+                    //case 2: evade casted spell
+                    if (!cast)
                     {
-                        if (spell->m_targets.GetUnitTarget() == me && spell->GetTimer() < 500 &&
-                            spell->GetSpellInfo()->HasEffect(SPELL_EFFECT_SCHOOL_DAMAGE))
-                            cast = true;
+                        if (Spell const* spell = mytar->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                        {
+                            if (spell->m_targets.GetUnitTarget() == me && spell->GetTimer() < 500 &&
+                                spell->GetSpellInfo()->HasEffect(SPELL_EFFECT_SCHOOL_DAMAGE))
+                                cast = true;
+                        }
                     }
+                    //case 3: reset threat / evade in CheckVanish (regardless of mytar availability)
+                    if (cast && doCast(me, GetSpell(VANISH_1)))
+                        return; //custom: do not skip animation
                 }
-                //case 3: reset threat / evade in CheckVanish (regardless of mytar availability)
-                if (cast && doCast(me, GetSpell(VANISH_1)))
-                    return; //custom: do not skip animation
             }
 
             if (dist > 5)

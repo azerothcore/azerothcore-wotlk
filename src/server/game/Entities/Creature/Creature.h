@@ -420,6 +420,7 @@ public:
     bool IsNPCBotPet() const override;
     bool IsNPCBotOrPet() const override;
     bool IsFreeBot() const;
+        bool IsWandererBot() const;
     uint8 GetBotClass() const;
     uint32 GetBotRoles() const;
     bot_ai* GetBotAI() const { return bot_AI; }

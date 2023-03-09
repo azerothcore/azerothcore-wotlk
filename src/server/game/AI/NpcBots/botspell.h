@@ -63,6 +63,7 @@ enum BotSpells : uint32
   //common
   //modify
     SPELL_TRIGGERED_HEAL                = 25155,//hidden
+    SPELL_TELEPORT_LOCAL                = 7794,//Teleport, no log
   //unmodify
     SPELL_ATTACK_MELEE_1H               = 42880,
     SPELL_TRIGGERED_ENERGIZE            = 60628,//hidden

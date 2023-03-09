@@ -92,6 +92,7 @@ class bot_ai : public CreatureAI
         Creature* GetBotsPet() const { return botPet; }
 
         void Evade();
+        void GetNextEvadeMovePoint(Position& pos, bool& need_jump) const;
 
         EventProcessor* GetEvents() { return &Events; }
         ObjectGuid::LowType GetBotOwnerGuid() const { return _ownerGuid; }
@@ -158,7 +159,7 @@ class bot_ai : public CreatureAI
 
         //wandering bots
         bool IsWanderer() const { return _wanderer; }
-        void SetWanderer() { if (IAmFree()) _wanderer = true; }
+        void SetWanderer();
         uint32 GetTravelNodeCur() const { return _travel_node_cur; }
         uint32 GetTravelNodeLast() const { return _travel_node_last; }
         void SetTravelNodeCur(uint32 nodeId) { _travel_node_cur = nodeId; }
@@ -536,7 +537,7 @@ class bot_ai : public CreatureAI
         bool IsPotionSpell(uint32 spellId) const;
         void StartPotionTimer();
 
-        void BotJump(Position const* pos);
+        void BotJump(Position const* pos, bool count = true);
         bool UpdateImpossibleChase(Unit const* target);
         void ResetChaseTimer(Position const* pos);
         void ResetChase(Position const* pos);
@@ -636,7 +637,7 @@ class bot_ai : public CreatureAI
 
         uint32 _lastZoneId, _lastAreaId, _lastWMOAreaId;
 
-        uint8 _jumpCount, _evadeCount;
+        uint8 _unreachableCount, _jumpCount, _evadeCount;
         uint32 _roleMask;
         uint32 _usableItemSlotsMask;
         ObjectGuid::LowType _ownerGuid;
@@ -654,6 +655,7 @@ class bot_ai : public CreatureAI
         uint32 _travel_node_last;
         uint32 _travel_node_cur;
         std::unordered_set<BotEquipSlot> _equipsSlotsToGenerate;
+        std::vector<std::pair<uint32, std::string>> _travelHistory;
 
         float _energyFraction;
 
