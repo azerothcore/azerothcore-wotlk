@@ -264,8 +264,8 @@ struct npc_time_rift : public NullCreatureAI
             return;
         }
 
-        events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 16000);
-        events.ScheduleEvent(EVENT_CHECK_DEATH, 8000);
+        events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 16s);
+        events.ScheduleEvent(EVENT_CHECK_DEATH, 8s);
         events.ScheduleEvent(EVENT_SUMMON_BOSS, 6s);
     }
 
@@ -364,10 +364,6 @@ struct npc_time_rift : public NullCreatureAI
                     if (summon->GetEntry() != NPC_AEONUS)
                     {
                         me->CastSpell(summon, SPELL_RIFT_CHANNEL, false);
-                    }
-                    else
-                    {
-                        summon->SetReactState(REACT_DEFENSIVE);
                     }
                 }
             }
