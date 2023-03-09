@@ -1,3 +1,4 @@
+-- DB update 2023_03_09_00 -> 2023_03_09_01
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (12, 17, 33, 57, 67, 99, 104, 109, 111, 113, 163, 188, 190, 193, 203, 257, 258, 267, 269, 275, 276, 286, 294, 295, 296) AND `locale` = 'deDE';
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (12, 'deDE', 'Vielleicht habe ich mich nicht klar genug ausgedrückt, $GKandidat:Kandidatin;. Um Euren Wert als $GDiener:Dienerin; der Volksmiliz und $GDiener:Dienerin; des Lichtes zu beweisen, müsst Ihr 15 Fallensteller der Defias und 15 Schmuggler der Defias erschlagen und zu mir zurückkehren, sobald Ihr dies getan habt.', 0),

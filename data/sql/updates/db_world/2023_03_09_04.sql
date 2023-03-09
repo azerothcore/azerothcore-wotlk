@@ -1,3 +1,4 @@
+-- DB update 2023_03_09_03 -> 2023_03_09_04
 --
 UPDATE `creature` SET `spawntimesecs`=900, `wander_distance`=10, `MovementType`=1 WHERE `id1`=23008;
 

@@ -1,3 +1,4 @@
+-- DB update 2023_03_09_02 -> 2023_03_09_03
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (455, 457, 470, 471, 487, 488, 498, 501, 509, 513, 516, 518, 526, 527, 528, 531, 541, 545, 549, 567, 569, 574, 575, 579, 593, 598) AND `locale` = 'deDE';
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (455, 'deDE', 'Ihr kommt vom Loch Modan? Wie sieht es mit den Orcs beim Algaztor aus?', 0),

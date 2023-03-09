@@ -1,3 +1,4 @@
+-- DB update 2023_03_09_01 -> 2023_03_09_02
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (306, 310, 312, 313, 319, 332, 335, 347, 353, 370, 371, 372, 374, 378, 379, 380, 384, 385, 404, 409, 410, 412, 421, 427, 429, 433) AND `locale` = 'deDE';
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (306, 'deDE', 'Habt Ihr Merrin gefunden? Hat sie eine Nachricht geschickt?', 0),
