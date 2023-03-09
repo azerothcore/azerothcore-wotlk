@@ -1190,12 +1190,10 @@ public:
         else
             player->SaveRecallPosition(); // save only in non-flight case
 
-        // to point to see at target with same orientation
-        float x, y, z;
-        bot->GetClosePoint(x, y, z, player->GetCombatReach(), 1.0f);
+        WorldLocation wloc = *bot;
+        wloc.m_positionZ += 1.5f;
 
-        player->TeleportTo(bot->GetMapId(), x, y, z, player->GetAbsoluteAngle(bot), TELE_TO_GM_MODE);
-        player->SetPhaseMask(bot->GetPhaseMask(), true);
+        player->TeleportTo(wloc, TELE_TO_GM_MODE);
         return true;
     }
 
@@ -2595,7 +2593,7 @@ public:
         if (!names || names->empty())
         {
             Creature const* bot = handler->getSelectedCreature();
-            if (bot && bot->IsNPCBot() && !mgr->GetBot(bot->GetGUID()) && bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) &&
+            if (bot && bot->IsNPCBot() && !bot->IsTempBot() && !mgr->GetBot(bot->GetGUID()) && bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) &&
                 BotDataMgr::SelectNpcBotData(bot->GetEntry())->owner == owner->GetGUID().GetCounter())
             {
                 if (mgr->RebindBot(const_cast<Creature*>(bot)) != BOT_ADD_SUCCESS)
@@ -2617,7 +2615,7 @@ public:
                     name[i] = ' ';
 
             Creature const* bot = BotDataMgr::FindBot(name, owner->GetSession()->GetSessionDbLocaleIndex());
-            if (bot && bot->IsNPCBot() && !mgr->GetBot(bot->GetGUID()) && bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) &&
+            if (bot && bot->IsNPCBot() && !bot->IsTempBot() && !mgr->GetBot(bot->GetGUID()) && bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) &&
                 BotDataMgr::SelectNpcBotData(bot->GetEntry())->owner == owner->GetGUID().GetCounter())
             {
                 if (mgr->RebindBot(const_cast<Creature*>(bot)) != BOT_ADD_SUCCESS)

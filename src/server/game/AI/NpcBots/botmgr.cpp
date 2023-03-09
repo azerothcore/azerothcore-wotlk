@@ -33,6 +33,10 @@ Player NpcBots management
 TODO: Move creature hooks here
 */
 
+#ifdef _MSC_VER
+# pragma warning(push, 4)
+#endif
+
 //config
 uint8 _basefollowdist;
 uint8 _maxNpcBots;
@@ -1912,3 +1916,7 @@ float BotMgr::GetBotDamageModByClass(uint8 botclass)
             return 1.0;
     }
 }
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif

@@ -78,6 +78,8 @@ bot_pet_ai::bot_pet_ai(Creature* creature) : CreatureAI(creature)
     _updateTimerEx1 = urand(12000, 15000);
     checkAurasTimer = 0;
 
+    _wanderer = false;
+
     myType = 0;
     petOwner = nullptr;
     canUpdate = true;

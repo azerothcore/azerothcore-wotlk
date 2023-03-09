@@ -91,7 +91,7 @@ public:
                         std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
                         for (Creature const* bot : BotDataMgr::GetExistingNPCBots())
                         {
-                            if (!bot->IsAlive() || bot->IsTempBot() || bot->GetBotAI()->GetBotOwnerGuid() || bot->HasAura(BERSERK))
+                            if (!bot->IsAlive() || bot->IsTempBot() || bot->IsWandererBot() || bot->GetBotAI()->GetBotOwnerGuid() || bot->HasAura(BERSERK))
                                 continue;
                             if (BotMgr::FilterRaces() && bot->GetBotClass() < BOT_CLASS_EX_START && (bot->GetRaceMask() & RACEMASK_ALL_PLAYABLE) &&
                                 !(bot->GetRaceMask() & ((player->GetRaceMask() & RACEMASK_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE)))
@@ -184,7 +184,7 @@ public:
                     {
                         Creature const* bot = *ci;
                         bot_ai const* ai = bot->GetBotAI();
-                        if (bot->GetBotClass() != botclass || !bot->IsAlive() || ai->IsTempBot() || ai->GetBotOwnerGuid() || bot->HasAura(BERSERK))
+                        if (bot->GetBotClass() != botclass || !bot->IsAlive() || ai->IsTempBot() || bot->IsWandererBot() || ai->GetBotOwnerGuid() || bot->HasAura(BERSERK))
                             continue;
                         if (BotMgr::FilterRaces() && botclass < BOT_CLASS_EX_START && (bot->GetRaceMask() & RACEMASK_ALL_PLAYABLE) &&
                             !(bot->GetRaceMask() & ((player->GetRaceMask() & RACEMASK_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE)))
