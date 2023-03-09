@@ -15,22 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Zangarmarsh
-SD%Complete: 100
-SDComment: Quest support: 9752, 9785, 9803, 10009. Mark Of ... buffs.
-SDCategory: Zangarmarsh
-EndScriptData */
-
-/* ContentData
-npcs_ashyen_and_keleth
-npc_cooshcoosh
-npc_elder_kuruti
-npc_mortog_steamhead
-npc_kayra_longmane
-npc_timothy_daniels
-EndContentData */
-
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -528,6 +512,71 @@ public:
     }
 };
 
+enum PumpOverseer
+{
+    SPELL_TOUGHEN       = 33962,
+    SPELL_KNOCKDOWN     = 5164,
+};
+
+class npc_steam_pump_overseer : public CreatureScript
+{
+public:
+    npc_steam_pump_overseer() : CreatureScript("npc_steam_pump_overseer") { }
+
+    struct npc_steam_pump_overseerAI : public ScriptedAI
+    {
+        npc_steam_pump_overseerAI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 knockdownTimer;
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            if (Aura* aur = me->GetAura(SPELL_TOUGHEN))
+            {
+                if (uint8 hp = 10 - (me->GetHealthPct() * 0.1)) // Max stacks are 10, 1 stack per 10% missing health.
+                {
+                    aur->SetStackAmount(hp);
+                }
+            }
+            else
+            {
+                if (me->HealthBelowPct(90))
+                {
+                    me->AddAura(SPELL_TOUGHEN, me);
+                }
+            }
+        }
+
+        void Reset() override
+        {
+            knockdownTimer = urand(9000, 12000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (knockdownTimer <= diff)
+            {
+                DoCastVictim(SPELL_KNOCKDOWN);
+                knockdownTimer = urand(12000, 15000);
+            }
+            else
+            {
+                knockdownTimer -= diff;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_steam_pump_overseerAI(creature);
+    }
+};
+
 /*######
 ## AddSC
 ######*/
@@ -544,4 +593,5 @@ void AddSC_zangarmarsh()
     new npc_mortog_steamhead();
     new npc_kayra_longmane();
     new npc_timothy_daniels();
+    new npc_steam_pump_overseer();
 }
