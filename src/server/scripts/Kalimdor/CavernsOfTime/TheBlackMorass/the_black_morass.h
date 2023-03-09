@@ -42,7 +42,7 @@ enum DataTypes
     DATA_RIFT_NUMBER                    = 14,
 
     DATA_SUMMONED_NPC                   = 20,
-    DATA_DELETED_NPC                    = 21,
+    DATA_DELETED_NPC                    = 21
 };
 
 enum WorldStateIds
