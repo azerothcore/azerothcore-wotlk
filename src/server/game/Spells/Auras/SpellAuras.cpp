@@ -2867,6 +2867,10 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster)
     {
         if (!HasEffect(effIndex))
             continue;
+        //npcbot
+        if (!GetUnitOwner()->IsInWorld())
+            continue;
+        //end npcbot
         UnitList targetList;
         // non-area aura
         if (GetSpellInfo()->Effects[effIndex].Effect == SPELL_EFFECT_APPLY_AURA)
