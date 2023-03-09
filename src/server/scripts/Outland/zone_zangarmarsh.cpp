@@ -15,6 +15,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* ScriptData
+SDName: Zangarmarsh
+SD%Complete: 100
+SDComment: Quest support: 9752, 9785, 9803, 10009. Mark Of ... buffs.
+SDCategory: Zangarmarsh
+EndScriptData */
+
+/* ContentData
+npcs_ashyen_and_keleth
+npc_cooshcoosh
+npc_elder_kuruti
+npc_mortog_steamhead
+npc_kayra_longmane
+npc_timothy_daniels
+EndContentData */
+
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -512,6 +528,7 @@ public:
     }
 };
 
+<<<<<<< HEAD
 enum PumpOverseer
 {
     SPELL_TOUGHEN       = 33962,
@@ -577,6 +594,8 @@ public:
     }
 };
 
+=======
+>>>>>>> parent of f02568c35 (fix(Scripts/Creature): Move Steam Pump Overseer to ScriptedAI.)
 /*######
 ## AddSC
 ######*/
@@ -593,5 +612,4 @@ void AddSC_zangarmarsh()
     new npc_mortog_steamhead();
     new npc_kayra_longmane();
     new npc_timothy_daniels();
-    new npc_steam_pump_overseer();
 }
