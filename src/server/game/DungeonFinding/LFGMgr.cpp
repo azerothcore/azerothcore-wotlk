@@ -632,7 +632,7 @@ namespace lfg
             {
                 joinData.result = LFG_JOIN_USING_BG_SYSTEM;
             }
-            else if (player->HasAura(LFG_SPELL_DUNGEON_DESERTER))
+            else if (player->HasAura(LFG_SPELL_DUNGEON_DESERTER) || (player->HasAura(9454)))
             {
                 joinData.result = LFG_JOIN_DESERTER;
             }
@@ -651,7 +651,7 @@ namespace lfg
                     {
                         if (Player* plrg = itr->GetSource())
                         {
-                            if (plrg->HasAura(LFG_SPELL_DUNGEON_DESERTER))
+                            if (plrg->HasAura(LFG_SPELL_DUNGEON_DESERTER) || (plrg->HasAura(9454)))
                             {
                                 joinData.result = LFG_JOIN_PARTY_DESERTER;
                             }
@@ -714,7 +714,7 @@ namespace lfg
 
             // Xinef: Check dungeon cooldown only for random dungeons
             // Xinef: Moreover check this only if dungeon is not started, afterwards its obvious that players will have the cooldown
-            if (joinData.result == LFG_JOIN_OK && !isContinue && rDungeonId)
+            if (joinData.result == LFG_JOIN_OK && !isContinue)
             {
                 if (player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)) // xinef: added !isContinue
                     joinData.result = LFG_JOIN_RANDOM_COOLDOWN;
