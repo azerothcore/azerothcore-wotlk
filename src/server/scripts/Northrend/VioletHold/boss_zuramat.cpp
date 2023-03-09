@@ -86,9 +86,9 @@ public:
             Talk(SAY_AGGRO);
             DoZoneInCombat();
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_SHROUD_OF_DARKNESS, urand(5000, 7000));
-            events.RescheduleEvent(EVENT_SPELL_VOID_SHIFT, urand(23000, 25000));
-            events.RescheduleEvent(EVENT_SPELL_SUMMON_VOID_SENTRY, 10000);
+            events.RescheduleEvent(EVENT_SPELL_SHROUD_OF_DARKNESS, 5s, 7s);
+            events.RescheduleEvent(EVENT_SPELL_VOID_SHIFT, 23s, 25s);
+            events.RescheduleEvent(EVENT_SPELL_SUMMON_VOID_SENTRY, 10s);
             if (pInstance)
                 pInstance->SetData(DATA_ACHIEV, 1);
         }
@@ -110,7 +110,7 @@ public:
                 case EVENT_SPELL_SHROUD_OF_DARKNESS:
                     me->CastSpell(me, SPELL_SHROUD_OF_DARKNESS, false);
                     Talk(SAY_SHIELD);
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 case EVENT_SPELL_VOID_SHIFT:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
@@ -118,11 +118,11 @@ public:
                         me->CastSpell(target, SPELL_VOID_SHIFT, false);
                         me->Whisper("Gaze... into the void.", LANG_UNIVERSAL, target->ToPlayer());
                     }
-                    events.RepeatEvent(urand(18000, 22000));
+                    events.Repeat(18s, 22s);
                     break;
                 case EVENT_SPELL_SUMMON_VOID_SENTRY:
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOID_SENTRY, false);
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     break;
             }
 

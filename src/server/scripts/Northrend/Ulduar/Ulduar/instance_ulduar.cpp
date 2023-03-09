@@ -180,7 +180,7 @@ public:
 
                 if (m_algalonTimer <= 60)
                 {
-                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 60000);
+                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
                     algalon->AI()->DoAction(ACTION_INIT_ALGALON);
                 }
                 else // if (m_algalonTimer = TIMER_ALGALON_TO_SUMMON)
@@ -750,7 +750,7 @@ public:
                     DoUpdateWorldState(WORLD_STATE_ALGALON_TIMER_ENABLED, 1);
                     DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, 60);
                     m_algalonTimer = 60;
-                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 60000);
+                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
                     SaveToDB();
                     return;
                 case DATA_ALGALON_SUMMON_STATE:
@@ -1126,7 +1126,7 @@ public:
                     DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, --m_algalonTimer);
                     if (m_algalonTimer)
                     {
-                        _events.RepeatEvent(60000);
+                        _events.Repeat(1min);
                         return;
                     }
 

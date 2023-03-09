@@ -64,7 +64,7 @@ public:
             if (type == DATA_START_INTRO && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE && counter == 0 && !me->IsVisible())
             {
                 me->setActive(true);
-                events.RescheduleEvent(1, 0);
+                events.RescheduleEvent(1, 0ms);
             }
         }
 
@@ -97,11 +97,11 @@ public:
                             }
 
                             ++counter;
-                            events.RepeatEvent(150);
+                            events.Repeat(150ms);
                         }
                         else
                         {
-                            events.RescheduleEvent(2, 2500);
+                            events.RescheduleEvent(2, 2500ms);
                         }
                     }
                     break;
@@ -113,14 +113,14 @@ public:
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_1);
                         }
 
-                    events.RescheduleEvent(3, 7000);
+                    events.RescheduleEvent(3, 7s);
                     break;
                 case 3:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_2);
 
-                    events.RescheduleEvent(4, 14000);
+                    events.RescheduleEvent(4, 14s);
                     break;
                 case 4:
                     if (pInstance)
@@ -161,19 +161,19 @@ public:
                         }
                     }
 
-                    events.RescheduleEvent(5, 1);
+                    events.RescheduleEvent(5, 1ms);
                     break;
                 case 5:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_1 : SAY_SYLVANAS_INTRO_1);
 
-                    events.RescheduleEvent(6, 1000);
+                    events.RescheduleEvent(6, 1s);
                     break;
                 case 6:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_3);
 
-                    events.RescheduleEvent(7, 5000);
+                    events.RescheduleEvent(7, 5s);
                     break;
                 case 7: /// @todo: (Initial RP, when zoning in the instance) is not complete.
                     if (pInstance)
@@ -202,14 +202,14 @@ public:
                             }
                     }
 
-                    events.RescheduleEvent(8, 7000);
+                    events.RescheduleEvent(8, 7s);
                     break;
                 case 8:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->CastSpell(c, 69753, false);
 
-                    events.RescheduleEvent(9, 400);
+                    events.RescheduleEvent(9, 400ms);
                     break;
                 case 9:
                     if (pInstance)
@@ -223,12 +223,12 @@ public:
                                 c->GetMotionMaster()->MoveFall(0, true);
                             }
 
-                    events.RescheduleEvent(10, 1000);
+                    events.RescheduleEvent(10, 1s);
                     break;
                 case 10:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_2);
 
-                    events.RescheduleEvent(11, 1000);
+                    events.RescheduleEvent(11, 1s);
                     break;
                 case 11:
                     if (pInstance)
@@ -243,7 +243,7 @@ public:
                                 c->CastSpell(c, 69350, true);
                             }
 
-                    events.RescheduleEvent(12, 2000);
+                    events.RescheduleEvent(12, 2s);
                     break;
                 case 12:
                     if (pInstance)
@@ -264,7 +264,7 @@ public:
                             }
                     }
 
-                    events.RescheduleEvent(13, 3000);
+                    events.RescheduleEvent(13, 3s);
                     break;
                 case 13:
                     if (pInstance)
@@ -284,7 +284,7 @@ public:
                             }
                     }
 
-                    events.RescheduleEvent(14, 2000);
+                    events.RescheduleEvent(14, 2s);
                     break;
                 case 14:
                     if (pInstance)
@@ -303,7 +303,7 @@ public:
                         }
                     }
 
-                    events.RescheduleEvent(15, 2000);
+                    events.RescheduleEvent(15, 2s);
                     break;
                 case 15:
                     if (pInstance)
@@ -319,7 +319,7 @@ public:
                         }
                     }
 
-                    events.RescheduleEvent(16, 3000);
+                    events.RescheduleEvent(16, 3s);
                     break;
                 case 16:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_4 : SAY_SYLVANAS_INTRO_3);
@@ -344,7 +344,7 @@ public:
                         pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_FINISHED_INTRO);
                     }
 
-                    events.RescheduleEvent(17, 5000);
+                    events.RescheduleEvent(17, 5s);
                     break;
                 case 17:
                     me->setActive(false);
@@ -438,8 +438,8 @@ public:
             //            if (SPELL_NECROLYTE_CHANNELING)
             me->RemoveAura(SPELL_NECROLYTE_CHANNELING);
             events.Reset();
-            events.RescheduleEvent(1, 0);
-            events.RescheduleEvent(2, urand(5000, 9000));
+            events.RescheduleEvent(1, 0ms);
+            events.RescheduleEvent(2, 5s, 9s);
 
             if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                 c->AI()->SetData(DATA_START_INTRO, 0);
@@ -473,12 +473,12 @@ public:
                     break;
                 case 1: // Shadow Bolt
                     me->CastSpell(me->GetVictim(), 69577, false);
-                    events.RepeatEvent(4000);
+                    events.Repeat(4s);
                     break;
                 case 2: // Conversion Beam
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, 69578, false);
-                    events.RepeatEvent(urand(20000, 25000));
+                    events.Repeat(20s, 25s);
                     break;
             }
 
@@ -522,7 +522,7 @@ public:
             switch(id)
             {
                 case 1:
-                    events.RescheduleEvent(id, 0);
+                    events.RescheduleEvent(id, 0ms);
                     break;
             }
         }
@@ -552,14 +552,14 @@ public:
                                 c->GetMotionMaster()->MovePath(FBSData[i].pathId, false);
                             ++i;
                         }
-                        events.RescheduleEvent(2, 3000);
+                        events.RescheduleEvent(2, 3s);
                         break;
                     }
                 case 2:
                     if (Creature* c = me->SummonCreature(NPC_TYRANNUS_VOICE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 10.0f, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 1))
                         c->AI()->Talk(SAY_TYRANNUS_GARFROST);
 
-                    events.RescheduleEvent(3, 4000);
+                    events.RescheduleEvent(3, 4s);
                     break;
                 case 3:
                     Talk(SAY_GENERAL_GARFROST);
@@ -603,18 +603,18 @@ public:
                         me->setActive(false);
                         break;
                     case 1:
-                        events.ScheduleEvent(1, 0);
+                        events.ScheduleEvent(1, 0ms);
                         break;
                     case 2:
-                        events.ScheduleEvent(2, 0);
+                        events.ScheduleEvent(2, 0ms);
                         break;
                     case 3:
-                        events.ScheduleEvent(4, 0);
+                        events.ScheduleEvent(4, 0ms);
                         break;
                 }
             }
             else if (type == EFFECT_MOTION_TYPE && id == 10)
-                events.ScheduleEvent(6, 0);
+                events.ScheduleEvent(6, 0ms);
         }
 
         void SetData(uint32 type, uint32 id) override
@@ -639,8 +639,8 @@ public:
                     pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_WARN_1);
                     Talk(SAY_TYRANNUS_AMBUSH_1);
                     killsLeft = 10;
-                    events.ScheduleEvent(30, 0);
-                    events.ScheduleEvent(3, 25000);
+                    events.ScheduleEvent(30, 0ms);
+                    events.ScheduleEvent(3, 25s);
                     break;
                 case 2:
                     if (pInstance->GetData(DATA_INSTANCE_PROGRESS) != INSTANCE_PROGRESS_AFTER_WARN_1)
@@ -650,8 +650,8 @@ public:
                     pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_WARN_2);
                     Talk(SAY_TYRANNUS_AMBUSH_2);
                     killsLeft = (Difficulty(me->GetMap()->GetSpawnMode()) == DUNGEON_DIFFICULTY_HEROIC ? 12 : 6);
-                    events.ScheduleEvent(60, 0);
-                    events.ScheduleEvent(5, 20000);
+                    events.ScheduleEvent(60, 0ms);
+                    events.ScheduleEvent(5, 20s);
                     break;
                     break;
                 case 3:
@@ -716,8 +716,8 @@ public:
                             path.push_back(G3D::Vector3(883.15f, 54.6254f, 528.5f));
                             c->GetMotionMaster()->MoveSplinePath(&path);
                         }
-                        events.ScheduleEvent(31, 500);
-                        events.ScheduleEvent(32, 500);
+                        events.ScheduleEvent(31, 500ms);
+                        events.ScheduleEvent(32, 500ms);
                     }
                     break;
                 case 31:
@@ -725,34 +725,34 @@ public:
                         if (c->GetMotionMaster()->GetCurrentMovementGeneratorType() != ESCORT_MOTION_TYPE)
                         {
                             c->CastSpell(c, 69516, false);
-                            events.ScheduleEvent(33, 3000);
+                            events.ScheduleEvent(33, 3s);
                             break;
                         }
-                    events.ScheduleEvent(31, 500);
+                    events.ScheduleEvent(31, 500ms);
                     break;
                 case 32:
                     if (Creature* c = pInstance->instance->GetCreature(deathbringerGUID[1]))
                         if (c->GetMotionMaster()->GetCurrentMovementGeneratorType() != ESCORT_MOTION_TYPE)
                         {
                             c->CastSpell(c, 69516, false);
-                            events.ScheduleEvent(34, 3000);
+                            events.ScheduleEvent(34, 3s);
                             break;
                         }
-                    events.ScheduleEvent(32, 500);
+                    events.ScheduleEvent(32, 500ms);
                     break;
                 case 33:
                     me->SummonCreature(NPC_YMIRJAR_WRATHBRINGER, 919.733f, 89.0972f, 558.959f, 3.85718f);
                     me->SummonCreature(NPC_YMIRJAR_WRATHBRINGER, 911.936f, 63.3542f, 547.698f, 3.735f);
                     me->SummonCreature(NPC_YMIRJAR_FLAMEBEARER, 909.356f, 83.1684f, 551.717f, 3.57792f);
                     me->SummonCreature(NPC_YMIRJAR_FLAMEBEARER, 920.946f, 69.1667f, 557.594f, 3.1765f);
-                    events.ScheduleEvent(35, 3500);
+                    events.ScheduleEvent(35, 3500ms);
                     break;
                 case 34:
                     me->SummonCreature(NPC_YMIRJAR_WRATHBRINGER, 879.464f, 41.1997f, 521.394f, 3.735f);
                     me->SummonCreature(NPC_YMIRJAR_WRATHBRINGER, 885.715f, 65.5156f, 533.631f, 3.85718f);
                     me->SummonCreature(NPC_YMIRJAR_FLAMEBEARER, 876.884f, 61.0139f, 527.715f, 3.57792f);
                     me->SummonCreature(NPC_YMIRJAR_FLAMEBEARER, 889.49f, 45.2865f, 527.233f, 3.97935f);
-                    events.ScheduleEvent(36, 3500);
+                    events.ScheduleEvent(36, 3500ms);
                     break;
                 case 35:
                     if (Creature* c = pInstance->instance->GetCreature(deathbringerGUID[0]))
@@ -923,8 +923,8 @@ public:
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
             i = 0;
             events.Reset();
-            events.RescheduleEvent(1, 500);
-            events.RescheduleEvent(2, 15000);
+            events.RescheduleEvent(1, 500ms);
+            events.RescheduleEvent(2, 15s);
 
             if (pInstance)
                 if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
@@ -950,7 +950,7 @@ public:
         {
             if (type == POINT_MOTION_TYPE && id == 2)
             {
-                events.RescheduleEvent(5, 1000);
+                events.RescheduleEvent(5, 1s);
             }
         }
 
@@ -1024,12 +1024,12 @@ public:
                             c->GetMotionMaster()->MovePoint(0, TSData[i].x, TSData[i].y, TSHeight);
                         }
                         ++i;
-                        events.ScheduleEvent(1, 150);
+                        events.ScheduleEvent(1, 150ms);
                     }
                     break;
                 case 2:
                     Talk(me->GetEntry() == NPC_MARTIN_VICTUS_2 ? SAY_GENERAL_ALLIANCE_TRASH : SAY_GENERAL_HORDE_TRASH);
-                    events.RescheduleEvent(3, 8000);
+                    events.RescheduleEvent(3, 8s);
                     break;
                 case 3:
                     if (pInstance)
@@ -1046,9 +1046,9 @@ public:
                             c->SetOrientation(5.26f);
                             c->SetHomePosition(*c);
                         }
-                    events.RescheduleEvent(10, 15000);
+                    events.RescheduleEvent(10, 15s);
 
-                    events.RescheduleEvent(4, 15000);
+                    events.RescheduleEvent(4, 15s);
                     break;
                 case 4:
                     if (pInstance)
@@ -1176,8 +1176,8 @@ public:
         {
             if (p == 1)
             {
-                events.RescheduleEvent(1, me->GetEntry() == NPC_JAINA_PART2 ? 15500 : 18000);
-                events.RescheduleEvent(2, me->GetEntry() == NPC_JAINA_PART2 ? 16500 : 19000);
+                events.RescheduleEvent(1, me->GetEntry() == NPC_JAINA_PART2 ? 15s + 500ms : 18s);
+                events.RescheduleEvent(2, me->GetEntry() == NPC_JAINA_PART2 ? 16s + 500ms : 19s);
             }
         }
 
@@ -1238,20 +1238,20 @@ public:
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
                             c->AI()->Talk(SAY_GENERAL_OUTRO_2);
 
-                    events.RescheduleEvent(3, me->GetEntry() == NPC_JAINA_PART2 ? 7000 : 8000);
+                    events.RescheduleEvent(3, me->GetEntry() == NPC_JAINA_PART2 ? 7s : 8s);
                     break;
                 case 3:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OUTRO_1 : SAY_SYLVANAS_OUTRO_1);
                     me->CastSpell(me, me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA_VISUAL : SPELL_TELEPORT_SYLVANAS_VISUAL, true);
 
-                    events.RescheduleEvent(4, 2000);
+                    events.RescheduleEvent(4, 2s);
                     break;
                 case 4:
                     me->CastSpell(me, me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA : SPELL_TELEPORT_SYLVANAS, true);
                     if (GameObject* barrier = me->SummonGameObject(203005, 1055.49f, 115.03f, 628.15f, 2.08f, 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
                         barrierGUID = barrier->GetGUID();
 
-                    events.RescheduleEvent(5, 1500);
+                    events.RescheduleEvent(5, 1500ms);
                     break;
                 case 5:
                     if (pInstance)
@@ -1261,15 +1261,15 @@ public:
                                 c->CastSpell(x->GetPositionX(), x->GetPositionY(), x->GetPositionZ(), SPELL_SINDRAGOSA_FROST_BOMB_POS, true);
                         }
 
-                    events.RescheduleEvent(6, 5000);
-                    events.RescheduleEvent(10, 2000);
+                    events.RescheduleEvent(6, 5s);
+                    events.RescheduleEvent(10, 2s);
                     break;
                 case 6:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos1);
 
-                    events.RescheduleEvent(7, 4500);
+                    events.RescheduleEvent(7, 4500ms);
                     break;
                 case 7:
                     if (pInstance)
@@ -1279,7 +1279,7 @@ public:
                         barrier->Delete();
                     barrierGUID.Clear();
 
-                    events.RescheduleEvent(8, 2000);
+                    events.RescheduleEvent(8, 2s);
                     break;
                 case 8:
                     me->GetMotionMaster()->MovePath(me->GetEntry() == NPC_JAINA_PART2 ? PATH_BEGIN_VALUE + 16 : PATH_BEGIN_VALUE + 17, false);

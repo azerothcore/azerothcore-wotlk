@@ -115,9 +115,9 @@ struct boss_volazj : public BossAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
-        events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
-        events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
-        events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);
+        events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8s);
+        events.ScheduleEvent(EVENT_HERALD_SHADOW, 5s);
+        events.ScheduleEvent(EVENT_HERALD_SHIVER, 15s);
         Talk(SAY_AGGRO);
         DoCastSelf(SPELL_WHISPER_AGGRO);
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
@@ -241,13 +241,13 @@ struct boss_volazj : public BossAI
                 case EVENT_HERALD_MIND_FLAY:
                 {
                     DoCastVictim(SPELL_MIND_FLAY, false);
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 }
                 case EVENT_HERALD_SHADOW:
                 {
                     DoCastVictim(SPELL_SHADOW_BOLT_VOLLEY, false);
-                    events.RepeatEvent(5000);
+                    events.Repeat(5s);
                     break;
                 }
                 case EVENT_HERALD_SHIVER:
@@ -257,7 +257,7 @@ struct boss_volazj : public BossAI
                         DoCast(pTarget, SPELL_SHIVER, false);
                     }
 
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 }
             }
