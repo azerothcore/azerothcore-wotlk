@@ -22,7 +22,6 @@
 #include "ScriptedCreature.h"
 #include "trial_of_the_crusader.h"
 
-#define CLEANUP_CHECK_INTERVAL  5000
 std::map<uint32, bool> validDedicatedInsanityItems;
 
 class instance_trial_of_the_crusader : public InstanceMapScript
@@ -575,7 +574,7 @@ public:
                         {
                             InstanceCleanup();
                         }
-                        events.RepeatEvent(CLEANUP_CHECK_INTERVAL);
+                        events.Repeat(5s);
                     }
                     break;
                 case EVENT_OPEN_GATE:
@@ -1415,7 +1414,7 @@ public:
             // if missing spawn anub'arak
             SpawnAnubArak();
 
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
@@ -1590,7 +1589,7 @@ public:
             Counter = 0;
             EncounterStatus = NOT_STARTED;
             events.Reset();
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         void ReadSaveDataMore(std::istringstream& data) override

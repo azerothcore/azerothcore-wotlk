@@ -79,9 +79,9 @@ public:
             BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_ENRAGE, 15000);
-            events.ScheduleEvent(EVENT_FLAME_BREATH, 10000);
-            events.ScheduleEvent(EVENT_FLIGHT, 30000);
+            events.ScheduleEvent(EVENT_ENRAGE, 15s);
+            events.ScheduleEvent(EVENT_FLAME_BREATH, 10s);
+            events.ScheduleEvent(EVENT_FLIGHT, 30s);
         }
 
         void JustDied(Unit* killer) override
@@ -99,13 +99,13 @@ public:
             {
                 case POINT_FLIGHT:
                     me->SetFacingTo(4.69f);
-                    events.ScheduleEvent(EVENT_CONFLAGRATION, 1000);
-                    events.ScheduleEvent(EVENT_LAND_BACK, 7000);
+                    events.ScheduleEvent(EVENT_CONFLAGRATION, 1s);
+                    events.ScheduleEvent(EVENT_LAND_BACK, 7s);
                     Talk(SAY_CONFLAGRATION);
                     break;
                 case POINT_LAND:
                     me->SetDisableGravity(false);
-                    events.ScheduleEvent(EVENT_LAND_GROUND, 500);
+                    events.ScheduleEvent(EVENT_LAND_GROUND, 500ms);
                     break;
             }
         }
@@ -122,7 +122,7 @@ public:
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
                 Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
             }
         }
 
@@ -143,9 +143,9 @@ public:
                         me->AttackStop();
                         me->SetDisableGravity(true);
                         me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, false);
-                        events.ScheduleEvent(EVENT_FLIGHT, 50000);
-                        events.DelayEvents(15000);
-                        events.ScheduleEvent(EVENT_AIR_MOVEMENT, 2000);
+                        events.ScheduleEvent(EVENT_FLIGHT, 50s);
+                        events.DelayEvents(15s);
+                        events.ScheduleEvent(EVENT_AIR_MOVEMENT, 2s);
                         break;
                     }
                 case EVENT_CONFLAGRATION:
@@ -154,11 +154,11 @@ public:
                 case EVENT_ENRAGE:
                     me->CastSpell(me, SPELL_ENRAGE, false);
                     Talk(EMOTE_ENRAGED);
-                    events.ScheduleEvent(EVENT_ENRAGE, urand(15000, 20000));
+                    events.ScheduleEvent(EVENT_ENRAGE, 15s, 20s);
                     break;
                 case EVENT_FLAME_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_FLAME_BREATH, false);
-                    events.ScheduleEvent(EVENT_FLAME_BREATH, urand(20000, 30000));
+                    events.ScheduleEvent(EVENT_FLAME_BREATH, 20s, 30s);
                     break;
                 case EVENT_AIR_MOVEMENT:
                     me->GetMotionMaster()->MovePoint(POINT_FLIGHT, 3155.51f, 683.844f, 95.0f, false);

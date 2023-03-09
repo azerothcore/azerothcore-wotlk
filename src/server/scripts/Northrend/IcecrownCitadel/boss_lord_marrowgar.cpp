@@ -113,11 +113,11 @@ public:
     {
         me->SetReactState(REACT_AGGRESSIVE);
         _Reset();
-        events.ScheduleEvent(EVENT_ENABLE_BONE_SLICE, 10000);
-        events.ScheduleEvent(EVENT_SPELL_BONE_SPIKE_GRAVEYARD, urand(10000, 15000));
-        events.ScheduleEvent(EVENT_SPELL_COLDFLAME, 5000);
-        events.ScheduleEvent(EVENT_WARN_BONE_STORM, urand(45000, 50000));
-        events.ScheduleEvent(EVENT_ENRAGE, 600000);
+        events.ScheduleEvent(EVENT_ENABLE_BONE_SLICE, 10s);
+        events.ScheduleEvent(EVENT_SPELL_BONE_SPIKE_GRAVEYARD, 10s, 15s);
+        events.ScheduleEvent(EVENT_SPELL_COLDFLAME, 5s);
+        events.ScheduleEvent(EVENT_WARN_BONE_STORM, 45s, 50s);
+        events.ScheduleEvent(EVENT_ENRAGE, 10min);
 
         _boneSlice = false;
 
@@ -176,13 +176,13 @@ public:
                     bool a = me->HasAura(SPELL_BONE_STORM);
                     if (IsHeroic() || !a)
                         me->CastSpell(me, SPELL_BONE_SPIKE_GRAVEYARD, a);
-                    events.RepeatEvent(urand(15000, 20000));
+                    events.Repeat(15s, 20s);
                 }
                 break;
             case EVENT_SPELL_COLDFLAME:
                 if (!me->HasAura(SPELL_BONE_STORM))
                     me->CastSpell((Unit*)nullptr, SPELL_COLDFLAME_NORMAL, false);
-                events.RepeatEvent(5000);
+                events.Repeat(5s);
                 break;
             case EVENT_SPELL_COLDFLAME_BONE_STORM:
                 me->CastSpell(me, SPELL_COLDFLAME_BONE_STORM, false);
@@ -196,15 +196,15 @@ public:
                 me->SetReactState(REACT_PASSIVE); // to prevent chasing another target on UpdateVictim()
                 me->GetMotionMaster()->MoveIdle();
                 me->GetMotionMaster()->MovementExpired();
-                events.RepeatEvent(urand(90000, 95000));
-                events.ScheduleEvent(EVENT_BEGIN_BONE_STORM, 3050);
+                events.Repeat(90s, 95s);
+                events.ScheduleEvent(EVENT_BEGIN_BONE_STORM, 3050ms);
                 break;
             case EVENT_BEGIN_BONE_STORM:
                 {
                     uint32 _boneStormDuration = RAID_MODE<uint32>(20000, 30000, 20000, 30000);
                     if (Aura* pStorm = me->GetAura(SPELL_BONE_STORM))
                         pStorm->SetDuration(int32(_boneStormDuration));
-                    events.ScheduleEvent(EVENT_BONE_STORM_MOVE, 0);
+                    events.ScheduleEvent(EVENT_BONE_STORM_MOVE, 0ms);
                     events.ScheduleEvent(EVENT_END_BONE_STORM, _boneStormDuration + 1);
                 }
                 break;
@@ -212,10 +212,10 @@ public:
                 {
                     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
                     {
-                        events.RepeatEvent(1);
+                        events.Repeat(1ms);
                         break;
                     }
-                    events.RepeatEvent(5000);
+                    events.Repeat(5s);
                     Unit* unit = SelectTarget(SelectTargetMethod::Random, 0, BoneStormMoveTargetSelector(me));
                     if (!unit)
                     {
@@ -237,9 +237,9 @@ public:
                 me->SetReactState(REACT_AGGRESSIVE);
                 DoStartMovement(me->GetVictim());
                 events.CancelEvent(EVENT_BONE_STORM_MOVE);
-                events.ScheduleEvent(EVENT_ENABLE_BONE_SLICE, 10000);
+                events.ScheduleEvent(EVENT_ENABLE_BONE_SLICE, 10s);
                 if (!IsHeroic())
-                    events.RescheduleEvent(EVENT_SPELL_BONE_SPIKE_GRAVEYARD, urand(15000, 20000));
+                    events.RescheduleEvent(EVENT_SPELL_BONE_SPIKE_GRAVEYARD, 15s, 20s);
                 break;
             case EVENT_ENRAGE:
                 me->CastSpell(me, SPELL_BERSERK, true);
@@ -267,7 +267,7 @@ public:
         if (type != POINT_MOTION_TYPE || id != 1337)
             return;
 
-        events.ScheduleEvent(EVENT_SPELL_COLDFLAME_BONE_STORM, 0);
+        events.ScheduleEvent(EVENT_SPELL_COLDFLAME_BONE_STORM, 0ms);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -320,8 +320,8 @@ public:
 
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
-            events.ScheduleEvent(1, 450);
-            events.ScheduleEvent(2, 12000);
+            events.ScheduleEvent(1, 450ms);
+            events.ScheduleEvent(2, 12s);
             me->m_positionZ = 42.5f;
         }
 
@@ -345,7 +345,7 @@ public:
                             break;
                         }
                         me->NearTeleportTo(nx, ny, 42.5f, me->GetOrientation());
-                        events.RepeatEvent(450);
+                        events.Repeat(450ms);
                     }
                     break;
                 case 2:

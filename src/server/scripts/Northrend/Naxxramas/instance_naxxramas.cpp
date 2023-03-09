@@ -855,7 +855,7 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
-                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6s);
                         break;
                     case BOSS_ANUB:
                         if (GameObject* go = instance->GetGameObject(_anubGateGUID))
@@ -895,7 +895,7 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
-                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6s);
                         break;
                     case BOSS_GOTHIK:
                         if (GameObject* go = instance->GetGameObject(_gothikEnterGateGUID))
@@ -912,7 +912,7 @@ public:
                         }
                         break;
                     case BOSS_SAPPHIRON:
-                        events.ScheduleEvent(EVENT_FROSTWYRM_WATERFALL_DOOR, 5000);
+                        events.ScheduleEvent(EVENT_FROSTWYRM_WATERFALL_DOOR, 5s);
                         break;
                     case BOSS_THADDIUS:
                         if (GameObject* go = instance->GetGameObject(_thaddiusPortalGUID))
@@ -928,7 +928,7 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
-                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6s);
                         break;
                     case BOSS_HORSEMAN:
                         if (GameObject* go = instance->GetGameObject(_horsemanPortalGUID))
@@ -944,7 +944,7 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
-                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6s);
                         break;
                     default:
                         break;

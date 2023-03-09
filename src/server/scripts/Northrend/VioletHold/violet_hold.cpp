@@ -138,9 +138,9 @@ public:
                     addValue = 1;
 
                 if (wave % 6 != 0)
-                    events.RescheduleEvent(RAND(EVENT_SUMMON_KEEPER_OR_GUARDIAN, EVENT_SUMMON_ELITES), 10000);
+                    events.RescheduleEvent(RAND(EVENT_SUMMON_KEEPER_OR_GUARDIAN, EVENT_SUMMON_ELITES), 10s);
                 else
-                    events.RescheduleEvent(EVENT_SUMMON_SABOTEOUR, 3000);
+                    events.RescheduleEvent(EVENT_SUMMON_SABOTEOUR, 3s);
             }
         }
 
@@ -168,7 +168,7 @@ public:
                     spawned = true;
                     if (Creature* c = DoSummon(RAND(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER), me, 2.0f, 0, TEMPSUMMON_DEAD_DESPAWN))
                         me->CastSpell(c, SPELL_PORTAL_CHANNEL, false);
-                    events.RescheduleEvent(EVENT_SUMMON_KEEPER_TRASH, 20000);
+                    events.RescheduleEvent(EVENT_SUMMON_KEEPER_TRASH, 20s);
                     break;
                 case EVENT_SUMMON_KEEPER_TRASH:
                     for (uint8 i = 0; i < 3 + addValue; ++i)
@@ -176,7 +176,7 @@ public:
                         uint32 entry = RAND(NPC_AZURE_INVADER_1, NPC_AZURE_INVADER_2, NPC_AZURE_SPELLBREAKER_1, NPC_AZURE_SPELLBREAKER_2, NPC_AZURE_MAGE_SLAYER_1, NPC_AZURE_MAGE_SLAYER_2, NPC_AZURE_BINDER_1, NPC_AZURE_BINDER_2);
                         DoSummon(entry, me, 2.0f, 20000, TEMPSUMMON_DEAD_DESPAWN);
                     }
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 case EVENT_SUMMON_ELITES:
                     spawned = true;
