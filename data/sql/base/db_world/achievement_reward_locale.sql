@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.achievement_reward_locale
+-- Dumping structure for table acore_world.achievement_reward_locale
 DROP TABLE IF EXISTS `achievement_reward_locale`;
 CREATE TABLE IF NOT EXISTS `achievement_reward_locale` (
   `ID` mediumint unsigned NOT NULL DEFAULT '0',
@@ -22,9 +24,8 @@ CREATE TABLE IF NOT EXISTS `achievement_reward_locale` (
   PRIMARY KEY (`ID`,`Locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
--- Dumpar data för tabell acore_world.achievement_reward_locale: ~229 rows (ungefär)
+-- Dumping data for table acore_world.achievement_reward_locale: ~229 rows (approximately)
 DELETE FROM `achievement_reward_locale`;
-/*!40000 ALTER TABLE `achievement_reward_locale` DISABLE KEYS */;
 INSERT INTO `achievement_reward_locale` (`ID`, `Locale`, `Subject`, `Text`) VALUES
 	(13, 'deDE', 'Glückwunsch', 'Viele Glückwunsche bezüglich eurer Überzeugung, auch die 80. Saison der Abenteurer zu erreichen. Ihr seit zweifellos dem Ziel ergben, Azeroth vom Bösen zu befreien.$B$BObwohl der Weg hierher keine Kleinigkeit war, steht der wahre Kampf erst noch bevor.$B$BKämpft weiter!$B$BRhonin'),
 	(13, 'esES', 'Nivel 80', 'Felicitaciones por tu convicción de llegar a la temporada 80 de aventuras. Sin duda, estás dedicado a la causa de librar a Azeroth de los males que nos han asolado.$B$BY aunque el viaje hasta ahora no ha sido una hazaña menor, la verdadera batalla está por llegar.$B$B¡Sigue luchando!$B$BRhonin'),
@@ -255,8 +256,8 @@ INSERT INTO `achievement_reward_locale` (`ID`, `Locale`, `Subject`, `Text`) VALU
 	(4785, 'esMX', 'Intendente de emblemas en el Santuario Atracasol de Dalaran', 'Tus logros en Rasganorte no han pasado desapercibidos, amigo.$B$BLos emblemas que hayas ganado se pueden usar para comprar equipo de los distintos Intendente de emblemas en Dalaran.$B$BPuede encontrarnos en el Santuario Atracasol, donde cada variedad de emblema tiene su propio intendente.$B$B¡Esperamos tu llegada!'),
 	(4785, 'frFR', '', NULL),
 	(4785, 'zhCN', '夺日者圣殿的纹章收集者', '朋友，你在诺森德所取得的成就让人不得不注意。$B$B用获取的纹章在达拉然换取对应的装备，武装自己来更强大，不是每个人都乐意的么？$B$B在达拉然的夺日者圣殿，你能找到每一种纹章所对应的兑换师，在他的身上，你能收获许多。$B$B期待你的到来！');
-/*!40000 ALTER TABLE `achievement_reward_locale` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

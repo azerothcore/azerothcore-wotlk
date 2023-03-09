@@ -349,7 +349,7 @@ PreparedResultSet::PreparedResultSet(MySQLStmt* stmt, MySQLResult* result, uint6
                     // when mysql_stmt_fetch returned MYSQL_DATA_TRUNCATED
                     // we cannot blindly null-terminate the data either as it may be retrieved as binary blob and not specifically a string
                     // in this case using Field::GetCString will result in garbage
-                    // TODO: remove Field::GetCString and use std::string_view in C++17
+                    /// @todo: remove Field::GetCString and use std::string_view in C++17
                     if (fetched_length < buffer_length)
                         *((char*)buffer + fetched_length) = '\0';
                     break;

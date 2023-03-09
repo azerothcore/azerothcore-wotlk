@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.areatrigger
+-- Dumping structure for table acore_world.areatrigger
 DROP TABLE IF EXISTS `areatrigger`;
 CREATE TABLE IF NOT EXISTS `areatrigger` (
   `entry` int unsigned NOT NULL AUTO_INCREMENT,
@@ -28,9 +30,8 @@ CREATE TABLE IF NOT EXISTS `areatrigger` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5873 DEFAULT CHARSET=latin1;
 
--- Dumpar data för tabell acore_world.areatrigger: ~1 217 rows (ungefär)
+-- Dumping data for table acore_world.areatrigger: ~1,217 rows (approximately)
 DELETE FROM `areatrigger`;
-/*!40000 ALTER TABLE `areatrigger` DISABLE KEYS */;
 INSERT INTO `areatrigger` (`entry`, `map`, `x`, `y`, `z`, `radius`, `length`, `width`, `height`, `orientation`) VALUES
 	(45, 0, 2924.38, -798.429, 161.611, 8, 0, 0, 0, 0),
 	(71, 0, -10645.9, 1179.06, 48.1781, 27, 0, 0, 0, 0),
@@ -1249,8 +1250,8 @@ INSERT INTO `areatrigger` (`entry`, `map`, `x`, `y`, `z`, `radius`, `length`, `w
 	(5867, 724, 3152.08, 362.875, 85.5175, 100, 0, 0, 0, 0),
 	(5869, 571, 3608.19, 186.17, -100, 0, 5, 16, 24, 5.341),
 	(5872, 724, 3286.8, 533.392, 98.5718, 0, 5, 16, 24, 6.248);
-/*!40000 ALTER TABLE `areatrigger` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -26,6 +26,8 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "karazhan.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Netherspite
 {
@@ -249,7 +251,7 @@ public:
                 Door->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             HandleDoors(false);
             SwitchToPortalPhase();
@@ -347,7 +349,23 @@ public:
     };
 };
 
+class spell_nether_portal_perseverence : public AuraScript
+{
+    PrepareAuraScript(spell_nether_portal_perseverence);
+
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        const_cast<AuraEffect*>(aurEff)->SetAmount(aurEff->GetAmount() + 30000);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_nether_portal_perseverence::HandleApply, EFFECT_2, SPELL_AURA_MOD_INCREASE_HEALTH, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
 void AddSC_boss_netherspite()
 {
     new boss_netherspite();
+    RegisterSpellScript(spell_nether_portal_perseverence);
 }

@@ -31,86 +31,89 @@ enum Spells
 {
     SPELL_VOID_ZONE                 = 36119,
     SPELL_SHADOW_NOVA               = 36127,
-    SPELL_SEED_OF_CORRUPTION        = 36123
+    SPELL_SEED_OF_CORRUPTION        = 36123,
+    SPELL_CORRUPTION_PROC           = 32865
 };
 
-enum Events
+struct boss_zereketh_the_unbound : public BossAI
 {
-    EVENT_VOID_ZONE                 = 1,
-    EVENT_SHADOW_NOVA               = 2,
-    EVENT_SEED_OF_CORRUPTION        = 3
-};
-
-class boss_zereketh_the_unbound : public CreatureScript
-{
-public:
-    boss_zereketh_the_unbound() : CreatureScript("boss_zereketh_the_unbound") { }
-
-    struct boss_zereketh_the_unboundAI : public BossAI
+    boss_zereketh_the_unbound(Creature* creature) : BossAI(creature, DATA_ZEREKETH)
     {
-        boss_zereketh_the_unboundAI(Creature* creature) : BossAI(creature, DATA_ZEREKETH) { }
-
-        void JustDied(Unit* /*killer*/) override
+        scheduler.SetValidator([this]
         {
-            _JustDied();
-            Talk(SAY_DEATH);
-        }
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
-        void EnterCombat(Unit* /*who*/) override
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+
+        scheduler.Schedule(6s, [this](TaskContext context)
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_VOID_ZONE, 6000);
-            events.ScheduleEvent(EVENT_SHADOW_NOVA, 10000);
-            events.ScheduleEvent(EVENT_SEED_OF_CORRUPTION, 16000);
-            Talk(SAY_AGGRO);
-        }
-
-        void KilledUnit(Unit* victim) override
+            DoCastRandomTarget(SPELL_VOID_ZONE, 0, 60.0f);
+            context.Repeat(15s);
+        }).Schedule(10s, [this](TaskContext context)
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+            DoCastAOE(SPELL_SHADOW_NOVA);
+            if (roll_chance_i(50))
             {
-                case EVENT_VOID_ZONE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-                        me->CastSpell(target, SPELL_VOID_ZONE, false);
-                    events.ScheduleEvent(EVENT_VOID_ZONE, 15000);
-                    break;
-                case EVENT_SHADOW_NOVA:
-                    me->CastSpell(me, SPELL_SHADOW_NOVA, false);
-                    if (roll_chance_i(50))
-                        Talk(SAY_SHADOW_NOVA);
-                    events.ScheduleEvent(EVENT_SHADOW_NOVA, 12000);
-                    break;
-                case EVENT_SEED_OF_CORRUPTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
-                        me->CastSpell(target, SPELL_SEED_OF_CORRUPTION, false);
-                    events.ScheduleEvent(EVENT_SEED_OF_CORRUPTION, 16000);
-                    break;
+                Talk(SAY_SHADOW_NOVA);
             }
+            context.Repeat(12s);
+        }).Schedule(16s, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_SEED_OF_CORRUPTION, 0, 30.0f);
+            context.Repeat(16s);
+        });
+    }
 
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void KilledUnit(Unit* victim) override
     {
-        return GetArcatrazAI<boss_zereketh_the_unboundAI>(creature);
+        if (victim->IsPlayer())
+        {
+            Talk(SAY_SLAY);
+        }
+    }
+};
+
+// 36123, 39367 -- Seed of Corruption
+class spell_zereketh_seed_of_corruption: public AuraScript
+{
+    PrepareAuraScript(spell_zereketh_seed_of_corruption);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CORRUPTION_PROC });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        uint32 val = GetSpellInfo()->GetEffect(EFFECT_1).BasePoints;
+        GetTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id);
+
+        if (GetCaster())
+        {
+            GetCaster()->CastCustomSpell(SPELL_CORRUPTION_PROC, SPELLVALUE_BASE_POINT0, val, GetTarget(), true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_zereketh_seed_of_corruption::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
 };
 
 void AddSC_boss_zereketh_the_unbound()
 {
-    new boss_zereketh_the_unbound();
+    RegisterArcatrazCreatureAI(boss_zereketh_the_unbound);
+    RegisterSpellScript(spell_zereketh_seed_of_corruption);
 }

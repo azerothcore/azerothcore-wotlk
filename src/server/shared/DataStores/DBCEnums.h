@@ -154,7 +154,7 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL                   = 34,
     ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL                = 35,
     ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM                      = 36,
-    ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA               = 37, // TODO: the archievements 1162 and 1163 requires a special rating which can't be found in the dbc
+    ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA               = 37, /// @todo: the archievements 1162 and 1163 requires a special rating which can't be found in the dbc
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_TEAM_RATING           = 38,
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_PERSONAL_RATING       = 39,
     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL             = 40,
@@ -167,13 +167,13 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION       = 47,
     ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP             = 48, // note: rewarded as soon as the player payed, not at taking place at the seat
     ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM               = 49,
-    ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT             = 50, // TODO: itemlevel is mentioned in text but not present in dbc
+    ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT             = 50, /// @todo: itemlevel is mentioned in text but not present in dbc
     ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT            = 51,
     ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS                      = 52,
     ACHIEVEMENT_CRITERIA_TYPE_HK_RACE                       = 53,
     ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE                      = 54,
     ACHIEVEMENT_CRITERIA_TYPE_HEALING_DONE                  = 55,
-    ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS             = 56, // TODO: in some cases map not present, and in some cases need do without die
+    ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS             = 56, /// @todo: in some cases map not present, and in some cases need do without die
     ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM                    = 57,
     ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS            = 59,
     ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_TALENTS        = 60,
@@ -187,11 +187,11 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2              = 69,
     ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL              = 70,
     ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT            = 72,
-    ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN                      = 74, // TODO: title id is not mentioned in dbc
+    ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN                      = 74, /// @todo: title id is not mentioned in dbc
     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS        = 75,
     ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL                      = 76,
     ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL                     = 77,
-    ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE            = 78, // TODO: creature type (demon, undead etc.) is not stored in dbc
+    ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE            = 78, /// @todo: creature type (demon, undead etc.) is not stored in dbc
     ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS       = 80,
     ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION                = 82,
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_BID           = 83,
@@ -220,7 +220,7 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED               = 107,
     ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN            = 108,
     ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE                     = 109,
-    ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2                   = 110, // TODO: target entry is missing
+    ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2                   = 110, /// @todo: target entry is missing
     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE              = 112,
     ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL           = 113,
     ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS           = 114,
@@ -321,17 +321,17 @@ enum FactionFlags
 
 enum FactionTemplateFlags
 {
-    FACTION_TEMPLATE_FLAG_RESPOND_TO_CALL_FOR_HELP           = 0x0001, //@todo Not implemented.
-    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_LOW_PRIORITY  = 0x0002, //@todo Not implemented.
-    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_MED_PRIORITY  = 0x0004, //@todo Not implemented.
-    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_HIGH_PRIORITY = 0x0008, //@todo Not implemented.
-    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_LOW_PRIORITY    = 0x0010, //@todo Not implemented.
-    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_MED_PRIORITY    = 0x0020, //@todo Not implemented.
-    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_HIGH_PRIORITY   = 0x0040, //@todo Not implemented.
-    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_LOW_PRIORITY    = 0x0080, //@todo Not implemented.
-    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_MED_PRIORITY    = 0x0100, //@todo Not implemented.
-    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_HIGH_PRIORITY   = 0x0200, //@todo Not implemented.
-    FACTION_TEMPLATE_FLAG_FLEE_FROM_CALL_FOR_HELP            = 0x0400, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_RESPOND_TO_CALL_FOR_HELP           = 0x0001, /// @todo: Not Yet Implemented (NYI)
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_LOW_PRIORITY  = 0x0002, /// @todo: NYI
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_MED_PRIORITY  = 0x0004, /// @todo: NYI
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_HIGH_PRIORITY = 0x0008, /// @todo: NYI
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_LOW_PRIORITY    = 0x0010, /// @todo: NYI
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_MED_PRIORITY    = 0x0020, /// @todo: NYI
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_HIGH_PRIORITY   = 0x0040, /// @todo: NYI
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_LOW_PRIORITY    = 0x0080, /// @todo: NYI
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_MED_PRIORITY    = 0x0100, /// @todo: NYI
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_HIGH_PRIORITY   = 0x0200, /// @todo: NYI
+    FACTION_TEMPLATE_FLAG_FLEE_FROM_CALL_FOR_HELP            = 0x0400, /// @todo: NYI
     FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS                     = 0x0800, // Old title: FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS, Old comment: flagged for PvP //@todo: Should see if this is implemented correctly.
     FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS          = 0x1000, // Old title: FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS, Old comment: faction will attack players that were involved in PvP combats //@todo: Should see if this is implemented correctly.
     FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS           = 0x2000, // Old title: FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS, Old comment: //@todo: Should see if this is implemented correctly.
@@ -416,32 +416,32 @@ enum TotemCategoryType
 enum SummonPropGroup
 {
     SUMMON_PROP_GROUP_NONE           = 0,                   // 1160 spells in 3.0.3
-    SUMMON_PROP_GROUP_GUARDIAN       = 1,                   // 861 spells in 3.0.3                      TODO: Needs implementation
-    SUMMON_PROP_GROUP_PETS           = 2,                   // 52 spells in 3.0.3, pets mostly          TODO: Needs implementation
-    SUMMON_PROP_GROUP_CONTROLLABLE   = 3,                   // 13 spells in 3.0.3, mostly controllable  TODO: Needs implementation
-    SUMMON_PROP_GROUP_VEHICLE        = 4                    // 86 spells in 3.0.3, taxi/mounts          TODO: Needs implementation
+    SUMMON_PROP_GROUP_GUARDIAN       = 1,                   /// @todo: NYI 861 spells in 3.0.3
+    SUMMON_PROP_GROUP_PETS           = 2,                   /// @todo: NYI 52 spells in 3.0.3, pets mostly
+    SUMMON_PROP_GROUP_CONTROLLABLE   = 3,                   /// @todo: NYI 13 spells in 3.0.3, mostly controllable
+    SUMMON_PROP_GROUP_VEHICLE        = 4                    /// @todo: NYI 86 spells in 3.0.3, taxi/mounts
 };
 
 // SummonProperties.dbc, col 5
 enum SummonPropFlags
 {
     SUMMON_PROP_FLAG_NONE                            = 0x00000000,          // 1342 spells in 3.0.3
-    SUMMON_PROP_FLAG_ATTACK_SUMMONER                 = 0x00000001,          // NYI 75 spells in 3.0.3, something unfriendly
-    SUMMON_PROP_FLAG_ASSIST_COMBAT_SUMMON            = 0x00000002,          // NYI 616 spells in 3.0.3, something friendly
-    SUMMON_PROP_FLAG_USE_LEVEL_OFFSET                = 0x00000004,          // NYI 22 spells in 3.0.3, no idea...
-    SUMMON_PROP_FLAG_DESPAWN_ON_SUMMONER_DEATH       = 0x00000008,          // NYI 49 spells in 3.0.3, some mounts
+    SUMMON_PROP_FLAG_ATTACK_SUMMONER                 = 0x00000001,          /// @todo: NYI 75 spells in 3.0.3, something unfriendly
+    SUMMON_PROP_FLAG_ASSIST_COMBAT_SUMMON            = 0x00000002,          /// @todo: NYI 616 spells in 3.0.3, something friendly
+    SUMMON_PROP_FLAG_USE_LEVEL_OFFSET                = 0x00000004,          /// @todo: NYI 22 spells in 3.0.3, no idea...
+    SUMMON_PROP_FLAG_DESPAWN_ON_SUMMONER_DEATH       = 0x00000008,          /// @todo: NYI 49 spells in 3.0.3, some mounts
     SUMMON_PROP_FLAG_ONLY_VISIBLE_TO_SUMMONER        = 0x00000010,          // 25 spells in 3.0.3, quest related?
-    SUMMON_PROP_FLAG_CANNOT_DISMISS_PET              = 0x00000020,          // NYI 0 spells in 3.3.5, unused
-    SUMMON_PROP_FLAG_USE_DEMON_TIMEOUT               = 0x00000040,          // NYI 12 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_UNLIMITED_SUMMONS               = 0x00000080,          // NYI 4 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_USE_CREATURE_LEVEL              = 0x00000100,          // NYI 51 spells in 3.0.3, no idea, many quest related
-    SUMMON_PROP_FLAG_JOIN_SUMMONER_SPAWN_GROUP       = 0x00000200,          // NYI 51 spells in 3.0.3, something defensive
-    SUMMON_PROP_FLAG_DO_NOT_TOGGLE                   = 0x00000400,          // NYI 3 spells, requires something near?
-    SUMMON_PROP_FLAG_DESPAWN_WHEN_EXPIRED            = 0x00000800,          // NYI 30 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_USE_SUMMONER_FACTION            = 0x00001000,          // NYI Lightwell, Jeeves, Gnomish Alarm-o-bot, Build vehicles(wintergrasp)
-    SUMMON_PROP_FLAG_DO_NOT_FOLLOW_MOUNTED_SUMMONER  = 0x00002000,          // NYI Guides, player follows
-    SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST               = 0x00004000,          // NYI Force of Nature, Shadowfiend, Feral Spirit, Summon Water Elemental
-    SUMMON_PROP_FLAG_IGNORE_SUMMONER_PHASE           = 0x00008000,          // NYI Light/Dark Bullet, Soul/Fiery Consumption, Twisted Visage, Twilight Whelp. Phase related?
+    SUMMON_PROP_FLAG_CANNOT_DISMISS_PET              = 0x00000020,          /// @todo: NYI 0 spells in 3.3.5, unused
+    SUMMON_PROP_FLAG_USE_DEMON_TIMEOUT               = 0x00000040,          /// @todo: NYI 12 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNLIMITED_SUMMONS               = 0x00000080,          /// @todo: NYI 4 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_USE_CREATURE_LEVEL              = 0x00000100,          /// @todo: NYI 51 spells in 3.0.3, no idea, many quest related
+    SUMMON_PROP_FLAG_JOIN_SUMMONER_SPAWN_GROUP       = 0x00000200,          /// @todo: NYI 51 spells in 3.0.3, something defensive
+    SUMMON_PROP_FLAG_DO_NOT_TOGGLE                   = 0x00000400,          /// @todo: NYI 3 spells, requires something near?
+    SUMMON_PROP_FLAG_DESPAWN_WHEN_EXPIRED            = 0x00000800,          /// @todo: NYI 30 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_USE_SUMMONER_FACTION            = 0x00001000,          /// @todo: NYI Lightwell, Jeeves, Gnomish Alarm-o-bot, Build vehicles(wintergrasp)
+    SUMMON_PROP_FLAG_DO_NOT_FOLLOW_MOUNTED_SUMMONER  = 0x00002000,          /// @todo: NYI Guides, player follows
+    SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST               = 0x00004000,          /// @todo: NYI Force of Nature, Shadowfiend, Feral Spirit, Summon Water Elemental
+    SUMMON_PROP_FLAG_IGNORE_SUMMONER_PHASE           = 0x00008000,          /// @todo: NYI Light/Dark Bullet, Soul/Fiery Consumption, Twisted Visage, Twilight Whelp. Phase related?
 };
 
 enum VehicleSeatFlags
