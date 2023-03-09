@@ -35,12 +35,9 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19832);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (19832, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 12, 19851, 4, 300000, 0, 0, 0, 8, 0, 0, 0, 0, 3148.7415, 3233.878, 97.6867, 1.906365156173706, 'Doctor Vomisa, Ph.T. - On Data Set 1 1 - Summon Creature \'Negatron\''),
-(19832, 0, 1, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 80, 1983200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Doctor Vomisa, Ph.T. - On Data Set 2 2 - Run Script');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1983200);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(1983200, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 5.072320938110352, 'Doctor Vomisa, Ph.T. - Actionlist - Set Orientation 5.072320938110352'),
-(1983200, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Doctor Vomisa, Ph.T. - Actionlist - Say Line 0');
+(19832, 0, 1, 2, 38, 0, 100, 0, 2, 2, 0, 0, 0, 80, 1983200, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Doctor Vomisa, Ph.T. - On Data Set 2 2 - Run Script'),
+(19832, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Doctor Vomisa, Ph.T. - On Data Set 2 2 - Set Orientation Invoker'),
+(19832, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Doctor Vomisa, Ph.T. - On Data Set 2 2 - Say Line 0');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19849;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19849);
