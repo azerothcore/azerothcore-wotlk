@@ -1215,9 +1215,9 @@ public:
                     events.Repeat(50s);
                     break;
                 case EVENT_YS_SHADOW_BEACON:
+                    events.Repeat(5s);
                     Talk(EMOTE_YOGG_SARON_EMPOWERING_SHADOWS);
                     me->CastCustomSpell(SPELL_SHADOW_BEACON, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 3), me, false);
-                    events.Repeat(5s);
                     break;
                 case EVENT_YS_SUMMON_GUARDIAN:
                     SummonImmortalGuardian();
