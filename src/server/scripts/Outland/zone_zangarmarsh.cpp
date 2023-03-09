@@ -546,7 +546,7 @@ public:
 
         uint32 knockdownTimer;
 
-        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (Aura* aur = me->GetAura(SPELL_TOUGHEN))
             {
