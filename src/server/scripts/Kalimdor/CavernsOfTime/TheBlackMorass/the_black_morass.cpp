@@ -258,14 +258,13 @@ struct npc_time_rift : public NullCreatureAI
 
     void Reset() override
     {
-        if (_instance->GetData(DATA_RIFT_NUMBER) >= 18)
+        if (_instance->GetData(DATA_RIFT_NUMBER) > 18)
         {
             me->DespawnOrUnsummon(30000);
             return;
         }
 
         events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 16s);
-        events.ScheduleEvent(EVENT_CHECK_DEATH, 8s);
         events.ScheduleEvent(EVENT_SUMMON_BOSS, 6s);
     }
 
@@ -308,6 +307,14 @@ struct npc_time_rift : public NullCreatureAI
         }
     }
 
+    void SummonedCreatureDies(Creature* creature, Unit* /*killer*/) override
+    {
+        if (creature->GetGUID() == _riftKeeperGUID)
+        {
+            me->DespawnOrUnsummon(0);
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         events.Update(diff);
@@ -316,22 +323,6 @@ struct npc_time_rift : public NullCreatureAI
             case EVENT_SUMMON_AT_RIFT:
                 DoSelectSummon();
                 events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 15000);
-                break;
-            case EVENT_CHECK_DEATH:
-                if (!me->HasUnitState(UNIT_STATE_CASTING))
-                {
-                    Creature* riftKeeper = ObjectAccessor::GetCreature(*me, _riftKeeperGUID);
-                    if (!riftKeeper || !riftKeeper->IsAlive())
-                    {
-                        me->DespawnOrUnsummon(0);
-                        break;
-                    }
-                    else
-                    {
-                        me->CastSpell(riftKeeper, SPELL_RIFT_CHANNEL, false);
-                    }
-                }
-                events.ScheduleEvent(EVENT_CHECK_DEATH, 500);
                 break;
             case EVENT_SUMMON_BOSS:
             {
@@ -366,6 +357,8 @@ struct npc_time_rift : public NullCreatureAI
                         me->CastSpell(summon, SPELL_RIFT_CHANNEL, false);
                     }
                 }
+
+                LOG_ERROR("sql.sql", "wave {}", _instance->GetData(DATA_RIFT_NUMBER));
             }
         }
     }
