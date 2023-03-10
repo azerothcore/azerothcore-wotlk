@@ -245,7 +245,8 @@ private:
 enum timeRift
 {
     EVENT_SUMMON_AT_RIFT        = 1,
-    EVENT_CHECK_DEATH           = 2
+    EVENT_CHECK_DEATH           = 2,
+    EVENT_SUMMON_BOSS           = 3
 };
 
 struct npc_time_rift : public NullCreatureAI
@@ -257,14 +258,14 @@ struct npc_time_rift : public NullCreatureAI
 
     void Reset() override
     {
-        if (_instance->GetData(DATA_RIFT_NUMBER) >= 18)
+        if (_instance->GetData(DATA_RIFT_NUMBER) > 18)
         {
             me->DespawnOrUnsummon(30000);
             return;
         }
 
-        events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 16000);
-        events.ScheduleEvent(EVENT_CHECK_DEATH, 8000);
+        events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 16s);
+        events.ScheduleEvent(EVENT_SUMMON_BOSS, 6s);
     }
 
     void JustSummoned(Creature* creature) override
@@ -306,31 +307,60 @@ struct npc_time_rift : public NullCreatureAI
         }
     }
 
+    void SummonedCreatureDies(Creature* creature, Unit* /*killer*/) override
+    {
+        if (creature->GetGUID() == _riftKeeperGUID)
+        {
+            me->DespawnOrUnsummon(0);
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         events.Update(diff);
         switch (events.ExecuteEvent())
         {
             case EVENT_SUMMON_AT_RIFT:
-                DoSelectSummon();
-                events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 15000);
-                break;
-            case EVENT_CHECK_DEATH:
-                if (!me->HasUnitState(UNIT_STATE_CASTING))
+                if (_riftKeeperGUID.GetEntry() != NPC_AEONUS)
                 {
-                    Creature* riftKeeper = ObjectAccessor::GetCreature(*me, _riftKeeperGUID);
-                    if (!riftKeeper || !riftKeeper->IsAlive())
-                    {
-                        me->DespawnOrUnsummon(0);
+                    DoSelectSummon();
+                    events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 15000);
+                }
+                break;
+            case EVENT_SUMMON_BOSS:
+            {
+                int32 entry = 0;
+                switch (_instance->GetData(DATA_RIFT_NUMBER))
+                {
+                    case 6:
+                        entry = _instance->GetBossState(DATA_CHRONO_LORD_DEJA) == DONE ? (me->GetMap()->IsHeroic() ? NPC_INFINITE_CHRONO_LORD : -NPC_CHRONO_LORD_DEJA) : NPC_CHRONO_LORD_DEJA;
                         break;
-                    }
-                    else
+                    case 12:
+                        entry = _instance->GetBossState(DATA_TEMPORUS) == DONE ? (me->GetMap()->IsHeroic() ? NPC_INFINITE_TIMEREAVER : -NPC_TEMPORUS) : NPC_TEMPORUS;
+                        break;
+                    case 18:
+                        entry = NPC_AEONUS;
+                        break;
+                    default:
+                        entry = RAND(NPC_RIFT_KEEPER_WARLOCK, NPC_RIFT_KEEPER_MAGE, NPC_RIFT_LORD, NPC_RIFT_LORD_2);
+                        break;
+                }
+
+                Position pos = me->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
+
+                if (Creature* summon = me->SummonCreature(std::abs(entry), pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3 * MINUTE * IN_MILLISECONDS))
+                {
+                    if (entry < 0)
                     {
-                        me->CastSpell(riftKeeper, SPELL_RIFT_CHANNEL, false);
+                        summon->SetLootMode(0);
+                    }
+
+                    if (summon->GetEntry() != NPC_AEONUS)
+                    {
+                        me->CastSpell(summon, SPELL_RIFT_CHANNEL, false);
                     }
                 }
-                events.ScheduleEvent(EVENT_CHECK_DEATH, 500);
-                break;
+            }
         }
     }
 
