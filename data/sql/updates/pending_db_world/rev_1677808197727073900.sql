@@ -104,7 +104,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1984900, 9, 1, 0, 0, 0, 100, 512, 10000, 10000, 0, 0, 0, 18, 33556488, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Set Flags PvP Attackable & Pet In Combat & Not Selectable'),
 (1984900, 9, 2, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Set Flag Standstate Dead'),
 (1984900, 9, 3, 0, 0, 0, 100, 512, 200, 200, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Say Line 0'),
-(1984900, 9, 4, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 41, 6000, 60000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Despawn In 6000 ms');
+(1984900, 9, 4, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 41, 6000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Despawn In 6000 ms');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19851);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
