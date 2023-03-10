@@ -360,8 +360,6 @@ struct npc_time_rift : public NullCreatureAI
                         me->CastSpell(summon, SPELL_RIFT_CHANNEL, false);
                     }
                 }
-
-                LOG_ERROR("sql.sql", "wave {}", _instance->GetData(DATA_RIFT_NUMBER));
             }
         }
     }
