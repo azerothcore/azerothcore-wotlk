@@ -188,10 +188,9 @@ void Totem::UnSummon(uint32 msTime)
     }
 
     //npcbot: send SummonedCreatureDespawn()
-    if (GetCreatorGUID() && GetCreatorGUID().IsCreature())
-        if (Creature* bot = ObjectAccessor::GetCreature(*GetOwner(), GetCreatorGUID()))
-            if (bot->IsNPCBot())
-                bot->OnBotDespawn(this);
+    if (Unit* creator = GetCreator())
+        if (creator->IsNPCBot())
+            creator->ToCreature()->OnBotDespawn(this);
     //end npcbot
 
     AddObjectToRemoveList();

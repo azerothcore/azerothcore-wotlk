@@ -161,6 +161,7 @@ class BotDataMgr
         static CreatureTemplate const* GetBotExtraCreatureTemplate(uint32 entry);
         static EquipmentInfo const* GetBotEquipmentInfo(uint32 entry);
 
+        static uint8 GetLevelBonusForBotRank(uint32 rank);
         static uint8 GetMaxLevelForMapId(uint32 mapId);
         static uint8 GetMinLevelForBotClass(uint8 m_class);
         static std::pair<uint8, uint8> GetZoneLevels(uint32 zoneId);

@@ -50,11 +50,11 @@ static constexpr char const* WanderMapCreationQuery =
     "`name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',"
     "PRIMARY KEY (`id`)"
     ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bot Wander Map'";
-static constexpr float NODE_CONNECTION_DIST_MAX = 2000.f;
+static constexpr float NODE_CONNECTION_DIST_MAX = 1800.f;
 static constexpr float NODE_CONNECTION_DIST_MAX_GEN = 370.f;
 static constexpr std::array wanderMapIds{ 0u, 1u };
 
-bool allBotsLoaded = false;
+static bool allBotsLoaded = false;
 
 class BotTravelGraph
 {
@@ -426,7 +426,7 @@ void BotDataMgr::LoadNpcBots(bool spawn)
 
         if (spawn)
         {
-            for (std::list<uint32>::const_iterator itr = entryList.begin(); itr != entryList.end(); ++itr)
+            for (std::list<uint32>::const_iterator itr = entryList.cbegin(); itr != entryList.cend(); ++itr)
             {
                 uint32 entry = *itr;
                 proto = sObjectMgr->GetCreatureTemplate(entry);
@@ -556,18 +556,33 @@ void BotDataMgr::GenerateWanderingBots()
 
     uint32 oldMSTime = getMSTime();
 
-    if (int32(_botsExtras.size() - _existingBots.size()) < int32(WANDERING_BOTS_COUNT))
+    std::map<uint8, std::set<uint32>> spareBotIdsPerClassMap;
+    for (uint8 c = BOT_CLASS_WARRIOR; c < BOT_CLASS_END; ++c)
+        if (c != BOT_CLASS_BM && BotMgr::IsClassEnabled(c) && spareBotIdsPerClassMap.find(c) == spareBotIdsPerClassMap.cend())
+            spareBotIdsPerClassMap.insert({ c, {} });
+
+    uint32 maxWanderingBots = 0;
+    for (decltype(_botsExtras)::value_type const& vt : _botsExtras)
     {
-        LOG_FATAL("server.loading", "Trying to generate {} bots but only {} out of {} bots aren't spawned. Create new bots or delete some from world. Aborting!",
-            WANDERING_BOTS_COUNT, int32(_botsExtras.size() - _existingBots.size()), uint32(_botsExtras.size()));
-        ASSERT(false);
+        uint8 c = vt.second->bclass;
+        if (c != BOT_CLASS_NONE && c != BOT_CLASS_BM && BotMgr::IsClassEnabled(c) && _botsData.find(vt.first) == _botsData.end())
+        {
+            ASSERT(spareBotIdsPerClassMap.find(c) != spareBotIdsPerClassMap.cend());
+            spareBotIdsPerClassMap.at(c).insert(vt.first);
+            ++maxWanderingBots;
+        }
     }
 
-    std::vector<uint8> allowed_classes;
-    allowed_classes.reserve(BOT_CLASS_END);
     for (uint8 c = BOT_CLASS_WARRIOR; c < BOT_CLASS_END; ++c)
-        if (c != BOT_CLASS_BM && BotMgr::IsClassEnabled(c))
-            allowed_classes.push_back(c);
+        if (spareBotIdsPerClassMap.find(c) != spareBotIdsPerClassMap.cend() && spareBotIdsPerClassMap.at(c).empty())
+            spareBotIdsPerClassMap.erase(c);
+
+    if (maxWanderingBots < WANDERING_BOTS_COUNT)
+    {
+        LOG_FATAL("server.loading", "Only {} out of {} bots of enabled classes aren't spawned. Desired amount of wandering bots ({}) cannot be created. Aborting!",
+            maxWanderingBots, uint32(_botsExtras.size()), WANDERING_BOTS_COUNT);
+        ASSERT(false);
+    }
 
     uint32 bot_id = BOT_ENTRY_CREATE_BEGIN - 1;
     QueryResult result = CharacterDatabase.Query("SELECT value FROM worldstates WHERE entry = {}", uint32(BOT_GIVER_ENTRY));
@@ -583,42 +598,33 @@ void BotDataMgr::GenerateWanderingBots()
     else
         bot_id = result->Fetch()[0].Get<uint32>();
 
-    decltype(bot_id) bot_id_start = bot_id;
-    ASSERT(bot_id_start > BOT_ENTRY_BEGIN);
+    ASSERT(bot_id > BOT_ENTRY_BEGIN);
 
     CreatureTemplateContainer const* all_templates = sObjectMgr->GetCreatureTemplates();
-    std::vector<uint32> clonedIds;
-    clonedIds.reserve(WANDERING_BOTS_COUNT);
 
-    auto find_bot_creature_template_by_botclass = [&clonedIds](uint8 b_class, uint32 max_entry) -> CreatureTemplate const* {
-        std::vector<CreatureTemplate const*> valid_templates;
-        for (uint32 i = BOT_ENTRY_BEGIN; i < max_entry; ++i)
-        {
-            if (NpcBotExtras const* templateExtras = SelectNpcBotExtras(i))
-            {
-                if (templateExtras->bclass == b_class &&
-                    std::find(std::cbegin(clonedIds), std::cend(clonedIds), i) == clonedIds.cend() &&
-                    !BotDataMgr::FindBot(i))
-                    valid_templates.push_back(sObjectMgr->GetCreatureTemplate(i));
-            }
-        }
-        return valid_templates.empty() ? nullptr : Acore::Containers::SelectRandomContainerElement(valid_templates);
+    auto find_bot_creature_template_by_botclass = [&spareBotIdsPerClassMap](uint8 b_class) -> CreatureTemplate const* {
+        ASSERT(spareBotIdsPerClassMap.find(b_class) != spareBotIdsPerClassMap.cend());
+        auto const& cSet = spareBotIdsPerClassMap.at(b_class);
+        uint32 entry = cSet.size() == 1 ? *cSet.cbegin() : Acore::Containers::SelectRandomContainerElement(cSet);
+        return sObjectMgr->GetCreatureTemplate(entry);
+    };
+
+    auto remove_bot_orig_entry_from_available = [&spareBotIdsPerClassMap](uint8 bclass, uint32 botId) {
+        ASSERT(spareBotIdsPerClassMap.find(bclass) != spareBotIdsPerClassMap.cend());
+        ASSERT(spareBotIdsPerClassMap.at(bclass).find(botId) != spareBotIdsPerClassMap.at(bclass).cend());
+        spareBotIdsPerClassMap.at(bclass).erase(botId);
+        if (spareBotIdsPerClassMap.at(bclass).empty())
+            spareBotIdsPerClassMap.erase(bclass);
     };
 
     std::set<uint32> botgrids;
     for (int32 i = 0; i < int32(WANDERING_BOTS_COUNT); ++i) // i is unused as value
     {
-        while (all_templates->find(++bot_id) != all_templates->end()) {}
+        while (all_templates->find(++bot_id) != all_templates->cend()) {}
 
-        uint8 bot_class = Acore::Containers::SelectRandomContainerElement(allowed_classes);
-        CreatureTemplate const* orig_template = find_bot_creature_template_by_botclass(bot_class, bot_id_start);
-        if (!orig_template)
-        {
-            //try again
-            --i;
-            --bot_id;
-            continue;
-        }
+        uint8 bot_class = Acore::Containers::SelectRandomContainerElement(spareBotIdsPerClassMap).first;
+        CreatureTemplate const* orig_template = find_bot_creature_template_by_botclass(bot_class);
+        ASSERT(orig_template);
 
         CreatureTemplate& bot_template = _botsWanderCreatureTemplates[bot_id];
         //copy all fields
@@ -637,7 +643,6 @@ void BotDataMgr::GenerateWanderingBots()
         NpcBotData* bot_data = new NpcBotData(bot_ai::DefaultRolesForClass(bot_class), rentry ? rentry->FactionID : 14, bot_ai::DefaultSpecForClass(bot_class));
         _botsData[bot_id] = bot_data;
         NpcBotExtras* bot_extras = new NpcBotExtras();
-        ASSERT_NOTNULL(bot_extras);
         bot_extras->bclass = bot_class;
         bot_extras->race = orig_extras->race;
         _botsExtras[bot_id] = bot_extras;
@@ -655,15 +660,13 @@ void BotDataMgr::GenerateWanderingBots()
         int8 beqId = 1;
         _botsWanderCreatureEquipmentTemplates[bot_id] = sObjectMgr->GetEquipmentInfo(orig_template->Entry, beqId);
 
-        clonedIds.push_back(orig_template->Entry);
-
         //We do not create CreatureData for generated bots
 
         NodeType const* spawnLoc = nullptr;
         do
         {
             auto const& spair = Acore::Containers::SelectRandomContainerElement(Acore::Containers::SelectRandomContainerElement(WanderMap.Nodes).second);
-            if (!(spair.second.maxlevel < GetMinLevelForBotClass(bot_class)))
+            if (spair.second.maxlevel >= GetMinLevelForBotClass(bot_class))
                 spawnLoc = &spair.second;
 
         } while (spawnLoc == nullptr);
@@ -694,11 +697,12 @@ void BotDataMgr::GenerateWanderingBots()
             LOG_FATAL("server.loading", "Cannot load npcbot from DB!");
             ASSERT(false);
         }
+
         bot->GetBotAI()->SetTravelNodeCur(spawnLoc->id);
 
-        botgrids.insert(g.GetId());
+        remove_bot_orig_entry_from_available(bot_class, orig_template->Entry);
 
-        //TC_LOG_INFO("server.loading", "Spawned wandering bot %u at: %s", bot_id, bot->ToString().c_str());
+        botgrids.insert(g.GetId());
     }
 
     CharacterDatabase.Execute("UPDATE worldstates SET value = {} WHERE entry = {}", bot_id, uint32(BOT_GIVER_ENTRY));
@@ -710,7 +714,7 @@ void BotDataMgr::GenerateWanderingBots()
 CreatureTemplate const* BotDataMgr::GetBotExtraCreatureTemplate(uint32 entry)
 {
     CreatureTemplateContainer::const_iterator cit = _botsWanderCreatureTemplates.find(entry);
-    return cit == _botsWanderCreatureTemplates.end() ? nullptr : &cit->second;
+    return cit == _botsWanderCreatureTemplates.cend() ? nullptr : &cit->second;
 }
 
 EquipmentInfo const* BotDataMgr::GetBotEquipmentInfo(uint32 entry)
@@ -750,7 +754,7 @@ void BotDataMgr::AddNpcBotData(uint32 entry, uint32 roles, uint8 spec, uint32 fa
 NpcBotData const* BotDataMgr::SelectNpcBotData(uint32 entry)
 {
     NpcBotDataMap::const_iterator itr = _botsData.find(entry);
-    return itr != _botsData.end() ? itr->second : nullptr;
+    return itr != _botsData.cend() ? itr->second : nullptr;
 }
 void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType, void* data)
 {
@@ -985,26 +989,26 @@ void BotDataMgr::SaveNpcBotStats(NpcBotStats const* stats)
 NpcBotAppearanceData const* BotDataMgr::SelectNpcBotAppearance(uint32 entry)
 {
     NpcBotAppearanceDataMap::const_iterator itr = _botsAppearanceData.find(entry);
-    return itr != _botsAppearanceData.end() ? itr->second : nullptr;
+    return itr != _botsAppearanceData.cend() ? itr->second : nullptr;
 }
 
 NpcBotExtras const* BotDataMgr::SelectNpcBotExtras(uint32 entry)
 {
     NpcBotExtrasMap::const_iterator itr = _botsExtras.find(entry);
-    return itr != _botsExtras.end() ? itr->second : nullptr;
+    return itr != _botsExtras.cend() ? itr->second : nullptr;
 }
 
 NpcBotTransmogData const* BotDataMgr::SelectNpcBotTransmogs(uint32 entry)
 {
     NpcBotTransmogDataMap::const_iterator itr = _botsTransmogData.find(entry);
-    return itr != _botsTransmogData.end() ? itr->second : nullptr;
+    return itr != _botsTransmogData.cend() ? itr->second : nullptr;
 }
 void BotDataMgr::UpdateNpcBotTransmogData(uint32 entry, uint8 slot, uint32 item_id, uint32 fake_id, bool update_db)
 {
     ASSERT(slot < BOT_TRANSMOG_INVENTORY_SIZE);
 
-    NpcBotTransmogDataMap::iterator itr = _botsTransmogData.find(entry);
-    if (itr == _botsTransmogData.end())
+    NpcBotTransmogDataMap::const_iterator itr = _botsTransmogData.find(entry);
+    if (itr == _botsTransmogData.cend())
         _botsTransmogData[entry] = new NpcBotTransmogData();
 
     _botsTransmogData[entry]->transmogs[slot] = { item_id, fake_id };
@@ -1023,8 +1027,8 @@ void BotDataMgr::UpdateNpcBotTransmogData(uint32 entry, uint8 slot, uint32 item_
 
 void BotDataMgr::ResetNpcBotTransmogData(uint32 entry, bool update_db)
 {
-    NpcBotTransmogDataMap::iterator itr = _botsTransmogData.find(entry);
-    if (itr == _botsTransmogData.end())
+    NpcBotTransmogDataMap::const_iterator itr = _botsTransmogData.find(entry);
+    if (itr == _botsTransmogData.cend())
         return;
 
     if (update_db)
@@ -1084,7 +1088,7 @@ Creature const* BotDataMgr::FindBot(uint32 entry)
 {
     std::shared_lock<std::shared_mutex> lock(*GetLock());
 
-    for (NpcBotRegistry::const_iterator ci = _existingBots.begin(); ci != _existingBots.end(); ++ci)
+    for (NpcBotRegistry::const_iterator ci = _existingBots.cbegin(); ci != _existingBots.cend(); ++ci)
     {
         if ((*ci)->GetEntry() == entry)
             return *ci;
@@ -1098,7 +1102,7 @@ Creature const* BotDataMgr::FindBot(std::string_view name, LocaleConstant loc)
     {
         wstrToLower(wname);
         std::shared_lock<std::shared_mutex> lock(*GetLock());
-        for (NpcBotRegistry::const_iterator ci = _existingBots.begin(); ci != _existingBots.end(); ++ci)
+        for (NpcBotRegistry::const_iterator ci = _existingBots.cbegin(); ci != _existingBots.cend(); ++ci)
         {
             std::string basename = (*ci)->GetName();
             if (CreatureLocale const* creatureInfo = sObjectMgr->GetCreatureLocale((*ci)->GetEntry()))
@@ -1131,7 +1135,7 @@ void BotDataMgr::GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, Objec
 
     std::shared_lock<std::shared_mutex> lock(*GetLock());
 
-    for (NpcBotRegistry::const_iterator ci = _existingBots.begin(); ci != _existingBots.end(); ++ci)
+    for (NpcBotRegistry::const_iterator ci = _existingBots.cbegin(); ci != _existingBots.cend(); ++ci)
     {
         if (_botsData[(*ci)->GetEntry()]->owner == owner_guid.GetCounter())
             guids_vec.push_back((*ci)->GetGUID());
@@ -1144,7 +1148,7 @@ ObjectGuid BotDataMgr::GetNPCBotGuid(uint32 entry)
 
     std::shared_lock<std::shared_mutex> lock(*GetLock());
 
-    for (NpcBotRegistry::const_iterator ci = _existingBots.begin(); ci != _existingBots.end(); ++ci)
+    for (NpcBotRegistry::const_iterator ci = _existingBots.cbegin(); ci != _existingBots.cend(); ++ci)
     {
         if ((*ci)->GetEntry() == entry)
             return (*ci)->GetGUID();
@@ -1173,6 +1177,21 @@ uint8 BotDataMgr::GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask)
             ++count;
 
     return count;
+}
+
+uint8 BotDataMgr::GetLevelBonusForBotRank(uint32 rank)
+{
+    switch (rank)
+    {
+        case CREATURE_ELITE_RARE:
+            return 1;
+        case CREATURE_ELITE_ELITE:
+            return 2;
+        case CREATURE_ELITE_RAREELITE:
+            return 3;
+        default:
+            return 0;
+    }
 }
 
 uint8 BotDataMgr::GetMaxLevelForMapId(uint32 mapId)
