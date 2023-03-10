@@ -442,6 +442,7 @@ public:
         static ChatCommandTable npcbotRecallCommandTable =
         {
             { "",           HandleNpcBotRecallCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_RECALL,             Console::No  },
+            { "spawns",     HandleNpcBotRecallSpawnsCommand,        rbac::RBAC_PERM_COMMAND_NPCBOT_RECALL,             Console::No  },
             { "teleport",   HandleNpcBotRecallTeleportCommand,      rbac::RBAC_PERM_COMMAND_NPCBOT_RECALL,             Console::No  },
         };
 
@@ -1472,6 +1473,36 @@ public:
         handler->SendSysMessage("You must select one of your bots or yourself");
         handler->SetSentErrorMessage(true);
         return false;
+    }
+
+    static bool HandleNpcBotRecallSpawnsCommand(ChatHandler* handler)
+    {
+        Player const* owner = handler->GetSession()->GetPlayer();
+
+        std::vector<ObjectGuid> botvec;
+        BotDataMgr::GetNPCBotGuidsByOwner(botvec, owner->GetGUID());
+        if (owner->HaveBot())
+            botvec.erase(std::remove_if(botvec.begin(), botvec.end(), [=](ObjectGuid botguid) { return owner->GetBotMgr()->GetBot(botguid); }), botvec.end());
+
+        uint32 recalled_count = 0;
+        for (ObjectGuid botguid : botvec)
+        {
+            if (Creature const* bot = BotDataMgr::FindBot(botguid.GetEntry()))
+            {
+                bot->GetBotAI()->ResetBotAI(BOTAI_RESET_FORCERECALL);
+                ++recalled_count;
+            }
+        }
+
+        if (recalled_count == 0)
+        {
+            handler->SendSysMessage(".npcbot recall spawns");
+            handler->SendSysMessage("Forces all your owned inactive npcbots to teleport to their spawn locations immediatelly");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        return true;
     }
 
     static bool HandleNpcBotRecallTeleportCommand(ChatHandler* handler)

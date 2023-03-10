@@ -572,7 +572,7 @@ void bot_ai::ResetBotAI(uint8 resetType)
     if (spawned)
         ReturnHome();
 
-    if (!me->IsInWorld())
+    if (!me->IsInWorld() || resetType == BOTAI_RESET_FORCERECALL)
     {
         AbortTeleport();
 
@@ -14714,7 +14714,24 @@ void bot_ai::KilledUnit(Unit* u)
 {
     ++_killsCount;
     if (u->IsControlledByPlayer() || u->IsPvP())
+    {
         ++_pvpKillsCount;
+        if (IsWanderer())
+        {
+            LOG_DEBUG("npcbots", "Wandering bot {} id {} class {} level {} KILLED {} {} id {} class {} level {} on their way to {}!",
+                me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
+                (u->IsPlayer() ? "player" : u->ToCreature()->GetBotAI()->IsWanderer() ? "wandering bot" : u->IsNPCBot() ? "bot" : u->IsNPCBotPet() ? "botpet" : "creature"),
+                u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
+                BotDataMgr::GetWanderMapNodeName(me->GetMap()->GetEntry()->MapID, _travel_node_cur).c_str());
+        }
+        if (u->IsNPCBot() && u->ToCreature()->GetBotAI()->IsWanderer())
+        {
+            LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} WAS KILLED BY wandering bot {} id {} class {} level {} on their way to {}!",
+                me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
+                u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
+                BotDataMgr::GetWanderMapNodeName(me->GetMap()->GetEntry()->MapID, _travel_node_cur).c_str());
+        }
+    }
     if (u->isType(TYPEMASK_PLAYER))
         ++_playerKillsCount;
     if (IsWanderer())
