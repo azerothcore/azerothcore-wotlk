@@ -143,7 +143,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1985104, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 50, 183987, 180000, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3031.6763, 3671.5273, 180.86804, 0.69813144, 'Negatron - Actionlist - Summon Gameobject \'Rocket Fire\''),
 (1985104, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 70009, 19570, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Say Line 0 (Rocket-Chief Fuselage)'),
 (1985104, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 19, 512, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Remove Flag Immune To NPC'),
-(1985104, 9, 9, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 107, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Summon Creature Group 0'),
+(1985104, 9, 9, 0, 0, 0, 100, 0, 800, 800, 0, 0, 0, 107, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Summon Creature Group 0'),
 (1985104, 9, 10, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 19541, 100, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Start Attacking');
 
 -- Experimental Pilot Refactor
@@ -197,3 +197,6 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceEntr
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (17, 0, 34630, 0, 0, 29, 0, 19851, 200, 0, 1, 0, 0, '', 'Only cast Scrap Reaver X6000 if Negatron is not spawned'),
 (17, 0, 34630, 0, 0, 28, 0, 10248, 0, 0, 1, 0, 0, '', 'Only cast Scrap Reaver X6000 if quest You, Robot is not completed');
+
+-- Quest not being completable
+UPDATE `quest_template_addon` SET `SpecialFlags`=`SpecialFlags`&~2 WHERE (`ID` = 10248);
