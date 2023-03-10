@@ -122,11 +122,11 @@ public:
             Talk(SAY_AGGRO);
             BossAI::JustEngagedWith(who);
 
-            events.ScheduleEvent(EVENT_SUMMON_FETID_TROLL, 3000);
-            events.ScheduleEvent(EVENT_SUMMON_SHADOWCASTER, 9000);
-            events.ScheduleEvent(EVENT_SUMMON_HULKING_CORPSE, 30000);
-            events.ScheduleEvent(EVENT_SUMMON_CRYSTAL_HANDLER, 20000);
-            events.ScheduleEvent(EVENT_CHECK_PHASE, 80000);
+            events.ScheduleEvent(EVENT_SUMMON_FETID_TROLL, 3s);
+            events.ScheduleEvent(EVENT_SUMMON_SHADOWCASTER, 9s);
+            events.ScheduleEvent(EVENT_SUMMON_HULKING_CORPSE, 30s);
+            events.ScheduleEvent(EVENT_SUMMON_CRYSTAL_HANDLER, 20s);
+            events.ScheduleEvent(EVENT_CHECK_PHASE, 80s);
 
             me->CastSpell(me, SPELL_ARCANE_BLAST, true);
             me->CastSpell(me, SPELL_ARCANE_FIELD, true);
@@ -167,7 +167,7 @@ public:
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
                 Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
             }
         }
 
@@ -191,17 +191,17 @@ public:
                 case EVENT_SUMMON_FETID_TROLL:
                     if (Creature* trigger = summons.GetCreatureWithEntry(NPC_CRYSTAL_CHANNEL_TARGET))
                         trigger->CastSpell(trigger, SPELL_SUMMON_FETID_TROLL_CORPSE, true, nullptr, nullptr, me->GetGUID());
-                    events.ScheduleEvent(EVENT_SUMMON_FETID_TROLL, 3000);
+                    events.ScheduleEvent(EVENT_SUMMON_FETID_TROLL, 3s);
                     break;
                 case EVENT_SUMMON_HULKING_CORPSE:
                     if (Creature* trigger = summons.GetCreatureWithEntry(NPC_CRYSTAL_CHANNEL_TARGET))
                         trigger->CastSpell(trigger, SPELL_SUMMON_HULKING_CORPSE, true, nullptr, nullptr, me->GetGUID());
-                    events.ScheduleEvent(EVENT_SUMMON_HULKING_CORPSE, 30000);
+                    events.ScheduleEvent(EVENT_SUMMON_HULKING_CORPSE, 30s);
                     break;
                 case EVENT_SUMMON_SHADOWCASTER:
                     if (Creature* trigger = summons.GetCreatureWithEntry(NPC_CRYSTAL_CHANNEL_TARGET))
                         trigger->CastSpell(trigger, SPELL_SUMMON_RISEN_SHADOWCASTER, true, nullptr, nullptr, me->GetGUID());
-                    events.ScheduleEvent(EVENT_SUMMON_SHADOWCASTER, 10000);
+                    events.ScheduleEvent(EVENT_SUMMON_SHADOWCASTER, 10s);
                     break;
                 case EVENT_SUMMON_CRYSTAL_HANDLER:
                     if (_crystalCounter++ < 4)
@@ -211,18 +211,18 @@ public:
                         if (Creature* target = ObjectAccessor::GetCreature(*me, _stage ? _summonTargetLeftGUID : _summonTargetRightGUID))
                             target->CastSpell(target, SPELL_SUMMON_CRYSTAL_HANDLER, true, nullptr, nullptr, me->GetGUID());
                         _stage = _stage ? 0 : 1;
-                        events.ScheduleEvent(EVENT_SUMMON_CRYSTAL_HANDLER, 20000);
+                        events.ScheduleEvent(EVENT_SUMMON_CRYSTAL_HANDLER, 20s);
                     }
                     break;
                 case EVENT_CHECK_PHASE:
                     if (me->HasAura(SPELL_BEAM_CHANNEL))
                     {
-                        events.ScheduleEvent(EVENT_CHECK_PHASE, 2000);
+                        events.ScheduleEvent(EVENT_CHECK_PHASE, 2s);
                         break;
                     }
                     events.Reset();
-                    events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 10000);
+                    events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 3s);
+                    events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 10s);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->InterruptNonMeleeSpells(false);
@@ -232,16 +232,16 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             me->CastSpell(target, RAND(SPELL_BLIZZARD, SPELL_FROSTBOLT, SPELL_TOUCH_OF_MISERY), false);
 
-                    events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 500);
+                    events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 500ms);
                     break;
                 case EVENT_SPELL_SUMMON_MINIONS:
                     if (me->HasUnitState(UNIT_STATE_CASTING))
                     {
                         me->CastSpell(me, SPELL_SUMMON_MINIONS, false);
-                        events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 15000);
+                        events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 15s);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 500);
+                    events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 500ms);
                     break;
             }
         }
