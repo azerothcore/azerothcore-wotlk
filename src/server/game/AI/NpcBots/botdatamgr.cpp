@@ -679,7 +679,7 @@ void BotDataMgr::GenerateWanderingBots()
         map->LoadGrid(spawnLoc->m_positionX, spawnLoc->m_positionY);
         ASSERT(!map->Instanceable(), map->GetDebugInfo().c_str());
 
-        LOG_INFO("server.loading", "Spawning wandering bot: {} ({}) class {} race {} fac {}, location: mapId {} {} ({})",
+        LOG_INFO("npcbots", "Spawning wandering bot: {} ({}) class {} race {} fac {}, location: mapId {} {} ({})",
             bot_template.Name.c_str(), bot_id, uint32(bot_extras->bclass), uint32(bot_extras->race), bot_data->faction,
             spawnLoc->m_mapId, spawnLoc->ToString().c_str(), spawnLoc->name.c_str());
         Position spos;

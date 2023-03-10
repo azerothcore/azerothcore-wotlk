@@ -14500,10 +14500,18 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToPC()))
         return false;
 
-    //npcbot: CvC case fix for bots
-    if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) &&
-        ((IsNPCBotOrPet() && !ToCreature()->IsFreeBot()) || (target->IsNPCBotOrPet() && !target->ToCreature()->IsFreeBot())))
-        return GetReactionTo(target) <= REP_NEUTRAL || target->GetReactionTo(this) <= REP_NEUTRAL;
+    //npcbot: CvC case fix for bots, still a TODO
+    if (((IsNPCBotOrPet() && ToCreature()->IsFreeBot()) || (target->IsNPCBotOrPet() && target->ToCreature()->IsFreeBot())) &&
+        !IsFriendlyTo(target) && !target->IsFriendlyTo(this))
+    {
+        auto const* ft1 = sFactionTemplateStore.LookupEntry(GetFaction());
+        auto const* ft2 = sFactionTemplateStore.LookupEntry(target->GetFaction());
+        auto const* fe1 = ft1 ? sFactionStore.LookupEntry(ft1->faction) : nullptr;
+        auto const* fe2 = ft2 ? sFactionStore.LookupEntry(ft2->faction) : nullptr;
+        if ((IsNPCBotOrPet() && fe2 && fe2->CanHaveReputation() && ReputationMgr::ReputationToRank(fe2->BaseRepValue[0]) >= REP_NEUTRAL) ||
+            (target->IsNPCBotOrPet() && fe1 && fe1->CanHaveReputation() && ReputationMgr::ReputationToRank(fe1->BaseRepValue[0]) >= REP_NEUTRAL))
+            return false;
+    }
     //end npcbot
 
     // CvC case - can attack each other only when one of them is hostile
