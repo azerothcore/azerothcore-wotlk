@@ -176,7 +176,7 @@ public:
                         // Here we check if we have available rift spots.
                         if (_currentRift < 18)
                         {
-                            if (!_availableRiftPositions.empty())
+                            if (!_availableRiftPositions.empty() && _availableRiftPositions.size() < 3)
                             {
                                 context.Repeat((_currentRift >= 13 ? 2min : 90s));
                             }
