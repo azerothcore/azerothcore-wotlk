@@ -2236,27 +2236,18 @@ void bot_ai::SetStats(bool force)
             auto [zonelevelmin, zonelevelmax] = BotDataMgr::GetZoneLevels(me->GetZoneId());
             ASSERT(zonelevelmin > 0 && zonelevelmax > 0);
             mylevel = std::min<uint8>(urand(std::max<uint8>(zonelevelmin + 2, zonelevelmax), zonelevelmax), zonelevelmax);
+            mylevel += BotDataMgr::GetLevelBonusForBotRank(me->GetCreatureTemplate()->rank);
             _baseLevel = mylevel;
         }
         else
-            mylevel = std::max<uint8>(mylevel, _baseLevel + std::min<uint8>(uint16(_killsCount / std::max<uint8>(mylevel * 5 / 2, 20)), 80));
-
-        mylevel = std::min<uint8>(mylevel, BotDataMgr::GetMaxLevelForMapId(me->GetMap()->GetEntry()->MapID));
-    }
-
-    /*TC_LOG_ERROR("entities.player", "*etStats(): Updating bot %s, class: %u, race: %u, level %u, master: %s",
-        me->GetName().c_str(), myclass, myrace, mylevel, master->GetName().c_str());*/
-
-    if (firstspawn)
-    {
-        switch (me->GetCreatureTemplate()->rank)
         {
-            case CREATURE_ELITE_RARE:       mylevel += 1;   break;
-            case CREATURE_ELITE_ELITE:      mylevel += 2;   break;
-            case CREATURE_ELITE_RAREELITE:  mylevel += 3;   break;
-            default:                                        break;
+            uint8 mapmaxlevel = std::min<uint8>(mylevel, BotDataMgr::GetMaxLevelForMapId(me->GetMap()->GetEntry()->MapID));
+            mapmaxlevel += BotDataMgr::GetLevelBonusForBotRank(me->GetCreatureTemplate()->rank);
+            mylevel = std::max<uint8>(mylevel, _baseLevel + std::min<uint8>(uint16(_killsCount / std::max<uint8>(mylevel * 5 / 2, 20)), mapmaxlevel));
         }
     }
+    else
+        mylevel += BotDataMgr::GetLevelBonusForBotRank(me->GetCreatureTemplate()->rank);
 
     mylevel = std::min<uint8>(mylevel, 83);
 
@@ -4192,7 +4183,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
     }
 
     bool canAttack = mytar && CanBotAttack(mytar, byspell);
-    if (mytar && (!IAmFree() || me->GetDistance(mytar) < float(BOT_MAX_CHASE_RANGE)) && CanBotAttack(mytar, byspell) &&/* !InDuel(mytar) &&*/
+    if (mytar && (!IAmFree() || me->GetDistance(mytar) < float(BOT_MAX_CHASE_RANGE)) && canAttack &&/* !InDuel(mytar) &&*/
         !(mytar->GetVictim() != nullptr && IsTank() && IsTank(mytar->GetVictim())))
     {
         //TC_LOG_ERROR("entities.player", "bot %s continues attack its target %s", me->GetName().c_str(), mytar->GetName().c_str());
@@ -4268,7 +4259,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
             return { u, u };
     }
 
-    if (IAmFree() && IsWanderer() && !me->IsInCombat() && (Feasting() || me->GetHealthPct() < 85.f))
+    if (IAmFree() && IsWanderer() && !me->IsInCombat() && (evadeDelayTimer > lastdiff || Feasting() || me->GetHealthPct() < 85.f))
         return { nullptr, nullptr };
 
     //check targets around
@@ -14588,9 +14579,17 @@ bool bot_ai::UpdateImpossibleChase(Unit const* target)
     if (JumpingOrFalling())
         return false;
 
+    if (_jumpCount >= 3)
+    {
+        me->AttackStop();
+        Evade();
+        return true;
+    }
+
     if (_unreachableCount < 5)
     {
-        if (!(IsRanged() ? me->GetDistance(target) < 40.0f : me->IsWithinMeleeRange(target)))
+        if ((IsRanged() ? me->GetDistance(target) > 40.0f : !me->IsWithinMeleeRange(target)) ||
+            (target->GetTypeId() == TYPEID_UNIT && !me->IsWithinLOSInMap(target)))
         {
             ++_unreachableCount;
             ResetChaseTimer(target);
@@ -14602,16 +14601,13 @@ bool bot_ai::UpdateImpossibleChase(Unit const* target)
         return true;
     }
 
+    if (target->IsPlayer() && (!me->IsWithinDist(target, HasRole(BOT_ROLE_RANGED) ? 65 : 40) || me->IsWithinDist(target, HasRole(BOT_ROLE_RANGED) ? 35 : 10)))
+        return false;
+
     _unreachableCount = 0;
 
-    if (_jumpCount >= 3)
-    {
-        me->AttackStop();
-        Evade();
-        return true;
-    }
-
     ResetChaseTimer(target);
+
     BotJump(target);
     return true;
 }
@@ -16940,6 +16936,7 @@ void bot_ai::Evade()
                     //me->CastSpell(targs, SPELL_TELEPORT_LOCAL);
                     BotJump(&pos, false);
                     _evadeCount = 0;
+                    evadeDelayTimer = 2500;
                     return;
                 }
                 else
