@@ -149,8 +149,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1985104, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 50, 183987, 180000, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3042.363, 3667.0383, 180.62209, 4.747296, 'Negatron - Actionlist - Summon Gameobject \'Rocket Fire\''),
 (1985104, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 50, 183987, 180000, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3031.6763, 3671.5273, 180.86804, 0.69813144, 'Negatron - Actionlist - Summon Gameobject \'Rocket Fire\''),
 (1985104, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 70009, 19570, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Say Line 0 (Rocket-Chief Fuselage)'),
-(1985104, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33024, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Remove Flag Immune To NPC'),
-(1985104, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 107, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Summon Creature Group 0'),
+(1985104, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 19, 512, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Remove Flag Immune To NPC'),
+(1985104, 9, 9, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 107, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Summon Creature Group 0'),
 (1985104, 9, 10, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 19541, 100, 0, 0, 0, 0, 0, 0, 'Negatron - Actionlist - Start Attacking');
 
 -- Experimental Pilot Refactor
