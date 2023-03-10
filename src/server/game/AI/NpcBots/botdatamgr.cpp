@@ -579,7 +579,7 @@ void BotDataMgr::GenerateWanderingBots()
 
     if (maxWanderingBots < WANDERING_BOTS_COUNT)
     {
-        TC_LOG_FATAL("server.loading", "Only %u out of %u bots of enabled classes aren't spawned. Desired amount of wandering bots (%u) cannot be created. Aborting!",
+        LOG_FATAL("server.loading", "Only {} out of {} bots of enabled classes aren't spawned. Desired amount of wandering bots ({}) cannot be created. Aborting!",
             maxWanderingBots, uint32(_botsExtras.size()), WANDERING_BOTS_COUNT);
         ASSERT(false);
     }
@@ -605,7 +605,7 @@ void BotDataMgr::GenerateWanderingBots()
     auto find_bot_creature_template_by_botclass = [&spareBotIdsPerClassMap](uint8 b_class) -> CreatureTemplate const* {
         ASSERT(spareBotIdsPerClassMap.find(b_class) != spareBotIdsPerClassMap.cend());
         auto const& cSet = spareBotIdsPerClassMap.at(b_class);
-        uint32 entry = cSet.size() == 1 ? *cSet.cbegin() : Trinity::Containers::SelectRandomContainerElement(cSet);
+        uint32 entry = cSet.size() == 1 ? *cSet.cbegin() : Acore::Containers::SelectRandomContainerElement(cSet);
         return sObjectMgr->GetCreatureTemplate(entry);
     };
 
@@ -620,7 +620,7 @@ void BotDataMgr::GenerateWanderingBots()
     std::set<uint32> botgrids;
     for (int32 i = 0; i < int32(WANDERING_BOTS_COUNT); ++i) // i is unused as value
     {
-        while (all_templates.find(++bot_id) != all_templates.cend()) {}
+        while (all_templates->find(++bot_id) != all_templates->cend()) {}
 
         uint8 bot_class = Acore::Containers::SelectRandomContainerElement(spareBotIdsPerClassMap).first;
         CreatureTemplate const* orig_template = find_bot_creature_template_by_botclass(bot_class);
