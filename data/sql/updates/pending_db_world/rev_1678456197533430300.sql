@@ -1,58 +1,30 @@
 --
--- 00:11:46.759 Select Option
--- Object Guid: Full: 0x2041E4446011794000003B000071A413 Creature/0 R4217/S59 Map: 547 Entry: 17893 Low: 7447571
--- FactionTemplate: 113
--- Flags: 32768
--- NpcFlags: 0
--- UpdateType: Values
--- Object Guid: Full: 0x2C41E44460B1D38000003B000071A413 GameObject/0 R4217/S59 Map: 547 Entry: 182094 Low: 7447571
--- Flags: 3
--- State: 0
-
--- Wait 200ms SummonCGroup
-
--- Wait 800ms Go To 1
-
--- On Reached:
--- Wait 240ms
--- Face Player
--- Wait 200
--- Text: Uh oh!  It would appear that all of the noise you've been making has attracted some unwanted attention!
--- Wait 3000ms
--- Go To 2
-
--- On Reached:
--- NpcFlags: 1
-
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `flags_extra` = 0, `unit_flags` = 32768, `ScriptName` = '' WHERE (`entry` = 17893);
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 17893);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17893, 0, 0, 0, 10, 0, 100, 0, 1, 15, 15000, 90000, 1, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Within 1-15 Range Out of Combat LoS - Say Line 0'),
-(17893, 0, 1, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Aggro - Say Line 2'),
+(17893, 0, 0, 0, 10, 0, 100, 257, 1, 15, 15000, 90000, 1, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Within 1-15 Range Out of Combat LoS - Say Line 0'),
+(17893, 0, 1, 0, 4, 0, 100, 257, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Aggro - Say Line 2'),
 (17893, 0, 2, 0, 62, 0, 100, 0, 7520, 0, 0, 0, 0, 80, 1789300, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Gossip Option 0 Selected - Run Script'),
-(17893, 0, 3, 4, 11, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33536, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Respawn - Set Flags Immune To Players & Immune To NPC\'s'),
-(17893, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Respawn - Set Run Off'),
-(17893, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 8, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Respawn - Set Reactstate Defensive'),
-(17893, 0, 6 , 7, 62, 0, 100, 0, 7520, 1, 0, 0, 0, 11, 34906, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Gossip Option 1 Selected - Cast \'Mark of Bite\''),
-(17893, 0, 7 , 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Gossip Option 1 Selected - Close Gossip'),
-(17893, 0, 8 , 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 33, 17893, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Gossip Hello - Quest Credit \'Lost in Action\''),
-(17893, 0, 9 , 0, 34, 0, 100, 0, 0, 1, 0, 0, 0, 80, 1789301, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Reached Point 1 - Run Script'),
-(17893, 0, 10, 11, 34, 0, 100, 0, 0, 2, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Reached Point 2 - Add Npc Flags Gossip'),
-(17893, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Reached Point 2 - Set Home Position');
+(17893, 0, 3, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33536, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Respawn - Set Flags Immune To Players & Immune To NPC\'s'),
+(17893, 0, 4, 5, 62, 0, 100, 0, 7520, 1, 0, 0, 0, 11, 34906, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Gossip Option 1 Selected - Cast \'Mark of Bite\''),
+(17893, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Gossip Option 1 Selected - Close Gossip'),
+(17893, 0, 6, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 33, 17893, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Gossip Hello - Quest Credit \'null\''),
+(17893, 0, 7, 0, 40, 0, 100, 0, 1, 1789300, 0, 0, 0, 80, 1789301, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Waypoint 1 Reached - Run Script'),
+(17893, 0, 8, 0, 58, 0, 100, 0, 2, 1789300, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - On Waypoint 2 Reached - Add Npc Flags Gossip');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1789300, 1789301));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1789300, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Store Targetlist'),
 (1789300, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 113, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Set Faction 113'),
-(1789300, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 18, 32768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Set Flag '),
+(1789300, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s'),
 (1789300, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Remove Npc Flags Gossip'),
 (1789300, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 15, 182094, 10, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Activate Gameobject'),
 (1789300, 9, 5, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 107, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Summon Creature Group 0'),
-(1789300, 9, 6, 0, 0, 0, 100, 0, 800, 800, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -190.92549, -796.38947, 43.799316, 0, 'Naturalist Bite - Actionlist - Move To Position'),
-(1789301, 9, 0, 0, 0, 0, 100, 0, 240, 240, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Set Orientation Stored Player'),
-(1789301, 9, 1, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Say Line 1'),
-(1789301, 9, 2, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 69, 2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -183.40784, -780.19904, 43.799313, 0, 'Naturalist Bite - Actionlist - Move To Position');
+(1789300, 9, 6, 0, 0, 0, 100, 0, 800, 800, 0, 0, 0, 53, 0, 1789300, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Start Waypoint'),
+(1789301, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 54, 3440, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Pause Waypoint'),
+(1789301, 9, 1, 0, 0, 0, 100, 0, 240, 240, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Set Orientation Stored Player'),
+(1789301, 9, 2, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Naturalist Bite - Actionlist - Say Line 1');
 
 DELETE FROM `waypoints` WHERE `entry`=1789300 AND `point_comment`='Naturalist Bite';
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
@@ -81,10 +53,10 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` IN (14, 15)) AND (`SourceGroup` = 7520) AND (`ConditionValue1` = 182094);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(14, 7520, 9119, 0, 0, 30, 1, 182094, 10, 0, 0, 0, 0, '', 'Only show if Naturalist Bite is imprisoned'),
-(15, 7520, 0, 0, 0, 30, 1, 182094, 10, 0, 0, 0, 0, '', 'Only show if Naturalist Bite is imprisoned'),
-(14, 7520, 9144, 0, 0, 30, 1, 182094, 10, 0, 1, 0, 0, '', 'Only show if Naturalist Bite is freed'),
-(15, 7520, 1, 0, 0, 30, 1, 182094, 10, 0, 1, 0, 0, '', 'Only show if Naturalist Bite is freed');
+(14, 7520, 9119, 0, 0, 30, 1, 182094, 5, 0, 0, 0, 0, '', 'Only show if Naturalist Bite is imprisoned'),
+(15, 7520, 0, 0, 0, 30, 1, 182094, 5, 0, 0, 0, 0, '', 'Only show if Naturalist Bite is imprisoned'),
+(14, 7520, 9144, 0, 0, 30, 1, 182094, 5, 0, 1, 0, 0, '', 'Only show if Naturalist Bite is freed'),
+(15, 7520, 1, 0, 0, 30, 1, 182094, 5, 0, 1, 0, 0, '', 'Only show if Naturalist Bite is freed');
 
 DELETE FROM `creature_text` WHERE `CreatureID`=17957 AND `comment` LIKE 'Coilfang Champion%';
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
