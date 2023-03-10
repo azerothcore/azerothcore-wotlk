@@ -321,8 +321,11 @@ struct npc_time_rift : public NullCreatureAI
         switch (events.ExecuteEvent())
         {
             case EVENT_SUMMON_AT_RIFT:
-                DoSelectSummon();
-                events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 15000);
+                if (!_riftKeeperGUID.GetEntry() == NPC_AEONUS)
+                {
+                    DoSelectSummon();
+                    events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 15000);
+                }
                 break;
             case EVENT_SUMMON_BOSS:
             {
