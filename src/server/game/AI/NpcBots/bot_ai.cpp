@@ -14667,7 +14667,7 @@ void bot_ai::JustEngagedWith(Unit* u)
     ResetChase(u);
 }
 //killer may be NULL
-void bot_ai::JustDied(Unit*)
+void bot_ai::JustDied(Unit* u)
 {
     AbortTeleport();
     AbortAwaitStateRemoval();
@@ -14701,6 +14701,15 @@ void bot_ai::JustDied(Unit*)
                 gr->SendUpdate();
     }
 
+    if (u && (u->IsPvP() || u->IsControlledByPlayer()))
+    {
+        LOG_DEBUG("npcbots", "{} {} id {} class {} level {} WAS KILLED BY {} {} id {} class {} level {} on their way to {}!",
+            IsWanderer() ? "Wandering bot" : "Bot", me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
+            (u->IsPlayer() ? "player" : u->IsNPCBot() ? u->ToCreature()->GetBotAI()->IsWanderer() ? "wandering bot" : "bot" : u->IsNPCBotPet() ? "botpet" : "creature"),
+            u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
+            BotDataMgr::GetWanderMapNodeName(me->GetMap()->GetEntry()->MapID, _travel_node_cur).c_str());
+    }
+
     _reviveTimer = IsWanderer() ? 90000 : IAmFree() ? 180000 : 60000; //1.5min/3min/1min
     _atHome = false;
     _evadeMode = false;
@@ -14720,13 +14729,13 @@ void bot_ai::KilledUnit(Unit* u)
         {
             LOG_DEBUG("npcbots", "Wandering bot {} id {} class {} level {} KILLED {} {} id {} class {} level {} on their way to {}!",
                 me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
-                (u->IsPlayer() ? "player" : u->ToCreature()->GetBotAI()->IsWanderer() ? "wandering bot" : u->IsNPCBot() ? "bot" : u->IsNPCBotPet() ? "botpet" : "creature"),
+                (u->IsPlayer() ? "player" : u->IsNPCBot() ? u->ToCreature()->GetBotAI()->IsWanderer() ? "wandering bot" : "bot" : u->IsNPCBotPet() ? "botpet" : "creature"),
                 u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
                 BotDataMgr::GetWanderMapNodeName(me->GetMap()->GetEntry()->MapID, _travel_node_cur).c_str());
         }
-        if (u->IsNPCBot() && u->ToCreature()->GetBotAI()->IsWanderer())
+        else if (u->IsNPCBot() && u->ToCreature()->GetBotAI()->IsWanderer())
         {
-            LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} WAS KILLED BY wandering bot {} id {} class {} level {} on their way to {}!",
+            LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} KILLED wandering bot {} id {} class {} level {} on their way to {}!",
                 me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
                 u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
                 BotDataMgr::GetWanderMapNodeName(me->GetMap()->GetEntry()->MapID, _travel_node_cur).c_str());
