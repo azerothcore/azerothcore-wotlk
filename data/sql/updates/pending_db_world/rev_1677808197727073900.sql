@@ -5,22 +5,6 @@ UPDATE `creature_template` SET `unit_flags` = 32768, `flags_extra` = `flags_extr
 DELETE FROM `creature` WHERE `id1`=19851; -- Delete extra Negatron
 UPDATE `creature` SET `spawntimesecs`=120 WHERE `id1` IN (19737, 19849);
 
--- Position: X: 3148.7415 Y: 3233.878 Z: 97.6867
--- Orientation: 1.906365156173706054
-
--- Guard GUIDs:
--- 0x20420042401315400037800000F983CD
--- X: 3035.4849 Y: 3630.7654 Z: 144.4357
--- Orientation: 1.488142371177673339
-
--- 0x204200424013154000378000007983CD
--- X: 3029.642 Y: 3638.9456 Z: 143.87413
--- Orientation: 1.169370532035827636
-
--- 0x20420042401315400037800000F983CD
--- X: 3148.7415 Y: 3233.878 Z: 97.6867
--- Orientation: 1.906365156173706054
-
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=19851 AND `entry`=19541;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
 (19851, 0, 0, 19541, 3035.4849, 3630.7654, 144.4357, 1.488142371177673339, 4, 60000, 'Netherstorm Agent - You, Robot - Negatron Failure Event'),
@@ -55,6 +39,16 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1973703,1,3026.3057,3644.5496,143.46822,NULL,'Engineering Crewmember'), -- 70615
 (1973703,2,3009.577,3644.3416,143.75604,NULL,'Engineering Crewmember');
 
+UPDATE `creature_text` SET `Emote`=25, `BroadcastTextId`=17456 WHERE `CreatureID`=19832 AND `GroupID`=0 AND `ID`=0;
+
+DELETE FROM `creature_text` WHERE `CreatureID` IN (19570, 19849, 19851);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(19570, 0, 0, 'Oh no!  The X-52 Nether-Rocket is being attacked!  Guards!  Guards!', 14, 0, 100, 5, 0, 0, 17474, 0, 'Rocket-Chief Fuselage'),
+(19849, 0, 0, 'The %s, having fought the good fight, falls to pieces.', 16, 0, 100, 0, 0, 0, 18587, 0, 'Scrap Reaver X6000'),
+(19851, 0, 0, 'I AM DEATH!  PREPARE YOUR TOWN FOR ANNIHILATION!', 14, 0, 100, 0, 0, 0, 17455, 0, 'Negatron'),
+(19851, 1, 0, 'YOUR SAD ATTEMPT AT CREATING A FEL REAVER TO STOP ME HAS FAILED!  NOW, ON TO AREA 52!', 14, 0, 100, 0, 0, 0, 17468, 0, 'Negatron');
+
+-- After reaching Area 52, Negatron causes Engineering Crewmembers to flee (WPs) and Rocket-Chief to perform a short event
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19737;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (-70612, -70613, -70614, -70615));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -75,21 +69,14 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (19570, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 67, 1, 60000, 60000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rocket-Chief Fuselage - On Reached Point 1 - Create Timed Event'),
 (19570, 0, 5, 0, 59, 0, 100, 0, 1, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rocket-Chief Fuselage - On Timed Event 1 Triggered - Evade');
 
-UPDATE `creature_text` SET `Emote`=25, `BroadcastTextId`=17456 WHERE `CreatureID`=19832 AND `GroupID`=0 AND `ID`=0;
-
-DELETE FROM `creature_text` WHERE `CreatureID` IN (19570, 19849, 19851);
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(19570, 0, 0, 'Oh no!  The X-52 Nether-Rocket is being attacked!  Guards!  Guards!', 14, 0, 100, 5, 0, 0, 17474, 0, 'Rocket-Chief Fuselage'),
-(19849, 0, 0, 'The %s, having fought the good fight, falls to pieces.', 16, 0, 100, 0, 0, 0, 18587, 0, 'Scrap Reaver X6000'),
-(19851, 0, 0, 'I AM DEATH!  PREPARE YOUR TOWN FOR ANNIHILATION!', 14, 0, 100, 0, 0, 0, 17455, 0, 'Negatron'),
-(19851, 1, 0, 'YOUR SAD ATTEMPT AT CREATING A FEL REAVER TO STOP ME HAS FAILED!  NOW, ON TO AREA 52!', 14, 0, 100, 0, 0, 0, 17468, 0, 'Negatron');
-
+-- Doctor Vomisa
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19832);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (19832, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 12, 19851, 4, 300000, 0, 0, 0, 8, 0, 0, 0, 0, 3148.74, 3233.88, 97.6867, 1.90637, 'Doctor Vomisa, Ph.T. - On Data Set 1 1 - Summon Creature \'Negatron\''),
 (19832, 0, 1, 2, 38, 0, 100, 512, 2, 2, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 5.072320938110352, 'Doctor Vomisa, Ph.T. - On Data Set 2 2 - Set Orientation 5.072320938110352'),
 (19832, 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Doctor Vomisa, Ph.T. - On Data Set 2 2 - Say Line 0');
 
+-- Scrap Reaver X6000
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19849;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19849);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -106,16 +93,22 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1984900, 9, 3, 0, 0, 0, 100, 512, 200, 200, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Say Line 0'),
 (1984900, 9, 4, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 41, 6000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Despawn In 6000 ms');
 
+-- Negatron
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19851);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(19851, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1985100, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On Just Summoned - Run Script'),
-(19851, 0, 1, 0, 40, 0, 100, 0, 3, 1985100, 0, 0, 0, 45, 2, 2, 0, 0, 0, 0, 10, 70967, 19832, 0, 0, 0, 0, 0, 0, 'Negatron - On Waypoint 3 Reached - Set Data 2 2 on Doctor Vomisa, Ph.T.'),
-(19851, 0, 2, 0, 58, 0, 100, 0, 6, 1985100, 0, 0, 0, 80, 1985101, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On Waypoint Finished - Run Script'),
-(19851, 0, 3, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On Reset - Set Event Phase 1 (Allow Failure Event Timer to Start)'),
-(19851, 0, 4, 0, 1, 1, 100, 1, 15000, 15000, 0, 0, 0, 80, 1985102, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Out of Combat - Run Failure Event Script (Phase 1)'),
-(19851, 0, 5, 0, 58, 0, 100, 0, 7, 1985101, 0, 0, 0, 80, 1985103, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On Waypoint Finished - Run Script'),
-(19851, 0, 6, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 80, 1985104, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On MovementInform 1 - Run Script'),
-(19851, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 19849, 100, 0, 0, 0, 0, 0, 0, 'Negatron - On Just Died - Set Data 1 1 on Scrap Reaver X6000 - Start Success Event');
+(19851, 0, 0 , 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1985100, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On Just Summoned - Run Script'),
+(19851, 0, 1 , 0, 40, 0, 100, 0, 3, 1985100, 0, 0, 0, 45, 2, 2, 0, 0, 0, 0, 10, 70967, 19832, 0, 0, 0, 0, 0, 0, 'Negatron - On Waypoint 3 Reached - Set Data 2 2 on Doctor Vomisa, Ph.T.'),
+(19851, 0, 2 , 0, 58, 0, 100, 0, 6, 1985100, 0, 0, 0, 80, 1985101, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On Waypoint Finished - Run Script'),
+(19851, 0, 3 , 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On Reset - Set Event Phase 1 (Allow Failure Event Timer to Start)'),
+(19851, 0, 4 , 0, 1, 1, 100, 1, 15000, 15000, 0, 0, 0, 80, 1985102, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Out of Combat - Run Failure Event Script (Phase 1)'),
+(19851, 0, 5 , 0, 58, 0, 100, 0, 7, 1985101, 0, 0, 0, 80, 1985103, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On Waypoint Finished - Run Script'),
+(19851, 0, 6 , 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 80, 1985104, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On MovementInform 1 - Run Script'),
+(19851, 0, 7 , 8, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 19849, 100, 0, 0, 0, 0, 0, 0, 'Negatron - On Just Died - Set Data 1 1 on Scrap Reaver X6000 - Start Success Event'),
+(19851, 0, 8 , 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 15000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - On Just Died - Despawn In 15000 ms'),
+(19851, 0, 9 , 0, 9, 0, 100, 0, 8, 25, 15000, 21000, 1, 11, 35570, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Within 8-25 Range - Cast \'Charge\''),
+(19851, 0, 10, 0, 9, 0, 100, 0, 0, 5, 8000, 12000, 0, 11, 34625, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Within 0-5 Range - Cast \'Demolish\''),
+(19851, 0, 11, 0, 0, 0, 100, 0, 15000, 19000, 21000, 25000, 0, 11, 35565, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - In Combat - Cast \'Earthquake\''),
+(19851, 0, 12, 0, 2, 0, 100, 0, 0, 50, 16000, 22000, 0, 11, 34624, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negatron - Between 0-50% Health - Cast \'Frenzy\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1985100, 1985101, 1985102, 1985103, 1985104));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -186,15 +179,21 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 2, 19776, 0, 0, 29, 1, 19737, 10, 0, 0, 0, 0, '', 'Only Run Script if creature Engineering Crewmember (19737) is nearby');
 
+-- Netherstorm Agent
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19541);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (19541, 0, 0, 0, 1, 0, 80, 0, 60000, 60000, 200000, 230000, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherstorm Agent - Out of Combat - Say Line 0'),
 (19541, 0, 1, 0, 9, 0, 100, 0, 5, 30, 3600, 3600, 0, 11, 36246, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherstorm Agent - Within 5-30 Range - Cast \'Shoot Tech Gun\''),
-(19541, 0, 2, 0, 0, 0, 100, 0, 12000, 17000, 17000, 24000, 0, 11, 34625, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherstorm Agent - In Combat - Cast \'Demolish\''),
-(19541, 0, 3, 0, 54, 0, 100, 512, 0, 0, 0, 0, 0, 80, 1954100, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherstorm Agent - On Just Summoned - Run Script');
+(19541, 0, 2, 0, 54, 0, 100, 512, 0, 0, 0, 0, 0, 80, 1954100, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherstorm Agent - On Just Summoned - Run Script');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1954100);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1954100, 9, 0, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 2, 1770, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherstorm Agent - Actionlist - Set Faction 1770'),
 (1954100, 9, 1, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherstorm Agent - Actionlist - Set Invincibility Hp 1'),
 (1954100, 9, 2, 0, 0, 0, 100, 512, 1200, 1200, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 19851, 100, 0, 0, 0, 0, 0, 0, 'Netherstorm Agent - Actionlist - Start Attacking');
+
+-- Conditions for controlling Scrap Reaver X6000
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceEntry` = 34630) AND (`ConditionTypeOrReference` = 29) AND (`ConditionValue1` = 19851);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(17, 0, 34630, 0, 0, 29, 0, 19851, 200, 0, 1, 0, 0, '', 'Only cast Scrap Reaver X6000 if Negatron is not spawned'),
+(17, 0, 34630, 0, 0, 28, 0, 10248, 0, 0, 1, 0, 0, '', 'Only cast Scrap Reaver X6000 if quest You, Robot is not completed');
