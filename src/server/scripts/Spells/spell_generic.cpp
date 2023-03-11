@@ -4614,7 +4614,7 @@ class spell_gen_basic_campfire : public SpellScript
         }
     }
 
-    void ModifyCookingSkill(SpellEffIndex effIndex)
+    void ModifyCookingSkill(SpellEffIndex /*effIndex*/)
     {
         if (Player* player = GetCaster()->ToPlayer())
         {
