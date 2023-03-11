@@ -207,10 +207,14 @@ public:
                 case NPC_RIFT_LORD:
                 case NPC_RIFT_LORD_2:
                 case NPC_INFINITE_ASSASIN:
+                case NPC_INFINITE_ASSASIN_2:
                 case NPC_INFINITE_WHELP:
-                case NPC_INFINITE_CRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER_2:
                 case NPC_INFINITE_EXECUTIONER:
+                case NPC_INFINITE_EXECUTIONER_2:
                 case NPC_INFINITE_VANQUISHER:
+                case NPC_INFINITE_VANQUISHER_2:
                 case NPC_DP_BEAM_STALKER:
                     _encounterNPCs.insert(creature->GetGUID());
                     break;
@@ -248,10 +252,14 @@ public:
                 case NPC_RIFT_LORD:
                 case NPC_RIFT_LORD_2:
                 case NPC_INFINITE_ASSASIN:
+                case NPC_INFINITE_ASSASIN_2:
                 case NPC_INFINITE_WHELP:
-                case NPC_INFINITE_CRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER_2:
                 case NPC_INFINITE_EXECUTIONER:
+                case NPC_INFINITE_EXECUTIONER_2:
                 case NPC_INFINITE_VANQUISHER:
+                case NPC_INFINITE_VANQUISHER_2:
                     _encounterNPCs.erase(creature->GetGUID());
                     break;
             }

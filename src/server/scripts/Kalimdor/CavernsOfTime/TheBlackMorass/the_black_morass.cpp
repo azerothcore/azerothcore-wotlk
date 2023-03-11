@@ -43,6 +43,10 @@ enum medivhMisc
     EVENT_OUTRO_8               = 17
 };
 
+static std::vector<uint32> firstWave = { NPC_INFINITE_ASSASIN, NPC_INFINITE_WHELP, NPC_INFINITE_CHRONOMANCER };
+static std::vector<uint32> secondWave = { NPC_INFINITE_EXECUTIONER, NPC_INFINITE_CHRONOMANCER, NPC_INFINITE_WHELP, NPC_INFINITE_ASSASIN };
+static std::vector<uint32> thirdWave = { NPC_INFINITE_EXECUTIONER, NPC_INFINITE_VANQUISHER, NPC_INFINITE_CHRONOMANCER, NPC_INFINITE_ASSASIN  };
+
 class NpcRunToHome : public BasicEvent
 {
 public:
@@ -258,12 +262,27 @@ struct npc_time_rift : public NullCreatureAI
 
     void Reset() override
     {
-        if (_instance->GetData(DATA_RIFT_NUMBER) > 18)
+        uint32 riftNumer = _instance->GetData(DATA_RIFT_NUMBER);
+        if (riftNumer >= 18)
         {
             me->DespawnOrUnsummon(30000);
             return;
         }
 
+        if (riftNumer < 6)
+        {
+            waveMobs = firstWave;
+        }
+        else if (riftNumer < 12)
+        {
+            waveMobs = secondWave;
+        }
+        else
+        {
+            waveMobs = thirdWave;
+        }
+
+        waveMobIndex = 0;
         events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 16s);
         events.ScheduleEvent(EVENT_SUMMON_BOSS, 6s);
     }
@@ -294,7 +313,7 @@ struct npc_time_rift : public NullCreatureAI
 
     void DoSelectSummon()
     {
-        uint32 entry = RAND(NPC_INFINITE_ASSASIN, NPC_INFINITE_WHELP, NPC_INFINITE_CRONOMANCER, NPC_INFINITE_EXECUTIONER, NPC_INFINITE_VANQUISHER);
+        uint32 entry = waveMobs[waveMobIndex];
         if (entry == NPC_INFINITE_WHELP)
         {
             DoSummonAtRift(entry);
@@ -303,7 +322,33 @@ struct npc_time_rift : public NullCreatureAI
         }
         else
         {
+            if (urand(0, 1))
+            {
+                switch (entry)
+                {
+                    case NPC_INFINITE_ASSASIN:
+                        entry = NPC_INFINITE_ASSASIN_2;
+                        break;
+                    case NPC_INFINITE_CHRONOMANCER:
+                        entry = NPC_INFINITE_CHRONOMANCER_2;
+                        break;
+                    case NPC_INFINITE_EXECUTIONER:
+                        entry = NPC_INFINITE_EXECUTIONER_2;
+                        break;
+                    case NPC_INFINITE_VANQUISHER:
+                        entry = NPC_INFINITE_VANQUISHER_2;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             DoSummonAtRift(entry);
+        }
+
+        if (++waveMobIndex >= waveMobs.size())
+        {
+            waveMobIndex = 0;
         }
     }
 
@@ -368,6 +413,8 @@ private:
     EventMap _events;
     InstanceScript* _instance;
     ObjectGuid _riftKeeperGUID;
+    std::vector<uint32> waveMobs;
+    uint8 waveMobIndex;
 };
 
 struct npc_black_morass_summoned_add : public SmartAI
