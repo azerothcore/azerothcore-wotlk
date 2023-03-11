@@ -1,3 +1,4 @@
+-- DB update 2023_03_11_04 -> 2023_03_11_05
 -- Infinite Assasin
 UPDATE `creature_template` SET `difficulty_entry_1`=20740 WHERE `entry`=17835;
 UPDATE `creature_template` SET `faction`=1720, `MovementType`=1 WHERE `entry`=20740;
