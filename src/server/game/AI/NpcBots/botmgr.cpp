@@ -815,7 +815,7 @@ void BotMgr::_reviveBot(Creature* bot, WorldLocation* dest)
 
     bot->SetDisplayId(bot->GetNativeDisplayId());
     bot->ReplaceAllNpcFlags(NPCFlags(bot->GetCreatureTemplate()->npcflag));
-    bot->ClearUnitState(UNIT_STATE_ALL_ERASABLE);
+    bot->ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD)));
     bot->ReplaceAllUnitFlags(UnitFlags(0));
     bot->SetLootRecipient(nullptr);
     bot->ResetPlayerDamageReq();
