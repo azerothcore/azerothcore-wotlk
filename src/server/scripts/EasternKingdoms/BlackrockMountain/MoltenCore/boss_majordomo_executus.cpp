@@ -237,21 +237,21 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*attacker*/) override
+        void JustEngagedWith(Unit* /*attacker*/) override
         {
             if (!events.IsInPhase(PHASE_COMBAT))
             {
                 return;
             }
 
-            _EnterCombat();
+            _JustEngagedWith();
             DoCastAOE(SPELL_SEPARATION_ANXIETY);
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
-            events.ScheduleEvent(EVENT_SHIELD_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 25000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 15000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_SHIELD_REFLECTION, 30s, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 25s, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 15s, PHASE_COMBAT, PHASE_COMBAT);
 
             aliveMinionsGUIDS.clear();
             aliveMinionsGUIDS = static_minionsGUIDS;
@@ -302,7 +302,7 @@ public:
             {
                 events.Reset();
                 events.SetPhase(PHASE_DEFEAT_OUTRO);
-                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_1, 7500, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
+                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_1, 7500ms, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
             }
         }
 
@@ -389,13 +389,13 @@ public:
                             case EVENT_DEFEAT_OUTRO_1:
                             {
                                 Talk(SAY_DEFEAT_2);
-                                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_2, 8000, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
+                                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_2, 8s, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
                                 break;
                             }
                             case EVENT_DEFEAT_OUTRO_2:
                             {
                                 Talk(SAY_DEFEAT_3);
-                                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_3, 21500, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
+                                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_3, 21500ms, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
                                 break;
                             }
                             case EVENT_DEFEAT_OUTRO_3:
@@ -440,8 +440,8 @@ public:
                                 }
 
                                 Talk(SAY_SUMMON_MAJ);
-                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_3, 16700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
-                                events.ScheduleEvent(EVENT_RAGNAROS_EMERGE, 15000, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_3, 16700ms, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                events.ScheduleEvent(EVENT_RAGNAROS_EMERGE, 15s, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_3:
@@ -450,13 +450,13 @@ public:
                                 {
                                     ragnaros->AI()->Talk(SAY_ARRIVAL1_RAG);
                                 }
-                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_4, 11700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_4, 11700ms, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_4:
                             {
                                 Talk(SAY_ARRIVAL2_MAJ);
-                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_5, 8700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_5, 8700ms, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_5:
@@ -466,7 +466,7 @@ public:
                                     ragnaros->AI()->Talk(SAY_ARRIVAL3_RAG);
                                 }
 
-                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_6, 16500, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_6, 16500ms, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_6:
@@ -499,7 +499,7 @@ public:
             if (type == POINT_MOTION_TYPE && pointId == POINT_RAGNAROS_SUMMON)
             {
                 DoCastAOE(SPELL_SUMMON_RAGNAROS);
-                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_2, 11500, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_2, 11500ms, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
             }
         }
 
@@ -519,7 +519,7 @@ public:
             if (action == ACTION_START_RAGNAROS_INTRO && !events.IsInPhase(PHASE_RAGNAROS_SUMMONING))
             {
                 events.SetPhase(PHASE_RAGNAROS_SUMMONING);
-                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_1, 5000, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_1, 5s, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
             }
         }
     private:

@@ -328,7 +328,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
 
         summons.DespawnAll();
         events.Reset();
-        events.ScheduleEvent(EVENT_CHECK_HOUR, 2000);
+        events.ScheduleEvent(EVENT_CHECK_HOUR, 2s);
         kegCounter = 0;
         guzzlerCounter = 0;
         thrown = 0;
@@ -336,7 +336,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
 
     // DARK IRON ATTACK EVENT
     void MoveInLineOfSight(Unit*  /*who*/) override {}
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
 
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
@@ -396,13 +396,13 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
             case EVENT_PRE_FINISH_ATTACK:
                 {
                     events.CancelEvent(EVENT_SPAWN_MOLE_MACHINE);
-                    events.ScheduleEvent(EVENT_FINISH_ATTACK, 20000);
+                    events.ScheduleEvent(EVENT_FINISH_ATTACK, 20s);
                     break;
                 }
             case EVENT_FINISH_ATTACK:
                 {
                     FinishAttackDueToWin();
-                    events.RescheduleEvent(EVENT_CHECK_HOUR, 60000);
+                    events.RescheduleEvent(EVENT_CHECK_HOUR, 1min);
                     break;
                 }
             case EVENT_BARTENDER_SAY:
@@ -443,7 +443,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
         }
 
         Reset();
-        events.RescheduleEvent(EVENT_CHECK_HOUR, 60000);
+        events.RescheduleEvent(EVENT_CHECK_HOUR, 1min);
     }
 
     void FinishAttackDueToWin()
@@ -521,9 +521,9 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
         guzzlerCounter = 0;
         thrown = 0;
 
-        events.ScheduleEvent(EVENT_SPAWN_MOLE_MACHINE, 1500);
-        events.ScheduleEvent(EVENT_PRE_FINISH_ATTACK, 280000);
-        events.ScheduleEvent(EVENT_BARTENDER_SAY, 5000);
+        events.ScheduleEvent(EVENT_SPAWN_MOLE_MACHINE, 1500ms);
+        events.ScheduleEvent(EVENT_PRE_FINISH_ATTACK, 280s);
+        events.ScheduleEvent(EVENT_BARTENDER_SAY, 5s);
     }
 
     bool AllowStart()
@@ -560,7 +560,7 @@ struct npc_dark_iron_attack_mole_machine : public ScriptedAI
 {
     npc_dark_iron_attack_mole_machine(Creature* creature) : ScriptedAI(creature) { }
 
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
     void MoveInLineOfSight(Unit*) override {}
     void AttackStart(Unit*) override {}
 
@@ -618,7 +618,7 @@ struct npc_dark_iron_guzzler : public ScriptedAI
     ObjectGuid targetGUID;
     bool attacking;
 
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
     void MoveInLineOfSight(Unit*) override {}
     void AttackStart(Unit*) override {}
 
@@ -768,7 +768,7 @@ struct npc_brewfest_super_brew_trigger : public ScriptedAI
     npc_brewfest_super_brew_trigger(Creature* creature) : ScriptedAI(creature) { }
 
     uint32 timer;
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
     void MoveInLineOfSight(Unit*  /*who*/) override
     {
     }
@@ -1588,7 +1588,7 @@ struct npc_coren_direbrew : public ScriptedAI
         }
 
         _events.SetPhase(PHASE_INTRO);
-        _events.ScheduleEvent(EVENT_INTRO_1, 6 * IN_MILLISECONDS, 0, PHASE_INTRO);
+        _events.ScheduleEvent(EVENT_INTRO_1, 6s, 0, PHASE_INTRO);
         Talk(SAY_INTRO);
     }
 
@@ -1609,8 +1609,8 @@ struct npc_coren_direbrew : public ScriptedAI
             EntryCheckPredicate pred(NPC_ANTAGONIST);
             _summons.DoAction(ACTION_ANTAGONIST_HOSTILE, pred);
 
-            _events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINE, 15 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_DIREBREW_DISARM, 20 * IN_MILLISECONDS);
+            _events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINE, 15s);
+            _events.ScheduleEvent(EVENT_DIREBREW_DISARM, 20s);
         }
     }
 
@@ -1632,11 +1632,11 @@ struct npc_coren_direbrew : public ScriptedAI
     {
         if (summon->GetEntry() == NPC_ILSA_DIREBREW)
         {
-            _events.ScheduleEvent(EVENT_RESPAWN_ILSA, 1 * IN_MILLISECONDS);
+            _events.ScheduleEvent(EVENT_RESPAWN_ILSA, 1s);
         }
         else if (summon->GetEntry() == NPC_URSULA_DIREBREW)
         {
-            _events.ScheduleEvent(EVENT_RESPAWN_URSULA, 1 * IN_MILLISECONDS);
+            _events.ScheduleEvent(EVENT_RESPAWN_URSULA, 1s);
         }
     }
 
@@ -1686,13 +1686,13 @@ struct npc_coren_direbrew : public ScriptedAI
             {
                 case EVENT_INTRO_1:
                     Talk(SAY_INTRO1);
-                    _events.ScheduleEvent(EVENT_INTRO_2, 4 * IN_MILLISECONDS, 0, PHASE_INTRO);
+                    _events.ScheduleEvent(EVENT_INTRO_2, 4s, 0, PHASE_INTRO);
                     break;
                 case EVENT_INTRO_2:
                 {
                     EntryCheckPredicate pred(NPC_ANTAGONIST);
                     _summons.DoAction(ACTION_ANTAGONIST_SAY_1, pred);
-                    _events.ScheduleEvent(EVENT_INTRO_3, 3 * IN_MILLISECONDS, 0, PHASE_INTRO);
+                    _events.ScheduleEvent(EVENT_INTRO_3, 3s, 0, PHASE_INTRO);
                     break;
                 }
                 case EVENT_INTRO_3:
@@ -1758,7 +1758,7 @@ struct npc_coren_direbrew_sisters : public ScriptedAI
         return ObjectGuid::Empty;
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoCastSelf(SPELL_PORT_TO_COREN);
 
@@ -1845,10 +1845,10 @@ struct npc_direbrew_antagonist : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_ANTAGONIST_COMBAT, who);
-        ScriptedAI::EnterCombat(who);
+        ScriptedAI::JustEngagedWith(who);
     }
 };
 

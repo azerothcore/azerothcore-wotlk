@@ -99,7 +99,7 @@ public:
         npc_tiger_matriarch_creditAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
-            events.ScheduleEvent(EVENT_CHECK_SUMMON_AURA, 2000);
+            events.ScheduleEvent(EVENT_CHECK_SUMMON_AURA, 2s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -129,7 +129,7 @@ public:
                     }
                 }
 
-                events.ScheduleEvent(EVENT_CHECK_SUMMON_AURA, 5000);
+                events.ScheduleEvent(EVENT_CHECK_SUMMON_AURA, 5s);
             }
         }
 
@@ -154,11 +154,11 @@ public:
         {
         }
 
-        void EnterCombat(Unit* /*target*/) override
+        void JustEngagedWith(Unit* /*target*/) override
         {
             _events.Reset();
-            _events.ScheduleEvent(EVENT_POUNCE, 100);
-            _events.ScheduleEvent(EVENT_NOSUMMON, 50000);
+            _events.ScheduleEvent(EVENT_POUNCE, 100ms);
+            _events.ScheduleEvent(EVENT_NOSUMMON, 50s);
         }
 
         void IsSummonedBy(WorldObject* summoner) override
@@ -232,7 +232,7 @@ public:
                 {
                     case EVENT_POUNCE:
                         DoCastVictim(SPELL_POUNCE);
-                        _events.ScheduleEvent(EVENT_POUNCE, 30000);
+                        _events.ScheduleEvent(EVENT_POUNCE, 30s);
                         break;
                     case EVENT_NOSUMMON: // Reapply SPELL_NO_SUMMON_AURA
                         if (Unit* tiger = ObjectAccessor::GetUnit(*me, _tigerGuid))
@@ -241,7 +241,7 @@ public:
                                 if (Unit* vehSummoner = tiger->ToTempSummon()->GetSummonerUnit())
                                     me->AddAura(SPELL_NO_SUMMON_AURA, vehSummoner);
                         }
-                        _events.ScheduleEvent(EVENT_NOSUMMON, 50000);
+                        _events.ScheduleEvent(EVENT_NOSUMMON, 50s);
                         break;
                     default:
                         break;

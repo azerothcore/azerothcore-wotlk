@@ -55,13 +55,13 @@ public:
     {
         boss_magmadarAI(Creature* creature) : BossAI(creature, DATA_MAGMADAR) {}
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_FRENZY, 8500);
-            events.ScheduleEvent(EVENT_PANIC, 9500);
-            events.ScheduleEvent(EVENT_LAVA_BOMB, 12000);
-            events.ScheduleEvent(EVENT_LAVA_BOMB_RANGED, 15000);
+            _JustEngagedWith();
+            events.ScheduleEvent(EVENT_FRENZY, 8500ms);
+            events.ScheduleEvent(EVENT_PANIC, 9500ms);
+            events.ScheduleEvent(EVENT_LAVA_BOMB, 12s);
+            events.ScheduleEvent(EVENT_LAVA_BOMB_RANGED, 15s);
         }
 
         void ExecuteEvent(uint32 eventId) override
