@@ -1,3 +1,4 @@
+-- DB update 2023_03_11_00 -> 2023_03_11_01
 --
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `flags_extra` = 0, `unit_flags` = 32768, `ScriptName` = '' WHERE (`entry` = 17893);
 
