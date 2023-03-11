@@ -329,11 +329,6 @@ private:
             BotInfo(BotInfo const&) = delete;
             BotInfo& operator=(BotInfo const&) = delete;
     };
-    static bool sortbots(BotInfo const& p1, BotInfo const& p2)
-    {
-        return p1.id < p2.id;
-    }
-
 
     static char const* get_race_name(uint8 race)
     {
@@ -1814,7 +1809,7 @@ public:
             return false;
         }
 
-        std::sort(botlist.begin(), botlist.end(), script_bot_commands::sortbots);
+        std::sort(botlist.begin(), botlist.end(), [](BotInfo const& bi1, BotInfo const& bi2) { return bi1.id < bi2.id; });
 
         for (BotList::const_iterator itr = botlist.begin(); itr != botlist.end(); ++itr)
         {
