@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.game_event_gameobject
+-- Dumping structure for table acore_world.game_event_gameobject
 DROP TABLE IF EXISTS `game_event_gameobject`;
 CREATE TABLE IF NOT EXISTS `game_event_gameobject` (
   `eventEntry` tinyint NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
@@ -20,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `game_event_gameobject` (
   PRIMARY KEY (`guid`,`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.game_event_gameobject: 21 647 rows
+-- Dumping data for table acore_world.game_event_gameobject: 21,709 rows
 DELETE FROM `game_event_gameobject`;
 /*!40000 ALTER TABLE `game_event_gameobject` DISABLE KEYS */;
 INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
@@ -14469,6 +14471,46 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(12, 54948),
 	(2, 55005),
 	(2, 55028),
+	(2, 55735),
+	(2, 55736),
+	(2, 55737),
+	(2, 55738),
+	(2, 55739),
+	(2, 55740),
+	(2, 55741),
+	(2, 55742),
+	(2, 55743),
+	(2, 55744),
+	(2, 55745),
+	(2, 55746),
+	(2, 55747),
+	(2, 55748),
+	(2, 55749),
+	(2, 55750),
+	(2, 55751),
+	(2, 55752),
+	(2, 55753),
+	(2, 55754),
+	(2, 55755),
+	(2, 55756),
+	(2, 55757),
+	(2, 55758),
+	(2, 55759),
+	(2, 55760),
+	(2, 55761),
+	(2, 55762),
+	(2, 55763),
+	(2, 55764),
+	(2, 55765),
+	(2, 55766),
+	(2, 55767),
+	(2, 55768),
+	(2, 55769),
+	(2, 55770),
+	(2, 55771),
+	(2, 55772),
+	(2, 55773),
+	(2, 55774),
 	(2, 57262),
 	(2, 57263),
 	(2, 57266),
@@ -18116,6 +18158,28 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(24, 100021),
 	(24, 100022),
 	(24, 100023),
+	(17, 105000),
+	(17, 105001),
+	(17, 105002),
+	(17, 105003),
+	(17, 105004),
+	(17, 105005),
+	(17, 105006),
+	(17, 105007),
+	(17, 105008),
+	(17, 105009),
+	(17, 105010),
+	(17, 105011),
+	(17, 105012),
+	(17, 105013),
+	(17, 105014),
+	(17, 105015),
+	(17, 105016),
+	(17, 105017),
+	(17, 105018),
+	(17, 105019),
+	(17, 105020),
+	(17, 105021),
 	(50, 121572),
 	(5, 121576),
 	(5, 121577),
@@ -19326,7 +19390,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(9, 152113),
 	(9, 152114),
 	(9, 152115),
-	(15, 164445),
+	(62, 164445),
 	(1, 220100),
 	(1, 220101),
 	(1, 220102),
@@ -19962,7 +20026,8 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(26, 240705),
 	(26, 240706),
 	(26, 240707),
-	(26, 240708),
+	(26, 240708);
+INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(26, 240709),
 	(26, 240710),
 	(26, 240711),
@@ -20024,8 +20089,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(26, 240767),
 	(26, 240768),
 	(26, 240769),
-	(26, 240770);
-INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
+	(26, 240770),
 	(26, 240771),
 	(26, 240772),
 	(26, 240773),
@@ -21675,6 +21739,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(1, 242684);
 /*!40000 ALTER TABLE `game_event_gameobject` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

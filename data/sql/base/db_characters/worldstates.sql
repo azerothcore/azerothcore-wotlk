@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_characters.worldstates
+-- Dumping structure for table acore_characters.worldstates
 DROP TABLE IF EXISTS `worldstates`;
 CREATE TABLE IF NOT EXISTS `worldstates` (
   `entry` int unsigned NOT NULL DEFAULT '0',
@@ -21,9 +23,8 @@ CREATE TABLE IF NOT EXISTS `worldstates` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Variable Saves';
 
--- Dumpar data för tabell acore_characters.worldstates: ~98 rows (ungefär)
+-- Dumping data for table acore_characters.worldstates: ~102 rows (approximately)
 DELETE FROM `worldstates`;
-/*!40000 ALTER TABLE `worldstates` DISABLE KEYS */;
 INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(1, 0, NULL),
 	(2, 0, NULL),
@@ -112,6 +113,10 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(87, 0, NULL),
 	(88, 0, NULL),
 	(89, 0, NULL),
+	(197, 0, 'Fishing Extravaganza - STV_FISHING_PREV_WIN_TIME'),
+	(198, 0, 'Fishing Extravaganza - STV_FISHING_HAS_WINNER'),
+	(199, 0, 'Fishing Extravaganza - STV_FISHING_ANNOUNCE_EVENT_BEGIN'),
+	(200, 0, 'Fishing Extravaganza - STV_FISHING_ANNOUNCE_POOLS_DESPAN'),
 	(3781, 9000000, NULL),
 	(3801, 0, NULL),
 	(3802, 1, NULL),
@@ -123,8 +128,8 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(20006, 1661140800, 'NextGuildDailyResetTime'),
 	(20007, 1662004800, 'NextMonthlyQuestResetTime'),
 	(20008, 1661140800, NULL);
-/*!40000 ALTER TABLE `worldstates` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

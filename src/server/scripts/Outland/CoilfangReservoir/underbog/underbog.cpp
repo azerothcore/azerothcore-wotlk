@@ -21,27 +21,6 @@
 #include "TaskScheduler.h"
 #include "the_underbog.h"
 
-class spell_fungal_decay : public AuraScript
-{
-    PrepareAuraScript(spell_fungal_decay);
-
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        ModStackAmount(5);
-    }
-
-    void PeriodicTick(AuraEffect const* /*aurEff*/)
-    {
-        ModStackAmount(-1);
-    }
-
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(spell_fungal_decay::OnApply, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_fungal_decay::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
-    }
-};
-
 enum UnderbatSpells
 {
     SPELL_TENTACLE_LASH = 34171
@@ -56,7 +35,7 @@ struct npc_underbat : public ScriptedAI
         _scheduler.CancelAll();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.Schedule(2200ms, 6900ms, [this](TaskContext context)
         {
@@ -86,8 +65,60 @@ private:
     TaskScheduler _scheduler;
 };
 
+class spell_fungal_decay : public AuraScript
+{
+    PrepareAuraScript(spell_fungal_decay);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        ModStackAmount(5);
+    }
+
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_fungal_decay::OnApply, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_fungal_decay::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
+enum AllergiesEnum
+{
+    SPELL_SNEEZE    = 31428
+};
+
+class spell_allergies : public AuraScript
+{
+    PrepareAuraScript(spell_allergies);
+
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+    {
+        isPeriodic = true;
+        amplitude = urand(10 * IN_MILLISECONDS, 60 * IN_MILLISECONDS);
+    }
+
+    void Update(AuraEffect* /*effect*/)
+    {
+        if (Unit* target = GetUnitOwner())
+        {
+            target->CastSpell(target, SPELL_SNEEZE, true);
+        }
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_allergies::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_allergies::Update, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_underbog()
 {
-    RegisterSpellScript(spell_fungal_decay);
     RegisterUnderbogCreatureAI(npc_underbat);
+    RegisterSpellScript(spell_fungal_decay);
+    RegisterSpellScript(spell_allergies);
 }

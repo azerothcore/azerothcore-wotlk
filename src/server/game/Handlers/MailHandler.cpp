@@ -269,10 +269,17 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
         if (!sScriptMgr->CanSendMail(player, receiverGuid, mailbox, subject, body, money, COD, item))
         {
+            player->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
             return;
         }
 
         items[i] = item;
+    }
+
+    if (!items_count && !sScriptMgr->CanSendMail(player, receiverGuid, mailbox, subject, body, money, COD, nullptr))
+    {
+        player->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+        return;
     }
 
     player->SendMailResult(0, MAIL_SEND, MAIL_OK);

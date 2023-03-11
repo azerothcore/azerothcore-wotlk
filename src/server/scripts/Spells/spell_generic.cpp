@@ -43,7 +43,7 @@
 #include "Vehicle.h"
 #include <array>
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -137,7 +137,7 @@ class spell_the_flag_of_ownership : public SpellScript
             return;
         caster->CastSpell(target, 52605, true);
         char buff[100];
-        sprintf(buff, "%s plants the Flag of Ownership in the corpse of %s.", caster->GetName().c_str(), target->GetName().c_str());
+        snprintf(buff, sizeof(buff), "%s plants the Flag of Ownership in the corpse of %s.", caster->GetName().c_str(), target->GetName().c_str());
         caster->TextEmote(buff, caster);
         haveTarget = true;
     }

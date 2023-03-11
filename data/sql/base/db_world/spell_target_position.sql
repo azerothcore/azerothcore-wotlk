@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.spell_target_position
+-- Dumping structure for table acore_world.spell_target_position
 DROP TABLE IF EXISTS `spell_target_position`;
 CREATE TABLE IF NOT EXISTS `spell_target_position` (
   `ID` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
@@ -22,11 +24,11 @@ CREATE TABLE IF NOT EXISTS `spell_target_position` (
   `PositionY` float NOT NULL DEFAULT '0',
   `PositionZ` float NOT NULL DEFAULT '0',
   `Orientation` float NOT NULL DEFAULT '0',
-  `VerifiedBuild` smallint DEFAULT '0',
+  `VerifiedBuild` mediumint DEFAULT NULL,
   PRIMARY KEY (`ID`,`EffectIndex`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell System';
 
--- Dumpar data för tabell acore_world.spell_target_position: 645 rows
+-- Dumping data for table acore_world.spell_target_position: 667 rows
 DELETE FROM `spell_target_position`;
 /*!40000 ALTER TABLE `spell_target_position` DISABLE KEYS */;
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES
@@ -264,7 +266,7 @@ INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, 
 	(28026, 0, 533, 2705.95, -3412.45, 267.688, 2.19126, 0),
 	(28147, 0, 532, -11100, -2001.64, 49.8927, 0.799535, 0),
 	(28280, 0, 533, 3128.96, -3312.96, 293.25, 0, 0),
-	(28444, 0, 533, 3038.98, -3434.47, 298.22, 0, 0),
+	(28444, 0, 533, 3005.51, -3434.64, 304.195, 6.2831, 0),
 	(28689, 0, 530, 7513.63, -6388.93, 23.8, 2.84, 0),
 	(28690, 0, 530, 7524.72, -6378.58, 30.03, 0.69, 0),
 	(28691, 0, 530, 7199.4, -7097.36, 66.97, 0.87, 0),
@@ -621,8 +623,8 @@ INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, 
 	(72340, 1, 631, -548.983, 2211.24, 539.29, 0.00576, 0),
 	(72468, 0, 631, -66.8684, 2158.28, 30.7374, 3.89345, 0),
 	(72546, 1, 631, 514, -2523, 1050.99, 3.1765, 0),
-	(72613, 0, 533, 3005.51, -3434.64, 304.195, 5.81041, 0),
-	(72617, 0, 533, 3038.98, -3434.47, 298.22, 0, 0),
+	(72613, 0, 533, 3038.98, -3434.47, 298.22, 1.994, 0),
+	(72617, 0, 533, 3498.3, -5349.49, 144.968, 1.36989, 0),
 	(73655, 1, 631, 495.708, -2523.76, 1050.99, 3.1765, 0),
 	(26454, 0, 0, -8748.48, 1073.61, 90.4898, 5.03789, 0),
 	(26452, 0, 0, -4663, -955.663, 500.377, 0.722862, 0),
@@ -674,9 +676,32 @@ INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, 
 	(25825, 0, 509, -9805.95, 1422.85, 77.5852, 0, 0),
 	(25826, 0, 509, -9827.58, 1506.28, 82.3052, 0, 0),
 	(25827, 0, 509, -9778.91, 1419.98, 61.0743, 0, 0),
-	(25828, 0, 509, -9829.42, 1456.37, 90.7015, 0, 0);
+	(25828, 0, 509, -9829.42, 1456.37, 90.7015, 0, 0),
+	(29181, 0, 531, -8971.81, 1321.47, -104.249, 0, 0),
+	(29190, 0, 531, -8632.84, 2055.87, 108.86, 0, 0),
+	(25865, 0, 531, -8023.59, 964.772, -41.229, 5.376, 0),
+	(25866, 0, 531, -8042.13, 911.263, -42.841, 6.2, 0),
+	(25867, 0, 531, -7999.36, 860.525, -47.206, 1.417, 0),
+	(25868, 0, 531, -7971.3, 862.581, -48.099, 2.148, 0),
+	(25869, 0, 531, -7943.21, 903.804, -48.473, 3.078, 0),
+	(25870, 0, 531, -7954.38, 958.562, -41.609, 3.962, 0),
+	(25871, 0, 531, -7997.19, 979.192, -41.653, 4.896, 0),
+	(25872, 0, 531, -8037.89, 929.679, -43.416, 6.024, 0),
+	(25873, 0, 531, -8015.41, 867.734, -45.607, 1.103, 0),
+	(25874, 0, 531, -7982.8, 857.172, -48.212, 1.5, 0),
+	(25875, 0, 531, -7952.12, 883.183, -48.194, 2.43, 0),
+	(25876, 0, 531, -7947.22, 939.122, -44.014, 3.718, 0),
+	(25877, 0, 531, -7975.77, 974.82, -41.584, 4.417, 0),
+	(25878, 0, 531, -8032.75, 948.274, -41.919, 5.595, 0),
+	(25879, 0, 531, -8037.08, 887.268, -43.581, 0.675, 0),
+	(25880, 0, 531, -7992.21, 857.5, -47.762, 1.664, 0),
+	(25881, 0, 531, -7960.71, 872.483, -48.759, 2.36, 0),
+	(25882, 0, 531, -7942.98, 918.616, -46.401, 3.306, 0),
+	(25883, 0, 531, -7964.32, 967.879, -42.112, 4.087, 0),
+	(25884, 0, 531, -8015.24, 976.553, -41.647, 4.947, 0);
 /*!40000 ALTER TABLE `spell_target_position` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
