@@ -18,6 +18,7 @@
 #ifndef AllPackets_h__
 #define AllPackets_h__
 
+#include "AuctionHousePackets.h"
 #include "LFGPackets.h"
 #include "BankPackets.h"
 #include "CharacterPackets.h"

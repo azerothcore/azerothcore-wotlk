@@ -1997,7 +1997,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
             for (auto const& [auID, Aentry] : auctionHouse->GetAuctions())
             {
-                if (Aentry && (Aentry->owner == factionChangeInfo->Guid || Aentry->bidder == factionChangeInfo->Guid))
+                if (Aentry && (Aentry->PlayerOwner == factionChangeInfo->Guid || Aentry->Bidder == factionChangeInfo->Guid))
                 {
                     has_auctions = true;
                     break;

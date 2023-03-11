@@ -24,7 +24,7 @@
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
 #include "ArenaTeamMgr.h"
-#include "AsyncAuctionListing.h"
+#include "AsyncAuctionMgr.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
@@ -2146,6 +2146,8 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Load Channels...");
     ChannelMgr::LoadChannels();
 
+    sAsyncAuctionMgr->Initialize();
+
     sScriptMgr->OnBeforeWorldInitialized();
 
     if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
@@ -2344,12 +2346,8 @@ void World::Update(uint32 diff)
         ResetGuildCap();
     }
 
-    // pussywizard:
-    // acquire mutex now, this is kind of waiting for listing thread to finish it's work (since it can't process next packet)
-    // so we don't have to do it in every packet that modifies auctions
-    AsyncAuctionListingMgr::SetAuctionListingAllowed(false);
     {
-        std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetLock());
+        std::lock_guard guard(sAsyncAuctionMgr->GetLock());
 
         // pussywizard: handle auctions when the timer has passed
         if (_timers[WUPDATE_AUCTIONS].Passed())
@@ -2362,7 +2360,7 @@ void World::Update(uint32 diff)
             sAuctionMgr->Update();
         }
 
-        AsyncAuctionListingMgr::Update(diff);
+        sAsyncAuctionMgr->Update(Milliseconds{ diff });
 
         if (currentGameTime > _mail_expire_check_timer)
         {
@@ -2376,9 +2374,6 @@ void World::Update(uint32 diff)
             UpdateSessions(diff);
         }
     }
-
-    // end of section with mutex
-    AsyncAuctionListingMgr::SetAuctionListingAllowed(true);
 
     /// <li> Handle weather updates when the timer has passed
     if (_timers[WUPDATE_WEATHERS].Passed())
