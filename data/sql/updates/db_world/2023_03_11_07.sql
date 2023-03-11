@@ -1,3 +1,4 @@
+-- DB update 2023_03_11_06 -> 2023_03_11_07
 -- Steam Pump Overseer
 UPDATE `creature_template_addon` SET `auras` = '6961' WHERE `entry` = 18340;
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|64 WHERE `entry` = 18340;
