@@ -11885,7 +11885,7 @@ void bot_ai::_generateGear()
         return itemEntry + 1 + itemEntry % ((myEntry % 20) + 1);
     };
 
-    uint32 itemId = urand(60u, 45000u);
+    uint32 itemId = urand(20u, 45000u);
     for (uint8 n = 0; n < ITEMS_PER_CHECK;)
     {
         if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId))
@@ -11893,7 +11893,11 @@ void bot_ai::_generateGear()
             bool skip1 = false;
             switch (proto->Class)
             {
-                case ITEM_CLASS_ARMOR: case ITEM_CLASS_WEAPON:
+                case ITEM_CLASS_ARMOR:
+                    break;
+                case ITEM_CLASS_WEAPON:
+                    if (proto->Damage[0].DamageMin < 1.0f)
+                        skip1 = true;
                     break;
                 default:
                     skip1 = true;
@@ -11994,6 +11998,8 @@ void bot_ai::_generateGear()
                             }
                             break;
                         case BOT_SLOT_RANGED:
+                            if (proto->Class != ITEM_CLASS_WEAPON)
+                                skip2 = true;
                             break;
                         case BOT_SLOT_HEAD:
                         case BOT_SLOT_SHOULDERS:
