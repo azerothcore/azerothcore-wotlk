@@ -1,4 +1,4 @@
-a/*
+/*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -2871,7 +2871,7 @@ void Map::RemoveRespawnTime(RespawnVector& respawnData, bool doRespawn, Characte
 
 void Map::ProcessRespawns()
 {
-    time_t now = time(NULL);
+    time_t now = GameTime::GetGameTime().count();
     while (!_respawnTimes.empty())
     {
         RespawnInfo* next = _respawnTimes.top();
