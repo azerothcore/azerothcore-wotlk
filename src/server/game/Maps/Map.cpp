@@ -1,4 +1,4 @@
-/*
+a/*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -2665,7 +2665,7 @@ bool Map::CheckRespawn(RespawnInfo* info)
                 doDelete = true;
             break;
         default:
-            ASSERT(false, "Invalid spawn type %u with spawnId %u on map %u", uint32(info->type), info->spawnId, GetId());
+            ASSERT(false, "Invalid spawn type {} with spawnId %u on map {}", uint32(info->type), info->spawnId, GetId());
             return true;
         }
         if (doDelete)
@@ -2698,7 +2698,7 @@ bool Map::CheckRespawn(RespawnInfo* info)
         else if (info->type == SPAWN_TYPE_CREATURE)
             sPoolMgr->UpdatePool<Creature>(poolId, info->spawnId);
         else
-            ASSERT(false, "Invalid spawn type %u (spawnid %u) on map %u", uint32(info->type), info->spawnId, GetId());
+            ASSERT(false, "Invalid spawn type {} (spawnid {}) on map {}", uint32(info->type), info->spawnId, GetId());
         info->respawnTime = 0;
         return false;
     }
@@ -2727,7 +2727,7 @@ void Map::DoRespawn(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 gr
         break;
     }
     default:
-        ASSERT(false, "Invalid spawn type %u (spawnid %u) on map %u", uint32(type), spawnId, GetId());
+        ASSERT(false, "Invalid spawn type {} (spawnid {}) on map {}", uint32(type), spawnId, GetId());
     }
 }
 

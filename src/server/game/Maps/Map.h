@@ -335,7 +335,7 @@ inline bool CompareRespawnInfo::operator()(RespawnInfo const* a, RespawnInfo con
         return (a->respawnTime > b->respawnTime);
     if (a->spawnId != b->spawnId)
         return a->spawnId < b->spawnId;
-    ASSERT(a->type != b->type, "Duplicate respawn entry for spawnId (%u,%u) found!", a->type, a->spawnId);
+    ASSERT(a->type != b->type, "Duplicate respawn entry for spawnId ({}, {}) found!", a->type, a->spawnId);
     return a->type < b->type;
 }
 
