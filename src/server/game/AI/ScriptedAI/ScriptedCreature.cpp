@@ -565,7 +565,7 @@ void BossAI::_Reset()
     scheduler.CancelAll();
     summons.DespawnAll();
     _healthCheckEvents.clear();
-    if (instance)
+
     if (instance && instance->GetBossState(_bossId) != DONE)
         instance->SetBossState(_bossId, NOT_STARTED);
 }

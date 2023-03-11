@@ -4,19 +4,19 @@
 --		0x02	Manual Spawn (don't automatically spawn, instead spawned by core as part of script)
 DROP TABLE IF EXISTS `spawn_group_template`;
 CREATE TABLE `spawn_group_template` (
-    `groupId` int(10) unsigned NOT NULL,
+    `groupId` INT UNSIGNED NOT NULL,
     `groupName` varchar(100) NOT NULL,
-    `groupFlags` int(10) unsigned NOT NULL DEFAULT '0',
+    `groupFlags` INT UNSIGNED NOT NULL DEFAULT '0',
     PRIMARY KEY (`groupId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `spawn_group`;
 CREATE TABLE `spawn_group` (
-    `groupId` int(10) unsigned NOT NULL,
+    `groupId` INT UNSIGNED NOT NULL,
     `spawnType` tinyint(10) unsigned NOT NULL,
-    `spawnId` int(10) unsigned NOT NULL,
+    `spawnId` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`groupId`,`spawnType`,`spawnId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Create the default groups
 INSERT INTO `spawn_group_template` (`groupId`, `groupName`, `groupFlags`) VALUES
@@ -30,8 +30,8 @@ INSERT INTO `spawn_group_template` (`groupId`, `groupName`, `groupFlags`) VALUES
 DROP TABLE IF EXISTS `creature_temp_group`;
 CREATE TEMPORARY TABLE `creature_temp_group`
 (
-  `creatureId` int(10) unsigned NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `creatureId` INT UNSIGNED NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `creature_temp_group`
 SELECT `guid`
@@ -78,14 +78,14 @@ DROP TABLE `creature_temp_group`;
 DROP TABLE IF EXISTS `gameobject_temp_group`;
 CREATE TEMPORARY TABLE `gameobject_temp_group`
 (
-  `gameobjectId` int(10) unsigned NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `gameobjectId` INT UNSIGNED NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `gameobject_temp_group_ids`;
 CREATE TEMPORARY TABLE `gameobject_temp_group_ids`
 (
-  `entryid` int(10) NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `entryid` INT NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE `gameobject_temp_group_ids` ADD INDEX (`entryid`);
 
