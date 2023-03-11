@@ -1,3 +1,4 @@
+-- DB update 2023_03_11_05 -> 2023_03_11_06
 --
 -- Revamp Aeonus Tables
 DELETE FROM `reference_loot_template` WHERE Entry IN (35004);
