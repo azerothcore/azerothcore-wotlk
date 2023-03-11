@@ -218,7 +218,7 @@ enum AcoreStrings
     LANG_GRID_POSITION                  = 178,
     // 179-185 used in other client versions
     LANG_TRANSPORT_POSITION             = 186,
-    // 187
+    LANG_PROFANITY_NAME                 = 187,
     LANG_2FA_SECRET_TOO_LONG            = 188,
     LANG_2FA_SECRET_INVALID             = 189,
     LANG_2FA_SECRET_SET_COMPLETE        = 190,
