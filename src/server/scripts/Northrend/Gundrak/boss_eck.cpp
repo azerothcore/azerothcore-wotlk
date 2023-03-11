@@ -79,10 +79,10 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             BossAI::JustEngagedWith(who);
-            events.ScheduleEvent(EVENT_ECK_BERSERK, urand(60000, 90000));
-            events.ScheduleEvent(EVENT_ECK_BITE, 5000);
-            events.ScheduleEvent(EVENT_ECK_SPIT, 10000);
-            events.ScheduleEvent(EVENT_ECK_SPRING, 8000);
+            events.ScheduleEvent(EVENT_ECK_BERSERK, 60s, 90s);
+            events.ScheduleEvent(EVENT_ECK_BITE, 5s);
+            events.ScheduleEvent(EVENT_ECK_SPIT, 10s);
+            events.ScheduleEvent(EVENT_ECK_SPRING, 8s);
         }
 
         void JustDied(Unit* killer) override
@@ -108,7 +108,7 @@ public:
                         me->CastSpell(me, SPELL_ECK_BERSERK, false);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_ECK_HEALTH, 1000);
+                    events.ScheduleEvent(EVENT_ECK_HEALTH, 1s);
                     break;
                 case EVENT_ECK_BERSERK:
                     me->CastSpell(me, SPELL_ECK_BERSERK, false);
@@ -116,11 +116,11 @@ public:
                     break;
                 case EVENT_ECK_BITE:
                     me->CastSpell(me->GetVictim(), SPELL_ECK_BITE, false);
-                    events.ScheduleEvent(EVENT_ECK_BITE, urand(8000, 12000));
+                    events.ScheduleEvent(EVENT_ECK_BITE, 8s, 12s);
                     break;
                 case EVENT_ECK_SPIT:
                     me->CastSpell(me->GetVictim(), SPELL_ECK_SPIT, false);
-                    events.ScheduleEvent(EVENT_ECK_SPIT, 10000);
+                    events.ScheduleEvent(EVENT_ECK_SPIT, 10s);
                     break;
                 case EVENT_ECK_SPRING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f, true))
@@ -130,7 +130,7 @@ public:
                         me->CastSpell(target, SPELL_ECK_SPRING, false);
                     }
 
-                    events.ScheduleEvent(EVENT_ECK_SPRING, urand(5000, 10000));
+                    events.ScheduleEvent(EVENT_ECK_SPRING, 5s, 10s);
                     break;
             }
 

@@ -154,6 +154,11 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
     }
 }
 
+bool Warden::IsInitialized()
+{
+    return _initialized;
+}
+
 union keyData
 {
     std::array<uint8, 20> bytes;

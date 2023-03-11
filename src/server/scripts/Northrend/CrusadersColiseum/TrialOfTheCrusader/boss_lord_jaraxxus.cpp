@@ -129,14 +129,14 @@ public:
         {
             me->setActive(true);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_FEL_FIREBALL, 5000);
-            events.RescheduleEvent(EVENT_SPELL_FEL_LIGHTNING, urand(10000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_INCINERATE_FLESH, urand(24000, 26000));
-            events.RescheduleEvent(EVENT_SPELL_NETHER_POWER, urand(25000, 45000));
-            events.RescheduleEvent(EVENT_SPELL_LEGION_FLAME, 30000);
+            events.RescheduleEvent(EVENT_SPELL_FEL_FIREBALL, 5s);
+            events.RescheduleEvent(EVENT_SPELL_FEL_LIGHTNING, 10s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_INCINERATE_FLESH, 24s, 26s);
+            events.RescheduleEvent(EVENT_SPELL_NETHER_POWER, 25s, 45s);
+            events.RescheduleEvent(EVENT_SPELL_LEGION_FLAME, 30s);
             //if( GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC )
-            //  events.RescheduleEvent(EVENT_SPELL_TOUCH_OF_JARAXXUS, urand(10000,15000));
-            events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 20000); // it schedules EVENT_SUMMON_VOLCANO
+            //  events.RescheduleEvent(EVENT_SPELL_TOUCH_OF_JARAXXUS, 10s, 15s);
+            events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 20s); // it schedules EVENT_SUMMON_VOLCANO
 
             me->RemoveAura(SPELL_CHAINS);
             Talk(SAY_AGGRO);
@@ -208,12 +208,12 @@ public:
                 case EVENT_SPELL_FEL_FIREBALL:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_FEL_FIREBALL, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     break;
                 case EVENT_SPELL_FEL_LIGHTNING:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
                         me->CastSpell(target, SPELL_FEL_LIGHTNING, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     break;
                 case EVENT_SPELL_INCINERATE_FLESH:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
@@ -222,12 +222,12 @@ public:
                         Talk(SAY_INCINERATE);
                         me->CastSpell(target, SPELL_INCINERATE_FLESH, false);
                     }
-                    events.RepeatEvent(urand(20000, 25000));
+                    events.Repeat(20s, 25s);
                     break;
                 case EVENT_SPELL_NETHER_POWER:
                     me->CastSpell(me, SPELL_NETHER_POWER, false);
-                    events.DelayEvents(5000);
-                    events.RepeatEvent(urand(25000, 45000));
+                    events.DelayEvents(5s);
+                    events.Repeat(25s, 45s);
                     break;
                 case EVENT_SPELL_LEGION_FLAME:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
@@ -235,26 +235,26 @@ public:
                         Talk(EMOTE_LEGION_FLAME, target);
                         me->CastSpell(target, SPELL_LEGION_FLAME, false);
                     }
-                    events.RepeatEvent(30000);
+                    events.Repeat(30s);
                     break;
                 case EVENT_SPELL_TOUCH_OF_JARAXXUS:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                         me->CastSpell(target, SPELL_TOUCH_OF_JARAXXUS, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     break;
                 case EVENT_SUMMON_NETHER_PORTAL:
                     Talk(EMOTE_NETHER_PORTAL);
                     Talk(SAY_MISTRESS_OF_PAIN);
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_NETHER_PORTAL, false);
 
-                    events.RescheduleEvent(EVENT_SUMMON_VOLCANO, 60000);
+                    events.RescheduleEvent(EVENT_SUMMON_VOLCANO, 1min);
                     break;
                 case EVENT_SUMMON_VOLCANO:
                     Talk(EMOTE_INFERNAL_ERUPTION);
                     Talk(SAY_INFERNAL_ERUPTION);
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOLCANO, false);
 
-                    events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 60000);
+                    events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 1min);
                     break;
             }
 
@@ -316,7 +316,7 @@ public:
                 DoZoneInCombat();
             }
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_FEL_STEAK, urand(7000, 20000));
+            events.RescheduleEvent(EVENT_SPELL_FEL_STEAK, 7s, 20s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -340,10 +340,10 @@ public:
                         me->AddThreat(target, 50000.0f);
                         me->CastSpell(target, SPELL_FEL_STEAK_MORPH, true);
                         me->CastSpell(target, SPELL_FEL_STEAK, true);
-                        events.RepeatEvent(30000);
+                        events.Repeat(30s);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
             }
 
@@ -386,10 +386,10 @@ public:
                 DoZoneInCombat();
             }
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_SHIVAN_SLASH, urand(10000, 20000));
-            events.RescheduleEvent(EVENT_SPELL_SPINNING_PAIN_SPIKE, urand(22000, 30000));
+            events.RescheduleEvent(EVENT_SPELL_SHIVAN_SLASH, 10s, 20s);
+            events.RescheduleEvent(EVENT_SPELL_SPINNING_PAIN_SPIKE, 22s, 30s);
             if( IsHeroic() )
-                events.RescheduleEvent(EVENT_SPELL_MISTRESS_KISS, urand(10000, 15000));
+                events.RescheduleEvent(EVENT_SPELL_MISTRESS_KISS, 10s, 15s);
         }
 
         void SpellHit(Unit*  /*caster*/, SpellInfo const*  /*spell*/) override
@@ -415,16 +415,16 @@ public:
                 case EVENT_SPELL_SHIVAN_SLASH:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_SHIVAN_SLASH, false);
-                    events.RepeatEvent(urand(15000, 25000));
+                    events.Repeat(15s, 25s);
                     break;
                 case EVENT_SPELL_SPINNING_PAIN_SPIKE:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true) )
                         me->CastSpell(target, SPELL_SPINNING_PAIN_SPIKE, false);
-                    events.RepeatEvent(urand(25000, 30000));
+                    events.Repeat(25s, 30s);
                     break;
                 case EVENT_SPELL_MISTRESS_KISS:
                     me->CastSpell((Unit*)nullptr, SPELL_MISTRESS_KISS, false);
-                    events.RepeatEvent(urand(25000, 35000));
+                    events.Repeat(25s, 35s);
                     break;
             }
 

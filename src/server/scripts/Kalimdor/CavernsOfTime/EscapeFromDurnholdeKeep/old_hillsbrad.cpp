@@ -54,6 +54,9 @@ enum Says
     SAY_ENTER_CHURCH                = 18,
     SAY_GREET_TARETHA               = 19,
     SAY_CHAT_TARETHA1               = 20,
+    SAY_EMOTE_HORSE                 = 21,
+    SAY_EMOTE_HORSE_2               = 22,
+    SAY_LEAD                        = 23,
 
     SAY_TARETHA_FREE                = 0,
     SAY_TARETHA_ESCAPED             = 1,
@@ -87,7 +90,10 @@ enum Spells
 
     SPELL_TELEPORT              = 34776,
     SPELL_MEMORY_WIPE           = 33336,
-    SPELL_MEMORY_WIPE_RESUME    = 33337
+    SPELL_MEMORY_WIPE_RESUME    = 33337,
+    SPELL_KNOCKOUT_ARMORER      = 32890,
+    SPELL_SALVATION             = 33790,
+    SPELL_DUMMY_AURA            = 22805
 };
 
 enum Npcs
@@ -133,8 +139,10 @@ enum Events
     EVENT_START_WP              = 7,
 
     EVENT_SET_FACING            = 9,
-    EVENT_KILL_ARMORER          = 10,
-    EVENT_TALK_KILL_ARMORER     = 11,
+    EVENT_ARMORER_SAY           = 10,
+    EVENT_THRALL_EMOTE          = 11,
+    EVENT_KILL_ARMORER          = 12,
+    EVENT_TALK_KILL_ARMORER     = 13,
 
     EVENT_DRESSING_KNEEL        = 20,
     EVENT_DRESSING_ARMOR        = 21,
@@ -149,12 +157,14 @@ enum Events
     EVENT_LOOK_1                = 40,
     EVENT_MOVE_AROUND           = 41,
     EVENT_LOOK_2                = 42,
-    EVENT_LOOK_3                = 43,
-    EVENT_SUMMON_GUARDS         = 44,
+    EVENT_SUMMON_GUARDS         = 43,
+    EVENT_LOOK_3                = 44,
     EVENT_SUMMON_TALK1          = 45,
-    EVENT_SUMMON_TALK2          = 46,
+    EVENT_LOOK_4                = 46,
+    EVENT_SUMMON_TALK2          = 47,
+    EVENT_GUARDS_MOVING         = 48,
 
-    EVENT_LOOK_4                = 50,
+    EVENT_LOOK_5                = 50,
     EVENT_SUMMON_GUARDS_2       = 51,
     EVENT_SUMMON_TALK3          = 52,
 
@@ -186,7 +196,8 @@ enum Events
     EVENT_EROZION_TALK_3        = 89,
     EVENT_THRALL_TALK_6         = 90,
     EVENT_THRALL_RUN_AWAY       = 91,
-    EVENT_TARETHA_TALK_2        = 92
+    EVENT_TARETHA_TALK_2        = 92,
+    EVENT_EROZION_FLAGS         = 93
 };
 
 class npc_thrall_old_hillsbrad : public CreatureScript
@@ -238,6 +249,8 @@ public:
         npc_thrall_old_hillsbradAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
+            _barnWave = false;
+            _churchWave = false;
         }
 
         void DoAction(int32 param) override
@@ -258,7 +271,7 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_CHRONO, 0);
                     events.ScheduleEvent(EVENT_THRALL_TALK_2, 6000);
                     events.ScheduleEvent(EVENT_TARETHA_FALL, 11000);
-                    events.ScheduleEvent(EVENT_THRALL_TALK_3, 14000);
+                    events.ScheduleEvent(EVENT_THRALL_TALK_3, 15000);
                     events.ScheduleEvent(EVENT_THRALL_MOVE_DOWN, 17000);
                     break;
                 case NPC_TARETHA:
@@ -268,13 +281,14 @@ public:
                     events.ScheduleEvent(EVENT_THRALL_TALK_5, 17000);
                     events.ScheduleEvent(EVENT_SUMMON_EROZION, 17500);
                     events.ScheduleEvent(EVENT_EROZION_TALK_1, 18000);
-                    events.ScheduleEvent(EVENT_EROZION_ACTION_1, 26000);
+                    events.ScheduleEvent(EVENT_EROZION_ACTION_1, 24000);
                     events.ScheduleEvent(EVENT_EROZION_TALK_2, 29000);
-                    events.ScheduleEvent(EVENT_EROZION_TALK_3, 42000);
-                    events.ScheduleEvent(EVENT_EROZION_ACTION_2, 47000);
+                    events.ScheduleEvent(EVENT_EROZION_TALK_3, 40000);
+                    events.ScheduleEvent(EVENT_EROZION_ACTION_2, 46000);
                     events.ScheduleEvent(EVENT_THRALL_TALK_6, 48000);
                     events.ScheduleEvent(EVENT_THRALL_RUN_AWAY, 51000);
                     events.ScheduleEvent(EVENT_TARETHA_TALK_2, 53000);
+                    events.ScheduleEvent(EVENT_EROZION_FLAGS, 56000);
                     break;
             }
         }
@@ -298,11 +312,13 @@ public:
                     break;
                 case 8:
                     events.ScheduleEvent(EVENT_SET_FACING, 500);
+                    events.ScheduleEvent(EVENT_ARMORER_SAY, 700);
+                    events.ScheduleEvent(EVENT_THRALL_EMOTE, 1300);
                     break;
                 case 9:
                     SetRun(false);
                     events.ScheduleEvent(EVENT_KILL_ARMORER, 500);
-                    events.ScheduleEvent(EVENT_TALK_KILL_ARMORER, 4000);
+                    events.ScheduleEvent(EVENT_TALK_KILL_ARMORER, 3000);
                     break;
                 case 10:
                     SetRun(true);
@@ -313,35 +329,33 @@ public:
                     events.ScheduleEvent(EVENT_DRESSING_SHIELD, 9000);
                     events.ScheduleEvent(EVENT_DRESSING_TALK, 12000);
                     break;
-                case 13:
-                    me->SummonCreature(NPC_DURNHOLDE_SENTRY, 2200.28f, 137.37f, 87.93f, 5.07f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_SENTRY, 2197.44f, 131.83f, 87.93f, 0.78f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_MAGE, 2203.62f, 135.40f, 87.93f, 3.70f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2200.75f, 130.13f, 87.93f, 1.48f, TEMPSUMMON_MANUAL_DESPAWN);
-                    break;
-                case 16:
-                    me->SummonCreature(NPC_DURNHOLDE_SENTRY, 2147.43f, 122.194f, 76.422f, 0.67f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_SENTRY, 2146.27f, 126.13f, 76.241f, 0.60f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_MAGE, 2142.62f, 120.38f, 75.862f, 0.48f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2141.74f, 123.95f, 75.732f, 0.24f, TEMPSUMMON_MANUAL_DESPAWN);
-                    break;
                 case 18:
-                    me->SummonCreature(NPC_DURNHOLDE_SENTRY, 2138.37f, 167.98f, 66.23f, 2.59f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_WARDEN, 2142.76f, 173.62f, 66.23f, 2.59f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_MAGE, 2140.96f, 168.64f, 66.23f, 2.59f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2142.53f, 171.03f, 66.23f, 2.59f, TEMPSUMMON_MANUAL_DESPAWN);
-                    break;
-                case 22:
-                    me->SummonCreature(NPC_DURNHOLDE_SENTRY, 2108.73f, 190.43f, 66.23f, 5.56f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_MAGE, 2109.74f, 195.29f, 66.23f, 5.56f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_MAGE, 2107.74f, 192.59f, 66.23f, 5.56f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_DURNHOLDE_SENTRY, 2112.26f, 195.13f, 66.23f, 5.56f, TEMPSUMMON_MANUAL_DESPAWN);
+                    if (Creature* warden = me->SummonCreature(NPC_DURNHOLDE_WARDEN, 2149.4634f, 104.97559f, 73.632385f, 1.9065f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
+                    {
+                        warden->SetWalk(true);
+                        warden->GetMotionMaster()->MovePoint(0, 2144.9893f, 117.81233f, 75.98518f);
+                    }
+                    if (Creature* veteran = me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2147.3281f, 106.72353f, 74.34447f, 1.6904f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
+                    {
+                        veteran->SetWalk(true);
+                        veteran->GetMotionMaster()->MovePoint(0, 2145.2092f, 124.361f, 76.13655f);
+                    }
+                    if (Creature* veteran = me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2149.212f, 107.20052f, 74.15676f, 1.9887f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
+                    {
+                        veteran->SetWalk(true);
+                        veteran->GetMotionMaster()->MovePoint(0, 2143.7898f, 119.41281f, 75.96626f);
+                    }
+                    if (Creature* mage = me->SummonCreature(NPC_DURNHOLDE_MAGE, 2147.624f, 104.61046f, 73.909294f, 1.6186f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
+                    {
+                        mage->SetWalk(true);
+                        mage->GetMotionMaster()->MovePoint(0, 2146.975f, 118.05078f, 76.098465f);
+                    }
                     break;
                 case 27:
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_AMBUSHES_1);
                     break;
                 case 28:
-                    me->SummonCreature(NPC_CAPTAIN_SKARLOC, 1995.78f, 277.46f, 66.64f, 0.74f, TEMPSUMMON_MANUAL_DESPAWN);
+                    me->SummonCreature(NPC_CAPTAIN_SKARLOC, 1995.78f, 277.46f, 66.64f, 0.74f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
                     break;
                 case 29:
                     SetEscortPaused(true);
@@ -353,34 +367,45 @@ public:
                     break;
                 case 59:
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_TARREN_MILL);
-                    me->SummonCreature(NPC_SKARLOC_MOUNT, 2488.64f, 625.77f, 58.26f, 4.71f, TEMPSUMMON_TIMED_DESPAWN, 7000);
+                    if (Creature* mount = me->SummonCreature(NPC_SKARLOC_MOUNT, 2488.64f, 625.77f, 58.26f, 4.71f, TEMPSUMMON_TIMED_DESPAWN, 7000))
+                    {
+                        mount->SetImmuneToNPC(true);
+                        mount->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    }
                     UnMountSelf();
                     _mounted = false;
                     SetRun(false);
+                    me->SetFacingTo(6.0388f);
                     break;
                 case 60:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                     if (Creature* horse = me->FindNearestCreature(NPC_SKARLOC_MOUNT, 10.0f))
+                    {
                         horse->GetMotionMaster()->MovePoint(0, 2501.15f, 572.14f, 54.13f);
-
+                        horse->DespawnOrUnsummon(30 * IN_MILLISECONDS);
+                    }
+                    Talk(SAY_EMOTE_HORSE);
                     SetEscortPaused(true);
                     SetRun(true);
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                    me->SetFacingTo(4.1364f);
                     break;
                 case 64:
                     SetRun(false);
                     break;
                 case 67:
-                    events.ScheduleEvent(EVENT_LOOK_1, 500);
+                    events.ScheduleEvent(EVENT_LOOK_1, 1200);
                     events.ScheduleEvent(EVENT_MOVE_AROUND, 3500);
                     events.ScheduleEvent(EVENT_LOOK_2, 5000);
-                    events.ScheduleEvent(EVENT_LOOK_3, 6700);
-                    events.ScheduleEvent(EVENT_SUMMON_GUARDS, 6000);
-                    events.ScheduleEvent(EVENT_SUMMON_TALK1, 6500);
-                    events.ScheduleEvent(EVENT_SUMMON_TALK2, 12000);
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDS, 5100);
+                    events.ScheduleEvent(EVENT_LOOK_3, 7000);
+                    events.ScheduleEvent(EVENT_SUMMON_TALK1, 12000);
+                    events.ScheduleEvent(EVENT_LOOK_4, 17000);
+                    events.ScheduleEvent(EVENT_SUMMON_TALK2, 19000);
+                    events.ScheduleEvent(EVENT_GUARDS_MOVING, 21000);
                     break;
                 case 82:
-                    events.ScheduleEvent(EVENT_LOOK_4, 500);
+                    events.ScheduleEvent(EVENT_LOOK_5, 500);
                     events.ScheduleEvent(EVENT_SUMMON_GUARDS_2, 1000);
                     events.ScheduleEvent(EVENT_SUMMON_TALK3, 1500);
                     break;
@@ -401,8 +426,11 @@ public:
                     SetRun(true);
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_TARETHA_MEET);
                     if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
+                    {
+                        Taretha->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                         Taretha->AI()->Talk(SAY_TARETHA_ESCAPED);
-                    events.ScheduleEvent(EVENT_THRALL_TALK, 2000);
+                    }
+                    events.ScheduleEvent(EVENT_THRALL_TALK, 4000);
                     break;
                 case 101:
                     SetEscortPaused(true);
@@ -412,8 +440,6 @@ public:
                     events.ScheduleEvent(EVENT_START_WAVE_1, 25000);
                     break;
                 case 103:
-                    if (Creature* erozion = summons.GetCreatureWithEntry(NPC_EROZION))
-                        erozion->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_FINISHED);
                     me->SetVisible(false);
                     break;
@@ -476,6 +502,20 @@ public:
                 ReorderInstance(data);
         }
 
+        void JustReachedHome() override
+        {
+            if (_barnWave)
+            {
+                _barnWave = false;
+                Talk(SAY_LEAD);
+            }
+            else if (_churchWave)
+            {
+                _churchWave = false;
+                Talk(SAY_CHURCH_END);
+            }
+        }
+
         void KilledUnit(Unit*) override
         {
             Talk(SAY_RANDOM_KILL);
@@ -517,6 +557,13 @@ public:
                 case EVENT_OPEN_DOORS:
                     if (GameObject* doors = me->FindNearestGameObject(GO_PRISON_DOOR, 10.0f))
                         doors->SetGoState(GO_STATE_ACTIVE);
+                    me->SummonCreature(NPC_DURNHOLDE_SENTRY, 2142.372f, 174.2907f, 66.30494f, 2.5656f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_DURNHOLDE_SENTRY, 2138.178f, 168.6046f, 66.30494f, 2.4783f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2140.1458f, 169.23643f, 66.30494f, 2.4958f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2107.9377f, 192.07530f, 66.30494f, 2.5481f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_DURNHOLDE_MAGE, 2142.3633f, 172.42600f, 66.30494f, 2.5481f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_DURNHOLDE_MAGE, 2109.8518f, 195.14030f, 66.30493f, 2.4260f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_DURNHOLDE_MAGE, 2108.4856f, 189.93457f, 66.30494f, 2.6878f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
                     break;
                 case EVENT_START_WP:
                     Start(true, true);
@@ -525,15 +572,28 @@ public:
                 case EVENT_SET_FACING:
                     if (Creature* armorer = me->FindNearestCreature(NPC_DURNHOLDE_ARMORER, 30.0f))
                     {
-                        armorer->AI()->Talk(SAY_ARMORER_THRALL);
+                        armorer->GetMotionMaster()->Clear();
+                        armorer->GetMotionMaster()->MoveIdle();
                         armorer->SetFacingToObject(me);
                         me->SetFacingToObject(armorer);
                     }
                     break;
+                case EVENT_ARMORER_SAY:
+                    if (Creature* armorer = me->FindNearestCreature(NPC_DURNHOLDE_ARMORER, 30.0f))
+                    {
+                        armorer->AI()->Talk(SAY_ARMORER_THRALL);
+                    }
+                    break;
+                case EVENT_THRALL_EMOTE:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                    break;
                 case EVENT_KILL_ARMORER:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
                     if (Creature* armorer = me->FindNearestCreature(NPC_DURNHOLDE_ARMORER, 30.0f))
+                    {
+                        DoCast(armorer, SPELL_KNOCKOUT_ARMORER, true);
                         armorer->SetStandState(UNIT_STAND_STATE_DEAD);
+                    }
                     break;
                 case EVENT_TALK_KILL_ARMORER:
                     Talk(SAY_KILL_ARMORER);
@@ -557,7 +617,29 @@ public:
                     break;
                 case EVENT_DRESSING_TALK:
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_THRALL_ARMORED);
+                    DoCastSelf(SPELL_SALVATION);
+                    me->SetFacingTo(5.6897f);
                     Talk(SAY_GO_ARMORED);
+                    if (Creature* sentry = me->SummonCreature(NPC_DURNHOLDE_SENTRY, 2185.916f, 140.38835f, 88.299866f, 5.9238f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
+                    {
+                        sentry->SetWalk(true);
+                        sentry->GetMotionMaster()->MovePoint(0, 2191.9712f, 138.11394f, 88.2125f);
+                    }
+                    if (Creature* warden = me->SummonCreature(NPC_DURNHOLDE_WARDEN, 2188.5586f, 138.88553f, 88.299866f, 1.6031f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
+                    {
+                        warden->SetWalk(true);
+                        warden->GetMotionMaster()->MovePoint(0, 2188.5068f, 140.48346f, 88.21251f);
+                    }
+                    if (Creature* veteran = me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2186.9856f, 142.199f, 88.299866f, 5.9049f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
+                    {
+                        veteran->SetWalk(true);
+                        veteran->GetMotionMaster()->MovePoint(0, 2190.48f, 140.81056f, 88.21251f);
+                    }
+                    if (Creature* mage = me->SummonCreature(NPC_DURNHOLDE_MAGE, 2189.7336f, 140.64551f, 88.299866f, 3.9532f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
+                    {
+                        mage->SetWalk(true);
+                        mage->GetMotionMaster()->MovePoint(0, 2187.8035f, 138.61118f, 88.21251f);
+                    }
                     break;
                 case EVENT_ENTER_MOUNT:
                     MountSelf();
@@ -571,43 +653,60 @@ public:
                     Talk(SAY_MOUNTS_UP);
                     break;
                 case EVENT_LOOK_1:
-                    me->SetFacingTo(5.058f);
+                    me->SetFacingTo(5.0090f);
+                    me->SetImmuneToNPC(true);
                     break;
                 case EVENT_MOVE_AROUND:
                     me->GetMotionMaster()->MovePoint(0, 2477.146f, 695.041f, 55.801f);
                     break;
                 case EVENT_LOOK_2:
-                    me->SetFacingTo(2.297f);
-                    break;
-                case EVENT_LOOK_3:
-                    me->SetFacingTo(0.64f);
+                    me->SetFacingTo(2.0071f);
                     break;
                 case EVENT_SUMMON_GUARDS:
                     SetRun(true);
-                    me->SummonCreature(NPC_TM_PROTECTOR, 2501.34f, 700.80f, 55.573f, 3.92f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_TM_LOOKOUT, 2503.02f, 699.11f, 55.57f, 3.92f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_TM_GUARDSMAN, 2503.04f, 702.495f, 50.63f, 3.92f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_TM_GUARDSMAN, 2504.72f, 700.806f, 55.62f, 3.92f, TEMPSUMMON_MANUAL_DESPAWN);
+                    me->SummonCreature(NPC_TM_PROTECTOR, 2501.5708f, 699.38086f, 55.64138f, 3.8571f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_TM_LOOKOUT, 2500.7002f, 698.26746f, 55.618248f, 3.7350f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    if (Creature* guardsman = me->SummonCreature(NPC_TM_GUARDSMAN, 2500.0908f, 699.9389f, 55.629555f, 4.2935f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
+                    {
+                        guardsman->CastSpell(guardsman, SPELL_DUMMY_AURA, true);
+                    }
+                    me->SummonCreature(NPC_TM_GUARDSMAN, 2499.0579f, 698.99725f, 55.611156f, 4.5727f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
                     summons.DoAction(ACTION_SET_IMMUNE_FLAG);
+                    break;
+                case EVENT_LOOK_3:
+                    me->SetFacingTo(0.3490f);
                     break;
                 case EVENT_SUMMON_TALK1:
                     if (Creature* summon = summons.GetCreatureWithEntry(NPC_TM_LOOKOUT))
                         summon->AI()->Talk(SAY_LOOKOUT_SAW);
-                    break;
-                case EVENT_SUMMON_TALK2:
-                    if (Creature* summon = summons.GetCreatureWithEntry(NPC_TM_LOOKOUT))
-                        summon->AI()->Talk(SAY_LOOKOUT_GO);
-                    summons.DoAction(ACTION_REMOVE_IMMUNE_FLAG);
+                    me->SetFacingTo(0.4363f);
                     break;
                 case EVENT_LOOK_4:
-                    me->SetFacingTo(0.41f);
+                    me->SetFacingTo(4.7510f);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_NO);
+                    Talk(SAY_EMOTE_HORSE_2);
+                    break;
+                case EVENT_SUMMON_TALK2:
+                    me->SetFacingTo(0.4363f);
+                    if (Creature* summon = summons.GetCreatureWithEntry(NPC_TM_LOOKOUT))
+                        summon->AI()->Talk(SAY_LOOKOUT_GO);
+                    me->SetImmuneToNPC(true);
+                    break;
+                case EVENT_GUARDS_MOVING:
+                    me->SetImmuneToNPC(false);
+                    summons.DoAction(ACTION_REMOVE_IMMUNE_FLAG);
+                    _barnWave = true;
+                    break;
+                case EVENT_LOOK_5:
+                    me->SetFacingTo(0.4886f);
                     Talk(SAY_ENTER_CHURCH);
                     break;
                 case EVENT_SUMMON_GUARDS_2:
-                    me->SummonCreature(NPC_TM_PROTECTOR, 2630.75f, 664.80f, 54.28f, 4.37f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_TM_LOOKOUT, 2632.20f, 661.98f, 54.30f, 4.37f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_TM_GUARDSMAN, 2630.02f, 662.75f, 54.28f, 4.37f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_TM_GUARDSMAN, 2632.86f, 664.05f, 54.31f, 4.37f, TEMPSUMMON_MANUAL_DESPAWN);
+                    me->SummonCreature(NPC_TM_PROTECTOR, 2630.75f, 664.80f, 54.28f, 4.37f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_TM_LOOKOUT, 2632.20f, 661.98f, 54.30f, 4.37f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_TM_GUARDSMAN, 2630.02f, 662.75f, 54.28f, 4.37f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_TM_GUARDSMAN, 2632.86f, 664.05f, 54.31f, 4.37f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
+                    _churchWave = true;
                     break;
                 case EVENT_SUMMON_TALK3:
                     if (Creature* summon = summons.GetCreatureWithEntry(NPC_TM_LOOKOUT))
@@ -625,7 +724,7 @@ public:
                     }
                     break;
                 case EVENT_THRALL_TALK_2:
-                    me->SetFacingTo(2.67f);
+                    me->SetFacingTo(2.60f);
                     Talk(SAY_EPOCH_WONDER);
                     break;
                 case EVENT_TARETHA_FALL:
@@ -638,16 +737,22 @@ public:
                     }
                     break;
                 case EVENT_THRALL_TALK_3:
-                    me->SetFacingTo(5.78f);
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
+                    {
+                        me->SetFacingToObject(Taretha);
+                    }
                     Talk(SAY_EPOCH_KILL_TARETHA);
                     break;
                 case EVENT_THRALL_MOVE_DOWN:
                     SetEscortPaused(false);
                     break;
                 case EVENT_EPOCH_INTRO:
-                    me->SetFacingTo(1.33f);
                     if (Creature* epoch = summons.GetCreatureWithEntry(NPC_EPOCH_HUNTER))
+                    {
+                        me->SetFacingToObject(epoch);
+                        epoch->SetFacingToObject(me);
                         epoch->AI()->Talk(SAY_EPOCH_ENTER3);
+                    }
                     break;
                 case EVENT_SUMMON_INFINITES:
                     me->SummonCreature(NPC_EPOCH_LOOKOUT, 2647.57f, 701.17f, 56.215f, 4.3f, TEMPSUMMON_MANUAL_DESPAWN);
@@ -715,15 +820,24 @@ public:
                                 if (Player* player = itr->GetSource())
                                     player->KilledMonsterCredit(20156);
 
-                        me->SetFacingTo(5.76f);
+                        if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
+                        {
+                            me->SetFacingToObject(Taretha);
+                        }
+                        me->SetImmuneToNPC(true);
                         break;
                     }
                 case EVENT_THRALL_TALK_4:
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_TALK);
                     Talk(SAY_GREET_TARETHA);
                     break;
                 case EVENT_TARETHA_TALK_1:
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
                     if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
+                    {
+                        Taretha->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         Taretha->AI()->Talk(SAY_TARETHA_TALK1);
+                    }
                     break;
                 case EVENT_THRALL_TALK_5:
                     Talk(SAY_CHAT_TARETHA1);
@@ -766,9 +880,13 @@ public:
                 case EVENT_TARETHA_TALK_2:
                     if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                     {
-                        Taretha->SetFacingTo(4.233f);
+                        Taretha->SetFacingToObject(me);
                         Taretha->AI()->Talk(SAY_TARETHA_TALK2);
                     }
+                    break;
+                case EVENT_EROZION_FLAGS:
+                    if (Creature* erozion = summons.GetCreatureWithEntry(NPC_EROZION))
+                        erozion->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     break;
             }
         }
@@ -832,7 +950,11 @@ public:
                     SetNextWaypoint(27, false);
                     break;
                 case ENCOUNTER_PROGRESS_SKARLOC_KILLED:
-                    me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
+                    if (Creature* mount = me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
+                    {
+                        mount->SetImmuneToNPC(true);
+                        mount->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    }
                     SetNextWaypoint(30, false);
                     break;
                 case ENCOUNTER_PROGRESS_TARREN_MILL:
@@ -853,6 +975,8 @@ public:
         SummonList summons;
 
         bool _mounted;
+        bool _barnWave;
+        bool _churchWave;
     };
 };
 
