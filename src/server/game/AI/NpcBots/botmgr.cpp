@@ -815,10 +815,13 @@ void BotMgr::_reviveBot(Creature* bot, WorldLocation* dest)
 
     bot->SetDisplayId(bot->GetNativeDisplayId());
     bot->ReplaceAllNpcFlags(NPCFlags(bot->GetCreatureTemplate()->npcflag));
-    bot->ClearUnitState(uint32(UNIT_STATE_ALL_STATE));
+    bot->ClearUnitState(UNIT_STATE_ALL_ERASABLE);
     bot->ReplaceAllUnitFlags(UnitFlags(0));
+    bot->SetLootRecipient(nullptr);
+    bot->ResetPlayerDamageReq();
     bot->SetPvP(bot->GetBotOwner()->IsPvP());
     bot->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
+    bot->Motion_Initialize();
     bot->setDeathState(ALIVE);
     //bot->GetBotAI()->Reset();
     bot->GetBotAI()->SetShouldUpdateStats();
