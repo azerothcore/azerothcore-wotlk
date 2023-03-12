@@ -111,6 +111,8 @@ class EventProcessor
         template<typename T>
         is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset, uint8 eventGroup) { AddEvent(new LambdaBasicEvent<T>(std::move(event)), CalculateTime(offset.count()), true, eventGroup); };
         template<typename T>
+        is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset, Milliseconds offset2, uint8 eventGroup) { AddEvent(new LambdaBasicEvent<T>(std::move(event)), CalculateTime(randtime(offset, offset2).count()), true, eventGroup); };
+        template<typename T>
         is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset) { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset); }
         template<typename T>
         is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset, Milliseconds offset2) { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset, offset2); }
