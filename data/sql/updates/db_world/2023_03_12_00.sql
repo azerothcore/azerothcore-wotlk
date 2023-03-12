@@ -1,3 +1,4 @@
+-- DB update 2023_03_11_09 -> 2023_03_12_00
 --
 DELETE FROM `achievement_criteria_data` WHERE `criteria_id` IN (3931,12859,4227,3929);
 INSERT INTO `achievement_criteria_data` (`criteria_id`,`type`,`value1`,`value2`,`ScriptName`) VALUES
