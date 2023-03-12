@@ -250,7 +250,9 @@ enum timeRift
 {
     EVENT_SUMMON_AT_RIFT        = 1,
     EVENT_CHECK_DEATH           = 2,
-    EVENT_SUMMON_BOSS           = 3
+    EVENT_SUMMON_BOSS           = 3,
+
+    SAY_RIFT_MOB_SUMMONED       = 0
 };
 
 struct npc_time_rift : public NullCreatureAI
@@ -398,6 +400,11 @@ struct npc_time_rift : public NullCreatureAI
                     if (summon->GetEntry() != NPC_AEONUS)
                     {
                         me->CastSpell(summon, SPELL_RIFT_CHANNEL, false);
+                    }
+
+                    if (summon->IsAIEnabled)
+                    {
+                        summon->AI()->Talk(SAY_RIFT_MOB_SUMMONED);
                     }
                 }
             }
