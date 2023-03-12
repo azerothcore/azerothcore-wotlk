@@ -56,6 +56,7 @@ public:
             _currentRift = 0;
             _shieldPercent = 100;
             _encounterNPCs.clear();
+            _canSpawnPortal = true; // Delay after bosses
         }
 
         void CleanupInstance()
@@ -113,7 +114,14 @@ public:
                     case DATA_CHRONO_LORD_DEJA:
                     case DATA_TEMPORUS:
                     {
-                        _scheduler.RescheduleGroup(CONTEXT_GROUP_RIFTS, 2min + 30s);
+                        _canSpawnPortal = false;
+
+                        _scheduler.Schedule(2min + 30s, [this](TaskContext)
+                        {
+                            _canSpawnPortal = true;
+                        });
+
+                        ScheduleNextPortal(2min + 30s);
 
                         for (ObjectGuid const& guid : _encounterNPCs)
                         {
@@ -163,6 +171,12 @@ public:
             {
                 if (GetCreature(DATA_MEDIVH))
                 {
+                    // Spawning prevented - there's a 150s delay after a boss dies.
+                    if (!_canSpawnPortal)
+                    {
+                        return;
+                    }
+
                     Position spawnPos;
                     if (!_availableRiftPositions.empty())
                     {
@@ -412,6 +426,7 @@ public:
         GuidSet _encounterNPCs;
         uint8 _currentRift;
         int8 _shieldPercent;
+        bool _canSpawnPortal;
         TaskScheduler _scheduler;
     };
 };
