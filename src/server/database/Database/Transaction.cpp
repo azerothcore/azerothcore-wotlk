@@ -110,7 +110,7 @@ bool TransactionTask::Execute()
             // Make sure only 1 async thread retries a transaction so they don't keep dead-locking each other
             std::lock_guard<std::mutex> lock(_deadlockLock);
 
-            for (Milliseconds loopDuration = 0s, startMSTime = GetTimeMS(); loopDuration <= DEADLOCK_MAX_RETRY_TIME_MS; loopDuration = GetMSTimeDiffToNow(startMSTime))
+            for (Milliseconds loopDuration{}, startMSTime = GetTimeMS(); loopDuration <= DEADLOCK_MAX_RETRY_TIME_MS; loopDuration = GetMSTimeDiffToNow(startMSTime))
             {
                 if (!TryExecute())
                     return true;
@@ -157,7 +157,7 @@ bool TransactionWithResultTask::Execute()
             // Make sure only 1 async thread retries a transaction so they don't keep dead-locking each other
             std::lock_guard<std::mutex> lock(_deadlockLock);
 
-            for (Milliseconds loopDuration = 0s, startMSTime = GetTimeMS(); loopDuration <= DEADLOCK_MAX_RETRY_TIME_MS; loopDuration = GetMSTimeDiffToNow(startMSTime))
+            for (Milliseconds loopDuration{}, startMSTime = GetTimeMS(); loopDuration <= DEADLOCK_MAX_RETRY_TIME_MS; loopDuration = GetMSTimeDiffToNow(startMSTime))
             {
                 if (!TryExecute())
                 {
