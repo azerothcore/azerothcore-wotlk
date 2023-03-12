@@ -263,7 +263,7 @@ class achievement_flirt_with_disaster_perf_check : public AchievementCriteriaScr
     public:
         achievement_flirt_with_disaster_perf_check() : AchievementCriteriaScript("achievement_flirt_with_disaster_perf_check") { }
 
-        bool OnCheck(Player* player, Unit* target, uint32 /*criteria_id*/) override
+        bool OnCheck(Player* player, Unit* /*target*/, uint32 /*criteria_id*/) override
         {
             if (!player)
                 return false;
