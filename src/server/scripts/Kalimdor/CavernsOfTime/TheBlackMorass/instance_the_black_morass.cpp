@@ -109,6 +109,26 @@ public:
                                 player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
                             }
                         });
+
+                        for (ObjectGuid const& guid : _encounterNPCs)
+                        {
+                            if (Creature* creature = instance->GetCreature(guid))
+                            {
+                                switch (creature->GetEntry())
+                                {
+                                    case NPC_RIFT_KEEPER_WARLOCK:
+                                    case NPC_RIFT_KEEPER_MAGE:
+                                    case NPC_RIFT_LORD:
+                                    case NPC_RIFT_LORD_2:
+                                    case NPC_TIME_RIFT:
+                                        creature->DespawnOrUnsummon();
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+
                         break;
                     }
                     case DATA_CHRONO_LORD_DEJA:
