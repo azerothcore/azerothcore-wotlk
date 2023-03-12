@@ -263,11 +263,6 @@ struct npc_time_rift : public NullCreatureAI
     void Reset() override
     {
         uint32 riftNumer = _instance->GetData(DATA_RIFT_NUMBER);
-        if (riftNumer >= 18)
-        {
-            me->DespawnOrUnsummon(30000);
-            return;
-        }
 
         if (riftNumer < 6)
         {
@@ -366,7 +361,7 @@ struct npc_time_rift : public NullCreatureAI
         switch (events.ExecuteEvent())
         {
             case EVENT_SUMMON_AT_RIFT:
-                if (_riftKeeperGUID.GetEntry() != NPC_AEONUS)
+                if (!_instance->GetCreature(DATA_AEONUS))
                 {
                     DoSelectSummon();
                     events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 15000);

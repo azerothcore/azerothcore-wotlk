@@ -56,6 +56,7 @@ public:
             _currentRift = 0;
             _shieldPercent = 100;
             _encounterNPCs.clear();
+            _canSpawnPortal = true; // Delay after bosses
         }
 
         void CleanupInstance()
@@ -108,12 +109,6 @@ public:
                                 player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
                             }
                         });
-                        break;
-                    }
-                    case DATA_CHRONO_LORD_DEJA:
-                    case DATA_TEMPORUS:
-                    {
-                        _scheduler.RescheduleGroup(CONTEXT_GROUP_RIFTS, 2min + 30s);
 
                         for (ObjectGuid const& guid : _encounterNPCs)
                         {
@@ -126,13 +121,36 @@ public:
                                     case NPC_RIFT_LORD:
                                     case NPC_RIFT_LORD_2:
                                     case NPC_TIME_RIFT:
+                                    case NPC_INFINITE_ASSASIN:
+                                    case NPC_INFINITE_ASSASIN_2:
+                                    case NPC_INFINITE_WHELP:
+                                    case NPC_INFINITE_CHRONOMANCER:
+                                    case NPC_INFINITE_CHRONOMANCER_2:
+                                    case NPC_INFINITE_EXECUTIONER:
+                                    case NPC_INFINITE_EXECUTIONER_2:
+                                    case NPC_INFINITE_VANQUISHER:
+                                    case NPC_INFINITE_VANQUISHER_2:
                                         creature->DespawnOrUnsummon();
-                                    break;
-                                default:
-                                    break;
+                                        break;
+                                    default:
+                                        break;
                                 }
                             }
                         }
+
+                        break;
+                    }
+                    case DATA_CHRONO_LORD_DEJA:
+                    case DATA_TEMPORUS:
+                    {
+                        _canSpawnPortal = false;
+
+                        _scheduler.Schedule(2min + 30s, [this](TaskContext)
+                        {
+                            _canSpawnPortal = true;
+                        });
+
+                        ScheduleNextPortal(2min + 30s);
                         break;
                     }
                     default:
@@ -163,6 +181,12 @@ public:
             {
                 if (GetCreature(DATA_MEDIVH))
                 {
+                    // Spawning prevented - there's a 150s delay after a boss dies.
+                    if (!_canSpawnPortal)
+                    {
+                        return;
+                    }
+
                     Position spawnPos;
                     if (!_availableRiftPositions.empty())
                     {
@@ -412,6 +436,7 @@ public:
         GuidSet _encounterNPCs;
         uint8 _currentRift;
         int8 _shieldPercent;
+        bool _canSpawnPortal;
         TaskScheduler _scheduler;
     };
 };
