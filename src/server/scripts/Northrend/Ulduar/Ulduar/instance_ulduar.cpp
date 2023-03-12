@@ -1141,7 +1141,7 @@ public:
                     DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, --m_algalonTimer);
                     if (m_algalonTimer)
                     {
-                        _events.RepeatEvent(1min);
+                        _events.Repeat(1min);
 
                         if (Creature* algalon = instance->GetCreature(m_uiAlgalonGUID))
                         {

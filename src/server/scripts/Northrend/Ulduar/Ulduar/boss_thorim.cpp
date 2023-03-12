@@ -890,7 +890,7 @@ public:
                     break;
                 case EVENT_SIF_FROSTBOLT_VALLEY:
                     me->CastSpell(me, Is25ManRaid() ? SPELL_FROSTBOLT_VALLEY : SPELL_FROSTBOLT_VALLEY_10, false);
-                    events.RepeatEvent(13s);
+                    events.Repeat(13s);
                     return;
                 case EVENT_SIF_BLIZZARD:
                     me->SummonCreature(NPC_SIF_BLIZZARD, 2108.7f, -280.04f, 419.42f, 0, TEMPSUMMON_TIMED_DESPAWN, 30000);
