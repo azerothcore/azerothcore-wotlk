@@ -16220,3 +16220,8 @@ std::string Player::GetDebugInfo() const
     sstr << Unit::GetDebugInfo();
     return sstr.str();
 }
+
+void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
+{
+    ChatHandler(GetSession()).SendSysMessage(msg, escapeCharacters);
+}
