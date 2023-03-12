@@ -275,7 +275,6 @@ class achievement_flirt_with_disaster_perf_check : public AchievementCriteriaScr
         }
 };
 
-
 void AddSC_achievement_scripts()
 {
     new achievement_resilient_victory();
