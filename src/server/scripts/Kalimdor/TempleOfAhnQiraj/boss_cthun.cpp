@@ -186,6 +186,13 @@ struct boss_eye_of_cthun : public BossAI
         ScheduleTask(true);
         BossAI::JustEngagedWith(who);
         _beamTarget = who->GetGUID();
+
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            Talk(0);
+        }, 10s, 10);
+
+        me->m_Events.CancelEventGroup(10);
     }
 
     void MoveInLineOfSight(Unit* who) override
