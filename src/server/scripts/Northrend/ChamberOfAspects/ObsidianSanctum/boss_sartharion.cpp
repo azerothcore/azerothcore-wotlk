@@ -619,7 +619,7 @@ public:
             summons.RemoveNotExisting();
             Talk(WHISPER_LAVA_CHURN);
             extraEvents.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 2s);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 9s);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 14s);
 
             // Send wave from left
             if (lastLavaSide == LAVA_RIGHT_SIDE)
