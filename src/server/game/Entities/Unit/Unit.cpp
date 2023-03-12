@@ -19956,17 +19956,27 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         pos = *exitPosition;
 
     // HACK
-    if (vehicle->GetVehicleInfo()->m_ID == 380) // Kologarn right arm
-        pos.Relocate(1776.0f, -24.0f, 448.75f, 0.0f);
-    else if (vehicle->GetVehicleInfo()->m_ID == 91) // Helsman's Ship
-        pos.Relocate(2802.18f, 7054.91f, -0.6f, 4.67f);
-    else if (vehicle->GetVehicleInfo()->m_ID == 349) // AT Mounts, dismount to the right
+    VehicleEntry const* vehicleInfo = vehicle->GetVehicleInfo();
+    if (vehicleInfo)
     {
-        float x = pos.GetPositionX() + 2.0f * cos(pos.GetOrientation() - M_PI / 2.0f);
-        float y = pos.GetPositionY() + 2.0f * std::sin(pos.GetOrientation() - M_PI / 2.0f);
-        float z = GetMapHeight(x, y, pos.GetPositionZ());
-        if (z > INVALID_HEIGHT)
-            pos.Relocate(x, y, z);
+        if (vehicleInfo->m_ID == 380) // Kologarn right arm
+        {
+            pos.Relocate(1776.0f, -24.0f, 448.75f, 0.0f);
+        }
+        else if (vehicleInfo->m_ID == 91) // Helsman's Ship
+        {
+            pos.Relocate(2802.18f, 7054.91f, -0.6f, 4.67f);
+        }
+        else if (vehicleInfo->m_ID == 349) // AT Mounts, dismount to the right
+        {
+            float x = pos.GetPositionX() + 2.0f * cos(pos.GetOrientation() - M_PI / 2.0f);
+            float y = pos.GetPositionY() + 2.0f * std::sin(pos.GetOrientation() - M_PI / 2.0f);
+            float z = GetMapHeight(x, y, pos.GetPositionZ());
+            if (z > INVALID_HEIGHT)
+            {
+                pos.Relocate(x, y, z);
+            }
+        }
     }
 
     AddUnitState(UNIT_STATE_MOVE);
@@ -19986,7 +19996,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 
     // xinef: hack for flameleviathan seat vehicle
-    if (vehicle->GetVehicleInfo()->m_ID != 341)
+    if (!vehicleInfo || vehicleInfo->m_ID != 341)
     {
         Movement::MoveSplineInit init(this);
         init.MoveTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
@@ -20008,16 +20018,18 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 
     // xinef: move fall, should we support all creatures that exited vehicle in air? Currently Quest Drag and Drop only, Air Assault quest
-    if (GetTypeId() == TYPEID_UNIT && !CanFly() &&
-            (vehicle->GetVehicleInfo()->m_ID == 113 || vehicle->GetVehicleInfo()->m_ID == 8 || vehicle->GetVehicleInfo()->m_ID == 290 || vehicle->GetVehicleInfo()->m_ID == 298))
+    if (GetTypeId() == TYPEID_UNIT && !CanFly() && vehicleInfo && (vehicleInfo->m_ID == 113 || vehicleInfo->m_ID == 8 || vehicleInfo->m_ID == 290 || vehicleInfo->m_ID == 298))
+    {
         GetMotionMaster()->MoveFall();
-    //GetMotionMaster()->MoveFall();            // Enable this once passenger positions are calculater properly (see above)
+    }
 
     if ((!player || !(player->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT)) && vehicle->GetBase()->HasUnitTypeMask(UNIT_MASK_MINION))
         if (((Minion*)vehicleBase)->GetOwner() == this)
         {
-            if (vehicle->GetVehicleInfo()->m_ID != 349)
+            if (!vehicleInfo || vehicleInfo->m_ID != 349)
+            {
                 vehicle->Dismiss();
+            }
             else if (vehicleBase->GetTypeId() == TYPEID_UNIT)
             {
                 vehicle->Uninstall();

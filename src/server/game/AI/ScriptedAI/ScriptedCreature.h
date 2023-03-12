@@ -139,6 +139,20 @@ public:
         }
     }
 
+    void DoForAllSummons(std::function<void(WorldObject*)> exec)
+    {
+        // We need to use a copy of SummonList here, otherwise original SummonList would be modified
+        StorageType listCopy = storage_;
+
+        for (auto const& guid : listCopy)
+        {
+            if (WorldObject* summon = ObjectAccessor::GetWorldObject(*me, guid))
+            {
+                exec(summon);
+            }
+        }
+    }
+
     void DoZoneInCombat(uint32 entry = 0);
     void RemoveNotExisting();
     bool HasEntry(uint32 entry) const;
