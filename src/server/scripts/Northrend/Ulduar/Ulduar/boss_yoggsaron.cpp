@@ -376,7 +376,6 @@ public:
         float _summonSpeed;
         uint8 _currentIllusion;
         bool _isIllusionReversed;
-        uint8 _PsychosisSpam;
 
         void AttackStart(Unit*) override { }
         void MoveInLineOfSight(Unit*) override { }
@@ -447,14 +446,13 @@ public:
         {
             if (!_secondPhase) // Phase 1 wipe
             {
-                Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
                     if(Creature* voice = me->FindNearestCreature(NPC_VOICE_OF_YOGG_SARON, 10))
                     {
-                        voice->AI()->Talk(WHISPER_VOICE_PHASE_1_WIPE, itr->GetSource());
+                        voice->AI()->Talk(WHISPER_VOICE_PHASE_1_WIPE, player);
                     }
-                }
+                });
             }
 
             summons.DoAction(ACTION_DESPAWN_ADDS);
@@ -478,7 +476,6 @@ public:
             _summonSpeed = 1.0f;
             _currentIllusion = urand(1, 3);
             _isIllusionReversed = urand(0, 1);
-            _PsychosisSpam = 0;
 
             if (m_pInstance)
             {
@@ -607,7 +604,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 {
                     Talk(SAY_SARA_KILL);
                 }
@@ -828,8 +825,7 @@ public:
                     events.Repeat(20s);
                     break;
                 case EVENT_SARA_P2_PSYCHOSIS:
-                    _PsychosisSpam = urand(0, 3); // Rarely said (as it's casted every 3.5s)
-                    if (_PsychosisSpam == urand(0, 3))
+                    if ((urand(0, 9)) == 0)  // Rarely said (as it's casted every 3.5s)
                     {
                         Talk(SAY_SARA_PSYCHOSIS_HIT);
                     }
@@ -991,7 +987,7 @@ public:
             if (_checkTimer >= 500 && !_isSummoning)
             {
                 Unit* who = me->SelectNearbyTarget(nullptr, 6.0f);
-                if (who && who->GetTypeId() == TYPEID_PLAYER && !me->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS) && !who->HasAura(SPELL_HODIR_FLASH_FREEZE))
+                if (who && who->IsPlayer() && !me->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS) && !who->HasAura(SPELL_HODIR_FLASH_FREEZE))
                 {
                     _isSummoning = true;
                     Talk(0, who);
@@ -2654,7 +2650,7 @@ public:
         {
             std::list<WorldObject*> tmplist;
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if ((*itr)->GetTypeId() == TYPEID_PLAYER && !(*itr)->ToPlayer()->HasAuraType(SPELL_AURA_AOE_CHARM) && !(*itr)->ToPlayer()->HasAura(SPELL_SANITY))
+                if ((*itr)->IsPlayer() && !(*itr)->ToPlayer()->HasAuraType(SPELL_AURA_AOE_CHARM) && !(*itr)->ToPlayer()->HasAura(SPELL_SANITY))
                     tmplist.push_back(*itr);
 
             targets.clear();
@@ -2721,7 +2717,7 @@ public:
         void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
             Unit* target = GetTarget();
-            if (!target || target->GetTypeId() != TYPEID_PLAYER)
+            if (!target || !target->IsPlayer())
                 return;
 
             if (Aura* aur = target->GetAura(SPELL_SANITY))
@@ -2860,7 +2856,7 @@ public:
 
         SpellCastResult CheckCast()
         {
-            if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+            if (!GetCaster()->IsPlayer())
                 return SPELL_FAILED_BAD_TARGETS;
 
             Unit* target = GetCaster()->ToPlayer()->GetSelectedUnit();
