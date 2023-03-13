@@ -605,9 +605,9 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (who->IsPlayer())
-                {
-                    Talk(SAY_SARA_KILL);
-                }
+            {
+                Talk(SAY_SARA_KILL);
+            }
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
