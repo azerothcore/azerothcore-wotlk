@@ -3352,6 +3352,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     // some spell specific modifiers
     float totalDamagePercentMod  = 100.0f;                  // applied to final bonus+weapon damage
     int32 spell_bonus = 0;                                  // bonus specific for spell
+    bool normalized = false;
 
     switch (m_spellInfo->SpellFamilyName)
     {
@@ -3437,6 +3438,18 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 {
                     spell_bonus += int32(0.08f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
                     spell_bonus += int32(0.13f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
+                }
+
+                switch (m_spellInfo->Id)
+                {
+                    case 20424: // Seal of Command
+                    case 42463: // Seal of Vengeance
+                    case 53739: // Seal of Corruption
+                    case 53385: // Divine Storm
+                        normalized = true;
+                        break;
+                    default:
+                        break;
                 }
                 break;
             }
@@ -3557,13 +3570,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
     }
 
-    bool normalized = false;
     float weaponDamagePercentMod = 100.0f;
     int32 fixed_bonus = 0;
-
-    // xinef: Divine Storm deals normalized damage
-    if (m_spellInfo->Id == 53385)
-        normalized = true;
 
     for (int j = 0; j < MAX_SPELL_EFFECTS; ++j)
     {
@@ -4939,7 +4947,8 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             m_caster->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), m_caster->GetPositionZ());
 
         ObjectGuid targetGUID = ObjectGuid::Empty;
-        if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetTarget() == unitTarget->GetGUID())
+        if (!m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) && !m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER &&
+            m_caster->GetTarget() == unitTarget->GetGUID())
         {
             targetGUID = unitTarget->GetGUID();
         }

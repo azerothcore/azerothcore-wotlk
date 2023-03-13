@@ -43,6 +43,10 @@ enum medivhMisc
     EVENT_OUTRO_8               = 17
 };
 
+static std::vector<uint32> firstWave = { NPC_INFINITE_ASSASIN, NPC_INFINITE_WHELP, NPC_INFINITE_CHRONOMANCER };
+static std::vector<uint32> secondWave = { NPC_INFINITE_EXECUTIONER, NPC_INFINITE_CHRONOMANCER, NPC_INFINITE_WHELP, NPC_INFINITE_ASSASIN };
+static std::vector<uint32> thirdWave = { NPC_INFINITE_EXECUTIONER, NPC_INFINITE_VANQUISHER, NPC_INFINITE_CHRONOMANCER, NPC_INFINITE_ASSASIN  };
+
 class NpcRunToHome : public BasicEvent
 {
 public:
@@ -91,7 +95,7 @@ struct npc_medivh_bm : public ScriptedAI
         events.Reset();
         me->CastSpell(me, SPELL_MANA_SHIELD, true);
 
-        if (_instance->GetData(TYPE_AEONUS) != DONE)
+        if (_instance->GetBossState(DATA_AEONUS) != DONE)
         {
             me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
         }
@@ -101,8 +105,6 @@ struct npc_medivh_bm : public ScriptedAI
 
     void JustSummoned(Creature* summon) override
     {
-        _instance->SetGuidData(DATA_SUMMONED_NPC, summon->GetGUID());
-
         if (summon->GetEntry() == NPC_DP_CRYSTAL_STALKER)
         {
             summon->DespawnOrUnsummon(25000);
@@ -119,14 +121,9 @@ struct npc_medivh_bm : public ScriptedAI
         }
     }
 
-    void SummonedCreatureDespawn(Creature* summon) override
-    {
-        _instance->SetGuidData(DATA_DELETED_NPC, summon->GetGUID());
-    }
-
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!events.Empty() || _instance->GetData(TYPE_AEONUS) == DONE)
+        if (!events.Empty() || _instance->GetBossState(DATA_AEONUS) == DONE)
         {
             return;
         }
@@ -252,7 +249,10 @@ private:
 enum timeRift
 {
     EVENT_SUMMON_AT_RIFT        = 1,
-    EVENT_CHECK_DEATH           = 2
+    EVENT_CHECK_DEATH           = 2,
+    EVENT_SUMMON_BOSS           = 3,
+
+    SAY_RIFT_MOB_SUMMONED       = 0
 };
 
 struct npc_time_rift : public NullCreatureAI
@@ -264,19 +264,32 @@ struct npc_time_rift : public NullCreatureAI
 
     void Reset() override
     {
-        if (_instance->GetData(DATA_RIFT_NUMBER) >= 18)
+        uint32 riftNumer = _instance->GetData(DATA_RIFT_NUMBER);
+
+        if (riftNumer < 6)
         {
-            me->DespawnOrUnsummon(30000);
-            return;
+            waveMobs = firstWave;
+        }
+        else if (riftNumer < 12)
+        {
+            waveMobs = secondWave;
+        }
+        else
+        {
+            waveMobs = thirdWave;
         }
 
-        events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 16000);
-        events.ScheduleEvent(EVENT_CHECK_DEATH, 8000);
+        waveMobIndex = 0;
+        events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 16s);
+        events.ScheduleEvent(EVENT_SUMMON_BOSS, 6s);
     }
 
-    void SetGUID(ObjectGuid guid, int32) override
+    void JustSummoned(Creature* creature) override
     {
-        _riftKeeperGUID = guid;
+        if (creature->GetEntry() != NPC_AEONUS && _riftKeeperGUID.IsEmpty())
+        {
+            _riftKeeperGUID = creature->GetGUID();
+        }
     }
 
     void DoSummonAtRift(uint32 entry)
@@ -284,21 +297,20 @@ struct npc_time_rift : public NullCreatureAI
         Position pos = me->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
 
         if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 150000))
-            if (_instance)
+        {
+            if (Creature* medivh = _instance->GetCreature(DATA_MEDIVH))
             {
-                if (Unit* medivh = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_MEDIVH)))
-                {
-                    float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
-                    summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * std::sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
-                    summon->GetMotionMaster()->MoveTargetedHome(true);
-                    summon->SetReactState(REACT_DEFENSIVE);
-                }
+                float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
+                summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * std::sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
+                summon->GetMotionMaster()->MoveTargetedHome(true);
+                summon->SetReactState(REACT_DEFENSIVE);
             }
+        }
     }
 
     void DoSelectSummon()
     {
-        uint32 entry = RAND(NPC_INFINITE_ASSASIN, NPC_INFINITE_WHELP, NPC_INFINITE_CRONOMANCER, NPC_INFINITE_EXECUTIONER, NPC_INFINITE_VANQUISHER);
+        uint32 entry = waveMobs[waveMobIndex];
         if (entry == NPC_INFINITE_WHELP)
         {
             DoSummonAtRift(entry);
@@ -307,7 +319,41 @@ struct npc_time_rift : public NullCreatureAI
         }
         else
         {
+            if (urand(0, 1))
+            {
+                switch (entry)
+                {
+                    case NPC_INFINITE_ASSASIN:
+                        entry = NPC_INFINITE_ASSASIN_2;
+                        break;
+                    case NPC_INFINITE_CHRONOMANCER:
+                        entry = NPC_INFINITE_CHRONOMANCER_2;
+                        break;
+                    case NPC_INFINITE_EXECUTIONER:
+                        entry = NPC_INFINITE_EXECUTIONER_2;
+                        break;
+                    case NPC_INFINITE_VANQUISHER:
+                        entry = NPC_INFINITE_VANQUISHER_2;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             DoSummonAtRift(entry);
+        }
+
+        if (++waveMobIndex >= waveMobs.size())
+        {
+            waveMobIndex = 0;
+        }
+    }
+
+    void SummonedCreatureDies(Creature* creature, Unit* /*killer*/) override
+    {
+        if (creature->GetGUID() == _riftKeeperGUID)
+        {
+            me->DespawnOrUnsummon(0);
         }
     }
 
@@ -317,27 +363,51 @@ struct npc_time_rift : public NullCreatureAI
         switch (events.ExecuteEvent())
         {
             case EVENT_SUMMON_AT_RIFT:
-                DoSelectSummon();
-                events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 15000);
-                break;
-            case EVENT_CHECK_DEATH:
-                if (!me->HasUnitState(UNIT_STATE_CASTING))
+                if (!_instance->GetCreature(DATA_AEONUS))
                 {
-                    Creature* riftKeeper = ObjectAccessor::GetCreature(*me, _riftKeeperGUID);
-                    if (!riftKeeper || !riftKeeper->IsAlive())
-                    {
-                        _instance->SetGuidData(DATA_RIFT_KILLED, me->GetGUID());
-
-                        me->DespawnOrUnsummon(0);
+                    DoSelectSummon();
+                    events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 15000);
+                }
+                break;
+            case EVENT_SUMMON_BOSS:
+            {
+                int32 entry = 0;
+                switch (_instance->GetData(DATA_RIFT_NUMBER))
+                {
+                    case 6:
+                        entry = _instance->GetBossState(DATA_CHRONO_LORD_DEJA) == DONE ? (me->GetMap()->IsHeroic() ? NPC_INFINITE_CHRONO_LORD : -NPC_CHRONO_LORD_DEJA) : NPC_CHRONO_LORD_DEJA;
                         break;
-                    }
-                    else
+                    case 12:
+                        entry = _instance->GetBossState(DATA_TEMPORUS) == DONE ? (me->GetMap()->IsHeroic() ? NPC_INFINITE_TIMEREAVER : -NPC_TEMPORUS) : NPC_TEMPORUS;
+                        break;
+                    case 18:
+                        entry = NPC_AEONUS;
+                        break;
+                    default:
+                        entry = RAND(NPC_RIFT_KEEPER_WARLOCK, NPC_RIFT_KEEPER_MAGE, NPC_RIFT_LORD, NPC_RIFT_LORD_2);
+                        break;
+                }
+
+                Position pos = me->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
+
+                if (Creature* summon = me->SummonCreature(std::abs(entry), pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3 * MINUTE * IN_MILLISECONDS))
+                {
+                    if (entry < 0)
                     {
-                        me->CastSpell(riftKeeper, SPELL_RIFT_CHANNEL, false);
+                        summon->SetLootMode(0);
+                    }
+
+                    if (summon->GetEntry() != NPC_AEONUS)
+                    {
+                        me->CastSpell(summon, SPELL_RIFT_CHANNEL, false);
+                    }
+
+                    if (summon->IsAIEnabled)
+                    {
+                        summon->AI()->Talk(SAY_RIFT_MOB_SUMMONED);
                     }
                 }
-                events.ScheduleEvent(EVENT_CHECK_DEATH, 500);
-                break;
+            }
         }
     }
 
@@ -345,6 +415,8 @@ private:
     EventMap _events;
     InstanceScript* _instance;
     ObjectGuid _riftKeeperGUID;
+    std::vector<uint32> waveMobs;
+    uint8 waveMobIndex;
 };
 
 struct npc_black_morass_summoned_add : public SmartAI

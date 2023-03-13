@@ -36,15 +36,6 @@ enum DataTypes
     DATA_NETHERMANCER_SEPRETHREA        = 3,
     DATA_PATHALEON_THE_CALCULATOR       = 4,
     MAX_ENCOUNTER                       = 5,
-
-    ENCOUNTER_PASSAGE_NOT_STARTED       = 0,
-    ENCOUNTER_PASSAGE_PHASE1            = 1,
-    ENCOUNTER_PASSAGE_PHASE2            = 2,
-    ENCOUNTER_PASSAGE_PHASE3            = 3,
-    ENCOUNTER_PASSAGE_PHASE4            = 4,
-    ENCOUNTER_PASSAGE_PHASE5            = 5,
-    ENCOUNTER_PASSAGE_PHASE6            = 6,
-    ENCOUNTER_PASSAGE_DONE              = 7,
 };
 
 enum NpcIds
@@ -67,12 +58,11 @@ enum GameobjectIds
 
 enum SpellIds
 {
-    SPELL_TELEPORT_VISUAL               = 35517
+    SPELL_TELEPORT_VISUAL               = 34427
 };
 
 enum DataIndex
 {
-    DATA_INDEX_PASSAGE_ENCOUNTER = 0,
     MAX_DATA_INDEXES
 };
 

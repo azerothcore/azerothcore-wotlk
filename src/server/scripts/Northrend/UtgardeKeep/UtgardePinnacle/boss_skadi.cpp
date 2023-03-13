@@ -175,7 +175,7 @@ public:
 
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->SetInCombatWithZone();
-                events.RescheduleEvent(EVENT_SKADI_START, 2000);
+                events.RescheduleEvent(EVENT_SKADI_START, 2s);
             }
         }
 
@@ -184,9 +184,9 @@ public:
             if (param == ACTION_PHASE2)
             {
                 SecondPhase = true;
-                events.ScheduleEvent(EVENT_SKADI_CRUSH, 8000);
-                events.ScheduleEvent(EVENT_SKADI_SPEAR, 10000);
-                events.ScheduleEvent(EVENT_SKADI_WHIRLWIND, 15000);
+                events.ScheduleEvent(EVENT_SKADI_CRUSH, 8s);
+                events.ScheduleEvent(EVENT_SKADI_SPEAR, 10s);
+                events.ScheduleEvent(EVENT_SKADI_WHIRLWIND, 15s);
 
                 if (me->GetVictim())
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -222,7 +222,7 @@ public:
                 case EVENT_SKADI_CRUSH:
                     {
                         me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_CRUSH_H : SPELL_CRUSH_N, false);
-                        events.RepeatEvent(8000);
+                        events.Repeat(8s);
                         break;
                     }
                 case EVENT_SKADI_SPEAR:
@@ -230,14 +230,14 @@ public:
                         if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_POISONED_SPEAR_H : SPELL_POISONED_SPEAR_N, false);
 
-                        events.RepeatEvent(10000);
+                        events.Repeat(10s);
                         break;
                     }
                 case EVENT_SKADI_WHIRLWIND:
                     {
                         me->CastSpell(me, IsHeroic() ? SPELL_WHIRLWIND_H : SPELL_WHIRLWIND_N, false);
-                        events.RepeatEvent(15000 + rand() % 5000);
-                        events.DelayEvents(10000);
+                        events.Repeat(15s, 20s);
+                        events.DelayEvents(10s);
                         break;
                     }
             }
@@ -303,8 +303,8 @@ public:
         {
             if (param == ACTION_START_EVENT)
             {
-                events.RescheduleEvent(EVENT_GRAUF_CHECK, 5000);
-                events.RescheduleEvent(EVENT_GRAUF_START, 2000);
+                events.RescheduleEvent(EVENT_GRAUF_CHECK, 5s);
+                events.RescheduleEvent(EVENT_GRAUF_START, 2s);
             }
             else if (param == ACTION_REMOVE_SKADI)
             {
@@ -312,7 +312,7 @@ public:
                     if (Creature* skadi = passenger->ToCreature())
                         skadi->AI()->Talk(SAY_DRAKE_DEATH);
                 me->GetMotionMaster()->MovePoint(10, 480.0f, -513.0f, 108.0f);
-                events.ScheduleEvent(EVENT_GRAUF_REMOVE_SKADI, 2000);
+                events.ScheduleEvent(EVENT_GRAUF_REMOVE_SKADI, 2s);
             }
             else if (param == ACTION_MYGIRL_ACHIEVEMENT)
             {
@@ -445,7 +445,7 @@ public:
                 case EVENT_GRAUF_CHECK:
                     {
                         CheckPlayers();
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                         break;
                     }
                 case EVENT_GRAUF_START:
@@ -455,8 +455,8 @@ public:
 
                         SpawnHelpers(0);
                         SpawnHelpers(0);
-                        events.ScheduleEvent(EVENT_GRAUF_MOVE, 15000);
-                        events.ScheduleEvent(EVENT_GRAUF_SUMMON_HELPERS, 20000);
+                        events.ScheduleEvent(EVENT_GRAUF_MOVE, 15s);
+                        events.ScheduleEvent(EVENT_GRAUF_SUMMON_HELPERS, 20s);
                         break;
                     }
                 case EVENT_GRAUF_MOVE:
@@ -475,13 +475,13 @@ public:
                             m_pInstance->SetData(SKADI_IN_RANGE, 0);
 
                         currentPos = targetPoint;
-                        events.RepeatEvent(25000);
+                        events.Repeat(25s);
                         break;
                     }
                 case EVENT_GRAUF_SUMMON_HELPERS:
                     {
                         SpawnHelpers(1);
-                        events.RepeatEvent(15000);
+                        events.Repeat(15s);
                         break;
                     }
                 case EVENT_GRAUF_REMOVE_SKADI:

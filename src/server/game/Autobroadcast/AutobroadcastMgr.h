@@ -37,8 +37,8 @@ public:
     void SendAutobroadcasts();
 
 private:
-    void SendWorldAnnouncement(std::string_view msg);
-    void SendNotificationAnnouncement(std::string_view msg);
+    void SendWorldAnnouncement(std::string msg);
+    void SendNotificationAnnouncement(std::string msg);
 
     typedef std::map<uint8, std::string> AutobroadcastsMap;
     typedef std::map<uint8, uint8> AutobroadcastsWeightMap;
