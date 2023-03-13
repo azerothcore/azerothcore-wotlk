@@ -1,3 +1,4 @@
+-- DB update 2023_03_12_00 -> 2023_03_13_00
 -- Yogg Saron Vision -- Add missing text
 DELETE FROM `creature_text` WHERE `CreatureID`=33552;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
