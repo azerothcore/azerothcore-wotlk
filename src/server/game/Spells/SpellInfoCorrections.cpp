@@ -4471,6 +4471,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
+    // Death Ray Warning Visual, Death Ray Damage Visual
+    ApplySpellFix({ 63882, 63886 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
+    });
+
     // Quest - Healing Salve
     ApplySpellFix({ 29314 }, [](SpellInfo* spellInfo)
     {
