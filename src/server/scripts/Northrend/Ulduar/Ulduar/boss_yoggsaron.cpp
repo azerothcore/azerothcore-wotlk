@@ -448,7 +448,7 @@ public:
             {
                 me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
-                    if(Creature* voice = me->FindNearestCreature(NPC_VOICE_OF_YOGG_SARON, 10))
+                    if (Creature* voice = me->FindNearestCreature(NPC_VOICE_OF_YOGG_SARON, 10.0f))
                     {
                         voice->AI()->Talk(WHISPER_VOICE_PHASE_1_WIPE, player);
                     }
