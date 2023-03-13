@@ -4595,6 +4595,26 @@ private:
     uint32 _aura;
 };
 
+inline int32 SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLevel, uint32 YellowLevel)
+{
+    if (SkillValue >= GrayLevel)
+    {
+        return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_GREY) * 10;
+    }
+
+    if (SkillValue >= GreenLevel)
+    {
+        return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_GREEN) * 10;
+    }
+
+    if (SkillValue >= YellowLevel)
+    {
+        return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_YELLOW) * 10;
+    }
+
+    return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_ORANGE) * 10;
+}
+
 // 818 Basic Campfire
 class spell_gen_basic_campfire : public SpellScript
 {
@@ -4612,9 +4632,20 @@ class spell_gen_basic_campfire : public SpellScript
         }
     }
 
+    void ModifyCookingSkill(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            uint32 SkillValue = player->GetPureSkillValue(SKILL_COOKING);
+            int32 chance = SkillGainChance(SkillValue, 75, 50, 25);
+            player->UpdateSkillPro(SKILL_COOKING, chance, 1);
+        }
+    }
+
     void Register() override
     {
         OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_gen_basic_campfire::ModDest, EFFECT_0, TARGET_DEST_CASTER_SUMMON);
+        OnEffectHit += SpellEffectFn(spell_gen_basic_campfire::ModifyCookingSkill, EFFECT_0, SPELL_EFFECT_TRANS_DOOR);
     }
 };
 
