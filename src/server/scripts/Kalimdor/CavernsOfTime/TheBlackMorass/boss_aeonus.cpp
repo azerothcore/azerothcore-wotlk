@@ -21,7 +21,6 @@
 
 enum Enums
 {
-    SAY_ENTER                   = 0,
     SAY_AGGRO                   = 1,
     SAY_BANISH                  = 2,
     SAY_SLAY                    = 3,
@@ -53,7 +52,7 @@ struct boss_aeonus : public BossAI
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
-        Talk(SAY_ENTER);
+        me->SetReactState(REACT_DEFENSIVE);
 
         if (Creature* medivh = instance->GetCreature(DATA_MEDIVH))
         {
