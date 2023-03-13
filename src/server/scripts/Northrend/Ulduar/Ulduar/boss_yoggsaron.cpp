@@ -183,6 +183,7 @@ enum NPCsGOs
     NPC_SANITY_WELL                     = 33991,
     NPC_YOGG_SARON                      = 33288,
     NPC_VOICE_OF_YOGG_SARON             = 33280,
+    NPC_YOGG_SARON_VISION               = 33552,
 
     NPC_CRUSHER_TENTACLE                = 33966, // 50 secs ?
     NPC_CONSTRICTOR_TENTACLE            = 33983, // 15-20 secs ?
@@ -226,57 +227,6 @@ enum NPCsGOs
     SARA_TRANSFORM_MODEL                = 29182,
 };
 
-enum YoggSaronSounds
-{
-    // SARA
-    SARA_AGGRO                          = 15775,
-    SARA_P1_CAST1                       = 15773,
-    SARA_P1_CAST2                       = 15774,
-    SARA_P1_KILL1                       = 15778,
-    SARA_P1_KILL2                       = 15779,
-
-    SARA_P2_START                       = 15754,
-    SARA_P2_CAST1                       = 15776,
-    SARA_P2_CAST2                       = 15777,
-
-    // YOGG-SARON
-    YS_OPEN_PORTALS                     = 15756,
-    YS_P3_START                         = 15755,
-    YS_P3_DEAFENING_ROAR                = 15758,
-    YS_P3_DEATH                         = 15761,
-    YS_P3_LUNATIC_GAZE                  = 15757,
-
-    VOYS_P1_WIPE                        = 15780,
-    VOYS_INSANE1                        = 15759,
-    VOYS_INSANE2                        = 15760,
-
-    // VISIONS
-    // STORMWIND
-    YS_V1_1                             = 15762,
-    YS_V1_2                             = 15763,
-    YS_V1_3                             = 15764,
-    GAR_1                               = 15538,
-    GAR_2                               = 15539,
-    GAR_3                               = 15540,
-    GAR_4                               = 15541,
-    LL_1                                = 15585,
-
-    // CHAMBER
-    NEL_1                               = 15631,
-    NEL_2                               = 15632,
-    YSE_1                               = 15784,
-    MAL_1                               = 15610,
-    YS_V2_1                             = 15765,
-
-    // ICECROWN
-    LK_1                                = 15598,
-    LK_2                                = 15599,
-    YS_V3_1                             = 15766,
-    YS_V3_2                             = 15767,
-    IC_1                                = 15470,
-    IC_2                                = 15471,
-};
-
 enum Misc
 {
     ACTION_UNSUMMON_CLOUDS              = -16,
@@ -305,6 +255,9 @@ enum Misc
 
     CRITERIA_NOT_GETTING_OLDER          = 21001,
 
+    // YOGG-SARON (laugh)
+    YS_P3_LUNATIC_GAZE                  = 15757,
+
     DATA_GET_KEEPERS_COUNT              = 1,
     DATA_GET_CURRENT_ILLUSION           = 2,
     DATA_GET_SARA_PHASE                 = 3,
@@ -328,6 +281,68 @@ static LocationsXY yoggPortalLoc[] =
     {2000.66f, -29.68f, 325.5f},
     {1999.88f, -19.61f, 325.5f},
     {1961.37f, -19.54f, 325.5f}
+};
+
+enum Texts
+{
+    // Sara
+    SAY_SARA_ULDUAR_SCREAM_0            = 0, // Unused
+    SAY_SARA_ULDUAR_SCREAM_1            = 1, // Unused
+    SAY_SARA_AGGRO                      = 2,
+    SAY_SARA_FERVOR_HIT                 = 3,
+    SAY_SARA_ANGER                      = 4, // Comment in DB is for BLESSING_HIT, but it's wrong.
+    SAY_SARA_KILL                       = 5,
+    SAY_SARA_TRANSFORM_1                = 6, // "I am the lucid dream."
+    SAY_SARA_TRANSFORM_2                = 7, // "The monster in your nightmares."
+    SAY_SARA_TRANSFORM_3                = 8, // "The fiend of a thousand faces."
+    SAY_SARA_TRANSFORM_4                = 9, // "Cower before my true form."
+    SAY_SARA_DEATH_RAY                  = 10,
+    SAY_SARA_PSYCHOSIS_HIT              = 11,
+
+    // Voice of Yogg-Saron
+    WHISPER_VOICE_PHASE_1_WIPE          = 0,
+    WHISPER_VOICE_INSANE                = 1,
+
+    // Brain of Yogg-Saron
+    EMOTE_YOGG_SARON_BRAIN_SHATTERED    = 0,
+
+    // Yogg-Saron
+    SAY_YOGG_SARON_SPAWN                = 0,
+    SAY_YOGG_SARON_MADNESS              = 1, // Open Portals
+    EMOTE_YOGG_SARON_MADNESS            = 2,
+    SAY_YOGG_SARON_PHASE_3              = 3,
+    SAY_YOGG_SARON_DEAFENING_ROAR       = 4,
+    EMOTE_YOGG_SARON_DEAFENING_ROAR     = 5,
+    SAY_YOGG_SARON_DEATH                = 6,
+    EMOTE_YOGG_SARON_EMPOWERING_SHADOWS = 7, // Shadow Beacon
+    EMOTE_YOGG_SARON_BERSERK            = 8,
+
+    // Visions - Text is in order of Roleplay
+    // The Assassination of King Llane vision
+    SAY_GARONA_1                        = 0,
+    SAY_GARONA_2                        = 1,
+    SAY_GARONA_3                        = 2,
+    SAY_YOGG_1                          = 0,
+    SAY_YOGG_2                          = 1,
+    SAY_LLANE_1                         = 0,
+    SAY_GARONA_4                        = 3,
+    SAY_YOGG_3                          = 2,
+
+    // The Forging of the Demon Soul vision
+    SAY_NEL_1                           = 0,
+    SAY_YAS_1                           = 0,
+    SAY_NEL_2                           = 1,
+    SAY_MAL_1                           = 0,
+    SAY_YOGG_4                          = 5,
+
+    // The Tortured Champion vision
+    SAY_LK_1                            = 0,
+    SAY_IC_1                            = 0,
+    SAY_IC_2                            = 1,
+    SAY_LK_2                            = 1,
+    SAY_YOGG_5                          = 3,
+    SAY_YOGG_6                          = 4,
+
 };
 
 const Position Middle = {1980.28f, -25.5868f, 329.397f, M_PI * 1.5f};
@@ -429,6 +444,17 @@ public:
 
         void Reset() override
         {
+            if (!_secondPhase) // Phase 1 wipe
+            {
+                me->GetMap()->DoForAllPlayers([&](Player* player)
+                {
+                    if (Creature* voice = me->FindNearestCreature(NPC_VOICE_OF_YOGG_SARON, 10.0f))
+                    {
+                        voice->AI()->Talk(WHISPER_VOICE_PHASE_1_WIPE, player);
+                    }
+                });
+            }
+
             summons.DoAction(ACTION_DESPAWN_ADDS);
             events.Reset();
             summons.DespawnAll();
@@ -484,8 +510,7 @@ public:
             events.ScheduleEvent(EVENT_SARA_P1_SUMMON, 0ms, 0, EVENT_PHASE_ONE);
             events.SetPhase(EVENT_PHASE_ONE);
 
-            me->Yell("The time to strike at the head of the beast will soon be upon us! Focus your anger and hatred on his minions!", LANG_UNIVERSAL);
-            me->PlayDirectSound(SARA_AGGRO);
+            Talk(SAY_SARA_AGGRO);
             me->setActive(true);
         }
 
@@ -577,37 +602,11 @@ public:
                 _currentIllusion = _currentIllusion == 1 ? 3 : (_currentIllusion - 1);
         }
 
-        void SpellSounds()
-        {
-            if (urand(0, 9))
-                return;
-
-            if (urand(0, 1))
-            {
-                me->Yell(_secondPhase ? "Tremble, mortals, before the coming of the end!" : "Yes! YES! Show them no mercy! Give no pause to your attacks!", LANG_UNIVERSAL);
-                me->PlayDirectSound(_secondPhase ? SARA_P2_CAST2 : SARA_P1_CAST1);
-            }
-            else
-            {
-                me->Yell(_secondPhase ? "Suffocate upon your own hate!" : "Let hatred and rage guide your blows!", LANG_UNIVERSAL);
-                me->PlayDirectSound(_secondPhase ? SARA_P2_CAST1 : SARA_P1_CAST2);
-            }
-        }
-
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
-                return;
-
-            if (urand(0, 1))
+            if (who->IsPlayer())
             {
-                me->Yell("Could they have been saved?", LANG_UNIVERSAL);
-                me->PlayDirectSound(SARA_P1_KILL2);
-            }
-            else
-            {
-                me->Yell("Powerless to act...", LANG_UNIVERSAL);
-                me->PlayDirectSound(SARA_P1_KILL1);
+                Talk(SAY_SARA_KILL);
             }
         }
 
@@ -675,9 +674,10 @@ public:
                 return;
 
             // Illusion shatters (param - stun time)
-            WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, "Illusion shatters and a path to the central chamber opens!");
-            me->SendMessageToSetInRange(&data, 500, false);
+            if (Creature* yoggb = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_BRAIN_OF_YOGG_SARON)))
+            {
+                yoggb->AI()->Talk(EMOTE_YOGG_SARON_BRAIN_SHATTERED);
+            }
 
             uint32 timer = events.GetNextEventTime(EVENT_SARA_P2_OPEN_PORTALS);
             uint32 portalTime = (timer > events.GetTimer() ? timer - events.GetTimer() : 0);
@@ -706,8 +706,7 @@ public:
                         cr->SetVisible(false);
 
                     _p2TalkTimer++;
-                    me->Yell("I am the lucid dream.", LANG_UNIVERSAL);
-                    me->PlayDirectSound(SARA_P2_START);
+                    Talk(SAY_SARA_TRANSFORM_1);
                 }
                 return;
             }
@@ -747,18 +746,18 @@ public:
                 {
                     EntryCheckPredicate pred(NPC_OMINOUS_CLOUD);
                     summons.DoAction(ACTION_UNSUMMON_CLOUDS, pred);
-                    me->Yell("The monster in your nightmares.", LANG_UNIVERSAL);
+                    Talk(SAY_SARA_TRANSFORM_2);
                     _p2TalkTimer = 20000;
                 }
                 else if (_p2TalkTimer >= 25000 && _p2TalkTimer < 40000)
                 {
                     summons.DespawnEntry(NPC_OMINOUS_CLOUD);
-                    me->Yell("The fiend of a thousand faces.", LANG_UNIVERSAL);
+                    Talk(SAY_SARA_TRANSFORM_3);
                     _p2TalkTimer = 40000;
                 }
                 else if (_p2TalkTimer >= 44500 && _p2TalkTimer < 60000)
                 {
-                    me->Yell("Cower before my true form.", LANG_UNIVERSAL);
+                    Talk(SAY_SARA_TRANSFORM_4);
                     _p2TalkTimer = 60000;
                 }
                 else if (_p2TalkTimer >= 64000)
@@ -795,8 +794,19 @@ public:
                 case EVENT_SARA_P1_SPELLS:
                     {
                         uint32 spell = RAND(SPELL_SARAS_ANGER_TARGET_SELECTOR, SPELL_SARAS_BLESSING_TARGET_SELECTOR, SPELL_SARAS_FAVOR_TARGET_SELECTOR);
+                        if (urand(0, 2))
+                        {
+                            if (spell == SPELL_SARAS_ANGER_TARGET_SELECTOR)
+                            {
+                                Talk(SAY_SARA_ANGER);
+                            }
+                            else if (spell == SPELL_SARAS_FAVOR_TARGET_SELECTOR)
+                            {
+                                Talk(SAY_SARA_FERVOR_HIT);
+                            }
+                        }
+
                         me->CastCustomSpell(spell, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
-                        SpellSounds();
                         events.RepeatEvent(me->GetMap()->Is25ManRaid() ? urand(0, 3000) : 4000 + urand(0, 2000));
                         break;
                     }
@@ -815,11 +825,15 @@ public:
                     events.Repeat(20s);
                     break;
                 case EVENT_SARA_P2_PSYCHOSIS:
-                    SpellSounds();
+                    if ((urand(0, 9)) == 0)  // Rarely said (as it's casted every 3.5s)
+                    {
+                        Talk(SAY_SARA_PSYCHOSIS_HIT);
+                    }
                     me->CastCustomSpell(SPELL_PSYCHOSIS, SPELLVALUE_MAX_TARGETS, 1, me, false);
                     events.Repeat(3500ms);
                     break;
                 case EVENT_SARA_P2_DEATH_RAY:
+                    Talk(SAY_SARA_DEATH_RAY);
                     SummonDeathOrbs();
                     events.Repeat(20s);
                     break;
@@ -857,7 +871,7 @@ public:
                     me->SetOrientation(M_PI);
                     me->SetDisplayId(SARA_TRANSFORM_MODEL);
 
-                    me->SendMonsterMove(me->GetPositionX(), me->GetPositionY(), 355, 2000, SPLINEFLAG_FLYING);
+                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
                     me->SetPosition(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
 
                     SpawnTentacle(NPC_CRUSHER_TENTACLE);
@@ -875,6 +889,13 @@ public:
                     events.ScheduleEvent(EVENT_SARA_P2_OPEN_PORTALS, 60000, 0, EVENT_PHASE_TWO);
                     break;
                 case EVENT_SARA_P1_BERSERK:
+                    if (me->GetInstanceScript())
+                    {
+                        if (Creature* yogg = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON)))
+                        {
+                            yogg->AI()->Talk(EMOTE_YOGG_SARON_BERSERK);
+                        }
+                    }
                     me->CastSpell(me, SPELL_EXTINGUISH_ALL_LIFE, true);
                     events.Repeat(5s);
                     break;
@@ -966,7 +987,7 @@ public:
             if (_checkTimer >= 500 && !_isSummoning)
             {
                 Unit* who = me->SelectNearbyTarget(nullptr, 6.0f);
-                if (who && who->GetTypeId() == TYPEID_PLAYER && !me->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS) && !who->HasAura(SPELL_HODIR_FLASH_FREEZE))
+                if (who && who->IsPlayer() && !me->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS) && !who->HasAura(SPELL_HODIR_FLASH_FREEZE))
                 {
                     _isSummoning = true;
                     Talk(0, who);
@@ -1079,8 +1100,7 @@ public:
             summons.DespawnAll();
             events.Reset();
 
-            me->Yell("Your fate is sealed. The end of days is finally upon you and ALL who inhabit this miserable little seedling. Uulwi ifis halahs gag erh'ongg w'ssh.", LANG_UNIVERSAL);
-            me->PlayDirectSound(YS_P3_DEATH);
+            Talk(SAY_YOGG_SARON_DEATH);
 
             if (m_pInstance)
             {
@@ -1116,12 +1136,12 @@ public:
             }
             else if (param == ACTION_YOGG_SARON_START_YELL)
             {
-                me->Yell("BOW DOWN BEFORE THE GOD OF DEATH!", LANG_UNIVERSAL);
+                Talk(SAY_YOGG_SARON_SPAWN);
             }
             else if (param == ACTION_YOGG_SARON_OPEN_PORTAL_YELL)
             {
-                me->Yell("MADNESS WILL CONSUME YOU!", LANG_UNIVERSAL);
-                me->PlayDirectSound(YS_OPEN_PORTALS);
+                Talk(SAY_YOGG_SARON_MADNESS);
+                Talk(EMOTE_YOGG_SARON_MADNESS);
             }
             else if (param == ACTION_YOGG_SARON_START_P3)
             {
@@ -1135,8 +1155,7 @@ public:
                 events.ScheduleEvent(EVENT_YS_SUMMON_GUARDIAN, 0);
                 _thirdPhase = true;
 
-                me->Yell("Look upon the true face of death and know that your end comes soon!", LANG_UNIVERSAL);
-                me->PlayDirectSound(YS_P3_START);
+                Talk(SAY_YOGG_SARON_PHASE_3);
             }
             else if (param == ACTION_YOGG_SARON_HARD_MODE)
             {
@@ -1181,20 +1200,19 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_YS_LUNATIC_GAZE:
-                    me->Yell("Hoohehehahahaha... AHAHAHAHAHAHA!", LANG_UNIVERSAL);
                     me->PlayDirectSound(YS_P3_LUNATIC_GAZE);
                     me->CastSpell(me, SPELL_LUNATIC_GAZE_YS, true);
                     events.Repeat(12s);
                     break;
                 case EVENT_YS_DEAFENING_ROAR:
-                    me->TextEmote("Yogg-Saron opens his mouth wide!", nullptr, true);
-                    me->Yell("Eternal suffering awaits!", LANG_UNIVERSAL);
-                    me->PlayDirectSound(YS_P3_DEAFENING_ROAR);
+                    Talk(SAY_YOGG_SARON_DEAFENING_ROAR);
+                    Talk(EMOTE_YOGG_SARON_DEAFENING_ROAR);
                     me->CastSpell(me, SPELL_DEAFENING_ROAR, false);
                     events.Repeat(50s);
                     break;
                 case EVENT_YS_SHADOW_BEACON:
                     events.Repeat(5s);
+                    Talk(EMOTE_YOGG_SARON_EMPOWERING_SHADOWS);
                     me->CastCustomSpell(SPELL_SHADOW_BEACON, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 3), me, false);
                     break;
                 case EVENT_YS_SUMMON_GUARDIAN:
@@ -1286,6 +1304,9 @@ public:
             me->SummonCreature(NPC_YSERA, 2116, -25.8f, 242.647f, 3.14f);
             me->SummonCreature(NPC_NELTHARION, 2103.6f, -35.8f, 242.64f, 1.5f);
             me->SummonCreature(NPC_MALYGOS, 2103.6f, -15.8f, 242.64f, 4.7f);
+
+            // Yogg Vision
+            me->SummonCreature(NPC_YOGG_SARON_VISION, 2109.695f, -25.09549f, 222.3250f, 0);
         }
 
         void PrepareIceCrownIllusion()
@@ -1317,6 +1338,9 @@ public:
             // Others
             me->SummonCreature(NPC_LICH_KING, 1906.98f, -153, 240, 4.2f);
             me->SummonCreature(NPC_IMMOLATED_CHAMPION, 1902.03f, -161.7f, 240, 1.07f);
+
+            // Yogg Vision
+            me->SummonCreature(NPC_YOGG_SARON_VISION, 1906.226f, -155.8941f, 223.4727, 0);
         }
 
         void PrepareStormwindIllusion()
@@ -1345,6 +1369,9 @@ public:
             // Others
             me->SummonCreature(NPC_GARONA, 1928.58f, 65.64f, 242.37f, 2.1f);
             me->SummonCreature(NPC_KING_LLANE, 1925.14f, 71.74f, 242.37f, 5.17f);
+
+            // Yogg Vision
+            me->SummonCreature(NPC_YOGG_SARON_VISION, 1929.160f, 67.75694f, 221.7322f, 0);
         }
 
         void DoAction(int32 param) override
@@ -1909,17 +1936,12 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        ObjectGuid _championGUID;
-        ObjectGuid _yoggGUID;
 
         void Reset() override
         {
             _running = true;
             _checkTimer = 0;
             _step = 0;
-            _championGUID.Clear();
-            if (me->GetInstanceScript())
-                _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
 
         void NextStep(const uint32 time)
@@ -1928,34 +1950,14 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
+        void Say(uint8 text, uint32 id)
         {
-            Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
+            Creature* creature = me->FindNearestCreature(id, 50);
             if (!creature)
                 return;
 
-            WorldPacket data;
-            if (creature->GetGUID() != _yoggGUID)
-            {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
-                creature->SendMessageToSetInRange(&data, 90, true);
-            }
-            else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
-            {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
-                cr->SendMessageToSetInRange(&data, 90, true);
-            }
-            else
+            creature->AI()->Talk(text);
                 return;
-
-            Playsound(soundId);
-        }
-
-        void Playsound(uint32 soundId)
-        {
-            WorldPacket data(SMSG_PLAY_SOUND, 4);
-            data << uint32(soundId);
-            me->SendMessageToSetInRange(&data, 90, false);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1976,29 +1978,27 @@ public:
                         NextStep(5000);
                         break;
                     case 1:
-                        if (Creature* cr = me->FindNearestCreature(NPC_IMMOLATED_CHAMPION, 50))
-                            _championGUID = cr->GetGUID();
-                        Say("Your resilience is admirable.", ObjectGuid::Empty, false, LK_1);
+                        Say(SAY_LK_1, NPC_LICH_KING);
                         NextStep(7000);
                         break;
                     case 2:
-                        Say("Arrrrrrgh!", _championGUID, true, IC_1);
+                        Say(SAY_IC_1, NPC_IMMOLATED_CHAMPION);
                         NextStep(6000);
                         break;
                     case 3:
-                        Say("I'm not afraid of you!", _championGUID, false, IC_2);
+                        Say(SAY_IC_2, NPC_IMMOLATED_CHAMPION);
                         NextStep(6500);
                         break;
                     case 4:
-                        Say("I will break you as I broke him.", ObjectGuid::Empty, false, LK_2);
+                        Say(SAY_LK_2, NPC_LICH_KING);
                         NextStep(7500);
                         break;
                     case 5:
-                        Say("Yrr n'lyeth... shuul anagg!", _yoggGUID, false, YS_V3_1);
+                        Say(SAY_YOGG_5, NPC_YOGG_SARON_VISION);
                         NextStep(5000);
                         break;
                     case 6:
-                        Say("He will learn... no king rules forever; only death is eternal!", _yoggGUID, false, YS_V3_2);
+                        Say(SAY_YOGG_6, NPC_YOGG_SARON_VISION);
                         _running = false;
                         break;
                 }
@@ -2023,17 +2023,12 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        ObjectGuid _garonaGUID;
-        ObjectGuid _yoggGUID;
 
         void Reset() override
         {
             _running = true;
             _checkTimer = 0;
             _step = 0;
-            _garonaGUID.Clear();
-            if (me->GetInstanceScript())
-                _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
 
         void NextStep(const uint32 time)
@@ -2042,34 +2037,14 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
+        void Say(uint8 text, uint32 id)
         {
-            Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
+            Creature* creature = me->FindNearestCreature(id, 50);
             if (!creature)
                 return;
 
-            WorldPacket data;
-            if (creature->GetGUID() != _yoggGUID)
-            {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
-                creature->SendMessageToSetInRange(&data, 90, true);
-            }
-            else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
-            {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
-                cr->SendMessageToSetInRange(&data, 90, true);
-            }
-            else
+            creature->AI()->Talk(text);
                 return;
-
-            Playsound(soundId);
-        }
-
-        void Playsound(uint32 soundId)
-        {
-            WorldPacket data(SMSG_PLAY_SOUND, 4);
-            data << uint32(soundId);
-            me->SendMessageToSetInRange(&data, 90, false);
         }
 
         void UpdateAI(uint32 diff) override
@@ -2090,37 +2065,35 @@ public:
                         NextStep(5000);
                         break;
                     case 1:
-                        if (Creature* cr = me->FindNearestCreature(NPC_GARONA, 50))
-                            _garonaGUID = cr->GetGUID();
-                        Say("Bad news sire. The clans are united under Blackhand in this assault. They will stand together until Stormwind has fallen.", _garonaGUID, false, GAR_1);
+                        Say(SAY_GARONA_1, NPC_GARONA);
                         NextStep(2000);
                         break;
                     case 2:
-                        Playsound(GAR_2);
+                        Say(SAY_GARONA_2, NPC_GARONA);
                         NextStep(6500);
                         break;
                     case 3:
-                        Say("Gul'dan is bringing up his warlocks by nightfall. Until then, the Blackrock clan will be trying to take the Eastern Wall.", _garonaGUID, false, GAR_3);
+                        Say(SAY_GARONA_3, NPC_GARONA);
                         NextStep(11000);
                         break;
                     case 4:
-                        Say("A thousand deaths... or one murder.", _yoggGUID, false, YS_V1_1);
+                        Say(SAY_YOGG_1, NPC_YOGG_SARON_VISION);
                         NextStep(2500);
                         break;
                     case 5:
-                        Playsound(YS_V1_2);
+                        Say(SAY_YOGG_2, NPC_YOGG_SARON_VISION);
                         NextStep(2500);
                         break;
                     case 6:
-                        Say("We will hold until the reinforcements come. As long as men with stout hearts are manning the walls and throne Stormwind will hold.", ObjectGuid::Empty, false, LL_1);
+                        Say(SAY_LLANE_1, NPC_KING_LLANE);
                         NextStep(10000);
                         break;
                     case 7:
-                        Say("The orc leaders agree with your assessment.", _garonaGUID, false, GAR_4);
+                        Say(SAY_GARONA_4, NPC_GARONA);
                         NextStep(5000);
                         break;
                     case 8:
-                        Say("Your petty quarrels only make me stronger!", _yoggGUID, false, YS_V1_3);
+                        Say(SAY_YOGG_3, NPC_YOGG_SARON_VISION);
                         _running = false;
                         break;
                 }
@@ -2145,15 +2118,12 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        ObjectGuid _yoggGUID;
 
         void Reset() override
         {
             _running = true;
             _checkTimer = 0;
             _step = 0;
-            if (me->GetInstanceScript())
-                _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
 
         void NextStep(const uint32 time)
@@ -2162,34 +2132,14 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
+        void Say(uint8 text, uint32 id)
         {
-            Creature* creature = !guid ? ObjectAccessor::GetCreature(*me, guid) : me;
+            Creature* creature = me->FindNearestCreature(id, 50);
             if (!creature)
                 return;
 
-            WorldPacket data;
-            if (creature->GetGUID() != _yoggGUID)
-            {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
-                creature->SendMessageToSetInRange(&data, 90, true);
-            }
-            else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
-            {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
-                cr->SendMessageToSetInRange(&data, 90, true);
-            }
-            else
+            creature->AI()->Talk(text);
                 return;
-
-            Playsound(soundId);
-        }
-
-        void Playsound(uint32 soundId)
-        {
-            WorldPacket data(SMSG_PLAY_SOUND, 4);
-            data << uint32(soundId);
-            me->SendMessageToSetInRange(&data, 90, false);
         }
 
         void UpdateAI(uint32 diff) override
@@ -2210,25 +2160,23 @@ public:
                         NextStep(5000);
                         break;
                     case 1:
-                        Say("It is done... All have been given that which must be given. I now seal the Dragon Soul forever...", ObjectGuid::Empty, false, NEL_1);
+                        Say(SAY_NEL_1, NPC_NELTHARION);
                         NextStep(10000);
                         break;
                     case 2:
-                        if (Creature* cr = me->FindNearestCreature(NPC_YSERA, 50))
-                            Say("That terrible glow... should that be?", cr->GetGUID(), false, YSE_1);
+                        Say(SAY_YAS_1, NPC_YSERA);
                         NextStep(4000);
                         break;
                     case 3:
-                        Say("For it to be as it must, yes.", ObjectGuid::Empty, false, NEL_2);
+                        Say(SAY_NEL_2, NPC_NELTHARION);
                         NextStep(4000);
                         break;
                     case 4:
-                        if (Creature* cr = me->FindNearestCreature(NPC_MALYGOS, 50))
-                            Say("It is a weapon like no other. It must be like no other.", cr->GetGUID(), false, MAL_1);
+                        Say(SAY_MAL_1, NPC_MALYGOS);
                         NextStep(8000);
                         break;
                     case 5:
-                        Say("His brood learned their lesson before too long, you shall soon learn yours!", _yoggGUID, false, YS_V2_1);
+                        Say(SAY_YOGG_4, NPC_YOGG_SARON_VISION);
                         _running = false;
                         break;
                 }
@@ -2272,7 +2220,7 @@ public:
                     if (Creature* yogg = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON)))
                         yogg->AI()->DoAction(ACTION_FAILED_DRIVE_ME_CRAZY);
 
-                events.ScheduleEvent(40, 8000);
+                events.ScheduleEvent(40, 2s);
                 _targets.push_back(target->GetGUID());
             }
         }
@@ -2289,8 +2237,7 @@ public:
 
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
                         {
-                            me->PlayDirectSound(15760, player);
-                            me->Whisper("Destroy them minion, your master commands it!", LANG_UNIVERSAL, player);
+                            Talk(WHISPER_VOICE_INSANE, player);
                         }
                         break;
                     }
@@ -2695,8 +2642,6 @@ public:
                 return;
 
             Unit* caster = GetCaster();
-            caster->PlayDirectSound(VOYS_INSANE1, target);
-            caster->Whisper("Your will is no longer you own...", LANG_UNIVERSAL, target);
             caster->CastSpell(target, SPELL_INSANE1, true);
             target->CastSpell(target, SPELL_INSANE2, true);
         }
@@ -2705,7 +2650,7 @@ public:
         {
             std::list<WorldObject*> tmplist;
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if ((*itr)->GetTypeId() == TYPEID_PLAYER && !(*itr)->ToPlayer()->HasAuraType(SPELL_AURA_AOE_CHARM) && !(*itr)->ToPlayer()->HasAura(SPELL_SANITY))
+                if ((*itr)->IsPlayer() && !(*itr)->ToPlayer()->HasAuraType(SPELL_AURA_AOE_CHARM) && !(*itr)->ToPlayer()->HasAura(SPELL_SANITY))
                     tmplist.push_back(*itr);
 
             targets.clear();
@@ -2772,7 +2717,7 @@ public:
         void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
             Unit* target = GetTarget();
-            if (!target || target->GetTypeId() != TYPEID_PLAYER)
+            if (!target || !target->IsPlayer())
                 return;
 
             if (Aura* aur = target->GetAura(SPELL_SANITY))
@@ -2911,7 +2856,7 @@ public:
 
         SpellCastResult CheckCast()
         {
-            if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+            if (!GetCaster()->IsPlayer())
                 return SPELL_FAILED_BAD_TARGETS;
 
             Unit* target = GetCaster()->ToPlayer()->GetSelectedUnit();
