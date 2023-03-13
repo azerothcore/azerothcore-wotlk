@@ -117,6 +117,7 @@ struct boss_faction_championsAI : public ScriptedAI
         }
     }
 
+    /// @todo - Convert to std::chrono
     void EventMapGCD(EventMap& e, uint32 delay, uint32 gcd = 0)
     {
         e.DelayEventsToMax(delay, gcd);
@@ -278,14 +279,14 @@ public:
         {
             SetEquipmentSlots(false, 51799, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_LIFEBLOOM, urand(5000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_NOURISH, urand(5000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_REGROWTH, urand(5000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_REJUVENATION, urand(5000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_TRANQUILITY, urand(25000, 40000));
-            events.RescheduleEvent(EVENT_SPELL_BARKSKIN, 10000);
-            events.RescheduleEvent(EVENT_SPELL_THORNS, urand(5000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_NATURE_GRASP, urand(5000, 15000));
+            events.RescheduleEvent(EVENT_SPELL_LIFEBLOOM, 5s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_NOURISH, 5s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_REGROWTH, 5s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_REJUVENATION, 5s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_TRANQUILITY, 25s, 40s);
+            events.RescheduleEvent(EVENT_SPELL_BARKSKIN, 10s);
+            events.RescheduleEvent(EVENT_SPELL_THORNS, 5s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_NATURE_GRASP, 5s, 15s);
         }
 
         EventMap events;
@@ -313,51 +314,51 @@ public:
                 case EVENT_SPELL_LIFEBLOOM:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_LIFEBLOOM, 40.0f) )
                         me->CastSpell(target, SPELL_LIFEBLOOM, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_NOURISH:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_NOURISH, 40.0f) )
                         me->CastSpell(target, SPELL_NOURISH, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_REGROWTH:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_REGROWTH, 40.0f) )
                         me->CastSpell(target, SPELL_REGROWTH, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_REJUVENATION:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_REJUVENATION, 40.0f) )
                         me->CastSpell(target, SPELL_REJUVENATION, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_THORNS:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_THORNS, 30.0f) )
                         me->CastSpell(target, SPELL_THORNS, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_TRANQUILITY:
                     me->CastSpell(me, SPELL_TRANQUILITY, false);
-                    events.RepeatEvent(urand(120000, 180000));
+                    events.Repeat(2min, 3min);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_BARKSKIN:
                     if( HealthBelowPct(50) )
                     {
                         me->CastSpell(me, SPELL_BARKSKIN, false);
-                        events.RepeatEvent(60000);
+                        events.Repeat(1min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_NATURE_GRASP:
                     me->CastSpell(me, SPELL_NATURE_GRASP, false);
-                    events.RepeatEvent(60000);
+                    events.Repeat(1min);
                     EventMapGCD(events, 1500);
                     break;
             }
@@ -408,13 +409,13 @@ public:
         {
             SetEquipmentSlots(false, 49992, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_HEALING_WAVE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_RIPTIDE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_SPIRIT_CLEANSE, urand(10000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_HEROISM_OR_BLOODLUST, urand(25000, 40000));
-            events.RescheduleEvent(EVENT_SPELL_HEX, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_EARTH_SHIELD, urand(15000, 25000));
-            events.RescheduleEvent(EVENT_SPELL_EARTH_SHOCK, urand(3000, 10000));
+            events.RescheduleEvent(EVENT_SPELL_HEALING_WAVE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_RIPTIDE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_SPIRIT_CLEANSE, 10s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_HEROISM_OR_BLOODLUST, 25s, 40s);
+            events.RescheduleEvent(EVENT_SPELL_HEX, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_EARTH_SHIELD, 15s, 25s);
+            events.RescheduleEvent(EVENT_SPELL_EARTH_SHOCK, 3s, 10s);
         }
 
         EventMap events;
@@ -442,19 +443,19 @@ public:
                 case EVENT_SPELL_HEALING_WAVE:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HEALING_WAVE, 40.0f) )
                         me->CastSpell(target, SPELL_HEALING_WAVE, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_RIPTIDE:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_RIPTIDE, 40.0f) )
                         me->CastSpell(target, SPELL_RIPTIDE, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_SPIRIT_CLEANSE:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_SPIRIT_CLEANSE, 40.0f) )
                         me->CastSpell(target, SPELL_SPIRIT_CLEANSE, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_HEROISM_OR_BLOODLUST:
@@ -462,25 +463,25 @@ public:
                         me->CastSpell((Unit*)nullptr, SPELL_HEROISM, true);
                     else
                         me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, true);
-                    events.RepeatEvent(600000);
+                    events.Repeat(10min);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_HEX:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true) )
                         me->CastSpell(target, SPELL_HEX, false);
-                    events.RepeatEvent(45000);
+                    events.Repeat(45s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_EARTH_SHIELD:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_EARTH_SHIELD, 40.0f) )
                         me->CastSpell(target, SPELL_EARTH_SHIELD, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_EARTH_SHOCK:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_EARTH_SHOCK, false);
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.Repeat(5s, 10s);
                     EventMapGCD(events, 1500);
                     break;
             }
@@ -530,14 +531,14 @@ public:
         {
             SetEquipmentSlots(false, 50771, 47079, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_HAND_OF_FREEDOM, urand(10000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_BUBBLE, 10000);
-            events.RescheduleEvent(EVENT_SPELL_CLEANSE, urand(10000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_FLASH_OF_LIGHT, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_HOLY_LIGHT, urand(5000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_HOLY_SHOCK, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_HAND_OF_PROTECTION, urand(20000, 35000));
-            events.RescheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, urand(10000, 20000));
+            events.RescheduleEvent(EVENT_SPELL_HAND_OF_FREEDOM, 10s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_BUBBLE, 10s);
+            events.RescheduleEvent(EVENT_SPELL_CLEANSE, 10s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_FLASH_OF_LIGHT, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_HOLY_LIGHT, 5s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_HOLY_SHOCK, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_HAND_OF_PROTECTION, 20s, 35s);
+            events.RescheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 10s, 20s);
         }
 
         EventMap events;
@@ -565,62 +566,62 @@ public:
                 case EVENT_SPELL_HAND_OF_FREEDOM:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HAND_OF_FREEDOM, 30.0f) )
                         me->CastSpell(target, SPELL_HAND_OF_FREEDOM, false);
-                    events.RepeatEvent(25000);
+                    events.Repeat(25s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_BUBBLE:
                     if( HealthBelowPct(25) )
                     {
                         me->CastSpell(me, SPELL_BUBBLE, false);
-                        events.RepeatEvent(300000);
+                        events.Repeat(5min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(10000);
+                        events.Repeat(10s);
                     break;
                 case EVENT_SPELL_CLEANSE:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_CLEANSE, 40.0f) )
                         me->CastSpell(target, SPELL_CLEANSE, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FLASH_OF_LIGHT:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_FLASH_OF_LIGHT, 40.0f) )
                         me->CastSpell(target, SPELL_FLASH_OF_LIGHT, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_HOLY_LIGHT:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HOLY_LIGHT, 40.0f) )
                         me->CastSpell(target, SPELL_HOLY_LIGHT, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_HOLY_SHOCK:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HOLY_SHOCK, 40.0f) )
                         me->CastSpell(target, SPELL_HOLY_SHOCK, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_HAND_OF_PROTECTION:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HAND_OF_PROTECTION, 40.0f) )
                     {
                         me->CastSpell(target, SPELL_HAND_OF_PROTECTION, false);
-                        events.RepeatEvent(300000);
+                        events.Repeat(5min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(10000);
+                        events.Repeat(10s);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE:
                     if( Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 15.0f, true) )
                     {
                         me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE, false);
-                        events.RepeatEvent(40000);
+                        events.Repeat(40s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(10000);
+                        events.Repeat(10s);
                     break;
             }
 
@@ -665,12 +666,12 @@ public:
         {
             SetEquipmentSlots(false, 49992, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_RENEW, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_SHIELD, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_FLASH_HEAL, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_DISPEL, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_MANA_BURN, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_PSYCHIC_SCREAM, 10000);
+            events.RescheduleEvent(EVENT_SPELL_RENEW, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_SHIELD, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_FLASH_HEAL, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_DISPEL, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_MANA_BURN, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_PSYCHIC_SCREAM, 10s);
         }
 
         EventMap events;
@@ -698,46 +699,46 @@ public:
                 case EVENT_SPELL_RENEW:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_RENEW, 40.0f) )
                         me->CastSpell(target, SPELL_RENEW, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_SHIELD:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_SHIELD, 40.0f) )
                         me->CastSpell(target, SPELL_SHIELD, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FLASH_HEAL:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_FLASH_HEAL, 40.0f) )
                         me->CastSpell(target, SPELL_FLASH_HEAL, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_DISPEL:
                     if( Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
                         me->CastSpell(target, SPELL_DISPEL, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_MANA_BURN:
                     if( Unit* target = SelectEnemyCaster(false, 30.0f) )
                     {
                         me->CastSpell(target, SPELL_MANA_BURN, false);
-                        events.RepeatEvent(urand(10000, 15000));
+                        events.Repeat(10s, 15s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_PSYCHIC_SCREAM:
                     if( HealthBelowPct(50) && EnemiesInRange(8.0f) >= 3 )
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_PSYCHIC_SCREAM, false);
-                        events.RepeatEvent(30000);
+                        events.Repeat(30s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
             }
 
@@ -785,15 +786,15 @@ public:
         {
             SetEquipmentSlots(false, 50040, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_SILENCE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_VAMPIRIC_TOUCH, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_SW_PAIN, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_MIND_FLAY, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_MIND_BLAST, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_HORROR, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_DISPERSION, 10000);
-            events.RescheduleEvent(EVENT_SPELL_DISPEL, urand(5000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_PSYCHIC_SCREAM, 10000);
+            events.RescheduleEvent(EVENT_SPELL_SILENCE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_VAMPIRIC_TOUCH, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_SW_PAIN, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_MIND_FLAY, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_MIND_BLAST, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_HORROR, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_DISPERSION, 10s);
+            events.RescheduleEvent(EVENT_SPELL_DISPEL, 5s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_PSYCHIC_SCREAM, 10s);
         }
 
         EventMap events;
@@ -822,72 +823,72 @@ public:
                     if( Unit* target = SelectEnemyCaster(false, 30.0f) )
                     {
                         me->CastSpell(target, SPELL_SILENCE, false);
-                        events.RepeatEvent(45000);
+                        events.Repeat(45s);
                         EventMapGCD(events, 1500);
                         break;
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_VAMPIRIC_TOUCH:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_VAMPIRIC_TOUCH, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_SW_PAIN:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_SW_PAIN, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_MIND_FLAY:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_MIND_FLAY, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_MIND_BLAST:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_MIND_BLAST, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_HORROR:
                     if( me->GetVictim() && me->GetExactDist2d(me->GetVictim()) <= 30.0f )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_HORROR, false);
-                        events.RepeatEvent(120000);
+                        events.Repeat(2min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(10000);
+                        events.Repeat(10s);
                     break;
                 case EVENT_SPELL_DISPERSION:
                     if( HealthBelowPct(25) )
                     {
                         me->CastSpell(me, SPELL_DISPERSION, false);
-                        events.RepeatEvent(180000);
+                        events.Repeat(3min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_DISPEL:
                     if( Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
                         me->CastSpell(target, SPELL_DISPEL, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_PSYCHIC_SCREAM:
                     if( EnemiesInRange(8.0f) >= 3 )
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_PSYCHIC_SCREAM, false);
-                        events.RepeatEvent(30000);
+                        events.Repeat(30s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
             }
 
@@ -939,15 +940,15 @@ public:
         {
             SetEquipmentSlots(false, 49992, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_HELLFIRE, 10000);
-            events.RescheduleEvent(EVENT_SPELL_CORRUPTION, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_CURSE_OF_AGONY, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_CURSE_OF_EXHAUSTION, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_FEAR, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_SEARING_PAIN, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_SHADOW_BOLT, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_UNSTABLE_AFFLICTION, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_SUMMON_FELHUNTER, 0);
+            events.RescheduleEvent(EVENT_SPELL_HELLFIRE, 10s);
+            events.RescheduleEvent(EVENT_SPELL_CORRUPTION, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_CURSE_OF_AGONY, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_CURSE_OF_EXHAUSTION, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_FEAR, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_SEARING_PAIN, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_SHADOW_BOLT, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_UNSTABLE_AFFLICTION, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_SUMMON_FELHUNTER, 0ms);
         }
 
         EventMap events;
@@ -986,52 +987,52 @@ public:
                     if( EnemiesInRange(9.0f) >= 3 )
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_HELLFIRE, false);
-                        events.RepeatEvent(30000);
+                        events.Repeat(30s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_CORRUPTION:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_CORRUPTION, false);
-                    events.RepeatEvent(urand(10000, 20000));
+                    events.Repeat(10s, 20s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CURSE_OF_AGONY:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_CURSE_OF_AGONY, false);
-                    events.RepeatEvent(urand(10000, 20000));
+                    events.Repeat(10s, 20s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CURSE_OF_EXHAUSTION:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_CURSE_OF_EXHAUSTION, false);
-                    events.RepeatEvent(urand(10000, 20000));
+                    events.Repeat(10s, 20s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FEAR:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true) )
                         me->CastSpell(target, SPELL_FEAR, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_SEARING_PAIN:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_SEARING_PAIN, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_UNSTABLE_AFFLICTION:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_UNSTABLE_AFFLICTION, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
             }
@@ -1083,14 +1084,14 @@ public:
         {
             SetEquipmentSlots(false, 47524, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_ARCANE_BARRAGE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_ARCANE_BLAST, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_BLINK, 10000);
-            events.RescheduleEvent(EVENT_SPELL_COUNTERSPELL, urand(10000, 20000));
-            events.RescheduleEvent(EVENT_SPELL_FROSTBOLT, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_ICE_BLOCK, 10000);
-            events.RescheduleEvent(EVENT_SPELL_POLYMORPH, urand(5000, 10000));
+            events.RescheduleEvent(EVENT_SPELL_ARCANE_BARRAGE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_ARCANE_BLAST, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_BLINK, 10s);
+            events.RescheduleEvent(EVENT_SPELL_COUNTERSPELL, 10s, 20s);
+            events.RescheduleEvent(EVENT_SPELL_FROSTBOLT, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_ICE_BLOCK, 10s);
+            events.RescheduleEvent(EVENT_SPELL_POLYMORPH, 5s, 10s);
         }
 
         EventMap events;
@@ -1118,66 +1119,66 @@ public:
                 case EVENT_SPELL_ARCANE_BARRAGE:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_ARCANE_BARRAGE, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_ARCANE_BLAST:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_ARCANE_BLAST, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_ARCANE_EXPLOSION:
                     if( EnemiesInRange(9.0f) >= 3 )
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_ARCANE_EXPLOSION, false);
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_BLINK:
                     if( HealthBelowPct(50) && EnemiesInRange(10.0f) >= 3 )
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_FROST_NOVA, false);
-                        events.RepeatEvent(15000);
+                        events.Repeat(15s);
                         EventMapGCD(events, 1500);
                         // blink disabled, movement not working
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_COUNTERSPELL:
                     if( Unit* target = SelectEnemyCaster(true, 30.0f) )
                     {
                         me->CastSpell(target, SPELL_COUNTERSPELL, false);
-                        events.RepeatEvent(24000);
+                        events.Repeat(24s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_FROSTBOLT:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_FROSTBOLT, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_ICE_BLOCK:
                     if( HealthBelowPct(25) )
                     {
                         me->CastSpell(me, SPELL_ICE_BLOCK, false);
-                        events.RepeatEvent(300000);
+                        events.Repeat(5min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_POLYMORPH:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_POLYMORPH, false);
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     EventMapGCD(events, 1500);
                     break;
             }
@@ -1230,15 +1231,15 @@ public:
         {
             SetEquipmentSlots(false, 47156, EQUIP_NO_CHANGE, 48711);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_AIMED_SHOT, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_DETERRENCE, 10000);
-            //events.RescheduleEvent(EVENT_SPELL_DISENGAGE, 10000);
-            events.RescheduleEvent(EVENT_SPELL_EXPLOSIVE_SHOT, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_FROST_TRAP, urand(15000, 20000));
-            events.RescheduleEvent(EVENT_SPELL_STEADY_SHOT, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_WING_CLIP, 10000);
-            events.RescheduleEvent(EVENT_SPELL_WYVERN_STING, urand(5000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_CALL_PET, 0);
+            events.RescheduleEvent(EVENT_SPELL_AIMED_SHOT, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_DETERRENCE, 10s);
+            //events.RescheduleEvent(EVENT_SPELL_DISENGAGE, 10s);
+            events.RescheduleEvent(EVENT_SPELL_EXPLOSIVE_SHOT, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_FROST_TRAP, 15s, 20s);
+            events.RescheduleEvent(EVENT_SPELL_STEADY_SHOT, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_WING_CLIP, 10s);
+            events.RescheduleEvent(EVENT_SPELL_WYVERN_STING, 5s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_CALL_PET, 0ms);
         }
 
         EventMap events;
@@ -1276,61 +1277,61 @@ public:
                 case EVENT_SPELL_AIMED_SHOT:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_AIMED_SHOT, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_DETERRENCE:
                     if( HealthBelowPct(25) )
                     {
                         me->CastSpell(me, SPELL_DETERRENCE, false);
-                        events.RepeatEvent(90000);
+                        events.Repeat(90s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_DISENGAGE:
                     if( EnemiesInRange(10.0f) >= 3 )
                     {
                         me->CastSpell(me, SPELL_DISENGAGE, false);
-                        events.RepeatEvent(20000);
+                        events.Repeat(20s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_EXPLOSIVE_SHOT:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_EXPLOSIVE_SHOT, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FROST_TRAP:
                     me->CastSpell(me, SPELL_FROST_TRAP, false);
-                    events.RepeatEvent(30000);
+                    events.Repeat(30s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_STEADY_SHOT:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_STEADY_SHOT, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_WING_CLIP:
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) <= 5.0f )
                         me->CastSpell(me->GetVictim(), SPELL_WING_CLIP, false);
-                    events.RepeatEvent(8000);
+                    events.Repeat(8s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_WYVERN_STING:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true) )
                     {
                         me->CastSpell(target, SPELL_WYVERN_STING, false);
-                        events.RepeatEvent(60000);
+                        events.Repeat(1min);
                         EventMapGCD(events, 1500);
                         break;
                     }
-                    events.RepeatEvent(10000);
+                    events.Repeat(10s);
                     break;
             }
 
@@ -1383,15 +1384,15 @@ public:
         {
             SetEquipmentSlots(false, 50966, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_BARKSKIN, 10000);
-            events.RescheduleEvent(EVENT_SPELL_WRATH, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_MOONFIRE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_STARFIRE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_INSECT_SWARM, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_FAERIE_FIRE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_CYCLONE, urand(10000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_FORCE_OF_NATURE, urand(20000, 40000));
+            events.RescheduleEvent(EVENT_SPELL_BARKSKIN, 10s);
+            events.RescheduleEvent(EVENT_SPELL_WRATH, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_MOONFIRE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_STARFIRE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_INSECT_SWARM, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_FAERIE_FIRE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_CYCLONE, 10s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_FORCE_OF_NATURE, 20s, 40s);
         }
 
         EventMap events;
@@ -1426,57 +1427,57 @@ public:
                     if( HealthBelowPct(50) )
                     {
                         me->CastSpell(me, SPELL_BARKSKIN, false);
-                        events.RepeatEvent(60000);
+                        events.Repeat(1min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_WRATH:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_WRATH, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_MOONFIRE:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_MOONFIRE, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_STARFIRE:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_STARFIRE, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_INSECT_SWARM:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_INSECT_SWARM, false);
-                    events.RepeatEvent(urand(5000, 15000));
+                    events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_ENTANGLING_ROOTS:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_ENTANGLING_ROOTS, false);
-                    events.RepeatEvent(urand(10000, 15000));
+                    events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FAERIE_FIRE:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_FAERIE_FIRE, false);
-                    events.RepeatEvent(urand(15000, 20000));
+                    events.Repeat(15s, 20s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CYCLONE:
                     if( Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 20.0f, true) )
                         me->CastSpell(target, SPELL_CYCLONE, false);
-                    events.RepeatEvent(urand(25000, 40000));
+                    events.Repeat(25s, 40s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FORCE_OF_NATURE:
                     me->CastSpell((Unit*)nullptr, SPELL_FORCE_OF_NATURE, false);
-                    events.RepeatEvent(180000);
+                    events.Repeat(3min);
                     EventMapGCD(events, 1500);
                     break;
             }
@@ -1528,15 +1529,15 @@ public:
         {
             SetEquipmentSlots(false, 47427, 46964, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_BLADESTORM, 20000);
-            events.RescheduleEvent(EVENT_SPELL_INTIMIDATING_SHOUT, 14000);
-            events.RescheduleEvent(EVENT_SPELL_MORTAL_STRIKE, urand(5000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_CHARGE, 3000);
-            events.RescheduleEvent(EVENT_SPELL_DISARM, urand(15000, 25000));
-            events.RescheduleEvent(EVENT_SPELL_OVERPOWER, urand(5000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_SUNDER_ARMOR, urand(5000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_SHATTERING_THROW, urand(25000, 40000));
-            events.RescheduleEvent(EVENT_SPELL_RETALIATION, urand(25000, 40000));
+            events.RescheduleEvent(EVENT_SPELL_BLADESTORM, 20s);
+            events.RescheduleEvent(EVENT_SPELL_INTIMIDATING_SHOUT, 14s);
+            events.RescheduleEvent(EVENT_SPELL_MORTAL_STRIKE, 5s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_CHARGE, 3s);
+            events.RescheduleEvent(EVENT_SPELL_DISARM, 15s, 25s);
+            events.RescheduleEvent(EVENT_SPELL_OVERPOWER, 5s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 5s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_SHATTERING_THROW, 25s, 40s);
+            events.RescheduleEvent(EVENT_SPELL_RETALIATION, 25s, 40s);
         }
 
         EventMap events;
@@ -1564,118 +1565,118 @@ public:
                 case EVENT_SPELL_BLADESTORM:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( EnemiesInRange(8.0f) >= 3 )
                     {
                         me->CastSpell(me, SPELL_BLADESTORM, false);
-                        events.RepeatEvent(90000);
-                        events.DelayEvents(9000);
+                        events.Repeat(90s);
+                        events.DelayEvents(9s);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_INTIMIDATING_SHOUT:
                     if( EnemiesInRange(8.0f) >= 3 )
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_INTIMIDATING_SHOUT, false);
-                        events.RepeatEvent(120000);
+                        events.Repeat(2min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_MORTAL_STRIKE:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
-                    events.RepeatEvent(urand(6000, 8000));
+                    events.Repeat(6s, 8s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CHARGE:
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) > 8.0f && me->GetDistance2d(me->GetVictim()) < 25.0f )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_CHARGE, false);
-                        events.RepeatEvent(10000);
+                        events.Repeat(10s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_DISARM:
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) < 5.0f  )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_DISARM, false);
-                        events.RepeatEvent(60000);
+                        events.Repeat(1min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_OVERPOWER:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) < 5.0f  )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_OVERPOWER, false);
-                        events.RepeatEvent(urand(10000, 15000));
+                        events.Repeat(10s, 15s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_SUNDER_ARMOR:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) < 5.0f  )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
-                        events.RepeatEvent(urand(10000, 15000));
+                        events.Repeat(10s, 15s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_SHATTERING_THROW:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) < 25.0f  )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_SHATTERING_THROW, false);
-                        events.RepeatEvent(300000);
+                        events.Repeat(5min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_RETALIATION:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( EnemiesInRange(8.0f) >= 3 )
                     {
                         me->CastSpell(me, SPELL_RETALIATION, false);
-                        events.RepeatEvent(300000);
+                        events.Repeat(5min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
             }
 
@@ -1722,13 +1723,13 @@ public:
         {
             SetEquipmentSlots(false, 47518, 51021, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_CHAINS_OF_ICE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_DEATH_COIL, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_DEATH_GRIP, 0);
-            events.RescheduleEvent(EVENT_SPELL_FROST_STRIKE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_ICEBOUND_FORTITUDE, 10000);
-            events.RescheduleEvent(EVENT_SPELL_ICY_TOUCH, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_STRANGULATE, urand(20000, 30000));
+            events.RescheduleEvent(EVENT_SPELL_CHAINS_OF_ICE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_DEATH_COIL, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_DEATH_GRIP, 0ms);
+            events.RescheduleEvent(EVENT_SPELL_FROST_STRIKE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_ICEBOUND_FORTITUDE, 10s);
+            events.RescheduleEvent(EVENT_SPELL_ICY_TOUCH, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_STRANGULATE, 20s, 30s);
         }
 
         EventMap events;
@@ -1757,21 +1758,21 @@ public:
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) <= 25.0f )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_CHAINS_OF_ICE, false);
-                        events.RepeatEvent(urand(10000, 15000));
+                        events.Repeat(10s, 15s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_DEATH_COIL:
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) <= 30.0f )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_DEATH_COIL, false);
-                        events.RepeatEvent(urand(5000, 8000));
+                        events.Repeat(5s, 8s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_DEATH_GRIP:
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) <= 30.0f && me->GetDistance2d(me->GetVictim()) >= 12.0f )
@@ -1782,56 +1783,56 @@ public:
                         me->GetClosePoint(x, y, z, 3.0f);
                         pos.Relocate(x, y, z);
                         me->GetVictim()->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), 49575, true);
-                        events.RepeatEvent(35000);
+                        events.Repeat(35s);
                         EventMapGCD(events, 2000);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_FROST_STRIKE:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) < 5.0f  )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FROST_STRIKE, false);
-                        events.RepeatEvent(urand(6000, 10000));
+                        events.Repeat(6s, 10s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_ICEBOUND_FORTITUDE:
                     if( HealthBelowPct(50) )
                     {
                         me->CastSpell(me, SPELL_ICEBOUND_FORTITUDE, false);
-                        events.RepeatEvent(60000);
+                        events.Repeat(1min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_ICY_TOUCH:
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) < 20.0f  )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_ICY_TOUCH, false);
-                        events.RepeatEvent(urand(10000, 15000));
+                        events.Repeat(10s, 15s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_STRANGULATE:
                     if(SelectEnemyCaster(false, 30.0f))
                     {
                         me->CastSpell(me->GetVictim(), SPELL_STRANGULATE, false);
-                        events.RepeatEvent(120000);
+                        events.Repeat(2min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
             }
 
@@ -1879,13 +1880,13 @@ public:
             SetEquipmentSlots(false, 47422, 49982, EQUIP_NO_CHANGE);
             me->setPowerType(POWER_ENERGY);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_FAN_OF_KNIVES, 10000);
-            events.RescheduleEvent(EVENT_SPELL_BLIND, urand(10000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_CLOAK, 10000);
-            events.RescheduleEvent(EVENT_SPELL_BLADE_FLURRY, urand(20000, 40000));
-            //events.RescheduleEvent(EVENT_SPELL_SHADOWSTEP, urand(15000,25000));
-            events.RescheduleEvent(EVENT_SPELL_HEMORRHAGE, urand(3000, 5000));
-            events.RescheduleEvent(EVENT_SPELL_EVISCERATE, urand(20000, 25000));
+            events.RescheduleEvent(EVENT_SPELL_FAN_OF_KNIVES, 10s);
+            events.RescheduleEvent(EVENT_SPELL_BLIND, 10s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_CLOAK, 10s);
+            events.RescheduleEvent(EVENT_SPELL_BLADE_FLURRY, 20s, 40s);
+            //events.RescheduleEvent(EVENT_SPELL_SHADOWSTEP, 15s, 25s);
+            events.RescheduleEvent(EVENT_SPELL_HEMORRHAGE, 3s, 5s);
+            events.RescheduleEvent(EVENT_SPELL_EVISCERATE, 20s, 25s);
         }
 
         EventMap events;
@@ -1913,45 +1914,45 @@ public:
                 case EVENT_SPELL_FAN_OF_KNIVES:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( EnemiesInRange(10.0f) >= 3 )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FAN_OF_KNIVES, false);
-                        events.RepeatEvent(urand(6000, 10000));
+                        events.Repeat(6s, 10s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_BLIND:
                     if( Unit* target = SelectTarget(SelectTargetMethod::MinThreat, 0, 20.0f, true) )
                     {
                         me->CastSpell(target, SPELL_BLIND, false);
-                        events.RepeatEvent(120000);
+                        events.Repeat(2min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_CLOAK:
                     if( HealthBelowPct(50) )
                     {
                         me->CastSpell(me, SPELL_CLOAK, false);
-                        events.RepeatEvent(90000);
+                        events.Repeat(90s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(6000);
+                        events.Repeat(6s);
                     break;
                 case EVENT_SPELL_BLADE_FLURRY:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     else
                     {
                         me->CastSpell(me, SPELL_BLADE_FLURRY, false);
-                        events.RepeatEvent(120000);
+                        events.Repeat(2min);
                         EventMapGCD(events, 1500);
                     }
                     break;
@@ -1959,41 +1960,41 @@ public:
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) < 40.0f && me->GetDistance2d(me->GetVictim()) > 10.0f )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_SHADOWSTEP, false);
-                        events.RepeatEvent(30000);
+                        events.Repeat(30s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_HEMORRHAGE:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) <= 5.0f )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_HEMORRHAGE, false);
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_EVISCERATE:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( me->GetVictim() && me->GetDistance2d(me->GetVictim()) <= 5.0f )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_EVISCERATE, false);
-                        events.RepeatEvent(urand(15000, 25000));
+                        events.Repeat(15s, 25s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
             }
 
@@ -2039,11 +2040,11 @@ public:
             me->UpdateDamagePhysical(OFF_ATTACK);
 
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_HEROISM_OR_BLOODLUST, urand(25000, 40000));
-            events.RescheduleEvent(EVENT_SPELL_EARTH_SHOCK_ENH, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_LAVA_LASH, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_STORMSTRIKE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SUMMON_TOTEM, urand(10000, 20000));
+            events.RescheduleEvent(EVENT_SPELL_HEROISM_OR_BLOODLUST, 25s, 40s);
+            events.RescheduleEvent(EVENT_SPELL_EARTH_SHOCK_ENH, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_LAVA_LASH, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_STORMSTRIKE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SUMMON_TOTEM, 10s, 20s);
         }
 
         EventMap events;
@@ -2071,59 +2072,59 @@ public:
                 case EVENT_SPELL_EARTH_SHOCK_ENH:
                     if( me->HasUnitFlag(UNIT_FLAG_SILENCED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 25.0f, true) )
                     {
                         me->CastSpell(target, SPELL_EARTH_SHOCK_ENH, false);
-                        events.RepeatEvent(urand(6000, 8000));
+                        events.Repeat(6s, 8s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_LAVA_LASH:
                     if( me->HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.0f, true) )
                     {
                         me->CastSpell(target, SPELL_LAVA_LASH, false);
-                        events.RepeatEvent(urand(6000, 8000));
+                        events.Repeat(6s, 8s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_STORMSTRIKE:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) && me->HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.0f, true) )
                     {
                         me->CastSpell(target, SPELL_STORMSTRIKE, false);
-                        events.RepeatEvent(urand(8000, 9000));
+                        events.Repeat(8s, 9s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_HEROISM_OR_BLOODLUST:
                     if( me->GetEntry() == NPC_ALLIANCE_SHAMAN_RESTORATION )
                         me->CastSpell((Unit*)nullptr, SPELL_HEROISM, true);
                     else
                         me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, true);
-                    events.RepeatEvent(600000);
+                    events.Repeat(10min);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SUMMON_TOTEM:
                     me->CastSpell((Unit*)nullptr, RAND(SPELL_GROUNDING_TOTEM, SPELL_WINDFURY_TOTEM, SPELL_TREMOR_TOTEM), false);
-                    events.RepeatEvent(30000);
+                    events.Repeat(30s);
                     EventMapGCD(events, 1500);
                     break;
             }
@@ -2174,14 +2175,14 @@ public:
         {
             SetEquipmentSlots(false, 47519, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_AVENGING_WRATH, urand(20000, 30000));
-            events.RescheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_DIVINE_SHIELD, 10000);
-            events.RescheduleEvent(EVENT_SPELL_DIVINE_STORM, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE_RET, urand(15000, 25000));
-            events.RescheduleEvent(EVENT_SPELL_HAND_OF_PROTECTION_RET, urand(25000, 40000));
-            events.RescheduleEvent(EVENT_SPELL_JUDGEMENT_OF_COMMAND, urand(3000, 10000));
-            events.RescheduleEvent(EVENT_SPELL_REPENTANCE, urand(10000, 15000));
+            events.RescheduleEvent(EVENT_SPELL_AVENGING_WRATH, 20s, 30s);
+            events.RescheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_DIVINE_SHIELD, 10s);
+            events.RescheduleEvent(EVENT_SPELL_DIVINE_STORM, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE_RET, 15s, 25s);
+            events.RescheduleEvent(EVENT_SPELL_HAND_OF_PROTECTION_RET, 25s, 40s);
+            events.RescheduleEvent(EVENT_SPELL_JUDGEMENT_OF_COMMAND, 3s, 10s);
+            events.RescheduleEvent(EVENT_SPELL_REPENTANCE, 10s, 15s);
         }
 
         EventMap events;
@@ -2208,88 +2209,88 @@ public:
                     break;
                 case EVENT_SPELL_AVENGING_WRATH:
                     me->CastSpell(me, SPELL_AVENGING_WRATH, false);
-                    events.RepeatEvent(180000);
+                    events.Repeat(3min);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CRUSADER_STRIKE:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.0f, true) )
                     {
                         me->CastSpell(target, SPELL_CRUSADER_STRIKE, false);
-                        events.RepeatEvent(urand(6000, 8000));
+                        events.Repeat(6s, 8s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_DIVINE_SHIELD:
                     if( HealthBelowPct(25) )
                     {
                         me->CastSpell(me, SPELL_DIVINE_SHIELD, false);
-                        events.RepeatEvent(300000);
+                        events.Repeat(5min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_DIVINE_STORM:
                     if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
                     if( EnemiesInRange(5.0f) >= 3 )
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_DIVINE_STORM, false);
-                        events.RepeatEvent(urand(10000, 15000));
+                        events.Repeat(10s, 15s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE_RET:
                     if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 15.0f, true) )
                     {
                         me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE_RET, false);
-                        events.RepeatEvent(40000);
+                        events.Repeat(40s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_HAND_OF_PROTECTION_RET:
                     if( Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HAND_OF_PROTECTION_RET, 30.0f) )
                     {
                         me->CastSpell(target, SPELL_HAND_OF_PROTECTION_RET, false);
-                        events.RepeatEvent(300000);
+                        events.Repeat(5min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_JUDGEMENT_OF_COMMAND:
                     if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 20.0f, true) )
                     {
                         me->CastSpell(target, SPELL_JUDGEMENT_OF_COMMAND, false);
-                        events.RepeatEvent(urand(10000, 15000));
+                        events.Repeat(10s, 15s);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
                 case EVENT_SPELL_REPENTANCE:
                     if( Unit* target = SelectTarget(SelectTargetMethod::MinThreat, 0, 20.0f, true) )
                     {
                         me->CastSpell(target, SPELL_REPENTANCE, false);
-                        events.RepeatEvent(60000);
+                        events.Repeat(1min);
                         EventMapGCD(events, 1500);
                     }
                     else
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                     break;
             }
 
@@ -2325,8 +2326,8 @@ public:
         npc_toc_pet_warlockAI(Creature* pCreature) : boss_faction_championsAI(pCreature, AI_PET)
         {
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_DEVOUR_MAGIC, urand(5000, 15000));
-            events.RescheduleEvent(EVENT_SPELL_SPELL_LOCK, urand(5000, 15000));
+            events.RescheduleEvent(EVENT_SPELL_DEVOUR_MAGIC, 5s, 15s);
+            events.RescheduleEvent(EVENT_SPELL_SPELL_LOCK, 5s, 15s);
         }
 
         EventMap events;
@@ -2354,13 +2355,13 @@ public:
                 case EVENT_SPELL_DEVOUR_MAGIC:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_DEVOUR_MAGIC, false);
-                    events.RepeatEvent(urand(8000, 15000));
+                    events.Repeat(8s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_SPELL_LOCK:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_SPELL_LOCK, false);
-                    events.RepeatEvent(24000);
+                    events.Repeat(24s);
                     EventMapGCD(events, 1500);
                     break;
             }
@@ -2400,7 +2401,7 @@ public:
         npc_toc_pet_hunterAI(Creature* pCreature) : boss_faction_championsAI(pCreature, AI_PET)
         {
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_CLAW, urand(5000, 15000));
+            events.RescheduleEvent(EVENT_SPELL_CLAW, 5s, 15s);
         }
 
         EventMap events;
@@ -2428,7 +2429,7 @@ public:
                 case EVENT_SPELL_CLAW:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_CLAW, false);
-                    events.RepeatEvent(urand(8000, 15000));
+                    events.Repeat(8s, 15s);
                     break;
             }
 
