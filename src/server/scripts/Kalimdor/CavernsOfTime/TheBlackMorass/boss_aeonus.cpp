@@ -55,6 +55,8 @@ struct boss_aeonus : public BossAI
     {
         Talk(SAY_ENTER);
 
+        me->SetReactState(REACT_DEFENSIVE);
+
         if (Creature* medivh = instance->GetCreature(DATA_MEDIVH))
         {
             me->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(medivh->GetAngle(me)), medivh->GetPositionY() + 14.0f * std::sin(medivh->GetAngle(me)), medivh->GetPositionZ(), me->GetAngle(medivh));

@@ -171,13 +171,7 @@ public:
 
                         DoUpdateWorldState(WORLD_STATE_BM_RIFT, ++_currentRift);
 
-                        if (Creature* rift = instance->SummonCreature(NPC_TIME_RIFT, spawnPos))
-                        {
-                            _scheduler.Schedule(6s, [this, rift](TaskContext)
-                            {
-                                SummonPortalKeeper(rift);
-                            });
-                        }
+                        instance->SummonCreature(NPC_TIME_RIFT, spawnPos);
 
                         // Here we check if we have available rift spots.
                         if (_currentRift < 18)
@@ -213,10 +207,14 @@ public:
                 case NPC_RIFT_LORD:
                 case NPC_RIFT_LORD_2:
                 case NPC_INFINITE_ASSASIN:
+                case NPC_INFINITE_ASSASIN_2:
                 case NPC_INFINITE_WHELP:
-                case NPC_INFINITE_CRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER_2:
                 case NPC_INFINITE_EXECUTIONER:
+                case NPC_INFINITE_EXECUTIONER_2:
                 case NPC_INFINITE_VANQUISHER:
+                case NPC_INFINITE_VANQUISHER_2:
                 case NPC_DP_BEAM_STALKER:
                     _encounterNPCs.insert(creature->GetGUID());
                     break;
@@ -254,10 +252,14 @@ public:
                 case NPC_RIFT_LORD:
                 case NPC_RIFT_LORD_2:
                 case NPC_INFINITE_ASSASIN:
+                case NPC_INFINITE_ASSASIN_2:
                 case NPC_INFINITE_WHELP:
-                case NPC_INFINITE_CRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER_2:
                 case NPC_INFINITE_EXECUTIONER:
+                case NPC_INFINITE_EXECUTIONER_2:
                 case NPC_INFINITE_VANQUISHER:
+                case NPC_INFINITE_VANQUISHER_2:
                     _encounterNPCs.erase(creature->GetGUID());
                     break;
             }
@@ -398,51 +400,6 @@ public:
                     return _currentRift;
             }
             return 0;
-        }
-
-        void SummonPortalKeeper(Creature* rift)
-        {
-            if (!rift)
-            {
-                return;
-            }
-
-            int32 entry = 0;
-            switch (_currentRift)
-            {
-                case 6:
-                    entry = GetBossState(DATA_CHRONO_LORD_DEJA) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_CHRONO_LORD : -NPC_CHRONO_LORD_DEJA) : NPC_CHRONO_LORD_DEJA;
-                    break;
-                case 12:
-                    entry = GetBossState(DATA_TEMPORUS) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_TIMEREAVER : -NPC_TEMPORUS) : NPC_TEMPORUS;
-                    break;
-                case 18:
-                    entry = NPC_AEONUS;
-                    break;
-                default:
-                    entry = RAND(NPC_RIFT_KEEPER_WARLOCK, NPC_RIFT_KEEPER_MAGE, NPC_RIFT_LORD, NPC_RIFT_LORD_2);
-                    break;
-            }
-
-            Position pos = rift->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
-
-            if (Creature* summon = rift->SummonCreature(std::abs(entry), pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3 * MINUTE * IN_MILLISECONDS))
-            {
-                if (entry < 0)
-                {
-                    summon->SetLootMode(0);
-                }
-
-                if (summon->GetEntry() != NPC_AEONUS)
-                {
-                    rift->CastSpell(summon, SPELL_RIFT_CHANNEL, false);
-                }
-                else
-                {
-                    summon->SetReactState(REACT_DEFENSIVE);
-                    _scheduler.CancelGroup(CONTEXT_GROUP_RIFTS);
-                }
-            }
         }
 
         void Update(uint32 diff) override
