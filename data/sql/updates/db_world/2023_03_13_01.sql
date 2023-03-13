@@ -1,3 +1,4 @@
+-- DB update 2023_03_13_00 -> 2023_03_13_01
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (606, 618, 619, 629, 631, 632, 633, 660, 664, 676, 677, 678, 679, 683, 704, 724, 728, 731, 739, 745, 754, 758, 764, 782, 829, 835, 848, 861, 863, 865, 872, 887, 891, 903, 909, 938, 942, 943, 953, 957, 974, 984, 985) AND `locale` = 'deDE';
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (606, 'deDE', 'He! Den Blick, den Ihr mir da zuwerft, mag ich gar nicht, $Sire:Madame;.', 0),

@@ -1,3 +1,4 @@
+-- DB update 2023_03_13_01 -> 2023_03_13_02
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (1002, 1012, 1017, 1022, 1043, 1045, 1048, 1057, 1071, 1073, 1074, 1076, 1077, 1079, 1080, 1086, 1096, 1109, 1125, 1127, 1139, 1140, 1147, 1168, 1172, 1173, 1175, 1179, 1188, 1192) AND `locale` = 'deDE';
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (1002, 'deDE', 'Obwohl Ihr die sechs Mondpirscherfangzähne noch nicht eingebaut habt, meint Ihr doch, statische Geräusche und wirres Gnomgebrabbel aus der Maschine dringen zu hören. Ob wohl ein anderer die Maschine bereits repariert hat?', 0),
