@@ -7,6 +7,10 @@ DELETE FROM `waypoint_scripts` WHERE `id` IN (8319501, 8319502, 8319701, 8319702
 
 DELETE FROM `gameobject` WHERE `map`=554 AND `id` IN (185015,185018,184449,184632,184322,184465) AND `guid` IN (6032,6033,6034,20463,20464,20467,20473,44743);
 
+-- INSERTS
+SET @CGUID := 138800;
+SET @OGUID := 9879;
+
 DELETE FROM `creature` WHERE `map`=554 AND `id1` IN (19166,19167,19168,19218,19219,19220,19221,19231,19510,19710,19712,19713,19716,19735,20059,20988,20990) AND `guid` BETWEEN @CGUID AND @CGUID+93;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `VerifiedBuild`) VALUES
 (@CGUID+0 , 19166, 0, 0, 554, 3849, 3849, 3, 1, 0, 39.9918, 28.693, 0.0795518, 3.41476, 86400, 5, 1, 46924),
