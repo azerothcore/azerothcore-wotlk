@@ -1,3 +1,4 @@
+-- DB update 2023_03_14_02 -> 2023_03_14_03
 DELETE FROM `quest_request_items` WHERE `ID` IN (660, 714, 722, 747, 754, 758, 789, 829, 934);
 INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`, `CompletionText`, `VerifiedBuild`) VALUES
 (660, 1, 0, 'The time for talk is done. Protect Kinelory if you care about the people of Hillsbrad at all.', 0), 
