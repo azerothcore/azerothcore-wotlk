@@ -1,3 +1,4 @@
+-- DB update 2023_03_14_03 -> 2023_03_14_04
 DELETE FROM `quest_request_items` WHERE `ID` IN (124, 191, 192, 257, 258, 289, 457, 511);
 INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`, `CompletionText`, `VerifiedBuild`) VALUES
 (124, 1, 0, 'My horses still seem skittish, and I still hear that cursed wolf cry at night. Please, $N, do something about those Gnolls!', 0),
