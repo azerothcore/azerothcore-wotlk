@@ -4477,7 +4477,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
     });
-    
     // Death Ray Warning Visual, Death Ray Damage Visual
     ApplySpellFix({ 63882, 63886 }, [](SpellInfo* spellInfo)
     {
