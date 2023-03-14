@@ -21,7 +21,6 @@
 
 enum Enums
 {
-    SAY_ENTER                   = 0,
     SAY_AGGRO                   = 1,
     SAY_BANISH                  = 2,
     SAY_SLAY                    = 3,
@@ -35,121 +34,78 @@ enum Enums
     SPELL_BANISH_DRAGON_HELPER  = 31550,
 };
 
-enum Events
-{
-    EVENT_ARCANE_BLAST          = 1,
-    EVENT_TIME_LAPSE            = 2,
-    EVENT_ARCANE_DISCHARGE      = 3,
-    EVENT_ATTRACTION            = 4
-};
+ struct boss_chrono_lord_deja : public BossAI
+ {
+     boss_chrono_lord_deja(Creature* creature) : BossAI(creature, DATA_CHRONO_LORD_DEJA) { }
 
-class boss_chrono_lord_deja : public CreatureScript
-{
-public:
-    boss_chrono_lord_deja() : CreatureScript("boss_chrono_lord_deja") { }
+     void OwnTalk(uint32 id)
+     {
+         if (me->GetEntry() == NPC_CHRONO_LORD_DEJA)
+         {
+             Talk(id);
+         }
+     }
 
-    struct boss_chrono_lord_dejaAI : public ScriptedAI
-    {
-        boss_chrono_lord_dejaAI(Creature* creature) : ScriptedAI(creature) { }
+     void JustEngagedWith(Unit* /*who*/) override
+     {
+         OwnTalk(SAY_AGGRO);
+         _JustEngagedWith();
 
-        EventMap events;
+         scheduler.Schedule(10s, [this](TaskContext context)
+         {
+             DoCastVictim(SPELL_ARCANE_BLAST);
+             context.Repeat(20s);
+         }).Schedule(15s, [this](TaskContext context)
+         {
+             DoCastAOE(SPELL_TIME_LAPSE);
+             context.Repeat(20s);
+         }).Schedule(20s, [this](TaskContext context)
+         {
+             DoCastAOE(SPELL_ARCANE_DISCHARGE);
+             context.Repeat(25s);
+         });
 
-        void Reset() override
-        {
-            events.Reset();
-        }
+         if (IsHeroic())
+         {
+             scheduler.Schedule(20s, [this](TaskContext context)
+             {
+                 DoCastAOE(SPELL_ATTRACTION);
+                 context.Repeat(30s);
+             });
+         }
+     }
 
-        void OwnTalk(uint32 id)
-        {
-            if (me->GetEntry() == NPC_CHRONO_LORD_DEJA)
-                Talk(id);
-        }
+     void MoveInLineOfSight(Unit* who) override
+     {
+         if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
+         {
+             if (me->IsWithinDistInMap(who, 20.0f))
+             {
+                 OwnTalk(SAY_BANISH);
+                 DoCastAOE(SPELL_BANISH_DRAGON_HELPER);
+                 return;
+             }
+         }
 
-        void InitializeAI() override
-        {
-            OwnTalk(SAY_ENTER);
-            ScriptedAI::InitializeAI();
-        }
+         ScriptedAI::MoveInLineOfSight(who);
+     }
 
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            events.ScheduleEvent(EVENT_ARCANE_BLAST, 10000);
-            events.ScheduleEvent(EVENT_TIME_LAPSE, 15000);
-            events.ScheduleEvent(EVENT_ARCANE_DISCHARGE, 25000);
-            if (IsHeroic())
-                events.ScheduleEvent(EVENT_ATTRACTION, 20000);
+     void KilledUnit(Unit* victim) override
+     {
+         if (victim->IsPlayer())
+         {
+             OwnTalk(SAY_SLAY);
+         }
+     }
 
-            OwnTalk(SAY_AGGRO);
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
-            {
-                if (me->IsWithinDistInMap(who, 20.0f))
-                {
-                    OwnTalk(SAY_BANISH);
-                    me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
-                    return;
-                }
-            }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                OwnTalk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            OwnTalk(SAY_DEATH);
-            if (InstanceScript* instance = me->GetInstanceScript())
-                instance->SetData(TYPE_CHRONO_LORD_DEJA, DONE);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ARCANE_BLAST:
-                    me->CastSpell(me->GetVictim(), SPELL_ARCANE_BLAST, false);
-                    events.ScheduleEvent(EVENT_ARCANE_BLAST, 20000);
-                    break;
-                case EVENT_TIME_LAPSE:
-                    me->CastSpell(me, SPELL_TIME_LAPSE, false);
-                    events.ScheduleEvent(EVENT_TIME_LAPSE, 20000);
-                    break;
-                case EVENT_ARCANE_DISCHARGE:
-                    me->CastSpell(me, SPELL_ARCANE_DISCHARGE, false);
-                    events.ScheduleEvent(EVENT_ARCANE_DISCHARGE, 25000);
-                    break;
-                case EVENT_ATTRACTION:
-                    me->CastSpell(me, SPELL_ATTRACTION, false);
-                    events.ScheduleEvent(EVENT_ATTRACTION, 30000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetTheBlackMorassAI<boss_chrono_lord_dejaAI>(creature);
-    }
-};
+     void JustDied(Unit* /*killer*/) override
+     {
+         OwnTalk(SAY_DEATH);
+         _JustDied();
+     }
+ };
 
 void AddSC_boss_chrono_lord_deja()
 {
-    new boss_chrono_lord_deja();
+    RegisterTheBlackMorassCreatureAI(boss_chrono_lord_deja);
 }

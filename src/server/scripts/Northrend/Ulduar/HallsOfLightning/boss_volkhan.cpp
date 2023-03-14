@@ -192,10 +192,10 @@ public:
         void ScheduleEvents(bool anvil)
         {
             events.SetPhase(1);
-            events.RescheduleEvent(EVENT_HEAT, 8000, 0, 1);
-            events.RescheduleEvent(EVENT_SHATTER, 10000, 0, 1);
-            events.RescheduleEvent(EVENT_CHECK_HEALTH, anvil ? 1000 : 6000, 0, 1);
-            events.RescheduleEvent(EVENT_POSITION, 4000, 0, 1);
+            events.RescheduleEvent(EVENT_HEAT, 8s, 0, 1);
+            events.RescheduleEvent(EVENT_SHATTER, 10s, 0, 1);
+            events.RescheduleEvent(EVENT_CHECK_HEALTH, anvil ? 1s : 6s, 0, 1);
+            events.RescheduleEvent(EVENT_POSITION, 4s, 0, 1);
         }
 
         void JustSummoned(Creature* summon) override
@@ -243,7 +243,7 @@ public:
                 me->SetControlled(true, UNIT_STATE_ROOT);
             }
             else
-                events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0, 0, 2);
+                events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0ms, 0, 2);
         }
 
         void SpellHitTarget(Unit* /*who*/, SpellInfo const* spellInfo) override
@@ -269,7 +269,7 @@ public:
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
                 me->GetMotionMaster()->MovementExpired();
 
-            events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0, 0, 2);
+            events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0ms, 0, 2);
         }
 
         void UpdateAI(uint32 diff) override
@@ -287,17 +287,17 @@ public:
             {
                 case EVENT_HEAT:
                     me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_HEAT_H : SPELL_HEAT_N, true);
-                    events.RepeatEvent(8000);
+                    events.Repeat(8s);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(HealthCheck))
                         GoToAnvil();
 
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     return;
                 case EVENT_SHATTER:
                     {
-                        events.RepeatEvent(10000);
+                        events.Repeat(10s);
                         summons.DoAction(ACTION_SHATTER);
                         break;
                     }
@@ -309,7 +309,7 @@ public:
                     if (me->GetDistance(1331.9f, -106, 56) > 95)
                         EnterEvadeMode();
                     else
-                        events.RepeatEvent(4000);
+                        events.Repeat(4s);
 
                     return;
             }
@@ -342,8 +342,8 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_BLAST, 7000);
-            events.ScheduleEvent(EVENT_IMMOLATION, 3000);
+            events.ScheduleEvent(EVENT_BLAST, 7s);
+            events.ScheduleEvent(EVENT_IMMOLATION, 3s);
         }
 
         void DamageTaken(Unit*, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
@@ -397,11 +397,11 @@ public:
             {
                 case EVENT_BLAST:
                     me->CastSpell(me, SPELL_BLAST_WAVE, false);
-                    events.RepeatEvent(14000);
+                    events.Repeat(14s);
                     break;
                 case EVENT_IMMOLATION:
                     me->CastSpell(me->GetVictim(), me->GetMap()->IsHeroic() ? SPELL_IMMOLATION_STRIKE_H : SPELL_IMMOLATION_STRIKE_N, false);
-                    events.RepeatEvent(5000);
+                    events.Repeat(5s);
                     break;
             }
 
@@ -482,7 +482,7 @@ public:
                     _isActive = false;
                     _attackGUID = who->GetGUID();
                     events.Reset();
-                    events.RescheduleEvent(EVENT_UNFREEZE, 5000);
+                    events.RescheduleEvent(EVENT_UNFREEZE, 5s);
                 }
             }
         }
@@ -492,16 +492,16 @@ public:
             events.Reset();
             if (me->GetEntry() == 28961) // NPC_TITANIUM_SIEGEBREAKER
             {
-                events.ScheduleEvent(EVENT_PIERCING_HOWL, 10000 + rand() % 15000);
-                events.ScheduleEvent(EVENT_PENETRATING_STRIKE, 5000 + rand() % 5000);
-                events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 20000 + rand() % 8000);
-                events.ScheduleEvent(EVENT_BLADE_TURNING, 12000);
+                events.ScheduleEvent(EVENT_PIERCING_HOWL, 10s, 25s);
+                events.ScheduleEvent(EVENT_PENETRATING_STRIKE, 5s, 10s);
+                events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 20s, 28s);
+                events.ScheduleEvent(EVENT_BLADE_TURNING, 12s);
             }
             else
             {
-                events.ScheduleEvent(EVENT_THROW, 10000 + rand() % 15000);
-                events.ScheduleEvent(EVENT_DEADLY_THROW, 15000 + rand() % 15000);
-                events.ScheduleEvent(EVENT_DEFLECTION, 15000);
+                events.ScheduleEvent(EVENT_THROW, 10s, 25s);
+                events.ScheduleEvent(EVENT_DEADLY_THROW, 15s, 30s);
+                events.ScheduleEvent(EVENT_DEFLECTION, 15s);
             }
         }
 
@@ -542,31 +542,31 @@ public:
             {
                 case EVENT_PIERCING_HOWL:
                     me->CastSpell(me->GetVictim(), SPELL_PIERCING_HOWL, false);
-                    events.RepeatEvent(10000 + rand() % 1500);
+                    events.Repeat(10s, 25s);
                     break;
                 case EVENT_PENETRATING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_PENETRATING_STRIKE, false);
-                    events.RepeatEvent(5000 + rand() % 5000);
+                    events.Repeat(5s, 10s);
                     break;
                 case EVENT_FRIGHTENING_SHOUT:
                     me->CastSpell(me->GetVictim(), SPELL_FRIGHTENING_SHOUT, false);
-                    events.RepeatEvent(20000 + rand() % 8000);
+                    events.Repeat(20s, 28s);
                     break;
                 case EVENT_BLADE_TURNING:
                     me->CastSpell(me->GetVictim(), me->GetMap()->IsHeroic() ? SPELL_BLADE_TURNING_H : SPELL_BLADE_TURNING_N, false);
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     break;
                 case EVENT_THROW:
                     me->CastSpell(SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0), me->GetMap()->IsHeroic() ? SPELL_THROW_H : SPELL_THROW_N, true);
-                    events.RepeatEvent(10000 + rand() % 15000);
+                    events.Repeat(10s, 25s);
                     break;
                 case EVENT_DEADLY_THROW:
                     me->CastSpell(SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0), me->GetMap()->IsHeroic() ? SPELL_DEADLY_THROW_H : SPELL_DEADLY_THROW_N, true);
-                    events.RepeatEvent(15000 + rand() % 15000);
+                    events.Repeat(15s, 30s);
                     break;
                 case EVENT_DEFLECTION:
                     me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_DEFLECTION_H : SPELL_DEFLECTION_N, false);
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
             }
 

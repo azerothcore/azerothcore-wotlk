@@ -118,12 +118,16 @@ public:
             }
             else if (id == 2)
             {
-                me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
                 me->Dismount();
                 me->SetWalk(true);
                 for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                         summon->SetWalk(true);
+                if (Creature* mount = me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
+                {
+                    mount->SetImmuneToNPC(true);
+                    mount->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                }
             }
 
             if (me->movespline->Finalized())

@@ -129,9 +129,9 @@ public:
 
             me->SetInCombatWithZone();
 
-            events.RescheduleEvent(EVENT_AMPLIFY_MAGIC, urand(5000, 10000));
-            events.RescheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 5000);
-            events.RescheduleEvent(EVENT_ENERGIZE_CORES_THIN, 0);
+            events.RescheduleEvent(EVENT_AMPLIFY_MAGIC, 5s, 10s);
+            events.RescheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 5s);
+            events.RescheduleEvent(EVENT_ENERGIZE_CORES_THIN, 0ms);
         }
 
         void JustDied(Unit*  /*killer*/) override
@@ -175,7 +175,7 @@ public:
                     {
                         if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
                             me->CastSpell(target, SPELL_AMPLIFY_MAGIC, false);
-                        events.RepeatEvent(urand(17500, 22500));
+                        events.Repeat(17s + 500ms, 22s + 500ms);
                     }
                     break;
                 case EVENT_CALL_AZURE_RING_CAPTAIN_1:
@@ -189,19 +189,19 @@ public:
                         {
                             case EVENT_CALL_AZURE_RING_CAPTAIN_1:
                                 me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_1, true);
-                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_2, 16000);
+                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_2, 16s);
                                 break;
                             case EVENT_CALL_AZURE_RING_CAPTAIN_2:
                                 me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_2, true);
-                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_3, 16000);
+                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_3, 16s);
                                 break;
                             case EVENT_CALL_AZURE_RING_CAPTAIN_3:
                                 me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_3, true);
-                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_4, 16000);
+                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_4, 16s);
                                 break;
                             case EVENT_CALL_AZURE_RING_CAPTAIN_4:
                                 me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_4, true);
-                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 16000);
+                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 16s);
                                 break;
                         }
                         if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
@@ -222,7 +222,7 @@ public:
                         me->DisableRotate(false);
                         me->SetOrientation(ZapAngle);
                         me->CastSpell(me, SPELL_ENERGIZE_CORES_THIN, true);
-                        events.ScheduleEvent(EVENT_ENERGIZE_CORES_DAMAGE, 4500);
+                        events.ScheduleEvent(EVENT_ENERGIZE_CORES_DAMAGE, 4500ms);
                     }
                     break;
                 case EVENT_ENERGIZE_CORES_DAMAGE:
@@ -236,7 +236,7 @@ public:
                         ZapAngle += M_PI / 2;
                         if( ZapAngle >= 2 * M_PI )
                             ZapAngle -= 2 * M_PI;
-                        events.ScheduleEvent(EVENT_ENERGIZE_CORES_THIN, 2000);
+                        events.ScheduleEvent(EVENT_ENERGIZE_CORES_THIN, 2s);
                     }
                     break;
             }

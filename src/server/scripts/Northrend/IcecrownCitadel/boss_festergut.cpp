@@ -117,13 +117,13 @@ public:
                 return;
             }
 
-            events.ScheduleEvent(EVENT_BERSERK, 300000);
-            events.ScheduleEvent(EVENT_INHALE_BLIGHT, urand(25000, 30000));
-            events.ScheduleEvent(EVENT_GAS_SPORE, urand(20000, 25000));
-            events.ScheduleEvent(EVENT_VILE_GAS, urand(30000, 40000), 1);
-            events.ScheduleEvent(EVENT_GASTRIC_BLOAT, urand(12500, 15000));
+            events.ScheduleEvent(EVENT_BERSERK, 5min);
+            events.ScheduleEvent(EVENT_INHALE_BLIGHT, 25s, 30s);
+            events.ScheduleEvent(EVENT_GAS_SPORE, 20s, 25s);
+            events.ScheduleEvent(EVENT_VILE_GAS, 30s, 40s, 1);
+            events.ScheduleEvent(EVENT_GASTRIC_BLOAT, 12s + 500ms, 15s);
             if (IsHeroic())
-                events.ScheduleEvent(EVENT_FESTERGUT_GOO, urand(15000, 20000));
+                events.ScheduleEvent(EVENT_FESTERGUT_GOO, 15s, 20s);
 
             me->setActive(true);
             Talk(SAY_AGGRO);
@@ -211,7 +211,7 @@ public:
                         Talk(SAY_PUNGENT_BLIGHT);
                         me->CastSpell(me, SPELL_PUNGENT_BLIGHT, false);
                         _inhaleCounter = 0;
-                        events.RescheduleEvent(EVENT_GAS_SPORE, urand(20000, 25000));
+                        events.RescheduleEvent(EVENT_GAS_SPORE, 20s, 25s);
                     }
                     else
                     {
@@ -222,13 +222,13 @@ public:
                             me->CastSpell(me, gaseousBlight[_inhaleCounter], true, nullptr, nullptr, me->GetGUID());
                     }
 
-                    events.ScheduleEvent(EVENT_INHALE_BLIGHT, 34000);
+                    events.ScheduleEvent(EVENT_INHALE_BLIGHT, 34s);
                     break;
                 case EVENT_GAS_SPORE:
                     Talk(EMOTE_WARN_GAS_SPORE);
                     Talk(EMOTE_GAS_SPORE);
                     me->CastCustomSpell(SPELL_GAS_SPORE, SPELLVALUE_MAX_TARGETS, RAID_MODE<int32>(2, 3, 2, 3), me);
-                    events.ScheduleEvent(EVENT_GAS_SPORE, urand(40000, 45000));
+                    events.ScheduleEvent(EVENT_GAS_SPORE, 40s, 45s);
                     events.DelayEventsToMax(20000, 1); // delay EVENT_VILE_GAS
                     break;
                 case EVENT_VILE_GAS:
@@ -242,18 +242,18 @@ public:
 
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, minDist, true))
                             me->CastSpell(target, SPELL_VILE_GAS, false);
-                        events.ScheduleEvent(EVENT_VILE_GAS, urand(28000, 35000), 1);
+                        events.ScheduleEvent(EVENT_VILE_GAS, 28s, 35s, 1);
                         break;
                     }
                 case EVENT_GASTRIC_BLOAT:
                     me->CastSpell(me->GetVictim(), SPELL_GASTRIC_BLOAT, false);
-                    events.ScheduleEvent(EVENT_GASTRIC_BLOAT, urand(15000, 17500));
+                    events.ScheduleEvent(EVENT_GASTRIC_BLOAT, 15s, 17s + 500ms);
                     break;
                 case EVENT_FESTERGUT_GOO:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NonTankTargetSelector(me)))
                         if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                             professor->CastSpell(target, SPELL_MALLABLE_GOO_H, true);
-                    events.ScheduleEvent(EVENT_FESTERGUT_GOO, urand(15000, 20000));
+                    events.ScheduleEvent(EVENT_FESTERGUT_GOO, 15s, 20s);
                 default:
                     break;
             }
@@ -439,8 +439,8 @@ public:
         {
             me->setActive(true);
             me->CastSpell(me, SPELL_PLAGUE_STENCH, true);
-            events.ScheduleEvent(EVENT_DECIMATE, urand(20000, 25000));
-            events.ScheduleEvent(EVENT_MORTAL_WOUND, urand(1500, 2500));
+            events.ScheduleEvent(EVENT_DECIMATE, 20s, 25s);
+            events.ScheduleEvent(EVENT_MORTAL_WOUND, 1500ms, 2500ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -459,11 +459,11 @@ public:
                 {
                     case EVENT_DECIMATE:
                         me->CastSpell(me->GetVictim(), SPELL_DECIMATE, false);
-                        events.ScheduleEvent(EVENT_DECIMATE, urand(20000, 25000));
+                        events.ScheduleEvent(EVENT_DECIMATE, 20s, 25s);
                         break;
                     case EVENT_MORTAL_WOUND:
                         me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
-                        events.ScheduleEvent(EVENT_MORTAL_WOUND, urand(1500, 2500));
+                        events.ScheduleEvent(EVENT_MORTAL_WOUND, 1500ms, 2500ms);
                         break;
                     default:
                         break;

@@ -2575,6 +2575,8 @@ public:
     [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
     void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
 
+    void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
+
     std::string GetDebugInfo() const override;
 
  protected:
