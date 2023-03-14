@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.spell_linked_spell
+-- Dumping structure for table acore_world.spell_linked_spell
 DROP TABLE IF EXISTS `spell_linked_spell`;
 CREATE TABLE IF NOT EXISTS `spell_linked_spell` (
   `spell_trigger` mediumint NOT NULL,
@@ -22,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `spell_linked_spell` (
   UNIQUE KEY `trigger_effect_type` (`spell_trigger`,`spell_effect`,`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Spell System';
 
--- Dumpar data för tabell acore_world.spell_linked_spell: 576 rows
+-- Dumping data for table acore_world.spell_linked_spell: 578 rows
 DELETE FROM `spell_linked_spell`;
 /*!40000 ALTER TABLE `spell_linked_spell` DISABLE KEYS */;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
@@ -214,7 +216,7 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 	(23161, 31725, 0, 'Summon Nightmare'),
 	(23214, 31726, 0, 'Summon Charger'),
 	(24023, 12021, 1, 'Charge (24023) will now trigger Fixate'),
-	(24071, 24020, 1, 'Axe Flurry will now throw axes at nearby players, stunning them'),
+	(35475, 51120, 1, 'Drums of War - Tinnitus'),
 	(24707, 24870, 2, 'Bobbing Apple'),
 	(24714, 24750, 1, 'Trick cast Trick'),
 	(24743, 24730, 1, 'Cannon Prep - Link Teleport'),
@@ -601,9 +603,12 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 	(23414, -26889, 2, 'Nefarian Rogue class call - Vanish'),
 	(25654, 6608, 1, 'Hive\'Zara Tail Lasher: On Tail Lash - Apply Dropped Weapon'),
 	(28757, 28758, 0, 'Stalker\'s Ally'),
-	(26084, 25174, 1, 'Battleguard Sartura - OnHit Whirlwind - Apply Sundering Cleave');
+	(35476, 51120, 1, 'Drums of Battle - Tinnitus'),
+	(35477, 51120, 1, 'Drums of Speed - Tinnitus'),
+	(35478, 51120, 1, 'Drums of War - Tinnitus');
 /*!40000 ALTER TABLE `spell_linked_spell` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -99,10 +99,10 @@ void DistractMovementGenerator::Finalize(Unit* owner)
 
 bool DistractMovementGenerator::Update(Unit* owner, uint32 time_diff)
 {
-    if (owner->IsInCombat() || time_diff > _timer)
+    if (owner->IsInCombat() || time_diff > m_timer)
         return false;
 
-    _timer -= time_diff;
+    m_timer -= time_diff;
     return true;
 }
 

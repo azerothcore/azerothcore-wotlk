@@ -25,15 +25,11 @@ enum eEnums
     SAY_KILL                    = 1,
     SAY_DIE                     = 2,
 
-    SPELL_ACID_SPRAY            = 38153,
     SPELL_EXPLODING_BREAKER     = 30925,
-    SPELL_KNOCKDOWN             = 20276,
-    SPELL_DOMINATION            = 25772,
+    SPELL_DOMINATION            = 30923,
 
-    EVENT_SPELL_ACID                = 1,
-    EVENT_SPELL_EXPLODING           = 2,
-    EVENT_SPELL_DOMINATION          = 3,
-    EVENT_SPELL_KNOCKDOWN           = 4,
+    EVENT_SPELL_EXPLODING       = 1,
+    EVENT_SPELL_DOMINATION      = 2
 };
 
 class boss_the_maker : public CreatureScript
@@ -63,13 +59,11 @@ public:
             instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), true);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_SPELL_ACID, 15000);
             events.ScheduleEvent(EVENT_SPELL_EXPLODING, 6000);
             events.ScheduleEvent(EVENT_SPELL_DOMINATION, 120000);
-            events.ScheduleEvent(EVENT_SPELL_KNOCKDOWN, 10000);
 
             if (!instance)
                 return;
@@ -107,10 +101,6 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_ACID:
-                    me->CastSpell(me->GetVictim(), SPELL_ACID_SPRAY, false);
-                    events.RepeatEvent(urand(15000, 23000));
-                    break;
                 case EVENT_SPELL_EXPLODING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_EXPLODING_BREAKER, false);
@@ -120,10 +110,6 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_DOMINATION, false);
                     events.RepeatEvent(120000);
-                    break;
-                case EVENT_SPELL_KNOCKDOWN:
-                    me->CastSpell(me->GetVictim(), SPELL_KNOCKDOWN, false);
-                    events.RepeatEvent(urand(4000, 12000));
                     break;
             }
 

@@ -21,6 +21,8 @@
 #include "CombatAI.h"
 #include "CreatureAIImpl.h"
 
+#define DataHeader "TC"
+
 #define TrialOfTheChampionScriptName "instance_trial_of_the_champion"
 
 enum eData

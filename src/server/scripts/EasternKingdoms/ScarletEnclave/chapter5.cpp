@@ -392,20 +392,20 @@ public:
                 SendInitialWorldStates();
 
                 events.Reset();
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_1, 60000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_2, 120000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_3, 180000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_4, 240000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_5, 300000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_6, 308000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_7, 312000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_8, 316000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_9, 320000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_10, 324000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_11, 332000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_12, 335000);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 337500);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 345000);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_1, 60s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_2, 120s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_3, 180s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_4, 240s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_5, 300s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_6, 308s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_7, 312s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_8, 316s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_9, 320s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_10, 324s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_11, 332s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_12, 335s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 337s + 500ms);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 345s);
             }
         }
 
@@ -507,11 +507,11 @@ public:
                 tirion->LoadEquipment(0, true);
                 tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25);
                 events.Reset();
-                events.ScheduleEvent(EVENT_FINISH_FIGHT_1, 10000);
-                events.ScheduleEvent(EVENT_FINISH_FIGHT_2, 20000);
-                events.ScheduleEvent(EVENT_FINISH_FIGHT_3, 22000);
-                events.ScheduleEvent(EVENT_FINISH_FIGHT_4, 23000);
-                events.ScheduleEvent(EVENT_FINISH_FIGHT_5, 24000);
+                events.ScheduleEvent(EVENT_FINISH_FIGHT_1, 10s);
+                events.ScheduleEvent(EVENT_FINISH_FIGHT_2, 20s);
+                events.ScheduleEvent(EVENT_FINISH_FIGHT_3, 22s);
+                events.ScheduleEvent(EVENT_FINISH_FIGHT_4, 23s);
+                events.ScheduleEvent(EVENT_FINISH_FIGHT_5, 24s);
 
                 tirion->SummonGameObject(GO_HOLY_LIGHTNING, 2254.84f, -5298.75f, 82.168f, 1.134f, 0, 0, 0.537102f, 0.843517f, 20);
                 tirion->SummonGameObject(GO_HOLY_LIGHTNING, 2296.24f, -5296.44f, 81.9964f, 5.3398f, 0, 0, 0.454395f, -0.8908f, 20);
@@ -520,7 +520,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             if (battleStarted != ENCOUNTER_STATE_FIGHT)
                 return;
@@ -579,25 +579,25 @@ public:
                 Talk(EMOTE_LIGHT_OF_DAWN05);
                 events.Reset();
 
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_1, 2000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_2, 19000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_3, 38000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_4, 50000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_5, 62000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_6, 68000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_7, 71000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_8, 72000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_9, 74000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_10, 77000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_11, 79000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_12, 82000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_13, 85000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_14, 92000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_15, 98000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_16, 105000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_17, 120000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_18, 131000);
-                events.ScheduleEvent(EVENT_OUTRO_SCENE_19, 158000);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_1, 2s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_2, 19s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_3, 38s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_4, 50s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_5, 62s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_6, 68s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_7, 71s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_8, 72s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_9, 74s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_10, 77s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_11, 79s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_12, 82s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_13, 85s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_14, 92s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_15, 98s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_16, 105s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_17, 120s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_18, 131s);
+                events.ScheduleEvent(EVENT_OUTRO_SCENE_19, 158s);
             }
         }
 
@@ -843,23 +843,23 @@ public:
                         alex->AI()->Talk(SAY_LIGHT_OF_DAWN42);
 
                     events.Reset();
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_20, 4000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_21, 4500);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_22, 7000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_23, 9000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_24, 14000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_25, 21200);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_26, 22500);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_27, 24000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_28, 28000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_29, 34000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_30, 36000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_31, 51000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_32, 68000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_33, 73000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_34, 76000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_35, 77000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_36, 81000);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_20, 4s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_21, 4s + 500ms);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_22, 7s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_23, 9s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_24, 14s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_25, 21s + 200ms);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_26, 22s + 500ms);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_27, 24s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_28, 28s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_29, 34s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_30, 36s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_31, 51s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_32, 68s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_33, 73s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_34, 76s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_35, 77s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_36, 81s);
                     break;
                 case EVENT_OUTRO_SCENE_20:
                     if (Creature* lk = me->SummonCreature(NPC_THE_LICH_KING, LightOfDawnPos[12].GetPositionX(), LightOfDawnPos[12].GetPositionY(), LightOfDawnPos[12].GetPositionZ(), LightOfDawnPos[12].GetOrientation(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
@@ -971,23 +971,23 @@ public:
                         me->SetFacingToObject(tirion);
 
                     events.Reset();
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_37, 1000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_38, 5000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_39, 7000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_40, 9000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_41, 13000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_42, 16000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_43, 17000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_44, 19000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_45, 25000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_46, 32000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_47, 42000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_48, 52000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_49, 54000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_50, 58000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_51, 65000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_52, 70000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_53, 84000);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_37, 1s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_38, 5s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_39, 7s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_40, 9s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_41, 13s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_42, 16s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_43, 17s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_44, 19s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_45, 25s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_46, 32s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_47, 42s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_48, 52s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_49, 54s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_50, 58s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_51, 65s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_52, 70s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_53, 84s);
                     break;
                 case EVENT_OUTRO_SCENE_37:
                     me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(EQUIP_UNEQUIP));
@@ -1089,14 +1089,14 @@ public:
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN62);
 
                     events.Reset();
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_54, 6000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_55, 14000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_56, 27000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_57, 37000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_58, 44000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_59, 50000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_60, 63000);
-                    events.ScheduleEvent(EVENT_OUTRO_SCENE_61, 150000);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_54, 6s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_55, 14s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_56, 27s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_57, 37s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_58, 44s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_59, 50s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_60, 63s);
+                    events.ScheduleEvent(EVENT_OUTRO_SCENE_61, 150s);
                     break;
                 case EVENT_OUTRO_SCENE_54:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
@@ -1151,23 +1151,23 @@ public:
             {
                 case EVENT_SPELL_ANTI_MAGIC_ZONE:
                     DoCast(me, SPELL_ANTI_MAGIC_ZONE1);
-                    events.RescheduleEvent(eventId, urand(25000, 30000));
+                    events.RescheduleEvent(eventId, 25s, 30s);
                     break;
                 case EVENT_SPELL_DEATH_STRIKE:
                     DoCastVictim(SPELL_DEATH_STRIKE);
-                    events.RescheduleEvent(eventId, urand(5000, 10000));
+                    events.RescheduleEvent(eventId, 5s, 10s);
                     break;
                 case EVENT_SPELL_DEATH_EMBRACE:
                     DoCastVictim(SPELL_DEATH_EMBRACE);
-                    events.RescheduleEvent(eventId, urand(15000, 20000));
+                    events.RescheduleEvent(eventId, 15s, 20s);
                     break;
                 case EVENT_SPELL_UNHOLY_BLIGHT:
                     DoCast(me, SPELL_UNHOLY_BLIGHT);
-                    events.RescheduleEvent(eventId, 60000);
+                    events.RescheduleEvent(eventId, 60s);
                     break;
                 case EVENT_SPELL_TALK:
                     Talk(SAY_LIGHT_OF_DAWN09);
-                    events.RescheduleEvent(eventId, urand(15000, 20000));
+                    events.RescheduleEvent(eventId, 15s, 20s);
                     break;
             }
 

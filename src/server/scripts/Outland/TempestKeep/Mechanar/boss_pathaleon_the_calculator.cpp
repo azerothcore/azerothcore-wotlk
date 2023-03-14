@@ -65,22 +65,11 @@ public:
         void InitializeAI() override
         {
             BossAI::InitializeAI();
-            me->SetVisible(false);
-            me->SetReactState(REACT_PASSIVE);
         }
 
-        void DoAction(int32  /*param*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            me->SetVisible(true);
-            me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-            me->SetReactState(REACT_AGGRESSIVE);
-            Talk(SAY_APPEAR);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_SUMMON, 30000);
             events.ScheduleEvent(EVENT_MANA_TAP, 12000);
             events.ScheduleEvent(EVENT_ARCANE_TORRENT, 16000);

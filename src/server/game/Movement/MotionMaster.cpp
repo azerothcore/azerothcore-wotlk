@@ -248,14 +248,14 @@ void MotionMaster::MoveRandom(float wanderDistance)
     }
 }
 
-void MotionMaster::MoveTargetedHome()
+void MotionMaster::MoveTargetedHome(bool walk /*= false*/)
 {
     Clear(false);
 
     if (_owner->GetTypeId() == TYPEID_UNIT && !_owner->ToCreature()->GetCharmerOrOwnerGUID())
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) targeted home", _owner->GetGUID().ToString());
-        Mutate(new HomeMovementGenerator<Creature>(), MOTION_SLOT_ACTIVE);
+        Mutate(new HomeMovementGenerator<Creature>(walk), MOTION_SLOT_ACTIVE);
     }
     else if (_owner->GetTypeId() == TYPEID_UNIT && _owner->ToCreature()->GetCharmerOrOwnerGUID())
     {
@@ -791,7 +791,7 @@ void MotionMaster::MoveRotate(uint32 time, RotateDirection direction)
     Mutate(new RotateMovementGenerator(time, direction), MOTION_SLOT_ACTIVE);
 }
 
-void MotionMaster::PropagateSpeedChange()
+void MotionMaster::propagateSpeedChange()
 {
     /*Impl::container_type::iterator it = Impl::c.begin();
     for (; it != end(); ++it)
@@ -801,7 +801,7 @@ void MotionMaster::PropagateSpeedChange()
     for (int i = 0; i <= _top; ++i)
     {
         if (Impl[i])
-            Impl[i]->UnitSpeedChanged();
+            Impl[i]->unitSpeedChanged();
     }
 }
 

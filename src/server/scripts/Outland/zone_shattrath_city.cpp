@@ -28,7 +28,6 @@ npc_salsalabim
 npc_shattrathflaskvendors
 npc_zephyr
 npc_kservant
-npc_ishanah
 EndContentData */
 
 #include "Player.h"
@@ -36,6 +35,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "TaskScheduler.h"
 
 /*######
 ## npc_raliq_the_drunk
@@ -46,7 +46,8 @@ EndContentData */
 enum Raliq
 {
     SPELL_UPPERCUT          = 10966,
-    QUEST_CRACK_SKULLS      = 10009
+    QUEST_CRACK_SKULLS      = 10009,
+    EMOTE_DRINK             = 7,
 };
 
 class npc_raliq_the_drunk : public CreatureScript
@@ -88,28 +89,40 @@ public:
         }
 
         uint32 m_uiNormFaction;
-        uint32 Uppercut_Timer;
 
         void Reset() override
         {
-            Uppercut_Timer = 5000;
             me->RestoreFaction();
+            _scheduler.CancelAll();
+            _scheduler.Schedule(5s, [this](TaskContext context)
+            {
+                me->HandleEmoteCommand(EMOTE_DRINK);
+                context.Repeat(5s);
+            });
         }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            _scheduler
+                .Schedule(5s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_UPPERCUT);
+                context.Repeat(15s);
+            });
+        };
 
         void UpdateAI(uint32 diff) override
         {
+
+            _scheduler.Update(diff);
+
             if (!UpdateVictim())
                 return;
 
-            if (Uppercut_Timer <= diff)
-            {
-                DoCastVictim(SPELL_UPPERCUT);
-                Uppercut_Timer = 15000;
-            }
-            else Uppercut_Timer -= diff;
-
             DoMeleeAttackIfReady();
         }
+    private:
+        TaskScheduler _scheduler;
     };
 };
 
@@ -407,7 +420,7 @@ public:
             }
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
@@ -421,121 +434,6 @@ public:
     };
 };
 
-/*######
-# npc_ishanah
-######*/
-
-enum Ishanah
-{
-    // ISHANAH SPELL EVENTS
-    EVENT_SPELL_ISHANAH_HOLY_SMITE = 3,
-    EVENT_SPELL_POWER_WORD_SHIELD  = 4,
-    EVENT_ISHANAH_SAY_1            = 18, // Make kaylaan bow
-    SOCRETHAR                      = 20132,
-    KAYLAAN_THE_LOST               = 20794,
-
-    // ISHANAH SPELLS
-    HOLY_SMITE_ISHANAH             = 15238,
-    POWER_WORLD_SHIELD             = 22187
-};
-
-#define ISANAH_GOSSIP_1 "Who are the Sha'tar?"
-#define ISANAH_GOSSIP_2 "Isn't Shattrath a draenei city? Why do you allow others here?"
-
-class npc_ishanah : public CreatureScript
-{
-public:
-    npc_ishanah() : CreatureScript("npc_ishanah") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-            SendGossipMenuFor(player, 9458, creature->GetGUID());
-        else if (action == GOSSIP_ACTION_INFO_DEF + 2)
-            SendGossipMenuFor(player, 9459, creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-
-    struct ishanahAI : public ScriptedAI
-    {
-        ishanahAI(Creature* creature) : ScriptedAI(creature) { }
-
-        EventMap _events;
-
-        void EnterCombat(Unit* who) override
-        {
-            AttackStart(who);
-            _events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 2000);
-            _events.ScheduleEvent(EVENT_SPELL_POWER_WORD_SHIELD, 1000);
-        }
-
-        void MovementInform(uint32 type, uint32 point) override
-        {
-            if (type != POINT_MOTION_TYPE)
-            {
-                if (point == 2)
-                {
-                    if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
-                    {
-                        kaylaan->AI()->Talk(5);
-                        kaylaan->SetOrientation(me->GetPositionX());
-                        if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
-                        {
-                            socrethar->AI()->DoAction(EVENT_ISHANAH_SAY_1);
-                            socrethar->SetOrientation(me->GetPositionX());
-                        }
-                    }
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!me->GetVictim())
-                return;
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            _events.Update(diff);
-
-            switch (_events.ExecuteEvent())
-            {
-                case EVENT_SPELL_ISHANAH_HOLY_SMITE:
-                    me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);
-                    _events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 2500);
-                    break;
-                case EVENT_SPELL_POWER_WORD_SHIELD:
-                    me->CastSpell(me, POWER_WORLD_SHIELD, false);
-                    _events.ScheduleEvent(EVENT_SPELL_POWER_WORD_SHIELD, 30000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new ishanahAI(creature);
-    }
-};
-
 void AddSC_shattrath_city()
 {
     new npc_raliq_the_drunk();
@@ -543,5 +441,4 @@ void AddSC_shattrath_city()
     new npc_shattrathflaskvendors();
     new npc_zephyr();
     new npc_kservant();
-    new npc_ishanah();
 }

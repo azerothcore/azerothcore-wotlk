@@ -49,7 +49,7 @@ private:
 class DistractMovementGenerator : public MovementGenerator
 {
 public:
-    explicit DistractMovementGenerator(uint32 timer) : _timer(timer) {}
+    explicit DistractMovementGenerator(uint32 timer) : m_timer(timer) {}
 
     void Initialize(Unit*) override;
     void Finalize(Unit*) override;
@@ -58,7 +58,7 @@ public:
     MovementGeneratorType GetMovementGeneratorType() override { return DISTRACT_MOTION_TYPE; }
 
 private:
-    uint32 _timer;
+    uint32 m_timer;
 };
 
 class AssistanceDistractMovementGenerator : public DistractMovementGenerator

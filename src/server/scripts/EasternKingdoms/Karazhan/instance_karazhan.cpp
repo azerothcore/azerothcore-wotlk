@@ -32,6 +32,12 @@ const Position OptionalSpawn[] =
     { -10899.903320f, -2085.573730f, 49.474449f, 1.38f }  // Rokad the Ravager
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN  },
+    { NPC_MIDNIGHT,             DATA_MIDNIGHT }
+};
+
 class instance_karazhan : public InstanceMapScript
 {
 public:
@@ -46,7 +52,9 @@ public:
     {
         instance_karazhan_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
+            LoadObjectData(creatureData, nullptr);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
@@ -73,7 +81,18 @@ public:
                 case NPC_RELAY:
                     m_uiRelayGUID = creature->GetGUID();
                     break;
+                case NPC_BARNES:
+                    _barnesGUID = creature->GetGUID();
+                    if (GetBossState(DATA_OPERA_PERFORMANCE) != DONE && !creature->IsAlive())
+                    {
+                        creature->Respawn(true);
+                    }
+                    break;
+                default:
+                    break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -161,6 +180,13 @@ public:
                         if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
                             sideEntrance->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
+                    }
+                    else if (state == FAIL)
+                    {
+                        HandleGameObject(m_uiStageDoorLeftGUID, false);
+                        HandleGameObject(m_uiStageDoorRightGUID, false);
+                        HandleGameObject(m_uiCurtainGUID, false);
+                        DoRespawnCreature(_barnesGUID, true);
                     }
                     break;
                 case DATA_CHESS:
@@ -336,6 +362,7 @@ public:
         ObjectGuid ImageGUID;
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;
+        ObjectGuid _barnesGUID;
         GuidVector _operaDecorations[EVENT_RAJ];
     };
 };

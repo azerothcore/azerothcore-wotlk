@@ -15,8 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
-        os: [ubuntu-latest]
-        compiler: [clang12]
+        os: [ubuntu-20.04]
+        compiler: [clang]
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.compiler }}
     env:

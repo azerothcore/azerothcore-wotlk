@@ -862,7 +862,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
                 UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(winner_kills));
 
                 // Xinef: check player level and not bracket level if (CanAwardArenaPoints())
-                if (player->getLevel() >= BG_AWARD_ARENA_POINTS_MIN_LEVEL)
+                if (player->GetLevel() >= BG_AWARD_ARENA_POINTS_MIN_LEVEL)
                     player->ModifyArenaPoints(winner_arena);
 
                 if (!player->GetRandomWinner())
@@ -1599,7 +1599,7 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
         creature->setDeathState(DEAD);
         creature->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, creature->GetGUID());
         // aura
-        // TODO: Fix display here
+        /// @todo: Fix display here
         // creature->SetVisibleAura(0, SPELL_SPIRIT_HEAL_CHANNEL);
         // casting visual effect
         creature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_SPIRIT_HEAL_CHANNEL);

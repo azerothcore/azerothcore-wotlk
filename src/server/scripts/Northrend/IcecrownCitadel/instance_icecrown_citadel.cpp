@@ -197,6 +197,7 @@ public:
             LichKingRandomWhisperTimer = 120 * IN_MILLISECONDS;
             DarkwhisperElevatorTimer = 3000;
 
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
@@ -1067,7 +1068,7 @@ public:
                         }
                     }
                     else if (state == FAIL)
-                        Events.ScheduleEvent(EVENT_RESPAWN_GUNSHIP, 30000);
+                        Events.ScheduleEvent(EVENT_RESPAWN_GUNSHIP, 30s);
                     break;
                 case DATA_DEATHBRINGER_SAURFANG:
                     switch (state)
@@ -1335,7 +1336,7 @@ public:
                         switch (data)
                         {
                             case IN_PROGRESS:
-                                Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 60000);
+                                Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 1min);
                                 BloodQuickeningMinutes = 30;
                                 DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
                                 DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
@@ -1576,73 +1577,54 @@ public:
             }
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
+            data >> HeroicAttempts;
 
-            std::ostringstream saveStream;
-            saveStream << "I C " << GetBossSaveData() << HeroicAttempts << ' '
-                       << ColdflameJetsState << ' ' << BloodQuickeningState << ' ' << BloodQuickeningMinutes << ' ' << WeeklyQuestId10 << ' ' << PutricideEventProgress << ' '
-                       << uint32(LichKingHeroicAvailable ? 1 : 0) << ' ' << BloodPrinceTrashCount << ' ' << uint32(IsBuffAvailable ? 1 : 0);
+            uint32 temp = 0;
+            data >> temp;
 
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(const char* str) override
-        {
-            if (!str)
+            if (temp == IN_PROGRESS)
             {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(str);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'I' && dataHead2 == 'C')
-            {
-                for (uint32 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState == FAIL || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
-
-                loadStream >> HeroicAttempts;
-
-                uint32 temp = 0;
-                loadStream >> temp;
-                ColdflameJetsState = temp ? DONE : NOT_STARTED;
-
-                loadStream >> BloodQuickeningState;
-                loadStream >> BloodQuickeningMinutes;
-                if (BloodQuickeningState == IN_PROGRESS)
-                {
-                    Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 60000);
-                    DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
-                    DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
-                }
-
-                loadStream >> WeeklyQuestId10;
-                loadStream >> PutricideEventProgress;
-                PutricideEventProgress &= ~PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS;
-                loadStream >> temp;
-                LichKingHeroicAvailable = !!temp;
-                loadStream >> BloodPrinceTrashCount;
-                loadStream >> temp;
-                SetData(DATA_BUFF_AVAILABLE, !!temp);
+                ColdflameJetsState = NOT_STARTED;
             }
             else
-                OUT_LOAD_INST_DATA_FAIL;
+            {
+                ColdflameJetsState = temp ? DONE : NOT_STARTED;
+            }
 
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data >> temp;
+            data >> BloodQuickeningState;
+            data >> BloodQuickeningMinutes;
+
+            if (BloodQuickeningState == IN_PROGRESS)
+            {
+                Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 1min);
+                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
+                DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
+            }
+
+            data >> WeeklyQuestId10;
+            data >> PutricideEventProgress;
+            PutricideEventProgress &= ~PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS;
+            data >> temp;
+            LichKingHeroicAvailable = !!temp;
+            data >> BloodPrinceTrashCount;
+            data >> temp;
+            SetData(DATA_BUFF_AVAILABLE, !!temp);
+        }
+
+        void WriteSaveDataMore(std::ostringstream& data) override
+        {
+            data << HeroicAttempts << ' '
+                << ColdflameJetsState << ' '
+                << BloodQuickeningState << ' '
+                << BloodQuickeningMinutes << ' '
+                << WeeklyQuestId10 << ' '
+                << PutricideEventProgress << ' '
+                << uint32(LichKingHeroicAvailable ? 1 : 0) << ' '
+                << BloodPrinceTrashCount << ' '
+                << uint32(IsBuffAvailable ? 1 : 0);
         }
 
         void Update(uint32 diff) override
@@ -1697,7 +1679,7 @@ public:
                             --BloodQuickeningMinutes;
                             if (BloodQuickeningMinutes)
                             {
-                                Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 60000);
+                                Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 1min);
                                 DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
                                 DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
                             }
@@ -1783,13 +1765,13 @@ public:
                 case EVENT_QUAKE:
                     if (GameObject* warning = instance->GetGameObject(FrozenThroneWarningGUID))
                         warning->SetGoState(GO_STATE_ACTIVE);
-                    Events.ScheduleEvent(EVENT_QUAKE_SHATTER, 5000);
+                    Events.ScheduleEvent(EVENT_QUAKE_SHATTER, 5s);
                     break;
                 case EVENT_SECOND_REMORSELESS_WINTER:
                     if (GameObject* platform = instance->GetGameObject(ArthasPlatformGUID))
                     {
                         platform->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
-                        Events.ScheduleEvent(EVENT_REBUILD_PLATFORM, 1500);
+                        Events.ScheduleEvent(EVENT_REBUILD_PLATFORM, 1500ms);
                     }
                     break;
                 case EVENT_TELEPORT_TO_FROSMOURNE: // Harvest Soul (normal mode)

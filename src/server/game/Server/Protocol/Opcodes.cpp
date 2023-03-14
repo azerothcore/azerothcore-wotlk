@@ -206,7 +206,7 @@ void OpcodeTable::Initialize()
     /*0x04B*/ DEFINE_HANDLER(CMSG_LOGOUT_REQUEST,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleLogoutRequestOpcode                );
     /*0x04C*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LOGOUT_RESPONSE,                                    STATUS_NEVER);
     /*0x04D*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LOGOUT_COMPLETE,                                    STATUS_NEVER);
-    /*0x04E*/ DEFINE_HANDLER(CMSG_LOGOUT_CANCEL,                                                    STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleLogoutCancelOpcode                 );
+    /*0x04E*/ DEFINE_HANDLER(CMSG_LOGOUT_CANCEL,                                                    STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT,   PROCESS_THREADUNSAFE,   &WorldSession::HandleLogoutCancelOpcode);
     /*0x04F*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LOGOUT_CANCEL_ACK,                                  STATUS_NEVER);
     /*0x050*/ DEFINE_HANDLER(CMSG_NAME_QUERY,                                                       STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleNameQueryOpcode                    );
     /*0x051*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_NAME_QUERY_RESPONSE,                                STATUS_NEVER);
@@ -412,7 +412,7 @@ void OpcodeTable::Initialize()
     /*0x119*/ DEFINE_HANDLER(CMSG_IGNORE_TRADE,                                                     STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleIgnoreTradeOpcode                  );
     /*0x11A*/ DEFINE_HANDLER(CMSG_ACCEPT_TRADE,                                                     STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleAcceptTradeOpcode                  );
     /*0x11B*/ DEFINE_HANDLER(CMSG_UNACCEPT_TRADE,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleUnacceptTradeOpcode                );
-    /*0x11C*/ DEFINE_HANDLER(CMSG_CANCEL_TRADE,                                                     STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleCancelTradeOpcode                  );
+    /*0x11C*/ DEFINE_HANDLER(CMSG_CANCEL_TRADE,                                                     STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT,   PROCESS_THREADUNSAFE,   &WorldSession::HandleCancelTradeOpcode);
     /*0x11D*/ DEFINE_HANDLER(CMSG_SET_TRADE_ITEM,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleSetTradeItemOpcode                 );
     /*0x11E*/ DEFINE_HANDLER(CMSG_CLEAR_TRADE_ITEM,                                                 STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleClearTradeItemOpcode               );
     /*0x11F*/ DEFINE_HANDLER(CMSG_SET_TRADE_GOLD,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleSetTradeGoldOpcode                 );
