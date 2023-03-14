@@ -4470,7 +4470,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
- 
     // Game In Session
     ApplySpellFix({ 39331 }, [](SpellInfo* spellInfo)
     {
