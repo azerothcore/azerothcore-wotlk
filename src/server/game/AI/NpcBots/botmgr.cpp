@@ -622,22 +622,24 @@ void BotMgr::Update(uint32 diff)
         }
 
         if (partyCombat == false)
+        {
             ai->UpdateReviveTimer(diff);
 
-        //bot->IsAIEnabled = true;
+            //bot->IsAIEnabled = true;
 
-        if (ai->GetReviveTimer() <= diff)
-        {
-            if (bot->IsInWorld() && !bot->IsAlive() && _owner->IsAlive() && !_owner->IsInCombat() &&
-                !_owner->IsBeingTeleported() && !_owner->InArena() && !_owner->IsInFlight() &&
-                !_owner->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) &&
-                !_owner->HasInvisibilityAura() && !_owner->HasStealthAura())
+            if (ai->GetReviveTimer() <= diff)
             {
-                _reviveBot(bot);
-                continue;
-            }
+                if (bot->IsInWorld() && !bot->IsAlive() && _owner->IsAlive() && !_owner->IsInCombat() &&
+                    !_owner->IsBeingTeleported() && !_owner->InArena() && !_owner->IsInFlight() &&
+                    !_owner->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) &&
+                    !_owner->HasInvisibilityAura() && !_owner->HasStealthAura())
+                {
+                    _reviveBot(bot);
+                    continue;
+                }
 
-            ai->SetReviveTimer(urand(1000, 5000));
+                ai->SetReviveTimer(urand(1000, 5000));
+            }
         }
 
         if (_owner->IsAlive() && (bot->IsAlive() || restrictBots) && !ai->IsTempBot() && !ai->IsDuringTeleport() &&
