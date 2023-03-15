@@ -82,16 +82,20 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19849);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (19849, 0, 0, 1, 8, 0, 100, 513, 34630, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 70967, 19832, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - On Spellhit \'Scrap Reaver X6000\' - Set Data 1 1 on Doctor Vomisa, Ph.T. - Summon Negatron'),
 (19849, 0, 1, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - On Spellhit \'Scrap Reaver X6000\' - Store Targetlist Invoker Party'),
-(19849, 0, 2, 0, 38, 0, 100, 512, 1, 1, 0, 0, 0, 80, 1984900, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - On Data Set 1 1 - Run Script'),
-(19849, 0, 3, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 90, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - On Respawn - Set Flag Standstate Stand Up');
+(19849, 0, 2, 0, 38, 0, 100, 512, 1, 1, 0, 0, 0, 80, 1984900, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - On Data Set 1 1 - Run Success Script'),
+(19849, 0, 3, 0, 11, 0, 100, 512, 0, 0, 0, 0, 0, 80, 1984901, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - On Respawn - Run Respawn Script');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1984900);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1984900, 1984901));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1984900, 9, 0, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 33, 19851, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Quest Credit \'You, Robot\''),
 (1984900, 9, 1, 0, 0, 0, 100, 512, 10000, 10000, 0, 0, 0, 18, 33556488, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Set Flags PvP Attackable & Pet In Combat & Not Selectable'),
-(1984900, 9, 2, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Set Flag Standstate Dead'),
-(1984900, 9, 3, 0, 0, 0, 100, 512, 200, 200, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Say Line 0'),
-(1984900, 9, 4, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 41, 6000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Despawn In 6000 ms');
+(1984900, 9, 2, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 103, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Set Rooted On'),
+(1984900, 9, 3, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Set Flag Standstate Dead'),
+(1984900, 9, 4, 0, 0, 0, 100, 512, 200, 200, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Say Line 0'),
+(1984900, 9, 5, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 41, 6000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Despawn In 6000 ms'),
+(1984901, 9, 0, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Remove FlagStandstate Dead'),
+(1984901, 9, 1, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 19, 33556488, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Remove Flags PvP Attackable & Pet In Combat & Not Selectable'),
+(1984901, 9, 2, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scrap Reaver X6000 - Actionlist - Set Rooted Off');
 
 -- Negatron
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19851);
@@ -193,7 +197,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1954100, 9, 2, 0, 0, 0, 100, 512, 1200, 1200, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 19851, 100, 0, 0, 0, 0, 0, 0, 'Netherstorm Agent - Actionlist - Start Attacking');
 
 -- Conditions for controlling Scrap Reaver X6000
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceEntry` = 34630) AND (`ConditionTypeOrReference` = 29) AND (`ConditionValue1` = 19851);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceEntry` = 34630) AND (`ConditionTypeOrReference` IN (28, 29)) AND (`ConditionValue1` IN (19851, 10248));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (17, 0, 34630, 0, 0, 29, 0, 19851, 200, 0, 1, 0, 0, '', 'Only cast Scrap Reaver X6000 if Negatron is not spawned'),
 (17, 0, 34630, 0, 0, 28, 0, 10248, 0, 0, 1, 0, 0, '', 'Only cast Scrap Reaver X6000 if quest You, Robot is not completed');
