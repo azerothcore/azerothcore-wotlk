@@ -4470,7 +4470,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
-
+    // Game In Session
+    ApplySpellFix({ 39331 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+    });
     // Death Ray Warning Visual, Death Ray Damage Visual
     ApplySpellFix({ 63882, 63886 }, [](SpellInfo* spellInfo)
     {
