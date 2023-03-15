@@ -1,3 +1,4 @@
+-- DB update 2023_03_14_05 -> 2023_03_15_00
 --
 UPDATE `creature_template` SET `ScriptName` = "npc_chesspiece", `flags_extra`=`flags_extra`|0x01000000 WHERE `entry` IN (17469,17211,21748,21664,21750,21683,21747,21682,21726,21160,21752,21684);
 UPDATE `creature_template` SET `ScriptName` = "npc_echo_of_medivh" WHERE `entry`=16816;
