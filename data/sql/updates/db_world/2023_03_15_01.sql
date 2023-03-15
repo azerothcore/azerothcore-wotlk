@@ -1,3 +1,4 @@
+-- DB update 2023_03_15_00 -> 2023_03_15_01
 --
 UPDATE `creature_template_addon` SET `bytes2` = 1, `visibilityDistanceType` = 5 WHERE (`entry` = 19851);
 UPDATE `creature_template` SET `unit_flags` = 32768, `flags_extra` = `flags_extra`|2097152 WHERE (`entry` = 19851);
