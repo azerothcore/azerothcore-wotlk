@@ -1,3 +1,4 @@
+-- DB update 2023_03_15_02 -> 2023_03_15_03
 -- Ridgespine Horror
 UPDATE `creature_template_addon` SET `auras` = '7939 22766' WHERE `entry` = 20998;
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20998;

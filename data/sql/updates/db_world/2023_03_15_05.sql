@@ -1,3 +1,4 @@
+-- DB update 2023_03_15_04 -> 2023_03_15_05
 -- Brother Sarno
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 7917;
 

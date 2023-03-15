@@ -1,3 +1,4 @@
+-- DB update 2023_03_15_01 -> 2023_03_15_02
 --
 -- Repair Warp Splinter Loot Table
 UPDATE `reference_loot_template` SET `GroupId`=3 WHERE `Entry`=35006 AND `Item` IN (28370, 28367, 28371, 28348, 28350, 28349);
