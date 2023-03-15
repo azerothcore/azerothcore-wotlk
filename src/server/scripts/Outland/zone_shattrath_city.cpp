@@ -35,6 +35,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "TaskScheduler.h"
 
 /*######
 ## npc_raliq_the_drunk
@@ -45,7 +46,8 @@ EndContentData */
 enum Raliq
 {
     SPELL_UPPERCUT          = 10966,
-    QUEST_CRACK_SKULLS      = 10009
+    QUEST_CRACK_SKULLS      = 10009,
+    EMOTE_DRINK             = 7,
 };
 
 class npc_raliq_the_drunk : public CreatureScript
@@ -87,28 +89,40 @@ public:
         }
 
         uint32 m_uiNormFaction;
-        uint32 Uppercut_Timer;
 
         void Reset() override
         {
-            Uppercut_Timer = 5000;
             me->RestoreFaction();
+            _scheduler.CancelAll();
+            _scheduler.Schedule(5s, [this](TaskContext context)
+            {
+                me->HandleEmoteCommand(EMOTE_DRINK);
+                context.Repeat(5s);
+            });
         }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            _scheduler
+                .Schedule(5s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_UPPERCUT);
+                context.Repeat(15s);
+            });
+        };
 
         void UpdateAI(uint32 diff) override
         {
+
+            _scheduler.Update(diff);
+
             if (!UpdateVictim())
                 return;
 
-            if (Uppercut_Timer <= diff)
-            {
-                DoCastVictim(SPELL_UPPERCUT);
-                Uppercut_Timer = 15000;
-            }
-            else Uppercut_Timer -= diff;
-
             DoMeleeAttackIfReady();
         }
+    private:
+        TaskScheduler _scheduler;
     };
 };
 

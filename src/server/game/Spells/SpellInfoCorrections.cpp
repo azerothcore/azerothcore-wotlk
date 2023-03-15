@@ -4471,6 +4471,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
+    // Death Ray Warning Visual, Death Ray Damage Visual
+    ApplySpellFix({ 63882, 63886 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

@@ -21,7 +21,6 @@
 
 enum Enums
 {
-    SAY_ENTER                   = 0,
     SAY_AGGRO                   = 1,
     SAY_BANISH                  = 2,
     SAY_SLAY                    = 3,
@@ -45,12 +44,6 @@ enum Enums
          {
              Talk(id);
          }
-     }
-
-     void InitializeAI() override
-     {
-         OwnTalk(SAY_ENTER);
-         ScriptedAI::InitializeAI();
      }
 
      void JustEngagedWith(Unit* /*who*/) override
