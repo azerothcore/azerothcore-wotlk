@@ -1,3 +1,4 @@
+-- DB update 2023_03_16_00 -> 2023_03_16_01
 /*  Dark Iron Agent  - GUID 30132  */
 
 UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = 30132;
