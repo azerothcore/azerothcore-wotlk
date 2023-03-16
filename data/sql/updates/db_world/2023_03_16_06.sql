@@ -1,3 +1,4 @@
+-- DB update 2023_03_16_05 -> 2023_03_16_06
 --
 UPDATE `creature_template` SET `minlevel` = 63, `maxlevel` = 63 WHERE (`entry` = 20700);
 UPDATE `creature_template` SET `AIName` = '' WHERE (`entry` = 18703);
