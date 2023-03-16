@@ -4483,6 +4483,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
     });
 
+    // Shoulder Charge
+    ApplySpellFix({ 31994 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
