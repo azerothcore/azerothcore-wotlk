@@ -340,7 +340,7 @@ namespace MMAP
         {
             fclose(file);
             delete[] verts;
-            delete[] inds;
+            delete[] inds; // cppcheck-suppress uninitdata
             return;
         }
 

@@ -165,14 +165,14 @@ public:
         {
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-            events.ScheduleEvent(EVENT_SHIELD, 14000 + rand() % 5000);
-            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 6000 + rand() % 6000);
-            events.ScheduleEvent(EVENT_STATIC_CHARGE, 24000);
-            events.ScheduleEvent(EVENT_LIGHTNING_RING, 25000 + rand() % 6000);
-            events.ScheduleEvent(EVENT_SUMMON, 20000);
-            events.ScheduleEvent(EVENT_SUMMON, 21500);
-            events.ScheduleEvent(EVENT_SUMMON_SPEACH, 20000);
+            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
+            events.ScheduleEvent(EVENT_SHIELD, 14s, 19s);
+            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 6s, 12s);
+            events.ScheduleEvent(EVENT_STATIC_CHARGE, 24s);
+            events.ScheduleEvent(EVENT_LIGHTNING_RING, 25s, 31s);
+            events.ScheduleEvent(EVENT_SUMMON, 20s);
+            events.ScheduleEvent(EVENT_SUMMON, 21s + 500ms);
+            events.ScheduleEvent(EVENT_SUMMON_SPEACH, 20s);
 
             if (pInstance)
             {
@@ -214,8 +214,8 @@ public:
                         {
                             SummonPhase = PHASE_SUMMON_OOZE;
                             events.CancelEvent(EVENT_SUMMON);
-                            events.ScheduleEvent(EVENT_SUMMON, 0);
-                            events.ScheduleEvent(EVENT_SUMMON, 1500);
+                            events.ScheduleEvent(EVENT_SUMMON, 0ms);
+                            events.ScheduleEvent(EVENT_SUMMON, 1500ms);
 
                             if (pInstance)
                                 if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
@@ -236,17 +236,17 @@ public:
                             me->CastSpell(me, SPELL_FRENZY, false);
 
                             events.CancelEvent(EVENT_SUMMON);
-                            events.ScheduleEvent(EVENT_SUMMON, 0);
+                            events.ScheduleEvent(EVENT_SUMMON, 0ms);
                             break;
                         }
 
-                        events.RepeatEvent(1000);
+                        events.Repeat(1s);
                         break;
                     }
                 case EVENT_SHIELD:
                     {
                         me->CastSpell(me, DUNGEON_MODE(SPELL_LIGHTNING_SHIELD, SPELL_LIGHTNING_SHIELD_H), false);
-                        events.RepeatEvent(14000 + rand() % 5000);
+                        events.Repeat(14s, 19s);
                         break;
                     }
                 case EVENT_CHAIN_LIGHTNING:
@@ -254,7 +254,7 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, DUNGEON_MODE(SPELL_CHAIN_LIGHTNING, SPELL_CHAIN_LIGHTNING_H), false);
 
-                        events.RepeatEvent(6000 + rand() % 6000);
+                        events.Repeat(6s, 12s);
                         break;
                     }
                 case EVENT_STATIC_CHARGE:
@@ -262,14 +262,14 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, DUNGEON_MODE(SPELL_STATIC_CHARGE, SPELL_STATIC_CHARGE_H), false);
 
-                        events.RepeatEvent(20000);
+                        events.Repeat(20s);
                         break;
                     }
                 case EVENT_LIGHTNING_RING:
                     {
                         me->CastSpell(me, DUNGEON_MODE(SPELL_LIGHTNING_RING, SPELL_LIGHTNING_RING_H), false);
-                        events.RepeatEvent(25000 + rand() % 6000);
-                        events.DelayEvents(10000); // Channel duration
+                        events.Repeat(25s, 31s);
+                        events.DelayEvents(10s); // Channel duration
                         break;
                     }
                 case EVENT_SUMMON_SPEACH:
@@ -289,7 +289,7 @@ public:
                             case PHASE_SUMMON_UNFRIENDLY_DWARFES:
                                 {
                                     SummonDwarfes(false);
-                                    events.RepeatEvent(20000);
+                                    events.Repeat(20s);
                                     break;
                                 }
                             case PHASE_SUMMON_OOZE:
@@ -303,7 +303,7 @@ public:
                                             summons.Summon(ooze);
                                         }
                                     }
-                                    events.RepeatEvent(10000);
+                                    events.Repeat(10s);
                                     break;
                                 }
                             case PHASE_SUMMON_FRIENDLY_DWARFES:
@@ -454,7 +454,7 @@ public:
                 case EVENT_TOXIC_VOLLEY:
                     {
                         me->CastSpell(me, DUNGEON_MODE(SPELL_TOXIC_VOLLEY, SPELL_TOXIC_VOLLEY_H), false);
-                        events.RepeatEvent(5000);
+                        events.Repeat(5s);
                         break;
                     }
             }
@@ -483,7 +483,7 @@ public:
         void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == 0)
-                events.RescheduleEvent(EVENT_MALFORMED_OOZE_CHECK, 1000);
+                events.RescheduleEvent(EVENT_MALFORMED_OOZE_CHECK, 1s);
         }
 
         void JustEngagedWith(Unit*) override { }
@@ -508,7 +508,7 @@ public:
                                     break;
                                 }
 
-                        events.RepeatEvent(1000);
+                        events.Repeat(1s);
                         break;
                     }
             }

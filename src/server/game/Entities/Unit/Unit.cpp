@@ -10717,11 +10717,6 @@ void Unit::SetMinion(Minion* minion, bool apply)
         // PvP, FFAPvP
         minion->SetByteValue(UNIT_FIELD_BYTES_2, 1, GetByteValue(UNIT_FIELD_BYTES_2, 1));
 
-        // FIXME: hack, speed must be set only at follow
-        if (GetTypeId() == TYPEID_PLAYER && minion->IsPet())
-            for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
-                minion->SetSpeed(UnitMoveType(i), m_speed_rate[i], true);
-
         // Ghoul pets have energy instead of mana (is anywhere better place for this code?)
         if (minion->IsPetGhoul() || minion->GetEntry() == 24207 /*ENTRY_ARMY_OF_THE_DEAD*/)
             minion->setPowerType(POWER_ENERGY);
@@ -14268,7 +14263,17 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
         {
             // Set creature speed rate
             if (GetTypeId() == TYPEID_UNIT)
-                speed *= ToCreature()->GetCreatureTemplate()->speed_run; // at this point, MOVE_WALK is never reached
+            {
+                if (IsPet() && ToPet()->isControlled() && IsControlledByPlayer())
+                {
+                    // contant value for player pets
+                    speed *= 1.15f;
+                }
+                else
+                {
+                    speed *= ToCreature()->GetCreatureTemplate()->speed_run; // at this point, MOVE_WALK is never reached
+                }
+            }
 
             // Normalize speed by 191 aura SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED if need
             /// @todo possible affect only on MOVE_RUN
@@ -15397,7 +15402,7 @@ void Unit::SetHealth(uint32 val)
     SetUInt32Value(UNIT_FIELD_HEALTH, val);
 
     // mobs that are now or were below 30% need to update their speed
-    if (GetTypeId() == TYPEID_UNIT && (prevHealthPct < 30.0 || HealthBelowPct(30)))
+    if (GetTypeId() == TYPEID_UNIT && !(IsPet() && ToPet()->isControlled() && IsControlledByPlayer()) && (prevHealthPct < 30.0 || HealthBelowPct(30)))
     {
         UpdateSpeed(MOVE_RUN, false);
     }
@@ -15905,7 +15910,10 @@ bool CharmInfo::AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates new
                         {
                             WorldPacket data;
                             creature->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spell_id, cooldown);
-                            creature->GetCharmer()->ToPlayer()->SendDirectMessage(&data);
+                            if (creature->GetCharmer() && creature->GetCharmer()->IsPlayer())
+                            {
+                                creature->GetCharmer()->ToPlayer()->SendDirectMessage(&data);
+                            }
                         }
                     }, 500ms);
                 }
@@ -18586,15 +18594,15 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     // Charmer stop charming
     if (playerCharmer)
     {
-        playerCharmer->StopCastingCharm();
-        playerCharmer->StopCastingBindSight();
+        playerCharmer->StopCastingCharm(aurApp ? aurApp->GetBase() : nullptr);
+        playerCharmer->StopCastingBindSight(aurApp ? aurApp->GetBase() : nullptr);
     }
 
     // Charmed stop charming
     if (GetTypeId() == TYPEID_PLAYER)
     {
-        ToPlayer()->StopCastingCharm();
-        ToPlayer()->StopCastingBindSight();
+        ToPlayer()->StopCastingCharm(aurApp ? aurApp->GetBase() : nullptr);
+        ToPlayer()->StopCastingBindSight(aurApp ? aurApp->GetBase() : nullptr);
     }
 
     // StopCastingCharm may remove a possessed pet?
@@ -18706,8 +18714,11 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
                         SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(GameTime::GetGameTime().count())); // cast can't be helped
                     }
                 }
-                GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
-                playerCharmer->CharmSpellInitialize();
+                if (playerCharmer->m_seer != this)
+                {
+                    GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
+                    playerCharmer->CharmSpellInitialize();
+                }
                 break;
             default:
                 break;
@@ -19979,17 +19990,27 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         pos = *exitPosition;
 
     // HACK
-    if (vehicle->GetVehicleInfo()->m_ID == 380) // Kologarn right arm
-        pos.Relocate(1776.0f, -24.0f, 448.75f, 0.0f);
-    else if (vehicle->GetVehicleInfo()->m_ID == 91) // Helsman's Ship
-        pos.Relocate(2802.18f, 7054.91f, -0.6f, 4.67f);
-    else if (vehicle->GetVehicleInfo()->m_ID == 349) // AT Mounts, dismount to the right
+    VehicleEntry const* vehicleInfo = vehicle->GetVehicleInfo();
+    if (vehicleInfo)
     {
-        float x = pos.GetPositionX() + 2.0f * cos(pos.GetOrientation() - M_PI / 2.0f);
-        float y = pos.GetPositionY() + 2.0f * std::sin(pos.GetOrientation() - M_PI / 2.0f);
-        float z = GetMapHeight(x, y, pos.GetPositionZ());
-        if (z > INVALID_HEIGHT)
-            pos.Relocate(x, y, z);
+        if (vehicleInfo->m_ID == 380) // Kologarn right arm
+        {
+            pos.Relocate(1776.0f, -24.0f, 448.75f, 0.0f);
+        }
+        else if (vehicleInfo->m_ID == 91) // Helsman's Ship
+        {
+            pos.Relocate(2802.18f, 7054.91f, -0.6f, 4.67f);
+        }
+        else if (vehicleInfo->m_ID == 349) // AT Mounts, dismount to the right
+        {
+            float x = pos.GetPositionX() + 2.0f * cos(pos.GetOrientation() - M_PI / 2.0f);
+            float y = pos.GetPositionY() + 2.0f * std::sin(pos.GetOrientation() - M_PI / 2.0f);
+            float z = GetMapHeight(x, y, pos.GetPositionZ());
+            if (z > INVALID_HEIGHT)
+            {
+                pos.Relocate(x, y, z);
+            }
+        }
     }
 
     AddUnitState(UNIT_STATE_MOVE);
@@ -20009,7 +20030,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 
     // xinef: hack for flameleviathan seat vehicle
-    if (vehicle->GetVehicleInfo()->m_ID != 341)
+    if (!vehicleInfo || vehicleInfo->m_ID != 341)
     {
         Movement::MoveSplineInit init(this);
         init.MoveTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
@@ -20031,16 +20052,18 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 
     // xinef: move fall, should we support all creatures that exited vehicle in air? Currently Quest Drag and Drop only, Air Assault quest
-    if (GetTypeId() == TYPEID_UNIT && !CanFly() &&
-            (vehicle->GetVehicleInfo()->m_ID == 113 || vehicle->GetVehicleInfo()->m_ID == 8 || vehicle->GetVehicleInfo()->m_ID == 290 || vehicle->GetVehicleInfo()->m_ID == 298))
+    if (GetTypeId() == TYPEID_UNIT && !CanFly() && vehicleInfo && (vehicleInfo->m_ID == 113 || vehicleInfo->m_ID == 8 || vehicleInfo->m_ID == 290 || vehicleInfo->m_ID == 298))
+    {
         GetMotionMaster()->MoveFall();
-    //GetMotionMaster()->MoveFall();            // Enable this once passenger positions are calculater properly (see above)
+    }
 
     if ((!player || !(player->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT)) && vehicle->GetBase()->HasUnitTypeMask(UNIT_MASK_MINION))
         if (((Minion*)vehicleBase)->GetOwner() == this)
         {
-            if (vehicle->GetVehicleInfo()->m_ID != 349)
+            if (!vehicleInfo || vehicleInfo->m_ID != 349)
+            {
                 vehicle->Dismiss();
+            }
             else if (vehicleBase->GetTypeId() == TYPEID_UNIT)
             {
                 vehicle->Uninstall();
