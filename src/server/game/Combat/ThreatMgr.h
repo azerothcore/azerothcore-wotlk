@@ -227,7 +227,6 @@ public:
 
     Acore::IteratorPair<std::list<ThreatReference*>::const_iterator> GetSortedThreatList() const { auto& list = iThreatContainer.GetThreatList(); return { list.cbegin(), list.cend() }; }
     Acore::IteratorPair<std::list<ThreatReference*>::const_iterator> GetUnsortedThreatList() const { return GetSortedThreatList(); }
-    std::list<ThreatReference*> GetModifiableThreatList() const { return iThreatContainer.GetThreatList(); }
 
     void processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusChangeEvent);
 
