@@ -147,8 +147,6 @@ enum RizzleSprysprocketData
     MSG_ESCAPE_NOTICE               = 3
 };
 
-#define GOSSIP_GET_MOONSTONE "Hand over the Southfury moonstone and I'll let you go."
-
 Position const WPs[58] =
 {
     {3691.97f, -3962.41f, 35.9118f, 3.67f},
@@ -258,6 +256,7 @@ public:
         void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
             CloseGossipMenuFor(player);
+            me->ReplaceAllNpcFlags(NPCFlags(0));
             me->CastSpell(player, SPELL_GIVE_SOUTHFURY_MOONSTONE, true);
             MustDieTimer = 3000;
             MustDie = true;
@@ -380,17 +379,6 @@ public:
         bool ContinueWP;
         bool Reached;
     };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_CHASING_THE_MOONSTONE) != QUEST_STATUS_INCOMPLETE)
-            return true;
-
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_GET_MOONSTONE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, 10811, creature->GetGUID());
-
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {
