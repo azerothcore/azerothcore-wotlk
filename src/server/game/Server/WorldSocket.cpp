@@ -355,8 +355,12 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
             sessionGuard.lock();
             LogOpcodeText(opcode, sessionGuard);
             if (_worldSession)
+            {
                 _worldSession->ResetTimeOutTime(true);
-            return ReadDataHandlerResult::Ok;
+                return ReadDataHandlerResult::Ok;
+            }
+            LOG_ERROR("network", "WorldSocket::ReadDataHandler: client {} sent CMSG_KEEP_ALIVE without being authenticated", GetRemoteIpAddress().to_string());
+            return ReadDataHandlerResult::Error;
         case CMSG_TIME_SYNC_RESP:
             packetToQueue = new WorldPacket(std::move(packet), GameTime::Now());
             break;
