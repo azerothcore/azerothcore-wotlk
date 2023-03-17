@@ -7199,10 +7199,6 @@ void Player::_SaveActions(CharacterDatabaseTransaction trans)
 
 void Player::_SaveAuras(CharacterDatabaseTransaction trans, bool logout)
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA);
-    stmt->SetData(0, GetGUID().GetCounter());
-    trans->Append(stmt);
-
     for (AuraMap::const_iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end(); ++itr)
     {
         if (!itr->second->CanBeSaved())
@@ -7234,7 +7230,7 @@ void Player::_SaveAuras(CharacterDatabaseTransaction trans, bool logout)
         }
 
         uint8 index = 0;
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_AURA);
         stmt->SetData(index++, GetGUID().GetCounter());
         stmt->SetData(index++, itr->second->GetCasterGUID().GetRawValue());
         stmt->SetData(index++, itr->second->GetCastItemGUID().GetRawValue());
