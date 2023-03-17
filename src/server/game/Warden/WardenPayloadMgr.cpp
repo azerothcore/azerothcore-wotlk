@@ -43,7 +43,7 @@ uint16 WardenPayloadMgr::GetFreePayloadId()
     return payloadId;
 }
 
-uint16 WardenPayloadMgr::RegisterPayload(const std::string& payload)
+uint16 WardenPayloadMgr::RegisterPayload(std::string const& payload)
 {
     uint16 payloadId = GetFreePayloadId();
 
@@ -156,7 +156,7 @@ std::string WardenPayloadMgr::GetCheckListSignature(std::list<uint16>& checkList
 {
     std::string sigResult;
 
-    for (const uint16& checkId : checkList)
+    for (uint16 const& checkId : checkList)
     {
         sigResult.append(std::to_string(checkId));
         sigResult.append(";");
@@ -169,7 +169,7 @@ bool WardenPayloadMgr::IsInterruptedCheck(std::list<uint16>& checkList, uint32 s
 {
     std::string checkSig = GetCheckListSignature(checkList);
 
-    for (const auto& checkInfo : InterruptedChecks)
+    for (auto const& checkInfo : InterruptedChecks)
     {
         if (serverTicks == checkInfo.CheckTime &&
             checkSig == checkInfo.Signature)
