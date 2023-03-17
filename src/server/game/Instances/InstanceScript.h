@@ -220,6 +220,9 @@ public:
     // Cast spell on all players in instance
     void DoCastSpellOnPlayers(uint32 spell);
 
+    // Cast spell on player
+    void DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets /*= false*/, bool includeControlled /*= false*/);
+
     // Return wether server allow two side groups or not
     bool ServerAllowsTwoSideGroups() { return sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP); }
 

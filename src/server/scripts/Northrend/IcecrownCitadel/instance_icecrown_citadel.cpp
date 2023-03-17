@@ -252,6 +252,22 @@ public:
 
             if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                 SpawnGunship();
+
+            if (IsBuffAvailable)
+            {
+                SpellAreaForAreaMapBounds saBounds = sSpellMgr->GetSpellAreaForAreaMapBounds(4812);
+                for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
+                    if ((itr->second->raceMask & player->getRaceMask()) && !player->HasAura(itr->second->spellId))
+                    {
+                        if (SpellInfo const* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
+                        {
+                            if (si->HasAura(SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT))
+                            {
+                                DoCastSpellOnPlayer(player, itr->second->spellId, false, false);
+                            }
+                        }
+                    }
+            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -1210,40 +1226,39 @@ public:
                     IsBuffAvailable = !!data;
                     if (!IsBuffAvailable)
                     {
-                        Map::PlayerList const& plrList = instance->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = plrList.begin(); itr != plrList.end(); ++itr)
-                            if (Player* plr = itr->GetSource())
+                        instance->DoForAllPlayers([&](Player* player)
+                        {
+                            player->UpdateAreaDependentAuras(player->GetAreaId());
+                            for (Unit::ControlSet::const_iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
                             {
-                                plr->UpdateAreaDependentAuras(plr->GetAreaId());
-                                for (Unit::ControlSet::const_iterator itr = plr->m_Controlled.begin(); itr != plr->m_Controlled.end(); ++itr)
-                                {
-                                    Unit::AuraMap& am = (*itr)->GetOwnedAuras();
-                                    for (Unit::AuraMap::iterator itra = am.begin(); itra != am.end();)
-                                        switch (itra->second->GetId())
-                                        {
-                                            // Hellscream's Warsong
-                                            case 73816:
-                                            case 73818:
-                                            case 73819:
-                                            case 73820:
-                                            case 73821:
-                                            case 73822:
+                                Unit::AuraMap& am = (*itr)->GetOwnedAuras();
+                                for (Unit::AuraMap::iterator itra = am.begin(); itra != am.end();)
+                                    switch (itra->second->GetId())
+                                    {
+                                        // Hellscream's Warsong
+                                        case 73816:
+                                        case 73818:
+                                        case 73819:
+                                        case 73820:
+                                        case 73821:
+                                        case 73822:
                                             // Strength of Wrynn
-                                            case 73762:
-                                            case 73824:
-                                            case 73825:
-                                            case 73826:
-                                            case 73827:
-                                            case 73828:
-                                                (*itr)->RemoveOwnedAura(itra);
-                                                break;
-                                            default:
-                                                ++itra;
-                                                break;
-                                        }
-                                }
+                                        case 73762:
+                                        case 73824:
+                                        case 73825:
+                                        case 73826:
+                                        case 73827:
+                                        case 73828:
+                                            (*itr)->RemoveOwnedAura(itra);
+                                            break;
+                                        default:
+                                            ++itra;
+                                            break;
+                                    }
                             }
+                        });
                     }
+                    SaveToDB();
                     break;
                 case DATA_WEEKLY_QUEST_ID:
                     for (uint8 i = 0; i < WeeklyNPCs; ++i)
@@ -1593,7 +1608,6 @@ public:
                 ColdflameJetsState = temp ? DONE : NOT_STARTED;
             }
 
-            data >> temp;
             data >> BloodQuickeningState;
             data >> BloodQuickeningMinutes;
 
@@ -1607,11 +1621,10 @@ public:
             data >> WeeklyQuestId10;
             data >> PutricideEventProgress;
             PutricideEventProgress &= ~PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS;
-            data >> temp;
-            LichKingHeroicAvailable = !!temp;
+            data >> LichKingHeroicAvailable;
             data >> BloodPrinceTrashCount;
-            data >> temp;
-            SetData(DATA_BUFF_AVAILABLE, !!temp);
+            data >> IsBuffAvailable;
+            SetData(DATA_BUFF_AVAILABLE, IsBuffAvailable);
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override

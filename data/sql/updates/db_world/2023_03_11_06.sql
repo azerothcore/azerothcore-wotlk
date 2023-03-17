@@ -16,6 +16,6 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (35004, 28193, 0, 0, 0, 1, 3, 1, 1, 'Mana-Etched Crown'),
 (35004, 28206, 0, 0, 0, 1, 3, 1, 1, 'Cowl of the Guiltless');
 -- Insert 2nd loot drop
-DELETE FROM `creature_loot_template` WHERE `Entry`=17881 AND `Item`=35007 AND `GroupId`=3;
+DELETE FROM `creature_loot_template` WHERE `Entry`=17881 AND `Item`=35004 AND `GroupId`=3;
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES 
 (17881, 35004, 35004, 100, 0, 1, 3, 1, 1, 'Aeonus High Value Table - (ReferenceTable)');
