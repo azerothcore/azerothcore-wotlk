@@ -183,6 +183,11 @@ bool WardenPayloadMgr::IsInterruptedCheck(std::list<uint16>& checkList, uint32 s
 
 void WardenPayloadMgr::CleanOldInterrupts()
 {
+    if (InterruptedChecks.empty())
+    {
+        return;
+    }
+
     auto currentTicks = GameTime::GetGameTimeMS().count();
 
     InterruptedChecks.erase(std::remove_if(InterruptedChecks.begin(), InterruptedChecks.end(), [currentTicks](WardenCheckInfo checkInfo)
