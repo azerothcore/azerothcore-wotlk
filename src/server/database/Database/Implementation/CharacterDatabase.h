@@ -193,7 +193,7 @@ enum CharacterDatabaseStatements : uint32
     CHAR_INS_EQUIP_SET,
     CHAR_DEL_EQUIP_SET,
 
-    CHAR_INS_AURA,
+    CHAR_REP_AURA,
 
     CHAR_SEL_ACCOUNT_DATA,
     CHAR_REP_ACCOUNT_DATA,
