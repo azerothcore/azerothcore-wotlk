@@ -1,4 +1,5 @@
 --
+DELETE FROM `creature_addon` WHERE `guid` IN (98348, 102744);
 
 DELETE FROM `creature_template_addon` WHERE `entry` IN (29149, 29006, 28025, 28668, 28667, 29124, 28443, 28112, 28001, 28010, 29036, 28095);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES
