@@ -564,6 +564,8 @@ void WardenWin::RequestChecks()
         checkInfo.Signature = GetPayloadMgr()->GetCheckListSignature(_CurrentChecks);
 
         GetPayloadMgr()->InterruptedChecks.push_back(checkInfo);
+
+        _interrupted = false;
     }
 }
 
