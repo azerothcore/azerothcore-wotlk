@@ -199,5 +199,5 @@ void WardenPayloadMgr::CleanOldInterrupts()
         return (diff > (WardenInterruptCleanTime * IN_MILLISECONDS));
     }));
 
-    LOG_DEBUG("warden", "Cleaned up '{}' interrupts.", count - InterruptedChecks.size());
+    LOG_DEBUG("warden", "Cleaned up '{}' interrupt(s).", count - InterruptedChecks.size());
 }
