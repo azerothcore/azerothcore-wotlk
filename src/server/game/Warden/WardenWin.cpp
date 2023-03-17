@@ -411,6 +411,11 @@ void WardenWin::RequestChecks()
                 check = &_payloadMgr.CachedChecks.at(id);
             }
 
+            if (_interrupted && id < WardenPayloadMgr::WardenPayloadOffsetMin)
+            {
+                return true;
+            }
+
             // Remove nullptr if it snuck in from earlier check.
             if (!check)
             {

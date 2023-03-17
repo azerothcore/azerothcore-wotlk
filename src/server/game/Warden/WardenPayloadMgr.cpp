@@ -156,7 +156,7 @@ std::string WardenPayloadMgr::GetCheckListSignature(std::list<uint16>& checkList
 {
     std::string sigResult;
 
-    for (const auto& checkId : checkList)
+    for (const uint16& checkId : checkList)
     {
         sigResult.append(std::to_string(checkId));
         sigResult.append(";");
@@ -195,7 +195,7 @@ void WardenPayloadMgr::CleanOldInterrupts()
 
     for (auto it = InterruptedChecks.begin(); it != InterruptedChecks.end();)
     {
-        auto diff = currentTicks - it->CheckTime;
+        uint32 diff = currentTicks - it->CheckTime;
 
         if (diff > (WardenInterruptCleanTime * IN_MILLISECONDS))
         {
