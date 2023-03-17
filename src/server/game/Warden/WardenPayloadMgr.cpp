@@ -16,6 +16,7 @@
  */
 
 #include "WardenPayloadMgr.h"
+#include "Common.h"
 #include "GameTime.h"
 #include "StringFormat.h"
 #include "Errors.h"
