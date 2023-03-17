@@ -411,6 +411,7 @@ void WardenWin::RequestChecks()
                 check = &_payloadMgr.CachedChecks.at(id);
             }
 
+            // Remove normal Warden checkid if Warden is interrupted by ForceChecks
             if (_interrupted && id < WardenPayloadMgr::WardenPayloadOffsetMin)
             {
                 return true;
