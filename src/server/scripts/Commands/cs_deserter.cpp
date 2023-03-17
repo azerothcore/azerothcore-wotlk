@@ -195,7 +195,7 @@ public:
             }
 
             uint8 index = 0;
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_AURA);
             stmt->SetData(index++, guid.GetCounter());
             stmt->SetData(index++, guid.GetCounter());
             stmt->SetData(index++, 0);
