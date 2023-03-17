@@ -19,7 +19,9 @@
 #define _WARDEN_PAYLOAD_MGR_H
 
 #include "WardenCheckMgr.h"
+
 #include <vector>
+#include <list>
 
 struct WardenCheckInfo
 {
