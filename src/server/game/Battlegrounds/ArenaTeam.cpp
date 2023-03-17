@@ -281,7 +281,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
 
 bool ArenaTeam::SetName(std::string const& name)
 {
-    if (TeamName == name || name.empty() || name.length() > 24 || sObjectMgr->IsReservedName(name) || !ObjectMgr::IsValidCharterName(name))
+    if (TeamName == name || name.empty() || name.length() > 24 || sObjectMgr->IsReservedName(name) || sObjectMgr->IsProfanityName(name) || !ObjectMgr::IsValidCharterName(name))
         return false;
 
     TeamName = name;
@@ -751,7 +751,7 @@ int32 ArenaTeam::GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won 
     // Calculate the rating modification
     float mod;
 
-    // TODO: Replace this hack with using the confidence factor (limiting the factor to 2.0f)
+    /// @todo: Replace this hack with using the confidence factor (limiting the factor to 2.0f)
     if (won)
     {
         if (ownRating < 1300)

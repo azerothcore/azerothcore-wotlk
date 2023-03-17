@@ -69,7 +69,7 @@ void PossessedAI::KilledUnit(Unit*  /*victim*/)
     //    victim->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
 }
 
-void CritterAI::EnterCombat(Unit* who)
+void CritterAI::JustEngagedWith(Unit* who)
 {
     if (!me->HasUnitState(UNIT_STATE_FLEEING))
     {

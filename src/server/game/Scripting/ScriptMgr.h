@@ -27,6 +27,7 @@
 #include "DynamicObject.h"
 #include "GameEventMgr.h"
 #include "Group.h"
+#include "InstanceScript.h"
 #include "LFGMgr.h"
 #include "ObjectMgr.h"
 #include "PetDefines.h"
@@ -1597,6 +1598,9 @@ public:
 
     // Called when instance id is removed from database (e.g. instance reset)
     virtual void OnInstanceIdRemoved(uint32 /*instanceId*/) { }
+
+    // Called when any raid boss has their state updated (e.g. pull, reset, kill)
+    virtual void OnBeforeSetBossState(uint32 /*id*/, EncounterState /*newState*/, EncounterState /*oldState*/, Map* /*instance*/) { }
 };
 
 class BGScript : public ScriptObject
@@ -2431,6 +2435,7 @@ public: /* GlobalScript */
     void OnLoadSpellCustomAttr(SpellInfo* spell);
     bool OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid source);
     void OnInstanceIdRemoved(uint32 instanceId);
+    void OnBeforeSetBossState(uint32 id, EncounterState newState, EncounterState oldState, Map* instance);
 
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }

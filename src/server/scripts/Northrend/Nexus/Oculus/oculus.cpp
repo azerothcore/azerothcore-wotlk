@@ -354,7 +354,7 @@ public:
 
         void IsSummonedBy(WorldObject* summoner) override
         {
-            if (summoner->GetTypeId() != TYPEID_UNIT)
+            if (summoner->GetTypeId() != TYPEID_PLAYER)
             {
                 return;
             }
@@ -502,7 +502,7 @@ public:
 
         void Reset() override {}
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoCast(IsHeroic() ? H_SPELL_EMPOWERING_BLOWS : SPELL_EMPOWERING_BLOWS);
         }

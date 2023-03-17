@@ -264,6 +264,27 @@ SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePos
     return SPELL_FAILED_BAD_TARGETS;
 }
 
+/**
+ * @brief Cast spell on the max threat target, which may not always be the current victim.
+ *
+ * @param uint32 spellId Spell ID to cast.
+ * @param uint32 Threat table position.
+ * @param float dist Distance from caster to target.
+ * @param bool playerOnly Select players only, excludes pets and other npcs.
+ * @param bool triggered Triggered cast (full triggered mask).
+ *
+ * @return SpellCastResult
+ */
+SpellCastResult UnitAI::DoCastMaxThreat(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered)
+{
+    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, threatTablePosition, dist, playerOnly))
+    {
+        return DoCast(target, spellId, triggered);
+    }
+
+    return SPELL_FAILED_BAD_TARGETS;
+}
+
 #define UPDATE_TARGET(a) {if (AIInfo->target<a) AIInfo->target=a;}
 
 void UnitAI::FillAISpellInfo()

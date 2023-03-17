@@ -26,6 +26,8 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
+#define DataHeader "BT"
+
 #define BlackTempleScriptName "instance_black_temple"
 
 enum DataTypes

@@ -572,10 +572,12 @@ void BossAI::_Reset()
     if (!me->IsAlive())
         return;
 
+    me->SetCombatPulseDelay(0);
     me->ResetLootMode();
     events.Reset();
     scheduler.CancelAll();
     summons.DespawnAll();
+    _healthCheckEvents.clear();
     if (instance)
         instance->SetBossState(_bossId, NOT_STARTED);
 }
@@ -585,6 +587,7 @@ void BossAI::_JustDied()
     events.Reset();
     scheduler.CancelAll();
     summons.DespawnAll();
+    _healthCheckEvents.clear();
     if (instance)
     {
         instance->SetBossState(_bossId, DONE);
@@ -592,8 +595,9 @@ void BossAI::_JustDied()
     }
 }
 
-void BossAI::_EnterCombat()
+void BossAI::_JustEngagedWith()
 {
+    me->SetCombatPulseDelay(5);
     me->setActive(true);
     DoZoneInCombat();
     ScheduleTasks();
@@ -646,6 +650,7 @@ void BossAI::UpdateAI(uint32 diff)
     }
 
     events.Update(diff);
+    scheduler.Update(diff);
 
     if (me->HasUnitState(UNIT_STATE_CASTING))
     {
@@ -662,6 +667,39 @@ void BossAI::UpdateAI(uint32 diff)
     }
 
     DoMeleeAttackIfReady();
+}
+
+void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+{
+    if (!_healthCheckEvents.empty())
+    {
+        _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
+        {
+            return _ProccessHealthCheckEvent(data._healthPct, damage, data._exec);
+        });
+    }
+}
+
+/**
+ * @brief Executes a function once the creature reaches the defined health point percent.
+ *
+ * @param healthPct The health percent at which the code will be executed.
+ * @param exec The fuction to be executed.
+ */
+void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec)
+{
+    _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec));
+};
+
+bool BossAI::_ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const
+{
+    if (me->HealthBelowPctDamaged(healthPct, damage))
+    {
+        exec();
+        return true;
+    }
+
+    return false;
 }
 
 // WorldBossAI - for non-instanced bosses
@@ -687,7 +725,7 @@ void WorldBossAI::_JustDied()
     summons.DespawnAll();
 }
 
-void WorldBossAI::_EnterCombat()
+void WorldBossAI::_JustEngagedWith()
 {
     Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
     if (target)
