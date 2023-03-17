@@ -1654,10 +1654,6 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
 
 void Pet::_SaveAuras(CharacterDatabaseTransaction trans)
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_AURAS);
-    stmt->SetData(0, m_charmInfo->GetPetNumber());
-    trans->Append(stmt);
-
     for (AuraMap::const_iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end(); ++itr)
     {
         // check if the aura has to be saved
@@ -1714,23 +1710,23 @@ void Pet::_SaveAuras(CharacterDatabaseTransaction trans)
 
         uint8 index = 0;
 
-        CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
-        stmt2->SetData(index++, m_charmInfo->GetPetNumber());
-        stmt2->SetData(index++, casterGUID.GetRawValue());
-        stmt2->SetData(index++, itr->second->GetId());
-        stmt2->SetData(index++, effMask);
-        stmt2->SetData(index++, recalculateMask);
-        stmt2->SetData(index++, itr->second->GetStackAmount());
-        stmt2->SetData(index++, damage[0]);
-        stmt2->SetData(index++, damage[1]);
-        stmt2->SetData(index++, damage[2]);
-        stmt2->SetData(index++, baseDamage[0]);
-        stmt2->SetData(index++, baseDamage[1]);
-        stmt2->SetData(index++, baseDamage[2]);
-        stmt2->SetData(index++, itr->second->GetMaxDuration());
-        stmt2->SetData(index++, itr->second->GetDuration());
-        stmt2->SetData(index++, itr->second->GetCharges());
-        trans->Append(stmt2);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PET_AURA);
+        stmt->SetData(index++, m_charmInfo->GetPetNumber());
+        stmt->SetData(index++, casterGUID.GetRawValue());
+        stmt->SetData(index++, itr->second->GetId());
+        stmt->SetData(index++, effMask);
+        stmt->SetData(index++, recalculateMask);
+        stmt->SetData(index++, itr->second->GetStackAmount());
+        stmt->SetData(index++, damage[0]);
+        stmt->SetData(index++, damage[1]);
+        stmt->SetData(index++, damage[2]);
+        stmt->SetData(index++, baseDamage[0]);
+        stmt->SetData(index++, baseDamage[1]);
+        stmt->SetData(index++, baseDamage[2]);
+        stmt->SetData(index++, itr->second->GetMaxDuration());
+        stmt->SetData(index++, itr->second->GetDuration());
+        stmt->SetData(index++, itr->second->GetCharges());
+        trans->Append(stmt);
     }
 }
 
