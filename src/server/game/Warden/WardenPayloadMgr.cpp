@@ -188,11 +188,16 @@ void WardenPayloadMgr::CleanOldInterrupts()
         return;
     }
 
+    LOG_DEBUG("warden", "Cleaning up old interrupts..");
+
     auto currentTicks = GameTime::GetGameTimeMS().count();
+    uint32 count = InterruptedChecks.size();
 
     InterruptedChecks.erase(std::remove_if(InterruptedChecks.begin(), InterruptedChecks.end(), [currentTicks](WardenCheckInfo checkInfo)
     {
         auto diff = currentTicks - checkInfo.CheckTime;
         return (diff > (WardenInterruptCleanTime * IN_MILLISECONDS));
     }));
+
+    LOG_DEBUG("warden", "Cleaned up '{}' interrupts.", count - InterruptedChecks.size());
 }
