@@ -414,6 +414,7 @@ void WardenWin::RequestChecks()
             // Remove normal Warden checkid if Warden is interrupted by ForceChecks
             if (_interrupted && id < WardenPayloadMgr::WardenPayloadOffsetMin)
             {
+                _PendingChecks.push_back(id);
                 return true;
             }
 
