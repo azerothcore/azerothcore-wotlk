@@ -4483,6 +4483,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
     });
 
+    // Buffeting Winds of Susurrus
+    ApplySpellFix({ 32474 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(556); // 28 seconds
+    });
+
     // Shoulder Charge
     ApplySpellFix({ 31994 }, [](SpellInfo* spellInfo)
     {
