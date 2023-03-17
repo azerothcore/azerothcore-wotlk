@@ -2483,7 +2483,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
 
         if (!GetAchievement(criteria->referredAchievement))
         {
-            LOG_DEBUG("server.loading", "Achievement %u referenced by criteria %u doesn't exist, criteria not loaded.", criteria->referredAchievement, criteria->ID);
+            LOG_DEBUG("server.loading", "Achievement {} referenced by criteria {} doesn't exist, criteria not loaded.", criteria->referredAchievement, criteria->ID);
             continue;
         }
 
