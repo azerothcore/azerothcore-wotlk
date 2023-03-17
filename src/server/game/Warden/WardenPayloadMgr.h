@@ -19,7 +19,14 @@
 #define _WARDEN_PAYLOAD_MGR_H
 
 #include "WardenCheckMgr.h"
-#include <list>
+#include <vector>
+
+struct WardenCheckInfo
+{
+public:
+    uint32 CheckTime;
+    std::string Signature;
+};
 
  /**
  * @class WardenPayloadMgr
@@ -110,6 +117,26 @@ public:
     std::list<uint16>* GetPayloadsInQueue();
 
     /**
+    * @brief Get the signature of all payload ids.
+    * @param checkList The Warden _CurrentChecks is typically passed as this parameter.
+    * @return The signature of all of the payloads in the list.
+    */
+    std::string GetCheckListSignature(std::list<uint16>& checkList);
+
+    /**
+    * @brief Checks if the check list is in the interrupt cache before returning a bool as a result.
+    * @param checkList The Warden _CurrentChecks is typically passed as this parameter.
+    * @serverTicks The server ticks (in ms) as it is currently.
+    * @return If the check list is stored in the interrupt cache.
+    */
+    bool IsInterruptedCheck(std::list<uint16>& checkList, uint32 serverTicks);
+
+    /**
+    * @brief Cleans up old checks in the interrupt cache.
+    */
+    void CleanOldInterrupts();
+
+    /**
     * @brief The minimum id available for custom payloads.
     */
     static uint16 constexpr WardenPayloadOffsetMin = 5000;
@@ -125,6 +152,11 @@ public:
     static uint32 constexpr WardenPayloadCheckType = 139;
 
     /**
+    * @brief The cleanup time for old interrupts in seconds.
+    */
+    static uint32 constexpr WardenInterruptCleanTime = 15;
+
+    /**
     * @brief The list of currently queued payload ids to be sent through Warden.
     */
     std::list<uint16> QueuedPayloads;
@@ -133,6 +165,11 @@ public:
     * @brief The cached payloads that are accessed by payload id.
     */
     std::map<uint16, WardenCheck> CachedChecks;
+
+    /**
+    * @brief The cached interrupted check list signatues.
+    */
+    std::vector<WardenCheckInfo> InterruptedChecks;
 };
 
 #endif // _WARDEN_PAYLOAD_MGR_H

@@ -16,9 +16,12 @@
  */
 
 #include "WardenPayloadMgr.h"
+#include "GameTime.h"
 #include "StringFormat.h"
 #include "Errors.h"
 #include "Log.h"
+
+#include <algorithm>
 
 WardenPayloadMgr::WardenPayloadMgr() { }
 
@@ -147,4 +150,44 @@ uint32 WardenPayloadMgr::GetPayloadCountInQueue()
 std::list<uint16>* WardenPayloadMgr::GetPayloadsInQueue()
 {
     return &QueuedPayloads;
+}
+
+std::string WardenPayloadMgr::GetCheckListSignature(std::list<uint16>& checkList)
+{
+    std::string sigResult;
+
+    for (const auto& checkId : checkList)
+    {
+        sigResult.append(std::to_string(checkId));
+        sigResult.append(";");
+    }
+
+    return sigResult;
+}
+
+bool WardenPayloadMgr::IsInterruptedCheck(std::list<uint16>& checkList, uint32 serverTicks)
+{
+    std::string checkSig = GetCheckListSignature(checkList);
+
+    for (const auto& checkInfo : InterruptedChecks)
+    {
+        if (serverTicks == checkInfo.CheckTime &&
+            checkSig == checkInfo.Signature)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void WardenPayloadMgr::CleanOldInterrupts()
+{
+    auto currentTicks = GameTime::GetGameTimeMS().count();
+
+    InterruptedChecks.erase(std::remove_if(InterruptedChecks.begin(), InterruptedChecks.end(), [currentTicks](WardenCheckInfo checkInfo)
+    {
+        auto diff = currentTicks - checkInfo.CheckTime;
+        return (diff > (WardenInterruptCleanTime * IN_MILLISECONDS));
+    }));
 }

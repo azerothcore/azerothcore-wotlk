@@ -267,7 +267,6 @@ void WardenWin::ForceChecks()
     if (_dataSent)
     {
         _interrupted = true;
-        _interruptCounter++;
     }
 
     RequestChecks();
@@ -557,6 +556,15 @@ void WardenWin::RequestChecks()
     }
 
     LOG_DEBUG("warden", "{}", stream.str());
+
+    if (_interrupted)
+    {
+        WardenCheckInfo checkInfo;
+        checkInfo.CheckTime = _serverTicks;
+        checkInfo.Signature = GetPayloadMgr()->GetCheckListSignature(_CurrentChecks);
+
+        GetPayloadMgr()->InterruptedChecks.push_back(checkInfo);
+    }
 }
 
 void WardenWin::HandleData(ByteBuffer& buff)
@@ -575,10 +583,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
     {
         buff.rfinish();
 
-        if (!_interrupted)
-        {
-            ApplyPenalty(0, "Failed size checks in HandleData");
-        }
+        ApplyPenalty(0, "Failed size checks in HandleData");
 
         return;
     }
@@ -588,10 +593,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
         buff.rpos(buff.wpos());
         LOG_DEBUG("warden", "CHECKSUM FAIL");
 
-        if (!_interrupted)
-        {
-            ApplyPenalty(0, "Failed checksum in HandleData");
-        }
+        ApplyPenalty(0, "Failed checksum in HandleData");
 
         return;
     }
@@ -619,6 +621,8 @@ void WardenWin::HandleData(ByteBuffer& buff)
         LOG_DEBUG("warden", "Ticks {}", newClientTicks);         // At response
         LOG_DEBUG("warden", "Ticks diff {}", ourTicks - newClientTicks);
     }
+
+    bool ignoreResults = GetPayloadMgr()->IsInterruptedCheck(_CurrentChecks, _serverTicks);
 
     uint16 checkFailed = 0;
 
@@ -746,21 +750,16 @@ void WardenWin::HandleData(ByteBuffer& buff)
         }
     }
 
-    if (checkFailed > 0 && !_interrupted)
+    if (!ignoreResults)
     {
-        ApplyPenalty(checkFailed, "");
-    }
-
-    if (_interrupted)
-    {
-        LOG_DEBUG("warden", "Warden was interrupted by ForceChecks, ignoring results.");
-
-        _interruptCounter--;
-
-        if (_interruptCounter == 0)
+        if (checkFailed > 0)
         {
-            _interrupted = false;
+            ApplyPenalty(checkFailed, "");
         }
+    }
+    else
+    {
+        LOG_DEBUG("warden", "Warden was interrupted by Warden::ForceChecks, ignoring results.");
     }
 
     // Set hold off timer, minimum timer should at least be 1 second
