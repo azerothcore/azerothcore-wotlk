@@ -1897,8 +1897,22 @@ bool Creature::CanStartAttack(Unit const* who) const
     }
 
     if (Unit* owner = who->GetOwner())
-        if (owner->GetTypeId() == TYPEID_PLAYER && IsImmuneToPC())     // immune to PC and target has player owner
-            return false;
+    {
+        if (owner->GetTypeId() == TYPEID_PLAYER)
+        {
+            // Player totems are invalid attack targets
+            if (who->IsTotem())
+            {
+                return false;
+            }
+
+            // immune to PC and target has player owner
+            if (IsImmuneToPC())
+            {
+                return false;
+            }
+        }
+    }
 
     // Do not attack non-combat pets
     if (who->GetTypeId() == TYPEID_UNIT && who->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
