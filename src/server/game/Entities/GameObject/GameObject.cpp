@@ -1252,7 +1252,7 @@ bool GameObject::IsNeverVisible() const
     if (WorldObject::IsNeverVisible())
         return true;
 
-    if (GetGoType()->GetServerOnly())
+    if (GetGOInfo()->GetServerOnly())
         return true;
 
     return false;
