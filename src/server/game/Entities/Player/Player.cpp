@@ -11959,7 +11959,7 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
 
 void Player::GetAurasForTarget(Unit* target, bool force /*= false*/)
 {
-    if (!target || (!force && target->GetVisibleAuras().empty())    // speedup things
+    if (!target || (!force && target->GetVisibleAuras()->empty())    // speedup things
         return;
 
     /*! Blizz sends certain movement packets sometimes even before CreateObject
