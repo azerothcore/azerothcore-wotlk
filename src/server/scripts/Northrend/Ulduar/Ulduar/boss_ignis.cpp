@@ -247,9 +247,9 @@ public:
             lastShatterMSTime = 0;
             events.Reset();
             events.ScheduleEvent(EVENT_ACTIVATE_CONSTRUCT, RAID_MODE(40000, 30000));
-            events.ScheduleEvent(EVENT_SPELL_SCORCH, 10000);
-            events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32000);
-            events.ScheduleEvent(EVENT_GRAB, 25000);
+            events.ScheduleEvent(EVENT_SPELL_SCORCH, 10s);
+            events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32s);
+            events.ScheduleEvent(EVENT_GRAB, 25s);
 
             Talk(SAY_AGGRO);
             DoZoneInCombat();
@@ -354,8 +354,8 @@ public:
                     me->DisableRotate(true);
                     me->SendMovementFlagUpdate();
                     me->CastSpell(me->GetVictim(), S_SCORCH, false);
-                    events.RepeatEvent(20000);
-                    events.RescheduleEvent(EVENT_ENABLE_ROTATE, 3001);
+                    events.Repeat(20s);
+                    events.RescheduleEvent(EVENT_ENABLE_ROTATE, 3s);
                     break;
                 case EVENT_ENABLE_ROTATE:
                     me->SetControlled(false, UNIT_STATE_ROOT);
@@ -364,7 +364,7 @@ public:
                 case EVENT_SPELL_FLAME_JETS:
                     Talk(EMOTE_JETS);
                     me->CastSpell(me->GetVictim(), S_FLAME_JETS, false);
-                    events.RepeatEvent(25000);
+                    events.Repeat(25s);
                     break;
                 case EVENT_GRAB:
                     {
@@ -406,8 +406,8 @@ public:
                             }
                         }
 
-                        events.RepeatEvent(24000); // +6000 below
-                        events.DelayEvents(6000);
+                        events.Repeat(24s);
+                        events.DelayEvents(6s);
                     }
                     break;
             }

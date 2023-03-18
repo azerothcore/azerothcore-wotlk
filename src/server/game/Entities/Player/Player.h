@@ -2298,8 +2298,8 @@ public:
     void SetSeer(WorldObject* target) { m_seer = target; }
     void SetViewpoint(WorldObject* target, bool apply);
     [[nodiscard]] WorldObject* GetViewpoint() const;
-    void StopCastingCharm();
-    void StopCastingBindSight();
+    void StopCastingCharm(Aura* except = nullptr);
+    void StopCastingBindSight(Aura* except = nullptr);
 
     [[nodiscard]] uint32 GetSaveTimer() const { return m_nextSave; }
     void SetSaveTimer(uint32 timer) { m_nextSave = timer; }
@@ -2574,6 +2574,8 @@ public:
     // Settings
     [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
     void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
+
+    void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 
     std::string GetDebugInfo() const override;
 

@@ -84,11 +84,11 @@ public:
         void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
-            events.RescheduleEvent(EVENT_BOULDER, 8000);
-            events.RescheduleEvent(EVENT_STOMP, 5000);
-            events.RescheduleEvent(EVENT_GROUND_SLAM, 15000);
+            events.RescheduleEvent(EVENT_BOULDER, 8s);
+            events.RescheduleEvent(EVENT_STOMP, 5s);
+            events.RescheduleEvent(EVENT_GROUND_SLAM, 15s);
             if (me->GetMap()->IsHeroic())
-                events.RescheduleEvent(EVENT_GROUND_SPIKE, 10000);
+                events.RescheduleEvent(EVENT_GROUND_SPIKE, 10s);
 
             if (pInstance)
                 pInstance->SetData(BOSS_KRYSTALLUS, IN_PROGRESS);
@@ -125,34 +125,34 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, DUNGEON_MODE(BOULDER_TOSS, BOULDER_TOSS_H), false);
 
-                        events.RepeatEvent(5000 + rand() % 2000);
+                        events.Repeat(5s, 7s);
                         break;
                     }
                 case EVENT_GROUND_SPIKE:
                     {
                         me->CastSpell(me->GetVictim(), GROUND_SPIKE_H, false); // current enemy target
-                        events.RepeatEvent(8000 + rand() % 3000);
+                        events.Repeat(8s, 11s);
                         break;
                     }
                 case EVENT_STOMP:
                     {
                         me->CastSpell(me, DUNGEON_MODE(STOMP, STOMP_H), false);
-                        events.RepeatEvent(13000 + rand() % 5000);
+                        events.Repeat(13s, 18s);
                         break;
                     }
                 case EVENT_GROUND_SLAM:
                     {
-                        events.RepeatEvent(10000 + rand() % 3000);
+                        events.Repeat(10s, 13s);
                         me->CastSpell(me->GetVictim(), GROUND_SLAM, true);
-                        events.DelayEvents(10000);
-                        events.RescheduleEvent(EVENT_SHATTER, 8000);
+                        events.DelayEvents(10s);
+                        events.RescheduleEvent(EVENT_SHATTER, 8s);
                         break;
                     }
                 case EVENT_SHATTER:
                     {
                         me->CastSpell((Unit*)nullptr, DUNGEON_MODE(SHATTER, SHATTER_H), false);
                         Talk(SAY_SHATTER);
-                        events.RescheduleEvent(EVENT_REMOVE_STONED, 1500);
+                        events.RescheduleEvent(EVENT_REMOVE_STONED, 1500ms);
                         break;
                     }
                 case EVENT_REMOVE_STONED:

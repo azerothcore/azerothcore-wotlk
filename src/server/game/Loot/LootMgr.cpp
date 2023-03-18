@@ -190,6 +190,7 @@ uint32 LootStore::LoadLootTable()
 
         // Looking for the template of the entry
         // often entries are put together
+        // cppcheck-suppress eraseDereference
         if (m_LootTemplates.empty() || tab->first != entry)
         {
             // Searching the template (in case template Id changed)
