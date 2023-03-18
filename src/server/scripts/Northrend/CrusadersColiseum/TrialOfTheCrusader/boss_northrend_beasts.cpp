@@ -324,7 +324,7 @@ public:
                                     if( Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))) )
                                     {
                                         snobold->ChangeSeat(4); // switch to hand
-                                        me->setAttackTimer(BASE_ATTACK, 3000);
+                                        me->setAttackTimer(BASE_ATTACK, 3s);
                                         PlayerGUID = p->GetGUID();
                                         events.RescheduleEvent(EVENT_RELEASE_SNOBOLD, 2500ms);
                                     }

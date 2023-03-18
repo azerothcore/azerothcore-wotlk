@@ -94,8 +94,8 @@ public:
                                         cr->RemoveAllAuras();
                                         if (Aura* aur = cr->AddAura(SPELL_STONED_AURA, cr))
                                         {
-                                            aur->SetMaxDuration(60 * MINUTE * IN_MILLISECONDS);
-                                            aur->SetDuration(60 * MINUTE * IN_MILLISECONDS);
+                                            aur->SetMaxDuration(60min);
+                                            aur->SetDuration(60min);
                                         }
                                     }
 

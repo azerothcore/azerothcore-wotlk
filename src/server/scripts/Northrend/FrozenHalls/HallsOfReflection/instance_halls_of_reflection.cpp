@@ -1000,7 +1000,7 @@ public:
                                 {
                                     pFalric->GetMotionMaster()->MovePoint(0, FalricMovePos);
                                     if (Aura* a = pFalric->AddAura(SPELL_SHADOWMOURNE_VISUAL, pFalric))
-                                        a->SetDuration(8000);
+                                        a->SetDuration(8s);
                                 }
                             }
                             if (Creature* pMarwyn = instance->GetCreature(NPC_MarwynGUID))
@@ -1012,7 +1012,7 @@ public:
                                 {
                                     pMarwyn->GetMotionMaster()->MovePoint(0, MarwynMovePos);
                                     if (Aura* a = pMarwyn->AddAura(SPELL_SHADOWMOURNE_VISUAL, pMarwyn))
-                                        a->SetDuration(8000);
+                                        a->SetDuration(8s);
                                 }
 
                                 pMarwyn->AI()->Talk(EMOTE_MARWYN_INTRO_SPIRIT);

@@ -919,7 +919,7 @@ public:
 
         void Reset() override
         {
-            me->setAttackTimer(BASE_ATTACK, 2000);
+            me->setAttackTimer(BASE_ATTACK, 2s);
             me->AddAura(SPELL_VENGEFUL_BLAST_PASSIVE, me);
         }
 

@@ -74,7 +74,7 @@ public:
     void MovementInform(uint32, uint32) override;
 
     // EscortAI functions
-    void AddWaypoint(uint32 id, float x, float y, float z, uint32 waitTime = 0);    // waitTime is in ms
+    void AddWaypoint(uint32 id, float x, float y, float z, Milliseconds waitTime = 0s);    // waitTime is in ms
 
     //this will set the current position to x/y/z/o, and the current WP to pointId.
     bool SetNextWaypoint(uint32 pointId, float x, float y, float z, float orientation);

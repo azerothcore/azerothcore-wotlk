@@ -2145,7 +2145,7 @@ public:
 
             GetCaster()->CastSpell((Unit*)nullptr, SPELL_SHADOW_TRAP_KNOCKBACK, true);
             if (Aura* a = GetCaster()->GetAura(SPELL_SHADOW_TRAP_AURA))
-                a->SetDuration(0);
+                a->SetDuration(0ms);
             if (GetCaster()->GetTypeId() == TYPEID_UNIT)
                 GetCaster()->ToCreature()->DespawnOrUnsummon(3000);
         }

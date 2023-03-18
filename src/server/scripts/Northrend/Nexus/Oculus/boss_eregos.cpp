@@ -232,7 +232,7 @@ public:
                                 pa->CastSpell(pa, SPELL_PLANAR_AURA_VISUAL, true);
                                 pa->CastSpell(pa, SPELL_PLANAR_AURA_DAMAGE, true);
                                 if (Aura* a = pa->GetAura(SPELL_PLANAR_AURA_DAMAGE))
-                                    a->SetDuration(15000);
+                                    a->SetDuration(15s);
                                 if( pa->AI() )
                                 {
                                     pa->AI()->AttackStart(t);

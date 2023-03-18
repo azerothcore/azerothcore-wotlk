@@ -215,7 +215,7 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true))
                     {
                         me->CastSpell(target, SPELL_MIRRORED_SOUL, false);
-                        me->setAttackTimer(BASE_ATTACK, 2500);
+                        me->setAttackTimer(BASE_ATTACK, 2500ms);
                         Talk(EMOTE_MIRRORED_SOUL);
                     }
                     events.Repeat(20s, 30s);
@@ -232,7 +232,7 @@ public:
                     Talk(EMOTE_UNLEASH_SOUL);
                     events.Repeat(30s, 40s);
                     events.DelayEventsToMax(5000, 0);
-                    me->setAttackTimer(BASE_ATTACK, 5500);
+                    me->setAttackTimer(BASE_ATTACK, 5500ms);
                     break;
                 case EVENT_SPELL_WAILING_SOULS:
                     Talk(SAY_FACE_WAILING_SOUL);

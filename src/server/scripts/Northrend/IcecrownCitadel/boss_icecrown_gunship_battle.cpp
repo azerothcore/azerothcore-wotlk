@@ -587,11 +587,11 @@ public:
             {
                 _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, creature);
                 if (Aura* a = creature->GetAura(SPELL_CHECK_FOR_PLAYERS))
-                    a->SetDuration(0);
+                    a->SetDuration(0ms);
             }
             _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
             if (Aura* a = me->GetAura(SPELL_CHECK_FOR_PLAYERS))
-                a->SetDuration(0);
+                a->SetDuration(0ms);
 
             uint32 explosionSpell = isVictory ? SPELL_EXPLOSION_VICTORY : SPELL_EXPLOSION_WIPE;
             if (MotionTransport* t = (me->GetTransport() ? me->GetTransport()->ToMotionTransport() : nullptr))

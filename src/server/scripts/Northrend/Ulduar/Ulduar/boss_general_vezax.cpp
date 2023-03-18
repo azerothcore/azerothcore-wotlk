@@ -240,7 +240,7 @@ public:
                         }
                         if (!players.empty())
                         {
-                            me->setAttackTimer(BASE_ATTACK, 2000);
+                            me->setAttackTimer(BASE_ATTACK, 2s);
                             Player* target = players.at(urand(0, players.size() - 1));
                             me->SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
                             me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);

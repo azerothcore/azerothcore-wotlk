@@ -77,8 +77,8 @@ public:
                 {
                     if (Aura* aur = me->AddAura(SPELL_STONED_AURA, me))
                     {
-                        aur->SetMaxDuration(60 * MINUTE * IN_MILLISECONDS);
-                        aur->SetDuration(60 * MINUTE * IN_MILLISECONDS);
+                        aur->SetMaxDuration(60min);
+                        aur->SetDuration(60min);
                     }
                 }
                 pInstance->SetData(EVENT_TORAVON, NOT_STARTED);

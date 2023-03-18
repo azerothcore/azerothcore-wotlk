@@ -742,7 +742,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     GetPlayer()->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
 
-void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const
+void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, Seconds timeElapsed, bool timedCompleted) const
 {
     WorldPacket data(SMSG_CRITERIA_UPDATE, 8 + 4 + 8);
     data << uint32(entry->ID);
@@ -756,7 +756,7 @@ void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, C
     else
         data << uint32(timedCompleted ? 0 : 1); // 1 is for keeping the counter at 0 in client
     data.AppendPackedTime(progress->date);
-    data << uint32(timeElapsed);    // time elapsed in seconds
+    data << uint32(timeElapsed.count());    // time elapsed in seconds
     data << uint32(0);              // unk
     GetPlayer()->SendDirectMessage(&data);
 }
@@ -2091,7 +2091,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     progress->changed = true;
     progress->date = GameTime::GetGameTime().count(); // set the date to the latest update.
 
-    uint32 timeElapsed = 0;
+    Seconds timeElapsed = 0s;
     bool timedCompleted = false;
 
     if (entry->timeLimit)
@@ -2099,7 +2099,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
         // has to exist else we wouldn't be here
         timedCompleted = IsCompletedCriteria(entry, sAchievementStore.LookupEntry(entry->referredAchievement));
         // Client expects this in packet
-        timeElapsed = entry->timeLimit - (timedIter->second / IN_MILLISECONDS);
+        timeElapsed = Seconds(entry->timeLimit - (timedIter->second / IN_MILLISECONDS));
 
         // Remove the timer, we wont need it anymore
         if (timedCompleted)

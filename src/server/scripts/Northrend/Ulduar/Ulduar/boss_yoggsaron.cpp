@@ -968,7 +968,7 @@ public:
                 for (uint8 i = 0; i <= dist; ++i)
                 {
                     float angle = M_PI * 2 / dist * i;
-                    AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0);
+                    AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0ms);
                 }
             }
             else
@@ -976,7 +976,7 @@ public:
                 for (uint8 i = 0; i <= dist; ++i)
                 {
                     float angle = M_PI * 2 - (M_PI * 2 / dist * i);
-                    AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0);
+                    AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0ms);
                 }
             }
         }
