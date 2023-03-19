@@ -2,7 +2,7 @@
 SET @CGUID := 25949;
 
 DELETE FROM `creature` WHERE `id1` = 18857;
-DELETE FROM `creature` WHERE (guid BETWEEN @CGUID+0 AND @CGUID+12) AND `id1` = 18857;
+DELETE FROM `creature` WHERE (`guid` BETWEEN @CGUID+0 AND @CGUID+12) AND `id1` = 18857;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (@CGUID+0, 18857, 530, 3523, 3726, 1, 1, 0, 2911.767822265625, 4197.4384765625, 161.8751678466796875, 4.096341133117675781, 120, 10, 0, 0, 0, 1, 0, 0, 0, '', 43400),
 (@CGUID+1, 18857, 530, 3523, 3726, 1, 1, 0, 2913.6337890625, 4203.1884765625, 162.5833740234375, 5.358422279357910156, 120, 10, 0, 0, 0, 1, 0, 0, 0, '', 43400),
