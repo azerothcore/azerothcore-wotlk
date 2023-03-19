@@ -119,10 +119,10 @@ struct boss_talon_king_ikiss : public BossAI
             scheduler.Schedule(1s, [this](TaskContext)
             {
                 DoCastAOE(SPELL_ARCANE_EXPLOSION);
-                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             }).Schedule(6500ms, [this](TaskContext /*context*/)
             {
                 me->GetThreatMgr().ResetAllThreat();
+                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             });
         }
 
@@ -137,10 +137,10 @@ struct boss_talon_king_ikiss : public BossAI
             scheduler.Schedule(1s, [this](TaskContext)
             {
                 DoCastAOE(SPELL_ARCANE_EXPLOSION);
-                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             }).Schedule(6500ms, [this](TaskContext /*context*/)
             {
                 me->GetThreatMgr().ResetAllThreat();
+                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             });
         }
 
@@ -155,10 +155,10 @@ struct boss_talon_king_ikiss : public BossAI
             scheduler.Schedule(1s, [this](TaskContext)
             {
                 DoCastAOE(SPELL_ARCANE_EXPLOSION);
-                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             }).Schedule(6500ms, [this](TaskContext /*context*/)
             {
                 me->GetThreatMgr().ResetAllThreat();
+                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             });
         }
 
