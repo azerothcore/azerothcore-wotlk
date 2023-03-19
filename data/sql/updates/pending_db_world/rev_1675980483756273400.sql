@@ -12,6 +12,8 @@ DELETE FROM `smart_scripts` WHERE `entryorguid` IN(18766) AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (18766, 0, 0, 0, 10, 0, 100, 0, 0, 60, 1000, 1000, 0, 11, 32889, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Pool of Souls - Ooc los - Cast Grasp of Death');
 
+UPDATE `creature_template` SET `unit_flags`=`unit_flags`|33554432 WHERE `entry` = 18766;
+
 DELETE FROM `creature_template_movement` WHERE `creatureId` = 18766;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Flight`, `Rooted`) VALUES
 (18766, 1, 1);
