@@ -123,7 +123,6 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefMgr<Creatur
             {
                 // call MoveInLineOfSight for nearby grid creatures
                 Acore::AIRelocationNotifier notifier(*obj);
-                float radius = 60.0f;
                 Cell::VisitGridObjects(obj, notifier, 60.f);
             }
         }
