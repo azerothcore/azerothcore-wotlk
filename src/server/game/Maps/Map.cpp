@@ -2544,7 +2544,7 @@ void Map::SendInitSelf(Player* player)
 
     // clean buffers for further work
     packet.clear();
-    data.clear();
+    data.Clear();
 
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
     if (Transport* transport = player->GetTransport())
