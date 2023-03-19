@@ -1,3 +1,4 @@
+-- DB update 2023_03_19_00 -> 2023_03_19_01
 --
 UPDATE `creature_template` SET `speed_walk`=2.4, `speed_run`=0.857143  WHERE `entry` IN (20405,21534);
 UPDATE `creature_template_addon` SET `auras`=''  WHERE `entry` IN (20405,21534);
