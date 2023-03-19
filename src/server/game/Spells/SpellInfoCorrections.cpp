@@ -4489,6 +4489,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(556); // 28 seconds
     });
 
+    // Quest - Healing Salve
+    ApplySpellFix({ 29314 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
+    });
+
     // Mulgore Hatchling (periodic)
     ApplySpellFix({ 62586 }, [](SpellInfo* spellInfo)
     {
