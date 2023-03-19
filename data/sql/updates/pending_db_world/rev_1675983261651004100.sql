@@ -136,7 +136,7 @@ DELETE FROM `creature_equip_template` WHERE `CreatureID`=38493;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`) VALUES
 (38493, 1, 40595, 49933, 0), -- 38493
 (38493, 2, 46107, 49933, 0); -- 38493
-UPDATE `creature` SET `equipment_id`=2 WHERE `guid` IN (112005,111997,111996);
+UPDATE `creature` SET `equipment_id`=2 WHERE `guid` IN (246904,246905,246915);
 
 UPDATE `creature` SET `equipment_id`=-1 WHERE `id1` IN (1976, 14901, 23745, 24015, 24062, 24212, 28579, 32710, 32711, 34838); 
 DELETE FROM `creature_equip_template` WHERE `CreatureID` IN (1976, 14901, 23745, 24015, 24062, 24212, 28579, 32710, 32711, 34838);
