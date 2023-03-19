@@ -32,11 +32,11 @@ enum Spells
 
 enum Yells
 {
-    YELL_AGGRO                      = 0,
-    YELL_REFLECTIVE_MAGIC_SHIELD    = 1,
-    YELL_REFLECTIVE_DAMAGE_SHIELD   = 2,
-    YELL_KILL                       = 3,
-    YELL_DEATH                      = 4
+    SAY_AGGRO                      = 0,
+    SAY_REFLECTIVE_MAGIC_SHIELD    = 1,
+    SAY_REFLECTIVE_DAMAGE_SHIELD   = 2,
+    SAY_KILL                       = 3,
+    SAY_DEATH                      = 4
 };
 
 enum Creatures
@@ -51,7 +51,7 @@ struct boss_mechano_lord_capacitus : public BossAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
-        Talk(YELL_AGGRO);
+        Talk(SAY_AGGRO);
 
         scheduler.Schedule(6s, [this](TaskContext context)
         {
@@ -81,12 +81,12 @@ struct boss_mechano_lord_capacitus : public BossAI
             {
                 if (IsEvenNumber(context.GetRepeatCounter()))
                 {
-                    Talk(YELL_REFLECTIVE_DAMAGE_SHIELD);
+                    Talk(SAY_REFLECTIVE_DAMAGE_SHIELD);
                     DoCastSelf(SPELL_REFLECTIVE_DAMAGE_SHIELD);
                 }
                 else
                 {
-                    Talk(YELL_REFLECTIVE_MAGIC_SHIELD);
+                    Talk(SAY_REFLECTIVE_MAGIC_SHIELD);
                     DoCastSelf(SPELL_REFLECTIVE_MAGIC_SHIELD);
                 }
 
@@ -99,14 +99,14 @@ struct boss_mechano_lord_capacitus : public BossAI
     {
         if (victim->IsPlayer())
         {
-            Talk(YELL_KILL);
+            Talk(SAY_KILL);
         }
     }
 
     void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
-        Talk(YELL_DEATH);
+        Talk(SAY_DEATH);
     }
 
     void JustSummoned(Creature* summon) override
