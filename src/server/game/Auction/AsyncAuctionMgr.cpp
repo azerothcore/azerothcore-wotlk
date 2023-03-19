@@ -67,7 +67,7 @@ void AsyncAuctionMgr::Initialize()
     _scheduler = std::make_unique<TaskScheduler>();
 
     LOG_INFO("server.loading", ">> Async auction initialized in {}", sw);
-    LOG_INFO("server.loading", "");
+    LOG_INFO("server.loading", " ");
 }
 
 void AsyncAuctionMgr::Update(Milliseconds diff)
