@@ -32,7 +32,7 @@ UPDATE `creature_template` SET `unit_flags` = 32832, `detection_range` = 10 WHER
 UPDATE `creature_template` SET `unit_flags` = 64, `RegenHealth` = 0, `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (20869, 21586));
 
 -- Corpses are rooted
-DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 21303);
+DELETE FROM `creature_template_movement` WHERE (`CreatureId` IN (21303, 21304, 21592, 21623));
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 (21303, 0, 0, 0, 1, 0, 0, 0),
 (21304, 0, 0, 0, 1, 0, 0, 0),
