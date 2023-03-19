@@ -4496,7 +4496,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Seed of Corruption
-    ApplySpellFix({ 27285 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 27285, 47833, 47834 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_REFLECTION;
     });
