@@ -821,6 +821,14 @@ enum GoblinWeatherMachiene
 
 uint32 WeatherForcast()
 {
+    if (!SpellScript::ValidateSpellInfo({
+        SPELL_PERSONALIZED_WEATHER_RAIN,
+        SPELL_PERSONALIZED_WEATHER_SNOW,
+        SPELL_PERSONALIZED_WEATHER_SUN,
+        SPELL_PERSONALIZED_WEATHER_CLOUDS
+        }))
+        return 0;
+
     uint32 spellId;
     switch (urand(0, 3))
     {
