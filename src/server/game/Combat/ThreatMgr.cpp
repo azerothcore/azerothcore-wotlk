@@ -331,6 +331,10 @@ HostileReference* ThreatContainer::SelectNextVictim(Creature* attacker, HostileR
             currentVictim = nullptr;
         else if (cvUnit->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || cvUnit->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE)) // pussywizard: no 10%/30% if currentVictim is immune to damage or has auras breakable by damage
             currentVictim = nullptr;
+        else if (attacker->HasUnitState(UNIT_STATE_ROOT) && (attacker->m_CombatDistance > 0.f) ? !attacker->IsWithinCombatRange(cvUnit, attacker->m_CombatDistance) : !attacker->IsWithinMeleeRange(cvUnit))
+        {
+            currentVictim = nullptr;
+        }
     }
 
     ThreatContainer::StorageType::const_iterator lastRef = iThreatList.end();
@@ -346,18 +350,22 @@ HostileReference* ThreatContainer::SelectNextVictim(Creature* attacker, HostileR
 
         // pussywizard: don't go to threat comparison if this ref is immune to damage or has aura breakable on damage (second choice target)
         // pussywizard: if this is the last entry on the threat list, then all targets are second choice, set bool to true and loop threat list again, ignoring this section
-        if (!noPriorityTargetFound && (target->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || target->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE) || target->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, attacker->GetGUID())))
+        if (!noPriorityTargetFound)
         {
-            if (iter != lastRef)
+            if (target->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || target->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE) ||
+                target->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, attacker->GetGUID()) || (attacker->HasUnitState(UNIT_STATE_ROOT) && (attacker->m_CombatDistance > 0.f) ? !attacker->IsWithinCombatRange(target, attacker->m_CombatDistance) : !attacker->IsWithinMeleeRange(target)))
             {
-                ++iter;
-                continue;
-            }
-            else
-            {
-                noPriorityTargetFound = true;
-                iter = iThreatList.begin();
-                continue;
+                if (iter != lastRef)
+                {
+                    ++iter;
+                    continue;
+                }
+                else
+                {
+                    noPriorityTargetFound = true;
+                    iter = iThreatList.begin();
+                    continue;
+                }
             }
         }
 
