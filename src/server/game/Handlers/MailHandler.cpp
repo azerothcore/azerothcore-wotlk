@@ -237,6 +237,13 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
             return;
         }
 
+        // handle empty bag before CanBeTraded, since that func already has that check
+        if (item->IsNotEmptyBag())
+        {
+            player->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS);
+            return;
+        }
+
         if (!item->CanBeTraded(true))
         {
             player->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_MAIL_BOUND_ITEM);
@@ -258,12 +265,6 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         if (COD && item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
         {
             player->SendMailResult(0, MAIL_SEND, MAIL_ERR_CANT_SEND_WRAPPED_COD);
-            return;
-        }
-
-        if (item->IsNotEmptyBag())
-        {
-            player->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS);
             return;
         }
 

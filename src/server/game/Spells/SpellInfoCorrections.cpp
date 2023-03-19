@@ -4489,6 +4489,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(556); // 28 seconds
     });
 
+    // Quest - Healing Salve
+    ApplySpellFix({ 29314 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
+    });
+
     // Shoulder Charge
     ApplySpellFix({ 31994 }, [](SpellInfo* spellInfo)
     {
