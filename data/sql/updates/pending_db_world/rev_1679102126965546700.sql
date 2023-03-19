@@ -27,8 +27,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2130400, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 11, 36593, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warder/Defender Corpse - On Script - Cast \'Corpse Burst\''),
 (2130400, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'WarderDefender Corpse - On Script - Despawn Instant');
 
--- Remove imaginary flags
-UPDATE `creature_template` SET `unit_flags` = 32832 WHERE (`entry` IN (21303, 21304, 21592, 21623)); -- Sniffed
+-- Fix Templates - Sniffed unit flags
+UPDATE `creature_template` SET `unit_flags` = 32832, `detection_range` = 10 WHERE (`entry` IN (21303, 21304, 21592, 21623));
 UPDATE `creature_template` SET `unit_flags` = 64, `RegenHealth` = 0, `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (20869, 21586));
 
 -- Corpses are rooted
