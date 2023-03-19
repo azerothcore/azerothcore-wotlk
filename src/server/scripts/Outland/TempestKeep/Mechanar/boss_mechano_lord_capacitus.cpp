@@ -27,7 +27,14 @@ enum Spells
     SPELL_REFLECTIVE_MAGIC_SHIELD   = 35158,
     SPELL_REFLECTIVE_DAMAGE_SHIELD  = 35159,
     SPELL_POLARITY_SHIFT            = 39096,
-    SPELL_BERSERK                   = 26662
+    SPELL_BERSERK                   = 26662,
+
+    SPELL_NETHER_CHARGE_PASSIVE     = 35150,
+
+    SPELL_SUMMON_NETHER_CHARGE_NE   = 35153,
+    SPELL_SUMMON_NETHER_CHARGE_NW   = 35904,
+    SPELL_SUMMON_NETHER_CHARGE_SE   = 35905,
+    SPELL_SUMMON_NETHER_CHARGE_SW   = 35906,
 };
 
 enum Yells
@@ -65,9 +72,12 @@ struct boss_mechano_lord_capacitus : public BossAI
             context.Repeat(20s);
         }).Schedule(10s, [this](TaskContext context)
         {
-            Position pos = me->GetRandomNearPosition(8.0f);
-            me->SummonCreature(NPC_NETHER_CHARGE, pos, TEMPSUMMON_TIMED_DESPAWN, 18000);
-            context.Repeat(5s);
+            uint32 spellId = RAND(SPELL_SUMMON_NETHER_CHARGE_NE,
+                SPELL_SUMMON_NETHER_CHARGE_NW,
+                SPELL_SUMMON_NETHER_CHARGE_SE,
+                SPELL_SUMMON_NETHER_CHARGE_SW);
+            DoCastAOE(spellId);
+            IsHeroic() ? context.Repeat(2s, 5s) : context.Repeat(9s, 11s);
         }).Schedule(3min, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_BERSERK, true);
