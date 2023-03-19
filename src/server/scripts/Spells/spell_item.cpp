@@ -829,7 +829,7 @@ uint32 WeatherForcast()
         }))
         return 0;
 
-    uint32 spellId;
+    uint32 spellId = 0;
     switch (urand(0, 3))
     {
         case 0:
