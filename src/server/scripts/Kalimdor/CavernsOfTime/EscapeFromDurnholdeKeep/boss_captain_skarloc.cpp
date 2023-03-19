@@ -203,7 +203,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_HAMMER, 30000);
                     break;
                 case EVENT_SPELL_HOLY_SHIELD:
-                    me->CastSpell(me, SPELL_CLEANSE, false);
+                    me->CastSpell(me, SPELL_HOLY_SHIELD, false);
                     events.ScheduleEvent(SPELL_HOLY_SHIELD, 30000);
                     break;
                 case EVENT_SPELL_CONSECRATION:
