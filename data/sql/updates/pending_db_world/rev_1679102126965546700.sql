@@ -7,11 +7,11 @@ INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpell
 (36719, 36719, 38830),
 (36716, 36716, 38828);
 
-UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 64, `EffectBasePoints_1` = 1 WHERE `ID`=37394;
+UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 64, `EffectBasePoints_1` = 0 WHERE `ID`=37394;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (20869, 21303, 21304));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(20869, 0, 0, 0, 25, 0, 100, 512, 0, 0, 0, 0, 0, 142, 40, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Arcatraz Sentinel - On Reset - Set Health 40%'),
+(20869, 0, 0, 0, 4, 0, 100, 512, 0, 0, 0, 0, 0, 142, 40, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Arcatraz Sentinel - On Aggro - Set Health 40%'),
 (20869, 0, 1, 0, 25, 0, 100, 512, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Arcatraz Sentinel - On Reset - Set Reactstate Aggressive'),
 (20869, 0, 2, 0, 4 , 0, 100, 512, 0, 0, 0, 0, 0, 28, 31261, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Arcatraz Sentinel - On Aggro - Remove Aura \'Permanent Feign Death (Root)\''),
 (20869, 0, 3, 0, 2 , 0, 100, 1, 0, 10, 0, 0, 0, 11, 36719, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Arcatraz Sentinel - Between 0-10% Health - Cast \'Explode\' (No Repeat)'),
@@ -29,7 +29,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- Remove imaginary flags
 UPDATE `creature_template` SET `unit_flags` = 32832 WHERE (`entry` IN (21303, 21304, 21592, 21623)); -- Sniffed
-UPDATE `creature_template` SET `unit_flags` = 64, `RegenHealth` = 0 WHERE (`entry` IN (20869, 21586));
+UPDATE `creature_template` SET `unit_flags` = 64, `RegenHealth` = 0, `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (20869, 21586));
 
 -- Corpses are rooted
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 21303);
