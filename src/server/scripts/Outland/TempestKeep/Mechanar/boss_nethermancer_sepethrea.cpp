@@ -118,16 +118,6 @@ struct boss_nethermancer_sepethrea : public BossAI
     }
 };
 
-enum raginFlames
-{
-    SPELL_INFERNO                   = 35268,
-    SPELL_FIRE_TAIL                 = 35278,
-    SPELL_INFERNO_DAMAGE            = 35283,
-
-    EVENT_SPELL_FIRE_TAIL           = 1,
-    EVENT_SPELL_INFERNO             = 2
-};
-
 struct npc_raging_flames : public ScriptedAI
 {
     npc_raging_flames(Creature* creature) : ScriptedAI(creature) { }
