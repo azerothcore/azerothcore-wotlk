@@ -69,6 +69,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1804200, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 17969, 0, 0, 0, 0, 0, 0, 0, 'Umbrafen Slavebinder - On Script - Start Attacking Closest Creature \'Kayra Longmane\'');
 
 -- Kayra Longmane
+DELETE FROM `script_waypoint` WHERE `entry`=17969;
+
 DELETE FROM `waypoints` WHERE `entry` = 17969;
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
 (17969,1,-930.049,5288.08,23.8484,'Kayra Longmane'),
