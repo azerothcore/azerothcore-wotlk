@@ -1,3 +1,4 @@
+-- DB update 2023_03_20_00 -> 2023_03_20_01
 --
 -- spell_gen_feign_death_no_dyn_flag
 -- UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT, UNIT_FLAG2_FEIGN_DEATH
