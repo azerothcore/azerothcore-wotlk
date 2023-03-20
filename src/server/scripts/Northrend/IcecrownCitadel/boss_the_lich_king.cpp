@@ -660,6 +660,18 @@ public:
             SetEquipmentSlots(true);
             if (me->IsImmuneToPC())
                 me->SetStandState(UNIT_STAND_STATE_SIT);
+                
+            DoAction(ACTION_RESTORE_LIGHT);
+
+            // Reset The Frozen Throne gameobjects
+            FrozenThroneResetWorker reset;
+            Acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
+            Cell::VisitGridObjects(me, worker, 333.0f);
+
+            me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
+            me->SetImmuneToPC(true);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetStandState(UNIT_STAND_STATE_SIT);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -691,22 +703,6 @@ public:
             events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, 30s, 31s, EVENT_GROUP_ABILITIES);
             if (IsHeroic())
                 events.ScheduleEvent(EVENT_SHADOW_TRAP, 15s + 500ms, EVENT_GROUP_ABILITIES);
-        }
-
-        void JustReachedHome() override
-        {
-            _JustReachedHome();
-            DoAction(ACTION_RESTORE_LIGHT);
-
-            // Reset The Frozen Throne gameobjects
-            FrozenThroneResetWorker reset;
-            Acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
-            Cell::VisitGridObjects(me, worker, 333.0f);
-
-            me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
-            me->SetImmuneToPC(true);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetStandState(UNIT_STAND_STATE_SIT);
         }
 
         bool CanAIAttack(Unit const* target) const override
