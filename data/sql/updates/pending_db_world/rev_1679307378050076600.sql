@@ -122,7 +122,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ID,0,7,0,11,0,100,0,0,0,0,0,0,90,8,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Kayra Longmane - On spawn -  Set Flag Standstate Kneel'),
 (@ID,0,8,0,0,0,100,0,1000,2000,2000,3000,0,11,9739,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Kayra Longmane - In Combat -  Cast Wrath'),
 (@ID,0,9,0,0,0,100,0,5000,6000,6000,7000,0,11,31401,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Kayra Longmane - In Combat -  Cast Moonfire'),
-(@ID, 0, 10, 0, 74, 1, 100, 0, 0, 25, 8000, 15000, 25, 11, 23381, 64, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Kayra Longmane - On Friendly Between 0-25% Health (Range: 25) - Cast \'Healing Touch\' (Phase 1)'),
+(@ID, 0, 10, 0, 74, 1, 100, 0, 0, 25, 8000, 15000, 0, 11, 23381, 64, 0, 0, 0, 0, 18, 25, 0, 0, 0, 0, 0, 0, 0, 'Kayra Longmane - On Friendly Between 0-25% Health (Range: 25) - Cast \'Healing Touch\' (Phase 1)'),
 (@ID, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kayra Longmane - On Quest \'Escape from Umbrafen\' Taken - Set Event Phase 1'),
 (@ID*100+0,9,0,0,0,0,100,0,0,0,0,0,0,64,1,0,0,0,0,0,7,0,0,0,0,0,0,0,0,'Kayra Longmane - On Script - Store Targetlist'),
 (@ID*100+0,9,1,0,0,0,100,0,0,0,0,0,0,1,0,0,0,0,0,0,12,1,0,0,0,0,0,0,0,'Kayra Longmane - On Script - Say Line 0'),
