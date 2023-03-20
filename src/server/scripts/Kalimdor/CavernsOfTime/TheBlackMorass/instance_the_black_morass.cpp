@@ -130,7 +130,7 @@ public:
                                     case NPC_INFINITE_EXECUTIONER_2:
                                     case NPC_INFINITE_VANQUISHER:
                                     case NPC_INFINITE_VANQUISHER_2:
-                                        creature->DespawnOrUnsummon();
+                                        creature->DespawnOrUnsummon(1);
                                         break;
                                     default:
                                         break;

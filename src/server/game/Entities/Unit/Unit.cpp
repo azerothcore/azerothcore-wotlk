@@ -13473,7 +13473,7 @@ void Unit::Dismount()
     if (Player* player = ToPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(player);
-
+        ToPlayer()->SetCanTeleport(true);
         if (Pet* pPet = player->GetPet())
         {
             if (pPet->HasUnitFlag(UNIT_FLAG_STUNNED) && !pPet->HasUnitState(UNIT_STATE_STUNNED))
