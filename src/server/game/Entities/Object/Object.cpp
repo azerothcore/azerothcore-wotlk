@@ -1863,7 +1863,9 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
             return false;
 
     if (!CanDetect(obj, ignoreStealth, !distanceCheck, checkAlert))
+    {
         return false;
+    }
 
     return true;
 }
@@ -1888,9 +1890,11 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool che
         return true;
 
     if (!ignoreStealth)
-    {
+    {        
         if (!seer->CanDetectInvisibilityOf(obj)) // xinef: added ignoreStealth, allow AoE spells to hit invisible targets!
+        {
             return false;
+        }
 
         if (!seer->CanDetectStealthOf(obj, checkAlert))
         {
@@ -1923,6 +1927,22 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
     // It seems like that only Units are affected by this check (couldn't see arena doors with preparation invisibility)
     if (obj->ToUnit())
     {
+        // Permanently invisible creatures should be able to engage non-invisible targets.
+        // ex. Skulking Witch (20882) / Greater Invisibility (16380)
+        if (Creature const* baseObj = ToCreature())
+        {
+            auto auraEffects = baseObj->GetAuraEffectsByType(SPELL_AURA_MOD_INVISIBILITY);
+            for (auto const effect : auraEffects)
+            {
+                if (SpellInfo const* spell = effect->GetSpellInfo())
+                {
+                    if (spell->GetMaxDuration() == -1)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
         uint32 objMask = m_invisibility.GetFlags() & obj->m_invisibilityDetect.GetFlags();
         // xinef: include invisible flags of caster in the mask, 2 invisible objects should be able to detect eachother
         objMask |= m_invisibility.GetFlags() & obj->m_invisibility.GetFlags();
