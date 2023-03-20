@@ -1,3 +1,4 @@
+-- DB update 2023_03_20_03 -> 2023_03_20_04
 --
 UPDATE `creature_template_addon` SET `auras` = '11838 31261 36716' WHERE (`entry` = 20869);
 UPDATE `creature_template_addon` SET `auras` = '11838 31261 38828' WHERE (`entry` = 21586);
