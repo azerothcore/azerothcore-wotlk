@@ -1890,7 +1890,7 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool che
         return true;
 
     if (!ignoreStealth)
-    {        
+    {
         if (!seer->CanDetectInvisibilityOf(obj)) // xinef: added ignoreStealth, allow AoE spells to hit invisible targets!
         {
             return false;
