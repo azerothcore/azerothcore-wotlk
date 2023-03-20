@@ -30,10 +30,18 @@ enum Says
 
 enum Spells
 {
-    SPELL_SUMMON_RAGIN_FLAMES      = 35275,
-    SPELL_FROST_ATTACK             = 35263,
+    SPELL_FROST_ATTACK             = 45196, // This is definitely spell added in TBC but did it replaced both 35264 and 39086 or only normal version?
+    SPELL_SUMMON_RAGING_FLAMES     = 35275,
+    SPELL_QUELL_RAGING_FLAMES      = 35277,
     SPELL_ARCANE_BLAST             = 35314,
     SPELL_DRAGONS_BREATH           = 35250,
+
+    // Raging Flames
+    SPELL_RAGING_FLAMES_DUMMY      = 35274, // NYI, no clue what it can do
+    SPELL_RAGING_FLAMES_AREA_AURA  = 35281,
+    SPELL_INVIS_STEALTH_DETECTION  = 18950,
+    SPELL_INFERNO                  = 35268,
+    SPELL_INFERNO_DAMAGE           = 35283
 };
 
 struct boss_nethermancer_sepethrea : public BossAI
@@ -54,14 +62,18 @@ struct boss_nethermancer_sepethrea : public BossAI
         {
             DoCastVictim(SPELL_FROST_ATTACK);
             context.Repeat(8s);
-        }).Schedule(14s, [this](TaskContext context)
+        }).Schedule(15s, 25s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_ARCANE_BLAST);
-            context.Repeat(12s);
-        }).Schedule(18s, [this](TaskContext context)
+            if (me->GetVictim())
+            {
+                DoModifyThreatByPercent(me->GetVictim(), -50);
+            }
+            context.Repeat();
+        }).Schedule(20s, 30s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_DRAGONS_BREATH);
-            context.Repeat(16s);
+            context.Repeat(25s, 35s);
             if (roll_chance_i(50))
             {
                 Talk(SAY_DRAGONS_BREATH);
@@ -69,7 +81,14 @@ struct boss_nethermancer_sepethrea : public BossAI
         });
 
         Talk(SAY_AGGRO);
-        DoCastSelf(SPELL_SUMMON_RAGIN_FLAMES, true);
+        DoCastSelf(SPELL_SUMMON_RAGING_FLAMES, true);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        // Fails probably because target is in evade mode (yes, she kills them on evade too). We'll kill them directly in their script for now
+        DoCastSelf(SPELL_QUELL_RAGING_FLAMES, true);
+        ScriptedAI::EnterEvadeMode(why);
     }
 
     void JustSummoned(Creature* summon) override
@@ -95,6 +114,7 @@ struct boss_nethermancer_sepethrea : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
+        DoCastSelf(SPELL_QUELL_RAGING_FLAMES, true);
     }
 };
 
@@ -108,21 +128,52 @@ enum raginFlames
     EVENT_SPELL_INFERNO             = 2
 };
 
-struct npc_ragin_flames : public ScriptedAI
+struct npc_raging_flames : public ScriptedAI
 {
-    npc_ragin_flames(Creature* creature) : ScriptedAI(creature) { }
+    npc_raging_flames(Creature* creature) : ScriptedAI(creature) { }
 
-    EventMap events;
+    void InitializeAI() override
+    {
+        me->SetCorpseDelay(20);
+    }
+
+    // It's more tricky actually
+    void FixateRandomTarget()
+    {
+        me->GetThreatMgr().ClearAllThreat();
+
+        if (TempSummon* summon = me->ToTempSummon())
+            if (Creature* summoner = summon->GetSummonerCreatureBase())
+                if (summoner->IsAIEnabled)
+                    if (Unit* target = summoner->AI()->SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, false))
+                        me->AddThreat(target, 1000000.0f);
+    }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        DoZoneInCombat();
+        DoCastSelf(SPELL_RAGING_FLAMES_AREA_AURA);
+        DoCastSelf(SPELL_INVIS_STEALTH_DETECTION);
+
+        FixateRandomTarget();
+
+        _scheduler.Schedule(15s, 25s, [this](TaskContext task)
+        {
+            DoCastSelf(SPELL_INFERNO);
+            FixateRandomTarget();
+
+            task.Repeat(20s, 30s);
+        });
+    }
 
     void Reset() override
     {
-        me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, true);
+        _scheduler.CancelAll();
     }
 
-    void JustEngagedWith(Unit*) override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        events.ScheduleEvent(EVENT_SPELL_FIRE_TAIL, 500);
-        events.ScheduleEvent(EVENT_SPELL_INFERNO, urand(10000, 20000));
+        me->KillSelf();
     }
 
     void UpdateAI(uint32 diff) override
@@ -130,26 +181,13 @@ struct npc_ragin_flames : public ScriptedAI
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SPELL_INFERNO:
-            if (me->IsWithinCombatRange(me->GetVictim(), 5.0f))
-            {
-                me->CastSpell(me, SPELL_INFERNO, true);
-                events.ScheduleEvent(EVENT_SPELL_INFERNO, 20000);
-            }
-            else
-                events.ScheduleEvent(EVENT_SPELL_INFERNO, 1000);
-            break;
-        case EVENT_SPELL_FIRE_TAIL:
-            me->CastSpell(me, SPELL_FIRE_TAIL, true);
-            events.ScheduleEvent(EVENT_SPELL_FIRE_TAIL, 500);
-            break;
-        }
+        _scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
     }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 class spell_ragin_flames_inferno : public AuraScript
@@ -170,6 +208,6 @@ class spell_ragin_flames_inferno : public AuraScript
 void AddSC_boss_nethermancer_sepethrea()
 {
     RegisterMechanarCreatureAI(boss_nethermancer_sepethrea);
-    RegisterMechanarCreatureAI(npc_ragin_flames);
+    RegisterMechanarCreatureAI(npc_raging_flames);
     RegisterSpellScript(spell_ragin_flames_inferno);
 }
