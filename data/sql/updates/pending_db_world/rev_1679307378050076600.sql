@@ -112,7 +112,7 @@ UPDATE `creature_template_addon` SET `bytes1`=0 WHERE `entry` = @ID;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = @ID AND `source_type` = 0;
 DELETE FROM `smart_scripts` WHERE `entryorguid` BETWEEN @ID*100+0 AND @ID*100+5 AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(@ID,0,0,0,19,0,100,0,9752,0,0,0,0,80,@ID*100+0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Kayra Longmane - On Quest 'Escape from Umbrafen' Taken - Run Script"),
+(@ID,0,0,11,19,0,100,0,9752,0,0,0,0,80,@ID*100+0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Kayra Longmane - On Quest 'Escape from Umbrafen' Taken - Run Script"),
 (@ID,0,1,0,40,0,100,0,5,0,0,0,0,80,@ID*100+1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Kayra Longmane - On Waypoint 5 Reached - Run Script"),
 (@ID,0,2,0,40,0,100,0,6,0,0,0,0,80,@ID*100+2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Kayra Longmane - On Waypoint 6 Reached - Run Script"),
 (@ID,0,3,0,40,0,100,0,17,0,0,0,0,80,@ID*100+3,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Kayra Longmane - On Waypoint 17 Reached - Run Script"),
@@ -122,6 +122,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ID,0,7,0,11,0,100,0,0,0,0,0,0,90,8,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Kayra Longmane - On spawn -  Set Flag Standstate Kneel"),
 (@ID,0,8,0,0,0,100,0,1000,2000,2000,3000,0,11,9739,64,0,0,0,0,2,0,0,0,0,0,0,0,0,"Kayra Longmane - In Combat -  Cast Wrath"),
 (@ID,0,9,0,0,0,100,0,5000,6000,6000,7000,0,11,31401,64,0,0,0,0,2,0,0,0,0,0,0,0,0,"Kayra Longmane - In Combat -  Cast Moonfire"),
+(@ID, 0, 10, 0, 74, 1, 100, 0, 0, 25, 8000, 15000, 25, 11, 23381, 64, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Kayra Longmane - On Friendly Between 0-25% Health (Range: 25) - Cast \'Healing Touch\' (Phase 1)'),
+(@ID, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kayra Longmane - On Quest \'Escape from Umbrafen\' Taken - Set Event Phase 1'),
 (@ID*100+0,9,0,0,0,0,100,0,0,0,0,0,0,64,1,0,0,0,0,0,7,0,0,0,0,0,0,0,0,"Kayra Longmane - On Script - Store Targetlist"),
 (@ID*100+0,9,1,0,0,0,100,0,0,0,0,0,0,1,0,0,0,0,0,0,12,1,0,0,0,0,0,0,0,"Kayra Longmane - On Script - Say Line 0"),
 (@ID*100+0,9,2,0,0,0,100,0,0,0,0,0,0,2,495,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Kayra Longmane - On Script - Set Faction 495"),
@@ -146,4 +148,5 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ID*100+5,9,0,0,0,0,100,0,0,0,0,0,0,54,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Kayra Longmane - On Script - Pause Waypoint"),
 (@ID*100+5,9,1,0,0,0,100,0,0,0,0,0,0,1,5,0,0,0,0,0,12,1,0,0,0,0,0,0,0,"Kayra Longmane - On Script - Say Line 5"),
 (@ID*100+5,9,2,0,0,0,100,0,0,0,0,0,0,15,9752,0,0,0,0,0,16,0,0,0,0,0,0,0,0,"Kayra Longmane - On Script - Quest Credit 'Escape from Umbrafen'"),
-(@ID*100+5,9,3,0,0,0,100,0,0,0,0,0,0,41,10000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Kayra Longmane - On Script - Despawn (10000)");
+(@ID*100+5,9,3,0,0,0,100,0,0,0,0,0,0,41,10000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Kayra Longmane - On Script - Despawn (10000)"),
+(@ID*100+5, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kayra Longmane - Actionlist - Set Event Phase 0');
