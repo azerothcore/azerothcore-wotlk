@@ -1,3 +1,4 @@
+-- DB update 2023_03_20_05 -> 2023_03_20_06
 -- Delete wrong creature_text for Ashyen(17900) and Keleth(17901) and set as SAI.
 DELETE FROM `creature_text` WHERE `CreatureID` IN (17900,17901);
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` IN (17900,17901);
