@@ -1929,6 +1929,7 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
     {
         // Permanently invisible creatures should be able to engage non-invisible targets.
         // ex. Skulking Witch (20882) / Greater Invisibility (16380)
+        bool isPermInvisibleCreature = false;
         if (Creature const* baseObj = ToCreature())
         {
             auto auraEffects = baseObj->GetAuraEffectsByType(SPELL_AURA_MOD_INVISIBILITY);
@@ -1938,16 +1939,20 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
                 {
                     if (spell->GetMaxDuration() == -1)
                     {
-                        return true;
+                        isPermInvisibleCreature = true;
                     }
                 }
             }
         }
-        uint32 objMask = m_invisibility.GetFlags() & obj->m_invisibilityDetect.GetFlags();
-        // xinef: include invisible flags of caster in the mask, 2 invisible objects should be able to detect eachother
-        objMask |= m_invisibility.GetFlags() & obj->m_invisibility.GetFlags();
-        if (objMask != m_invisibility.GetFlags())
-            return false;
+
+        if (!isPermInvisibleCreature)
+        {
+            uint32 objMask = m_invisibility.GetFlags() & obj->m_invisibilityDetect.GetFlags();
+            // xinef: include invisible flags of caster in the mask, 2 invisible objects should be able to detect eachother
+            objMask |= m_invisibility.GetFlags() & obj->m_invisibility.GetFlags();
+            if (objMask != m_invisibility.GetFlags())
+                return false;
+        }
     }
 
     for (uint32 i = 0; i < TOTAL_INVISIBILITY_TYPES; ++i)
