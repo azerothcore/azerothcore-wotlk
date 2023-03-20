@@ -72,4 +72,6 @@ inline AI* GetMechanarAI(T* obj)
     return GetInstanceAI<AI>(obj, MechanarScriptName);
 }
 
+#define RegisterMechanarCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetMechanarAI)
+
 #endif
