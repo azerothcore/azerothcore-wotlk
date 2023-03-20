@@ -2362,13 +2362,21 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        CellCoord p(Acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
-        Cell cell(p);
-        cell.SetNoCreate();
-
+        // First handle any creatures that still have a corpse around
         Acore::RespawnDo u_do;
         Acore::WorldObjectWorker<Acore::RespawnDo> worker(player, u_do);
         Cell::VisitGridObjects(player, worker, player->GetGridActivationRange());
+
+        // Now handle any that had despawned, but had respawn time logged.
+        RespawnVector data;
+        player->GetMap()->GetRespawnInfo(data, SPAWN_TYPEMASK_ALL, 0);
+        if (!data.empty())
+        {
+            uint32 const gridId = Acore::ComputeGridCoord(player->GetPositionX(), player->GetPositionY()).GetId();
+            for (RespawnInfo* info : data)
+                if (info->gridId == gridId)
+                    player->GetMap()->RemoveRespawnTime(info, true);
+        }
 
         return true;
     }

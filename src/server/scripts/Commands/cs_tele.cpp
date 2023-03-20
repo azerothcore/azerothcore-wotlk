@@ -349,7 +349,7 @@ public:
 
         CreatureTemplate const* creatureTemplate = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(*creatureId));
 
-        return DoNameTeleport(handler, player, spawnpoint->mapid, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, creatureTemplate->Name);
+        return DoNameTeleport(handler, player, spawnpoint->spawnPoint.GetMapId(), {spawnpoint->spawnPoint.GetPositionX(), spawnpoint->spawnPoint.GetPositionY(), spawnpoint->spawnPoint.GetPositionZ()}, creatureTemplate->Name);
     }
 
     static bool HandleTeleNameNpcSpawnIdCommand(ChatHandler* handler, PlayerIdentifier player, Variant<Hyperlink<creature>, ObjectGuid::LowType> spawnId)
@@ -364,7 +364,7 @@ public:
 
         CreatureTemplate const* creatureTemplate = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(spawnpoint->id1));
 
-        return DoNameTeleport(handler, player, spawnpoint->mapid, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, creatureTemplate->Name);
+        return DoNameTeleport(handler, player, spawnpoint->spawnPoint.GetMapId(), {spawnpoint->spawnPoint.GetPositionX(), spawnpoint->spawnPoint.GetPositionY(), spawnpoint->spawnPoint.GetPositionZ()}, creatureTemplate->Name);
     }
 
     static bool HandleTeleNameNpcNameCommand(ChatHandler* handler, PlayerIdentifier player, Tail name)

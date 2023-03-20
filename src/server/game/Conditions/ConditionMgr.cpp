@@ -2165,7 +2165,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             {
                 if (GameObjectData const* goData = sObjectMgr->GetGameObjectData(cond->ConditionValue3))
                 {
-                    if (cond->ConditionValue2 && goData->id != cond->ConditionValue2)
+                    if (cond->ConditionValue2 && goData->id1 != cond->ConditionValue2)
                     {
                         LOG_ERROR("sql.sql", "ObjectEntryGuid condition has guid {} set but does not match gameobject entry ({}), skipped", cond->ConditionValue3, cond->ConditionValue2);
                         return false;

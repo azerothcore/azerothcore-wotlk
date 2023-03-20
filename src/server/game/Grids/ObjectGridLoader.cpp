@@ -23,6 +23,7 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "ObjectMgr.h"
+#include "ScriptMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
 
@@ -97,19 +98,19 @@ void AddObjectHelper(CellCoord& cell, GameObjectMapType& m, uint32& count, Map* 
 }
 
 template <class T>
-void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefMgr<T>& m, uint32& count, Map* map)
+void LoadHelper(CellGuidSet const& guid_set, CellCoord &cell, GridRefMgr<T> &m, uint32 &count, Map* map)
 {
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
+        // Don't spawn at all if there's a respawn timer
         T* obj = new T;
         ObjectGuid::LowType guid = *i_guid;
 
-        if (!obj->LoadFromDB(guid, map))
+        if (!obj->LoadFromDB(guid, map, false, false))
         {
             delete obj;
             continue;
         }
-
         AddObjectHelper(cell, m, count, map, obj);
     }
 }
@@ -121,9 +122,9 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefMgr<GameObj
     {
         ObjectGuid::LowType guid = *i_guid;
         GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
-        GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
+        GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id1) ? new StaticTransport() : new GameObject();
 
-        if (!obj->LoadFromDB(guid, map))
+        if (!obj->LoadFromDB(guid, map, false, false))
         {
             delete obj;
             continue;
@@ -202,9 +203,6 @@ void ObjectGridUnloader::Visit(GridRefMgr<T>& m)
     while (!m.IsEmpty())
     {
         T* obj = m.getFirst()->GetSource();
-        // if option set then object already saved at this moment
-        //if (!sWorld->getBoolConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATELY))
-        //    obj->SaveRespawnTime();
         //Some creatures may summon other temp summons in CleanupsBeforeDelete()
         //So we need this even after cleaner (maybe we can remove cleaner)
         //Example: Flame Leviathan Turret 33139 is summoned when a creature is deleted

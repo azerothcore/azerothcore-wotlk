@@ -25,6 +25,7 @@
 #include "Object.h"
 #include "SharedDefines.h"
 #include "GameObjectData.h"
+#include "SpawnData.h"
 #include "Unit.h"
 #include <array>
 
@@ -133,7 +134,8 @@ public:
     uint32 GetDynamicFlags() const override { return GetUInt32Value(GAMEOBJECT_DYNAMIC); }
     void ReplaceAllDynamicFlags(uint32 flag) override { SetUInt32Value(GAMEOBJECT_DYNAMIC, flag); }
 
-    virtual bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
+    /// @todo - Remove classic coords(x,y,z,o), to keep only Position
+    bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0, bool dynamic = false, ObjectGuid::LowType spawnid = 0);
     void Update(uint32 p_time) override;
     [[nodiscard]] GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
     [[nodiscard]] GameObjectTemplateAddon const* GetTemplateAddon() const;
@@ -158,9 +160,8 @@ public:
 
     void SaveToDB(bool saveAddon = false);
     void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool saveAddon = false);
-    bool LoadFromDB(ObjectGuid::LowType guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
-    bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true);
-    void DeleteFromDB();
+    bool LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, bool = true); // arg4 is unused, only present to match the signature on Creature
+    static bool DeleteFromDB(ObjectGuid::LowType spawnId);
 
     void SetOwnerGUID(ObjectGuid owner)
     {
@@ -243,8 +244,7 @@ public:
     [[nodiscard]] uint32 GetUseCount() const { return m_usetimes; }
     [[nodiscard]] uint32 GetUniqueUseCount() const { return m_unique_users.size(); }
 
-    void SaveRespawnTime() override { SaveRespawnTime(0); }
-    void SaveRespawnTime(uint32 forceDelay);
+    void SaveRespawnTime(uint32 forceDelay = 0);
 
     Loot        loot;
 
@@ -305,6 +305,10 @@ public:
     }
 
     void EventInform(uint32 eventId);
+
+    // There's many places not ready for dynamic spawns. This allows them to live on for now.
+    void SetRespawnCompatibilityMode(bool mode = true) { m_respawnCompatibilityMode = mode; }
+    bool GetRespawnCompatibilityMode() { return m_respawnCompatibilityMode; }
 
     [[nodiscard]] virtual uint32 GetScriptId() const;
     [[nodiscard]] GameObjectAI* AI() const { return m_AI; }
@@ -429,6 +433,7 @@ private:
     }
     GameObjectAI* m_AI;
 
+    bool m_respawnCompatibilityMode;
     bool m_saveStateOnDb = false;
 };
 #endif

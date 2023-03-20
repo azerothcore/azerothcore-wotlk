@@ -319,16 +319,14 @@ Creature* MotionTransport::CreateNPCPassenger(ObjectGuid::LowType guid, Creature
     Map* map = GetMap();
     Creature* creature = new Creature();
 
-    if (!creature->LoadCreatureFromDB(guid, map, false))
+    if (!creature->LoadFromDB(guid, map, false, true))
     {
         delete creature;
         return nullptr;
     }
 
-    float x = data->posX;
-    float y = data->posY;
-    float z = data->posZ;
-    float o = data->orientation;
+    float x, y, z, o;
+    data->spawnPoint.GetPosition(x, y, z, o);
 
     creature->SetTransport(this);
     creature->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
@@ -366,18 +364,16 @@ GameObject* MotionTransport::CreateGOPassenger(ObjectGuid::LowType guid, GameObj
 {
     Map* map = GetMap();
     GameObject* go = new GameObject();
-    ASSERT(!sObjectMgr->IsGameObjectStaticTransport(data->id));
+    ASSERT(!sObjectMgr->IsGameObjectStaticTransport(data->id1));
 
-    if (!go->LoadGameObjectFromDB(guid, map, false))
+    if (!go->LoadFromDB(guid, map, false))
     {
         delete go;
         return nullptr;
     }
 
-    float x = data->posX;
-    float y = data->posY;
-    float z = data->posZ;
-    float o = data->orientation;
+    float x, y, z, o;
+    data->spawnPoint.GetPosition(x, y, z, o);
 
     go->SetTransport(this);
     go->m_movementInfo.transport.guid = GetGUID();
@@ -781,6 +777,11 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     this->setActive(true);
     return true;
 }
+
+bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, Position const& pos, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
+{
+    return Create(guidlow, name_id, map, phaseMask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), rotation, animprogress,go_state, artKit);
+};
 
 void StaticTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
 {

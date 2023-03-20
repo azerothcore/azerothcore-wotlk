@@ -25,6 +25,8 @@
 #include "DatabaseEnv.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
+#include "IteratorPair.h"
+#include "Errors.h"
 #include "ItemTemplate.h"
 #include "Log.h"
 #include "Mail.h"
@@ -33,6 +35,7 @@
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
+#include "Position.h"
 #include "QuestDef.h"
 #include "TemporarySummon.h"
 #include "VehicleDefines.h"
@@ -43,6 +46,7 @@
 #include <string>
 
 class Item;
+class Map;
 struct DungeonProgressionRequirements;
 struct PlayerClassInfo;
 struct PlayerClassLevelInfo;
@@ -503,6 +507,8 @@ typedef std::unordered_map<ObjectGuid::LowType, CreatureData> CreatureDataContai
 typedef std::unordered_map<ObjectGuid::LowType, GameObjectData> GameObjectDataContainer;
 typedef std::map<TempSummonGroupKey, std::vector<TempSummonData> > TempSummonDataContainer;
 typedef std::unordered_map<uint32, CreatureLocale> CreatureLocaleContainer;
+typedef std::unordered_map<uint32, SpawnGroupTemplateData> SpawnGroupDataContainer;
+typedef std::multimap<uint32, SpawnData const*> SpawnGroupLinkContainer;
 typedef std::unordered_map<uint32, GameObjectLocale> GameObjectLocaleContainer;
 typedef std::unordered_map<uint32, ItemLocale> ItemLocaleContainer;
 typedef std::unordered_map<uint32, ItemSetNameLocale> ItemSetNameLocaleContainer;
@@ -694,6 +700,7 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 bool ReservedNames(std::wstring& name);
 bool ProfanityNames(std::wstring& name);
 bool normalizePlayerName(std::string& name);
+#define SPAWNGROUP_MAP_UNSET 0xFFFFFFFF
 
 struct LanguageDesc
 {
@@ -1039,7 +1046,9 @@ public:
     void LoadEquipmentTemplates();
     void LoadCreatureMovementOverrides();
     void LoadGameObjectLocales();
-    void LoadGameobjects();
+    void LoadGameObjects();
+    void LoadSpawnGroupTemplates();
+    void LoadSpawnGroups();
     void LoadItemTemplates();
     void LoadItemLocales();
     void LoadItemSetNames();
@@ -1131,6 +1140,14 @@ public:
     ObjectGuid::LowType GenerateCreatureSpawnId();
     ObjectGuid::LowType GenerateGameObjectSpawnId();
 
+    bool SpawnGroupSpawn(uint32 groupId, Map* map, bool ignoreRespawn = false, bool force = false, std::vector<WorldObject*>* spawnedObjects = nullptr);
+    bool SpawnGroupDespawn(uint32 groupId, Map* map, bool deleteRespawnTimes = false);
+    void SetSpawnGroupActive(uint32 groupId, bool state) { auto it = _spawnGroupDataStore.find(groupId); if (it != _spawnGroupDataStore.end()) it->second.isActive = state; }
+    bool IsSpawnGroupActive(uint32 groupId) const { auto it = _spawnGroupDataStore.find(groupId); return (it != _spawnGroupDataStore.end()) && it->second.isActive; }
+    SpawnGroupTemplateData const* GetDefaultSpawnGroup() const { return &_spawnGroupDataStore.at(0); }
+    SpawnGroupTemplateData const* GetLegacySpawnGroup() const { return &_spawnGroupDataStore.at(1); }
+    Acore::IteratorPair<SpawnGroupLinkContainer::const_iterator> GetSpawnDataForGroup(uint32 groupId) const { return Acore::Containers::MapEqualRange(_spawnGroupMapStore, groupId); }
+
     typedef std::multimap<int32, uint32> ExclusiveQuestGroups;
     typedef std::pair<ExclusiveQuestGroups::const_iterator, ExclusiveQuestGroups::const_iterator> ExclusiveQuestGroupsBounds;
 
@@ -1196,6 +1213,17 @@ public:
             return &itr->second;
         return nullptr;
     }
+    SpawnData const* GetSpawnData(SpawnObjectType type, ObjectGuid::LowType guid)
+    {
+        if (type == SPAWN_TYPE_CREATURE)
+            return GetCreatureData(guid);
+        else if (type == SPAWN_TYPE_GAMEOBJECT)
+            return GetGameObjectData(guid);
+        else
+            ASSERT(false, "Invalid spawn object type %u", uint32(type));
+        return nullptr;
+    }
+    void OnDeleteSpawnData(SpawnData const* data);
     [[nodiscard]] CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
     [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
@@ -1213,13 +1241,15 @@ public:
         return itr->second;
     }
 
-    [[nodiscard]] GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
-    [[nodiscard]] GameObjectData const* GetGameObjectData(ObjectGuid::LowType spawnId) const
+    GameObjectDataContainer const& GetAllGameObjectData() const { return _gameObjectDataStore; }
+    GameObjectData const* GetGameObjectData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
         if (itr == _gameObjectDataStore.end()) return nullptr;
             return &itr->second;
     }
+    GameObjectData& NewOrExistGameObjectData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
+    void DeleteGameObjectData(ObjectGuid::LowType guid);
     [[nodiscard]] CreatureLocale const* GetCreatureLocale(uint32 entry) const
     {
         CreatureLocaleContainer::const_iterator itr = _creatureLocaleStore.find(entry);
@@ -1308,9 +1338,6 @@ public:
     }
     QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
 
-    GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
-    void DeleteGOData(ObjectGuid::LowType guid);
-
     [[nodiscard]] AcoreString const* GetAcoreString(uint32 entry) const
     {
         AcoreStringContainer::const_iterator itr = _acoreStringStore.find(entry);
@@ -1329,8 +1356,8 @@ public:
     void RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData const* data);
     void AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data);
     void RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectData const* data);
-    uint32 AddGOData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0, float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
-    uint32 AddCreData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
+    ObjectGuid::LowType AddGameObjectData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0, float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
+    ObjectGuid::LowType AddCreatureData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
 
     // reserved names
     void LoadReservedPlayersNames();
@@ -1590,6 +1617,8 @@ private:
     GameObjectLocaleContainer _gameObjectLocaleStore;
     GameObjectTemplateContainer _gameObjectTemplateStore;
     GameObjectTemplateAddonContainer _gameObjectTemplateAddonStore;
+    SpawnGroupDataContainer _spawnGroupDataStore;
+    SpawnGroupLinkContainer _spawnGroupMapStore;
     /// Stores temp summon data grouped by summoner's entry, summoner's type and group id
     TempSummonDataContainer _tempSummonDataStore;
 

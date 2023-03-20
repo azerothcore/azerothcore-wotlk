@@ -121,6 +121,10 @@ public:
     MOCK_METHOD(std::string const&, GetRealmName, (), (const));
     MOCK_METHOD(void, SetRealmName, (std::string name), ());
     MOCK_METHOD(void, RemoveOldCorpses, ());
+    MOCK_METHOD(void, TriggerGuidWarning, ());
+    MOCK_METHOD(void, TriggerGuidAlert, ());
+    MOCK_METHOD(bool, IsGuidWarning, (), (const));
+    MOCK_METHOD(bool, IsGuidAlert, (), (const));
 };
 #pragma GCC diagnostic pop
 

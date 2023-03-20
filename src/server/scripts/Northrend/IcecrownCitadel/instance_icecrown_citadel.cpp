@@ -545,17 +545,17 @@ public:
                     break;
                 case NPC_ZAFOD_BOOMBOX:
                     if (GameObjectTemplate const* go = sObjectMgr->GetGameObjectTemplate(GO_THE_SKYBREAKER_A))
-                        if ((TeamIdInInstance == TEAM_ALLIANCE && data->mapid == go->moTransport.mapID) ||
-                                (TeamIdInInstance == TEAM_HORDE && data->mapid != go->moTransport.mapID))
+                        if ((TeamIdInInstance == TEAM_ALLIANCE && data->spawnPoint.GetMapId() == go->moTransport.mapID) ||
+                                (TeamIdInInstance == TEAM_HORDE && data->spawnPoint.GetMapId() != go->moTransport.mapID))
                             return entry;
                     return 0;
                 case NPC_IGB_MURADIN_BRONZEBEARD:
-                    if ((TeamIdInInstance == TEAM_ALLIANCE && data->posX > 10.0f) ||
-                            (TeamIdInInstance == TEAM_HORDE && data->posX < 10.0f))
+                    if ((TeamIdInInstance == TEAM_ALLIANCE && data->spawnPoint.GetPositionX() > 10.0f) ||
+                            (TeamIdInInstance == TEAM_HORDE && data->spawnPoint.GetPositionX() < 10.0f))
                         return entry;
                     return 0;
                 case NPC_SPIRE_FROSTWYRM:
-                    if ((TeamIdInInstance == TEAM_ALLIANCE && data->posY < 2200.0f) || (TeamIdInInstance == TEAM_HORDE && data->posY > 2200.0f))
+                    if ((TeamIdInInstance == TEAM_ALLIANCE && data->spawnPoint.GetPositionY() < 2200.0f) || (TeamIdInInstance == TEAM_HORDE && data->spawnPoint.GetPositionY() > 2200.0f))
                         return 0;
                     break;
             }

@@ -193,7 +193,7 @@ void PoolGroup<Creature>::Despawn1Object(ObjectGuid::LowType guid)
     {
         sObjectMgr->RemoveCreatureFromGrid(guid, data);
 
-        Map* map = sMapMgr->CreateBaseMap(data->mapid);
+        Map* map = sMapMgr->CreateBaseMap(data->spawnPoint.GetMapId());
         if (!map->Instanceable())
         {
             auto creatureBounds = map->GetCreatureBySpawnIdStore().equal_range(guid);
@@ -201,6 +201,10 @@ void PoolGroup<Creature>::Despawn1Object(ObjectGuid::LowType guid)
             {
                 Creature* creature = itr->second;
                 ++itr;
+                // For dynamic spawns, save respawn time here
+                if (!creature->GetRespawnCompatibilityMode())
+                    creature->SaveRespawnTime();
+
                 creature->AddObjectToRemoveList();
             }
         }
@@ -215,7 +219,7 @@ void PoolGroup<GameObject>::Despawn1Object(ObjectGuid::LowType guid)
     {
         sObjectMgr->RemoveGameobjectFromGrid(guid, data);
 
-        Map* map = sMapMgr->CreateBaseMap(data->mapid);
+        Map* map = sMapMgr->CreateBaseMap(data->spawnPoint.GetMapId());
         if (!map->Instanceable())
         {
             auto gameobjectBounds = map->GetGameObjectBySpawnIdStore().equal_range(guid);
@@ -223,6 +227,10 @@ void PoolGroup<GameObject>::Despawn1Object(ObjectGuid::LowType guid)
             {
                 GameObject* go = itr->second;
                 ++itr;
+                // For dynamic spawns, save respawn time here
+                if (!go->GetRespawnCompatibilityMode())
+                    go->SaveRespawnTime();
+
                 go->AddObjectToRemoveList();
             }
         }
@@ -380,13 +388,13 @@ void PoolGroup<Creature>::Spawn1Object(PoolObject* obj)
         sObjectMgr->AddCreatureToGrid(obj->guid, data);
 
         // Spawn if necessary (loaded grids only)
-        Map* map = sMapMgr->CreateBaseMap(data->mapid);
+        Map* map = sMapMgr->CreateBaseMap(data->spawnPoint.GetMapId());
         // We use spawn coords to spawn
-        if (!map->Instanceable() && map->IsGridLoaded(data->posX, data->posY))
+        if (!map->Instanceable() && map->IsGridLoaded(data->spawnPoint))
         {
             Creature* creature = new Creature;
             //LOG_DEBUG("pool", "Spawning creature {}", guid);
-            if (!creature->LoadCreatureFromDB(obj->guid, map))
+            if (!creature->LoadFromDB(obj->guid, map, true, false))
             {
                 delete creature;
                 return;
@@ -404,13 +412,13 @@ void PoolGroup<GameObject>::Spawn1Object(PoolObject* obj)
         sObjectMgr->AddGameobjectToGrid(obj->guid, data);
         // Spawn if necessary (loaded grids only)
         // this base map checked as non-instanced and then only existed
-        Map* map = sMapMgr->CreateBaseMap(data->mapid);
+        Map* map = sMapMgr->CreateBaseMap(data->spawnPoint.GetMapId());
         // We use current coords to unspawn, not spawn coords since creature can have changed grid
-        if (!map->Instanceable() && map->IsGridLoaded(data->posX, data->posY))
+        if (!map->Instanceable() && map->IsGridLoaded(data->spawnPoint))
         {
-            GameObject* pGameobject = sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
+            GameObject* pGameobject = sObjectMgr->IsGameObjectStaticTransport(data->id1) ? new StaticTransport() : new GameObject();
             //LOG_DEBUG("pool", "Spawning gameobject {}", guid);
-            if (!pGameobject->LoadGameObjectFromDB(obj->guid, map, false))
+            if (!pGameobject->LoadFromDB(obj->guid, map, false))
             {
                 delete pGameobject;
                 return;
@@ -693,7 +701,7 @@ void PoolMgr::LoadFromDB()
                     continue;
                 }
 
-                GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(data->id);
+                GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(data->id1);
                 if (goinfo->type != GAMEOBJECT_TYPE_CHEST &&
                         goinfo->type != GAMEOBJECT_TYPE_GOOBER &&
                         goinfo->type != GAMEOBJECT_TYPE_FISHINGHOLE)
@@ -1104,6 +1112,21 @@ void PoolMgr::DespawnPool(uint32 pool_id)
         auto it = mPoolQuestGroups.find(pool_id);
         if (it != mPoolQuestGroups.end() && !it->second.IsEmpty())
             it->second.DespawnObject(mSpawnedData);
+    }
+}
+
+// Selects proper template overload to call based on passed type
+uint32 PoolMgr::IsPartOfAPool(SpawnObjectType type, ObjectGuid::LowType spawnId) const
+{
+    switch (type)
+    {
+    case SPAWN_TYPE_CREATURE:
+        return IsPartOfAPool<Creature>(spawnId);
+    case SPAWN_TYPE_GAMEOBJECT:
+        return IsPartOfAPool<GameObject>(spawnId);
+    default:
+        ASSERT(false, "Invalid spawn type %u passed to PoolMgr::IsPartOfPool (with spawnId %u)", uint32(type), spawnId);
+        return 0;
     }
 }
 

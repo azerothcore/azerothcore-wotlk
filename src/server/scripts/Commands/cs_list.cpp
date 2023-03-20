@@ -531,6 +531,12 @@ public:
 
         return true;
     }
+
+    static char const* GetZoneName(uint32 zoneId, LocaleConstant locale)
+    {
+        AreaTableEntry const* zoneEntry = sAreaTableStore.LookupEntry(zoneId);
+        return zoneEntry ? zoneEntry->area_name[locale] : "<unknown zone>";
+    }
 };
 
 void AddSC_list_commandscript()

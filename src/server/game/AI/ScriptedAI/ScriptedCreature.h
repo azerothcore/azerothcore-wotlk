@@ -460,8 +460,6 @@ public:
 
     InstanceScript* const instance;
 
-    bool CanRespawn() override;
-
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;

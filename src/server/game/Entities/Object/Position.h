@@ -18,6 +18,7 @@
 #ifndef ACore_game_Position_h__
 #define ACore_game_Position_h__
 
+#include "Define.h"
 #include <cmath>
 #include "Common.h"
 #include "G3D/Vector3.h"
@@ -29,11 +30,11 @@ struct Position
     Position(float x = 0, float y = 0, float z = 0, float o = 0)
             : m_positionX(x), m_positionY(y), m_positionZ(z), m_orientation(NormalizeOrientation(o)) { }
 
-    Position(Position const& loc) { Relocate(loc); }
     /* requried as of C++ 11 */
     Position(Position&&) = default;
     Position& operator=(const Position&) = default;
     Position& operator=(Position&&) = default;
+    Position(Position const& loc) { Relocate(loc); }
 
     struct PositionXYStreamer
     {
@@ -140,7 +141,7 @@ struct Position
         o = m_orientation;
     }
 
-    [[nodiscard]] Position GetPosition() const { return *this; }
+    Position GetPosition() const { return *this; }
 
     Position::PositionXYZStreamer PositionXYZStream()
     {
@@ -214,15 +215,9 @@ struct Position
         return GetExactDist2dSq(pos) < dist * dist;
     }
 
-    [[nodiscard]] bool IsInDist(float x, float y, float z, float dist) const
-    {
-        return GetExactDistSq(x, y, z) < dist * dist;
-    }
-
-    bool IsInDist(const Position* pos, float dist) const
-    {
-        return GetExactDistSq(pos) < dist * dist;
-    }
+    bool IsInDist(float x, float y, float z, float dist) const { return GetExactDistSq(x, y, z) < dist * dist; }
+    bool IsInDist(Position const& pos, float dist) const { return GetExactDistSq(pos) < dist * dist; }
+    bool IsInDist(Position const* pos, float dist) const { return GetExactDistSq(pos) < dist * dist; }
 
     [[nodiscard]] bool IsWithinBox(const Position& center, float xradius, float yradius, float zradius) const;
     bool HasInArc(float arcangle, const Position* pos, float targetRadius = 0.0f) const;
@@ -256,12 +251,9 @@ public:
     WorldLocation(uint32 mapId, Position const& position)
             : Position(position), m_mapId(mapId) { }
 
-    void WorldRelocate(const WorldLocation& loc)
-    {
-        m_mapId = loc.GetMapId();
-        Relocate(loc);
-    }
-
+    void WorldRelocate(WorldLocation const& loc) { m_mapId = loc.GetMapId(); Relocate(loc); }
+    void WorldRelocate(WorldLocation const* loc) { m_mapId = loc->GetMapId(); Relocate(loc); }
+    void WorldRelocate(uint32 mapId, Position const& pos) { m_mapId = mapId; Relocate(pos); }
     void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
     {
         m_mapId = mapId;
@@ -273,10 +265,7 @@ public:
         m_mapId = mapId;
     }
 
-    [[nodiscard]] uint32 GetMapId() const
-    {
-        return m_mapId;
-    }
+    uint32 GetMapId() const { return m_mapId; }
 
     void GetWorldLocation(uint32& mapId, float& x, float& y) const
     {

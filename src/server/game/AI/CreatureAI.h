@@ -110,9 +110,6 @@ public:
     // Trigger Creature "Alert" state (creature can see stealthed unit)
     void TriggerAlert(Unit const* who) const;
 
-    // Called in Creature::Update when deathstate = DEAD. Inherited classes may maniuplate the ability to respawn based on scripted events.
-    virtual bool CanRespawn() { return true; }
-
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
@@ -143,6 +140,8 @@ public:
 
     // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
     virtual void AttackedBy(Unit* /*attacker*/) {}
+
+    // Should return true if the NPC is currently being escorted
     virtual bool IsEscorted() { return false; }
 
     // Called when creature is spawned or respawned (for reseting variables)
