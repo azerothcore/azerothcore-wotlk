@@ -134,3 +134,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (19716, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mechanar Tinkerer - On Link - Set Reactstate Passive'),
 (19716, 0, 5, 6, 0, 2, 100, 1, 2000, 2000, 0, 0, 0, 11, 35058, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mechanar Tinkerer - In Combat - Cast \'Nether Explosion\' (No Repeat) (Phase 2)'),
 (19716, 0, 6, 0, 61, 2, 100, 1, 0, 0, 0, 0, 0, 11, 29878, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mechanar Tinkerer - On Link - Cast \'Instakill Self\' (No Repeat) (Phase 2)');
+
+-- Mechanar Wrecker
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19713);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(19713, 0, 0, 0, 0, 0, 100, 0, 15200, 27700, 21700, 36800, 0, 11, 35056, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Mechanar Wrecker - In Combat - Cast \'Glob of Machine Fluid\''),
+(19713, 0, 1, 0, 0, 0, 100, 0, 15700, 22500, 17300, 26500, 0, 11, 35049, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Mechanar Wrecker - In Combat - Cast \'Pound\'');
