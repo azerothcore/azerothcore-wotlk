@@ -140,15 +140,6 @@ public:
                 pInstance->SetData(DATA_KELESETH, NOT_STARTED);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) override {}
-
-        /*void KilledUnit(Unit * victim)
-        {
-            if (victim == me)
-                return;
-            DoScriptText(SAY_KILL, me);
-        }*/
-
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
