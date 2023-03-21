@@ -130,7 +130,7 @@ public:
                                     case NPC_INFINITE_EXECUTIONER_2:
                                     case NPC_INFINITE_VANQUISHER:
                                     case NPC_INFINITE_VANQUISHER_2:
-                                        creature->DespawnOrUnsummon();
+                                        creature->DespawnOrUnsummon(1);
                                         break;
                                     default:
                                         break;
@@ -150,7 +150,7 @@ public:
                             _canSpawnPortal = true;
                         });
 
-                        ScheduleNextPortal(2min + 30s);
+                        ScheduleNextPortal(2min + 30s, Position(0.0f, 0.0f, 0.0f, 0.0f));
                         break;
                     }
                     default:
@@ -173,11 +173,11 @@ public:
             player->SendUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
         }
 
-        void ScheduleNextPortal(Milliseconds time)
+        void ScheduleNextPortal(Milliseconds time, Position lastPosition)
         {
             _scheduler.CancelGroup(CONTEXT_GROUP_RIFTS);
 
-            _scheduler.Schedule(time, [this](TaskContext context)
+            _scheduler.Schedule(time, [this, lastPosition](TaskContext context)
             {
                 if (GetCreature(DATA_MEDIVH))
                 {
@@ -190,7 +190,18 @@ public:
                     Position spawnPos;
                     if (!_availableRiftPositions.empty())
                     {
-                        spawnPos = Acore::Containers::SelectRandomContainerElement(_availableRiftPositions);
+                        if (_availableRiftPositions.size() > 1)
+                        {
+                            spawnPos = Acore::Containers::SelectRandomContainerElementIf(_availableRiftPositions, [&](Position pos) -> bool
+                            {
+                                return pos != lastPosition;
+                            });
+                        }
+                        else
+                        {
+                            spawnPos = Acore::Containers::SelectRandomContainerElement(_availableRiftPositions);
+                        }
+
                         _availableRiftPositions.remove(spawnPos);
 
                         DoUpdateWorldState(WORLD_STATE_BM_RIFT, ++_currentRift);
@@ -254,13 +265,13 @@ public:
                 case NPC_TIME_RIFT:
                     if (_currentRift < 18)
                     {
-                        if (!_availableRiftPositions.empty() && _availableRiftPositions.size() < 3)
+                        if (_availableRiftPositions.size() < 3)
                         {
-                            ScheduleNextPortal((_currentRift >= 13 ? 2min : 90s));
+                            ScheduleNextPortal((_currentRift >= 13 ? 2min : 90s), creature->GetHomePosition());
                         }
                         else
                         {
-                            ScheduleNextPortal(4s);
+                            ScheduleNextPortal(1s, creature->GetHomePosition());
                         }
                     }
 
@@ -301,7 +312,7 @@ public:
                     DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
                     DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
 
-                    ScheduleNextPortal(3s);
+                    ScheduleNextPortal(3s, Position(0.0f, 0.0f, 0.0f, 0.0f));
 
                     for (ObjectGuid const& guid : _encounterNPCs)
                     {
