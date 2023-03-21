@@ -141,7 +141,7 @@ public:
                 pInstance->SetData(DATA_KELESETH, NOT_STARTED);
         }
 
-        void KilledUnit(Unit * victim)
+        void KilledUnit(Unit * victim) override
         {
             if (victim->IsPlayer())
             {
