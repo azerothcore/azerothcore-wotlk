@@ -40,7 +40,7 @@ public:
 
     void SellItem(ObjectGuid playerGuid, std::shared_ptr<AuctionSellItem> listItems);
     void PlaceBid(ObjectGuid playerGuid, ObjectGuid auctioneer, uint32 auctionID, uint32 price);
-    void ListBidderItems(ObjectGuid playerGuid, ObjectGuid auctioneer, uint32 listFrom, uint32 outbiddedCount, std::vector<uint32>& outbiddedAuctionIds);
+    void ListBidderItems(ObjectGuid playerGuid, ObjectGuid auctioneer, uint32 outbiddedCount, std::vector<uint32>& outbiddedAuctionIds);
     void ListOwnerItems(ObjectGuid playerGuid, ObjectGuid creatureGuid);
     void ListItems(ObjectGuid playerGuid, std::shared_ptr<AuctionListItems> listItems);
 //    void UpdateBotAgents();

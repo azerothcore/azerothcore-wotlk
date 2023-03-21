@@ -80,10 +80,9 @@ private:
 class AC_GAME_API ListBidderItemsTask : public AsyncAuctionOperation
 {
 public:
-    ListBidderItemsTask(ObjectGuid playerGuid, ObjectGuid auctioneer, uint32 listFrom, uint32 outbiddedCount, std::vector<uint32>& outbiddedAuctionIds) :
+    ListBidderItemsTask(ObjectGuid playerGuid, ObjectGuid auctioneer, uint32 outbiddedCount, std::vector<uint32>& outbiddedAuctionIds) :
         AsyncAuctionOperation(playerGuid),
         _auctioneer(auctioneer),
-        _listFrom(listFrom),
         _outbiddedCount(outbiddedCount),
         _outbiddedAuctionIds(std::move(outbiddedAuctionIds)) { }
 
@@ -93,7 +92,7 @@ public:
 
 private:
     ObjectGuid _auctioneer;
-    uint32 _listFrom{};
+    // uint32 _listFrom{};
     uint32 _outbiddedCount{};
     std::vector<uint32> _outbiddedAuctionIds{};
 };

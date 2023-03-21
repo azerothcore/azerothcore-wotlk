@@ -140,7 +140,7 @@ void WorldPackets::AuctionHouse::RemoveItem::Read()
 void WorldPackets::AuctionHouse::ListBidderItems::Read()
 {
     _worldPacket >> Auctioneer;
-    _worldPacket >> ListFrom;
+    _worldPacket >> ListFrom; // not used in fact (this list not have page control in client)
     _worldPacket >> OutbiddedCount;
 
     if (GetSize() != (16 + OutbiddedCount * 4))

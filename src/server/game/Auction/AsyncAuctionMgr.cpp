@@ -85,9 +85,9 @@ void AsyncAuctionMgr::PlaceBid(ObjectGuid playerGuid, ObjectGuid auctioneer, uin
     Enqueue(new PlaceBidTask(playerGuid, auctioneer, auctionID, price));
 }
 
-void AsyncAuctionMgr::ListBidderItems(ObjectGuid playerGuid, ObjectGuid auctioneer, uint32 listFrom, uint32 outbiddedCount, std::vector<uint32>& outbiddedAuctionIds)
+void AsyncAuctionMgr::ListBidderItems(ObjectGuid playerGuid, ObjectGuid auctioneer, uint32 outbiddedCount, std::vector<uint32>& outbiddedAuctionIds)
 {
-    Enqueue(new ListBidderItemsTask(playerGuid, auctioneer, listFrom, outbiddedCount, outbiddedAuctionIds));
+    Enqueue(new ListBidderItemsTask(playerGuid, auctioneer, outbiddedCount, outbiddedAuctionIds));
 }
 
 void AsyncAuctionMgr::ListOwnerItems(ObjectGuid playerGuid, ObjectGuid creatureGuid)

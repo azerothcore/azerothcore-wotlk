@@ -201,7 +201,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPackets::AuctionHouse::RemoveIte
 void WorldSession::HandleAuctionListBidderItems(WorldPackets::AuctionHouse::ListBidderItems& packet)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_BIDDER_ITEMS");
-    sAsyncAuctionMgr->ListBidderItems(_player->GetGUID(), packet.Auctioneer, packet.ListFrom, packet.OutbiddedCount, packet.OutbiddedAuctionIds);
+    sAsyncAuctionMgr->ListBidderItems(_player->GetGUID(), packet.Auctioneer, packet.OutbiddedCount, packet.OutbiddedAuctionIds);
 }
 
 // Sends player info about his auctions
