@@ -246,14 +246,14 @@ void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
         if (Player const* plr = _session->GetPlayer())
         {
             std::string const reportFormat = "Player {} (guid {}, account id: {}) failed warden {} check ({}). Action: {}";
-            reportMsg = Acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUID().GetCounter(), _session->GetAccountId(),
-                                           checkId, ((checkData && !checkData->Comment.empty()) ? checkData->Comment.c_str() : "<warden comment is not set>"),
-                                           GetWardenActionStr(action).c_str());
+            reportMsg = Acore::StringFormatFmt(reportFormat, plr->GetName(), plr->GetGUID().GetCounter(), _session->GetAccountId(),
+                                           checkId, ((checkData && !checkData->Comment.empty()) ? checkData->Comment : "<warden comment is not set>"),
+                                           GetWardenActionStr(action));
         }
         else
         {
             std::string const reportFormat = "Account id: {} failed warden {} check. Action: {}";
-            reportMsg = Acore::StringFormat(reportFormat, _session->GetAccountId(), checkId, GetWardenActionStr(action).c_str());
+            reportMsg = Acore::StringFormatFmt(reportFormat, _session->GetAccountId(), checkId, GetWardenActionStr(action));
         }
     }
     else
@@ -261,12 +261,12 @@ void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
         if (Player const* plr = _session->GetPlayer())
         {
             std::string const reportFormat = "Player {} (guid {}, account id: {}) triggered warden penalty by reason: {}. Action: {}";
-            reportMsg = Acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUID().GetCounter(), _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+            reportMsg = Acore::StringFormatFmt(reportFormat, plr->GetName(), plr->GetGUID().GetCounter(), _session->GetAccountId(), causeMsg, GetWardenActionStr(action));
         }
         else
         {
             std::string const reportFormat = "Account id: {} failed warden {} check. Action: {}";
-            reportMsg = Acore::StringFormat(reportFormat, _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+            reportMsg = Acore::StringFormatFmt(reportFormat, _session->GetAccountId(), causeMsg, GetWardenActionStr(action));
         }
     }
 

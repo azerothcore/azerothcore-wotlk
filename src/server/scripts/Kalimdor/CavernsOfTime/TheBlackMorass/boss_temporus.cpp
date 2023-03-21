@@ -21,7 +21,6 @@
 
 enum Enums
 {
-    SAY_ENTER                   = 0,
     SAY_AGGRO                   = 1,
     SAY_BANISH                  = 2,
     SAY_SLAY                    = 3,
@@ -42,12 +41,6 @@ struct boss_temporus : public BossAI
     {
         if (me->GetEntry() == NPC_TEMPORUS)
             Talk(id);
-    }
-
-    void InitializeAI() override
-    {
-        OwnTalk(SAY_ENTER);
-        ScriptedAI::InitializeAI();
     }
 
     void JustEngagedWith(Unit* /*who*/) override

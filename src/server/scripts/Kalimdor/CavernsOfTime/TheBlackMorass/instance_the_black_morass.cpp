@@ -56,6 +56,7 @@ public:
             _currentRift = 0;
             _shieldPercent = 100;
             _encounterNPCs.clear();
+            _canSpawnPortal = true; // Delay after bosses
         }
 
         void CleanupInstance()
@@ -108,12 +109,6 @@ public:
                                 player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
                             }
                         });
-                        break;
-                    }
-                    case DATA_CHRONO_LORD_DEJA:
-                    case DATA_TEMPORUS:
-                    {
-                        _scheduler.RescheduleGroup(CONTEXT_GROUP_RIFTS, 2min + 30s);
 
                         for (ObjectGuid const& guid : _encounterNPCs)
                         {
@@ -126,13 +121,36 @@ public:
                                     case NPC_RIFT_LORD:
                                     case NPC_RIFT_LORD_2:
                                     case NPC_TIME_RIFT:
-                                        creature->DespawnOrUnsummon();
-                                    break;
-                                default:
-                                    break;
+                                    case NPC_INFINITE_ASSASIN:
+                                    case NPC_INFINITE_ASSASIN_2:
+                                    case NPC_INFINITE_WHELP:
+                                    case NPC_INFINITE_CHRONOMANCER:
+                                    case NPC_INFINITE_CHRONOMANCER_2:
+                                    case NPC_INFINITE_EXECUTIONER:
+                                    case NPC_INFINITE_EXECUTIONER_2:
+                                    case NPC_INFINITE_VANQUISHER:
+                                    case NPC_INFINITE_VANQUISHER_2:
+                                        creature->DespawnOrUnsummon(1);
+                                        break;
+                                    default:
+                                        break;
                                 }
                             }
                         }
+
+                        break;
+                    }
+                    case DATA_CHRONO_LORD_DEJA:
+                    case DATA_TEMPORUS:
+                    {
+                        _canSpawnPortal = false;
+
+                        _scheduler.Schedule(2min + 30s, [this](TaskContext)
+                        {
+                            _canSpawnPortal = true;
+                        });
+
+                        ScheduleNextPortal(2min + 30s, Position(0.0f, 0.0f, 0.0f, 0.0f));
                         break;
                     }
                     default:
@@ -155,18 +173,35 @@ public:
             player->SendUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
         }
 
-        void ScheduleNextPortal(Milliseconds time)
+        void ScheduleNextPortal(Milliseconds time, Position lastPosition)
         {
             _scheduler.CancelGroup(CONTEXT_GROUP_RIFTS);
 
-            _scheduler.Schedule(time, [this](TaskContext context)
+            _scheduler.Schedule(time, [this, lastPosition](TaskContext context)
             {
                 if (GetCreature(DATA_MEDIVH))
                 {
+                    // Spawning prevented - there's a 150s delay after a boss dies.
+                    if (!_canSpawnPortal)
+                    {
+                        return;
+                    }
+
                     Position spawnPos;
                     if (!_availableRiftPositions.empty())
                     {
-                        spawnPos = Acore::Containers::SelectRandomContainerElement(_availableRiftPositions);
+                        if (_availableRiftPositions.size() > 1)
+                        {
+                            spawnPos = Acore::Containers::SelectRandomContainerElementIf(_availableRiftPositions, [&](Position pos) -> bool
+                            {
+                                return pos != lastPosition;
+                            });
+                        }
+                        else
+                        {
+                            spawnPos = Acore::Containers::SelectRandomContainerElement(_availableRiftPositions);
+                        }
+
                         _availableRiftPositions.remove(spawnPos);
 
                         DoUpdateWorldState(WORLD_STATE_BM_RIFT, ++_currentRift);
@@ -207,10 +242,14 @@ public:
                 case NPC_RIFT_LORD:
                 case NPC_RIFT_LORD_2:
                 case NPC_INFINITE_ASSASIN:
+                case NPC_INFINITE_ASSASIN_2:
                 case NPC_INFINITE_WHELP:
-                case NPC_INFINITE_CRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER_2:
                 case NPC_INFINITE_EXECUTIONER:
+                case NPC_INFINITE_EXECUTIONER_2:
                 case NPC_INFINITE_VANQUISHER:
+                case NPC_INFINITE_VANQUISHER_2:
                 case NPC_DP_BEAM_STALKER:
                     _encounterNPCs.insert(creature->GetGUID());
                     break;
@@ -226,13 +265,13 @@ public:
                 case NPC_TIME_RIFT:
                     if (_currentRift < 18)
                     {
-                        if (!_availableRiftPositions.empty() && _availableRiftPositions.size() < 3)
+                        if (_availableRiftPositions.size() < 3)
                         {
-                            ScheduleNextPortal((_currentRift >= 13 ? 2min : 90s));
+                            ScheduleNextPortal((_currentRift >= 13 ? 2min : 90s), creature->GetHomePosition());
                         }
                         else
                         {
-                            ScheduleNextPortal(4s);
+                            ScheduleNextPortal(1s, creature->GetHomePosition());
                         }
                     }
 
@@ -248,10 +287,14 @@ public:
                 case NPC_RIFT_LORD:
                 case NPC_RIFT_LORD_2:
                 case NPC_INFINITE_ASSASIN:
+                case NPC_INFINITE_ASSASIN_2:
                 case NPC_INFINITE_WHELP:
-                case NPC_INFINITE_CRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER:
+                case NPC_INFINITE_CHRONOMANCER_2:
                 case NPC_INFINITE_EXECUTIONER:
+                case NPC_INFINITE_EXECUTIONER_2:
                 case NPC_INFINITE_VANQUISHER:
+                case NPC_INFINITE_VANQUISHER_2:
                     _encounterNPCs.erase(creature->GetGUID());
                     break;
             }
@@ -269,7 +312,7 @@ public:
                     DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
                     DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
 
-                    ScheduleNextPortal(3s);
+                    ScheduleNextPortal(3s, Position(0.0f, 0.0f, 0.0f, 0.0f));
 
                     for (ObjectGuid const& guid : _encounterNPCs)
                     {
@@ -404,6 +447,7 @@ public:
         GuidSet _encounterNPCs;
         uint8 _currentRift;
         int8 _shieldPercent;
+        bool _canSpawnPortal;
         TaskScheduler _scheduler;
     };
 };
