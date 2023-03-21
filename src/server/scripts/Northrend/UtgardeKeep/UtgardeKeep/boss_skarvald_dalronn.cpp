@@ -112,7 +112,7 @@ public:
             switch (param)
             {
                 case 1:
-                    events.RescheduleEvent(EVENT_MATE_DIED, 3500);
+                    events.RescheduleEvent(EVENT_MATE_DIED, 3500ms);
                     break;
             }
         }
@@ -120,14 +120,14 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             events.Reset();
-            events.RescheduleEvent(EVENT_SHARVALD_CHARGE, 5000);
-            events.RescheduleEvent(EVENT_STONE_STRIKE, 10000);
+            events.RescheduleEvent(EVENT_SHARVALD_CHARGE, 5s);
+            events.RescheduleEvent(EVENT_STONE_STRIKE, 10s);
             if (me->GetEntry() == NPC_SKARVALD)
             {
                 Talk(YELL_SKARVALD_AGGRO);
                 if (IsHeroic())
                 {
-                    events.ScheduleEvent(EVENT_ENRAGE, 1000);
+                    events.ScheduleEvent(EVENT_ENRAGE, 1s);
                 }
             }
             if (pInstance)
@@ -202,17 +202,17 @@ public:
                         me->AddThreat(target, 10000.0f);
                         me->CastSpell(target, SPELL_CHARGE, false);
                     }
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.Repeat(5s, 10s);
                     break;
                 case EVENT_STONE_STRIKE:
                     if (me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->CastSpell(me->GetVictim(), SPELL_STONE_STRIKE, false);
-                        events.RepeatEvent(urand(5000, 10000));
+                        events.Repeat(5s, 10s);
                     }
                     else
                     {
-                        events.RepeatEvent(3000);
+                        events.Repeat(3s);
                     }
                     break;
                 case EVENT_ENRAGE:
@@ -221,7 +221,7 @@ public:
                         me->CastSpell(me, SPELL_ENRAGE, true);
                         break;
                     }
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     break;
             }
             DoMeleeAttackIfReady();
@@ -280,7 +280,7 @@ public:
                     summons.DespawnAll();
                     break;
                 case 1:
-                    events.RescheduleEvent(EVENT_MATE_DIED, 3500);
+                    events.RescheduleEvent(EVENT_MATE_DIED, 3500ms);
                     break;
             }
         }
@@ -288,15 +288,15 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             events.Reset();
-            events.RescheduleEvent(EVENT_SHADOW_BOLT, 1000);
-            events.RescheduleEvent(EVENT_DEBILITATE, 5000);
+            events.RescheduleEvent(EVENT_SHADOW_BOLT, 1s);
+            events.RescheduleEvent(EVENT_DEBILITATE, 5s);
             if (IsHeroic())
             {
-                events.RescheduleEvent(EVENT_SUMMON_SKELETONS, 10000);
+                events.RescheduleEvent(EVENT_SUMMON_SKELETONS, 10s);
             }
             if (me->GetEntry() == NPC_DALRONN)
             {
-                events.RescheduleEvent(EVENT_YELL_DALRONN_AGGRO, 4999);
+                events.RescheduleEvent(EVENT_YELL_DALRONN_AGGRO, 5s);
             }
             if (pInstance)
             {
@@ -376,22 +376,22 @@ public:
                     {
                         me->CastSpell(target, DUNGEON_MODE(SPELL_SHADOW_BOLT_N, SPELL_SHADOW_BOLT_H), false);
                     }
-                    events.RepeatEvent(2050);
+                    events.Repeat(2s);
                     break;
                 case EVENT_DEBILITATE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true))
                     {
                         me->CastSpell(target, SPELL_DEBILITATE, false);
-                        events.RepeatEvent(urand(5000, 10000));
+                        events.Repeat(5s, 10s);
                     }
                     else
                     {
-                        events.RepeatEvent(3000);
+                        events.Repeat(3s);
                     }
                     break;
                 case EVENT_SUMMON_SKELETONS:
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_SKELETONS, false);
-                    events.RepeatEvent(urand(20000, 30000));
+                    events.Repeat(20s, 30s);
                     break;
             }
             DoMeleeAttackIfReady();
