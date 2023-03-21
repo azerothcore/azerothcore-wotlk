@@ -917,10 +917,13 @@ void BfCapturePoint::SendChangePhase()
             }
 }
 
-bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
+bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint, TeamId team)
 {
     ASSERT(capturePoint);
 
+    //At first call using TEAM_NEUTRAL as a checker but never using it, after first call we reset the capturepoints to the new winner of the last WG war
+    if (team == TEAM_NEUTRAL)
+        team = m_team;
     LOG_DEBUG("bg.battlefield", "Creating capture point {}", capturePoint->GetEntry());
 
     m_capturePoint = capturePoint->GetGUID();
@@ -939,7 +942,7 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
     m_neutralValuePct = goinfo->capturePoint.neutralPercent;
     m_minValue = m_maxValue * goinfo->capturePoint.neutralPercent / 100;
     m_capturePointEntry = capturePoint->GetEntry();
-    if (m_team == TEAM_ALLIANCE)
+    if (team == TEAM_ALLIANCE)
     {
         m_value = m_maxValue;
         m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE;
