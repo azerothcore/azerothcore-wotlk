@@ -1,3 +1,4 @@
+-- DB update 2023_03_21_04 -> 2023_03_21_05
 -- Coosh'coosh (18586)
 -- Co-authored-by: aletson <aletson@users.noreply.github.com> https://github.com/TrinityCore/TrinityCore/pull/20773
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 18586;
