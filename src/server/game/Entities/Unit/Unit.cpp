@@ -74,6 +74,7 @@
 #include <math.h>
 
 //npcbot
+#include "botdatamgr.h"
 #include "botmgr.h"
 //end npcbot
 
@@ -14503,8 +14504,8 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
         auto const* ft2 = sFactionTemplateStore.LookupEntry(target->GetFaction());
         auto const* fe1 = ft1 ? sFactionStore.LookupEntry(ft1->faction) : nullptr;
         auto const* fe2 = ft2 ? sFactionStore.LookupEntry(ft2->faction) : nullptr;
-        if ((IsNPCBotOrPet() && fe2 && fe2->CanHaveReputation() && ReputationMgr::ReputationToRank(fe2->BaseRepValue[0]) >= REP_NEUTRAL) ||
-            (target->IsNPCBotOrPet() && fe1 && fe1->CanHaveReputation() && ReputationMgr::ReputationToRank(fe1->BaseRepValue[0]) >= REP_NEUTRAL))
+        if ((IsNPCBotOrPet() && fe2 && fe2->CanHaveReputation() && ReputationMgr::ReputationToRank(BotDataMgr::GetBotBaseReputation(ToCreature(), fe2)) >= REP_NEUTRAL) ||
+            (target->IsNPCBotOrPet() && fe1 && fe1->CanHaveReputation() && ReputationMgr::ReputationToRank(BotDataMgr::GetBotBaseReputation(target->ToCreature(), fe1)) >= REP_NEUTRAL))
             return false;
     }
     //end npcbot

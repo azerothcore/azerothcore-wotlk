@@ -2,6 +2,8 @@
 #include "botdatamgr.h"
 #include "botmgr.h"
 #include "botspell.h"
+#include "botwanderful.h"
+#include "bpet_ai.h"
 #include "Containers.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
@@ -37,242 +39,74 @@ NpcBotRegistry _existingBots;
 
 CreatureTemplateContainer _botsWanderCreatureTemplates;
 std::unordered_map<uint32, EquipmentInfo const*> _botsWanderCreatureEquipmentTemplates;
+std::list<std::pair<uint32, WanderNode const*>> _botsWanderCreaturesToSpawn;
 
-static constexpr char const* WanderMapCreationQuery =
-    "CREATE TABLE IF NOT EXISTS `creature_wander_nodes` ("
-    "`id` int(10) unsigned NOT NULL,"
-    "`mapid` smallint(5) unsigned NOT NULL DEFAULT '0',"
-    "`zoneid` int(10) unsigned NOT NULL DEFAULT '0',"
-    "`x` float NOT NULL DEFAULT '0',"
-    "`y` float NOT NULL DEFAULT '0',"
-    "`z` float NOT NULL DEFAULT '0',"
-    "`o` float NOT NULL DEFAULT '0',"
-    "`name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',"
-    "PRIMARY KEY (`id`)"
-    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bot Wander Map'";
-static constexpr float NODE_CONNECTION_DIST_MAX = 1800.f;
-static constexpr float NODE_CONNECTION_DIST_MAX_GEN = 370.f;
-static constexpr std::array wanderMapIds{ 0u, 1u };
+constexpr uint8 ITEM_SORTING_LEVEL_STEP = 5;
+typedef std::vector<uint32> ItemIdVector;
+typedef std::array<ItemIdVector, DEFAULT_MAX_LEVEL / ITEM_SORTING_LEVEL_STEP + 1> ItemLeveledArr;
+typedef std::array<ItemLeveledArr, BOT_INVENTORY_SIZE> ItemPerSlot;
+typedef std::array<ItemPerSlot, BOT_CLASS_END> ItemPerBotClassMap;
+ItemPerBotClassMap _botsWanderCreaturesSortedGear;
+
+constexpr uint32 FLAGS_ONLY_A = AsUnderlyingType(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY);
+constexpr uint32 FLAGS_ONLY_H = AsUnderlyingType(BotWPFlags::BOTWP_FLAG_HORDE_ONLY);
+constexpr uint32 FLAGS_ONLY_A_OR_H = FLAGS_ONLY_A | FLAGS_ONLY_H;
 
 static bool allBotsLoaded = false;
 
-class BotTravelGraph
+static uint32 next_wandering_bot_spawn_delay = 0;
+
+void BotDataMgr::Update(uint32 diff)
 {
-public:
-    ~BotTravelGraph() {
-        //order
-        Tops.clear();
-        Nodes.clear();
+    if (_botsWanderCreaturesToSpawn.empty())
+        return;
+
+    static const uint32 WANDERING_BOT_SPAWN_DELAY = 500;
+
+    if (next_wandering_bot_spawn_delay >= diff)
+    {
+        next_wandering_bot_spawn_delay -= diff;
+        return;
     }
+    else
+        next_wandering_bot_spawn_delay += WANDERING_BOT_SPAWN_DELAY;
 
-    struct BotTravelNode : public WorldLocation
+    auto const& p = _botsWanderCreaturesToSpawn.front();
+
+    uint32 bot_id = p.first;
+    WanderNode const* spawnLoc = p.second;
+
+    _botsWanderCreaturesToSpawn.pop_front();
+
+    CreatureTemplate const& bot_template = _botsWanderCreatureTemplates.at(bot_id);
+    NpcBotData const* bot_data = SelectNpcBotData(bot_id);
+    NpcBotExtras const* bot_extras = SelectNpcBotExtras(bot_id);
+    Position spawnPos = spawnLoc->GetPosition();
+
+    ASSERT(bot_data);
+    ASSERT(bot_extras);
+
+    Map* map = sMapMgr->CreateBaseMap(spawnLoc->GetMapId());
+    map->LoadGrid(spawnLoc->m_positionX, spawnLoc->m_positionY);
+
+    LOG_INFO("npcbots", "Spawning wandering bot: {} ({}) class {} race {} fac {}, location: mapId {} {} ({})",
+        bot_template.Name.c_str(), bot_id, uint32(bot_extras->bclass), uint32(bot_extras->race), bot_data->faction,
+        spawnLoc->GetMapId(), spawnLoc->ToString().c_str(), spawnLoc->GetName().c_str());
+
+    Creature* bot = new Creature();
+    if (!bot->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, bot_id, 0,
+        spawnLoc->m_positionX, spawnLoc->m_positionY, spawnLoc->m_positionZ, spawnLoc->GetOrientation()))
     {
-        BotTravelNode(uint32 _mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f,
-            uint32 _id = 0, uint32 _zoneId = 0, uint8 _minlevel = 0, uint8 _maxlevel = 0, std::string const& _name = "unknown") :
-            WorldLocation(_mapId, x, y, z, o), id(_id), zoneId(_zoneId), minlevel(_minlevel), maxlevel(_maxlevel), name(_name) {}
-        BotTravelNode(uint32 _mapId, Position const& pos, uint32 _id, uint32 _zoneId, uint8 _minlevel, uint8 _maxlevel, std::string const& _name) :
-            WorldLocation(_mapId, pos), id(_id), zoneId(_zoneId), minlevel(_minlevel), maxlevel(_maxlevel), name(_name) {}
-
-        uint32 id;
-        uint32 zoneId;
-        uint8 minlevel;
-        uint8 maxlevel;
-        std::string name;
-
-        std::vector<BotTravelNode*> connections;
-    };
-
-    std::unordered_map<uint32 /*mapId*/, std::unordered_map<uint32, BotTravelNode>> Nodes;
-    std::vector<BotTravelNode*> Tops; // single connection nodes
-
-    // debug
-    static constexpr size_t sizeofNode = sizeof(BotTravelNode);
-} static WanderMap;
-
-void GenerateWanderNodes()
-{
-    using NodeType = BotTravelGraph::BotTravelNode;
-
-    for (GameTeleContainer::value_type const& tele_pair : sObjectMgr->GetGameTeleMap())
-    {
-        GameTele const& tele = tele_pair.second;
-        if (std::find(std::cbegin(wanderMapIds), std::cend(wanderMapIds), tele.mapId) == wanderMapIds.cend())
-            continue;
-
-        Position pos(tele.position_x, tele.position_y, tele.position_z, tele.orientation);
-        uint32 teleZoneId = sMapMgr->GetZoneId(PHASEMASK_NORMAL, tele.mapId, pos);
-        auto [lvlmin, lvlmax] = BotDataMgr::GetZoneLevels(teleZoneId);
-        if (lvlmin == 0 || lvlmax == 0)
-            continue;
-
-        WanderMap.Nodes[tele.mapId][tele_pair.first] = NodeType(tele.mapId, pos, tele_pair.first, teleZoneId, lvlmin, lvlmax, tele.name);
-    }
-
-    for (decltype(WanderMap.Nodes)::value_type& mapNodes1 : WanderMap.Nodes)
-    {
-        for (decltype(mapNodes1.second)::iterator it = mapNodes1.second.begin(); it != mapNodes1.second.end();)
-        {
-            for (auto& nodepair2 : WanderMap.Nodes.at(it->second.m_mapId))
-            {
-                if (it->first == nodepair2.first)
-                    continue;
-
-                float dist2d = it->second.GetExactDist2d(nodepair2.second);
-                if (dist2d < NODE_CONNECTION_DIST_MAX_GEN)
-                    it->second.connections.push_back(&nodepair2.second);
-            }
-
-            if (it->second.connections.empty())
-                it = mapNodes1.second.erase(it);
-            else
-                ++it;
-        }
-    }
-
-    uint32 total_nodes = 0;
-    for (decltype(WanderMap.Nodes)::value_type& mapNodes1 : WanderMap.Nodes)
-        total_nodes += mapNodes1.second.size();
-
-    if (total_nodes == 0)
-    {
-        LOG_FATAL("server.loading", "Failed to generate wander points: no game_tele points added!");
+        delete bot;
+        LOG_FATAL("server.loading", "Creature is not created!");
         ASSERT(false);
     }
-
-    LOG_INFO("server.loading", "Generated {} nodes, saving...", total_nodes);
-
-    std::ostringstream ss;
-    ss.setf(std::ios_base::fixed);
-    ss.precision(4);
-    ss << "INSERT INTO creature_wander_nodes (id, mapid, zoneid, x, y, z, o, name) VALUES ";
-    for (auto const& vt : WanderMap.Nodes)
+    if (!bot->LoadBotCreatureFromDB(0, map, true, true, bot_id, &spawnPos))
     {
-        for (auto const& nvt : vt.second)
-        {
-            auto const& n = nvt.second;
-            ss << '('
-                << n.id << ',' << n.m_mapId << ',' << n.zoneId << ','
-                << n.m_positionX << ',' << n.m_positionY << ',' << n.m_positionZ << ',' << n.GetOrientation() << ','
-                << '\'' << n.name << '\''
-                << "),";
-        }
-    }
-
-    std::string qstring = ss.str();
-    qstring.resize(qstring.size() - 1);
-    //TC_LOG_INFO("scripts", "Executing: %s", qstring.c_str());
-
-    WorldDatabase.DirectExecute(qstring.c_str());
-
-    LOG_INFO("server.loading", "Successfully exported {} nodes", total_nodes);
-}
-
-void FillWanderMap()
-{
-    using NodeType = BotTravelGraph::BotTravelNode;
-
-    //LOG_INFO("server.loading", "Loading bot wander map...");
-
-    uint32 botoldMSTime = getMSTime();
-
-    WorldDatabase.DirectExecute(WanderMapCreationQuery);
-    QueryResult tableExists = WorldDatabase.Query("SELECT * from creature_wander_nodes LIMIT 1");
-    if (!tableExists)
-    {
-        LOG_WARN("server.loading", "Table `creature_wander_nodes` is empty. Trying to re-generate nodes... (this is a one-time action)");
-        GenerateWanderNodes();
-    }
-
-    QueryResult wres = WorldDatabase.Query("SELECT id, mapid, zoneid, x, y, z, o, name FROM creature_wander_nodes");
-    if (!wres)
-    {
-        LOG_FATAL("server.loading", "Failed to load wander points: table `creature_wander_nodes` is empty!");
+        delete bot;
+        LOG_FATAL("server.loading", "Cannot load npcbot from DB!");
         ASSERT(false);
     }
-
-    do
-    {
-        Field* fields = wres->Fetch();
-        uint32 index = 0;
-
-        uint32 id             = fields[  index].Get<uint32>();
-        uint32 mapid          = fields[++index].Get<uint16>();
-
-        if (std::find(std::cbegin(wanderMapIds), std::cend(wanderMapIds), mapid) == wanderMapIds.cend())
-            continue;
-
-        uint32 zoneId         = fields[++index].Get<uint32>();
-
-        auto [lvlmin, lvlmax] = BotDataMgr::GetZoneLevels(zoneId);
-        if (lvlmin == 0 || lvlmax == 0)
-            continue;
-
-        float x          = fields[++index].Get<float>();
-        float y          = fields[++index].Get<float>();
-        float z          = fields[++index].Get<float>();
-        float o          = fields[++index].Get<float>();
-        std::string name = fields[++index].Get<std::string>();
-
-        WanderMap.Nodes[mapid][id] = NodeType(mapid, x, y, z, o, id, zoneId, lvlmin, lvlmax, name);
-
-    } while (wres->NextRow());
-
-    uint32 total_connections = 0;
-    float mindist = 50000.f;
-    float maxdist = 0.f;
-    for (decltype(WanderMap.Nodes)::value_type& mapNodes1 : WanderMap.Nodes)
-    {
-        for (decltype(mapNodes1.second)::iterator it = mapNodes1.second.begin(); it != mapNodes1.second.end();)
-        {
-            for (auto& nodepair2 : WanderMap.Nodes.at(it->second.m_mapId))
-            {
-                if (it->first == nodepair2.first)
-                    continue;
-
-                float dist2d = it->second.GetExactDist2d(nodepair2.second);
-                if (dist2d < NODE_CONNECTION_DIST_MAX)
-                {
-                    if (dist2d < mindist)
-                        mindist = dist2d;
-                    if (dist2d > maxdist)
-                        maxdist = dist2d;
-
-                    it->second.connections.push_back(&nodepair2.second);
-                    if (nodepair2.second.connections.empty() ||
-                        std::find(std::cbegin(nodepair2.second.connections), std::cend(nodepair2.second.connections), &it->second) == nodepair2.second.connections.cend())
-                        ++total_connections;
-                }
-            }
-
-            if (it->second.connections.empty())
-                it = mapNodes1.second.erase(it);
-            else
-            {
-                if (it->second.connections.size() == 1u)
-                {
-                    WanderMap.Tops.push_back(&it->second);
-                    if (it->second.connections.front()->connections.size() == 1)
-                        LOG_INFO("server.loading", "Node pair {}-{} is isolated!", it->second.id, it->second.connections.front()->id);
-                }
-                ++it;
-            }
-        }
-    }
-
-    uint32 total_nodes = 0;
-    for (auto const& vt : WanderMap.Nodes)
-    {
-        total_nodes += vt.second.size();
-        if (vt.second.empty())
-        {
-            LOG_FATAL("server.loading", "Failed to load wander points: no game_tele points added to map {}!", vt.first);
-            ASSERT(false);
-        }
-    }
-
-    LOG_INFO("server.loading", ">> Loaded {} bot wander nodes on {} maps (total {} ribs, {} tops) in {} ms",
-        total_nodes, uint32(WanderMap.Nodes.size()), total_connections, uint32(WanderMap.Tops.size()), GetMSTimeDiffToNow(botoldMSTime));
-    LOG_INFO("server.loading", "Nodes distances: min = {}, max = {}", mindist, maxdist);
 }
 
 std::shared_mutex* BotDataMgr::GetLock()
@@ -541,9 +375,203 @@ void BotDataMgr::LoadNpcBotGroupData()
     LOG_INFO("server.loading", ">> Loaded {} NPCBot group members in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+void BotDataMgr::LoadWanderMap(bool reload)
+{
+    if (WanderNode::GetAllWPsCount() > 0u)
+    {
+        if (!reload)
+            return;
+
+        WanderNode::RemoveAllWPs();
+    }
+
+    uint32 botoldMSTime = getMSTime();
+
+    LOG_INFO("server.loading", "Setting up wander map...");
+
+    //                                             0    1   2 3 4 5   6      7       8        9      10   11    12
+    QueryResult wres = WorldDatabase.Query("SELECT id,mapid,x,y,z,o,zoneId,areaId,minlevel,maxlevel,flags,name,links FROM creature_template_npcbot_wander_nodes ORDER BY mapid,id");
+    if (!wres)
+    {
+        LOG_FATAL("server.loading", "Failed to load wander points: table `creature_template_npcbot_wander_nodes` is empty!");
+        ASSERT(false);
+    }
+
+    bool spawn_node_exists = false;
+    std::unordered_map<uint32, std::pair<WanderNode*, std::vector<std::pair<std::string, std::string>>>> links_to_create;
+    do
+    {
+        Field* fields = wres->Fetch();
+        uint32 index = 0;
+
+        uint32 id             = fields[  index].Get<uint32>();
+        uint32 mapId          = fields[++index].Get<uint16>();
+        float x               = fields[++index].Get<float>();
+        float y               = fields[++index].Get<float>();
+        float z               = fields[++index].Get<float>();
+        float o               = fields[++index].Get<float>();
+        uint32 zoneId         = fields[++index].Get<uint32>();
+        uint32 areaId         = fields[++index].Get<uint32>();
+        uint8 minLevel        = fields[++index].Get<uint8>();
+        uint8 maxLevel        = fields[++index].Get<uint8>();
+        uint32 flags          = fields[++index].Get<uint32>();
+        std::string name      = fields[++index].Get<std::string>();
+        std::string_view lstr = fields[++index].Get<std::string_view>();
+
+        WanderNode::nextWPId = std::max<uint32>(WanderNode::nextWPId, id);
+        spawn_node_exists |= !!(flags & AsUnderlyingType(BotWPFlags::BOTWP_FLAG_SPAWN));
+
+        if (minLevel == 1u && maxLevel == DEFAULT_MAX_LEVEL)
+            LOG_WARN("server.loading", "WP {} has no levels set.", id);
+
+        if (!minLevel || !maxLevel || minLevel > DEFAULT_MAX_LEVEL || maxLevel > DEFAULT_MAX_LEVEL || minLevel > maxLevel)
+        {
+            LOG_WARN("server.loading", "WP {} has invalid levels min {} max {}! Setting to default...",
+                id, uint32(minLevel), uint32(maxLevel));
+            minLevel = 1;
+            maxLevel = DEFAULT_MAX_LEVEL;
+        }
+
+        if (flags >= AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END))
+        {
+            LOG_WARN("server.loading", "WP {} has invalid flags {}! Removing all invalid flags...", id, flags);
+            flags &= (AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END) - 1);
+        }
+
+        const uint32 conflicting_flags_1 = AsUnderlyingType(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY) | AsUnderlyingType(BotWPFlags::BOTWP_FLAG_HORDE_ONLY);
+        if ((flags & conflicting_flags_1) == conflicting_flags_1)
+        {
+            LOG_WARN("server.loading", "WP {} has conflicting flags {}+{}! Removing both...",
+                id, AsUnderlyingType(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY), AsUnderlyingType(BotWPFlags::BOTWP_FLAG_HORDE_ONLY));
+            flags &= ~conflicting_flags_1;
+        }
+
+        WanderNode* wp = new WanderNode(id, mapId, x, y, z, o, zoneId, areaId, name);
+        wp->SetLevels(minLevel, maxLevel);
+        wp->SetFlags(BotWPFlags(flags));
+
+        if (lstr.empty())
+        {
+            LOG_WARN("server.loading", "WP {} has no links!", id);
+            continue;
+        }
+        std::vector<std::string_view> tok = Acore::Tokenize(lstr, ' ', false);
+        for (std::vector<std::string_view>::size_type i = 0; i != tok.size(); ++i)
+        {
+            std::vector<std::string_view> link_str = Acore::Tokenize(tok[i], ':', false);
+            ASSERT(link_str.size() == 2u, "Invalid links_str format: '{}'", std::string(tok[i].data(), tok[i].length()).c_str());
+            ASSERT(link_str[0].find(" ") == std::string_view::npos);
+            ASSERT(link_str[1].find(" ") == std::string_view::npos);
+            ASSERT(Acore::StringTo<uint32>(link_str[0]) != std::nullopt, "Invalid links_str format: '{}'", std::string(tok[i].data(), tok[i].length()).c_str());
+            ASSERT(Acore::StringTo<uint32>(link_str[1]) != std::nullopt, "Invalid links_str format: '{}'", std::string(tok[i].data(), tok[i].length()).c_str());
+
+            std::pair<std::string, std::string> tok_pair = { std::string(link_str[0].data(), link_str[0].length()), std::string(link_str[1].data(), link_str[1].length()) };
+            if (links_to_create.find(id) == links_to_create.cend())
+                links_to_create[id] = { wp, {std::move(tok_pair)} };
+            else
+                links_to_create.at(id).second.push_back(std::move(tok_pair));
+        }
+
+    } while (wres->NextRow());
+
+    if (!spawn_node_exists)
+    {
+        LOG_FATAL("server.loading", "Not a single spawn node exists! Spawning wandering bots is impossible! Aborting.");
+        ASSERT(false);
+    }
+
+    uint32 total_ribs = 0;
+    float mindist = 50000.f;
+    float maxdist = 0.f;
+    for (auto const& vt : links_to_create)
+    {
+        for (auto const& p : vt.second.second)
+        {
+            uint32 lid = *Acore::StringTo<uint32>(p.first);
+            if (lid == vt.first)
+            {
+                LOG_ERROR("server.loading", "WP {} has link {} which links to itself! Skipped.", vt.first, lid);
+                continue;
+            }
+
+            WanderNode* lwp = WanderNode::FindInAllWPs(lid);
+            if (!lwp)
+            {
+                LOG_ERROR("server.loading", "WP {} has link {} which does not exist!", vt.first, lid);
+                continue;
+            }
+            if (lwp->GetMapId() != vt.second.first->GetMapId())
+            {
+                LOG_ERROR("server.loading", "WP {} map {} has link {} ON A DIFFERENT MAP {}!", vt.first, vt.second.first->GetMapId(), lid, lwp->GetMapId());
+                continue;
+            }
+            float lwpdist2d = vt.second.first->GetExactDist2d(lwp);
+            if (lwpdist2d > SIZE_OF_GRIDS * 1.5f)
+                LOG_WARN("server.loading", "Warning! Link distance between WP {} and {} is too great ({})", vt.first, lid, lwpdist2d);
+            if (lwpdist2d < VISIBILITY_DISTANCE_NORMAL * 0.5f)
+                LOG_WARN("server.loading", "Warning! Link distance between WP {} and {} is low ({})", vt.first, lid, lwpdist2d);
+
+            if (!vt.second.first->HasLink(lwp))
+            {
+                ++total_ribs;
+                vt.second.first->Link(lwp);
+                float dist2d = vt.second.first->GetExactDist2d(lwp);
+                if (dist2d < mindist)
+                    mindist = dist2d;
+                if (dist2d > maxdist)
+                    maxdist = dist2d;
+            }
+        }
+    }
+
+    std::set<WanderNode const*> tops;
+    WanderNode::DoForAllWPs([&](WanderNode const* wp) {
+        if (tops.count(wp) == 0u && wp->GetLinks().size() == 1u)
+        {
+            LOG_TRACE("server.loading", "Node {} ('{}') has single connection!", wp->GetWPId(), wp->GetName().c_str());
+            WanderNode const* tn = wp->GetLinks().front();
+            std::vector<WanderNode const*> sc_chain;
+            sc_chain.push_back(wp);
+            while (tn != wp)
+            {
+                if (tn->GetLinks().size() != 2u)
+                {
+                    sc_chain.push_back(tn);
+                    break;
+                }
+                uint32 prevId = sc_chain.back()->GetWPId();
+                sc_chain.push_back(tn);
+                tn = *std::find_if_not(std::cbegin(tn->GetLinks()), std::cend(tn->GetLinks()), [nId = prevId](WanderNode const* lwp) {
+                    return lwp->GetWPId() == nId;
+                });
+            }
+            if (sc_chain.back()->GetLinks().size() == 1u)
+            {
+                LOG_TRACE("server.loading", "Node {} ('{}') has single connection!", tn->GetWPId(), tn->GetName().c_str());
+                tops.emplace(sc_chain.front());
+                tops.emplace(sc_chain.back());
+                std::ostringstream ss;
+                ss << "Node " << (sc_chain.size() == 2u ? "pair " : "chain ");
+                for (uint32 i = 0u; i < sc_chain.size(); ++i)
+                {
+                    ss << sc_chain[i]->GetWPId();
+                    if (i < sc_chain.size() - 1u)
+                        ss << '-';
+                }
+                ss << " is isolated!";
+                LOG_INFO("server.loading", ss.str().c_str());
+            }
+        }
+    });
+
+    LOG_INFO("server.loading", ">> Loaded {} bot wander nodes on {} maps (total {} ribs, {} tops) in {} ms. Distances: min {}, max {}",
+        uint32(WanderNode::GetAllWPsCount()), uint32(WanderNode::GetWPMapsCount()), total_ribs, uint32(tops.size()),
+        GetMSTimeDiffToNow(botoldMSTime), mindist, maxdist);
+}
+
 void BotDataMgr::GenerateWanderingBots()
 {
-    using NodeType = BotTravelGraph::BotTravelNode;
+    using NodeVec = std::vector<WanderNode const*>;
 
     const std::map<uint8, uint32> wbot_faction_for_ex_class = {
         {BOT_CLASS_BM, 2u},
@@ -556,12 +584,16 @@ void BotDataMgr::GenerateWanderingBots()
         {BOT_CLASS_SEA_WITCH, 14u}
     };
 
-    const uint32 WANDERING_BOTS_COUNT = BotMgr::GetDesiredWanderingBotsCount();
+    /// @TODO: manage allowed world maps HERE: 0, 1 530, 571
+    const std::array wbot_allowed_maps{ 0u };
 
-    if (WANDERING_BOTS_COUNT == 0)
+    const uint32 wandering_bots_desired = BotMgr::GetDesiredWanderingBotsCount();
+
+    if (wandering_bots_desired == 0)
         return;
 
-    FillWanderMap();
+    LoadWanderMap();
+    CreateWanderingBotsSortedGear();
 
     LOG_INFO("server.loading", "Spawning wandering bots...");
 
@@ -588,10 +620,10 @@ void BotDataMgr::GenerateWanderingBots()
         if (spareBotIdsPerClassMap.find(c) != spareBotIdsPerClassMap.cend() && spareBotIdsPerClassMap.at(c).empty())
             spareBotIdsPerClassMap.erase(c);
 
-    if (maxWanderingBots < WANDERING_BOTS_COUNT)
+    if (maxWanderingBots < wandering_bots_desired)
     {
         LOG_FATAL("server.loading", "Only {} out of {} bots of enabled classes aren't spawned. Desired amount of wandering bots ({}) cannot be created. Aborting!",
-            maxWanderingBots, uint32(_botsExtras.size()), WANDERING_BOTS_COUNT);
+            maxWanderingBots, uint32(_botsExtras.size()), wandering_bots_desired);
         ASSERT(false);
     }
 
@@ -628,29 +660,90 @@ void BotDataMgr::GenerateWanderingBots()
             spareBotIdsPerClassMap.erase(bclass);
     };
 
+    NodeVec spawns_a, spawns_h, spawns_rest;
+    for (NodeVec* vec : { &spawns_a, &spawns_h, &spawns_rest })
+        vec->reserve(WanderNode::GetWPMapsCount() * 20u);
+
+    WanderNode::DoForAllWPs([&spawns_a, &spawns_h, &spawns_rest, &wbot_allowed_maps](WanderNode const* wp) {
+        if (std::find(std::cbegin(wbot_allowed_maps), std::cend(wbot_allowed_maps), wp->GetMapId()) != std::cend(wbot_allowed_maps))
+        {
+            uint32 flags = wp->GetFlags();
+            if (flags & AsUnderlyingType(BotWPFlags::BOTWP_FLAG_SPAWN))
+            {
+                if (flags & AsUnderlyingType(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY))
+                    spawns_a.push_back(wp);
+                else if (flags & AsUnderlyingType(BotWPFlags::BOTWP_FLAG_HORDE_ONLY))
+                    spawns_h.push_back(wp);
+                else
+                {
+                    spawns_a.push_back(wp);
+                    spawns_h.push_back(wp);
+                    spawns_rest.push_back(wp);
+                }
+            }
+        }
+    });
+
+    if (spawns_a.empty() || spawns_h.empty() || spawns_rest.empty())
+    {
+        LOG_FATAL("server.loading", "Not all factions (a/h/m) have spawn points, make sure at least one exists for each! Aborting!");
+        ASSERT(false);
+    }
+
     std::set<uint32> botgrids;
-    for (int32 i = 0; i < int32(WANDERING_BOTS_COUNT); ++i) // i is unused as value
+    for (uint32 i = 1; i <= wandering_bots_desired; ++i) // i is a counter, NOT used as index or value
     {
         while (all_templates->find(++bot_id) != all_templates->cend()) {}
 
         uint8 bot_class = Acore::Containers::SelectRandomContainerElement(spareBotIdsPerClassMap).first;
         CreatureTemplate const* orig_template = find_bot_creature_template_by_botclass(bot_class);
         ASSERT(orig_template);
-
-        CreatureTemplate& bot_template = _botsWanderCreatureTemplates[bot_id];
-        //copy all fields
-        //pointers to non-const objects: QueryData[TOTAL_LOCALES]
-        bot_template = *orig_template;
-        bot_template.Entry = bot_id;
-        //bot_template.Name = bot_template.Name;
-        bot_template.SubName = "";
-        //possibly need to override whole array (and pointer)
-        bot_template.InitializeQueryData();
-
         NpcBotExtras const* orig_extras = SelectNpcBotExtras(orig_template->Entry);
         ASSERT_NOTNULL(orig_extras);
         ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(orig_extras->race);
         uint32 bot_faction = (bot_class >= BOT_CLASS_EX_START) ? wbot_faction_for_ex_class.find(bot_class)->second : rentry ? rentry->FactionID : 14;
+
+        NodeVec* bot_spawn_nodes;
+        TeamId bot_team = GetTeamForFaction(bot_faction);
+        switch (bot_team)
+        {
+            case TEAM_ALLIANCE:
+                bot_spawn_nodes = &spawns_a;
+                break;
+            case TEAM_HORDE:
+                bot_spawn_nodes = &spawns_h;
+                break;
+            default:
+                bot_spawn_nodes = &spawns_rest;
+                break;
+        }
+        NodeVec level_nodes;
+        level_nodes.reserve(bot_spawn_nodes->size());
+        uint8 myminlevel = GetMinLevelForBotClass(bot_class);
+        for (WanderNode const* node : *bot_spawn_nodes)
+        {
+            auto [minlevel, maxlevel] = node->GetLevels();
+            if (minlevel >= myminlevel && myminlevel <= maxlevel)
+                level_nodes.push_back(node);
+        }
+
+        WanderNode const* spawnLoc = level_nodes.empty() ? nullptr : Acore::Containers::SelectRandomContainerElement(level_nodes);
+        if (!spawnLoc)
+        {
+            LOG_WARN("server.loading", "No viable nodes found for bot {} id {} orig id {} class {} race {} faction {} team {}. Skipping.",
+                orig_template->Name.c_str(), bot_id, orig_template->Entry, uint32(orig_extras->bclass), uint32(orig_extras->race),
+                bot_faction, uint32(bot_team));
+            --i;
+            --bot_id;
+            continue;
+        }
+
+        CreatureTemplate& bot_template = _botsWanderCreatureTemplates[bot_id];
+        //copy all fields
+        bot_template = *orig_template;
+        bot_template.Entry = bot_id;
+        bot_template.SubName = "";
+        bot_template.InitializeQueryData();
 
         NpcBotData* bot_data = new NpcBotData(bot_ai::DefaultRolesForClass(bot_class), bot_faction, bot_ai::DefaultSpecForClass(bot_class));
         _botsData[bot_id] = bot_data;
@@ -674,43 +767,14 @@ void BotDataMgr::GenerateWanderingBots()
 
         //We do not create CreatureData for generated bots
 
-        NodeType const* spawnLoc = nullptr;
-        do
-        {
-            auto const& spair = Acore::Containers::SelectRandomContainerElement(Acore::Containers::SelectRandomContainerElement(WanderMap.Nodes).second);
-            if (spair.second.maxlevel >= GetMinLevelForBotClass(bot_class))
-                spawnLoc = &spair.second;
-
-        } while (spawnLoc == nullptr);
-
         CellCoord c = Acore::ComputeCellCoord(spawnLoc->m_positionX, spawnLoc->m_positionY);
         GridCoord g = Acore::ComputeGridCoord(spawnLoc->m_positionX, spawnLoc->m_positionY);
         ASSERT(c.IsCoordValid(), "Invalid Cell coord!");
         ASSERT(g.IsCoordValid(), "Invalid Grid coord!");
-        Map* map = sMapMgr->CreateBaseMap(spawnLoc->m_mapId);
-        map->LoadGrid(spawnLoc->m_positionX, spawnLoc->m_positionY);
+        Map const* map = sMapMgr->CreateBaseMap(spawnLoc->GetMapId());
         ASSERT(!map->Instanceable(), map->GetDebugInfo().c_str());
 
-        LOG_INFO("npcbots", "Spawning wandering bot: {} ({}) class {} race {} fac {}, location: mapId {} {} ({})",
-            bot_template.Name.c_str(), bot_id, uint32(bot_extras->bclass), uint32(bot_extras->race), bot_data->faction,
-            spawnLoc->m_mapId, spawnLoc->ToString().c_str(), spawnLoc->name.c_str());
-        Position spos;
-        spos.Relocate(spawnLoc->m_positionX, spawnLoc->m_positionY, spawnLoc->m_positionZ, spawnLoc->GetOrientation());
-        Creature* bot = new Creature();
-        if (!bot->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, bot_id, 0, spos.m_positionX, spos.m_positionY, spos.m_positionZ, 0.0f))
-        {
-            delete bot;
-            LOG_FATAL("server.loading", "Creature is not created!");
-            ASSERT(false);
-        }
-        if (!bot->LoadBotCreatureFromDB(0, map, true, true, bot_id, &spos))
-        {
-            delete bot;
-            LOG_FATAL("server.loading", "Cannot load npcbot from DB!");
-            ASSERT(false);
-        }
-
-        bot->GetBotAI()->SetTravelNodeCur(spawnLoc->id);
+        _botsWanderCreaturesToSpawn.push_back({ bot_id, spawnLoc });
 
         remove_bot_orig_entry_from_available(bot_class, orig_template->Entry);
 
@@ -719,8 +783,499 @@ void BotDataMgr::GenerateWanderingBots()
 
     CharacterDatabase.Execute("UPDATE worldstates SET value = {} WHERE entry = {}", bot_id, uint32(BOT_GIVER_ENTRY));
 
-    LOG_INFO("server.loading", ">> Spawned {} wandering bots in {} grids in {} ms",
+    LOG_INFO("server.loading", ">> Set up spawning of {} wandering bots in {} grids in {} ms",
         uint32(_botsWanderCreatureTemplates.size()), uint32(botgrids.size()), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void BotDataMgr::CreateWanderingBotsSortedGear()
+{
+    //uint32 botoldMSTime = getMSTime();
+
+    LOG_INFO("server.loading", "Sorting wandering bot's gear...");
+
+    const std::map<uint32, uint8> InvTypeToBotSlot = {
+        {INVTYPE_HEAD, BOT_SLOT_HEAD},
+        {INVTYPE_SHOULDERS, BOT_SLOT_SHOULDERS},
+        {INVTYPE_CHEST, BOT_SLOT_CHEST},
+        {INVTYPE_WAIST, BOT_SLOT_WAIST},
+        {INVTYPE_LEGS, BOT_SLOT_LEGS},
+        {INVTYPE_FEET, BOT_SLOT_FEET},
+        {INVTYPE_WRISTS, BOT_SLOT_WRIST},
+        {INVTYPE_HANDS, BOT_SLOT_HANDS}
+    };
+
+    ItemTemplateContainer const* all_item_templates = sObjectMgr->GetItemTemplateStore();
+    for (auto const& kv : *all_item_templates)
+    {
+        ItemTemplate const& proto = kv.second;
+
+        if (!(proto.Quality >= ITEM_QUALITY_UNCOMMON && proto.Quality <= ITEM_QUALITY_EPIC))
+            continue;
+        if (!(proto.RequiredLevel >= 2 && proto.RequiredLevel <= DEFAULT_MAX_LEVEL))
+            continue;
+
+        uint32 itemId = kv.first;
+        uint8 reqLstep = (proto.RequiredLevel + ITEM_SORTING_LEVEL_STEP - 1) / ITEM_SORTING_LEVEL_STEP;
+
+        switch (proto.Class)
+        {
+            case ITEM_CLASS_ARMOR:
+                switch (proto.InventoryType)
+                {
+                    case INVTYPE_FINGER:
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ARCHMAGE][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ARCHMAGE][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        break;
+                    case INVTYPE_TRINKET:
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ARCHMAGE][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ARCHMAGE][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        break;
+                    case INVTYPE_CLOAK:
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ARCHMAGE][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        break;
+                    case INVTYPE_HOLDABLE:
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        break;
+                    case INVTYPE_SHIELD:
+                        if (proto.Armor == 0)
+                            break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        break;
+                    case INVTYPE_HEAD:
+                    case INVTYPE_SHOULDERS:
+                    case INVTYPE_CHEST:
+                    case INVTYPE_WAIST:
+                    case INVTYPE_LEGS:
+                    case INVTYPE_FEET:
+                    case INVTYPE_WRISTS:
+                    case INVTYPE_HANDS:
+                    {
+                        if (proto.Armor == 0)
+                            break;
+                        decltype(InvTypeToBotSlot)::const_iterator ci = InvTypeToBotSlot.find(proto.InventoryType);
+                        ASSERT(ci != InvTypeToBotSlot.cend());
+                        uint8 slot = ci->second;
+                        switch (proto.SubClass)
+                        {
+                            case ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_CLOTH:
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_ARCHMAGE][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][slot][reqLstep].push_back(itemId);
+                                break;
+                            case ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_LEATHER:
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][slot][reqLstep].push_back(itemId);
+                                if (proto.RequiredLevel < 40)
+                                {
+                                    _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][slot][reqLstep].push_back(itemId);
+                                    _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][slot][reqLstep].push_back(itemId);
+                                }
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][slot][reqLstep].push_back(itemId);
+                                break;
+                            case ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_MAIL:
+                                if (proto.RequiredLevel < 40)
+                                {
+                                    _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][slot][reqLstep].push_back(itemId);
+                                    _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][slot][reqLstep].push_back(itemId);
+
+                                }
+                                else
+                                {
+                                    _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][slot][reqLstep].push_back(itemId);
+                                    _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][slot][reqLstep].push_back(itemId);
+                                }
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_BM][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_SPHYNX][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][slot][reqLstep].push_back(itemId);
+                                break;
+                            case ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_PLATE:
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_BM][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_SPHYNX][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][slot][reqLstep].push_back(itemId);
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                break;
+            case ITEM_CLASS_WEAPON:
+                if (proto.Damage[0].DamageMin < 1.0f)
+                    break;
+                switch (proto.SubClass)
+                {
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_WAND:
+                        if (proto.InventoryType != INVTYPE_RANGED && proto.InventoryType != INVTYPE_RANGEDRIGHT)
+                            break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SPHYNX][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SPHYNX][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_GUN:
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_CROSSBOW:
+                        if (proto.InventoryType != INVTYPE_RANGED && proto.InventoryType != INVTYPE_RANGEDRIGHT)
+                            break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_BOW:
+                        if (proto.InventoryType != INVTYPE_RANGED && proto.InventoryType != INVTYPE_RANGEDRIGHT)
+                            break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_THROWN:
+                        if (proto.InventoryType != INVTYPE_THROWN)
+                            break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_RANGED][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_STAFF:
+                        if (proto.InventoryType != INVTYPE_2HWEAPON)
+                            break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_ARCHMAGE][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_AXE2:
+                        if (proto.InventoryType != INVTYPE_2HWEAPON)
+                            break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.RequiredLevel >= 60 - ITEM_SORTING_LEVEL_STEP)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_SWORD2:
+                        if (proto.InventoryType != INVTYPE_2HWEAPON)
+                            break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.RequiredLevel >= 60 - ITEM_SORTING_LEVEL_STEP)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_POLEARM:
+                        if (proto.InventoryType != INVTYPE_2HWEAPON)
+                            break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.RequiredLevel >= 60 - ITEM_SORTING_LEVEL_STEP)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_MACE2:
+                        if (proto.InventoryType != INVTYPE_2HWEAPON)
+                            break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.RequiredLevel >= 60 - ITEM_SORTING_LEVEL_STEP)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_AXE:
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_MACE:
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_SWORD:
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_FIST:
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        break;
+                    case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_DAGGER:
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_ROGUE][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_WARLOCK][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
+                            _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    LOG_INFO("server.loading", ">> Done");
+}
+
+Item* BotDataMgr::GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(ItemTemplate const*)>&& check)
+{
+    ASSERT(slot < BOT_INVENTORY_SIZE);
+    ASSERT(botclass < BOT_CLASS_END);
+    ASSERT(level <= DEFAULT_MAX_LEVEL + 4);
+
+    ItemIdVector const& itemIdVec = _botsWanderCreaturesSortedGear[botclass][slot][level / ITEM_SORTING_LEVEL_STEP];
+
+    if (!itemIdVec.empty())
+    {
+        uint32 itemId;
+        uint32 tries = 0;
+        bool can_equip = false;
+        do
+        {
+            ++tries;
+            itemId = Acore::Containers::SelectRandomContainerElement(itemIdVec);
+            can_equip = check(sObjectMgr->GetItemTemplate(itemId));
+
+        } while (!can_equip && tries < 20);
+
+        if (Item* newItem = Item::CreateItem(itemId, 1, nullptr))
+        {
+            if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(itemId))
+                newItem->SetItemRandomProperties(randomPropertyId);
+
+            return newItem;
+        }
+    }
+
+    return nullptr;
 }
 
 CreatureTemplate const* BotDataMgr::GetBotExtraCreatureTemplate(uint32 entry)
@@ -1242,157 +1797,165 @@ uint8 BotDataMgr::GetMinLevelForBotClass(uint8 m_class)
     }
 }
 
-std::pair<uint8, uint8> BotDataMgr::GetZoneLevels(uint32 zoneId)
+int32 BotDataMgr::GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry)
 {
-    //Only maps 0 and 1 are covered
-    switch (zoneId)
-    {
-        case 1: // Dun Morogh
-        case 12: // Elwynn Forest
-        case 14: // Durotar
-        case 85: // Tirisfal Glades
-        case 141: // Teldrassil
-        case 215: // Mulgore
-        case 3430: // Eversong Woods
-        case 3524: // Azuremyst Isle
-            return { 1, 12 };
-        case 38: // Loch Modan
-        case 40: // Westfall
-        case 130: // Silverpine Woods
-        case 148: // Darkshore
-        case 3433: // Ghostlands
-        case 3525: // Bloodmyst Isle
-            return { 8, 22 };
-        case 17: // Barrens
-        case 721: // Gnomeregan
-            return { 8, 28 };
-        case 44: // Redridge Mountains
-            return { 13, 28 };
-        case 406: // Stonetalon Mountains
-            return { 13, 30 };
-        case 10: // Duskwood
-        case 11: // Wetlands
-        case 267: // Hillsbrad Foothills
-        case 331: // Ashenvale
-            return { 18, 32 };
-        case 400: // Thousand Needles
-            return { 23, 38 };
-        case 36: // Alterac Mountains
-        case 45: // Arathi Highlands
-        case 405: // Desolace
-            return { 28, 42 };
-        case 33: // Stranglethorn Valley
-            return { 28, 48 };
-        case 3: // Badlands
-        case 8: // Swamp of Sorrows
-        case 15: // Dustwallow Marsh
-            return { 33, 48 };
-        case 47: // Hinterlands
-        case 357: // Feralas
-        case 440: // Tanaris
-            return { 38, 52 };
-        case 4: // Blasted Lands
-        case 16: // Azshara
-        case 51: // Searing Gorge
-            return { 43, 54 };
-        case 490: // Un'Goro Crater
-            return { 45, 56 };
-        case 361: // Felwood
-            return { 46, 56 };
-        case 28: // Western Plaguelands
-        case 46: // Burning Steppes
-            return { 48, 56 };
-        case 41: // Deadwind Pass
-            return { 50, 60 };
-        case 1377: // Silithus
-        case 2017: // Stratholme
-            return { 53, 60 };
-        case 139: // Eastern Plaguelands
-        case 618: // Winterspring
-            return { 53, 60 }; //63
-        default:
-            LOG_ERROR("scripts", "GetZoneLevels: no choice for zoneId {}", zoneId);
-            return { 50, 60 };
-    }
-}
+    if (!factionEntry)
+        return 0;
 
-std::pair<uint32, Position const*> BotDataMgr::GetWanderMapNode(uint32 mapId, uint32 curNodeId, uint32 lastNodeId, uint8 lvl)
-{
-    decltype(WanderMap.Nodes)::const_iterator cit = WanderMap.Nodes.find(mapId);
-    if (cit != WanderMap.Nodes.cend())
+    if (bot->IsNPCBotPet())
+        bot = bot->GetBotPetAI()->GetPetsOwner();
+
+    uint32 raceMask = bot->GetFaction() == 14 ? 0 : bot->GetRaceMask();
+    uint32 classMask = bot->GetClassMask();
+
+    int32 minRep = 42999;
+    for (uint8 i = 0; i < 4; ++i)
     {
-        decltype(WanderMap.Nodes)::value_type::second_type::const_iterator ici = cit->second.find(curNodeId);
-        if (ici != cit->second.cend())
+        if (raceMask == 0)
+            minRep = std::min<int32>(minRep, factionEntry->BaseRepValue[i]);
+        if ((factionEntry->BaseRepRaceMask[i] & raceMask || (factionEntry->BaseRepRaceMask[i] == 0 && factionEntry->BaseRepClassMask[i] != 0)) &&
+            (factionEntry->BaseRepClassMask[i] & classMask || factionEntry->BaseRepClassMask[i] == 0))
         {
-            std::vector<decltype(WanderMap)::BotTravelNode const*> convec;
-            if (ici->second.connections.size() == 1)
-                convec.push_back(ici->second.connections.front());
-            else
-            {
-                uint8 minlevel = 255;
-                for (auto const* con : ici->second.connections)
-                {
-                    if (con->id != lastNodeId && lvl >= con->minlevel && lvl <= con->maxlevel + 3)
-                        convec.push_back(con);
-                    if (con->maxlevel < minlevel)
-                        minlevel = con->maxlevel;
-                }
-                if (convec.empty())
-                {
-                    for (auto const* con : ici->second.connections)
-                    {
-                        if (con->id != lastNodeId && con->maxlevel == minlevel)
-                            convec.push_back(con);
-                    }
-                }
-                if (convec.empty())
-                {
-                    for (auto const* con : ici->second.connections)
-                    {
-                        if (con->maxlevel == minlevel)
-                            convec.push_back(con);
-                    }
-                }
-                if (convec.empty())
-                {
-                    for (auto const* con : ici->second.connections)
-                    {
-                        if (con->id != lastNodeId)
-                            convec.push_back(con);
-                    }
-                }
-            }
-            ASSERT(!convec.empty());
-            auto* randomNode = (convec.size() == 1) ? convec.front() : Acore::Containers::SelectRandomContainerElement(convec);
-            return std::make_pair(randomNode->id, static_cast<Position const*>(randomNode));
+            return factionEntry->BaseRepValue[i];
         }
     }
 
-    return { 0, nullptr };
+    return std::min<int32>(minRep, 0);
 }
 
-Position const* BotDataMgr::GetWanderMapNodePosition(uint32 mapId, uint32 nodeId)
+TeamId BotDataMgr::GetTeamForFaction(uint32 factionTemplateId)
 {
-    decltype(WanderMap.Nodes)::const_iterator cit = WanderMap.Nodes.find(mapId);
-    if (cit != WanderMap.Nodes.cend())
+    if (FactionTemplateEntry const* fte = sFactionTemplateStore.LookupEntry(factionTemplateId))
     {
-        decltype(WanderMap.Nodes)::value_type::second_type::const_iterator ici = cit->second.find(nodeId);
-        if (ici != cit->second.cend())
-            return static_cast<Position const*>(&ici->second);
+        if (fte->ourMask & FACTION_MASK_ALLIANCE)
+            return TEAM_ALLIANCE;
+        else if (fte->ourMask & FACTION_MASK_HORDE)
+            return TEAM_HORDE;
     }
-    return nullptr;
+
+    return TEAM_NEUTRAL;
+}
+
+bool BotDataMgr::IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId)
+{
+    switch (GetTeamForFaction(factionTemplateId))
+    {
+        case TEAM_ALLIANCE:
+            return !(wp->GetFlags() & FLAGS_ONLY_H);
+        case TEAM_HORDE:
+            return !(wp->GetFlags() & FLAGS_ONLY_A);
+        case TEAM_NEUTRAL:
+            return !(wp->GetFlags() & FLAGS_ONLY_A_OR_H);
+        default:
+            return true;
+    }
+}
+
+std::pair<uint32, Position const*> BotDataMgr::GetNextWanderNode(uint32 mapId, uint32 curNodeId, uint32 lastNodeId, uint8 lvl, Creature const* bot)
+{
+    WanderNode const* node_cur = WanderNode::FindInMapWPs(curNodeId, mapId);
+
+    //Node got deleted! Select closest and go from there
+    if (!node_cur)
+    {
+        float mindist = 50000.0f; // Anywhere
+        WanderNode const* node_new = nullptr;
+        WanderNode::DoForAllMapWPs(mapId, [bot = bot, &mindist, &node_new](WanderNode const* wp) {
+            float dist = bot->GetExactDist2d(wp);
+            if (IsWanderNodeAvailableForBotFaction(wp, bot->GetFaction()) && dist < mindist)
+            {
+                mindist = dist;
+                node_new = wp;
+            }
+        });
+
+        if (node_new)
+            return { node_new->GetWPId(), static_cast<Position const*>(node_new) };
+
+        return { 0, nullptr };
+    }
+
+    auto linksCopy = node_cur->GetLinks();
+
+    if (linksCopy.size() > 1u)
+    {
+        for (decltype(linksCopy)::const_iterator cit = linksCopy.cbegin(); cit != linksCopy.cend();)
+        {
+            if (IsWanderNodeAvailableForBotFaction(*cit, bot->GetFaction()) &&
+                ((*cit)->GetWPId() == lastNodeId || lvl + 6 >= (*cit)->GetLevels().first ||
+                (lvl + 2 >= (*cit)->GetLevels().first && lvl <= (*cit)->GetLevels().second)))
+                ++cit;
+            else
+                cit = linksCopy.erase(cit);
+        }
+        if (linksCopy.size() > 1u)
+        {
+            for (decltype(linksCopy)::const_iterator cit = linksCopy.cbegin(); cit != linksCopy.cend(); ++cit)
+            {
+                if ((*cit)->GetWPId() == lastNodeId)
+                {
+                    linksCopy.erase(cit);
+                    break;
+                }
+            }
+            if (linksCopy.size() > 1u)
+            {
+                decltype(linksCopy)::size_type normal_nodes_count = 0;
+                for (decltype(linksCopy)::const_iterator cit = linksCopy.cbegin(); cit != linksCopy.cend(); ++cit)
+                    if (lvl + 2 >= (*cit)->GetLevels().first && lvl <= (*cit)->GetLevels().second)
+                        ++normal_nodes_count;
+                if (normal_nodes_count > 0 && normal_nodes_count < linksCopy.size())
+                {
+                    for (decltype(linksCopy)::const_iterator cit = linksCopy.cbegin(); cit != linksCopy.cend();)
+                    {
+                        if (lvl + 2 >= (*cit)->GetLevels().first && lvl <= (*cit)->GetLevels().second)
+                            ++cit;
+                        else
+                            cit = linksCopy.erase(cit);
+                    }
+                }
+            }
+        }
+    }
+
+    ASSERT(!linksCopy.empty());
+    WanderNode const* wp = linksCopy.size() == 1u ? linksCopy.front() : Acore::Containers::SelectRandomContainerElement(linksCopy);
+
+    return std::make_pair(wp->GetWPId(), static_cast<Position const*>(wp));
+}
+
+uint32 BotDataMgr::GetClosestWanderNodeId(WorldLocation const* loc)
+{
+    float mindist = 50000.0f;
+    uint32 closestNodeId = 0;
+    WanderNode::DoForAllMapWPs(loc->GetMapId(), [&mindist, &closestNodeId, loc = loc](WanderNode const* wp) {
+        float dist = wp->GetExactDist2d(loc);
+        if (dist < mindist)
+        {
+            mindist = dist;
+            closestNodeId = wp->GetWPId();
+        }
+    });
+
+    return closestNodeId;
+}
+
+Position BotDataMgr::GetWanderMapNodePosition(uint32 mapId, uint32 nodeId)
+{
+    WanderNode const* node_cur = WanderNode::FindInMapWPs(nodeId, mapId);
+    return node_cur ? node_cur->GetPosition() : Position{};
 }
 
 std::string BotDataMgr::GetWanderMapNodeName(uint32 mapId, uint32 nodeId)
 {
-    decltype(WanderMap.Nodes)::const_iterator cit = WanderMap.Nodes.find(mapId);
-    if (cit != WanderMap.Nodes.cend())
-    {
-        decltype(WanderMap.Nodes)::value_type::second_type::const_iterator ici = cit->second.find(nodeId);
-        if (ici != cit->second.cend())
-            return ici->second.name;
-    }
-    return {};
+    WanderNode const* node_cur = WanderNode::FindInMapWPs(nodeId, mapId);
+    return node_cur ? node_cur->GetName() : std::string{};
+}
+
+std::pair<uint8, uint8> BotDataMgr::GetWanderMapNodeLevels(uint32 mapId, uint32 nodeId)
+{
+    WanderNode const* node_cur = WanderNode::FindInMapWPs(nodeId, mapId);
+    return node_cur ? node_cur->GetLevels() : std::pair<uint8, uint8>{1, 1};
 }
 
 #ifdef _MSC_VER

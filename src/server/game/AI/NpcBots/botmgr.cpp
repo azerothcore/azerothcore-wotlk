@@ -37,6 +37,8 @@ TODO: Move creature hooks here
 # pragma warning(push, 4)
 #endif
 
+static std::list<BotMgr::delayed_teleport_callback_type> delayed_bot_teleports;
+
 //config
 uint8 _basefollowdist;
 uint8 _maxNpcBots;
@@ -828,9 +830,9 @@ void BotMgr::_reviveBot(Creature* bot, WorldLocation* dest)
     //bot->GetBotAI()->Reset();
     bot->GetBotAI()->SetShouldUpdateStats();
 
-    bot->SetHealth(bot->GetMaxHealth() / 4); //25% of max health
+    bot->SetHealth(bot->GetMaxHealth() / (bot->IsWandererBot() ? 1 : 4)); //25% of max health
     if (bot->GetMaxPower(POWER_MANA) > 1)
-        bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA) / 4); //25% of max mana
+        bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA) / (bot->IsWandererBot() ? 1 : 4)); //25% of max mana
 
     if (!bot->GetBotAI()->IAmFree() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_MASK_UNMOVING))
         bot->GetBotAI()->SetBotCommandState(BOT_COMMAND_FOLLOW, true);
@@ -956,50 +958,52 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
     if (bot->IsInWorld())
         bot->CastSpell(bot, COSMETIC_TELEPORT_EFFECT, true);
 
-    if (Map* mymap = bot->FindMap())
-    {
-        bot->BotStopMovement();
-        bot->GetBotAI()->UnsummonAll();
-
-        bot->InterruptNonMeleeSpells(true);
-        if (bot->IsInWorld())
+    BotMgr::AddDelayedTeleportCallback([bot, newMap, x, y, z, ori, quick]() {
+        if (Map* mymap = bot->FindMap())
         {
-            if (!bot->IsFreeBot())
-                if (InstanceScript* iscr = bot->GetBotOwner()->GetInstanceScript())
-                    iscr->OnNPCBotLeave(bot);
+            bot->BotStopMovement();
+            bot->GetBotAI()->UnsummonAll();
 
-            bot->RemoveFromWorld();
+            bot->InterruptNonMeleeSpells(true);
+            if (bot->IsInWorld())
+            {
+                if (!bot->IsFreeBot())
+                    if (InstanceScript* iscr = bot->GetBotOwner()->GetInstanceScript())
+                        iscr->OnNPCBotLeave(bot);
+
+                bot->RemoveFromWorld();
+            }
+
+            ASSERT(bot->GetGUID());
+
+            bot->RemoveAllGameObjects();
+
+            bot->m_Events.KillAllEvents(false);
+            bot->CombatStop();
+            bot->ClearComboPoints();
+            bot->ClearComboPointHolders();
+
+            mymap->RemoveFromMap(bot, false);
         }
 
-        ASSERT(bot->GetGUID());
+        if (bot->IsFreeBot())
+        {
+            bot->Relocate(x, y, z, ori);
+            bot->SetMap(newMap);
+            bot->GetMap()->AddToMap(bot);
+            return;
+        }
 
-        bot->RemoveAllGameObjects();
+        //update group member online state
+        if (Group* gr = bot->GetBotOwner()->GetGroup())
+            if (gr->IsMember(bot->GetGUID()))
+                gr->SendUpdate();
 
-        bot->m_Events.KillAllEvents(false);
-        bot->CombatStop();
-        bot->ClearComboPoints();
-        bot->ClearComboPointHolders();
-
-        mymap->RemoveFromMap(bot, false);
-    }
-
-    if (bot->IsFreeBot())
-    {
-        bot->Relocate(x, y, z, ori);
-        bot->SetMap(newMap);
-        bot->GetMap()->AddToMap(bot);
-        return;
-    }
-
-    //update group member online state
-    if (Group* gr = bot->GetBotOwner()->GetGroup())
-        if (gr->IsMember(bot->GetGUID()))
-            gr->SendUpdate();
-
-    TeleportFinishEvent* finishEvent = new TeleportFinishEvent(bot->GetBotAI());
-    uint64 delay = quick ? urand(500, 1500) : urand(5000, 8000);
-    bot->GetBotAI()->GetEvents()->AddEvent(finishEvent, bot->GetBotAI()->GetEvents()->CalculateTime(delay));
-    bot->GetBotAI()->SetTeleportFinishEvent(finishEvent);
+        TeleportFinishEvent* finishEvent = new TeleportFinishEvent(bot->GetBotAI());
+        uint64 delay = quick ? urand(500, 1500) : urand(5000, 8000);
+        bot->GetBotAI()->GetEvents()->AddEvent(finishEvent, bot->GetBotAI()->GetEvents()->CalculateTime(delay));
+        bot->GetBotAI()->SetTeleportFinishEvent(finishEvent);
+    });
 }
 
 void BotMgr::TeleportBot(Creature* bot, Map* newMap, Position* pos, bool quick)
@@ -1920,6 +1924,23 @@ float BotMgr::GetBotDamageModByClass(uint8 botclass)
         default:
             return 1.0;
     }
+}
+
+BotMgr::delayed_teleport_mutex_type* BotMgr::_getTpLock()
+{
+    static BotMgr::delayed_teleport_mutex_type _lock;
+    return &_lock;
+}
+void BotMgr::AddDelayedTeleportCallback(delayed_teleport_callback_type&& callback)
+{
+    delayed_teleport_lock_type lock(*_getTpLock());
+    delayed_bot_teleports.push_back(std::forward<delayed_teleport_callback_type>(callback));
+}
+void BotMgr::HandleDelayedTeleports()
+{
+    for (auto& func : delayed_bot_teleports)
+        func();
+    delayed_bot_teleports.clear();
 }
 
 #ifdef _MSC_VER

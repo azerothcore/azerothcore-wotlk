@@ -3,14 +3,20 @@
 
 #include "botcommon.h"
 
+#include <functional>
 #include <set>
 #include <shared_mutex>
 #include <vector>
 
 class Creature;
+class Item;
+class WanderNode;
+class WorldLocation;
 
 struct EquipmentInfo;
 struct CreatureTemplate;
+struct FactionEntry;
+struct ItemTemplate;
 struct Position;
 
 enum LocaleConstant;
@@ -129,6 +135,8 @@ typedef std::set<Creature const*> NpcBotRegistry;
 class BotDataMgr
 {
     public:
+        static void Update(uint32 diff);
+
         static void LoadNpcBots(bool spawn = true);
         static void LoadNpcBotGroupData();
 
@@ -157,17 +165,24 @@ class BotDataMgr
         static std::vector<uint32> GetExistingNPCBotIds();
         static uint8 GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask = 0);
 
+        static void LoadWanderMap(bool reload = false);
         static void GenerateWanderingBots();
+        static void CreateWanderingBotsSortedGear();
+        static Item* GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(ItemTemplate const*)>&& check);
         static CreatureTemplate const* GetBotExtraCreatureTemplate(uint32 entry);
         static EquipmentInfo const* GetBotEquipmentInfo(uint32 entry);
 
         static uint8 GetLevelBonusForBotRank(uint32 rank);
         static uint8 GetMaxLevelForMapId(uint32 mapId);
         static uint8 GetMinLevelForBotClass(uint8 m_class);
-        static std::pair<uint8, uint8> GetZoneLevels(uint32 zoneId);
-        static std::pair<uint32 /*nodeId*/, Position const*> GetWanderMapNode(uint32 mapId, uint32 curNodeId, uint32 lastNodeId, uint8 lvl);
-        static Position const* GetWanderMapNodePosition(uint32 mapId, uint32 nodeId);
+        static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
+        static TeamId GetTeamForFaction(uint32 factionTemplateId);
+        static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId);
+        static std::pair<uint32, Position const*> GetNextWanderNode(uint32 mapId, uint32 curNodeId, uint32 lastNodeId, uint8 lvl, Creature const* bot);
+        static uint32 GetClosestWanderNodeId(WorldLocation const* loc);
+        static Position GetWanderMapNodePosition(uint32 mapId, uint32 nodeId);
         static std::string GetWanderMapNodeName(uint32 mapId, uint32 nodeId);
+        static std::pair<uint8, uint8> GetWanderMapNodeLevels(uint32 mapId, uint32 nodeId);
 
         static std::shared_mutex* GetLock();
 
