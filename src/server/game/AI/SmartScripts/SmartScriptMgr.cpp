@@ -725,7 +725,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_CORPSE_DELAY: return sizeof(SmartAction::corpseDelay);
             case SMART_ACTION_DISABLE_EVADE: return sizeof(SmartAction::disableEvade);
             case SMART_ACTION_GO_SET_GO_STATE: return sizeof(SmartAction::goState);
-            case SMART_ACTION_SET_CAN_FLY: return sizeof(SmartAction::setFly);
+            // case SMART_ACTION_SET_CAN_FLY: return sizeof(SmartAction::setFly);
             // case SMART_ACTION_REMOVE_AURAS_BY_TYPE: return sizeof(SmartAction::auraType);
             case SMART_ACTION_SET_SIGHT_DIST: return sizeof(SmartAction::sightDistance);
             case SMART_ACTION_FLEE: return sizeof(SmartAction::flee);
