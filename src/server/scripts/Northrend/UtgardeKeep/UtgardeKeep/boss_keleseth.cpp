@@ -29,6 +29,7 @@ enum eTexts
     SAY_SUMMON_SKELETONS                = 2,
     SAY_FROST_TOMB_EMOTE                = 4,
     SAY_DEATH                           = 5,
+    SAY_KILL                            = 6,
 };
 
 enum eNPCs
@@ -138,6 +139,14 @@ public:
             events.Reset();
             if (pInstance)
                 pInstance->SetData(DATA_KELESETH, NOT_STARTED);
+        }
+
+        void KilledUnit(Unit * victim)
+        {
+            if (victim->IsPlayer())
+            {
+                Talk(SAY_KILL);
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
