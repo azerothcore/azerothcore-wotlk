@@ -276,7 +276,7 @@ public:
         {
             if (IsAnyPlayerValid())
                 return;
-                
+
             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
             if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
                 controller->AI()->DoAction(ACTION_RESET_ENCOUNTER);

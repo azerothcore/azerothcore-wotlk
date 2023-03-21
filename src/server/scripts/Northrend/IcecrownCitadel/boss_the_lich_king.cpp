@@ -661,7 +661,7 @@ public:
             SetEquipmentSlots(true);
             if (me->IsImmuneToPC())
                 me->SetStandState(UNIT_STAND_STATE_SIT);
-                
+
             DoAction(ACTION_RESTORE_LIGHT);
 
             // Reset The Frozen Throne gameobjects
