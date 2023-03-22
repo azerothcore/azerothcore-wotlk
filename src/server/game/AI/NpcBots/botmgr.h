@@ -226,7 +226,7 @@ class AC_GAME_API BotMgr
 
         //TELEPORT BETWEEN MAPS
         //CONFIRMEND UNSAFE (charmer,owner)
-        static void TeleportBot(Creature* bot, Map* newMap, Position* pos, bool quick = false);
+        static void TeleportBot(Creature* bot, Map* newMap, Position* pos, bool quick = false, bool reset = false);
 
         AoeSpotsVec const& GetAoeSpots() const { return _aoespots; }
         AoeSpotsVec& GetAoeSpots() { return _aoespots; }
@@ -238,7 +238,7 @@ class AC_GAME_API BotMgr
         static void HandleDelayedTeleports();
 
     private:
-        static void _teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori = 0.f, bool quick = false);
+        static void _teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori, bool quick, bool reset);
         static void _reviveBot(Creature* bot, WorldLocation* dest = nullptr);
         void _addBotToRemoveList(ObjectGuid guid);
         void _setBotExactAttackRange(uint8 exactRange) { _exactAttackRange = exactRange; }

@@ -168,8 +168,9 @@ class bot_ai : public CreatureAI
 
         static bool CCed(Unit const* target, bool root = false);
 
-        void TeleportHome();
-        bool FinishTeleport(/*uint32 mapId, uint32 instanceId, float x, float y, float z, float o*/);
+        void TeleportHomeStart(bool reset);
+        void TeleportHome(bool reset);
+        bool FinishTeleport(bool reset);
 
         bool IsDuringTeleport() const { return teleFinishEvent || teleHomeEvent; }
         void SetTeleportFinishEvent(TeleportFinishEvent* tfevent) { ASSERT(!teleFinishEvent); teleFinishEvent = tfevent; }
@@ -614,6 +615,7 @@ class bot_ai : public CreatureAI
         SpellInfo const* m_botSpellInfo;
         Position homepos, movepos, attackpos, sendlastpos;
         Position sendpos[MAX_SEND_POINTS];
+        AoeSpotsVec _aoeSpots;
 
         uint32 _botCommandState;
         uint8 _botAwaitState;
