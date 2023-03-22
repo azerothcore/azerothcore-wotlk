@@ -8,6 +8,8 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 (30230, 4, 47484, 12340),
 (30230, 5, 47496, 12340);
 
+UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_pet_dk_risen_ally' WHERE `entry` = 30230;
+
 -- Thrash
 DELETE FROM `spell_script_names` WHERE `spell_id`=47480 AND `ScriptName`='spell_dk_ghoul_thrash';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES

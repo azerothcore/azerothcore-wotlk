@@ -255,6 +255,32 @@ public:
     }
 };
 
+class npc_pet_dk_risen_ally : public CreatureScript
+{
+public:
+    npc_pet_dk_risen_ally() : CreatureScript("npc_pet_dk_risen_ally") { }
+
+    struct npc_pet_dk_risen_allyAI : public PossessedAI
+    {
+        npc_pet_dk_risen_allyAI(Creature* c) : PossessedAI(c) { }
+
+        void OnCharmed(bool apply) override
+        {
+            if (!apply)
+            {
+                me->GetCharmerOrOwner()->RemoveAurasDueToSpell(46619); // Remove Raise Ally aura
+                me->GetCharmerOrOwner()->RemoveAurasDueToSpell(46619); // Remove Frenzy aura
+                me->GetCharmerOrOwner()->ClearResurrectRequestData();
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const override
+    {
+        return new npc_pet_dk_risen_allyAI (pCreature);
+    }
+};
+
 class npc_pet_dk_army_of_the_dead : public CreatureScript
 {
 public:
@@ -335,6 +361,7 @@ void AddSC_deathknight_pet_scripts()
 {
     new npc_pet_dk_ebon_gargoyle();
     new npc_pet_dk_ghoul();
+    new npc_pet_dk_risen_ally();
     new npc_pet_dk_army_of_the_dead();
     new npc_pet_dk_dancing_rune_weapon();
     RegisterSpellScript(spell_pet_dk_gargoyle_strike);
