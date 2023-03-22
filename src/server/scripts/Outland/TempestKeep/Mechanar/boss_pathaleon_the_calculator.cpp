@@ -100,11 +100,16 @@ struct boss_pathaleon_the_calculator : public BossAI
             Talk(SAY_DOMINATION);
             DoCastRandomTarget(SPELL_DOMINATION, 1, 50.0f);
             context.Repeat(30s);
-        }).Schedule(8s, [this](TaskContext context)
-        {
-            DoCastAOE(SPELL_ARCANE_EXPLOSION);
-            context.Repeat(12s);
         });
+        
+        if (IsHeroic())
+        {
+            scheduler.Schedule(8s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+                context.Repeat(12s);
+            });
+        }
 
         Talk(SAY_AGGRO);
     }
