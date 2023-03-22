@@ -35,83 +35,55 @@ enum Spells
     SPELL_STREAM_OF_MACHINE_FLUID  = 35311
 };
 
-enum Events
+struct boss_gatewatcher_iron_hand : public BossAI
 {
-    EVENT_STREAM_OF_MACHINE_FLUID   = 1,
-    EVENT_JACKHAMMER                = 2,
-    EVENT_SHADOW_POWER              = 3
-};
-
-class boss_gatewatcher_iron_hand : public CreatureScript
-{
-public:
-    boss_gatewatcher_iron_hand(): CreatureScript("boss_gatewatcher_iron_hand") { }
-
-    struct boss_gatewatcher_iron_handAI : public BossAI
+    boss_gatewatcher_iron_hand(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_IRON_HAND)
     {
-        boss_gatewatcher_iron_handAI(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_IRON_HAND) { }
-
-        void JustEngagedWith(Unit* /*who*/) override
+        scheduler.SetValidator([this]
         {
-            _JustEngagedWith();
-            events.ScheduleEvent(EVENT_STREAM_OF_MACHINE_FLUID, 15000);
-            events.ScheduleEvent(EVENT_JACKHAMMER, 35000);
-            events.ScheduleEvent(EVENT_SHADOW_POWER, 25000);
-            Talk(SAY_AGGRO);
-        }
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            Talk(SAY_DEATH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_STREAM_OF_MACHINE_FLUID:
-                    me->CastSpell(me->GetVictim(), SPELL_STREAM_OF_MACHINE_FLUID, false);
-                    events.ScheduleEvent(EVENT_STREAM_OF_MACHINE_FLUID, 20000);
-                    break;
-                case EVENT_JACKHAMMER:
-                    Talk(EMOTE_HAMMER);
-                    Talk(SAY_HAMMER);
-                    me->CastSpell(me, SPELL_JACKHAMMER, false);
-                    events.ScheduleEvent(EVENT_JACKHAMMER, 40000);
-                    break;
-                case EVENT_SHADOW_POWER:
-                    me->CastSpell(me, SPELL_SHADOW_POWER, false);
-                    events.ScheduleEvent(EVENT_SHADOW_POWER, 25000);
-                    break;
-                default:
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        return GetMechanarAI<boss_gatewatcher_iron_handAI>(creature);
+        _JustEngagedWith();
+
+        scheduler.Schedule(15s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_STREAM_OF_MACHINE_FLUID);
+            context.Repeat(20s);
+        }).Schedule(35s, [this](TaskContext context)
+        {
+            Talk(EMOTE_HAMMER);
+            Talk(SAY_HAMMER);
+            DoCastSelf(SPELL_JACKHAMMER);
+            context.Repeat(40s);
+        }).Schedule(25s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_SHADOW_POWER);
+            context.Repeat(25s);
+        });
+
+        Talk(SAY_AGGRO);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer())
+        {
+            Talk(SAY_SLAY);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
     }
 };
 
 void AddSC_boss_gatewatcher_iron_hand()
 {
-    new boss_gatewatcher_iron_hand();
+    RegisterMechanarCreatureAI(boss_gatewatcher_iron_hand);
 }

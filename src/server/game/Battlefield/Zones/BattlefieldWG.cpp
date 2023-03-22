@@ -102,7 +102,7 @@ bool BattlefieldWG::SetupBattlefield()
 
         // When between games, the graveyard is controlled by the defending team
         if (WGGraveYard[i].startcontrol == TEAM_NEUTRAL)
-            graveyard->Initialize(m_DefenderTeam, WGGraveYard[i].gyid);
+            graveyard->Initialize(WGGraveYard[i].gyid == BATTLEFIELD_WG_GY_WORKSHOP_SE || WGGraveYard[i].gyid == BATTLEFIELD_WG_GY_WORKSHOP_SW ? GetAttackerTeam() : m_DefenderTeam, WGGraveYard[i].gyid);
         else
             graveyard->Initialize(WGGraveYard[i].startcontrol, WGGraveYard[i].gyid);
 
@@ -114,7 +114,7 @@ bool BattlefieldWG::SetupBattlefield()
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WGWorkshop* workshop = new WGWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+        if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
             workshop->GiveControlTo(GetAttackerTeam(), true);
         else
             workshop->GiveControlTo(GetDefenderTeam(), true);
@@ -262,6 +262,11 @@ void BattlefieldWG::OnBattleStart()
         if (*itr)
             (*itr)->UpdateGraveyardAndWorkshop();
 
+    // Set Sliders capture points data to his owners when battle start
+    for (BfCapturePointVector::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+        (*itr)->SetCapturePointData((*itr)->GetCapturePointGo(),
+            (*itr)->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE || (*itr)->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SW ? GetAttackerTeam() : GetDefenderTeam());
+
     for (uint8 team = 0; team < 2; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
@@ -375,7 +380,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // Update all graveyard, control is to defender when no wartime
     for (uint8 i = 0; i < BATTLEFIELD_WG_GY_HORDE; i++)
         if (BfGraveyard* graveyard = GetGraveyardById(i))
-            graveyard->GiveControlTo(GetDefenderTeam());
+            graveyard->GiveControlTo(i == BATTLEFIELD_WG_GY_WORKSHOP_SE || i == BATTLEFIELD_WG_GY_WORKSHOP_SW ? GetAttackerTeam() : GetDefenderTeam());
 
     for (GameObjectSet::const_iterator itr = m_KeepGameObject[GetDefenderTeam()].begin(); itr != m_KeepGameObject[GetDefenderTeam()].end(); ++itr)
         (*itr)->SetRespawnTime(RESPAWN_IMMEDIATELY);
@@ -396,7 +401,10 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     }
 
     for (Workshop::const_iterator itr = WorkshopsList.begin(); itr != WorkshopsList.end(); ++itr)
+    {
+        (*itr)->GiveControlTo((*itr)->workshopId == BATTLEFIELD_WG_WORKSHOP_SE || (*itr)->workshopId == BATTLEFIELD_WG_WORKSHOP_SW ? GetAttackerTeam() : GetDefenderTeam(), true);
         (*itr)->Save();
+    }
 
     for (uint8 team = 0; team < 2; ++team)
     {
@@ -689,9 +697,9 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
         {
             if (workshop->workshopId == workshopId)
             {
-                WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, GetAttackerTeam());
-
-                capturePoint->SetCapturePointData(go);
+                WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, workshop->teamControl);
+                //Sending neutral team at start to set normal capture points by workshop->teamControl, TEAM_NEUTRAL is ignored at first call
+                capturePoint->SetCapturePointData(go, TEAM_NEUTRAL);
                 capturePoint->LinkToWorkshop(workshop);
                 AddCapturePoint(capturePoint);
                 break;
@@ -846,7 +854,7 @@ void BattlefieldWG::OnPlayerJoinWar(Player* player)
         if (player->GetTeamId() == TEAM_HORDE)
             player->TeleportTo(571, 5025.857422f, 3674.628906f, 362.737122f, 4.135169f);
         else
-            player->TeleportTo(571, 5101.284f, 2186.564f, 373.549f, 3.812f);
+            player->TeleportTo(571, 5101.284f, 2186.564f, 365.549f, 3.812f);
     }
 
     if (player->GetTeamId() == GetAttackerTeam())
