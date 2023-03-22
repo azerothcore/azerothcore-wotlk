@@ -939,7 +939,7 @@ void BotMgr::OnTeleportFar(uint32 mapId, float x, float y, float z, float ori)
     }
 }
 
-void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori, bool quick)
+void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori, bool quick, bool reset)
 {
     ASSERT(bot->GetBotAI());
     bot->GetBotAI()->AbortTeleport();
@@ -958,7 +958,7 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
     if (bot->IsInWorld())
         bot->CastSpell(bot, COSMETIC_TELEPORT_EFFECT, true);
 
-    BotMgr::AddDelayedTeleportCallback([bot, newMap, x, y, z, ori, quick]() {
+    BotMgr::AddDelayedTeleportCallback([bot, newMap, x, y, z, ori, quick, reset]() {
         if (Map* mymap = bot->FindMap())
         {
             bot->BotStopMovement();
@@ -991,6 +991,8 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
             bot->Relocate(x, y, z, ori);
             bot->SetMap(newMap);
             bot->GetMap()->AddToMap(bot);
+            if (reset)
+                bot->GetBotAI()->Reset();
             return;
         }
 
@@ -999,16 +1001,16 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
             if (gr->IsMember(bot->GetGUID()))
                 gr->SendUpdate();
 
-        TeleportFinishEvent* finishEvent = new TeleportFinishEvent(bot->GetBotAI());
+        TeleportFinishEvent* finishEvent = new TeleportFinishEvent(bot->GetBotAI(), reset);
         uint64 delay = quick ? urand(500, 1500) : urand(5000, 8000);
         bot->GetBotAI()->GetEvents()->AddEvent(finishEvent, bot->GetBotAI()->GetEvents()->CalculateTime(delay));
         bot->GetBotAI()->SetTeleportFinishEvent(finishEvent);
     });
 }
 
-void BotMgr::TeleportBot(Creature* bot, Map* newMap, Position* pos, bool quick)
+void BotMgr::TeleportBot(Creature* bot, Map* newMap, Position* pos, bool quick, bool reset)
 {
-    _teleportBot(bot, newMap, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation(), quick);
+    _teleportBot(bot, newMap, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation(), quick, reset);
 }
 
 void BotMgr::CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype)
@@ -1097,7 +1099,7 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
     switch (removetype)
     {
         case BOT_REMOVE_DISMISS: resetType = BOTAI_RESET_DISMISS; break;
-        case BOT_REMOVE_UNBIND:  resetType = BOTAI_RESET_LOST;    break;
+        case BOT_REMOVE_UNBIND:  resetType = BOTAI_RESET_UNBIND;    break;
         default:                 resetType = BOTAI_RESET_LOGOUT;  break;
     }
     bot->GetBotAI()->ResetBotAI(resetType);
@@ -1111,11 +1113,6 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
         uint32 newOwner = 0;
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &newOwner);
     }
-
-    if (removetype != BOT_REMOVE_UNBIND)
-        bot->GetBotAI()->Reset();
-
-    bot->GetBotAI()->canUpdate = true;
 }
 
 void BotMgr::UnbindBot(ObjectGuid guid)

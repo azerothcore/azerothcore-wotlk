@@ -575,15 +575,7 @@ void bot_ai::ResetBotAI(uint8 resetType)
 
     if (!me->IsInWorld() || resetType == BOTAI_RESET_FORCERECALL)
     {
-        AbortTeleport();
-
-        //if no master - will teleport to spawn position
-        //otherwise - will teleport to master
-        teleHomeEvent = new TeleportHomeEvent(this);
-        Events.AddEvent(teleHomeEvent, Events.CalculateTime(0)); //make sure event will be deleted
-        if (teleHomeEvent->IsActive())
-            teleHomeEvent->ScheduleAbort(); //make sure event will not be executed twice
-        teleHomeEvent->Execute(0,0);
+        TeleportHomeStart(resetType != BOTAI_RESET_UNBIND);
     }
     else
     {
@@ -16706,7 +16698,7 @@ void bot_ai::Evade()
     {
         if (!teleHomeEvent || !teleHomeEvent->IsActive())
         {
-            teleHomeEvent = new TeleportHomeEvent(this);
+            teleHomeEvent = new TeleportHomeEvent(this, false);
             Events.AddEvent(teleHomeEvent, Events.CalculateTime(5000));
 
             //if bot has been removed manually and while in dungeon
@@ -16895,8 +16887,20 @@ void bot_ai::GetNextEvadeMovePoint(Position& pos, bool& use_path) const
         mypos.m_positionZ = me->GetPositionZ();
     pos.Relocate(mypos);
 }
+void bot_ai::TeleportHomeStart(bool reset)
+{
+    AbortTeleport();
+
+    //if no master - will teleport to spawn position
+    //otherwise - will teleport to master
+    teleHomeEvent = new TeleportHomeEvent(this, reset);
+    Events.AddEvent(teleHomeEvent, Events.CalculateTime(0)); //make sure event will be deleted
+    if (teleHomeEvent->IsActive())
+        teleHomeEvent->ScheduleAbort(); //make sure event will not be executed twice
+    teleHomeEvent->Execute(0,0);
+}
 //TeleportHome() ONLY CALLED THROUGH EVENTPROCESSOR
-void bot_ai::TeleportHome()
+void bot_ai::TeleportHome(bool reset)
 {
     ASSERT(teleHomeEvent);
     //ASSERT(IAmFree());
@@ -16909,13 +16913,13 @@ void bot_ai::TeleportHome()
 
     Map* map = sMapMgr->CreateBaseMap(mapid);
     ASSERT(!map->Instanceable(), map->GetDebugInfo().c_str());
-    BotMgr::TeleportBot(me, map, &pos);
+    BotMgr::TeleportBot(me, map, &pos, false, reset);
 
     spawned = false;
     _evadeCount = 0;
 }
 //FinishTeleport(uint32, float, float, float, float) ONLY CALLED THROUGH EVENTPROCESSOR
-bool bot_ai::FinishTeleport(/*uint32 mapId, uint32 instanceId, float x, float y, float z, float o*/)
+bool bot_ai::FinishTeleport(bool reset)
 {
     ASSERT(teleFinishEvent);
     //ASSERT(!IAmFree());
@@ -16926,24 +16930,20 @@ bool bot_ai::FinishTeleport(/*uint32 mapId, uint32 instanceId, float x, float y,
     //1) Cannot teleport: master disappeared - return home
     if (IAmFree()/* || master->GetSession()->isLogingOut()*/)
     {
-        teleHomeEvent = new TeleportHomeEvent(this);
-        Events.AddEvent(teleHomeEvent, Events.CalculateTime(0)); //make sure event will be deleted
-        if (teleHomeEvent->IsActive())
-            teleHomeEvent->ScheduleAbort(); //make sure event will not be executed twice
-        teleHomeEvent->Execute(0,0);
+        TeleportHomeStart(true);
         _evadeMode = false;
 
         return false;
     }
 
-    BotMgr::AddDelayedTeleportCallback([this]() {
+    BotMgr::AddDelayedTeleportCallback([this, reset]() {
         Map* map = master->FindMap();
         //2) Cannot teleport: map not found or forbidden - delay teleport
         if (!map || !master->IsAlive() || master->GetBotMgr()->RestrictBots(me, true))
         {
             //ChatHandler ch(master->GetSession());
             //ch.PSendSysMessage("Your bot %s cannot teleport to you. Restricted bot access on this map...", me->GetName().c_str());
-            teleFinishEvent = new TeleportFinishEvent(this);
+            teleFinishEvent = new TeleportFinishEvent(this, reset);
             Events.AddEvent(teleFinishEvent, Events.CalculateTime(5000));
             return;
         }
@@ -16965,6 +16965,8 @@ bool bot_ai::FinishTeleport(/*uint32 mapId, uint32 instanceId, float x, float y,
 
         map->AddToMap(me);
         me->BotStopMovement();
+        if (reset)
+            this->Reset();
         //bot->SetAI(oldAI);
         //me->IsAIEnabled = true;
         canUpdate = true;
