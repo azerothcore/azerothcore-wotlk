@@ -4328,6 +4328,12 @@ void Player::BuildPlayerRepop()
     WorldPacket data(SMSG_PRE_RESURRECT, GetPackGUID().size());
     data << GetPackGUID();
     GetSession()->SendPacket(&data);
+
+    // Remove Raise Ally aura
+    this->RemoveAurasDueToSpell(46619);
+    // Remove Frenzy aura
+    this->RemoveAurasDueToSpell(62218);
+
     if (getRace(true) == RACE_NIGHTELF)
     {
         CastSpell(this, 20584, true);
