@@ -3,6 +3,9 @@
 
 #include "botcommon.h"
 
+#include <functional>
+#include <mutex>
+
 class Creature;
 class Map;
 class Player;
@@ -61,6 +64,10 @@ typedef std::unordered_map<ObjectGuid /*guid*/, Creature* /*bot*/> BotMap;
 class AC_GAME_API BotMgr
 {
     public:
+        using delayed_teleport_callback_type = std::function<void(void)>;
+        using delayed_teleport_mutex_type = std::mutex;
+        using delayed_teleport_lock_type = std::unique_lock<delayed_teleport_mutex_type>;
+
         BotMgr(Player* const master);
         ~BotMgr();
 
@@ -227,11 +234,15 @@ class AC_GAME_API BotMgr
         void UpdateTargetIconName(uint8 id, std::string const& name);
         void ResetTargetIconNames();
 
+        static void AddDelayedTeleportCallback(delayed_teleport_callback_type&& callback);
+        static void HandleDelayedTeleports();
+
     private:
         static void _teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori = 0.f, bool quick = false);
         static void _reviveBot(Creature* bot, WorldLocation* dest = nullptr);
         void _addBotToRemoveList(ObjectGuid guid);
         void _setBotExactAttackRange(uint8 exactRange) { _exactAttackRange = exactRange; }
+        static delayed_teleport_mutex_type* _getTpLock();
 
         Player* const _owner;
         BotMap _bots;

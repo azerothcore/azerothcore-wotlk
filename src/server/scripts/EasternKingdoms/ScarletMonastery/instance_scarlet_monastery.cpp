@@ -155,6 +155,9 @@ public:
                     if (data == SPECIAL)
                         encounter = SPECIAL;
                     break;
+                case DATA_HORSEMAN_EVENT:
+                    encounter = data;
+                    break;
             }
         }
 
@@ -176,6 +179,8 @@ public:
         uint32 GetData(uint32 type) const override
         {
             if (type == TYPE_MOGRAINE_AND_WHITE_EVENT)
+                return encounter;
+            else if (type == DATA_HORSEMAN_EVENT)
                 return encounter;
             return 0;
         }

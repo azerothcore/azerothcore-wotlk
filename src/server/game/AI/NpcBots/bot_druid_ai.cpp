@@ -1565,7 +1565,7 @@ public:
                     SetSpellCooldown(REBIRTH_1, 1500);
                     return;
                 }
-                else if (!target->IsWithinLOSInMap(me))
+                else if (!target->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS))
                     me->Relocate(*target);
 
                 if (doCast(target, GetSpell(REBIRTH_1))) //rezzing
@@ -1606,7 +1606,7 @@ public:
                     me->GetMotionMaster()->MovePoint(targetOrCorpse->GetMapId(), *targetOrCorpse);
                     return;
                 }
-                else if (!targetOrCorpse->IsWithinLOSInMap(me))
+                else if (!targetOrCorpse->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS))
                     me->Relocate(*targetOrCorpse);
 
                 if (doCast(targetOrCorpse, GetSpell(REBIRTH_1))) //rezzing
@@ -2530,8 +2530,7 @@ public:
 
         void SummonBotPet(Unit* target)
         {
-            //if (botPet)
-            //    UnsummonAll();
+            UnsummonTreants();
 
             uint32 entry = BOT_PET_FORCE_OF_NATURE;
 
@@ -2602,6 +2601,20 @@ public:
                 {
                     LOG_ERROR("entities.unit", "Druid_bot:SummonedCreatureDespawn() treant is not found in array");
                     ASSERT(false);
+                }
+            }
+        }
+
+        void UnsummonTreants()
+        {
+            for (uint8 i = 0; i != MAX_TREANTS; ++i)
+            {
+                if (_treants[i])
+                {
+                    if (Unit* tr = ObjectAccessor::GetUnit(*me, _treants[i]))
+                        tr->ToTempSummon()->UnSummon();
+                    else
+                        _treants[i] = ObjectGuid::Empty;
                 }
             }
         }

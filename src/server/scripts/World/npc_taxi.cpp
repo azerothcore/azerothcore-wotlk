@@ -15,42 +15,57 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Npc_Taxi
-SD%Complete: 0%
-SDComment: To be used for taxi NPCs that are located globally.
-SDCategory: NPCs
-EndScriptData
-*/
-
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 
-#define GOSSIP_NETHER_DRAKE     "我准备起飞了！带我飞翔吧，龙！"
-#define GOSSIP_IRONWING         "我想飞去暴风城港口。"
-#define GOSSIP_DABIREE1         "送我去穆尔凯斯和沙德拉兹之门"
-#define GOSSIP_DABIREE2         "送我去破碎岗哨"
-#define GOSSIP_BRACK1           "送我去穆尔凯斯和沙德拉兹之门"
-#define GOSSIP_BRACK2           "送我去地狱岩床"
-#define GOSSIP_BRACK3           "送我去断背岗哨"
-#define GOSSIP_IRENA            "送我去斯克提斯"
-#define GOSSIP_CLOUDBREAKER1    "说到行动，我已下令发动空袭。"
-#define GOSSIP_CLOUDBREAKER2    "我需要拦截黎明之刃的援军。"
-#define GOSSIP_DRAGONHAWK       "<乘坐龙鹰去太阳之岛。>"
-#define GOSSIP_VERONIA          "请送我去法力熔炉：库鲁恩"
-#define GOSSIP_DEESAK           "请送我去奥格瑞拉"
-#define GOSSIP_AFRASASTRASZ1    "我想返回神殿底层，阿弗拉沙斯塔兹。"
-#define GOSSIP_AFRASASTRASZ2    "指挥官，我想去龙眠神殿顶层。"
-#define GOSSIP_TARIOLSTRASZ1    "指挥官，我想去龙眠神殿顶层。"
-#define GOSSIP_TARIOLSTRASZ2    "能让我搭乘幼龙前往龙眠神殿中层，与阿弗拉沙斯塔兹会面吗？"
-#define GOSSIP_TORASTRASZA1     "我想去龙眠神殿中层，与阿弗拉沙斯塔兹指挥官谈一谈。"
-#define GOSSIP_TORASTRASZA2     "嗯，我想返回神殿底层。"
-#define GOSSIP_CRIMSONWING      "<骑狮鹫去调查奥卡兹岛>"
-#define GOSSIP_WILLIAMKEILAR1   "送我去北地哨塔。"
-#define GOSSIP_WILLIAMKEILAR2   "送我去东墙哨塔。"
-#define GOSSIP_WILLIAMKEILAR3   "送我去皇冠哨塔。"
+enum Npcs
+{
+    NPC_NETHER_DRAKE    = 20903,  // Netherstorm - Protectorate Nether Drake
+    NPC_IRONWING        = 29154,  // Stormwind City - Thargold Ironwing
+    NPC_DABIR           = 19409,  // Hellfire Peninsula - Wing Commander Dabir'ee
+    NPC_BRACK           = 19401,  // Hellfire Peninsula - Wing Commander Brack
+    NPC_IRENA           = 23413,  // Blade's Edge Mountains - Skyguard Handler Irena
+    NPC_AYREN           = 25059,  // Isle of Quel'Danas - Ayren Cloudbreaker
+    NPC_DRAGONHAWK      = 25236,  // Isle of Quel'Danas - Unrestrained Dragonhawk
+    NPC_VERONIA         = 20162,  // Netherstorm - Veronia
+    NPC_DEESAK          = 23415,  // Terokkar Forest - Skyguard Handler Deesak
+    NPC_AFRASASTRASZ    = 27575,  // Dragonblight - Lord Afrasastrasz
+    NPC_TARIOLSTRASZ    = 26443,  // Dragonblight - Tariolstrasz
+    NPC_TORASTRASZA     = 26949,  // Dragonblight - Torastrasza
+    NPC_CESSA           = 23704,  // Dustwallow Marsh - Cassa Crimsonwing
+    NPC_KIELAR          = 17209,  // William Kielar <Spectral Gryphon Master> - Eastern Plaguelands Towers
+};
+
+enum Misc
+{
+    REP_SKYGUARD        = 1031,   // Sha'tari Skyguard Reputation
+
+    // Netherstorm
+    QUEST_NETHERY_WINGS = 10438,  // On Nethery Wings
+    ITEM_DISRUPTOR      = 29778,  // Phase Disruptor (Needed for On Nethery Wings)
+    QUEST_BEHIND_ENEMY  = 10652,  // Behind Enemy Lines
+
+    // Hellfire Peninsula - Alliance
+    QUEST_GATEWAYS_A    = 10146,  // Mission: The Murketh and Shaadraz Gateways
+    QUEST_SHATTER_POINT = 10340,  // Shatter Point
+
+    // Hellfire Peninsula - Horde
+    QUEST_GATEWAYS_H    = 10129,  // Mission: The Murketh and Shaadraz Gateways
+    QUEST_ABBYSAL       = 10162,  // Mission: The Abyssal Shelf
+    QUEST_ABBYSAL_DAILY = 10347,  // Return to the Abyssal Shelf (Daily)
+    QUEST_SPINEBREAKER  = 10242,  // Spinebreaker Post
+
+    // Isle of Quel'Danas (Daily)
+    QUEST_DEAD_SCAR     = 11532,  // Mission: Distraction at the Dead Scar
+    QUEST_AIR_STRIKE    = 11533,  // The Air Strikes Must Continue
+    QUEST_INTERCEPT     = 11542,  // Mission: Intercept the Reinforcements
+    QUEST_KEEP_AT_BEY   = 11543,  // Keeping the Enemy at Bay
+
+    // Dustwallow Marsh
+    QUEST_SURVEY_ALCAZ  = 11142,  // Survey Alcaz Island
+};
 
 class npc_taxi : public CreatureScript
 {
@@ -62,87 +77,84 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
+        uint32 gossipmenuid = 0;
+        gossipmenuid = creature->GetCreatureTemplate()->GossipMenuId;
+
         switch (creature->GetEntry())
         {
-            case 20903: // Netherstorm - Protectorate Nether Drake
-                if (player->GetQuestStatus(10438) == QUEST_STATUS_INCOMPLETE && player->HasItemCount(29778))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_NETHER_DRAKE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            case NPC_NETHER_DRAKE:
+                if (player->GetQuestStatus(QUEST_NETHERY_WINGS) == QUEST_STATUS_INCOMPLETE && player->HasItemCount(ITEM_DISRUPTOR))
+                    AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 break;
-            case 29154: // Stormwind City - Thargold Ironwing
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_IRONWING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            case NPC_IRONWING:
+                AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 break;
-            case 19409: // Hellfire Peninsula - Wing Commander Dabir'ee
-                //Mission: The Murketh and Shaadraz Gateways
-                if (player->GetQuestStatus(10146) == QUEST_STATUS_INCOMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DABIREE1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+            case NPC_DABIR:
+                if (player->GetQuestStatus(QUEST_GATEWAYS_A) == QUEST_STATUS_INCOMPLETE)
+                    AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
 
-                //Shatter Point
-                if (!player->GetQuestRewardStatus(10340))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DABIREE2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                if (!player->GetQuestRewardStatus(QUEST_SHATTER_POINT))
+                    AddGossipItemFor(player, gossipmenuid, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 break;
-            case 19401: // Hellfire Peninsula - Wing Commander Brack
-                //Mission: The Murketh and Shaadraz Gateways
-                if (player->GetQuestStatus(10129) == QUEST_STATUS_INCOMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BRACK1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
+            case NPC_BRACK:
+                if (player->GetQuestStatus(QUEST_GATEWAYS_H) == QUEST_STATUS_INCOMPLETE)
+                    AddGossipItemFor(player, gossipmenuid, 5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
 
-                //Mission: The Abyssal Shelf || Return to the Abyssal Shelf
-                if (player->GetQuestStatus(10162) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(10347) == QUEST_STATUS_INCOMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BRACK2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+                if (player->GetQuestStatus(QUEST_ABBYSAL) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_ABBYSAL_DAILY) == QUEST_STATUS_INCOMPLETE)
+                    AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
 
-                //Spinebreaker Post
-                if (player->GetQuestStatus(10242) == QUEST_STATUS_COMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BRACK3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+                if (player->GetQuestStatus(QUEST_SPINEBREAKER) == QUEST_STATUS_COMPLETE)
+                    AddGossipItemFor(player, gossipmenuid, 4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
                 break;
-            case 23413: // Blade's Edge Mountains - Skyguard Handler Irena
-                if (player->GetReputationRank(1031) >= REP_HONORED)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_IRENA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+            case NPC_IRENA:
+                if (player->GetReputationRank(REP_SKYGUARD) >= REP_HONORED)
+                    AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
                 break;
-            case 25059: // Isle of Quel'Danas - Ayren Cloudbreaker
-                if (player->GetQuestStatus(11532) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(11533) == QUEST_STATUS_INCOMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_CLOUDBREAKER1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
+            case NPC_AYREN:
+                if (player->GetQuestStatus(QUEST_DEAD_SCAR) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_AIR_STRIKE) == QUEST_STATUS_INCOMPLETE)
+                    AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
 
-                if (player->GetQuestStatus(11542) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(11543) == QUEST_STATUS_INCOMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_CLOUDBREAKER2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
+                if (player->GetQuestStatus(QUEST_INTERCEPT) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_KEEP_AT_BEY) == QUEST_STATUS_INCOMPLETE)
+                    AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
                 break;
-            case 25236: // Isle of Quel'Danas - Unrestrained Dragonhawk
-                if (player->GetQuestStatus(11542) == QUEST_STATUS_COMPLETE || player->GetQuestStatus(11543) == QUEST_STATUS_COMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DRAGONHAWK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
+            case NPC_DRAGONHAWK:
+                if (player->GetQuestStatus(QUEST_INTERCEPT) == QUEST_STATUS_COMPLETE || player->GetQuestStatus(QUEST_KEEP_AT_BEY) == QUEST_STATUS_COMPLETE)
+                    AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
                 break;
-            case 20162: // Netherstorm - Veronia
-                //Behind Enemy Lines
-                if (player->GetQuestStatus(10652) != QUEST_STATUS_REWARDED)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_VERONIA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
+            case NPC_VERONIA:
+                if (player->GetQuestStatus(QUEST_BEHIND_ENEMY) != QUEST_STATUS_REWARDED)
+                    AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
                 break;
-            case 23415: // Terokkar Forest - Skyguard Handler Deesak
-                if (player->GetReputationRank(1031) >= REP_HONORED)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DEESAK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 16);
+            case NPC_DEESAK:
+                if (player->GetReputationRank(REP_SKYGUARD) >= REP_HONORED)
+                    AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 16);
                 break;
-            case 27575: // Dragonblight - Lord Afrasastrasz
+            case NPC_AFRASASTRASZ:
                 // middle -> ground
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_AFRASASTRASZ1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 17);
+                AddGossipItemFor(player, gossipmenuid, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 17);
                 // middle -> top
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_AFRASASTRASZ2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 18);
+                AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 18);
                 break;
-            case 26443: // Dragonblight - Tariolstrasz //need to check if quests are required before gossip available (12123, 12124)
+            case NPC_TARIOLSTRASZ:
                 // ground -> top
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TARIOLSTRASZ1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 19);
+                AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 19);
                 // ground -> middle
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TARIOLSTRASZ2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 20);
+                AddGossipItemFor(player, gossipmenuid, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 20);
                 break;
-            case 26949: // Dragonblight - Torastrasza
+            case NPC_TORASTRASZA:
                 // top -> middle
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TORASTRASZA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 21);
+                AddGossipItemFor(player, gossipmenuid, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 21);
                 // top -> ground
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TORASTRASZA2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
+                AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
                 break;
-            case 23704: // Dustwallow Marsh - Cassa Crimsonwing
-                if (player->GetQuestStatus(11142) == QUEST_STATUS_INCOMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_CRIMSONWING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 25);
+            case NPC_CESSA:
+                if (player->GetQuestStatus(QUEST_SURVEY_ALCAZ) == QUEST_STATUS_INCOMPLETE)
+                    AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 25);
                 break;
-            case 17209:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 26);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 27);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 28);
+            case NPC_KIELAR:
+                AddGossipItemFor(player, gossipmenuid, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 26); // Northpass Tower.
+                AddGossipItemFor(player, gossipmenuid, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 27); // Eastwall Tower.
+                AddGossipItemFor(player, gossipmenuid, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 28); // Crown Guard Tower.
                 break;
         }
 
@@ -230,15 +242,6 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 22:
                 CloseGossipMenuFor(player);
                 player->ActivateTaxiPathTo(879);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 23:
-                CloseGossipMenuFor(player);
-                player->CastSpell(player, 43074, true);               //TaxiPath 736
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 24:
-                CloseGossipMenuFor(player);
-                //player->ActivateTaxiPathTo(738);
-                player->CastSpell(player, 43136, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 25:
                 CloseGossipMenuFor(player);

@@ -2138,6 +2138,11 @@ void Creature::Respawn(bool force)
 {
     //DestroyForNearbyPlayers(); // pussywizard: not needed
 
+    //npcbot
+    if (IsNPCBot())
+        return;
+    //end npcbot
+
     if (force)
     {
         if (IsAlive())

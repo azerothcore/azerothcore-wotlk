@@ -1,4 +1,4 @@
--- 
+--
 SET @BOT_START = 70659;
 SET @BOT_END   = 70659;
 

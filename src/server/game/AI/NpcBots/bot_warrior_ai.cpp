@@ -639,7 +639,7 @@ public:
             //SHOCKWAVE - frontal cone
             if (IsSpellReady(SHOCKWAVE_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS) && dist < 8.f && !CCed(mytar) &&
                 rage >= rcost(SHOCKWAVE_1) && Rand() < (70 + 70 * mytar->IsNonMeleeSpellCast(false)) &&
-                me->HasInArc(float(M_PI)/2, mytar) && mytar->IsWithinLOSInMap(me))
+                me->HasInArc(float(M_PI)/2, mytar) && mytar->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS))
             {
                 if (doCast(me, GetSpell(SHOCKWAVE_1)))
                     return;
@@ -931,7 +931,7 @@ public:
 
         void CheckShouts(uint32 diff)
         {
-            if (shoutCheckTimer > diff || GC_Timer > diff || Rand() > 35 || IAmFree() || me->IsMounted() || IsCasting() ||
+            if (shoutCheckTimer > diff || GC_Timer > diff || Rand() > 35 || (IAmFree() && !IsWanderer()) || me->IsMounted() || IsCasting() ||
                 (rage < rcost(BATTLE_SHOUT_1) && !IsSpellReady(BLOODRAGE_1, diff, false)))
                 return;
 

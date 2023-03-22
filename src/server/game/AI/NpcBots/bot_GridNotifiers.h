@@ -87,7 +87,7 @@ class ImmunityShieldDispelTargetCheck
             if (!u->HasAuraWithMechanic(1<<MECHANIC_IMMUNE_SHIELD))
                 return false;
 
-            if (!u->IsWithinLOSInMap(me))
+            if (!u->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS))
                 return false;
 
             return true;
@@ -112,7 +112,7 @@ class NearestHostileUnitCheck
         NearestHostileUnitCheck(NearestHostileUnitCheck const&) = delete;
         explicit NearestHostileUnitCheck(Unit const* unit, float dist, bool magic, bot_ai const* m_ai, bool targetCCed, bool withSecondary) :
         me(unit), m_range(dist), byspell(magic), ai(m_ai), AttackCCed(targetCCed), checkSecondary(withSecondary)
-        { free = ai->IAmFree(); berserk = free && ai->IsWanderer(); }
+        { free = ai->IAmFree(); berserk = free && (ai->IsWanderer() || unit->GetFaction() == 14); }
         explicit NearestHostileUnitCheck(Unit const* unit, float dist, bool magic, bot_ai const* m_ai) :
         NearestHostileUnitCheck(unit, dist, magic, m_ai, true, false)
         {}
@@ -138,16 +138,11 @@ class NearestHostileUnitCheck
             if (!berserk && !ai->IsInBotParty(u->GetVictim()))
                 return INVALID;
 
-            if (free)
-            {
-                if (!berserk && u->IsControlledByPlayer() && !u->IsInCombat())
-                    return INVALID;
-            }
-            else
-            {
-                if (!u->IsWithinLOSInMap(me))
-                    return INVALID;
-            }
+            if (free && !berserk && u->IsControlledByPlayer() && !u->IsInCombat())
+                return INVALID;
+
+            if (!u->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_ALL_CHECKS))
+                return INVALID;
 
             uint32 res = VALID_PRIMARY;
             if (!ai->CanBotAttack(u, byspell))

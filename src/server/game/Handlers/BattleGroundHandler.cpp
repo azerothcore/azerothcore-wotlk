@@ -297,7 +297,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             Player* member = itr->GetSource();
             if (!member)
                 continue;   // this should never happen
- 
+
             LOG_DEBUG("bg.battleground", "Battleground: player joined queue for bg queue type {} bg type {}: GUID {}, NAME {}",
                 bgQueueTypeId, bgTypeId, member->GetGUID().ToString().c_str(), member->GetName().c_str());
 
