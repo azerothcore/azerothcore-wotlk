@@ -114,6 +114,7 @@ struct boss_pathaleon_the_calculator : public BossAI
             if (mobCount >= 4)
             {
                 Talk(SAY_APPEAR);
+                DoCastSelf(SPELL_ETHEREAL_TELEPORT);
 
                 scheduler.Schedule(2s, [this](TaskContext)
                 {
