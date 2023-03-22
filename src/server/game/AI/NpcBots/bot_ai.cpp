@@ -2240,7 +2240,7 @@ void bot_ai::SetStats(bool force)
                 ASSERT(minlevel > 0 && minlevel > 0);
                 mylevel = urand(std::min<uint8>(minlevel + 2, maxlevel), maxlevel);
                 mylevel += BotDataMgr::GetLevelBonusForBotRank(me->GetCreatureTemplate()->rank);
-                _baseLevel = mylevel;
+                _baseLevel = std::max<uint8>(mylevel, BotDataMgr::GetMinLevelForBotClass(_botclass));
                 LOG_DEBUG("npcbots", "Wandering bot {} id {} selected level {}...", me->GetName().c_str(), me->GetEntry(), uint32(_baseLevel));
             }
         }
@@ -13790,6 +13790,12 @@ void bot_ai::InitEquips()
         for (uint8 i = BOT_SLOT_MAINHAND; i < BOT_INVENTORY_SIZE; ++i)
         {
             if (i == BOT_SLOT_OFFHAND && !_canUseOffHand())
+                continue;
+            if (i == BOT_SLOT_SHOULDERS && me->GetLevel() < 16)
+                continue;
+            if ((i == BOT_SLOT_FINGER1 || i == BOT_SLOT_FINGER2) && me->GetLevel() < 19)
+                continue;
+            if ((i == BOT_SLOT_HEAD || i == BOT_SLOT_TRINKET1 || i == BOT_SLOT_TRINKET2) && me->GetLevel() < 29)
                 continue;
 
             Item* item = BotDataMgr::GenerateWanderingBotItem(i, _botclass, me->GetLevel(),

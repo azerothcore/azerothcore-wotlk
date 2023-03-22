@@ -605,14 +605,19 @@ void BotDataMgr::GenerateWanderingBots()
             spareBotIdsPerClassMap.insert({ c, {} });
 
     uint32 maxWanderingBots = 0;
+    uint32 enabledBotsCount = 0;
     for (decltype(_botsExtras)::value_type const& vt : _botsExtras)
     {
         uint8 c = vt.second->bclass;
-        if (c != BOT_CLASS_NONE && c != BOT_CLASS_BM && BotMgr::IsClassEnabled(c) && _botsData.find(vt.first) == _botsData.end())
+        if (c != BOT_CLASS_NONE && c != BOT_CLASS_BM && BotMgr::IsClassEnabled(c))
         {
-            ASSERT(spareBotIdsPerClassMap.find(c) != spareBotIdsPerClassMap.cend());
-            spareBotIdsPerClassMap.at(c).insert(vt.first);
-            ++maxWanderingBots;
+            ++enabledBotsCount;
+            if (_botsData.find(vt.first) == _botsData.end())
+            {
+                ASSERT(spareBotIdsPerClassMap.find(c) != spareBotIdsPerClassMap.cend());
+                spareBotIdsPerClassMap.at(c).insert(vt.first);
+                ++maxWanderingBots;
+            }
         }
     }
 
@@ -623,7 +628,7 @@ void BotDataMgr::GenerateWanderingBots()
     if (maxWanderingBots < wandering_bots_desired)
     {
         LOG_FATAL("server.loading", "Only {} out of {} bots of enabled classes aren't spawned. Desired amount of wandering bots ({}) cannot be created. Aborting!",
-            maxWanderingBots, uint32(_botsExtras.size()), wandering_bots_desired);
+            maxWanderingBots, enabledBotsCount, wandering_bots_desired);
         ASSERT(false);
     }
 
@@ -690,6 +695,51 @@ void BotDataMgr::GenerateWanderingBots()
         ASSERT(false);
     }
 
+    bool found_maxlevel_node_a = false;
+    bool found_maxlevel_node_h = false;
+    bool found_maxlevel_node_rest = false;
+    const uint8 maxof_minclasslvl_nor = GetMinLevelForBotClass(BOT_CLASS_DEATH_KNIGHT); // 55
+    const uint8 maxof_minclasslvl_ex = GetMinLevelForBotClass(BOT_CLASS_DREADLORD); // 60
+    for (WanderNode const* wp : spawns_a)
+    {
+        if (wp->GetLevels().second >= maxof_minclasslvl_nor)
+        {
+            found_maxlevel_node_a = true;
+            break;
+        }
+    }
+    for (WanderNode const* wp : spawns_h)
+    {
+        if (wp->GetLevels().second >= maxof_minclasslvl_nor)
+        {
+            found_maxlevel_node_h = true;
+            break;
+        }
+    }
+    for (WanderNode const* wp : spawns_rest)
+    {
+        if (wp->GetLevels().second >= maxof_minclasslvl_ex)
+        {
+            found_maxlevel_node_rest = true;
+            break;
+        }
+    }
+    if (!found_maxlevel_node_a)
+    {
+        LOG_FATAL("server.loading", "Not a single spawn point exists for Alliance DKs!");
+        ASSERT(false);
+    }
+    if (!found_maxlevel_node_h)
+    {
+        LOG_FATAL("server.loading", "Not a single spawn point exists for Horde DKs!");
+        ASSERT(false);
+    }
+    if (!found_maxlevel_node_rest)
+    {
+        LOG_FATAL("server.loading", "Not a single spawn point exists for extra classes (level 60)!");
+        ASSERT(false);
+    }
+
     std::set<uint32> botgrids;
     for (uint32 i = 1; i <= wandering_bots_desired; ++i) // i is a counter, NOT used as index or value
     {
@@ -722,8 +772,7 @@ void BotDataMgr::GenerateWanderingBots()
         uint8 myminlevel = GetMinLevelForBotClass(bot_class);
         for (WanderNode const* node : *bot_spawn_nodes)
         {
-            auto [minlevel, maxlevel] = node->GetLevels();
-            if (minlevel >= myminlevel && myminlevel <= maxlevel)
+            if (myminlevel <= node->GetLevels().second)
                 level_nodes.push_back(node);
         }
 
@@ -809,10 +858,28 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
     {
         ItemTemplate const& proto = kv.second;
 
-        if (!(proto.Quality >= ITEM_QUALITY_UNCOMMON && proto.Quality <= ITEM_QUALITY_EPIC))
+        if (proto.ItemLevel == 0)
             continue;
-        if (!(proto.RequiredLevel >= 2 && proto.RequiredLevel <= DEFAULT_MAX_LEVEL))
-            continue;
+
+        switch (proto.Quality)
+        {
+            case ITEM_QUALITY_POOR:
+                if (proto.RequiredLevel > 1)
+                    continue;
+                break;
+            case ITEM_QUALITY_NORMAL:
+                if (proto.RequiredLevel > 14)
+                    continue;
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+            case ITEM_QUALITY_RARE:
+            case ITEM_QUALITY_EPIC:
+                if (!(proto.RequiredLevel >= 2 && proto.RequiredLevel <= DEFAULT_MAX_LEVEL))
+                    continue;
+                break;
+            default:
+                continue;
+        }
 
         uint32 itemId = kv.first;
         uint8 reqLstep = (proto.RequiredLevel + ITEM_SORTING_LEVEL_STEP - 1) / ITEM_SORTING_LEVEL_STEP;
@@ -823,6 +890,8 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                 switch (proto.InventoryType)
                 {
                     case INVTYPE_FINGER:
+                        if (proto.Quality < ITEM_QUALITY_UNCOMMON)
+                            break;
                         _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
@@ -859,6 +928,8 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
                         break;
                     case INVTYPE_TRINKET:
+                        if (proto.Quality < ITEM_QUALITY_UNCOMMON)
+                            break;
                         _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
@@ -914,6 +985,8 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_BACK][reqLstep].push_back(itemId);
                         break;
                     case INVTYPE_HOLDABLE:
+                        if (proto.Quality < ITEM_QUALITY_UNCOMMON)
+                            break;
                         _botsWanderCreaturesSortedGear[BOT_CLASS_PRIEST][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_MAGE][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
