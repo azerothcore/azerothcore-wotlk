@@ -58,7 +58,7 @@ struct boss_pathaleon_the_calculator : public BossAI
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
     }
-    
+
     bool CanAIAttack(Unit const* /*target*/) const override
     {
         return instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) >= 4;
@@ -101,7 +101,7 @@ struct boss_pathaleon_the_calculator : public BossAI
             DoCastRandomTarget(SPELL_DOMINATION, 1, 50.0f);
             context.Repeat(30s);
         });
-        
+ 
         if (IsHeroic())
         {
             scheduler.Schedule(8s, [this](TaskContext context)
