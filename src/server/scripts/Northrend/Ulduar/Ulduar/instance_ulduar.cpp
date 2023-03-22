@@ -1172,7 +1172,6 @@ public:
                                 LOG_ERROR("module", "奥尔加隆挑战超时,跳过召唤");
                             }
                         }
-
                         return;
                     }
 

@@ -456,6 +456,8 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         if (Player* player = ObjectAccessor::FindPlayer(*itr))
         {
             player->CastSpell(player, SPELL_DEFEAT_REWARD, true);
+            if (player->HasAura(SPELL_LIEUTENANT))
+                player->AreaExploredOrEventHappens(GetDefenderTeam() ? 13183 : 13181); // 增加中尉胜利奖励
             RemoveAurasFromPlayer(player);
 
             for (uint8 i = 0; i < damagedTowersAtt; ++i)
@@ -1129,9 +1131,9 @@ void BattlefieldWG::UpdateTenacity()
     if (alliancePlayers && hordePlayers)
     {
         if (alliancePlayers < hordePlayers)
-            newStack = int32((((float)hordePlayers / alliancePlayers) - 1.0f) * 4.0f);  // positive, should cast on alliance
+            newStack = int32((((float)hordePlayers / alliancePlayers) - 1.0f) * 6.0f);  // positive, should cast on alliance参数从4倍增加到6倍
         else if (alliancePlayers > hordePlayers)
-            newStack = int32((1.0f - ((float)alliancePlayers / hordePlayers)) * 4.0f);  // negative, should cast on horde
+            newStack = int32((1.0f - ((float)alliancePlayers / hordePlayers)) * 6.0f);  // negative, should cast on horde参数从4倍增加到6倍
     }
 
     // Return if no change in stack and apply tenacity to new player
@@ -1141,7 +1143,7 @@ void BattlefieldWG::UpdateTenacity()
             if (Player* newPlayer = ObjectAccessor::FindPlayer(*itr))
                 if ((newPlayer->GetTeamId() == TEAM_ALLIANCE && m_tenacityStack > 0) || (newPlayer->GetTeamId() == TEAM_HORDE && m_tenacityStack < 0))
                 {
-                    newStack = std::min(std::abs(newStack), 20);
+                    newStack = std::min(std::abs(newStack), 99);//上限提升至99层
                     uint32 buff_honor = GetHonorBuff(newStack);
                     newPlayer->SetAuraStack(SPELL_TENACITY, newPlayer, newStack);
                     if (buff_honor)
@@ -1175,7 +1177,7 @@ void BattlefieldWG::UpdateTenacity()
     if (newStack)
     {
         team = newStack > 0 ? TEAM_ALLIANCE : TEAM_HORDE;
-        newStack = std::min(std::abs(newStack), 20);
+        newStack = std::min(std::abs(newStack), 99);//上限提升至99层
         uint32 buff_honor = GetHonorBuff(newStack);
 
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
