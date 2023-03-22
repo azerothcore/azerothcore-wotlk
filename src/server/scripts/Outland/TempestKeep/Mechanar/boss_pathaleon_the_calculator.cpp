@@ -59,12 +59,9 @@ struct boss_pathaleon_the_calculator : public BossAI
         });
     }
     
-    void MoveInLineOfSight(Unit* who) override
+    bool CanAIAttack(Unit const* /*target*/) const override
     {
-        if (instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) >= 4)
-        {
-            BossAI::MoveInLineOfSight(who);
-        }
+        return instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) >= 4;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
