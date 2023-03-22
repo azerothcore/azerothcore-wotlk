@@ -1485,13 +1485,6 @@ class spell_dk_ghoul_explode : public SpellScript
 
     void Suicide(SpellEffIndex /*effIndex*/)
     {
-        // Remove Raise Ally aura and Frenzy aura from player corpse
-        if (Unit* charmer = GetCaster()->GetCharmer())
-        {
-            charmer->RemoveAurasDueToSpell(SPELL_DK_RAISE_ALLY);
-            charmer->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY);
-        }
-
         if (Unit* unitTarget = GetHitUnit())
         {
             // Corpse Explosion (Suicide)
