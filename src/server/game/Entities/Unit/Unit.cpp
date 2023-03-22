@@ -22466,15 +22466,20 @@ bool Unit::CanRestoreMana(SpellInfo const* spellInfo) const
     // Aura of Despair exceptions
     switch (spellInfo->Id)
     {
+        case 16666: // Demonic Rune
+        case 27869: // Dark Rune
         case 30824: // Shamanistic Rage
         case 31786: // Spiritual Attunement
         case 31930: // Judgements of the Wise
         case 34075: // Aspect of the Viper
         case 34720: // Thrill of the hunt
         case 47755: // Rapture
+        case 54425: // Improved Felhunter
+        case 57319: // Blessing of Sanctuary
         case 63337: // Saronite Vapors (regenerate mana)
         case 63375: // Improved stormstrike
         case 64372: // Lifebloom
+        case 68285: // Improved Leader of the Pack
             return true;
         case 54428: // Divine Plea - only with talent Guarded by the Light
             return HasSpell(53583);
