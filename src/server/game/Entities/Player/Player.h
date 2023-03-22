@@ -2581,6 +2581,8 @@ public:
 
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 
+    void ResetSpeakTimers();
+
     std::string GetDebugInfo() const override;
 
     /*****************************************************************/
