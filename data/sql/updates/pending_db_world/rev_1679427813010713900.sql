@@ -67,8 +67,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21338, 0, 5, 0, 0, 2, 100, 0, 9000, 14000, 12000, 15000, 0, 11, 40505, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Leper - In Combat - Cast \'Cleave\' (Phase 2)'),
 (21338, 0, 6, 0, 0, 4, 100, 2, 4000, 6000, 9000, 10000, 0, 11, 13339, 0, 0, 0, 0, 0, 5, 20, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Leper - In Combat - Cast \'Fire Blast\' (Phase 3) (Normal Dungeon)'),
 (21338, 0, 7, 0, 0, 4, 100, 4, 4000, 6000, 9000, 10000, 0, 11, 14145, 0, 0, 0, 0, 0, 5, 20, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Leper - In Combat - Cast \'Fire Blast\' (Phase 3) (Heroic Dungeon)'),
-(21338, 0, 8, 0, 0, 4, 100, 2, 0, 0, 3000, 3000, 0, 11, 9613, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Leper - In Combat - Cast \'Shadow Bolt\' (Phase 3) (Normal Dungeon)'),
-(21338, 0, 9, 0, 0, 4, 100, 4, 0, 0, 3000, 3000, 0, 11, 12739, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Leper - In Combat - Cast \'Shadow Bolt\' (Phase 3) (Heroic Dungeon)');
+(21338, 0, 8, 0, 0, 4, 100, 2, 0, 0, 3000, 3000, 0, 11, 9613, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Leper - In Combat - Cast \'Shadow Bolt\' (Phase 3) (Normal Dungeon)'),
+(21338, 0, 9, 0, 0, 4, 100, 4, 0, 0, 3000, 3000, 0, 11, 12739, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Leper - In Combat - Cast \'Shadow Bolt\' (Phase 3) (Heroic Dungeon)');
 
 DELETE FROM `creature_template_addon` WHERE (`entry` IN (21694, 21914));
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
