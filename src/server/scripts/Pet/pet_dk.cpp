@@ -43,7 +43,10 @@ enum DeathKnightSpells
     SPELL_DK_DISMISS_GARGOYLE       = 50515,
     SPELL_DK_SANCTUARY              = 54661,
     SPELL_DK_NIGHT_OF_THE_DEAD      = 62137,
-    SPELL_DK_PET_SCALING            = 61017
+    SPELL_DK_PET_SCALING            = 61017,
+    // Risen Ally
+    SPELL_DK_RAISE_ALLY             = 46619,
+    SPELL_GHOUL_FRENZY              = 62218,
 };
 
 class npc_pet_dk_ebon_gargoyle : public CreatureScript
@@ -268,9 +271,15 @@ public:
         {
             if (!apply)
             {
-                me->GetCharmerOrOwner()->RemoveAurasDueToSpell(46619); // Remove Raise Ally aura
-                me->GetCharmerOrOwner()->RemoveAurasDueToSpell(46619); // Remove Frenzy aura
-                me->GetCharmerOrOwner()->ClearResurrectRequestData();
+                if (Unit* owner = me->GetCharmerOrOwner())
+                {
+                    if (Player* player = owner->ToPlayer())
+                    {
+                        player->RemoveAurasDueToSpell(SPELL_DK_RAISE_ALLY); // Remove Raise Ally aura
+                        player->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY); // Remove Frenzy aura
+                        //player->ClearResurrectRequestData();
+                    }
+                }
             }
         }
     };
