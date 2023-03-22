@@ -37,10 +37,16 @@ enum Spells
     SPELL_ARCANE_TORRENT            = 36022,
     SPELL_MANA_TAP                  = 36021,
     SPELL_DOMINATION                = 35280,
+    SPELL_ETHEREAL_TELEPORT         = 34427,
     SPELL_SUMMON_NETHER_WRAITH_1    = 35285,
     SPELL_SUMMON_NETHER_WRAITH_2    = 35286,
     SPELL_SUMMON_NETHER_WRAITH_3    = 35287,
     SPELL_SUMMON_NETHER_WRAITH_4    = 35288,
+};
+
+enum Misc
+{
+    ACTION_BRIDGE_MOB_DEATH = 1, // Used by SAI
 };
 
 struct boss_pathaleon_the_calculator : public BossAI
@@ -96,6 +102,31 @@ struct boss_pathaleon_the_calculator : public BossAI
         });
 
         Talk(SAY_AGGRO);
+    }
+
+    void DoAction(int32 actionId) override
+    {
+        if (actionId == ACTION_BRIDGE_MOB_DEATH)
+        {
+            uint8 mobCount = instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT);
+            instance->StorePersistentData(DATA_BRIDGE_MOB_DEATH_COUNT, ++mobCount);
+
+            if (mobCount >= 4)
+            {
+                Talk(SAY_APPEAR);
+
+                scheduler.Schedule(2s, [this](TaskContext)
+                {
+                    me->HandleEmoteCommand(EMOTE_STATE_READY1H);
+                }).Schedule(25s, [this](TaskContext)
+                {
+                    if (Player* player = me->SelectNearestPlayer(100.0f))
+                    {
+                        AttackStart(player);
+                    }
+                });
+            }
+        }
     }
 
     void KilledUnit(Unit* victim) override
