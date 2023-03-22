@@ -13284,12 +13284,15 @@ void bot_ai::DefaultInit()
     }
 
     //bot needs to be either directly controlled by player of have pvp flag to be a valid assist target (buffs, heals, etc.)
-    me->SetPvP(master->IsPvP() || IsWanderer());
     me->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
-    if (sWorld->IsFFAPvPRealm())
-        me->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-    else if (IAmFree())
-        me->SetByteFlag(UNIT_FIELD_BYTES_2, 1, 0);
+    if (!IsWanderer())
+    {
+        me->SetPvP(master->IsPvP());
+        if (sWorld->IsFFAPvPRealm())
+            me->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        else if (IAmFree())
+            me->SetByteFlag(UNIT_FIELD_BYTES_2, 1, 0);
+    }
 
     InitSpec();
     InitRoles();
