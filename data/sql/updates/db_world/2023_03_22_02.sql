@@ -1,3 +1,4 @@
+-- DB update 2023_03_22_01 -> 2023_03_22_02
 --
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_item_goblin_weather_machine';
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_item_goblin_weather_machine_aura';
