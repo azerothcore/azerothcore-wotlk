@@ -277,6 +277,9 @@ public:
             if (IsAnyPlayerValid())
                 return;
 
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
+                controller->AI()->DoAction(ACTION_RESET_ENCOUNTER);
             BossAI::EnterEvadeMode(why);
         }
 
@@ -284,14 +287,6 @@ public:
         {
             me->SetReactState(REACT_AGGRESSIVE);
             BossAI::AttackStart(who);
-        }
-
-        void JustReachedHome() override
-        {
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
-                controller->AI()->DoAction(ACTION_RESET_ENCOUNTER);
-            BossAI::JustReachedHome();
         }
 
         void JustEngagedWith(Unit* who) override

@@ -308,6 +308,7 @@ enum Phases
 };
 
 Position const CenterPosition     = {503.6282f, -2124.655f, 840.8569f, 0.0f};
+Position const TirionSpawn        = { 505.2118f, -2124.353f, 840.9403f, 3.141593f };
 Position const TirionIntro        = {488.2970f, -2124.840f, 840.8569f, 0.0f};
 Position const TirionCharge       = {472.8500f, -2124.350f, 840.8570f, 0.0f};
 Position const LichKingIntro[3]   = { {432.0851f, -2123.673f, 864.6582f, 0.0f}, {457.8351f, -2123.423f, 841.1582f, 0.0f}, {465.0730f, -2123.470f, 840.8569f, 0.0f} };
@@ -660,6 +661,21 @@ public:
             SetEquipmentSlots(true);
             if (me->IsImmuneToPC())
                 me->SetStandState(UNIT_STAND_STATE_SIT);
+
+            DoAction(ACTION_RESTORE_LIGHT);
+
+            // Reset The Frozen Throne gameobjects
+            FrozenThroneResetWorker reset;
+            Acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
+            Cell::VisitGridObjects(me, worker, 333.0f);
+
+            me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
+            me->SetImmuneToPC(true);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetStandState(UNIT_STAND_STATE_SIT);
+
+            if (!ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
+                me->SummonCreature(NPC_HIGHLORD_TIRION_FORDRING_LK, TirionSpawn, TEMPSUMMON_MANUAL_DESPAWN);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -691,22 +707,6 @@ public:
             events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, 30s, 31s, EVENT_GROUP_ABILITIES);
             if (IsHeroic())
                 events.ScheduleEvent(EVENT_SHADOW_TRAP, 15s + 500ms, EVENT_GROUP_ABILITIES);
-        }
-
-        void JustReachedHome() override
-        {
-            _JustReachedHome();
-            DoAction(ACTION_RESTORE_LIGHT);
-
-            // Reset The Frozen Throne gameobjects
-            FrozenThroneResetWorker reset;
-            Acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
-            Cell::VisitGridObjects(me, worker, 333.0f);
-
-            me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
-            me->SetImmuneToPC(true);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetStandState(UNIT_STAND_STATE_SIT);
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -1262,7 +1262,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
 
             if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
-                tirion->AI()->EnterEvadeMode();
+                tirion->DespawnOrUnsummon();
         }
     };
 
