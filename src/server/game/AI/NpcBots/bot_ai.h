@@ -615,6 +615,7 @@ class bot_ai : public CreatureAI
         SpellInfo const* m_botSpellInfo;
         Position homepos, movepos, attackpos, sendlastpos;
         Position sendpos[MAX_SEND_POINTS];
+        AoeSpotsVec _aoeSpots;
 
         uint32 _botCommandState;
         uint8 _botAwaitState;
