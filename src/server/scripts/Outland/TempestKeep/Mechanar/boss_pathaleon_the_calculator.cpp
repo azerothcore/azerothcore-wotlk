@@ -58,6 +58,14 @@ struct boss_pathaleon_the_calculator : public BossAI
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
     }
+    
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) >= 4)
+        {
+            BossAI::MoveInLineOfSight(who);
+        }
+    }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
