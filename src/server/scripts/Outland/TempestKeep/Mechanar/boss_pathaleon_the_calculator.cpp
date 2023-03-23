@@ -144,7 +144,6 @@ struct boss_pathaleon_the_calculator : public BossAI
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 }).Schedule(25s, [this](TaskContext)
                 {
-                    LOG_ERROR("sql.sql", "searching");
                     DoZoneInCombat();
                 });
             }
