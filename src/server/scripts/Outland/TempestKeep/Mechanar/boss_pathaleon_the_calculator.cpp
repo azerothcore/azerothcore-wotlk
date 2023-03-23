@@ -114,7 +114,7 @@ struct boss_pathaleon_the_calculator : public BossAI
             }
             context.Repeat(30s);
         });
- 
+
         if (IsHeroic())
         {
             scheduler.Schedule(8s, [this](TaskContext context)
