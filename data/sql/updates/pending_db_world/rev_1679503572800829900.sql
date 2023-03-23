@@ -544,7 +544,6 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 	Scripted Movement
 */
 
--- Dreghood Slaves run this when freed
 -- Pathing for Dreghood Slave Entry: 17799
 DELETE FROM `waypoints` WHERE `entry`=1779900 AND `point_comment`='Dreghood Slave - Escape';
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
@@ -557,16 +556,6 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1779900,7,-98.12532,-330.5687,-7.8259435,NULL,'Dreghood Slave - Escape'),
 (1779900,8,-90.69756,-316.37994,-7.7673373,NULL,'Dreghood Slave - Escape'),
 (1779900,9,-90.356445,-283.37686,-7.7673373,NULL,'Dreghood Slave - Escape');
--- 0x2041F844201161C000429F00051B89CF .go xyz -184.5388 -261.0958 -7.75556
-
--- Assist me slaves! 18972
--- Data Set: Faction 16 -> Attack
--- Data Set: 20:06:28.420 Stop Attack
--- Flags: 524368 FactionTemplate: 190
--- 18707 - 18713 (14) (5)
--- Wait 1200ms
--- Run above WPs
--- Despawn in 1s
 
 DELETE FROM `creature_text` WHERE `CreatureID`=17799 AND `GroupID`=0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
