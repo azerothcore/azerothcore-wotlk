@@ -38,6 +38,7 @@ enum Spells
     SPELL_MANA_TAP                  = 36021,
     SPELL_DOMINATION                = 35280,
     SPELL_ETHEREAL_TELEPORT         = 34427,
+    SPELL_GREATER_INVISIBILITY      = 34426,
     SPELL_SUMMON_NETHER_WRAITH_1    = 35285,
     SPELL_SUMMON_NETHER_WRAITH_2    = 35286,
     SPELL_SUMMON_NETHER_WRAITH_3    = 35287,
@@ -57,6 +58,16 @@ struct boss_pathaleon_the_calculator : public BossAI
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
+    }
+
+    void Reset() override
+    {
+        _Reset();
+
+        if (instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) < 4)
+        {
+            DoCastSelf(SPELL_GREATER_INVISIBILITY);
+        }
     }
 
     bool CanAIAttack(Unit const* /*target*/) const override
@@ -125,8 +136,8 @@ struct boss_pathaleon_the_calculator : public BossAI
 
             if (mobCount >= 4)
             {
-                Talk(SAY_APPEAR);
                 DoCastSelf(SPELL_ETHEREAL_TELEPORT);
+                Talk(SAY_APPEAR);
 
                 scheduler.Schedule(2s, [this](TaskContext)
                 {
