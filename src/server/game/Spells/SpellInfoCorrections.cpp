@@ -4495,6 +4495,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
     });
 
+    // Poultryized!
+    ApplySpellFix({ 30504 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
