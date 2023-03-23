@@ -415,6 +415,25 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
         player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
+
+    if (m->HasItems())
+    {
+        for (MailItemInfoVec::iterator itr = m->items.begin(); itr != m->items.end(); ++itr)
+        {
+            Item* item = player->GetMItem(itr->item_guid);
+            if (item && !sScriptMgr->CanSendMail(player, ObjectGuid(HighGuid::Player, m->sender), mailbox, m->subject, m->body, m->money, m->COD, item))
+            {
+                player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
+                return;
+            }
+        }
+    }
+    else if (!sScriptMgr->CanSendMail(player, ObjectGuid(HighGuid::Player, m->sender), mailbox, m->subject, m->body, m->money, m->COD, nullptr))
+    {
+        player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
+        return;
+    }
+
     //we can return mail now
     //so firstly delete the old one
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
