@@ -37,8 +37,8 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+28 , 17721, 545, 3715, 3715, 3, 1, 8.37782, -204.823, -22.3658, 4.27606, 86400, 0, 0, 46924),
 (@CGUID+29 , 17721, 545, 3715, 3715, 3, 1, 14.2811, -213.334, -22.3567, 3.4383, 86400, 0, 0, 46924),
 (@CGUID+30 , 17721, 545, 3715, 3715, 3, 1, 8.40569, -147.05, -21.8826, 3.87463, 86400, 0, 0, 46924),
-(@CGUID+31 , 17721, 545, 3715, 3715, 3, 1, -42.0492, -372.102, -7.41123, 6.07375, 86400, 0, 0, 46924),
-(@CGUID+32 , 17721, 545, 3715, 3715, 3, 1, -50.1679, -382.556, -7.40377, 4.41568, 86400, 0, 0, 46924),
+(@CGUID+31 , 17721, 545, 3715, 3715, 3, 2, -42.0492, -372.102, -7.41123, 6.07375, 86400, 0, 0, 46924),
+(@CGUID+32 , 17721, 545, 3715, 3715, 3, 2, -50.1679, -382.556, -7.40377, 4.41568, 86400, 0, 0, 46924),
 (@CGUID+33 , 17722, 545, 3715, 3715, 3, 1, -85.8321, -276.48, -7.67224, 1.5708, 86400, 0, 0, 46924),
 (@CGUID+34 , 17722, 545, 3715, 3715, 3, 1, -94.5917, -277.669, -7.67224, 1.39626, 86400, 0, 0, 46924),
 (@CGUID+35 , 17722, 545, 3715, 3715, 3, 1, -49.2924, -211.491, -18.5854, 4.69494, 86400, 0, 0, 46924),
@@ -183,7 +183,10 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+174, 21696, 545, 3715, 3715, 3, 0, -12.0575, -161.064, -22.6888, 5.07313, 86400, 0, 0, 46924);
 
 -- Coilfang Engineer Equipment (Formerly Item 2023)
-UPDATE `creature_equip_template` SET `ItemID1` = 1903 WHERE (`CreatureID` = 17721);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 17721);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `VerifiedBuild`) VALUES
+(17721, 1, 1903, 46924),
+(17721, 2, 2023, 46924);
 
 -- Stealth Detection Auras
 UPDATE `creature_template_addon` SET `bytes2` = 1 WHERE (`entry` IN (17798, 20633));
@@ -619,14 +622,6 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 (20926, 0, 0, 0, 0, 0, 5, '');
 
 -- Main Chambers Door RP
-UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 183049;
-DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 183049);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(183049, 1, 0, 1, 70, 0, 100, 0, 2, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, @CGUID+71, 17800, 0, 0, 0, 0, 0, 0, 'Main Chambers Door - On Gameobject State Changed - Set Data 1 1 to Sally Out Event'),
-(183049, 1, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, @CGUID+72, 17800, 0, 0, 0, 0, 0, 0, 'Main Chambers Door - On Gameobject State Changed - Set Data 1 1 to Sally Out Event'),
-(183049, 1, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, @CGUID+116, 17803, 0, 0, 0, 0, 0, 0, 'Main Chambers Door - On Gameobject State Changed - Set Data 1 1 to Sally Out Event'),
-(183049, 1, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, @CGUID+40, 17722, 0, 0, 0, 0, 0, 0, 'Main Chambers Door - On Gameobject State Changed - Set Data 1 1 to Sally Out Event');
-
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (-(@CGUID+71),-(@CGUID+72),-(@CGUID+116),-(@CGUID+40)));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-(@CGUID+71), 0, 0, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon Sally Left - On Aggro - Say Line 0'),
@@ -634,11 +629,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+71), 0, 2, 0, 12, 0, 100, 0, 0, 20, 10000, 10000, 0, 11, 7160, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon Sally Left - Target Between 0-20% Health - Cast \'Execute\''),
 (-(@CGUID+71), 0, 3, 0, 0, 0, 100, 0, 15000, 30000, 30000, 30000, 0, 11, 18765, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon Sally Left - In Combat - Cast \'Sweeping Strikes\''),
 (-(@CGUID+71), 0, 1001, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 4, 90, 0, 0, 0, 2, 10, @CGUID+72, 17800, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon Sally Left - On Data Set 1 1 - Start Follow - Sally Out Event'),
-(-(@CGUID+72), 0, 0, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon Sally Right - On Aggro - Say Line 0'),
-(-(@CGUID+72), 0, 1, 0, 0, 0, 100, 0, 3000, 5000, 5000, 7000, 0, 11, 15496, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon Sally Right - In Combat - Cast \'Cleave\''),
-(-(@CGUID+72), 0, 2, 0, 12, 0, 100, 0, 0, 20, 10000, 10000, 0, 11, 7160, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon Sally Right - Target Between 0-20% Health - Cast \'Execute\''),
-(-(@CGUID+72), 0, 1001, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -94.94731, -410.06146, -7.625664, 0, 'Coilfang Myrmidon Sally Right - On Data Set 1 1 - Move To Position - Sally Out Event'),
-(-(@CGUID+72), 0, 1002, 0, 34, 0, 100, 0, 0, 1, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon Sally Right - On Reached Point 1 - Set Home Position'),
+(-(@CGUID+72), 0, 0, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon - On Aggro - Say Line 0'),
+(-(@CGUID+72), 0, 1, 0, 0, 0, 100, 0, 3000, 5000, 5000, 7000, 0, 11, 15496, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon - In Combat - Cast \'Cleave\''),
+(-(@CGUID+72), 0, 2, 0, 12, 0, 100, 0, 0, 20, 10000, 10000, 0, 11, 7160, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon - Target Between 0-20% Health - Cast \'Execute\''),
+(-(@CGUID+72), 0, 1001, 1002, 10, 0, 100, 1, 0, 90, 0, 0, 1, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -94.9473, -410.061, -7.62566, 0, 'Coilfang Myrmidon - Within 0-90 Range Out of Combat LoS - Move To Position (No Repeat)'),
+(-(@CGUID+72), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 9, 0, 0, 15, 1, 0, 0, 0, 0, 'Coilfang Myrmidon - Within 0-90 Range Out of Combat LoS - Set Data 1 1 (No Repeat)'), -- This is hacked, they should move immediately once the door opens. Not only I think moving in sight of players is better, though, I also didn't manage to trigger from the gob using only SAI
+(-(@CGUID+72), 0, 1003, 0, 34, 0, 100, 0, 0, 1, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon - On Reached Point 1 - Set Home Position'),
+(-(@CGUID+72), 0, 1004, 0, 11, 0, 100, 512, 0, 0, 0, 0, 0, 121, 90, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Myrmidon - On Respawn - Set Sight Distance to 90y'),
 (-(@CGUID+116), 0, 0, 0, 0, 0, 100, 2, 5000, 8000, 13000, 16000, 0, 11, 22582, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Oracle Sally Left - In Combat - Cast \'Frost Shock\' (Normal Dungeon)'),
 (-(@CGUID+116), 0, 1, 0, 0, 0, 100, 4, 5000, 8000, 13000, 16000, 0, 11, 37865, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Oracle Sally Left - In Combat - Cast \'Frost Shock\' (Heroic Dungeon)'),
 (-(@CGUID+116), 0, 2, 0, 74, 0, 100, 2, 0, 40, 9000, 14000, 40, 11, 22883, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Oracle Sally Left - On Friendly Between 0-40% Health - Cast \'Heal\' (Normal Dungeon)'),
@@ -664,3 +661,100 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@OGUID+1, 184125, 545, 3715, 3715, 3, 1, 98.8156890869140625, -316.336395263671875, -6.68396186828613281, 4.799657344818115234, 0, 0, -0.67558956146240234, 0.737277925014495849, 86400, 255, 1, 43400),
 (@OGUID+2, 184126, 545, 3715, 3715, 3, 1, -332.350006103515625, -117.158683776855468, -6.70766210556030273, 0.261798173189163208, 0, 0, 0.130525588989257812, 0.991444945335388183, 86400, 255, 1, 43400),
 (@OGUID+3, 182197, 545, 3715, 3715, 3, 1, 19.60387611389160156, -304.913726806640625, -66.1715011596679687, 6.108653545379638671, 0, 0, -0.08715534210205078, 0.996194720268249511, 86400, 255, 1, 43400);
+
+-- Static Linking
+DELETE FROM `creature_formations` WHERE `groupAI` IN (3, 27) AND `leaderGUID` IN (@CGUID+22,@CGUID+23,@CGUID+26,@CGUID+28,@CGUID+30,@CGUID+31,@CGUID+36,@CGUID+37,@CGUID+41,@CGUID+42,@CGUID+43,@CGUID+44,@CGUID+61,@CGUID+63,@CGUID+72,@CGUID+80,@CGUID+86,@CGUID+102,@CGUID+103,@CGUID+110,@CGUID+117,@CGUID+120,@CGUID+139,@CGUID+140) AND `memberGUID` IN (@CGUID+21,@CGUID+22,@CGUID+23,@CGUID+24,@CGUID+25,@CGUID+26,@CGUID+27,@CGUID+28,@CGUID+29,@CGUID+30,@CGUID+31,@CGUID+32,@CGUID+33,@CGUID+34,@CGUID+36,@CGUID+37,@CGUID+38,@CGUID+40,@CGUID+41,@CGUID+42,@CGUID+43,@CGUID+44,@CGUID+61,@CGUID+62,@CGUID+63,@CGUID+64,@CGUID+65,@CGUID+66,@CGUID+67,@CGUID+70,@CGUID+71,@CGUID+72,@CGUID+73,@CGUID+74,@CGUID+75,@CGUID+76,@CGUID+77,@CGUID+78,@CGUID+79,@CGUID+80,@CGUID+82,@CGUID+83,@CGUID+84,@CGUID+86,@CGUID+87,@CGUID+89,@CGUID+90,@CGUID+91,@CGUID+92,@CGUID+93,@CGUID+94,@CGUID+95,@CGUID+96,@CGUID+98,@CGUID+99,@CGUID+100,@CGUID+101,@CGUID+102,@CGUID+103,@CGUID+106,@CGUID+110,@CGUID+111,@CGUID+112,@CGUID+113,@CGUID+114,@CGUID+115,@CGUID+116,@CGUID+117,@CGUID+118,@CGUID+119,@CGUID+120,@CGUID+122,@CGUID+124,@CGUID+125,@CGUID+126,@CGUID+127,@CGUID+128,@CGUID+139,@CGUID+140,@CGUID+141,@CGUID+142,@CGUID+143,@CGUID+144,@CGUID+145,@CGUID+146,@CGUID+147,@CGUID+148,@CGUID+149,@CGUID+150,@CGUID+151,@CGUID+152,@CGUID+153,@CGUID+154);
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
+(@CGUID+103, @CGUID+103, 3),
+(@CGUID+103, @CGUID+21, 3),
+(@CGUID+103, @CGUID+25, 3),
+(@CGUID+30, @CGUID+30, 3),
+(@CGUID+30, @CGUID+95, 3),
+(@CGUID+30, @CGUID+114, 3),
+(@CGUID+30, @CGUID+83, 3),
+(@CGUID+110, @CGUID+110, 3),
+(@CGUID+110, @CGUID+77, 3),
+(@CGUID+110, @CGUID+79, 3),
+(@CGUID+22, @CGUID+22, 3),
+(@CGUID+22, @CGUID+84, 3),
+(@CGUID+22, @CGUID+99, 3),
+(@CGUID+26, @CGUID+26, 3),
+(@CGUID+26, @CGUID+96, 3),
+(@CGUID+26, @CGUID+112, 3),
+(@CGUID+26, @CGUID+27, 3),
+(@CGUID+28, @CGUID+28, 3),
+(@CGUID+28, @CGUID+29, 3),
+(@CGUID+28, @CGUID+100, 3),
+(@CGUID+28, @CGUID+111, 3),
+(@CGUID+23, @CGUID+23, 3),
+(@CGUID+23, @CGUID+78, 3),
+(@CGUID+23, @CGUID+101, 3),
+(@CGUID+23, @CGUID+24, 3),
+(@CGUID+86, @CGUID+86, 3),
+(@CGUID+86, @CGUID+87, 3),
+(@CGUID+86, @CGUID+115, 3),
+(@CGUID+86, @CGUID+106, 3),
+(@CGUID+80, @CGUID+80, 3),
+(@CGUID+80, @CGUID+98, 3),
+(@CGUID+80, @CGUID+82, 3),
+(@CGUID+80, @CGUID+113, 3),
+(@CGUID+44, @CGUID+44, 27),
+(@CGUID+44, @CGUID+124, 27),
+(@CGUID+44, @CGUID+125, 27),
+(@CGUID+61, @CGUID+61, 3),
+(@CGUID+61, @CGUID+62, 3),
+(@CGUID+102, @CGUID+102, 3),
+(@CGUID+102, @CGUID+33, 3),
+(@CGUID+102, @CGUID+34, 3),
+(@CGUID+37, @CGUID+37, 3),
+(@CGUID+37, @CGUID+91, 3),
+(@CGUID+37, @CGUID+67, 3),
+(@CGUID+37, @CGUID+66, 3),
+(@CGUID+36, @CGUID+36, 3),
+(@CGUID+36, @CGUID+90, 3),
+(@CGUID+36, @CGUID+89, 3),
+(@CGUID+36, @CGUID+64, 3),
+(@CGUID+31, @CGUID+31, 3),
+(@CGUID+31, @CGUID+32, 3),
+(@CGUID+31, @CGUID+38, 3),
+(@CGUID+31, @CGUID+70, 3),
+(@CGUID+63, @CGUID+63, 3),
+(@CGUID+63, @CGUID+65, 3),
+(@CGUID+120, @CGUID+120, 3),
+(@CGUID+120, @CGUID+122, 3),
+(@CGUID+139, @CGUID+139, 3),
+(@CGUID+139, @CGUID+146, 3),
+(@CGUID+139, @CGUID+143, 3),
+(@CGUID+139, @CGUID+145, 3),
+(@CGUID+139, @CGUID+147, 3),
+(@CGUID+139, @CGUID+149, 3),
+(@CGUID+139, @CGUID+154, 3),
+(@CGUID+139, @CGUID+144, 3),
+(@CGUID+140, @CGUID+140, 3),
+(@CGUID+140, @CGUID+152, 3),
+(@CGUID+140, @CGUID+142, 3),
+(@CGUID+140, @CGUID+150, 3),
+(@CGUID+140, @CGUID+153, 3),
+(@CGUID+140, @CGUID+151, 3),
+(@CGUID+140, @CGUID+141, 3),
+(@CGUID+140, @CGUID+148, 3),
+(@CGUID+43, @CGUID+43, 3),
+(@CGUID+43, @CGUID+127, 3),
+(@CGUID+43, @CGUID+126, 3),
+(@CGUID+43, @CGUID+128, 3),
+(@CGUID+72, @CGUID+72, 3),
+(@CGUID+72, @CGUID+116, 3),
+(@CGUID+72, @CGUID+71, 3),
+(@CGUID+72, @CGUID+40, 3),
+(@CGUID+117, @CGUID+117, 3),
+(@CGUID+117, @CGUID+74, 3),
+(@CGUID+117, @CGUID+73, 3),
+(@CGUID+117, @CGUID+92, 3),
+(@CGUID+41, @CGUID+41, 3),
+(@CGUID+41, @CGUID+75, 3),
+(@CGUID+41, @CGUID+118, 3),
+(@CGUID+41, @CGUID+93, 3),
+(@CGUID+42, @CGUID+42, 3),
+(@CGUID+42, @CGUID+76, 3),
+(@CGUID+42, @CGUID+94, 3),
+(@CGUID+42, @CGUID+119, 3);
