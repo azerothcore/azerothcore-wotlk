@@ -146,8 +146,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 DELETE FROM `pool_gameobject` WHERE `description` LIKE 'The Steamvault%' AND `guid` BETWEEN @OGUID+2 AND @OGUID+50 AND `pool_entry` BETWEEN @POOL+0 AND @POOL+14;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@OGUID+2 , @POOL+0, 0 , 'The Steamvault - Ragveil'),
-(@OGUID+4 , @POOL+1, 40, 'The Steamvault - Flame Cap'),
-(@OGUID+3 , @POOL+0, 0 , 'The Steamvault - Ragveil'),
+(@OGUID+4 , @POOL+0, 40, 'The Steamvault - Flame Cap'),
+(@OGUID+3 , @POOL+1, 0 , 'The Steamvault - Ragveil'),
 (@OGUID+5 , @POOL+1, 40, 'The Steamvault - Flame Cap'),
 (@OGUID+18, @POOL+2, 0 , 'The Steamvault - Fel Iron Deposit'),
 (@OGUID+20, @POOL+3, 0 , 'The Steamvault - Fel Iron Deposit'),
