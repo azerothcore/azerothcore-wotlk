@@ -21,6 +21,9 @@ struct Position;
 
 enum LocaleConstant;
 
+constexpr float MIN_WANDER_NODE_DISTANCE = VISIBILITY_DISTANCE_NORMAL * 0.5f;
+constexpr float MAX_WANDER_NODE_DISTANCE = SIZE_OF_GRIDS * 1.5f;
+
 enum NpcBotDataUpdateType
 {
     NPCBOT_UPDATE_OWNER                 = 1,
@@ -178,11 +181,8 @@ class BotDataMgr
         static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
         static TeamId GetTeamForFaction(uint32 factionTemplateId);
         static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId);
-        static std::pair<uint32, Position const*> GetNextWanderNode(uint32 mapId, uint32 curNodeId, uint32 lastNodeId, uint8 lvl, Creature const* bot);
-        static uint32 GetClosestWanderNodeId(WorldLocation const* loc);
-        static Position GetWanderMapNodePosition(uint32 mapId, uint32 nodeId);
-        static std::string GetWanderMapNodeName(uint32 mapId, uint32 nodeId);
-        static std::pair<uint8, uint8> GetWanderMapNodeLevels(uint32 mapId, uint32 nodeId);
+        static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* curPos, uint32 faction, uint32 lvl);
+        static WanderNode const* GetClosestWanderNode(WorldLocation const* loc);
 
         static std::shared_mutex* GetLock();
 
