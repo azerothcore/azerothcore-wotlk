@@ -2499,7 +2499,7 @@ public:
             return false;
         }
 
-        if (teamid && !(*teamid >= uint8(TEAM_ALLIANCE) && *teamid <= uint8(TEAM_NEUTRAL)))
+        if (teamid && *teamid > uint8(TEAM_NEUTRAL))
         {
             handler->PSendSysMessage("Unknown team %u", uint32(*teamid));
             handler->SetSentErrorMessage(true);
