@@ -1,3 +1,4 @@
+-- DB update 2023_03_24_00 -> 2023_03_24_01
 SET @ENTRY := 18869;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
