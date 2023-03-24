@@ -63,6 +63,7 @@ enum SpellIds
 
 enum DataIndex
 {
+    DATA_BRIDGE_MOB_DEATH_COUNT,
     MAX_DATA_INDEXES
 };
 

@@ -37,10 +37,17 @@ enum Spells
     SPELL_ARCANE_TORRENT            = 36022,
     SPELL_MANA_TAP                  = 36021,
     SPELL_DOMINATION                = 35280,
+    SPELL_ETHEREAL_TELEPORT         = 34427,
+    SPELL_GREATER_INVISIBILITY      = 34426,
     SPELL_SUMMON_NETHER_WRAITH_1    = 35285,
     SPELL_SUMMON_NETHER_WRAITH_2    = 35286,
     SPELL_SUMMON_NETHER_WRAITH_3    = 35287,
     SPELL_SUMMON_NETHER_WRAITH_4    = 35288,
+};
+
+enum Misc
+{
+    ACTION_BRIDGE_MOB_DEATH = 1, // Used by SAI
 };
 
 struct boss_pathaleon_the_calculator : public BossAI
@@ -51,6 +58,21 @@ struct boss_pathaleon_the_calculator : public BossAI
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
+    }
+
+    void Reset() override
+    {
+        _Reset();
+
+        if (instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) < 4)
+        {
+            DoCastSelf(SPELL_GREATER_INVISIBILITY);
+        }
+    }
+
+    bool CanAIAttack(Unit const* /*target*/) const override
+    {
+        return instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) >= 4;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -86,16 +108,46 @@ struct boss_pathaleon_the_calculator : public BossAI
             context.Repeat(15s);
         }).Schedule(25s, [this](TaskContext context)
         {
-            Talk(SAY_DOMINATION);
-            DoCastRandomTarget(SPELL_DOMINATION, 1, 50.0f);
+            if (DoCastRandomTarget(SPELL_DOMINATION, 1, 50.0f) == SPELL_CAST_OK)
+            {
+                Talk(SAY_DOMINATION);
+            }
             context.Repeat(30s);
-        }).Schedule(8s, [this](TaskContext context)
-        {
-            DoCastAOE(SPELL_ARCANE_EXPLOSION);
-            context.Repeat(12s);
         });
 
+        if (IsHeroic())
+        {
+            scheduler.Schedule(8s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+                context.Repeat(12s);
+            });
+        }
+
         Talk(SAY_AGGRO);
+    }
+
+    void DoAction(int32 actionId) override
+    {
+        if (actionId == ACTION_BRIDGE_MOB_DEATH)
+        {
+            uint8 mobCount = instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT);
+            instance->StorePersistentData(DATA_BRIDGE_MOB_DEATH_COUNT, ++mobCount);
+
+            if (mobCount >= 4)
+            {
+                DoCastSelf(SPELL_ETHEREAL_TELEPORT);
+                Talk(SAY_APPEAR);
+
+                scheduler.Schedule(2s, [this](TaskContext)
+                {
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+                }).Schedule(25s, [this](TaskContext)
+                {
+                    DoZoneInCombat();
+                });
+            }
+        }
     }
 
     void KilledUnit(Unit* victim) override
