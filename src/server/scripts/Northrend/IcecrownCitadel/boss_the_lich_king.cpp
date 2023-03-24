@@ -844,6 +844,11 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
+            if (summon->GetEntry() == NPC_HIGHLORD_TIRION_FORDRING_LK)
+            {
+                return;
+            }
+
             switch (summon->GetEntry())
             {
                 case NPC_SHAMBLING_HORROR:
