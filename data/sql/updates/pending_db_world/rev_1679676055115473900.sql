@@ -4,6 +4,14 @@ INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpell
 (33480, 33480, 38226),
 (32863, 32863, 38252);
 
+-- BroadcastID
+UPDATE `creature_text` SET `BroadcastTextId` = 16798 WHERE `Text` = 'Ruin finds us all!';
+UPDATE `creature_text` SET `BroadcastTextId` = 16799 WHERE `Text` = 'In Sargeras\' name!';
+UPDATE `creature_text` SET `BroadcastTextId` = 16800 WHERE `Text` = 'The end comes for you!';
+UPDATE `creature_text` SET `BroadcastTextId` = 16801 WHERE `Text` = 'I do as I must!';
+UPDATE `creature_text` SET `BroadcastTextId` = 16802 WHERE `Text` = 'The Legion reigns!';
+UPDATE `creature_text` SET `BroadcastTextId` = 16803 WHERE `Text` = 'I shall be rewarded!';
+
 -- Cabal Cultist (18631)
 UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '8876' WHERE (`entry` = 18631); -- This is from ACID / TC - I don't believe this creature uses an aura
 DELETE FROM `creature_template_addon` WHERE (`entry` = 20640);
@@ -63,6 +71,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18634, 0, 8, 0, 17, 0, 100, 0, 19209, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Summoner - On Summoned Unit - Say Line 4');
 
 -- Cabal Deathsworn (18635)
+DELETE FROM `creature_text` WHERE `CreatureID`=18635 AND `GroupID`=1;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (18635, 1, 0, '%s goes into a frenzy!', 16, 0, 100, 0, 0, 0, 2384, 0, 'Cabal Deathsworn');
+
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18635);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (18635, 0, 0, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Aggro - Say Line 0'),
@@ -190,14 +201,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18796, 0, 4, 0, 0, 0, 100, 0, 13300, 18900, 15700, 26500, 0, 11, 30471, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel Overseer - In Combat - Cast \'Uppercut\'');
 
 -- Tortured Skeleton
-DELETE FROM `creature_template_addon` WHERE (`entry` = 20662);
-INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(20662, 0, 0, 7, 1, 0, 0, '');
+UPDATE `creature_template` SET `unit_flags`=`unit_flags`|33587200 WHERE (`entry` IN (18797, 20662));
+
+DELETE FROM `creature_template_addon` WHERE (`entry` IN (18797, 20662));
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18797);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18797, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tortured Skeleton - On Aggro - Remove Flag Standstate Dead'),
-(18797, 0, 1, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tortured Skeleton - On Aggro - Remove Flag Not Selectable');
+(18797, 0, 0, 1, 4, 0, 100, 0, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tortured Skeleton - On Aggro - Remove FlagStandstate Dead'),
+(18797, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 19, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tortured Skeleton - On Aggro - Remove Flags Not Selectable'),
+(18797, 0, 2, 3, 25, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tortured Skeleton - On Reset - Set Flags Not Selectable'),
+(18797, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tortured Skeleton - On Reset - Set Flag Standstate Dead');
 
 -- Cabal Fanatic (18830)
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18830);
@@ -240,7 +253,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (19209, 0, 3, 4, 2, 0, 100, 1, 0, 25, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Cabal Deathsworn - Between 0-25% Health - Cast \'Enrage\' (No Repeat)'),
 (19209, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Cabal Deathsworn - On Link - Say Line 0'),
 (19209, 0, 5, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Cabal Deathsworn - On Evade - Despawn (0)'),
-(19209, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 146, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Cabal Deathsworn - On Evade - Set Flag Not Selectable');
+(19209, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Cabal Deathsworn - On Evade - Set Flag Not Selectable');
 
 -- Summoned Cabal Acolyte (19208)
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19208);
@@ -253,4 +266,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (19208, 0, 5, 0, 74, 0, 100, 4, 0, 50, 13200, 19300, 40, 11, 38210, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Cabal Acolyte - On Friendly Between 0-50% Health - Cast \'Renew\' (Heroic Dungeon)'),
 (19208, 0, 6, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Cabal Acolyte - Between 0-15% Health - Flee For Assist (No Repeat)'),
 (19208, 0, 7, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Cabal Acolyte - On Evade - Despawn (0)'),
-(19208, 0, 8, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 146, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Cabal Acolyte - On Evade - Set Flag Not Selectable');
+(19208, 0, 8, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Cabal Acolyte - On Evade - Set Flag Not Selectable');
