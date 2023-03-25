@@ -1970,7 +1970,7 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
     }
 
     ASSERT(!links.empty());
-    return links.size() == 1u ? links.front() : Trinity::Containers::SelectRandomContainerElement(links);
+    return links.size() == 1u ? links.front() : Acore::Containers::SelectRandomContainerElement(links);
 }
 
 WanderNode const* BotDataMgr::GetClosestWanderNode(WorldLocation const* loc)

@@ -16730,10 +16730,10 @@ void bot_ai::Evade()
 
     if (IsWanderer())
     {
-        if (mapid != me->GetMap()->GetEntry()->ID || me->GetExactDist2d(pos) > MAX_WANDER_NODE_DISTANCE ||
+        if (mapid != me->GetMap()->GetEntry()->MapID || me->GetExactDist2d(pos) > MAX_WANDER_NODE_DISTANCE ||
             (me->GetExactDist2d(pos) < 20.0f && me->GetExactDist(pos) > 100.0f))
         {
-            TC_LOG_DEBUG("npcbots", "Bot %s id %u class %u level %u map %u TELEPORTING to node %u ('%s') map %u, %s, dist %.1f yd!",
+            LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} map {} TELEPORTING to node {} ('{}') map {}, {}, dist {} yd!",
                 me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), me->GetMapId(), _travel_node_cur->GetWPId(),
                 _travel_node_cur->GetName().c_str(), uint32(mapid), pos.ToString().c_str(), me->GetExactDist(pos));
 
