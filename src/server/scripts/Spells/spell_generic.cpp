@@ -4792,6 +4792,41 @@ class spell_freezing_circle : public SpellScript
     }
 };
 
+enum Threshalisk
+{
+    SPELL_THRESHALISK_CHARGE = 35385,
+    SPELL_RUSHING_CHARGE     = 35382,
+};
+
+class spell_gen_threshalisk_charge : public SpellScript
+{
+    PrepareSpellScript(spell_gen_threshalisk_charge);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_THRESHALISK_CHARGE });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Creature* caster = GetCaster()->ToCreature())
+        {
+            if (Unit* victim = caster->GetVictim())
+            {
+                if (caster->GetReactState() != REACT_PASSIVE)
+                {
+                    caster->CastSpell(victim, GetSpellInfo()->Effects[EFFECT_1].TriggerSpell, true);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_threshalisk_charge::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4934,4 +4969,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq40", SPELL_VEKNISS_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
     RegisterSpellScript(spell_gen_basic_campfire);
     RegisterSpellScript(spell_freezing_circle);
+    RegisterSpellScript(spell_gen_threshalisk_charge);
 }
