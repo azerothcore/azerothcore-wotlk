@@ -77,7 +77,7 @@ struct boss_mechano_lord_capacitus : public BossAI
                 SPELL_SUMMON_NETHER_CHARGE_SE,
                 SPELL_SUMMON_NETHER_CHARGE_SW);
             DoCastAOE(spellId);
-            IsHeroic() ? context.Repeat(2s, 5s) : context.Repeat(9s, 11s);
+            context.Repeat(2400ms, 3600ms);
         }).Schedule(3min, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_BERSERK, true);
