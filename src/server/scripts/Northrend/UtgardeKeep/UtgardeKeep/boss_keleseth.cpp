@@ -29,6 +29,7 @@ enum eTexts
     SAY_SUMMON_SKELETONS                = 2,
     SAY_FROST_TOMB_EMOTE                = 4,
     SAY_DEATH                           = 5,
+    SAY_KILL                            = 6,
 };
 
 enum eNPCs
@@ -140,14 +141,13 @@ public:
                 pInstance->SetData(DATA_KELESETH, NOT_STARTED);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) override {}
-
-        /*void KilledUnit(Unit * victim)
+        void KilledUnit(Unit* victim) override
         {
-            if (victim == me)
-                return;
-            DoScriptText(SAY_KILL, me);
-        }*/
+            if (victim->IsPlayer())
+            {
+                Talk(SAY_KILL);
+            }
+        }
 
         void JustDied(Unit* /*killer*/) override
         {
