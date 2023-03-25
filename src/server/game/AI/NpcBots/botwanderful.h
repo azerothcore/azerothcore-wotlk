@@ -17,12 +17,14 @@ class Creature;
 
 enum class BotWPFlags : uint32
 {
-    BOTWP_FLAG_NONE             = 0x00000000,
-    BOTWP_FLAG_SPAWN            = 0x00000001,
-    BOTWP_FLAG_ALLIANCE_ONLY    = 0x00000002,
-    BOTWP_FLAG_HORDE_ONLY       = 0x00000004,
-    BOTWP_FLAG_CAN_BACKTRACK_TO = 0x00000008, //unused
-    BOTWP_FLAG_END              = 0x00000010
+    BOTWP_FLAG_NONE                     = 0x00000000,
+    BOTWP_FLAG_SPAWN                    = 0x00000001,
+    BOTWP_FLAG_ALLIANCE_ONLY            = 0x00000002,
+    BOTWP_FLAG_HORDE_ONLY               = 0x00000004,
+    BOTWP_FLAG_CAN_BACKTRACK_TO         = 0x00000008, //unused
+    BOTWP_FLAG_END                      = 0x00000010,
+
+    BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY   = BOTWP_FLAG_ALLIANCE_ONLY | BOTWP_FLAG_HORDE_ONLY
 };
 
 class WanderNode : public Position

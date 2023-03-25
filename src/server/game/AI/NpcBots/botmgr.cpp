@@ -943,6 +943,7 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
 {
     ASSERT(bot->GetBotAI());
     bot->GetBotAI()->AbortTeleport();
+    bot->GetBotAI()->SetInDuringTeleport(true);
 
     bot->GetBotAI()->KillEvents(true);
 
@@ -993,6 +994,7 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
             bot->GetMap()->AddToMap(bot);
             if (reset)
                 bot->GetBotAI()->Reset();
+            bot->GetBotAI()->SetInDuringTeleport(false);
             return;
         }
 
@@ -1008,7 +1010,7 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
     });
 }
 
-void BotMgr::TeleportBot(Creature* bot, Map* newMap, Position* pos, bool quick, bool reset)
+void BotMgr::TeleportBot(Creature* bot, Map* newMap, Position const* pos, bool quick, bool reset)
 {
     _teleportBot(bot, newMap, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation(), quick, reset);
 }

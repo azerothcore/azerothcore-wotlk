@@ -431,7 +431,7 @@ public:
                     return;
             }
             //ICY VEINS (no GCD)
-            if (IsSpellReady(ICY_VEINS_1, diff, false) && GetManaPCT(me) > 20 &&
+            if (IsSpellReady(ICY_VEINS_1, diff, false) && me->IsInCombat() && GetManaPCT(me) > 20 &&
                 (mytar->GetMaxHealth() > master->GetMaxHealth() * 2 ||
                 (mytar->GetTypeId() == TYPEID_UNIT && mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)) &&
                 Rand() < 45)
@@ -440,7 +440,7 @@ public:
                     return;
             }
             //ARCANE POWER (no GCD, not with PoM)
-            if (IsSpellReady(ARCANE_POWER_1, diff, false) && GetManaPCT(me) > 50 &&
+            if (IsSpellReady(ARCANE_POWER_1, diff, false) && me->IsInCombat() && GetManaPCT(me) > 50 &&
                 (mytar->GetMaxHealth() > master->GetMaxHealth() * 2 ||
                 (mytar->GetTypeId() == TYPEID_UNIT && mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)) &&
                 Rand() < 75 && !me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_MAGE, 0x0, 0x20, 0x0))
@@ -449,7 +449,7 @@ public:
                     return;
             }
             //PRESENCE OF MIND (no GCD, not with AP)
-            if (IsSpellReady(PRESENCE_OF_MIND_1, diff, false) && GetManaPCT(me) > 10 && Rand() < 35 &&
+            if (IsSpellReady(PRESENCE_OF_MIND_1, diff, false) && me->IsInCombat() && GetManaPCT(me) > 10 && Rand() < 35 &&
                 !me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_MAGE, 0x0, 0x80000, 0x0))
             {
                 if (doCast(me, GetSpell(PRESENCE_OF_MIND_1)))

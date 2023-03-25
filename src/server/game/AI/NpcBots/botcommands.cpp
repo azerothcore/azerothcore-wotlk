@@ -2461,7 +2461,7 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotLookupCommand(ChatHandler* handler, Optional<uint8> botclass, Optional <bool> unspawned)
+    static bool HandleNpcBotLookupCommand(ChatHandler* handler, Optional<uint8> botclass, Optional <bool> unspawned, Optional<uint8> teamid)
     {
         //this is just a modified '.lookup creature' command
         if (!botclass)
@@ -2469,6 +2469,7 @@ public:
             handler->SendSysMessage(".npcbot lookup #class #[not_spawned_only]");
             handler->SendSysMessage("按#class（职业ID）查找NpcBots，并返回所有匹配的生物ID。");
             handler->SendSysMessage("如果#not_spawned_only（仅未生成）设置为1，则只显示世界上不存在的NpcBots。");
+            handler->SendSysMessage("如果提供#team_id, 则会按阵营筛选: 联盟 = 0, 部落 = 1, 中立 = 2");
             handler->PSendSysMessage("战士 = %u", uint32(BOT_CLASS_WARRIOR));
             handler->PSendSysMessage("圣骑士 = %u", uint32(BOT_CLASS_PALADIN));
             handler->PSendSysMessage("猎人 = %u", uint32(BOT_CLASS_HUNTER));
@@ -2498,6 +2499,13 @@ public:
             return false;
         }
 
+        if (teamid && *teamid > uint8(TEAM_NEUTRAL))
+        {
+            handler->PSendSysMessage("未知阵营 %u", uint32(*teamid));
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         handler->PSendSysMessage("按职业ID %u 查找NPCBots...", uint32(*botclass));
 
         uint8 localeIndex = handler->GetSessionDbLocaleIndex();
@@ -2522,6 +2530,16 @@ public:
                 continue;
 
             uint8 race = _botExtras->race;
+
+            if (teamid)
+            {
+                ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(race);
+                uint32 faction = rentry ? rentry->FactionID : 14;
+                TeamId team = BotDataMgr::GetTeamForFaction(faction);
+
+                if (*teamid != uint8(team))
+                    continue;
+            }
 
             if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(id))
             {

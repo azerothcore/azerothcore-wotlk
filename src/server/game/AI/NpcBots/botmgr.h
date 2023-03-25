@@ -226,7 +226,7 @@ class AC_GAME_API BotMgr
 
         //TELEPORT BETWEEN MAPS
         //CONFIRMEND UNSAFE (charmer,owner)
-        static void TeleportBot(Creature* bot, Map* newMap, Position* pos, bool quick = false, bool reset = false);
+        static void TeleportBot(Creature* bot, Map* newMap, Position const* pos, bool quick = false, bool reset = false);
 
         AoeSpotsVec const& GetAoeSpots() const { return _aoespots; }
         AoeSpotsVec& GetAoeSpots() { return _aoespots; }

@@ -844,6 +844,11 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
+            if (summon->GetEntry() == NPC_HIGHLORD_TIRION_FORDRING_LK)
+            {
+                return;
+            }
+
             switch (summon->GetEntry())
             {
                 case NPC_SHAMBLING_HORROR:
@@ -3127,11 +3132,6 @@ public:
         {
             if (!summoner)
                 return;
-
-            if (summoner->GetTypeId() != TYPEID_UNIT)
-            {
-                return;
-            }
 
             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
             {

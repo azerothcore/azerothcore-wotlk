@@ -4557,11 +4557,11 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
     });
 
-    // Yogg-Saron - Death Orb - Death Ray Warning Visual & Death Ray Damage Visual
-    ApplySpellFix({ 63882, 63886 }, [](SpellInfo* spellInfo)
-        {
-            spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
-        });
+    // Seed of Corruption
+    ApplySpellFix({ 27285, 47833, 47834 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_REFLECTION;
+    });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {

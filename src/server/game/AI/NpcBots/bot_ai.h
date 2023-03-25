@@ -36,6 +36,7 @@ class Spell;
 class SpellCastTargets;
 class Unit;
 class Vehicle;
+class WanderNode;
 
 class bot_ai : public CreatureAI
 {
@@ -160,11 +161,7 @@ class bot_ai : public CreatureAI
         //wandering bots
         bool IsWanderer() const { return _wanderer; }
         void SetWanderer();
-        uint32 GetTravelNodeCur() const { return _travel_node_cur; }
-        uint32 GetTravelNodeLast() const { return _travel_node_last; }
-        void SetTravelNodeCur(uint32 nodeId) { _travel_node_cur = nodeId; }
-        void SetTravelNodeLast(uint32 nodeId) { _travel_node_last = nodeId; }
-        uint32 GetNextTravelNode(Position& pos) const;
+        WanderNode const* GetNextTravelNode(Position const* from) const;
 
         static bool CCed(Unit const* target, bool root = false);
 
@@ -172,9 +169,10 @@ class bot_ai : public CreatureAI
         void TeleportHome(bool reset);
         bool FinishTeleport(bool reset);
 
-        bool IsDuringTeleport() const { return teleFinishEvent || teleHomeEvent; }
+        bool IsDuringTeleport() const { return teleFinishEvent || teleHomeEvent || _duringTeleport; }
         void SetTeleportFinishEvent(TeleportFinishEvent* tfevent) { ASSERT(!teleFinishEvent); teleFinishEvent = tfevent; }
         void AbortTeleport();
+        void SetInDuringTeleport(bool value) { _duringTeleport = value; }
 
         uint8 GetPlayerClass() const;
         uint8 GetPlayerRace() const;
@@ -648,12 +646,13 @@ class bot_ai : public CreatureAI
         bool firstspawn;
         bool _evadeMode;
         bool _atHome;
+        bool _duringTeleport;
 
         //wandering bots
         bool _wanderer;
         uint8 _baseLevel;
-        uint32 _travel_node_last;
-        uint32 _travel_node_cur;
+        WanderNode const* _travel_node_last;
+        WanderNode const* _travel_node_cur;
         std::vector<std::pair<uint32, std::string>> _travelHistory;
 
         float _energyFraction;

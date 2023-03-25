@@ -19,6 +19,7 @@ enum BotSpells : uint32
     MODEL_TRANSITION                    = 24753,//"Trick" cannot cast or attack
     SUMMONING_DISORIENTATION            = 32752,
     ACTIVATE_SPEC                       = 63645,//Activate Primary Spec
+    WANDERER_HEARTHSTONE                = 54318,//"Hearthsone" no CD
     SHOOT_WAND                          = 5019,
 ///Passives
     DAMAGE_REDUCTION                    = 68066,//Vigilance, Blessing of Sanctuary, etc.
