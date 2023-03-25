@@ -41,9 +41,6 @@ public:
             SetPersistentDataCount(MAX_DATA_INDEXES);
             LoadDoorData(doorData);
 
-            _passageEncounter = 0;
-            _passageTimer = 0;
-            _passageGUIDs.clear();
         }
 
         void OnGameObjectCreate(GameObject* gameObject) override
@@ -80,137 +77,8 @@ public:
                 _pathaleonGUID = creature->GetGUID();
         }
 
-        void OnUnitDeath(Unit* unit) override
-        {
-            if (unit->GetTypeId() == TYPEID_UNIT)
-                if (_passageEncounter > ENCOUNTER_PASSAGE_NOT_STARTED && _passageEncounter < ENCOUNTER_PASSAGE_DONE)
-                    if (_passageGUIDs.find(unit->GetGUID()) != _passageGUIDs.end())
-                        _passageGUIDs.erase(unit->GetGUID());
-        }
-
-        Player* GetPassagePlayer(float x)
-        {
-            Map::PlayerList const& pl = instance->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                if (Player* player = itr->GetSource())
-                    if (player->GetPositionX() < x && player->GetPositionZ() > 24.0f && player->GetPositionY() > -30.0f)
-                        return player;
-            return nullptr;
-        }
-
-        void DoSummonAction(Creature* summon, Player* player)
-        {
-            summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
-            summon->AI()->AttackStart(player);
-            _passageGUIDs.insert(summon->GetGUID());
-        }
-
-        void Update(uint32 diff) override
-        {
-            if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
-                return;
-
-            _passageTimer += diff;
-            if (_passageTimer >= 1000)
-            {
-                _passageTimer = 0;
-                if (_passageEncounter == ENCOUNTER_PASSAGE_NOT_STARTED)
-                {
-                    if (Player* player = GetPassagePlayer(250.0f))
-                    {
-                        _passageEncounter++;
-                        for (uint8 i = 0; i < 4; ++i)
-                        {
-                            Position pos = {238.0f, -27.0f + 3.0f * i, 26.328f, 0.0f};
-                            if (Creature* creature = instance->SummonCreature(i == 1 || i == 2 ? NPC_SUNSEEKER_ASTROMAGE : NPC_BLOODWARDER_CENTURION, pos))
-                                DoSummonAction(creature, player);
-                        }
-                    }
-                }
-
-                if (!_passageGUIDs.empty())
-                    return;
-
-                if (_passageEncounter < ENCOUNTER_PASSAGE_PHASE3)
-                {
-                    if (Player* player = GetPassagePlayer(250.0f))
-                    {
-                        if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE1)
-                        {
-                            Position pos = {214.37f, -23.5f, 24.88f, 0.0f};
-                            if (Creature* creature = instance->SummonCreature(NPC_TEMPEST_KEEPER_DESTROYER, pos))
-                                DoSummonAction(creature, player);
-                        }
-                        else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE2)
-                        {
-                            for (uint8 i = 0; i < 3; ++i)
-                            {
-                                Position pos = {199.76f, -26.0f + 2.5f * i, 24.88f, 0.0f};
-                                if (Creature* creature = instance->SummonCreature(i == 1 ? NPC_SUNSEEKER_ENGINEER : NPC_BLOODWARDER_PHYSICIAN, pos))
-                                    DoSummonAction(creature, player);
-                            }
-                        }
-
-                        StorePersistentData(DATA_INDEX_PASSAGE_ENCOUNTER, _passageEncounter++);
-                        SaveToDB();
-                    }
-                }
-                else
-                {
-                    if (Player* player = GetPassagePlayer(148.0f))
-                    {
-                        if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE3)
-                        {
-                            for (uint8 i = 0; i < 3; ++i)
-                            {
-                                Position pos = {135.0f + 2.5f * i, 36.76f, 24.88f, M_PI * 1.5f};
-                                if (Creature* creature = instance->SummonCreature(i == 1 ? NPC_SUNSEEKER_ASTROMAGE : NPC_BLOODWARDER_PHYSICIAN, pos))
-                                    DoSummonAction(creature, player);
-                            }
-                        }
-                        else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE4)
-                        {
-                            Position pos = {137.62f, 62.23f, 24.88f, M_PI * 1.5f};
-                            if (Creature* creature = instance->SummonCreature(NPC_TEMPEST_KEEPER_DESTROYER, pos))
-                                DoSummonAction(creature, player);
-                        }
-                        else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE5)
-                        {
-                            for (uint8 i = 0; i < 4; ++i)
-                            {
-                                Position pos = {133.0f + 3.5f * i, 92.88f, 26.38f, M_PI * 1.5f};
-                                if (Creature* creature = instance->SummonCreature(i == 1 || i == 2 ? NPC_SUNSEEKER_ASTROMAGE : NPC_SUNSEEKER_ENGINEER, pos))
-                                    DoSummonAction(creature, player);
-                            }
-                        }
-                        else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE6)
-                        {
-                            if (Creature* creature = instance->GetCreature(_pathaleonGUID))
-                                creature->AI()->DoAction(1);
-                        }
-
-                        StorePersistentData(DATA_INDEX_PASSAGE_ENCOUNTER, _passageEncounter++);
-                        SaveToDB();
-                    }
-                }
-            }
-        }
-
-        void ReadSaveDataMore(std::istringstream& /*data*/) override
-        {
-            _passageEncounter = GetPersistentData(DATA_INDEX_PASSAGE_ENCOUNTER);
-
-            if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
-            {
-                _passageEncounter = ENCOUNTER_PASSAGE_PHASE6;
-            }
-        }
-
     private:
         ObjectGuid _pathaleonGUID;
-        uint32 _passageTimer;
-        uint32 _passageEncounter;
-        GuidSet _passageGUIDs;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

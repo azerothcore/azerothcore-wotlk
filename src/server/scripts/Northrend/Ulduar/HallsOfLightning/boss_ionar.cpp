@@ -106,10 +106,10 @@ public:
         {
             events.SetPhase(1);
             if (!spark)
-                events.RescheduleEvent(EVENT_CHECK_HEALTH, 1000, 0, 1);
+                events.RescheduleEvent(EVENT_CHECK_HEALTH, 1s, 0, 1);
 
-            events.RescheduleEvent(EVENT_BALL_LIGHTNING, 10000, 0, 1);
-            events.RescheduleEvent(EVENT_STATIC_OVERLOAD, 5000, 0, 1);
+            events.RescheduleEvent(EVENT_BALL_LIGHTNING, 10s, 0, 1);
+            events.RescheduleEvent(EVENT_STATIC_OVERLOAD, 5s, 0, 1);
         }
 
         void JustEngagedWith(Unit*) override
@@ -171,7 +171,7 @@ public:
             me->SetControlled(true, UNIT_STATE_STUNNED);
 
             events.SetPhase(2);
-            events.ScheduleEvent(EVENT_CALL_SPARKS, 15000, 0, 2);
+            events.ScheduleEvent(EVENT_CALL_SPARKS, 15s, 0, 2);
         }
 
         void UpdateAI(uint32 diff) override
@@ -190,25 +190,25 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_BALL_LIGHTNING_H : SPELL_BALL_LIGHTNING_N, false);
 
-                    events.RepeatEvent(10000 + rand() % 1000);
+                    events.Repeat(10s, 11s);
                     break;
                 case EVENT_STATIC_OVERLOAD:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_H : SPELL_STATIC_OVERLOAD_N, false);
 
-                    events.RepeatEvent(5000 + rand() % 1000);
+                    events.Repeat(5s, 6s);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(HealthCheck))
                         me->CastSpell(me, SPELL_DISPERSE, false);
 
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     return;
                 case EVENT_CALL_SPARKS:
                     {
                         EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
                         summons.DoAction(ACTION_CALLBACK, pred);
-                        events.ScheduleEvent(EVENT_RESTORE, 2000, 0, 2);
+                        events.ScheduleEvent(EVENT_RESTORE, 2s, 0, 2);
                         return;
                     }
                 case EVENT_RESTORE:

@@ -129,12 +129,12 @@ void AutobroadcastMgr::SendAutobroadcasts()
     LOG_DEBUG("autobroadcast", "AutobroadcastMgr::SendAutobroadcasts: '{}'", msg);
 }
 
-void AutobroadcastMgr::SendWorldAnnouncement(std::string_view msg)
+void AutobroadcastMgr::SendWorldAnnouncement(std::string msg)
 {
     sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.data());
 }
 
-void AutobroadcastMgr::SendNotificationAnnouncement(std::string_view msg)
+void AutobroadcastMgr::SendNotificationAnnouncement(std::string msg)
 {
     WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
     data << msg.data();
