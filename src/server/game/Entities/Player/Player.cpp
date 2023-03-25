@@ -824,7 +824,7 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
             {
                 if (!IsAlive())
                     return DISABLED_MIRROR_TIMER;
-                return 2002;
+                return 2020;
             }
         default:
             return 0;
@@ -920,7 +920,7 @@ void Player::HandleDrowning(uint32 time_diff)
             m_MirrorTimer[FIRE_TIMER] -= time_diff;
             if (m_MirrorTimer[FIRE_TIMER] < 0)
             {
-                m_MirrorTimer[FIRE_TIMER] += 2002;
+                m_MirrorTimer[FIRE_TIMER] += 2020;
                 // Calculate and deal damage
                 /// @todo: Check this formula
                 uint32 damage = urand(600, 700);
