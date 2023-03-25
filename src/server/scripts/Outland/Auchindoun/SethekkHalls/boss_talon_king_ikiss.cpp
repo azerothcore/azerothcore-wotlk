@@ -113,6 +113,7 @@ struct boss_talon_king_ikiss : public BossAI
             _comboHealthStages[0] = true;
 
             me->InterruptNonMeleeSpells(false);
+            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             DoCastAOE(SPELL_BLINK);
             Talk(EMOTE_ARCANE_EXP);
 
@@ -122,7 +123,6 @@ struct boss_talon_king_ikiss : public BossAI
             }).Schedule(6500ms, [this](TaskContext /*context*/)
             {
                 me->GetThreatMgr().ResetAllThreat();
-                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             });
         }
 
@@ -131,6 +131,7 @@ struct boss_talon_king_ikiss : public BossAI
             _comboHealthStages[1] = true;
 
             me->InterruptNonMeleeSpells(false);
+            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             DoCastAOE(SPELL_BLINK);
             Talk(EMOTE_ARCANE_EXP);
 
@@ -140,7 +141,6 @@ struct boss_talon_king_ikiss : public BossAI
             }).Schedule(6500ms, [this](TaskContext /*context*/)
             {
                 me->GetThreatMgr().ResetAllThreat();
-                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             });
         }
 
@@ -149,6 +149,7 @@ struct boss_talon_king_ikiss : public BossAI
             _comboHealthStages[2] = true;
 
             me->InterruptNonMeleeSpells(false);
+            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             DoCastAOE(SPELL_BLINK);
             Talk(EMOTE_ARCANE_EXP);
 
@@ -158,7 +159,6 @@ struct boss_talon_king_ikiss : public BossAI
             }).Schedule(6500ms, [this](TaskContext /*context*/)
             {
                 me->GetThreatMgr().ResetAllThreat();
-                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             });
         }
 
