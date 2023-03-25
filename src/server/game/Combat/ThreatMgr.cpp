@@ -353,7 +353,7 @@ HostileReference* ThreatContainer::SelectNextVictim(Creature* attacker, HostileR
         if (!noPriorityTargetFound)
         {
             if (target->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || target->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE) ||
-                target->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, attacker->GetGUID()) || (attacker->HasUnitState(UNIT_STATE_ROOT) && (attacker->m_CombatDistance > 0.f) ? !attacker->IsWithinCombatRange(target, attacker->m_CombatDistance) : !attacker->IsWithinMeleeRange(target)))
+                target->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, attacker->GetGUID()) || (attacker->HasUnitState(UNIT_STATE_ROOT) && ((attacker->m_CombatDistance > 0.f) ? !attacker->IsWithinCombatRange(target, attacker->m_CombatDistance) : !attacker->IsWithinMeleeRange(target))))
             {
                 if (iter != lastRef)
                 {
