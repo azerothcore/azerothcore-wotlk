@@ -824,7 +824,7 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
             {
                 if (!IsAlive())
                     return DISABLED_MIRROR_TIMER;
-                return 1 * IN_MILLISECONDS;
+                return 2020;
             }
         default:
             return 0;
@@ -920,7 +920,7 @@ void Player::HandleDrowning(uint32 time_diff)
             m_MirrorTimer[FIRE_TIMER] -= time_diff;
             if (m_MirrorTimer[FIRE_TIMER] < 0)
             {
-                m_MirrorTimer[FIRE_TIMER] += 1 * IN_MILLISECONDS;
+                m_MirrorTimer[FIRE_TIMER] += 2020;
                 // Calculate and deal damage
                 /// @todo: Check this formula
                 uint32 damage = urand(600, 700);
@@ -9183,32 +9183,47 @@ Pet* Player::CreatePet(uint32 creatureEntry, uint32 spellID /*= 0*/)
     return pet;
 }
 
-void Player::StopCastingCharm()
+void Player::StopCastingCharm(Aura* except /*= nullptr*/)
 {
     Unit* charm = GetCharm();
     if (!charm)
+    {
         return;
+    }
 
     if (charm->GetTypeId() == TYPEID_UNIT)
     {
         if (charm->ToCreature()->HasUnitTypeMask(UNIT_MASK_PUPPET))
+        {
             ((Puppet*)charm)->UnSummon();
+        }
         else if (charm->IsVehicle())
+        {
             ExitVehicle();
+        }
     }
+
     if (GetCharmGUID())
-        charm->RemoveCharmAuras();
+    {
+        charm->RemoveAurasByType(SPELL_AURA_MOD_CHARM, ObjectGuid::Empty, except);
+        charm->RemoveAurasByType(SPELL_AURA_MOD_POSSESS_PET, ObjectGuid::Empty, except);
+        charm->RemoveAurasByType(SPELL_AURA_MOD_POSSESS, ObjectGuid::Empty, except);
+        charm->RemoveAurasByType(SPELL_AURA_AOE_CHARM, ObjectGuid::Empty, except);
+    }
 
     if (GetCharmGUID())
     {
         LOG_FATAL("entities.player", "Player {} ({} is not able to uncharm unit ({})", GetName(), GetGUID().ToString(), GetCharmGUID().ToString());
+
         if (charm->GetCharmerGUID())
         {
             LOG_FATAL("entities.player", "Charmed unit has charmer {}", charm->GetCharmerGUID().ToString());
             ABORT();
         }
         else
+        {
             SetCharm(charm, false);
+        }
     }
 }
 
@@ -13031,15 +13046,15 @@ bool ItemPosCount::isContainedIn(ItemPosCountVec const& vec) const
     return false;
 }
 
-void Player::StopCastingBindSight()
+void Player::StopCastingBindSight(Aura* except /*= nullptr*/)
 {
     if (WorldObject* target = GetViewpoint())
     {
         if (target->isType(TYPEMASK_UNIT))
         {
-            ((Unit*)target)->RemoveAurasByType(SPELL_AURA_BIND_SIGHT, GetGUID());
-            ((Unit*)target)->RemoveAurasByType(SPELL_AURA_MOD_POSSESS, GetGUID());
-            ((Unit*)target)->RemoveAurasByType(SPELL_AURA_MOD_POSSESS_PET, GetGUID());
+            ((Unit*)target)->RemoveAurasByType(SPELL_AURA_BIND_SIGHT, GetGUID(), except);
+            ((Unit*)target)->RemoveAurasByType(SPELL_AURA_MOD_POSSESS, GetGUID(), except);
+            ((Unit*)target)->RemoveAurasByType(SPELL_AURA_MOD_POSSESS_PET, GetGUID(), except);
         }
     }
 }
@@ -15127,7 +15142,7 @@ void Player::ActivateSpec(uint8 spec)
     for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end();)
     {
         Aura* aura = *iter;
-        if (!HasActiveSpell(aura->GetId()) && !HasTalent(aura->GetId(), GetActiveSpec()))
+        if (!HasActiveSpell(aura->GetId()) && !HasTalent(aura->GetId(), GetActiveSpec()) && !aura->GetCastItemGUID())
         {
             aura->Remove();
             iter = scAuras.begin();
@@ -16219,4 +16234,9 @@ std::string Player::GetDebugInfo() const
     std::stringstream sstr;
     sstr << Unit::GetDebugInfo();
     return sstr.str();
+}
+
+void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
+{
+    ChatHandler(GetSession()).SendSysMessage(msg, escapeCharacters);
 }

@@ -2284,14 +2284,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
-        case SMART_ACTION_SET_GO_STATE:
-        {
-            for (WorldObject* target : targets)
-                if (IsGameObject(target))
-                    target->ToGameObject()->SetGoState((GOState)e.action.goState.state);
-
-            break;
-        }
         case SMART_ACTION_EXIT_VEHICLE:
         {
             for (WorldObject* target : targets)

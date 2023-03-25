@@ -409,7 +409,10 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     }
 
     //Player is not looking at loot list, he doesn't need to see updates on the loot list
-    loot->RemoveLooter(player->GetGUID());
+    if (!lguid.IsItem())
+    {
+        loot->RemoveLooter(player->GetGUID());
+    }
 }
 
 void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
