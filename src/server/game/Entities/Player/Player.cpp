@@ -12566,15 +12566,18 @@ bool Player::isHonorOrXPTarget(Unit* victim) const
 
     // Victim level less gray level
     if (v_level <= k_grey)
+    {
         return false;
+    }
 
     if (victim->GetTypeId() == TYPEID_UNIT)
     {
-        if (victim->IsTotem() ||
-                victim->IsPet() ||
-                victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP)
+        if (victim->IsTotem() || victim->IsCritter() || victim->IsPet() || (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP))
+        {
             return false;
+        }
     }
+
     return true;
 }
 
