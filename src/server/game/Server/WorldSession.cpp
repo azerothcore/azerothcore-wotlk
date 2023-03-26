@@ -1034,10 +1034,18 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
             mi->RemoveMovementFlag((maskToRemove));
 #endif
 
+    /*! Cannot fly if no fly auras present. Exception is being a GM.
+        Note that we check for account level instead of Player::IsGameMaster() because in some
+        situations it may be feasable to use .gm fly on as a GM without having .gm on,
+        e.g. aerial combat.
+    */
+
     bool stricterFlightChecks = true;
     stricterFlightChecks = (mi->HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY) && GetSecurity() == SEC_PLAYER && !GetPlayer()->m_mover->HasAuraType(SPELL_AURA_FLY) && !GetPlayer()->m_mover->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED));
     if (stricterFlightChecks)
     {
+        // Inform the client we can no longer fly, which is required if data mismatches for some reason
+        // Like flight auras being removed but the client still sends flight movement packets.
         GetPlayer()->SetCanFly(false);
         mi->RemoveMovementFlag(MOVEMENTFLAG_FLYING);
     }
