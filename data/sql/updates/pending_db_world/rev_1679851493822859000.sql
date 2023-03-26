@@ -1,6 +1,6 @@
 -- Mote of Shadow
 DELETE FROM `creature_loot_template` WHERE `Item` = 22577;
-INSERT INTO `creature_loot_template` VALUES
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (16974, 22577, 0, 20, 0, 1, 0, 1, 1, 'Rogue Voidwalker - Mote of Shadow'),
 (16975, 22577, 0, 20, 0, 1, 0, 1, 1, 'Uncontrolled Voidwalker - Mote of Shadow'),
 (17014, 22577, 0, 20, 0, 1, 0, 1, 2, 'Collapsing Voidwalker - Mote of Shadow'),
