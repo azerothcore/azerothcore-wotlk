@@ -1091,12 +1091,6 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
     REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FALLING_SLOW) && !GetPlayer()->HasAuraType(SPELL_AURA_FEATHER_FALL),
         MOVEMENTFLAG_FALLING_SLOW);
 
-    /*! Cannot fly if no fly auras present. Exception is being a GM.
-        Note that we check for account level instead of Player::IsGameMaster() because in some
-        situations it may be feasable to use .gm fly on as a GM without having .gm on,
-        e.g. aerial combat.
-    */
-
     //! Cannot fly and fall at the same time
     REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY) && mi->HasMovementFlag(MOVEMENTFLAG_FALLING),
         MOVEMENTFLAG_FALLING);
