@@ -281,6 +281,15 @@ int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellInfo const
     // Explicit diminishing duration
     switch (spellproto->SpellFamilyName)
     {
+        case SPELLFAMILY_MAGE:
+        {
+            // Polymorph - 8 sec in PvP
+            if (spellproto->SpellFamilyFlags[0] & 0x01000000)
+            {
+                return 8 * IN_MILLISECONDS;
+            }
+            break;
+        }
         case SPELLFAMILY_DRUID:
             {
                 // Faerie Fire - limit to 40 seconds in PvP (3.1)
@@ -319,6 +328,11 @@ int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellInfo const
                 // Curse of Exhaustion
                 else if (spellproto->SpellFamilyFlags[0] & 0x400000)
                     return 12 * IN_MILLISECONDS;
+                // Seduction - 8 sec in PvP
+                else if (spellproto->SpellFamilyFlags[0] & 0x40000000)
+                {
+                    return 8 * IN_MILLISECONDS;
+                }
                 break;
             }
         default:
