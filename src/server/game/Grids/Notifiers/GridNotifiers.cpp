@@ -351,7 +351,7 @@ void ObjectUpdater::Visit(GridRefMgr<T>& m)
     {
         obj = iter->GetSource();
         ++iter;
-        if (obj->IsInWorld() && (i_largeOnly == obj->IsVisibilityOverridden()))
+        if (obj && obj->IsInWorld() && (i_largeOnly == obj->IsVisibilityOverridden()))
             obj->Update(i_timeDiff);
     }
 }
