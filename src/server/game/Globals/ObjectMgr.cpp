@@ -2469,6 +2469,74 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     return spawnId;
 }
 
+void ObjectMgr::UpdateCreatureHalaa(ObjectGuid::LowType spawnId, TeamId teamId, Map* map)
+{
+    CreatureData& data = NewOrExistCreatureData(spawnId);
+    uint32 entry = data.id1;
+    float x = data.posX;
+    float y = data.posY;
+    switch (entry) {
+    case 18192:
+    case 18256:
+        data.id1 = teamId == TEAM_HORDE ? 18192 : 18256;
+        break;
+    case 18816:
+    case 18817:
+        data.id1 = teamId == TEAM_HORDE ? 18816 : 18817;
+        data.posX = teamId == TEAM_HORDE ? -1523.92f : -1591.18f;
+        data.posY = teamId == TEAM_HORDE ? 7951.76f : 8020.39f;
+        data.posZ = teamId == TEAM_HORDE ? -17.6942f : -22.2042f;
+        data.orientation = teamId == TEAM_HORDE ? 3.51172f : 4.59022f;
+        break;
+    case 18821:
+    case 18822:
+        data.id1 = teamId == TEAM_HORDE ? 18821 : 18822;
+        data.posX = teamId == TEAM_HORDE ? -1527.75f : -1588.0f;
+        data.posY = teamId == TEAM_HORDE ? 7952.46f : 8019.0f;
+        data.posZ = teamId == TEAM_HORDE ? -17.6948f : -22.2042f;
+        data.orientation = teamId == TEAM_HORDE ? 3.99317f : 4.06662f;
+        break;
+    case 21474:
+    case 21485:
+        data.id1 = teamId == TEAM_HORDE ? 21474 : 21485;
+        data.posX = teamId == TEAM_HORDE ? -1520.14f : -1521.93f;
+        data.posY = teamId == TEAM_HORDE ? 7927.11f : 7927.37f;
+        data.posZ = teamId == TEAM_HORDE ? -20.2527f : -20.2299f;
+        data.orientation = teamId == TEAM_HORDE ? 3.39389f : 3.24631f;
+        break;
+    case 21484:
+    case 21487:
+        data.id1 = teamId == TEAM_HORDE ? 21484 : 21487;
+        data.posX = teamId == TEAM_HORDE ? -1524.84f : -1540.33f;
+        data.posY = teamId == TEAM_HORDE ? 7930.34f : 7971.95f;
+        data.posZ = teamId == TEAM_HORDE ? -20.182f : -20.7186f;
+        data.orientation = teamId == TEAM_HORDE ? 3.6405f : 3.07178f;
+        break;
+    case 21483:
+    case 21488:
+        data.id1 = teamId == TEAM_HORDE ? 21483 : 21488;
+        break;
+    default:
+        break;
+    }
+
+    _creatureDataStore[spawnId] = data;
+
+    AddCreatureToGrid(spawnId, &data);
+
+    // Spawn if necessary (loaded grids only)
+    if (!map->Instanceable() && !map->IsRemovalGrid(x, y))
+    {
+        Creature* creature = new Creature();
+        if (!creature->LoadCreatureFromDB(spawnId, map, true, false, true))
+        {
+            LOG_ERROR("sql.sql", "AddCreature: Cannot add creature entry {} to map", entry);
+            delete creature;
+            return;
+        }
+    }
+}
+
 void ObjectMgr::LoadGameobjects()
 {
     uint32 oldMSTime = getMSTime();
