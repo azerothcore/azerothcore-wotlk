@@ -259,6 +259,8 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `map`, `zoneId`, `areaId`, `spawnM
 UPDATE `creature_template` SET `lootid` = 0, `pickpocketloot` = 0, `mingold` = 0, `maxgold` = 0 WHERE (`entry` IN (18634, 18639, 20647, 20648));
 DELETE FROM `creature_loot_template` WHERE (`Entry` IN (18634, 18639));
 
+DELETE FROM 'pickpocketing_loot_template' WHERE (`Entry` IN (18634, 18639));
+
 -- Addon
 DELETE FROM `creature_addon` WHERE (`guid` IN (@CGUID+76,@CGUID+77,@CGUID+75,@CGUID+70,@CGUID+71,@CGUID+52,@CGUID+68,@CGUID+69,@CGUID+47,@CGUID+46,@CGUID+64,@CGUID+65,@CGUID+43,@CGUID+45,@CGUID+39,@CGUID+60,@CGUID+53,@CGUID+35,@CGUID+57,@CGUID+29,@CGUID+55,@CGUID+56,@CGUID+54,@CGUID+28,@CGUID+135,@CGUID+206,@CGUID+207,@CGUID+208,@CGUID+209));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
