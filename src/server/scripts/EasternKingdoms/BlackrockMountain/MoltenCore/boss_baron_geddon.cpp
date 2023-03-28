@@ -174,14 +174,13 @@ public:
                         break;
                     case 4:
                     case 5:
-                        multiplier = 3;
-                        break;
-                    case 6:
-                    case 7:
                         multiplier = 4;
                         break;
-                    case 8:
-                        multiplier = 5;
+                    case 6:
+                        multiplier = 6;
+                        break;
+                    case 7:
+                        multiplier = 10;
                         break;
                 }
 
