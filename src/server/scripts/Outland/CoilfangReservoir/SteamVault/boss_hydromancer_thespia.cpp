@@ -71,7 +71,10 @@ struct boss_hydromancer_thespia : public BossAI
         {
         case EVENT_SPELL_LIGHTNING:
             Talk(SAY_SPELL);
-            DoCastVictim(SPELL_LIGHTNING_CLOUD);
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+            {
+                DoCastVictim(SPELL_LIGHTNING_CLOUD);
+            }
             events.RepeatEvent(urand(12100, 14500));
             break;
         case EVENT_SPELL_LUNG:
