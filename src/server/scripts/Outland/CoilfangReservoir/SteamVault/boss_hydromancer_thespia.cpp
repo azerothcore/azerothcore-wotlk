@@ -21,10 +21,11 @@
 
 enum HydromancerThespia
 {
-    SAY_SUMMON                  = 0,
+    SAY_SUMMON                  = 0, // Unused or Unknown Use
     SAY_AGGRO                   = 1,
     SAY_SLAY                    = 2,
     SAY_DEAD                    = 3,
+    SAY_SPELL                   = 4,
 
     SPELL_LIGHTNING_CLOUD       = 25033,
     SPELL_LUNG_BURST            = 31481,
@@ -55,9 +56,9 @@ struct boss_hydromancer_thespia : public BossAI
     {
         Talk(SAY_AGGRO);
         _JustEngagedWith();
-        events.ScheduleEvent(EVENT_SPELL_LIGHTNING, 15000);
-        events.ScheduleEvent(EVENT_SPELL_LUNG, 7000);
-        events.ScheduleEvent(EVENT_SPELL_ENVELOPING, 9000);
+        events.ScheduleEvent(EVENT_SPELL_LIGHTNING, 9800);
+        events.ScheduleEvent(EVENT_SPELL_LUNG, 13300);
+        events.ScheduleEvent(EVENT_SPELL_ENVELOPING, 14500);
     }
 
     void UpdateAI(uint32 diff) override
@@ -69,21 +70,17 @@ struct boss_hydromancer_thespia : public BossAI
         switch (events.ExecuteEvent())
         {
         case EVENT_SPELL_LIGHTNING:
-            for (uint8 i = 0; i < DUNGEON_MODE(1, 2); ++i)
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    me->CastSpell(target, SPELL_LIGHTNING_CLOUD, false);
-            events.RepeatEvent(urand(15000, 25000));
+            Talk(SAY_SPELL);
+            DoCastRandomTarget(SPELL_LIGHTNING_CLOUD);
+            events.RepeatEvent(urand(12100, 14500));
             break;
         case EVENT_SPELL_LUNG:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                DoCast(target, SPELL_LUNG_BURST);
-            events.RepeatEvent(urand(7000, 12000));
+            DoCastRandomTarget(SPELL_LUNG_BURST);
+            events.RepeatEvent(urand(21800, 25400));
             break;
         case EVENT_SPELL_ENVELOPING:
-            for (uint8 i = 0; i < DUNGEON_MODE(1, 2); ++i)
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    me->CastSpell(target, SPELL_ENVELOPING_WINDS, false);
-            events.RepeatEvent(urand(10000, 15000));
+            DoCastRandomTarget(SPELL_ENVELOPING_WINDS);
+            events.RepeatEvent(urand(30000, 40000));
             break;
         }
 
