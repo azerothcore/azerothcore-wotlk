@@ -50,6 +50,8 @@ enum Spells
 enum Misc
 {
     ACTION_BRIDGE_MOB_DEATH = 1, // Used by SAI
+    EQUIPMENT_NORMAL        = 1,
+    EQUIPMENT_FRENZY        = 2,
 };
 
 struct boss_pathaleon_the_calculator : public BossAI
@@ -68,7 +70,7 @@ struct boss_pathaleon_the_calculator : public BossAI
     {
         _Reset();
         _isEnraged = false;
-        me->LoadEquipment(1);
+        me->LoadEquipment(EQUIPMENT_NORMAL);
 
         if (instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) < 4)
         {
@@ -91,7 +93,7 @@ struct boss_pathaleon_the_calculator : public BossAI
             DoCastSelf(SPELL_FRENZY, true);
             Talk(SAY_ENRAGE);
             _isEnraged = true;
-            me->LoadEquipment(2);
+            me->LoadEquipment(EQUIPMENT_FRENZY);
         });
 
         scheduler.Schedule(20s, 25s, [this](TaskContext context)

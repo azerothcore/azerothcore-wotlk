@@ -5,4 +5,4 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 
 DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 19220 AND `ID` = 2);
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
-(19220, 2, 29455, 0, 0, 0);
+(19220, 2, 29455, 0, 0, 48526);
