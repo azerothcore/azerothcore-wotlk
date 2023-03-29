@@ -61,7 +61,7 @@ void BotDataMgr::Update(uint32 diff)
     if (_botsWanderCreaturesToSpawn.empty())
         return;
 
-    static const uint32 WANDERING_BOT_SPAWN_DELAY = 500;
+    static const uint32 WANDERING_BOT_SPAWN_DELAY = 250;
 
     if (next_wandering_bot_spawn_delay >= diff)
     {
@@ -1925,33 +1925,40 @@ bool BotDataMgr::IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32
     }
 }
 
-WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* curPos, uint32 faction, uint32 lvl)
+WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* curPos, uint32 faction, uint32 lvl, bool random)
 {
-    WanderNode const* node_cur = WanderNode::FindInMapWPs(curNode->GetWPId(), curNode->GetMapId());
+    static auto node_viable = [](WanderNode const* wp, uint8 lvl) {
+        return lvl + 2 >= wp->GetLevels().first && lvl <= wp->GetLevels().second;
+    };
 
-    //Node got deleted! Select closest and go from there
-    if (!node_cur)
+    //Node got deleted (or forced)! Select close point and go from there
+    std::list<WanderNode const*> links;
+    if (curNode->GetLinks().empty() || random)
     {
-        float mindist = 50000.0f; // Anywhere
+        WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&links, lvl = lvl, fac = faction, pos = curPos](WanderNode const* wp) {
+            if (pos->GetExactDist2d(wp) < MAX_WANDER_NODE_DISTANCE &&
+                IsWanderNodeAvailableForBotFaction(wp, fac) && node_viable(wp, lvl))
+                links.push_back(wp);
+        });
+        if (!links.empty())
+            return links.size() == 1u ? links.front() : Acore::Containers::SelectRandomContainerElement(links);
+
+        //Select closest
         WanderNode const* node_new = nullptr;
-        WanderNode::DoForAllMapWPs(curNode->GetMapId(), [fac = faction, pos = curPos, &mindist, &node_new](WanderNode const* wp) {
+        float mindist = 50000.0f; // Anywhere
+        WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&node_new, &mindist, lvl = lvl, fac = faction, pos = curPos](WanderNode const* wp) {
             float dist = pos->GetExactDist2d(wp);
-            if (IsWanderNodeAvailableForBotFaction(wp, fac) && dist < mindist)
+            if (dist < mindist &&
+                IsWanderNodeAvailableForBotFaction(wp, fac) && node_viable(wp, lvl))
             {
                 mindist = dist;
                 node_new = wp;
             }
         });
-
         return node_new;
     }
 
-    static auto node_viable = [](WanderNode const* wp, uint8 lvl) {
-        return lvl + 2 >= wp->GetLevels().first && lvl <= wp->GetLevels().second;
-    };
-
-    std::list<WanderNode const*> links;
-    for (WanderNode const* wp : node_cur->GetLinks())
+    for (WanderNode const* wp : curNode->GetLinks())
     {
         if (IsWanderNodeAvailableForBotFaction(wp, faction) && node_viable(wp, lvl))
             links.push_back(wp);
@@ -1963,7 +1970,7 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
     if (links.empty())
     {
         //todo: use all wps
-        WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&links, cur = curNode, lvl = lvl, fac = faction](WanderNode const* wp) {
+        WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&links, lvl = lvl, fac = faction](WanderNode const* wp) {
             if (IsWanderNodeAvailableForBotFaction(wp, fac) && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && node_viable(wp, lvl))
                 links.push_back(wp);
         });

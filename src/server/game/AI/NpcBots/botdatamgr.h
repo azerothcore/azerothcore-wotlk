@@ -181,7 +181,7 @@ class BotDataMgr
         static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
         static TeamId GetTeamForFaction(uint32 factionTemplateId);
         static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId);
-        static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* curPos, uint32 faction, uint32 lvl);
+        static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* curPos, uint32 faction, uint32 lvl, bool random);
         static WanderNode const* GetClosestWanderNode(WorldLocation const* loc);
 
         static std::shared_mutex* GetLock();
