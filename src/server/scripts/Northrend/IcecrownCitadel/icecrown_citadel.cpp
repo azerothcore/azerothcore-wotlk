@@ -3372,7 +3372,7 @@ public:
                 float nz = me->GetFloorZ();
                 DoCastSelf(SPELL_WEB_BEAM);
                 me->SetHomePosition(nx, ny, nz, me->GetOrientation());
-                me->GetMotionMaster()->MoveLand(1, nx, ny, nz, false);
+                me->GetMotionMaster()->MoveLand(POINT_LAND, nx, ny, nz, false);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                 return;
             }
@@ -3388,25 +3388,12 @@ public:
             me->CallForHelp(15.0f);
         }
 
-        void JustReachedHome() override
+        void MovementInform(uint32 type, uint32 id) override
         {
-            if (me->IsLevitating())
+            if (type == EFFECT_MOTION_TYPE && id == POINT_LAND)
             {
-                me->SetDisableGravity(false);
                 me->SetImmuneToAll(false);
-                me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-            }
-        }
-
-        void MovementInform(uint32 /*type*/, uint32 id) override
-        {
-            if (id == 1)
-            {
-                if (me->IsLevitating())
-                {
-                    me->SetDisableGravity(false);
-                    me->SetOrientation(0.0f);
-                }
+                me->SetDisableGravity(false);
             }
         }
 
