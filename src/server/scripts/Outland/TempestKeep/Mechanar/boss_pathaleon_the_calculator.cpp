@@ -50,12 +50,7 @@ enum Spells
 enum Misc
 {
     ACTION_BRIDGE_MOB_DEATH = 1, // Used by SAI
-    ITEM_WEAPON             = 23382,
-    ITEM_SHIELD             = 24328,
-    ITEM_FRENZY             = 29455,
 };
-
-bool _isEnraged;
 
 struct boss_pathaleon_the_calculator : public BossAI
 {
@@ -67,12 +62,13 @@ struct boss_pathaleon_the_calculator : public BossAI
         });
     }
 
+    bool _isEnraged;
+
     void Reset() override
     {
         _Reset();
-        _isEnraged = 0;
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, ITEM_WEAPON);
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, ITEM_SHIELD);
+        _isEnraged = false;
+        me->LoadEquipment(1);
 
         if (instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) < 4)
         {
@@ -94,19 +90,18 @@ struct boss_pathaleon_the_calculator : public BossAI
             DoCastSelf(SPELL_SUICIDE, true);
             DoCastSelf(SPELL_FRENZY, true);
             Talk(SAY_ENRAGE);
-            _isEnraged = 1;
-            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, ITEM_FRENZY);
-            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 0);
+            _isEnraged = true;
+            me->LoadEquipment(2);
         });
 
         scheduler.Schedule(20s, 25s, [this](TaskContext context)
         {
             if (!_isEnraged)
             {
-                    for (uint8 i = 0; i < DUNGEON_MODE(3, 4); ++i)
-                        me->CastSpell(me, SPELL_SUMMON_NETHER_WRAITH_1 + i, true);
+                for (uint8 i = 0; i < DUNGEON_MODE(3, 4); ++i)
+                    me->CastSpell(me, SPELL_SUMMON_NETHER_WRAITH_1 + i, true);
 
-                    Talk(SAY_SUMMON);
+                Talk(SAY_SUMMON);
             }
             context.Repeat(45s, 50s);
         }).Schedule(12s, [this](TaskContext context)
