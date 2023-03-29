@@ -1,3 +1,4 @@
+-- DB update 2023_03_29_01 -> 2023_03_29_02
 --
 UPDATE `creature_template` SET `flags_extra`=512 WHERE `entry` IN (36725,38058);
 UPDATE `creature_template_addon` SET `bytes1`=0 WHERE `entry` IN (36725,38058);
