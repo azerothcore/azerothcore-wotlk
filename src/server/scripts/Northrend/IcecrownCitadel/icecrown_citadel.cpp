@@ -3522,7 +3522,7 @@ public:
                     if (spider->GetPositionZ() > 220.0f)
                     {
                         spider->CastSpell(spider, SPELL_WEB_BEAM2, false);
-                        spider->GetMotionMaster()->MovePoint(POINT_ENTER_COMBAT, spider->GetPositionX(), spider->GetPositionY(), 213.03f, false);
+                        spider->GetMotionMaster()->MoveLand(POINT_ENTER_COMBAT, spider->GetPositionX(), spider->GetPositionY(), 213.03f, false);
                     }
         }
 
