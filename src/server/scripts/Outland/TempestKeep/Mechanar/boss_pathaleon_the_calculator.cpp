@@ -37,6 +37,8 @@ enum Spells
     SPELL_ARCANE_TORRENT            = 36022,
     SPELL_MANA_TAP                  = 36021,
     SPELL_DOMINATION                = 35280,
+    SPELL_FRENZY                    = 36992,
+    SPELL_SUICIDE                   = 35301,
     SPELL_ETHEREAL_TELEPORT         = 34427,
     SPELL_GREATER_INVISIBILITY      = 34426,
     SPELL_SUMMON_NETHER_WRAITH_1    = 35285,
@@ -48,7 +50,12 @@ enum Spells
 enum Misc
 {
     ACTION_BRIDGE_MOB_DEATH = 1, // Used by SAI
+    ITEM_WEAPON             = 23382,
+    ITEM_SHIELD             = 24328,
+    ITEM_FRENZY             = 29455,
 };
+
+bool _isEnraged;
 
 struct boss_pathaleon_the_calculator : public BossAI
 {
@@ -63,6 +70,9 @@ struct boss_pathaleon_the_calculator : public BossAI
     void Reset() override
     {
         _Reset();
+        _isEnraged = 0;
+        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, ITEM_WEAPON);
+        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, ITEM_SHIELD);
 
         if (instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) < 4)
         {
@@ -81,18 +91,24 @@ struct boss_pathaleon_the_calculator : public BossAI
 
         ScheduleHealthCheckEvent(20, [&]()
         {
-            summons.DespawnAll();
-            DoCastSelf(SPELL_DISGRUNTLED_ANGER, true);
+            DoCastSelf(SPELL_SUICIDE, true);
+            DoCastSelf(SPELL_FRENZY, true);
             Talk(SAY_ENRAGE);
+            _isEnraged = 1;
+            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, ITEM_FRENZY);
+            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 0);
         });
 
-        scheduler.Schedule(30s, [this](TaskContext context)
+        scheduler.Schedule(20s, 25s, [this](TaskContext context)
         {
-            for (uint8 i = 0; i < DUNGEON_MODE(3, 4); ++i)
-                me->CastSpell(me, SPELL_SUMMON_NETHER_WRAITH_1 + i, true);
+            if (!_isEnraged)
+            {
+                    for (uint8 i = 0; i < DUNGEON_MODE(3, 4); ++i)
+                        me->CastSpell(me, SPELL_SUMMON_NETHER_WRAITH_1 + i, true);
 
-            Talk(SAY_SUMMON);
-            context.Repeat(30s, 40s);
+                    Talk(SAY_SUMMON);
+            }
+            context.Repeat(45s, 50s);
         }).Schedule(12s, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
@@ -106,13 +122,17 @@ struct boss_pathaleon_the_calculator : public BossAI
             me->ModifyPower(POWER_MANA, 5000);
             DoCastSelf(SPELL_ARCANE_TORRENT);
             context.Repeat(15s);
-        }).Schedule(25s, [this](TaskContext context)
+        }).Schedule(10s, 15s, [this](TaskContext context)
         {
             if (DoCastRandomTarget(SPELL_DOMINATION, 1, 50.0f) == SPELL_CAST_OK)
             {
                 Talk(SAY_DOMINATION);
             }
-            context.Repeat(30s);
+            context.Repeat(27s, 40s);
+            }).Schedule(25s, [this](TaskContext context)
+        {
+            DoCast(SPELL_DISGRUNTLED_ANGER);
+            context.Repeat(40s, 90s);
         });
 
         if (IsHeroic())
