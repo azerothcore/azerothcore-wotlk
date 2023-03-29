@@ -1941,7 +1941,7 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
                 links.push_back(wp);
         });
         if (!links.empty())
-            return links.size() == 1u ? links.front() : Trinity::Containers::SelectRandomContainerElement(links);
+            return links.size() == 1u ? links.front() : Acore::Containers::SelectRandomContainerElement(links);
 
         //Select closest
         WanderNode const* node_new = nullptr;
