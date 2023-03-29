@@ -3406,7 +3406,6 @@ public:
                 {
                     me->SetDisableGravity(false);
                     me->SetOrientation(0.0f);
-                    me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                 }
             }
         }
