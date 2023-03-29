@@ -124,7 +124,7 @@ struct boss_pathaleon_the_calculator : public BossAI
                 Talk(SAY_DOMINATION);
             }
             context.Repeat(27s, 40s);
-            }).Schedule(25s, [this](TaskContext context)
+        }).Schedule(25s, [this](TaskContext context)
         {
             DoCast(SPELL_DISGRUNTLED_ANGER);
             context.Repeat(40s, 90s);
