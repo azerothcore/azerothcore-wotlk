@@ -6742,20 +6742,19 @@ void bot_ai::_OnAreaUpdate(uint32 areaId)
 
     _lastAreaId = areaId;
 
-    Unit::AuraMap& ownerAuras = me->GetOwnedAuras();
-    for (Unit::AuraMap::iterator iter = ownerAuras.begin(); iter != ownerAuras.end();)
+    Unit::AuraMap const& ownerAuras = me->GetOwnedAuras();
+    for (Unit::AuraMap::const_iterator iter = ownerAuras.cbegin(); iter != ownerAuras.cend(); ++iter)
     {
         if (iter->second->GetSpellInfo()->CheckLocation(me->GetMapId(), _lastZoneId, areaId, master, false) != SPELL_CAST_OK)
         {
             //me->RemoveOwnedAura(iter);
             //we assume 1 aura at a time at most for area (once per 1.5 sec)
-            me->RemoveAurasDueToSpell(iter->first);
+            uint32 spellId = iter->first;
+            me->RemoveAurasDueToSpell(spellId);
             if (botPet)
-                botPet->RemoveAurasDueToSpell(iter->first);
+                botPet->RemoveAurasDueToSpell(spellId);
             break;
         }
-        else
-            ++iter;
     }
 
     SpellAreaForAreaMapBounds saBounds = sSpellMgr->GetSpellAreaForAreaMapBounds(areaId);
