@@ -14518,7 +14518,7 @@ void bot_ai::JustDied(Unit* u)
             _travel_node_cur->GetName().c_str());
     }
 
-    _reviveTimer = IsWanderer() ? 90000 : IAmFree() ? 180000 : 60000; //1.5min/3min/1min
+    _reviveTimer = (IsWanderer() && !(u && u->IsControlledByPlayer())) ? 90000 : IAmFree() ? 180000 : 60000; //1.5min/3min/1min
     _atHome = false;
     _evadeMode = false;
     spawned = false;
