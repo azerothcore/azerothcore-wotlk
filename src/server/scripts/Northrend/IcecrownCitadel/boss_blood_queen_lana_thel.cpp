@@ -164,6 +164,17 @@ public:
 
             events.Reset();
             summons.DespawnAll();
+
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+
+            if (bEnteredCombat)
+            {
+                bEnteredCombat = false;
+                if (me->IsAlive() && instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != DONE)
+                    instance->SetBossState(DATA_BLOOD_QUEEN_LANA_THEL, FAIL);
+            }
+
             if (instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != DONE)
                 instance->SetBossState(DATA_BLOOD_QUEEN_LANA_THEL, NOT_STARTED);
         }
@@ -251,20 +262,6 @@ public:
                 _killMinchar = true;
             else
                 GoToMinchar();
-        }
-
-        void JustReachedHome() override
-        {
-            me->SetCanFly(false);
-            me->SetDisableGravity(false);
-
-            _JustReachedHome();
-            if (bEnteredCombat)
-            {
-                bEnteredCombat = false;
-                if (me->IsAlive() && instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != DONE)
-                    instance->SetBossState(DATA_BLOOD_QUEEN_LANA_THEL, FAIL);
-            }
         }
 
         void KilledUnit(Unit* victim) override
