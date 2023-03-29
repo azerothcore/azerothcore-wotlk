@@ -1193,6 +1193,8 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                     return spellId == 56618;
                 else if (team == TEAM_ALLIANCE)
                     return spellId == 56617;
+                else
+                    return false;
                 break;
             }
         // Hellscream's Warsong

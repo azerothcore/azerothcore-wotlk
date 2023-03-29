@@ -177,12 +177,12 @@ public:
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_AURIAYA, IN_PROGRESS);
 
-            events.ScheduleEvent(EVENT_TERRIFYING_SCREECH, 35000);
-            events.ScheduleEvent(EVENT_SONIC_SCREECH, 45000);
-            events.ScheduleEvent(EVENT_GUARDIAN_SWARM, 70000);
-            events.ScheduleEvent(EVENT_SUMMON_FERAL_DEFENDER, 60000);
-            events.ScheduleEvent(EVENT_SENTINEL_BLAST, 36000);
-            events.ScheduleEvent(EVENT_ENRAGE, 600000);
+            events.ScheduleEvent(EVENT_TERRIFYING_SCREECH, 35s);
+            events.ScheduleEvent(EVENT_SONIC_SCREECH, 45s);
+            events.ScheduleEvent(EVENT_GUARDIAN_SWARM, 70s);
+            events.ScheduleEvent(EVENT_SUMMON_FERAL_DEFENDER, 60s);
+            events.ScheduleEvent(EVENT_SENTINEL_BLAST, 36s);
+            events.ScheduleEvent(EVENT_ENRAGE, 10min);
 
             summons.DoZoneInCombat(NPC_SANCTUM_SENTRY);
 
@@ -212,7 +212,7 @@ public:
         void DoAction(int32 param) override
         {
             if (param == ACTION_FERAL_DEATH_WITH_STACK)
-                events.ScheduleEvent(EVENT_RESPAWN_FERAL_DEFENDER, 25000);
+                events.ScheduleEvent(EVENT_RESPAWN_FERAL_DEFENDER, 25s);
             else if (param == ACTION_FERAL_DEATH)
                 _nineLives = true;
         }
@@ -232,7 +232,7 @@ public:
                     Talk(EMOTE_DEFFENDER);
                     me->CastSpell(me, SPELL_ACTIVATE_FERAL_DEFENDER, true);
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
-                    events.ScheduleEvent(EVENT_REMOVE_IMMUNE, 3000);
+                    events.ScheduleEvent(EVENT_REMOVE_IMMUNE, 3s);
                     break;
                 case EVENT_REMOVE_IMMUNE:
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
@@ -240,19 +240,19 @@ public:
                 case EVENT_TERRIFYING_SCREECH:
                     Talk(EMOTE_FEAR);
                     me->CastSpell(me, SPELL_TERRIFYING_SCREECH, false);
-                    events.RepeatEvent(35000);
+                    events.Repeat(35s);
                     break;
                 case EVENT_SONIC_SCREECH:
                     me->CastSpell(me, SPELL_SONIC_SCREECH, false);
-                    events.RepeatEvent(50000);
+                    events.Repeat(50s);
                     break;
                 case EVENT_GUARDIAN_SWARM:
                     me->CastSpell(me->GetVictim(), SPELL_GUARDIAN_SWARM, false);
-                    events.RepeatEvent(40000);
+                    events.Repeat(40s);
                     break;
                 case EVENT_SENTINEL_BLAST:
                     me->CastSpell(me, SPELL_SENTINEL_BLAST, false);
-                    events.RepeatEvent(35000);
+                    events.Repeat(35s);
                     events.DelayEvents(5000, 0);
                     break;
                 case EVENT_RESPAWN_FERAL_DEFENDER:
