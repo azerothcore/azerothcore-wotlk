@@ -79,7 +79,6 @@ struct boss_wrath_scryer_soccothrates : public BossAI
         _Reset();
         events2.Reset();
         me->CastSpell(me, SPELL_FEL_IMMOLATION, true);
-        me->SetImmuneToAll(false);
 
         ScheduleHealthCheckEvent(25, [&]
         {
@@ -96,8 +95,6 @@ struct boss_wrath_scryer_soccothrates : public BossAI
     void InitializeAI() override
     {
         BossAI::InitializeAI();
-        if (!preFight)
-            me->SetImmuneToAll(true);
     }
 
     void JustDied(Unit* /*killer*/) override
