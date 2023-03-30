@@ -371,14 +371,6 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE)) // this flag is removed after she lands and can be engaged
-            {
-                const Map::PlayerList& pl = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                    if (Player* p = itr->GetSource())
-                        if (p->IsAlive() && !p->IsGameMaster() && p->GetExactDist(&SindragosaLandPos) < 200.0f && !p->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
-                            Unit::Kill(me, p);
-            }
             me->DisableRotate(false);
             me->SetControlled(false, UNIT_STATE_ROOT);
             BossAI::EnterEvadeMode(why);
