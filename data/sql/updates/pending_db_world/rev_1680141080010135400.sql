@@ -251,3 +251,27 @@ UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 64, `EffectBasePo
 25789, -- Summon Yauj Brood
 29434  -- Summon Maexxna Spiderling
 );
+
+UPDATE `spell_dbc` SET `Effect_2` = 28, `EffectMiscValueB_2` = 64, `EffectBasePoints_2` = 1 WHERE `ID` IN (
+21883  -- Summon Healed Celebrian Vine
+);
+
+UPDATE `spell_dbc` SET `Effect_2` = 28, `EffectMiscValueB_2` = 64, `EffectBasePoints_2` = 0 WHERE `ID` IN (
+23201, -- Hunter Epic Anti-Cheat DND
+27939, -- Summon Spectral Rivendare
+29110, -- Summon Enraged Mounts
+30774, -- Summon Elekk
+33614, -- Summon Void Portal B
+33616, -- Summon Void Portal E
+36616, -- Veneratus Spawn
+39074, -- [DND]Rexxars Bird Effect
+69868  -- Carrying Beer Barrels [TEST]
+);
+
+UPDATE `spell_dbc` SET `Effect_2` = 28, `EffectMiscValueB_2` = 496, `EffectBasePoints_2` = 0 WHERE `ID` IN (
+74125  -- Summon Creator Spell Test
+);
+
+UPDATE `spell_dbc` SET `Effect_3` = 28, `EffectMiscValueB_3` = 496, `EffectBasePoints_3` = 0 WHERE `ID` IN (
+33615  -- Summon Void Portal C
+);
