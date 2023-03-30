@@ -293,6 +293,10 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (@CGUID+207, 0, 0, 0, 1, 0, 0, '8734'),
 (@CGUID+208, 0, 0, 0, 1, 0, 0, '8734');
 
+-- Oops
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18793;
+UPDATE `smart_scripts` SET `event_param3`=1200, `event_param4`=1200 WHERE (`entryorguid` = 18793) AND (`source_type` = 0) AND (`id` IN (0, 1));
+
 -- Remove global Not-selectable flag from Tortured Skeletons
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`&~33554432 WHERE (`entry` = 18797);
 
