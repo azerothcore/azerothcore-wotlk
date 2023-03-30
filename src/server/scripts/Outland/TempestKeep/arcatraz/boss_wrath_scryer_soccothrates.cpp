@@ -128,9 +128,10 @@ struct boss_wrath_scryer_soccothrates : public BossAI
 
         scheduler.Schedule(30s, 35s, [this](TaskContext context)
         {
+            scheduler.DelayAll(5s);
             me->CastSpell(me, SPELL_KNOCK_AWAY, false);
-            me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
             Talk(SAY_KNOCK_AWAY);
+            me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
 
             scheduler.Schedule(4600ms, [this](TaskContext)
             {
