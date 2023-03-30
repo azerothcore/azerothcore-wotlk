@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WARHEAD_AUCTION_HOUSE_MGR_H_
-#define WARHEAD_AUCTION_HOUSE_MGR_H_
+#ifndef AC_AUCTION_HOUSE_MGR_H_
+#define AC_AUCTION_HOUSE_MGR_H_
 
 #include "AuctionFwd.h"
 #include "DBCStructure.h"

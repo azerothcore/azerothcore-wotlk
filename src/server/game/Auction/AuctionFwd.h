@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WARHEAD_AUCTION_FWD_H_
-#define WARHEAD_AUCTION_FWD_H_
+#ifndef AC_AUCTION_FWD_H_
+#define AC_AUCTION_FWD_H_
 
 #include "Duration.h"
 #include "ObjectGuid.h"

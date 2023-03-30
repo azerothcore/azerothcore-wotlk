@@ -656,7 +656,7 @@ variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [
         ("dry-run,d", "Dry run")
         ("config,c", value<fs::path>(&configFile)->default_value(fs::path(sConfigMgr->GetConfigPath() + std::string(_ACORE_CORE_CONFIG))), "use <arg> as configuration file");
 
-#if AC_PLATFORM == WARHEAD_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     options_description win("Windows platform specific options");
     win.add_options()
         ("service,s", value<std::string>(&configService)->default_value(""), "Windows service options: [install | uninstall]");

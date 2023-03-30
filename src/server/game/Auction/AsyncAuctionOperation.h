@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WARHEAD_ASYNC_AUCTION_OPERATION_H_
-#define WARHEAD_ASYNC_AUCTION_OPERATION_H_
+#ifndef AC_ASYNC_AUCTION_OPERATION_H_
+#define AC_ASYNC_AUCTION_OPERATION_H_
 
 #include "ObjectGuid.h"
 #include <memory>
