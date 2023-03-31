@@ -56,6 +56,7 @@ struct boss_talon_king_ikiss : public BossAI
         _Reset();
         _spoken = false;
         _manaShield = false;
+        _comboHealthStages.fill(false);
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -74,25 +75,13 @@ struct boss_talon_king_ikiss : public BossAI
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 
-        scheduler.Schedule(35s, [this](TaskContext context)
-        {
-            me->InterruptNonMeleeSpells(false);
-            DoCastAOE(SPELL_BLINK);
-            Talk(EMOTE_ARCANE_EXP);
-            context.Repeat(35s, 40s);
-
-            scheduler.Schedule(1s, [this](TaskContext)
-            {
-                DoCastAOE(SPELL_ARCANE_EXPLOSION);
-                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
-            });
-        }).Schedule(5s, [this](TaskContext context)
+        scheduler.Schedule(5s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_ARCANE_VOLLEY);
             context.Repeat(7s, 12s);
         }).Schedule(8s, [this](TaskContext context)
         {
-            IsHeroic() ? DoCastRandomTarget(SPELL_POLYMORPH) : DoCastMaxThreat(SPELL_POLYMORPH);
+            DoCastRandomTarget(SPELL_POLYMORPH);
             context.Repeat(15s, 17500ms);
         });
 
@@ -119,6 +108,60 @@ struct boss_talon_king_ikiss : public BossAI
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
+        if (!_comboHealthStages[0] && me->HealthBelowPctDamaged(80, damage))
+        {
+            _comboHealthStages[0] = true;
+
+            me->InterruptNonMeleeSpells(false);
+            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
+            DoCastAOE(SPELL_BLINK);
+            Talk(EMOTE_ARCANE_EXP);
+
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+            }).Schedule(6500ms, [this](TaskContext /*context*/)
+            {
+                me->GetThreatMgr().ResetAllThreat();
+            });
+        }
+
+        if (!_comboHealthStages[1] && me->HealthBelowPctDamaged(50, damage))
+        {
+            _comboHealthStages[1] = true;
+
+            me->InterruptNonMeleeSpells(false);
+            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
+            DoCastAOE(SPELL_BLINK);
+            Talk(EMOTE_ARCANE_EXP);
+
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+            }).Schedule(6500ms, [this](TaskContext /*context*/)
+            {
+                me->GetThreatMgr().ResetAllThreat();
+            });
+        }
+
+        if (!_comboHealthStages[2] && me->HealthBelowPctDamaged(25, damage))
+        {
+            _comboHealthStages[2] = true;
+
+            me->InterruptNonMeleeSpells(false);
+            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
+            DoCastAOE(SPELL_BLINK);
+            Talk(EMOTE_ARCANE_EXP);
+
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+            }).Schedule(6500ms, [this](TaskContext /*context*/)
+            {
+                me->GetThreatMgr().ResetAllThreat();
+            });
+        }
+
         if (!_manaShield && me->HealthBelowPctDamaged(20, damage))
         {
             DoCast(me, SPELL_MANA_SHIELD);
@@ -132,9 +175,10 @@ struct boss_talon_king_ikiss : public BossAI
             Talk(SAY_SLAY);
     }
 
-    private:
-        bool _spoken;
-        bool _manaShield;
+private:
+    bool _spoken;
+    bool _manaShield;
+    std::array<bool, 3> _comboHealthStages;
 };
 
 // 38194 - Blink

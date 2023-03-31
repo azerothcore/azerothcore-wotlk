@@ -56,8 +56,7 @@ enum Events
     EVENT_MARK_CAST                     = 1,
     EVENT_PRIMARY_SPELL                 = 2,
     EVENT_SECONDARY_SPELL               = 3,
-    EVENT_PUNISH                        = 4,
-    EVENT_BERSERK                       = 5
+    EVENT_BERSERK                       = 4
 };
 
 enum Misc
@@ -75,12 +74,12 @@ enum Misc
 
 enum FourHorsemen
 {
-    SAY_AGGRO       = 0,
-    SAY_TAUNT       = 1,
-    SAY_SPECIAL     = 2,
-    SAY_SLAY        = 3,
-    SAY_DEATH       = 4,
-    EMOTE_RAGECAST  = 7
+    SAY_AGGRO                           = 0,
+    SAY_TAUNT                           = 1,
+    SAY_SPECIAL                         = 2,
+    SAY_SLAY                            = 3,
+    SAY_DEATH                           = 4,
+    EMOTE_RAGECAST                      = 7
 };
 
 // MARKS
@@ -201,7 +200,6 @@ public:
             }
             else
             {
-                events.RescheduleEvent(EVENT_PUNISH, 5s);
                 events.RescheduleEvent(EVENT_SECONDARY_SPELL, 15s);
             }
             if (pInstance)
@@ -348,25 +346,29 @@ public:
                     me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
                     events.Repeat(15s);
                     return;
-                case EVENT_PUNISH:
-                    if (!SelectTarget(SelectTargetMethod::MaxDistance, 0, 45.0f, true))
-                    {
-                        me->CastSpell(me, TABLE_SPELL_PUNISH[horsemanId], false);
-                        Talk(EMOTE_RAGECAST);
-                    }
-                    events.Repeat(2s);
-                    return;
                 case EVENT_SECONDARY_SPELL:
                     me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_SECONDARY_10[horsemanId], TABLE_SPELL_SECONDARY_25[horsemanId]), false);
                     events.Repeat(15s);
                     return;
             }
 
-            if ((me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK))
+            if (me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 45.0f, true))
+                if (Unit* pTarget = me->SelectNearestPlayer(300.0f))
                 {
-                    me->CastSpell(target, RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
+                    if (pTarget && me->IsValidAttackTarget(pTarget))
+                    {
+                        AttackStart(pTarget);
+                    }
+                }
+                if (me->IsWithinDistInMap(me->GetVictim(), 45.0f) && me->IsValidAttackTarget(me->GetVictim()))
+                {
+                    DoCastVictim(RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]));
+                }
+                else if (!me->IsWithinDistInMap(me->GetVictim(), 45.0f) || !me->IsValidAttackTarget(me->GetVictim()))
+                {
+                    DoCastAOE(TABLE_SPELL_PUNISH[horsemanId]);
+                    Talk(EMOTE_RAGECAST);
                 }
             }
             else
@@ -406,7 +408,7 @@ public:
                         damage = 4000;
                         break;
                     case 5:
-                        damage = 12000;
+                        damage = 12500;
                         break;
                     case 6:
                         damage = 20000;
