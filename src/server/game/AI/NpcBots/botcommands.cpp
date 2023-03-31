@@ -386,6 +386,7 @@ private:
             case 618: // Winterspring
                 return { 53, 60 };
             case 25: // BlackrockMountain
+            case 493: // Moonglade
                 return { 46, 60 };
             default:
                 LOG_ERROR("scripts", "GetZoneLevels: no choice for zoneId {}", zoneId);
