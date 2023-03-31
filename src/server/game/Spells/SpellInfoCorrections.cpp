@@ -4501,6 +4501,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_REFLECTION;
     });
 
+    // Turn the Tables
+    ApplySpellFix({ 51627, 51628, 51629 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
+    });
+
     // Poultryized!
     ApplySpellFix({ 30504 }, [](SpellInfo* spellInfo)
     {
