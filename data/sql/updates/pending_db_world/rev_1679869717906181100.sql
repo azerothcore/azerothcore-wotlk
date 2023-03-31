@@ -239,7 +239,7 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `map`, `zoneId`, `areaId`, `spawnM
 (@CGUID+225, 18639, 0, 555, 3789, 3789, 3, 0, -179.281173706054687, -350.270538330078125, 17.16650772094726562, 5.98647928237915039, 86400, 0, 0, 48676),
 (@CGUID+226, 18634, 0, 555, 3789, 3789, 3, 0, -179.281173706054687, -350.270538330078125, 17.16650772094726562, 5.98647928237915039, 86400, 0, 0, 48676), -- These sometimes share spawn points, sometimes not, needs to test ingame to see if pathing isn't screwed, if so I'll change to the alternate spawn point
 (@CGUID+227, 18639, 0, 555, 3789, 3789, 3, 0, -134.274429321289062, -388.79547119140625, 17.16566085815429687, 3.141592741012573242, 86400, 0, 0, 48676),
-(@CGUID+228, 18634, 0, 555, 3789, 3789, 3, 0, -176.776290893554687, -434.265228271484375, 17.1622161865234375, 0.279252678155899047, 86400, 0, 0, 48676),
+(@CGUID+228, 18634, 0, 555, 3789, 3789, 3, 0, -176.776290893554687, -434.265228271484375, 17.1622161865234375, 0.279252678155899047, 86400, 0, 0, 48676);
 
 -- Random Points, ordered by closest to farthest from entrance
 /*
@@ -290,7 +290,7 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `map`, `zoneId`, `areaId`, `spawnM
 */
 
 -- Cabal Summoner and Cabal Spellbinder do not have any loot or gold
-UPDATE `creature_template` SET `lootid` = 0, `pickpocketloot` = 0, `mingold` = 0, `maxgold` = 0 WHERE (`entry` IN (18634, 18639, 20647, 20648));
+UPDATE `creature_template` SET `lootid` = 0, `pickpocketloot` = 0, `mingold` = 0, `maxgold` = 0, `flags_extra`=`flags_extra`|64 WHERE (`entry` IN (18634, 18639, 20647, 20648));
 DELETE FROM `creature_loot_template` WHERE (`Entry` IN (18634, 18639));
 
 DELETE FROM `pickpocketing_loot_template` WHERE (`Entry` IN (18634, 18639));
