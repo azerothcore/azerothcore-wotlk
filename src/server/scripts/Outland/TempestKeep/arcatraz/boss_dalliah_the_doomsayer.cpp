@@ -91,15 +91,15 @@ struct boss_dalliah_the_doomsayer : public BossAI
             }
         }
 
-        scheduler.Schedule(1s, 4s, [this](TaskContext context)
+        scheduler.Schedule(8s, 12s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_GIFT_OF_THE_DOOMSAYER);
-            context.Repeat(16s, 21s);
-        }).Schedule(7s, 9s, [this](TaskContext context)
+            context.Repeat(17s, 35s);
+        }).Schedule(20s, 30s, [this](TaskContext context)
         {
             Talk(SAY_WHIRLWIND);
             DoCastAOE(SPELL_WHIRLWIND);
-            context.Repeat(19s, 21s);
+            context.Repeat();
 
             scheduler.Schedule(7s, [this](TaskContext)
             {
@@ -110,10 +110,10 @@ struct boss_dalliah_the_doomsayer : public BossAI
 
         if (IsHeroic())
         {
-            scheduler.Schedule(11s, 16s, [this](TaskContext context)
+            scheduler.Schedule(11s, 30s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_SHADOW_WAVE);
-                context.Repeat(11s, 16s);
+                context.Repeat();
             });
         }
     }
