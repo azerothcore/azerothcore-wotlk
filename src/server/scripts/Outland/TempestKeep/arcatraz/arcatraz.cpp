@@ -345,7 +345,8 @@ public:
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, DONE);
                 if (Creature* creature = summons.GetCreatureWithEntry(NPC_MILLHOUSE))
                 {
-                    if (IsHeroic()){
+                    if (IsHeroic())
+                    {
                         instance->DoCastSpellOnPlayers(SPELL_QID10886);
                     }
                     creature->AI()->Talk(SAY_COMPLETE);
