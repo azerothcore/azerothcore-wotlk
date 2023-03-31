@@ -199,6 +199,7 @@ public:
 
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            SetPersistentDataCount(MAX_DATA_INDEXES);
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
             TeamIdInInstance = TEAM_NEUTRAL;
