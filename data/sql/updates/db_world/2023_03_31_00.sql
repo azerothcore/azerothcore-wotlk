@@ -1,3 +1,4 @@
+-- DB update 2023_03_30_07 -> 2023_03_31_00
 --
 UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 64, `EffectBasePoints_1` = -1 WHERE `ID` IN (
 14802 -- Idol Room Spawn B
