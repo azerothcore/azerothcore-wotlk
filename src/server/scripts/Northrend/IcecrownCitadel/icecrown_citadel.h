@@ -148,6 +148,12 @@ enum DataTypes
     DATA_BPC_TRASH_DIED             = 300,
 };
 
+enum PersistentData
+{
+    DATA_SPIRE_FROSTWYRM = 0,
+    MAX_DATA_INDEXES
+};
+
 enum CreaturesIds
 {
     // At Light's Hammer
