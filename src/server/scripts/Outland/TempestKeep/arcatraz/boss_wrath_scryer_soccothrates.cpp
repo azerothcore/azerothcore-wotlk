@@ -150,7 +150,7 @@ struct boss_wrath_scryer_soccothrates : public BossAI
             });
 
             context.Repeat(20s, 35s);
-        }).Schedule(12s, 14s, [this](TaskContext context)
+        }).Schedule(8500ms, 22s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_FELFIRE_SHOCK);
             context.Repeat();
