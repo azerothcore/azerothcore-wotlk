@@ -1,3 +1,4 @@
+-- DB update 2023_04_01_01 -> 2023_04_01_02
 --
 DELETE FROM `event_scripts` WHERE `id` IN (14592, 14593, 14595);
 

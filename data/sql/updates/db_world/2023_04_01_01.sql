@@ -1,3 +1,4 @@
+-- DB update 2023_04_01_00 -> 2023_04_01_01
 --
 -- Harbinger Skyriss Normal Loot
 UPDATE `reference_loot_template` SET `GroupId`=3 WHERE `Entry`=25004 AND `Item` IN (28413, 28414, 28415, 28416, 28418, 28419);
