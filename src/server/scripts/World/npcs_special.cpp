@@ -2641,7 +2641,7 @@ public:
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        _scheduler.Schedule(180s, [this](TaskContext context)
+        _scheduler.Schedule(180s, [this](TaskContext /*context*/)
         {
             me->KillSelf();
         });
