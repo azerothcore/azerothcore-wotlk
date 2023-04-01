@@ -40,6 +40,7 @@ EndContentData */
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 
 /*######
 ## npc_draenei_survivor
@@ -533,6 +534,7 @@ enum NestlewoodOwlkin
 
 class spell_inoculate_nestlewood_owlkin : public AuraScript
 {
+public:
     PrepareAuraScript(spell_inoculate_nestlewood_owlkin)
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
