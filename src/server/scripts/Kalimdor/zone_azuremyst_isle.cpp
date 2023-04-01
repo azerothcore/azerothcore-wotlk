@@ -522,6 +522,55 @@ public:
     }
 };
 
+enum NestlewoodOwlkin
+{
+    NPC_NESTLEWOOD_OWLKIN_ENTRY   = 16518,
+    NPC_INOCULATED_OWLKIN_ENTRY   = 16534,
+
+    TALK_OWLKIN                   = 0
+};
+
+class spell_inoculate_nestlewood_owlkin : public AuraScript
+{
+    PrepareAuraScript(spell_inoculate_nestlewood_owlkin)
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* owlkin = GetTarget()->ToCreature())
+            if (owlkin->GetEntry() == NPC_NESTLEWOOD_OWLKIN_ENTRY)
+                if (Player* caster = GetCaster()->ToPlayer())
+                    owlkin->SetFacingToObject(caster);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        if (Creature* owlkin = GetTarget()->ToCreature())
+        {
+            if (owlkin->GetEntry() == NPC_NESTLEWOOD_OWLKIN_ENTRY)
+            {
+                Player* caster = GetCaster()->ToPlayer();
+                if (owlkin->UpdateEntry(NPC_INOCULATED_OWLKIN_ENTRY))
+                {
+                    owlkin->AI()->Talk(TALK_OWLKIN);
+                    owlkin->GetMotionMaster()->MoveRandom(15.0f);
+                    owlkin->SetUnitFlag(UnitFlags(UNIT_FLAG_IMMUNE_TO_PC));
+                    owlkin->DespawnOrUnsummon(15s, 0s);
+                    caster->RewardPlayerAndGroupAtEvent(NPC_INOCULATED_OWLKIN_ENTRY, caster);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_inoculate_nestlewood_owlkin::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_inoculate_nestlewood_owlkin::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_azuremyst_isle()
 {
     new npc_draenei_survivor();
@@ -531,4 +580,5 @@ void AddSC_azuremyst_isle()
     new go_ravager_cage();
     new npc_stillpine_capitive();
     new go_bristlelimb_cage();
+    RegisterSpellScript(spell_inoculate_nestlewood_owlkin);
 }
