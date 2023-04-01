@@ -174,7 +174,7 @@ public:
                 instance->SetData(TYPE_HELLMAW, DONE);
         }
 
-        bool CanAIAttack(Unit const* unit) const override
+        bool CanAIAttack(Unit const* /*unit*/) const override
         {
             return !isBanished;
         }
