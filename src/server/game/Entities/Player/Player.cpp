@@ -7218,6 +7218,15 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                 continue;
             }
 
+            if (entry && (entry->attributeMask & ENCHANT_PROC_ATTR_EXCLUSIVE) != 0)
+            {
+                Unit* checkTarget = spellInfo->IsPositive() ? this : target;
+                if (checkTarget->HasAura(spellInfo->Id, GetGUID()))
+                {
+                    continue;
+                }
+            }
+
             float chance = pEnchant->amount[s] != 0 ? float(pEnchant->amount[s]) : GetWeaponProcChance();
 
             if (entry)

@@ -304,11 +304,17 @@ struct SpellProcEntry
 
 typedef std::unordered_map<uint32, SpellProcEntry> SpellProcMap;
 
+enum EnchantProcAttributes
+{
+    ENCHANT_PROC_ATTR_EXCLUSIVE     = 0x1 // Only one instance of that effect can be active
+};
+
 struct SpellEnchantProcEntry
 {
     uint32      customChance;
     float       PPMChance;
     uint32      procEx;
+    uint32      attributeMask;
 };
 
 typedef std::unordered_map<uint32, SpellEnchantProcEntry> SpellEnchantProcEventMap;
