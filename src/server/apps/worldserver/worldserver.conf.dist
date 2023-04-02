@@ -340,11 +340,18 @@ SocketTimeOutTimeActive = 60000
 SessionAddDelay = 10000
 
 #
+#    MinWorldUpdateTime
+#        Description: Minimum time (milliseconds) between world update ticks (for mostly idle servers).
+#        Default:     1 - (0.001 second)
+
+MinWorldUpdateTime = 1
+
+#
 #    MapUpdateInterval
 #        Description: Time (milliseconds) for map update interval.
-#        Default:     100 - (0.1 second)
+#        Default:     10 - (0.01 second)
 
-MapUpdateInterval = 100
+MapUpdateInterval = 10
 
 #
 #    ChangeWeatherInterval
