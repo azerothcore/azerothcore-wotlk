@@ -68,7 +68,7 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `map`, `zoneId`, `areaId`, `spawnM
 (@CGUID+56 , 18635, 0, 555, 3789, 3789, 3, 1, -454.978, -185.25, 12.7725, 0.0523599, 86400, 0, 0, 43400),
 (@CGUID+57 , 18635, 0, 555, 3789, 3789, 3, 1, -286.707, -99.5, 8.15633, 1.32645, 86400, 0, 0, 43400),
 (@CGUID+58 , 18635, 0, 555, 3789, 3789, 3, 1, -90.6977, -92.3565, -1.04497, 0.715585, 86400, 0, 0, 43400),
-(@CGUID+59 , 18635, 0, 555, 3789, 3789, 3, 1, -77.5523, -88.2126, -1.13213, 0.237499, 86400, 0, 0, 43400),
+(@CGUID+59 , 18635, 0, 555, 3789, 3789, 3, 1, -31.467445, -76.35811, -1.1387877, 0.237499, 86400, 0, 0, 43400),
 (@CGUID+60 , 18635, 0, 555, 3789, 3789, 3, 1, -36.1315, -84.0624, -1.04494, 0.0872665, 86400, 0, 0, 43400),
 (@CGUID+61 , 18635, 0, 555, 3789, 3789, 3, 1, -265.305, -82.2931, 8.15626, 2.84489, 86400, 0, 0, 43400),
 (@CGUID+62 , 18635, 0, 555, 3789, 3789, 3, 1, -271.845, -50.1835, 8.15619, 3.1765, 86400, 0, 0, 43400),
@@ -83,8 +83,8 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `map`, `zoneId`, `areaId`, `spawnM
 (@CGUID+71 , 18635, 0, 555, 3789, 3789, 3, 1, -73.8878, 1.75605, -1.04487, 5.23599, 86400, 0, 0, 43400),
 (@CGUID+72 , 18635, 0, 555, 3789, 3789, 3, 1, -267.801, 3.11204, 8.15628, 3.76991, 86400, 0, 0, 43400),
 (@CGUID+73 , 18635, 0, 555, 3789, 3789, 3, 1, -85.9936, 11.2334, -1.04485, 3.56047, 86400, 0, 0, 43400),
-(@CGUID+74 , 18635, 0, 555, 3789, 3789, 3, 1, -56.1253, 15.9023, -1.1281, 1.50098, 86400, 0, 0, 43400),
-(@CGUID+75 , 18635, 0, 555, 3789, 3789, 3, 1, -83.7188, 16.4396, -1.1368, 2.74401, 86400, 0, 0, 43400),
+(@CGUID+74 , 18635, 0, 555, 3789, 3789, 3, 1, -52.02843, 7.989649, -1.1363385, 1.50098, 86400, 0, 0, 43400),
+(@CGUID+75 , 18635, 0, 555, 3789, 3789, 3, 1, -90.26672, -63.179604, -1.0717194, 0.3125, 86400, 0, 0, 43400),
 (@CGUID+76 , 18636, 0, 555, 3789, 3789, 3, 1, -272.295, -140.066, 8.15626, 0.855211, 86400, 0, 2, 0), -- From TBCMangos
 (@CGUID+77 , 18636, 0, 555, 3789, 3789, 3, 1, -281.339, 55.2473, 8.07299, 0.01178, 86400, 0, 2, 0), -- From TBCMangos
 (@CGUID+78 , 18637, 0, 555, 3789, 3789, 3, 1, -264.152, -79.2966, 8.15624, 2.87979, 86400, 0, 0, 43400),
@@ -219,7 +219,7 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `map`, `zoneId`, `areaId`, `spawnM
 (@CGUID+206, 18639, 0, 555, 3789, 3789, 3, 1, -160.955673217773437, -461.8580322265625, 17.16060256958007812, 4.904375076293945312, 86400, 0, 0, 48676), -- (Auras: 8734 - 8734)
 (@CGUID+207, 18639, 0, 555, 3789, 3789, 3, 1, -156.283523559570312, -461.87066650390625, 17.16060066223144531, 4.694935798645019531, 86400, 0, 0, 48676), -- (Auras: 8734 - 8734)
 (@CGUID+208, 18639, 0, 555, 3789, 3789, 3, 1, -151.681686401367187, -461.163482666015625, 17.16060638427734375, 4.572762489318847656, 86400, 0, 0, 48676), -- (Auras: 8734 - 8734)
-(@CGUID+209, 18634, 0, 555, 3789, 3789, 3, 1, -156.497589111328125, -328.007171630859375, 17.16963386535644531, 3.141592741012573242, 86400, 0, 0, 48676),
+(@CGUID+209, 18634, 0, 555, 3789, 3789, 3, 1, -156.497589111328125, -328.007171630859375, 17.16963386535644531, 1.5, 86400, 0, 0, 48676), -- Original Orientation: 3.141592741012573242
 (@CGUID+210, 18634, 0, 555, 3789, 3789, 3, 1, -175.893997192382812, -349.783355712890625, 17.1660308837890625, 5.685440540313720703, 86400, 0, 0, 48676),
 (@CGUID+211, 18632, 0, 555, 3789, 3789, 3, 1, -135.7705078125, -329.128021240234375, 17.16867828369140625, 3.50811171531677246, 86400, 0, 0, 48676),
 (@CGUID+212, 18632, 0, 555, 3789, 3789, 3, 1, -172.172943115234375, -325.753936767578125, 17.16967201232910156, 5.532693862915039062, 86400, 0, 0, 48676),
@@ -301,7 +301,6 @@ DELETE FROM `creature_addon` WHERE (`guid` IN (@CGUID+76,@CGUID+77,@CGUID+75,@CG
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (@CGUID+76, (@CGUID+76)*10, 0, 0, 1, 0, 0, '30982 30991 30998'),
 (@CGUID+77, (@CGUID+77)*10, 0, 0, 1, 0, 0, '30982 30991 30998'),
-(@CGUID+75, 0, 0, 0, 1, 69, 0, ''),
 (@CGUID+70, 0, 0, 1, 1, 0, 0, ''),
 (@CGUID+71, 0, 0, 8, 1, 0, 0, ''),
 (@CGUID+52, 0, 0, 8, 1, 0, 0, ''),
@@ -331,6 +330,11 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 -- Oops
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18793;
 UPDATE `smart_scripts` SET `event_param3`=2000, `event_param4`=2000 WHERE (`entryorguid` = 18793) AND (`source_type` = 0) AND (`id` IN (0, 1));
+
+-- One more condition
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 36220) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 1) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 30231) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 36220, 0, 0, 1, 0, 30231, 0, 0, 0, 0, 0, '', 'Spell Containment Beam (36220) target needs aura Banish (30231)');
 
 -- Remove global Not-selectable flag from Tortured Skeletons
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`&~33554432 WHERE (`entry` = 18797);
@@ -644,3 +648,358 @@ DELETE FROM `creature_formations` WHERE `leaderGUID` IN (@CGUID+98) AND `memberG
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
 (@CGUID+98, @CGUID+98, 0, 0, 3),
 (@CGUID+98, @CGUID+100, 4, 180, 515);
+
+/*
+	All Scripted Movement
+*/
+
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-(@CGUID+90), -(@CGUID+74), -(@CGUID+75), -(@CGUID+50), -(@CGUID+66), -(@CGUID+58), -(@CGUID+59), -(@CGUID+35), -(@CGUID+31), -(@CGUID+36), -(@CGUID+93), -(@CGUID+95), -(@CGUID+96), -(@CGUID+97), -(@CGUID+99), -(@CGUID+89));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+-- @CGUID+90 Laughs at the misfortune of his pets :(
+(-(@CGUID+90), 0, 0, 0, 23, 0, 100, 0, 13787, 0, 3600, 3600, 0, 11, 13787, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - On Aura Missing - Cast \'Demon Armor\''),
+(-(@CGUID+90), 0, 1, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - On Aggro - Say Line 0'),
+(-(@CGUID+90), 0, 2, 0, 0, 0, 100, 2, 0, 0, 3600, 4800, 0, 11, 12471, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - In Combat - Cast \'Shadow Bolt\' (Normal Dungeon)'),
+(-(@CGUID+90), 0, 3, 0, 0, 0, 100, 4, 0, 0, 3600, 4800, 0, 11, 15232, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - In Combat - Cast \'Shadow Bolt\' (Heroic Dungeon)'),
+(-(@CGUID+90), 0, 4, 0, 0, 0, 100, 0, 7800, 24100, 19300, 36200, 0, 11, 32863, 32, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - In Combat - Cast \'Seed of Corruption\''),
+(-(@CGUID+90), 0, 1001, 0, 1, 0, 100, 0, 6000, 6000, 6000, 6000, 0, 5, 11, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - Out of Combat - Play Emote 11 (OneShotLaugh)'),
+-- @CGUID+74 Moves to several locations and kneels, pondering something
+(-(@CGUID+74), 0, 0, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Aggro - Say Line 0'),
+(-(@CGUID+74), 0, 1, 0, 0, 0, 100, 0, 10200, 18100, 14100, 26200, 0, 11, 33480, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - In Combat - Cast \'Black Cleave\''),
+(-(@CGUID+74), 0, 2, 0, 0, 0, 100, 0, 10900, 28200, 12100, 22900, 0, 11, 11428, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - In Combat - Cast \'Knockdown\''),
+(-(@CGUID+74), 0, 3, 4, 2, 0, 100, 1, 0, 25, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - Between 0-25% Health - Cast \'Enrage\'(No Repeat)'),
+(-(@CGUID+74), 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Link - Say Line 1'),
+(-(@CGUID+74), 0, 1001, 1002, 25, 0, 100, 0, 0, 0, 0, 0, 0, 88, 1863300, 1863303, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Reset - Start Movement from Random List'),
+(-(@CGUID+74), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Reset - Set Run Off'),
+(-(@CGUID+74), 0, 1003, 1004, 4, 0, 100, 0, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Aggro - Set Run On'),
+(-(@CGUID+74), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Aggro - Stop Pathing'),
+(-(@CGUID+74), 0, 1005, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 80, 1863304, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Point 1 Reached - Run Kneel Script'),
+(-(@CGUID+74), 0, 1006, 0, 34, 0, 100, 0, 8, 2, 0, 0, 0, 80, 1863305, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Point 2 Reached - Run Kneel Script'),
+(-(@CGUID+74), 0, 1007, 0, 34, 0, 100, 0, 8, 3, 0, 0, 0, 80, 1863306, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Point 3 Reached - Run Kneel Script'),
+(-(@CGUID+74), 0, 1008, 0, 40, 0, 100, 0, 6, 1863300, 0, 0, 0, 80, 1863307, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Path Ended - Run Kneel Script'),
+(-(@CGUID+74), 0, 1009, 0, 34, 0, 100, 0, 8, 4, 0, 0, 0, 88, 1863300, 1863303, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Movement Script Ended - Start Another Movement'),
+(-(@CGUID+74), 0, 1010, 0, 34, 0, 100, 0, 8, 5, 0, 0, 0, 88, 1863300, 1863303, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Movement Script Ended - Start Another Movement'),
+(-(@CGUID+74), 0, 1011, 0, 34, 0, 100, 0, 8, 6, 0, 0, 0, 88, 1863300, 1863303, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Movement Script Ended - Start Another Movement'),
+(-(@CGUID+74), 0, 1012, 0, 40, 0, 100, 0, 4, 1863301, 0, 0, 0, 88, 1863300, 1863303, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Movement Script Ended - Start Another Movement'),
+-- @CGUID+75 Cooks and distributes some food before falling asleep zZzZ
+(-(@CGUID+75), 0, 0, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Aggro - Say Line 0'),
+(-(@CGUID+75), 0, 1, 0, 0, 0, 100, 0, 10200, 18100, 14100, 26200, 0, 11, 33480, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - In Combat - Cast \'Black Cleave\''),
+(-(@CGUID+75), 0, 2, 0, 0, 0, 100, 0, 10900, 28200, 12100, 22900, 0, 11, 11428, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - In Combat - Cast \'Knockdown\''),
+(-(@CGUID+75), 0, 3, 4, 2, 0, 100, 1, 0, 25, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - Between 0-25% Health - Cast \'Enrage\'(No Repeat)'),
+(-(@CGUID+75), 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Link - Say Line 1'),
+(-(@CGUID+75), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1863310, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Spawn - Start Path'),
+(-(@CGUID+75), 0, 1002, 0, 40, 0, 100, 0, 7, 1863310, 0, 0, 0, 80, 1863310, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - First Path Ended - Run Script'),
+(-(@CGUID+75), 0, 1003, 0, 40, 0, 100, 0, 3, 1863311, 0, 0, 0, 80, 1863311, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Second Path Ended - Run Script'),
+(-(@CGUID+75), 0, 1004, 0, 40, 0, 100, 0, 4, 1863312, 0, 0, 0, 80, 1863312, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Third Path Ended - Run Script'),
+(-(@CGUID+75), 0, 1005, 0, 40, 0, 100, 0, 7, 1863313, 0, 0, 0, 80, 1863313, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Final Path Ended - Run Script'),
+-- @CGUID+59 This one also kneels around
+(-(@CGUID+59), 0, 0, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Aggro - Say Line 0'),
+(-(@CGUID+59), 0, 1, 0, 0, 0, 100, 0, 10200, 18100, 14100, 26200, 0, 11, 33480, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - In Combat - Cast \'Black Cleave\''),
+(-(@CGUID+59), 0, 2, 0, 0, 0, 100, 0, 10900, 28200, 12100, 22900, 0, 11, 11428, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - In Combat - Cast \'Knockdown\''),
+(-(@CGUID+59), 0, 3, 4, 2, 0, 100, 1, 0, 25, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - Between 0-25% Health - Cast \'Enrage\'(No Repeat)'),
+(-(@CGUID+59), 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Link - Say Line 1'),
+(-(@CGUID+59), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1863320, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Spawn - Start Waypoint'),
+(-(@CGUID+59), 0, 1002, 0, 40, 0, 100, 0, 4, 1863320, 0, 0, 0, 80, 1863320, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On First Path Finished - Run Script'),
+(-(@CGUID+59), 0, 1003, 0, 40, 0, 100, 0, 4, 1863321, 0, 0, 0, 80, 1863321, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Second Path Finished - Run Script'),
+(-(@CGUID+59), 0, 1004, 0, 40, 0, 100, 0, 4, 1863322, 0, 0, 0, 80, 1863322, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Third Path Finished - Run Script'),
+(-(@CGUID+59), 0, 1005, 0, 40, 0, 100, 0, 5, 1863323, 0, 0, 0, 80, 1863323, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Fourth Path Finished - Run Script'),
+-- Group emotes
+(-(@CGUID+50), 0, 0, 0, 23, 0, 100, 0, 33482, 0, 3600, 3600, 0, 11, 33482, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Aura \'Shadow Defense\' Missing - Cast \'Shadow Defense\''),
+(-(@CGUID+50), 0, 1, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Aggro - Say Line 0'),
+(-(@CGUID+50), 0, 2, 0, 74, 0, 100, 2, 0, 60, 15700, 27700, 40, 11, 12039, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Friendly Between 0-60% Health - Cast \'Heal\' (Normal Dungeon)'),
+(-(@CGUID+50), 0, 3, 0, 74, 0, 100, 4, 0, 60, 15700, 27700, 40, 11, 38209, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Friendly Between 0-60% Health - Cast \'Heal\' (Heroic Dungeon)'),
+(-(@CGUID+50), 0, 4, 0, 74, 0, 100, 2, 0, 50, 13200, 19300, 40, 11, 25058, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Friendly Between 0-50% Health - Cast \'Renew\' (Normal Dungeon)'),
+(-(@CGUID+50), 0, 5, 0, 74, 0, 100, 4, 0, 50, 13200, 19300, 40, 11, 38210, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Friendly Between 0-50% Health - Cast \'Renew\' (Heroic Dungeon)'),
+(-(@CGUID+50), 0, 6, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - Between 0-15% Health - Flee For Assist (No Repeat)'),
+(-(@CGUID+50), 0, 1001, 0, 1, 0, 100, 0, 0, 0, 16000, 16000, 0, 80, 1863330, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Out of Combat - Run Script'),
+(-(@CGUID+50), 0, 1002, 1003, 1, 0, 100, 1, 3600, 3600, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 10, @CGUID+70, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Respawn - Store Targetlist'),
+(-(@CGUID+50), 0, 1003, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 64, 2, 0, 0, 0, 0, 0, 10, @CGUID+71, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Respawn - Store Targetlist'),
+(-(@CGUID+66), 0, 0, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Aggro - Say Line 0'),
+(-(@CGUID+66), 0, 1, 0, 0, 0, 100, 0, 10200, 18100, 14100, 26200, 0, 11, 33480, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - In Combat - Cast \'Black Cleave\''),
+(-(@CGUID+66), 0, 2, 0, 0, 0, 100, 0, 10900, 28200, 12100, 22900, 0, 11, 11428, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - In Combat - Cast \'Knockdown\''),
+(-(@CGUID+66), 0, 3, 4, 2, 0, 100, 1, 0, 25, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - Between 0-25% Health - Cast \'Enrage\'(No Repeat)'),
+(-(@CGUID+66), 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Link - Say Line 1'),
+(-(@CGUID+66), 0, 1001, 0, 1, 0, 100, 0, 0, 0, 16000, 16000, 0, 80, 1863330, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Out of Combat - Run Script'),
+(-(@CGUID+66), 0, 1002, 1003, 1, 0, 100, 1, 3600, 3600, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 10, @CGUID+46, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Respawn - Store Targetlist'),
+(-(@CGUID+66), 0, 1003, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 64, 2, 0, 0, 0, 0, 0, 10, @CGUID+47, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Respawn - Store Targetlist'),
+(-(@CGUID+58), 0, 0, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Aggro - Say Line 0'),
+(-(@CGUID+58), 0, 1, 0, 0, 0, 100, 0, 10200, 18100, 14100, 26200, 0, 11, 33480, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - In Combat - Cast \'Black Cleave\''),
+(-(@CGUID+58), 0, 2, 0, 0, 0, 100, 0, 10900, 28200, 12100, 22900, 0, 11, 11428, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - In Combat - Cast \'Knockdown\''),
+(-(@CGUID+58), 0, 3, 4, 2, 0, 100, 1, 0, 25, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - Between 0-25% Health - Cast \'Enrage\'(No Repeat)'),
+(-(@CGUID+58), 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Deathsworn - On Link - Say Line 1'),
+(-(@CGUID+58), 0, 1001, 0, 1, 0, 100, 0, 0, 0, 16000, 16000, 0, 80, 1863330, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Out of Combat - Run Script'),
+(-(@CGUID+58), 0, 1002, 1003, 1, 0, 100, 1, 3600, 3600, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 10, @CGUID+38, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Respawn - Store Targetlist'),
+(-(@CGUID+58), 0, 1003, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 64, 2, 0, 0, 0, 0, 0, 10, @CGUID+37, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Respawn - Store Targetlist'),
+-- Group Emotes in Blackheart
+(-(@CGUID+35), 0, 0, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - On Aggro - Say Line 0'),
+(-(@CGUID+35), 0, 1, 0, 13, 0, 100, 0, 5000, 10000, 0, 0, 0, 11, 15614, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - On Victim Casting \'null\' - Cast \'Kick\''),
+(-(@CGUID+35), 0, 2, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - Between 0-15% Health - Flee For Assist (No Repeat)'),
+(-(@CGUID+35), 0, 1001, 1002, 1, 0, 100, 0, 6000, 6000, 16000, 16000, 0, 5, 273, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - Out of Combat - Play Emote 273 (OneShotYes)'),
+(-(@CGUID+35), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 5, 273, 0, 0, 0, 0, 0, 10, @CGUID+53, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - Out of Combat - Play Emote 273 (OneShotYes)'),
+(-(@CGUID+35), 0, 1003, 1004, 1, 0, 100, 0, 10000, 10000, 16000, 16000, 0, 5, 11, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - Out of Combat - Play Emote 11 (OneShotLaugh)'),
+(-(@CGUID+35), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 5, 274, 0, 0, 0, 0, 0, 10, @CGUID+53, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - Out of Combat - Play Emote 274 (OneShotNo)'),
+(-(@CGUID+31), 0, 0, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - On Aggro - Say Line 0'),
+(-(@CGUID+31), 0, 1, 0, 13, 0, 100, 0, 5000, 10000, 0, 0, 0, 11, 15614, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - On Victim Casting \'null\' - Cast \'Kick\''),
+(-(@CGUID+31), 0, 2, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - Between 0-15% Health - Flee For Assist (No Repeat)'),
+(-(@CGUID+31), 0, 1001, 1002, 1, 0, 100, 0, 6000, 6000, 16000, 16000, 0, 5, 273, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - Out of Combat - Play Emote 273 (OneShotYes)'),
+(-(@CGUID+31), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 5, 273, 0, 0, 0, 0, 0, 10, @CGUID+57, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - Out of Combat - Play Emote 273 (OneShotYes)'),
+(-(@CGUID+31), 0, 1003, 1004, 1, 0, 100, 0, 10000, 10000, 16000, 16000, 0, 5, 11, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - Out of Combat - Play Emote 11 (OneShotLaugh)'),
+(-(@CGUID+31), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 5, 274, 0, 0, 0, 0, 0, 10, @CGUID+57, 0, 0, 0, 0, 0, 0, 0, 'Cabal Cultist - Out of Combat - Play Emote 274 (OneShotNo)'),
+-- Group Emotes after Blackheart
+(-(@CGUID+36), 0, 0, 0, 23, 0, 100, 0, 33482, 0, 3600, 3600, 0, 11, 33482, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Aura \'Shadow Defense\' Missing - Cast \'Shadow Defense\''),
+(-(@CGUID+36), 0, 1, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Aggro - Say Line 0'),
+(-(@CGUID+36), 0, 2, 0, 74, 0, 100, 2, 0, 60, 15700, 27700, 40, 11, 12039, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Friendly Between 0-60% Health - Cast \'Heal\' (Normal Dungeon)'),
+(-(@CGUID+36), 0, 3, 0, 74, 0, 100, 4, 0, 60, 15700, 27700, 40, 11, 38209, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Friendly Between 0-60% Health - Cast \'Heal\' (Heroic Dungeon)'),
+(-(@CGUID+36), 0, 4, 0, 74, 0, 100, 2, 0, 50, 13200, 19300, 40, 11, 25058, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Friendly Between 0-50% Health - Cast \'Renew\' (Normal Dungeon)'),
+(-(@CGUID+36), 0, 5, 0, 74, 0, 100, 4, 0, 50, 13200, 19300, 40, 11, 38210, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - On Friendly Between 0-50% Health - Cast \'Renew\' (Heroic Dungeon)'),
+(-(@CGUID+36), 0, 6, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte - Between 0-15% Health - Flee For Assist (No Repeat)'),
+(-(@CGUID+36), 0, 1001, 0, 1, 0, 100, 0, 0, 0, 16000, 16000, 0, 80, 1863330, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Out of Combat - Run Script'),
+(-(@CGUID+36), 0, 1002, 1003, 1, 0, 100, 1, 3600, 3600, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 10, @CGUID+55, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Respawn - Store Targetlist'),
+(-(@CGUID+36), 0, 1003, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 64, 2, 0, 0, 0, 0, 0, 10, @CGUID+56, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - On Respawn - Store Targetlist'),
+-- That one Warlock with the Imps
+(-(@CGUID+93), 0, 0, 0, 0, 0, 100, 2, 0, 0, 2400, 3600, 0, 11, 20801, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - In Combat - Cast \'Firebolt\' (Normal Dungeon)'),
+(-(@CGUID+93), 0, 1, 0, 0, 0, 100, 4, 0, 0, 2400, 3600, 0, 11, 38239, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - In Combat - Cast \'Firebolt\' (Heroic Dungeon)'),
+(-(@CGUID+93), 0, 1001, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -54.60242, -78.51944, -1.1282262, 0, 'Cabal Familiar - On Data Set 1 1 - Move To Position'),
+(-(@CGUID+93), 0, 1002, 0, 34, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, @CGUID+89, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Reached Point 0 - Set Orientation Closest Creature \'Cabal Warlock\''),
+(-(@CGUID+93), 0, 1003, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -54.600212, -77.50109, -1.127364, 0, 'Cabal Familiar - On Data Set 2 2 - Move To Position'),
+(-(@CGUID+93), 0, 1004, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -54.675922, -77.17647, -1.1273506, 0, 'Cabal Familiar - On Data Set 3 3 - Move To Position'),
+(-(@CGUID+93), 0, 1005, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 4 4 - Set Flag Standstate Dead'),
+(-(@CGUID+93), 0, 1006, 1007, 38, 0, 100, 0, 5, 5, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 5 5 - Remove FlagStandstate Dead'),
+(-(@CGUID+93), 0, 1007, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -56.442944, -80.5976, -1.1282377, 0.4363323152065277, 'Cabal Familiar - On Data Set 5 5 - Move To Position'),
+(-(@CGUID+93), 0, 1008, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Reset - Set Run Off'),
+(-(@CGUID+93), 0, 1009, 1010, 4, 0, 100, 0, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Aggro - Set Run On'),
+(-(@CGUID+93), 0, 1010, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Aggro - Remove FlagStandstate Dead'),
+
+(-(@CGUID+95), 0, 0, 0, 0, 0, 100, 2, 0, 0, 2400, 3600, 0, 11, 20801, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - In Combat - Cast \'Firebolt\' (Normal Dungeon)'),
+(-(@CGUID+95), 0, 1, 0, 0, 0, 100, 4, 0, 0, 2400, 3600, 0, 11, 38239, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - In Combat - Cast \'Firebolt\' (Heroic Dungeon)'),
+(-(@CGUID+95), 0, 1001, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 1, 45, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 1 1 - Start Follow Column Formation'),
+(-(@CGUID+95), 0, 1002, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 29, 1, 270, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 2 2 - Start Follow Line Formation'),
+(-(@CGUID+95), 0, 1003, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 29, 1, 360, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 3 3 - Start Follow Circle Formation'),
+(-(@CGUID+95), 0, 1004, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 4 4 - Set Flag Standstate Dead'),
+(-(@CGUID+95), 0, 1005, 1006, 38, 0, 100, 0, 5, 5, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 5 5 - Remove FlagStandstate Dead'),
+(-(@CGUID+95), 0, 1006, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 29, 5, 30, 0, 0, 0, 0, 10, @CGUID+89, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 5 5 - Start Follow Semi-Circle Formation'),
+(-(@CGUID+95), 0, 1007, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Aggro - Remove FlagStandstate Dead'),
+
+(-(@CGUID+96), 0, 0, 0, 0, 0, 100, 2, 0, 0, 2400, 3600, 0, 11, 20801, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - In Combat - Cast \'Firebolt\' (Normal Dungeon)'),
+(-(@CGUID+96), 0, 1, 0, 0, 0, 100, 4, 0, 0, 2400, 3600, 0, 11, 38239, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - In Combat - Cast \'Firebolt\' (Heroic Dungeon)'),
+(-(@CGUID+96), 0, 1001, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 1, 135, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 1 1 - Start Follow Column Formation'),
+(-(@CGUID+96), 0, 1002, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 29, 2, 270, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 2 2 - Start Follow Line Formation'),
+(-(@CGUID+96), 0, 1003, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 29, 1, 90, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 3 3 - Start Follow Circle Formation'),
+(-(@CGUID+96), 0, 1004, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 4 4 - Set Flag Standstate Dead'),
+(-(@CGUID+96), 0, 1005, 1006, 38, 0, 100, 0, 5, 5, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 5 5 - Remove FlagStandstate Dead'),
+(-(@CGUID+96), 0, 1006, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 29, 5, 360, 0, 0, 0, 0, 10, @CGUID+89, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 5 5 - Start Follow Semi-Circle Formation'),
+(-(@CGUID+96), 0, 1007, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Aggro - Remove FlagStandstate Dead'),
+
+(-(@CGUID+97), 0, 0, 0, 0, 0, 100, 2, 0, 0, 2400, 3600, 0, 11, 20801, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - In Combat - Cast \'Firebolt\' (Normal Dungeon)'),
+(-(@CGUID+97), 0, 1, 0, 0, 0, 100, 4, 0, 0, 2400, 3600, 0, 11, 38239, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - In Combat - Cast \'Firebolt\' (Heroic Dungeon)'),
+(-(@CGUID+97), 0, 1001, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 1, 225, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 1 1 - Start Follow Column Formation'),
+(-(@CGUID+97), 0, 1002, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 29, 1, 90, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 2 2 - Start Follow Line Formation'),
+(-(@CGUID+97), 0, 1003, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 29, 1, 180, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 3 3 - Start Follow Circle Formation'),
+(-(@CGUID+97), 0, 1004, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 4 4 - Set Flag Standstate Dead'),
+(-(@CGUID+97), 0, 1005, 1006, 38, 0, 100, 0, 5, 5, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 5 5 - Remove FlagStandstate Dead'),
+(-(@CGUID+97), 0, 1006, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 29, 5, 330, 0, 0, 0, 0, 10, @CGUID+89, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 5 5 - Start Follow Semi-Circle Formation'),
+(-(@CGUID+97), 0, 1007, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Aggro - Remove FlagStandstate Dead'),
+
+(-(@CGUID+99), 0, 0, 0, 0, 0, 100, 2, 0, 0, 2400, 3600, 0, 11, 20801, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - In Combat - Cast \'Firebolt\' (Normal Dungeon)'),
+(-(@CGUID+99), 0, 1, 0, 0, 0, 100, 4, 0, 0, 2400, 3600, 0, 11, 38239, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - In Combat - Cast \'Firebolt\' (Heroic Dungeon)'),
+(-(@CGUID+99), 0, 1001, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 1, 315, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 1 1 - Start Follow Column Formation'),
+(-(@CGUID+99), 0, 1002, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 29, 2, 90, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 2 2 - Start Follow Line Formation'),
+(-(@CGUID+99), 0, 1003, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 29, 1, 270, 0, 0, 0, 0, 10, @CGUID+93, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 3 3 - Start Follow Circle Formation'),
+(-(@CGUID+99), 0, 1004, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 4 4 - Set Flag Standstate Dead'),
+(-(@CGUID+99), 0, 1005, 1006, 38, 0, 100, 0, 5, 5, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 5 5 - Remove FlagStandstate Dead'),
+(-(@CGUID+99), 0, 1006, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 29, 5, 300, 0, 0, 0, 0, 10, @CGUID+89, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Data Set 5 5 - Start Follow Semi-Circle Formation'),
+(-(@CGUID+99), 0, 1007, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Familiar - On Aggro - Remove FlagStandstate Dead'),
+
+(-(@CGUID+89), 0, 0, 0, 23, 0, 100, 0, 13787, 0, 3600, 3600, 0, 11, 13787, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - On Aura \'Demon Armor\' - Cast \'Demon Armor\''),
+(-(@CGUID+89), 0, 1, 0, 4, 0, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - On Aggro - Say Line 0'),
+(-(@CGUID+89), 0, 2, 0, 0, 0, 100, 2, 0, 0, 3600, 4800, 0, 11, 12471, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - In Combat - Cast \'Shadow Bolt\' (Normal Dungeon)'),
+(-(@CGUID+89), 0, 3, 0, 0, 0, 100, 4, 0, 0, 3600, 4800, 0, 11, 15232, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - In Combat - Cast \'Shadow Bolt\' (Heroic Dungeon)'),
+(-(@CGUID+89), 0, 4, 0, 0, 0, 100, 0, 7800, 24100, 19300, 36200, 0, 11, 32863, 32, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - In Combat - Cast \'Seed of Corruption\''),
+(-(@CGUID+89), 0, 1001, 0, 1, 0, 100, 0, 0, 0, 21600, 21600, 0, 80, 1864000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - Out of Combat - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1863300, 1863301, 1863302, 1863303, 1863304, 1863305, 1863306, 1863307, 1863310, 1863311, 1863312, 1863313, 1863320, 1863321, 1863322, 1863323, 1863330, 1864000));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+-- @CGUID+74
+(1863300, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -56.12531,15.902268,-1.1280963,1.500983119010925292, 'Cabal Acolyte/Deathsworn - Actionlist - Move To Position'),
+(1863301, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 69, 2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -45.583424,18.347652,-1.1280077,2.408554315567016601, 'Cabal Acolyte/Deathsworn - Actionlist - Move To Position'),
+(1863302, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 69, 3, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -39.553253,-2.8745165,-1.1311177,3.909537553787231445, 'Cabal Acolyte/Deathsworn - Actionlist - Move To Position'),
+(1863303, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1863300, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Start Waypoint'),
+(1863304, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Kneel'),
+(1863304, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 6 (OneShotQuestion)'),
+(1863304, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 69, 4, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -38.904556, 9.191648, -1.1282171, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Return'),
+(1863305, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Kneel'),
+(1863305, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 6 (OneShotQuestion)'),
+(1863305, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 69, 4, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -38.700325, 9.738519, -1.1281042, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Return'),
+(1863306, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Kneel'),
+(1863306, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 6 (OneShotQuestion)'),
+(1863306, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 69, 4, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -38.106625, 7.8376193, -1.139362, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Return'),
+(1863307, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Kneel'),
+(1863307, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 6 (OneShotQuestion)'),
+(1863307, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 53, 0, 1863301, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Return'),
+-- @CGUID+75
+(1863310, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 17, 69, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Emote State 69'),
+(1863310, 9, 1, 0, 0, 0, 100, 0, 120000, 120000, 0, 0, 0, 53, 0, 1863311, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Start Waypoint'),
+(1863311, 9, 0, 0, 0, 0, 100, 0, 120000, 120000, 0, 0, 0, 53, 0, 1863312, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Start Waypoint'),
+(1863312, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 5 (OneShotExclamation)'),
+(1863312, 9, 1, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 5, 274, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 274 (OneShotNo)'),
+(1863312, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1863313, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Start Waypoint'),
+(1863313, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 11, 6606, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Cast \'Self Visual - Sleep Until Cancelled  (DND)\''),
+(1863313, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Sleep'),
+-- @CGUID+59
+(1863320, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Kneel'),
+(1863320, 9, 1, 0, 0, 0, 100, 0, 10000, 20000, 0, 0, 0, 90, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Stand Up'),
+(1863320, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 53, 0, 1863321, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Start Waypoint'),
+(1863321, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Kneel'),
+(1863321, 9, 1, 0, 0, 0, 100, 0, 10000, 20000, 0, 0, 0, 90, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Stand Up'),
+(1863321, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 53, 0, 1863322, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Start Waypoint'),
+(1863322, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Kneel'),
+(1863322, 9, 1, 0, 0, 0, 100, 0, 10000, 20000, 0, 0, 0, 90, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Stand Up'),
+(1863322, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 53, 0, 1863323, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Start Waypoint'),
+(1863323, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Kneel'),
+(1863323, 9, 1, 0, 0, 0, 100, 0, 10000, 20000, 0, 0, 0, 90, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Set Flag Standstate Stand Up'),
+(1863323, 9, 2, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 53, 0, 1863320, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Start Waypoint'),
+-- Group Emotes
+(1863330, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 5'),
+(1863330, 9, 1, 0, 0, 0, 100, 0, 800, 800, 0, 0, 0, 5, 273, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 273'),
+(1863330, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 273, 0, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 273'),
+(1863330, 9, 3, 0, 0, 0, 100, 0, 5200, 5200, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 1'),
+(1863330, 9, 4, 0, 0, 0, 100, 0, 800, 800, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 11'),
+(1863330, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 274, 0, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Cabal Acolyte/Deathsworn - Actionlist - Play Emote 274'),
+-- Warlock w/ Imps
+(1864000, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 25, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - Actionlist - Play Emote 25 (OneShotPoint)'),
+(1864000, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 9, 18641, 0, 10, 0, 0, 0, 0, 0, 'Cabal Warlock - Actionlist - Set Data 1 1 on Cabal Familiar'),
+(1864000, 9, 2, 0, 0, 0, 100, 0, 4800, 4800, 0, 0, 0, 5, 25, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - Actionlist - Play Emote 25 (OneShotPoint)'),
+(1864000, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 2, 2, 0, 0, 0, 0, 9, 18641, 0, 10, 0, 0, 0, 0, 0, 'Cabal Warlock - Actionlist - Set Data 2 2 on Cabal Familiar'),
+(1864000, 9, 4, 0, 0, 0, 100, 0, 4800, 4800, 0, 0, 0, 5, 25, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - Actionlist - Play Emote 25 (OneShotPoint)'),
+(1864000, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 3, 3, 0, 0, 0, 0, 9, 18641, 0, 10, 0, 0, 0, 0, 0, 'Cabal Warlock - Actionlist - Set Data 3 3 on Cabal Familiar'),
+(1864000, 9, 6, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 5, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - Actionlist - Play Emote 15 (OneShotRoar)'),
+(1864000, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 4, 4, 0, 0, 0, 0, 9, 18641, 0, 10, 0, 0, 0, 0, 0, 'Cabal Warlock - Actionlist - Set Data 4 4 on Cabal Familiar'),
+(1864000, 9, 8, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Warlock - Actionlist - Play Emote 11 (OneShotLaugh)'),
+(1864000, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 5, 5, 0, 0, 0, 0, 9, 18641, 0, 10, 0, 0, 0, 0, 0, 'Cabal Warlock - Actionlist - Set Data 5 5 on Cabal Familiar');
+
+DELETE FROM `waypoints` WHERE `entry` IN (1863300, 1863301, 1863310, 1863311, 1863312, 1863313, 1863314, 1863320, 1863321, 1863322, 1863323);
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
+-- @CGUID+74
+(1863300,1,-52.02843,7.989649,-1.1363385,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863300,2,-60.46806,-17.786806,-1.1281031,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863300,3,-62.2594,-17.671495,-0.8781476,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement - Decomposed'),
+(1863300,4,-72.0094,-18.171495,-0.8781476,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement - Decomposed'),
+(1863300,5,-88.0094,-19.171495,-0.8781476,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement - Decomposed'),
+(1863300,6,-91.59668,-19.750717,-1.1281965,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'), -- Kneel
+(1863301,1,-79.35473,-18.369698,-1.1281896,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863301,2,-60.68144,-18.41702,-1.1281054,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863301,3,-59.339016,8.937592,-1.1331869,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863301,4,-38.207558,6.4706,-1.1396345,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+-- @CGUID+75
+(1863310,1,-72.57798,-57.46383,-1.1282872,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863310,2,-73.312515,-47.810535,-1.1282725,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863310,3,-75.1045,-31.282742,-1.128238,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863310,4,-70.535805,-9.529369,-1.1282011,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863310,5,-71.11048,4.415329,-1.131315,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863310,6,-77.05485,13.641082,-1.1259611,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863310,7,-83.71878,16.439613,-1.1252953,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863311,1,-83.42682,9.065303,-1.128148,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863311,2,-87.13698,5.347651,-1.1294439,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863311,3,-92.58539,6.675378,-1.1281886,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863312,1,-75.12263,5.945516,-1.1334243,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863312,2,-71.03537,0.777348,-1.1332686,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863312,3,-71.02589,-13.750463,-1.1282126,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863312,4,-78.04927,-34.81697,-1.128252,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863313,1,-71.23069,-3.681942,-1.1282022,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863313,2,-71.75592,4.065299,-1.1312664,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863313,3,-83.33886,16.183434,-1.1253709,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863313,4,-83.42682,9.065303,-1.128148,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863313,5,-87.13698,5.347651,-1.1294439,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863313,6,-92.58539,6.675378,-1.1281886,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863313,7,-95.19748,15.935198,-1.1281945,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+-- @CGUID+59
+(1863320,1,-31.467445,-76.35811,-1.1387877,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863320,2,-40.881832,-83.187546,-1.1387525,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863320,3,-53.190514,-85.86522,-1.1293151,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863320,4,-48.516537,-89.56273,-1.1283104,5.270894527435302734,'Cabal Acolyte/Deathsworn - Scripted Movement'), -- Kneel Event
+(1863321,1,-54.63497,-86.19853,-1.1276491,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863321,2,-71.14439,-87.47349,-1.1276826,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863321,3,-71.67121,-88.54126,-0.8780625,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement - Decomposed'),
+(1863321,4,-74.58814,-92.29362,-1.1282818,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'), -- Kneel Event
+(1863322,1,-76.037605,-87.968254,-1.1282866,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863322,2,-77.01048,-87.40318,-0.8784666,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement - Decomposed'),
+(1863322,3,-87.973404,-84.875786,-1.1286482,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863322,4,-93.06858,-93.0166,-1.1283059,0.802851438522338867,'Cabal Acolyte/Deathsworn - Scripted Movement'),  -- Kneel Event
+(1863323,1,-88.036644,-83.68095,-1.128579,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863323,2,-80.11424,-88.83278,-1.1282915,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863323,3,-67.98374,-85.89638,-1.1252053,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863323,4,-44.839676,-84.90544,-1.133501,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'),
+(1863323,5,-31.467445,-76.35811,-1.1387877,NULL,'Cabal Acolyte/Deathsworn - Scripted Movement'); -- Kneel Event
+
+-- https://github.com/azerothcore/azerothcore-wotlk/issues/14698
+UPDATE `creature_template_addon` SET `bytes1` = 0, `bytes2` = 1 WHERE (`entry` IN (18830, 20644, 18638, 20650));
+
+SET @NPC := @CGUID+25;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,8,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-354.83398,-267.55493,12.68742,NULL,15400,0,0,100,0), -- Kneel
+(@PATH,2,-367.75922,-267.6575,12.688927,NULL,0,0,0,100,0),
+(@PATH,3,-367.59622,-267.65622,12.689046,0.03490658476948738,15400,0,0,100,0); -- Kneel
+
+SET @NPC := @CGUID+27;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,8,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-323.5248,-264.78464,12.684626,0.01745329238474369,15400,0,0,100,0), -- Kneel
+(@PATH,2,-290.12753,-263.76453,12.682338,NULL,15400,0,0,100,0); -- Kneel
+
+SET @NPC := @CGUID+197;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-246.49648,-282.56845,17.086329,NULL,0,0,0,100,0),
+(@PATH,2,-238.89442,-277.1962,17.086287,NULL,0,0,0,100,0),
+(@PATH,3,-232.98311,-270.28983,17.086288,NULL,0,0,0,100,0),
+(@PATH,4,-231.82408,-256.32004,17.086378,NULL,0,0,0,100,0),
+(@PATH,5,-240.6651,-248.60138,17.086283,NULL,0,0,0,100,0),
+(@PATH,6,-247.90907,-247.09088,17.086376,NULL,0,0,0,100,0),
+(@PATH,7,-258.20337,-246.84099,12.67995,NULL,0,0,0,100,0),
+(@PATH,8,-268.21298,-248.91357,12.064231,NULL,0,0,0,100,0),
+(@PATH,9,-275.60107,-252.21254,12.681708,NULL,0,0,0,100,0),
+(@PATH,10,-279.302,-258.68976,12.681697,NULL,0,0,0,100,0),
+(@PATH,11,-279.3916,-269.65582,12.681446,NULL,0,0,0,100,0),
+(@PATH,12,-271.79556,-275.23175,12.6813135,NULL,0,0,0,100,0),
+(@PATH,13,-264.27405,-279.25732,12.680406,NULL,0,0,0,100,0),
+(@PATH,14,-257.4364,-281.72037,12.679068,NULL,0,0,0,100,0);
+
+DELETE FROM `creature_addon` WHERE (`guid` IN (@CGUID+83,@CGUID+193,@CGUID+190,@CGUID+84,@CGUID+194,@CGUID+192,@CGUID+85,@CGUID+195,@CGUID+26,@CGUID+191));
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(@CGUID+83 , 0, 0, 8, 1, 0, 0, ''),
+(@CGUID+193, 0, 0, 8, 1, 0, 0, ''),
+(@CGUID+190, 0, 0, 8, 1, 0, 0, ''),
+(@CGUID+84 , 0, 0, 8, 1, 0, 0, ''),
+(@CGUID+194, 0, 0, 8, 1, 0, 0, ''),
+(@CGUID+192, 0, 0, 8, 1, 0, 0, ''),
+(@CGUID+85 , 0, 0, 8, 1, 0, 0, ''),
+(@CGUID+195, 0, 0, 8, 1, 0, 0, ''),
+(@CGUID+26 , 0, 0, 8, 1, 0, 0, ''),
+(@CGUID+191, 0, 0, 8, 1, 0, 0, '');
+
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (@CGUID+25,@CGUID+27,@CGUID+197) AND `memberGUID` IN (@CGUID+25,@CGUID+193,@CGUID+83,@CGUID+190,@CGUID+27,@CGUID+194,@CGUID+84,@CGUID+192,@CGUID+197,@CGUID+196,@CGUID+86,@CGUID+87);
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
+(@CGUID+025, @CGUID+025, 0, 0, 3),
+(@CGUID+025, @CGUID+193, 2, 90, 515),
+(@CGUID+025, @CGUID+083, 4, 90, 515),
+(@CGUID+025, @CGUID+190, 2, 270, 515),
+(@CGUID+027, @CGUID+027, 0, 0, 3),
+(@CGUID+027, @CGUID+194, 3, 90, 515),
+(@CGUID+027, @CGUID+084, 6, 90, 515),
+(@CGUID+027, @CGUID+192, 3, 270, 515),
+(@CGUID+197, @CGUID+197, 0, 0, 3),
+(@CGUID+197, @CGUID+196, 2, 90, 515),
+(@CGUID+197, @CGUID+086, 4, 90, 515),
+(@CGUID+197, @CGUID+087, 2, 270, 515);
