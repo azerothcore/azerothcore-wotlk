@@ -342,9 +342,10 @@ private:
             case 148: // Darkshore
             case 3433: // Ghostlands
             case 3525: // Bloodmyst Isle
-            case 17: // Barrens
             case 721: // Gnomeregan
                 return { 8, 20 };
+            case 17: // Barrens
+                return { 8, 25 };
             case 44: // Redridge Mountains
             case 406: // Stonetalon Mountains
                 return { 13, 25 };
@@ -1081,7 +1082,7 @@ public:
         }
 
         WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET flags=%u WHERE id=%u", wp->GetFlags(), wpId);
- 
+
         return true;
     }
     static bool HandleNpcBotWPSetNameCommand(ChatHandler* handler, Optional<std::string> newname)
