@@ -3905,7 +3905,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (!me || !me->IsEngaged())
                     return;
 
-                ObjectVector targets;
+                Unit* unitTarget = nullptr;
                 switch (e.GetTargetType())
                 {
                     case SMART_TARGET_CREATURE_RANGE:
@@ -3916,8 +3916,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     case SMART_TARGET_PLAYER_RANGE:
                     case SMART_TARGET_PLAYER_DISTANCE:
                     {
-                        if (targets.empty())
-                            return;
+                        ObjectVector targets;
+                        GetTargets(targets, e);
                         for (WorldObject* target : targets)
                         {
                             if (IsUnit(target) && me->IsFriendlyTo(target->ToUnit()) && target->ToUnit()->IsAlive() && target->ToUnit()->IsInCombat())
@@ -3928,7 +3928,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                                     continue;
                                 }
 
-                                target = target->ToUnit();
+                                unitTarget = target->ToUnit();
                                 break;
                             }
                         }
@@ -3937,16 +3937,16 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     }
                     case SMART_TARGET_SELF:
                     case SMART_TARGET_ACTION_INVOKER:
-                        DoSelectLowestHpPercentFriendly((float)e.event.friendlyHealthPct.radius, e.event.friendlyHealthPct.minHpPct, e.event.friendlyHealthPct.maxHpPct);
+                        unitTarget = DoSelectLowestHpPercentFriendly((float)e.event.friendlyHealthPct.radius, e.event.friendlyHealthPct.minHpPct, e.event.friendlyHealthPct.maxHpPct);
                         break;
                     default:
                         return;
                 }
 
-                if (targets.empty())
+                if (!unitTarget)
                     return;
 
-                ProcessTimedAction(e, e.event.friendlyHealthPct.repeatMin, e.event.friendlyHealthPct.repeatMax);
+                ProcessTimedAction(e, e.event.friendlyHealthPct.repeatMin, e.event.friendlyHealthPct.repeatMax, unitTarget);
                 break;
             }
         case SMART_EVENT_DISTANCE_CREATURE:
