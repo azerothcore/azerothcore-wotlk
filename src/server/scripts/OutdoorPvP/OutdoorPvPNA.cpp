@@ -657,7 +657,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
                 m_value = -m_maxValue;
                 m_State = OBJECTIVESTATE_HORDE;
                 m_team = TEAM_HORDE;
-            } 
+            }
             else //then point is still in battle between teams
             {
                 if (m_OldState == OBJECTIVESTATE_NEUTRAL || m_OldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE || m_OldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE)

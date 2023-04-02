@@ -29,9 +29,6 @@ enum OutdoorPvPNASpells
     NA_CAPTURE_BUFF = 33795  // strength of the halaani
 };
 
-// FACTIONS
-const uint32 NEUTRAL_FACT = 113;
-
 // kill credit for pks
 const uint32 NA_CREDIT_MARKER = 24867;
 
@@ -171,28 +168,6 @@ const HalaaIds PatrolCreatureEntry[12] =
     21474,
     21484,
     21483,
-    // Ally
-    18256,
-    18817,
-    18822,
-    21485,
-    21487,
-    21488
-};
-
-const HalaaIds PatrolCreatureEntryHorde[6] =
-{
-    // Horde
-    18192,
-    18816,
-    18821,
-    21474,
-    21484,
-    21483
-};
-
-const HalaaIds PatrolCreatureEntryAlly[6] =
-{
     // Ally
     18256,
     18817,
