@@ -6825,7 +6825,10 @@ void bot_ai::OnSpellHit(Unit* caster, SpellInfo const* spell)
     {
         case WANDERER_HEARTHSTONE:
             if (IsWanderer())
+            {
                 BotMgr::TeleportBot(me, sMapMgr->CreateBaseMap(_travel_node_cur->GetMapId()), _travel_node_cur, true);
+                _evadeCount = 0;
+            }
             return;
         default:
             break;
@@ -14517,7 +14520,7 @@ void bot_ai::JustDied(Unit* u)
             IsWanderer() ? "Wandering bot" : "Bot", me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
             (u->IsPlayer() ? "player" : u->IsNPCBot() ? u->ToCreature()->GetBotAI()->IsWanderer() ? "wandering bot" : "bot" : u->IsNPCBotPet() ? "botpet" : "creature"),
             u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
-            _travel_node_cur->GetName().c_str());
+            IsWanderer() ? _travel_node_cur->GetName().c_str() : "''");
     }
 
     _reviveTimer = (IsWanderer() && !(u && u->IsControlledByPlayer())) ? 90000 : IAmFree() ? 180000 : 60000; //1.5min/3min/1min
@@ -14548,7 +14551,7 @@ void bot_ai::KilledUnit(Unit* u)
             LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} KILLED wandering bot {} id {} class {} level {} on their way to {}!",
                 me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
                 u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
-                _travel_node_cur->GetName().c_str());
+                IsWanderer() ? _travel_node_cur->GetName().c_str() : "''");
         }
     }
     if (u->isType(TYPEMASK_PLAYER))

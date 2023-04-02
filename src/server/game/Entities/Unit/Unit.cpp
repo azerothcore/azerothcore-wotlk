@@ -14380,6 +14380,17 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
         controlled->SetInCombatState(PvP, enemy, duration);
     }
 
+    //npcbot: party combat hook
+    Player* playerOwner = nullptr;
+    if (IsPlayer() && ToPlayer()->HaveBot())
+        playerOwner = ToPlayer();
+    else if (IsNPCBotOrPet() && !ToCreature()->IsFreeBot())
+        playerOwner = ToCreature()->GetBotOwner();
+
+    if (playerOwner)
+        BotMgr::OnBotPartyEngage(playerOwner);
+    //end npcbot
+
     //npcbot: combatstate for bots
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->HaveBot())
     {
@@ -22595,7 +22606,7 @@ bool Unit::IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType aur
         AuraEffect const* existingAurEff = (*itr);
         ++itr;
 
-        if (sSpellMgr->CheckSpellGroupStackRules(spellInfo, existingAurEff->GetSpellInfo(), true, spellInfo->IsAffectingArea()) & SPELL_GROUP_STACK_FLAG_EFFECT_EXCLUSIVE)
+        if (sSpellMgr->CheckSpellGroupStackRules(spellInfo, existingAurEff->GetSpellInfo(), true, spellInfo->IsAffectingArea()) & SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST)
         {
             int32 diff = abs(effectAmount) - abs(existingAurEff->GetAmount());
             if (!diff)
