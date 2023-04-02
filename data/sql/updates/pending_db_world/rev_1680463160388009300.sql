@@ -15,7 +15,7 @@ DELETE FROM `creature` WHERE (`guid` = 77583 AND `id1` = 22100);
 DELETE FROM `creature` WHERE (`guid` = 82379 AND `id1` = 15652);
 -- Scalewing Serpent
 DELETE FROM `creature` WHERE (`guid` = 73192 AND `id1` = 20749);
- -- Stunetusk Boar
+-- Stunetusk Boar
 DELETE FROM `creature` WHERE (`guid` = 80419 AND `id1` = 113);
 
 
