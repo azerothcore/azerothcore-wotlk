@@ -1,11 +1,23 @@
 -- Remove old/deprecated bytes2 flags.
-UPDATE `creature_addon` SET `bytes2` = 1 WHERE `bytes2` IN (4092,4096,4097,256,257,301993985,318771201,285216769);
-UPDATE `creature_addon` SET `bytes2` = 0 WHERE `bytes2` IN (733,141313,234885121,251662337);
+UPDATE `creature_addon` SET `bytes2` = 1 WHERE `bytes2` IN (257,733,4092,4097,301993985,318771201,285216769,234885121);
+UPDATE `creature_addon` SET `bytes2` = 0 WHERE `bytes2` IN (256,4096);
 UPDATE `creature_addon` SET `bytes2` = 2 WHERE `bytes2` IN (258,4098);
 
--- Elder Springpaw, Scorpid Bonecrawler & Blackwind Sabercat wrong spawns.
-DELETE FROM `creature_addon` WHERE `guid` IN (75829,77583,77606,77607,82379);
-DELETE FROM `creature` WHERE `guid` IN (75829,77583,82379);
+-- Creature where neither of the values in creature_addon were used.
+DELETE FROM `creature_addon` WHERE `guid` IN (75829,77583,77606,77607,82379,73192,80419,81738,82004,32943);
+
+-- Incorrect mob spawns (wrong zone/area/sniffed as a pet (with spirit bond))
+-- Blackwind Sabercat
+DELETE FROM `creature` WHERE (`guid` = 75829 AND `id1` = 21723);
+-- Scorpid Bonecrawler
+DELETE FROM `creature` WHERE (`guid` = 77583 AND `id1` = 22100);
+-- Elder Springpaw
+DELETE FROM `creature` WHERE (`guid` = 82379 AND `id1` = 15652);
+-- Scalewing Serpent
+DELETE FROM `creature` WHERE (`guid` = 73192 AND `id1` = 20749);
+ -- Stunetusk Boar
+DELETE FROM `creature` WHERE (`guid` = 80419 AND `id1` = 113);
+
 
 -- Hatecrest Warrior defensive stance, handled by SAI
-UPDATE `creature_addon` SET `auras` = NULL WHERE `guid` = 51476;
+UPDATE `creature_addon` SET `auras` = '' WHERE `guid` = 51476;
