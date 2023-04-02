@@ -164,12 +164,36 @@ struct HalaaIds
 
 const HalaaIds PatrolCreatureEntry[12] =
 {
+    // Horde
     18192,
     18816,
     18821,
     21474,
     21484,
     21483,
+    // Ally
+    18256,
+    18817,
+    18822,
+    21485,
+    21487,
+    21488
+};
+
+const HalaaIds PatrolCreatureEntryHorde[6] =
+{
+    // Horde
+    18192,
+    18816,
+    18821,
+    21474,
+    21484,
+    21483
+};
+
+const HalaaIds PatrolCreatureEntryAlly[6] =
+{
+    // Ally
     18256,
     18817,
     18822,
@@ -225,22 +249,18 @@ public:
     uint32 GetAliveGuardsCount();
     TeamId GetControllingFaction() const;
 
-    void NPCHalaaRegister(GameObject* m_capturePoint);
-
-    void HideOrShowHalaaNPCS(bool hide);
-
 protected:
     // called when a faction takes control
     void FactionTakeOver(TeamId teamId);
 
     void DeSpawnGOs();
+    void DeSpawnNPCs(HalaaNPCS teamNPC);
 
-    void SpawnNPCsForTeam(TeamId teamId);
+    void SpawnNPCsForTeam(HalaaNPCS teamNPC);
     void SpawnGOsForTeam(TeamId teamId);
 
     void UpdateWyvernRoostWorldState(uint32 roost);
     void UpdateHalaaWorldState();
-    HalaaNPCS halaaNPC;
 private:
     bool m_capturable;
 
@@ -260,8 +280,6 @@ private:
     uint32 m_GuardCheckTimer;
 
     bool m_canRecap;
-
-    bool m_npcsInitialized;
 };
 
 class OutdoorPvPNA : public OutdoorPvP

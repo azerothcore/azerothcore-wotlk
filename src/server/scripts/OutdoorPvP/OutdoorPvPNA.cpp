@@ -32,6 +32,10 @@ OutdoorPvPNA::OutdoorPvPNA()
     m_obj = nullptr;
 }
 
+// SpawnIds from creatures
+HalaaNPCS halaaNPCHorde;
+HalaaNPCS halaaNPCAlly;
+
 void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 {
     if (killed->GetTypeId() == TYPEID_PLAYER && player->GetTeamId() != killed->ToPlayer()->GetTeamId())
@@ -50,8 +54,6 @@ uint32 OPvPCapturePointNA::GetAliveGuardsCount()
         for (auto itr2 = bounds.first; itr2 != bounds.second; ++itr2)
             if (itr2->second->IsAlive() && (itr2->second->GetEntry() == 18192 || itr2->second->GetEntry() == 18256))
                 ++cnt;
-        if (cnt == 15)
-            break;
     }
     return cnt;
 }
@@ -61,37 +63,33 @@ TeamId OPvPCapturePointNA::GetControllingFaction() const
     return m_ControllingFaction;
 }
 
-void OPvPCapturePointNA::HideOrShowHalaaNPCS(bool hide)
+void OPvPCapturePointNA::DeSpawnNPCs(HalaaNPCS teamNPC)
 {
     for (int i = 0; i < 20; i++)
     {
-        ObjectGuid::LowType spawnId = halaaNPC[i];
+        ObjectGuid::LowType spawnId = teamNPC[i];
         auto bounds = m_PvP->GetMap()->GetCreatureBySpawnIdStore().equal_range(spawnId);
-        for (auto itr = bounds.first; itr != bounds.second;)
-        {
-            // can happen when closing the core
-            Creature* c = itr->second;
-            ++itr;
-            c->SetPhaseMask(hide ? 2 : 1, false);
-        }
-    }
-}
-void OPvPCapturePointNA::SpawnNPCsForTeam(TeamId teamId)
-{
-    for (int i = 0; i < 20; i++)
-    {
-        ObjectGuid::LowType spawnId = halaaNPC[i];
         const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
-        auto bounds = m_PvP->GetMap()->GetCreatureBySpawnIdStore().equal_range(spawnId);
         for (auto itr = bounds.first; itr != bounds.second;)
         {
             // can happen when closing the core
             Creature* c = itr->second;
             ++itr;
             c->AddObjectToRemoveList();
+            sObjectMgr->RemoveCreatureFromGrid(spawnId, data);
+            m_Creatures[i] = 0;
+            m_CreatureTypes[m_Creatures[i]] = 0;
         }
-        sObjectMgr->RemoveCreatureFromGrid(spawnId, data);
-        sObjectMgr->UpdateCreatureHalaa(spawnId, GetControllingFaction(), m_PvP->GetMap());
+    }
+}
+
+void OPvPCapturePointNA::SpawnNPCsForTeam(HalaaNPCS teamNPC)
+{
+    for (int i = 0; i < 20; i++)
+    {
+        ObjectGuid::LowType spawnId = teamNPC[i];
+        const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
+        sObjectMgr->UpdateCreatureHalaa(spawnId, m_PvP->GetMap(), data->posX, data->posY);
         m_Creatures[i] = spawnId;
         m_CreatureTypes[m_Creatures[i]] = i;
     }
@@ -137,15 +135,13 @@ void OPvPCapturePointNA::FactionTakeOver(TeamId teamId)
         sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_NA_LOSE_A));
     else if (m_ControllingFaction == TEAM_HORDE)
         sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_NA_LOSE_H));
-    bool isHide = teamId == GetControllingFaction(); //Made to check if the same faction recap halaa
-    HideOrShowHalaaNPCS(isHide);
+    DeSpawnNPCs(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
     m_ControllingFaction = teamId;
     if (m_ControllingFaction != TEAM_NEUTRAL)
         sGraveyard->AddGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, m_ControllingFaction, false);
     DeSpawnGOs();
     SpawnGOsForTeam(teamId);
-    if(!isHide)
-        SpawnNPCsForTeam(teamId);
+    SpawnNPCsForTeam(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
     m_GuardsAlive = NA_GUARDS_MAX;
     m_capturable = false;
     m_canRecap = false;
@@ -202,7 +198,7 @@ void OPvPCapturePointNA::HandlePlayerLeave(Player* player)
 OPvPCapturePointNA::OPvPCapturePointNA(OutdoorPvP* pvp) :
     OPvPCapturePoint(pvp), m_capturable(true), m_GuardsAlive(0), m_ControllingFaction(TEAM_NEUTRAL),
     m_WyvernStateNorth(0), m_WyvernStateSouth(0), m_WyvernStateEast(0), m_WyvernStateWest(0),
-    m_HalaaState(HALAA_N), m_canRecap(true), m_GuardCheckTimer(NA_GUARD_CHECK_TIME), m_RespawnTimer(NA_RESPAWN_TIME), m_npcsInitialized(false)
+    m_HalaaState(HALAA_N), m_canRecap(true), m_GuardCheckTimer(NA_GUARD_CHECK_TIME), m_RespawnTimer(NA_RESPAWN_TIME)
 {
     SetCapturePointData(182210, 530, -1572.57f, 7945.3f, -22.475f, 2.05949f, 0.0f, 0.0f, 0.857167f, 0.515038f);
 }
@@ -543,38 +539,12 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
     return -1;
 }
 
-void OPvPCapturePointNA::NPCHalaaRegister(GameObject* m_capturePoint)
-{
-    std::list<Creature*> creatures;
-    uint32 entry = 0;
-    for (int i = 0; i < 12; i++)
-    {
-        m_capturePoint->GetCreatureListWithEntryInGrid(creatures, PatrolCreatureEntry[i].idPatrol, 200);
-    }
-
-    if (creatures.size() == 20)
-    {
-        m_npcsInitialized = true;
-        for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
-        {
-            Creature* const creature = *itr;
-            halaaNPC[entry] = (creature->GetSpawnId());
-            creature->SetPhaseMask(2, false);
-            creature->SetFaction(NEUTRAL_FACT);
-            entry++;
-        }
-    }
-}
-
 bool OPvPCapturePointNA::Update(uint32 diff)
 {
     if (!m_capturePoint)
         return false;
 
-    if(!m_npcsInitialized)
-        NPCHalaaRegister(m_capturePoint);
-
-    float radius = ((float)m_capturePoint->GetGOInfo()->capturePoint.radius) - 40.0f;
+    float radius = ((float)m_capturePoint->GetGOInfo()->capturePoint.radius) - 60.0f;
 
     for (uint32 team = 0; team < 2; ++team)
     {
@@ -704,7 +674,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
                 //When the point goes through neutral, the same faction can recapture again to respawn the guards, still need check blizzlike
                 m_canRecap = true;
                 DeSpawnGOs();
-                HideOrShowHalaaNPCS(true);
+                DeSpawnNPCs(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
             }
         }
         else //blue
@@ -731,7 +701,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
                 //When the point goes through neutral, the same faction can recapture again to respawn the guards, still need check blizzlike
                 m_canRecap = true;
                 DeSpawnGOs();
-                HideOrShowHalaaNPCS(true);
+                DeSpawnNPCs(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
             }
         }
 
@@ -854,7 +824,59 @@ public:
     }
 };
 
+class OutdoorPvP_nagrandCreature : public CreatureScript
+{
+public:
+    OutdoorPvP_nagrandCreature() : CreatureScript("OutdoorPvP_nagrandCreature") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_halaa_creature(creature);
+    }
+
+    struct npc_halaa_creature : public ScriptedAI
+    {
+
+        bool m_initialized = false;
+        npc_halaa_creature(Creature* creature) : ScriptedAI(creature) { }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!m_initialized)
+            {
+                std::list<Creature*> creatures;
+                uint32 entry = 0;
+                for (int i = 0; i < 12; i++)
+                {
+                    me->GetCreatureListWithEntryInGrid(creatures, PatrolCreatureEntry[i].idPatrol, 250);
+                }
+
+                if (creatures.size() == 40)
+                {
+                    m_initialized = true;
+                    for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                    {
+                        Creature* const creature = *itr;
+                        if (entry < 20)
+                        {
+                            halaaNPCHorde[entry] = (creature->GetSpawnId());
+                        }
+                        else
+                        {
+                            halaaNPCAlly[entry-20] = (creature->GetSpawnId());
+                        }
+                        creature->AddObjectToRemoveList();
+                        entry++;
+                        sObjectMgr->RemoveCreatureFromGrid(creature->GetSpawnId(), creature->GetCreatureData());
+                    }
+                }
+            }
+        }
+    };
+};
+
 void AddSC_outdoorpvp_na()
 {
     new OutdoorPvP_nagrand();
+    new OutdoorPvP_nagrandCreature();
 }
