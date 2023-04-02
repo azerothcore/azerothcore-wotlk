@@ -1,3 +1,4 @@
+-- DB update 2023_04_02_08 -> 2023_04_02_09
 -- Form Rhok'delar and Lok'delar at once
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger`=23192;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES (23192, 24872, 0, 'Form Rhok\'delar and Lok\'delar at once ');
