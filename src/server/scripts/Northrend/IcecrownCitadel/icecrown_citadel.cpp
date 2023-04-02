@@ -3347,13 +3347,19 @@ public:
         EventMap events;
         bool _didWebBeam;
 
+        void InitializeAI() override
+        {
+            me->SetDisableGravity(true);
+            me->SetImmuneToAll(true);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_03);
+        }
+
         void Reset() override
         {
             events.Reset();
             events.ScheduleEvent(1, 3s, 10s); // Crypt Scarabs
             events.ScheduleEvent(2, 15s, 25s); // Dark Mending
             events.ScheduleEvent(3, 8s, 15s); // Web Wrap
-            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -3364,9 +3370,10 @@ public:
                 float nx = me->GetPositionX();
                 float ny = me->GetPositionY();
                 float nz = me->GetFloorZ();
+                DoCastSelf(SPELL_WEB_BEAM);
                 me->SetHomePosition(nx, ny, nz, me->GetOrientation());
-                me->CastSpell(me, SPELL_WEB_BEAM, false);
-                me->GetMotionMaster()->MovePoint(1, nx, ny, nz, false);
+                me->GetMotionMaster()->MoveLand(POINT_LAND, nx, ny, nz, false);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                 return;
             }
 
@@ -3381,26 +3388,12 @@ public:
             me->CallForHelp(15.0f);
         }
 
-        void JustReachedHome() override
-        {
-            if (me->IsLevitating())
-            {
-                me->SetDisableGravity(false);
-                me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-            }
-        }
-
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type == POINT_MOTION_TYPE && id == 1)
+            if (type == EFFECT_MOTION_TYPE && id == POINT_LAND)
             {
-                if (me->IsLevitating())
-                {
-                    me->SetDisableGravity(false);
-                    me->SetOrientation(0.0f);
-                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                    me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-                }
+                me->SetImmuneToAll(false);
+                me->SetDisableGravity(false);
             }
         }
 
@@ -3516,7 +3509,7 @@ public:
                     if (spider->GetPositionZ() > 220.0f)
                     {
                         spider->CastSpell(spider, SPELL_WEB_BEAM2, false);
-                        spider->GetMotionMaster()->MovePoint(POINT_ENTER_COMBAT, spider->GetPositionX(), spider->GetPositionY(), 213.03f, false);
+                        spider->GetMotionMaster()->MoveLand(POINT_ENTER_COMBAT, spider->GetPositionX(), spider->GetPositionY(), 213.03f, false);
                     }
         }
 
