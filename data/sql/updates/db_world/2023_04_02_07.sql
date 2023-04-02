@@ -1,3 +1,4 @@
+-- DB update 2023_04_02_06 -> 2023_04_02_07
 --
 UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|46284631 WHERE (`entry` IN (20866, 21614, 20898, 21598));
 UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|652689279 WHERE (`entry` IN (20870, 21626, 20912, 21601));

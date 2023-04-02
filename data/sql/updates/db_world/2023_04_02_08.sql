@@ -1,3 +1,4 @@
+-- DB update 2023_04_02_07 -> 2023_04_02_08
 --
 -- Warlord Kalithresh Normal Loot Repairs
 UPDATE `creature_loot_template` SET `GroupId`=0 WHERE `Entry`=17798 AND `Item`=23572 AND `Reference`=0 AND `GroupId`=3;
