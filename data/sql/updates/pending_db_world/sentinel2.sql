@@ -1,0 +1,1 @@
+UPDATE `smart_scripts` SET `event_type` = 25 AND `comment` = 'Arcatraz Sentinel - On Reset - Set Health 40%' WHERE `source_type` = 0 AND `entryorguid` = 20869 AND `id` = 0;
