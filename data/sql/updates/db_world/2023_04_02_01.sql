@@ -1,3 +1,4 @@
+-- DB update 2023_04_02_00 -> 2023_04_02_01
 -- Mote of Shadow
 DELETE FROM `creature_loot_template` WHERE `Item` = 22577;
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
