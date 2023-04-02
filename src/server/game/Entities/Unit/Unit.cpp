@@ -22562,7 +22562,7 @@ bool Unit::IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType aur
         AuraEffect const* existingAurEff = (*itr);
         ++itr;
 
-        if (sSpellMgr->CheckSpellGroupStackRules(spellInfo, existingAurEff->GetSpellInfo(), true, spellInfo->IsAffectingArea()) & SPELL_GROUP_STACK_FLAG_EFFECT_EXCLUSIVE)
+        if (sSpellMgr->CheckSpellGroupStackRules(spellInfo, existingAurEff->GetSpellInfo(), true, spellInfo->IsAffectingArea()) & SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST)
         {
             int32 diff = abs(effectAmount) - abs(existingAurEff->GetAmount());
             if (!diff)
