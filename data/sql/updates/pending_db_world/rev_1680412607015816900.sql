@@ -8,8 +8,5 @@ DELETE FROM `conditions` WHERE `SourceGroup` = 29244 AND `SourceTypeOrReferenceI
 
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (14, 9798, 13503, 0, 0, 8, 0, 12212, 0, 0, 0, 0, 0, '', '(OR) Jesse Masters - Show gossip menu 9798 VENDOR only if quest 12212 have been rewarded.'),
-(14, 9798, 13503, 0, 1, 8, 0, 12216, 0, 0, 0, 0, 0, '', '(OR) Jesse Masters - Show gossip menu 9798 VENDOR only if quest 12216 have been rewarded.'),
 (15, 9798, 0, 0, 0, 8, 0, 12212, 0, 0, 0, 0, 0, '', '(OR) Jesse Masters - Show gossip menu 9798 option VENDOR only if quest 12212 have been rewarded.'),
-(15, 9798, 0, 0, 1, 8, 0, 12216, 0, 0, 0, 0, 0, '', '(OR) Jesse Masters - Show gossip menu 9798 option VENDOR only if quest 12216 have been rewarded.'),
-(23, 29244, 33454, 0, 0, 8, 0, 12212, 0, 0, 0, 0, 0, '', '(OR) Jesse Masters - Sell Salted Venison only if quest 12212 has been rewarded.'),
 (23, 29244, 40202, 0, 1, 8, 0, 12216, 0, 0, 0, 0, 0, '', '(OR) Jesse Masters - Sell Sizzling Grizzly Flank only if quest 12216 has been rewarded.');
