@@ -824,59 +824,38 @@ public:
     }
 };
 
-class OutdoorPvP_nagrandCreature : public CreatureScript
+struct outdoorpvp_na_halaa_creatures : public ScriptedAI
 {
-public:
-    OutdoorPvP_nagrandCreature() : CreatureScript("OutdoorPvP_nagrandCreature") { }
+    outdoorpvp_na_halaa_creatures(Creature* creature) : ScriptedAI(creature) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void UpdateAI(uint32 diff) override
     {
-        return new npc_halaa_creature(creature);
-    }
-
-    struct npc_halaa_creature : public ScriptedAI
-    {
-
-        bool m_initialized = false;
-        npc_halaa_creature(Creature* creature) : ScriptedAI(creature) { }
-
-        void UpdateAI(uint32 diff) override
+        if (!(halaaNPCAlly.size() == 20 && halaaNPCHorde.size() == 20))
         {
-            if (!m_initialized)
+            // First Horde Map
+            for (HalaaIds id : PatrolCreatureEntryHorde)
             {
-                std::list<Creature*> creatures;
-                uint32 entry = 0;
-                for (int i = 0; i < 12; i++)
+                if (me->GetEntry() == id.idPatrol && !halaaNPCHorde.contains(me->GetSpawnId()))
                 {
-                    me->GetCreatureListWithEntryInGrid(creatures, PatrolCreatureEntry[i].idPatrol, 250);
-                }
-
-                if (creatures.size() == 40)
-                {
-                    m_initialized = true;
-                    for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
-                    {
-                        Creature* const creature = *itr;
-                        if (entry < 20)
-                        {
-                            halaaNPCHorde[entry] = (creature->GetSpawnId());
-                        }
-                        else
-                        {
-                            halaaNPCAlly[entry-20] = (creature->GetSpawnId());
-                        }
-                        creature->AddObjectToRemoveList();
-                        entry++;
-                        sObjectMgr->RemoveCreatureFromGrid(creature->GetSpawnId(), creature->GetCreatureData());
-                    }
+                    halaaNPCHorde[halaaNPCHorde.size()] = me->GetSpawnId();
                 }
             }
+            // Second Ally Map
+            for (HalaaIds id : PatrolCreatureEntryAlly)
+            {
+                if (me->GetEntry() == id.idPatrol && !halaaNPCAlly.contains(me->GetSpawnId()))
+                {
+                    halaaNPCAlly[halaaNPCAlly.size()] = me->GetSpawnId();
+                }
+            }
+            me->AddObjectToRemoveList();
+            sObjectMgr->RemoveCreatureFromGrid(me->GetSpawnId(), me->GetCreatureData());
         }
-    };
+    }
 };
 
 void AddSC_outdoorpvp_na()
 {
     new OutdoorPvP_nagrand();
-    new OutdoorPvP_nagrandCreature();
+    RegisterCreatureAI(outdoorpvp_na_halaa_creatures);
 }

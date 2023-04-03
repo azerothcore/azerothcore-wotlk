@@ -177,6 +177,28 @@ const HalaaIds PatrolCreatureEntry[12] =
     21488
 };
 
+const HalaaIds PatrolCreatureEntryAlly[6] =
+{
+    // Ally
+    18256,
+    18817,
+    18822,
+    21485,
+    21487,
+    21488
+};
+
+const HalaaIds PatrolCreatureEntryHorde[6] =
+{
+    // Horde
+    18192,
+    18816,
+    18821,
+    21474,
+    21484,
+    21483
+};
+
 enum WyvernStates
 {
     WYVERN_NEU_HORDE = 1,
