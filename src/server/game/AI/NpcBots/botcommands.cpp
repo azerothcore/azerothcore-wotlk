@@ -3359,9 +3359,9 @@ public:
 
         static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
-                chandler->PSendSysMessage("Successfully re-bound %u bot(s)", name_or_count.get<uint32>());
+                chandler->PSendSysMessage("成功重新绑定 %u 个NPCBots", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Successfully re-bound %s", name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("成功重新绑定 %s", name_or_count.get<std::string>().c_str());
             return true;
         };
 

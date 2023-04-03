@@ -77,6 +77,19 @@ public:
             return false;
         }
 
+        auto cretureLocale = sObjectMgr->GetCreatureLocale(creatureId);
+        std::string name;
+
+        if (cretureLocale)
+        {
+            name = cretureLocale->Name[handler->GetSessionDbcLocale()];
+        }
+
+        if (name.empty() && cInfo)
+        {
+            name = cInfo->Name;
+        }
+
         uint32 count = countArg.value_or(10);
 
         if (count == 0)
@@ -127,9 +140,9 @@ public:
                         for (std::unordered_multimap<uint32, Creature*>::const_iterator itr = creBounds.first; itr != creBounds.second;)
                         {
                             if (handler->GetSession())
-                                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
+                                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
                             else
-                                handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
+                                handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
                             ++itr;
                         }
                         liveFound = true;
@@ -139,9 +152,9 @@ public:
                 if (!liveFound)
                 {
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name.c_str(), x, y, z, mapId, "", "");
+                        handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, name.c_str(), x, y, z, mapId, "", "");
                     else
-                        handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name.c_str(), x, y, z, mapId, "", "");
+                        handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, name.c_str(), x, y, z, mapId, "", "");
                 }
             }
             while (result->NextRow());
