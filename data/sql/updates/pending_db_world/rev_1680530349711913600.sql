@@ -12,5 +12,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20907, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Professor Dabiri - On Gossip Option 0 Selected - Close Gossip');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=15 AND `SourceGroup`=8207;
-INSERT INTO `conditions` VALUES (15, 8207, 0, 0, 0, 2, 0, 29778, 1, 0, 1, 0, 0, '', '(AND) Professor Dabiri - Show gossip option 0 if item 29778 is NOT in inventory.');
-INSERT INTO `conditions` VALUES (15, 8207, 0, 0, 0, 47, 0, 10438, 10, 0, 0, 0, 0, '', '(AND) Professor Dabiri - Show gossip option 0 if quest 10438 is complete or incomplete.');
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(15, 8207, 0, 0, 0, 2, 0, 29778, 1, 0, 1, 0, 0, '', '(AND) Professor Dabiri - Show gossip option 0 if item 29778 is NOT in inventory.'),
+(15, 8207, 0, 0, 0, 47, 0, 10438, 10, 0, 0, 0, 0, '', '(AND) Professor Dabiri - Show gossip option 0 if quest 10438 is complete or incomplete.');
