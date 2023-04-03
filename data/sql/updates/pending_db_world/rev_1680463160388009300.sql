@@ -3,6 +3,9 @@ UPDATE `creature_addon` SET `bytes2` = 1 WHERE `bytes2` IN (257,733,4092,4097,30
 UPDATE `creature_addon` SET `bytes2` = 0 WHERE `bytes2` IN (256,4096);
 UPDATE `creature_addon` SET `bytes2` = 2 WHERE `bytes2` IN (258,4098);
 
+UPDATE `creature_template_addon` SET `bytes2` = 1 WHERE `bytes2` IN (133121,10241,2305,2049,69,3);
+UPDATE `creature_template_addon` SET `bytes2` = 0 WHERE `bytes2` = 65536;
+
 -- Creature where neither of the values in creature_addon were used.
 DELETE FROM `creature_addon` WHERE `guid` IN (75829,77583,77606,77607,82379,73192,80419,81738,82004,32943);
 
