@@ -1,7 +1,7 @@
 -- ID 8397 (Sentinel Keldara Sunblade)
 DELETE FROM `creature_addon` WHERE (`guid` IN (35937));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(35937, 0, 0, 0, 1, 0, 0, NULL);
+(35937, 0, 0, 0, 1, 0, 0, '');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 8397;
 
