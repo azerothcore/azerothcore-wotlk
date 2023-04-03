@@ -48,7 +48,7 @@ enum saeed
     SPELL_DIMENSIUS_TRANSFORM       = 35939,
 
     GOSSIP_MENU_SAEED               = 8228,
-    TEXT_NPC_SAEED_MOVE             = 10229,
+    TEXT_NPC_SAEED_DEFAULT          = 10229,
     TEXT_NPC_SAEED_START_FIGHT      = 10232,
 };
 
@@ -275,7 +275,7 @@ public:
                 AddGossipItemFor(player, GOSSIP_MENU_SAEED, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
         }
 
-        SendGossipMenuFor(player, creature->AI()->GetData(1) ? TEXT_NPC_SAEED_START_FIGHT : player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, creature->AI()->GetData(1) ? TEXT_NPC_SAEED_START_FIGHT : TEXT_NPC_SAEED_DEFAULT, creature->GetGUID());
 
         return true;
     }
