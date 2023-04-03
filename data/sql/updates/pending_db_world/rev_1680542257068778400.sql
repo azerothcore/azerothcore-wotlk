@@ -22,3 +22,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2093300, 9, 2, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 11, 35763, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Camera Shakers Manaforge Ultris - Script - Cast Ultris Explosion'),
 (2093300, 9, 3, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 11, 35763, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Camera Shakers Manaforge Ultris - Script - Cast Ultris Explosion'),
 (2093300, 9, 4, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 11, 35763, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Camera Shakers Manaforge Ultris - Script - Cast Ultris Explosion');
+
+-- Void Conduit Spell Focus
+UPDATE `gameobject_template` SET `Data1` = 150 WHERE `entry` = 184643;
