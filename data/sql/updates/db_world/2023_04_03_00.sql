@@ -1,3 +1,4 @@
+-- DB update 2023_04_02_11 -> 2023_04_03_00
 --
 SET @PATH = 36853 * 10;
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
