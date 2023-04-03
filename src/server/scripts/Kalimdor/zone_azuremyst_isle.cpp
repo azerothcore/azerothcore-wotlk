@@ -541,8 +541,7 @@ public:
     {
         if (Creature* owlkin = GetTarget()->ToCreature())
             if (owlkin->GetEntry() == NPC_NESTLEWOOD_OWLKIN_ENTRY)
-                if (Player* caster = GetCaster()->ToPlayer())
-                    owlkin->SetFacingToObject(caster);
+                owlkin->SetFacingToObject(GetCaster());
     }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
