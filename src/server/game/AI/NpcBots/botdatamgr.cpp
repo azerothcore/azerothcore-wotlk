@@ -996,6 +996,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                     case INVTYPE_SHIELD:
                         if (proto.Armor == 0)
                             break;
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][BOT_SLOT_OFFHAND][reqLstep].push_back(itemId);
@@ -1330,7 +1331,7 @@ Item* BotDataMgr::GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 lev
     if (!itemIdVec.empty())
     {
         uint32 itemId;
-        uint32 tries = 0;
+        uint8 tries = 0;
         bool can_equip = false;
         do
         {
@@ -1340,12 +1341,15 @@ Item* BotDataMgr::GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 lev
 
         } while (!can_equip && tries < 20);
 
-        if (Item* newItem = Item::CreateItem(itemId, 1, nullptr))
+        if (can_equip)
         {
-            if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(itemId))
-                newItem->SetItemRandomProperties(randomPropertyId);
+            if (Item* newItem = Item::CreateItem(itemId, 1, nullptr))
+            {
+                if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(itemId))
+                    newItem->SetItemRandomProperties(randomPropertyId);
 
-            return newItem;
+                return newItem;
+            }
         }
     }
 
