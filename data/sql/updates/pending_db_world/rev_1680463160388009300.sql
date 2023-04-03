@@ -19,5 +19,5 @@ DELETE FROM `creature` WHERE (`guid` = 73192 AND `id1` = 20749);
 DELETE FROM `creature` WHERE (`guid` = 80419 AND `id1` = 113);
 
 
--- Hatecrest Warrior defensive stance, handled by SAI
-UPDATE `creature_addon` SET `auras` = '' WHERE `guid` = 51476;
+-- Hatecrest Warrior defensive stance, Grimtotem Raider berserk stance, handled by SAI
+UPDATE `creature_addon` SET `auras` = '' WHERE `guid` IN (51476,50009);
