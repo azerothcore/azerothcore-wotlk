@@ -1,3 +1,4 @@
+-- DB update 2023_04_04_02 -> 2023_04_04_03
 -- Remove old/deprecated bytes2 flags.
 UPDATE `creature_addon` SET `bytes2` = 1 WHERE `bytes2` IN (257,733,4097,301993985,318771201,285216769,234885121);
 UPDATE `creature_addon` SET `bytes2` = 0 WHERE `bytes2` IN (256,4092,4096);

@@ -1,3 +1,4 @@
+-- DB update 2023_04_04_05 -> 2023_04_04_06
 -- ID 7879 (Quintis Jonespyre)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 7879;
 

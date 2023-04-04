@@ -1,3 +1,4 @@
+-- DB update 2023_04_04_03 -> 2023_04_04_04
 --
 -- Slows the repeat behavior of NPCs 263 (Lord Ello Ebonlocke), 269 (Role Dreuger), 270 (Councilman Millstripe), 271 (Ambassador Berrybuck), and 325 (Hogan Ference) dialogue to be more correctly timed
 UPDATE `smart_scripts` SET `event_param3`=1306000, `event_param4`=1407000 WHERE `entryorguid`=263 AND `source_type`=0 AND `id`=1 AND `link`=0 AND `action_type`=1;

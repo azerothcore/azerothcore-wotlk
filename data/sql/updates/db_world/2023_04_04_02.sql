@@ -1,3 +1,4 @@
+-- DB update 2023_04_04_01 -> 2023_04_04_02
 -- ID 8397 (Sentinel Keldara Sunblade)
 DELETE FROM `creature_addon` WHERE (`guid` IN (35937));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES

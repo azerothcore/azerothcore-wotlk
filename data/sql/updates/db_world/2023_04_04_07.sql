@@ -1,3 +1,4 @@
+-- DB update 2023_04_04_06 -> 2023_04_04_07
 -- Steamvault
 DELETE FROM `creature_onkill_reputation` WHERE (`creature_id` IN (17721,17722,17796,17797,17798,17799,17800,17801,17802,17803,17805,17917,17951,17954,20926,21338,21694,21695,21696,20620,20621,20622,20623,20624,20625,20626,20627,20628,20629,20630,20631,20632,20633,21914,21915,21916,21917));
 INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`, `MaxStanding1`, `IsTeamAward1`, `RewOnKillRepValue1`, `MaxStanding2`, `IsTeamAward2`, `RewOnKillRepValue2`, `TeamDependent`) VALUES
