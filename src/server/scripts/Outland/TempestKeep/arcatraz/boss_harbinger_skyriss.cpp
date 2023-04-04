@@ -59,8 +59,7 @@ struct boss_harbinger_skyriss : public BossAI
 
     void Reset() override
     {
-        events.Reset();
-        summons.DespawnAll();
+        _Reset();
         me->SetImmuneToAll(false);
 
         ScheduleHealthCheckEvent(66, [&] {
@@ -88,23 +87,24 @@ struct boss_harbinger_skyriss : public BossAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        _JustDied();
         Talk(SAY_DEATH);
-        summons.DespawnAll();
     }
 
     void JustSummoned(Creature* summon) override
     {
         summon->SetHealth(summon->CountPctFromMaxHealth(summon->GetEntry() == NPC_HARBINGER_SKYRISS_66 ? 66 : 33));
-        summons.Summon(summon);
-        summon->SetInCombatWithZone();
         me->UpdatePosition(*summon, true);
         me->SendMovementFlagUpdate();
+        BossAI::JustSummoned(summon);
     }
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
+        {
             Talk(SAY_KILL);
+        }
     }
 
     void UpdateAI(uint32 diff) override
