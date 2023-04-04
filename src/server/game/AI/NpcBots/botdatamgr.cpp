@@ -336,7 +336,7 @@ void BotDataMgr::LoadNpcBots(bool spawn)
 
 void BotDataMgr::LoadNpcBotGroupData()
 {
-    LOG_INFO("server.loading", "Loading NPCBot Group members...");
+    LOG_INFO("server.loading", "Loading NPCBot group members...");
 
     uint32 oldMSTime = getMSTime();
 
@@ -528,10 +528,11 @@ void BotDataMgr::LoadWanderMap(bool reload)
     WanderNode::DoForAllWPs([&](WanderNode const* wp) {
         if (tops.count(wp) == 0u && wp->GetLinks().size() == 1u)
         {
-            LOG_TRACE("server.loading", "Node {} ('{}') has single connection!", wp->GetWPId(), wp->GetName().c_str());
+            LOG_DEBUG("server.loading", "Node {} ('{}') has single connection!", wp->GetWPId(), wp->GetName().c_str());
             WanderNode const* tn = wp->GetLinks().front();
             std::vector<WanderNode const*> sc_chain;
             sc_chain.push_back(wp);
+            tops.emplace(wp);
             while (tn != wp)
             {
                 if (tn->GetLinks().size() != 2u)
@@ -547,8 +548,7 @@ void BotDataMgr::LoadWanderMap(bool reload)
             }
             if (sc_chain.back()->GetLinks().size() == 1u)
             {
-                LOG_TRACE("server.loading", "Node {} ('{}') has single connection!", tn->GetWPId(), tn->GetName().c_str());
-                tops.emplace(sc_chain.front());
+                LOG_DEBUG("server.loading", "Node {} ('{}') has single connection!", tn->GetWPId(), tn->GetName().c_str());
                 tops.emplace(sc_chain.back());
                 std::ostringstream ss;
                 ss << "Node " << (sc_chain.size() == 2u ? "pair " : "chain ");
@@ -585,7 +585,7 @@ void BotDataMgr::GenerateWanderingBots()
     };
 
     /// @TODO: manage allowed world maps HERE: 0, 1 530, 571
-    const std::array wbot_allowed_maps{ 0u };
+    const std::array wbot_allowed_maps{ 0u, 1u };
 
     const uint32 wandering_bots_desired = BotMgr::GetDesiredWanderingBotsCount();
 
@@ -1973,8 +1973,7 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
     //Overleveled or died: no viable nodes in reach, find one for teleport
     if (links.empty())
     {
-        //todo: use all wps
-        WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&links, lvl = lvl, fac = faction](WanderNode const* wp) {
+        WanderNode::DoForAllWPs([&links, lvl = lvl, fac = faction](WanderNode const* wp) {
             if (IsWanderNodeAvailableForBotFaction(wp, fac) && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && node_viable(wp, lvl))
                 links.push_back(wp);
         });

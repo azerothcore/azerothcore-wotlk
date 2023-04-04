@@ -653,7 +653,6 @@ class bot_ai : public CreatureAI
         uint8 _baseLevel;
         WanderNode const* _travel_node_last;
         WanderNode const* _travel_node_cur;
-        std::vector<std::pair<uint32, std::string>> _travelHistory;
 
         float _energyFraction;
 
