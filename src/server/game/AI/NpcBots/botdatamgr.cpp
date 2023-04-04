@@ -585,7 +585,7 @@ void BotDataMgr::GenerateWanderingBots()
     };
 
     /// @TODO: manage allowed world maps HERE: 0, 1 530, 571
-    const std::array wbot_allowed_maps{ 0u };
+    const std::array wbot_allowed_maps{ 0u, 1u };
 
     const uint32 wandering_bots_desired = BotMgr::GetDesiredWanderingBotsCount();
 
@@ -1973,8 +1973,7 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
     //Overleveled or died: no viable nodes in reach, find one for teleport
     if (links.empty())
     {
-        //todo: use all wps
-        WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&links, lvl = lvl, fac = faction](WanderNode const* wp) {
+        WanderNode::DoForAllWPs([&links, lvl = lvl, fac = faction](WanderNode const* wp) {
             if (IsWanderNodeAvailableForBotFaction(wp, fac) && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && node_viable(wp, lvl))
                 links.push_back(wp);
         });
