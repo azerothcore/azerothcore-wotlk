@@ -10,7 +10,7 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` IN (14,15) AND `SourceG
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (14, 7704, 9406, 0, 0, 28, 0, 9978, 0, 0, 0, 0, 0, '', 'Show gossip text 9406 if quest \'By Any Means Necessary\' is complete.'),
 (14, 7704, 9425, 0, 0, 8, 0, 9978, 0, 0, 0, 0, 0, '', 'Show gossip text 9425 if quest \'By Any Means Necessary\' has been rewarded.'),
-(15, 7704, 0, 0, 0, 47, 0, 9978, 10, 0, 0, 0, 0, '', 'Show gossip option 0 if quest 9978 is complete or incomplete.'),
+(15, 7704, 0, 0, 0, 47, 0, 9978, 8, 0, 0, 0, 0, '', 'Show gossip option 0 if quest 9978 is incomplete.'),
 (15, 7704, 1, 0, 0, 47, 0, 9978, 66, 0, 0, 0, 0, '', '(AND) Show gossip option 1 if quest \'By Any Means Necessary\' is complete or rewarded.'),
 (15, 7704, 1, 0, 0, 14, 0, 9979, 0, 0, 0, 0, 0, '', '(AND) Show gossip option 1 if quest \'Wind Trader Lathrai\' is not taken.');
 
