@@ -359,6 +359,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FEAR, 42000);
             events.ScheduleEvent(EVENT_SPELL_GRIP_OF_THE_LEGION, 2000);
             events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 1000);
+            events.ScheduleEvent(EVENT_SPELL_HAND_OF_DEATH, 600s);
         }
 
         void KilledUnit(Unit* victim) override
@@ -625,7 +626,6 @@ public:
                     events.ScheduleEvent(EVENT_ENRAGE, 0);
                     events.ScheduleEvent(EVENT_ENRAGE_ROOT, 0);
                     events.ScheduleEvent(EVENT_SUMMON_WISPS, 1000);
-                    events.ScheduleEvent(EVENT_SPELL_HAND_OF_DEATH, 1500);
                     events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 2500);
                     break;
                 case EVENT_SUMMON_WISPS:
@@ -640,9 +640,11 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_WISPS, 1500);
                     break;
                 case EVENT_SPELL_HAND_OF_DEATH:
-                    DoCastVictim(SPELL_RED_SKY_EFFECT);
-                    DoCastVictim(SPELL_HAND_OF_DEATH);
-                    events.ScheduleEvent(EVENT_SPELL_HAND_OF_DEATH, 3000);
+                    if (!BelowTenPercent){
+                        DoCastVictim(SPELL_RED_SKY_EFFECT);
+                        DoCastVictim(SPELL_HAND_OF_DEATH);
+                        events.ScheduleEvent(EVENT_SPELL_HAND_OF_DEATH, 3000);
+                    }
                     break;
                 case EVENT_SPELL_FINGER_OF_DEATH:
                     if (CanUseFingerOfDeath())
