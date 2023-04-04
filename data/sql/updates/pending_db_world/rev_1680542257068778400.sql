@@ -24,4 +24,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2093300, 9, 4, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 11, 35763, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Camera Shakers Manaforge Ultris - Script - Cast Ultris Explosion');
 
 -- Void Conduit Spell Focus
-UPDATE `gameobject_template` SET `Data1` = 150 WHERE `entry` = 184643;
+DELETE FROM `gameobject` WHERE `id` = 184643 AND `map` = 530;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
+(9381, 184643, 530, 0, 0, 1, 1, 3930.18, 2038.26, 383.501, 1.72, 0, 0, 0, 1, 180, 0, 1, '', 0),
+(9385, 184643, 530, 0, 0, 1, 1, 3902.94, 1996.42, 383.644, 3.27509, 0, 0, 0, 1, 180, 0, 1, '', 0),
+(9386, 184643, 530, 0, 0, 1, 1, 3943, 1970.1, 383.321, 5.10507, 0, 0, 0, 1, 180, 0, 1, '', 0),
+(99956, 184643, 530, 0, 0, 1, 1, 3964.1, 2008.44, 383.941, 0.176697, 0, 0, 0, 1, 180, 0, 1, '', 0);
