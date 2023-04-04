@@ -149,7 +149,6 @@ struct boss_harbinger_skyriss : public BossAI
         DoMeleeAttackIfReady();
     }
 };
-    
 
 void AddSC_boss_harbinger_skyriss()
 {
