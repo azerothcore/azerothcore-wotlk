@@ -17,3 +17,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-25123, 0, 3, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 60, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Water Spirit - On Respawn - Set Fly Off');
 
 UPDATE `smart_scripts` SET `action_param3` = 0 WHERE (`entryorguid` BETWEEN 2102900 AND 2102904) AND (`source_type` = 9) AND (`id` IN (3));
+
+UPDATE `creature_template_movement` SET `Ground` = 1, `Flight` = 0 WHERE (`CreatureId` = 21029);
