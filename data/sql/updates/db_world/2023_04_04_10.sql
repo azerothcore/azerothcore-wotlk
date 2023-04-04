@@ -1,3 +1,4 @@
+-- DB update 2023_04_04_09 -> 2023_04_04_10
 -- Quest: On Nethery Wings ID 10438
 -- Void Conduit
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 20899 AND `source_type` = 0;
