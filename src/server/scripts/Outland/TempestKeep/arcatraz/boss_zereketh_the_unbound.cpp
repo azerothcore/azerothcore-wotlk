@@ -56,22 +56,22 @@ struct boss_zereketh_the_unbound : public BossAI
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 
-        scheduler.Schedule(6s, [this](TaskContext context)
+        scheduler.Schedule(11s, 29s, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_VOID_ZONE, 0, 60.0f);
-            context.Repeat(15s);
-        }).Schedule(10s, [this](TaskContext context)
+            context.Repeat();
+        }).Schedule(12s, 22s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_SHADOW_NOVA);
             if (roll_chance_i(50))
             {
                 Talk(SAY_SHADOW_NOVA);
             }
-            context.Repeat(12s);
-        }).Schedule(16s, [this](TaskContext context)
+            context.Repeat();
+        }).Schedule(6s, 12s, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_SEED_OF_CORRUPTION, 0, 30.0f);
-            context.Repeat(16s);
+            context.Repeat(13s, 27s);
         });
     }
 

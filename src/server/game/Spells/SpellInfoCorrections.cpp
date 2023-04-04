@@ -4374,7 +4374,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Judgement (Paladin T2 8P Bonus)
-    ApplySpellFix({ 23591 }, [](SpellInfo* spellInfo)
+    // Battlegear of Eternal Justice
+    ApplySpellFix({ 23591, 26135 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcFlags = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
     });
@@ -4495,11 +4496,17 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
     });
 
-    // Yogg-Saron - Death Orb - Death Ray Warning Visual & Death Ray Damage Visual
-    ApplySpellFix({ 63882, 63886 }, [](SpellInfo* spellInfo)
-        {
-            spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
-        });
+    // Seed of Corruption
+    ApplySpellFix({ 27285, 47833, 47834 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_REFLECTION;
+    });
+
+    // Turn the Tables
+    ApplySpellFix({ 51627, 51628, 51629 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
+    });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {

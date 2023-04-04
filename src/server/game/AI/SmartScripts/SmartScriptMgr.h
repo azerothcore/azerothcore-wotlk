@@ -526,7 +526,7 @@ enum SMART_ACTION
     SMART_ACTION_TALK                               = 1,      // groupID from creature_text, duration to wait before TEXT_OVER event is triggered, use first target from targetlist as invoker, useTalkTarget (0/1) - use target as talk target
     SMART_ACTION_SET_FACTION                        = 2,      // FactionId (or 0 for default)
     SMART_ACTION_MORPH_TO_ENTRY_OR_MODEL            = 3,      // Creature_template entry(param1) OR ModelId (param2) (or 0 for both to demorph)
-    SMART_ACTION_SOUND                              = 4,      // SoundId, onlySelf
+    SMART_ACTION_SOUND                              = 4,      // SoundId, onlySelf, distance
     SMART_ACTION_PLAY_EMOTE                         = 5,      // EmoteId
     SMART_ACTION_FAIL_QUEST                         = 6,      // QuestID
     SMART_ACTION_OFFER_QUEST                        = 7,      // QuestID, directAdd
@@ -572,7 +572,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_VISIBILITY                     = 47,     // on/off
     SMART_ACTION_SET_ACTIVE                         = 48,     // on/off
     SMART_ACTION_ATTACK_START                       = 49,     //
-    SMART_ACTION_SUMMON_GO                          = 50,     // GameObjectID, DespawnTime in s
+    SMART_ACTION_SUMMON_GO                          = 50,     // GameObjectID, DespawnTime, targetSummon, summonType (0 time or summoner dies/1 time)
     SMART_ACTION_KILL_UNIT                          = 51,     //
     SMART_ACTION_ACTIVATE_TAXI                      = 52,     // TaxiID
     SMART_ACTION_WP_START                           = 53,     // run/walk, pathID, canRepeat, quest, despawntime, reactState
@@ -637,7 +637,7 @@ enum SMART_ACTION
     SMART_ACTION_GAME_EVENT_START                   = 112,    // GameEventId
     SMART_ACTION_START_CLOSEST_WAYPOINT             = 113,    // wp1, wp2, wp3, wp4, wp5, wp6, wp7
     SMART_ACTION_RISE_UP                            = 114,    // distance
-    SMART_ACTION_RANDOM_SOUND                       = 115,    // SoundId1, SoundId2, SoundId3, SoundId4, onlySelf
+    SMART_ACTION_RANDOM_SOUND                       = 115,    // SoundId1, SoundId2, SoundId3, SoundId4, onlySelf, distance
     SMART_ACTION_SET_CORPSE_DELAY                   = 116,    // timer
     SMART_ACTION_DISABLE_EVADE                      = 117,    // 0/1 (1 = disabled, 0 = enabled)
     SMART_ACTION_GO_SET_GO_STATE                    = 118,    // state
@@ -657,18 +657,18 @@ enum SMART_ACTION
     SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    /// @todo: NOT SUPPORTED YET
     SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    /// @todo: NOT SUPPORTED YET
     // SMART_ACTION_INVOKER_CAST                    = 134,    /// @todo: solve name conflicts
-    SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry, cinematic
+    SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry
     SMART_ACTION_SET_MOVEMENT_SPEED                 = 136,    // movementType, speedInteger, speedFraction
 
     SMART_ACTION_SET_HEALTH_PCT                     = 142,    // percent
 
     SMART_ACTION_TC_END                             = 199,    // placeholder
-    // AC-only SmartActions:
 
+    // AC-only SmartActions:
     SMART_ACTION_AC_START                           = 200,    // placeholder
 
     SMART_ACTION_MOVE_TO_POS_TARGET                 = 201,    // pointId
-    SMART_ACTION_SET_GO_STATE                       = 202,    // state
+    // SMART_ACTION_SET_GO_STATE                    = 202,    // state // Replaced by SMART_ACTION_GO_SET_GO_STATE
     SMART_ACTION_EXIT_VEHICLE                       = 203,    // none
     SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS            = 204,    // flags
     SMART_ACTION_SET_COMBAT_DISTANCE                = 205,    // combatDistance

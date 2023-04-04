@@ -538,16 +538,6 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    if (!guid)
-    {
-        // Clear any active gossip related to current selection if not present at player's client
-        GossipMenu& gossipMenu = _player->PlayerTalkClass->GetGossipMenu();
-        if (gossipMenu.GetSenderGUID() == _player->GetTarget())
-        {
-            _player->PlayerTalkClass->SendCloseGossip();
-        }
-    }
-
     _player->SetSelection(guid);
 
     // Change target of current autoshoot spell
