@@ -235,8 +235,8 @@ inline void Map::_ScriptProcessDoor(Object* source, Object* target, const Script
     }
     if (!guid)
         LOG_ERROR("maps.script", "{} door guid is not specified.", scriptInfo->GetDebugInfo());
-    else if (!source)
-        LOG_ERROR("maps.script", "{} source object is nullptr.", scriptInfo->GetDebugInfo());
+//    else if (!source)
+//        LOG_ERROR("maps.script", "{} source object is nullptr.", scriptInfo->GetDebugInfo());
     else if (!source->isType(TYPEMASK_UNIT))
         LOG_ERROR("maps.script", "{} source object is not unit ({}), skipping.", scriptInfo->GetDebugInfo(), source->GetGUID().ToString());
     else
