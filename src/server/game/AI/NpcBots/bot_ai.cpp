@@ -16653,7 +16653,8 @@ void bot_ai::UpdateReviveTimer(uint32 diff)
 
             if (IsWanderer())
             {
-                GraveyardStruct const* gy = sGraveyard->GetClosestGraveyard((Player*)me, me->GetFaction() == 1801 ? TEAM_HORDE : TEAM_ALLIANCE, false);
+                TeamId my_team = BotDataMgr::GetTeamForFaction(me->GetFaction());
+                GraveyardStruct const* gy = sGraveyard->GetClosestGraveyard((Player*)me, my_team == TEAM_HORDE ? TEAM_HORDE : TEAM_ALLIANCE, false);
                 Position safePos;
                 if (gy)
                 {
