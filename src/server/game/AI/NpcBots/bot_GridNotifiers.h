@@ -120,7 +120,9 @@ class NearestHostileUnitCheck
         {
             if (u == me)
                 return INVALID;
-            if (!me->IsWithinDistInMap(u, m_range))
+            if (!me->IsWithinDistInMap(u, m_range, !berserk))
+                return INVALID;
+            if (berserk && std::fabs(me->GetPositionZ() - u->GetPositionZ()) > (m_range * 0.25f + 5.0f))
                 return INVALID;
             if (me->HasUnitState(UNIT_STATE_ROOT) && (ai->HasRole(BOT_ROLE_RANGED) == me->IsWithinDistInMap(u, 8.f)))
                 return INVALID;

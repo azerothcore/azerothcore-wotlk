@@ -4260,13 +4260,11 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
         //check attackers
         u = nullptr;
         for (Unit* att : me->getAttackers())
-            if (att != mytar && (!u || me->GetDistance(att) < me->GetDistance(u) - 10.0f || att->GetHealth() < u->GetHealth()) &&
-                CanBotAttack(att, byspell))
+            if (_canSwitchToTarget(u, att, byspell))
                 u = att;
         if (!u && botPet)
             for (Unit* att : botPet->getAttackers())
-                if (att != mytar && (!u || me->GetDistance(att) < me->GetDistance(u) - 10.0f || att->GetHealth() < u->GetHealth()) &&
-                    CanBotAttack(att, byspell))
+                if (_canSwitchToTarget(u, att, byspell))
                     u = att;
         if (u)
             return { u, u };
@@ -4832,6 +4830,21 @@ void bot_ai::_extendAttackRange(float& dist) const
             spelldist = GetSpellAttackRange(rangeMode == BOT_ATTACK_RANGE_LONG);
         dist = std::max<float>(dist, spelldist * 0.5f + 4.f);
     }
+}
+bool bot_ai::_canSwitchToTarget(Unit const* from, Unit const* newTarget, int8 byspell) const
+{
+    if (newTarget)
+    {
+        if (IAmFree())
+        {
+            if (newTarget != me->GetVictim() &&
+                (!from || me->GetDistance(newTarget) < me->GetDistance(from) - 10.0f || newTarget->GetHealth() < from->GetHealth()) &&
+                CanBotAttack(newTarget, byspell))
+                return true;
+        }
+    }
+
+    return false;
 }
 //Ranged attack position
 void bot_ai::CalculateAttackPos(Unit* target, Position& pos, bool& force) const
@@ -10358,12 +10371,6 @@ void bot_ai::OnOwnerDamagedBy(Unit* attacker)
 {
     if (HasBotCommandState(BOT_COMMAND_FULLSTOP))
         return;
-    if (me->GetVictim() && (!IAmFree() || me->IsWithinMeleeRange(me->GetVictim()) || me->GetDistance(me->GetVictim()) < me->GetDistance(attacker)))
-        return;
-    else if (!IsMelee() && (opponent || disttarget))
-        return;
-    //if (InDuel(attacker))
-    //    return;
 
     bool byspell = false;
     switch (_botclass)
@@ -10384,7 +10391,7 @@ void bot_ai::OnOwnerDamagedBy(Unit* attacker)
             break;
     }
 
-    if (!CanBotAttack(attacker, byspell))
+    if (!_canSwitchToTarget(me->GetVictim(), attacker, byspell))
         return;
 
     SetBotCommandState(BOT_COMMAND_COMBATRESET); //reset AttackStart()
