@@ -2153,11 +2153,6 @@ void bot_ai::_listAuras(Player const* player, Unit const* unit) const
         botstring << "\n_lastWMOAreaId: " << uint32(_lastWMOAreaId);
 
         //debug
-        botstring << "\n_travelHistory:";
-        for (decltype(_travelHistory)::value_type const& p : _travelHistory)
-            botstring << "\n" << p.first << ": " << p.second;
-
-        //debug
         //botstring << "\ncurrent Engage timer: " << GetEngageTimer();
 
         //debug
@@ -16683,7 +16678,6 @@ void bot_ai::UpdateReviveTimer(uint32 diff)
 
                     _travel_node_last = _travel_node_cur;
                     _travel_node_cur = nextNode;
-                    _travelHistory.push_back(std::make_pair(nextNode->GetWPId(), nextNode->GetName()));
                     return;
                 }
             }
@@ -16803,7 +16797,6 @@ void bot_ai::Evade()
 
                 _travel_node_last = _travel_node_cur;
                 _travel_node_cur = nextNode;
-                _travelHistory.push_back(std::make_pair(nextNode->GetWPId(), nextNode->GetName()));
                 _evadeCount = 0;
                 evadeDelayTimer = urand(7000, 11000);
                 return;
