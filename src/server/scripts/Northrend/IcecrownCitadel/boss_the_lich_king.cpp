@@ -833,7 +833,7 @@ public:
                     _bFordringMustFallYell = true;
                     if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     {
-                        tirion->Yell("The Lich King must fall!", LANG_UNIVERSAL);
+                        //tirion->Yell("The Lich King must fall!", LANG_UNIVERSAL);
                         tirion->PlayDirectSound(17389);
                     }
                 }
@@ -1354,7 +1354,7 @@ public:
             {
                 // remove glow on ashbringer and tirion
                 me->RemoveAllAuras();
-                SetEquipmentSlots(true);
+                SetEquipmentSlots(false, 13262, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             }
         }
 
@@ -1595,7 +1595,7 @@ public:
                             lichKing->SetImmuneToNPC(false);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                             me->RemoveAllAuras();
-                            SetEquipmentSlots(true);
+                            SetEquipmentSlots(false, 13262, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
                             me->Attack(lichKing, true);
                             me->GetMotionMaster()->MovePoint(0, 512.16f, -2120.25f, 840.86f);
                         }
