@@ -14310,6 +14310,17 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
     if (GetTypeId() == TYPEID_UNIT && enemy && IsImmuneToPC() && enemy->GetCharmerOrOwnerPlayerOrPlayerItself())
         SetImmuneToPC(false); // unit has engaged in combat, remove immunity so players can fight back
 
+    //npcbot: party combat hook
+    Player const* playerOwner = nullptr;
+    if (enemy->IsPlayer() && enemy->ToPlayer()->HaveBot())
+        playerOwner = enemy->ToPlayer();
+    else if (enemy->IsNPCBotOrPet() && !enemy->ToCreature()->IsFreeBot())
+        playerOwner = enemy->ToCreature()->GetBotOwner();
+
+    if (playerOwner)
+        BotMgr::OnBotPartyEngage(playerOwner);
+    //end npcbot
+
     if (IsInCombat())
         return;
 
@@ -14360,17 +14371,6 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
         controlled->SetInCombatState(PvP, enemy, duration);
     }
-
-    //npcbot: party combat hook
-    Player* playerOwner = nullptr;
-    if (IsPlayer() && ToPlayer()->HaveBot())
-        playerOwner = ToPlayer();
-    else if (IsNPCBotOrPet() && !ToCreature()->IsFreeBot())
-        playerOwner = ToCreature()->GetBotOwner();
-
-    if (playerOwner)
-        BotMgr::OnBotPartyEngage(playerOwner);
-    //end npcbot
 
     //npcbot: combatstate for bots
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->HaveBot())
