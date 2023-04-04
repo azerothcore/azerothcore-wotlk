@@ -251,6 +251,30 @@ public:
     }
 };
 
+enum FlirtWithDisaster
+{
+    AURA_PERFUME_FOREVER           = 70235,
+    AURA_PERFUME_ENCHANTRESS       = 70234,
+    AURA_PERFUME_VICTORY           = 70233,
+};
+
+class achievement_flirt_with_disaster_perf_check : public AchievementCriteriaScript
+{
+    public:
+        achievement_flirt_with_disaster_perf_check() : AchievementCriteriaScript("achievement_flirt_with_disaster_perf_check") { }
+
+        bool OnCheck(Player* player, Unit* /*target*/, uint32 /*criteria_id*/) override
+        {
+            if (!player)
+                return false;
+
+            if (player->HasAura(AURA_PERFUME_FOREVER) || player->HasAura(AURA_PERFUME_ENCHANTRESS) || player->HasAura(AURA_PERFUME_VICTORY))
+                return true;
+
+            return false;
+        }
+};
+
 void AddSC_achievement_scripts()
 {
     new achievement_resilient_victory();
@@ -270,4 +294,5 @@ void AddSC_achievement_scripts()
     new achievement_tilted();
     new achievement_not_even_a_scratch();
     new achievement_killed_exp_or_honor_target();
+    new achievement_flirt_with_disaster_perf_check();
 }

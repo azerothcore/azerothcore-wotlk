@@ -246,9 +246,9 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_MOUNT_CHARGE, urand(2500, 4000));
-            events.ScheduleEvent(EVENT_SHIELD_BREAKER, urand(5000, 8000));
-            events.ScheduleEvent(EVENT_THRUST, urand(3000, 5000));
+            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+            events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
+            events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
             me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
         }
 
@@ -302,7 +302,7 @@ public:
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
                         }
-                        events.RepeatEvent(urand(4500, 6000));
+                        events.Repeat(4500ms, 6000ms);
                     }
                     break;
                 case EVENT_SHIELD_BREAKER:
@@ -324,13 +324,13 @@ public:
                             if( Unit* target = ObjectAccessor::GetCreature(*me, LIST.at(rnd)) )
                                 me->CastSpell(target, SPELL_NPC_SHIELD_BREAKER, false);
                         }
-                        events.RepeatEvent(urand(6000, 8000));
+                        events.Repeat(6s, 8s);
                     }
                     break;
                 case EVENT_THRUST:
                     if( me->GetVictim() && me->GetExactDist(me->GetVictim()) <= 5.5f )
                         me->CastSpell(me->GetVictim(), SPELL_PLAYER_VEHICLE_THRUST, false);
-                    events.RepeatEvent(urand(3000, 5000));
+                    events.Repeat(3s, 5s);
                     break;
             }
         }
@@ -363,9 +363,9 @@ public:
             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
 
             events.Reset();
-            events.ScheduleEvent(EVENT_MOUNT_CHARGE, urand(2500, 4000));
-            events.ScheduleEvent(EVENT_SHIELD_BREAKER, urand(5000, 8000));
-            events.ScheduleEvent(EVENT_THRUST, urand(3000, 5000));
+            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+            events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
+            events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
 
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
@@ -421,36 +421,34 @@ public:
             {
                 case NPC_AMBROSE: // Ambrose Boltspark
                 case NPC_ERESSEA: // Eressea Dawnsinger
-                    events.RescheduleEvent(EVEMT_MAGE_SPELL_FIREBALL, 5000);
-                    events.RescheduleEvent(EVEMT_MAGE_SPELL_BLAST_WAVE, 12000);
-                    events.RescheduleEvent(EVEMT_MAGE_SPELL_HASTE, 22000);
-                    events.RescheduleEvent(EVEMT_MAGE_SPELL_POLYMORPH, 8000);
+                    events.RescheduleEvent(EVEMT_MAGE_SPELL_FIREBALL, 5s);
+                    events.RescheduleEvent(EVEMT_MAGE_SPELL_BLAST_WAVE, 12s);
+                    events.RescheduleEvent(EVEMT_MAGE_SPELL_HASTE, 22s);
+                    events.RescheduleEvent(EVEMT_MAGE_SPELL_POLYMORPH, 8s);
                     break;
                 case NPC_COLOSOS: // Colosos
                 case NPC_RUNOK: // Runok Wildmane
-                    events.RescheduleEvent(EVENT_SHAMAN_SPELL_CHAIN_LIGHTNING, 16000);
-                    events.RescheduleEvent(EVENT_SHAMAN_SPELL_EARTH_SHIELD, urand(30000, 35000));
-                    events.RescheduleEvent(EVENT_SHAMAN_SPELL_HEALING_WAVE, 12000);
-                    events.RescheduleEvent(EVENT_SHAMAN_SPELL_HEX_OF_MENDING, urand(20000, 25000));
+                    events.RescheduleEvent(EVENT_SHAMAN_SPELL_CHAIN_LIGHTNING, 16s);
+                    events.RescheduleEvent(EVENT_SHAMAN_SPELL_EARTH_SHIELD, 30s, 35s);
+                    events.RescheduleEvent(EVENT_SHAMAN_SPELL_HEALING_WAVE, 12s);
+                    events.RescheduleEvent(EVENT_SHAMAN_SPELL_HEX_OF_MENDING, 20s, 25s);
                     break;
                 case NPC_JAELYNE: // Jaelyne Evensong
                 case NPC_ZULTORE: // Zul'tore
-                    //events.RescheduleEvent(EVENT_HUNTER_SPELL_DISENGAGE, x);
-                    events.RescheduleEvent(EVENT_HUNTER_SPELL_LIGHTNING_ARROWS, 7000);
-                    events.RescheduleEvent(EVENT_HUNTER_SPELL_MULTI_SHOT, 12000);
+                    events.RescheduleEvent(EVENT_HUNTER_SPELL_LIGHTNING_ARROWS, 7s);
+                    events.RescheduleEvent(EVENT_HUNTER_SPELL_MULTI_SHOT, 12s);
                     break;
                 case NPC_LANA: // Lana Stouthammer
                 case NPC_VISCERI: // Deathstalker Visceri
-                    events.RescheduleEvent(EVENT_ROGUE_SPELL_EVISCERATE, 8000);
-                    events.RescheduleEvent(EVENT_ROGUE_SPELL_FAN_OF_KNIVES, 14000);
-                    events.RescheduleEvent(EVENT_ROGUE_SPELL_POISON_BOTTLE, 19000);
+                    events.RescheduleEvent(EVENT_ROGUE_SPELL_EVISCERATE, 8s);
+                    events.RescheduleEvent(EVENT_ROGUE_SPELL_FAN_OF_KNIVES, 14s);
+                    events.RescheduleEvent(EVENT_ROGUE_SPELL_POISON_BOTTLE, 19s);
                     break;
                 case NPC_JACOB: // Marshal Jacob Alerius
                 case NPC_MOKRA: // Mokra the Skullcrusher
-                    events.RescheduleEvent(EVENT_WARRIOR_SPELL_MORTAL_STRIKE, urand(8000, 12000));
-                    events.RescheduleEvent(EVENT_WARRIOR_SPELL_BLADESTORM, urand(15000, 20000));
-                    events.RescheduleEvent(EVENT_WARRIOR_SPELL_INTERCEPT, 7000);
-                    //events.RescheduleEvent(EVENT_WARRIOR_SPELL_ROLLING_THROW, x);
+                    events.RescheduleEvent(EVENT_WARRIOR_SPELL_MORTAL_STRIKE, 8s, 12s);
+                    events.RescheduleEvent(EVENT_WARRIOR_SPELL_BLADESTORM, 15s, 20s);
+                    events.RescheduleEvent(EVENT_WARRIOR_SPELL_INTERCEPT, 7s);
                     break;
                 default:
                     break;
@@ -568,7 +566,7 @@ public:
                         {
                             NewMountGUID = mount->GetGUID();
                             me->GetMotionMaster()->MovePoint(7, *mount);
-                            events.RescheduleEvent(EVENT_FIND_NEW_MOUNT, 1000);
+                            events.RescheduleEvent(EVENT_FIND_NEW_MOUNT, 1s);
                         }
                     }
                 }
@@ -627,9 +625,9 @@ public:
                             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
                             me->SetRegeneratingHealth(true);
                             events.Reset();
-                            events.ScheduleEvent(EVENT_MOUNT_CHARGE, urand(2500, 4000));
-                            events.ScheduleEvent(EVENT_SHIELD_BREAKER, urand(5000, 8000));
-                            events.ScheduleEvent(EVENT_THRUST, urand(3000, 5000));
+                            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+                            events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
+                            events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             me->SetImmuneToAll(false);
@@ -681,7 +679,7 @@ public:
                     {
                         if( me->HasAura(SPELL_TRAMPLE_STUN) )
                         {
-                            events.RepeatEvent(200);
+                            events.Repeat(200ms);
                             break;
                         }
 
@@ -707,7 +705,7 @@ public:
 
                             if( trample )
                             {
-                                events.RepeatEvent(15100);
+                                events.Repeat(15s);
                                 break;
                             }
                         }
@@ -717,7 +715,7 @@ public:
                             {
                                 if( me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE )
                                     me->GetMotionMaster()->MovePoint(7, *mount);
-                                events.RepeatEvent(200);
+                                events.Repeat(200ms);
                                 break;
                             }
 
@@ -728,7 +726,7 @@ public:
                             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             me->SetImmuneToAll(true);
                             me->GetMotionMaster()->MovePoint(7, *mount);
-                            events.RepeatEvent(200);
+                            events.Repeat(200ms);
                             break;
                         }
                     }
@@ -761,7 +759,7 @@ public:
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
                         }
-                        events.RepeatEvent(urand(4500, 6000));
+                        events.Repeat(4500ms, 6000ms);
                     }
                     break;
                 case EVENT_SHIELD_BREAKER:
@@ -783,34 +781,34 @@ public:
                             if( Unit* target = ObjectAccessor::GetCreature(*me, LIST.at(rnd)) )
                                 me->CastSpell(target, SPELL_NPC_SHIELD_BREAKER, false);
                         }
-                        events.RepeatEvent(urand(6000, 8000));
+                        events.Repeat(6s, 8s);
                     }
                     break;
                 case EVENT_THRUST:
                     if( Unit* victim = me->GetVictim() )
                         if( me->GetExactDist(victim) <= 6.0f )
                             me->CastSpell(victim, SPELL_PLAYER_VEHICLE_THRUST, false);
-                    events.RepeatEvent(urand(3000, 5000));
+                    events.Repeat(3s, 5s);
                     break;
 
                 /******************* MAGE *******************/
                 case EVEMT_MAGE_SPELL_FIREBALL:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_FIREBALL, false);
-                    events.RepeatEvent(5000);
+                    events.Repeat(5s);
                     break;
                 case EVEMT_MAGE_SPELL_BLAST_WAVE:
                     me->CastSpell((Unit*)nullptr, SPELL_BLAST_WAVE, false);
-                    events.RepeatEvent(13000);
+                    events.Repeat(13s);
                     break;
                 case EVEMT_MAGE_SPELL_HASTE:
                     me->CastSpell(me, SPELL_HASTE, false);
-                    events.RepeatEvent(22000);
+                    events.Repeat(22s);
                     break;
                 case EVEMT_MAGE_SPELL_POLYMORPH:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_POLYMORPH, false);
-                    events.RepeatEvent(8000);
+                    events.Repeat(8s);
                     break;
                 /***************** MAGE END *****************/
 
@@ -818,11 +816,11 @@ public:
                 case EVENT_SHAMAN_SPELL_CHAIN_LIGHTNING:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
-                    events.RepeatEvent(16000);
+                    events.Repeat(16s);
                     break;
                 case EVENT_SHAMAN_SPELL_EARTH_SHIELD:
                     me->CastSpell(me, SPELL_EARTH_SHIELD, false);
-                    events.RepeatEvent(urand(30000, 35000));
+                    events.Repeat(30s, 35s);
                     break;
                 case EVENT_SHAMAN_SPELL_HEALING_WAVE:
                     {
@@ -836,13 +834,13 @@ public:
                         else
                             target = me;
                         me->CastSpell(target, SPELL_HEALING_WAVE, false);
-                        events.RepeatEvent(22000);
+                        events.Repeat(22s);
                     }
                     break;
                 case EVENT_SHAMAN_SPELL_HEX_OF_MENDING:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_HEX_OF_MENDING, false);
-                    events.RepeatEvent(urand(20000, 25000));
+                    events.Repeat(20s, 25s);
                     break;
                 /**************** SHAMAN END ****************/
 
@@ -852,7 +850,7 @@ public:
                     break;
                 case EVENT_HUNTER_SPELL_LIGHTNING_ARROWS:
                     me->CastSpell((Unit*)nullptr, SPELL_LIGHTNING_ARROWS, false);
-                    events.RepeatEvent(urand(20000, 25000));
+                    events.Repeat(20s, 25s);
                     break;
                 case EVENT_HUNTER_SPELL_MULTI_SHOT:
                     {
@@ -863,7 +861,7 @@ public:
                                 me->CastSpell(target, SPELL_SHOOT, false);
                                 UnitTargetGUID = target->GetGUID();
                             }
-                            events.RepeatEvent(2000);
+                            events.Repeat(2s);
                             break;
                         }
                         else
@@ -886,7 +884,7 @@ public:
                             }
                             UnitTargetGUID.Clear();
                         }
-                        events.RepeatEvent(urand(15000, 20000));
+                        events.Repeat(15s, 20s);
                     }
                     break;
                 /**************** HUNTER END ****************/
@@ -895,16 +893,16 @@ public:
                 case EVENT_ROGUE_SPELL_EVISCERATE:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_EVISCERATE, false);
-                    events.RepeatEvent(8000);
+                    events.Repeat(8s);
                     break;
                 case EVENT_ROGUE_SPELL_FAN_OF_KNIVES:
                     me->CastSpell((Unit*)nullptr, SPELL_FAN_OF_KNIVES, false);
-                    events.RepeatEvent(14000);
+                    events.Repeat(14s);
                     break;
                 case EVENT_ROGUE_SPELL_POISON_BOTTLE:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_POISON_BOTTLE, false);
-                    events.RepeatEvent(19000);
+                    events.Repeat(19s);
                     break;
                 /**************** ROGUE END *****************/
 
@@ -912,12 +910,12 @@ public:
                 case EVENT_WARRIOR_SPELL_MORTAL_STRIKE:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
-                    events.RepeatEvent(urand(8000, 12000));
+                    events.Repeat(8s, 12s);
                     break;
                 case EVENT_WARRIOR_SPELL_BLADESTORM:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_BLADESTORM, false);
-                    events.RepeatEvent(urand(15000, 20000));
+                    events.Repeat(15s, 20s);
                     break;
                 case EVENT_WARRIOR_SPELL_INTERCEPT:
                     {
@@ -933,7 +931,7 @@ public:
                                 break;
                             }
                         }
-                        events.RepeatEvent(7000);
+                        events.Repeat(7s);
                     }
                     break;
                 case EVENT_WARRIOR_SPELL_ROLLING_THROW:

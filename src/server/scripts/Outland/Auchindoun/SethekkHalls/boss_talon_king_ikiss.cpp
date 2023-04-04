@@ -43,7 +43,7 @@ enum Spells
 
 struct boss_talon_king_ikiss : public BossAI
 {
-    boss_talon_king_ikiss(Creature* creature) : BossAI(creature, DATA_IKISS), _spoken(false), _manaShield(false)
+    boss_talon_king_ikiss(Creature* creature) : BossAI(creature, DATA_IKISS), _spoken(false)
     {
         scheduler.SetValidator([this]
         {
@@ -55,7 +55,44 @@ struct boss_talon_king_ikiss : public BossAI
     {
         _Reset();
         _spoken = false;
-        _manaShield = false;
+
+        ScheduleHealthCheckEvent(80, [&] {
+            TeleportAndCastExplosion();
+        });
+
+        ScheduleHealthCheckEvent(50, [&] {
+            TeleportAndCastExplosion();
+        });
+
+        ScheduleHealthCheckEvent(25, [&] {
+            TeleportAndCastExplosion();
+        });
+
+        ScheduleHealthCheckEvent(20, [&] {
+            DoCast(me, SPELL_MANA_SHIELD);
+        });
+    }
+
+    /// @todo: remove this once pets stop going through doors.
+    bool CanAIAttack(Unit const* /*victim*/) const override
+    {
+        return _spoken;
+    }
+
+    void TeleportAndCastExplosion()
+    {
+        me->InterruptNonMeleeSpells(false);
+        DoCastSelf(SPELL_ARCANE_BUBBLE, true);
+        DoCastAOE(SPELL_BLINK);
+        Talk(EMOTE_ARCANE_EXP);
+
+        scheduler.Schedule(1s, [this](TaskContext)
+        {
+            DoCastAOE(SPELL_ARCANE_EXPLOSION);
+        }).Schedule(6500ms, [this](TaskContext /*context*/)
+        {
+            me->GetThreatMgr().ResetAllThreat();
+        });
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -74,25 +111,13 @@ struct boss_talon_king_ikiss : public BossAI
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 
-        scheduler.Schedule(35s, [this](TaskContext context)
-        {
-            me->InterruptNonMeleeSpells(false);
-            DoCastAOE(SPELL_BLINK);
-            Talk(EMOTE_ARCANE_EXP);
-            context.Repeat(35s, 40s);
-
-            scheduler.Schedule(1s, [this](TaskContext)
-            {
-                DoCastAOE(SPELL_ARCANE_EXPLOSION);
-                DoCastSelf(SPELL_ARCANE_BUBBLE, true);
-            });
-        }).Schedule(5s, [this](TaskContext context)
+        scheduler.Schedule(5s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_ARCANE_VOLLEY);
             context.Repeat(7s, 12s);
         }).Schedule(8s, [this](TaskContext context)
         {
-            IsHeroic() ? DoCastRandomTarget(SPELL_POLYMORPH) : DoCastMaxThreat(SPELL_POLYMORPH);
+            DoCastRandomTarget(SPELL_POLYMORPH);
             context.Repeat(15s, 17500ms);
         });
 
@@ -117,24 +142,14 @@ struct boss_talon_king_ikiss : public BossAI
         }
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-    {
-        if (!_manaShield && me->HealthBelowPctDamaged(20, damage))
-        {
-            DoCast(me, SPELL_MANA_SHIELD);
-            _manaShield = true;
-        }
-    }
-
     void KilledUnit(Unit* /*victim*/) override
     {
         if (urand(0, 1))
             Talk(SAY_SLAY);
     }
 
-    private:
-        bool _spoken;
-        bool _manaShield;
+private:
+    bool _spoken;
 };
 
 // 38194 - Blink

@@ -307,11 +307,11 @@ public:
             bEnteredCombat = true;
             me->CastSpell(me, SPELL_OOZE_TANK_PROTECTION, true);
             events.Reset();
-            events.ScheduleEvent(EVENT_BERSERK, 600000);
-            events.ScheduleEvent(EVENT_SLIME_PUDDLE, 10000, EVENT_GROUP_ABILITIES);
-            events.ScheduleEvent(EVENT_UNSTABLE_EXPERIMENT, urand(30000, 35000), EVENT_GROUP_ABILITIES);
+            events.ScheduleEvent(EVENT_BERSERK, 10min);
+            events.ScheduleEvent(EVENT_SLIME_PUDDLE, 10s, EVENT_GROUP_ABILITIES);
+            events.ScheduleEvent(EVENT_UNSTABLE_EXPERIMENT, 30s, 35s, EVENT_GROUP_ABILITIES);
             if (IsHeroic())
-                events.ScheduleEvent(EVENT_UNBOUND_PLAGUE, 20000, EVENT_GROUP_ABILITIES);
+                events.ScheduleEvent(EVENT_UNBOUND_PLAGUE, 20s, EVENT_GROUP_ABILITIES);
 
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GAS_VARIABLE);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_OOZE_VARIABLE);
@@ -463,7 +463,7 @@ public:
                     me->SetFacingTo(tablePos.GetOrientation());
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MoveIdle();
-                    events.ScheduleEvent(EVENT_TABLE_DRINK_STUFF, IsHeroic() ? 25000 : 0);
+                    events.ScheduleEvent(EVENT_TABLE_DRINK_STUFF, IsHeroic() ? 25s : 0ms);
                     break;
             }
         }
@@ -552,13 +552,13 @@ public:
                         if (!targets.empty())
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                 me->CastSpell(*itr, SPELL_SLIME_PUDDLE_TRIGGER, true);
-                        events.ScheduleEvent(EVENT_SLIME_PUDDLE, 35000, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_SLIME_PUDDLE, 35s, EVENT_GROUP_ABILITIES);
                     }
                     break;
                 case EVENT_UNSTABLE_EXPERIMENT:
                     Talk(EMOTE_UNSTABLE_EXPERIMENT);
                     me->CastSpell(me, SPELL_UNSTABLE_EXPERIMENT, false);
-                    events.ScheduleEvent(EVENT_UNSTABLE_EXPERIMENT, urand(35000, 40000), EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_UNSTABLE_EXPERIMENT, 35s, 40s, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_GO_TO_TABLE:
                     me->CastSpell(me, SPELL_TEAR_GAS_PERIODIC_TRIGGER, true);
@@ -594,14 +594,14 @@ public:
                                     me->SetFacingToObject(face);
                                 me->SetStandState(UNIT_STAND_STATE_KNEEL);
                                 Talk(SAY_TRANSFORM_1);
-                                events.ScheduleEvent(EVENT_RESUME_ATTACK, 5500);
+                                events.ScheduleEvent(EVENT_RESUME_ATTACK, 5500ms);
                                 break;
                             case 3:
                                 if (Creature* face = me->FindNearestCreature(NPC_TEAR_GAS_TARGET_STALKER, 50.0f))
                                     me->SetFacingToObject(face);
                                 me->SetStandState(UNIT_STAND_STATE_KNEEL);
                                 Talk(SAY_TRANSFORM_2);
-                                events.ScheduleEvent(EVENT_RESUME_ATTACK, 8500);
+                                events.ScheduleEvent(EVENT_RESUME_ATTACK, 8500ms);
                                 break;
                             default:
                                 break;
@@ -625,10 +625,10 @@ public:
                     {
                         me->CastSpell(target, SPELL_UNBOUND_PLAGUE, false);
                         me->CastSpell(target, SPELL_UNBOUND_PLAGUE_SEARCHER, false);
-                        events.ScheduleEvent(EVENT_UNBOUND_PLAGUE, 90000, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_UNBOUND_PLAGUE, 90s, EVENT_GROUP_ABILITIES);
                     }
                     else
-                        events.ScheduleEvent(EVENT_UNBOUND_PLAGUE, 3500, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_UNBOUND_PLAGUE, 3500ms, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_MALLEABLE_GOO:
                     if (Is25ManRaid())
@@ -651,12 +651,12 @@ public:
                             me->CastSpell(target, SPELL_MALLEABLE_GOO, true);
                         }
                     }
-                    events.ScheduleEvent(EVENT_MALLEABLE_GOO, urand(25000, 30000), EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_MALLEABLE_GOO, 25s, 30s, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_CHOKING_GAS_BOMB:
                     Talk(EMOTE_CHOKING_GAS_BOMB);
                     me->CastSpell(me, SPELL_CHOKING_GAS_BOMB, false);
-                    events.ScheduleEvent(EVENT_CHOKING_GAS_BOMB, urand(35000, 40000), EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_CHOKING_GAS_BOMB, 35s, 40s, EVENT_GROUP_ABILITIES);
                     break;
                 default:
                     break;
@@ -681,7 +681,7 @@ public:
             if (!IsHeroic())
             {
                 me->CastSpell(me, SPELL_TEAR_GAS, false);
-                events.ScheduleEvent(EVENT_GO_TO_TABLE, 2500);
+                events.ScheduleEvent(EVENT_GO_TO_TABLE, 2500ms);
             }
             else
             {
@@ -1008,9 +1008,12 @@ public:
                     break;
                 }
 
-            if (Aura* aura = target->GetAura(uint32(GetSpellInfo()->Effects[stage].CalcValue())))
-                if (aura->GetOwner() == target) // avoid assert(false) at any cost
-                    aura->UpdateOwner(5000, target); // update whole aura so previous periodic ticks before refreshed by new one
+            if (target)
+            {
+                if (Aura* aura = target->GetAura(uint32(GetSpellInfo()->Effects[stage].CalcValue())))
+                    if (aura->GetOwner() == target) // avoid assert(false) at any cost
+                        aura->UpdateOwner(5000, target); // update whole aura so previous periodic ticks before refreshed by new one
+            }
 
             GetCaster()->CastSpell(target, uint32(GetSpellInfo()->Effects[stage].CalcValue()), true, nullptr, nullptr, GetCaster()->GetGUID());
         }
