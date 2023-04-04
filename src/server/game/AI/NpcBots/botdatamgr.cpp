@@ -336,7 +336,7 @@ void BotDataMgr::LoadNpcBots(bool spawn)
 
 void BotDataMgr::LoadNpcBotGroupData()
 {
-    LOG_INFO("server.loading", "Loading NPCBot Group members...");
+    LOG_INFO("server.loading", "Loading NPCBot group members...");
 
     uint32 oldMSTime = getMSTime();
 
@@ -528,10 +528,11 @@ void BotDataMgr::LoadWanderMap(bool reload)
     WanderNode::DoForAllWPs([&](WanderNode const* wp) {
         if (tops.count(wp) == 0u && wp->GetLinks().size() == 1u)
         {
-            LOG_TRACE("server.loading", "Node {} ('{}') has single connection!", wp->GetWPId(), wp->GetName().c_str());
+            LOG_DEBUG("server.loading", "Node {} ('{}') has single connection!", wp->GetWPId(), wp->GetName().c_str());
             WanderNode const* tn = wp->GetLinks().front();
             std::vector<WanderNode const*> sc_chain;
             sc_chain.push_back(wp);
+            tops.emplace(wp);
             while (tn != wp)
             {
                 if (tn->GetLinks().size() != 2u)
@@ -547,8 +548,7 @@ void BotDataMgr::LoadWanderMap(bool reload)
             }
             if (sc_chain.back()->GetLinks().size() == 1u)
             {
-                LOG_TRACE("server.loading", "Node {} ('{}') has single connection!", tn->GetWPId(), tn->GetName().c_str());
-                tops.emplace(sc_chain.front());
+                LOG_DEBUG("server.loading", "Node {} ('{}') has single connection!", tn->GetWPId(), tn->GetName().c_str());
                 tops.emplace(sc_chain.back());
                 std::ostringstream ss;
                 ss << "Node " << (sc_chain.size() == 2u ? "pair " : "chain ");
