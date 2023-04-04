@@ -834,6 +834,7 @@ public:
                     if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     {
                         //tirion->Yell("The Lich King must fall!", LANG_UNIVERSAL);
+                        tirion->Yell(38113);//broadcast_text 38113
                         tirion->PlayDirectSound(17389);
                     }
                 }
