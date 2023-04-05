@@ -282,6 +282,7 @@ public:
             _didFirstFlyPhase = false;
             _isBelow20Pct = false;
             _isThirdPhase = false;
+            _isLanding = false;
             _bombCount = 0;
             _mysticBuffetStack = 0;
             _Reset();
@@ -365,15 +366,16 @@ public:
 
         void DoAction(int32 action) override
         {
-            if (action == ACTION_START_FROSTWYRM)
+            if (action == ACTION_START_FROSTWYRM && !_isLanding)
             {
+                _isLanding = true;
+
                 if (TempSummon* summon = me->ToTempSummon())
                     summon->SetTempSummonType(TEMPSUMMON_DEAD_DESPAWN);
 
                 if (me->isDead())
                     return;
 
-                instance->SetBossState(DATA_SINDRAGOSA, IN_PROGRESS);
                 me->setActive(true);
                 me->SetDisableGravity(true);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -673,6 +675,7 @@ public:
         bool _isBelow20Pct;
         bool _isThirdPhase;
         bool _isInAirPhase;
+        bool _isLanding;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

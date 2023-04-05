@@ -61,7 +61,6 @@ struct boss_harbinger_skyriss : public BossAI
     void Reset() override
     {
         _Reset();
-        me->SetImmuneToAll(false);
 
         ScheduleHealthCheckEvent(66, [&] {
             Talk(SAY_IMAGE);
