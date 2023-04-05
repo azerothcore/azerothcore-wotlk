@@ -61,6 +61,7 @@ enum Texts
     SAY_TIRION_INTRO_2              = 1,
     SAY_TIRION_OUTRO_1              = 2,
     SAY_TIRION_OUTRO_2              = 3,
+    SAY_TIRION_OUTRO_3              = 4,
 
     // Terenas Menethil (outro)
     SAY_TERENAS_OUTRO_1             = 0,
@@ -343,6 +344,7 @@ enum MiscData
 {
     LIGHT_SNOWSTORM             = 2490,
     LIGHT_SOULSTORM             = 2508,
+    EQUIP_ASHBRINGER            = 13262,
     MUSIC_FROZEN_THRONE         = 17457,
     MUSIC_SPECIAL               = 17458, // Summon Shambling Horror, Remorseless Winter, Quake, Summon Val'kyr Periodic, Harvest Soul, Vile Spirits
     MUSIC_FURY_OF_FROSTMOURNE   = 17459,
@@ -834,8 +836,7 @@ public:
                     if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     {
                         //tirion->Yell("The Lich King must fall!", LANG_UNIVERSAL);
-                        tirion->Yell(38113);//broadcast_text 38113
-                        tirion->PlayDirectSound(17389);
+                        tirion->AI()->Talk(SAY_TIRION_OUTRO_3);
                     }
                 }
             }
@@ -1355,7 +1356,7 @@ public:
             {
                 // remove glow on ashbringer and tirion
                 me->RemoveAllAuras();
-                SetEquipmentSlots(false, 13262, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
+                SetEquipmentSlots(false, EQUIP_ASHBRINGER, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             }
         }
 
@@ -1596,7 +1597,7 @@ public:
                             lichKing->SetImmuneToNPC(false);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                             me->RemoveAllAuras();
-                            SetEquipmentSlots(false, 13262, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
+                            SetEquipmentSlots(false, EQUIP_ASHBRINGER, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
                             me->Attack(lichKing, true);
                             me->GetMotionMaster()->MovePoint(0, 512.16f, -2120.25f, 840.86f);
                         }
