@@ -1692,6 +1692,21 @@ int32 BotMgr::GetHPSTaken(Unit const* unit) const
     return amount;
 }
 
+void BotMgr::OnBotWandererKilled(Creature const* bot, Player* looter)
+{
+    bot->GetBotAI()->SpawnKillReward(looter);
+}
+
+void BotMgr::OnBotWandererKilled(GameObject* go)
+{
+    if (go->GetEntry() == GO_BOT_MONEY_BAG && go->GetSpellId() > go->GetEntry())
+    {
+        uint32 bot_id = go->GetSpellId() - GO_BOT_MONEY_BAG;
+        if (Creature const* bot = BotDataMgr::FindBot(bot_id))
+            bot->GetBotAI()->FillKillReward(go);
+    }
+}
+
 void BotMgr::OnBotSpellInterrupt(Unit const* caster, CurrentSpellTypes spellType)
 {
     if (spellType == CURRENT_AUTOREPEAT_SPELL)

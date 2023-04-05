@@ -356,6 +356,11 @@ void Creature::SearchFormation()
 
 void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
 {
+    //npcbot
+    if (IsNPCBotOrPet())
+        return;
+    //end npcbot
+
     if (getDeathState() != CORPSE)
         return;
 
@@ -704,16 +709,6 @@ void Creature::Update(uint32 diff)
             if (m_deathState != CORPSE)
                 break;
 
-            //npcbot: update dead bots
-            if (bot_AI)
-            {
-                bot_AI->UpdateDeadAI(diff);
-                break;
-            }
-            else if (bot_pet_AI)
-                break;
-            //end npcbot
-
             if (m_groupLootTimer && lootingGroupLowGUID)
             {
                 if (m_groupLootTimer <= diff)
@@ -729,6 +724,15 @@ void Creature::Update(uint32 diff)
                     m_groupLootTimer -= diff;
                 }
             }
+            //npcbot: update dead bots
+            else if (bot_AI)
+            {
+                bot_AI->UpdateDeadAI(diff);
+                break;
+            }
+            else if (bot_pet_AI)
+                break;
+            //end npcbot
             else if (m_corpseRemoveTime <= GameTime::GetGameTime().count())
             {
                 //npcbot: do not remove corpse
@@ -844,11 +848,6 @@ void Creature::Update(uint32 diff)
                 {
                     m_assistanceTimer -= diff;
                 }
-            }
-
-            if (bot_AI)
-            {
-                //TC_LOG_ERROR("entities.unit", "creature update for %u", m_spawnId);
             }
 
             if (!IsInEvadeMode() && IsAIEnabled)
@@ -2138,7 +2137,7 @@ void Creature::Respawn(bool force)
     //DestroyForNearbyPlayers(); // pussywizard: not needed
 
     //npcbot
-    if (IsNPCBot())
+    if (IsNPCBotOrPet())
         return;
     //end npcbot
 
@@ -2221,6 +2220,11 @@ void Creature::Respawn(bool force)
 
 void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
 {
+    //npcbot
+    if (IsNPCBotOrPet())
+        return;
+    //end npcbot
+
     if (timeMSToDespawn)
     {
         ForcedDespawnDelayEvent* pEvent = new ForcedDespawnDelayEvent(*this, forceRespawnTimer);
@@ -3057,6 +3061,11 @@ CreatureMovementData const& Creature::GetMovementTemplate() const
 
 void Creature::AllLootRemovedFromCorpse()
 {
+    //npcbot
+    if (IsNPCBotOrPet())
+        return;
+    //end npcbot
+
     if (loot.loot_type != LOOT_SKINNING && !IsPet() && GetCreatureTemplate()->SkinLootId && hasLootRecipient())
     {
         if (LootTemplates_Skinning.HaveLootFor(GetCreatureTemplate()->SkinLootId))

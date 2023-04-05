@@ -25,6 +25,8 @@
 #include "LFG.h"
 #include "LFGMgr.h"
 #include "Log.h"
+#include "Loot.h"
+#include "LootMgr.h"
 #include "Mail.h"
 #include "MapMgr.h"
 #include "MotionMaster.h"
@@ -10414,6 +10416,52 @@ void bot_ai::OnOwnerVehicleDamagedBy(Unit* attacker)
 //////////
 ///LOOT///
 //////////
+void bot_ai::SpawnKillReward(Player* looter) const
+{
+    ASSERT(IsWanderer());
+
+    QuaternionData rotation = QuaternionData::fromEulerAnglesZYX(looter->GetOrientation(), 0.f, 0.f);
+    GameObject* moneyBag = looter->SummonGameObject(GO_BOT_MONEY_BAG, *me, rotation, std::chrono::duration_cast<Seconds>(Milliseconds(REVIVE_TIMER_DEFAULT)));
+    moneyBag->SetSpellId(GO_BOT_MONEY_BAG + me->GetEntry());
+}
+void bot_ai::FillKillReward(GameObject* go) const
+{
+    static const uint32 MAX_KILL_REWARD_ITEMS = 2;
+
+    ASSERT(IsWanderer());
+    ASSERT(go->GetEntry() == GO_BOT_MONEY_BAG);
+    ASSERT((go->GetSpellId() - go->GetEntry()) == me->GetEntry());
+
+    go->SetObjectScale(0.875f);
+
+    Loot& loot = go->loot;
+
+    loot.clear();
+    loot.loot_type = LOOT_CORPSE;
+
+    //gold
+    loot.gold = uint32(me->GetLevel() * std::min<uint32>(std::max<int32>(125 + int32(_killsCount * 5) - int32(_deathsCount * 50), 125), 1250));
+
+    //items
+    uint32 loot_items_count = 0;
+    for (Item const* item : _equips)
+    {
+        if (item)
+        {
+            ItemTemplate const* proto = item->GetTemplate();
+            if (proto->Quality == ITEM_QUALITY_UNCOMMON || proto->Quality == ITEM_QUALITY_RARE)
+            {
+                if (roll_chance_f(5.0f))
+                {
+                    loot.AddItem(LootStoreItem(proto->ItemId, 0, 100.0f, false, 0, 0, 1, 1));
+
+                    if (++loot_items_count >= std::min<uint32>(MAX_KILL_REWARD_ITEMS, MAX_NR_LOOT_ITEMS))
+                        break;
+                }
+            }
+        }
+    }
+}
 uint32 bot_ai::_getLootQualityMask() const
 {
     uint32 lootRoleMask = (_roleMask & BOT_ROLE_MASK_LOOTING);
@@ -14523,7 +14571,7 @@ void bot_ai::JustDied(Unit* u)
             IsWanderer() ? _travel_node_cur->GetName().c_str() : "''");
     }
 
-    _reviveTimer = (IsWanderer() && !(u && u->IsControlledByPlayer())) ? 90000 : IAmFree() ? 180000 : 60000; //1.5min/3min/1min
+    _reviveTimer = (IsWanderer() && !(u && u->IsControlledByPlayer())) ? REVIVE_TIMER_MEDIUM : IAmFree() ? REVIVE_TIMER_DEFAULT : REVIVE_TIMER_SHORT;
     _atHome = false;
     _evadeMode = false;
     spawned = false;

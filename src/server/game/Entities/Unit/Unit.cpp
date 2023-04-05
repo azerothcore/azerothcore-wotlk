@@ -18770,6 +18770,11 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             if (creature->GetLootMode())
                 loot->generateMoneyLoot(creature->GetCreatureTemplate()->mingold, creature->GetCreatureTemplate()->maxgold);
 
+            //npcbot: spawn wandering bot kill reward
+            if (creature->IsNPCBot() && creature->IsWandererBot())
+                BotMgr::OnBotWandererKilled(creature, looter);
+            //end npcbot
+
             if (group)
             {
                 if (hasLooterGuid)
