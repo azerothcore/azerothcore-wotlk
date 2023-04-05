@@ -25,7 +25,6 @@
 #include "LFG.h"
 #include "LFGMgr.h"
 #include "Log.h"
-#include "Loot.h"
 #include "LootMgr.h"
 #include "Mail.h"
 #include "MapMgr.h"
@@ -10420,8 +10419,7 @@ void bot_ai::SpawnKillReward(Player* looter) const
 {
     ASSERT(IsWanderer());
 
-    QuaternionData rotation = QuaternionData::fromEulerAnglesZYX(looter->GetOrientation(), 0.f, 0.f);
-    GameObject* moneyBag = looter->SummonGameObject(GO_BOT_MONEY_BAG, *me, rotation, std::chrono::duration_cast<Seconds>(Milliseconds(REVIVE_TIMER_DEFAULT)));
+    GameObject* moneyBag = looter->SummonGameObject(GO_BOT_MONEY_BAG, me->m_positionX, me->m_positionY, me->m_positionZ, me->GetOrientation(), 0, 0, 0, 0, REVIVE_TIMER_DEFAULT);
     moneyBag->SetSpellId(GO_BOT_MONEY_BAG + me->GetEntry());
 }
 void bot_ai::FillKillReward(GameObject* go) const

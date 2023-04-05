@@ -838,7 +838,7 @@ void GenerateBotCustomSpells()
     sinfo->MaxAffectedTargets = 1;
     sinfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_CHANGE_MAP;
     //sinfo->ExplicitTargetMask = TARGET_FLAG_UNIT;
-    sinfo->Attributes |= SPELL_ATTR0_NO_ACTIVE_DEFENSE | SPELL_ATTR0_NEGATIVE_1;
+    sinfo->Attributes |= SPELL_ATTR0_NO_ACTIVE_DEFENSE | SPELL_ATTR0_AURA_IS_DEBUFF;
     sinfo->AttributesEx |= SPELL_ATTR1_NO_REDIRECTION | SPELL_ATTR1_NO_REFLECTION;
     sinfo->AttributesEx2 |= SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS/* | SPELL_ATTR2_CANT_CRIT*/;
     sinfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;

@@ -2002,7 +2002,7 @@ WanderNode const* BotDataMgr::GetClosestWanderNode(WorldLocation const* loc)
     return closestNode;
 }
 
-class TC_GAME_API WanderingBotXpGainFormulaScript : public FormulaScript
+class AC_GAME_API WanderingBotXpGainFormulaScript : public FormulaScript
 {
     static constexpr float WANDERING_BOT_XP_GAIN_MULT = 10.0f;
 
