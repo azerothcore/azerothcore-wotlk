@@ -7,9 +7,9 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (14308, 8146, 0, 5, 0, 1, 0, 1, 1, 'Ferra - Wicked Claw'),
 (14308, 11414, 0, 65, 0, 1, 0, 1, 1, 'Ferra - Grizzled Mane'),
 (14308, 11415, 0, 27, 0, 1, 0, 1, 1, 'Ferra - Mixed Berries'),
-(14308, 7909, 0, 1, 0, 1, 1, 1, 1, 'Ferra - Aquamarine'),
-(14308, 7910, 0, 0.5, 0, 1, 1, 1, 1, 'Ferra - Star Ruby'),
-(14308, 24016, 24016, 2, 0, 1, 2, 1, 1, 'Ferra - (ReferenceTable)'),
-(14308, 24018, 24018, 1.5, 0, 1, 2, 1, 1, 'Ferra - (ReferenceTable)'),
-(14308, 24020, 24020, 1, 0, 1, 2, 1, 1, 'Ferra - (ReferenceTable)'),
-(14308, 24033, 24033, 0.75, 0, 1, 2, 1, 1, 'Ferra - (ReferenceTable)');
+(14308, 7909, 0, 1, 0, 1, 2, 1, 1, 'Ferra - Aquamarine'),
+(14308, 7910, 0, 0.5, 0, 1, 2, 1, 1, 'Ferra - Star Ruby'),
+(14308, 24016, 24016, 2, 0, 1, 1, 1, 1, 'Ferra - (ReferenceTable)'),
+(14308, 24018, 24018, 1.5, 0, 1, 1, 1, 1, 'Ferra - (ReferenceTable)'),
+(14308, 24020, 24020, 1, 0, 1, 1, 1, 1, 'Ferra - (ReferenceTable)'),
+(14308, 24033, 24033, 0.75, 0, 1, 1, 1, 1, 'Ferra - (ReferenceTable)');
