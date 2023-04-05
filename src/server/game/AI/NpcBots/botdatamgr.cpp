@@ -792,6 +792,7 @@ void BotDataMgr::GenerateWanderingBots()
         bot_template = *orig_template;
         bot_template.Entry = bot_id;
         bot_template.SubName = "";
+        bot_template.speed_run = 1.05f;
         bot_template.InitializeQueryData();
 
         NpcBotData* bot_data = new NpcBotData(bot_ai::DefaultRolesForClass(bot_class), bot_faction, bot_ai::DefaultSpecForClass(bot_class));
