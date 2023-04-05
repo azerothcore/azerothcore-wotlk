@@ -18,8 +18,8 @@ DELETE FROM `smart_scripts` WHERE `entryorguid` = 18482 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (18482, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 83, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Respawn - Remove Npc Flag Questgiver'),
 (18482, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Respawn - Set Invincibility at 1 HP'),
-(18482, 0, 2, 4, 62, 0, 100, 0, 7704, 0, 0, 0, 0, 80, 1848200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Gossip Option 0 Selected - Run Script'),
-(18482, 0, 3, 4, 62, 0, 100, 0, 7704, 1, 0, 0, 0, 80, 1848200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Gossip Option 1 Selected - Run Script'),
+(18482, 0, 2, 4, 62, 0, 100, 0, 7704, 0, 0, 0, 0, 80, 1848200, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Gossip Option 0 Selected - Run Script'),
+(18482, 0, 3, 4, 62, 0, 100, 0, 7704, 1, 0, 0, 0, 80, 1848200, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Gossip Option 1 Selected - Run Script'),
 (18482, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 78, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Gossip Option Selected - Reset All Scripts'),
 (18482, 0, 5, 0, 2, 0, 100, 1, 0, 1, 0, 0, 0, 80, 1848201, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - Between 0-1% Health - Run Script (No Repeat)'),
 (18482, 0, 6, 0, 0, 0, 100, 0, 3000, 5000, 9000, 12000, 0, 11, 12548, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - In Combat - Cast \'Frost Shock\''),
@@ -31,7 +31,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1848200, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 1679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Script - Set Faction 1679'),
 (1848200, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 18483, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Script - Set Data 1 to Empoor\'s Bodyguard'),
 (1848200, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Script - Say Line 0'),
-(1848200, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 40, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Script - Start Attacking');
+(1848200, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 40, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Script - Start Attacking'),
+(1848200, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Script - Root Disable');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 1848201 AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -47,7 +48,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 1848202 AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(1848202, 9, 0, 0, 0, 0, 100, 0, 20000, 20000, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Script - Set Faction 35');
+(1848202, 9, 0, 0, 0, 0, 100, 0, 20000, 20000, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Script - Set Faction 35'),
+(1848202, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Empoor - On Script - Root Disable');
 
 -- Empoor's Bodyguard
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18483;
