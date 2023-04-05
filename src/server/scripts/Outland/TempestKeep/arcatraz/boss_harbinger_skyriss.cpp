@@ -75,7 +75,6 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            me->SetImmuneToAll(false);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
