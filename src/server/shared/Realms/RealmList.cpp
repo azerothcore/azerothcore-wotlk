@@ -92,12 +92,13 @@ void RealmList::LoadBuildInfo()
 
 void RealmList::UpdateRealm(RealmHandle const& id, uint32 build, std::string const& name,
     boost::asio::ip::address&& address, boost::asio::ip::address&& localAddr, boost::asio::ip::address&& localSubmask,
-    uint16 port, uint8 icon, RealmFlags flag, uint8 timezone, AccountTypes allowedSecurityLevel, float population)
+    uint16 port, uint8 icon, RealmFlags flag, uint8 timezone, AccountTypes allowedSecurityLevel, float population, RealmHandle const& uid)
 {
     // Create new if not exist or update existed
-    Realm& realm = _realms[id];
+    Realm& realm = _realms[uid];
 
     realm.Id = id;
+    realm.uId = uid;
     realm.Build = build;
     realm.Name = name;
     realm.Type = icon;
@@ -152,7 +153,8 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
         {
             try
             {
-                uint32 realmId = fields[0].Get<uint32>();
+                uint32 realmId = 1;
+                uint32 listId = fields[0].Get<uint32>();
                 std::string name = fields[1].Get<std::string>();
                 std::string externalAddressString = fields[2].Get<std::string>();
                 std::string localAddressString = fields[3].Get<std::string>();
@@ -199,11 +201,12 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
                 uint32 build = fields[11].Get<uint32>();
 
                 RealmHandle id{ realmId };
+                RealmHandle uid{ listId };
 
                 UpdateRealm(id, build, name, externalAddress->address(), localAddress->address(), localSubmask->address(), port, icon, flag,
-                    timezone, (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR), pop);
+                    timezone, (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR), pop, uid);
 
-                if (!existingRealms.count(id))
+                if (!existingRealms.count(uid))
                 {
                     LOG_INFO("server.authserver", "Added realm \"{}\" at {}:{}.", name, externalAddressString, port);
                 }
@@ -212,7 +215,7 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
                     LOG_DEBUG("server.authserver", "Updating realm \"{}\" at {}:{}.", name, externalAddressString, port);
                 }
 
-                existingRealms.erase(id);
+                existingRealms.erase(uid);
             }
             catch (std::exception const& ex)
             {
