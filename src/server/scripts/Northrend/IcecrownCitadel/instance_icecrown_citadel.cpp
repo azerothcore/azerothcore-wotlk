@@ -1445,8 +1445,13 @@ public:
             return false;
         }
 
-        bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const override
+        bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
         {
+            if (player->GetSession() && player->GetSession()->GetSecurity() >= SEC_MODERATOR)
+            {
+                return true;
+            }
+
             switch (bossId)
             {
                 case DATA_THE_LICH_KING:
