@@ -163,7 +163,6 @@ Position const RimefangFlyPos      = {4413.309f, 2456.421f, 233.3795f, 2.890186f
 Position const RimefangLandPos     = {4413.309f, 2456.421f, 203.3848f, 2.890186f};
 Position const SpinestalkerFlyPos  = {4418.895f, 2514.233f, 230.4864f, 3.396045f};
 Position const SpinestalkerLandPos = {4418.895f, 2514.233f, 203.3848f, 3.396045f};
-Position const SindragosaSpawnPos  = {4818.700f, 2483.710f, 287.0650f, 3.089233f};
 Position const SindragosaFlyInPos  = {4420.190f, 2484.360f, 232.5150f, 3.141593f};
 Position const SindragosaLandPos   = {4419.190f, 2484.570f, 203.3848f, 3.141593f};
 Position const SindragosaAirPos    = {4475.990f, 2484.430f, 247.9340f, 3.141593f};
@@ -273,7 +272,7 @@ public:
 
     struct boss_sindragosaAI : public BossAI
     {
-        boss_sindragosaAI(Creature* creature) : BossAI(creature, DATA_SINDRAGOSA), _summoned(false)
+        boss_sindragosaAI(Creature* creature) : BossAI(creature, DATA_SINDRAGOSA)
         {
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HASTE_SPELLS, true);
         }
@@ -286,16 +285,9 @@ public:
             _bombCount = 0;
             _mysticBuffetStack = 0;
             _Reset();
-            me->DisableRotate(false);
-            me->SetControlled(false, UNIT_STATE_ROOT);
             me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
             me->SetReactState(REACT_AGGRESSIVE);
             me->CastSpell(me, SPELL_TANK_MARKER, true);
-
-            if (!_summoned)
-            {
-                me->SetDisableGravity(true);
-            }
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -359,20 +351,9 @@ public:
             return me->IsVisible() && target->GetEntry() != NPC_CROK_SCOURGEBANE;
         }
 
-        void JustReachedHome() override
-        {
-            _JustReachedHome();
-            instance->SetBossState(DATA_SINDRAGOSA, FAIL);
-            if (_summoned)
-            {
-                me->SetDisableGravity(false);
-            }
-        }
-
         void EnterEvadeMode(EvadeReason why) override
         {
-            me->DisableRotate(false);
-            me->SetControlled(false, UNIT_STATE_ROOT);
+            instance->SetBossState(DATA_SINDRAGOSA, FAIL);
             BossAI::EnterEvadeMode(why);
         }
 
@@ -386,16 +367,13 @@ public:
         {
             if (action == ACTION_START_FROSTWYRM)
             {
-                if (_summoned)
-                    return;
-
-                _summoned = true;
                 if (TempSummon* summon = me->ToTempSummon())
                     summon->SetTempSummonType(TEMPSUMMON_DEAD_DESPAWN);
 
                 if (me->isDead())
                     return;
 
+                instance->SetBossState(DATA_SINDRAGOSA, IN_PROGRESS);
                 me->setActive(true);
                 me->SetDisableGravity(true);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -403,7 +381,11 @@ public:
                 float moveTime = me->GetExactDist(&SindragosaFlyInPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SindragosaLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
                 me->GetMotionMaster()->MovePoint(POINT_FROSTWYRM_FLY_IN, SindragosaFlyInPos);
-                me->CastSpell(me, SPELL_SINDRAGOSA_S_FURY, true);
+
+                if (!instance->GetData(DATA_SINDRAGOSA_INTRO))
+                {
+                    DoCastAOE(SPELL_SINDRAGOSA_S_FURY);
+                }
             }
         }
 
@@ -685,7 +667,6 @@ public:
         }
 
     private:
-        bool _summoned;
         uint8 _bombCount;
         uint8 _mysticBuffetStack;
         bool _didFirstFlyPhase;
@@ -1724,13 +1705,10 @@ public:
                 if (Creature* rimefang = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_RIMEFANG)))
                     rimefang->AI()->DoAction(ACTION_START_FROSTWYRM);
 
-            if (!instance->GetData(DATA_SINDRAGOSA_FROSTWYRMS) && !instance->GetGuidData(DATA_SINDRAGOSA) && instance->GetBossState(DATA_SINDRAGOSA) != DONE)
+            if (!instance->GetData(DATA_SINDRAGOSA_FROSTWYRMS) && instance->GetBossState(DATA_SINDRAGOSA) != IN_PROGRESS)
             {
-                if (instance->GetData(DATA_HAS_LIMITED_ATTEMPTS) && !instance->GetData(DATA_HEROIC_ATTEMPTS))
-                    return true;
-
                 player->GetMap()->LoadGrid(SindragosaSpawnPos.GetPositionX(), SindragosaSpawnPos.GetPositionY());
-                if (Creature* sindragosa = player->GetMap()->SummonCreature(NPC_SINDRAGOSA, SindragosaSpawnPos))
+                if (Creature* sindragosa = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_SINDRAGOSA)))
                     sindragosa->AI()->DoAction(ACTION_START_FROSTWYRM);
             }
         }
