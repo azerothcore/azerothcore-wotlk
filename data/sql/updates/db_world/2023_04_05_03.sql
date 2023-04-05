@@ -1,3 +1,4 @@
+-- DB update 2023_04_05_02 -> 2023_04_05_03
 -- Ferra loot update
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 14308) AND (`Item` IN (4500, 5759, 7909, 7910, 8146, 11414, 11415, 24016, 24018, 24020, 24033));
 
