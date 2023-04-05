@@ -45,17 +45,18 @@ enum Spells
 
 enum Misc
 {
-    NPC_HARBINGER_SKYRISS_66    = 21466,
-
-    EVENT_SPELL_MIND_REND       = 1,
-    EVENT_SPELL_FEAR            = 2,
-    EVENT_SPELL_DOMINATION      = 3,
-    EVENT_SPELL_MANA_BURN       = 4
+    NPC_HARBINGER_SKYRISS_66    = 21466
 };
 
 struct boss_harbinger_skyriss : public BossAI
 {
-    boss_harbinger_skyriss(Creature* creature) : BossAI(creature, DATA_WARDEN_MELLICHAR) { }
+    boss_harbinger_skyriss(Creature* creature) : BossAI(creature, DATA_WARDEN_MELLICHAR)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {
@@ -78,11 +79,38 @@ struct boss_harbinger_skyriss : public BossAI
         Talk(SAY_AGGRO);
         me->SetInCombatWithZone();
 
-        events.ScheduleEvent(EVENT_SPELL_MIND_REND, 10000);
-        events.ScheduleEvent(EVENT_SPELL_FEAR, 15000);
-        events.ScheduleEvent(EVENT_SPELL_DOMINATION, 30000);
+        scheduler.Schedule(10s, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_MIND_REND, 0, 50.0f);
+            context.Repeat(10s);
+        }).Schedule(15s, [this](TaskContext context)
+        {
+            if (DoCastRandomTarget(SPELL_FEAR, 1, 20.0f) == SPELL_CAST_OK)
+            {
+                Talk(SAY_FEAR);
+            }
+            context.Repeat(25s);
+        }).Schedule(30s, [this](TaskContext context)
+        {
+            if (DoCastRandomTarget(SPELL_DOMINATION, 1, 30.0f) == SPELL_CAST_OK)
+            {
+                Talk(SAY_MIND);
+            }
+            context.Repeat();
+        });
+
         if (IsHeroic())
-            events.ScheduleEvent(EVENT_SPELL_MANA_BURN, 25000);
+        {
+            scheduler.Schedule(25s, [this](TaskContext context)
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
+                {
+                    DoCast(target, SPELL_MANA_BURN);
+                }
+
+                context.Repeat(30s);
+            });
+        }
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -105,49 +133,7 @@ struct boss_harbinger_skyriss : public BossAI
         {
             Talk(SAY_KILL);
         }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SPELL_MIND_REND:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f))
-                me->CastSpell(target, SPELL_MIND_REND, false);
-            events.ScheduleEvent(EVENT_SPELL_MIND_REND, 10000);
-            break;
-        case EVENT_SPELL_FEAR:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 20.0f))
-            {
-                Talk(SAY_FEAR);
-                me->CastSpell(target, SPELL_FEAR, false);
-            }
-            events.ScheduleEvent(EVENT_SPELL_FEAR, 25000);
-            break;
-        case EVENT_SPELL_DOMINATION:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f))
-            {
-                Talk(SAY_MIND);
-                me->CastSpell(target, SPELL_DOMINATION, false);
-            }
-            events.ScheduleEvent(EVENT_SPELL_DOMINATION, 30000);
-            break;
-        case EVENT_SPELL_MANA_BURN:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
-                me->CastSpell(target, SPELL_MANA_BURN, false);
-            events.ScheduleEvent(EVENT_SPELL_MANA_BURN, 30000);
-            break;
-        }
-
-        DoMeleeAttackIfReady();
-    }
+    }    
 };
 
 void AddSC_boss_harbinger_skyriss()
