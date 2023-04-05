@@ -133,7 +133,7 @@ struct boss_harbinger_skyriss : public BossAI
         {
             Talk(SAY_KILL);
         }
-    }    
+    }
 };
 
 void AddSC_boss_harbinger_skyriss()
