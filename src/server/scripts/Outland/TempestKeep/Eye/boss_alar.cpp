@@ -443,8 +443,6 @@ public:
 
             GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetUnitOwner()->SetStandState(UNIT_STAND_STATE_DEAD);
-            GetUnitOwner()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-            GetUnitOwner()->m_delayed_unit_relocation_timer = 1000;
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
