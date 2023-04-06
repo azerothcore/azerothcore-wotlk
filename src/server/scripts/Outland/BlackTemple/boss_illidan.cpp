@@ -457,7 +457,8 @@ public:
                     events2.ScheduleEvent(EVENT_OUTRO_3, 17000);
                     break;
                 case EVENT_OUTRO_3:
-                    Unit::Kill(nullptr, me);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true);
+                    Unit::Kill(target, me);
                     break;
             }
 
