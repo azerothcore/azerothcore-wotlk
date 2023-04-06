@@ -99,19 +99,19 @@ struct boss_mekgineer_steamrigger : public BossAI
         {
         case EVENT_SPELL_SHRINK:
             me->CastSpell(me->GetVictim(), SPELL_SUPER_SHRINK_RAY, false);
-            events.Repeat(35100, 54100);
+            events.Repeat(35100ms, 54100ms);
             break;
         case EVENT_SPELL_SAW:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                 me->CastSpell(target, SPELL_SAW_BLADE, false);
             else
                 me->CastSpell(me->GetVictim(), SPELL_SAW_BLADE, false);
-            events.Repeat(6050, 17650);
+            events.Repeat(6050ms, 17650ms);
             break;
         case EVENT_SPELL_NET:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 me->CastSpell(target, SPELL_ELECTRIFIED_NET, false);
-            events.Repeat(21800, 34200);
+            events.Repeat(21800ms, 34200ms);
             break;
         case EVENT_ENRAGE:
             DoCastSelf(SPELL_ENRAGE, true);

@@ -81,16 +81,16 @@ struct boss_warlord_kalithresh : public BossAI
         {
         case EVENT_SPELL_REFLECTION:
             me->CastSpell(me, SPELL_SPELL_REFLECTION, false);
-            events.Repeat(20000, 36000);
+            events.Repeat(20s, 36s);
             break;
         case EVENT_SPELL_IMPALE:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
                 me->CastSpell(target, SPELL_IMPALE, false);
-            events.RepeatEvent(7500, 12500);
+            events.RepeatEvent(7500ms, 12500ms);
             break;
         case EVENT_SPELL_HEAD_CRACK:
             DoCastVictim(SPELL_HEAD_CRACK);
-            events.Repeat(45000, 55000);
+            events.Repeat(45s, 55s);
             break;
         case EVENT_SPELL_RAGE:
             if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 100.0f))
