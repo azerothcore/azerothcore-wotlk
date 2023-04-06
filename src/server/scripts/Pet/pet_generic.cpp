@@ -779,7 +779,6 @@ enum Darting
 {
     SPELL_DARTING_ON_SPAWN      = 62586, // Applied on spawn via creature_template_addon
     SPELL_DARTING_FEAR          = 62585, // Applied every 20s from SPELL_DARTING_ON_SPAWN
-
 };
 
 struct npc_pet_darting_hatchling : public NullCreatureAI
