@@ -51,8 +51,8 @@ struct boss_warlord_kalithresh : public BossAI
     {
         Talk(SAY_AGGRO);
         _JustEngagedWith();
-        events.ScheduleEvent(EVENT_SPELL_REFLECTION, urand(20000, 36000));
-        events.ScheduleEvent(EVENT_SPELL_IMPALE, urand(7000, 14000));
+        events.ScheduleEvent(EVENT_SPELL_REFLECTION, 20000, 36000);
+        events.ScheduleEvent(EVENT_SPELL_IMPALE, 7000, 14000);
         events.ScheduleEvent(EVENT_SPELL_HEAD_CRACK, 15000);
         events.ScheduleEvent(EVENT_SPELL_RAGE, 20000);
     }
@@ -81,16 +81,16 @@ struct boss_warlord_kalithresh : public BossAI
         {
         case EVENT_SPELL_REFLECTION:
             me->CastSpell(me, SPELL_SPELL_REFLECTION, false);
-            events.RepeatEvent(urand(20000, 36000));
+            events.RepeatEvent(20000, 36000);
             break;
         case EVENT_SPELL_IMPALE:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
                 me->CastSpell(target, SPELL_IMPALE, false);
-            events.RepeatEvent(urand(7500, 12500));
+            events.RepeatEvent(7500, 12500);
             break;
         case EVENT_SPELL_HEAD_CRACK:
             DoCastVictim(SPELL_HEAD_CRACK);
-            events.RepeatEvent(urand(45000, 55000));
+            events.RepeatEvent(45000, 55000);
             break;
         case EVENT_SPELL_RAGE:
             if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 100.0f))
