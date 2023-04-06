@@ -835,7 +835,6 @@ public:
                     _bFordringMustFallYell = true;
                     if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     {
-
                         tirion->AI()->Talk(SAY_TIRION_OUTRO_3);
                     }
                 }
