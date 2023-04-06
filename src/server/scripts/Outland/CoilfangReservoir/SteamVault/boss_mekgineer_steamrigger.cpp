@@ -65,7 +65,7 @@ struct boss_mekgineer_steamrigger : public BossAI
         Talk(SAY_AGGRO);
         _JustEngagedWith();
         events.ScheduleEvent(EVENT_SPELL_SHRINK, 26550);
-        events.ScheduleEvent(EVENT_SPELL_SAW, urand(6050, 17650));
+        events.ScheduleEvent(EVENT_SPELL_SAW, 6050, 17650);
         events.ScheduleEvent(EVENT_SPELL_NET, 14400);
         events.ScheduleEvent(EVENT_ENRAGE, 300000);
         events.ScheduleEvent(EVENT_CHECK_HP75, 5000);
@@ -99,19 +99,19 @@ struct boss_mekgineer_steamrigger : public BossAI
         {
         case EVENT_SPELL_SHRINK:
             me->CastSpell(me->GetVictim(), SPELL_SUPER_SHRINK_RAY, false);
-            events.RepeatEvent(urand(35100, 54100));
+            events.RepeatEvent(35100, 54100);
             break;
         case EVENT_SPELL_SAW:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                 me->CastSpell(target, SPELL_SAW_BLADE, false);
             else
                 me->CastSpell(me->GetVictim(), SPELL_SAW_BLADE, false);
-            events.RepeatEvent(urand(6050, 17650));
+            events.RepeatEvent(6050, 17650);
             break;
         case EVENT_SPELL_NET:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 me->CastSpell(target, SPELL_ELECTRIFIED_NET, false);
-            events.RepeatEvent(urand(21800, 34200));
+            events.RepeatEvent(21800, 34200);
             break;
         case EVENT_ENRAGE:
             DoCastSelf(SPELL_ENRAGE, true);
