@@ -348,7 +348,8 @@ enum MiscData
     MUSIC_FURY_OF_FROSTMOURNE   = 17459,
     MUSIC_FINAL                 = 17460, // Raise Dead, Light's Blessing
     SOUND_PAIN                  = 17360, // separate sound, not attached to any text
-    EQUIP_ASHBRINGER_GLOWING    = 50442,
+    EQUIP_ASHBRINGER_GLOWING    = 50442, // Ashbringer with effects
+    EQUIP_ASHBRINGER_NORMAL     = 13262, // ashbringer without effects
     EQUIP_BROKEN_FROSTMOURNE    = 50840,
     MOVIE_FALL_OF_THE_LICH_KING = 16,
 };
@@ -1354,7 +1355,7 @@ public:
             {
                 // remove glow on ashbringer and tirion
                 me->RemoveAllAuras();
-                SetEquipmentSlots(true);
+                SetEquipmentSlots(false, EQUIP_ASHBRINGER_NORMAL); //Tirion now wields the Ashbringer
             }
         }
 
@@ -1595,6 +1596,7 @@ public:
                             lichKing->SetImmuneToNPC(false);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                             me->RemoveAllAuras();
+                            SetEquipmentSlots(false, EQUIP_ASHBRINGER_NORMAL); //Tirion now wields the Ashbringer
                             SetEquipmentSlots(true);
                             me->Attack(lichKing, true);
                             me->GetMotionMaster()->MovePoint(0, 512.16f, -2120.25f, 840.86f);
