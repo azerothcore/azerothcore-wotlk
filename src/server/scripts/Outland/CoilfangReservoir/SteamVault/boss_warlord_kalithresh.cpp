@@ -86,7 +86,7 @@ struct boss_warlord_kalithresh : public BossAI
         case EVENT_SPELL_IMPALE:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
                 me->CastSpell(target, SPELL_IMPALE, false);
-            events.RepeatEvent(7500ms, 12500ms);
+            events.Repeat(7500ms, 12500ms);
             break;
         case EVENT_SPELL_HEAD_CRACK:
             DoCastVictim(SPELL_HEAD_CRACK);
