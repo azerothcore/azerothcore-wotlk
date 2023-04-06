@@ -1597,7 +1597,6 @@ public:
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                             me->RemoveAllAuras();
                             SetEquipmentSlots(false, EQUIP_ASHBRINGER_NORMAL); //Tirion now wields the Ashbringer
-                            SetEquipmentSlots(true);
                             me->Attack(lichKing, true);
                             me->GetMotionMaster()->MovePoint(0, 512.16f, -2120.25f, 840.86f);
                         }
