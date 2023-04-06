@@ -894,7 +894,7 @@ void SmartAI::ReceiveEmote(Player* player, uint32 textEmote)
 
 void SmartAI::IsSummonedBy(WorldObject* summoner)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_JUST_SUMMONED, summoner ? summoner->ToUnit() : nullptr, 0, 0, false, nullptr, summoner ? summoner->ToGameObject() : nullptr);
+    GetScript()->ProcessEventsFor(SMART_EVENT_JUST_SUMMONED, summoner->ToUnit(), 0, 0, false, nullptr, summoner->ToGameObject());
 }
 
 void SmartAI::DamageDealt(Unit* doneTo, uint32& damage, DamageEffectType /*damagetype*/)
