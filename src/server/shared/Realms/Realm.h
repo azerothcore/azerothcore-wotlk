@@ -66,6 +66,7 @@ enum RealmType
 struct AC_SHARED_API Realm
 {
     RealmHandle Id;
+    RealmHandle uId;
     uint32 Build;
     std::unique_ptr<boost::asio::ip::address> ExternalAddress;
     std::unique_ptr<boost::asio::ip::address> LocalAddress;

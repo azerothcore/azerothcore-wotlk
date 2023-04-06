@@ -457,7 +457,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         {
             player->CastSpell(player, SPELL_DEFEAT_REWARD, true);
             if (player->HasAura(SPELL_LIEUTENANT))
-                player->AreaExploredOrEventHappens(GetDefenderTeam() ? 13183 : 13181); // 增加中尉胜利奖励
+                player->AreaExploredOrEventHappens(GetAttackerTeam() ? 13183 : 13181); // 增加中尉胜利奖励
             RemoveAurasFromPlayer(player);
 
             for (uint8 i = 0; i < damagedTowersAtt; ++i)
