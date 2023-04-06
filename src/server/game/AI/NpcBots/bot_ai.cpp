@@ -25,6 +25,7 @@
 #include "LFG.h"
 #include "LFGMgr.h"
 #include "Log.h"
+#include "LootMgr.h"
 #include "Mail.h"
 #include "MapMgr.h"
 #include "MotionMaster.h"
@@ -4175,7 +4176,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
     if (!dropTarget && (!u || IAmFree()) && master->IsAlive() && mytar && mytar == opponent)
     {
         dropTarget = IAmFree() ?
-            !IsWanderer() && me->GetDistance(mytar) > foldist :
+            me->GetDistance(mytar) > (IsWanderer() ? float(followdist + 10) : foldist) :
             HasBotCommandState(BOT_COMMAND_STAY) ?
             (!IsRanged() ? !me->IsWithinMeleeRange(mytar) : me->GetDistance(mytar) > foldist) :
             (master->GetDistance(mytar) > foldist || (master->GetDistance(mytar) > foldist * 0.75f && !mytar->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS)));
@@ -4274,7 +4275,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
         return { nullptr, nullptr };
 
     //check targets around
-    float maxdist = InitAttackRange(float(followdist), ranged);
+    float maxdist = InitAttackRange(float(followdist + 10), ranged);
     std::array<std::pair<Unit*, float>, 2u> ts{};
     std::list<Unit*> unitList;
     NearestHostileUnitCheck check(me, maxdist, byspell, this);
@@ -10416,6 +10417,51 @@ void bot_ai::OnOwnerVehicleDamagedBy(Unit* attacker)
 //////////
 ///LOOT///
 //////////
+void bot_ai::SpawnKillReward(Player* looter) const
+{
+    ASSERT(IsWanderer());
+
+    GameObject* moneyBag = looter->SummonGameObject(GO_BOT_MONEY_BAG, me->m_positionX, me->m_positionY, me->m_positionZ, me->GetOrientation(), 0, 0, 0, 0, REVIVE_TIMER_DEFAULT);
+    moneyBag->SetSpellId(GO_BOT_MONEY_BAG + me->GetEntry());
+}
+void bot_ai::FillKillReward(GameObject* go) const
+{
+    static const uint32 MAX_KILL_REWARD_ITEMS = 2;
+
+    ASSERT(IsWanderer());
+    ASSERT(go->GetEntry() == GO_BOT_MONEY_BAG);
+    ASSERT((go->GetSpellId() - go->GetEntry()) == me->GetEntry());
+
+    go->SetObjectScale(0.875f);
+
+    Loot& loot = go->loot;
+
+    loot.clear();
+    loot.loot_type = LOOT_CORPSE;
+
+    //gold
+    loot.gold = uint32(me->GetLevel() * std::min<uint32>(std::max<int32>(125 + int32(_killsCount * 5) - int32(_deathsCount * 50), 125), 1250));
+
+    //items
+    uint32 loot_items_count = 0;
+    for (Item const* item : _equips)
+    {
+        if (item)
+        {
+            ItemTemplate const* proto = item->GetTemplate();
+            if (proto->Quality == ITEM_QUALITY_UNCOMMON || proto->Quality == ITEM_QUALITY_RARE)
+            {
+                if (roll_chance_f(5.0f))
+                {
+                    loot.AddItem(LootStoreItem(proto->ItemId, 0, 100.0f, false, 0, 0, 1, 1));
+
+                    if (++loot_items_count >= std::min<uint32>(MAX_KILL_REWARD_ITEMS, MAX_NR_LOOT_ITEMS))
+                        break;
+                }
+            }
+        }
+    }
+}
 uint32 bot_ai::_getLootQualityMask() const
 {
     uint32 lootRoleMask = (_roleMask & BOT_ROLE_MASK_LOOTING);
@@ -14516,7 +14562,7 @@ void bot_ai::JustDied(Unit* u)
                 gr->SendUpdate();
     }
 
-    if (u && (u->IsPvP() || u->IsControlledByPlayer()))
+    if (u && (u->IsPvP() || u->IsControlledByPlayer() || u->IsNPCBotOrPet()))
     {
         LOG_DEBUG("npcbots", "{} {} id {} class {} level {} WAS KILLED BY {} {} id {} class {} level {} on their way to {}!",
             IsWanderer() ? "Wandering bot" : "Bot", me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
@@ -14525,7 +14571,7 @@ void bot_ai::JustDied(Unit* u)
             IsWanderer() ? _travel_node_cur->GetName().c_str() : "''");
     }
 
-    _reviveTimer = (IsWanderer() && !(u && u->IsControlledByPlayer())) ? 90000 : IAmFree() ? 180000 : 60000; //1.5min/3min/1min
+    _reviveTimer = (IsWanderer() && !(u && u->IsControlledByPlayer())) ? REVIVE_TIMER_MEDIUM : IAmFree() ? REVIVE_TIMER_DEFAULT : REVIVE_TIMER_SHORT;
     _atHome = false;
     _evadeMode = false;
     spawned = false;
@@ -14537,7 +14583,7 @@ void bot_ai::JustDied(Unit* u)
 void bot_ai::KilledUnit(Unit* u)
 {
     ++_killsCount;
-    if (u->IsControlledByPlayer() || u->IsPvP())
+    if (u->IsControlledByPlayer() || u->IsPvP() || u->IsNPCBotOrPet())
     {
         ++_pvpKillsCount;
         if (IsWanderer())

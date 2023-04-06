@@ -31,6 +31,7 @@ struct SpellNonMeleeDamage;
 
 class Aura;
 class DamageInfo;
+class GameObject;
 class Item;
 class Spell;
 class SpellCastTargets;
@@ -242,6 +243,9 @@ class bot_ai : public CreatureAI
         void OnOwnerVehicleDamagedBy(Unit* attacker);
         virtual void OnClassSpellStart(SpellInfo const* /*spellInfo*/) {}
         virtual void OnClassSpellGo(SpellInfo const* /*spell*/) {}
+
+        void SpawnKillReward(Player* looter) const;
+        void FillKillReward(GameObject* go) const;
 
         uint32 GetReviveTimer() const { return _reviveTimer; }
         void SetReviveTimer(uint32 newtime) { _reviveTimer = newtime; }

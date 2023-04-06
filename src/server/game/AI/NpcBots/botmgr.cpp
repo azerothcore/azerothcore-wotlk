@@ -148,6 +148,7 @@ void AddSC_mage_bot_pets();
 void AddSC_druid_bot_pets();
 void AddSC_script_bot_commands();
 void AddSC_script_bot_giver();
+void AddSC_wandering_bot_xp_gain_script();
 
 void AddNpcBotScripts()
 {
@@ -183,6 +184,7 @@ void AddNpcBotScripts()
     AddSC_druid_bot_pets();
     AddSC_script_bot_commands();
     AddSC_script_bot_giver();
+    AddSC_wandering_bot_xp_gain_script();
 }
 
 BotMgr::BotMgr(Player* const master) : _owner(master), _dpstracker(new DPSTracker())
@@ -1706,6 +1708,21 @@ int32 BotMgr::GetHPSTaken(Unit const* unit) const
     //    TC_LOG_ERROR("entities.player", "BotMgr:GetHPSTaken(): %s got %i)", unit->GetName().c_str(), amount);
 
     return amount;
+}
+
+void BotMgr::OnBotWandererKilled(Creature const* bot, Player* looter)
+{
+    bot->GetBotAI()->SpawnKillReward(looter);
+}
+
+void BotMgr::OnBotWandererKilled(GameObject* go)
+{
+    if (go->GetEntry() == GO_BOT_MONEY_BAG && go->GetSpellId() > go->GetEntry())
+    {
+        uint32 bot_id = go->GetSpellId() - GO_BOT_MONEY_BAG;
+        if (Creature const* bot = BotDataMgr::FindBot(bot_id))
+            bot->GetBotAI()->FillKillReward(go);
+    }
 }
 
 void BotMgr::OnBotSpellInterrupt(Unit const* caster, CurrentSpellTypes spellType)

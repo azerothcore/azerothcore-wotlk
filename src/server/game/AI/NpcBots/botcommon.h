@@ -35,11 +35,15 @@ enum BotCommonValues
     GO_REFRESHMENT_TABLE_2              = 193061,//lvl 80 req80
     GO_SOULWELL_1                       = 181621,//lvl 60 req68
     GO_SOULWELL_2                       = 193169,//lvl 69 req80
+    GO_BOT_MONEY_BAG                    = 186736,
 //COMMON CDs
     POTION_CD                           = 60000,//default 60sec potion cd
     REGEN_CD                            = 1000, //update hp/mana every X milliseconds
 //COMMON TIMERS
     ITEM_ENCHANTMENT_EXPIRE_TIMER       = 3600000, //1 Hour
+    REVIVE_TIMER_DEFAULT                = 180000, //3 Minutes
+    REVIVE_TIMER_MEDIUM                 = 90000, //1.5 Minutes
+    REVIVE_TIMER_SHORT                  = 60000, //1 Minute
 //VEHICLE CREATURES
     CREATURE_NEXUS_SKYTALON_1           = 32535, // [Q] Aces High
     CREATURE_EOE_SKYTALON_N             = 30161, // Eye of Eternity
