@@ -1628,6 +1628,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
             Map::PlayerList const& pl = me->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                 if (Player* p = itr->GetSource())
+                {
                     if (CanAIAttack(p) && me->IsValidAttackTarget(p))
                     {
                         anyValid = true;
@@ -1651,6 +1652,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
                         }
                     }
                     //end npcbot
+                }
         }
         else
             checkTimer -= diff;
@@ -1886,6 +1888,7 @@ public:
                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                     if (Player* p = itr->GetSource())
+                    {
                         if (CanAIAttack(p) && me->IsValidAttackTarget(p))
                         {
                             anyValid = true;
@@ -1909,6 +1912,7 @@ public:
                             }
                         }
                         //end npcbot
+                    }
             }
             else
                 checkTimer -= diff;
