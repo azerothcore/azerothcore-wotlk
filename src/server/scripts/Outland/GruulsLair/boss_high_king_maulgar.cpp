@@ -417,9 +417,9 @@ struct boss_krosh_firehand : public ScriptedAI
         me->SetInCombatWithZone();
         instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
 
-        events.ScheduleEvent(EVENT_ADD_ABILITY1, 1s);
-        events.ScheduleEvent(EVENT_ADD_ABILITY2, 5s);
-        events.ScheduleEvent(EVENT_ADD_ABILITY3, 20s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY1, 1500ms); //spellshield
+        events.ScheduleEvent(EVENT_ADD_ABILITY2, 3500ms); //greater fireball
+        events.ScheduleEvent(EVENT_ADD_ABILITY3, 8s); //blast wave (needs to check for players in range)
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -439,16 +439,16 @@ struct boss_krosh_firehand : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ADD_ABILITY1:
-                DoCastVictim(SPELL_GREATER_FIREBALL);
-                events.ScheduleEvent(EVENT_ADD_ABILITY1, 3500ms);
+                DoCastSelf(SPELL_SPELLSHIELD);
+                events.ScheduleEvent(EVENT_ADD_ABILITY1, 30s);
                 break;
             case EVENT_ADD_ABILITY2:
-                DoCastSelf(SPELL_SPELLSHIELD);
-                events.ScheduleEvent(EVENT_ADD_ABILITY2, 40s);
+                DoCastVictim(SPELL_GREATER_FIREBALL);
+                events.ScheduleEvent(EVENT_ADD_ABILITY2, 1s);
                 break;
             case EVENT_ADD_ABILITY3:
                 DoCastAOE(SPELL_BLAST_WAVE);
-                events.ScheduleEvent(EVENT_ADD_ABILITY3, 20s);
+                events.ScheduleEvent(EVENT_ADD_ABILITY3, 8s);
                 break;
         }
 
