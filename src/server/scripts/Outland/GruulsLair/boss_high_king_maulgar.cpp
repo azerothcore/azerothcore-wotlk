@@ -447,7 +447,10 @@ struct boss_krosh_firehand : public ScriptedAI
                 events.ScheduleEvent(EVENT_ADD_ABILITY2, 1s);
                 break;
             case EVENT_ADD_ABILITY3:
-                DoCastAOE(SPELL_BLAST_WAVE);
+                if (me->IsWithinRange(me->GetVictim(), 15.0f))
+                {
+                    DoCastAOE(SPELL_BLAST_WAVE);
+                }
                 events.ScheduleEvent(EVENT_ADD_ABILITY3, 8s);
                 break;
         }
