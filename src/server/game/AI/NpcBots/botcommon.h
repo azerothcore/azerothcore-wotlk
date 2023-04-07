@@ -1,6 +1,7 @@
 #ifndef _BOTCOMMON_H
 #define _BOTCOMMON_H
 
+#include "ObjectGuid.h"
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 

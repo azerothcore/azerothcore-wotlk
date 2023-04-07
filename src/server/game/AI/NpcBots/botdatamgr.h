@@ -21,8 +21,8 @@ struct Position;
 
 enum LocaleConstant : uint8;
 
-constexpr float MIN_WANDER_NODE_DISTANCE = VISIBILITY_DISTANCE_NORMAL * 0.5f;
-constexpr float MAX_WANDER_NODE_DISTANCE = SIZE_OF_GRIDS * 1.5f;
+constexpr float MIN_WANDER_NODE_DISTANCE = 50.0f; // VISIBILITY_DISTANCE_NORMAL * 0.5f;
+constexpr float MAX_WANDER_NODE_DISTANCE = 800.0f; //SIZE_OF_GRIDS * 1.5f;
 
 enum NpcBotDataUpdateType
 {
