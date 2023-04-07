@@ -49,10 +49,6 @@ typedef std::array<ItemLeveledArr, BOT_INVENTORY_SIZE> ItemPerSlot;
 typedef std::array<ItemPerSlot, BOT_CLASS_END> ItemPerBotClassMap;
 ItemPerBotClassMap _botsWanderCreaturesSortedGear;
 
-constexpr uint32 FLAGS_ONLY_A = AsUnderlyingType(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY);
-constexpr uint32 FLAGS_ONLY_H = AsUnderlyingType(BotWPFlags::BOTWP_FLAG_HORDE_ONLY);
-constexpr uint32 FLAGS_ONLY_A_OR_H = FLAGS_ONLY_A | FLAGS_ONLY_H;
-
 static bool allBotsLoaded = false;
 
 static uint32 next_wandering_bot_spawn_delay = 0;

@@ -1956,7 +1956,7 @@ public:
                 damage && me->GetLevel() >= 15 && me->CanDualWield() &&
                 (damageType == DIRECT_DAMAGE || damageType == SPELL_DIRECT_DAMAGE))
             {
-                if (roll_chance_f(me->GetPPMProcChance(me->GetFloatValue(UNIT_FIELD_BASEATTACKTIME+BASE_ATTACK), 15.f, nullptr)))
+                if (roll_chance_f(me->GetPPMProcChance(me->GetFloatValue(UNIT_FIELD_BASEATTACKTIME), 15.f, nullptr)))
                     me->CastSpell(me, UNBRIDLED_WRATH_EFFECT, true);
             }
             bot_ai::DamageDealt(victim, damage, damageType);
