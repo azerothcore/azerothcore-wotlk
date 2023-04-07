@@ -20,6 +20,7 @@ class TeleportFinishEvent;
 class AwaitStateRemovalEvent;
 
 enum CombatRating : uint8;
+enum EnchantmentSlot : uint16;
 enum GossipOptionIcon : uint8;
 enum MeleeHitOutcome : uint8;
 
