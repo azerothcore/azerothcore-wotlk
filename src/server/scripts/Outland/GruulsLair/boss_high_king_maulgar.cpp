@@ -214,9 +214,9 @@ struct boss_olm_the_summoner : public ScriptedAI
         me->SetInCombatWithZone();
         instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
 
-        events.ScheduleEvent(EVENT_ADD_ABILITY1, 10s);
-        events.ScheduleEvent(EVENT_ADD_ABILITY2, 15s);
-        events.ScheduleEvent(EVENT_ADD_ABILITY3, 20s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY1, 500ms);
+        events.ScheduleEvent(EVENT_ADD_ABILITY2, 5s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY3, 6500ms);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -241,16 +241,17 @@ struct boss_olm_the_summoner : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ADD_ABILITY1:
-                DoCastVictim(SPELL_DARK_DECAY);
-                events.ScheduleEvent(EVENT_ADD_ABILITY1, 7s);
+                me->CastSpell(me, SPELL_SUMMON_WFH, false);
+                events.ScheduleEvent(EVENT_ADD_ABILITY1, 50s);
                 break;
             case EVENT_ADD_ABILITY2:
-                me->CastSpell(me, SPELL_SUMMON_WFH, false);
-                events.ScheduleEvent(EVENT_ADD_ABILITY2, 30s);
+                DoCastVictim(SPELL_DARK_DECAY);
+                events.ScheduleEvent(EVENT_ADD_ABILITY2, 6500ms);
                 break;
+            
             case EVENT_ADD_ABILITY3:
                 DoCastRandomTarget(SPELL_DEATH_COIL);
-                events.ScheduleEvent(EVENT_ADD_ABILITY3, 20s);
+                events.ScheduleEvent(EVENT_ADD_ABILITY3, 7s);
                 break;
         }
 
@@ -279,9 +280,9 @@ struct boss_kiggler_the_crazed : public ScriptedAI
         me->SetInCombatWithZone();
         instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
 
-        events.ScheduleEvent(EVENT_ADD_ABILITY1, 5s);
-        events.ScheduleEvent(EVENT_ADD_ABILITY2, 10s);
-        events.ScheduleEvent(EVENT_ADD_ABILITY3, 20s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY1, 1500ms);
+        events.ScheduleEvent(EVENT_ADD_ABILITY2, 5s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY3, 25s);
         events.ScheduleEvent(EVENT_ADD_ABILITY4, 30s);
     }
 
@@ -302,20 +303,23 @@ struct boss_kiggler_the_crazed : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ADD_ABILITY1:
-                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1))
-                    me->CastSpell(target, SPELL_GREATER_POLYMORPH, false);
-                events.ScheduleEvent(EVENT_ADD_ABILITY1, 20s);
+                DoCastVictim(SPELL_LIGHTNING_BOLT);
+                events.ScheduleEvent(EVENT_ADD_ABILITY1, 1500ms);
                 break;
             case EVENT_ADD_ABILITY2:
-                DoCastVictim(SPELL_LIGHTNING_BOLT);
-                events.ScheduleEvent(EVENT_ADD_ABILITY2, 1500ms);
+                DoCastVictim(SPELL_ARCANE_SHOCK);
+                events.ScheduleEvent(EVENT_ADD_ABILITY2, 5s);
                 break;
             case EVENT_ADD_ABILITY3:
-                DoCastVictim(SPELL_ARCANE_SHOCK);
-                events.ScheduleEvent(EVENT_ADD_ABILITY3, 20s);
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1)) //target method should perhaps change
+                    me->CastSpell(target, SPELL_GREATER_POLYMORPH, false);
+                events.ScheduleEvent(EVENT_ADD_ABILITY3, 11s);
                 break;
             case EVENT_ADD_ABILITY4:
-                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+            if (me->IsWithinRange(me->GetVictim(), 15.0f))
+                {
+                    DoCastAOE(SPELL_ARCANE_EXPLOSION);
+                }
                 events.ScheduleEvent(EVENT_ADD_ABILITY4, 30s);
                 break;
         }
