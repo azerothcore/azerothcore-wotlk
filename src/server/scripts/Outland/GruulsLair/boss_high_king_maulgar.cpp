@@ -345,9 +345,9 @@ struct boss_blindeye_the_seer : public ScriptedAI
         me->SetInCombatWithZone();
         instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
 
-        events.ScheduleEvent(EVENT_ADD_ABILITY1, 1700ms);
-        events.ScheduleEvent(EVENT_ADD_ABILITY2, 10s);
-        events.ScheduleEvent(EVENT_ADD_ABILITY3, 20s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY1, 11s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY2, 30s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY3, 31s);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -367,15 +367,15 @@ struct boss_blindeye_the_seer : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ADD_ABILITY1:
-                DoCastSelf(SPELL_GREATER_PW_SHIELD);
-                events.ScheduleEvent(EVENT_ADD_ABILITY1, 30s);
-                break;
-            case EVENT_ADD_ABILITY2:
                 if (Unit* target = DoSelectLowestHpFriendly(60.0f, 50000))
                 {
                     DoCast(target, SPELL_HEAL);
                 }
-                events.ScheduleEvent(EVENT_ADD_ABILITY2, 25s);
+                events.ScheduleEvent(EVENT_ADD_ABILITY1, 6s);
+                break;
+            case EVENT_ADD_ABILITY2:
+                DoCastSelf(SPELL_GREATER_PW_SHIELD);
+                events.ScheduleEvent(EVENT_ADD_ABILITY2, 30s);
                 break;
             case EVENT_ADD_ABILITY3:
                 me->CastSpell(me, SPELL_PRAYER_OH, false);
