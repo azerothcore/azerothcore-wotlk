@@ -1115,7 +1115,7 @@ public:
             }
 
             //LAVA BURST
-            if (IsSpellReady(LAVA_BURST_1, diff) && can_do_fire && _spec == BOT_SPEC_SHAMAN_ELEMENTAL &&
+            if (IsSpellReady(LAVA_BURST_1, diff) && can_do_fire && GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL &&
                 HasRole(BOT_ROLE_DPS) && dist < CalcSpellMaxRange(LAVA_BURST_1) && Rand() < 60 &&
                 (me->getAttackers().empty() || dist > 10))
             {
@@ -1123,7 +1123,7 @@ public:
                     return;
             }
 
-            if (((MaelstromCount < 5 || MaelstromTimer == 0) && IsMelee()) ||
+            if (((MaelstromCount < 5 || MaelstromTimer == 0) && me->GetLevel() >= 55 && IsMelee()) ||
                 (HasRole(BOT_ROLE_HEAL) && GetManaPCT(me) < 25))
                 return;
 
@@ -1475,7 +1475,7 @@ public:
             uint8 lvl = me->GetLevel();
 
             //Call of Thunder: 5% additional critical chance for Lightning Bolt, Chain Lightning and Thunderstorm
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 30 &&
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 30 &&
                 (spellId == GetSpell(LIGHTNING_BOLT_1) ||
                 spellId == GetSpell(CHAIN_LIGHTNING_1) ||
                 spellId == GetSpell(THUNDERSTORM_1)))
@@ -1484,7 +1484,7 @@ public:
             if (lvl >= 25 && (SPELL_SCHOOL_MASK_NATURE & schoolMask))
                 crit_chance += 5.f;
             //Blessing of the Eternals: 4% additional critical chance for all spells
-            if ((_spec == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 45)
+            if ((GetSpec() == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 45)
                 crit_chance += 4.f;
             //Tidal Waves (Lesser Healing Wave crit)
             if (spellInfo->SpellFamilyFlags[0] & 0x80)
@@ -1544,7 +1544,7 @@ public:
                     (spellInfo->GetSchoolMask() & (SPELL_SCHOOL_MASK_NATURE|SPELL_SCHOOL_MASK_FIRE|SPELL_SCHOOL_MASK_FROST)))
                     pctbonus += 0.333f;
                 //Lava Flows (part 1): 24% additional crit damage bonus for Lava Burst
-                if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 50 && spellId == GetSpell(LAVA_BURST_1))
+                if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 50 && spellId == GetSpell(LAVA_BURST_1))
                     pctbonus += 0.16f;
             }
             //Concussion: 5% bonus damage for Lightning Bolt, Chain Lightning, Thunderstorm, Lava Burst and Shocks
@@ -1561,10 +1561,10 @@ public:
             if (lvl >= 15 && spellId == GetSpell(LAVA_BURST_1))
                 pctbonus += 0.06f;
             //Storm, Earth and fire (part 3): 60% bonus damage for Flame Shock (periodic damage in fact but who cares?)
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 40 && spellId == GetSpell(FLAME_SHOCK_1))
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 40 && spellId == GetSpell(FLAME_SHOCK_1))
                 pctbonus += 0.6f;
             //Booming Echoes (part 2): 20% bonus damage for Flame Shock and Frost Shock (direct damage)
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 45 &&
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 45 &&
                 (spellId == GetSpell(FLAME_SHOCK_1) ||
                 spellId == GetSpell(FROST_SHOCK_1)))
                 pctbonus += 0.2f;
@@ -1572,7 +1572,7 @@ public:
             if (lvl >= 15 && spellInfo->IsRankOf(sSpellMgr->GetSpellInfo(LIGHTNING_SHIELD_DAMAGE_1)))
                 pctbonus += 0.15f;
             //Shamanism: +20/25% bonus from spp
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 45)
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 45)
             {
                 if (spellId == GetSpell(CHAIN_LIGHTNING_1) || spellId == GetSpell(LIGHTNING_BOLT_1))
                     flat_mod += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.2f * me->CalculateDefaultCoefficient(spellInfo, SPELL_DIRECT_DAMAGE) * me->CalculateLevelPenalty(spellInfo);
@@ -1580,7 +1580,7 @@ public:
                     flat_mod += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.25f * me->CalculateDefaultCoefficient(spellInfo, SPELL_DIRECT_DAMAGE) * me->CalculateLevelPenalty(spellInfo);
             }
             //Elemental Oath (part 1): 10% bonus damage
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) &&
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) &&
                 lvl >= 45 && me->GetAuraEffect(ELEMENTAL_FOCUS_BUFF, 0, me->GetGUID()))
                 pctbonus += 0.1f;
             //Elemental Weapons (part 1): 40% bonus damage
@@ -1602,26 +1602,26 @@ public:
             float flat_mod = 0.0f;
 
             //Healing Way: 25% bonus healing for Healing Wave
-            if ((_spec == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 30 && spellId == GetSpell(HEALING_WAVE_1))
+            if ((GetSpec() == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 30 && spellId == GetSpell(HEALING_WAVE_1))
                 pctbonus += 0.25f;
             //Purification: 10% bonus healing for all spells
-            if ((_spec == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 35)
+            if ((GetSpec() == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 35)
                 pctbonus += 0.1f;
             //Nature's Blessing: 15% of Intellect to healing
-            if ((_spec == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 45)
+            if ((GetSpec() == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 45)
                 flat_mod += GetTotalBotStat(BOT_STAT_MOD_INTELLECT) * 0.15f * me->CalculateDefaultCoefficient(spellInfo, damagetype) * stack * 1.88f * me->CalculateLevelPenalty(spellInfo) * stack;
             //Improved Chain Heal: 20% bonus healing for Chain Heal
-            if ((_spec == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 45 && spellId == GetSpell(CHAIN_HEAL_1))
+            if ((GetSpec() == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 45 && spellId == GetSpell(CHAIN_HEAL_1))
                 pctbonus += 0.2f;
             //Improved Earth Shield: 10% bonus healing for Earth Shield
             //Glyph of Earth Shield: 20% bonus healing for Earth Shield
             if (lvl >= 50 && spellId == EARTH_SHIELD_HEAL)
-                pctbonus += (_spec == BOT_SPEC_SHAMAN_RESTORATION) ? 0.3f : 0.2f;
+                pctbonus += (GetSpec() == BOT_SPEC_SHAMAN_RESTORATION) ? 0.3f : 0.2f;
             //Improved Shields (part 3): 15% bonus healing for Earth Shield
             if (lvl >= 15 && spellId == EARTH_SHIELD_HEAL)
                 pctbonus += 0.15f;
             //Tidal Waves (part 2): 20% bonus (from spellpower) for Healing Wave and 10% bonus (from spellpower) for Lesser Healing Wave
-            if ((_spec == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 55)
+            if ((GetSpec() == BOT_SPEC_SHAMAN_RESTORATION) && lvl >= 55)
             {
                 if (spellId == GetSpell(HEALING_WAVE_1))
                     flat_mod += me->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.2f * me->CalculateDefaultCoefficient(spellInfo, damagetype) * 1.88f * me->CalculateLevelPenalty(spellInfo) * stack;
@@ -1653,7 +1653,7 @@ public:
             if (lvl >= 20 && (spellInfo->SpellFamilyFlags[0] & 0x90100000))
                 pctbonus += 0.45f;
             //Mental Quickness:
-            if ((_spec == BOT_SPEC_SHAMAN_ENHANCEMENT) && lvl >= 50 && !spellInfo->CalcCastTime())
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ENHANCEMENT) && lvl >= 50 && !spellInfo->CalcCastTime())
                 pctbonus += 0.06f;
             //Totemic Focus:
             if (lvl >= 10 && (spellInfo->AttributesEx7 & SPELL_ATTR7_CAN_BE_MULTI_CAST))
@@ -1716,7 +1716,7 @@ public:
             if (lvl >= 10 && spellId == GetSpell(HEALING_WAVE_1))
                 timebonus += 500;
             //Lightning Mastery: -0.5 sec
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) &&
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) &&
                 lvl >= 35 && ((spellInfo->SpellFamilyFlags[0] & 0x3) || (spellInfo->SpellFamilyFlags[1] & 0x1000)))
                 timebonus += 500;
             //Stormcaller Chain Heal Bonus (26122): -0.4 sec
@@ -1745,13 +1745,13 @@ public:
             if (lvl >= 20 && ((spellInfo->SpellFamilyFlags[0] & 0x90100000) || (spellInfo->SpellFamilyFlags[1] & 0x8000000)))
                 timebonus += 1000;
             //Booming Echoes (part 1)
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 45 && (spellInfo->SpellFamilyFlags[0] & 0x90000000))
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 45 && (spellInfo->SpellFamilyFlags[0] & 0x90000000))
                 timebonus += 2000;
             //Storm, Earth and Fire (part 1)
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 40 && (spellInfo->SpellFamilyFlags[0] & 0x2))
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 40 && (spellInfo->SpellFamilyFlags[0] & 0x2))
                 timebonus += 2500;
             //Improved Fire Nova (part 2)
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 25 && (spellInfo->SpellFamilyFlags[0] & 0x8000000))
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) && lvl >= 25 && (spellInfo->SpellFamilyFlags[0] & 0x8000000))
                 timebonus += 4000;
 
             cooldown = std::max<int32>((float(cooldown) * (1.0f - pctbonus)) - timebonus, 0);
@@ -1804,11 +1804,11 @@ public:
 
             //flat mods
             //Elemental Reach part 1: +6 yd
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) &&
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) &&
                 lvl >= 30 && ((spellInfo->SpellFamilyFlags[0] & 0x8000003) || (spellInfo->SpellFamilyFlags[1] & 0x1000)))
                 flatbonus += 6.f;
             //Elemental Reach part 2: +15 yd
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) &&
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) &&
                 lvl >= 30 && (spellInfo->SpellFamilyFlags[0] & 0x10000000))
                 flatbonus += 15.f;
 
@@ -2032,14 +2032,14 @@ public:
             }
 
             //Earthen Power part 2
-            if ((_spec == BOT_SPEC_SHAMAN_ENHANCEMENT) && me->GetLevel() >= 50 && baseId == EARTH_SHOCK_1)
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ENHANCEMENT) && me->GetLevel() >= 50 && baseId == EARTH_SHOCK_1)
             {
                 if (AuraEffect* eff = target->GetAuraEffect(spellId, 0, me->GetGUID()))
                     eff->ChangeAmount(eff->GetAmount() * 2);
             }
 
             //Lightning Overload
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) &&
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) &&
                 me->GetLevel() >= 45 && (baseId == LIGHTNING_BOLT_1 || baseId == CHAIN_LIGHTNING_1) &&
                 urand(1,100) <= 33)
             {
@@ -2389,7 +2389,7 @@ public:
             //check by btype
 
             // Storm, Earth and Fire: Earthbind totem AoE root
-            if ((_spec == BOT_SPEC_SHAMAN_ELEMENTAL) && btype == BOT_TOTEM_EARTHBIND && me->GetLevel() >= 40)
+            if ((GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL) && btype == BOT_TOTEM_EARTHBIND && me->GetLevel() >= 40)
             {
                 //master's talent will be found so do not cast earthgrab twice, instead let spell script roll the chance
                 //see spell_shaman.cpp
@@ -2524,9 +2524,9 @@ public:
         void InitSpells() override
         {
             uint8 lvl = me->GetLevel();
-            bool isElem = _spec == BOT_SPEC_SHAMAN_ELEMENTAL;
-            bool isEnha = _spec == BOT_SPEC_SHAMAN_ENHANCEMENT;
-            bool isRest = _spec == BOT_SPEC_SHAMAN_RESTORATION;
+            bool isElem = GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL;
+            bool isEnha = GetSpec() == BOT_SPEC_SHAMAN_ENHANCEMENT;
+            bool isRest = GetSpec() == BOT_SPEC_SHAMAN_RESTORATION;
 
             InitSpellMap(HEALING_WAVE_1);
             InitSpellMap(CHAIN_HEAL_1);
@@ -2608,9 +2608,9 @@ public:
         void ApplyClassPassives() const override
         {
             uint8 level = master->GetLevel();
-            bool isElem = _spec == BOT_SPEC_SHAMAN_ELEMENTAL;
-            bool isEnha = _spec == BOT_SPEC_SHAMAN_ENHANCEMENT;
-            bool isRest = _spec == BOT_SPEC_SHAMAN_RESTORATION;
+            bool isElem = GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL;
+            bool isEnha = GetSpec() == BOT_SPEC_SHAMAN_ENHANCEMENT;
+            bool isRest = GetSpec() == BOT_SPEC_SHAMAN_RESTORATION;
 
             RefreshAura(ELEMENTAL_DEVASTATION3, isEnha && level >= 18 ? 1 : 0);
             RefreshAura(ELEMENTAL_DEVASTATION2, isEnha && level >= 15 && level < 18 ? 1 : 0);

@@ -725,18 +725,16 @@ public:
             //Main mode
             //Choose form. Mode should be selected considering bot_ai::CheckAttackTarget() positioning selection
             //1 Tanking mode
-            if (IsTank() && GetSpell(BEAR_FORM_1))
+            if ((IsTank() || (IsWanderer() && bot_ai::IsMelee() && !GetSpell(CAT_FORM_1))) && GetSpell(BEAR_FORM_1))
             {
-                if (_form == DRUID_BEAR_FORM ||
-                    (GC_Timer <= diff && doCast(me, GetSpell(BEAR_FORM_1))))
+                if (_form == DRUID_BEAR_FORM || (IsSpellReady(BEAR_FORM_1, diff, false) && doCast(me, GetSpell(BEAR_FORM_1))))
                     doBearActions(mytar, diff);
             }
             //2 Melee (tanking cat impossible: cat lvl 20, bear lvl 10)
             else if (bot_ai::IsMelee())
             {
                 //if lvl < 20 then bot gonna just melee its targets
-                if (_form == DRUID_CAT_FORM ||
-                    (IsSpellReady(CAT_FORM_1, diff) && doCast(me, GetSpell(CAT_FORM_1))))
+                if (_form == DRUID_CAT_FORM || (IsSpellReady(CAT_FORM_1, diff, false) && doCast(me, GetSpell(CAT_FORM_1))))
                     doCatActions(mytar, diff);
             }
             //3 Ranged dps
@@ -744,9 +742,8 @@ public:
             {
                 //pure dps goes moonkin
                 if (_form == DRUID_MOONKIN_FORM ||
-                    ((!GetSpell(MOONKIN_FORM_1) || HasRole(BOT_ROLE_HEAL)) && GC_Timer <= diff && removeShapeshiftForm()) ||
-                    HasRole(BOT_ROLE_HEAL) ||
-                    (IsSpellReady(MOONKIN_FORM_1, diff) && doCast(me, GetSpell(MOONKIN_FORM_1))))
+                    ((!GetSpell(MOONKIN_FORM_1) || HasRole(BOT_ROLE_HEAL)) && (_form == BOT_STANCE_NONE || removeShapeshiftForm())) ||
+                    (!HasRole(BOT_ROLE_HEAL) && IsSpellReady(MOONKIN_FORM_1, diff, false) && doCast(me, GetSpell(MOONKIN_FORM_1))))
                     doBalanceActions(mytar, diff);
             }
             //4 Healer
@@ -754,9 +751,8 @@ public:
             {
                 //pure healer goes tree
                 if (_form == DRUID_TREE_FORM ||
-                    ((!GetSpell(TREE_OF_LIFE_FORM_1) || HasRole(BOT_ROLE_DPS)) && GC_Timer <= diff && removeShapeshiftForm()) ||
-                    HasRole(BOT_ROLE_DPS) ||
-                    (IsSpellReady(TREE_OF_LIFE_FORM_1, diff) && doCast(me, GetSpell(TREE_OF_LIFE_FORM_1))))
+                    ((!GetSpell(TREE_OF_LIFE_FORM_1) || HasRole(BOT_ROLE_DPS)) && (_form == BOT_STANCE_NONE || removeShapeshiftForm())) ||
+                    (!HasRole(BOT_ROLE_DPS) && IsSpellReady(TREE_OF_LIFE_FORM_1, diff) && doCast(me, GetSpell(TREE_OF_LIFE_FORM_1))))
                 {/*do nothing*/} //not a mistake
             }
         }
@@ -1637,7 +1633,7 @@ public:
                         me->SetPowerType(POWER_RAGE);
                     }
                     RefreshAura(MASTER_SHAPESHIFTER_BEAR_BUFF, me->GetLevel() >= 20);
-                    if (_spec == BOT_SPEC_DRUID_FERAL)
+                    if (GetSpec() == BOT_SPEC_DRUID_FERAL)
                     {
                         RefreshAura(NATURAL_REACTION, me->GetLevel() >= 35);
                         RefreshAura(SURVIVAL_OF_THE_FITTEST_BUFF, me->GetLevel() >= 35);
@@ -1652,7 +1648,7 @@ public:
                     }
                     RefreshAura(MASTER_SHAPESHIFTER_CAT_BUFF, me->GetLevel() >= 20);
                     RefreshAura(FERAL_SWIFTNESS, me->GetLevel() >= 20); //talents ignore forms for creatures so put that here
-                    if (_spec == BOT_SPEC_DRUID_FERAL)
+                    if (GetSpec() == BOT_SPEC_DRUID_FERAL)
                     {
                         RefreshAura(NURTURING_INSTINCT_BUFF, me->GetLevel() >= 30);
                         RefreshAura(PREDATORY_INSTINCTS, me->GetLevel() >= 45);
@@ -1722,10 +1718,10 @@ public:
             {
                 //!!!Melee spell damage is not yet critical, all reduced by half
                 //Primal Fury (white attacks): 100% to gain 5 rage at crit in (Dire) Bear Form
-                if ((_spec == BOT_SPEC_DRUID_FERAL) && lvl >= 25 && _form == DRUID_BEAR_FORM)
+                if ((GetSpec() == BOT_SPEC_DRUID_FERAL) && lvl >= 25 && _form == DRUID_BEAR_FORM)
                     me->CastSpell(me, PRIMAL_FURY_EFFECT_ENERGIZE, true);
                 //Predatory Instincts (part 1): 10% additional crit damage bonus for melee attacks in Cat form
-                if ((_spec == BOT_SPEC_DRUID_FERAL) && lvl >= 45 && _form == DRUID_CAT_FORM)
+                if ((GetSpec() == BOT_SPEC_DRUID_FERAL) && lvl >= 45 && _form == DRUID_CAT_FORM)
                     pctbonus += 0.05f;
             }
 
@@ -1764,7 +1760,7 @@ public:
                 baseId == MAUL_1))
                 pctbonus += 0.2f;
             //Rend and Tear: 20% bonus damage on bleeding targets for Maul and Shred
-            if ((_spec == BOT_SPEC_DRUID_FERAL) &&
+            if ((GetSpec() == BOT_SPEC_DRUID_FERAL) &&
                 lvl >= 55 && damageinfo.target && damageinfo.target->HasAuraState(AURA_STATE_BLEEDING) &&
                 (baseId == MAUL_1 || baseId == SHRED_1))
                 pctbonus += 0.2f;
@@ -1791,7 +1787,7 @@ public:
             uint8 lvl = me->GetLevel();
 
             //Nature's bounty: 25% additional critical chance for Regrowth and Nourish
-            if ((_spec == BOT_SPEC_DRUID_RESTORATION) && lvl >= 35 && (baseId == REGROWTH_1 || baseId == NOURISH_1))
+            if ((GetSpec() == BOT_SPEC_DRUID_RESTORATION) && lvl >= 35 && (baseId == REGROWTH_1 || baseId == NOURISH_1))
                 crit_chance += 25.f;
             //Rend and Tear (part 2): 25% additional critical chance on bleeding targets for Ferocious Bite (handled in Unit.cpp)
             //if (lvl >= 55 && victim->HasAuraState(AURA_STATE_BLEEDING) && baseId == FEROCIOUS_BITE_1)
@@ -1806,7 +1802,7 @@ public:
             if (lvl >= 50 && baseId == STARFIRE_1 && me->HasAura(ECLIPSE_LUNAR_BUFF))
                 crit_chance += 40.f;
             //Natural Perfection: 3% additional critical chance for all spells
-            if ((_spec == BOT_SPEC_DRUID_RESTORATION) && lvl >= 40)
+            if ((GetSpec() == BOT_SPEC_DRUID_RESTORATION) && lvl >= 40)
                 crit_chance += 3.f;
         }
 
@@ -1841,7 +1837,7 @@ public:
             if (lvl >= 70 && (spellInfo->SpellFamilyFlags[1] & 0x800000))
                 pctbonus += 0.1f;
             //Wrath of Cenarius: 20%/10% Increased spellpower bonus for Starfire/Wrath
-            if ((_spec == BOT_SPEC_DRUID_BALANCE) && lvl >= 45)
+            if ((GetSpec() == BOT_SPEC_DRUID_BALANCE) && lvl >= 45)
             {
                 if (baseId == STARFIRE_1)
                     fdamage += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.2f * me->CalculateDefaultCoefficient(spellInfo, SPELL_DIRECT_DAMAGE) * me->CalculateLevelPenalty(spellInfo);
@@ -1852,7 +1848,7 @@ public:
             if (lvl >= 50 && baseId == WRATH_1 && me->HasAura(ECLIPSE_SOLAR_BUFF))
                 pctbonus += 0.4f;
             //Gale Winds: 30% bonus damage for Hurricane and Typhoon
-            if ((_spec == BOT_SPEC_DRUID_BALANCE) &&
+            if ((GetSpec() == BOT_SPEC_DRUID_BALANCE) &&
                 lvl >= 50 && ((spellInfo->SpellFamilyFlags[0] & 0x400000) || (spellInfo->SpellFamilyFlags[1] & 0x1000000)))
                 pctbonus += 0.3f;
 
@@ -1877,10 +1873,10 @@ public:
             //if (baseId == REJUVENATION_1)
             //    pctbonus += 0.27f;
             //Gift of Nature: 10% bonus healing for all spells
-            if ((_spec == BOT_SPEC_DRUID_RESTORATION) && lvl >= 30)
+            if ((GetSpec() == BOT_SPEC_DRUID_RESTORATION) && lvl >= 30)
                 pctbonus += 0.1f;
             //Empowered Touch: 40% bonus (from spellpower) for Healing Touch and 20% bonus (from spellpower) for Nourish
-            if ((_spec == BOT_SPEC_DRUID_RESTORATION) && lvl >= 35)
+            if ((GetSpec() == BOT_SPEC_DRUID_RESTORATION) && lvl >= 35)
             {
                 if (baseId == HEALING_TOUCH_1)
                     flat_mod += me->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.4f * me->CalculateDefaultCoefficient(spellInfo, damagetype) * 1.88f * me->CalculateLevelPenalty(spellInfo) * stack;
@@ -1888,7 +1884,7 @@ public:
                     flat_mod += me->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.2f * me->CalculateDefaultCoefficient(spellInfo, damagetype) * 1.88f * me->CalculateLevelPenalty(spellInfo) * stack;
             }
             //Empowered Rejuvenation: 20% bonus healing for healing over time effects
-            if ((_spec == BOT_SPEC_DRUID_RESTORATION) &&
+            if ((GetSpec() == BOT_SPEC_DRUID_RESTORATION) &&
                 lvl >= 45 && ((spellInfo->SpellFamilyFlags[0] & 0xD0) || (spellInfo->SpellFamilyFlags[1] & 0x4000010)))
                 flat_mod += me->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.2f * me->CalculateDefaultCoefficient(spellInfo, damagetype) * 1.88f * me->CalculateLevelPenalty(spellInfo) * stack;
 
@@ -1913,7 +1909,7 @@ public:
 
             //percent mods
             //Tree of Life Passive (5420) (activates when learned):
-            if ((_spec == BOT_SPEC_DRUID_RESTORATION) &&
+            if ((GetSpec() == BOT_SPEC_DRUID_RESTORATION) &&
                 lvl >= 50 && ((spellInfo->SpellFamilyFlags[0] & 0x50) || (spellInfo->SpellFamilyFlags[1] & 0x4000010)))
                 pctbonus += 0.5f;
             //Glyph of the Wild:
@@ -1935,7 +1931,7 @@ public:
             if (lvl >= 15 && ((spellInfo->SpellFamilyFlags[0] & 0x77) || (spellInfo->SpellFamilyFlags[1] & 0x2800000)))
                 pctbonus += 0.09f;
             //Berserk part 2:
-            if ((_spec == BOT_SPEC_DRUID_FERAL) && lvl >= 60 && _form == DRUID_CAT_FORM &&
+            if ((GetSpec() == BOT_SPEC_DRUID_FERAL) && lvl >= 60 && _form == DRUID_CAT_FORM &&
                 //((spellInfo->SpellFamilyFlags[0] & 0x839000) ||
                 //(spellInfo->SpellFamilyFlags[1] & 0x30000480) ||
                 //(spellInfo->SpellFamilyFlags[2] & 0x40420)) &&
@@ -1962,7 +1958,7 @@ public:
                     flatbonus += 5;
             }
             //Improved Mangle part 2:
-            if ((_spec == BOT_SPEC_DRUID_FERAL) && lvl >= 50 && (spellInfo->SpellFamilyFlags[1] & 0x400))
+            if ((GetSpec() == BOT_SPEC_DRUID_FERAL) && lvl >= 50 && (spellInfo->SpellFamilyFlags[1] & 0x400))
                 flatbonus += 6;
 
             //cost can be < 0
@@ -2022,7 +2018,7 @@ public:
 
             //pct mods
             //Improved Tranquility: -60% cooldown for Tanquility
-            if ((_spec == BOT_SPEC_DRUID_RESTORATION) && lvl >= 30 && baseId == TRANQUILITY_1)
+            if ((GetSpec() == BOT_SPEC_DRUID_RESTORATION) && lvl >= 30 && baseId == TRANQUILITY_1)
                 pctbonus += 0.6f;
 
             //flat mods
@@ -2059,7 +2055,7 @@ public:
             if (lvl >= 50 && baseId == MANGLE_BEAR_1)
                 timebonus += 1500;
             //Brutal Impact: -30 sec cooldown for Bash
-            if ((_spec == BOT_SPEC_DRUID_FERAL) && lvl >= 30 && baseId == BASH_1)
+            if ((GetSpec() == BOT_SPEC_DRUID_FERAL) && lvl >= 30 && baseId == BASH_1)
                 timebonus += 30000;
             //Glyph of Typhoon: -3 sec cooldown for Typhoon
             if (lvl >= 70 && baseId == TYPHOON_1)
@@ -2276,7 +2272,7 @@ public:
             //Infected Wound: handle proc
             if (baseId == SHRED_1 || baseId == MAUL_1 || baseId == MANGLE_BEAR_1 || baseId == MANGLE_CAT_1)
             {
-                if ((_spec == BOT_SPEC_DRUID_FERAL) && lvl >= 45)
+                if ((GetSpec() == BOT_SPEC_DRUID_FERAL) && lvl >= 45)
                 {
                     //CastSpellExtraArgs args(true);
                     //args.SetOriginalCaster(me->GetGUID());
@@ -2456,7 +2452,7 @@ public:
             }
             */
             //Improved Barkskin: 10% additional damage reduction
-            if ((_spec == BOT_SPEC_DRUID_RESTORATION) && baseId == BARKSKIN_1)
+            if ((GetSpec() == BOT_SPEC_DRUID_RESTORATION) && baseId == BARKSKIN_1)
             {
                 AuraEffect* bar = me->GetAuraEffect(spellId, EFFECT_1, me->GetGUID());
                 if (bar)
@@ -2486,7 +2482,7 @@ public:
             //Leader of the Pack helper
             if (baseId == CAT_FORM_1 || baseId == BEAR_FORM_1)
             {
-                if ((_spec == BOT_SPEC_DRUID_FERAL) && lvl >= 40)
+                if ((GetSpec() == BOT_SPEC_DRUID_FERAL) && lvl >= 40)
                     me->CastSpell(me, LEADER_OF_THE_PACK_BUFF, true);
             }
 
@@ -2697,9 +2693,9 @@ public:
         void InitSpells() override
         {
             uint8 lvl = me->GetLevel();
-            bool isBala = _spec == BOT_SPEC_DRUID_BALANCE;
-            bool isFera = _spec == BOT_SPEC_DRUID_FERAL;
-            bool isRest = _spec == BOT_SPEC_DRUID_RESTORATION;
+            bool isBala = GetSpec() == BOT_SPEC_DRUID_BALANCE;
+            bool isFera = GetSpec() == BOT_SPEC_DRUID_FERAL;
+            bool isRest = GetSpec() == BOT_SPEC_DRUID_RESTORATION;
 
             InitSpellMap(MARK_OF_THE_WILD_1);
             InitSpellMap(THORNS_1);
@@ -2774,9 +2770,9 @@ public:
         void ApplyClassPassives() const override
         {
             uint8 level = master->GetLevel();
-            bool isBala = _spec == BOT_SPEC_DRUID_BALANCE;
-            bool isFera = _spec == BOT_SPEC_DRUID_FERAL;
-            bool isRest = _spec == BOT_SPEC_DRUID_RESTORATION;
+            bool isBala = GetSpec() == BOT_SPEC_DRUID_BALANCE;
+            bool isFera = GetSpec() == BOT_SPEC_DRUID_FERAL;
+            bool isRest = GetSpec() == BOT_SPEC_DRUID_RESTORATION;
 
             RefreshAura(NATURESGRACE, level >= 20 ? 1 : 0);
             RefreshAura(DREAMSTATE, isBala && level >= 35 ? 1 : 0);
