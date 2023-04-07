@@ -564,7 +564,7 @@ public:
             //Rupture: little troll with applying rupture on target without breaking gouge (creatures only, pvp - restealth)
             if (GetSpell(RUPTURE_1) && !stealthed && !shadowdance && HasRole(BOT_ROLE_DPS) &&
                 comboPoints > ((hasHunger || !GetSpell(HUNGER_FOR_BLOOD_1)) ? 1 : 0) &&
-                !(hasHunger && _spec == BOT_SPEC_ROGUE_ASSASINATION && GetSpell(ENVENOM_1)) &&
+                !(hasHunger && GetSpec() == BOT_SPEC_ROGUE_ASSASINATION && GetSpell(ENVENOM_1)) &&
                 (hasnormalstun || (mytar->CanHaveThreatList() && duration < 2000)) &&
                 (comboPoints < 4 || !GetSpell(KIDNEY_SHOT_1) || stunDivider > DIMINISHING_LEVEL_2) &&
                 energy >= ecost(RUPTURE_1) && mytar->GetHealth() > me->GetMaxHealth() / 4 * (1 + mytar->getAttackers().size()) &&
@@ -597,7 +597,7 @@ public:
                         return;
                 }
                 //Envenom / Eviscerate
-                uint32 envescerate = (_spec == BOT_SPEC_ROGUE_ASSASINATION && GetSpell(ENVENOM_1) &&
+                uint32 envescerate = (GetSpec() == BOT_SPEC_ROGUE_ASSASINATION && GetSpell(ENVENOM_1) &&
                     (mytar->GetHealth() > me->GetMaxHealth() / 5 || !GetSpell(EVISCERATE_1))) ? ENVENOM_1 : GetSpell(EVISCERATE_1) ? EVISCERATE_1 : 0;
                 if (envescerate && IsSpellReady(envescerate, diff) && !stealthed && !shadowdance && HasRole(BOT_ROLE_DPS) &&
                     (comboPoints >= 4  || (envescerate == EVISCERATE_1 && mytar->GetHealth() < me->GetMaxHealth() / 4)) &&
@@ -726,7 +726,7 @@ public:
             if (me->IsInCombat() && Rand() < 25)
             {
                 bool canVanish = IsSpellReady(VANISH_1, diff, false);
-                bool canSprint = (_spec == BOT_SPEC_ROGUE_COMBAT) && me->GetLevel() >= 25 && !HasBotCommandState(BOT_COMMAND_STAY) && IsSpellReady(SPRINT_1, diff, false);
+                bool canSprint = (GetSpec() == BOT_SPEC_ROGUE_COMBAT) && me->GetLevel() >= 25 && !HasBotCommandState(BOT_COMMAND_STAY) && IsSpellReady(SPRINT_1, diff, false);
                 if ((canVanish || canSprint) && me->HasAuraWithMechanic((1<<MECHANIC_SNARE)|(1<<MECHANIC_ROOT)))
                 {
                     uint32 Spanish = canSprint ? SPRINT_1 : VANISH_1;
@@ -778,12 +778,12 @@ public:
             //MH 20+ Instant, 32+ Wound, envenom Instant
             //OH 20+ Crippling, 40+ Instant (deadly brew inc), 68+ Anesthetic, envenom Deadly
             if (needChooseMHEnchant && mhReady)
-                mhEnchant = (_spec == BOT_SPEC_ROGUE_ASSASINATION && GetSpell(ENVENOM_1)) ? INSTANT_POISON_1 :
+                mhEnchant = (GetSpec() == BOT_SPEC_ROGUE_ASSASINATION && GetSpell(ENVENOM_1)) ? INSTANT_POISON_1 :
                     lvl >= 32 ? WOUND_POISON_1 :
                     lvl >= 20 ? INSTANT_POISON_1 : 0;
 
             if (needChooseOHEnchant && ohReady)
-                ohEnchant = (_spec == BOT_SPEC_ROGUE_ASSASINATION && GetSpell(ENVENOM_1)) ? DEADLY_POISON_1 :
+                ohEnchant = (GetSpec() == BOT_SPEC_ROGUE_ASSASINATION && GetSpell(ENVENOM_1)) ? DEADLY_POISON_1 :
                     lvl >= 68 ? ANESTHETIC_POISON_1 :
                     lvl >= 40 ? INSTANT_POISON_1 :
                     lvl >= 20 ? CRIPPLING_POISON_1 : 0;
@@ -1019,7 +1019,7 @@ public:
             if (lvl >= 15 && baseId == EVISCERATE_1)
                 crit_chance += 10.f;
             //Improved Ambush: 50% additional critical chance for Ambush
-            if ((_spec == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 25 && baseId == AMBUSH_1)
+            if ((GetSpec() == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 25 && baseId == AMBUSH_1)
                 crit_chance += 50.f;
             //Turn the Tables:
             if (lvl >= 50 &&
@@ -1056,7 +1056,7 @@ public:
             if (lvl >= 60 && baseId == EVISCERATE_1)
                 pctbonus += 0.15f;
             //Find Weakness: 6% bonus damage to all abilities
-            if ((_spec == BOT_SPEC_ROGUE_ASSASINATION) && lvl >= 45)
+            if ((GetSpec() == BOT_SPEC_ROGUE_ASSASINATION) && lvl >= 45)
                 pctbonus += 0.06f;
             //Improved Eviscerate: 20% damage bonus for Eviscerate
             if (lvl >= 10 && baseId == EVISCERATE_1)
@@ -1067,7 +1067,7 @@ public:
                 baseId == MUTILATE_DAMAGE_OFFHAND_1 || baseId == GARROTE_1 || baseId == AMBUSH_1))
                 pctbonus += 0.2f;
             //Aggression: 15% damage bonus for Sinister Strike, Backstab and Eviscerate
-            if ((_spec == BOT_SPEC_ROGUE_COMBAT) &&
+            if ((GetSpec() == BOT_SPEC_ROGUE_COMBAT) &&
                 lvl >= 25 && (baseId == SINISTER_STRIKE_1 || baseId == BACKSTAB_1 || baseId == EVISCERATE_1))
                 pctbonus += 0.15f;
             //Blood Spatter: 30% bonus damage for Rupture and Garrote
@@ -1080,16 +1080,16 @@ public:
             if (lvl >= 20 && baseId == RUPTURE_1)
                 pctbonus += 0.3f;
             //Surprise Attacks: 10% bonus damage for Sinister Strike, Backstab, Shiv, Hemmorhage and Gouge
-            if ((_spec == BOT_SPEC_ROGUE_COMBAT) &&
+            if ((GetSpec() == BOT_SPEC_ROGUE_COMBAT) &&
                 lvl >= 50 && (baseId == SINISTER_STRIKE_1 || baseId == BACKSTAB_1 ||
                 /*baseId == SHIV_1 || */baseId == HEMORRHAGE_1 || baseId == GOUGE_1))
                 pctbonus += 0.1f;
             //Blade Twisting: 10% bonus damage for Sinister Strike and Backstab
-            if ((_spec == BOT_SPEC_ROGUE_COMBAT) && lvl >= 35 && (baseId == SINISTER_STRIKE_1 || baseId == BACKSTAB_1))
+            if ((GetSpec() == BOT_SPEC_ROGUE_COMBAT) && lvl >= 35 && (baseId == SINISTER_STRIKE_1 || baseId == BACKSTAB_1))
                 pctbonus += 0.1f;
             //Sinister Calling: 10% bonus percentage damage for Backstab and Hemorrhage
             //We add bonus damage pct because SpellMods are not handled
-            if ((_spec == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 45 && (baseId == BACKSTAB_1 || baseId == HEMORRHAGE_1))
+            if ((GetSpec() == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 45 && (baseId == BACKSTAB_1 || baseId == HEMORRHAGE_1))
                 pctbonus += 0.1f;
             //Glyph of Fan of Knives: 20% bonus damage for Fan of Knives
             if (lvl >= 80 && baseId == FAN_OF_KNIVES_1)
@@ -1130,17 +1130,17 @@ public:
             if (lvl >= 10 && baseId == SINISTER_STRIKE_1)
                 flatbonus += 5;
             //Dirty Deeds part 1: -20 energy cost for Cheap Shot and Garrote
-            if ((_spec == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 30 && (baseId == CHEAP_SHOT_1 || baseId == GARROTE_1))
+            if ((GetSpec() == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 30 && (baseId == CHEAP_SHOT_1 || baseId == GARROTE_1))
                 flatbonus += 20;
             //Filthy Tricks part 2: -10 energy cost for Tricks of the Trade, Distract and Shadowstep
-            if ((_spec == BOT_SPEC_ROGUE_SUBTLETY) &&
+            if ((GetSpec() == BOT_SPEC_ROGUE_SUBTLETY) &&
                 lvl >= 50 && (baseId == TRICKS_OF_THE_TRADE_1 || baseId == DISTRACT_1 || baseId == SHADOWSTEP_1))
                 flatbonus += 10;
             //Slaugher from the Shadows part 1: -20 energy cost for Backstab and Ambush
-            if ((_spec == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 55 && (baseId == BACKSTAB_1 || baseId == AMBUSH_1))
+            if ((GetSpec() == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 55 && (baseId == BACKSTAB_1 || baseId == AMBUSH_1))
                 flatbonus += 20;
             //Slaugher from the Shadows part 2: -5 energy cost for Hemorrhage
-            if ((_spec == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 55 && baseId == HEMORRHAGE_1)
+            if ((GetSpec() == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 55 && baseId == HEMORRHAGE_1)
                 flatbonus += 5;
             //Glyph of Feint: -20 energy cost for Feint
             if (lvl >= 16 && baseId == FEINT_1)
@@ -1203,11 +1203,11 @@ public:
             if (lvl >= 20 && baseId == CLOAK_OF_SHADOWS_1)
                 timebonus += 30000;
             //Filthy Tricks part 1: -10 sec cooldown for Tricks of the Trade, Distract and Shadowstep
-            if ((_spec == BOT_SPEC_ROGUE_SUBTLETY) &&
+            if ((GetSpec() == BOT_SPEC_ROGUE_SUBTLETY) &&
                 lvl >= 50 && (baseId == TRICKS_OF_THE_TRADE_1 || baseId == DISTRACT_1 || baseId == SHADOWSTEP_1))
                 timebonus += 10000;
             //Filthy Tricks part 3: -3 min cooldown for Preparation
-            if ((_spec == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 50 && baseId == PREPARATION_1)
+            if ((GetSpec() == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 50 && baseId == PREPARATION_1)
                 timebonus += 180000;
             //Glyph of Killing Spree: -45 sec cooldown for Killing Spree
             if (lvl >= 60 && baseId == KILLING_SPREE_1)
@@ -1292,7 +1292,7 @@ public:
 
             //flat mods
             //Throwing Specialization: + 4 yd range for Deadly Throw
-            if ((_spec == BOT_SPEC_ROGUE_COMBAT) && lvl >= 45 && baseId == DEADLY_THROW_1)
+            if ((GetSpec() == BOT_SPEC_ROGUE_COMBAT) && lvl >= 45 && baseId == DEADLY_THROW_1)
                 flatbonus += 4.f;
             //Dirty Tricks: + 5 yd range for Blind and Sap
             if (lvl >= 15 && (baseId == BLIND_1 || baseId == SAP_1))
@@ -1665,7 +1665,7 @@ public:
                 }
             }
             //Cut to the Chase: Eviscerate and Envenom will refresh Slice and Dice duration as for 5 points
-            if (_spec == BOT_SPEC_ROGUE_ASSASINATION && lvl >= 55 && (baseId == EVISCERATE_1 || baseId == ENVENOM_1) && GetSpell(SLICE_DICE_1))
+            if (GetSpec() == BOT_SPEC_ROGUE_ASSASINATION && lvl >= 55 && (baseId == EVISCERATE_1 || baseId == ENVENOM_1) && GetSpell(SLICE_DICE_1))
             {
                 if (Aura* dice = me->GetAura(GetSpell(SLICE_DICE_1)))
                 {
@@ -1675,7 +1675,7 @@ public:
                 }
             }
             //Waylay
-            if ((_spec == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 45 && (baseId == BACKSTAB_1 || baseId == AMBUSH_1))
+            if ((GetSpec() == BOT_SPEC_ROGUE_SUBTLETY) && lvl >= 45 && (baseId == BACKSTAB_1 || baseId == AMBUSH_1))
                 me->CastSpell(target, WAYLAY_DEBUFF, true);
 
             //Stun: move behind
@@ -1826,9 +1826,9 @@ public:
         void InitSpells() override
         {
             uint8 lvl = me->GetLevel();
-            bool isAssa = _spec == BOT_SPEC_ROGUE_ASSASINATION;
-            bool isComb = _spec == BOT_SPEC_ROGUE_COMBAT;
-            bool isSubt = _spec == BOT_SPEC_ROGUE_SUBTLETY;
+            bool isAssa = GetSpec() == BOT_SPEC_ROGUE_ASSASINATION;
+            bool isComb = GetSpec() == BOT_SPEC_ROGUE_COMBAT;
+            bool isSubt = GetSpec() == BOT_SPEC_ROGUE_SUBTLETY;
 
             InitSpellMap(KICK_1);
             //InitSpellMap(EXPOSE_ARMOR_1);
@@ -1892,9 +1892,9 @@ public:
         void ApplyClassPassives() const override
         {
             uint8 level = master->GetLevel();
-            bool isAssa = _spec == BOT_SPEC_ROGUE_ASSASINATION;
-            bool isComb = _spec == BOT_SPEC_ROGUE_COMBAT;
-            bool isSubt = _spec == BOT_SPEC_ROGUE_SUBTLETY;
+            bool isAssa = GetSpec() == BOT_SPEC_ROGUE_ASSASINATION;
+            bool isComb = GetSpec() == BOT_SPEC_ROGUE_COMBAT;
+            bool isSubt = GetSpec() == BOT_SPEC_ROGUE_SUBTLETY;
 
             RefreshAura(REMORSELESS_ATTACKS, level >= 10 ? 1 : 0);
             RefreshAura(VIGOR, level >= 20 ? 1 : 0);

@@ -268,7 +268,7 @@ class bot_ai : public CreatureAI
         void ReInitFaction() { InitFaction(); }
         void ReinitOwner() { InitOwner(); }
         void SetSpec(uint8 spec, bool activate = true);
-        uint8 GetSpec() const { return _spec; }
+        uint8 GetSpec() const;
         static uint8 DefaultSpecForClass(uint8 m_class);
         static uint32 TextForSpec(uint8 spec);
         static bool IsValidSpecForClass(uint8 m_class, uint8 spec);

@@ -777,7 +777,7 @@ public:
 
         bool HOFTarget(Unit* target, uint32 /*diff*/)
         {
-            bool canUnstun = me->GetLevel() >= 35 && _spec == BOT_SPEC_PALADIN_RETRIBUTION;
+            bool canUnstun = me->GetLevel() >= 35 && GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION;
             if (target->HasAuraType(SPELL_AURA_MECHANIC_IMMUNITY))
             {
                 if (target->HasAuraTypeWithMiscvalue(SPELL_AURA_MECHANIC_IMMUNITY, 11) &&
@@ -996,7 +996,7 @@ public:
 
         void BreakCC(uint32 diff) override
         {
-            if (me->GetLevel() >= 35 && _spec == BOT_SPEC_PALADIN_RETRIBUTION && IsSpellReady(HAND_OF_FREEDOM_1, diff) && Rand() < 30 && me->HasAuraWithMechanic(1<<MECHANIC_STUN))
+            if (me->GetLevel() >= 35 && GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION && IsSpellReady(HAND_OF_FREEDOM_1, diff) && Rand() < 30 && me->HasAuraWithMechanic(1<<MECHANIC_STUN))
             {
                 if (me->IsMounted())
                     me->RemoveAurasByType(SPELL_AURA_MOUNTED);
@@ -1157,8 +1157,8 @@ public:
             uint32 RETRIBUTION_AURA = GetSpell(RETRIBUTION_AURA_1);
             //uint32 CRUSADER_AURA = GetSpell(CRUSADER_AURA_1);
 
-            bool pureHealer = _spec == BOT_SPEC_PALADIN_HOLY;
-            bool isProt = _spec == BOT_SPEC_PALADIN_PROTECTION;
+            bool pureHealer = GetSpec() == BOT_SPEC_PALADIN_HOLY;
+            bool isProt = GetSpec() == BOT_SPEC_PALADIN_PROTECTION;
 
             std::map<uint32 /*baseid*/, uint32 /*curid*/> idMap;
             uint32 mask = _getAurasMask(idMap);
@@ -1691,10 +1691,10 @@ public:
             uint8 lvl = me->GetLevel();
 
             //Sanctified Light: 6% additional critical chance for Holy Light and Holy Shock
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && lvl >= 30 && (baseId == HOLY_LIGHT_1 || baseId == HOLY_SHOCK_1))
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && lvl >= 30 && (baseId == HOLY_LIGHT_1 || baseId == HOLY_SHOCK_1))
                 crit_chance += 6.f;
             //Holy Power: 5% additional critical chance for Holy spells
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && lvl >= 35 && (schoolMask & SPELL_SCHOOL_MASK_HOLY))
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && lvl >= 35 && (schoolMask & SPELL_SCHOOL_MASK_HOLY))
                 crit_chance += 5.f;
             //Improved Flash of Light (id: 20251): 6% additional critical chance for Flash of Light
             if (lvl >= 70 && baseId == FLASH_OF_LIGHT_1)
@@ -1703,10 +1703,10 @@ public:
             if (lvl >= 20 && baseId == FLASH_OF_LIGHT_1)
                 crit_chance += 5.f;
             //Sanctified Wrath: 50% additional critical chance for Hammer of Wrath
-            if ((_spec == BOT_SPEC_PALADIN_RETRIBUTION) && lvl >= 45 && baseId == HAMMER_OF_WRATH_1)
+            if ((GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION) && lvl >= 45 && baseId == HAMMER_OF_WRATH_1)
                 crit_chance += 50.f;
             //Fanaticism: 18% additional critical chance for all Judgements (not shure which check is right)
-            if ((_spec == BOT_SPEC_PALADIN_RETRIBUTION) && lvl >= 45 && spellInfo->GetCategory() == SPELLCATEGORY_JUDGEMENT)
+            if ((GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION) && lvl >= 45 && spellInfo->GetCategory() == SPELLCATEGORY_JUDGEMENT)
                 crit_chance += 18.f;
             //Infusion of Light
             if (baseId == HOLY_LIGHT_1)
@@ -1735,14 +1735,14 @@ public:
             //{
             //}
             //Sanctity of Battle: 15% bonus damage for Exorcism and Crusader Strike
-            if ((_spec == BOT_SPEC_PALADIN_RETRIBUTION) && lvl >= 25 && baseId == EXORCISM_1)
+            if ((GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION) && lvl >= 25 && baseId == EXORCISM_1)
                 pctbonus += 0.15f;
             //The Art of War (damage part): 10% bonus damage for Judgements, Crusader Strike and Divine Storm
-            if ((_spec == BOT_SPEC_PALADIN_RETRIBUTION) && lvl >= 40 &&
+            if ((GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION) && lvl >= 40 &&
                 (spellInfo->GetCategory() == SPELLCATEGORY_JUDGEMENT || baseId == CRUSADER_STRIKE_1 || baseId == DIVINE_STORM_1))
                 pctbonus += 0.1f;
             //Judgements of the Pure (damage part): 25% bonus damage for Judgements and Seals
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && lvl >= 50 &&
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && lvl >= 50 &&
                 (spellInfo->GetCategory() == SPELLCATEGORY_JUDGEMENT ||
                 spellInfo->GetSpellSpecific() == SPELL_SPECIFIC_SEAL ||
                 baseId == JUDGEMENT_OF_COMMAND_DAMAGE))
@@ -1767,7 +1767,7 @@ public:
             //}
 
             //Judgements of the Pure (damage part): 25% bonus damage for Judgements and Seals
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && lvl >= 50 &&
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && lvl >= 50 &&
                 (spellInfo->GetCategory() == SPELLCATEGORY_JUDGEMENT ||
                 spellInfo->GetSpellSpecific() == SPELL_SPECIFIC_SEAL ||
                 spellId == JUDGEMENT_OF_COMMAND_DAMAGE))
@@ -1791,7 +1791,7 @@ public:
                 pctbonus -= 0.5f;
 
             //Healing Light: 12% bonus healing for Holy Light, Flash of Light and Holy Shock
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && lvl >= 15 && (baseId == HOLY_LIGHT_1 || baseId == FLASH_OF_LIGHT_1 || baseId == HOLY_SHOCK_1))
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && lvl >= 15 && (baseId == HOLY_LIGHT_1 || baseId == FLASH_OF_LIGHT_1 || baseId == HOLY_SHOCK_1))
                 pctbonus += 0.12f;
             //Glyph of Seal of Light: 5% bonus healing for all spells
             if (lvl >= 30 && me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_PALADIN, 0x0, 0x2000000, 0x0))
@@ -1814,7 +1814,7 @@ public:
             if (lvl >= 10 && !spellInfo->CalcCastTime())
                 pctbonus += 0.1f;
             //Blessed Hands: -30% mana cost for Hand spells
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && lvl >= 25 && (spellInfo->SpellFamilyFlags[0] & 0x2110))
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && lvl >= 25 && (spellInfo->SpellFamilyFlags[0] & 0x2110))
                 pctbonus += 0.3f;
             //Holy Light Cost Reduction (id: 60148): -5% mana cost for Holy Light
             if (lvl >= 30 && baseId == HOLY_LIGHT_1)
@@ -1910,7 +1910,7 @@ public:
                     timebonus += 2000;
             }
             //Sacred Duty: -60 sec cooldown for Divine Shield and Divine Protection
-            if ((_spec == BOT_SPEC_PALADIN_PROTECTION) && lvl >= 35 && (baseId == DIVINE_SHIELD_1 || baseId == DIVINE_PROTECTION_1))
+            if ((GetSpec() == BOT_SPEC_PALADIN_PROTECTION) && lvl >= 35 && (baseId == DIVINE_SHIELD_1 || baseId == DIVINE_PROTECTION_1))
                 timebonus += 60000;
             //Reduced Righteous Defense Cooldown (37181): -2 sec cooldown for Righteous Defense
             if (lvl >= 60 && baseId == RIGHTEOUS_DEFENSE_1)
@@ -1936,7 +1936,7 @@ public:
 
             //pct mods
             //Purifying Power part 2: -33% cooldown for Exorcism and Holy Wrath
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && lvl >= 35 && (baseId == EXORCISM_1 || baseId == HOLY_WRATH_1))
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && lvl >= 35 && (baseId == EXORCISM_1 || baseId == HOLY_WRATH_1))
                 pctbonus += 0.333f;
             //Glyph of Avenging Wrath: -50% cooldown for Hammer of Wrath if Avenging Wrath is active
             if (lvl >= 70 && baseId == HAMMER_OF_WRATH_1 &&
@@ -1960,10 +1960,10 @@ public:
             if (lvl >= 15 && baseId == HAND_OF_PROTECTION_1)
                 timebonus += 120000;
             //Improved Hammer of Justice: -20 sec cooldown for Hammer of Justice
-            if ((_spec == BOT_SPEC_PALADIN_PROTECTION) && lvl >= 25 && baseId == HAMMER_OF_JUSTICE_1)
+            if ((GetSpec() == BOT_SPEC_PALADIN_PROTECTION) && lvl >= 25 && baseId == HAMMER_OF_JUSTICE_1)
                 timebonus += 20000;
             //Judgements of the Just: -10 sec cooldown for Hammer of Justice (tanks only)
-            if ((_spec == BOT_SPEC_PALADIN_PROTECTION) && lvl >= 55 && baseId == HAMMER_OF_JUSTICE_1)
+            if ((GetSpec() == BOT_SPEC_PALADIN_PROTECTION) && lvl >= 55 && baseId == HAMMER_OF_JUSTICE_1)
                 timebonus += 10000;
             //Glyph of Holy Shock: -1 sec cooldown for Holy Shock
             if (baseId == HOLY_SHOCK_1)
@@ -2041,7 +2041,7 @@ public:
 
             //flat mods
             //Enlightened Judgements: +30 yd range for Judgement of Light and Judgement of Wisdom (healers)
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && lvl >= 55 && (spellInfo->SpellFamilyFlags[0] & 0x800000))
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && lvl >= 55 && (spellInfo->SpellFamilyFlags[0] & 0x800000))
                 flatbonus += 30.f;
 
             maxrange = maxrange * (1.0f + pctbonus) + flatbonus;
@@ -2065,10 +2065,10 @@ public:
             float pctbonus = 1.0f;
 
             //Improved Devotion Aura: 50% increased effect
-            if (baseId == DEVOTION_AURA_1 && effIndex == EFFECT_0 && _spec == BOT_SPEC_PALADIN_PROTECTION && lvl >= 25)
+            if (baseId == DEVOTION_AURA_1 && effIndex == EFFECT_0 && GetSpec() == BOT_SPEC_PALADIN_PROTECTION && lvl >= 25)
                 pctbonus *= 1.5f;
             //Improved Devotion Aura: 6% bonus healing
-            if (baseId == IMPROVED_DEVOTION_AURA_SPELL && effIndex == EFFECT_1 && _spec == BOT_SPEC_PALADIN_PROTECTION && lvl >= 25)
+            if (baseId == IMPROVED_DEVOTION_AURA_SPELL && effIndex == EFFECT_1 && GetSpec() == BOT_SPEC_PALADIN_PROTECTION && lvl >= 25)
                 value += 6.f;
 
             value = value * pctbonus;
@@ -2138,19 +2138,19 @@ public:
                 }
             }
             //Judgements of the Just melee attack speed reduction part 1
-            if ((_spec == BOT_SPEC_PALADIN_PROTECTION) && lvl >= 55 && spell->GetCategory() == SPELLCATEGORY_JUDGEMENT)
+            if ((GetSpec() == BOT_SPEC_PALADIN_PROTECTION) && lvl >= 55 && spell->GetCategory() == SPELLCATEGORY_JUDGEMENT)
             {
                 me->CastSpell(target, JUDGEMENTS_OF_THE_JUST_AURA, true);
             }
             //Judgements of the Just melee attack speed reduction part 2
-            if ((_spec == BOT_SPEC_PALADIN_PROTECTION) && spellId == JUDGEMENTS_OF_THE_JUST_AURA)
+            if ((GetSpec() == BOT_SPEC_PALADIN_PROTECTION) && spellId == JUDGEMENTS_OF_THE_JUST_AURA)
             {
                 AuraEffect* slow = target->GetAuraEffect(JUDGEMENTS_OF_THE_JUST_AURA, 1, me->GetGUID());
                 if (slow)
                     slow->ChangeAmount(slow->GetAmount() - 20);
             }
 
-            if ((_spec == BOT_SPEC_PALADIN_PROTECTION) && spellId == SEAL_OF_JUSTICE_STUN_AURA)
+            if ((GetSpec() == BOT_SPEC_PALADIN_PROTECTION) && spellId == SEAL_OF_JUSTICE_STUN_AURA)
             {
                 if (lvl >= 55)
                 {
@@ -2178,7 +2178,7 @@ public:
                     }
                 }
             }
-            if ((_spec == BOT_SPEC_PALADIN_RETRIBUTION) && baseId == RETRIBUTION_AURA_1)
+            if ((GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION) && baseId == RETRIBUTION_AURA_1)
             {
                 if (lvl >= 30)
                 {
@@ -2188,7 +2188,7 @@ public:
                         eff->ChangeAmount(eff->GetAmount() * 3 / 2);
                 }
             }
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && baseId == CONCENTRATION_AURA_1)
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && baseId == CONCENTRATION_AURA_1)
             {
                 if (lvl >= 25)
                 {
@@ -2200,7 +2200,7 @@ public:
             }
             if (baseId == FLASH_OF_LIGHT_HEAL_PERIODIC)
             {
-                if ((_spec == BOT_SPEC_PALADIN_HOLY) && lvl >= 78 && !HasRole(BOT_ROLE_TANK | BOT_ROLE_DPS))
+                if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && lvl >= 78 && !HasRole(BOT_ROLE_TANK | BOT_ROLE_DPS))
                 {
                     //Paldin T9 Holy 4P Bonus: 100% increased healing from Infusion of Light (pure healers only)
                     AuraEffect* eff = target->GetAuraEffect(spellId, EFFECT_0, me->GetGUID());
@@ -2239,7 +2239,7 @@ public:
                     hof->SetMaxDuration(dur);
                 }
             }
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && baseId == HAND_OF_SALVATION_1 && !IsTank(target))
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && baseId == HAND_OF_SALVATION_1 && !IsTank(target))
             {
                 //Blessed Hands (part 2)
                 if (AuraEffect* hos = target->GetAuraEffect(spellId, 0, me->GetGUID()))
@@ -2247,7 +2247,7 @@ public:
                     hos->ChangeAmount(hos->GetAmount() * 2);
                 }
             }
-            if ((_spec == BOT_SPEC_PALADIN_HOLY) && baseId == HAND_OF_SACRIFICE_1)
+            if ((GetSpec() == BOT_SPEC_PALADIN_HOLY) && baseId == HAND_OF_SACRIFICE_1)
             {
                 //Blessed Hands (part 3)
                 if (AuraEffect* hos = target->GetAuraEffect(spellId, 0, me->GetGUID()))
@@ -2369,7 +2369,7 @@ public:
         void HealReceived(Unit* healer, uint32& heal) override
         {
             //Spiritual Attunement (double the effect on bots)
-            if (heal && (_spec == BOT_SPEC_PALADIN_PROTECTION) && me->GetLevel() >= 40 && healer != me && GetLostHP(me))
+            if (heal && (GetSpec() == BOT_SPEC_PALADIN_PROTECTION) && me->GetLevel() >= 40 && healer != me && GetLostHP(me))
             {
                 if (int32 basepoints = int32(CalculatePct(std::min<int32>(heal, GetLostHP(me)), 20)))
                 {
@@ -2429,9 +2429,9 @@ public:
         void InitSpells() override
         {
             uint8 lvl = me->GetLevel();
-            bool isHoly = _spec == BOT_SPEC_PALADIN_HOLY;
-            bool isProt = _spec == BOT_SPEC_PALADIN_PROTECTION;
-            bool isRetr = _spec == BOT_SPEC_PALADIN_RETRIBUTION;
+            bool isHoly = GetSpec() == BOT_SPEC_PALADIN_HOLY;
+            bool isProt = GetSpec() == BOT_SPEC_PALADIN_PROTECTION;
+            bool isRetr = GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION;
 
             InitSpellMap(FLASH_OF_LIGHT_1);
             InitSpellMap(HOLY_LIGHT_1);
@@ -2504,9 +2504,9 @@ public:
         void ApplyClassPassives() const override
         {
             uint8 level = master->GetLevel();
-            bool isHoly = _spec == BOT_SPEC_PALADIN_HOLY;
-            bool isProt = _spec == BOT_SPEC_PALADIN_PROTECTION;
-            bool isRetr = _spec == BOT_SPEC_PALADIN_RETRIBUTION;
+            bool isHoly = GetSpec() == BOT_SPEC_PALADIN_HOLY;
+            bool isProt = GetSpec() == BOT_SPEC_PALADIN_PROTECTION;
+            bool isRetr = GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION;
 
             RefreshAura(ILLUMINATION, isHoly && level >= 20 ? 1 : 0);
             RefreshAura(IMPROVED_LAY_ON_HANDS, isHoly && level >= 20 ? 1 : 0);
