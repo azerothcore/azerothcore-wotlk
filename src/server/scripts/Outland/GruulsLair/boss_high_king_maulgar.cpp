@@ -126,9 +126,9 @@ struct boss_high_king_maulgar : public BossAI
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 
-        events.ScheduleEvent(EVENT_ARCING_SMASH, 6s);
-        events.ScheduleEvent(EVENT_MIGHTY_BLOW, 20s);
-        events.ScheduleEvent(EVENT_WHIRLWIND, 30s);
+        events.ScheduleEvent(EVENT_ARCING_SMASH, 10s);
+        events.ScheduleEvent(EVENT_MIGHTY_BLOW, 15s);
+        events.ScheduleEvent(EVENT_WHIRLWIND, 54s);
         events.ScheduleEvent(EVENT_CHECK_HEALTH, 500ms);
     }
 
@@ -149,12 +149,13 @@ struct boss_high_king_maulgar : public BossAI
                 break;
             case EVENT_MIGHTY_BLOW:
                 me->CastSpell(me->GetVictim(), SPELL_MIGHTY_BLOW, false);
-                events.ScheduleEvent(EVENT_MIGHTY_BLOW, 16s);
+                events.ScheduleEvent(EVENT_MIGHTY_BLOW, 15s);
                 break;
             case EVENT_WHIRLWIND:
                 events.DelayEvents(15s);
                 me->CastSpell(me, SPELL_WHIRLWIND, false);
                 events.ScheduleEvent(EVENT_WHIRLWIND, 54s);
+                events.DelayEvents(5s); //extra delay to prevent events from insta-casting (necessary?)
                 break;
             case EVENT_CHECK_HEALTH:
                 if (me->HealthBelowPct(50))
