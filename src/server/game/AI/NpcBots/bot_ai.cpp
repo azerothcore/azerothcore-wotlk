@@ -16917,6 +16917,9 @@ void bot_ai::GetNextEvadeMovePoint(Position& pos, bool& use_path) const
         path.GetPath().size() > 4)
         return;
 
+    if (me->IsInWater())
+        LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} is pathing from water!", me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()));
+
     switch (path.GetPathType())
     {
         case PATHFIND_NOT_USING_PATH: //swimming
@@ -16938,12 +16941,10 @@ void bot_ai::GetNextEvadeMovePoint(Position& pos, bool& use_path) const
             }
             //log error and use direct point movement
             LOG_DEBUG("npcbots", "Bot {} id {} class {] level {} can't find full path to node {} (res {}) from pos {}, falling back to default PF!",
-                me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), _travel_node_cur->GetWPId(), uint32(path.GetPathType()),
+                me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), IsWanderer() ? _travel_node_cur->GetWPId() : 0, uint32(path.GetPathType()),
                 me->GetPosition().ToString().c_str());
+            break;
         default:
-            if (me->IsInWater())
-                LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} is pathing from water!",
-                    me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()));
             break;
     }
 
