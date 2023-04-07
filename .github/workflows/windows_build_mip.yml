@@ -35,7 +35,6 @@ jobs:
           CONTINUOUS_INTEGRATION: true
         run: |
           ./acore.sh install-deps
-          ls "/c/Program Files/OpenSSL-Win64/bin/"
       # - name: Process pending sql
       #   shell: bash
       #   run: bash bin/acore-db-pendings

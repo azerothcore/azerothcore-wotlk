@@ -277,12 +277,6 @@ public:
                 _experimentState = (data ? 1 : 0);
         }
 
-        void AttackStart(Unit* who) override
-        {
-            if (instance->CheckRequiredBosses(DATA_PROFESSOR_PUTRICIDE))
-                BossAI::AttackStart(who);
-        }
-
         bool CanAIAttack(Unit const* target) const override
         {
             return me->IsVisible() && target->GetPositionZ() > 388.0f && target->GetPositionZ() < 410.0f && target->GetPositionY() > 3157.1f && target->GetExactDist2dSq(4356.0f, 3211.0f) < 80.0f * 80.0f;
