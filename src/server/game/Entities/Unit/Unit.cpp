@@ -14311,14 +14311,17 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
         SetImmuneToPC(false); // unit has engaged in combat, remove immunity so players can fight back
 
     //npcbot: party combat hook
-    Player const* playerOwner = nullptr;
-    if (enemy->IsPlayer() && enemy->ToPlayer()->HaveBot())
-        playerOwner = enemy->ToPlayer();
-    else if (enemy->IsNPCBotOrPet() && !enemy->ToCreature()->IsFreeBot())
-        playerOwner = enemy->ToCreature()->GetBotOwner();
+    if (enemy)
+    {
+        Player const* playerOwner = nullptr;
+        if (enemy->IsPlayer() && enemy->ToPlayer()->HaveBot())
+            playerOwner = enemy->ToPlayer();
+        else if (enemy->IsNPCBotOrPet() && !enemy->ToCreature()->IsFreeBot())
+            playerOwner = enemy->ToCreature()->GetBotOwner();
 
-    if (playerOwner)
-        BotMgr::OnBotPartyEngage(playerOwner);
+        if (playerOwner)
+            BotMgr::OnBotPartyEngage(playerOwner);
+    }
     //end npcbot
 
     if (IsInCombat())
