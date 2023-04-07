@@ -59,9 +59,8 @@ jobs:
         run: |
           rm -rf env/dist/data
           cp "/c/tools/mysql/current/lib/libmysql.dll" "env/dist"
-          cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-3-x64.dll" "env/dist"
-          cp "/c/Program Files/OpenSSL-Win64/bin/libssl-3-x64.dll" "env/dist"
-          cp "/c/Program Files/OpenSSL-Win64/bin/legacy.dll" "env/dist"
+          cp "/c/Program/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "env/dist"
+          cp "/c/Program/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "env/dist"
       - uses: actions/upload-artifact@v2
         with:
           name: windows-2022-MSVC17-release
