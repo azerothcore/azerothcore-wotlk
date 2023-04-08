@@ -51,10 +51,29 @@ struct boss_warlord_kalithresh : public BossAI
     {
         Talk(SAY_AGGRO);
         _JustEngagedWith();
-        events.ScheduleEvent(EVENT_SPELL_REFLECTION, 20000, 36000);
-        events.ScheduleEvent(EVENT_SPELL_IMPALE, 7000, 14000);
-        events.ScheduleEvent(EVENT_SPELL_HEAD_CRACK, 15000);
-        events.ScheduleEvent(EVENT_SPELL_RAGE, 20000);
+
+        scheduler.Schedule(20s, 36s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_SPELL_REFLECTION);
+            context.Repeat();
+        }).Schedule(7s, 14s, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_IMPALE, 0, 10.0f);
+            context.Repeat(7500ms, 12500ms);
+        }).Schedule(15s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_HEAD_CRACK);
+            context.Repeat(45s, 55s);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 100.0f))
+            {
+                Talk(SAY_REGEN);
+                //me->CastSpell(me, SPELL_WARLORDS_RAGE, false);
+                distiller->AI()->DoAction(1);
+            }
+            context.Repeat(45s);
+        });
     }
 
     void KilledUnit(Unit* victim) override
@@ -69,41 +88,6 @@ struct boss_warlord_kalithresh : public BossAI
     {
         Talk(SAY_DEATH);
         _JustDied();
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SPELL_REFLECTION:
-            me->CastSpell(me, SPELL_SPELL_REFLECTION, false);
-            events.Repeat(20s, 36s);
-            break;
-        case EVENT_SPELL_IMPALE:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
-                me->CastSpell(target, SPELL_IMPALE, false);
-            events.Repeat(7500ms, 12500ms);
-            break;
-        case EVENT_SPELL_HEAD_CRACK:
-            DoCastVictim(SPELL_HEAD_CRACK);
-            events.Repeat(45s, 55s);
-            break;
-        case EVENT_SPELL_RAGE:
-            if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 100.0f))
-            {
-                Talk(SAY_REGEN);
-                //me->CastSpell(me, SPELL_WARLORDS_RAGE, false);
-                distiller->AI()->DoAction(1);
-            }
-            events.RepeatEvent(45000);
-            break;
-        }
-
-        DoMeleeAttackIfReady();
     }
 };
 
