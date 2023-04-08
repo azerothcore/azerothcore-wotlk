@@ -25,6 +25,11 @@ enum MainChambersAccessPanelSays
     SAY_LOUD_RUMBLE = 1
 };
 
+MinionData const minionData[] =
+{
+    { NPC_NAGA_DISTILLER, DATA_WARLORD_KALITHRESH }
+};
+
 class go_main_chambers_access_panel : public GameObjectScript
 {
 public:
@@ -113,6 +118,7 @@ public:
             SetHeaders(DataHeaders);
             SetBossNumber(EncounterCount);
             LoadObjectData(creatureData, objectData);
+            LoadMinionData(minionData);
         }
 
         void OnGameObjectCreate(GameObject* go) override

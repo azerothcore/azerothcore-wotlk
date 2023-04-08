@@ -20,32 +20,37 @@
 #include "SpellInfo.h"
 #include "steam_vault.h"
 
-enum NagaDistiller
+enum Texts
 {
-    SAY_INTRO                   = 0,
-    SAY_REGEN                   = 1,
-    SAY_AGGRO                   = 2,
-    SAY_SLAY                    = 3,
-    SAY_DEATH                   = 4,
+    SAY_INTRO = 0,
+    SAY_REGEN = 1,
+    SAY_AGGRO = 2,
+    SAY_SLAY  = 3,
+    SAY_DEATH = 4
+};
 
-    SPELL_SPELL_REFLECTION      = 31534,
-    SPELL_IMPALE                = 39061,
-    SPELL_HEAD_CRACK            = 16172,
-    SPELL_WARLORDS_RAGE         = 37081,
-    SPELL_WARLORDS_RAGE_NAGA    = 31543,
-    SPELL_WARLORDS_RAGE_PROC    = 36453,
-
-    NPC_NAGA_DISTILLER          = 17954,
-
-    EVENT_SPELL_REFLECTION      = 1,
-    EVENT_SPELL_IMPALE          = 2,
-    EVENT_SPELL_HEAD_CRACK      = 3,
-    EVENT_SPELL_RAGE            = 4
+enum Spells
+{
+    SPELL_SPELL_REFLECTION        = 31534,
+    SPELL_IMPALE                  = 39061,
+    SPELL_HEAD_CRACK              = 16172,
+    SPELL_WARLORDS_RAGE           = 37081,
+    SPELL_WARLORDS_RAGE_DISTILLER = 31543,
+    SPELL_WARLORDS_RAGE_PROC      = 36453
 };
 
 struct boss_warlord_kalithresh : public BossAI
 {
     boss_warlord_kalithresh(Creature* creature) : BossAI(creature, DATA_WARLORD_KALITHRESH) { }
+
+    void Reset() override
+    {
+        _Reset();
+        instance->DoForAllMinions(DATA_WARLORD_KALITHRESH, [&](Creature* minion) {
+            minion->SetReactState(REACT_PASSIVE);
+            minion->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        });
+    }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
@@ -69,8 +74,8 @@ struct boss_warlord_kalithresh : public BossAI
             if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 100.0f))
             {
                 Talk(SAY_REGEN);
-                //me->CastSpell(me, SPELL_WARLORDS_RAGE, false);
-                distiller->AI()->DoAction(1);
+                distiller->AI()->DoCast(me, SPELL_WARLORDS_RAGE_DISTILLER, true);
+                distiller->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             }
             context.Repeat(45s);
         });
@@ -88,50 +93,39 @@ struct boss_warlord_kalithresh : public BossAI
     {
         Talk(SAY_DEATH);
         _JustDied();
+        instance->DoForAllMinions(DATA_WARLORD_KALITHRESH, [&](Creature* minion) {
+            minion->KillSelf();
+        });
     }
 };
 
-struct npc_naga_distiller : public NullCreatureAI
+// 31543 - Warlord's Rage
+class spell_warlords_rage : public AuraScript
 {
-    npc_naga_distiller(Creature* creature) : NullCreatureAI(creature) { }
+    PrepareAuraScript(spell_warlords_rage);
 
-    uint32 spellTimer;
-
-    void Reset() override
+    void HandleAfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        spellTimer = 0;
-        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-    }
-
-    void DoAction(int32 param) override
-    {
-        if (param != 1)
-            return;
-
-        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        me->CastSpell(me, SPELL_WARLORDS_RAGE_NAGA, true);
-        spellTimer = 1;
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (spellTimer)
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
         {
-            spellTimer += diff;
-            if (spellTimer >= 12000)
+            if (GetCaster() && GetCaster()->IsAlive())
             {
-                if (Creature* kali = me->FindNearestCreature(NPC_WARLORD_KALITHRESH, 100.0f))
+                if (Unit* kali = GetTarget())
+                {
                     kali->CastSpell(kali, SPELL_WARLORDS_RAGE_PROC, true);
-                me->KillSelf();
+                }
             }
         }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_warlords_rage::HandleAfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 void AddSC_boss_warlord_kalithresh()
 {
     RegisterSteamvaultCreatureAI(boss_warlord_kalithresh);
-    RegisterSteamvaultCreatureAI(npc_naga_distiller);
+    RegisterSpellScript(spell_warlords_rage);
 }
