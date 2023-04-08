@@ -22,11 +22,12 @@
 
 enum Texts
 {
-    SAY_INTRO = 0,
-    SAY_REGEN = 1,
-    SAY_AGGRO = 2,
-    SAY_SLAY  = 3,
-    SAY_DEATH = 4
+    SAY_INTRO       = 0,
+    SAY_REGEN       = 1,
+    SAY_AGGRO       = 2,
+    SAY_SLAY        = 3,
+    SAY_DEATH       = 4,
+    EMOTE_DISTILLER = 5
 };
 
 enum Spells
@@ -88,6 +89,8 @@ struct boss_warlord_kalithresh : public BossAI
         }).Schedule(20s, [this](TaskContext context)
         {
             Talk(SAY_REGEN);
+            Talk(EMOTE_DISTILLER);
+
             if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 8.0f))
             {
                 distiller->AI()->DoCast(me, SPELL_WARLORDS_RAGE_DISTILLER, true);
@@ -97,32 +100,26 @@ struct boss_warlord_kalithresh : public BossAI
             {
                 if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 100.0f))
                 {
-                    me->GetMotionMaster()->MovePoint(POINT_DISTILLER, distiller->GetNearPosition(8.0f, me->GetOrientation()));
+                    me->GetMotionMaster()->MoveFollow(distiller, 8.0f, 0.0f);
+
+                    scheduler.Schedule(1s, [this](TaskContext chaseContext)
+                    {
+                        if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 8.0f))
+                        {
+                            distiller->AI()->DoCast(me, SPELL_WARLORDS_RAGE_DISTILLER, true);
+                            distiller->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                            me->ResumeChasingVictim();
+                        }
+                        else
+                        {
+                            chaseContext.Repeat();
+                        }
+                    });
                 }
             }
 
             context.Repeat(45s);
         });
-    }
-
-    void MovementInform(uint32 type, uint32 point) override
-    {
-        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
-            return;
-
-        if (point == POINT_DISTILLER)
-        {
-            if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 10.0f))
-            {
-                distiller->AI()->DoCast(me, SPELL_WARLORDS_RAGE_DISTILLER, true);
-                distiller->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                me->SetFacingToObject(distiller);
-            }
-
-            me->m_Events.AddEventAtOffset([this]() {
-                me->ResumeChasingVictim();
-            }, 2s);
-        }
     }
 
     void KilledUnit(Unit* victim) override

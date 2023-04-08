@@ -15,3 +15,7 @@ SELECT * FROM creature_template_movement WHERE creatureid = 17954;
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_warlords_rage';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (31543, 'spell_warlords_rage');
+
+DELETE FROM `creature_text` WHERE `CreatureId` = 17798 AND `GroupID` = 5;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(17798, 5, 0, '%s begins to channel from the nearby distiller...', 16, 0, 100, 0, 0, 0, 19166, 0, 'kalithresh EMOTE_DISTILLER');
