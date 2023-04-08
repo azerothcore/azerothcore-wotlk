@@ -39,9 +39,14 @@ enum Spells
     SPELL_WARLORDS_RAGE_PROC      = 36453
 };
 
+enum Misc
+{
+    POINT_DISTILLER = 1
+};
+
 struct boss_warlord_kalithresh : public BossAI
 {
-    boss_warlord_kalithresh(Creature* creature) : BossAI(creature, DATA_WARLORD_KALITHRESH) { }
+    boss_warlord_kalithresh(Creature* creature) : BossAI(creature, DATA_WARLORD_KALITHRESH), _introDone(false) { }
 
     void Reset() override
     {
@@ -50,6 +55,17 @@ struct boss_warlord_kalithresh : public BossAI
             minion->SetReactState(REACT_PASSIVE);
             minion->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         });
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_introDone && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 50.0f))
+        {
+            Talk(SAY_INTRO);
+            _introDone = true;
+        }
+
+        ScriptedAI::MoveInLineOfSight(who);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -71,14 +87,42 @@ struct boss_warlord_kalithresh : public BossAI
             context.Repeat(45s, 55s);
         }).Schedule(20s, [this](TaskContext context)
         {
-            if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 100.0f))
+            Talk(SAY_REGEN);
+            if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 8.0f))
             {
-                Talk(SAY_REGEN);
                 distiller->AI()->DoCast(me, SPELL_WARLORDS_RAGE_DISTILLER, true);
                 distiller->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             }
+            else
+            {
+                if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 100.0f))
+                {
+                    me->GetMotionMaster()->MovePoint(POINT_DISTILLER, distiller->GetNearPosition(8.0f, me->GetOrientation()));
+                }
+            }
+
             context.Repeat(45s);
         });
+    }
+
+    void MovementInform(uint32 type, uint32 point) override
+    {
+        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
+            return;
+
+        if (point == POINT_DISTILLER)
+        {
+            if (Creature* distiller = me->FindNearestCreature(NPC_NAGA_DISTILLER, 10.0f))
+            {
+                distiller->AI()->DoCast(me, SPELL_WARLORDS_RAGE_DISTILLER, true);
+                distiller->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetFacingToObject(distiller);
+            }
+
+            me->m_Events.AddEventAtOffset([this]() {
+                me->ResumeChasingVictim();
+            }, 2s);
+        }
     }
 
     void KilledUnit(Unit* victim) override
@@ -97,6 +141,9 @@ struct boss_warlord_kalithresh : public BossAI
             minion->KillSelf();
         });
     }
+
+private:
+    bool _introDone;
 };
 
 // 31543 - Warlord's Rage
