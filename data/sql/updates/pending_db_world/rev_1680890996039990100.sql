@@ -228,3 +228,6 @@ UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '18950' WHERE (`ent
 
 -- Blood Guard
 UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '18950' WHERE (`entry` IN (17461, 20581, 20923));
+
+-- Fel Orc Convert
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`|33554432 WHERE (`entry` = 17083);
