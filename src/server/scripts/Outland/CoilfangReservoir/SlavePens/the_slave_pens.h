@@ -64,7 +64,8 @@ enum SPCreaturesIds
     NPC_SHAMAN_BEAM_BUNNY_001            = 25965,
     NPC_SHAMAN_BEAM_BUNNY_002            = 25966,
     NPC_WHISP_DEST_BUNNY                 = 26120,
-    NPC_WHISP_SOURCE_BUNNY               = 26121
+    NPC_WHISP_SOURCE_BUNNY               = 26121,
+    NPC_QUAGMIRRAN                       = 17942
 };
 
 enum SPGameObjectIds

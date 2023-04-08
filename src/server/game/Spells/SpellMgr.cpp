@@ -2211,8 +2211,8 @@ void SpellMgr::LoadSpellEnchantProcData()
 
     mSpellEnchantProcEventMap.clear();                             // need for reload case
 
-    //                                                  0         1           2         3
-    QueryResult result = WorldDatabase.Query("SELECT entry, customChance, PPMChance, procEx FROM spell_enchant_proc_data");
+    //                                                  0         1           2         3          4
+    QueryResult result = WorldDatabase.Query("SELECT entry, customChance, PPMChance, procEx, attributeMask FROM spell_enchant_proc_data");
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 spell enchant proc event conditions. DB table `spell_enchant_proc_data` is empty.");
@@ -2239,6 +2239,7 @@ void SpellMgr::LoadSpellEnchantProcData()
         spe.customChance = fields[1].Get<uint32>();
         spe.PPMChance = fields[2].Get<float>();
         spe.procEx = fields[3].Get<uint32>();
+        spe.attributeMask = fields[4].Get<uint32>();
 
         mSpellEnchantProcEventMap[enchantId] = spe;
 
