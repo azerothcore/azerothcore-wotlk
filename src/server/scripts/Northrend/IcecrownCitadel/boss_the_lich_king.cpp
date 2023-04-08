@@ -1355,7 +1355,7 @@ public:
             {
                 // remove glow on ashbringer and tirion
                 me->RemoveAllAuras();
-                SetEquipmentSlots(false, EQUIP_ASHBRINGER, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
+                SetEquipmentSlots(false, EQUIP_ASHBRINGER);
             }
         }
 
@@ -1596,7 +1596,7 @@ public:
                             lichKing->SetImmuneToNPC(false);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                             me->RemoveAllAuras();
-                            SetEquipmentSlots(false, EQUIP_ASHBRINGER, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
+                            SetEquipmentSlots(false, EQUIP_ASHBRINGER);
                             me->Attack(lichKing, true);
                             me->GetMotionMaster()->MovePoint(0, 512.16f, -2120.25f, 840.86f);
                         }
