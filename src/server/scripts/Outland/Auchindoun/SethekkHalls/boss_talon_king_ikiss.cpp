@@ -82,8 +82,8 @@ struct boss_talon_king_ikiss : public BossAI
     void TeleportAndCastExplosion()
     {
         me->InterruptNonMeleeSpells(false);
-        DoCastSelf(SPELL_ARCANE_BUBBLE, true);
         DoCastAOE(SPELL_BLINK);
+        DoCastSelf(SPELL_ARCANE_BUBBLE, true);
         Talk(EMOTE_ARCANE_EXP);
 
         scheduler.Schedule(1s, [this](TaskContext)
