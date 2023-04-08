@@ -108,12 +108,9 @@ class spell_warlords_rage : public AuraScript
     {
         if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
         {
-            if (GetCaster() && GetCaster()->IsAlive())
+            if (GetTarget())
             {
-                if (Unit* kali = GetTarget())
-                {
-                    kali->CastSpell(kali, SPELL_WARLORDS_RAGE_PROC, true);
-                }
+                GetTarget()->CastSpell(GetTarget(), SPELL_WARLORDS_RAGE_PROC, true);
             }
         }
     }
