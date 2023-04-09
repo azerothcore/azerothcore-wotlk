@@ -177,14 +177,14 @@ public:
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_AGGRO);
         SetPhase(PHASE_GROUNDED);
 
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT); // just in case at reset some players already left the instance
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
 
         me->SummonCreature(NPC_ONYXIAN_LAIR_GUARD, -167.837936f, -200.549332f, -66.343231f, 5.598287f, TEMPSUMMON_MANUAL_DESPAWN);
     }
@@ -552,7 +552,7 @@ public:
 
     EventMap events;
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         events.Reset();
         events.ScheduleEvent(EVENT_OLG_SPELL_BLASTNOVA, 15000);

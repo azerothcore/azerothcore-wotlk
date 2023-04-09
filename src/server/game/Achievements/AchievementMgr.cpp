@@ -2341,7 +2341,7 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket* data) const
         *data << uint32(iter->first);
         data->appendPackGUID(iter->second.counter);
         *data << GetPlayer()->GetPackGUID();
-        *data << uint32(0); // TODO: This should be 1 if it is a failed timed criteria
+        *data << uint32(0); /// @todo: This should be 1 if it is a failed timed criteria
         data->AppendPackedTime(iter->second.date);
         *data << uint32(now - iter->second.date);
         *data << uint32(now - iter->second.date);
@@ -2480,6 +2480,12 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
         AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(entryId);
         if (!criteria)
             continue;
+
+        if (!GetAchievement(criteria->referredAchievement))
+        {
+            LOG_DEBUG("server.loading", "Achievement {} referenced by criteria {} doesn't exist, criteria not loaded.", criteria->referredAchievement, criteria->ID);
+            continue;
+        }
 
         _achievementCriteriasByType[criteria->requiredType].push_back(criteria);
         _achievementCriteriaListByAchievement[criteria->referredAchievement].push_back(criteria);

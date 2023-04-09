@@ -40,7 +40,38 @@ class spell_fungal_decay : public AuraScript
     }
 };
 
+enum AllergiesEnum
+{
+    SPELL_SNEEZE    = 31428
+};
+
+class spell_allergies : public AuraScript
+{
+    PrepareAuraScript(spell_allergies);
+
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+    {
+        isPeriodic = true;
+        amplitude = urand(10 * IN_MILLISECONDS, 60 * IN_MILLISECONDS);
+    }
+
+    void Update(AuraEffect* /*effect*/)
+    {
+        if (Unit* target = GetUnitOwner())
+        {
+            target->CastSpell(target, SPELL_SNEEZE, true);
+        }
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_allergies::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_allergies::Update, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_underbog()
 {
     RegisterSpellScript(spell_fungal_decay);
+    RegisterSpellScript(spell_allergies);
 }

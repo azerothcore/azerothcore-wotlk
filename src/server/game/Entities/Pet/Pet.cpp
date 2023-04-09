@@ -1005,7 +1005,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     return true;
 }
 
-// TODO: Move stat mods code to pet passive auras
+/// @todo: Move stat mods code to pet passive auras
 bool Guardian::InitStatsForLevel(uint8 petlevel)
 {
     CreatureTemplate const* cinfo = GetCreatureTemplate();
@@ -1047,6 +1047,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
             else if (petType != SUMMON_PET)
                 LOG_ERROR("entities.pet", "Unknown type pet {} is summoned by player class {}", GetEntry(), owner->getClass());
+        }
+
+        if (petType == HUNTER_PET || petType == SUMMON_PET)
+        {
+            SetSpeed(MOVE_RUN, 1.15f);
         }
     }
 
@@ -1107,6 +1112,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         // xinef: multiply base values by creature_template factors!
         float factorHealth = owner->GetTypeId() == TYPEID_PLAYER ? std::min(1.0f, cinfo->ModHealth) : cinfo->ModHealth;
         float factorMana = owner->GetTypeId() == TYPEID_PLAYER ? std::min(1.0f, cinfo->ModMana) : cinfo->ModMana;
+
+        if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
+        {
+            factorHealth *= _GetHealthMod(cinfo->rank);
+        }
 
         SetCreateHealth(std::max<uint32>(1, stats->BaseHealth[cinfo->expansion]*factorHealth));
         SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, GetCreateHealth());
@@ -2091,34 +2101,52 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
 {
     // not need after this call
     if (owner->ToPlayer()->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
+    {
         owner->ToPlayer()->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS, true);
+    }
 
     // reset for online
     if (onlinePet)
+    {
         onlinePet->resetTalents();
+    }
 
     PetStable* petStable = owner->GetPetStable();
     if (!petStable)
+    {
         return;
+    }
 
     std::unordered_set<uint32> petIds;
     if (petStable->CurrentPet)
+    {
         petIds.insert(petStable->CurrentPet->PetNumber);
+    }
 
     for (Optional<PetStable::PetInfo> const& stabledPet : petStable->StabledPets)
+    {
         if (stabledPet)
+        {
             petIds.insert(stabledPet->PetNumber);
+        }
+    }
 
     for (PetStable::PetInfo const& unslottedPet : petStable->UnslottedPets)
+    {
         petIds.insert(unslottedPet.PetNumber);
+    }
 
     // now need only reset for offline pets (all pets except online case)
     if (onlinePet)
+    {
         petIds.erase(onlinePet->GetCharmInfo()->GetPetNumber());
+    }
 
     // no offline pets
-    if (!petIds.empty())
+    if (petIds.empty())
+    {
         return;
+    }
 
     bool need_comma = false;
     std::ostringstream ss;
@@ -2127,7 +2155,9 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
     for (uint32 id : petIds)
     {
         if (need_comma)
+        {
             ss << ',';
+        }
 
         ss << id;
 
@@ -2140,7 +2170,9 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
     for (uint32 spell : sPetTalentSpells)
     {
         if (need_comma)
+        {
             ss << ',';
+        }
 
         ss << spell;
 

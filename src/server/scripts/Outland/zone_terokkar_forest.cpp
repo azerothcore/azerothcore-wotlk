@@ -364,7 +364,7 @@ public:
             me->SetFaction(FACTION_HOSTILE);
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void DoNice()
         {
@@ -520,7 +520,7 @@ public:
                 me->SetFaction(m_uiNormFaction);
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -641,7 +641,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_WRATH, 0);

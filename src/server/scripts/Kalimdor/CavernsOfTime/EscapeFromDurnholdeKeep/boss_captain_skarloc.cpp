@@ -67,13 +67,11 @@ public:
         boss_captain_skarlocAI(Creature* creature) : ScriptedAI(creature), summons(me) { }
 
         EventMap events;
-        EventMap events2;
         SummonList summons;
 
         void Reset() override
         {
             events.Reset();
-            events2.Reset();
             summons.DespawnAll();
         }
 
@@ -120,22 +118,42 @@ public:
             }
             else if (id == 2)
             {
-                me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
                 me->Dismount();
                 me->SetWalk(true);
                 for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                         summon->SetWalk(true);
+                if (Creature* mount = me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
+                {
+                    mount->SetImmuneToNPC(true);
+                    mount->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                }
             }
 
             if (me->movespline->Finalized())
             {
-                events2.ScheduleEvent(EVENT_INITIAL_TALK, 500);
-                events2.ScheduleEvent(EVENT_START_FIGHT, 8000);
+                Talk(SAY_ENTER, 500ms);
+
+                me->m_Events.AddEventAtOffset([this]()
+                {
+                    me->SetImmuneToAll(false);
+                    me->SetInCombatWithZone();
+                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    {
+                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                        {
+                            if (summon->GetEntry() != NPC_SKARLOC_MOUNT)
+                            {
+                                summon->SetImmuneToAll(false);
+                                summon->SetInCombatWithZone();
+                            }
+                        }
+                    }
+                }, 8s);
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->CastSpell(me, SPELL_DEVOTION_AURA, true);
 
@@ -161,25 +179,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            events2.Update(diff);
-            switch (events2.ExecuteEvent())
-            {
-                case EVENT_INITIAL_TALK:
-                    Talk(SAY_ENTER);
-                    break;
-                case EVENT_START_FIGHT:
-                    me->SetImmuneToAll(false);
-                    me->SetInCombatWithZone();
-                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                            if (summon->GetEntry() != NPC_SKARLOC_MOUNT)
-                            {
-                                summon->SetImmuneToAll(false);
-                                summon->SetInCombatWithZone();
-                            }
-                    break;
-            }
-
             if (!UpdateVictim())
                 return;
 
@@ -204,7 +203,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_HAMMER, 30000);
                     break;
                 case EVENT_SPELL_HOLY_SHIELD:
-                    me->CastSpell(me, SPELL_CLEANSE, false);
+                    me->CastSpell(me, SPELL_HOLY_SHIELD, false);
                     events.ScheduleEvent(SPELL_HOLY_SHIELD, 30000);
                     break;
                 case EVENT_SPELL_CONSECRATION:

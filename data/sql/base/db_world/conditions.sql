@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.conditions
+-- Dumping structure for table acore_world.conditions
 DROP TABLE IF EXISTS `conditions`;
 CREATE TABLE IF NOT EXISTS `conditions` (
   `SourceTypeOrReferenceId` mediumint NOT NULL DEFAULT '0',
@@ -33,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `conditions` (
   PRIMARY KEY (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Condition System';
 
--- Dumpar data för tabell acore_world.conditions: 14 793 rows
+-- Dumping data for table acore_world.conditions: 14,884 rows
 DELETE FROM `conditions`;
 /*!40000 ALTER TABLE `conditions` DISABLE KEYS */;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
@@ -1045,9 +1047,9 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(1, 18064, 26043, 0, 0, 6, 0, 469, 0, 0, 0, 0, 0, '', NULL),
 	(1, 18065, 26042, 0, 0, 6, 0, 67, 0, 0, 0, 0, 0, '', NULL),
 	(1, 18065, 26043, 0, 0, 6, 0, 469, 0, 0, 0, 0, 0, '', NULL),
-	(1, 18088, 24330, 0, 0, 8, 0, 9720, 0, 0, 0, 0, 0, '', NULL),
+	(1, 18088, 24330, 0, 0, 8, 0, 9718, 0, 0, 0, 0, 0, '', NULL),
 	(1, 18088, 24330, 0, 0, 9, 0, 9731, 0, 0, 1, 0, 0, '', NULL),
-	(1, 18089, 24330, 0, 0, 8, 0, 9720, 0, 0, 0, 0, 0, '', NULL),
+	(1, 18089, 24330, 0, 0, 8, 0, 9718, 0, 0, 0, 0, 0, '', NULL),
 	(1, 18089, 24330, 0, 0, 9, 0, 9731, 0, 0, 1, 0, 0, '', NULL),
 	(1, 18124, 24483, 0, 0, 6, 0, 469, 0, 0, 0, 0, 0, '', NULL),
 	(1, 18124, 24484, 0, 0, 6, 0, 67, 0, 0, 0, 0, 0, '', NULL),
@@ -1080,7 +1082,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(1, 18331, 29460, 0, 0, 8, 0, 10970, 0, 0, 0, 0, 0, '', NULL),
 	(1, 18334, 26042, 0, 0, 6, 0, 67, 0, 0, 0, 0, 0, '', NULL),
 	(1, 18334, 26043, 0, 0, 6, 0, 469, 0, 0, 0, 0, 0, '', NULL),
-	(1, 18340, 24330, 0, 0, 8, 0, 9720, 0, 0, 0, 0, 0, '', NULL),
+	(1, 18340, 24330, 0, 0, 8, 0, 9718, 0, 0, 0, 0, 0, '', NULL),
 	(1, 18340, 24330, 0, 0, 9, 0, 9731, 0, 0, 1, 0, 0, '', NULL),
 	(1, 18341, 28558, 0, 0, 1, 0, 33377, 0, 0, 0, 0, 0, '', NULL),
 	(1, 18343, 28558, 0, 0, 1, 0, 33377, 0, 0, 0, 0, 0, '', NULL),
@@ -1280,9 +1282,9 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(1, 20052, 30304, 0, 0, 7, 0, 165, 1, 0, 0, 0, 0, '', NULL),
 	(1, 20052, 30321, 0, 0, 7, 0, 164, 1, 0, 0, 0, 0, '', NULL),
 	(1, 20052, 30322, 0, 0, 7, 0, 164, 1, 0, 0, 0, 0, '', NULL),
-	(1, 20088, 24330, 0, 0, 8, 0, 9720, 0, 0, 0, 0, 0, '', NULL),
+	(1, 20088, 24330, 0, 0, 8, 0, 9718, 0, 0, 0, 0, 0, '', NULL),
 	(1, 20088, 24330, 0, 0, 9, 0, 9731, 0, 0, 1, 0, 0, '', NULL),
-	(1, 20089, 24330, 0, 0, 8, 0, 9720, 0, 0, 0, 0, 0, '', NULL),
+	(1, 20089, 24330, 0, 0, 8, 0, 9718, 0, 0, 0, 0, 0, '', NULL),
 	(1, 20089, 24330, 0, 0, 9, 0, 9731, 0, 0, 1, 0, 0, '', NULL),
 	(1, 20134, 21911, 0, 0, 7, 0, 197, 1, 0, 0, 0, 0, '', NULL),
 	(1, 20135, 21911, 0, 0, 7, 0, 197, 1, 0, 0, 0, 0, '', NULL),
@@ -9575,7 +9577,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(15, 8918, 0, 0, 0, 2, 0, 33618, 1, 0, 1, 0, 0, '', 'Gossip Option requires Player does not have worg disguise'),
 	(15, 8918, 0, 0, 0, 8, 0, 11322, 0, 0, 0, 0, 0, '', 'Gossip Option requires The Cleansing rewarded'),
 	(15, 8918, 0, 0, 0, 8, 0, 11326, 0, 0, 1, 0, 0, '', 'Gossip Option requires Alpha Worg not rewarded'),
-	(15, 8934, 0, 0, 0, 8, 0, 11122, 0, 0, 0, 0, 0, '', 'Gossip item requires quest rewarded'),
+	(15, 8934, 1, 0, 0, 1, 0, 43883, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player does not have Aura "Rental Racing Ram"'),
 	(15, 8954, 0, 0, 0, 9, 0, 11390, 0, 0, 0, 0, 0, '', 'Show gossip option 0 if player has quest I\'ve got a Flying Machine'),
 	(15, 8991, 0, 0, 0, 28, 0, 11448, 0, 0, 0, 0, 0, '', 'McGoyver show gossip option only if player has completed but not rewarded quest The Explorers\' League Outpost'),
 	(15, 8991, 1, 0, 0, 8, 0, 11448, 0, 0, 0, 0, 0, '', 'McGoyver show gossip option only if player has rewarded quest The Explorers\' League Outpost'),
@@ -11903,13 +11905,11 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(17, 0, 48290, 0, 0, 31, 1, 3, 27213, 0, 0, 0, 0, '', '\'Onslaught Riding Crop\' can only target \'Onslaught Warhorse\''),
 	(17, 0, 48328, 0, 0, 28, 0, 12151, 0, 0, 1, 0, 0, '', 'Do not summon Grom\'thar, if player has quest objective completed, but not yet rewarded.'),
 	(17, 0, 48328, 0, 0, 29, 0, 27002, 100, 0, 1, 0, 0, '', 'Do not summon Grom\'thar, if he is already spawned (100 Yards)'),
-	(17, 0, 48363, 0, 0, 29, 0, 27315, 5, 0, 0, 0, 0, '', 'Required NPC to cast Spell'),
-	(17, 0, 48363, 0, 1, 29, 0, 27336, 5, 0, 0, 0, 0, '', 'Required NPC to cast Spell'),
+	(14, 6644, 8701, 0, 0, 13, 0, 8, 3, 2, 1, 0, 0, '', 'Andorgos show text 8701 gossip if Ouro is not done'),
 	(17, 0, 48388, 0, 0, 23, 0, 4188, 0, 0, 0, 172, 26, '', 'Limit Call Wintergarde Gryphon use to The Carrion Fields'),
 	(17, 0, 48388, 0, 1, 23, 0, 4177, 0, 0, 0, 172, 26, '', 'Limit Call Wintergarde Gryphon use to Wintergrasp Keep'),
-	(17, 0, 48397, 0, 0, 29, 0, 27315, 5, 0, 0, 0, 0, '', 'Required NPC to cast Spell'),
-	(17, 0, 48397, 0, 0, 30, 0, 188679, 15, 0, 0, 0, 0, '', 'Spell focus for Drop Off Helpless Wintergarde Villager'),
-	(17, 0, 48397, 0, 1, 29, 0, 27336, 5, 0, 0, 0, 0, '', 'Required NPC to cast Spell'),
+	(14, 6644, 8701, 0, 0, 13, 0, 7, 3, 2, 0, 0, 0, '', 'Andorgos show text 8701 if Twin Emperors is done'),
+	(14, 6644, 7899, 0, 0, 13, 0, 7, 3, 2, 1, 0, 0, '', 'Andorgos show text 7899 if Twin Emperors is not done'),
 	(17, 0, 48549, 0, 0, 31, 1, 3, 26633, 0, 0, 0, 0, '', NULL),
 	(17, 0, 48549, 0, 0, 36, 1, 0, 0, 0, 1, 0, 0, '', NULL),
 	(17, 0, 48603, 0, 0, 31, 1, 3, 27209, 0, 0, 0, 0, '', NULL),
@@ -14235,7 +14235,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(13, 1, 12938, 0, 3, 31, 0, 3, 7664, 0, 0, 0, 0, '', 'Fel Curse Targets Razelikh the Defiler'),
 	(13, 1, 12938, 0, 4, 31, 0, 3, 7668, 0, 0, 0, 0, '', 'Fel Curse Targets Servent of Razelikh'),
 	(15, 5502, 0, 0, 0, 2, 0, 5462, 1, 1, 1, 0, 0, '', 'Only show gossip option if player doesn\'t have item Dartol\'s Rod of Transformation'),
-	(15, 5502, 0, 0, 0, 8, 0, 1046, 0, 0, 0, 0, 0, '', 'Only show gossip option if player has completed quest 1046'),
+	(15, 5502, 0, 0, 0, 8, 0, 1030, 0, 0, 0, 0, 0, '', 'Only show gossip option if player has completed quest 1030'),
 	(17, 0, 15702, 0, 0, 31, 1, 3, 6556, 0, 0, 0, 0, '', 'Filling Empty Jar can be used on Muculent Ooze'),
 	(17, 0, 15702, 0, 1, 31, 1, 3, 6557, 0, 0, 0, 0, '', 'Filling Empty Jar can be used on Muculent Ooze'),
 	(17, 0, 15702, 0, 2, 31, 1, 3, 6559, 0, 0, 0, 0, '', 'Filling Empty Jar can be used on Muculent Ooze'),
@@ -14655,7 +14655,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(13, 1, 68798, 0, 0, 31, 0, 3, 36530, 0, 0, 0, 0, '', 'Spell Concentrated Alluring Perfume Spill targets [DND] Valentine Boss - Vial Bunny'),
 	(13, 5, 19832, 0, 0, 31, 0, 3, 12435, 0, 0, 0, 0, '', 'Possess targets Razorgore the Untamed'),
 	(13, 1, 19873, 0, 0, 31, 0, 5, 177807, 0, 0, 0, 0, '', 'Destroy Egg targets Razorgore\'s Egg'),
-	(17, 0, 23642, 0, 0, 31, 1, 3, 13020, 0, 0, 0, 0, '', 'Nefarius Corruption only affects Vaelastrasz'),
+	(17, 0, 23642, 0, 0, 31, 1, 3, 13020, 0, 0, 0, 0, '', 'Nefarius Corruption only affects Vaelastrasz the Corrupt'),
 	(14, 6445, 7638, 0, 0, 8, 0, 8227, 0, 0, 1, 0, 0, '', 'Group 0: Show gossip text 7638 if quest \'Nat\'s Measuring Tape\' is not rewarded'),
 	(14, 6445, 7639, 0, 0, 8, 0, 8227, 0, 0, 0, 0, 0, '', 'Group 0: Show gossip text 7639 if quest \'Nat\'s Measuring Tape\' is rewarded'),
 	(15, 6445, 0, 0, 0, 8, 0, 8227, 0, 0, 0, 0, 0, '', 'Group 0: Show Gossip Option 0 if quest \'Nat\'s Measuring Tape\' is rewarded'),
@@ -14830,9 +14830,103 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(14, 7048, 8305, 0, 0, 13, 0, 1, 3, 2, 0, 0, 0, '', 'Show gossip option if Rajaxx is done'),
 	(15, 7048, 0, 0, 0, 13, 0, 1, 3, 2, 0, 0, 0, '', 'Show gossip option if Rajaxx is done'),
 	(15, 7048, 1, 0, 0, 13, 0, 1, 3, 2, 1, 0, 0, '', 'Show gossip option if Rajaxx is not done'),
-	(23, 15471, 0, 0, 0, 13, 0, 1, 3, 2, 0, 0, 0, '', 'Show vendor npc flag option if Rajaxx is done');
+	(23, 15471, 0, 0, 0, 13, 0, 1, 3, 2, 0, 0, 0, '', 'Show vendor npc flag option if Rajaxx is done'),
+	(29, 0, 15514, 0, 0, 13, 0, 16, 2, 0, 1, 0, 0, '', 'Buru Egg spawn only if Buru is in egg phase.'),
+	(14, 6644, 8702, 0, 0, 13, 0, 8, 3, 2, 0, 0, 0, '', 'Andorgos show text 8702 gossip if Ouro is done'),
+	(15, 6644, 0, 0, 0, 13, 0, 7, 3, 2, 0, 0, 0, '', 'Andorgos show gossip if Twin Emperors is done'),
+	(15, 6644, 1, 0, 0, 13, 0, 8, 3, 2, 0, 0, 0, '', 'Andorgos show gossip if Ouro is done'),
+	(14, 6793, 8080, 0, 0, 29, 0, 15727, 250, 0, 0, 0, 0, '', 'Show gossip if Cthun is alive'),
+	(14, 6793, 8111, 0, 0, 29, 0, 15727, 250, 1, 0, 0, 0, '', 'Show gossip if Cthun is dead'),
+	(14, 6794, 8078, 0, 0, 29, 0, 15727, 250, 0, 0, 0, 0, '', 'Show gossip if Cthun is alive'),
+	(14, 6794, 8112, 0, 0, 29, 0, 15727, 250, 1, 0, 0, 0, '', 'Show gossip if Cthun is dead'),
+	(14, 6795, 8079, 0, 0, 29, 0, 15727, 250, 0, 0, 0, 0, '', 'Show gossip if Cthun is alive'),
+	(14, 6795, 8113, 0, 0, 29, 0, 15727, 250, 1, 0, 0, 0, '', 'Show gossip if Cthun is dead'),
+	(19, 0, 374, 0, 0, 8, 0, 427, 0, 0, 0, 0, 0, '', 'Enable quest 374, only if the player has completed quest 427.'),
+	(15, 6560, 0, 0, 0, 9, 0, 8309, 0, 0, 0, 0, 0, '', 'Requires Quest Taken'),
+	(15, 6560, 0, 0, 0, 2, 0, 20455, 1, 0, 1, 0, 0, '', 'Requires Missing Item'),
+	(15, 6560, 0, 0, 0, 2, 0, 20453, 1, 0, 0, 0, 0, '', 'Requires Item'),
+	(15, 6561, 0, 0, 0, 9, 0, 8309, 0, 0, 0, 0, 0, '', 'Requires Quest Taken'),
+	(15, 6561, 0, 0, 0, 2, 0, 20456, 1, 0, 1, 0, 0, '', 'Requires Missing Item'),
+	(15, 6561, 0, 0, 0, 2, 0, 20453, 1, 0, 0, 0, 0, '', 'Requires Item'),
+	(15, 6559, 0, 0, 0, 9, 0, 8309, 0, 0, 0, 0, 0, '', 'Requires Quest Taken'),
+	(15, 6559, 0, 0, 0, 2, 0, 20454, 1, 0, 1, 0, 0, '', 'Requires Missing Item'),
+	(15, 6559, 0, 0, 0, 2, 0, 20453, 1, 0, 0, 0, 0, '', 'Requires Item'),
+	(15, 12039, 1, 0, 0, 2, 0, 12219, 1, 0, 0, 0, 0, '', 'Show gossip option if player has Unadorned Seal of Ascension'),
+	(15, 12039, 1, 0, 0, 27, 0, 57, 3, 0, 0, 0, 0, '', 'Show gossip option if player is at least level 57'),
+	(15, 12039, 0, 0, 0, 2, 0, 12219, 1, 0, 1, 0, 0, '', 'Show gossip option if player does not have Unadorned Seal of Ascension'),
+	(15, 12039, 0, 0, 0, 27, 0, 57, 3, 0, 0, 0, 0, '', 'Show gossip option if player is at least level 57'),
+	(22, 4, 10299, 0, 0, 2, 0, 12219, 1, 0, 1, 0, 0, '', 'Show gossip text if player does not have Unadorned Seal of Ascension'),
+	(22, 4, 10299, 0, 1, 27, 0, 57, 3, 0, 1, 0, 0, '', 'Show gossip text if player is below level 57'),
+	(22, 5, 10299, 0, 0, 2, 0, 12219, 1, 0, 0, 0, 0, '', 'Show gossip text if player has Unadorned Seal of Ascension'),
+	(22, 5, 10299, 0, 0, 27, 0, 57, 3, 0, 0, 0, 0, '', 'Show gossip text if player is at least level 57'),
+	(17, 0, 16349, 0, 0, 4, 0, 1583, 0, 0, 0, 39, 0, '', 'Ring of Ascension on-use-effect only if inside Blackrock Spire'),
+	(17, 0, 16349, 0, 0, 13, 0, 10, 1, 2, 0, 172, 0, '', 'Ring of Ascension on-use-effect only if boss state 10 (Rend) is IN_PROGRESS.'),
+	(17, 0, 16349, 0, 0, 13, 0, 25, 0, 0, 0, 172, 0, '', 'Ring of Ascension on-use-effect only if boss state 25 (Vaelastrasz) is NOT_STARTED.'),
+	(17, 0, 23642, 0, 1, 31, 1, 3, 10538, 0, 0, 0, 0, '', 'Nefarius Corruption only affects Vaelastrasz'),
+	(15, 8934, 1, 0, 0, 47, 0, 11122, 10, 0, 0, 0, 0, '', 'Show Gossip option only if player does not have "There and Back Again" taken'),
+	(15, 8934, 1, 0, 0, 28, 0, 11122, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player has not quest "There and Back Again" rewarded'),
+	(15, 8934, 2, 0, 0, 1, 0, 43883, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player does not have Aura "Rental Racing Ram"'),
+	(15, 8934, 2, 0, 0, 47, 0, 11318, 10, 0, 0, 0, 0, '', 'Show Gossip option only if player does not have "Now This is Ram Racing... Almost." taken'),
+	(15, 8934, 2, 0, 0, 28, 0, 11318, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player has not quest "Now This is Ram Racing... Almost." rewarded'),
+	(15, 8934, 3, 0, 0, 1, 0, 43883, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player does not have Aura "Rental Racing Ram"'),
+	(15, 8934, 3, 0, 0, 47, 0, 11293, 10, 0, 0, 0, 0, '', 'Show Gossip option only if player does not have "Bark for the Barleybrews!" taken'),
+	(15, 8934, 3, 0, 1, 47, 0, 11294, 10, 0, 0, 0, 0, '', 'Show Gossip option only if player does not have "Bark for the Thunderbrews!" taken'),
+	(15, 8934, 3, 0, 0, 28, 0, 11293, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player has not quest "Bark for the Barleybrews!" rewarded'),
+	(15, 8934, 3, 0, 1, 28, 0, 11294, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player has not quest "Bark for the Thunderbrews!" rewarded'),
+	(15, 8934, 4, 0, 0, 8, 0, 11122, 0, 0, 0, 0, 0, '', 'Brewfest Relay Race - Show gossip if player has turned in the quest "There and Back Again"'),
+	(15, 8934, 4, 0, 0, 1, 0, 44689, 0, 0, 1, 0, 0, '', 'Brewfest Relay Race - Show gossip if player does not have aura "Relay Race Accept Hidden Debuff - DND"'),
+	(15, 8934, 4, 0, 0, 1, 0, 43883, 0, 0, 1, 0, 0, '', 'Brewfest Relay Race - Show gossip if player does not have aura "Rental Racing Ram"'),
+	(15, 8976, 1, 0, 0, 1, 0, 43883, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player does not have Aura "Rental Racing Ram"'),
+	(15, 8976, 1, 0, 0, 47, 0, 11412, 10, 0, 0, 0, 0, '', 'Show Gossip option only if player does not have "There and Back Again" taken'),
+	(15, 8976, 1, 0, 0, 28, 0, 11412, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player has not quest "There and Back Again" rewarded'),
+	(15, 8976, 2, 0, 0, 1, 0, 43883, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player does not have Aura "Rental Racing Ram"'),
+	(15, 8976, 2, 0, 0, 47, 0, 11409, 10, 0, 0, 0, 0, '', 'Show Gossip option only if player does not have "Now This is Ram Racing... Almost." taken'),
+	(15, 8976, 2, 0, 0, 28, 0, 11409, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player has not quest "Now This is Ram Racing... Almost." rewarded'),
+	(15, 8976, 3, 0, 0, 1, 0, 43883, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player does not have Aura "Rental Racing Ram"'),
+	(15, 8976, 3, 0, 0, 47, 0, 11407, 10, 0, 0, 0, 0, '', 'Show Gossip option only if player does not have "Bark for Drohns Distillery!" taken'),
+	(15, 8976, 3, 0, 1, 47, 0, 11408, 10, 0, 0, 0, 0, '', 'Show Gossip option only if player does not have "Bark for Tchalis Voodoo Brewery!" taken'),
+	(15, 8976, 3, 0, 0, 28, 0, 11407, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player has not quest "Bark for Drohns Distillery!" rewarded'),
+	(15, 8976, 3, 0, 1, 28, 0, 11408, 0, 0, 1, 0, 0, '', 'Show Gossip option only if player has not quest "Bark for Tchalis Voodoo Brewery!" rewarded'),
+	(15, 8976, 4, 0, 0, 8, 0, 11412, 0, 0, 0, 0, 0, '', 'Brewfest Relay Race - Show gossip if player has turned in the quest "There and Back Again"'),
+	(15, 8976, 4, 0, 0, 1, 0, 44689, 0, 0, 1, 0, 0, '', 'Brewfest Relay Race - Show gossip if player does not have aura "Relay Race Accept Hidden Debuff - DND"'),
+	(15, 8976, 4, 0, 0, 1, 0, 43883, 0, 0, 1, 0, 0, '', 'Brewfest Relay Race - Show gossip if player does not have aura "Rental Racing Ram"'),
+	(15, 6529, 0, 0, 0, 2, 0, 20402, 1, 0, 1, 0, 0, '', 'If player does not have \'Agent of Nozdormu\' in inventory'),
+	(19, 0, 8225, 0, 0, 12, 0, 90, 0, 0, 0, 0, 0, '', 'Fishing Extravaganza - Turn-ins active'),
+	(19, 0, 8224, 0, 0, 12, 0, 90, 0, 0, 0, 0, 0, '', 'Fishing Extravaganza - Turn-ins active'),
+	(19, 0, 8221, 0, 0, 12, 0, 90, 0, 0, 0, 0, 0, '', 'Fishing Extravaganza - Turn-ins active'),
+	(19, 0, 8194, 0, 0, 12, 0, 90, 0, 0, 0, 0, 0, '', 'Fishing Extravaganza - Turn-ins active'),
+	(19, 0, 8194, 0, 0, 11, 0, 198, 1, 0, 0, 0, 0, '', 'Fishing Extravaganza - fishing event has a winner'),
+	(15, 10311, 0, 0, 0, 7, 0, 185, 15, 0, 0, 0, 0, '', 'Show vendor flag if player has cooking'),
+	(15, 10311, 0, 0, 0, 8, 0, 862, 0, 0, 0, 0, 0, '', 'Show vendor flag if player player has quest Dig Rat Stew rewarded'),
+	(23, 3443, 0, 0, 0, 7, 0, 185, 15, 0, 0, 0, 0, '', 'Show vendor flag if player has cooking'),
+	(23, 3443, 0, 0, 0, 8, 0, 862, 0, 0, 0, 0, 0, '', 'Show vendor flag if player player has quest Dig Rat Stew rewarded'),
+	(13, 3, 34303, 0, 0, 32, 0, 144, 0, 0, 1, 0, 0, '', 'Nether Charge cannot target players'),
+	(14, 9581, 12932, 0, 0, 15, 0, 128, 0, 0, 1, 0, 0, '', 'Portal Trainer - Show gossip menu if player is not a mage'),
+	(14, 9581, 12933, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Portal Trainer - Show gossip menu if player is a mage'),
+	(13, 1, 32930, 0, 0, 31, 0, 3, 18778, 0, 0, 0, 0, '', 'Blue Beam (32930) can only target Cosmetic Raging Soul (18778)'),
+	(15, 6529, 0, 0, 0, 2, 0, 20402, 1, 1, 1, 0, 0, '', 'If player does not have \'Agent of Nozdormu\' in bank'),
+	(15, 6529, 0, 0, 0, 8, 0, 8301, 0, 0, 0, 0, 0, '', 'If player has quest \'The Path of the Righteous\' rewarded'),
+	(30, 0, 24753, 0, 0, 33, 0, 1, 2, 0, 0, 0, 0, '', 'Pint-Sized Pink Pachyderm visible only if target is in party with its owner'),
+	(30, 0, 24753, 0, 1, 10, 0, 2, 0, 0, 0, 0, 0, '', 'Pint-Sized Pink Pachyderm visible only if target is drunk'),
+	(30, 0, 22943, 0, 0, 33, 0, 1, 2, 0, 0, 0, 0, '', 'Pint-Sized Pink Pachyderm visible only if target is in party with its owner'),
+	(30, 0, 22943, 0, 1, 10, 0, 2, 0, 0, 0, 0, 0, '', 'Pint-Sized Pink Pachyderm visible only if target is drunk'),
+	(15, 3651, 0, 0, 0, 2, 0, 12368, 1, 0, 1, 0, 0, '', 'If player does not have \'Dawn\'s Gambit\' in inventory'),
+	(15, 3651, 0, 0, 0, 2, 0, 12368, 1, 1, 1, 0, 0, '', 'If player does not have \'Dawn\'s Gambit\' in bank'),
+	(15, 3651, 0, 0, 0, 8, 0, 4771, 0, 0, 0, 0, 0, '', 'If player has quest \'Dawn\'s Gambit\' rewarded'),
+	(15, 3651, 1, 0, 0, 2, 0, 13209, 1, 0, 1, 0, 0, '', 'If player does not have \'Seal of the Dawn\' in inventory'),
+	(15, 3651, 1, 0, 0, 2, 0, 13209, 1, 1, 1, 0, 0, '', 'If player does not have \'Seal of the Dawn\' in bank'),
+	(15, 3651, 1, 0, 0, 2, 0, 19812, 1, 0, 1, 0, 0, '', 'If player does not have \'Rune of the Dawn\' in inventory'),
+	(15, 3651, 1, 0, 0, 2, 0, 19812, 1, 1, 1, 0, 0, '', 'If player does not have \'Rune of the Dawn\' in bank'),
+	(15, 3651, 1, 0, 0, 8, 0, 5213, 0, 0, 0, 0, 0, '', 'If player has quest \'The Active Agent\' rewarded'),
+	(15, 3651, 2, 0, 0, 2, 0, 13209, 1, 0, 1, 0, 0, '', 'If player does not have \'Seal of the Dawn\' in inventory'),
+	(15, 3651, 2, 0, 0, 2, 0, 13209, 1, 1, 1, 0, 0, '', 'If player does not have \'Seal of the Dawn\' in bank'),
+	(15, 3651, 2, 0, 0, 2, 0, 19812, 1, 0, 1, 0, 0, '', 'If player does not have \'Rune of the Dawn\' in inventory'),
+	(15, 3651, 2, 0, 0, 2, 0, 19812, 1, 1, 1, 0, 0, '', 'If player does not have \'Rune of the Dawn\' in bank'),
+	(15, 3651, 2, 0, 0, 8, 0, 5213, 0, 0, 0, 0, 0, '', 'If player has quest \'The Active Agent\' rewarded'),
+	(13, 1, 31702, 0, 0, 31, 0, 3, 17992, 0, 0, 0, 0, '', 'Group 0: Spell \'Someone Grab Me\' (Effect 0) targets creature \'Coilfang Invisible Vacuum Dummy\'');
 /*!40000 ALTER TABLE `conditions` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

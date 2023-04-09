@@ -1599,7 +1599,7 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
         creature->setDeathState(DEAD);
         creature->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, creature->GetGUID());
         // aura
-        // TODO: Fix display here
+        /// @todo: Fix display here
         // creature->SetVisibleAura(0, SPELL_SPIRIT_HEAL_CHANNEL);
         // casting visual effect
         creature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_SPIRIT_HEAL_CHANNEL);

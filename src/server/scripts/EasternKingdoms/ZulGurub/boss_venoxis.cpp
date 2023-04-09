@@ -138,18 +138,18 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             me->SetReactState(REACT_AGGRESSIVE);
             // Always running events
-            events.ScheduleEvent(EVENT_THRASH, 5000);
+            events.ScheduleEvent(EVENT_THRASH, 5s);
             // Phase one events (regular form)
-            events.ScheduleEvent(EVENT_HOLY_NOVA, urand(5000, 15000), 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_DISPEL_MAGIC, 35000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_HOLY_FIRE, urand(10000,20000), 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_RENEW, 30000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_HOLY_WRATH, urand(15000, 25000), 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_HOLY_NOVA, 5s, 15s, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_DISPEL_MAGIC, 35s, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_HOLY_FIRE, 10s, 20s, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_RENEW, 30s, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_HOLY_WRATH, 15s, 25s, 0, PHASE_ONE);
 
             events.SetPhase(PHASE_ONE);
 
@@ -165,13 +165,13 @@ public:
             {
                 _transformed = true;
                 // schedule the event that changes our phase
-                events.ScheduleEvent(EVENT_TRANSFORM, 100);
+                events.ScheduleEvent(EVENT_TRANSFORM, 100ms);
             }
             // we're losing health, bad, go frenzy
             else if (!_frenzied && !HealthAbovePct(20))
             {
                 _frenzied = true;
-                events.ScheduleEvent(EVENT_FRENZY, 100);
+                events.ScheduleEvent(EVENT_FRENZY, 100ms);
             }
         }
 
@@ -193,31 +193,31 @@ public:
                     // thrash is available in all phases
                     case EVENT_THRASH:
                         DoCast(me, SPELL_THRASH, true);
-                        events.ScheduleEvent(EVENT_THRASH, urand(10000, 20000));
+                        events.ScheduleEvent(EVENT_THRASH, 10s, 20s);
                         break;
 
                     // troll form spells and Actions (first part)
                     case EVENT_DISPEL_MAGIC:
                         DoCast(me, SPELL_DISPEL_MAGIC);
-                        events.ScheduleEvent(EVENT_DISPEL_MAGIC, urand(15000, 20000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_DISPEL_MAGIC, 15s, 20s, 0, PHASE_ONE);
                         break;
                     case EVENT_RENEW:
                         DoCast(me, SPELL_RENEW);
-                        events.ScheduleEvent(EVENT_RENEW, urand(25000, 30000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_RENEW, 25s, 30s, 0, PHASE_ONE);
                         break;
                     case EVENT_HOLY_WRATH:
                         if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
                             DoCast(target, SPELL_HOLY_WRATH);
-                        events.ScheduleEvent(EVENT_HOLY_WRATH, urand(12000, 22000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_HOLY_WRATH, 12s, 22s, 0, PHASE_ONE);
                         break;
                     case EVENT_HOLY_FIRE:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_HOLY_FIRE);
-                        events.ScheduleEvent(EVENT_HOLY_FIRE, urand(10000, 24000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_HOLY_FIRE, 10s, 24s, 0, PHASE_ONE);
                         break;
                     case EVENT_HOLY_NOVA:
                         DoCastSelf(SPELL_HOLY_NOVA);
-                        events.ScheduleEvent(EVENT_HOLY_NOVA, urand(10000, 24000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_HOLY_NOVA, 10s,  24s, 0, PHASE_ONE);
                         break;
 
                     //
@@ -227,17 +227,17 @@ public:
                     case EVENT_VENOM_SPIT:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_VENOM_SPIT);
-                        events.ScheduleEvent(EVENT_VENOM_SPIT, urand(5000, 15000), 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_VENOM_SPIT, 5s, 15s, 0, PHASE_TWO);
                         break;
                     case EVENT_POISON_CLOUD:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_POISON_CLOUD);
-                        events.ScheduleEvent(EVENT_POISON_CLOUD, urand(15000, 20000), 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_POISON_CLOUD, 15s, 20s, 0, PHASE_TWO);
                         break;
                     case EVENT_PARASITIC_SERPENT:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_SUMMON_PARASITIC_SERPENT);
-                        events.ScheduleEvent(EVENT_PARASITIC_SERPENT, 15000, 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_PARASITIC_SERPENT, 15s, 0, PHASE_TWO);
                         break;
                     case EVENT_FRENZY:
                         // frenzy at 20% health
@@ -255,9 +255,9 @@ public:
                         DoResetThreatList();
 
                         // phase two events (snakeform)
-                        events.ScheduleEvent(EVENT_VENOM_SPIT, 5000, 0, PHASE_TWO);
-                        events.ScheduleEvent(EVENT_POISON_CLOUD, 10000, 0, PHASE_TWO);
-                        events.ScheduleEvent(EVENT_PARASITIC_SERPENT, 30000, 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_VENOM_SPIT, 5s, 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_POISON_CLOUD, 10s, 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_PARASITIC_SERPENT, 30s, 0, PHASE_TWO);
 
                         // transformed, start phase two
                         events.SetPhase(PHASE_TWO);
@@ -299,9 +299,9 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*)
+        void JustEngagedWith(Unit*)
         {
-            events.ScheduleEvent(EVENT_POISON, 8 * IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_POISON, 8ms);
 
             if (Creature* Venoxis = GetVenoxis())
             {
@@ -331,7 +331,7 @@ public:
                 case EVENT_POISON:
                 {
                     me->CastSpell(me->GetVictim(), SPELL_POISON);
-                    events.ScheduleEvent(EVENT_POISON, 15 * IN_MILLISECONDS);
+                    events.ScheduleEvent(EVENT_POISON, 15ms);
                     break;
                 }
                 }

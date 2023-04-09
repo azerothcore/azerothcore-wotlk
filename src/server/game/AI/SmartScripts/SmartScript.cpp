@@ -2284,14 +2284,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
-        case SMART_ACTION_SET_GO_STATE:
-        {
-            for (WorldObject* target : targets)
-                if (IsGameObject(target))
-                    target->ToGameObject()->SetGoState((GOState)e.action.goState.state);
-
-            break;
-        }
         case SMART_ACTION_EXIT_VEHICLE:
         {
             for (WorldObject* target : targets)
@@ -3367,6 +3359,33 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             }
             break;
         }
+        case SMART_TARGET_INSTANCE_STORAGE:
+        {
+            if (InstanceScript* instance = GetBaseObject()->GetInstanceScript())
+            {
+                if (e.target.instanceStorage.type == 1)
+                {
+                    if (Creature* creature = instance->GetCreature(e.target.instanceStorage.index))
+                    {
+                        targets.push_back(creature);
+                    }
+                }
+                else if (e.target.instanceStorage.type == 2)
+                {
+                    if (GameObject* go = instance->GetGameObject(e.target.instanceStorage.index))
+                    {
+                        targets.push_back(go);
+                    }
+                }
+            }
+            else
+            {
+                LOG_ERROR("scripts.ai.sai", "SMART_TARGET_INSTANCE_STORAGE: Entry {} SourceType {} Event {} Action {} Target {} called outside an instance map.",
+                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+            }
+
+            break;
+        }
         case SMART_TARGET_NONE:
         case SMART_TARGET_POSITION:
         default:
@@ -3886,7 +3905,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (!me || !me->IsEngaged())
                     return;
 
-                ObjectVector targets;
+                Unit* unitTarget = nullptr;
                 switch (e.GetTargetType())
                 {
                     case SMART_TARGET_CREATURE_RANGE:
@@ -3897,8 +3916,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     case SMART_TARGET_PLAYER_RANGE:
                     case SMART_TARGET_PLAYER_DISTANCE:
                     {
-                        if (targets.empty())
-                            return;
+                        ObjectVector targets;
+                        GetTargets(targets, e);
                         for (WorldObject* target : targets)
                         {
                             if (IsUnit(target) && me->IsFriendlyTo(target->ToUnit()) && target->ToUnit()->IsAlive() && target->ToUnit()->IsInCombat())
@@ -3909,7 +3928,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                                     continue;
                                 }
 
-                                target = target->ToUnit();
+                                unitTarget = target->ToUnit();
                                 break;
                             }
                         }
@@ -3918,16 +3937,16 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     }
                     case SMART_TARGET_SELF:
                     case SMART_TARGET_ACTION_INVOKER:
-                        DoSelectLowestHpPercentFriendly((float)e.event.friendlyHealthPct.radius, e.event.friendlyHealthPct.minHpPct, e.event.friendlyHealthPct.maxHpPct);
+                        unitTarget = DoSelectLowestHpPercentFriendly((float)e.event.friendlyHealthPct.radius, e.event.friendlyHealthPct.minHpPct, e.event.friendlyHealthPct.maxHpPct);
                         break;
                     default:
                         return;
                 }
 
-                if (targets.empty())
+                if (!unitTarget)
                     return;
 
-                ProcessTimedAction(e, e.event.friendlyHealthPct.repeatMin, e.event.friendlyHealthPct.repeatMax);
+                ProcessTimedAction(e, e.event.friendlyHealthPct.repeatMin, e.event.friendlyHealthPct.repeatMax, unitTarget);
                 break;
             }
         case SMART_EVENT_DISTANCE_CREATURE:
