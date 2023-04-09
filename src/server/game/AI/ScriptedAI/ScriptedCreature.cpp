@@ -691,6 +691,14 @@ void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> ex
     _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec));
 };
 
+void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec)
+{
+    for (auto const& checks : healthPct)
+    {
+        _healthCheckEvents.push_back(HealthCheckEventData(checks, exec));
+    }
+}
+
 bool BossAI::_ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const
 {
     if (me->HealthBelowPctDamaged(healthPct, damage))
