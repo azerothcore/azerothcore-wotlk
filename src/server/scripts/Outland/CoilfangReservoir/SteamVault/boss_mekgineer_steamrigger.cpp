@@ -118,9 +118,7 @@ struct boss_mekgineer_steamrigger : public BossAI
     {
         Talk(SAY_MECHANICS);
 
-        constexpr std::array<uint32, 3> summonSpells = { SPELL_SUMMON_MECHANICS_1, SPELL_SUMMON_MECHANICS_2, SPELL_SUMMON_MECHANICS_3 };
-
-        for (auto const& spell : summonSpells)
+        for (auto const& spell : { SPELL_SUMMON_MECHANICS_1, SPELL_SUMMON_MECHANICS_2, SPELL_SUMMON_MECHANICS_3 })
         {
             DoCastAOE(spell, true);
         }
