@@ -1428,7 +1428,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_SUMMONED_CREATURES             = 204,  // Entry
     SMART_TARGET_INSTANCE_STORAGE               = 205,  // Instance data index, Type (creature (1), gameobject (2))
 
-    SMART_TARGET_AC_END                         = 205   // placeholder
+    SMART_TARGET_AC_END                         = 206   // placeholder
 };
 
 struct SmartTarget
