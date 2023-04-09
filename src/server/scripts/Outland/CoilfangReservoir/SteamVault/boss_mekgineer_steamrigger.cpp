@@ -29,6 +29,7 @@ enum MekgineerSteamrigger
     SPELL_SUPER_SHRINK_RAY      = 31485,
     SPELL_SAW_BLADE             = 31486,
     SPELL_ELECTRIFIED_NET       = 35107,
+    SPELL_ENRAGE                = 26662,
     SPELL_REPAIR_N              = 31532,
     SPELL_REPAIR_H              = 37936,
 
@@ -39,7 +40,8 @@ enum MekgineerSteamrigger
     EVENT_CHECK_HP75            = 3,
     EVENT_SPELL_SHRINK          = 4,
     EVENT_SPELL_SAW             = 5,
-    EVENT_SPELL_NET             = 6
+    EVENT_SPELL_NET             = 6,
+    EVENT_ENRAGE                = 7
 };
 
 struct boss_mekgineer_steamrigger : public BossAI
@@ -62,9 +64,10 @@ struct boss_mekgineer_steamrigger : public BossAI
     {
         Talk(SAY_AGGRO);
         _JustEngagedWith();
-        events.ScheduleEvent(EVENT_SPELL_SHRINK, 20000);
-        events.ScheduleEvent(EVENT_SPELL_SAW, 15000);
-        events.ScheduleEvent(EVENT_SPELL_NET, 10000);
+        events.ScheduleEvent(EVENT_SPELL_SHRINK, 26550);
+        events.ScheduleEvent(EVENT_SPELL_SAW, 6050, 17650);
+        events.ScheduleEvent(EVENT_SPELL_NET, 14400);
+        events.ScheduleEvent(EVENT_ENRAGE, 300000);
         events.ScheduleEvent(EVENT_CHECK_HP75, 5000);
         events.ScheduleEvent(EVENT_CHECK_HP50, 5000);
         events.ScheduleEvent(EVENT_CHECK_HP25, 5000);
@@ -96,19 +99,22 @@ struct boss_mekgineer_steamrigger : public BossAI
         {
         case EVENT_SPELL_SHRINK:
             me->CastSpell(me->GetVictim(), SPELL_SUPER_SHRINK_RAY, false);
-            events.RepeatEvent(20000);
+            events.Repeat(35100ms, 54100ms);
             break;
         case EVENT_SPELL_SAW:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                 me->CastSpell(target, SPELL_SAW_BLADE, false);
             else
                 me->CastSpell(me->GetVictim(), SPELL_SAW_BLADE, false);
-            events.RepeatEvent(15000);
+            events.Repeat(6050ms, 17650ms);
             break;
         case EVENT_SPELL_NET:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 me->CastSpell(target, SPELL_ELECTRIFIED_NET, false);
-            events.RepeatEvent(10000);
+            events.Repeat(21800ms, 34200ms);
+            break;
+        case EVENT_ENRAGE:
+            DoCastSelf(SPELL_ENRAGE, true);
             break;
         case EVENT_CHECK_HP25:
         case EVENT_CHECK_HP50:
