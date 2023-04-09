@@ -1,12 +1,13 @@
 /*
  * NpcBots Data Migration System by Trickerer (onlysuffering@gmail.com)
  *
- * Last update: *23 Jan 2021*
+ * Last update: *09 Apr 2023*
  *
  * Saved data:
  * 1) `characters_npcbot` - spawned bots' BOT info
- * 2) `item_instance` - bots' equipment
- * 3) `creature` - bot spawns
+ * 2) `characters_npcbot_transmog` - bots' transmogs
+ * 3) `item_instance` - bots' equipment
+ * 4) `creature` - bot spawns
  *
  * Make sure you have bots installed, or you are in for an unpleasant surprise.
  */
@@ -706,13 +707,15 @@ BotDataDumpResult NPCBotsDump::Write(std::string const& file)
     std::string dumpstr;
     if (!GetDump(dumpstr))
         ret = BOT_DUMP_FAIL_INCOMPLETE;
+    else
+    {
+        FILE* fout = fopen(file.c_str(), "w");
+        if (!fout)
+            return BOT_DUMP_FAIL_CANT_WRITE_TO_FILE;
 
-    FILE* fout = fopen(file.c_str(), "w");
-    if (!fout)
-        return BOT_DUMP_FAIL_CANT_WRITE_TO_FILE;
-
-    fprintf(fout, "%s", dumpstr.c_str());
-    fclose(fout);
+        fprintf(fout, "%s", dumpstr.c_str());
+        fclose(fout);
+    }
 
     return ret;
 }
@@ -734,6 +737,10 @@ bool NPCBotsDump::GetDump(std::string& dump)
     bool integrityChecked = true;
     for (uint32 i : BotDataMgr::GetExistingNPCBotIds())
     {
+        //skip generated bots
+        if (i >= BOT_ENTRY_CREATE_BEGIN && BotDataMgr::GetBotExtraCreatureTemplate(i))
+            continue;
+
         BotDataVerificationResult res = VerifyWriteData(i);
         if (res == BOT_DATA_INCOMPLETE)
         {
