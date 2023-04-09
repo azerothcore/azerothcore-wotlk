@@ -9,9 +9,8 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 
 DELETE FROM `creature_template_movement` WHERE `CreatureId` IN (17954, 20631);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Rooted`) VALUES
-(17954, 1, 1), (20631, 1, 1);
-
-SELECT * FROM creature_template_movement WHERE creatureid = 17954;
+(17954, 1, 1),
+(20631, 1, 1);
 
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_warlords_rage';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
