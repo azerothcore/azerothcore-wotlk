@@ -27,8 +27,9 @@ enum MainChambersAccessPanelSays
 
 MinionData const minionData[] =
 {
-    { NPC_NAGA_DISTILLER, DATA_WARLORD_KALITHRESH },
-    { 0,                  0                       }
+    { NPC_NAGA_DISTILLER,          DATA_WARLORD_KALITHRESH  },
+    { NPC_THESPIA_WATER_ELEMENTAL, DATA_HYDROMANCER_THESPIA },
+    { 0,                            0                       }
 };
 
 class go_main_chambers_access_panel : public GameObjectScript
