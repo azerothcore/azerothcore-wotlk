@@ -130,7 +130,7 @@ struct boss_mekgineer_steamrigger : public BossAI
         {
             creature->GetMotionMaster()->MoveFollow(me, 5.0f, 0.0f);
         }
-    } 
+    }
 };
 
 void AddSC_boss_mekgineer_steamrigger()
