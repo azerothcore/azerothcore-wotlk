@@ -92,12 +92,14 @@ struct boss_mekgineer_steamrigger : public BossAI
 
         if (!IsHeroic())
         {
-            for (auto const& healthCheckEvents : { 75, 50, 25 })
-            {
-                ScheduleHealthCheckEvent(healthCheckEvents, [&] {
-                    SummonMechanics();
-                });
-            }
+            ScheduleHealthCheckEvent({ 75, 50, 25 }, [&] {
+                Talk(SAY_MECHANICS);
+
+                for (auto const& spell : { SPELL_SUMMON_MECHANICS_1, SPELL_SUMMON_MECHANICS_2, SPELL_SUMMON_MECHANICS_3 })
+                {
+                    DoCastAOE(spell, true);
+                }
+            });
         }
         else
         {
@@ -111,16 +113,6 @@ struct boss_mekgineer_steamrigger : public BossAI
                 DoCastAOE(RAND(SPELL_SUMMON_MECHANICS_1, SPELL_SUMMON_MECHANICS_2, SPELL_SUMMON_MECHANICS_3), true);
                 context.Repeat(15600ms, 25400ms);
             });
-        }
-    }
-
-    void SummonMechanics()
-    {
-        Talk(SAY_MECHANICS);
-
-        for (auto const& spell : { SPELL_SUMMON_MECHANICS_1, SPELL_SUMMON_MECHANICS_2, SPELL_SUMMON_MECHANICS_3 })
-        {
-            DoCastAOE(spell, true);
         }
     }
 
