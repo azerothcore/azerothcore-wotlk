@@ -1,3 +1,4 @@
+-- DB update 2023_04_09_01 -> 2023_04_09_02
 -- Blood Elf Defender
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=8581;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 8581);
