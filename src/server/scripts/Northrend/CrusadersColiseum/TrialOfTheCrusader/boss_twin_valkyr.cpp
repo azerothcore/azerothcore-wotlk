@@ -319,7 +319,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     for( uint8 i = 0; i < count; ++i )
                     {
                         float angle = rand_norm() * 2 * M_PI;
-                        if( Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500) )
+                        if( Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 54.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 54.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500) )
                             boss_twin_valkyrAI::JustSummoned(ball);
                     }
 
@@ -718,7 +718,7 @@ public:
         void MoveToNextPoint()
         {
             float angle = rand_norm() * 2 * M_PI;
-            me->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 47.0f, me->GetPositionZ());
+            me->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 54.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 54.0f, me->GetPositionZ());
         }
 
         void UpdateAI(uint32  /*diff*/) override
