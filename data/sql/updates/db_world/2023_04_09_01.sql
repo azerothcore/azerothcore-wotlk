@@ -1,3 +1,4 @@
+-- DB update 2023_04_09_00 -> 2023_04_09_01
 --
 SET @REP_MEDIUM_N := 12;
 SET @REP_MEDIUM_H := 15;
