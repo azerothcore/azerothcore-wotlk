@@ -85,7 +85,7 @@ struct boss_mekgineer_steamrigger : public BossAI
         {
             DoCastRandomTarget(SPELL_ELECTRIFIED_NET);
             context.Repeat(21800ms, 34200ms);
-        }).Schedule(5min, [this](TaskContext context)
+        }).Schedule(5min, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_ENRAGE, true);
         });
