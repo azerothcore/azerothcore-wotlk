@@ -33,21 +33,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 
-/*######
-## npc_spitelashes
-######*/
-
-enum Spitelashes
-{
-    SPELL_POLYMORPH_RANK1       = 118,
-    SPELL_POLYMORPH_RANK2       = 12824,
-    SPELL_POLYMORPH_RANK3       = 12825,
-    SPELL_POLYMORPH_RANK4       = 12826,
-    SPELL_POLYMORPH             = 29124,
-    SPELL_POLYMORPH_BACKFIRE    = 28406,
-    SPELL_REMOVE_POLYMORPH      = 6924
-};
-
 /*####
 # npc_rizzle_sprysprocket
 ####*/
