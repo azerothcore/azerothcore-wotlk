@@ -1,3 +1,4 @@
+-- DB update 2023_04_09_09 -> 2023_04_09_10
 -- Risen Ally(30230)
 DELETE FROM `creature_template_spell` WHERE `CreatureID` = 30230;
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES

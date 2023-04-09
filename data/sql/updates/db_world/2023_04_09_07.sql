@@ -1,3 +1,4 @@
+-- DB update 2023_04_09_06 -> 2023_04_09_07
 -- Populate creature_text for Highlord Tirion Fordring (ToC5) from ToC25 (34996) Should probably be 34996 for both, needs a sniff.
 DELETE FROM `creature_text` WHERE `CreatureID`=33628;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES

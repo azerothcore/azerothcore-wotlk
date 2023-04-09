@@ -1,3 +1,4 @@
+-- DB update 2023_04_09_10 -> 2023_04_09_11
 -- 28728 - Feign Death - Used by outland Basilisks && 35385 - Threshalisk Charge - Used by outland Basilisks
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (28728,35385);
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
