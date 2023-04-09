@@ -1,3 +1,4 @@
+-- DB update 2023_04_08_00 -> 2023_04_09_00
 --
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` |33554432, `ScriptName` = '' WHERE `entry` IN (17954, 20631);
 
