@@ -710,14 +710,10 @@ public:
             if (IsSpellReady(BASH_1, diff) && !CCed(mytar, !mytar->IsNonMeleeSpellCast(false,false,true)) &&
                 mytar->IsWithinMeleeRange(me))
             {
-                if (_form == DRUID_BEAR_FORM && rage >= acost(BASH_1))
+                if ((_form == DRUID_BEAR_FORM && rage >= acost(BASH_1)) ||
+                    (IsSpellReady(BEAR_FORM_1, diff, false) && doCast(me, GetSpell(BEAR_FORM_1))))
                 {
                     if (doCast(mytar, GetSpell(BASH_1)))
-                        return;
-                }
-                else if (_form != DRUID_BEAR_FORM && mytar->GetVictim() == me && Rand() < 25)
-                {
-                    if (doCast(me, GetSpell(BEAR_FORM_1)))
                         return;
                 }
             }

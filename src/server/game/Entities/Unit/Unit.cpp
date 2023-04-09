@@ -14317,6 +14317,10 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
     if (PvP)
         m_CombatTimer = std::max<uint32>(GetCombatTimer(), std::max<uint32>(5500, duration));
+    //npcbot: non-PvP npcbots should use PvP rules
+    else if (enemy && enemy->IsNPCBotOrPet())
+        m_CombatTimer = std::max<uint32>(GetCombatTimer(), std::max<uint32>(5500, duration));
+    //end npcbot
     else if (duration)
         m_CombatTimer = std::max<uint32>(GetCombatTimer(), duration);
 
