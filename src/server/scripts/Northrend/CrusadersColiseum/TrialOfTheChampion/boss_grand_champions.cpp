@@ -90,6 +90,11 @@ enum ChampionSpells
     SPELL_ROLLING_THROW                     = 67546, // not implemented yet!
 };
 
+enum Texts
+{
+    SAY_TRAMPLED                            = 0,
+};
+
 #define SPELL_FIREBALL                      DUNGEON_MODE(SPELL_FIREBALL_N, SPELL_FIREBALL_H)
 #define SPELL_BLAST_WAVE                    DUNGEON_MODE(SPELL_BLAST_WAVE_N, SPELL_BLAST_WAVE_H)
 #define SPELL_POLYMORPH                     DUNGEON_MODE(SPELL_POLYMORPH_N, SPELL_POLYMORPH_H)
@@ -647,16 +652,8 @@ public:
 
         void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
-            switch( spell->Id )
-            {
-                case SPELL_TRAMPLE_STUN:
-                    {
-                        char buffer[50];
-                        snprintf(buffer, sizeof(buffer), "%s is trampled!", me->GetName().c_str());
-                        me->TextEmote(buffer);
-                    }
-                    break;
-            }
+            if (spell->Id == SPELL_TRAMPLE_STUN)
+                Talk(SAY_TRAMPLED, me);
         }
 
         void UpdateAI(uint32 diff) override
