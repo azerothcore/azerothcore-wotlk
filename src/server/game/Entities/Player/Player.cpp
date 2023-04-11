@@ -13179,11 +13179,11 @@ void Player::SetBattlegroundOrBattlefieldRaid(Group* group, int8 subgroup)
         BotMap const* map = GetBotMgr()->GetBotMap();
         for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
         {
-            Creature const* bot = itr->second;
+            Creature* bot = itr->second;
             if (!bot || !GetGroup()->IsMember(bot->GetGUID()))
                 continue;
 
-            ASSERT(group->AddMember((Player*)bot));
+            ASSERT(group->AddMember(bot));
         }
     }
     //end npcbot

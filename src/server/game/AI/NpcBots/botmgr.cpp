@@ -1328,7 +1328,7 @@ bool BotMgr::AddBotToGroup(Creature* bot)
         sGroupMgr->AddGroup(gr);
     }
 
-    if (gr->AddMember((Player*)bot))
+    if (gr->AddMember(bot))
     {
         if (!bot->GetBotAI()->HasRole(BOT_ROLE_PARTY))
             bot->GetBotAI()->ToggleRole(BOT_ROLE_PARTY, true);
