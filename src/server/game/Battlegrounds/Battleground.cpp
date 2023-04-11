@@ -263,6 +263,9 @@ void Battleground::Update(uint32 diff)
     if (!PreUpdateImpl(diff))
         return;
 
+    //npcbot
+    if (m_Bots.empty())
+    //end npcbot
     if (!GetPlayersSize())
     {
         //BG is empty
@@ -1343,7 +1346,7 @@ void Battleground::AddPlayer(Player* player)
 void Battleground::AddBot(Creature* bot)
 {
     ObjectGuid guid = bot->GetGUID();
-    TeamId teamId = GetBotTeamId(guid);
+    TeamId teamId = BotDataMgr::GetTeamIdForFaction(bot->GetFaction());
 
     // Add to list/maps
     BattlegroundBot bb;
