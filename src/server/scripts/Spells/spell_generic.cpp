@@ -2030,8 +2030,7 @@ class spell_gen_animal_blood : public AuraScript
     {
         if (Unit* owner = GetUnitOwner())
         {
-            if (owner->IsInWater())
-                owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
+            owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
         }
     }
 
@@ -2039,6 +2038,27 @@ class spell_gen_animal_blood : public AuraScript
     {
         AfterEffectApply += AuraEffectApplyFn(spell_gen_animal_blood::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_gen_animal_blood::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 63471 - Spawn Blood Pool
+class spell_spawn_blood_pool : public SpellScript
+{
+    PrepareSpellScript(spell_spawn_blood_pool);
+
+    void SetDest(SpellDestination &dest)
+    {
+        Unit* caster = GetCaster();
+        LiquidData liquidStatus = caster->GetMap()->GetLiquidData(caster->GetPhaseMask(), caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), caster->GetCollisionHeight(), MAP_ALL_LIQUIDS);
+
+        float level = liquidStatus.Level > INVALID_HEIGHT ? liquidStatus.Level : caster->GetPositionZ();
+        Position pos = Position(caster->GetPositionX(), caster->GetPositionY(), level, caster->GetOrientation());
+        dest.Relocate(pos);
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_spawn_blood_pool::SetDest, EFFECT_0, TARGET_DEST_CASTER);
     }
 };
 
@@ -4893,6 +4913,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_feign_death_no_prevent_emotes);
     RegisterSpellScript(spell_pvp_trinket_wotf_shared_cd);
     RegisterSpellScript(spell_gen_animal_blood);
+    RegisterSpellScript(spell_spawn_blood_pool);
     RegisterSpellScript(spell_gen_divine_storm_cd_reset);
     RegisterSpellScript(spell_gen_profession_research);
     RegisterSpellScript(spell_gen_clone);
