@@ -117,6 +117,7 @@ void EventProcessor::CancelEventGroup(uint8 group)
     {
         if (itr->second->m_eventGroup != group)
         {
+            ++itr;
             continue;
         }
 

@@ -27,7 +27,7 @@
 
 enum slData
 {
-    TYPE_OVERSEER                   = 0,
+    TYPE_RITUALISTS                 = 0,
     TYPE_HELLMAW                    = 1,
     DATA_BLACKHEARTTHEINCITEREVENT  = 2,
     DATA_GRANDMASTERVORPILEVENT     = 3,
@@ -37,7 +37,7 @@ enum slData
 
 enum slNPCandGO
 {
-    NPC_FEL_OVERSEER            = 18796,
+    NPC_CABAL_RITUALIST         = 18794,
     NPC_HELLMAW                 = 18731,
 
     REFECTORY_DOOR              = 183296,                     //door opened when blackheart the inciter dies
