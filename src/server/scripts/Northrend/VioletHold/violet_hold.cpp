@@ -24,6 +24,21 @@
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 
+/// @todo: Missing Sinclari Trigger announcements (32204) Look at its creature_text for more info.
+/// @todo: Activation Crystals (go_vh_activation_crystal) (193611) are spammable, should be a 1 time use per crystal.
+
+enum Texts
+{
+    GOSSIP_MENU_START_EVENT     = 9998,
+    GOSSIP_MENU_ITEM            = 9997,
+    GOSSIP_MENU_LATE_JOIN       = 10275,
+
+    NPC_TEXT_SINCLARI_IN        = 13853,
+    NPC_TEXT_SINCLARI_ITEM      = 13854,
+    NPC_TEXT_SINCLARI_DONE      = 13910,
+    NPC_TEXT_SINCLARI_LATE_JOIN = 14271,
+};
+
 /***********
 ** DEFENSE SYSTEM CRYSTAL
 ***********/
@@ -45,10 +60,6 @@ public:
 ** SINCLARI
 ***********/
 
-#define GOSSIP_START_EVENT  "Get your people to safety, we'll keep the Blue Dragonflight's forces at bay."
-#define GOSSIP_ITEM_1      "Activate the crystals when we get in trouble, right."
-#define GOSSIP_I_WANT_IN    "Sorry, I'm late! Can I get in to help my friends?"
-
 class npc_vh_sinclari : public CreatureScript
 {
 public:
@@ -60,16 +71,16 @@ public:
             switch (pInstance->GetData(DATA_ENCOUNTER_STATUS))
             {
                 case NOT_STARTED:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    SendGossipMenuFor(player, 13853, creature->GetGUID());
+                    AddGossipItemFor(player, GOSSIP_MENU_ITEM, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, GOSSIP_MENU_START_EVENT, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    SendGossipMenuFor(player, NPC_TEXT_SINCLARI_IN, creature->GetGUID());
                     break;
                 case IN_PROGRESS:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_I_WANT_IN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    SendGossipMenuFor(player, 13853, creature->GetGUID());
+                    AddGossipItemFor(player, GOSSIP_MENU_LATE_JOIN, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    SendGossipMenuFor(player, NPC_TEXT_SINCLARI_LATE_JOIN, creature->GetGUID());
                     break;
                 default: // DONE or invalid
-                    SendGossipMenuFor(player, 13910, creature->GetGUID());
+                    SendGossipMenuFor(player, NPC_TEXT_SINCLARI_DONE, creature->GetGUID());
             }
         return true;
     }
@@ -86,7 +97,7 @@ public:
                     pInstance->SetData(DATA_START_INSTANCE, 1);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                SendGossipMenuFor(player, 13854, creature->GetGUID());
+                SendGossipMenuFor(player, NPC_TEXT_SINCLARI_ITEM, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
                 player->NearTeleportTo(playerTeleportPosition.GetPositionX(), playerTeleportPosition.GetPositionY(), playerTeleportPosition.GetPositionZ(), playerTeleportPosition.GetOrientation(), true);
