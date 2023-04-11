@@ -912,7 +912,7 @@ public:
                 wpc->SetMaxPower(POWER_MANA, uint32(uwp->GetLinks().size()));
                 wpc->SetPower(POWER_MANA, wpc->GetMaxPower(POWER_MANA));
             }
-            trans->Append("UPDATE creature_template_npcbot_wander_nodes SET links='%s' WHERE id=%u", uwp->FormatLinks().c_str(), uwp->GetWPId());
+            trans->Append("UPDATE creature_template_npcbot_wander_nodes SET links='{}' WHERE id={}", uwp->FormatLinks().c_str(), uwp->GetWPId());
         });
         WorldDatabase.DirectCommitTransaction(trans);
     }
@@ -990,7 +990,7 @@ public:
             if (Creature* creature = wp->GetCreature())
                 if (creature->GetLevel() != minl)
                     creature->SetLevel(minl);
-            WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET minlevel=%u, maxlevel=%u WHERE id=%u",
+            WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET minlevel={}, maxlevel={} WHERE id={}",
                 uint32(minl), uint32(maxl), wp->GetWPId());
         });
 
@@ -1033,7 +1033,7 @@ public:
             if (creature->GetLevel() != *minlevel)
                 creature->SetLevel(*minlevel);
 
-        WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET minlevel=%u, maxlevel=%u WHERE id=%u",
+        WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET minlevel={}, maxlevel={} WHERE id={}",
             uint32(*minlevel), uint32(*maxlevel), wpId);
 
         return true;
@@ -1064,7 +1064,7 @@ public:
                 handler->PSendSysMessage("Adding WP %u '%s' flag %u", wpId, wp->GetName().c_str(), uint32(flags));
                 const_cast<WanderNode*>(wp)->SetFlags(BotWPFlags(flags));
             }
-            WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET flags=%u WHERE id=%u", wp->GetFlags(), wpId);
+            WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET flags={} WHERE id={}", wp->GetFlags(), wpId);
         });
 
         return true;
@@ -1102,7 +1102,7 @@ public:
             wp->SetFlags(BotWPFlags(*flags));
         }
 
-        WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET flags=%u WHERE id=%u", wp->GetFlags(), wpId);
+        WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET flags={} WHERE id={}", wp->GetFlags(), wpId);
 
         return true;
     }
@@ -1131,7 +1131,7 @@ public:
         handler->PSendSysMessage("Changing WP %u '%s' name to '%s'", wpId, wp->GetName().c_str(), newname->c_str());
         wp->SetName(*newname);
 
-        WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET name='%s' WHERE id=%u", wp->GetName().c_str(), wpId);
+        WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET name='{}' WHERE id={}", wp->GetName().c_str(), wpId);
 
         return true;
     }
@@ -1161,7 +1161,7 @@ public:
         if (Creature* creature = wp->GetCreature())
             creature->NearTeleportTo(*player);
 
-        WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET x=%f,y=%f,z=%f,o=%f WHERE id=%u",
+        WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET x={},y={},z={},o={} WHERE id={}",
             wp->m_positionX, wp->m_positionY, wp->m_positionZ, wp->GetOrientation(), wp->GetWPId());
 
         handler->PSendSysMessage("WP %u '%s' was successfully moved.", wp->GetWPId(), wp->GetName().c_str());
@@ -1284,7 +1284,7 @@ public:
             wpc->ToTempSummon()->DespawnOrUnsummon();
         WanderNode::RemoveWP(wp);
 
-        WorldDatabase.Execute("DELETE FROM creature_template_npcbot_wander_nodes WHERE id=%u", wpId);
+        WorldDatabase.Execute("DELETE FROM creature_template_npcbot_wander_nodes WHERE id={}", wpId);
 
         handler->PSendSysMessage("WP %u '%s' was successfully deleted.", wpId, wpName.c_str());
 
