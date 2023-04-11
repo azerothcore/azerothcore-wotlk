@@ -386,7 +386,7 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
     //npcbot
     else if (afcbot)
     {
-        data << uint64(afcbot->GetGUID());
+        data << afcbot->GetGUID();
         data << float(afcbot->GetPositionX());
         data << float(afcbot->GetPositionY());
     }
@@ -401,7 +401,7 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
     //npcbot
     else if (hfcbot)
     {
-        data << uint64(hfcbot->GetGUID());
+        data << hfcbot->GetGUID();
         data << float(hfcbot->GetPositionX());
         data << float(hfcbot->GetPositionY());
     }

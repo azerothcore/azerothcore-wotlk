@@ -1044,7 +1044,7 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
                         bg->AddPlayerToResurrectQueue(shGuid, bot->GetGUID());
                     else
                     {
-                        TC_LOG_ERROR("npcbots", "TeleportBot: Bot %u '%s' can't find SpiritHealer in bg %s!",
+                        LOG_ERROR("npcbots", "TeleportBot: Bot {} '{}' can't find SpiritHealer in bg {}!",
                             bot->GetEntry(), bot->GetName().c_str(), bg->GetName().c_str());
                     }
                 }
@@ -2012,27 +2012,27 @@ void BotMgr::InviteBotToBG(ObjectGuid botguid, GroupQueueInfo* ginfo, Battlegrou
     Creature const* bot = BotDataMgr::FindBot(botguid.GetEntry());
     ASSERT(bot);
 
-    bg->IncreaseInvitedCount(ginfo->Team);
+    bg->IncreaseInvitedCount(ginfo->teamId);
     //TC_LOG_INFO("npcbots", "Battleground: invited NPCBot %u to BG instance %u bgtype %u '%s'",
     //    botguid.GetEntry(), bg->GetInstanceID(), bg->GetTypeID(), bg->GetName().c_str());
 }
 
-bool BotMgr::IsBotInAreaTriggerRadius(Creature const* bot, AreaTriggerEntry const* trigger)
+bool BotMgr::IsBotInAreaTriggerRadius(Creature const* bot, AreaTrigger const* trigger)
 {
-    if (!trigger || !bot->IsInWorld() || bot->GetMap()->GetId() != trigger->ContinentID)
+    if (!trigger || !bot->IsInWorld() || bot->GetMap()->GetId() != trigger->map)
         return false;
 
-    if (trigger->Radius > 0.f)
+    if (trigger->radius > 0.f)
     {
         // if we have radius check it
-        float dist = bot->GetDistance(trigger->Pos.X, trigger->Pos.Y, trigger->Pos.Z);
-        if (dist > trigger->Radius)
+        float dist = bot->GetDistance(trigger->x, trigger->y, trigger->z);
+        if (dist > trigger->radius)
             return false;
     }
     else
     {
-        Position center(trigger->Pos.X, trigger->Pos.Y, trigger->Pos.Z, trigger->BoxYaw);
-        if (!bot->IsWithinBox(center, trigger->BoxLength / 2.f, trigger->BoxWidth / 2.f, trigger->BoxHeight / 2.f))
+        Position center(trigger->x, trigger->y, trigger->z, trigger->orientation);
+        if (!bot->IsWithinBox(center, trigger->length / 2.f, trigger->width / 2.f, trigger->height / 2.f))
             return false;
     }
 

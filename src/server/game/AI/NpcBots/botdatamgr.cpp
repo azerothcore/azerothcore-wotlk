@@ -16,6 +16,7 @@
 #include "Map.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
@@ -72,7 +73,7 @@ public:
 
     void AbortMe()
     {
-        TC_LOG_ERROR("npcbots", "BotBattlegroundEnterEvent: Aborting bot %u bg %u!", _botGUID.GetEntry(), uint32(_bgQueueTypeId));
+        LOG_ERROR("npcbots", "BotBattlegroundEnterEvent: Aborting bot {} bg {}!", _botGUID.GetEntry(), uint32(_bgQueueTypeId));
         sBattlegroundMgr->GetBattlegroundQueue(_bgQueueTypeId).RemovePlayer(_botGUID, true);
         BotDataMgr::DespawnWandererBot(_botGUID.GetEntry());
     }
@@ -133,21 +134,22 @@ void SpawnWanderergBot(uint32 bot_id, WanderNode const* spawnLoc, NpcBotRegistry
     Map* map = sMapMgr->CreateBaseMap(spawnLoc->GetMapId());
     map->LoadGrid(spawnLoc->m_positionX, spawnLoc->m_positionY);
 
-    TC_LOG_DEBUG("npcbots", "Spawning wandering bot: %s (%u) class %u race %u fac %u, location: mapId %u %s (%s)",
+    LOG_DEBUG("npcbots", "Spawning wandering bot: {} ({}) class {} race {} fac {}, location: mapId {} {} ({})",
         bot_template.Name.c_str(), bot_id, uint32(bot_extras->bclass), uint32(bot_extras->race), bot_data->faction,
         spawnLoc->GetMapId(), spawnLoc->ToString().c_str(), spawnLoc->GetName().c_str());
 
     Creature* bot = new Creature();
-    if (!bot->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, bot_id, *spawnLoc))
+    if (!bot->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, bot_id, 0,
+        spawnLoc->m_positionX, spawnLoc->m_positionY, spawnLoc->m_positionZ, spawnLoc->GetOrientation()))
     {
         delete bot;
-        TC_LOG_FATAL("server.loading", "Creature is not created!");
+        LOG_FATAL("server.loading", "Creature is not created!");
         ASSERT(false);
     }
     if (!bot->LoadBotCreatureFromDB(0, map, true, true, bot_id, &spawnPos))
     {
         delete bot;
-        TC_LOG_FATAL("server.loading", "Cannot load npcbot from DB!");
+        LOG_FATAL("server.loading", "Cannot load npcbot from DB!");
         ASSERT(false);
     }
 
@@ -165,7 +167,7 @@ void BotDataMgr::DespawnWandererBot(uint32 entry)
         _botsWanderCreaturesToDespawn.insert(entry);
     }
     else
-        TC_LOG_ERROR("npcbots", "DespawnWandererBot(): trying to despawn non-existing wanderer bot %u '%s'!", entry, bot ? bot->GetName().c_str() : "unknown");
+        LOG_ERROR("npcbots", "DespawnWandererBot(): trying to despawn non-existing wanderer bot {} '{}'!", entry, bot ? bot->GetName().c_str() : "unknown");
 }
 
 struct WanderingBotsGenerator
@@ -248,7 +250,7 @@ private:
         const uint8 bot_class = spareBotPair.first;
         auto const& cSet = spareBotPair.second;
         ASSERT(!cSet.empty());
-        uint32 orig_entry = cSet.size() == 1 ? *cSet.cbegin() : Trinity::Containers::SelectRandomContainerElement(cSet);
+        uint32 orig_entry = cSet.size() == 1 ? *cSet.cbegin() : Acore::Containers::SelectRandomContainerElement(cSet);
         CreatureTemplate const* orig_template = sObjectMgr->GetCreatureTemplate(orig_entry);
         ASSERT(orig_template);
         NpcBotExtras const* orig_extras = BotDataMgr::SelectNpcBotExtras(orig_entry);
@@ -292,8 +294,8 @@ private:
         if (bracketEntry)
         {
             //force level range for bgs
-            bot_template.minlevel = bracketEntry->MinLevel;
-            bot_template.maxlevel = bracketEntry->MaxLevel;
+            bot_template.minlevel = bracketEntry->minLevel;
+            bot_template.maxlevel = bracketEntry->maxLevel;
         }
         bot_template.InitializeQueryData();
 
@@ -417,7 +419,7 @@ public:
         if (team == -1)
         {
             static const std::array<int32, 6> team_choices{ ALLIANCE, HORDE, TEAM_OTHER, ALLIANCE, HORDE, TEAM_OTHER };
-            team = Trinity::Containers::SelectRandomContainerElement(team_choices);
+            team = Acore::Containers::SelectRandomContainerElement(team_choices);
         }
 
         switch (team)
@@ -455,7 +457,7 @@ public:
                 if (bracketEntry)
                 {
                     uint8 botminlevel = BotDataMgr::GetMinLevelForBotClass(kv.first);
-                    if (botminlevel > bracketEntry->MaxLevel)
+                    if (botminlevel > bracketEntry->maxLevel)
                         continue;
                 }
 
@@ -1134,24 +1136,22 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     if (!bg_template)
         return false;
 
-    [[maybe_unused]] uint32 minplayers = bg_template->GetMinPlayers();
-    [[maybe_unused]] uint32 maxplayers = bg_template->GetMaxPlayers();
     [[maybe_unused]] uint32 minteamplayers = bg_template->GetMinPlayersPerTeam();
     [[maybe_unused]] uint32 maxteamplayers = bg_template->GetMaxPlayersPerTeam();
     [[maybe_unused]] uint32 avgteamplayers = (minteamplayers + 1 + maxteamplayers) / 2;
 
-    [[maybe_unused]] uint32 minlevel = bracketEntry->MinLevel;
-    [[maybe_unused]] uint32 maxlevel = bracketEntry->MaxLevel;
+    [[maybe_unused]] uint32 minlevel = bracketEntry->minLevel;
+    [[maybe_unused]] uint32 maxlevel = bracketEntry->maxLevel;
 
     uint8 bracketId = uint8(bracketEntry->GetBracketId());
 
     uint32 queued_players_a = 0;
     uint32 queued_players_h = 0;
-    for (uint8 i = 0; i < BG_QUEUE_GROUP_TYPES_COUNT; ++i)
+    for (uint8 i = 0; i < BG_QUEUE_CFBG; ++i)
     {
         for (GroupQueueInfo const* qgr : queue->m_QueuedGroups[bracketId][i])
         {
-            if (qgr->Team == ALLIANCE)
+            if (qgr->teamId == TEAM_ALLIANCE)
                 queued_players_a += qgr->Players.size();
             else
                 queued_players_h += qgr->Players.size();
@@ -1178,8 +1178,8 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
 
     if (!sBotGen->GenerateWanderingBotsToSpawn(needed_bots_count_a, bg_template->GetMapId(), ALLIANCE, true, bracketEntry, &spawned_bots_a, spawned_a))
     {
-        TC_LOG_WARN("npcbots", "Failed to spawn %u ALLIANCE bots for BG %u '%s' queued A %u H %u req A %u H %u spare %u",
-            needed_bots_count_a, uint32(bg_template->GetTypeID()), bg_template->GetName().c_str(),
+        LOG_WARN("npcbots", "Failed to spawn {} ALLIANCE bots for BG {} '{}' queued A {} H {} req A {} H {} spare {}",
+            needed_bots_count_a, uint32(bg_template->GetBgTypeID()), bg_template->GetName().c_str(),
             queued_players_a, queued_players_h, needed_bots_count_a, needed_bots_count_h, spareBots);
         for (NpcBotRegistry const* registry1 : { &spawned_bots_a, &spawned_bots_h })
             for (Creature const* bot : *registry1)
@@ -1190,8 +1190,8 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     spareBots = sBotGen->GetSpareBotsCount();
     if (!sBotGen->GenerateWanderingBotsToSpawn(needed_bots_count_h, bg_template->GetMapId(), HORDE, true, bracketEntry, &spawned_bots_h, spawned_h))
     {
-        TC_LOG_WARN("npcbots", "Failed to spawn %u HORDE bots for BG %u '%s' queued A %u H %u req A %u H %u spare %u",
-            needed_bots_count_h, uint32(bg_template->GetTypeID()), bg_template->GetName().c_str(),
+        LOG_WARN("npcbots", "Failed to spawn {} HORDE bots for BG {} '{}' queued A {} H {} req A {} H {} spare {}",
+            needed_bots_count_h, uint32(bg_template->GetBgTypeID()), bg_template->GetName().c_str(),
             queued_players_a, queued_players_h, needed_bots_count_a, needed_bots_count_h, spareBots);
         for (NpcBotRegistry const* registry2 : { &spawned_bots_a, &spawned_bots_h })
             for (Creature const* bot : *registry2)
@@ -1212,13 +1212,13 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
             bot->GetBotAI()->canUpdate = false;
 
             const_cast<Creature*>(bot)->SetPvP(true);
-            queue->AddBotAsGroup(bot->GetGUID(), GetTeamIdForFaction(bot->GetFaction()) == TEAM_HORDE ? HORDE : ALLIANCE,
+            queue->AddBotAsGroup(bot->GetGUID(), GetTeamIdForFaction(bot->GetFaction()),
                 gqinfo->BgTypeId, bracketEntry, gqinfo->ArenaType, false, gqinfo->ArenaTeamRating, gqinfo->ArenaMatchmakerRating);
 
             seconds_delay += std::max<uint32>(1u, uint32((MINUTE / 2) / (spawned_bots_a.size() + spawned_bots_h.size())));
 
             BotBattlegroundEnterEvent* bbe = new BotBattlegroundEnterEvent(groupLeader->GetGUID(), bot->GetGUID(), bgqTypeId,
-                botDataEvents.CalculateTime(Milliseconds(uint32(INVITE_ACCEPT_WAIT_TIME) + uint32(BG_START_DELAY_2M))).count());
+                botDataEvents.CalculateTime(Milliseconds(uint32(INVITE_ACCEPT_WAIT_TIME) + uint32(BG_START_DELAY_2M)).count()));
             botDataEvents.AddEventAtOffset(bbe, Seconds(seconds_delay));
         }
     }

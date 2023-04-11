@@ -14621,7 +14621,6 @@ void bot_ai::JustDied(Unit* u)
     {
         Battleground* bg = me->GetMap()->ToBattlegroundMap()->GetBG();
         ASSERT_NOTNULL(bg);
-        TeamId my_team = BotDataMgr::GetTeamIdForFaction(me->GetFaction());
         GraveyardStruct const* gy = bg->GetClosestGraveyardForBot(me);
         if (gy)
         {

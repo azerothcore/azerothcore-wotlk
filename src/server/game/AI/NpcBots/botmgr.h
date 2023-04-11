@@ -17,10 +17,13 @@ class Vehicle;
 class WorldLocation;
 class DPSTracker;
 
+struct AreaTrigger;
+struct CleanDamage;
 struct GroupQueueInfo;
 struct Position;
 
-enum CurrentSpellTypes;
+enum CurrentSpellTypes : uint8;
+enum DamageEffectType : uint8;
 
 constexpr size_t TargetIconNamesCacheSize = 8u; // Group.h TARGETICONCOUNT
 
@@ -242,7 +245,7 @@ class AC_GAME_API BotMgr
 
         static void InviteBotToBG(ObjectGuid botguid, GroupQueueInfo* ginfo, Battleground* bg);
 
-        static bool IsBotInAreaTriggerRadius(Creature const* bot, AreaTriggerEntry const* trigger);
+        static bool IsBotInAreaTriggerRadius(Creature const* bot, AreaTrigger const* trigger);
 
         static void AddDelayedTeleportCallback(delayed_teleport_callback_type&& callback);
         static void HandleDelayedTeleports();
