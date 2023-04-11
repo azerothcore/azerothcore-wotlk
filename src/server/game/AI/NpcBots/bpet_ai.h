@@ -25,7 +25,7 @@ class bot_pet_ai : public CreatureAI
         void Reset() override {}
 
         void JustDied(Unit*) override;
-        //virtual void KilledUnit(Unit* u);
+        void KilledUnit(Unit* u) override;
         void AttackStart(Unit* u) override;
         //virtual void JustEngagedWith(Unit* u) override;
         void MoveInLineOfSight(Unit* /*u*/) override {}

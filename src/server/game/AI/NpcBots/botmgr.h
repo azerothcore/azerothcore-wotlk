@@ -6,6 +6,7 @@
 #include <functional>
 #include <mutex>
 
+class Battleground;
 class Creature;
 class GameObject;
 class Map;
@@ -16,6 +17,7 @@ class Vehicle;
 class WorldLocation;
 class DPSTracker;
 
+struct GroupQueueInfo;
 struct Position;
 
 enum CurrentSpellTypes;
@@ -237,6 +239,10 @@ class AC_GAME_API BotMgr
 
         void UpdateTargetIconName(uint8 id, std::string const& name);
         void ResetTargetIconNames();
+
+        static void InviteBotToBG(ObjectGuid botguid, GroupQueueInfo* ginfo, Battleground* bg);
+
+        static bool IsBotInAreaTriggerRadius(Creature const* bot, AreaTriggerEntry const* trigger);
 
         static void AddDelayedTeleportCallback(delayed_teleport_callback_type&& callback);
         static void HandleDelayedTeleports();

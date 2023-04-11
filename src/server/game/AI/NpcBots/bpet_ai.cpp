@@ -2067,6 +2067,11 @@ void bot_pet_ai::JustDied(Unit*)
     KillEvents(false);
 }
 
+void bot_pet_ai::KilledUnit(Unit* u)
+{
+    GetPetsOwner()->GetBotAI()->KilledUnit(u);
+}
+
 void bot_pet_ai::AttackStart(Unit* /*u*/)
 {
 }

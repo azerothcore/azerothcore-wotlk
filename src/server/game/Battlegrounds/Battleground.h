@@ -198,6 +198,13 @@ enum BattlegroundStatus
     STATUS_WAIT_LEAVE               = 4                      // means some faction has won BG and it is ending
 };
 
+//npcbot
+struct BattlegroundBot
+{
+    TeamId Team;                                             // bot's team
+};
+//end npcbot
+
 struct BattlegroundObjectInfo
 {
     BattlegroundObjectInfo()  = default;
@@ -390,6 +397,10 @@ public:
     [[nodiscard]] bool isRated() const        { return m_IsRated; }
 
     typedef std::map<ObjectGuid, Player*> BattlegroundPlayerMap;
+    //npcbot
+    typedef std::map<ObjectGuid, BattlegroundBot> BattlegroundBotMap;
+    [[nodiscard]] BattlegroundBotMap const& GetBots() const { return m_Bots; }
+    //end npcbot
     [[nodiscard]] BattlegroundPlayerMap const& GetPlayers() const { return m_Players; }
     [[nodiscard]] uint32 GetPlayersSize() const { return m_Players.size(); }
 
@@ -519,6 +530,23 @@ public:
 
     void AddOrSetPlayerToCorrectBgGroup(Player* player, TeamId teamId);
 
+    //npcbot
+    [[nodiscard]] std::size_t GetBotScoresSize() const { return BotScores.size(); }
+    void RemoveBotFromResurrectQueue(ObjectGuid guid);
+    virtual void AddBot(Creature* bot);
+    virtual void RemoveBotAtLeave(ObjectGuid guid);
+    virtual bool UpdateBotScore(Creature const* bot, uint32 type, uint32 value);
+    void AddOrSetBotToCorrectBgGroup(Creature* bot, TeamId teamId);
+    virtual void HandleBotKillPlayer(Creature* killer, Player* victim);
+    virtual void HandleBotKillBot(Creature* killer, Creature* victim);
+    virtual void HandlePlayerKillBot(Creature* victim, Player* killer);
+    TeamId GetBotTeamId(ObjectGuid guid) const;
+    virtual GraveyardStruct const* GetClosestGraveyardForBot(Creature* bot) const;
+    virtual void RemoveBot(ObjectGuid /*guid*/) {}
+    virtual void EventBotDroppedFlag(Creature* /*bot*/) { }
+    virtual void EventBotClickedOnFlag(Creature* /*bot*/, GameObject* /*target_obj*/) { }
+    //end npcbot
+
     virtual void RemovePlayerAtLeave(Player* player);
     // can be extended in in BG subclass
 
@@ -609,6 +637,10 @@ protected:
 
     // Scorekeeping
     BattlegroundScoreMap PlayerScores;                // Player scores
+    //npcbot
+    BattlegroundScoreMap BotScores;
+    BattlegroundBotMap m_Bots;
+    //end npcbot
     // must be implemented in BG subclass
     virtual void RemovePlayer(Player* /*player*/) {}
 

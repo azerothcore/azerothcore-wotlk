@@ -945,7 +945,7 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
 {
     ASSERT(bot->GetBotAI());
     bot->GetBotAI()->AbortTeleport();
-    bot->GetBotAI()->SetInDuringTeleport(true);
+    bot->GetBotAI()->SetIsDuringTeleport(true);
 
     bot->GetBotAI()->KillEvents(true);
 
@@ -962,7 +962,8 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
         bot->CastSpell(bot, COSMETIC_TELEPORT_EFFECT, true);
 
     BotMgr::AddDelayedTeleportCallback([bot, newMap, x, y, z, ori, quick, reset]() {
-        if (Map* mymap = bot->FindMap())
+        Map* mymap = bot->FindMap();
+        if (mymap)
         {
             bot->BotStopMovement();
             bot->GetBotAI()->UnsummonAll();
@@ -996,7 +997,61 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
             bot->GetMap()->AddToMap(bot);
             if (reset)
                 bot->GetBotAI()->Reset();
-            bot->GetBotAI()->SetInDuringTeleport(false);
+            bot->GetBotAI()->SetIsDuringTeleport(false);
+
+            if (bot->GetMap()->GetEntry()->IsBattleground())
+            {
+                //get player to get a bg, GetBG() may return invalid pointer
+                Player const* pl = nullptr;
+                for (auto const& ref : bot->GetMap()->GetPlayers())
+                {
+                    pl = ref.GetSource();
+                    if (pl)
+                        break;
+                }
+                Battleground* bg = pl ? pl->GetBattleground() : nullptr;
+                if (!bg)
+                {
+                    if (bot->IsWandererBot() && newMap != mymap)
+                    {
+                        BotDataMgr::DespawnWandererBot(bot->GetEntry());
+                        return;
+                    }
+                }
+                else if (newMap != mymap)
+                    bg->AddBot(bot);
+
+                if (!bot->IsAlive())
+                {
+                    ObjectGuid shGuid = ObjectGuid::Empty;
+                    float mindist = 0.0f;
+                    for (ObjectGuid bgCreGuid : bg->BgCreatures)
+                    {
+                        if (Creature const* bgCre = newMap->GetCreature(bgCreGuid))
+                        {
+                            if (bgCre->IsSpiritService())
+                            {
+                                float dist = bot->GetExactDist2d(bgCre);
+                                if (shGuid == ObjectGuid::Empty || dist < mindist)
+                                {
+                                    mindist = dist;
+                                    shGuid = bgCreGuid;
+                                }
+                            }
+                        }
+                    }
+                    if (shGuid)
+                        bg->AddPlayerToResurrectQueue(shGuid, bot->GetGUID());
+                    else
+                    {
+                        TC_LOG_ERROR("npcbots", "TeleportBot: Bot %u '%s' can't find SpiritHealer in bg %s!",
+                            bot->GetEntry(), bot->GetName().c_str(), bg->GetName().c_str());
+                    }
+                }
+            }
+
+            bot->GetBotAI()->canUpdate = true;
+
             return;
         }
 
@@ -1950,6 +2005,38 @@ float BotMgr::GetBotDamageModByClass(uint8 botclass)
         default:
             return 1.0;
     }
+}
+
+void BotMgr::InviteBotToBG(ObjectGuid botguid, GroupQueueInfo* ginfo, Battleground* bg)
+{
+    Creature const* bot = BotDataMgr::FindBot(botguid.GetEntry());
+    ASSERT(bot);
+
+    bg->IncreaseInvitedCount(ginfo->Team);
+    //TC_LOG_INFO("npcbots", "Battleground: invited NPCBot %u to BG instance %u bgtype %u '%s'",
+    //    botguid.GetEntry(), bg->GetInstanceID(), bg->GetTypeID(), bg->GetName().c_str());
+}
+
+bool BotMgr::IsBotInAreaTriggerRadius(Creature const* bot, AreaTriggerEntry const* trigger)
+{
+    if (!trigger || !bot->IsInWorld() || bot->GetMap()->GetId() != trigger->ContinentID)
+        return false;
+
+    if (trigger->Radius > 0.f)
+    {
+        // if we have radius check it
+        float dist = bot->GetDistance(trigger->Pos.X, trigger->Pos.Y, trigger->Pos.Z);
+        if (dist > trigger->Radius)
+            return false;
+    }
+    else
+    {
+        Position center(trigger->Pos.X, trigger->Pos.Y, trigger->Pos.Z, trigger->BoxYaw);
+        if (!bot->IsWithinBox(center, trigger->BoxLength / 2.f, trigger->BoxWidth / 2.f, trigger->BoxHeight / 2.f))
+            return false;
+    }
+
+    return true;
 }
 
 BotMgr::delayed_teleport_mutex_type* BotMgr::_getTpLock()

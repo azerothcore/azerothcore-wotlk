@@ -2558,7 +2558,7 @@ public:
             {
                 ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(race);
                 uint32 faction = rentry ? rentry->FactionID : 14;
-                TeamId team = BotDataMgr::GetTeamForFaction(faction);
+                TeamId team = BotDataMgr::GetTeamIdForFaction(faction);
 
                 if (*teamid != uint8(team))
                     continue;

@@ -1,3 +1,5 @@
+#include "BattlegroundMgr.h"
+#include "BattlegroundQueue.h"
 #include "bot_ai.h"
 #include "botdatamgr.h"
 #include "botmgr.h"
@@ -38,11 +40,11 @@ NpcBotExtrasMap _botsExtras;
 NpcBotTransmogDataMap _botsTransmogData;
 NpcBotRegistry _existingBots;
 
-std::map<uint8, std::set<uint32>> spareBotIdsPerClassMap;
+std::map<uint8, std::set<uint32>> _spareBotIdsPerClassMap;
 CreatureTemplateContainer _botsWanderCreatureTemplates;
 std::unordered_map<uint32, EquipmentInfo const*> _botsWanderCreatureEquipmentTemplates;
 std::list<std::pair<uint32, WanderNode const*>> _botsWanderCreaturesToSpawn;
-std::list<uint32> _botsWanderCreaturesToDespawn;
+std::set<uint32> _botsWanderCreaturesToDespawn;
 
 constexpr uint8 ITEM_SORTING_LEVEL_STEP = 5;
 typedef std::vector<uint32> ItemIdVector;
@@ -55,31 +57,135 @@ static bool allBotsLoaded = false;
 
 static uint32 next_wandering_bot_spawn_delay = 0;
 
+static EventProcessor botDataEvents;
+
+class BotBattlegroundEnterEvent : public BasicEvent
+{
+    const ObjectGuid _playerGUID;
+    const ObjectGuid _botGUID;
+    const BattlegroundQueueTypeId _bgQueueTypeId;
+    const uint64 _removeTime;
+
+public:
+    BotBattlegroundEnterEvent(ObjectGuid playerGUID, ObjectGuid botGUID, BattlegroundQueueTypeId bgQueueTypeId, uint64 removeTime)
+        : _playerGUID(playerGUID), _botGUID(botGUID), _bgQueueTypeId(bgQueueTypeId), _removeTime(removeTime) {}
+
+    void AbortMe()
+    {
+        TC_LOG_ERROR("npcbots", "BotBattlegroundEnterEvent: Aborting bot %u bg %u!", _botGUID.GetEntry(), uint32(_bgQueueTypeId));
+        sBattlegroundMgr->GetBattlegroundQueue(_bgQueueTypeId).RemovePlayer(_botGUID, true);
+        BotDataMgr::DespawnWandererBot(_botGUID.GetEntry());
+    }
+
+    bool Execute(uint64 e_time, uint32 /*p_time*/) override
+    {
+        //timed out
+        if (e_time >= _removeTime)
+        {
+            AbortMe();
+            return true;
+        }
+        else if (Creature const* bot = BotDataMgr::FindBot(_botGUID.GetEntry()))
+        {
+            Player const* bgPlayer = ObjectAccessor::FindConnectedPlayer(_playerGUID);
+            if (bgPlayer && bgPlayer->IsInWorld() && bgPlayer->InBattleground())
+            {
+                Battleground* bg = bgPlayer->GetBattleground();
+                Map* bgMap = bgPlayer->FindMap();
+                ASSERT_NOTNULL(bg);
+                ASSERT_NOTNULL(bgMap);
+                ASSERT(bgMap->GetEntry()->IsBattlegroundOrArena());
+
+                //full, some players connected
+                if (!bg->HasFreeSlots())
+                {
+                    AbortMe();
+                    return true;
+                }
+
+                sBattlegroundMgr->GetBattlegroundQueue(_bgQueueTypeId).RemovePlayer(bot->GetGUID(), false);
+
+                TeamId teamId = BotDataMgr::GetTeamIdForFaction(bot->GetFaction());
+                BotMgr::TeleportBot(const_cast<Creature*>(bot), bgMap, bg->GetTeamStartPosition(teamId), true, false);
+            }
+            else if (bgPlayer && bgPlayer->InBattlegroundQueue())
+                botDataEvents.AddEventAtOffset(new BotBattlegroundEnterEvent(_playerGUID, _botGUID, _bgQueueTypeId, _removeTime), 2s);
+            else
+                AbortMe();
+        }
+
+        return true;
+    }
+
+    void Abort(uint64 /*e_time*/) override { AbortMe(); }
+};
+
+void SpawnWanderergBot(uint32 bot_id, WanderNode const* spawnLoc, NpcBotRegistry* registry)
+{
+    CreatureTemplate const& bot_template = _botsWanderCreatureTemplates.at(bot_id);
+    NpcBotData const* bot_data = BotDataMgr::SelectNpcBotData(bot_id);
+    NpcBotExtras const* bot_extras = BotDataMgr::SelectNpcBotExtras(bot_id);
+    Position spawnPos = spawnLoc->GetPosition();
+
+    ASSERT(bot_data);
+    ASSERT(bot_extras);
+
+    Map* map = sMapMgr->CreateBaseMap(spawnLoc->GetMapId());
+    map->LoadGrid(spawnLoc->m_positionX, spawnLoc->m_positionY);
+
+    TC_LOG_DEBUG("npcbots", "Spawning wandering bot: %s (%u) class %u race %u fac %u, location: mapId %u %s (%s)",
+        bot_template.Name.c_str(), bot_id, uint32(bot_extras->bclass), uint32(bot_extras->race), bot_data->faction,
+        spawnLoc->GetMapId(), spawnLoc->ToString().c_str(), spawnLoc->GetName().c_str());
+
+    Creature* bot = new Creature();
+    if (!bot->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, bot_id, *spawnLoc))
+    {
+        delete bot;
+        TC_LOG_FATAL("server.loading", "Creature is not created!");
+        ASSERT(false);
+    }
+    if (!bot->LoadBotCreatureFromDB(0, map, true, true, bot_id, &spawnPos))
+    {
+        delete bot;
+        TC_LOG_FATAL("server.loading", "Cannot load npcbot from DB!");
+        ASSERT(false);
+    }
+
+    if (registry)
+        registry->insert(bot);
+}
+
+void BotDataMgr::DespawnWandererBot(uint32 entry)
+{
+    Creature const* bot = FindBot(entry);
+    if (bot && bot->IsWandererBot())
+    {
+        if (bot->GetBotAI())
+            bot->GetBotAI()->canUpdate = false;
+        _botsWanderCreaturesToDespawn.insert(entry);
+    }
+    else
+        TC_LOG_ERROR("npcbots", "DespawnWandererBot(): trying to despawn non-existing wanderer bot %u '%s'!", entry, bot ? bot->GetName().c_str() : "unknown");
+}
+
 struct WanderingBotsGenerator
 {
 private:
     using NodeVec = std::vector<WanderNode const*>;
 
+    const std::map<uint8, uint32> wbot_faction_for_ex_class = {
+        {BOT_CLASS_BM, 2u},
+        {BOT_CLASS_SPHYNX, 14u},
+        {BOT_CLASS_ARCHMAGE, 1u},
+        {BOT_CLASS_DREADLORD, 14u},
+        {BOT_CLASS_SPELLBREAKER, 1610u},
+        {BOT_CLASS_DARK_RANGER, 14u},
+        {BOT_CLASS_NECROMANCER, 14u},
+        {BOT_CLASS_SEA_WITCH, 14u}
+    };
+
     uint32 next_bot_id;
-    uint32 maxWanderingBots;
     uint32 enabledBotsCount;
-
-    CreatureTemplate const* find_bot_creature_template_by_botclass(uint8 b_class)
-    {
-        ASSERT(spareBotIdsPerClassMap.find(b_class) != spareBotIdsPerClassMap.cend());
-        auto const& cSet = spareBotIdsPerClassMap.at(b_class);
-        uint32 entry = cSet.size() == 1 ? *cSet.cbegin() : Acore::Containers::SelectRandomContainerElement(cSet);
-        return sObjectMgr->GetCreatureTemplate(entry);
-    }
-
-    void remove_bot_orig_entry_from_available(uint8 bclass, uint32 botId)
-    {
-        ASSERT(spareBotIdsPerClassMap.find(bclass) != spareBotIdsPerClassMap.cend());
-        ASSERT(spareBotIdsPerClassMap.at(bclass).find(botId) != spareBotIdsPerClassMap.at(bclass).cend());
-        spareBotIdsPerClassMap.at(bclass).erase(botId);
-        if (spareBotIdsPerClassMap.at(bclass).empty())
-            spareBotIdsPerClassMap.erase(bclass);
-    }
 
     WanderingBotsGenerator()
     {
@@ -100,8 +206,8 @@ private:
         ASSERT(next_bot_id > BOT_ENTRY_BEGIN);
 
         for (uint8 c = BOT_CLASS_WARRIOR; c < BOT_CLASS_END; ++c)
-            if (c != BOT_CLASS_BM && BotMgr::IsClassEnabled(c) && spareBotIdsPerClassMap.find(c) == spareBotIdsPerClassMap.cend())
-                spareBotIdsPerClassMap.insert({ c, {} });
+            if (c != BOT_CLASS_BM && BotMgr::IsClassEnabled(c) && _spareBotIdsPerClassMap.find(c) == _spareBotIdsPerClassMap.cend())
+                _spareBotIdsPerClassMap.insert({ c, {} });
 
         for (decltype(_botsExtras)::value_type const& vt : _botsExtras)
         {
@@ -111,45 +217,46 @@ private:
                 ++enabledBotsCount;
                 if (_botsData.find(vt.first) == _botsData.end())
                 {
-                    ASSERT(spareBotIdsPerClassMap.find(c) != spareBotIdsPerClassMap.cend());
-                    spareBotIdsPerClassMap.at(c).insert(vt.first);
-                    ++maxWanderingBots;
+                    ASSERT(_spareBotIdsPerClassMap.find(c) != _spareBotIdsPerClassMap.cend());
+                    _spareBotIdsPerClassMap.at(c).insert(vt.first);
                 }
             }
         }
 
         for (uint8 c = BOT_CLASS_WARRIOR; c < BOT_CLASS_END; ++c)
-            if (spareBotIdsPerClassMap.find(c) != spareBotIdsPerClassMap.cend() && spareBotIdsPerClassMap.at(c).empty())
-                spareBotIdsPerClassMap.erase(c);
+            if (_spareBotIdsPerClassMap.find(c) != _spareBotIdsPerClassMap.cend() && _spareBotIdsPerClassMap.at(c).empty())
+                _spareBotIdsPerClassMap.erase(c);
     }
 
-    bool GenerateWanderingBotToSpawn(NodeVec const& spawns_a, NodeVec const& spawns_h, NodeVec const& spawns_n)
+    uint32 GetDefaultFactionForRaceClass(uint8 bot_class, uint8 bot_race) const
     {
-        static const std::map<uint8, uint32> wbot_faction_for_ex_class = {
-            {BOT_CLASS_BM, 2u},
-            {BOT_CLASS_SPHYNX, 14u},
-            {BOT_CLASS_ARCHMAGE, 1u},
-            {BOT_CLASS_DREADLORD, 14u},
-            {BOT_CLASS_SPELLBREAKER, 1610u},
-            {BOT_CLASS_DARK_RANGER, 14u},
-            {BOT_CLASS_NECROMANCER, 14u},
-            {BOT_CLASS_SEA_WITCH, 14u}
-        };
+        ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(bot_race);
+        return
+            (bot_class >= BOT_CLASS_EX_START) ? wbot_faction_for_ex_class.find(bot_class)->second : rentry ? rentry->FactionID : 14;
+    }
+
+    bool GenerateWanderingBotToSpawn(std::map<uint8, std::set<uint32>>& spareBotIdsPerClass,
+        NodeVec const& spawns_a, NodeVec const& spawns_h, NodeVec const& spawns_n, bool immediate, PvPDifficultyEntry const* bracketEntry, NpcBotRegistry* registry)
+    {
+        ASSERT(!spareBotIdsPerClass.empty());
 
         CreatureTemplateContainer const* all_templates = sObjectMgr->GetCreatureTemplates();
 
         while (all_templates->find(++next_bot_id) != all_templates->cend()) {}
 
-        uint8 bot_class = Acore::Containers::SelectRandomContainerElement(spareBotIdsPerClassMap).first;
-        CreatureTemplate const* orig_template = find_bot_creature_template_by_botclass(bot_class);
+        auto const& spareBotPair = Acore::Containers::SelectRandomContainerElement(spareBotIdsPerClass);
+        const uint8 bot_class = spareBotPair.first;
+        auto const& cSet = spareBotPair.second;
+        ASSERT(!cSet.empty());
+        uint32 orig_entry = cSet.size() == 1 ? *cSet.cbegin() : Trinity::Containers::SelectRandomContainerElement(cSet);
+        CreatureTemplate const* orig_template = sObjectMgr->GetCreatureTemplate(orig_entry);
         ASSERT(orig_template);
-        NpcBotExtras const* orig_extras = BotDataMgr::SelectNpcBotExtras(orig_template->Entry);
+        NpcBotExtras const* orig_extras = BotDataMgr::SelectNpcBotExtras(orig_entry);
         ASSERT_NOTNULL(orig_extras);
-        ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(orig_extras->race);
-        uint32 bot_faction = (bot_class >= BOT_CLASS_EX_START) ? wbot_faction_for_ex_class.find(bot_class)->second : rentry ? rentry->FactionID : 14;
+        uint32 bot_faction = GetDefaultFactionForRaceClass(bot_class, orig_extras->race);
 
         NodeVec const* bot_spawn_nodes;
-        TeamId bot_team = BotDataMgr::GetTeamForFaction(bot_faction);
+        TeamId bot_team = BotDataMgr::GetTeamIdForFaction(bot_faction);
         switch (bot_team)
         {
             case TEAM_ALLIANCE:
@@ -181,7 +288,13 @@ private:
         bot_template.SubName = "";
         bot_template.speed_run = 1.05f;
         bot_template.flags_extra &= ~(CREATURE_FLAG_EXTRA_NO_XP);
-        bot_template.KillCredit[0] = orig_template->Entry;
+        bot_template.KillCredit[0] = orig_entry;
+        if (bracketEntry)
+        {
+            //force level range for bgs
+            bot_template.minlevel = bracketEntry->MinLevel;
+            bot_template.maxlevel = bracketEntry->MaxLevel;
+        }
         bot_template.InitializeQueryData();
 
         NpcBotData* bot_data = new NpcBotData(bot_ai::DefaultRolesForClass(bot_class), bot_faction, bot_ai::DefaultSpecForClass(bot_class));
@@ -190,7 +303,7 @@ private:
         bot_extras->bclass = bot_class;
         bot_extras->race = orig_extras->race;
         _botsExtras[next_bot_id] = bot_extras;
-        if (NpcBotAppearanceData const* orig_apdata = BotDataMgr::SelectNpcBotAppearance(orig_template->Entry))
+        if (NpcBotAppearanceData const* orig_apdata = BotDataMgr::SelectNpcBotAppearance(orig_entry))
         {
             NpcBotAppearanceData* bot_apdata = new NpcBotAppearanceData();
             bot_apdata->face = orig_apdata->face;
@@ -202,7 +315,7 @@ private:
             _botsAppearanceData[next_bot_id] = bot_apdata;
         }
         int8 beqId = 1;
-        _botsWanderCreatureEquipmentTemplates[next_bot_id] = sObjectMgr->GetEquipmentInfo(orig_template->Entry, beqId);
+        _botsWanderCreatureEquipmentTemplates[next_bot_id] = sObjectMgr->GetEquipmentInfo(orig_entry, beqId);
 
         //We do not create CreatureData for generated bots
 
@@ -210,24 +323,41 @@ private:
         GridCoord g = Acore::ComputeGridCoord(spawnLoc->m_positionX, spawnLoc->m_positionY);
         ASSERT(c.IsCoordValid(), "Invalid Cell coord!");
         ASSERT(g.IsCoordValid(), "Invalid Grid coord!");
-        Map const* map = sMapMgr->CreateBaseMap(spawnLoc->GetMapId());
+        Map* map = sMapMgr->CreateBaseMap(spawnLoc->GetMapId());
         ASSERT(map->GetEntry()->IsContinent() || map->GetEntry()->IsBattlegroundOrArena(), map->GetDebugInfo().c_str());
 
-        _botsWanderCreaturesToSpawn.push_back({ next_bot_id, spawnLoc });
+        if (immediate)
+            SpawnWanderergBot(next_bot_id, spawnLoc, registry);
+        else
+            _botsWanderCreaturesToSpawn.push_back({ next_bot_id, spawnLoc });
 
-        remove_bot_orig_entry_from_available(bot_class, orig_template->Entry);
+        _spareBotIdsPerClassMap.at(bot_class).erase(orig_entry);
+        if (_spareBotIdsPerClassMap.at(bot_class).empty())
+            _spareBotIdsPerClassMap.erase(bot_class);
+
+        spareBotIdsPerClass.at(bot_class).erase(orig_entry);
+        if (spareBotIdsPerClass.at(bot_class).empty())
+            spareBotIdsPerClass.erase(bot_class);
+
         return true;
     }
 
 public:
-    uint32 GetMaxWanderingBots() const { return maxWanderingBots; }
     uint32 GetEnabledBotsCount() const { return enabledBotsCount; }
 
-    bool GenerateWanderingBotsToSpawn(uint32 count, int32 map_id, uint32& spawned)
+    uint32 GetSpareBotsCount() const
+    {
+        uint32 count = 0;
+        for (auto const& kv : _spareBotIdsPerClassMap)
+            count += kv.second.size();
+        return count;
+    }
+
+    bool GenerateWanderingBotsToSpawn(uint32 count, int32 map_id, int32 team, bool immediate, PvPDifficultyEntry const* bracketEntry, NpcBotRegistry* registry, uint32& spawned)
     {
         using NodeVec = std::vector<WanderNode const*>;
 
-        if (spareBotIdsPerClassMap.empty())
+        if (_spareBotIdsPerClassMap.empty())
             return false;
 
         NodeVec spawns_a, spawns_h, spawns_n;
@@ -283,15 +413,65 @@ public:
                 break;
             }
         }
-        if (!found_maxlevel_node_a && !found_maxlevel_node_h && !found_maxlevel_node_rest)
+
+        if (team == -1)
+        {
+            static const std::array<int32, 6> team_choices{ ALLIANCE, HORDE, TEAM_OTHER, ALLIANCE, HORDE, TEAM_OTHER };
+            team = Trinity::Containers::SelectRandomContainerElement(team_choices);
+        }
+
+        switch (team)
+        {
+            case ALLIANCE:
+                if (!found_maxlevel_node_a)
+                    return false;
+                break;
+            case HORDE:
+                if (!found_maxlevel_node_h)
+                    return false;
+                break;
+            case TEAM_OTHER:
+            default:
+                if (!found_maxlevel_node_rest)
+                    return false;
+                break;
+        }
+
+        decltype (_spareBotIdsPerClassMap) teamSpareBotIdsPerClass;
+        for (auto const& kv : _spareBotIdsPerClassMap)
+        {
+            for (uint32 spareBotId : kv.second)
+            {
+                NpcBotExtras const* orig_extras = BotDataMgr::SelectNpcBotExtras(spareBotId);
+                ASSERT_NOTNULL(orig_extras);
+
+                uint32 bot_faction = GetDefaultFactionForRaceClass(kv.first, orig_extras->race);
+
+                uint32 botTeam = BotDataMgr::GetTeamForFaction(bot_faction);
+
+                if (int32(botTeam) != team)
+                    continue;
+
+                if (bracketEntry)
+                {
+                    uint8 botminlevel = BotDataMgr::GetMinLevelForBotClass(kv.first);
+                    if (botminlevel > bracketEntry->MaxLevel)
+                        continue;
+                }
+
+                teamSpareBotIdsPerClass[kv.first].insert(spareBotId);
+            }
+        }
+
+        if (teamSpareBotIdsPerClass.empty())
             return false;
 
-        for (uint32 i = 1; i <= count;) // i is a counter, NOT used as index or value
+        for (uint32 i = 1; i <= count && !teamSpareBotIdsPerClass.empty();) // i is a counter, NOT used as index or value
         {
             int8 tries = 100;
             do {
                 --tries;
-                if (GenerateWanderingBotToSpawn(spawns_a, spawns_h, spawns_n))
+                if (GenerateWanderingBotToSpawn(teamSpareBotIdsPerClass, spawns_a, spawns_h, spawns_n, immediate, bracketEntry, registry))
                 {
                     ++i;
                     ++spawned;
@@ -316,24 +496,17 @@ public:
 };
 #define sBotGen WanderingBotsGenerator::instance()
 
-void BotDataMgr::DespawnWandererBot(uint32 entry)
-{
-    Creature const* bot = FindBot(entry);
-    if (bot && bot->IsWandererBot())
-        _botsWanderCreaturesToDespawn.push_back(entry);
-    else
-        LOG_ERROR("npcbots", "DespawnWandererBot(): trying to despawn wanderer bot {} '{}' does not exist!", entry, bot ? bot->GetName().c_str() : "unknown");
-}
-
 void BotDataMgr::Update(uint32 diff)
 {
+    botDataEvents.Update(diff);
+
     if (!_botsWanderCreaturesToDespawn.empty())
     {
-        LOG_ERROR("npcbots", "Bots to despawn: {}", uint32(_botsWanderCreaturesToDespawn.size()));
+        LOG_DEBUG("npcbots", "Bots to despawn: {}", uint32(_botsWanderCreaturesToDespawn.size()));
 
         while (!_botsWanderCreaturesToDespawn.empty())
         {
-            uint32 bot_despawn_id = _botsWanderCreaturesToDespawn.front();
+            uint32 bot_despawn_id = *_botsWanderCreaturesToDespawn.begin();
 
             Creature* bot = const_cast<Creature*>(FindBot(bot_despawn_id));
             ASSERT(bot);
@@ -341,12 +514,12 @@ void BotDataMgr::Update(uint32 diff)
             if (!bot->IsInWorld())
                 break;
 
-            _botsWanderCreaturesToDespawn.pop_front();
+            _botsWanderCreaturesToDespawn.erase(bot_despawn_id);
 
             uint32 origEntry = _botsWanderCreatureTemplates.at(bot_despawn_id).KillCredit[0];
             std::string botName = bot->GetName();
 
-            spareBotIdsPerClassMap[bot->GetBotClass()].insert(origEntry);
+            _spareBotIdsPerClassMap[bot->GetBotClass()].insert(origEntry);
 
             BotMgr::CleanupsBeforeBotDelete(bot);
 
@@ -364,7 +537,7 @@ void BotDataMgr::Update(uint32 diff)
 
             ASSERT(bditr != _botsData.end());
             ASSERT(beitr != _botsExtras.end());
-            ASSERT(baditr != _botsAppearanceData.end());
+            //ASSERT(baditr != _botsAppearanceData.end()); may not exist
             ASSERT(bwcetitr != _botsWanderCreatureEquipmentTemplates.end());
             ASSERT(bwctitr != _botsWanderCreatureTemplates.end());
 
@@ -372,63 +545,39 @@ void BotDataMgr::Update(uint32 diff)
             _botsData.erase(bditr);
             delete beitr->second;
             _botsExtras.erase(beitr);
-            delete baditr->second;
-            _botsAppearanceData.erase(baditr);
+            if (baditr != _botsAppearanceData.end())
+            {
+                delete baditr->second;
+                _botsAppearanceData.erase(baditr);
+            }
             _botsWanderCreatureEquipmentTemplates.erase(bwcetitr);
             _botsWanderCreatureTemplates.erase(bwctitr);
 
-            LOG_ERROR("npcbots", "Despawned wanderer bot {} '{}' (orig {})", bot_despawn_id, botName.c_str(), origEntry);
+            LOG_DEBUG("npcbots", "Despawned wanderer bot {} '{}' (orig {})", bot_despawn_id, botName.c_str(), origEntry);
         }
     }
 
-    if (_botsWanderCreaturesToSpawn.empty())
+    if (!_botsWanderCreaturesToSpawn.empty())
+    {
+        static const uint32 WANDERING_BOT_SPAWN_DELAY = 500;
+
+        next_wandering_bot_spawn_delay += diff;
+
+        while (next_wandering_bot_spawn_delay >= WANDERING_BOT_SPAWN_DELAY && !_botsWanderCreaturesToSpawn.empty())
+        {
+            next_wandering_bot_spawn_delay -= WANDERING_BOT_SPAWN_DELAY;
+
+            auto const& p = _botsWanderCreaturesToSpawn.front();
+
+            uint32 bot_id = p.first;
+            WanderNode const* spawnLoc = p.second;
+
+            _botsWanderCreaturesToSpawn.pop_front();
+
+            SpawnWanderergBot(bot_id, spawnLoc, nullptr);
+        }
+
         return;
-
-    static const uint32 WANDERING_BOT_SPAWN_DELAY = 250;
-
-    if (next_wandering_bot_spawn_delay >= diff)
-    {
-        next_wandering_bot_spawn_delay -= diff;
-        return;
-    }
-    else
-        next_wandering_bot_spawn_delay += WANDERING_BOT_SPAWN_DELAY;
-
-    auto const& p = _botsWanderCreaturesToSpawn.front();
-
-    uint32 bot_id = p.first;
-    WanderNode const* spawnLoc = p.second;
-
-    _botsWanderCreaturesToSpawn.pop_front();
-
-    CreatureTemplate const& bot_template = _botsWanderCreatureTemplates.at(bot_id);
-    NpcBotData const* bot_data = SelectNpcBotData(bot_id);
-    NpcBotExtras const* bot_extras = SelectNpcBotExtras(bot_id);
-    Position spawnPos = spawnLoc->GetPosition();
-
-    ASSERT(bot_data);
-    ASSERT(bot_extras);
-
-    Map* map = sMapMgr->CreateBaseMap(spawnLoc->GetMapId());
-    map->LoadGrid(spawnLoc->m_positionX, spawnLoc->m_positionY);
-
-    LOG_INFO("npcbots", "Spawning wandering bot: {} ({}) class {} race {} fac {}, location: mapId {} {} ({})",
-        bot_template.Name.c_str(), bot_id, uint32(bot_extras->bclass), uint32(bot_extras->race), bot_data->faction,
-        spawnLoc->GetMapId(), spawnLoc->ToString().c_str(), spawnLoc->GetName().c_str());
-
-    Creature* bot = new Creature();
-    if (!bot->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, bot_id, 0,
-        spawnLoc->m_positionX, spawnLoc->m_positionY, spawnLoc->m_positionZ, spawnLoc->GetOrientation()))
-    {
-        delete bot;
-        LOG_FATAL("server.loading", "Creature is not created!");
-        ASSERT(false);
-    }
-    if (!bot->LoadBotCreatureFromDB(0, map, true, true, bot_id, &spawnPos))
-    {
-        delete bot;
-        LOG_FATAL("server.loading", "Cannot load npcbot from DB!");
-        ASSERT(false);
     }
 }
 
@@ -939,19 +1088,18 @@ void BotDataMgr::GenerateWanderingBots()
     using NodeVec = std::vector<WanderNode const*>;
 
     LoadWanderMap();
+    CreateWanderingBotsSortedGear();
 
     const uint32 wandering_bots_desired = BotMgr::GetDesiredWanderingBotsCount();
 
     if (wandering_bots_desired == 0)
         return;
 
-    CreateWanderingBotsSortedGear();
-
     LOG_INFO("server.loading", "Spawning wandering bots...");
 
     uint32 oldMSTime = getMSTime();
 
-    uint32 maxbots = sBotGen->GetMaxWanderingBots();
+    uint32 maxbots = sBotGen->GetSpareBotsCount();
     uint32 enabledbots = sBotGen->GetEnabledBotsCount();
 
     if (maxbots < wandering_bots_desired)
@@ -962,13 +1110,120 @@ void BotDataMgr::GenerateWanderingBots()
     }
 
     uint32 spawned_count = 0;
-    if (!sBotGen->GenerateWanderingBotsToSpawn(wandering_bots_desired, -1, spawned_count))
+    if (!sBotGen->GenerateWanderingBotsToSpawn(wandering_bots_desired, -1, -1, false, nullptr, nullptr, spawned_count))
     {
         LOG_FATAL("server.loading", "Failed to spawn all {} bots ({} succeeded)!", wandering_bots_desired, spawned_count);
         ASSERT(false);
     }
 
     LOG_INFO("server.loading", ">> Set up spawning of {} wandering bots in {} ms", spawned_count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unused]] Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo)
+{
+    uint32 spareBots = sBotGen->GetSpareBotsCount();
+
+    if (spareBots == 0)
+        return false;
+
+    BattlegroundQueueTypeId bgqTypeId = sBattlegroundMgr->BGQueueTypeId(gqinfo->BgTypeId, gqinfo->ArenaType);
+    ASSERT(bgqTypeId != BATTLEGROUND_QUEUE_NONE);
+
+    Battleground const* bg_template = sBattlegroundMgr->GetBattlegroundTemplate(gqinfo->BgTypeId);
+
+    if (!bg_template)
+        return false;
+
+    [[maybe_unused]] uint32 minplayers = bg_template->GetMinPlayers();
+    [[maybe_unused]] uint32 maxplayers = bg_template->GetMaxPlayers();
+    [[maybe_unused]] uint32 minteamplayers = bg_template->GetMinPlayersPerTeam();
+    [[maybe_unused]] uint32 maxteamplayers = bg_template->GetMaxPlayersPerTeam();
+    [[maybe_unused]] uint32 avgteamplayers = (minteamplayers + 1 + maxteamplayers) / 2;
+
+    [[maybe_unused]] uint32 minlevel = bracketEntry->MinLevel;
+    [[maybe_unused]] uint32 maxlevel = bracketEntry->MaxLevel;
+
+    uint8 bracketId = uint8(bracketEntry->GetBracketId());
+
+    uint32 queued_players_a = 0;
+    uint32 queued_players_h = 0;
+    for (uint8 i = 0; i < BG_QUEUE_GROUP_TYPES_COUNT; ++i)
+    {
+        for (GroupQueueInfo const* qgr : queue->m_QueuedGroups[bracketId][i])
+        {
+            if (qgr->Team == ALLIANCE)
+                queued_players_a += qgr->Players.size();
+            else
+                queued_players_h += qgr->Players.size();
+        }
+    }
+
+    uint32 needed_bots_count_a = 0;
+    uint32 needed_bots_count_h = 0;
+    if (queued_players_a < avgteamplayers)
+        needed_bots_count_a += avgteamplayers - queued_players_a;
+    if (queued_players_h < avgteamplayers)
+        needed_bots_count_h += avgteamplayers - queued_players_h;
+
+    ASSERT(needed_bots_count_a <= maxteamplayers);
+    ASSERT(needed_bots_count_h <= maxteamplayers);
+
+    if (spareBots < needed_bots_count_a + needed_bots_count_h)
+        return false;
+
+    uint32 spawned_a = 0;
+    uint32 spawned_h = 0;
+    NpcBotRegistry spawned_bots_a;
+    NpcBotRegistry spawned_bots_h;
+
+    if (!sBotGen->GenerateWanderingBotsToSpawn(needed_bots_count_a, bg_template->GetMapId(), ALLIANCE, true, bracketEntry, &spawned_bots_a, spawned_a))
+    {
+        TC_LOG_WARN("npcbots", "Failed to spawn %u ALLIANCE bots for BG %u '%s' queued A %u H %u req A %u H %u spare %u",
+            needed_bots_count_a, uint32(bg_template->GetTypeID()), bg_template->GetName().c_str(),
+            queued_players_a, queued_players_h, needed_bots_count_a, needed_bots_count_h, spareBots);
+        for (NpcBotRegistry const* registry1 : { &spawned_bots_a, &spawned_bots_h })
+            for (Creature const* bot : *registry1)
+                DespawnWandererBot(bot->GetEntry());
+
+        return false;
+    }
+    spareBots = sBotGen->GetSpareBotsCount();
+    if (!sBotGen->GenerateWanderingBotsToSpawn(needed_bots_count_h, bg_template->GetMapId(), HORDE, true, bracketEntry, &spawned_bots_h, spawned_h))
+    {
+        TC_LOG_WARN("npcbots", "Failed to spawn %u HORDE bots for BG %u '%s' queued A %u H %u req A %u H %u spare %u",
+            needed_bots_count_h, uint32(bg_template->GetTypeID()), bg_template->GetName().c_str(),
+            queued_players_a, queued_players_h, needed_bots_count_a, needed_bots_count_h, spareBots);
+        for (NpcBotRegistry const* registry2 : { &spawned_bots_a, &spawned_bots_h })
+            for (Creature const* bot : *registry2)
+                DespawnWandererBot(bot->GetEntry());
+
+        return false;
+    }
+
+    ASSERT(uint32(spawned_bots_a.size()) == needed_bots_count_a);
+    ASSERT(uint32(spawned_bots_h.size()) == needed_bots_count_h);
+
+    uint32 seconds_delay = 5;
+    for (NpcBotRegistry const* registry3 : { &spawned_bots_a, &spawned_bots_h })
+    {
+        for (Creature const* bot : *registry3)
+        {
+            bot->GetBotAI()->SetBotCommandState(BOT_COMMAND_STAY);
+            bot->GetBotAI()->canUpdate = false;
+
+            const_cast<Creature*>(bot)->SetPvP(true);
+            queue->AddBotAsGroup(bot->GetGUID(), GetTeamIdForFaction(bot->GetFaction()) == TEAM_HORDE ? HORDE : ALLIANCE,
+                gqinfo->BgTypeId, bracketEntry, gqinfo->ArenaType, false, gqinfo->ArenaTeamRating, gqinfo->ArenaMatchmakerRating);
+
+            seconds_delay += std::max<uint32>(1u, uint32((MINUTE / 2) / (spawned_bots_a.size() + spawned_bots_h.size())));
+
+            BotBattlegroundEnterEvent* bbe = new BotBattlegroundEnterEvent(groupLeader->GetGUID(), bot->GetGUID(), bgqTypeId,
+                botDataEvents.CalculateTime(Milliseconds(uint32(INVITE_ACCEPT_WAIT_TIME) + uint32(BG_START_DELAY_2M))).count());
+            botDataEvents.AddEventAtOffset(bbe, Seconds(seconds_delay));
+        }
+    }
+
+    return true;
 }
 
 void BotDataMgr::CreateWanderingBotsSortedGear()
@@ -2032,7 +2287,7 @@ int32 BotDataMgr::GetBotBaseReputation(Creature const* bot, FactionEntry const* 
     return std::min<int32>(minRep, 0);
 }
 
-TeamId BotDataMgr::GetTeamForFaction(uint32 factionTemplateId)
+TeamId BotDataMgr::GetTeamIdForFaction(uint32 factionTemplateId)
 {
     if (FactionTemplateEntry const* fte = sFactionTemplateStore.LookupEntry(factionTemplateId))
     {
@@ -2045,12 +2300,34 @@ TeamId BotDataMgr::GetTeamForFaction(uint32 factionTemplateId)
     return TEAM_NEUTRAL;
 }
 
+uint32 BotDataMgr::GetTeamForFaction(uint32 factionTemplateId)
+{
+    switch (GetTeamIdForFaction(factionTemplateId))
+    {
+        case TEAM_ALLIANCE:
+            return ALLIANCE;
+        case TEAM_HORDE:
+            return HORDE;
+        default:
+            return TEAM_OTHER;
+    }
+}
+
 bool BotDataMgr::IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport)
 {
-    if (!teleport && wp->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_FACTION))
-        return true;
+    if (!teleport)
+    {
+        if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_FACTION))
+            return true;
+    }
+    else
+    {
+        MapEntry const* mapEntry = sMapStore.LookupEntry(wp->GetMapId());
+        if (!mapEntry->IsContinent())
+            return false;
+    }
 
-    switch (GetTeamForFaction(factionTemplateId))
+    switch (GetTeamIdForFaction(factionTemplateId))
     {
         case TEAM_ALLIANCE:
             return !wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY);
