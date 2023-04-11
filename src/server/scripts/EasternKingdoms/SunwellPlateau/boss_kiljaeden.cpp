@@ -398,7 +398,10 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_KILL_SELF:
-                    me->KillSelf();
+                    if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                        Unit::Kill(player, me);
+                    else
+                        me->KillSelf();
                     break;
                 case EVENT_REBIRTH:
                     me->SetVisible(true);

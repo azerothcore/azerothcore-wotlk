@@ -457,8 +457,10 @@ public:
                     events2.ScheduleEvent(EVENT_OUTRO_3, 17000);
                     break;
                 case EVENT_OUTRO_3:
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true);
-                    Unit::Kill(target, me);
+                    if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                        Unit::Kill(player, me);
+                    else
+                        Unit::Kill(nullptr, me);
                     break;
             }
 
