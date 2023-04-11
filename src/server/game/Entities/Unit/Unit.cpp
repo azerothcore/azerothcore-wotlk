@@ -1416,9 +1416,9 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     //TODO: rename to ApplyBotDamageMultiplierPhysical
                     ToCreature()->ApplyBotDamageMultiplierMelee(damage, *damageInfo, spellInfo, attackType, crit);
                     if (damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL)
-                        damage *= BotMgr::GetBotDamageModPhysical();
+                        damage *= (BotMgr::IsWanderingWorldBot(ToCreature()) ? BotMgr::GetBotWandererDamageMod() : BotMgr::GetBotDamageModPhysical());
                     else if (damageSchoolMask & SPELL_SCHOOL_MASK_MAGIC)
-                        damage *= BotMgr::GetBotDamageModSpell();
+                        damage *= (BotMgr::IsWanderingWorldBot(ToCreature()) ? BotMgr::GetBotWandererDamageMod() : BotMgr::GetBotDamageModSpell());
                 }
                 //End NpcBot
 
@@ -1498,9 +1498,9 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                 {
                     ToCreature()->ApplyBotDamageMultiplierSpell(damage, *damageInfo, spellInfo, attackType, crit);
                     if (damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL)
-                        damage *= BotMgr::GetBotDamageModPhysical();
+                        damage *= (BotMgr::IsWanderingWorldBot(ToCreature()) ? BotMgr::GetBotWandererDamageMod() : BotMgr::GetBotDamageModPhysical());
                     else if (damageSchoolMask & SPELL_SCHOOL_MASK_MAGIC)
-                        damage *= BotMgr::GetBotDamageModSpell();
+                        damage *= (BotMgr::IsWanderingWorldBot(ToCreature()) ? BotMgr::GetBotWandererDamageMod() : BotMgr::GetBotDamageModSpell());
                 }
                 //End NpcBot
 
@@ -1678,7 +1678,7 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
             //damage is unused. TODO: remove this redundant argument
             ToCreature()->ApplyBotDamageMultiplierMelee(damageInfo->damages[i].damage, *damageInfo);
             damage = damageInfo->damages[i].damage;
-            damage *= BotMgr::GetBotDamageModPhysical();
+            damage *= (BotMgr::IsWanderingWorldBot(ToCreature()) ? BotMgr::GetBotWandererDamageMod() : BotMgr::GetBotDamageModPhysical());
         }
         //End NpcBot
 

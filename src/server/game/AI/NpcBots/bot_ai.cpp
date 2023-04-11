@@ -6548,7 +6548,7 @@ void bot_ai::_OnHealthUpdate() const
     //TC_LOG_ERROR("entities.player", "_OnHealthUpdate(): updating bot %s", me->GetName().c_str());
     bool fullhp = me->GetHealth() == me->GetMaxHealth();
     float pct = fullhp ? 100.f : me->GetHealthPct(); // needs for regeneration
-    uint32 m_basehp = uint32(_classinfo->basehealth * BotMgr::GetBotHPMod());
+    uint32 m_basehp = uint32(_classinfo->basehealth * (BotMgr::IsWanderingWorldBot(me) ? BotMgr::GetBotWandererHPMod() : BotMgr::GetBotHPMod()));
     //TC_LOG_ERROR("entities.player", "class base health: %u", m_basehp);
     me->SetCreateHealth(m_basehp);
 
@@ -6562,7 +6562,7 @@ void bot_ai::_OnHealthUpdate() const
     //hp_add += IAmFree() ? mylevel * 375.f : 0; //+30000/+0 hp at 80
     hp_add += _getTotalBotStat(BOT_STAT_MOD_HEALTH);
     //TC_LOG_ERROR("entities.player", "health to add after stam mod: %i", hp_add);
-    uint32 m_totalhp = m_basehp + int32(hp_add * BotMgr::GetBotHPMod()); //m_totalhp = uint32(float(m_basehp + hp_add) * stammod);
+    uint32 m_totalhp = m_basehp + int32(hp_add * (BotMgr::IsWanderingWorldBot(me) ? BotMgr::GetBotWandererHPMod() : BotMgr::GetBotHPMod()));
     //TC_LOG_ERROR("entities.player", "total base health: %u", m_totalhp);
 
     //hp bonuses
@@ -7080,7 +7080,7 @@ void bot_ai::ApplyBotDamageMultiplierHeal(Unit const* victim, float& heal, Spell
 {
     //HEALING SPELLS amount bonus
     ApplyClassDamageMultiplierHeal(victim, heal, spellInfo, damagetype, stack);
-    heal = (heal * BotMgr::GetBotHealingMod());
+    heal = (heal * (BotMgr::IsWanderingWorldBot(me) ? BotMgr::GetBotWandererHealingMod() : BotMgr::GetBotHealingMod()));
 }
 void bot_ai::ApplyBotCritMultiplierAll(Unit const* victim, float& crit_chance, SpellInfo const* spellInfo, SpellSchoolMask schoolMask, WeaponAttackType attackType) const
 {
@@ -13684,7 +13684,7 @@ void bot_ai::SetSpec(uint8 spec, bool activate)
 
 uint8 bot_ai::GetSpec() const
 {
-    return me->GetLevel() < 10 ? BOT_SPEC_DEFAULT : _spec;
+    return me->GetLevel() < 10 ? uint8(BOT_SPEC_DEFAULT) : _spec;
 }
 
 uint8 bot_ai::DefaultSpecForClass(uint8 m_class)
@@ -16906,7 +16906,10 @@ void bot_ai::Evade()
 
             if (dist > (me->GetMap()->GetEntry()->IsContinent() ? 15.0f : 3.0f))
             {
-                bool use_path = true;
+                bool use_path =
+                    !(_travel_node_cur && _travel_node_last &&
+                    _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_PATHING) &&
+                    _travel_node_last->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_PATHING));
                 GetNextEvadeMovePoint(pos, use_path);
                 ASSERT(pos.m_positionZ > INVALID_HEIGHT);
 

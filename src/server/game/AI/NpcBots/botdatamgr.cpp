@@ -289,14 +289,17 @@ private:
         bot_template.Entry = next_bot_id;
         bot_template.SubName = "";
         bot_template.speed_run = 1.05f;
-        bot_template.flags_extra &= ~(CREATURE_FLAG_EXTRA_NO_XP);
         bot_template.KillCredit[0] = orig_entry;
         if (bracketEntry)
         {
             //force level range for bgs
             bot_template.minlevel = bracketEntry->minLevel;
             bot_template.maxlevel = bracketEntry->maxLevel;
+            bot_template.type_flags |= CREATURE_TYPE_FLAG_TREAT_AS_RAID_UNIT;
         }
+        else
+            bot_template.flags_extra &= ~(CREATURE_FLAG_EXTRA_NO_XP);
+
         bot_template.InitializeQueryData();
 
         NpcBotData* bot_data = new NpcBotData(bot_ai::DefaultRolesForClass(bot_class), bot_faction, bot_ai::DefaultSpecForClass(bot_class));
@@ -1087,8 +1090,6 @@ void BotDataMgr::LoadWanderMap(bool reload)
 
 void BotDataMgr::GenerateWanderingBots()
 {
-    using NodeVec = std::vector<WanderNode const*>;
-
     LoadWanderMap();
     CreateWanderingBotsSortedGear();
 
@@ -1158,15 +1159,14 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
         }
     }
 
-    uint32 needed_bots_count_a = 0;
-    uint32 needed_bots_count_h = 0;
-    if (queued_players_a < avgteamplayers)
-        needed_bots_count_a += avgteamplayers - queued_players_a;
-    if (queued_players_h < avgteamplayers)
-        needed_bots_count_h += avgteamplayers - queued_players_h;
+    uint32 needed_bots_count_a = (queued_players_a < avgteamplayers) ? (avgteamplayers - queued_players_a) : 0;
+    uint32 needed_bots_count_h = (queued_players_h < avgteamplayers) ? (avgteamplayers - queued_players_h) : 0;
 
     ASSERT(needed_bots_count_a <= maxteamplayers);
     ASSERT(needed_bots_count_h <= maxteamplayers);
+
+    if (needed_bots_count_a + needed_bots_count_h == 0)
+        return true;
 
     if (spareBots < needed_bots_count_a + needed_bots_count_h)
         return false;
@@ -1176,28 +1176,34 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     NpcBotRegistry spawned_bots_a;
     NpcBotRegistry spawned_bots_h;
 
-    if (!sBotGen->GenerateWanderingBotsToSpawn(needed_bots_count_a, bg_template->GetMapId(), ALLIANCE, true, bracketEntry, &spawned_bots_a, spawned_a))
+    if (needed_bots_count_a)
     {
-        LOG_WARN("npcbots", "Failed to spawn {} ALLIANCE bots for BG {} '{}' queued A {} H {} req A {} H {} spare {}",
-            needed_bots_count_a, uint32(bg_template->GetBgTypeID()), bg_template->GetName().c_str(),
-            queued_players_a, queued_players_h, needed_bots_count_a, needed_bots_count_h, spareBots);
-        for (NpcBotRegistry const* registry1 : { &spawned_bots_a, &spawned_bots_h })
-            for (Creature const* bot : *registry1)
-                DespawnWandererBot(bot->GetEntry());
+        if (!sBotGen->GenerateWanderingBotsToSpawn(needed_bots_count_a, bg_template->GetMapId(), ALLIANCE, true, bracketEntry, &spawned_bots_a, spawned_a))
+        {
+            LOG_WARN("npcbots", "Failed to spawn {} ALLIANCE bots for BG {} '{}' queued A {} H {} req A {} H {} spare {}",
+                needed_bots_count_a, uint32(bg_template->GetBgTypeID()), bg_template->GetName().c_str(),
+                queued_players_a, queued_players_h, needed_bots_count_a, needed_bots_count_h, spareBots);
+            for (NpcBotRegistry const* registry1 : { &spawned_bots_a, &spawned_bots_h })
+                for (Creature const* bot : *registry1)
+                    DespawnWandererBot(bot->GetEntry());
 
-        return false;
+            return false;
+        }
+        spareBots = sBotGen->GetSpareBotsCount();
     }
-    spareBots = sBotGen->GetSpareBotsCount();
-    if (!sBotGen->GenerateWanderingBotsToSpawn(needed_bots_count_h, bg_template->GetMapId(), HORDE, true, bracketEntry, &spawned_bots_h, spawned_h))
+    if (needed_bots_count_h)
     {
-        LOG_WARN("npcbots", "Failed to spawn {} HORDE bots for BG {} '{}' queued A {} H {} req A {} H {} spare {}",
-            needed_bots_count_h, uint32(bg_template->GetBgTypeID()), bg_template->GetName().c_str(),
-            queued_players_a, queued_players_h, needed_bots_count_a, needed_bots_count_h, spareBots);
-        for (NpcBotRegistry const* registry2 : { &spawned_bots_a, &spawned_bots_h })
-            for (Creature const* bot : *registry2)
-                DespawnWandererBot(bot->GetEntry());
+        if (!sBotGen->GenerateWanderingBotsToSpawn(needed_bots_count_h, bg_template->GetMapId(), HORDE, true, bracketEntry, &spawned_bots_h, spawned_h))
+        {
+            LOG_WARN("npcbots", "Failed to spawn {} HORDE bots for BG {} '{}' queued A {} H {} req A {} H {} spare {}",
+                needed_bots_count_h, uint32(bg_template->GetBgTypeID()), bg_template->GetName().c_str(),
+                queued_players_a, queued_players_h, needed_bots_count_a, needed_bots_count_h, spareBots);
+            for (NpcBotRegistry const* registry2 : { &spawned_bots_a, &spawned_bots_h })
+                for (Creature const* bot : *registry2)
+                    DespawnWandererBot(bot->GetEntry());
 
-        return false;
+            return false;
+        }
     }
 
     ASSERT(uint32(spawned_bots_a.size()) == needed_bots_count_a);
@@ -2343,7 +2349,7 @@ bool BotDataMgr::IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32
 WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* curPos, uint32 faction, uint32 lvl, bool random)
 {
     static auto node_viable = [](WanderNode const* wp, uint8 lvl) -> bool {
-        return (lvl + 2 >= wp->GetLevels().first && lvl <= wp->GetLevels().second) || sMapStore.LookupEntry(wp->GetMapId())->IsBattlegroundOrArena();
+        return (lvl + 2 >= wp->GetLevels().first && lvl <= wp->GetLevels().second);
     };
 
     //Node got deleted (or forced)! Select close point and go from there
@@ -2378,7 +2384,7 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
         if (IsWanderNodeAvailableForBotFaction(wp, faction, false) && node_viable(wp, lvl))
             links.push_back(wp);
     }
-    if (links.size() > 1 && lastNode)
+    if (links.size() > 1 && lastNode && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
         links.remove(lastNode);
 
     //Overleveled or died: no viable nodes in reach, find one for teleport

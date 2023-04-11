@@ -87,6 +87,7 @@ bool _enableclass_necromancer;
 bool _enableclass_seawitch;
 bool _enrageOnDismiss;
 bool _botStatLimits;
+bool _enableWanderingBotsBG;
 float _botStatLimits_dodge;
 float _botStatLimits_parry;
 float _botStatLimits_block;
@@ -95,6 +96,9 @@ float _mult_dmg_physical;
 float _mult_dmg_spell;
 float _mult_healing;
 float _mult_hp;
+float _mult_dmg_wanderer;
+float _mult_healing_wanderer;
+float _mult_hp_wanderer;
 float _mult_dmg_warrior;
 float _mult_dmg_paladin;
 float _mult_dmg_hunter;
@@ -245,6 +249,9 @@ void BotMgr::LoadConfig(bool reload)
     _mult_dmg_spell                 = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Spell", 1.0f);
     _mult_healing                   = sConfigMgr->GetFloatDefault("NpcBot.Mult.Healing", 1.0f);
     _mult_hp                        = sConfigMgr->GetFloatDefault("NpcBot.Mult.HP", 1.0f);
+    _mult_dmg_wanderer              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Damage", 1.0f);
+    _mult_healing_wanderer          = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Healing", 1.0f);
+    _mult_hp_wanderer               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.HP", 1.0f);
     _mult_dmg_warrior               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Warrior", 1.0f);
     _mult_dmg_paladin               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Paladin", 1.0f);
     _mult_dmg_hunter                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Hunter", 1.0f);
@@ -276,7 +283,6 @@ void BotMgr::LoadConfig(bool reload)
     _npcBotEngageDelayDPS_default   = sConfigMgr->GetIntDefault("NpcBot.EngageDelay.DPS", 0);
     _npcBotEngageDelayHeal_default  = sConfigMgr->GetIntDefault("NpcBot.EngageDelay.Heal", 0);
     _npcBotOwnerExpireTime          = sConfigMgr->GetIntDefault("NpcBot.OwnershipExpireTime", 0);
-    _desiredWanderingBotsCount      = sConfigMgr->GetIntDefault("NpcBot.DesiredWanderingBotsCount", 0);
     _botPvP                         = sConfigMgr->GetBoolDefault("NpcBot.PvP", true);
     _botMovementFoodInterrupt       = sConfigMgr->GetBoolDefault("NpcBot.Movements.InterruptFood", false);
     _displayEquipment               = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.Enable", true);
@@ -302,12 +308,35 @@ void BotMgr::LoadConfig(bool reload)
     _botStatLimits_parry            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Parry", 95.0f);
     _botStatLimits_block            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Block", 95.0f);
     _botStatLimits_crit             = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Crit", 95.0f);
+    _desiredWanderingBotsCount      = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.Continents.Count", 0);
+    _enableWanderingBotsBG          = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.Enable", false);
 
     //limits
     RoundToInterval(_mult_dmg_physical, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_spell, 0.1f, 10.f);
     RoundToInterval(_mult_healing, 0.1f, 10.f);
     RoundToInterval(_mult_hp, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_wanderer, 0.1f, 10.f);
+    RoundToInterval(_mult_healing_wanderer, 0.1f, 10.f);
+    RoundToInterval(_mult_hp_wanderer, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_warrior, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_paladin, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_hunter, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_rogue, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_priest, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_deathknight, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_shaman, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_mage, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_warlock, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_druid, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_blademaster, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_obsidiandestroyer, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_archmage, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_dreadlord, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_spellbreaker, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_darkranger, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_necromancer, 0.1f, 10.f);
+    RoundToInterval(_mult_dmg_seawitch, 0.1f, 10.f);
 
     //exclusions
     uint8 dpsFlags = /*_tankingTargetIconFlags | _offTankingTargetIconFlags | */_dpsTargetIconFlags | _rangedDpsTargetIconFlags;
@@ -485,6 +514,10 @@ bool BotMgr::FilterRaces()
 {
     return _filterRaces;
 }
+bool BotMgr::IsBotGenerationEnabledBGs()
+{
+    return _enableWanderingBotsBG;
+}
 uint8 BotMgr::GetMaxClassBots()
 {
     return _maxClassNpcBots;
@@ -579,6 +612,11 @@ bool BotMgr::CanBotParryWhileCasting(Creature const* bot)
         default:
             return false;
     }
+}
+
+bool BotMgr::IsWanderingWorldBot(Creature const* bot)
+{
+    return (bot->IsWandererBot() && !(bot->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_TREAT_AS_RAID_UNIT));
 }
 
 void BotMgr::Update(uint32 diff)
@@ -1961,7 +1999,18 @@ float BotMgr::GetBotHPMod()
 {
     return _mult_hp;
 }
-
+float BotMgr::GetBotWandererDamageMod()
+{
+    return _mult_dmg_wanderer;
+}
+float BotMgr::GetBotWandererHealingMod()
+{
+    return _mult_healing_wanderer;
+}
+float BotMgr::GetBotWandererHPMod()
+{
+    return _mult_hp_wanderer;
+}
 float BotMgr::GetBotDamageModByClass(uint8 botclass)
 {
     switch (botclass)
