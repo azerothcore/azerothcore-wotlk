@@ -3305,6 +3305,8 @@ void bot_ai::SetStats(bool force)
         me->SetFullHealth();
         if (_botclass != BOT_CLASS_SPHYNX)
             me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+
+        me->ResetPlayerDamageReq();
     }
 
     if (botPet)
@@ -7133,7 +7135,8 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
     if (!BotMgr::IsNpcBotModEnabled() || !BotMgr::IsClassEnabled(_botclass) ||
         IsTempBot() || me->IsInCombat() || CCed(me) || IsCasting() || IsDuringTeleport() ||
         HasBotCommandState(BOT_COMMAND_ISSUED_ORDER | BOT_COMMAND_NOGOSSIP) ||
-        (me->GetVehicle() && me->GetVehicle()->GetBase()->IsInCombat()))
+        (me->GetVehicle() && me->GetVehicle()->GetBase()->IsInCombat()) ||
+        (!player->IsGameMaster() && IsWanderer()))
     {
         player->PlayerTalkClass->SendCloseGossip();
         return true;
@@ -16774,7 +16777,7 @@ void bot_ai::Evade()
     }
 
     //delay evade
-    if (evadeDelayTimer == 0)
+    if (evadeDelayTimer == 0 && !me->GetMap()->GetEntry()->IsBattlegroundOrArena())
     {
         evadeDelayTimer = 5000;
         return;
@@ -16860,7 +16863,8 @@ void bot_ai::Evade()
                 _travel_node_last = _travel_node_cur;
                 _travel_node_cur = nextNode;
                 _evadeCount = 0;
-                evadeDelayTimer = urand(7000, 11000);
+                if (me->GetMap()->GetEntry()->IsContinent())
+                    evadeDelayTimer = urand(7000, 11000);
                 return;
             }
 

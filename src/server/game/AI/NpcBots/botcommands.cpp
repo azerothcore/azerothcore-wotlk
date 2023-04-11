@@ -508,7 +508,7 @@ public:
         static ChatCommandTable npcbotWPCommandTable =
         {
             //{ "generate",   HandleNpcBotWPGenerateCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::Yes },
-            { "spawnall",   HandleNpcBotWPSpawnAllCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::Yes },
+            { "spawnall",   HandleNpcBotWPSpawnAllCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "move",       HandleNpcBotWPMoveCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "add",        HandleNpcBotWPAddCommand,               rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "del",        HandleNpcBotWPDeleteCommand,            rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
@@ -658,15 +658,14 @@ public:
         return commandTable;
     }
 
-    static TempSummon* HandleWPSummon(WanderNode* wp)
+    static TempSummon* HandleWPSummon(WanderNode* wp, Map* map)
     {
         CellCoord c = Acore::ComputeCellCoord(wp->m_positionX, wp->m_positionY);
         GridCoord g = Acore::ComputeGridCoord(wp->m_positionX, wp->m_positionY);
         ASSERT(c.IsCoordValid(), "Invalid Cell coord!");
         ASSERT(g.IsCoordValid(), "Invalid Grid coord!");
-        Map* map = sMapMgr->CreateBaseMap(wp->GetMapId());
         map->LoadGrid(wp->m_positionX, wp->m_positionY);
-        ASSERT(!map->Instanceable(), map->GetDebugInfo().c_str());
+        ASSERT(map->GetEntry()->IsContinent() || map->GetEntry()->IsBattlegroundOrArena(), map->GetDebugInfo().c_str());
 
         TempSummon* wpc = map->SummonCreature(VISUAL_WAYPOINT, *wp);
         wpc->SetTempSummonType(TEMPSUMMON_CORPSE_DESPAWN);
@@ -785,7 +784,7 @@ public:
         if (!isWPSpawnWarningGiven)
         {
             isWPSpawnWarningGiven = true;
-            handler->SendSysMessage("Warning! Spawning ALL wander points will load ALL required grids. Repeat to confirm.");
+            handler->SendSysMessage("Warning! Spawning all wander points in map will load ALL required grids. Repeat to confirm.");
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -794,10 +793,11 @@ public:
             if (WanderNode::GetAllWPsCount() == 0u)
                 BotDataMgr::LoadWanderMap();
 
-            WanderNode::DoForAllWPs([](WanderNode* wp) {
+            Player* player = handler->GetPlayer();
+            WanderNode::DoForAllMapWPs(player->GetMapId(), [map = player->GetMap()](WanderNode const* wp) {
                 if (Creature* wpc = wp->GetCreature())
                     wpc->ToTempSummon()->DespawnOrUnsummon();
-                ASSERT_NOTNULL(HandleWPSummon(wp));
+                ASSERT_NOTNULL(HandleWPSummon(const_cast<WanderNode*>(wp), map));
             });
         }
 
@@ -842,13 +842,15 @@ public:
 
         return true;
     }
-    static void HandleWPUpdateLinks(ChatHandler* handler, WanderNode* wp, std::vector<uint32> linkIds)
+    static void HandleWPUpdateLinks(ChatHandler* handler, WanderNode* wp, std::vector<uint32> linkIds, bool oneway = false)
     {
         auto const linksCopy = wp->GetLinks();
 
         std::set<decltype(linksCopy)::value_type> wps_updates;
-
         std::copy(std::cbegin(linksCopy), std::cend(linksCopy), std::inserter(wps_updates, wps_updates.begin()));
+
+        std::set<decltype(linksCopy)::value_type> wps_relinks = wps_updates;
+
         wps_updates.insert(wp);
 
         if (linksCopy.empty())
@@ -876,12 +878,31 @@ public:
                 continue;
             }
 
-            handler->PSendSysMessage("Adding link %u<->%u...", wp->GetWPId(), lid);
+            if (wps_relinks.count(lwp) != 0)
+                wps_relinks.erase(lwp);
+
+            handler->PSendSysMessage("Adding link %u%s%u...", wp->GetWPId(), oneway ? "->" : "<->", lid);
             if (wp->GetExactDist2d(lwp) > MAX_VISIBILITY_DISTANCE)
                 handler->PSendSysMessage("Warning! Link distance is too great (%.2f)", wp->GetExactDist2d(lwp));
 
-            wp->Link(lwp);
+            wp->Link(lwp, oneway);
             wps_updates.insert(lwp);
+        }
+
+        if (oneway)
+        {
+            std::vector<decltype(linksCopy)::value_type> wps_relinks_vec;
+            wps_relinks_vec.reserve(wps_relinks.size());
+            for (WanderNode* rlwp : wps_relinks)
+                wps_relinks_vec.push_back(rlwp);
+            std::sort(wps_relinks_vec.begin(), wps_relinks_vec.end());
+            for (WanderNode* rlwp : wps_relinks_vec)
+            {
+                handler->PSendSysMessage("Adding link %u<->%u...", wp->GetWPId(), rlwp->GetWPId());
+                if (wp->GetExactDist2d(rlwp) > MAX_VISIBILITY_DISTANCE)
+                    handler->PSendSysMessage("Warning! Link distance is too great (%.2f)", wp->GetExactDist2d(rlwp));
+                wp->Link(rlwp);
+            }
         }
 
         WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
@@ -895,7 +916,7 @@ public:
         });
         WorldDatabase.DirectCommitTransaction(trans);
     }
-    static bool HandleNpcBotWPLinksSetCommand(ChatHandler* handler, Optional<std::vector<uint32>> linkIds)
+    static bool HandleNpcBotWPLinksSetCommand(ChatHandler* handler, Optional<std::vector<uint32>> linkIds, Optional<bool> oneway)
     {
         Player* player = handler->GetPlayer();
         Unit* wpc = player->GetSelectedUnit();
@@ -915,7 +936,7 @@ public:
             return false;
         }
 
-        HandleWPUpdateLinks(handler, wp, *linkIds);
+        HandleWPUpdateLinks(handler, wp, *linkIds, oneway ? *oneway : false);
 
         return true;
     }
@@ -1153,7 +1174,7 @@ public:
     {
         Player* player = handler->GetPlayer();
 
-        if (!flags || !name || !player->GetMap()->GetEntry()->IsContinent())
+        if (!flags || !name || (!player->GetMap()->GetEntry()->IsContinent() && !player->GetMap()->GetEntry()->IsBattlegroundOrArena()))
         {
             handler->SendSysMessage("Syntax: npcbot wp add #[flags] #[name] #[minlevel #[maxlevel]]. World maps only");
             handler->SetSentErrorMessage(true);
@@ -1220,7 +1241,7 @@ public:
         }
         HandleWPUpdateLinks(handler, wp, linkIds);
 
-        ASSERT_NOTNULL(HandleWPSummon(wp));
+        ASSERT_NOTNULL(HandleWPSummon(wp, player->GetMap()));
 
         uint32 wpId = wp->GetWPId();
         std::string wpName = wp->GetName();
@@ -2619,9 +2640,9 @@ public:
 
         if (bot->GetBotAI()->IsWanderer())
         {
-            handler->SendSysMessage("Cannot delete wanderer npcbot");
-            handler->SetSentErrorMessage(true);
-            return false;
+            BotDataMgr::DespawnWandererBot(bot->GetEntry());
+            handler->PSendSysMessage("Wandering bot %u '%s' successfully deleted", bot->GetEntry(), bot->GetName().c_str());
+            return true;
         }
 
         Player const* botowner = bot->GetBotOwner()->ToPlayer();

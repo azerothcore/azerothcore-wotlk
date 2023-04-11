@@ -22,7 +22,8 @@ enum class BotWPFlags : uint32
     BOTWP_FLAG_ALLIANCE_ONLY            = 0x00000002,
     BOTWP_FLAG_HORDE_ONLY               = 0x00000004,
     BOTWP_FLAG_CAN_BACKTRACK_TO         = 0x00000008, //unused
-    BOTWP_FLAG_END                      = 0x00000010,
+    BOTWP_FLAG_MOVEMENT_IGNORES_FACTION = 0x00000010,
+    BOTWP_FLAG_END                      = 0x00000020,
 
     BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY   = BOTWP_FLAG_ALLIANCE_ONLY | BOTWP_FLAG_HORDE_ONLY
 };
@@ -82,10 +83,11 @@ public:
 
     std::string FormatLinks() const;
 
-    void Link(WanderNode* wp) {
+    void Link(WanderNode* wp, bool oneway = false) {
         if (!HasLink(wp)) {
             _links.push_back(wp);
-            wp->Link(this);
+            if (!oneway)
+                wp->Link(this);
         }
     }
     void UnLink(WanderNode* wp) {

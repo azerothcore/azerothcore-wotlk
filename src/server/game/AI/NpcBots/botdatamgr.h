@@ -42,6 +42,7 @@ struct NpcBotData
     typedef std::set<uint32> DisabledSpellsContainer;
 
     friend class BotDataMgr;
+    friend struct WanderingBotsGenerator;
 public:
     uint32 owner;
     uint32 roles;
@@ -62,6 +63,7 @@ private:
 struct NpcBotAppearanceData
 {
     friend class BotDataMgr;
+    friend struct WanderingBotsGenerator;
 public:
     uint8 gender;
     uint8 skin;
@@ -77,6 +79,7 @@ private:
 struct NpcBotExtras
 {
     friend class BotDataMgr;
+    friend struct WanderingBotsGenerator;
 public:
     uint8 race;
     uint8 bclass;
@@ -168,6 +171,7 @@ class BotDataMgr
         static std::vector<uint32> GetExistingNPCBotIds();
         static uint8 GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask = 0);
 
+        static void DespawnWandererBot(uint32 entry);
         static void LoadWanderMap(bool reload = false);
         static void GenerateWanderingBots();
         static void CreateWanderingBotsSortedGear();
@@ -180,7 +184,7 @@ class BotDataMgr
         static uint8 GetMinLevelForBotClass(uint8 m_class);
         static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
         static TeamId GetTeamForFaction(uint32 factionTemplateId);
-        static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId);
+        static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport);
         static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* curPos, uint32 faction, uint32 lvl, bool random);
         static WanderNode const* GetClosestWanderNode(WorldLocation const* loc);
 

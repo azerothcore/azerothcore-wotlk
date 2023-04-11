@@ -1027,6 +1027,17 @@ void BotMgr::CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype)
 
     Creature* bot = itr->second;
 
+    ASSERT(bot->GetCreatorGUID() == _owner->GetGUID());
+
+    RemoveBotFromBGQueue(bot);
+    if (removetype != BOT_REMOVE_LOGOUT)
+        RemoveBotFromGroup(bot);
+
+    CleanupsBeforeBotDelete(bot);
+}
+
+void BotMgr::CleanupsBeforeBotDelete(Creature* bot)
+{
     //don't allow removing bots while they are teleporting
     if (!bot->IsInWorld())
         bot->GetBotAI()->AbortTeleport();
@@ -1034,16 +1045,11 @@ void BotMgr::CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype)
     if (bot->GetVehicle())
         bot->ExitVehicle();
 
-    RemoveBotFromBGQueue(bot);
-    if (removetype != BOT_REMOVE_LOGOUT)
-        RemoveBotFromGroup(bot);
-
     //remove any summons
     bot->GetBotAI()->UnsummonAll();
     bot->AttackStop();
     bot->CombatStopWithPets(true);
 
-    ASSERT(bot->GetCreatorGUID() == _owner->GetGUID());
     //bot->SetOwnerGUID(ObjectGuid::Empty);
     //_owner->m_Controlled.erase(bot);
     bot->SetControlledByPlayer(false);
@@ -1054,11 +1060,6 @@ void BotMgr::CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype)
     Map* map = bot->FindMap();
     if (!map || map->IsDungeon())
         bot->RemoveFromWorld();
-}
-
-void BotMgr::_addBotToRemoveList(ObjectGuid guid)
-{
-    _removeList.push_back(guid);
 }
 
 void BotMgr::RemoveAllBots(uint8 removetype)
@@ -1095,7 +1096,7 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
     if (bot->GetBotAI()->IsTempBot())
     {
         //bot->GetBotAI()->OnBotDespawn(bot); //send to self
-        _addBotToRemoveList(guid);
+        _removeList.push_back(guid);
         return;
     }
 
