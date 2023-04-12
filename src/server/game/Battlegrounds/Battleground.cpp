@@ -48,7 +48,7 @@
 #include "WorldPacket.h"
 #include "WorldStatePackets.h"
 
-//npcbot 
+//npcbot
 #include "bot_ai.h"
 #include "botdatamgr.h"
 #include "botmgr.h"

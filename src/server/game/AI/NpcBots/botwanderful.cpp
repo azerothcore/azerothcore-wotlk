@@ -152,7 +152,7 @@ WanderNode::WanderNode(uint32 wpId, uint32 mapId, float x, float y, float z, flo
     ASSERT(!!sMapStore.LookupEntry(_mapId), "WanderNode::Ctr(): Invalid value for _mapId");
     ASSERT(!!sAreaTableStore.LookupEntry(_zoneId), "WanderNode::Ctr(): Invalid value for _zoneId");
     ASSERT(!!sAreaTableStore.LookupEntry(_areaId), "WanderNode::Ctr(): Invalid value for _areaId");
-    
+
     lock_type lock(*GetLock());
 
     ALL_WPS.push_back(this);

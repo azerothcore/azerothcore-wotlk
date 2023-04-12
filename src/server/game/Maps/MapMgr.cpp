@@ -35,7 +35,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-//npcbot 
+//npcbot
 #include "botdatamgr.h"
 #include "botmgr.h"
 //end npcbot
@@ -255,7 +255,7 @@ void MapMgr::Update(uint32 diff)
 {
     for (uint8 i = 0; i < 4; ++i)
         i_timer[i].Update(diff);
- 
+
     //npcbot
     BotDataMgr::Update(diff);
     //end npcbot
@@ -285,7 +285,7 @@ void MapMgr::Update(uint32 diff)
 
     if (m_updater.activated())
         m_updater.wait();
- 
+
     //npcbot
     BotMgr::HandleDelayedTeleports();
     //end npcbot

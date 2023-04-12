@@ -1133,7 +1133,7 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
 
     if (spareBots == 0)
     {
-        LOG_WARN("npcbots", "[No spare bots] Failed to generate bots for BG %u inited by player %s (%u)",
+        LOG_WARN("npcbots", "[No spare bots] Failed to generate bots for BG {} inited by player {} ({})",
             uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
         return false;
     }
@@ -1154,7 +1154,7 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
                 Battleground const* real_bg = real_bg_pair.second;
                 if (real_bg->GetInstanceID() != 0 && real_bg->GetBracketId() == bracketId)
                 {
-                    LOG_INFO("npcbots", "[Already running] Found running BG %u inited by player %s (%u). Not generating bots",
+                    LOG_INFO("npcbots", "[Already running] Found running BG {} inited by player {} ({}). Not generating bots",
                         uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
                     return true; // This BG is running already
                 }
@@ -1195,14 +1195,14 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
 
     if (needed_bots_count_a + needed_bots_count_h == 0)
     {
-        LOG_INFO("npcbots", "[No bots required] Failed to generate bots for BG %u inited by player %s (%u)",
+        LOG_INFO("npcbots", "[No bots required] Failed to generate bots for BG {} inited by player {} ({})",
             uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
         return true;
     }
 
     if (spareBots < needed_bots_count_a + needed_bots_count_h)
     {
-        LOG_INFO("npcbots", "[Not enough spare bots] Failed to generate bots for BG %u inited by player %s (%u)",
+        LOG_INFO("npcbots", "[Not enough spare bots] Failed to generate bots for BG {} inited by player {} ({})",
             uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
         return false;
     }
