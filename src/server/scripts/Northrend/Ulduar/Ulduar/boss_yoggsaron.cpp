@@ -732,7 +732,8 @@ public:
                 return;
             }
 
-            if (!SelectTargetFromPlayerList(90, SPELL_INSANE1) && me->GetMap()->GetPlayers().getSize() > 1)
+            if ((!SelectTargetFromPlayerList(90, SPELL_INSANE1) && me->GetMap()->GetPlayers().getSize() > 1)
+                || (me->GetMap()->GetPlayers().getSize() == 1 && !(me->GetMap()->GetPlayers().getFirst()->GetSource()->IsAlive())))
             {
                 m_pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_INSANE1);
                 EnterEvadeMode(EVADE_REASON_OTHER);
