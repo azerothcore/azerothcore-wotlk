@@ -193,6 +193,8 @@ public:
     bool   LoadGroupFromDB(Field* field);
     void   LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles);
     //npcbot
+    bool Create(Creature* leader);
+    bool AddMember(Creature* creature);
     void LoadCreatureMemberFromDB(uint32 entry, uint8 memberFlags, uint8 subgroup, uint8 roles);
     //end npcbot
     bool   AddInvite(Player* player);

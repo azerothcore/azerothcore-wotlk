@@ -600,8 +600,8 @@ public:
             //Main rotation
             //Arcane Missiles (arcane spec only)
             if (IsSpellReady(ARCANEMISSILES_1, diff) && can_do_arcane && GetSpec() == BOT_SPEC_MAGE_ARCANE && dist < CalcSpellMaxRange(ARCANEMISSILES_1) &&
-                (me->GetLevel() < 45 || ((arcaneBlastStack >= 3 ||
-                sSpellMgr->GetSpellInfo(ARCANE_BLAST_1)->CalcPowerCost(me, SPELL_SCHOOL_MASK_ARCANE) > int(me->GetPower(POWER_MANA))) &&
+                (me->GetLevel() < 45 ||
+                ((!GetSpell(ARCANE_BLAST_1) || arcaneBlastStack >= 3 || sSpellMgr->GetSpellInfo(ARCANE_BLAST_1)->CalcPowerCost(me, SPELL_SCHOOL_MASK_ARCANE) > int(me->GetPower(POWER_MANA))) &&
                 me->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_MAGE, 0x0, 0x2, 0x0))))
             {
                 if (doCast(mytar, GetSpell(ARCANEMISSILES_1)))
@@ -613,23 +613,26 @@ public:
                 if (doCast(mytar, GetSpell(ARCANE_BLAST_1)))
                     return;
             }
-            if (IsSpellReady(FROSTFIREBOLT, diff) && (can_do_frost | can_do_fire) && (GetSpec() == BOT_SPEC_MAGE_FIRE ||
-                (GetSpec() == BOT_SPEC_MAGE_FROST && (FROSTFIREBOLT == FROSTFIRE_BOLT_1 || !GetSpell(FROSTBOLT_1)))) &&
-                dist < CalcSpellMaxRange(FROSTFIREBOLT))
+            if (GetSpec() != BOT_SPEC_MAGE_ARCANE || !GetSpell(ARCANE_BLAST_1))
             {
-                if (doCast(mytar, GetSpell(FROSTFIREBOLT)))
-                    return;
-            }
-            //Level 1-10 rotation
-            if (IsSpellReady(FROSTBOLT_1, diff) && can_do_frost && GetSpec() == BOT_SPEC_DEFAULT && dist < CalcSpellMaxRange(FROSTBOLT_1))
-            {
-                if (doCast(mytar, GetSpell(FROSTBOLT_1)))
-                    return;
-            }
-            if (IsSpellReady(FIREBALL_1, diff) && can_do_fire && GetSpec() == BOT_SPEC_DEFAULT && dist < CalcSpellMaxRange(FIREBALL_1))
-            {
-                if (doCast(mytar, GetSpell(FIREBALL_1)))
-                    return;
+                if (IsSpellReady(FROSTFIREBOLT, diff) && (can_do_frost | can_do_fire) && (GetSpec() == BOT_SPEC_MAGE_FIRE ||
+                    (GetSpec() == BOT_SPEC_MAGE_FROST && (FROSTFIREBOLT == FROSTFIRE_BOLT_1 || !GetSpell(FROSTBOLT_1)))) &&
+                    dist < CalcSpellMaxRange(FROSTFIREBOLT))
+                {
+                    if (doCast(mytar, GetSpell(FROSTFIREBOLT)))
+                        return;
+                }
+
+                if (IsSpellReady(FROSTBOLT_1, diff) && can_do_frost && GetSpec() != BOT_SPEC_MAGE_FIRE && dist < CalcSpellMaxRange(FROSTBOLT_1))
+                {
+                    if (doCast(mytar, GetSpell(FROSTBOLT_1)))
+                        return;
+                }
+                if (IsSpellReady(FIREBALL_1, diff) && can_do_fire && GetSpec() == BOT_SPEC_DEFAULT && dist < CalcSpellMaxRange(FIREBALL_1))
+                {
+                    if (doCast(mytar, GetSpell(FIREBALL_1)))
+                        return;
+                }
             }
 
             if (Spell const* shot = me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))

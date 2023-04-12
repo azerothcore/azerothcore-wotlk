@@ -4225,6 +4225,7 @@ NpcBot.NoDPSTargetIconMask = 0
 #    NpcBot.Mult.Healing
 #    NpcBot.Mult.HP
 #        Description: Multipliers for bots' damage, healing, etc. Allows to balance bots vs players.
+#                     Only affects normal spawned bots and generated wandering bot in BGs.
 #        Default:     1.0
 #        Minimum:     0.1
 #        Maximum:    10.0
@@ -4233,6 +4234,20 @@ NpcBot.Mult.Damage.Physical = 1.0
 NpcBot.Mult.Damage.Spell    = 1.0
 NpcBot.Mult.Healing         = 1.0
 NpcBot.Mult.HP              = 1.0
+
+#
+#    NpcBot.Mult.Wanderer.Damage
+#    NpcBot.Mult.Wanderer.Healing
+#    NpcBot.Mult.Wanderer.HP
+#        Description: Multipliers for wandering bots' damage, healing, an hp.
+#                     Only affects wandering bots in open world.
+#        Default:     1.0
+#        Minimum:     0.1
+#        Maximum:    10.0
+
+NpcBot.Mult.Wanderer.Damage  = 1.0
+NpcBot.Mult.Wanderer.Healing = 1.0
+NpcBot.Mult.Wanderer.HP      = 1.0
 
 #
 #    NpcBot.Mult.Damage.<Class>
@@ -4474,15 +4489,24 @@ NpcBot.OwnershipExpireTime = 0
 NpcBot.EnrageOnDismiss = 1
  
 #
-#    NpcBot.DesiredWanderingBotsCount
-#        Description: Number of free wandering bots to generate. Wandering bots, well, wander
+#    NpcBot.WanderingBots.Continents.Count
+#        Description: Desired number of free wandering bots to generate. Wandering bots roam
 #                     around the map looking for trouble. Names and visuals are cloned from
 #                     existing non-spawned bots. Wandering bots aren't saved in DB.
 #        Note:        Wandering bots keep grids loaded, increasing CPU and memory usage.
 #        Note2:       You must have at least this number of non-spawned bots in creature_template.
-#        Default:     0  - (Disabled)
+#        Default:     0 - (Disabled)
 
-NpcBot.DesiredWanderingBotsCount = 0
+NpcBot.WanderingBots.Continents.Count = 0
+
+#
+#    NpcBot.WanderingBots.BG.Enable
+#        Description: Allow wandering bots generation for Battlegrounds.
+#        Note:        Bots are temporarily borrowed from non-spawned bots pool.
+#        Default:     0 - (Disabled)
+#                     1 - (Enable)
+
+NpcBot.WanderingBots.BG.Enable = 0
 
 #
 ###################################################################################################

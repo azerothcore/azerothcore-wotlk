@@ -430,7 +430,7 @@ enum CombatRating : uint8
 
 #define MAX_COMBAT_RATING         25
 
-enum DamageEffectType
+enum DamageEffectType : uint8
 {
     DIRECT_DAMAGE           = 0,                            // used for normal weapon damage (not for class abilities or spells)
     SPELL_DIRECT_DAMAGE     = 1,                            // spell/class abilities damage
@@ -993,7 +993,7 @@ struct DeclinedName
     std::string name[MAX_DECLINED_NAME_CASES];
 };
 
-enum CurrentSpellTypes
+enum CurrentSpellTypes : uint8
 {
     CURRENT_MELEE_SPELL             = 0,
     CURRENT_GENERIC_SPELL           = 1,

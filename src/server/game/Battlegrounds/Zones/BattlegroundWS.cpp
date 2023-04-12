@@ -26,6 +26,11 @@
 #include "World.h"
 #include "WorldPacket.h"
 
+//npcbot
+#include "botdatamgr.h"
+#include "botmgr.h"
+//end npcbot
+
 void BattlegroundWGScore::BuildObjectivesBlock(WorldPacket& data)
 {
     data << uint32(2); // Objectives Count
@@ -147,6 +152,16 @@ void BattlegroundWS::AddPlayer(Player* player)
     Battleground::AddPlayer(player);
     PlayerScores.emplace(player->GetGUID().GetCounter(), new BattlegroundWGScore(player->GetGUID()));
 }
+
+//npcbot
+void BattlegroundWS::AddBot(Creature* bot)
+{
+    bool const isInBattleground = IsPlayerInBattleground(bot->GetGUID());
+    Battleground::AddBot(bot);
+    if (!isInBattleground)
+        BotScores[bot->GetEntry()] = new BattlegroundWGScore(bot->GetGUID());
+}
+//end npcbot
 
 void BattlegroundWS::RespawnFlagAfterDrop(TeamId teamId)
 {
@@ -521,6 +536,33 @@ void BattlegroundWS::HandleKillPlayer(Player* player, Player* killer)
     Battleground::HandleKillPlayer(player, killer);
 }
 
+//npcbot
+void BattlegroundWS::HandleBotKillPlayer(Creature* killer, Player* victim)
+{
+    if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
+    EventPlayerDroppedFlag(victim);
+    Battleground::HandleBotKillPlayer(killer, victim);
+}
+void BattlegroundWS::HandleBotKillBot(Creature* killer, Creature* victim)
+{
+    if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
+    EventBotDroppedFlag(victim);
+    Battleground::HandleBotKillBot(killer, victim);
+}
+void BattlegroundWS::HandlePlayerKillBot(Creature* victim, Player* killer)
+{
+    if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
+    EventBotDroppedFlag(victim);
+    Battleground::HandlePlayerKillBot(victim, killer);
+}
+//end npcbot
+
 bool BattlegroundWS::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
 {
     if (!Battleground::UpdatePlayerScore(player, type, value, doAddHonor))
@@ -539,6 +581,16 @@ bool BattlegroundWS::UpdatePlayerScore(Player* player, uint32 type, uint32 value
     return true;
 }
 
+//npcbot
+bool BattlegroundWS::UpdateBotScore(Creature const* bot, uint32 type, uint32 value)
+{
+    if (!Battleground::UpdateBotScore(bot, type, value))
+        return false;
+
+    return true;
+}
+//end npcbot
+
 GraveyardStruct const* BattlegroundWS::GetClosestGraveyard(Player* player)
 {
     if (GetStatus() == STATUS_IN_PROGRESS)
@@ -546,6 +598,16 @@ GraveyardStruct const* BattlegroundWS::GetClosestGraveyard(Player* player)
     else
         return sGraveyard->GetGraveyard(player->GetTeamId() == TEAM_ALLIANCE ? WS_GRAVEYARD_FLAGROOM_ALLIANCE : WS_GRAVEYARD_FLAGROOM_HORDE);
 }
+
+//npcbot
+GraveyardStruct const* BattlegroundWS::GetClosestGraveyardForBot(Creature* bot) const
+{
+    if (GetStatus() == STATUS_IN_PROGRESS)
+        return sGraveyard->GetGraveyard(GetBotTeamId(bot->GetGUID()) == TEAM_ALLIANCE ? WS_GRAVEYARD_MAIN_ALLIANCE : WS_GRAVEYARD_MAIN_HORDE);
+    else
+        return sGraveyard->GetGraveyard(GetBotTeamId(bot->GetGUID()) == TEAM_ALLIANCE ? WS_GRAVEYARD_FLAGROOM_ALLIANCE : WS_GRAVEYARD_FLAGROOM_HORDE);
+}
+//end npcbot
 
 void BattlegroundWS::FillInitialWorldStates(WorldPacket& data)
 {

@@ -32,6 +32,7 @@
 #include "WorldSession.h"
 
 //npcbot
+#include "botdatamgr.h"
 #include "botmgr.h"
 //end npcbot
 
@@ -333,11 +334,24 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
     Player* allianceFlagCarrier = nullptr;
     Player* hordeFlagCarrier = nullptr;
 
+    //npcbot
+    Creature const* afcbot = nullptr;
+    Creature const* hfcbot = nullptr;
+    //end npcbot
+
     if (ObjectGuid guid = bg->GetFlagPickerGUID(TEAM_ALLIANCE))
     {
         allianceFlagCarrier = ObjectAccessor::FindPlayer(guid);
         if (allianceFlagCarrier)
             ++flagCarrierCount;
+        //npcbot
+        else if (guid.IsCreature())
+        {
+            afcbot = BotDataMgr::FindBot(guid.GetEntry());
+            if (afcbot)
+                ++flagCarrierCount;
+        }
+        //end npcbot
     }
 
     if (ObjectGuid guid = bg->GetFlagPickerGUID(TEAM_HORDE))
@@ -345,6 +359,14 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
         hordeFlagCarrier = ObjectAccessor::FindPlayer(guid);
         if (hordeFlagCarrier)
             ++flagCarrierCount;
+        //npcbot
+        else if (guid.IsCreature())
+        {
+            hfcbot = BotDataMgr::FindBot(guid.GetEntry());
+            if (hfcbot)
+                ++flagCarrierCount;
+        }
+        //end npcbot
     }
 
     WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, 4 + 4 + 16 * flagCarrierCount);
@@ -361,6 +383,14 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
         data << float(allianceFlagCarrier->GetPositionX());
         data << float(allianceFlagCarrier->GetPositionY());
     }
+    //npcbot
+    else if (afcbot)
+    {
+        data << afcbot->GetGUID();
+        data << float(afcbot->GetPositionX());
+        data << float(afcbot->GetPositionY());
+    }
+    //end npcbot
 
     if (hordeFlagCarrier)
     {
@@ -368,6 +398,14 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
         data << float(hordeFlagCarrier->GetPositionX());
         data << float(hordeFlagCarrier->GetPositionY());
     }
+    //npcbot
+    else if (hfcbot)
+    {
+        data << hfcbot->GetGUID();
+        data << float(hfcbot->GetPositionX());
+        data << float(hfcbot->GetPositionY());
+    }
+    //end npcbot
 
     SendPacket(&data);
 }

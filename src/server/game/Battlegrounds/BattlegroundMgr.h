@@ -183,6 +183,11 @@ private:
     typedef std::map<uint32 /*mapId*/, BattlegroundTemplate*> BattlegroundMapTemplateContainer;
     BattlegroundTemplateMap _battlegroundTemplates;
     BattlegroundMapTemplateContainer _battlegroundMapTemplates;
+
+    //npcbot
+public:
+    BattlegroundDataContainer const& GetBgDataStore() const { return bgDataStore; }
+    //end npcbot
 };
 
 #define sBattlegroundMgr BattlegroundMgr::instance()

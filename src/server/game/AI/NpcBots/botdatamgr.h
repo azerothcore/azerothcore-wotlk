@@ -8,21 +8,26 @@
 #include <shared_mutex>
 #include <vector>
 
+class BattlegroundQueue;
 class Creature;
+class Group;
 class Item;
+class Player;
 class WanderNode;
 class WorldLocation;
 
 struct EquipmentInfo;
 struct CreatureTemplate;
 struct FactionEntry;
+struct GroupQueueInfo;
 struct ItemTemplate;
 struct Position;
+struct PvPDifficultyEntry;
 
-enum LocaleConstant;
+enum LocaleConstant : uint8;
 
-constexpr float MIN_WANDER_NODE_DISTANCE = VISIBILITY_DISTANCE_NORMAL * 0.5f;
-constexpr float MAX_WANDER_NODE_DISTANCE = SIZE_OF_GRIDS * 1.5f;
+constexpr float MIN_WANDER_NODE_DISTANCE = 50.0f; // VISIBILITY_DISTANCE_NORMAL * 0.5f;
+constexpr float MAX_WANDER_NODE_DISTANCE = 800.0f; //SIZE_OF_GRIDS * 1.5f;
 
 enum NpcBotDataUpdateType
 {
@@ -42,6 +47,7 @@ struct NpcBotData
     typedef std::set<uint32> DisabledSpellsContainer;
 
     friend class BotDataMgr;
+    friend struct WanderingBotsGenerator;
 public:
     uint32 owner;
     uint32 roles;
@@ -62,6 +68,7 @@ private:
 struct NpcBotAppearanceData
 {
     friend class BotDataMgr;
+    friend struct WanderingBotsGenerator;
 public:
     uint8 gender;
     uint8 skin;
@@ -77,6 +84,7 @@ private:
 struct NpcBotExtras
 {
     friend class BotDataMgr;
+    friend struct WanderingBotsGenerator;
 public:
     uint8 race;
     uint8 bclass;
@@ -168,8 +176,10 @@ class BotDataMgr
         static std::vector<uint32> GetExistingNPCBotIds();
         static uint8 GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask = 0);
 
+        static void DespawnWandererBot(uint32 entry);
         static void LoadWanderMap(bool reload = false);
         static void GenerateWanderingBots();
+        static bool GenerateBattlegroundBots(Player const* groupLeader, Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo);
         static void CreateWanderingBotsSortedGear();
         static Item* GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(ItemTemplate const*)>&& check);
         static CreatureTemplate const* GetBotExtraCreatureTemplate(uint32 entry);
@@ -179,8 +189,9 @@ class BotDataMgr
         static uint8 GetMaxLevelForMapId(uint32 mapId);
         static uint8 GetMinLevelForBotClass(uint8 m_class);
         static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
-        static TeamId GetTeamForFaction(uint32 factionTemplateId);
-        static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId);
+        static TeamId GetTeamIdForFaction(uint32 factionTemplateId);
+        static uint32 GetTeamForFaction(uint32 factionTemplateId);
+        static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport);
         static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* curPos, uint32 faction, uint32 lvl, bool random);
         static WanderNode const* GetClosestWanderNode(WorldLocation const* loc);
 

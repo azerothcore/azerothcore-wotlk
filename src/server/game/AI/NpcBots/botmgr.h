@@ -6,19 +6,27 @@
 #include <functional>
 #include <mutex>
 
+class Battleground;
 class Creature;
 class GameObject;
 class Map;
 class Player;
 class Spell;
+class SpellInfo;
 class Unit;
 class Vehicle;
 class WorldLocation;
+class WorldObject;
+
 class DPSTracker;
 
+struct AreaTrigger;
+struct CleanDamage;
+struct GroupQueueInfo;
 struct Position;
 
-enum CurrentSpellTypes;
+enum CurrentSpellTypes : uint8;
+enum DamageEffectType : uint8;
 
 constexpr size_t TargetIconNamesCacheSize = 8u; // Group.h TARGETICONCOUNT
 
@@ -94,6 +102,7 @@ class AC_GAME_API BotMgr
         static bool IsPvPEnabled();
         static bool IsFoodInterruptedByMovement();
         static bool FilterRaces();
+        static bool IsBotGenerationEnabledBGs();
         static uint8 GetMaxClassBots();
         static uint8 GetHealTargetIconFlags();
         static uint8 GetTankTargetIconFlags();
@@ -112,6 +121,9 @@ class AC_GAME_API BotMgr
         static float GetBotDamageModSpell();
         static float GetBotHealingMod();
         static float GetBotHPMod();
+        static float GetBotWandererDamageMod();
+        static float GetBotWandererHealingMod();
+        static float GetBotWandererHPMod();
         static float GetBotDamageModByClass(uint8 botclass);
 
         static void Initialize();
@@ -160,6 +172,7 @@ class AC_GAME_API BotMgr
         static int32 GetBotInfoPacketsLimit();
         static bool LimitBots(Map const* map);
         static bool CanBotParryWhileCasting(Creature const* bot);
+        static bool IsWanderingWorldBot(Creature const* bot);
         bool RestrictBots(Creature const* bot, bool add) const;
         bool IsPartyInCombat() const;
         bool HasBotClass(uint8 botclass) const;
@@ -185,6 +198,7 @@ class AC_GAME_API BotMgr
         void KillBot(Creature* bot);
 
         void CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype = BOT_REMOVE_LOGOUT);
+        static void CleanupsBeforeBotDelete(Creature* bot);
         void RemoveAllBots(uint8 removetype = BOT_REMOVE_LOGOUT);
         void RemoveBot(ObjectGuid guid, uint8 removetype = BOT_REMOVE_LOGOUT);
         void UnbindBot(ObjectGuid guid);
@@ -237,13 +251,16 @@ class AC_GAME_API BotMgr
         void UpdateTargetIconName(uint8 id, std::string const& name);
         void ResetTargetIconNames();
 
+        static void InviteBotToBG(ObjectGuid botguid, GroupQueueInfo* ginfo, Battleground* bg);
+
+        static bool IsBotInAreaTriggerRadius(Creature const* bot, AreaTrigger const* trigger);
+
         static void AddDelayedTeleportCallback(delayed_teleport_callback_type&& callback);
         static void HandleDelayedTeleports();
 
     private:
         static void _teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori, bool quick, bool reset);
         static void _reviveBot(Creature* bot, WorldLocation* dest = nullptr);
-        void _addBotToRemoveList(ObjectGuid guid);
         void _setBotExactAttackRange(uint8 exactRange) { _exactAttackRange = exactRange; }
         static delayed_teleport_mutex_type* _getTpLock();
 

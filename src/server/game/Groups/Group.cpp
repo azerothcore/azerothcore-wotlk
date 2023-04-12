@@ -110,6 +110,38 @@ Group::~Group()
     delete[] m_subGroupsCounts;
 }
 
+//npcbot
+bool Group::Create(Creature* leader)
+{
+    ASSERT(isBGGroup());
+
+    ObjectGuid leaderGuid = leader->GetGUID();
+    ObjectGuid::LowType lowguid = sGroupMgr->GenerateGroupId();
+
+    m_guid = ObjectGuid::Create<HighGuid::Group>(lowguid);
+    m_leaderGuid = leaderGuid;
+    m_leaderName = leader->GetName();
+
+    m_groupType = GROUPTYPE_BGRAID;
+
+    _initRaidSubGroupsCounter();
+
+    m_lootMethod = FREE_FOR_ALL;
+
+    m_lootThreshold = ITEM_QUALITY_UNCOMMON;
+    m_looterGuid = leaderGuid;
+    m_masterLooterGuid.Clear();
+
+    m_dungeonDifficulty = DUNGEON_DIFFICULTY_NORMAL;
+    m_raidDifficulty = RAID_DIFFICULTY_10MAN_NORMAL;
+
+    if (!AddMember(leader))
+        return false;
+
+    return true;
+}
+//end npcbot
+
 bool Group::Create(Player* leader)
 {
     ObjectGuid leaderGuid = leader->GetGUID();
@@ -433,6 +465,43 @@ Player* Group::GetInvited(const std::string& name) const
     return nullptr;
 }
 
+//npcbot
+bool Group::AddMember(Creature* creature)
+{
+    // Get first not-full group
+    uint8 subGroup = 0;
+    if (m_subGroupsCounts)
+    {
+        bool groupFound = false;
+        for (; subGroup < MAX_RAID_SUBGROUPS; ++subGroup)
+        {
+            if (m_subGroupsCounts[subGroup] < MAXGROUPSIZE)
+            {
+                groupFound = true;
+                break;
+            }
+        }
+        // We are raid group and no one slot is free
+        if (!groupFound)
+            return false;
+    }
+
+    MemberSlot member;
+    member.guid      = creature->GetGUID();
+    member.name      = creature->GetName();
+    member.group     = subGroup;
+    member.flags     = 0;
+    member.roles     = 0;
+    m_memberSlots.push_back(member);
+
+    SubGroupCounterIncrease(subGroup);
+    SendUpdate();
+    sScriptMgr->OnGroupAddMember(this, creature->GetGUID());
+
+    return true;
+}
+//end npcbot
+
 bool Group::AddMember(Player* player)
 {
     if (!player)
@@ -668,7 +737,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
             if (!(map && map->IsDungeon() && player && player->GetSession()->PlayerLogout()))
                 Disband();
         }
-        else if (GetMembersCount() < 2 && !(isLFGGroup() || isBGGroup() || isBFGroup()))
+        else if (GetMembersCount() < ((isLFGGroup() || isBGGroup() || isBFGroup()) ? 1u : 2u))
         {
             Disband();
             return false;
