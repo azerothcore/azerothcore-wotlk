@@ -1654,6 +1654,9 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
         if (target->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
         {
             target->FinishSpell(CURRENT_AUTOREPEAT_SPELL);
+            //npcbot: do not try with npcbot target
+            if (target->IsPlayer())
+            //end npcbot
             target->ToPlayer()->SendAutoRepeatCancel(target);
         }
     }
