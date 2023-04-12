@@ -317,9 +317,9 @@ struct boss_kiggler_the_crazed : public ScriptedAI
                 events.ScheduleEvent(EVENT_ADD_ABILITY3, 11s);
                 break;
             case EVENT_ADD_ABILITY4:
-            if (me->IsWithinRange(me->GetVictim(), 15.0f))
+            if (me->SelectNearestPlayer(30.0f))
                 {
-                    DoCastAOE(SPELL_ARCANE_EXPLOSION);
+                     DoCastAOE(SPELL_ARCANE_EXPLOSION);
                 }
                 events.ScheduleEvent(EVENT_ADD_ABILITY4, 30s);
                 break;
@@ -452,9 +452,9 @@ struct boss_krosh_firehand : public ScriptedAI
                 events.ScheduleEvent(EVENT_ADD_ABILITY2, 1s);
                 break;
             case EVENT_ADD_ABILITY3:
-                if (me->IsWithinRange(me->GetVictim(), 15.0f))
+                if (me->SelectNearestPlayer(15.0f))
                 {
-                    DoCastAOE(SPELL_BLAST_WAVE);
+                     DoCastAOE(SPELL_BLAST_WAVE);
                 }
                 events.ScheduleEvent(EVENT_ADD_ABILITY3, 8s);
                 break;
