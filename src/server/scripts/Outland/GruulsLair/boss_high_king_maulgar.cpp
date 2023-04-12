@@ -249,13 +249,11 @@ struct boss_olm_the_summoner : public ScriptedAI
                 DoCastVictim(SPELL_DARK_DECAY);
                 events.ScheduleEvent(EVENT_ADD_ABILITY2, 6500ms);
                 break;
-            
             case EVENT_ADD_ABILITY3:
                 DoCastRandomTarget(SPELL_DEATH_COIL);
                 events.ScheduleEvent(EVENT_ADD_ABILITY3, 7s);
                 break;
         }
-
         DoMeleeAttackIfReady();
     }
 };
