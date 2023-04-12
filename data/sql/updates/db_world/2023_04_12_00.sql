@@ -1,3 +1,4 @@
+-- DB update 2023_04_09_12 -> 2023_04_12_00
 -- ID 20985 (Captain Saeed)
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 8228;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
