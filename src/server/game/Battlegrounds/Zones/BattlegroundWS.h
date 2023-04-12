@@ -248,7 +248,7 @@ public:
     void EndBattleground(TeamId winnerTeamId) override;
     GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
-    //npcbot 
+    //npcbot
     void AddBot(Creature* bot) override;
     GraveyardStruct const* GetClosestGraveyardForBot(Creature* bot) const override;
     //void RemoveBot(ObjectGuid guid) override;

@@ -1315,7 +1315,7 @@ void bot_pet_ai::RefreshAura(uint32 spellId, int8 count, Unit* target) const
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
     {
-        LOG_ERROR("entities.player", "bot_pet_ai::RefreshAura(): Invalid spellInfo for spell %u! Bot - {} (botclass: {}, entry: {})",
+        LOG_ERROR("entities.player", "bot_pet_ai::RefreshAura(): Invalid spellInfo for spell {}! Bot - {} (botclass: {}, entry: {})",
             spellId, me->GetName().c_str(), uint32(petOwner->GetBotClass()), me->GetEntry());
         return;
     }

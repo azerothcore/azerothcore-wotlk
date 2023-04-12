@@ -5477,7 +5477,7 @@ void bot_ai::_updateStandState() const
                 }
             }
         }
-        else if (me->IsSitState() && (me->GetInterruptMask() & AURA_INTERRUPT_FLAG_NOT_SEATED))
+        else if (me->IsSitState() && !(me->GetInterruptMask() & AURA_INTERRUPT_FLAG_NOT_SEATED))
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
         return;
@@ -6875,7 +6875,9 @@ void bot_ai::OnSpellHit(Unit* caster, SpellInfo const* spell)
         case WANDERER_HEARTHSTONE:
             if (IsWanderer())
             {
-                BotMgr::TeleportBot(me, sMapMgr->CreateBaseMap(_travel_node_cur->GetMapId()), _travel_node_cur, true);
+                Map* targetMap = (me->GetMap()->GetEntry()->IsContinent() && _travel_node_cur->GetMapId() != me->GetMap()->GetId()) ?
+                    sMapMgr->CreateBaseMap(_travel_node_cur->GetMapId()) : me->GetMap();
+                BotMgr::TeleportBot(me, targetMap, _travel_node_cur, true);
                 _evadeCount = 0;
             }
             return;
@@ -14610,7 +14612,21 @@ void bot_ai::JustDied(Unit* u)
                 gr->SendUpdate();
     }
 
-    if (u && (u->IsPvP() || u->IsControlledByPlayer() || u->IsNPCBotOrPet()))
+    if (IsWanderer() && me->GetMap()->IsBattlegroundOrArena())
+    {
+        if (me->GetMap()->GetPlayersCountExceptGMs() > 0)
+        {
+            if (Battleground const* bg = me->GetMap()->ToBattlegroundMap()->GetBG())
+            {
+                if (GraveyardStruct const* gy = bg->GetClosestGraveyardForBot(me))
+                {
+                    Position pos(gy->x, gy->y, gy->z, me->GetOrientation());
+                    Events.AddEventAtOffset([me = me, pos = pos]() { BotMgr::TeleportBot(me, me->GetMap(), &pos, true); }, 5s);
+                }
+            }
+        }
+    }
+    else if (u && (u->IsPvP() || u->IsControlledByPlayer() || u->IsNPCBotOrPet()))
     {
         LOG_DEBUG("npcbots", "{} {} id {} class {} level {} WAS KILLED BY {} {} id {} class {} level {} on their way to {}!",
             IsWanderer() ? "Wandering bot" : "Bot", me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
@@ -14619,19 +14635,8 @@ void bot_ai::JustDied(Unit* u)
             IsWanderer() ? _travel_node_cur->GetName().c_str() : "''");
     }
 
-    if (IsWanderer() && me->GetMap()->GetEntry()->IsBattleground())
-    {
-        Battleground* bg = me->GetMap()->ToBattlegroundMap()->GetBG();
-        ASSERT_NOTNULL(bg);
-        GraveyardStruct const* gy = bg->GetClosestGraveyardForBot(me);
-        if (gy)
-        {
-            Position pos(gy->x, gy->y, gy->z, me->GetOrientation());
-            Events.AddEventAtOffset([me = me, pos = pos]() { BotMgr::TeleportBot(me, me->GetMap(), &pos, true); }, 5s);
-        }
-    }
-
-    _reviveTimer = (IsWanderer() && !(u && u->IsControlledByPlayer())) ? REVIVE_TIMER_MEDIUM : IAmFree() ? REVIVE_TIMER_DEFAULT : REVIVE_TIMER_SHORT;
+    _reviveTimer = (IsWanderer() && !(u && u->IsControlledByPlayer())) ? REVIVE_TIMER_MEDIUM :
+        IAmFree() ? REVIVE_TIMER_DEFAULT : master->InBattleground() ? REVIVE_TIMER_SHORT / 2 : REVIVE_TIMER_SHORT;
     _atHome = false;
     _evadeMode = false;
     spawned = false;
@@ -14646,20 +14651,23 @@ void bot_ai::KilledUnit(Unit* u)
     if (u->IsControlledByPlayer() || u->IsPvP() || u->IsNPCBotOrPet())
     {
         ++_pvpKillsCount;
-        if (IsWanderer())
+        if (!me->GetMap()->IsBattlegroundOrArena())
         {
-            LOG_DEBUG("npcbots", "Wandering bot {} id {} class {} level {} KILLED {} {} id {} class {} level {} on their way to {}!",
-                me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
-                (u->IsPlayer() ? "player" : u->IsNPCBot() ? u->ToCreature()->GetBotAI()->IsWanderer() ? "wandering bot" : "bot" : u->IsNPCBotPet() ? "botpet" : "creature"),
-                u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
-                _travel_node_cur->GetName().c_str());
-        }
-        else if (u->IsNPCBot() && u->ToCreature()->GetBotAI()->IsWanderer())
-        {
-            LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} KILLED wandering bot {} id {} class {} level {} on their way to {}!",
-                me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
-                u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
-                IsWanderer() ? _travel_node_cur->GetName().c_str() : "''");
+            if (IsWanderer())
+            {
+                LOG_DEBUG("npcbots", "Wandering bot {} id {} class {} level {} KILLED {} {} id {} class {} level {} on their way to {}!",
+                    me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
+                    (u->IsPlayer() ? "player" : u->IsNPCBot() ? u->ToCreature()->GetBotAI()->IsWanderer() ? "wandering bot" : "bot" : u->IsNPCBotPet() ? "botpet" : "creature"),
+                    u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
+                    _travel_node_cur->GetName().c_str());
+            }
+            else if (u->IsNPCBot() && u->ToCreature()->GetBotAI()->IsWanderer())
+            {
+                LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} KILLED wandering bot {} id {} class {} level {} on their way to {}!",
+                    me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()),
+                    u->GetName().c_str(), u->GetEntry(), uint32(u->GetClass()), uint32(u->GetLevel()),
+                    IsWanderer() ? _travel_node_cur->GetName().c_str() : "''");
+            }
         }
     }
 
@@ -16871,7 +16879,7 @@ void bot_ai::Evade()
                 me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), me->GetMapId(), _travel_node_cur->GetWPId(),
                 _travel_node_cur->GetName().c_str(), uint32(mapid), pos.ToString().c_str(), me->GetExactDist(pos));
 
-            evadeDelayTimer = 15000;
+            evadeDelayTimer = 12000;
             me->CastSpell(me, WANDERER_HEARTHSTONE);
             return;
         }
@@ -16932,7 +16940,7 @@ void bot_ai::Evade()
 
                 homepos.Relocate(nextNode);
 
-                LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} wandered from node {} to {}, next {} ('{}'), {}, dist {} yd!",
+                LOG_TRACE("npcbots", "Bot {} id {} class {} level {} wandered from node {} to {}, next {} ('{}'), {}, dist {} yd!",
                     me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), _travel_node_last ? _travel_node_last->GetWPId() : 0, _travel_node_cur->GetWPId(),
                     nextNode->GetWPId(), nextNode->GetName().c_str(), homepos.ToString().c_str(), pos.GetExactDist(homepos));
 
@@ -17007,7 +17015,7 @@ void bot_ai::GetNextEvadeMovePoint(Position& pos, bool& use_path) const
         return;
 
     if (me->IsInWater())
-        LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} is pathing from water!", me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()));
+        LOG_TRACE("npcbots", "Bot {} id {} class {} level {} is pathing from water!", me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()));
 
     switch (path.GetPathType())
     {
@@ -17030,7 +17038,7 @@ void bot_ai::GetNextEvadeMovePoint(Position& pos, bool& use_path) const
                 return;
             }
             //log error and use direct point movement
-            LOG_DEBUG("npcbots", "Bot {} id {} class {] level {} can't find full path to node {} (res {}) from pos {}, falling back to default PF!",
+            LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} can't find full path to node {} (res {}) from pos {}, falling back to default PF!",
                 me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), IsWanderer() ? _travel_node_cur->GetWPId() : 0, uint32(path.GetPathType()),
                 me->GetPosition().ToString().c_str());
             break;

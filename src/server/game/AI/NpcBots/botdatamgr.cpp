@@ -293,8 +293,8 @@ private:
         if (bracketEntry)
         {
             //force level range for bgs
-            bot_template.minlevel = bracketEntry->minLevel;
-            bot_template.maxlevel = bracketEntry->maxLevel;
+            bot_template.minlevel = std::min<uint32>(bracketEntry->minLevel, 80u);
+            bot_template.maxlevel = std::min<uint32>(bracketEntry->maxLevel, 80u);
         }
         else
             bot_template.flags_extra &= ~(CREATURE_FLAG_EXTRA_NO_XP);
@@ -390,7 +390,7 @@ public:
 
         bool found_maxlevel_node_a = false;
         bool found_maxlevel_node_h = false;
-        bool found_maxlevel_node_rest = false;
+        bool found_maxlevel_node_n = false;
         const uint8 maxof_minclasslvl_nor = BotDataMgr::GetMinLevelForBotClass(BOT_CLASS_DEATH_KNIGHT); // 55
         const uint8 maxof_minclasslvl_ex = BotDataMgr::GetMinLevelForBotClass(BOT_CLASS_DREADLORD); // 60
         for (WanderNode const* wp : spawns_a)
@@ -413,57 +413,63 @@ public:
         {
             if (wp->GetLevels().second >= maxof_minclasslvl_ex)
             {
-                found_maxlevel_node_rest = true;
+                found_maxlevel_node_n = true;
                 break;
             }
         }
 
+        decltype (_spareBotIdsPerClassMap) teamSpareBotIdsPerClass;
+
         if (team == -1)
         {
-            static const std::array<int32, 6> team_choices{ ALLIANCE, HORDE, TEAM_OTHER, ALLIANCE, HORDE, TEAM_OTHER };
-            team = Acore::Containers::SelectRandomContainerElement(team_choices);
-        }
+            if (!found_maxlevel_node_a || !found_maxlevel_node_h || !found_maxlevel_node_n)
+                return false;
 
-        switch (team)
-        {
-            case ALLIANCE:
-                if (!found_maxlevel_node_a)
-                    return false;
-                break;
-            case HORDE:
-                if (!found_maxlevel_node_h)
-                    return false;
-                break;
-            case TEAM_OTHER:
-            default:
-                if (!found_maxlevel_node_rest)
-                    return false;
-                break;
+            //make a full copy
+            teamSpareBotIdsPerClass = _spareBotIdsPerClassMap;
         }
-
-        decltype (_spareBotIdsPerClassMap) teamSpareBotIdsPerClass;
-        for (auto const& kv : _spareBotIdsPerClassMap)
+        else
         {
-            for (uint32 spareBotId : kv.second)
+            switch (team)
             {
-                NpcBotExtras const* orig_extras = BotDataMgr::SelectNpcBotExtras(spareBotId);
-                ASSERT_NOTNULL(orig_extras);
+                case ALLIANCE:
+                    if (!found_maxlevel_node_a)
+                        return false;
+                    break;
+                case HORDE:
+                    if (!found_maxlevel_node_h)
+                        return false;
+                    break;
+                case TEAM_OTHER:
+                default:
+                    if (!found_maxlevel_node_n)
+                        return false;
+                    break;
+            }
 
-                uint32 bot_faction = GetDefaultFactionForRaceClass(kv.first, orig_extras->race);
-
-                uint32 botTeam = BotDataMgr::GetTeamForFaction(bot_faction);
-
-                if (int32(botTeam) != team)
-                    continue;
-
-                if (bracketEntry)
+            for (auto const& kv : _spareBotIdsPerClassMap)
+            {
+                for (uint32 spareBotId : kv.second)
                 {
-                    uint8 botminlevel = BotDataMgr::GetMinLevelForBotClass(kv.first);
-                    if (botminlevel > bracketEntry->maxLevel)
-                        continue;
-                }
+                    NpcBotExtras const* orig_extras = BotDataMgr::SelectNpcBotExtras(spareBotId);
+                    ASSERT_NOTNULL(orig_extras);
 
-                teamSpareBotIdsPerClass[kv.first].insert(spareBotId);
+                    uint32 bot_faction = GetDefaultFactionForRaceClass(kv.first, orig_extras->race);
+
+                    uint32 botTeam = BotDataMgr::GetTeamForFaction(bot_faction);
+
+                    if (int32(botTeam) != team)
+                        continue;
+
+                    if (bracketEntry)
+                    {
+                        uint8 botminlevel = BotDataMgr::GetMinLevelForBotClass(kv.first);
+                        if (botminlevel > bracketEntry->maxLevel)
+                            continue;
+                    }
+
+                    teamSpareBotIdsPerClass[kv.first].insert(spareBotId);
+                }
             }
         }
 
@@ -1126,7 +1132,11 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     uint32 spareBots = sBotGen->GetSpareBotsCount();
 
     if (spareBots == 0)
+    {
+        LOG_WARN("npcbots", "[No spare bots] Failed to generate bots for BG {} inited by player {} ({})",
+            uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
         return false;
+    }
 
     BattlegroundQueueTypeId bgqTypeId = sBattlegroundMgr->BGQueueTypeId(gqinfo->BgTypeId, gqinfo->ArenaType);
     ASSERT(bgqTypeId != BATTLEGROUND_QUEUE_NONE);
@@ -1143,7 +1153,11 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
             {
                 Battleground const* real_bg = real_bg_pair.second;
                 if (real_bg->GetInstanceID() != 0 && real_bg->GetBracketId() == bracketId)
+                {
+                    LOG_INFO("npcbots", "[Already running] Found running BG {} inited by player {} ({}). Not generating bots",
+                        uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
                     return true; // This BG is running already
+                }
             }
         }
     }
@@ -1180,10 +1194,18 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     ASSERT(needed_bots_count_h <= maxteamplayers);
 
     if (needed_bots_count_a + needed_bots_count_h == 0)
+    {
+        LOG_INFO("npcbots", "[No bots required] Failed to generate bots for BG {} inited by player {} ({})",
+            uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
         return true;
+    }
 
     if (spareBots < needed_bots_count_a + needed_bots_count_h)
+    {
+        LOG_INFO("npcbots", "[Not enough spare bots] Failed to generate bots for BG {} inited by player {} ({})",
+            uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
         return false;
+    }
 
     uint32 spawned_a = 0;
     uint32 spawned_h = 0;
@@ -1200,7 +1222,6 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
             for (NpcBotRegistry const* registry1 : { &spawned_bots_a, &spawned_bots_h })
                 for (Creature const* bot : *registry1)
                     DespawnWandererBot(bot->GetEntry());
-
             return false;
         }
         spareBots = sBotGen->GetSpareBotsCount();
@@ -1215,7 +1236,6 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
             for (NpcBotRegistry const* registry2 : { &spawned_bots_a, &spawned_bots_h })
                 for (Creature const* bot : *registry2)
                     DespawnWandererBot(bot->GetEntry());
-
             return false;
         }
     }
@@ -1235,7 +1255,7 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
             queue->AddBotAsGroup(bot->GetGUID(), GetTeamIdForFaction(bot->GetFaction()),
                 gqinfo->BgTypeId, bracketEntry, gqinfo->ArenaType, false, gqinfo->ArenaTeamRating, gqinfo->ArenaMatchmakerRating);
 
-            seconds_delay += std::max<uint32>(1u, uint32((MINUTE / 2) / (spawned_bots_a.size() + spawned_bots_h.size())));
+            seconds_delay += std::max<uint32>(1u, uint32((MINUTE / 2) / (needed_bots_count_a + needed_bots_count_h)));
 
             BotBattlegroundEnterEvent* bbe = new BotBattlegroundEnterEvent(groupLeader->GetGUID(), bot->GetGUID(), bgqTypeId,
                 botDataEvents.CalculateTime(Milliseconds(uint32(INVITE_ACCEPT_WAIT_TIME) + uint32(BG_START_DELAY_2M)).count()));

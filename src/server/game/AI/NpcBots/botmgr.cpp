@@ -663,7 +663,7 @@ void BotMgr::Update(uint32 diff)
             continue;
         }
 
-        if (partyCombat == false)
+        if (partyCombat == false || _owner->InBattleground())
         {
             ai->UpdateReviveTimer(diff);
 
@@ -870,9 +870,10 @@ void BotMgr::_reviveBot(Creature* bot, WorldLocation* dest)
     //bot->GetBotAI()->Reset();
     bot->GetBotAI()->SetShouldUpdateStats();
 
-    bot->SetHealth(bot->GetMaxHealth() / (bot->IsWandererBot() ? 1 : 4)); //25% of max health
+    uint8 restore_factor = (bot->IsWandererBot() || (!bot->GetBotAI()->IAmFree() && bot->GetBotOwner()->InBattleground())) ? 1 : 4;
+    bot->SetHealth(bot->GetMaxHealth() / restore_factor); //25% of max health
     if (bot->GetMaxPower(POWER_MANA) > 1)
-        bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA) / (bot->IsWandererBot() ? 1 : 4)); //25% of max mana
+        bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA) / restore_factor); //25% of max mana
 
     if (!bot->GetBotAI()->IAmFree() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_MASK_UNMOVING))
         bot->GetBotAI()->SetBotCommandState(BOT_COMMAND_FOLLOW, true);
