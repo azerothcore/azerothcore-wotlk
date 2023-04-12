@@ -155,7 +155,6 @@ struct boss_high_king_maulgar : public BossAI
                 events.DelayEvents(15s);
                 me->CastSpell(me, SPELL_WHIRLWIND, false);
                 events.ScheduleEvent(EVENT_WHIRLWIND, 54s);
-                events.DelayEvents(5s); //extra delay to prevent events from insta-casting (necessary?)
                 break;
             case EVENT_CHECK_HEALTH:
                 if (me->HealthBelowPct(50))
