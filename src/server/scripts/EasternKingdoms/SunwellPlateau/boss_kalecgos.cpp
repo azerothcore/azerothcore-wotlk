@@ -407,7 +407,13 @@ public:
 
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!who || who->GetEntry() != NPC_SATHROVARR || (me->GetMap()->GetPlayers().getSize() == 1))
+            if (me->GetMap()->GetPlayers().getSize() == 1){
+                Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource();
+                if (player->GetPositionZ() > 50.0f && player->IsAlive())
+                    damage = 0;
+            }
+
+            if (!who || who->GetEntry() != NPC_SATHROVARR)
                 damage = 0;
         }
 
