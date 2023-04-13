@@ -4864,7 +4864,7 @@ class spell_gen_shriveling_gaze : public AuraScript
         return ValidateSpellInfo({ SPELL_SHRIVELING_GAZE });
     }
 
-    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         ModStackAmount(20);
     }
