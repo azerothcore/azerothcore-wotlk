@@ -3439,10 +3439,10 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         spell_bonus += int32(0.08f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
                         spell_bonus += int32(0.13f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
                         break;
-                     case 53385:  // Divine Storm deals normalized damage
+                    case 53385:  // Divine Storm deals normalized damage
                         normalized = true;
                         break;
-                     default:
+                    default:
                         break;
                 }
                 break;
