@@ -212,6 +212,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->MaxAffectedTargets = 4;
     });
+
     ApplySpellFix({
         20424,  // Seal of Command
         42463,  // Seal of Vengeance
