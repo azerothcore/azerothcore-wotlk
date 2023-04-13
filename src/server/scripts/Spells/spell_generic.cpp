@@ -4869,7 +4869,7 @@ class spell_gen_shriveling_gaze : public AuraScript
         ModStackAmount(20);
     }
 
-    void OnPeriodic(AuraEffect const* aurEff)
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
         PreventDefaultAction();
         ModStackAmount(-1);
