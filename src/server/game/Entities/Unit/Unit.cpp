@@ -4655,6 +4655,8 @@ void Unit::RemoveOwnedAura(AuraMap::iterator& i, AuraRemoveMode removeMode)
     aura->_Remove(removeMode);
 
     i = m_ownedAuras.begin();
+
+    sScriptMgr->OnAuraRemove(this, nullptr, removeMode);
 }
 
 void Unit::RemoveOwnedAura(uint32 spellId, ObjectGuid casterGUID, uint8 reqEffMask, AuraRemoveMode removeMode)
