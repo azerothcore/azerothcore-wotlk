@@ -70,7 +70,7 @@ float VoidPortalCoords[5][4] =
     {-261.676f, -297.69f, 17.087011f, 1.360249996185302734f}, //portal B 33614
     {-282.272f, -240.432f, 12.683899f, 5.580170154571533203f}, //portal C 33615
     {-291.833f, -268.595f, 12.682545f, 0.047733999788761138f}, //portal D 33567 
-    {-303.966f, -255.759f, 12.683404f, 6.012829780578613281f}
+    {-303.966f, -255.759f, 12.683404f, 6.012829780578613281f} //portal E 33616
 };
 
 class boss_grandmaster_vorpil : public CreatureScript
@@ -209,10 +209,9 @@ public:
 
                         me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
                         me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
-                        events.DelayEvents(1000);
                         me->CastSpell(me, DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
                         events.RepeatEvent(24000);
-                        events.DelayEvents(6000);
+                        //events.DelayEvents(6000);
                         break;
                     }
             }
