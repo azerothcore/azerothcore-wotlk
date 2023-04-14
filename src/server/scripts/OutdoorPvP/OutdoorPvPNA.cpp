@@ -828,30 +828,39 @@ struct outdoorpvp_na_halaa_creatures : public ScriptedAI
 {
     outdoorpvp_na_halaa_creatures(Creature* creature) : ScriptedAI(creature) { }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 diff)
     {
-        if (!(halaaNPCAlly.size() == 20 && halaaNPCHorde.size() == 20))
+        if(halaaNPCHorde.size() != 20 && halaaNPCAlly.size() != 20)
         {
-            // First Horde Map
-            for (HalaaIds id : PatrolCreatureEntryHorde)
+            std::list<Creature*> creatures;
+            uint32 entry = 0;
+            for (int i = 0; i < 12; i++)
             {
-                if (me->GetEntry() == id.idPatrol && !halaaNPCHorde.contains(me->GetSpawnId()))
+                me->GetCreatureListWithEntryInGrid(creatures, PatrolCreatureEntry[i].idPatrol, 250);
+            }
+
+            if (creatures.size() == 40)
+            {
+                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
                 {
-                    halaaNPCHorde[halaaNPCHorde.size()] = me->GetSpawnId();
+                    Creature* const c = *itr;
+                    if (entry < 20)
+                    {
+                        halaaNPCHorde[entry] = (c->GetSpawnId());
+                    }
+                    else
+                    {
+                        halaaNPCAlly[entry - 20] = (c->GetSpawnId());
+                    }
+                    c->AddObjectToRemoveList();
+                    entry++;
+                    sObjectMgr->RemoveCreatureFromGrid(c->GetSpawnId(), c->GetCreatureData());
                 }
             }
-            // Second Ally Map
-            for (HalaaIds id : PatrolCreatureEntryAlly)
-            {
-                if (me->GetEntry() == id.idPatrol && !halaaNPCAlly.contains(me->GetSpawnId()))
-                {
-                    halaaNPCAlly[halaaNPCAlly.size()] = me->GetSpawnId();
-                }
-            }
-            me->AddObjectToRemoveList();
-            sObjectMgr->RemoveCreatureFromGrid(me->GetSpawnId(), me->GetCreatureData());
         }
+        DoMeleeAttackIfReady();
     }
+    void Reset() override { }
 };
 
 void AddSC_outdoorpvp_na()
