@@ -194,8 +194,8 @@ public:
 
                         me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
                         me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
-                        me->CastSpell(me, SPELL_RAIN_OF_FIRE_N);
-
+                        events.DelayEvents(1000);
+                        me->CastSpell(me, DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
                         events.RepeatEvent(24000);
                         events.DelayEvents(6000);
                         break;
