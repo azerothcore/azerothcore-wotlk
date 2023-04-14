@@ -47,7 +47,8 @@ enum GrandmasterVorpil
     EVENT_SPELL_SHADOWBOLT      = 1,
     EVENT_SPELL_DRAWSHADOWS     = 2,
     EVENT_SUMMON_TRAVELER       = 3,
-    EVENT_SPELL_BANISH          = 4
+    EVENT_SPELL_BANISH          = 4,
+    EVENT_SPELL_RAIN_OF_FIRE    = 5
 };
 
 float VorpilPosition[3] = {-252.8820f, -264.3030f, 17.1f};
@@ -144,6 +145,7 @@ public:
 
             events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(7000, 14000));
             events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 45000);
+            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 46000);
             events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 5000);
             if (IsHeroic())
             {
@@ -198,11 +200,13 @@ public:
 
                         me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
                         me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
-                        me->CastSpell(me, DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
                         events.RepeatEvent(24000);
-                        //events.DelayEvents(6000);
                         break;
                     }
+                case EVENT_SPELL_RAIN_OF_FIRE:
+                    me->CastSpell(me, DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
+                    events.RepeatEvent(24000);
+                    break;
             }
 
             DoMeleeAttackIfReady();
@@ -255,8 +259,7 @@ public:
                 {
                     me->AddAura(DUNGEON_MODE(SPELL_EMPOWERING_SHADOWS_N, SPELL_EMPOWERING_SHADOWS_H), Vorpil);
                     Vorpil->ModifyHealth(int32(Vorpil->CountPctFromMaxHealth(4)));
-                    //me->CastSpell(me, SPELL_SHADOW_NOVA, true);
-                    DoCastAOE(SPELL_SHADOW_NOVA);
+                    me->CastSpell(me, SPELL_SHADOW_NOVA, true);
                     me->KillSelf();
                     return;
                 }
