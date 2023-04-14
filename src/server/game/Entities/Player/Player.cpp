@@ -1990,7 +1990,7 @@ void Player::RegenerateHealth()
         for (AuraEffectList::const_iterator i = mModHealthRegenPct.begin(); i != mModHealthRegenPct.end(); ++i) {
             AddPct(addvalue, (*i)->GetAmount());
         }
-            
+
         if (!IsInCombat())
         {
             addvalue += GetTotalAuraModifier(SPELL_AURA_MOD_REGEN) * 2 * IN_MILLISECONDS / (5 * IN_MILLISECONDS);
