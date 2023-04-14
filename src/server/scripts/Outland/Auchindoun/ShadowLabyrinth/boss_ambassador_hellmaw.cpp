@@ -154,8 +154,10 @@ struct boss_ambassador_hellmaw : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
+        if (victim->IsPlayer() && urand(0, 1))
+        {
             Talk(SAY_SLAY);
+        }
     }
 
     void JustDied(Unit* /*killer*/) override
