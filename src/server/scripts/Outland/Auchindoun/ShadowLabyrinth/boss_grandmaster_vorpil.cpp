@@ -191,6 +191,7 @@ public:
                     break;
                 case EVENT_SPELL_DRAWSHADOWS:
                     {
+                        me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
                         Map* map = me->GetMap();
                         Map::PlayerList const& PlayerList = map->GetPlayers();
                         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -199,7 +200,6 @@ public:
                                     player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
 
                         me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
-                        me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
                         events.RepeatEvent(24000);
                         break;
                     }
