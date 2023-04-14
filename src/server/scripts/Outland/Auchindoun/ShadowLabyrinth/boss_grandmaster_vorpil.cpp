@@ -51,7 +51,7 @@ enum GrandmasterVorpil
     EVENT_SPELL_RAIN_OF_FIRE    = 5
 };
 
-float VorpilPosition[3] = {-252.8820f, -264.3030f, 17.1f};
+float VorpilPosition[3] = {-253.548f, -263.646f, 17.0864f};
 
 //x, y, z, and orientation
 float VoidPortalCoords[5][4] =
@@ -145,7 +145,7 @@ public:
 
             events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(7000, 14000));
             events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 45000);
-            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 45500);
+            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 46000);
             events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 5000);
             if (IsHeroic())
             {
