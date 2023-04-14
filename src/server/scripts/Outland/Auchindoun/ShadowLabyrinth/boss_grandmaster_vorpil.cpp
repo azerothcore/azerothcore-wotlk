@@ -52,17 +52,6 @@ enum GrandmasterVorpil
 
 float VorpilPosition[3] = {-252.8820f, -264.3030f, 17.1f};
 
-/*
-float VoidPortalCoords[5][3] =
-{
-    {-283.5894f, -239.5718f, 12.7f},
-    {-306.5853f, -258.4539f, 12.7f},
-    {-295.8789f, -269.0899f, 12.7f},
-    {-209.3401f, -262.7564f, 17.1f},
-    {-261.4533f, -297.3298f, 17.1f}
-};
-*/
-
 //x, y, z, and orientation
 float VoidPortalCoords[5][4] =
 {
@@ -266,7 +255,8 @@ public:
                 {
                     me->AddAura(DUNGEON_MODE(SPELL_EMPOWERING_SHADOWS_N, SPELL_EMPOWERING_SHADOWS_H), Vorpil);
                     Vorpil->ModifyHealth(int32(Vorpil->CountPctFromMaxHealth(4)));
-                    me->CastSpell(me, SPELL_SHADOW_NOVA, true);
+                    //me->CastSpell(me, SPELL_SHADOW_NOVA, true);
+                    DoCastAOE(SPELL_SHADOW_NOVA);
                     me->KillSelf();
                     return;
                 }
