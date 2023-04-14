@@ -62,7 +62,6 @@ float VoidPortalCoords[5][4] =
     {-291.833f, -268.595f, 12.682545f, 0.047733999788761138f}, //portal D 33567 
     {-303.966f, -255.759f, 12.683404f, 6.012829780578613281f} //portal E 33616
 };
-
 class boss_grandmaster_vorpil : public CreatureScript
 {
 public:
