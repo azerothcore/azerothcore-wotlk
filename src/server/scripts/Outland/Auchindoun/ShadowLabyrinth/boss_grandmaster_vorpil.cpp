@@ -52,6 +52,7 @@ enum GrandmasterVorpil
 
 float VorpilPosition[3] = {-252.8820f, -264.3030f, 17.1f};
 
+/*
 float VoidPortalCoords[5][3] =
 {
     {-283.5894f, -239.5718f, 12.7f},
@@ -59,6 +60,17 @@ float VoidPortalCoords[5][3] =
     {-295.8789f, -269.0899f, 12.7f},
     {-209.3401f, -262.7564f, 17.1f},
     {-261.4533f, -297.3298f, 17.1f}
+};
+*/
+
+//x, y, z, and orientation
+float VoidPortalCoords[5][4] =
+{
+    {-208.411f, -263.652f, 17.086313f, 3.121870040893554687f}, //portal A 33566
+    {-261.676f, -297.69f, 17.087011f, 1.360249996185302734f}, //portal B 33614
+    {-282.272f, -240.432f, 12.683899f, 5.580170154571533203f}, //portal C 33615
+    {-291.833f, -268.595f, 12.682545f, 0.047733999788761138f}, //portal D 33567 
+    {-303.966f, -255.759f, 12.683404f, 6.012829780578613281f}
 };
 
 class boss_grandmaster_vorpil : public CreatureScript
@@ -145,10 +157,13 @@ public:
             events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 45000);
             events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 5000);
             if (IsHeroic())
+            {
                 events.ScheduleEvent(EVENT_SPELL_BANISH, 17000);
-
+            }
             if (instance)
+            {
                 instance->SetData(DATA_GRANDMASTERVORPILEVENT, IN_PROGRESS);
+            }
         }
 
         void MoveInLineOfSight(Unit* who) override
