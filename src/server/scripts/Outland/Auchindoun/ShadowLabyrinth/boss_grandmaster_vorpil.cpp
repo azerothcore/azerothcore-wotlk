@@ -145,7 +145,7 @@ public:
 
             events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(7000, 14000));
             events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 45000);
-            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 46000);
+            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 45500);
             events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 5000);
             if (IsHeroic())
             {
@@ -206,9 +206,9 @@ public:
                 case EVENT_SPELL_RAIN_OF_FIRE:
                     me->CastSpell(me, DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
                     events.RepeatEvent(24000);
+                    events.DelayEvents(6000);
                     break;
             }
-
             DoMeleeAttackIfReady();
         }
     };
