@@ -53,6 +53,19 @@ public:
             return false;
     }
 
+    bool UnsetTaximaskNode(uint32 nodeidx)
+    {
+        uint8  field   = uint8((nodeidx - 1) / 32);
+        uint32 submask = 1 << ((nodeidx - 1) % 32);
+        if ((m_taximask[field] & submask) == submask)
+        {
+            m_taximask[field] &= ~submask;
+            return true;
+        }
+        else
+            return false;
+    }
+
     void AppendTaximaskTo(ByteBuffer& data, bool all);
 
     // Destinations
