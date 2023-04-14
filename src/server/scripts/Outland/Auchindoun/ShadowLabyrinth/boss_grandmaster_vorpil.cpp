@@ -110,13 +110,13 @@ public:
         void summonPortals()
         {
             for (uint8 i = 0; i < 5; ++i)
-                me->SummonCreature(NPC_VOID_PORTAL, VoidPortalCoords[i][0], VoidPortalCoords[i][1], VoidPortalCoords[i][2], 0, TEMPSUMMON_CORPSE_DESPAWN, 3000000);
+                me->SummonCreature(NPC_VOID_PORTAL, VoidPortalCoords[i][0], VoidPortalCoords[i][1], VoidPortalCoords[i][2], VoidPortalCoords[i][3], TEMPSUMMON_CORPSE_DESPAWN, 3000000);
         }
 
         void spawnVoidTraveler()
         {
             uint8 pos = urand(0, 4);
-            me->SummonCreature(NPC_VOID_TRAVELER, VoidPortalCoords[pos][0], VoidPortalCoords[pos][1], VoidPortalCoords[pos][2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+            me->SummonCreature(NPC_VOID_TRAVELER, VoidPortalCoords[pos][0], VoidPortalCoords[pos][1], VoidPortalCoords[pos][2], VoidPortalCoords[pos][3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             if (!sayHelp)
             {
                 Talk(SAY_HELP);
