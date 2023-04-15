@@ -99,6 +99,7 @@ float _mult_hp;
 float _mult_dmg_wanderer;
 float _mult_healing_wanderer;
 float _mult_hp_wanderer;
+float _mult_speed_wanderer;
 float _mult_dmg_warrior;
 float _mult_dmg_paladin;
 float _mult_dmg_hunter;
@@ -249,6 +250,7 @@ void BotMgr::LoadConfig(bool reload)
     _mult_dmg_wanderer              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Damage", 1.0f);
     _mult_healing_wanderer          = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Healing", 1.0f);
     _mult_hp_wanderer               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.HP", 1.0f);
+    _mult_speed_wanderer            = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Speed", 1.0f);
     _mult_dmg_warrior               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Warrior", 1.0f);
     _mult_dmg_paladin               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Paladin", 1.0f);
     _mult_dmg_hunter                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Hunter", 1.0f);
@@ -316,6 +318,7 @@ void BotMgr::LoadConfig(bool reload)
     RoundToInterval(_mult_dmg_wanderer, 0.1f, 10.f);
     RoundToInterval(_mult_healing_wanderer, 0.1f, 10.f);
     RoundToInterval(_mult_hp_wanderer, 0.1f, 10.f);
+    RoundToInterval(_mult_speed_wanderer, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_warrior, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_paladin, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_hunter, 0.1f, 10.f);
@@ -2011,6 +2014,10 @@ float BotMgr::GetBotWandererHealingMod()
 float BotMgr::GetBotWandererHPMod()
 {
     return _mult_hp_wanderer;
+}
+float BotMgr::GetBotWandererSpeedMod()
+{
+    return _mult_speed_wanderer;
 }
 float BotMgr::GetBotDamageModByClass(uint8 botclass)
 {

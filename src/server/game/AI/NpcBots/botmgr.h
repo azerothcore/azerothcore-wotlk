@@ -124,6 +124,7 @@ class AC_GAME_API BotMgr
         static float GetBotWandererDamageMod();
         static float GetBotWandererHealingMod();
         static float GetBotWandererHPMod();
+        static float GetBotWandererSpeedMod();
         static float GetBotDamageModByClass(uint8 botclass);
 
         static void Initialize();

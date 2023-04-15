@@ -4239,7 +4239,8 @@ NpcBot.Mult.HP              = 1.0
 #    NpcBot.Mult.Wanderer.Damage
 #    NpcBot.Mult.Wanderer.Healing
 #    NpcBot.Mult.Wanderer.HP
-#        Description: Multipliers for wandering bots' damage, healing, an hp.
+#    NpcBot.Mult.Wanderer.Speed
+#        Description: Multipliers for wandering bots' damage, healing, hp and speed.
 #                     Only affects wandering bots in open world.
 #        Default:     1.0
 #        Minimum:     0.1
@@ -4248,6 +4249,7 @@ NpcBot.Mult.HP              = 1.0
 NpcBot.Mult.Wanderer.Damage  = 1.0
 NpcBot.Mult.Wanderer.Healing = 1.0
 NpcBot.Mult.Wanderer.HP      = 1.0
+NpcBot.Mult.Wanderer.Speed   = 1.0
 
 #
 #    NpcBot.Mult.Damage.<Class>
