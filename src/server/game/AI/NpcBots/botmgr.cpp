@@ -99,6 +99,7 @@ float _mult_hp;
 float _mult_dmg_wanderer;
 float _mult_healing_wanderer;
 float _mult_hp_wanderer;
+float _mult_speed_wanderer;
 float _mult_dmg_warrior;
 float _mult_dmg_paladin;
 float _mult_dmg_hunter;
@@ -204,9 +205,6 @@ BotMgr::BotMgr(Player* const master) : _owner(master), _dpstracker(new DPSTracke
 
     _botsHidden = false;
     _quickrecall = false;
-
-    _dpstracker->SetOwner(master->GetGUID().GetCounter());
-    master->SetBotMgr(this);
 }
 BotMgr::~BotMgr()
 {
@@ -252,6 +250,7 @@ void BotMgr::LoadConfig(bool reload)
     _mult_dmg_wanderer              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Damage", 1.0f);
     _mult_healing_wanderer          = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Healing", 1.0f);
     _mult_hp_wanderer               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.HP", 1.0f);
+    _mult_speed_wanderer            = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Speed", 1.0f);
     _mult_dmg_warrior               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Warrior", 1.0f);
     _mult_dmg_paladin               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Paladin", 1.0f);
     _mult_dmg_hunter                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Hunter", 1.0f);
@@ -319,6 +318,7 @@ void BotMgr::LoadConfig(bool reload)
     RoundToInterval(_mult_dmg_wanderer, 0.1f, 10.f);
     RoundToInterval(_mult_healing_wanderer, 0.1f, 10.f);
     RoundToInterval(_mult_hp_wanderer, 0.1f, 10.f);
+    RoundToInterval(_mult_speed_wanderer, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_warrior, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_paladin, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_hunter, 0.1f, 10.f);
@@ -1057,34 +1057,37 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
                         return;
                     }
                 }
-                else if (newMap != mymap)
-                    bg->AddBot(bot);
-
-                if (!bot->IsAlive())
+                else
                 {
-                    ObjectGuid shGuid = ObjectGuid::Empty;
-                    float mindist = 0.0f;
-                    for (ObjectGuid bgCreGuid : bg->BgCreatures)
+                    if (newMap != mymap)
+                        bg->AddBot(bot);
+
+                    if (!bot->IsAlive())
                     {
-                        if (Creature const* bgCre = newMap->GetCreature(bgCreGuid))
+                        ObjectGuid shGuid = ObjectGuid::Empty;
+                        float mindist = 0.0f;
+                        for (ObjectGuid bgCreGuid : bg->BgCreatures)
                         {
-                            if (bgCre->IsSpiritService())
+                            if (Creature const* bgCre = newMap->GetCreature(bgCreGuid))
                             {
-                                float dist = bot->GetExactDist2d(bgCre);
-                                if (shGuid == ObjectGuid::Empty || dist < mindist)
+                                if (bgCre->IsSpiritService())
                                 {
-                                    mindist = dist;
-                                    shGuid = bgCreGuid;
+                                    float dist = bot->GetExactDist2d(bgCre);
+                                    if (shGuid == ObjectGuid::Empty || dist < mindist)
+                                    {
+                                        mindist = dist;
+                                        shGuid = bgCreGuid;
+                                    }
                                 }
                             }
                         }
-                    }
-                    if (shGuid)
-                        bg->AddPlayerToResurrectQueue(shGuid, bot->GetGUID());
-                    else
-                    {
-                        LOG_ERROR("npcbots", "TeleportBot: Bot {} '{}' can't find SpiritHealer in bg {}!",
-                            bot->GetEntry(), bot->GetName().c_str(), bg->GetName().c_str());
+                        if (shGuid)
+                            bg->AddPlayerToResurrectQueue(shGuid, bot->GetGUID());
+                        else
+                        {
+                            LOG_ERROR("npcbots", "TeleportBot: Bot {} '{}' can't find SpiritHealer in bg {}!",
+                                bot->GetEntry(), bot->GetName().c_str(), bg->GetName().c_str());
+                        }
                     }
                 }
             }
@@ -2029,6 +2032,10 @@ float BotMgr::GetBotWandererHealingMod()
 float BotMgr::GetBotWandererHPMod()
 {
     return _mult_hp_wanderer;
+}
+float BotMgr::GetBotWandererSpeedMod()
+{
+    return _mult_speed_wanderer;
 }
 float BotMgr::GetBotDamageModByClass(uint8 botclass)
 {

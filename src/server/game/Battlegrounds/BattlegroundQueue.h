@@ -77,6 +77,7 @@ public:
     GroupQueueInfo* AddGroup(Player* leader, Group* group, BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated, bool isPremade, uint32 arenaRating, uint32 matchmakerRating, uint32 arenaTeamId = 0, uint32 opponentsArenaTeamId = 0);
     //npcbot
     GroupQueueInfo* AddBotAsGroup(ObjectGuid leaderGuid, TeamId teamId, BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isPremade, uint32 arenaRating, uint32 matchmakerRating, uint32 arenaTeamId = 0, uint32 opponentsArenaTeamId = 0);
+        bool IsBotInvited(ObjectGuid guid, uint32 bgInstanceGuid) const;
     //end npcbot
     void RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount);
     bool IsPlayerInvitedToRatedArena(ObjectGuid pl_guid);

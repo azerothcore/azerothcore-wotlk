@@ -396,7 +396,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_reputationMgr = new ReputationMgr(this);
 
     /////////////// NPCBot System //////////////////
-    _botMgr = nullptr;
+    _botMgr = new BotMgr(this);
     ///////////// End NPCBot System ////////////////
 
     // Ours
@@ -457,11 +457,7 @@ Player::~Player()
     delete m_reputationMgr;
 
     //npcbot
-    if (_botMgr)
-    {
-        delete _botMgr;
-        _botMgr = nullptr;
-    }
+    delete _botMgr;
     //end npcbot
 
     sWorld->DecreasePlayerCount();
@@ -1758,19 +1754,19 @@ void Player::RemoveFromWorld()
 //NPCBOT
 bool Player::HaveBot() const
 {
-    return _botMgr && _botMgr->HaveBot();
+    return _botMgr->HaveBot();
 }
 uint8 Player::GetNpcBotsCount() const
 {
-    return _botMgr ? _botMgr->GetNpcBotsCount() : 0;
+    return _botMgr->GetNpcBotsCount();
 }
 void Player::RemoveAllBots(uint8 removetype)
 {
-    if (_botMgr) _botMgr->RemoveAllBots(removetype);
+    _botMgr->RemoveAllBots(removetype);
 }
 void Player::UpdatePhaseForBots()
 {
-    if (_botMgr) _botMgr->UpdatePhaseForBots();
+    _botMgr->UpdatePhaseForBots();
 }
 //END NPCBOT
 
@@ -2290,8 +2286,7 @@ void Player::SetGameMaster(bool on)
     }
 
     //npcbot: pet is handled already, bots are not, so do it
-    if (HaveBot())
-        _botMgr->OnOwnerSetGameMaster(on);
+    _botMgr->OnOwnerSetGameMaster(on);
     //end npcbot
 
     UpdateObjectVisibility();
@@ -2629,8 +2624,7 @@ void Player::GiveLevel(uint8 level)
     sScriptMgr->OnPlayerLevelChanged(this, oldLevel);
 
     //npcbot: force bots to update stats
-    if (HaveBot())
-        _botMgr->SetBotsShouldUpdateStats();
+    _botMgr->SetBotsShouldUpdateStats();
     //end npcbot
 }
 

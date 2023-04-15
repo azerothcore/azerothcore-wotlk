@@ -511,6 +511,15 @@ bool BattlegroundQueue::IsPlayerInvited(ObjectGuid pl_guid, const uint32 bgInsta
     return qItr != m_QueuedPlayers.end() && qItr->second->IsInvitedToBGInstanceGUID == bgInstanceGuid && qItr->second->RemoveInviteTime == removeTime;
 }
 
+//npcbot
+bool BattlegroundQueue::IsBotInvited(ObjectGuid guid, uint32 bgInstanceGuid) const
+{
+    ASSERT(guid.IsCreature());
+    QueuedPlayersMap::const_iterator qItr = m_QueuedPlayers.find(guid);
+    return qItr != m_QueuedPlayers.end() && qItr->second->IsInvitedToBGInstanceGUID == bgInstanceGuid;
+}
+//end npcbot
+
 bool BattlegroundQueue::GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo)
 {
     auto qItr = m_QueuedPlayers.find(guid);
