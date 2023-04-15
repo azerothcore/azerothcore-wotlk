@@ -2873,14 +2873,14 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
     return pos;
 }
 
-Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
+Position WorldObject::GetFirstCollisionPosition(float dist, float angle) const
 {
     Position pos = GetPosition();
     MovePositionToFirstCollision(pos, dist, angle);
     return pos;
 }
 
-void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
+void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle) const
 {
     angle += GetOrientation();
     float destx, desty, destz;

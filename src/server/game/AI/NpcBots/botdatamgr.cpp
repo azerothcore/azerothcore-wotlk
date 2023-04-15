@@ -80,7 +80,6 @@ public:
 
     bool Execute(uint64 e_time, uint32 /*p_time*/) override
     {
-        //timed out
         if (e_time >= _removeTime)
         {
             AbortMe();
@@ -92,10 +91,8 @@ public:
             if (bgPlayer && bgPlayer->IsInWorld() && bgPlayer->InBattleground())
             {
                 Battleground* bg = bgPlayer->GetBattleground();
-                Map* bgMap = bgPlayer->FindMap();
                 ASSERT_NOTNULL(bg);
-                ASSERT_NOTNULL(bgMap);
-                ASSERT(bgMap->GetEntry()->IsBattlegroundOrArena());
+                ASSERT(bgPlayer->GetMap()->IsBattlegroundOrArena());
 
                 //full, some players connected
                 if (!bg->HasFreeSlots())
@@ -104,10 +101,17 @@ public:
                     return true;
                 }
 
-                sBattlegroundMgr->GetBattlegroundQueue(_bgQueueTypeId).RemovePlayer(bot->GetGUID(), false);
+                BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(_bgQueueTypeId);
+                if (!queue.IsBotInvited(_botGUID, bg->GetInstanceID()))
+                {
+                    AbortMe();
+                    return true;
+                }
+
+                queue.RemovePlayer(bot->GetGUID(), false);
 
                 TeamId teamId = BotDataMgr::GetTeamIdForFaction(bot->GetFaction());
-                BotMgr::TeleportBot(const_cast<Creature*>(bot), bgMap, bg->GetTeamStartPosition(teamId), true, false);
+                BotMgr::TeleportBot(const_cast<Creature*>(bot), bgPlayer->GetMap(), bg->GetTeamStartPosition(teamId), true, false);
             }
             else if (bgPlayer && bgPlayer->InBattlegroundQueue())
                 botDataEvents.AddEventAtOffset(new BotBattlegroundEnterEvent(_playerGUID, _botGUID, _bgQueueTypeId, _removeTime), 2s);
@@ -1129,6 +1133,12 @@ void BotDataMgr::GenerateWanderingBots()
 
 bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unused]] Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo)
 {
+    BattlegroundTypeId bgTypeId = gqinfo->BgTypeId;
+    uint8 atype = gqinfo->ArenaType;
+    uint32 ammr = gqinfo->ArenaMatchmakerRating;
+    BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
+    BattlegroundQueueTypeId bgqTypeId = sBattlegroundMgr->BGQueueTypeId(bgTypeId, atype);
+
     uint32 spareBots = sBotGen->GetSpareBotsCount();
 
     if (spareBots == 0)
@@ -1138,41 +1148,34 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
         return false;
     }
 
-    BattlegroundQueueTypeId bgqTypeId = sBattlegroundMgr->BGQueueTypeId(gqinfo->BgTypeId, gqinfo->ArenaType);
-    ASSERT(bgqTypeId != BATTLEGROUND_QUEUE_NONE);
-
-    BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
-
     //find running BG
     auto const& all_bgs = sBattlegroundMgr->GetBgDataStore();
     for (auto const& kv : all_bgs)
     {
-        if (kv.first == gqinfo->BgTypeId)
+        if (kv.first == bgTypeId)
         {
             for (auto const& real_bg_pair : kv.second._Battlegrounds)
             {
                 Battleground const* real_bg = real_bg_pair.second;
-                if (real_bg->GetInstanceID() != 0 && real_bg->GetBracketId() == bracketId)
+                if (real_bg->GetInstanceID() != 0 && real_bg->GetBracketId() == bracketId &&
+                    real_bg->GetStatus() < STATUS_WAIT_LEAVE && real_bg->HasFreeSlots())
                 {
                     LOG_INFO("npcbots", "[Already running] Found running BG {} inited by player {} ({}). Not generating bots",
-                        uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
-                    return true; // This BG is running already
+                        uint32(bgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
+                    return true;
                 }
             }
         }
     }
 
-    Battleground const* bg_template = sBattlegroundMgr->GetBattlegroundTemplate(gqinfo->BgTypeId);
+    Battleground const* bg_template = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
 
     if (!bg_template)
         return false;
 
-    [[maybe_unused]] uint32 minteamplayers = bg_template->GetMinPlayersPerTeam();
-    [[maybe_unused]] uint32 maxteamplayers = bg_template->GetMaxPlayersPerTeam();
-    [[maybe_unused]] uint32 avgteamplayers = (minteamplayers + 1 + maxteamplayers) / 2;
-
-    [[maybe_unused]] uint32 minlevel = bracketEntry->minLevel;
-    [[maybe_unused]] uint32 maxlevel = bracketEntry->maxLevel;
+    uint32 minteamplayers = bg_template->GetMinPlayersPerTeam();
+    uint32 maxteamplayers = bg_template->GetMaxPlayersPerTeam();
+    uint32 avgteamplayers = (minteamplayers + 1 + maxteamplayers) / 2;
 
     uint32 queued_players_a = 0;
     uint32 queued_players_h = 0;
@@ -1196,14 +1199,14 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     if (needed_bots_count_a + needed_bots_count_h == 0)
     {
         LOG_INFO("npcbots", "[No bots required] Failed to generate bots for BG {} inited by player {} ({})",
-            uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
+            uint32(bgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
         return true;
     }
 
     if (spareBots < needed_bots_count_a + needed_bots_count_h)
     {
         LOG_INFO("npcbots", "[Not enough spare bots] Failed to generate bots for BG {} inited by player {} ({})",
-            uint32(gqinfo->BgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
+            uint32(bgTypeId), groupLeader->GetName().c_str(), groupLeader->GetGUID().GetCounter());
         return false;
     }
 
@@ -1244,6 +1247,11 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     ASSERT(uint32(spawned_bots_h.size()) == needed_bots_count_h);
 
     uint32 seconds_delay = 5;
+
+    botDataEvents.AddEventAtOffset([ammr = ammr, atype = atype, bgqTypeId = bgqTypeId, bgTypeId = bgTypeId, bracketId = bracketId]() {
+        sBattlegroundMgr->ScheduleQueueUpdate(ammr, atype, bgqTypeId, bgTypeId, bracketId);
+    }, Seconds(2));
+
     for (NpcBotRegistry const* registry3 : { &spawned_bots_a, &spawned_bots_h })
     {
         for (Creature const* bot : *registry3)
@@ -1253,7 +1261,7 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
 
             const_cast<Creature*>(bot)->SetPvP(true);
             queue->AddBotAsGroup(bot->GetGUID(), GetTeamIdForFaction(bot->GetFaction()),
-                gqinfo->BgTypeId, bracketEntry, gqinfo->ArenaType, false, gqinfo->ArenaTeamRating, gqinfo->ArenaMatchmakerRating);
+                bgTypeId, bracketEntry, atype, false, gqinfo->ArenaTeamRating, ammr);
 
             seconds_delay += std::max<uint32>(1u, uint32((MINUTE / 2) / (needed_bots_count_a + needed_bots_count_h)));
 

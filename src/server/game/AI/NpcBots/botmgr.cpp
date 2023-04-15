@@ -204,9 +204,6 @@ BotMgr::BotMgr(Player* const master) : _owner(master), _dpstracker(new DPSTracke
 
     _botsHidden = false;
     _quickrecall = false;
-
-    _dpstracker->SetOwner(master->GetGUID().GetCounter());
-    master->SetBotMgr(this);
 }
 BotMgr::~BotMgr()
 {
@@ -1057,34 +1054,37 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
                         return;
                     }
                 }
-                else if (newMap != mymap)
-                    bg->AddBot(bot);
-
-                if (!bot->IsAlive())
+                else
                 {
-                    ObjectGuid shGuid = ObjectGuid::Empty;
-                    float mindist = 0.0f;
-                    for (ObjectGuid bgCreGuid : bg->BgCreatures)
+                    if (newMap != mymap)
+                        bg->AddBot(bot);
+
+                    if (!bot->IsAlive())
                     {
-                        if (Creature const* bgCre = newMap->GetCreature(bgCreGuid))
+                        ObjectGuid shGuid = ObjectGuid::Empty;
+                        float mindist = 0.0f;
+                        for (ObjectGuid bgCreGuid : bg->BgCreatures)
                         {
-                            if (bgCre->IsSpiritService())
+                            if (Creature const* bgCre = newMap->GetCreature(bgCreGuid))
                             {
-                                float dist = bot->GetExactDist2d(bgCre);
-                                if (shGuid == ObjectGuid::Empty || dist < mindist)
+                                if (bgCre->IsSpiritService())
                                 {
-                                    mindist = dist;
-                                    shGuid = bgCreGuid;
+                                    float dist = bot->GetExactDist2d(bgCre);
+                                    if (shGuid == ObjectGuid::Empty || dist < mindist)
+                                    {
+                                        mindist = dist;
+                                        shGuid = bgCreGuid;
+                                    }
                                 }
                             }
                         }
-                    }
-                    if (shGuid)
-                        bg->AddPlayerToResurrectQueue(shGuid, bot->GetGUID());
-                    else
-                    {
-                        LOG_ERROR("npcbots", "TeleportBot: Bot {} '{}' can't find SpiritHealer in bg {}!",
-                            bot->GetEntry(), bot->GetName().c_str(), bg->GetName().c_str());
+                        if (shGuid)
+                            bg->AddPlayerToResurrectQueue(shGuid, bot->GetGUID());
+                        else
+                        {
+                            LOG_ERROR("npcbots", "TeleportBot: Bot {} '{}' can't find SpiritHealer in bg {}!",
+                                bot->GetEntry(), bot->GetName().c_str(), bg->GetName().c_str());
+                        }
                     }
                 }
             }

@@ -10,6 +10,7 @@
 #include "botwanderful.h"
 #include "bpet_ai.h"
 #include "Bag.h"
+#include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "CharacterCache.h"
 #include "CharacterDatabase.h"
@@ -419,11 +420,7 @@ bool bot_ai::SetBotOwner(Player* newowner)
         return false;
     }
 
-    BotMgr* mgr = newowner->GetBotMgr();
-    if (!mgr)
-        mgr = new BotMgr(newowner);
-
-    if (mgr->AddBot(me) & BOT_ADD_FATAL)
+    if (newowner->GetBotMgr()->AddBot(me) & BOT_ADD_FATAL)
     {
         checkMasterTimer += 30000;
         return false;
@@ -549,7 +546,7 @@ void bot_ai::ResetBotAI(uint8 resetType)
 {
     //ASSERT(me->IsInWorld());
 
-    _botCommandState = BOT_COMMAND_FOLLOW;
+    _botCommandState = 0;
     _botAwaitState = BOT_AWAIT_NONE;
     _reviveTimer = 0;
 
@@ -636,7 +633,7 @@ SpellCastResult bot_ai::CheckBotCast(Unit const* victim, uint32 spellId) const
     if (!IAmFree() && !master->GetBotMgr()->GetBotAllowCombatPositioning())
     {
         Position mpos;
-        _calculatePos(mpos);
+        _calculatePos(master, mpos);
 
         if (me->GetDistance(mpos) > float(std::max<uint8>(5, master->GetBotMgr()->GetBotFollowDist() / 8)))
             return SPELL_FAILED_NOT_IDLE;
@@ -945,17 +942,16 @@ bool bot_ai::doCast(Unit* victim, uint32 spellId, TriggerCastFlags flags)
     return true;
 }
 //Follow point calculation
-void bot_ai::_calculatePos(Position& pos) const
+void bot_ai::_calculatePos(Unit const* followUnit, Position& pos) const
 {
-    ASSERT(!IAmFree());
-
-    uint8 followdist = master->GetBotMgr()->GetBotFollowDist();
+    Player const* player = followUnit->ToPlayer();
+    uint8 followdist = !player ? BotMgr::GetBotFollowDistDefault() / 2 : player->GetBotMgr()->GetBotFollowDist();
     float mydist, angle;
 
-    if (HasRole(BOT_ROLE_TANK) && !IsTank(master))
+    if (HasRole(BOT_ROLE_TANK) && !IsTank(followUnit))
     {
-        uint8 tanks = master->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_TANK);
-        uint8 slot = master->GetBotMgr()->GetNpcBotSlotByRole(BOT_ROLE_TANK, me);
+        uint8 tanks = !player ? 10 : player->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_TANK);
+        uint8 slot = !player ? urand(0, 9) : player->GetBotMgr()->GetNpcBotSlotByRole(BOT_ROLE_TANK, me);
         angle = float(M_PI) / 6.0f; //max bias (left of right) //total arc is angle * 2
         angle = (angle / tanks) * (slot - (slot % 2)); //bias
         if (slot % 2) angle *= -1.f; //bias interchange
@@ -963,8 +959,8 @@ void bot_ai::_calculatePos(Position& pos) const
     }
     else if (HasRole(BOT_ROLE_RANGED))
     {
-        uint8 rangeds = master->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_RANGED);
-        uint8 slot = master->GetBotMgr()->GetNpcBotSlotByRole(BOT_ROLE_RANGED, me);
+        uint8 rangeds = !player ? 20 : player->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_RANGED);
+        uint8 slot = !player ? urand(0, 19) : player->GetBotMgr()->GetNpcBotSlotByRole(BOT_ROLE_RANGED, me);
         angle = float(M_PI) / 3.5f; //max bias (left of right) //total arc is angle * 2
         angle = (angle / rangeds) * (slot - (slot % 2)); //bias
         if (slot % 2) angle *= -1.f; //bias interchange
@@ -973,8 +969,8 @@ void bot_ai::_calculatePos(Position& pos) const
     }
     else if (HasRole(BOT_ROLE_DPS))
     {
-        uint8 dpss = master->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_DPS);
-        uint8 slot = master->GetBotMgr()->GetNpcBotSlotByRole(BOT_ROLE_DPS, me);
+        uint8 dpss = !player ? 20 : player->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_DPS);
+        uint8 slot = !player ? urand(0, 19) : player->GetBotMgr()->GetNpcBotSlotByRole(BOT_ROLE_DPS, me);
         angle = float(M_PI) / 7.5f; //max bias (left of right) //total arc is angle * 2
         angle = (angle / dpss) * (slot); //bias
         if (slot % 2) angle *= -1.f; //bias interchange
@@ -995,7 +991,7 @@ void bot_ai::_calculatePos(Position& pos) const
 
     Position mpos;
     Unit const* bmover = me->GetVehicle() ? me->GetVehicleBase() : me;
-    Unit* mmover = master->GetVehicle() ? master->GetVehicleBase() : master;
+    Unit const* mmover = followUnit->GetVehicle() ? followUnit->GetVehicleBase() : followUnit;
     uint32 movFlags = mmover->m_movementInfo.GetMovementFlags();
     float size = bmover->GetCombatReach() * 2;
     if (bmover->CanFly())
@@ -1011,7 +1007,7 @@ void bot_ai::_calculatePos(Position& pos) const
                 break;
             }
             mmover->GetNearPoint(bmover, x, y, z, 0.f, mydist, angle);
-            if (!master->IsWithinLOS(x,y,z)) //try to get much closer to master
+            if (!followUnit->IsWithinLOS(x,y,z)) //try to get much closer to follow unit
             {
                 mydist *= 0.4f - float(i*0.07f);
                 size *= 0.1f;
@@ -1048,7 +1044,7 @@ void bot_ai::_calculatePos(Position& pos) const
     //      m       m
     //        rrrrr
     //
-    //M - master
+    //M - master (followUnit)
     //T - bot tank (ROLE_TANK)
     //r - ranged (ROLE_RANGED)
     //m - melee (ROLE_DPS)
@@ -1165,13 +1161,15 @@ void bot_ai::SetBotCommandState(uint32 st, bool force, Position* newpos)
     if (mover)
     {
         if ((st & BOT_COMMAND_FOLLOW) && !IsChanneling() &&
-            ((!mover->isMoving() && !IsCasting() && master->IsAlive() && !Feasting()) || force))
+            (force || (!mover->isMoving() && !IsCasting() && master->IsAlive() && !Feasting())))
         {
             if (!me->IsInMap(master)) return;
             if (CCed(mover, true)/* || master->HasUnitState(UNIT_STATE_FLEEING)*/) return;
-            //if (mover->isMoving() && Rand() > 10) return;
             if (!newpos)
-                _calculatePos(movepos);
+            {
+                ASSERT(!IAmFree());
+                _calculatePos(master, movepos);
+            }
             else
             {
                 movepos.m_positionX = newpos->m_positionX;
@@ -16596,6 +16594,10 @@ bool bot_ai::GlobalUpdate(uint32 diff)
 
     CheckAttackState();
 
+    //second alive check - CheckAttackState() can cause bot to die
+    if (!me->IsAlive())
+        return false;
+
     if (checkAurasTimer <= lastdiff)
     {
         checkAurasTimer += uint32(__rand + __rand + (IAmFree() ? 1000 : 40 * (1 + master->GetNpcBotsCount())));
@@ -16669,10 +16671,11 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         return false;
 
     //opponent unsafe
-    if (!IAmFree() && (!opponent || !master->GetBotMgr()->GetBotAllowCombatPositioning()) && !HasBotCommandState(BOT_COMMAND_STAY) &&
+    if ((IsWanderer() || (!IAmFree() && (!opponent || !master->GetBotMgr()->GetBotAllowCombatPositioning()))) &&
+        !HasBotCommandState(BOT_COMMAND_STAY) &&
         (!me->GetVehicle() || (!CCed(me->GetVehicleBase(), true) && !me->GetVehicleBase()->GetTarget())))
     {
-        Unit* mover = me->GetVehicle() ? me->GetVehicleBase() : me;
+        Unit const* mover = me->GetVehicle() ? me->GetVehicleBase() : me;
 
         if (!master->IsAlive())
         {
@@ -16693,17 +16696,59 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         }
         else if (!IsCasting(mover) && (!IsShootingWand(mover) || Rand() < 10))
         {
-            _calculatePos(movepos);
-            float maxdist = std::max<float>(master->GetBotMgr()->GetBotFollowDist() *
-                ((master->m_movementInfo.GetMovementFlags() & MOVEMENTFLAG_FORWARD) ? 0.125f : master->isMoving() ? 0.03125f : 0.25f), 3.f);
-            Position destPos;
-            if (me->isMoving())
-                me->GetMotionMaster()->GetDestination(destPos.m_positionX, destPos.m_positionY, destPos.m_positionZ);
-            else
-                destPos = me->GetPosition();
+            Unit const* mmover = !IAmFree() ? master : nullptr;
+            if (!mmover && me->GetMap()->IsBattleground() && !me->HasAuraType(SPELL_AURA_EFFECT_IMMUNITY))
+            {
+                //GET BG FOLLOW UNIT
+                static const std::function<bool(Unit const*)> wsg_carrier_pred = [](Unit const* u) {
+                    if (u->HasAuraType(SPELL_AURA_EFFECT_IMMUNITY)) {
+                        switch (u->GetAuraEffectsByType(SPELL_AURA_EFFECT_IMMUNITY).front()->GetBase()->GetId()) {
+                            case 23333: // Warsong Flag (WSG)
+                            case 23335: // Silverwing Flag (WSG)
+                                return true;
+                            default:
+                                break;
+                        }
+                    }
+                    return false;
+                };
 
-            if (!HasBotCommandState(BOT_COMMAND_FOLLOW) || destPos.GetExactDist(&movepos) > maxdist)
-                SetBotCommandState(BOT_COMMAND_FOLLOW, true, &movepos);
+                std::function<bool(Unit const*)> const* my_pred = nullptr;
+                switch (me->GetMap()->GetId())
+                {
+                    case 489: //WSG
+                        my_pred = &wsg_carrier_pred;
+                        break;
+                    default:
+                        break;
+                }
+
+                if (my_pred)
+                {
+                    Unit* nmover = nullptr;
+                    Acore::UnitSearcher searcher(me, nmover, *my_pred);
+                    Cell::VisitAllObjects(me, searcher, 80.0f);
+                    if (nmover)
+                        mmover = nmover;
+                    else
+                        RemoveBotCommandState(BOT_COMMAND_FOLLOW);
+                }
+            }
+
+            if (mmover)
+            {
+                _calculatePos(mmover, movepos);
+                float maxdist = std::max<float>((mmover->IsPlayer() ? mmover->ToPlayer()->GetBotMgr()->GetBotFollowDist() : BotMgr::GetBotFollowDistDefault() / 2) *
+                    ((mmover->m_movementInfo.GetMovementFlags() & MOVEMENTFLAG_FORWARD) ? 0.125f : mmover->isMoving() ? 0.03125f : 0.25f), 3.f);
+                Position destPos;
+                if (me->isMoving())
+                    me->GetMotionMaster()->GetDestination(destPos.m_positionX, destPos.m_positionY, destPos.m_positionZ);
+                else
+                    destPos = me->GetPosition();
+
+                if (!HasBotCommandState(BOT_COMMAND_FOLLOW) || destPos.GetExactDist(&movepos) > maxdist)
+                    SetBotCommandState(BOT_COMMAND_FOLLOW, true, &movepos);
+            }
         }
     }
 
@@ -16834,9 +16879,11 @@ void bot_ai::Evade()
         return;
     if (evadeDelayTimer > lastdiff)
         return;
-    if (IsWanderer() && Feasting())
-        return;
     if (me->GetVictim())
+        return;
+    if (IAmFree() && HasBotCommandState(BOT_COMMAND_FOLLOW))
+        return;
+    if (IsWanderer() && Feasting())
         return;
     if (JumpingOrFalling())
         return;
@@ -17138,7 +17185,7 @@ bool bot_ai::FinishTeleport(bool reset)
         else
         {
             Position destpos;
-            _calculatePos(destpos);
+            _calculatePos(master, destpos);
             me->Relocate(destpos);
         }
 

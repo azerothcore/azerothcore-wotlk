@@ -18,8 +18,6 @@ class DPSTracker
         void TrackDamage(Unit const* victim, uint32 damage);
         uint32 GetDPSTaken(uint64 guid) const;
 
-        void SetOwner(uint32 guidlow) { _ownerGuid = guidlow; }
-
     private:
         void _Reset();
         void _Release();
@@ -30,8 +28,6 @@ class DPSTracker
         typedef std::unordered_map<uint64 /*guid*/, uint32 /*dps*/> DPSTakenMap;
         DamageTakenMap _damages;
         DPSTakenMap _DPSes;
-
-        uint32 _ownerGuid;
 
         uint32 _updateTimer;
         uint32 _inactiveTimer;

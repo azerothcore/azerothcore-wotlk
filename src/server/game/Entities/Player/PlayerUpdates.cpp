@@ -426,8 +426,7 @@ void Player::Update(uint32 p_time)
     }
 
     //NpcBot mod: Update
-    if (_botMgr)
-        _botMgr->Update(p_time);
+    _botMgr->Update(p_time);
     //end Npcbot
 }
 
