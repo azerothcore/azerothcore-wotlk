@@ -1518,6 +1518,16 @@ struct ScalingStatValuesEntry
         return 0;
     }
 
+    bool IsTwoHand(uint32 mask) const
+    {
+        if (mask & 0x7E00)
+        {
+            if (mask & 0x00000400) return true;
+            if (mask & 0x00001000) return true;
+        }
+        return false;
+    }
+
     [[nodiscard]] uint32 getSpellBonus(uint32 mask) const
     {
         if (mask & 0x00008000) return spellPower;

@@ -39,13 +39,13 @@ public:
         ObjectGuid m_uiRefectoryDoorGUID;
         ObjectGuid m_uiScreamingHallDoorGUID;
 
-        uint32 m_uiFelOverseerCount;
+        uint32 _ritualistsAliveCount;
 
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
-            m_uiFelOverseerCount = 0;
+            _ritualistsAliveCount = 0;
         }
 
         bool IsEncounterInProgress() const override
@@ -76,11 +76,13 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
-                case NPC_FEL_OVERSEER:
+                case NPC_CABAL_RITUALIST:
                     if (creature->IsAlive())
-                        ++m_uiFelOverseerCount;
+                        ++_ritualistsAliveCount;
                     break;
                 case NPC_HELLMAW:
                     m_uiHellmawGUID = creature->GetGUID();
@@ -88,19 +90,26 @@ public:
             }
         }
 
+        void OnUnitDeath(Unit* unit) override
+        {
+            InstanceScript::OnUnitDeath(unit);
+
+            if (unit->GetEntry() == NPC_CABAL_RITUALIST)
+                if (!--_ritualistsAliveCount)
+                {
+                    m_auiEncounter[TYPE_RITUALISTS] = DONE;
+                    SaveToDB();
+                    if (Creature* cr = instance->GetCreature(m_uiHellmawGUID))
+                    {
+                        cr->AI()->DoAction(1);
+                    }
+                }
+        }
+
         void SetData(uint32 type, uint32 uiData) override
         {
             switch (type)
             {
-                case TYPE_OVERSEER:
-                    if (!--m_uiFelOverseerCount)
-                    {
-                        m_auiEncounter[type] = DONE;
-                        if (Creature* cr = instance->GetCreature(m_uiHellmawGUID))
-                            cr->AI()->DoAction(1);
-                    }
-                    break;
-
                 case DATA_BLACKHEARTTHEINCITEREVENT:
                     if (uiData == DONE)
                         DoUseDoorOrButton(m_uiRefectoryDoorGUID);
@@ -125,7 +134,7 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            if (type == TYPE_OVERSEER)
+            if (type == TYPE_RITUALISTS)
                 return m_auiEncounter[0];
             return 0;
         }
