@@ -3,7 +3,7 @@ DELETE FROM `creature` WHERE `map` = 540 AND `id1` IN (20923,16507,16594,16699,1
 
 SET @CGUID := 151000;
 
-DELETE FROM `creature` WHERE `map` = 540 AND `zoneId` = 3714 AND `guid` BETWEEN @CGUID+0 AND @CGUID+34;
+DELETE FROM `creature` WHERE `map` = 540 AND `zoneId` = 3714 AND `guid` BETWEEN @CGUID+0 AND @CGUID+48;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `VerifiedBuild`) VALUES
 -- Entrance Hallway
 (@CGUID+0, 17420, 540, 3714, 3714, 3, 1, 59.46694183349609375, 55.7273406982421875, -13.2002639770507812, 5.650152206420898437, 7200, 0, 0, 48966),
@@ -44,19 +44,35 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+31, 16699, 540, 3714, 3714, 3, 1, 63.214092, 222.1942, -13.155267, 5.854599952697753906, 7200, 0, 0, 46924),
 (@CGUID+32, 16704, 540, 3714, 3714, 3, 1, 76.789505, 221.83418, -13.204874, 3.881541728973388671, 7200, 0, 0, 46924),
 (@CGUID+33, 16704, 540, 3714, 3714, 3, 1, 77.27148, 221.63124, -13.205348, 3.700255870819091796, 7200, 0, 0, 46924),
-(@CGUID+34, 16704, 540, 3714, 3714, 3, 1, 83.88206, 223.66586, -13.117929, 3.963497877120971679, 7200, 0, 0, 46924);
+(@CGUID+34, 16704, 540, 3714, 3714, 3, 1, 83.88206, 223.66586, -13.117929, 3.963497877120971679, 7200, 0, 0, 46924),
+-- Barracks w/ Hammocks
+(@CGUID+35, 16700, 540, 3714, 3714, 3, 1, 69.760185, 263.40073, -13.201066, 3.944444179534912109, 7200, 0, 0, 46924),
+(@CGUID+36, 17083, 540, 3714, 3714, 3, 1, 67.6849, 270.865, -13.1014, 4.17134, 7200, 0, 0, 46924),
+(@CGUID+37, 16523, 540, 3714, 3714, 3, 1, 72.6862, 267.434, -13.1023, 3.94444, 7200, 0, 0, 46924),
+(@CGUID+38, 17083, 540, 3714, 3714, 3, 1, 78.1933, 264.122, -13.1129, 3.71755, 7200, 0, 0, 46924),
+(@CGUID+39, 17694, 540, 3714, 3714, 3, 1, 72.871, 274.047, -13.1036, 4.08407, 7200, 0, 0, 46924),
+(@CGUID+40, 16699, 540, 3714, 3714, 3, 1, 77.8619, 270.631, -13.1145, 3.89208, 7200, 0, 0, 46924),
+(@CGUID+41, 16594, 540, 3714, 3714, 3, 1, 83.3397, 265.004, -13.1239, 3.66519, 7200, 0, 0, 46924),
+(@CGUID+42, 16593, 540, 3714, 3714, 3, 1, 43.5914, 253.725, -10.9988, 1.58825, 7200, 0, 0, 46924),
+(@CGUID+43, 16593, 540, 3714, 3714, 3, 1, 43.5588, 265.281, -10.7783, 1.65806, 7200, 0, 0, 46924),
+(@CGUID+44, 16593, 540, 3714, 3714, 3, 1, 69.6697, 286.034, -10.8391, 0.122173, 7200, 0, 0, 46924),
+(@CGUID+45, 16594, 540, 3714, 3714, 3, 1, 83.5451, 286.75, -10.8789, 3.03687, 7200, 0, 0, 46924),
+(@CGUID+46, 17670, 540, 3714, 3714, 3, 1, 103.037, 266.34, -13.1397, 2.9147, 7200, 0, 0, 46924),
+(@CGUID+47, 17669, 540, 3714, 3714, 3, 1, 102.997, 269.962, -13.1397, 3.19395, 7200, 0, 0, 46924),
+(@CGUID+48, 17669, 540, 3714, 3714, 3, 1, 102.89, 262.341, -13.1397, 3.00197, 7200, 0, 0, 46924);
 
-DELETE FROM `creature_addon` WHERE (`guid` BETWEEN @CGUID AND @CGUID+18);
+DELETE FROM `creature_addon` WHERE (`guid` BETWEEN @CGUID AND @CGUID+48);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(@CGUID+0, 0, 0, 0, 0, 0, 0, NULL),
-(@CGUID+1, 0, 0, 0, 0, 0, 0, NULL),
-(@CGUID+2, 0, 0, 0, 0, 0, 0, NULL),
-(@CGUID+3, 0, 0, 0, 0, 0, 0, NULL),
-(@CGUID+4, 0, 0, 0, 0, 0, 0, NULL),
-(@CGUID+6, 0, 0, 0, 1, 333, 0, '18950'),
-(@CGUID+7, 0, 0, 0, 1, 333, 0, '18950'),
-(@CGUID+8, 0, 0, 0, 1, 333, 0, '18950'),
-(@CGUID+9, 0, 0, 0, 1, 333, 0, '18950');
+(@CGUID+0 , 0, 0, 0, 0, 0, 0, NULL),
+(@CGUID+1 , 0, 0, 0, 0, 0, 0, NULL),
+(@CGUID+2 , 0, 0, 0, 0, 0, 0, NULL),
+(@CGUID+3 , 0, 0, 0, 0, 0, 0, NULL),
+(@CGUID+4 , 0, 0, 0, 0, 0, 0, NULL),
+(@CGUID+6 , 0, 0, 0, 1, 333, 0, '18950'),
+(@CGUID+7 , 0, 0, 0, 1, 333, 0, '18950'),
+(@CGUID+8 , 0, 0, 0, 1, 333, 0, '18950'),
+(@CGUID+9 , 0, 0, 0, 1, 333, 0, '18950'),
+(@CGUID+46, 0, 0, 0, 2, 214, 0, NULL);
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 16700;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -160,7 +176,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (16700, 13, 1, 'Break their bones!', 12, 0, 100, 5, 0, 0, 12686, 0, 'Shattered Hand Legionnaire'),
 (16700, 14, 0, 'Know your master, you worthless mutts!', 12, 0, 100, 25, 0, 0, 12687, 0, 'Shattered Hand Legionnaire'); -- Causes Kneel
 
-DELETE FROM `waypoints` WHERE `entry` IN (1742000, 1742001, 1742002, 1742003, 1742004, 1670000, 1670001, 1708301, 1708302, 1708303, 1670002, 1670003, 1742005, 1670004, 1670005, 1670006, 1670007, 1670400, 1670401, 1669900);
+DELETE FROM `waypoints` WHERE `entry` IN (1742000, 1742001, 1742002, 1742003, 1742004, 1670000, 1670001, 1708301, 1708302, 1708303, 1670002, 1670003, 1742005, 1670004, 1670005, 1670006, 1670007, 1670400, 1670401, 1669900, 1670008, 1670009, 1670010, 1670011);
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
 -- @CGUID+0
 (1742000,1,67.89315 ,39.01408,-13.229578,NULL,'Shattered Halls Entrance Path 1'),
@@ -222,56 +238,88 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1708303,3,69.81086,195.43225,-13.230811,NULL,'Fel Orc Convert Legionnaire Add Path 3'),
 (1708303,4,69.74186,167.36273,-13.200679,NULL,'Fel Orc Convert Legionnaire Add Path 3'),
 -- Legionnaire Gauntlet Leader 1
-(1670002,1,85.41615,150.316,-13.221173,NULL,'Legionnaire Gauntlet Leader 1 - Decomposed'),
-(1670002,2,80.19127,150.6295,-13.225728,NULL,'Legionnaire Gauntlet Leader 1 - Decomposed'),
-(1670002,3,71.02793,146.30322,-13.229441,NULL,'Legionnaire Gauntlet Leader 1'),
-(1670002,4,69.945755,137.83614,-13.2063465,NULL,'Legionnaire Gauntlet Leader 1'),
-(1670002,5,70.05969,130.191,-13.198575,NULL,'Legionnaire Gauntlet Leader 1'),
+(1670002,1,85.41615,150.316,-13.221173,NULL,'Shattered Halls Legionnaire Gauntlet Leader 1 - Decomposed'),
+(1670002,2,80.19127,150.6295,-13.225728,NULL,'Shattered Halls Legionnaire Gauntlet Leader 1 - Decomposed'),
+(1670002,3,71.02793,146.30322,-13.229441,NULL,'Shattered Halls Legionnaire Gauntlet Leader 1'),
+(1670002,4,69.945755,137.83614,-13.2063465,NULL,'Shattered Halls Legionnaire Gauntlet Leader 1'),
+(1670002,5,70.05969,130.191,-13.198575,NULL,'Shattered Halls Legionnaire Gauntlet Leader 1'),
 -- Repeat
-(1670003,1,70.11518,142.67537,-13.226289,NULL,'Legionnaire Gauntlet Leader 1 - Repeat Path'),
-(1670003,2,69.93477,128.13034,-13.196481,NULL,'Legionnaire Gauntlet Leader 1 - Repeat Path'),
-(1670003,3,70.11518,142.67537,-13.226289,NULL,'Legionnaire Gauntlet Leader 1 - Repeat Path'),
-(1670003,4,69.93477,128.13034,-13.196481,NULL,'Legionnaire Gauntlet Leader 1 - Repeat Path'),
+(1670003,1,70.11518,142.67537,-13.226289,NULL,'Shattered Halls Legionnaire Gauntlet Leader 1 - Repeat Path'),
+(1670003,2,69.93477,128.13034,-13.196481,NULL,'Shattered Halls Legionnaire Gauntlet Leader 1 - Repeat Path'),
+(1670003,3,70.11518,142.67537,-13.226289,NULL,'Shattered Halls Legionnaire Gauntlet Leader 1 - Repeat Path'),
+(1670003,4,69.93477,128.13034,-13.196481,NULL,'Shattered Halls Legionnaire Gauntlet Leader 1 - Repeat Path'),
 -- Legionnaire Gauntlet Member 1
-(1742005,1,96.9828,151.07903,-13.063042,NULL,'Legionnaire Gauntlet Member 1 - Decomposed'),
-(1742005,2,88.984535,150.3885,-13.146009,NULL,'Legionnaire Gauntlet Member 1 - Decomposed'),
-(1742005,3,73.52618,149.05394,-13.230848,NULL,'Legionnaire Gauntlet Member 1'),
-(1742005,4,72.90818,131.60164,-13.200008,NULL,'Legionnaire Gauntlet Member 1'),
+(1742005,1,96.9828,151.07903,-13.063042,NULL,'Shattered Halls Legionnaire Gauntlet Member 1 - Decomposed'),
+(1742005,2,88.984535,150.3885,-13.146009,NULL,'Shattered Halls Legionnaire Gauntlet Member 1 - Decomposed'),
+(1742005,3,73.52618,149.05394,-13.230848,NULL,'Shattered Halls Legionnaire Gauntlet Member 1'),
+(1742005,4,72.90818,131.60164,-13.200008,NULL,'Shattered Halls Legionnaire Gauntlet Member 1'),
 -- Legionnaire Gauntlet Leader 2
-(1670004,1,71.80546,182.78496,-13.244954,NULL,'Legionnaire Gauntlet Leader 2'),
-(1670004,2,69.46158,171.00041,-13.204378,NULL,'Legionnaire Gauntlet Leader 2'),
-(1670004,3,69.71826,164.11491,-13.197376,NULL,'Legionnaire Gauntlet Leader 2'),
-(1670004,4,70.14036,158.16167,-13.219431,NULL,'Legionnaire Gauntlet Leader 2'),
+(1670004,1,71.80546,182.78496,-13.244954,NULL,'Shattered Halls Legionnaire Gauntlet Leader 2'),
+(1670004,2,69.46158,171.00041,-13.204378,NULL,'Shattered Halls Legionnaire Gauntlet Leader 2'),
+(1670004,3,69.71826,164.11491,-13.197376,NULL,'Shattered Halls Legionnaire Gauntlet Leader 2'),
+(1670004,4,70.14036,158.16167,-13.219431,NULL,'Shattered Halls Legionnaire Gauntlet Leader 2'),
 -- Repeat
-(1670005,1,69.834885,177.27766,-13.215765,NULL,'Legionnaire Gauntlet Leader 2 - Repeat Path'),
-(1670005,2,70.14036,158.16167,-13.219431,NULL,'Legionnaire Gauntlet Leader 2 - Repeat Path'),
-(1670005,3,69.834885,177.27766,-13.215765,NULL,'Legionnaire Gauntlet Leader 2 - Repeat Path'),
-(1670005,4,70.14036,158.16167,-13.219431,NULL,'Legionnaire Gauntlet Leader 2 - Repeat Path'),
+(1670005,1,69.834885,177.27766,-13.215765,NULL,'Shattered Halls Legionnaire Gauntlet Leader 2 - Repeat Path'),
+(1670005,2,70.14036,158.16167,-13.219431,NULL,'Shattered Halls Legionnaire Gauntlet Leader 2 - Repeat Path'),
+(1670005,3,69.834885,177.27766,-13.215765,NULL,'Shattered Halls Legionnaire Gauntlet Leader 2 - Repeat Path'),
+(1670005,4,70.14036,158.16167,-13.219431,NULL,'Shattered Halls Legionnaire Gauntlet Leader 2 - Repeat Path'),
 -- Legionnaire Gauntlet Leader 3
-(1670006,1,66.70524,210.72876,-13.206715,NULL,'Legionnaire Gauntlet Leader 3'),
-(1670006,2,67.4717,201.65619,-13.197479,NULL,'Legionnaire Gauntlet Leader 3'),
-(1670006,3,69.66244,195.64166,-13.230581,NULL,'Legionnaire Gauntlet Leader 3'),
-(1670006,4,79.708755,194.18694,-13.231843,NULL,'Legionnaire Gauntlet Leader 3'),
+(1670006,1,66.70524,210.72876,-13.206715,NULL,'Shattered Halls Legionnaire Gauntlet Leader 3'),
+(1670006,2,67.4717,201.65619,-13.197479,NULL,'Shattered Halls Legionnaire Gauntlet Leader 3'),
+(1670006,3,69.66244,195.64166,-13.230581,NULL,'Shattered Halls Legionnaire Gauntlet Leader 3'),
+(1670006,4,79.708755,194.18694,-13.231843,NULL,'Shattered Halls Legionnaire Gauntlet Leader 3'),
 -- Repeat
-(1670007,1,61.958435,195.32573,-13.231223,NULL,'Legionnaire Gauntlet Leader 3 - Repeat Path'),
-(1670007,2,79.708755,194.18694,-13.231843,NULL,'Legionnaire Gauntlet Leader 3 - Repeat Path'),
-(1670007,3,61.958435,195.32573,-13.231223,NULL,'Legionnaire Gauntlet Leader 3 - Repeat Path'),
-(1670007,4,79.708755,194.18694,-13.231843,NULL,'Legionnaire Gauntlet Leader 3 - Repeat Path'),
+(1670007,1,61.958435,195.32573,-13.231223,NULL,'Shattered Halls Legionnaire Gauntlet Leader 3 - Repeat Path'),
+(1670007,2,79.708755,194.18694,-13.231843,NULL,'Shattered Halls Legionnaire Gauntlet Leader 3 - Repeat Path'),
+(1670007,3,61.958435,195.32573,-13.231223,NULL,'Shattered Halls Legionnaire Gauntlet Leader 3 - Repeat Path'),
+(1670007,4,79.708755,194.18694,-13.231843,NULL,'Shattered Halls Legionnaire Gauntlet Leader 3 - Repeat Path'),
 -- Legionnaire Gauntlet Member 2
-(1670400,1,74.694565,219.92151,-13.214061,NULL,'Legionnaire Gauntlet Member 2 - Decomposed'),
-(1670400,2,71.43161,216.94246,-13.229442,NULL,'Legionnaire Gauntlet Member 2 - Decomposed'),
-(1670400,3,63.087967,209.32477,-13.205284,NULL,'Legionnaire Gauntlet Member 2'),
-(1670400,4,63.84162,200.18079,-13.195976,NULL,'Legionnaire Gauntlet Member 2'),
+(1670400,1,74.694565,219.92151,-13.214061,NULL,'Shattered Halls Legionnaire Gauntlet Member 2 - Decomposed'),
+(1670400,2,71.43161,216.94246,-13.229442,NULL,'Shattered Halls Legionnaire Gauntlet Member 2 - Decomposed'),
+(1670400,3,63.087967,209.32477,-13.205284,NULL,'Shattered Halls Legionnaire Gauntlet Member 2'),
+(1670400,4,63.84162,200.18079,-13.195976,NULL,'Shattered Halls Legionnaire Gauntlet Member 2'),
 -- Legionnaire Gauntlet Member 3
-(1670401,1,82.75517,225.05904,-13.113562,NULL,'Legionnaire Gauntlet Member 3 - Decomposed'),
-(1670401,2,78.335075,222.29608,-13.201896,NULL,'Legionnaire Gauntlet Member 3 - Decomposed'),
-(1670401,3,69.99741,217.0843,-13.228961,NULL,'Legionnaire Gauntlet Member 3'),
-(1670401,4,69.67751,203.89116,-13.199755,NULL,'Legionnaire Gauntlet Member 3'),
+(1670401,1,82.75517,225.05904,-13.113562,NULL,'Shattered Halls Legionnaire Gauntlet Member 3 - Decomposed'),
+(1670401,2,78.335075,222.29608,-13.201896,NULL,'Shattered Halls Legionnaire Gauntlet Member 3 - Decomposed'),
+(1670401,3,69.99741,217.0843,-13.228961,NULL,'Shattered Halls Legionnaire Gauntlet Member 3'),
+(1670401,4,69.67751,203.89116,-13.199755,NULL,'Shattered Halls Legionnaire Gauntlet Member 3'),
 -- Legionnaire Gauntlet Member 4
-(1669900,1,56.865456,225.09496,-13.114193,NULL,'Legionnaire Gauntlet Member 4 - Decomposed'),
-(1669900,2,74.70813,216.94246,-13.2296295,NULL,'Legionnaire Gauntlet Member 4 - Decomposed'),
-(1669900,3,75.63649,216.51828,-13.22187,NULL,'Legionnaire Gauntlet Member 4'),
-(1669900,4,73.530624,203.36192,-13.199218,NULL,'Legionnaire Gauntlet Member 4');
+(1669900,1,56.865456,225.09496,-13.114193,NULL,'Shattered Halls Legionnaire Gauntlet Member 4 - Decomposed'),
+(1669900,2,74.70813,216.94246,-13.2296295,NULL,'Shattered Halls Legionnaire Gauntlet Member 4 - Decomposed'),
+(1669900,3,75.63649,216.51828,-13.22187,NULL,'Shattered Halls Legionnaire Gauntlet Member 4'),
+(1669900,4,73.530624,203.36192,-13.199218,NULL,'Shattered Halls Legionnaire Gauntlet Member 4'),
+-- Barracks Legionnaire
+(1670008,1,76.421555,261.56696,-13.203058,NULL,'Shattered Halls Legionnaire Barracks Path 1'),
+(1670008,2,66.63585,268.7488,-13.200854,NULL,'Shattered Halls Legionnaire Barracks Path 1'),
+(1670008,3,76.421555,261.56696,-13.203058,NULL,'Shattered Halls Legionnaire Barracks Path 1'),
+(1670008,4,66.63585,268.7488,-13.200854,NULL,'Shattered Halls Legionnaire Barracks Path 1'),
+(1670008,5,69.713936,263.39304,-13.201049,3.944444179534912109,'Shattered Halls Legionnaire Barracks Path 1'),
+(1670009,1,77.156654,257.29916,-13.202623,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
+(1670009,2,86.677475,258.9731,-13.206164,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
+(1670009,3,90.03374,267.7625,-13.208733,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
+(1670009,4,80.56659,275.73517,-13.206765,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
+(1670009,5,70.84464,280.1304,-13.204133,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
+(1670009,6,63.218967,278.31616,-13.192625,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
+(1670009,7,61.75474,269.22348,-13.199254,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
+(1670009,8,69.713936,263.39304,-13.201049,3.944444179534912109,'Shattered Halls Legionnaire Barracks Path 2'),
+(1670010,1,63.464737,269.65533,-13.19991,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,2,64.41525,277.1848,-13.20145,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,3,72.19377,278.96936,-13.20441,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,4,80.11674,274.18732,-13.206361,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,5,88.38716,265.49927,-13.207803,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,6,84.63591,258.43936,-13.205377,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,7,76.947754,257.96246,-13.202659,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,8,84.63591,258.43936,-13.205377,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,9,88.38716,265.49927,-13.207803,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,10,80.11674,274.18732,-13.206361,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,11,69.713936,263.39304,-13.201049,3.944444179534912109,'Shattered Halls Legionnaire Barracks Path 3'),
+/*
+-- Path 4
+(1670011,1,69.66478,257.30325,-13.20005,NULL,'Shattered Halls Legionnaire Barracks Path 4'),
+(1670011,2,69.760185,263.40073,-13.201066,NULL,'Shattered Halls Legionnaire Barracks Path 4'),
+
+-- Awoken Add Point: 69.452446 239.98776 -13.193644
+*/
 
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-(@CGUID+0),-(@CGUID+1),-(@CGUID+2),-(@CGUID+3),-(@CGUID+4),-(@CGUID+5),-(@CGUID+10),-(@CGUID+8),-(@CGUID+9),-(@CGUID+19), -(@CGUID+20), -(@CGUID+21),-(@CGUID+22),-(@CGUID+23),-(@CGUID+24),-(@CGUID+25),-(@CGUID+26),-(@CGUID+27),-(@CGUID+28),-(@CGUID+29),-(@CGUID+30),-(@CGUID+31),-(@CGUID+32),-(@CGUID+33),-(@CGUID+34));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -384,6 +432,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+21), 0, 1, 0, 9, 0, 100, 4, 5, 30, 2300, 5000, 0, 11, 22907, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Shoot\' (Heroic Dungeon)'),
 (-(@CGUID+21), 0, 2, 0, 9, 0, 100, 0, 5, 30, 6000, 9000, 0, 11, 30481, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Incendiary Shot\''),
 (-(@CGUID+21), 0, 3, 0, 9, 0, 100, 4, 5, 30, 10000, 14000, 0, 11, 37551, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Viper Sting\' (Heroic Dungeon)'),
+(-(@CGUID+21), 0, 4, 0, 6, 0, 15, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Just Died - Set Data 1 1 on Closest Legionnaire'),
 (-(@CGUID+21), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670011, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Respawn - Run Script'),
 (-(@CGUID+21), 0, 1002, 1003, 38, 0, 100, 0, 3, 1, 0, 0, 0, 80, 1670012, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Data Set 3 1 - Run Script'),
 (-(@CGUID+21), 0, 1003, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 66.798805, 133.15752, -13.2015915, 0, 'Shattered Hand Sharpshooter - On Data Set 3 1 - Move To Position'),
@@ -442,6 +491,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+26), 0, 1, 0, 9, 0, 100, 4, 5, 30, 2300, 5000, 0, 11, 22907, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Shoot\' (Heroic Dungeon)'),
 (-(@CGUID+26), 0, 2, 0, 9, 0, 100, 0, 5, 30, 6000, 9000, 0, 11, 30481, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Incendiary Shot\''),
 (-(@CGUID+26), 0, 3, 0, 9, 0, 100, 4, 5, 30, 10000, 14000, 0, 11, 37551, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Viper Sting\' (Heroic Dungeon)'),
+(-(@CGUID+26), 0, 4, 0, 6, 0, 15, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Just Died - Set Data 1 1 on Closest Legionnaire'),
 (-(@CGUID+26), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670011, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Respawn - Run Script'),
 (-(@CGUID+26), 0, 1002, 1003, 38, 0, 100, 0, 3, 2, 0, 0, 0, 80, 1670012, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Data Set 3 2 - Run Script'),
 (-(@CGUID+26), 0, 1003, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 75.93612, 163.10774, -13.198574, 0, 'Shattered Hand Sharpshooter - On Data Set 3 2 - Move To Position'),
@@ -451,6 +501,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+27), 0, 1, 0, 9, 0, 100, 4, 5, 30, 2300, 5000, 0, 11, 22907, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Shoot\' (Heroic Dungeon)'),
 (-(@CGUID+27), 0, 2, 0, 9, 0, 100, 0, 5, 30, 6000, 9000, 0, 11, 30481, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Incendiary Shot\''),
 (-(@CGUID+27), 0, 3, 0, 9, 0, 100, 4, 5, 30, 10000, 14000, 0, 11, 37551, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Viper Sting\' (Heroic Dungeon)'),
+(-(@CGUID+27), 0, 4, 0, 6, 0, 15, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Just Died - Set Data 1 1 on Closest Legionnaire'),
 (-(@CGUID+27), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670011, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Respawn - Run Script'),
 (-(@CGUID+27), 0, 1002, 1003, 38, 0, 100, 0, 3, 2, 0, 0, 0, 80, 1670012, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Data Set 3 2 - Run Script'),
 (-(@CGUID+27), 0, 1003, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 63.555927, 163.12886, -13.198391, 0, 'Shattered Hand Sharpshooter - On Data Set 3 2 - Move To Position'),
@@ -518,6 +569,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+33), 0, 1, 0, 9, 0, 100, 4, 5, 30, 2300, 5000, 0, 11, 22907, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Shoot\' (Heroic Dungeon)'),
 (-(@CGUID+33), 0, 2, 0, 9, 0, 100, 0, 5, 30, 6000, 9000, 0, 11, 30481, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Incendiary Shot\''),
 (-(@CGUID+33), 0, 3, 0, 9, 0, 100, 4, 5, 30, 10000, 14000, 0, 11, 37551, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Viper Sting\' (Heroic Dungeon)'),
+(-(@CGUID+33), 0, 4, 0, 6, 0, 15, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Just Died - Set Data 1 1 on Closest Legionnaire'),
 (-(@CGUID+33), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670011, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Respawn - Run Script'),
 (-(@CGUID+33), 0, 1002, 1003, 38, 0, 100, 0, 3, 2, 0, 0, 0, 80, 1670012, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Data Set 3 2 - Run Script'),
 (-(@CGUID+33), 0, 1003, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1670401, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Data Set 3 2 - Start Path'),
@@ -527,11 +579,26 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+34), 0, 1, 0, 9, 0, 100, 4, 5, 30, 2300, 5000, 0, 11, 22907, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Shoot\' (Heroic Dungeon)'),
 (-(@CGUID+34), 0, 2, 0, 9, 0, 100, 0, 5, 30, 6000, 9000, 0, 11, 30481, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Incendiary Shot\''),
 (-(@CGUID+34), 0, 3, 0, 9, 0, 100, 4, 5, 30, 10000, 14000, 0, 11, 37551, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - Within 5-30 Range - Cast \'Viper Sting\' (Heroic Dungeon)'),
+(-(@CGUID+34), 0, 4, 0, 6, 0, 15, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Just Died - Set Data 1 1 on Closest Legionnaire'),
 (-(@CGUID+34), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670011, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Respawn - Run Script'),
 (-(@CGUID+34), 0, 1002, 1003, 38, 0, 100, 0, 3, 2, 0, 0, 0, 80, 1670012, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Data Set 3 2 - Run Script'),
 (-(@CGUID+34), 0, 1003, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 75.6599, 200.369, -13.1962, 0, 'Shattered Hand Sharpshooter - On Data Set 3 2 - Move To Position'),
 (-(@CGUID+34), 0, 1004, 1005, 34, 0, 100, 0, 8, 1, 0, 0, 0, 80, 1670400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Reached Point 1 - Run Script'),
-(-(@CGUID+34), 0, 1005, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 4.2586, 'Shattered Hand Sharpshooter - Linked - Set Orientation 4.258603572845458984');
+(-(@CGUID+34), 0, 1005, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 4.2586, 'Shattered Hand Sharpshooter - Linked - Set Orientation 4.258603572845458984'),
+-- Barracks & Hammocks Legionnaire
+(-(@CGUID+35), 0, 0, 0, 0, 0, 100, 0, 1500, 5000, 240000, 240000, 0, 11, 30472, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - In Combat - Cast \'Aura of Discipline\''),
+(-(@CGUID+35), 0, 1, 0, 13, 0, 100, 0, 10000, 15000, 0, 0, 0, 11, 15615, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Victim Casting - Cast \'Pummel\''),
+(-(@CGUID+35), 0, 2, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Aggro - Say Line 1'),
+(-(@CGUID+35), 0, 3, 4, 38, 0, 100, 0, 1, 1, 60000, 60000, 0, 11, 30485, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 (Friendly Dies Nearby) - Cast \'Enrage\''),
+(-(@CGUID+35), 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Linked - Say Line 0'),
+(-(@CGUID+35), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 88, 1670014, 1670017, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Respawn - Start Random Path'),
+(-(@CGUID+35), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 88, 1670014, 1670017, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Waypoint Finished - Start Random Path'),
+(-(@CGUID+35), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 - Add 1 to Counter'),
+(-(@CGUID+35), 0, 1004, 1008, 77, 0, 100, 0, 1, 1, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+44, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 1/4 - Set Data 4 1'),
+(-(@CGUID+35), 0, 1005, 1008, 77, 0, 100, 0, 1, 2, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+42, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 2/4 - Set Data 4 1'),
+(-(@CGUID+35), 0, 1006, 1008, 77, 0, 100, 0, 1, 3, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+45, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 3/4 - Set Data 4 1'),
+(-(@CGUID+35), 0, 1007, 1008, 77, 0, 100, 0, 1, 4, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+43, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 4/4 - Set Data 4 1'),
+(-(@CGUID+35), 0, 1008, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Add Awoken - Say Line 10');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1742000, 1670000, 1670001, 1670002, 1670003, 1670004, 1670005, 1670006, 1670007, 1670008, 1670009, 1670010, 1670011, 1670012, 1670013, 1669900, 1670400, 1742001, 1769400, 1670014, 1769401));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -656,6 +723,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16593, 0, 5, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
 (16593, 0, 6, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 2 3 - Run Script'),
 (16593, 0, 7, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 2 4 - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16704) AND (`source_type` = 0) AND (`id` IN (4));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(16704, 0, 4, 0, 6, 0, 15, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Just Died - Set Data 1 1 on Closest Legionnaire');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 17083);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
