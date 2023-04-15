@@ -174,7 +174,10 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (16700, 12, 0, 'Serve the Fel Horde!', 12, 0, 100, 5, 0, 0, 12684, 0, 'Shattered Hand Legionnaire'), -- Causes Bow
 (16700, 13, 0, 'Power to the Fel Horde!', 12, 0, 100, 5, 0, 0, 12685, 0, 'Shattered Hand Legionnaire'),
 (16700, 13, 1, 'Break their bones!', 12, 0, 100, 5, 0, 0, 12686, 0, 'Shattered Hand Legionnaire'),
-(16700, 14, 0, 'Know your master, you worthless mutts!', 12, 0, 100, 25, 0, 0, 12687, 0, 'Shattered Hand Legionnaire'); -- Causes Kneel
+(16700, 14, 0, 'Know your master, you worthless mutts!', 12, 0, 100, 25, 0, 0, 12687, 0, 'Shattered Hand Legionnaire'), -- Causes Kneel
+
+(16700, 15, 0, 'As if you weaklings pose any threat to us. We will devour you.', 12, 0, 100, 25, 0, 0, 12691, 0, 'Shattered Hand Legionnaire'),
+(16700, 16, 0, 'We will destroy you.', 12, 0, 100, 25, 0, 0, 12692, 0, 'Shattered Hand Legionnaire');
 
 DELETE FROM `waypoints` WHERE `entry` IN (1742000, 1742001, 1742002, 1742003, 1742004, 1670000, 1670001, 1708301, 1708302, 1708303, 1670002, 1670003, 1742005, 1670004, 1670005, 1670006, 1670007, 1670400, 1670401, 1669900, 1670008, 1670009, 1670010, 1670011);
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
@@ -293,7 +296,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1670008,2,66.63585,268.7488,-13.200854,NULL,'Shattered Halls Legionnaire Barracks Path 1'),
 (1670008,3,76.421555,261.56696,-13.203058,NULL,'Shattered Halls Legionnaire Barracks Path 1'),
 (1670008,4,66.63585,268.7488,-13.200854,NULL,'Shattered Halls Legionnaire Barracks Path 1'),
-(1670008,5,69.713936,263.39304,-13.201049,3.944444179534912109,'Shattered Halls Legionnaire Barracks Path 1'),
+(1670008,5,69.713936,263.39304,-13.201049,NULL,'Shattered Halls Legionnaire Barracks Path 1'),
 (1670009,1,77.156654,257.29916,-13.202623,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
 (1670009,2,86.677475,258.9731,-13.206164,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
 (1670009,3,90.03374,267.7625,-13.208733,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
@@ -301,7 +304,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1670009,5,70.84464,280.1304,-13.204133,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
 (1670009,6,63.218967,278.31616,-13.192625,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
 (1670009,7,61.75474,269.22348,-13.199254,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
-(1670009,8,69.713936,263.39304,-13.201049,3.944444179534912109,'Shattered Halls Legionnaire Barracks Path 2'),
+(1670009,8,69.713936,263.39304,-13.201049,NULL,'Shattered Halls Legionnaire Barracks Path 2'),
 (1670010,1,63.464737,269.65533,-13.19991,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
 (1670010,2,64.41525,277.1848,-13.20145,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
 (1670010,3,72.19377,278.96936,-13.20441,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
@@ -312,7 +315,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1670010,8,84.63591,258.43936,-13.205377,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
 (1670010,9,88.38716,265.49927,-13.207803,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
 (1670010,10,80.11674,274.18732,-13.206361,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
-(1670010,11,69.713936,263.39304,-13.201049,3.944444179534912109,'Shattered Halls Legionnaire Barracks Path 3'),
+(1670010,11,69.713936,263.39304,-13.201049,NULL,'Shattered Halls Legionnaire Barracks Path 3');
 /*
 -- Path 4
 (1670011,1,69.66478,257.30325,-13.20005,NULL,'Shattered Halls Legionnaire Barracks Path 4'),
@@ -321,7 +324,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 -- Awoken Add Point: 69.452446 239.98776 -13.193644
 */
 
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-(@CGUID+0),-(@CGUID+1),-(@CGUID+2),-(@CGUID+3),-(@CGUID+4),-(@CGUID+5),-(@CGUID+10),-(@CGUID+8),-(@CGUID+9),-(@CGUID+19), -(@CGUID+20), -(@CGUID+21),-(@CGUID+22),-(@CGUID+23),-(@CGUID+24),-(@CGUID+25),-(@CGUID+26),-(@CGUID+27),-(@CGUID+28),-(@CGUID+29),-(@CGUID+30),-(@CGUID+31),-(@CGUID+32),-(@CGUID+33),-(@CGUID+34));
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-(@CGUID+0),-(@CGUID+1),-(@CGUID+2),-(@CGUID+3),-(@CGUID+4),-(@CGUID+5),-(@CGUID+10),-(@CGUID+8),-(@CGUID+9),-(@CGUID+19), -(@CGUID+20), -(@CGUID+21),-(@CGUID+22),-(@CGUID+23),-(@CGUID+24),-(@CGUID+25),-(@CGUID+26),-(@CGUID+27),-(@CGUID+28),-(@CGUID+29),-(@CGUID+30),-(@CGUID+31),-(@CGUID+32),-(@CGUID+33),-(@CGUID+34),-(@CGUID+35),-(@CGUID+36),-(@CGUID+37),-(@CGUID+38),-(@CGUID+39),-(@CGUID+40),-(@CGUID+41),-(@CGUID+42),-(@CGUID+43),-(@CGUID+44),-(@CGUID+45));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-(@CGUID+0), 0, 0, 0, 0, 0, 100, 2, 6000, 13000, 12000, 16000, 0, 11, 30474, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - In Combat - Cast \'Bloodthirst\' (Normal Dungeon)'),
 (-(@CGUID+0), 0, 1, 0, 0, 0, 100, 4, 6000, 13000, 12000, 16000, 0, 11, 35949, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - In Combat - Cast \'Bloodthirst\' (Heroic Dungeon)'),
@@ -591,16 +594,112 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+35), 0, 2, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Aggro - Say Line 1'),
 (-(@CGUID+35), 0, 3, 4, 38, 0, 100, 0, 1, 1, 60000, 60000, 0, 11, 30485, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 (Friendly Dies Nearby) - Cast \'Enrage\''),
 (-(@CGUID+35), 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Linked - Say Line 0'),
-(-(@CGUID+35), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 88, 1670014, 1670017, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Respawn - Start Random Path'),
-(-(@CGUID+35), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 88, 1670014, 1670017, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Waypoint Finished - Start Random Path'),
-(-(@CGUID+35), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 - Add 1 to Counter'),
-(-(@CGUID+35), 0, 1004, 1008, 77, 0, 100, 0, 1, 1, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+44, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 1/4 - Set Data 4 1'),
-(-(@CGUID+35), 0, 1005, 1008, 77, 0, 100, 0, 1, 2, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+42, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 2/4 - Set Data 4 1'),
-(-(@CGUID+35), 0, 1006, 1008, 77, 0, 100, 0, 1, 3, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+45, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 3/4 - Set Data 4 1'),
-(-(@CGUID+35), 0, 1007, 1008, 77, 0, 100, 0, 1, 4, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+43, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 4/4 - Set Data 4 1'),
-(-(@CGUID+35), 0, 1008, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Add Awoken - Say Line 10');
+(-(@CGUID+35), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 88, 1670015, 1670019, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Reset - Start Random Script'),
+(-(@CGUID+35), 0, 1002, 1004, 58, 0, 100, 0, 0, 0, 0, 0, 0, 88, 1670015, 1670019, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Waypoint Finished - Start Random Script'),
+(-(@CGUID+35), 0, 1003, 1004, 34, 0, 100, 0, 8, 1, 0, 0, 0, 88, 1670015, 1670019, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Reached Point 1 - Run Random Script'),
+(-(@CGUID+35), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Linked - Set Event Phase 0'),
+(-(@CGUID+35), 0, 1005, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Aggro - Set Run On'),
+(-(@CGUID+35), 0, 1006, 0, 1, 1, 100, 0, 6000, 6000, 6000, 6000, 0, 88, 1670020, 1670022, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Out of Combat, During Waypoints - Run Random Emote Script (Phase 1)'),
+(-(@CGUID+35), 0, 1007, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 - Add 1 to Counter'),
+(-(@CGUID+35), 0, 1008, 1012, 77, 0, 100, 0, 1, 1, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+44, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 1/4 - Set Data 4 1'),
+(-(@CGUID+35), 0, 1009, 1012, 77, 0, 100, 0, 1, 2, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+42, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 2/4 - Set Data 4 1'),
+(-(@CGUID+35), 0, 1010, 1012, 77, 0, 100, 0, 1, 3, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+45, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 3/4 - Set Data 4 1'),
+(-(@CGUID+35), 0, 1011, 1012, 77, 0, 100, 0, 1, 4, 0, 0, 0, 45, 4, 1, 0, 0, 0, 0, 10, @CGUID+43, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 4/4 - Set Data 4 1'),
+(-(@CGUID+35), 0, 1012, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Add Awoken - Say Line 10'),
+-- Barracks & Hammocks Members
+(-(@CGUID+36), 0, 0, 0, 0, 0, 100, 0, 1500, 3000, 10000, 15000, 0, 11, 30478, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel Orc Convert - In Combat - Cast \'Hemorrhage\''),
+(-(@CGUID+36), 0, 1, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Fel Orc Convert - On Just Died - Set Data 1 1'),
+(-(@CGUID+36), 0, 2, 0, 38, 0, 100, 0, 4, 2, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel Orc Convert - On Data Set 4 2 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+36), 0, 3, 0, 38, 0, 100, 0, 4, 3, 0, 0, 0, 5, 153, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel Orc Convert - On Data Set 4 3 - Play Emote 153 (OneShotLaughNoSheathe)'),
+(-(@CGUID+36), 0, 4, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 5, 113, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel Orc Convert - On Data Set 4 4 - Play Emote 113 (OneShotSaluteNoSheath)'),
+(-(@CGUID+37), 0, 0, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 11, 36023, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Just Died - Cast \'Deathblow\''),
+(-(@CGUID+37), 0, 1, 0, 0, 0, 100, 0, 4000, 4000, 20000, 25000, 0, 11, 30470, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - In Combat - Cast \'Slice and Dice\''),
+(-(@CGUID+37), 0, 2, 3, 2, 0, 100, 0, 0, 30, 120000, 120000, 0, 11, 30485, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - Between 0-30% Health - Cast \'Enrage\''),
+(-(@CGUID+37), 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - Between 0-30% Health - Say Line 0'),
+(-(@CGUID+37), 0, 4, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Aggro - Say Line 1'),
+(-(@CGUID+37), 0, 5, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Just Died - Set Data 1 1 on Closest Legionnaire'),
+(-(@CGUID+37), 0, 1001, 0, 38, 0, 100, 0, 4, 2, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Data Set 4 2 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+37), 0, 1002, 0, 38, 0, 100, 0, 4, 3, 0, 0, 0, 5, 153, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Data Set 4 3 - Play Emote 153 (OneShotLaughNoSheathe)'),
+(-(@CGUID+37), 0, 1003, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 5, 113, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Data Set 4 4 - Play Emote 113 (OneShotSaluteNoSheath)'),
+(-(@CGUID+38), 0, 0, 0, 0, 0, 100, 0, 1500, 3000, 10000, 15000, 0, 11, 30478, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel Orc Convert - In Combat - Cast \'Hemorrhage\''),
+(-(@CGUID+38), 0, 1, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Fel Orc Convert - On Just Died - Set Data 1 1'),
+(-(@CGUID+38), 0, 2, 0, 38, 0, 100, 0, 4, 2, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel Orc Convert - On Data Set 4 2 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+38), 0, 3, 0, 38, 0, 100, 0, 4, 3, 0, 0, 0, 5, 153, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel Orc Convert - On Data Set 4 3 - Play Emote 153 (OneShotLaughNoSheathe)'),
+(-(@CGUID+38), 0, 4, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 5, 113, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel Orc Convert - On Data Set 4 4 - Play Emote 113 (OneShotSaluteNoSheath)'),
+(-(@CGUID+39), 0, 0, 0, 0, 0, 100, 2, 0, 0, 2400, 3800, 0, 11, 12471, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - In Combat - Cast \'Shadow Bolt\' (Normal Dungeon)'),
+(-(@CGUID+39), 0, 1, 0, 0, 0, 100, 4, 0, 0, 2400, 3800, 0, 11, 15232, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - In Combat - Cast \'Shadow Bolt\' (Heroic Dungeon)'),
+(-(@CGUID+39), 0, 2, 0, 0, 0, 100, 0, 4000, 8000, 13000, 18000, 0, 11, 12542, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - In Combat - Cast \'Fear\''),
+(-(@CGUID+39), 0, 3, 0, 0, 0, 100, 2, 2000, 6000, 14000, 18000, 0, 11, 11990, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - In Combat - Cast \'Rain of Fire\' (Normal Dungeon)'),
+(-(@CGUID+39), 0, 4, 0, 0, 0, 100, 4, 2000, 6000, 14000, 18000, 0, 11, 33508, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - In Combat - Cast \'Rain of Fire\' (Heroic Dungeon)'),
+(-(@CGUID+39), 0, 5, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Aggro - Say Line 1'),
+(-(@CGUID+39), 0, 6, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - Between 0-15% Health - Flee For Assist (No Repeat)'),
+(-(@CGUID+39), 0, 7, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Death - Set Data 1 1 on Closest Legionnaire'),
+(-(@CGUID+39), 0, 1001, 0, 38, 0, 100, 0, 4, 2, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Data Set 4 2 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+39), 0, 1002, 0, 38, 0, 100, 0, 4, 3, 0, 0, 0, 5, 153, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Data Set 4 3 - Play Emote 153 (OneShotLaughNoSheathe)'),
+(-(@CGUID+39), 0, 1003, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 5, 113, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Data Set 4 4 - Play Emote 113 (OneShotSaluteNoSheath)'),
+(-(@CGUID+40), 0, 0, 0, 0, 0, 100, 0, 1500, 1500, 5000, 9000, 0, 11, 15496, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - In Combat - Cast \'Cleave\''),
+(-(@CGUID+40), 0, 1, 0, 0, 0, 100, 0, 8000, 12000, 9000, 13000, 0, 11, 30471, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - In Combat - Cast \'Uppercut\''),
+(-(@CGUID+40), 0, 2, 3, 2, 0, 100, 0, 0, 25, 120000, 120000, 0, 11, 30485, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - Between 0-25% Health - Cast \'Enrage\''),
+(-(@CGUID+40), 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - Between 0-25% Health - Say Line 0'),
+(-(@CGUID+40), 0, 4, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Aggro - Say Line 1'),
+(-(@CGUID+40), 0, 5, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Just Died - Set Data 1 1 on Closest Legionnaire'),
+(-(@CGUID+40), 0, 1001, 0, 38, 0, 100, 0, 4, 2, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Data Set 4 2 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+40), 0, 1002, 0, 38, 0, 100, 0, 4, 3, 0, 0, 0, 5, 153, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Data Set 4 3 - Play Emote 153 (OneShotLaughNoSheathe)'),
+(-(@CGUID+40), 0, 1003, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 5, 113, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Data Set 4 4 - Play Emote 113 (OneShotSaluteNoSheath)'),
+(-(@CGUID+41), 0, 0, 0, 0, 0, 100, 0, 0, 0, 2500, 2500, 0, 11, 15587, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Mind Blast\''),
+(-(@CGUID+41), 0, 1, 0, 0, 0, 100, 2, 5000, 5000, 25000, 25000, 0, 11, 35944, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Power Word: Shield\' (Normal Dungeon)'),
+(-(@CGUID+41), 0, 2, 0, 0, 0, 100, 4, 5000, 5000, 25000, 25000, 0, 11, 36052, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Power Word: Shield\' (Heroic Dungeon)'),
+(-(@CGUID+41), 0, 3, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 11, 30479, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Resist Shadow\' (No Repeat)'),
+(-(@CGUID+41), 0, 4, 0, 2, 0, 100, 2, 0, 60, 7000, 7000, 0, 11, 15585, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - Between 0-60% Health - Cast \'Prayer of Healing\' (Normal Dungeon)'),
+(-(@CGUID+41), 0, 5, 0, 2, 0, 100, 4, 0, 60, 7000, 7000, 0, 11, 35943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - Between 0-60% Health - Cast \'Prayer of Healing\' (Heroic Dungeon)'),
+(-(@CGUID+41), 0, 6, 0, 4, 0, 15, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Aggro - Say Line 1 (No Repeat)'),
+(-(@CGUID+41), 0, 7, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Just Died - Set Data 1 1 on Closest Legionnaire'),
+(-(@CGUID+41), 0, 1001, 0, 38, 0, 100, 0, 4, 2, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 4 2 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+41), 0, 1002, 0, 38, 0, 100, 0, 4, 3, 0, 0, 0, 5, 153, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 4 3 - Play Emote 153 (OneShotLaughNoSheathe)'),
+(-(@CGUID+41), 0, 1003, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 5, 113, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 4 4 - Play Emote 113 (OneShotSaluteNoSheath)'),
+-- Sleeping Orcs
+(-(@CGUID+42), 0, 0, 0, 9, 0, 100, 0, 0, 5, 12000, 21000, 0, 11, 36020, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - Within 0-5 Range - Cast \'Curse of the Shattered Hand\''),
+(-(@CGUID+42), 0, 1, 0, 13, 0, 100, 0, 6000, 15000, 0, 0, 0, 11, 36033, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Victim Casting - Cast \'Kick\''),
+(-(@CGUID+42), 0, 2, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Say Line 1'),
+(-(@CGUID+42), 0, 3, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Just Died - Set Data 1 1 on Closest Legionnaire'),
+(-(@CGUID+42), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670023, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reset - Run Reset Script'),
+(-(@CGUID+42), 0, 1002, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Run Aggro Script'),
+(-(@CGUID+42), 0, 1003, 1004, 38, 1, 100, 0, 4, 1, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 4 1 - Run Aggro Script AND Move to Pos'),
+(-(@CGUID+42), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.452446, 239.98776, -13.193644, 0, 'Shattered Hand Brawler - Linked - Move To Position'),
+(-(@CGUID+42), 0, 1005, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reached Point - Set In Combat With Zone'),
+(-(@CGUID+43), 0, 0, 0, 9, 0, 100, 0, 0, 5, 12000, 21000, 0, 11, 36020, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - Within 0-5 Range - Cast \'Curse of the Shattered Hand\''),
+(-(@CGUID+43), 0, 1, 0, 13, 0, 100, 0, 6000, 15000, 0, 0, 0, 11, 36033, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Victim Casting - Cast \'Kick\''),
+(-(@CGUID+43), 0, 2, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Say Line 1'),
+(-(@CGUID+43), 0, 3, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Just Died - Set Data 1 1 on Closest Legionnaire'),
+(-(@CGUID+43), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670023, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reset - Run Reset Script'),
+(-(@CGUID+43), 0, 1002, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Run Aggro Script'),
+(-(@CGUID+43), 0, 1003, 1004, 38, 1, 100, 0, 4, 1, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 4 1 - Run Aggro Script AND Move to Pos'),
+(-(@CGUID+43), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.452446, 239.98776, -13.193644, 0, 'Shattered Hand Brawler - Linked - Move To Position'),
+(-(@CGUID+43), 0, 1005, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reached Point - Set In Combat With Zone'),
+(-(@CGUID+44), 0, 0, 0, 9, 0, 100, 0, 0, 5, 12000, 21000, 0, 11, 36020, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - Within 0-5 Range - Cast \'Curse of the Shattered Hand\''),
+(-(@CGUID+44), 0, 1, 0, 13, 0, 100, 0, 6000, 15000, 0, 0, 0, 11, 36033, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Victim Casting - Cast \'Kick\''),
+(-(@CGUID+44), 0, 2, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Say Line 1'),
+(-(@CGUID+44), 0, 3, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Just Died - Set Data 1 1 on Closest Legionnaire'),
+(-(@CGUID+44), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670023, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reset - Run Reset Script'),
+(-(@CGUID+44), 0, 1002, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Run Aggro Script'),
+(-(@CGUID+44), 0, 1003, 1004, 38, 1, 100, 0, 4, 1, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 4 1 - Run Aggro Script AND Move to Pos'),
+(-(@CGUID+44), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.452446, 239.98776, -13.193644, 0, 'Shattered Hand Brawler - Linked - Move To Position'),
+(-(@CGUID+44), 0, 1005, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reached Point - Set In Combat With Zone'),
+(-(@CGUID+45), 0, 0, 0, 0, 0, 100, 0, 0, 0, 2500, 2500, 0, 11, 15587, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Mind Blast\''),
+(-(@CGUID+45), 0, 1, 0, 0, 0, 100, 2, 5000, 5000, 25000, 25000, 0, 11, 35944, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Power Word: Shield\' (Normal Dungeon)'),
+(-(@CGUID+45), 0, 2, 0, 0, 0, 100, 4, 5000, 5000, 25000, 25000, 0, 11, 36052, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Power Word: Shield\' (Heroic Dungeon)'),
+(-(@CGUID+45), 0, 3, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 11, 30479, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Resist Shadow\' (No Repeat)'),
+(-(@CGUID+45), 0, 4, 0, 2, 0, 100, 2, 0, 60, 7000, 7000, 0, 11, 15585, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - Between 0-60% Health - Cast \'Prayer of Healing\' (Normal Dungeon)'),
+(-(@CGUID+45), 0, 5, 0, 2, 0, 100, 4, 0, 60, 7000, 7000, 0, 11, 35943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - Between 0-60% Health - Cast \'Prayer of Healing\' (Heroic Dungeon)'),
+(-(@CGUID+45), 0, 6, 0, 4, 0, 15, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Aggro - Say Line 1 (No Repeat)'),
+(-(@CGUID+45), 0, 7, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Just Died - Set Data 1 1 on Closest Legionnaire'),
+(-(@CGUID+45), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670023, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Reset - Run Reset Script'),
+(-(@CGUID+45), 0, 1002, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Aggro - Run Aggro Script'),
+(-(@CGUID+45), 0, 1003, 1004, 38, 1, 100, 0, 4, 1, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 4 1 - Run Aggro Script AND Move to Pos'),
+(-(@CGUID+45), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.452446, 239.98776, -13.193644, 0, 'Shadowmoon Acolyte - Linked - Move To Position'),
+(-(@CGUID+45), 0, 1005, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Reached Point - Set In Combat With Zone');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1742000, 1670000, 1670001, 1670002, 1670003, 1670004, 1670005, 1670006, 1670007, 1670008, 1670009, 1670010, 1670011, 1670012, 1670013, 1669900, 1670400, 1742001, 1769400, 1670014, 1769401));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1742000, 1670000, 1670001, 1670002, 1670003, 1670004, 1670005, 1670006, 1670007, 1670008, 1670009, 1670010, 1670011, 1670012, 1670013, 1669900, 1670400, 1742001, 1769400, 1670014, 1769401, 1670015, 1670016, 1670017, 1670018, 1670019, 1670020, 1670021, 1670022, 1670023, 1670024));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1742000, 9, 0, 0, 0, 0, 100, 0, 600, 600, 0, 0, 0, 4, 1341, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - Actionlist - Play Sound 1341'),
 (1742000, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - Actionlist - Set Emote State 333'),
@@ -665,7 +764,40 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1670014, 9, 1, 0, 0, 0, 100, 0, 3600, 3600, 0, 0, 0, 53, 0, 1670005, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Start Waypoint'),
 (1769401, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - Actionlist - Set Home Position'),
 (1769401, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 275, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - Actionlist - Play Emote 275'),
-(1769401, 9, 2, 0, 0, 0, 100, 0, 2800, 2800, 0, 0, 0, 17, 27, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - Actionlist - Set Emote State 27');
+(1769401, 9, 2, 0, 0, 0, 100, 0, 2800, 2800, 0, 0, 0, 17, 27, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - Actionlist - Set Emote State 27'),
+(1670015, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Run Off'),
+(1670015, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0.5410520434379578, 'Shattered Hand Legionnaire - Actionlist - Set Orientation 0.5410520434379578'),
+(1670015, 9, 2, 0, 0, 0, 100, 0, 7200, 7200, 0, 0, 0, 5, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Play Emote 15 (OneShotRoar)'),
+(1670015, 9, 3, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 45, 4, 2, 0, 0, 0, 0, 9, 0, 0, 20, 1, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Data 4 2 Emote ID: 71 (OneShotCheerNoSheathe)'),
+(1670015, 9, 4, 0, 0, 0, 100, 0, 4800, 4800, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Play Emote 1 (OneShotTalk)'),
+(1670015, 9, 5, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 45, 4, 3, 0, 0, 0, 0, 9, 0, 0, 20, 1, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Data 4 3 Emote ID: 153 (OneShotLaughNoSheathe)'),
+(1670015, 9, 6, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.713936, 263.39304, -13.201049, 3.944444179534912, 'Shattered Hand Legionnaire - Actionlist - Reset Position'),
+(1670016, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Run Off'),
+(1670016, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 4.6949357986450195, 'Shattered Hand Legionnaire - Actionlist - Set Orientation 4.6949357986450195'),
+(1670016, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Say Line 15'),
+(1670016, 9, 3, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.66478, 257.30325, -13.20005, 0, 'Shattered Hand Legionnaire - Actionlist - Move To Position'),
+(1670016, 9, 4, 0, 0, 0, 100, 0, 2800, 2800, 0, 0, 0, 1, 16, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Say Line 16'),
+(1670016, 9, 5, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.760185, 263.40073, -13.201066, 0, 'Shattered Hand Legionnaire - Actionlist - Reset Position'),
+(1670017, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1670008, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Start Waypoint'),
+(1670017, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Event Phase 1'),
+(1670018, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1670009, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Start Waypoint'),
+(1670018, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Event Phase 1'),
+(1670019, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1670010, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Start Waypoint'),
+(1670019, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Event Phase 1'),
+(1670020, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Play Emote 15 (OneShotRoar)'),
+(1670020, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 45, 4, 2, 0, 0, 0, 0, 9, 0, 0, 20, 1, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Data 4 2 Emote ID: 71 (OneShotCheerNoSheathe)'),
+(1670021, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Play Emote 1 (OneShotTalk)'),
+(1670021, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 45, 4, 3, 0, 0, 0, 0, 9, 0, 0, 20, 1, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Data 4 3 Emote ID: 153 (OneShotLaughNoSheathe)'),
+(1670022, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Play Emote 5 (OneShotExclamation)'),
+(1670022, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 45, 4, 4, 0, 0, 0, 0, 9, 0, 0, 20, 1, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Data 4 4 Emote ID: 113 (OneShotSaluteNoSheath)'),
+(1670023, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 11, 16093, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Barracks Sleeping Orc Reset - Actionlist - Cast \'Self Visual - Sleep Until Cancelled (DND)\''),
+(1670023, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 90, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Barracks Sleeping Orc Reset - Actionlist - Set Flag Standstate Sleep'),
+(1670023, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 8, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Barracks Sleeping Orc Reset - Actionlist - Set Reactstate Defensive'),
+(1670023, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Barracks Sleeping Orc Reset - Actionlist - Set Event Phase 1'),
+(1670024, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 28, 16093, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Barracks Sleeping Orc Aggro - Actionlist - Remove Aura \'Self Visual - Sleep Until Cancelled (DND)\''),
+(1670024, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 91, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Barracks Sleeping Orc Aggro - Actionlist - Remove FlagStandstate Sleep'),
+(1670024, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Barracks Sleeping Orc Aggro - Actionlist - Set Reactstate Aggressive'),
+(1670024, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Barracks Sleeping Orc Reset - Actionlist - Set Event Phase 0');
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` = -(@CGUID+5));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
@@ -691,13 +823,20 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16523, 0, 8, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Data Set 2 3 - Run Script'),
 (16523, 0, 9, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Data Set 2 4 - Run Script');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16594) AND (`source_type` = 0) AND (`id` BETWEEN 11 AND 15);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16594 AND `source_type` = 0);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(16594, 0, 11, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Death - Set Data 1 1 on Closest Legionnaire'),
-(16594, 0, 12, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
-(16594, 0, 13, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
-(16594, 0, 14, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 3 - Run Script'),
-(16594, 0, 15, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 4 - Run Script');
+(16594, 0, 0, 0, 0, 0, 100, 0, 0, 0, 2500, 2500, 0, 11, 15587, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Mind Blast\''),
+(16594, 0, 1, 0, 0, 0, 100, 2, 5000, 5000, 25000, 25000, 0, 11, 35944, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Power Word: Shield\' (Normal Dungeon)'),
+(16594, 0, 2, 0, 0, 0, 100, 4, 5000, 5000, 25000, 25000, 0, 11, 36052, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Power Word: Shield\' (Heroic Dungeon)'),
+(16594, 0, 3, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 11, 30479, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Resist Shadow\' (No Repeat)'),
+(16594, 0, 4, 0, 2, 0, 100, 2, 0, 60, 7000, 7000, 0, 11, 15585, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - Between 0-60% Health - Cast \'Prayer of Healing\' (Normal Dungeon)'),
+(16594, 0, 5, 0, 2, 0, 100, 4, 0, 60, 7000, 7000, 0, 11, 35943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - Between 0-60% Health - Cast \'Prayer of Healing\' (Heroic Dungeon)'),
+(16594, 0, 6, 0, 4, 0, 15, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Aggro - Say Line 1 (No Repeat)'),
+(16594, 0, 7 , 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Death - Set Data 1 1 on Closest Legionnaire'),
+(16594, 0, 8 , 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(16594, 0, 9 , 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
+(16594, 0, 10, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 3 - Run Script'),
+(16594, 0, 11, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 4 - Run Script');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 17694) AND (`source_type` = 0) AND (`id` BETWEEN 7 AND 11);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
