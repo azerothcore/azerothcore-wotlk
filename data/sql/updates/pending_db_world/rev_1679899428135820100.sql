@@ -1,6 +1,3 @@
--- EffectMiscValueB_1 64 does not make the adds show the title "'s minion"
-UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 67 WHERE `ID` IN (36042, 36043, 36044, 36045, 36046, 36047, 36048, 36049, 36050);
-
 -- ID 18885 (Farahlon Giant)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18885;
 
