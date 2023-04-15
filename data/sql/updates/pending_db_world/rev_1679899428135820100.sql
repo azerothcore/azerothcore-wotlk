@@ -1,5 +1,5 @@
 -- EffectMiscValueB_1 64 does not make the adds show the title "'s minion"
-UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 67 WHERE `ID` IN (36042, 36043, 36044, 36045, 36046, 36047, 36048, 36049, 36050,36595,36596,36597,36579,36584,36585);
+UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValueB_1` = 67 WHERE `ID` IN (36042, 36043, 36044, 36045, 36046, 36047, 36048, 36049, 36050);
 
 -- ID 18885 (Farahlon Giant)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18885;
@@ -49,10 +49,10 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19940;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19940);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(19940, 0, 0, 0, 0, 0, 100, 0, 11900, 11900, 21200, 21200, 0, 11, 8078, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apex - In Combat - Cast \'Thunderclap\''),
-(19940, 0, 1, 0, 2, 0, 100, 512, 0, 75, 0, 0, 0, 11, 36595, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Apex - Between 0-75% Health - Cast \'Serverside - Summon Apex Crumbler\''),
-(19940, 0, 2, 0, 2, 0, 100, 512, 0, 50, 0, 0, 0, 11, 36596, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Apex - Between 0-50% Health - Cast \'Serverside - Summon Apex Crumbler\''),
-(19940, 0, 3, 0, 2, 0, 100, 512, 0, 25, 0, 0, 0, 11, 36597, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Apex - Between 0-25% Health - Cast \'Serverside - Summon Apex Crumbler\'');
+(19940, 0, 0, 0, 0, 0, 100, 0, 11900, 11900, 15000, 21200, 0, 11, 8078, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apex - In Combat - Cast \'Thunderclap\''),
+(19940, 0, 1, 0, 2, 0, 100, 512, 0, 75, 0, 0, 0, 11, 36595, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apex - Between 0-75% Health - Cast \'Serverside - Summon Apex Crumbler\''),
+(19940, 0, 2, 0, 2, 0, 100, 512, 0, 50, 0, 0, 0, 11, 36596, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apex - Between 0-50% Health - Cast \'Serverside - Summon Apex Crumbler\''),
+(19940, 0, 3, 0, 2, 0, 100, 512, 0, 25, 0, 0, 0, 11, 36597, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apex - Between 0-25% Health - Cast \'Serverside - Summon Apex Crumbler\'');
 -- ID 21328 (Apex Crumbler)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21328;
 
@@ -65,9 +65,9 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20772;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 20772);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(20772, 0, 1, 0, 2, 0, 100, 512, 0, 75, 0, 0, 0, 11, 36579, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherock - Between 0-75% Health - Cast \'Serverside - Summon Netherock Crumbler\''),
-(20772, 0, 2, 0, 2, 0, 100, 512, 0, 50, 0, 0, 0, 11, 36584, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherock - Between 0-50% Health - Cast \'Serverside - Summon Netherock Crumbler\''),
-(20772, 0, 3, 0, 2, 0, 100, 512, 0, 25, 0, 0, 0, 11, 36585, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherock - Between 0-25% Health - Cast \'Serverside - Summon Netherock Crumbler\'');
+(20772, 0, 1, 0, 2, 0, 100, 512, 0, 75, 0, 0, 0, 11, 36579, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherock - Between 0-75% Health - Cast \'Serverside - Summon Netherock Crumbler\''),
+(20772, 0, 2, 0, 2, 0, 100, 512, 0, 50, 0, 0, 0, 11, 36584, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherock - Between 0-50% Health - Cast \'Serverside - Summon Netherock Crumbler\''),
+(20772, 0, 3, 0, 2, 0, 100, 512, 0, 25, 0, 0, 0, 11, 36585, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Netherock - Between 0-25% Health - Cast \'Serverside - Summon Netherock Crumbler\'');
 -- ID 21323 (Netherock Crumbler)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21323;
 
