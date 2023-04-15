@@ -87,6 +87,8 @@ public:
 
         bool sayIntro, sayHelp;
 
+        int count = 0;
+
         void Reset() override
         {
             sayHelp = false;
@@ -112,6 +114,38 @@ public:
                 Talk(SAY_HELP);
                 sayHelp = true;
             }
+        }
+
+        int counterVoidSpawns(int count)
+        {
+            int timer = 0;
+            switch(count)
+            {
+                case 1:
+                case 2:
+                    timer = 13300;
+                    break;
+                case 3:
+                    timer = 12100;
+                    break;
+                case 4:
+                    timer = 10900;
+                    break;
+                case 5:
+                case 6:
+                    timer = 9700;
+                    break;
+                case 7:
+                case 8:
+                    timer = 7200;
+                    break;
+                case 9:
+                    timer = 6000;
+                    break;
+                default:
+                    timer = 4800;
+            }
+            return timer;
         }
 
         void JustSummoned(Creature* summon) override
@@ -146,7 +180,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(7000, 14000));
             events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 45000);
             events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 46000);
-            events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 5000);
+            events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 10900);
             if (IsHeroic())
             {
                 events.ScheduleEvent(EVENT_SPELL_BANISH, 17000);
@@ -187,7 +221,8 @@ public:
                     break;
                 case EVENT_SUMMON_TRAVELER:
                     spawnVoidTraveler();
-                    events.RepeatEvent(HealthBelowPct(20) ? 5000 : 10000);
+                    count++;
+                    events.RepeatEvent(counterVoidSpawns(count));
                     break;
                 case EVENT_SPELL_DRAWSHADOWS:
                     {
