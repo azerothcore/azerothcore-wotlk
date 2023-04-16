@@ -66,6 +66,7 @@ struct boss_murmur : public BossAI
     void CastSupressionOOC()
     {
         me->m_Events.AddEventAtOffset([this] {
+            me->CastCustomSpell(SPELL_SUPPRESSION, SPELLVALUE_MAX_TARGETS, 5);
             DoCastAOE(SPELL_SUPPRESSION);
             CastSupressionOOC();
         }, 3600ms, 10900ms, GROUP_OOC_CAST);
