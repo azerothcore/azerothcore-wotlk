@@ -256,9 +256,10 @@ public:
     void HandleBotKillPlayer(Creature* killer, Player* victim) override;
     void HandleBotKillBot(Creature* killer, Creature* victim) override;
     void HandlePlayerKillBot(Creature* victim, Player* killer) override;
-    //void EventBotDroppedFlag(Creature* bot) override;
-    //void EventBotClickedOnFlag(Creature* bot, GameObject* target_obj) override;
-    //void EventBotCapturedFlag(Creature* bot);
+    void EventBotDroppedFlag(Creature* bot) override;
+    void EventBotClickedOnFlag(Creature* bot, GameObject* target_obj) override;
+    void HandleBotAreaTrigger(Creature* bot, uint32 trigger) override;
+    void EventBotCapturedFlag(Creature* bot);
     //end npcbot
 
     void UpdateFlagState(TeamId teamId, uint32 value);

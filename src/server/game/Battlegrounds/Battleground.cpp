@@ -706,13 +706,6 @@ inline void Battleground::_ProcessLeave(uint32 diff)
     if (m_EndTime <= 0)
     {
         m_EndTime = TIME_TO_AUTOREMOVE; // pussywizard: 0 -> TIME_TO_AUTOREMOVE
-        BattlegroundPlayerMap::iterator itr, next;
-        for (itr = m_Players.begin(); itr != m_Players.end(); itr = next)
-        {
-            next = itr;
-            ++next;
-            itr->second->LeaveBattleground(this); //itr is erased here!
-        }
         //npcbot
         BattlegroundBotMap::iterator bitr, bnext;
         for (bitr = m_Bots.begin(); bitr != m_Bots.end(); bitr = bnext)
@@ -722,6 +715,13 @@ inline void Battleground::_ProcessLeave(uint32 diff)
             RemoveBotAtLeave(bitr->first);
         }
         //end npcbot
+        BattlegroundPlayerMap::iterator itr, next;
+        for (itr = m_Players.begin(); itr != m_Players.end(); itr = next)
+        {
+            next = itr;
+            ++next;
+            itr->second->LeaveBattleground(this); //itr is erased here!
+        }
     }
 }
 

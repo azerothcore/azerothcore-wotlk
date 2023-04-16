@@ -164,6 +164,7 @@ class bot_ai : public CreatureAI
         bool IsWanderer() const { return _wanderer; }
         void SetWanderer();
         WanderNode const* GetNextTravelNode(Position const* from, bool random) const;
+        void OnWanderNodeReached();
 
         static bool CCed(Unit const* target, bool root = false);
 
@@ -306,6 +307,8 @@ class bot_ai : public CreatureAI
         static bool IsDamagingSpell(SpellInfo const* spellInfo);
 
         bool IsImmunedToMySpellEffect(Unit const* unit, SpellInfo const* spellInfo, SpellEffIndex index) const;
+
+        static bool IsFlagCarrier(Unit const* unit, BattlegroundTypeId bgTypeId = BATTLEGROUND_TYPE_NONE);
 
     protected:
         explicit bot_ai(Creature* creature);

@@ -545,6 +545,7 @@ public:
     virtual void RemoveBot(ObjectGuid /*guid*/) {}
     virtual void EventBotDroppedFlag(Creature* /*bot*/) { }
     virtual void EventBotClickedOnFlag(Creature* /*bot*/, GameObject* /*target_obj*/) { }
+    virtual void HandleBotAreaTrigger(Creature* /*bot*/, uint32 /*trigger*/) { }
     //end npcbot
 
     virtual void RemovePlayerAtLeave(Player* player);

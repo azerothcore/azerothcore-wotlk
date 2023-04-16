@@ -192,7 +192,7 @@ class BotDataMgr
         static TeamId GetTeamIdForFaction(uint32 factionTemplateId);
         static uint32 GetTeamForFaction(uint32 factionTemplateId);
         static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport);
-        static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* curPos, uint32 faction, uint32 lvl, bool random);
+        static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* fromPos, Creature const* bot, uint8 lvl, bool random);
         static WanderNode const* GetClosestWanderNode(WorldLocation const* loc);
 
         static std::shared_mutex* GetLock();
