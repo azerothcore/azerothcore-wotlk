@@ -24,6 +24,8 @@ enum Murmur
 {
     EMOTE_SONIC_BOOM            = 0,
 
+    SPELL_SHOCKWAVE                 = 33686,
+    SPELL_SHOCKWAVE_SERVERSIDE      = 33673,
     SPELL_RESONANCE                 = 33657,
     SPELL_MAGNETIC_PULL             = 33689,
     SPELL_SONIC_SHOCK               = 38797,
@@ -169,8 +171,32 @@ class spell_murmur_thundering_storm : public SpellScript
     }
 };
 
+// 33711/38794 - Murmur's Touch
+class spell_murmur_touch : public AuraScript
+{
+    PrepareAuraScript(spell_murmur_touch);
+
+    void HandleAfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+        {
+            if (GetTarget())
+            {
+                GetTarget()->CastSpell(GetTarget(), SPELL_SHOCKWAVE, true);
+                GetTarget()->CastSpell(GetTarget(), SPELL_SHOCKWAVE_SERVERSIDE, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_murmur_touch::HandleAfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_murmur()
 {
     RegisterShadowLabyrinthCreatureAI(boss_murmur);
     RegisterSpellScript(spell_murmur_thundering_storm);
+    RegisterSpellScript(spell_murmur_touch);
 }
