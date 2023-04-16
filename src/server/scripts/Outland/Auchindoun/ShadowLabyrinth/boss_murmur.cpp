@@ -34,196 +34,139 @@ enum Murmur
     SPELL_SONIC_BOOM_EFFECT_N       = 38795,
     SPELL_SONIC_BOOM_EFFECT_H       = 33666,
     SPELL_MURMURS_TOUCH_N           = 33711,
-    SPELL_MURMURS_TOUCH_H           = 38794,
-
-    EVENT_SPELL_SONIC_BOOM          = 1,
-    EVENT_SPELL_SONIC_BOOM_EFFECT   = 2,
-    EVENT_SPELL_MURMURS_TOUCH       = 3,
-    EVENT_SPELL_RESONANCE           = 4,
-    EVENT_SPELL_MAGNETIC            = 5,
-    EVENT_SPELL_THUNDERING          = 6,
-    EVENT_SPELL_SONIC_SHOCK         = 7
+    SPELL_MURMURS_TOUCH_H           = 38794
 };
 
-class boss_murmur : public CreatureScript
+struct boss_murmur : public BossAI
 {
-public:
-    boss_murmur() : CreatureScript("boss_murmur") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_murmur(Creature* creature) : BossAI(creature, DATA_MURMUR)
     {
-        return GetShadowLabyrinthAI<boss_murmurAI>(creature);
+        SetCombatMovement(false);
     }
 
-    struct boss_murmurAI : public ScriptedAI
+    void Reset() override
     {
-        boss_murmurAI(Creature* creature) : ScriptedAI(creature)
+        _Reset();
+        me->SetHealth(me->CountPctFromMaxHealth(40));
+        me->ResetPlayerDamageReq();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+
+        scheduler.Schedule(30s, [this](TaskContext context)
         {
-            SetCombatMovement(false);
-            instance = creature->GetInstanceScript();
-        }
+            Talk(EMOTE_SONIC_BOOM);
+            DoCastAOE(DUNGEON_MODE(SPELL_SONIC_BOOM_CAST_N, SPELL_SONIC_BOOM_CAST_H));
 
-        InstanceScript* instance;
-        EventMap events;
-
-        void Reset() override
-        {
-            events.Reset();
-            me->SetHealth(me->CountPctFromMaxHealth(40));
-            me->ResetPlayerDamageReq();
-
-            if (instance)
-                instance->SetData(DATA_MURMUREVENT, NOT_STARTED);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            events.ScheduleEvent(EVENT_SPELL_SONIC_BOOM, 30000);
-            events.ScheduleEvent(EVENT_SPELL_MURMURS_TOUCH, urand(8000, 20000));
-            events.ScheduleEvent(EVENT_SPELL_RESONANCE, 5000);
-            events.ScheduleEvent(EVENT_SPELL_MAGNETIC, urand(15000, 30000));
-            if (IsHeroic())
+            scheduler.Schedule(1500ms, [this](TaskContext)
             {
-                events.ScheduleEvent(EVENT_SPELL_THUNDERING, 15000);
-                events.ScheduleEvent(EVENT_SPELL_SONIC_SHOCK, 10000);
-            }
+                DoCastAOE(DUNGEON_MODE(SPELL_SONIC_BOOM_EFFECT_N, SPELL_SONIC_BOOM_EFFECT_H), true);
+            });
 
-            if (instance)
-                instance->SetData(DATA_MURMUREVENT, IN_PROGRESS);
-        }
-
-        void JustDied(Unit*) override
+            context.Repeat(28500ms);
+        }).Schedule(8s, 20s, [this](TaskContext context)
         {
-            if (instance)
-                instance->SetData(DATA_MURMUREVENT, DONE);
-        }
-
-        void UpdateAI(uint32 diff) override
+            DoCastRandomTarget(DUNGEON_MODE(SPELL_MURMURS_TOUCH_N, SPELL_MURMURS_TOUCH_H));
+            context.Repeat(25s, 35s);
+        }).Schedule(5s, [this](TaskContext context)
         {
-            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_SONIC_BOOM:
-                    Talk(EMOTE_SONIC_BOOM);
-                    me->CastSpell(me, DUNGEON_MODE(SPELL_SONIC_BOOM_CAST_N, SPELL_SONIC_BOOM_CAST_H), false);
-                    events.RepeatEvent(28500);
-                    events.DelayEvents(1500);
-                    events.ScheduleEvent(EVENT_SPELL_SONIC_BOOM_EFFECT, 0);
-                    return;
-                case EVENT_SPELL_SONIC_BOOM_EFFECT:
-                    me->CastSpell(me, DUNGEON_MODE(SPELL_SONIC_BOOM_EFFECT_N, SPELL_SONIC_BOOM_EFFECT_H), true);
-                    break;
-                case EVENT_SPELL_MURMURS_TOUCH:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 80.0f, true))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_MURMURS_TOUCH_N, SPELL_MURMURS_TOUCH_H), false);
-                    events.RepeatEvent(urand(25000, 35000));
-                    break;
-                case EVENT_SPELL_RESONANCE:
-                    if (!me->IsWithinMeleeRange(me->GetVictim()))
-                        me->CastSpell(me, SPELL_RESONANCE, false);
-                    events.RepeatEvent(5000);
-                    break;
-                case EVENT_SPELL_MAGNETIC:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 80.0f, true))
-                    {
-                        me->CastSpell(target, SPELL_MAGNETIC_PULL, false);
-                        events.RepeatEvent(urand(15000, 30000));
-                        return;
-                    }
-                    events.RepeatEvent(500);
-                    break;
-                case EVENT_SPELL_THUNDERING:
-                    me->CastSpell(me, SPELL_THUNDERING_STORM, true);
-                    events.RepeatEvent(15000);
-                    break;
-                case EVENT_SPELL_SONIC_SHOCK:
-                    me->CastSpell(me->GetVictim(), SPELL_SONIC_SHOCK, false);
-                    events.RepeatEvent(urand(10000, 20000));
-                    break;
-            }
-
-            if (!me->isAttackReady())
-                return;
-
             if (!me->IsWithinMeleeRange(me->GetVictim()))
             {
-                ThreatContainer::StorageType threatlist = me->GetThreatMgr().GetThreatList();
-                for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
-                    if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
-                        if (target->IsAlive() && me->IsWithinMeleeRange(target))
-                        {
-                            me->TauntApply(target);
-                            break;
-                        }
+                DoCastVictim(SPELL_RESONANCE);
             }
 
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
-class spell_murmur_sonic_boom_effect : public SpellScriptLoader
-{
-public:
-    spell_murmur_sonic_boom_effect() : SpellScriptLoader("spell_murmur_sonic_boom_effect") { }
-
-    class spell_murmur_sonic_boom_effect_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_murmur_sonic_boom_effect_SpellScript)
-
-    public:
-        spell_murmur_sonic_boom_effect_SpellScript() : SpellScript() { }
-
-        void RecalculateDamage()
+            context.Repeat(5000ms);
+        }).Schedule(15s, 30s, [this](TaskContext context)
         {
-            SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(90));
-        }
+            if (DoCastRandomTarget(SPELL_MAGNETIC_PULL, 0, 80.0f) == SPELL_CAST_OK)
+            {
+                context.Repeat(15s, 30s);
+            }
+            else
+            {
+                context.Repeat(500ms);
+            }
+        });
 
-        void Register() override
+        if (IsHeroic())
         {
-            OnHit += SpellHitFn(spell_murmur_sonic_boom_effect_SpellScript::RecalculateDamage);
+            scheduler.Schedule(15s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_THUNDERING_STORM);
+                context.Repeat(15s);
+            }).Schedule(10s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_SONIC_SHOCK);
+                context.Repeat(10s, 20s);
+            });
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void UpdateAI(uint32 diff) override
     {
-        return new spell_murmur_sonic_boom_effect_SpellScript();
+        if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        scheduler.Update(diff);
+
+        if (!me->isAttackReady())
+            return;
+
+        if (!me->IsWithinMeleeRange(me->GetVictim()))
+        {
+            ThreatContainer::StorageType threatlist = me->GetThreatMgr().GetThreatList();
+            for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
+                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                    if (target->IsAlive() && me->IsWithinMeleeRange(target))
+                    {
+                        me->TauntApply(target);
+                        break;
+                    }
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
-class spell_murmur_thundering_storm : public SpellScriptLoader
+class spell_murmur_sonic_boom_effect : public SpellScript
 {
+    PrepareSpellScript(spell_murmur_sonic_boom_effect)
+
 public:
-    spell_murmur_thundering_storm() : SpellScriptLoader("spell_murmur_thundering_storm") { }
+    spell_murmur_sonic_boom_effect() : SpellScript() { }
 
-    class spell_murmur_thundering_storm_SpellScript : public SpellScript
+    void RecalculateDamage()
     {
-        PrepareSpellScript(spell_murmur_thundering_storm_SpellScript);
+        SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(90));
+    }
 
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_murmur_thundering_storm_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_murmur_thundering_storm_SpellScript();
+        OnHit += SpellHitFn(spell_murmur_sonic_boom_effect::RecalculateDamage);
+    }
+};
+
+class spell_murmur_thundering_storm : public SpellScript
+{
+    PrepareSpellScript(spell_murmur_thundering_storm);
+
+    void SelectTarget(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_murmur_thundering_storm::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
 void AddSC_boss_murmur()
 {
-    new boss_murmur();
-    new spell_murmur_sonic_boom_effect();
-    new spell_murmur_thundering_storm();
+    RegisterShadowLabyrinthCreatureAI(boss_murmur);
+    RegisterSpellScript(spell_murmur_sonic_boom_effect);
+    RegisterSpellScript(spell_murmur_thundering_storm);
 }
