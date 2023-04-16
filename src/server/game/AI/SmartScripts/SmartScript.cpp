@@ -2692,47 +2692,23 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
             {
+                ObjectGuid guidToSend = me ? me->GetGUID() : go->GetGUID();
+
+                if (e.action.setGuid.invokerGUID)
+                {
+                    if (Unit* invoker = GetLastInvoker())
+                    {
+                        guidToSend = invoker->GetGUID();
+                    }
+                }
+
                 if (Creature* creature = target->ToCreature())
                 {
-                    if (e.action.setGuid.invokerGUID)
-                    {
-                        if (Unit* invoker = GetLastInvoker())
-                        {
-                            creature->AI()->SetGUID(invoker->GetGUID(), e.action.setGuid.index);
-                        }
-                    }
-                    else
-                    {
-                        if (me)
-                        {
-                            creature->AI()->SetGUID(me->GetGUID(), e.action.setGuid.index);
-                        }
-                        else if (go)
-                        {
-                            creature->AI()->SetGUID(go->GetGUID(), e.action.setGuid.index);
-                        }
-                    }
+                    creature->AI()->SetGUID(guidToSend, e.action.setGuid.index);
                 }
                 else if (GameObject* object = target->ToGameObject())
                 {
-                    if (e.action.setGuid.invokerGUID)
-                    {
-                        if (Unit* invoker = GetLastInvoker())
-                        {
-                            object->AI()->SetGUID(invoker->GetGUID(), e.action.setGuid.index);
-                        }
-                    }
-                    else
-                    {
-                        if (me)
-                        {
-                            object->AI()->SetGUID(me->GetGUID(), e.action.setGuid.index);
-                        }
-                        else if (go)
-                        {
-                            object->AI()->SetGUID(go->GetGUID(), e.action.setGuid.index);
-                        }
-                    }
+                    object->AI()->SetGUID(guidToSend, e.action.setGuid.index);
                 }
             }
             break;
