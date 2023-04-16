@@ -2688,6 +2688,38 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
+        case SMART_ACTION_SET_GUID:
+        {
+            for (WorldObject* target : targets)
+            {
+                if (IsCreature(target))
+                {
+                    if (Creature* target = target->ToCreature())
+                    {
+                        if (e.action.setGuid.invokerGUID)
+                        {
+                            if (Unit* invoker = GetLastInvoker())
+                            {
+                                target->AI()->SetGUID(invoker->GetGUID(), e.action.setGuid.index);
+
+                            }
+                        }
+                        else
+                        {
+                            if (me)
+                            {
+                                target->AI()->SetGUID(me->GetGUID(), e.action.setGuid.index);
+                            }
+                            else if (go)
+                            {
+                                target->AI()->SetGUID(go->GetGUID(), e.action.setGuid.index);
+                            }
+                        }
+                    }
+                }
+            }
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
