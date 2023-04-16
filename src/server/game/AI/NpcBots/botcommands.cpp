@@ -3412,7 +3412,12 @@ public:
                 if (name[i] == '_')
                     name[i] = ' ';
 
-            Creature const* bot = BotDataMgr::FindBot(name, owner->GetSession()->GetSessionDbLocaleIndex());
+            std::vector<uint32> bot_ids;
+            bot_ids.reserve(owner->GetBotMgr()->GetNpcBotsCount());
+            for (auto const& kv : *owner->GetBotMgr()->GetBotMap())
+                bot_ids.push_back(kv.first.GetEntry());
+
+            Creature const* bot = BotDataMgr::FindBot(name, owner->GetSession()->GetSessionDbLocaleIndex(), &bot_ids);
             if (bot && bot->IsNPCBot() && !bot->IsTempBot() && !mgr->GetBot(bot->GetGUID()) && bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) &&
                 BotDataMgr::SelectNpcBotData(bot->GetEntry())->owner == owner->GetGUID().GetCounter())
             {

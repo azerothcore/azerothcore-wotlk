@@ -2181,7 +2181,7 @@ Creature const* BotDataMgr::FindBot(uint32 entry)
     }
     return nullptr;
 }
-Creature const* BotDataMgr::FindBot(std::string_view name, LocaleConstant loc)
+Creature const* BotDataMgr::FindBot(std::string_view name, LocaleConstant loc, std::vector<uint32> const* not_ids)
 {
     std::wstring wname;
     if (Utf8toWStr(name, wname))
@@ -2190,6 +2190,9 @@ Creature const* BotDataMgr::FindBot(std::string_view name, LocaleConstant loc)
         std::shared_lock<std::shared_mutex> lock(*GetLock());
         for (NpcBotRegistry::const_iterator ci = _existingBots.cbegin(); ci != _existingBots.cend(); ++ci)
         {
+            if (not_ids && std::find(not_ids->cbegin(), not_ids->cend(), (*ci)->GetEntry()) != not_ids->cend())
+                continue;
+
             std::string basename = (*ci)->GetName();
             if (CreatureLocale const* creatureInfo = sObjectMgr->GetCreatureLocale((*ci)->GetEntry()))
             {
