@@ -120,7 +120,7 @@ struct boss_murmur : public BossAI
             {
                 context.Repeat(500ms);
             }
-        }).Schedule(1s, [this](TaskContext context)
+        }).Schedule(3s, [this](TaskContext context)
         {
             if (ShouldCastResonance())
             {
