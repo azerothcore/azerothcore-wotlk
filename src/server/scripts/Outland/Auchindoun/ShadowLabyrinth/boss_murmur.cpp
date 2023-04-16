@@ -43,6 +43,11 @@ enum Murmur
     GROUP_OOC_CAST                  = 2
 };
 
+enum Creatures
+{
+    NPC_CABAL_SPELLBINDER           = 18639
+};
+
 struct boss_murmur : public BossAI
 {
     boss_murmur(Creature* creature) : BossAI(creature, DATA_MURMUR)
@@ -66,9 +71,12 @@ struct boss_murmur : public BossAI
     void CastSupressionOOC()
     {
         me->m_Events.AddEventAtOffset([this] {
-            me->CastCustomSpell(SPELL_SUPPRESSION, SPELLVALUE_MAX_TARGETS, 5);
-            DoCastAOE(SPELL_SUPPRESSION);
-            CastSupressionOOC();
+            if (me->FindNearestCreature(NPC_CABAL_SPELLBINDER, 35.0f))
+            {
+                me->CastCustomSpell(SPELL_SUPPRESSION, SPELLVALUE_MAX_TARGETS, 5);
+                DoCastAOE(SPELL_SUPPRESSION);
+                CastSupressionOOC();
+            }
         }, 3600ms, 10900ms, GROUP_OOC_CAST);
     }
 
