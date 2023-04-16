@@ -664,24 +664,22 @@ void BotMgr::Update(uint32 diff)
         }
 
         if (partyCombat == false || _owner->InBattleground())
-        {
             ai->UpdateReviveTimer(diff);
 
-            //bot->IsAIEnabled = true;
+        //bot->IsAIEnabled = true;
 
-            if (ai->GetReviveTimer() <= diff)
+        if (ai->GetReviveTimer() <= diff)
+        {
+            if (bot->IsInMap(_owner) && !bot->IsAlive() && !ai->IsDuringTeleport() && _owner->IsAlive() && !_owner->IsInCombat() &&
+                !_owner->IsBeingTeleported() && !_owner->InArena() && !_owner->IsInFlight() &&
+                !_owner->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) &&
+                !_owner->HasInvisibilityAura() && !_owner->HasStealthAura())
             {
-                if (bot->IsInWorld() && !bot->IsAlive() && _owner->IsAlive() && !_owner->IsInCombat() &&
-                    !_owner->IsBeingTeleported() && !_owner->InArena() && !_owner->IsInFlight() &&
-                    !_owner->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) &&
-                    !_owner->HasInvisibilityAura() && !_owner->HasStealthAura())
-                {
-                    _reviveBot(bot);
-                    continue;
-                }
-
-                ai->SetReviveTimer(urand(1000, 5000));
+                _reviveBot(bot);
+                continue;
             }
+
+            ai->SetReviveTimer(urand(1000, 5000));
         }
 
         if (_owner->IsAlive() && (bot->IsAlive() || restrictBots) && !ai->IsTempBot() && !ai->IsDuringTeleport() &&
@@ -985,22 +983,18 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
     ASSERT(bot->GetBotAI());
     bot->GetBotAI()->AbortTeleport();
     bot->GetBotAI()->SetIsDuringTeleport(true);
-
     bot->GetBotAI()->KillEvents(true);
 
-    if (bot->GetVehicle())
-        bot->ExitVehicle();
-
-    if (bot->GetTransport())
-    {
-        bot->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
-        bot->GetTransport()->RemovePassenger(bot, true);
-    }
-
-    if (bot->IsInWorld())
-        bot->CastSpell(bot, COSMETIC_TELEPORT_EFFECT, true);
-
     BotMgr::AddDelayedTeleportCallback([bot, newMap, x, y, z, ori, quick, reset]() {
+        if (bot->GetVehicle())
+            bot->ExitVehicle();
+
+        if (bot->GetTransport())
+        {
+            bot->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+            bot->GetTransport()->RemovePassenger(bot, true);
+        }
+
         Map* mymap = bot->FindMap();
         if (mymap)
         {
@@ -1008,8 +1002,14 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
             bot->GetBotAI()->UnsummonAll();
 
             bot->InterruptNonMeleeSpells(true);
+
             if (bot->IsInWorld())
             {
+                if (Battleground* bg = bot->GetBotBG())
+                    bg->EventBotDroppedFlag(bot);
+
+                bot->CastSpell(bot, COSMETIC_TELEPORT_EFFECT, true);
+
                 if (!bot->IsFreeBot())
                     if (InstanceScript* iscr = bot->GetBotOwner()->GetInstanceScript())
                         iscr->OnNPCBotLeave(bot);
@@ -1033,61 +1033,53 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
         {
             bot->Relocate(x, y, z, ori);
             bot->SetMap(newMap);
-            bot->GetMap()->AddToMap(bot);
+            newMap->AddToMap(bot);
             if (reset)
                 bot->GetBotAI()->Reset();
             bot->GetBotAI()->SetIsDuringTeleport(false);
 
-            if (bot->GetMap()->GetEntry()->IsBattleground())
+            if (newMap->IsBattleground())
             {
-                //get player to get a bg, GetBG() may return invalid pointer
-                Player const* pl = nullptr;
-                for (auto const& ref : bot->GetMap()->GetPlayers())
-                {
-                    pl = ref.GetSource();
-                    if (pl)
-                        break;
-                }
-                Battleground* bg = pl ? pl->GetBattleground() : nullptr;
+                Battleground* bg = bot->GetBotAI()->GetBG();
                 if (!bg)
                 {
-                    if (bot->IsWandererBot() && newMap != mymap)
-                    {
-                        BotDataMgr::DespawnWandererBot(bot->GetEntry());
-                        return;
-                    }
+                    BotDataMgr::DespawnWandererBot(bot->GetEntry());
+                    return;
                 }
-                else
-                {
-                    if (newMap != mymap)
-                        bg->AddBot(bot);
 
-                    if (!bot->IsAlive())
+                if (newMap != mymap)
+                {
+                    //we teleport from base non-instanced map which normally doesn't exist
+                    ASSERT(mymap->GetPlayersCountExceptGMs() == 0);
+
+                    bg->AddBot(bot);
+                }
+
+                if (!bot->IsAlive())
+                {
+                    ObjectGuid shGuid = ObjectGuid::Empty;
+                    float mindist = 0.0f;
+                    for (ObjectGuid bgCreGuid : bg->BgCreatures)
                     {
-                        ObjectGuid shGuid = ObjectGuid::Empty;
-                        float mindist = 0.0f;
-                        for (ObjectGuid bgCreGuid : bg->BgCreatures)
+                        if (Creature const* bgCre = newMap->GetCreature(bgCreGuid))
                         {
-                            if (Creature const* bgCre = newMap->GetCreature(bgCreGuid))
+                            if (bgCre->IsSpiritService())
                             {
-                                if (bgCre->IsSpiritService())
+                                float dist = bot->GetExactDist2d(bgCre);
+                                if (shGuid == ObjectGuid::Empty || dist < mindist)
                                 {
-                                    float dist = bot->GetExactDist2d(bgCre);
-                                    if (shGuid == ObjectGuid::Empty || dist < mindist)
-                                    {
-                                        mindist = dist;
-                                        shGuid = bgCreGuid;
-                                    }
+                                    mindist = dist;
+                                    shGuid = bgCreGuid;
                                 }
                             }
                         }
-                        if (shGuid)
-                            bg->AddPlayerToResurrectQueue(shGuid, bot->GetGUID());
-                        else
-                        {
-                            LOG_ERROR("npcbots", "TeleportBot: Bot {} '{}' can't find SpiritHealer in bg {}!",
-                                bot->GetEntry(), bot->GetName().c_str(), bg->GetName().c_str());
-                        }
+                    }
+                    if (shGuid)
+                        bg->AddPlayerToResurrectQueue(shGuid, bot->GetGUID());
+                    else
+                    {
+                        LOG_ERROR("npcbots", "TeleportBot: Bot {} '{}' can't find SpiritHealer in bg {}!",
+                            bot->GetEntry(), bot->GetName().c_str(), bg->GetName().c_str());
                     }
                 }
             }

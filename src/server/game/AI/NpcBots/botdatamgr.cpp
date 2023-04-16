@@ -110,6 +110,9 @@ public:
 
                 queue.RemovePlayer(bot->GetGUID(), false);
 
+                //BG is set second time in Battleground::AddBot() but it's the same value so this is alright
+                bot->GetBotAI()->SetBG(bg);
+
                 TeamId teamId = BotDataMgr::GetTeamIdForFaction(bot->GetFaction());
                 BotMgr::TeleportBot(const_cast<Creature*>(bot), bgPlayer->GetMap(), bg->GetTeamStartPosition(teamId), true, false);
             }

@@ -31,6 +31,7 @@ struct PlayerClassLevelInfo;
 struct SpellNonMeleeDamage;
 
 class Aura;
+class Battleground;
 class DamageInfo;
 class GameObject;
 class Item;
@@ -165,6 +166,8 @@ class bot_ai : public CreatureAI
         void SetWanderer();
         WanderNode const* GetNextTravelNode(Position const* from, bool random) const;
         void OnWanderNodeReached();
+        Battleground* GetBG() const { return _bg; }
+        void SetBG(Battleground* bg) { _bg = bg; }
 
         static bool CCed(Unit const* target, bool root = false);
 
@@ -662,6 +665,7 @@ class bot_ai : public CreatureAI
         uint8 _baseLevel;
         WanderNode const* _travel_node_last;
         WanderNode const* _travel_node_cur;
+        Battleground* _bg;
 
         float _energyFraction;
 

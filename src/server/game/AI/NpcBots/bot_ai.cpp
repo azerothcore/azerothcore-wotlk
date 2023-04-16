@@ -261,6 +261,7 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature)
     _baseLevel = 0;
     _travel_node_last = nullptr;
     _travel_node_cur = nullptr;
+    _bg = nullptr;
 
     opponent = nullptr;
     disttarget = nullptr;
@@ -4299,7 +4300,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
         if (IsWanderer())
         {
             //Try to prioritize flag carrier
-            if (me->GetMap()->GetEntry()->IsBattlegroundOrArena() && me->GetMap()->GetPlayersCountExceptGMs() > 0)
+            if (me->GetMap()->IsBattlegroundOrArena())
             {
                 for (decltype(unitList)::iterator it = unitList.begin(); it != unitList.end(); ++it)
                 {
@@ -14597,15 +14598,12 @@ void bot_ai::JustDied(Unit* u)
 
     if (IsWanderer() && me->GetMap()->IsBattlegroundOrArena())
     {
-        if (me->GetMap()->GetPlayersCountExceptGMs() > 0)
+        if (Battleground const* bg = GetBG())
         {
-            if (Battleground const* bg = me->GetMap()->ToBattlegroundMap()->GetBG())
+            if (GraveyardStruct const* gy = bg->GetClosestGraveyardForBot(me))
             {
-                if (GraveyardStruct const* gy = bg->GetClosestGraveyardForBot(me))
-                {
-                    Position pos(gy->x, gy->y, gy->z, me->GetOrientation());
-                    Events.AddEventAtOffset([me = me, pos = pos]() { BotMgr::TeleportBot(me, me->GetMap(), &pos, true); }, 5s);
-                }
+                Position pos(gy->x, gy->y, gy->z, me->GetOrientation());
+                Events.AddEventAtOffset([me = me, pos = pos]() { BotMgr::TeleportBot(me, me->GetMap(), &pos, true); }, 5s);
             }
         }
     }
@@ -14655,10 +14653,9 @@ void bot_ai::KilledUnit(Unit* u)
     }
 
     //handle BG kill BvP, BvB
-    if (me->GetMap()->IsBattleground() && me->GetMap()->GetPlayersCountExceptGMs() > 0)
+    if (me->GetMap()->IsBattleground() && GetBG())
     {
-        Battleground* bg = me->GetMap()->ToBattlegroundMap()->GetBG();
-        ASSERT(bg);
+        Battleground* bg = GetBG();
         //could be removed from BG
         if (bg->GetBots().find(me->GetGUID()) != bg->GetBots().end() &&
             (u->IsNPCBot() ? bg->GetBots().find(u->GetGUID()) != bg->GetBots().end() :
@@ -16797,7 +16794,7 @@ void bot_ai::UpdateReviveTimer(uint32 diff)
         {
             BotMgr::ReviveBot(me);
 
-            if (IsWanderer())
+            if (IsWanderer() && me->GetMap()->GetEntry()->IsContinent())
             {
                 TeamId my_team = BotDataMgr::GetTeamIdForFaction(me->GetFaction());
                 GraveyardStruct const* gy = sGraveyard->GetClosestGraveyard((Player*)me, my_team == TEAM_HORDE ? TEAM_HORDE : TEAM_ALLIANCE, false);
@@ -17235,59 +17232,46 @@ void bot_ai::OnWanderNodeReached()
     ASSERT(me->IsInWorld());
     ASSERT(_travel_node_cur != nullptr, me->GetGUID().ToString().c_str());
 
-    if (me->GetMap()->IsBattleground())
+    if (Battleground* bg = GetBG())
     {
-        Battleground* bg = nullptr;
-        for (auto const& ref : me->GetMap()->GetPlayers())
+        if (_travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_DELIVER_TARGET) && IsFlagCarrier(me, bg->GetBgTypeID()))
         {
-            Player const* pl = ref.GetSource();
-            if (pl && pl->GetBattleground())
+            switch (bg->GetBgTypeID())
             {
-                bg = pl->GetBattleground();
-                break;
+                case BATTLEGROUND_WS:
+                    if (bg->GetBotTeamId(me->GetGUID()) == TEAM_ALLIANCE && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY))
+                        bg->HandleBotAreaTrigger(me, 3646);
+                    if (bg->GetBotTeamId(me->GetGUID()) == TEAM_HORDE && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY))
+                        bg->HandleBotAreaTrigger(me, 3647);
+                    break;
+                default:
+                    break;
             }
         }
-        if (bg)
+        if (_travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET) && !IsFlagCarrier(me, bg->GetBgTypeID()))
         {
-            if (_travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_DELIVER_TARGET) && IsFlagCarrier(me, bg->GetBgTypeID()))
+            switch (bg->GetBgTypeID())
             {
-                switch (bg->GetBgTypeID())
-                {
-                    case BATTLEGROUND_WS:
-                        if (bg->GetBotTeamId(me->GetGUID()) == TEAM_ALLIANCE && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY))
-                            bg->HandleBotAreaTrigger(me, 3646);
-                        if (bg->GetBotTeamId(me->GetGUID()) == TEAM_HORDE && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY))
-                            bg->HandleBotAreaTrigger(me, 3647);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if (_travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET) && !IsFlagCarrier(me, bg->GetBgTypeID()))
-            {
-                switch (bg->GetBgTypeID())
-                {
-                    case BATTLEGROUND_WS:
-                        if (bg->GetBotTeamId(me->GetGUID()) == TEAM_ALLIANCE && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY))
+                case BATTLEGROUND_WS:
+                    if (bg->GetBotTeamId(me->GetGUID()) == TEAM_ALLIANCE && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY))
+                    {
+                        if (GameObject* go = bg->GetBGObject(BG_WS_OBJECT_H_FLAG))
                         {
-                            if (GameObject* go = bg->GetBGObject(BG_WS_OBJECT_H_FLAG))
-                            {
-                                //TC_LOG_ERROR("npcbots", "OnWanderNodeReached: [WSG] Horde flag dist: %f", me->GetExactDist(go));
-                                bg->EventBotClickedOnFlag(me, go);
-                            }
+                            //TC_LOG_ERROR("npcbots", "OnWanderNodeReached: [WSG] Horde flag dist: %f", me->GetExactDist(go));
+                            bg->EventBotClickedOnFlag(me, go);
                         }
-                        if (bg->GetBotTeamId(me->GetGUID()) == TEAM_HORDE && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY))
+                    }
+                    if (bg->GetBotTeamId(me->GetGUID()) == TEAM_HORDE && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY))
+                    {
+                        if (GameObject* go = bg->GetBGObject(BG_WS_OBJECT_A_FLAG))
                         {
-                            if (GameObject* go = bg->GetBGObject(BG_WS_OBJECT_A_FLAG))
-                            {
-                                //TC_LOG_ERROR("npcbots", "OnWanderNodeReached: [WSG] Alliance flag dist: %f", me->GetExactDist(go));
-                                bg->EventBotClickedOnFlag(me, go);
-                            }
+                            //TC_LOG_ERROR("npcbots", "OnWanderNodeReached: [WSG] Alliance flag dist: %f", me->GetExactDist(go));
+                            bg->EventBotClickedOnFlag(me, go);
                         }
-                        break;
-                    default:
-                        break;
-                }
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }

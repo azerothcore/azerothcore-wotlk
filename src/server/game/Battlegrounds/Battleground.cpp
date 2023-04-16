@@ -443,11 +443,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
             if (guid.IsCreature())
             {
                 if (Creature const* cbot = BotDataMgr::FindBot(guid.GetEntry()))
-                {
-                    Creature* bot = const_cast<Creature*>(cbot);
-                    ASSERT(bot->IsInWorld());
-                    BotMgr::ReviveBot(bot);
-                }
+                    BotMgr::ReviveBot(const_cast<Creature*>(cbot));
                 continue;
             }
             //end npcbot
@@ -1184,6 +1180,7 @@ void Battleground::RemoveBotAtLeave(ObjectGuid guid)
 
     if (Creature const* bot = BotDataMgr::FindBot(guid.GetEntry()))
     {
+        bot->GetBotAI()->SetBG(nullptr);
         if (bot->IsWandererBot())
         {
             bot->GetBotAI()->canUpdate = false;
@@ -1343,6 +1340,7 @@ void Battleground::AddBot(Creature* bot)
 
     AddOrSetBotToCorrectBgGroup(bot, teamId);
 
+    bot->GetBotAI()->SetBG(this);
     if (GetStatus() != STATUS_IN_PROGRESS && bot->IsWandererBot())
         bot->GetBotAI()->SetBotCommandState(BOT_COMMAND_STAY);
 }

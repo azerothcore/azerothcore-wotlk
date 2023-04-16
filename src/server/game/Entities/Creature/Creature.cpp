@@ -4006,6 +4006,11 @@ bool Creature::IsWandererBot() const
     return bot_AI ? bot_AI->IsWanderer() : bot_pet_AI ? bot_pet_AI->IsWanderer() : false;
 }
 
+Battleground* Creature::GetBotBG() const
+{
+    return bot_AI ? bot_AI->GetBG() : nullptr;
+}
+
 uint32 Creature::GetBotRoles() const
 {
     return bot_AI ? bot_AI->GetBotRoles() : 0;
