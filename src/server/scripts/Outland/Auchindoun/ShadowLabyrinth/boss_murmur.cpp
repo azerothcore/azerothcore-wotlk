@@ -65,25 +65,7 @@ struct boss_murmur : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        if (!me->GetThreatMgr().GetThreatList().empty())
-        {
-            if (!scheduler.IsGroupScheduled(GROUP_RESONANCE))
-            {
-                if (ShouldCastResonance())
-                {
-                    scheduler.Schedule(5s, 5s, GROUP_RESONANCE, [this](TaskContext context)
-                    {
-                        if (ShouldCastResonance())
-                        {
-                            DoCastAOE(SPELL_RESONANCE);
-                            context.Repeat(5s);
-                        }
-                    });
-
-                }
-            }
-        }
-        else
+        if (me->GetThreatMgr().GetThreatList().empty())
         {
             BossAI::EnterEvadeMode(why);
         }
@@ -93,16 +75,18 @@ struct boss_murmur : public BossAI
     {
         if (Unit* victim = me->GetVictim())
         {
-            if (!victim->IsWithinMeleeRange(me))
+            if (!me->IsWithinMeleeRange(victim))
             {
-                if (Unit* victimTarget = victim->GetVictim())
-                {
-                    return victimTarget != me;
-                }
+                return true;
+            }
+
+            if (Unit* victimTarget = victim->GetVictim())
+            {
+                return victimTarget != me;
             }
         }
 
-        return false;
+        return true;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -134,6 +118,24 @@ struct boss_murmur : public BossAI
             {
                 context.Repeat(500ms);
             }
+        }).Schedule(1s, [this](TaskContext context)
+        {
+            if (ShouldCastResonance())
+            {
+                if (!scheduler.IsGroupScheduled(GROUP_RESONANCE))
+                {
+                    scheduler.Schedule(5s, 5s, GROUP_RESONANCE, [this](TaskContext context)
+                    {
+                        if (ShouldCastResonance())
+                        {
+                            DoCastAOE(SPELL_RESONANCE);
+                            context.Repeat(5s);
+                        }
+                    });
+                }
+            }
+
+            context.Repeat();
         });
 
         if (IsHeroic())
