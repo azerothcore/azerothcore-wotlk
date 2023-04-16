@@ -24,6 +24,7 @@ enum Murmur
 {
     EMOTE_SONIC_BOOM            = 0,
 
+    SPELL_SUPPRESSION               = 33332,
     SPELL_SHOCKWAVE                 = 33686,
     SPELL_SHOCKWAVE_SERVERSIDE      = 33673,
     SPELL_RESONANCE                 = 33657,
@@ -38,7 +39,8 @@ enum Murmur
     SPELL_MURMURS_TOUCH_N           = 33711,
     SPELL_MURMURS_TOUCH_H           = 38794,
 
-    GROUP_RESONANCE                 = 1
+    GROUP_RESONANCE                 = 1,
+    GROUP_OOC_CAST                  = 2
 };
 
 struct boss_murmur : public BossAI
@@ -58,6 +60,15 @@ struct boss_murmur : public BossAI
         _Reset();
         me->SetHealth(me->CountPctFromMaxHealth(40));
         me->ResetPlayerDamageReq();
+        CastSupressionOOC();
+    }
+
+    void CastSupressionOOC()
+    {
+        me->m_Events.AddEventAtOffset([this] {
+            DoCastAOE(SPELL_SUPPRESSION);
+            CastSupressionOOC();
+        }, 3600ms, 10900ms, GROUP_OOC_CAST);
     }
 
     bool CanAIAttack(Unit const* victim) const override
@@ -152,6 +163,8 @@ struct boss_murmur : public BossAI
                 context.Repeat(10s, 20s);
             });
         }
+
+        me->m_Events.CancelEventGroup(GROUP_OOC_CAST);
     }
 };
 
