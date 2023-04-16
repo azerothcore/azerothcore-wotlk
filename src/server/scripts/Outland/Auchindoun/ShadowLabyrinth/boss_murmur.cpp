@@ -69,20 +69,40 @@ struct boss_murmur : public BossAI
         {
             if (!scheduler.IsGroupScheduled(GROUP_RESONANCE))
             {
-                scheduler.Schedule(5s, 5s, GROUP_RESONANCE, [this](TaskContext context)
+                if (ShouldCastResonance())
                 {
-                    if (!me->SelectNearestPlayer(5.0f))
+                    scheduler.Schedule(5s, 5s, GROUP_RESONANCE, [this](TaskContext context)
                     {
-                        DoCastAOE(SPELL_RESONANCE);
-                        context.Repeat(5s);
-                    }
-                });
+                        if (ShouldCastResonance())
+                        {
+                            DoCastAOE(SPELL_RESONANCE);
+                            context.Repeat(5s);
+                        }
+                    });
+
+                }
             }
         }
         else
         {
             BossAI::EnterEvadeMode(why);
         }
+    }
+
+    bool ShouldCastResonance()
+    {
+        if (Unit* victim = me->GetVictim())
+        {
+            if (!victim->IsWithinMeleeRange(me))
+            {
+                if (Unit* victimTarget = victim->GetVictim())
+                {
+                    return victimTarget != me;
+                }
+            }
+        }
+
+        return false;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
