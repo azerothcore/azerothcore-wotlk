@@ -36,6 +36,39 @@ OutdoorPvPNA::OutdoorPvPNA()
 HalaaNPCS halaaNPCHorde;
 HalaaNPCS halaaNPCAlly;
 
+void OutdoorPvPNA::HandleKill(Player* killer, Unit* killed)
+{
+    if (Group* group = killer->GetGroup())
+    {
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* groupGuy = itr->GetSource();
+
+            if (!groupGuy)
+                continue;
+
+            // skip if too far away
+            if (!groupGuy->IsAtGroupRewardDistance(killed) && killer != groupGuy)
+                continue;
+
+            // creature kills must be notified, even if not inside objective / not outdoor pvp active
+            // player kills only count if active and inside objective
+            if ((groupGuy->IsOutdoorPvPActive() && groupGuy->GetAreaId() == NA_HALAA_ZONE_ID) || killed->GetTypeId() == TYPEID_UNIT)
+            {
+                HandleKillImpl(groupGuy, killed);
+            }
+        }
+    }
+    else
+    {
+        // creature kills must be notified, even if not inside objective / not outdoor pvp active
+        if (killer && ((killer->IsOutdoorPvPActive() && killer->ToPlayer()->GetAreaId() == NA_HALAA_ZONE_ID) || killed->GetTypeId() == TYPEID_UNIT))
+        {
+            HandleKillImpl(killer, killed);
+        }
+    }
+}
+
 void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 {
     if (killed->GetTypeId() == TYPEID_PLAYER && player->GetTeamId() != killed->ToPlayer()->GetTeamId())
