@@ -2692,28 +2692,45 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
             {
-                if (IsCreature(target))
+                if (Creature* creature = target->ToCreature())
                 {
-                    if (Creature* target = target->ToCreature())
+                    if (e.action.setGuid.invokerGUID)
                     {
-                        if (e.action.setGuid.invokerGUID)
+                        if (Unit* invoker = GetLastInvoker())
                         {
-                            if (Unit* invoker = GetLastInvoker())
-                            {
-                                target->AI()->SetGUID(invoker->GetGUID(), e.action.setGuid.index);
-
-                            }
+                            creature->AI()->SetGUID(invoker->GetGUID(), e.action.setGuid.index);
                         }
-                        else
+                    }
+                    else
+                    {
+                        if (me)
                         {
-                            if (me)
-                            {
-                                target->AI()->SetGUID(me->GetGUID(), e.action.setGuid.index);
-                            }
-                            else if (go)
-                            {
-                                target->AI()->SetGUID(go->GetGUID(), e.action.setGuid.index);
-                            }
+                            creature->AI()->SetGUID(me->GetGUID(), e.action.setGuid.index);
+                        }
+                        else if (go)
+                        {
+                            creature->AI()->SetGUID(go->GetGUID(), e.action.setGuid.index);
+                        }
+                    }
+                }
+                else if (GameObject* object = target->ToGameObject())
+                {
+                    if (e.action.setGuid.invokerGUID)
+                    {
+                        if (Unit* invoker = GetLastInvoker())
+                        {
+                            object->AI()->SetGUID(invoker->GetGUID(), e.action.setGuid.index);
+                        }
+                    }
+                    else
+                    {
+                        if (me)
+                        {
+                            object->AI()->SetGUID(me->GetGUID(), e.action.setGuid.index);
+                        }
+                        else if (go)
+                        {
+                            object->AI()->SetGUID(go->GetGUID(), e.action.setGuid.index);
                         }
                     }
                 }
