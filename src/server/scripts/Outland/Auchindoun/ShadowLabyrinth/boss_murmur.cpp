@@ -140,7 +140,7 @@ public:
 
     void RecalculateDamage()
     {
-        SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(90));
+        SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(80));
     }
 
     void Register() override
