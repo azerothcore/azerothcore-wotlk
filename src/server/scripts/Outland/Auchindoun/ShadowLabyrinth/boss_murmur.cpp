@@ -42,6 +42,11 @@ struct boss_murmur : public BossAI
     boss_murmur(Creature* creature) : BossAI(creature, DATA_MURMUR)
     {
         SetCombatMovement(false);
+
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void Reset() override
@@ -49,6 +54,11 @@ struct boss_murmur : public BossAI
         _Reset();
         me->SetHealth(me->CountPctFromMaxHealth(40));
         me->ResetPlayerDamageReq();
+    }
+
+    bool CanAIAttack(Unit const* victim) const override
+    {
+        return me->IsWithinMeleeRange(victim);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -102,31 +112,6 @@ struct boss_murmur : public BossAI
                 context.Repeat(10s, 20s);
             });
         }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        scheduler.Update(diff);
-
-        if (!me->isAttackReady())
-            return;
-
-        if (!me->IsWithinMeleeRange(me->GetVictim()))
-        {
-            ThreatContainer::StorageType threatlist = me->GetThreatMgr().GetThreatList();
-            for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
-                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
-                    if (target->IsAlive() && me->IsWithinMeleeRange(target))
-                    {
-                        me->TauntApply(target);
-                        break;
-                    }
-        }
-
-        DoMeleeAttackIfReady();
     }
 };
 
