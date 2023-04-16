@@ -585,7 +585,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
             {
                 m_capturable = true;
                 m_RespawnTimer = NA_RESPAWN_TIME;
-                //SEND MESSAGE TO LOCALDEFENSE
+                sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_NA_DEFENSELESS));
             }
             else
                 m_capturable = false;
