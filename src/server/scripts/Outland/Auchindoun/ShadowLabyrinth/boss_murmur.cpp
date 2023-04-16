@@ -34,7 +34,9 @@ enum Murmur
     SPELL_SONIC_BOOM_EFFECT_N       = 38795,
     SPELL_SONIC_BOOM_EFFECT_H       = 33666,
     SPELL_MURMURS_TOUCH_N           = 33711,
-    SPELL_MURMURS_TOUCH_H           = 38794
+    SPELL_MURMURS_TOUCH_H           = 38794,
+
+    GROUP_RESONANCE                 = 1
 };
 
 struct boss_murmur : public BossAI
@@ -61,6 +63,28 @@ struct boss_murmur : public BossAI
         return me->IsWithinMeleeRange(victim);
     }
 
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (!me->GetThreatMgr().GetThreatList().empty())
+        {
+            if (!scheduler.IsGroupScheduled(GROUP_RESONANCE))
+            {
+                scheduler.Schedule(5s, 5s, GROUP_RESONANCE, [this](TaskContext context)
+                {
+                    if (!me->SelectNearestPlayer(5.0f))
+                    {
+                        DoCastAOE(SPELL_RESONANCE);
+                        context.Repeat(5s);
+                    }
+                });
+            }
+        }
+        else
+        {
+            BossAI::EnterEvadeMode(why);
+        }
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
@@ -80,14 +104,6 @@ struct boss_murmur : public BossAI
         {
             DoCastRandomTarget(DUNGEON_MODE(SPELL_MURMURS_TOUCH_N, SPELL_MURMURS_TOUCH_H));
             context.Repeat(25s, 35s);
-        }).Schedule(5s, [this](TaskContext context)
-        {
-            if (!me->IsWithinMeleeRange(me->GetVictim()))
-            {
-                DoCastVictim(SPELL_RESONANCE);
-            }
-
-            context.Repeat(5000ms);
         }).Schedule(15s, 30s, [this](TaskContext context)
         {
             if (DoCastRandomTarget(SPELL_MAGNETIC_PULL, 0, 80.0f) == SPELL_CAST_OK)
