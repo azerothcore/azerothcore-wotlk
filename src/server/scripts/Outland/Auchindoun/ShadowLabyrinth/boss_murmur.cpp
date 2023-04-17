@@ -231,9 +231,28 @@ class spell_murmur_touch : public AuraScript
     }
 };
 
+class spell_murmur_sonic_boom_effect : public SpellScript
+{
+    PrepareSpellScript(spell_murmur_sonic_boom_effect)
+
+public:
+    spell_murmur_sonic_boom_effect() : SpellScript() { }
+
+    void RecalculateDamage()
+    {
+        SetHitDamage(GetHitUnit()->CountPctFromCurHealth(80));
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_murmur_sonic_boom_effect::RecalculateDamage);
+    }
+};
+
 void AddSC_boss_murmur()
 {
     RegisterShadowLabyrinthCreatureAI(boss_murmur);
     RegisterSpellScript(spell_murmur_thundering_storm);
     RegisterSpellScript(spell_murmur_touch);
+    RegisterSpellScript(spell_murmur_sonic_boom_effect);
 }
