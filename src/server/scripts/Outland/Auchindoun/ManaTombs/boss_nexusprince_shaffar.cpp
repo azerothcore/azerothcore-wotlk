@@ -196,7 +196,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(6000, 9000));
+            events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(26500, 30500));
             events.ScheduleEvent(EVENT_STOMP, urand(12000, 18000));
         }
 
@@ -214,11 +214,11 @@ public:
                     case EVENT_DOUBLE_BREATH:
                         if (me->IsWithinDist(me->GetVictim(), ATTACK_DISTANCE))
                             DoCastVictim(SPELL_DOUBLE_BREATH);
-                        events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(6000, 9000));
+                        events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(10000, 20000));
                         break;
                     case EVENT_STOMP:
-                        DoCastAOE(SPELL_STOMP, false);
-                        DoCastAOE(SPELL_STOMP_KNOCKBACK, false);
+                        DoCastAOE(SPELL_STOMP);
+                        DoCastAOE(SPELL_STOMP_KNOCKBACK);
                         events.ScheduleEvent(EVENT_STOMP, urand(14000, 24000));
                         break;
                     default:
