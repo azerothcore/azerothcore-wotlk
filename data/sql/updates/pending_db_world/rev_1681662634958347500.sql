@@ -20,4 +20,4 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (13, 1, 33329, 0, 2, 31, 0, 3, 18639, 146227, 0, 0, 0, '', 'Murmur\'s Wrath (33329) only targets a set of guids'),
 (13, 1, 33329, 0, 3, 31, 0, 3, 18634, 146228, 0, 0, 0, '', 'Murmur\'s Wrath (33329) only targets a set of guids'),
 (13, 1, 33329, 0, 4, 31, 0, 3, 18639, 146229, 0, 0, 0, '', 'Murmur\'s Wrath (33329) only targets a set of guids'),
-(13, 1, 33329, 0, 3, 31, 0, 5, 18634, 146209, 0, 0, 0, '', 'Murmur\'s Wrath (33329) only targets a set of guids');
+(13, 1, 33329, 0, 5, 31, 0, 3, 18634, 146209, 0, 0, 0, '', 'Murmur\'s Wrath (33329) only targets a set of guids');
