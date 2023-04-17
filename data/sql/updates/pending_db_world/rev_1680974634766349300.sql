@@ -577,7 +577,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+29), 0, 1004, 1005, 61, 1, 100, 0, 0, 0, 0, 0, 0, 12, 17083, 4, 300000, 0, 0, 0, 8, 0, 0, 0, 0, 83.530716, 250.53445, -13.113142, 3.607418537139892578, 'Shattered Hand Legionnaire - On Data Set 1 1 - Summon Creature \'Fel Orc Convert\' (Phase 1)'),
 (-(@CGUID+29), 0, 1005, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 - Set Event Phase 2 (Do Not Allow Adds to Spawn)'),
 (-(@CGUID+29), 0, 1006, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670011, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Respawn - Run Script'),
-(-(@CGUID+29), 0, 1007, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 121, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Respawn - Missing comment for action_type 121'),
+(-(@CGUID+29), 0, 1007, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 121, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Respawn - Set Sight Range to 100y'),
 (-(@CGUID+29), 0, 1008, 1009, 10, 0, 100, 267, 0, 90, 0, 0, 1, 80, 1670012, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Within 0-90 Range Out of Combat LoS - Run Script'),
 (-(@CGUID+29), 0, 1009, 1010, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 3, 2, 0, 0, 0, 0, 9, 0, 0, 90, 1, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Linked - Set Data 3 2 to Start Group 2 & 3 Spawns'),
 (-(@CGUID+29), 0, 1010, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1670006, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Linked - Start Waypoint'),
