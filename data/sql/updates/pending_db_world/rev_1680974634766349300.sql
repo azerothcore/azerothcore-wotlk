@@ -475,7 +475,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 -- Awoken Add Point: 69.452446 239.98776 -13.193644
 */
 
-UPDATE `creature_template` SET `flags_extra` = `flags_extra`|67108864 WHERE (`entry` IN (16700, 16699, 16704, 17420, 16507, 17694, 16523, 16594));
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|67108864 WHERE (`entry` IN (16700, 16699, 16704, 17420, 16507, 17694, 16523, 16594, 16593));
 
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-(@CGUID+0),-(@CGUID+1),-(@CGUID+2),-(@CGUID+3),-(@CGUID+4),-(@CGUID+5),-(@CGUID+10),-(@CGUID+8),-(@CGUID+9),-(@CGUID+19), -(@CGUID+20), -(@CGUID+21),-(@CGUID+22),-(@CGUID+23),-(@CGUID+24),-(@CGUID+25),-(@CGUID+26),-(@CGUID+27),-(@CGUID+28),-(@CGUID+29),-(@CGUID+30),-(@CGUID+31),-(@CGUID+32),-(@CGUID+33),-(@CGUID+34),-(@CGUID+35),-(@CGUID+36),-(@CGUID+37),-(@CGUID+38),-(@CGUID+39),-(@CGUID+40),-(@CGUID+41),-(@CGUID+42),-(@CGUID+43),-(@CGUID+44),-(@CGUID+45));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -642,41 +642,21 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+41), 0, 1002, 0, 38, 0, 100, 0, 4, 3, 0, 0, 0, 5, 153, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 4 3 - Play Emote 153 (OneShotLaughNoSheathe)'),
 (-(@CGUID+41), 0, 1003, 0, 38, 0, 100, 0, 4, 4, 0, 0, 0, 5, 113, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 4 4 - Play Emote 113 (OneShotSaluteNoSheath)'),
 -- Sleeping Orcs
-(-(@CGUID+42), 0, 0, 0, 9, 0, 100, 0, 0, 5, 12000, 21000, 0, 11, 36020, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - Within 0-5 Range - Cast \'Curse of the Shattered Hand\''),
-(-(@CGUID+42), 0, 1, 0, 13, 0, 100, 0, 6000, 15000, 0, 0, 0, 11, 36033, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Victim Casting - Cast \'Kick\''),
-(-(@CGUID+42), 0, 2, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Say Line 1'),
-(-(@CGUID+42), 0, 3, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Just Died - Set Data 1 1 on Closest Legionnaire'),
 (-(@CGUID+42), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670023, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reset - Run Reset Script'),
 (-(@CGUID+42), 0, 1002, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Run Aggro Script'),
 (-(@CGUID+42), 0, 1003, 1004, 38, 1, 100, 0, 4, 1, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 4 1 - Run Aggro Script AND Move to Pos'),
 (-(@CGUID+42), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.452446, 239.98776, -13.193644, 0, 'Shattered Hand Brawler - Linked - Move To Position'),
 (-(@CGUID+42), 0, 1005, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reached Point - Set In Combat With Zone'),
-(-(@CGUID+43), 0, 0, 0, 9, 0, 100, 0, 0, 5, 12000, 21000, 0, 11, 36020, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - Within 0-5 Range - Cast \'Curse of the Shattered Hand\''),
-(-(@CGUID+43), 0, 1, 0, 13, 0, 100, 0, 6000, 15000, 0, 0, 0, 11, 36033, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Victim Casting - Cast \'Kick\''),
-(-(@CGUID+43), 0, 2, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Say Line 1'),
-(-(@CGUID+43), 0, 3, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Just Died - Set Data 1 1 on Closest Legionnaire'),
 (-(@CGUID+43), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670023, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reset - Run Reset Script'),
 (-(@CGUID+43), 0, 1002, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Run Aggro Script'),
 (-(@CGUID+43), 0, 1003, 1004, 38, 1, 100, 0, 4, 1, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 4 1 - Run Aggro Script AND Move to Pos'),
 (-(@CGUID+43), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.452446, 239.98776, -13.193644, 0, 'Shattered Hand Brawler - Linked - Move To Position'),
 (-(@CGUID+43), 0, 1005, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reached Point - Set In Combat With Zone'),
-(-(@CGUID+44), 0, 0, 0, 9, 0, 100, 0, 0, 5, 12000, 21000, 0, 11, 36020, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - Within 0-5 Range - Cast \'Curse of the Shattered Hand\''),
-(-(@CGUID+44), 0, 1, 0, 13, 0, 100, 0, 6000, 15000, 0, 0, 0, 11, 36033, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Victim Casting - Cast \'Kick\''),
-(-(@CGUID+44), 0, 2, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Say Line 1'),
-(-(@CGUID+44), 0, 3, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Just Died - Set Data 1 1 on Closest Legionnaire'),
 (-(@CGUID+44), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670023, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reset - Run Reset Script'),
 (-(@CGUID+44), 0, 1002, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Run Aggro Script'),
 (-(@CGUID+44), 0, 1003, 1004, 38, 1, 100, 0, 4, 1, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 4 1 - Run Aggro Script AND Move to Pos'),
 (-(@CGUID+44), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.452446, 239.98776, -13.193644, 0, 'Shattered Hand Brawler - Linked - Move To Position'),
 (-(@CGUID+44), 0, 1005, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Reached Point - Set In Combat With Zone'),
-(-(@CGUID+45), 0, 0, 0, 0, 0, 100, 0, 0, 0, 2500, 2500, 0, 11, 15587, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Mind Blast\''),
-(-(@CGUID+45), 0, 1, 0, 0, 0, 100, 2, 5000, 5000, 25000, 25000, 0, 11, 35944, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Power Word: Shield\' (Normal Dungeon)'),
-(-(@CGUID+45), 0, 2, 0, 0, 0, 100, 4, 5000, 5000, 25000, 25000, 0, 11, 36052, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Power Word: Shield\' (Heroic Dungeon)'),
-(-(@CGUID+45), 0, 3, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 11, 30479, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - In Combat - Cast \'Resist Shadow\' (No Repeat)'),
-(-(@CGUID+45), 0, 4, 0, 2, 0, 100, 2, 0, 60, 7000, 7000, 0, 11, 15585, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - Between 0-60% Health - Cast \'Prayer of Healing\' (Normal Dungeon)'),
-(-(@CGUID+45), 0, 5, 0, 2, 0, 100, 4, 0, 60, 7000, 7000, 0, 11, 35943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - Between 0-60% Health - Cast \'Prayer of Healing\' (Heroic Dungeon)'),
-(-(@CGUID+45), 0, 6, 0, 4, 0, 15, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Aggro - Say Line 1 (No Repeat)'),
-(-(@CGUID+45), 0, 7, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Just Died - Set Data 1 1 on Closest Legionnaire'),
 (-(@CGUID+45), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670023, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Reset - Run Reset Script'),
 (-(@CGUID+45), 0, 1002, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Aggro - Run Aggro Script'),
 (-(@CGUID+45), 0, 1003, 1004, 38, 1, 100, 0, 4, 1, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 4 1 - Run Aggro Script AND Move to Pos'),
