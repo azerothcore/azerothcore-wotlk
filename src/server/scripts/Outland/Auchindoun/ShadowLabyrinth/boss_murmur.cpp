@@ -180,11 +180,11 @@ struct boss_murmur : public BossAI
             scheduler.Schedule(5s, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_THUNDERING_STORM);
-                context.Repeat(6050ms, 10000ms);
+                context.Repeat(6050ms, 10s);
             }).Schedule(3650ms, 9150ms, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_SONIC_SHOCK);
-                context.Repeat(9150ms, 10000ms);
+                context.Repeat(9150ms, 10s);
             });
         }
 
