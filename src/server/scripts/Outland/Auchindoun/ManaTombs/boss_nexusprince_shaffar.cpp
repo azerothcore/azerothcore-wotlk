@@ -225,10 +225,8 @@ public:
                         break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
-
     private:
         EventMap events;
     };
