@@ -170,8 +170,12 @@ public:
 
 enum Yor
 {
-    SPELL_DOUBLE_BREATH = 38361,
-    EVENT_DOUBLE_BREATH = 1
+    SPELL_DOUBLE_BREATH     = 38361,
+    SPELL_STOMP             = 34716,
+    SPELL_STOMP_KNOCKBACK   = 36405,
+
+    EVENT_DOUBLE_BREATH     = 1,
+    EVENT_STOMP             = 2
 };
 
 class npc_yor : public CreatureScript
@@ -193,6 +197,7 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(6000, 9000));
+            events.ScheduleEvent(EVENT_STOMP, urand(12000, 18000));
         }
 
         void UpdateAI(uint32 diff) override
@@ -210,6 +215,11 @@ public:
                         if (me->IsWithinDist(me->GetVictim(), ATTACK_DISTANCE))
                             DoCastVictim(SPELL_DOUBLE_BREATH);
                         events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(6000, 9000));
+                        break;
+                    case EVENT_STOMP:
+                        DoCastAOE(SPELL_STOMP, false);
+                        DoCastAOE(SPELL_STOMP_KNOCKBACK, false);
+                        events.ScheduleEvent(EVENT_STOMP, urand(14000, 24000));
                         break;
                     default:
                         break;
