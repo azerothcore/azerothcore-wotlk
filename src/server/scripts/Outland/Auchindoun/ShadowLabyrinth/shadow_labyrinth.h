@@ -31,8 +31,9 @@ enum slData
     TYPE_HELLMAW                    = 1,
     DATA_BLACKHEARTTHEINCITEREVENT  = 2,
     DATA_GRANDMASTERVORPILEVENT     = 3,
-    DATA_MURMUREVENT                = 4,
-    MAX_ENCOUNTER                   = 5
+    DATA_MURMUR                     = 4,
+    DATA_MURMUREVENT                = 5,
+    MAX_ENCOUNTER                   = 6
 };
 
 enum slNPCandGO
@@ -49,5 +50,7 @@ inline AI* GetShadowLabyrinthAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, ShadowLabyrinthScriptName);
 }
+
+#define RegisterShadowLabyrinthCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetShadowLabyrinthAI)
 
 #endif
