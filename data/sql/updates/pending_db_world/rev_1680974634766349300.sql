@@ -475,7 +475,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 -- Awoken Add Point: 69.452446 239.98776 -13.193644
 */
 
-UPDATE `creature_template` SET `flags_extra` = `flags_extra`|67108864 WHERE (`entry` IN (16700, 16699, 16704, 17420, 16507, 17694, 16523, 16594, 16593));
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|67108864 WHERE (`entry` IN (16700, 16699, 16704, 17420, 16507, 17694, 16523, 16594, 16593, 20593, 20591, 20582, 20576, 20590, 20589, 20594, 20587, 20577));
 
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-(@CGUID+0),-(@CGUID+1),-(@CGUID+2),-(@CGUID+3),-(@CGUID+4),-(@CGUID+5),-(@CGUID+10),-(@CGUID+8),-(@CGUID+9),-(@CGUID+19), -(@CGUID+20), -(@CGUID+21),-(@CGUID+22),-(@CGUID+23),-(@CGUID+24),-(@CGUID+25),-(@CGUID+26),-(@CGUID+27),-(@CGUID+28),-(@CGUID+29),-(@CGUID+30),-(@CGUID+31),-(@CGUID+32),-(@CGUID+33),-(@CGUID+34),-(@CGUID+35),-(@CGUID+36),-(@CGUID+37),-(@CGUID+38),-(@CGUID+39),-(@CGUID+40),-(@CGUID+41),-(@CGUID+42),-(@CGUID+43),-(@CGUID+44),-(@CGUID+45));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
