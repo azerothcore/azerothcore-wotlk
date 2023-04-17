@@ -4511,7 +4511,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Acid Spit
     ApplySpellFix({ 34290 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(0);
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
