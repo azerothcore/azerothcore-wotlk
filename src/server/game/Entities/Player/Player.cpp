@@ -1987,7 +1987,8 @@ void Player::RegenerateHealth()
         addvalue = OCTRegenHPPerSpirit() * HealthIncreaseRate;
 
         AuraEffectList const& mModHealthRegenPct = GetAuraEffectsByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
-        for (AuraEffectList::const_iterator i = mModHealthRegenPct.begin(); i != mModHealthRegenPct.end(); ++i) {
+        for (AuraEffectList::const_iterator i = mModHealthRegenPct.begin(); i != mModHealthRegenPct.end(); ++i)
+        {
             AddPct(addvalue, (*i)->GetAmount());
         }
 
