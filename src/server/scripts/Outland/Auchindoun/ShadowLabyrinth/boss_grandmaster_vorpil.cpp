@@ -179,7 +179,6 @@ public:
 
             events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(9700, 20000));
             events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 36400);
-            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 37400);
             events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 10900);
             if (IsHeroic())
             {
@@ -235,12 +234,12 @@ public:
                                     player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
 
                         me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
-                        events.RepeatEvent(36400);
+                        events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 1000);
+                        events.RepeatEvent(urand(36400, 44950));
                         break;
                     }
                 case EVENT_SPELL_RAIN_OF_FIRE:
                     me->CastSpell(me, DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
-                    events.RepeatEvent(36400);
                     events.DelayEvents(6000);
                     break;
             }
