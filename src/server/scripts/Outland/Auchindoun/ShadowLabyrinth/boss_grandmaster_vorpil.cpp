@@ -177,13 +177,13 @@ public:
             Talk(SAY_AGGRO);
             summonPortals();
 
-            events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(7000, 14000));
-            events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 45000);
-            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 46000);
+            events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(9700, 20000));
+            events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 36400);
+            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 37400);
             events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 10900);
             if (IsHeroic())
             {
-                events.ScheduleEvent(EVENT_SPELL_BANISH, 17000);
+                events.ScheduleEvent(EVENT_SPELL_BANISH, urand(17000, 28000));
             }
             if (instance)
             {
@@ -212,12 +212,12 @@ public:
             {
                 case EVENT_SPELL_SHADOWBOLT:
                     me->CastSpell(me, SPELL_SHADOWBOLT_VOLLEY, false);
-                    events.RepeatEvent(urand(15000, 30000));
+                    events.RepeatEvent(urand(9700, 20000));
                     break;
                 case EVENT_SPELL_BANISH:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30, false))
                         me->CastSpell(target, SPELL_BANISH, false);
-                    events.RepeatEvent(16000);
+                    events.RepeatEvent(urand(17000, 28000));
                     break;
                 case EVENT_SUMMON_TRAVELER:
                     spawnVoidTraveler();
@@ -235,12 +235,12 @@ public:
                                     player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
 
                         me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
-                        events.RepeatEvent(24000);
+                        events.RepeatEvent(36400);
                         break;
                     }
                 case EVENT_SPELL_RAIN_OF_FIRE:
                     me->CastSpell(me, DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
-                    events.RepeatEvent(24000);
+                    events.RepeatEvent(36400);
                     events.DelayEvents(6000);
                     break;
             }
