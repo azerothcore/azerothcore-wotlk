@@ -31,6 +31,8 @@ enum Murmur
     SPELL_MAGNETIC_PULL             = 33689,
     SPELL_SONIC_SHOCK               = 38797,
     SPELL_THUNDERING_STORM          = 39365,
+    SPELL_MURMUR_WRATH_AOE          = 33329,
+    SPELL_MURMUR_WRATH              = 33331,
 
     SPELL_SONIC_BOOM_CAST_N         = 33923,
     SPELL_SONIC_BOOM_CAST_H         = 38796,
@@ -40,7 +42,9 @@ enum Murmur
     SPELL_MURMURS_TOUCH_H           = 38794,
 
     GROUP_RESONANCE                 = 1,
-    GROUP_OOC_CAST                  = 2
+    GROUP_OOC_CAST                  = 2,
+
+    GUID_MURMUR_NPCS                = 1
 };
 
 enum Creatures
@@ -109,6 +113,17 @@ struct boss_murmur : public BossAI
         }
 
         return true;
+    }
+
+    void SetGUID(ObjectGuid guid, int32 index) override
+    {
+        if (index == GUID_MURMUR_NPCS)
+        {
+            if (Creature* creature = ObjectAccessor::GetCreature(*me, guid))
+            {
+                DoCast(creature, SPELL_MURMUR_WRATH, true);
+            }
+        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
