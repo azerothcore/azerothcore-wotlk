@@ -77,8 +77,7 @@ struct boss_murmur : public BossAI
         me->m_Events.AddEventAtOffset([this] {
             if (me->FindNearestCreature(NPC_CABAL_SPELLBINDER, 35.0f))
             {
-                me->CastCustomSpell(SPELL_SUPPRESSION, SPELLVALUE_MAX_TARGETS, 5);
-                DoCastAOE(SPELL_SUPPRESSION);
+                me->CastCustomSpell(SPELL_SUPPRESSION, SPELLVALUE_MAX_TARGETS, 5, (Unit*)nullptr, false);
                 CastSupressionOOC();
             }
         }, 3600ms, 10900ms, GROUP_OOC_CAST);
