@@ -1,3 +1,4 @@
+-- DB update 2023_04_15_00 -> 2023_04_17_00
 --
 DELETE FROM `creature_template_movement` WHERE `CreatureId` IN (18708, 20657);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Rooted`, `Flight`) VALUES
