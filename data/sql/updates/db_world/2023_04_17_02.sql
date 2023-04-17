@@ -1,3 +1,4 @@
+-- DB update 2023_04_17_01 -> 2023_04_17_02
 -- 184906 (Power Converter)
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 184906;
 
