@@ -148,13 +148,13 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+128, 17670, 540, 3714, 3714, 3, 0, 444.895, 60.1288, 1.92657, 2.91832, 7200, 0, 0, 46924),
 (@CGUID+129, 17669, 540, 3714, 3714, 3, 0, 444.895, 60.1288, 1.92657, 2.91832, 7200, 0, 0, 46924),
 (@CGUID+130, 17669, 540, 3714, 3714, 3, 0, 444.895, 60.1288, 1.92657, 2.91832, 7200, 0, 0, 46924),
-(@CGUID+131, 16700, 540, 3714, 3714, 3, 0, 522.331, 226.306, 1.9386, 3.436, 7200, 0, 0, 46924),
+(@CGUID+131, 16700, 540, 3714, 3714, 3, 0, 528.1561, 228.07251, 1.9335356, 3.436, 7200, 0, 0, 46924),
 (@CGUID+132, 16594, 540, 3714, 3714, 3, 0, 525.954, 224.065, 2.01948, 2.00713, 7200, 0, 0, 46924),
 (@CGUID+133, 17694, 540, 3714, 3714, 3, 0, 523.479, 222.138, 2.01358, 1.76278, 7200, 0, 0, 46924),
 (@CGUID+134, 17420, 540, 3714, 3714, 3, 0, 528.68, 223.405, 2.02312, 2.1293, 7200, 0, 0, 46924),
 (@CGUID+135, 16699, 540, 3714, 3714, 3, 0, 525.762, 220.791, 2.01693, 1.91986, 7200, 0, 0, 46924),
 (@CGUID+136, 17420, 540, 3714, 3714, 3, 0, 522.697, 218.956, 2.00999, 1.71042, 7200, 0, 0, 46924),
-(@CGUID+137, 16700, 540, 3714, 3714, 3, 0, 522.076, 159.033, 1.9296, 6.00745, 7200, 0, 0, 46924),
+(@CGUID+137, 16700, 540, 3714, 3714, 3, 0, 511.35275, 162.06738, 1.9312072, 6.00745, 7200, 0, 0, 46924),
 (@CGUID+138, 17694, 540, 3714, 3714, 3, 0, 522.82, 154.456, 2.01251, 2.18166, 7200, 0, 0, 46924),
 (@CGUID+139, 16699, 540, 3714, 3714, 3, 0, 519.49, 152.004, 2.01341, 1.69297, 7200, 0, 0, 46924),
 (@CGUID+140, 17420, 540, 3714, 3714, 3, 0, 515.54, 152.437, 2.01156, 1.23918, 7200, 0, 0, 46924),
@@ -330,7 +330,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (17465, 0, 0, 'Fight!', 12, 0, 100, 25, 0, 0, 14134, 0, 'Shattered Hand Centurion'),
 (17465, 2, 0, 'That\'s enough. Now back off!', 12, 0, 100, 0, 0, 0, 14135, 0, 'Shattered Hand Centurion');
 
-DELETE FROM `waypoints` WHERE `entry` IN (1742000, 1742001, 1742002, 1742003, 1742004, 1670000, 1670001, 1708301, 1708302, 1708303, 1670002, 1670003, 1742005, 1670004, 1670005, 1670006, 1670007, 1670400, 1670401, 1669900, 1670008, 1670009, 1670010, 1670011, 1769300);
+DELETE FROM `waypoints` WHERE `entry` IN (1742000, 1742001, 1742002, 1742003, 1742004, 1670000, 1670001, 1708301, 1708302, 1708303, 1670002, 1670003, 1742005, 1670004, 1670005, 1670006, 1670007, 1670400, 1670401, 1669900, 1670008, 1670009, 1670010, 1670011, 1670012);
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
 -- @CGUID+0
 (1742000,1,67.89315 ,39.01408,-13.229578,NULL,'Shattered Halls Entrance Path 1'),
@@ -466,7 +466,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1670010,8,84.63591,258.43936,-13.205377,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
 (1670010,9,88.38716,265.49927,-13.207803,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
 (1670010,10,80.11674,274.18732,-13.206361,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
-(1670010,11,69.713936,263.39304,-13.201049,NULL,'Shattered Halls Legionnaire Barracks Path 3');
+(1670010,11,69.713936,263.39304,-13.201049,NULL,'Shattered Halls Legionnaire Barracks Path 3'),
 /*
 -- Path 4
 (1670011,1,69.66478,257.30325,-13.20005,NULL,'Shattered Halls Legionnaire Barracks Path 4'),
@@ -474,10 +474,19 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 
 -- Awoken Add Point: 69.452446 239.98776 -13.193644
 */
+-- Sparring Hall
+(1670011,1,528.1561,228.07251,1.9335356,NULL,'Shattered Halls Legionnaire Sparring Hall Path 1'),
+(1670011,2,521.939,226.18733,1.9384854,NULL,'Shattered Halls Legionnaire Sparring Hall Path 1'),
+(1670011,3,519.15515,222.23543,1.9348023,NULL,'Shattered Halls Legionnaire Sparring Hall Path 1'),
+(1670011,4,521.939,226.18733,1.9384854,NULL,'Shattered Halls Legionnaire Sparring Hall Path 1'),
+(1670012,1,511.35275,162.06738,1.9312072,NULL,'Shattered Halls Legionnaire Sparring Hall Path 2'),
+(1670012,2,522.757,158.84065,1.9294991,NULL,'Shattered Halls Legionnaire Sparring Hall Path 2'),
+(1670012,3,511.35275,162.06738,1.9312072,NULL,'Shattered Halls Legionnaire Sparring Hall Path 2'),
+(1670012,4,522.757,158.84065,1.9294991,NULL,'Shattered Halls Legionnaire Sparring Hall Path 2');
 
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|67108864 WHERE (`entry` IN (16700, 16699, 16704, 17420, 16507, 17694, 16523, 16594, 16593, 20593, 20591, 20582, 20576, 20590, 20589, 20594, 20587, 20577));
 
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-(@CGUID+0),-(@CGUID+1),-(@CGUID+2),-(@CGUID+3),-(@CGUID+4),-(@CGUID+5),-(@CGUID+10),-(@CGUID+8),-(@CGUID+9),-(@CGUID+19), -(@CGUID+20), -(@CGUID+21),-(@CGUID+22),-(@CGUID+23),-(@CGUID+24),-(@CGUID+25),-(@CGUID+26),-(@CGUID+27),-(@CGUID+28),-(@CGUID+29),-(@CGUID+30),-(@CGUID+31),-(@CGUID+32),-(@CGUID+33),-(@CGUID+34),-(@CGUID+35),-(@CGUID+36),-(@CGUID+37),-(@CGUID+38),-(@CGUID+39),-(@CGUID+40),-(@CGUID+41),-(@CGUID+42),-(@CGUID+43),-(@CGUID+44),-(@CGUID+45));
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-(@CGUID+0),-(@CGUID+1),-(@CGUID+2),-(@CGUID+3),-(@CGUID+4),-(@CGUID+5),-(@CGUID+10),-(@CGUID+8),-(@CGUID+9),-(@CGUID+19), -(@CGUID+20), -(@CGUID+21),-(@CGUID+22),-(@CGUID+23),-(@CGUID+24),-(@CGUID+25),-(@CGUID+26),-(@CGUID+27),-(@CGUID+28),-(@CGUID+29),-(@CGUID+30),-(@CGUID+31),-(@CGUID+32),-(@CGUID+33),-(@CGUID+34),-(@CGUID+35),-(@CGUID+36),-(@CGUID+37),-(@CGUID+38),-(@CGUID+39),-(@CGUID+40),-(@CGUID+41),-(@CGUID+42),-(@CGUID+43),-(@CGUID+44),-(@CGUID+45),-(@CGUID+163),-(@CGUID+165),-(@CGUID+167),-(@CGUID+169),-(@CGUID+171),-(@CGUID+173));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-(@CGUID+0), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742000, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Respawn - Start Waypoint'),
 (-(@CGUID+0), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Waypoint Finished - Run Script'),
@@ -661,8 +670,14 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+45), 0, 1002, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Aggro - Run Aggro Script'),
 (-(@CGUID+45), 0, 1003, 1004, 38, 1, 100, 0, 4, 1, 0, 0, 0, 80, 1670024, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 4 1 - Run Aggro Script AND Move to Pos'),
 (-(@CGUID+45), 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.452446, 239.98776, -13.193644, 0, 'Shadowmoon Acolyte - Linked - Move To Position'),
-(-(@CGUID+45), 0, 1005, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Reached Point - Set In Combat With Zone');
-
+(-(@CGUID+45), 0, 1005, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Reached Point - Set In Combat With Zone'),
+-- Sparring w/ Dummies
+(-(@CGUID+163), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 2, 1692, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Sparring Hall - On Respawn - Set Faction 1692 (Monster Spar)'),
+(-(@CGUID+165), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 2, 1692, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Sparring Hall - On Respawn - Set Faction 1692 (Monster Spar)'),
+(-(@CGUID+167), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 2, 1692, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Sparring Hall - On Respawn - Set Faction 1692 (Monster Spar)'),
+(-(@CGUID+169), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 2, 1692, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Sparring Hall - On Respawn - Set Faction 1692 (Monster Spar)'),
+(-(@CGUID+171), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 2, 1692, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Sparring Hall - On Respawn - Set Faction 1692 (Monster Spar)'),
+(-(@CGUID+173), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 2, 1692, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Halls Sparring Hall - On Respawn - Set Faction 1692 (Monster Spar)');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1742000, 1670000, 1670001, 1670002, 1670003, 1670004, 1670005, 1670006, 1670007, 1670008, 1670009, 1670010, 1670011, 1670012, 1670013, 1669900, 1670400, 1742001, 1769400, 1670014, 1769401, 1670015, 1670016, 1670017, 1670018, 1670019, 1670020, 1670021, 1670022, 1670023, 1670024,1769300));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -975,10 +990,70 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,14,184.36604,154.83159,-42.358753,NULL,0,0,0,100,0);
 -- 0x203CA8438010F3400016A100003B3F73 .go xyz 203.84158 166.2325 -42.404785
 
+-- Pathing for Shattered Hand Houndmaster Entry: 17670
+SET @NPC := @CGUID+128;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=430.70596,`position_y`=58.27038,`position_z`=2.0049384 WHERE `guid`=@NPC;
+UPDATE `creature` SET `position_x`=430.70596,`position_y`=58.27038,`position_z`=2.0049384 WHERE `guid` IN (@CGUID+129, @CGUID+130);
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,430.70596,58.27038,2.0049384,NULL,0,0,0,100,0),
+(@PATH,2,436.75922,53.82539,1.925432,NULL,0,0,0,100,0),
+(@PATH,3,450.10388,57.169678,1.9267677,NULL,0,0,0,100,0),
+(@PATH,4,459.8768,57.486713,1.9384289,NULL,0,0,0,100,0),
+(@PATH,5,484.6614,57.491474,1.9347191,NULL,0,0,0,100,0),
+(@PATH,6,499.84537,57.432102,1.9408772,NULL,0,0,0,100,0),
+(@PATH,7,512.16394,59.819527,1.9372166,NULL,0,0,0,100,0),
+(@PATH,8,518.48566,74.102104,1.9048867,NULL,0,0,0,100,0),
+(@PATH,9,518.7643,84.54578,1.933246,NULL,0,0,0,100,0),
+(@PATH,10,522.1816,93.50193,1.9172946,NULL,0,0,0,100,0),
+(@PATH,11,522.32776,103.9952,1.9267256,NULL,0,0,0,100,0),
+(@PATH,12,518.59015,109.2831,1.9350262,NULL,0,0,0,100,0),
+(@PATH,13,514.31537,105.71796,1.929482,NULL,0,0,0,100,0),
+(@PATH,14,518.8863,86.14224,1.9351246,NULL,0,0,0,100,0),
+(@PATH,15,517.80896,74.34265,1.9050009,NULL,0,0,0,100,0),
+(@PATH,16,511.79678,60.39599,1.9369621,NULL,0,0,0,100,0),
+(@PATH,17,500.0572,58.475758,1.9402512,NULL,0,0,0,100,0),
+(@PATH,18,485.16956,58.154434,1.9346583,NULL,0,0,0,100,0),
+(@PATH,19,459.37115,58.70152,1.9383427,NULL,0,0,0,100,0),
+(@PATH,20,450.82022,58.783375,1.9266548,NULL,0,0,0,100,0),
+(@PATH,21,437.0384,61.912605,1.9237044,NULL,0,0,0,100,0);
+-- 0x2041DC43801141800058470000BC54A2 .go xyz 430.70596 58.27038 2.0049384
+
+-- Pathing for Shattered Hand Houndmaster Entry: 17670
+SET @NPC := @CGUID+125;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=521.30457,`position_y`=237.0814,`position_z`=1.9299809 WHERE `guid`=@NPC;
+UPDATE `creature` SET `position_x`=521.30457,`position_y`=237.0814,`position_z`=1.9299809 WHERE `guid` IN (@CGUID+126, @CGUID+127);
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,521.30457,237.0814,1.9299809,NULL,0,0,0,100,0),
+(@PATH,2,517.14276,249.81818,1.9339325,NULL,0,0,0,100,0),
+(@PATH,3,506.72614,240.23392,1.93266,NULL,0,0,0,100,0),
+(@PATH,4,510.5138,229.18658,1.9293674,NULL,0,0,0,100,0),
+(@PATH,5,519.78186,208.59735,1.8669927,NULL,0,0,0,100,0),
+(@PATH,6,518.95435,196.91217,1.9373496,NULL,0,0,0,100,0),
+(@PATH,7,518.4774,175.9383,1.9424627,NULL,0,0,0,100,0),
+(@PATH,8,506.59488,163.44115,1.9319266,NULL,0,0,0,100,0),
+(@PATH,9,501.43848,152.39388,1.929595,NULL,0,0,0,100,0),
+(@PATH,10,508.708,141.22534,1.9262449,NULL,0,0,0,100,0),
+(@PATH,11,522.292,141.31062,1.9339751,NULL,0,0,0,100,0),
+(@PATH,12,532.2282,148.97649,1.9294553,NULL,0,0,0,100,0),
+(@PATH,13,525.00385,170.1712,1.9321325,NULL,0,0,0,100,0),
+(@PATH,14,519.4442,175.25598,1.9428399,NULL,0,0,0,100,0),
+(@PATH,15,519.6646,196.366,1.9364898,NULL,0,0,0,100,0),
+(@PATH,16,520.9925,208.3555,1.863179,NULL,0,0,0,100,0),
+(@PATH,17,513.1584,221.61227,1.9342216,NULL,0,0,0,100,0);
+-- 0x2041DC438011418000584700013C54A2 .go xyz 521.30457 237.0814 1.9299809
+
 /*
 	Formations
 */
-DELETE FROM `creature_formations` WHERE `memberGUID` IN (@CGUID+49,@CGUID+50,@CGUID+51,@CGUID+52,@CGUID+53,@CGUID+54,@CGUID+55,@CGUID+56,@CGUID+57,@CGUID+58,@CGUID+59,@CGUID+60,@CGUID+61,@CGUID+62,@CGUID+63,@CGUID+64,@CGUID+65,@CGUID+66,@CGUID+67,@CGUID+68,@CGUID+69,@CGUID+70,@CGUID+71,@CGUID+72,@CGUID+73,@CGUID+74,@CGUID+75,@CGUID+76,@CGUID+77,@CGUID+78,@CGUID+79,@CGUID+80,@CGUID+81,@CGUID+82,@CGUID+83,@CGUID+84);
+DELETE FROM `creature_formations` WHERE `memberGUID` IN (@CGUID+49,@CGUID+50,@CGUID+51,@CGUID+52,@CGUID+53,@CGUID+54,@CGUID+55,@CGUID+56,@CGUID+57,@CGUID+58,@CGUID+59,@CGUID+60,@CGUID+61,@CGUID+62,@CGUID+63,@CGUID+64,@CGUID+65,@CGUID+66,@CGUID+67,@CGUID+68,@CGUID+69,@CGUID+70,@CGUID+71,@CGUID+72,@CGUID+73,@CGUID+74,@CGUID+75,@CGUID+76,@CGUID+77,@CGUID+78,@CGUID+79,@CGUID+80,@CGUID+81,@CGUID+82,@CGUID+83,@CGUID+84,@CGUID+128,@CGUID+129,@CGUID+130,@CGUID+125,@CGUID+126,@CGUID+127);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
 (@CGUID+49, @CGUID+49, 0, 0, 3),
 (@CGUID+49, @CGUID+50, 2, 0, 515),
@@ -1015,4 +1090,10 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@CGUID+79, @CGUID+81, 2, 72, 515),
 (@CGUID+79, @CGUID+82, 2, 144, 515),
 (@CGUID+79, @CGUID+83, 2, 216, 515),
-(@CGUID+79, @CGUID+84, 2, 288, 515);
+(@CGUID+79, @CGUID+84, 2, 288, 515),
+(@CGUID+128, @CGUID+128, 0, 0, 3),
+(@CGUID+128, @CGUID+129, 3, 90, 515),
+(@CGUID+128, @CGUID+130, 3, 270, 515),
+(@CGUID+125, @CGUID+125, 0, 0, 3),
+(@CGUID+125, @CGUID+126, 3, 90, 515),
+(@CGUID+125, @CGUID+127, 3, 270, 515);
