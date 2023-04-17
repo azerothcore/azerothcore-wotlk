@@ -2,7 +2,7 @@
 DELETE FROM `creature_template_movement` WHERE `CreatureId` IN (18708, 20657);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Rooted`, `Flight`) VALUES
 (18708, 1, 1, 1),
-(20657, 1, 1, 1),
+(20657, 1, 1, 1);
 
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (33666, 38795, 33711);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
