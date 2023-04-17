@@ -50,4 +50,6 @@ inline AI* GetShadowLabyrinthAI(T* obj)
     return GetInstanceAI<AI>(obj, ShadowLabyrinthScriptName);
 }
 
+#define RegisterShadowLabyrinthCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetShadowLabyrinthAI)
+
 #endif
