@@ -2688,6 +2688,31 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
+        case SMART_ACTION_SET_GUID:
+        {
+            for (WorldObject* target : targets)
+            {
+                ObjectGuid guidToSend = me ? me->GetGUID() : go->GetGUID();
+
+                if (e.action.setGuid.invokerGUID)
+                {
+                    if (Unit* invoker = GetLastInvoker())
+                    {
+                        guidToSend = invoker->GetGUID();
+                    }
+                }
+
+                if (Creature* creature = target->ToCreature())
+                {
+                    creature->AI()->SetGUID(guidToSend, e.action.setGuid.index);
+                }
+                else if (GameObject* object = target->ToGameObject())
+                {
+                    object->AI()->SetGUID(guidToSend, e.action.setGuid.index);
+                }
+            }
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -4302,7 +4327,17 @@ void SmartScript::GetScript()
         e = sSmartScriptMgr->GetScript(-((int32)me->GetSpawnId()), mScriptType);
         if (e.empty())
             e = sSmartScriptMgr->GetScript((int32)me->GetEntry(), mScriptType);
+
         FillScript(e, me, nullptr);
+
+        if (CreatureTemplate const* cInfo = me->GetCreatureTemplate())
+        {
+            if (cInfo->HasFlagsExtra(CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI))
+            {
+                e = sSmartScriptMgr->GetScript((int32)me->GetEntry(), mScriptType);
+                FillScript(e, me, nullptr);
+            }
+        }
     }
     else if (go)
     {
