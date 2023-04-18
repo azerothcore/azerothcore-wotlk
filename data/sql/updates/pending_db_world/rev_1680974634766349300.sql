@@ -305,7 +305,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+281, 19523, 540, 3714, 3714, 3, 0, 374.379, 51.2857, 30.6439, 0.0349066, 7200, 0, 0, 46924),
 (@CGUID+282, 19524, 540, 3714, 3714, 3, 0, 374.356, 64.5048, 31.2206, 6.07375, 7200, 0, 0, 46924);
 
-DELETE FROM `creature_addon` WHERE (`guid` BETWEEN @CGUID AND @CGUID+48);
+DELETE FROM `creature_addon` WHERE (`guid` BETWEEN @CGUID AND @CGUID+282);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (@CGUID+0 , 0, 0, 0, 0, 0, 0, NULL),
 (@CGUID+1 , 0, 0, 0, 0, 0, 0, NULL),
@@ -316,7 +316,13 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (@CGUID+7 , 0, 0, 0, 1, 333, 0, '18950'),
 (@CGUID+8 , 0, 0, 0, 1, 333, 0, '18950'),
 (@CGUID+9 , 0, 0, 0, 1, 333, 0, '18950'),
-(@CGUID+46, 0, 0, 0, 2, 214, 0, NULL);
+(@CGUID+46, 0, 0, 0, 2, 214, 0, NULL),
+(@CGUID+121, 0, 0, 0, 1, 333, 0, '18950'),
+(@CGUID+122, 0, 0, 0, 1, 333, 0, '18950'),
+(@CGUID+123, 0, 0, 0, 1, 333, 0, '18950'),
+(@CGUID+124, 0, 0, 0, 1, 333, 0, '18950'),
+(@CGUID+119, 0, 0, 0, 2, 376, 0, NULL),
+(@CGUID+120, 0, 0, 0, 2, 376, 0, NULL);
 
 UPDATE `creature_template_addon` SET `bytes2` = 1, `visibilityDistanceType` = 4, `auras` = '18950' WHERE (`entry` IN (17693, 20592)); -- Shattered Hand Scout triggers the start of Blood Guard Encounter
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (17464, 20586));
@@ -592,23 +598,23 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|67108864 WHERE (`entry` IN (16700, 16699, 16704, 17420, 16507, 17694, 16523, 16594, 16593, 20593, 20591, 20582, 20576, 20590, 20589, 20594, 20587, 20577, 17464, 20586));
 
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-(@CGUID+0),-(@CGUID+1),-(@CGUID+2),-(@CGUID+3),-(@CGUID+4),-(@CGUID+5),-(@CGUID+10),-(@CGUID+8),-(@CGUID+9),-(@CGUID+19), -(@CGUID+20), -(@CGUID+21),-(@CGUID+22),-(@CGUID+23),-(@CGUID+24),-(@CGUID+25),-(@CGUID+26),-(@CGUID+27),-(@CGUID+28),-(@CGUID+29),-(@CGUID+30),-(@CGUID+31),-(@CGUID+32),-(@CGUID+33),-(@CGUID+34),-(@CGUID+35),-(@CGUID+36),-(@CGUID+37),-(@CGUID+38),-(@CGUID+39),-(@CGUID+40),-(@CGUID+41),-(@CGUID+42),-(@CGUID+43),-(@CGUID+44),-(@CGUID+45),-(@CGUID+163),-(@CGUID+165),-(@CGUID+167),-(@CGUID+169),-(@CGUID+171),-(@CGUID+173),-(@CGUID+131),-(@CGUID+137),-(@CGUID+144),-(@CGUID+145),-(@CGUID+146),-(@CGUID+147),-(@CGUID+149),-(@CGUID+150),-(@CGUID+151),-(@CGUID+152),-(@CGUID+155),-(@CGUID+157),-(@CGUID+156),-(@CGUID+154),-(@CGUID+159),-(@CGUID+160),-(@CGUID+162),-(@CGUID+161));
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-(@CGUID+0),-(@CGUID+1),-(@CGUID+2),-(@CGUID+3),-(@CGUID+4),-(@CGUID+5),-(@CGUID+10),-(@CGUID+11),-(@CGUID+12),-(@CGUID+13),-(@CGUID+14),-(@CGUID+15),-(@CGUID+16),-(@CGUID+17),-(@CGUID+18),-(@CGUID+8),-(@CGUID+9),-(@CGUID+19), -(@CGUID+20), -(@CGUID+21),-(@CGUID+22),-(@CGUID+23),-(@CGUID+24),-(@CGUID+25),-(@CGUID+26),-(@CGUID+27),-(@CGUID+28),-(@CGUID+29),-(@CGUID+30),-(@CGUID+31),-(@CGUID+32),-(@CGUID+33),-(@CGUID+34),-(@CGUID+35),-(@CGUID+36),-(@CGUID+37),-(@CGUID+38),-(@CGUID+39),-(@CGUID+40),-(@CGUID+41),-(@CGUID+42),-(@CGUID+43),-(@CGUID+44),-(@CGUID+45),-(@CGUID+163),-(@CGUID+165),-(@CGUID+167),-(@CGUID+169),-(@CGUID+171),-(@CGUID+173),-(@CGUID+131),-(@CGUID+137),-(@CGUID+144),-(@CGUID+145),-(@CGUID+146),-(@CGUID+147),-(@CGUID+149),-(@CGUID+150),-(@CGUID+151),-(@CGUID+152),-(@CGUID+155),-(@CGUID+157),-(@CGUID+156),-(@CGUID+154),-(@CGUID+159),-(@CGUID+160),-(@CGUID+162),-(@CGUID+161));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-(@CGUID+0), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742000, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Respawn - Start Waypoint'),
-(-(@CGUID+0), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Waypoint Finished - Run Script'),
-(-(@CGUID+0), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1670003, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Data Set 1 1 - Run Script'),
-(-(@CGUID+1), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742001, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Respawn - Start Waypoint'),
-(-(@CGUID+1), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Waypoint Finished - Run Script'),
-(-(@CGUID+1), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1670003, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Data Set 1 1 - Run Script'),
-(-(@CGUID+2), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742002, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Respawn - Start Waypoint'),
-(-(@CGUID+2), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Waypoint Finished - Run Script'),
-(-(@CGUID+2), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1670003, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Data Set 1 1 - Run Script'),
-(-(@CGUID+3), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742003, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Respawn - Start Waypoint'),
-(-(@CGUID+3), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Waypoint Finished - Run Script'),
-(-(@CGUID+3), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1670003, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Data Set 1 1 - Run Script'),
-(-(@CGUID+4), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742004, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Respawn - Start Waypoint'),
-(-(@CGUID+4), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Waypoint Finished - Run Script'),
-(-(@CGUID+4), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1670003, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Data Set 1 1 - Run Script'),
+(-(@CGUID+0), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742000, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Respawn - Start Waypoint'),
+(-(@CGUID+0), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Waypoint Finished - Run Script'),
+(-(@CGUID+0), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1670003, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 1 1 - Run Script'),
+(-(@CGUID+1), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742001, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Respawn - Start Waypoint'),
+(-(@CGUID+1), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Waypoint Finished - Run Script'),
+(-(@CGUID+1), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1670003, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 1 1 - Run Script'),
+(-(@CGUID+2), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742002, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Respawn - Start Waypoint'),
+(-(@CGUID+2), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Waypoint Finished - Run Script'),
+(-(@CGUID+2), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1670003, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 1 1 - Run Script'),
+(-(@CGUID+3), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742003, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Respawn - Start Waypoint'),
+(-(@CGUID+3), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Waypoint Finished - Run Script'),
+(-(@CGUID+3), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1670003, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 1 1 - Run Script'),
+(-(@CGUID+4), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 53, 1, 1742004, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Respawn - Start Waypoint'),
+(-(@CGUID+4), 0, 1002, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1742000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Waypoint Finished - Run Script'),
+(-(@CGUID+4), 0, 1003, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 1670003, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 1 1 - Run Script'),
 (-(@CGUID+5), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1670000, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Reset - Start Waypoint'),
 (-(@CGUID+5), 0, 1002, 0, 40, 0, 15, 0, 0, 1670000, 0, 0, 0, 87, 1670000, 1670001, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Any Point Reached - Run Random Script'),
 (-(@CGUID+5), 0, 1003, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 80, 1670002, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Reached Point 1 - Run Script'),
@@ -623,9 +629,41 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+10), 0, 1007, 1008, 38, 1, 100, 0, 1, 1, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 - Say Line 3 (Phase 1)'),
 (-(@CGUID+10), 0, 1008, 1009, 61, 1, 100, 0, 0, 0, 0, 0, 0, 12, 17083, 4, 300000, 0, 0, 0, 8, 0, 0, 0, 0, 79.99492, 111.56079, -13.138484, 4.6949357986450195, 'Shattered Hand Legionnaire - On Data Set 1 1 - Summon Creature \'Fel Orc Convert\' (Phase 1)'),
 (-(@CGUID+10), 0, 1009, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 - Set Event Phase 2 (Do Not Allow Adds to Spawn)'),
+(-(@CGUID+11), 0, 1000, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+11), 0, 1001, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
+(-(@CGUID+11), 0, 1002, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 3 - Run Script'),
+(-(@CGUID+11), 0, 1003, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 4 - Run Script'),
+(-(@CGUID+12), 0, 1000, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+12), 0, 1001, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
+(-(@CGUID+12), 0, 1002, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 3 - Run Script'),
+(-(@CGUID+12), 0, 1003, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 4 - Run Script'),
+(-(@CGUID+13), 0, 1000, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+13), 0, 1001, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
+(-(@CGUID+13), 0, 1002, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 3 - Run Script'),
+(-(@CGUID+13), 0, 1003, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 4 - Run Script'),
+(-(@CGUID+14), 0, 1000, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+14), 0, 1001, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
+(-(@CGUID+14), 0, 1002, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 3 - Run Script'),
+(-(@CGUID+14), 0, 1003, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 4 - Run Script'),
+(-(@CGUID+15), 0, 1000, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+15), 0, 1001, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
+(-(@CGUID+15), 0, 1002, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 3 - Run Script'),
+(-(@CGUID+15), 0, 1003, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 4 - Run Script'),
+(-(@CGUID+16), 0, 1000, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+16), 0, 1001, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
+(-(@CGUID+16), 0, 1002, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 3 - Run Script'),
+(-(@CGUID+16), 0, 1003, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 4 - Run Script'),
+(-(@CGUID+17), 0, 1000, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+17), 0, 1001, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
+(-(@CGUID+17), 0, 1002, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 3 - Run Script'),
+(-(@CGUID+17), 0, 1003, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 4 - Run Script'),
+(-(@CGUID+18), 0, 1000, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
+(-(@CGUID+18), 0, 1001, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
+(-(@CGUID+18), 0, 1002, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 3 - Run Script'),
+(-(@CGUID+18), 0, 1003, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Trash - On Data Set 2 4 - Run Script'),
 -- Sentries Start Group 1 of Legionnaire Gauntlet
-(-(@CGUID+8), 0, 1001, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 10, 151019, 16700, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sentry - On Just Died - Set Counter to Start Legionnaire Gauntlet Group 1'),
-(-(@CGUID+9), 0, 1001, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 10, 151019, 16700, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sentry - On Just Died - Set Counter to Start Legionnaire Gauntlet Group 1'),
+(-(@CGUID+8), 0, 1000, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 10, 151019, 16700, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sentry - On Just Died - Set Counter to Start Legionnaire Gauntlet Group 1'),
+(-(@CGUID+9), 0, 1000, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 10, 151019, 16700, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sentry - On Just Died - Set Counter to Start Legionnaire Gauntlet Group 1'),
 -- Legionnaire Gauntlet Group 1
 (-(@CGUID+19), 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Reset - Set Event Phase 1 (Allow Add to Spawn)'),
 (-(@CGUID+19), 0, 1002, 0, 82, 0, 100, 0, 17083, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Summoned Add Dies - Set Event Phase 1 (Allow Add to Spawn)'),
@@ -903,9 +941,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1670016, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Run Off'),
 (1670016, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 4.6949357986450195, 'Shattered Hand Legionnaire - Actionlist - Set Orientation 4.6949357986450195'),
 (1670016, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Say Line 15'),
-(1670016, 9, 3, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.66478, 257.30325, -13.20005, 0, 'Shattered Hand Legionnaire - Actionlist - Move To Position'),
-(1670016, 9, 4, 0, 0, 0, 100, 0, 2800, 2800, 0, 0, 0, 1, 16, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Say Line 16'),
-(1670016, 9, 5, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.760185, 263.40073, -13.201066, 0, 'Shattered Hand Legionnaire - Actionlist - Reset Position'),
+(1670016, 9, 3, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 45, 4, 2, 0, 0, 0, 0, 9, 0, 0, 20, 1, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Data 4 2 Emote ID: 71 (OneShotCheerNoSheathe)'),
+(1670016, 9, 4, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.66478, 257.30325, -13.20005, 0, 'Shattered Hand Legionnaire - Actionlist - Move To Position'),
+(1670016, 9, 5, 0, 0, 0, 100, 0, 2800, 2800, 0, 0, 0, 1, 16, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Say Line 16'),
+(1670016, 9, 6, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 45, 4, 2, 0, 0, 0, 0, 9, 0, 0, 20, 1, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Data 4 2 Emote ID: 71 (OneShotCheerNoSheathe)'),
+(1670016, 9, 7, 0, 0, 0, 100, 0, 800, 800, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 69.760185, 263.40073, -13.201066, 0, 'Shattered Hand Legionnaire - Actionlist - Reset Position'),
 (1670017, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1670008, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Start Waypoint'),
 (1670017, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Set Event Phase 1'),
 (1670018, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1670009, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Start Waypoint'),
@@ -954,21 +994,13 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	Heathen, Savage, Acolyte, Darkcaster, Reaver, Brawler, Sharpshooter
 */
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 17420) AND (`source_type` = 0) AND (`id` BETWEEN 5 AND 9);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 17420) AND (`source_type` = 0) AND (`id` = 5);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17420, 0, 5, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 40, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Just Died - Set Data 1 1 on Closest Legionnaire'),
-(17420, 0, 6, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
-(17420, 0, 7, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
-(17420, 0, 8, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Data Set 2 3 - Run Script'),
-(17420, 0, 9, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Data Set 2 4 - Run Script');
+(17420, 0, 5, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 40, 0, 0, 0, 0, 0, 0, 'Shattered Hand Heathen - On Just Died - Set Data 1 1 on Closest Legionnaire');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16523) AND (`source_type` = 0) AND (`id` BETWEEN 5 AND 9);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16523) AND (`source_type` = 0) AND (`id` = 5);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(16523, 0, 5, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Just Died - Set Data 1 1 on Closest Legionnaire'),
-(16523, 0, 6, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
-(16523, 0, 7, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
-(16523, 0, 8, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Data Set 2 3 - Run Script'),
-(16523, 0, 9, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Data Set 2 4 - Run Script');
+(16523, 0, 5, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Savage - On Just Died - Set Data 1 1 on Closest Legionnaire');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16594 AND `source_type` = 0);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -979,36 +1011,20 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16594, 0, 4, 0, 2, 0, 100, 2, 0, 60, 7000, 7000, 0, 11, 15585, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - Between 0-60% Health - Cast \'Prayer of Healing\' (Normal Dungeon)'),
 (16594, 0, 5, 0, 2, 0, 100, 4, 0, 60, 7000, 7000, 0, 11, 35943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - Between 0-60% Health - Cast \'Prayer of Healing\' (Heroic Dungeon)'),
 (16594, 0, 6, 0, 4, 0, 15, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Aggro - Say Line 1 (No Repeat)'),
-(16594, 0, 7 , 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Death - Set Data 1 1 on Closest Legionnaire'),
-(16594, 0, 8 , 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
-(16594, 0, 9 , 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
-(16594, 0, 10, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 3 - Run Script'),
-(16594, 0, 11, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Data Set 2 4 - Run Script');
+(16594, 0, 7 , 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shadowmoon Acolyte - On Death - Set Data 1 1 on Closest Legionnaire');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 17694) AND (`source_type` = 0) AND (`id` BETWEEN 7 AND 11);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 17694) AND (`source_type` = 0) AND (`id` = 7);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17694, 0, 7, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Death - Set Data 1 1 on Closest Legionnaire'),
-(17694, 0, 8 , 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
-(17694, 0, 9 , 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
-(17694, 0, 10, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Data Set 2 3 - Run Script'),
-(17694, 0, 11, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Data Set 2 4 - Run Script');
+(17694, 0, 7, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shadowmoon Darkcaster - On Death - Set Data 1 1 on Closest Legionnaire');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16699) AND (`source_type` = 0) AND (`id` BETWEEN 5 AND 9);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16699) AND (`source_type` = 0) AND (`id` = 5);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(16699, 0, 5, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Just Died - Set Data 1 1 on Closest Legionnaire'),
-(16699, 0, 6, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
-(16699, 0, 7, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
-(16699, 0, 8, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Data Set 2 3 - Run Script'),
-(16699, 0, 9, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Data Set 2 4 - Run Script');
+(16699, 0, 5, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Reaver - On Just Died - Set Data 1 1 on Closest Legionnaire');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16593) AND (`source_type` = 0) AND (`id` BETWEEN 2 AND 7);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16593) AND (`source_type` = 0) AND (`id` IN (2, 3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (16593, 0, 2, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Aggro - Say Line 1'),
-(16593, 0, 3, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Just Died - Set Data 1 1 on Closest Legionnaire'),
-(16593, 0, 4, 0, 38, 0, 100, 0, 2, 1, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 2 1 - Play Emote 71 (OneShotCheerNoSheathe)'),
-(16593, 0, 5, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 2 2 - Play Emote 2 (OneShotBow)'),
-(16593, 0, 6, 0, 38, 0, 100, 0, 2, 3, 0, 0, 0, 80, 1670009, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 2 3 - Run Script'),
-(16593, 0, 7, 0, 38, 0, 100, 0, 2, 4, 0, 0, 0, 80, 1670010, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Data Set 2 4 - Run Script');
+(16593, 0, 3, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16700, 20, 0, 0, 0, 0, 0, 0, 'Shattered Hand Brawler - On Just Died - Set Data 1 1 on Closest Legionnaire');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16704) AND (`source_type` = 0) AND (`id` IN (4));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -1385,3 +1401,93 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@CGUID+180, @CGUID+180, 0, 0, 3),
 (@CGUID+180, @CGUID+181, 3, 90, 515),
 (@CGUID+180, @CGUID+182, 3, 270, 515);
+
+DELETE FROM `creature_formations` WHERE `memberGUID` IN (@CGUID+006,@CGUID+007,@CGUID+010,@CGUID+011,@CGUID+012,@CGUID+013,@CGUID+014,@CGUID+015,@CGUID+016,@CGUID+017,@CGUID+018,@CGUID+008,@CGUID+009,@CGUID+019,@CGUID+023,@CGUID+021,@CGUID+022,@CGUID+020,@CGUID+024,@CGUID+027,@CGUID+025,@CGUID+028,@CGUID+026,@CGUID+029,@CGUID+032,@CGUID+030,@CGUID+033,@CGUID+031,@CGUID+034,@CGUID+035,@CGUID+036,@CGUID+037,@CGUID+038,@CGUID+039,@CGUID+040,@CGUID+041,@CGUID+094,@CGUID+095,@CGUID+096,@CGUID+097,@CGUID+121,@CGUID+122,@CGUID+123,@CGUID+124,@CGUID+131,@CGUID+134,@CGUID+132,@CGUID+135,@CGUID+133,@CGUID+136,@CGUID+137,@CGUID+138,@CGUID+139,@CGUID+140,@CGUID+141,@CGUID+142,@CGUID+175,@CGUID+176,@CGUID+177,@CGUID+178,@CGUID+183,@CGUID+184,@CGUID+192,@CGUID+193,@CGUID+046,@CGUID+047,@CGUID+048,@CGUID+148,@CGUID+149,@CGUID+150,@CGUID+151,@CGUID+152,@CGUID+143,@CGUID+144,@CGUID+145,@CGUID+147,@CGUID+146,@CGUID+153,@CGUID+155,@CGUID+157,@CGUID+154,@CGUID+156,@CGUID+158,@CGUID+159,@CGUID+160,@CGUID+161,@CGUID+162);
+INSERT INTO `creature_formations` (`memberGUID`, `leaderGUID`, `groupAI`) VALUES
+(@CGUID+006,@CGUID+006,3),
+(@CGUID+007,@CGUID+006,3),
+(@CGUID+010,@CGUID+010,3),
+(@CGUID+011,@CGUID+010,3),
+(@CGUID+012,@CGUID+010,3),
+(@CGUID+013,@CGUID+010,3),
+(@CGUID+014,@CGUID+010,3),
+(@CGUID+015,@CGUID+010,3),
+(@CGUID+016,@CGUID+010,3),
+(@CGUID+017,@CGUID+010,3),
+(@CGUID+018,@CGUID+010,3),
+(@CGUID+008,@CGUID+008,3),
+(@CGUID+009,@CGUID+008,3),
+(@CGUID+019,@CGUID+019,3),
+(@CGUID+023,@CGUID+019,3),
+(@CGUID+021,@CGUID+019,3),
+(@CGUID+022,@CGUID+019,3),
+(@CGUID+020,@CGUID+019,3),
+(@CGUID+024,@CGUID+024,3),
+(@CGUID+027,@CGUID+024,3),
+(@CGUID+025,@CGUID+024,3),
+(@CGUID+028,@CGUID+024,3),
+(@CGUID+026,@CGUID+024,3),
+(@CGUID+029,@CGUID+029,3),
+(@CGUID+032,@CGUID+029,3),
+(@CGUID+030,@CGUID+029,3),
+(@CGUID+033,@CGUID+029,3),
+(@CGUID+031,@CGUID+029,3),
+(@CGUID+034,@CGUID+029,3),
+(@CGUID+035,@CGUID+035,3),
+(@CGUID+036,@CGUID+035,3),
+(@CGUID+037,@CGUID+035,3),
+(@CGUID+038,@CGUID+035,3),
+(@CGUID+039,@CGUID+035,3),
+(@CGUID+040,@CGUID+035,3),
+(@CGUID+041,@CGUID+035,3),
+(@CGUID+094,@CGUID+094,3),
+(@CGUID+095,@CGUID+094,3),
+(@CGUID+096,@CGUID+094,3),
+(@CGUID+097,@CGUID+094,3),
+(@CGUID+121,@CGUID+121,3),
+(@CGUID+122,@CGUID+121,3),
+(@CGUID+123,@CGUID+121,3),
+(@CGUID+124,@CGUID+121,3),
+(@CGUID+131,@CGUID+131,3),
+(@CGUID+134,@CGUID+131,3),
+(@CGUID+132,@CGUID+131,3),
+(@CGUID+135,@CGUID+131,3),
+(@CGUID+133,@CGUID+131,3),
+(@CGUID+136,@CGUID+131,3),
+(@CGUID+137,@CGUID+137,3),
+(@CGUID+138,@CGUID+137,3),
+(@CGUID+139,@CGUID+137,3),
+(@CGUID+140,@CGUID+137,3),
+(@CGUID+141,@CGUID+137,3),
+(@CGUID+142,@CGUID+137,3),
+(@CGUID+175,@CGUID+175,3),
+(@CGUID+176,@CGUID+175,3),
+(@CGUID+177,@CGUID+177,3),
+(@CGUID+178,@CGUID+177,3),
+(@CGUID+183,@CGUID+183,3),
+(@CGUID+184,@CGUID+183,3),
+(@CGUID+192,@CGUID+192,3),
+(@CGUID+193,@CGUID+192,3),
+(@CGUID+046,@CGUID+046,3),
+(@CGUID+047,@CGUID+046,3),
+(@CGUID+048,@CGUID+046,3),
+(@CGUID+148,@CGUID+148,3),
+(@CGUID+149,@CGUID+148,3),
+(@CGUID+150,@CGUID+148,3),
+(@CGUID+151,@CGUID+148,3),
+(@CGUID+152,@CGUID+148,3),
+(@CGUID+143,@CGUID+143,3),
+(@CGUID+144,@CGUID+143,3),
+(@CGUID+145,@CGUID+143,3),
+(@CGUID+147,@CGUID+143,3),
+(@CGUID+146,@CGUID+143,3),
+(@CGUID+153,@CGUID+153,3),
+(@CGUID+155,@CGUID+153,3),
+(@CGUID+157,@CGUID+153,3),
+(@CGUID+154,@CGUID+153,3),
+(@CGUID+156,@CGUID+153,3),
+(@CGUID+158,@CGUID+158,3),
+(@CGUID+159,@CGUID+158,3),
+(@CGUID+160,@CGUID+158,3),
+(@CGUID+161,@CGUID+158,3),
+(@CGUID+162,@CGUID+158,3);
