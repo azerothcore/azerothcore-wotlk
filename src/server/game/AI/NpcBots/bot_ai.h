@@ -59,7 +59,7 @@ class bot_ai : public CreatureAI
         void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) override;
         //void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo*/) override { }
         void ReceiveEmote(Player* player, uint32 emote) override;
-        //void EnterEvadeMode(EvadeReason/* why*/ = EVADE_REASON_OTHER) override { }
+        void EnterEvadeMode(EvadeReason/* why*/ = EVADE_REASON_OTHER) override { }
         //void LeavingWorld() override { }
         void OnSpellStart(SpellInfo const* spellInfo) override { OnBotSpellStart(spellInfo); }
         bool CanRespawn() override { return IAmFree(); }

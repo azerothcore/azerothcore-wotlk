@@ -10470,7 +10470,22 @@ void bot_ai::FillKillReward(GameObject* go) const
     loot.loot_type = LOOT_CORPSE;
 
     //gold
-    loot.gold = uint32(me->GetLevel() * std::min<uint32>(std::max<int32>(125 + int32(_killsCount * 5) - int32(_deathsCount * 50), 125), 1250));
+    float lvl = float(std::min<uint8>(me->GetLevel(), DEFAULT_MAX_LEVEL));
+    float gold = 125.0f;
+    switch (me->GetLevel() / 10)
+    {
+        case 0: gold *= 0.100; break;
+        case 1: gold *= 0.125; break;
+        case 2: gold *= 0.175; break;
+        case 3: gold *= 0.225; break;
+        case 4: gold *= 0.300; break;
+        case 5: gold *= 0.400; break;
+        case 6: gold *= 0.550; break;
+        case 7: gold *= 0.750; break;
+        default:gold *= 1.000; break;
+    }
+
+    loot.gold = uint32(lvl * std::min<float>(std::max<float>(gold + _killsCount * gold * 0.04f - _deathsCount * gold * 0.4f, gold), gold * 10.0f));
 
     //items
     uint32 loot_items_count = 0;
