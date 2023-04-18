@@ -10474,15 +10474,15 @@ void bot_ai::FillKillReward(GameObject* go) const
     float gold = 125.0f;
     switch (me->GetLevel() / 10)
     {
-        case 0: gold *= 0.100; break;
-        case 1: gold *= 0.125; break;
-        case 2: gold *= 0.175; break;
-        case 3: gold *= 0.225; break;
-        case 4: gold *= 0.300; break;
-        case 5: gold *= 0.400; break;
-        case 6: gold *= 0.550; break;
-        case 7: gold *= 0.750; break;
-        default:gold *= 1.000; break;
+        case 0: gold *= 0.100f; break;
+        case 1: gold *= 0.125f; break;
+        case 2: gold *= 0.175f; break;
+        case 3: gold *= 0.225f; break;
+        case 4: gold *= 0.300f; break;
+        case 5: gold *= 0.400f; break;
+        case 6: gold *= 0.550f; break;
+        case 7: gold *= 0.750f; break;
+        default:gold *= 1.000f; break;
     }
 
     loot.gold = uint32(lvl * std::min<float>(std::max<float>(gold + _killsCount * gold * 0.04f - _deathsCount * gold * 0.4f, gold), gold * 10.0f));
