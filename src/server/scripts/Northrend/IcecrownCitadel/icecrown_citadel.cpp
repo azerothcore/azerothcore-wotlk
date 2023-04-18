@@ -1007,13 +1007,6 @@ public:
             me->SendMovementFlagUpdate();
         }
 
-        void AttackStart(Unit* victim) override
-        {
-            if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
-                return;
-            BossAI::AttackStart(victim);
-        }
-
         void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
@@ -1039,13 +1032,6 @@ public:
 
         void JustEngagedWith(Unit* /*attacker*/) override
         {
-            if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
-            {
-                me->CombatStop(false);
-                me->SetImmuneToAll(true);
-                me->SetReactState(REACT_PASSIVE);
-                return;
-            }
             _JustEngagedWith();
             me->LowerPlayerDamageReq(me->GetMaxHealth());
             if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
@@ -3051,95 +3037,110 @@ public:
     }
 };
 
-class npc_icc_spire_frostwyrm : public CreatureScript
+enum SpireFrostwyrm
 {
-public:
-    npc_icc_spire_frostwyrm() : CreatureScript("npc_icc_spire_frostwyrm") { }
+    SPELL_BLIZZARD    = 70362,
+    SPELL_CLEAVE      = 70361,
+    SPELL_FROSTBREATH = 70116,
 
-    struct npc_icc_spire_frostwyrmAI : public ScriptedAI
+    HORDE_AREATRIGGER = 5630
+};
+
+struct npc_icc_spire_frostwyrm : public ScriptedAI
+{
+    npc_icc_spire_frostwyrm(Creature* creature) : ScriptedAI(creature)
     {
-        npc_icc_spire_frostwyrmAI(Creature* creature) : ScriptedAI(creature)
+        _scheduler.SetValidator([this]
         {
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-        }
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
 
-        EventMap events;
-
-        void Reset() override
-        {
-            events.Reset();
-            events.ScheduleEvent(1, 15s, 25s); // blizzard
-            events.ScheduleEvent(2, 5s); // cleave
-            events.ScheduleEvent(3, 10s, 15s); // frost breath
-        }
-
-        void DoAction(int32 a) override
-        {
-            if (a != -1)
-                return;
-            if (me->GetHomePosition().GetPositionZ() < 225.0f)
-                return;
-            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), 191.26f, me->GetOrientation());
-            me->GetMotionMaster()->MoveLand(1, me->GetPositionX(), me->GetPositionY(), 191.26f, 2.5f * 7.0f);
-            Talk(0);
-        }
-
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type == EFFECT_MOTION_TYPE && id == 1)
-            {
-                me->SetCanFly(false);
-                me->SetDisableGravity(false);
-
-                if (Player* p = SelectTargetFromPlayerList(100.0f))
-                {
-                    Talk(p->GetTeamId() == TEAM_HORDE ? 1 : 2);
-                    AttackStart(p);
-                }
-            }
-        }
-
-        bool CanAIAttack(Unit const* target) const override
-        {
-            return me->GetPositionZ() < 225.0f && me->GetHomePosition().GetExactDist(target) < 200.0f;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 1:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
-                        me->CastSpell(target, 70362, false);
-                    events.Repeat(25s, 35s);
-                    break;
-                case 2:
-                    me->CastSpell(me->GetVictim(), 70361, false);
-                    events.Repeat(5s);
-                    break;
-                case 3:
-                    me->CastSpell(me->GetVictim(), 70116, false);
-                    events.Repeat(10s, 15s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetIcecrownCitadelAI<npc_icc_spire_frostwyrmAI>(creature);
+        _canResetFlyingEffects = true;
     }
+
+    void Reset() override
+    {
+        if (!_canResetFlyingEffects)
+        {
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+        }
+    }
+
+    void JustEngagedWith(Unit* /*victim*/) override
+    {
+        _scheduler.Schedule(15s, 25s, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_BLIZZARD);
+            context.Repeat(25s, 35s);
+        }).Schedule(5s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CLEAVE);
+            context.Repeat();
+        }).Schedule(10s, 15s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_FROSTBREATH);
+            context.Repeat();
+        });
+
+        _canResetFlyingEffects = false;
+    }
+
+    void DoAction(int32 action) override
+    {
+        const Position posHordeMove = { -433.667084f, 2080.347412f, 191.253860f, 3.825093f };
+        const Position posAllianceMove = { -433.589508f, 2344.564697f, 191.253616f, 2.543328f };
+
+        bool hordeSide = action == HORDE_AREATRIGGER || action == HORDE_AREATRIGGER + 1;
+        Position landingPosition = hordeSide ? posHordeMove : posAllianceMove;
+
+        me->GetMotionMaster()->MovePoint(1, landingPosition);
+        me->SetHomePosition(landingPosition);
+
+        Talk(0);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == EFFECT_MOTION_TYPE && id == 1)
+        {
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+            _canResetFlyingEffects = false;
+        }
+    }
+
+    void JustReachedHome() override
+    {
+        ScriptedAI::JustReachedHome();
+        if (!_canResetFlyingEffects)
+        {
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+        }
+    }
+
+    bool CanAIAttack(Unit const* target) const override
+    {
+        return me->GetPositionZ() < 225.0f && me->GetHomePosition().GetExactDist(target) < 200.0f;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+    private:
+        TaskScheduler _scheduler;
+        bool _canResetFlyingEffects;
 };
 
 #define VENGEFUL_WP_COUNT 6
@@ -3332,13 +3333,19 @@ public:
         EventMap events;
         bool _didWebBeam;
 
+        void InitializeAI() override
+        {
+            me->SetDisableGravity(true);
+            me->SetImmuneToAll(true);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_03);
+        }
+
         void Reset() override
         {
             events.Reset();
             events.ScheduleEvent(1, 3s, 10s); // Crypt Scarabs
             events.ScheduleEvent(2, 15s, 25s); // Dark Mending
             events.ScheduleEvent(3, 8s, 15s); // Web Wrap
-            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -3349,9 +3356,10 @@ public:
                 float nx = me->GetPositionX();
                 float ny = me->GetPositionY();
                 float nz = me->GetFloorZ();
+                DoCastSelf(SPELL_WEB_BEAM);
                 me->SetHomePosition(nx, ny, nz, me->GetOrientation());
-                me->CastSpell(me, SPELL_WEB_BEAM, false);
-                me->GetMotionMaster()->MovePoint(1, nx, ny, nz, false);
+                me->GetMotionMaster()->MoveLand(POINT_LAND, nx, ny, nz, false);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                 return;
             }
 
@@ -3366,26 +3374,12 @@ public:
             me->CallForHelp(15.0f);
         }
 
-        void JustReachedHome() override
-        {
-            if (me->IsLevitating())
-            {
-                me->SetDisableGravity(false);
-                me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-            }
-        }
-
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type == POINT_MOTION_TYPE && id == 1)
+            if (type == EFFECT_MOTION_TYPE && id == POINT_LAND)
             {
-                if (me->IsLevitating())
-                {
-                    me->SetDisableGravity(false);
-                    me->SetOrientation(0.0f);
-                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                    me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-                }
+                me->SetImmuneToAll(false);
+                me->SetDisableGravity(false);
             }
         }
 
@@ -3501,7 +3495,7 @@ public:
                     if (spider->GetPositionZ() > 220.0f)
                     {
                         spider->CastSpell(spider, SPELL_WEB_BEAM2, false);
-                        spider->GetMotionMaster()->MovePoint(POINT_ENTER_COMBAT, spider->GetPositionX(), spider->GetPositionY(), 213.03f, false);
+                        spider->GetMotionMaster()->MoveLand(POINT_ENTER_COMBAT, spider->GetPositionX(), spider->GetPositionY(), 213.03f, false);
                     }
         }
 
@@ -3746,16 +3740,27 @@ public:
     }
 };
 
-class at_icc_spire_frostwyrm : public AreaTriggerScript
+class at_icc_spire_frostwyrm : public OnlyOnceAreaTriggerScript
 {
 public:
-    at_icc_spire_frostwyrm() : AreaTriggerScript("at_icc_spire_frostwyrm") { }
+    at_icc_spire_frostwyrm() : OnlyOnceAreaTriggerScript("at_icc_spire_frostwyrm") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    bool _OnTrigger(Player* player, AreaTrigger const* areaTrigger) override
     {
-        if (Creature* frostwyrm = player->FindNearestCreature(NPC_SPIRE_FROSTWYRM, 150.0f, true))
-            if (frostwyrm->GetPositionZ() > 250.0f && frostwyrm->AI())
-                frostwyrm->AI()->DoAction(-1);
+        if (player->GetInstanceScript()->GetPersistentData(DATA_SPIRE_FROSTWYRM) != DONE)
+        {
+            player->GetInstanceScript()->StorePersistentData(DATA_SPIRE_FROSTWYRM, DONE);
+            const Position posHordeWyrm = { -375.538879f, 2120.774658f, 242.256775f, 3.714352f };
+            const Position posAllianceWyrm = { -361.154358f, 2305.821289f, 244.771713f, 2.704335f };
+
+            bool hordeSide = areaTrigger->entry == HORDE_AREATRIGGER || areaTrigger->entry == HORDE_AREATRIGGER + 1;
+
+            if (Creature* frostwyrm = player->SummonCreature(NPC_SPIRE_FROSTWYRM, hordeSide ? posHordeWyrm : posAllianceWyrm))
+            {
+                frostwyrm->AI()->DoAction(areaTrigger->entry);
+            }
+        }
+
         return true;
     }
 };
@@ -3803,7 +3808,7 @@ void AddSC_icecrown_citadel()
     new npc_icc_skybreaker_luminary();
     new npc_icc_valkyr_herald();
     new npc_icc_severed_essence();
-    new npc_icc_spire_frostwyrm();
+    RegisterIcecrownCitadelCreatureAI(npc_icc_spire_frostwyrm);
     new npc_icc_vengeful_fleshreaper();
     new npc_icc_buff_switcher();
     new npc_icc_nerubar_broodkeeper();

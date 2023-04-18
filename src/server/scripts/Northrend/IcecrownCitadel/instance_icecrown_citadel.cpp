@@ -49,7 +49,8 @@ enum TimedEvents
     EVENT_UPDATE_EXECUTION_TIME = 1,
     EVENT_QUAKE_SHATTER         = 2,
     EVENT_REBUILD_PLATFORM      = 3,
-    EVENT_RESPAWN_GUNSHIP       = 4
+    EVENT_RESPAWN_GUNSHIP       = 4,
+    EVENT_RESPAWN_SINDRAGOSA    = 5
 };
 
 enum Spells
@@ -115,6 +116,11 @@ DoorData const doorData[] =
     {0,                                      0,                          DOOR_TYPE_ROOM       }
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_SINDRAGOSA, DATA_SINDRAGOSA }
+};
+
 // this doesnt have to only store questgivers, also can be used for related quest spawns
 struct WeeklyQuest
 {
@@ -140,6 +146,7 @@ Position const JainaSpawnPos    = { -48.65278f, 2211.026f, 27.98586f, 3.124139f 
 Position const MuradinSpawnPos  = { -47.34549f, 2208.087f, 27.98586f, 3.106686f };
 Position const UtherSpawnPos    = { -26.58507f, 2211.524f, 30.19898f, 3.124139f };
 Position const SylvanasSpawnPos = { -41.45833f, 2222.891f, 27.98586f, 3.647738f };
+Position const SindragosaSpawnPos = { 4818.6997f, 2483.7102f, 287.06497f, 3.286661f };
 
 // Set position traps Spirit Alarm
 std::vector<Position> GoSpiritAlarm_1 = { { -160.96f, 2210.46f, 35.24f, 0.0f }, { -176.27f, 2201.93f, 35.24f, 0.0f}, { -207.83f, 2207.38f, 35.24f, 0.0f } };
@@ -199,7 +206,9 @@ public:
 
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            SetPersistentDataCount(MAX_DATA_INDEXES);
             LoadBossBoundaries(boundaries);
+            LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
             TeamIdInInstance = TEAM_NEUTRAL;
             HeroicAttempts = MaxHeroicAttempts;
@@ -211,6 +220,7 @@ public:
             BloodQuickeningState = NOT_STARTED;
             BloodQuickeningMinutes = 0;
             BloodPrinceTrashCount = 0;
+            IsSindragosaIntroDone = false;
         }
 
         void FillInitialWorldStates(WorldPacket& data) override
@@ -252,6 +262,11 @@ public:
 
             if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                 SpawnGunship();
+
+            if (GetBossState(DATA_SINDRAGOSA) != DONE && IsSindragosaIntroDone && !GetCreature(DATA_SINDRAGOSA) && Events.GetTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA) == Milliseconds::max())
+            {
+                Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
+            }
 
             if (IsBuffAvailable)
             {
@@ -509,12 +524,16 @@ public:
                 default:
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnCreatureRemove(Creature* creature) override
         {
             if (creature->GetEntry() == NPC_SINDRAGOSA)
                 SindragosaGUID.Clear();
+
+            InstanceScript::OnCreatureRemove(creature);
         }
 
         uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
@@ -936,6 +955,8 @@ public:
                     return BloodQuickeningState;
                 case DATA_HEROIC_ATTEMPTS:
                     return HeroicAttempts;
+                case DATA_SINDRAGOSA_INTRO:
+                    return (IsSindragosaIntroDone ? 1 : 0);
                 default:
                     break;
             }
@@ -1160,7 +1181,21 @@ public:
                     if (state == DONE)
                         CheckLichKingAvailability();
                     else if (state == FAIL)
+                    {
+                        IsSindragosaIntroDone = true;
                         HandleDropAttempt();
+                        if (instance->IsHeroic())
+                        {
+                            if (HeroicAttempts)
+                            {
+                                Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
+                            }
+                        }
+                        else
+                        {
+                            Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
+                        }
+                    }
                     if (state == DONE && !instance->IsHeroic() && LichKingHeroicAvailable)
                     {
                         LichKingHeroicAvailable = false;
@@ -1420,8 +1455,13 @@ public:
             return false;
         }
 
-        bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const override
+        bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
         {
+            if (player && player->GetSession() && player->GetSession()->GetSecurity() >= SEC_MODERATOR)
+            {
+                return true;
+            }
+
             switch (bossId)
             {
                 case DATA_THE_LICH_KING:
@@ -1625,6 +1665,7 @@ public:
             data >> BloodPrinceTrashCount;
             data >> IsBuffAvailable;
             SetData(DATA_BUFF_AVAILABLE, IsBuffAvailable);
+            data >> IsSindragosaIntroDone;
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override
@@ -1637,7 +1678,8 @@ public:
                 << PutricideEventProgress << ' '
                 << uint32(LichKingHeroicAvailable ? 1 : 0) << ' '
                 << BloodPrinceTrashCount << ' '
-                << uint32(IsBuffAvailable ? 1 : 0);
+                << uint32(IsBuffAvailable ? 1 : 0) << ' '
+                << uint32(IsSindragosaIntroDone ? 1 : 0);
         }
 
         void Update(uint32 diff) override
@@ -1678,7 +1720,7 @@ public:
             else
                 DarkwhisperElevatorTimer -= diff;
 
-            if (BloodQuickeningState != IN_PROGRESS && GetBossState(DATA_THE_LICH_KING) != IN_PROGRESS && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != FAIL)
+            if (Events.Empty())
                 return;
 
             Events.Update(diff);
@@ -1730,6 +1772,24 @@ public:
                         break;
                     case EVENT_RESPAWN_GUNSHIP:
                         SpawnGunship();
+                        break;
+                    case EVENT_RESPAWN_SINDRAGOSA:
+                        if (!GetCreature(DATA_SINDRAGOSA))
+                        {
+                            if (Creature* sindragosa = instance->SummonCreature(NPC_SINDRAGOSA, SindragosaSpawnPos))
+                            {
+                                sindragosa->setActive(true);
+                                sindragosa->SetDisableGravity(true);
+                                sindragosa->GetMotionMaster()->MovePath(NPC_SINDRAGOSA * 10, true);
+
+                                if (TempSummon* summon = sindragosa->ToTempSummon())
+                                {
+                                    summon->SetTempSummonType(TEMPSUMMON_DEAD_DESPAWN);
+                                }
+                            }
+                        }
+                        // Could happen more than once if more than one player enters before she respawns.
+                        Events.CancelEvent(EVENT_RESPAWN_SINDRAGOSA);
                         break;
                     default:
                         break;
@@ -1943,6 +2003,7 @@ public:
         bool IsOozeDanceEligible;
         bool IsNauseaEligible;
         bool IsOrbWhispererEligible;
+        bool IsSindragosaIntroDone;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
