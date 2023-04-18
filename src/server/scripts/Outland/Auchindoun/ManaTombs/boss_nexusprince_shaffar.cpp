@@ -171,8 +171,7 @@ public:
 enum Yor
 {
     SPELL_DOUBLE_BREATH     = 38361,
-    SPELL_STOMP             = 34716,
-    SPELL_STOMP_KNOCKBACK   = 36405,
+    SPELL_STOMP             = 36405,
 
     EVENT_DOUBLE_BREATH     = 1,
     EVENT_STOMP             = 2
@@ -222,7 +221,6 @@ public:
                         break;
                     case EVENT_STOMP:
                         DoCastAOE(SPELL_STOMP);
-                        DoCastAOE(SPELL_STOMP_KNOCKBACK);
                         events.ScheduleEvent(EVENT_STOMP, urand(14000, 24000));
                         break;
                 }
