@@ -141,10 +141,7 @@ public:
                         break;
                     }
                 case EVENT_SPELL_CHARGE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    {
-                        DoCast(target, SPELL_CHARGE);
-                    }
+                    DoCastRandomTarget(SPELL_CHARGE);
                     events.RepeatEvent(urand(30000, 50000));
                     break;
                 case EVENT_SPELL_WAR_STOMP:
