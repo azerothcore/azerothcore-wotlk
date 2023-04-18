@@ -1086,6 +1086,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     }
 
     if (attacker && attacker != victim)
+    {
         if (Player* killer = attacker->GetCharmerOrOwnerPlayerOrPlayerItself())
         {
             // pussywizard: don't allow GMs to deal damage in normal way (this leaves no evidence in logs!), they have commands to do so
@@ -1099,6 +1100,15 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             }
             //killer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_DEALT, damage); // pussywizard: optimization
         }
+        //npcbot
+        if (attacker->IsNPCBot() && (victim->IsPlayer() || victim->IsNPCBot()))
+        {
+            Creature const* bot = attacker->ToCreature();
+            if (Battleground* bg = bot->GetBotBG())
+                bg->UpdateBotScore(bot, SCORE_DAMAGE_DONE, damage);
+        }
+        //end npcbot
+    }
 
     if (victim->GetTypeId() == TYPEID_PLAYER)
         ;//victim->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_RECEIVED, damage); // pussywizard: optimization
@@ -11533,6 +11543,15 @@ int32 Unit::DealHeal(Unit* healer, Unit* victim, uint32 addhealth)
         //player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEAL_CASTED, addhealth); // pussywizard: optimization
     }
 
+    //npcbot
+    if (unit->IsNPCBot())
+    {
+        Creature const* bot = unit->ToCreature();
+        if (Battleground* bg = bot->GetBotBG())
+            bg->UpdateBotScore(bot, SCORE_HEALING_DONE, gain);
+    }
+    //end npcbot
+
     /*if (Player* player = victim->ToPlayer())
     {
         //player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_HEALING_RECEIVED, gain); // pussywizard: optimization
@@ -19029,7 +19048,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 bg->HandleKillPlayer(victim->ToPlayer(), player);
             //npcbot: handler PvB bg kill
-            else if (victim->IsNPCBot() && victim->ToCreature()->IsWandererBot())
+            else if (victim->IsNPCBot() && victim->ToCreature()->GetBotBG() == bg)
                 bg->HandlePlayerKillBot(victim->ToCreature(), player);
             //end npcbot
             else

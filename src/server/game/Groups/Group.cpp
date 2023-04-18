@@ -887,7 +887,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
 
         if (m_memberMgr.getSize() < ((isLFGGroup() || isBGGroup() || isBFGroup()) ? 1u : 2u))
         //npcbot: prevent group from being disbanded due to checking only players count
-        if (GetMembersCount() < ((isLFGGroup() || isBGGroup()) ? 1u : 2u))
+        if (GetMembersCount() < ((isLFGGroup() || isBGGroup() || isBFGroup()) ? 1u : 2u))
         //end npcbot
         {
             Disband();

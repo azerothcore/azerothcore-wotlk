@@ -1926,6 +1926,20 @@ void GameObject::Use(Unit* user)
 
         case GAMEOBJECT_TYPE_FLAGSTAND:                     // 24
             {
+                //npcbot
+                if (user->IsNPCBot())
+                {
+                    Creature* bot = user->ToCreature();
+                    if (Battleground* botbg = bot->GetBotBG())
+                    {
+                        bot->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
+                        bot->RemoveAurasByType(SPELL_AURA_MOD_INVISIBILITY);
+                        botbg->EventBotClickedOnFlag(bot, this);
+                        return;
+                    }
+                }
+                //end npcbot
+
                 if (user->GetTypeId() != TYPEID_PLAYER)
                     return;
 
@@ -1970,6 +1984,38 @@ void GameObject::Use(Unit* user)
 
         case GAMEOBJECT_TYPE_FLAGDROP:                      // 26
             {
+                //npcbot
+                if (user->IsNPCBot())
+                {
+                    Creature* bot = user->ToCreature();
+                    if (Battleground* botbg = bot->GetBotBG())
+                    {
+                        bot->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
+                        bot->RemoveAurasByType(SPELL_AURA_MOD_INVISIBILITY);
+
+                        if (GameObjectTemplate const* bgoinfo = GetGOInfo())
+                        {
+                            switch (bgoinfo->entry)
+                            {
+                                case 179785:                        // Silverwing Flag
+                                case 179786:                        // Warsong Flag
+                                    if (botbg->GetBgTypeID(true) == BATTLEGROUND_WS)
+                                        botbg->EventBotClickedOnFlag(bot, this);
+                                    break;
+                                case 184142:                        // Netherstorm Flag
+                                    if (botbg->GetBgTypeID(true) == BATTLEGROUND_EY)
+                                        botbg->EventBotClickedOnFlag(bot, this);
+                                    break;
+                            }
+                        }
+                        //this cause to call return, all flags must be deleted here!!
+                        spellId = 0;
+                        Delete();
+                        break;
+                    }
+                }
+                //end npcbot
+
                 if (user->GetTypeId() != TYPEID_PLAYER)
                     return;
 

@@ -169,7 +169,7 @@ class BotDataMgr
         static void RegisterBot(Creature const* bot);
         static void UnregisterBot(Creature const* bot);
         static Creature const* FindBot(uint32 entry);
-        static Creature const* FindBot(std::string_view name, LocaleConstant loc);
+        static Creature const* FindBot(std::string_view name, LocaleConstant loc, std::vector<uint32> const* not_ids = nullptr);
         static NpcBotRegistry const& GetExistingNPCBots();
         static void GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid);
         static ObjectGuid GetNPCBotGuid(uint32 entry);
@@ -192,7 +192,7 @@ class BotDataMgr
         static TeamId GetTeamIdForFaction(uint32 factionTemplateId);
         static uint32 GetTeamForFaction(uint32 factionTemplateId);
         static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport);
-        static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* curPos, uint32 faction, uint32 lvl, bool random);
+        static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* fromPos, Creature const* bot, uint8 lvl, bool random);
         static WanderNode const* GetClosestWanderNode(WorldLocation const* loc);
 
         static std::shared_mutex* GetLock();
