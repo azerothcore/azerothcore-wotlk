@@ -225,8 +225,6 @@ public:
                         DoCastAOE(SPELL_STOMP_KNOCKBACK);
                         events.ScheduleEvent(EVENT_STOMP, urand(14000, 24000));
                         break;
-                    default:
-                        break;
                 }
             }
             DoMeleeAttackIfReady();
