@@ -288,7 +288,6 @@ void SmartAIMgr::LoadSmartAIFromDB()
                 break;
         }
 
-        // xinef: rozpierdol tc, niedojeby ze szok
         if (temp.action.type == SMART_ACTION_MOVE_TO_POS)
             if (temp.target.type == SMART_TARGET_SELF && (std::fabs(temp.target.x) > 200.0f || std::fabs(temp.target.y) > 200.0f || std::fabs(temp.target.z) > 200.0f))
                 temp.target.type = SMART_TARGET_POSITION;
@@ -762,6 +761,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_ZONE_UNDER_ATTACK: return NO_PARAMS;
             case SMART_ACTION_LOAD_GRID: return NO_PARAMS;
             case SMART_ACTION_MUSIC: return sizeof(SmartAction::music);
+            case SMART_ACTION_SET_GUID: return sizeof(SmartAction::setGuid);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -1914,6 +1914,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_CORPSE_DELAY:
         case SMART_ACTION_ATTACK_STOP:
         case SMART_ACTION_PLAY_CINEMATIC:
+        case SMART_ACTION_SET_GUID:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

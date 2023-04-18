@@ -666,7 +666,7 @@ void World::LoadConfigSettings(bool reload)
         _int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] = 0;
     }
 
-    _int_configs[CONFIG_INTERVAL_MAPUPDATE] = sConfigMgr->GetOption<int32>("MapUpdateInterval", 100);
+    _int_configs[CONFIG_INTERVAL_MAPUPDATE] = sConfigMgr->GetOption<int32>("MapUpdateInterval", 10);
     if (_int_configs[CONFIG_INTERVAL_MAPUPDATE] < MIN_MAP_UPDATE_DELAY)
     {
         LOG_ERROR("server.loading", "MapUpdateInterval ({}) must be greater {}. Use this minimal value.", _int_configs[CONFIG_INTERVAL_MAPUPDATE], MIN_MAP_UPDATE_DELAY);
