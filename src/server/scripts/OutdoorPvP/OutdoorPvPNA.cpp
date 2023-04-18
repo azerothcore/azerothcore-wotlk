@@ -779,13 +779,18 @@ void OPvPCapturePointNA::ChangeState()
             artkit = 1;
             break;
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
+            m_HalaaState = HALAA_N_A;
+            break;
         case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:
-            m_HalaaState = GetControllingFaction() == TEAM_HORDE ? HALAA_N_H : HALAA_N_A;
+            m_HalaaState = HALAA_N_H;
             break;
         case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
+            m_HalaaState = HALAA_N_A;
+            artkit = 2;
+            break;
         case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
-            m_HalaaState = GetControllingFaction() == TEAM_HORDE ? HALAA_N_H : HALAA_N_A;
-            artkit = GetControllingFaction() == TEAM_HORDE ? 1 : 2;
+            m_HalaaState = HALAA_N_H;
+            artkit = 1;
             break;
     }
 
