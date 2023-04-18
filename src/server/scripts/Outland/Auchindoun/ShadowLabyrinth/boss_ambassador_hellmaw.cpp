@@ -98,21 +98,21 @@ struct boss_ambassador_hellmaw : public BossAI
         }
 
         Talk(SAY_AGGRO);
-        events.ScheduleEvent(EVENT_SPELL_CORROSIVE, urand(5000, 10000));
+        events.ScheduleEvent(EVENT_SPELL_CORROSIVE, urand(23050, 30350));
 
-        scheduler.Schedule(5s, 10s, [this](TaskContext context)
+        scheduler.Schedule(23050ms, 30350ms, [this](TaskContext context)
         {
             DoCastVictim(SPELL_CORROSIVE_ACID);
-            context.Repeat(15s, 25s);
-        }).Schedule(15s, 20s, [this](TaskContext context)
+            context.Repeat(23050ms, 30350ms);
+        }).Schedule(23s, 33s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_FEAR);
-            context.Repeat(20s, 35s);
+            context.Repeat(23s, 33s);
         });
 
         if (IsHeroic())
         {
-            scheduler.Schedule(5min, [this](TaskContext)
+            scheduler.Schedule(3min, [this](TaskContext)
             {
                 DoCastSelf(SPELL_ENRAGE, true);
             });
