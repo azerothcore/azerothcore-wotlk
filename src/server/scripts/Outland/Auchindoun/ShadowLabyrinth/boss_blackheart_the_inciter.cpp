@@ -85,10 +85,10 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_SPELL_INCITE, 20000);
+            events.ScheduleEvent(EVENT_SPELL_INCITE, 24000);
             events.ScheduleEvent(EVENT_INCITE_WAIT, 15000);
             events.ScheduleEvent(EVENT_SPELL_CHARGE, 0);
-            events.ScheduleEvent(EVENT_SPELL_KNOCKBACK, 15000);
+            events.ScheduleEvent(EVENT_SPELL_KNOCKBACK, urand(16950, 26350));
 
             if (instance)
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, IN_PROGRESS);
@@ -127,18 +127,18 @@ public:
                         DoResetThreatList();
                         InciteChaos = true;
                         events.DelayEvents(15000);
-                        events.RepeatEvent(40000);
+                        events.RepeatEvent(urand(50000, 70000));
                         events.ScheduleEvent(EVENT_INCITE_WAIT, 15000);
                         break;
                     }
                 case EVENT_SPELL_CHARGE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHARGE, false);
-                    events.RepeatEvent(urand(15000, 25000));
+                    events.RepeatEvent(urand(30000, 50000));
                     break;
                 case EVENT_SPELL_KNOCKBACK:
                     me->CastSpell(me, SPELL_WAR_STOMP, false);
-                    events.RepeatEvent(urand(18000, 24000));
+                    events.RepeatEvent(urand(16950, 26350));
                     break;
             }
 

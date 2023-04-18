@@ -129,7 +129,7 @@ struct boss_murmur : public BossAI
     {
         _JustEngagedWith();
 
-        scheduler.Schedule(30s, [this](TaskContext context)
+        scheduler.Schedule(28s, [this](TaskContext context)
         {
             Talk(EMOTE_SONIC_BOOM);
             DoCastAOE(DUNGEON_MODE(SPELL_SONIC_BOOM_CAST_N, SPELL_SONIC_BOOM_CAST_H));
@@ -139,11 +139,11 @@ struct boss_murmur : public BossAI
                 DoCastAOE(DUNGEON_MODE(SPELL_SONIC_BOOM_EFFECT_N, SPELL_SONIC_BOOM_EFFECT_H), true);
             });
 
-            context.Repeat(28500ms);
-        }).Schedule(8s, 20s, [this](TaskContext context)
+            context.Repeat(34s, 40s);
+        }).Schedule(14600ms, 25500ms, [this](TaskContext context)
         {
             DoCastRandomTarget(DUNGEON_MODE(SPELL_MURMURS_TOUCH_N, SPELL_MURMURS_TOUCH_H));
-            context.Repeat(25s, 35s);
+            context.Repeat(14600ms, 25500ms);
         }).Schedule(15s, 30s, [this](TaskContext context)
         {
             if (DoCastRandomTarget(SPELL_MAGNETIC_PULL, 0, 80.0f) == SPELL_CAST_OK)
@@ -165,7 +165,7 @@ struct boss_murmur : public BossAI
                         if (ShouldCastResonance())
                         {
                             DoCastAOE(SPELL_RESONANCE);
-                            context.Repeat(5s);
+                            context.Repeat(6s, 18s);
                         }
                     });
                 }
@@ -176,14 +176,14 @@ struct boss_murmur : public BossAI
 
         if (IsHeroic())
         {
-            scheduler.Schedule(15s, [this](TaskContext context)
+            scheduler.Schedule(5s, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_THUNDERING_STORM);
-                context.Repeat(15s);
-            }).Schedule(10s, [this](TaskContext context)
+                context.Repeat(6050ms, 10s);
+            }).Schedule(3650ms, 9150ms, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_SONIC_SHOCK);
-                context.Repeat(10s, 20s);
+                context.Repeat(9150ms, 10s);
             });
         }
 
