@@ -409,7 +409,7 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_INVOKER_PARTY:
             if (e.GetScriptType() != SMART_SCRIPT_TYPE_TIMED_ACTIONLIST && e.GetEventType() != SMART_EVENT_LINK && !EventHasInvoker(e.event.type))
             {
-                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invoker target, but action does not provide any invoker!", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invoker target, but event does not provide any invoker!", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
                  return false;
             }
             break;
@@ -620,7 +620,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_THREAT_SINGLE_PCT: return sizeof(SmartAction::threatPCT);
             case SMART_ACTION_THREAT_ALL_PCT: return sizeof(SmartAction::threatPCT);
             case SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS: return sizeof(SmartAction::quest);
-                //case SMART_ACTION_RESERVED_16: return sizeof(SmartAction::raw);
+            case SMART_ACTION_RESERVED_16: return sizeof(SmartAction::raw);
             case SMART_ACTION_SET_EMOTE_STATE: return sizeof(SmartAction::emote);
             case SMART_ACTION_SET_UNIT_FLAG: return sizeof(SmartAction::unitFlag);
             case SMART_ACTION_REMOVE_UNIT_FLAG: return sizeof(SmartAction::unitFlag);
@@ -690,6 +690,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_ADD_NPC_FLAG: return sizeof(SmartAction::flag);
             case SMART_ACTION_REMOVE_NPC_FLAG: return sizeof(SmartAction::flag);
             case SMART_ACTION_SIMPLE_TALK: return sizeof(SmartAction::simpleTalk);
+            case SMART_ACTION_SELF_CAST: return sizeof(SmartAction::cast);
             case SMART_ACTION_INVOKER_CAST: return sizeof(SmartAction::cast);
             case SMART_ACTION_CROSS_CAST: return sizeof(SmartAction::crossCast);
             case SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST: return sizeof(SmartAction::randTimedActionList);
@@ -733,22 +734,21 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT: return sizeof(SmartAction::randomTimedEvent);
             case SMART_ACTION_REMOVE_ALL_GAMEOBJECTS: return NO_PARAMS;
             // case SMART_ACTION_PAUSE_MOVEMENT: return sizeof(SmartAction::pauseMovement);
-                //case SMART_ACTION_PLAY_ANIMKIT: return sizeof(SmartAction::raw);
-                //case SMART_ACTION_SCENE_PLAY: return sizeof(SmartAction::raw);
-                //case SMART_ACTION_SCENE_CANCEL: return sizeof(SmartAction::raw);
+            case SMART_ACTION_PLAY_ANIMKIT: return sizeof(SmartAction::raw);
+            case SMART_ACTION_SCENE_PLAY: return sizeof(SmartAction::raw);
+            case SMART_ACTION_SCENE_CANCEL: return sizeof(SmartAction::raw);
             // case SMART_ACTION_SPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
             // case SMART_ACTION_DESPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
             // case SMART_ACTION_RESPAWN_BY_SPAWNID: return sizeof(SmartAction::respawnData);
-            // case SMART_ACTION_INVOKER_CAST: return sizeof(SmartAction::cast);
             case SMART_ACTION_PLAY_CINEMATIC: return sizeof(SmartAction::cinematic);
             case SMART_ACTION_SET_MOVEMENT_SPEED: return sizeof(SmartAction::movementSpeed);
-                //case SMART_ACTION_PLAY_SPELL_VISUAL_KIT: return sizeof(SmartAction::raw);
+            // case SMART_ACTION_PLAY_SPELL_VISUAL_KIT: return sizeof(SmartAction::raw);
             // case SMART_ACTION_OVERRIDE_LIGHT: return sizeof(SmartAction::overrideLight);
             // case SMART_ACTION_OVERRIDE_WEATHER: return sizeof(SmartAction::overrideWeather);
-                //case SMART_ACTION_SET_AI_ANIM_KIT: return sizeof(SmartAction::raw);
+            // case SMART_ACTION_SET_AI_ANIM_KIT: return sizeof(SmartAction::raw);
             case SMART_ACTION_SET_HOVER: return sizeof(SmartAction::setHover);
             case SMART_ACTION_SET_HEALTH_PCT: return sizeof(SmartAction::setHealthPct);
-                //case SMART_ACTION_CREATE_CONVERSATION: return sizeof(SmartAction::raw);
+            // case SMART_ACTION_CREATE_CONVERSATION: return sizeof(SmartAction::raw);
             case SMART_ACTION_MOVE_TO_POS_TARGET: return sizeof(SmartAction::moveToPos);
             case SMART_ACTION_EXIT_VEHICLE: return NO_PARAMS;
             case SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS: return sizeof(SmartAction::movementFlag);
@@ -1438,11 +1438,14 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 }
                 break;
             }
-        case SMART_ACTION_CAST:
         case SMART_ACTION_INVOKER_CAST:
-            if (!IsSpellValid(e, e.action.cast.spell))
+            if (e.GetScriptType() != SMART_SCRIPT_TYPE_TIMED_ACTIONLIST && e.GetEventType() != SMART_EVENT_LINK && !EventHasInvoker(e.event.type))
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invoker cast action, but event does not provide any invoker!", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
                 return false;
+            }
             break;
+        case SMART_ACTION_CAST:
         case SMART_ACTION_CROSS_CAST:
             if (!IsSpellValid(e, e.action.crossCast.spell))
                 return false;

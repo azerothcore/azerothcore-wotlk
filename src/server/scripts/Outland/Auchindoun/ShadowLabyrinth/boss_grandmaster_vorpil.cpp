@@ -47,18 +47,20 @@ enum GrandmasterVorpil
     EVENT_SPELL_SHADOWBOLT      = 1,
     EVENT_SPELL_DRAWSHADOWS     = 2,
     EVENT_SUMMON_TRAVELER       = 3,
-    EVENT_SPELL_BANISH          = 4
+    EVENT_SPELL_BANISH          = 4,
+    EVENT_SPELL_RAIN_OF_FIRE    = 5
 };
 
-float VorpilPosition[3] = {-252.8820f, -264.3030f, 17.1f};
+float VorpilPosition[3] = {-253.548f, -263.646f, 17.0864f};
 
-float VoidPortalCoords[5][3] =
+//x, y, z, and orientation
+float VoidPortalCoords[5][4] =
 {
-    {-283.5894f, -239.5718f, 12.7f},
-    {-306.5853f, -258.4539f, 12.7f},
-    {-295.8789f, -269.0899f, 12.7f},
-    {-209.3401f, -262.7564f, 17.1f},
-    {-261.4533f, -297.3298f, 17.1f}
+    {-208.411f, -263.652f, 17.086313f, 3.121870040893554687f}, //portal A 33566
+    {-261.676f, -297.69f, 17.087011f, 1.360249996185302734f}, //portal B 33614
+    {-282.272f, -240.432f, 12.683899f, 5.580170154571533203f}, //portal C 33615
+    {-291.833f, -268.595f, 12.682545f, 0.047733999788761138f}, //portal D 33567
+    {-303.966f, -255.759f, 12.683404f, 6.012829780578613281f} //portal E 33616
 };
 
 class boss_grandmaster_vorpil : public CreatureScript
@@ -85,6 +87,8 @@ public:
 
         bool sayIntro, sayHelp;
 
+        int count = 0;
+
         void Reset() override
         {
             sayHelp = false;
@@ -98,18 +102,50 @@ public:
         void summonPortals()
         {
             for (uint8 i = 0; i < 5; ++i)
-                me->SummonCreature(NPC_VOID_PORTAL, VoidPortalCoords[i][0], VoidPortalCoords[i][1], VoidPortalCoords[i][2], 0, TEMPSUMMON_CORPSE_DESPAWN, 3000000);
+                me->SummonCreature(NPC_VOID_PORTAL, VoidPortalCoords[i][0], VoidPortalCoords[i][1], VoidPortalCoords[i][2], VoidPortalCoords[i][3], TEMPSUMMON_CORPSE_DESPAWN, 3000000);
         }
 
         void spawnVoidTraveler()
         {
             uint8 pos = urand(0, 4);
-            me->SummonCreature(NPC_VOID_TRAVELER, VoidPortalCoords[pos][0], VoidPortalCoords[pos][1], VoidPortalCoords[pos][2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+            me->SummonCreature(NPC_VOID_TRAVELER, VoidPortalCoords[pos][0], VoidPortalCoords[pos][1], VoidPortalCoords[pos][2], VoidPortalCoords[pos][3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             if (!sayHelp)
             {
                 Talk(SAY_HELP);
                 sayHelp = true;
             }
+        }
+
+        int counterVoidSpawns(int count)
+        {
+            int timer = 0;
+            switch(count)
+            {
+                case 1:
+                case 2:
+                    timer = 13300;
+                    break;
+                case 3:
+                    timer = 12100;
+                    break;
+                case 4:
+                    timer = 10900;
+                    break;
+                case 5:
+                case 6:
+                    timer = 9700;
+                    break;
+                case 7:
+                case 8:
+                    timer = 7200;
+                    break;
+                case 9:
+                    timer = 6000;
+                    break;
+                default:
+                    timer = 4800;
+            }
+            return timer;
         }
 
         void JustSummoned(Creature* summon) override
@@ -141,14 +177,17 @@ public:
             Talk(SAY_AGGRO);
             summonPortals();
 
-            events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(7000, 14000));
-            events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 45000);
-            events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 5000);
+            events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(9700, 20000));
+            events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 36400);
+            events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 10900);
             if (IsHeroic())
-                events.ScheduleEvent(EVENT_SPELL_BANISH, 17000);
-
+            {
+                events.ScheduleEvent(EVENT_SPELL_BANISH, urand(17000, 28000));
+            }
             if (instance)
+            {
                 instance->SetData(DATA_GRANDMASTERVORPILEVENT, IN_PROGRESS);
+            }
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -172,19 +211,21 @@ public:
             {
                 case EVENT_SPELL_SHADOWBOLT:
                     me->CastSpell(me, SPELL_SHADOWBOLT_VOLLEY, false);
-                    events.RepeatEvent(urand(15000, 30000));
+                    events.RepeatEvent(urand(9700, 20000));
                     break;
                 case EVENT_SPELL_BANISH:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30, false))
                         me->CastSpell(target, SPELL_BANISH, false);
-                    events.RepeatEvent(16000);
+                    events.RepeatEvent(urand(17000, 28000));
                     break;
                 case EVENT_SUMMON_TRAVELER:
                     spawnVoidTraveler();
-                    events.RepeatEvent(HealthBelowPct(20) ? 5000 : 10000);
+                    count++;
+                    events.RepeatEvent(counterVoidSpawns(count));
                     break;
                 case EVENT_SPELL_DRAWSHADOWS:
                     {
+                        me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
                         Map* map = me->GetMap();
                         Map::PlayerList const& PlayerList = map->GetPlayers();
                         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -193,15 +234,15 @@ public:
                                     player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
 
                         me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
-                        me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
-                        me->CastSpell(me, SPELL_RAIN_OF_FIRE_N);
-
-                        events.RepeatEvent(24000);
-                        events.DelayEvents(6000);
+                        events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 1000);
+                        events.RepeatEvent(urand(36400, 44950));
                         break;
                     }
+                case EVENT_SPELL_RAIN_OF_FIRE:
+                    me->CastSpell(me, DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
+                    events.DelayEvents(6000);
+                    break;
             }
-
             DoMeleeAttackIfReady();
         }
     };
