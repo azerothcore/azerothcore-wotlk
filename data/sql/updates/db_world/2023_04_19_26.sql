@@ -1,3 +1,4 @@
+-- DB update 2023_04_19_25 -> 2023_04_19_26
 -- ID 21861 (Vision of the Raven God), also set to not specified
 UPDATE `creature_template` SET `type` = 10 WHERE `entry` = 21861;
 
