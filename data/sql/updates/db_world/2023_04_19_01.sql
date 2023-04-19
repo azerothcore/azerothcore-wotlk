@@ -1,3 +1,4 @@
+-- DB update 2023_04_19_00 -> 2023_04_19_01
 --
 -- Create and Enable SmartAI for creature 348 to enable broadcasts
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=348;

@@ -1,3 +1,4 @@
+-- DB update 2023_04_19_11 -> 2023_04_19_12
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 18708) AND (`Item` IN (24309));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (18708, 24309, 0, 10, 0, 1, 0, 1, 1, 'Murmur - Pattern: Spellstrike Pants');
