@@ -1,3 +1,4 @@
+-- DB update 2023_04_19_21 -> 2023_04_19_22
 -- Quest: By Any Means Necessary 9978
 UPDATE `quest_template_addon` SET `SpecialFlags`=2 WHERE `ID`=9978;
 
