@@ -369,12 +369,13 @@ public:
             {
                 Say_Timer = 5000;
                 ReleasedFromCage = true;
+                auto target = SelectTargetFromPlayerList(15);
                 if (me->GetEntry() == NPC_CORKI)
-                    Talk(CORKI_SAY_THANKS);
+                    Talk(CORKI_SAY_THANKS, target);
                 if (me->GetEntry() == NPC_CORKI_2)
-                    Talk(CORKI_SAY_PROMISE);
+                    Talk(CORKI_SAY_PROMISE, target);
                 if (me->GetEntry() == NPC_CORKI_3)
-                    Talk(CORKI_SAY_LAST);
+                    Talk(CORKI_SAY_LAST, target);
             }
         };
     };
