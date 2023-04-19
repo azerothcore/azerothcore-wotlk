@@ -1,3 +1,4 @@
+-- DB update 2023_04_19_20 -> 2023_04_19_21
 -- Fel Reaver Sentinel
 DELETE FROM `spell_cooldown_overrides` WHERE `Id` IN (38055,38006,38052,37920);
 INSERT INTO `spell_cooldown_overrides` (`Id`, `RecoveryTime`, `CategoryRecoveryTime`, `StartRecoveryTime`, `StartRecoveryCategory`) VALUES 
