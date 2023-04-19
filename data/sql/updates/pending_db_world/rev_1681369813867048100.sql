@@ -12,9 +12,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21861, 0, 6, 7, 38, 0, 100, 0, 1, 4, 0, 0, 0, 11, 39431, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Vision of Raven God - On Data Set 4 - Cast credit'),
 (21861, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Vision of Raven God - Link - Say 3');
 
--- Remove cast time
-UPDATE `gameobject_template` SET `Data0` = 0 WHERE `entry` IN (184950,184967,184968,184969);
-
 -- The First Prophecy, also correct spawn position (previously falling from above)
 UPDATE `smart_scripts` SET `target_z` = 170.498 WHERE `source_type` = 1 AND `entryorguid` = 184950 AND `id` = 0;
 
