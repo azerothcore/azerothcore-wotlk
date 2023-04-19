@@ -1,3 +1,4 @@
+-- DB update 2023_04_19_33 -> 2023_04_19_34
 -- Rathis Tomber (16224)
 DELETE FROM `gossip_menu` WHERE `MenuID` = 7162 AND `TextID` = 8432;
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
