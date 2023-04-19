@@ -4,7 +4,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25416, 0, 1, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 42, 0, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simmer - On Respawn - Set Invincibility Hp 5%'),
 (25416, 0, 2, 0, 0, 0, 100, 1, 5000, 5000, 5000, 5000, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simmer - In Combat - Say Line 2'),
 (25416, 0, 3, 4, 0, 0, 100, 1, 10000, 10000, 10000, 10000, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simmer - In Combat - Say Line 3'),
-(25416, 0, 4, 5, 61, 0, 100, 1, 0, 0, 0, 0, 0, 134, 45599, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 'Simmer - Between 0-5% Health - Invoker Cast &apos;Boiling Point: Simmer Kill Credit&apos; (No Repeat)'),
+(25416, 0, 4, 5, 61, 0, 100, 1, 0, 0, 0, 0, 0, 134, 45599, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 'Simmer - Between 0-5% Health - Invoker Cast \'Boiling Point: Simmer Kill Credit\' (No Repeat)'),
 (25416, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simmer - Between 0-5% Health - Say Line 1 (No Repeat)'),
 (25416, 0, 6, 7, 61, 0, 100, 512, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simmer - Between 0-5% Health - Set Faction 35 (No Repeat)'),
 (25416, 0, 7, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simmer - Between 0-5% Health - Evade (No Repeat)'),
