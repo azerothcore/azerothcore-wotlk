@@ -1,3 +1,4 @@
+-- DB update 2023_04_19_30 -> 2023_04_19_31
 -- Costume Scraps
 DELETE FROM `conditions` WHERE `SourceGroup` IN (21383,21382,21492,21810,22308,21809,21637) AND `SourceEntry` = 31121 AND `SourceTypeOrReferenceId` = 1;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
