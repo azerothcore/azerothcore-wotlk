@@ -1,3 +1,4 @@
+-- DB update 2023_04_19_32 -> 2023_04_19_33
 -- Wickerman Guardian 15195
 DELETE FROM `creature_template_addon` WHERE (`entry` = 15195);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
