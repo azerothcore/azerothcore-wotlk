@@ -1,3 +1,4 @@
+-- DB update 2023_04_19_28 -> 2023_04_19_29
 -- Bogblossom Bunny SAI (Source: https://www.youtube.com/watch?v=EIFhKHtvOe0) 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23104;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 23104 AND `source_type` = 0;
