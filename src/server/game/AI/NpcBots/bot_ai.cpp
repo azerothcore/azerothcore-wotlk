@@ -14246,10 +14246,10 @@ void bot_ai::_AddItemLink(Player const* forPlayer, Item const* item, std::ostrin
     //name
     _LocalizeItem(forPlayer, name, suffix, item);
 
-    str << "|h[" << name;
+    str << "|h[";
     if (suffix.length() > 0)
-        str << ' ' << suffix;
-    str <<"]|h|r";
+        str << suffix;
+    str << name <<"]|h|r";
 
     //quantity
     if (item->GetCount() > 1)
