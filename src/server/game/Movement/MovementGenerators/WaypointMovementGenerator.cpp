@@ -406,7 +406,7 @@ bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
         bool departureEvent = true;
         do
         {
-            ASSERT(i_currentNode < i_path.size(), "Point Id: {}\n{}", pointId, player->GetGUID().ToString().c_str());
+            ASSERT(i_currentNode < i_path.size(), "Point Id: {}\n{}", pointId, player->GetGUID().ToString());
 
             DoEventIfAny(player, i_path[i_currentNode], departureEvent);
             while (!_pointsForPathSwitch.empty() && _pointsForPathSwitch.front().PathIndex <= i_currentNode)
