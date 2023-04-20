@@ -511,12 +511,12 @@ public:
                         {
                             Talk(SAY_MO_RESURRECTED);
                             me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);
-                            me->m_Events.AddEventAtOffset([this, Whitemane]()
+                            me->m_Events.AddEventAtOffset([this]()
                                 {
                                     me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                                 }, 1200ms);
                         }, 1000ms);
-                    me->m_Events.AddEventAtOffset([this, Whitemane]()
+                    me->m_Events.AddEventAtOffset([this]()
                         {
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
@@ -638,7 +638,7 @@ public:
                         DoCast(SPELL_SCARLET_RESURRECTION);
                         Talk(SAY_WH_RESURRECT, pMograine);
                         me->SetSheath(SHEATH_STATE_UNARMED);
-                        me->m_Events.AddEventAtOffset([this, pMograine]()
+                        me->m_Events.AddEventAtOffset([this]()
                             {
                                 me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                             }, 2600ms);
