@@ -324,7 +324,15 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (@CGUID+123, 0, 0, 0, 1, 333, 0, '18950'),
 (@CGUID+124, 0, 0, 0, 1, 333, 0, '18950'),
 (@CGUID+119, 0, 0, 0, 2, 376, 0, NULL),
-(@CGUID+120, 0, 0, 0, 2, 376, 0, NULL);
+(@CGUID+120, 0, 0, 0, 2, 376, 0, NULL),
+(@CGUID+175, 0, 0, 0, 1, 333, 0, '12782 18950'),
+(@CGUID+176, 0, 0, 0, 1, 333, 0, '12782 18950'),
+(@CGUID+177, 0, 0, 0, 1, 333, 0, '12782 18950'),
+(@CGUID+178, 0, 0, 0, 1, 333, 0, '12782 18950'),
+(@CGUID+183, 0, 0, 0, 1, 333, 0, '12782 18950'),
+(@CGUID+184, 0, 0, 0, 1, 333, 0, '12782 18950'),
+(@CGUID+192, 0, 0, 0, 1, 333, 0, '12782 18950'),
+(@CGUID+193, 0, 0, 0, 1, 333, 0, '12782 18950');
 
 UPDATE `creature_template_addon` SET `bytes2` = 1, `visibilityDistanceType` = 4, `auras` = '18950' WHERE (`entry` IN (17693, 20592)); -- Shattered Hand Scout triggers the start of Blood Guard Encounter
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (17464, 20586));
