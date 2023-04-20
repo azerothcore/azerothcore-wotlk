@@ -761,7 +761,7 @@ bool WorldSession::ValidateHyperlinksAndMaybeKick(std::string_view str)
     if (Acore::Hyperlinks::CheckAllLinks(str))
         return true;
 
-    LOG_ERROR("network", "Player {}{} sent a message with an invalid link:\n%.*s", GetPlayer()->GetName(),
+    LOG_ERROR("network", "Player {} {} sent a message with an invalid link:\n%.*s", GetPlayer()->GetName(),
         GetPlayer()->GetGUID().ToString(), STRING_VIEW_FMT_ARG(str));
 
     if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
