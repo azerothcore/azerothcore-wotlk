@@ -617,10 +617,20 @@ public:
             {
                 if (me->IsNonMeleeSpellCast(false))
                     me->InterruptNonMeleeSpells(false);
-
                 me->CastSpell(me->GetVictim(), SPELL_DEEP_SLEEP, true);
+                if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
+                {
+                    me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    me->InterruptNonMeleeSpells(false);
+                    float fx, fy, fz;
+                    mograine->GetContactPoint(me, fx, fy, fz, 2.f);
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MovePoint(1, fx, fy, fz);
+                }
                 canResurrectCheck = true;
                 canResurrect = true;
+                canEmote = true;
                 return;
             }
 
