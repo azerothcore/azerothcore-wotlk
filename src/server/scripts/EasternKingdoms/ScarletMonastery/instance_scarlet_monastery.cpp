@@ -457,6 +457,7 @@ public:
 
                 hasDied = true;
                 fakeDeath = true;
+                canEmote = true;
                 damage = 0;
                 ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_WHITEMANE))->SetInCombatWithZone();
             }
