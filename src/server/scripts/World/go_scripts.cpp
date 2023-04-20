@@ -1135,9 +1135,9 @@ public:
 
 #define GOSSIP_FEL_CRYSTALFORGE_TEXT 31000
 #define GOSSIP_FEL_CRYSTALFORGE_ITEM_TEXT_RETURN 31001
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_1 "Purchase 1 Unstable Flask of the Beast for the cost of 10 Apexis Shards"
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_5 "Purchase 5 Unstable Flask of the Beast for the cost of 50 Apexis Shards"
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN "Use the fel crystalforge to make another purchase."
+#define GOSSIP_FEL_CRYSTALFORGE_ITEM_1 "以 10 个埃匹希斯碎片的价格购买 1 个不稳定的野兽合剂"
+#define GOSSIP_FEL_CRYSTALFORGE_ITEM_5 "以 50 个埃匹希斯碎片的价格购买 5 个不稳定的野兽合剂"
+#define GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN "使用邪能水晶熔炉进行另一次购买。"
 
 enum FelCrystalforge
 {

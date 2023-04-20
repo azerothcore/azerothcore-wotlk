@@ -346,8 +346,8 @@ public:
             Talk(SAY_KJ_DEATH);
             instance->SetBossState(DATA_KILJAEDEN, DONE);
             if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KILJAEDEN_CONTROLLER))) {
-                if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                    Unit::Kill(player, controller);
+                if (auto player = me->GetMap()->GetPlayers().getFirst())
+                    Unit::Kill(player->GetSource(), controller);
                 else
                     controller->KillSelf();
             }
@@ -402,8 +402,8 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_KILL_SELF:
-                    if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                        Unit::Kill(player, me);
+                    if (auto player = me->GetMap()->GetPlayers().getFirst())
+                        Unit::Kill(player->GetSource(), me);
                     else
                         me->KillSelf();
                     break;

@@ -287,8 +287,8 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
         for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
             data << float(0);
-            data << "Greetings $N";
-            data << "Greetings $N";
+            data << "你好，$N";
+            data << "你好，$N";
             data << uint32(0);
             data << uint32(0);
             data << uint32(0);

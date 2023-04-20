@@ -440,18 +440,23 @@ public:
         npc_demonic_vapor_trailAI(Creature* creature) : NullCreatureAI(creature)
         {
             timer = 1;
+            cnt = 0;
         }
 
         uint32 timer;
+        uint32 cnt;
         void Reset() override
         {
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
+            cnt = 0;
         }
 
         void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
+            if (spellInfo->Id == SPELL_DEMONIC_VAPOR && cnt < (me->GetMap()->GetPlayers().getSize() > 1 ? 8 : 2)) {
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
+                cnt++;
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -462,7 +467,10 @@ public:
                 if (timer >= 6000)
                 {
                     timer = 0;
-                    me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
+                    if (cnt < (me->GetMap()->GetPlayers().getSize() > 1 ? 8 : 2)){
+                        me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
+                        cnt++;
+                    }
                 }
             }
         }
