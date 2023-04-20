@@ -609,7 +609,6 @@ public:
             Talk(SAY_WH_INTRO);
             events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1s, 3s);
             events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 6s);
-            //events.ScheduleEvent(EVENT_SPELL_HEAL, 9s);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -718,9 +717,6 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, false);
                     events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6s);
                     break;
-                    //case EVENT_SPELL_HEAL:
-                    //    me->CastSpell(me, SPELL_HEAL, false);
-                    //    break;
                 }
             }
             DoMeleeAttackIfReady();
