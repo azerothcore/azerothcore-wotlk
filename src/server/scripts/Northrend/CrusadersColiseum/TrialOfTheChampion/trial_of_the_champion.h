@@ -141,11 +141,28 @@ enum eNpcs
 
     NPC_BLACK_KNIGHT                                = 35451,
 
-    NPC_JAEREN                                      = 35004,
-    NPC_ARELAS                                      = 35005,
+    NPC_JAEREN                                      = 35004, // Horde
+    NPC_ARELAS                                      = 35005, // Alliance
     NPC_RISEN_JAEREN                                = 35545,
     NPC_RISEN_ARELAS                                = 35564,
-    NPC_TIRION                                      = 33628,
+    NPC_TIRION                                      = 33628, // Possibly wrong npc here, 34996 had already populated creature_text (from ToC25) that matches. Needs a sniff to confirm.
+
+    /// @todo: Argent Raid Spectator - FX - Missing spawns for Toc5 (map 650), ToC25 probably matches positions, needs a sniff to confirm.
+    // Horde
+    NPC_SPECTATOR_HORDE                             = 34883,
+    NPC_SPECTATOR_BELF                              = 34904,
+    NPC_SPECTATOR_TAUREN                            = 34903,
+    NPC_SPECTATOR_TROLL                             = 34902,
+    NPC_SPECTATOR_ORC                               = 34901,
+    NPC_SPECTATOR_UNDEAD                            = 34905,
+
+    // Alliance
+    NPC_SPECTATOR_ALLIANCE                          = 34887,
+    NPC_SPECTATOR_DWARF                             = 34906,
+    NPC_SPECTATOR_GNOME                             = 34910,
+    NPC_SPECTATOR_HUMAN                             = 34900,
+    NPC_SPECTATOR_NELF                              = 34909,
+    NPC_SPECTATOR_DRAENEI                           = 34908,
 };
 
 enum eGameObjects
@@ -175,69 +192,57 @@ enum eVehicles
 
 enum eTexts
 {
-    TEXT_LANA_STOUTHAMMER                           = 1,
-    TEXT_CHEER_LANA_STOUTHAMMER                     = 2,
-    TEXT_COLOSOS                                    = 3,
-    TEXT_CHEER_COLOSOS                              = 4,
-    TEXT_EVENSONG                                   = 5,
-    TEXT_CHEER_EVENSONG                             = 6,
-    TEXT_MARSHAL_JACOB_ALERIUS                      = 7,
-    TEXT_CHEER_MARSHAL_JACOB_ALERIUS                = 8,
-    TEXT_AMBROSE_BOLTSPARK                          = 9,
-    TEXT_CHEER_AMBROSE_BOLTSPARK                    = 10,
+    // Spectators
+    SAY_SPECTATOR_CHEER                             = 0,
 
-    TEXT_DEATHSTALKER_VESCERI                       = 11,
-    TEXT_CHEER_DEATHSTALKER_VESCERI                 = 12,
-    TEXT_RUNOK_WILDMANE                             = 13,
-    TEXT_CHEER_RUNOK_WILDMANE                       = 14,
-    TEXT_ZUL_TORE                                   = 15,
-    TEXT_CHEER_ZUL_TORE                             = 16,
-    TEXT_MOKRA_SKILLCRUSHER                         = 17,
-    TEXT_CHEER_MOKRA_SKILLCRUSHER                   = 18,
-    TEXT_ERESSEA_DAWNSINGER                         = 19,
-    TEXT_CHEER_ERESSEA_DAWNSINGER                   = 20,
+    // Announcers: Alliance Announcer - Arelas Brightstar && Horde Announcer - Jaeren Sunsworn
+    SAY_EADRIC_INTRO_ANNOUNCER                      = 0,
+    SAY_JAEREN_PALETRESS_INTRO                      = 1,
+    SAY_GRAND_CHAMPIONS_INTRO_1                     = 2,
+    SAY_GRAND_CHAMPIONS_INTRO_DAWNSINGER            = 3, // Boltspark
+    SAY_GRAND_CHAMPIONS_INTRO_ZULTORE               = 4, // Jaelyne
+    SAY_GRAND_CHAMPIONS_INTRO_SKULLCRUSHER          = 5, // Jacob
+    SAY_GRAND_CHAMPIONS_INTRO_DEATHSTALKER          = 6, // Lana
+    SAY_GRAND_CHAMPIONS_INTRO_WILDMANE              = 7, // Colosos
+    SAY_KNIGHT_INTRO                                = 8,
 
+    // Eadric
+    SAY_EADRIC_INTRO                                = 0,
+    SAY_EADRIC_AGGRO                                = 1,
+    SAY_EADRIC_EMOTE_RADIANCE                       = 2,
+    SAY_EADRIC_EMOTE_HAMMER_RIGHTEOUS               = 3,
+    SAY_EADRIC_HAMMER_RIGHTEOUS                     = 4,
+    SAY_EADRIC_KILL_PLAYER                          = 5, // "You! You need more practice." && "Nay, nay, and I say yet again nay! Not good enough."
+    SAY_EADRIC_DEFEATED                             = 6,
+
+    // Confessor Paletress
+    SAY_PALETRESS_INTRO_1                            = 0,
+    SAY_PALETRESS_INTRO_2                            = 1,
+    SAY_PALETRESS_AGGRO                              = 2,
+    SAY_PALETRESS_MEMORY_SUMMON                      = 3,
+    SAY_PALETRESS_MEMORY_DEATH                       = 4,
+    SAY_PALETRESS_KILL_PLAYER                        = 5, // "Take your rest. "&& "Be at ease."
+    SAY_PALETRESS_DEFEATED                           = 6,
+
+    // Tirion
     TEXT_WELCOME                                    = 21,
     TEXT_WELCOME_2                                  = 22,
     TEXT_BEGIN                                      = 23,
     TEXT_GRATZ_SLAIN_CHAMPIONS                      = 24,
-    TEXT_INTRODUCE_EADRIC                           = 25,
-    TEXT_INTRODUCE_PALETRESS                        = 26,
-    TEXT_CHEER_EADRIC_1                             = 27,
-    TEXT_CHEER_EADRIC_2                             = 28,
-    TEXT_EADRIC_SAY_1                               = 39,
-    TEXT_CHEER_PALETRESS_1                          = 29,
-    TEXT_CHEER_PALETRESS_2                          = 30,
-    TEXT_PALETRESS_SAY_1                            = 37,
-    TEXT_PALETRESS_SAY_2                            = 38,
     TEXT_YOU_MAY_BEGIN                              = 41,
-
+    // Tirion - The Black Knight Interactions
     TEXT_BK_INTRO                                   = 31,
-    TEXT_BK_RAFTERS                                 = 32,
-    TEXT_BK_SPOILED                                 = 33,
     TEXT_BK_MEANING                                 = 34,
-    TEXT_BK_LICH                                    = 35,
-    TEXT_BK_TASK                                    = 36,
 
-    TEXT_EADRIC_AGGRO                               = 42,
-    TEXT_EADRIC_HAMMER                              = 43,
-    TEXT_EADRIC_SLAIN_1                             = 44,
-    TEXT_EADRIC_SLAIN_2                             = 45,
-    TEXT_EADRIC_DEATH                               = 46,
-
-    TEXT_PALETRESS_AGGRO                            = 47,
-    TEXT_PALETRESS_MEMORY_SUMMON                    = 48,
-    TEXT_PALETRESS_MEMORY_DEFEATED                  = 51,
-    TEXT_PALETRESS_SLAIN_1                          = 49,
-    TEXT_PALETRESS_SLAIN_2                          = 50,
-    TEXT_PALETRESS_DEATH                            = 52,
-
-    TEXT_BK_AGGRO                                   = 53,
-    TEXT_BK_SLAIN_1                                 = 57,
-    TEXT_BK_SLAIN_2                                 = 58,
-    TEXT_BK_SKELETON_RES                            = 54,
-    TEXT_BK_GHOST_RES                               = 55,
-    TEXT_BK_DEATH                                   = 56,
+    // The Black Knight
+    SAY_BK_INTRO_1                                  = 0,
+    SAY_BK_INTRO_2                                  = 1,
+    SAY_BK_INTRO_3                                  = 2,
+    SAY_BK_AGGRO                                    = 3,
+    SAY_BK_PHASE_2                                  = 4, // Skeleton
+    SAY_BK_PHASE_3                                  = 5, // Ghost
+    SAY_BK_KILL_PLAYER                              = 6, // "Pathetic." && "A waste of flesh."
+    SAY_BK_DEATH                                    = 7,
 };
 
 template <class AI, class T>
