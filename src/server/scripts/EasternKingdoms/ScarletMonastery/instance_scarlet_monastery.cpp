@@ -396,6 +396,15 @@ public:
             hasDied = false;
             heal = false;
             fakeDeath = false;
+            canEmote = false;
+            if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
+            {
+                if (Whitemane->isDead())
+                {
+                    me->setDeathState(DEAD);
+                    me->RemoveCorpse();
+                }
+            }
             events.Reset();
         }
 
@@ -455,6 +464,7 @@ public:
 
         void KilledUnit(Unit* /*victim*/) override
         {
+
             Talk(SAY_MO_KILL);
         }
 
@@ -463,7 +473,6 @@ public:
             //When hit with resurrection say text
             if (spell->Id == SPELL_SCARLET_RESURRECTION)
             {
-                Talk(SAY_MO_RESURRECTED);
                 fakeDeath = false;
                 instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, SPECIAL);
             }
@@ -490,21 +499,38 @@ public:
                 if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
                 {
                     //Incase wipe during phase that mograine fake death
+                    me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
-                    me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
-                    me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);
-                    events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 1s, 5s);
-                    events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 6s, 11s);
-                    if (me->GetVictim())
-                        me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    me->AttackStop();
+                    me->InterruptNonMeleeSpells(false);
+                    me->SetReactState(REACT_PASSIVE);
+                    me->SetFacingToObject(Whitemane);
+                    me->m_Events.AddEventAtOffset([this, Whitemane]()
+                        {
+                            Talk(SAY_MO_RESURRECTED);
+                            me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);
+                            me->m_Events.AddEventAtOffset([this, Whitemane]()
+                                {
+                                    me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                                }, 1200ms);
+                        }, 1000ms);
+                    me->m_Events.AddEventAtOffset([this, Whitemane]()
+                        {
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
+                            events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 1s, 5s);
+                            events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 6s, 11s);
+                            if (me->GetVictim())
+                                AttackStart(me->GetVictim());
+                            canEmote = false;
+                        }, 5200ms);
                     heal = true;
                 }
             }
 
             //This if-check to make sure mograine does not attack while fake death
-            if (fakeDeath)
+            if (fakeDeath || canEmote)
                 return;
 
             events.Update(diff);
@@ -538,6 +564,7 @@ public:
         bool hasDied;
         bool heal;
         bool fakeDeath;
+        bool canEmote;
         EventMap events;
         InstanceScript* instance;
     };
