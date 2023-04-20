@@ -564,12 +564,15 @@ public:
         {
             canResurrectCheck = false;
             canResurrect = false;
-            Wait_Timer = 7000;
+            canEmote = false;
+            Wait_Timer = 6500;
             Heal_Timer = 10000;
+            me->SetReactState(REACT_AGGRESSIVE);
         }
 
         void JustReachedHome() override
         {
+            SetCombatMovement(true);
             instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
         }
 
@@ -578,7 +581,7 @@ public:
             Talk(SAY_WH_INTRO);
             events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1s, 3s);
             events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 6s);
-            events.ScheduleEvent(EVENT_SPELL_HEAL, 9s);
+            //events.ScheduleEvent(EVENT_SPELL_HEAL, 9s);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -602,10 +605,22 @@ public:
                 //When casting resuruction make sure to delay so on rez when reinstate battle deepsleep runs out
                 if (Wait_Timer <= diff)
                 {
-                    if (ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
+                    if (Creature* pMograine = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
                     {
+                        me->SetFacingToObject(pMograine);
                         DoCast(SPELL_SCARLET_RESURRECTION);
-                        Talk(SAY_WH_RESURRECT);
+                        Talk(SAY_WH_RESURRECT, pMograine);
+                        me->SetSheath(SHEATH_STATE_UNARMED);
+                        me->m_Events.AddEventAtOffset([this, pMograine]()
+                            {
+                                me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                            }, 2600ms);
+                        me->m_Events.AddEventAtOffset([this]()
+                            {
+                                me->SetReactState(REACT_AGGRESSIVE);
+                                AttackStart(me->GetVictim());
+                                canEmote = false;
+                            }, 5000ms);
                         canResurrect = false;
                     }
                 }
@@ -635,14 +650,13 @@ public:
             }
 
             //while in "resurrect-mode", don't do anything
-            if (canResurrect)
+            if (canResurrect || canEmote)
                 return;
 
             //If we are <75% hp cast healing spells at self or Mograine
             if (Heal_Timer <= diff)
             {
                 Creature* target = nullptr;
-
                 if (!HealthAbovePct(75))
                     target = me;
 
@@ -668,20 +682,19 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_SPELL_POWER_WORLD_SHIELD:
-                        me->CastSpell(me, SPELL_POWER_WORD_SHIELD, false);
-                        events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 15s);
-                        break;
-                    case EVENT_SPELL_HOLY_SMITE:
-                        me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, false);
-                        events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6s);
-                        break;
-                    case EVENT_SPELL_HEAL:
-                        me->CastSpell(me, SPELL_HEAL, false);
-                        break;
+                case EVENT_SPELL_POWER_WORLD_SHIELD:
+                    me->CastSpell(me, SPELL_POWER_WORD_SHIELD, false);
+                    events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 15s);
+                    break;
+                case EVENT_SPELL_HOLY_SMITE:
+                    me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, false);
+                    events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6s);
+                    break;
+                    //case EVENT_SPELL_HEAL:
+                    //    me->CastSpell(me, SPELL_HEAL, false);
+                    //    break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
 
@@ -691,6 +704,7 @@ public:
         uint32 Wait_Timer;
         bool canResurrectCheck;
         bool canResurrect;
+        bool canEmote;
         EventMap events;
     };
 
