@@ -25,6 +25,13 @@ enum MainChambersAccessPanelSays
     SAY_LOUD_RUMBLE = 1
 };
 
+MinionData const minionData[] =
+{
+    { NPC_NAGA_DISTILLER,          DATA_WARLORD_KALITHRESH  },
+    { NPC_THESPIA_WATER_ELEMENTAL, DATA_HYDROMANCER_THESPIA },
+    { 0,                            0                       }
+};
+
 class go_main_chambers_access_panel : public GameObjectScript
 {
 public:
@@ -91,14 +98,16 @@ public:
 ObjectData const creatureData[] =
 {
     { NPC_MEKGINEER_STEAMRIGGER,    DATA_MEKGINEER_STEAMRIGGER  },
-    { NPC_DOOR_CONTROLLER,          DATA_DOOR_CONTROLLER        }
+    { NPC_DOOR_CONTROLLER,          DATA_DOOR_CONTROLLER        },
+    { 0,                            0                           }
 };
 
 ObjectData const objectData[] =
 {
     { GO_ACCESS_PANEL_HYDRO, DATA_ACCESS_PANEL_HYDROMANCER },
     { GO_ACCESS_PANEL_MEK,   DATA_ACCESS_PANEL_MEKGINEER   },
-    { GO_MAIN_CHAMBERS_DOOR, DATA_MAIN_CHAMBERS_DOOR       }
+    { GO_MAIN_CHAMBERS_DOOR, DATA_MAIN_CHAMBERS_DOOR       },
+    { 0,                     0,                            }
 };
 
 class instance_steam_vault : public InstanceMapScript
@@ -113,6 +122,7 @@ public:
             SetHeaders(DataHeaders);
             SetBossNumber(EncounterCount);
             LoadObjectData(creatureData, objectData);
+            LoadMinionData(minionData);
         }
 
         void OnGameObjectCreate(GameObject* go) override

@@ -4461,7 +4461,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Self Visual - Sleep Until Cancelled(DND)
-    ApplySpellFix({ 14915 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 6606, 14915 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_SEATED;
     });

@@ -260,6 +260,9 @@ public:
 
     // Allows to perform particular actions
     virtual void DoAction(int32 /*action*/) {}
+
+    // Allows executing code using all creatures registered in the instance script as minions
+    void DoForAllMinions(uint32 id, std::function<void(Creature*)> exec);
 protected:
     void SetHeaders(std::string const& dataHeaders);
     void SetBossNumber(uint32 number) { bosses.resize(number); }
