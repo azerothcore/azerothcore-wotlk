@@ -150,7 +150,7 @@ void SecretMgr::AttemptLoad(Secrets i, LogLevel errorLevel, std::unique_lock<std
         Optional<std::string> error = AttemptTransition(Secrets(i), currentValue, oldSecret, static_cast<bool>(oldDigest));
         if (error)
         {
-            LOG_MESSAGE_BODY("server.loading", errorLevel, "Your value of '{}' changed, but we cannot transition your database to the new value:\n{}", info.configKey, error->c_str());
+            LOG_MESSAGE_BODY("server.loading", errorLevel, "Your value of '{}' changed, but we cannot transition your database to the new value:\n{}", info.configKey, error);
             _secrets[i].state = Secret::LOAD_FAILED;
             return;
         }
