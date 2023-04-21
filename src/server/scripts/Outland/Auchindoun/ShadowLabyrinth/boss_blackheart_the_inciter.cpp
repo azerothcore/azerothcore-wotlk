@@ -136,7 +136,7 @@ public:
                         for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                         {
                             Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                            
+
                             if (target && target->IsPlayer())
                             {
                                 if (Creature* inciteTrigger = me->SummonCreature(inciteTriggerID++, *target, TEMPSUMMON_TIMED_DESPAWN, 15 * IN_MILLISECONDS))
