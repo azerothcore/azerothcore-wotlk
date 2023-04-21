@@ -56,8 +56,8 @@ AC_API_EXPORT EnumText EnumUtils<CreatureFlagsExtra>::ToString(CreatureFlagsExtr
         case CREATURE_FLAG_EXTRA_AVOID_AOE: return { "CREATURE_FLAG_EXTRA_AVOID_AOE", "CREATURE_FLAG_EXTRA_AVOID_AOE", "pussywizard: ignored by aoe attacks (for icc blood prince council npc - Dark Nucleus)" };
         case CREATURE_FLAG_EXTRA_NO_DODGE: return { "CREATURE_FLAG_EXTRA_NO_DODGE", "CREATURE_FLAG_EXTRA_NO_DODGE", "xinef: target cannot dodge" };
         case CREATURE_FLAG_EXTRA_MODULE: return { "CREATURE_FLAG_EXTRA_MODULE", "CREATURE_FLAG_EXTRA_MODULE", "Used by module creatures to avoid blizzlike checks." };
-        case CREATURE_FLAG_EXTRA_IGNORE_ASSISTANCE_CALL: return { "CREATURE_FLAG_EXTRA_IGNORE_ASSISTANCE_CALL", "Creatures are not aggroed by other mobs assistance functions", "" };
-        case CREATURE_FLAG_EXTRA_UNUSED_27: return { "CREATURE_FLAG_EXTRA_UNUSED_27", "CREATURE_FLAG_EXTRA_UNUSED_27", "" };
+        case CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE: return { "CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE", "Creature does not call for assistance on initial aggro", "" };
+        case CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI: return { "CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI", "Creature entry SAI won't be overriden by GUID SAI", "" };
         case CREATURE_FLAG_EXTRA_UNUSED_28: return { "CREATURE_FLAG_EXTRA_UNUSED_28", "CREATURE_FLAG_EXTRA_UNUSED_28", "" };
         case CREATURE_FLAG_EXTRA_DUNGEON_BOSS: return { "CREATURE_FLAG_EXTRA_DUNGEON_BOSS", "CREATURE_FLAG_EXTRA_DUNGEON_BOSS", "creature is a dungeon boss (SET DYNAMICALLY, DO NOT ADD IN DB)" };
         case CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING: return { "CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING", "CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING", "creature ignore pathfinding" };
@@ -100,8 +100,8 @@ AC_API_EXPORT CreatureFlagsExtra EnumUtils<CreatureFlagsExtra>::FromIndex(size_t
         case 22: return CREATURE_FLAG_EXTRA_AVOID_AOE;
         case 23: return CREATURE_FLAG_EXTRA_NO_DODGE;
         case 24: return CREATURE_FLAG_EXTRA_MODULE;
-        case 25: return CREATURE_FLAG_EXTRA_IGNORE_ASSISTANCE_CALL;
-        case 26: return CREATURE_FLAG_EXTRA_UNUSED_27;
+        case 25: return CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE;
+        case 26: return CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI;
         case 27: return CREATURE_FLAG_EXTRA_UNUSED_28;
         case 28: return CREATURE_FLAG_EXTRA_DUNGEON_BOSS;
         case 29: return CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING;
@@ -141,8 +141,8 @@ AC_API_EXPORT size_t EnumUtils<CreatureFlagsExtra>::ToIndex(CreatureFlagsExtra v
         case CREATURE_FLAG_EXTRA_AVOID_AOE: return 22;
         case CREATURE_FLAG_EXTRA_NO_DODGE: return 23;
         case CREATURE_FLAG_EXTRA_MODULE: return 24;
-        case CREATURE_FLAG_EXTRA_IGNORE_ASSISTANCE_CALL: return 25;
-        case CREATURE_FLAG_EXTRA_UNUSED_27: return 26;
+        case CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE: return 25;
+        case CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI: return 26;
         case CREATURE_FLAG_EXTRA_UNUSED_28: return 27;
         case CREATURE_FLAG_EXTRA_DUNGEON_BOSS: return 28;
         case CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING: return 29;

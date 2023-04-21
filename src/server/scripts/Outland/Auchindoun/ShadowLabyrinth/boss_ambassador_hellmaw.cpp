@@ -42,217 +42,194 @@ enum eEnums
     SOUND_INTRO             = 9349
 };
 
-class boss_ambassador_hellmaw : public CreatureScript
+struct boss_ambassador_hellmaw : public BossAI
 {
-public:
-    boss_ambassador_hellmaw() : CreatureScript("boss_ambassador_hellmaw") { }
+    boss_ambassador_hellmaw(Creature* creature) : BossAI(creature, TYPE_HELLMAW) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    bool isBanished;
+
+    void InitializeAI() override
     {
-        return GetShadowLabyrinthAI<boss_ambassador_hellmawAI>(creature);
-    }
+        Reset();
 
-    struct boss_ambassador_hellmawAI : public ScriptedAI
-    {
-        boss_ambassador_hellmawAI(Creature* creature) : ScriptedAI(creature)
+        if (instance->GetData(TYPE_RITUALISTS) != DONE)
         {
-            instance = creature->GetInstanceScript();
+            isBanished = true;
+            me->SetImmuneToAll(true);
+
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                DoCastSelf(SPELL_BANISH, true);
+            }, 500ms);
         }
-
-        InstanceScript* instance;
-        EventMap events;
-        bool isBanished;
-
-        void InitializeAI() override
+        else
         {
-            Reset();
-
-            if (instance && instance->GetData(TYPE_RITUALISTS) != DONE)
-            {
-                isBanished = true;
-                me->SetImmuneToAll(true);
-
-                me->m_Events.AddEventAtOffset([this]()
-                {
-                    DoCastSelf(SPELL_BANISH, true);
-                }, 500ms);
-            }
-            else
-            {
-                me->GetMotionMaster()->MovePath(PATH_ID_START, false);
-            }
-        }
-
-        void Reset() override
-        {
-            events.Reset();
-            isBanished = false;
-            me->SetImmuneToAll(false);
-            if (instance)
-            {
-                instance->SetData(TYPE_HELLMAW, NOT_STARTED);
-            }
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param != 1)
-            {
-                return;
-            }
-
-            me->RemoveAurasDueToSpell(SPELL_BANISH);
-            Talk(SAY_INTRO);
-            DoPlaySoundToSet(me, SOUND_INTRO);
-            isBanished = false;
-            me->SetImmuneToAll(false);
             me->GetMotionMaster()->MovePath(PATH_ID_START, false);
         }
+    }
 
-        void JustEngagedWith(Unit*) override
+    void Reset() override
+    {
+        _Reset();
+        isBanished = false;
+        me->SetImmuneToAll(false);
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param != 1)
         {
-            if (isBanished)
-            {
-                return;
-            }
-
-            Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_SPELL_CORROSIVE, urand(5000, 10000));
-            events.ScheduleEvent(EVENT_SPELL_FEAR, urand(15000, 20000));
-            if (IsHeroic())
-            {
-                events.ScheduleEvent(EVENT_SPELL_ENRAGE, 180000);
-            }
-
-            if (instance)
-            {
-                instance->SetData(TYPE_HELLMAW, IN_PROGRESS);
-            }
+            return;
         }
 
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (isBanished)
-            {
-                return;
-            }
+        me->RemoveAurasDueToSpell(SPELL_BANISH);
+        Talk(SAY_INTRO);
+        DoPlaySoundToSet(me, SOUND_INTRO);
+        isBanished = false;
+        me->SetImmuneToAll(false);
+        me->GetMotionMaster()->MovePath(PATH_ID_START, false);
+    }
 
-            ScriptedAI::MoveInLineOfSight(who);
+    void JustEngagedWith(Unit*) override
+    {
+        if (isBanished)
+        {
+            return;
         }
 
-        void AttackStart(Unit* who) override
-        {
-            if (isBanished)
-            {
-                return;
-            }
+        Talk(SAY_AGGRO);
+        events.ScheduleEvent(EVENT_SPELL_CORROSIVE, urand(23050, 30350));
 
-            ScriptedAI::AttackStart(who);
+        scheduler.Schedule(23050ms, 30350ms, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CORROSIVE_ACID);
+            context.Repeat(23050ms, 30350ms);
+        }).Schedule(23s, 33s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_FEAR);
+            context.Repeat(23s, 33s);
+        });
+
+        if (IsHeroic())
+        {
+            scheduler.Schedule(3min, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_ENRAGE, true);
+            });
         }
 
-        void PathEndReached(uint32 pathId) override
+        _JustEngagedWith();
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (isBanished)
         {
-            if (pathId == PATH_ID_START)
+            return;
+        }
+
+        ScriptedAI::MoveInLineOfSight(who);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (isBanished)
+        {
+            return;
+        }
+
+        ScriptedAI::AttackStart(who);
+    }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        if (pathId == PATH_ID_START)
+        {
+            me->m_Events.AddEventAtOffset([this]()
             {
-                me->m_Events.AddEventAtOffset([this]()
+                me->GetMotionMaster()->MovePath(PATH_ID_PATHING, true);
+            }, 20s);
+        }
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer() && urand(0, 1))
+        {
+            Talk(SAY_SLAY);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
+        _JustDied();
+    }
+
+    bool CanAIAttack(Unit const* /*unit*/) const override
+    {
+        return !isBanished;
+    }
+
+    void DoMeleeAttackIfReady(bool ignoreCasting)
+    {
+        if (!ignoreCasting && me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            return;
+        }
+
+        Unit* victim = me->GetVictim();
+        if (!victim || !victim->IsInWorld())
+        {
+            return;
+        }
+
+        if (!me->IsWithinMeleeRange(victim))
+        {
+            return;
+        }
+
+        //Make sure our attack is ready and we aren't currently casting before checking distance
+        if (me->isAttackReady())
+        {
+            // xinef: prevent base and off attack in same time, delay attack at 0.2 sec
+            if (me->haveOffhandWeapon())
+            {
+                if (me->getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
                 {
-                    me->GetMotionMaster()->MovePath(PATH_ID_PATHING, true);
-                }, 20s);
-            }
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            if (instance)
-                instance->SetData(TYPE_HELLMAW, DONE);
-        }
-
-        bool CanAIAttack(Unit const* /*unit*/) const override
-        {
-            return !isBanished;
-        }
-
-        void DoMeleeAttackIfReady(bool ignoreCasting)
-        {
-            if (!ignoreCasting && me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            Unit* victim = me->GetVictim();
-            if (!victim || !victim->IsInWorld())
-            {
-                return;
-            }
-
-            if (!me->IsWithinMeleeRange(victim))
-            {
-                return;
-            }
-
-            //Make sure our attack is ready and we aren't currently casting before checking distance
-            if (me->isAttackReady())
-            {
-                // xinef: prevent base and off attack in same time, delay attack at 0.2 sec
-                if (me->haveOffhandWeapon())
-                {
-                    if (me->getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
-                    {
-                        me->setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-                    }
+                    me->setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
                 }
-
-                me->AttackerStateUpdate(victim, BASE_ATTACK, false, ignoreCasting);
-                me->resetAttackTimer();
             }
 
-            if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK))
-            {
-                // xinef: delay main hand attack if both will hit at the same time (players code)
-                if (me->getAttackTimer(BASE_ATTACK) < ATTACK_DISPLAY_DELAY)
-                {
-                    me->setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
-                }
-
-                me->AttackerStateUpdate(victim, OFF_ATTACK, false, ignoreCasting);
-                me->resetAttackTimer(OFF_ATTACK);
-            }
+            me->AttackerStateUpdate(victim, BASE_ATTACK, false, ignoreCasting);
+            me->resetAttackTimer();
         }
 
-        void UpdateAI(uint32 diff) override
+        if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK))
         {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            switch (events.ExecuteEvent())
+            // xinef: delay main hand attack if both will hit at the same time (players code)
+            if (me->getAttackTimer(BASE_ATTACK) < ATTACK_DISPLAY_DELAY)
             {
-                case EVENT_SPELL_CORROSIVE:
-                    me->CastSpell(me->GetVictim(), SPELL_CORROSIVE_ACID, false);
-                    events.RepeatEvent(urand(15000, 25000));
-                    break;
-                case EVENT_SPELL_FEAR:
-                    me->CastSpell(me, SPELL_FEAR, false);
-                    events.RepeatEvent(urand(20000, 35000));
-                    break;
-                case EVENT_SPELL_ENRAGE:
-                    me->CastSpell(me->GetVictim(), SPELL_ENRAGE, false);
-                    break;
+                me->setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
             }
 
-            DoMeleeAttackIfReady(me->FindCurrentSpellBySpellId(SPELL_CORROSIVE_ACID) != nullptr);
+            me->AttackerStateUpdate(victim, OFF_ATTACK, false, ignoreCasting);
+            me->resetAttackTimer(OFF_ATTACK);
         }
-    };
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        DoMeleeAttackIfReady(me->FindCurrentSpellBySpellId(SPELL_CORROSIVE_ACID) != nullptr);
+    }
 };
 
 void AddSC_boss_ambassador_hellmaw()
 {
-    new boss_ambassador_hellmaw();
+    RegisterShadowLabyrinthCreatureAI(boss_ambassador_hellmaw);
 }
