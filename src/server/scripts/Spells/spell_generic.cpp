@@ -3663,7 +3663,9 @@ class spell_gen_ds_flush_knockback : public SpellScript
    60864 - Jaws of Death            (spell_gen_default_count_pct_from_max_hp)
    38441 - Cataclysmic Bolt                         (spell_gen_50pct_count_pct_from_max_hp)
    66316, 67100, 67101, 67102 - Spinning Pain Spike (spell_gen_50pct_count_pct_from_max_hp)
-   41360 - L5 Arcane Charge                         (spell_gen_100pct_count_pct_from_max_hp) */
+   41360 - L5 Arcane Charge                         (spell_gen_100pct_count_pct_from_max_hp)
+   33711/38794 - Murmur's Touch
+   */
 class spell_gen_count_pct_from_max_hp : public SpellScript
 {
     PrepareSpellScript(spell_gen_count_pct_from_max_hp)

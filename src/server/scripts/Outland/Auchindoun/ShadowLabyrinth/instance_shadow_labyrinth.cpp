@@ -68,7 +68,7 @@ public:
                     break;
                 case SCREAMING_HALL_DOOR:
                     m_uiScreamingHallDoorGUID = go->GetGUID();
-                    if (m_auiEncounter[DATA_GRANDMASTERVORPILEVENT] == DONE)
+                    if (m_auiEncounter[DATA_GRANDMASTER_VORPIL_EVENT] == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
             }
@@ -116,7 +116,7 @@ public:
                     m_auiEncounter[type] = uiData;
                     break;
 
-                case DATA_GRANDMASTERVORPILEVENT:
+                case DATA_GRANDMASTER_VORPIL_EVENT:
                     if (uiData == DONE)
                         DoUseDoorOrButton(m_uiScreamingHallDoorGUID);
                     m_auiEncounter[type] = uiData;
