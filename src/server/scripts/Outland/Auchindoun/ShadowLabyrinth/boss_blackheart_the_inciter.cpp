@@ -22,7 +22,7 @@
 enum BlackheartTheInciter
 {
     SPELL_INCITE_CHAOS      = 33676,
-    SPELL_INCITE_CHAOS_B    = 33684,                         //debuff applied to each member of party
+    SPELL_INCITE_CHAOS_B    = 33684,    //debuff applied to each member of party
     SPELL_CHARGE            = 33709,
     SPELL_WAR_STOMP         = 33707,
 
@@ -35,6 +35,7 @@ enum BlackheartTheInciter
     EVENT_SPELL_INCITE      = 1,
     EVENT_INCITE_WAIT       = 2,
     EVENT_SPELL_CHARGE      = 3,
+    
     EVENT_SPELL_KNOCKBACK   = 4,
 
     NPC_INCITE_TRIGGER   = 19300
@@ -59,7 +60,6 @@ public:
 
         InstanceScript* instance;
         EventMap events;
-
         bool InciteChaos;
 
         void Reset() override
@@ -67,40 +67,48 @@ public:
             me->SetImmuneToPC(false);
             InciteChaos = false;
             events.Reset();
-
             if (instance)
+            {
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, NOT_STARTED);
+            }
         }
 
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
+            {
                 Talk(SAY_SLAY);
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (instance)
+            {
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, DONE);
+            }
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_SPELL_INCITE, 20000);
+            me->CallForHelp(100.0f);
+            events.ScheduleEvent(EVENT_SPELL_INCITE, 24000);
             events.ScheduleEvent(EVENT_INCITE_WAIT, 15000);
-            events.ScheduleEvent(EVENT_SPELL_CHARGE, 0);
-            events.ScheduleEvent(EVENT_SPELL_KNOCKBACK, 15000);
-
+            events.ScheduleEvent(EVENT_SPELL_CHARGE, urand(30000, 50000));
+            events.ScheduleEvent(EVENT_SPELL_WAR_STOMP, urand(16950, 26350));
             if (instance)
+            {
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, IN_PROGRESS);
+            }
         }
 
         void EnterEvadeMode(EvadeReason why) override
         {
             if (InciteChaos && SelectTargetFromPlayerList(100.0f))
                 return;
+
             CreatureAI::EnterEvadeMode(why);
         }
 
@@ -120,38 +128,37 @@ public:
                     break;
                 case EVENT_SPELL_INCITE:
                     {
-                        me->CastSpell(me, SPELL_INCITE_CHAOS, false);
+                        DoCastAOE(SPELL_INCITE_CHAOS);
 
                         uint32 inciteTriggerID = NPC_INCITE_TRIGGER;
                         std::list<HostileReference*> t_list = me->GetThreatMgr().GetThreatList();
                         for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                         {
                             Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+                            
                             if (target && target->IsPlayer())
                             {
                                 if (Creature* inciteTrigger = me->SummonCreature(inciteTriggerID++, *target, TEMPSUMMON_TIMED_DESPAWN, 15 * IN_MILLISECONDS))
                                 {
                                     inciteTrigger->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
                                 }
-                            }
                         }
 
                         DoResetThreatList();
                         me->SetImmuneToPC(true);
                         InciteChaos = true;
                         events.DelayEvents(15000);
-                        events.RepeatEvent(40000);
+                        events.RepeatEvent(urand(50000, 70000));
                         events.ScheduleEvent(EVENT_INCITE_WAIT, 15000);
                         break;
                     }
                 case EVENT_SPELL_CHARGE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_CHARGE, false);
-                    events.RepeatEvent(urand(15000, 25000));
+                    DoCastRandomTarget(SPELL_CHARGE);
+                    events.RepeatEvent(urand(30000, 50000));
                     break;
-                case EVENT_SPELL_KNOCKBACK:
-                    me->CastSpell(me, SPELL_WAR_STOMP, false);
-                    events.RepeatEvent(urand(18000, 24000));
+                case EVENT_SPELL_WAR_STOMP:
+                    DoCastAOE(SPELL_WAR_STOMP);
+                    events.RepeatEvent(urand(16950, 26350));
                     break;
             }
 

@@ -134,7 +134,12 @@ public:
 
             // Not in progress
             instance->SetData(DATA_ARAN, NOT_STARTED);
-            instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), true);
+
+            if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+            {
+                libraryDoor->SetGoState(GO_STATE_ACTIVE);
+                libraryDoor->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            }
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -147,7 +152,12 @@ public:
             Talk(SAY_DEATH);
 
             instance->SetData(DATA_ARAN, DONE);
-            instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), true);
+
+            if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+            {
+                libraryDoor->SetGoState(GO_STATE_ACTIVE);
+                libraryDoor->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            }
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -155,7 +165,13 @@ public:
             Talk(SAY_AGGRO);
 
             instance->SetData(DATA_ARAN, IN_PROGRESS);
-            instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), false);
+
+            if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+            {
+                libraryDoor->SetGoState(GO_STATE_READY);
+                libraryDoor->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            }
+
             DoZoneInCombat();
         }
 
@@ -203,7 +219,11 @@ public:
             {
                 if (CloseDoorTimer <= diff)
                 {
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), false);
+                    if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+                    {
+                        libraryDoor->SetGoState(GO_STATE_READY);
+                        libraryDoor->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                    }
                     CloseDoorTimer = 0;
                 }
                 else
