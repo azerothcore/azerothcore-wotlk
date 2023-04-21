@@ -35,7 +35,10 @@ enum BlackheartTheInciter
     EVENT_SPELL_INCITE      = 1,
     EVENT_INCITE_WAIT       = 2,
     EVENT_SPELL_CHARGE      = 3,
-    EVENT_SPELL_WAR_STOMP   = 4
+    EVENT_SPELL_KNOCKBACK   = 4,
+    EVENT_SPELL_WAR_STOMP   = 5,
+
+    NPC_INCITE_TRIGGER   = 19300
 };
 
 class boss_blackheart_the_inciter : public CreatureScript
@@ -61,6 +64,7 @@ public:
 
         void Reset() override
         {
+            me->SetImmuneToPC(false);
             InciteChaos = false;
             events.Reset();
             if (instance)
@@ -110,30 +114,39 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
+            if (!UpdateVictim() && !InciteChaos)
+            {
                 return;
+            }
 
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
                 case EVENT_INCITE_WAIT:
+                    me->SetImmuneToPC(false);
                     InciteChaos = false;
                     break;
                 case EVENT_SPELL_INCITE:
                     {
                         DoCastAOE(SPELL_INCITE_CHAOS);
 
+                        uint32 inciteTriggerID = NPC_INCITE_TRIGGER;
                         std::list<HostileReference*> t_list = me->GetThreatMgr().GetThreatList();
                         for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                         {
                             Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                            if (target && target->GetTypeId() == TYPEID_PLAYER)
+
+                            if (target && target->IsPlayer())
                             {
-                                me->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
+                                if (Creature* inciteTrigger = me->SummonCreature(inciteTriggerID++, *target, TEMPSUMMON_TIMED_DESPAWN, 15 * IN_MILLISECONDS))
+                                {
+                                    inciteTrigger->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
+                                }
                             }
                         }
 
                         DoResetThreatList();
+                        me->SetImmuneToPC(true);
                         InciteChaos = true;
                         events.DelayEvents(15000);
                         events.RepeatEvent(urand(50000, 70000));
