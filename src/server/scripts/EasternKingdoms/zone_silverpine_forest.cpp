@@ -27,6 +27,7 @@ npc_deathstalker_erland
 pyrewood_ambush
 EndContentData */
 
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -325,12 +326,165 @@ public:
     };
 };
 
-/*######
-## AddSC
-######*/
+/**
+ *
+ * @todo: Actual emote and BroadcastTextId need to be sniffed. Probably the entire event to begin with....
+ * There is a possibility that the unused texts are chosen by random for specific parts of the speech. (making it look like they are preset, when in fact, they are not)
+ *
+ */
+
+enum ApparitionMisc
+{
+    // Crowd
+    NPC_GNOLL_RUNNER        = 1772,
+    NPC_GNOLL_MYSTIC        = 1773,
+    EMOTE_CHEER             = 71,
+    EMOTE_GNOLL_CHEER       = 1,
+
+    // Apparition
+    SAY_APPA_INTRO          = 0,
+    SAY_APPA_OUTRO          = 14,
+
+    // Variation 1
+    SAY_APPA_OPTION_1_1     = 1,
+    SAY_APPA_OPTION_1_2     = 5,
+    SAY_APPA_OPTION_1_3     = 10,
+    SAY_APPA_OPTION_1_4     = 13,
+
+    // Variation 2
+    SAY_APPA_OPTION_2_1     = 2,
+    SAY_APPA_OPTION_2_2     = 5,
+    SAY_APPA_OPTION_2_3     = 9,
+    SAY_APPA_OPTION_2_4     = 12,
+};
+
+enum ApparitionEvents
+{
+    EVENT_APPA_INTRO        = 1,
+    EVENT_APPA_SAY_1        = 2,
+    EVENT_APPA_SAY_2        = 3,
+    EVENT_APPA_SAY_3        = 4,
+    EVENT_APPA_SAY_4        = 5,
+    EVENT_APPA_OUTRO        = 6,
+    EVENT_APPA_OUTRO_CROWD  = 7,
+    EVENT_APPA_OUTRO_END    = 8,
+};
+
+class npc_ravenclaw_apparition : public CreatureScript
+{
+public:
+    npc_ravenclaw_apparition() : CreatureScript("npc_ravenclaw_apparition") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_ravenclaw_apparitionAI(creature);
+    }
+
+    struct npc_ravenclaw_apparitionAI : public NullCreatureAI
+    {
+        npc_ravenclaw_apparitionAI(Creature* creature) : NullCreatureAI(creature), summons(me)
+        {
+            HasEnded = false;
+            TalkRNG = urand(0,1);
+            events.ScheduleEvent(EVENT_APPA_INTRO, 2000);
+            summons.DespawnAll();
+        }
+
+        EventMap events;
+        SummonList summons;
+        bool HasEnded;
+        bool TalkRNG;
+
+        void SummonCrowd()
+        {
+            for (uint8 i = 0; i < urand(3, 5); ++i)
+            {
+                float o = i * 10;
+                me->SummonCreature(urand(NPC_GNOLL_RUNNER,NPC_GNOLL_MYSTIC), me->GetPositionX() + urand(3,5) * cos(o) , me->GetPositionY() + urand(3,5) * sin(o), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 35000);
+            }
+        }
+
+        void EmoteCrowd()
+        {
+            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            {
+                if (Creature* c = ObjectAccessor::GetCreature(*me, *itr))
+                    {
+                        if (urand(0,1))
+                        {
+                            c->HandleEmoteCommand(EMOTE_CHEER);
+                            c->AI()->Talk(EMOTE_GNOLL_CHEER);
+                        }
+                    }
+            }
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            summons.Summon(summon);
+            summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PACIFIED);
+            summon->SetFacingToObject(me);
+        }
+
+        // Should never die, just in case.
+        void JustDied(Unit* /*killer*/) override
+        {
+            summons.DespawnAll();
+            events.Reset();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (HasEnded || !me->IsVisible())
+                return;
+
+            events.Update(diff);
+
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_APPA_INTRO:
+                    Talk(SAY_APPA_INTRO);
+                    SummonCrowd();
+                    events.ScheduleEvent(EVENT_APPA_SAY_1, 3000);
+                    break;
+                case EVENT_APPA_SAY_1:
+                    Talk(TalkRNG ? SAY_APPA_OPTION_1_1 : SAY_APPA_OPTION_2_1);
+                    events.ScheduleEvent(EVENT_APPA_SAY_2, 5000);
+                    break;
+                case EVENT_APPA_SAY_2:
+                    Talk(TalkRNG ? SAY_APPA_OPTION_1_2 : SAY_APPA_OPTION_2_2);
+                    events.ScheduleEvent(EVENT_APPA_SAY_3, 5000);
+                    break;
+                case EVENT_APPA_SAY_3:
+                    Talk(TalkRNG ? SAY_APPA_OPTION_1_3 : SAY_APPA_OPTION_2_3);
+                    events.ScheduleEvent(EVENT_APPA_SAY_4, 5000);
+                    break;
+                case EVENT_APPA_SAY_4:
+                    Talk(TalkRNG ? SAY_APPA_OPTION_1_4 : SAY_APPA_OPTION_2_4);
+                    events.ScheduleEvent(EVENT_APPA_OUTRO, 5000);
+                    break;
+                case EVENT_APPA_OUTRO:
+                    Talk(SAY_APPA_OUTRO);
+                    events.ScheduleEvent(EVENT_APPA_OUTRO_CROWD, 3000);
+                    break;
+                case EVENT_APPA_OUTRO_CROWD:
+                    EmoteCrowd();
+                    events.ScheduleEvent(EVENT_APPA_OUTRO_END, 5000);
+                    break;
+                case EVENT_APPA_OUTRO_END: // Despawn for Apparition is handled via Areatrigger SAI (5m)
+                    summons.DespawnAll();
+                    me->SetVisible(false);
+                    HasEnded = true;
+                    events.Reset();
+                    break;
+            }
+        }
+    };
+};
 
 void AddSC_silverpine_forest()
 {
     new npc_deathstalker_erland();
     new pyrewood_ambush();
+    new npc_ravenclaw_apparition();
 }
