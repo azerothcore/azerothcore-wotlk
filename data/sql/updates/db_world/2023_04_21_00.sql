@@ -1,3 +1,4 @@
+-- DB update 2023_04_20_00 -> 2023_04_21_00
 -- Trigger SAI Areatrigger 173 if no Ravenclaw Apparition within 30 yards.
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 173 AND `SourceId` = 2;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
