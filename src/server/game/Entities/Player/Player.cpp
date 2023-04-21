@@ -1988,7 +1988,7 @@ void Player::RegenerateHealth()
 
         if (!IsStandState())
         {
-            addvalue *= 1.5f;
+            addvalue *= 1.33f;
         }
 
         AuraEffectList const& mModHealthRegenPct = GetAuraEffectsByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
