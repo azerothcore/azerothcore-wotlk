@@ -35,7 +35,6 @@ enum BlackheartTheInciter
     EVENT_SPELL_INCITE      = 1,
     EVENT_INCITE_WAIT       = 2,
     EVENT_SPELL_CHARGE      = 3,
-    
     EVENT_SPELL_KNOCKBACK   = 4,
     EVENT_SPELL_WAR_STOMP   = 5,
 
