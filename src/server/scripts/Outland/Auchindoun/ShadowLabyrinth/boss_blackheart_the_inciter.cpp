@@ -37,6 +37,7 @@ enum BlackheartTheInciter
     EVENT_SPELL_CHARGE      = 3,
     
     EVENT_SPELL_KNOCKBACK   = 4,
+    EVENT_SPELL_WAR_STOMP   = 5,
 
     NPC_INCITE_TRIGGER   = 19300
 };
@@ -142,6 +143,7 @@ public:
                                 {
                                     inciteTrigger->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
                                 }
+                            }
                         }
 
                         DoResetThreatList();
