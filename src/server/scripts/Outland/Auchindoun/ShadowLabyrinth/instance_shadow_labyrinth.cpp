@@ -26,6 +26,12 @@ DoorData const doorData[] =
     { 0,                      0,                              DOOR_TYPE_ROOM    }  // END
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_HELLMAW, TYPE_HELLMAW },
+    { 0,           0            },
+};
+
 class instance_shadow_labyrinth : public InstanceMapScript
 {
 public:
@@ -43,9 +49,8 @@ public:
             SetBossNumber(EncounterCount);
             SetPersistentDataCount(PersistentDataCount);
             LoadDoorData(doorData);
+            LoadObjectData(creatureData, nullptr);
         }
-
-        ObjectGuid m_uiHellmawGUID;
 
         uint32 _ritualistsAliveCount;
 
@@ -58,15 +63,12 @@ public:
         {
             InstanceScript::OnCreatureCreate(creature);
 
-            switch (creature->GetEntry())
+            if (creature->GetEntry() == NPC_CABAL_RITUALIST)
             {
-                case NPC_CABAL_RITUALIST:
-                    if (creature->IsAlive())
-                        ++_ritualistsAliveCount;
-                    break;
-                case NPC_HELLMAW:
-                    m_uiHellmawGUID = creature->GetGUID();
-                    break;
+                if (creature->IsAlive())
+                {
+                    ++_ritualistsAliveCount;
+                }
             }
         }
 
@@ -79,9 +81,9 @@ public:
                 if (!--_ritualistsAliveCount)
                 {
                     StorePersistentData(TYPE_RITUALISTS, DONE);
-                    if (Creature* cr = instance->GetCreature(m_uiHellmawGUID))
+                    if (Creature* hellmaw = GetCreature(TYPE_HELLMAW))
                     {
-                        cr->AI()->DoAction(1);
+                        hellmaw->AI()->DoAction(1);
                     }
                 }
             }
