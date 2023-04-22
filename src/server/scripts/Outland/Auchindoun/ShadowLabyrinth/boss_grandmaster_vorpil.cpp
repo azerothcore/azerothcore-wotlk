@@ -43,12 +43,6 @@ enum GrandmasterVorpil
 
     NPC_VOID_PORTAL             = 19224,
     SPELL_VOID_PORTAL_VISUAL    = 33569,
-
-    EVENT_SPELL_SHADOWBOLT      = 1,
-    EVENT_SPELL_DRAWSHADOWS     = 2,
-    EVENT_SUMMON_TRAVELER       = 3,
-    EVENT_SPELL_BANISH          = 4,
-    EVENT_SPELL_RAIN_OF_FIRE    = 5
 };
 
 float VorpilPosition[3] = {-253.548f, -263.646f, 17.0864f};
@@ -67,23 +61,15 @@ struct boss_grandmaster_vorpil : public BossAI
 {
     boss_grandmaster_vorpil(Creature* creature) : BossAI(creature, DATA_GRANDMASTER_VORPIL)
     {
-        instance = creature->GetInstanceScript();
         sayIntro = false;
     }
 
-    InstanceScript* instance;
     bool sayIntro, sayHelp;
-    int count = 0;
 
     void Reset() override
     {
+        _Reset();
         sayHelp = false;
-        events.Reset();
-        summons.DespawnAll();
-        if (instance)
-        {
-            instance->SetData(DATA_GRANDMASTER_VORPIL_EVENT, NOT_STARTED);
-        }
     }
 
     void summonPortals()
@@ -105,36 +91,30 @@ struct boss_grandmaster_vorpil : public BossAI
         }
     }
 
-    int counterVoidSpawns(int count)
+    Milliseconds counterVoidSpawns(uint8 count)
     {
-        int timer = 0;
-        switch(count)
+        switch (count)
         {
             case 1:
             case 2:
-                timer = 13300;
-                break;
+                return 13300ms;
             case 3:
-                timer = 12100;
-                break;
+                return 12100ms;
             case 4:
-                timer = 10900;
-                break;
+                return 10900ms;
             case 5:
             case 6:
-                timer = 9700;
-                break;
+                return 9700ms;
             case 7:
             case 8:
-                timer = 7200;
-                break;
+                return 7200ms;
             case 9:
-                timer = 6000;
-                break;
+                return 6000ms;
             default:
-                timer = 4800;
+                return 4800ms;
         }
-        return timer;
+
+        return 1s;
     }
 
     void JustSummoned(Creature* summon) override
@@ -152,7 +132,7 @@ struct boss_grandmaster_vorpil : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
         {
             Talk(SAY_SLAY);
         }
@@ -161,27 +141,50 @@ struct boss_grandmaster_vorpil : public BossAI
     void JustDied(Unit* /*killer*/) override
     {
         Talk(SAY_DEATH);
-        summons.DespawnAll();
-        if (instance)
-        {
-            instance->SetData(DATA_GRANDMASTER_VORPIL_EVENT, DONE);
-        }
+        _JustDied();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         summonPortals();
-        events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(9700, 20000));
-        events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 36400);
-        events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 10900);
+
+        scheduler.Schedule(9700ms, 20s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_SHADOWBOLT_VOLLEY);
+            context.Repeat();
+        }).Schedule(36400ms, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_DRAW_SHADOWS, true);
+
+            me->GetMap()->DoForAllPlayers([&](Player* player)
+            {
+                if (player->IsAlive() && !player->HasAura(SPELL_BANISH))
+                {
+                    player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
+                }
+            });
+
+            scheduler.Schedule(1s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
+            });
+
+            me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
+            context.Repeat(36400ms, 44950ms);
+        }).Schedule(10900ms, [this](TaskContext context)
+        {
+            spawnVoidTraveler();
+            context.Repeat(counterVoidSpawns(context.GetRepeatCounter()));
+        });
+
         if (IsHeroic())
         {
-            events.ScheduleEvent(EVENT_SPELL_BANISH, urand(17000, 28000));
-        }
-        if (instance)
-        {
-            instance->SetData(DATA_GRANDMASTER_VORPIL_EVENT, IN_PROGRESS);
+            scheduler.Schedule(17s, 28s, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_BANISH, 0, 30.0f, true);
+                context.Repeat();
+            });
         }
     }
 
@@ -193,55 +196,6 @@ struct boss_grandmaster_vorpil : public BossAI
             Talk(SAY_INTRO);
             sayIntro = true;
         }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        switch (events.ExecuteEvent())
-        {
-            case EVENT_SPELL_SHADOWBOLT:
-                DoCastAOE(SPELL_SHADOWBOLT_VOLLEY);
-                events.RepeatEvent(urand(9700, 20000));
-                break;
-            case EVENT_SPELL_BANISH:
-                DoCastRandomTarget(SPELL_BANISH, 0, 30.0f, true);
-                events.RepeatEvent(urand(17000, 28000));
-                break;
-            case EVENT_SUMMON_TRAVELER:
-                spawnVoidTraveler();
-                count++;
-                events.RepeatEvent(counterVoidSpawns(count));
-                break;
-            case EVENT_SPELL_DRAWSHADOWS:
-                {
-                    DoCastSelf(SPELL_DRAW_SHADOWS, true);
-                    Map* map = me->GetMap();
-                    Map::PlayerList const& PlayerList = map->GetPlayers();
-                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    {
-                        if (Player* player = i->GetSource())
-                        {
-                            if (player->IsAlive() && !player->HasAura(SPELL_BANISH))
-                            {
-                                player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
-                            }
-                        }
-                    }
-                    me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
-                    events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 1000);
-                    events.RepeatEvent(urand(36400, 44950));
-                    break;
-                }
-            case EVENT_SPELL_RAIN_OF_FIRE:
-                DoCastSelf(DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
-                events.DelayEvents(6000);
-                break;
-        }
-        DoMeleeAttackIfReady();
     }
 };
 
