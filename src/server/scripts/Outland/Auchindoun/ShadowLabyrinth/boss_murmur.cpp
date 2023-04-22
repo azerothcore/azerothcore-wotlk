@@ -218,7 +218,6 @@ class spell_murmur_touch : public AuraScript
         {
             if (GetTarget())
             {
-                GetTarget()->CastSpell(GetTarget(), SPELL_SHOCKWAVE, true);
                 GetTarget()->CastSpell(GetTarget(), SPELL_SHOCKWAVE_SERVERSIDE, true);
             }
         }
