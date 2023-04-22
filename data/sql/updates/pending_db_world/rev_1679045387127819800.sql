@@ -59,8 +59,6 @@ ALTER TABLE `creature_loot_template` MODIFY `Reference` INT NOT NULL DEFAULT '0'
 ALTER TABLE `creature_model_info` MODIFY `DisplayID` INT UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `creature_model_info` MODIFY `DisplayID_Other_Gender` INT UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `creature_onkill_reputation` MODIFY `creature_id` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Creature Identifier';
-ALTER TABLE `creature_onkill_reputation` MODIFY `RewOnKillRepValue1` INT NOT NULL DEFAULT '0';
-ALTER TABLE `creature_onkill_reputation` MODIFY `RewOnKillRepValue2` INT NOT NULL DEFAULT '0';
 ALTER TABLE `creature_questender` MODIFY `id` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Identifier';
 ALTER TABLE `creature_questender` MODIFY `quest` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Quest Identifier';
 ALTER TABLE `creature_questitem` MODIFY `VerifiedBuild` INT DEFAULT NULL;
