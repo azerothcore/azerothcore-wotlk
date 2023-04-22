@@ -1,3 +1,4 @@
+-- DB update 2023_04_22_05 -> 2023_04_22_06
 DELETE FROM `achievement_reward_locale` WHERE `ID` IN (13, 45, 614, 876, 1250, 1956, 2096, 2143, 3478, 3656, 4478, 4602, 4603, 4784, 4785) AND `locale` = 'deDE';
 INSERT INTO `achievement_reward_locale` (`ID`, `Locale`, `Subject`, `Text`) VALUES
 (13, 'deDE', 'Stufe 80', 'Herzlichen Glückwunsch zu Eurem Erreichen der 80. Abenteuersaison! Ihr habt Euch zweifelsohne der Sache verschrieben, Azeroth von den Übeln zu befreien, die uns geplagt haben.$B$BUnd obwohl die bisherige Reise keine Kleinigkeit war, steht der wahre Kampf noch bevor.$B$BKämpft weiter!$B$BRhonin'),

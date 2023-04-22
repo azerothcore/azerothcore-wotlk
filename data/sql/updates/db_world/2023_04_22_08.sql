@@ -1,3 +1,4 @@
+-- DB update 2023_04_22_07 -> 2023_04_22_08
 --
 
 /* Does not drop from any other creatures */

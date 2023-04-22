@@ -1,3 +1,4 @@
+-- DB update 2023_04_22_06 -> 2023_04_22_07
 -- ID 18885 (Farahlon Giant)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18885;
 
