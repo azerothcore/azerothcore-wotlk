@@ -422,6 +422,12 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
     AuctionEntry* auction = auctionHouse->GetAuction(auctionId);
     Player* player = GetPlayer();
 
+    if (!sScriptMgr->CanPlaceAuctionBid(player, auction))
+    {
+        SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_RESTRICTED_ACCOUNT);
+        return;
+    }
+
     if (!auction || auction->owner == player->GetGUID())
     {
         //you cannot bid your own auction:

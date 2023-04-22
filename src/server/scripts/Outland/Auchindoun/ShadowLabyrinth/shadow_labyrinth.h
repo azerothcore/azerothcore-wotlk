@@ -30,9 +30,11 @@ enum slData
     TYPE_RITUALISTS                 = 0,
     TYPE_HELLMAW                    = 1,
     DATA_BLACKHEARTTHEINCITEREVENT  = 2,
-    DATA_GRANDMASTERVORPILEVENT     = 3,
-    DATA_MURMUREVENT                = 4,
-    MAX_ENCOUNTER                   = 5
+    DATA_GRANDMASTER_VORPIL         = 3,
+    DATA_GRANDMASTER_VORPIL_EVENT   = 4,
+    DATA_MURMUR                     = 5,
+    DATA_MURMUREVENT                = 6,
+    MAX_ENCOUNTER                   = 7
 };
 
 enum slNPCandGO
