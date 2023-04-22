@@ -52,7 +52,7 @@ struct boss_ambassador_hellmaw : public BossAI
     {
         Reset();
 
-        if (instance->GetData(TYPE_RITUALISTS) != DONE)
+        if (instance->GetPersistentData(TYPE_RITUALISTS) != DONE)
         {
             isBanished = true;
             me->SetImmuneToAll(true);
@@ -98,7 +98,6 @@ struct boss_ambassador_hellmaw : public BossAI
         }
 
         Talk(SAY_AGGRO);
-        events.ScheduleEvent(EVENT_SPELL_CORROSIVE, urand(23050, 30350));
 
         scheduler.Schedule(23050ms, 30350ms, [this](TaskContext context)
         {
