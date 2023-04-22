@@ -32,6 +32,11 @@ enum HunterSpells
     SPELL_HUNTER_PET_SCALING            = 62915
 };
 
+enum CreatureTemplateEntry {
+    CREATURE_VENOMOUS_SNAKE             = 19833,
+    CREATURE_VIPER                      = 19921
+};
+
 struct npc_pet_hunter_snake_trap : public ScriptedAI
 {
     npc_pet_hunter_snake_trap(Creature* creature) : ScriptedAI(creature) { _init = false; }
@@ -113,6 +118,15 @@ struct npc_pet_hunter_snake_trap : public ScriptedAI
             uint32 delta = urand(0, 700);
             me->SetAttackTime(BASE_ATTACK, Info->BaseAttackTime + delta);
             me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER, float(stats->AttackPower));
+
+            if (Info->Entry == CREATURE_VIPER) {
+                me->SetFloatValue(UNIT_FIELD_MINDAMAGE, 38);
+                me->SetFloatValue(UNIT_FIELD_MAXDAMAGE, 53);
+            } else if (Info->Entry == CREATURE_VENOMOUS_SNAKE) {
+                me->SetFloatValue(UNIT_FIELD_MINDAMAGE, 16);
+                me->SetFloatValue(UNIT_FIELD_MAXDAMAGE, 24);
+            }
+
             me->CastSpell(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
 
             // Glyph of Snake Trap
