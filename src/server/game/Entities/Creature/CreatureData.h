@@ -71,7 +71,8 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_AVOID_AOE                       = 0x00400000,   // pussywizard: ignored by aoe attacks (for icc blood prince council npc - Dark Nucleus)
     CREATURE_FLAG_EXTRA_NO_DODGE                        = 0x00800000,   // xinef: target cannot dodge
     CREATURE_FLAG_EXTRA_MODULE                          = 0x01000000,
-    CREATURE_FLAG_EXTRA_IGNORE_ASSISTANCE_CALL          = 0x02000000,   // Creatures are not aggroed by other mobs assistance functions
+    CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE            = 0x02000000,   // Prevent creatures from calling for assistance on initial aggro
+    CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI               = 0x04000000,   // Load both ENTRY and GUID specific SAI
     CREATURE_FLAG_EXTRA_NPCBOT                          = 0x04000000,   // custom flag for NPCBots (not confirmed safe)
     CREATURE_FLAG_EXTRA_NPCBOT_PET                      = 0x08000000,   // custom flag for NPCBot pets (not confirmed safe)
     CREATURE_FLAG_EXTRA_DUNGEON_BOSS                    = 0x10000000,   // creature is a dungeon boss (SET DYNAMICALLY, DO NOT ADD IN DB)
