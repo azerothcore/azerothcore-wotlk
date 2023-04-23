@@ -1,3 +1,4 @@
+-- DB update 2023_04_23_01 -> 2023_04_23_02
 -- 18116 (Daggerfen Assassin)
 UPDATE `creature_template_addon` SET `auras` = '22766' WHERE `entry` = 18116;
 
