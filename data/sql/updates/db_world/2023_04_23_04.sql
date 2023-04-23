@@ -1,3 +1,4 @@
+-- DB update 2023_04_23_03 -> 2023_04_23_04
 UPDATE `creature_template` SET `DamageModifier`=0.01, `ArmorModifier`=0.98 WHERE `Entry`=21097;
 UPDATE `creature_template` SET `DamageModifier`=0.01, `ArmorModifier`=1 WHERE `Entry`=15706;
 UPDATE `creature_template` SET `DamageModifier`=0.01, `ArmorModifier`=1 WHERE `Entry`=17096;

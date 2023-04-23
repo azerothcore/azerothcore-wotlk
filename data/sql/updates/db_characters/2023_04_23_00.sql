@@ -1,3 +1,4 @@
+-- DB update 2023_04_22_00 -> 2023_04_23_00
 -- convert mediumint to int
 ALTER TABLE `character_aura` MODIFY `spell` INT UNSIGNED DEFAULT '0';
 ALTER TABLE `character_pet` MODIFY `CreatedBySpell` INT UNSIGNED DEFAULT '0';

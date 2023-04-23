@@ -1,3 +1,4 @@
+-- DB update 2023_04_23_02 -> 2023_04_23_03
 -- Convert mediumint to int
 ALTER TABLE `achievement_criteria_data` MODIFY `criteria_id` INT NOT NULL;
 ALTER TABLE `achievement_criteria_data` MODIFY `value1` INT UNSIGNED NOT NULL DEFAULT '0';

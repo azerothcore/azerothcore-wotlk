@@ -1,3 +1,4 @@
+-- DB update 2023_04_23_05 -> 2023_04_23_06
 --
 /*  Gug Fatcandle  */
 UPDATE `creature_template` SET `speed_walk` = 1.0, `speed_run` = 0.857143 WHERE `entry`=62;

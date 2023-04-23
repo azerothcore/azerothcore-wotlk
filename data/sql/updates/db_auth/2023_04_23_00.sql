@@ -1,3 +1,4 @@
+-- DB update 2023_02_20_00 -> 2023_04_23_00
 -- Update engine, row format, charset and collation
 ALTER TABLE `account` ENGINE InnoDB ROW_FORMAT=DEFAULT, CONVERT TO CHARSET utf8mb4 COLLATE 'utf8mb4_unicode_ci';
 ALTER TABLE `account_access` ENGINE InnoDB ROW_FORMAT=DEFAULT, CONVERT TO CHARSET utf8mb4 COLLATE 'utf8mb4_unicode_ci';
