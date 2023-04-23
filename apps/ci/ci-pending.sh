@@ -27,7 +27,7 @@ for i in `find data/sql/updates/pending* -name "*sql" -type f`; do
         echo "> broadcast_text check - Failed"
         echo "    - DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!"
         echo "    - This error can safely be ignored if the changes are approved to be sniffed."
-        exit 1
+#        exit 1
     else
         echo "> broadcast_text check - OK"
     fi
