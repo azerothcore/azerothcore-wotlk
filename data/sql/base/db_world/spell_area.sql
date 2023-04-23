@@ -17,22 +17,21 @@
 -- Dumping structure for table acore_world.spell_area
 DROP TABLE IF EXISTS `spell_area`;
 CREATE TABLE IF NOT EXISTS `spell_area` (
-  `spell` mediumint unsigned NOT NULL DEFAULT '0',
-  `area` mediumint unsigned NOT NULL DEFAULT '0',
-  `quest_start` mediumint unsigned NOT NULL DEFAULT '0',
-  `quest_end` mediumint unsigned NOT NULL DEFAULT '0',
-  `aura_spell` mediumint NOT NULL DEFAULT '0',
-  `racemask` mediumint unsigned NOT NULL DEFAULT '0',
+  `spell` int unsigned NOT NULL DEFAULT '0',
+  `area` int unsigned NOT NULL DEFAULT '0',
+  `quest_start` int unsigned NOT NULL DEFAULT '0',
+  `quest_end` int unsigned NOT NULL DEFAULT '0',
+  `aura_spell` int NOT NULL DEFAULT '0',
+  `racemask` int unsigned NOT NULL DEFAULT '0',
   `gender` tinyint unsigned NOT NULL DEFAULT '2',
   `autocast` tinyint unsigned NOT NULL DEFAULT '0',
   `quest_start_status` int NOT NULL DEFAULT '64',
   `quest_end_status` int NOT NULL DEFAULT '11',
   PRIMARY KEY (`spell`,`area`,`quest_start`,`aura_spell`,`racemask`,`gender`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.spell_area: 697 rows
+-- Dumping data for table acore_world.spell_area: ~697 rows (approximately)
 DELETE FROM `spell_area`;
-/*!40000 ALTER TABLE `spell_area` DISABLE KEYS */;
 INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status`) VALUES
 	(27105, 4492, 0, 12951, 0, 0, 2, 1, 64, 11),
 	(27769, 4071, 0, 0, 0, 0, 2, 1, 64, 11),
@@ -731,7 +730,6 @@ INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spe
 	(75434, 14, 25444, 25444, 0, 0, 2, 1, 74, 11),
 	(75434, 367, 25444, 25444, 0, 0, 2, 1, 74, 11),
 	(75434, 393, 25444, 25444, 0, 0, 2, 1, 74, 11);
-/*!40000 ALTER TABLE `spell_area` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

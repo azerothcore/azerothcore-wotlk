@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `lag_reports` (
   `latency` int unsigned NOT NULL DEFAULT '0',
   `createTime` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`reportId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
 -- Dumping data for table acore_characters.lag_reports: ~0 rows (approximately)
 DELETE FROM `lag_reports`;

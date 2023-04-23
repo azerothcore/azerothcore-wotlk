@@ -18,19 +18,17 @@
 DROP TABLE IF EXISTS `cinematiccamera_dbc`;
 CREATE TABLE IF NOT EXISTS `cinematiccamera_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `model` varchar(100) DEFAULT NULL,
+  `model` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `soundEntry` int NOT NULL DEFAULT '0',
   `locationX` float NOT NULL DEFAULT '0',
   `locationY` float NOT NULL DEFAULT '0',
   `locationZ` float NOT NULL DEFAULT '0',
   `rotation` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Cinematic camera DBC';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cinematic camera DBC';
 
--- Dumping data for table acore_world.cinematiccamera_dbc: 0 rows
+-- Dumping data for table acore_world.cinematiccamera_dbc: ~0 rows (approximately)
 DELETE FROM `cinematiccamera_dbc`;
-/*!40000 ALTER TABLE `cinematiccamera_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `cinematiccamera_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS `account_access` (
   `id` int unsigned NOT NULL,
   `gmlevel` tinyint unsigned NOT NULL,
   `RealmID` int NOT NULL DEFAULT '-1',
-  `comment` varchar(255) DEFAULT '',
+  `comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
   PRIMARY KEY (`id`,`RealmID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_auth.account_access: ~0 rows (approximately)
 DELETE FROM `account_access`;

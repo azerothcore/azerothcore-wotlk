@@ -18,15 +18,14 @@
 DROP TABLE IF EXISTS `player_factionchange_titles`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_titles` (
   `alliance_id` int NOT NULL,
-  `alliance_comment` text,
+  `alliance_comment` text COLLATE utf8mb4_unicode_ci,
   `horde_id` int NOT NULL,
-  `horde_comment` text,
+  `horde_comment` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.player_factionchange_titles: 22 rows
+-- Dumping data for table acore_world.player_factionchange_titles: ~22 rows (approximately)
 DELETE FROM `player_factionchange_titles`;
-/*!40000 ALTER TABLE `player_factionchange_titles` DISABLE KEYS */;
 INSERT INTO `player_factionchange_titles` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
 	(1, 'Private <name>', 15, 'Scout <name>'),
 	(2, 'Corporal <name>', 16, 'Grunt <name>'),
@@ -50,7 +49,6 @@ INSERT INTO `player_factionchange_titles` (`alliance_id`, `alliance_comment`, `h
 	(147, '<name> of Darnassus', 154, '<name> of the Undercity'),
 	(148, '<name> of Ironforge', 151, '<name> of Sen\'jin'),
 	(149, '<name> of Stormwind', 150, '<name> of Orgrimmar');
-/*!40000 ALTER TABLE `player_factionchange_titles` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
