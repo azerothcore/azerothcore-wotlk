@@ -1,3 +1,4 @@
+-- DB update 2023_04_22_11 -> 2023_04_23_00
 --
 -- Put Item 1219 Redridge Machete loot on right mob
 DELETE FROM `reference_loot_template` WHERE  `Entry`=24077 AND `Item`=1219;
