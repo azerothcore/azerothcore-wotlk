@@ -1,3 +1,4 @@
+
 DELETE FROM `creature` WHERE `id1` = 17461;
 DELETE FROM `creature` WHERE `id1` = 20923;
 INSERT INTO `creature` VALUES (151283, 20923, 0, 0, 540, 0, 0, 2, 1, 1, 512.687, 315.652, 2.0405, 2.98451, 86400, 0, 0, 103320, 0, 0, 0, 0, 0, '', 0);
