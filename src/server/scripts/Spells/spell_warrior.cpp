@@ -59,6 +59,7 @@ enum WarriorSpells
     SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2     = 64850,
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
+    SPELL_WARRIOR_WHIRLWIND_MAIN                    = 50622,
     SPELL_WARRIOR_WHIRLWIND_OFF                     = 44949
 };
 
@@ -646,12 +647,18 @@ class spell_warr_sweeping_strikes : public AuraScript
                 case SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2:
                 case SPELL_WARRIOR_WHIRLWIND_OFF:
                     return false;
+                case SPELL_WARRIOR_WHIRLWIND_MAIN:
+                    if (actor->HasSpellCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1))
+                    {
+                        return false;
+                    }
+                    break;
                 default:
                     break;
             }
         }
 
-        _procTarget = eventInfo.GetActor()->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
+        _procTarget = actor->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
         return _procTarget != nullptr;
     }
 
@@ -668,6 +675,11 @@ class spell_warr_sweeping_strikes : public AuraScript
             }
             else
             {
+                if (spellInfo && spellInfo->Id == SPELL_WARRIOR_WHIRLWIND_MAIN)
+                {
+                    eventInfo.GetActor()->AddSpellCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, 0, 500);
+                }
+
                 int32 damage = damageInfo->GetUnmitigatedDamage();
                 GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, &damage, 0, 0, true, nullptr, aurEff);
             }

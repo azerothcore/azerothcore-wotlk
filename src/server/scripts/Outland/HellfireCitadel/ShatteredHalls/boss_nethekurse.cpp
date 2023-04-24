@@ -22,37 +22,40 @@
 
 enum eGrandWarlockNethekurse
 {
-    SAY_INTRO                   = 0,
-    SAY_PEON_ATTACKED           = 1,
-    SAY_PEON_DIES               = 2,
-    SAY_TAUNT                   = 3,
-    SAY_AGGRO                   = 4,
-    SAY_SLAY                    = 5,
-    SAY_DIE                     = 6,
+    SAY_INTRO                  = 0,
+    SAY_PEON_ATTACKED          = 1,
+    SAY_PEON_DIES              = 2,
+    SAY_TAUNT                  = 3,
+    SAY_AGGRO                  = 4,
+    SAY_SLAY                   = 5,
+    SAY_DIE                    = 6,
 
-    SPELL_DEATH_COIL_N          = 30741,
-    SPELL_DEATH_COIL_H          = 30500,
-    SPELL_DARK_SPIN             = 30502,
-    SPELL_SHADOW_FISSURE        = 30496,
-    SPELL_SHADOW_CLEAVE_N       = 30495,
-    SPELL_SHADOW_SLAM_H         = 35953,
-    SPELL_SHADOW_SEAR           = 30735,
+    SPELL_DEATH_COIL_N         = 30500,
+    SPELL_DEATH_COIL_H         = 35954,
+    SPELL_DARK_SPIN            = 30502,
+    SPELL_SHADOW_FISSURE       = 30496,
+    SPELL_SHADOW_CLEAVE_N      = 30495,
+    SPELL_SHADOW_SLAM_H        = 35953,
 
-    SETDATA_DATA                = 1,
-    SETDATA_PEON_AGGRO          = 1,
-    SETDATA_PEON_DEATH          = 2,
+    // Spells used exclusively in RP
+    SPELL_SHADOW_SEAR          = 30735,
+    SPELL_DEATH_COIL           = 30741,
 
-    EVENT_STAGE_NONE            = 0,
-    EVENT_STAGE_INTRO           = 1,
-    EVENT_STAGE_TAUNT           = 2,
-    EVENT_STAGE_MAIN            = 3,
+    EVENT_INTRO                = 1,
+    EVENT_SPELL_DEATH_COIL     = 2,
+    EVENT_SPELL_SHADOW_FISSURE = 3,
+    EVENT_SPELL_CLEAVE         = 4,
+    EVENT_CHECK_HEALTH         = 5,
+    EVENT_START_ATTACK         = 6,
 
-    EVENT_INTRO                 = 1,
-    EVENT_SPELL_DEATH_COIL      = 2,
-    EVENT_SPELL_SHADOW_FISSURE  = 3,
-    EVENT_SPELL_CLEAVE          = 4,
-    EVENT_CHECK_HEALTH          = 5,
-    EVENT_START_ATTACK          = 6
+    EVENT_STAGE_NONE           = 0,
+    EVENT_STAGE_INTRO          = 1,
+    EVENT_STAGE_TAUNT          = 2,
+    EVENT_STAGE_MAIN           = 3,
+
+    SETDATA_DATA               = 1,
+    SETDATA_PEON_AGGRO         = 1,
+    SETDATA_PEON_DEATH         = 2
 };
 
 // ########################################################
@@ -71,21 +74,9 @@ public:
         EventMap events2;
         void Reset() override
         {
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             EventStage = EVENT_STAGE_NONE;
-            PeonEngagedCount = 0;
-            PeonKilledCount = 0;
             _Reset();
-            SummonMinions();
             events2.Reset();
-        }
-
-        void SummonMinions()
-        {
-            me->SummonCreature(NPC_FEL_ORC_CONVERT, 172.556f, 258.227f, -13.191f, 1.41189f);
-            me->SummonCreature(NPC_FEL_ORC_CONVERT, 165.181f, 261.511f, -13.1926f, 0.942743f);
-            me->SummonCreature(NPC_FEL_ORC_CONVERT, 182.482f, 258.635f, -13.1788f, 1.70929f);
-            me->SummonCreature(NPC_FEL_ORC_CONVERT, 189.616f, 259.866f, -13.1966f, 1.95748f);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -130,13 +121,6 @@ public:
             {
                 DoStartMovement(who);
             }
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            summon->SetReactState(REACT_DEFENSIVE);
-            summon->SetRegeneratingHealth(false);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -194,7 +178,6 @@ public:
                 {
                     Talk(SAY_AGGRO);
                     EventStage = EVENT_STAGE_MAIN;
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     if (Unit* target = me->SelectNearestPlayer(50.0f))
                         AttackStart(target);
 
@@ -246,9 +229,9 @@ public:
         }
 
     private:
-        uint32 PeonEngagedCount;
-        uint32 PeonKilledCount;
-        uint32 EventStage;
+        uint8 PeonEngagedCount = 0;
+        uint8 PeonKilledCount = 0;
+        uint8 EventStage;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

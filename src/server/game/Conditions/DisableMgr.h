@@ -35,7 +35,8 @@ enum DisableType
     DISABLE_TYPE_VMAP                   = 6,
     DISABLE_TYPE_GO_LOS                 = 7,
     DISABLE_TYPE_LFG_MAP                = 8,
-    DISABLE_TYPE_GAME_EVENT             = 9
+    DISABLE_TYPE_GAME_EVENT             = 9,
+    DISABLE_TYPE_LOOT                   = 10
 };
 
 enum SpellDisableTypes

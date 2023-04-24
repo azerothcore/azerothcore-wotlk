@@ -459,17 +459,8 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
 
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 
-    float runSpeed = cinfo->speed_run;
-    if (Pet* pet = ToPet())
-    {
-        if (pet->isControlled() && pet->GetOwnerGUID().IsPlayer())
-        {
-            runSpeed = 1.15f;
-        }
-    }
-
     SetSpeed(MOVE_WALK, cinfo->speed_walk);
-    SetSpeed(MOVE_RUN, runSpeed);
+    SetSpeed(MOVE_RUN, cinfo->speed_run);
     SetSpeed(MOVE_SWIM, cinfo->speed_swim);
     SetSpeed(MOVE_FLIGHT, cinfo->speed_flight);
 
@@ -2454,12 +2445,6 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (GetCharmerOrOwnerGUID())
         return false;
 
-    // Check for ignore assistance extra flag
-    if (m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_IGNORE_ASSISTANCE_CALL))
-    {
-        return false;
-    }
-
     // only from same creature faction
     if (checkfaction)
     {
@@ -2803,6 +2788,16 @@ void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_t
     else if (spellcooldown)
     {
         _AddCreatureSpellCooldown(spellInfo->Id, 0, spellcooldown);
+    }
+
+    if (sSpellMgr->HasSpellCooldownOverride(spellInfo->Id))
+    {
+        if (IsCharmed() && GetCharmer()->IsPlayer())
+        {
+            WorldPacket data;
+            BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spellInfo->Id, spellcooldown);
+            GetCharmer()->ToPlayer()->SendDirectMessage(&data);
+        }
     }
 }
 

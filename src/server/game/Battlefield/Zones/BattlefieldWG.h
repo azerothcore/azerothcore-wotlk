@@ -1474,6 +1474,17 @@ struct WGWorkshop
                     // Send warning message to all player to inform a faction attack to a workshop
                     // alliance / horde attacking a workshop
                     bf->SendWarning(teamControl ? WorkshopsData[workshopId].attackText : (WorkshopsData[workshopId].attackText + 2));
+
+                    // Updating worldstate, update icon to neutral
+                    state = BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_INTACT;
+                    bf->SendUpdateWorldState(WorkshopsData[workshopId].worldstate, state);
+
+                    // Found associate graveyard and update it
+                    if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+                        if (bf->GetGraveyardById(workshopId))
+                            bf->GetGraveyardById(workshopId)->GiveControlTo(team);
+
+                    teamControl = team;
                     break;
                 }
             case TEAM_ALLIANCE:

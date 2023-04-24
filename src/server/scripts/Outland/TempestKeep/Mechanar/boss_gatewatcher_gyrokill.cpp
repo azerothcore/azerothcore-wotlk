@@ -34,81 +34,54 @@ enum Spells
     SPELL_SHADOW_POWER              = 35322
 };
 
-enum Events
+struct boss_gatewatcher_gyrokill : public BossAI
 {
-    EVENT_STREAM_OF_MACHINE_FLUID   = 1,
-    EVENT_SAW_BLADE                 = 2,
-    EVENT_SHADOW_POWER              = 3
-};
-
-class boss_gatewatcher_gyrokill : public CreatureScript
-{
-public:
-    boss_gatewatcher_gyrokill() : CreatureScript("boss_gatewatcher_gyrokill") { }
-
-    struct boss_gatewatcher_gyrokillAI : public BossAI
+    boss_gatewatcher_gyrokill(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_GYROKILL)
     {
-        boss_gatewatcher_gyrokillAI(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_GYROKILL) { }
-
-        void JustDied(Unit* /*killer*/) override
+        scheduler.SetValidator([this]
         {
-            _JustDied();
-            Talk(SAY_DEATH);
-        }
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            _JustEngagedWith();
-            events.ScheduleEvent(EVENT_STREAM_OF_MACHINE_FLUID, 10000);
-            events.ScheduleEvent(EVENT_SAW_BLADE, 20000);
-            events.ScheduleEvent(EVENT_SHADOW_POWER, 30000);
-            Talk(SAY_AGGRO);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_STREAM_OF_MACHINE_FLUID:
-                    me->CastSpell(me->GetVictim(), SPELL_STREAM_OF_MACHINE_FLUID, false);
-                    events.ScheduleEvent(EVENT_STREAM_OF_MACHINE_FLUID, urand(12000, 14000));
-                    break;
-                case EVENT_SAW_BLADE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f))
-                        me->CastSpell(target, SPELL_SAW_BLADE, false);
-                    Talk(SAY_SAW_BLADE);
-                    events.ScheduleEvent(EVENT_SAW_BLADE, 25000);
-                    break;
-                case EVENT_SHADOW_POWER:
-                    me->CastSpell(me, SPELL_SHADOW_POWER, false);
-                    events.ScheduleEvent(EVENT_SAW_BLADE, 25000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustDied(Unit* /*killer*/) override
     {
-        return GetMechanarAI<boss_gatewatcher_gyrokillAI>(creature);
+        _JustDied();
+        Talk(SAY_DEATH);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+
+        scheduler.Schedule(10s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_STREAM_OF_MACHINE_FLUID);
+            context.Repeat(12s, 14s);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_SAW_BLADE, 0, 50.0f);
+            Talk(SAY_SAW_BLADE);
+            context.Repeat(25s);
+        }).Schedule(30s, [this](TaskContext context)
+        {
+            me->CastSpell(me, SPELL_SHADOW_POWER, false);
+            context.Repeat(25s);
+        });
+
+        Talk(SAY_AGGRO);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer())
+        {
+            Talk(SAY_SLAY);
+        }
     }
 };
 
 void AddSC_boss_gatewatcher_gyrokill()
 {
-    new boss_gatewatcher_gyrokill();
+    RegisterMechanarCreatureAI(boss_gatewatcher_gyrokill);
 }

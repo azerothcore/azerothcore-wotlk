@@ -250,6 +250,9 @@ public:
                     me->CastCustomSpell(SPELL_SUMMON_ENSLAVED_SOUL, SPELLVALUE_MAX_TARGETS, 1, me, false);
                     break;
             }
+
+            if (!UpdateVictim())
+                return;
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override

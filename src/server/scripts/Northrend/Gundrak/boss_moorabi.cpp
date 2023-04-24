@@ -78,7 +78,7 @@ public:
         {
             BossAI::Reset();
             events2.Reset();
-            events2.ScheduleEvent(EVENT_PHANTOM, 21000);
+            events2.ScheduleEvent(EVENT_PHANTOM, 21s);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -87,10 +87,10 @@ public:
             BossAI::JustEngagedWith(who);
             me->CastSpell(me, SPELL_MOJO_FRENZY, true);
 
-            events.ScheduleEvent(EVENT_GROUND_TREMOR, 18000);
-            events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 10000);
-            events.ScheduleEvent(EVENT_DETERMINED_STAB, 20000);
-            events.ScheduleEvent(EVENT_TRANSFORMATION, 12000);
+            events.ScheduleEvent(EVENT_GROUND_TREMOR, 18s);
+            events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 10s);
+            events.ScheduleEvent(EVENT_DETERMINED_STAB, 20s);
+            events.ScheduleEvent(EVENT_TRANSFORMATION, 12s);
         }
 
         void SpellHitTarget(Unit*  /*caster*/, SpellInfo const* spellInfo) override
@@ -115,7 +115,7 @@ public:
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
                 Talk(SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
             }
         }
 
@@ -127,7 +127,7 @@ public:
                 if (events2.ExecuteEvent() == EVENT_PHANTOM)
                 {
                     me->CastSpell(me, SPELL_SUMMON_PHANTOM, true);
-                    events2.ScheduleEvent(EVENT_PHANTOM, urand(20000, 25000));
+                    events2.ScheduleEvent(EVENT_PHANTOM, 20s, 25s);
                 }
             }
 
@@ -144,22 +144,22 @@ public:
                     if (roll_chance_i(50))
                         Talk(SAY_QUAKE);
                     me->CastSpell(me, me->GetDisplayId() != me->GetNativeDisplayId() ? SPELL_QUAKE : SPELL_GROUND_TREMOR, false);
-                    events.ScheduleEvent(EVENT_GROUND_TREMOR, 10000);
+                    events.ScheduleEvent(EVENT_GROUND_TREMOR, 10s);
                     break;
                 case EVENT_NUMBLING_SHOUT:
                     me->CastSpell(me, me->GetDisplayId() != me->GetNativeDisplayId() ? SPELL_NUMBING_ROAR : SPELL_NUMBING_SHOUT, false);
-                    events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 10000);
+                    events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 10s);
                     break;
                 case EVENT_DETERMINED_STAB:
                     me->CastSpell(me->GetVictim(), me->GetDisplayId() != me->GetNativeDisplayId() ? SPELL_DETERMINED_GORE : SPELL_DETERMINED_STAB, false);
-                    events.ScheduleEvent(EVENT_DETERMINED_STAB, 8000);
+                    events.ScheduleEvent(EVENT_DETERMINED_STAB, 8s);
                     break;
                 case EVENT_TRANSFORMATION:
                     Talk(EMOTE_TRANSFORM);
                     Talk(SAY_TRANSFORM);
                     me->CastSpell(me, SPELL_TRANSFORMATION, false);
                     me->CastSpell(me, SPELL_SUMMON_PHANTOM_TRANSFORM, true);
-                    events.ScheduleEvent(EVENT_TRANSFORMATION, 10000);
+                    events.ScheduleEvent(EVENT_TRANSFORMATION, 10s);
                     break;
             }
 

@@ -208,7 +208,10 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
                 minion->Respawn();
             else
             {
-                minion->AI()->DoZoneInCombat(nullptr, 100.0f);
+                if (minion->GetReactState() == REACT_AGGRESSIVE)
+                {
+                    minion->AI()->DoZoneInCombat(nullptr, 100.0f);
+                }
             }
             break;
         default:
@@ -351,6 +354,31 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
     return false;
 }
 
+void InstanceScript::StorePersistentData(uint32 index, uint32 data)
+{
+    if (index > persistentData.size())
+    {
+        LOG_ERROR("scripts", "InstanceScript::StorePersistentData() index larger than storage size. Index: {} Size: {} Data: {}.", index, persistentData.size(), data);
+        return;
+    }
+
+    persistentData[index] = data;
+}
+
+void InstanceScript::DoForAllMinions(uint32 id, std::function<void(Creature*)> exec)
+{
+    BossInfo* bossInfo = &bosses[id];
+    MinionSet listCopy = bossInfo->minion;
+
+    for (auto const& minion : listCopy)
+    {
+        if (minion)
+        {
+            exec(minion);
+        }
+    }
+}
+
 void InstanceScript::Load(const char* data)
 {
     if (!data)
@@ -366,6 +394,7 @@ void InstanceScript::Load(const char* data)
     if (ReadSaveDataHeaders(loadStream))
     {
         ReadSaveDataBossStates(loadStream);
+        ReadSavePersistentData(loadStream);
         ReadSaveDataMore(loadStream);
     }
     else
@@ -403,6 +432,14 @@ void InstanceScript::ReadSaveDataBossStates(std::istringstream& data)
     }
 }
 
+void InstanceScript::ReadSavePersistentData(std::istringstream& data)
+{
+    for (uint32 i = 0; i < persistentData.size(); ++i)
+    {
+        data >> persistentData[i];
+    }
+}
+
 std::string InstanceScript::GetSaveData()
 {
     OUT_SAVE_INST_DATA;
@@ -411,6 +448,7 @@ std::string InstanceScript::GetSaveData()
 
     WriteSaveDataHeaders(saveStream);
     WriteSaveDataBossStates(saveStream);
+    WritePersistentData(saveStream);
     WriteSaveDataMore(saveStream);
 
     OUT_SAVE_INST_DATA_COMPLETE;
@@ -431,6 +469,14 @@ void InstanceScript::WriteSaveDataBossStates(std::ostringstream& data)
     for (BossInfo const& bossInfo : bosses)
     {
         data << uint32(bossInfo.state) << ' ';
+    }
+}
+
+void InstanceScript::WritePersistentData(std::ostringstream& data)
+{
+    for (auto const& entry : persistentData)
+    {
+        data << entry << ' ';
     }
 }
 
@@ -581,6 +627,35 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->CastSpell(player, spell, true);
+}
+
+void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets /*= false*/, bool includeControlled /*= false*/)
+{
+    if (!player)
+        return;
+
+    player->CastSpell(player, spell, true);
+
+    if (!includePets)
+        return;
+
+    for (uint8 itr2 = 0; itr2 < MAX_SUMMON_SLOT; ++itr2)
+    {
+        ObjectGuid summonGUID = player->m_SummonSlot[itr2];
+        if (!summonGUID.IsEmpty())
+            if (Creature* summon = instance->GetCreature(summonGUID))
+                summon->CastSpell(player, spell, true);
+    }
+
+    if (!includeControlled)
+        return;
+
+    for (auto itr2 = player->m_Controlled.begin(); itr2 != player->m_Controlled.end(); ++itr2)
+    {
+        if (Unit* controlled = *itr2)
+            if (controlled->IsInWorld() && controlled->GetTypeId() == TYPEID_UNIT)
+                controlled->CastSpell(player, spell, true);
+    }
 }
 
 bool InstanceScript::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= nullptr*/, uint32 /*miscvalue1*/ /*= 0*/)
