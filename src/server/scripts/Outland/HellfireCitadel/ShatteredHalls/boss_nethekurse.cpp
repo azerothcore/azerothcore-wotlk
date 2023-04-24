@@ -174,7 +174,7 @@ public:
         {
             _JustEngagedWith();
 
-            Talk(SAY_AGGRO);
+            Talk(SAY_INTRO_2);
             scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
             {
                 if (me->HealthBelowPct(90))
