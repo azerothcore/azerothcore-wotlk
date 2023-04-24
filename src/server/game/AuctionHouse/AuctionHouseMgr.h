@@ -133,7 +133,7 @@ public:
     AuctionHouseObject() { _next = _auctionsMap.begin(); }
     ~AuctionHouseObject()
     {
-        for (auto & itr : _auctionsMap)
+        for (auto& itr : _auctionsMap)
             delete itr.second;
     }
 

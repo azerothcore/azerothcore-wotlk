@@ -183,7 +183,7 @@ struct boss_murmur : public BossAI
             }).Schedule(3650ms, 9150ms, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_SONIC_SHOCK);
-                context.Repeat(9150ms, 10s);
+                context.Repeat(3650ms, 9150ms);
             });
         }
 
@@ -218,7 +218,6 @@ class spell_murmur_touch : public AuraScript
         {
             if (GetTarget())
             {
-                GetTarget()->CastSpell(GetTarget(), SPELL_SHOCKWAVE, true);
                 GetTarget()->CastSpell(GetTarget(), SPELL_SHOCKWAVE_SERVERSIDE, true);
             }
         }
