@@ -42,11 +42,7 @@ enum eGrandWarlockNethekurse
     SPELL_DEATH_COIL           = 30741,
 
     EVENT_INTRO                = 1,
-    EVENT_SPELL_DEATH_COIL     = 2,
-    EVENT_SPELL_SHADOW_FISSURE = 3,
-    EVENT_SPELL_CLEAVE         = 4,
-    EVENT_CHECK_HEALTH         = 5,
-    EVENT_START_ATTACK         = 6,
+    EVENT_START_ATTACK         = 2,
 
     EVENT_STAGE_NONE           = 0,
     EVENT_STAGE_INTRO          = 1,
