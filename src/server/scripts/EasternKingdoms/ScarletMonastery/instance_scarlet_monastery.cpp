@@ -511,10 +511,6 @@ public:
                         {
                             Talk(SAY_MO_RESURRECTED);
                             me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);
-                            me->m_Events.AddEventAtOffset([this]()
-                                {
-                                    me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                                }, 1200ms);
                         }, 1000ms);
                     me->m_Events.AddEventAtOffset([this]()
                         {
@@ -525,7 +521,7 @@ public:
                             if (me->GetVictim())
                                 AttackStart(me->GetVictim());
                             canEmote = false;
-                        }, 5200ms);
+                        }, 2200ms);
                     heal = true;
                 }
             }
@@ -649,14 +645,10 @@ public:
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->m_Events.AddEventAtOffset([this]()
                             {
-                                me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                            }, 2600ms);
-                        me->m_Events.AddEventAtOffset([this]()
-                            {
                                 me->SetReactState(REACT_AGGRESSIVE);
                                 AttackStart(me->GetVictim());
                                 canEmote = false;
-                            }, 5000ms);
+                            }, 3000ms);
                         canResurrect = false;
                     }
                 }
@@ -674,10 +666,11 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     me->InterruptNonMeleeSpells(false);
+                    //Move to the closest location 0.5 yards of Mograine's body
                     if (me->GetDistance(mograine) > 0.50)
                     {
                         float fx, fy, fz;
-                        mograine->GetContactPoint(me, fx, fy, fz);
+                        mograine->GetContactPoint(me, fx, fy, fz, 0.5f);
                         me->GetMotionMaster()->Clear();
                         me->GetMotionMaster()->MovePoint(1, fx, fy, fz);
                     }
