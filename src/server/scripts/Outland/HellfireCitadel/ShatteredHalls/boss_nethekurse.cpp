@@ -209,7 +209,7 @@ public:
             if (choice == 1)
             {
                 Talk(SAY_SHADOW_SEAR);
-                me->CastSpell(peon, SPELL_SHADOW_SEAR, false);
+                me->CastSpell(me, SPELL_SHADOW_SEAR, false);
             }
             else if (choice == 2)
             {
@@ -219,7 +219,7 @@ public:
             else if (choice == 3)
             {
                 Talk(SAY_DEATH_COIL);
-                me->CastSpell(peon, SPELL_DEATH_COIL, false);
+                me->CastSpell(me, SPELL_DEATH_COIL, false);
             }
         }
 
