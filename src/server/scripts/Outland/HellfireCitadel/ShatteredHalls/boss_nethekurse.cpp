@@ -198,9 +198,10 @@ public:
                     if (Unit* target = me->SelectNearestPlayer(50.0f))
                         AttackStart(target);
 
-                    events.ScheduleEvent(EVENT_SPELL_DEATH_COIL, 20000);
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_FISSURE, 8000);
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                    events.ScheduleEvent(EVENT_SPELL_DEATH_COIL, urand(12150, 19850));
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_FISSURE, urand(8100, 17300));
+                    events.ScheduleEvent(EVENT_SPELL_CLEAVE, urand(10950, 21850));
+                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000); //is there any more efficient/better way to handle this?
                     return;
                 }
             }
@@ -217,19 +218,24 @@ public:
                 case EVENT_SPELL_SHADOW_FISSURE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_SHADOW_FISSURE, false);
-                    events.RescheduleEvent(EVENT_SPELL_SHADOW_FISSURE, urand(7500, 10000));
+                    events.RescheduleEvent(EVENT_SPELL_SHADOW_FISSURE, urand(8450, 9450));
                     break;
                 case EVENT_SPELL_DEATH_COIL:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), false);
-                    events.RescheduleEvent(EVENT_SPELL_DEATH_COIL, urand(15000, 20000));
+                    if (me->HealthBelowPct(90))
+                    {
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                            {
+                            me->CastSpell(target, DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), false);
+                            }
+                    }
+                    events.RescheduleEvent(EVENT_SPELL_DEATH_COIL, urand(12150, 19850));
                     break;
                 case EVENT_SPELL_CLEAVE:
                     me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H), false);
-                    events.RescheduleEvent(EVENT_SPELL_CLEAVE, urand(6000, 8000));
+                    events.RescheduleEvent(EVENT_SPELL_CLEAVE, urand(1200, 23900));
                     break;
                 case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(21))
+                    if (me->HealthBelowPct(25))
                     {
                         events.Reset();
                         me->CastSpell(me, SPELL_DARK_SPIN, false);
@@ -241,7 +247,7 @@ public:
                     break;
             }
 
-            if (!me->HealthBelowPct(21))
+            if (!me->HealthBelowPct(25))
                 DoMeleeAttackIfReady();
         }
 
