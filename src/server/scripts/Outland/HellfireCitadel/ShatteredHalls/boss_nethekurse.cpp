@@ -230,9 +230,9 @@ public:
             if (EventStage < EVENT_STAGE_MAIN || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            //not needed?
-            //if (!me->HealthBelowPct(25))
-            //    DoMeleeAttackIfReady();
+            //isneeded
+            if (!me->HealthBelowPct(25))
+                DoMeleeAttackIfReady();
         }
 
     private:
