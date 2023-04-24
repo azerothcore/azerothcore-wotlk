@@ -58,6 +58,14 @@ enum eGrandWarlockNethekurse
 // Grand Warlock Nethekurse
 // ########################################################
 
+//path during RP intro
+float NethekursePath[4][3] =
+{
+    {184.78966f, 290.3699f, -8.18139f},
+    {178.51125f, 278.97794f, -8.183065f},
+    {171.82281f, 289.97687f, -8.185595f},
+    {178.51125f, 287.97794f, -8.183065}
+};
 class boss_grand_warlock_nethekurse : public CreatureScript
 {
 public:
@@ -150,6 +158,8 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
+            _JustEngagedWith();
+
             Talk(SAY_AGGRO);
             scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
             {
