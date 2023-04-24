@@ -73,7 +73,13 @@ public:
 
     struct boss_grand_warlock_nethekurseAI : public BossAI
     {
-        boss_grand_warlock_nethekurseAI(Creature* creature) : BossAI(creature, DATA_NETHEKURSE) { }
+        boss_grand_warlock_nethekurseAI(Creature* creature) : BossAI(creature, DATA_NETHEKURSE)
+        {
+            scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+        }
 
         EventMap events2;
         void Reset() override
@@ -197,6 +203,8 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
+            scheduler.Update(diff);
+
             uint32 eventId = events2.ExecuteEvent();
 
             if (EventStage < EVENT_STAGE_MAIN && instance->GetBossState(DATA_NETHEKURSE) == IN_PROGRESS)
