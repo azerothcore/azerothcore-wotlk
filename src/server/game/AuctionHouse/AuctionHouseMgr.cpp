@@ -37,7 +37,7 @@ constexpr auto AH_MINIMUM_DEPOSIT = 100;
 // Proof of concept, we should shift the info we're obtaining in here into AuctionEntry probably
 static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrderVector& sortOrder, Player* player, bool checkMinBidBuyout)
 {
-    for (auto thisOrder : sortOrder)
+    for (auto& thisOrder : sortOrder)
     {
         switch (thisOrder.sortOrder)
         {
@@ -908,7 +908,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
         }
     }
 
-    for (auto auction : auctionShortlist)
+    for (auto& auction : auctionShortlist)
     {
         // Add the item if no search term or if entered search term was found
         if (count < 50 && totalcount >= listfrom)

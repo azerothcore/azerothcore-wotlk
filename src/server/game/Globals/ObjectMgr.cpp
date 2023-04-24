@@ -948,7 +948,7 @@ void ObjectMgr::LoadCreatureCustomIDs()
     std::string stringCreatureIds = sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "");
     std::vector<std::string_view> CustomCreatures = Acore::Tokenize(stringCreatureIds, ',', false);
 
-    for (auto itr : CustomCreatures)
+    for (auto& itr : CustomCreatures)
     {
         _creatureCustomIDsStore.push_back(Acore::StringTo<uint32>(itr).value());
     }
@@ -1296,7 +1296,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     const_cast<CreatureTemplate*>(cInfo)->DamageModifier *= Creature::_GetDamageMod(cInfo->rank);
 
     // Hack for modules
-    for (auto itr : _creatureCustomIDsStore)
+    for (auto& itr : _creatureCustomIDsStore)
     {
         if (cInfo->Entry == itr)
             return;
