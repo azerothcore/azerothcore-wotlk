@@ -32,7 +32,6 @@ enum eGrandWarlockNethekurse
     SAY_SLAY                   = 7,
     SAY_DIE                    = 8,
 
-
     SPELL_DEATH_COIL_N         = 30500,
     SPELL_DEATH_COIL_H         = 35954,
     SPELL_DARK_SPIN            = 30502,
@@ -203,7 +202,7 @@ public:
             });
         }
 
-        void CastRandomPeonSpell(Unit* peon)
+        void CastRandomPeonSpell()
         {
             uint32 choice = urand(1, 3);
             if (choice == 1)
@@ -214,7 +213,7 @@ public:
             else if (choice == 2)
             {
                 Talk(SAY_SHADOW_FISSURE);
-                me->CastSpell(peon, SPELL_SHADOW_FISSURE, false);
+                me->CastSpell(me->FindNearestCreature(NPC_PEON, 40.0f), SPELL_SHADOW_FISSURE, false);
             }
             else if (choice == 3)
             {
@@ -239,9 +238,9 @@ public:
             {
                 if (eventId == EVENT_INTRO)
                 {
-                    //handling for casting a spell on peon
+                    //handling for casting a spell on peon doesn't seem to work currently
                     EventStage = EVENT_STAGE_TAUNT;
-                    CastRandomPeonSpell(me->FindNearestCreature(NPC_PEON, 40.0f));
+                    CastRandomPeonSpell();
                 }
                 else if (eventId == EVENT_START_ATTACK)
                 {
