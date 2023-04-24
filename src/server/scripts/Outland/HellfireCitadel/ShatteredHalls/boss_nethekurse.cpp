@@ -149,7 +149,7 @@ public:
         }
 
         void JustEngagedWith(Unit* /*who*/) override
-        { 
+        {
             Talk(SAY_AGGRO);
             scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
             {
