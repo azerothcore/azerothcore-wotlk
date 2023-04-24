@@ -613,8 +613,17 @@ public:
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!canResurrectCheck && damage >= me->GetHealth())
-                damage = me->GetHealth() - 1;
+            if (me->GetHealth() == 1)
+            {
+                damage = 0;
+                return;
+            }
+
+            if ((!canResurrectCheck || canEmote) && damage >= me->GetHealth())
+            {
+                damage = 0;
+                me->SetHealth(1);
+            }
         }
 
         void KilledUnit(Unit* /*victim*/) override
