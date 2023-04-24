@@ -674,10 +674,13 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     me->InterruptNonMeleeSpells(false);
-                    float fx, fy, fz;
-                    mograine->GetContactPoint(me, fx, fy, fz, 2.f);
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(1, fx, fy, fz);
+                    if (me->GetDistance(mograine) > 0.50)
+                    {
+                        float fx, fy, fz;
+                        mograine->GetContactPoint(me, fx, fy, fz);
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MovePoint(1, fx, fy, fz);
+                    }
                 }
                 canResurrectCheck = true;
                 canResurrect = true;
