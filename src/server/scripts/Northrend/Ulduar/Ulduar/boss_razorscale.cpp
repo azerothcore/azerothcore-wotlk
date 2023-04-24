@@ -209,12 +209,12 @@ public:
         {
             me->SetInCombatWithZone();
             events.Reset();
-            events.ScheduleEvent(EVENT_COMMANDER_SAY_AGGRO, 5000);
-            events.ScheduleEvent(EVENT_EE_SAY_MOVE_OUT, 10000);
-            events.ScheduleEvent(EVENT_ENRAGE, 600000);
-            events.ScheduleEvent(EVENT_SPELL_FIREBALL, 6000);
-            events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME, 13000);
-            events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINES, 11000);
+            events.ScheduleEvent(EVENT_COMMANDER_SAY_AGGRO, 5s);
+            events.ScheduleEvent(EVENT_EE_SAY_MOVE_OUT, 10s);
+            events.ScheduleEvent(EVENT_ENRAGE, 10min);
+            events.ScheduleEvent(EVENT_SPELL_FIREBALL, 6s);
+            events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME, 13s);
+            events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINES, 11s);
 
             std::list<Creature*> eeList;
             me->GetCreaturesWithEntryInRange(eeList, 300.0f, NPC_EXPEDITION_ENGINEER);
@@ -310,7 +310,7 @@ public:
             if (me->GetPositionZ() > 440.0f) // protection, razorscale is attackable (so harpoons can hit him, etc.), but should not receive dmg while in air
                 damage = 0;
             else if (!bGroundPhase && ((me->GetHealth() * 100) / me->GetMaxHealth() < 50) && me->HasAura(62794)) // already below 50%, but still in chains and stunned
-                events.RescheduleEvent(EVENT_WARN_DEEP_BREATH, 0);
+                events.RescheduleEvent(EVENT_WARN_DEEP_BREATH, 0ms);
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -336,13 +336,13 @@ public:
                 me->SetFacingTo(M_PI / 2);
                 me->SetDisableGravity(false);
                 me->CastSpell(me, 62794, true);
-                events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30000);
+                events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30s);
             }
             else if (id == 1) // flied up
             {
-                events.ScheduleEvent(EVENT_SPELL_FIREBALL, 2000);
-                events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME, 4000);
-                events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINES, 5000);
+                events.ScheduleEvent(EVENT_SPELL_FIREBALL, 2s);
+                events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME, 4s);
+                events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINES, 5s);
             }
         }
 
@@ -397,12 +397,12 @@ public:
                 case EVENT_SPELL_FIREBALL:
                     if( Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true) )
                         me->CastSpell(pTarget, SPELL_FIREBALL, false);
-                    events.RepeatEvent(4000);
+                    events.Repeat(4s);
                     break;
                 case EVENT_SPELL_DEVOURING_FLAME:
                     if( Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true) )
                         me->CastSpell(pTarget, SPELL_DEVOURINGFLAME, false);
-                    events.RepeatEvent(13000);
+                    events.Repeat(13s);
                     break;
                 case EVENT_SUMMON_MOLE_MACHINES:
                     {
@@ -423,8 +423,8 @@ public:
                                 drill->SetGoAnimProgress(0);
                             }
                         }
-                        events.RepeatEvent(45000);
-                        events.RescheduleEvent(EVENT_SUMMON_ADDS, 4000);
+                        events.Repeat(45s);
+                        events.RescheduleEvent(EVENT_SUMMON_ADDS, 4s);
                     }
                     break;
                 case EVENT_SUMMON_ADDS:
@@ -486,11 +486,11 @@ public:
                 case EVENT_WARN_DEEP_BREATH:
                     Talk(EMOTE_BREATH);
                     me->RemoveAura(62794);
-                    events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500);
+                    events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500ms);
                     break;
                 case EVENT_PHASE2_FLAME_BREATH:
                     me->CastSpell(me, SPELL_FLAMEBREATH, true);
-                    events.ScheduleEvent(EVENT_FLY_UP, 2000);
+                    events.ScheduleEvent(EVENT_FLY_UP, 2s);
                     break;
                 case EVENT_FLY_UP:
                     me->SetInCombatWithZone(); // just in case
@@ -532,10 +532,10 @@ public:
                         events.CancelEvent(EVENT_SPELL_DEVOURING_FLAME);
                         events.CancelEvent(EVENT_SUMMON_MOLE_MACHINES);
 
-                        events.ScheduleEvent(EVENT_SPELL_FLAME_BREATH, 20000);
-                        events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME_GROUND, 5000);
-                        events.ScheduleEvent(EVENT_SPELL_FUSE_ARMOR, 10000);
-                        events.ScheduleEvent(EVENT_SPELL_FLAME_BUFFET, 3000);
+                        events.ScheduleEvent(EVENT_SPELL_FLAME_BREATH, 20s);
+                        events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME_GROUND, 5s);
+                        events.ScheduleEvent(EVENT_SPELL_FUSE_ARMOR, 10s);
+                        events.ScheduleEvent(EVENT_SPELL_FLAME_BUFFET, 3s);
 
                         break;
                     }
@@ -549,7 +549,7 @@ public:
                         me->StopMoving();
                         me->SetDisableGravity(true);
                         me->GetMotionMaster()->MoveTakeoff(1, CORDS_AIR, 25.0f);
-                        events.ScheduleEvent(EVENT_RESUME_FIXING, 22000);
+                        events.ScheduleEvent(EVENT_RESUME_FIXING, 22s);
                     }
 
                     break;
@@ -564,11 +564,11 @@ public:
                     break;
                 case EVENT_SPELL_FLAME_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_FLAMEBREATH, false);
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 case EVENT_SPELL_DEVOURING_FLAME_GROUND:
                     me->CastSpell(me->GetVictim(), SPELL_DEVOURINGFLAME, false);
-                    events.RepeatEvent(13000);
+                    events.Repeat(13s);
                     break;
                 case EVENT_SPELL_FUSE_ARMOR:
                     if (Unit* victim = me->GetVictim())
@@ -578,14 +578,14 @@ public:
                             if (Aura* aur = victim->GetAura(SPELL_FUSEARMOR))
                                 if (aur->GetStackAmount() == 5)
                                     victim->CastSpell(victim, SPELL_FUSED_ARMOR, true);
-                            events.RepeatEvent(10000);
+                            events.Repeat(10s);
                             break;
                         }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 case EVENT_SPELL_FLAME_BUFFET:
                     me->CastSpell(me->GetVictim(), SPELL_FLAMEBUFFET, false);
-                    events.RepeatEvent(7000);
+                    events.Repeat(7s);
                     break;
             }
 

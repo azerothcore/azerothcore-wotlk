@@ -68,12 +68,13 @@ enum Creatures
     NPC_DARK_RANGER_LORALEN                       = 37779,
     NPC_ARCHMAGE_KORELN                           = 37582,
 
+    // Wave mobs
+    NPC_WAVE_PRIEST                               = 38175,
+    NPC_WAVE_MAGE                                 = 38172,
+    NPC_PHANTOM_HALLUCINATION                     = 38567, // Doesn't talk
     NPC_WAVE_MERCENARY                            = 38177,
     NPC_WAVE_FOOTMAN                              = 38173,
     NPC_WAVE_RIFLEMAN                             = 38176,
-    NPC_WAVE_PRIEST                               = 38175,
-    NPC_WAVE_MAGE                                 = 38172,
-    NPC_PHANTOM_HALLUCINATION                     = 38567,
 
     NPC_FROSTSWORN_GENERAL                        = 36723,
     NPC_SPIRITUAL_REFLECTION                      = 37068,
@@ -124,94 +125,122 @@ enum BatteredHiltStatusFlags
 
 enum hYells
 {
-    SAY_JAINA_INTRO_1                             = 1,
-    SAY_JAINA_INTRO_2                             = 2,
-    SAY_JAINA_INTRO_3                             = 3,
-    SAY_JAINA_INTRO_4                             = 4,
-    SAY_UTHER_INTRO_A2_1                          = 5,
-    SAY_JAINA_INTRO_5                             = 6,
-    SAY_UTHER_INTRO_A2_2                          = 7,
-    SAY_JAINA_INTRO_6                             = 8,
-    SAY_UTHER_INTRO_A2_3                          = 9,
-    SAY_JAINA_INTRO_7                             = 10,
-    SAY_UTHER_INTRO_A2_4                          = 11,
-    SAY_JAINA_INTRO_8                             = 12,
-    SAY_UTHER_INTRO_A2_5                          = 13,
-    SAY_JAINA_INTRO_9                             = 14,
-    SAY_UTHER_INTRO_A2_6                          = 15,
-    SAY_UTHER_INTRO_A2_7                          = 16,
-    SAY_JAINA_INTRO_10                            = 17,
-    SAY_UTHER_INTRO_A2_8                          = 18,
-    SAY_JAINA_INTRO_11                            = 19,
-    SAY_UTHER_INTRO_A2_9                          = 20,
+    // Part 1
+    // Alliance
+    SAY_JAINA_INTRO_1                             = 0,
+    SAY_JAINA_INTRO_2                             = 1,
+    SAY_JAINA_INTRO_3                             = 2,
+    SAY_JAINA_INTRO_4                             = 3,
+    SAY_UTHER_INTRO_A2_1                          = 0,
+    SAY_JAINA_INTRO_5                             = 4,
+    SAY_UTHER_INTRO_A2_2                          = 1,
+    SAY_JAINA_INTRO_6                             = 5,
+    SAY_UTHER_INTRO_A2_3                          = 2,
+    SAY_JAINA_INTRO_7                             = 6,
+    SAY_UTHER_INTRO_A2_4                          = 3,
+    SAY_JAINA_INTRO_8                             = 7,
+    SAY_UTHER_INTRO_A2_5                          = 4,
+    SAY_JAINA_INTRO_9                             = 8,
+    SAY_UTHER_INTRO_A2_6                          = 5,
+    SAY_UTHER_INTRO_A2_7                          = 6,
+    SAY_JAINA_INTRO_10                            = 9,
+    SAY_UTHER_INTRO_A2_8                          = 7,
+    SAY_JAINA_INTRO_11                            = 10,
+    SAY_UTHER_INTRO_A2_9                          = 8,
 
-    SAY_SYLVANAS_INTRO_1                          = 21,
-    SAY_SYLVANAS_INTRO_2                          = 22,
-    SAY_SYLVANAS_INTRO_3                          = 23,
-    SAY_UTHER_INTRO_H2_1                          = 24,
-    SAY_SYLVANAS_INTRO_4                          = 25,
-    SAY_UTHER_INTRO_H2_2                          = 26,
-    SAY_SYLVANAS_INTRO_5                          = 27,
-    SAY_UTHER_INTRO_H2_3                          = 28,
-    SAY_SYLVANAS_INTRO_6                          = 29,
-    SAY_UTHER_INTRO_H2_4                          = 30,
-    SAY_SYLVANAS_INTRO_7                          = 31,
-    SAY_UTHER_INTRO_H2_5                          = 32,
-    SAY_UTHER_INTRO_H2_6                          = 33,
-    SAY_SYLVANAS_INTRO_8                          = 34,
-    SAY_UTHER_INTRO_H2_7                          = 35,
+    // Horde
+    SAY_SYLVANAS_INTRO_1                          = 0,
+    SAY_SYLVANAS_INTRO_2                          = 1,
+    SAY_SYLVANAS_INTRO_3                          = 2,
+    SAY_UTHER_INTRO_H2_1                          = 9,
+    SAY_SYLVANAS_INTRO_4                          = 3,
+    SAY_UTHER_INTRO_H2_2                          = 10,
+    SAY_SYLVANAS_INTRO_5                          = 4,
+    SAY_UTHER_INTRO_H2_3                          = 11,
+    SAY_SYLVANAS_INTRO_6                          = 5,
+    SAY_UTHER_INTRO_H2_4                          = 12,
+    SAY_SYLVANAS_INTRO_7                          = 6,
+    SAY_UTHER_INTRO_H2_5                          = 13,
+    SAY_UTHER_INTRO_H2_6                          = 14,
+    SAY_SYLVANAS_INTRO_8                          = 7,
+    SAY_UTHER_INTRO_H2_7                          = 15,
 
-    SAY_LK_INTRO_1                                = 36,
-    SAY_LK_INTRO_2                                = 37,
-    SAY_LK_INTRO_3                                = 38,
-    SAY_FALRIC_INTRO_1                            = 39,
-    SAY_MARWYN_INTRO_1                            = 40,
-    SAY_FALRIC_INTRO_2                            = 41,
+    // The Lich King Event
+    SAY_LK_INTRO_1                                = 0,
+    SAY_LK_INTRO_2                                = 1,
+    SAY_LK_INTRO_3                                = 2,
+    SAY_FALRIC_INTRO_1                            = 5,
+    SAY_MARWYN_INTRO_1                            = 5,
+    SAY_FALRIC_INTRO_2                            = 6,
 
-    SAY_JAINA_INTRO_END                           = 42,
-    SAY_SYLVANAS_INTRO_END                        = 43,
+    SAY_JAINA_INTRO_END                           = 11,
+    SAY_SYLVANAS_INTRO_END                        = 8,
 
-    SAY_FROSTSWORN_GENERAL_AGGRO                  = 98,
-    SAY_FROSTSWORN_GENERAL_DEATH                  = 99,
+    // Wave mobs
+    SAY_WAVE_DEATH                                = 0,
 
-    SAY_LK_AGGRO_HORDE                            = 100,
-    SAY_LK_AGGRO_ALLY                             = 101,
-    SAY_SYLVANAS_LEAVE                            = 102,
-    SAY_JAINA_LEAVE                               = 103,
-    SAY_LK_IW_1                                   = 104,
-    SAY_LK_IW_2                                   = 105,
-    SAY_LK_IW_3                                   = 106,
-    SAY_LK_IW_4                                   = 107,
-    SAY_LK_IW_1_SUMMON                            = 108,
-    SAY_SYLVANAS_IW_1                             = 109,
-    SAY_SYLVANAS_IW_2                             = 110,
-    SAY_SYLVANAS_IW_3                             = 111,
-    SAY_SYLVANAS_IW_4                             = 112,
-    SAY_SYLVANAS_OPENING                          = 113,
-    SAY_SYLVANAS_END                              = 114,
-    SAY_LK_NOWHERE_TO_RUN                         = 115,
-    SAY_FIRE_HORDE                                = 116,
-    SAY_ONBOARD_HORDE                             = 117,
-    SAY_FINAL_HORDE                               = 118,
-    SAY_JAINA_IW_1                                = 119,
-    SAY_JAINA_IW_2                                = 120,
-    SAY_JAINA_IW_3                                = 121,
-    SAY_JAINA_IW_4                                = 122,
-    SAY_JAINA_OPENING                             = 123,
-    SAY_JAINA_END                                 = 124,
-    SAY_FIRE_ALLY                                 = 125,
-    SAY_ONBOARD_ALLY                              = 126,
-    SAY_FINAL_ALLY                                = 127,
-    SAY_FINAL_ALLY_SECOND                         = 128,
+    // Frostsworn General - Big add after Falrick and Marwyn
+    SAY_FROSTSWORN_GENERAL_AGGRO                  = 0,
+    SAY_FROSTSWORN_GENERAL_DEATH                  = 1,
 
-    SAY_BATTERED_HILT_HALT                        = 200,
-    SAY_BATTERED_HILT_LEAP                        = 201,
-    SAY_BATTERED_HILT_REALIZE                     = 202,
-    SAY_BATTERED_HILT_PREPARE                     = 203,
-    SAY_BATTERED_HILT_OUTRO1                      = 204,
-    SAY_BATTERED_HILT_OUTRO2                      = 205,
-    SAY_BATTERED_HILT_OUTRO3                      = 206,
-    SAY_BATTERED_HILT_OUTRO4                      = 207,
+    // Part 2
+    // The Lich King Boss
+    SAY_LK_AGGRO_ALLY                             = 0,
+    SAY_LK_AGGRO_HORDE                            = 1,
+    SAY_LK_IW_1                                   = 2,
+    SAY_LK_IW_2                                   = 3,
+    SAY_LK_IW_3                                   = 4,
+    SAY_LK_IW_4                                   = 5,
+    //SAY_LK_GHOUL                                = 6, // Unused
+    //SAY_LK_ABON                                 = 7, // Unused
+    SAY_LK_WINTER                                 = 8,
+    SAY_LK_NOWHERE_TO_RUN                         = 9,
+
+    // Horde
+    SAY_SYLVANA_AGGRO                             = 0,
+    SAY_SYLVANAS_IW_1                             = 1,
+    SAY_SYLVANAS_IW_2                             = 2,
+    SAY_SYLVANAS_IW_3                             = 3,
+    SAY_SYLVANAS_IW_4                             = 4,
+    SAY_SYLVANA_ESCAPE_01                         = 5,
+    //SAY_SYLVANA_ESCAPE_02                       = 6, // Unused
+    SAY_SYLVANA_TRAP                              = 7,
+    SAY_SYLVANA_FINAL                             = 8,
+
+    // (H) Ship Captain 30824
+    SAY_FIRE_HORDE                                = 0,
+    SAY_ONBOARD_HORDE                             = 1,
+
+    // Alliance
+    SAY_JAINA_AGGRO                               = 0,
+    SAY_JAINA_IW_1                                = 1,
+    SAY_JAINA_IW_2                                = 2,
+    SAY_JAINA_IW_3                                = 3,
+    SAY_JAINA_IW_4                                = 4,
+    SAY_JAINA_ESCAPE_01                           = 5,
+    SAY_JAINA_TRAP                                = 6,
+    SAY_JAINA_FINAL_1                             = 7,
+    SAY_JAINA_FINAL_2                             = 8,
+
+    // (A) Ship Captain 30344
+    SAY_FIRE_ALLY                                 = 0,
+    SAY_ONBOARD_ALLY                              = 1,
+
+    // Battered Hilt - Quest: The Halls Of Reflection
+    // Uther
+    SAY_BATTERED_HILT_HALT                        = 16,
+    EMOTE_QUEL_SPAWN                              = 0, // "Quel'Delar leeps to life in the presence of Frostmourne!"
+    SAY_BATTERED_HILT_REALIZE                     = 17,
+    EMOTE_QUEL_PREPARE                            = 1, // "Quel'Delar prepares to attack!"
+    SAY_BATTERED_HILT_OUTRO1                      = 18,
+    SAY_BATTERED_HILT_OUTRO2                      = 19,
+    SAY_BATTERED_HILT_OUTRO3                      = 20,
+    SAY_BATTERED_HILT_OUTRO4                      = 21,
+
+    // Marwin - Said when starting after a wipe
+    EMOTE_MARWYN_INTRO_SPIRIT                     = 6,
+    // Marwin - Wipe between wave 6 and 9
+    SAY_MARWYN_WIPE_AFTER_FALRIC                  = 7,
 };
 
 enum hMisc
@@ -264,6 +293,9 @@ enum hMisc
     SPELL_SUMMON_LUMBERING_ABOMINATION            = 69835,
     SPELL_GUNSHIP_CANNON_FIRE_PERIODIC            = 70017,
     SPELL_ACHIEVEMENT_CHECK                       = 72830,
+
+    // Battered Hilt - Summon Quel'Delar
+    SPELL_SUMMON_EVIL_QUEL                        = 69966,
 };
 
 const uint32 allowedCompositions[8][5] =
@@ -339,12 +371,12 @@ const Position CannonFirePos[2][3] =
 
 const Position StairsPos[2][3] =
 {
-    {
+    {   // Alliance stairs
         {5226.36f, 1640.87f, 785.737f, 5.56137f},
-        {5213.76f, 1626.21f, 798.068f, 5.56534f},
+        {5213.76f, 1626.21f, 798.068f, 5.56534f}, /// @todo: Issue with the clipping on the top most part, probably needs a positional sniff.
         {0.0f, 0.0f, 0.0f, 0.0f}
     },
-    {
+    {   // Horde stairs
         {5233.61f, 1607.48f, 796.5f, 5.77774f},
         {5223.32f, 1589.24f, 809.0f, 5.76989f},
         {5243.42f, 1624.8f, 784.361f, 5.76592f}

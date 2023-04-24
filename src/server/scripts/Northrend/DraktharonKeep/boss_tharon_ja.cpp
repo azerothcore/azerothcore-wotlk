@@ -94,10 +94,10 @@ public:
         {
             Talk(SAY_AGGRO);
             BossAI::JustEngagedWith(who);
-            events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 5000);
-            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(14000, 18000));
-            events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, urand(8000, 10000));
-            events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1000);
+            events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 5s);
+            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 14s, 18s);
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 8s, 10s);
+            events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1s);
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -105,7 +105,7 @@ public:
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
                 Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
             }
         }
 
@@ -115,7 +115,7 @@ public:
             {
                 Talk(SAY_SKELETON);
                 events.Reset();
-                events.ScheduleEvent(EVENT_TURN_BONES_REAL, 3000);
+                events.ScheduleEvent(EVENT_TURN_BONES_REAL, 3s);
             }
         }
 
@@ -146,16 +146,16 @@ public:
                 case EVENT_SPELL_CURSE_OF_LIFE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_CURSE_OF_LIFE, false);
-                    events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 13000);
+                    events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 13s);
                     break;
                 case EVENT_SPELL_RAIN_OF_FIRE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_RAIN_OF_FIRE, false);
-                    events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 16000);
+                    events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 16s);
                     break;
                 case EVENT_SPELL_SHADOW_VOLLEY:
                     me->CastSpell(me, SPELL_SHADOW_VOLLEY, false);
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 9000);
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 9s);
                     break;
                 case EVENT_SPELL_TURN_FLESH:
                     if (me->HealthBelowPct(50))
@@ -165,18 +165,18 @@ public:
                         me->CastSpell((Unit*)nullptr, SPELL_TURN_FLESH, false);
 
                         events.Reset();
-                        events.ScheduleEvent(EVENT_TURN_FLESH_REAL, 3000);
+                        events.ScheduleEvent(EVENT_TURN_FLESH_REAL, 3s);
                         return;
                     }
-                    events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1000);
+                    events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1s);
                     break;
                 case EVENT_TURN_FLESH_REAL:
                     me->CastSpell(me, SPELL_DUMMY, true);
 
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    events.ScheduleEvent(EVENT_SPELL_EYE_BEAM, 11000);
-                    events.ScheduleEvent(EVENT_SPELL_LIGHTNING_BREATH, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 6000);
+                    events.ScheduleEvent(EVENT_SPELL_EYE_BEAM, 11s);
+                    events.ScheduleEvent(EVENT_SPELL_LIGHTNING_BREATH, 3s);
+                    events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 6s);
                     break;
                 case EVENT_SPELL_EYE_BEAM:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
@@ -184,21 +184,21 @@ public:
                     break;
                 case EVENT_SPELL_LIGHTNING_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_LIGHTNING_BREATH, false);
-                    events.ScheduleEvent(EVENT_SPELL_LIGHTNING_BREATH, 8000);
+                    events.ScheduleEvent(EVENT_SPELL_LIGHTNING_BREATH, 8s);
                     break;
                 case EVENT_SPELL_POISON_CLOUD:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                         me->CastSpell(target, SPELL_POISON_CLOUD, false);
-                    events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 10000);
+                    events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 10s);
                     break;
                 case EVENT_TURN_BONES_REAL:
                     me->SetDisplayId(me->GetNativeDisplayId());
                     me->CastSpell(me, SPELL_FLESH_VISUAL, true);
                     me->CastSpell(me, SPELL_CLEAR_GIFT, true);
                     events.Reset();
-                    events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 1000);
-                    events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(12000, 14000));
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, urand(8000, 10000));
+                    events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 1s);
+                    events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 12s, 14s);
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 8s, 10s);
                     break;
             }
 

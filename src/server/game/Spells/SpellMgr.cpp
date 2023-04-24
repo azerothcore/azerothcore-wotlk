@@ -1193,6 +1193,8 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                     return spellId == 56618;
                 else if (team == TEAM_ALLIANCE)
                     return spellId == 56617;
+                else
+                    return false;
                 break;
             }
         // Hellscream's Warsong
@@ -2209,8 +2211,8 @@ void SpellMgr::LoadSpellEnchantProcData()
 
     mSpellEnchantProcEventMap.clear();                             // need for reload case
 
-    //                                                  0         1           2         3
-    QueryResult result = WorldDatabase.Query("SELECT entry, customChance, PPMChance, procEx FROM spell_enchant_proc_data");
+    //                                                  0         1           2         3          4
+    QueryResult result = WorldDatabase.Query("SELECT entry, customChance, PPMChance, procEx, attributeMask FROM spell_enchant_proc_data");
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 spell enchant proc event conditions. DB table `spell_enchant_proc_data` is empty.");
@@ -2237,6 +2239,7 @@ void SpellMgr::LoadSpellEnchantProcData()
         spe.customChance = fields[1].Get<uint32>();
         spe.PPMChance = fields[2].Get<float>();
         spe.procEx = fields[3].Get<uint32>();
+        spe.attributeMask = fields[4].Get<uint32>();
 
         mSpellEnchantProcEventMap[enchantId] = spe;
 
@@ -2723,6 +2726,48 @@ void SpellMgr::LoadSpellInfoStore()
 
     LOG_INFO("server.loading", ">> Loaded Spell Custom Attributes in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+void SpellMgr::LoadSpellCooldownOverrides()
+{
+    uint32 oldMSTime = getMSTime();
+
+    mSpellCooldownOverrideMap.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT Id, RecoveryTime, CategoryRecoveryTime, StartRecoveryTime, StartRecoveryCategory FROM spell_cooldown_overrides");
+
+    uint32 count = 0;
+
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            SpellCooldownOverride spellCooldown;
+            uint32 spellId = fields[0].Get<uint32>();
+            spellCooldown.RecoveryTime = fields[1].Get<uint32>();
+            spellCooldown.CategoryRecoveryTime = fields[2].Get<uint32>();
+            spellCooldown.StartRecoveryTime = fields[3].Get<uint32>();
+            spellCooldown.StartRecoveryCategory = fields[4].Get<uint32>();
+            mSpellCooldownOverrideMap[spellId] = spellCooldown;
+
+            ++count;
+        } while (result->NextRow());
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} Spell Cooldown Overrides entries in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+bool SpellMgr::HasSpellCooldownOverride(uint32 spellId) const
+{
+    return mSpellCooldownOverrideMap.find(spellId) != mSpellCooldownOverrideMap.end();
+}
+
+SpellCooldownOverride SpellMgr::GetSpellCooldownOverride(uint32 spellId) const
+{
+    auto range = mSpellCooldownOverrideMap.find(spellId);
+    return range->second;
 }
 
 void SpellMgr::UnloadSpellInfoStore()
@@ -3412,9 +3457,35 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 }
             }
         }
-       spellInfo->_InitializeExplicitTargetMask();
 
-       sScriptMgr->OnLoadSpellCustomAttr(spellInfo);
+        spellInfo->_InitializeExplicitTargetMask();
+
+        if (sSpellMgr->HasSpellCooldownOverride(spellInfo->Id))
+        {
+            SpellCooldownOverride spellOverride = sSpellMgr->GetSpellCooldownOverride(spellInfo->Id);
+
+            if (spellInfo->RecoveryTime != spellOverride.RecoveryTime)
+            {
+                spellInfo->RecoveryTime = spellOverride.RecoveryTime;
+            }
+
+            if (spellInfo->CategoryRecoveryTime != spellOverride.CategoryRecoveryTime)
+            {
+                spellInfo->CategoryRecoveryTime = spellOverride.CategoryRecoveryTime;
+            }
+
+            if (spellInfo->StartRecoveryTime != spellOverride.StartRecoveryTime)
+            {
+                spellInfo->RecoveryTime = spellOverride.RecoveryTime;
+            }
+
+            if (spellInfo->StartRecoveryCategory != spellOverride.StartRecoveryCategory)
+            {
+                spellInfo->RecoveryTime = spellOverride.RecoveryTime;
+            }
+        }
+
+        sScriptMgr->OnLoadSpellCustomAttr(spellInfo);
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells
