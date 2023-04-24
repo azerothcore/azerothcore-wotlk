@@ -153,7 +153,34 @@ public:
         }
 
         void JustEngagedWith(Unit* /*who*/) override
-        {
+        { 
+            Talk(SAY_AGGRO);
+            scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+            {
+                if (me->HealthBelowPct(90))
+                {
+                    DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
+                }
+                context.Repeat();
+            }).Schedule(8100ms, 17300ms, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
+                context.Repeat(8450ms, 9450ms);
+            }).Schedule(10950ms, 21850ms, [this](TaskContext context)
+            {
+                DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
+                context.Repeat(1200ms, 23900ms);
+            }).Schedule(1s, [this](TaskContext context)
+            {
+                if (me->HealthBelowPct(25))
+                {
+                    DoCastSelf(SPELL_DARK_SPIN);
+                }
+                else
+                {
+                    context.Repeat();
+                }
+            });
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -176,15 +203,9 @@ public:
                 }
                 else if (eventId == EVENT_START_ATTACK)
                 {
-                    Talk(SAY_AGGRO);
                     EventStage = EVENT_STAGE_MAIN;
                     if (Unit* target = me->SelectNearestPlayer(50.0f))
                         AttackStart(target);
-
-                    events.ScheduleEvent(EVENT_SPELL_DEATH_COIL, urand(12150, 19850));
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_FISSURE, urand(8100, 17300));
-                    events.ScheduleEvent(EVENT_SPELL_CLEAVE, urand(10950, 21850));
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000); //is there any more efficient/better way to handle this?
                     return;
                 }
             }
@@ -192,46 +213,12 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
             if (EventStage < EVENT_STAGE_MAIN || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_SHADOW_FISSURE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_SHADOW_FISSURE, false);
-                    events.RescheduleEvent(EVENT_SPELL_SHADOW_FISSURE, urand(8450, 9450));
-                    break;
-                case EVENT_SPELL_DEATH_COIL:
-                    if (me->HealthBelowPct(90))
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            {
-                            me->CastSpell(target, DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), false);
-                            }
-                    }
-                    events.RescheduleEvent(EVENT_SPELL_DEATH_COIL, urand(12150, 19850));
-                    break;
-                case EVENT_SPELL_CLEAVE:
-                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H), false);
-                    events.RescheduleEvent(EVENT_SPELL_CLEAVE, urand(1200, 23900));
-                    break;
-                case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(25))
-                    {
-                        events.Reset();
-                        me->CastSpell(me, SPELL_DARK_SPIN, false);
-                    }
-                    else
-                    {
-                        events.RescheduleEvent(EVENT_CHECK_HEALTH, 1000);
-                    }
-                    break;
-            }
-
-            if (!me->HealthBelowPct(25))
-                DoMeleeAttackIfReady();
+            //not needed?
+            //if (!me->HealthBelowPct(25))
+            //    DoMeleeAttackIfReady();
         }
 
     private:
