@@ -23,12 +23,15 @@
 enum eGrandWarlockNethekurse
 {
     SAY_INTRO                  = 0,
-    SAY_PEON_ATTACKED          = 1,
-    SAY_PEON_DIES              = 2,
-    SAY_TAUNT                  = 3,
-    SAY_AGGRO                  = 4,
-    SAY_SLAY                   = 5,
-    SAY_DIE                    = 6,
+    SAY_INTRO_2                = 1,
+    SAY_PEON_ATTACKED          = 2,
+    SAY_PEON_DIES              = 3,
+    SAY_SHADOW_SEAR            = 4,
+    SAY_SHADOW_FISSURE         = 5,
+    SAY_DEATH_COIL             = 6,
+    SAY_SLAY                   = 7,
+    SAY_DIE                    = 8,
+
 
     SPELL_DEATH_COIL_N         = 30500,
     SPELL_DEATH_COIL_H         = 35954,
@@ -52,6 +55,11 @@ enum eGrandWarlockNethekurse
     SETDATA_DATA               = 1,
     SETDATA_PEON_AGGRO         = 1,
     SETDATA_PEON_DEATH         = 2
+};
+
+enum Creatures
+{
+    NPC_PEON                   = 17083
 };
 
 // ########################################################
@@ -195,6 +203,26 @@ public:
             });
         }
 
+        void CastRandomPeonSpell(Unit* peon)
+        {
+            uint32 choice = urand(1, 3);
+            if (choice == 1)
+            {
+                Talk(SAY_SHADOW_SEAR);
+                me->CastSpell(peon, SPELL_SHADOW_SEAR, false);
+            }
+            else if (choice == 2)
+            {
+                Talk(SAY_SHADOW_FISSURE);
+                me->CastSpell(peon, SPELL_SHADOW_FISSURE, false);
+            }
+            else if (choice == 3)
+            {
+                Talk(SAY_DEATH_COIL);
+                me->CastSpell(peon, SPELL_DEATH_COIL, false);
+            }
+        }
+
         void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
@@ -211,9 +239,9 @@ public:
             {
                 if (eventId == EVENT_INTRO)
                 {
-                    Talk(SAY_TAUNT);
+                    //handling for casting a spell on peon
                     EventStage = EVENT_STAGE_TAUNT;
-                    me->CastSpell(me, SPELL_SHADOW_SEAR, false);
+                    CastRandomPeonSpell(me->FindNearestCreature(NPC_PEON, 40.0f));
                 }
                 else if (eventId == EVENT_START_ATTACK)
                 {
