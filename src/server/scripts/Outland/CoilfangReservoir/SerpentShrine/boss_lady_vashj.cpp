@@ -420,6 +420,36 @@ public:
     }
 };
 
+class spell_lady_vashj_paralyze : public SpellScriptLoader
+{
+public:
+    spell_lady_vashj_paralyze() : SpellScriptLoader("spell_lady_vashj_paralyze") { }
+
+    class spell_lady_vashj_paralyze_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_lady_vashj_paralyze_SpellScript)
+
+        SpellCastResult CheckRequirement()
+        {
+            Player* playerCaster = GetCaster()->ToPlayer();
+            if (playerCaster->GetMap()->GetPlayers().getSize() == 1)
+                return SPELL_FAILED_DONT_REPORT;
+            else
+                return SPELL_CAST_OK;
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_lady_vashj_paralyze_SpellScript::CheckRequirement);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_lady_vashj_paralyze_SpellScript();
+    }
+};
+
 class spell_lady_vashj_remove_tainted_cores : public SpellScriptLoader
 {
 public:
@@ -507,6 +537,7 @@ void AddSC_boss_lady_vashj()
 {
     new boss_lady_vashj();
     new spell_lady_vashj_magic_barrier();
+    new spell_lady_vashj_paralyze();
     new spell_lady_vashj_remove_tainted_cores();
     new spell_lady_vashj_summon_sporebat();
     new spell_lady_vashj_spore_drop_effect();
