@@ -25,6 +25,11 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+//npcbot
+#include "botdatamgr.h"
+#include "botmgr.h"
+//end npcbot
+
 void BattlegroundABScore::BuildObjectivesBlock(WorldPacket& data)
 {
     data << uint32(2);
@@ -178,6 +183,16 @@ void BattlegroundAB::AddPlayer(Player* player)
     Battleground::AddPlayer(player);
     PlayerScores.emplace(player->GetGUID().GetCounter(), new BattlegroundABScore(player->GetGUID()));
 }
+
+//npcbot
+void BattlegroundAB::AddBot(Creature* bot)
+{
+    bool const isInBattleground = IsPlayerInBattleground(bot->GetGUID());
+    Battleground::AddBot(bot);
+    if (!isInBattleground)
+        BotScores[bot->GetEntry()] = new BattlegroundABScore(bot->GetGUID());
+}
+//end npcbot
 
 void BattlegroundAB::RemovePlayer(Player* player)
 {
@@ -515,6 +530,56 @@ GraveyardStruct const* BattlegroundAB::GetClosestGraveyard(Player* player)
     return nearestEntry;
 }
 
+//npcbot
+void BattlegroundAB::HandleBotKillPlayer(Creature* killer, Player* victim)
+{
+    if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
+    Battleground::HandleBotKillPlayer(killer, victim);
+
+    // Score feature
+    auto teamId = GetBotTeamId(killer->GetGUID());
+    m_TeamScores[teamId] += BG_AB_TickPoints[1];
+    if (m_TeamScores[teamId] > BG_AB_MAX_TEAM_SCORE)
+        m_TeamScores[teamId] = BG_AB_MAX_TEAM_SCORE;
+    UpdateWorldState(teamId == TEAM_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE, m_TeamScores[teamId]);
+    if (m_TeamScores[teamId] >= BG_AB_MAX_TEAM_SCORE)
+        EndBattleground(teamId);
+}
+void BattlegroundAB::HandleBotKillBot(Creature* killer, Creature* victim)
+{
+    if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
+    Battleground::HandleBotKillBot(killer, victim);
+    // Score feature
+    auto teamId = GetBotTeamId(killer->GetGUID());
+    m_TeamScores[teamId] += BG_AB_TickPoints[1];
+    if (m_TeamScores[teamId] > BG_AB_MAX_TEAM_SCORE)
+        m_TeamScores[teamId] = BG_AB_MAX_TEAM_SCORE;
+    UpdateWorldState(teamId == TEAM_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE, m_TeamScores[teamId]);
+    if (m_TeamScores[teamId] >= BG_AB_MAX_TEAM_SCORE)
+        EndBattleground(teamId);
+}
+void BattlegroundAB::HandlePlayerKillBot(Creature* victim, Player* killer)
+{
+    if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
+    Battleground::HandlePlayerKillBot(victim, killer);
+    // Score feature
+    auto teamId = killer->GetTeamId();
+    m_TeamScores[teamId] += BG_AB_TickPoints[1];
+    if (m_TeamScores[teamId] > BG_AB_MAX_TEAM_SCORE)
+        m_TeamScores[teamId] = BG_AB_MAX_TEAM_SCORE;
+    UpdateWorldState(teamId == TEAM_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE, m_TeamScores[teamId]);
+    if (m_TeamScores[teamId] >= BG_AB_MAX_TEAM_SCORE)
+        EndBattleground(teamId);
+}
+
+//end npcbot
+
 bool BattlegroundAB::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
 {
     if (!Battleground::UpdatePlayerScore(player, type, value, doAddHonor))
@@ -534,6 +599,16 @@ bool BattlegroundAB::UpdatePlayerScore(Player* player, uint32 type, uint32 value
 
     return true;
 }
+
+//npcbot
+bool BattlegroundAB::UpdateBotScore(Creature const* bot, uint32 type, uint32 value)
+{
+    if (!Battleground::UpdateBotScore(bot, type, value))
+        return false;
+
+    return true;
+}
+//end npcbot
 
 bool BattlegroundAB::AllNodesConrolledByTeam(TeamId teamId) const
 {
