@@ -2434,13 +2434,16 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
     NodeList links;
     if (curNode->GetLinks().empty() || random)
     {
-        WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&links, lvl = lvl, fac = faction, pos = fromPos](WanderNode const* wp) {
-            if (pos->GetExactDist2d(wp) < MAX_WANDER_NODE_DISTANCE &&
-                IsWanderNodeAvailableForBotFaction(wp, fac, true) && node_viable(wp, lvl))
-                links.push_back(wp);
-        });
-        if (!links.empty())
-            return links.size() == 1u ? links.front() : Acore::Containers::SelectRandomContainerElement(links);
+        if (bot->IsInWorld() && !bot->GetMap()->IsBattlegroundOrArena())
+        {
+            WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&links, lvl = lvl, fac = faction, pos = fromPos](WanderNode const* wp) {
+                if (pos->GetExactDist2d(wp) < MAX_WANDER_NODE_DISTANCE &&
+                    IsWanderNodeAvailableForBotFaction(wp, fac, true) && node_viable(wp, lvl))
+                    links.push_back(wp);
+            });
+            if (!links.empty())
+                return links.size() == 1u ? links.front() : Acore::Containers::SelectRandomContainerElement(links);
+        }
 
         //Select closest
         WanderNode const* node_new = nullptr;

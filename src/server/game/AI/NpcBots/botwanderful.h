@@ -25,7 +25,7 @@ enum class BotWPFlags : uint32
     BOTWP_FLAG_MOVEMENT_IGNORES_FACTION = 0x00000010, // ignore faction flags for next WP selection
     BOTWP_FLAG_MOVEMENT_IGNORES_PATHING = 0x00000020, // do not generate path between 2 WPs having this flag
     BOTWP_FLAG_BG_FLAG_DELIVER_TARGET   = 0x00000040, // <BG only> flag carrier destination marker
-    BOTWP_FLAG_BG_FLAG_PICKUP_TARGET    = 0x00000080, // <BG only> flag pick up marker
+    BOTWP_FLAG_BG_FLAG_PICKUP_TARGET    = 0x00000080, // <BG only> flag pick/activate up marker
     BOTWP_FLAG_END                      = 0x00000100,
 
     BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY   = BOTWP_FLAG_ALLIANCE_ONLY | BOTWP_FLAG_HORDE_ONLY

@@ -540,27 +540,6 @@ bool Group::AddMember(Player* player)
 
     SubGroupCounterIncrease(subGroup);
 
-    //npcbot - check if trying to add bot
-    //TC_LOG_ERROR("entities.player", "Group::AddMember(): new member %s", player->GetName().c_str());
-    if (!player->GetGUID().IsPlayer())
-    {
-        // insert into the table if we're not a battleground group
-        if (!isBGGroup() && !isBFGroup())
-        {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_NPCBOT_GROUP_MEMBER);
-
-            stmt->SetData(0, GetGUID().GetCounter());
-            stmt->SetData(1, player->GetEntry());
-            stmt->SetData(2, member.flags);
-            stmt->SetData(3, member.group);
-            stmt->SetData(4, member.roles);
-
-            CharacterDatabase.Execute(stmt);
-        }
-    }
-    else
-    {
-    //end npcbot
     player->SetGroupInvite(nullptr);
     if (player->GetGroup())
     {
@@ -591,9 +570,6 @@ bool Group::AddMember(Player* player)
         stmt->SetData(4, member.roles);
         CharacterDatabase.Execute(stmt);
     }
-    //npcbot
-    }
-    //end npcbot
 
     SendUpdate();
 
@@ -601,10 +577,6 @@ bool Group::AddMember(Player* player)
     {
         sScriptMgr->OnGroupAddMember(this, player->GetGUID());
 
-        //npcbot - check 2
-        if (player->GetGUID().IsPlayer())
-        {
-        //end npcbot
         if (!IsLeader(player->GetGUID()) && !isBGGroup() && !isBFGroup())
         {
             Player::ResetInstances(player->GetGUID(), INSTANCE_RESET_GROUP_JOIN, false);
@@ -681,10 +653,12 @@ bool Group::AddMember(Player* player)
 
         if (m_maxEnchantingLevel < player->GetSkillValue(SKILL_ENCHANTING))
             m_maxEnchantingLevel = player->GetSkillValue(SKILL_ENCHANTING);
-        //npcbot
-        }
-        //end npcbot
     }
+
+    //npcbot: if player has been added to bot BG raid switch leader to it
+    if (isBGGroup() && !m_leaderGuid.IsPlayer())
+        ChangeLeader(player->GetGUID());
+    //end npcbot
 
     return true;
 }

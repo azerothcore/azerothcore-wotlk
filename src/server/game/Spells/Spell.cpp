@@ -6409,6 +6409,15 @@ SpellCastResult Spell::CheckCast(bool strict)
                             m_spellInfo->Effects[i].TargetA.GetTarget() != TARGET_GAMEOBJECT_ITEM_TARGET)
                         break;
 
+                //npcbot
+                if (m_caster->IsNPCBot())
+                {
+                    if (m_spellInfo->Effects[i].TargetA.GetTarget() == TARGET_GAMEOBJECT_TARGET && !m_targets.GetGOTarget())
+                        return SPELL_FAILED_BAD_TARGETS;
+                    break;
+                }
+                //end npcbot
+
                     if (m_caster->GetTypeId() != TYPEID_PLAYER  // only players can open locks, gather etc.
                             // we need a go target in case of TARGET_GAMEOBJECT_TARGET
                             || (m_spellInfo->Effects[i].TargetA.GetTarget() == TARGET_GAMEOBJECT_TARGET && !m_targets.GetGOTarget()))
@@ -7247,6 +7256,14 @@ SpellCastResult Spell::CheckRange(bool strict)
 
     if (GameObject* goTarget = m_targets.GetGOTarget())
     {
+        //npcbot
+        if (!m_caster->IsPlayer())
+        {
+            if (!goTarget->IsAtInteractDistance(*m_caster, m_spellInfo->GetMaxRange(m_spellInfo->IsPositive())))
+                return SPELL_FAILED_OUT_OF_RANGE;
+        }
+        else
+        //end npcbot
         if (!goTarget->IsAtInteractDistance(m_caster->ToPlayer(), m_spellInfo))
         {
             return SPELL_FAILED_OUT_OF_RANGE;

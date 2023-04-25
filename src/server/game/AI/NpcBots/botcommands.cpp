@@ -931,7 +931,7 @@ public:
 
         if (!linkIds)
         {
-            handler->SendSysMessage("Syntax: npcbot wp links set #[ids...]");
+            handler->SendSysMessage("Syntax: npcbot wp links set #[ids...] #[oneway: true/false]");
             handler->SetSentErrorMessage(true);
             return false;
         }
