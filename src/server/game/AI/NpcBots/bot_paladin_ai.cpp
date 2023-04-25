@@ -1654,21 +1654,17 @@ public:
                 if (doCast(mytar, GetSpell(SHIELD_OF_RIGHTEOUSNESS_1)))
                     return;
             }
-            //Crusader Strike (2h only)
+            //Crusader Strike
             if (IsSpellReady(CRUSADER_STRIKE_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS) && dist < 5 && Rand() < 90)
             {
-                Item const* mh = GetEquips(BOT_SLOT_MAINHAND);
-                if (mh && mh->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)
-                    if (doCast(mytar, GetSpell(CRUSADER_STRIKE_1)))
-                        return;
+                if (doCast(mytar, GetSpell(CRUSADER_STRIKE_1)))
+                    return;
             }
-            //Divine Storm (2h only)
+            //Divine Storm
             if (IsSpellReady(DIVINE_STORM_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS) && dist < 7 && Rand() < 40)
             {
-                Item const* mh = GetEquips(BOT_SLOT_MAINHAND);
-                if (mh && mh->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)
-                    if (doCast(me, GetSpell(DIVINE_STORM_1)))
-                        return;
+                if (doCast(me, GetSpell(DIVINE_STORM_1)))
+                    return;
             }
             //Holy Wrath
             if (IsSpellReady(HOLY_WRATH_1, diff) && HasRole(BOT_ROLE_DPS) && Rand() < 50)
