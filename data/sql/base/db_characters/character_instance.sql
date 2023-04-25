@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `character_instance` (
   `extended` tinyint unsigned NOT NULL,
   PRIMARY KEY (`guid`,`instance`),
   KEY `instance` (`instance`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.character_instance: ~0 rows (approximately)
 DELETE FROM `character_instance`;

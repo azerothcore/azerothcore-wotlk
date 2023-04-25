@@ -19,15 +19,13 @@ DROP TABLE IF EXISTS `game_event_model_equip`;
 CREATE TABLE IF NOT EXISTS `game_event_model_equip` (
   `eventEntry` tinyint NOT NULL COMMENT 'Entry of the game event.',
   `guid` int unsigned NOT NULL DEFAULT '0',
-  `modelid` mediumint unsigned NOT NULL DEFAULT '0',
+  `modelid` int unsigned NOT NULL DEFAULT '0',
   `equipment_id` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event_model_equip: 0 rows
+-- Dumping data for table acore_world.game_event_model_equip: ~0 rows (approximately)
 DELETE FROM `game_event_model_equip`;
-/*!40000 ALTER TABLE `game_event_model_equip` DISABLE KEYS */;
-/*!40000 ALTER TABLE `game_event_model_equip` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `realmcharacters` (
   `numchars` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`realmid`,`acctid`),
   KEY `acctid` (`acctid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Realm Character Tracker';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Realm Character Tracker';
 
 -- Dumping data for table acore_auth.realmcharacters: ~0 rows (approximately)
 DELETE FROM `realmcharacters`;
