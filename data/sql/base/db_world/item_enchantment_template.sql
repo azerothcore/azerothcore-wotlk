@@ -17,16 +17,15 @@
 -- Dumping structure for table acore_world.item_enchantment_template
 DROP TABLE IF EXISTS `item_enchantment_template`;
 CREATE TABLE IF NOT EXISTS `item_enchantment_template` (
-  `entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `ench` mediumint unsigned NOT NULL DEFAULT '0',
+  `entry` int unsigned NOT NULL DEFAULT '0',
+  `ench` int unsigned NOT NULL DEFAULT '0',
   `chance` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`,`ench`),
   CONSTRAINT `item_enchantment_template_chk_1` CHECK ((`chance` >= 0))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Item Random Enchantment System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Item Random Enchantment System';
 
--- Dumping data for table acore_world.item_enchantment_template: 28,606 rows
+-- Dumping data for table acore_world.item_enchantment_template: ~28,159 rows (approximately)
 DELETE FROM `item_enchantment_template`;
-/*!40000 ALTER TABLE `item_enchantment_template` DISABLE KEYS */;
 INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(61, 6, 7.73),
 	(61, 8, 7.31),
@@ -28636,7 +28635,6 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(8675, 2151, 11.98),
 	(8675, 2153, 6.93),
 	(8675, 2154, 11.98);
-/*!40000 ALTER TABLE `item_enchantment_template` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

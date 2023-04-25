@@ -24,11 +24,10 @@ CREATE TABLE IF NOT EXISTS `player_race_stats` (
   `Intellect` int NOT NULL DEFAULT '0',
   `Spirit` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`Race`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores race stats.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci PACK_KEYS=0 COMMENT='Stores race stats.';
 
--- Dumping data for table acore_world.player_race_stats: 10 rows
+-- Dumping data for table acore_world.player_race_stats: ~10 rows (approximately)
 DELETE FROM `player_race_stats`;
-/*!40000 ALTER TABLE `player_race_stats` DISABLE KEYS */;
 INSERT INTO `player_race_stats` (`Race`, `Strength`, `Agility`, `Stamina`, `Intellect`, `Spirit`) VALUES
 	(1, 0, 0, 0, 0, 0),
 	(2, 3, -3, 1, -3, 2),
@@ -40,7 +39,6 @@ INSERT INTO `player_race_stats` (`Race`, `Strength`, `Agility`, `Stamina`, `Inte
 	(8, 1, 2, 0, -4, 1),
 	(10, -3, 2, 0, 3, -2),
 	(11, 1, -3, 0, 0, 2);
-/*!40000 ALTER TABLE `player_race_stats` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
