@@ -13933,7 +13933,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= fa
             for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
                 if (TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first))
                     if (TalentEntry const* itrTalentInfo = sTalentStore.LookupEntry(talentPos->talent_id))
-                        if (itrTalentInfo->TalentTab == talentInfo->TalentTab)
+                        // if (itrTalentInfo->TalentTab == talentInfo->TalentTab)
                             if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(GetActiveSpec())) // pussywizard
                                 spentPoints += talentPos->rank + 1;
         }
