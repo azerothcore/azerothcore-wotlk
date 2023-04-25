@@ -2451,7 +2451,7 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
         WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&node_new, &mindist, lvl = lvl, fac = faction, pos = fromPos](WanderNode const* wp) {
             float dist = pos->GetExactDist2d(wp);
             if (dist < mindist &&
-                IsWanderNodeAvailableForBotFaction(wp, fac, true) && node_viable(wp, lvl))
+                IsWanderNodeAvailableForBotFaction(wp, fac, false) && node_viable(wp, lvl))
             {
                 mindist = dist;
                 node_new = wp;

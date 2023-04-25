@@ -13184,7 +13184,8 @@ void Player::SetBattlegroundOrBattlefieldRaid(Group* group, int8 subgroup)
             if (!bot || !GetGroup()->IsMember(bot->GetGUID()))
                 continue;
 
-            ASSERT(group->AddMember(bot));
+            if (!group->IsMember(itr->first))
+                group->AddMember(bot);
         }
     }
     //end npcbot
