@@ -29,8 +29,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2081200, 9, 2 , 0, 0, 0, 100, 0, 4000, 4000, 0,0,69,0,0,0,0,0,0,8,0,0,0,-1001.022, 8113.366, -95.849, 0.352908, 'Corki - Action list - Move Foward'),
 (2081200, 9, 3 , 0, 0, 0, 100, 0, 4000, 4000, 0,0,41,0,0,0,0,0,0,1,0,0,0,0, 0, 0, 0, 'Corki - Action list - Despawn after 5 seconds');
 
-UPDATE `creature` SET `position_x`=-2563.89,`position_y`=6288.29,`position_z`=15.295,`orientation`=5.23599 WHERE `id1` = (18369);
-UPDATE `creature` SET `position_x`=-918.143,`position_y`=8663.94,`position_z`=172.542,`orientation`=0.523599 WHERE `id1` = (18445);
+UPDATE `creature` SET `position_x`=-2563.89,`position_y`=6288.29,`position_z`=15.295,`orientation`=5.23599 WHERE `guid`=65786 AND `id1`=18369;
+UPDATE `creature` SET `position_x`=-918.143,`position_y`=8663.94,`position_z`=172.542,`orientation`=0.523599 WHERE `guid`=65849 AND `id1`=18445;
 
 DELETE FROM `creature_questender`  WHERE `id` IN (18369,18445);
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
