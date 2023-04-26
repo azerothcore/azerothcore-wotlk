@@ -23,7 +23,16 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'file-cpp') || github.event.label.name == 'file-cpp' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
+    if: |
+      github.repository == 'azerothcore/azerothcore-wotlk'
+      && !github.event.pull_request.draft
+      && (
+        github.ref == 'refs/heads/master'
+        || contains(github.event.pull_request.labels.*.name, 'file-cpp'
+        || github.event.label.name == 'file-cpp'
+        || contains(github.event.pull_request.labels.*.name, 'run-build')
+        || github.event.label.name == 'run-build')
+      )
     steps:
       - uses: actions/checkout@v2
       - name: Checkout modules

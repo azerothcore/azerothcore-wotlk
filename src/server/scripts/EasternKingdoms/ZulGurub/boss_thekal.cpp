@@ -121,9 +121,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
 
             _scheduler.CancelAll();
             _scheduler.Schedule(4s, [this](TaskContext context) {
@@ -163,7 +163,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->SetStandState(UNIT_STAND_STATE_SLEEP);
                     me->AttackStop();
-                    DoResetThreat();
+                    DoResetThreatList();
                     WasDead = true;
                     CheckPhaseTransition();
                     Talk(EMOTE_THEKAL_DIES);
@@ -245,7 +245,7 @@ public:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             {
                                 DoCast(target, SPELL_CHARGE);
-                                DoResetThreat();
+                                DoResetThreatList();
                                 AttackStart(target);
                             }
                             context.Repeat(15s, 22s);
@@ -306,7 +306,7 @@ public:
             });
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _scheduler.Schedule(1s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SHIELD);
@@ -391,7 +391,7 @@ public:
             });
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _scheduler.Schedule(13s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SWEEPINGSTRIKES);
@@ -407,7 +407,7 @@ public:
 
                 if (DoGetThreat(me->GetVictim()))
                 {
-                    DoModifyThreatPercent(me->GetVictim(), -100);
+                    DoModifyThreatByPercent(me->GetVictim(), -100);
                 }
 
                 context.Repeat(17s, 27s);

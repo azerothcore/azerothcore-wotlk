@@ -1,21 +1,23 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.pet_levelstats
+-- Dumping structure for table acore_world.pet_levelstats
 DROP TABLE IF EXISTS `pet_levelstats`;
 CREATE TABLE IF NOT EXISTS `pet_levelstats` (
-  `creature_entry` mediumint unsigned NOT NULL,
+  `creature_entry` int unsigned NOT NULL,
   `level` tinyint unsigned NOT NULL,
   `hp` int unsigned NOT NULL DEFAULT '0',
   `mana` int unsigned NOT NULL DEFAULT '0',
@@ -28,11 +30,10 @@ CREATE TABLE IF NOT EXISTS `pet_levelstats` (
   `min_dmg` int unsigned NOT NULL DEFAULT '0',
   `max_dmg` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`creature_entry`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci PACK_KEYS=0 COMMENT='Stores pet levels stats.';
 
--- Dumpar data för tabell acore_world.pet_levelstats: 2 720 rows
+-- Dumping data for table acore_world.pet_levelstats: ~2,720 rows (approximately)
 DELETE FROM `pet_levelstats`;
-/*!40000 ALTER TABLE `pet_levelstats` DISABLE KEYS */;
 INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, `str`, `agi`, `sta`, `inte`, `spi`, `min_dmg`, `max_dmg`) VALUES
 	(1, 1, 42, 1, 20, 22, 20, 22, 20, 20, 0, 0),
 	(1, 2, 55, 1, 21, 23, 21, 23, 20, 20, 0, 0),
@@ -2754,8 +2755,8 @@ INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, 
 	(37994, 78, 7153, 2815, 5688, 195, 151, 114, 341, 230, 0, 0),
 	(37994, 79, 7361, 2860, 5868, 199, 155, 116, 347, 235, 0, 0),
 	(37994, 80, 7561, 2908, 7782, 203, 159, 118, 369, 240, 0, 0);
-/*!40000 ALTER TABLE `pet_levelstats` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

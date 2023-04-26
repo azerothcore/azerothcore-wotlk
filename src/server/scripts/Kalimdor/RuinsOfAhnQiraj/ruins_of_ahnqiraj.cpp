@@ -46,7 +46,7 @@ struct npc_hivezara_stinger : public ScriptedAI
         _scheduler.CancelAll();
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         DoCast(who ,who->HasAura(SPELL_HIVEZARA_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
 
@@ -100,15 +100,15 @@ struct npc_obsidian_destroyer : public ScriptedAI
         me->SetPower(POWER_MANA, 0);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.Schedule(6s, [this](TaskContext context)
         {
             std::list<Unit*> targets;
-            SelectTargetList(targets, [&](Unit* target)
+            SelectTargetList(targets, 6, SelectTargetMethod::Random, 1, [&](Unit* target)
             {
                 return target && target->IsPlayer() && target->GetPower(POWER_MANA) > 0;
-            }, 6, SelectTargetMethod::Random);
+            });
 
             for (Unit* target : targets)
             {

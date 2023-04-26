@@ -191,7 +191,10 @@ namespace Movement
 
             uint32 nodes = move_spline.getPath().size();
             data << nodes;
-            data.append<Vector3>(&move_spline.getPath()[0], nodes);
+            if (nodes)
+            {
+                data.append<Vector3>(&move_spline.getPath()[0], nodes);
+            }
             data << uint8(move_spline.spline.mode());       // added in 3.1
             data << (move_spline.isCyclic() ? Vector3::zero() : move_spline.FinalDestination());
         }

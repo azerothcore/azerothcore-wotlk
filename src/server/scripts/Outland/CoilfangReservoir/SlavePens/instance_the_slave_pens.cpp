@@ -28,6 +28,11 @@
 #include "ScriptMgr.h"
 #include "the_slave_pens.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_QUAGMIRRAN, DATA_QUAGMIRRAN }
+};
+
 class instance_the_slave_pens : public InstanceMapScript
 {
 public:
@@ -37,10 +42,10 @@ public:
     {
         instance_the_slave_pens_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
+            LoadObjectData(creatureData, nullptr);
             counter = DATA_FLAMECALLER_000;
         }
-
-        void Load(char const* /*data*/) override { LoadBossState(DataHeader); }
 
         void OnCreatureCreate(Creature* creature) override
         {
@@ -83,6 +88,8 @@ public:
                 default:
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void SetGuidData(uint32 data, ObjectGuid guid) override

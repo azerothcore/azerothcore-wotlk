@@ -88,7 +88,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             Talk(SAY_AGGRO);
 
@@ -170,8 +170,11 @@ public:
 
 enum Yor
 {
-    SPELL_DOUBLE_BREATH = 38361,
-    EVENT_DOUBLE_BREATH = 1
+    SPELL_DOUBLE_BREATH     = 38361,
+    SPELL_STOMP             = 36405,
+
+    EVENT_DOUBLE_BREATH     = 1,
+    EVENT_STOMP             = 2
 };
 
 class npc_yor : public CreatureScript
@@ -190,9 +193,10 @@ public:
 
         void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(6000, 9000));
+            events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(26500, 30500));
+            events.ScheduleEvent(EVENT_STOMP, urand(12000, 18000));
         }
 
         void UpdateAI(uint32 diff) override
@@ -201,6 +205,10 @@ public:
                 return;
 
             events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
 
             while (uint32 eventId = events.ExecuteEvent())
             {
@@ -209,16 +217,16 @@ public:
                     case EVENT_DOUBLE_BREATH:
                         if (me->IsWithinDist(me->GetVictim(), ATTACK_DISTANCE))
                             DoCastVictim(SPELL_DOUBLE_BREATH);
-                        events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(6000, 9000));
+                        events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(10000, 20000));
                         break;
-                    default:
+                    case EVENT_STOMP:
+                        DoCastAOE(SPELL_STOMP);
+                        events.ScheduleEvent(EVENT_STOMP, urand(14000, 24000));
                         break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
-
     private:
         EventMap events;
     };

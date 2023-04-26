@@ -1,33 +1,34 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.game_tele
+-- Dumping structure for table acore_world.game_tele
 DROP TABLE IF EXISTS `game_tele`;
 CREATE TABLE IF NOT EXISTS `game_tele` (
-  `id` mediumint unsigned NOT NULL AUTO_INCREMENT,
+  `id` int unsigned NOT NULL,
   `position_x` float NOT NULL DEFAULT '0',
   `position_y` float NOT NULL DEFAULT '0',
   `position_z` float NOT NULL DEFAULT '0',
   `orientation` float NOT NULL DEFAULT '0',
   `map` smallint unsigned NOT NULL DEFAULT '0',
-  `name` varchar(100) NOT NULL DEFAULT '',
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1492 DEFAULT CHARSET=utf8mb4 COMMENT='Tele Command';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tele Command';
 
--- Dumpar data för tabell acore_world.game_tele: 1 491 rows
+-- Dumping data for table acore_world.game_tele: ~1,491 rows (approximately)
 DELETE FROM `game_tele`;
-/*!40000 ALTER TABLE `game_tele` DISABLE KEYS */;
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES
 	(1, 1054.94, 1055.23, -48.2358, 0.313367, 529, 'AB'),
 	(2, -2068.19, 7463.77, -18.9908, 5.21755, 530, 'AbandonedArmory'),
@@ -1520,8 +1521,8 @@ INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orient
 	(1489, 5372.72, -3378.71, 1655.47, 5.27658, 1, 'HyjalTheWorldTree'),
 	(1490, 5474.07, 39.7615, 149.546, 6.27193, 571, 'CrystalsongForest'),
 	(1491, 79, -1, 18.6778, 0, 44, 'OldScarletMonastery');
-/*!40000 ALTER TABLE `game_tele` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

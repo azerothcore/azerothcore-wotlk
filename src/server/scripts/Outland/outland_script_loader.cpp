@@ -23,6 +23,7 @@ void AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
 void AddSC_boss_pandemonius();
 void AddSC_instance_mana_tombs();
 void AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
+void AddSC_boss_anzu();
 void AddSC_instance_sethekk_halls();
 void AddSC_instance_shadow_labyrinth();      //Auchindoun Shadow Labyrinth
 void AddSC_boss_ambassador_hellmaw();
@@ -50,8 +51,12 @@ void AddSC_boss_hydromancer_thespia();       //CR Steam Vault
 void AddSC_boss_mekgineer_steamrigger();
 void AddSC_boss_warlord_kalithresh();
 void AddSC_instance_steam_vault();
-void AddSC_boss_the_black_stalker();         //CR Underbog
+void AddSC_underbog();                       //CR Underbog
+void AddSC_boss_hungarfen();
+void AddSC_boss_ghazan();
+void AddSC_boss_the_black_stalker();
 void AddSC_instance_the_underbog();
+void AddSC_the_slave_pens();                // The Slave Pens
 void AddSC_boss_ahune();
 void AddSC_instance_the_slave_pens();
 void AddSC_boss_gruul();                     //Gruul's Lair
@@ -103,7 +108,7 @@ void AddSC_netherstorm();
 void AddSC_shadowmoon_valley();
 void AddSC_shattrath_city();
 void AddSC_terokkar_forest();
-void AddSC_zangarmarsh();
+//void AddSC_zangarmarsh();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -116,6 +121,7 @@ void AddOutlandScripts()
     AddSC_boss_pandemonius();
     AddSC_instance_mana_tombs();
     AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
+    AddSC_boss_anzu();
     AddSC_instance_sethekk_halls();
     AddSC_instance_shadow_labyrinth();      //Auchindoun Shadow Labyrinth
     AddSC_boss_ambassador_hellmaw();
@@ -143,8 +149,12 @@ void AddOutlandScripts()
     AddSC_boss_mekgineer_steamrigger();
     AddSC_boss_warlord_kalithresh();
     AddSC_instance_steam_vault();
-    AddSC_boss_the_black_stalker();         //CR Underbog
+    AddSC_underbog();                       //CR Underbog
+    AddSC_boss_hungarfen();
+    AddSC_boss_ghazan();
+    AddSC_boss_the_black_stalker();
     AddSC_instance_the_underbog();
+    AddSC_the_slave_pens();                 // The Slave Pens
     AddSC_boss_ahune();
     AddSC_instance_the_slave_pens();
     AddSC_boss_gruul();                     //Gruul's Lair
@@ -196,5 +206,5 @@ void AddOutlandScripts()
     AddSC_shadowmoon_valley();
     AddSC_shattrath_city();
     AddSC_terokkar_forest();
-    AddSC_zangarmarsh();
+    //AddSC_zangarmarsh();
 }

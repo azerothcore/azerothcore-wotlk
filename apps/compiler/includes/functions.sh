@@ -17,6 +17,8 @@ function comp_ccacheEnable() {
     export CCACHE_CPP2=${CCACHE_CPP2:-true} # optimization for clang
     export CCACHE_COMPRESS=${CCACHE_COMPRESS:-1}
     export CCACHE_COMPRESSLEVEL=${CCACHE_COMPRESSLEVEL:-9}
+    export CCACHE_COMPILERCHECK=${CCACHE_COMPILERCHECK:-content}
+    export CCACHE_LOGFILE=${CCACHE_LOGFILE:-"$CCACHE_DIR/cache.debug"}
     #export CCACHE_NODIRECT=true
 
     export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
@@ -102,9 +104,9 @@ function comp_compile() {
 
   echo "Using $MTHREADS threads"
 
-  CWD=$(pwd)
+  pushd "$BUILDPATH" >> /dev/null || exit 1
 
-  cd $BUILDPATH
+  comp_ccacheEnable
 
   comp_ccacheResetStats
 
@@ -117,7 +119,7 @@ function comp_compile() {
     msys*)
       cmake --install . --config $CTYPE
 
-      cd $CWD
+      popd >> /dev/null || exit 1
 
       echo "Done"
       ;;
@@ -134,7 +136,7 @@ function comp_compile() {
       echo "Cmake install..."
       sudo cmake --install . --config $CTYPE
 
-      cd $CWD
+      popd >> /dev/null || exit 1
 
       # set all aplications SUID bit
       echo "Setting permissions on binary files"
@@ -145,13 +147,30 @@ function comp_compile() {
 
       if [[ $DOCKER = 1 && $DISABLE_DOCKER_CONF != 1 ]]; then
         echo "Generating confs..."
-        cp -n "$DOCKER_ETC_FOLDER/worldserver.conf.dockerdist" "${confDir}/worldserver.conf"
-        cp -n "$DOCKER_ETC_FOLDER/authserver.conf.dockerdist" "${confDir}/authserver.conf"
-        cp -n "$DOCKER_ETC_FOLDER/dbimport.conf.dockerdist" "${confDir}/dbimport.conf"
+
+        # Search for all configs under DOCKER_ETC_FOLDER
+        for dockerdist in "$DOCKER_ETC_FOLDER"/*.dockerdist; do
+          # Grab "base" conf. turns foo.conf.dockerdist into foo.conf
+          baseConf="$(echo "$dockerdist" | rev | cut -f1 -d. --complement | rev)"
+          # env/dist/etc/foo.conf becomes foo.conf
+          filename="$(basename "$baseConf")"
+          # the dist files should be always found inside $confDir
+          # which may not be the same as DOCKER_ETC_FOLDER
+          distPath="$confDir/$filename.dist"
+          # if dist file doesn't exist, skip this iteration
+          [ ! -f "$distPath" ] && continue
+
+          # replace params in foo.conf.dist with params in foo.conf.dockerdist
+          conf_layer "$dockerdist" "$distPath" " # Copied from dockerdist"
+
+          # Copy modified dist file to $confDir/$filename
+          # Don't overwrite foo.conf if it already exists.
+          cp --no-clobber --verbose "$distPath" "$confDir/$filename"
+        done
       fi
 
       echo "Done"
-    ;;
+      ;;
   esac
 
   runHooks "ON_AFTER_BUILD"
@@ -165,4 +184,37 @@ function comp_build() {
 function comp_all() {
   comp_clean
   comp_build
+}
+
+# conf_layer FILENAME FILENAME
+# Layer the configuration parameters from the first argument onto the second argument
+function conf_layer() {
+  LAYER="$1"
+  BASE="$2"
+  COMMENT="$3"
+
+  # Loop over all defined params in conf file
+  grep -E "^[a-zA-Z\.0-9]+\s*=.*$" "$LAYER" \
+    | while read -r param
+      do
+        # remove spaces from param
+        # foo       = bar becomes foo=bar
+        NOSPACE="$(tr -d '[:space:]' <<< "$param")"
+
+        # split into key and value
+        KEY="$(cut -f1 -d= <<< "$NOSPACE")"
+        VAL="$(cut -f2 -d= <<< "$NOSPACE")"
+        # if key in base and val not in line
+        if grep -qE "^$KEY" "$BASE" && ! grep -qE "^$KEY.*=.*$VAL" "$BASE"; then
+          # Replace line
+          # Prevent issues with shell quoting 
+          sed -i \
+            's,^'"$KEY"'.*,'"$KEY = $VAL$COMMENT"',g' \
+            "$BASE"
+        else
+          # insert line
+          echo "$KEY = $VAL$COMMENT" >> "$BASE"
+        fi
+      done
+  echo "Layered $LAYER onto $BASE"
 }

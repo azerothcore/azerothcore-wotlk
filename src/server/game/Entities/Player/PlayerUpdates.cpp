@@ -38,7 +38,7 @@
 #include "WeatherMgr.h"
 #include "WorldStatePackets.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -164,7 +164,7 @@ void Player::Update(uint32 p_time)
         if (Unit* victim = GetVictim())
         {
             // default combat reach 10
-            // TODO add weapon, skill check
+            /// @todo add weapon, skill check
 
             if (isAttackReady(BASE_ATTACK))
             {
@@ -489,12 +489,11 @@ void Player::UpdateLocalChannels(uint32 newZone)
         {
             Channel* usedChannel = nullptr;
 
-            for (JoinedChannelsList::iterator itr = m_channels.begin();
-                 itr != m_channels.end(); ++itr)
+            for (Channel* channel : m_channels)
             {
-                if ((*itr)->GetChannelId() == i)
+                if (channel && channel->GetChannelId() == i)
                 {
-                    usedChannel = *itr;
+                    usedChannel = channel;
                     break;
                 }
             }
@@ -980,7 +979,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
 
 void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item /*= nullptr*/)
 {
-    uint8  playerLevel = getLevel();
+    uint8  playerLevel = GetLevel();
     uint16 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
     uint16 currentSkillMax = 5 * playerLevel;
     int32  skillDiff = currentSkillMax - currentSkillValue;
@@ -993,7 +992,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
     }
 
     uint8 greylevel = Acore::XP::GetGrayLevel(playerLevel);
-    uint8 moblevel = defence ? victim->getLevelForTarget(this) : victim->getLevel(); // if defense than victim == attacker
+    uint8 moblevel = defence ? victim->getLevelForTarget(this) : victim->GetLevel(); // if defense than victim == attacker
     /*if (moblevel < greylevel)
         return;*/
     // Patch 3.0.8 (2009-01-20): You can no longer skill up weapons on mobs that are immune to damage.
@@ -1407,7 +1406,7 @@ void Player::UpdatePvPState()
 
 void Player::UpdateFFAPvPState(bool reset /*= true*/)
 {
-    // TODO: should we always synchronize UNIT_FIELD_BYTES_2, 1 of controller
+    /// @todo: should we always synchronize UNIT_FIELD_BYTES_2, 1 of controller
     // and controlled? no, we shouldn't, those are checked for affecting player
     // by client
     if (!pvpInfo.IsInNoPvPArea && !IsGameMaster() &&
@@ -1761,28 +1760,33 @@ void Player::UpdateForQuestWorldObjects()
                 continue;
 
             // check if this unit requires quest specific flags
-            if (!obj->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
-                continue;
-
-            SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
-            for (SpellClickInfoContainer::const_iterator _itr = clickPair.first; _itr != clickPair.second; ++_itr)
+            if (obj->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
             {
-                //! This code doesn't look right, but it was logically converted to condition system to do the exact
-                //! same thing it did before. It definitely needs to be overlooked for intended functionality.
-                ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(obj->GetEntry(), _itr->second.spellId);
-                bool buildUpdateBlock = false;
-                for (ConditionList::const_iterator jtr = conds.begin(); jtr != conds.end() && !buildUpdateBlock; ++jtr)
-                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
-                        buildUpdateBlock = true;
-
-                if (buildUpdateBlock)
+                SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
+                for (SpellClickInfoContainer::const_iterator _itr = clickPair.first; _itr != clickPair.second; ++_itr)
                 {
-                    obj->BuildValuesUpdateBlockForPlayer(&udata, this);
-                    break;
+                    //! This code doesn't look right, but it was logically converted to condition system to do the exact
+                    //! same thing it did before. It definitely needs to be overlooked for intended functionality.
+                    ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(obj->GetEntry(), _itr->second.spellId);
+                    bool buildUpdateBlock = false;
+                    for (ConditionList::const_iterator jtr = conds.begin(); jtr != conds.end() && !buildUpdateBlock; ++jtr)
+                        if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
+                            buildUpdateBlock = true;
+
+                    if (buildUpdateBlock)
+                    {
+                        obj->BuildValuesUpdateBlockForPlayer(&udata, this);
+                        break;
+                    }
                 }
+            }
+            else if (obj->HasNpcFlag(UNIT_NPC_FLAG_VENDOR_MASK | UNIT_NPC_FLAG_TRAINER))
+            {
+                obj->BuildValuesUpdateBlockForPlayer(&udata, this);
             }
         }
     }
+
     udata.BuildPacket(&packet);
     GetSession()->SendPacket(&packet);
 }
@@ -1973,7 +1977,7 @@ void Player::UpdateCharmedAI()
 
     if (!target || !IsValidAttackTarget(target))
     {
-        target = SelectNearbyTarget(nullptr, 30);
+        target = SelectNearbyTarget(nullptr, GetMap()->IsDungeon() ? 100.f : 30.f);
         if (!target)
         {
             if (!HasUnitState(UNIT_STATE_FOLLOW))

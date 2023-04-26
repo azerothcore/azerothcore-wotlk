@@ -322,7 +322,7 @@ public:
     static bool HandleDeserterRemoveAll(ChatHandler* handler, bool isInstance, Optional<std::string> maxTime)
     {
         uint32 deserterSpell = isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER;
-        int32 remainTime = isInstance ? 1800 : 900;
+        int32 remainTime = isInstance ? 1800 : 1800;
         uint64 deserterCount = 0;
         bool countOnline = true;
 

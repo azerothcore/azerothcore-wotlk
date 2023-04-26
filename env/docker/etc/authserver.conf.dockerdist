@@ -16,7 +16,7 @@ TempDir = "/azerothcore/env/dist/temp"
 LoginDatabaseInfo = "ac-database;3306;root;password;acore_auth"
 
 # Add more configuration overwrites by copying settings from from authserver.conf.dist
-LogLevel = 3
+
 SQLDriverLogFile = "SQLDriver.log"
 SQLDriverQueryLogging = 1
 

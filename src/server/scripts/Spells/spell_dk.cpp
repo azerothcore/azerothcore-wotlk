@@ -72,7 +72,11 @@ enum DeathKnightSpells
     SPELL_DK_UNHOLY_PRESENCE                    = 48265,
     SPELL_DK_UNHOLY_PRESENCE_TRIGGERED          = 49772,
     SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1   = 49189,
-    SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284
+    SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284,
+    // Risen Ally
+    SPELL_DK_RAISE_ALLY                         = 46619,
+    SPELL_DK_THRASH                             = 47480,
+    SPELL_GHOUL_FRENZY                          = 62218,
 };
 
 enum DeathKnightSpellIcons
@@ -82,7 +86,8 @@ enum DeathKnightSpellIcons
 
 enum Misc
 {
-    NPC_DK_GHOUL                                = 26125
+    NPC_DK_GHOUL                                = 26125,
+    NPC_RISEN_ALLY                              = 30230
 };
 
 // 50526 - Wandering Plague
@@ -149,7 +154,7 @@ class spell_dk_raise_ally : public SpellScript
             if (Unit* ghoul = unitTarget->GetCharm())
             {
                 //health, mana, armor and resistance
-                PetLevelInfo const* pInfo = sObjectMgr->GetPetLevelInfo(ghoul->GetEntry(), ghoul->getLevel());
+                PetLevelInfo const* pInfo = sObjectMgr->GetPetLevelInfo(ghoul->GetEntry(), ghoul->GetLevel());
                 if (pInfo)                                      // exist in DB
                 {
                     ghoul->SetCreateHealth(pInfo->health);
@@ -159,8 +164,8 @@ class spell_dk_raise_ally : public SpellScript
                         ghoul->SetCreateStat(Stats(stat), float(pInfo->stats[stat]));
                 }
 
-                ghoul->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(ghoul->getLevel() - (ghoul->getLevel() / 4)));
-                ghoul->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(ghoul->getLevel() + (ghoul->getLevel() / 4)));
+                ghoul->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(ghoul->GetLevel() - (ghoul->GetLevel() / 4)));
+                ghoul->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(ghoul->GetLevel() + (ghoul->GetLevel() / 4)));
 
                 // Avoidance, Night of the Dead
                 if (Aura* aur = ghoul->AddAura(62137, ghoul))
@@ -861,7 +866,7 @@ class spell_dk_anti_magic_shell_raid : public AuraScript
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // TODO: this should absorb limited amount of damage, but no info on calculation formula
+        /// @todo: this should absorb limited amount of damage, but no info on calculation formula
         amount = -1;
     }
 
@@ -1493,6 +1498,53 @@ class spell_dk_ghoul_explode : public SpellScript
     {
         OnEffectLaunchTarget += SpellEffectFn(spell_dk_ghoul_explode::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         OnEffectHitTarget += SpellEffectFn(spell_dk_ghoul_explode::Suicide, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
+// 47480 - Thrash
+class spell_dk_ghoul_thrash : public SpellScript
+{
+    PrepareSpellScript(spell_dk_ghoul_thrash);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_GHOUL_FRENZY });
+    }
+
+    void CalcDamage(SpellEffIndex /*effIndex*/)
+    {
+        /*
+        Causes more damage per frenzy point:
+            1 point   : (Attack power * 40 * 0.01 + Attack power * 0.05)-(Attack power * 40 * 0.01 + Attack power * 0.10) damage
+            2 points  : (Attack power * 40 * 0.01 + Attack power * 0.10)-(Attack power * 40 * 0.01 + Attack power * 0.20) damage
+            3 points  : (Attack power * 40 * 0.01 + Attack power * 0.15)-(Attack power * 40 * 0.01 + Attack power * 0.30) damage
+            4 points  : (Attack power * 40 * 0.01 + Attack power * 0.20)-(Attack power * 40 * 0.01 + Attack power * 0.40) damage
+            5 points  : (Attack power * 40 * 0.01 + Attack power * 0.25)-(Attack power * 40 * 0.01 + Attack power * 0.50) damage
+        */
+
+        if (Aura* frenzy = GetCaster()->GetAura(SPELL_GHOUL_FRENZY))
+        {
+            float APBonus = GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
+            float fixedDamageBonus = APBonus * GetEffectValue() * 0.01f;
+            APBonus *= 0.05f * frenzy->GetStackAmount();
+
+            SetEffectValue(fixedDamageBonus + urand(int32(APBonus), int32(APBonus * 2.f)));
+
+            if (Unit* caster = GetCaster())
+            {
+                caster->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY);
+
+                if (Unit* charmer = caster->GetCharmer())
+                {
+                    charmer->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_dk_ghoul_thrash::CalcDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
@@ -2184,4 +2236,5 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_spell_deflection);
     RegisterSpellScript(spell_dk_vampiric_blood);
     RegisterSpellScript(spell_dk_will_of_the_necropolis);
+    RegisterSpellScript(spell_dk_ghoul_thrash);
 }

@@ -195,7 +195,7 @@ struct boss_viscidus : public BossAI
                     me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
                     me->LowerPlayerDamageReq(me->GetMaxHealth());
                     me->SetHealth(me->GetMaxHealth() * 0.01f); // set 1% health
-                    DoResetThreat();
+                    DoResetThreatList();
                     me->NearTeleportTo(roomCenter.GetPositionX(),
                         roomCenter.GetPositionY(),
                         roomCenter.GetPositionZ(),
@@ -276,9 +276,9 @@ struct boss_viscidus : public BossAI
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         InitSpells();
     }
 
@@ -362,7 +362,7 @@ struct boss_glob_of_viscidus : public ScriptedAI
         if (id == ROOM_CENTER)
         {
             DoCastSelf(SPELL_REJOIN_VISCIDUS);
-            Unit::Kill(me, me);
+            me->KillSelf();
         }
     }
 

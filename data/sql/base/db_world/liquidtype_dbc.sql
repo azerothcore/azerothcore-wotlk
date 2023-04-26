@@ -1,22 +1,24 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.liquidtype_dbc
+-- Dumping structure for table acore_world.liquidtype_dbc
 DROP TABLE IF EXISTS `liquidtype_dbc`;
 CREATE TABLE IF NOT EXISTS `liquidtype_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `Name` varchar(100) DEFAULT NULL,
+  `Name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Flags` int NOT NULL DEFAULT '0',
   `Type` int NOT NULL DEFAULT '0',
   `SoundID` int NOT NULL DEFAULT '0',
@@ -30,12 +32,12 @@ CREATE TABLE IF NOT EXISTS `liquidtype_dbc` (
   `ParticleMovement` int NOT NULL DEFAULT '0',
   `ParticleTexSlots` int NOT NULL DEFAULT '0',
   `MaterialID` int NOT NULL DEFAULT '0',
-  `Texture_1` varchar(100) DEFAULT NULL,
-  `Texture_2` varchar(100) DEFAULT NULL,
-  `Texture_3` varchar(100) DEFAULT NULL,
-  `Texture_4` varchar(100) DEFAULT NULL,
-  `Texture_5` varchar(100) DEFAULT NULL,
-  `Texture_6` varchar(100) DEFAULT NULL,
+  `Texture_1` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_2` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_3` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_4` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_5` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_6` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Color_1` int NOT NULL DEFAULT '0',
   `Color_2` int NOT NULL DEFAULT '0',
   `Float_1` float NOT NULL DEFAULT '0',
@@ -61,13 +63,12 @@ CREATE TABLE IF NOT EXISTS `liquidtype_dbc` (
   `Int_3` int NOT NULL DEFAULT '0',
   `Int_4` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.liquidtype_dbc: 0 rows
+-- Dumping data for table acore_world.liquidtype_dbc: ~0 rows (approximately)
 DELETE FROM `liquidtype_dbc`;
-/*!40000 ALTER TABLE `liquidtype_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `liquidtype_dbc` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

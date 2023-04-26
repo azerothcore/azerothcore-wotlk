@@ -238,20 +238,10 @@ void OPvPCapturePointHP::ChangeState()
                 break;
             }
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
-            field = HP_MAP_N[m_TowerType];
-            break;
         case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:
-            field = HP_MAP_N[m_TowerType];
-            break;
         case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
-            field = HP_MAP_A[m_TowerType];
-            artkit = 2;
-            artkit2 = HP_TowerArtKit_A[m_TowerType];
-            break;
         case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
-            field = HP_MAP_H[m_TowerType];
-            artkit = 1;
-            artkit2 = HP_TowerArtKit_H[m_TowerType];
+            field = HP_MAP_N[m_TowerType];
             break;
     }
 

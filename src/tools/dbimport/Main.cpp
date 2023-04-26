@@ -16,13 +16,13 @@
  */
 
 #include "Banner.h"
-#include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "IoContext.h"
 #include "Log.h"
 #include "MySQLThreading.h"
+#include "OpenSSLCrypto.h"
 #include "Util.h"
 #include <boost/program_options.hpp>
 #include <boost/version.hpp>
@@ -73,10 +73,14 @@ int main(int argc, char** argv)
         []()
         {
             LOG_INFO("dbimport", "> Using configuration file:       {}", sConfigMgr->GetFilename());
-            LOG_INFO("dbimport", "> Using SSL version:              {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            LOG_INFO("dbimport", "> Using SSL version:              {} (library: {})", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
             LOG_INFO("dbimport", "> Using Boost version:            {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         }
     );
+
+    OpenSSLCrypto::threadsSetup();
+
+    std::shared_ptr<void> opensslHandle(nullptr, [](void*) { OpenSSLCrypto::threadsCleanup(); });
 
     // Initialize the database connection
     if (!StartDB())

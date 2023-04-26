@@ -356,12 +356,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (AccountMgr::IsPlayerAccount(GetSecurity()) && sObjectMgr->IsReservedName(createInfo->Name))
-    {
-        SendCharCreate(CHAR_NAME_RESERVED);
-        return;
-    }
-
     // speedup check for heroic class disabled case
     uint32 heroic_free_slots = sWorld->getIntConfig(CONFIG_HEROIC_CHARACTERS_PER_REALM);
     if (heroic_free_slots == 0 && AccountMgr::IsPlayerAccount(GetSecurity()) && createInfo->Class == CLASS_DEATH_KNIGHT)
@@ -581,7 +575,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                 {
                     LOG_INFO("entities.player.character", "Account: {} (IP: {}) Create Character: {} {}", GetAccountId(), GetRemoteAddress(), newChar->GetName(), newChar->GetGUID().ToString());
                     sScriptMgr->OnPlayerCreate(newChar.get());
-                    sCharacterCache->AddCharacterCacheEntry(newChar->GetGUID(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->getRace(), newChar->getClass(), newChar->getLevel());
+                    sCharacterCache->AddCharacterCacheEntry(newChar->GetGUID(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->getRace(), newChar->getClass(), newChar->GetLevel());
                     SendCharCreate(CHAR_CREATE_SUCCESS);
                 }
                 else
@@ -658,7 +652,8 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     sCalendarMgr->RemoveAllPlayerEventsAndInvites(guid);
     Player::DeleteFromDB(guid.GetCounter(), GetAccountId(), true, false);
 
-    sCharacterCache->DeleteCharacterCacheEntry(guid, name);
+    sWorld->UpdateRealmCharCount(GetAccountId());
+
     SendCharDelete(CHAR_DELETE_SUCCESS);
 }
 
@@ -1046,7 +1041,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
     std::string IP_str = GetRemoteAddress();
     LOG_INFO("entities.player", "Account: {} (IP: {}) Login Character:[{}] ({}) Level: {}",
-                  GetAccountId(), IP_str, pCurrChar->GetName(), pCurrChar->GetGUID().ToString(), pCurrChar->getLevel());
+                  GetAccountId(), IP_str, pCurrChar->GetName(), pCurrChar->GetGUID().ToString(), pCurrChar->GetLevel());
 
     if (!pCurrChar->IsStandState() && !pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
         pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
@@ -1347,13 +1342,6 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
     if (res != CHAR_NAME_SUCCESS)
     {
         SendCharRename(ResponseCodes(res), renameInfo.get());
-        return;
-    }
-
-    // check name limitations
-    if (AccountMgr::IsPlayerAccount(GetSecurity()) && sObjectMgr->IsReservedName(renameInfo->Name))
-    {
-        SendCharRename(CHAR_NAME_RESERVED, renameInfo.get());
         return;
     }
 
@@ -1694,13 +1682,6 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
     if (res != CHAR_NAME_SUCCESS)
     {
         SendCharCustomize(res, customizeInfo.get());
-        return;
-    }
-
-    // check name limitations
-    if (AccountMgr::IsPlayerAccount(GetSecurity()) && sObjectMgr->IsReservedName(customizeInfo->Name))
-    {
-        SendCharCustomize(CHAR_NAME_RESERVED, customizeInfo.get());
         return;
     }
 
@@ -2079,13 +2060,6 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
     if (res != CHAR_NAME_SUCCESS)
     {
         SendCharFactionChange(res, factionChangeInfo.get());
-        return;
-    }
-
-    // check name limitations
-    if (AccountMgr::IsPlayerAccount(GetSecurity()) && sObjectMgr->IsReservedName(factionChangeInfo->Name))
-    {
-        SendCharFactionChange(CHAR_NAME_RESERVED, factionChangeInfo.get());
         return;
     }
 

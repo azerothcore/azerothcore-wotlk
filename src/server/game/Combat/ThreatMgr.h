@@ -225,6 +225,9 @@ public:
     [[nodiscard]] bool isThreatListEmpty() const { return iThreatContainer.empty(); }
     [[nodiscard]] bool areThreatListsEmpty() const { return iThreatContainer.empty() && iThreatOfflineContainer.empty(); }
 
+    Acore::IteratorPair<std::list<ThreatReference*>::const_iterator> GetSortedThreatList() const { auto& list = iThreatContainer.GetThreatList(); return { list.cbegin(), list.cend() }; }
+    Acore::IteratorPair<std::list<ThreatReference*>::const_iterator> GetUnsortedThreatList() const { return GetSortedThreatList(); }
+
     void processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusChangeEvent);
 
     bool isNeedUpdateToClient(uint32 time);
@@ -256,7 +259,7 @@ public:
         if (threatList.empty())
             return;
 
-        for (auto ref : threatList)
+        for (auto& ref : threatList)
         {
             if (predicate(ref->getTarget()))
             {

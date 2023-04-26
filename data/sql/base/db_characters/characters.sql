@@ -1,23 +1,25 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_characters.characters
+-- Dumping structure for table acore_characters.characters
 DROP TABLE IF EXISTS `characters`;
 CREATE TABLE IF NOT EXISTS `characters` (
   `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `account` int unsigned NOT NULL DEFAULT '0' COMMENT 'Account Identifier',
-  `name` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL,
   `race` tinyint unsigned NOT NULL DEFAULT '0',
   `class` tinyint unsigned NOT NULL DEFAULT '0',
   `gender` tinyint unsigned NOT NULL DEFAULT '0',
@@ -39,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `instance_id` int unsigned NOT NULL DEFAULT '0',
   `instance_mode_mask` tinyint unsigned NOT NULL DEFAULT '0',
   `orientation` float NOT NULL DEFAULT '0',
-  `taximask` text NOT NULL,
+  `taximask` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `online` tinyint unsigned NOT NULL DEFAULT '0',
   `cinematic` tinyint unsigned NOT NULL DEFAULT '0',
   `totaltime` int unsigned NOT NULL DEFAULT '0',
@@ -53,13 +55,13 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `trans_y` float NOT NULL DEFAULT '0',
   `trans_z` float NOT NULL DEFAULT '0',
   `trans_o` float NOT NULL DEFAULT '0',
-  `transguid` mediumint NOT NULL DEFAULT '0',
+  `transguid` int DEFAULT '0',
   `extra_flags` smallint unsigned NOT NULL DEFAULT '0',
   `stable_slots` tinyint unsigned NOT NULL DEFAULT '0',
   `at_login` smallint unsigned NOT NULL DEFAULT '0',
   `zone` smallint unsigned NOT NULL DEFAULT '0',
   `death_expire_time` int unsigned NOT NULL DEFAULT '0',
-  `taxi_path` text,
+  `taxi_path` text COLLATE utf8mb4_unicode_ci,
   `arenaPoints` int unsigned NOT NULL DEFAULT '0',
   `totalHonorPoints` int unsigned NOT NULL DEFAULT '0',
   `todayHonorPoints` int unsigned NOT NULL DEFAULT '0',
@@ -79,32 +81,32 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `power5` int unsigned NOT NULL DEFAULT '0',
   `power6` int unsigned NOT NULL DEFAULT '0',
   `power7` int unsigned NOT NULL DEFAULT '0',
-  `latency` mediumint unsigned NOT NULL DEFAULT '0',
+  `latency` int unsigned DEFAULT '0',
   `talentGroupsCount` tinyint unsigned NOT NULL DEFAULT '1',
   `activeTalentGroup` tinyint unsigned NOT NULL DEFAULT '0',
-  `exploredZones` longtext,
-  `equipmentCache` longtext,
+  `exploredZones` longtext COLLATE utf8mb4_unicode_ci,
+  `equipmentCache` longtext COLLATE utf8mb4_unicode_ci,
   `ammoId` int unsigned NOT NULL DEFAULT '0',
-  `knownTitles` longtext,
+  `knownTitles` longtext COLLATE utf8mb4_unicode_ci,
   `actionBars` tinyint unsigned NOT NULL DEFAULT '0',
   `grantableLevels` tinyint unsigned NOT NULL DEFAULT '0',
   `order` tinyint DEFAULT NULL,
   `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleteInfos_Account` int unsigned DEFAULT NULL,
-  `deleteInfos_Name` varchar(12) DEFAULT NULL,
+  `deleteInfos_Name` varchar(12) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `deleteDate` int unsigned DEFAULT NULL,
   `innTriggerId` int unsigned NOT NULL,
+  `extraBonusTalentCount` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`),
   KEY `idx_account` (`account`),
   KEY `idx_online` (`online`),
   KEY `idx_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
--- Dumpar data för tabell acore_characters.characters: ~0 rows (ungefär)
+-- Dumping data for table acore_characters.characters: ~0 rows (approximately)
 DELETE FROM `characters`;
-/*!40000 ALTER TABLE `characters` DISABLE KEYS */;
-/*!40000 ALTER TABLE `characters` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

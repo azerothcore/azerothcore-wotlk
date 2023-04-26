@@ -334,12 +334,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Attributes &= ~SPELL_ATTR0_NOT_SHAPESHIFTED;   // with this spell atrribute aura can be stacked several times
     });
 
-    // Nether Portal - Perseverence
-    ApplySpellFix({ 30421 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_2].BasePoints += 30000;
-    });
-
     // Natural shapeshifter
     ApplySpellFix({ 16834, 16835 }, [](SpellInfo* spellInfo)
     {
@@ -434,13 +428,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         // SpellFamilyFlags[0] & 0x00000040 in SPELLFAMILY_DEATHKNIGHT is currently unused (3.3.5a)
         // this needs research on modifier applying rules, does not seem to be in Attributes fields
         spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000040, 0x00000000, 0x00000000);
-    });
-
-    // Idol of the Flourishing Life
-    ApplySpellFix({ 64949 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000000, 0x02000000, 0x00000000);
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_ADD_FLAT_MODIFIER;
     });
 
     ApplySpellFix({
@@ -719,8 +706,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     ApplySpellFix({
         5171,   // Slice and Dice
-        6774,   // Slice and Dice
-        1725    // Distract
+        6774    // Slice and Dice
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
@@ -4380,7 +4366,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Judgement (Paladin T2 8P Bonus)
-    ApplySpellFix({ 23591 }, [](SpellInfo* spellInfo)
+    // Battlegear of Eternal Justice
+    ApplySpellFix({ 23591, 26135 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcFlags = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
     });
@@ -4425,6 +4412,92 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 26007 }, [](SpellInfo* spellInfo)
     {
             spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
+    });
+
+    // Digestive Acid (Temporary)
+    ApplySpellFix({ 26476 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Drums of War/Battle/Speed/Restoration
+    ApplySpellFix({ 35475, 35476, 35477, 35478 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ExcludeTargetAuraSpell = 51120;
+    });
+
+    // Slap!
+    ApplySpellFix({ 6754 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
+    // Summon Cauldron Stuff
+    ApplySpellFix({ 36549 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(28); // 5 seconds
+        spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_CASTER;
+    });
+
+    // Hunter's Mark
+    ApplySpellFix({ 31615 }, [](SpellInfo* spellInfo)
+    {
+        for (uint8 index = EFFECT_0; index <= EFFECT_1; ++index)
+        {
+            spellInfo->Effects[index].TargetA = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->Effects[index].TargetB = 0;
+        }
+    });
+
+    // Self Visual - Sleep Until Cancelled(DND)
+    ApplySpellFix({ 6606, 14915, 16093 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_SEATED;
+    });
+
+     // Cleansing Totem, Healing Stream Totem, Mana Tide Totem
+    ApplySpellFix({ 8171,52025, 52041, 52042, 52046, 52047, 52048, 52049, 52050, 58759, 58760, 58761, 39610, 39609 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+    // Game In Session
+    ApplySpellFix({ 39331 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+    });
+    // Death Ray Warning Visual, Death Ray Damage Visual
+    ApplySpellFix({ 63882, 63886 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
+    });
+
+    // Buffeting Winds of Susurrus
+    ApplySpellFix({ 32474 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(556); // 28 seconds
+    });
+
+    // Quest - Healing Salve
+    ApplySpellFix({ 29314 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
+    });
+
+    // Seed of Corruption
+    ApplySpellFix({ 27285, 47833, 47834 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_REFLECTION;
+    });
+
+    // Turn the Tables
+    ApplySpellFix({ 51627, 51628, 51629 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

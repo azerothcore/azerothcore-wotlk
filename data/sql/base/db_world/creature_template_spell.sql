@@ -1,31 +1,32 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.creature_template_spell
+-- Dumping structure for table acore_world.creature_template_spell
 DROP TABLE IF EXISTS `creature_template_spell`;
 CREATE TABLE IF NOT EXISTS `creature_template_spell` (
-  `CreatureID` mediumint unsigned NOT NULL,
+  `CreatureID` int unsigned NOT NULL,
   `Index` tinyint unsigned NOT NULL DEFAULT '0',
-  `Spell` mediumint unsigned DEFAULT NULL,
-  `VerifiedBuild` smallint DEFAULT '0',
+  `Spell` int unsigned DEFAULT NULL,
+  `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`CreatureID`,`Index`),
   CONSTRAINT `creature_template_spell_chk_1` CHECK (((`Index` >= 0) and (`Index` <= 7)))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.creature_template_spell: ~9 511 rows (ungefär)
+-- Dumping data for table acore_world.creature_template_spell: ~9,549 rows (approximately)
 DELETE FROM `creature_template_spell`;
-/*!40000 ALTER TABLE `creature_template_spell` DISABLE KEYS */;
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
 	(30, 0, 744, 12340),
 	(40, 0, 6016, 12340),
@@ -66,8 +67,6 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(215, 0, 2589, 12340),
 	(217, 0, 744, 12340),
 	(217, 1, 745, 12340),
-	(290, 0, 7159, 12340),
-	(290, 1, 6713, 12340),
 	(300, 0, 8716, 12340),
 	(314, 1, 20819, 12340),
 	(314, 2, 11831, 12340),
@@ -5501,6 +5500,10 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(17201, 0, 31274, 12340),
 	(17206, 0, 134, 12340),
 	(17206, 1, 8050, 12340),
+	(17211, 0, 37146, 12340),
+	(17211, 1, 30284, 12340),
+	(17211, 2, 37406, 12340),
+	(17211, 3, 37414, 12340),
 	(17217, 0, 31271, 12340),
 	(17220, 0, 134, 12340),
 	(17220, 1, 8050, 12340),
@@ -5620,6 +5623,10 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(17468, 1, 59701, 12340),
 	(17468, 2, 59703, 12340),
 	(17468, 3, 33542, 12340),
+	(17469, 0, 37146, 12340),
+	(17469, 1, 30284, 12340),
+	(17469, 2, 37413, 12340),
+	(17469, 3, 37416, 12340),
 	(17475, 0, 3417, 12340),
 	(17477, 0, 15242, 12340),
 	(17478, 0, 30615, 12340),
@@ -7600,6 +7607,10 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(21137, 1, 14873, 12340),
 	(21137, 2, 14874, 12340),
 	(21137, 3, 30832, 12340),
+	(21160, 0, 37146, 12340),
+	(21160, 1, 30284, 12340),
+	(21160, 2, 37427, 12340),
+	(21160, 3, 37432, 12340),
 	(21165, 0, 6660, 12340),
 	(21168, 0, 35871, 12340),
 	(21168, 1, 39262, 12340),
@@ -7935,8 +7946,22 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(21661, 1, 8599, 12340),
 	(21662, 0, 37685, 12340),
 	(21662, 1, 1604, 12340),
-	(21684, 0, 37471, 12340),
-	(21684, 1, 37474, 12340),
+	(21664, 0, 37144, 12340),
+	(21664, 1, 30284, 12340),
+	(21664, 2, 37453, 12340),
+	(21664, 3, 37498, 12340),
+	(21682, 0, 37146, 12340),
+	(21682, 1, 30284, 12340),
+	(21682, 2, 37455, 12340),
+	(21682, 3, 37459, 12340),
+	(21683, 0, 37148, 12340),
+	(21683, 1, 30284, 12340),
+	(21683, 2, 37462, 12340),
+	(21683, 3, 37465, 12340),
+	(21684, 0, 37146, 12340),
+	(21684, 1, 30284, 12340),
+	(21684, 2, 37471, 12340),
+	(21684, 3, 37474, 12340),
 	(21694, 0, 8599, 12340),
 	(21694, 1, 32065, 12340),
 	(21694, 2, 37272, 12340),
@@ -7969,6 +7994,10 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(21720, 2, 14900, 12340),
 	(21723, 0, 33912, 12340),
 	(21724, 0, 36590, 12340),
+	(21726, 0, 37146, 12340),
+	(21726, 1, 30284, 12340),
+	(21726, 2, 37428, 12340),
+	(21726, 3, 37434, 12340),
 	(21728, 0, 32011, 12340),
 	(21729, 0, 37273, 12340),
 	(21731, 0, 38465, 12340),
@@ -7976,8 +8005,22 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(21742, 1, 38008, 12340),
 	(21743, 0, 36104, 12340),
 	(21743, 1, 37577, 12340),
-	(21752, 0, 37476, 12340),
-	(21752, 1, 37472, 12340),
+	(21747, 0, 37146, 12340),
+	(21747, 1, 30284, 12340),
+	(21747, 2, 37456, 12340),
+	(21747, 3, 37461, 12340),
+	(21748, 0, 37144, 12340),
+	(21748, 1, 30284, 12340),
+	(21748, 2, 37454, 12340),
+	(21748, 3, 37502, 12340),
+	(21750, 0, 37148, 12340),
+	(21750, 1, 30284, 12340),
+	(21750, 2, 37463, 12340),
+	(21750, 3, 37461, 12340),
+	(21752, 0, 37146, 12340),
+	(21752, 1, 30284, 12340),
+	(21752, 2, 37472, 12340),
+	(21752, 3, 37476, 12340),
 	(21763, 0, 38167, 12340),
 	(21783, 0, 36500, 12340),
 	(21783, 1, 34232, 12340),
@@ -8685,7 +8728,8 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(25576, 0, 44503, 12340),
 	(25576, 1, 44504, 12340),
 	(25577, 0, 44533, 12340),
-	(25596, 0, 45877, 12340),
+	(25596, 0, 45876, 12340),
+	(25596, 1, 45877, 12340),
 	(25653, 0, 45862, 12340),
 	(25653, 1, 45856, 12340),
 	(25653, 2, 45860, 12340),
@@ -8958,11 +9002,12 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(30228, 0, 56683, 12340),
 	(30228, 1, 56684, 12340),
 	(30228, 2, 56712, 12340),
-	(30230, 0, 47468, 12340),
-	(30230, 1, 47484, 12340),
+	(30230, 0, 62225, 12340),
+	(30230, 1, 47480, 12340),
 	(30230, 2, 47481, 12340),
 	(30230, 3, 47482, 12340),
-	(30230, 4, 51874, 12340),
+	(30230, 4, 47484, 12340),
+	(30230, 5, 47496, 12340),
 	(30236, 0, 57385, 12340),
 	(30236, 1, 57412, 12340),
 	(30264, 0, 56407, 12340),
@@ -9531,15 +9576,9 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(40281, 0, 49297, 11159),
 	(40305, 0, 75159, 12340),
 	(40305, 1, 75160, 12340),
-	(40305, 2, 75161, 12340),
-	(50002, 0, 29426, 0),
-	(50002, 1, 16509, 0),
-	(50002, 2, 13730, 0),
-	(61021, 0, 14518, 0),
-	(61021, 1, 13005, 0),
-	(61021, 2, 13952, 0);
-/*!40000 ALTER TABLE `creature_template_spell` ENABLE KEYS */;
+	(40305, 2, 75161, 12340);
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

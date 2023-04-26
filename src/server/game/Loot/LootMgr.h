@@ -168,6 +168,7 @@ struct LootItem
     bool    is_counted        : 1;
     bool    needs_quest       : 1;                          // quest drop
     bool    follow_loot_rules : 1;
+    uint8   groupid           : 7;
 
     // Constructor, copies most fields from LootStoreItem, generates random count and random suffixes/properties
     // Should be called for non-reference LootStoreItem entries only (reference = 0)
@@ -176,8 +177,7 @@ struct LootItem
     LootItem() = default;
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-    bool AllowedForPlayer(Player const* player, bool isGivenByMasterLooter = false, bool allowQuestLoot = true, ObjectGuid source = ObjectGuid::Empty) const;
-    bool AllowedForPlayer(Player const* player, ObjectGuid source) { return AllowedForPlayer(player, false, true, source); };
+    bool AllowedForPlayer(Player const* player, ObjectGuid source) const;
     void AddAllowedLooter(Player const* player);
     [[nodiscard]] const AllowedLooterSet& GetAllowedLooters() const { return allowedGUIDs; }
 };

@@ -1,30 +1,31 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.pet_name_generation
+-- Dumping structure for table acore_world.pet_name_generation
 DROP TABLE IF EXISTS `pet_name_generation`;
 CREATE TABLE IF NOT EXISTS `pet_name_generation` (
-  `id` mediumint unsigned NOT NULL AUTO_INCREMENT,
-  `word` tinytext NOT NULL,
-  `entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `id` int unsigned NOT NULL,
+  `word` tinytext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `entry` int unsigned NOT NULL DEFAULT '0',
   `half` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.pet_name_generation: 313 rows
+-- Dumping data for table acore_world.pet_name_generation: ~313 rows (approximately)
 DELETE FROM `pet_name_generation`;
-/*!40000 ALTER TABLE `pet_name_generation` DISABLE KEYS */;
 INSERT INTO `pet_name_generation` (`id`, `word`, `entry`, `half`) VALUES
 	(1, 'Aba', 416, 0),
 	(2, 'Az', 416, 0),
@@ -339,8 +340,8 @@ INSERT INTO `pet_name_generation` (`id`, `word`, `entry`, `half`) VALUES
 	(311, 'catcher', 26125, 1),
 	(312, 'drinker', 26125, 1),
 	(313, 'slicer', 26125, 1);
-/*!40000 ALTER TABLE `pet_name_generation` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

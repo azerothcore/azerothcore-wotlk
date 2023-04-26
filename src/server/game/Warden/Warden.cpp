@@ -19,7 +19,7 @@
 #include "AccountMgr.h"
 #include "BanMgr.h"
 #include "ByteBuffer.h"
-#include "Common.h"
+#include "CryptoHash.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -28,10 +28,9 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include <openssl/sha.h>
 
 Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
-    _dataSent(false), _module(nullptr), _initialized(false)
+    _dataSent(false), _module(nullptr), _initialized(false), _interrupted(false), _checkInProgress(false)
 {
     memset(_inputKey, 0, sizeof(_inputKey));
     memset(_outputKey, 0, sizeof(_outputKey));
@@ -77,11 +76,11 @@ void Warden::RequestModule()
     LOG_DEBUG("warden", "Request module");
 
     // Create packet structure
-    WardenModuleUse request;
+    WardenModuleUse request{};
     request.Command = WARDEN_SMSG_MODULE_USE;
 
-    memcpy(request.ModuleId, _module->Id, 16);
-    memcpy(request.ModuleKey, _module->Key, 16);
+    memcpy(request.ModuleId, _module->Id.data(), 16);
+    memcpy(request.ModuleKey, _module->Key.data(), 16);
     request.Size = _module->CompressedSize;
 
     EndianConvert(request.Size);
@@ -155,30 +154,26 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
     }
 }
 
-struct keyData
+bool Warden::IsInitialized()
 {
-    union
-    {
-        struct
-        {
-            uint8 bytes[20];
-        } bytes;
+    return _initialized;
+}
 
-        struct
-        {
-            uint32 ints[5];
-        } ints;
-    };
+union keyData
+{
+    std::array<uint8, 20> bytes;
+    std::array<uint32, 5> ints;
 };
 
 uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
 {
-    keyData hash;
-    SHA1(data, length, hash.bytes.bytes);
+    keyData hash{};
+    hash.bytes = Acore::Crypto::SHA1::GetDigestOf(data, size_t(length));
     uint32 checkSum = 0;
+
     for (uint8 i = 0; i < 5; ++i)
     {
-        checkSum = checkSum ^ hash.ints.ints[i];
+        checkSum = checkSum ^ hash.ints[i];
     }
 
     return checkSum;
@@ -250,28 +245,28 @@ void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
     {
         if (Player const* plr = _session->GetPlayer())
         {
-            std::string const reportFormat = "Player %s (guid %u, account id: %u) failed warden %u check (%s). Action: %s";
-            reportMsg = Acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUID().GetCounter(), _session->GetAccountId(),
-                                           checkId, ((checkData && !checkData->Comment.empty()) ? checkData->Comment.c_str() : "<warden comment is not set>"),
-                                           GetWardenActionStr(action).c_str());
+            std::string const reportFormat = "Player {} (guid {}, account id: {}) failed warden {} check ({}). Action: {}";
+            reportMsg = Acore::StringFormatFmt(reportFormat, plr->GetName(), plr->GetGUID().GetCounter(), _session->GetAccountId(),
+                                           checkId, ((checkData && !checkData->Comment.empty()) ? checkData->Comment : "<warden comment is not set>"),
+                                           GetWardenActionStr(action));
         }
         else
         {
-            std::string const reportFormat = "Account id: %u failed warden %u check. Action: %s";
-            reportMsg = Acore::StringFormat(reportFormat, _session->GetAccountId(), checkId, GetWardenActionStr(action).c_str());
+            std::string const reportFormat = "Account id: {} failed warden {} check. Action: {}";
+            reportMsg = Acore::StringFormatFmt(reportFormat, _session->GetAccountId(), checkId, GetWardenActionStr(action));
         }
     }
     else
     {
         if (Player const* plr = _session->GetPlayer())
         {
-            std::string const reportFormat = "Player %s (guid %u, account id: %u) triggered warden penalty by reason: %s. Action: %s";
-            reportMsg = Acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUID().GetCounter(), _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+            std::string const reportFormat = "Player {} (guid {}, account id: {}) triggered warden penalty by reason: {}. Action: {}";
+            reportMsg = Acore::StringFormatFmt(reportFormat, plr->GetName(), plr->GetGUID().GetCounter(), _session->GetAccountId(), causeMsg, GetWardenActionStr(action));
         }
         else
         {
-            std::string const reportFormat = "Account id: %u failed warden %u check. Action: %s";
-            reportMsg = Acore::StringFormat(reportFormat, _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+            std::string const reportFormat = "Account id: {} failed warden {} check. Action: {}";
+            reportMsg = Acore::StringFormatFmt(reportFormat, _session->GetAccountId(), causeMsg, GetWardenActionStr(action));
         }
     }
 
@@ -313,6 +308,11 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
 
     ApplyPenalty(0, "Sent bogus Lua check response for Warden");
     return true;
+}
+
+WardenPayloadMgr* Warden::GetPayloadMgr()
+{
+    return &_payloadMgr;
 }
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)

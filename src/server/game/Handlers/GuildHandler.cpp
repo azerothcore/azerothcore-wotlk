@@ -290,7 +290,7 @@ void WorldSession::HandleGuildBankerActivate(WorldPackets::Guild::GuildBankActiv
     guild->SendBankTabsInfo(this, packet.FullUpdate);
 }
 
-// Called when opening guild bank tab only (first one)
+// Called when opening guild bank tab only
 void WorldSession::HandleGuildBankQueryTab(WorldPackets::Guild::GuildBankQueryTab& packet)
 {
     LOG_DEBUG("guild", "CMSG_GUILD_BANK_QUERY_TAB [{}]: Go: [{}], TabId: {}, ShowTabs: {}"

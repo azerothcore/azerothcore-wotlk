@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.player_factionchange_quests
+-- Dumping structure for table acore_world.player_factionchange_quests
 DROP TABLE IF EXISTS `player_factionchange_quests`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_quests` (
   `alliance_id` int unsigned NOT NULL,
@@ -20,11 +22,10 @@ CREATE TABLE IF NOT EXISTS `player_factionchange_quests` (
   PRIMARY KEY (`alliance_id`,`horde_id`),
   UNIQUE KEY `alliance_uniq` (`alliance_id`),
   UNIQUE KEY `horde_uniq` (`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.player_factionchange_quests: 292 rows
+-- Dumping data for table acore_world.player_factionchange_quests: ~293 rows (approximately)
 DELETE FROM `player_factionchange_quests`;
-/*!40000 ALTER TABLE `player_factionchange_quests` DISABLE KEYS */;
 INSERT INTO `player_factionchange_quests` (`alliance_id`, `horde_id`) VALUES
 	(7065, 7064),
 	(7168, 7163),
@@ -121,6 +122,7 @@ INSERT INTO `player_factionchange_quests` (`alliance_id`, `horde_id`) VALUES
 	(10147, 10133),
 	(10148, 10135),
 	(10163, 10162),
+	(10382, 10388),
 	(10394, 10390),
 	(10395, 10393),
 	(10397, 10392),
@@ -318,8 +320,8 @@ INSERT INTO `player_factionchange_quests` (`alliance_id`, `horde_id`) VALUES
 	(25282, 25254),
 	(25290, 25288),
 	(25414, 25293);
-/*!40000 ALTER TABLE `player_factionchange_quests` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

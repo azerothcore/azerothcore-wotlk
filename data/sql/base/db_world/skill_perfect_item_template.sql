@@ -1,30 +1,31 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.skill_perfect_item_template
+-- Dumping structure for table acore_world.skill_perfect_item_template
 DROP TABLE IF EXISTS `skill_perfect_item_template`;
 CREATE TABLE IF NOT EXISTS `skill_perfect_item_template` (
-  `spellId` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'SpellId of the item creation spell',
-  `requiredSpecialization` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Specialization spell id',
+  `spellId` int unsigned NOT NULL DEFAULT '0' COMMENT 'SpellId of the item creation spell',
+  `requiredSpecialization` int unsigned NOT NULL DEFAULT '0' COMMENT 'Specialization spell id',
   `perfectCreateChance` float NOT NULL DEFAULT '0' COMMENT 'chance to create the perfect item instead',
-  `perfectItemType` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'perfect item type to create instead',
+  `perfectItemType` int unsigned NOT NULL DEFAULT '0' COMMENT 'perfect item type to create instead',
   PRIMARY KEY (`spellId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Crafting Perfection System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Crafting Perfection System';
 
--- Dumpar data för tabell acore_world.skill_perfect_item_template: 72 rows
+-- Dumping data for table acore_world.skill_perfect_item_template: ~72 rows (approximately)
 DELETE FROM `skill_perfect_item_template`;
-/*!40000 ALTER TABLE `skill_perfect_item_template` DISABLE KEYS */;
 INSERT INTO `skill_perfect_item_template` (`spellId`, `requiredSpecialization`, `perfectCreateChance`, `perfectItemType`) VALUES
 	(53831, 55534, 20, 41432),
 	(53832, 55534, 20, 41434),
@@ -98,8 +99,8 @@ INSERT INTO `skill_perfect_item_template` (`spellId`, `requiredSpecialization`, 
 	(53941, 55534, 20, 41440),
 	(53943, 55534, 20, 41443),
 	(54017, 55534, 20, 41437);
-/*!40000 ALTER TABLE `skill_perfect_item_template` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

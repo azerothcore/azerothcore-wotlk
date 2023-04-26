@@ -15,17 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-    This placeholder for the instance is needed for dungeon finding to be able
-    to give credit after the boss defined in lastEncounterDungeon is killed.
-    Without it, the party doing random dungeon won't get satchel of spoils and
-    gets instead the deserter debuff.
-*/
-
 #include "InstanceScript.h"
 #include "Map.h"
 #include "ScriptMgr.h"
 #include "the_underbog.h"
+
+ObjectData const creatureData[] =
+{
+    { NPC_HUNGARFEN, DATA_HUNGARFEN },
+    { NPC_GHAZAN, DATA_GHAZAN }
+};
 
 class instance_the_underbog : public InstanceMapScript
 {
@@ -40,6 +39,12 @@ public:
     struct instance_the_underbog_InstanceMapScript : public InstanceScript
     {
         instance_the_underbog_InstanceMapScript(Map* map) : InstanceScript(map) { }
+
+        void Initialize() override
+        {
+            SetBossNumber(MAX_ENCOUNTERS);
+            LoadObjectData(creatureData, nullptr);
+        }
     };
 };
 

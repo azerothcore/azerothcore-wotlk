@@ -24,6 +24,21 @@
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 
+/// @todo: Missing Sinclari Trigger announcements (32204) Look at its creature_text for more info.
+/// @todo: Activation Crystals (go_vh_activation_crystal) (193611) are spammable, should be a 1 time use per crystal.
+
+enum Texts
+{
+    GOSSIP_MENU_START_EVENT     = 9998,
+    GOSSIP_MENU_ITEM            = 9997,
+    GOSSIP_MENU_LATE_JOIN       = 10275,
+
+    NPC_TEXT_SINCLARI_IN        = 13853,
+    NPC_TEXT_SINCLARI_ITEM      = 13854,
+    NPC_TEXT_SINCLARI_DONE      = 13910,
+    NPC_TEXT_SINCLARI_LATE_JOIN = 14271,
+};
+
 /***********
 ** DEFENSE SYSTEM CRYSTAL
 ***********/
@@ -45,10 +60,6 @@ public:
 ** SINCLARI
 ***********/
 
-#define GOSSIP_START_EVENT  "Get your people to safety, we'll keep the Blue Dragonflight's forces at bay."
-#define GOSSIP_ITEM_1      "Activate the crystals when we get in trouble, right."
-#define GOSSIP_I_WANT_IN    "Sorry, I'm late! Can I get in to help my friends?"
-
 class npc_vh_sinclari : public CreatureScript
 {
 public:
@@ -60,16 +71,16 @@ public:
             switch (pInstance->GetData(DATA_ENCOUNTER_STATUS))
             {
                 case NOT_STARTED:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    SendGossipMenuFor(player, 13853, creature->GetGUID());
+                    AddGossipItemFor(player, GOSSIP_MENU_ITEM, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, GOSSIP_MENU_START_EVENT, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    SendGossipMenuFor(player, NPC_TEXT_SINCLARI_IN, creature->GetGUID());
                     break;
                 case IN_PROGRESS:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_I_WANT_IN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    SendGossipMenuFor(player, 13853, creature->GetGUID());
+                    AddGossipItemFor(player, GOSSIP_MENU_LATE_JOIN, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    SendGossipMenuFor(player, NPC_TEXT_SINCLARI_LATE_JOIN, creature->GetGUID());
                     break;
                 default: // DONE or invalid
-                    SendGossipMenuFor(player, 13910, creature->GetGUID());
+                    SendGossipMenuFor(player, NPC_TEXT_SINCLARI_DONE, creature->GetGUID());
             }
         return true;
     }
@@ -86,7 +97,7 @@ public:
                     pInstance->SetData(DATA_START_INSTANCE, 1);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                SendGossipMenuFor(player, 13854, creature->GetGUID());
+                SendGossipMenuFor(player, NPC_TEXT_SINCLARI_ITEM, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
                 player->NearTeleportTo(playerTeleportPosition.GetPositionX(), playerTeleportPosition.GetPositionY(), playerTeleportPosition.GetPositionZ(), playerTeleportPosition.GetOrientation(), true);
@@ -138,9 +149,9 @@ public:
                     addValue = 1;
 
                 if (wave % 6 != 0)
-                    events.RescheduleEvent(RAND(EVENT_SUMMON_KEEPER_OR_GUARDIAN, EVENT_SUMMON_ELITES), 10000);
+                    events.RescheduleEvent(RAND(EVENT_SUMMON_KEEPER_OR_GUARDIAN, EVENT_SUMMON_ELITES), 10s);
                 else
-                    events.RescheduleEvent(EVENT_SUMMON_SABOTEOUR, 3000);
+                    events.RescheduleEvent(EVENT_SUMMON_SABOTEOUR, 3s);
             }
         }
 
@@ -168,7 +179,7 @@ public:
                     spawned = true;
                     if (Creature* c = DoSummon(RAND(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER), me, 2.0f, 0, TEMPSUMMON_DEAD_DESPAWN))
                         me->CastSpell(c, SPELL_PORTAL_CHANNEL, false);
-                    events.RescheduleEvent(EVENT_SUMMON_KEEPER_TRASH, 20000);
+                    events.RescheduleEvent(EVENT_SUMMON_KEEPER_TRASH, 20s);
                     break;
                 case EVENT_SUMMON_KEEPER_TRASH:
                     for (uint8 i = 0; i < 3 + addValue; ++i)
@@ -176,7 +187,7 @@ public:
                         uint32 entry = RAND(NPC_AZURE_INVADER_1, NPC_AZURE_INVADER_2, NPC_AZURE_SPELLBREAKER_1, NPC_AZURE_SPELLBREAKER_2, NPC_AZURE_MAGE_SLAYER_1, NPC_AZURE_MAGE_SLAYER_2, NPC_AZURE_BINDER_1, NPC_AZURE_BINDER_2);
                         DoSummon(entry, me, 2.0f, 20000, TEMPSUMMON_DEAD_DESPAWN);
                     }
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 case EVENT_SUMMON_ELITES:
                     spawned = true;
@@ -275,7 +286,7 @@ struct violet_hold_trashAI : public npc_escortAI
                 c->RemoveAura(SPELL_DESTROY_DOOR_SEAL, me->GetGUID());
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         if (!who->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
         {
@@ -1173,21 +1184,6 @@ public:
     }
 };
 
-class go_violet_hold_gate_lever : public GameObjectScript
-{
-public:
-    go_violet_hold_gate_lever() : GameObjectScript("go_violet_hold_gate_lever") { }
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        if (GameObject* gate = go->GetMap()->GetGameObject(ObjectGuid::Create<HighGuid::GameObject>(193019, 61606)))
-            if (gate->getLootState() == GO_READY)
-                gate->UseDoorOrButton(0, false, player);
-
-        return false;
-    }
-};
-
 void AddSC_violet_hold()
 {
     new go_vh_activation_crystal();
@@ -1205,5 +1201,4 @@ void AddSC_violet_hold()
     new npc_azure_stalker();
 
     new spell_destroy_door_seal();
-    new go_violet_hold_gate_lever();
 }

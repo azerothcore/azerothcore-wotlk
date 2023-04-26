@@ -1,30 +1,31 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.player_factionchange_spells
+-- Dumping structure for table acore_world.player_factionchange_spells
 DROP TABLE IF EXISTS `player_factionchange_spells`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_spells` (
   `alliance_id` int unsigned NOT NULL,
-  `alliance_comment` text NOT NULL,
+  `alliance_comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `horde_id` int unsigned NOT NULL,
-  `horde_comment` text NOT NULL,
+  `horde_comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.player_factionchange_spells: 112 rows
+-- Dumping data for table acore_world.player_factionchange_spells: ~113 rows (approximately)
 DELETE FROM `player_factionchange_spells`;
-/*!40000 ALTER TABLE `player_factionchange_spells` DISABLE KEYS */;
 INSERT INTO `player_factionchange_spells` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
 	(458, 'Brown Horse', 6654, 'Brown Wolf'),
 	(470, 'Black Stallion', 64658, 'Black Wolf'),
@@ -50,6 +51,7 @@ INSERT INTO `player_factionchange_spells` (`alliance_id`, `alliance_comment`, `h
 	(16083, 'White Stallion', 16081, 'Winter Wolf'),
 	(17229, 'Winterspring Frostsaber', 64659, 'Venomhide Ravasaur'),
 	(17453, 'Green Mechanostrider', 18989, 'Gray Kodo'),
+	(17454, 'Unpainted Mechanostrider', 18990, 'Brown Kodo'),
 	(17459, 'Icy Blue Mechanostrider Mod A', 18991, 'Green Kodo'),
 	(17460, 'Frost Ram', 17450, 'Ivory Raptor'),
 	(17461, 'Black Ram', 16084, 'Mottled Red Raptor'),
@@ -138,8 +140,8 @@ INSERT INTO `player_factionchange_spells` (`alliance_id`, `alliance_comment`, `h
 	(67096, 'Sunforged Bracers', 67135, 'Sunforged Bracers'),
 	(68057, 'Swift Alliance Steed', 68056, 'Swift Horde Wolf'),
 	(68187, 'Crusader\'s White Warhorse', 68188, 'Crusader\'s Black Warhorse');
-/*!40000 ALTER TABLE `player_factionchange_spells` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

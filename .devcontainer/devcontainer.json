@@ -49,5 +49,5 @@
   // "postCreateCommand": "apt-get update && apt-get install -y curl",
 
   // Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
-  "remoteUser": "acore"
+  "remoteUser": "root"
 }

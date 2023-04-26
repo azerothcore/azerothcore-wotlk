@@ -582,6 +582,14 @@ void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid 
     });
 }
 
+void ScriptMgr::OnStoreNewItem(Player* player, Item* item, uint32 count)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnStoreNewItem(player, item, count);
+    });
+}
+
 void ScriptMgr::OnCreateItem(Player* player, Item* item, uint32 count)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -596,6 +604,21 @@ void ScriptMgr::OnQuestRewardItem(Player* player, Item* item, uint32 count)
     {
         script->OnQuestRewardItem(player, item, count);
     });
+}
+
+bool ScriptMgr::CanPlaceAuctionBid(Player* player, AuctionEntry* auction)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript *script)
+    {
+       return !script->CanPlaceAuctionBid(player, auction);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 void ScriptMgr::OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll)
@@ -626,6 +649,14 @@ void ScriptMgr::OnFirstLogin(Player* player)
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnFirstLogin(player);
+    });
+}
+
+void ScriptMgr::OnSetMaxLevel(Player* player, uint32& maxPlayerLevel)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnSetMaxLevel(player, maxPlayerLevel);
     });
 }
 

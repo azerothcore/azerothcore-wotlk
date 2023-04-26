@@ -326,7 +326,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
     if (!creature)
         return nullptr;
     if (creature->GetEntry() == BG_AV_CreatureInfo[AV_NPC_A_CAPTAIN] || creature->GetEntry() == BG_AV_CreatureInfo[AV_NPC_H_CAPTAIN])
-        creature->SetRespawnDelay(RESPAWN_ONE_DAY); // TODO: look if this can be done by database + also add this for the wingcommanders
+        creature->SetRespawnDelay(RESPAWN_ONE_DAY); /// @todo: look if this can be done by database + also add this for the wingcommanders
 
     if ((isStatic && cinfoid >= 10 && cinfoid <= 14) || (!isStatic && ((cinfoid >= AV_NPC_A_GRAVEDEFENSE0 && cinfoid <= AV_NPC_A_GRAVEDEFENSE3) ||
             (cinfoid >= AV_NPC_H_GRAVEDEFENSE0 && cinfoid <= AV_NPC_H_GRAVEDEFENSE3))))
@@ -650,9 +650,9 @@ void BattlegroundAV::EventPlayerDestroyedPoint(BG_AV_Nodes node)
     //send a nice message to all :)
     char buf[256];
     if (IsTower(node))
-        sprintf(buf, GetAcoreString(LANG_BG_AV_TOWER_TAKEN), GetNodeName(node), (ownerId == TEAM_ALLIANCE) ? GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
+        snprintf(buf, sizeof(buf), GetAcoreString(LANG_BG_AV_TOWER_TAKEN), GetNodeName(node), (ownerId == TEAM_ALLIANCE) ? GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
     else
-        sprintf(buf, GetAcoreString(LANG_BG_AV_GRAVE_TAKEN), GetNodeName(node), (ownerId == TEAM_ALLIANCE) ? GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
+        snprintf(buf, sizeof(buf), GetAcoreString(LANG_BG_AV_GRAVE_TAKEN), GetNodeName(node), (ownerId == TEAM_ALLIANCE) ? GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
 
     Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
     if (creature)
@@ -729,7 +729,7 @@ void BattlegroundAV::ChangeMineOwner(uint8 mine, TeamId teamId, bool initial)
     {
         m_Mine_Reclaim_Timer[mine] = AV_MINE_RECLAIM_TIMER;
         char buf[256];
-        sprintf(buf, GetAcoreString(LANG_BG_AV_MINE_TAKEN), (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE),
+        snprintf(buf, sizeof(buf), GetAcoreString(LANG_BG_AV_MINE_TAKEN), (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE),
                 GetAcoreString((mine == AV_NORTH_MINE) ? LANG_BG_AV_MINE_NORTH : LANG_BG_AV_MINE_SOUTH));
         Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
         if (creature)
@@ -983,7 +983,7 @@ void BattlegroundAV::EventPlayerDefendsPoint(Player* player, uint32 object)
     }
     //send a nice message to all :)
     char buf[256];
-    sprintf(buf, GetAcoreString((IsTower(node)) ? LANG_BG_AV_TOWER_DEFENDED : LANG_BG_AV_GRAVE_DEFENDED), GetNodeName(node), (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
+    snprintf(buf, sizeof(buf), GetAcoreString((IsTower(node)) ? LANG_BG_AV_TOWER_DEFENDED : LANG_BG_AV_GRAVE_DEFENDED), GetNodeName(node), (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
     Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
     if (creature)
         YellToAll(creature, buf, LANG_UNIVERSAL);
@@ -1095,7 +1095,7 @@ void BattlegroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
 
     //send a nice message to all :)
     char buf[256];
-    sprintf(buf, (IsTower(node)) ? GetAcoreString(LANG_BG_AV_TOWER_ASSAULTED) : GetAcoreString(LANG_BG_AV_GRAVE_ASSAULTED), GetNodeName(node),  (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
+    snprintf(buf, sizeof(buf), (IsTower(node)) ? GetAcoreString(LANG_BG_AV_TOWER_ASSAULTED) : GetAcoreString(LANG_BG_AV_GRAVE_ASSAULTED), GetNodeName(node),  (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
     Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
     if (creature)
         YellToAll(creature, buf, LANG_UNIVERSAL);
@@ -1579,7 +1579,7 @@ void BattlegroundAV::ResetBGSubclass()
 
 bool BattlegroundAV::IsBothMinesControlledByTeam(TeamId teamId) const
 {
-    for (auto mine : m_Mine_Owner)
+    for (auto& mine : m_Mine_Owner)
         if (mine != teamId)
             return false;
 
