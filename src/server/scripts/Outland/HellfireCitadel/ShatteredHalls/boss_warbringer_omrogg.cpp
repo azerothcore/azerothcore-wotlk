@@ -108,7 +108,6 @@ public:
             _JustEngagedWith();
 
             bool burningphase = false;
-            
             if(!burningphase)
             {
                 scheduler.Schedule(12100ms, 17300ms, [this, &burningphase](TaskContext context)
@@ -148,7 +147,6 @@ public:
                                 me->AddThreat(target, 2250.0f);
                             }
                         });
-                        
                     });
                 });
             }
