@@ -65,7 +65,6 @@ enum Creatures
 // Grand Warlock Nethekurse
 // ########################################################
 
-
 float NethekurseIntroPath[4][3] =
 {
     {184.78966f, 290.3699f, -8.18139f},
