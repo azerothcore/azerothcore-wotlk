@@ -65,13 +65,13 @@ enum Creatures
 // Grand Warlock Nethekurse
 // ########################################################
 
-//path during RP intro
-float NethekursePath[4][3] =
+
+float NethekurseIntroPath[4][3] =
 {
     {184.78966f, 290.3699f, -8.18139f},
     {178.51125f, 278.97794f, -8.183065f},
     {171.82281f, 289.97687f, -8.185595f},
-    {178.51125f, 287.97794f, -8.183065}
+    {178.51125f, 287.97794f, -8.183065f}
 };
 class boss_grand_warlock_nethekurse : public CreatureScript
 {
@@ -238,7 +238,6 @@ public:
             {
                 if (eventId == EVENT_INTRO)
                 {
-                    //handling for casting a spell on peon doesn't seem to work currently
                     EventStage = EVENT_STAGE_TAUNT;
                     CastRandomPeonSpell();
                 }
@@ -257,7 +256,6 @@ public:
             if (EventStage < EVENT_STAGE_MAIN || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            //isneeded
             if (!me->HealthBelowPct(25))
                 DoMeleeAttackIfReady();
         }
