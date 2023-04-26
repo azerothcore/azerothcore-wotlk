@@ -27,7 +27,7 @@ enum Spells
     SPELL_BEATDOWN              = 30618,
     SPELL_BURNING_MAUL_N        = 30598,
     SPELL_BURNING_MAUL_H        = 36056,
-    
+
     EQUIP_STANDARD              = 1,
     EQUIP_BURNING_MAUL          = 2,
 };
@@ -108,7 +108,7 @@ public:
             _JustEngagedWith();
 
             me->Yell("entered non-burning phase", LANG_UNIVERSAL);
-            
+
             scheduler.Schedule(12100ms, 17300ms, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_THUNDERCLAP);
