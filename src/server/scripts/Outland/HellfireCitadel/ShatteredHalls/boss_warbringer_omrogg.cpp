@@ -59,11 +59,6 @@ enum Events
     EVENT_KILL_YELL_RIGHT       = 9,
     EVENT_DEATH_YELL            = 10,
 
-    EVENT_SPELL_FEAR            = 20,
-    EVENT_SPELL_BURNING_MAUL    = 21,
-    EVENT_SPELL_THUNDER_CLAP    = 22,
-    EVENT_RESET_THREAT          = 23,
-    EVENT_SPELL_BLAST_WAVE      = 24
 };
 
 // ########################################################
@@ -110,6 +105,7 @@ public:
             bool burningphase = false;
             if(!burningphase)
             {
+                me->Yell("entered burning phase", LANG_UNIVERSAL);
                 scheduler.Schedule(12100ms, 17300ms, [this, &burningphase](TaskContext context)
                 {
                     DoCastAOE(SPELL_THUNDERCLAP);
@@ -119,6 +115,7 @@ public:
                     DoCastSelf(SPELL_BEATDOWN, false);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
+                        me->Yell("debug: threat remove first", LANG_UNIVERSAL);
                         uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
                         if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
                             head->AI()->Talk(threatYell - 1);
@@ -133,11 +130,13 @@ public:
                         DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
                         //handle for change item id WIP
                         //placeholder say "%s roars!"
+                        me->Yell("testburningmaul", LANG_UNIVERSAL);
                         burningphase = true;
                         scheduler.Schedule(2200ms, [this](TaskContext context)
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             {
+                                me->Yell("debug: threat remove maul", LANG_UNIVERSAL);
                                 uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
                                 if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
                                     head->AI()->Talk(threatYell - 1);
@@ -150,8 +149,9 @@ public:
                     });
                 });
             }
-            else if(burningphase)
+            else
             {
+                me->Yell("entered burning phase", LANG_UNIVERSAL);
                 scheduler.Schedule(4850ms, 8500ms, [this, &burningphase](TaskContext context)
                 {
                     DoCastAOE(SPELL_BLAST_WAVE, false);
