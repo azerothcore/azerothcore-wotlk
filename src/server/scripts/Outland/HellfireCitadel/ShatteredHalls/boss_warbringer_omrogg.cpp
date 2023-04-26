@@ -105,13 +105,14 @@ public:
             bool burningphase = false;
             if(!burningphase)
             {
-                me->Yell("entered burning phase", LANG_UNIVERSAL);
+                me->Yell("entered non-burning phase", LANG_UNIVERSAL);
                 scheduler.Schedule(12100ms, 17300ms, [this, &burningphase](TaskContext context)
                 {
                     DoCastAOE(SPELL_THUNDERCLAP);
                     context.Repeat(17200ms, 24200ms);
                 }).Schedule(20s, 30s, [this, &burningphase](TaskContext context)
                 {
+                    me->Yell("beatdown", LANG_UNIVERSAL);
                     DoCastSelf(SPELL_BEATDOWN, false);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
