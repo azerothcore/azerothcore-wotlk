@@ -108,60 +108,61 @@ public:
             _JustEngagedWith();
 
             bool burningphase = false;
-            while(me->IsAlive())
+            
+            if(!burningphase)
             {
-                if(!burningphase)
+                scheduler.Schedule(12100ms, 17300ms, [this, &burningphase](TaskContext context)
                 {
-                    scheduler.Schedule(12100ms, 17300ms, [this](TaskContext context)
+                    DoCastAOE(SPELL_THUNDERCLAP);
+                    context.Repeat(17200ms, 24200ms);
+                }).Schedule(20s, 30s, [this, &burningphase](TaskContext context)
+                {
+                    DoCastSelf(SPELL_BEATDOWN, false);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
-                        DoCastAOE(SPELL_THUNDERCLAP);
-                        context.Repeat(17200ms, 24200ms);
-                    }).Schedule(20s, 30s, [this](TaskContext context)
-                    {
-                        DoCastSelf(SPELL_BEATDOWN, false);
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        {
-                            uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
-                            if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
-                                head->AI()->Talk(threatYell - 1);
-                            events.ScheduleEvent(threatYell, 3000);
+                        uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
+                        if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
+                            head->AI()->Talk(threatYell - 1);
+                        events.ScheduleEvent(threatYell, 3000);
 
-                            DoResetThreatList();
-                            me->AddThreat(target, 2250.0f);
-                        }
-                    }).Schedule(20s, 30s, [this](TaskContext context)
+                        DoResetThreatList();
+                        me->AddThreat(target, 2250.0f);
+                    }
+                    scheduler.Schedule(20s, 30s, [this, &burningphase](TaskContext context)
                     {
                         DoCastSelf(SPELL_FEAR, false);
                         DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
                         //handle for change item id WIP
                         //placeholder say "%s roars!"
-                    }).Schedule(2200ms, [this](TaskContext context)
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        burningphase = true;
+                        scheduler.Schedule(2200ms, [this](TaskContext context)
                         {
-                            uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
-                            if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
-                                head->AI()->Talk(threatYell - 1);
-                            events.ScheduleEvent(threatYell, 3000);
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                            {
+                                uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
+                                if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
+                                    head->AI()->Talk(threatYell - 1);
+                                events.ScheduleEvent(threatYell, 3000);
 
-                            DoResetThreatList();
-                            me->AddThreat(target, 2250.0f);
-                        }
+                                DoResetThreatList();
+                                me->AddThreat(target, 2250.0f);
+                            }
+                        });
+                        
                     });
-                    burningphase = true;
-                }
-                else if(burningphase)
+                });
+            }
+            else if(burningphase)
+            {
+                scheduler.Schedule(4850ms, 8500ms, [this, &burningphase](TaskContext context)
                 {
-                    scheduler.Schedule(4850ms, 8500ms, [this](TaskContext context)
-                    {
-                        DoCastAOE(SPELL_BLAST_WAVE, false);
+                    DoCastAOE(SPELL_BLAST_WAVE, false);
 
-                    }).Schedule(45s, 60s, [this](TaskContext context)
-                    {
-                        //change item back WIP
-                    });
-                    burningphase = true;
-                }
+                }).Schedule(45s, 60s, [this, &burningphase](TaskContext context)
+                {
+                    //change item back WIP
+                    burningphase = false;
+                });
             }
         }
 
