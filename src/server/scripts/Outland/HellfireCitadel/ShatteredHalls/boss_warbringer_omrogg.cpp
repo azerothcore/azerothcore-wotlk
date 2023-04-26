@@ -24,6 +24,7 @@ enum Spells
     SPELL_BLAST_WAVE            = 30600,
     SPELL_FEAR                  = 30584,
     SPELL_THUNDERCLAP           = 30633,
+    SPELL_BEATDOWN              = 30618,
     SPELL_BURNING_MAUL_N        = 30598,
     SPELL_BURNING_MAUL_H        = 36056,
 };
@@ -106,10 +107,62 @@ public:
 
             _JustEngagedWith();
 
-            events.ScheduleEvent(EVENT_SPELL_FEAR, 8000);
-            events.ScheduleEvent(EVENT_SPELL_BURNING_MAUL, 25000);
-            events.ScheduleEvent(EVENT_SPELL_THUNDER_CLAP, 15000);
-            events.ScheduleEvent(EVENT_RESET_THREAT, 30000);
+            bool burningphase = false;
+            while(me->IsAlive())
+            {
+                if(!burningphase)
+                {
+                    scheduler.Schedule(12100ms, 17300ms, [this](TaskContext context)
+                    {
+                        DoCastAOE(SPELL_THUNDERCLAP);
+                        context.Repeat(17200ms, 24200ms);
+                    }).Schedule(20s, 30s, [this](TaskContext context)
+                    {
+                        DoCastSelf(SPELL_BEATDOWN, false);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        {
+                            uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
+                            if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
+                                head->AI()->Talk(threatYell - 1);
+                            events.ScheduleEvent(threatYell, 3000);
+
+                            DoResetThreatList();
+                            me->AddThreat(target, 2250.0f);
+                        }
+                    }).Schedule(20s, 30s, [this](TaskContext context)
+                    {
+                        DoCastSelf(SPELL_FEAR, false);
+                        DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
+                        //handle for change item id WIP
+                        //placeholder say "%s roars!"
+                    }).Schedule(2200ms, [this](TaskContext context)
+                    {
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        {
+                            uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
+                            if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
+                                head->AI()->Talk(threatYell - 1);
+                            events.ScheduleEvent(threatYell, 3000);
+
+                            DoResetThreatList();
+                            me->AddThreat(target, 2250.0f);
+                        }
+                    });
+                    burningphase = true;
+                }
+                else if(burningphase)
+                {
+                    scheduler.Schedule(4850ms, 8500ms, [this](TaskContext context)
+                    {
+                        DoCastAOE(SPELL_BLAST_WAVE, false);
+
+                    }).Schedule(45s, 60s, [this](TaskContext context)
+                    {
+                        //change item back WIP
+                    });
+                    burningphase = true;
+                }
+            }
         }
 
         void JustSummoned(Creature* summoned) override
@@ -157,6 +210,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
+            scheduler.Update(diff);
             switch (uint32 eventId = events2.ExecuteEvent())
             {
                 case EVENT_AGGRO_YELL_1:
@@ -179,44 +233,8 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_FEAR:
-                    me->CastSpell(me, SPELL_FEAR, false);
-                    events.ScheduleEvent(EVENT_SPELL_FEAR, 22000);
-                    break;
-                case EVENT_SPELL_THUNDER_CLAP:
-                    me->CastSpell(me, SPELL_THUNDERCLAP, false);
-                    events.ScheduleEvent(EVENT_SPELL_THUNDER_CLAP, 25000);
-                    break;
-                case EVENT_RESET_THREAT:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    {
-                        uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
-                        if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
-                            head->AI()->Talk(threatYell - 1);
-                        events.ScheduleEvent(threatYell, 3000);
-
-                        DoResetThreatList();
-                        me->AddThreat(target, 10.0f);
-                    }
-                    events.ScheduleEvent(EVENT_RESET_THREAT, 30000);
-                    break;
-                case EVENT_SPELL_BURNING_MAUL:
-                    Talk(EMOTE_ENRAGE);
-                    me->CastSpell(me, DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
-                    events.ScheduleEvent(EVENT_SPELL_BURNING_MAUL, 40000);
-                    events.ScheduleEvent(EVENT_SPELL_BLAST_WAVE, 15000);
-                    events.ScheduleEvent(EVENT_SPELL_BLAST_WAVE, 20000);
-                    break;
-                case EVENT_SPELL_BLAST_WAVE:
-                    me->CastSpell(me, SPELL_BLAST_WAVE, false);
-                    break;
-            }
 
             DoMeleeAttackIfReady();
         }
