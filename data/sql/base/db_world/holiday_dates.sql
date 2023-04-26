@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `holiday_dates` (
   `date_value` int unsigned NOT NULL,
   `holiday_duration` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`date_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_world.holiday_dates: ~156 rows (approximately)
 DELETE FROM `holiday_dates`;
