@@ -1595,9 +1595,9 @@ void ObjectMgr::LoadEquipmentTemplates()
             if (!equipmentInfo.ItemEntry[i])
                 continue;
 
-            ItemTemplate const* item = GetItemTemplate(equipmentInfo.ItemEntry[i]);
+            ItemEntry const* dbcItem = sItemStore.LookupEntry(equipmentInfo.ItemEntry[i]);
 
-            if (!item)
+            if (!dbcItem)
             {
                 LOG_ERROR("sql.sql", "Unknown item (ID={}) in creature_equip_template.ItemID{} for CreatureID = {} and ID = {}, forced to 0.",
                                  equipmentInfo.ItemEntry[i], i + 1, entry, id);
@@ -1605,15 +1605,15 @@ void ObjectMgr::LoadEquipmentTemplates()
                 continue;
             }
 
-            if (item->InventoryType != INVTYPE_WEAPON &&
-                    item->InventoryType != INVTYPE_SHIELD &&
-                    item->InventoryType != INVTYPE_RANGED &&
-                    item->InventoryType != INVTYPE_2HWEAPON &&
-                    item->InventoryType != INVTYPE_WEAPONMAINHAND &&
-                    item->InventoryType != INVTYPE_WEAPONOFFHAND &&
-                    item->InventoryType != INVTYPE_HOLDABLE &&
-                    item->InventoryType != INVTYPE_THROWN &&
-                    item->InventoryType != INVTYPE_RANGEDRIGHT)
+            if (dbcItem->InventoryType != INVTYPE_WEAPON &&
+                dbcItem->InventoryType != INVTYPE_SHIELD &&
+                dbcItem->InventoryType != INVTYPE_RANGED &&
+                dbcItem->InventoryType != INVTYPE_2HWEAPON &&
+                dbcItem->InventoryType != INVTYPE_WEAPONMAINHAND &&
+                dbcItem->InventoryType != INVTYPE_WEAPONOFFHAND &&
+                dbcItem->InventoryType != INVTYPE_HOLDABLE &&
+                dbcItem->InventoryType != INVTYPE_THROWN &&
+                dbcItem->InventoryType != INVTYPE_RANGEDRIGHT)
             {
                 LOG_ERROR("sql.sql", "Item (ID={}) in creature_equip_template.ItemID{} for CreatureID = {} and ID = {} is not equipable in a hand, forced to 0.",
                                  equipmentInfo.ItemEntry[i], i + 1, entry, id);
@@ -2741,8 +2741,10 @@ void ObjectMgr::LoadItemTemplates()
         return;
     }
 
-    _itemTemplateStore.rehash(result->GetRowCount());
+    _itemTemplateStore.reserve(result->GetRowCount());
     uint32 count = 0;
+    // original inspiration https://github.com/TrinityCore/TrinityCore/commit/0c44bd33ee7b42c924859139a9f4b04cf2b91261
+    bool enforceDBCAttributes = sWorld->getBoolConfig(CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES);
 
     do
     {
@@ -2859,17 +2861,55 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.FlagsCu                 = fields[137].Get<uint32>();
 
         // Checks
-        if (itemTemplate.Class >= MAX_ITEM_CLASS)
-        {
-            LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Class value ({})", entry, itemTemplate.Class);
-            itemTemplate.Class = ITEM_CLASS_MISC;
-        }
+        ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
 
-        if (itemTemplate.SubClass >= MaxItemSubclassValues[itemTemplate.Class])
+        if (dbcitem)
         {
-            LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Subclass value ({}) for class {}", entry, itemTemplate.SubClass, itemTemplate.Class);
-            itemTemplate.SubClass = 0;// exist for all item classes
+            if (itemTemplate.Class != dbcitem->ClassID)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Class value ({}), must be ({}).", entry, itemTemplate.Class, dbcitem->ClassID);
+                if (enforceDBCAttributes)
+                    itemTemplate.Class = dbcitem->ClassID;
+            }
+            if (itemTemplate.SubClass != dbcitem->SubclassID)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Subclass value ({}) for class {}, must be ({}).", entry, itemTemplate.SubClass, itemTemplate.Class, dbcitem->SubclassID);
+                if (enforceDBCAttributes)
+                    itemTemplate.SubClass = dbcitem->SubclassID;
+            }
+            if (itemTemplate.SoundOverrideSubclass != dbcitem->SoundOverrideSubclassID)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct SoundOverrideSubclass ({}), must be {}.", entry, itemTemplate.SoundOverrideSubclass);
+                if (enforceDBCAttributes)
+                    itemTemplate.SoundOverrideSubclass = dbcitem->SoundOverrideSubclassID;
+            }
+            if (itemTemplate.Material != dbcitem->Material)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {%u}}) does not have a correct material ({}), must be {}.", entry, itemTemplate.Material, dbcitem->Material);
+                if (enforceDBCAttributes)
+                    itemTemplate.Material = dbcitem->Material;
+            }
+            if (itemTemplate.InventoryType != dbcitem->InventoryType)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong InventoryType value ({}), must be {}.", entry, itemTemplate.InventoryType, dbcitem->InventoryType);
+                if (enforceDBCAttributes)
+                    itemTemplate.InventoryType = dbcitem->InventoryType;
+            }
+            if (itemTemplate.DisplayInfoID != dbcitem->DisplayInfoID)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {%u}}) does not have a correct display id ({}), must be {}.", entry, itemTemplate.DisplayInfoID, dbcitem->DisplayInfoID);
+                if (enforceDBCAttributes)
+                    itemTemplate.DisplayInfoID = dbcitem->DisplayInfoID;
+            }
+            if (itemTemplate.Sheath != dbcitem->SheatheType)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Sheath ({}), must be {}.", entry, itemTemplate.Sheath, dbcitem->SheatheType);
+                if (enforceDBCAttributes)
+                    itemTemplate.Sheath = dbcitem->SheatheType;
+            }
         }
+        else
+            LOG_ERROR("sql.sql", "Item (Entry: {}) does not exist in item.dbc! (not correct id?).", entry);
 
         if (itemTemplate.Quality >= MAX_ITEM_QUALITY)
         {
@@ -2900,12 +2940,6 @@ void ObjectMgr::LoadItemTemplates()
         {
             LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong BuyCount value ({}), set to default(1).", entry, itemTemplate.BuyCount);
             itemTemplate.BuyCount = 1;
-        }
-
-        if (itemTemplate.InventoryType >= MAX_INVTYPE)
-        {
-            LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong InventoryType value ({})", entry, itemTemplate.InventoryType);
-            itemTemplate.InventoryType = INVTYPE_NON_EQUIP;
         }
 
         if (itemTemplate.RequiredSkill >= MAX_SKILL_TYPE)
@@ -3117,12 +3151,6 @@ void ObjectMgr::LoadItemTemplates()
 
         if (itemTemplate.LockID && !sLockStore.LookupEntry(itemTemplate.LockID))
             LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong LockID ({})", entry, itemTemplate.LockID);
-
-        if (itemTemplate.Sheath >= MAX_SHEATHETYPE)
-        {
-            LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Sheath ({})", entry, itemTemplate.Sheath);
-            itemTemplate.Sheath = SHEATHETYPE_NONE;
-        }
 
         if (itemTemplate.RandomProperty)
         {
@@ -9995,8 +10023,8 @@ void ObjectMgr::LoadGameObjectQuestItems()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                               0                1
-    QueryResult result = WorldDatabase.Query("SELECT GameObjectEntry, ItemId FROM gameobject_questitem ORDER BY Idx ASC");
+    //                                               0                1        2
+    QueryResult result = WorldDatabase.Query("SELECT GameObjectEntry, ItemId, Idx FROM gameobject_questitem ORDER BY Idx ASC");
 
     if (!result)
     {
@@ -10011,6 +10039,21 @@ void ObjectMgr::LoadGameObjectQuestItems()
 
         uint32 entry = fields[0].Get<uint32>();
         uint32 item = fields[1].Get<uint32>();
+        uint32 idx = fields[2].Get<uint32>();
+
+        GameObjectTemplate const* goInfo = GetGameObjectTemplate(entry);
+        if (!goInfo)
+        {
+            LOG_ERROR("sql.sql", "Table `gameobject_questitem` has data for nonexistent gameobject (entry: {}, idx: {}), skipped", entry, idx);
+            continue;
+        };
+
+        ItemEntry const* dbcData = sItemStore.LookupEntry(item);
+        if (!dbcData)
+        {
+            LOG_ERROR("sql.sql", "Table `gameobject_questitem` has nonexistent item (ID: {}) in gameobject (entry: {}, idx: {}), skipped", item, entry, idx);
+            continue;
+        };
 
         _gameObjectQuestItemStore[entry].push_back(item);
 
@@ -10025,8 +10068,8 @@ void ObjectMgr::LoadCreatureQuestItems()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                               0              1
-    QueryResult result = WorldDatabase.Query("SELECT CreatureEntry, ItemId FROM creature_questitem ORDER BY Idx ASC");
+    //                                               0              1        2
+    QueryResult result = WorldDatabase.Query("SELECT CreatureEntry, ItemId, Idx FROM creature_questitem ORDER BY Idx ASC");
 
     if (!result)
     {
@@ -10041,6 +10084,21 @@ void ObjectMgr::LoadCreatureQuestItems()
 
         uint32 entry = fields[0].Get<uint32>();
         uint32 item = fields[1].Get<uint32>();
+        uint32 idx = fields[2].Get<uint32>();
+
+        CreatureTemplate const* creatureInfo = GetCreatureTemplate(entry);
+        if (!creatureInfo)
+        {
+            LOG_ERROR("sql.sql", "Table `creature_questitem` has data for nonexistent creature (entry: {}, idx: {}), skipped", entry, idx);
+            continue;
+        };
+
+        ItemEntry const* dbcData = sItemStore.LookupEntry(item);
+        if (!dbcData)
+        {
+            LOG_ERROR("sql.sql", "Table `creature_questitem` has nonexistent item (ID: {}) in creature (entry: {}, idx: {}), skipped", item, entry, idx);
+            continue;
+        };
 
         _creatureQuestItemStore[entry].push_back(item);
 
