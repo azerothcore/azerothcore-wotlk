@@ -27,7 +27,6 @@ enum Spells
     SPELL_BEATDOWN              = 30618,
     SPELL_BURNING_MAUL_N        = 30598,
     SPELL_BURNING_MAUL_H        = 36056,
-
     EQUIP_STANDARD              = 1,
     EQUIP_BURNING_MAUL          = 2,
 };
@@ -64,6 +63,11 @@ enum Events
 
 };
 
+enum Phase
+{
+    GROUP_NON_BURNING_PHASE           = 0,
+    GROUP_BURNING_PHASE               = 1,
+};
 
 
 // ########################################################
@@ -79,6 +83,10 @@ public:
     {
         boss_warbringer_omroggAI(Creature* creature) : BossAI(creature, DATA_OMROGG)
         {
+            scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
         }
 
         EventMap events2;
@@ -108,8 +116,8 @@ public:
             _JustEngagedWith();
 
             me->Yell("entered non-burning phase", LANG_UNIVERSAL);
-
-            scheduler.Schedule(12100ms, 17300ms, [this](TaskContext context)
+            LOG_ERROR("server", "Data {}", "debug1");
+            scheduler.Schedule(12100ms, 17300ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_THUNDERCLAP);
                 context.Repeat(17200ms, 24200ms);
@@ -128,7 +136,7 @@ public:
                         if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
                             head->AI()->Talk(threatYell - 1);
                         events.ScheduleEvent(threatYell, 3000);
-
+                        scheduler.CancelGroup(GROUP_NON_BURNING_PHASE);
                         DoResetThreatList();
                         me->AddThreat(target, 2250.0f);
                         scheduler.Schedule(1200ms, [this](TaskContext context)
@@ -158,13 +166,15 @@ public:
                             me->AddThreat(target, 2250.0f);
                         }
                         me->Yell("entered burning phase", LANG_UNIVERSAL);
-                        scheduler.Schedule(4850ms, 8500ms, [this](TaskContext context)
+                        scheduler.Schedule(4850ms, 8500ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                         {
                             DoCastAOE(SPELL_BLAST_WAVE, false);
+                            context.Repeat(4850ms, 8500ms);
                         }).Schedule(45s, 60s, [this](TaskContext context)
                         {
                             me->Yell("back to p1", LANG_UNIVERSAL);
                             me->LoadEquipment(EQUIP_STANDARD);
+                            scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 17200ms, 24200ms);
                         });
                     });
                 });
