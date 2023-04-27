@@ -170,6 +170,8 @@ public:
 
                                     DoResetThreatList();
                                     me->AddThreat(target, 2250.0f);
+                                    me->SetReactState(REACT_AGGRESSIVE);
+                                    me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                                 }
                                 me->Yell("entered burning phase", LANG_UNIVERSAL);
                             });
