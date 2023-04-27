@@ -704,42 +704,54 @@ public:
             if (!IsSpellReady(BLINK_1, diff) || IsCasting() || Rand() > 70)
                 return;
 
+            bool cast = false;
+            Unit* u = nullptr;
             if (!IAmFree())
             {
                 if (!me->IsInCombat() && me->GetExactDist2d(master) > std::max<uint8>(master->GetBotMgr()->GetBotFollowDist(), 35) &&
                     me->HasInArc(float(M_PI)*0.67f, master))
                 {
-                    if (doCast(me, GetSpell(BLINK_1)))
-                        return;
+                    cast = true;
                 }
             }
-            if (me->IsInCombat() && !me->getAttackers().empty() && HasRole(BOT_ROLE_RANGED))
+            if (!cast && me->IsInCombat() && !me->getAttackers().empty() && HasRole(BOT_ROLE_RANGED))
             {
-                bool cast = me->HasAuraWithMechanic((1<<MECHANIC_STUN)|(1<<MECHANIC_ROOT));
-                Unit* u = nullptr;
+                cast = me->HasAuraWithMechanic((1<<MECHANIC_STUN)|(1<<MECHANIC_ROOT));
                 if (!cast)
                 {
                     u = me->SelectNearestTarget(7);
-                    cast = (u && u->GetVictim() == me && u->IsWithinLOSInMap(me));
+                    cast = (u && u->GetVictim() == me && u->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS));
                 }
                 if (!cast)
                 {
                     u = (*me->getAttackers().begin());
                     cast = (u && (!CCed(u, true) || me->getAttackers().size() > 1) && u->GetDistance(me) < 5.f &&
-                        u->IsWithinLOSInMap(me));
+                        u->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS));
                 }
-                if (cast)
+            }
+            if (!cast && IsWanderer() && (me->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD) || me->HasUnitState(UNIT_STATE_ROOT)))
+            {
+                u = nullptr;
+                InstanceTemplate const* instt = sObjectMgr->GetInstanceTemplate(me->GetMap()->GetId());
+                bool map_allows_mount = (!me->GetMap()->IsDungeon() || me->GetMap()->IsBattlegroundOrArena()) && (!instt || instt->AllowMount);
+                if (!me->GetVictim() ?
+                    (me->IsInCombat() || !map_allows_mount || !IsOutdoors() || IsFlagCarrier(me)) :
+                    !me->IsWithinDist(me->GetVictim(), 15.0f + GetSpellAttackRange(true)))
                 {
-                    if (u)
-                    {
-                        //turn away from target
-                        me->AttackStop();
-                        //me->SetFacingTo(me->GetAbsoluteAngle(u) + M_PI);
-                        me->SetOrientation(me->GetAbsoluteAngle(u) + M_PI);
-                    }
-                    if (doCast(me, GetSpell(BLINK_1)))
-                        return;
+                    Position forwardPos = me->GetFirstCollisionPosition(30.0f, 0.0f);
+                    cast = me->GetExactDist2d(forwardPos) > 15.0f;
                 }
+            }
+            if (cast)
+            {
+                if (u)
+                {
+                    //turn away from target
+                    me->AttackStop();
+                    me->SetOrientation(me->GetAbsoluteAngle(u) + float(M_PI) * frand(0.85f, 1.15f));
+                }
+                if (doCast(me, GetSpell(BLINK_1)))
+                    return;
             }
         }
 
@@ -848,7 +860,7 @@ public:
 
         void CheckIceBlock(uint32 diff)
         {
-            if (!me->IsAlive() || GC_Timer > diff || me->GetVehicle() || !GetSpell(ICE_BLOCK_1) || Rand() > 60 || IsTank())
+            if (!me->IsAlive() || GC_Timer > diff || me->GetVehicle() || !GetSpell(ICE_BLOCK_1) || Rand() > 60 || IsTank() || IsFlagCarrier(me))
                 return;
 
             if (iceblockCheckTimer <= diff)

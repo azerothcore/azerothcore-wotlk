@@ -1152,16 +1152,16 @@ public:
             Hexy = FindAffectedTarget(GetSpell(HEX_1), me->GetGUID());
         }
 
-        void CheckHex(uint32 /*diff*/)
+        void CheckHex(uint32 diff)
         {
-            //if (Hexy || !IsSpellReady(HEX_1, diff))
-            //    return;
+            if (Hexy || !IsSpellReady(HEX_1, diff))
+                return;
 
-            //if (Unit* target = FindPolyTarget(20))
-            //{
-            //    if (doCast(target, GetSpell(HEX_1)))
-            //        return;
-            //}
+            if (Unit* target = FindPolyTarget(20))
+            {
+                if (doCast(target, GetSpell(HEX_1)))
+                    return;
+            }
         }
 
         void CheckEarthy(uint32 diff)
@@ -1176,9 +1176,25 @@ public:
 
         void CheckGhostWolf(uint32 diff)
         {
-            if (!IsSpellReady(GHOST_WOLF_1, diff) || !HasBotCommandState(BOT_COMMAND_FOLLOW) || Rand() > 15 ||
-                me->GetShapeshiftForm() == FORM_GHOSTWOLF || me->GetVictim() || me->IsMounted() || IAmFree())
+            if (!IsSpellReady(GHOST_WOLF_1, diff) || (!IAmFree() && !HasBotCommandState(BOT_COMMAND_FOLLOW)) ||
+                Rand() > 35 || me->GetShapeshiftForm() != FORM_NONE || me->IsMounted() || !IsOutdoors() || IsCasting())
                 return;
+
+            if (IAmFree())
+            {
+                InstanceTemplate const* instt = sObjectMgr->GetInstanceTemplate(me->GetMap()->GetId());
+                bool map_allows_mount = (!me->GetMap()->IsDungeon() || me->GetMap()->IsBattlegroundOrArena()) && (!instt || instt->AllowMount);
+                if (me->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD) &&
+                    (!me->GetVictim() ?
+                        (me->IsInCombat() || !map_allows_mount || IsFlagCarrier(me)) :
+                        !me->IsWithinDist(me->GetVictim(), 8.0f + (IsMelee() ? 5.0f : GetSpellAttackRange(true)))))
+                {
+                    if (doCast(me, GetSpell(GHOST_WOLF_1)))
+                        return;
+                }
+
+                return;
+            }
 
             if (me->GetExactDist2d(master) > std::max<uint8>(master->GetBotMgr()->GetBotFollowDist(), 30))
             {

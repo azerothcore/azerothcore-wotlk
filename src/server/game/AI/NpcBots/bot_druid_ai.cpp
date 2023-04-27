@@ -629,7 +629,7 @@ public:
             if (ProcessImmediateNonAttackTarget())
                 return;
 
-            CheckTravelForm(diff);
+            CheckTravel(diff);
 
             if (!CheckAttackTarget())
             {
@@ -1218,7 +1218,7 @@ public:
 
         void BreakCC(uint32 diff) override
         {
-            if (GC_Timer <= diff && Rand() < 35 && GetManaPCT(me) > 15 &&
+            if (GC_Timer <= diff && Rand() < 25 && GetManaPCT(me) > 15 &&
                 (me->IsPolymorphed() || me->HasAuraWithMechanic((1<<MECHANIC_SNARE)|(1<<MECHANIC_ROOT))))
             {
                 uint32 sshift;
@@ -1375,17 +1375,50 @@ public:
             return false;
         }
 
-        void CheckTravelForm(uint32 diff)
+        void CheckTravel(uint32 diff)
         {
-            if (!IsSpellReady(TRAVEL_FORM_1, diff) || !HasBotCommandState(BOT_COMMAND_FOLLOW) || Rand() > 15 || !me->IsInCombat() ||
-                me->GetShapeshiftForm() == FORM_TRAVEL || me->GetVictim() || me->IsMounted() || IAmFree() || IsCasting() ||
+            if ((!IAmFree() && !HasBotCommandState(BOT_COMMAND_FOLLOW)) || Rand() > 35 || me->IsMounted() || IsCasting() ||
                 me->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING))
                 return;
 
+            bool can_use_travel_form = IsSpellReady(TRAVEL_FORM_1, diff) && me->GetShapeshiftForm() == FORM_NONE && IsOutdoors();
+
+            if (IAmFree())
+            {
+                InstanceTemplate const* instt = sObjectMgr->GetInstanceTemplate(me->GetMap()->GetId());
+                bool map_allows_mount = (!me->GetMap()->IsDungeon() || me->GetMap()->IsBattlegroundOrArena()) && (!instt || instt->AllowMount);
+                if (me->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD) &&
+                    (!me->GetVictim() ?
+                        (me->IsInCombat() || !map_allows_mount || IsFlagCarrier(me)) :
+                        !me->IsWithinDist(me->GetVictim(), 8.0f + (IsMelee() ? 0.0f : GetSpellAttackRange(true)))))
+                {
+                    if (me->GetShapeshiftForm() == FORM_CAT && IsSpellReady(DASH_1, diff, false))
+                    {
+                        if (doCast(me, GetSpell(DASH_1)))
+                            return;
+                    }
+                    else if (can_use_travel_form)
+                    {
+                        if (doCast(me, GetSpell(TRAVEL_FORM_1)))
+                            return;
+                    }
+                }
+
+                return;
+            }
+
             if (me->GetExactDist2d(master) > std::max<uint8>(master->GetBotMgr()->GetBotFollowDist(), 30))
             {
-                if (doCast(me, GetSpell(TRAVEL_FORM_1)))
-                    return;
+                if (me->GetShapeshiftForm() == FORM_CAT && IsSpellReady(DASH_1, diff, false))
+                {
+                    if (doCast(me, GetSpell(DASH_1)))
+                        return;
+                }
+                else if (can_use_travel_form)
+                {
+                    if (doCast(me, GetSpell(TRAVEL_FORM_1)))
+                        return;
+                }
             }
         }
 

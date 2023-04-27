@@ -112,6 +112,8 @@ class bot_pet_ai : public CreatureAI
         bool JumpingFlyingOrFalling() const;
         bool JumpingOrFalling() const;
         bool Jumping() const;
+        bool IsIndoors() const;
+        bool IsOutdoors() const;
 
         float CalcSpellMaxRange(uint32 spellId, bool enemy = true) const;
         void CalculateAttackPos(Unit* target, Position &pos) const;
@@ -158,6 +160,8 @@ class bot_pet_ai : public CreatureAI
         //timers
         uint32 lastdiff, checkAurasTimer, regenTimer, _updateTimerMedium, _updateTimerEx1;
         mutable uint32 waitTimer;
+        uint32 indoorsTimer;
+        uint32 outdoorsTimer;
 
         //wandering bots
         bool _wanderer;

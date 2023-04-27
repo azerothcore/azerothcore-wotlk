@@ -308,7 +308,8 @@ private:
 
         bot_template.InitializeQueryData();
 
-        NpcBotData* bot_data = new NpcBotData(bot_ai::DefaultRolesForClass(bot_class), bot_faction, bot_ai::DefaultSpecForClass(bot_class));
+        uint8 bot_spec = bot_ai::SelectSpecForClass(bot_class);
+        NpcBotData* bot_data = new NpcBotData(bot_ai::DefaultRolesForClass(bot_class, bot_spec), bot_faction, bot_spec);
         _botsData[next_bot_id] = bot_data;
         NpcBotExtras* bot_extras = new NpcBotExtras();
         bot_extras->bclass = bot_class;

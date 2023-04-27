@@ -152,7 +152,7 @@ class bot_ai : public CreatureAI
         GossipOptionIcon GetRoleIcon(uint32 role) const;
         static uint32 GetRoleString(uint32 role);
         void ToggleRole(uint32 role, bool force);
-        static uint32 DefaultRolesForClass(uint8 m_class);
+        static uint32 DefaultRolesForClass(uint8 m_class, uint8 spec);
         bool IsTank(Unit const* unit = nullptr) const;
         bool IsOffTank(Unit const* unit = nullptr) const;
 
@@ -273,7 +273,7 @@ class bot_ai : public CreatureAI
         void ReinitOwner() { InitOwner(); }
         void SetSpec(uint8 spec, bool activate = true);
         uint8 GetSpec() const;
-        static uint8 DefaultSpecForClass(uint8 m_class);
+        static uint8 SelectSpecForClass(uint8 m_class);
         static uint32 TextForSpec(uint8 spec);
         static bool IsValidSpecForClass(uint8 m_class, uint8 spec);
 
@@ -388,6 +388,8 @@ class bot_ai : public CreatureAI
         bool JumpingFlyingOrFalling() const;
         bool JumpingOrFalling() const;
         bool Jumping() const;
+        bool IsIndoors() const;
+        bool IsOutdoors() const;
         bool IsInContactWithWater() const;
 
         float CalcSpellMaxRange(uint32 spellId, bool enemy = true) const;
@@ -467,6 +469,7 @@ class bot_ai : public CreatureAI
 
         //event helpers
         void BotJumpInPlaceInFrontOf(Position const* pos, float speedXY, float maxHeight);
+        void DismountBot();
 
         void BuildGrouUpdatePacket(WorldPacket* data);
 
@@ -563,6 +566,7 @@ class bot_ai : public CreatureAI
         bool _canCureTarget(Unit const* target, uint32 cureSpell) const;
         void _getBotDispellableAuraList(Unit const* target, uint32 dispelMask, std::list<Aura const*> &dispelList) const;
         void _calculatePos(Unit const* followUnit, Position& pos) const;
+        uint32 _selectMountSpell() const;
         void _updateMountedState();
         void _updateStandState() const;
         void _updateRations();
@@ -642,6 +646,8 @@ class bot_ai : public CreatureAI
         uint32 waitTimer;
         uint32 itemsAutouseTimer;
         uint32 evadeDelayTimer;
+        uint32 indoorsTimer;
+        uint32 outdoorsTimer;
         //save timers
         uint32 _saveDisabledSpellsTimer;
 

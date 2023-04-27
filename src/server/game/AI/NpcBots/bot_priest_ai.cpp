@@ -1120,7 +1120,7 @@ public:
                 }
             }
             // Heal myself
-            if (GetHealthPCT(me) < 95 && !b_attackers.empty())
+            if ((GetHealthPCT(me) < 95 && !b_attackers.empty()) || (IsWanderer() && IsFlagCarrier(me)))
             {
                 if (ShieldTarget(me, diff)) return;
 

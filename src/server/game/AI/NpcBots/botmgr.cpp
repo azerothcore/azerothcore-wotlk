@@ -37,6 +37,12 @@ TODO: Move creature hooks here
 # pragma warning(push, 4)
 #endif
 
+#ifdef AC_COMPILER
+# define GetBoolDefault GetOption<bool>
+# define GetIntDefault GetOption<int32>
+# define GetFloatDefault GetOption<float>
+#endif
+
 static std::list<BotMgr::delayed_teleport_callback_type> delayed_bot_teleports;
 
 //config

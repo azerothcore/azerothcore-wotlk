@@ -880,7 +880,7 @@ public:
             //WHIRLWIND
             if (IsSpellReady(WHIRLWIND_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS) && !IsTank() && !CanBlock() && Rand() < 80 &&
                 (isFury || mytar->IsControlledByPlayer() || me->GetLevel() < 60 || !me->GetMap()->IsDungeon()) &&
-                (_inStance(3) || stancetimer <= diff) && dist < 7.f &&
+                (_inStance(3) || stancetimer <= diff) && dist < 6.f &&
                 rage >= rcost(WHIRLWIND_1) && (isFury || rage >= 500 || FindSplashTarget(7.f, mytar, 15.f)))
             {
                 if ((_inStance(3) || stanceChange(diff, 3)) &&

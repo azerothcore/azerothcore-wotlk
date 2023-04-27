@@ -251,7 +251,7 @@ public:
                 me->GetLevel() < 30 || me->GetPower(POWER_MANA) < UNHOLY_FRENZY_COST || Rand() > 35)
                 return;
 
-            static auto frenzy_pred_player = [=](Unit const* pl) -> bool {
+            static auto frenzy_pred_player = [this](Unit const* pl) -> bool {
                 return (pl->GetVictim() && pl->IsInCombat() && IsMeleeClass(pl->GetClass()) && !IsTank(pl) &&
                     me->GetDistance(pl) < 30 && pl->GetDistance(pl->GetVictim()) < 15 &&
                     pl->getAttackers().empty() && !CCed(pl, true) &&

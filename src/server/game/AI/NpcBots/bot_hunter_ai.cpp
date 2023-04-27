@@ -252,7 +252,7 @@ public:
 
         void CheckAspects(uint32 diff)
         {
-            if (aspectTimer > diff || IAmFree() || me->IsMounted() || Feasting() || IsCasting() || Rand() > 55)
+            if (aspectTimer > diff || me->IsMounted() || Feasting() || IsCasting() || Rand() > 55)
                 return;
 
             aspectTimer = urand(5000, 10000);
@@ -280,61 +280,79 @@ public:
                 return;
             }
 
-            if (ASPECT_OF_THE_VIPER && GetManaPCT(me) < 20)
+            if (GetManaPCT(me) < 20)
             {
-                if (doCast(me, ASPECT_OF_THE_VIPER))
-                    return;
+                if (ASPECT_OF_THE_VIPER)
+                {
+                    if (doCast(me, ASPECT_OF_THE_VIPER))
+                        return;
+                }
                 return;
+            }
+            else if (Aspect == ASPECT_VIPER && GetManaPCT(me) > 50)
+            {
+                me->RemoveAurasDueToSpell(ASPECT_OF_THE_VIPER_1, me->GetGUID());
+                Aspect = ASPECT_NONE;
             }
 
             if (IAmFree())
             {
-                if (ASPECT_OF_THE_DRAGONHAWK && Aspect != ASPECT_DRAGONHAWK)
-                    if (doCast(me, ASPECT_OF_THE_DRAGONHAWK))
-                        return;
-                return;
-            }
-
-            //Group const* gr = master->GetGroup();
-            //choose movement aspect first
-            if (!master->GetBotMgr()->IsPartyInCombat())
-            {
-                if (!(mask & SPECIFIC_ASPECT_PACK))
+                InstanceTemplate const* instt = sObjectMgr->GetInstanceTemplate(me->GetMap()->GetId());
+                bool map_allows_mount = (!me->GetMap()->IsDungeon() || me->GetMap()->IsBattlegroundOrArena()) && (!instt || instt->AllowMount);
+                if (me->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD) &&
+                    (!me->GetVictim() ?
+                        (me->IsInCombat() || !map_allows_mount || !IsOutdoors() || IsFlagCarrier(me)) :
+                        !me->IsWithinDist(me->GetVictim(), 8.0f + GetSpellAttackRange(true))))
                 {
-                    uint32 movFlags;
-                    if (ASPECT_OF_THE_PACK)
+                    if (ASPECT_OF_THE_CHEETAH && !(mask & (SPECIFIC_ASPECT_CHEETAH | SPECIFIC_ASPECT_PACK)) && Aspect != ASPECT_CHEETAH)
                     {
-                        movFlags = master->m_movementInfo.GetMovementFlags();
-                        if ((movFlags & MOVEMENTFLAG_FORWARD) && !(movFlags & (MOVEMENTFLAG_FALLING_FAR)))
-                        {
-                            if (doCast(me, ASPECT_OF_THE_PACK))
-                                return;
-                        }
-                    }
-                    if (ASPECT_OF_THE_CHEETAH && Aspect != ASPECT_CHEETAH)
-                    {
-                        movFlags = me->m_movementInfo.GetMovementFlags();
-                        if ((movFlags & MOVEMENTFLAG_FORWARD) && !(movFlags & (MOVEMENTFLAG_FALLING_FAR)) &&
-                            me->GetDistance(master) > 20)
-                        {
-                            if (doCast(me, ASPECT_OF_THE_CHEETAH))
-                                return;
-                        }
+                        if (doCast(me, ASPECT_OF_THE_CHEETAH))
+                            return;
                     }
                 }
-
-                return;
+                else if (Aspect == ASPECT_CHEETAH)
+                {
+                    me->RemoveAurasDueToSpell(ASPECT_OF_THE_CHEETAH_1, me->GetGUID());
+                    Aspect = ASPECT_NONE;
+                }
             }
-            else if (Aspect == ASPECT_PACK)
+            else
             {
-                me->RemoveAurasDueToSpell(ASPECT_OF_THE_PACK_1, me->GetGUID());
-                Aspect = ASPECT_NONE;
+                //choose movement aspect first
+                if (!master->GetBotMgr()->IsPartyInCombat())
+                {
+                    if (!(mask & SPECIFIC_ASPECT_PACK))
+                    {
+                        uint32 movFlags;
+                        if (ASPECT_OF_THE_PACK)
+                        {
+                            movFlags = master->m_movementInfo.GetMovementFlags();
+                            if ((movFlags & MOVEMENTFLAG_FORWARD) && !(movFlags & (MOVEMENTFLAG_FALLING_FAR)))
+                            {
+                                if (doCast(me, ASPECT_OF_THE_PACK))
+                                    return;
+                            }
+                        }
+                        if (ASPECT_OF_THE_CHEETAH && Aspect != ASPECT_CHEETAH)
+                        {
+                            movFlags = me->m_movementInfo.GetMovementFlags();
+                            if ((movFlags & MOVEMENTFLAG_FORWARD) && !(movFlags & (MOVEMENTFLAG_FALLING_FAR)) &&
+                                me->GetDistance(master) > 20)
+                            {
+                                if (doCast(me, ASPECT_OF_THE_CHEETAH))
+                                    return;
+                            }
+                        }
+                    }
+
+                    return;
+                }
+                else if (Aspect == ASPECT_PACK)
+                {
+                    me->RemoveAurasDueToSpell(ASPECT_OF_THE_PACK_1, me->GetGUID());
+                    Aspect = ASPECT_NONE;
+                }
             }
-            //else if (Aspect == ASPECT_CHEETAH)
-            //{
-            //    me->RemoveAurasDueToSpell(ASPECT_OF_THE_CHEETAH_1, me->GetGUID());
-            //    Aspect = ASPECT_NONE;
-            //}
 
             if ((Aspect == ASPECT_DRAGONHAWK && idMap[ASPECT_OF_THE_DRAGONHAWK_1] == ASPECT_OF_THE_DRAGONHAWK) ||
                 (!ASPECT_OF_THE_DRAGONHAWK && ((Aspect == ASPECT_HAWK && idMap[ASPECT_OF_THE_HAWK_1] == ASPECT_OF_THE_HAWK) ||
@@ -2340,9 +2358,9 @@ public:
                     case ASPECT_OF_THE_HAWK_1:
                         mask |= SPECIFIC_ASPECT_HAWK;
                         break;
-                    //case ASPECT_OF_THE_CHEETAH_1:
-                    //    mask |= SPECIFIC_ASPECT_CHEETAH;
-                    //    break;
+                    case ASPECT_OF_THE_CHEETAH_1:
+                        mask |= SPECIFIC_ASPECT_CHEETAH;
+                        break;
                     //case ASPECT_OF_THE_VIPER_1:
                     //    mask |= SPECIFIC_ASPECT_VIPER;
                     //    break;
