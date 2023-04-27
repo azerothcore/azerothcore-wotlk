@@ -10,7 +10,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18445, 0, 0 ,0,38, 0, 100, 0, 1, 1, 0,0,80,1844500,0,0,0,0,0,1,0,0,0,0, 0, 0, 0, 'Corki - On Data Set - Action list'),
 (1844500, 9, 0 ,0,0, 0, 100, 0, 0, 0, 0,0,1,0,0,0,0,0,0,12,1,0,0,0, 0, 0, 0, 'Corki - Action list - Say'),
 (1844500, 9, 1 ,0,0, 0, 100, 0, 0, 0, 0,0,33,18444,0,0,0,0,0,12,1,0,0,0, 0, 0, 0, 'Corki - Action list - Kill Credit'),
-(1844500, 9, 2 ,0,0, 0, 100, 0, 4000, 4000, 0,0,69,0,0,0,0,0,0,8,0,0,0,-896.082, 8687.346, 170.455, 3.81311, 'Corki - Action listt - Move Foward'),
+(1844500, 9, 2 ,0,0, 0, 100, 0, 4000, 4000, 0,0,69,0,0,0,0,0,0,8,0,0,0,-896.082, 8687.346, 170.455, 3.81311, 'Corki - Action listt - Move Forward'),
 (1844500, 9, 3 ,0,0, 0, 100, 0, 4000, 4000, 0,0,41,0,0,0,0,0,0,1,0,0,0,0, 0, 0, 0, 'Corki - Action list - Despawn after 5 seconds'),
 (182349, 1, 0 ,1,70, 0, 100, 0, 2, 0, 0,0,64,1,0,0,0,0,0,16,0,0,0,0, 0, 0, 0, 'Corkis Prison - On State Changed - Store Targetlist'),
 (182349, 1, 1 ,2,61, 0, 100, 0, 0, 0, 0,0,100,1,0,0,0,0,0,19,18369,0,0,0, 0, 0, 0, 'Corkis Prison - Script - Send Targetlist'),
@@ -26,7 +26,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20812, 0, 0 ,0,38, 0, 100, 0, 1, 1, 0,0,80,2081200,0,0,0,0,0,1,0,0,0,0, 0, 0, 0, 'Corki - On Data Set - Action list'),
 (2081200, 9, 0 , 0, 0, 0, 100, 0, 0, 0, 0,0,1,0,0,0,0,0,0,12,1,0,0,0, 0, 0, 0, 'Corki - Action list - Say'),
 (2081200, 9, 1 , 0, 0, 0, 100, 0, 0, 0, 0,0,33,20812,0,0,0,0,0,12,1,0,0,0, 0, 0, 0, 'Corki - Action list - Kill Credit'),
-(2081200, 9, 2 , 0, 0, 0, 100, 0, 4000, 4000, 0,0,69,0,0,0,0,0,0,8,0,0,0,-1001.022, 8113.366, -95.849, 0.352908, 'Corki - Action list - Move Foward'),
+(2081200, 9, 2 , 0, 0, 0, 100, 0, 4000, 4000, 0,0,69,0,0,0,0,0,0,8,0,0,0,-1001.022, 8113.366, -95.849, 0.352908, 'Corki - Action list - Move Forward'),
 (2081200, 9, 3 , 0, 0, 0, 100, 0, 4000, 4000, 0,0,41,0,0,0,0,0,0,1,0,0,0,0, 0, 0, 0, 'Corki - Action list - Despawn after 5 seconds');
 
 UPDATE `creature` SET `position_x`=-2563.89,`position_y`=6288.29,`position_z`=15.295,`orientation`=5.23599 WHERE `guid`=65786 AND `id1`=18369;
