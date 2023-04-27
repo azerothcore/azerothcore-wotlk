@@ -158,7 +158,7 @@ public:
                         scheduler.Schedule(200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                         {
                             me->Yell("%s roars!", LANG_UNIVERSAL);
-                            scheduler.Schedule(2200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                            scheduler.Schedule(2200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                             {
                                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                 {
