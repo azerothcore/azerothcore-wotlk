@@ -121,13 +121,13 @@ public:
             {
                 DoCastAOE(SPELL_THUNDERCLAP);
                 context.Repeat(17200ms, 24200ms);
-            }).Schedule(20s, 30s, [this](TaskContext context)
+            }).Schedule(20s, 30s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
             {
                 me->Yell("beatdown", LANG_UNIVERSAL);
                 DoCastSelf(SPELL_BEATDOWN, false);
                 me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                 me->SetReactState(REACT_PASSIVE);
-                scheduler.Schedule(200ms, [this](TaskContext context)
+                scheduler.Schedule(200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
@@ -139,20 +139,20 @@ public:
                         scheduler.CancelGroup(GROUP_NON_BURNING_PHASE);
                         DoResetThreatList();
                         me->AddThreat(target, 2250.0f);
-                        scheduler.Schedule(1200ms, [this](TaskContext context)
+                        scheduler.Schedule(1200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
                         {
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                         });
                     }
                 });
-                scheduler.Schedule(20s, 30s, [this](TaskContext context)
+                scheduler.Schedule(20s, 30s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
                 {
                     DoCastSelf(SPELL_FEAR, false);
                     DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
                     me->LoadEquipment(EQUIP_BURNING_MAUL);
                     me->Yell("%s roars!", LANG_UNIVERSAL);
-                    scheduler.Schedule(2200ms, [this](TaskContext context)
+                    scheduler.Schedule(2200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
@@ -170,10 +170,11 @@ public:
                         {
                             DoCastAOE(SPELL_BLAST_WAVE, false);
                             context.Repeat(4850ms, 8500ms);
-                        }).Schedule(45s, 60s, [this](TaskContext context)
+                        }).Schedule(45s, 60s, GROUP_BURNING_PHASE, [this](TaskContext context)
                         {
                             me->Yell("back to p1", LANG_UNIVERSAL);
                             me->LoadEquipment(EQUIP_STANDARD);
+                            scheduler.CancelGroup(GROUP_BURNING_PHASE);
                             scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 17200ms, 24200ms);
                         });
                     });
