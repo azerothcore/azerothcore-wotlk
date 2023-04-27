@@ -139,33 +139,41 @@ public:
                         scheduler.CancelGroup(GROUP_NON_BURNING_PHASE);
                         DoResetThreatList();
                         me->AddThreat(target, 2250.0f);
-                        scheduler.Schedule(1200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                        scheduler.Schedule(1200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                         {
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                         });
                     }
                 });
-                scheduler.Schedule(20s, 30s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                scheduler.Schedule(20s, 30s, GROUP_BURNING_PHASE, [this](TaskContext context)
                 {
-                    DoCastSelf(SPELL_FEAR, false);
-                    DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
-                    me->LoadEquipment(EQUIP_BURNING_MAUL);
-                    me->Yell("%s roars!", LANG_UNIVERSAL);
-                    scheduler.Schedule(2200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                    me->SetUnitFlag(UNIT_FLAG_PACIFIED);
+                    me->SetReactState(REACT_PASSIVE);
+                    scheduler.Schedule(1200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        DoCastSelf(SPELL_FEAR, false);
+                        DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
+                        me->LoadEquipment(EQUIP_BURNING_MAUL);
+                        scheduler.Schedule(200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                         {
-                            me->Yell("debug: threat remove maul", LANG_UNIVERSAL);
-                            uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
-                            if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
-                                head->AI()->Talk(threatYell - 1);
-                            events.ScheduleEvent(threatYell, 3000);
+                            me->Yell("%s roars!", LANG_UNIVERSAL);
+                            scheduler.Schedule(2200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                            {
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                                {
+                                    me->Yell("debug: threat remove maul", LANG_UNIVERSAL);
+                                    uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
+                                    if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
+                                        head->AI()->Talk(threatYell - 1);
+                                    events.ScheduleEvent(threatYell, 3000);
 
-                            DoResetThreatList();
-                            me->AddThreat(target, 2250.0f);
-                        }
-                        me->Yell("entered burning phase", LANG_UNIVERSAL);
+                                    DoResetThreatList();
+                                    me->AddThreat(target, 2250.0f);
+                                }
+                                me->Yell("entered burning phase", LANG_UNIVERSAL);
+                            });
+                        });                
                         scheduler.Schedule(4850ms, 8500ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                         {
                             DoCastAOE(SPELL_BLAST_WAVE, false);
