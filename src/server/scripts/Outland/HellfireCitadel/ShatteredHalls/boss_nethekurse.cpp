@@ -154,6 +154,7 @@ public:
                     EventStage = EVENT_STAGE_INTRO;
                     instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                     me->SetInCombatWithZone();
+                    IntroRP();
                 }
                 else if (PeonKilledCount >= 4)
                 {
