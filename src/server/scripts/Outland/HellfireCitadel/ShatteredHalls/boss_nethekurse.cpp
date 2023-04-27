@@ -141,7 +141,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (me->IsWithinDistInMap(who, 30.0f))
+            if (me->IsWithinDistInMap(who, 50.0f))
             {
                 if (who->GetTypeId() != TYPEID_PLAYER)
                     return;
