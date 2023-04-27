@@ -150,7 +150,7 @@ public:
                 {
                     events2.ScheduleEvent(EVENT_INTRO, 90000);
                     Talk(SAY_INTRO);
-                    me->Yell("test intro debug", LANG_UNIVERSAL);
+                    LOG_ERROR("server", "Data {}", "event started");
                     EventStage = EVENT_STAGE_INTRO;
                     instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                     me->SetInCombatWithZone();
@@ -173,7 +173,7 @@ public:
         void IntroRP()
         {
             //TODO: implement
-            me->Yell("enter intro rp debug", LANG_UNIVERSAL);
+            LOG_ERROR("server", "Data {}", "intro rp started");
             me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[0][0], NethekurseIntroPath[0][1], NethekurseIntroPath[0][2]);
             me->GetMotionMaster()->Clear();
             CastRandomPeonSpell();
@@ -229,7 +229,9 @@ public:
 
         void CastRandomPeonSpell()
         {
+            LOG_ERROR("server", "Data {}", "spellcast debug peon");
             uint32 choice = urand(1, 3);
+            LOG_ERROR("server", "Data {}", std::to_string(choice).c_str());
             if (choice == 1)
             {
                 Talk(SAY_SHADOW_SEAR);
