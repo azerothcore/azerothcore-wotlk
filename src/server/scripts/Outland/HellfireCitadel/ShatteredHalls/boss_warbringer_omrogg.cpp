@@ -175,7 +175,7 @@ public:
                             me->Yell("back to p1", LANG_UNIVERSAL);
                             me->LoadEquipment(EQUIP_STANDARD);
                             scheduler.CancelGroup(GROUP_BURNING_PHASE);
-                            scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 17200ms, 24200ms);
+                            scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 12100ms, 17300ms);
                         });
                     });
                 });
