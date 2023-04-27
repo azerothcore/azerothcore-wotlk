@@ -150,6 +150,7 @@ public:
                 {
                     events2.ScheduleEvent(EVENT_INTRO, 90000);
                     Talk(SAY_INTRO);
+                    me->Yell("test intro debug", LANG_UNIVERSAL);
                     EventStage = EVENT_STAGE_INTRO;
                     instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                     me->SetInCombatWithZone();
@@ -166,6 +167,30 @@ public:
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);
+        }
+
+        void IntroRP()
+        {
+            //TODO: implement
+            me->Yell("enter intro rp debug", LANG_UNIVERSAL);
+            me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[0][0], NethekurseIntroPath[0][1], NethekurseIntroPath[0][2]);
+            me->GetMotionMaster()->Clear();
+            CastRandomPeonSpell();
+            me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[1][0], NethekurseIntroPath[1][1], NethekurseIntroPath[1][2]);
+            me->GetMotionMaster()->Clear();
+            CastRandomPeonSpell();
+            me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[2][0], NethekurseIntroPath[2][1], NethekurseIntroPath[2][2]);
+            me->GetMotionMaster()->Clear();
+            CastRandomPeonSpell();
+            me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[3][0], NethekurseIntroPath[3][1], NethekurseIntroPath[3][2]);
+            me->GetMotionMaster()->Clear();
+            CastRandomPeonSpell();
+            me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[2][0], NethekurseIntroPath[2][1], NethekurseIntroPath[2][2]);
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[1][0], NethekurseIntroPath[1][1], NethekurseIntroPath[1][2]);
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[0][0], NethekurseIntroPath[0][1], NethekurseIntroPath[0][2]);
+            me->GetMotionMaster()->Clear();
         }
 
         void JustEngagedWith(Unit* /*who*/) override
