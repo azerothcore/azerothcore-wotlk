@@ -309,6 +309,8 @@ public:
                         if (doCast(me, ASPECT_OF_THE_CHEETAH))
                             return;
                     }
+
+                    return;
                 }
                 else if (Aspect == ASPECT_CHEETAH)
                 {

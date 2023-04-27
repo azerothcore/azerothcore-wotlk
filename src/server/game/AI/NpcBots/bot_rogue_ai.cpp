@@ -322,7 +322,7 @@ public:
             //we don't want rogue to swith into stealth for no purpose
             if (IsSpellReady(STEALTH_1, diff, false) && !me->IsInCombat() && !IsTank() && Rand() < 50 && dist < 28 &&
                 (!me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) || (mytar->GetTypeId() == TYPEID_PLAYER && dist < 6)) &&
-                (me->GetLevel() >= 35 || (energy >= 40 && me->GetLevel() >= 30) || dist > 8))
+                (me->GetLevel() >= 35 || (energy >= 40 && me->GetLevel() >= 30) || dist > 8) && !IsFlagCarrier(me))
             {
                 if (doCast(me, GetSpell(STEALTH_1)))
                 {}

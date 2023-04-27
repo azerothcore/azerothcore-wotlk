@@ -1277,7 +1277,7 @@ bool bot_ai::IsPointedAnyAttackTarget(Unit const* target) const
 void bot_ai::BuffAndHealGroup(uint32 diff)
 {
     if (GC_Timer > diff) return;
-    if (me->IsMounted()) return;
+    if (me->IsMounted() && !IsWanderer()) return;
     if (IsCasting() || Feasting()) return;
 
     if (IAmFree())
@@ -16280,6 +16280,12 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             //gossip availability check
             if (HasBotCommandState(BOT_COMMAND_NOGOSSIP) && me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        }
+
+        if (me->IsInWorld() && me->IsAlive() && IAmFree())
+        {
+            if (me->HasAuraType(SPELL_AURA_MOUNTED) && IsIndoors() && sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK))
+                me->RemoveAurasWithAttribute(SPELL_ATTR0_ONLY_OUTDOORS);
         }
     }
 

@@ -917,7 +917,7 @@ public:
                 return;
 
             //Prowl (for Cooldown handling see bot_ai::ReleaseSpellCooldown)
-            if (IsSpellReady(PROWL_1, diff, false) && !me->IsInCombat() && Rand() < 50 && me->GetDistance(mytar) < 28)
+            if (IsSpellReady(PROWL_1, diff, false) && !me->IsInCombat() && Rand() < 50 && me->GetDistance(mytar) < 28 && !IsFlagCarrier(me))
             {
                 if (doCast(me, GetSpell(PROWL_1)))
                 {}
