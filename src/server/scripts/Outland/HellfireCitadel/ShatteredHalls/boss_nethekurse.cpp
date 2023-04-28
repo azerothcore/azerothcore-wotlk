@@ -61,6 +61,11 @@ enum Creatures
     NPC_PEON                   = 17083
 };
 
+enum Groups
+{
+    GROUP_RP                   = 0,
+};
+
 // ########################################################
 // Grand Warlock Nethekurse
 // ########################################################
@@ -158,9 +163,37 @@ public:
                 }
                 else if (PeonKilledCount >= 4)
                 {
+                    scheduler.CancelGroup(GROUP_RP);
+                    LOG_ERROR("server", "Data {}", "all peons dead");
                     events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
                     instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                     me->SetInCombatWithZone();
+                    scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+                    {
+                        if (me->HealthBelowPct(90))
+                        {
+                            DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
+                        }
+                        context.Repeat();
+                    }).Schedule(8100ms, 17300ms, [this](TaskContext context)
+                    {
+                        DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
+                        context.Repeat(8450ms, 9450ms);
+                    }).Schedule(10950ms, 21850ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
+                        context.Repeat(1200ms, 23900ms);
+                    }).Schedule(1s, [this](TaskContext context)
+                    {
+                        if (me->HealthBelowPct(25))
+                        {
+                            DoCastSelf(SPELL_DARK_SPIN);
+                        }
+                        else
+                        {
+                            context.Repeat();
+                        }
+                    });
                 }
             }
 
@@ -172,7 +205,7 @@ public:
 
         void IntroRP()
         {
-            scheduler.Schedule(500ms, [this](TaskContext context)
+            scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
             {
                 me->GetMotionMaster()->Clear();
                 uint32 choicelocation = urand(0, 3);
@@ -180,7 +213,7 @@ public:
                 CastRandomPeonSpell();
                 context.Repeat(19400ms, 31500ms);
             });
-            //TODO: implement
+            
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -189,32 +222,6 @@ public:
 
             Talk(SAY_INTRO_2);
             LOG_ERROR("server", "Data {}", "combat start");
-            scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
-            {
-                if (me->HealthBelowPct(90))
-                {
-                    DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
-                }
-                context.Repeat();
-            }).Schedule(8100ms, 17300ms, [this](TaskContext context)
-            {
-                DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
-                context.Repeat(8450ms, 9450ms);
-            }).Schedule(10950ms, 21850ms, [this](TaskContext context)
-            {
-                DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
-                context.Repeat(1200ms, 23900ms);
-            }).Schedule(1s, [this](TaskContext context)
-            {
-                if (me->HealthBelowPct(25))
-                {
-                    DoCastSelf(SPELL_DARK_SPIN);
-                }
-                else
-                {
-                    context.Repeat();
-                }
-            });
         }
 
         void CastRandomPeonSpell()
@@ -256,7 +263,6 @@ public:
                 if (eventId == EVENT_INTRO)
                 {
                     EventStage = EVENT_STAGE_TAUNT;
-                    CastRandomPeonSpell();
                 }
                 else if (eventId == EVENT_START_ATTACK)
                 {
