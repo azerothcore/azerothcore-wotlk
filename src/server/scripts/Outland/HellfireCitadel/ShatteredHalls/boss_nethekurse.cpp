@@ -390,7 +390,7 @@ class at_rp_nethekurse : public AreaTriggerScript
                 LOG_ERROR("server", "Data {}", "boss not completed");
                 if (Creature* nethekurse = instance->GetCreature(DATA_NETHEKURSE))
                 {
-                    LOG_ERROR("server", "Data {}", "AT Nethekurse action started");
+                    LOG_ERROR("server", "Data {}", "AT Nethekurse action started final test of the day");
                     nethekurse->AI()->DoAction(ACTION_START_INTRO);
                 }
             }
