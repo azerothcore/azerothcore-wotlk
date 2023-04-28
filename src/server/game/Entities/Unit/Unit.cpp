@@ -9968,15 +9968,9 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
     return true;
 }
 
-void Unit::setPowerType(Powers new_powertype, bool sendUpdate/* = true*/)
+void Unit::setPowerType(Powers new_powertype)
 {
-    if (getPowerType() == new_powertype)
-        return;
-
-    SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_POWER_TYPE, new_powertype);
-
-    if (!sendUpdate)
-        return;
+    SetByteValue(UNIT_FIELD_BYTES_0, 3, new_powertype);
 
     if (GetTypeId() == TYPEID_PLAYER)
     {
@@ -15179,10 +15173,7 @@ uint32 Unit::GetCreatureType() const
         if (ssEntry && ssEntry->creatureType > 0)
             return ssEntry->creatureType;
         else
-        {
-            ChrRacesEntry const* raceEntry = sChrRacesStore.AssertEntry(getRace());
-            return raceEntry->CreatureType;
-        }
+            return CREATURE_TYPE_HUMANOID;
     }
     else
         return ToCreature()->GetCreatureTemplate()->type;
@@ -21284,6 +21275,25 @@ void Unit::BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns c
         data << uint32(itr->first);
         data << uint32(itr->second);
     }
+}
+
+uint8 Unit::getRace(bool original) const
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        if (original)
+            return m_realRace;
+        else
+            return m_race;
+    }
+
+    return GetByteValue(UNIT_FIELD_BYTES_0, 0);
+}
+
+void Unit::setRace(uint8 race)
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        m_race = race;
 }
 
 // Check if unit in combat with specific unit
