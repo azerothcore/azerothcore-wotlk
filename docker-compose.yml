@@ -203,6 +203,8 @@ services:
       - ${DOCKER_VOL_DATA_MAPS:-./env/docker/data/maps}:/azerothcore/env/dist/data/maps
       - ${DOCKER_VOL_DATA_VMAPS:-./env/docker/data/vmaps}:/azerothcore/env/dist/data/vmaps
       - ${DOCKER_VOL_DATA_MMAPS:-./env/docker/data/mmaps}:/azerothcore/env/dist/data/mmaps
+      # eluna
+      - ./scripts/lua:/azerothcore/env/dist/scripts/lua
     profiles: [local, app, worldserver]
     depends_on:
       ac-database:
