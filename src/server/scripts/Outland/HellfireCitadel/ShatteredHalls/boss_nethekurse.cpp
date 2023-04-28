@@ -128,9 +128,12 @@ public:
                     {
                         me->GetMotionMaster()->Clear();
                         me->SetFacingTo(4.572762489318847656f);
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
-                        Talk(SAY_PEON_DIES);
-                        scheduler.DelayGroup(GROUP_RP, 6050ms);
+                        scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+                        {
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
+                            Talk(SAY_PEON_DIES);
+                        });
+                        scheduler.DelayGroup(GROUP_RP, 5550ms);
                     }
                     if (++PeonKilledCount == 4)
                         events2.ScheduleEvent(EVENT_START_ATTACK, 5000);
@@ -151,7 +154,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (me->IsWithinDistInMap(who, 50.0f))
+            if (me->GetAreaId() == 4347)
             {
                 if (who->GetTypeId() != TYPEID_PLAYER)
                     return;
@@ -238,6 +241,7 @@ public:
             {
                 Talk(SAY_SHADOW_SEAR);
                 me->CastSpell(me, SPELL_SHADOW_SEAR, false);
+                me->SetFullHealth();
             }
             else if (choice == 2)
             {
