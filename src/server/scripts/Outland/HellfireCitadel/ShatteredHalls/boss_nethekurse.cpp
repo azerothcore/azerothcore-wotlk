@@ -377,20 +377,23 @@ class at_rp_nethekurse : public AreaTriggerScript
 
     bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
+        LOG_ERROR("server", "Data {}", "AT Nethekurse reached by non-GM");
         if (player->IsGameMaster())
         {
             return false;
         }
         if (InstanceScript* instance = player->GetInstanceScript())
         {
-            LOG_ERROR("server", "Data {}", "AT Nethekurse reached by non-GM");
-            if (Creature* nethekurse = instance->GetCreature(DATA_NETHEKURSE))
+            LOG_ERROR("server", "Data {}", "instance script loaded");
+            if (instance->GetBossState(DATA_NETHEKURSE) != DONE)
             {
-                LOG_ERROR("server", "Data {}", "AT Nethekurse action started");
-                nethekurse->AI()->DoAction(ACTION_START_INTRO);
-            }           
-
-            return true;
+                LOG_ERROR("server", "Data {}", "boss not completed");
+                if (Creature* nethekurse = instance->GetCreature(DATA_NETHEKURSE))
+                {
+                    LOG_ERROR("server", "Data {}", "AT Nethekurse action started");
+                    nethekurse->AI()->DoAction(ACTION_START_INTRO);
+                }
+            }
         }
         return false;
     }
