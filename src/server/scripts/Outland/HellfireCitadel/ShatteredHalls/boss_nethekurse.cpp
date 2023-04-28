@@ -109,6 +109,10 @@ public:
 
         void SetData(uint32 data, uint32 value) override
         {
+            LOG_ERROR("server", "Data {}", "--data boolean--");
+            LOG_ERROR("server", "Data {}", std::to_string(data).c_str());
+            LOG_ERROR("server", "Data {}", std::to_string(SETDATA_DATA).c_str());
+            LOG_ERROR("server", "Data {}", "----------------");
             if (data != SETDATA_DATA)
                 return;
 
@@ -375,6 +379,7 @@ class at_rp_nethekurse : public AreaTriggerScript
             LOG_ERROR("server", "Data {}", "AT Nethekurse reached by non-GM");
             if (Creature* nethekurse = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_NETHEKURSE)))
             {
+                LOG_ERROR("server", "Data {}", "room breached set");
                 nethekurse->AI()->SetData(SETDATA_ROOM_BREACHED, SETDATA_ROOM_BREACHED);
             }
 
