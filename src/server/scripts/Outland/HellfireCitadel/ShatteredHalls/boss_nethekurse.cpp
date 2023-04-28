@@ -125,8 +125,13 @@ public:
                         return;
 
                     if (EventStage < EVENT_STAGE_TAUNT)
+                    {
+                        me->GetMotionMaster()->Clear();
+                        me->SetFacingTo(4.572762489318847656f);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
                         Talk(SAY_PEON_DIES);
-
+                        scheduler.DelayGroup(GROUP_RP, 6050ms);
+                    }
                     if (++PeonKilledCount == 4)
                         events2.ScheduleEvent(EVENT_START_ATTACK, 5000);
                     break;
@@ -237,7 +242,7 @@ public:
             else if (choice == 2)
             {
                 Talk(SAY_SHADOW_FISSURE);
-                me->CastSpell(me->FindNearestCreature(NPC_PEON, 40.0f), SPELL_SHADOW_FISSURE, false);
+                me->CastSpell(me->FindNearestCreature(NPC_PEON, 40.0f), SPELL_SHADOW_FISSURE, true);
             }
             else if (choice == 3)
             {
