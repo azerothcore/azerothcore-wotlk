@@ -43,6 +43,7 @@ public:
         void Initialize() override
         {
             SetBossNumber(ENCOUNTER_COUNT);
+            LoadObjectData(creatureData, nullptr);
 
             TeamIdInInstance = TEAM_NEUTRAL;
             RescueTimer = 100 * MINUTE * IN_MILLISECONDS;
@@ -85,9 +86,6 @@ public:
             {
                 case NPC_WARCHIEF_KARGATH:
                     warchiefKargathGUID = creature->GetGUID();
-                    break;
-                case NPC_GRAND_WARLOCK_NETHEKURSE:
-                    grandWarlockNethekurseGUID = creature->GetGUID();
                     break;
                 case NPC_SHATTERED_EXECUTIONER:
                     if (RescueTimer > 25 * MINUTE * IN_MILLISECONDS)
