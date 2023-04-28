@@ -54,7 +54,6 @@ enum eGrandWarlockNethekurse
     SETDATA_DATA               = 1,
     SETDATA_PEON_AGGRO         = 1,
     SETDATA_PEON_DEATH         = 2,
-    SETDATA_ROOM_BREACHED      = 3
 };
 
 enum Creatures
@@ -65,6 +64,13 @@ enum Creatures
 enum Groups
 {
     GROUP_RP                   = 0,
+};
+
+enum Actions
+{
+    ACTION_START_INTRO         = 0,
+    ACTION_CANCEL_INTRO        = 1,
+    ACTION_START_COMBAT        = 2,
 };
 
 // ########################################################
@@ -109,10 +115,6 @@ public:
 
         void SetData(uint32 data, uint32 value) override
         {
-            LOG_ERROR("server", "Data {}", "--data boolean--");
-            LOG_ERROR("server", "Data {}", std::to_string(data).c_str());
-            LOG_ERROR("server", "Data {}", std::to_string(SETDATA_DATA).c_str());
-            LOG_ERROR("server", "Data {}", "----------------");
             if (data != SETDATA_DATA)
                 return;
 
@@ -140,60 +142,11 @@ public:
                         });
                     }
                     if (++PeonKilledCount == 4)
-                        events2.ScheduleEvent(EVENT_START_ATTACK, 5000);
-                    break;
-                case SETDATA_ROOM_BREACHED:
-                    LOG_ERROR("server", "Data {}", "switch room breached");
-                    if (EventStage == EVENT_STAGE_NONE && PeonKilledCount < 4)
-                    {
-                        events2.ScheduleEvent(EVENT_INTRO, 90000);
-                        Talk(SAY_INTRO);
-                        LOG_ERROR("server", "Data {}", "event started");
-                        EventStage = EVENT_STAGE_INTRO;
-                        instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
-                        me->SetInCombatWithZone();
-                        IntroRP();
-                    }
-                    else if (PeonKilledCount >= 4)
-                    {
-                        scheduler.CancelGroup(GROUP_RP);
-                        LOG_ERROR("server", "Data {}", "all peons dead");
-                        events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
-                        instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
-                        me->SetInCombatWithZone();
-                        scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
-                        {
-                            if (me->HealthBelowPct(90))
-                            {
-                                DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
-                            }
-                            context.Repeat();
-                        }).Schedule(8100ms, 17300ms, [this](TaskContext context)
-                        {
-                            DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
-                            context.Repeat(8450ms, 9450ms);
-                        }).Schedule(10950ms, 21850ms, [this](TaskContext context)
-                        {
-                            DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
-                            context.Repeat(1200ms, 23900ms);
-                        }).Schedule(1s, [this](TaskContext context)
-                        {
-                            if (me->HealthBelowPct(25))
-                            {
-                                DoCastSelf(SPELL_DARK_SPIN);
-                            }
-                            else
-                            {
-                                context.Repeat();
-                            }
-                        });
-                    }
-                    if (EventStage < EVENT_STAGE_MAIN)
-                        return;
+                        DoAction(ACTION_CANCEL_INTRO);
                     break;
             }
         }
-
+        
         void AttackStart(Unit* who) override
         {
             if (EventStage < EVENT_STAGE_MAIN)
@@ -222,9 +175,34 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             _JustEngagedWith();
-
             Talk(SAY_INTRO_2);
             LOG_ERROR("server", "Data {}", "combat start");
+            scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+            {
+                if (me->HealthBelowPct(90))
+                {
+                    DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
+                }
+                context.Repeat();
+            }).Schedule(8100ms, 17300ms, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
+                context.Repeat(8450ms, 9450ms);
+            }).Schedule(10950ms, 21850ms, [this](TaskContext context)
+            {
+                DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
+                context.Repeat(1200ms, 23900ms);
+            }).Schedule(1s, [this](TaskContext context)
+            {
+                if (me->HealthBelowPct(25))
+                {
+                    DoCastSelf(SPELL_DARK_SPIN);
+                }
+                else
+                {
+                    context.Repeat();
+                }
+            });
         }
 
         void CastRandomPeonSpell()
@@ -253,6 +231,33 @@ public:
         void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_CANCEL_INTRO)
+            {
+                introDone = true;
+                scheduler.CancelGroup(GROUP_RP);
+                LOG_ERROR("server", "Data {}", "intro done - all peons dead");
+                events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
+                instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
+                me->SetInCombatWithZone();
+                return;
+            }
+
+            if (action != ACTION_START_INTRO)
+            {
+                return;
+            }
+
+            events2.ScheduleEvent(EVENT_INTRO, 90000);
+            Talk(SAY_INTRO);
+            LOG_ERROR("server", "Data {}", "event started");
+            EventStage = EVENT_STAGE_INTRO;
+            instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
+            me->SetInCombatWithZone();
+            IntroRP();
         }
 
         void UpdateAI(uint32 diff) override
@@ -291,7 +296,9 @@ public:
         uint8 PeonEngagedCount = 0;
         uint8 PeonKilledCount = 0;
         uint8 EventStage;
+        bool introDone;
     };
+    
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -377,11 +384,15 @@ class at_rp_nethekurse : public AreaTriggerScript
         if (InstanceScript* instance = player->GetInstanceScript())
         {
             LOG_ERROR("server", "Data {}", "AT Nethekurse reached by non-GM");
-            if (Creature* nethekurse = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_NETHEKURSE)))
+            if (instance->GetBossState(DATA_NETHEKURSE) == DONE)
             {
-                LOG_ERROR("server", "Data {}", "room breached set");
-                nethekurse->AI()->SetData(SETDATA_ROOM_BREACHED, SETDATA_ROOM_BREACHED);
+                return false;
             }
+            if (Creature* nethekurse = instance->GetCreature(DATA_NETHEKURSE))
+            {
+                LOG_ERROR("server", "Data {}", "AT Nethekurse action started");
+                nethekurse->AI()->DoAction(ACTION_START_INTRO);
+            }           
 
             return true;
         }
