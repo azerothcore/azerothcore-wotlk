@@ -53,7 +53,8 @@ enum eGrandWarlockNethekurse
 
     SETDATA_DATA               = 1,
     SETDATA_PEON_AGGRO         = 1,
-    SETDATA_PEON_DEATH         = 2
+    SETDATA_PEON_DEATH         = 2,
+    SETDATA_ROOM_BREACHED      = 3
 };
 
 enum Creatures
@@ -133,10 +134,58 @@ public:
                             me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
                             Talk(SAY_PEON_DIES);
                         });
-                        scheduler.DelayGroup(GROUP_RP, 5550ms);
                     }
                     if (++PeonKilledCount == 4)
                         events2.ScheduleEvent(EVENT_START_ATTACK, 5000);
+                    break;
+                case SETDATA_ROOM_BREACHED:
+                    LOG_ERROR("server", "Data {}", "switch room breached");
+                    if (EventStage == EVENT_STAGE_NONE && PeonKilledCount < 4)
+                    {
+                        events2.ScheduleEvent(EVENT_INTRO, 90000);
+                        Talk(SAY_INTRO);
+                        LOG_ERROR("server", "Data {}", "event started");
+                        EventStage = EVENT_STAGE_INTRO;
+                        instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
+                        me->SetInCombatWithZone();
+                        IntroRP();
+                    }
+                    else if (PeonKilledCount >= 4)
+                    {
+                        scheduler.CancelGroup(GROUP_RP);
+                        LOG_ERROR("server", "Data {}", "all peons dead");
+                        events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
+                        instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
+                        me->SetInCombatWithZone();
+                        scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+                        {
+                            if (me->HealthBelowPct(90))
+                            {
+                                DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
+                            }
+                            context.Repeat();
+                        }).Schedule(8100ms, 17300ms, [this](TaskContext context)
+                        {
+                            DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
+                            context.Repeat(8450ms, 9450ms);
+                        }).Schedule(10950ms, 21850ms, [this](TaskContext context)
+                        {
+                            DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
+                            context.Repeat(1200ms, 23900ms);
+                        }).Schedule(1s, [this](TaskContext context)
+                        {
+                            if (me->HealthBelowPct(25))
+                            {
+                                DoCastSelf(SPELL_DARK_SPIN);
+                            }
+                            else
+                            {
+                                context.Repeat();
+                            }
+                        });
+                    }
+                    if (EventStage < EVENT_STAGE_MAIN)
+                        return;
                     break;
             }
         }
@@ -152,64 +201,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (me->GetAreaId() == 4347)
-            {
-                if (who->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
-                if (EventStage == EVENT_STAGE_NONE && PeonKilledCount < 4)
-                {
-                    events2.ScheduleEvent(EVENT_INTRO, 90000);
-                    Talk(SAY_INTRO);
-                    LOG_ERROR("server", "Data {}", "event started");
-                    EventStage = EVENT_STAGE_INTRO;
-                    instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
-                    me->SetInCombatWithZone();
-                    IntroRP();
-                }
-                else if (PeonKilledCount >= 4)
-                {
-                    scheduler.CancelGroup(GROUP_RP);
-                    LOG_ERROR("server", "Data {}", "all peons dead");
-                    events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
-                    instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
-                    me->SetInCombatWithZone();
-                    scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
-                    {
-                        if (me->HealthBelowPct(90))
-                        {
-                            DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
-                        }
-                        context.Repeat();
-                    }).Schedule(8100ms, 17300ms, [this](TaskContext context)
-                    {
-                        DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
-                        context.Repeat(8450ms, 9450ms);
-                    }).Schedule(10950ms, 21850ms, [this](TaskContext context)
-                    {
-                        DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
-                        context.Repeat(1200ms, 23900ms);
-                    }).Schedule(1s, [this](TaskContext context)
-                    {
-                        if (me->HealthBelowPct(25))
-                        {
-                            DoCastSelf(SPELL_DARK_SPIN);
-                        }
-                        else
-                        {
-                            context.Repeat();
-                        }
-                    });
-                }
-            }
-
-            if (EventStage < EVENT_STAGE_MAIN)
-                return;
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
+        void MoveInLineOfSight(Unit* who) override { }
 
         void IntroRP()
         {
@@ -221,7 +213,6 @@ public:
                 CastRandomPeonSpell();
                 context.Repeat(19400ms, 31500ms);
             });
-            
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -367,9 +358,36 @@ public:
     }
 };
 
+class at_rp_nethekurse : public AreaTriggerScript
+{
+    public:
+    at_rp_nethekurse() : AreaTriggerScript
+    ("at_rp_nethekurse") { }
+
+    bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    {
+        if (player->IsGameMaster())
+        {
+            return false;
+        }
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            LOG_ERROR("server", "Data {}", "AT Nethekurse reached by non-GM");
+            if (Creature* nethekurse = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_NETHEKURSE)))
+            {
+                nethekurse->AI()->SetData(SETDATA_ROOM_BREACHED, SETDATA_ROOM_BREACHED);
+            }
+
+            return true;
+        }
+        return false;
+    }
+};
+
 void AddSC_boss_grand_warlock_nethekurse()
 {
     new boss_grand_warlock_nethekurse();
     new spell_tsh_shadow_sear();
     new spell_tsh_shadow_bolt();
+    new at_rp_nethekurse();
 }
