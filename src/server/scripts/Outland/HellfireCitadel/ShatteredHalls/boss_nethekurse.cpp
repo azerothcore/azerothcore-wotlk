@@ -133,13 +133,8 @@ public:
 
                     if (EventStage < EVENT_STAGE_TAUNT)
                     {
-                        me->GetMotionMaster()->Clear();
-                        me->SetFacingTo(4.572762489318847656f);
-                        scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
-                        {
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
-                            Talk(SAY_PEON_DIES);
-                        });
+                        PeonDieRP();
+                        //peon dies placeholder
                     }
                     if (++PeonKilledCount == 4)
                         DoAction(ACTION_CANCEL_INTRO);
@@ -147,6 +142,17 @@ public:
             }
         }
         
+        void PeonDieRP()
+        {
+            me->GetMotionMaster()->Clear();
+            me->SetFacingTo(4.572762489318847656f);
+            scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+            {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
+                Talk(SAY_PEON_DIES);
+            });
+        }
+
         void AttackStart(Unit* who) override
         {
             if (EventStage < EVENT_STAGE_MAIN)
@@ -175,34 +181,6 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             _JustEngagedWith();
-            Talk(SAY_INTRO_2);
-            LOG_ERROR("server", "Data {}", "combat start");
-            scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
-            {
-                if (me->HealthBelowPct(90))
-                {
-                    DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
-                }
-                context.Repeat();
-            }).Schedule(8100ms, 17300ms, [this](TaskContext context)
-            {
-                DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
-                context.Repeat(8450ms, 9450ms);
-            }).Schedule(10950ms, 21850ms, [this](TaskContext context)
-            {
-                DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
-                context.Repeat(1200ms, 23900ms);
-            }).Schedule(1s, [this](TaskContext context)
-            {
-                if (me->HealthBelowPct(25))
-                {
-                    DoCastSelf(SPELL_DARK_SPIN);
-                }
-                else
-                {
-                    context.Repeat();
-                }
-            });
         }
 
         void CastRandomPeonSpell()
@@ -243,6 +221,34 @@ public:
                 events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
                 instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                 me->SetInCombatWithZone();
+                Talk(SAY_INTRO_2);
+                LOG_ERROR("server", "Data {}", "combat start");
+                scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+                {
+                    if (me->HealthBelowPct(90))
+                    {
+                        DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
+                    }
+                    context.Repeat();
+                }).Schedule(8100ms, 17300ms, [this](TaskContext context)
+                {
+                    DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
+                    context.Repeat(8450ms, 9450ms);
+                }).Schedule(10950ms, 21850ms, [this](TaskContext context)
+                {
+                    DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
+                    context.Repeat(1200ms, 23900ms);
+                }).Schedule(1s, [this](TaskContext context)
+                {
+                    if (me->HealthBelowPct(25))
+                    {
+                        DoCastSelf(SPELL_DARK_SPIN);
+                    }
+                    else
+                    {
+                        context.Repeat();
+                    }
+                });
                 return;
             }
 
