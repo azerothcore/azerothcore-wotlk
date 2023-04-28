@@ -82,6 +82,8 @@ public:
                         TeamIdInInstance = player->GetTeamId();
             }
 
+            
+
             switch (creature->GetEntry())
             {
                 case NPC_WARCHIEF_KARGATH:
@@ -108,6 +110,7 @@ public:
                     prisonerGUID[2] = creature->GetGUID();
                     break;
             }
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
