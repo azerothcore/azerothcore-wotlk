@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS `chrraces_dbc`; 
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
 -- Server version:               8.0.29 - MySQL Community Server - GPL
