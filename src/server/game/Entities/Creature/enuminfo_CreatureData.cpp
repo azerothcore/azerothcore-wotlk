@@ -58,7 +58,7 @@ AC_API_EXPORT EnumText EnumUtils<CreatureFlagsExtra>::ToString(CreatureFlagsExtr
         case CREATURE_FLAG_EXTRA_MODULE: return { "CREATURE_FLAG_EXTRA_MODULE", "CREATURE_FLAG_EXTRA_MODULE", "Used by module creatures to avoid blizzlike checks." };
         case CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE: return { "CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE", "Creature does not call for assistance on initial aggro", "" };
         case CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI: return { "CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI", "Creature entry SAI won't be overriden by GUID SAI", "" };
-        case CREATURE_FLAG_EXTRA_NPCBOT_PET: return { "CREATURE_FLAG_EXTRA_NPCBOT_PET", "CREATURE_FLAG_EXTRA_NPCBOT_PET", "creature is a NPCBot's pet" };
+        case CREATURE_FLAG_EXTRA_UNUSED_28: return { "CREATURE_FLAG_EXTRA_UNUSED_28", "CREATURE_FLAG_EXTRA_UNUSED_28", "" };
         case CREATURE_FLAG_EXTRA_DUNGEON_BOSS: return { "CREATURE_FLAG_EXTRA_DUNGEON_BOSS", "CREATURE_FLAG_EXTRA_DUNGEON_BOSS", "creature is a dungeon boss (SET DYNAMICALLY, DO NOT ADD IN DB)" };
         case CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING: return { "CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING", "CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING", "creature ignore pathfinding" };
         case CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK: return { "CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK", "CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK", "creature is immune to knockback effects" };
@@ -102,7 +102,7 @@ AC_API_EXPORT CreatureFlagsExtra EnumUtils<CreatureFlagsExtra>::FromIndex(size_t
         case 24: return CREATURE_FLAG_EXTRA_MODULE;
         case 25: return CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE;
         case 26: return CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI;
-        case 27: return CREATURE_FLAG_EXTRA_NPCBOT_PET;
+        case 27: return CREATURE_FLAG_EXTRA_UNUSED_28;
         case 28: return CREATURE_FLAG_EXTRA_DUNGEON_BOSS;
         case 29: return CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING;
         case 30: return CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK;
@@ -143,7 +143,7 @@ AC_API_EXPORT size_t EnumUtils<CreatureFlagsExtra>::ToIndex(CreatureFlagsExtra v
         case CREATURE_FLAG_EXTRA_MODULE: return 24;
         case CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE: return 25;
         case CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI: return 26;
-        case CREATURE_FLAG_EXTRA_NPCBOT_PET: return 27;
+        case CREATURE_FLAG_EXTRA_UNUSED_28: return 27;
         case CREATURE_FLAG_EXTRA_DUNGEON_BOSS: return 28;
         case CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING: return 29;
         case CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK: return 30;

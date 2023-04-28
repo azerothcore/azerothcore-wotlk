@@ -215,7 +215,7 @@ public:
 
         //npcbot
         CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(id);
-        if (cinfo && ((cinfo->flags_extra & CREATURE_FLAG_EXTRA_NPCBOT) || (cinfo->flags_extra & CREATURE_FLAG_EXTRA_NPCBOT_PET)))
+        if (cinfo && cinfo->IsNPCBotOrPet())
         {
             handler->PSendSysMessage("You tried to spawn creature %u, which is part of NPCBots mod. To spawn bots use '.npcbot spawn' instead.", uint32(id));
             handler->SetSentErrorMessage(true);
@@ -777,7 +777,7 @@ public:
         //npcbot
         CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(creature->GetEntry());
         ASSERT(ct);
-        if ((ct->flags_extra & (CREATURE_FLAG_EXTRA_NPCBOT | CREATURE_FLAG_EXTRA_NPCBOT_PET)) != 0)
+        if (ct->IsNPCBotOrPet())
         {
             handler->PSendSysMessage("creature %u (id %u) is a part of NPCBots mod. Use '.npcbot move' instead", lowguid, creature->GetEntry());
             handler->SetSentErrorMessage(true);
