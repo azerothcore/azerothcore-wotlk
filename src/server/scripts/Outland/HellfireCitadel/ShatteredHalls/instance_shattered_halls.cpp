@@ -20,6 +20,12 @@
 #include "ScriptMgr.h"
 #include "shattered_halls.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_GRAND_WARLOCK_NETHEKURSE  , DATA_NETHEKURSE     },
+    { NPC_WARCHIEF_KARGATH          , DATA_KARGATH        }
+};
+
 class instance_shattered_halls : public InstanceMapScript
 {
 public:
