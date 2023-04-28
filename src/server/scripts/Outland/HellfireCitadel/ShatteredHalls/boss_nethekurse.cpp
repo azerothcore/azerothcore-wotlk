@@ -384,10 +384,6 @@ class at_rp_nethekurse : public AreaTriggerScript
         if (InstanceScript* instance = player->GetInstanceScript())
         {
             LOG_ERROR("server", "Data {}", "AT Nethekurse reached by non-GM");
-            if (instance->GetBossState(DATA_NETHEKURSE) == DONE)
-            {
-                return false;
-            }
             if (Creature* nethekurse = instance->GetCreature(DATA_NETHEKURSE))
             {
                 LOG_ERROR("server", "Data {}", "AT Nethekurse action started");
