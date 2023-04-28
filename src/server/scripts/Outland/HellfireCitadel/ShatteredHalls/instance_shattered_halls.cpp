@@ -86,6 +86,9 @@ public:
                 case NPC_WARCHIEF_KARGATH:
                     warchiefKargathGUID = creature->GetGUID();
                     break;
+                case NPC_GRAND_WARLOCK_NETHEKURSE:
+                    grandWarlockNethekurseGUID = creature->GetGUID();
+                    break;
                 case NPC_SHATTERED_EXECUTIONER:
                     if (RescueTimer > 25 * MINUTE * IN_MILLISECONDS)
                         creature->AddLootMode(2);
@@ -204,6 +207,7 @@ public:
 
     protected:
         ObjectGuid warchiefKargathGUID;
+        ObjectGuid grandWarlockNethekurseGUID;
         ObjectGuid nethekurseDoor1GUID;
         ObjectGuid nethekurseDoor2GUID;
 
