@@ -388,7 +388,7 @@ class at_rp_nethekurse : public AreaTriggerScript
             if (instance->GetBossState(DATA_NETHEKURSE) != DONE)
             {
                 LOG_ERROR("server", "Data {}", "boss not completed");
-                if (Creature* nethekurse = instance->GetCreature(DATA_NETHEKURSE))
+                if (Creature* nethekurse = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_NETHEKURSE)))
                 {
                     LOG_ERROR("server", "Data {}", "AT Nethekurse action started");
                     nethekurse->AI()->DoAction(ACTION_START_INTRO);
@@ -398,6 +398,7 @@ class at_rp_nethekurse : public AreaTriggerScript
         return false;
     }
 };
+
 
 void AddSC_boss_grand_warlock_nethekurse()
 {
