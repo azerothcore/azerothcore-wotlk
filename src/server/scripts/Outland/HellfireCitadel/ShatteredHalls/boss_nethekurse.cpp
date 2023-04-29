@@ -284,6 +284,7 @@ public:
                     EventStage = EVENT_STAGE_MAIN;
                     if (Unit* target = me->SelectNearestPlayer(50.0f))
                         AttackStart(target);
+                    DoAction(ACTION_CANCEL_INTRO);
                     return;
                 }
             }
@@ -383,7 +384,7 @@ class at_rp_nethekurse : public AreaTriggerScript
 
     bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
-        LOG_ERROR("server", "Data {}", "AT Nethekurse reached by non-GM");
+        LOG_ERROR("server", "Data {}", "AT Nethekurse reached");
         if (player->IsGameMaster())
         {
             return false;
