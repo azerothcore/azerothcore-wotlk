@@ -153,21 +153,15 @@ struct boss_grandmaster_vorpil : public BossAI
             context.Repeat();
         }).Schedule(36400ms, [this](TaskContext context)
         {
-            DoCastSelf(SPELL_DRAW_SHADOWS, true);
-
-            me->GetMap()->DoForAllPlayers([&](Player* player)
-            {
-                if (player->IsAlive() && !player->HasAura(SPELL_BANISH))
-                {
-                    player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
-                }
-            });
+            DoCastAOE(SPELL_DRAW_SHADOWS, true);
 
             me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
+            me->GetMotionMaster()->Clear();
 
             scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
                 DoCastSelf(SPELL_RAIN_OF_FIRE);
+                me->ResumeChasingVictim();
             });
 
             context.Repeat(36400ms, 44950ms);
@@ -202,52 +196,59 @@ struct npc_voidtraveler : public ScriptedAI
 {
     npc_voidtraveler(Creature* creature) : ScriptedAI(creature) {}
 
-    ObjectGuid VorpilGUID;
-    uint32 moveTimer;
-    bool sacrificed;
-
     void Reset() override
     {
-        moveTimer = 1000;
-        sacrificed = false;
-    }
+        if (TempSummon* summon = me->ToTempSummon())
+        {
+            if (Unit* vorpil = summon->GetSummonerUnit())
+            {
+                me->GetMotionMaster()->MoveFollow(vorpil, 0.0f, 0.0f);
+            }
+        }
 
-    void SetGUID(ObjectGuid guid, int32) override
-    {
-        VorpilGUID = guid;
+        _scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (TempSummon* summon = me->ToTempSummon())
+            {
+                if (Unit* vorpil = summon->GetSummonerUnit())
+                {
+                    if (me->IsWithinCombatRange(vorpil, 3.0f))
+                    {
+                        DoCastSelf(SPELL_SACRIFICE);
+                        _scheduler.Schedule(1200ms, [this](TaskContext /*context*/)
+                        {
+                            if (TempSummon* summon = me->ToTempSummon())
+                            {
+                                if (Unit* vorpil = summon->GetSummonerUnit())
+                                {
+                                    DoCastAOE(SPELL_SHADOW_NOVA, true);
+                                    me->CastSpell(vorpil, SPELL_EMPOWERING_SHADOWS, true, nullptr, nullptr, vorpil->GetGUID());
+                                    vorpil->ModifyHealth(int32(vorpil->CountPctFromMaxHealth(4)));
+                                }
+                            }
+
+                            _scheduler.Schedule(100ms, [this](TaskContext /*context*/)
+                            {
+                                me->KillSelf();
+                            });
+                        });
+                    }
+                    else
+                    {
+                        context.Repeat();
+                    }
+                }
+            }
+        });
     }
 
     void UpdateAI(uint32 diff) override
     {
-        moveTimer += diff;
-        if (moveTimer >= 1000)
-        {
-            moveTimer = 0;
-            Creature* Vorpil = ObjectAccessor::GetCreature(*me, VorpilGUID);
-            if (!Vorpil)
-            {
-                me->DespawnOrUnsummon();
-                return;
-            }
-            me->GetMotionMaster()->MoveFollow(Vorpil, 0.0f, 0.0f);
-
-            if (sacrificed)
-            {
-                Vorpil->AI()->DoCastSelf(SPELL_EMPOWERING_SHADOWS, true);
-                Vorpil->ModifyHealth(int32(Vorpil->CountPctFromMaxHealth(4)));
-                DoCastAOE(SPELL_SHADOW_NOVA, true);
-                me->KillSelf();
-                return;
-            }
-
-            if (me->IsWithinDist(Vorpil, 3.0f))
-            {
-                DoCastSelf(SPELL_SACRIFICE);
-                sacrificed = true;
-                moveTimer = 500;
-            }
-        }
+        _scheduler.Update(diff);
     }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 void AddSC_boss_grandmaster_vorpil()
