@@ -1,3 +1,4 @@
+-- DB update 2023_04_27_02 -> 2023_04_29_00
 DROP TABLE IF EXISTS `lfgdungeons_dbc`; 
 CREATE TABLE `lfgdungeons_dbc` ( 
 `ID` INT NOT NULL DEFAULT '0', 
