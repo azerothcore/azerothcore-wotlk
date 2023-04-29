@@ -3643,7 +3643,7 @@ class spell_item_recall : public SpellScript
         }
 
         TeamId bgTeam = player->GetBgTeamId();
-        if (player->GetTeamId() != bgTeam)
+        if (player->GetTeamId(true) != bgTeam)
         {
             if (SpellTargetPosition const* recallSpellTarget = sSpellMgr->GetSpellTargetPosition(bgTeam == TEAM_HORDE ? SPELL_RECALL_HORDE : SPELL_RECALL_ALLIANCE, EFFECT_0))
             {
