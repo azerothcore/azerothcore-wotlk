@@ -69,3 +69,5 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 UPDATE `creature_template_addon` SET `auras` = '8876' WHERE (`entry` = 17397);
 
 UPDATE `creature_addon` SET `auras` = '30991' WHERE (`guid` IN (138193, 138237));
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1739500, 1739501));
