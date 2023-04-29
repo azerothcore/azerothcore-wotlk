@@ -393,7 +393,7 @@ public: // pussywizard: public class Member
     }
     inline Member* GetMember(std::string_view name)
     {
-        for (auto & m_member : m_members)
+        for (auto& m_member : m_members)
             if (m_member.second.GetName() == name)
                 return &m_member.second;
 

@@ -42,9 +42,12 @@ enum slNPCandGO
     NPC_CABAL_RITUALIST         = 18794,
     NPC_HELLMAW                 = 18731,
 
-    REFECTORY_DOOR              = 183296,                     //door opened when blackheart the inciter dies
-    SCREAMING_HALL_DOOR         = 183295                      //door opened when grandmaster vorpil dies
+    GO_REFECTORY_DOOR           = 183296,                     //door opened when blackheart the inciter dies
+    GO_SCREAMING_HALL_DOOR      = 183295                      //door opened when grandmaster vorpil dies
 };
+
+uint32 constexpr EncounterCount = 4;
+uint32 constexpr PersistentDataCount = 1;
 
 template <class AI, class T>
 inline AI* GetShadowLabyrinthAI(T* obj)

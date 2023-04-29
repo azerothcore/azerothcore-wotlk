@@ -2310,12 +2310,12 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         return EQUIP_ERR_ITEM_NOT_FOUND;
     }
 
-    if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && GetTeamId(true) != TEAM_HORDE)
+    if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && GetTeamId() != TEAM_HORDE)
     {
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
     }
 
-    if ((proto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && GetTeamId(true) != TEAM_ALLIANCE)
+    if ((proto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && GetTeamId() != TEAM_ALLIANCE)
     {
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
     }
@@ -4954,8 +4954,8 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, "
     // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69
     //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles,
-    // 70          71               72
-    //"actionBars, grantableLevels, innTriggerId FROM characters WHERE guid = '{}'", guid);
+    // 70          71               72            73
+    //"actionBars, grantableLevels, innTriggerId, extraBonusTalentCount FROM characters WHERE guid = '{}'", guid);
     PreparedQueryResult result = holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_FROM);
 
     if (!result)
@@ -5076,7 +5076,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     //Need to call it to initialize m_team (m_team can be calculated from race)
     //Other way is to saves m_team into characters table.
-    SetFactionForRace(getRace(true));
+    SetFactionForRace(getRace());
 
     // pussywizard: create empty instance bind containers if necessary
     sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(playerGuid);
@@ -5249,7 +5249,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     else if (!taxi_nodes.empty())
     {
         instanceId = 0;
-        if (!m_taxi.LoadTaxiDestinationsFromString(taxi_nodes, GetTeamId(true)))
+        if (!m_taxi.LoadTaxiDestinationsFromString(taxi_nodes, GetTeamId()))
         {
             // xinef: could no load valid data for taxi, relocate to homebind and clear
             m_taxi.ClearTaxiDestinations();
@@ -5311,7 +5311,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         map = sMapMgr->CreateMap(mapId, this);
         if (!map)
         {
-            PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
+            PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
             mapId = info->mapId;
             Relocate(info->positionX, info->positionY, info->positionZ, 0.0f);
             LOG_ERROR("entities.player", "Player (guidlow {}) have invalid coordinates (X: {} Y: {} Z: {} O: {}). Teleport to default race/class locations.", guid, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
@@ -5473,7 +5473,10 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     _LoadMonthlyQuestStatus(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS));
     _LoadRandomBGStatus(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_RANDOM_BG));
 
-    // after spell and quest load
+    // Extra Bonus Talent Points
+    m_extraBonusTalentCount = fields[73].Get<uint8>();
+
+    // after spell, bonus talents, and quest load
     InitTalentForLevel();
 
     // must be before inventory (some items required reputation check)
@@ -6777,7 +6780,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 missingItems = &missingLeaderItems;
             }
 
-            if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == checkPlayer->GetTeamId(true))
+            if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == checkPlayer->GetTeamId())
             {
                 if (!checkPlayer->HasItemCount(itemRequirement->id, 1))
                 {
@@ -6799,7 +6802,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 missingAchievements = &missingLeaderAchievements;
             }
 
-            if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == GetTeamId(true))
+            if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == GetTeamId())
             {
                 if (!checkPlayer || !checkPlayer->HasAchieved(achievementRequirement->id))
                 {
@@ -6821,7 +6824,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 missingQuests = &missingLeaderQuests;
             }
 
-            if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == checkPlayer->GetTeamId(true))
+            if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == checkPlayer->GetTeamId())
             {
                 if (!checkPlayer->GetQuestRewardStatus(questRequirement->id))
                 {
@@ -7002,7 +7005,7 @@ bool Player::CheckInstanceCount(uint32 instanceId) const
 
 bool Player::_LoadHomeBind(PreparedQueryResult result)
 {
-    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
+    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
     if (!info)
     {
         LOG_ERROR("entities.player", "Player (Name {}) has incorrect race/class pair. Can't be loaded.", GetName());

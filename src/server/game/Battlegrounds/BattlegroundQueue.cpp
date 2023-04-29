@@ -151,7 +151,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* group, Battle
     ginfo->JoinTime                     = GameTime::GetGameTimeMS().count();
     ginfo->RemoveInviteTime             = 0;
     ginfo->teamId                       = leader->GetTeamId();
-    ginfo->RealTeamID                   = leader->GetTeamId(true);
+    ginfo->RealTeamID                   = leader->GetTeamId();
     ginfo->ArenaTeamRating              = arenaRating;
     ginfo->ArenaMatchmakerRating        = matchmakerRating;
     ginfo->PreviousOpponentsTeamId      = opponentsArenaTeamId;

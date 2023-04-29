@@ -1356,6 +1356,9 @@ void World::LoadConfigSettings(bool reload)
     // Dungeon finder
     _int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 5);
 
+    // DBC_ItemAttributes
+    _bool_configs[CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES] = sConfigMgr->GetOption<bool>("DBC.EnforceItemAttributes", true);
+
     // Max instances per hour
     _int_configs[CONFIG_MAX_INSTANCES_PER_HOUR] = sConfigMgr->GetOption<int32>("AccountInstancesPerHour", 5);
 
@@ -1560,7 +1563,7 @@ void World::SetInitialWorldSettings()
     sIPLocation->Load();
 
     std::vector<uint32> mapIds;
-    for (auto const map : sMapStore)
+    for (auto const& map : sMapStore)
     {
         mapIds.emplace_back(map->MapID);
     }
@@ -2201,7 +2204,7 @@ void World::DetectDBCLang()
     uint8 default_locale = TOTAL_LOCALES;
     for (uint8 i = default_locale - 1; i < TOTAL_LOCALES; --i) // -1 will be 255 due to uint8
     {
-        if (race->name[i][0] != '\0')                     // check by race names
+        if (race->Name[i][0] != '\0')                     // check by race names
         {
             default_locale = i;
             _availableDbcLocaleMask |= (1 << i);

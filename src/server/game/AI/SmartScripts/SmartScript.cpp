@@ -584,7 +584,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (e.GetScriptType() == SMART_SCRIPT_TYPE_AREATRIGGER)
                 caster = unit->SummonTrigger(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetOrientation(), 5000);
 
-            if (e.action.cast.targetsLimit > 0 && targets.size() > e.action.cast.targetsLimit)
+            if (e.action.cast.targetsLimit)
                 Acore::Containers::RandomResize(targets, e.action.cast.targetsLimit);
 
             for (WorldObject* target : targets)
@@ -605,12 +605,27 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 else if (me && (!(e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || !target->ToUnit()->HasAura(e.action.cast.spell)))
                 {
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
+                    {
                         me->InterruptNonMeleeSpells(false);
+                    }
 
-                    // Xinef: flag usable only if caster has max dist set
+                    TriggerCastFlags triggerFlags = TRIGGERED_NONE;
+                    if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
+                    {
+                        if (e.action.cast.triggerFlags)
+                        {
+                            triggerFlags = TriggerCastFlags(e.action.cast.triggerFlags);
+                        }
+                        else
+                        {
+                            triggerFlags = TRIGGERED_FULL_MASK;
+                        }
+                    }
+
+                    // Flag usable only if caster has max dist set.
                     if ((e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE) && GetCasterMaxDist() > 0.0f && me->GetMaxPower(GetCasterPowerType()) > 0)
                     {
-                        // Xinef: check mana case only and operate movement accordingly, LoS and range is checked in targetet movement generator
+                        // Check mana case only and operate movement accordingly, LoS and range is checked in targetet movement generator.
                         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.cast.spell);
                         int32 currentPower = me->GetPower(GetCasterPowerType());
 
@@ -626,10 +641,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         }
                     }
 
-                    me->CastSpell(target->ToUnit(), e.action.cast.spell, (e.action.cast.castFlags & SMARTCAST_TRIGGERED));
+                    me->CastSpell(target->ToUnit(), e.action.cast.spell, triggerFlags);
+                    LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_CAST: Unit {} casts spell {} on target {} with castflags {}",
+                              me->GetGUID().ToString().c_str(), e.action.cast.spell, target->GetGUID().ToString().c_str(), e.action.cast.castFlags);
+                }
+                else
+                {
+                    LOG_DEBUG("scripts.ai", "Spell {} not cast because it has flag SMARTCAST_AURA_NOT_PRESENT and the target {} already has the aura",
+                              e.action.cast.spell, target->GetGUID().ToString().c_str());
                 }
             }
-
             break;
         }
         case SMART_ACTION_SELF_CAST:
@@ -644,9 +665,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
             {
                 if (e.action.cast.triggerFlags)
+                {
                     triggerFlags = TriggerCastFlags(e.action.cast.triggerFlags);
+                }
                 else
+                {
                     triggerFlags = TRIGGERED_FULL_MASK;
+                }
             }
 
             for (WorldObject* target : targets)
@@ -658,7 +683,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (!(e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || !uTarget->HasAura(e.action.cast.spell))
                 {
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
+                    {
                         uTarget->InterruptNonMeleeSpells(false);
+                    }
 
                     uTarget->CastSpell(uTarget, e.action.cast.spell, triggerFlags);
                 }
@@ -667,7 +694,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_INVOKER_CAST:
         {
-            Unit* tempLastInvoker = GetLastInvoker(unit); // xinef: can be used for area triggers cast
+            // Can be used for area trigger cast
+            Unit* tempLastInvoker = GetLastInvoker(unit);
             if (!tempLastInvoker)
                 break;
 
@@ -685,12 +713,33 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (!(e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || !target->ToUnit()->HasAura(e.action.cast.spell))
                 {
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
+                    {
                         tempLastInvoker->InterruptNonMeleeSpells(false);
+                    }
 
-                    tempLastInvoker->CastSpell(target->ToUnit(), e.action.cast.spell, (e.action.cast.castFlags & SMARTCAST_TRIGGERED));
+                    TriggerCastFlags triggerFlags = TRIGGERED_NONE;
+                    if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
+                    {
+                        if (e.action.cast.triggerFlags)
+                        {
+                            triggerFlags = TriggerCastFlags(e.action.cast.triggerFlags);
+                        }
+                        else
+                        {
+                            triggerFlags = TRIGGERED_FULL_MASK;
+                        }
+                    }
+
+                    tempLastInvoker->CastSpell(target->ToUnit(), e.action.cast.spell, triggerFlags);
+                    LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_INVOKER_CAST: Invoker {} casts spell {} on target {} with castflags {}",
+                              tempLastInvoker->GetGUID().ToString().c_str(), e.action.cast.spell, target->GetGUID().ToString().c_str(), e.action.cast.castFlags);
+                }
+                else
+                {
+                    LOG_DEBUG("scripts.ai", "Spell {} not cast because it has flag SMARTCAST_AURA_NOT_PRESENT and the target {} already has the aura",
+                              e.action.cast.spell, target->GetGUID().ToString().c_str());
                 }
             }
-
             break;
         }
         case SMART_ACTION_ADD_AURA:
@@ -2497,7 +2546,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (IsUnit(target))
                 {
                     if (e.action.castCustom.flags & SMARTCAST_INTERRUPT_PREVIOUS)
+                    {
                         me->InterruptNonMeleeSpells(false);
+                    }
 
                     if (e.action.castCustom.flags & SMARTCAST_COMBAT_MOVE)
                     {
@@ -4179,7 +4230,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         // delay spell cast event if another spell is being casted
         if (e.GetActionType() == SMART_ACTION_CAST)
         {
-            if (!(e.action.cast.castFlags & (SMARTCAST_INTERRUPT_PREVIOUS | SMARTCAST_TRIGGERED)))
+            if (!(e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS))
             {
                 if (me && me->HasUnitState(UNIT_STATE_CASTING))
                 {

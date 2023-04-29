@@ -1388,7 +1388,7 @@ void Guild::HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string_v
         rankInfo->SetRights(rights);
         _SetRankBankMoneyPerDay(rankId, moneyPerDay);
 
-        for (auto rightsAndSlot : rightsAndSlots)
+        for (auto& rightsAndSlot : rightsAndSlots)
             _SetRankBankTabRightsAndSlots(rankId, rightsAndSlot);
 
         _BroadcastEvent(GE_RANK_UPDATED, ObjectGuid::Empty, std::to_string(rankId), rankInfo->GetName(), std::to_string(m_ranks.size()));
@@ -1441,7 +1441,7 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
     if (pInvitee->GetSocial()->HasIgnore(player->GetGUID()))
         return;
 
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && pInvitee->GetTeamId(true) != player->GetTeamId(true))
+    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && pInvitee->GetTeamId() != player->GetTeamId())
     {
         SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_NOT_ALLIED, name);
         return;
@@ -2382,7 +2382,7 @@ void Guild::_CreateNewBankTab()
     trans->Append(stmt);
 
     ++tabId;
-    for (auto & m_rank : m_ranks)
+    for (auto& m_rank : m_ranks)
         m_rank.CreateMissingTabsIfNeeded(tabId, trans, false);
 
     CharacterDatabase.CommitTransaction(trans);

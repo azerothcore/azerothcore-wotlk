@@ -17,17 +17,16 @@
 -- Dumping structure for table acore_world.creature_model_info
 DROP TABLE IF EXISTS `creature_model_info`;
 CREATE TABLE IF NOT EXISTS `creature_model_info` (
-  `DisplayID` mediumint unsigned NOT NULL DEFAULT '0',
+  `DisplayID` int unsigned NOT NULL DEFAULT '0',
   `BoundingRadius` float NOT NULL DEFAULT '0',
   `CombatReach` float NOT NULL DEFAULT '0',
   `Gender` tinyint unsigned NOT NULL DEFAULT '2',
-  `DisplayID_Other_Gender` mediumint unsigned NOT NULL DEFAULT '0',
+  `DisplayID_Other_Gender` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`DisplayID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Creature System (Model related info)';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Creature System (Model related info)';
 
--- Dumping data for table acore_world.creature_model_info: 24,143 rows
+-- Dumping data for table acore_world.creature_model_info: ~23,729 rows (approximately)
 DELETE FROM `creature_model_info`;
-/*!40000 ALTER TABLE `creature_model_info` DISABLE KEYS */;
 INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `Gender`, `DisplayID_Other_Gender`) VALUES
 	(4, 2, 3, 2, 0),
 	(13, 0, 0, 2, 0),
@@ -24174,7 +24173,6 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(32179, 1.75, 12.25, 0, 0),
 	(32670, 0.09, 0, 2, 0),
 	(32754, 1.25, 6.25, 2, 0);
-/*!40000 ALTER TABLE `creature_model_info` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -670,6 +670,13 @@ struct ChrClassesEntry
     uint32  expansion;                                      // 59 (0 - original race, 1 - tbc addon, ...)
 };
 
+enum ChrRacesAllianceType
+{
+    CHRRACES_ALLIANCE_TYPE_ALLIANCE = 0,
+    CHRRACES_ALLIANCE_TYPE_HORDE = 1,
+    CHRRACES_ALLIANCE_TYPE_NOT_PLAYABLE = 2,
+};
+
 enum ChrRacesFlags
 {
     CHRRACES_FLAGS_NOT_PLAYABLE = 0x01,
@@ -679,25 +686,29 @@ enum ChrRacesFlags
 
 struct ChrRacesEntry
 {
-    uint32      RaceID;                                     // 0
-    uint32      Flags;                                      // 1
-    uint32      FactionID;                                  // 2 facton template id
-    // 3 unused
-    uint32      model_m;                                    // 4
-    uint32      model_f;                                    // 5
-    // 6 unused
-    uint32      TeamID;                                     // 7 (7-Alliance 1-Horde)
-    // 8-11 unused
-    uint32      CinematicSequence;                          // 12 id from CinematicSequences.dbc
-    //uint32    unk_322;                                    // 13 faction (0 alliance, 1 horde, 2 not available?)
-    char const*       name[16];                             // 14-29 used for DBC language detection/selection
-    // 30 string flags, unused
-    //char const*       nameFemale[16];                     // 31-46, if different from base (male) case
-    // 47 string flags, unused
-    //char const*       nameNeutralGender[16];              // 48-63, if different from base (male) case
-    // 64 string flags, unused
-    // 65-67 unused
-    uint32      expansion;                                  // 68 (0 - original race, 1 - tbc addon, ...)
+    uint32 ID;                                              // 0
+    uint32 Flags;                                           // 1
+    uint32 FactionID;                                       // 2
+    //uint32 ExplorationSoundID;                            // 3
+    uint32 MaleDisplayID;                                   // 4
+    uint32 FemaleDisplayID;                                 // 5
+    //char const* ClientPrefix;                             // 6
+    uint32 BaseLanguage;                                    // 7 (7-Alliance 1-Horde)
+    uint32 CreatureType;                                    // 8
+    uint32 ResSicknessSpellID;                              // 9
+    //uint32 SplashSoundID;                                 // 10
+    //char const* ClientFileString;                         // 11
+    uint32 CinematicSequenceID;                             // 12 ID from CinematicSequences.dbc
+    uint32 Alliance;                                        // 13
+    char const* Name[16];                                   // 14-29
+    //uint32 Name_lang_mask;                                // 30
+    //char const* NameFemale[16];                           // 31-46
+    //uint32 NameFemale_lang_mask;                          // 47
+    //char const* NameMale[16];                             // 48-63
+    //uint32 NameMale_lang_mask;                            // 64
+    //char const* FacialHairCustomization[2];               // 65-66
+    //char const* HairCustomization;                        // 67
+    uint32 RequiredExpansion;                               // 68
 
     inline bool HasFlag(ChrRacesFlags flag) const { return (Flags & flag) != 0; }
 };
@@ -1127,6 +1138,18 @@ struct HolidaysEntry
     uint32 Priority;                                        // 52       m_priority
     int32 CalendarFilterType;                               // 53       m_calendarFilterType (-1 = Fishing Contest, 0 = Unk, 1 = Darkmoon Festival, 2 = Yearly holiday)
     //uint32 flags;                                         // 54       m_flags (0 = Darkmoon Faire, Fishing Contest and Wotlk Launch, rest is 1)
+};
+
+struct ItemEntry
+{
+    uint32 ID;                                               // 0
+    uint32 ClassID;                                          // 1
+    uint32 SubclassID;                                       // 2
+    int32 SoundOverrideSubclassID;                           // 3
+    int32 Material;                                          // 4
+    uint32 DisplayInfoID;                                    // 5
+    uint32 InventoryType;                                    // 6
+    uint32 SheatheType;                                      // 7
 };
 
 struct ItemBagFamilyEntry

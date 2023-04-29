@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `character_achievement` (
   `achievement` smallint unsigned NOT NULL,
   `date` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`achievement`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.character_achievement: ~0 rows (approximately)
 DELETE FROM `character_achievement`;
