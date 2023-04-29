@@ -5104,13 +5104,17 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     target->PlayDistanceSound(11965);
                     break;
                 case 46354:                                     // Blood Elf Illusion
-                    // We change this to a if statement since workflow failed due to not having nuetral race as a part of the switch.
                     if (caster)
                     {
-                        if (caster->getGender() == GENDER_FEMALE)
-                            caster->CastSpell(target, 46356, true, nullptr, this);
-                        else
-                            caster->CastSpell(target, 46355, true, nullptr, this);
+                        switch (caster->getGender())
+                        {
+                            case GENDER_FEMALE:
+                                caster->CastSpell(target, 46356, true, nullptr, this);
+                                break;
+                            case GENDER_MALE:
+                                caster->CastSpell(target, 46355, true, nullptr, this);
+                                break;
+                        }
                     }
                     break;
                 case 46361:                                     // Reinforced Net

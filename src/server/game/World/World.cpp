@@ -2206,7 +2206,7 @@ void World::DetectDBCLang()
     uint8 default_locale = TOTAL_LOCALES;
     for (uint8 i = default_locale - 1; i < TOTAL_LOCALES; --i) // -1 will be 255 due to uint8
     {
-        if (race->Name[i][0] != '\0')                     // check by race names
+        if (race->name[i][0] != '\0')                     // check by race names
         {
             default_locale = i;
             _availableDbcLocaleMask |= (1 << i);
