@@ -212,7 +212,7 @@ struct npc_voidtraveler : public ScriptedAI
             {
                 if (Unit* vorpil = summon->GetSummonerUnit())
                 {
-                    if (me->IsWithinCombatRange(vorpil, 3.0f))
+                    if (me->IsWithinMeleeRange(vorpil))
                     {
                         DoCastSelf(SPELL_SACRIFICE);
                         _scheduler.Schedule(1200ms, [this](TaskContext /*context*/)
