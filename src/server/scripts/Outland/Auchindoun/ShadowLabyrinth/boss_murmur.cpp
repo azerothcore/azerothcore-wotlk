@@ -74,6 +74,8 @@ struct boss_murmur : public BossAI
 
     void CastSupressionOOC()
     {
+        me->m_Events.CancelEventGroup(GROUP_OOC_CAST);
+
         me->m_Events.AddEventAtOffset([this] {
             if (me->FindNearestCreature(NPC_CABAL_SPELLBINDER, 35.0f))
             {
@@ -125,8 +127,13 @@ struct boss_murmur : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
+        if (!who->IsInCombatWith(me))
+        {
+            return;
+        }
+
         _JustEngagedWith();
 
         scheduler.Schedule(28s, [this](TaskContext context)
