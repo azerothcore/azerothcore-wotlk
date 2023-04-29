@@ -1,3 +1,4 @@
+-- DB update 2023_04_29_01 -> 2023_04_29_02
 --
 
 DELETE FROM `creature` WHERE `guid` IN (125917, 125918, 125920, 125921) AND `id1` = 18766; -- Pool of Souls

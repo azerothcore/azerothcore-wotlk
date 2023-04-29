@@ -1,3 +1,4 @@
+-- DB update 2023_04_29_02 -> 2023_04_29_03
 --
 DELETE FROM `waypoints` WHERE `entry` = 1728000;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES 

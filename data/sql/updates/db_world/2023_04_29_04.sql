@@ -1,3 +1,4 @@
+-- DB update 2023_04_29_03 -> 2023_04_29_04
 -- Kidney Shot updates
 UPDATE `smart_scripts` SET `event_param1` = 6100, `event_param2` = 17200, `event_param3` = 20650, `event_param4` = 26950 WHERE (`entryorguid` = 17264) AND (`source_type` = 0) AND (`id` = 2); -- Bonechewer Ravener
 UPDATE `smart_scripts` SET `event_param1` = 5700, `event_param2` = 25050, `event_param3` = 15400, `event_param4` = 25050 WHERE (`entryorguid` = 17517) AND (`source_type` = 0) AND (`id` = 0); -- Hellfire Sentry

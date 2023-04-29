@@ -1,3 +1,4 @@
+-- DB update 2023_04_29_04 -> 2023_04_29_05
 --
 DELETE FROM `spell_area` WHERE `spell` = 57940 AND `area` IN (495,4277);
 INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status`) VALUES
