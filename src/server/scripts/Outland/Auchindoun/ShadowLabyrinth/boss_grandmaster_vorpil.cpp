@@ -28,8 +28,7 @@ enum GrandmasterVorpil
     SAY_SLAY                    = 3,
     SAY_DEATH                   = 4,
 
-    SPELL_RAIN_OF_FIRE_N        = 33617,
-    SPELL_RAIN_OF_FIRE_H        = 39363,
+    SPELL_RAIN_OF_FIRE          = 33617,
 
     SPELL_DRAW_SHADOWS          = 33563,
     SPELL_SHADOWBOLT_VOLLEY     = 33841,
@@ -38,8 +37,7 @@ enum GrandmasterVorpil
     NPC_VOID_TRAVELER           = 19226,
     SPELL_SACRIFICE             = 33587,
     SPELL_SHADOW_NOVA           = 33846,
-    SPELL_EMPOWERING_SHADOWS_N  = 33783,
-    SPELL_EMPOWERING_SHADOWS_H  = 39364,
+    SPELL_EMPOWERING_SHADOWS    = 33783,
 
     NPC_VOID_PORTAL             = 19224,
     SPELL_VOID_PORTAL_VISUAL    = 33569,
@@ -165,12 +163,13 @@ struct boss_grandmaster_vorpil : public BossAI
                 }
             });
 
+            me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
+
             scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
-                DoCastSelf(DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
+                DoCastSelf(SPELL_RAIN_OF_FIRE);
             });
 
-            me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
             context.Repeat(36400ms, 44950ms);
         }).Schedule(10900ms, [this](TaskContext context)
         {
@@ -234,7 +233,7 @@ struct npc_voidtraveler : public ScriptedAI
 
             if (sacrificed)
             {
-                Vorpil->AddAura(DUNGEON_MODE(SPELL_EMPOWERING_SHADOWS_N, SPELL_EMPOWERING_SHADOWS_H), Vorpil);
+                Vorpil->AI()->DoCastSelf(SPELL_EMPOWERING_SHADOWS, true);
                 Vorpil->ModifyHealth(int32(Vorpil->CountPctFromMaxHealth(4)));
                 DoCastAOE(SPELL_SHADOW_NOVA, true);
                 me->KillSelf();
