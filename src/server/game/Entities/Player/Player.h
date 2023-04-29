@@ -2056,9 +2056,9 @@ public:
     void CheckAreaExploreAndOutdoor();
 
     static TeamId TeamIdForRace(uint8 race);
-    [[nodiscard]] uint32 GetTeam() const { return m_team; }
-    [[nodiscard]] TeamId GetTeamId() const { return m_team == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE; }
+    [[nodiscard]] TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace(true)) : m_team; };
     void SetFactionForRace(uint8 race);
+    void setTeamId(TeamId teamid) { m_team = teamid; };
 
     void InitDisplayIds();
 
@@ -2709,7 +2709,7 @@ public:
     void outDebugValues() const;
     ObjectGuid m_lootGuid;
 
-    uint32 m_team;
+    TeamId m_team;
     uint32 m_nextSave; // pussywizard
     uint16 m_additionalSaveTimer; // pussywizard
     uint8 m_additionalSaveMask; // pussywizard

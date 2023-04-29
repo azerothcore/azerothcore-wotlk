@@ -1968,7 +1968,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
         // Spell::SendSpellCooldown() skips all spells with TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
         player->AddSpellAndCategoryCooldowns(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
 
-        if (player->GetTeamId() == TEAM_HORDE)
+        if (player->GetTeamId(true) == TEAM_HORDE)
         {
             if (GetSpellInfo()->Id == SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER)
             {
