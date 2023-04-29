@@ -3756,6 +3756,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].Effect = 0;
     });
 
+    // Magic Rooster
+    ApplySpellFix({ 65917 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx &= ~SPELL_ATTR0_ALLOW_WHILE_MOUNTED;
+    });
+
     // Titanium Seal of Dalaran, Toss your luck
     ApplySpellFix({ 60476 }, [](SpellInfo* spellInfo)
     {
