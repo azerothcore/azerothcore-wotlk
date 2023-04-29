@@ -141,7 +141,7 @@ public:
                     break;
             }
         }
-        
+
         void PeonDieRP()
         {
             me->GetMotionMaster()->Clear();
@@ -305,7 +305,6 @@ public:
         uint8 EventStage;
         bool introDone;
     };
-    
 
     CreatureAI* GetAI(Creature* creature) const override
     {

@@ -82,8 +82,6 @@ public:
                         TeamIdInInstance = player->GetTeamId();
             }
 
-            
-
             switch (creature->GetEntry())
             {
                 case NPC_WARCHIEF_KARGATH:
