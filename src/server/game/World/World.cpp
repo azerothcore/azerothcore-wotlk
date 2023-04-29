@@ -1356,6 +1356,9 @@ void World::LoadConfigSettings(bool reload)
     // Dungeon finder
     _int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 5);
 
+    // DBC_ItemAttributes
+    _bool_configs[CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES] = sConfigMgr->GetOption<bool>("DBC.EnforceItemAttributes", true);
+
     // Max instances per hour
     _int_configs[CONFIG_MAX_INSTANCES_PER_HOUR] = sConfigMgr->GetOption<int32>("AccountInstancesPerHour", 5);
 
@@ -2061,6 +2064,8 @@ void World::SetInitialWorldSettings()
 
     _mail_expire_check_timer = GameTime::GetGameTime() + 6h;
 
+    _timers[WUPDATE_DELAYED_DAMAGES].SetInterval(400);
+
     ///- Initialize MapMgr
     LOG_INFO("server.loading", "Starting Map System");
     LOG_INFO("server.loading", " ");
@@ -2306,6 +2311,12 @@ void World::Update(uint32 diff)
 
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Check quest reset times"));
+
+        if (_timers[WUPDATE_DELAYED_DAMAGES].Passed())
+        {
+            _timers[WUPDATE_DELAYED_DAMAGES].Reset();
+            ProcessDelayedDamages();
+        }
 
         /// Handle daily quests reset time
         if (currentGameTime > _nextDailyQuestReset)
@@ -3327,4 +3338,25 @@ CliCommandHolder::CliCommandHolder(void* callbackArg, char const* command, Print
 CliCommandHolder::~CliCommandHolder()
 {
     free(m_command);
+}
+
+void World::AddDelayedDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss)
+{
+    DelayedDamage delayedDamage;
+    delayedDamage.attacker = attacker;
+    delayedDamage.victim = victim;
+    delayedDamage.damage = damage;
+    delayedDamage.cleanDamage = cleanDamage;
+    delayedDamage.damagetype = damagetype;
+    delayedDamage.damageSchoolMask = damageSchoolMask;
+    delayedDamage.spellProto = spellProto;
+    delayedDamage.durabilityLoss = durabilityLoss;
+    _delayedDamages.push_back(delayedDamage);
+}
+
+void World::ProcessDelayedDamages()
+{
+    for (auto& damage : _delayedDamages)
+        Unit::DealDamage(damage.attacker, damage.victim, damage.damage, damage.cleanDamage, damage.damagetype, damage.damageSchoolMask, damage.spellProto, damage.durabilityLoss);
+    _delayedDamages.clear();
 }

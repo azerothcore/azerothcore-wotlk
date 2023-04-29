@@ -17,16 +17,15 @@
 -- Dumping structure for table acore_world.item_set_names
 DROP TABLE IF EXISTS `item_set_names`;
 CREATE TABLE IF NOT EXISTS `item_set_names` (
-  `entry` mediumint unsigned NOT NULL,
-  `name` varchar(255) NOT NULL DEFAULT '',
+  `entry` int unsigned NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `InventoryType` tinyint unsigned NOT NULL DEFAULT '0',
-  `VerifiedBuild` mediumint DEFAULT NULL,
+  `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.item_set_names: 2,481 rows
+-- Dumping data for table acore_world.item_set_names: ~2,481 rows (approximately)
 DELETE FROM `item_set_names`;
-/*!40000 ALTER TABLE `item_set_names` DISABLE KEYS */;
 INSERT INTO `item_set_names` (`entry`, `name`, `InventoryType`, `VerifiedBuild`) VALUES
 	(6473, 'Armor of the Fang', 5, 11723),
 	(6833, 'White Tuxedo Shirt', 4, 11723),
@@ -2509,7 +2508,6 @@ INSERT INTO `item_set_names` (`entry`, `name`, `InventoryType`, `VerifiedBuild`)
 	(51774, 'Ymirjar Lord\'s Greathelm', 1, 11723),
 	(51775, 'Ymirjar Lord\'s Legguards', 7, 11723),
 	(51776, 'Ymirjar Lord\'s Pauldrons', 3, 11723);
-/*!40000 ALTER TABLE `item_set_names` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
