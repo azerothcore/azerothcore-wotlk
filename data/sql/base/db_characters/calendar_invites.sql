@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS `calendar_invites` (
   `status` tinyint unsigned NOT NULL DEFAULT '0',
   `statustime` int unsigned NOT NULL DEFAULT '0',
   `rank` tinyint unsigned NOT NULL DEFAULT '0',
-  `text` varchar(255) NOT NULL DEFAULT '',
+  `text` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.calendar_invites: ~0 rows (approximately)
 DELETE FROM `calendar_invites`;

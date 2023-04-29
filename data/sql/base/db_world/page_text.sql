@@ -17,16 +17,15 @@
 -- Dumping structure for table acore_world.page_text
 DROP TABLE IF EXISTS `page_text`;
 CREATE TABLE IF NOT EXISTS `page_text` (
-  `ID` mediumint unsigned NOT NULL DEFAULT '0',
-  `Text` longtext NOT NULL,
-  `NextPageID` mediumint unsigned NOT NULL DEFAULT '0',
-  `VerifiedBuild` mediumint DEFAULT NULL,
+  `ID` int unsigned NOT NULL DEFAULT '0',
+  `Text` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `NextPageID` int unsigned NOT NULL DEFAULT '0',
+  `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Item System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Item System';
 
--- Dumping data for table acore_world.page_text: 1,946 rows
+-- Dumping data for table acore_world.page_text: ~1,853 rows (approximately)
 DELETE FROM `page_text`;
-/*!40000 ALTER TABLE `page_text` DISABLE KEYS */;
 INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
 	(15, 'Hello Morgan,$B$BBusiness in Goldshire is brisk, so brisk that I haven\'t had time to send you any shipments!  $B$BI commissioned the person bearing this note to bring you a package of large wax candles (you know, the ones the Kobolds like to wear on their heads?). $B$BPlease give this person our thanks, and fair payment.', 0, 12340),
 	(16, 'To the Honorable Headmaster Crillian,\n\nMy former Master, I write to you so that you might know what your apprentice has been doing of late.  Paying heed to your advice, I sought to build my knowledge and wisdom through travel outside the gates of our beloved Stormwind.  My journeys took me to many places but I have decided to take up residence here in the lovely town of Moonbrook.  The surrounding fields of Westfall are most beautiful as the harvest approaches.', 17, 1),
@@ -1974,7 +1973,6 @@ INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
 	(3613, 'We live in tumultuous times. War, invasion, and famine have swept the world, but the real trial is yet to come: the end of Azeroth itself.\r\n\r\nHow will you cope with the loss and destruction of everything you hold dear? The answer is that you don\'t have to. Bring your friends and family to one of our gatherings and learn how you can survive the apocalypse together, with us.', 0, 1),
 	(3614, 'Citizens of Orgrimmar, beware the soothsayers and prophets of doom that have taken over our streets. Do not be taken in by their mad raving. They only want to weaken us in the face of our true enemies!', 0, 1),
 	(3622, 'Tail swooshing and hips swaying, the curvy figure walked purposefully across the lake toward the man resting by the shore; rising quickly as she approached, he appeared visibly happy to be in her presence.  Blue arms flowed over his shoulders as a smooth tail coiled seductively around his waist.  "Why must I travel so far to be meeting man like you?"  Her voice carried a strong, alluring accent.$B$BGrinning wildly, he gently pushed her away, openly staring as the light caught her features.$B$B"Up here!", she exclaimed in playful anger.$B$BWith a helpless shrug, he reached into his pack and pulled out a small pouch.  "My wonderful Soola, I\'ve brought you something."  Confidence wrapped his words like a steel blanket.', 0, 1);
-/*!40000 ALTER TABLE `page_text` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

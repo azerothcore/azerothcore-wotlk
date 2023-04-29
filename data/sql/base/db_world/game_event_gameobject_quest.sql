@@ -18,14 +18,13 @@
 DROP TABLE IF EXISTS `game_event_gameobject_quest`;
 CREATE TABLE IF NOT EXISTS `game_event_gameobject_quest` (
   `eventEntry` tinyint unsigned NOT NULL COMMENT 'Entry of the game event',
-  `id` mediumint unsigned NOT NULL DEFAULT '0',
-  `quest` mediumint unsigned NOT NULL DEFAULT '0',
+  `id` int unsigned NOT NULL DEFAULT '0',
+  `quest` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`quest`,`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event_gameobject_quest: 78 rows
+-- Dumping data for table acore_world.game_event_gameobject_quest: ~78 rows (approximately)
 DELETE FROM `game_event_gameobject_quest`;
-/*!40000 ALTER TABLE `game_event_gameobject_quest` DISABLE KEYS */;
 INSERT INTO `game_event_gameobject_quest` (`eventEntry`, `id`, `quest`) VALUES
 	(1, 187559, 11580),
 	(1, 187564, 11581),
@@ -105,7 +104,6 @@ INSERT INTO `game_event_gameobject_quest` (`eventEntry`, `id`, `quest`) VALUES
 	(1, 194046, 13457),
 	(1, 194048, 13458),
 	(1, 194049, 13449);
-/*!40000 ALTER TABLE `game_event_gameobject_quest` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
