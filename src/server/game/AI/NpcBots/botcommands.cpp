@@ -681,6 +681,7 @@ public:
         wpc->SetMaxPower(POWER_MANA, uint32(wp->GetLinks().size()));
         wpc->SetPower(POWER_MANA, wpc->GetMaxPower(POWER_MANA));
         wpc->SetObjectScale(10.0f);
+        wpc->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, wpc->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM));
         return wpc;
     }
 
