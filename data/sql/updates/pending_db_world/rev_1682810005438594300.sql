@@ -7,5 +7,3 @@ INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spe
 (57940, 4820, 0, 0, 0, 0, 2, 1, 0, 0);
 
 UPDATE `spell_area` SET `quest_start_status` = 0, `quest_end_status` = 0 WHERE `spell` = 57940;
-
-UPDATE `conditions` SET `ConditionValue1` = 57940 WHERE `SourceEntry` = 43228 AND `ConditionValue1` = 58045;
