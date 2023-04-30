@@ -84,6 +84,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (19511, 0, 1, 0, 0, 0, 100, 0, 4300, 9700, 21700, 38600, 0, 11, 34615, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Inciter - In Combat - Cast \'Mind-numbing Poison\''),
 (19511, 0, 2, 0, 0, 0, 100, 0, 13400, 20600, 20600, 29000, 0, 11, 30621, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nethervine Inciter - In Combat - Cast \'Kidney Shot\'');
 
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19513;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19513);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(19513, 0, 0, 0, 0, 0, 100, 0, 8000, 24000, 28000, 36000, 0, 11, 30584, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mutate Fear-Shrieker - In Combat - Cast \'Fear\'');
+
 DELETE FROM `creature_template_addon` WHERE (`entry` IN (19843, 21565));
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (19843, 0, 0, 0, 1, 0, 0, '30991'),
