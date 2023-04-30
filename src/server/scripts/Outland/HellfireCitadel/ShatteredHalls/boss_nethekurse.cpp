@@ -138,7 +138,7 @@ public:
                         //peon dies placeholder
                     }
                     if (++PeonKilledCount == 4)
-                        DoAction(ACTION_CANCEL_INTRO);
+                        //DoAction(ACTION_CANCEL_INTRO);
                     break;
             }
         }
