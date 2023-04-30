@@ -72,7 +72,11 @@ enum DeathKnightSpells
     SPELL_DK_UNHOLY_PRESENCE                    = 48265,
     SPELL_DK_UNHOLY_PRESENCE_TRIGGERED          = 49772,
     SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1   = 49189,
-    SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284
+    SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284,
+    // Risen Ally
+    SPELL_DK_RAISE_ALLY                         = 46619,
+    SPELL_DK_THRASH                             = 47480,
+    SPELL_GHOUL_FRENZY                          = 62218,
 };
 
 enum DeathKnightSpellIcons
@@ -82,7 +86,8 @@ enum DeathKnightSpellIcons
 
 enum Misc
 {
-    NPC_DK_GHOUL                                = 26125
+    NPC_DK_GHOUL                                = 26125,
+    NPC_RISEN_ALLY                              = 30230
 };
 
 // 50526 - Wandering Plague
@@ -1496,6 +1501,53 @@ class spell_dk_ghoul_explode : public SpellScript
     }
 };
 
+// 47480 - Thrash
+class spell_dk_ghoul_thrash : public SpellScript
+{
+    PrepareSpellScript(spell_dk_ghoul_thrash);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_GHOUL_FRENZY });
+    }
+
+    void CalcDamage(SpellEffIndex /*effIndex*/)
+    {
+        /*
+        Causes more damage per frenzy point:
+            1 point   : (Attack power * 40 * 0.01 + Attack power * 0.05)-(Attack power * 40 * 0.01 + Attack power * 0.10) damage
+            2 points  : (Attack power * 40 * 0.01 + Attack power * 0.10)-(Attack power * 40 * 0.01 + Attack power * 0.20) damage
+            3 points  : (Attack power * 40 * 0.01 + Attack power * 0.15)-(Attack power * 40 * 0.01 + Attack power * 0.30) damage
+            4 points  : (Attack power * 40 * 0.01 + Attack power * 0.20)-(Attack power * 40 * 0.01 + Attack power * 0.40) damage
+            5 points  : (Attack power * 40 * 0.01 + Attack power * 0.25)-(Attack power * 40 * 0.01 + Attack power * 0.50) damage
+        */
+
+        if (Aura* frenzy = GetCaster()->GetAura(SPELL_GHOUL_FRENZY))
+        {
+            float APBonus = GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
+            float fixedDamageBonus = APBonus * GetEffectValue() * 0.01f;
+            APBonus *= 0.05f * frenzy->GetStackAmount();
+
+            SetEffectValue(fixedDamageBonus + urand(int32(APBonus), int32(APBonus * 2.f)));
+
+            if (Unit* caster = GetCaster())
+            {
+                caster->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY);
+
+                if (Unit* charmer = caster->GetCharmer())
+                {
+                    charmer->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_dk_ghoul_thrash::CalcDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 // 48792 - Icebound Fortitude
 class spell_dk_icebound_fortitude : public AuraScript
 {
@@ -2184,4 +2236,5 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_spell_deflection);
     RegisterSpellScript(spell_dk_vampiric_blood);
     RegisterSpellScript(spell_dk_will_of_the_necropolis);
+    RegisterSpellScript(spell_dk_ghoul_thrash);
 }

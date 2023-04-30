@@ -573,7 +573,7 @@ public:
 
             if (_summonAddsTimer <= diff)
             {
-                for (auto itr : shadowpriestSezzizAdds[_summmonAddsCount])
+                for (auto& itr : shadowpriestSezzizAdds[_summmonAddsCount])
                 {
                     if (Creature* add = me->SummonCreature(itr.first, itr.second, TEMPSUMMON_DEAD_DESPAWN, 10 * IN_MILLISECONDS))
                     {

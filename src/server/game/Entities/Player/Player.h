@@ -1801,7 +1801,7 @@ public:
     {
         Unit::SetPvP(state);
         if (!m_Controlled.empty())
-            for (auto itr : m_Controlled)
+            for (auto& itr : m_Controlled)
                 itr->SetPvP(state);
     }
     void UpdatePvP(bool state, bool _override = false);
@@ -2183,7 +2183,7 @@ public:
     void SendBGWeekendWorldStates();
     void SendBattlefieldWorldStates();
 
-    void GetAurasForTarget(Unit* target);
+    void GetAurasForTarget(Unit* target, bool force = false);
 
     PlayerMenu* PlayerTalkClass;
     std::vector<ItemSetEffect*> ItemSetEff;

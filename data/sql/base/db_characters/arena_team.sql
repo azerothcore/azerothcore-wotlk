@@ -18,7 +18,7 @@
 DROP TABLE IF EXISTS `arena_team`;
 CREATE TABLE IF NOT EXISTS `arena_team` (
   `arenaTeamId` int unsigned NOT NULL DEFAULT '0',
-  `name` varchar(24) NOT NULL,
+  `name` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
   `captainGuid` int unsigned NOT NULL DEFAULT '0',
   `type` tinyint unsigned NOT NULL DEFAULT '0',
   `rating` smallint unsigned NOT NULL DEFAULT '0',
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `arena_team` (
   `borderStyle` tinyint unsigned NOT NULL DEFAULT '0',
   `borderColor` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`arenaTeamId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.arena_team: ~0 rows (approximately)
 DELETE FROM `arena_team`;
