@@ -138,7 +138,7 @@ public:
                         //peon dies placeholder
                     }
                     if (++PeonKilledCount == 4)
-                        //DoAction(ACTION_CANCEL_INTRO);
+                        DoAction(ACTION_CANCEL_INTRO);
                     break;
             }
         }
@@ -197,7 +197,17 @@ public:
                 });
         }
 
-        void MoveInLineOfSight(Unit* who) override { }
+        void MoveInLineOfSight(Unit* who) override 
+        {
+            if (EventStage == EVENT_STAGE_NONE)
+            {
+                if (Unit* target = me->SelectNearestPlayer(50.0f))
+                {
+                    AttackStart(target); 
+                    LOG_ERROR("server", "Data {}", "attack los after reset");
+                }
+            }
+        }
 
         void IntroRP()
         {
@@ -296,7 +306,7 @@ public:
                     EventStage = EVENT_STAGE_MAIN;
                     if (Unit* target = me->SelectNearestPlayer(50.0f))
                         AttackStart(target);
-                    DoAction(ACTION_CANCEL_INTRO);
+                    //DoAction(ACTION_CANCEL_INTRO);
                     return;
                 }
             }
