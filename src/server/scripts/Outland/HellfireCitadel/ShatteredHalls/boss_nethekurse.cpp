@@ -162,7 +162,6 @@ public:
             if (me->Attack(who, true))
             {
                 DoStartMovement(who);
-                LOG_ERROR("server", "Data {}", "attackstart triggered");
                 CombatEventScheduler();
             }
         }
@@ -204,7 +203,6 @@ public:
                 if (Unit* target = me->SelectNearestPlayer(50.0f))
                 {
                     AttackStart(target); 
-                    LOG_ERROR("server", "Data {}", "attack los after reset");
                 }
             }
         }
@@ -226,16 +224,13 @@ public:
             _JustEngagedWith();
             if (EventStage == EVENT_STAGE_NONE)
             {
-                LOG_ERROR("server", "Data {}", "after reset attempt at boss kill");
                 CombatEventScheduler();
             }
         }
 
         void CastRandomPeonSpell()
         {
-            LOG_ERROR("server", "Data {}", "spellcast debug peon");
             uint32 choice = urand(1, 3);
-            LOG_ERROR("server", "Data {}", std::to_string(choice).c_str());
             if (choice == 1)
             {
                 Talk(SAY_SHADOW_SEAR);
@@ -265,12 +260,10 @@ public:
             {
                 introDone = true;
                 scheduler.CancelGroup(GROUP_RP);
-                LOG_ERROR("server", "Data {}", "intro done - all peons dead");
                 events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
                 instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                 me->SetInCombatWithZone();
                 Talk(SAY_INTRO_2);
-                LOG_ERROR("server", "Data {}", "combat start");
                 return;
             }
 
@@ -281,7 +274,6 @@ public:
 
             events2.ScheduleEvent(EVENT_INTRO, 90000);
             Talk(SAY_INTRO);
-            LOG_ERROR("server", "Data {}", "event started");
             EventStage = EVENT_STAGE_INTRO;
             instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
             me->SetInCombatWithZone();
