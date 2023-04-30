@@ -18,7 +18,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (17723, 0, 2, 0, 0, 0, 100, 0, 4500, 9600, 18200, 27100, 0, 11, 15550, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bog Giant - In Combat - Cast \'Trample\''),
 (17723, 0, 3, 4, 2, 0, 100, 3, 0, 30, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bog Giant - Between 0-30% Health - Cast \'Enrage\' (Normal Dungeon)'),
 (17723, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bog Giant - Between 0-30% Health - Say Line 0 (Normal Dungeon)'),
-(17724, 0, 0, 0, 0, 0, 100, 0, 1200, 12500, 1200, 12500, 0, 11, 34171, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbat - In Combat - Cast \'Tentacle Lash\''),
+(17724, 0, 0, 0, 67, 0, 100, 0, 1200, 12500, 0, 0, 0, 11, 34171, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbat - On Behind Target - Cast \'Tentacle Lash\''),
 (17731, 0, 0, 0, 0, 0, 100, 0, 5800, 11850, 16300, 21500, 0, 11, 34984, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Fen Ray - In Combat - Cast \'Psychic Horror\''),
 (17732, 0, 0, 0, 0, 0, 100, 0, 1600, 3200, 2850, 4900, 0, 11, 32330, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Lykul Wasp - In Combat - Cast \'Poison Spit\''),
 (17732, 0, 1, 2, 2, 0, 100, 1, 0, 30, 0, 0, 0, 11, 8599, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lykul Wasp - Between 0-30% Health - Cast \'Enrage\''),
