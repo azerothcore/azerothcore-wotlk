@@ -42,6 +42,7 @@ enum eGrandWarlockNethekurse
     // Spells used exclusively in RP
     SPELL_SHADOW_SEAR          = 30735,
     SPELL_DEATH_COIL           = 30741,
+    SPELL_SHADOW_FISSURE_RP    = 30745,
 
     EVENT_INTRO                = 1,
     EVENT_START_ATTACK         = 2,
@@ -161,6 +162,33 @@ public:
             if (me->Attack(who, true))
             {
                 DoStartMovement(who);
+                LOG_ERROR("server", "Data {}", "attackstart triggered");
+                scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+                {
+                    if (me->HealthBelowPct(90))
+                    {
+                        DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
+                    }
+                    context.Repeat();
+                }).Schedule(8100ms, 17300ms, [this](TaskContext context)
+                {
+                    DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
+                    context.Repeat(8450ms, 9450ms);
+                }).Schedule(10950ms, 21850ms, [this](TaskContext context)
+                {
+                    DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
+                    context.Repeat(1200ms, 23900ms);
+                }).Schedule(1s, [this](TaskContext context)
+                {
+                    if (me->HealthBelowPct(25))
+                    {
+                        DoCastSelf(SPELL_DARK_SPIN);
+                    }
+                    else
+                    {
+                        context.Repeat();
+                    }
+                });
             }
         }
 
@@ -197,7 +225,7 @@ public:
             else if (choice == 2)
             {
                 Talk(SAY_SHADOW_FISSURE);
-                me->CastSpell(me->FindNearestCreature(NPC_PEON, 40.0f), SPELL_SHADOW_FISSURE, true);
+                me->CastSpell(me, SPELL_SHADOW_FISSURE_RP, false);
             }
             else if (choice == 3)
             {
@@ -223,32 +251,6 @@ public:
                 me->SetInCombatWithZone();
                 Talk(SAY_INTRO_2);
                 LOG_ERROR("server", "Data {}", "combat start");
-                scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
-                {
-                    if (me->HealthBelowPct(90))
-                    {
-                        DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
-                    }
-                    context.Repeat();
-                }).Schedule(8100ms, 17300ms, [this](TaskContext context)
-                {
-                    DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
-                    context.Repeat(8450ms, 9450ms);
-                }).Schedule(10950ms, 21850ms, [this](TaskContext context)
-                {
-                    DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
-                    context.Repeat(1200ms, 23900ms);
-                }).Schedule(1s, [this](TaskContext context)
-                {
-                    if (me->HealthBelowPct(25))
-                    {
-                        DoCastSelf(SPELL_DARK_SPIN);
-                    }
-                    else
-                    {
-                        context.Repeat();
-                    }
-                });
                 return;
             }
 
@@ -383,7 +385,7 @@ class at_rp_nethekurse : public AreaTriggerScript
 
     bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
-        LOG_ERROR("server", "Data {}", "AT Nethekurse reached");
+        LOG_ERROR("server", "Data {}", "AT Nethekurse reached saveattempt");
         if (player->IsGameMaster())
         {
             return false;
