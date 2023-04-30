@@ -112,8 +112,6 @@ struct boss_the_black_stalker : public BossAI
     void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
     {
         summons.Despawn(summon);
-        for (uint8 i = 0; i < 3; ++i)
-            me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
     }
 
     void UpdateAI(uint32 diff) override
