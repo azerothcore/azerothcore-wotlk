@@ -27,7 +27,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18405, 0, 2, 0, 0, 0, 100, 0, 6050, 15000, 18250, 26700, 0, 11, 34785, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Tempest-Forge Peacekeeper - In Combat - Cast \'Arcane Volley\''),
 (19633, 0, 0, 0, 0, 0, 100, 2, 7350, 13950, 12150, 15750, 0, 11, 17194, 0, 0, 0, 0, 0, 5, 25, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Mender - In Combat - Cast \'Mind Blast\' (Normal Dungeon)'),
 (19633, 0, 1, 0, 0, 0, 100, 4, 0, 0, 2000, 3000, 0, 11, 17287, 64, 0, 0, 0, 0, 5, 25, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Mender - In Combat - Cast \'Mind Blast\' (Heroic Dungeon)'),
-(19633, 0, 2, 0, 74, 0, 100, 0, 0, 75, 6000, 6000, 0, 11, 35096, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Mender - On Friendly Between 0-75% Health - Cast \'Greater Heal\''),
+(19633, 0, 2, 0, 74, 0, 100, 0, 0, 75, 10000, 10000, 0, 11, 35096, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Mender - On Friendly Between 0-75% Health - Cast \'Greater Heal\''),
 (19633, 0, 3, 0, 23, 0, 100, 0, 34809, 0, 3600, 3600, 0, 11, 34809, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Mender - On Aura \'Holy Fury\' Missing - Cast \'Holy Fury\''),
 (19633, 0, 4, 0, 16, 0, 100, 0, 34809, 30, 12150, 15750, 1, 11, 34809, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Mender - On Friendly Unit Missing Buff \'Holy Fury\' - Cast \'Holy Fury\''),
 (18404, 0, 0, 0, 0, 0, 100, 0, 14350, 23050, 17000, 29150, 0, 11, 34821, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodwarder Steward - In Combat - Cast \'Arcane Flurry\''),
