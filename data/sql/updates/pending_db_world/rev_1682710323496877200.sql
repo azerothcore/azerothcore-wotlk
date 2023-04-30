@@ -62,7 +62,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (17957, 0, 2, 0, 0, 0, 100, 0, 7400, 15750, 1200, 28600, 0, 11, 15284, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Champion - In Combat - Cast \'Cleave\''),
 (17957, 0, 3, 0, 0, 0, 100, 0, 10950, 26050, 10950, 26050, 0, 11, 16145, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Champion - In Combat - Cast \'Sunder Armor\'');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1794000);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1794000, 1794001, 1794002, 1794003));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1794000, 9, 0, 0, 0, 0, 100, 2, 0, 0, 0, 0, 0, 11, 16005, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Technician - Actionlist for Random Cast - Cast \'Rain of Fire\' (Normal Dungeon)'),
 (1794001, 9, 0, 0, 0, 0, 100, 2, 0, 0, 0, 0, 0, 11, 21096, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Technician - Actionlist for Random Cast - Cast \'Blizzard\' (Normal Dungeon)'),
