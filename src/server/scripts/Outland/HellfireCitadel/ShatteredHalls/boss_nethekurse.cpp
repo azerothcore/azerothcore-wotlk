@@ -163,7 +163,13 @@ public:
             {
                 DoStartMovement(who);
                 LOG_ERROR("server", "Data {}", "attackstart triggered");
-                scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+                CombatEventScheduler();
+            }
+        }
+
+        void CombatEventScheduler()
+        {
+            scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
                 {
                     if (me->HealthBelowPct(90))
                     {
@@ -189,7 +195,6 @@ public:
                         context.Repeat();
                     }
                 });
-            }
         }
 
         void MoveInLineOfSight(Unit* who) override { }
@@ -209,6 +214,11 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             _JustEngagedWith();
+            if (EventStage == EVENT_STAGE_NONE)
+            {
+                LOG_ERROR("server", "Data {}", "after reset attempt at boss kill");
+                CombatEventScheduler();
+            }
         }
 
         void CastRandomPeonSpell()
