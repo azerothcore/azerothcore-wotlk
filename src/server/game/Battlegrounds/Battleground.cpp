@@ -1063,6 +1063,15 @@ void Battleground::RemovePlayerAtLeave(Player* player)
         player->SpawnCorpseBones();
     }
 
+    //npcbot
+    if (player->HaveBot())
+    {
+        BotMap const* map = player->GetBotMgr()->GetBotMap();
+        for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
+            RemoveBotAtLeave(itr->first);
+    }
+    //end npcbot
+
     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
     // GetStatus might be changed in RemovePlayer - define it here
