@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameObjectAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
@@ -94,22 +95,32 @@ class go_broggok_lever : public GameObjectScript
 public:
     go_broggok_lever() : GameObjectScript("go_broggok_lever") {}
 
-    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    struct go_broggok_leverAI : public GameObjectAI
     {
-        if (InstanceScript* instance = go->GetInstanceScript())
+        go_broggok_leverAI(GameObject* go) : GameObjectAI(go), instance(go->GetInstanceScript()) { }
+
+        InstanceScript* instance;
+
+        bool GossipHello(Player* /*player*/, bool /*reportUse*/) override
         {
-            if (instance->GetBossState(DATA_BROGGOK) == NOT_STARTED)
+            if (instance->GetBossState(DATA_BROGGOK) != DONE && instance->GetBossState(DATA_BROGGOK) != IN_PROGRESS)
             {
-                if (Creature* broggok = instance->GetCreature(DATA_BROGGOK))
+                if (Creature* broggok = GetBroggok(instance))
                 {
+                    instance->SetBossState(DATA_BROGGOK, IN_PROGRESS);
                     instance->SetData(DATA_BROGGOK, IN_PROGRESS);
                     broggok->AI()->DoAction(ACTION_PREPARE_BROGGOK);
                 }
             }
-        }
 
-        go->UseDoorOrButton();
-        return false;
+            me->UseDoorOrButton();
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_broggok_leverAI(go);
     }
 };
 

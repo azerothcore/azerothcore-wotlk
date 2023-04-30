@@ -21,6 +21,9 @@
 #include "CreatureAIImpl.h"
 #include "Player.h"
 
+class Creature;
+class InstanceScript;
+
 #define DataHeader "BF"
 
 constexpr uint32 EncounterCount = 4;
@@ -65,6 +68,8 @@ enum BloodFurnaceGO
     GO_BROGGOK_DOOR_REAR                = 181819,
     GO_BROGGOK_LEVER                    = 181982
 };
+
+Creature *GetBroggok(InstanceScript *instance);
 
 template <class AI, class T>
 inline AI* GetBloodFurnaceAI(T* obj)

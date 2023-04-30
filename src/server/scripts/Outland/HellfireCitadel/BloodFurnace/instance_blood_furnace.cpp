@@ -39,6 +39,16 @@ ObjectData const creatureData[] =
     { NPC_KELIDAN, DATA_KELIDAN }
 };
 
+Creature *GetBroggok(InstanceScript *instance)
+{
+    Creature* broggok = instance->GetCreature(DATA_BROGGOK);
+    if (!broggok)
+    {
+        broggok = instance->GetCreature(NPC_BROGGOK);
+    }
+    return broggok;
+}
+
 class instance_blood_furnace : public InstanceMapScript
 {
 public:
@@ -274,7 +284,7 @@ public:
                     {
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     }
-                    if (Creature* broggok = GetCreature(DATA_BROGGOK))
+                    if (Creature* broggok = GetBroggok(this))
                     {
                         broggok->AI()->DoAction(ACTION_ACTIVATE_BROGGOK);
                     }
