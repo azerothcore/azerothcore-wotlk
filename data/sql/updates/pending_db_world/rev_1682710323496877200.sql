@@ -27,7 +27,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20465, 0, 0, 0, 0, 0, 100, 0, 1200, 9600, 15350, 17000, 0, 11, 12097, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Frenzy - In Combat - Cast \'Pierce Armor\''),
 (20465, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Frenzy - On Reset - Set Run On'),
 (19632, 0, 0, 1, 2, 0, 100, 0, 0, 50, 14000, 18000, 0, 11, 34392, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lykul Stinger - Between 0-50% Health - Cast \'Stinger Rage\''),
-(19632, 0, 1, 0, 61, 0, 100, 0, 0, 50, 14000, 18000, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lykul Stinger - Between 0-50% Health - Say Line 0'),
+(19632, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lykul Stinger - Between 0-50% Health - Say Line 0'),
 (19632, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 3, 0, 19367, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hack: Lykul Stinger - On Reset - Morph To Model 19367'),
 (17726, 0, 0, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wrathfin Myrmidon - On Aggro - Say Line 0'),
 (17726, 0, 1, 0, 0, 0, 100, 0, 4050, 16450, 10900, 21300, 0, 11, 31410, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Wrathfin Myrmidon - In Combat - Cast \'Coral Cut\''),
