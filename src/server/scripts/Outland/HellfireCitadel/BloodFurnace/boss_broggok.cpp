@@ -103,7 +103,7 @@ public:
 
         bool GossipHello(Player* /*player*/, bool /*reportUse*/) override
         {
-            if (instance->GetBossState(DATA_BROGGOK) != DONE && instance->GetBossState(DATA_BROGGOK) != IN_PROGRESS)
+            if (instance->GetBossState(DATA_BROGGOK) == NOT_STARTED)
             {
                 if (Creature* broggok = GetBroggok(instance))
                 {
