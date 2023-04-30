@@ -306,7 +306,7 @@ public:
                     EventStage = EVENT_STAGE_MAIN;
                     if (Unit* target = me->SelectNearestPlayer(50.0f))
                         AttackStart(target);
-                    //DoAction(ACTION_CANCEL_INTRO);
+                    DoAction(ACTION_CANCEL_INTRO);
                     return;
                 }
             }
@@ -411,7 +411,7 @@ class at_rp_nethekurse : public AreaTriggerScript
         }
         if (InstanceScript* instance = player->GetInstanceScript())
         {
-            if (instance->GetBossState(DATA_NETHEKURSE) != DONE || instance->GetBossState(DATA_NETHEKURSE) != IN_PROGRESS)
+            if (instance->GetBossState(DATA_NETHEKURSE) != DONE && instance->GetBossState(DATA_NETHEKURSE) != IN_PROGRESS)
             {
                 if (Creature* nethekurse = instance->GetCreature(DATA_NETHEKURSE))
                 {
