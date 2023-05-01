@@ -41,7 +41,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (17961, 0, 2, 0, 0, 0, 100, 0, 7300, 12150, 21450, 31600, 0, 11, 15234, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Enchantress - In Combat - Cast \'Lightning Bolt\''),
 (17961, 0, 4, 0, 0, 0, 100, 0, 14850, 21200, 19450, 27900, 0, 11, 32193, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Enchantress - In Combat - Cast \'Lightning Cloud\''),
 (21126, 0, 0, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Scale-Healer - On Aggro - Say Line 0'),
-(21126, 0, 1, 0, 74, 0, 100, 0, 0, 65, 12000, 16000, 0, 11, 34945, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Scale-Healer - On Friendly Between 0-65% Health - Cast \'Heal\''),
+(21126, 0, 1, 0, 74, 0, 100, 0, 0, 65, 12000, 16000, 40, 11, 34945, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Scale-Healer - On Friendly Between 0-65% Health - Cast \'Heal\''),
 (21126, 0, 2, 0, 0, 0, 100, 0, 4250, 8850, 13400, 21900, 0, 11, 34944, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Scale-Healer - In Combat - Cast \'Holy Nova\''),
 (21126, 0, 3, 0, 16, 0, 100, 0, 17139, 40, 7200, 13300, 1, 11, 17139, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Scale-Healer - On Friendly Unit Missing Buff \'Power Word: Shield\' - Cast \'Power Word: Shield\''),
 (21127, 0, 0, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Tempest - On Aggro - Say Line 0'),
