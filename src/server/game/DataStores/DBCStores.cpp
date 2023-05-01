@@ -108,6 +108,7 @@ DBCStorage <GtRegenMPPerSptEntry>         sGtRegenMPPerSptStore(GtRegenMPPerSptf
 
 DBCStorage <HolidaysEntry>                sHolidaysStore(Holidaysfmt);
 
+DBCStorage <ItemEntry>                    sItemStore(Itemfmt);
 DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore(ItemBagFamilyfmt);
 //DBCStorage <ItemCondExtCostsEntry> sItemCondExtCostsStore(ItemCondExtCostsEntryfmt);
 DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt);
@@ -329,6 +330,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sGtRegenHPPerSptStore,                 "gtRegenHPPerSpt.dbc",                  "gtregenhpperspt_dbc");
     LOAD_DBC(sGtRegenMPPerSptStore,                 "gtRegenMPPerSpt.dbc",                  "gtregenmpperspt_dbc");
     LOAD_DBC(sHolidaysStore,                        "Holidays.dbc",                         "holidays_dbc");
+    LOAD_DBC(sItemStore,                            "Item.dbc",                             "item_dbc");
     LOAD_DBC(sItemBagFamilyStore,                   "ItemBagFamily.dbc",                    "itembagfamily_dbc");
     LOAD_DBC(sItemDisplayInfoStore,                 "ItemDisplayInfo.dbc",                  "itemdisplayinfo_dbc");
     //LOAD_DBC(sItemCondExtCostsStore,              "ItemCondExtCosts.dbc",                 "itemcondextcosts_dbc");
@@ -650,9 +652,10 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     // Check loaded DBC files proper version
-    if (!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a
+    if (!sAreaTableStore.LookupEntry(4987)             ||       // last area added in 3.3.5a
             !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
             !sGemPropertiesStore.LookupEntry(1629)     ||       // last added spell in 3.3.5a
+            !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a
             !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a
             !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a
             !sSpellStore.LookupEntry(80864)            )        // last client known item added in 3.3.5a
@@ -875,9 +878,15 @@ CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType
 /// Returns LFGDungeonEntry for a specific map and difficulty. Will return first found entry if multiple dungeons use the same map (such as Scarlet Monastery)
 LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty)
 {
-    for (LFGDungeonEntry const* dungeon : sLFGDungeonStore)
-        if (dungeon->map == int32(mapId) && Difficulty(dungeon->difficulty) == difficulty)
+    for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
+    {
+        LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(i);
+        if (!dungeon)
+            continue;
+
+        if (dungeon->MapID == uint32(mapId) && Difficulty(dungeon->Difficulty) == difficulty)
             return dungeon;
+    }
 
     return nullptr;
 }
@@ -886,7 +895,7 @@ LFGDungeonEntry const* GetZoneLFGDungeonEntry(std::string const& zoneName, Local
 {
     for (LFGDungeonEntry const* dungeon : sLFGDungeonStore)
     {
-        if (dungeon->type == lfg::LFG_TYPE_ZONE && zoneName.find(dungeon->name[locale]) != std::string::npos)
+        if (dungeon->TypeID == lfg::LFG_TYPE_ZONE && zoneName.find(dungeon->Name[locale]) != std::string::npos)
         {
             return dungeon;
         }

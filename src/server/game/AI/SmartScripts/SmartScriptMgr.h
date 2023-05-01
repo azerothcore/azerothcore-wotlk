@@ -2007,7 +2007,7 @@ private:
 
     bool IsItemValid(SmartScriptHolder const& e, uint32 entry)
     {
-        if (!sObjectMgr->GetItemTemplate(entry))
+        if (!sItemStore.LookupEntry(entry))
         {
             LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Item entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
