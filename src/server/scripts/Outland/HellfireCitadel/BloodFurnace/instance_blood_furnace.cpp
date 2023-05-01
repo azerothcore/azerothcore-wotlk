@@ -30,13 +30,15 @@ DoorData const doorData[] =
 ObjectData const gameobjectData[] =
 {
     { GO_BROGGOK_DOOR_REAR, DATA_BROGGOK_REAR_DOOR },
-    { GO_BROGGOK_LEVER,     DATA_BROGGOK_LEVER     }
+    { GO_BROGGOK_LEVER,     DATA_BROGGOK_LEVER     },
+    { 0,                    0,                     }
 };
 
 ObjectData const creatureData[] =
 {
     { NPC_BROGGOK, DATA_BROGGOK },
-    { NPC_KELIDAN, DATA_KELIDAN }
+    { NPC_KELIDAN, DATA_KELIDAN },
+    { 0,           0            }
 };
 
 class instance_blood_furnace : public InstanceMapScript
