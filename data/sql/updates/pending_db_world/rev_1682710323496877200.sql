@@ -70,7 +70,7 @@ DELETE FROM `creature_text` WHERE `CreatureID` IN (17723, 17729, 17734);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (17723, 0, 0, '%s becomes enraged!', 16, 0, 100, 0, 0, 0, 24144, 0, 'Bog Giant'),
 (17729, 0, 0, '%s goes into a frenzy!', 16, 0, 100, 0, 0, 0, 38630, 0, 'Murkblood Spearman'),
-(17734, 0, 0, '%s goes into a frenzy!', 16, 0, 100, 0, 0, 0, 38630, 0, 'Underbog Lord'),
+(17734, 0, 0, '%s goes into a frenzy!', 16, 0, 100, 0, 0, 0, 38630, 0, 'Underbog Lord');
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 17735 AND `GroupID` = 1;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
