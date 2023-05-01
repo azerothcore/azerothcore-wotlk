@@ -115,15 +115,14 @@ public:
 
             _JustEngagedWith();
 
-            me->Yell("entered non-burning phase", LANG_UNIVERSAL);
-            LOG_ERROR("server", "Data {}", "debug1");
+            LOG_ERROR("server", "Data {}", "entered non-burning phase");
             scheduler.Schedule(12100ms, 17300ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_THUNDERCLAP);
                 context.Repeat(17200ms, 24200ms);
             }).Schedule(20s, 30s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
             {
-                me->Yell("beatdown", LANG_UNIVERSAL);
+                LOG_ERROR("server", "Data {}", "beatdown cast");
                 DoCastSelf(SPELL_BEATDOWN, false);
                 me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                 me->SetReactState(REACT_PASSIVE);
@@ -131,7 +130,7 @@ public:
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
-                        me->Yell("debug: threat remove first", LANG_UNIVERSAL);
+                        LOG_ERROR("server", "Data {}", "threat remove 1");
                         uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
                         if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
                             head->AI()->Talk(threatYell - 1);
@@ -162,7 +161,7 @@ public:
                             {
                                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                 {
-                                    me->Yell("debug: threat remove maul", LANG_UNIVERSAL);
+                                    LOG_ERROR("server", "Data {}", "threat remove 2");
                                     uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
                                     if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
                                         head->AI()->Talk(threatYell - 1);
@@ -173,7 +172,7 @@ public:
                                     me->SetReactState(REACT_AGGRESSIVE);
                                     me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                                 }
-                                me->Yell("entered burning phase", LANG_UNIVERSAL);
+                                LOG_ERROR("server", "Data {}", "entered burning phase");
                             });
                         });                
                         scheduler.Schedule(4850ms, 8500ms, GROUP_BURNING_PHASE, [this](TaskContext context)
@@ -182,7 +181,7 @@ public:
                             context.Repeat(4850ms, 8500ms);
                         }).Schedule(45s, 60s, GROUP_BURNING_PHASE, [this](TaskContext context)
                         {
-                            me->Yell("back to p1", LANG_UNIVERSAL);
+                            LOG_ERROR("server", "Data {}", "should go back to p1 now");
                             me->LoadEquipment(EQUIP_STANDARD);
                             scheduler.CancelGroup(GROUP_BURNING_PHASE);
                             scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 12100ms, 17300ms);
