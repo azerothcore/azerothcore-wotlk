@@ -266,7 +266,6 @@ enum hMisc
     SPELL_HOR_START_QUEST_HORDE                   = 71542,
     SPELL_SHADOWMOURNE_VISUAL                     = 72523,
     SPELL_UTHER_DESPAWN                           = 70693, //Sniffed
-  //SPELL_ARCANE_CAST_VISUAL                      = 65633, // Warning-> Wrong spell
     SPELL_WELL_OF_SOULS_VISUAL                    = 72630,
     SPELL_SUMMON_SOULS                            = 72711, //Sniffed Sylvanas
 
