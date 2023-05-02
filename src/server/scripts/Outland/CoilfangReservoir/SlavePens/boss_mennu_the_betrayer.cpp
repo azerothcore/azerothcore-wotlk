@@ -46,14 +46,18 @@ struct boss_mennu_the_betrayer : public BossAI
     }
 
     void Reset() override
-    { 
+    {
         _Reset();
 
         ScheduleHealthCheckEvent(60, [&] {
-            DoCastSelf(SPELL_HEALING_WARD);    
+            DoCastSelf(SPELL_HEALING_WARD);
         });
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        summon->GetMotionMaster()->Clear();
+    }
 
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -94,7 +98,7 @@ struct boss_mennu_the_betrayer : public BossAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-
+        
         DoMeleeAttackIfReady();
     }
 

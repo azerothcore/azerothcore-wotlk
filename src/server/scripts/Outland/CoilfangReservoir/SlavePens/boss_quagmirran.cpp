@@ -39,7 +39,7 @@ struct boss_quagmirran : public BossAI
     }
 
     void Reset() override
-    { 
+    {
         _Reset();
     }
 

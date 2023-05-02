@@ -39,7 +39,7 @@ struct boss_rokmar_the_crackler : public BossAI
     }
 
     void Reset() override
-    { 
+    {
         _Reset();
 
         ScheduleHealthCheckEvent(20, [&] {
