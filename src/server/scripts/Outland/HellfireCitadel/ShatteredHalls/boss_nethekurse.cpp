@@ -106,6 +106,10 @@ public:
             EventStage = EVENT_STAGE_NONE;
             _Reset();
             events2.Reset();
+
+            ScheduleHealthCheckEvent(25, [&] {
+                DoCastSelf(SPELL_DARK_SPIN);
+            });
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -183,16 +187,6 @@ public:
                 {
                     DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
                     context.Repeat(1200ms, 23900ms);
-                }).Schedule(1s, [this](TaskContext context)
-                {
-                    if (me->HealthBelowPct(25))
-                    {
-                        DoCastSelf(SPELL_DARK_SPIN);
-                    }
-                    else
-                    {
-                        context.Repeat();
-                    }
                 });
         }
 
@@ -391,7 +385,7 @@ public:
 
 class at_rp_nethekurse : public AreaTriggerScript
 {
-    public:
+public:
     at_rp_nethekurse() : AreaTriggerScript
     ("at_rp_nethekurse") { }
 
