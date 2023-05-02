@@ -98,11 +98,8 @@ struct boss_mennu_the_betrayer : public BossAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-        
         DoMeleeAttackIfReady();
     }
-
-    
 };
 
 void AddSC_boss_mennu_the_betrayer()

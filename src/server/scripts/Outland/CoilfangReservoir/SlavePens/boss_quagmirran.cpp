@@ -71,7 +71,6 @@ struct boss_quagmirran : public BossAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-
         DoMeleeAttackIfReady();
     }
 };

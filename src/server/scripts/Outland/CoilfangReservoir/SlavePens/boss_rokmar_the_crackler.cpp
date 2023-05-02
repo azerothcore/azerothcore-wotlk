@@ -71,7 +71,6 @@ struct boss_rokmar_the_crackler : public BossAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-
         DoMeleeAttackIfReady();
     }
 };
