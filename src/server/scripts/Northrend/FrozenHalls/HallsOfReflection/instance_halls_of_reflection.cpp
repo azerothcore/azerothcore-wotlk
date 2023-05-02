@@ -449,7 +449,7 @@ public:
                             HandleGameObject(GO_FrontDoorGUID, true);
                             HandleGameObject(GO_ArthasDoorGUID, true);
                             if (Creature* c = instance->GetCreature(NPC_FrostswornGeneralGUID))
-                            {                               
+                            {
                                 c->SetVisible(true);
                                 c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -1057,7 +1057,7 @@ public:
                             if (Creature* falric = instance->GetCreature(NPC_FalricGUID))
                                 falric->SetVisible(false);
                             if (Creature* marwyn = instance->GetCreature(NPC_MarwynGUID))
-                                marwyn->SetVisible(false);                          
+                                marwyn->SetVisible(false);
                           ResumeFirstEventStep = 0;
                             ResumeFirstEventTimer = 0;
                             break;
