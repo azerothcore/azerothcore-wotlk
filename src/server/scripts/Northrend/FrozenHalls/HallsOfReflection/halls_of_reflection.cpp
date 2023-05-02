@@ -330,7 +330,7 @@ public:
                 case EVENT_INTRO_A2_3:
                     pInstance->HandleGameObject(pInstance->GetGuidData(GO_FROSTMOURNE), true);
                     me->CastSpell(me, SPELL_FROSTMOURNE_SPAWN_SOUND, true);
-                    //me->CastSpell(me, SPELL_ARCANE_CAST_VISUAL, false);// tirar assim que acabar de trabalhar na horda
+                    //me->CastSpell(me, SPELL_ARCANE_CAST_VISUAL, false);// take it off as soon as you finish working on the horde
                     events.ScheduleEvent(EVENT_INTRO_A2_4, 10s);
                     break;
                 case EVENT_INTRO_A2_4:
