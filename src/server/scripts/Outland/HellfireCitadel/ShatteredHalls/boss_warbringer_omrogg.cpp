@@ -135,7 +135,6 @@ public:
                         if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
                             head->AI()->Talk(threatYell - 1);
                         events.ScheduleEvent(threatYell, 3000);
-                        scheduler.CancelGroup(GROUP_NON_BURNING_PHASE);
                         DoResetThreatList();
                         me->AddThreat(target, 2250.0f);
                         scheduler.Schedule(1200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
@@ -144,16 +143,16 @@ public:
                             me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                         });
                     }
-                });
-                scheduler.Schedule(20s, 30s, GROUP_BURNING_PHASE, [this](TaskContext context)
+                }).Schedule(40s, 60s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
                 {
                     me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                     me->SetReactState(REACT_PASSIVE);
-                    scheduler.Schedule(1200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
+                    scheduler.Schedule(1200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
                     {
                         DoCastSelf(SPELL_FEAR, false);
                         DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
                         me->LoadEquipment(EQUIP_BURNING_MAUL);
+                        scheduler.CancelGroup(GROUP_NON_BURNING_PHASE);
                         scheduler.Schedule(200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                         {
                             me->Yell("%s roars!", LANG_UNIVERSAL);
@@ -186,8 +185,6 @@ public:
                             context.CancelGroup(GROUP_BURNING_PHASE);
                             scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 5ms);
                             context.RescheduleGroup(GROUP_NON_BURNING_PHASE, 5ms);
-                            LOG_ERROR("server", "Data {}", "last blast wave");
-                            DoCastAOE(SPELL_BLAST_WAVE);
                             LOG_ERROR("server", "Burning phase scheduled: {}", std::to_string(scheduler.IsGroupScheduled(GROUP_BURNING_PHASE)));
                             LOG_ERROR("server", "Non-burning phase scheduled: {}", std::to_string(scheduler.IsGroupScheduled(GROUP_NON_BURNING_PHASE)));
                         });
