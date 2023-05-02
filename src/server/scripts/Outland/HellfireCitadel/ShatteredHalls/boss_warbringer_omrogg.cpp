@@ -183,10 +183,13 @@ public:
                         {
                             LOG_ERROR("server", "Data {}", "should go back to p1 now");
                             me->LoadEquipment(EQUIP_STANDARD);
-                            scheduler.CancelGroup(GROUP_BURNING_PHASE);
-                            scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 12100ms, 17300ms);
-                            LOG_ERROR("server", "Data {}", std::to_string(scheduler.IsGroupScheduled(GROUP_BURNING_PHASE)));
-                            LOG_ERROR("server", "Data {}", std::to_string(scheduler.IsGroupScheduled(GROUP_NON_BURNING_PHASE)));
+                            context.CancelGroup(GROUP_BURNING_PHASE);
+                            scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 5ms);
+                            context.RescheduleGroup(GROUP_NON_BURNING_PHASE, 5ms);
+                            LOG_ERROR("server", "Data {}", "last blast wave");
+                            DoCastAOE(SPELL_BLAST_WAVE);
+                            LOG_ERROR("server", "Burning phase scheduled: {}", std::to_string(scheduler.IsGroupScheduled(GROUP_BURNING_PHASE)));
+                            LOG_ERROR("server", "Non-burning phase scheduled: {}", std::to_string(scheduler.IsGroupScheduled(GROUP_NON_BURNING_PHASE)));
                         });
                     });
                 });
