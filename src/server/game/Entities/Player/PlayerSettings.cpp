@@ -48,7 +48,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
 
             uint32 count = 0;
 
-            for (auto token : tokens)
+            for (auto& token : tokens)
             {
                 if (token.empty())
                 {
@@ -95,11 +95,11 @@ void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
         return;
     }
 
-    for (auto itr : m_charSettingsMap)
+    for (auto& itr : m_charSettingsMap)
     {
         std::ostringstream data;
 
-        for (auto setting : itr.second)
+        for (auto& setting : itr.second)
         {
             data << setting.value << ' ';
         }

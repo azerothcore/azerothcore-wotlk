@@ -85,8 +85,6 @@ enum PaletressEvents
     EVENT_SPELL_WAKING_NIGHTMARE,
 };
 
-#define TEXT_RADIATE                    "Eadric the Pure begins to radiate light. Shield your eyes!"
-
 class boss_eadric : public CreatureScript
 {
 public:
@@ -119,10 +117,7 @@ public:
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0, 1) )
-                    Talk(TEXT_EADRIC_SLAIN_1);
-                else
-                    Talk(TEXT_EADRIC_SLAIN_2);
+                Talk(SAY_EADRIC_KILL_PLAYER);
             }
         }
 
@@ -131,7 +126,7 @@ public:
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16000);
             events.ScheduleEvent(EVENT_SPELL_HAMMER_RIGHTEOUS, 25000);
-            Talk(TEXT_EADRIC_AGGRO);
+            Talk(SAY_EADRIC_AGGRO);
             me->CastSpell(me, SPELL_VENGEANCE, false);
             if( pInstance )
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
@@ -154,7 +149,7 @@ public:
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, 68574, me); // paletress' spell credits encounter, but shouldn't credit achievements
                     me->SetFaction(FACTION_FRIENDLY);
                     events.Reset();
-                    Talk(TEXT_EADRIC_DEATH);
+                    Talk(SAY_EADRIC_DEFEATED);
                     me->GetThreatMgr().clearReferences();
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
@@ -182,16 +177,14 @@ public:
                     break;
                 case EVENT_SPELL_RADIANCE:
                     me->CastSpell((Unit*)nullptr, SPELL_RADIANCE, false);
-                    me->TextEmote(TEXT_RADIATE, nullptr, true);
+                    Talk(SAY_EADRIC_EMOTE_RADIANCE);
                     events.Repeat(16s);
                     break;
                 case EVENT_SPELL_HAMMER_RIGHTEOUS:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 55.0f, true) )
                     {
-                        char buffer[100];
-                        snprintf(buffer, sizeof(buffer), "Eadric the Pure targets %s with the Hammer of the Righteous!", target->GetName().c_str());
-                        me->TextEmote(buffer, nullptr, true);
-                        Talk(TEXT_EADRIC_HAMMER);
+                        Talk(SAY_EADRIC_EMOTE_HAMMER_RIGHTEOUS, target);
+                        Talk(SAY_EADRIC_HAMMER_RIGHTEOUS);
                         me->CastSpell(target, SPELL_HAMMER_JUSTICE, true);
                         me->CastSpell(target, SPELL_HAMMER_RIGHTEOUS, false);
                     }
@@ -251,10 +244,7 @@ public:
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0, 1) )
-                    Talk(TEXT_PALETRESS_SLAIN_1);
-                else
-                    Talk(TEXT_PALETRESS_SLAIN_2);
+                Talk(SAY_PALETRESS_KILL_PLAYER);
             }
         }
 
@@ -264,7 +254,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, 9s, 12s);
             events.ScheduleEvent(EVENT_SPELL_SMITE, 2s, 3s);
             me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-            Talk(TEXT_PALETRESS_AGGRO);
+            Talk(SAY_PALETRESS_AGGRO);
             if( pInstance )
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
@@ -275,7 +265,7 @@ public:
             {
                 MemoryGUID.Clear();
                 me->RemoveAura(SPELL_SHIELD);
-                Talk(TEXT_PALETRESS_MEMORY_DEFEATED);
+                Talk(SAY_PALETRESS_MEMORY_DEATH);
             }
             else if( param == (-1) )
             {
@@ -302,7 +292,7 @@ public:
                     me->CastSpell((Unit*)nullptr, 68574, true); // achievements
                     me->SetFaction(FACTION_FRIENDLY);
                     events.Reset();
-                    Talk(TEXT_PALETRESS_DEATH);
+                    Talk(SAY_PALETRESS_DEFEATED);
                     me->GetThreatMgr().clearReferences();
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
@@ -341,7 +331,7 @@ public:
             if( !summoned && HealthBelowPct(25) )
             {
                 me->InterruptNonMeleeSpells(true);
-                Talk(TEXT_PALETRESS_MEMORY_SUMMON);
+                Talk(SAY_PALETRESS_MEMORY_SUMMON);
                 me->CastSpell((Unit*)nullptr, SPELL_HOLY_NOVA, false);
                 me->CastSpell(me, SPELL_SHIELD, false);
                 me->CastSpell((Unit*)nullptr, SPELL_SUMMON_MEMORY, false);

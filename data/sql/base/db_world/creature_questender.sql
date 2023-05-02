@@ -17,14 +17,13 @@
 -- Dumping structure for table acore_world.creature_questender
 DROP TABLE IF EXISTS `creature_questender`;
 CREATE TABLE IF NOT EXISTS `creature_questender` (
-  `id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
-  `quest` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
+  `id` int unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
+  `quest` int unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Creature System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Creature System';
 
--- Dumping data for table acore_world.creature_questender: 7,898 rows
+-- Dumping data for table acore_world.creature_questender: ~7,899 rows (approximately)
 DELETE FROM `creature_questender`;
-/*!40000 ALTER TABLE `creature_questender` DISABLE KEYS */;
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 	(196, 33),
 	(196, 5261),
@@ -3193,6 +3192,7 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 	(14905, 8073),
 	(14905, 8141),
 	(14905, 8142),
+	(14905, 8143),
 	(14905, 8144),
 	(14905, 8145),
 	(14905, 8146),
@@ -7924,7 +7924,6 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 	(40391, 25470),
 	(40391, 25480),
 	(40429, 26013);
-/*!40000 ALTER TABLE `creature_questender` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

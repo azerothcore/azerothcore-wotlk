@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `game_event_gameobject` (
   `eventEntry` tinyint NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
   `guid` int unsigned NOT NULL,
   PRIMARY KEY (`guid`,`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event_gameobject: 21,709 rows
+-- Dumping data for table acore_world.game_event_gameobject: ~21,720 rows (approximately)
 DELETE FROM `game_event_gameobject`;
-/*!40000 ALTER TABLE `game_event_gameobject` DISABLE KEYS */;
 INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(1, 1),
 	(1, 3),
@@ -217,6 +216,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(8, 9761),
 	(8, 9762),
 	(8, 9763),
+	(8, 9764),
 	(8, 9765),
 	(8, 9766),
 	(8, 9767),
@@ -227,6 +227,8 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(8, 9772),
 	(8, 9773),
 	(8, 9774),
+	(8, 9775),
+	(8, 9776),
 	(8, 9777),
 	(8, 9778),
 	(8, 9779),
@@ -238,6 +240,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(8, 9785),
 	(8, 9786),
 	(8, 9787),
+	(8, 9788),
 	(8, 9789),
 	(8, 9790),
 	(8, 9791),
@@ -261,9 +264,30 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(8, 9810),
 	(8, 9811),
 	(8, 9813),
+	(8, 9814),
+	(8, 9815),
+	(8, 9816),
+	(8, 9817),
+	(8, 9818),
+	(8, 9819),
+	(8, 9820),
+	(8, 9821),
+	(8, 9822),
+	(8, 9823),
+	(8, 9824),
+	(8, 9825),
+	(8, 9826),
+	(8, 9827),
 	(8, 9828),
+	(8, 9829),
 	(8, 9830),
+	(8, 9831),
+	(8, 9832),
 	(8, 9833),
+	(8, 9834),
+	(8, 9835),
+	(8, 9836),
+	(8, 9837),
 	(15, 11012),
 	(15, 11453),
 	(15, 11480),
@@ -2089,20 +2113,13 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(24, 31869),
 	(24, 31870),
 	(24, 31871),
-	(24, 31872),
 	(71, 31872),
 	(24, 31873),
-	(24, 31874),
 	(71, 31874),
-	(24, 31875),
 	(71, 31875),
-	(24, 31876),
 	(71, 31876),
-	(24, 31877),
 	(71, 31877),
-	(24, 31878),
 	(71, 31878),
-	(24, 31879),
 	(71, 31879),
 	(24, 31880),
 	(24, 31881),
@@ -2120,19 +2137,12 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(24, 31893),
 	(24, 31894),
 	(24, 31895),
-	(24, 31912),
 	(71, 31912),
-	(24, 31913),
 	(71, 31913),
-	(24, 31914),
 	(71, 31914),
-	(24, 31915),
 	(71, 31915),
-	(24, 31916),
 	(71, 31916),
-	(24, 31918),
 	(71, 31918),
-	(24, 31919),
 	(71, 31919),
 	(24, 31920),
 	(24, 31921),
@@ -10014,7 +10024,8 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(31, 47097),
 	(31, 47098),
 	(31, 47099),
-	(31, 47100),
+	(31, 47100);
+INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(31, 47101),
 	(31, 47102),
 	(31, 47103),
@@ -10025,8 +10036,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(31, 47108),
 	(31, 47109),
 	(31, 47110),
-	(31, 47111);
-INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
+	(31, 47111),
 	(31, 47112),
 	(31, 47113),
 	(31, 47114),
@@ -20015,7 +20025,8 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(26, 240694),
 	(26, 240695),
 	(26, 240696),
-	(26, 240697),
+	(26, 240697);
+INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(26, 240698),
 	(26, 240699),
 	(26, 240700),
@@ -20026,8 +20037,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(26, 240705),
 	(26, 240706),
 	(26, 240707),
-	(26, 240708);
-INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
+	(26, 240708),
 	(26, 240709),
 	(26, 240710),
 	(26, 240711),
@@ -21737,7 +21747,6 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(1, 242682),
 	(1, 242683),
 	(1, 242684);
-/*!40000 ALTER TABLE `game_event_gameobject` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

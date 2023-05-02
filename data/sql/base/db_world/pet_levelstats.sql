@@ -17,7 +17,7 @@
 -- Dumping structure for table acore_world.pet_levelstats
 DROP TABLE IF EXISTS `pet_levelstats`;
 CREATE TABLE IF NOT EXISTS `pet_levelstats` (
-  `creature_entry` mediumint unsigned NOT NULL,
+  `creature_entry` int unsigned NOT NULL,
   `level` tinyint unsigned NOT NULL,
   `hp` int unsigned NOT NULL DEFAULT '0',
   `mana` int unsigned NOT NULL DEFAULT '0',
@@ -30,11 +30,10 @@ CREATE TABLE IF NOT EXISTS `pet_levelstats` (
   `min_dmg` int unsigned NOT NULL DEFAULT '0',
   `max_dmg` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`creature_entry`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci PACK_KEYS=0 COMMENT='Stores pet levels stats.';
 
--- Dumping data for table acore_world.pet_levelstats: 2,720 rows
+-- Dumping data for table acore_world.pet_levelstats: ~2,720 rows (approximately)
 DELETE FROM `pet_levelstats`;
-/*!40000 ALTER TABLE `pet_levelstats` DISABLE KEYS */;
 INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, `str`, `agi`, `sta`, `inte`, `spi`, `min_dmg`, `max_dmg`) VALUES
 	(1, 1, 42, 1, 20, 22, 20, 22, 20, 20, 0, 0),
 	(1, 2, 55, 1, 21, 23, 21, 23, 20, 20, 0, 0),
@@ -2756,7 +2755,6 @@ INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, 
 	(37994, 78, 7153, 2815, 5688, 195, 151, 114, 341, 230, 0, 0),
 	(37994, 79, 7361, 2860, 5868, 199, 155, 116, 347, 235, 0, 0),
 	(37994, 80, 7561, 2908, 7782, 203, 159, 118, 369, 240, 0, 0);
-/*!40000 ALTER TABLE `pet_levelstats` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
