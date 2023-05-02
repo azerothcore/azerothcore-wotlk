@@ -606,6 +606,21 @@ void ScriptMgr::OnQuestRewardItem(Player* player, Item* item, uint32 count)
     });
 }
 
+bool ScriptMgr::CanPlaceAuctionBid(Player* player, AuctionEntry* auction)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript *script)
+    {
+       return !script->CanPlaceAuctionBid(player, auction);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void ScriptMgr::OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)

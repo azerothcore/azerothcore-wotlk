@@ -131,7 +131,7 @@ public:
 
             if (!cobraList.empty())
             {
-                for (auto cobras : cobraList)
+                for (auto& cobras : cobraList)
                 {
                     cobras->SetInCombatWithZone();
                 }

@@ -17,13 +17,13 @@
 -- Dumping structure for table acore_auth.ip_banned
 DROP TABLE IF EXISTS `ip_banned`;
 CREATE TABLE IF NOT EXISTS `ip_banned` (
-  `ip` varchar(15) NOT NULL DEFAULT '127.0.0.1',
+  `ip` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '127.0.0.1',
   `bandate` int unsigned NOT NULL,
   `unbandate` int unsigned NOT NULL,
-  `bannedby` varchar(50) NOT NULL DEFAULT '[Console]',
-  `banreason` varchar(255) NOT NULL DEFAULT 'no reason',
+  `bannedby` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '[Console]',
+  `banreason` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'no reason',
   PRIMARY KEY (`ip`,`bandate`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Banned IPs';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Banned IPs';
 
 -- Dumping data for table acore_auth.ip_banned: ~0 rows (approximately)
 DELETE FROM `ip_banned`;
