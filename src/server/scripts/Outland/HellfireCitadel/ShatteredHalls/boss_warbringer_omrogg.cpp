@@ -67,6 +67,7 @@ enum Phase
 {
     GROUP_NON_BURNING_PHASE           = 0,
     GROUP_BURNING_PHASE               = 1,
+    GROUP_FULL_PHASE                  = 2
 };
 
 
@@ -114,82 +115,82 @@ public:
             }
 
             _JustEngagedWith();
-            LOG_ERROR("server", "Data {}", "entered non-burning phase");
-            scheduler.Schedule(12100ms, 17300ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+            scheduler.Schedule(500ms, GROUP_FULL_PHASE, [this](TaskContext context)
             {
-                LOG_ERROR("server", "Data {}", std::to_string(scheduler.IsGroupScheduled(GROUP_NON_BURNING_PHASE)));
-                DoCastAOE(SPELL_THUNDERCLAP);
-                context.Repeat(17200ms, 24200ms);
-            }).Schedule(20s, 30s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
-            {
-                LOG_ERROR("server", "Data {}", "beatdown cast");
-                DoCastSelf(SPELL_BEATDOWN, false);
-                me->SetUnitFlag(UNIT_FLAG_PACIFIED);
-                me->SetReactState(REACT_PASSIVE);
-                scheduler.Schedule(200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+
+                scheduler.Schedule(12100ms, 17300ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
                 {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    {
-                        LOG_ERROR("server", "Data {}", "threat remove 1");
-                        uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
-                        if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
-                            head->AI()->Talk(threatYell - 1);
-                        events.ScheduleEvent(threatYell, 3000);
-                        DoResetThreatList();
-                        me->AddThreat(target, 2250.0f);
-                        scheduler.Schedule(1200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
-                        {
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
-                        });
-                    }
-                }).Schedule(40s, 60s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                    DoCastAOE(SPELL_THUNDERCLAP);
+                    context.Repeat(17200ms, 24200ms);
+                }).Schedule(20s, 30s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
                 {
+                    DoCastSelf(SPELL_BEATDOWN, false);
                     me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                     me->SetReactState(REACT_PASSIVE);
-                    scheduler.Schedule(1200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                    scheduler.Schedule(200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
                     {
-                        DoCastSelf(SPELL_FEAR, false);
-                        DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
-                        me->LoadEquipment(EQUIP_BURNING_MAUL);
-                        scheduler.CancelGroup(GROUP_NON_BURNING_PHASE);
-                        scheduler.Schedule(200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
-                            me->Yell("%s roars!", LANG_UNIVERSAL);
-                            scheduler.Schedule(2200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
+                            uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
+                            if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
+                                head->AI()->Talk(threatYell - 1);
+                            events.ScheduleEvent(threatYell, 3000);
+                            DoResetThreatList();
+                            me->AddThreat(target, 2250.0f);
+                            scheduler.Schedule(1200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                             {
-                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                                {
-                                    LOG_ERROR("server", "Data {}", "threat remove 2");
-                                    uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
-                                    if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
-                                        head->AI()->Talk(threatYell - 1);
-                                    events.ScheduleEvent(threatYell, 3000);
-
-                                    DoResetThreatList();
-                                    me->AddThreat(target, 2250.0f);
-                                    me->SetReactState(REACT_AGGRESSIVE);
-                                    me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
-                                }
-                                LOG_ERROR("server", "Data {}", "entered burning phase");
+                                me->SetReactState(REACT_AGGRESSIVE);
+                                me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                             });
-                        });                
-                        scheduler.Schedule(4850ms, 8500ms, GROUP_BURNING_PHASE, [this](TaskContext context)
+                        }
+                    }).Schedule(40s, 60s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                    {
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
+                        me->SetReactState(REACT_PASSIVE);
+                        scheduler.Schedule(1200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
                         {
-                            DoCastAOE(SPELL_BLAST_WAVE, false);
-                            context.Repeat(4850ms, 8500ms);
-                        }).Schedule(45s, 60s, GROUP_BURNING_PHASE, [this](TaskContext context)
-                        {
-                            LOG_ERROR("server", "Data {}", "should go back to p1 now");
-                            me->LoadEquipment(EQUIP_STANDARD);
-                            context.CancelGroup(GROUP_BURNING_PHASE);
-                            scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 5ms);
-                            context.RescheduleGroup(GROUP_NON_BURNING_PHASE, 5ms);
-                            LOG_ERROR("server", "Burning phase scheduled: {}", std::to_string(scheduler.IsGroupScheduled(GROUP_BURNING_PHASE)));
-                            LOG_ERROR("server", "Non-burning phase scheduled: {}", std::to_string(scheduler.IsGroupScheduled(GROUP_NON_BURNING_PHASE)));
+                            DoCastSelf(SPELL_FEAR, false);
+                            DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
+                            me->LoadEquipment(EQUIP_BURNING_MAUL);
+                            scheduler.CancelGroup(GROUP_NON_BURNING_PHASE);
+                            scheduler.Schedule(200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
+                            {
+                                me->Yell("%s roars!", LANG_UNIVERSAL);
+                                scheduler.Schedule(2200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
+                                {
+                                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                                    {
+                                        uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
+                                        if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())
+                                            head->AI()->Talk(threatYell - 1);
+                                        events.ScheduleEvent(threatYell, 3000);
+
+                                        DoResetThreatList();
+                                        me->AddThreat(target, 2250.0f);
+                                        me->SetReactState(REACT_AGGRESSIVE);
+                                        me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
+                                    }
+                                });
+                            });
+                            scheduler.Schedule(4850ms, 8500ms, GROUP_BURNING_PHASE, [this](TaskContext context)
+                            {
+                                DoCastAOE(SPELL_BLAST_WAVE, false);
+                                context.Repeat(4850ms, 8500ms);
+                            }).Schedule(45s, 60s, GROUP_BURNING_PHASE, [this](TaskContext context)
+                            {
+                                me->LoadEquipment(EQUIP_STANDARD);
+                                context.CancelGroup(GROUP_BURNING_PHASE);
+                                scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 5ms);
+                                context.RescheduleGroup(GROUP_NON_BURNING_PHASE, 5ms);
+                                scheduler.Schedule(1s, [this](TaskContext context)
+                                {
+                                    context.RescheduleGroup(GROUP_FULL_PHASE, 50ms);
+                                });
+                            });
                         });
                     });
                 });
+            context.Repeat(130s, 150s);
             });
         }
 
