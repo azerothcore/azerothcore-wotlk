@@ -114,10 +114,10 @@ public:
             }
 
             _JustEngagedWith();
-
             LOG_ERROR("server", "Data {}", "entered non-burning phase");
             scheduler.Schedule(12100ms, 17300ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
             {
+                LOG_ERROR("server", "Data {}", std::to_string(scheduler.IsGroupScheduled(GROUP_NON_BURNING_PHASE)));
                 DoCastAOE(SPELL_THUNDERCLAP);
                 context.Repeat(17200ms, 24200ms);
             }).Schedule(20s, 30s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
@@ -185,6 +185,8 @@ public:
                             me->LoadEquipment(EQUIP_STANDARD);
                             scheduler.CancelGroup(GROUP_BURNING_PHASE);
                             scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 12100ms, 17300ms);
+                            LOG_ERROR("server", "Data {}", std::to_string(scheduler.IsGroupScheduled(GROUP_BURNING_PHASE)));
+                            LOG_ERROR("server", "Data {}", std::to_string(scheduler.IsGroupScheduled(GROUP_NON_BURNING_PHASE)));
                         });
                     });
                 });
