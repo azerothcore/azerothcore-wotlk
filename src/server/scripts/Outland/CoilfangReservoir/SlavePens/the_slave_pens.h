@@ -65,6 +65,8 @@ enum SPCreaturesIds
     NPC_SHAMAN_BEAM_BUNNY_002            = 25966,
     NPC_WHISP_DEST_BUNNY                 = 26120,
     NPC_WHISP_SOURCE_BUNNY               = 26121,
+    NPC_MENNU_THE_BETRAYER               = 17941,
+    NPC_ROKMAR_THE_CRACKLER              = 17991,
     NPC_QUAGMIRRAN                       = 17942
 };
 
@@ -79,5 +81,7 @@ inline AI* GetTheSlavePensAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, SPScriptName);
 }
+
+#define RegisterTheSlavePensCreatureAI(ai_name) RegisterCreatureAIWithFactory (ai_name, GetTheSlavePensAI)
 
 #endif // SLAVE_PENS_H
