@@ -1167,7 +1167,7 @@ public:
                             {
                                 c->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 c->GetMotionMaster()->MovePoint(0, WalkCaveInPos);
-                                c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP); // precisa da gossip 10931
+                                c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP); // need gossip ID 10931
                             }
                             ++outroStep;
                             outroTimer = 6000;
