@@ -294,9 +294,11 @@ public:
                     if (me->GetEntry() == NPC_JAINA_PART1)
                         events.ScheduleEvent(EVENT_INTRO_A2_1, 10s);
                     else
+                    {
                         events.ScheduleEvent(EVENT_INTRO_H2_2, 9s);
                         events.ScheduleEvent(EVENT_LORALEN_MOVE_1, 24s);
                         events.ScheduleEvent(EVENT_LORALEN_MOVE_2, 32s);
+                    }
                     break;
 
                 case EVENT_LORALEN_MOVE_1:
