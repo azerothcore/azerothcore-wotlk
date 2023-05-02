@@ -26,8 +26,14 @@ enum Events
     EVENT_PRE_INTRO_2,
     EVENT_PRE_INTRO_3,
 
+    EVENT_TALK_LEADER_1,
+    EVENT_EMOTE_LEADER_1,
+
     EVENT_START_INTRO,
     EVENT_SKIP_INTRO,
+    EVENT_LORALEN_MOVE_1,
+    EVENT_LORALEN_MOVE_2,
+    //EVENT_LORALEN_DEAD,
 
     EVENT_INTRO_A2_1,
     EVENT_INTRO_A2_2,
@@ -51,7 +57,10 @@ enum Events
 
     EVENT_INTRO_H2_1,
     EVENT_INTRO_H2_2,
+    EVENT_INTRO_H2_2_1,
     EVENT_INTRO_H2_3,
+    EVENT_INTRO_H2_3_1,
+    EVENT_INTRO_H2_3_2,
     EVENT_INTRO_H2_4,
     EVENT_INTRO_H2_5,
     EVENT_INTRO_H2_6,
@@ -65,20 +74,31 @@ enum Events
     EVENT_INTRO_H2_14,
     EVENT_INTRO_H2_15,
 
+    //BATTLE SYLVANAS X LK//
+    BATTLE_SYLVANAS_PART1,
+
     EVENT_INTRO_LK_1,
+    EVENT_INTRO_LK_1_1,
     EVENT_INTRO_LK_1_2,
     EVENT_INTRO_LK_1_3,
     EVENT_INTRO_LK_2,
+    EVENT_INTRO_LK_2_1,
     EVENT_INTRO_LK_3,
     EVENT_INTRO_LK_4,
     EVENT_INTRO_LK_4_2,
     EVENT_INTRO_LK_4_3,
     EVENT_INTRO_LK_5,
+    EVENT_INTRO_LK_5_1,
     EVENT_INTRO_LK_5_2,
+    EVENT_INTRO_LK_5_3,
     EVENT_INTRO_LK_6,
     EVENT_INTRO_LK_7,
     EVENT_INTRO_LK_8,
     EVENT_INTRO_LK_9,
+    EVENT_INTRO_LK_10,
+    EVENT_INTRO_LK_11,
+    EVENT_INTRO_LK_12,
+    EVENT_INTRO_LK_13,
 
     EVENT_INTRO_END,
     EVENT_INTRO_END_SET,
@@ -86,11 +106,23 @@ enum Events
 
 enum Gossips
 {
-    GOSSIP_MENU_SYLVANAS      = 10950,
-    GOSISP_MENU_JAINA         = 11031,
+    GOSSIP_MENU_SYLVANAS        = 10950,
+    GOSISP_MENU_JAINA           = 11031,
 
     GOSSIP_OPTION_START       = 0,
     GOSSIP_OPTION_START_SKIP  = 1,
+};
+Position const NpcJainaOrSylvanasEscapeRoute[] =
+{
+    { 5601.217285f, 2207.652832f, 731.541931f, 5.223304f }, // leave the throne room
+    { 5607.224375f, 2173.913330f, 731.126038f, 2.608723f }, // adjust route
+    { 5583.427246f, 2138.784180f, 731.150391f, 4.260901f }, // stop for talking
+    { 5560.281738f, 2104.025635f, 731.410889f, 4.058383f }, // attack the first icewall
+    { 5510.990723f, 2000.772217f, 734.716064f, 3.973213f }, // attack the second icewall
+    { 5452.641113f, 1905.762329f, 746.530579f, 4.118834f }, // attack the third icewall
+    { 5338.126953f, 1768.429810f, 767.237244f, 3.855189f }, // attack the fourth icewall
+    { 5259.06f,     1669.27f,     784.3008f,   0.0f      }, // trap (sniffed)
+    { 5265.53f,     1681.6f,      784.2947f,   4.13643f  }  // final position (sniffed)
 };
 
 class npc_hor_leader : public CreatureScript
@@ -189,7 +221,7 @@ public:
         bool shortver;
 
         void Reset() override
-        {
+        {           
             shortver = false;
             events.Reset();
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
@@ -198,7 +230,9 @@ public:
                 first = false;
                 events.ScheduleEvent(EVENT_PRE_INTRO_1, 10s);
                 events.ScheduleEvent(EVENT_PRE_INTRO_2, 11s);
-                events.ScheduleEvent(EVENT_PRE_INTRO_3, 17s);
+                events.ScheduleEvent(EVENT_EMOTE_LEADER_1, 16s);
+                events.ScheduleEvent(EVENT_TALK_LEADER_1, 16s);              
+                events.ScheduleEvent(EVENT_PRE_INTRO_3, 19s);               
             }
         }
 
@@ -219,49 +253,74 @@ public:
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
-            {
+            {               
                 case EVENT_PRE_INTRO_1:
                     if (pInstance)
                     {
+                        
+                        me->SetSheath(SHEATH_STATE_MELEE);
                         me->SetVisible(true);
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                            c->SetVisible(true);
+                        
                     }
                     break;
                 case EVENT_PRE_INTRO_2:
                     if (me->GetEntry() == NPC_JAINA_PART1)
-                        Talk(SAY_JAINA_INTRO_1);
-                    me->GetMotionMaster()->MovePoint(0, SpawnPos);
+                       Talk(SAY_JAINA_INTRO_1);                 
+                    me->GetMotionMaster()->MovePoint(0, SpawnPos);                   
+                    break;
+                case EVENT_TALK_LEADER_1:
+                    me->SetSheath(SHEATH_STATE_UNARMED);
+                    Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_1);                  
+                    break;
+                case EVENT_EMOTE_LEADER_1:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
                     break;
                 case EVENT_PRE_INTRO_3:
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                    Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_1);
-                    me->SetFacingTo(0.89f);
-                    break;
-
+                    me->SetSheath(SHEATH_STATE_MELEE);
+                    break;                  
                 case EVENT_START_INTRO:
-                    shortver = false;
+                    shortver = false;                   
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                     me->GetMotionMaster()->MovePoint(0, MoveThronePos);
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                        c->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
+                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                    {
+                        pLoralen->LoadEquipment(true);
+                        pLoralen->SetVisible(true);
+                        pLoralen->SetWalk(true);
+                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenMidleFollowPos);
+                        
+                    }
                     // Begining of intro is differents between factions as the speech sequence and timers are differents.
                     if (me->GetEntry() == NPC_JAINA_PART1)
                         events.ScheduleEvent(EVENT_INTRO_A2_1, 10s);
                     else
-                        events.ScheduleEvent(EVENT_INTRO_H2_2, 10s);
+                        events.ScheduleEvent(EVENT_INTRO_H2_2, 9s);
+                        events.ScheduleEvent(EVENT_LORALEN_MOVE_1, 24s);
+                        events.ScheduleEvent(EVENT_LORALEN_MOVE_2, 32s);
                     break;
+
+                case EVENT_LORALEN_MOVE_1:
+                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))                   
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
+                    break;
+
+                case EVENT_LORALEN_MOVE_2:
+                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                        pLoralen->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
+                    break;
+
                 case EVENT_SKIP_INTRO:
                     shortver = true;
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, (me->GetEntry() == NPC_JAINA_PART1 ? EMOTE_STATE_READY2H : EMOTE_STATE_READY1H));
                     me->GetMotionMaster()->MovePoint(0, MoveThronePos);
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                        c->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
+                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
                     events.ScheduleEvent(EVENT_INTRO_LK_1, 0ms);
                     break;
 
                 // A2 Intro Events
-                case EVENT_INTRO_A2_1:
+                case EVENT_INTRO_A2_1:                   
                     Talk(SAY_JAINA_INTRO_3);
                     events.ScheduleEvent(EVENT_INTRO_A2_2, 5s);
                     break;
@@ -272,7 +331,7 @@ public:
                 case EVENT_INTRO_A2_3:
                     pInstance->HandleGameObject(pInstance->GetGuidData(GO_FROSTMOURNE), true);
                     me->CastSpell(me, SPELL_FROSTMOURNE_SPAWN_SOUND, true);
-                    me->CastSpell(me, SPELL_ARCANE_CAST_VISUAL, false);
+                    //me->CastSpell(me, SPELL_ARCANE_CAST_VISUAL, false);// tirar assim que acabar de trabalhar na horda
                     events.ScheduleEvent(EVENT_INTRO_A2_4, 10s);
                     break;
                 case EVENT_INTRO_A2_4:
@@ -347,7 +406,7 @@ public:
                 case EVENT_INTRO_A2_18:
                     if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
                     {
-                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_NO);
+                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         pUther->AI()->Talk(SAY_UTHER_INTRO_A2_8);
                     }
                     events.ScheduleEvent(EVENT_INTRO_A2_19, 11s);
@@ -359,76 +418,114 @@ public:
 
                 // H2 Intro Events
                 case EVENT_INTRO_H2_2:
+                    me->SetSheath(SHEATH_STATE_UNARMED);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                     Talk(SAY_SYLVANAS_INTRO_2);
-                    events.ScheduleEvent(EVENT_INTRO_H2_3, 6s);
+                    events.ScheduleEvent(EVENT_INTRO_H2_2_1, 7s +500ms);
                     break;
-                case EVENT_INTRO_H2_3:
+
+                case EVENT_INTRO_H2_2_1:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     Talk(SAY_SYLVANAS_INTRO_3);
+                    events.ScheduleEvent(EVENT_INTRO_H2_3, 2s);
+                    break;
+
+                case EVENT_INTRO_H2_3:                 
+                    me->CastSpell(me, SPELL_SUMMON_SOULS, false); //esperar              
+                    events.ScheduleEvent(EVENT_INTRO_H2_3_1, 5s);
+                    break;
+
+                case EVENT_INTRO_H2_3_1:
+                    me->CastSpell(me, SPELL_FROSTMOURNE_SPAWN_SOUND, false);
                     pInstance->HandleGameObject(pInstance->GetGuidData(GO_FROSTMOURNE), true);
-                    me->CastSpell(me, SPELL_FROSTMOURNE_SPAWN_SOUND, true);
-                    me->CastSpell(me, SPELL_ARCANE_CAST_VISUAL, false);
-                    events.ScheduleEvent(EVENT_INTRO_H2_4, 6s);
+                     events.ScheduleEvent(EVENT_INTRO_H2_3_2, 3s);
+                    break;
+
+                case EVENT_INTRO_H2_3_2:
+                    me->RemoveAurasDueToSpell(SPELL_SUMMON_SOULS);
+                    events.ScheduleEvent(EVENT_INTRO_H2_4, 2s);
                     break;
                 case EVENT_INTRO_H2_4:
-                    if (Creature* pUther = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_UTHER)))
-                    {
-                        pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                        pUther->SetVisible(true);
-                        if (Aura* a = pUther->AddAura(SPELL_SHADOWMOURNE_VISUAL, pUther))
-                            a->SetDuration(8000);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_H2_5, 2s);
+                    if (Creature* pUther = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_UTHER)))// testando            
+                        {
+                            pUther->SetVisible(true);
+                            if (Aura* a = pUther->AddAura(SPELL_SHADOWMOURNE_VISUAL, pUther))
+                                a->SetDuration(8000);
+                        }
+                    events.ScheduleEvent(EVENT_INTRO_H2_5, 7s);
                     break;
+
                 case EVENT_INTRO_H2_5:
                     if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                    {
+                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         pUther->AI()->Talk(SAY_UTHER_INTRO_H2_1);
+                    }
                     events.ScheduleEvent(EVENT_INTRO_H2_6, 11s);
                     break;
                 case EVENT_INTRO_H2_6:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     Talk(SAY_SYLVANAS_INTRO_4);
-                    events.ScheduleEvent(EVENT_INTRO_H2_7, 3s);
+                    events.ScheduleEvent(EVENT_INTRO_H2_7, 2s +500ms);
                     break;
                 case EVENT_INTRO_H2_7:
                     if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                    {
+                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         pUther->AI()->Talk(SAY_UTHER_INTRO_H2_2);
-                    events.ScheduleEvent(EVENT_INTRO_H2_8, 6s);
+                    }
+                    events.ScheduleEvent(EVENT_INTRO_H2_8, 9s);//
                     break;
                 case EVENT_INTRO_H2_8:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     Talk(SAY_SYLVANAS_INTRO_5);
                     events.ScheduleEvent(EVENT_INTRO_H2_9, 5s);
                     break;
                 case EVENT_INTRO_H2_9:
                     if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                    {
+                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         pUther->AI()->Talk(SAY_UTHER_INTRO_H2_3);
-                    events.ScheduleEvent(EVENT_INTRO_H2_10, 19s);
+                    }
+                    events.ScheduleEvent(EVENT_INTRO_H2_10, 20s);
                     break;
                 case EVENT_INTRO_H2_10:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     Talk(SAY_SYLVANAS_INTRO_6);
-                    events.ScheduleEvent(EVENT_INTRO_H2_11, 1500ms);
+                    events.ScheduleEvent(EVENT_INTRO_H2_11, 3s);
                     break;
                 case EVENT_INTRO_H2_11:
                     if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                    {
+                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         pUther->AI()->Talk(SAY_UTHER_INTRO_H2_4);
-                    events.ScheduleEvent(EVENT_INTRO_H2_12, 19s + 500ms);
+                    }
+                    events.ScheduleEvent(EVENT_INTRO_H2_12, 21s + 500ms);
                     break;
                 case EVENT_INTRO_H2_12:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                     Talk(SAY_SYLVANAS_INTRO_7);
-                    events.ScheduleEvent(EVENT_INTRO_H2_13, 2s);
+                    events.ScheduleEvent(EVENT_INTRO_H2_13, 3s + 500ms);
                     break;
                 case EVENT_INTRO_H2_13:
                     if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
                     {
-                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_NO);
+                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         pUther->AI()->Talk(SAY_UTHER_INTRO_H2_5);
+                        
                     }
-                    events.ScheduleEvent(EVENT_INTRO_H2_14, 12s);
+                    events.ScheduleEvent(EVENT_INTRO_H2_14, 12s + 500ms);
                     break;
                 case EVENT_INTRO_H2_14:
                     if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                    {
+                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         pUther->AI()->Talk(SAY_UTHER_INTRO_H2_6);
+                    }
                     events.ScheduleEvent(EVENT_INTRO_H2_15, 8s);
                     break;
                 case EVENT_INTRO_H2_15:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                     Talk(SAY_SYLVANAS_INTRO_8);
                     events.ScheduleEvent(EVENT_INTRO_LK_1, 2s);
                     break;
@@ -436,30 +533,47 @@ public:
                 // Remaining Intro Events common for both faction
                 case EVENT_INTRO_LK_1:
                     if (Creature* pLichKing = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
-                    {
+                    {                      
+                        
                         pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), true);
                         pLichKing->SetVisible(true);
-                        pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos, false);
+                                               
+                        pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveMidlelThronePos, false);
+                        
                     }
 
                     if (!shortver)
                         if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
                         {
+                                pUther->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
                             if (me->GetEntry() == NPC_JAINA_PART1)
+                                
                                 pUther->AI()->Talk(SAY_UTHER_INTRO_A2_9);
                             else
                                 pUther->AI()->Talk(SAY_UTHER_INTRO_H2_7);
-                        }
 
-                    events.ScheduleEvent(EVENT_INTRO_LK_1_2, 2s);
-                    events.ScheduleEvent(EVENT_INTRO_LK_1_3, 4s);
-                    events.ScheduleEvent(EVENT_INTRO_LK_2, 11s);
+                        }
+                    events.ScheduleEvent(EVENT_INTRO_LK_1_1, 9s);
+                    events.ScheduleEvent(EVENT_INTRO_LK_1_2, 3s);                   
+                    events.ScheduleEvent(EVENT_INTRO_LK_1_3, 6s);
+                    events.ScheduleEvent(EVENT_INTRO_LK_2, 12s);
+                    break;
+
+                case EVENT_INTRO_LK_1_1:
+                    if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
+                    {
+                        pLichKing->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                        pLichKing->AI()->Talk(SAY_LK_INTRO_1);
+                    }
                     break;
 
                 case EVENT_INTRO_LK_1_2:
                     if (!shortver)
                         if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                            pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
+                        {
+                            pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);                          
+                            pUther->SetFacingTo(0.89f);
+                        }
                     break;
 
                 case EVENT_INTRO_LK_1_3:
@@ -469,20 +583,38 @@ public:
                 case EVENT_INTRO_LK_2:
                     if (!shortver)
                         if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
-                            pLichKing->AI()->Talk(SAY_LK_INTRO_1);
-                    events.ScheduleEvent(EVENT_INTRO_LK_3, 2s);
+                        {
+                            pLichKing->SetVisible(true);
+                            pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos, false);
+                            events.ScheduleEvent(EVENT_INTRO_LK_2_1, 1s);
+                        }
                     break;
+
+                case EVENT_INTRO_LK_2_1:
+                       if (!shortver)
+                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                        {
+                            pUther->SendPlaySpellVisual(SPELL_UTHER_DESPAWN);
+                            pUther->CastSpell(pUther, SPELL_UTHER_DESPAWN, true);                         
+                            events.ScheduleEvent(EVENT_INTRO_LK_3, 2s);
+                        }
+                break;
 
                 case EVENT_INTRO_LK_3:
                     if (!shortver)
                         if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                        {
                             pUther->SetVisible(false);
-                    events.ScheduleEvent(EVENT_INTRO_LK_4, 4s);
+                            events.ScheduleEvent(EVENT_INTRO_LK_4, 6s);
+                        }
                     break;
 
                 case EVENT_INTRO_LK_4:
                     if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
+                    {
+                        pLichKing->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                         pLichKing->AI()->Talk(SAY_LK_INTRO_2);
+                    }
                     events.ScheduleEvent(EVENT_INTRO_LK_4_2, 10s);
                     break;
 
@@ -527,12 +659,18 @@ public:
                                 a->SetDuration(8000);
                         }
                     }
+                    events.ScheduleEvent(EVENT_INTRO_LK_5_1, 0s);
+                    events.ScheduleEvent(EVENT_INTRO_LK_5_2, 7s);
+                    events.ScheduleEvent(EVENT_INTRO_LK_5_3, 0s);
+                    events.ScheduleEvent(EVENT_INTRO_LK_6, 11s);
+                    break;
 
+                case EVENT_INTRO_LK_5_1:               
                     if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
+                    {
+                        pLichKing->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         pLichKing->AI()->Talk(SAY_LK_INTRO_3);
-
-                    events.ScheduleEvent(EVENT_INTRO_LK_5_2, 5s);
-                    events.ScheduleEvent(EVENT_INTRO_LK_6, 8s);
+                    }
                     break;
 
                 case EVENT_INTRO_LK_5_2:
@@ -540,55 +678,98 @@ public:
                         pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);
                     break;
 
+                case EVENT_INTRO_LK_5_3:
+                    me->SetSpeed(MOVE_RUN, 1.6);
+                    me->SetSheath(SHEATH_STATE_MELEE);
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                    {
+                        pLoralen->SetSheath(SHEATH_STATE_MELEE);
+                        pLoralen->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+                        pLoralen->SetWalk(false);
+                        pLoralen->LoadEquipment(true);
+                    }      
+                    break;
+
                 case EVENT_INTRO_LK_6:
                     if (Creature* pFalric = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FALRIC)))
+                    {
+                        pFalric->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
                         pFalric->AI()->Talk(SAY_FALRIC_INTRO_1);
-
+                    }
                     events.ScheduleEvent(EVENT_INTRO_LK_7, 2s);
                     break;
 
                 case EVENT_INTRO_LK_7:
                     if (Creature* pMarwyn = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MARWYN)))
+                    {
+                        pMarwyn->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
                         pMarwyn->AI()->Talk(SAY_MARWYN_INTRO_1);
-
-                    events.ScheduleEvent(EVENT_INTRO_LK_8, 2s);
+                    }
+                    events.ScheduleEvent(EVENT_INTRO_LK_8, 3s);
                     break;
 
                 case EVENT_INTRO_LK_8:
                     if (Creature* pFalric = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FALRIC)))
                         pFalric->AI()->Talk(SAY_FALRIC_INTRO_2);
                     pInstance->SetData(ACTION_SHOW_TRASH, 1);
-
                     pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), true);
 
-                    events.ScheduleEvent(EVENT_INTRO_LK_9, 5s);
+                    events.ScheduleEvent(EVENT_INTRO_LK_9, 6s);
                     break;
 
                 case EVENT_INTRO_LK_9:
                     if (me->GetEntry() == NPC_JAINA_PART1)
-                        Talk(SAY_JAINA_INTRO_END);
-                    else
+                        Talk(SAY_JAINA_INTRO_END);                      
+                    else                       
                         Talk(SAY_SYLVANAS_INTRO_END);
-
-                    me->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                        c->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);
-                    events.ScheduleEvent(EVENT_INTRO_END, 14s);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                        me->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);                       
+                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk1, false);
+                    events.ScheduleEvent(EVENT_INTRO_LK_10, 1s +500ms);
                     break;
 
-                case EVENT_INTRO_END:
-                    pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), false);
-                    pInstance->HandleGameObject(pInstance->GetGuidData(GO_FRONT_DOOR), false);
-                    events.ScheduleEvent(EVENT_INTRO_END_SET, 10s);
+                case EVENT_INTRO_LK_10:
+                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk2, false);
+                    events.ScheduleEvent(EVENT_INTRO_LK_11, 2s);
                     break;
-                case EVENT_INTRO_END_SET:
+
+                case EVENT_INTRO_LK_11:                   
+                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk3, false);
+                    events.ScheduleEvent(EVENT_INTRO_LK_12, 5s +500ms);
+                    break;
+
+                case EVENT_INTRO_LK_12:
                     if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
                         pLichKing->SetVisible(false);
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                        c->SetVisible(false);
+                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLkFinal, false);
+                    events.ScheduleEvent(EVENT_INTRO_LK_13, 2s);
+                    break;                     
+
+                case EVENT_INTRO_LK_13:
                     me->SetVisible(false);
-                    pInstance->SetData(DATA_INTRO, DONE);
+                    events.ScheduleEvent(EVENT_INTRO_END, 2s +500ms);
                     break;
+
+                case EVENT_INTRO_END:                  
+                    pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), false);
+                    pInstance->HandleGameObject(pInstance->GetGuidData(GO_FRONT_DOOR), false);
+                    events.ScheduleEvent(EVENT_INTRO_END_SET, 3s);
+                    break;
+                case EVENT_INTRO_END_SET:
+                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                    {
+                        pLoralen->UpdatePosition(5369.71289f, 2083.6330f, 707.695129f, 0.188739f, true);
+                        pLoralen->StopMovingOnCurrentPos();
+                        pLoralen->SetVisible(true);
+                        pLoralen->KillSelf(pLoralen);
+                    }                   
+                    pInstance->SetData(DATA_INTRO, DONE);
+                    break;          
             }
         }
     };
@@ -1391,6 +1572,10 @@ enum eFightEvents
 {
     EVENT_EMPTY = 0,
     EVENT_LK_SAY_AGGRO,
+    EVENT_LK_BATTLE_1,
+    EVENT_LK_BATTLE_2,
+    EVENT_LK_BATTLE_3,
+    EVENT_LK_BATTLE_4,
     EVENT_JAINA_IMMOBILIZE_LK,
     EVENT_SYLVANAS_IMMOBILIZE_JUMP,
     EVENT_SYLVANAS_DARK_BINDING,
@@ -1443,8 +1628,7 @@ public:
             reqKillCount = 0;
             events.Reset();
             events.RescheduleEvent(EVENT_LK_CHECK_COMBAT, 1s);
-        }
-
+        }       
         void DoAction(int32 a) override
         {
             if (a == ACTION_START_LK_FIGHT_REAL)
@@ -1464,7 +1648,7 @@ public:
                     else
                         me->RemoveAura(SPELL_REMORSELESS_WINTER);
 
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_SYLVANAS_PART2)))
+                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_SYLVANAS_PART2)))                      
                         c->AI()->DoAction(ACTION_INFORM_WALL_DESTROYED);
                 }
             }
@@ -1474,15 +1658,16 @@ public:
         {
             // Xinef: dont use 0, it is no longer the last point
             // Xinef: if type is escort and spline is finalized, it means that we reached last point from the path
-            if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
+            if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())               
             {
                 if (currentWall == 0)
                 {
-                    Talk(SAY_LK_IW_1);
+                    Talk(SAY_LK_IW_1);                 
                     me->SetOrientation(4.15f);
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_ICE_WALL_TARGET)))
+                    if (Creature* icewall = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_ICE_WALL_TARGET)))
                     {
-                        me->CastSpell(c, SPELL_SUMMON_ICE_WALL, false);
+                        me->SetFacingToObject(icewall);
+                        me->CastSpell(icewall, SPELL_SUMMON_ICE_WALL, false);
                         events.ScheduleEvent(EVENT_LK_REMORSELESS_WINTER, 4s);
                     }
                 }
@@ -1496,6 +1681,7 @@ public:
 
         void JustSummoned(Creature* s) override
         {
+
             ++reqKillCount;
             if (events.GetNextEventTime(EVENT_DECREASE_REQ_COUNT_BY_100))
                 events.RescheduleEvent(EVENT_DECREASE_REQ_COUNT_BY_100, 10s);
@@ -1580,12 +1766,13 @@ public:
                         leader->CastSpell(leader, SPELL_HOR_SUICIDE, true);
                         Unit::Kill(me, leader);
                         me->InterruptNonMeleeSpells(true);
-                        me->CastSpell((Unit*)nullptr, SPELL_FURY_OF_FROSTMOURNE, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_FURY_OF_FROSTMOURNE, false);                        
                     }
                     break;
-                case EVENT_LK_START_FOLLOWING: /// @todo: LK Moves too fast at the begining and too slow after and the leaders (Sylvana/Jaina) should be running instead of walking.
+                case EVENT_LK_START_FOLLOWING: 
                     {
-                        me->SetSpeed(MOVE_RUN, 9.0f / 7.0f);
+                        
+                        me->SetSpeed(MOVE_RUN, 9.0f / 7.0f);                      
                         Movement::PointsArray path;
                         path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
                         for (uint8 i = 0; i <= 2; ++i)
@@ -1595,9 +1782,10 @@ public:
                     break;
                 case EVENT_LK_REMORSELESS_WINTER:
                     {
+
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                         Talk(SAY_LK_WINTER);
-                        me->CastSpell(me, SPELL_REMORSELESS_WINTER, true);
+                        me->CastSpell(me, SPELL_REMORSELESS_WINTER, true);                       
                         Movement::PointsArray path;
                         path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
                         for (uint8 i = 3; i < PATH_WP_COUNT - 1; ++i)
@@ -1703,6 +1891,7 @@ public:
             pInstance = me->GetInstanceScript();
             if (!pInstance)
                 me->IsAIEnabled = false;
+
         }
 
         InstanceScript* pInstance;
@@ -1713,6 +1902,7 @@ public:
         {
             currentStopPoint = 0;
             events.Reset();
+            
         }
 
         void DoAction(int32 actionId) override
@@ -1721,11 +1911,13 @@ public:
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_LK_SAY_AGGRO, 0ms);
+                    events.ScheduleEvent(EVENT_LK_BATTLE_1, 2s +500ms);
+                    events.ScheduleEvent(EVENT_LK_BATTLE_2, 3s);
                     break;
                 case ACTION_START_LK_FIGHT_REAL:
                     events.ScheduleEvent(EVENT_START_RUN, 0ms);
                     break;
-                case ACTION_INFORM_WALL_DESTROYED:
+                case ACTION_INFORM_WALL_DESTROYED:                 
                     MoveToNextStopPoint();
                     if (currentStopPoint == 5)
                         events.ScheduleEvent(EVENT_SAY_OPENING, 3s);
@@ -1740,9 +1932,12 @@ public:
         }
 
         void MoveToNextStopPoint()
-        {
+        {           
+            me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
             me->InterruptNonMeleeSpells(true);
+            me->SetSheath(SHEATH_STATE_MELEE); 
             ++currentStopPoint;
+            me->SetWalk(false);
             Movement::PointsArray path;
             path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
             for (uint8 i = WP_STOP[currentStopPoint - 1] + (currentStopPoint == 1 ? 0 : 1); i <= WP_STOP[currentStopPoint]; ++i)
@@ -1757,51 +1952,84 @@ public:
         }
 
         void UpdateAI(uint32 diff) override
-        {
-            events.Update(diff);
+        {           
+            events.Update(diff);          
             switch(events.ExecuteEvent())
             {
+                
                 case EVENT_LK_SAY_AGGRO:
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
-                        c->AI()->Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_LK_AGGRO_ALLY : SAY_LK_AGGRO_HORDE);
-                    events.ScheduleEvent(me->GetEntry() == NPC_JAINA_PART2 ? EVENT_JAINA_IMMOBILIZE_LK : EVENT_SYLVANAS_IMMOBILIZE_JUMP, 12s);
-                    break;
-                case EVENT_JAINA_IMMOBILIZE_LK:
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                    
+                    if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                        me->Attack(lkboss, true),
+                        lkboss->AI()->Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_LK_AGGRO_ALLY : SAY_LK_AGGRO_HORDE);                   
+                        events.ScheduleEvent(me->GetEntry() == NPC_JAINA_PART2 ? EVENT_JAINA_IMMOBILIZE_LK : EVENT_SYLVANAS_IMMOBILIZE_JUMP, 9s);
+
+                case EVENT_LK_BATTLE_1:                                      
+                    if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
                     {
-                        c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                        me->CastSpell(c, SPELL_JAINA_ICE_PRISON, false);
-                        events.ScheduleEvent(EVENT_SAY_LEAVE, 5s);
+                        lkboss->CastSpell(lkboss, SPELL_SOUL_REAPER, false);
+                    }                  
+                    break;
+
+                case EVENT_LK_BATTLE_2:                   
+                    //horda                               
+                    if (Creature* leader = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_SYLVANAS_PART2)))
+                    {
+
+                        leader->CastSpell(leader, SPELL_EVASION, true);                    
                     }
+                    if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                    {                     
+                        lkboss->SetFacingToObject(me);
+                    }
+                    if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                    {
+                        lkboss->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK2HTIGHT);
+                        me->SetFacingToObject(lkboss);
+                    }
+                    break;
+                   
+                case EVENT_JAINA_IMMOBILIZE_LK:
+                    if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                    {                        
+                        lkboss->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_SPELL_OMNI);
+                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                        me->CastSpell(lkboss, SPELL_JAINA_ICE_PRISON, false);
+                        events.ScheduleEvent(EVENT_SAY_LEAVE, 5s);
+                    }              
                     break;
                 case EVENT_SYLVANAS_IMMOBILIZE_JUMP:
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                    if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
                     {
-                        c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                        me->AttackStop();
+                        me->SetSheath(SHEATH_STATE_MELEE);
+                        lkboss->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_SPELL_OMNI);
+                        lkboss->CastSpell(me, SPELL_BLIDING_RETREAT, false);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                        me->KnockbackFrom(c->GetPositionX(), c->GetPositionY(), 10.0f, 3.0f);
-                        events.ScheduleEvent(EVENT_SYLVANAS_DARK_BINDING, 1500ms);
-                    }
+                        me->KnockbackFrom(lkboss->GetPositionX(), lkboss->GetPositionY(), 34.3f, 4.0f);
+                        events.ScheduleEvent(EVENT_SYLVANAS_DARK_BINDING, 2s +500ms);
+                    }                       
                     break;
                 case EVENT_SYLVANAS_DARK_BINDING:
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
-                        me->CastSpell(c, SPELL_SYLVANAS_DARK_BINDING, false);
-                    events.ScheduleEvent(EVENT_SAY_LEAVE, 3500ms);
+                    if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                        me->CastSpell(lkboss, SPELL_SYLVANAS_DARK_BINDING, false);
+                    events.ScheduleEvent(EVENT_SAY_LEAVE, 2s);
                     break;
                 case EVENT_SAY_LEAVE:
                     {
                         Map::PlayerList const& pl = pInstance->instance->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
-                                p->KilledMonsterCredit(me->GetEntry()); // for quest
-
+                                p->KilledMonsterCredit(me->GetEntry()); // for quest                      
                         Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_AGGRO : SAY_SYLVANA_AGGRO);
+                        me->SetSheath(SHEATH_STATE_MELEE);
+                        me->SetWalk(false);
+                        me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                         me->GetMotionMaster()->MovePoint(0, LeaderEscapePos);
-                        events.ScheduleEvent(EVENT_ADD_GOSSIP, 8s);
+                        events.ScheduleEvent(EVENT_ADD_GOSSIP, 7s);
                     }
                     break;
-                case EVENT_ADD_GOSSIP:
+                case EVENT_ADD_GOSSIP:                  
                     me->RemoveAura(me->GetEntry() == NPC_JAINA_PART2 ? SPELL_JAINA_ICE_BARRIER : SPELL_SYLVANAS_CLOAK_OF_DARKNESS);
                     me->SetFacingTo(LeaderEscapePos.GetOrientation());
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
@@ -1811,12 +2039,12 @@ public:
                         pInstance->SetData(ACTION_START_LK_FIGHT, 1);
                         me->setActive(true);
                         MoveToNextStopPoint();
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                        if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
                         {
-                            c->setActive(true);
-                            c->SetInCombatWithZone();
-                            c->RemoveAura(me->GetEntry() == NPC_JAINA_PART2 ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING);
-                            c->AI()->DoAction(ACTION_START_LK_FIGHT_REAL);
+                            lkboss->setActive(true);
+                            lkboss->SetInCombatWithZone();
+                            lkboss->RemoveAura(me->GetEntry() == NPC_JAINA_PART2 ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING);
+                            lkboss->AI()->DoAction(ACTION_START_LK_FIGHT_REAL);
                         }
                     }
                     break;
@@ -1855,6 +2083,7 @@ public:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_ESCAPE_01 : SAY_SYLVANA_ESCAPE_01);
                     break;
             }
+            DoMeleeAttackIfReady();
         }
     };
 };
@@ -1898,8 +2127,8 @@ public:
         {
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (Creature* lk = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
-                    lk->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
+                if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                    lkboss->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
         }
     };
 
@@ -1967,8 +2196,8 @@ public:
         {
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (Creature* lk = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
-                    lk->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
+                if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                    lkboss->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
         }
     };
 
@@ -2032,8 +2261,8 @@ public:
         {
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (Creature* lk = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
-                    lk->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
+                if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                    lkboss->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
         }
     };
 
