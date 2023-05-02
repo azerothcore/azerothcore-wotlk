@@ -64,8 +64,7 @@ enum Creatures
     NPC_JAINA_PART1                               = 37221,
     NPC_JAINA_PART2                               = 36955,
     NPC_SYLVANAS_PART1                            = 37223,
-    NPC_SYLVANAS_PART2                            = 37554
-,
+    NPC_SYLVANAS_PART2                            = 37554,
 
     NPC_DARK_RANGER_LORALEN                       = 37779,
     NPC_ARCHMAGE_KORELN                           = 37582,
