@@ -335,7 +335,6 @@ const Position LichKingMoveThronePos   = {5312.79638f, 2010.07141f, 709.3942183f
 const Position LichKingMoveAwayPos   = {5400.069824f, 2102.7131689f, 707.69525f, 0.843803f}; // Lich King walks away [sniff]
 const Position FalricMovePos         = {5284.161133f, 2030.691650f, 709.319336f, 5.489386f};
 const Position MarwynMovePos         = {5335.330078f, 1982.376221f, 709.319580f, 2.339942f};
-//const Position SylvanasFightPos      = {5549.14990f, 2257.47998f, 733.110962f, 0.99299f}; //Sniff
 const Position LeaderEscapePos       = {5576.80566f, 2235.55004f, 733.012268f, 2.782125f}; //Sniff
 const Position ShipMasterSummonPos   = {5262.773926f, 1669.980103f, 715.000000f, 0.000000f};
 const Position WalkCaveInPos         = {5267.594238f, 1678.750000f, 784.302856f, 1.041739f};
