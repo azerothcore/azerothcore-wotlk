@@ -236,7 +236,7 @@ public:
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART1);
                     creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                    creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);                 
+                    creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                     break;
                 case NPC_DARK_RANGER_LORALEN:
                     creature->SetVisible(false);
@@ -302,7 +302,7 @@ public:
                         creature->CastSpell(creature, SPELL_SOUL_REAPER, true);
                         if (TeamIdInInstance != TEAM_ALLIANCE)
                         {
-                           // creature->StopMoving();                
+                           // creature->StopMoving();
                            // creature->SetFacingTo();
                         }
                     }
@@ -317,15 +317,15 @@ public:
                     break;
                 case NPC_SYLVANAS_PART2:
                     if (!creature->IsAlive())
-                        creature->Respawn();                      
+                        creature->Respawn();
                     NPC_LeaderGUID = creature->GetGUID();
                     creature->SetWalk(false);
                     creature->SetSheath(SHEATH_STATE_MELEE);
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART2);
-                    creature->SetWalk(false);                 
-                    creature->SetHealth(creature->GetMaxHealth() / 20);                   
-                    if (!(EncounterMask & (1 << DATA_FROSTSWORN_GENERAL)))                       
+                    creature->SetWalk(false);
+                    creature->SetHealth(creature->GetMaxHealth() / 20);
+                    if (!(EncounterMask & (1 << DATA_FROSTSWORN_GENERAL)))
                         creature->SetVisible(false);
                     if (!(EncounterMask & (1 << DATA_LK_INTRO)))
                     {
@@ -1026,7 +1026,7 @@ public:
                                 }
 
                                 pMarwyn->AI()->Talk(EMOTE_MARWYN_INTRO_SPIRIT);
-                            }                           
+                            }
                             ++ResumeFirstEventStep;
                             ResumeFirstEventTimer = 7500;
                             break;
@@ -1044,7 +1044,7 @@ public:
                                         marwyn->AI()->Talk(SAY_MARWYN_WIPE_AFTER_FALRIC); // Between wave 6 and 9
                                     }
                                 }
-                            }                                                        
+                            }
                             SetData(ACTION_SHOW_TRASH, 1);
                             ResumeFirstEventStep = 0;
                             ResumeFirstEventTimer = 0;
@@ -1175,17 +1175,16 @@ public:
                             if (Creature* c = instance->GetCreature(NPC_ShipCaptainGUID))
                                 c->AI()->Talk(TeamIdInInstance == TEAM_ALLIANCE ? SAY_ONBOARD_ALLY : SAY_ONBOARD_HORDE);
                             if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
-                            {                               
+                            {
                                 c->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 c->GetMotionMaster()->MovePoint(0, WalkCaveInPos);
                                 c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP); // precisa da gossip 10931
-                            }                          
+                            }
                             ++outroStep;
                             outroTimer = 6000;
                             break;
                         case 9:
                             if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
-                                
                                 c->AI()->Talk(TeamIdInInstance == TEAM_ALLIANCE ? SAY_JAINA_FINAL_1 : SAY_SYLVANA_FINAL);
                             HandleGameObject(GO_CaveInGUID, true);
                             ++outroStep;
