@@ -300,11 +300,6 @@ public:
                     {
                         creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK2HTIGHT); //the fight cannot be in the form of an emote, it is causing bugs
                         creature->CastSpell(creature, SPELL_SOUL_REAPER, true);
-                        if (TeamIdInInstance != TEAM_ALLIANCE)
-                        {
-                           // creature->StopMoving();
-                           // creature->SetFacingTo();
-                        }
                     }
                     else if (!(EncounterMask & (1 << DATA_LICH_KING)))
                         creature->AddAura(TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING, creature);
@@ -333,11 +328,6 @@ public:
                         creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, TeamIdInInstance == TEAM_ALLIANCE ? EMOTE_ONESHOT_ATTACK2HTIGHT : EMOTE_ONESHOT_ATTACK1H); //the fight cannot be in the form of an emote, it is causing bugs.                      
                         creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         creature->CastSpell(creature, TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_BARRIER : SPELL_SYLVANAS_CLOAK_OF_DARKNESS, true);
-                        if (TeamIdInInstance != TEAM_ALLIANCE)
-                        {
-                            //creature->UpdatePosition(SylvanasFightPos, true);
-                            //creature->StopMovingOnCurrentPos();
-                        }
                     }
                     else if (!(EncounterMask & (1 << DATA_LICH_KING)))
                     {
@@ -1162,12 +1152,12 @@ public:
                                     if (StairsPos[index][i].GetPositionX())
                                         if (GameObject* go = leader->SummonGameObject(TeamIdInInstance == TEAM_ALLIANCE ? GO_STAIRS_ALLIANCE : GO_STAIRS_HORDE, StairsPos[index][i].GetPositionX(), StairsPos[index][i].GetPositionY(), StairsPos[index][i].GetPositionZ(), StairsPos[index][i].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
                                             go->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
-                                //
+                                
                                 //Position pos = TeamIdInInstance == TEAM_ALLIANCE ? AllyPortalPos : HordePortalPos;
                                 //leader->SummonGameObject(GO_PORTAL_TO_DALARAN, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400);
                                 //pos = TeamIdInInstance == TEAM_ALLIANCE ? AllyChestPos : HordeChestPos;
                                 //leader->SummonGameObject(instance->GetSpawnMode() ? GO_CHEST_HEROIC : GO_CHEST_NORMAL, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400);
-                            }   //
+                            }
                             ++outroStep;
                             outroTimer = 1000;
                             break;
