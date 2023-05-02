@@ -79,8 +79,11 @@ public:
     static bool Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories);
     static bool Populate(DatabaseWorkerPool<T>& pool);
 
-    // module
+    // Get name of databases for module
     static std::string GetDBModuleName();
+
+    // Get search paths for module sql files
+    static std::vector<std::string> GetDBModulePaths();
 
 private:
     static QueryResult Retrieve(DatabaseWorkerPool<T>& pool, std::string const& query);

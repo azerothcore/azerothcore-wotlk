@@ -38,9 +38,9 @@ struct UpdateFetcher::DirectoryEntry
 UpdateFetcher::UpdateFetcher(Path const& sourceDirectory,
                              std::function<void(std::string const&)> const& apply,
                              std::function<void(Path const& path)> const& applyFile,
-                             std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName, std::vector<std::string> const* setDirectories /*= nullptr*/) :
+                             std::function<QueryResult(std::string const&)> const& retrieve, std::vector<std::string> const& dbModulePaths, std::vector<std::string> const* setDirectories /*= nullptr*/) :
     _sourceDirectory(std::make_unique<Path>(sourceDirectory)), _apply(apply), _applyFile(applyFile),
-    _retrieve(retrieve), _dbModuleName(dbModuleName), _setDirectories(setDirectories)
+    _retrieve(retrieve), _dbModulePaths(dbModulePaths), _setDirectories(setDirectories)
 {
 }
 
@@ -48,10 +48,10 @@ UpdateFetcher::UpdateFetcher(Path const& sourceDirectory,
     std::function<void(std::string const&)> const& apply,
     std::function<void(Path const& path)> const& applyFile,
     std::function<QueryResult(std::string const&)> const& retrieve,
-    std::string const& dbModuleName,
+    std::vector<std::string> const& dbModulePaths,
     std::string_view modulesList /*= {}*/) :
     _sourceDirectory(std::make_unique<Path>(sourceDirectory)), _apply(apply), _applyFile(applyFile),
-    _retrieve(retrieve), _dbModuleName(dbModuleName), _setDirectories(nullptr), _modulesList(modulesList)
+    _retrieve(retrieve), _dbModulePaths(dbModulePaths), _setDirectories(nullptr), _modulesList(modulesList)
 {
 }
 
@@ -162,18 +162,23 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
         // data/sql
         for (auto const& itr : moduleList)
         {
-            std::string path = _sourceDirectory->generic_string() + "/modules/" + itr + "/data/sql/" + _dbModuleName; // modules/mod-name/data/sql/db-world
-
-            Path const p(path);
-            if (!is_directory(p))
+            for (auto const& dir : _dbModulePaths)
             {
-                continue;
+                // modules/mod-name/data/sql/db-world
+                // modules/mod-name/sql/world
+                std::string path = _sourceDirectory->generic_string() + "/modules/" + itr + "/" + dir;
+
+                Path const p(path);
+                if (!is_directory(p))
+                {
+                    continue;
+                }
+
+                DirectoryEntry const entry = { p, AppliedFileEntry::StateConvert("MODULE") };
+                directories.push_back(entry);
+
+                LOG_TRACE("sql.updates", "Added applied modules file \"{}\" from remote.", p.filename().generic_string());
             }
-
-            DirectoryEntry const entry = { p, AppliedFileEntry::StateConvert("MODULE") };
-            directories.push_back(entry);
-
-            LOG_TRACE("sql.updates", "Added applied modules file \"{}\" from remote.", p.filename().generic_string());
         }
     }
 

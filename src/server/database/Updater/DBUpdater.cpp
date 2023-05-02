@@ -29,6 +29,8 @@
 #include <fstream>
 #include <iostream>
 
+namespace fs = std::filesystem;
+
 std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 {
     if (!corrected_path().empty())
@@ -91,6 +93,16 @@ bool DBUpdater<LoginDatabaseConnection>::IsEnabled(uint32 const updateMask)
 }
 
 template<>
+std::vector<std::string> DBUpdater<LoginDatabaseConnection>::GetDBModulePaths()
+{
+    std::vector<std::string> dbModulePaths = {
+        "data/sql/db-auth",
+        "sql/auth"
+    };
+    return dbModulePaths;
+}
+
+template<>
 std::string DBUpdater<LoginDatabaseConnection>::GetDBModuleName()
 {
     return "db-auth";
@@ -121,6 +133,18 @@ bool DBUpdater<WorldDatabaseConnection>::IsEnabled(uint32 const updateMask)
     // This way silences warnings under msvc
     return (updateMask & DatabaseLoader::DATABASE_WORLD) ? true : false;
 }
+
+template<>
+std::vector<std::string> DBUpdater<WorldDatabaseConnection>::GetDBModulePaths()
+{
+    std::vector<std::string> dbModulePaths = {
+        "data/sql/db-world",
+        "sql/world"
+    };
+
+    return dbModulePaths;
+}
+
 
 template<>
 std::string DBUpdater<WorldDatabaseConnection>::GetDBModuleName()
@@ -155,6 +179,17 @@ bool DBUpdater<CharacterDatabaseConnection>::IsEnabled(uint32 const updateMask)
 }
 
 template<>
+std::vector<std::string> DBUpdater<CharacterDatabaseConnection>::GetDBModulePaths()
+{
+    std::vector<std::string> dbModulePaths = {
+        "data/sql/db-characters",
+        "sql/characters"
+    };
+
+    return dbModulePaths;
+}
+
+template<>
 std::string DBUpdater<CharacterDatabaseConnection>::GetDBModuleName()
 {
     return "db-characters";
@@ -186,7 +221,9 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     LOG_INFO("sql.updates", "Creating database \"{}\"...", pool.GetConnectionInfo()->database);
 
     // Path of temp file
-    static Path const temp("create_table.sql");
+    static Path const temp = fs::temp_directory_path().string() + "create_table.sql";
+
+    LOG_DEBUG("sql.updates", "Temporary file defined at \"{}\"", temp.generic_string());
 
     // Create temporary query to use external MySQL CLi
     std::ofstream file(temp.generic_string());
@@ -262,9 +299,14 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
     if (!CheckUpdateTable("updates") || !CheckUpdateTable("updates_include"))
         return false;
 
-    UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
-    [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
-    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), modulesList);
+    auto apply = [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); };
+    auto applyFile = [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); };
+    auto queryResult = [&](std::string const & query) -> QueryResult {
+        return DBUpdater<T>::Retrieve(pool, query);
+    };
+
+    UpdateFetcher updateFetcher(sourceDirectory, apply, applyFile,
+            queryResult, DBUpdater<T>::GetDBModulePaths(), modulesList);
 
     UpdateResult result;
     try
@@ -332,9 +374,15 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> 
         return false;
     }
 
-    UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
-    [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
-    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), setDirectories);
+
+    auto apply = [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); };
+    auto applyFile = [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); };
+    auto queryResult = [&](std::string const & query) -> QueryResult {
+        return DBUpdater<T>::Retrieve(pool, query);
+    };
+
+    UpdateFetcher updateFetcher(sourceDirectory, apply, applyFile,
+            queryResult, DBUpdater<T>::GetDBModulePaths(), setDirectories);
 
     UpdateResult result;
     try

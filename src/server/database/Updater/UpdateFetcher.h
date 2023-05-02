@@ -47,13 +47,13 @@ public:
     UpdateFetcher(Path const& updateDirectory,
                   std::function<void(std::string const&)> const& apply,
                   std::function<void(Path const& path)> const& applyFile,
-                  std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName, std::vector<std::string> const* setDirectories = nullptr);
+                  std::function<QueryResult(std::string const&)> const& retrieve, std::vector<std::string> const& dbModulePaths, std::vector<std::string> const* setDirectories = nullptr);
 
     UpdateFetcher(Path const& updateDirectory,
         std::function<void(std::string const&)> const& apply,
         std::function<void(Path const& path)> const& applyFile,
         std::function<QueryResult(std::string const&)> const& retrieve,
-        std::string const& dbModuleName,
+        std::vector<std::string> const& dbModulePaths,
         std::string_view modulesList = {});
 
     ~UpdateFetcher();
@@ -158,9 +158,11 @@ private:
     std::function<void(Path const& path)> const _applyFile;
     std::function<QueryResult(std::string const&)> const _retrieve;
 
-    // modules
-    std::string const _dbModuleName;
+    // SQL paths for modules
+    std::vector<std::string> const _dbModulePaths;
+    // Existing directories for all modules
     std::vector<std::string> const* _setDirectories;
+    // Modules in ./modules/
     std::string_view _modulesList = {};
 };
 
