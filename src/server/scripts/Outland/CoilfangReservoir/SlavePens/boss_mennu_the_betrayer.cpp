@@ -47,7 +47,7 @@ struct boss_mennu_the_betrayer : public BossAI
 
     void Reset() override
     {
-       _Reset();
+        _Reset();
 
         ScheduleHealthCheckEvent(60, [&] {
             DoCastSelf(SPELL_HEALING_WARD);
@@ -58,6 +58,7 @@ struct boss_mennu_the_betrayer : public BossAI
     {
         summon->GetMotionMaster()->Clear();
     }
+
 
     void JustEngagedWith(Unit* /*who*/) override
     {

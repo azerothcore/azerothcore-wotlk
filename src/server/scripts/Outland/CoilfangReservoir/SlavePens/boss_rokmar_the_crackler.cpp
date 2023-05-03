@@ -47,6 +47,8 @@ struct boss_rokmar_the_crackler : public BossAI
         });
     }
 
+
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
