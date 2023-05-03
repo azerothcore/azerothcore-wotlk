@@ -23,12 +23,14 @@
 enum eGrandWarlockNethekurse
 {
     SAY_INTRO                  = 0,
-    SAY_PEON_ATTACKED          = 1,
-    SAY_PEON_DIES              = 2,
-    SAY_TAUNT                  = 3,
-    SAY_AGGRO                  = 4,
-    SAY_SLAY                   = 5,
-    SAY_DIE                    = 6,
+    SAY_INTRO_2                = 1,
+    SAY_PEON_ATTACKED          = 2,
+    SAY_PEON_DIES              = 3,
+    SAY_SHADOW_SEAR            = 4,
+    SAY_SHADOW_FISSURE         = 5,
+    SAY_DEATH_COIL             = 6,
+    SAY_SLAY                   = 7,
+    SAY_DIE                    = 8,
 
     SPELL_DEATH_COIL_N         = 30500,
     SPELL_DEATH_COIL_H         = 35954,
@@ -40,13 +42,10 @@ enum eGrandWarlockNethekurse
     // Spells used exclusively in RP
     SPELL_SHADOW_SEAR          = 30735,
     SPELL_DEATH_COIL           = 30741,
+    SPELL_SHADOW_FISSURE_RP    = 30745,
 
     EVENT_INTRO                = 1,
-    EVENT_SPELL_DEATH_COIL     = 2,
-    EVENT_SPELL_SHADOW_FISSURE = 3,
-    EVENT_SPELL_CLEAVE         = 4,
-    EVENT_CHECK_HEALTH         = 5,
-    EVENT_START_ATTACK         = 6,
+    EVENT_START_ATTACK         = 2,
 
     EVENT_STAGE_NONE           = 0,
     EVENT_STAGE_INTRO          = 1,
@@ -55,12 +54,37 @@ enum eGrandWarlockNethekurse
 
     SETDATA_DATA               = 1,
     SETDATA_PEON_AGGRO         = 1,
-    SETDATA_PEON_DEATH         = 2
+    SETDATA_PEON_DEATH         = 2,
+};
+
+enum Creatures
+{
+    NPC_PEON                   = 17083
+};
+
+enum Groups
+{
+    GROUP_RP                   = 0,
+};
+
+enum Actions
+{
+    ACTION_START_INTRO         = 0,
+    ACTION_CANCEL_INTRO        = 1,
+    ACTION_START_COMBAT        = 2,
 };
 
 // ########################################################
 // Grand Warlock Nethekurse
 // ########################################################
+
+float NethekurseIntroPath[4][3] =
+{
+    {184.78966f, 290.3699f, -8.18139f},
+    {178.51125f, 278.779022f, -8.183065f},
+    {171.82281f, 289.97687f, -8.185595f},
+    {178.51125f, 287.97794f, -8.183065f}
+};
 
 class boss_grand_warlock_nethekurse : public CreatureScript
 {
@@ -69,7 +93,13 @@ public:
 
     struct boss_grand_warlock_nethekurseAI : public BossAI
     {
-        boss_grand_warlock_nethekurseAI(Creature* creature) : BossAI(creature, DATA_NETHEKURSE) { }
+        boss_grand_warlock_nethekurseAI(Creature* creature) : BossAI(creature, DATA_NETHEKURSE)
+        {
+            scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+        }
 
         EventMap events2;
         void Reset() override
@@ -77,6 +107,10 @@ public:
             EventStage = EVENT_STAGE_NONE;
             _Reset();
             events2.Reset();
+
+            ScheduleHealthCheckEvent(25, [&] {
+                DoCastSelf(SPELL_DARK_SPIN);
+            });
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -97,19 +131,33 @@ public:
                         return;
 
                     if (EventStage < EVENT_STAGE_TAUNT)
+                    {
                         Talk(SAY_PEON_ATTACKED);
+                    }
                     break;
                 case SETDATA_PEON_DEATH:
                     if (PeonKilledCount >= 4)
                         return;
 
                     if (EventStage < EVENT_STAGE_TAUNT)
-                        Talk(SAY_PEON_DIES);
-
+                    {
+                        PeonDieRP();
+                    }
                     if (++PeonKilledCount == 4)
-                        events2.ScheduleEvent(EVENT_START_ATTACK, 5000);
+                        DoAction(ACTION_CANCEL_INTRO);
                     break;
             }
+        }
+
+        void PeonDieRP()
+        {
+            me->GetMotionMaster()->Clear();
+            me->SetFacingTo(4.572762489318847656f);
+            scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+            {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
+                Talk(SAY_PEON_DIES);
+            });
         }
 
         void AttackStart(Unit* who) override
@@ -120,40 +168,92 @@ public:
             if (me->Attack(who, true))
             {
                 DoStartMovement(who);
+                CombatEventScheduler();
             }
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void CombatEventScheduler()
         {
-            if (me->IsWithinDistInMap(who, 30.0f))
-            {
-                if (who->GetTypeId() != TYPEID_PLAYER)
-                    return;
+            scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+                {
+                    if (me->HealthBelowPct(90))
+                    {
+                        DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
+                    }
+                    context.Repeat();
+                }).Schedule(8100ms, 17300ms, [this](TaskContext context)
+                {
+                    DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
+                    context.Repeat(8450ms, 9450ms);
+                }).Schedule(10950ms, 21850ms, [this](TaskContext context)
+                {
+                    DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
+                    context.Repeat(1200ms, 23900ms);
+                });
+        }
 
-                if (EventStage == EVENT_STAGE_NONE && PeonKilledCount < 4)
+        void MoveInLineOfSight(Unit* who) override 
+        { 
+            if (EventStage == EVENT_STAGE_NONE)
+            {
+                if (Unit* target = me->SelectNearestPlayer(50.0f))
                 {
-                    events2.ScheduleEvent(EVENT_INTRO, 90000);
-                    Talk(SAY_INTRO);
-                    EventStage = EVENT_STAGE_INTRO;
-                    instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
-                    me->SetInCombatWithZone();
-                }
-                else if (PeonKilledCount >= 4)
-                {
-                    events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
-                    instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
-                    me->SetInCombatWithZone();
+                    DoAction(ACTION_CANCEL_INTRO);
                 }
             }
+        }
 
-            if (EventStage < EVENT_STAGE_MAIN)
-                return;
-
-            ScriptedAI::MoveInLineOfSight(who);
+        void IntroRP()
+        {
+            scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+            {
+                LOG_ERROR("server", "Data {}", "boss stand still");
+                me->GetMotionMaster()->Clear();
+                scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+                {
+                    uint32 choicelocation = urand(1, 3);
+                    me->GetMotionMaster()->MoveIdle();
+                    me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[choicelocation][0], NethekurseIntroPath[choicelocation][1], NethekurseIntroPath[choicelocation][2]);
+                    LOG_ERROR("server", "Data move boss to coordinates of location {}", std::to_string(choicelocation));
+                    scheduler.Schedule(2500ms, GROUP_RP, [this, choicelocation](TaskContext context)
+                    {
+                        LOG_ERROR("server", "Data {}", "cast spell");
+                        CastRandomPeonSpell(choicelocation);
+                    });
+                });
+                context.Repeat(16400ms, 28500ms);
+            });
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
+            _JustEngagedWith();
+            if (EventStage == EVENT_STAGE_NONE)
+            {
+                LOG_ERROR("server", "Data {}", "start combat after reset");
+                DoAction(ACTION_CANCEL_INTRO);
+                CombatEventScheduler();
+            }
+        }
+
+        void CastRandomPeonSpell(uint32 choice)
+        {
+            if (choice == 1)
+            {
+                Talk(SAY_DEATH_COIL);
+                me->CastSpell(me, SPELL_DEATH_COIL, false);
+                
+            }
+            else if (choice == 2)
+            {
+                Talk(SAY_SHADOW_FISSURE);
+                me->CastSpell(me, SPELL_SHADOW_FISSURE_RP, false);
+            }
+            else if (choice == 3)
+            {
+                Talk(SAY_SHADOW_SEAR);
+                me->CastSpell(me, SPELL_SHADOW_SEAR, false);
+            }
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -161,29 +261,60 @@ public:
             Talk(SAY_SLAY);
         }
 
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_CANCEL_INTRO)
+            {
+                introDone = true;
+                scheduler.CancelGroup(GROUP_RP);
+                events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
+                instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
+                me->SetInCombatWithZone();
+                Talk(SAY_INTRO_2);
+                me->SetHomePosition(NethekurseIntroPath[3][0], NethekurseIntroPath[3][1], NethekurseIntroPath[3][2], 4.572762489318847656f);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
+                return;
+            }
+
+            if (action != ACTION_START_INTRO)
+            {
+                return;
+            }
+
+            if (ATreached == true)
+            {
+                return;
+            }
+
+            ATreached = true;
+            me->SetUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
+            events2.ScheduleEvent(EVENT_INTRO, 90000);
+            Talk(SAY_INTRO);
+            EventStage = EVENT_STAGE_INTRO;
+            instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
+            me->SetInCombatWithZone();
+            IntroRP();
+        }
+
         void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
+            scheduler.Update(diff);
+
             uint32 eventId = events2.ExecuteEvent();
 
             if (EventStage < EVENT_STAGE_MAIN && instance->GetBossState(DATA_NETHEKURSE) == IN_PROGRESS)
             {
                 if (eventId == EVENT_INTRO)
                 {
-                    Talk(SAY_TAUNT);
                     EventStage = EVENT_STAGE_TAUNT;
-                    me->CastSpell(me, SPELL_SHADOW_SEAR, false);
                 }
                 else if (eventId == EVENT_START_ATTACK)
                 {
-                    Talk(SAY_AGGRO);
                     EventStage = EVENT_STAGE_MAIN;
                     if (Unit* target = me->SelectNearestPlayer(50.0f))
                         AttackStart(target);
-
-                    events.ScheduleEvent(EVENT_SPELL_DEATH_COIL, 20000);
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_FISSURE, 8000);
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                    DoAction(ACTION_CANCEL_INTRO);
                     return;
                 }
             }
@@ -191,40 +322,10 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
             if (EventStage < EVENT_STAGE_MAIN || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_SHADOW_FISSURE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_SHADOW_FISSURE, false);
-                    events.RescheduleEvent(EVENT_SPELL_SHADOW_FISSURE, urand(7500, 10000));
-                    break;
-                case EVENT_SPELL_DEATH_COIL:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), false);
-                    events.RescheduleEvent(EVENT_SPELL_DEATH_COIL, urand(15000, 20000));
-                    break;
-                case EVENT_SPELL_CLEAVE:
-                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H), false);
-                    events.RescheduleEvent(EVENT_SPELL_CLEAVE, urand(6000, 8000));
-                    break;
-                case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(21))
-                    {
-                        events.Reset();
-                        me->CastSpell(me, SPELL_DARK_SPIN, false);
-                    }
-                    else
-                    {
-                        events.RescheduleEvent(EVENT_CHECK_HEALTH, 1000);
-                    }
-                    break;
-            }
-
-            if (!me->HealthBelowPct(21))
+            if (!me->HealthBelowPct(25))
                 DoMeleeAttackIfReady();
         }
 
@@ -232,6 +333,8 @@ public:
         uint8 PeonEngagedCount = 0;
         uint8 PeonKilledCount = 0;
         uint8 EventStage;
+        bool introDone;
+        bool ATreached = false;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -251,7 +354,7 @@ public:
 
         void CalculateDamageAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
-            amount = 1000;
+            amount = 0;
         }
 
         void Register() override
@@ -303,9 +406,38 @@ public:
     }
 };
 
+class at_rp_nethekurse : public AreaTriggerScript
+{
+public:
+    at_rp_nethekurse() : AreaTriggerScript
+    ("at_rp_nethekurse") { }
+
+    bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    {
+        if (player->IsGameMaster())
+        {
+            return false;
+        }
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (instance->GetBossState(DATA_NETHEKURSE) != DONE && instance->GetBossState(DATA_NETHEKURSE) != IN_PROGRESS)
+            {
+                if (Creature* nethekurse = instance->GetCreature(DATA_NETHEKURSE))
+                {
+                    LOG_ERROR("server", "Data {}", "AT reached, intro start");
+                    nethekurse->AI()->DoAction(ACTION_START_INTRO);
+                }
+            }
+        }
+        return false;
+    }
+};
+
+
 void AddSC_boss_grand_warlock_nethekurse()
 {
     new boss_grand_warlock_nethekurse();
     new spell_tsh_shadow_sear();
     new spell_tsh_shadow_bolt();
+    new at_rp_nethekurse();
 }
