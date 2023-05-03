@@ -264,7 +264,9 @@ public:
                 break;
             case EVENT_PRE_INTRO_2:
                 if (me->GetEntry() == NPC_JAINA_PART1)
+                {
                     Talk(SAY_JAINA_INTRO_1);
+                }
                     me->GetMotionMaster()->MovePoint(0, SpawnPos);
                 break;
             case EVENT_TALK_LEADER_1:
