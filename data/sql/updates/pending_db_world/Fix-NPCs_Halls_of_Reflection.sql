@@ -1,10 +1,16 @@
  
 --SQL Dark Ranger Loralen emote
-UPDATE `creature_template_addon` SET `emote` = 0 WHERE (`entry` = 37779); 
+DELETE FROM `creature_template_addon` WHERE (`entry` = 37779);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(37779, 0, 0, 0, 2, 0, 0, NULL);
 --SQL LK Boss final
-UPDATE `creature` SET `guid`=1972025, `id1`=36954, `id2`=0, `id3`=0, `map`=668, `zoneId`=0, `areaId`=0, `spawnMask`=3, `phaseMask`=1, `equipment_id`=1, `position_x`=5553.48, `position_y`=2262.91, `position_z`=733.012, `orientation`=4.03979, `spawntimesecs`=86400, `wander_distance`=0, `currentwaypoint`=0, `curhealth`=27890000, `curmana`=0, `MovementType`=0, `npcflag`=0, `unit_flags`=0, `dynamicflags`=0, `ScriptName`='', `VerifiedBuild`=0 WHERE `guid`=1972025;
---SQL LK Boss final
-UPDATE `creature` SET `guid`=1972026, `id1`=37554, `id2`=0, `id3`=0, `map`=668, `zoneId`=0, `areaId`=0, `spawnMask`=1, `phaseMask`=1, `equipment_id`=1, `position_x`=5554.73, `position_y`=2259.63, `position_z`=733.011, `orientation`=1.78626, `spawntimesecs`=300, `wander_distance`=0, `currentwaypoint`=0, `curhealth`=5040000, `curmana`=881400, `MovementType`=0, `npcflag`=0, `unit_flags`=0, `dynamicflags`=0, `ScriptName`='', `VerifiedBuild`=NULL WHERE `guid`=1972026;
+DELETE FROM `creature` WHERE (`id1` = 36954);
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
+(1972025, 36954, 0, 0, 668, 0, 0, 3, 1, 1, 5552.77, 2262.57, 733.012, 4.15523, 300, 0, 0, 27890000, 0, 0, 0, 0, 0, '', NULL);
+--SQL LK Sylvanas final
+DELETE FROM `creature` WHERE (`id1` = 37554);
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
+(1972026, 37554, 0, 0, 668, 0, 0, 3, 1, 1, 5549.51, 2257.59, 733.011, 0.99299, 300, 0, 0, 5040000, 881400, 0, 0, 0, 0, '', NULL);
 --Add Gossip Sylvanas Final
 DELETE FROM `gossip_menu` WHERE (`MenuID` = 10931);
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES (10931, 15190);
