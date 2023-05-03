@@ -230,8 +230,8 @@ public:
                 events.ScheduleEvent(EVENT_PRE_INTRO_1, 10s);
                 events.ScheduleEvent(EVENT_PRE_INTRO_2, 11s);
                 events.ScheduleEvent(EVENT_EMOTE_LEADER_1, 16s);
-                events.ScheduleEvent(EVENT_TALK_LEADER_1, 16s);              
-                events.ScheduleEvent(EVENT_PRE_INTRO_3, 19s);               
+                events.ScheduleEvent(EVENT_TALK_LEADER_1, 16s);
+                events.ScheduleEvent(EVENT_PRE_INTRO_3, 19s);
             }
         }
 
