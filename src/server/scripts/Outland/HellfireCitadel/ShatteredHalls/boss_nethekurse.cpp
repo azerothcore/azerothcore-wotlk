@@ -215,6 +215,11 @@ public:
                     LOG_ERROR("server", "Data move boss to coordinates of location {}", std::to_string(choicelocation));
                     scheduler.Schedule(2500ms, GROUP_RP, [this, choicelocation](TaskContext context)
                     {
+                        //to prevent flying
+                        if (choicelocation == 1)
+                        {
+                            me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[1][0], NethekurseIntroPath[1][1], NethekurseIntroPath[1][2]);
+                        }
                         LOG_ERROR("server", "Data {}", "cast spell");
                         CastRandomPeonSpell(choicelocation);
                     });
