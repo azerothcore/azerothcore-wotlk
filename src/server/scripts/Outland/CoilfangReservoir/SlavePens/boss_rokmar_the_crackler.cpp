@@ -47,8 +47,6 @@ struct boss_rokmar_the_crackler : public BossAI
         });
     }
 
-
-
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
@@ -66,12 +64,6 @@ struct boss_rokmar_the_crackler : public BossAI
             DoCastSelf(SPELL_WATER_SPIT);
             context.Repeat(19s);
         });
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        scheduler.Update(diff);
-        DoMeleeAttackIfReady();
     }
 };
 

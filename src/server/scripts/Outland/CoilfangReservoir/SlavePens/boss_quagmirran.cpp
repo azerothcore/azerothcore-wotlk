@@ -19,6 +19,11 @@
 #include "ScriptedCreature.h"
 #include "the_slave_pens.h"
 
+//////////////////////////
+//QUAGMIRRAN//////////////
+//////////////////////////
+
+
 enum Spells
 {
     SPELL_ACID_SPRAY            = 38153,
@@ -43,8 +48,6 @@ struct boss_quagmirran : public BossAI
         _Reset();
     }
 
-
-
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
@@ -66,12 +69,6 @@ struct boss_quagmirran : public BossAI
             DoCastSelf(DUNGEON_MODE(SPELL_POISON_BOLT_VOLLEY_N, SPELL_POISON_BOLT_VOLLEY_H));
             context.Repeat(24400ms);
         });
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        scheduler.Update(diff);
-        DoMeleeAttackIfReady();
     }
 };
 
