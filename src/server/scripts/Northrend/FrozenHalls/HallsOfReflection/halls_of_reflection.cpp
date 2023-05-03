@@ -1951,6 +1951,7 @@ public:
                     events.ScheduleEvent(EVENT_LK_SAY_AGGRO, 0ms);
                     events.ScheduleEvent(EVENT_LK_BATTLE_1, 2s +500ms);
                     events.ScheduleEvent(EVENT_LK_BATTLE_2, 3s);
+                    events.ScheduleEvent(me->GetEntry() == NPC_JAINA_PART2 ? EVENT_JAINA_IMMOBILIZE_LK : EVENT_SYLVANAS_IMMOBILIZE_JUMP, 9s);
                     break;
                 case ACTION_START_LK_FIGHT_REAL:
                     events.ScheduleEvent(EVENT_START_RUN, 0ms);
@@ -1997,7 +1998,7 @@ public:
                 case EVENT_LK_SAY_AGGRO:
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
                         me->Attack(lkboss, true),
-                        lkboss->AI()->Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_LK_AGGRO_ALLY : SAY_LK_AGGRO_HORDE);
+                        lkboss->AI()->Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_LK_AGGRO_ALLY : SAY_LK_AGGRO_HORDE);               
                 case EVENT_LK_BATTLE_1:
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
                     {
@@ -2019,7 +2020,6 @@ public:
                         lkboss->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK2HTIGHT);
                         me->SetFacingToObject(lkboss);
                     }
-                    events.ScheduleEvent(me->GetEntry() == NPC_JAINA_PART2 ? EVENT_JAINA_IMMOBILIZE_LK : EVENT_SYLVANAS_IMMOBILIZE_JUMP, 9s);
                     break;
                 case EVENT_JAINA_IMMOBILIZE_LK:
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
