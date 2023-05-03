@@ -206,9 +206,15 @@ public:
             scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
             {
                 me->GetMotionMaster()->Clear();
-                uint32 choicelocation = urand(0, 3);
-                me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[choicelocation][0], NethekurseIntroPath[choicelocation][1], NethekurseIntroPath[choicelocation][2]);
-                CastRandomPeonSpell();
+                scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+                {
+                    uint32 choicelocation = urand(0, 3);
+                    me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[choicelocation][0], NethekurseIntroPath[choicelocation][1], NethekurseIntroPath[choicelocation][2]);
+                    scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+                    {
+                        CastRandomPeonSpell();
+                    });
+                });
                 context.Repeat(19400ms, 31500ms);
             });
         }
