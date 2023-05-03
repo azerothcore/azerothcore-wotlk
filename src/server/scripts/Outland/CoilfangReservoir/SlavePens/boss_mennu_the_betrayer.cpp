@@ -49,6 +49,8 @@ struct boss_mennu_the_betrayer : public BossAI
     {
         _Reset();
 
+        LOG_ERROR("server", "Data {}", "reset");
+
         ScheduleHealthCheckEvent(60, [&] {
             DoCastSelf(SPELL_HEALING_WARD);
         });
@@ -59,6 +61,14 @@ struct boss_mennu_the_betrayer : public BossAI
         summon->GetMotionMaster()->Clear();
     }
 
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if(me->GetThreatMgr().GetThreatList().empty())
+        {
+            LOG_ERROR("server", "Data {}", "evading");
+            BossAI::EnterEvadeMode(why);
+        }
+    }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
