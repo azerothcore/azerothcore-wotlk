@@ -31,18 +31,19 @@ enum SPDataTypes
     DATA_ROKMAR_THE_CRACKLER              = 2,
     DATA_QUAGMIRRAN                       = 3,
     DATA_AHUNE                            = 4,
-    DATA_AHUNE_BUNNY                      = 5,
-    DATA_FROZEN_CORE                      = 6,
-    DATA_FLAMECALLER_000                  = 7,
-    DATA_FLAMECALLER_001                  = 8,
-    DATA_FLAMECALLER_002                  = 9,
-    DATA_BONFIRE_BUNNY_000                = 10,
-    DATA_BONFIRE_BUNNY_001                = 11,
-    DATA_BONFIRE_BUNNY_002                = 12,
-    DATA_BEAM_BUNNY_000                   = 13,
-    DATA_BEAM_BUNNY_001                   = 14,
-    DATA_BEAM_BUNNY_002                   = 15,
-    DATA_LUMA_SKYMOTHER                   = 16
+    MAX_ENCOUNTER                         = 5,
+    DATA_AHUNE_BUNNY                      = 6,
+    DATA_FROZEN_CORE                      = 7,
+    DATA_FLAMECALLER_000                  = 8,
+    DATA_FLAMECALLER_001                  = 9,
+    DATA_FLAMECALLER_002                  = 10,
+    DATA_BONFIRE_BUNNY_000                = 11,
+    DATA_BONFIRE_BUNNY_001                = 12,
+    DATA_BONFIRE_BUNNY_002                = 13,
+    DATA_BEAM_BUNNY_000                   = 14,
+    DATA_BEAM_BUNNY_001                   = 15,
+    DATA_BEAM_BUNNY_002                   = 16,
+    DATA_LUMA_SKYMOTHER                   = 17
 };
 
 enum SPCreaturesIds
@@ -65,6 +66,8 @@ enum SPCreaturesIds
     NPC_SHAMAN_BEAM_BUNNY_002            = 25966,
     NPC_WHISP_DEST_BUNNY                 = 26120,
     NPC_WHISP_SOURCE_BUNNY               = 26121,
+    NPC_MENNU_THE_BETRAYER               = 17941,
+    NPC_ROKMAR_THE_CRACKLER              = 17991,
     NPC_QUAGMIRRAN                       = 17942
 };
 
@@ -79,5 +82,7 @@ inline AI* GetTheSlavePensAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, SPScriptName);
 }
+
+#define RegisterTheSlavePensCreatureAI(ai_name) RegisterCreatureAIWithFactory (ai_name, GetTheSlavePensAI)
 
 #endif // SLAVE_PENS_H
