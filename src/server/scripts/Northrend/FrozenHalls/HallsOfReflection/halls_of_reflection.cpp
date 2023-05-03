@@ -469,7 +469,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_H2_4, 2s);
                 break;
             case EVENT_INTRO_H2_4:
-                if (Creature* pUther = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_UTHER)))           
+                if (Creature* pUther = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_UTHER)))
                 {
                     pUther->SetVisible(true);
                     if (Aura* a = pUther->AddAura(SPELL_SHADOWMOURNE_VISUAL, pUther))
@@ -621,7 +621,6 @@ public:
                     {
                         pUther->SendPlaySpellVisual(SPELL_UTHER_DESPAWN);
                         pUther->CastSpell(pUther, SPELL_UTHER_DESPAWN, true);
-                       
                     }
                 events.ScheduleEvent(EVENT_INTRO_LK_3, 2s);
                 break;
@@ -792,8 +791,7 @@ public:
                     pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLkFinal, false);
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_13, 2s);
-                    break;                     
-
+                    break;
                 case EVENT_INTRO_LK_13:
                     me->SetVisible(false);
                     events.ScheduleEvent(EVENT_INTRO_END, 2s +500ms);
@@ -1691,8 +1689,7 @@ public:
                     }
                     else
                         me->RemoveAura(SPELL_REMORSELESS_WINTER);
-
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_SYLVANAS_PART2)))                      
+                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_SYLVANAS_PART2)))
                         c->AI()->DoAction(ACTION_INFORM_WALL_DESTROYED);
                 }
             }
@@ -1813,7 +1810,7 @@ public:
                         me->CastSpell((Unit*)nullptr, SPELL_FURY_OF_FROSTMOURNE, false);
                     }
                     break;
-                case EVENT_LK_START_FOLLOWING: 
+                case EVENT_LK_START_FOLLOWING:
                     {
                         me->SetSpeed(MOVE_RUN, 9.0f / 7.0f);
                         Movement::PointsArray path;
@@ -1944,9 +1941,8 @@ public:
         {
             currentStopPoint = 0;
             events.Reset();
-            
         }
-
+        
         void DoAction(int32 actionId) override
         {
             switch(actionId)
@@ -1974,10 +1970,10 @@ public:
         }
 
         void MoveToNextStopPoint()
-        {           
+        {
             me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
             me->InterruptNonMeleeSpells(true);
-            me->SetSheath(SHEATH_STATE_MELEE); 
+            me->SetSheath(SHEATH_STATE_MELEE);
             ++currentStopPoint;
             me->SetWalk(false);
             Movement::PointsArray path;
@@ -1992,36 +1988,31 @@ public:
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
                 events.ScheduleEvent(EVENT_SAY_LEADER_STOP_TEXT, 1s);
         }
-
+        
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
             {
-                
                 case EVENT_LK_SAY_AGGRO:
-                    
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
                         me->Attack(lkboss, true),
                         lkboss->AI()->Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_LK_AGGRO_ALLY : SAY_LK_AGGRO_HORDE);
                         events.ScheduleEvent(me->GetEntry() == NPC_JAINA_PART2 ? EVENT_JAINA_IMMOBILIZE_LK : EVENT_SYLVANAS_IMMOBILIZE_JUMP, 9s);
-
                 case EVENT_LK_BATTLE_1:
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
                     {
                         lkboss->CastSpell(lkboss, SPELL_SOUL_REAPER, false);
                     }
                     break;
-
                 case EVENT_LK_BATTLE_2:
                     //horda
                     if (Creature* leader = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_SYLVANAS_PART2)))
                     {
-
                         leader->CastSpell(leader, SPELL_EVASION, true);
                     }
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
-                    {                     
+                    {
                         lkboss->SetFacingToObject(me);
                     }
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
@@ -2030,7 +2021,6 @@ public:
                         me->SetFacingToObject(lkboss);
                     }
                     break;
-                   
                 case EVENT_JAINA_IMMOBILIZE_LK:
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
                     {
@@ -2062,7 +2052,7 @@ public:
                         Map::PlayerList const& pl = pInstance->instance->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
-                                p->KilledMonsterCredit(me->GetEntry()); // for quest                      
+                                p->KilledMonsterCredit(me->GetEntry()); //for quest
                         Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_AGGRO : SAY_SYLVANA_AGGRO);
                         me->SetSheath(SHEATH_STATE_MELEE);
                         me->SetWalk(false);
