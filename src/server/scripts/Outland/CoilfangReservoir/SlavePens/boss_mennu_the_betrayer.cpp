@@ -59,7 +59,6 @@ struct boss_mennu_the_betrayer : public BossAI
         summon->GetMotionMaster()->Clear();
     }
 
-
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
