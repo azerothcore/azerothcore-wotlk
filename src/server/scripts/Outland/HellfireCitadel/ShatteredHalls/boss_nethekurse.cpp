@@ -81,7 +81,7 @@ enum Actions
 float NethekurseIntroPath[4][3] =
 {
     {184.78966f, 290.3699f, -8.18139f},
-    {178.51125f, 278.97795f, -8.183065f},
+    {178.51125f, 278.97796f, -8.183065f},
     {171.82281f, 289.97687f, -8.185595f},
     {178.51125f, 287.97794f, -8.183065f}
 };
@@ -130,7 +130,9 @@ public:
                         return;
 
                     if (EventStage < EVENT_STAGE_TAUNT)
+                    {
                         Talk(SAY_PEON_ATTACKED);
+                    }
                     break;
                 case SETDATA_PEON_DEATH:
                     if (PeonKilledCount >= 4)
@@ -139,7 +141,6 @@ public:
                     if (EventStage < EVENT_STAGE_TAUNT)
                     {
                         PeonDieRP();
-                        //peon dies placeholder
                     }
                     if (++PeonKilledCount == 4)
                         DoAction(ACTION_CANCEL_INTRO);
@@ -276,6 +277,7 @@ public:
                 me->SetInCombatWithZone();
                 Talk(SAY_INTRO_2);
                 me->SetHealth(me->GetMaxHealth());
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
                 return;
             }
 
@@ -290,6 +292,7 @@ public:
             }
 
             ATreached = true;
+            me->SetUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
             events2.ScheduleEvent(EVENT_INTRO, 90000);
             Talk(SAY_INTRO);
             EventStage = EVENT_STAGE_INTRO;
@@ -356,7 +359,7 @@ public:
 
         void CalculateDamageAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
-            amount = 1000;
+            amount = 0;
         }
 
         void Register() override
