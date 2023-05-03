@@ -85,6 +85,7 @@ float NethekurseIntroPath[4][3] =
     {171.82281f, 289.97687f, -8.185595f},
     {178.51125f, 287.97794f, -8.183065f}
 };
+
 class boss_grand_warlock_nethekurse : public CreatureScript
 {
 public:
@@ -144,7 +145,6 @@ public:
                     }
                     if (++PeonKilledCount == 4)
                         DoAction(ACTION_CANCEL_INTRO);
-                        Talk(SAY_INTRO_2);
                     break;
             }
         }
@@ -270,7 +270,8 @@ public:
                 events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
                 instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                 me->SetInCombatWithZone();
-                me->SetHomePosition(NethekurseIntroPath[3][0], NethekurseIntroPath[3][0], NethekurseIntroPath[3][0], 4.572762489318847656f);
+                Talk(SAY_INTRO_2);
+                me->SetHomePosition(NethekurseIntroPath[3][0], NethekurseIntroPath[3][1], NethekurseIntroPath[3][2], 4.572762489318847656f);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
                 return;
             }
