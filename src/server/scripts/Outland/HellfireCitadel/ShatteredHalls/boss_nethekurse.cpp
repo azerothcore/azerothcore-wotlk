@@ -205,13 +205,16 @@ public:
         {
             scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
             {
+                LOG_ERROR("server", "Data {}", "boss stand still");
                 me->GetMotionMaster()->Clear();
                 scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
                 {
                     uint32 choicelocation = urand(0, 3);
                     me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[choicelocation][0], NethekurseIntroPath[choicelocation][1], NethekurseIntroPath[choicelocation][2]);
+                    LOG_ERROR("server", "Data move boss to coordinates of location {}", std::to_string(choicelocation));
                     scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
                     {
+                        LOG_ERROR("server", "Data {}", "cast spell");
                         CastRandomPeonSpell();
                     });
                 });
@@ -224,7 +227,9 @@ public:
             _JustEngagedWith();
             if (EventStage == EVENT_STAGE_NONE)
             {
+                LOG_ERROR("server", "Data {}", "start combat after reset");
                 CombatEventScheduler();
+                me->SetReactState(REACT_AGGRESSIVE);
             }
         }
 
@@ -407,6 +412,7 @@ public:
             {
                 if (Creature* nethekurse = instance->GetCreature(DATA_NETHEKURSE))
                 {
+                    LOG_ERROR("server", "Data {}", "AT reached, intro start");
                     nethekurse->AI()->DoAction(ACTION_START_INTRO);
                 }
             }
