@@ -67,12 +67,6 @@ struct boss_rokmar_the_crackler : public BossAI
             context.Repeat(19s);
         });
     }
-
-    void UpdateAI(uint32 diff) override
-    {
-        scheduler.Update(diff);
-        DoMeleeAttackIfReady();
-    }
 };
 
 void AddSC_boss_rokmar_the_crackler()

@@ -43,8 +43,6 @@ struct boss_quagmirran : public BossAI
         _Reset();
     }
 
-
-
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
@@ -66,12 +64,6 @@ struct boss_quagmirran : public BossAI
             DoCastSelf(DUNGEON_MODE(SPELL_POISON_BOLT_VOLLEY_N, SPELL_POISON_BOLT_VOLLEY_H));
             context.Repeat(24400ms);
         });
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        scheduler.Update(diff);
-        DoMeleeAttackIfReady();
     }
 };
 
