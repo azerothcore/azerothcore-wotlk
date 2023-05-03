@@ -210,15 +210,16 @@ public:
                 scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
                 {
                     uint32 choicelocation = urand(0, 3);
+                    me->GetMotionMaster()->MoveIdle();
                     me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[choicelocation][0], NethekurseIntroPath[choicelocation][1], NethekurseIntroPath[choicelocation][2]);
                     LOG_ERROR("server", "Data move boss to coordinates of location {}", std::to_string(choicelocation));
-                    scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+                    scheduler.Schedule(1500ms, GROUP_RP, [this, choicelocation](TaskContext context)
                     {
                         LOG_ERROR("server", "Data {}", "cast spell");
-                        CastRandomPeonSpell();
+                        CastRandomPeonSpell(choicelocation);
                     });
                 });
-                context.Repeat(19400ms, 31500ms);
+                context.Repeat(17400ms, 29500ms);
             });
         }
 
@@ -230,12 +231,13 @@ public:
                 LOG_ERROR("server", "Data {}", "start combat after reset");
                 CombatEventScheduler();
                 me->SetReactState(REACT_AGGRESSIVE);
+                if (Unit* target = me->SelectNearestPlayer(50.0f))
+                        AttackStart(target);
             }
         }
 
-        void CastRandomPeonSpell()
+        void CastRandomPeonSpell(uint32 choice)
         {
-            uint32 choice = urand(1, 3);
             if (choice == 1)
             {
                 Talk(SAY_SHADOW_SEAR);
