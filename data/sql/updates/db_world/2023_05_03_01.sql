@@ -1,3 +1,4 @@
+-- DB update 2023_05_03_00 -> 2023_05_03_01
 --
 DELETE FROM `creature_addon` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id1` = 16733);
 
