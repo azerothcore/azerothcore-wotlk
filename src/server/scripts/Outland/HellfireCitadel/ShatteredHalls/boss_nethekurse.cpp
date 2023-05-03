@@ -209,7 +209,7 @@ public:
                 me->GetMotionMaster()->Clear();
                 scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
                 {
-                    uint32 choicelocation = urand(0, 2);
+                    uint32 choicelocation = urand(1, 3);
                     me->GetMotionMaster()->MoveIdle();
                     me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[choicelocation][0], NethekurseIntroPath[choicelocation][1], NethekurseIntroPath[choicelocation][2]);
                     LOG_ERROR("server", "Data move boss to coordinates of location {}", std::to_string(choicelocation));
@@ -238,21 +238,22 @@ public:
 
         void CastRandomPeonSpell(uint32 choice)
         {
-            if (choice == 0)
+            if (choice == 1)
             {
-                Talk(SAY_SHADOW_SEAR);
-                me->CastSpell(me, SPELL_SHADOW_SEAR, false);
-                me->SetHealth(me->GetMaxHealth());
+                Talk(SAY_DEATH_COIL);
+                me->CastSpell(me, SPELL_DEATH_COIL, false);
+                
             }
-            else if (choice == 1)
+            else if (choice == 2)
             {
                 Talk(SAY_SHADOW_FISSURE);
                 me->CastSpell(me, SPELL_SHADOW_FISSURE_RP, false);
             }
-            else if (choice == 2)
+            else if (choice == 3)
             {
-                Talk(SAY_DEATH_COIL);
-                me->CastSpell(me, SPELL_DEATH_COIL, false);
+                Talk(SAY_SHADOW_SEAR);
+                me->CastSpell(me, SPELL_SHADOW_SEAR, false);
+                me->SetHealth(me->GetMaxHealth());
             }
         }
 
