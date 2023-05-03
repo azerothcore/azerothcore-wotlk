@@ -81,10 +81,11 @@ enum Actions
 float NethekurseIntroPath[4][3] =
 {
     {184.78966f, 290.3699f, -8.18139f},
-    {178.51125f, 278.97794f, -8.183065f},
+    {178.51125f, 278.779022f, -8.183065f},
     {171.82281f, 289.97687f, -8.185595f},
     {178.51125f, 287.97794f, -8.183065f}
 };
+
 class boss_grand_warlock_nethekurse : public CreatureScript
 {
 public:
@@ -130,7 +131,9 @@ public:
                         return;
 
                     if (EventStage < EVENT_STAGE_TAUNT)
+                    {
                         Talk(SAY_PEON_ATTACKED);
+                    }
                     break;
                 case SETDATA_PEON_DEATH:
                     if (PeonKilledCount >= 4)
@@ -139,7 +142,6 @@ public:
                     if (EventStage < EVENT_STAGE_TAUNT)
                     {
                         PeonDieRP();
-                        //peon dies placeholder
                     }
                     if (++PeonKilledCount == 4)
                         DoAction(ACTION_CANCEL_INTRO);
@@ -191,12 +193,12 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who) override 
-        {
+        { 
             if (EventStage == EVENT_STAGE_NONE)
             {
                 if (Unit* target = me->SelectNearestPlayer(50.0f))
                 {
-                    AttackStart(target); 
+                    DoAction(ACTION_CANCEL_INTRO);
                 }
             }
         }
@@ -208,14 +210,15 @@ public:
                 me->GetMotionMaster()->Clear();
                 scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
                 {
-                    uint32 choicelocation = urand(0, 3);
+                    uint32 choicelocation = urand(1, 3);
+                    me->GetMotionMaster()->MoveIdle();
                     me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[choicelocation][0], NethekurseIntroPath[choicelocation][1], NethekurseIntroPath[choicelocation][2]);
-                    scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+                    scheduler.Schedule(2500ms, GROUP_RP, [this, choicelocation](TaskContext context)
                     {
-                        CastRandomPeonSpell();
+                        CastRandomPeonSpell(choicelocation);
                     });
                 });
-                context.Repeat(19400ms, 31500ms);
+                context.Repeat(16400ms, 28500ms);
             });
         }
 
@@ -224,18 +227,18 @@ public:
             _JustEngagedWith();
             if (EventStage == EVENT_STAGE_NONE)
             {
+                DoAction(ACTION_CANCEL_INTRO);
                 CombatEventScheduler();
             }
         }
 
-        void CastRandomPeonSpell()
+        void CastRandomPeonSpell(uint32 choice)
         {
-            uint32 choice = urand(1, 3);
             if (choice == 1)
             {
-                Talk(SAY_SHADOW_SEAR);
-                me->CastSpell(me, SPELL_SHADOW_SEAR, false);
-                me->SetFullHealth();
+                Talk(SAY_DEATH_COIL);
+                me->CastSpell(me, SPELL_DEATH_COIL, false);
+                
             }
             else if (choice == 2)
             {
@@ -244,8 +247,8 @@ public:
             }
             else if (choice == 3)
             {
-                Talk(SAY_DEATH_COIL);
-                me->CastSpell(me, SPELL_DEATH_COIL, false);
+                Talk(SAY_SHADOW_SEAR);
+                me->CastSpell(me, SPELL_SHADOW_SEAR, false);
             }
         }
 
@@ -264,6 +267,8 @@ public:
                 instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                 me->SetInCombatWithZone();
                 Talk(SAY_INTRO_2);
+                me->SetHomePosition(NethekurseIntroPath[3][0], NethekurseIntroPath[3][1], NethekurseIntroPath[3][2], 4.572762489318847656f);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
                 return;
             }
 
@@ -272,6 +277,13 @@ public:
                 return;
             }
 
+            if (ATreached == true)
+            {
+                return;
+            }
+
+            ATreached = true;
+            me->SetUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
             events2.ScheduleEvent(EVENT_INTRO, 90000);
             Talk(SAY_INTRO);
             EventStage = EVENT_STAGE_INTRO;
@@ -318,6 +330,7 @@ public:
         uint8 PeonKilledCount = 0;
         uint8 EventStage;
         bool introDone;
+        bool ATreached = false;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -337,7 +350,7 @@ public:
 
         void CalculateDamageAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
-            amount = 1000;
+            amount = 0;
         }
 
         void Register() override
