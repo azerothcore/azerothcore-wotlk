@@ -14,14 +14,3 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 -- Add Gossip Sylvanas Final
 DELETE FROM `gossip_menu` WHERE (`MenuID` = 10931);
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES (10931, 15190);
-
-
-
-
-
-
-
-
-
-
-
