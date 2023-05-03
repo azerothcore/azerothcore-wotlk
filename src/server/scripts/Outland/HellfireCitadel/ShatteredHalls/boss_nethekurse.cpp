@@ -295,7 +295,6 @@ public:
         {
             events2.Update(diff);
             scheduler.Update(diff);
-
             uint32 eventId = events2.ExecuteEvent();
 
             if (EventStage < EVENT_STAGE_MAIN && instance->GetBossState(DATA_NETHEKURSE) == IN_PROGRESS)
@@ -426,7 +425,6 @@ public:
         return false;
     }
 };
-
 
 void AddSC_boss_grand_warlock_nethekurse()
 {
