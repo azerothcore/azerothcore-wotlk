@@ -469,11 +469,13 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_H2_4, 2s);
                 break;
             case EVENT_INTRO_H2_4:
-                if (Creature* pUther = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_UTHER)))// testando            
+                if (Creature* pUther = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_UTHER)))           
                 {
                     pUther->SetVisible(true);
                     if (Aura* a = pUther->AddAura(SPELL_SHADOWMOURNE_VISUAL, pUther))
+                    {
                         a->SetDuration(8000);
+                    }
                 }
                 events.ScheduleEvent(EVENT_INTRO_H2_5, 7s);
                 break;
