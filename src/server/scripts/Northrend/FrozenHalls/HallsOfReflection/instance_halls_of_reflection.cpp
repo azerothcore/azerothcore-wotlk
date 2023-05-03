@@ -19,7 +19,6 @@
 #include "Transport.h"
 #include "halls_of_reflection.h"
 
-
 class UtherBatteredHiltEvent : public BasicEvent
 {
 public:
@@ -712,7 +711,6 @@ public:
                 case GO_FRONT_DOOR:
                     return GO_FrontDoorGUID;
             }
-
             return ObjectGuid::Empty;
         }
 
@@ -772,7 +770,6 @@ public:
                         ++ur;
                     }
             }
-
             if (bFinished5Waves)
             {
                 for (; WaveNumber < 4; ++WaveNumber)
@@ -860,9 +857,7 @@ public:
                     num_to_activate = 3;
                 else if (WaveNumber <= 4)
                     num_to_activate = 4;
-
                 reqKillCount += num_to_activate;
-
                 for (uint8 i = 0; i < num_to_activate; ++i)
                 {
                     uint32 entry = chosenComposition[WaveNumber - (WaveNumber > 5 ? 2 : 1)][i];
@@ -910,7 +905,6 @@ public:
                         c->StopMovingOnCurrentPos();
                     }
             memset(&TrashActive, 0, sizeof(TrashActive));
-
             if (Creature* falric = instance->GetCreature(NPC_FalricGUID))
                 falric->AI()->EnterEvadeMode();
             if (Creature* marwyn = instance->GetCreature(NPC_MarwynGUID))
@@ -1014,7 +1008,6 @@ public:
                                     if (Aura* a = pMarwyn->AddAura(SPELL_SHADOWMOURNE_VISUAL, pMarwyn))
                                         a->SetDuration(8000);
                                 }
-
                                 pMarwyn->AI()->Talk(EMOTE_MARWYN_INTRO_SPIRIT);
                             }
                             ++ResumeFirstEventStep;
@@ -1056,7 +1049,6 @@ public:
                 else
                     ResumeFirstEventTimer -= diff;
             }
-
             if (outroStep)
             {
                 if (outroTimer <= diff)
