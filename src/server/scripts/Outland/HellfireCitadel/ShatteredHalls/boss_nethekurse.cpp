@@ -192,8 +192,8 @@ public:
                 });
         }
 
-        void MoveInLineOfSight(Unit* who) override 
-        { 
+        void MoveInLineOfSight(Unit* who) override
+        {
             if (EventStage == EVENT_STAGE_NONE)
             {
                 if (Unit* target = me->SelectNearestPlayer(50.0f))
@@ -238,7 +238,6 @@ public:
             {
                 Talk(SAY_DEATH_COIL);
                 me->CastSpell(me, SPELL_DEATH_COIL, false);
-                
             }
             else if (choice == 2)
             {
