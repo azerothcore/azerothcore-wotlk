@@ -220,7 +220,7 @@ public:
         bool shortver;
 
         void Reset() override
-        {           
+        {
             shortver = false;
             events.Reset();
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
@@ -454,7 +454,7 @@ public:
                 break;
 
             case EVENT_INTRO_H2_3:
-                me->CastSpell(me, SPELL_SUMMON_SOULS, false); //esperar              
+                me->CastSpell(me, SPELL_SUMMON_SOULS, false); //esperar
                 events.ScheduleEvent(EVENT_INTRO_H2_3_1, 5s);
                 break;
 
