@@ -1699,7 +1699,7 @@ public:
         {
             // Xinef: dont use 0, it is no longer the last point
             // Xinef: if type is escort and spline is finalized, it means that we reached last point from the path
-            if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())               
+            if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
             {
                 if (currentWall == 0)
                 {
@@ -1942,8 +1942,8 @@ public:
             currentStopPoint = 0;
             events.Reset();
         }
-        
         void DoAction(int32 actionId) override
+
         {
             switch(actionId)
             {
@@ -1988,7 +1988,7 @@ public:
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
                 events.ScheduleEvent(EVENT_SAY_LEADER_STOP_TEXT, 1s);
         }
-        
+
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
