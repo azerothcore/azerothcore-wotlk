@@ -218,6 +218,7 @@ public:
                         //to prevent flying
                         if (choicelocation == 1)
                         {
+                            me->GetMotionMaster()->Clear();
                             me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[1][0], NethekurseIntroPath[1][1], NethekurseIntroPath[1][2]);
                         }
                         LOG_ERROR("server", "Data {}", "cast spell");
