@@ -194,9 +194,9 @@ public:
         {
             if (EventStage == EVENT_STAGE_NONE)
             {
-                if (Unit* target = me->SelectNearestPlayer(50.0f))
+                if (who->IsPlayer())
                 {
-                    AttackStart(target); 
+                    DoAction(ACTION_CANCEL_INTRO);
                 }
             }
         }
@@ -278,6 +278,12 @@ public:
                 return;
             }
 
+            if (ATreached == true)
+            {
+                return;
+            }
+
+            ATreached = true;
             events2.ScheduleEvent(EVENT_INTRO, 90000);
             Talk(SAY_INTRO);
             EventStage = EVENT_STAGE_INTRO;
@@ -324,6 +330,7 @@ public:
         uint8 PeonKilledCount = 0;
         uint8 EventStage;
         bool introDone;
+        bool ATreached = false;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
