@@ -1999,8 +1999,8 @@ public:
                     {
                         me->Attack(lkboss, true),
                         lkboss->AI()->Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_LK_AGGRO_ALLY : SAY_LK_AGGRO_HORDE);
-                    }
                         events.ScheduleEvent(me->GetEntry() == NPC_JAINA_PART2 ? EVENT_JAINA_IMMOBILIZE_LK : EVENT_SYLVANAS_IMMOBILIZE_JUMP, 9s);
+                    }
                 case EVENT_LK_BATTLE_1:
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
                     {
