@@ -19,6 +19,11 @@
 #include "ScriptedCreature.h"
 #include "the_slave_pens.h"
 
+//////////////////////////
+//QUAGMIRRAN//////////////
+//////////////////////////
+
+
 enum Spells
 {
     SPELL_ACID_SPRAY            = 38153,
