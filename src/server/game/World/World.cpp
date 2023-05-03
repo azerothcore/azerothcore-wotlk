@@ -3357,6 +3357,11 @@ void World::AddDelayedDamage(Unit* attacker, Unit* victim, uint32 damage, CleanD
 void World::ProcessDelayedDamages()
 {
     for (auto& damage : _delayedDamages)
+    {
+        if (!damage.victim)
+            continue;
+
         Unit::DealDamage(damage.attacker, damage.victim, damage.damage, damage.cleanDamage, damage.damagetype, damage.damageSchoolMask, damage.spellProto, damage.durabilityLoss);
+    }
     _delayedDamages.clear();
 }
