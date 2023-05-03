@@ -251,504 +251,546 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
-            {               
-                case EVENT_PRE_INTRO_1:
-                    if (pInstance)
-                    {
-                        
-                        me->SetSheath(SHEATH_STATE_MELEE);
-                        me->SetVisible(true);
-                        
-                    }
-                    break;
-                case EVENT_PRE_INTRO_2:
-                    if (me->GetEntry() == NPC_JAINA_PART1)
-                       Talk(SAY_JAINA_INTRO_1);                 
-                    me->GetMotionMaster()->MovePoint(0, SpawnPos);                   
-                    break;
-                case EVENT_TALK_LEADER_1:
-                    me->SetSheath(SHEATH_STATE_UNARMED);
-                    Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_1);                  
-                    break;
-                case EVENT_EMOTE_LEADER_1:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                    break;
-                case EVENT_PRE_INTRO_3:
-                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            switch (events.ExecuteEvent())
+            {
+            case EVENT_PRE_INTRO_1:
+                if (pInstance)
+                {
+
                     me->SetSheath(SHEATH_STATE_MELEE);
-                    break;                  
-                case EVENT_START_INTRO:
-                    shortver = false;                   
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                    me->GetMotionMaster()->MovePoint(0, MoveThronePos);
-                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                    {
-                        pLoralen->LoadEquipment(true);
-                        pLoralen->SetVisible(true);
-                        pLoralen->SetWalk(true);
-                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenMidleFollowPos);
-                        
-                    }
-                    // Begining of intro is differents between factions as the speech sequence and timers are differents.
-                    if (me->GetEntry() == NPC_JAINA_PART1)
-                        events.ScheduleEvent(EVENT_INTRO_A2_1, 10s);
-                    else
-                    {
-                        events.ScheduleEvent(EVENT_INTRO_H2_2, 9s);
-                        events.ScheduleEvent(EVENT_LORALEN_MOVE_1, 24s);
-                        events.ScheduleEvent(EVENT_LORALEN_MOVE_2, 32s);
-                    }
-                    break;
+                    me->SetVisible(true);
 
-                case EVENT_LORALEN_MOVE_1:
-                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))                   
-                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
-                    break;
+                }
+                break;
+            case EVENT_PRE_INTRO_2:
+                if (me->GetEntry() == NPC_JAINA_PART1)
+                {
+                    Talk(SAY_JAINA_INTRO_1);
+                    me->GetMotionMaster()->MovePoint(0, SpawnPos);
+                }
+                break;
+            case EVENT_TALK_LEADER_1:
+                me->SetSheath(SHEATH_STATE_UNARMED);
+                Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_1);
+                break;
+            case EVENT_EMOTE_LEADER_1:
+                me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                break;
+            case EVENT_PRE_INTRO_3:
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                me->SetSheath(SHEATH_STATE_MELEE);
+                break;
+            case EVENT_START_INTRO:
+                shortver = false;
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                me->GetMotionMaster()->MovePoint(0, MoveThronePos);
+                if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                {
+                    pLoralen->LoadEquipment(true);
+                    pLoralen->SetVisible(true);
+                    pLoralen->SetWalk(true);
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenMidleFollowPos);
 
-                case EVENT_LORALEN_MOVE_2:
-                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                        pLoralen->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
-                    break;
-
-                case EVENT_SKIP_INTRO:
-                    shortver = true;
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, (me->GetEntry() == NPC_JAINA_PART1 ? EMOTE_STATE_READY2H : EMOTE_STATE_READY1H));
-                    me->GetMotionMaster()->MovePoint(0, MoveThronePos);
-                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
-                    events.ScheduleEvent(EVENT_INTRO_LK_1, 0ms);
-                    break;
-
-                // A2 Intro Events
-                case EVENT_INTRO_A2_1:                   
-                    Talk(SAY_JAINA_INTRO_3);
-                    events.ScheduleEvent(EVENT_INTRO_A2_2, 5s);
-                    break;
-                case EVENT_INTRO_A2_2:
-                    Talk(SAY_JAINA_INTRO_4);
-                    events.ScheduleEvent(EVENT_INTRO_A2_3, 10s);
-                    break;
-                case EVENT_INTRO_A2_3:
-                    pInstance->HandleGameObject(pInstance->GetGuidData(GO_FROSTMOURNE), true);
-                    me->CastSpell(me, SPELL_FROSTMOURNE_SPAWN_SOUND, true);
-                    //me->CastSpell(me, SPELL_ARCANE_CAST_VISUAL, false);// take it off as soon as you finish working on the horde
-                    events.ScheduleEvent(EVENT_INTRO_A2_4, 10s);
-                    break;
-                case EVENT_INTRO_A2_4:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                    {
-                        pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                        pUther->SetVisible(true);
-                        if (Aura* a = pUther->AddAura(SPELL_SHADOWMOURNE_VISUAL, pUther))
-                            a->SetDuration(8000);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_A2_5, 2s);
-                    break;
-                case EVENT_INTRO_A2_5:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_1);
-                    events.ScheduleEvent(EVENT_INTRO_A2_6, 3s);
-                    break;
-                case EVENT_INTRO_A2_6:
-                    Talk(SAY_JAINA_INTRO_5);
-                    events.ScheduleEvent(EVENT_INTRO_A2_7, 6s);
-                    break;
-                case EVENT_INTRO_A2_7:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_2);
-                    events.ScheduleEvent(EVENT_INTRO_A2_8, 6500ms);
-                    break;
-                case EVENT_INTRO_A2_8:
-                    Talk(SAY_JAINA_INTRO_6);
-                    events.ScheduleEvent(EVENT_INTRO_A2_9, 2s);
-                    break;
-                case EVENT_INTRO_A2_9:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_3);
-                    events.ScheduleEvent(EVENT_INTRO_A2_10, 9s);
-                    break;
-                case EVENT_INTRO_A2_10:
-                    Talk(SAY_JAINA_INTRO_7);
-                    events.ScheduleEvent(EVENT_INTRO_A2_11, 5s);
-                    break;
-                case EVENT_INTRO_A2_11:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_4);
-                    events.ScheduleEvent(EVENT_INTRO_A2_12, 11s);
-                    break;
-                case EVENT_INTRO_A2_12:
-                    Talk(SAY_JAINA_INTRO_8);
-                    events.ScheduleEvent(EVENT_INTRO_A2_13, 4s);
-                    break;
-                case EVENT_INTRO_A2_13:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_5);
-                    events.ScheduleEvent(EVENT_INTRO_A2_14, 12s + 500ms);
-                    break;
-                case EVENT_INTRO_A2_14:
-                    Talk(SAY_JAINA_INTRO_9);
-                    events.ScheduleEvent(EVENT_INTRO_A2_15, 10s);
-                    break;
-                case EVENT_INTRO_A2_15:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_6);
-                    events.ScheduleEvent(EVENT_INTRO_A2_16, 24s);
-                    break;
-                case EVENT_INTRO_A2_16:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_7);
-                    events.ScheduleEvent(EVENT_INTRO_A2_17, 4s);
-                    break;
-                case EVENT_INTRO_A2_17:
-                    Talk(SAY_JAINA_INTRO_10);
-                    events.ScheduleEvent(EVENT_INTRO_A2_18, 2s);
-                    break;
-                case EVENT_INTRO_A2_18:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                    {
-                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_8);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_A2_19, 11s);
-                    break;
-                case EVENT_INTRO_A2_19:
-                    Talk(SAY_JAINA_INTRO_11);
-                    events.ScheduleEvent(EVENT_INTRO_LK_1, 2s);
-                    break;
-
-                // H2 Intro Events
-                case EVENT_INTRO_H2_2:
-                    me->SetSheath(SHEATH_STATE_UNARMED);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                    Talk(SAY_SYLVANAS_INTRO_2);
-                    events.ScheduleEvent(EVENT_INTRO_H2_2_1, 7s +500ms);
-                    break;
-
-                case EVENT_INTRO_H2_2_1:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                    Talk(SAY_SYLVANAS_INTRO_3);
-                    events.ScheduleEvent(EVENT_INTRO_H2_3, 2s);
-                    break;
-
-                case EVENT_INTRO_H2_3:                 
-                    me->CastSpell(me, SPELL_SUMMON_SOULS, false); //esperar              
-                    events.ScheduleEvent(EVENT_INTRO_H2_3_1, 5s);
-                    break;
-
-                case EVENT_INTRO_H2_3_1:
-                    me->CastSpell(me, SPELL_FROSTMOURNE_SPAWN_SOUND, false);
-                    pInstance->HandleGameObject(pInstance->GetGuidData(GO_FROSTMOURNE), true);
-                     events.ScheduleEvent(EVENT_INTRO_H2_3_2, 3s);
-                    break;
-
-                case EVENT_INTRO_H2_3_2:
-                    me->RemoveAurasDueToSpell(SPELL_SUMMON_SOULS);
-                    events.ScheduleEvent(EVENT_INTRO_H2_4, 2s);
-                    break;
-                case EVENT_INTRO_H2_4:
-                    if (Creature* pUther = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_UTHER)))// testando            
-                        {
-                            pUther->SetVisible(true);
-                            if (Aura* a = pUther->AddAura(SPELL_SHADOWMOURNE_VISUAL, pUther))
-                                a->SetDuration(8000);
-                        }
-                    events.ScheduleEvent(EVENT_INTRO_H2_5, 7s);
-                    break;
-
-                case EVENT_INTRO_H2_5:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                    {
-                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_1);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_H2_6, 11s);
-                    break;
-                case EVENT_INTRO_H2_6:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                    Talk(SAY_SYLVANAS_INTRO_4);
-                    events.ScheduleEvent(EVENT_INTRO_H2_7, 2s +500ms);
-                    break;
-                case EVENT_INTRO_H2_7:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                    {
-                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_2);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_H2_8, 9s);//
-                    break;
-                case EVENT_INTRO_H2_8:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                    Talk(SAY_SYLVANAS_INTRO_5);
-                    events.ScheduleEvent(EVENT_INTRO_H2_9, 5s);
-                    break;
-                case EVENT_INTRO_H2_9:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                    {
-                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_3);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_H2_10, 20s);
-                    break;
-                case EVENT_INTRO_H2_10:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                    Talk(SAY_SYLVANAS_INTRO_6);
-                    events.ScheduleEvent(EVENT_INTRO_H2_11, 3s);
-                    break;
-                case EVENT_INTRO_H2_11:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                    {
-                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_4);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_H2_12, 21s + 500ms);
-                    break;
-                case EVENT_INTRO_H2_12:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                    Talk(SAY_SYLVANAS_INTRO_7);
-                    events.ScheduleEvent(EVENT_INTRO_H2_13, 3s + 500ms);
-                    break;
-                case EVENT_INTRO_H2_13:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                    {
-                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_5);
-                        
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_H2_14, 12s + 500ms);
-                    break;
-                case EVENT_INTRO_H2_14:
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                    {
-                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_6);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_H2_15, 8s);
-                    break;
-                case EVENT_INTRO_H2_15:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                    Talk(SAY_SYLVANAS_INTRO_8);
-                    events.ScheduleEvent(EVENT_INTRO_LK_1, 2s);
-                    break;
-
-                // Remaining Intro Events common for both faction
-                case EVENT_INTRO_LK_1:
-                    if (Creature* pLichKing = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
-                    {                      
-                        
-                        pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), true);
-                        pLichKing->SetVisible(true);
-                                               
-                        pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveMidlelThronePos, false);
-                        
-                    }
-
-                    if (!shortver)
-                        if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        {
-                                pUther->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                            if (me->GetEntry() == NPC_JAINA_PART1)
-                                
-                                pUther->AI()->Talk(SAY_UTHER_INTRO_A2_9);
-                            else
-                                pUther->AI()->Talk(SAY_UTHER_INTRO_H2_7);
-
-                        }
-                    events.ScheduleEvent(EVENT_INTRO_LK_1_1, 9s);
-                    events.ScheduleEvent(EVENT_INTRO_LK_1_2, 3s);                   
-                    events.ScheduleEvent(EVENT_INTRO_LK_1_3, 6s);
-                    events.ScheduleEvent(EVENT_INTRO_LK_2, 12s);
-                    break;
-
-                case EVENT_INTRO_LK_1_1:
-                    if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
-                    {
-                        pLichKing->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                        pLichKing->AI()->Talk(SAY_LK_INTRO_1);
-                    }
-                    break;
-
-                case EVENT_INTRO_LK_1_2:
-                    if (!shortver)
-                        if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        {
-                            pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);                          
-                            pUther->SetFacingTo(0.89f);
-                        }
-                    break;
-
-                case EVENT_INTRO_LK_1_3:
-                    pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), false);
-                    break;
-
-                case EVENT_INTRO_LK_2:
-                    if (!shortver)
-                        if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
-                        {
-                            pLichKing->SetVisible(true);
-                            pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos, false);
-                            events.ScheduleEvent(EVENT_INTRO_LK_2_1, 1s);
-                        }
-                    break;
-
-                case EVENT_INTRO_LK_2_1:
-                       if (!shortver)
-                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        {
-                            pUther->SendPlaySpellVisual(SPELL_UTHER_DESPAWN);
-                            pUther->CastSpell(pUther, SPELL_UTHER_DESPAWN, true);                         
-                            events.ScheduleEvent(EVENT_INTRO_LK_3, 2s);
-                        }
+                }
+                // Begining of intro is differents between factions as the speech sequence and timers are differents.
+                if (me->GetEntry() == NPC_JAINA_PART1)
+                {
+                    events.ScheduleEvent(EVENT_INTRO_A2_1, 10s);
+                }
+                else
+                {
+                    events.ScheduleEvent(EVENT_INTRO_H2_2, 9s);
+                    events.ScheduleEvent(EVENT_LORALEN_MOVE_1, 24s);
+                    events.ScheduleEvent(EVENT_LORALEN_MOVE_2, 32s);
+                }
                 break;
 
-                case EVENT_INTRO_LK_3:
-                    if (!shortver)
-                        if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
-                        {
-                            pUther->SetVisible(false);
-                            events.ScheduleEvent(EVENT_INTRO_LK_4, 6s);
-                        }
-                    break;
+            case EVENT_SKIP_INTRO:
+                shortver = true;
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, (me->GetEntry() == NPC_JAINA_PART1 ? EMOTE_STATE_READY2H : EMOTE_STATE_READY1H));
+                me->GetMotionMaster()->MovePoint(0, MoveThronePos);
+                if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                {
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_1, 0ms);
+                break;
 
-                case EVENT_INTRO_LK_4:
-                    if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
-                    {
-                        pLichKing->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                        pLichKing->AI()->Talk(SAY_LK_INTRO_2);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_LK_4_2, 10s);
-                    break;
+                // A2 Intro Events
+            case EVENT_INTRO_A2_1:
+                Talk(SAY_JAINA_INTRO_3);
+                events.ScheduleEvent(EVENT_INTRO_A2_2, 5s);
+                break;
+            case EVENT_INTRO_A2_2:
+                Talk(SAY_JAINA_INTRO_4);
+                events.ScheduleEvent(EVENT_INTRO_A2_3, 10s);
+                break;
+            case EVENT_INTRO_A2_3:
+                pInstance->HandleGameObject(pInstance->GetGuidData(GO_FROSTMOURNE), true);
+                me->CastSpell(me, SPELL_FROSTMOURNE_SPAWN_SOUND, true);
+                //me->CastSpell(me, SPELL_ARCANE_CAST_VISUAL, false);// the sniff is missing from the alliance
+                events.ScheduleEvent(EVENT_INTRO_A2_4, 10s);
+                break;
+            case EVENT_INTRO_A2_4:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                    pUther->SetVisible(true);
+                    if (Aura* a = pUther->AddAura(SPELL_SHADOWMOURNE_VISUAL, pUther))
+                        a->SetDuration(8000);
+                }
+                events.ScheduleEvent(EVENT_INTRO_A2_5, 2s);
+                break;
+            case EVENT_INTRO_A2_5:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_A2_1);
+                    events.ScheduleEvent(EVENT_INTRO_A2_6, 3s);
+                }
+                break;
+            case EVENT_INTRO_A2_6:
+                Talk(SAY_JAINA_INTRO_5);
+                events.ScheduleEvent(EVENT_INTRO_A2_7, 6s);
+                break;
+            case EVENT_INTRO_A2_7:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_A2_2);
+                }
+                events.ScheduleEvent(EVENT_INTRO_A2_8, 6500ms);
+                break;
+            case EVENT_INTRO_A2_8:
+                Talk(SAY_JAINA_INTRO_6);
+                events.ScheduleEvent(EVENT_INTRO_A2_9, 2s);
+                break;
+            case EVENT_INTRO_A2_9:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_A2_3);
+                }
+                events.ScheduleEvent(EVENT_INTRO_A2_10, 9s);
+                break;
+            case EVENT_INTRO_A2_10:
+                Talk(SAY_JAINA_INTRO_7);
+                events.ScheduleEvent(EVENT_INTRO_A2_11, 5s);
+                break;
+            case EVENT_INTRO_A2_11:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_A2_4);
+                }
+                events.ScheduleEvent(EVENT_INTRO_A2_12, 11s);
+                break;
+            case EVENT_INTRO_A2_12:
+                Talk(SAY_JAINA_INTRO_8);
+                events.ScheduleEvent(EVENT_INTRO_A2_13, 4s);
+                break;
+            case EVENT_INTRO_A2_13:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_A2_5);
+                }
+                events.ScheduleEvent(EVENT_INTRO_A2_14, 12s + 500ms);
+                break;
+            case EVENT_INTRO_A2_14:
+                Talk(SAY_JAINA_INTRO_9);
+                events.ScheduleEvent(EVENT_INTRO_A2_15, 10s);
+                break;
+            case EVENT_INTRO_A2_15:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_A2_6);
+                }
+                events.ScheduleEvent(EVENT_INTRO_A2_16, 24s);
+                break;
+            case EVENT_INTRO_A2_16:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_A2_7);
+                events.ScheduleEvent(EVENT_INTRO_A2_17, 4s);
+                break;
+            case EVENT_INTRO_A2_17:
+                Talk(SAY_JAINA_INTRO_10);
+                events.ScheduleEvent(EVENT_INTRO_A2_18, 2s);
+                break;
+            case EVENT_INTRO_A2_18:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_A2_8);
+                }
+                events.ScheduleEvent(EVENT_INTRO_A2_19, 11s);
+                break;
+            case EVENT_INTRO_A2_19:
+                Talk(SAY_JAINA_INTRO_11);
+                events.ScheduleEvent(EVENT_INTRO_LK_1, 2s);
+                break;
 
-                case EVENT_INTRO_LK_4_2:
-                    if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
-                    {
-                        pLichKing->LoadEquipment(1, true);
-                        pLichKing->SendMovementFlagUpdate();
-                        pLichKing->CastSpell(pLichKing, SPELL_FROSTMOURNE_EQUIP, false);
-                        pInstance->HandleGameObject(pInstance->GetGuidData(GO_FROSTMOURNE), false);
-                        events.ScheduleEvent(EVENT_INTRO_LK_4_3, 1750);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_LK_5, 6s);
-                    break;
+                // H2 Intro Events
+            case EVENT_LORALEN_MOVE_1:
+                if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                {
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
+                }
+                break;
 
-                case EVENT_INTRO_LK_4_3:
-                    if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(GO_FROSTMOURNE)))
-                        go->SetPhaseMask(2, true);
-                    break;
-                case EVENT_INTRO_LK_5:
-                    if (Creature* pFalric = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FALRIC)))
-                    {
-                        pFalric->UpdatePosition(5274.9f, 2039.2f, 709.319f, 5.4619f, true);
-                        pFalric->StopMovingOnCurrentPos();
-                        pFalric->SetVisible(true);
-                        if (pFalric->IsAlive())
-                        {
-                            pFalric->GetMotionMaster()->MovePoint(0, FalricMovePos);
-                            if (Aura* a = pFalric->AddAura(SPELL_SHADOWMOURNE_VISUAL, pFalric))
-                                a->SetDuration(8000);
-                        }
-                    }
-                    if (Creature* pMarwyn = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MARWYN)))
-                    {
-                        pMarwyn->UpdatePosition(5343.77f, 1973.86f, 709.319f, 2.35173f, true);
-                        pMarwyn->StopMovingOnCurrentPos();
-                        pMarwyn->SetVisible(true);
-                        if (pMarwyn->IsAlive())
-                        {
-                            pMarwyn->GetMotionMaster()->MovePoint(0, MarwynMovePos);
-                            if (Aura* a = pMarwyn->AddAura(SPELL_SHADOWMOURNE_VISUAL, pMarwyn))
-                                a->SetDuration(8000);
-                        }
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_LK_5_1, 0s);
-                    events.ScheduleEvent(EVENT_INTRO_LK_5_2, 7s);
-                    events.ScheduleEvent(EVENT_INTRO_LK_5_3, 0s);
-                    events.ScheduleEvent(EVENT_INTRO_LK_6, 11s);
-                    break;
+            case EVENT_LORALEN_MOVE_2:
+                if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                {
+                    pLoralen->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
+                }
+                break;
 
-                case EVENT_INTRO_LK_5_1:               
-                    if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
-                    {
-                        pLichKing->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        pLichKing->AI()->Talk(SAY_LK_INTRO_3);
-                    }
-                    break;
+            case EVENT_INTRO_H2_2:
+                me->SetSheath(SHEATH_STATE_UNARMED);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                Talk(SAY_SYLVANAS_INTRO_2);
+                events.ScheduleEvent(EVENT_INTRO_H2_2_1, 7s + 500ms);
+                break;
 
-                case EVENT_INTRO_LK_5_2:
-                    if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
-                        pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);
-                    break;
+            case EVENT_INTRO_H2_2_1:
+                me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                Talk(SAY_SYLVANAS_INTRO_3);
+                events.ScheduleEvent(EVENT_INTRO_H2_3, 2s);
+                break;
 
-                case EVENT_INTRO_LK_5_3:
-                    me->SetSpeed(MOVE_RUN, 1.6);
-                    me->SetSheath(SHEATH_STATE_MELEE);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
-                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                    {
-                        pLoralen->SetSheath(SHEATH_STATE_MELEE);
-                        pLoralen->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
-                        pLoralen->SetWalk(false);
-                        pLoralen->LoadEquipment(true);
-                    }      
-                    break;
+            case EVENT_INTRO_H2_3:
+                me->CastSpell(me, SPELL_SUMMON_SOULS, false); //esperar              
+                events.ScheduleEvent(EVENT_INTRO_H2_3_1, 5s);
+                break;
 
-                case EVENT_INTRO_LK_6:
-                    if (Creature* pFalric = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FALRIC)))
-                    {
-                        pFalric->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
-                        pFalric->AI()->Talk(SAY_FALRIC_INTRO_1);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_LK_7, 2s);
-                    break;
+            case EVENT_INTRO_H2_3_1:
+                me->CastSpell(me, SPELL_FROSTMOURNE_SPAWN_SOUND, false);
+                pInstance->HandleGameObject(pInstance->GetGuidData(GO_FROSTMOURNE), true);
+                events.ScheduleEvent(EVENT_INTRO_H2_3_2, 3s);
+                break;
 
-                case EVENT_INTRO_LK_7:
-                    if (Creature* pMarwyn = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MARWYN)))
-                    {
-                        pMarwyn->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
-                        pMarwyn->AI()->Talk(SAY_MARWYN_INTRO_1);
-                    }
-                    events.ScheduleEvent(EVENT_INTRO_LK_8, 3s);
-                    break;
+            case EVENT_INTRO_H2_3_2:
+                me->RemoveAurasDueToSpell(SPELL_SUMMON_SOULS);
+                events.ScheduleEvent(EVENT_INTRO_H2_4, 2s);
+                break;
+            case EVENT_INTRO_H2_4:
+                if (Creature* pUther = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_UTHER)))// testando            
+                {
+                    pUther->SetVisible(true);
+                    if (Aura* a = pUther->AddAura(SPELL_SHADOWMOURNE_VISUAL, pUther))
+                        a->SetDuration(8000);
+                }
+                events.ScheduleEvent(EVENT_INTRO_H2_5, 7s);
+                break;
 
-                case EVENT_INTRO_LK_8:
-                    if (Creature* pFalric = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FALRIC)))
-                        pFalric->AI()->Talk(SAY_FALRIC_INTRO_2);
-                    pInstance->SetData(ACTION_SHOW_TRASH, 1);
+            case EVENT_INTRO_H2_5:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_H2_1);
+                }
+                events.ScheduleEvent(EVENT_INTRO_H2_6, 11s);
+                break;
+            case EVENT_INTRO_H2_6:
+                me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                Talk(SAY_SYLVANAS_INTRO_4);
+                events.ScheduleEvent(EVENT_INTRO_H2_7, 2s + 500ms);
+                break;
+            case EVENT_INTRO_H2_7:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_H2_2);
+                }
+                events.ScheduleEvent(EVENT_INTRO_H2_8, 9s);//
+                break;
+            case EVENT_INTRO_H2_8:
+                me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                Talk(SAY_SYLVANAS_INTRO_5);
+                events.ScheduleEvent(EVENT_INTRO_H2_9, 5s);
+                break;
+            case EVENT_INTRO_H2_9:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_H2_3);
+                }
+                events.ScheduleEvent(EVENT_INTRO_H2_10, 20s);
+                break;
+            case EVENT_INTRO_H2_10:
+                me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                Talk(SAY_SYLVANAS_INTRO_6);
+                events.ScheduleEvent(EVENT_INTRO_H2_11, 3s);
+                break;
+            case EVENT_INTRO_H2_11:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_H2_4);
+                }
+                events.ScheduleEvent(EVENT_INTRO_H2_12, 21s + 500ms);
+                break;
+            case EVENT_INTRO_H2_12:
+                me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                Talk(SAY_SYLVANAS_INTRO_7);
+                events.ScheduleEvent(EVENT_INTRO_H2_13, 3s + 500ms);
+                break;
+            case EVENT_INTRO_H2_13:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_H2_5);
+
+                }
+                events.ScheduleEvent(EVENT_INTRO_H2_14, 12s + 500ms);
+                break;
+            case EVENT_INTRO_H2_14:
+                if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                {
+                    pUther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    pUther->AI()->Talk(SAY_UTHER_INTRO_H2_6);
+                }
+                events.ScheduleEvent(EVENT_INTRO_H2_15, 8s);
+                break;
+            case EVENT_INTRO_H2_15:
+                me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                Talk(SAY_SYLVANAS_INTRO_8);
+                events.ScheduleEvent(EVENT_INTRO_LK_1, 2s);
+                break;
+
+                // Remaining Intro Events common for both faction
+            case EVENT_INTRO_LK_1:
+                if (Creature* pLichKing = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
+                {
+
                     pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), true);
+                    pLichKing->SetVisible(true);
 
-                    events.ScheduleEvent(EVENT_INTRO_LK_9, 6s);
-                    break;
+                    pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveMidlelThronePos, false);
 
-                case EVENT_INTRO_LK_9:
-                    if (me->GetEntry() == NPC_JAINA_PART1)
-                        Talk(SAY_JAINA_INTRO_END);                      
-                    else                       
-                        Talk(SAY_SYLVANAS_INTRO_END);
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                        me->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);                       
-                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk1, false);
-                    events.ScheduleEvent(EVENT_INTRO_LK_10, 1s +500ms);
-                    break;
+                }
 
-                case EVENT_INTRO_LK_10:
-                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk2, false);
-                    events.ScheduleEvent(EVENT_INTRO_LK_11, 2s);
-                    break;
+                if (!shortver)
+                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                    {
+                        pUther->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                        if (me->GetEntry() == NPC_JAINA_PART1)
 
-                case EVENT_INTRO_LK_11:                   
-                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk3, false);
-                    events.ScheduleEvent(EVENT_INTRO_LK_12, 5s +500ms);
-                    break;
+                            pUther->AI()->Talk(SAY_UTHER_INTRO_A2_9);
+                        else
+                            pUther->AI()->Talk(SAY_UTHER_INTRO_H2_7);
 
-                case EVENT_INTRO_LK_12:
+                    }
+                events.ScheduleEvent(EVENT_INTRO_LK_1_1, 9s);
+                events.ScheduleEvent(EVENT_INTRO_LK_1_2, 3s);
+                events.ScheduleEvent(EVENT_INTRO_LK_1_3, 6s);
+                events.ScheduleEvent(EVENT_INTRO_LK_2, 12s);
+                break;
+
+            case EVENT_INTRO_LK_1_1:
+                if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
+                {
+                    pLichKing->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                    pLichKing->AI()->Talk(SAY_LK_INTRO_1);
+                }
+                break;
+
+            case EVENT_INTRO_LK_1_2:
+                if (!shortver)
+                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                    {
+                        pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
+                        pUther->SetFacingTo(0.89f);
+                    }
+                break;
+
+            case EVENT_INTRO_LK_1_3:
+                pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), false);
+                break;
+
+            case EVENT_INTRO_LK_2:
+                if (!shortver)
                     if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
-                        pLichKing->SetVisible(false);
-                    if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
-                        pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLkFinal, false);
-                    events.ScheduleEvent(EVENT_INTRO_LK_13, 2s);
+                    {
+                        pLichKing->SetVisible(true);
+                        pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos, false);
+                        
+                    }
+                events.ScheduleEvent(EVENT_INTRO_LK_2_1, 1s);
+                break;
+
+            case EVENT_INTRO_LK_2_1:
+                if (!shortver)
+                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                    {
+                        pUther->SendPlaySpellVisual(SPELL_UTHER_DESPAWN);
+                        pUther->CastSpell(pUther, SPELL_UTHER_DESPAWN, true);
+                       
+                    }
+                events.ScheduleEvent(EVENT_INTRO_LK_3, 2s);
+                break;
+
+            case EVENT_INTRO_LK_3:
+                if (!shortver)
+                    if (Creature* pUther = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_UTHER)))
+                    {
+                        pUther->SetVisible(false);
+                    }
+                events.ScheduleEvent(EVENT_INTRO_LK_4, 6s);
+                break;
+
+            case EVENT_INTRO_LK_4:
+                if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
+                {
+                    pLichKing->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                    pLichKing->AI()->Talk(SAY_LK_INTRO_2);
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_4_2, 10s);
+                break;
+
+            case EVENT_INTRO_LK_4_2:
+                if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
+                {
+                    pLichKing->LoadEquipment(1, true);
+                    pLichKing->SendMovementFlagUpdate();
+                    pLichKing->CastSpell(pLichKing, SPELL_FROSTMOURNE_EQUIP, false);
+                    pInstance->HandleGameObject(pInstance->GetGuidData(GO_FROSTMOURNE), false);
+                    events.ScheduleEvent(EVENT_INTRO_LK_4_3, 1750);
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_5, 6s);
+                break;
+
+            case EVENT_INTRO_LK_4_3:
+                if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(GO_FROSTMOURNE)))
+                    go->SetPhaseMask(2, true);
+                break;
+            case EVENT_INTRO_LK_5:
+                if (Creature* pFalric = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FALRIC)))
+                {
+                    pFalric->UpdatePosition(5274.9f, 2039.2f, 709.319f, 5.4619f, true);
+                    pFalric->StopMovingOnCurrentPos();
+                    pFalric->SetVisible(true);
+                    if (pFalric->IsAlive())
+                    {
+                        pFalric->GetMotionMaster()->MovePoint(0, FalricMovePos);
+                        if (Aura* a = pFalric->AddAura(SPELL_SHADOWMOURNE_VISUAL, pFalric))
+                            a->SetDuration(8000);
+                    }
+                }
+                if (Creature* pMarwyn = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MARWYN)))
+                {
+                    pMarwyn->UpdatePosition(5343.77f, 1973.86f, 709.319f, 2.35173f, true);
+                    pMarwyn->StopMovingOnCurrentPos();
+                    pMarwyn->SetVisible(true);
+                    if (pMarwyn->IsAlive())
+                    {
+                        pMarwyn->GetMotionMaster()->MovePoint(0, MarwynMovePos);
+                        if (Aura* a = pMarwyn->AddAura(SPELL_SHADOWMOURNE_VISUAL, pMarwyn))
+                            a->SetDuration(8000);
+                    }
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_5_1, 0s);
+                events.ScheduleEvent(EVENT_INTRO_LK_5_2, 7s);
+                events.ScheduleEvent(EVENT_INTRO_LK_5_3, 0s);
+                events.ScheduleEvent(EVENT_INTRO_LK_6, 11s);
+                break;
+
+            case EVENT_INTRO_LK_5_1:
+                if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
+                {
+                    pLichKing->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    pLichKing->AI()->Talk(SAY_LK_INTRO_3);
+                }
+                break;
+
+            case EVENT_INTRO_LK_5_2:
+                if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
+                {
+                    pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);
+                }
+                break;
+
+            case EVENT_INTRO_LK_5_3:
+                me->SetSpeed(MOVE_RUN, 1.6);
+                me->SetSheath(SHEATH_STATE_MELEE);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+                if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                {
+                    pLoralen->SetSheath(SHEATH_STATE_MELEE);
+                    pLoralen->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+                    pLoralen->SetWalk(false);
+                    pLoralen->LoadEquipment(true);
+                }
+                break;
+
+            case EVENT_INTRO_LK_6:
+                if (Creature* pFalric = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FALRIC)))
+                {
+                    pFalric->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
+                    pFalric->AI()->Talk(SAY_FALRIC_INTRO_1);
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_7, 2s);
+                break;
+
+            case EVENT_INTRO_LK_7:
+                if (Creature* pMarwyn = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MARWYN)))
+                {
+                    pMarwyn->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
+                    pMarwyn->AI()->Talk(SAY_MARWYN_INTRO_1);
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_8, 3s);
+                break;
+
+            case EVENT_INTRO_LK_8:
+                if (Creature* pFalric = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FALRIC)))
+                {
+                    pFalric->AI()->Talk(SAY_FALRIC_INTRO_2);
+                    pInstance->SetData(ACTION_SHOW_TRASH, 1);
+                    pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), true);        
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_9, 6s);
+                break;
+
+            case EVENT_INTRO_LK_9:
+                if (me->GetEntry() == NPC_JAINA_PART1)
+                {
+                    Talk(SAY_JAINA_INTRO_END);
+                }
+                else
+                {
+                    Talk(SAY_SYLVANAS_INTRO_END);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                    me->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);
+                }
+                if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                {
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk1, false);   
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_10, 1s + 500ms);
+                break;
+
+            case EVENT_INTRO_LK_10:
+                if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                {
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk2, false);
+
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_11, 2s);
+                break;
+
+            case EVENT_INTRO_LK_11:
+                if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                {
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk3, false);                 
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_12, 5s + 500ms);
+                break;
+
+            case EVENT_INTRO_LK_12:
+                if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
+                {
+                    pLichKing->SetVisible(false);
+                }
+                if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
+                {
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLkFinal, false);           
+                }
+                events.ScheduleEvent(EVENT_INTRO_LK_13, 2s);
                     break;                     
 
                 case EVENT_INTRO_LK_13:
