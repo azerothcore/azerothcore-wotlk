@@ -144,6 +144,7 @@ public:
                     }
                     if (++PeonKilledCount == 4)
                         DoAction(ACTION_CANCEL_INTRO);
+                        Talk(SAY_INTRO_2);
                     break;
             }
         }
@@ -192,7 +193,15 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who) override 
-        { }
+        { 
+            if (EventStage == EVENT_STAGE_NONE)
+            {
+                if (Unit* target = me->SelectNearestPlayer(50.0f))
+                {
+                    DoAction(ACTION_CANCEL_INTRO);
+                }
+            }
+        }
 
         void IntroRP()
         {
@@ -261,7 +270,6 @@ public:
                 events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
                 instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                 me->SetInCombatWithZone();
-                Talk(SAY_INTRO_2);
                 me->SetHomePosition(NethekurseIntroPath[3][0], NethekurseIntroPath[3][0], NethekurseIntroPath[3][0], 4.572762489318847656f);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
                 return;
