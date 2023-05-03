@@ -1996,8 +1996,10 @@ public:
             {
                 case EVENT_LK_SAY_AGGRO:
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                    {
                         me->Attack(lkboss, true),
                         lkboss->AI()->Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_LK_AGGRO_ALLY : SAY_LK_AGGRO_HORDE);
+                    }
                         events.ScheduleEvent(me->GetEntry() == NPC_JAINA_PART2 ? EVENT_JAINA_IMMOBILIZE_LK : EVENT_SYLVANAS_IMMOBILIZE_JUMP, 9s);
                 case EVENT_LK_BATTLE_1:
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
@@ -2229,7 +2231,9 @@ public:
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
                 if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                {
                     lkboss->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
+                }
         }
     };
 
@@ -2284,8 +2288,9 @@ public:
             }
 
             if (me->GetVictim() && me->isAttackReady() && me->IsWithinMeleeRange(me->GetVictim()) && !me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 me->CastSpell(me->GetVictim(), 40505, false);
-
+            }
             DoMeleeAttackIfReady();
         }
 
@@ -2294,7 +2299,9 @@ public:
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
                 if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
+                {
                     lkboss->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
+                }
         }
     };
 
@@ -2318,7 +2325,9 @@ public:
             PreventDefaultAction();
             if (Unit* caster = GetCaster())
                 if (Creature* c = caster->SummonCreature(WORLD_TRIGGER, CannonFirePos[caster->GetEntry() == NPC_JAINA_PART2 ? 0 : 1][urand(0, 2)], TEMPSUMMON_TIMED_DESPAWN, 1))
+                {
                     c->CastSpell((Unit*)nullptr, 70021, true);
+                }
         }
 
         void Register() override
