@@ -81,7 +81,7 @@ enum Actions
 float NethekurseIntroPath[4][3] =
 {
     {184.78966f, 290.3699f, -8.18139f},
-    {178.51125f, 278.97796f, -8.183065f},
+    {178.51125f, 278.779022f, -8.183065f},
     {171.82281f, 289.97687f, -8.185595f},
     {178.51125f, 287.97794f, -8.183065f}
 };
@@ -192,15 +192,7 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who) override 
-        {
-            if (EventStage == EVENT_STAGE_NONE)
-            {
-                if (who->IsPlayer())
-                {
-                    DoAction(ACTION_CANCEL_INTRO);
-                }
-            }
-        }
+        { }
 
         void IntroRP()
         {
@@ -216,12 +208,6 @@ public:
                     LOG_ERROR("server", "Data move boss to coordinates of location {}", std::to_string(choicelocation));
                     scheduler.Schedule(2500ms, GROUP_RP, [this, choicelocation](TaskContext context)
                     {
-                        //to prevent flying
-                        if (choicelocation == 1)
-                        {
-                            me->GetMotionMaster()->Clear();
-                            me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[1][0], NethekurseIntroPath[1][1], NethekurseIntroPath[1][2]);
-                        }
                         LOG_ERROR("server", "Data {}", "cast spell");
                         CastRandomPeonSpell(choicelocation);
                     });
@@ -276,7 +262,7 @@ public:
                 instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                 me->SetInCombatWithZone();
                 Talk(SAY_INTRO_2);
-                me->SetHealth(me->GetMaxHealth());
+                me->SetHomePosition(NethekurseIntroPath[3][0], NethekurseIntroPath[3][0], NethekurseIntroPath[3][0], 4.572762489318847656f);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
                 return;
             }
