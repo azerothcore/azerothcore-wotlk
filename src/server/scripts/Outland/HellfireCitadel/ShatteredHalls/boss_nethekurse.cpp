@@ -229,10 +229,8 @@ public:
             if (EventStage == EVENT_STAGE_NONE)
             {
                 LOG_ERROR("server", "Data {}", "start combat after reset");
+                DoAction(ACTION_CANCEL_INTRO);
                 CombatEventScheduler();
-                me->SetReactState(REACT_AGGRESSIVE);
-                if (Unit* target = me->SelectNearestPlayer(50.0f))
-                        AttackStart(target);
             }
         }
 
@@ -253,7 +251,6 @@ public:
             {
                 Talk(SAY_SHADOW_SEAR);
                 me->CastSpell(me, SPELL_SHADOW_SEAR, false);
-                me->SetHealth(me->GetMaxHealth());
             }
         }
 
@@ -272,6 +269,7 @@ public:
                 instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
                 me->SetInCombatWithZone();
                 Talk(SAY_INTRO_2);
+                me->SetHealth(me->GetMaxHealth());
                 return;
             }
 
