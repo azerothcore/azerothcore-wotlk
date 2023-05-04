@@ -90,8 +90,7 @@ public:
             Player const* bgPlayer = ObjectAccessor::FindConnectedPlayer(_playerGUID);
             if (bgPlayer && bgPlayer->IsInWorld() && bgPlayer->InBattleground())
             {
-                Battleground* bg = bgPlayer->GetBattleground();
-                ASSERT_NOTNULL(bg);
+                Battleground* bg = ASSERT_NOTNULL(bgPlayer->GetBattleground());
                 ASSERT(bgPlayer->GetMap()->IsBattlegroundOrArena());
 
                 //full, some players connected
@@ -258,10 +257,8 @@ private:
         auto const& cSet = spareBotPair.second;
         ASSERT(!cSet.empty());
         uint32 orig_entry = cSet.size() == 1 ? *cSet.cbegin() : Acore::Containers::SelectRandomContainerElement(cSet);
-        CreatureTemplate const* orig_template = sObjectMgr->GetCreatureTemplate(orig_entry);
-        ASSERT(orig_template);
-        NpcBotExtras const* orig_extras = BotDataMgr::SelectNpcBotExtras(orig_entry);
-        ASSERT_NOTNULL(orig_extras);
+        CreatureTemplate const* orig_template = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(orig_entry));
+        NpcBotExtras const* orig_extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(orig_entry));
         uint32 bot_faction = GetDefaultFactionForRaceClass(bot_class, orig_extras->race);
 
         NodeVec const* bot_spawn_nodes;
@@ -459,11 +456,8 @@ public:
             {
                 for (uint32 spareBotId : kv.second)
                 {
-                    NpcBotExtras const* orig_extras = BotDataMgr::SelectNpcBotExtras(spareBotId);
-                    ASSERT_NOTNULL(orig_extras);
-
+                    NpcBotExtras const* orig_extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(spareBotId));
                     uint32 bot_faction = GetDefaultFactionForRaceClass(kv.first, orig_extras->race);
-
                     uint32 botTeam = BotDataMgr::GetTeamForFaction(bot_faction);
 
                     if (int32(botTeam) != team)

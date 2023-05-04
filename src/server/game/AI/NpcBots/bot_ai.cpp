@@ -13436,8 +13436,7 @@ void bot_ai::DefaultInit()
 
     if (IsWanderer())
     {
-        _travel_node_cur = BotDataMgr::GetClosestWanderNode(me);
-        ASSERT_NOTNULL(_travel_node_cur);
+        _travel_node_cur = ASSERT_NOTNULL(BotDataMgr::GetClosestWanderNode(me));
     }
 
     SetStats(true); // Class passives included

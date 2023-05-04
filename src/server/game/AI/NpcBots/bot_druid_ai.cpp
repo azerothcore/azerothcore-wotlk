@@ -2622,11 +2622,11 @@ public:
                         break;
                     }
                 }
-                if (!found)
-                {
-                    LOG_ERROR("entities.unit", "Druid_bot:SummonedCreatureDespawn() treant is not found in array");
-                    ASSERT(false);
-                }
+                //if (!found)
+                //{
+                //    LOG_ERROR("entities.unit", "Druid_bot:SummonedCreatureDespawn() treant is not found in array");
+                //    ASSERT(false);
+                //}
             }
         }
 

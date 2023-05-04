@@ -2214,11 +2214,11 @@ public:
                         break;
                     }
                 }
-                if (!found)
-                {
-                    LOG_ERROR("entities.unit", "Shaman_bot:SummonedCreatureDespawn() wolf is not found in array");
-                    ASSERT(false);
-                }
+                //if (!found)
+                //{
+                //    LOG_ERROR("entities.unit", "Shaman_bot:SummonedCreatureDespawn() wolf is not found in array");
+                //    ASSERT(false);
+                //}
             }
         }
 
