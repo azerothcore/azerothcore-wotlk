@@ -8,4 +8,4 @@ SET `Scriptname` =
     END, `AIName` = ''
 WHERE `entry` IN (17941, 17942, 17991);
 
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN (17941, 17942, 17991);
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN (17941, 17942, 17991) AND `source_type` = 0;
