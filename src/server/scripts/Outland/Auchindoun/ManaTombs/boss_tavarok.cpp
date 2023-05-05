@@ -45,7 +45,7 @@ struct boss_tavarok : public BossAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
-        
+
         scheduler.Schedule(10s, 14200ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_EARTHQUAKE);
