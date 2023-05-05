@@ -2897,7 +2897,7 @@ void ObjectMgr::LoadItemTemplates()
             }
             if (itemTemplate.DisplayInfoID != dbcitem->DisplayInfoID)
             {
-                LOG_ERROR("sql.sql", "Item (Entry: {}}) does not have a correct display id ({}), must be {}.", entry, itemTemplate.DisplayInfoID, dbcitem->DisplayInfoID);
+                LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct display id ({}), must be {}.", entry, itemTemplate.DisplayInfoID, dbcitem->DisplayInfoID);
                 if (enforceDBCAttributes)
                     itemTemplate.DisplayInfoID = dbcitem->DisplayInfoID;
             }
