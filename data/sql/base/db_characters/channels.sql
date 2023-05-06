@@ -18,14 +18,14 @@
 DROP TABLE IF EXISTS `channels`;
 CREATE TABLE IF NOT EXISTS `channels` (
   `channelId` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(128) NOT NULL,
+  `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `team` int unsigned NOT NULL,
   `announce` tinyint unsigned NOT NULL DEFAULT '1',
   `ownership` tinyint unsigned NOT NULL DEFAULT '1',
-  `password` varchar(32) DEFAULT NULL,
+  `password` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lastUsed` int unsigned NOT NULL,
   PRIMARY KEY (`channelId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Channel System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Channel System';
 
 -- Dumping data for table acore_characters.channels: ~0 rows (approximately)
 DELETE FROM `channels`;

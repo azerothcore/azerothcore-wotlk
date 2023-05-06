@@ -1243,7 +1243,7 @@ class spell_shadowblink : public SpellScript
             return;
         }
 
-        for (auto itr : spellPos)
+        for (auto& itr : spellPos)
         {
             float distTarget = target->GetDistance2d(itr.second.m_positionX, itr.second.m_positionY);
             if (distTarget <= 30.f)

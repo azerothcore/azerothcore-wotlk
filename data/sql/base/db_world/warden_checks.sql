@@ -19,18 +19,17 @@ DROP TABLE IF EXISTS `warden_checks`;
 CREATE TABLE IF NOT EXISTS `warden_checks` (
   `id` smallint unsigned NOT NULL AUTO_INCREMENT,
   `type` tinyint unsigned DEFAULT NULL,
-  `data` varchar(48) DEFAULT NULL,
-  `str` varchar(170) DEFAULT NULL,
+  `data` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `str` varchar(170) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `address` int unsigned DEFAULT NULL,
   `length` tinyint unsigned DEFAULT NULL,
-  `result` varchar(24) DEFAULT NULL,
-  `comment` varchar(50) DEFAULT NULL,
+  `result` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `comment` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=795 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=812 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.warden_checks: 793 rows
+-- Dumping data for table acore_world.warden_checks: ~793 rows (approximately)
 DELETE FROM `warden_checks`;
-/*!40000 ALTER TABLE `warden_checks` DISABLE KEYS */;
 INSERT INTO `warden_checks` (`id`, `type`, `data`, `str`, `address`, `length`, `result`, `comment`) VALUES
 	(1, 178, '07F223143C69271AA2A851FECF6DC883A9D3A7DBA6FE26CC', '', 710730, 23, '', NULL),
 	(2, 191, 'C7D18F99DBC446A4B36E78B9130B6FA2E365B3D2D4199DF5', '', 28940, 17, '', NULL),
@@ -119,6 +118,7 @@ INSERT INTO `warden_checks` (`id`, `type`, `data`, `str`, `address`, `length`, `
 	(85, 191, '7E3CC1BC53477D84F05F623BBC94B9DE8D01A2607CA935DB', '', 41188, 24, '', NULL),
 	(86, 191, 'DC06565CC1512B5A91A848E08BC4FBC6DA705F6503667852', '', 41127, 24, '', NULL),
 	(87, 191, '03DC47CDFBB14C5CF0D0010FA5424556F951585588A2180A', '', 29916, 16, '', NULL),
+	(88, 191, '29EC91C4D87891FECDED381CE65A86A259F00DD788833E4D', '', 174688, 37, '', NULL),
 	(89, 191, '31F024003681765368F6EFB667E83CE1D12799723AA99BF9', '', 685304, 44, '', NULL),
 	(90, 191, '6A82AC1D0BFEF5DA7385510CBC57189FACD42E45E0D2A65E', '', 30012, 16, '', NULL),
 	(91, 191, '3901FBD52655E12ADA4EEDED3B365B1DDFAAA925A140097F', '', 448492, 48, '', NULL),
@@ -164,6 +164,7 @@ INSERT INTO `warden_checks` (`id`, `type`, `data`, `str`, `address`, `length`, `
 	(131, 191, 'B337F892EEDD52A5B978C116A19D927134273626EFC4DAA3', '', 17890, 11, '', NULL),
 	(132, 191, 'D97560108AA21A487EC9278759F7615BFA304A933776A201', '', 18680, 35, '', NULL),
 	(133, 178, 'DA59505BA61459508532CBEAD246DCD2C8E7BF5C6D3CE676', '', 3037164, 22, '', NULL),
+	(134, 191, '5803CA69E5B7F1DF08D95219894D75F52EDB1AD429E562D9', '', 174688, 37, '', NULL),
 	(135, 178, '8A1099E19139D91573286DBB3DED2CC093A99FD178F7FEC8', '', 3033068, 22, '', NULL),
 	(136, 178, '0331B438B085F55C06F7F697160845BE953D9CE789AA62A4', '', 3000288, 31, '', NULL),
 	(137, 191, 'E844078A5671FF7DB0621E7F1C7EDDF9C92F5A9FA0477FCB', '', 41023, 24, '', NULL),
@@ -290,6 +291,7 @@ INSERT INTO `warden_checks` (`id`, `type`, `data`, `str`, `address`, `length`, `
 	(258, 191, '917AC1C48C1FF354FD594A3705C70A2C356FE981275E7FB5', '', 22792, 25, '', NULL),
 	(259, 178, '48CD29D8B39DC07B0FD071FD8C643E07A8FC2C9AFC2A3083', '', 3045356, 22, '', NULL),
 	(260, 243, '', '', 11154396, 8, 'D893FEC0488C11C1', 'Jump Momentum'),
+	(261, 191, 'FB13A8360C8E23B83ED7309625A7EFBAEE7DCF737068C5A6', '', 174688, 37, '', NULL),
 	(262, 191, '3C8D85F85ED5DD0354561F84EACA575123DE05EE941C28D2', '', 56063, 25, '', NULL),
 	(263, 191, 'FBC20EEA52B5882209BC016EC14818376CA7BAF28780BCED', '', 22792, 25, '', NULL),
 	(264, 191, '210D85A84F7BE48F3EB427E0CBCCD9C146320ABAAB5E28D8', '', 41096, 24, '', NULL),
@@ -430,6 +432,7 @@ INSERT INTO `warden_checks` (`id`, `type`, `data`, `str`, `address`, `length`, `
 	(399, 191, 'A388E8CE523DB7C3C501AC5DB2C8AAE58FD1831E75665C48', '', 401992, 14, '', NULL),
 	(400, 178, '77C74B5E4CBCA9150FB64261E497AC4E7642A316C89B291A', '', 3045356, 22, '', NULL),
 	(401, 178, '8A2C4F7F3367A4648744D8964BB9A6833182ECABFE015B00', '', 3022016, 31, '', NULL),
+	(402, 243, '', '', 4609675, 5, '5E5DC20800', 'Loggin Result'),
 	(403, 191, 'E8A24A78E6A716734CC666B48263B424804A42155C0BDB51', '', 18700, 32, '', NULL),
 	(404, 191, '3C881D2F0634D9223A36DF5266A7CF36B503DCF424441FA5', '', 28928, 17, '', NULL),
 	(405, 191, '7B3D92577810CAB5DA0134FDDA91CE6F36003C5373526774', '', 41023, 24, '', NULL),
@@ -464,6 +467,7 @@ INSERT INTO `warden_checks` (`id`, `type`, `data`, `str`, `address`, `length`, `
 	(434, 178, 'B8AE30A02C59219D144EE95228C6CC9F99916F6FE423C940', '', 700714, 23, '', NULL),
 	(435, 178, 'DAFD84BA8F977F5CFEEC9310C0EEF8F949F8EB6B827EBE71', '', 3990720, 23, '', NULL),
 	(436, 191, 'B42986974893A82D73CC497B3252E9B844A11A99ACF46BEA', '', 41188, 24, '', NULL),
+	(437, 243, '', '', 11287980, 8, '04000000903C9F00', 'Login State - (May be false positive)'),
 	(438, 191, '0DC0953AE42E913121092DF17BC2BEE8BE133D1C53C8BFFD', '', 17762, 11, '', NULL),
 	(439, 178, '72C81E9BA425C54DE57BF4B7745D9C8D6B44D56E8FE933BA', '', 3049888, 31, '', NULL),
 	(440, 191, '100426CD22E80090502AA7A087B094B49ACFF4E7A09773ED', '', 30044, 16, '', NULL),
@@ -803,7 +807,7 @@ INSERT INTO `warden_checks` (`id`, `type`, `data`, `str`, `address`, `length`, `
 	(774, 191, 'BECE667BF9443EF6515E8E154F74FC2C5817455C8636DB72', '', 501956, 48, '', NULL),
 	(775, 191, '94F1DA3E0D955761826D6BC932E26F44D321B4838C7567D8', '', 13538, 15, '', NULL),
 	(776, 191, 'EA3A3AD71FD14B038C98F256E80C1EFA1F45562A3DF92E7D', '', 22792, 25, '', NULL),
-	(88, 191, '29EC91C4D87891FECDED381CE65A86A259F00DD788833E4D', '', 174688, 37, '', NULL),
+	(777, 191, 'AD5A8CBF55EC436DA968EE0B9744C93F65D9E0D6E3C1B136', '', 174688, 37, '', NULL),
 	(778, 191, '9B6B3B311BA9007C06CF0D146BB979B11CF295C58768DD4F', '', 31924, 23, '', NULL),
 	(779, 217, '', 'RPE.DLL', 0, 0, '', 'rEdoX Packet Editor - injected dll'),
 	(780, 243, '', '', 5345728, 2, '558B', 'Lua Protection Remover'),
@@ -818,14 +822,25 @@ INSERT INTO `warden_checks` (`id`, `type`, `data`, `str`, `address`, `length`, `
 	(790, 139, NULL, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find("|cffffd200PQR|r") then return true end end', NULL, NULL, NULL, 'Detects PQR'),
 	(791, 139, NULL, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find("|cFF32CD32EWT|r") then return true end end', NULL, NULL, NULL, 'Detects EWT'),
 	(792, 139, NULL, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find("|cFFFF4400WoWPlus|r") then return true end end', NULL, NULL, NULL, 'Detects WoWPlus'),
-	(134, 191, '5803CA69E5B7F1DF08D95219894D75F52EDB1AD429E562D9', '', 174688, 37, '', NULL),
-	(261, 191, 'FB13A8360C8E23B83ED7309625A7EFBAEE7DCF737068C5A6', '', 174688, 37, '', NULL),
-	(402, 243, '', '', 4609675, 5, '5E5DC20800', 'Loggin Result'),
-	(437, 243, '', '', 11287980, 8, '04000000903C9F00', 'Login State - (May be false positive)'),
-	(777, 191, 'AD5A8CBF55EC436DA968EE0B9744C93F65D9E0D6E3C1B136', '', 174688, 37, '', NULL),
+	(793, 139, NULL, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find("New addon name is ") then return true end end', NULL, NULL, NULL, 'Detects KickKitty'),
 	(794, 139, NULL, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find(". It\'s in new directory not this one") then return true end end', NULL, NULL, NULL, 'Detects KickKitty'),
-	(793, 139, NULL, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find("New addon name is ") then return true end end', NULL, NULL, NULL, 'Detects KickKitty');
-/*!40000 ALTER TABLE `warden_checks` ENABLE KEYS */;
+	(795, 217, '', 'BlackMagic.dll', 0, 0, '', 'BlackMagic - injected dll'),
+	(796, 217, '', 'x0.dll', 0, 0, '', 'x0 gold hack dll'),
+	(797, 217, '', 'Luim.dll', 0, 0, '', 'Lua Unlocker dll'),
+	(798, 217, '', 'Gold Hack.dll', 0, 0, '', 'Gold Hack dll'),
+	(799, 217, '', 'fasmdll_managed.dll', 0, 0, '', 'Rotation Bot'),
+	(800, 217, '', 'PortBlock.dll', 0, 0, '', 'Multiclient Lagger'),
+	(801, 217, '', 'PinvokeCollection.dll', 0, 0, '', 'Keysender'),
+	(802, 217, '', 'FuncCollection.dll', 0, 0, '', 'Multi Hack dll'),
+	(803, 139, NULL, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find("Rotation :        %3s") then return true end end', NULL, NULL, NULL, 'Cloud Magic Rotation Bot'),
+	(804, 217, '', 'nampower.dll', 0, 0, '', 'Multi Hack dll'),
+	(805, 217, '', 'EWTDll.dll', 0, 0, '', 'Multi Hack dll'),
+	(806, 217, '', 'iKillFish.dll', 0, 0, '', 'Fish Bot'),
+	(807, 217, '', 'iwanna.dll', 0, 0, '', 'Fish Bot'),
+	(808, 217, '', 'oGasai.dll', 0, 0, '', 'Multi Hack dll'),
+	(809, 217, '', 'tMorph.dll', 0, 0, '', 'tMorph - injected dll'),
+	(810, 217, '', 'jMorph.dll', 0, 0, '', 'jMorph - injected dll'),
+	(811, 217, '', 'dmorph.dll', 0, 0, '', 'dmorph - injected dll');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

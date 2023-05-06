@@ -18,15 +18,14 @@
 DROP TABLE IF EXISTS `mail_level_reward`;
 CREATE TABLE IF NOT EXISTS `mail_level_reward` (
   `level` tinyint unsigned NOT NULL DEFAULT '0',
-  `raceMask` mediumint unsigned NOT NULL DEFAULT '0',
-  `mailTemplateId` mediumint unsigned NOT NULL DEFAULT '0',
-  `senderEntry` mediumint unsigned NOT NULL DEFAULT '0',
+  `raceMask` int unsigned NOT NULL DEFAULT '0',
+  `mailTemplateId` int unsigned NOT NULL DEFAULT '0',
+  `senderEntry` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`level`,`raceMask`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Mail System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Mail System';
 
--- Dumping data for table acore_world.mail_level_reward: 24 rows
+-- Dumping data for table acore_world.mail_level_reward: ~24 rows (approximately)
 DELETE FROM `mail_level_reward`;
-/*!40000 ALTER TABLE `mail_level_reward` DISABLE KEYS */;
 INSERT INTO `mail_level_reward` (`level`, `raceMask`, `mailTemplateId`, `senderEntry`) VALUES
 	(20, 1, 224, 4732),
 	(20, 2, 231, 4752),
@@ -52,7 +51,6 @@ INSERT INTO `mail_level_reward` (`level`, `raceMask`, `mailTemplateId`, `senderE
 	(60, 1101, 283, 35100),
 	(70, 690, 285, 35135),
 	(70, 1101, 284, 35133);
-/*!40000 ALTER TABLE `mail_level_reward` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

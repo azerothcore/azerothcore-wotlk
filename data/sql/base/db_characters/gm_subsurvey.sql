@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS `gm_subsurvey` (
   `surveyId` int unsigned NOT NULL AUTO_INCREMENT,
   `questionId` int unsigned NOT NULL DEFAULT '0',
   `answer` int unsigned NOT NULL DEFAULT '0',
-  `answerComment` text NOT NULL,
+  `answerComment` text COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`surveyId`,`questionId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
 -- Dumping data for table acore_characters.gm_subsurvey: ~0 rows (approximately)
 DELETE FROM `gm_subsurvey`;

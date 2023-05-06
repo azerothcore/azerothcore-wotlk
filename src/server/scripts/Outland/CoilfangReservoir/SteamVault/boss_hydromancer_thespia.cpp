@@ -21,18 +21,15 @@
 
 enum HydromancerThespia
 {
-    SAY_SUMMON                  = 0,
+    SAY_SUMMON                  = 0, // Unused or Unknown Use
     SAY_AGGRO                   = 1,
     SAY_SLAY                    = 2,
     SAY_DEAD                    = 3,
+    SAY_SPELL                   = 4,
 
     SPELL_LIGHTNING_CLOUD       = 25033,
     SPELL_LUNG_BURST            = 31481,
-    SPELL_ENVELOPING_WINDS      = 31718,
-
-    EVENT_SPELL_LIGHTNING       = 1,
-    EVENT_SPELL_LUNG            = 2,
-    EVENT_SPELL_ENVELOPING      = 3
+    SPELL_ENVELOPING_WINDS      = 31718
 };
 
 struct boss_hydromancer_thespia : public BossAI
@@ -43,51 +40,39 @@ struct boss_hydromancer_thespia : public BossAI
     {
         _JustDied();
         Talk(SAY_DEAD);
+
+        instance->DoForAllMinions(DATA_HYDROMANCER_THESPIA, [&](Creature* creature) {
+            creature->DespawnOrUnsummon();
+        });
     }
 
     void KilledUnit(Unit* victim) override
     {
         if (victim->IsPlayer())
+        {
             Talk(SAY_SLAY);
+        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         _JustEngagedWith();
-        events.ScheduleEvent(EVENT_SPELL_LIGHTNING, 15000);
-        events.ScheduleEvent(EVENT_SPELL_LUNG, 7000);
-        events.ScheduleEvent(EVENT_SPELL_ENVELOPING, 9000);
-    }
 
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        switch (events.ExecuteEvent())
+        scheduler.Schedule(9800ms, [this](TaskContext context)
         {
-        case EVENT_SPELL_LIGHTNING:
-            for (uint8 i = 0; i < DUNGEON_MODE(1, 2); ++i)
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    me->CastSpell(target, SPELL_LIGHTNING_CLOUD, false);
-            events.RepeatEvent(urand(15000, 25000));
-            break;
-        case EVENT_SPELL_LUNG:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                DoCast(target, SPELL_LUNG_BURST);
-            events.RepeatEvent(urand(7000, 12000));
-            break;
-        case EVENT_SPELL_ENVELOPING:
-            for (uint8 i = 0; i < DUNGEON_MODE(1, 2); ++i)
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    me->CastSpell(target, SPELL_ENVELOPING_WINDS, false);
-            events.RepeatEvent(urand(10000, 15000));
-            break;
-        }
-
-        DoMeleeAttackIfReady();
+            Talk(SAY_SPELL);
+            DoCastRandomTarget(SPELL_LIGHTNING_CLOUD);
+            context.Repeat(12100ms, 14500ms);
+        }).Schedule(13300ms, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_LUNG_BURST);
+            context.Repeat(21800ms, 25400ms);
+        }).Schedule(14500ms, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_ENVELOPING_WINDS);
+            context.Repeat(30s, 40s);
+        });
     }
 };
 
