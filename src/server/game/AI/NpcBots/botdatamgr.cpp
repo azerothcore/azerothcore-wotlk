@@ -127,7 +127,7 @@ public:
     void Abort(uint64 /*e_time*/) override { AbortMe(); }
 };
 
-void SpawnWanderergBot(uint32 bot_id, WanderNode const* spawnLoc, NpcBotRegistry* registry)
+void SpawnWandererBot(uint32 bot_id, WanderNode const* spawnLoc, NpcBotRegistry* registry)
 {
     CreatureTemplate const& bot_template = _botsWanderCreatureTemplates.at(bot_id);
     NpcBotData const* bot_data = BotDataMgr::SelectNpcBotData(bot_id);
@@ -336,7 +336,7 @@ private:
         ASSERT(map->GetEntry()->IsContinent() || map->GetEntry()->IsBattlegroundOrArena(), map->GetDebugInfo().c_str());
 
         if (immediate)
-            SpawnWanderergBot(next_bot_id, spawnLoc, registry);
+            SpawnWandererBot(next_bot_id, spawnLoc, registry);
         else
             _botsWanderCreaturesToSpawn.push_back({ next_bot_id, spawnLoc });
 
@@ -586,7 +586,7 @@ void BotDataMgr::Update(uint32 diff)
 
             _botsWanderCreaturesToSpawn.pop_front();
 
-            SpawnWanderergBot(bot_id, spawnLoc, nullptr);
+            SpawnWandererBot(bot_id, spawnLoc, nullptr);
         }
 
         return;
