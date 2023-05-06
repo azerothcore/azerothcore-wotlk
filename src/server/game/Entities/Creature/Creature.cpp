@@ -3889,7 +3889,7 @@ std::string Creature::GetDebugInfo() const
 //NPCBOT
 bool Creature::LoadBotCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, bool generated, uint32 entry, Position const* pos)
 {
-    CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
+    CreatureData const* data = generated ? nullptr : sObjectMgr->GetCreatureData(spawnId);
     if (!data)
     {
         if (!generated)

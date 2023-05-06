@@ -145,13 +145,6 @@ void SpawnWandererBot(uint32 bot_id, WanderNode const* spawnLoc, NpcBotRegistry*
         spawnLoc->GetMapId(), spawnLoc->ToString().c_str(), spawnLoc->GetName().c_str());
 
     Creature* bot = new Creature();
-    if (!bot->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, bot_id, 0,
-        spawnLoc->m_positionX, spawnLoc->m_positionY, spawnLoc->m_positionZ, spawnLoc->GetOrientation()))
-    {
-        delete bot;
-        LOG_FATAL("server.loading", "Creature is not created!");
-        ASSERT(false);
-    }
     if (!bot->LoadBotCreatureFromDB(0, map, true, true, bot_id, &spawnPos))
     {
         delete bot;
