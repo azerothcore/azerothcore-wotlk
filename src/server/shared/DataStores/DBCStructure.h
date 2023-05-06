@@ -670,13 +670,6 @@ struct ChrClassesEntry
     uint32  expansion;                                      // 59 (0 - original race, 1 - tbc addon, ...)
 };
 
-enum ChrRacesAllianceType
-{
-    CHRRACES_ALLIANCE_TYPE_ALLIANCE = 0,
-    CHRRACES_ALLIANCE_TYPE_HORDE = 1,
-    CHRRACES_ALLIANCE_TYPE_NOT_PLAYABLE = 2,
-};
-
 enum ChrRacesFlags
 {
     CHRRACES_FLAGS_NOT_PLAYABLE = 0x01,
@@ -686,29 +679,25 @@ enum ChrRacesFlags
 
 struct ChrRacesEntry
 {
-    uint32 ID;                                              // 0
-    uint32 Flags;                                           // 1
-    uint32 FactionID;                                       // 2
-    //uint32 ExplorationSoundID;                            // 3
-    uint32 MaleDisplayID;                                   // 4
-    uint32 FemaleDisplayID;                                 // 5
-    //char const* ClientPrefix;                             // 6
-    uint32 BaseLanguage;                                    // 7 (7-Alliance 1-Horde)
-    uint32 CreatureType;                                    // 8
-    uint32 ResSicknessSpellID;                              // 9
-    //uint32 SplashSoundID;                                 // 10
-    //char const* ClientFileString;                         // 11
-    uint32 CinematicSequenceID;                             // 12 ID from CinematicSequences.dbc
-    uint32 Alliance;                                        // 13
-    char const* Name[16];                                   // 14-29
-    //uint32 Name_lang_mask;                                // 30
-    //char const* NameFemale[16];                           // 31-46
-    //uint32 NameFemale_lang_mask;                          // 47
-    //char const* NameMale[16];                             // 48-63
-    //uint32 NameMale_lang_mask;                            // 64
-    //char const* FacialHairCustomization[2];               // 65-66
-    //char const* HairCustomization;                        // 67
-    uint32 RequiredExpansion;                               // 68
+    uint32      RaceID;                                     // 0
+    uint32      Flags;                                      // 1
+    uint32      FactionID;                                  // 2 facton template id
+    // 3 unused
+    uint32      model_m;                                    // 4
+    uint32      model_f;                                    // 5
+    // 6 unused
+    uint32      TeamID;                                     // 7 (7-Alliance 1-Horde)
+    // 8-11 unused
+    uint32      CinematicSequence;                          // 12 id from CinematicSequences.dbc
+    //uint32    unk_322;                                    // 13 faction (0 alliance, 1 horde, 2 not available?)
+    char const*       name[16];                             // 14-29 used for DBC language detection/selection
+    // 30 string flags, unused
+    //char const*       nameFemale[16];                     // 31-46, if different from base (male) case
+    // 47 string flags, unused
+    //char const*       nameNeutralGender[16];              // 48-63, if different from base (male) case
+    // 64 string flags, unused
+    // 65-67 unused
+    uint32      expansion;                                  // 68 (0 - original race, 1 - tbc addon, ...)
 
     inline bool HasFlag(ChrRacesFlags flag) const { return (Flags & flag) != 0; }
 };
@@ -1247,25 +1236,28 @@ struct ItemSetEntry
 
 struct LFGDungeonEntry
 {
-    uint32  ID;                                             // 0
-    char const*   name[16];                                 // 1-17 Name lang
-    uint32  minlevel;                                       // 18
-    uint32  maxlevel;                                       // 19
-    uint32  reclevel;                                       // 20
-    uint32  recminlevel;                                    // 21
-    uint32  recmaxlevel;                                    // 22
-    int32   map;                                            // 23
-    uint32  difficulty;                                     // 24
-    uint32  flags;                                          // 25
-    uint32  type;                                           // 26
-    //uint32  unk;                                          // 27
-    //char const*   iconname;                               // 28
-    uint32  expansion;                                      // 29
-    //uint32  unk4;                                         // 30
-    uint32  grouptype;                                      // 31
-    //char const*   desc[16];                                     // 32-47 Description
+    uint32 ID;                                              // 0
+    char const* Name[16];                                   // 1-16
+    //uint32 Name_lang_mask;                                // 17
+    uint32 MinLevel;                                        // 18
+    uint32 MaxLevel;                                        // 19
+    uint32 TargetLevel;                                     // 20
+    uint32 TargetLevelMin;                                  // 21
+    uint32 TargetLevelMax;                                  // 22
+    uint32 MapID;                                           // 23
+    uint32 Difficulty;                                      // 24
+    uint32 Flags;                                           // 25
+    uint32 TypeID;                                          // 26
+    //int32 Faction;                                        // 27
+    //char const* TextureFilename;                          // 28
+    uint32 ExpansionLevel;                                  // 29
+    //uint32 OrderIndex;                                    // 30
+    uint32 GroupID;                                         // 31
+    //char const* Description[16];                          // 32-47
+    //uint32 Description_lang_mask;                         // 48
+
     // Helpers
-    [[nodiscard]] uint32 Entry() const { return ID + (type << 24); }
+    [[nodiscard]] uint32 Entry() const { return ID + (TypeID << 24); }
 };
 
 struct LightEntry

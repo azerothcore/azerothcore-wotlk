@@ -847,9 +847,15 @@ CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, ui
 /// Returns LFGDungeonEntry for a specific map and difficulty. Will return first found entry if multiple dungeons use the same map (such as Scarlet Monastery)
 LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty)
 {
-    for (LFGDungeonEntry const* dungeon : sLFGDungeonStore)
-        if (dungeon->map == int32(mapId) && Difficulty(dungeon->difficulty) == difficulty)
+    for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
+    {
+        LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(i);
+        if (!dungeon)
+            continue;
+
+        if (dungeon->MapID == uint32(mapId) && Difficulty(dungeon->Difficulty) == difficulty)
             return dungeon;
+    }
 
     return nullptr;
 }
@@ -858,7 +864,7 @@ LFGDungeonEntry const* GetZoneLFGDungeonEntry(std::string const& zoneName, Local
 {
     for (LFGDungeonEntry const* dungeon : sLFGDungeonStore)
     {
-        if (dungeon->type == lfg::LFG_TYPE_ZONE && zoneName.find(dungeon->name[locale]) != std::string::npos)
+        if (dungeon->TypeID == lfg::LFG_TYPE_ZONE && zoneName.find(dungeon->Name[locale]) != std::string::npos)
         {
             return dungeon;
         }

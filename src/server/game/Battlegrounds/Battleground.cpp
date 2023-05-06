@@ -820,7 +820,7 @@ uint32 Battleground::GetRealRepFactionForPlayer(uint32 factionId, Player* player
     if (player)
     {
         // if the bg team is not the original team, reverse reputation
-        if (player->GetBgTeamId() != player->GetTeamId())
+        if (player->GetBgTeamId() != player->GetTeamId(true))
         {
             switch (factionId)
             {

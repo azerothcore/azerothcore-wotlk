@@ -737,10 +737,8 @@ enum Language
 enum TeamId
 {
     TEAM_ALLIANCE = 0,
-    TEAM_HORDE = 1,
-    TEAM_NEUTRAL = 2,
-    HORDE_FACTION = 67,
-    ALLIANCE_FACTION = 469
+    TEAM_HORDE,
+    TEAM_NEUTRAL,
 };
 
 enum Team

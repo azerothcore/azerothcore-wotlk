@@ -2064,6 +2064,8 @@ void World::SetInitialWorldSettings()
 
     _mail_expire_check_timer = GameTime::GetGameTime() + 6h;
 
+    _timers[WUPDATE_DELAYED_DAMAGES].SetInterval(400);
+
     ///- Initialize MapMgr
     LOG_INFO("server.loading", "Starting Map System");
     LOG_INFO("server.loading", " ");
@@ -2204,7 +2206,7 @@ void World::DetectDBCLang()
     uint8 default_locale = TOTAL_LOCALES;
     for (uint8 i = default_locale - 1; i < TOTAL_LOCALES; --i) // -1 will be 255 due to uint8
     {
-        if (race->Name[i][0] != '\0')                     // check by race names
+        if (race->name[i][0] != '\0')                     // check by race names
         {
             default_locale = i;
             _availableDbcLocaleMask |= (1 << i);
@@ -2309,6 +2311,12 @@ void World::Update(uint32 diff)
 
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Check quest reset times"));
+
+        if (_timers[WUPDATE_DELAYED_DAMAGES].Passed())
+        {
+            _timers[WUPDATE_DELAYED_DAMAGES].Reset();
+            ProcessDelayedDamages();
+        }
 
         /// Handle daily quests reset time
         if (currentGameTime > _nextDailyQuestReset)
@@ -3330,4 +3338,30 @@ CliCommandHolder::CliCommandHolder(void* callbackArg, char const* command, Print
 CliCommandHolder::~CliCommandHolder()
 {
     free(m_command);
+}
+
+void World::AddDelayedDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss)
+{
+    DelayedDamage delayedDamage;
+    delayedDamage.attacker = attacker;
+    delayedDamage.victim = victim;
+    delayedDamage.damage = damage;
+    delayedDamage.cleanDamage = cleanDamage;
+    delayedDamage.damagetype = damagetype;
+    delayedDamage.damageSchoolMask = damageSchoolMask;
+    delayedDamage.spellProto = spellProto;
+    delayedDamage.durabilityLoss = durabilityLoss;
+    _delayedDamages.push_back(delayedDamage);
+}
+
+void World::ProcessDelayedDamages()
+{
+    for (auto& damage : _delayedDamages)
+    {
+        if (!damage.victim)
+            continue;
+
+        Unit::DealDamage(damage.attacker, damage.victim, damage.damage, damage.cleanDamage, damage.damagetype, damage.damageSchoolMask, damage.spellProto, damage.durabilityLoss);
+    }
+    _delayedDamages.clear();
 }

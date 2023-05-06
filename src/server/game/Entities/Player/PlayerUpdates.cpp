@@ -1203,7 +1203,7 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    uint32 const areaRestFlag = (GetTeamId() == TEAM_ALLIANCE)
+    uint32 const areaRestFlag = (GetTeamId(true) == TEAM_ALLIANCE)
                                     ? AREA_FLAG_REST_ZONE_ALLIANCE
                                     : AREA_FLAG_REST_ZONE_HORDE;
     if (area && area->flags & areaRestFlag)
@@ -1263,12 +1263,12 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     {
     case AREATEAM_ALLY:
         pvpInfo.IsInHostileArea =
-            GetTeamId() != TEAM_ALLIANCE &&
+            GetTeamId(true) != TEAM_ALLIANCE &&
             (sWorld->IsPvPRealm() || zone->flags & AREA_FLAG_CAPITAL);
         break;
     case AREATEAM_HORDE:
         pvpInfo.IsInHostileArea =
-            GetTeamId() != TEAM_HORDE &&
+            GetTeamId(true) != TEAM_HORDE &&
             (sWorld->IsPvPRealm() || zone->flags & AREA_FLAG_CAPITAL);
         break;
     case AREATEAM_NONE:

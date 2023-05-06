@@ -865,8 +865,14 @@ void Unit::DealDamageMods(Unit const* victim, uint32& damage, uint32* absorb)
     }
 }
 
-uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, bool /*allowGM*/, Spell const* damageSpell /*= nullptr*/)
+uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, bool /*allowGM*/, Spell const* damageSpell /*= nullptr*/, bool delayed)
 {
+    if (delayed && attacker && attacker->GetTypeId() == TYPEID_PLAYER && attacker->GetGUID() != victim->GetGUID())
+    {
+        sWorld->AddDelayedDamage(attacker, victim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto, durabilityLoss);
+        return 0;
+    }
+
     // Xinef: initialize damage done for rage calculations
     // Xinef: its rare to modify damage in hooks, however training dummy's sets damage to 0
     uint32 rage_damage = damage + ((cleanDamage != nullptr) ? cleanDamage->absorbed_damage : 0);
@@ -1576,7 +1582,7 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss,
 
     // Call default DealDamage
     CleanDamage cleanDamage(damageInfo->cleanDamage, damageInfo->absorb, BASE_ATTACK, MELEE_HIT_NORMAL);
-    Unit::DealDamage(this, victim, damageInfo->damage, &cleanDamage, SPELL_DIRECT_DAMAGE, SpellSchoolMask(damageInfo->schoolMask), spellProto, durabilityLoss, false, spell);
+    Unit::DealDamage(this, victim, damageInfo->damage, &cleanDamage, SPELL_DIRECT_DAMAGE, SpellSchoolMask(damageInfo->schoolMask), spellProto, durabilityLoss, false, spell, true);
 }
 
 // @todo for melee need create structure as in
@@ -10509,15 +10515,9 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
     return true;
 }
 
-void Unit::setPowerType(Powers new_powertype, bool sendUpdate/* = true*/)
+void Unit::setPowerType(Powers new_powertype)
 {
-    if (getPowerType() == new_powertype)
-        return;
-
-    SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_POWER_TYPE, new_powertype);
-
-    if (!sendUpdate)
-        return;
+    SetByteValue(UNIT_FIELD_BYTES_0, 3, new_powertype);
 
     if (GetTypeId() == TYPEID_PLAYER)
     {
@@ -15942,10 +15942,7 @@ uint32 Unit::GetCreatureType() const
         if (ssEntry && ssEntry->creatureType > 0)
             return ssEntry->creatureType;
         else
-        {
-            ChrRacesEntry const* raceEntry = sChrRacesStore.AssertEntry(getRace());
-            return raceEntry->CreatureType;
-        }
+            return CREATURE_TYPE_HUMANOID;
     }
     //npcbot: support for druid's shapeshifting
     else if (IsNPCBot())
@@ -21285,7 +21282,10 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 
     if (player)
+    {
         player->ResummonPetTemporaryUnSummonedIfAny();
+        player->SetCanTeleport(true);
+    }
 }
 
 void Unit::BuildMovementPacket(ByteBuffer* data) const
@@ -22415,6 +22415,25 @@ void Unit::BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns c
         data << uint32(itr->first);
         data << uint32(itr->second);
     }
+}
+
+uint8 Unit::getRace(bool original) const
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        if (original)
+            return m_realRace;
+        else
+            return m_race;
+    }
+
+    return GetByteValue(UNIT_FIELD_BYTES_0, 0);
+}
+
+void Unit::setRace(uint8 race)
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        m_race = race;
 }
 
 // Check if unit in combat with specific unit
