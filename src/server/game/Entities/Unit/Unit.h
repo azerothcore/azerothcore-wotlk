@@ -1463,6 +1463,9 @@ public:
     [[nodiscard]] uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
 
     //npcbot: compatibility accessors
+    [[nodiscard]] inline uint8 GetRace(bool original = false) const { return getRace(original); }
+    [[nodiscard]] inline uint32 GetRaceMask() const { return getRaceMask(); }
+    [[nodiscard]] inline uint8 GetClass() const { return getClass(); }
     [[nodiscard]] inline uint32 GetClassMask() const { return getClassMask(); }
     [[nodiscard]] inline uint8 GetGender() const { return getGender(); }
     inline void SetPowerType(Powers power) { setPowerType(power); }
