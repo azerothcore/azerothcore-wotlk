@@ -524,7 +524,7 @@ public:
     [[nodiscard]] virtual WorldSession* FindSession(uint32 id) const = 0;
     [[nodiscard]] virtual WorldSession* FindOfflineSession(uint32 id) const = 0;
     [[nodiscard]] virtual WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const = 0;
-    virtual void AddDelayedDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss);
+    virtual void AddDelayedDamage(ObjectGuid attacker, ObjectGuid victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, uint32 mapId, uint32 instanceId);
     virtual void AddSession(WorldSession* s) = 0;
     virtual bool KickSession(uint32 id) = 0;
     virtual void UpdateMaxSessionCounters() = 0;
