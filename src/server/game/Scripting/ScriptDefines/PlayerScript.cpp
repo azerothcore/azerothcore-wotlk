@@ -154,11 +154,11 @@ void ScriptMgr::OnBeforeLootMoney(Player* player, Loot* loot)
     });
 }
 
-void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim)
+void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
-        script->OnGiveXP(player, amount, victim);
+        script->OnGiveXP(player, amount, victim, xpSource);
     });
 }
 
