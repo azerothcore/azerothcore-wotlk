@@ -272,6 +272,14 @@ void WardenWin::ForceChecks()
     RequestChecks();
 }
 
+/**
+* @brief Add the CheckIds from the next RequestChecks() to the interrupt list so the results are ignored.
+*/
+void WardenWin::InterruptNextCheck()
+{
+    _interrupted = true;
+}
+
 void WardenWin::RequestChecks()
 {
     LOG_DEBUG("warden", "Request data");
@@ -578,8 +586,12 @@ void WardenWin::HandleData(ByteBuffer& buff)
 
     uint16 Length;
     buff >> Length;
+
     uint32 Checksum;
     buff >> Checksum;
+
+    LOG_WARN("warden", "Expected size: {}", buff.size() - buff.rpos());
+    LOG_WARN("warden", "Got size: {}", Length);
 
     if (Length != (buff.size() - buff.rpos()))
     {
@@ -624,136 +636,137 @@ void WardenWin::HandleData(ByteBuffer& buff)
         LOG_DEBUG("warden", "Ticks diff {}", ourTicks - newClientTicks);
     }
 
+    LOG_WARN("warden", "Size after timing check: {}", buff.size() - buff.rpos());
+
     bool ignoreResults = GetPayloadMgr()->IsInterruptedCheck(_CurrentChecks, _serverTicks);
-
-    uint16 checkFailed = 0;
-
-    for (uint16 const checkId : _CurrentChecks)
-    {
-        WardenCheck const* rd = sWardenCheckMgr->GetWardenDataById(checkId);
-
-        // Custom payload should be loaded in if equal to over offset.
-        if (!rd && checkId >= WardenPayloadMgr::WardenPayloadOffsetMin)
-        {
-            rd = &_payloadMgr.CachedChecks.at(checkId);
-        }
-
-        uint8 const type = rd->Type;
-        switch (type)
-        {
-        case MEM_CHECK:
-        {
-            uint8 Mem_Result;
-            buff >> Mem_Result;
-
-            if (Mem_Result != 0)
-            {
-                LOG_DEBUG("warden", "RESULT MEM_CHECK not 0x00, CheckId {} account Id {}", checkId, _session->GetAccountId());
-                checkFailed = checkId;
-                continue;
-            }
-
-            WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
-
-            std::vector<uint8> result = rs->Result.ToByteVector(0, false);
-            if (memcmp(buff.contents() + buff.rpos(), result.data(), rd->Length) != 0)
-            {
-                LOG_DEBUG("warden", "RESULT MEM_CHECK fail CheckId {} account Id {}", checkId, _session->GetAccountId());
-                checkFailed = checkId;
-                buff.rpos(buff.rpos() + rd->Length);
-                continue;
-            }
-
-            buff.rpos(buff.rpos() + rd->Length);
-            LOG_DEBUG("warden", "RESULT MEM_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
-            break;
-        }
-        case PAGE_CHECK_A:
-        case PAGE_CHECK_B:
-        case DRIVER_CHECK:
-        case MODULE_CHECK:
-        {
-            uint8 const byte = 0xE9;
-            if (memcmp(buff.contents() + buff.rpos(), &byte, sizeof(uint8)) != 0)
-            {
-                if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
-                {
-                    LOG_DEBUG("warden", "RESULT PAGE_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
-                }
-
-                if (type == MODULE_CHECK)
-                {
-                    LOG_DEBUG("warden", "RESULT MODULE_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
-                }
-
-                if (type == DRIVER_CHECK)
-                {
-                    LOG_DEBUG("warden", "RESULT DRIVER_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
-                }
-
-                checkFailed = checkId;
-                buff.rpos(buff.rpos() + 1);
-                continue;
-            }
-
-            buff.rpos(buff.rpos() + 1);
-
-            if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
-            {
-                LOG_DEBUG("warden", "RESULT PAGE_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
-            }
-            else if (type == MODULE_CHECK)
-            {
-                LOG_DEBUG("warden", "RESULT MODULE_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
-            }
-            else if (type == DRIVER_CHECK)
-            {
-                LOG_DEBUG("warden", "RESULT DRIVER_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
-            }
-            break;
-        }
-        case LUA_EVAL_CHECK:
-        {
-            uint8 const result = buff.read<uint8>();
-
-            if (result == 0)
-            {
-                buff.read_skip(buff.read<uint8>()); // discard attached string
-            }
-
-            LOG_DEBUG("warden", "LUA_EVAL_CHECK CheckId {} account Id {} got in-warden dummy response", checkId, _session->GetAccountId()/* , result */);
-            break;
-        }
-        case MPQ_CHECK:
-        {
-            uint8 Mpq_Result;
-            buff >> Mpq_Result;
-
-            if (Mpq_Result != 0)
-            {
-                LOG_DEBUG("warden", "RESULT MPQ_CHECK not 0x00 account id {}", _session->GetAccountId());
-                checkFailed = checkId;
-                continue;
-            }
-
-            WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
-            if (memcmp(buff.contents() + buff.rpos(), rs->Result.ToByteArray<20>(false).data(), Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0) // SHA1
-            {
-                LOG_DEBUG("warden", "RESULT MPQ_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
-                checkFailed = checkId;
-                buff.rpos(buff.rpos() + Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);            // 20 bytes SHA1
-                continue;
-            }
-
-            buff.rpos(buff.rpos() + Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);                // 20 bytes SHA1
-            LOG_DEBUG("warden", "RESULT MPQ_CHECK passed, CheckId {} account Id {}", checkId, _session->GetAccountId());
-            break;
-        }
-        }
-    }
-
     if (!ignoreResults)
     {
+        uint16 checkFailed = 0;
+
+        for (uint16 const checkId : _CurrentChecks)
+        {
+            WardenCheck const* rd = sWardenCheckMgr->GetWardenDataById(checkId);
+
+            // Custom payload should be loaded in if equal to over offset.
+            if (!rd && checkId >= WardenPayloadMgr::WardenPayloadOffsetMin)
+            {
+                rd = &_payloadMgr.CachedChecks.at(checkId);
+            }
+
+            uint8 const type = rd->Type;
+            switch (type)
+            {
+                case MEM_CHECK:
+                {
+                    uint8 Mem_Result;
+                    buff >> Mem_Result;
+
+                    if (Mem_Result != 0)
+                    {
+                        LOG_DEBUG("warden", "RESULT MEM_CHECK not 0x00, CheckId {} account Id {}", checkId, _session->GetAccountId());
+                        checkFailed = checkId;
+                        continue;
+                    }
+
+                    WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
+
+                    std::vector<uint8> result = rs->Result.ToByteVector(0, false);
+                    if (memcmp(buff.contents() + buff.rpos(), result.data(), rd->Length) != 0)
+                    {
+                        LOG_DEBUG("warden", "RESULT MEM_CHECK fail CheckId {} account Id {}", checkId, _session->GetAccountId());
+                        checkFailed = checkId;
+                        buff.rpos(buff.rpos() + rd->Length);
+                        continue;
+                    }
+
+                    buff.rpos(buff.rpos() + rd->Length);
+                    LOG_DEBUG("warden", "RESULT MEM_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
+                    break;
+                }
+                case PAGE_CHECK_A:
+                case PAGE_CHECK_B:
+                case DRIVER_CHECK:
+                case MODULE_CHECK:
+                {
+                    uint8 const byte = 0xE9;
+                    if (memcmp(buff.contents() + buff.rpos(), &byte, sizeof(uint8)) != 0)
+                    {
+                        if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
+                        {
+                            LOG_DEBUG("warden", "RESULT PAGE_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
+                        }
+
+                        if (type == MODULE_CHECK)
+                        {
+                            LOG_DEBUG("warden", "RESULT MODULE_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
+                        }
+
+                        if (type == DRIVER_CHECK)
+                        {
+                            LOG_DEBUG("warden", "RESULT DRIVER_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
+                        }
+
+                        checkFailed = checkId;
+                        buff.rpos(buff.rpos() + 1);
+                        continue;
+                    }
+
+                    buff.rpos(buff.rpos() + 1);
+
+                    if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
+                    {
+                        LOG_DEBUG("warden", "RESULT PAGE_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
+                    }
+                    else if (type == MODULE_CHECK)
+                    {
+                        LOG_DEBUG("warden", "RESULT MODULE_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
+                    }
+                    else if (type == DRIVER_CHECK)
+                    {
+                        LOG_DEBUG("warden", "RESULT DRIVER_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
+                    }
+                    break;
+                }
+                case LUA_EVAL_CHECK:
+                {
+                    uint8 const result = buff.read<uint8>();
+
+                    if (result == 0)
+                    {
+                        buff.read_skip(buff.read<uint8>()); // discard attached string
+                    }
+
+                    LOG_DEBUG("warden", "LUA_EVAL_CHECK CheckId {} account Id {} got in-warden dummy response", checkId, _session->GetAccountId()/* , result */);
+                    break;
+                }
+                case MPQ_CHECK:
+                {
+                    uint8 Mpq_Result;
+                    buff >> Mpq_Result;
+
+                    if (Mpq_Result != 0)
+                    {
+                        LOG_DEBUG("warden", "RESULT MPQ_CHECK not 0x00 account id {}", _session->GetAccountId());
+                        checkFailed = checkId;
+                        continue;
+                    }
+
+                    WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
+                    if (memcmp(buff.contents() + buff.rpos(), rs->Result.ToByteArray<20>(false).data(), Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0) // SHA1
+                    {
+                        LOG_DEBUG("warden", "RESULT MPQ_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
+                        checkFailed = checkId;
+                        buff.rpos(buff.rpos() + Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);            // 20 bytes SHA1
+                        continue;
+                    }
+
+                    buff.rpos(buff.rpos() + Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);                // 20 bytes SHA1
+                    LOG_DEBUG("warden", "RESULT MPQ_CHECK passed, CheckId {} account Id {}", checkId, _session->GetAccountId());
+                    break;
+                }
+            }
+        }
+
         if (checkFailed > 0)
         {
             ApplyPenalty(checkFailed, "");
@@ -762,6 +775,9 @@ void WardenWin::HandleData(ByteBuffer& buff)
     else
     {
         LOG_DEBUG("warden", "Warden was interrupted by Warden::ForceChecks, ignoring results.");
+
+        // Skip to the end of warden packet.
+        buff.read_skip(Length - sizeof(uint8) - sizeof(uint32));
     }
 
     // Set hold off timer, minimum timer should at least be 1 second
@@ -769,4 +785,6 @@ void WardenWin::HandleData(ByteBuffer& buff)
     _checkTimer = (holdOff < 1 ? 1 : holdOff) * IN_MILLISECONDS;
 
     _checkInProgress = false;
+
+    LOG_WARN("warden", "Finished size: {}", buff.size() - buff.rpos());
 }

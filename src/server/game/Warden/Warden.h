@@ -117,6 +117,7 @@ public:
     virtual bool IsCheckInProgress() = 0;
     virtual bool IsInitialized();
     virtual void ForceChecks() = 0;
+    virtual void InterruptNextCheck() = 0;
     virtual void RequestChecks() = 0;
     virtual void HandleData(ByteBuffer &buff) = 0;
     bool ProcessLuaCheckResponse(std::string const& msg);

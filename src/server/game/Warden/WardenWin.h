@@ -83,6 +83,7 @@ public:
     void RequestChecks() override;
     bool IsCheckInProgress() override;
     void ForceChecks() override;
+    void InterruptNextCheck() override;
     void HandleData(ByteBuffer& buff) override;
 
 private:
