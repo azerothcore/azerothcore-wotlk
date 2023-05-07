@@ -624,29 +624,32 @@ public:
             else
             {
                 spell = me->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-                if (spell)
+                SpellInfo const* baseSpellInfo = spell ? spell->GetSpellInfo()->GetFirstRankSpell() : nullptr;
+                uint32 base_id = baseSpellInfo ? baseSpellInfo->Id : 0;
+                if (baseSpellInfo && (base_id == FEAR_1 || base_id == BANISH_1 || baseSpellInfo->SpellVisual[0] == 99))
                 {
-                    //Fear interrupt
-                    if (spell->GetSpellInfo()->GetFirstRankSpell()->Id == FEAR_1 && spell->m_targets.GetUnitTarget() &&
-                        spell->m_targets.GetUnitTarget()->HasAuraType(SPELL_AURA_MOD_FEAR))
-                        me->InterruptSpell(CURRENT_GENERIC_SPELL);
-                    //Banish interrupt
-                    else if (spell->GetSpellInfo()->GetFirstRankSpell()->Id == BANISH_1 && spell->m_targets.GetUnitTarget())
+                    if (Unit const* target = ObjectAccessor::GetUnit(*me, spell->m_targets.GetObjectTargetGUID()))
                     {
-                        if (AuraEffect const* bani = spell->m_targets.GetUnitTarget()->GetAuraEffect(SPELL_AURA_SCHOOL_IMMUNITY, SPELLFAMILY_WARLOCK, 0x0, 0x8000000, 0x0))
+                        //Fear interrupt
+                        if (base_id == FEAR_1 && target->HasAuraType(SPELL_AURA_MOD_FEAR))
+                            me->InterruptSpell(CURRENT_GENERIC_SPELL);
+                        //Banish interrupt
+                        else if (base_id == BANISH_1)
                         {
-                            //Already banished
-                            //check spell cast time
-                            if (bani->GetBase()->GetDuration() > bani->GetBase()->GetMaxDuration() - 1500)
+                            if (AuraEffect const* bani = target->GetAuraEffect(SPELL_AURA_SCHOOL_IMMUNITY, SPELLFAMILY_WARLOCK, 0x0, 0x8000000, 0x0))
+                            {
+                                //Already banished
+                                //check spell cast time
+                                if (bani->GetBase()->GetDuration() > bani->GetBase()->GetMaxDuration() - 1500)
+                                    me->InterruptSpell(CURRENT_GENERIC_SPELL);
+                            }
+                            else if (!target->getAttackers().empty())
                                 me->InterruptSpell(CURRENT_GENERIC_SPELL);
                         }
-                        else if (!spell->m_targets.GetUnitTarget()->getAttackers().empty())
+                        //Soulstone resurrection interrupt
+                        else if (spell->GetSpellInfo()->SpellVisual[0] == 99 && target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
                             me->InterruptSpell(CURRENT_GENERIC_SPELL);
                     }
-                    //Soulstone resurrection interrupt
-                    else if (spell->GetSpellInfo()->SpellVisual[0] == 99 && spell->m_targets.GetUnitTarget() &&
-                        spell->m_targets.GetUnitTarget()->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
-                        me->InterruptSpell(CURRENT_GENERIC_SPELL);
                 }
             }
 

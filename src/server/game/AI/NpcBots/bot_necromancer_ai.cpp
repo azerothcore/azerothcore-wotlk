@@ -338,11 +338,11 @@ public:
             //Interrupt corpse-usage spells if no longer usable
             if (Spell const* spell = me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
             {
-                if (Unit const* target = spell->m_targets.GetUnitTarget())
+                if ((spell->GetSpellInfo()->GetFirstRankSpell()->Id == RAISE_DEAD_1 ||
+                    spell->GetSpellInfo()->GetFirstRankSpell()->Id == CORPSE_EXPLOSION_1))
                 {
-                    if ((spell->GetSpellInfo()->GetFirstRankSpell()->Id == RAISE_DEAD_1 ||
-                        spell->GetSpellInfo()->GetFirstRankSpell()->Id == CORPSE_EXPLOSION_1) &&
-                        target->GetDisplayId() != target->GetNativeDisplayId())
+                    Unit const* target = ObjectAccessor::GetUnit(*me, spell->m_targets.GetObjectTargetGUID());
+                    if (target && target->GetDisplayId() != target->GetNativeDisplayId())
                         me->InterruptSpell(CURRENT_GENERIC_SPELL);
                 }
             }

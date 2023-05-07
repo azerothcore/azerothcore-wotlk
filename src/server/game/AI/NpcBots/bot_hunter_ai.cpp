@@ -712,8 +712,8 @@ public:
             Spell const* spell = me->GetCurrentSpell(CURRENT_GENERIC_SPELL);
             if (spell && spell->GetSpellInfo()->Id == GetSpell(SCARE_BEAST_1))
             {
-                if (spell->m_targets.GetUnitTarget() &&
-                    spell->m_targets.GetUnitTarget()->HasAuraType(SPELL_AURA_MOD_FEAR))
+                Unit const* target = ObjectAccessor::GetUnit(*me, spell->m_targets.GetObjectTargetGUID());
+                if (target && target->HasAuraType(SPELL_AURA_MOD_FEAR))
                     me->InterruptSpell(CURRENT_GENERIC_SPELL);
             }
 

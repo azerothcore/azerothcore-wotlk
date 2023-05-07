@@ -2207,9 +2207,11 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
         for (uint8 i = CURRENT_FIRST_NON_MELEE_SPELL; i != CURRENT_AUTOREPEAT_SPELL; ++i)
         {
             interrupt = false;
-            Spell const* spell = me->GetCurrentSpell(CurrentSpellTypes(i));
+            Spell* spell = me->GetCurrentSpell(CurrentSpellTypes(i));
             if (!spell)
                 continue;
+            if (spell->m_targets.GetObjectTargetGUID().IsAnyTypeCreature())
+                spell->m_targets.Update(me);
             Unit const* target = spell->m_targets.GetUnitTarget();
             if (!target)
                 continue;

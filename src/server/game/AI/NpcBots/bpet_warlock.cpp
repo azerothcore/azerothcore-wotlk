@@ -184,10 +184,11 @@ public:
             {
                 if (myType == BOT_PET_SUCCUBUS)
                 {
-                    if (Unit const* target = spell->m_targets.GetUnitTarget())
+                    //Seduction interrupt
+                    if (spell->GetSpellInfo()->GetFirstRankSpell()->Id == SEDUCTION_1)
                     {
-                        //Seduction interrupt
-                        if (spell->GetSpellInfo()->GetFirstRankSpell()->Id == SEDUCTION_1 && CCed(target))
+                        Unit const* target = ObjectAccessor::GetUnit(*me, spell->m_targets.GetObjectTargetGUID());
+                        if (target && CCed(target))
                             me->InterruptSpell(CURRENT_GENERIC_SPELL);
                     }
                 }
