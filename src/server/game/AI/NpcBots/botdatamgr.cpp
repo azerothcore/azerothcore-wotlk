@@ -2533,9 +2533,19 @@ public:
             gain *= WANDERING_BOT_XP_GAIN_MULT;
     }
 };
-void AddSC_wandering_bot_xp_gain_script()
+
+class AC_GAME_API BotDataMgrShutdownScript : public WorldScript
+{
+public:
+    BotDataMgrShutdownScript() : WorldScript("BotDataMgrShutdownScript") {}
+
+    void OnShutdown() override { botDataEvents.KillAllEvents(true); }
+};
+
+void AddSC_botdatamgr_scripts()
 {
     new WanderingBotXpGainFormulaScript();
+    new BotDataMgrShutdownScript();
 }
 
 #ifdef _MSC_VER
