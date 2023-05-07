@@ -355,7 +355,7 @@ public:
 
     void RemoveOldCorpses() override;
 
-    void AddDelayedDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss) override;
+    void AddDelayedDamage(ObjectGuid attacker, ObjectGuid victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, uint32 mapId, uint32 instanceId) override;
 
     void ProcessDelayedDamages();
 

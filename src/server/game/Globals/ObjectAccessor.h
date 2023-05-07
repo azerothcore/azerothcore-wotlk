@@ -71,6 +71,7 @@ namespace ObjectAccessor
     Transport* GetTransport(WorldObject const& u, ObjectGuid const guid);
     DynamicObject* GetDynamicObject(WorldObject const& u, ObjectGuid const guid);
     Unit* GetUnit(WorldObject const&, ObjectGuid const guid);
+    Unit* GetUnit(Map const* map, ObjectGuid const guid);
     Creature* GetCreature(WorldObject const& u, ObjectGuid const guid);
     Pet* GetPet(WorldObject const&, ObjectGuid const guid);
     Player* GetPlayer(Map const*, ObjectGuid const guid);
