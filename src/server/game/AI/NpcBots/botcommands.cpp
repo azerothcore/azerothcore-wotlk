@@ -532,6 +532,7 @@ public:
             { "spellvisual",HandleNpcBotDebugSpellVisualCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_VISUAL,       Console::No  },
             { "states",     HandleNpcBotDebugStatesCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
             { "spells",     HandleNpcBotDebugSpellsCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
+            { "guids",      HandleNpcBotDebugGuidsCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
         };
 
         static ChatCommandTable npcbotSetCommandTable =
@@ -1343,6 +1344,28 @@ public:
 
         player->TeleportTo(WorldLocation(wp->GetMapId(), *wp), TELE_TO_GM_MODE);
 
+        return true;
+    }
+
+    static bool HandleNpcBotDebugGuidsCommand(ChatHandler* handler)
+    {
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+            target = handler->GetPlayer();
+
+        std::ostringstream gss;
+        gss << target->GetName() << "'s guids:"
+            << "\n  own guid:\n" << target->GetGUID().ToString()
+            << "\n  combo target guid:\n" << target->GetComboTargetGUID().ToString()
+            << "\n  pet guid:\n" << target->GetPetGUID().ToString()
+            << "\n  minion guid:\n" << target->GetMinionGUID().ToString()
+            << "\n  critter guid:\n" << target->GetCritterGUID().ToString()
+            << "\n  charmed guid:\n" << target->GetCharmGUID().ToString()
+            << "\n  charmer guid:\n" << target->GetCharmerGUID().ToString()
+            << "\n  creator guid:\n" << target->GetCreatorGUID().ToString()
+            << "\n  owner guid:\n" << target->GetOwnerGUID().ToString();
+
+        handler->SendSysMessage(gss.str().c_str());
         return true;
     }
 

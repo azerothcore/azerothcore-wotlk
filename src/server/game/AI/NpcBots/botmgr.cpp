@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "Tokenize.h"
 #include "Transport.h"
 #include "World.h"
 /*
@@ -124,6 +125,7 @@ float _mult_dmg_spellbreaker;
 float _mult_dmg_darkranger;
 float _mult_dmg_necromancer;
 float _mult_dmg_seawitch;
+std::vector<float> _mult_dmg_levels;
 
 bool __firstload = true;
 
@@ -315,6 +317,20 @@ void BotMgr::LoadConfig(bool reload)
     _botStatLimits_crit             = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Crit", 95.0f);
     _desiredWanderingBotsCount      = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.Continents.Count", 0);
     _enableWanderingBotsBG          = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.Enable", false);
+
+    std::string mult_dps_by_levels  = sConfigMgr->GetStringDefault("NpcBot.Mult.Damage.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
+    std::vector<std::string_view> toks = Acore::Tokenize(mult_dps_by_levels, ',', false);
+    ASSERT(toks.size() >= DEFAULT_MAX_LEVEL / 10 + 1, "NpcBot.Mult.Damage.Levels must has at least %u values", DEFAULT_MAX_LEVEL / 10 + 1);
+    _mult_dmg_levels.reserve(toks.size());
+    for (decltype(toks)::size_type i = 0; i != toks.size(); ++i)
+    {
+        Optional<float> val = Acore::StringTo<float>(toks[i]);
+        if (val == std::nullopt)
+            LOG_ERROR("server.loading", "NpcBot.Mult.Damage.Levels contains invalid float value '{}', set to default", toks[i]);
+        float fval = val.value_or(1.0f);
+        RoundToInterval(fval, 0.1f, 10.f);
+        _mult_dmg_levels.push_back(fval);
+    }
 
     //limits
     RoundToInterval(_mult_dmg_physical, 0.1f, 10.f);
@@ -1145,7 +1161,7 @@ void BotMgr::CleanupsBeforeBotDelete(Creature* bot)
     bot->AttackStop();
     bot->CombatStopWithPets(true);
 
-    //bot->SetOwnerGUID(ObjectGuid::Empty);
+    bot->SetOwnerGUID(ObjectGuid::Empty);
     //_owner->m_Controlled.erase(bot);
     bot->SetControlledByPlayer(false);
     //bot->RemoveUnitFlag(UNIT_FLAG_PVP_ATTACKABLE);
@@ -1313,7 +1329,8 @@ BotAddResult BotMgr::AddBot(Creature* bot)
     _bots[bot->GetGUID()] = bot;
 
     ASSERT(!bot->GetCreatorGUID());
-    //bot->SetOwnerGUID(_owner->GetGUID());
+    ASSERT(!bot->GetOwnerGUID());
+    bot->SetOwnerGUID(_owner->GetGUID());
     bot->SetCreator(_owner); //needed in case of FFAPVP
     //_owner->m_Controlled.insert(bot);
     bot->SetControlledByPlayer(true);
@@ -2060,6 +2077,14 @@ float BotMgr::GetBotDamageModByClass(uint8 botclass)
         default:
             return 1.0;
     }
+}
+
+float BotMgr::GetBotDamageModByLevel(uint8 botlevel)
+{
+    uint8 bracket = botlevel / 10;
+    if (bracket < _mult_dmg_levels.size())
+        return _mult_dmg_levels[bracket];
+    return 1.0f;
 }
 
 void BotMgr::InviteBotToBG(ObjectGuid botguid, GroupQueueInfo* ginfo, Battleground* bg)
