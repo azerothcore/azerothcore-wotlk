@@ -1442,9 +1442,9 @@ void LootTemplate::LootGroup::Process(Loot& loot, Player const* player, LootStor
             // recursively call this function to produce more items for this group.
             // However, if this is a quest item we shouldn't multiply this group.
             if (nonRefIterationsLeft > 1 and not item->needs_quest)
+            {    
                 this->Process(loot, player, store, lootMode, nonRefIterationsLeft-1);
             }
-
         }
     }
 }
