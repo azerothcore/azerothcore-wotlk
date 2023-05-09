@@ -1,3 +1,4 @@
+-- DB update 2023_05_09_00 -> 2023_05_09_01
 --
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|67108864 WHERE (`entry` = 18829);
 
