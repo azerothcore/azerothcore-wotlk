@@ -326,7 +326,7 @@ void BotMgr::LoadConfig(bool reload)
     {
         Optional<float> val = Acore::StringTo<float>(toks[i]);
         if (val == std::nullopt)
-            LOG_ERROR("server.loading", "NpcBot.Mult.Damage.Levels contains invalid float value '{}', set to default", toks[i]);
+            LOG_ERROR("server.loading", "NpcBot.Mult.Damage.Levels contains invalid float value '{}', set to default", std::string(toks[i]).c_str());
         float fval = val.value_or(1.0f);
         RoundToInterval(fval, 0.1f, 10.f);
         _mult_dmg_levels.push_back(fval);
