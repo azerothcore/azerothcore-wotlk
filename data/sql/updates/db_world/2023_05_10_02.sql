@@ -1,3 +1,4 @@
+-- DB update 2023_05_10_01 -> 2023_05_10_02
 -- Update spawnposition
 UPDATE `creature` SET `position_x` = -2347.824219, `position_y` = -11363.384766, `position_z` = 27.942247, `orientation` = 1.895, `wander_distance` = 0, `MovementType` = 0 WHERE `guid` = 62369 AND `id1` = 17337;
 UPDATE `creature` SET `position_x` = -2571.970459, `position_y` = -11343.209961, `position_z` = 25.304287, `wander_distance` = 10, `MovementType` = 1 WHERE `guid` = 62370 AND `id1` = 17338;
