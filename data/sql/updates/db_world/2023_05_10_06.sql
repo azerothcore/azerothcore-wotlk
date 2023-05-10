@@ -1,3 +1,4 @@
+-- DB update 2023_05_10_05 -> 2023_05_10_06
 -- Void Baron Galaxi
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 16939);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES

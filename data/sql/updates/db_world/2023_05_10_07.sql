@@ -1,3 +1,4 @@
+-- DB update 2023_05_10_06 -> 2023_05_10_07
 DELETE FROM `spelldifficulty_dbc` WHERE `ID` IN (32197, 40062, 30846);
 INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpellID_2`) VALUES
 (32197, 32197, 37113),
