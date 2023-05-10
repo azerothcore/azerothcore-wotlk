@@ -192,7 +192,7 @@ public:
             });
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void MoveInLineOfSight(Unit* /*who*/) override
         {
             if (EventStage == EVENT_STAGE_NONE)
             {
