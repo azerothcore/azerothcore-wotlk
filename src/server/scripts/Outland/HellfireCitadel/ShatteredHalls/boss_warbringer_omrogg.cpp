@@ -60,7 +60,6 @@ enum Events
     EVENT_KILL_YELL_LEFT        = 8,
     EVENT_KILL_YELL_RIGHT       = 9,
     EVENT_DEATH_YELL            = 10,
-
 };
 
 enum Phase
@@ -121,12 +120,12 @@ public:
                 {
                     DoCastAOE(SPELL_THUNDERCLAP);
                     context.Repeat(17200ms, 24200ms);
-                }).Schedule(20s, 30s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                }).Schedule(20s, 30s, GROUP_NON_BURNING_PHASE, [this](TaskContext /*context*/)
                 {
                     DoCastSelf(SPELL_BEATDOWN, false);
                     me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                     me->SetReactState(REACT_PASSIVE);
-                    scheduler.Schedule(200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                    scheduler.Schedule(200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext /*context*/)
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
@@ -136,17 +135,17 @@ public:
                             events.ScheduleEvent(threatYell, 3000);
                             DoResetThreatList();
                             me->AddThreat(target, 2250.0f);
-                            scheduler.Schedule(1200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
+                            scheduler.Schedule(1200ms, GROUP_BURNING_PHASE, [this](TaskContext /*context*/)
                             {
                                 me->SetReactState(REACT_AGGRESSIVE);
                                 me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                             });
                         }
-                    }).Schedule(40s, 60s, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                    }).Schedule(40s, 60s, GROUP_NON_BURNING_PHASE, [this](TaskContext /*context*/)
                     {
                         me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         me->SetReactState(REACT_PASSIVE);
-                        scheduler.Schedule(1200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext context)
+                        scheduler.Schedule(1200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext /*context*/)
                         {
                             DoCastSelf(SPELL_FEAR, false);
                             DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
@@ -155,7 +154,7 @@ public:
                             scheduler.Schedule(200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                             {
                                 me->Yell("%s roars!", LANG_UNIVERSAL);
-                                scheduler.Schedule(2200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
+                                scheduler.Schedule(2200ms, GROUP_BURNING_PHASE, [this](TaskContext /*context*/)
                                 {
                                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                     {
