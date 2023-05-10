@@ -86,7 +86,6 @@ struct boss_the_black_stalker : public BossAI
                 return;
             }
         });
-
         if (IsHeroic())
         {
             scheduler.Schedule(10s, 15s, [this](TaskContext context)
