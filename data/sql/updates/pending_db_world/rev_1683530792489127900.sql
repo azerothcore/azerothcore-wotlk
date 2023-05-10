@@ -1,7 +1,7 @@
 --
 UPDATE `creature_template` SET `minlevel`=63, `maxlevel`=63, `AIName`='SmartAI' WHERE  `entry`=16383;
 
-DELETE FROM `creature_template_addon` WHERE entry=16383;
+DELETE FROM `creature_template_addon` WHERE `entry`=16383;
 INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES (16383, '28330');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 16383);
