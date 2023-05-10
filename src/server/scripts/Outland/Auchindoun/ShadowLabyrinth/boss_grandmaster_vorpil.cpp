@@ -28,8 +28,7 @@ enum GrandmasterVorpil
     SAY_SLAY                    = 3,
     SAY_DEATH                   = 4,
 
-    SPELL_RAIN_OF_FIRE_N        = 33617,
-    SPELL_RAIN_OF_FIRE_H        = 39363,
+    SPELL_RAIN_OF_FIRE          = 33617,
 
     SPELL_DRAW_SHADOWS          = 33563,
     SPELL_SHADOWBOLT_VOLLEY     = 33841,
@@ -38,8 +37,7 @@ enum GrandmasterVorpil
     NPC_VOID_TRAVELER           = 19226,
     SPELL_SACRIFICE             = 33587,
     SPELL_SHADOW_NOVA           = 33846,
-    SPELL_EMPOWERING_SHADOWS_N  = 33783,
-    SPELL_EMPOWERING_SHADOWS_H  = 39364,
+    SPELL_EMPOWERING_SHADOWS    = 33783,
 
     NPC_VOID_PORTAL             = 19224,
     SPELL_VOID_PORTAL_VISUAL    = 33569,
@@ -155,22 +153,17 @@ struct boss_grandmaster_vorpil : public BossAI
             context.Repeat();
         }).Schedule(36400ms, [this](TaskContext context)
         {
-            DoCastSelf(SPELL_DRAW_SHADOWS, true);
+            DoCastAOE(SPELL_DRAW_SHADOWS, true);
 
-            me->GetMap()->DoForAllPlayers([&](Player* player)
-            {
-                if (player->IsAlive() && !player->HasAura(SPELL_BANISH))
-                {
-                    player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
-                }
-            });
+            me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
+            me->GetMotionMaster()->Clear();
 
             scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
-                DoCastSelf(DUNGEON_MODE(SPELL_RAIN_OF_FIRE_N, SPELL_RAIN_OF_FIRE_H));
+                DoCastSelf(SPELL_RAIN_OF_FIRE);
+                me->ResumeChasingVictim();
             });
 
-            me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
             context.Repeat(36400ms, 44950ms);
         }).Schedule(10900ms, [this](TaskContext context)
         {
@@ -203,52 +196,59 @@ struct npc_voidtraveler : public ScriptedAI
 {
     npc_voidtraveler(Creature* creature) : ScriptedAI(creature) {}
 
-    ObjectGuid VorpilGUID;
-    uint32 moveTimer;
-    bool sacrificed;
-
     void Reset() override
     {
-        moveTimer = 1000;
-        sacrificed = false;
-    }
+        if (TempSummon* summon = me->ToTempSummon())
+        {
+            if (Unit* vorpil = summon->GetSummonerUnit())
+            {
+                me->GetMotionMaster()->MoveFollow(vorpil, 0.0f, 0.0f);
+            }
+        }
 
-    void SetGUID(ObjectGuid guid, int32) override
-    {
-        VorpilGUID = guid;
+        _scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (TempSummon* summon = me->ToTempSummon())
+            {
+                if (Unit* vorpil = summon->GetSummonerUnit())
+                {
+                    if (me->IsWithinMeleeRange(vorpil))
+                    {
+                        DoCastSelf(SPELL_SACRIFICE);
+                        _scheduler.Schedule(1200ms, [this](TaskContext /*context*/)
+                        {
+                            if (TempSummon* summon = me->ToTempSummon())
+                            {
+                                if (Unit* vorpil = summon->GetSummonerUnit())
+                                {
+                                    DoCastAOE(SPELL_SHADOW_NOVA, true);
+                                    me->CastSpell(vorpil, SPELL_EMPOWERING_SHADOWS, true, nullptr, nullptr, vorpil->GetGUID());
+                                    vorpil->ModifyHealth(int32(vorpil->CountPctFromMaxHealth(4)));
+                                }
+                            }
+
+                            _scheduler.Schedule(100ms, [this](TaskContext /*context*/)
+                            {
+                                me->KillSelf();
+                            });
+                        });
+                    }
+                    else
+                    {
+                        context.Repeat();
+                    }
+                }
+            }
+        });
     }
 
     void UpdateAI(uint32 diff) override
     {
-        moveTimer += diff;
-        if (moveTimer >= 1000)
-        {
-            moveTimer = 0;
-            Creature* Vorpil = ObjectAccessor::GetCreature(*me, VorpilGUID);
-            if (!Vorpil)
-            {
-                me->DespawnOrUnsummon();
-                return;
-            }
-            me->GetMotionMaster()->MoveFollow(Vorpil, 0.0f, 0.0f);
-
-            if (sacrificed)
-            {
-                Vorpil->AddAura(DUNGEON_MODE(SPELL_EMPOWERING_SHADOWS_N, SPELL_EMPOWERING_SHADOWS_H), Vorpil);
-                Vorpil->ModifyHealth(int32(Vorpil->CountPctFromMaxHealth(4)));
-                DoCastAOE(SPELL_SHADOW_NOVA, true);
-                me->KillSelf();
-                return;
-            }
-
-            if (me->IsWithinDist(Vorpil, 3.0f))
-            {
-                DoCastSelf(SPELL_SACRIFICE);
-                sacrificed = true;
-                moveTimer = 500;
-            }
-        }
+        _scheduler.Update(diff);
     }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 void AddSC_boss_grandmaster_vorpil()
