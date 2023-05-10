@@ -175,21 +175,21 @@ public:
         void CombatEventScheduler()
         {
             scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+            {
+                if (me->HealthBelowPct(90))
                 {
-                    if (me->HealthBelowPct(90))
-                    {
-                        DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
-                    }
-                    context.Repeat();
-                }).Schedule(8100ms, 17300ms, [this](TaskContext context)
-                {
-                    DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
-                    context.Repeat(8450ms, 9450ms);
-                }).Schedule(10950ms, 21850ms, [this](TaskContext context)
-                {
-                    DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
-                    context.Repeat(1200ms, 23900ms);
-                });
+                    DoCastRandomTarget(DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), 0, 30.0f, true);
+                }
+                context.Repeat();
+            }).Schedule(8100ms, 17300ms, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
+                context.Repeat(8450ms, 9450ms);
+            }).Schedule(10950ms, 21850ms, [this](TaskContext context)
+            {
+                DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H));
+                context.Repeat(1200ms, 23900ms);
+            });
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -399,7 +399,6 @@ public:
         return new spell_tsh_shadow_bolt_SpellScript();
     }
 };
-
 class at_rp_nethekurse : public AreaTriggerScript
 {
 public:
