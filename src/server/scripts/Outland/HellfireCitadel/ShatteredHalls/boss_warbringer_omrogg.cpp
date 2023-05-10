@@ -179,10 +179,7 @@ public:
                                 context.CancelGroup(GROUP_BURNING_PHASE);
                                 scheduler.RescheduleGroup(GROUP_NON_BURNING_PHASE, 5ms);
                                 context.RescheduleGroup(GROUP_NON_BURNING_PHASE, 5ms);
-                                scheduler.Schedule(1s, [this](TaskContext context)
-                                {
-                                    context.RescheduleGroup(GROUP_FULL_PHASE, 50ms);
-                                });
+                                context.RescheduleGroup(GROUP_FULL_PHASE, 1050ms);
                             });
                         });
                     });
