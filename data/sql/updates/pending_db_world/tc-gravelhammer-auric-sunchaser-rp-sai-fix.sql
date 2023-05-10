@@ -52,7 +52,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (18745,6,2,"If we're to help with that in any way we'll need more people.  Call some of the scouts in to help with that.",12,7,100,1,0,0,15851,0,"Captain Auric Sunchaser"),
 (18745,6,3,"Lieutenant, I want you to make that your top priority.  Notify anyone that you think can help.",12,7,100,1,0,0,15852,0,"Captain Auric Sunchaser");
 
--- WP
+-- Waypoints
 DELETE FROM `waypoints` WHERE `entry`=18713;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
 (18713,1,-3012.45019,3983.69726,3.10552,""),
