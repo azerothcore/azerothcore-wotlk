@@ -192,11 +192,11 @@ public:
             });
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void MoveInLineOfSight(Unit* /*who*/) override
         {
             if (EventStage == EVENT_STAGE_NONE)
             {
-                if (who->IsPlayer() && who->IsInRange(me, 50.0f, true))
+                if (me->SelectNearestPlayer(30.0f))
                 {
                     DoAction(ACTION_CANCEL_INTRO);
                 }
