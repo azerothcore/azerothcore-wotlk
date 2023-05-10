@@ -150,7 +150,7 @@ public:
                             DoCastSelf(DUNGEON_MODE(SPELL_BURNING_MAUL_N, SPELL_BURNING_MAUL_H), false);
                             me->LoadEquipment(EQUIP_BURNING_MAUL);
                             scheduler.CancelGroup(GROUP_NON_BURNING_PHASE);
-                            scheduler.Schedule(200ms, GROUP_BURNING_PHASE, [this](TaskContext context)
+                            scheduler.Schedule(200ms, GROUP_BURNING_PHASE, [this](TaskContext /*context*/)
                             {
                                 me->Yell("%s roars!", LANG_UNIVERSAL);
                                 scheduler.Schedule(2200ms, GROUP_BURNING_PHASE, [this](TaskContext /*context*/)
