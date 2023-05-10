@@ -1115,15 +1115,16 @@ public:
             }
 
             //LAVA BURST
-            if (IsSpellReady(LAVA_BURST_1, diff) && can_do_fire && GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL &&
-                HasRole(BOT_ROLE_DPS) && dist < CalcSpellMaxRange(LAVA_BURST_1) && Rand() < 60 &&
+            if (IsSpellReady(LAVA_BURST_1, diff) && can_do_fire && HasRole(BOT_ROLE_DPS) &&
+                (GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL || (IsRanged() && (!can_do_nature || !GetSpell(LIGHTNING_BOLT_1)))) &&
+                dist < CalcSpellMaxRange(LAVA_BURST_1) && Rand() < 60 &&
                 (me->getAttackers().empty() || dist > 10))
             {
                 if (doCast(mytar, GetSpell(LAVA_BURST_1)))
                     return;
             }
 
-            if (((MaelstromCount < 5 || MaelstromTimer == 0) && me->GetLevel() >= 55 && IsMelee()) ||
+            if (((MaelstromCount < 5 || MaelstromTimer == 0 || me->GetLevel() < 55) && IsMelee()) ||
                 (HasRole(BOT_ROLE_HEAL) && GetManaPCT(me) < 25))
                 return;
 

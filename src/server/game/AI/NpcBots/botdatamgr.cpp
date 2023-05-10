@@ -290,8 +290,8 @@ private:
         if (bracketEntry)
         {
             //force level range for bgs
-            bot_template.minlevel = std::min<uint32>(bracketEntry->minLevel, 80u);
-            bot_template.maxlevel = std::min<uint32>(bracketEntry->maxLevel, 80u);
+            bot_template.minlevel = std::min<uint32>(bracketEntry->minLevel, DEFAULT_MAX_LEVEL);
+            bot_template.maxlevel = std::min<uint32>(bracketEntry->maxLevel, DEFAULT_MAX_LEVEL);
         }
         else
             bot_template.flags_extra &= ~(CREATURE_FLAG_EXTRA_NO_XP);
