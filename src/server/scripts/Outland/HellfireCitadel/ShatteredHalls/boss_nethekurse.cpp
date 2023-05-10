@@ -153,7 +153,7 @@ public:
         {
             me->GetMotionMaster()->Clear();
             me->SetFacingTo(4.572762489318847656f);
-            scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+            scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
                 Talk(SAY_PEON_DIES);
@@ -208,12 +208,12 @@ public:
             scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
             {
                 me->GetMotionMaster()->Clear();
-                scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
+                scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
                 {
                     uint32 choicelocation = urand(1, 3);
                     me->GetMotionMaster()->MoveIdle();
                     me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[choicelocation][0], NethekurseIntroPath[choicelocation][1], NethekurseIntroPath[choicelocation][2]);
-                    scheduler.Schedule(2500ms, GROUP_RP, [this, choicelocation](TaskContext context)
+                    scheduler.Schedule(2500ms, GROUP_RP, [this, choicelocation](TaskContext /*context*/)
                     {
                         CastRandomPeonSpell(choicelocation);
                     });
