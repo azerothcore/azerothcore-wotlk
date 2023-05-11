@@ -12,4 +12,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16414, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostly Steward - In Combat - Say Line 2'),
 (16414, 0, 4, 5, 2, 0, 100, 1, 50, 50, 0, 0, 0, 11, 29691, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostly Steward - At Health 50% - Cast Frenzy'),
 (16414, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostly Steward - At Health 50% - Say Line 3'),
-(16414, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 14, 0, 100, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostly Steward - At Health 50% - Wipe Raid Threat');
+(16414, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 14, 0, 100, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostly Steward - At Health 50% - Wipe Raid Threat');
