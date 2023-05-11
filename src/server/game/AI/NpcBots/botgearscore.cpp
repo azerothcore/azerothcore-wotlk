@@ -108,7 +108,7 @@ float CalculateItemGearScore(uint32 botentry, uint8 botlevel, uint8 botclass, ui
             else if (botclass == BOT_CLASS_HUNTER)
                 itemscore *= 0.3164f;
         }
-        else if (slot == BOT_SLOT_RANGED && BOT_CLASS_HUNTER)
+        else if (slot == BOT_SLOT_RANGED && botclass == BOT_CLASS_HUNTER)
             itemscore *= 5.3224f;
     }
 
