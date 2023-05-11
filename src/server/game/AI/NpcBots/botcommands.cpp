@@ -1,7 +1,8 @@
 #include "bot_ai.h"
-#include "botdump.h"
-#include "botmgr.h"
 #include "botdatamgr.h"
+#include "botdump.h"
+#include "botgearscore.h"
+#include "botmgr.h"
 #include "botwanderful.h"
 #include "Chat.h"
 #include "CharacterCache.h"
@@ -644,6 +645,7 @@ public:
             { "kill",       HandleNpcBotKillCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_KILL,               Console::No  },
             { "suicide",    HandleNpcBotKillCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_KILL,               Console::No  },
             { "go",         HandleNpcBotGoCommand,                  rbac::RBAC_PERM_COMMAND_NPCBOT_MOVE,               Console::No  },
+            { "gs",         HandleNpcBotGearScoreCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
             { "sendto",     npcbotSendToCommandTable                                                                                },
             { "distance",   npcbotDistanceCommandTable                                                                              },
             { "order",      npcbotOrderCommandTable                                                                                 },
@@ -3148,6 +3150,56 @@ public:
         }
 
         handler->SendSysMessage(ss.str().c_str());
+        return true;
+    }
+
+    static bool HandleNpcBotGearScoreCommand(ChatHandler* handler, Optional<std::string_view> class_name)
+    {
+        Player* owner = handler->GetSession()->GetPlayer();
+        Unit* unit = owner->GetSelectedUnit();
+        if (!(unit && owner->GetBotMgr()->GetBot(unit->GetGUID())) && !class_name)
+        {
+            handler->SendSysMessage(".npcbot gs [#class_name]");
+            handler->SendSysMessage("Lists GearScore of your selected NPCBot or all bots by #class_name");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        std::list<Creature*> bots;
+        if (class_name)
+        {
+            std::string cname(*class_name);
+            for (auto const c : cname)
+            {
+                if (!std::islower(c))
+                {
+                    handler->SendSysMessage("Bot class name must be in lower case!");
+                    return true;
+                }
+            }
+
+            uint8 bot_class = BotMgr::BotClassByClassName(cname);
+            if (bot_class == BOT_CLASS_NONE)
+            {
+                handler->PSendSysMessage("Unknown bot name or class %s!", cname.c_str());
+                return true;
+            }
+
+            bots = owner->GetBotMgr()->GetAllBotsByClass(bot_class);
+            if (bots.empty())
+            {
+                handler->PSendSysMessage("No bots of class %u found!", uint32(bot_class));
+                return true;
+            }
+        }
+        else
+            bots.push_back(unit->ToCreature());
+
+        for (Creature const* bot : bots)
+        {
+            auto scores = bot->GetBotAI()->GetBotGearScores();
+            handler->PSendSysMessage("%s's GearScore total: %u, average: %u", bot->GetName().c_str(), uint32(scores.first), uint32(scores.second));
+        }
+
         return true;
     }
 

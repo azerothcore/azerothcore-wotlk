@@ -238,6 +238,7 @@ class bot_ai : public CreatureAI
         bool UnEquipAll(ObjectGuid receiver);
         bool HasRealEquipment() const;
         float GetAverageItemLevel() const;
+        std::pair<float, float> GetBotGearScores() const;
 
         void CastBotItemCombatSpell(DamageInfo const& damageInfo);
         void CastBotItemCombatSpell(DamageInfo const& damageInfo, Item* item, ItemTemplate const* proto);
@@ -621,7 +622,7 @@ class bot_ai : public CreatureAI
         float _getRatingMultiplier(CombatRating cr) const;
 
         float _getStatScore(uint8 stat) const;
-        float _getItemGearScore(ItemTemplate const* iproto, uint8 forslot, Item const* item) const;
+        float _getItemGearStatScore(ItemTemplate const* iproto, uint8 forslot, Item const* item) const;
 
         void _saveStats();
 
