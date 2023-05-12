@@ -1,3 +1,4 @@
+-- DB update 2023_05_12_01 -> 2023_05_12_02
 --
 -- Captain Auric Sunchaser
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=18745;
