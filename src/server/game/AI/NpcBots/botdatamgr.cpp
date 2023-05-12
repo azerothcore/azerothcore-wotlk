@@ -527,11 +527,7 @@ void BotDataMgr::Update(uint32 diff)
             _spareBotIdsPerClassMap[bot->GetBotClass()].insert(origEntry);
 
             BotMgr::CleanupsBeforeBotDelete(bot);
-
-            bot->CombatStop();
-            bot->GetBotAI()->Reset();
             bot->GetBotAI()->canUpdate = false;
-
             bot->GetMap()->AddObjectToRemoveList(bot);
 
             auto bditr = _botsData.find(bot_despawn_id);
