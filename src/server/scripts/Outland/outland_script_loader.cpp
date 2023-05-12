@@ -58,6 +58,9 @@ void AddSC_boss_the_black_stalker();
 void AddSC_instance_the_underbog();
 void AddSC_the_slave_pens();                // The Slave Pens
 void AddSC_boss_ahune();
+void AddSC_boss_mennu_the_betrayer();
+void AddSC_boss_rokmar_the_crackler();
+void AddSC_boss_quagmirran();
 void AddSC_instance_the_slave_pens();
 void AddSC_boss_gruul();                     //Gruul's Lair
 void AddSC_boss_high_king_maulgar();
@@ -154,8 +157,11 @@ void AddOutlandScripts()
     AddSC_boss_ghazan();
     AddSC_boss_the_black_stalker();
     AddSC_instance_the_underbog();
-    AddSC_the_slave_pens();                 // The Slave Pens
+    AddSC_the_slave_pens();                 //CR The Slave Pens
     AddSC_boss_ahune();
+    AddSC_boss_mennu_the_betrayer();
+    AddSC_boss_rokmar_the_crackler();
+    AddSC_boss_quagmirran();
     AddSC_instance_the_slave_pens();
     AddSC_boss_gruul();                     //Gruul's Lair
     AddSC_boss_high_king_maulgar();
