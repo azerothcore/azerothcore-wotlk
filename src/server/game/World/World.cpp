@@ -3340,7 +3340,7 @@ CliCommandHolder::~CliCommandHolder()
     free(m_command);
 }
 
-void World::AddDelayedDamage(ObjectGuid attacker, ObjectGuid victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, uint32 mapId, uint32 instanceId)
+void World::AddDelayedDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss)
 {
     DelayedDamage delayedDamage;
     delayedDamage.attacker = attacker;
@@ -3351,8 +3351,6 @@ void World::AddDelayedDamage(ObjectGuid attacker, ObjectGuid victim, uint32 dama
     delayedDamage.damageSchoolMask = damageSchoolMask;
     delayedDamage.spellProto = spellProto;
     delayedDamage.durabilityLoss = durabilityLoss;
-    delayedDamage.mapId = mapId;
-    delayedDamage.instanceId = instanceId;
     _delayedDamages.push_back(delayedDamage);
 }
 
@@ -3360,18 +3358,10 @@ void World::ProcessDelayedDamages()
 {
     for (auto& damage : _delayedDamages)
     {
-        // Get map first
-        Map* map = sMapMgr->FindMap(damage.mapId, damage.instanceId);
-        if (!map)
+        if (!damage.victim)
             continue;
 
-        // Now we get both, attacker and victim, but attacker can be null (although attacker is always a player).
-        Unit* attacker = ObjectAccessor::GetUnit(map, damage.attacker);
-        Unit* victim = ObjectAccessor::GetUnit(map, damage.victim);
-        if (!victim)
-            continue;
-
-        Unit::DealDamage(attacker, victim, damage.damage, damage.cleanDamage, damage.damagetype, damage.damageSchoolMask, damage.spellProto, damage.durabilityLoss);
+        Unit::DealDamage(damage.attacker, damage.victim, damage.damage, damage.cleanDamage, damage.damagetype, damage.damageSchoolMask, damage.spellProto, damage.durabilityLoss);
     }
     _delayedDamages.clear();
 }

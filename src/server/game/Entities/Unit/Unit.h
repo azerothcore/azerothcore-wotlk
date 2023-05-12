@@ -759,16 +759,14 @@ struct SpellNonMeleeDamage;
 
 struct DelayedDamage
 {
-    ObjectGuid attacker;
-    ObjectGuid victim;
+    Unit* attacker;
+    Unit* victim;
     uint32 damage;
     CleanDamage const* cleanDamage;
     DamageEffectType damagetype;
     SpellSchoolMask damageSchoolMask;
     SpellInfo const* spellProto;
     bool durabilityLoss;
-    uint32 mapId;
-    uint32 instanceId;
 };
 
 class DamageInfo

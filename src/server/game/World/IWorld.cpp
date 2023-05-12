@@ -20,7 +20,7 @@
 class Unit;
 class IWorld;
 
-void IWorld::AddDelayedDamage(ObjectGuid attacker, ObjectGuid victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, uint32 mapId, uint32 instanceId)
+void IWorld::AddDelayedDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss)
 {
     DelayedDamage delayedDamage;
     delayedDamage.attacker = attacker;
@@ -31,7 +31,5 @@ void IWorld::AddDelayedDamage(ObjectGuid attacker, ObjectGuid victim, uint32 dam
     delayedDamage.damageSchoolMask = damageSchoolMask;
     delayedDamage.spellProto = spellProto;
     delayedDamage.durabilityLoss = durabilityLoss;
-    delayedDamage.mapId = mapId;
-    delayedDamage.instanceId = instanceId;
     _delayedDamages.push_back(delayedDamage);
 }
