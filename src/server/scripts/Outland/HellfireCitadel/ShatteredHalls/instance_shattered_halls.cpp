@@ -23,7 +23,8 @@
 ObjectData const creatureData[] =
 {
     { NPC_GRAND_WARLOCK_NETHEKURSE  , DATA_NETHEKURSE     },
-    { NPC_WARCHIEF_KARGATH          , DATA_KARGATH        }
+    { NPC_WARCHIEF_KARGATH          , DATA_KARGATH        },
+    { 0,                                                  , 0                                }
 };
 
 class instance_shattered_halls : public InstanceMapScript
