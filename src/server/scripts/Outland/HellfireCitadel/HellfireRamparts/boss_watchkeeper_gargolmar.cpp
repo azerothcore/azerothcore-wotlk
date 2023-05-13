@@ -38,9 +38,7 @@ enum Spells
 
 enum Misc
 {
-    NPC_HELLFIRE_WATCHER    = 17309,
-
-    EVENT_KILL_TALK         = 1,
+    NPC_HELLFIRE_WATCHER    = 17309
 };
 
 class boss_watchkeeper_gargolmar : public CreatureScript
@@ -118,11 +116,15 @@ public:
 
         void KilledUnit(Unit*) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!_hasSpoken)
             {
+                _hasSpoken = true;
                 Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
             }
+            scheduler.Schedule(6s, [this](TaskContext /*context*/)
+            {
+                _hasSpoken = false;
+            });
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -144,6 +146,7 @@ public:
 
     private:
         bool _taunted;
+        bool _hasSpoken;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

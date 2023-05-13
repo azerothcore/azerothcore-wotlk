@@ -45,9 +45,7 @@ enum Misc
     ACTION_FLY_DOWN                 = 0,
 
     POINT_MIDDLE                    = 0,
-    POINT_FLIGHT                    = 1,
-
-    EVENT_KILL_TALK                 = 1,
+    POINT_FLIGHT                    = 1
 };
 
 enum GroupPhase
@@ -249,7 +247,6 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -308,11 +305,15 @@ public:
 
         void KilledUnit(Unit*) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!_hasSpoken)
             {
+                _hasSpoken = true;
                 Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
             }
+            scheduler.Schedule(6s, [this](TaskContext /*context*/)
+            {
+                _hasSpoken = false;
+            });
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
@@ -339,6 +340,7 @@ public:
 
     private:
         EventMap events;
+        bool _hasSpoken;
         bool _nazanCalled;
     };
 

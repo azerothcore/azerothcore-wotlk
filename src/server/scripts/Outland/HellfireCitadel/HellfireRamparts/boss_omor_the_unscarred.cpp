@@ -95,16 +95,14 @@ public:
 
         void KilledUnit(Unit*) override
         {
-            if(!hasSpoken)
+            if(!_hasSpoken)
             {
-                hasSpoken = true;
+                _hasSpoken = true;
                 Talk(SAY_KILL);
-                LOG_ERROR("server", "Data {}", "say kill Omor");
             }
             scheduler.Schedule(6s, [this](TaskContext /*context*/)
             {
-                LOG_ERROR("server", "Data {}", "say kill Omor ready again");
-                hasSpoken = false;
+                _hasSpoken = false;
             });
         }
 
@@ -147,7 +145,7 @@ public:
 
     private:
         ObjectGuid _targetGUID;
-        bool hasSpoken = false;
+        bool _hasSpoken;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
