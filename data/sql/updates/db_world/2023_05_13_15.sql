@@ -1,3 +1,4 @@
+-- DB update 2023_05_13_14 -> 2023_05_13_15
 DELETE FROM `creature_text` WHERE `CreatureID` = 16807;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (16807, 0, 0, 'You wish to fight us all at once? This should be amusing!\n', 14, 0, 100, 0, 0, 10262, 15594, 0, 'Netherkurse AGGRO_1'),
