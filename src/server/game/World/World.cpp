@@ -2064,8 +2064,6 @@ void World::SetInitialWorldSettings()
 
     _mail_expire_check_timer = GameTime::GetGameTime() + 6h;
 
-    _timers[WUPDATE_DELAYED_DAMAGES].SetInterval(400);
-
     ///- Initialize MapMgr
     LOG_INFO("server.loading", "Starting Map System");
     LOG_INFO("server.loading", " ");
@@ -2311,12 +2309,6 @@ void World::Update(uint32 diff)
 
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Check quest reset times"));
-
-        if (_timers[WUPDATE_DELAYED_DAMAGES].Passed())
-        {
-            _timers[WUPDATE_DELAYED_DAMAGES].Reset();
-            ProcessDelayedDamages();
-        }
 
         /// Handle daily quests reset time
         if (currentGameTime > _nextDailyQuestReset)
@@ -3338,40 +3330,4 @@ CliCommandHolder::CliCommandHolder(void* callbackArg, char const* command, Print
 CliCommandHolder::~CliCommandHolder()
 {
     free(m_command);
-}
-
-void World::AddDelayedDamage(ObjectGuid attacker, ObjectGuid victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, uint32 mapId, uint32 instanceId)
-{
-    DelayedDamage delayedDamage;
-    delayedDamage.attacker = attacker;
-    delayedDamage.victim = victim;
-    delayedDamage.damage = damage;
-    delayedDamage.cleanDamage = cleanDamage;
-    delayedDamage.damagetype = damagetype;
-    delayedDamage.damageSchoolMask = damageSchoolMask;
-    delayedDamage.spellProto = spellProto;
-    delayedDamage.durabilityLoss = durabilityLoss;
-    delayedDamage.mapId = mapId;
-    delayedDamage.instanceId = instanceId;
-    _delayedDamages.push_back(delayedDamage);
-}
-
-void World::ProcessDelayedDamages()
-{
-    for (auto& damage : _delayedDamages)
-    {
-        // Get map first
-        Map* map = sMapMgr->FindMap(damage.mapId, damage.instanceId);
-        if (!map)
-            continue;
-
-        // Now we get both, attacker and victim, but attacker can be null (although attacker is always a player).
-        Unit* attacker = ObjectAccessor::GetUnit(map, damage.attacker);
-        Unit* victim = ObjectAccessor::GetUnit(map, damage.victim);
-        if (!victim)
-            continue;
-
-        Unit::DealDamage(attacker, victim, damage.damage, damage.cleanDamage, damage.damagetype, damage.damageSchoolMask, damage.spellProto, damage.durabilityLoss);
-    }
-    _delayedDamages.clear();
 }
