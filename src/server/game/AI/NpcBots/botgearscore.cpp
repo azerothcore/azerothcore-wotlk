@@ -112,7 +112,7 @@ float CalculateItemGearScore(uint32 botentry, uint8 botlevel, uint8 botclass, ui
             itemscore *= 5.3224f;
     }
 
-    return itemscore;
+    return std::max<float>(itemscore, 0.0f);
 }
 
 std::pair<float, float> CalculateBotGearScore(uint32 botentry, uint8 botlevel, uint8 botclass, uint8 botspec, Item const* const items[BOT_INVENTORY_SIZE])
