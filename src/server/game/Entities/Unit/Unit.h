@@ -1437,6 +1437,11 @@ public:
     [[nodiscard]] uint32 GetUnitState() const { return m_state; }
     [[nodiscard]] bool CanFreeMove() const
     {
+        //npcbot: skip owner guid condition for bots
+        if (IsNPCBotOrPet())
+            return !HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT |
+                                 UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED);
+        //end npcbot
         return !HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT |
                              UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) && !GetOwnerGUID();
     }
