@@ -45,16 +45,13 @@ enum Misc
     ACTION_FLY_DOWN                 = 0,
 
     POINT_MIDDLE                    = 0,
-    POINT_FLIGHT                    = 1,
+    POINT_FLIGHT                    = 1
+};
 
-    EVENT_SPELL_REVENGE             = 1,
-    EVENT_KILL_TALK                 = 2,
-    EVENT_AGGRO_TALK                = 3,
-    EVENT_SPELL_FIREBALL            = 4,
-    EVENT_SPELL_CONE_OF_FIRE        = 5,
-    EVENT_SPELL_BELLOWING_ROAR      = 6,
-    EVENT_CHANGE_POS                = 7,
-    EVENT_RESTORE_COMBAT            = 8
+enum GroupPhase
+{
+    GROUP_PHASE_1                   = 0,
+    GROUP_PHASE_2                   = 1
 };
 
 const Position NazanPos[3] =
@@ -158,10 +155,14 @@ class boss_nazan : public CreatureScript
 public:
     boss_nazan() : CreatureScript("boss_nazan") { }
 
-    struct boss_nazanAI : public ScriptedAI
+    struct boss_nazanAI : public BossAI
     {
-        boss_nazanAI(Creature* creature) : ScriptedAI(creature)
+        boss_nazanAI(Creature* creature) : BossAI(creature, DATA_VAZRUDEN)
         {
+            scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
         }
 
         void Reset() override
@@ -178,8 +179,17 @@ public:
 
         void JustEngagedWith(Unit*) override
         {
-            events.ScheduleEvent(EVENT_CHANGE_POS, 0);
-            events.ScheduleEvent(EVENT_SPELL_FIREBALL, 5000);
+            scheduler.CancelGroup(GROUP_PHASE_2);
+            scheduler.Schedule(5ms, GROUP_PHASE_1, [this](TaskContext context)
+            {
+                me->GetMotionMaster()->MovePoint(POINT_FLIGHT, NazanPos[urand(0, 2)], false);
+                scheduler.DelayAll(7s);
+                context.Repeat(30s);
+            }).Schedule(5s, GROUP_PHASE_1, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_FIREBALL);
+                context.Repeat(4s, 6s);
+            });
         }
 
         void AttackStart(Unit* who) override
@@ -209,11 +219,26 @@ public:
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetReactState(REACT_AGGRESSIVE);
-                events.ScheduleEvent(EVENT_RESTORE_COMBAT, 1);
-                events.ScheduleEvent(EVENT_SPELL_CONE_OF_FIRE, 5000);
-                events.ScheduleEvent(EVENT_SPELL_FIREBALL, 6000);
+                scheduler.CancelGroup(GROUP_PHASE_1);
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
+
+                scheduler.Schedule(5s, GROUP_PHASE_2, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_CONE_OF_FIRE);
+                    context.Repeat(12s);
+                }).Schedule(6s, GROUP_PHASE_2, [this](TaskContext context)
+                {
+                    DoCastRandomTarget(SPELL_FIREBALL);
+                    context.Repeat(4s, 6s);
+                });
                 if (IsHeroic())
-                    events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 10000);
+                {
+                    scheduler.Schedule(10s, GROUP_PHASE_2, [this](TaskContext context)
+                    {
+                        DoCastSelf(SPELL_BELLOWING_ROAR);
+                        context.Repeat(30s);
+                    });
+                }
             }
         }
 
@@ -222,34 +247,8 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_FIREBALL:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_FIREBALL, false);
-                    events.ScheduleEvent(EVENT_SPELL_FIREBALL, urand(4000, 6000));
-                    break;
-                case EVENT_CHANGE_POS:
-                    me->GetMotionMaster()->MovePoint(POINT_FLIGHT, NazanPos[urand(0, 2)], false);
-                    events.DelayEvents(7000);
-                    events.ScheduleEvent(EVENT_CHANGE_POS, 30000);
-                    break;
-                case EVENT_RESTORE_COMBAT:
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    break;
-                case EVENT_SPELL_CONE_OF_FIRE:
-                    me->CastSpell(me->GetVictim(), SPELL_CONE_OF_FIRE, false);
-                    events.ScheduleEvent(EVENT_SPELL_CONE_OF_FIRE, 12000);
-                    break;
-                case EVENT_SPELL_BELLOWING_ROAR:
-                    me->CastSpell(me, SPELL_BELLOWING_ROAR, false);
-                    events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 30000);
-                    break;
-            }
 
             if (!me->IsLevitating())
                 DoMeleeAttackIfReady();
@@ -270,9 +269,15 @@ class boss_vazruden : public CreatureScript
 public:
     boss_vazruden() : CreatureScript("boss_vazruden") { }
 
-    struct boss_vazrudenAI : public ScriptedAI
+    struct boss_vazrudenAI : public BossAI
     {
-        boss_vazrudenAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_vazrudenAI(Creature* creature) : BossAI(creature, DATA_VAZRUDEN)
+        {
+            scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+        }
 
         void Reset() override
         {
@@ -288,17 +293,27 @@ public:
 
         void JustEngagedWith(Unit*) override
         {
-            events.ScheduleEvent(EVENT_AGGRO_TALK, 5000);
-            events.ScheduleEvent(EVENT_SPELL_REVENGE, 4000);
+            scheduler.Schedule(5s, [this](TaskContext /*context*/)
+            {
+                Talk(SAY_AGGRO);
+            }).Schedule(4s, [this](TaskContext context)
+            {
+                DoCastVictim(DUNGEON_MODE(SPELL_REVENGE, SPELL_REVENGE_H));
+                context.Repeat(6s);
+            });
         }
 
         void KilledUnit(Unit*) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!_hasSpoken)
             {
+                _hasSpoken = true;
                 Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
             }
+            scheduler.Schedule(6s, [this](TaskContext /*context*/)
+            {
+                _hasSpoken = false;
+            });
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
@@ -320,23 +335,12 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_AGGRO_TALK:
-                    Talk(SAY_AGGRO);
-                    break;
-                case EVENT_SPELL_REVENGE:
-                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_REVENGE, SPELL_REVENGE_H), false);
-                    events.ScheduleEvent(EVENT_SPELL_REVENGE, 6000);
-                    break;
-            }
-
             DoMeleeAttackIfReady();
         }
 
     private:
         EventMap events;
+        bool _hasSpoken;
         bool _nazanCalled;
     };
 
