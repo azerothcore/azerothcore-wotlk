@@ -97,14 +97,12 @@ public:
         {
             if(!_hasSpoken)
             {
-                LOG_ERROR("server", "Data {}", "test has not spoken trigger");
                 _hasSpoken = true;
                 Talk(SAY_KILL);
             }
             scheduler.Schedule(6s, [this](TaskContext /*context*/)
             {
                 _hasSpoken = false;
-                LOG_ERROR("server", "Data {}", "test has not spoken cooldown reached");
             });
         }
 
