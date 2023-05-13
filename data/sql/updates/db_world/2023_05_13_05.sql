@@ -1,3 +1,4 @@
+-- DB update 2023_05_13_04 -> 2023_05_13_05
 --
 UPDATE `creature_template`
 SET `mingold` = 448, `maxgold` = 2520

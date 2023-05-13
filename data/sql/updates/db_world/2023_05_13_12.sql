@@ -1,3 +1,4 @@
+-- DB update 2023_05_13_11 -> 2023_05_13_12
 -- Co-authored-by: aletson <aletson@users.noreply.github.com> https://github.com/TrinityCore/TrinityCore/pull/20630
 -- Floon(18588) & Raliq the Drunk(18585) & Sal'salabim(18584)
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` IN (18588,18585,18584);

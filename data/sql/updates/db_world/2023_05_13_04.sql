@@ -1,3 +1,4 @@
+-- DB update 2023_05_13_03 -> 2023_05_13_04
  
 -- SQL Dark Ranger Loralen emote
 DELETE FROM `creature_template_addon` WHERE (`entry` = 37779);

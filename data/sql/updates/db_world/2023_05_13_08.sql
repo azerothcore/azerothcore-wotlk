@@ -1,3 +1,4 @@
+-- DB update 2023_05_13_07 -> 2023_05_13_08
 --
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_violet_hold_defense_system' WHERE `entry`=30837;
 

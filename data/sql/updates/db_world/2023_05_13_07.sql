@@ -1,3 +1,4 @@
+-- DB update 2023_05_13_06 -> 2023_05_13_07
 --
 UPDATE `smart_scripts` SET `comment` = 'Windroc - In Combat - Cast \'Eagle Claw\'' WHERE `entryorguid` = 17128 AND `source_type` = 0 AND `id` = 0;
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `Entry` = 18220;
