@@ -94,7 +94,7 @@ public:
             }).Schedule(3s, [this](TaskContext context)
             {
                 Talk(SAY_SURGE);
-                if(Unit* target = (SelectTargetMethod::MinDistance, 0))
+                if(Unit* target = SelectTarget((SelectTargetMethod::MinDistance), 0))
                 {
                     me->CastSpell(target, SPELL_SURGE);
                 }
