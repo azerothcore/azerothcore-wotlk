@@ -37,11 +37,6 @@ enum Spells
     SPELL_DEMONIC_SHIELD        = 31901,
 };
 
-enum Misc
-{
-    EVENT_KILL_TALK             = 1
-};
-
 class boss_omor_the_unscarred : public CreatureScript
 {
 public:
@@ -100,11 +95,17 @@ public:
 
         void KilledUnit(Unit*) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if(!hasSpoken)
             {
+                hasSpoken = true;
                 Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                LOG_ERROR("server", "Data {}", "say kill Omor");
             }
+            scheduler.Schedule(6s, [this](TaskContext /*context*/)
+            {
+                LOG_ERROR("server", "Data {}", "say kill Omor ready again");
+                hasSpoken = false;
+            });
         }
 
         void JustSummoned(Creature* summon) override
@@ -125,7 +126,6 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -147,6 +147,7 @@ public:
 
     private:
         ObjectGuid _targetGUID;
+        bool hasSpoken = false;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
