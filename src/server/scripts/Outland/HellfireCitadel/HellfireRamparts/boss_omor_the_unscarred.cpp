@@ -34,7 +34,7 @@ enum Spells
     SPELL_SHADOW_BOLT           = 30686,
     SPELL_SUMMON_FIENDISH_HOUND = 30707,
     SPELL_TREACHEROUS_AURA      = 30695,
-    SPELL_DEMONIC_SHIELD        = 31901,
+    SPELL_DEMONIC_SHIELD        = 31901
 };
 
 class boss_omor_the_unscarred : public CreatureScript

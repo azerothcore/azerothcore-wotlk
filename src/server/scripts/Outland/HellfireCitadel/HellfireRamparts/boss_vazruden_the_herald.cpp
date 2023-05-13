@@ -43,7 +43,6 @@ enum Spells
 enum Misc
 {
     ACTION_FLY_DOWN                 = 0,
-
     POINT_MIDDLE                    = 0,
     POINT_FLIGHT                    = 1
 };

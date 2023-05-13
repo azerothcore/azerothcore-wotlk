@@ -31,7 +31,7 @@ enum Says
 
 enum Spells
 {
-    SPELL_MORTAL_WOUND    = 30641,
+    SPELL_MORTAL_WOUND      = 30641,
     SPELL_SURGE             = 34645,
     SPELL_RETALIATION       = 22857
 };
