@@ -90,7 +90,6 @@ public:
                 context.Repeat(12s, 18s);
             }).Schedule(10s, [this](TaskContext /*context*/)
             {
-                Talk(SAY_SUMMON); //check if plays two times
                 DoCastSelf(SPELL_SUMMON_FIENDISH_HOUND);
             }).Schedule(25s, [this](TaskContext context)
             {
