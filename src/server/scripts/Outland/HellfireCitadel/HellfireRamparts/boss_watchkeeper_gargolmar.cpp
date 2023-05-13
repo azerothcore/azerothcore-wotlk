@@ -31,7 +31,7 @@ enum Says
 
 enum Spells
 {
-    SPELL_MORTAL_WOUND      = 30641,
+    SPELL_MORTAL_WOUND    = 30641,
     SPELL_SURGE             = 34645,
     SPELL_RETALIATION       = 22857
 };
@@ -40,11 +40,7 @@ enum Misc
 {
     NPC_HELLFIRE_WATCHER    = 17309,
 
-    EVENT_MORTAL_WOUND      = 1,
-    EVENT_SURGE             = 2,
-    EVENT_RETALIATION       = 3,
-    EVENT_KILL_TALK         = 4,
-    EVENT_CHECK_HEALTH      = 5
+    EVENT_KILL_TALK         = 1,
 };
 
 class boss_watchkeeper_gargolmar : public CreatureScript
@@ -57,21 +53,53 @@ public:
         boss_watchkeeper_gargolmarAI(Creature* creature) : BossAI(creature, DATA_WATCHKEEPER_GARGOLMAR)
         {
             _taunted = false;
+
+            scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
         }
 
         void Reset() override
         {
-            BossAI::Reset();
+            _Reset();
+
+            ScheduleHealthCheckEvent(50, [&]{
+                Talk(SAY_HEAL);
+                std::list<Creature*> clist;
+                me->GetCreaturesWithEntryInRange(clist, 100.0f, NPC_HELLFIRE_WATCHER);
+                for (std::list<Creature*>::const_iterator itr = clist.begin(); itr != clist.end(); ++itr)
+                    (*itr)->AI()->SetData(NPC_HELLFIRE_WATCHER, 0);
+            });
+
+            ScheduleHealthCheckEvent(20, [&]{
+                DoCastSelf(SPELL_RETALIATION);
+                scheduler.Schedule(30s, [this](TaskContext context)
+                {
+                    DoCastSelf(SPELL_RETALIATION);
+                    context.Repeat(30s);
+                });
+            });
         }
 
-        void JustEngagedWith(Unit* who) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            BossAI::JustEngagedWith(who);
-            events.ScheduleEvent(EVENT_MORTAL_WOUND, 5000);
-            events.ScheduleEvent(EVENT_SURGE, 3000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-            events.ScheduleEvent(EVENT_RETALIATION, 1000);
+            _JustEngagedWith();
+
+            scheduler.Schedule(5s, [this] (TaskContext context)
+            {
+                DoCastVictim(SPELL_MORTAL_WOUND);
+                context.Repeat(8s);
+            }).Schedule(3s, [this](TaskContext context)
+            {
+                Talk(SAY_SURGE);
+                if(Unit* target = (SelectTargetMethod::MinDistance, 0))
+                {
+                    me->CastSpell(target, SPELL_SURGE);
+                }
+                context.Repeat(11s);
+            });
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -97,10 +125,10 @@ public:
             }
         }
 
-        void JustDied(Unit* killer) override
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DIE);
-            BossAI::JustDied(killer);
+            _JustDied();
         }
 
         void UpdateAI(uint32 diff) override
@@ -108,44 +136,8 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_MORTAL_WOUND:
-                    me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
-                    events.ScheduleEvent(EVENT_MORTAL_WOUND, 8000);
-                    break;
-                case EVENT_SURGE:
-                    Talk(SAY_SURGE);
-                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0))
-                        me->CastSpell(target, SPELL_SURGE, false);
-                    events.ScheduleEvent(EVENT_SURGE, 11000);
-                    break;
-                case EVENT_RETALIATION:
-                    if (me->HealthBelowPct(20))
-                    {
-                        me->CastSpell(me, SPELL_RETALIATION, false);
-                        events.ScheduleEvent(EVENT_RETALIATION, 30000);
-                    }
-                    else
-                        events.ScheduleEvent(EVENT_RETALIATION, 500);
-                    break;
-                case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(50))
-                    {
-                        Talk(SAY_HEAL);
-                        std::list<Creature*> clist;
-                        me->GetCreaturesWithEntryInRange(clist, 100.0f, NPC_HELLFIRE_WATCHER);
-                        for (std::list<Creature*>::const_iterator itr = clist.begin(); itr != clist.end(); ++itr)
-                            (*itr)->AI()->SetData(NPC_HELLFIRE_WATCHER, 0);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
-                    break;
-            }
 
             DoMeleeAttackIfReady();
         }
