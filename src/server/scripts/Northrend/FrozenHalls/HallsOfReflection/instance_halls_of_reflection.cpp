@@ -1041,7 +1041,7 @@ public:
                                 falric->SetVisible(false);
                             if (Creature* marwyn = instance->GetCreature(NPC_MarwynGUID))
                                 marwyn->SetVisible(false);
-                          ResumeFirstEventStep = 0;
+                              ResumeFirstEventStep = 0;
                             ResumeFirstEventTimer = 0;
                             break;
                     }
