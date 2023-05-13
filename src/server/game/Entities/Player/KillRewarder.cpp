@@ -181,6 +181,7 @@ void KillRewarder::_RewardXP(Player* player, float rate)
         //end npcbot
 
         // 4.2.3. Give XP to player.
+        sScriptMgr->OnGivePlayerXP(player, xp, _victim, PlayerXPSource::XPSOURCE_KILL);
         player->GiveXP(xp, _victim, _groupRate);
         if (Pet* pet = player->GetPet())
             // 4.2.4. If player has pet, reward pet with XP (100% for single player, 50% for group case).

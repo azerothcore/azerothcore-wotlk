@@ -869,7 +869,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 {
     if (delayed && attacker && attacker->GetTypeId() == TYPEID_PLAYER && attacker->GetGUID() != victim->GetGUID())
     {
-        sWorld->AddDelayedDamage(attacker, victim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto, durabilityLoss);
+        sWorld->AddDelayedDamage(attacker->GetGUID(), victim->GetGUID(), damage, cleanDamage, damagetype, damageSchoolMask, spellProto, durabilityLoss, attacker->GetMapId(), attacker->GetInstanceId());
         return 0;
     }
 
@@ -21167,6 +21167,9 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     Vehicle* vehicle = m_vehicle;
     Unit* vehicleBase = m_vehicle->GetBase();
     m_vehicle = nullptr;
+
+    if (!vehicleBase)
+        return;
 
     SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEMENTFLAG_ROOT
 
