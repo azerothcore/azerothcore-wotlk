@@ -444,7 +444,9 @@ public:
                                 c->SetReactState(REACT_AGGRESSIVE);
                             }
                             if (Creature* c = instance->GetCreature(NPC_FrostswornGeneralGUID))
-                                c->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                            {
+                                    c->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                                }
                             WaveNumber = 0;
                             DoUpdateWorldState(WORLD_STATE_HOR_COUNTER, 0);
 
