@@ -22,128 +22,6 @@ x-ac-shared-conf: &ac-shared-conf
     AC_DISABLE_INTERACTIVE: "1"
 
 services:
-#=======================
-#
-# DATABASE
-#
-#=======================
-  ac-database-dev:
-    <<: *networks
-    image: mysql:8.0
-    restart: unless-stopped
-    cap_add:
-      - SYS_NICE  # CAP_SYS_NICE
-    ports:
-      - ${DOCKER_DB_EXTERNAL_PORT:-3306}:3306
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD:-azerothcore}
-    volumes:
-      - type: volume
-        source: ac-database-dev
-        target: /var/lib/mysql
-    healthcheck:
-      test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
-      interval: 5s
-      timeout: 10s
-      retries: 40
-    profiles: [dev-build, dev]
-
-#======================
-#
-# Dev services
-#
-#======================
-  # Used for the build process to avoid the host binding of /azerothcore
-  # and speedup the compilation by avoiding the host-container
-  # filesystem conversion issue on non-ext filesystems.
-  # # Reference https://stackoverflow.com/a/63437557/1964544
-  ac-dev-build:
-    <<: [ *ac-shared-conf ] # merge with
-    image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
-    user: ${DOCKER_USER:-root}
-    cap_add:
-      - SYS_NICE  # CAP_SYS_NICE
-    build:
-      <<: *build-params
-      target: dev
-      dockerfile: ./apps/docker/dev-server.Dockerfile
-    security_opt:
-      - seccomp:unconfined
-    env_file:
-        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    volumes:
-      # expose some dist folder outside allowing the host to use them
-      - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
-      - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin
-      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
-      - ac-build-dev:/azerothcore/var/build
-      - ac-ccache-dev:/azerothcore/var/ccache
-    profiles: [dev-build]
-
-  #
-  # Dev server with the ./azerothcore folder binded from the host
-  # Please use Linux, WSL2 or any ext-compatible filesystem
-  # to avoid performance issues
-  #
-  ac-dev-server:
-    <<: [ *ac-shared-conf ] # merge with
-    tty: true
-    image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
-    user: ${DOCKER_USER:-root}
-    cap_add:
-      - SYS_NICE  # CAP_SYS_NICE
-    build:
-      <<: *build-params
-      target: dev
-      dockerfile: ./apps/docker/dev-server.Dockerfile
-      cache_from:
-        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
-    security_opt:
-      - seccomp:unconfined
-    env_file:
-      ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
-    ports:
-      - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
-      - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
-      - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
-    volumes:
-      - ${DOCKER_VOL_ROOT:-.}:/azerothcore:cached
-      # expose some dist folder outside allowing the host to use them
-      - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
-      - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin
-      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
-      # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
-      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
-      - ac-build-dev:/azerothcore/var/build
-      - ac-ccache-dev:/azerothcore/var/ccache
-      # client data
-      - ${DOCKER_VOL_DATA_CAMERAS:-./env/docker/data/Cameras}:/azerothcore/env/dist/data/Cameras
-      - ${DOCKER_VOL_DATA_DBC:-./env/docker/data/dbc}:/azerothcore/env/dist/data/dbc
-      - ${DOCKER_VOL_DATA_MAPS:-./env/docker/data/maps}:/azerothcore/env/dist/data/maps
-      - ${DOCKER_VOL_DATA_VMAPS:-./env/docker/data/vmaps}:/azerothcore/env/dist/data/vmaps
-      - ${DOCKER_VOL_DATA_MMAPS:-./env/docker/data/mmaps}:/azerothcore/env/dist/data/mmaps
-      # remount again for the extractors
-      - ${DOCKER_VOL_DATA_CAMERAS:-./env/docker/data/Cameras}:/azerothcore/env/dist/bin/Cameras
-      - ${DOCKER_VOL_DATA_DBC:-./env/docker/data/dbc}:/azerothcore/env/dist/bin/dbc
-      - ${DOCKER_VOL_DATA_MAPS:-./env/docker/data/maps}:/azerothcore/env/dist/bin/maps
-      - ${DOCKER_VOL_DATA_VMAPS:-./env/docker/data/vmaps}:/azerothcore/env/dist/bin/vmaps
-      - ${DOCKER_VOL_DATA_MMAPS:-./env/docker/data/mmaps}:/azerothcore/env/dist/bin/mmaps
-      # this is not the directory of the extracted data! It's the client folder used by the extractors
-      - ${DOCKER_AC_CLIENT_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
-    profiles: [dev]
-    depends_on:
-      ac-database-dev:
-        condition: service_healthy
-
-#======================
-#
-# Production Services
-#
-#======================
-
-# In this context, Production just means
-#   "the services you should be running for standard play"
-
   ac-database:
     <<: *networks
     image: mysql:8.0
@@ -223,7 +101,6 @@ services:
     depends_on:
       ac-database:
         condition: service_healthy
-
 
   ac-client-data:
     image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master}
