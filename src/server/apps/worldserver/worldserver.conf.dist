@@ -2267,7 +2267,20 @@ Rate.Drop.Item.Artifact         = 1
 Rate.Drop.Item.Referenced       = 1
 Rate.Drop.Money                 = 1
 
-#    RewardBonusMoney
+#    Rate.Drop.Item.ReferencedAmount
+#        Description: Multiplier for referenced loot amount. Makes many raid bosses (and others) drop additional loot.
+#        Default:     1
+
+Rate.Drop.Item.ReferencedAmount = 1
+
+#
+#    Rate.Drop.Item.GroupAmount
+#        Description: Multiplier for grouped items. Makes many dungeon bosses (and others) drop additional loot.
+#        Default:     1
+
+Rate.Drop.Item.GroupAmount = 1
+
+#    Rate.RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
 #                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
 #                     NOTE: the final amount will also affected by Rate.Drop.Money
@@ -2330,13 +2343,6 @@ Rate.BuyValue.Item.Epic             = 1
 Rate.BuyValue.Item.Legendary        = 1
 Rate.BuyValue.Item.Artifact         = 1
 Rate.BuyValue.Item.Heirloom         = 1
-
-#
-#    Rate.Drop.Item.ReferencedAmount
-#        Description: Multiplier for referenced loot amount.
-#        Default:     1
-
-Rate.Drop.Item.ReferencedAmount = 1
 
 #
 #    Rate.XP.Kill
