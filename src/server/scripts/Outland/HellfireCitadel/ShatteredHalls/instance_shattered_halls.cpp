@@ -20,6 +20,13 @@
 #include "ScriptMgr.h"
 #include "shattered_halls.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_GRAND_WARLOCK_NETHEKURSE  , DATA_NETHEKURSE     },
+    { NPC_WARCHIEF_KARGATH          , DATA_KARGATH        },
+    { 0,                                                  0                                }
+};
+
 class instance_shattered_halls : public InstanceMapScript
 {
 public:
@@ -37,6 +44,7 @@ public:
         void Initialize() override
         {
             SetBossNumber(ENCOUNTER_COUNT);
+            LoadObjectData(creatureData, nullptr);
 
             TeamIdInInstance = TEAM_NEUTRAL;
             RescueTimer = 100 * MINUTE * IN_MILLISECONDS;
@@ -101,6 +109,7 @@ public:
                     prisonerGUID[2] = creature->GetGUID();
                     break;
             }
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -198,6 +207,7 @@ public:
 
     protected:
         ObjectGuid warchiefKargathGUID;
+        ObjectGuid grandWarlockNethekurseGUID;
         ObjectGuid nethekurseDoor1GUID;
         ObjectGuid nethekurseDoor2GUID;
 
