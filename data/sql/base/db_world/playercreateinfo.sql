@@ -20,17 +20,16 @@ CREATE TABLE IF NOT EXISTS `playercreateinfo` (
   `race` tinyint unsigned NOT NULL DEFAULT '0',
   `class` tinyint unsigned NOT NULL DEFAULT '0',
   `map` smallint unsigned NOT NULL DEFAULT '0',
-  `zone` mediumint unsigned NOT NULL DEFAULT '0',
+  `zone` int unsigned NOT NULL DEFAULT '0',
   `position_x` float NOT NULL DEFAULT '0',
   `position_y` float NOT NULL DEFAULT '0',
   `position_z` float NOT NULL DEFAULT '0',
   `orientation` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`race`,`class`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.playercreateinfo: 62 rows
+-- Dumping data for table acore_world.playercreateinfo: ~62 rows (approximately)
 DELETE FROM `playercreateinfo`;
-/*!40000 ALTER TABLE `playercreateinfo` DISABLE KEYS */;
 INSERT INTO `playercreateinfo` (`race`, `class`, `map`, `zone`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
 	(1, 1, 0, 12, -8949.95, -132.493, 83.5312, 0),
 	(1, 2, 0, 12, -8949.95, -132.493, 83.5312, 0),
@@ -94,7 +93,6 @@ INSERT INTO `playercreateinfo` (`race`, `class`, `map`, `zone`, `position_x`, `p
 	(11, 6, 609, 4298, 2358.17, -5663.21, 426.027, 3.65997),
 	(11, 7, 530, 3526, -3961.64, -13931.2, 100.615, 2.08364),
 	(11, 8, 530, 3526, -3961.64, -13931.2, 100.615, 2.08364);
-/*!40000 ALTER TABLE `playercreateinfo` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

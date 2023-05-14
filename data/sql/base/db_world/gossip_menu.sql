@@ -18,13 +18,12 @@
 DROP TABLE IF EXISTS `gossip_menu`;
 CREATE TABLE IF NOT EXISTS `gossip_menu` (
   `MenuID` smallint unsigned NOT NULL DEFAULT '0',
-  `TextID` mediumint unsigned NOT NULL DEFAULT '0',
+  `TextID` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`MenuID`,`TextID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gossip_menu: 5,954 rows
+-- Dumping data for table acore_world.gossip_menu: ~5,961 rows (approximately)
 DELETE FROM `gossip_menu`;
-/*!40000 ALTER TABLE `gossip_menu` DISABLE KEYS */;
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(21, 518),
 	(21, 519),
@@ -346,7 +345,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(1664, 2316),
 	(1665, 2317),
 	(1666, 2318),
-	(1667, 2317),
+	(1667, 2319),
 	(1668, 2320),
 	(1681, 2333),
 	(1701, 2353),
@@ -2281,6 +2280,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(7159, 8424),
 	(7160, 8429),
 	(7162, 8431),
+	(7162, 8432),
 	(7163, 8433),
 	(7171, 8445),
 	(7172, 8447),
@@ -2588,6 +2588,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(7517, 9117),
 	(7519, 9118),
 	(7520, 9119),
+	(7520, 9144),
 	(7521, 9121),
 	(7522, 8785),
 	(7522, 9122),
@@ -2752,10 +2753,12 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(7697, 9392),
 	(7698, 9393),
 	(7699, 9394),
+	(7699, 9403),
 	(7700, 9395),
 	(7701, 9397),
 	(7703, 9401),
 	(7704, 9405),
+	(7704, 9406),
 	(7704, 9425),
 	(7705, 9406),
 	(7706, 9410),
@@ -2897,6 +2900,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(7865, 9631),
 	(7865, 9632),
 	(7866, 9634),
+	(7868, 9635),
 	(7868, 9636),
 	(7869, 938),
 	(7872, 9637),
@@ -3121,6 +3125,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(8116, 9922),
 	(8116, 10045),
 	(8117, 10051),
+	(8117, 10210),
 	(8118, 10054),
 	(8119, 10056),
 	(8120, 10058),
@@ -4622,6 +4627,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(9795, 13482),
 	(9795, 13485),
 	(9797, 13501),
+	(9798, 13502),
 	(9798, 13503),
 	(9799, 13504),
 	(9800, 580),
@@ -5980,7 +5986,6 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(61028, 50034),
 	(61029, 50020),
 	(61030, 50019);
-/*!40000 ALTER TABLE `gossip_menu` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

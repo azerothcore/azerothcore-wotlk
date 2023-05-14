@@ -37,14 +37,12 @@ CREATE TABLE IF NOT EXISTS `creaturedisplayinfoextra_dbc` (
   `NPCItemDisplay10` int unsigned NOT NULL DEFAULT '0',
   `NPCItemDisplay11` int unsigned NOT NULL DEFAULT '0',
   `Flags` int unsigned NOT NULL DEFAULT '0',
-  `BakeName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `BakeName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creaturedisplayinfoextra_dbc: 0 rows
+-- Dumping data for table acore_world.creaturedisplayinfoextra_dbc: ~0 rows (approximately)
 DELETE FROM `creaturedisplayinfoextra_dbc`;
-/*!40000 ALTER TABLE `creaturedisplayinfoextra_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `creaturedisplayinfoextra_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

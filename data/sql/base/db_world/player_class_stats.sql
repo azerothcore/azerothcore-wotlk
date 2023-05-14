@@ -25,11 +25,10 @@ CREATE TABLE IF NOT EXISTS `player_class_stats` (
   `Intellect` int unsigned NOT NULL DEFAULT '0',
   `Spirit` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`Class`,`Level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores levels stats.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci PACK_KEYS=0 COMMENT='Stores levels stats.';
 
--- Dumping data for table acore_world.player_class_stats: 746 rows
+-- Dumping data for table acore_world.player_class_stats: ~746 rows (approximately)
 DELETE FROM `player_class_stats`;
-/*!40000 ALTER TABLE `player_class_stats` DISABLE KEYS */;
 INSERT INTO `player_class_stats` (`Class`, `Level`, `Strength`, `Agility`, `Stamina`, `Intellect`, `Spirit`) VALUES
 	(1, 1, 23, 20, 22, 20, 20),
 	(1, 2, 24, 21, 23, 20, 20),
@@ -777,7 +776,6 @@ INSERT INTO `player_class_stats` (`Class`, `Level`, `Strength`, `Agility`, `Stam
 	(11, 78, 87, 80, 95, 138, 153),
 	(11, 79, 88, 81, 96, 141, 156),
 	(11, 80, 89, 82, 98, 143, 159);
-/*!40000 ALTER TABLE `player_class_stats` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
