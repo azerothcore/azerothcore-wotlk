@@ -43,6 +43,7 @@ RUN mkdir -pv /azerothcore/apps                  \
               /azerothcore/var/build/obj         \
               /azerothcore/var/ccache
 
+# configure timezone
 RUN apt update && \
     apt install -y tzdata ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
@@ -50,6 +51,7 @@ RUN apt update && \
     echo $TZ > /etc/timezone && \
     dpkg-reconfigure --frontend noninteractive tzdata
 
+# Create the acore user and set their homedir to /azerothcore
 RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
     useradd -d /azerothcore --uid "$USER_ID"  --gid "$GROUP_ID"  "$DOCKER_USER" && \
     passwd -d "$DOCKER_USER" && \
@@ -133,6 +135,7 @@ FROM skeleton as runtime
 
 ENV ACORE_COMPONENT=undefined
 
+# Install base dependencies for azerothcore
 RUN apt update && \
     apt install -y --no-install-recommends \
       libmysqlclient21 libreadline8 \
