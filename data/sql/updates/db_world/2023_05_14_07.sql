@@ -1,3 +1,4 @@
+-- DB update 2023_05_14_06 -> 2023_05_14_07
 -- 
 -- Polly (pre E.C.A.C)
 UPDATE `creature_template` SET `minlevel` = 50, `maxlevel` = 50 WHERE `entry` = 7167;
