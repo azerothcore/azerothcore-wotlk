@@ -173,15 +173,15 @@ services:
     <<: *ac-shared-conf
     init: true
     cap_add:
-      - SYS_NICE  # CAP_SYS_NICE
+      - SYS_NICE
     image: acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
     restart: unless-stopped
     env_file:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     environment:
-      SAFE_WORLDSERVER: "true"
-      ACORE_USERNAME: ${ACORE_USERNAME:-}
-      ACORE_PASSWORD: ${ACORE_PASSWORD:-}
+      SAFE_WORLDSERVER: "${SAFE_WORLDSERVER:-true}"
+      ACORE_USERNAME: "${ACORE_USERNAME:-}"
+      ACORE_PASSWORD: "${ACORE_PASSWORD:-}"
     build:
       target: worldserver
       <<: *build-params
@@ -198,8 +198,6 @@ services:
     depends_on:
       ac-database:
         condition: service_healthy
-      ac-db-import:
-        condition: service_completed_successfully
       ac-client-data:
         condition: service_completed_successfully
     stop_grace_period: 1m
@@ -225,8 +223,6 @@ services:
     depends_on:
       ac-database:
         condition: service_healthy
-      ac-db-import:
-        condition: service_completed_successfully
 
 
   ac-client-data:
@@ -258,22 +254,6 @@ services:
       - ${DOCKER_AC_CLIENT_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
       - ${DOCKER_VOL_CONFIG:-./env/docker/etc}:/azerothcore/env/dist/etc:rw
     profiles: [tools]
-
-  ac-db-import:
-    <<: *ac-shared-conf
-    image: acore/ac-wotlk-db-import:${DOCKER_IMAGE_TAG:-master}
-    volumes:
-      - ${DOCKER_VOL_DATA:-./data/}:/azerothcore/data:ro
-      - ${DOCKER_VOL_MODULES:-./modules/}:/azerothcore/modules:ro
-      - ${DOCKER_VOL_ETC:-./env/docker/etc/}:/azerothcore/env/dist/etc:rw
-    build:
-      target: dbimport
-      <<: *build-params
-    profiles: [app]
-    depends_on:
-      ac-database:
-        condition: service_healthy
-
 
   #
   # In case you want to get the builds themselves

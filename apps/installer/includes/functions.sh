@@ -222,32 +222,50 @@ function inst_simple_restarter {
 }
 
 function inst_download_client_data {
-    # change the following version when needed
-    local VERSION=v16
+    VERSION="${VERSION:-v16}"
+    DATAPATH="${DATAPATH:-AC_BINPATH_FULL}"
+    DATAPATH_ZIP="${DATAPATH_ZIP:-$(mktemp -d)/data.zip}"
 
-    echo "#######################"
-    echo "Client data downloader"
-    echo "#######################"
+    local dataVersionFile="$DATAPATH/data-version"
+    local INSTALLED_VERSION="false"
 
-    # first check if it's defined in env, otherwise use the default
-    local path="${DATAPATH:-$AC_BINPATH_FULL}"
-    local zipPath="${DATAPATH_ZIP:-"$path/data.zip"}"
 
-    dataVersionFile="$path/data-version"
+    cat << EOF
+##########################
+# Client data downloader #
+##########################
 
-    [ -f "$dataVersionFile" ] && source "$dataVersionFile"
+version = $VERSION
+EOF
 
-    # create the path if doesn't exists
-    mkdir -p "$path"
+
+    mkdir -pv "$DATAPATH"
+
+    if [ -f "$dataVersionFile" ]; then
+      source "$dataVersionFile"
+    fi
 
     if [ "$VERSION" == "$INSTALLED_VERSION" ]; then
-        echo "Data $VERSION already installed. If you want to force the download remove the following file: $dataVersionFile"
+      cat << EOF
+Client data $VERSION is already installed.
+
+If you want to force the download, remove the data version file located at $dataVersionFile:
+
+$ rm $dataVersionFile
+EOF
         return
     fi
 
-    echo "Downloading client data in: $zipPath ..."
-    curl -L https://github.com/wowgaming/client-data/releases/download/$VERSION/data.zip > "$zipPath" \
-        && echo "unzip downloaded file in $path..." && unzip -q -o "$zipPath" -d "$path/" \
-        && echo "Remove downloaded file" && rm "$zipPath" \
-        && echo "INSTALLED_VERSION=$VERSION" > "$dataVersionFile"
+    echo "Downloading client data to $DATAPATH_ZIP..."
+    curl -L -# -o "$DATAPATH_ZIP" \
+      "https://github.com/wowgaming/client-data/releases/download/$VERSION/data.zip"
+    echo "Download finished"
+    echo "Extracting client data to $DATAPATH..."
+
+    unzip -q -o "$DATAPATH_ZIP" -d "$DATAPATH/"
+
+    echo "Client data successfully extracted to $DATAPATH"
+    echo "Cleanup file at $DATAPATH_ZIP"
+    rm "$DATAPATH_ZIP"
+    echo "INSTALLED_VERSION=$VERSION" > "$dataVersionFile"
 }

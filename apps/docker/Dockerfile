@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1-labs
 
 ARG TZ=Etc/UTC
-ARG UBUNTU_VERSION=20.04
+ARG UBUNTU_VERSION=22.04
 
 # Create Directory tree
 FROM ubuntu:$UBUNTU_VERSION as skeleton
@@ -9,8 +9,12 @@ FROM ubuntu:$UBUNTU_VERSION as skeleton
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 ARG DOCKER_USER=acore
+ARG INSTALLER_GUARDYVAR=1
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV DOCKER=true
+ENV TZ=$TZ
+ENV AC_FORCE_CREATE_DB=1
 
 WORKDIR /azerothcore
 
@@ -41,7 +45,10 @@ RUN mkdir -pv /azerothcore/apps                  \
 
 RUN apt update && \
     apt install -y tzdata ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone && \
+    dpkg-reconfigure --frontend noninteractive tzdata
 
 RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
     useradd -d /azerothcore --uid "$USER_ID"  --gid "$GROUP_ID"  "$DOCKER_USER" && \
@@ -52,50 +59,53 @@ RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
 
 FROM skeleton as build
 
-ARG TZ
 ARG CTOOLS_BUILD=all
+ARG USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
+ARG CTYPE=RelWithDebInfo
+ARG AC_CCACHE=true
+ARG CCACHE_CPP2=true
+ARG CSCRIPTPCH=OFF
+ARG CCOREPCH=OFF
+ARG CSCRIPTS=static
+ARG CSCRIPTS_DEFAULT_LINKAGE=static
+ARG CMODULES=static
+
+# Install the Eluna Lua scripting engine
 ARG INSTALL_ELUNA=true
-
-
-ENV TZ=$TZ
-ENV DEBIAN_FRONTEND=noninteractive
-ARG SKIP_INSTALL_DENO=true
-
-ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
-ENV CTYPE=RelWithDebInfo
-ENV AC_CCACHE=true
-ENV CCACHE_CPP2=true
-ENV CSCRIPTPCH=OFF
-ENV CCOREPCH=OFF
-ENV CTOOLS_BUILD=$CTOOLS_BUILD
-ENV CSCRIPTS=static
-ENV CSCRIPTS_DEFAULT_LINKAGE=static
-ENV CMODULES=static
 
 WORKDIR /azerothcore
 
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone && \
-    dpkg-reconfigure --frontend noninteractive tzdata
-
-# This is a lot of packages to download
-# We're going to benefit from caching apt packages
-RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
-    --mount=target=/var/cache/apt,type=cache,sharing=locked \
+# This is a lot of large packages to download
+RUN --mount=target=/var/cache/apt,type=cache,sharing=locked \
     rm -f /etc/apt/apt.conf.d/docker-clean && \
     apt update && \
     apt install -y --no-install-recommends \
-      git lsb-core curl unzip sudo \
-      make cmake clang libmysqlclient-dev \
-      libboost-system-dev libboost-filesystem-dev \
+      # Build tools
+      git lsb-core curl unzip sudo make cmake clang  mysql-client\
+      build-essential ccache libtool cmake-data openssl \
+      # source libraries
+      libmysqlclient-dev libboost-system-dev libboost-filesystem-dev \
       libboost-program-options-dev libboost-iostreams-dev \
-      build-essential libtool cmake-data openssl \
       libssl-dev libmysql++-dev libreadline-dev zlib1g-dev \
-      libbz2-dev mysql-client \
-      libncurses5-dev ccache && \
+      libbz2-dev libncurses5-dev && \
     rm -rf /var/lib/apt/lists/*
 
+# see .dockerignore to see what isn't being blocked in.
+# main things NOT bringing brought in are
+# - /.git
+# - /apps, except for the few necessary sections
+# - /build*
+# - /data
+# - /deps/deno
+# - /env/dist
+# - /env/user
+# - /env/docker/logs
+# - /env/docker/data
+# - /env/**/bin
+# - /var
 COPY . .
+
+# Copy configs into env/dist. Config generation scripts make assumptions that they will be in this dir
 COPY env/docker env/dist
 
 RUN if [ "$INSTALL_ELUNA" = "true" ]; then \
@@ -106,8 +116,11 @@ RUN if [ "$INSTALL_ELUNA" = "true" ]; then \
       modules/mod-eluna; \
     fi
 
+# Force re-run the build without removing docker cache with this build arg
+# --build-arg CACHEBUST=$(date +%s)
 ARG CACHEBUST=1
 
+# As
 RUN --mount=type=cache,target=/azerothcore/var/ \
     git config --global --add safe.directory /azerothcore && \
     DOCKER=1 bash apps/compiler/compiler.sh build
@@ -118,29 +131,20 @@ RUN --mount=type=cache,target=/azerothcore/var/ \
 
 FROM skeleton as runtime
 
-ARG TZ Etc/UTC
-
-ENV TZ $TZ
-ENV DEBIAN_FRONTEND=noninteractive
 ENV ACORE_COMPONENT=undefined
-ENV DOCKER=1
-
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone && \
-    dpkg-reconfigure --frontend noninteractive tzdata
 
 RUN apt update && \
-    apt install -y \ 
+    apt install -y --no-install-recommends \
       libmysqlclient21 libreadline8 \
       gettext-base expect mysql-client && \
     rm -rf /var/lib/apt/lists/*
 
 COPY apps/docker/entrypoint.sh /entrypoint.sh
-COPY acore.json acore.json 
+COPY acore.json acore.json
 
 RUN chmod -v +x /entrypoint.sh
 
-# Create a separate dir with the configs. 
+# Create a separate dir with the configs.
 # The entrypoint will move these to env/dist/etc and template them with env variables
 COPY --from=build /azerothcore/env/dist/etc/ /azerothcore/env/ref/etc/
 
@@ -222,26 +226,6 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
   /azerothcore/env/dist/bin/vmap4_extractor /azerothcore/env/client/vmap4_extractor
 
-#############
-# DB Import #
-#############
-
-FROM runtime as dbimport
-
-LABEL description "AzerothCore Database Import tool"
-
-USER $DOCKER_USER
-
-ENV ACORE_COMPONENT=dbimport
-
-COPY --chown=$DOCKER_USER:$DOCKER_USER\
-     --from=build \
-     /azerothcore/env/dist/bin/dbimport /azerothcore/env/dist/bin/dbimport
-
-VOLUME /azerothcore/env/dist/etc
-
-CMD /azerothcore/env/dist/bin/dbimport
-
 ###############
 # Client Data #
 ###############
@@ -250,19 +234,16 @@ FROM skeleton as client-data
 
 LABEL description="AzerothCore client-data"
 
+ENV DATAPATH=/azerothcore/env/dist/data
+
 RUN apt update && \
     apt install -y curl unzip && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER apps apps
 
-COPY --chown=$DOCKER_USER:$DOCKER_USER \
-  apps/docker/client-data.sh /azerothcore/apps/docker/client-data.sh
-
-RUN chmod +x /azerothcore/apps/docker/client-data.sh
-
 VOLUME /azerothcore/env/dist/data
 
 USER $DOCKER_USER
 
-CMD /azerothcore/apps/docker/client-data.sh 
+CMD bash -c "source /azerothcore/apps/installer/includes/functions.sh && inst_download_client_data"
