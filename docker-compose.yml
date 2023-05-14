@@ -48,7 +48,7 @@ services:
 
   ac-database:
     <<: *networks
-    image: mysql:8.0
+    image: mysql:8.0.32
     restart: unless-stopped
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
