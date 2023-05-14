@@ -1,4 +1,3 @@
---
 -- [Q] Deciphering the Book -- http://wotlk.openwow.com/quest=9557
 -- Anchorite Paetheus SAI
 SET @ENTRY := 17424;
