@@ -104,7 +104,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
             DoCastSelf(SPELL_DARK_SPIN);
         });
     }
-    
+
     void JustDied(Unit* /*killer*/) override
     {
         Talk(SAY_DIE);
