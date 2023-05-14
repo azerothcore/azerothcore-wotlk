@@ -4521,6 +4521,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
     });
 
+    // Hit Rating (Dungeon T3 - 2P Bonus - Wastewalker, Doomplate)
+    ApplySpellFix({ 37608, 37610 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(0);
+        spellInfo->Effects[EFFECT_0].MiscValue = 224;
+    });
+
     // Mulgore Hatchling (periodic)
     ApplySpellFix({ 62586 }, [](SpellInfo* spellInfo)
     {
