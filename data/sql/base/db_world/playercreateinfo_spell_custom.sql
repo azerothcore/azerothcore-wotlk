@@ -19,15 +19,13 @@ DROP TABLE IF EXISTS `playercreateinfo_spell_custom`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_spell_custom` (
   `racemask` int unsigned NOT NULL DEFAULT '0',
   `classmask` int unsigned NOT NULL DEFAULT '0',
-  `Spell` mediumint unsigned NOT NULL DEFAULT '0',
-  `Note` varchar(255) DEFAULT NULL,
+  `Spell` int unsigned NOT NULL DEFAULT '0',
+  `Note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`racemask`,`classmask`,`Spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.playercreateinfo_spell_custom: 0 rows
+-- Dumping data for table acore_world.playercreateinfo_spell_custom: ~0 rows (approximately)
 DELETE FROM `playercreateinfo_spell_custom`;
-/*!40000 ALTER TABLE `playercreateinfo_spell_custom` DISABLE KEYS */;
-/*!40000 ALTER TABLE `playercreateinfo_spell_custom` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

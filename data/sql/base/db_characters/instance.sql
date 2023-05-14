@@ -22,12 +22,12 @@ CREATE TABLE IF NOT EXISTS `instance` (
   `resettime` int unsigned NOT NULL DEFAULT '0',
   `difficulty` tinyint unsigned NOT NULL DEFAULT '0',
   `completedEncounters` int unsigned NOT NULL DEFAULT '0',
-  `data` tinytext NOT NULL,
+  `data` tinytext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `map` (`map`),
   KEY `resettime` (`resettime`),
   KEY `difficulty` (`difficulty`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.instance: ~0 rows (approximately)
 DELETE FROM `instance`;

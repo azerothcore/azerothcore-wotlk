@@ -18,11 +18,11 @@
 DROP TABLE IF EXISTS `pet_spell_cooldown`;
 CREATE TABLE IF NOT EXISTS `pet_spell_cooldown` (
   `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier, Low part',
-  `spell` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
-  `category` mediumint unsigned NOT NULL DEFAULT '0',
+  `spell` int unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
+  `category` int unsigned DEFAULT '0',
   `time` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`spell`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.pet_spell_cooldown: ~0 rows (approximately)
 DELETE FROM `pet_spell_cooldown`;

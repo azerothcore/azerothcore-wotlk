@@ -31,11 +31,10 @@ CREATE TABLE IF NOT EXISTS `reputation_spillover_template` (
   `rate_4` float NOT NULL DEFAULT '0',
   `rank_4` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`faction`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Reputation spillover reputation gain';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Reputation spillover reputation gain';
 
--- Dumping data for table acore_world.reputation_spillover_template: 26 rows
+-- Dumping data for table acore_world.reputation_spillover_template: ~26 rows (approximately)
 DELETE FROM `reputation_spillover_template`;
-/*!40000 ALTER TABLE `reputation_spillover_template` DISABLE KEYS */;
 INSERT INTO `reputation_spillover_template` (`faction`, `faction1`, `rate_1`, `rank_1`, `faction2`, `rate_2`, `rank_2`, `faction3`, `rate_3`, `rank_3`, `faction4`, `rate_4`, `rank_4`) VALUES
 	(21, 369, 0.5, 7, 470, 0.5, 7, 577, 0.5, 7, 0, 0, 0),
 	(47, 72, 0.25, 7, 54, 0.25, 7, 69, 0.25, 7, 930, 0.25, 7),
@@ -63,7 +62,6 @@ INSERT INTO `reputation_spillover_template` (`faction`, `faction1`, `rate_1`, `r
 	(1105, 1104, -2.2, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 	(1124, 1052, 0.5, 7, 1064, 0.5, 7, 1067, 0.5, 7, 1085, 0.5, 7),
 	(1126, 1037, 0.5, 7, 1050, 0.5, 7, 1068, 0.5, 7, 1094, 0.5, 7);
-/*!40000 ALTER TABLE `reputation_spillover_template` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

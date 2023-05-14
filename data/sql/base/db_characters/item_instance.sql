@@ -18,22 +18,22 @@
 DROP TABLE IF EXISTS `item_instance`;
 CREATE TABLE IF NOT EXISTS `item_instance` (
   `guid` int unsigned NOT NULL DEFAULT '0',
-  `itemEntry` mediumint unsigned NOT NULL DEFAULT '0',
+  `itemEntry` int unsigned DEFAULT '0',
   `owner_guid` int unsigned NOT NULL DEFAULT '0',
   `creatorGuid` int unsigned NOT NULL DEFAULT '0',
   `giftCreatorGuid` int unsigned NOT NULL DEFAULT '0',
   `count` int unsigned NOT NULL DEFAULT '1',
   `duration` int NOT NULL DEFAULT '0',
-  `charges` tinytext,
-  `flags` mediumint unsigned NOT NULL DEFAULT '0',
-  `enchantments` text NOT NULL,
+  `charges` tinytext COLLATE utf8mb4_unicode_ci,
+  `flags` int unsigned DEFAULT '0',
+  `enchantments` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `randomPropertyId` smallint NOT NULL DEFAULT '0',
   `durability` smallint unsigned NOT NULL DEFAULT '0',
   `playedTime` int unsigned NOT NULL DEFAULT '0',
-  `text` text,
+  `text` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`guid`),
   KEY `idx_owner_guid` (`owner_guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Item System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Item System';
 
 -- Dumping data for table acore_characters.item_instance: ~0 rows (approximately)
 DELETE FROM `item_instance`;

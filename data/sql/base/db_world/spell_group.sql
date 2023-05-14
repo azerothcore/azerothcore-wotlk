@@ -21,11 +21,10 @@ CREATE TABLE IF NOT EXISTS `spell_group` (
   `spell_id` int unsigned NOT NULL DEFAULT '0',
   `special_flag` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`spell_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Spell System';
 
--- Dumping data for table acore_world.spell_group: 356 rows
+-- Dumping data for table acore_world.spell_group: ~358 rows (approximately)
 DELETE FROM `spell_group`;
-/*!40000 ALTER TABLE `spell_group` DISABLE KEYS */;
 INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1, 673, 2),
 	(1, 2367, 1),
@@ -102,6 +101,7 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1, 28521, 3),
 	(1, 28540, 3),
 	(1, 29348, 2),
+	(1, 33053, 3),
 	(1, 33720, 1),
 	(1, 33721, 1),
 	(1, 33726, 1),
@@ -154,8 +154,14 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1001, 5021, 0),
 	(1001, 5257, 0),
 	(1001, 6114, 0),
+	(1001, 15852, 0),
 	(1001, 18125, 0),
 	(1001, 18141, 0),
+	(1001, 18191, 0),
+	(1001, 18192, 0),
+	(1001, 18193, 0),
+	(1001, 18194, 0),
+	(1001, 18222, 0),
 	(1001, 19705, 0),
 	(1001, 19706, 0),
 	(1001, 19708, 0),
@@ -163,11 +169,13 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1001, 19710, 0),
 	(1001, 19711, 0),
 	(1001, 20875, 0),
+	(1001, 22730, 0),
 	(1001, 22789, 0),
 	(1001, 23697, 0),
 	(1001, 24799, 0),
 	(1001, 24870, 0),
 	(1001, 25037, 0),
+	(1001, 25661, 0),
 	(1001, 25694, 0),
 	(1001, 25722, 0),
 	(1001, 25804, 0),
@@ -294,6 +302,8 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1013, 30708, 0),
 	(1014, 89, 2),
 	(1014, 6343, 4096),
+	(1014, 8042, 0),
+	(1014, 20005, 0),
 	(1014, 55095, 0),
 	(1014, 58179, 2),
 	(1014, 68055, 1),
@@ -327,11 +337,16 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1022, 5760, 0),
 	(1022, 31589, 0),
 	(1023, 1126, 0),
+	(1023, 16878, 0),
 	(1023, 21849, 0),
+	(1023, 24752, 0),
+	(1023, 39233, 0),
 	(1023, 72588, 0),
 	(1024, 1243, 0),
 	(1024, 8099, 0),
 	(1024, 21562, 0),
+	(1024, 23947, 0),
+	(1024, 23948, 0),
 	(1024, 72590, 0),
 	(1025, 976, 0),
 	(1025, 27683, 0),
@@ -367,23 +382,8 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1112, 8220, 0),
 	(1112, 8221, 0),
 	(1112, 8222, 0),
-	(1113, 57055, 0),
 	(1113, 56648, 0),
-	(1023, 16878, 0),
-	(1023, 24752, 0),
-	(1023, 39233, 0),
-	(1024, 23947, 0),
-	(1024, 23948, 0),
-	(1001, 22730, 0),
-	(1001, 18191, 0),
-	(1001, 18192, 0),
-	(1001, 18193, 0),
-	(1001, 18194, 0),
-	(1001, 18222, 0),
-	(1001, 15852, 0),
-	(1014, 8042, 0),
-	(1014, 20005, 0);
-/*!40000 ALTER TABLE `spell_group` ENABLE KEYS */;
+	(1113, 57055, 0);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
