@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `character_aura` (
   `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `casterGuid` bigint unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
   `itemGuid` bigint unsigned NOT NULL DEFAULT '0',
-  `spell` mediumint unsigned NOT NULL DEFAULT '0',
+  `spell` int unsigned NOT NULL DEFAULT '0',
   `effectMask` tinyint unsigned NOT NULL DEFAULT '0',
   `recalculateMask` tinyint unsigned NOT NULL DEFAULT '0',
   `stackCount` tinyint unsigned NOT NULL DEFAULT '1',
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `character_aura` (
   `remainTime` int NOT NULL DEFAULT '0',
   `remainCharges` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`casterGuid`,`itemGuid`,`spell`,`effectMask`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
 -- Dumping data for table acore_characters.character_aura: ~0 rows (approximately)
 DELETE FROM `character_aura`;

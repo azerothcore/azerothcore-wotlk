@@ -102,7 +102,6 @@ public:
             {
                 if (Creature* broggok = instance->GetCreature(DATA_BROGGOK))
                 {
-                    instance->SetData(DATA_BROGGOK, IN_PROGRESS);
                     broggok->AI()->DoAction(ACTION_PREPARE_BROGGOK);
                 }
             }

@@ -18,16 +18,15 @@
 DROP TABLE IF EXISTS `transports`;
 CREATE TABLE IF NOT EXISTS `transports` (
   `guid` int unsigned NOT NULL AUTO_INCREMENT,
-  `entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `name` text,
-  `ScriptName` char(64) NOT NULL DEFAULT '',
+  `entry` int unsigned NOT NULL DEFAULT '0',
+  `name` text COLLATE utf8mb4_unicode_ci,
+  `ScriptName` char(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`guid`),
   UNIQUE KEY `idx_entry` (`entry`)
-) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Transports';
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Transports';
 
--- Dumping data for table acore_world.transports: 20 rows
+-- Dumping data for table acore_world.transports: ~20 rows (approximately)
 DELETE FROM `transports`;
-/*!40000 ALTER TABLE `transports` DISABLE KEYS */;
 INSERT INTO `transports` (`guid`, `entry`, `name`, `ScriptName`) VALUES
 	(1, 176495, 'Undercity, Tirisfal Glades and Grom\'gol Base Camp, Stranglethorn Vale ("The Purple Princess")', ''),
 	(2, 176310, 'Stormwind Harbor and Auberdine, Darkshore ("Ship (The Bravery)")', ''),
@@ -49,7 +48,6 @@ INSERT INTO `transports` (`guid`, `entry`, `name`, `ScriptName`) VALUES
 	(18, 192241, 'Horde gunship patrolling above Icecrown ("Orgrim\'s Hammer")', ''),
 	(19, 192242, 'Alliance gunship patrolling above Icecrown ("The Skybreaker")', ''),
 	(20, 190549, 'Orgrimmar and Thunder Bluff', '');
-/*!40000 ALTER TABLE `transports` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
