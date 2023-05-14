@@ -1,3 +1,4 @@
+-- DB update 2023_05_14_03 -> 2023_05_14_04
 -- Jessera of Mac'Aree SAI
 SET @ENTRY := 17663;
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
