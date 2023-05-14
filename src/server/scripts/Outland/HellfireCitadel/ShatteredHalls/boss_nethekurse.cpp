@@ -152,49 +152,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
         });
     }
 
-    void SetData(uint32 data, uint32 value) override
-    {
-        if (data != SETDATA_DATA)
-            return;
-
-        switch (value)
-        {
-            case SETDATA_PEON_AGGRO:
-                if (PeonEngagedCount >= 4)
-                    return;
-
-                if (EventStage < EVENT_STAGE_TAUNT)
-                {
-                    Talk(SAY_PEON_ATTACKED);
-                }
-                break;
-            case SETDATA_PEON_DEATH:
-                if (PeonKilledCount >= 4)
-                    return;
-
-                if (EventStage < EVENT_STAGE_TAUNT)
-                {
-                    PeonDieRP();
-                }
-                if (++PeonKilledCount == 4)
-                {
-                    DoAction(ACTION_CANCEL_INTRO);
-                }
-                break;
-        }
-    }
-
-    void PeonDieRP()
-    {
-        me->GetMotionMaster()->Clear();
-        me->SetFacingTo(4.572762489318847656f);
-        scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
-        {
-            me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
-            Talk(SAY_PEON_DIES);
-        });
-    }
-
     void AttackStart(Unit* who) override
     {
         if (EventStage < EVENT_STAGE_MAIN)
@@ -377,6 +334,11 @@ class spell_tsh_shadow_bolt : public SpellScript
                 target = randomTarget;
             }
         }
+    }
+
+    void Register() override
+    {
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_tsh_shadow_bolt::SelectRandomPlayer, EFFECT_0, TARGET_UNIT_TARGET_ENEMY);
     }
 };
 
