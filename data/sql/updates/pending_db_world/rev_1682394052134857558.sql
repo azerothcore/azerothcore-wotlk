@@ -40,3 +40,4 @@ DELETE FROM `creature_queststarter`  WHERE `id` IN (18369,18445);
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 (18369, 9923),
 (18445, 9955);
+
