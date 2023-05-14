@@ -36,7 +36,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-151033, 0, 1002, 1003, 38, 0, 100, 0, 3, 2, 0, 0, 0, 226, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Data Set 3 2 - Enable'),
 (-151034, 0, 1002, 1003, 38, 0, 100, 0, 3, 2, 0, 0, 0, 226, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Sharpshooter - On Data Set 3 2 - Enable');
 
--- Start WP 1670002, say line 5
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = -151019) AND (`source_type` = 0) AND (`id` IN (1009, 1010, 1011));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-151019, 0, 1009, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670011, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Linked - Run Script'),
@@ -47,7 +46,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1670011, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1670002, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Start Waypoint'),
 (1670011, 9, 1, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Say Line 5');
 
--- Start WP 1670004, Say Line 8
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = -151024) AND (`source_type` = 0) AND (`id` IN (1008, 1009, 1010));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-151024, 0, 1008, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1670012, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Linked - Run Script'),
@@ -57,3 +55,5 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1670012
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1670012, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 1670004, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Start Waypoint'),
 (1670012, 9, 1, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 1, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Actionlist - Say Line 8');
+
+UPDATE `smart_scripts` SET `event_flags`=257 WHERE `entryorguid`=-151029 AND `source_type`=0 AND `id`=1008 AND `link`=1009;
