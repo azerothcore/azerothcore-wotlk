@@ -156,7 +156,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
     {
         if (EventStage < EVENT_STAGE_MAIN)
             return;
-            
+
         if (me->Attack(who, true))
         {
             DoStartMovement(who);
@@ -347,7 +347,7 @@ class at_rp_nethekurse : public OnlyOnceAreaTriggerScript
 {
 public:
     at_rp_nethekurse() : OnlyOnceAreaTriggerScript("at_rp_nethekurse") { }
-    
+
     bool _OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
         if (player->IsGameMaster())
