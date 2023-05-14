@@ -170,7 +170,7 @@ struct boss_warchief_kargath_bladefist : public BossAI
 
         scheduler.Update(diff);
 
-        if (!events.IsInPhase(1)) //  howToMigrate?  scheduler.IsGroupScheduled(1) ?
+        if (!events.IsInPhase(1)) //  howToMigrate?
             DoMeleeAttackIfReady();
     }
 };

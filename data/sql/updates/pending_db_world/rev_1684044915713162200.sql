@@ -5,13 +5,5 @@ INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpell
 (30925, 30925, 40059),
 (12739, 12739, 15472),
 (30500, 30500, 35954),
-(30495, 30495, 35953),
-
-
-
-
-
-
-
-
+(30495, 30495, 35953);
 
