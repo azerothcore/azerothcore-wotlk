@@ -313,7 +313,7 @@ public:
                 kelidan->AI()->DoAction(ACTION_CHANNELER_ENGAGED);
 
             me->InterruptNonMeleeSpells(false);
-            events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, urand(1500, 3500));
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, urand(1200, 2400));
             events.ScheduleEvent(EVENT_SPELL_MARK, urand(5000, 6500));
         }
 
@@ -336,7 +336,7 @@ public:
             {
                 case EVENT_SPELL_SHADOW_BOLT:
                     me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SHADOW_BOLT_H : SPELL_SHADOW_BOLT, false);
-                    events.RepeatEvent(urand(6000, 7500));
+                    events.RepeatEvent(urand(6000, 7200));
                     break;
                 case EVENT_SPELL_MARK:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))

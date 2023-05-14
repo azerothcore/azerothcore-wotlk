@@ -212,6 +212,17 @@ Unit* ObjectAccessor::GetUnit(WorldObject const& u, ObjectGuid const guid)
     return GetCreature(u, guid);
 }
 
+Unit* ObjectAccessor::GetUnit(Map const* map, ObjectGuid const guid)
+{
+    if (guid.IsPlayer())
+        return GetPlayer(map, guid);
+
+    if (guid.IsPet())
+        return const_cast<Map*>(map)->GetPet(guid);
+
+    return const_cast<Map*>(map)->GetCreature(guid);
+}
+
 Creature* ObjectAccessor::GetCreature(WorldObject const& u, ObjectGuid const guid)
 {
     return u.GetMap()->GetCreature(guid);

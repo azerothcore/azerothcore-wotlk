@@ -19,21 +19,19 @@ DROP TABLE IF EXISTS `log_arena_memberstats`;
 CREATE TABLE IF NOT EXISTS `log_arena_memberstats` (
   `fight_id` int unsigned NOT NULL,
   `member_id` tinyint unsigned NOT NULL,
-  `name` char(20) NOT NULL,
+  `name` char(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `guid` int unsigned NOT NULL,
   `team` int unsigned NOT NULL,
   `account` int unsigned NOT NULL,
-  `ip` char(15) NOT NULL,
+  `ip` char(15) COLLATE utf8mb4_unicode_ci NOT NULL,
   `damage` int unsigned NOT NULL,
   `heal` int unsigned NOT NULL,
   `kblows` int unsigned NOT NULL,
   PRIMARY KEY (`fight_id`,`member_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_characters.log_arena_memberstats: 0 rows
+-- Dumping data for table acore_characters.log_arena_memberstats: ~0 rows (approximately)
 DELETE FROM `log_arena_memberstats`;
-/*!40000 ALTER TABLE `log_arena_memberstats` DISABLE KEYS */;
-/*!40000 ALTER TABLE `log_arena_memberstats` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

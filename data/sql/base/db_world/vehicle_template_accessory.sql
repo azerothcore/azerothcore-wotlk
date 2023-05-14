@@ -17,19 +17,18 @@
 -- Dumping structure for table acore_world.vehicle_template_accessory
 DROP TABLE IF EXISTS `vehicle_template_accessory`;
 CREATE TABLE IF NOT EXISTS `vehicle_template_accessory` (
-  `entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `accessory_entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `entry` int unsigned NOT NULL DEFAULT '0',
+  `accessory_entry` int unsigned NOT NULL DEFAULT '0',
   `seat_id` tinyint NOT NULL DEFAULT '0',
   `minion` tinyint unsigned NOT NULL DEFAULT '0',
-  `description` text NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `summontype` tinyint unsigned NOT NULL DEFAULT '6' COMMENT 'see enum TempSummonType',
   `summontimer` int unsigned NOT NULL DEFAULT '30000' COMMENT 'timer, only relevant for certain summontypes',
   PRIMARY KEY (`entry`,`seat_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.vehicle_template_accessory: 193 rows
+-- Dumping data for table acore_world.vehicle_template_accessory: ~193 rows (approximately)
 DELETE FROM `vehicle_template_accessory`;
-/*!40000 ALTER TABLE `vehicle_template_accessory` DISABLE KEYS */;
 INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer`) VALUES
 	(24083, 24082, 0, 0, 'Proto-Drake Handler', 6, 120000),
 	(24750, 24751, 0, 1, 'Excelsior rides Hidalgo the Master Falconer', 6, 30000),
@@ -224,7 +223,6 @@ INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`,
 	(40472, 40100, 1, 1, 'Orb Carrier', 6, 30000),
 	(40472, 40468, 2, 1, 'Orb Carrier', 6, 30000),
 	(40472, 40469, 3, 1, 'Orb Carrier', 6, 30000);
-/*!40000 ALTER TABLE `vehicle_template_accessory` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

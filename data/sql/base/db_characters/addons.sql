@@ -17,10 +17,10 @@
 -- Dumping structure for table acore_characters.addons
 DROP TABLE IF EXISTS `addons`;
 CREATE TABLE IF NOT EXISTS `addons` (
-  `name` varchar(120) NOT NULL DEFAULT '',
+  `name` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `crc` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Addons';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Addons';
 
 -- Dumping data for table acore_characters.addons: ~23 rows (approximately)
 DELETE FROM `addons`;

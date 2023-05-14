@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `character_stats` (
   `resilience` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`),
   CONSTRAINT `character_stats_chk_1` CHECK (((`blockPct` >= 0) and (`dodgePct` >= 0) and (`parryPct` >= 0) and (`critPct` >= 0) and (`rangedCritPct` >= 0) and (`spellCritPct` >= 0)))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.character_stats: ~0 rows (approximately)
 DELETE FROM `character_stats`;
