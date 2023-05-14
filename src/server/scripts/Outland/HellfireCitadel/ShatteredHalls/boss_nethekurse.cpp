@@ -357,7 +357,7 @@ class spell_tsh_shadow_bolt : public SpellScript
                     }
                 }
             }
-                    
+
             if (!playerList.empty())
             {
                 target = Acore::Containers::SelectRandomContainerElement(playerList);
