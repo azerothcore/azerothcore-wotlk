@@ -24,17 +24,15 @@
 #include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
-#include "Unit.h"
 #include <atomic>
 #include <list>
 #include <map>
 #include <set>
 #include <unordered_map>
 
-class IWorld;
-class Player;
 class WorldPacket;
 class WorldSession;
+class Player;
 
 /// Storage class for commands issued for delayed execution
 struct AC_GAME_API CliCommandHolder
@@ -438,8 +436,8 @@ enum Rates
     RATE_DROP_ITEM_LEGENDARY,
     RATE_DROP_ITEM_ARTIFACT,
     RATE_DROP_ITEM_REFERENCED,
-
     RATE_DROP_ITEM_REFERENCED_AMOUNT,
+    RATE_DROP_ITEM_GROUP_AMOUNT,
     RATE_SELLVALUE_ITEM_POOR,
     RATE_SELLVALUE_ITEM_NORMAL,
     RATE_SELLVALUE_ITEM_UNCOMMON,
@@ -518,13 +516,10 @@ enum Rates
 class IWorld
 {
 public:
-    std::list<DelayedDamage> _delayedDamages;
-
     virtual ~IWorld() = default;
     [[nodiscard]] virtual WorldSession* FindSession(uint32 id) const = 0;
     [[nodiscard]] virtual WorldSession* FindOfflineSession(uint32 id) const = 0;
     [[nodiscard]] virtual WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const = 0;
-    virtual void AddDelayedDamage(ObjectGuid attacker, ObjectGuid victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, uint32 mapId, uint32 instanceId);
     virtual void AddSession(WorldSession* s) = 0;
     virtual bool KickSession(uint32 id) = 0;
     virtual void UpdateMaxSessionCounters() = 0;
