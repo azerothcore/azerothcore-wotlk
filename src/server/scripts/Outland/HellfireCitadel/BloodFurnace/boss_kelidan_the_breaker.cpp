@@ -118,7 +118,7 @@ struct boss_kelidan_the_breaker : public BossAI
                 DoCastAOE(SPELL_VORTEX);
             }
             scheduler.DelayGroup(0, 6s);
-            scheduler.Schedule(5s, [this](TaskContext context)
+            scheduler.Schedule(5s, [this](TaskContext /*context*/)
             {
                 DoCastSelf(SPELL_FIRE_NOVA, true);
             });

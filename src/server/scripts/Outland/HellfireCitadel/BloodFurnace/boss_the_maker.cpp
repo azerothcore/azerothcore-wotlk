@@ -26,7 +26,7 @@ enum Says
     SAY_DIE                 = 2
 };
 
-enum eEnums
+enum Spells
 {
     SPELL_EXPLODING_BEAKER  = 30925,
     SPELL_DOMINATION        = 30923
