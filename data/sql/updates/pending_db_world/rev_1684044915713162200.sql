@@ -1,5 +1,5 @@
 --
-DELETE FROM `spelldifficulty_dbc` WHERE `ID`=19130;
+DELETE FROM `spelldifficulty_dbc` WHERE `ID` IN (19130,30925,12739,30500,30495);
 INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpellID_2`) VALUES
 (19130, 19130, 40392),
 (30925, 30925, 40059),
