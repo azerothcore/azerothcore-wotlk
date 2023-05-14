@@ -35,17 +35,14 @@ enum Texts
 
 enum Spells
 {
-    SPELL_DEATH_COIL_N      = 30500,
-    SPELL_DEATH_COIL_H      = 35954,
-    SPELL_DARK_SPIN         = 30502,
-    SPELL_SHADOW_FISSURE    = 30496,
-    SPELL_SHADOW_CLEAVE_N   = 30495,
-    SPELL_SHADOW_SLAM_H     = 35953,
+    SPELL_DEATH_COIL           = 30500,
+    SPELL_DARK_SPIN            = 30502,
+    SPELL_SHADOW_FISSURE       = 30496,
+    SPELL_SHADOW_CLEAVE        = 30495,
 
-    // Spells used exclusively in RP
-    SPELL_SHADOW_SEAR       = 30735,
-    SPELL_DEATH_COIL        = 30741,
-    SPELL_SHADOW_FISSURE_RP = 30745
+    SPELL_SHADOW_SEAR          = 30735,
+    SPELL_DEATH_COIL_RP        = 30741,
+    SPELL_SHADOW_FISSURE_RP    = 30745
 };
 
 enum Events
@@ -275,7 +272,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
         if (choice == 1)
         {
             Talk(SAY_DEATH_COIL);
-            me->CastSpell(me, SPELL_DEATH_COIL_RP, false);
+            me->CastSpell(me, SPELL_DEATH_COIL, false);
         }
         else if (choice == 2)
         {
@@ -358,14 +355,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
         if (!me->HealthBelowPct(25))
             DoMeleeAttackIfReady();
     }
-
-private:
-    uint8 PeonEngagedCount = 0;
-    uint8 PeonKilledCount = 0;
-    uint8 EventStage;
-    bool introDone;
-    bool ATreached = false;
-};
 
 private:
     uint8 PeonEngagedCount = 0;
