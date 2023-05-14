@@ -43,7 +43,7 @@ enum Spells
 
 struct boss_talon_king_ikiss : public BossAI
 {
-    boss_talon_king_ikiss(Creature* creature) : BossAI(creature, DATA_IKISS), _spoken(false), _manaShield(false)
+    boss_talon_king_ikiss(Creature* creature) : BossAI(creature, DATA_IKISS), _spoken(false)
     {
         scheduler.SetValidator([this]
         {
@@ -55,8 +55,31 @@ struct boss_talon_king_ikiss : public BossAI
     {
         _Reset();
         _spoken = false;
-        _manaShield = false;
-        _comboHealthStages.fill(false);
+
+        ScheduleHealthCheckEvent({ 80, 50, 25 }, [&] {
+            me->InterruptNonMeleeSpells(false);
+            DoCastAOE(SPELL_BLINK);
+            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
+            Talk(EMOTE_ARCANE_EXP);
+
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+            }).Schedule(6500ms, [this](TaskContext /*context*/)
+            {
+                me->GetThreatMgr().ResetAllThreat();
+            });
+        });
+
+        ScheduleHealthCheckEvent(20, [&] {
+            DoCast(me, SPELL_MANA_SHIELD);
+        });
+    }
+
+    /// @todo: remove this once pets stop going through doors.
+    bool CanAIAttack(Unit const* /*victim*/) const override
+    {
+        return _spoken;
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -106,69 +129,6 @@ struct boss_talon_king_ikiss : public BossAI
         }
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-    {
-        if (!_comboHealthStages[0] && me->HealthBelowPctDamaged(80, damage))
-        {
-            _comboHealthStages[0] = true;
-
-            me->InterruptNonMeleeSpells(false);
-            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
-            DoCastAOE(SPELL_BLINK);
-            Talk(EMOTE_ARCANE_EXP);
-
-            scheduler.Schedule(1s, [this](TaskContext)
-            {
-                DoCastAOE(SPELL_ARCANE_EXPLOSION);
-            }).Schedule(6500ms, [this](TaskContext /*context*/)
-            {
-                me->GetThreatMgr().ResetAllThreat();
-            });
-        }
-
-        if (!_comboHealthStages[1] && me->HealthBelowPctDamaged(50, damage))
-        {
-            _comboHealthStages[1] = true;
-
-            me->InterruptNonMeleeSpells(false);
-            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
-            DoCastAOE(SPELL_BLINK);
-            Talk(EMOTE_ARCANE_EXP);
-
-            scheduler.Schedule(1s, [this](TaskContext)
-            {
-                DoCastAOE(SPELL_ARCANE_EXPLOSION);
-            }).Schedule(6500ms, [this](TaskContext /*context*/)
-            {
-                me->GetThreatMgr().ResetAllThreat();
-            });
-        }
-
-        if (!_comboHealthStages[2] && me->HealthBelowPctDamaged(25, damage))
-        {
-            _comboHealthStages[2] = true;
-
-            me->InterruptNonMeleeSpells(false);
-            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
-            DoCastAOE(SPELL_BLINK);
-            Talk(EMOTE_ARCANE_EXP);
-
-            scheduler.Schedule(1s, [this](TaskContext)
-            {
-                DoCastAOE(SPELL_ARCANE_EXPLOSION);
-            }).Schedule(6500ms, [this](TaskContext /*context*/)
-            {
-                me->GetThreatMgr().ResetAllThreat();
-            });
-        }
-
-        if (!_manaShield && me->HealthBelowPctDamaged(20, damage))
-        {
-            DoCast(me, SPELL_MANA_SHIELD);
-            _manaShield = true;
-        }
-    }
-
     void KilledUnit(Unit* /*victim*/) override
     {
         if (urand(0, 1))
@@ -177,8 +137,6 @@ struct boss_talon_king_ikiss : public BossAI
 
 private:
     bool _spoken;
-    bool _manaShield;
-    std::array<bool, 3> _comboHealthStages;
 };
 
 // 38194 - Blink

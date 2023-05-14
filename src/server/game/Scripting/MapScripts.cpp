@@ -113,9 +113,9 @@ inline Player* Map::_GetScriptPlayerSourceOrTarget(Object* source, Object* targe
 
         if (!player)
             LOG_ERROR("maps.script", "{} neither source nor target object is player (source: TypeId: {}, Entry: {}, GUID: {}; target: TypeId: {}, Entry: {}, GUID: {}), skipping.",
-                           scriptInfo->GetDebugInfo().c_str(),
-                           source ? source->GetTypeId() : 0, source ? source->GetEntry() : 0, source ? source->GetGUID().ToString().c_str() : "",
-                           target ? target->GetTypeId() : 0, target ? target->GetEntry() : 0, target ? target->GetGUID().ToString().c_str() : "");
+                           scriptInfo->GetDebugInfo(),
+                           source ? source->GetTypeId() : 0, source ? source->GetEntry() : 0, source ? source->GetGUID().ToString() : "",
+                           target ? target->GetTypeId() : 0, target ? target->GetEntry() : 0, target ? target->GetGUID().ToString() : "");
     }
     return player;
 }
@@ -146,9 +146,9 @@ inline Creature* Map::_GetScriptCreatureSourceOrTarget(Object* source, Object* t
 
         if (!creature)
             LOG_ERROR("maps.script", "{} neither source nor target are creatures (source: TypeId: {}, Entry: {}, GUID: {}; target: TypeId: {}, Entry: {}, GUID: {}), skipping.",
-                           scriptInfo->GetDebugInfo().c_str(),
-                           source ? source->GetTypeId() : 0, source ? source->GetEntry() : 0, source ? source->GetGUID().ToString().c_str() : "",
-                           target ? target->GetTypeId() : 0, target ? target->GetEntry() : 0, target ? target->GetGUID().ToString().c_str() : "");
+                           scriptInfo->GetDebugInfo(),
+                           source ? source->GetTypeId() : 0, source ? source->GetEntry() : 0, source ? source->GetGUID().ToString() : "",
+                           target ? target->GetTypeId() : 0, target ? target->GetEntry() : 0, target ? target->GetGUID().ToString() : "");
     }
     return creature;
 }
@@ -533,7 +533,7 @@ void Map::ScriptsProcess()
                         else
                         {
                             LOG_ERROR("maps.script", "{} neither source nor target is player (source: {}; target: {}), skipping.",
-                                           step.script->GetDebugInfo().c_str(), source->GetGUID().ToString().c_str(), target->GetGUID().ToString().c_str());
+                                           step.script->GetDebugInfo(), source->GetGUID().ToString(), target->GetGUID().ToString());
                             break;
                         }
                     }

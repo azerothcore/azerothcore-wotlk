@@ -46,11 +46,6 @@ enum Yells
     SAY_DEATH                      = 4
 };
 
-enum Creatures
-{
-    NPC_NETHER_CHARGE               = 20405
-};
-
 struct boss_mechano_lord_capacitus : public BossAI
 {
     boss_mechano_lord_capacitus(Creature* creature) : BossAI(creature, DATA_MECHANOLORD_CAPACITUS)
@@ -127,7 +122,6 @@ struct boss_mechano_lord_capacitus : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
         summon->GetMotionMaster()->MoveRandom(30.0f);
     }
 };

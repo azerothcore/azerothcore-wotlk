@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `character_entry_point` (
   `taxiPath1` int unsigned NOT NULL DEFAULT '0',
   `mountSpell` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
 -- Dumping data for table acore_characters.character_entry_point: ~0 rows (approximately)
 DELETE FROM `character_entry_point`;

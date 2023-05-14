@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `guild_member_withdraw` (
   `tab5` int unsigned NOT NULL DEFAULT '0',
   `money` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild Member Daily Withdraws';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Guild Member Daily Withdraws';
 
 -- Dumping data for table acore_characters.guild_member_withdraw: ~0 rows (approximately)
 DELETE FROM `guild_member_withdraw`;

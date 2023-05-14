@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `character_reputation` (
   `standing` int NOT NULL DEFAULT '0',
   `flags` smallint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`faction`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
 -- Dumping data for table acore_characters.character_reputation: ~0 rows (approximately)
 DELETE FROM `character_reputation`;

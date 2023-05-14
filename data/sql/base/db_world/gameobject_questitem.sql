@@ -20,13 +20,12 @@ CREATE TABLE IF NOT EXISTS `gameobject_questitem` (
   `GameObjectEntry` int unsigned NOT NULL DEFAULT '0',
   `Idx` int unsigned NOT NULL DEFAULT '0',
   `ItemId` int unsigned NOT NULL DEFAULT '0',
-  `VerifiedBuild` mediumint DEFAULT NULL,
+  `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`GameObjectEntry`,`Idx`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gameobject_questitem: 862 rows
+-- Dumping data for table acore_world.gameobject_questitem: ~862 rows (approximately)
 DELETE FROM `gameobject_questitem`;
-/*!40000 ALTER TABLE `gameobject_questitem` DISABLE KEYS */;
 INSERT INTO `gameobject_questitem` (`GameObjectEntry`, `Idx`, `ItemId`, `VerifiedBuild`) VALUES
 	(32, 0, 1309, 0),
 	(41, 0, 1923, 0),
@@ -890,7 +889,6 @@ INSERT INTO `gameobject_questitem` (`GameObjectEntry`, `Idx`, `ItemId`, `Verifie
 	(201778, 0, 49867, 0),
 	(201794, 0, 49871, 0),
 	(201937, 0, 49869, 0);
-/*!40000 ALTER TABLE `gameobject_questitem` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

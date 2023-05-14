@@ -2249,7 +2249,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
                     // Get level from LFGDungeonEntry because the one from AreaTableEntry is not valid
                     // If area level is too big, do not add new taxi
-                    if (lfgDungeon->minlevel > level)
+                    if (lfgDungeon->MinLevel > level)
                     {
                         FillTaxiMask(field, 0);
                         continue;
