@@ -1,3 +1,4 @@
+-- DB update 2023_05_14_00 -> 2023_05_14_01
 --
 UPDATE `creature_template` SET `minlevel`=63, `maxlevel`=63, `AIName`='SmartAI' WHERE  `entry`=16383;
 

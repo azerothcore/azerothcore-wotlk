@@ -1,3 +1,4 @@
+-- DB update 2023_05_13_15 -> 2023_05_14_00
 -- 21151 (Borgrim Stouthammer)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21151;
 
