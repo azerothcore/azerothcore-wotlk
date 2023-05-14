@@ -41,121 +41,110 @@ enum Misc
     NPC_HELLFIRE_WATCHER    = 17309
 };
 
-class boss_watchkeeper_gargolmar : public CreatureScript
+struct boss_watchkeeper_gargolmar : public BossAI
 {
-public:
-    boss_watchkeeper_gargolmar() : CreatureScript("boss_watchkeeper_gargolmar") { }
-
-    struct boss_watchkeeper_gargolmarAI : public BossAI
+    boss_watchkeeper_gargolmar(Creature* creature) : BossAI(creature, DATA_WATCHKEEPER_GARGOLMAR)
     {
-        boss_watchkeeper_gargolmarAI(Creature* creature) : BossAI(creature, DATA_WATCHKEEPER_GARGOLMAR)
+        _taunted = false;
+        scheduler.SetValidator([this]
         {
-            _taunted = false;
-
-            scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-        }
-
-        void Reset() override
-        {
-            _Reset();
-
-            ScheduleHealthCheckEvent(50, [&]{
-                Talk(SAY_HEAL);
-                std::list<Creature*> clist;
-                me->GetCreaturesWithEntryInRange(clist, 100.0f, NPC_HELLFIRE_WATCHER);
-                for (std::list<Creature*>::const_iterator itr = clist.begin(); itr != clist.end(); ++itr)
-                    (*itr)->AI()->SetData(NPC_HELLFIRE_WATCHER, 0);
-            });
-
-            ScheduleHealthCheckEvent(20, [&]{
-                DoCastSelf(SPELL_RETALIATION);
-                scheduler.Schedule(30s, [this](TaskContext context)
-                {
-                    DoCastSelf(SPELL_RETALIATION);
-                    context.Repeat(30s);
-                });
-            });
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-            _JustEngagedWith();
-
-            scheduler.Schedule(5s, [this] (TaskContext context)
-            {
-                DoCastVictim(SPELL_MORTAL_WOUND);
-                context.Repeat(8s);
-            }).Schedule(3s, [this](TaskContext context)
-            {
-                Talk(SAY_SURGE);
-                if(Unit* target = SelectTarget((SelectTargetMethod::MinDistance), 0))
-                {
-                    me->CastSpell(target, SPELL_SURGE);
-                }
-                context.Repeat(11s);
-            });
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!_taunted)
-            {
-                if (who->GetTypeId() == TYPEID_PLAYER)
-                {
-                    _taunted = true;
-                    Talk(SAY_TAUNT);
-                }
-            }
-
-            BossAI::MoveInLineOfSight(who);
-        }
-
-        void KilledUnit(Unit*) override
-        {
-            if (!_hasSpoken)
-            {
-                _hasSpoken = true;
-                Talk(SAY_KILL);
-            }
-            scheduler.Schedule(6s, [this](TaskContext /*context*/)
-            {
-                _hasSpoken = false;
-            });
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DIE);
-            _JustDied();
-        }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        bool _taunted;
-        bool _hasSpoken;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetHellfireRampartsAI<boss_watchkeeper_gargolmarAI>(creature);
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
+
+    void Reset() override
+    {
+        _Reset();
+        ScheduleHealthCheckEvent(50, [&]{
+            Talk(SAY_HEAL);
+            std::list<Creature*> clist;
+            me->GetCreaturesWithEntryInRange(clist, 100.0f, NPC_HELLFIRE_WATCHER);
+            for (std::list<Creature*>::const_iterator itr = clist.begin(); itr != clist.end(); ++itr)
+            {
+                (*itr)->AI()->SetData(NPC_HELLFIRE_WATCHER, 0);
+            }
+        });
+
+        ScheduleHealthCheckEvent(20, [&]{
+            DoCastSelf(SPELL_RETALIATION);
+            scheduler.Schedule(30s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_RETALIATION);
+                context.Repeat(30s);
+            });
+        });
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        Talk(SAY_AGGRO);
+        _JustEngagedWith();
+        scheduler.Schedule(5s, [this] (TaskContext context)
+        {
+            DoCastVictim(SPELL_MORTAL_WOUND);
+            context.Repeat(8s);
+        }).Schedule(3s, [this](TaskContext context)
+        {
+            Talk(SAY_SURGE);
+            if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0))
+            {
+                me->CastSpell(target, SPELL_SURGE);
+            }
+            context.Repeat(11s);
+        });
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_taunted)
+        {
+            if (who->GetTypeId() == TYPEID_PLAYER)
+            {
+                _taunted = true;
+                Talk(SAY_TAUNT);
+            }
+        }
+        BossAI::MoveInLineOfSight(who);
+    }
+
+    void KilledUnit(Unit*) override
+    {
+        if (!_hasSpoken)
+        {
+            _hasSpoken = true;
+            Talk(SAY_KILL);
+        }
+        scheduler.Schedule(6s, [this](TaskContext /*context*/)
+        {
+            _hasSpoken = false;
+        });
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DIE);
+        _JustDied();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    bool _taunted;
+    bool _hasSpoken;
+
 };
 
 void AddSC_boss_watchkeeper_gargolmar()
 {
-    new boss_watchkeeper_gargolmar();
+    RegisterHellfireRampartsCreatureAI(boss_watchkeeper_gargolmar);
 }
