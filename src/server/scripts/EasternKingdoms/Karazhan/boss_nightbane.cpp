@@ -406,7 +406,7 @@ public:
 
                 if (FireballBarrageTimer <= diff)
                 {
-                    me->Yell("barrage!", LANG_UNIVERSAL);
+                    me->Yell("barrage test!", LANG_UNIVERSAL);
                     if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, -50.0f))
                         DoCast(target, SPELL_FIREBALL_BARRAGE);
 
