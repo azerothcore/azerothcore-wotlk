@@ -38,7 +38,6 @@ enum Spells
     SPELL_AURA_DEATH        = 37131
 };
 
-
 class boss_doomwalker : public CreatureScript
 {
 public:
