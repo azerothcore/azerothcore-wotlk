@@ -406,10 +406,11 @@ public:
 
                 if (FireballBarrageTimer <= diff)
                 {
+                    me->Yell("barrage!", LANG_UNIVERSAL);
                     if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, -50.0f))
                         DoCast(target, SPELL_FIREBALL_BARRAGE);
 
-                    FireballBarrageTimer = 20000;
+                    FireballBarrageTimer = 2000;
                 }
                 else
                     FireballBarrageTimer -= diff;
