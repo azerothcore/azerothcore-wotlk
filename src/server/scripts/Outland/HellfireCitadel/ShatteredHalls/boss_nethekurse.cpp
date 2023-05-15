@@ -94,7 +94,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
 
     void Reset() override
     {
-        EventStage = EVENT_STAGE_NONE;
         _Reset();
         events2.Reset();
         ScheduleHealthCheckEvent(25, [&] {
@@ -119,21 +118,23 @@ struct boss_grand_warlock_nethekurse : public BossAI
             if (PeonEngagedCount >= 4)
                 return;
 
-            if (EventStage < EVENT_STAGE_TAUNT)
-            {
-                Talk(SAY_PEON_ATTACKED);
-            }
+            Talk(SAY_PEON_ATTACKED);
             break;
         case SETDATA_PEON_DEATH:
             if (PeonKilledCount >= 4)
                 return;
 
-            if (EventStage < EVENT_STAGE_TAUNT)
-            {
-                PeonDieRP();
-            }
+            PeonDieRP();
+
             if (++PeonKilledCount == 4)
+            {
+                Talk(SAY_INTRO_2);
                 DoAction(ACTION_CANCEL_INTRO);
+                if (Unit* target = me->SelectNearestPlayer(80.0f))
+                {
+                    AttackStart(target);
+                }
+            }
             break;
         }
     }
@@ -176,31 +177,28 @@ struct boss_grand_warlock_nethekurse : public BossAI
         }
 
         _JustEngagedWith();
-        if (EventStage == EVENT_STAGE_NONE)
+        DoAction(ACTION_CANCEL_INTRO);
+
+        scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
         {
-            DoAction(ACTION_CANCEL_INTRO);
-
-            scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+            if (me->HealthBelowPct(90))
             {
-                if (me->HealthBelowPct(90))
-                {
-                    DoCastRandomTarget(SPELL_DEATH_COIL, 0, 30.0f, true);
-                }
-                context.Repeat();
-            }).Schedule(8100ms, 17300ms, [this](TaskContext context)
-            {
-                DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
-                context.Repeat(8450ms, 9450ms);
-            }).Schedule(10950ms, 21850ms, [this](TaskContext context)
-            {
-                DoCastVictim(SPELL_SHADOW_CLEAVE);
-                context.Repeat(1200ms, 23900ms);
-            });
-
-            if (PeonKilledCount < 4)
-            {
-                Talk(SAY_SKIP_INTRO);
+                DoCastRandomTarget(SPELL_DEATH_COIL, 0, 30.0f, true);
             }
+            context.Repeat();
+        }).Schedule(8100ms, 17300ms, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
+            context.Repeat(8450ms, 9450ms);
+        }).Schedule(10950ms, 21850ms, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_SHADOW_CLEAVE);
+            context.Repeat(1200ms, 23900ms);
+        });
+
+        if (PeonKilledCount < 4)
+        {
+            Talk(SAY_SKIP_INTRO);
         }
     }
 
@@ -235,9 +233,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
             introDone = true;
             scheduler.CancelGroup(GROUP_RP);
             events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
-            instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
             me->SetInCombatWithZone();
-            Talk(SAY_INTRO_2);
             return;
         }
 
@@ -252,8 +248,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
         }
 
         ATreached = true;
-        events2.ScheduleEvent(EVENT_INTRO, 90000);
-        EventStage = EVENT_STAGE_INTRO;
         instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
         me->SetInCombatWithZone();
         IntroRP();
@@ -261,30 +255,12 @@ struct boss_grand_warlock_nethekurse : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        events2.Update(diff);
         scheduler.Update(diff);
-        uint32 eventId = events2.ExecuteEvent();
-
-        if (EventStage < EVENT_STAGE_MAIN && instance->GetBossState(DATA_NETHEKURSE) == IN_PROGRESS)
-        {
-            if (eventId == EVENT_INTRO)
-            {
-                EventStage = EVENT_STAGE_TAUNT;
-            }
-            else if (eventId == EVENT_START_ATTACK)
-            {
-                EventStage = EVENT_STAGE_MAIN;
-                if (Unit* target = me->SelectNearestPlayer(50.0f))
-                    AttackStart(target);
-                DoAction(ACTION_CANCEL_INTRO);
-                return;
-            }
-        }
 
         if (!UpdateVictim())
             return;
 
-        if (EventStage < EVENT_STAGE_MAIN || me->HasUnitState(UNIT_STATE_CASTING))
+        if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
         if (!me->HealthBelowPct(25))
@@ -294,7 +270,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
 private:
     uint8 PeonEngagedCount = 0;
     uint8 PeonKilledCount = 0;
-    uint8 EventStage;
     bool introDone;
     bool ATreached = false;
 };
