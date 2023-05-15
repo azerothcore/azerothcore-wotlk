@@ -123,18 +123,12 @@ struct boss_grand_warlock_nethekurse : public BossAI
         if (data != SETDATA_DATA)
             return;
 
-        switch (value)
+        if (value == SETDATA_PEON_AGGRO && PeonEngagedCount >= 4)
         {
-        case SETDATA_PEON_AGGRO:
-            if (PeonEngagedCount >= 4)
-                return;
-
             Talk(SAY_PEON_ATTACKED);
-            break;
-        case SETDATA_PEON_DEATH:
-            if (PeonKilledCount >= 4)
-                return;
-
+        }
+        else if (value == SETDATA_PEON_DEATH && PeonKilledCount >= 4)
+        {
             PeonDieRP();
 
             if (++PeonKilledCount == 4)
@@ -146,7 +140,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
                     AttackStart(target);
                 }
             }
-            break;
         }
     }
 
