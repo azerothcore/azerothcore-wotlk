@@ -106,7 +106,7 @@ struct boss_nexusprince_shaffar : public BossAI
             DoCastSelf(SPELL_FROSTNOVA);
             context.Repeat(16s, 23s);
             scheduler.DelayAll(1500ms);
-            scheduler.Schedule(1500ms, [this](TaskContext context)
+            scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
             {
                 DoCastSelf(SPELL_BLINK);
             });
