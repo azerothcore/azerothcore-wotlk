@@ -19,3 +19,10 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 3, 17083, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Only play SAI Event if Invoker is a Player');
 
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_tsh_shadow_sear';
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 3) AND (`SourceEntry` = 30741);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 3, 30741, 0, 0, 31, 0, 3, 17083, 151090, 0, 0, 0, '', 'Death Coil (30741) can only target Fel Orc Convert (17083) of specific guids'),
+(13, 3, 30741, 0, 1, 31, 0, 3, 17083, 151091, 0, 0, 0, '', 'Death Coil (30741) can only target Fel Orc Convert (17083) of specific guids'),
+(13, 3, 30741, 0, 2, 31, 0, 3, 17083, 151092, 0, 0, 0, '', 'Death Coil (30741) can only target Fel Orc Convert (17083) of specific guids'),
+(13, 3, 30741, 0, 3, 31, 0, 3, 17083, 151093, 0, 0, 0, '', 'Death Coil (30741) can only target Fel Orc Convert (17083) of specific guids');
