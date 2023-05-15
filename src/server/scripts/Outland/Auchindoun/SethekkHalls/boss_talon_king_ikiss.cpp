@@ -60,7 +60,7 @@ struct boss_talon_king_ikiss : public BossAI
             DoCastAOE(SPELL_BLINK);
             DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             Talk(EMOTE_ARCANE_EXP);
-            scheduler.Schedule(1s, [this](TaskContext)
+            scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
                 DoCastAOE(SPELL_ARCANE_EXPLOSION);
             }).Schedule(6500ms, [this](TaskContext /*context*/)

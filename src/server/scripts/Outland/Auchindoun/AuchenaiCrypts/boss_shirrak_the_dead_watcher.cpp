@@ -53,9 +53,10 @@ struct boss_shirrak_the_dead_watcher : public BossAI
 
     ObjectGuid focusGUID;
 
-    void EnterEvadeMode(EvadeReason /*why*/) override
+    void EnterEvadeMode(EvadeReason why) override
     {
         me->SetControlled(false, UNIT_STATE_ROOT);
+        CreatureAI::EnterEvadeMode(why);
     }
 
     void Reset() override

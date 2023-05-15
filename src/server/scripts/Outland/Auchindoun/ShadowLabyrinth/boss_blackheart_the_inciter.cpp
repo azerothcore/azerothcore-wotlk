@@ -102,12 +102,12 @@ struct boss_blackheart_the_inciter : public BossAI
             InciteChaos = true;
             scheduler.DelayAll(15s);
             context.Repeat(50s, 70s);
-            scheduler.Schedule(15s, [this](TaskContext context)
+            scheduler.Schedule(15s, [this](TaskContext /*context*/)
             {
                 me->SetImmuneToPC(false);
                 InciteChaos = false;
             });
-        }).Schedule(15s, [this](TaskContext context)
+        }).Schedule(15s, [this](TaskContext /*context*/)
         {
             me->SetImmuneToPC(false);
             InciteChaos = false;

@@ -110,7 +110,7 @@ struct boss_ambassador_hellmaw : public BossAI
 
         if (IsHeroic())
         {
-            scheduler.Schedule(3min, [this](TaskContext)
+            scheduler.Schedule(3min, [this](TaskContext /*context*/)
             {
                 DoCastSelf(SPELL_ENRAGE, true);
             });

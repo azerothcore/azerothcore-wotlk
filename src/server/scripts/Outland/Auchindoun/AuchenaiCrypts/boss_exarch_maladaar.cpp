@@ -82,9 +82,10 @@ struct boss_exarch_maladaar : public BossAI
     {
         if (!_talked && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 150.0f))
         {
-            Talk(SAY_INTRO);
             _talked = true;
+            Talk(SAY_INTRO);
         }
+        ScriptedAI::MoveInLineOfSight(who);
     }
 
     void JustEngagedWith(Unit*) override
