@@ -80,6 +80,19 @@ enum Creatures
     NPC_PEON                   = 17083
 };
 
+struct PeonRoleplay
+{
+    uint32 spellId;
+    uint8 textId;
+};
+
+PeonRoleplay PeonRoleplayData[3] =
+{
+    { SPELL_DEATH_COIL_RP,     SAY_DEATH_COIL     },
+    { SPELL_SHADOW_FISSURE_RP, SAY_SHADOW_FISSURE },
+    { SPELL_SHADOW_SEAR,       SAY_SHADOW_SEAR    }
+};
+
 struct boss_grand_warlock_nethekurse : public BossAI
 {
     boss_grand_warlock_nethekurse(Creature* creature) : BossAI(creature, DATA_NETHEKURSE)
@@ -94,11 +107,11 @@ struct boss_grand_warlock_nethekurse : public BossAI
 
     void Reset() override
     {
-        _Reset();
-        events2.Reset();
         ScheduleHealthCheckEvent(25, [&] {
             DoCastSelf(SPELL_DARK_SPIN);
         });
+
+        instance->SetBossState(DATA_NETHEKURSE, NOT_STARTED);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -158,10 +171,11 @@ struct boss_grand_warlock_nethekurse : public BossAI
             me->GetMotionMaster()->MoveIdle();
             scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
-                uint32 choicelocation = urand(1, 3);
-                scheduler.Schedule(2500ms, GROUP_RP, [this, choicelocation](TaskContext /*context*/)
+                scheduler.Schedule(2500ms, GROUP_RP, [this](TaskContext /*context*/)
                 {
-                    CastRandomPeonSpell(choicelocation);
+                    PeonRoleplay roleplayData = Acore::Containers::SelectRandomContainerElement(PeonRoleplayData);
+                    DoCast(me, roleplayData.spellId);
+                    Talk(roleplayData.textId);
                     me->GetMotionMaster()->Initialize();
                 });
             });
@@ -178,6 +192,8 @@ struct boss_grand_warlock_nethekurse : public BossAI
 
         _JustEngagedWith();
         DoAction(ACTION_CANCEL_INTRO);
+
+        scheduler.CancelAll();
 
         scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
         {
@@ -202,25 +218,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
         }
     }
 
-    void CastRandomPeonSpell(uint32 choice)
-    {
-        if (choice == 1)
-        {
-            Talk(SAY_DEATH_COIL);
-            DoCastAOE(SPELL_DEATH_COIL_RP);
-        }
-        else if (choice == 2)
-        {
-            Talk(SAY_SHADOW_FISSURE);
-            DoCastAOE(SPELL_SHADOW_FISSURE_RP);
-        }
-        else if (choice == 3)
-        {
-            Talk(SAY_SHADOW_SEAR);
-            DoCastAOE(SPELL_SHADOW_SEAR);
-        }
-    }
-
     void KilledUnit(Unit* /*victim*/) override
     {
         Talk(SAY_SLAY);
@@ -236,21 +233,11 @@ struct boss_grand_warlock_nethekurse : public BossAI
             me->SetInCombatWithZone();
             return;
         }
-
-        if (action != ACTION_START_INTRO)
+        else if (action == ACTION_START_INTRO && !ATreached)
         {
-            return;
+            ATreached = true;
+            IntroRP();
         }
-
-        if (ATreached == true)
-        {
-            return;
-        }
-
-        ATreached = true;
-        instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
-        me->SetInCombatWithZone();
-        IntroRP();
     }
 
     void UpdateAI(uint32 diff) override
