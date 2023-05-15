@@ -129,7 +129,14 @@ struct boss_grand_warlock_nethekurse : public BossAI
         }
         else if (value == SETDATA_PEON_DEATH && PeonKilledCount >= 4)
         {
-            PeonDieRP();
+            me->GetMotionMaster()->Clear();
+            me->SetFacingTo(4.572762489318847656f);
+
+            scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
+            {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
+                Talk(SAY_PEON_DIES);
+            });
 
             if (++PeonKilledCount == 4)
             {
@@ -141,17 +148,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
                 }
             }
         }
-    }
-
-    void PeonDieRP()
-    {
-        me->GetMotionMaster()->Clear();
-        me->SetFacingTo(4.572762489318847656f);
-        scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
-        {
-            me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
-            Talk(SAY_PEON_DIES);
-        });
     }
 
     void IntroRP()
