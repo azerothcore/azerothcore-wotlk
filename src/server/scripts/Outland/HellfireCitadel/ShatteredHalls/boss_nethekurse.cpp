@@ -123,18 +123,20 @@ struct boss_grand_warlock_nethekurse : public BossAI
         if (data != SETDATA_DATA)
             return;
 
-        if (value == SETDATA_PEON_AGGRO && PeonEngagedCount >= 4)
+        if (value == SETDATA_PEON_AGGRO && PeonEngagedCount <= 4)
         {
             Talk(SAY_PEON_ATTACKED);
         }
-        else if (value == SETDATA_PEON_DEATH && PeonKilledCount >= 4)
+        else if (value == SETDATA_PEON_DEATH && PeonKilledCount <= 4)
         {
             me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
             me->SetFacingTo(4.572762489318847656f);
 
             scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
+                me->GetMotionMaster()->Initialize();
                 Talk(SAY_PEON_DIES);
             });
 
