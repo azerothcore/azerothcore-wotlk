@@ -79,8 +79,8 @@ struct boss_nexusprince_shaffar : public BossAI
     {
         if (!HasTaunted && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 100.0f))
         {
-            Talk(SAY_INTRO);
             HasTaunted = true;
+            Talk(SAY_INTRO);
         }
     }
 

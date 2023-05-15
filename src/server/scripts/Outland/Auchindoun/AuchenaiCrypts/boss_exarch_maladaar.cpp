@@ -85,7 +85,6 @@ struct boss_exarch_maladaar : public BossAI
             Talk(SAY_INTRO);
             _talked = true;
         }
-        MoveInLineOfSight(who);
     }
 
     void JustEngagedWith(Unit*) override

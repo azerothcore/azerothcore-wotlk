@@ -56,7 +56,6 @@ struct boss_shirrak_the_dead_watcher : public BossAI
     void EnterEvadeMode(EvadeReason why) override
     {
         me->SetControlled(false, UNIT_STATE_ROOT);
-        EnterEvadeMode(why);
     }
 
     void Reset() override
