@@ -154,7 +154,7 @@ struct npc_stolen_soul : public ScriptedAI
     void Reset() override
     {
         myClass = CLASS_WARRIOR;
-        _scheduler.Schedule(1s, [this] (TaskContext context)
+        _scheduler.Schedule(1s, [this] (TaskContext /*context*/)
         {
             switch (myClass)
             {
