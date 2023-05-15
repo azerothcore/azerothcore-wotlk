@@ -103,8 +103,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
         });
     }
 
-    EventMap events2;
-
     void Reset() override
     {
         ScheduleHealthCheckEvent(25, [&] {
@@ -229,7 +227,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
         {
             introDone = true;
             scheduler.CancelGroup(GROUP_RP);
-            events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
             me->SetInCombatWithZone();
             return;
         }
