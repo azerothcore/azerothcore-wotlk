@@ -75,14 +75,6 @@ enum Actions
     ACTION_START_COMBAT        = 2,
 };
 
-float NethekurseIntroPath[4][3] =
-{
-    {184.78966f, 290.3699f,   -8.18139f},
-    {178.51125f, 278.779022f, -8.183065f},
-    {171.82281f, 289.97687f,  -8.185595f},
-    {178.51125f, 287.97794f,  -8.183065f}
-};
-
 struct boss_grand_warlock_nethekurse : public BossAI
 {
     boss_grand_warlock_nethekurse(Creature* creature) : BossAI(creature, DATA_NETHEKURSE)
@@ -152,62 +144,19 @@ struct boss_grand_warlock_nethekurse : public BossAI
         });
     }
 
-    void AttackStart(Unit* who) override
-    {
-        if (EventStage < EVENT_STAGE_MAIN)
-            return;
-
-        if (me->Attack(who, true))
-        {
-            DoStartMovement(who);
-            CombatEventScheduler();
-        }
-    }
-
-    void CombatEventScheduler()
-    {
-        scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
-        {
-            if (me->HealthBelowPct(90))
-            {
-                DoCastRandomTarget(SPELL_DEATH_COIL, 0, 30.0f, true);
-            }
-            context.Repeat();
-        }).Schedule(8100ms, 17300ms, [this](TaskContext context)
-        {
-            DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
-            context.Repeat(8450ms, 9450ms);
-        }).Schedule(10950ms, 21850ms, [this](TaskContext context)
-        {
-            DoCastVictim(SPELL_SHADOW_CLEAVE);
-            context.Repeat(1200ms, 23900ms);
-        });
-    }
-
-    void MoveInLineOfSight(Unit* /*who*/) override
-    {
-        if (EventStage == EVENT_STAGE_NONE)
-        {
-            if (me->SelectNearestPlayer(30.0f))
-            {
-                DoAction(ACTION_CANCEL_INTRO);
-            }
-        }
-    }
-
     void IntroRP()
     {
         scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext context)
         {
             me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
             scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
                 uint32 choicelocation = urand(1, 3);
-                me->GetMotionMaster()->MoveIdle();
-                me->GetMotionMaster()->MovePoint(0, NethekurseIntroPath[choicelocation][0], NethekurseIntroPath[choicelocation][1], NethekurseIntroPath[choicelocation][2]);
                 scheduler.Schedule(2500ms, GROUP_RP, [this, choicelocation](TaskContext /*context*/)
                 {
                     CastRandomPeonSpell(choicelocation);
+                    me->GetMotionMaster()->Initialize();
                 });
             });
             context.Repeat(16400ms, 28500ms);
@@ -220,7 +169,23 @@ struct boss_grand_warlock_nethekurse : public BossAI
         if (EventStage == EVENT_STAGE_NONE)
         {
             DoAction(ACTION_CANCEL_INTRO);
-            CombatEventScheduler();
+
+            scheduler.Schedule(12150ms, 19850ms, [this](TaskContext context)
+            {
+                if (me->HealthBelowPct(90))
+                {
+                    DoCastRandomTarget(SPELL_DEATH_COIL, 0, 30.0f, true);
+                }
+                context.Repeat();
+            }).Schedule(8100ms, 17300ms, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_SHADOW_FISSURE, 0, 60.0f, true);
+                context.Repeat(8450ms, 9450ms);
+            }).Schedule(10950ms, 21850ms, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_SHADOW_CLEAVE);
+                context.Repeat(1200ms, 23900ms);
+            });
         }
     }
 
@@ -229,17 +194,17 @@ struct boss_grand_warlock_nethekurse : public BossAI
         if (choice == 1)
         {
             Talk(SAY_DEATH_COIL);
-            me->CastSpell(me, SPELL_DEATH_COIL, false);
+            DoCastAOE(SPELL_DEATH_COIL_RP);
         }
         else if (choice == 2)
         {
             Talk(SAY_SHADOW_FISSURE);
-            me->CastSpell(me, SPELL_SHADOW_FISSURE_RP, false);
+            DoCastAOE(SPELL_SHADOW_FISSURE_RP);
         }
         else if (choice == 3)
         {
             Talk(SAY_SHADOW_SEAR);
-            me->CastSpell(me, SPELL_SHADOW_SEAR, false);
+            DoCastAOE(SPELL_SHADOW_SEAR);
         }
     }
 
@@ -258,7 +223,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
             instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
             me->SetInCombatWithZone();
             Talk(SAY_INTRO_2);
-            me->SetHomePosition(NethekurseIntroPath[3][0], NethekurseIntroPath[3][1], NethekurseIntroPath[3][2], 4.572762489318847656f);
             return;
         }
 
@@ -350,10 +314,6 @@ public:
 
     bool _OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
-        if (player->IsGameMaster())
-        {
-            return false;
-        }
         if (InstanceScript* instance = player->GetInstanceScript())
         {
             if (instance->GetBossState(DATA_NETHEKURSE) != DONE && instance->GetBossState(DATA_NETHEKURSE) != IN_PROGRESS)
