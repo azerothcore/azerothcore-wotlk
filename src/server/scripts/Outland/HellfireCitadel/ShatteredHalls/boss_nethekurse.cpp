@@ -22,7 +22,7 @@
 
 enum Texts
 {
-    SAY_INTRO               = 0,
+    SAY_SKIP_INTRO          = 0,
     SAY_INTRO_2             = 1,
     SAY_PEON_ATTACKED       = 2,
     SAY_PEON_DIES           = 3,
@@ -73,6 +73,11 @@ enum Actions
     ACTION_START_INTRO         = 0,
     ACTION_CANCEL_INTRO        = 1,
     ACTION_START_COMBAT        = 2,
+};
+
+enum Creatures
+{
+    NPC_PEON                   = 17083
 };
 
 struct boss_grand_warlock_nethekurse : public BossAI
@@ -163,8 +168,13 @@ struct boss_grand_warlock_nethekurse : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
+        if (who->GetEntry() == NPC_PEON)
+        {
+            return;
+        }
+
         _JustEngagedWith();
         if (EventStage == EVENT_STAGE_NONE)
         {
@@ -186,6 +196,11 @@ struct boss_grand_warlock_nethekurse : public BossAI
                 DoCastVictim(SPELL_SHADOW_CLEAVE);
                 context.Repeat(1200ms, 23900ms);
             });
+
+            if (PeonKilledCount < 4)
+            {
+                Talk(SAY_SKIP_INTRO);
+            }
         }
     }
 
@@ -238,7 +253,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
 
         ATreached = true;
         events2.ScheduleEvent(EVENT_INTRO, 90000);
-        Talk(SAY_INTRO);
         EventStage = EVENT_STAGE_INTRO;
         instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
         me->SetInCombatWithZone();
