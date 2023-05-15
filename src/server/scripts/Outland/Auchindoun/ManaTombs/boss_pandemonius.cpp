@@ -69,7 +69,7 @@ struct boss_pandemonius : public BossAI
             Talk(EMOTE_DARK_SHELL);
             DoCastSelf(SPELL_DARK_SHELL);
             context.Repeat(20s);
-        }).Schedule(8s, 23s, GROUP_PHASE_2, [this](TaskContext context)
+        }).Schedule(8s, 23s, GROUP_PHASE_2, [this](TaskContext /*context*/)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
             {
