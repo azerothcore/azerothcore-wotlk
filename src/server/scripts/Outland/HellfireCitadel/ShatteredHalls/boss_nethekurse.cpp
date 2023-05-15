@@ -138,17 +138,17 @@ struct boss_grand_warlock_nethekurse : public BossAI
                 me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
                 me->GetMotionMaster()->Initialize();
                 Talk(SAY_PEON_DIES);
-            });
 
-            if (++PeonKilledCount == 4)
-            {
-                Talk(SAY_INTRO_2);
-                DoAction(ACTION_CANCEL_INTRO);
-                if (Unit* target = me->SelectNearestPlayer(80.0f))
+                if (++PeonKilledCount == 4)
                 {
-                    AttackStart(target);
+                    Talk(SAY_INTRO_2);
+                    DoAction(ACTION_CANCEL_INTRO);
+                    if (Unit* target = me->SelectNearestPlayer(80.0f))
+                    {
+                        AttackStart(target);
+                    }
                 }
-            }
+            });
         }
     }
 
