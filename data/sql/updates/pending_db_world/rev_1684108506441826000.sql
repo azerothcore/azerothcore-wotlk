@@ -17,3 +17,5 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`) VALUES
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 3) AND (`SourceEntry` = 17083) AND (`SourceId` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 3, 17083, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Only play SAI Event if Invoker is a Player');
+
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_tsh_shadow_sear';
