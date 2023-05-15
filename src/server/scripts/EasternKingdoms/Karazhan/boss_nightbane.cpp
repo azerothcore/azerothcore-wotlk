@@ -406,8 +406,9 @@ public:
 
                 if (FireballBarrageTimer <= diff)
                 {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, -50.0f))
                         DoCast(target, SPELL_FIREBALL_BARRAGE);
+
                     FireballBarrageTimer = 20000;
                 }
                 else
