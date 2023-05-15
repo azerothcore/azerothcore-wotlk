@@ -80,8 +80,6 @@ struct boss_blackheart_the_inciter : public BossAI
         Talk(SAY_AGGRO);
         _JustEngagedWith();
         me->CallForHelp(100.0f);
-        events.ScheduleEvent(EVENT_SPELL_WAR_STOMP, urand(16950, 26350));
-
         scheduler.Schedule(24s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_INCITE_CHAOS);
