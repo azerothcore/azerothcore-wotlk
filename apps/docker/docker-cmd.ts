@@ -24,21 +24,21 @@ program
 shellCommandFactory(
   "start:app",
   "Startup the authserver and worldserver apps",
-  ["docker compose --profile app up"],
+  ["docker compose up"],
   env
 );
 
 shellCommandFactory(
   "start:app:d",
   "Startup the authserver and worldserver apps in detached mode",
-  ["docker compose --profile app up -d"],
+  ["docker compose up -d"],
   env
 );
 
 shellCommandFactory(
   "build",
   "Build the authserver and worldserver",
-  ["docker compose --profile app build"],
+  ["docker compose build"],
   env
 );
 
@@ -56,7 +56,7 @@ shellCommandFactory(
   "build:nocache",
   "Build the authserver and worldserver without docker cache",
   [
-    "docker compose --profile app build --no-cache",
+    "docker compose build --no-cache",
   ],
   env
 );
@@ -71,7 +71,7 @@ shellCommandFactory(
 shellCommandFactory(
   "client-data",
   "Download client data inside the ac-data volume",
-  ["docker compose --profile app up --no-deps ac-client-data"],
+  ["docker compose up --no-deps ac-client-data"],
   env
 );
 

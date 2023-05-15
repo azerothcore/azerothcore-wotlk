@@ -9,10 +9,11 @@ FROM ubuntu:$UBUNTU_VERSION as skeleton
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 ARG DOCKER_USER=acore
-ARG INSTALLER_GUARDYVAR=1
+ARG INSTALLER_GUARDYVAR= 1
+ARG SKIP_INSTALL_DENO=1
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV DOCKER=true
+ENV DOCKER=1
 ENV TZ=$TZ
 ENV AC_FORCE_CREATE_DB=1
 
@@ -97,7 +98,7 @@ RUN --mount=target=/var/cache/apt,type=cache,sharing=locked \
 # - /.git
 # - /apps, except for the few necessary sections
 # - /build*
-# - /data
+# - /data/sql/archive
 # - /deps/deno
 # - /env/dist
 # - /env/user
@@ -250,3 +251,25 @@ VOLUME /azerothcore/env/dist/data
 USER $DOCKER_USER
 
 CMD bash -c "source /azerothcore/apps/installer/includes/functions.sh && inst_download_client_data"
+
+#############
+# DB Import #
+#############
+
+FROM runtime as dbimport
+
+LABEL description "AzerothCore Database Import tool"
+
+USER $DOCKER_USER
+
+ENV ACORE_COMPONENT=dbimport
+
+COPY data data
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER\
+     --from=build \
+     /azerothcore/env/dist/bin/dbimport /azerothcore/env/dist/bin/dbimport
+
+VOLUME /azerothcore/env/dist/etc
+
+CMD /azerothcore/env/dist/bin/dbimport

@@ -45,7 +45,20 @@ services:
       interval: 5s
       timeout: 10s
       retries: 40
-    profiles: [prod, app, local]
+
+
+  ac-db-import:
+    <<: *ac-shared-conf
+    image: acore/ac-wotlk-db-import:${DOCKER_IMAGE_TAG:-master}
+    volumes:
+      - ${DOCKER_VOL_DATA:-./data/}:/azerothcore/data:ro
+      - ${DOCKER_VOL_ETC:-./env/docker/etc/}:/azerothcore/env/dist/etc:rw
+    build:
+      target: dbimport
+      <<: *build-params
+    depends_on:
+      ac-database:
+        condition: service_healthy
 
   ac-worldserver:
     <<: *ac-shared-conf
@@ -72,10 +85,11 @@ services:
       - ${DOCKER_VOL_MODULES:-./modules}:/azerothcore/modules:ro
       - ${DOCKER_VOL_CONFIG:-./env/docker/etc}:/azerothcore/env/dist/etc:rw
       - ${DOCKER_VOL_DATA:-./data/}:/azerothcore/data:ro
-    profiles: [app]
     depends_on:
       ac-database:
         condition: service_healthy
+      ac-db-import:
+        condition: service_completed_successfully
       ac-client-data:
         condition: service_completed_successfully
     stop_grace_period: 1m
@@ -97,10 +111,11 @@ services:
       - ${DOCKER_VOL_MODULES:-./modules}:/azerothcore/modules:ro
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
-    profiles: [app]
     depends_on:
       ac-database:
         condition: service_healthy
+      ac-db-import:
+        condition: service_completed_successfully
 
   ac-client-data:
     image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master}
@@ -114,7 +129,6 @@ services:
         # BUILDKIT_INLINE_CACHE: 1
     volumes:
       - ${DOCKER_VOL_CLIENT_DATA:-ac-client-data}:/azerothcore/env/dist/data
-    profiles: [app]
 
   ac-tools:
     image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master}

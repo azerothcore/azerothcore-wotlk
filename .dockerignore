@@ -2,12 +2,12 @@
 /.idea
 /acore.sh
 /apps/
+/data/sql/archive
 /docker-compose.yml
 /.env*
 **/*Dockerfile
 **/*dockerignore
 **/*.md
-**/*.sql
 /cmake-build-debug
 /build*/
 /var/*
