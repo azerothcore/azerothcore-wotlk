@@ -216,14 +216,12 @@ struct boss_grand_warlock_nethekurse : public BossAI
     {
         if (action == ACTION_CANCEL_INTRO)
         {
-            introDone = true;
             scheduler.CancelGroup(GROUP_RP);
             me->SetInCombatWithZone();
             return;
         }
-        else if (action == ACTION_START_INTRO && !ATreached)
+        else if (action == ACTION_START_INTRO)
         {
-            ATreached = true;
             IntroRP();
         }
     }
@@ -245,8 +243,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
 private:
     uint8 PeonEngagedCount = 0;
     uint8 PeonKilledCount = 0;
-    bool introDone;
-    bool ATreached = false;
 };
 
 class spell_tsh_shadow_bolt : public SpellScript
