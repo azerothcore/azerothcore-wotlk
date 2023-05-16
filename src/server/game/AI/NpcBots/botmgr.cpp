@@ -42,6 +42,7 @@ TODO: Move creature hooks here
 # define GetBoolDefault GetOption<bool>
 # define GetIntDefault GetOption<int32>
 # define GetFloatDefault GetOption<float>
+# define GetStringDefault GetOption<std::string>
 #endif
 
 static std::list<BotMgr::delayed_teleport_callback_type> delayed_bot_teleports;
