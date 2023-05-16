@@ -70,7 +70,7 @@ services:
     env_file:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     environment:
-      SAFE_WORLDSERVER: "${SAFE_WORLDSERVER:-true}"
+      SAFE_WORLDSERVER: "${SAFE_WORLDSERVER:-}"
       ACORE_USERNAME: "${ACORE_USERNAME:-}"
       ACORE_PASSWORD: "${ACORE_PASSWORD:-}"
     build:
