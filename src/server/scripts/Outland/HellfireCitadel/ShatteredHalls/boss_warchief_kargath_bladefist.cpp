@@ -21,170 +21,161 @@
 
 enum Says
 {
-    SAY_AGGRO                      = 0,
-    SAY_SLAY                       = 1,
-    SAY_DEATH                      = 2
+    SAY_AGGRO                   = 0,
+    SAY_SLAY                    = 1,
+    SAY_DEATH                   = 2
 };
 
 enum Spells
 {
-    SPELL_BLADE_DANCE              = 30739,
-    SPELL_CHARGE                   = 25821,
-    SPELL_SPRINT                   = 32720,
+    SPELL_BLADE_DANCE           = 30739,
+    SPELL_CHARGE                = 25821,
+    SPELL_SPRINT                = 32720
 };
 
 enum Creatures
 {
-    NPC_SHATTERED_ASSASSIN         = 17695,
-    NPC_HEARTHEN_GUARD             = 17621,
-    NPC_SHARPSHOOTER_GUARD         = 17622,
-    NPC_REAVER_GUARD               = 17623
+    NPC_SHATTERED_ASSASSIN      = 17695,
+    NPC_HEARTHEN_GUARD          = 17621,
+    NPC_SHARPSHOOTER_GUARD      = 17622,
+    NPC_REAVER_GUARD            = 17623
+};
+
+enum Misc
+{
+    EVENT_SPELL_CHARGE          = 1,
+    EVENT_MOVE_TO_NEXT_POINT    = 2,
+    EVENT_BLADE_DANCE           = 3,
+    EVENT_FINISH_BLADE_DANCE    = 4
 };
 
 float AssassEntrance[3] = { 275.136f, -84.29f, 2.3f  }; // y -8
 float AssassExit[3]     = { 184.233f, -84.29f, 2.3f  }; // y -8
 float AddsEntrance[3]   = { 306.036f, -84.29f, 1.93f };
 
-enum Misc
+struct boss_warchief_kargath_bladefist : public BossAI
 {
-    EVENT_CHECK_ROOM                = 1,
-    EVENT_SUMMON_ADDS               = 2,
-    EVENT_SUMMON_ASSASSINS          = 3,
-    EVENT_SPELL_CHARGE              = 4,
-    EVENT_MOVE_TO_NEXT_POINT        = 5,
-    EVENT_BLADE_DANCE               = 6,
-    EVENT_FINISH_BLADE_DANCE        = 7
-};
-
-class boss_warchief_kargath_bladefist : public CreatureScript
-{
-public:
-    boss_warchief_kargath_bladefist() : CreatureScript("boss_warchief_kargath_bladefist") { }
-
-    struct boss_warchief_kargath_bladefistAI : public BossAI
+    boss_warchief_kargath_bladefist(Creature* creature) : BossAI(creature, DATA_KARGATH)
     {
-        boss_warchief_kargath_bladefistAI(Creature* creature) : BossAI(creature, DATA_KARGATH) { }
-
-        void InitializeAI() override
+        scheduler.SetValidator([this]
         {
-            BossAI::InitializeAI();
-            if (instance)
-                if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EXECUTIONER)))
-                    executioner->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        }
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
-        void JustDied(Unit* /*killer*/) override
+    void InitializeAI() override
+    {
+        BossAI::InitializeAI();
+        if (instance)
         {
-            Talk(SAY_DEATH);
-            _JustDied();
-
-            if (instance)
-                if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EXECUTIONER)))
-                    executioner->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        }
-
-        void JustEngagedWith(Unit*  /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-            _JustEngagedWith();
-
-            events.ScheduleEvent(EVENT_CHECK_ROOM, 5000);
-            events.ScheduleEvent(EVENT_SUMMON_ADDS, 30000);
-            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 5000);
-            events.ScheduleEvent(EVENT_BLADE_DANCE, 30000);
-            events.ScheduleEvent(EVENT_SPELL_CHARGE, 0);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            if (summon->GetEntry() != NPC_SHATTERED_ASSASSIN)
-                summon->AI()->AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
-
-            summons.Summon(summon);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type != POINT_MOTION_TYPE || id != 1)
-                return;
-
-            me->CastSpell(me, SPELL_BLADE_DANCE, true);
-            events.ScheduleEvent(EVENT_MOVE_TO_NEXT_POINT, 0);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            switch (events.ExecuteEvent())
+            if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EXECUTIONER)))
             {
-                case EVENT_CHECK_ROOM:
-                    if (me->GetPositionX() > 255 || me->GetPositionX() < 205)
-                    {
-                        EnterEvadeMode();
-                        return;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_ROOM, 5000);
-                    break;
-                case EVENT_SUMMON_ASSASSINS:
-                    me->SummonCreature(NPC_SHATTERED_ASSASSIN, AssassEntrance[0], AssassEntrance[1] + 8, AssassEntrance[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_SHATTERED_ASSASSIN, AssassEntrance[0], AssassEntrance[1] - 8, AssassEntrance[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_SHATTERED_ASSASSIN, AssassExit[0], AssassExit[1] + 8, AssassExit[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_SHATTERED_ASSASSIN, AssassExit[0], AssassExit[1] - 8, AssassExit[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    break;
-                case EVENT_SUMMON_ADDS:
-                    for (uint8 i = 0; i < 2; ++i)
-                        me->SummonCreature(NPC_HEARTHEN_GUARD + urand(0, 2), AddsEntrance[0], AddsEntrance[1], AddsEntrance[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-
-                    events.ScheduleEvent(EVENT_SUMMON_ADDS, 30000);
-                    break;
-                case EVENT_BLADE_DANCE:
-                    events.DelayEvents(10001);
-                    events.ScheduleEvent(EVENT_BLADE_DANCE, 40000);
-                    events.ScheduleEvent(EVENT_MOVE_TO_NEXT_POINT, 0);
-                    events.ScheduleEvent(EVENT_FINISH_BLADE_DANCE, 10000);
-                    events.SetPhase(1);
-                    me->CastSpell(me, SPELL_SPRINT, true);
-                    break;
-                case EVENT_MOVE_TO_NEXT_POINT:
-                    {
-                        float x = 210 + frand(0.0f, 35.0f);
-                        float y = -65.0f - frand(0.0f, 35.0f);
-                        me->GetMotionMaster()->MovePoint(1, x, y, me->GetPositionZ());
-                        break;
-                    }
-                case EVENT_FINISH_BLADE_DANCE:
-                    events.SetPhase(0);
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    if (IsHeroic())
-                        events.ScheduleEvent(EVENT_SPELL_CHARGE, 3000);
-                    break;
-                case EVENT_SPELL_CHARGE:
-                    me->CastSpell(me->GetVictim(), SPELL_CHARGE, false);
-                    break;
+                executioner->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
-
-            if (!events.IsInPhase(1))
-                DoMeleeAttackIfReady();
         }
-    };
+    }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustDied(Unit* /*killer*/) override
     {
-        return GetShatteredHallsAI<boss_warchief_kargath_bladefistAI>(creature);
+        Talk(SAY_DEATH);
+        _JustDied();
+        if (instance)
+        {
+            if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EXECUTIONER)))
+            {
+                executioner->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            }
+        }
+    }
+
+    void JustEngagedWith(Unit*  /*who*/) override
+    {
+        Talk(SAY_AGGRO);
+        _JustEngagedWith();
+        scheduler.Schedule(5s, [this](TaskContext /*context*/)
+        {
+            me->SummonCreature(NPC_SHATTERED_ASSASSIN, AssassEntrance[0], AssassEntrance[1] + 8, AssassEntrance[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+            me->SummonCreature(NPC_SHATTERED_ASSASSIN, AssassEntrance[0], AssassEntrance[1] - 8, AssassEntrance[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+            me->SummonCreature(NPC_SHATTERED_ASSASSIN, AssassExit[0], AssassExit[1] + 8, AssassExit[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+            me->SummonCreature(NPC_SHATTERED_ASSASSIN, AssassExit[0], AssassExit[1] - 8, AssassExit[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+        }).Schedule(30s, [this](TaskContext context)
+        {
+            for (uint8 i = 0; i < 2; ++i)
+            {
+                me->SummonCreature(NPC_HEARTHEN_GUARD + urand(0, 2), AddsEntrance[0], AddsEntrance[1], AddsEntrance[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+            }
+            context.Repeat(30s);
+        }).Schedule(30s, [this](TaskContext context)
+        {
+            scheduler.DelayAll(10001ms);
+            context.Repeat(40s);
+            scheduler.Schedule(1ms, [this](TaskContext /*context*/)
+            {
+                float x = 210 + frand(0.0f, 35.0f);
+                float y = -65.0f - frand(0.0f, 35.0f);
+                me->GetMotionMaster()->MovePoint(1, x, y, me->GetPositionZ());
+            }).Schedule(10s, [this](TaskContext /*context*/)
+            {
+                //events.SetPhase(0);  howToMigrate?
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                if (IsHeroic())
+                {
+                    scheduler.Schedule(3s, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_CHARGE);
+                        context.Repeat(30s);
+                    });
+                }
+            });
+            //events.SetPhase(1);  howToMigrate?
+            DoCastSelf(SPELL_SPRINT, true);
+        });
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() != NPC_SHATTERED_ASSASSIN)
+        {
+            summon->AI()->AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
+        }
+        summons.Summon(summon);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+            Talk(SAY_SLAY);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE || id != 1)
+            return;
+
+        me->CastSpell(me, SPELL_BLADE_DANCE, true);
+        events.ScheduleEvent(EVENT_MOVE_TO_NEXT_POINT, 0);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (me->GetPositionX() > 255 || me->GetPositionX() < 205)
+        {
+            EnterEvadeMode();
+            return;
+        }
+
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (!events.IsInPhase(1)) //  howToMigrate?
+            DoMeleeAttackIfReady();
     }
 };
 
 void AddSC_boss_warchief_kargath_bladefist()
 {
-    new boss_warchief_kargath_bladefist();
+    RegisterShatteredHallsCreatureAI(boss_warchief_kargath_bladefist);
 }
