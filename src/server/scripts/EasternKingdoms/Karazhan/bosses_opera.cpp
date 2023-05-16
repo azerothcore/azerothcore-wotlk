@@ -706,6 +706,11 @@ public:
             me->DespawnOrUnsummon();
         }
 
+        void JustSummoned(Creature* summon) override
+        {
+            summons.Summon(summon);
+        }
+
         void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_CRONE_SLAY);
