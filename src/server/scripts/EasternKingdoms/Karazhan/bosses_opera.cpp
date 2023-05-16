@@ -202,6 +202,11 @@ public:
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToPC(false);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
+                    {
+                        me->Yell("debug: attack random target", LANG_UNIVERSAL);
+                        me->Attack(target, true);
+                    }
                     AggroTimer = 0;
                 }
                 else
@@ -402,6 +407,11 @@ public:
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToPC(false);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
+                    {
+                        me->Yell("debug: attack random target", LANG_UNIVERSAL);
+                        me->Attack(target, true);
+                    }
                     AggroTimer = 0;
                 }
                 else
@@ -515,6 +525,11 @@ public:
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToPC(false);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
+                    {
+                        me->Yell("debug: attack random target", LANG_UNIVERSAL);
+                        me->Attack(target, true);
+                    }
                     AggroTimer = 0;
                 }
                 else
@@ -630,6 +645,11 @@ public:
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToPC(false);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
+                    {
+                        me->Yell("debug: attack random target", LANG_UNIVERSAL);
+                        me->Attack(target, true);
+                    }
                     AggroTimer = 0;
                 }
                 else
