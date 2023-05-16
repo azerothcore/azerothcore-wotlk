@@ -88,10 +88,9 @@ public:
         else if (Creature const* bot = BotDataMgr::FindBot(_botGUID.GetEntry()))
         {
             Player const* bgPlayer = ObjectAccessor::FindConnectedPlayer(_playerGUID);
-            if (bgPlayer && bgPlayer->IsInWorld() && bgPlayer->InBattleground())
+            if (bgPlayer && bgPlayer->IsInWorld() && bgPlayer->InBattleground() && bgPlayer->GetMap()->IsBattlegroundOrArena())
             {
                 Battleground* bg = ASSERT_NOTNULL(bgPlayer->GetBattleground());
-                ASSERT(bgPlayer->GetMap()->IsBattlegroundOrArena());
 
                 //full, some players connected
                 if (!bg->HasFreeSlots())
