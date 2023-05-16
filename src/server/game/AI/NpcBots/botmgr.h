@@ -91,6 +91,7 @@ class AC_GAME_API BotMgr
         static bool ShowEquippedCloak();
         static bool ShowEquippedHelm();
         static bool SendEquipListItems();
+        static bool IsGearBankEnabled();
         static bool IsTransmogEnabled();
         static bool MixArmorClasses();
         static bool MixWeaponClasses();

@@ -392,7 +392,13 @@ enum BotTexts : uint32
     BOT_TEXT_TRANSMOGRIFICATION         = 70658, //"Transmogrification..."
     BOT_TEXT_DISABLE_COMBAT_POSITIONING = 70659, //"DISABLE combat positioning"
     BOT_TEXT_PRIORITY_TARGET            = 70660, //"Priority target"
-    //70661-70799 reserved for custom localization strings
+    BOT_TEXT_BOT_GEAR_BANK              = 70661, //"Bot gear bank..."
+    BOT_TEXT_DEPOSIT_ITEMS              = 70662, //"Deposit items..."
+    BOT_TEXT_WITHDRAW_ITEMS             = 70663, //"Withdraw items..."
+    BOT_TEXT_BANK_IS_EMPTY              = 70664, //"Bank is empty"
+    BOT_TEXT_PREVIOUS_PAGE              = 70665, //"Previous page"
+    BOT_TEXT_NEXT_PAGE                  = 70666, //"Next page"
+    //70667-70799 reserved for custom localization strings
 };
 
 #endif //BOTTEXT_H

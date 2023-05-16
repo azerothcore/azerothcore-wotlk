@@ -8183,6 +8183,8 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
 
             //general
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_SHOW_INVENTORY), GOSSIP_SENDER_EQUIPMENT_LIST, GOSSIP_ACTION_INFO_DEF + 1);
+            if (BotMgr::IsGearBankEnabled())
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_BOT_GEAR_BANK), GOSSIP_SENDER_EQUIPMENT_BANK_MENU, GOSSIP_ACTION_INFO_DEF + 1);
 
             //auto-equip
             AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_AUTOEQUIP) + "...", GOSSIP_SENDER_EQUIP_AUTOEQUIP, GOSSIP_ACTION_INFO_DEF + 1);
@@ -8997,6 +8999,186 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
 
             if (found && _equip(sender - GOSSIP_SENDER_EQUIP, item, player->GetGUID())){}
             return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
+        }
+        case GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT_ITEM:
+        {
+            ObjectGuid::LowType itemGuidLow = action - GOSSIP_ACTION_INFO_DEF;
+            Item* item = player->GetItemByGuid(ObjectGuid::Create<HighGuid::Item>(itemGuidLow));
+            if (!item)
+            {
+                LOG_ERROR("npcbots", "GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT_ITEM: item {} not found on player {}! Cheater?",
+                    itemGuidLow, player->GetName().c_str());
+                break;
+            }
+
+            BotDataMgr::DepositBotBankItem(player->GetGUID(), item);
+            player->MoveItemFromInventory(item->GetBagSlot(), item->GetSlot(), true);
+
+            action = GOSSIP_ACTION_INFO_DEF; //return to page 0
+            //break;
+            [[fallthrough]];
+        }
+        case GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT:
+        {
+            subMenu = true;
+            uint32 page = action - GOSSIP_ACTION_INFO_DEF;
+            uint32 items_per_page = BOT_GOSSIP_MAX_ITEMS - 3; // prev page, back, next page
+            uint32 counter = 0;
+            uint32 can_add_count = 0;
+            uint32 k = 0;
+
+            static const auto is_bot_equippable_item = [](ItemTemplate const* proto) {
+                switch (proto->InventoryType)
+                {
+                    case INVTYPE_NON_EQUIP: case INVTYPE_BAG: case INVTYPE_TABARD: case INVTYPE_AMMO: case INVTYPE_QUIVER:
+                        return false;
+                    default:
+                        return true;
+                }
+            };
+
+            //backpack
+            for (uint8 i = INVENTORY_SLOT_ITEM_START; i != INVENTORY_SLOT_ITEM_END && can_add_count <= items_per_page; ++i)
+            {
+                if (Item const* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                {
+                    if (is_bot_equippable_item(pItem->GetTemplate()))
+                    {
+                        ++k;
+                        if (k <= page * items_per_page)
+                            continue;
+                        ++can_add_count;
+                        if (counter >= items_per_page)
+                            continue;
+                        ++counter;
+                        std::ostringstream name;
+                        _AddItemLink(player, pItem, name);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT_ITEM, GOSSIP_ACTION_INFO_DEF + pItem->GetGUID().GetCounter());
+                    }
+                }
+            }
+
+            //other bags
+            for (uint8 i = INVENTORY_SLOT_BAG_START; i != INVENTORY_SLOT_BAG_END && can_add_count <= items_per_page; ++i)
+            {
+                Bag const* pBag = player->GetBagByPos(i);
+                if (!pBag)
+                    continue;
+                for (uint32 j = 0; j != pBag->GetBagSize() && can_add_count <= items_per_page; ++j)
+                {
+                    Item const* pItem = player->GetItemByPos(i, j);
+                    if (!pItem)
+                        continue;
+                    if (is_bot_equippable_item(pItem->GetTemplate()))
+                    {
+                        ++k;
+                        if (k <= page * items_per_page)
+                            continue;
+                        ++can_add_count;
+                        if (counter >= items_per_page)
+                            continue;
+                        ++counter;
+                        std::ostringstream name;
+                        _AddItemLink(player, pItem, name);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT_ITEM, GOSSIP_ACTION_INFO_DEF + pItem->GetGUID().GetCounter());
+                    }
+                }
+            }
+
+            if (page > 0)
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_PREVIOUS_PAGE), GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT, action - 1);
+            if (can_add_count > items_per_page)
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_NEXT_PAGE), GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT, action + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_EQUIPMENT_BANK_MENU, GOSSIP_ACTION_INFO_DEF + 1);
+            break;
+        }
+        case GOSSIP_SENDER_EQUIPMENT_BANK_WITHDRAW_ITEM:
+        {
+            ObjectGuid::LowType itemGuidLow = action - GOSSIP_ACTION_INFO_DEF;
+
+            //BotBankItemContainer const& botBankItems = BotDataMgr::GetBotBankItems(player->GetGUID());
+            //Item const* item = std::find_if(std::cbegin(botBankItems), std::cend(botBankItems), [guidLow = itemGuidLow](Item const* item) {
+            //    return item->GetGUID().GetCounter() == guidLow;
+            //});
+            Item* item = BotDataMgr::WithdrawBotBankItem(player->GetGUID(), itemGuidLow);
+            if (!item)
+            {
+                LOG_ERROR("npcbots", "GOSSIP_SENDER_EQUIPMENT_BANK_WITHDRAW_ITEM: item {} not found on player {}! Cheater?",
+                    itemGuidLow, player->GetName().c_str());
+                break;
+            }
+
+            ItemPosCountVec dest;
+            uint32 no_space = 0;
+            InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->GetEntry(), 1, &no_space);
+            if (msg != EQUIP_ERR_OK)
+            {
+                std::ostringstream istr;
+                _AddItemLink(player, item, istr, false);
+                ChatHandler ch(player->GetSession());
+                ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_CANT_UNEQUIP_MAILING).c_str(), istr.str().c_str());
+
+                item->SetOwnerGUID(player->GetGUID());
+
+                CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+                item->FSetState(ITEM_CHANGED);
+                item->SaveToDB(trans);
+                MailDraft(istr.str(), "").AddItem(item).SendMailTo(trans, MailReceiver(player), MailSender(me));
+                CharacterDatabase.CommitTransaction(trans);
+
+                player->SendEquipError(msg, nullptr, nullptr, item->GetEntry());
+            }
+            else
+            {
+                Item* pItem = player->StoreItem(dest, item, true);
+                player->SendNewItem(pItem, 1, true, false, false);
+            }
+
+            action = GOSSIP_ACTION_INFO_DEF; //return to page 0
+            //break;
+            [[fallthrough]];
+        }
+        case GOSSIP_SENDER_EQUIPMENT_BANK_WITHDRAW:
+        {
+            uint32 page = action - GOSSIP_ACTION_INFO_DEF;
+            uint32 items_per_page = BOT_GOSSIP_MAX_ITEMS - 3; // page prev, page next, back
+            uint32 counter = 0;
+
+            BotBankItemContainer const* botBankItems = BotDataMgr::GetBotBankItems(player->GetGUID());
+            if (!botBankItems || botBankItems->empty())
+            {
+                BotWhisper(LocalizedNpcText(player, BOT_TEXT_BANK_IS_EMPTY), player);
+                return OnGossipSelect(player, me, GOSSIP_SENDER_EQUIPMENT_BANK_MENU, action);
+                break;
+            }
+
+            subMenu = true;
+
+            for (size_t i = page * items_per_page; i < botBankItems->size() && counter < items_per_page; ++i)
+            {
+                Item const* item = botBankItems->at(i);
+                ++counter;
+                std::ostringstream name;
+                _AddItemLink(player, item, name);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIPMENT_BANK_WITHDRAW_ITEM, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+            }
+
+            if (page > 0)
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_PREVIOUS_PAGE), GOSSIP_SENDER_EQUIPMENT_BANK_WITHDRAW, action - 1);
+            if (botBankItems->size() > (page + 1) * items_per_page)
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_NEXT_PAGE), GOSSIP_SENDER_EQUIPMENT_BANK_WITHDRAW, action + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_EQUIPMENT_BANK_MENU, GOSSIP_ACTION_INFO_DEF + 1);
+            break;
+        }
+        case GOSSIP_SENDER_EQUIPMENT_BANK_MENU:
+        {
+            subMenu = true;
+
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_DEPOSIT_ITEMS), GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT, GOSSIP_ACTION_INFO_DEF + 0);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_WITHDRAW_ITEMS), GOSSIP_SENDER_EQUIPMENT_BANK_WITHDRAW, GOSSIP_ACTION_INFO_DEF + 0);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 1);
+
+            break;
         }
         case GOSSIP_SENDER_ROLES_MAIN_TOGGLE: //ROLES 2: set/unset
         {
@@ -17141,6 +17323,9 @@ void bot_ai::Evade()
                     _evadeCount = 100;
                     return;
                 }
+
+                //if (TempSummon* wpc = me->GetMap()->SummonCreature(VISUAL_WAYPOINT, pos, nullptr, 20000))
+                //    wpc->SetTempSummonType(TEMPSUMMON_TIMED_DESPAWN);
 
                 movepos.Relocate(me);
                 BotMovement(BOT_MOVE_POINT, &pos, nullptr, use_path);

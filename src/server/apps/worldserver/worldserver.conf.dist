@@ -4436,6 +4436,15 @@ NpcBot.Transmog.UseEquipmentSlots = 0
 NpcBot.Gossip.ShowEquipmentListItems = 0
 
 #
+#    NpcBot.GearBank.Enable
+#        Description: Enable unlimited extra gear storage (accessible through gossip menu).
+#        Note: Unlimited storage creates an 'unlimited bags' exploit, you have been warned.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+NpcBot.GearBank.Enable = 0
+
+#
 #    NpcBot.NewClasses.<Class>.Enable
 #        Description: Allow players to hire bots of non-standard classes.
 #        Note:        Some bot abilities may be unbalanced or game breaking.

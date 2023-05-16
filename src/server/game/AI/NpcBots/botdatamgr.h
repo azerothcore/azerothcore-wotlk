@@ -2,6 +2,7 @@
 #define _BOTDATAMGR_H
 
 #include "botcommon.h"
+#include "DatabaseEnvFwd.h"
 
 #include <functional>
 #include <set>
@@ -142,6 +143,7 @@ public:
 };
 
 typedef std::set<Creature const*> NpcBotRegistry;
+typedef std::vector<Item*> BotBankItemContainer;
 
 class BotDataMgr
 {
@@ -150,6 +152,7 @@ class BotDataMgr
 
         static void LoadNpcBots(bool spawn = true);
         static void LoadNpcBotGroupData();
+        static void LoadNpcBotGearStorage();
 
         static void AddNpcBotData(uint32 entry, uint32 roles, uint8 spec, uint32 faction);
         static NpcBotData const* SelectNpcBotData(uint32 entry);
@@ -194,6 +197,11 @@ class BotDataMgr
         static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport);
         static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* fromPos, Creature const* bot, uint8 lvl, bool random);
         static WanderNode const* GetClosestWanderNode(WorldLocation const* loc);
+
+        static BotBankItemContainer const* GetBotBankItems(ObjectGuid playerGuid);
+        static Item* WithdrawBotBankItem(ObjectGuid playerGuid, ObjectGuid::LowType itemGuidLow);
+        static void DepositBotBankItem(ObjectGuid playerGuid, Item* item);
+        static void SaveNpcBotStoredGear(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
 
         static std::shared_mutex* GetLock();
 
