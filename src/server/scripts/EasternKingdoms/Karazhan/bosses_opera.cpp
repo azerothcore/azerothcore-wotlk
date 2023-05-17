@@ -132,6 +132,7 @@ public:
 
         void Initialize()
         {
+            Talk(SAY_DOROTHEE_AGGRO);
             AggroTimer = 13000;
 
             WaterBoltTimer = 5000;
@@ -140,6 +141,7 @@ public:
 
             SummonedTito = false;
             TitoDied = false;
+            IntroDone = false;
         }
 
         InstanceScript* instance;
@@ -152,6 +154,7 @@ public:
 
         bool SummonedTito;
         bool TitoDied;
+        bool IntroDone;
 
         void Reset() override
         {
@@ -160,8 +163,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            Talk(SAY_DOROTHEE_AGGRO);
-            DoZoneInCombat();
+            me->SetInCombatWithZone();
         }
 
         void JustReachedHome() override
@@ -186,7 +188,6 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
