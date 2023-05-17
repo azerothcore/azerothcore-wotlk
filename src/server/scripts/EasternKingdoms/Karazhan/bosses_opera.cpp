@@ -140,7 +140,6 @@ public:
 
             SummonedTito = false;
             TitoDied = false;
-            IntroDone = false;
         }
 
         InstanceScript* instance;
@@ -153,7 +152,7 @@ public:
 
         bool SummonedTito;
         bool TitoDied;
-        bool IntroDone;
+        bool IntroDone = false;
 
         void Reset() override
         {
@@ -198,8 +197,12 @@ public:
         {
             if(!IntroDone)
             {
-                Talk(SAY_DOROTHEE_AGGRO);
-                IntroDone=true;
+                if(!me->IsInEvadeMode())
+                {
+                    Talk(SAY_DOROTHEE_AGGRO);
+                    IntroDone = true;
+                }
+                me->Yell("I am evading!", LANG_UNIVERSAL);
             }
 
             if (AggroTimer)
