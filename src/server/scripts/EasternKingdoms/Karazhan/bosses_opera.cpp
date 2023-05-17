@@ -126,6 +126,7 @@ public:
     {
         boss_dorotheeAI(Creature* creature) : ScriptedAI(creature)
         {
+            SetCombatMovement(false); //this is kinda a big no-no. but it will prevent her from moving to chase targets. she should just cast her spells. in this case, since there is not really something to LOS her with or get out of range this would work. but a more elegant solution would be better
             Initialize();
             instance = creature->GetInstanceScript();
         }
@@ -175,6 +176,7 @@ public:
         {
             Talk(SAY_DOROTHEE_DEATH);
             SummonCroneIfReady(instance, me);
+            me->DespawnOrUnsummon();
         }
 
         void AttackStart(Unit* who) override
@@ -287,6 +289,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
+            
             if (DorotheeGUID)
             {
                 Creature* Dorothee = ObjectAccessor::GetCreature(*me, DorotheeGUID);
@@ -296,6 +299,7 @@ public:
                     Talk(SAY_DOROTHEE_TITO_DEATH, Dorothee);
                 }
             }
+            me->DespawnOrUnsummon();
         }
 
         void UpdateAI(uint32 diff) override
@@ -399,8 +403,8 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_ROAR_DEATH);
-
             SummonCroneIfReady(instance, me);
+            me->DespawnOrUnsummon();
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -535,8 +539,8 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_STRAWMAN_DEATH);
-
             SummonCroneIfReady(instance, me);
+            me->DespawnOrUnsummon();
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -656,8 +660,8 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_TINHEAD_DEATH);
-
             SummonCroneIfReady(instance, me);
+            me->DespawnOrUnsummon();
         }
 
         void KilledUnit(Unit* /*victim*/) override
