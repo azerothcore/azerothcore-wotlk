@@ -201,8 +201,10 @@ public:
             ScriptedAI::EnterEvadeMode(reason);
 
             if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
                 instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
                 me->DespawnOrUnsummon();
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -291,7 +293,6 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            
             if (DorotheeGUID)
             {
                 Creature* Dorothee = ObjectAccessor::GetCreature(*me, DorotheeGUID);
@@ -380,8 +381,10 @@ public:
             ScriptedAI::EnterEvadeMode(reason);
 
             if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
                 instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
                 me->DespawnOrUnsummon();
+            }
         }
 
         void AttackStart(Unit* who) override
@@ -513,8 +516,10 @@ public:
             ScriptedAI::EnterEvadeMode(reason);
 
             if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
                 instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
                 me->DespawnOrUnsummon();
+            }
         }
         void JustEngagedWith(Unit* /*who*/) override
         {
@@ -658,8 +663,10 @@ public:
             ScriptedAI::EnterEvadeMode(reason);
 
             if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
                 instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
                 me->DespawnOrUnsummon();
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
