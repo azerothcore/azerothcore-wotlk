@@ -132,9 +132,9 @@ public:
 
         void Initialize()
         {
-            AggroTimer = 13000;
+            AggroTimer = 12000;
 
-            WaterBoltTimer = 5000;
+            WaterBoltTimer = 1500;
             FearTimer = 15000;
             SummonTitoTimer = 41000;
 
@@ -202,7 +202,6 @@ public:
                     Talk(SAY_DOROTHEE_AGGRO);
                     IntroDone = true;
                 }
-                me->Yell("I am evading!", LANG_UNIVERSAL);
             }
 
             if (AggroTimer)
@@ -224,7 +223,7 @@ public:
             if (WaterBoltTimer <= diff)
             {
                 DoCast(SelectTarget(SelectTargetMethod::Random, 0), SPELL_WATERBOLT);
-                WaterBoltTimer = TitoDied ? 1500 : 5000;
+                WaterBoltTimer = 1500;
             }
             else
                 WaterBoltTimer -= diff;
@@ -347,7 +346,7 @@ public:
 
         void Reset() override
         {
-            AggroTimer = 17670;
+            AggroTimer = 16670;
             MangleTimer = 5000;
             ShredTimer  = 10000;
             ScreamTimer = 15000;
@@ -465,7 +464,7 @@ public:
 
         void Reset() override
         {
-            AggroTimer = 27300;
+            AggroTimer = 26300;
             BrainBashTimer = 5000;
             BrainWipeTimer = 7000;
         }
@@ -590,7 +589,7 @@ public:
 
         void Reset() override
         {
-            AggroTimer = 35470;
+            AggroTimer = 34470;
             CleaveTimer = 5000;
             RustTimer   = 15000;
 
