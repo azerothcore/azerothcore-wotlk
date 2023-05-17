@@ -193,6 +193,14 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            if(me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if(!IntroDone)
@@ -361,6 +369,14 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+        }
+
         void AttackStart(Unit* who) override
         {
             if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
@@ -478,7 +494,6 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
@@ -486,6 +501,13 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+        }
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_STRAWMAN_AGGRO);
@@ -616,12 +638,19 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);
+        }
+
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
         }
 
         void JustDied(Unit* /*killer*/) override
