@@ -126,7 +126,8 @@ public:
     {
         boss_dorotheeAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false); //this is kinda a big no-no. but it will prevent her from moving to chase targets. she should just cast her spells. in this case, since there is not really something to LOS her with or get out of range this would work. but a more elegant solution would be better
+            SetCombatMovement(false);
+            //this is kinda a big no-no. but it will prevent her from moving to chase targets. she should just cast her spells. in this case, since there is not really something to LOS her with or get out of range this would work. but a more elegant solution would be better
             Initialize();
             instance = creature->GetInstanceScript();
         }
@@ -199,8 +200,9 @@ public:
         {
             ScriptedAI::EnterEvadeMode(reason);
 
-            if(me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+                me->DespawnOrUnsummon();
         }
 
         void UpdateAI(uint32 diff) override
@@ -379,6 +381,7 @@ public:
 
             if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+                me->DespawnOrUnsummon();
         }
 
         void AttackStart(Unit* who) override
@@ -511,6 +514,7 @@ public:
 
             if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+                me->DespawnOrUnsummon();
         }
         void JustEngagedWith(Unit* /*who*/) override
         {
@@ -655,6 +659,7 @@ public:
 
             if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+                me->DespawnOrUnsummon();
         }
 
         void JustDied(Unit* /*killer*/) override
