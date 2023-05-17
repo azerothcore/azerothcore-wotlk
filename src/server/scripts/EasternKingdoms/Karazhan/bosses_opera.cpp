@@ -132,7 +132,6 @@ public:
 
         void Initialize()
         {
-            Talk(SAY_DOROTHEE_AGGRO);
             AggroTimer = 13000;
 
             WaterBoltTimer = 5000;
@@ -197,6 +196,12 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if(!IntroDone)
+            {
+                Talk(SAY_DOROTHEE_AGGRO);
+                IntroDone=true;
+            }
+
             if (AggroTimer)
             {
                 if (AggroTimer <= diff)
