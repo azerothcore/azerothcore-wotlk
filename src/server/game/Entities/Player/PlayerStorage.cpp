@@ -6978,7 +6978,7 @@ bool Player::CheckInstanceLoginValid()
     if (GetMap()->IsRaid())
     {
         // cannot be in raid instance without a group
-        if (!GetGroup())
+        if (!GetGroup() && !sWorld->getBoolConfig(CONFIG_INSTANCE_IGNORE_RAID))
             return false;
     }
     else
