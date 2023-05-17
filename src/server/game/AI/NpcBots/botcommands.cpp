@@ -637,7 +637,7 @@ public:
             { "revive",     HandleNpcBotReviveCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_REVIVE,             Console::No  },
             { "reloadconfig",HandleNpcBotReloadConfigCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_RELOADCONFIG,       Console::Yes },
             { "command",    npcbotCommandCommandTable                                                                               },
-            { "info",       HandleNpcBotInfoCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_INFO,               Console::No  },
+            { "info",       HandleNpcBotInfoCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_INFO,               Console::Yes },
             { "hide",       HandleNpcBotHideCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_HIDE,               Console::No  },
             { "unhide",     HandleNpcBotUnhideCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_UNHIDE,             Console::No  },
             { "show",       HandleNpcBotUnhideCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_UNHIDE,             Console::No  },
@@ -3203,86 +3203,105 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotInfoCommand(ChatHandler* handler)
+    static bool HandleNpcBotInfoCommand(ChatHandler* handler, Optional<Variant<uint32, std::string>> player_lg_name)
     {
-        Player* player = handler->GetSession()->GetPlayer();
-        if (!player->GetTarget())
+        Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
+        std::string master_name = (player_lg_name && player_lg_name->holds_alternative<std::string>()) ? player_lg_name->get<std::string>() : "";
+        if (!master_name.empty())
+            normalizePlayerName(master_name);
+        ObjectGuid cached_guid = !master_name.empty() ? sCharacterCache->GetCharacterGuidByName(master_name) : ObjectGuid::Empty;
+        ObjectGuid master_guid = cached_guid ? cached_guid :
+            (player_lg_name && player_lg_name->holds_alternative<uint32>()) ? ObjectGuid::Create<HighGuid::Player>(player_lg_name->get<uint32>()) :
+            player && player->GetTarget().IsPlayer() ? player->GetTarget() : ObjectGuid::Empty;
+
+        if (master_guid.IsEmpty())
         {
+            if (!master_name.empty())
+            {
+                handler->PSendSysMessage("Player '%s' is not found!", master_name.c_str());
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
             handler->SendSysMessage(".npcbot info");
             handler->SendSysMessage("Lists NpcBots count of each class owned by selected player. You can use this on self and your party members");
             handler->SetSentErrorMessage(true);
             return false;
         }
-        Player* master = player->GetSelectedPlayer();
-        if (!master)
+        if (master_name.empty() && !sCharacterCache->GetCharacterNameByGuid(master_guid, master_name))
         {
-            handler->SendSysMessage("No player selected");
+            handler->PSendSysMessage("Player %u is not found!", master_guid.GetCounter());
             handler->SetSentErrorMessage(true);
             return false;
         }
-        if (BotDataMgr::GetOwnedBotsCount(master->GetGUID()) == 0)
+        if (BotDataMgr::GetOwnedBotsCount(master_guid) == 0)
         {
-            handler->PSendSysMessage("%s has no NpcBots!", master->GetName().c_str());
+            handler->PSendSysMessage("%s (%u) has no NpcBots!", master_name.c_str(), master_guid.GetCounter());
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         std::vector<ObjectGuid> guidvec;
-        BotDataMgr::GetNPCBotGuidsByOwner(guidvec, master->GetGUID());
-        BotMap const* map = master->GetBotMgr()->GetBotMap();
-        guidvec.erase(std::remove_if(std::begin(guidvec), std::end(guidvec),
-            [bmap = map](ObjectGuid guid) { return bmap->find(guid) != bmap->end(); }
-        ), std::end(guidvec));
-
-        handler->PSendSysMessage("Listing NpcBots for %s", master->GetName().c_str());
-        handler->PSendSysMessage("Owned NpcBots: %u (active: %u)", uint32(guidvec.size() + map->size()), uint32(map->size()));
-        for (uint8 i = BOT_CLASS_WARRIOR; i != BOT_CLASS_END; ++i)
+        BotDataMgr::GetNPCBotGuidsByOwner(guidvec, master_guid);
+        Player* master = ObjectAccessor::FindConnectedPlayer(master_guid);
+        BotMap const* map = master ? master->GetBotMgr()->GetBotMap() : nullptr;
+        uint32 map_size = map ? uint32(map->size()) : 0u;
+        if (map)
         {
-            uint8 count = 0;
-            uint8 alivecount = 0;
-            for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
-            {
-                if (Creature* cre = itr->second)
-                {
-                    if (cre->GetBotClass() == i)
-                    {
-                        ++count;
-                        if (cre->IsAlive())
-                            ++alivecount;
-                    }
-                }
-            }
-            if (count == 0)
-                continue;
-
-            char const* bclass;
-            switch (i)
-            {
-                case BOT_CLASS_WARRIOR:         bclass = "Warriors";        break;
-                case BOT_CLASS_PALADIN:         bclass = "Paladins";        break;
-                case BOT_CLASS_MAGE:            bclass = "Mages";           break;
-                case BOT_CLASS_PRIEST:          bclass = "Priests";         break;
-                case BOT_CLASS_WARLOCK:         bclass = "Warlocks";        break;
-                case BOT_CLASS_DRUID:           bclass = "Druids";          break;
-                case BOT_CLASS_DEATH_KNIGHT:    bclass = "Death Knights";   break;
-                case BOT_CLASS_ROGUE:           bclass = "Rogues";          break;
-                case BOT_CLASS_SHAMAN:          bclass = "Shamans";         break;
-                case BOT_CLASS_HUNTER:          bclass = "Hunters";         break;
-                case BOT_CLASS_BM:              bclass = "Blademasters";    break;
-                case BOT_CLASS_SPHYNX:          bclass = "Destroyers";      break;
-                case BOT_CLASS_ARCHMAGE:        bclass = "Archmagi";        break;
-                case BOT_CLASS_DREADLORD:       bclass = "Dreadlords";      break;
-                case BOT_CLASS_SPELLBREAKER:    bclass = "Spell Breakers";  break;
-                case BOT_CLASS_DARK_RANGER:     bclass = "Dark Rangers";    break;
-                case BOT_CLASS_NECROMANCER:     bclass = "Necromancers";    break;
-                case BOT_CLASS_SEA_WITCH:       bclass = "Sea Witches";     break;
-                default:                        bclass = "Unknown Class";   break;
-            }
-            handler->PSendSysMessage("%s: %u (alive: %u)", bclass, count, alivecount);
+            guidvec.erase(std::remove_if(std::begin(guidvec), std::end(guidvec),
+                [bmap = map](ObjectGuid guid) { return bmap->find(guid) != bmap->end(); }
+            ), std::end(guidvec));
         }
 
-        if (guidvec.empty())
-            return true;
+        handler->PSendSysMessage("Listing NpcBots for %s, guid %u%s:", master_name.c_str(), master_guid.GetCounter(), !master ? " (offline)" : "");
+        handler->PSendSysMessage("Owned NpcBots: %u (active: %u)", uint32(guidvec.size()) + map_size, map_size);
+        if (map)
+        {
+            for (uint8 i = BOT_CLASS_WARRIOR; i != BOT_CLASS_END; ++i)
+            {
+                uint8 count = 0;
+                uint8 alivecount = 0;
+                for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
+                {
+                    if (Creature* cre = itr->second)
+                    {
+                        if (cre->GetBotClass() == i)
+                        {
+                            ++count;
+                            if (cre->IsAlive())
+                                ++alivecount;
+                        }
+                    }
+                }
+                if (count == 0)
+                    continue;
+
+                char const* bclass;
+                switch (i)
+                {
+                    case BOT_CLASS_WARRIOR:         bclass = "Warriors";        break;
+                    case BOT_CLASS_PALADIN:         bclass = "Paladins";        break;
+                    case BOT_CLASS_MAGE:            bclass = "Mages";           break;
+                    case BOT_CLASS_PRIEST:          bclass = "Priests";         break;
+                    case BOT_CLASS_WARLOCK:         bclass = "Warlocks";        break;
+                    case BOT_CLASS_DRUID:           bclass = "Druids";          break;
+                    case BOT_CLASS_DEATH_KNIGHT:    bclass = "Death Knights";   break;
+                    case BOT_CLASS_ROGUE:           bclass = "Rogues";          break;
+                    case BOT_CLASS_SHAMAN:          bclass = "Shamans";         break;
+                    case BOT_CLASS_HUNTER:          bclass = "Hunters";         break;
+                    case BOT_CLASS_BM:              bclass = "Blademasters";    break;
+                    case BOT_CLASS_SPHYNX:          bclass = "Destroyers";      break;
+                    case BOT_CLASS_ARCHMAGE:        bclass = "Archmagi";        break;
+                    case BOT_CLASS_DREADLORD:       bclass = "Dreadlords";      break;
+                    case BOT_CLASS_SPELLBREAKER:    bclass = "Spell Breakers";  break;
+                    case BOT_CLASS_DARK_RANGER:     bclass = "Dark Rangers";    break;
+                    case BOT_CLASS_NECROMANCER:     bclass = "Necromancers";    break;
+                    case BOT_CLASS_SEA_WITCH:       bclass = "Sea Witches";     break;
+                    default:                        bclass = "Unknown Class";   break;
+                }
+                handler->PSendSysMessage("%s: %u (alive: %u)", bclass, count, alivecount);
+            }
+        }
 
         handler->PSendSysMessage("%u inactive bots:", uint32(guidvec.size()));
         for (ObjectGuid guid : guidvec)
