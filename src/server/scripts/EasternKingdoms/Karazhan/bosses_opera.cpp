@@ -132,7 +132,7 @@ public:
 
         void Initialize()
         {
-            AggroTimer = 500;
+            AggroTimer = 13000;
 
             WaterBoltTimer = 5000;
             FearTimer = 15000;
@@ -338,7 +338,7 @@ public:
 
         void Reset() override
         {
-            AggroTimer = 5170;
+            AggroTimer = 17670;
             MangleTimer = 5000;
             ShredTimer  = 10000;
             ScreamTimer = 15000;
@@ -456,7 +456,7 @@ public:
 
         void Reset() override
         {
-            AggroTimer = 14800;
+            AggroTimer = 27300;
             BrainBashTimer = 5000;
             BrainWipeTimer = 7000;
         }
@@ -581,7 +581,7 @@ public:
 
         void Reset() override
         {
-            AggroTimer = 22970;
+            AggroTimer = 35470;
             CleaveTimer = 5000;
             RustTimer   = 15000;
 
