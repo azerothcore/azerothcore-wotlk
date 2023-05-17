@@ -134,7 +134,7 @@ public:
         {
             AggroTimer = 12000;
 
-            WaterBoltTimer = 1500;
+            WaterBoltTimer = 0;
             FearTimer = 15000;
             SummonTitoTimer = 41000;
 
