@@ -5284,7 +5284,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         if (at)
             Relocate(at->target_X, at->target_Y, at->target_Z, at->target_Orientation);
         else
-        RelocateToHomebind();
+            RelocateToHomebind();
     }
 
     // NOW player must have valid map
