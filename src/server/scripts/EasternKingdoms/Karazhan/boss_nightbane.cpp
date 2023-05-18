@@ -25,6 +25,7 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellInfo.h"
 #include "karazhan.h"
 
 enum Spells
@@ -252,6 +253,24 @@ public:
             Skeletons = false;
         }
 
+        void DoCastOnFarAwayPlayers(uint32 spellid, bool triggered, float tresholddistance)
+        {
+            //resembles DoCastToAllHostilePlayers a bit
+            ThreatContainer::StorageType targets = me->GetThreatMgr().GetThreatList();
+            for (ThreatContainer::StorageType::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            {
+                if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+                {
+                    me->Yell("unit found", LANG_UNIVERSAL);
+                    if (unit->IsPlayer() && !unit->IsWithinDist(me, tresholddistance, false))
+                    {
+                        me->Yell("unit is player and outside of distance", LANG_UNIVERSAL);
+                        me->CastSpell(unit, spellid, triggered);
+                    }
+                }
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (Intro)
@@ -406,13 +425,7 @@ public:
 
                 if (FireballBarrageTimer <= diff)
                 {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    {
-                        if (!target->IsInRange(me, 0.f, 50.0f, false))
-                        {
-                            DoCast(target, SPELL_FIREBALL_BARRAGE);
-                        }
-                    }
+                    DoCastOnFarAwayPlayers(SPELL_FIREBALL_BARRAGE, false, 50.0f);
             
                     FireballBarrageTimer = 2000;
                 }
@@ -434,6 +447,7 @@ public:
         }
     };
 };
+
 
 class go_blackened_urn : public GameObjectScript
 {
@@ -457,4 +471,5 @@ void AddSC_boss_nightbane()
 {
     new boss_nightbane();
     new go_blackened_urn();
+    RegisterSpellScript(spell_nightbane_fireball_barrage);
 }
