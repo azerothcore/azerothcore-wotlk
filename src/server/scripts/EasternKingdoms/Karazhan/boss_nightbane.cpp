@@ -423,7 +423,7 @@ public:
                 if (FireballBarrageTimer <= diff)
                 {
                     DoCastOnFarAwayPlayers(SPELL_FIREBALL_BARRAGE, false, 80.0f);
-            
+
                     FireballBarrageTimer = 20000;
                 }
                 else
