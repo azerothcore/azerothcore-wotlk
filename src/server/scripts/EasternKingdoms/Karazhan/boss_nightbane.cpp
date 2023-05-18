@@ -244,7 +244,7 @@ public:
 
                 if (Unit* victimTarget = victim->GetVictim())
                 {
-                    me->Yell("getting victim of victim and check", LANG_UNIVERSAL);
+                    me->Yell("getting victim of victim and checking", LANG_UNIVERSAL);
                     return victimTarget != me;
                 }
             }
