@@ -255,16 +255,14 @@ public:
 
         void DoCastOnFarAwayPlayers(uint32 spellid, bool triggered, float tresholddistance)
         {
-            //resembles DoCastToAllHostilePlayers a bit
+            //resembles DoCastToAllHostilePlayers a bit/lot
             ThreatContainer::StorageType targets = me->GetThreatMgr().GetThreatList();
             for (ThreatContainer::StorageType::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
             {
                 if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                 {
-                    me->Yell("unit found", LANG_UNIVERSAL);
                     if (unit->IsPlayer() && !unit->IsWithinDist(me, tresholddistance, false))
                     {
-                        me->Yell("unit is player and outside of distance", LANG_UNIVERSAL);
                         me->CastSpell(unit, spellid, triggered);
                     }
                 }
@@ -425,7 +423,7 @@ public:
 
                 if (FireballBarrageTimer <= diff)
                 {
-                    DoCastOnFarAwayPlayers(SPELL_FIREBALL_BARRAGE, false, 50.0f);
+                    DoCastOnFarAwayPlayers(SPELL_FIREBALL_BARRAGE, false, 80.0f);
             
                     FireballBarrageTimer = 2000;
                 }
