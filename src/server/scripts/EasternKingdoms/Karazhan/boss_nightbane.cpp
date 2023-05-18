@@ -232,6 +232,26 @@ public:
             summoned->AI()->AttackStart(me->GetVictim());
         }
 
+        bool ShouldCastBarrage()
+        {
+            if (Unit* victim = me->GetVictim())
+            {
+                if (!me->IsWithinRange(victim, 20.0f))
+                {
+                    me->Yell("victim out of range, condition true", LANG_UNIVERSAL);
+                    return true;
+                }
+
+                if (Unit* victimTarget = victim->GetVictim())
+                {
+                    me->Yell("getting victim of victim and check", LANG_UNIVERSAL);
+                    return victimTarget != me;
+                }
+            }
+
+            return true;
+        }
+
         void TakeOff()
         {
             Talk(YELL_FLY_PHASE);
@@ -406,11 +426,13 @@ public:
 
                 if (FireballBarrageTimer <= diff)
                 {
-                    me->Yell("barrage test v2!", LANG_UNIVERSAL);
-                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 10.0f))
+                    if (ShouldCastBarrage())
                     {
-                        me->Yell("in range beyond 10 yards!", LANG_UNIVERSAL);
-                        DoCast(target, SPELL_FIREBALL_BARRAGE);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 20.0f))
+                        {
+                            me->Yell("in range beyond 20 yards!", LANG_UNIVERSAL);
+                            DoCast(target, SPELL_FIREBALL_BARRAGE);
+                        }
                     }
                     FireballBarrageTimer = 2000;
                 }
