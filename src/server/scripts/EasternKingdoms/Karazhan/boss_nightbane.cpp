@@ -471,5 +471,4 @@ void AddSC_boss_nightbane()
 {
     new boss_nightbane();
     new go_blackened_urn();
-    RegisterSpellScript(spell_nightbane_fireball_barrage);
 }
