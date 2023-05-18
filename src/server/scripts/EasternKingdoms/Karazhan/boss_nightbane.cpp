@@ -25,7 +25,6 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellInfo.h"
 #include "karazhan.h"
 
 enum Spells
@@ -425,7 +424,7 @@ public:
                 {
                     DoCastOnFarAwayPlayers(SPELL_FIREBALL_BARRAGE, false, 80.0f);
             
-                    FireballBarrageTimer = 2000;
+                    FireballBarrageTimer = 20000;
                 }
                 else
                     FireballBarrageTimer -= diff;
