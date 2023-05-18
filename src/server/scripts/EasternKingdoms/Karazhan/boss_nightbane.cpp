@@ -445,7 +445,6 @@ public:
     };
 };
 
-
 class go_blackened_urn : public GameObjectScript
 {
 public:
