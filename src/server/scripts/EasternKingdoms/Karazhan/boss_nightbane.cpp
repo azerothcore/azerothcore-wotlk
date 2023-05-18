@@ -408,13 +408,8 @@ public:
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
-                        if (target->IsInRange(me, 0.f, 50.0f, false))
+                        if (!target->IsInRange(me, 0.f, 50.0f, false))
                         {
-                            me->Yell("current target in range within 20 yards!", LANG_UNIVERSAL);
-                        }
-                        else
-                        {
-                            me->Yell("current target out of range outside 20 yards!", LANG_UNIVERSAL);
                             DoCast(target, SPELL_FIREBALL_BARRAGE);
                         }
                     }
