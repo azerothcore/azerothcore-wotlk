@@ -1124,11 +1124,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, GetCreateMana());
 
         // xinef: added some multipliers so debuffs can affect pets in any way...
-        SetCreateStat(STAT_STRENGTH, 22 + 2 * petlevel);
-        SetCreateStat(STAT_AGILITY, 22 + 1.5f * petlevel);
-        SetCreateStat(STAT_STAMINA, 25 + 2 * petlevel);
-        SetCreateStat(STAT_INTELLECT, 28 + 2 * petlevel);
-        SetCreateStat(STAT_SPIRIT, 27 + 1.5f * petlevel);
+        SetCreateStat(STAT_STRENGTH, 22);
+        SetCreateStat(STAT_AGILITY, 22);
+        SetCreateStat(STAT_STAMINA, 25);
+        SetCreateStat(STAT_INTELLECT, 28);
+        SetCreateStat(STAT_SPIRIT, 27);
     }
 
     switch (petType)
