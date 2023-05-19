@@ -1348,6 +1348,14 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
                             break;
                         }
+                    case NPC_VENOMOUS_SNAKE:
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel / 2) - 25));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel / 2) - 18));
+                        break;
+                    case NPC_VIPER:
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel / 2 - 10));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel / 2));
+                        break;
                     case NPC_GENERIC_IMP:
                     case NPC_GENERIC_VOIDWALKER:
                         {
