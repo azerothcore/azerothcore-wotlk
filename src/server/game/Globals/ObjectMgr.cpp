@@ -2894,7 +2894,7 @@ void ObjectMgr::LoadItemTemplates()
             }
             if (itemTemplate.Material != dbcitem->Material)
             {
-                LOG_ERROR("sql.sql", "Item (Entry: {%u}}) does not have a correct material ({}), must be {}.", entry, itemTemplate.Material, dbcitem->Material);
+                LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct material ({}), must be {}.", entry, itemTemplate.Material, dbcitem->Material);
                 if (enforceDBCAttributes)
                     itemTemplate.Material = dbcitem->Material;
             }
@@ -2906,7 +2906,7 @@ void ObjectMgr::LoadItemTemplates()
             }
             if (itemTemplate.DisplayInfoID != dbcitem->DisplayInfoID)
             {
-                LOG_ERROR("sql.sql", "Item (Entry: {%u}}) does not have a correct display id ({}), must be {}.", entry, itemTemplate.DisplayInfoID, dbcitem->DisplayInfoID);
+                LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct display id ({}), must be {}.", entry, itemTemplate.DisplayInfoID, dbcitem->DisplayInfoID);
                 if (enforceDBCAttributes)
                     itemTemplate.DisplayInfoID = dbcitem->DisplayInfoID;
             }
