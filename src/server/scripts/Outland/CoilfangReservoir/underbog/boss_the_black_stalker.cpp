@@ -60,7 +60,7 @@ struct boss_the_black_stalker : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         float x, y, z, o;
 
@@ -96,7 +96,7 @@ struct boss_the_black_stalker : public BossAI
             });
         }
 
-        BossAI::JustEngagedWith(who);
+        _JustEngagedWith();
     }
 
     void JustSummoned(Creature* summon) override
@@ -120,9 +120,6 @@ struct boss_the_black_stalker : public BossAI
             return;
 
         scheduler.Update(diff);
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
 
         DoMeleeAttackIfReady();
     }

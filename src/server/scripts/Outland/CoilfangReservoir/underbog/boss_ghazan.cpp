@@ -56,10 +56,16 @@ struct boss_ghazan : public BossAI
             _movedToPlatform = false;
         }
 
-        BossAI::Reset();
+        ScheduleHealthCheckEvent(20, [&] {
+            _enraged = true;
+            DoCastSelf(SPELL_ENRAGE);
+
+        });
+
+        _Reset();
     }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         scheduler.Schedule(3s, [this](TaskContext context)
         {
@@ -74,17 +80,11 @@ struct boss_ghazan : public BossAI
             DoCastVictim(SPELL_TAIL_SWEEP);
             context.Repeat(7s, 9s);
         });
-        BossAI::JustEngagedWith(who);
+        
+        _JustEngagedWith();
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
-    {
-        if (!_enraged && me->HealthBelowPctDamaged(20, damage))
-        {
-            _enraged = true;
-            DoCastSelf(SPELL_ENRAGE);
-        }
-    }
+    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override { }
 
     void DoAction(int32 type) override
     {
@@ -119,7 +119,7 @@ struct boss_ghazan : public BossAI
             me->GetMotionMaster()->MoveRandom(12.f);
         }
 
-        BossAI::JustReachedHome();
+        _JustReachedHome();
     }
 
     void UpdateAI(uint32 diff) override
@@ -130,11 +130,6 @@ struct boss_ghazan : public BossAI
         }
 
         scheduler.Update(diff);
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
-            return;
-        }
 
         DoMeleeAttackIfReady();
     }
