@@ -1,0 +1,71 @@
+-- DB update 2023_05_13_01 -> 2023_05_13_02
+--
+DELETE FROM `spelldifficulty_dbc` WHERE `ID` IN (32860, 32858, 31975, 32861, 32863);
+INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpellID_2`) VALUES
+(32860, 32860, 38378),
+(32858, 32858, 38377),
+(31975, 31975, 35511),
+(32861, 32861, 38379),
+(32863, 32863, 38252);
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (18558, 18497, 18493, 18559, 18495, 18499, 18498, 18501, 18700, 18702));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(18558, 0, 0, 0, 0, 0, 100, 2, 0, 0, 2400, 3800, 0, 11, 12466, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Sorcerer - In Combat CMC - Cast \'Fireball\' (Normal Dungeon)'),
+(18558, 0, 1, 0, 0, 0, 100, 4, 0, 0, 2400, 3800, 0, 11, 17290, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Sorcerer - In Combat CMC - Cast \'Fireball\' (Heroic Dungeon)'),
+(18558, 0, 2, 0, 0, 0, 100, 2, 3600, 7800, 7800, 14500, 0, 11, 15043, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Sorcerer - In Combat - Cast \'Frostbolt\' (Normal Dungeon)'),
+(18558, 0, 3, 0, 0, 0, 100, 4, 6000, 8000, 7800, 14500, 0, 11, 15530, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Sorcerer - In Combat - Cast \'Frostbolt\' (Heroic Dungeon)'),
+(18558, 0, 4, 0, 0, 0, 100, 2, 10900, 16900, 9700, 15700, 0, 11, 15744, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Sorcerer - In Combat - Cast \'Blast Wave\' (Normal Dungeon)'),
+(18558, 0, 5, 0, 0, 0, 100, 4, 10900, 16900, 7200, 10900, 0, 11, 22424, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Sorcerer - In Combat - Cast \'Blast Wave\' (Heroic Dungeon)'),
+(18497, 0, 0, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Monk - On Aggro - Say Line 0'),
+(18497, 0, 1, 0, 0, 0, 100, 0, 18100, 40400, 20500, 33700, 0, 11, 37321, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Monk - In Combat - Cast \'Overpower\''),
+(18497, 0, 2, 0, 0, 0, 100, 0, 14650, 25150, 14150, 31350, 0, 11, 32849, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Monk - In Combat - Cast \'Cyclone Strike\''),
+(18497, 0, 3, 0, 13, 0, 100, 0, 8400, 19300, 0, 0, 0, 11, 32846, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Monk - On Victim Casting - Cast \'Counter Kick\''),
+(18497, 0, 4, 0, 23, 0, 100, 0, 38168, 0, 3600, 3600, 0, 11, 38168, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Monk - On Aura \'Spiritual Sight\' Missing - Cast \'Spiritual Sight\''),
+(18497, 0, 5, 0, 0, 0, 100, 513, 2450, 5700, 0, 0, 0, 88, 1849700, 1849704, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Monk - In Combat - Run Random Script (No Repeat)'),
+(18493, 0, 0, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - On Aggro - Say Line 0'),
+(18493, 0, 1, 0, 0, 0, 100, 0, 400, 4650, 2850, 4650, 0, 11, 32860, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Shadow Bolt\''),
+(18493, 0, 2, 0, 0, 0, 100, 0, 13800, 31900, 13800, 31900, 0, 11, 32859, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Falter\''),
+(18493, 0, 3, 0, 0, 0, 100, 0, 3600, 6500, 16900, 33700, 0, 11, 32858, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Cast \'Touch of the Forgotten\''),
+(18493, 0, 4, 0, 0, 0, 100, 513, 3450, 7300, 0, 0, 0, 88, 1849300, 1849304, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Soulpriest - In Combat - Run Random Script (No Repeat)'),
+(18559, 0, 0, 0, 0, 0, 100, 2, 0, 0, 3650, 5250, 0, 11, 15547, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Stalker - In Combat CMC - Cast \'Shoot\' (Normal Dungeon)'),
+(18559, 0, 1, 0, 0, 0, 100, 4, 0, 0, 3650, 5250, 0, 11, 16100, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Stalker - In Combat CMC - Cast \'Shoot\' (Heroic Dungeon)'),
+(18559, 0, 2, 0, 0, 0, 100, 2, 8450, 14350, 13300, 22900, 0, 11, 31975, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Stalker - In Combat - Cast \'Serpent Sting\' (Normal Dungeon)'),
+(18559, 0, 4, 0, 0, 0, 100, 4, 6000, 11000, 12000, 16000, 0, 11, 37551, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Stalker - In Combat - Cast \'Viper Sting\' (Heroic Dungeon)'),
+(18559, 0, 5, 0, 0, 0, 100, 0, 9650, 25300, 11000, 11000, 0, 11, 32829, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Phasing Stalker - In Combat - Cast \'Spirit Vengeance\''),
+(18495, 0, 0, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Vindicator - On Aggro - Say Line 0'),
+(18495, 0, 1, 0, 23, 0, 100, 0, 32861, 0, 3100, 5300, 0, 11, 32861, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Vindicator - On Aura \'Shadowguard\' Missing - Cast \'Shadowguard\''),
+(18495, 0, 2, 0, 0, 0, 100, 2, 6100, 15000, 15750, 25550, 0, 11, 17439, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Vindicator - In Combat - Cast \'Shadow Shock\' (Normal Dungeon)'),
+(18495, 0, 3, 0, 0, 0, 100, 4, 6100, 15000, 15750, 25550, 0, 11, 17289, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Vindicator - In Combat - Cast \'Shadow Shock\' (Heroic Dungeon)'),
+(18495, 0, 4, 0, 0, 0, 100, 1, 3450, 7300, 0, 0, 0, 88, 1849300, 1849304, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Vindicator - In Combat - Run Random Script (No Repeat)'),
+(18499, 0, 0, 0, 0, 0, 100, 2, 3200, 4650, 3200, 4650, 0, 87, 1849900, 1849901, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Sorcerer - In Combat - Cast Random Spell (Normal Dungeon)'),
+(18499, 0, 1, 0, 0, 0, 100, 4, 3200, 4650, 3200, 4650, 0, 87, 1849902, 1849903, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Sorcerer - In Combat - Cast Random Spell (Heroic Dungeon)'),
+(18499, 0, 2, 0, 0, 0, 100, 3, 7300, 25200, 0, 0, 0, 11, 15744, 64, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Sorcerer - In Combat - Cast \'Blast Wave\' (No Repeat) (Normal Dungeon)'),
+(18499, 0, 3, 0, 0, 0, 100, 5, 7300, 25200, 0, 0, 0, 11, 22424, 64, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Sorcerer - In Combat - Cast \'Blast Wave\' (No Repeat) (Heroic Dungeon)'),
+(18499, 0, 4, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 11, 33422, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Sorcerer - On Just Summoned - Cast \'Phase In\''),
+(18499, 0, 5, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Sorcerer - On Evade - Despawn Instant'),
+(18498, 0, 0, 0, 23, 0, 100, 0, 32828, 0, 3650, 4850, 0, 11, 32828, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Soldier - On Aura \'Protection Aura\' Missing - Cast \'Protection Aura\''),
+(18498, 0, 1, 0, 0, 0, 100, 0, 4800, 10900, 7200, 14500, 0, 11, 11972, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Soldier - In Combat - Cast \'Shield Bash\''),
+(18498, 0, 2, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 11, 33422, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Soldier - On Just Summoned - Cast \'Phase In\''),
+(18498, 0, 3, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Soldier - On Evade - Despawn Instant'),
+(18501, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 11, 33422, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Stalker - On Just Summoned - Cast \'Phase In\''),
+(18501, 0, 1, 0, 0, 0, 100, 2, 0, 0, 3650, 5250, 0, 11, 15547, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Stalker - In Combat CMC - Cast \'Shoot\' (Normal Dungeon)'),
+(18501, 0, 2, 0, 0, 0, 100, 4, 0, 0, 3650, 5250, 0, 11, 16100, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Stalker - In Combat CMC - Cast \'Shoot\' (Heroic Dungeon)'),
+(18501, 0, 3, 0, 0, 0, 100, 0, 8450, 14350, 13300, 22900, 0, 11, 31975, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Stalker - In Combat - Cast \'Serpent Sting\''),
+(18501, 0, 4, 0, 0, 0, 100, 4, 6000, 11000, 12000, 16000, 0, 11, 37551, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Stalker - In Combat - Cast \'Viper Sting\' (Heroic Dungeon)'),
+(18501, 0, 5, 0, 0, 0, 100, 0, 9650, 25300, 11000, 11000, 0, 11, 32829, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Stalker - In Combat - Cast \'Spirit Vengeance\''),
+(18501, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Stalker - On Evade - Despawn Instant'),
+(18700, 0, 0, 0, 0, 0, 100, 0, 2600, 13700, 1200, 20600, 0, 11, 13584, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Reanimated Bones - In Combat - Cast \'Strike\''),
+(18700, 0, 1, 0, 0, 0, 100, 0, 3650, 22850, 7250, 21150, 0, 11, 13444, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Reanimated Bones - In Combat - Cast \'Sunder Armor\''),
+(18702, 0, 0, 0, 4, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Necromancer - On Aggro - Say Line 0'),
+(18702, 0, 1, 0, 0, 0, 100, 0, 1000, 15200, 4800, 15700, 0, 11, 35839, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Necromancer - In Combat - Cast \'Drain Soul\''),
+(18702, 0, 2, 0, 0, 0, 100, 2, 12100, 29000, 22900, 35000, 0, 11, 32863, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Necromancer - In Combat - Cast \'Seed of Corruption\' (Normal Dungeon)'),
+(18702, 0, 3, 0, 0, 0, 100, 4, 12100, 17500, 4800, 9600, 0, 11, 38252, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Necromancer - In Combat - Cast \'Seed of Corruption\' (Heroic Dungeon)'),
+(18702, 0, 4, 0, 74, 0, 100, 2, 0, 70, 15700, 26500, 15, 11, 33325, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Necromancer - On Friendly Between 0-70% Health - Cast \'Shadow Mend\' (Normal Dungeon)'),
+(18702, 0, 5, 0, 74, 0, 100, 4, 0, 70, 6100, 8400, 15, 11, 37367, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Auchenai Necromancer - On Friendly Between 0-70% Health - Cast \'Shadow Mend\' (Heroic Dungeon)');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (1849900, 1849901, 1849902, 1849903));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1849900, 9, 0, 0, 0, 0, 100, 2, 0, 0, 0, 0, 0, 11, 12466, 64, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Sorcerer - Actionlist for Random Cast - Cast \'Fireball\' (Normal Dungeon)'),
+(1849901, 9, 0, 0, 0, 0, 100, 2, 0, 0, 0, 0, 0, 11, 15043, 64, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Sorcerer - Actionlist for Random Cast - Cast \'Frostbolt\' (Normal Dungeon)'),
+(1849902, 9, 0, 0, 0, 0, 100, 4, 0, 0, 0, 0, 0, 11, 17290, 64, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Sorcerer - Actionlist for Random Cast - Cast \'Fireball\' (Heroic Dungeon)'),
+(1849903, 9, 0, 0, 0, 0, 100, 4, 0, 0, 0, 0, 0, 11, 15530, 64, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unliving Sorcerer - Actionlist for Random Cast - Cast \'Frostbolt\' (Heroic Dungeon)');

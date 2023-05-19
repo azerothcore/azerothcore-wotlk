@@ -2885,7 +2885,7 @@ void ObjectMgr::LoadItemTemplates()
             }
             if (itemTemplate.Material != dbcitem->Material)
             {
-                LOG_ERROR("sql.sql", "Item (Entry: {%u}}) does not have a correct material ({}), must be {}.", entry, itemTemplate.Material, dbcitem->Material);
+                LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct material ({}), must be {}.", entry, itemTemplate.Material, dbcitem->Material);
                 if (enforceDBCAttributes)
                     itemTemplate.Material = dbcitem->Material;
             }
@@ -2897,7 +2897,7 @@ void ObjectMgr::LoadItemTemplates()
             }
             if (itemTemplate.DisplayInfoID != dbcitem->DisplayInfoID)
             {
-                LOG_ERROR("sql.sql", "Item (Entry: {%u}}) does not have a correct display id ({}), must be {}.", entry, itemTemplate.DisplayInfoID, dbcitem->DisplayInfoID);
+                LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct display id ({}), must be {}.", entry, itemTemplate.DisplayInfoID, dbcitem->DisplayInfoID);
                 if (enforceDBCAttributes)
                     itemTemplate.DisplayInfoID = dbcitem->DisplayInfoID;
             }
@@ -3744,8 +3744,8 @@ void ObjectMgr::LoadPlayerInfo()
                 info->positionY = positionY;
                 info->positionZ = positionZ;
                 info->orientation = orientation;
-                info->displayId_m = rEntry->MaleDisplayID;
-                info->displayId_f = rEntry->FemaleDisplayID;
+                info->displayId_m = rEntry->model_m;
+                info->displayId_f = rEntry->model_f;
                 _playerInfo[current_race][current_class] = info;
 
                 ++count;

@@ -52,4 +52,6 @@ inline AI* GetHellfireRampartsAI(T* obj)
     return GetInstanceAI<AI>(obj, HellfireRampartsScriptName);
 }
 
+#define RegisterHellfireRampartsCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetHellfireRampartsAI)
+
 #endif

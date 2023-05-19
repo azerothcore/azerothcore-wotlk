@@ -21,9 +21,11 @@ void AddSC_instance_auchenai_crypts();
 void AddSC_boss_shirrak_the_dead_watcher();
 void AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
 void AddSC_boss_pandemonius();
+void AddSC_boss_tavarok();
 void AddSC_instance_mana_tombs();
 void AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
 void AddSC_boss_anzu();
+void AddSC_boss_darkweaver_syth();
 void AddSC_instance_sethekk_halls();
 void AddSC_instance_shadow_labyrinth();      //Auchindoun Shadow Labyrinth
 void AddSC_boss_ambassador_hellmaw();
@@ -54,10 +56,14 @@ void AddSC_instance_steam_vault();
 void AddSC_underbog();                       //CR Underbog
 void AddSC_boss_hungarfen();
 void AddSC_boss_ghazan();
+void AddSC_boss_swamplord_muselek();
 void AddSC_boss_the_black_stalker();
 void AddSC_instance_the_underbog();
 void AddSC_the_slave_pens();                // The Slave Pens
 void AddSC_boss_ahune();
+void AddSC_boss_mennu_the_betrayer();
+void AddSC_boss_rokmar_the_crackler();
+void AddSC_boss_quagmirran();
 void AddSC_instance_the_slave_pens();
 void AddSC_boss_gruul();                     //Gruul's Lair
 void AddSC_boss_high_king_maulgar();
@@ -119,9 +125,11 @@ void AddOutlandScripts()
     AddSC_boss_shirrak_the_dead_watcher();
     AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
     AddSC_boss_pandemonius();
+    AddSC_boss_tavarok();
     AddSC_instance_mana_tombs();
     AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
     AddSC_boss_anzu();
+    AddSC_boss_darkweaver_syth();
     AddSC_instance_sethekk_halls();
     AddSC_instance_shadow_labyrinth();      //Auchindoun Shadow Labyrinth
     AddSC_boss_ambassador_hellmaw();
@@ -152,10 +160,14 @@ void AddOutlandScripts()
     AddSC_underbog();                       //CR Underbog
     AddSC_boss_hungarfen();
     AddSC_boss_ghazan();
+    AddSC_boss_swamplord_muselek();
     AddSC_boss_the_black_stalker();
     AddSC_instance_the_underbog();
-    AddSC_the_slave_pens();                 // The Slave Pens
+    AddSC_the_slave_pens();                 //CR The Slave Pens
     AddSC_boss_ahune();
+    AddSC_boss_mennu_the_betrayer();
+    AddSC_boss_rokmar_the_crackler();
+    AddSC_boss_quagmirran();
     AddSC_instance_the_slave_pens();
     AddSC_boss_gruul();                     //Gruul's Lair
     AddSC_boss_high_king_maulgar();

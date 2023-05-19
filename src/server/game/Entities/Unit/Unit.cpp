@@ -9968,15 +9968,9 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
     return true;
 }
 
-void Unit::setPowerType(Powers new_powertype, bool sendUpdate/* = true*/)
+void Unit::setPowerType(Powers new_powertype)
 {
-    if (getPowerType() == new_powertype)
-        return;
-
-    SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_POWER_TYPE, new_powertype);
-
-    if (!sendUpdate)
-        return;
+    SetByteValue(UNIT_FIELD_BYTES_0, 3, new_powertype);
 
     if (GetTypeId() == TYPEID_PLAYER)
     {
@@ -10375,7 +10369,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         creature->SendAIReaction(AI_REACTION_HOSTILE);
 
         /// @todo: Implement aggro range, detection range and assistance range templates
-        if (!(creature->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE))
+        if (!(creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE))
         {
             creature->CallAssistance();
         }
@@ -15179,10 +15173,7 @@ uint32 Unit::GetCreatureType() const
         if (ssEntry && ssEntry->creatureType > 0)
             return ssEntry->creatureType;
         else
-        {
-            ChrRacesEntry const* raceEntry = sChrRacesStore.AssertEntry(getRace());
-            return raceEntry->CreatureType;
-        }
+            return CREATURE_TYPE_HUMANOID;
     }
     else
         return ToCreature()->GetCreatureTemplate()->type;
@@ -20053,6 +20044,9 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     Unit* vehicleBase = m_vehicle->GetBase();
     m_vehicle = nullptr;
 
+    if (!vehicleBase)
+        return;
+
     SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEMENTFLAG_ROOT
 
     Position pos;
@@ -20167,7 +20161,10 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 
     if (player)
+    {
         player->ResummonPetTemporaryUnSummonedIfAny();
+        player->SetCanTeleport(true);
+    }
 }
 
 void Unit::BuildMovementPacket(ByteBuffer* data) const
@@ -21284,6 +21281,25 @@ void Unit::BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns c
         data << uint32(itr->first);
         data << uint32(itr->second);
     }
+}
+
+uint8 Unit::getRace(bool original) const
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        if (original)
+            return m_realRace;
+        else
+            return m_race;
+    }
+
+    return GetByteValue(UNIT_FIELD_BYTES_0, 0);
+}
+
+void Unit::setRace(uint8 race)
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        m_race = race;
 }
 
 // Check if unit in combat with specific unit
