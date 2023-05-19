@@ -17,24 +17,33 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 #include "the_underbog.h"
 
 enum Spells
 {
+    //Musel'ek
     SPELL_SHOOT               = 22907,
     SPELL_KNOCKAWAY           = 18813,
     SPELL_RAPTOR_STRIKE       = 31566,
     SPELL_MULTISHOT           = 34974,
     SPELL_THROW_FREEZING_TRAP = 31946,
     SPELL_AIMED_SHOT          = 31623,
-    SPELL_HUNTERS_MARK        = 31615
+    SPELL_HUNTERS_MARK        = 31615,
+
+    //Claw
+    SPELL_FERAL_CHARGE        = 39435,
+    SPELL_ECHOING_ROAR        = 31429,
+    SPELL_FRENZY              = 34971,
+    SPELL_MAUL                = 34298
 };
 
 enum Text
 {
-    SAY_AGGRO     = 1,
-    SAY_KILL      = 2,
-    SAY_JUST_DIED = 3
+    SAY_CLAW_FRENZY = 0,
+    SAY_AGGRO       = 1,
+    SAY_KILL        = 2,
+    SAY_JUST_DIED   = 3
 };
 
 enum Misc
@@ -172,7 +181,69 @@ private:
     bool _canChase;
 };
 
+
+struct npc_claw : public ScriptedAI
+{
+    npc_claw(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+
+        ScheduleHealthCheckEvent(20, [&] {
+            me->SetFaction(942);
+        });
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(7400ms, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_FERAL_CHARGE);
+            context.Repeat(20s);
+        }).Schedule(2400ms, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_ECHOING_ROAR);
+            context.Repeat(10600ms, 21200ms);
+        }).Schedule(5s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_FRENZY);
+
+            if (Creature* muselek = instance->GetCreature(DATA_MUSELEK))
+            {
+                muselek->AI()->Talk(SAY_CLAW_FRENZY);
+            }
+            context.Repeat(30500ms);
+        }).Schedule(5300ms, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_MAUL);
+            context.Repeat(11100ms, 21500ms);
+        });
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        SetData(DATA_MUSELEK, DONE);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return
+        
+        _scheduler.Update(diff, [this]
+        {
+            DoMeleeAttackIfReady();
+        });
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
+
 void AddSC_boss_swamplord_muselek()
 {
     RegisterUnderbogCreatureAI(boss_swamplord_muselek);
+    RegisterUnderbogCreatureAI(npc_claw);
 }
