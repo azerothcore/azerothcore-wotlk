@@ -50,6 +50,7 @@ struct boss_ghazan : public BossAI
 
     void Reset() override
     {
+        _Reset();
         _enraged = false;
         if (!_reachedPlatform)
         {
@@ -59,10 +60,7 @@ struct boss_ghazan : public BossAI
         ScheduleHealthCheckEvent(20, [&] {
             _enraged = true;
             DoCastSelf(SPELL_ENRAGE);
-
         });
-
-        _Reset();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
