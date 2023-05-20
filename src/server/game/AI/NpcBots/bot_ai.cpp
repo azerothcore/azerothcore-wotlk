@@ -324,7 +324,7 @@ const std::string& bot_ai::LocalizedNpcText(Player const* forPlayer, uint32 text
 
         if (!unk_botstrings.count(textId))
         {
-        	LOG_ERROR("entities.player", "NPCBots: bot text string #{} is not localized, at least for {}",
+            LOG_ERROR("entities.player", "NPCBots: bot text string #{} is not localized, at least for {}",
                 textId, localeNames[loc]);
 
             std::ostringstream msg;
@@ -14312,7 +14312,7 @@ void bot_ai::InitEquips()
         //  "FROM item_instance WHERE guid IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_SYNCH
 
         for (uint8 i = 0; i != BOT_INVENTORY_SIZE; ++i)
-        	stmt->SetData(i, npcBotData->equips[i]);
+            stmt->SetData(i, npcBotData->equips[i]);
 
         PreparedQueryResult iiresult = CharacterDatabase.Query(stmt);
 
@@ -17665,8 +17665,8 @@ void bot_ai::GetHomePosition(uint16& mapid, Position* pos) const
     else
     {
         CreatureData const* data = me->GetCreatureData();
-    	mapid = data->mapid;
-    	pos->Relocate(data->posX, data->posY, data->posZ, data->orientation);
+        mapid = data->mapid;
+        pos->Relocate(data->posX, data->posY, data->posZ, data->orientation);
     }
 }
 
