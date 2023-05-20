@@ -81,8 +81,8 @@ public:
         uint32 postGossipStep;
         uint32 Text_Timer;
         uint32 ShieldBash_Timer;
-        uint32 Revenge_Timer;    
-        uint32 Porthome_Timer;                               //this is wrong, spell should never be used unless me->GetVictim() dodge, parry or block attack. Trinity support required.
+        uint32 Revenge_Timer; //this is wrong, spell should never be used unless me->GetVictim() dodge, parry or block attack. Trinity support required.
+        uint32 Porthome_Timer;
         ObjectGuid PlayerGUID;
         TaskScheduler _scheduler;
 
@@ -192,7 +192,7 @@ public:
                 {
                     Murta->CastSpell(Murta, SPELL_BLYS_BAND_ESCAPE);
                 }
-                
+
                 me->DespawnOrUnsummon(10000);
                 Weegli->DespawnOrUnsummon(10000);
                 Raven->DespawnOrUnsummon(10000);
