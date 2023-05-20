@@ -1,3 +1,4 @@
+-- DB update 2023_05_20_01 -> 2023_05_20_02
 --
 UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '18950' WHERE (`entry` = 20993);
 UPDATE `creature_template_addon` SET `bytes2` = 2 WHERE (`entry` IN (17826, 20183));
