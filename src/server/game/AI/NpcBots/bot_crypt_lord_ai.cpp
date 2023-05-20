@@ -104,7 +104,7 @@ public:
     {
         return new crypt_lord_botAI(creature);
     }
-/*
+
     bool OnGossipHello(Player* player, Creature* creature)
     {
         return creature->GetBotAI()->OnGossipHello(player, 0);
@@ -123,7 +123,7 @@ public:
             return ai->OnGossipSelectCode(player, creature, sender, action, code);
         return true;
     }
-*/
+
     struct crypt_lord_botAI : public bot_ai
     {
         crypt_lord_botAI(Creature* creature) : bot_ai(creature)
