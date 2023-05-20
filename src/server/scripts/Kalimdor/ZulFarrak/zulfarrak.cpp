@@ -23,6 +23,7 @@ EndContentData */
 #include "GameObjectAI.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "TaskScheduler.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
@@ -44,6 +45,7 @@ enum blySays
 
 enum blySpells
 {
+    SPELL_BLYS_BAND_ESCAPE     = 11365,
     SPELL_SHIELD_BASH          = 11972,
     SPELL_REVENGE              = 12170
 };
@@ -64,6 +66,7 @@ public:
 
         void InitializeAI() override
         {
+            ableToPortHome = false;
             startedFight = false;
             me->SetFaction(FACTION_FRIENDLY);
             postGossipStep = 0;
@@ -74,16 +77,34 @@ public:
         InstanceScript* instance;
 
         bool startedFight;
+        bool ableToPortHome;
         uint32 postGossipStep;
         uint32 Text_Timer;
         uint32 ShieldBash_Timer;
-        uint32 Revenge_Timer;                                   //this is wrong, spell should never be used unless me->GetVictim() dodge, parry or block attack. Trinity support required.
+        uint32 Revenge_Timer;    
+        uint32 Porthome_Timer;                               //this is wrong, spell should never be used unless me->GetVictim() dodge, parry or block attack. Trinity support required.
         ObjectGuid PlayerGUID;
+        TaskScheduler _scheduler;
 
         void Reset() override
         {
             ShieldBash_Timer = 5000;
             Revenge_Timer = 8000;
+            Porthome_Timer = 156000;
+            ableToPortHome = false;
+            startedFight = false;
+        }
+
+        void EnterEvadeMode(EvadeReason /*reason*/) override
+        {
+            if (ableToPortHome)
+                return;
+
+            if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+            {
+                ableToPortHome = true;
+                Porthome_Timer = 156000;
+            }
         }
 
         void MovementInform(uint32 type, uint32 /*id*/) override
@@ -112,6 +133,7 @@ public:
                     switch (postGossipStep)
                     {
                         case 1:
+                            startedFight = true;
                             //weegli doesn't fight - he goes & blows up the door
                             if (Creature* pWeegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
                             {
@@ -146,6 +168,44 @@ public:
                 }
             }
 
+            if (Porthome_Timer <= diff && ableToPortHome == true)
+            {
+                Creature* Weegli = nullptr;
+                Creature* Raven = nullptr;
+                Creature* Oro = nullptr;
+                Creature* Murta = nullptr;
+
+                DoCastSelf(SPELL_BLYS_BAND_ESCAPE);
+                if (Weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
+                {
+                    Weegli->CastSpell(Weegli, SPELL_BLYS_BAND_ESCAPE);
+                }
+                if (Raven = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_RAVEN)))
+                {
+                    Raven->CastSpell(Raven, SPELL_BLYS_BAND_ESCAPE);
+                }
+                if (Oro = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ORO)))
+                {
+                    Oro->CastSpell(Oro, SPELL_BLYS_BAND_ESCAPE);
+                }
+                if (Murta = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURTA)))
+                {
+                    Murta->CastSpell(Murta, SPELL_BLYS_BAND_ESCAPE);
+                }
+                
+                me->DespawnOrUnsummon(10000);
+                Weegli->DespawnOrUnsummon(10000);
+                Raven->DespawnOrUnsummon(10000);
+                Oro->DespawnOrUnsummon(10000);
+                Murta->DespawnOrUnsummon(10000);
+                Porthome_Timer = 156000; //set timer back so that the event doesn't keep triggering
+            }
+            else
+            {
+                Porthome_Timer -= diff;
+            }
+
+
             if (!UpdateVictim())
             {
                 return;
@@ -176,6 +236,7 @@ public:
 
         void DoAction(int32 /*param*/) override
         {
+            ableToPortHome = false;
             postGossipStep = 1;
             Text_Timer = 0;
         }
@@ -213,7 +274,6 @@ public:
         {
             if (instance->GetData(DATA_PYRAMID) >= PYRAMID_DESTROY_GATES && !startedFight)
             {
-                startedFight = true;
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BLY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 1517, me->GetGUID());
             }
