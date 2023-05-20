@@ -316,6 +316,10 @@ public:
 
             StartAttack(mytar, IsMelee());
 
+            CheckAttackState();
+            if (!me->IsAlive())
+                return;
+
             float dist = me->GetDistance(mytar);
 
             //Stealth (for Cooldown handling see bot_ai::ReleaseSpellCooldown)

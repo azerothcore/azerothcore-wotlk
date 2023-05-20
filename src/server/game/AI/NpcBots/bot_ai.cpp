@@ -730,6 +730,7 @@ SpellCastResult bot_ai::CheckBotCast(Unit const* victim, uint32 spellId) const
         case BOT_CLASS_DARK_RANGER:
         case BOT_CLASS_NECROMANCER:
         case BOT_CLASS_SEA_WITCH:
+        case BOT_CLASS_CRYPT_LORD:
             break;
         default:
             LOG_ERROR("entities.player", "CheckBotCast(): Unknown bot class {}", _botclass);
@@ -2322,6 +2323,7 @@ void bot_ai::SetStats(bool force)
         case BOT_CLASS_DARK_RANGER:
         case BOT_CLASS_NECROMANCER:
         case BOT_CLASS_SEA_WITCH:
+        case BOT_CLASS_CRYPT_LORD:
             break;
 
         default:
@@ -2401,6 +2403,8 @@ void bot_ai::SetStats(bool force)
             strmult = 0.f; agimult = 0.f; break;
         case BOT_CLASS_SEA_WITCH:
             strmult = 0.f; agimult = 2.f; break;
+        case BOT_CLASS_CRYPT_LORD:
+            strmult = 9.f; agimult = 0.f; break;
         default:
             LOG_ERROR("entities.player", "_MeleeDamageUpdate(): NIY myclass {}!", uint32(myclass));
             strmult = 0.f; agimult = 0.f; break;
@@ -2561,6 +2565,10 @@ void bot_ai::SetStats(bool force)
         {
             value += 5.f * _getTotalBotStat(BOT_STAT_MOD_INTELLECT);
         }
+        if (_botclass == BOT_CLASS_CRYPT_LORD)
+        {
+            armor_mod += mylevel >= 60 ? 1.0f : mylevel >= 40 ? 0.5f : mylevel >= 20 ? 0.25f : 0.125f;
+        }
     }
 
     value *= armor_mod;
@@ -2582,7 +2590,7 @@ void bot_ai::SetStats(bool force)
             value += mylevel * 5; //total 498 at 83
         if (_botclass == BOT_CLASS_DREADLORD)
             value += mylevel * 3; //total 332 at 83
-        if (_botclass == BOT_CLASS_DARK_RANGER || _botclass == BOT_CLASS_SEA_WITCH)
+        if (_botclass == BOT_CLASS_DARK_RANGER || _botclass == BOT_CLASS_SEA_WITCH || _botclass == BOT_CLASS_CRYPT_LORD)
             value += mylevel * 2; //total 249 at 83
 
         resistbonus[i-1] = int32(value);
@@ -2693,6 +2701,11 @@ void bot_ai::SetStats(bool force)
     {
         tempval -= 0.3f;
     }
+    if (_botclass == BOT_CLASS_CRYPT_LORD)
+    {
+        value -= 0.3f;
+        tempval -= 0.15f;
+    }
 
     dmg_taken_phy = value;
     dmg_taken_mag = tempval;
@@ -2786,6 +2799,9 @@ void bot_ai::SetStats(bool force)
             case BOT_CLASS_DARK_RANGER:
             case BOT_CLASS_SEA_WITCH:
                 haste_per_lvl = 0.5f;
+                break;
+            case BOT_CLASS_CRYPT_LORD:
+                haste_per_lvl = 0.35f;
                 break;
             default:
                 haste_per_lvl = 0.25f;
@@ -2900,6 +2916,10 @@ void bot_ai::SetStats(bool force)
     if (_botclass == BOT_CLASS_DREADLORD)
     {
         value += 40.f;
+    }
+    if (_botclass == BOT_CLASS_CRYPT_LORD)
+    {
+        value += 20.f;
     }
 
     expertise = value;
@@ -3311,6 +3331,11 @@ void bot_ai::SetStats(bool force)
         {
             //bonus from intellect
             value += 2.f * _getTotalBotStat(BOT_STAT_MOD_INTELLECT);
+        }
+        if (_botclass == BOT_CLASS_CRYPT_LORD)
+        {
+            //bonus from strength
+            value += 2.f * _getTotalBotStat(BOT_STAT_MOD_STRENGTH);
         }
 
         spellpower = uint32(value);
@@ -4472,6 +4497,7 @@ bool bot_ai::CheckAttackTarget()
         case BOT_CLASS_SPELLBREAKER:
         case BOT_CLASS_DARK_RANGER:
         case BOT_CLASS_SEA_WITCH:
+        case BOT_CLASS_CRYPT_LORD:
             break;
         default:
             LOG_ERROR("entities.player", "bot_ai: CheckAttackTarget() - unknown bot class {}", _botclass);
@@ -6583,8 +6609,8 @@ void bot_ai::_OnHealthUpdate() const
     //Sphynx bonus (some equip slots unavailable)
     if (_botclass == BOT_CLASS_SPHYNX)
         bonuspct += 50;
-    //Dreadlord's vitality
-    if (_botclass == BOT_CLASS_DREADLORD)
+    //Dreadlord's / Crypt Lord's vitality
+    if (_botclass == BOT_CLASS_DREADLORD || _botclass == BOT_CLASS_CRYPT_LORD)
         bonuspct += 20;
     if (bonuspct)
         m_totalhp = (m_totalhp * (100 + bonuspct)) / 100;
@@ -6627,6 +6653,8 @@ void bot_ai::_OnManaUpdate() const
         m_basemana = BASE_MANA_NECROMANCER;
     if (_botclass == BOT_CLASS_SEA_WITCH)
         m_basemana = float(BASE_MANA_1_SEA_WITCH) + (BASE_MANA_10_SEA_WITCH - BASE_MANA_1_SEA_WITCH) * (mylevel/83.f);
+    if (_botclass == BOT_CLASS_CRYPT_LORD)
+        m_basemana = float (BASE_MANA_1_CRYPT_LORD) + (BASE_MANA_10_CRYPT_LORD - BASE_MANA_1_CRYPT_LORD) * (mylevel/83.f);
     //TC_LOG_ERROR("entities.player", "classinfo base mana = %f", m_basemana);
 
     me->SetCreateMana(uint32(m_basemana));
@@ -6708,6 +6736,8 @@ void bot_ai::_OnManaRegenUpdate() const
                 basemana = BASE_MANA_1_DARK_RANGER;
             else if (_botclass == BOT_CLASS_SEA_WITCH)
                 basemana = BASE_MANA_1_SEA_WITCH;
+            else if (_botclass == BOT_CLASS_CRYPT_LORD)
+                basemana = BASE_MANA_1_CRYPT_LORD;
             else
                 basemana = 0.f;
 
@@ -7206,6 +7236,8 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
             gossipTextId = GOSSIP_NORMAL_CUSTOM_DARKRANGER;
         else if (_botclass == BOT_CLASS_SEA_WITCH)
             gossipTextId = GOSSIP_NORMAL_CUSTOM_SEAWITCH;
+        else if (_botclass == BOT_CLASS_CRYPT_LORD)
+            gossipTextId = GOSSIP_NORMAL_CUSTOM_CRYPTLORD;
         else
             gossipTextId = GOSSIP_NORMAL_SERVE_MASTER;
     }
@@ -7219,6 +7251,8 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
             gossipTextId = GOSSIP_GREET_CUSTOM_DARKRANGER;
         else if (_botclass == BOT_CLASS_SEA_WITCH)
             gossipTextId = GOSSIP_GREET_CUSTOM_SEAWITCH;
+        else if (_botclass == BOT_CLASS_CRYPT_LORD)
+            gossipTextId = GOSSIP_GREET_CUSTOM_CRYPTLORD;
         else
             gossipTextId = GOSSIP_GREET_NEED_SMTH;
     }
@@ -7265,6 +7299,11 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
             {
                 message1 << LocalizedNpcText(player, BOT_TEXT_HIREWARN_SEAWITCH);
                 message2 << LocalizedNpcText(player, BOT_TEXT_HIREOPTION_SEAWITCH);
+            }
+            else if (_botclass == BOT_CLASS_CRYPT_LORD)
+            {
+                message1 << LocalizedNpcText(player, BOT_TEXT_HIREWARN_CRYPTLORD);
+                message2 << LocalizedNpcText(player, BOT_TEXT_HIREOPTION_CRYPTLORD);
             }
             else
             {
@@ -7478,6 +7517,8 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             gossipTextId = GOSSIP_NORMAL_CUSTOM_DARKRANGER;
         else if (_botclass == BOT_CLASS_SEA_WITCH)
             gossipTextId = GOSSIP_NORMAL_CUSTOM_SEAWITCH;
+        else if (_botclass == BOT_CLASS_CRYPT_LORD)
+            gossipTextId = GOSSIP_NORMAL_CUSTOM_CRYPTLORD;
         else
             gossipTextId = GOSSIP_NORMAL_SERVE_MASTER;
     }
@@ -7491,6 +7532,8 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             gossipTextId = GOSSIP_GREET_CUSTOM_DARKRANGER;
         else if (_botclass == BOT_CLASS_SEA_WITCH)
             gossipTextId = GOSSIP_GREET_CUSTOM_SEAWITCH;
+        else if (_botclass == BOT_CLASS_CRYPT_LORD)
+            gossipTextId = GOSSIP_GREET_CUSTOM_CRYPTLORD;
         else
             gossipTextId = GOSSIP_GREET_NEED_SMTH;
     }
@@ -10327,6 +10370,9 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 case BOT_CLASS_SEA_WITCH:
                     gossipTextId = GOSSIP_CLASSDESC_SEAWITCH;
                     break;
+                case BOT_CLASS_CRYPT_LORD:
+                    gossipTextId = GOSSIP_CLASSDESC_CRYPTLORD;
+                    break;
                 default:
                     break;
             }
@@ -10373,6 +10419,8 @@ bool bot_ai::OnGossipSelectCode(Player* player, Creature* creature/* == me*/, ui
             gossipTextId = GOSSIP_NORMAL_CUSTOM_DARKRANGER;
         else if (_botclass == BOT_CLASS_SEA_WITCH)
             gossipTextId = GOSSIP_NORMAL_CUSTOM_SEAWITCH;
+        else if (_botclass == BOT_CLASS_CRYPT_LORD)
+            gossipTextId = GOSSIP_NORMAL_CUSTOM_CRYPTLORD;
         else
             gossipTextId = GOSSIP_NORMAL_SERVE_MASTER;
     }
@@ -10386,6 +10434,8 @@ bool bot_ai::OnGossipSelectCode(Player* player, Creature* creature/* == me*/, ui
             gossipTextId = GOSSIP_GREET_CUSTOM_DARKRANGER;
         else if (_botclass == BOT_CLASS_SEA_WITCH)
             gossipTextId = GOSSIP_GREET_CUSTOM_SEAWITCH;
+        else if (_botclass == BOT_CLASS_CRYPT_LORD)
+            gossipTextId = GOSSIP_GREET_CUSTOM_CRYPTLORD;
         else
             gossipTextId = GOSSIP_GREET_NEED_SMTH;
     }
@@ -11192,8 +11242,8 @@ bool bot_ai::_canUseOffHand() const
     //sphynx can grab anything
     if (_botclass == BOT_CLASS_SPHYNX)
         return true;
-    //dreadlord can on only equip in main hand
-    if (_botclass == BOT_CLASS_DREADLORD)
+    //dreadlord / cryptlord can on only equip in main hand
+    if (_botclass == BOT_CLASS_DREADLORD || _botclass == BOT_CLASS_CRYPT_LORD)
         return false;
     //staff-only classes
     if (_botclass == BOT_CLASS_ARCHMAGE || _botclass == BOT_CLASS_NECROMANCER)
@@ -11549,6 +11599,7 @@ bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItem
                 }
                 break;
             case BOT_CLASS_DREADLORD:
+            case BOT_CLASS_CRYPT_LORD:
                 switch (newProto->SubClass)
                 {
                     case ITEM_SUBCLASS_WEAPON_AXE:
@@ -11742,6 +11793,7 @@ bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItem
                     case BOT_CLASS_SPHYNX:
                     case BOT_CLASS_DREADLORD:
                     case BOT_CLASS_SPELLBREAKER:
+                    case BOT_CLASS_CRYPT_LORD:
                         break;
                     case BOT_CLASS_WARRIOR:
                     case BOT_CLASS_PALADIN:
@@ -11759,6 +11811,7 @@ bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItem
                     case BOT_CLASS_BM:
                     case BOT_CLASS_SPHYNX:
                     case BOT_CLASS_SPELLBREAKER:
+                    case BOT_CLASS_CRYPT_LORD:
                         break;
                     case BOT_CLASS_WARRIOR:
                     case BOT_CLASS_PALADIN:
@@ -11798,6 +11851,7 @@ bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItem
                         return false;
                     case BOT_CLASS_DREADLORD:
                     case BOT_CLASS_SPELLBREAKER:
+                    case BOT_CLASS_CRYPT_LORD:
                         if (newProto->InventoryType != INVTYPE_CLOAK)
                             return false;
                         break;
@@ -14079,6 +14133,7 @@ bool bot_ai::IsValidSpecForClass(uint8 m_class, uint8 spec)
         case BOT_CLASS_DARK_RANGER:
         case BOT_CLASS_NECROMANCER:
         case BOT_CLASS_SEA_WITCH:
+        case BOT_CLASS_CRYPT_LORD:
             return spec == BOT_SPEC_DEFAULT;
         default:
             break;
@@ -15182,6 +15237,11 @@ void bot_ai::OnBotOwnerSpellGo(Spell const* spell, bool ok)
             vehspell->prepare(&targets);
         }
     }
+}
+
+void bot_ai::OnBotChannelFinish(Spell const* spell)
+{
+    OnClassChannelFinish(spell);
 }
 
 void bot_ai::OnBotSpellInterrupted(SpellSchoolMask schoolMask, uint32 unTimeMs)
@@ -16940,12 +17000,6 @@ bool bot_ai::GlobalUpdate(uint32 diff)
     if (!IsTempBot())
         _updateRations(); //safe
 
-    CheckAttackState();
-
-    //second alive check - CheckAttackState() can cause bot to die
-    if (!me->IsAlive())
-        return false;
-
     if (checkAurasTimer <= lastdiff)
     {
         checkAurasTimer += uint32(__rand + __rand + (IAmFree() ? 1000 : 40 * (1 + master->GetNpcBotsCount())));
@@ -17090,7 +17144,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             else
             {
                 //classes which don't display weapons
-                if (_botclass == BOT_CLASS_DREADLORD || _botclass == BOT_CLASS_SPELLBREAKER)
+                if (_botclass == BOT_CLASS_DREADLORD || _botclass == BOT_CLASS_SPELLBREAKER || _botclass == BOT_CLASS_CRYPT_LORD)
                 {
                     if (me->GetSheath() != SHEATH_STATE_UNARMED)
                         me->SetSheath(SHEATH_STATE_UNARMED);
@@ -18376,6 +18430,8 @@ uint8 bot_ai::GetPlayerClass() const
                 return BOT_CLASS_WARLOCK;
             case BOT_CLASS_SEA_WITCH:
                 return BOT_CLASS_MAGE;
+            case BOT_CLASS_CRYPT_LORD:
+                return BOT_CLASS_WARRIOR;
             default:
                 LOG_ERROR("entities.unit", "GetPlayerClass: {} has unknown Ex bot class {}!", me->GetName().c_str(), _botclass);
                 return BOT_CLASS_PALADIN;
@@ -18406,6 +18462,8 @@ uint8 bot_ai::GetPlayerRace() const
                 return RACE_HUMAN;
             case BOT_CLASS_SEA_WITCH:
                 return RACE_TROLL;
+            case BOT_CLASS_CRYPT_LORD:
+                return RACE_UNDEAD_PLAYER;
             default:
                 LOG_ERROR("entities.unit", "GetPlayerRace: {} has unknown Ex bot class {}!", me->GetName().c_str(), _botclass);
                 return RACE_HUMAN;
@@ -18482,12 +18540,13 @@ bool bot_ai::IsMeleeClass(uint8 m_class)
     return
         (m_class == CLASS_WARRIOR || m_class == CLASS_ROGUE || m_class == CLASS_PALADIN ||
         m_class == CLASS_DEATH_KNIGHT || m_class == BOT_CLASS_BM || m_class == BOT_CLASS_DREADLORD ||
-        m_class == BOT_CLASS_SPELLBREAKER);
+        m_class == BOT_CLASS_SPELLBREAKER || m_class == BOT_CLASS_CRYPT_LORD);
 }
 bool bot_ai::IsTankingClass(uint8 m_class)
 {
     return (m_class == CLASS_WARRIOR || m_class == CLASS_PALADIN ||
-        m_class == CLASS_DEATH_KNIGHT || m_class == BOT_CLASS_SPHYNX || m_class == BOT_CLASS_SPELLBREAKER);
+        m_class == CLASS_DEATH_KNIGHT || m_class == BOT_CLASS_SPHYNX ||
+        m_class == BOT_CLASS_SPELLBREAKER || m_class == BOT_CLASS_CRYPT_LORD);
 }
 bool bot_ai::IsBlockingClass(uint8 m_class)
 {
@@ -18517,7 +18576,7 @@ bool bot_ai::IsHumanoidClass(uint8 m_class)
 bool bot_ai::IsHeroExClass(uint8 m_class)
 {
     return m_class == BOT_CLASS_BM || m_class == BOT_CLASS_ARCHMAGE || m_class == BOT_CLASS_DREADLORD ||
-        m_class == BOT_CLASS_DARK_RANGER || m_class == BOT_CLASS_SEA_WITCH;
+        m_class == BOT_CLASS_DARK_RANGER || m_class == BOT_CLASS_SEA_WITCH || m_class == BOT_CLASS_CRYPT_LORD;
 }
 bool bot_ai::IsMelee() const
 {
@@ -18642,7 +18701,7 @@ bool bot_ai::CanChangeEquip(uint8 slot) const
     return (_botclass != BOT_CLASS_BM && _botclass != BOT_CLASS_ARCHMAGE &&
         _botclass != BOT_CLASS_DREADLORD && _botclass != BOT_CLASS_SPELLBREAKER &&
         _botclass != BOT_CLASS_DARK_RANGER && _botclass != BOT_CLASS_NECROMANCER &&
-        _botclass != BOT_CLASS_SEA_WITCH) ||
+        _botclass != BOT_CLASS_SEA_WITCH && _botclass != BOT_CLASS_CRYPT_LORD) ||
         slot > BOT_SLOT_RANGED;
 }
 bool bot_ai::CanDisplayNonWeaponEquipmentChanges() const

@@ -308,6 +308,11 @@ public:
         {
             if (!bot_ai::StartAttack(u, force))
                 return;
+
+            CheckAttackState();
+            if (!me->IsAlive())
+                return;
+
             GetInPosition(force, u);
         }
 

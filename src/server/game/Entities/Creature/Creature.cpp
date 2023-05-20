@@ -2062,11 +2062,6 @@ void Creature::setDeathState(DeathState s, bool despawn)
 
     if (s == JUST_DIED)
     {
-        //npcbot
-        if (bot_AI)
-            bot_AI->UnsummonAll();
-        //end npcbot
-
         _lastDamagedTime.reset();
 
         m_corpseRemoveTime = GameTime::GetGameTime().count() + m_corpseDelay;

@@ -1287,6 +1287,7 @@ public:
                 case BOT_CLASS_DARK_RANGER:
                 case BOT_CLASS_NECROMANCER:
                 case BOT_CLASS_SEA_WITCH:
+                case BOT_CLASS_CRYPT_LORD:
                     if (BLESSING_OF_KINGS && !kings && doCast(target, BLESSING_OF_KINGS))
                         return true;
                     else if (BLESSING_OF_MIGHT && !might && doCast(target, BLESSING_OF_MIGHT))
@@ -1441,6 +1442,10 @@ public:
                 return;
 
             StartAttack(mytar, IsMelee());
+
+            CheckAttackState();
+            if (!me->IsAlive())
+                return;
 
             MoveBehind(mytar);
 

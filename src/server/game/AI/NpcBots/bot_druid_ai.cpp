@@ -657,6 +657,10 @@ public:
 
             StartAttack(mytar, bot_ai::IsMelee());
 
+            CheckAttackState();
+            if (!me->IsAlive())
+                return;
+
             //NOT all forms abilities (prioritized)
             //Cat Instaheal
             if (_form == DRUID_CAT_FORM && GC_Timer <= diff && Rand() < 60 &&

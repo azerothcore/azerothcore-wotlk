@@ -163,6 +163,10 @@ public:
 
             StartAttack(mytar, IsMelee());
 
+            CheckAttackState();
+            if (!me->IsAlive())
+                return;
+
             MoveBehind(mytar);
         }
 

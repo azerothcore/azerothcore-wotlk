@@ -209,6 +209,10 @@ public:
 
             StartAttack(mytar, IsMelee());
 
+            CheckAttackState();
+            if (!me->IsAlive())
+                return;
+
             Counter(diff);
 
             CheckBlackArrow(diff);

@@ -88,6 +88,8 @@ enum rbac
 
 using namespace Acore::ChatCommands;
 
+static uint32 last_model_id = 0;
+
 class script_bot_commands : public CommandScript
 {
 private:
@@ -210,6 +212,7 @@ private:
             case BOT_CLASS_DARK_RANGER: bot_color_str = "ff3e255e"; bot_class_str = "Dark Ranger";        break;
             case BOT_CLASS_NECROMANCER: bot_color_str = "ff9900cc"; bot_class_str = "Necromancer";        break;
             case BOT_CLASS_SEA_WITCH:   bot_color_str = "ff40d7a9"; bot_class_str = "Sea Witch";          break;
+            case BOT_CLASS_CRYPT_LORD:  bot_color_str = "ff19782b"; bot_class_str = "Crypt Lord";         break;
             default:                    bot_color_str = "ffffffff"; bot_class_str = "Unknown";            break;
         }
     }
@@ -530,6 +533,7 @@ public:
         {
             { "raid",       HandleNpcBotDebugRaidCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_RAID,         Console::No  },
             { "mount",      HandleNpcBotDebugMountCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_MOUNT,        Console::No  },
+            { "model",      HandleNpcBotDebugModelCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_VISUAL,       Console::No  },
             { "spellvisual",HandleNpcBotDebugSpellVisualCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_VISUAL,       Console::No  },
             { "states",     HandleNpcBotDebugStatesCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
             { "spells",     HandleNpcBotDebugSpellsCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
@@ -1468,6 +1472,25 @@ public:
         }
 
         target->Mount(*mountId);
+        return true;
+    }
+
+    static bool HandleNpcBotDebugModelCommand(ChatHandler* handler, Optional<uint32> setId)
+    {
+        Player* owner = handler->GetSession()->GetPlayer();
+        Unit* target = owner->GetSelectedUnit();
+        if (!target)
+        {
+            handler->SendSysMessage("No target selected");
+            return true;
+        }
+
+        if (setId)
+            last_model_id = *setId;
+
+        handler->PSendSysMessage("Setting model %u...", last_model_id);
+        target->SetDisplayId(last_model_id++);
+
         return true;
     }
 
@@ -2537,6 +2560,7 @@ public:
             handler->PSendSysMessage("BOT_CLASS_DARK_RANGER = %u", uint32(BOT_CLASS_DARK_RANGER));
             handler->PSendSysMessage("BOT_CLASS_NECROMANCER = %u", uint32(BOT_CLASS_NECROMANCER));
             handler->PSendSysMessage("BOT_CLASS_SEA_WITCH = %u", uint32(BOT_CLASS_SEA_WITCH));
+            handler->PSendSysMessage("BOT_CLASS_CRYPT_LORD = %u", uint32(BOT_CLASS_CRYPT_LORD));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2921,6 +2945,7 @@ public:
             case BOT_CLASS_SPHYNX:
             case BOT_CLASS_DREADLORD:
             case BOT_CLASS_SPELLBREAKER:
+            case BOT_CLASS_CRYPT_LORD:
                 race = 15; //RACE_SKELETON
                 break;
             case BOT_CLASS_NECROMANCER:
@@ -3297,6 +3322,7 @@ public:
                     case BOT_CLASS_DARK_RANGER:     bclass = "Dark Rangers";    break;
                     case BOT_CLASS_NECROMANCER:     bclass = "Necromancers";    break;
                     case BOT_CLASS_SEA_WITCH:       bclass = "Sea Witches";     break;
+                    case BOT_CLASS_CRYPT_LORD:      bclass = "Crypt Lords";     break;
                     default:                        bclass = "Unknown Class";   break;
                 }
                 handler->PSendSysMessage("%s: %u (alive: %u)", bclass, count, alivecount);

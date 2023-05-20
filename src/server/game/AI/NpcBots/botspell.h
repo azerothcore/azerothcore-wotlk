@@ -53,6 +53,7 @@ enum BotSpells : uint32
     RACIAL_GIFT_OF_NAARU_SHAMAN         = 59547,
     RACIAL_GIFT_OF_NAARU_MAGE           = 59548,
 //ADVANCED
+    //SPELL_SUMMON_FELBLAZE_PREVISUAL     = 46350,//green splash impact head/torso
     //HONORLESS_TARGET                    = 2479,
     COSMETIC_TELEPORT_EFFECT            = 52096,//visual instant cast omni
     COSMETIC_RESURRECTION               = 58854,//visual instant cast self (castable while dead, hidden)
@@ -60,14 +61,17 @@ enum BotSpells : uint32
     CALL_PET_VISUAL                     = 30416,//QUEST_WOOD_CLEANSE_EFFECT
     SPELL_VERTEX_COLOR_BLACK            = 39662,//black color model full
     SPELL_VERTEX_COLOR_GREY             = 43355,//grey color model full
+    SPELL_BLACK_HOLE_VISUAL_2           = 46235,//blackened+smoke trail med
 ////CUSTOM SPELLS - UNUSED IN CODE AND DB
   //common
   //modify
     SPELL_TRIGGERED_HEAL                = 25155,//hidden
     SPELL_TELEPORT_LOCAL                = 7794,//Teleport, no log
+    SPELL_NULLIFY_POISON                = 550,//To convert into passive for bots
   //unmodify
     SPELL_ATTACK_MELEE_1H               = 42880,
     SPELL_TRIGGERED_ENERGIZE            = 60628,//hidden
+    SPELL_BRIEF_STUN                    = 41421,//1sec stun
 //BLADEMASTER
   //SPELLS
   //unmodify
@@ -151,8 +155,20 @@ enum BotSpells : uint32
     SPELL_SHOOT_BOW                     = 41188,
   //unmodify
     SPELL_TORNADO_LIGHTNING_VISUAL      = 45869, //periodic, 1 sec
-
-    //SPELL_SUMMON_FELBLAZE_PREVISUAL     = 46350,//green splash impact head/torso
+//CRYPT LORD
+  //modify
+    //impale cd 9
+    //locust dur 30 cd 180
+    SPELL_IMPALE                        = 53458,
+    SPELL_IMPALE_DAMAGE                 = 53454,
+    SPELL_IMPALE_VISUAL                 = 59446,
+    SPELL_CARRION_BEETLES               = 53520,
+    SPELL_LOCUST_SWARM                  = 28785,
+    SPELL_SOUL_BITE                     = 11016, //special - pet
+    SPELL_ENERGIZE_VISUAL               = 59198,
+    SPELL_BURROW                        = 68394, //special - pet (NYI) //SPELL_EFFECT_FORCE_DESELECT
+  //unmodify
+    SPELL_SPIKED_CARAPACE_DAMAGE        = 14104,
 
 //OTHER
     BASE_MANA_SPHYNX                    = 400 * 5,
@@ -164,12 +180,14 @@ enum BotSpells : uint32
     BASE_MANA_10_DREADLORD              = 600 * 5,
     BASE_MANA_10_DARK_RANGER            = 570 * 5,
     BASE_MANA_10_SEA_WITCH              = 735 * 5,
+    BASE_MANA_10_CRYPT_LORD             = 420 * 5,
     //base mana at 1
     BASE_MANA_1_BM                      = 240 * 5,
     BASE_MANA_1_ARCHMAGE                = 285 * 5,
     BASE_MANA_1_DREADLORD               = 270 * 5,
     BASE_MANA_1_DARK_RANGER             = 225 * 5,
     BASE_MANA_1_SEA_WITCH               = 330 * 5,
+    BASE_MANA_1_CRYPT_LORD              = 210 * 5,
 };
 
 enum BotMountSpells : uint32

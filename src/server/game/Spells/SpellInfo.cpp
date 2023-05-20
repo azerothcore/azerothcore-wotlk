@@ -904,7 +904,7 @@ SpellInfo::~SpellInfo()
 
 SpellInfo const* SpellInfo::TryGetSpellInfoOverride(WorldObject const* caster) const
 {
-    SpellInfo const* spellInfoOverride = (caster && caster->IsNPCBot()) ? GetBotSpellInfoOverride(Id) : nullptr;
+    SpellInfo const* spellInfoOverride = (caster && caster->IsNPCBotOrPet()) ? GetBotSpellInfoOverride(Id) : nullptr;
     return spellInfoOverride ? spellInfoOverride : this;
 }
 

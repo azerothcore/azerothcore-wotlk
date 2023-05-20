@@ -184,7 +184,8 @@ private:
         {BOT_CLASS_SPELLBREAKER, 1610u},
         {BOT_CLASS_DARK_RANGER, 14u},
         {BOT_CLASS_NECROMANCER, 14u},
-        {BOT_CLASS_SEA_WITCH, 14u}
+        {BOT_CLASS_SEA_WITCH, 14u},
+        {BOT_CLASS_CRYPT_LORD, 14u}
     };
 
     uint32 next_bot_id;
@@ -1399,6 +1400,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][BOT_SLOT_FINGER1][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
@@ -1416,6 +1418,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][BOT_SLOT_FINGER2][reqLstep].push_back(itemId);
                         break;
                     case INVTYPE_TRINKET:
                         if (proto.Quality < ITEM_QUALITY_UNCOMMON)
@@ -1437,6 +1440,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][BOT_SLOT_TRINKET1][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_PALADIN][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_HUNTER][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
@@ -1454,6 +1458,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][BOT_SLOT_TRINKET2][reqLstep].push_back(itemId);
                         break;
                     case INVTYPE_CLOAK:
                         _botsWanderCreaturesSortedGear[BOT_CLASS_WARRIOR][BOT_SLOT_BACK][reqLstep].push_back(itemId);
@@ -1473,6 +1478,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DARK_RANGER][BOT_SLOT_BACK][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_BACK][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SEA_WITCH][BOT_SLOT_BACK][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][BOT_SLOT_BACK][reqLstep].push_back(itemId);
                         break;
                     case INVTYPE_HOLDABLE:
                         if (proto.Quality < ITEM_QUALITY_UNCOMMON)
@@ -1547,8 +1553,9 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                                 _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][slot][reqLstep].push_back(itemId);
                                 _botsWanderCreaturesSortedGear[BOT_CLASS_BM][slot][reqLstep].push_back(itemId);
                                 _botsWanderCreaturesSortedGear[BOT_CLASS_SPHYNX][slot][reqLstep].push_back(itemId);
-                                _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][slot][reqLstep].push_back(itemId);
                                 _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_SPELLBREAKER][slot][reqLstep].push_back(itemId);
+                                _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][slot][reqLstep].push_back(itemId);
                                 break;
                             default:
                                 break;
@@ -1607,6 +1614,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_ARCHMAGE][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_NECROMANCER][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_AXE2:
                         if (proto.InventoryType != INVTYPE_2HWEAPON)
@@ -1620,6 +1628,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_SWORD2:
                         if (proto.InventoryType != INVTYPE_2HWEAPON)
@@ -1632,6 +1641,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DEATH_KNIGHT][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_POLEARM:
                         if (proto.InventoryType != INVTYPE_2HWEAPON)
@@ -1645,6 +1655,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_BM][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_MACE2:
                         if (proto.InventoryType != INVTYPE_2HWEAPON)
@@ -1657,6 +1668,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         _botsWanderCreaturesSortedGear[BOT_CLASS_SHAMAN][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DRUID][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         _botsWanderCreaturesSortedGear[BOT_CLASS_DREADLORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
+                        _botsWanderCreaturesSortedGear[BOT_CLASS_CRYPT_LORD][BOT_SLOT_MAINHAND][reqLstep].push_back(itemId);
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_AXE:
                         if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)

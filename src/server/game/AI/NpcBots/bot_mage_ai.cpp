@@ -410,6 +410,10 @@ public:
 
             StartAttack(mytar, IsMelee());
 
+            CheckAttackState();
+            if (!me->IsAlive())
+                return;
+
             MoveBehind(mytar);
 
             if (!HasRole(BOT_ROLE_DPS))
@@ -1716,8 +1720,8 @@ public:
  /*Special*/InitSpellMap(LIVING_BOMB_DAMAGE_1); //important
             InitSpellMap(SLOW_FALL_1);
             InitSpellMap(ICE_LANCE_1);
-            InitSpellMap(FROST_WARD_1);
-            InitSpellMap(FIRE_WARD_1);
+            //InitSpellMap(FROST_WARD_1);
+            //InitSpellMap(FIRE_WARD_1);
             InitSpellMap(MIRROR_IMAGE_1);
 
  /*Special*/InitSpellMap(CONJURE_MANA_GEM_1);

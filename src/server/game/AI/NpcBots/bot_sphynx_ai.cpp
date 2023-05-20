@@ -185,6 +185,10 @@ public:
 
             StartAttack(mytar, IsMelee());
 
+            CheckAttackState();
+            if (!me->IsAlive())
+                return;
+
             CheckDrainMana(diff);
 
             MoveBehind(mytar);

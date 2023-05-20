@@ -782,10 +782,12 @@ public:
 
             StartAttack(mytar, IsMelee());
 
+            CheckAttackState();
+            if (!me->IsAlive())
+                return;
+
             Counter(diff);
             CheckTranquil(diff);
-
-            MoveBehind(mytar);
 
             float dist = me->GetDistance(mytar);
             float maxRangeLong = me->GetLevel() >= 10 ? 51.f : 45.f;

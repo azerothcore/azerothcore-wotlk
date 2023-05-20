@@ -4290,6 +4290,7 @@ NpcBot.Mult.Damage.SpellBreaker      = 1.0
 NpcBot.Mult.Damage.DarkRanger        = 1.0
 NpcBot.Mult.Damage.Necromancer       = 1.0
 NpcBot.Mult.Damage.SeaWitch          = 1.0
+NpcBot.Mult.Damage.CryptLord         = 1.0
 
 #
 #    NpcBot.Mult.Damage.Levels
@@ -4462,6 +4463,7 @@ NpcBot.GearBank.Enable = 0
 #                     1 - (NpcBot.NewClasses.DarkRanger.Enable)
 #                     1 - (NpcBot.NewClasses.Necromancer.Enable)
 #                     1 - (NpcBot.NewClasses.SeaWitch.Enable)
+#                     1 - (NpcBot.NewClasses.CryptLord.Enable)
 
 NpcBot.NewClasses.Blademaster.Enable       = 1
 NpcBot.NewClasses.ObsidianDestroyer.Enable = 1
@@ -4471,6 +4473,7 @@ NpcBot.NewClasses.SpellBreaker.Enable      = 1
 NpcBot.NewClasses.DarkRanger.Enable        = 1
 NpcBot.NewClasses.Necromancer.Enable       = 1
 NpcBot.NewClasses.SeaWitch.Enable          = 1
+NpcBot.NewClasses.CryptLord.Enable         = 1
 
 #
 #    NpcBot.Stats.Limits.Enable
