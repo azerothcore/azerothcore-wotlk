@@ -168,34 +168,28 @@ public:
 
             if (Porthome_Timer <= diff && ableToPortHome == true)
             {
-                Creature* Weegli = nullptr;
-                Creature* Raven = nullptr;
-                Creature* Oro = nullptr;
-                Creature* Murta = nullptr;
-
+                if (Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
+                {
+                    weegli->CastSpell(weegli, SPELL_BLYS_BAND_ESCAPE);
+                    weegli->DespawnOrUnsummon(10000);
+                }
+                if (Creature* raven = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_RAVEN)))
+                {
+                    raven->CastSpell(raven, SPELL_BLYS_BAND_ESCAPE);
+                    raven->DespawnOrUnsummon(10000);
+                }
+                if (Creature* oro = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ORO)))
+                {
+                    oro->CastSpell(oro, SPELL_BLYS_BAND_ESCAPE);
+                    oro->DespawnOrUnsummon(10000);
+                }
+                if (Creature* murta = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURTA)))
+                {
+                    murta->CastSpell(murta, SPELL_BLYS_BAND_ESCAPE);
+                    murta->DespawnOrUnsummon(10000);
+                }
                 DoCastSelf(SPELL_BLYS_BAND_ESCAPE);
-                if (Weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
-                {
-                    Weegli->CastSpell(Weegli, SPELL_BLYS_BAND_ESCAPE);
-                }
-                if (Raven = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_RAVEN)))
-                {
-                    Raven->CastSpell(Raven, SPELL_BLYS_BAND_ESCAPE);
-                }
-                if (Oro = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ORO)))
-                {
-                    Oro->CastSpell(Oro, SPELL_BLYS_BAND_ESCAPE);
-                }
-                if (Murta = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURTA)))
-                {
-                    Murta->CastSpell(Murta, SPELL_BLYS_BAND_ESCAPE);
-                }
-
                 me->DespawnOrUnsummon(10000);
-                Weegli->DespawnOrUnsummon(10000);
-                Raven->DespawnOrUnsummon(10000);
-                Oro->DespawnOrUnsummon(10000);
-                Murta->DespawnOrUnsummon(10000);
                 Porthome_Timer = 156000; //set timer back so that the event doesn't keep triggering
             }
             else
