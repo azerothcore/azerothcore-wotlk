@@ -6,5 +6,4 @@ INSERT INTO `creature_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (16408, 0, 0, 0, 0, 0, 0, '18950');
 
-UPDATE `creature_addon` SET `auras` = 18950  WHERE `guid` in (20058, 16424)
 UPDATE `creature_template_addon` SET `auras` = '18950' WHERE `entry` IN (20058, 16424);
