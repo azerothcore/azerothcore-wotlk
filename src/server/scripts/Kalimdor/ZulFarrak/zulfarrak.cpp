@@ -23,7 +23,6 @@ EndContentData */
 #include "GameObjectAI.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "TaskScheduler.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
@@ -84,7 +83,6 @@ public:
         uint32 Revenge_Timer; //this is wrong, spell should never be used unless me->GetVictim() dodge, parry or block attack. Trinity support required.
         uint32 Porthome_Timer;
         ObjectGuid PlayerGUID;
-        TaskScheduler _scheduler;
 
         void Reset() override
         {
@@ -204,7 +202,6 @@ public:
             {
                 Porthome_Timer -= diff;
             }
-
 
             if (!UpdateVictim())
             {
