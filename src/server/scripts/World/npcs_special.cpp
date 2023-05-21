@@ -1185,7 +1185,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
 
     if (Event)
     {
-        if (SummonPatientTimer <= diff || SummonPatientCount < 7) // Starts with all beds filled
+        if (SummonPatientTimer <= diff || SummonPatientCount < 6) // Starts with beds filled
         {
             if (Coordinates.empty())
                 return;
