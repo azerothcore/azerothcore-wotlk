@@ -1,3 +1,4 @@
+-- DB update 2023_05_21_01 -> 2023_05_21_02
 --
 UPDATE `creature_template` SET `ScriptName` = '' WHERE `entry` IN (19523, 19524);
 
