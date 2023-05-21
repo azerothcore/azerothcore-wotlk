@@ -71,7 +71,6 @@ public:
             auto itemTokens = Acore::Tokenize(itemString, ':', false);
 
             uint32 itemCount;
-            handler->SendSysMessage(Acore::StringFormatFmt("> '{}' contains {} token.", itemString, itemTokens.size()));
             switch (itemTokens.size())
             {
                 case 1:
