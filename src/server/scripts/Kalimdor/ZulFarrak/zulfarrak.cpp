@@ -70,6 +70,7 @@ public:
             me->SetFaction(FACTION_FRIENDLY);
             postGossipStep = 0;
             Text_Timer = 0;
+            Walk_Timer = 0;
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
@@ -172,6 +173,7 @@ public:
             if (Walk_Timer <= diff && (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN || instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS))
             {
                 //makes sure to let Bly always walk during the movement phase, even when stopped due to chatting
+                LOG_ERROR("server", "moving");
                 me->GetMotionMaster()->MoveTargetedHome();
                 Walk_Timer = 5000;
             }
