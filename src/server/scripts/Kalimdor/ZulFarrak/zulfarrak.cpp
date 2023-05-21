@@ -277,6 +277,7 @@ public:
                 else
                 {
                     SendGossipMenuFor(player, 1516, me->GetGUID());
+                    me->GetMotionMaster()->MovePoint(1, {me->GetHomePosition()});
                 }
             }
         }
@@ -529,10 +530,6 @@ public:
                 me->SetHomePosition(1858.57f, 1146.35f, 14.745f, 3.85f);
                 Talk(SAY_WEEGLI_OK_I_GO);
                 instance->SetData(DATA_PYRAMID, PYRAMID_DESTROY_GATES);
-                if (Creature* sergeantBly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY)))
-                {
-                    sergeantBly->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                }
             }
         }
 
@@ -562,7 +559,8 @@ public:
                     SendGossipMenuFor(player, 1511, me->GetGUID());  //if event not started
                     break;
                 default:
-                    SendGossipMenuFor(player, 1513, me->GetGUID());  //if event are in progress
+                    SendGossipMenuFor(player, 1513, me->GetGUID());  //if event is in progress
+                    me->GetMotionMaster()->MovePoint(1, {me->GetHomePosition()});
             }
         }
     };
