@@ -1,3 +1,4 @@
+-- DB update 2023_05_20_02 -> 2023_05_21_00
 /*
 	Blood Guard Porung
 */
