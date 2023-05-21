@@ -990,7 +990,7 @@ public:
                 Reset();
         }
 
-        void PatientSaved(Creature* saved_patient, Player* player, Location* point)
+        void PatientSaved(Creature* savedPatient, Player* player, Location* point)
         {
             if (player && PlayerGUID == player->GetGUID())
             {
@@ -1004,7 +1004,7 @@ public:
                         {
                             for (ObjectGuid const& guid : Patients)
                             {
-                                if (guid != saved_patient->GetGUID()) // Don't kill the last guy we just saved
+                                if (guid != savedPatient->GetGUID()) // Don't kill the last guy we just saved
                                     if (Creature* patient = ObjectAccessor::GetCreature(*me, guid))
                                         patient->setDeathState(JUST_DIED);
                             }
@@ -1190,10 +1190,10 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
         switch (me->GetEntry())
         {
             case DOCTOR_ALLIANCE:
-                initialPatientCount = 7;
+                initialPatientCount = sizeof(AllianceCoords);
                 break;
             case DOCTOR_HORDE:
-                initialPatientCount = 6;
+                initialPatientCount = sizeof(HordeCoords);
                 break;
             default:
                 LOG_ERROR("scripts", "Invalid entry for Triage doctor. Please check your database");
