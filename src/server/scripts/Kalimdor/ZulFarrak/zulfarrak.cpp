@@ -70,7 +70,6 @@ public:
             me->SetFaction(FACTION_FRIENDLY);
             postGossipStep = 0;
             Text_Timer = 0;
-            Walk_Timer = 5000;
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
@@ -78,7 +77,6 @@ public:
 
         bool startedFight;
         bool ableToPortHome;
-        uint32 Walk_Timer;
         uint32 postGossipStep;
         uint32 Text_Timer;
         uint32 ShieldBash_Timer;
@@ -90,7 +88,6 @@ public:
         {
             ShieldBash_Timer = 5000;
             Revenge_Timer = 8000;
-            Walk_Timer = 5000;
             Porthome_Timer = 156000;
             ableToPortHome = false;
             startedFight = false;
