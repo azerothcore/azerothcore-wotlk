@@ -70,7 +70,7 @@ public:
             me->SetFaction(FACTION_FRIENDLY);
             postGossipStep = 0;
             Text_Timer = 0;
-            Walk_Timer = 5000;
+            Walk_Timer = 5000s;
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
@@ -176,10 +176,14 @@ public:
                 if (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN || instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
                 {
                     LOG_ERROR("server", "condition met");
+                    me->SetWalk(true);
                     me->GetMotionMaster()->MoveTargetedHome();
                 }
+                else
+                {
+                    LOG_ERROR("server", "condition not met");
+                }
 
-                LOG_ERROR("server", "condition not met");
                 Walk_Timer = 5000;
             }
             else
