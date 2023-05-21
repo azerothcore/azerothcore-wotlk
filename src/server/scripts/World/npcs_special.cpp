@@ -1185,7 +1185,22 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
 
     if (Event)
     {
-        if (SummonPatientTimer <= diff || SummonPatientCount < 6) // Starts with beds filled
+        // Horde and Alliance have a different number of patient positions
+        uint32 initialPatientCount;
+        switch (me->GetEntry())
+        {
+            case DOCTOR_ALLIANCE:
+                initialPatientCount = 7;
+                break;
+            case DOCTOR_HORDE:
+                initialPatientCount = 6;
+                break;
+            default:
+                LOG_ERROR("scripts", "Invalid entry for Triage doctor. Please check your database");
+                return;
+        }
+        
+        if (SummonPatientTimer <= diff || SummonPatientCount < initialPatientCount) // Starts with beds filled
         {
             if (Coordinates.empty())
                 return;
