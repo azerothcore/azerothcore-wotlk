@@ -67,6 +67,7 @@ public:
         {
             ableToPortHome = false;
             startedFight = false;
+            canWalk = false;
             me->SetFaction(FACTION_FRIENDLY);
             postGossipStep = 0;
             Text_Timer = 0;
@@ -77,6 +78,8 @@ public:
 
         bool startedFight;
         bool ableToPortHome;
+        bool canWalk;
+        uint32 Walk_Timer;
         uint32 postGossipStep;
         uint32 Text_Timer;
         uint32 ShieldBash_Timer;
@@ -88,9 +91,11 @@ public:
         {
             ShieldBash_Timer = 5000;
             Revenge_Timer = 8000;
+            Walk_Timer = 5000;
             Porthome_Timer = 156000;
             ableToPortHome = false;
             startedFight = false;
+            canWalk = false;
         }
 
         void EnterEvadeMode(EvadeReason /*reason*/) override
@@ -164,6 +169,17 @@ public:
                 {
                     Text_Timer -= diff;
                 }
+            }
+
+            if (Walk_Timer <= diff && canWalk)
+            {
+                me->GetMotionMaster()->MovePoint(1, {me->GetHomePosition()});
+                Walk_Timer = 5000;
+                canWalk = false;
+            }
+            else
+            {
+                Walk_Timer -= diff;
             }
 
             if (Porthome_Timer <= diff && ableToPortHome == true)
@@ -277,7 +293,7 @@ public:
                 else
                 {
                     SendGossipMenuFor(player, 1516, me->GetGUID());
-                    me->GetMotionMaster()->MovePoint(1, {me->GetHomePosition()});
+                    canWalk = true;
                 }
             }
         }
