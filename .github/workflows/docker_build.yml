@@ -104,7 +104,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   dispatch-acore-docker:
-    needs: [ docker-build-n-deploy-prod , docker-build-n-deploy-dev]
+    needs: docker-build-services
     runs-on: ubuntu-latest
     steps:
       - name: Repository Dispatch
