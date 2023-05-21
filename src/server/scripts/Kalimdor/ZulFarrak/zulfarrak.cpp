@@ -170,11 +170,16 @@ public:
                 }
             }
 
-            if (Walk_Timer <= diff && (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN || instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS))
+            if (Walk_Timer <= diff)
             {
                 //makes sure to let Bly always walk during the movement phase, even when stopped due to chatting
-                LOG_ERROR("server", "moving");
-                me->GetMotionMaster()->MoveTargetedHome();
+                if (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN || instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+                {
+                    LOG_ERROR("server", "condition met");
+                    me->GetMotionMaster()->MoveTargetedHome();
+                }
+
+                LOG_ERROR("server", "condition not met");
                 Walk_Timer = 5000;
             }
             else
