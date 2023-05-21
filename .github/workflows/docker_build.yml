@@ -37,12 +37,15 @@ jobs:
           github.event.label.name == 'run-build')
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        
       - name: Compile azerothcore
         uses: docker/build-push-action@v4
         with:
           push: false
+          file: apps/docker/Dockerfile
           target: ${{ matrix.build_target.target }}
           tags: acore/ac-wotlk-build:${{ github.sha }}
           cache-from: type=gha
@@ -95,10 +98,11 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == github.event.repository.default_branch
         uses: docker/build-push-action@v4
         with:
-          push: true
+          file: apps/docker/Dockerfile
+          push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && \
+                    github.ref_name   == github.event.repository.default_branch }}
           target: ${{ matrix.build_target.target }}
           tags: ${{ matrix.build_target.repo }}:${{ steps.version.outputs.version }}
           cache-from: type=gha
