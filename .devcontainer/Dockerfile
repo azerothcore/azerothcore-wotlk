@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
@@ -19,10 +19,11 @@ RUN --mount=target=/var/cache/apt,type=cache \
     apt-get update && \
     apt-get install -y \
         gdb gdbserver git dos2unix lsb-core sudo curl unzip \
-        make cmake clang libmysqlclient-dev \
-        libboost-system1.7*-dev libboost-filesystem1.7*-dev libboost-program-options1.7*-dev libboost-iostreams1.7*-dev \
-        build-essential libtool cmake-data openssl libgoogle-perftools-dev google-perftools \
-        libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client ccache && \
+        make cmake clang ccache build-essential \
+        libmysqlclient-dev libboost-all-dev libssl-dev libmysql++-dev \
+        libreadline6-dev zlib1g-dev libbz2-dev libgoogle-perftools-dev \
+        libtool cmake-data openssl google-perftools mysql-client \
+        && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     bash -c "echo $TZ > /etc/timezone" && \
     dpkg-reconfigure --frontend noninteractive tzdata
