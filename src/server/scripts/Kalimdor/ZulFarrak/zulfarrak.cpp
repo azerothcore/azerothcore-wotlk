@@ -153,6 +153,7 @@ public:
                             me->SetFaction(FACTION_MONSTER);
                             Player* target = ObjectAccessor::GetPlayer(*me, PlayerGUID);
 
+                            switchFactionIfAlive(NPC_WEEGLI, target);
                             switchFactionIfAlive(NPC_RAVEN, target);
                             switchFactionIfAlive(NPC_ORO, target);
                             switchFactionIfAlive(NPC_MURTA, target);
@@ -173,7 +174,7 @@ public:
 
             if (Walk_Timer <= diff && canWalk)
             {
-                me->GetMotionMaster()->MovePoint(1, {me->GetHomePosition()});
+                me->GetMotionMaster()->MoveTargetedHome();
                 Walk_Timer = 5000;
                 canWalk = false;
             }
