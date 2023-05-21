@@ -7,7 +7,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@NPC, 3, 171.82281, 289.97687, -8.185595, 0),
 (@NPC, 4, 178.51125, 287.97794, -8.183065, 0);
 
-UPDATE `creature_template` SET `MovementType` = 2 WHERE `entry` IN (16807, 20568);
+UPDATE `creature` SET `MovementType` = 2 WHERE `ID1` IN (16807, 20568);
 
 DELETE FROM `creature_template_addon` WHERE `entry` IN (16807, 20568);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`) VALUES
@@ -31,3 +31,14 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (13, 3, 30741, 0, 1, 31, 0, 3, 17083, 151091, 0, 0, 0, '', 'Death Coil (30741) can only target Fel Orc Convert (17083) of specific guids'),
 (13, 3, 30741, 0, 2, 31, 0, 3, 17083, 151092, 0, 0, 0, '', 'Death Coil (30741) can only target Fel Orc Convert (17083) of specific guids'),
 (13, 3, 30741, 0, 3, 31, 0, 3, 17083, 151093, 0, 0, 0, '', 'Death Coil (30741) can only target Fel Orc Convert (17083) of specific guids');
+
+DELETE FROM `spell_script_names` WHERE `spell_id` = 30745;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(30745, 'spell_target_fissures');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 3) AND (`SourceEntry` = 30745);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 3, 30745, 0, 0, 31, 0, 3, 17083, 151090, 0, 0, 0, '', 'Target Fissures (30745) can only target Fel Orc Convert (17083) of specific guids'),
+(13, 3, 30745, 0, 1, 31, 0, 3, 17083, 151091, 0, 0, 0, '', 'Target Fissures (30745) can only target Fel Orc Convert (17083) of specific guids'),
+(13, 3, 30745, 0, 2, 31, 0, 3, 17083, 151092, 0, 0, 0, '', 'Target Fissures (30745) can only target Fel Orc Convert (17083) of specific guids'),
+(13, 3, 30745, 0, 3, 31, 0, 3, 17083, 151093, 0, 0, 0, '', 'Target Fissures (30745) can only target Fel Orc Convert (17083) of specific guids');

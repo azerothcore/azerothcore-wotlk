@@ -35,14 +35,15 @@ enum Texts
 
 enum Spells
 {
-    SPELL_DEATH_COIL           = 30500,
-    SPELL_DARK_SPIN            = 30502,
-    SPELL_SHADOW_FISSURE       = 30496,
-    SPELL_SHADOW_CLEAVE        = 30495,
+    SPELL_DEATH_COIL            = 30500,
+    SPELL_DARK_SPIN             = 30502,
+    SPELL_SHADOW_FISSURE        = 30496,
+    SPELL_SHADOW_CLEAVE         = 30495,
 
-    SPELL_SHADOW_SEAR          = 30735,
-    SPELL_DEATH_COIL_RP        = 30741,
-    SPELL_SHADOW_FISSURE_RP    = 30745
+    SPELL_SHADOW_SEAR           = 30735,
+    SPELL_DEATH_COIL_RP         = 30741,
+    SPELL_SHADOW_FISSURE_RP     = 30745,
+    SPELL_LESSER_SHADOW_FISSURE = 30744
 };
 
 enum Events
@@ -158,6 +159,8 @@ struct boss_grand_warlock_nethekurse : public BossAI
         {
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveIdle();
+            me->SetFacingTo(4.572762489318847656f);
+
             scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
                 scheduler.Schedule(2500ms, GROUP_RP, [this](TaskContext /*context*/)
@@ -266,6 +269,20 @@ class spell_tsh_shadow_bolt : public SpellScript
     }
 };
 
+class spell_target_fissures : public SpellScript
+{
+    PrepareSpellScript(spell_target_fissures);
+
+    void HandleEffect(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_LESSER_SHADOW_FISSURE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_target_fissures::HandleEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
 
 class at_rp_nethekurse : public OnlyOnceAreaTriggerScript
 {
@@ -292,5 +309,6 @@ void AddSC_boss_grand_warlock_nethekurse()
 {
     RegisterShatteredHallsCreatureAI(boss_grand_warlock_nethekurse);
     RegisterSpellScript(spell_tsh_shadow_bolt);
+    RegisterSpellScript(spell_target_fissures);
     new at_rp_nethekurse();
 }
