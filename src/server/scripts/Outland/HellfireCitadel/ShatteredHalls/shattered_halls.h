@@ -35,7 +35,9 @@ enum DataTypes
     DATA_PRISONER_1                 = 11,
     DATA_PRISONER_2                 = 12,
     DATA_PRISONER_3                 = 13,
-    DATA_EXECUTIONER                = 14
+    DATA_EXECUTIONER                = 14,
+    DATA_OMROGG_LEFT_HEAD           = 15,
+    DATA_OMROGG_RIGHT_HEAD          = 16
 };
 
 enum CreatureIds
@@ -43,6 +45,10 @@ enum CreatureIds
     NPC_GRAND_WARLOCK_NETHEKURSE    = 16807,
     NPC_WARCHIEF_KARGATH            = 16808,
     NPC_FEL_ORC_CONVERT             = 17083,
+
+    // O'MROGG
+    NPC_OMROGG_LEFT_HEAD            = 19523,
+    NPC_OMROGG_RIGHT_HEAD           = 19524,
 
     // Trial of the Naaru: Mercy
     NPC_SHATTERED_EXECUTIONER       = 17301,
