@@ -11,70 +11,49 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  docker-build-n-deploy-dev:
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-20.04]
-    runs-on: ${{ matrix.os }}
+  docker-build-base:
+    runs-on: ubuntu-latest
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
-      && (github.ref == 'refs/heads/master' ||
+      && (github.ref_name == github.event.repository.default_branch ||
           contains(github.event.pull_request.labels.*.name, 'run-build') ||
           github.event.label.name == 'run-build')
-    env:
-      COMPOSE_DOCKER_CLI_BUILD: 1
-      DOCKER_BUILDKIT: 1
-
     steps:
-      - name: Remove unneeded tooling due to disk space requirements
-        run: |
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-
       - uses: actions/checkout@v3
-
-      - name: Login to Docker Hub
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
-        uses: docker/login-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Compile azerothcore
+        uses: docker/build-push-action@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build Dev
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
-        env:
-          DOCKER_CLIENT_TIMEOUT: 400
-          COMPOSE_HTTP_TIMEOUT: 400
-        run: |
-          export DOCKER_USER_ID=$(id -u)
-          export DOCKER_GROUP_ID=$(id -u)
-          DOCKER_IMAGE_TAG="$(jq -r '.version' < acore.json)" docker compose --profile dev build
-
-      - name: Deploy Dev
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
-        run: |
-          docker compose --profile dev push
-          DOCKER_IMAGE_TAG="$(jq -r '.version' < acore.json)"  docker compose --profile dev push
-
-  docker-build-n-deploy-prod:
+          push: false
+          target: ${{ matrix.build_target.target }}
+          tags: acore/ac-wotlk-build:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+        
+  docker-build-services:
+    needs: "docker-build-base"
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04]
-    runs-on: ${{ matrix.os }}
-    if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
-      && !github.event.pull_request.draft
-      && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
+        build_target:
+          - repo: "acore/ac-wotlk-worldserver"
+            target: worldserver
+          - repo: "acore/ac-wotlk-authserver"
+            target: authserver
+          - repo: "acore/ac-wotlk-db-import"
+            target: db-import
+          - repo: "acore/ac-wotlk-client-data"
+            target: client-data
+          - repo: "acore/ac-wotlk-tools"
+            target: tools
+    runs-on: "ubuntu-latest"
     env:
       COMPOSE_DOCKER_CLI_BUILD: 1
       DOCKER_BUILDKIT: 1
-
     steps:
+      # TODO: re-evaluate disk usage requirements
       - name: Remove unneeded tooling due to disk space requirements
         run: |
           sudo rm -rf /usr/local/lib/android
@@ -83,43 +62,30 @@ jobs:
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: get acore version
+        id: version
+        run: |
+          version="$(jq '.version' < acore.json)"
+          echo "version=$version" >> $GITHUB_OUTPUT      
 
       - name: Login to Docker Hub
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
+        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == github.event.repository.default_branch
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Cache
-        uses: actions/cache@v2
+      - name: Build
+        uses: docker/build-push-action@v4
         with:
-          path: var/docker/ccache
-          key: ccache:${{ matrix.os }}:clang:without-modules:${{ github.ref }}:${{ github.sha }}
-          restore-keys: |
-            ccache:${{ matrix.os }}:clang:without-modules:${{ github.ref }}
-            ccache:${{ matrix.os }}:clang:without-modules
-
-      - name: Build Production images
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
-        env:
-          DOCKER_CLIENT_TIMEOUT: 220
-          COMPOSE_HTTP_TIMEOUT: 220
-        run: |
-          export DOCKER_USER_ID=$(id -u)
-          export DOCKER_GROUP_ID=$(id -u)
-          docker compose --profile app build
-          DOCKER_IMAGE_TAG="$(jq -r '.version' < acore.json)" ./acore.sh docker build
-          # create the container to allow the copy right after
-          docker compose create ac-build
-          docker compose cp ac-build:/azerothcore/var/ccache var/docker/
-
-      - name: Deploy Production images
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
-        run: |
-          docker compose --profile app push
-          DOCKER_IMAGE_TAG="$(jq -r '.version' < acore.json)" docker compose --profile app push
-
+          push: true
+          target: ${{ matrix.build_target.target }}
+          tags: ${{ matrix.build_target.repo }}:${{ steps.version.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   dispatch-acore-docker:
     needs: [ docker-build-n-deploy-prod , docker-build-n-deploy-dev]
