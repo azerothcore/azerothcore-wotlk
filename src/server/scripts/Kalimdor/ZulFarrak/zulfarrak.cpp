@@ -318,6 +318,12 @@ public:
 
             instance->SetData(DATA_PYRAMID, PYRAMID_CAGES_OPEN);
 
+            //setting gossip option as soon as the cages open
+            Creature* bly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY));
+            Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI));
+            bly->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            weegli->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+
             //set bly & co to aggressive & start moving to top of stairs
             initBlyCrewMember(NPC_BLY, 1884.99f, 1263, 41.52f);
             initBlyCrewMember(NPC_RAVEN, 1882.5f, 1263, 41.52f);
@@ -486,13 +492,13 @@ public:
         {
             if (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN)
             {
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
             }
             else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
             else if (instance->GetData(DATA_PYRAMID) == PYRAMID_DESTROY_GATES)
             {
@@ -509,13 +515,13 @@ public:
 
             if (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN)
             {
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
             }
             else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
             else if (instance->GetData(DATA_PYRAMID) == PYRAMID_DESTROY_GATES)
             {
@@ -557,7 +563,7 @@ public:
         {
             switch (instance->GetData(DATA_PYRAMID))
             {
-                case PYRAMID_MOVED_DOWNSTAIRS:
+                case PYRAMID_KILLED_ALL_TROLLS:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WEEGLI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     SendGossipMenuFor(player, 1514, me->GetGUID());  //if event can proceed to end
                     break;
