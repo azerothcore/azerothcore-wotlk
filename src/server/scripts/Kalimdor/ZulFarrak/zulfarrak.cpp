@@ -67,7 +67,7 @@ public:
         {
             ableToPortHome = false;
             startedFight = false;
-            canWalk = false;
+            //canWalk = false;
             me->SetFaction(FACTION_FRIENDLY);
             postGossipStep = 0;
             Text_Timer = 0;
@@ -79,7 +79,7 @@ public:
 
         bool startedFight;
         bool ableToPortHome;
-        bool canWalk;
+        //bool canWalk;
         uint32 Walk_Timer;
         uint32 postGossipStep;
         uint32 Text_Timer;
@@ -96,7 +96,7 @@ public:
             Porthome_Timer = 156000;
             ableToPortHome = false;
             startedFight = false;
-            canWalk = false;
+            //canWalk = false;
         }
 
         void EnterEvadeMode(EvadeReason /*reason*/) override
@@ -176,7 +176,7 @@ public:
             if (Walk_Timer <= diff)
             {
                 //makes sure to let Bly always walk during the movement phase, even when stopped due to chatting
-                if (canWalk)
+                /*if (canWalk)
                 {
                     LOG_ERROR("server", "condition met");
                     me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
@@ -188,7 +188,7 @@ public:
                 {
                     LOG_ERROR("server", "condition not met");
                 }
-                canWalk = false;
+                canWalk = false;*/
                 Walk_Timer = 5000;
             }
             else
@@ -307,7 +307,7 @@ public:
                 else
                 {
                     SendGossipMenuFor(player, 1516, me->GetGUID());
-                    canWalk = true;
+                    //canWalk = true;
                 }
             }
         }
