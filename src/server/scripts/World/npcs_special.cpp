@@ -1199,7 +1199,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
                 LOG_ERROR("scripts", "Invalid entry for Triage doctor. Please check your database");
                 return;
         }
-        
+
         if (SummonPatientTimer <= diff || SummonPatientCount < initialPatientCount) // Starts with beds filled
         {
             if (Coordinates.empty())
