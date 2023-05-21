@@ -1,3 +1,4 @@
+-- DB update 2023_05_21_00 -> 2023_05_21_01
 --
 SET @NPC := 151089 * 10;
 DELETE FROM `waypoint_data` WHERE `id` = @NPC;
