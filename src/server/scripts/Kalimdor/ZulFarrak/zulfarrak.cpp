@@ -560,7 +560,6 @@ public:
                     break;
                 default:
                     SendGossipMenuFor(player, 1513, me->GetGUID());  //if event is in progress
-                    me->GetMotionMaster()->MovePoint(1, {me->GetHomePosition()});
             }
         }
     };
