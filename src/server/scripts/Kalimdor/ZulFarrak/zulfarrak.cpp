@@ -313,10 +313,15 @@ public:
             instance->SetData(DATA_PYRAMID, PYRAMID_CAGES_OPEN);
 
             //setting gossip option as soon as the cages open
-            Creature* bly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY));
-            Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI));
-            bly->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-            weegli->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            if(Creature* bly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY)))
+            {
+                bly->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            }
+
+            if(Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
+            {
+                weegli->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            }
 
             //set bly & co to aggressive & start moving to top of stairs
             initBlyCrewMember(NPC_BLY, 1884.99f, 1263, 41.52f);
@@ -490,7 +495,7 @@ public:
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
             }
-            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+            else if (instance->GetData(DATA_PYRAMID) >= PYRAMID_KILLED_ALL_TROLLS && instance->GetData(DATA_PYRAMID) < PYRAMID_DESTROY_GATES)
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
             }
@@ -513,7 +518,7 @@ public:
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
             }
-            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+            else if (instance->GetData(DATA_PYRAMID) >= PYRAMID_KILLED_ALL_TROLLS && instance->GetData(DATA_PYRAMID) < PYRAMID_DESTROY_GATES)
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
             }
