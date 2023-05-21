@@ -101,8 +101,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           file: apps/docker/Dockerfile
-          push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && \
-                    github.ref_name   == github.event.repository.default_branch }}
+          # TODO: @michaeldelago: use the GHA expression after this is approved
+          push: false # ${{ github.repository == 'azerothcore/azerothcore-wotlk' && \
+                      #     github.ref_name   == github.event.repository.default_branch }}
           target: ${{ matrix.build_target.target }}
           tags: ${{ matrix.build_target.repo }}:${{ steps.version.outputs.version }}
           cache-from: type=gha
