@@ -343,15 +343,6 @@ public:
                 crew->GetMotionMaster()->MovePoint(1, { x, y, z, 4.78f });
                 crew->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
 
-                switch (entry)
-                {
-                    case NPC_BLY:
-                    case NPC_WEEGLI:
-                        crew->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        break;
-                    default:
-                        break;
-                }
             }
         }
     };
@@ -562,6 +553,7 @@ public:
         {
             switch (instance->GetData(DATA_PYRAMID))
             {
+                case PYRAMID_MOVED_DOWNSTAIRS:
                 case PYRAMID_KILLED_ALL_TROLLS:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WEEGLI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     SendGossipMenuFor(player, 1514, me->GetGUID());  //if event can proceed to end
