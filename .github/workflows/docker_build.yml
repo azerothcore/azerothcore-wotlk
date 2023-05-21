@@ -46,7 +46,7 @@ jobs:
         with:
           push: false
           file: apps/docker/Dockerfile
-          target: ${{ matrix.build_target.target }}
+          target: build
           tags: acore/ac-wotlk-build:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
