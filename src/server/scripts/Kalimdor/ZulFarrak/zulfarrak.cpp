@@ -70,7 +70,7 @@ public:
             me->SetFaction(FACTION_FRIENDLY);
             postGossipStep = 0;
             Text_Timer = 0;
-            Walk_Timer = 0;
+            Walk_Timer = 5000;
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
