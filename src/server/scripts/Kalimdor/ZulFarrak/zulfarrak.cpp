@@ -263,7 +263,7 @@ public:
 
         void sGossipHello(Player* player) override
         {
-            if (instance->GetData(DATA_PYRAMID) >= PYRAMID_DESTROY_GATES && !startedFight)
+            if (instance->GetData(DATA_PYRAMID) >= PYRAMID_MOVED_DOWNSTAIRS && !startedFight)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BLY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 1517, me->GetGUID());
