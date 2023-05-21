@@ -179,8 +179,10 @@ public:
                 if (canWalk)
                 {
                     LOG_ERROR("server", "condition met");
+                    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     me->SetWalk(true);
                     me->GetMotionMaster()->MoveTargetedHome();
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 }
                 else
                 {
