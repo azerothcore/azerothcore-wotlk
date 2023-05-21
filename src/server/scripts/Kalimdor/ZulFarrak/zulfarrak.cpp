@@ -67,7 +67,6 @@ public:
         {
             ableToPortHome = false;
             startedFight = false;
-            canWalk = false;
             me->SetFaction(FACTION_FRIENDLY);
             postGossipStep = 0;
             Text_Timer = 0;
@@ -78,7 +77,6 @@ public:
 
         bool startedFight;
         bool ableToPortHome;
-        bool canWalk;
         uint32 Walk_Timer;
         uint32 postGossipStep;
         uint32 Text_Timer;
@@ -95,7 +93,6 @@ public:
             Porthome_Timer = 156000;
             ableToPortHome = false;
             startedFight = false;
-            canWalk = false;
         }
 
         void EnterEvadeMode(EvadeReason /*reason*/) override
@@ -172,11 +169,11 @@ public:
                 }
             }
 
-            if (Walk_Timer <= diff && canWalk)
+            if (Walk_Timer <= diff && (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN || instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS))
             {
+                //makes sure to let Bly always walk during the movement phase, even when stopped due to chatting
                 me->GetMotionMaster()->MoveTargetedHome();
                 Walk_Timer = 5000;
-                canWalk = false;
             }
             else
             {
@@ -294,7 +291,6 @@ public:
                 else
                 {
                     SendGossipMenuFor(player, 1516, me->GetGUID());
-                    canWalk = true;
                 }
             }
         }
