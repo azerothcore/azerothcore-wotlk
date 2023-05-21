@@ -41,7 +41,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (19524, 6, 0, 'I\'m tired.  You kill next one!', 14, 0, 100, 0, 0, 10320, 16921, 0, 'O\'mrogg Right Head Kill'),
 (19524, 7, 0, 'That\'s because I do all the hard work!', 14, 0, 100, 0, 0, 10321, 16923, 0, 'O\'mrogg Right Head Kill Reply'),
 
-(19523, 8, 0, 'I... hate... you.', 14, 0, 100, 0, 0, 10322, 16925, 0, 'O\'mrogg Right Head Death');
+(19524, 8, 0, 'I... hate... you.', 14, 0, 100, 0, 0, 10322, 16925, 0, 'O\'mrogg Right Head Death');
 
 DELETE FROM `spell_script_names` WHERE `spell_id` = 30598 AND `ScriptName` = 'spell_burning_maul';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
