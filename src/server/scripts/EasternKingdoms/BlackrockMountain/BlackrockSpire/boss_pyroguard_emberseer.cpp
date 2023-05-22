@@ -101,7 +101,7 @@ public:
             switch (data)
             {
                 case 1:
-                    events.ScheduleEvent(EVENT_PRE_FIGHT_1, 5s);
+                    events.ScheduleEvent(EVENT_PRE_FIGHT_1, 2s);
                     instance->SetBossState(DATA_PYROGAURD_EMBERSEER, IN_PROGRESS);
                     break;
                 case 2:
@@ -149,9 +149,8 @@ public:
 
             if (spell->Id == SPELL_EMBERSEER_GROWING_TRIGGER)
             {
-                if (me->GetAuraCount(SPELL_EMBERSEER_GROWING_TRIGGER) == 10) {
+                if (me->GetAuraCount(SPELL_EMBERSEER_GROWING_TRIGGER) == 10)
                     Talk(EMOTE_TEN_STACK);
-                }
 
                 if (me->GetAuraCount(SPELL_EMBERSEER_GROWING_TRIGGER) == 20)
                 {
