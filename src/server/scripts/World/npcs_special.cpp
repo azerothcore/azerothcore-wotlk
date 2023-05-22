@@ -1082,25 +1082,25 @@ public:
             {
                 //lower max health
                 case 12923:
-                case 12938:                                     //Injured Soldier
-                    me->SetHealth(me->CountPctFromMaxHealth(75));
+                case 12938:                                     //Injured Soldier, 65 seconds to die
+                    me->SetHealth(me->CountPctFromMaxHealth(65));
                     break;
                 case 12924:
-                case 12936:                                     //Badly injured Soldier
-                    me->SetHealth(me->CountPctFromMaxHealth(50));
+                case 12936:                                     //Badly injured Soldier, 35 seconds to die
+                    me->SetHealth(me->CountPctFromMaxHealth(35));
                     break;
                 case 12925:
-                case 12937:                                     //Critically injured Soldier
+                case 12937:                                     //Critically injured Soldier, 25 seconds to die
                     me->SetHealth(me->CountPctFromMaxHealth(25));
                     break;
             }
 
-            // emulate vanilla WoW's 200ms spell batching rate for maximum authenticity!
-            // https://www.wowhead.com/classic/news/spell-batching-in-classic-wow-290910
-            _scheduler.Schedule(200ms, [this](TaskContext context)
+            // Schedule health reduction every 1 second
+            _scheduler.Schedule(1s, [this](TaskContext context)
             {
-                me->ModifyHealth(-5.0f);
-                context.Repeat(200ms);
+                // Reduction of 1% per second, matching WotLK Classic timing
+                me->ModifyHealth(me->CountPctFromMaxHealth(1) * -1);
+                context.Repeat(1s);
             });
         }
 
@@ -1151,7 +1151,7 @@ public:
 
             _scheduler.Update(diff);
 
-            if (me->IsAlive() && me->GetHealth() <= 5)
+            if (me->IsAlive() && me->GetHealth() < me->CountPctFromMaxHealth(1))
             {
                 me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -1185,22 +1185,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
 
     if (Event)
     {
-        // Horde and Alliance have a different number of patient positions
-        uint32 initialPatientCount;
-        switch (me->GetEntry())
-        {
-            case DOCTOR_ALLIANCE:
-                initialPatientCount = sizeof(AllianceCoords);
-                break;
-            case DOCTOR_HORDE:
-                initialPatientCount = sizeof(HordeCoords);
-                break;
-            default:
-                LOG_ERROR("scripts", "Invalid entry for Triage doctor. Please check your database");
-                return;
-        }
-
-        if (SummonPatientTimer <= diff || SummonPatientCount < initialPatientCount) // Starts with beds filled
+        if (SummonPatientTimer <= diff || SummonPatientCount < 6) // Starts with 6 beds filled for both factions
         {
             if (Coordinates.empty())
                 return;
