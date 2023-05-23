@@ -219,7 +219,7 @@ public:
         InstanceScript* instance = me->GetInstanceScript();
         if (!instance)
             return;
-        
+
         if (Creature* kargath = instance->GetCreature(DATA_KARGATH))
             kargath->AI()->JustSummoned(creature);
     }
