@@ -277,7 +277,7 @@ class spell_blade_dance_targeting : public SpellScript
 
         targets.remove_if([&](WorldObject* target) -> bool
             {
-                if (Player* player = target->SelectNearestPlayer())
+                if (target->SelectNearestPlayer(15.f))
                     return false;
                 return true;
             });
