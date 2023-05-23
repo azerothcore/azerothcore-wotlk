@@ -54,7 +54,7 @@ enum PortalData
     DATA_RESET_FIGHT            = 2
 };
 
-std::array<uint32, 3> summonSpells = { SPELL_SUMMON_HEATHEN, SPELL_SUMMON_REAVER, SPELL_SUMMON_SHARPSHOOTER };
+std::array<uint32, 3> const summonSpells = { SPELL_SUMMON_HEATHEN, SPELL_SUMMON_REAVER, SPELL_SUMMON_SHARPSHOOTER };
 std::vector<Position> const assassinsPos =
 {
     { 172.68164f, -80.65692f, 2.0834563f, 5.4279f },
@@ -158,7 +158,7 @@ struct boss_warchief_kargath_bladefist : public BossAI
             Talk(SAY_SLAY);
     }
 
-    void MovementInform(uint32 type, uint32 id) override
+    void MovementInform(uint32 type, uint32 /*id*/) override
     {
         if (type != POINT_MOTION_TYPE)
             return;
