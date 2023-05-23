@@ -97,7 +97,7 @@ struct boss_warchief_kargath_bladefist : public BossAI
         if (summon)
         {
             summon->SetVisible(false);
-            scheduler.Schedule(20s, [this, summon](TaskContext /*context*/)
+            scheduler.Schedule(20s, [summon](TaskContext /*context*/)
                 {
                     if (summon)
                     {
