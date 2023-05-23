@@ -37,14 +37,17 @@ enum DataTypes
     DATA_PRISONER_3                 = 13,
     DATA_EXECUTIONER                = 14,
     DATA_OMROGG_LEFT_HEAD           = 15,
-    DATA_OMROGG_RIGHT_HEAD          = 16
+    DATA_OMROGG_RIGHT_HEAD          = 16,
+    DATA_WARCHIEF_PORTAL            = 17
 };
 
 enum CreatureIds
 {
     NPC_GRAND_WARLOCK_NETHEKURSE    = 16807,
-    NPC_WARCHIEF_KARGATH            = 16808,
     NPC_FEL_ORC_CONVERT             = 17083,
+    // Warchief Kargath
+    NPC_WARCHIEF_KARGATH            = 16808,
+    NPC_WARCHIEF_PORTAL             = 17611,
 
     // O'MROGG
     NPC_OMROGG_LEFT_HEAD            = 19523,

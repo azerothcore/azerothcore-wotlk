@@ -26,6 +26,7 @@ ObjectData const creatureData[] =
     { NPC_WARCHIEF_KARGATH          , DATA_KARGATH        },
     { NPC_OMROGG_LEFT_HEAD          , DATA_OMROGG_LEFT_HEAD },
     { NPC_OMROGG_RIGHT_HEAD         , DATA_OMROGG_RIGHT_HEAD },
+    { NPC_WARCHIEF_PORTAL           , DATA_WARCHIEF_PORTAL },
     { 0                             , 0                   }
 };
 
