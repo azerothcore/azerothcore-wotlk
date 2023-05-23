@@ -24,7 +24,16 @@ ObjectData const creatureData[] =
 {
     { NPC_GRAND_WARLOCK_NETHEKURSE  , DATA_NETHEKURSE     },
     { NPC_WARCHIEF_KARGATH          , DATA_KARGATH        },
-    { 0,                                                  0                                }
+    { NPC_OMROGG_LEFT_HEAD          , DATA_OMROGG_LEFT_HEAD },
+    { NPC_OMROGG_RIGHT_HEAD         , DATA_OMROGG_RIGHT_HEAD },
+    { 0                             , 0                   }
+};
+
+DoorData const doorData[] =
+{
+    { GO_GRAND_WARLOCK_CHAMBER_DOOR_1, DATA_NETHEKURSE, DOOR_TYPE_PASSAGE },
+    { GO_GRAND_WARLOCK_CHAMBER_DOOR_2, DATA_NETHEKURSE, DOOR_TYPE_PASSAGE },
+    { 0,                                             0, DOOR_TYPE_ROOM    } // END
 };
 
 class instance_shattered_halls : public InstanceMapScript
@@ -45,6 +54,7 @@ public:
         {
             SetBossNumber(ENCOUNTER_COUNT);
             LoadObjectData(creatureData, nullptr);
+            LoadDoorData(doorData);
 
             TeamIdInInstance = TEAM_NEUTRAL;
             RescueTimer = 100 * MINUTE * IN_MILLISECONDS;
@@ -54,23 +64,6 @@ public:
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
                 TeamIdInInstance = player->GetTeamId();
-        }
-
-        void OnGameObjectCreate(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_GRAND_WARLOCK_CHAMBER_DOOR_1:
-                    nethekurseDoor1GUID = go->GetGUID();
-                    if (GetBossState(DATA_NETHEKURSE) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
-                case GO_GRAND_WARLOCK_CHAMBER_DOOR_2:
-                    nethekurseDoor2GUID = go->GetGUID();
-                    if (GetBossState(DATA_NETHEKURSE) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
-            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -85,9 +78,6 @@ public:
 
             switch (creature->GetEntry())
             {
-                case NPC_WARCHIEF_KARGATH:
-                    warchiefKargathGUID = creature->GetGUID();
-                    break;
                 case NPC_SHATTERED_EXECUTIONER:
                     if (RescueTimer > 25 * MINUTE * IN_MILLISECONDS)
                         creature->AddLootMode(2);
@@ -112,29 +102,6 @@ public:
             InstanceScript::OnCreatureCreate(creature);
         }
 
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (!InstanceScript::SetBossState(type, state))
-                return false;
-
-            switch (type)
-            {
-                case DATA_NETHEKURSE:
-                    if (state == IN_PROGRESS)
-                    {
-                        HandleGameObject(nethekurseDoor1GUID, false);
-                        HandleGameObject(nethekurseDoor2GUID, false);
-                    }
-                    else
-                    {
-                        HandleGameObject(nethekurseDoor1GUID, true);
-                        HandleGameObject(nethekurseDoor2GUID, true);
-                    }
-                    break;
-            }
-            return true;
-        }
-
         void SetData(uint32 type, uint32 data) override
         {
             if (type == DATA_ENTERED_ROOM && data == DATA_ENTERED_ROOM && RescueTimer == 100 * MINUTE * IN_MILLISECONDS)
@@ -142,7 +109,7 @@ public:
                 DoCastSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_1);
                 instance->LoadGrid(230, -80);
 
-                if (Creature* kargath = instance->GetCreature(warchiefKargathGUID))
+                if (Creature* kargath = GetCreature(DATA_KARGATH))
                     sCreatureTextMgr->SendChat(kargath, TeamIdInInstance == TEAM_ALLIANCE ? 3 : 4, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
 
                 RescueTimer = 80 * MINUTE * IN_MILLISECONDS;
@@ -206,11 +173,6 @@ public:
         }
 
     protected:
-        ObjectGuid warchiefKargathGUID;
-        ObjectGuid grandWarlockNethekurseGUID;
-        ObjectGuid nethekurseDoor1GUID;
-        ObjectGuid nethekurseDoor2GUID;
-
         ObjectGuid executionerGUID;
         ObjectGuid prisonerGUID[3];
         uint32 RescueTimer;
