@@ -1,3 +1,4 @@
+-- DB update 2023_05_21_02 -> 2023_05_23_00
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` = 30738 AND `ScriptName` = 'spell_blade_dance_targeting';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
