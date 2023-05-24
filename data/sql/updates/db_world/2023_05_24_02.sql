@@ -1,3 +1,4 @@
+-- DB update 2023_05_24_01 -> 2023_05_24_02
 --
 -- Blackrock Summoner
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 9818);
