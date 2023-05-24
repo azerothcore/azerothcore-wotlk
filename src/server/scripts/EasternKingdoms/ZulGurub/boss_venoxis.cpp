@@ -301,7 +301,7 @@ public:
 
         void JustEngagedWith(Unit*)
         {
-            events.ScheduleEvent(EVENT_POISON, 8ms);
+            events.ScheduleEvent(EVENT_POISON, 8s);
 
             if (Creature* Venoxis = GetVenoxis())
             {
@@ -331,7 +331,7 @@ public:
                 case EVENT_POISON:
                 {
                     me->CastSpell(me->GetVictim(), SPELL_POISON);
-                    events.ScheduleEvent(EVENT_POISON, 15ms);
+                    events.ScheduleEvent(EVENT_POISON, 15s);
                     break;
                 }
                 }

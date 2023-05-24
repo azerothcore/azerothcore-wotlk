@@ -2372,8 +2372,6 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
 
     uint8 level = GetLevel();
 
-    sScriptMgr->OnGivePlayerXP(this, xp, victim);
-
     // Favored experience increase START
     uint32 zone = GetZoneId();
     float favored_exp_mult = 0;
@@ -5147,7 +5145,7 @@ float Player::OCTRegenHPPerSpirit()
     if (baseSpirit > 50)
         baseSpirit = 50;
     float moreSpirit = spirit - baseSpirit;
-    float regen = baseSpirit * baseRatio->ratio + moreSpirit * moreRatio->ratio;
+    float regen = (baseSpirit * baseRatio->ratio + moreSpirit * moreRatio->ratio) * 2;
     return regen;
 }
 
@@ -5732,6 +5730,7 @@ void Player::CheckAreaExploreAndOutdoor()
                     XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level) * sWorld->getRate(RATE_XP_EXPLORE));
                 }
 
+                sScriptMgr->OnGivePlayerXP(this, XP, nullptr, PlayerXPSource::XPSOURCE_EXPLORE);
                 GiveXP(XP, nullptr);
                 SendExplorationExperience(areaId, XP);
             }
@@ -6121,7 +6120,11 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             bg->UpdatePlayerScore(this, SCORE_BONUS_HONOR, honor, false); //false: prevent looping
             // Xinef: Only for BG activities
             if (!uVictim)
-                GiveXP(uint32(honor * (3 + GetLevel() * 0.30f)), nullptr);
+            {
+                uint32 xp = uint32(honor * (3 + GetLevel() * 0.30f));
+                sScriptMgr->OnGivePlayerXP(this, xp, nullptr, PlayerXPSource::XPSOURCE_BATTLEGROUND);
+                GiveXP(xp, nullptr);
+            }
         }
 
     if (sWorld->getBoolConfig(CONFIG_PVP_TOKEN_ENABLE))
@@ -7074,7 +7077,8 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
 
         LOG_DEBUG("entities.player", "WORLD: cast {} Equip spellId - {}", (item ? "item" : "itemset"), spellInfo->Id);
 
-        CastSpell(this, spellInfo, true, item);
+        //Ignore spellInfo->DurationEntry, cast with -1 duration
+        CastCustomSpell(spellInfo->Id, SPELLVALUE_AURA_DURATION, -1, this, true, item);
     }
     else
     {

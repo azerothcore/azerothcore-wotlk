@@ -756,6 +756,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     }
     else
     {
+        sScriptMgr->OnGivePlayerXP(this, XP, nullptr, isLFGReward ? PlayerXPSource::XPSOURCE_QUEST_DF : PlayerXPSource::XPSOURCE_QUEST);
         GiveXP(XP, nullptr, isLFGReward);
     }
 

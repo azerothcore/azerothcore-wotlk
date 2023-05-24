@@ -640,12 +640,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     me->CastSpell(target->ToUnit(), e.action.cast.spell, triggerFlags);
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_CAST: Unit {} casts spell {} on target {} with castflags {}",
-                              me->GetGUID().ToString().c_str(), e.action.cast.spell, target->GetGUID().ToString().c_str(), e.action.cast.castFlags);
+                              me->GetGUID().ToString(), e.action.cast.spell, target->GetGUID().ToString(), e.action.cast.castFlags);
                 }
                 else
                 {
                     LOG_DEBUG("scripts.ai", "Spell {} not cast because it has flag SMARTCAST_AURA_NOT_PRESENT and the target {} already has the aura",
-                              e.action.cast.spell, target->GetGUID().ToString().c_str());
+                              e.action.cast.spell, target->GetGUID().ToString());
                 }
             }
             break;
@@ -729,12 +729,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     tempLastInvoker->CastSpell(target->ToUnit(), e.action.cast.spell, triggerFlags);
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_INVOKER_CAST: Invoker {} casts spell {} on target {} with castflags {}",
-                              tempLastInvoker->GetGUID().ToString().c_str(), e.action.cast.spell, target->GetGUID().ToString().c_str(), e.action.cast.castFlags);
+                              tempLastInvoker->GetGUID().ToString(), e.action.cast.spell, target->GetGUID().ToString(), e.action.cast.castFlags);
                 }
                 else
                 {
                     LOG_DEBUG("scripts.ai", "Spell {} not cast because it has flag SMARTCAST_AURA_NOT_PRESENT and the target {} already has the aura",
-                              e.action.cast.spell, target->GetGUID().ToString().c_str());
+                              e.action.cast.spell, target->GetGUID().ToString());
                 }
             }
             break;
@@ -2793,6 +2793,18 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 else if (GameObject* object = target->ToGameObject())
                 {
                     object->AI()->SetGUID(guidToSend, e.action.setGuid.index);
+                }
+            }
+            break;
+        }
+        case SMART_ACTION_DISABLE:
+        {
+            for (WorldObject* target : targets)
+            {
+                if (IsUnit(target))
+                {
+                    target->ToUnit()->SetImmuneToAll(!e.action.disable.state);
+                    target->ToUnit()->SetVisible(e.action.disable.state);
                 }
             }
             break;
