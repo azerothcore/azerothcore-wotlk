@@ -100,3 +100,5 @@ local.properties
 #  !modules/yourmodule
 #
 # ==================
+.cache
+compile_commands.json

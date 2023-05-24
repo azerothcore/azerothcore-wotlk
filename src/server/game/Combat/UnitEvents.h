@@ -92,12 +92,12 @@ private:
     };
     ThreatMgr* iThreatMgr;
 public:
-    ThreatRefStatusChangeEvent(uint32 pType) : UnitBaseEvent(pType), iThreatMgr(nullptr), iFValue(0.f)
+    ThreatRefStatusChangeEvent(uint32 pType) : UnitBaseEvent(pType), iFValue(0.f), iThreatMgr(nullptr)
     {
         iHostileReference = nullptr;
     }
 
-    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference) : UnitBaseEvent(pType), iThreatMgr(nullptr), iFValue(0.f)
+    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference) : UnitBaseEvent(pType), iFValue(0.f), iThreatMgr(nullptr)
     {
         iHostileReference = pHostileReference;
     }
