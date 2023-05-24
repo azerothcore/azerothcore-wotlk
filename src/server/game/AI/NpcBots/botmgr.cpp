@@ -98,6 +98,9 @@ bool _enableclass_cryptlord;
 bool _enrageOnDismiss;
 bool _botStatLimits;
 bool _enableWanderingBotsBG;
+bool _bothk_enable;
+bool _bothk_message_enable;
+bool _bothk_achievements_enable;
 float _botStatLimits_dodge;
 float _botStatLimits_parry;
 float _botStatLimits_block;
@@ -129,6 +132,7 @@ float _mult_dmg_darkranger;
 float _mult_dmg_necromancer;
 float _mult_dmg_seawitch;
 float _mult_dmg_cryptlord;
+float _bothk_rate_honor;
 std::vector<float> _mult_dmg_levels;
 
 bool __firstload = true;
@@ -329,6 +333,10 @@ void BotMgr::LoadConfig(bool reload)
     _botStatLimits_crit             = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Crit", 95.0f);
     _desiredWanderingBotsCount      = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.Continents.Count", 0);
     _enableWanderingBotsBG          = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.Enable", false);
+    _bothk_enable                   = sConfigMgr->GetBoolDefault("NpcBot.HK.Enable", true);
+    _bothk_message_enable           = sConfigMgr->GetBoolDefault("NpcBot.HK.Message.Enable", false);
+    _bothk_achievements_enable      = sConfigMgr->GetBoolDefault("NpcBot.HK.Achievements.Enable", false);
+    _bothk_rate_honor               = sConfigMgr->GetFloatDefault("NpcBot.HK.Rate.Honor", 1.0);
 
     std::string mult_dps_by_levels  = sConfigMgr->GetStringDefault("NpcBot.Mult.Damage.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
     std::vector<std::string_view> toks = Acore::Tokenize(mult_dps_by_levels, ',', false);
@@ -372,6 +380,7 @@ void BotMgr::LoadConfig(bool reload)
     RoundToInterval(_mult_dmg_necromancer, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_seawitch, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_cryptlord, 0.1f, 10.f);
+    RoundToInterval(_bothk_rate_honor, 0.1f, 10.f);
 
     //exclusions
     uint8 dpsFlags = /*_tankingTargetIconFlags | _offTankingTargetIconFlags | */_dpsTargetIconFlags | _rangedDpsTargetIconFlags;
@@ -560,6 +569,18 @@ bool BotMgr::IsBotGenerationEnabledBGs()
 {
     return _enableWanderingBotsBG;
 }
+bool BotMgr::IsBotHKEnabled()
+{
+    return _bothk_enable;
+}
+bool BotMgr::IsBotHKMessageEnabled()
+{
+    return _bothk_message_enable;
+}
+bool BotMgr::IsBotHKAchievementsEnabled()
+{
+    return _bothk_achievements_enable;
+}
 uint8 BotMgr::GetMaxClassBots()
 {
     return _maxClassNpcBots;
@@ -599,6 +620,10 @@ uint32 BotMgr::GetOwnershipExpireTime()
 uint32 BotMgr::GetDesiredWanderingBotsCount()
 {
     return _desiredWanderingBotsCount;
+}
+float BotMgr::GetBotHKHonorRate()
+{
+    return _bothk_rate_honor;
 }
 float BotMgr::GetBotStatLimitDodge()
 {
@@ -1563,6 +1588,16 @@ uint8 BotMgr::BotClassByClassName(std::string const& className)
         return iter->second;
 
     return BOT_CLASS_NONE;
+}
+
+uint8 BotMgr::GetBotPlayerClass(Creature const* bot)
+{
+    return bot->GetBotAI()->GetPlayerClass();
+}
+
+uint8 BotMgr::GetBotPlayerRace(Creature const* bot)
+{
+    return bot->GetBotAI()->GetPlayerRace();
 }
 
 std::string BotMgr::GetTargetIconString(uint8 icon) const

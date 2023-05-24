@@ -6186,18 +6186,15 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
         //npcbot: honor for bots
         else if (uVictim->ToCreature()->IsNPCBot() && !uVictim->ToCreature()->IsTempBot())
         {
+            static const float WANDERING_BOT_HONOR_GAIN_MULT = 10.0f;
+
+            if (!BotMgr::IsBotHKEnabled())
+                return false;
+
             Creature const* bot = uVictim->ToCreature();
 
-            uint32 check1 = GetFaction();
-            uint32 check2 = bot->GetFaction();
-
-            if (!bot->IsFreeBot())
-            {
-                check1 = uint32(GetTeamId());
-                check2 = uint32(bot->GetBotOwner()->GetTeamId());
-            }
-
-            if (check1 == check2 && !sWorld->IsFFAPvPRealm())
+            TeamId victimTeam = !bot->IsFreeBot() ? bot->GetBotOwner()->GetTeamId() : BotDataMgr::GetTeamIdForFaction(bot->GetFaction());
+            if (GetTeamId() == victimTeam && !sWorld->IsFFAPvPRealm())
                 return false;
 
             uint8 k_level = GetLevel();
@@ -6207,10 +6204,26 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             if (v_level <= k_grey)
                 return false;
 
-            victim_guid.Clear(); // Don't show HK: <rank> message, only log.
+            if (!BotMgr::IsBotHKMessageEnabled())
+                victim_guid.Clear(); // Don't show HK: <rank> message, only log.
 
             //TODO: honor gain rate
             honor_f = ceil(Acore::Honor::hk_honor_at_level_f(k_level) * (v_level - k_grey) / (k_level - k_grey));
+            honor_f *= BotMgr::GetBotHKHonorRate();
+            if (bot->IsWandererBot() && !bot->GetBotBG())
+                honor_f *= WANDERING_BOT_HONOR_GAIN_MULT;
+
+            if (BotMgr::IsBotHKAchievementsEnabled())
+            {
+                ApplyModUInt32Value(PLAYER_FIELD_KILLS, 1, true);
+                ApplyModUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, 1, true);
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS, BotMgr::GetBotPlayerClass(uVictim->ToCreature()));
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, BotMgr::GetBotPlayerRace(uVictim->ToCreature()));
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaId());
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, uVictim);
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, uVictim);
+            }
         }
         //end npcbot
         else

@@ -4547,4 +4547,37 @@ NpcBot.WanderingBots.Continents.Count = 0
 NpcBot.WanderingBots.BG.Enable = 0
 
 #
+#    NpcBot.HK.Enable
+#        Description: Count NPCBot kill at honor kill.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+NpcBot.HK.Enable = 1
+
+#
+#    NpcBot.HK.Message.Enable
+#        Description: Show 'HK: <rank>' message for NPCBot honor kills.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+NpcBot.HK.Message.Enable = 0
+
+#
+#    NpcBot.HK.Achievements.Enable
+#        Description: Count NPCBot honor kills towards PvP achievements.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+NpcBot.HK.Achievements.Enable = 0
+
+#
+#    NpcBot.HK.Rate.Honor
+#        Description: Honor gained multiplier for NPCBot honor kills.
+#        Default:     1.0
+#        Minimum:     0.1
+#        Maximum:    10.0
+
+NpcBot.HK.Rate.Honor = 1.0
+
+#
 ###################################################################################################

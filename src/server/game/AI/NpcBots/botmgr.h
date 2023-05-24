@@ -104,6 +104,9 @@ class AC_GAME_API BotMgr
         static bool IsFoodInterruptedByMovement();
         static bool FilterRaces();
         static bool IsBotGenerationEnabledBGs();
+        static bool IsBotHKEnabled();
+        static bool IsBotHKMessageEnabled();
+        static bool IsBotHKAchievementsEnabled();
         static uint8 GetMaxClassBots();
         static uint8 GetHealTargetIconFlags();
         static uint8 GetTankTargetIconFlags();
@@ -114,6 +117,7 @@ class AC_GAME_API BotMgr
         static uint32 GetBaseUpdateDelay();
         static uint32 GetOwnershipExpireTime();
         static uint32 GetDesiredWanderingBotsCount();
+        static float GetBotHKHonorRate();
         static float GetBotStatLimitDodge();
         static float GetBotStatLimitParry();
         static float GetBotStatLimitBlock();
@@ -187,6 +191,8 @@ class AC_GAME_API BotMgr
         static uint32 GetNpcBotCost(uint8 level, uint8 botclass);
         static std::string GetNpcBotCostStr(uint8 level, uint8 botclass);
         static uint8 BotClassByClassName(std::string const& className);
+        static uint8 GetBotPlayerClass(Creature const* bot);
+        static uint8 GetBotPlayerRace(Creature const* bot);
 
         std::string GetTargetIconString(uint8 icon) const;
 
