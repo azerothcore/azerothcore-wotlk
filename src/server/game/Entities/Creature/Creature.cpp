@@ -2018,7 +2018,14 @@ bool Creature::CanStartAttack(Unit const* who) const
     if ((IsImmuneToNPC() && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
         (IsImmuneToPC() && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
     {
+        //npcbot: allow attacking PvP free bots
+        /*
         return false;
+        */
+        Unit const* bot = (who->IsNPCBotOrPet() && who->ToCreature()->IsFreeBot()) ? who->IsNPCBotPet() ? who->GetCreator() : who : nullptr;
+        if (!(bot && bot->ToCreature()->GetBotAI()->IsContestedPvP() && IsContestedGuard()))
+            return false;
+        //end npcbot
     }
 
     if (Unit* owner = who->GetOwner())

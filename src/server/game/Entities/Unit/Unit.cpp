@@ -10672,6 +10672,30 @@ ReputationRank Unit::GetReactionTo(Unit const* target, bool checkOriginalFaction
                     }
                 }
             }
+            ////npcbot: contested guards reaction to bots in contested PvP mode
+            //else if (GetTypeId() == TYPEID_UNIT)
+            //{
+            //    Unit const* bot = IsNPCBotPet() ? ToUnit()->GetCreator() : ToUnit();
+            //    if (bot && bot->IsNPCBot())
+            //    {
+            //        if (FactionTemplateEntry const* targetFactionTemplateEntry = targetUnit->GetFactionTemplateEntry())
+            //        {
+            //            if (FactionEntry const* targetFactionEntry = sFactionStore.LookupEntry(targetFactionTemplateEntry->Faction))
+            //            {
+            //                if (targetFactionEntry->CanHaveReputation())
+            //                {
+            //                    // check contested flags
+            //                    if (targetFactionTemplateEntry->Flags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD)
+            //                    {
+            //                        if (BotMgr::IsBotContestedPvP(bot->ToCreature()))
+            //                            return REP_HOSTILE;
+            //                    }
+            //                    return REP_FRIENDLY;
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
         }
     }
 
@@ -10752,6 +10776,20 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
             }
         }
     }
+    //npcbot: contested guards reaction to bots in contested PvP mode
+    else if (target->GetTypeId() == TYPEID_UNIT)
+    {
+        Unit const* bot = target->IsNPCBotPet() ? target->ToUnit()->GetCreator() : target->ToUnit();
+        if (bot && bot->IsNPCBot())
+        {
+            if (factionTemplateEntry->factionFlags & FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS)
+            {
+                if (BotMgr::IsBotContestedPvP(bot->ToCreature()))
+                    return REP_HOSTILE;
+            }
+        }
+    }
+    //end npcbot
 
     // common faction based check
     if (factionTemplateEntry->IsHostileTo(*targetFactionTemplateEntry))
@@ -14362,6 +14400,10 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
     Unit* who = victim->GetCharmerOrOwnerOrSelf();
     if (who->GetTypeId() == TYPEID_PLAYER)
         SetContestedPvP(who->ToPlayer());
+    //npcbot: init contested PvP against free bots
+    else if (who->IsPvP() && who->IsNPCBotOrPet())
+        SetContestedPvP();
+    //end npcbot
 
     Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
     if (player && who->IsPvP() && (who->GetTypeId() != TYPEID_PLAYER || !player->duel || player->duel->Opponent != who))
@@ -14369,6 +14411,21 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
         player->UpdatePvP(true);
         player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
     }
+    //npcbot: init contested PvP for free bots
+    else if (player && who->IsPvP() && who->IsNPCBotOrPet())
+    {
+        player->UpdatePvP(true);
+        player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
+    }
+    else if (!player && who->GetTypeId() == TYPEID_PLAYER && who->IsPvP() && IsNPCBotOrPet())
+    {
+        if (Unit* bot = IsNPCBotPet() ? GetCreator() : this)
+        {
+            BotMgr::SetBotContestedPvP(bot->ToCreature());
+            bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
+        }
+    }
+    //end npcbot
 }
 
 void Unit::CombatStartOnCast(Unit* target, bool initialAggro, uint32 duration)
@@ -14396,6 +14453,21 @@ void Unit::CombatStartOnCast(Unit* target, bool initialAggro, uint32 duration)
         player->UpdatePvP(true);
         player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
     }
+    //npcbot: init contested PvP for free bots
+    else if (player && who->IsPvP() && who->IsNPCBotOrPet())
+    {
+        player->UpdatePvP(true);
+        player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
+    }
+    else if (!player && who->GetTypeId() == TYPEID_PLAYER && who->IsPvP() && IsNPCBotOrPet())
+    {
+        if (Unit* bot = IsNPCBotPet() ? GetCreator() : this)
+        {
+            BotMgr::SetBotContestedPvP(bot->ToCreature());
+            bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
+        }
+    }
+    //end npcbot
 }
 
 void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
@@ -14626,10 +14698,19 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToPC()))
         return false;
 
-    //npcbot: CvC case fix for bots, still a TODO
+    //npcbot: CvB, BvC case
     if (((IsNPCBotOrPet() && ToCreature()->IsFreeBot()) || (target->IsNPCBotOrPet() && target->ToCreature()->IsFreeBot())) &&
         !IsFriendlyTo(target) && !target->IsFriendlyTo(this))
     {
+        if (target->IsNPCBotOrPet() && IsContestedGuard())
+        {
+            if (Unit const* bot = target->IsNPCBotPet() ? target->GetCreator() : target)
+            {
+                if (BotMgr::IsBotContestedPvP(bot->ToCreature()))
+                    return true;
+            }
+        }
+
         auto const* ft1 = sFactionTemplateStore.LookupEntry(GetFaction());
         auto const* ft2 = sFactionTemplateStore.LookupEntry(target->GetFaction());
         auto const* fe1 = ft1 ? sFactionStore.LookupEntry(ft1->faction) : nullptr;
@@ -14704,6 +14785,22 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
 
         return HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK1) || target->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK1);
     }
+    //npcbot: BvP checks
+    else if (playerAffectingTarget && !playerAffectingAttacker && IsNPCBotOrPet())
+    {
+        if (Unit const* bot = IsNPCBotPet() ? GetCreator() : this)
+        {
+            if (target->IsPvP())
+                return true;
+
+            if (bot->IsFFAPvP() && target->IsFFAPvP())
+                return true;
+
+            return bot->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK1) || target->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK1);
+        }
+    }
+    //end npcbot
+
     return true;
 }
 

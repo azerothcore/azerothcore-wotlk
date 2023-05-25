@@ -253,7 +253,7 @@ public:
             StartAttack(mytar, IsMelee());
 
             CheckAttackState();
-            if (!me->IsAlive())
+            if (!me->IsAlive() || !mytar->IsAlive())
                 return;
 
             MoveBehind(mytar);

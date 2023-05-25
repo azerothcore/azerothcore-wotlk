@@ -1062,7 +1062,7 @@ public:
             StartAttack(mytar, IsMelee());
 
             CheckAttackState();
-            if (!me->IsAlive())
+            if (!me->IsAlive() || !mytar->IsAlive())
                 return;
 
             auto [can_do_frost, can_do_fire, can_do_nature] = CanAffectVictimBools(mytar, SPELL_SCHOOL_FROST, SPELL_SCHOOL_FIRE, SPELL_SCHOOL_NATURE);

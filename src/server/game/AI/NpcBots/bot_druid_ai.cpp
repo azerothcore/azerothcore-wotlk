@@ -658,7 +658,7 @@ public:
             StartAttack(mytar, bot_ai::IsMelee());
 
             CheckAttackState();
-            if (!me->IsAlive())
+            if (!me->IsAlive() || !mytar->IsAlive())
                 return;
 
             //NOT all forms abilities (prioritized)

@@ -314,6 +314,11 @@ class bot_ai : public CreatureAI
 
         bool IsImmunedToMySpellEffect(Unit const* unit, SpellInfo const* spellInfo, SpellEffIndex index) const;
 
+        bool IsContestedPvP() const;
+        void SetContestedPvP();
+        void ResetContestedPvP();
+        void UpdateContestedPvP();
+
         static bool IsFlagCarrier(Unit const* unit, BattlegroundTypeId bgTypeId = BATTLEGROUND_TYPE_NONE);
 
     protected:
@@ -651,6 +656,7 @@ class bot_ai : public CreatureAI
         uint32 evadeDelayTimer;
         uint32 indoorsTimer;
         uint32 outdoorsTimer;
+        uint32 _contestedPvPTimer;
         //save timers
         uint32 _saveDisabledSpellsTimer;
 

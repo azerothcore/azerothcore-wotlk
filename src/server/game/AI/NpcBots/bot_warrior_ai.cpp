@@ -412,7 +412,7 @@ public:
             StartAttack(mytar, IsMelee());
 
             CheckAttackState();
-            if (!me->IsAlive())
+            if (!me->IsAlive() || !mytar->IsAlive())
                 return;
 
             bool const isFury = GetSpec() == BOT_SPEC_WARRIOR_FURY;

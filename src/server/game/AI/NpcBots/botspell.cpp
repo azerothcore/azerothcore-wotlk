@@ -1747,7 +1747,7 @@ void GenerateBotCustomSpells()
     sinfo->StartRecoveryCategory = 133;
     sinfo->StartRecoveryTime = 1500;
     sinfo->PowerType = POWER_MANA;
-    sinfo->ManaCost = 5 * 5;
+    sinfo->ManaCost = 50 * 5;
     sinfo->MaxAffectedTargets = 0;
     sinfo->StackAmount = 0;
     sinfo->ChannelInterruptFlags = 0x100C;
