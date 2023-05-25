@@ -230,6 +230,7 @@ public:
             {
                 case NPC_SYLVANAS_PART1:
                     creature->SetVisible(false);
+                    creature->SetSpeed(MOVE_RUN, 1.1);
                     NPC_LeaderIntroGUID = creature->GetGUID();
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART1);
@@ -296,12 +297,8 @@ public:
                         creature->SetVisible(false);
                     if (!(EncounterMask & (1 << DATA_LK_INTRO)))
                     {
-                        creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK2HTIGHT);
-                        if (TeamIdInInstance != TEAM_ALLIANCE)
-                        {
-                            creature->StopMoving();
-                            creature->SetFacingTo(creature->GetAngle(&SylvanasFightPos));
-                        }
+                        creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK2HTIGHT); //the fight cannot be in the form of an emote, it is causing bugs
+                        creature->CastSpell(creature, SPELL_SOUL_REAPER, true);
                     }
                     else if (!(EncounterMask & (1 << DATA_LICH_KING)))
                         creature->AddAura(TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING, creature);
@@ -316,22 +313,20 @@ public:
                     if (!creature->IsAlive())
                         creature->Respawn();
                     NPC_LeaderGUID = creature->GetGUID();
+                    creature->SetWalk(false);
+                    creature->SetSheath(SHEATH_STATE_MELEE);
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART2);
+                    creature->SetWalk(false);
                     creature->SetHealth(creature->GetMaxHealth() / 20);
-
                     if (!(EncounterMask & (1 << DATA_FROSTSWORN_GENERAL)))
                         creature->SetVisible(false);
                     if (!(EncounterMask & (1 << DATA_LK_INTRO)))
                     {
-                        creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, TeamIdInInstance == TEAM_ALLIANCE ? EMOTE_ONESHOT_ATTACK2HTIGHT : EMOTE_ONESHOT_ATTACK1H);
+                        creature->SetSheath(SHEATH_STATE_MELEE);
+                        creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, TeamIdInInstance == TEAM_ALLIANCE ? EMOTE_ONESHOT_ATTACK2HTIGHT : EMOTE_ONESHOT_ATTACK1H); //the fight cannot be in the form of an emote, it is causing bugs.
                         creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         creature->CastSpell(creature, TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_BARRIER : SPELL_SYLVANAS_CLOAK_OF_DARKNESS, true);
-                        if (TeamIdInInstance != TEAM_ALLIANCE)
-                        {
-                            creature->UpdatePosition(SylvanasFightPos, true);
-                            creature->StopMovingOnCurrentPos();
-                        }
                     }
                     else if (!(EncounterMask & (1 << DATA_LICH_KING)))
                     {
@@ -346,6 +341,7 @@ public:
                         creature->UpdatePosition(PathWaypoints[PATH_WP_COUNT - 1], true);
                         creature->StopMovingOnCurrentPos();
                     }
+                    creature->SetSheath(SHEATH_STATE_MELEE);
                     creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                     break;
                 case NPC_ICE_WALL_TARGET:
@@ -444,7 +440,12 @@ public:
                             if (Creature* c = instance->GetCreature(NPC_FrostswornGeneralGUID))
                             {
                                 c->SetVisible(true);
+                                c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                                 c->SetReactState(REACT_AGGRESSIVE);
+                            }
+                            if (Creature* c = instance->GetCreature(NPC_FrostswornGeneralGUID))
+                            {
+                                c->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
                             }
                             WaveNumber = 0;
                             DoUpdateWorldState(WORLD_STATE_HOR_COUNTER, 0);
@@ -712,7 +713,6 @@ public:
                 case GO_FRONT_DOOR:
                     return GO_FrontDoorGUID;
             }
-
             return ObjectGuid::Empty;
         }
 
@@ -772,7 +772,6 @@ public:
                         ++ur;
                     }
             }
-
             if (bFinished5Waves)
             {
                 for (; WaveNumber < 4; ++WaveNumber)
@@ -860,9 +859,7 @@ public:
                     num_to_activate = 3;
                 else if (WaveNumber <= 4)
                     num_to_activate = 4;
-
                 reqKillCount += num_to_activate;
-
                 for (uint8 i = 0; i < num_to_activate; ++i)
                 {
                     uint32 entry = chosenComposition[WaveNumber - (WaveNumber > 5 ? 2 : 1)][i];
@@ -910,7 +907,6 @@ public:
                         c->StopMovingOnCurrentPos();
                     }
             memset(&TrashActive, 0, sizeof(TrashActive));
-
             if (Creature* falric = instance->GetCreature(NPC_FalricGUID))
                 falric->AI()->EnterEvadeMode();
             if (Creature* marwyn = instance->GetCreature(NPC_MarwynGUID))
@@ -1014,7 +1010,6 @@ public:
                                     if (Aura* a = pMarwyn->AddAura(SPELL_SHADOWMOURNE_VISUAL, pMarwyn))
                                         a->SetDuration(8000);
                                 }
-
                                 pMarwyn->AI()->Talk(EMOTE_MARWYN_INTRO_SPIRIT);
                             }
                             ++ResumeFirstEventStep;
@@ -1035,7 +1030,6 @@ public:
                                     }
                                 }
                             }
-
                             SetData(ACTION_SHOW_TRASH, 1);
                             ResumeFirstEventStep = 0;
                             ResumeFirstEventTimer = 0;
@@ -1057,7 +1051,6 @@ public:
                 else
                     ResumeFirstEventTimer -= diff;
             }
-
             if (outroStep)
             {
                 if (outroTimer <= diff)
@@ -1153,7 +1146,6 @@ public:
                                     if (StairsPos[index][i].GetPositionX())
                                         if (GameObject* go = leader->SummonGameObject(TeamIdInInstance == TEAM_ALLIANCE ? GO_STAIRS_ALLIANCE : GO_STAIRS_HORDE, StairsPos[index][i].GetPositionX(), StairsPos[index][i].GetPositionY(), StairsPos[index][i].GetPositionZ(), StairsPos[index][i].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
                                             go->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
-
                                 //Position pos = TeamIdInInstance == TEAM_ALLIANCE ? AllyPortalPos : HordePortalPos;
                                 //leader->SummonGameObject(GO_PORTAL_TO_DALARAN, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400);
                                 //pos = TeamIdInInstance == TEAM_ALLIANCE ? AllyChestPos : HordeChestPos;
@@ -1169,6 +1161,7 @@ public:
                             {
                                 c->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 c->GetMotionMaster()->MovePoint(0, WalkCaveInPos);
+                                c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP); // need gossip ID 10931
                             }
                             ++outroStep;
                             outroTimer = 6000;

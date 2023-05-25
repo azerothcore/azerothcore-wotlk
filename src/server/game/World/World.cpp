@@ -492,7 +492,9 @@ void World::LoadConfigSettings(bool reload)
     _rate_values[RATE_DROP_ITEM_ARTIFACT]          = sConfigMgr->GetOption<float>("Rate.Drop.Item.Artifact", 1.0f);
     _rate_values[RATE_DROP_ITEM_REFERENCED]        = sConfigMgr->GetOption<float>("Rate.Drop.Item.Referenced", 1.0f);
     _rate_values[RATE_DROP_ITEM_REFERENCED_AMOUNT] = sConfigMgr->GetOption<float>("Rate.Drop.Item.ReferencedAmount", 1.0f);
+    _rate_values[RATE_DROP_ITEM_GROUP_AMOUNT]      = sConfigMgr->GetOption<float>("Rate.Drop.Item.GroupAmount", 1.0f);
     _rate_values[RATE_DROP_MONEY]                  = sConfigMgr->GetOption<float>("Rate.Drop.Money", 1.0f);
+
     _rate_values[RATE_REWARD_BONUS_MONEY]          = sConfigMgr->GetOption<float>("Rate.RewardBonusMoney", 1.0f);
     _rate_values[RATE_XP_KILL]                     = sConfigMgr->GetOption<float>("Rate.XP.Kill", 1.0f);
     _rate_values[RATE_XP_BG_KILL_AV]               = sConfigMgr->GetOption<float>("Rate.XP.BattlegroundKillAV", 1.0f);
@@ -2064,8 +2066,6 @@ void World::SetInitialWorldSettings()
 
     _mail_expire_check_timer = GameTime::GetGameTime() + 6h;
 
-    _timers[WUPDATE_DELAYED_DAMAGES].SetInterval(400);
-
     ///- Initialize MapMgr
     LOG_INFO("server.loading", "Starting Map System");
     LOG_INFO("server.loading", " ");
@@ -2311,12 +2311,6 @@ void World::Update(uint32 diff)
 
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Check quest reset times"));
-
-        if (_timers[WUPDATE_DELAYED_DAMAGES].Passed())
-        {
-            _timers[WUPDATE_DELAYED_DAMAGES].Reset();
-            ProcessDelayedDamages();
-        }
 
         /// Handle daily quests reset time
         if (currentGameTime > _nextDailyQuestReset)
@@ -3338,40 +3332,4 @@ CliCommandHolder::CliCommandHolder(void* callbackArg, char const* command, Print
 CliCommandHolder::~CliCommandHolder()
 {
     free(m_command);
-}
-
-void World::AddDelayedDamage(ObjectGuid attacker, ObjectGuid victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, uint32 mapId, uint32 instanceId)
-{
-    DelayedDamage delayedDamage;
-    delayedDamage.attacker = attacker;
-    delayedDamage.victim = victim;
-    delayedDamage.damage = damage;
-    delayedDamage.cleanDamage = cleanDamage;
-    delayedDamage.damagetype = damagetype;
-    delayedDamage.damageSchoolMask = damageSchoolMask;
-    delayedDamage.spellProto = spellProto;
-    delayedDamage.durabilityLoss = durabilityLoss;
-    delayedDamage.mapId = mapId;
-    delayedDamage.instanceId = instanceId;
-    _delayedDamages.push_back(delayedDamage);
-}
-
-void World::ProcessDelayedDamages()
-{
-    for (auto& damage : _delayedDamages)
-    {
-        // Get map first
-        Map* map = sMapMgr->FindMap(damage.mapId, damage.instanceId);
-        if (!map)
-            continue;
-
-        // Now we get both, attacker and victim, but attacker can be null (although attacker is always a player).
-        Unit* attacker = ObjectAccessor::GetUnit(map, damage.attacker);
-        Unit* victim = ObjectAccessor::GetUnit(map, damage.victim);
-        if (!victim)
-            continue;
-
-        Unit::DealDamage(attacker, victim, damage.damage, damage.cleanDamage, damage.damagetype, damage.damageSchoolMask, damage.spellProto, damage.durabilityLoss);
-    }
-    _delayedDamages.clear();
 }
