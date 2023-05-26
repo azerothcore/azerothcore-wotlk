@@ -780,6 +780,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 {
+    m_playerLoading = true;
     ObjectGuid playerGuid = holder.GetGuid();
 
     Player* pCurrChar = new Player(this);
