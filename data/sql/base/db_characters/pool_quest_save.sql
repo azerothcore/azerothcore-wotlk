@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `pool_quest_save` (
   `pool_id` int unsigned NOT NULL DEFAULT '0',
   `quest_id` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`pool_id`,`quest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.pool_quest_save: ~38 rows (approximately)
 DELETE FROM `pool_quest_save`;

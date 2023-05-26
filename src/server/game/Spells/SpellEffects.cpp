@@ -2704,11 +2704,8 @@ void Spell::EffectDistract(SpellEffIndex /*effIndex*/)
     if (unitTarget->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING))
         return;
 
-    unitTarget->SetFacingTo(unitTarget->GetAngle(destTarget));
-    unitTarget->ClearUnitState(UNIT_STATE_MOVING);
-
-    if (unitTarget->GetTypeId() == TYPEID_UNIT)
-        unitTarget->GetMotionMaster()->MoveDistract(damage * IN_MILLISECONDS);
+    unitTarget->SetFacingTo(unitTarget->GetAngle(destTarget)); /// @BUG Causes the player to stop moving + interrupts spellcast.
+    unitTarget->GetMotionMaster()->MoveDistract(damage * IN_MILLISECONDS);
 }
 
 void Spell::EffectPickPocket(SpellEffIndex /*effIndex*/)
@@ -3433,19 +3430,13 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
         case SPELLFAMILY_PALADIN:
             {
-                // Seal of Command Unleashed
-                if (m_spellInfo->Id == 20467)
-                {
-                    spell_bonus += int32(0.08f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
-                    spell_bonus += int32(0.13f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
-                }
-
                 switch (m_spellInfo->Id)
                 {
-                    case 20424: // Seal of Command
-                    case 42463: // Seal of Vengeance
-                    case 53739: // Seal of Corruption
-                    case 53385: // Divine Storm
+                    case 20467: // Seal of Command Unleashed
+                        spell_bonus += int32(0.08f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                        spell_bonus += int32(0.13f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
+                        break;
+                    case 53385:  // Divine Storm deals normalized damage
                         normalized = true;
                         break;
                     default:

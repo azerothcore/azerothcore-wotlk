@@ -761,7 +761,7 @@ bool WorldSession::ValidateHyperlinksAndMaybeKick(std::string_view str)
     if (Acore::Hyperlinks::CheckAllLinks(str))
         return true;
 
-    LOG_ERROR("network", "Player {}{} sent a message with an invalid link:\n%.*s", GetPlayer()->GetName(),
+    LOG_ERROR("network", "Player {} {} sent a message with an invalid link:\n%.*s", GetPlayer()->GetName(),
         GetPlayer()->GetGUID().ToString(), STRING_VIEW_FMT_ARG(str));
 
     if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
@@ -1081,12 +1081,8 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
         e.g. aerial combat.
     */
 
-    if (mi->HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY) && GetSecurity() == SEC_PLAYER && !GetPlayer()->m_mover->HasAuraType(SPELL_AURA_FLY) && !GetPlayer()->m_mover->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
-    {
-        // Inform the client we can no longer fly, which is required if data mismatches for some reason
-        // Like flight auras being removed but the client still sends flight movement packets.
-        GetPlayer()->SetCanFly(false);
-    }
+    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY) && GetSecurity() == SEC_PLAYER && !GetPlayer()->m_mover->HasAuraType(SPELL_AURA_FLY) && !GetPlayer()->m_mover->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED),
+        MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY);
 
     //! Cannot fly and fall at the same time
     REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY) && mi->HasMovementFlag(MOVEMENTFLAG_FALLING),

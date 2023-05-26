@@ -492,7 +492,9 @@ void World::LoadConfigSettings(bool reload)
     _rate_values[RATE_DROP_ITEM_ARTIFACT]          = sConfigMgr->GetOption<float>("Rate.Drop.Item.Artifact", 1.0f);
     _rate_values[RATE_DROP_ITEM_REFERENCED]        = sConfigMgr->GetOption<float>("Rate.Drop.Item.Referenced", 1.0f);
     _rate_values[RATE_DROP_ITEM_REFERENCED_AMOUNT] = sConfigMgr->GetOption<float>("Rate.Drop.Item.ReferencedAmount", 1.0f);
+    _rate_values[RATE_DROP_ITEM_GROUP_AMOUNT]      = sConfigMgr->GetOption<float>("Rate.Drop.Item.GroupAmount", 1.0f);
     _rate_values[RATE_DROP_MONEY]                  = sConfigMgr->GetOption<float>("Rate.Drop.Money", 1.0f);
+
     _rate_values[RATE_REWARD_BONUS_MONEY]          = sConfigMgr->GetOption<float>("Rate.RewardBonusMoney", 1.0f);
     _rate_values[RATE_XP_KILL]                     = sConfigMgr->GetOption<float>("Rate.XP.Kill", 1.0f);
     _rate_values[RATE_XP_BG_KILL_AV]               = sConfigMgr->GetOption<float>("Rate.XP.BattlegroundKillAV", 1.0f);
@@ -666,7 +668,7 @@ void World::LoadConfigSettings(bool reload)
         _int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] = 0;
     }
 
-    _int_configs[CONFIG_INTERVAL_MAPUPDATE] = sConfigMgr->GetOption<int32>("MapUpdateInterval", 100);
+    _int_configs[CONFIG_INTERVAL_MAPUPDATE] = sConfigMgr->GetOption<int32>("MapUpdateInterval", 10);
     if (_int_configs[CONFIG_INTERVAL_MAPUPDATE] < MIN_MAP_UPDATE_DELAY)
     {
         LOG_ERROR("server.loading", "MapUpdateInterval ({}) must be greater {}. Use this minimal value.", _int_configs[CONFIG_INTERVAL_MAPUPDATE], MIN_MAP_UPDATE_DELAY);
@@ -1356,6 +1358,9 @@ void World::LoadConfigSettings(bool reload)
     // Dungeon finder
     _int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 5);
 
+    // DBC_ItemAttributes
+    _bool_configs[CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES] = sConfigMgr->GetOption<bool>("DBC.EnforceItemAttributes", true);
+
     // Max instances per hour
     _int_configs[CONFIG_MAX_INSTANCES_PER_HOUR] = sConfigMgr->GetOption<int32>("AccountInstancesPerHour", 5);
 
@@ -1560,7 +1565,7 @@ void World::SetInitialWorldSettings()
     sIPLocation->Load();
 
     std::vector<uint32> mapIds;
-    for (auto const map : sMapStore)
+    for (auto const& map : sMapStore)
     {
         mapIds.emplace_back(map->MapID);
     }

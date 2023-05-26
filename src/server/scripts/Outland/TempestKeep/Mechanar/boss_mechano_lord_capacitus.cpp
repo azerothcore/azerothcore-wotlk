@@ -46,11 +46,6 @@ enum Yells
     SAY_DEATH                      = 4
 };
 
-enum Creatures
-{
-    NPC_NETHER_CHARGE               = 20405
-};
-
 struct boss_mechano_lord_capacitus : public BossAI
 {
     boss_mechano_lord_capacitus(Creature* creature) : BossAI(creature, DATA_MECHANOLORD_CAPACITUS)
@@ -77,7 +72,7 @@ struct boss_mechano_lord_capacitus : public BossAI
                 SPELL_SUMMON_NETHER_CHARGE_SE,
                 SPELL_SUMMON_NETHER_CHARGE_SW);
             DoCastAOE(spellId);
-            IsHeroic() ? context.Repeat(2s, 5s) : context.Repeat(9s, 11s);
+            context.Repeat(2400ms, 3600ms);
         }).Schedule(3min, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_BERSERK, true);
@@ -127,7 +122,6 @@ struct boss_mechano_lord_capacitus : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
         summon->GetMotionMaster()->MoveRandom(30.0f);
     }
 };

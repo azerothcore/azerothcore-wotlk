@@ -248,7 +248,7 @@ struct boss_malchezaar : public BossAI
 
     void EnfeebleResetHealth()
     {
-        for (auto targets : _enfeebleTargets)
+        for (auto& targets : _enfeebleTargets)
         {
             if (Unit* target = ObjectAccessor::GetUnit(*me, targets.first))
             {

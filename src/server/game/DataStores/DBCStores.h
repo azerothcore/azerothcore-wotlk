@@ -124,6 +124,7 @@ extern DBCStorage <GtRegenHPPerSptEntry>         sGtRegenHPPerSptStore;
 extern DBCStorage <GtRegenMPPerSptEntry>         sGtRegenMPPerSptStore;
 extern DBCStorage <HolidaysEntry>                sHolidaysStore;
 extern DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore;
+extern DBCStorage <ItemEntry>                    sItemStore;
 extern DBCStorage <ItemDisplayInfoEntry>         sItemDisplayInfoStore;
 extern DBCStorage <ItemExtendedCostEntry>        sItemExtendedCostStore;
 extern DBCStorage <ItemLimitCategoryEntry>       sItemLimitCategoryStore;
