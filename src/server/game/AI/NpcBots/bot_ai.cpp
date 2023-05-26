@@ -8314,7 +8314,8 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         case GOSSIP_SENDER_EQUIP_TRANSMOGRIFY_BODY:      //12 - 1 body
         {
             uint8 slot = sender - GOSSIP_SENDER_EQUIP_TRANSMOGRIFY;
-            uint32 itemId = action;
+            int32 itemId = (action == std::numeric_limits<uint32>::max()) ? -1 : int32(action);
+            uint32 itemId_u = uint32(std::max<int32>(itemId, 0));
 
             Item const* item = _equips[slot];
             ASSERT(item);
@@ -8322,7 +8323,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             BotDataMgr::UpdateNpcBotTransmogData(me->GetEntry(), slot, item->GetEntry(), itemId);
 
             if (slot <= BOT_SLOT_RANGED)
-                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, itemId ? itemId : item->GetEntry());
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, itemId_u ? itemId_u : item->GetEntry());
 
             return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
         }
@@ -8332,9 +8333,10 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
 
             NpcBotTransmogData const* tramsmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
             ASSERT(tramsmogData);
-            ASSERT(tramsmogData->transmogs[slot].second);
+            ASSERT(tramsmogData->transmogs[slot].second >= 0);
 
-            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tramsmogData->transmogs[slot].second);
+            uint32 item_id = uint32(tramsmogData->transmogs[slot].second);
+            ItemTemplate const* proto = item_id ? sObjectMgr->GetItemTemplate(item_id) : nullptr;
             if (proto)
             {
                 std::ostringstream msg;
@@ -8406,26 +8408,34 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             NpcBotTransmogData const* tramsmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
             if (tramsmogData && tramsmogData->transmogs[slot].first)
             {
-                if (tramsmogData->transmogs[slot].second)
+                int32 item_id = tramsmogData->transmogs[slot].second;
+                if (item_id >= 0)
                 {
                     //s5.2.1.1: current
                     std::ostringstream msg;
-                    if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tramsmogData->transmogs[slot].second))
+                    if (item_id == 0)
+                        msg << LocalizedNpcText(player, BOT_TEXT_HIDDEN);
+                    else if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(uint32(item_id)))
                         _AddItemTemplateLink(player, proto, msg);
                     else
-                        msg << '<' << LocalizedNpcText(player, BOT_TEXT_UNKNOWN) << "(" << tramsmogData->transmogs[slot].second << ")>";
+                        msg << '<' << LocalizedNpcText(player, BOT_TEXT_UNKNOWN) << "(" << item_id << ")>";
 
                     AddGossipItemFor(player, GOSSIP_ICON_BATTLE, msg.str(), GOSSIP_SENDER_EQUIP_TRANSMOG_INFO, GOSSIP_ACTION_INFO_DEF + slot);
 
                     //s5.2.1.2a: reset
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_EQUIP_TRANSMOGRIFY + slot, 0);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_NONE), GOSSIP_SENDER_EQUIP_TRANSMOGRIFY + slot, std::numeric_limits<uint32>::max());
                 }
                 else
                 {
                     //s5.2.1.2b: None
-                    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_EQUIP_TRANSMOGS, action);
+                    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, LocalizedNpcText(player, BOT_TEXT_NONE), GOSSIP_SENDER_EQUIP_TRANSMOGS, action);
                 }
             }
+
+            //s5.2.1.2c: hide
+            if (slot > BOT_SLOT_RANGED &&
+                !(tramsmogData && tramsmogData->transmogs[slot].first && tramsmogData->transmogs[slot].second == 0))
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_HIDDEN), GOSSIP_SENDER_EQUIP_TRANSMOGRIFY + slot, 0);
 
             if (!itemList.empty())
             {
@@ -12068,7 +12078,7 @@ bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver)
         {
             NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
             if (einfo->ItemEntry[slot] != newItemId && transmogData && BotMgr::IsTransmogEnabled() && (transmogData->transmogs[slot].first == newItemId || BotMgr::TransmogUseEquipmentSlots()))
-                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, transmogData->transmogs[slot].second);
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, uint32(std::max<int32>(transmogData->transmogs[slot].second, 0)));
             else
                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, newItemId);
         }
@@ -13451,29 +13461,34 @@ Item* bot_ai::GetEquipsByGuid(ObjectGuid itemGuid) const
 
 uint32 bot_ai::GetEquipDisplayId(uint8 slot) const
 {
-    uint32 displayId = 0;
+    int32 displayId = -1;
     if (_equips[slot])
     {
         NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
         if (transmogData && BotMgr::IsTransmogEnabled() &&
             (_equips[slot]->GetTemplate()->ItemId == transmogData->transmogs[slot].first || BotMgr::TransmogUseEquipmentSlots()))
         {
-            uint32 item_id = transmogData->transmogs[slot].second;
-            if (ItemTemplate const* proto = item_id ? sObjectMgr->GetItemTemplate(item_id) : nullptr)
+            int32 item_id = transmogData->transmogs[slot].second;
+            if (item_id > 0)
             {
-                displayId = proto->DisplayInfoID;
-            }
-            else if (item_id != 0)
-            {
+                if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(uint32(item_id)))
+                {
+                    displayId = proto->DisplayInfoID;
+                }
+                else
+                {
                 LOG_ERROR("scripts", "bot_ai::GetEquipDisplayId(): ivalid item Id {} for bot {} {} slot {}",
-                    item_id, me->GetEntry(), me->GetName().c_str(), uint32(slot));
+                        item_id, me->GetEntry(), me->GetName().c_str(), uint32(slot));
+                }
             }
+            else
+                displayId = item_id;
         }
-        if (!displayId)
-            displayId = _equips[slot]->GetTemplate()->DisplayInfoID;
+        if (displayId == -1)
+            displayId = int32(_equips[slot]->GetTemplate()->DisplayInfoID);
     }
 
-    return displayId;
+    return uint32(std::max<int32>(displayId, 0));
 }
 
 bool bot_ai::UnEquipAll(ObjectGuid receiver)
@@ -14367,7 +14382,7 @@ void bot_ai::InitEquips()
         {
             NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
             if (einfo->ItemEntry[i] != _equips[i]->GetEntry() && transmogData && BotMgr::IsTransmogEnabled() && (transmogData->transmogs[i].first == _equips[i]->GetEntry() || BotMgr::TransmogUseEquipmentSlots()))
-                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, transmogData->transmogs[i].second);
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, uint32(std::max<int32>(transmogData->transmogs[i].second, 0)));
             else
                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, _equips[i]->GetEntry());
         }
@@ -16802,7 +16817,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                     NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
                     if (einfo->ItemEntry[BOT_SLOT_OFFHAND] != _equips[BOT_SLOT_OFFHAND]->GetEntry() &&
                         transmogData && BotMgr::IsTransmogEnabled() && (transmogData->transmogs[BOT_SLOT_OFFHAND].first == _equips[BOT_SLOT_OFFHAND]->GetEntry() || BotMgr::TransmogUseEquipmentSlots()))
-                        me->SetUInt32Value(uint8(UNIT_VIRTUAL_ITEM_SLOT_ID) + BOT_SLOT_OFFHAND, transmogData->transmogs[BOT_SLOT_OFFHAND].second);
+                        me->SetUInt32Value(uint8(UNIT_VIRTUAL_ITEM_SLOT_ID) + BOT_SLOT_OFFHAND, uint32(std::max<int32>(transmogData->transmogs[BOT_SLOT_OFFHAND].second, 0)));
                     else
                         me->SetUInt32Value(uint8(UNIT_VIRTUAL_ITEM_SLOT_ID) + BOT_SLOT_OFFHAND, _equips[BOT_SLOT_OFFHAND]->GetEntry());
                 }
@@ -18779,7 +18794,7 @@ bool bot_ai::IsValidTransmog(uint8 slot, ItemTemplate const* source) const
     }
 
     NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
-    if (transmogData && transmogData->transmogs[slot].second == source->ItemId)
+    if (transmogData && transmogData->transmogs[slot].second == int32(source->ItemId))
         return false;
 
     return true;

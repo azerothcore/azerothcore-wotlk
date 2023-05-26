@@ -98,12 +98,12 @@ struct NpcBotTransmogData
 {
     friend class BotDataMgr;
 public:
-    std::pair<uint32 /*item_id*/, uint32 /*fake_id*/> transmogs[BOT_TRANSMOG_INVENTORY_SIZE];
+    std::pair<uint32 /*item_id*/, int32 /*fake_id*/> transmogs[BOT_TRANSMOG_INVENTORY_SIZE];
 private:
     explicit NpcBotTransmogData()
     {
         for (uint8 i = 0; i != BOT_TRANSMOG_INVENTORY_SIZE; ++i)
-            transmogs[i] = { 0, 0 };
+            transmogs[i] = { 0, -1 };
     }
     NpcBotTransmogData(NpcBotTransmogData const&);
 };
@@ -164,7 +164,7 @@ class BotDataMgr
         static NpcBotExtras const* SelectNpcBotExtras(uint32 entry);
 
         static NpcBotTransmogData const* SelectNpcBotTransmogs(uint32 entry);
-        static void UpdateNpcBotTransmogData(uint32 entry, uint8 slot, uint32 item_id, uint32 fake_id, bool update_db = true);
+        static void UpdateNpcBotTransmogData(uint32 entry, uint8 slot, uint32 item_id, int32 fake_id, bool update_db = true);
         static void ResetNpcBotTransmogData(uint32 entry, bool update_db = true);
 
         static bool AllBotsLoaded();
