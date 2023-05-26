@@ -29,11 +29,7 @@ enum HydromancerThespia
 
     SPELL_LIGHTNING_CLOUD       = 25033,
     SPELL_LUNG_BURST            = 31481,
-    SPELL_ENVELOPING_WINDS      = 31718,
-
-    EVENT_SPELL_LIGHTNING       = 1,
-    EVENT_SPELL_LUNG            = 2,
-    EVENT_SPELL_ENVELOPING      = 3
+    SPELL_ENVELOPING_WINDS      = 31718
 };
 
 struct boss_hydromancer_thespia : public BossAI
@@ -44,47 +40,39 @@ struct boss_hydromancer_thespia : public BossAI
     {
         _JustDied();
         Talk(SAY_DEAD);
+
+        instance->DoForAllMinions(DATA_HYDROMANCER_THESPIA, [&](Creature* creature) {
+            creature->DespawnOrUnsummon();
+        });
     }
 
     void KilledUnit(Unit* victim) override
     {
         if (victim->IsPlayer())
+        {
             Talk(SAY_SLAY);
+        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         _JustEngagedWith();
-        events.ScheduleEvent(EVENT_SPELL_LIGHTNING, 9800);
-        events.ScheduleEvent(EVENT_SPELL_LUNG, 13300);
-        events.ScheduleEvent(EVENT_SPELL_ENVELOPING, 14500);
-    }
 
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        switch (events.ExecuteEvent())
+        scheduler.Schedule(9800ms, [this](TaskContext context)
         {
-        case EVENT_SPELL_LIGHTNING:
             Talk(SAY_SPELL);
             DoCastRandomTarget(SPELL_LIGHTNING_CLOUD);
-            events.RepeatEvent(urand(12100, 14500));
-            break;
-        case EVENT_SPELL_LUNG:
+            context.Repeat(12100ms, 14500ms);
+        }).Schedule(13300ms, [this](TaskContext context)
+        {
             DoCastRandomTarget(SPELL_LUNG_BURST);
-            events.RepeatEvent(urand(21800, 25400));
-            break;
-        case EVENT_SPELL_ENVELOPING:
+            context.Repeat(21800ms, 25400ms);
+        }).Schedule(14500ms, [this](TaskContext context)
+        {
             DoCastRandomTarget(SPELL_ENVELOPING_WINDS);
-            events.RepeatEvent(urand(30000, 40000));
-            break;
-        }
-
-        DoMeleeAttackIfReady();
+            context.Repeat(30s, 40s);
+        });
     }
 };
 

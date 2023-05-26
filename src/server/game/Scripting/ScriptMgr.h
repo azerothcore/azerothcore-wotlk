@@ -1035,7 +1035,7 @@ public:
     virtual void OnBeforeLootMoney(Player* /*player*/, Loot* /*loot*/) {}
 
     // Called when a player gains XP (before anything is given)
-    virtual void OnGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/) { }
+    virtual void OnGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/, uint8 /*xpSource*/) { }
 
     // Called when a player's reputation changes (before it is actually changed)
     virtual bool OnReputationChange(Player* /*player*/, uint32 /*factionID*/, int32& /*standing*/, bool /*incremental*/) { return true; }
@@ -1189,6 +1189,9 @@ public:
 
     // After receiving item as a quest reward
     virtual void OnQuestRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
+
+    // When placing a bid or buying out an auction
+    [[nodiscard]] virtual bool CanPlaceAuctionBid(Player* /*player*/, AuctionEntry* /*auction*/) { return true; }
 
     // After receiving item as a group roll reward
     virtual void OnGroupRollRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, RollVote /*voteType*/, Roll* /*roll*/) { }
@@ -2237,7 +2240,7 @@ public: /* PlayerScript */
     void OnPlayerTalentsReset(Player* player, bool noCost);
     void OnPlayerMoneyChanged(Player* player, int32& amount);
     void OnBeforeLootMoney(Player* player, Loot* loot);
-    void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim);
+    void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource);
     bool OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
     void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
     void OnPlayerLearnSpell(Player* player, uint32 spellID);
@@ -2290,6 +2293,7 @@ public: /* PlayerScript */
     void OnStoreNewItem(Player* player, Item* item, uint32 count);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
+    bool CanPlaceAuctionBid(Player* player, AuctionEntry* auction);
     void OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll);
     bool OnBeforeOpenItem(Player* player, Item* item);
     bool OnBeforePlayerQuestComplete(Player* player, uint32 quest_id);

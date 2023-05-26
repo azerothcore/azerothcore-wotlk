@@ -122,6 +122,10 @@ enum NPCEntries
     NPC_ARMY_OF_THE_DEAD        = 24207,
     NPC_EBON_GARGOYLE           = 27829,
 
+    // Hunter
+    NPC_VENOMOUS_SNAKE          = 19833,
+    NPC_VIPER                   = 19921,
+
     // Generic
     NPC_GENERIC_IMP             = 12922,
     NPC_GENERIC_VOIDWALKER      = 8996

@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `channels_bans` (
   `playerGUID` int unsigned NOT NULL,
   `banTime` int unsigned NOT NULL,
   PRIMARY KEY (`channelId`,`playerGUID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.channels_bans: ~0 rows (approximately)
 DELETE FROM `channels_bans`;

@@ -18,13 +18,13 @@
 DROP TABLE IF EXISTS `character_declinedname`;
 CREATE TABLE IF NOT EXISTS `character_declinedname` (
   `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
-  `genitive` varchar(15) NOT NULL DEFAULT '',
-  `dative` varchar(15) NOT NULL DEFAULT '',
-  `accusative` varchar(15) NOT NULL DEFAULT '',
-  `instrumental` varchar(15) NOT NULL DEFAULT '',
-  `prepositional` varchar(15) NOT NULL DEFAULT '',
+  `genitive` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `dative` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `accusative` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `instrumental` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `prepositional` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.character_declinedname: ~0 rows (approximately)
 DELETE FROM `character_declinedname`;

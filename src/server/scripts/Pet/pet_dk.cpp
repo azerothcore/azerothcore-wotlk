@@ -43,7 +43,10 @@ enum DeathKnightSpells
     SPELL_DK_DISMISS_GARGOYLE       = 50515,
     SPELL_DK_SANCTUARY              = 54661,
     SPELL_DK_NIGHT_OF_THE_DEAD      = 62137,
-    SPELL_DK_PET_SCALING            = 61017
+    SPELL_DK_PET_SCALING            = 61017,
+    // Risen Ally
+    SPELL_DK_RAISE_ALLY             = 46619,
+    SPELL_GHOUL_FRENZY              = 62218,
 };
 
 class npc_pet_dk_ebon_gargoyle : public CreatureScript
@@ -255,6 +258,38 @@ public:
     }
 };
 
+class npc_pet_dk_risen_ally : public CreatureScript
+{
+public:
+    npc_pet_dk_risen_ally() : CreatureScript("npc_pet_dk_risen_ally") { }
+
+    struct npc_pet_dk_risen_allyAI : public PossessedAI
+    {
+        npc_pet_dk_risen_allyAI(Creature* c) : PossessedAI(c) { }
+
+        void OnCharmed(bool apply) override
+        {
+            if (!apply)
+            {
+                if (Unit* owner = me->GetCharmerOrOwner())
+                {
+                    if (Player* player = owner->ToPlayer())
+                    {
+                        player->RemoveAurasDueToSpell(SPELL_DK_RAISE_ALLY); // Remove Raise Ally aura
+                        player->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY); // Remove Frenzy aura
+                        //player->ClearResurrectRequestData();
+                    }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const override
+    {
+        return new npc_pet_dk_risen_allyAI (pCreature);
+    }
+};
+
 class npc_pet_dk_army_of_the_dead : public CreatureScript
 {
 public:
@@ -335,6 +370,7 @@ void AddSC_deathknight_pet_scripts()
 {
     new npc_pet_dk_ebon_gargoyle();
     new npc_pet_dk_ghoul();
+    new npc_pet_dk_risen_ally();
     new npc_pet_dk_army_of_the_dead();
     new npc_pet_dk_dancing_rune_weapon();
     RegisterSpellScript(spell_pet_dk_gargoyle_strike);

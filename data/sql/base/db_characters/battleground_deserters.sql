@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `battleground_deserters` (
   `guid` int unsigned NOT NULL COMMENT 'characters.guid',
   `type` tinyint unsigned NOT NULL COMMENT 'type of the desertion',
   `datetime` datetime NOT NULL COMMENT 'datetime of the desertion'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.battleground_deserters: ~0 rows (approximately)
 DELETE FROM `battleground_deserters`;
