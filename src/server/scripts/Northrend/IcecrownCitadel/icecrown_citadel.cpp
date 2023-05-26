@@ -1007,13 +1007,6 @@ public:
             me->SendMovementFlagUpdate();
         }
 
-        void AttackStart(Unit* victim) override
-        {
-            if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
-                return;
-            BossAI::AttackStart(victim);
-        }
-
         void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
@@ -1039,13 +1032,6 @@ public:
 
         void JustEngagedWith(Unit* /*attacker*/) override
         {
-            if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
-            {
-                me->CombatStop(false);
-                me->SetImmuneToAll(true);
-                me->SetReactState(REACT_PASSIVE);
-                return;
-            }
             _JustEngagedWith();
             me->LowerPlayerDamageReq(me->GetMaxHealth());
             if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))

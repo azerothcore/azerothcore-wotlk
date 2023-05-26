@@ -51,6 +51,12 @@ enum steamVaultNPCGO
     NPC_DOOR_CONTROLLER                 = 20926
 };
 
+enum Creatures
+{
+    NPC_NAGA_DISTILLER                  = 17954,
+    NPC_THESPIA_WATER_ELEMENTAL         = 17917
+};
+
 template <class AI, class T>
 inline AI* GetSteamVaultAI(T* obj)
 {

@@ -21,14 +21,14 @@ CREATE TABLE IF NOT EXISTS `build_info` (
   `majorVersion` int DEFAULT NULL,
   `minorVersion` int DEFAULT NULL,
   `bugfixVersion` int DEFAULT NULL,
-  `hotfixVersion` char(3) DEFAULT NULL,
-  `winAuthSeed` varchar(32) DEFAULT NULL,
-  `win64AuthSeed` varchar(32) DEFAULT NULL,
-  `mac64AuthSeed` varchar(32) DEFAULT NULL,
-  `winChecksumSeed` varchar(40) DEFAULT NULL,
-  `macChecksumSeed` varchar(40) DEFAULT NULL,
+  `hotfixVersion` char(3) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `winAuthSeed` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `win64AuthSeed` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `mac64AuthSeed` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `winChecksumSeed` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `macChecksumSeed` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`build`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_auth.build_info: ~11 rows (approximately)
 DELETE FROM `build_info`;

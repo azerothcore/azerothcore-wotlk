@@ -17,16 +17,15 @@
 -- Dumping structure for table acore_world.pet_name_generation
 DROP TABLE IF EXISTS `pet_name_generation`;
 CREATE TABLE IF NOT EXISTS `pet_name_generation` (
-  `id` mediumint unsigned NOT NULL AUTO_INCREMENT,
-  `word` tinytext NOT NULL,
-  `entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `id` int unsigned NOT NULL,
+  `word` tinytext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `entry` int unsigned NOT NULL DEFAULT '0',
   `half` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.pet_name_generation: 313 rows
+-- Dumping data for table acore_world.pet_name_generation: ~313 rows (approximately)
 DELETE FROM `pet_name_generation`;
-/*!40000 ALTER TABLE `pet_name_generation` DISABLE KEYS */;
 INSERT INTO `pet_name_generation` (`id`, `word`, `entry`, `half`) VALUES
 	(1, 'Aba', 416, 0),
 	(2, 'Az', 416, 0),
@@ -341,7 +340,6 @@ INSERT INTO `pet_name_generation` (`id`, `word`, `entry`, `half`) VALUES
 	(311, 'catcher', 26125, 1),
 	(312, 'drinker', 26125, 1),
 	(313, 'slicer', 26125, 1);
-/*!40000 ALTER TABLE `pet_name_generation` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

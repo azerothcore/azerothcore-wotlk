@@ -1201,6 +1201,7 @@ void Guild::HandleRoster(WorldSession* session)
 {
     WorldPackets::Guild::GuildRoster roster;
 
+    roster.RankData.reserve(m_ranks.size());
     for (RankInfo const& rank : m_ranks)
     {
         WorldPackets::Guild::GuildRankData& rankData =  roster.RankData.emplace_back();
@@ -1215,6 +1216,7 @@ void Guild::HandleRoster(WorldSession* session)
     }
 
     bool sendOfficerNote = _HasRankRight(session->GetPlayer(), GR_RIGHT_VIEWOFFNOTE);
+    roster.MemberData.reserve(m_members.size());
     for (auto const& [guid, member] : m_members)
     {
         WorldPackets::Guild::GuildRosterMemberData& memberData = roster.MemberData.emplace_back();
@@ -1386,7 +1388,7 @@ void Guild::HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string_v
         rankInfo->SetRights(rights);
         _SetRankBankMoneyPerDay(rankId, moneyPerDay);
 
-        for (auto rightsAndSlot : rightsAndSlots)
+        for (auto& rightsAndSlot : rightsAndSlots)
             _SetRankBankTabRightsAndSlots(rankId, rightsAndSlot);
 
         _BroadcastEvent(GE_RANK_UPDATED, ObjectGuid::Empty, std::to_string(rankId), rankInfo->GetName(), std::to_string(m_ranks.size()));
@@ -2380,7 +2382,7 @@ void Guild::_CreateNewBankTab()
     trans->Append(stmt);
 
     ++tabId;
-    for (auto & m_rank : m_ranks)
+    for (auto& m_rank : m_ranks)
         m_rank.CreateMissingTabsIfNeeded(tabId, trans, false);
 
     CharacterDatabase.CommitTransaction(trans);

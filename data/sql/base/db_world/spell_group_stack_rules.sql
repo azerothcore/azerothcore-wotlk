@@ -19,13 +19,12 @@ DROP TABLE IF EXISTS `spell_group_stack_rules`;
 CREATE TABLE IF NOT EXISTS `spell_group_stack_rules` (
   `group_id` int unsigned NOT NULL DEFAULT '0',
   `stack_rule` tinyint NOT NULL DEFAULT '0',
-  `description` varchar(150) NOT NULL DEFAULT '',
+  `description` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`group_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.spell_group_stack_rules: 37 rows
+-- Dumping data for table acore_world.spell_group_stack_rules: ~37 rows (approximately)
 DELETE FROM `spell_group_stack_rules`;
-/*!40000 ALTER TABLE `spell_group_stack_rules` DISABLE KEYS */;
 INSERT INTO `spell_group_stack_rules` (`group_id`, `stack_rule`, `description`) VALUES
 	(1, 4, 'Group of Battle / Guardian Elixirs, stacking done with exclusive flags'),
 	(1001, 8, 'Group of Food (Well Fed) and similar buffs'),
@@ -64,7 +63,6 @@ INSERT INTO `spell_group_stack_rules` (`group_id`, `stack_rule`, `description`) 
 	(1034, 1, 'Group of Thorns'),
 	(1112, 8, ''),
 	(1113, 8, 'Ahn\'kahet - Potent Fogus and Mini');
-/*!40000 ALTER TABLE `spell_group_stack_rules` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

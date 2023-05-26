@@ -642,7 +642,7 @@ void Unit::UpdateSplinePosition()
             transport->CalculatePassengerPosition(loc.x, loc.y, loc.z, &loc.orientation);
     }
 
-    // Xinef: this is bullcrap, if we had spline running update orientation along with position
+    // Xinef: if we had spline running update orientation along with position
     //if (HasUnitState(UNIT_STATE_CANNOT_TURN))
     //    loc.orientation = GetOrientation();
 
@@ -3822,6 +3822,8 @@ void Unit::_UpdateSpells(uint32 time)
     {
         if (i->second->IsExpired())
             RemoveOwnedAura(i, AURA_REMOVE_BY_EXPIRE);
+        else if (i->second->GetSpellInfo()->IsChanneled() && i->second->GetCasterGUID() != GetGUID() && !ObjectAccessor::GetWorldObject(*this, i->second->GetCasterGUID()))
+            RemoveOwnedAura(i, AURA_REMOVE_BY_CANCEL); // remove channeled auras when caster is not on the same map
         else
             ++i;
     }
@@ -4573,6 +4575,8 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator& i, AuraRemoveMode removeMo
     // only way correctly remove all auras from list
     //if (removedAuras != m_removedAurasCount) new aura may be added
     i = m_appliedAuras.begin();
+
+    sScriptMgr->OnAuraRemove(this, aurApp, removeMode);
 }
 
 void Unit::_UnapplyAura(AuraApplication* aurApp, AuraRemoveMode removeMode)
@@ -4716,8 +4720,6 @@ void Unit::RemoveAura(AuraApplicationMap::iterator& i, AuraRemoveMode mode)
     // Remove aura - for Area and Target auras
     if (aura->GetOwner() == this)
         aura->Remove(mode);
-
-    sScriptMgr->OnAuraRemove(this, aurApp, mode);
 }
 
 void Unit::RemoveAura(uint32 spellId, ObjectGuid caster, uint8 reqEffMask, AuraRemoveMode removeMode)
@@ -6498,11 +6500,12 @@ void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit* target, uint8 /*SwingType
 }
 
 //victim may be nullptr
-bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, Spell const* spellProc /*= nullptr*/)
+bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, ProcEventInfo const& eventInfo)
 {
     SpellInfo const* dummySpell = triggeredByAura->GetSpellInfo();
     uint32 effIndex = triggeredByAura->GetEffIndex();
     int32  triggerAmount = triggeredByAura->GetAmount();
+    Spell const* spellProc = eventInfo.GetProcSpell();
 
     Item* castItem = triggeredByAura->GetBase()->GetCastItemGUID() && GetTypeId() == TYPEID_PLAYER
                      ? ToPlayer()->GetItemByGuid(triggeredByAura->GetBase()->GetCastItemGUID()) : nullptr;
@@ -7864,12 +7867,22 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             if (!procSpell || !procSpell->IsPositive())
                                 return false;
 
-                            // heal amount
-                            basepoints0 = int32(CalculatePct(std::min(damage, GetMaxHealth() - GetHealth()), triggerAmount));
-                            target = this;
+                            HealInfo const* healInfo = eventInfo.GetHealInfo();
+                            if (!healInfo)
+                            {
+                                return false;
+                            }
 
-                            if (basepoints0)
-                                triggered_spell_id = 31786;
+                            uint32 effectiveHeal = healInfo->GetEffectiveHeal();
+                            if (effectiveHeal)
+                            {
+                                // heal amount
+                                basepoints0 = int32(CalculatePct(effectiveHeal, triggerAmount));
+                                target = this;
+
+                                if (basepoints0)
+                                    triggered_spell_id = 31786;
+                            }
                             break;
                         }
                     // Paladin Tier 6 Trinket (Ashtongue Talisman of Zeal)
@@ -10355,7 +10368,11 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
         creature->SendAIReaction(AI_REACTION_HOSTILE);
 
-        creature->CallAssistance();
+        /// @todo: Implement aggro range, detection range and assistance range templates
+        if (!(creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE))
+        {
+            creature->CallAssistance();
+        }
         creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
 
         SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
@@ -11185,16 +11202,18 @@ void Unit::UnsummonAllTotems(bool onDeath /*= false*/)
     }
 }
 
-void Unit::SendHealSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, uint32 OverHeal, uint32 Absorb, bool critical)
+void Unit::SendHealSpellLog(HealInfo const& healInfo, bool critical)
 {
+    uint32 overheal = healInfo.GetHeal() - healInfo.GetEffectiveHeal();
+
     // we guess size
     WorldPacket data(SMSG_SPELLHEALLOG, (8 + 8 + 4 + 4 + 4 + 4 + 1 + 1));
-    data << victim->GetPackGUID();
+    data << healInfo.GetTarget()->GetPackGUID();
     data << GetPackGUID();
-    data << uint32(SpellID);
-    data << uint32(Damage);
-    data << uint32(OverHeal);
-    data << uint32(Absorb); // Absorb amount
+    data << uint32(healInfo.GetSpellInfo()->Id);
+    data << uint32(healInfo.GetHeal());
+    data << uint32(overheal);
+    data << uint32(healInfo.GetAbsorb()); // Absorb amount
     data << uint8(critical ? 1 : 0);
     data << uint8(0); // unused
     SendMessageToSet(&data, true);
@@ -11210,7 +11229,9 @@ int32 Unit::HealBySpell(HealInfo& healInfo, bool critical)
     CalcHealAbsorb(healInfo);
 
     int32 gain = Unit::DealHeal(healInfo.GetHealer(), healInfo.GetTarget(), healInfo.GetHeal());
-    SendHealSpellLog(healInfo.GetTarget(), healInfo.GetSpellInfo()->Id, healInfo.GetHeal(), uint32(healInfo.GetHeal() - gain), healInfo.GetAbsorb(), critical);
+    healInfo.SetEffectiveHeal(gain);
+
+    SendHealSpellLog(healInfo, critical);
     return gain;
 }
 
@@ -11613,6 +11634,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
 
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
+    int32 DoneAdvertisedBenefit = 0;
     AuraEffectList const& mOverrideClassScript = owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
     for (AuraEffectList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
     {
@@ -11629,36 +11651,68 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             case 5148: // Idol of the Shooting Star
             case 6008: // Increased Lightning Damage
             case 8627: // Totem of Hex
-                {
-                    DoneTotal += (*i)->GetAmount();
-                    break;
-                }
+            {
+                DoneAdvertisedBenefit += (*i)->GetAmount();
+                break;
+            }
         }
     }
 
     // Custom scripted damage
-    if (spellProto->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
+    switch (spellProto->SpellFamilyName)
     {
-        // Sigil of the Vengeful Heart
-        if (spellProto->SpellFamilyFlags[0] & 0x2000)
-            if (AuraEffect* aurEff = GetAuraEffect(64962, EFFECT_1))
-                AddPct(DoneTotal, aurEff->GetAmount());
+        case SPELLFAMILY_DRUID:
+        {
+            // Insect Swarm vs Item - Druid T8 Balance Relic
+            if (spellProto->SpellFamilyFlags[0] & 0x00200000)
+            {
+                if (AuraEffect const* relicAurEff = GetAuraEffect(64950, EFFECT_0))
+                {
+                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
+                }
+            }
 
-        // Impurity
-        if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
-            AddPct(ApCoeffMod, aurEff->GetAmount());
+            // Nourish vs Idol of the Flourishing Life
+            if (spellProto->SpellFamilyFlags[1] & 0x02000000)
+            {
+                if (AuraEffect const* relicAurEff = GetAuraEffect(64949, EFFECT_0))
+                {
+                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
+                }
+            }
+            break;
+        }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            // Sigil of the Vengeful Heart
+            if (spellProto->SpellFamilyFlags[0] & 0x2000)
+            {
+                if (AuraEffect* aurEff = GetAuraEffect(64962, EFFECT_1))
+                {
+                    AddPct(DoneTotal, aurEff->GetAmount());
+                }
+            }
 
-        // Blood Boil - bonus for diseased targets
-        if (spellProto->SpellFamilyFlags[0] & 0x00040000)
-            if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0, 0, 0x00000002, GetGUID()))
+            // Impurity
+            if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
+            {
+                AddPct(ApCoeffMod, aurEff->GetAmount());
+            }
+
+            // Blood Boil - bonus for diseased targets
+            if ((spellProto->SpellFamilyFlags[0] & 0x00040000) && victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0, 0, 0x00000002, GetGUID()))
             {
                 DoneTotal += 95;
                 ApCoeffMod = 1.5835f;
             }
+            break;
+        }
+        default:
+            break;
     }
 
     // Done fixed damage bonus auras
-    int32 DoneAdvertisedBenefit  = SpellBaseDamageBonusDone(spellProto->GetSchoolMask());
+    DoneAdvertisedBenefit += SpellBaseDamageBonusDone(spellProto->GetSchoolMask());
 
     // Check for table values
     float coeff = spellProto->Effects[effIndex].BonusMultiplier;
@@ -12390,36 +12444,69 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
 
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
+    int32 DoneAdvertisedBenefit = 0;
     AuraEffectList const& mOverrideClassScript = owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
     for (AuraEffectList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
     {
         if (!(*i)->IsAffectedOnSpell(spellProto))
             continue;
+
         switch ((*i)->GetMiscValue())
         {
             case 4415: // Increased Rejuvenation Healing
             case 4953:
-                DoneTotal += (*i)->GetAmount() / 5; // 5 ticks of Rejuvenation
+                DoneAdvertisedBenefit += (*i)->GetAmount();
                 break;
             case 3736: // Hateful Totem of the Third Wind / Increased Lesser Healing Wave / LK Arena (4/5/6) Totem of the Third Wind / Savage Totem of the Third Wind
-                DoneTotal += (*i)->GetAmount();
+                DoneAdvertisedBenefit += (*i)->GetAmount();
                 break;
         }
     }
 
-    // Done fixed damage bonus auras
-    int32 DoneAdvertisedBenefit = SpellBaseHealingBonusDone(spellProto->GetSchoolMask());
-    float coeff = spellProto->Effects[effIndex].BonusMultiplier;
-
     switch (spellProto->SpellFamilyName)
     {
+        case SPELLFAMILY_DRUID:
+        {
+            // Nourish vs Idol of the Flourishing Life
+            if (spellProto->SpellFamilyFlags[1] & 0x02000000)
+            {
+                if (AuraEffect const* relicAurEff = GetAuraEffect(64949, EFFECT_0))
+                {
+                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
+                }
+            }
+
+            // Lifebloom vs Idol of Lush Moss/Increased Lifebloom Periodic
+            if (spellProto->SpellFamilyFlags[1] & 00000010)
+            {
+                if (AuraEffect const* relicAurEff = GetAuraEffect(60779, EFFECT_0))
+                {
+                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
+                }
+
+                if (AuraEffect const* relicAurEff = GetAuraEffect(34246, EFFECT_0))
+                {
+                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
+                }
+            }
+            break;
+        }
         case SPELLFAMILY_DEATHKNIGHT:
+        {
             // Impurity
             if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
+            {
                 AddPct(ApCoeffMod, aurEff->GetAmount());
-
+            }
+            break;
+        }
+        default:
             break;
     }
+
+    // Done fixed damage bonus auras
+    DoneAdvertisedBenefit += SpellBaseHealingBonusDone(spellProto->GetSchoolMask());
+    float coeff = spellProto->Effects[effIndex].BonusMultiplier;
 
     // Check for table values
     SpellBonusEntry const* bonus = sSpellMgr->GetSpellBonusData(spellProto->Id);
@@ -16538,7 +16625,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_DUMMY:
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell id {} (triggered by {} dummy aura of spell {})", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
-                            if (HandleDummyAuraProc(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procSpell))
+                            if (HandleDummyAuraProc(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, eventInfo))
                                 takeCharges = true;
                             break;
                         }
@@ -19957,6 +20044,9 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     Unit* vehicleBase = m_vehicle->GetBase();
     m_vehicle = nullptr;
 
+    if (!vehicleBase)
+        return;
+
     SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEMENTFLAG_ROOT
 
     Position pos;
@@ -20071,7 +20161,10 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 
     if (player)
+    {
         player->ResummonPetTemporaryUnSummonedIfAny();
+        player->SetCanTeleport(true);
+    }
 }
 
 void Unit::BuildMovementPacket(ByteBuffer* data) const
