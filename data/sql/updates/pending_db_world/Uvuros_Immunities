@@ -1,1 +1,1 @@
-UPDATE `creature_template` SET `mechanic_immune_mask` = 41949648 WHERE (`entry` = 21102);
+UPDATE `creature_template` SET `mechanic_immune_mask` = 41950544 WHERE (`entry` = 21102);
