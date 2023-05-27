@@ -114,7 +114,7 @@ void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint3
 void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, uint32 var1, bool bvar, SpellInfo const* spell, GameObject* gob)
 {
     //calc random
-    if (e.GetEventType() != SMART_EVENT_LINK && e.event.event_chance < 100 && e.event.event_chance)
+    if (e.event.event_chance < 100 && e.event.event_chance)
     {
         uint32 rnd = urand(1, 100);
         if (e.event.event_chance <= rnd)
