@@ -137,8 +137,12 @@ struct boss_grand_warlock_nethekurse : public BossAI
             scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
-                me->GetMotionMaster()->Initialize();
                 Talk(SAY_PEON_DIES);
+
+                scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
+                {
+                    me->GetMotionMaster()->Initialize();
+                });
 
                 if (++PeonKilledCount == 4)
                 {
@@ -161,16 +165,14 @@ struct boss_grand_warlock_nethekurse : public BossAI
             me->GetMotionMaster()->MoveIdle();
             me->SetFacingTo(4.572762489318847656f);
 
-            scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
+            scheduler.Schedule(2500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
-                scheduler.Schedule(2500ms, GROUP_RP, [this](TaskContext /*context*/)
-                {
-                    PeonRoleplay roleplayData = Acore::Containers::SelectRandomContainerElement(PeonRoleplayData);
-                    DoCast(me, roleplayData.spellId);
-                    Talk(roleplayData.textId);
-                    me->GetMotionMaster()->Initialize();
-                });
+                PeonRoleplay roleplayData = Acore::Containers::SelectRandomContainerElement(PeonRoleplayData);
+                DoCast(me, roleplayData.spellId);
+                Talk(roleplayData.textId);
+                me->GetMotionMaster()->Initialize();
             });
+
             context.Repeat(16400ms, 28500ms);
         });
     }
