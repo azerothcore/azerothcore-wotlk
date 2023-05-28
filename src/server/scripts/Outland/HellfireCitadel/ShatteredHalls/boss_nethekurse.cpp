@@ -111,6 +111,11 @@ struct boss_grand_warlock_nethekurse : public BossAI
         });
 
         instance->SetBossState(DATA_NETHEKURSE, NOT_STARTED);
+
+        if (!_canAggro)
+        {
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        }
     }
 
     void JustReachedHome() override
@@ -232,7 +237,10 @@ struct boss_grand_warlock_nethekurse : public BossAI
         }
         else if (action == ACTION_START_INTRO)
         {
-            // Hack: Prevent from pulling adds from behind door
+            // Hack: Prevent from pulling from behind door
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            _canAggro = true;
+
             std::list<Creature*> creatureList;
             GetCreatureListWithEntryInGrid(creatureList, me, NPC_PEON, 60.0f);
             for (Creature* creature : creatureList)
@@ -263,6 +271,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
 private:
     uint8 PeonEngagedCount = 0;
     uint8 PeonKilledCount = 0;
+    bool _canAggro = false;
 };
 
 class spell_tsh_shadow_bolt : public SpellScript
