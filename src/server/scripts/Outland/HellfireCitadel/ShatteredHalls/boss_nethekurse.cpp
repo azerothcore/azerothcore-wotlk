@@ -111,6 +111,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
         });
 
         instance->SetBossState(DATA_NETHEKURSE, NOT_STARTED);
+        me->GetMotionMaster()->Initialize();
     }
 
     void JustDied(Unit* /*killer*/) override
