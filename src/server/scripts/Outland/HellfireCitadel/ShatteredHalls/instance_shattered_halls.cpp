@@ -280,7 +280,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
 
     Creature* GetPorung()
     {
-        return me->FindNearestCreature(IsHeroic() ? NPC_PURONG : NPC_BLOOD_GUARD, 100.0f);
+        return me->FindNearestCreature(IsHeroic() ? NPC_PORUNG : NPC_BLOOD_GUARD, 100.0f);
     }
 
 private:
@@ -298,6 +298,15 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            unitList.remove_if([&](WorldObject* target) -> bool
+            {
+                return !target->SelectNearestPlayer(15.0f);
+            });
+
             Acore::Containers::RandomResize(unitList, 1);
         }
 
