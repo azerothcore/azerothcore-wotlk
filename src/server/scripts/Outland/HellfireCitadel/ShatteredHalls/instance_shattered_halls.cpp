@@ -211,14 +211,19 @@ struct npc_shattered_hand_scout : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && who->IsWithinLOSInMap(me) && who->IsWithinDistInMap(me, 60.0f)
-            && who->GetPositionY() > 300.0f)
+        // Scout can see across the floor...
+        // And aggros once you step near Nethekurse door...
+        // This should minimize the wrong pulls.
+        if (me->GetInstanceScript()->GetBossState(DATA_NETHEKURSE) == DONE)
         {
-            me->SetReactState(REACT_PASSIVE);
-            DoCastSelf(SPELL_CLEAR_ALL);
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            Talk(SAY_INVADERS_BREACHED);
-            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && me->IsWithinLOSInMap(who) && me->IsWithinDist2d(who, 30.0f))
+            {
+                me->SetReactState(REACT_PASSIVE);
+                DoCastSelf(SPELL_CLEAR_ALL);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                Talk(SAY_INVADERS_BREACHED);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+            }
         }
     }
 
@@ -298,7 +303,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
                             context.Repeat();
                         }
 
-                        if (!me->SelectNearestPlayer(150.0f))
+                        if (!me->SelectNearestPlayer(250.0f))
                         {
                             me->SetVisible(true);
                             me->DespawnOrUnsummon(5s, 5s);
