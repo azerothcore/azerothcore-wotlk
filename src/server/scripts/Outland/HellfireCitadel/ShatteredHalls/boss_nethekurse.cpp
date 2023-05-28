@@ -139,7 +139,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
                 me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
                 Talk(SAY_PEON_DIES);
 
-                scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
+                scheduler.Schedule(1ms, GROUP_RP, [this](TaskContext /*context*/)
                 {
                     me->GetMotionMaster()->Initialize();
                 });
