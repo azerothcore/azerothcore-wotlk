@@ -183,20 +183,20 @@ public:
 
 enum ScoutMisc
 {
-    SAY_INVADERS_BREACHED = 0,
+    SAY_INVADERS_BREACHED    = 0,
 
-    SAY_PORUNG_ARCHERS = 0,
-    SAY_PORUNG_READY = 1,
-    SAY_PORUNG_AIM = 2,
-    SAY_PORUNG_FIRE = 3,
+    SAY_PORUNG_ARCHERS       = 0,
+    SAY_PORUNG_READY         = 1,
+    SAY_PORUNG_AIM           = 2,
+    SAY_PORUNG_FIRE          = 3,
 
-    SPELL_CLEAR_ALL = 28471,
-    SPELL_SUMMON_ZEALOTS = 30976,
-    SPELL_SHOOT_FLAME_ARROW = 30952,
+    SPELL_CLEAR_ALL          = 28471,
+    SPELL_SUMMON_ZEALOTS     = 30976,
+    SPELL_SHOOT_FLAME_ARROW  = 30952,
 
-    POINT_SCOUT_WP_END = 3,
+    POINT_SCOUT_WP_END       = 3,
 
-    SET_DATA_ARBITRARY_VALUE = 1,
+    SET_DATA_ARBITRARY_VALUE = 1
 };
 
 struct npc_shattered_hand_scout : public ScriptedAI
