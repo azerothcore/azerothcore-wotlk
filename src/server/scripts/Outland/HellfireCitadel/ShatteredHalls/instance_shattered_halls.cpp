@@ -300,7 +300,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
                             {
                                 if (Creature* zealot = ObjectAccessor::GetCreature(*me, guid))
                                 {
-                                    if (!zealot->IsAlive())
+                                    if (zealot->IsAlive())
                                     {
                                         zealot->DespawnOrUnsummon(5s, 5s);
                                     }
