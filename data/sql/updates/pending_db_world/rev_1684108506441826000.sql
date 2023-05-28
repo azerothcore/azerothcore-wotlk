@@ -15,3 +15,9 @@ INSERT INTO `spell_target_position` (`ID`, `MapID`, `PositionX`, `PositionY`, `P
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 30952);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 30952, 0, 0, 31, 0, 3, 17687, 0, 0, 0, 0, '', 'Shoot Flame Arrow (30952) only hit Flame Arrow (17687)');
+
+DELETE FROM `creature_formations` WHERE `memberGUID` IN (151094,151095,151096,151097);
+INSERT INTO `creature_formations` (`memberGUID`, `leaderGUID`, `groupAI`) VALUES
+(151095,151095,3),
+(151096,151095,3),
+(151097,151095,3);
