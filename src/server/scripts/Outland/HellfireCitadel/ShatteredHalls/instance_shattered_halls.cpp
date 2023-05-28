@@ -337,7 +337,7 @@ public:
 void AddSC_instance_shattered_halls()
 {
     new instance_shattered_halls();
+    RegisterShatteredHallsCreatureAI(npc_shattered_hand_scout);
     new spell_tsh_shoot_flame_arrow();
     new at_shattered_halls_execution();
-    RegisterShatteredHallsCreatureAI(npc_shattered_hand_scout);
 }
