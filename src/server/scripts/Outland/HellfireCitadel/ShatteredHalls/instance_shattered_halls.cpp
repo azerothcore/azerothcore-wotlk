@@ -229,9 +229,16 @@ public:
     }
 };
 
-enum ScoutText
+enum ScoutMisc
 {
-    SAY_INVADERS_BREACHED = 0
+    SAY_INVADERS_BREACHED = 0,
+
+    SAY_PORUNG_ARCHERS    = 0,
+
+    SPELL_CLEAR_ALL       = 28471,
+    SPELL_SUMMON_ZEALOTS  = 30976,
+
+    POINT_SCOUT_WP_END    = 3
 };
 
 struct npc_shattered_hand_scout : public ScriptedAI
@@ -242,6 +249,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
     {
         if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && who->IsWithinLOSInMap(me))
         {
+            DoCastSelf(SPELL_CLEAR_ALL);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             Talk(SAY_INVADERS_BREACHED);
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
@@ -255,6 +263,23 @@ struct npc_shattered_hand_scout : public ScriptedAI
             // Let creature fall to 1 HP but prevent it from dying.
             damage = me->GetHealth() - 1;
         }
+    }
+
+    void MovementInform(uint32 type, uint32 point) override
+    {
+        if (type == WAYPOINT_MOTION_TYPE && point == POINT_SCOUT_WP_END)
+        {
+            if (Creature* porung = GetPorung())
+            {
+                porung->AI()->DoCastAOE(SPELL_SUMMON_ZEALOTS);
+                porung->AI()->Talk(SAY_PORUNG_ARCHERS);
+            }
+        }
+    }
+
+    Creature* GetPorung()
+    {
+        return me->FindNearestCreature(IsHeroic() ? NPC_PURONG : NPC_BLOOD_GUARD, 100.0f);
     }
 };
 
