@@ -232,6 +232,16 @@ struct boss_grand_warlock_nethekurse : public BossAI
         }
         else if (action == ACTION_START_INTRO)
         {
+            // Hack: Prevent from pulling adds from behind door
+            std::list<Creature*> creatureList;
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_PEON, 60.0f);
+            for (Creature* creature : creatureList)
+            {
+                if (creature)
+                {
+                    creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                }
+            }
             IntroRP();
         }
     }
