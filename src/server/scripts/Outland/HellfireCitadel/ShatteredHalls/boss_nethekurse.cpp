@@ -131,7 +131,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
 
     void SetData(uint32 data, uint32 value) override
     {
-        if (data != SETDATA_DATA)
+        if (data != SETDATA_DATA || me->IsInCombat())
             return;
 
         if (value == SETDATA_PEON_AGGRO && PeonEngagedCount <= 4)
