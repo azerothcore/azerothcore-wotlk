@@ -204,9 +204,15 @@ struct npc_shattered_hand_scout : public ScriptedAI
 {
     npc_shattered_hand_scout(Creature* creature) : ScriptedAI(creature) { }
 
+    void Reset() override
+    {
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+    }
+
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && who->IsWithinLOSInMap(me) && who->IsWithinDistInMap(me, 60.0f))
+        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && who->IsWithinLOSInMap(me) && who->IsWithinDistInMap(me, 60.0f)
+            && who->GetPositionY() > 190.0f);
         {
             me->SetReactState(REACT_PASSIVE);
             DoCastSelf(SPELL_CLEAR_ALL);
@@ -291,7 +297,8 @@ struct npc_shattered_hand_scout : public ScriptedAI
                         {
                             context.Repeat();
                         }
-                        else
+
+                        if (!me->SelectNearestPlayer(150.0f))
                         {
                             me->SetVisible(true);
                             me->DespawnOrUnsummon(5s, 5s);
