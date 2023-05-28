@@ -211,18 +211,24 @@ struct npc_shattered_hand_scout : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        // Scout can see through the floor...
-        // And aggros once you step near Nethekurse door...
-        // This should minimize the wrong pulls.
-        if (me->GetInstanceScript()->GetBossState(DATA_NETHEKURSE) == DONE)
+        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && me->IsWithinDist2d(who, 50.0f) && who->GetPositionZ() > -3.0f
+            && who->IsPlayer())
         {
-            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && me->IsWithinLOSInMap(who) && me->IsWithinDist2d(who, 30.0f))
+            me->SetReactState(REACT_PASSIVE);
+            DoCastSelf(SPELL_CLEAR_ALL);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            Talk(SAY_INVADERS_BREACHED);
+            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+
+            _firstZealots.clear();
+            std::list<Creature*> creatureList;
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_SH_ZEALOT, 15.0f);
+            for (Creature* creature : creatureList)
             {
-                me->SetReactState(REACT_PASSIVE);
-                DoCastSelf(SPELL_CLEAR_ALL);
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                Talk(SAY_INVADERS_BREACHED);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                if (creature)
+                {
+                    _firstZealots.insert(creature->GetGUID());
+                }
             }
         }
     }
@@ -273,6 +279,14 @@ struct npc_shattered_hand_scout : public ScriptedAI
                     }
                 }
 
+                for (auto const& guid : _firstZealots)
+                {
+                    if (Creature* zealot = ObjectAccessor::GetCreature(*me, guid))
+                    {
+                        zealot->SetInCombatWithZone();
+                    }
+                }
+
                 if (Creature* porung = GetPorung())
                 {
                     porung->AI()->Talk(SAY_PORUNG_READY, 3600ms);
@@ -309,6 +323,21 @@ struct npc_shattered_hand_scout : public ScriptedAI
                             me->DespawnOrUnsummon(5s, 5s);
 
                             for (auto const& guid : _zealotGUIDs)
+                            {
+                                if (Creature* zealot = ObjectAccessor::GetCreature(*me, guid))
+                                {
+                                    if (zealot->IsAlive())
+                                    {
+                                        zealot->DespawnOrUnsummon(5s, 5s);
+                                    }
+                                    else
+                                    {
+                                        zealot->Respawn(true);
+                                    }
+                                }
+                            }
+
+                            for (auto const& guid : _firstZealots)
                             {
                                 if (Creature* zealot = ObjectAccessor::GetCreature(*me, guid))
                                 {
@@ -365,6 +394,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
 private:
     TaskScheduler _scheduler;
     GuidSet _zealotGUIDs;
+    GuidSet _firstZealots;
 };
 
 class spell_tsh_shoot_flame_arrow : public SpellScriptLoader
