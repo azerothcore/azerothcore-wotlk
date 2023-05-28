@@ -208,6 +208,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
     {
         if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && who->IsWithinLOSInMap(me) && who->IsWithinDistInMap(me, 60.0f))
         {
+            me->SetReactState(REACT_PASSIVE);
             DoCastSelf(SPELL_CLEAR_ALL);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             Talk(SAY_INVADERS_BREACHED);
@@ -276,6 +277,11 @@ struct npc_shattered_hand_scout : public ScriptedAI
                         if (FireArrows())
                         {
                             context.Repeat();
+                        }
+                        else
+                        {
+                            me->SetVisible(true);
+                            me->DespawnOrUnsummon(5s, 5s);
                         }
                     });
                 });
