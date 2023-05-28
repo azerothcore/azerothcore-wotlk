@@ -212,7 +212,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
     void MoveInLineOfSight(Unit* who) override
     {
         if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && who->IsWithinLOSInMap(me) && who->IsWithinDistInMap(me, 60.0f)
-            && who->GetPositionY() > 190.0f)
+            && who->GetPositionY() > 300.0f)
         {
             me->SetReactState(REACT_PASSIVE);
             DoCastSelf(SPELL_CLEAR_ALL);
