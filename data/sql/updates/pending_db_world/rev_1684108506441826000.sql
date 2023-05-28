@@ -7,3 +7,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH,2,419.4097,315.15308,1.940825,NULL,0,1,0,100,0),
 (@PATH,3,460.31537,316.02213,1.9368871,NULL,0,1,0,100,0),
 (@PATH,4,488.62424,315.73007,1.9498857,NULL,0,1,0,100,0);
+
+DELETE FROM `spell_target_position` WHERE `ID` = 30976;
+INSERT INTO `spell_target_position` (`ID`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `VerifiedBuild`) VALUES
+(30976, 540, 520.062, 255.486, 2.0333333, 48999);

@@ -47,6 +47,8 @@ enum CreatureIds
     NPC_FEL_ORC_CONVERT             = 17083,
     NPC_PURONG                      = 20923,
     NPC_BLOOD_GUARD                 = 17461,
+    NPC_SH_ZEALOT                   = 17462,
+    NPC_SH_ARCHER                   = 17427,
 
     // Warchief Kargath
     NPC_WARCHIEF_KARGATH            = 16808,

@@ -231,14 +231,20 @@ public:
 
 enum ScoutMisc
 {
-    SAY_INVADERS_BREACHED = 0,
+    SAY_INVADERS_BREACHED    = 0,
 
-    SAY_PORUNG_ARCHERS    = 0,
+    SAY_PORUNG_ARCHERS       = 0,
+    SAY_PORUNG_READY         = 1,
+    SAY_PORUNG_AIM           = 2,
+    SAY_PORUNG_FIRE          = 3,
 
-    SPELL_CLEAR_ALL       = 28471,
-    SPELL_SUMMON_ZEALOTS  = 30976,
+    SPELL_CLEAR_ALL          = 28471,
+    SPELL_SUMMON_ZEALOTS     = 30976,
+    SPELL_SHOOT_FLAME_ARROW  = 30952,
 
-    POINT_SCOUT_WP_END    = 3
+    POINT_SCOUT_WP_END       = 3,
+
+    SET_DATA_ARBITRARY_VALUE = 1,
 };
 
 struct npc_shattered_hand_scout : public ScriptedAI
@@ -274,8 +280,53 @@ struct npc_shattered_hand_scout : public ScriptedAI
                 porung->AI()->DoCastAOE(SPELL_SUMMON_ZEALOTS);
                 porung->AI()->Talk(SAY_PORUNG_ARCHERS);
             }
+
+            _scheduler.Schedule(1s, [this](TaskContext /*context*/)
+            {
+                std::list<Creature*> creatureList;
+                GetCreatureListWithEntryInGrid(creatureList, me, NPC_SH_ZEALOT, 100.0f);
+                for (Creature* creature : creatureList)
+                {
+                    if (creature)
+                    {
+                        creature->AI()->SetData(SET_DATA_ARBITRARY_VALUE, SET_DATA_ARBITRARY_VALUE);
+                    }
+                }
+
+                if (Creature* porung = GetPorung())
+                {
+                    porung->AI()->Talk(SAY_PORUNG_READY, 3600ms);
+                    porung->AI()->Talk(SAY_PORUNG_AIM, 4800ms);
+                }
+
+                _scheduler.Schedule(5800ms, [this](TaskContext /*context*/)
+                {
+                    std::list<Creature*> creatureList;
+                    GetCreatureListWithEntryInGrid(creatureList, me, NPC_SH_ARCHER, 100.0f);
+                    for (Creature* creature : creatureList)
+                    {
+                        if (creature)
+                        {
+                            creature->AI()->DoCastAOE(SPELL_SHOOT_FLAME_ARROW);
+                        }
+                    }
+
+                    if (Creature* porung = GetPorung())
+                    {
+                        porung->AI()->Talk(SAY_PORUNG_FIRE, 200ms);
+                    }
+                });
+            });
         }
     }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+private:
+    TaskScheduler _scheduler;
 
     Creature* GetPorung()
     {
