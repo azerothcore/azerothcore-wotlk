@@ -111,6 +111,10 @@ struct boss_grand_warlock_nethekurse : public BossAI
         });
 
         instance->SetBossState(DATA_NETHEKURSE, NOT_STARTED);
+    }
+
+    void JustReachedHome() override
+    {
         me->GetMotionMaster()->Initialize();
     }
 
