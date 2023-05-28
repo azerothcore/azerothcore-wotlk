@@ -206,7 +206,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && who->IsWithinLOSInMap(me))
+        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && who->IsWithinLOSInMap(me) && who->IsWithinDistInMap(me, 60.0f))
         {
             DoCastSelf(SPELL_CLEAR_ALL);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -228,6 +228,8 @@ struct npc_shattered_hand_scout : public ScriptedAI
     {
         if (type == WAYPOINT_MOTION_TYPE && point == POINT_SCOUT_WP_END)
         {
+            me->SetVisible(false);
+
             if (Creature* porung = GetPorung())
             {
                 porung->AI()->DoCastAOE(SPELL_SUMMON_ZEALOTS);
@@ -268,6 +270,14 @@ struct npc_shattered_hand_scout : public ScriptedAI
                     {
                         porung->AI()->Talk(SAY_PORUNG_FIRE, 200ms);
                     }
+
+                    _scheduler.Schedule(2s, 9750ms, [this](TaskContext context)
+                    {
+                        if (FireArrows())
+                        {
+                            context.Repeat();
+                        }
+                    });
                 });
             });
         }
@@ -276,6 +286,27 @@ struct npc_shattered_hand_scout : public ScriptedAI
     void UpdateAI(uint32 diff) override
     {
         _scheduler.Update(diff);
+    }
+
+    bool FireArrows()
+    {
+        std::list<Creature*> creatureList;
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_SH_ARCHER, 100.0f);
+
+        if (creatureList.empty())
+        {
+            return false;
+        }
+
+        for (Creature* creature : creatureList)
+        {
+            if (creature)
+            {
+                creature->AI()->DoCastAOE(SPELL_SHOOT_FLAME_ARROW);
+            }
+        }
+
+        return true;
     }
 
     Creature* GetPorung()
