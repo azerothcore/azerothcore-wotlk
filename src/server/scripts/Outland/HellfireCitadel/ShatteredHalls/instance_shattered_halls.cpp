@@ -17,6 +17,7 @@
 
 #include "CreatureTextMgr.h"
 #include "InstanceScript.h"
+#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "shattered_halls.h"
 
