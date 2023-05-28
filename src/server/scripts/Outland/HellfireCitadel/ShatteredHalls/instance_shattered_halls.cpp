@@ -325,13 +325,13 @@ struct npc_shattered_hand_scout : public ScriptedAI
         _scheduler.Update(diff);
     }
 
-private:
-    TaskScheduler _scheduler;
-
     Creature* GetPorung()
     {
         return me->FindNearestCreature(IsHeroic() ? NPC_PURONG : NPC_BLOOD_GUARD, 100.0f);
     }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 void AddSC_instance_shattered_halls()
