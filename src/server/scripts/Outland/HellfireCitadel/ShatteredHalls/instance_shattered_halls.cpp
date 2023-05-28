@@ -181,68 +181,20 @@ public:
     };
 };
 
-class spell_tsh_shoot_flame_arrow : public SpellScriptLoader
-{
-public:
-    spell_tsh_shoot_flame_arrow() : SpellScriptLoader("spell_tsh_shoot_flame_arrow") { }
-
-    class spell_tsh_shoot_flame_arrow_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_tsh_shoot_flame_arrow_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            Acore::Containers::RandomResize(unitList, 1);
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, 30953, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_tsh_shoot_flame_arrow_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_tsh_shoot_flame_arrow_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_tsh_shoot_flame_arrow_SpellScript();
-    }
-};
-
-class at_shattered_halls_execution : public AreaTriggerScript
-{
-public:
-    at_shattered_halls_execution() : AreaTriggerScript("at_shattered_halls_execution") { }
-
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
-    {
-        if (InstanceScript* instanceScript = player->GetInstanceScript())
-            instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);
-
-        return true;
-    }
-};
-
 enum ScoutMisc
 {
-    SAY_INVADERS_BREACHED    = 0,
+    SAY_INVADERS_BREACHED = 0,
 
-    SAY_PORUNG_ARCHERS       = 0,
-    SAY_PORUNG_READY         = 1,
-    SAY_PORUNG_AIM           = 2,
-    SAY_PORUNG_FIRE          = 3,
+    SAY_PORUNG_ARCHERS = 0,
+    SAY_PORUNG_READY = 1,
+    SAY_PORUNG_AIM = 2,
+    SAY_PORUNG_FIRE = 3,
 
-    SPELL_CLEAR_ALL          = 28471,
-    SPELL_SUMMON_ZEALOTS     = 30976,
-    SPELL_SHOOT_FLAME_ARROW  = 30952,
+    SPELL_CLEAR_ALL = 28471,
+    SPELL_SUMMON_ZEALOTS = 30976,
+    SPELL_SHOOT_FLAME_ARROW = 30952,
 
-    POINT_SCOUT_WP_END       = 3,
+    POINT_SCOUT_WP_END = 3,
 
     SET_DATA_ARBITRARY_VALUE = 1,
 };
@@ -332,6 +284,54 @@ struct npc_shattered_hand_scout : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
+};
+
+class spell_tsh_shoot_flame_arrow : public SpellScriptLoader
+{
+public:
+    spell_tsh_shoot_flame_arrow() : SpellScriptLoader("spell_tsh_shoot_flame_arrow") { }
+
+    class spell_tsh_shoot_flame_arrow_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_tsh_shoot_flame_arrow_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& unitList)
+        {
+            Acore::Containers::RandomResize(unitList, 1);
+        }
+
+        void HandleScriptEffect(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+                target->CastSpell(target, 30953, true);
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_tsh_shoot_flame_arrow_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+            OnEffectHitTarget += SpellEffectFn(spell_tsh_shoot_flame_arrow_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_tsh_shoot_flame_arrow_SpellScript();
+    }
+};
+
+class at_shattered_halls_execution : public AreaTriggerScript
+{
+public:
+    at_shattered_halls_execution() : AreaTriggerScript("at_shattered_halls_execution") { }
+
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    {
+        if (InstanceScript* instanceScript = player->GetInstanceScript())
+            instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);
+
+        return true;
+    }
 };
 
 void AddSC_instance_shattered_halls()
