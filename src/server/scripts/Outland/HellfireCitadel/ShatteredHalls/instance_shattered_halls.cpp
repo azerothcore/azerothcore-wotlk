@@ -229,9 +229,39 @@ public:
     }
 };
 
+enum ScoutText
+{
+    SAY_INVADERS_BREACHED = 0
+};
+
+struct npc_shattered_hand_scout : public ScriptedAI
+{
+    npc_shattered_hand_scout(Creature* creature) : ScriptedAI(creature) { }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && who->IsWithinLOSInMap(me))
+        {
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            Talk(SAY_INVADERS_BREACHED);
+            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+        }
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+    {
+        if (damage >= me->GetHealth())
+        {
+            // Let creature fall to 1 HP but prevent it from dying.
+            damage = me->GetHealth() - 1;
+        }
+    }
+};
+
 void AddSC_instance_shattered_halls()
 {
     new instance_shattered_halls();
     new spell_tsh_shoot_flame_arrow();
     new at_shattered_halls_execution();
+    RegisterShatteredHallsCreatureAI(npc_shattered_hand_scout);
 }
