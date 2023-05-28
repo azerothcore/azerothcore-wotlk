@@ -243,6 +243,8 @@ struct npc_shattered_hand_scout : public ScriptedAI
                     {
                         porung->AI()->DoCastAOE(SPELL_SUMMON_ZEALOTS);
                     }
+
+                    context.Repeat();
                 });
             }
 
