@@ -233,8 +233,17 @@ struct npc_shattered_hand_scout : public ScriptedAI
 
             if (Creature* porung = GetPorung())
             {
+                porung->setActive(true);
                 porung->AI()->DoCastAOE(SPELL_SUMMON_ZEALOTS);
                 porung->AI()->Talk(SAY_PORUNG_ARCHERS);
+
+                _scheduler.Schedule(45s, [this](TaskContext context)
+                {
+                    if (Creature* porung = GetPorung())
+                    {
+                        porung->AI()->DoCastAOE(SPELL_SUMMON_ZEALOTS);
+                    }
+                });
             }
 
             _scheduler.Schedule(1s, [this](TaskContext /*context*/)
