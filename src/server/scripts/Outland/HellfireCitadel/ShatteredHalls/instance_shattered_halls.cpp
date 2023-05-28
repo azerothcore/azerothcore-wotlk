@@ -250,6 +250,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
 
             _scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
+                _zealotGUIDs.clear();
                 std::list<Creature*> creatureList;
                 GetCreatureListWithEntryInGrid(creatureList, me, NPC_SH_ZEALOT, 100.0f);
                 for (Creature* creature : creatureList)
@@ -257,6 +258,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
                     if (creature)
                     {
                         creature->AI()->SetData(SET_DATA_ARBITRARY_VALUE, SET_DATA_ARBITRARY_VALUE);
+                        _zealotGUIDs.insert(creature->GetGUID());
                     }
                 }
 
@@ -293,6 +295,23 @@ struct npc_shattered_hand_scout : public ScriptedAI
                         {
                             me->SetVisible(true);
                             me->DespawnOrUnsummon(5s, 5s);
+
+                            for (auto const& guid : _zealotGUIDs)
+                            {
+                                if (Creature* zealot = ObjectAccessor::GetCreature(*me, guid))
+                                {
+                                    if (!zealot->IsAlive())
+                                    {
+                                        zealot->DespawnOrUnsummon(5s, 5s);
+                                    }
+                                    else
+                                    {
+                                        zealot->Respawn(true);
+                                    }
+                                }
+                            }
+
+                            _scheduler.CancelAll();
                         }
                     });
                 });
@@ -333,6 +352,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
+    GuidSet _zealotGUIDs;
 };
 
 class spell_tsh_shoot_flame_arrow : public SpellScriptLoader
