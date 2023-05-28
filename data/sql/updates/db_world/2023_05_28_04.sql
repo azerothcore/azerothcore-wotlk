@@ -1,3 +1,4 @@
+-- DB update 2023_05_28_03 -> 2023_05_28_04
 UPDATE `creature_template` SET `ScriptName` = 'npc_shattered_hand_scout' WHERE `entry` = 17693;
 
 SET @PATH := 17693 * 10;
