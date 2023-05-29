@@ -2000,8 +2000,15 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1); // "I no longer wish to gain experience."
-        AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2); // "I wish to start gaining experience again."
+        if (!player->HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN))
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1); // "I no longer wish to gain experience."
+        }
+        else
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2); // "I wish to start gaining experience again."
+        }
+
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature);
         return true;
     }

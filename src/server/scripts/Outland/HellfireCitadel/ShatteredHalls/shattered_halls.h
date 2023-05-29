@@ -45,6 +45,11 @@ enum CreatureIds
 {
     NPC_GRAND_WARLOCK_NETHEKURSE    = 16807,
     NPC_FEL_ORC_CONVERT             = 17083,
+    NPC_PORUNG                      = 20923,
+    NPC_BLOOD_GUARD                 = 17461,
+    NPC_SH_ZEALOT                   = 17462,
+    NPC_SH_ARCHER                   = 17427,
+
     // Warchief Kargath
     NPC_WARCHIEF_KARGATH            = 16808,
     NPC_WARCHIEF_PORTAL             = 17611,

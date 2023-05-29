@@ -111,6 +111,16 @@ struct boss_grand_warlock_nethekurse : public BossAI
         });
 
         instance->SetBossState(DATA_NETHEKURSE, NOT_STARTED);
+
+        if (!_canAggro)
+        {
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        }
+    }
+
+    void JustReachedHome() override
+    {
+        me->GetMotionMaster()->Initialize();
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -121,7 +131,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
 
     void SetData(uint32 data, uint32 value) override
     {
-        if (data != SETDATA_DATA)
+        if (data != SETDATA_DATA || me->IsInCombat())
             return;
 
         if (value == SETDATA_PEON_AGGRO && PeonEngagedCount <= 4)
@@ -137,8 +147,12 @@ struct boss_grand_warlock_nethekurse : public BossAI
             scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
-                me->GetMotionMaster()->Initialize();
                 Talk(SAY_PEON_DIES);
+
+                scheduler.Schedule(1s, GROUP_RP, [this](TaskContext /*context*/)
+                {
+                    me->GetMotionMaster()->Initialize();
+                });
 
                 if (++PeonKilledCount == 4)
                 {
@@ -161,16 +175,14 @@ struct boss_grand_warlock_nethekurse : public BossAI
             me->GetMotionMaster()->MoveIdle();
             me->SetFacingTo(4.572762489318847656f);
 
-            scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
+            scheduler.Schedule(2500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
-                scheduler.Schedule(2500ms, GROUP_RP, [this](TaskContext /*context*/)
-                {
-                    PeonRoleplay roleplayData = Acore::Containers::SelectRandomContainerElement(PeonRoleplayData);
-                    DoCast(me, roleplayData.spellId);
-                    Talk(roleplayData.textId);
-                    me->GetMotionMaster()->Initialize();
-                });
+                PeonRoleplay roleplayData = Acore::Containers::SelectRandomContainerElement(PeonRoleplayData);
+                DoCast(me, roleplayData.spellId);
+                Talk(roleplayData.textId);
+                me->GetMotionMaster()->Initialize();
             });
+
             context.Repeat(16400ms, 28500ms);
         });
     }
@@ -225,6 +237,19 @@ struct boss_grand_warlock_nethekurse : public BossAI
         }
         else if (action == ACTION_START_INTRO)
         {
+            // Hack: Prevent from pulling from behind door
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            _canAggro = true;
+
+            std::list<Creature*> creatureList;
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_PEON, 60.0f);
+            for (Creature* creature : creatureList)
+            {
+                if (creature)
+                {
+                    creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                }
+            }
             IntroRP();
         }
     }
@@ -246,6 +271,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
 private:
     uint8 PeonEngagedCount = 0;
     uint8 PeonKilledCount = 0;
+    bool _canAggro = false;
 };
 
 class spell_tsh_shadow_bolt : public SpellScript
