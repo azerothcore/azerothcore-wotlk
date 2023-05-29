@@ -115,6 +115,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
         if (!_canAggro)
         {
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_PACIFIED);
         }
     }
 
@@ -238,7 +239,9 @@ struct boss_grand_warlock_nethekurse : public BossAI
         else if (action == ACTION_START_INTRO)
         {
             // Hack: Prevent from pulling from behind door
+            // Additional hack: prevent them from attacking pets that run by when jumping down the sewer
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
             _canAggro = true;
 
             std::list<Creature*> creatureList;
@@ -248,6 +251,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
                 if (creature)
                 {
                     creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    creature->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                 }
             }
             IntroRP();
