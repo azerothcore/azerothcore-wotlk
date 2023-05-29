@@ -131,7 +131,8 @@ public:
         {
             BossAI::Reset();
             me->SetReactState(REACT_PASSIVE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToAll(true);
             me->SetWalk(true);
         }
 
@@ -157,9 +158,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
         }
 
         void DoAction(int32 param) override
@@ -246,10 +247,11 @@ public:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->SetReactState(REACT_AGGRESSIVE);
-                        DoResetThreat();
+                        DoResetThreatList();
                         me->GetVictim()->InterruptNonMeleeSpells(false);
                         me->AddThreat(me->GetVictim(), 1000000.0f);
-                        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetImmuneToAll(false);
                         summonsGenerator.DoAction(ACTION_STOP_SPAWNING);
                         break;
                     }
@@ -330,7 +332,7 @@ public:
                 shade->AI()->DoAction(ACTION_AKAMA_DIED);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 2000);
             events.ScheduleEvent(EVENT_SPELL_DESTRUCTIVE_POISON, 5000);

@@ -64,14 +64,14 @@ void SummonList::DespawnEntry(uint32 entry)
     }
 }
 
-void SummonList::DespawnAll()
+void SummonList::DespawnAll(uint32 delay /*= 0*/)
 {
     while (!storage_.empty())
     {
         Creature* summon = ObjectAccessor::GetCreature(*me, storage_.front());
         storage_.pop_front();
         if (summon)
-            summon->DespawnOrUnsummon();
+            summon->DespawnOrUnsummon(delay);
     }
 }
 
@@ -144,6 +144,22 @@ bool SummonList::IsAnyCreatureAlive() const
         if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
         {
             if (summon->IsAlive())
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool SummonList::IsAnyCreatureWithEntryAlive(uint32 entry) const
+{
+    for (auto const& guid : storage_)
+    {
+        if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+        {
+            if (summon->GetEntry() == entry && summon->IsAlive())
             {
                 return true;
             }
@@ -368,11 +384,35 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
     return apSpell[urand(0, spellCount - 1)];
 }
 
-void ScriptedAI::DoResetThreat()
+void ScriptedAI::DoAddThreat(Unit* unit, float amount)
+{
+    if (!unit)
+        return;
+
+    me->GetThreatMgr().AddThreat(unit, amount);
+}
+
+void ScriptedAI::DoModifyThreatByPercent(Unit* unit, int32 pct)
+{
+    if (!unit)
+        return;
+
+    me->GetThreatMgr().ModifyThreatByPercent(unit, pct);
+}
+
+void ScriptedAI::DoResetThreat(Unit* unit)
+{
+    if (!unit)
+        return;
+
+    me->GetThreatMgr().ResetThreat(unit);
+}
+
+void ScriptedAI::DoResetThreatList()
 {
     if (!me->CanHaveThreatList() || me->GetThreatMgr().isThreatListEmpty())
     {
-        LOG_ERROR("entities.unit.ai", "DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = {})", me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "DoResetThreatList called for creature that either cannot have threat list or has empty threat list (me entry = {})", me->GetEntry());
         return;
     }
 
@@ -383,14 +423,8 @@ float ScriptedAI::DoGetThreat(Unit* unit)
 {
     if (!unit)
         return 0.0f;
-    return me->GetThreatMgr().getThreat(unit);
-}
 
-void ScriptedAI::DoModifyThreatPercent(Unit* unit, int32 pct)
-{
-    if (!unit)
-        return;
-    me->GetThreatMgr().modifyThreatPercent(unit, pct);
+    return me->GetThreatMgr().GetThreat(unit);
 }
 
 void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o)
@@ -520,14 +554,30 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
         SetBoundary(instance->GetBossBoundary(bossId));
 }
 
+bool BossAI::CanRespawn()
+{
+    if (instance)
+    {
+        if (instance->GetBossState(_bossId) == DONE)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void BossAI::_Reset()
 {
     if (!me->IsAlive())
         return;
 
+    me->SetCombatPulseDelay(0);
     me->ResetLootMode();
     events.Reset();
+    scheduler.CancelAll();
     summons.DespawnAll();
+    _healthCheckEvents.clear();
     if (instance)
         instance->SetBossState(_bossId, NOT_STARTED);
 }
@@ -535,7 +585,9 @@ void BossAI::_Reset()
 void BossAI::_JustDied()
 {
     events.Reset();
+    scheduler.CancelAll();
     summons.DespawnAll();
+    _healthCheckEvents.clear();
     if (instance)
     {
         instance->SetBossState(_bossId, DONE);
@@ -543,10 +595,12 @@ void BossAI::_JustDied()
     }
 }
 
-void BossAI::_EnterCombat()
+void BossAI::_JustEngagedWith()
 {
+    me->SetCombatPulseDelay(5);
     me->setActive(true);
     DoZoneInCombat();
+    ScheduleTasks();
     if (instance)
     {
         // bosses do not respawn, check only on enter combat
@@ -564,7 +618,7 @@ void BossAI::TeleportCheaters()
     float x, y, z;
     me->GetPosition(x, y, z);
 
-    ThreatContainer::StorageType threatList = me->GetThreatMgr().getThreatList();
+    ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
         if (Unit* target = (*itr)->getTarget())
             if (target->GetTypeId() == TYPEID_PLAYER && !IsInBoundary(target))
@@ -596,6 +650,7 @@ void BossAI::UpdateAI(uint32 diff)
     }
 
     events.Update(diff);
+    scheduler.Update(diff);
 
     if (me->HasUnitState(UNIT_STATE_CASTING))
     {
@@ -612,6 +667,47 @@ void BossAI::UpdateAI(uint32 diff)
     }
 
     DoMeleeAttackIfReady();
+}
+
+void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+{
+    if (!_healthCheckEvents.empty())
+    {
+        _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
+        {
+            return _ProccessHealthCheckEvent(data._healthPct, damage, data._exec);
+        });
+    }
+}
+
+/**
+ * @brief Executes a function once the creature reaches the defined health point percent.
+ *
+ * @param healthPct The health percent at which the code will be executed.
+ * @param exec The fuction to be executed.
+ */
+void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec)
+{
+    _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec));
+};
+
+void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec)
+{
+    for (auto const& checks : healthPct)
+    {
+        _healthCheckEvents.push_back(HealthCheckEventData(checks, exec));
+    }
+}
+
+bool BossAI::_ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const
+{
+    if (me->HealthBelowPctDamaged(healthPct, damage))
+    {
+        exec();
+        return true;
+    }
+
+    return false;
 }
 
 // WorldBossAI - for non-instanced bosses
@@ -637,7 +733,7 @@ void WorldBossAI::_JustDied()
     summons.DespawnAll();
 }
 
-void WorldBossAI::_EnterCombat()
+void WorldBossAI::_JustEngagedWith()
 {
     Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
     if (target)

@@ -45,7 +45,7 @@ namespace Movement
         MoveSplineFlag splineflags = move_spline.splineflags;
 
         data << uint8(0);                                       // sets/unsets MOVEMENTFLAG2_UNK7 (0x40)
-        data << move_spline.spline.getPoint(move_spline.spline.first(), true);
+        data << move_spline.spline.getPoint(move_spline.spline.first());
         data << move_spline.GetId();
 
         switch (splineflags & MoveSplineFlag::Mask_Final_Facing)
@@ -99,7 +99,7 @@ namespace Movement
     void WriteLinearPath(const Spline<int32>& spline, ByteBuffer& data)
     {
         uint32 last_idx = spline.getPointCount() - 3;
-        const Vector3* real_path = &spline.getPoint(1, true);
+        const Vector3* real_path = &spline.getPoint(1);
 
         data << last_idx;
         data << real_path[last_idx];   // destination
@@ -120,7 +120,7 @@ namespace Movement
     {
         uint32 count = spline.getPointCount() - 3;
         data << count;
-        data.append<Vector3>(&spline.getPoint(2, true), count);
+        data.append<Vector3>(&spline.getPoint(2), count);
     }
 
     void WriteCatmullRomCyclicPath(const Spline<int32>& spline, ByteBuffer& data, bool flying)
@@ -129,12 +129,12 @@ namespace Movement
         data << uint32(count + 1);
         if (flying)
         {
-            data << spline.getPoint(1, true); // fake point, client will erase it from the spline after first cycle done
-            data.append<Vector3>(&spline.getPoint(2, true), count);
+            data << spline.getPoint(1); // fake point, client will erase it from the spline after first cycle done
+            data.append<Vector3>(&spline.getPoint(2), count);
         }
         else
         {
-            data.append<Vector3>(&spline.getPoint(2, true), count);
+            data.append<Vector3>(&spline.getPoint(2), count);
             data << Vector3::zero(); //Xinef: fake point
         }
     }
@@ -189,9 +189,12 @@ namespace Movement
             data << move_spline.vertical_acceleration;      // added in 3.1
             data << move_spline.effect_start_time;          // added in 3.1
 
-            uint32 nodes = move_spline.getPath(true).size();
+            uint32 nodes = move_spline.getPath().size();
             data << nodes;
-            data.append<Vector3>(&move_spline.getPath(true)[0], nodes);
+            if (nodes)
+            {
+                data.append<Vector3>(&move_spline.getPath()[0], nodes);
+            }
             data << uint8(move_spline.spline.mode());       // added in 3.1
             data << (move_spline.isCyclic() ? Vector3::zero() : move_spline.FinalDestination());
         }

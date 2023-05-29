@@ -106,7 +106,7 @@ public:
             summons.DespawnAll();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
             instance->SetData(DATA_KAELTHAS_EVENT, NOT_STARTED);
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
         }
 
         void JustSummoned(Creature* summon) override
@@ -120,7 +120,7 @@ public:
         void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
         }
 
         void JustDied(Unit*) override
@@ -128,7 +128,7 @@ public:
             instance->SetData(DATA_KAELTHAS_EVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             instance->SetData(DATA_KAELTHAS_EVENT, IN_PROGRESS);
             me->SetInCombatWithZone();
@@ -162,7 +162,8 @@ public:
                 if (me->isRegeneratingHealth())
                 {
                     me->SetRegeneratingHealth(false);
-                    me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+                    me->SetImmuneToAll(true);
                     me->CombatStop();
                     me->SetReactState(REACT_PASSIVE);
                     LapseAction(ACTION_REMOVE_FLY);
@@ -200,12 +201,12 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_INIT_COMBAT:
-                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(false);
                     if (Unit* target = SelectTargetFromPlayerList(50.0f))
                         AttackStart(target);
                     return;
                 case EVENT_FINISH_TALK:
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                     return;
             }
 

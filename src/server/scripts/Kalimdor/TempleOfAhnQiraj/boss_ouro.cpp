@@ -15,188 +15,388 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Ouro
-SD%Complete: 85
-SDComment: No model for submerging. Currently just invisible.
-SDCategory: Temple of Ahn'Qiraj
-EndScriptData */
-
+#include "Cell.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
 {
+    // Ouro
     SPELL_SWEEP                 = 26103,
-    SPELL_SANDBLAST             = 26102,
+    SPELL_SAND_BLAST            = 26102,
     SPELL_GROUND_RUPTURE        = 26100,
-    SPELL_BIRTH                 = 26262, // The Birth Animation
+    SPELL_BERSERK               = 26615,
+    SPELL_BOULDER               = 26616,
+    SPELL_OURO_SUBMERGE_VISUAL  = 26063,
+    SPELL_SUMMON_SANDWORM_BASE  = 26133,
+
+    // Misc - Mounds, Ouro Spawner
+    SPELL_BIRTH                 = 26586,
     SPELL_DIRTMOUND_PASSIVE     = 26092,
-    SPELL_SUMMON_OURO           = 26061
+    SPELL_SUMMON_OURO           = 26061,
+    SPELL_SUMMON_OURO_MOUNDS    = 26058,
+    SPELL_QUAKE                 = 26093,
+    SPELL_SUMMON_SCARABS        = 26060,
+    SPELL_SUMMON_OURO_AURA      = 26642,
+    SPELL_DREAM_FOG             = 24780
 };
 
-class npc_ouro_spawner : public CreatureScript
+enum Misc
 {
-public:
-    npc_ouro_spawner() : CreatureScript("npc_ouro_spawner") {}
+    GROUP_EMERGED               = 0,
+    GROUP_PHASE_TRANSITION      = 1,
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_ouro_spawnerAI(creature);
-    }
+    NPC_DIRT_MOUND              = 15712,
+    GO_SANDWORM_BASE            = 180795,
 
-    struct npc_ouro_spawnerAI : public ScriptedAI
-    {
-        npc_ouro_spawnerAI(Creature* creature) : ScriptedAI(creature)
-        {
-            Reset();
-        }
-
-        bool hasSummoned;
-
-        void Reset() override
-        {
-            hasSummoned = false;
-            DoCast(me, SPELL_DIRTMOUND_PASSIVE);
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            // Spawn Ouro on LoS check
-            if (!hasSummoned && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 40.0f))
-            {
-                DoCast(me, SPELL_SUMMON_OURO);
-                hasSummoned = true;
-            }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void JustSummoned(Creature* creature) override
-        {
-            // Despawn when Ouro is spawned
-            if (creature->GetEntry() == NPC_OURO)
-            {
-                creature->SetInCombatWithZone();
-                creature->CastSpell(creature, SPELL_BIRTH, false);
-                me->DespawnOrUnsummon();
-            }
-        }
-
-    };
+    DATA_OURO_HEALTH            = 0
 };
 
-class boss_ouro : public CreatureScript
+struct npc_ouro_spawner : public ScriptedAI
 {
-public:
-    boss_ouro() : CreatureScript("boss_ouro") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    npc_ouro_spawner(Creature* creature) : ScriptedAI(creature)
     {
-        return GetTempleOfAhnQirajAI<boss_ouroAI>(creature);
+        Reset();
     }
 
-    struct boss_ouroAI : public ScriptedAI
+    bool hasSummoned;
+
+    void Reset() override
     {
-        boss_ouroAI(Creature* creature) : ScriptedAI(creature) { }
+        hasSummoned = false;
+        DoCastSelf(SPELL_DIRTMOUND_PASSIVE);
+    }
 
-        uint32 Sweep_Timer;
-        uint32 SandBlast_Timer;
-        uint32 Submerge_Timer;
-        uint32 Back_Timer;
-        uint32 ChangeTarget_Timer;
-        uint32 Spawn_Timer;
-
-        bool Enrage;
-        bool Submerged;
-
-        void Reset() override
+    void MoveInLineOfSight(Unit* who) override
+    {
+        // Spawn Ouro on LoS check
+        if (!hasSummoned && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 40.0f) && !who->ToPlayer()->IsGameMaster())
         {
-            Sweep_Timer = urand(5000, 10000);
-            SandBlast_Timer = urand(20000, 35000);
-            Submerge_Timer = urand(90000, 150000);
-            Back_Timer = urand(30000, 45000);
-            ChangeTarget_Timer = urand(5000, 8000);
-            Spawn_Timer = urand(10000, 20000);
-
-            Enrage = false;
-            Submerged = false;
+            if (InstanceScript* instance = me->GetInstanceScript())
+            {
+                Creature* ouro = instance->GetCreature(DATA_OURO);
+                if (instance->GetBossState(DATA_OURO) != IN_PROGRESS && !ouro)
+                {
+                    DoCastSelf(SPELL_SUMMON_OURO);
+                    hasSummoned = true;
+                }
+            }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        ScriptedAI::MoveInLineOfSight(who);
+    }
+
+    void JustSummoned(Creature* creature) override
+    {
+        // Despawn when Ouro is spawned
+        if (creature->GetEntry() == NPC_OURO)
         {
-            DoCastVictim(SPELL_BIRTH);
+            creature->SetInCombatWithZone();
+            me->DespawnOrUnsummon();
+        }
+    }
+};
+
+struct boss_ouro : public BossAI
+{
+    boss_ouro(Creature* creature) : BossAI(creature, DATA_OURO)
+    {
+        SetCombatMovement(false);
+        me->SetControlled(true, UNIT_STATE_ROOT);
+        _scheduler.SetValidator([this] { return !me->HasUnitState(UNIT_STATE_CASTING); });
+    }
+
+    bool CanAIAttack(Unit const* victim) const override
+    {
+        return me->IsWithinMeleeRange(victim);
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (me->HealthBelowPctDamaged(20, damage) && !_enraged)
+        {
+            DoCastSelf(SPELL_BERSERK, true);
+            _enraged = true;
+            _scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
+            _scheduler.Schedule(1s, [this](TaskContext context)
+                {
+                    if (!IsPlayerWithinMeleeRange())
+                        DoSpellAttackToRandomTargetIfReady(SPELL_BOULDER);
+
+                    context.Repeat();
+                })
+                .Schedule(20s, [this](TaskContext context)
+                    {
+                        DoCastSelf(SPELL_SUMMON_OURO_MOUNDS, true);
+                        context.Repeat();
+                    });
+        }
+    }
+
+    void Submerge()
+    {
+        if (_enraged || _submerged)
+            return;
+
+        me->AttackStop();
+        me->SetReactState(REACT_PASSIVE);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        _submergeMelee = 0;
+        _submerged = true;
+        DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
+        _scheduler.CancelGroup(GROUP_EMERGED);
+        _scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
+
+        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 10.f))
+        {
+            base->Use(me);
+            base->DespawnOrUnsummon(6s);
         }
 
-        void UpdateAI(uint32 diff) override
+        DoCastSelf(SPELL_SUMMON_OURO_MOUNDS, true);
+        // According to sniffs, Ouro uses his mounds to respawn. The health management could be a little scuffed.
+        std::list<Creature*> ouroMounds;
+        me->GetCreatureListWithEntryInGrid(ouroMounds, NPC_DIRT_MOUND, 200.f);
+        if (!ouroMounds.empty()) // This can't be possible, but just to be sure.
         {
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
-
-            //Sweep_Timer
-            if (!Submerged && Sweep_Timer <= diff)
+            if (Creature* mound = Acore::Containers::SelectRandomContainerElement(ouroMounds))
             {
-                DoCastVictim(SPELL_SWEEP);
-                Sweep_Timer = urand(15000, 30000);
+                mound->AddAura(SPELL_SUMMON_OURO_AURA, mound);
+                mound->AI()->SetData(DATA_OURO_HEALTH, me->GetHealth());
             }
-            else Sweep_Timer -= diff;
-
-            //SandBlast_Timer
-            if (!Submerged && SandBlast_Timer <= diff)
-            {
-                DoCastVictim(SPELL_SANDBLAST);
-                SandBlast_Timer = urand(20000, 35000);
-            }
-            else SandBlast_Timer -= diff;
-
-            //Submerge_Timer
-            if (!Submerged && Submerge_Timer <= diff)
-            {
-                //Cast
-                me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetFaction(FACTION_FRIENDLY);
-                DoCast(me, SPELL_DIRTMOUND_PASSIVE);
-
-                Submerged = true;
-                Back_Timer = urand(30000, 45000);
-            }
-            else Submerge_Timer -= diff;
-
-            //ChangeTarget_Timer
-            if (Submerged && ChangeTarget_Timer <= diff)
-            {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
-
-                if (target)
-                    me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
-
-                ChangeTarget_Timer = urand(10000, 20000);
-            }
-            else ChangeTarget_Timer -= diff;
-
-            //Back_Timer
-            if (Submerged && Back_Timer <= diff)
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetFaction(FACTION_MONSTER);
-
-                DoCastVictim(SPELL_GROUND_RUPTURE);
-
-                Submerged = false;
-                Submerge_Timer = urand(60000, 120000);
-            }
-            else Back_Timer -= diff;
-
-            DoMeleeAttackIfReady();
         }
-    };
+
+        me->DespawnOrUnsummon(1000);
+    }
+
+    void CastGroundRupture()
+    {
+        std::list<WorldObject*> targets;
+        Acore::AllWorldObjectsInRange checker(me, 10.0f);
+        Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(me, targets, checker);
+        Cell::VisitAllObjects(me, searcher, 10.0f);
+
+        for (WorldObject* target : targets)
+        {
+            if (Unit* unitTarget = target->ToUnit())
+            {
+                if (unitTarget->IsHostileTo(me))
+                    DoCast(unitTarget, SPELL_GROUND_RUPTURE, true);
+            }
+        }
+    }
+
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_SAND_BLAST && target)
+        {
+            me->GetThreatMgr().ModifyThreatByPercent(target, -100);
+        }
+    }
+
+    void Emerge()
+    {
+        DoCastSelf(SPELL_BIRTH);
+        DoCastSelf(SPELL_SUMMON_SANDWORM_BASE, true);
+        me->SetReactState(REACT_AGGRESSIVE);
+        CastGroundRupture();
+        _scheduler
+            .Schedule(20s, GROUP_EMERGED, [this](TaskContext context)
+                {
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true))
+                    {
+                        me->SetTarget(target->GetGUID());
+                    }
+
+                    DoCastAOE(SPELL_SAND_BLAST);
+
+                    me->m_Events.AddEventAtOffset([this]()
+                    {
+                        if (Unit* victim = me->GetVictim())
+                        {
+                            me->SetTarget(victim->GetGUID());
+                        }
+                    }, 3s);
+
+                    context.Repeat();
+                })
+            .Schedule(22s, GROUP_EMERGED, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_SWEEP);
+                    context.Repeat();
+                })
+            .Schedule(90s, GROUP_PHASE_TRANSITION, [this](TaskContext /*context*/)
+                {
+                    Submerge();
+                })
+            .Schedule(3s, GROUP_PHASE_TRANSITION, [this](TaskContext context)
+                {
+                    if (_enraged)
+                        return;
+
+                    if (!IsPlayerWithinMeleeRange() && !_submerged)
+                    {
+                        if (_submergeMelee < 10)
+                        {
+                            _submergeMelee++;
+                        }
+                        else
+                        {
+                            Submerge();
+                            _submergeMelee = 0;
+                        }
+                    }
+                    else
+                    {
+                        _submergeMelee = 0;
+                    }
+
+                    if (!_submerged)
+                        context.Repeat(1s);
+                });
+    }
+
+    void Reset() override
+    {
+        instance->SetBossState(DATA_OURO, NOT_STARTED);
+        _scheduler.CancelAll();
+        _submergeMelee = 0;
+        _submerged = false;
+        _enraged = false;
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        if (me->GetThreatMgr().GetThreatList().empty())
+        {
+            DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
+            me->DespawnOrUnsummon(1000);
+            instance->SetBossState(DATA_OURO, FAIL);
+            if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
+                base->DespawnOrUnsummon();
+        }
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        Emerge();
+
+        BossAI::JustEngagedWith(who);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        UpdateVictim();
+
+        _scheduler.Update(diff, [this]
+            {
+                DoMeleeAttackIfReady();
+            });
+    }
+
+protected:
+    TaskScheduler _scheduler;
+    bool _enraged;
+    uint8 _submergeMelee;
+    bool _submerged;
+
+    bool IsPlayerWithinMeleeRange() const
+    {
+        return me->IsWithinMeleeRange(me->GetVictim());
+    }
+};
+
+struct npc_dirt_mound : ScriptedAI
+{
+    npc_dirt_mound(Creature* creature) : ScriptedAI(creature)
+    {
+        _instance = creature->GetInstanceScript();
+    }
+
+    void JustSummoned(Creature* creature) override
+    {
+        if (creature->GetEntry() == NPC_OURO)
+        {
+            creature->SetInCombatWithZone();
+            creature->SetHealth(_ouroHealth);
+            creature->LowerPlayerDamageReq(creature->GetMaxHealth() - creature->GetHealth());
+        }
+    }
+
+    void SetData(uint32 type, uint32 data) override
+    {
+        if (type == DATA_OURO_HEALTH)
+            _ouroHealth = data;
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        DoZoneInCombat();
+        _scheduler.Schedule(30s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_SUMMON_SCARABS, true);
+                me->DespawnOrUnsummon(1000);
+            })
+            .Schedule(100ms, [this](TaskContext context)
+            {
+                ChaseNewTarget();
+                context.Repeat(5s, 10s);
+            });
+    }
+
+    void ChaseNewTarget()
+    {
+        DoResetThreatList();
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200.f, true))
+        {
+            me->AddThreat(target, 1000000.f);
+            AttackStart(target);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff);
+    }
+
+    void Reset() override
+    {
+        DoCastSelf(SPELL_DIRTMOUND_PASSIVE, true);
+        DoCastSelf(SPELL_DREAM_FOG, true);
+        DoCastSelf(SPELL_QUAKE, true);
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        if (_instance)
+        {
+            _instance->SetBossState(DATA_OURO, FAIL);
+        }
+
+        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
+            base->DespawnOrUnsummon();
+
+        me->DespawnOrUnsummon();
+    }
+
+protected:
+    TaskScheduler _scheduler;
+    uint32 _ouroHealth;
+    InstanceScript* _instance;
 };
 
 void AddSC_boss_ouro()
 {
-    new npc_ouro_spawner();
-    new boss_ouro();
+    RegisterTempleOfAhnQirajCreatureAI(npc_ouro_spawner);
+    RegisterTempleOfAhnQirajCreatureAI(boss_ouro);
+    RegisterTempleOfAhnQirajCreatureAI(npc_dirt_mound);
 }

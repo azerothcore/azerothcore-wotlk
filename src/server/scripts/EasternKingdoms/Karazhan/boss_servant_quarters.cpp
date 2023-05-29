@@ -48,131 +48,122 @@ enum ServantQuertersMisc
     EVENT_CHECK_VISIBILITY      = 30
 };
 
-class boss_servant_quarters : public CreatureScript
+struct boss_servant_quarters : public BossAI
 {
-public:
-    boss_servant_quarters() : CreatureScript("boss_servant_quarters") { }
+    boss_servant_quarters(Creature* creature) : BossAI(creature, DATA_SERVANT_QUARTERS) { }
 
-    struct boss_servant_quartersAI : public BossAI
+    void Reset() override
     {
-        boss_servant_quartersAI(Creature* creature) : BossAI(creature, DATA_SERVANT_QUARTERS) { }
+        events.Reset();
+        me->SetVisible(false);
+        me->SetReactState(REACT_PASSIVE);
+        me->SetFaction(FACTION_FRIENDLY);
+        _events2.Reset();
+        _events2.ScheduleEvent(EVENT_CHECK_VISIBILITY, 5s);
 
-        void Reset() override
+        if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)
         {
-            events.Reset();
-            me->SetVisible(false);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetFaction(FACTION_FRIENDLY);
-            _events2.Reset();
-            _events2.ScheduleEvent(EVENT_CHECK_VISIBILITY, 5000);
-            if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)
-                me->CastSpell(me, SPELL_SNEAK, true);
-
-            if (instance->GetData(DATA_SELECTED_RARE) != me->GetEntry())
-                me->DespawnOrUnsummon(1);
+            DoCastSelf(SPELL_SNEAK, true);
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        if (instance->GetData(DATA_SELECTED_RARE) != me->GetEntry())
+            me->DespawnOrUnsummon(1);
+    }
+
+    void JustEngagedWith(Unit*  /*who*/) override
+    {
+        me->setActive(true);
+        if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)
         {
-            me->setActive(true);
-            if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)
-            {
-                events.ScheduleEvent(EVENT_SPELL_ACIDIC_FANG, 5000);
-                events.ScheduleEvent(EVENT_SPELL_HYAKISS_WEB, 9000);
-            }
-            else if (me->GetEntry() == NPC_SHADIKITH_THE_GLIDER)
-            {
-                events.ScheduleEvent(EVENT_SPELL_SONIC_BURST, 4000);
-                events.ScheduleEvent(EVENT_SPELL_WING_BUFFET, 7000);
-                events.ScheduleEvent(EVENT_SPELL_DIVE, 10000);
-            }
-            else // if (me->GetEntry() == NPC_ROKAD_THE_RAVAGER)
-            {
-                events.ScheduleEvent(EVENT_SPELL_RAVAGE, 3000);
-            }
+            events.ScheduleEvent(EVENT_SPELL_ACIDIC_FANG, 5s);
+            events.ScheduleEvent(EVENT_SPELL_HYAKISS_WEB, 9s);
+        }
+        else if (me->GetEntry() == NPC_SHADIKITH_THE_GLIDER)
+        {
+            events.ScheduleEvent(EVENT_SPELL_SONIC_BURST, 4s);
+            events.ScheduleEvent(EVENT_SPELL_WING_BUFFET, 7s);
+            events.ScheduleEvent(EVENT_SPELL_DIVE, 10s);
+        }
+        else // if (me->GetEntry() == NPC_ROKAD_THE_RAVAGER)
+        {
+            events.ScheduleEvent(EVENT_SPELL_RAVAGE, 3s);
+        }
+    }
+
+    void JustDied(Unit* /*who*/) override
+    {
+    }
+
+    void MovementInform(uint32 type, uint32 point) override
+    {
+        if (type == POINT_MOTION_TYPE && point == EVENT_CHARGE)
+            events.ScheduleEvent(EVENT_SPELL_FEAR, 0);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events2.Update(diff);
+        switch (_events2.ExecuteEvent())
+        {
+            case EVENT_CHECK_VISIBILITY:
+                if (instance->GetBossState(DATA_SERVANT_QUARTERS) == DONE)
+                {
+                    me->SetVisible(true);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->RestoreFaction();
+                }
+                else
+                    _events2.ScheduleEvent(EVENT_CHECK_VISIBILITY, 5s);
+                break;
         }
 
-        void JustDied(Unit* /*who*/) override
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
+            case EVENT_SPELL_ACIDIC_FANG:
+                me->CastSpell(me->GetVictim(), SPELL_ACIDIC_FANG, false);
+                events.Repeat(12s, 18s);
+                break;
+            case EVENT_SPELL_HYAKISS_WEB:
+                DoCastRandomTarget(SPELL_HYAKISS_WEB, 0, 30.0f);
+                events.Repeat(15s);
+                break;
+            case EVENT_SPELL_SONIC_BURST:
+                DoCastSelf(SPELL_SONIC_BURST);
+                events.Repeat(12s, 18s);
+                break;
+            case EVENT_SPELL_WING_BUFFET:
+                DoCastSelf(SPELL_WING_BUFFET);
+                events.Repeat(12s, 18s);
+                break;
+            case EVENT_SPELL_DIVE:
+                if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, 40.0f, false, true)))
+                    me->CastSpell(target, SPELL_DIVE, false);
+                events.Repeat(20s);
+                break;
+            case EVENT_SPELL_FEAR:
+                DoCastVictim(SPELL_FEAR);
+                break;
+            case EVENT_SPELL_RAVAGE:
+                me->CastSpell(me->GetVictim(), SPELL_RAVAGE, false);
+                events.ScheduleEvent(EVENT_SPELL_RAVAGE, 10500);
+                break;
         }
 
-        void MovementInform(uint32 type, uint32 point) override
-        {
-            if (type == POINT_MOTION_TYPE && point == EVENT_CHARGE)
-                events.ScheduleEvent(EVENT_SPELL_FEAR, 0);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events2.Update(diff);
-            switch (_events2.ExecuteEvent())
-            {
-                case EVENT_CHECK_VISIBILITY:
-                    if (instance->GetBossState(DATA_SERVANT_QUARTERS) == DONE)
-                    {
-                        me->SetVisible(true);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        me->RestoreFaction();
-                    }
-                    else
-                        _events2.ScheduleEvent(EVENT_CHECK_VISIBILITY, 5000);
-                    break;
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_ACIDIC_FANG:
-                    me->CastSpell(me->GetVictim(), SPELL_ACIDIC_FANG, false);
-                    events.ScheduleEvent(EVENT_SPELL_ACIDIC_FANG, urand(12000, 18000));
-                    break;
-                case EVENT_SPELL_HYAKISS_WEB:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
-                        me->CastSpell(target, SPELL_HYAKISS_WEB, false);
-                    events.ScheduleEvent(EVENT_SPELL_HYAKISS_WEB, 15000);
-                    break;
-                case EVENT_SPELL_SONIC_BURST:
-                    me->CastSpell(me, SPELL_SONIC_BURST, false);
-                    events.ScheduleEvent(EVENT_SPELL_SONIC_BURST, urand(12000, 18000));
-                    break;
-                case EVENT_SPELL_WING_BUFFET:
-                    me->CastSpell(me, SPELL_WING_BUFFET, false);
-                    events.ScheduleEvent(EVENT_SPELL_WING_BUFFET, urand(12000, 18000));
-                    break;
-                case EVENT_SPELL_DIVE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, 40.0f, false, true)))
-                        me->CastSpell(target, SPELL_DIVE, false);
-                    events.ScheduleEvent(EVENT_SPELL_DIVE, 20000);
-                    break;
-                case EVENT_SPELL_FEAR:
-                    me->CastSpell(me->GetVictim(), SPELL_FEAR, false);
-                    break;
-                case EVENT_SPELL_RAVAGE:
-                    me->CastSpell(me->GetVictim(), SPELL_RAVAGE, false);
-                    events.ScheduleEvent(EVENT_SPELL_RAVAGE, 10500);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
+        DoMeleeAttackIfReady();
+    }
 
     private:
         EventMap _events2;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetKarazhanAI<boss_servant_quartersAI>(creature);
-    }
 };
 
 void AddSC_boss_servant_quarters()
 {
-    new boss_servant_quarters();
+    RegisterKarazhanCreatureAI(boss_servant_quarters);
 }

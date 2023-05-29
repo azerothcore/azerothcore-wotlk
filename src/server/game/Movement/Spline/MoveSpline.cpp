@@ -80,7 +80,7 @@ namespace Movement
 
     void MoveSpline::computeFallElevation(float& el) const
     {
-        float z_now = spline.getPoint(spline.first(), false).z - Movement::computeFallElevation(MSToSec(time_passed), false);
+        float z_now = spline.getPoint(spline.first()).z - Movement::computeFallElevation(MSToSec(time_passed), false);
         float final_z = FinalDestination().z;
         el = std::max(z_now, final_z);
     }
@@ -96,7 +96,7 @@ namespace Movement
         float start_elevation;
         inline int32 operator()(Spline<int32>& s, int32 i)
         {
-            return Movement::computeFallTime(start_elevation - s.getPoint(i + 1, false).z, false) * 1000.f;
+            return Movement::computeFallTime(start_elevation - s.getPoint(i + 1).z, false) * 1000.f;
         }
     };
 
@@ -138,7 +138,7 @@ namespace Movement
         // init spline timestamps
         if (splineflags.falling)
         {
-            FallInitializer init(spline.getPoint(spline.first(), false).z);
+            FallInitializer init(spline.getPoint(spline.first()).z);
             spline.initLengths(init);
         }
         else
@@ -147,7 +147,7 @@ namespace Movement
             spline.initLengths(init);
         }
 
-        // TODO: what to do in such cases? problem is in input data (all points are at same coords)
+        /// @todo: what to do in such cases? problem is in input data (all points are at same coords)
         if (spline.length() < minimal_duration)
         {
             spline.set_length(spline.last(), spline.isCyclic() ? 1000 : 1);

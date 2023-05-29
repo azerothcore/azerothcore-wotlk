@@ -134,7 +134,12 @@ public:
 
             // Not in progress
             instance->SetData(DATA_ARAN, NOT_STARTED);
-            instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), true);
+
+            if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+            {
+                libraryDoor->SetGoState(GO_STATE_ACTIVE);
+                libraryDoor->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            }
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -147,22 +152,33 @@ public:
             Talk(SAY_DEATH);
 
             instance->SetData(DATA_ARAN, DONE);
-            instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), true);
+
+            if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+            {
+                libraryDoor->SetGoState(GO_STATE_ACTIVE);
+                libraryDoor->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 
             instance->SetData(DATA_ARAN, IN_PROGRESS);
-            instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), false);
+
+            if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+            {
+                libraryDoor->SetGoState(GO_STATE_READY);
+                libraryDoor->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            }
+
             DoZoneInCombat();
         }
 
         void FlameWreathEffect()
         {
             std::vector<Unit*> targets;
-            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().GetThreatList();
 
             if (t_list.empty())
                 return;
@@ -203,7 +219,11 @@ public:
             {
                 if (CloseDoorTimer <= diff)
                 {
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), false);
+                    if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+                    {
+                        libraryDoor->SetGoState(GO_STATE_READY);
+                        libraryDoor->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                    }
                     CloseDoorTimer = 0;
                 }
                 else
@@ -584,7 +604,7 @@ public:
             CastTimer = 2000 + (rand() % 3000);
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {

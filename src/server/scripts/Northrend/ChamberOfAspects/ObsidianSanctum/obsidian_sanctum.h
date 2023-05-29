@@ -20,6 +20,8 @@
 
 #include "CreatureAIImpl.h"
 
+#define DataHeader "OS"
+
 #define ObsidianSanctumScriptName "instance_obsidian_sanctum"
 
 enum Data : uint32

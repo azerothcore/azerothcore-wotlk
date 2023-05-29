@@ -1,30 +1,31 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.page_text
+-- Dumping structure for table acore_world.page_text
 DROP TABLE IF EXISTS `page_text`;
 CREATE TABLE IF NOT EXISTS `page_text` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Text` longtext NOT NULL,
-  `NextPageID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` SMALLINT DEFAULT 0,
+  `ID` int unsigned NOT NULL DEFAULT '0',
+  `Text` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `NextPageID` int unsigned NOT NULL DEFAULT '0',
+  `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Item System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Item System';
 
--- Dumpar data för tabell acore_world.page_text: 1 946 rows
+-- Dumping data for table acore_world.page_text: ~1,853 rows (approximately)
 DELETE FROM `page_text`;
-/*!40000 ALTER TABLE `page_text` DISABLE KEYS */;
 INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
 	(15, 'Hello Morgan,$B$BBusiness in Goldshire is brisk, so brisk that I haven\'t had time to send you any shipments!  $B$BI commissioned the person bearing this note to bring you a package of large wax candles (you know, the ones the Kobolds like to wear on their heads?). $B$BPlease give this person our thanks, and fair payment.', 0, 12340),
 	(16, 'To the Honorable Headmaster Crillian,\n\nMy former Master, I write to you so that you might know what your apprentice has been doing of late.  Paying heed to your advice, I sought to build my knowledge and wisdom through travel outside the gates of our beloved Stormwind.  My journeys took me to many places but I have decided to take up residence here in the lovely town of Moonbrook.  The surrounding fields of Westfall are most beautiful as the harvest approaches.', 17, 1),
@@ -636,7 +637,7 @@ INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
 	(1435, 'Ofgut Stonefist Those fallen before Dark Keeper Ofgut\'s hammer cannot be counted. The soldiers of the West Garrison bow in awe as he passes.  For who among them can look into the eyes of Ofgut and see the secrets the dark key whispers? ', 0, 1),
 	(1436, 'Pelver Deepstomp$B$BDark Keeper Pelver is our most honored disciple.  He has borne the key for longer than any, and it has cost him dearly.  When he is called for his burden, he is guarded in the Domicile.$B$BHis sacrifice is cherished, and he will remain in our hearts for many years... after the darkness takes him.', 0, 12340),
 	(1470, 'Pelver Deepstomp Dark Keeper Pelver is our most honored disciple.  He has borne the key for longer than any, and it has cost him dearly.  When he is called for his burden, he is guarded in the Domicile. His sacrifice is cherished, and he will remain in our hearts for many years... after the darkness takes him. ', 0, 1),
-	(1471, 'Solomon,$B$BThe carrier of this decree has been granted official status as an acting deputy of Stormwind. You may use $g him:her\n\r', 0, 1),
+	(1471, 'Solomon,$B$BThe carrier of this decree has been granted official status as an acting deputy of Stormwind. You may use $ghim:her to find proof of the black dragonflight\'s involvement with the Blackrock orcs. Should such proof be found, this deputy shall return said proof to me in Stormwind, at which time I shall release the order to dispense sufficient millitary force to aid Lakeshire.$B$BRegards,$B$B$B$BHighlord Bolvar Fordragon', 0, 1),
 	(1490, 'Solomon,$B$BThe carrier of this decree has been granted official status as an acting deputy of Stormwind. You may use $g him:her ', 0, 1),
 	(1491, '<HTML>\n<BODY>\n<H1 align="center">\nCRYSTAL PYLON USER\'S MANUAL\n</H1>\n<BR/>\n<P align="center">\n"A guide to collecting and using the power crystals of Un\'Goro Crater"\n</P>\n<BR/>\n<BR/>\n<P align="left">\nChapter 1: The Northern Pylon\n</P>\n<BR/>\n<P align="left">\nChapter 2: The Eastern Pylon\n</P>\n<BR/>\n<P align="left">\nChapter 3: The Western Pylon\n</P>\n<BR/>\n</BODY>\n</HTML>\n', 1511, 11723),
 	(1510, '<HTML>\n<BODY>\n<H1 align="center">\nCRYSTAL PYLON USER\'S MANUAL\n</H1>\n<BR/>\n<P align="center">\n"A guide to collecting and using the power crystals of Un\'Goro Crater"\n</P>\n<BR/>\n<BR/>\n<P align="left">\nChapter 1: The Northern Pylon\n</P>\n<BR/>\n<P align="left">\nChapter 2: The Eastern Pylon\n</P>\n<BR/>\n<P align="left">\nChapter 3: The Western Pylon\n</P>\n<BR/>\n</BODY>\n</HTML>\n', 1511, 1),
@@ -1158,7 +1159,7 @@ INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
 	(2458, 'The spirits came to me in my dreams last night. They told me of your coming, and that it would be my task to aid you. We have much to go over in our short time together--discussions about nature, the spirits, the Earthmother, and even the night elves. But I will save the lessons for your arrival, and I will do all that is in my power to ensure that you are ready for the trials ahead.$B$BMay wisdom guide you. I will be waiting.$B$B-Gart Mistrunner, Druid Trainer ', 0, 1),
 	(2459, 'When word reached me that you were ready, I sent this sigil immediately. All of Cenarius\' druids take great satisfaction in seeing our numbers bolster. The spirits even seem to have become stronger with our enhanced presence. In time, and with some patience, hopefully our strength will return to its former grandeur. Find me near the top of Aldrassil when you are ready. I will be your guide as long as you are in Shadowglen.$B$B- Mardant Strongoak, Druid Trainer', 0, 1),
 	(2460, 'I greet you, young $c. The winds told me of your coming. The earth gave praise of your strength. And now the ancient spirits whisper of your accomplishments to come. Our people always need wise and great leaders. They often turn to our kind for both virtues. If you are willing, I would teach you more of our ways.$B$BSeek me out in Camp Narache on Red Cloud Mesa--we will speak more then.$B$B-Meela Dawnstrider, Shaman Trainer ', 0, 1),
-	(2461, 'Lok-tar, $gbrother:sister', 0, 1),
+	(2461, 'Lok-tar, $gbrother:sister;. The elements beckon you closer and bid me to show you the path of the shaman. The spirits of our ancestors watch from beyond and swell with pride knowing you have joined our ranks.$B$BWhen you are ready, seek me out near the entrance to the Den. It is there that I will be training others of our kind. Until then, may the wind be at your back.$B$BShikrik, Shaman Trainer', 0, 1),
 	(2462, 'Greetings to you, $gbrotha:sista;. Da spirits say you be ready to aid our allies. You have great ties to da elements, an\' you be much more powerful den when you first started your lessons wit me.$B$BNow I be sendin\' you to meet wit Shikrik, da orc shaman trainer in da Valley of Trials. She know you be comin\' to study wit her already. Make our ancestors proud. Until we meet again, may da flame keep you warm, and da wind be at your back.$B$B-Ishi-yo', 0, 12340),
 	(2463, 'I hope this letter finds you well, $c. I say that with great pride, because not many can profess such profound faith, but also know that they are among the most elite of Azeroth\'s protectors.$B$BAlways remember, first and foremost, it is your duty to go to battle against those who seek to harm our world and bring corruption into our homes.$B$BI have been given authority over your training for the time being. When you are ready, seek me out inside Northshire Abbey.$B$B-Brother Sammuel, Paladin Trainer ', 0, 1),
 	(2464, 'Some fear our kind more than dragons. Some envy us more than the most skilled blacksmiths. Some praise our strength in battle. Others revel in our faith. Some are just jealous that we can drink them under the table! But know this, $c, you are among the most elite protectors in all of Azeroth. The Holy Light gives us strength as much as we strengthen it.$B$BI would tell you more when you\'ve gotten acquainted with the land some. Find me inside Anvilmar above the Valley.$B$B-Bromos Grummner, Paladin Trainer ', 0, 1),
@@ -1972,8 +1973,8 @@ INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
 	(3613, 'We live in tumultuous times. War, invasion, and famine have swept the world, but the real trial is yet to come: the end of Azeroth itself.\r\n\r\nHow will you cope with the loss and destruction of everything you hold dear? The answer is that you don\'t have to. Bring your friends and family to one of our gatherings and learn how you can survive the apocalypse together, with us.', 0, 1),
 	(3614, 'Citizens of Orgrimmar, beware the soothsayers and prophets of doom that have taken over our streets. Do not be taken in by their mad raving. They only want to weaken us in the face of our true enemies!', 0, 1),
 	(3622, 'Tail swooshing and hips swaying, the curvy figure walked purposefully across the lake toward the man resting by the shore; rising quickly as she approached, he appeared visibly happy to be in her presence.  Blue arms flowed over his shoulders as a smooth tail coiled seductively around his waist.  "Why must I travel so far to be meeting man like you?"  Her voice carried a strong, alluring accent.$B$BGrinning wildly, he gently pushed her away, openly staring as the light caught her features.$B$B"Up here!", she exclaimed in playful anger.$B$BWith a helpless shrug, he reached into his pack and pulled out a small pouch.  "My wonderful Soola, I\'ve brought you something."  Confidence wrapped his words like a steel blanket.', 0, 1);
-/*!40000 ALTER TABLE `page_text` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

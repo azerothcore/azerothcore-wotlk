@@ -802,7 +802,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr5>::ToString(SpellAttr5 value)
 {
     switch (value)
     {
-        case SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL: return { "SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL", "Can be channeled while moving", "" };
+        case SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL: return { "SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL", "Can be channeled while moving/casting", "" };
         case SPELL_ATTR5_NO_REAGENT_COST_WITH_AURA: return { "SPELL_ATTR5_NO_REAGENT_COST_WITH_AURA", "No reagents during arena preparation", "" };
         case SPELL_ATTR5_REMOVE_ENTERING_ARENA: return { "SPELL_ATTR5_REMOVE_ENTERING_ARENA", "Remove when entering arena", "Force this aura to be removed on entering arena, regardless of other properties" };
         case SPELL_ATTR5_ALLOW_WHILE_STUNNED: return { "SPELL_ATTR5_ALLOW_WHILE_STUNNED", "Usable while stunned", "" };

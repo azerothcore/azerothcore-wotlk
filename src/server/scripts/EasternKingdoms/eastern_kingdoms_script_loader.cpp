@@ -68,6 +68,7 @@ void AddSC_instance_karazhan();              //Karazhan
 void AddSC_boss_servant_quarters();
 void AddSC_boss_attumen();
 void AddSC_boss_curator();
+void AddSC_boss_chess_event();
 void AddSC_boss_maiden_of_virtue();
 void AddSC_boss_shade_of_aran();
 void AddSC_boss_malchezaar();
@@ -97,6 +98,7 @@ void AddSC_instance_molten_core();
 void AddSC_the_scarlet_enclave();            //Scarlet Enclave
 void AddSC_the_scarlet_enclave_c1();
 void AddSC_the_scarlet_enclave_c2();
+void AddSC_the_scarlet_enclave_c3();
 void AddSC_the_scarlet_enclave_c5();
 void AddSC_instance_scarlet_monastery();     //Scarlet Monastery
 void AddSC_boss_kirtonos_the_herald();
@@ -140,6 +142,7 @@ void AddSC_boss_hazzarah();
 void AddSC_boss_renataki();
 void AddSC_boss_wushoolay();
 void AddSC_instance_zulgurub();
+void AddSC_zulgurub();
 // void AddSC_alterac_mountains();
 void AddSC_arathi_highlands();
 void AddSC_blasted_lands();
@@ -218,6 +221,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_servant_quarters();
     AddSC_boss_attumen();
     AddSC_boss_curator();
+    AddSC_boss_chess_event();
     AddSC_boss_maiden_of_virtue();
     AddSC_boss_shade_of_aran();
     AddSC_boss_malchezaar();
@@ -247,6 +251,7 @@ void AddEasternKingdomsScripts()
     AddSC_the_scarlet_enclave();            //Scarlet Enclave
     AddSC_the_scarlet_enclave_c1();
     AddSC_the_scarlet_enclave_c2();
+    AddSC_the_scarlet_enclave_c3();
     AddSC_the_scarlet_enclave_c5();
     AddSC_instance_scarlet_monastery();     //Scarlet Monastery
     AddSC_boss_kirtonos_the_herald();
@@ -290,6 +295,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_renataki();
     AddSC_boss_wushoolay();
     AddSC_instance_zulgurub();
+    AddSC_zulgurub();
     //AddSC_alterac_mountains();
     AddSC_arathi_highlands();
     AddSC_blasted_lands();

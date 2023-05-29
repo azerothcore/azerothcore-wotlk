@@ -213,6 +213,15 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 4;
     });
 
+    ApplySpellFix({
+        20424,  // Seal of Command
+        42463,  // Seal of Vengeance
+        53739   // Seal of Corruption
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
+    });
+
     // Spitfire Totem
     ApplySpellFix({ 38296 }, [](SpellInfo* spellInfo)
     {
@@ -334,12 +343,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Attributes &= ~SPELL_ATTR0_NOT_SHAPESHIFTED;   // with this spell atrribute aura can be stacked several times
     });
 
-    // Nether Portal - Perseverence
-    ApplySpellFix({ 30421 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_2].BasePoints += 30000;
-    });
-
     // Natural shapeshifter
     ApplySpellFix({ 16834, 16835 }, [](SpellInfo* spellInfo)
     {
@@ -434,13 +437,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         // SpellFamilyFlags[0] & 0x00000040 in SPELLFAMILY_DEATHKNIGHT is currently unused (3.3.5a)
         // this needs research on modifier applying rules, does not seem to be in Attributes fields
         spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000040, 0x00000000, 0x00000000);
-    });
-
-    // Idol of the Flourishing Life
-    ApplySpellFix({ 64949 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000000, 0x02000000, 0x00000000);
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_ADD_FLAT_MODIFIER;
     });
 
     ApplySpellFix({
@@ -719,8 +715,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     ApplySpellFix({
         5171,   // Slice and Dice
-        6774,   // Slice and Dice
-        1725    // Distract
+        6774    // Slice and Dice
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
@@ -1363,10 +1358,10 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].Amplitude = 15000;
     });
 
-    // Threatening Gaze
-    ApplySpellFix({ 24314 }, [](SpellInfo* spellInfo)
+    // Frightening Shout
+    ApplySpellFix({ 19134 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
     });
 
     // Isle of Conquest
@@ -4287,6 +4282,256 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 56541 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].MiscValueB = 844;
+    });
+
+    // Hakkar Cause Insanity
+    ApplySpellFix({ 24327 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Dispel = DISPEL_NONE;
+    });
+
+    // Summon Nightmare Illusions
+    ApplySpellFix({ 24681, 24728, 24729 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
+    // Blood Siphon
+    ApplySpellFix({ 24322, 24323 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_STUN;
+        spellInfo->Effects[EFFECT_2].Effect = 0;
+        spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
+        spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_MOVE;
+    });
+
+    // Place Fake Fur
+    ApplySpellFix({ 46085 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 8;
+    });
+
+    // Smash Mammoth Trap
+    ApplySpellFix({ 46201 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 8;
+    });
+
+    // Elemental Mastery
+    ApplySpellFix({ 16166 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000003, 0x00001000);
+    });
+
+    // Elemental Vulnerability
+    ApplySpellFix({ 28772 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Speed = 1;
+    });
+
+    // Find the Ancient Hero: Kill Credit
+    ApplySpellFix({ 25729 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_SUMMONER;
+    });
+
+    // Artorius Demonic Doom
+    ApplySpellFix({ 23298 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS;
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_CASTER_DAMAGE_MODIFIERS;
+    });
+
+    // Lash
+    ApplySpellFix({ 25852 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+    });
+
+    // Explosion
+    ApplySpellFix({ 5255 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Death's Respite
+    ApplySpellFix({ 67731, 68305 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
+    // Wyvern Sting DoT
+    ApplySpellFix({ 24131, 24134, 24135 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+    });
+
+     // Feed Pet
+    ApplySpellFix({ 1539, 51284 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_ALLOW_WHILE_SITTING;
+    });
+
+    // Judgement (Paladin T2 8P Bonus)
+    // Battlegear of Eternal Justice
+    ApplySpellFix({ 23591, 26135 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcFlags = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
+    });
+
+    // Gift of Arthas
+    ApplySpellFix({ 11371 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
+    });
+
+    // Refocus (Renataki's charm of beasts)
+    ApplySpellFix({ 24531 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+    });
+
+    // Collect Rookery Egg
+    ApplySpellFix({ 15958 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+    });
+
+    // WotLK Prologue Frozen Shade Visual, temp used to restore visual after Dispersion
+    ApplySpellFix({ 53444 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(27);
+    });
+
+    // Rental Racing Ram
+    ApplySpellFix({ 43883 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
+    });
+
+    // Summon Worm
+    ApplySpellFix({ 518, 25831, 25832 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
+    // Uppercut
+    ApplySpellFix({ 26007 }, [](SpellInfo* spellInfo)
+    {
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
+    });
+
+    // Digestive Acid (Temporary)
+    ApplySpellFix({ 26476 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Drums of War/Battle/Speed/Restoration
+    ApplySpellFix({ 35475, 35476, 35477, 35478 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ExcludeTargetAuraSpell = 51120;
+    });
+
+    // Slap!
+    ApplySpellFix({ 6754 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
+    // Summon Cauldron Stuff
+    ApplySpellFix({ 36549 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(28); // 5 seconds
+        spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_CASTER;
+    });
+
+    // Hunter's Mark
+    ApplySpellFix({ 31615 }, [](SpellInfo* spellInfo)
+    {
+        for (uint8 index = EFFECT_0; index <= EFFECT_1; ++index)
+        {
+            spellInfo->Effects[index].TargetA = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->Effects[index].TargetB = 0;
+        }
+    });
+
+    // Self Visual - Sleep Until Cancelled(DND)
+    ApplySpellFix({ 6606, 14915, 16093 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_SEATED;
+    });
+
+     // Cleansing Totem, Healing Stream Totem, Mana Tide Totem
+    ApplySpellFix({ 8171,52025, 52041, 52042, 52046, 52047, 52048, 52049, 52050, 58759, 58760, 58761, 39610, 39609 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+    // Game In Session
+    ApplySpellFix({ 39331 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+    });
+    // Death Ray Warning Visual, Death Ray Damage Visual
+    ApplySpellFix({ 63882, 63886 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
+    });
+
+    // Buffeting Winds of Susurrus
+    ApplySpellFix({ 32474 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(556); // 28 seconds
+    });
+
+    // Quest - Healing Salve
+    ApplySpellFix({ 29314 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
+    });
+
+    // Seed of Corruption
+    ApplySpellFix({ 27285, 47833, 47834 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_REFLECTION;
+    });
+
+    // Turn the Tables
+    ApplySpellFix({ 51627, 51628, 51629 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
+    });
+
+    // Absorb Life
+    ApplySpellFix({ 34239 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].ValueMultiplier = 1;
+    });
+
+    // Summon a Warp Rift in Void Ridge
+    ApplySpellFix({ 35036 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
+    });
+
+    // Hit Rating (Dungeon T3 - 2P Bonus - Wastewalker, Doomplate)
+    ApplySpellFix({ 37608, 37610 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(0);
+        spellInfo->Effects[EFFECT_0].MiscValue = 224;
+    });
+
+    // Target Fissures
+    ApplySpellFix({ 30745 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

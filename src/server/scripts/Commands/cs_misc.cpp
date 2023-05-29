@@ -44,7 +44,7 @@
 #include "Tokenize.h"
 #include "WeatherMgr.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -143,9 +143,9 @@ public:
         return commandTable;
     }
 
-    static bool HandleSkirmishCommand(ChatHandler* handler, std::string_view args)
+    static bool HandleSkirmishCommand(ChatHandler* handler, std::vector<std::string_view> args)
     {
-        auto tokens = Acore::Tokenize(args, ' ', true);
+        auto tokens = args;
 
         if (args.empty() || !tokens.size())
         {
@@ -1399,7 +1399,7 @@ public:
 
         if (location->empty() || *location == "inn")
         {
-            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
             return true;
         }
 
@@ -1966,7 +1966,7 @@ public:
             accId             = playerTarget->GetSession()->GetAccountId();
             money             = playerTarget->GetMoney();
             totalPlayerTime   = playerTarget->GetTotalPlayedTime();
-            level             = playerTarget->getLevel();
+            level             = playerTarget->GetLevel();
             latency           = playerTarget->GetSession()->GetLatency();
             raceid            = playerTarget->getRace();
             classid           = playerTarget->getClass();

@@ -27,7 +27,7 @@ class GuardAI : public ScriptedAI
 public:
     explicit GuardAI(Creature* creature);
 
-    static int Permissible(Creature const* creature);
+    static int32 Permissible(Creature const* creature);
 
     void Reset() override;
     void EnterEvadeMode(EvadeReason /*why*/) override;

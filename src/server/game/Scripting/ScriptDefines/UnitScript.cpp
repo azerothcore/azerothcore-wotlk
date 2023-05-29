@@ -53,11 +53,11 @@ void ScriptMgr::OnDamage(Unit* attacker, Unit* victim, uint32& damage)
     });
 }
 
-void ScriptMgr::ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage)
+void ScriptMgr::ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage, SpellInfo const* spellInfo)
 {
     ExecuteScript<UnitScript>([&](UnitScript* script)
     {
-        script->ModifyPeriodicDamageAurasTick(target, attacker, damage);
+        script->ModifyPeriodicDamageAurasTick(target, attacker, damage, spellInfo);
     });
 }
 
@@ -69,19 +69,19 @@ void ScriptMgr::ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage)
     });
 }
 
-void ScriptMgr::ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage)
+void ScriptMgr::ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage, SpellInfo const* spellInfo)
 {
     ExecuteScript<UnitScript>([&](UnitScript* script)
     {
-        script->ModifySpellDamageTaken(target, attacker, damage);
+        script->ModifySpellDamageTaken(target, attacker, damage, spellInfo);
     });
 }
 
-void ScriptMgr::ModifyHealRecieved(Unit* target, Unit* attacker, uint32& damage)
+void ScriptMgr::ModifyHealReceived(Unit* target, Unit* healer, uint32& heal, SpellInfo const* spellInfo)
 {
     ExecuteScript<UnitScript>([&](UnitScript* script)
     {
-        script->ModifyHealRecieved(target, attacker, damage);
+        script->ModifyHealReceived(target, healer, heal, spellInfo);
     });
 }
 
@@ -208,5 +208,45 @@ void ScriptMgr::OnUnitUpdate(Unit* unit, uint32 diff)
     ExecuteScript<UnitScript>([&](UnitScript* script)
     {
         script->OnUnitUpdate(unit, diff);
+    });
+}
+
+void ScriptMgr::OnDisplayIdChange(Unit* unit, uint32 displayId)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnDisplayIdChange(unit, displayId);
+    });
+}
+
+void ScriptMgr::OnUnitEnterEvadeMode(Unit* unit, uint8 evadeReason)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnUnitEnterEvadeMode(unit, evadeReason);
+    });
+}
+
+void ScriptMgr::OnUnitEnterCombat(Unit* unit, Unit* victim)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnUnitEnterCombat(unit, victim);
+    });
+}
+
+void ScriptMgr::OnUnitDeath(Unit* unit, Unit* killer)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnUnitDeath(unit, killer);
+    });
+}
+
+void ScriptMgr::OnAuraApply(Unit* unit, Aura* aura)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnAuraApply(unit, aura);
     });
 }

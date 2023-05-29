@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaBoundary.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "azjol_nerub.h"
@@ -34,6 +35,13 @@ ObjectData const creatureData[] =
     { NPC_HADRONOX,                 DATA_HADRONOX_EVENT                 }
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_KRIKTHIR_THE_GATEWATCHER_EVENT, new RectangleBoundary(400.0f, 580.0f, 623.5f, 810.0f) },
+    { DATA_HADRONOX_EVENT, new ZRangeBoundary(666.0f, 776.0f) },
+    { DATA_ANUBARAK_EVENT, new CircleBoundary(Position(550.6178f, 253.5917f), 26.0f) }
+};
+
 class instance_azjol_nerub : public InstanceMapScript
 {
 public:
@@ -43,7 +51,9 @@ public:
     {
         instance_azjol_nerub_InstanceScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, nullptr);
         };
@@ -91,39 +101,6 @@ public:
                 case GO_ANUBARAK_DOORS3:
                     AddDoor(go, false);
                     break;
-            }
-        }
-
-        bool SetBossState(uint32 id, EncounterState state) override
-        {
-            return InstanceScript::SetBossState(id, state);
-        }
-
-        std::string GetSaveData() override
-        {
-            std::ostringstream saveStream;
-            saveStream << "A N " << GetBossSaveData();
-            return saveStream.str();
-        }
-
-        void Load(const char* in) override
-        {
-            if( !in )
-                return;
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2;
-            if (dataHead1 == 'A' && dataHead2 == 'N')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
             }
         }
     };

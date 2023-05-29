@@ -24,19 +24,18 @@ enum Yells
 {
     SAY_TAUNT                       = 0,
     SAY_FREE                        = 1,
-    SAY_AGGRO                       = 2,
-    SAY_SLAY                        = 3,
-    SAY_BANISH                      = 4,
-    SAY_PHASE3                      = 5,
-    SAY_DEATH                       = 6,
+    SAY_SLAY                        = 2,
+    SAY_BANISH                      = 3,
+    SAY_PHASE3                      = 4,
+    SAY_DEATH                       = 5,
 };
 
 enum Emotes
 {
-    SAY_EMOTE_BEGIN                 = 7,
-    SAY_EMOTE_NEARLY                = 8,
-    SAY_EMOTE_FREE                  = 9,
-    SAY_EMOTE_NOVA                  = 10
+    SAY_EMOTE_BEGIN                 = 6,
+    SAY_EMOTE_NEARLY                = 7,
+    SAY_EMOTE_FREE                  = 8,
+    SAY_EMOTE_NOVA                  = 9
 };
 
 enum Spells
@@ -114,7 +113,8 @@ public:
             _Reset();
             me->CastSpell(me, SPELL_SHADOW_CAGE, true);
             me->SetReactState(REACT_PASSIVE);
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToPC(true);
         }
 
         void KilledUnit(Unit*  /*victim*/) override
@@ -134,10 +134,10 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events2.Reset();
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_EMOTE1, 0);
             events.ScheduleEvent(EVENT_EMOTE2, 60000);
             events.ScheduleEvent(EVENT_EMOTE3, 120000);
@@ -184,10 +184,10 @@ public:
                     Talk(SAY_FREE);
                     break;
                 case EVENT_ENTER_COMBAT:
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetImmuneToPC(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     events.ScheduleEvent(EVENT_CLEAVE, 9000);
-                    events.ScheduleEvent(EVENT_BLAST_NOVA, 60000);
                     events.ScheduleEvent(EVENT_BLAZE, 10000);
                     events.ScheduleEvent(EVENT_QUAKE, 40000);
                     events.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
@@ -202,7 +202,6 @@ public:
                     break;
                 case EVENT_BLAST_NOVA:
                     me->CastSpell(me, SPELL_BLAST_NOVA, false);
-                    events.ScheduleEvent(EVENT_BLAST_NOVA, 60000);
                     events.ScheduleEvent(EVENT_CANCEL_GRASP_CHECK, 12000);
                     events2.ScheduleEvent(EVENT_CHECK_GRASP, 0);
                     break;
@@ -218,6 +217,7 @@ public:
                     break;
                 case EVENT_QUAKE:
                     me->CastSpell(me, SPELL_QUAKE, false);
+                    events.ScheduleEvent(EVENT_BLAST_NOVA, 7000);
                     events.ScheduleEvent(EVENT_QUAKE, 50000);
                     break;
                 case EVENT_CHECK_HEALTH:

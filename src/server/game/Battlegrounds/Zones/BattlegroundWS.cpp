@@ -101,6 +101,10 @@ void BattlegroundWS::PostUpdateImpl(uint32 diff)
                     player->CastSpell(player, BG_WS_SPELL_BRUTAL_ASSAULT, true);
                 }
                 break;
+            case BG_WS_EVENT_DESPAWN_DOORS:
+                SpawnBGObject(BG_WS_OBJECT_DOOR_H_1, RESPAWN_ONE_DAY);
+                SpawnBGObject(BG_WS_OBJECT_DOOR_H_2, RESPAWN_ONE_DAY);
+                break;
         }
     }
 }
@@ -135,6 +139,7 @@ void BattlegroundWS::StartingEventOpenDoors()
     UpdateWorldState(BG_WS_STATE_TIMER_ACTIVE, 1);
     _bgEvents.ScheduleEvent(BG_WS_EVENT_UPDATE_GAME_TIME, 0);
     _bgEvents.ScheduleEvent(BG_WS_EVENT_NO_TIME_LEFT, BG_WS_TOTAL_GAME_TIME - 2 * MINUTE * IN_MILLISECONDS); // 27 - 2 = 25 minutes
+    _bgEvents.ScheduleEvent(BG_WS_EVENT_DESPAWN_DOORS, BG_WS_DOOR_DESPAWN_TIME);
 }
 
 void BattlegroundWS::AddPlayer(Player* player)

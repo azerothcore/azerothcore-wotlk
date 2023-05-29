@@ -63,7 +63,7 @@ enum ScriptTexts
     SAY_INTRO_ALLIANCE_1            = 0,
     SAY_INTRO_ALLIANCE_4            = 1,
     SAY_INTRO_ALLIANCE_5            = 2,
-    SAY_OUTRO_ALLIANCE_1            = 3, // TODO ALLIANCE OUTRO
+    SAY_OUTRO_ALLIANCE_1            = 3, /// @todo ALLIANCE OUTRO
     SAY_OUTRO_ALLIANCE_2            = 4,
     SAY_OUTRO_ALLIANCE_3            = 5,
     SAY_OUTRO_ALLIANCE_4            = 6,
@@ -251,7 +251,7 @@ public:
         void Reset() override
         {
             _Reset();
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToAll(true);
             me->SetReactState(REACT_DEFENSIVE);
             events.Reset();
             _introDone = false;
@@ -269,7 +269,7 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MARK_OF_THE_FALLEN_CHAMPION);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (!_introDone)
             {
@@ -294,11 +294,11 @@ public:
             Talk(SAY_AGGRO);
 
             events.Reset();
-            events.ScheduleEvent(EVENT_SUMMON_BLOOD_BEAST, 30000);
-            events.ScheduleEvent(EVENT_BERSERK, (IsHeroic() ? 360000 : 480000));
-            events.ScheduleEvent(EVENT_BOILING_BLOOD, 15500, 0);
-            events.ScheduleEvent(EVENT_BLOOD_NOVA, 17000, 0);
-            events.ScheduleEvent(EVENT_RUNE_OF_BLOOD, 20000, 0);
+            events.ScheduleEvent(EVENT_SUMMON_BLOOD_BEAST, 30s);
+            events.ScheduleEvent(EVENT_BERSERK, (IsHeroic() ? 6min : 8min));
+            events.ScheduleEvent(EVENT_BOILING_BLOOD, 15s + 500ms, 0);
+            events.ScheduleEvent(EVENT_BLOOD_NOVA, 17s, 0);
+            events.ScheduleEvent(EVENT_RUNE_OF_BLOOD, 20s, 0);
 
             _fallenChampionCastCount = 0;
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MARK_OF_THE_FALLEN_CHAMPION);
@@ -323,7 +323,7 @@ public:
 
         void AttackStart(Unit* victim) override
         {
-            if (!_introDone || me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
+            if (!_introDone || me->IsImmuneToPC())
                 return;
 
             ScriptedAI::AttackStart(victim);
@@ -426,9 +426,9 @@ public:
                             for (uint32 i25 = 0; i25 < 3; ++i25)
                                 DoCast(me, SPELL_SUMMON_BLOOD_BEAST_25_MAN + i25);
                         Talk(SAY_BLOOD_BEASTS);
-                        events.ScheduleEvent(EVENT_SUMMON_BLOOD_BEAST, 40000);
+                        events.ScheduleEvent(EVENT_SUMMON_BLOOD_BEAST, 40s);
                         if (IsHeroic())
-                            events.ScheduleEvent(EVENT_BLOOD_BEAST_SCENT_OF_BLOOD, 10000);
+                            events.ScheduleEvent(EVENT_BLOOD_BEAST_SCENT_OF_BLOOD, 10s);
                         break;
                     case EVENT_BLOOD_BEAST_SCENT_OF_BLOOD:
                         Talk(EMOTE_SCENT_OF_BLOOD);
@@ -437,16 +437,16 @@ public:
                     case EVENT_BLOOD_NOVA:
                         {
                             me->CastSpell((Unit*)nullptr, SPELL_BLOOD_NOVA_TRIGGER, false);
-                            events.ScheduleEvent(EVENT_BLOOD_NOVA, urand(20000, 25000));
+                            events.ScheduleEvent(EVENT_BLOOD_NOVA, 20s, 25s);
                             break;
                         }
                     case EVENT_RUNE_OF_BLOOD:
                         DoCastVictim(SPELL_RUNE_OF_BLOOD);
-                        events.ScheduleEvent(EVENT_RUNE_OF_BLOOD, urand(20000, 25000));
+                        events.ScheduleEvent(EVENT_RUNE_OF_BLOOD, 20s, 25s);
                         break;
                     case EVENT_BOILING_BLOOD:
                         me->CastSpell((Unit*)nullptr, SPELL_BOILING_BLOOD, false);
-                        events.ScheduleEvent(EVENT_BOILING_BLOOD, urand(15000, 20000));
+                        events.ScheduleEvent(EVENT_BOILING_BLOOD, 15s, 20s);
                         break;
                     case EVENT_BERSERK:
                         DoCast(me, SPELL_BERSERK);
@@ -465,7 +465,7 @@ public:
             switch (action)
             {
                 case ACTION_MARK_OF_THE_FALLEN_CHAMPION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, -SPELL_MARK_OF_THE_FALLEN_CHAMPION))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_MARK_OF_THE_FALLEN_CHAMPION))
                     {
                         ++_fallenChampionCastCount;
                         me->CastSpell(target, SPELL_MARK_OF_THE_FALLEN_CHAMPION, false);
@@ -561,8 +561,8 @@ public:
                         me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         Talk(SAY_INTRO_HORDE_1);
                         _events.SetPhase(PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5000, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 18500, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5s, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 18s + 500ms, 0, PHASE_INTRO_H);
                         _instance->HandleGameObject(_instance->GetGuidData(GO_SAURFANG_S_DOOR), true);
 
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
@@ -633,13 +633,13 @@ public:
                     case POINT_FIRST_STEP:
                         me->SetWalk(false);
                         Talk(SAY_INTRO_HORDE_3);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_4, 6500, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_5, 15500, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_6, 29500, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_7, 43800, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_8, 47000, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_9, 46700 + 1000 + 500, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_FINISH,  46700 + 1000 + 9000, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_4, 6500ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_5, 15s + 500ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_6, 29s + 500ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_7, 43s + 800ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_8, 47s, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_9, 48s + 200ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_FINISH,  56s + 700ms, 0, PHASE_INTRO_H);
                         break;
                     /*case POINT_CORPSE:
                         if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
@@ -707,7 +707,7 @@ public:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                     {
                         deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
-                        deathbringer->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                        deathbringer->SetImmuneToPC(false);
                         if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
                             deathbringer->AI()->AttackStart(target);
                     }
@@ -750,8 +750,8 @@ public:
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready to go, High Overlord. The Lich King must fall!", 631, -ACTION_START_EVENT);
-            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+            AddGossipItemFor(player, 10953, 0, GOSSIP_SENDER_INFO, -ACTION_START_EVENT);
+            SendGossipMenuFor(player, player->GetGossipTextId(10953, creature), creature->GetGUID());
         }
 
         return true;
@@ -822,9 +822,9 @@ public:
                         me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         Talk(SAY_INTRO_ALLIANCE_1);
                         _events.SetPhase(PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 2500, 0, PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_3, 20000, 0, PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 2500 + 17500 + 9500, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 2500ms, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_3, 20s, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 29s + 500ms, 0, PHASE_INTRO_A);
                         _instance->HandleGameObject(_instance->GetGuidData(GO_SAURFANG_S_DOOR), true);
 
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
@@ -892,10 +892,10 @@ public:
                     case POINT_FIRST_STEP:
                         me->SetWalk(false);
                         Talk(SAY_INTRO_ALLIANCE_4);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_5, 5000, 0, PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_6, 6500 + 500, 0, PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_7, 6500 + 500 + 2000, 0, PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_FINISH, 6500 + 500 + 2000 + 5000, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_5, 5s, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_6, 7s, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_7, 9s, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_FINISH, 14s, 0, PHASE_INTRO_A);
                         break;
                     default:
                         break;
@@ -945,7 +945,7 @@ public:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                     {
                         deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
-                        deathbringer->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                        deathbringer->SetImmuneToPC(false);
                         if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
                             deathbringer->AI()->AttackStart(target);
                     }
@@ -964,8 +964,8 @@ public:
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
         {
-            AddGossipItemFor(player, 0, "Let it begin...", 631, -ACTION_START_EVENT + 1);
-            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+            AddGossipItemFor(player, 10933, 0, GOSSIP_SENDER_INFO, -ACTION_START_EVENT + 1);
+            SendGossipMenuFor(player, player->GetGossipTextId(10933, creature), creature->GetGUID());
         }
 
         return true;

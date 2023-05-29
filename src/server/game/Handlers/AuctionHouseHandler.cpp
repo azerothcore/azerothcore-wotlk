@@ -53,7 +53,7 @@ void WorldSession::HandleAuctionHelloOpcode(WorldPacket& recvData)
 //this void causes that auction window is opened
 void WorldSession::SendAuctionHello(ObjectGuid guid, Creature* unit)
 {
-    if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ))
+    if (GetPlayer()->GetLevel() < sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ))
     {
         SendNotification(GetAcoreString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
         return;
@@ -422,6 +422,12 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
     AuctionEntry* auction = auctionHouse->GetAuction(auctionId);
     Player* player = GetPlayer();
 
+    if (!sScriptMgr->CanPlaceAuctionBid(player, auction))
+    {
+        SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_RESTRICTED_ACCOUNT);
+        return;
+    }
+
     if (!auction || auction->owner == player->GetGUID())
     {
         //you cannot bid your own auction:
@@ -506,6 +512,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
         sAuctionMgr->SendAuctionSalePendingMail(auction, trans);
         sAuctionMgr->SendAuctionSuccessfulMail(auction, trans);
         sAuctionMgr->SendAuctionWonMail(auction, trans);
+        sScriptMgr->OnAuctionSuccessful(auctionHouse, auction);
 
         SendAuctionCommandResult(auction->Id, AUCTION_PLACE_BID, ERR_AUCTION_OK);
 

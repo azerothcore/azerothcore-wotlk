@@ -43,6 +43,7 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             memset(&_encounters, 0, sizeof(_encounters));
         }
 
@@ -101,31 +102,18 @@ public:
             return 0;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            std::ostringstream saveStream;
-            saveStream << "U D " << _encounters[DATA_IRONAYA_DOORS] << ' ' << _encounters[DATA_STONE_KEEPERS] << ' ' << _encounters[DATA_ARCHAEDAS];
-            return saveStream.str();
+            data >> _encounters[DATA_IRONAYA_DOORS];
+            data >> _encounters[DATA_STONE_KEEPERS];
+            data >> _encounters[DATA_ARCHAEDAS];
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-                return;
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'U' && dataHead2 == 'D')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    loadStream >> _encounters[i];
-                    if (_encounters[i] == IN_PROGRESS)
-                        _encounters[i] = NOT_STARTED;
-                }
-            }
+            data << _encounters[DATA_IRONAYA_DOORS] << ' '
+                << _encounters[DATA_STONE_KEEPERS] << ' '
+                << _encounters[DATA_ARCHAEDAS];
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -201,14 +189,14 @@ public:
         {
             Creature* target = GetUnitOwner()->ToCreature();
             target->SetReactState(REACT_PASSIVE);
-            target->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->SetImmuneToAll(true);
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Creature* target = GetUnitOwner()->ToCreature();
             target->SetReactState(REACT_AGGRESSIVE);
-            target->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->SetImmuneToAll(false);
         }
 
         void Register() override

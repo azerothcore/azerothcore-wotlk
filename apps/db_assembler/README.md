@@ -1,5 +1,7 @@
 ## Description
 
+**ATTENTION:** this tool is not supported anymore. It has been replaced by the **dbimport** tools integrated in AC server sources
+
 This script allows you to assemble all sql files into one so you can easily import it to your databases (or use the main script to import directly). By default, it creates the merged files in `/env/dist`.
 
 ## How to use:
@@ -15,7 +17,7 @@ Just run it to display the options.
 Note: You can even use actions directly by command lines specifying the option.
 Ex:
 
-    ./db_assembler.sh 1  
+    ./db_assembler.sh 1
 
 It will merge all sql files without an interactive menu.
 

@@ -32,6 +32,7 @@ union u_map_fcc
 //
 // File version chunk
 //
+// cppcheck-suppress ctuOneDefinitionRuleViolation
 struct file_MVER
 {
     union

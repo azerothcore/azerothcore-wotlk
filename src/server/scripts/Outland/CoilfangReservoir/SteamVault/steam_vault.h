@@ -21,14 +21,23 @@
 #include "CreatureAIImpl.h"
 #include "PassiveAI.h"
 
+#define DataHeaders "SV"
+
+uint32 const EncounterCount = 3;
+
 #define SteamVaultScriptName "instance_steam_vault"
 
 enum steamVault
 {
-    TYPE_HYDROMANCER_THESPIA            = 0,
-    TYPE_MEKGINEER_STEAMRIGGER          = 1,
-    TYPE_WARLORD_KALITHRESH             = 2,
-    MAX_ENCOUNTER                       = 3
+    DATA_HYDROMANCER_THESPIA            = 0,
+    DATA_MEKGINEER_STEAMRIGGER          = 1,
+    DATA_WARLORD_KALITHRESH             = 2,
+    MAX_ENCOUNTER                       = 3,
+
+    DATA_ACCESS_PANEL_HYDROMANCER       = 4,
+    DATA_ACCESS_PANEL_MEKGINEER         = 5,
+    DATA_MAIN_CHAMBERS_DOOR             = 6,
+    DATA_DOOR_CONTROLLER                = 7
 };
 
 enum steamVaultNPCGO
@@ -39,6 +48,13 @@ enum steamVaultNPCGO
 
     NPC_MEKGINEER_STEAMRIGGER           = 17796,
     NPC_WARLORD_KALITHRESH              = 17798,
+    NPC_DOOR_CONTROLLER                 = 20926
+};
+
+enum Creatures
+{
+    NPC_NAGA_DISTILLER                  = 17954,
+    NPC_THESPIA_WATER_ELEMENTAL         = 17917
 };
 
 template <class AI, class T>
@@ -46,5 +62,7 @@ inline AI* GetSteamVaultAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, SteamVaultScriptName);
 }
+
+#define RegisterSteamvaultCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetSteamVaultAI)
 
 #endif

@@ -38,9 +38,9 @@ namespace lfg
 
     enum LfgOptions
     {
-        LFG_OPTION_ENABLE_DUNGEON_FINDER                = 0x01,
-        LFG_OPTION_ENABLE_RAID_BROWSER                  = 0x02,
-        LFG_OPTION_ENABLE_SEASONAL_BOSSES               = 0x04
+        LFG_OPTION_ENABLE_DUNGEON_FINDER             = 0x01,
+        LFG_OPTION_ENABLE_RAID_BROWSER               = 0x02,
+        LFG_OPTION_ENABLE_SEASONAL_BOSSES            = 0x04
     };
 
     enum LFGMgrEnum
@@ -330,7 +330,7 @@ namespace lfg
         Quest const* quest;
     };
 
-    /// Reward info
+    // Reward info
     struct LfgReward
     {
         LfgReward(uint32 _maxLevel = 0, uint32 _firstQuest = 0, uint32 _otherQuest = 0):
@@ -341,35 +341,35 @@ namespace lfg
         uint32 otherQuest;
     };
 
-    /// Stores player data related to proposal to join
+    // Stores player data related to proposal to join
     struct LfgProposalPlayer
     {
         LfgProposalPlayer() = default;
-        uint8 role{0};                                            ///< Proposed role
-        LfgAnswer accept{LFG_ANSWER_PENDING};                                      ///< Accept status (-1 not answer | 0 Not agree | 1 agree)
+        uint8 role{0};                                         ///< Proposed role
+        LfgAnswer accept{LFG_ANSWER_PENDING};                  ///< Accept status (-1 not answer | 0 Not agree | 1 agree)
         ObjectGuid group;                                      ///< Original group guid. 0 if no original group
     };
 
-    /// Stores group data related to proposal to join
+    // Stores group data related to proposal to join
     struct LfgProposal
     {
         LfgProposal(uint32 dungeon = 0):  dungeonId(dungeon)
         { }
 
-        uint32 id{0};                                             ///< Proposal Id
+        uint32 id{0};                                          ///< Proposal Id
         uint32 dungeonId;                                      ///< Dungeon to join
-        LfgProposalState state{LFG_PROPOSAL_INITIATING};                                ///< State of the proposal
+        LfgProposalState state{LFG_PROPOSAL_INITIATING};       ///< State of the proposal
         ObjectGuid group;                                      ///< Proposal group (0 if new)
         ObjectGuid leader;                                     ///< Leader guid.
-        time_t cancelTime{0};                                     ///< Time when we will cancel this proposal
-        uint32 encounters{0};                                     ///< Dungeon Encounters
-        bool isNew{true};                                            ///< Determines if it's new group or not
+        time_t cancelTime{0};                                  ///< Time when we will cancel this proposal
+        uint32 encounters{0};                                  ///< Dungeon Encounters
+        bool isNew{true};                                      ///< Determines if it's new group or not
         Lfg5Guids queues;                                      ///< Queue Ids to remove/readd
         LfgGuidList showorder;                                 ///< Show order in update window
         LfgProposalPlayerContainer players;                    ///< Players data
     };
 
-    /// Stores all rolecheck info of a group that wants to join
+    // Stores all rolecheck info of a group that wants to join
     struct LfgRoleCheck
     {
         time_t cancelTime;                                     ///< Time when the rolecheck will fail
@@ -380,7 +380,7 @@ namespace lfg
         ObjectGuid leader;                                     ///< Leader of the group
     };
 
-    /// Stores information of a current vote to kick someone from a group
+    // Stores information of a current vote to kick someone from a group
     struct LfgPlayerBoot
     {
         time_t cancelTime;                                     ///< Time left to vote
@@ -394,10 +394,10 @@ namespace lfg
     {
         LFGDungeonData():  name("")
         { }
-        LFGDungeonData(LFGDungeonEntry const* dbc): id(dbc->ID), name(dbc->name[0]), map(dbc->map),
-            type(dbc->type), expansion(dbc->expansion), group(dbc->grouptype),
-            minlevel(dbc->minlevel), maxlevel(dbc->maxlevel), difficulty(Difficulty(dbc->difficulty)),
-            seasonal(dbc->flags & LFG_FLAG_SEASONAL), x(0.0f), y(0.0f), z(0.0f), o(0.0f)
+        LFGDungeonData(LFGDungeonEntry const* dbc) : id(dbc->ID), name(dbc->Name[0]), map(dbc->MapID),
+            type(dbc->TypeID), expansion(uint8(dbc->ExpansionLevel)), group(uint8(dbc->GroupID)),
+            minlevel(uint8(dbc->MinLevel)), maxlevel(uint8(dbc->MaxLevel)), difficulty(Difficulty(dbc->Difficulty)),
+            seasonal((dbc->Flags & LFG_FLAG_SEASONAL) != 0), x(0.0f), y(0.0f), z(0.0f), o(0.0f)
         { }
 
         uint32 id{0};
@@ -491,7 +491,7 @@ namespace lfg
         /// Get leader of the group (using internal data)
         ObjectGuid GetLeader(ObjectGuid guid);
         /// Initializes locked dungeons for given player (called at login or level change)
-        void InitializeLockedDungeons(Player* player, uint8 level = 0);
+        void InitializeLockedDungeons(Player* player, Group const* group = nullptr);
         /// Sets player team
         void SetTeam(ObjectGuid guid, TeamId teamId);
         /// Sets player group

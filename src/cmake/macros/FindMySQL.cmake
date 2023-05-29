@@ -170,6 +170,7 @@ find_path(MYSQL_INCLUDE_DIR
     /usr/local/include
     /usr/local/include/mysql
     /usr/local/mysql/include
+    "C:/tools/mysql/current/include" # chocolatey package
     "C:/Program Files/MySQL/MySQL Server 8.0/include"
     "C:/Program Files/MySQL/MySQL Server 5.7/include"
     "C:/Program Files/MySQL/include"
@@ -209,6 +210,7 @@ if( WIN32 )
       libmysql
     PATHS
       ${MYSQL_ADD_LIBRARIES_PATH}
+      "C:/tools/mysql/current/lib" # chocolatey package
       "C:/Program Files/MySQL/MySQL Server 8.0/lib"
       "C:/Program Files/MySQL/MySQL Server 8.0/lib/opt"
       "C:/Program Files/MySQL/MySQL Server 5.7/lib/opt"
@@ -261,6 +263,7 @@ endif( UNIX )
 if( WIN32 )
   find_program(MYSQL_EXECUTABLE mysql
     PATHS
+      "C:/tools/mysql/current/bin" # chocolatey package
       "${PROGRAM_FILES_64}/MySQL/MySQL Server 8.0/bin"
       "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/bin"
       "${PROGRAM_FILES_64}/MySQL/MySQL Server 8.0/bin/opt"

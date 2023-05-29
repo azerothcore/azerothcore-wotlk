@@ -88,10 +88,12 @@ public:
         EVADE_REASON_NO_HOSTILES,       // the creature's threat list is empty
         EVADE_REASON_BOUNDARY,          // the creature has moved outside its evade boundary
         EVADE_REASON_SEQUENCE_BREAK,    // this is a boss and the pre-requisite encounters for engaging it are not defeated yet
+        EVADE_REASON_NO_PATH,           // the creature was unable to reach its target for over 5 seconds
         EVADE_REASON_OTHER
     };
 
-    void Talk(uint8 id, WorldObject const* whisperTarget = nullptr);
+    void Talk(uint8 id, WorldObject const* whisperTarget = nullptr, Milliseconds delay = 0s);
+    void Talk(uint8 id, Milliseconds delay) { Talk(id, nullptr, delay); }
 
     explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), m_MoveInLineOfSight_locked(false) { }
 
@@ -114,8 +116,10 @@ public:
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
-    // Called for reaction when initially engaged
-    virtual void EnterCombat(Unit* /*victim*/) {}
+    /**
+     * @brief Called for reaction when initially engaged
+     */
+    virtual void JustEngagedWith(Unit* /*who*/) {}
 
     // Called when the creature is killed
     virtual void JustDied(Unit* /*killer*/) {}
@@ -125,7 +129,7 @@ public:
 
     // Called when the creature summon successfully other creature
     virtual void JustSummoned(Creature* /*summon*/) {}
-    virtual void IsSummonedBy(Unit* /*summoner*/) {}
+    virtual void IsSummonedBy(WorldObject* /*summoner*/) {}
 
     virtual void SummonedCreatureDespawn(Creature* /*summon*/) {}
     virtual void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) {}
@@ -207,6 +211,11 @@ public:
 
     static bool IsInBounds(CreatureBoundary const& boundary, Position const* who);
     bool IsInBoundary(Position const* who = nullptr) const;
+
+    virtual void CalculateThreat(Unit* /*hatedUnit*/, float& /*threat*/, SpellInfo const* /*threatSpell*/) { }
+
+    virtual bool OnTeleportUnreacheablePlayer(Player* /*player*/) { return false; }
+
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);
 
@@ -219,7 +228,7 @@ private:
     bool m_MoveInLineOfSight_locked;
 };
 
-enum Permitions
+enum Permitions : int32
 {
     PERMIT_BASE_NO                 = -1,
     PERMIT_BASE_IDLE               = 1,

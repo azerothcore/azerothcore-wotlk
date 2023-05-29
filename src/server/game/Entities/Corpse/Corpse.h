@@ -54,6 +54,8 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
+    void BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const override;
+
     bool Create(ObjectGuid::LowType guidlow);
     bool Create(ObjectGuid::LowType guidlow, Player* owner);
 

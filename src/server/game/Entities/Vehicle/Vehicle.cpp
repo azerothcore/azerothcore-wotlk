@@ -109,8 +109,10 @@ void Vehicle::Uninstall()
     LOG_DEBUG("vehicles", "Vehicle::Uninstall {}", _me->GetGUID().ToString());
     RemoveAllPassengers();
 
-    if (GetBase()->GetTypeId() == TYPEID_UNIT)
+    if (_me && _me->GetTypeId() == TYPEID_UNIT)
+    {
         sScriptMgr->OnUninstall(this);
+    }
 }
 
 void Vehicle::Reset(bool evading /*= false*/)
@@ -342,6 +344,9 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         ASSERT(seat->second.IsEmpty());
     }
 
+    if (!seat->second.SeatInfo)
+        return false;
+
     LOG_DEBUG("vehicles", "Unit {} enter vehicle entry {} id {} ({}) seat {}",
         unit->GetName(), _me->GetEntry(), _vehicleInfo->m_ID, _me->GetGUID().ToString(), (int32)seat->first);
 
@@ -486,11 +491,11 @@ void Vehicle::RemovePassenger(Unit* unit)
     if (_me->IsFlying() && !_me->GetInstanceId() && unit->GetTypeId() == TYPEID_PLAYER && !(unit->ToPlayer()->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT) && _me->GetEntry() != 30275 /*NPC_WILD_WYRM*/)
         _me->CastSpell(unit, VEHICLE_SPELL_PARACHUTE, true);
 
+    if (_me->GetTypeId() == TYPEID_UNIT)
+        sScriptMgr->OnRemovePassenger(this, unit);
+
     if (_me->GetTypeId() == TYPEID_UNIT && _me->ToCreature()->IsAIEnabled)
         _me->ToCreature()->AI()->PassengerBoarded(unit, seat->first, false);
-
-    if (GetBase()->GetTypeId() == TYPEID_UNIT)
-        sScriptMgr->OnRemovePassenger(this, unit);
 }
 
 void Vehicle::RelocatePassengers()

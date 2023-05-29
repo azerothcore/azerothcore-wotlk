@@ -100,7 +100,7 @@ public:
             return false;
         }
 
-        if (sObjectMgr->IsReservedName(guildName) || !sObjectMgr->IsValidCharterName(guildName))
+        if (sObjectMgr->IsReservedName(guildName) || sObjectMgr->IsProfanityName(guildName) || !sObjectMgr->IsValidCharterName(guildName))
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);

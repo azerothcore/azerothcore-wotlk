@@ -197,6 +197,7 @@ bool LootItemStorage::LoadStoredLoot(Item* item, Player* player)
             li.randomPropertyId = it2->randomPropertyId;
             li.randomSuffix = it2->randomSuffix;
             li.rollWinnerGUID = ObjectGuid::Empty;
+            li.groupid = 0;
 
             // Copy the extra loot conditions from the item in the loot template
             lt->CopyConditions(&li, it2->conditionLootId);

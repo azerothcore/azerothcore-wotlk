@@ -63,7 +63,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         _lastTargetPosition.reset();
         if (Creature* cOwner2 = owner->ToCreature())
         {
-            cOwner2->SetCannotReachTarget(false);
+            cOwner2->SetCannotReachTarget();
         }
 
         return true;
@@ -91,12 +91,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         if (i_recalculateTravel && PositionOkay(owner, target, _movingTowards ? maxTarget : Optional<float>(), angle))
         {
-            i_recalculateTravel = false;
-            i_path = nullptr;
             if (Creature* cOwner2 = owner->ToCreature())
             {
-                cOwner2->SetCannotReachTarget(false);
+                cOwner2->SetCannotReachTarget();
             }
+
+            i_recalculateTravel = false;
+            i_path = nullptr;
 
             owner->StopMoving();
             owner->SetInFront(target);
@@ -107,14 +108,28 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && owner->movespline->Finalized())
     {
-        i_recalculateTravel = false;
-        i_path = nullptr;
         owner->ClearUnitState(UNIT_STATE_CHASE_MOVE);
         owner->SetInFront(target);
         MovementInform(owner);
 
         if (owner->IsWithinMeleeRange(this->i_target.getTarget()))
+        {
             owner->Attack(this->i_target.getTarget(), true);
+            if (Creature* cOwner2 = owner->ToCreature())
+            {
+                cOwner2->SetCannotReachTarget();
+            }
+        }
+        else if (i_path && i_path->GetPathType() & PATHFIND_INCOMPLETE)
+        {
+            if (Creature* cOwner2 = owner->ToCreature())
+            {
+                cOwner2->SetCannotReachTarget(this->i_target.getTarget()->GetGUID());
+            }
+        }
+
+        i_recalculateTravel = false;
+        i_path = nullptr;
     }
 
     if (_lastTargetPosition && i_target->GetPosition() == _lastTargetPosition.value() && mutualChase == _mutualChase)
@@ -123,7 +138,14 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     _lastTargetPosition = i_target->GetPosition();
 
     if (PositionOkay(owner, target, maxRange, angle) && !owner->HasUnitState(UNIT_STATE_CHASE_MOVE))
+    {
+        if (Creature* cOwner2 = owner->ToCreature())
+        {
+            cOwner2->SetCannotReachTarget();
+        }
+
         return true;
+    }
 
     float tarX, tarY, tarZ;
     target->GetPosition(tarX, tarY, tarZ);
@@ -139,7 +161,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         // can we get to the target?
         if (cOwner && !target->isInAccessiblePlaceFor(cOwner))
         {
-            cOwner->SetCannotReachTarget(true);
+            cOwner->SetCannotReachTarget(target->GetGUID());
             cOwner->StopMoving();
             i_path = nullptr;
             return true;
@@ -176,7 +198,10 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
     {
         if (cOwner)
-            cOwner->SetCannotReachTarget(true);
+        {
+            cOwner->SetCannotReachTarget(target->GetGUID());
+        }
+
         return true;
     }
 
@@ -184,22 +209,24 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         i_path->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), maxTarget);
 
     if (cOwner)
-        cOwner->SetCannotReachTarget(false);
+    {
+        cOwner->SetCannotReachTarget();
+    }
 
     bool walk = false;
     if (cOwner && !cOwner->IsPet())
     {
         switch (cOwner->GetMovementTemplate().GetChase())
         {
-        case CreatureChaseMovementType::CanWalk:
-            if (owner->IsWalking())
+            case CreatureChaseMovementType::CanWalk:
+                if (owner->IsWalking())
+                    walk = true;
+                break;
+            case CreatureChaseMovementType::AlwaysWalk:
                 walk = true;
-            break;
-        case CreatureChaseMovementType::AlwaysWalk:
-            walk = true;
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
     }
 
@@ -239,7 +266,9 @@ void ChaseMovementGenerator<T>::DoFinalize(T* owner)
 {
     owner->ClearUnitState(UNIT_STATE_CHASE | UNIT_STATE_CHASE_MOVE);
     if (Creature* cOwner = owner->ToCreature())
-        cOwner->SetCannotReachTarget(false);
+    {
+        cOwner->SetCannotReachTarget();
+    }
 }
 
 template<class T>
@@ -267,7 +296,13 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
     if (!owner->IsInCombat() && !owner->IsVehicle() && !owner->HasUnitFlag(UNIT_FLAG_POSSESSED) &&
         (owner->IsPet() || owner->IsGuardian() || owner->GetGUID() == target->GetCritterGUID() || owner->GetCharmerOrOwnerGUID() == target->GetGUID()))
     {
-        UnitMoveType moveType = Movement::SelectSpeedType(target->GetUnitMovementFlags());
+        uint32 moveFlags = target->GetUnitMovementFlags();
+        if (target->movespline->isWalking())
+        {
+            moveFlags |= MOVEMENTFLAG_WALKING;
+        }
+
+        UnitMoveType moveType = Movement::SelectSpeedType(moveFlags);
         speed = std::max(target->GetSpeed(moveType), owner->GetSpeed(moveType));
 
         if (playerPet)
@@ -474,8 +509,8 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(i_path->GetPath());
-        init.SetWalk(target->IsWalking());
-        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian() && target->GetTypeId() == TYPEID_PLAYER))
+        init.SetWalk(target->IsWalking() || target->movespline->isWalking());
+        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
             init.SetVelocity(*velocity);
         init.Launch();
     }

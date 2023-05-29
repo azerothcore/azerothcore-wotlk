@@ -1,56 +1,57 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.creaturemodeldata_dbc
+-- Dumping structure for table acore_world.creaturemodeldata_dbc
 DROP TABLE IF EXISTS `creaturemodeldata_dbc`;
 CREATE TABLE IF NOT EXISTS `creaturemodeldata_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Flags` INT NOT NULL DEFAULT 0,
-  `ModelName` VARCHAR(100) DEFAULT NULL,
-  `SizeClass` INT NOT NULL DEFAULT 0,
-  `ModelScale` float NOT NULL DEFAULT 0,
-  `BloodID` INT NOT NULL DEFAULT 0,
-  `FootprintTextureID` INT NOT NULL DEFAULT 0,
-  `FootprintTextureLength` float NOT NULL DEFAULT 0,
-  `FootprintTextureWidth` float NOT NULL DEFAULT 0,
-  `FootprintParticleScale` float NOT NULL DEFAULT 0,
-  `FoleyMaterialID` INT NOT NULL DEFAULT 0,
-  `FootstepShakeSize` INT NOT NULL DEFAULT 0,
-  `DeathThudShakeSize` INT NOT NULL DEFAULT 0,
-  `SoundID` INT NOT NULL DEFAULT 0,
-  `CollisionWidth` float NOT NULL DEFAULT 0,
-  `CollisionHeight` float NOT NULL DEFAULT 0,
-  `MountHeight` float NOT NULL DEFAULT 0,
-  `GeoBoxMinX` float NOT NULL DEFAULT 0,
-  `GeoBoxMinY` float NOT NULL DEFAULT 0,
-  `GeoBoxMinZ` float NOT NULL DEFAULT 0,
-  `GeoBoxMaxX` float NOT NULL DEFAULT 0,
-  `GeoBoxMaxY` float NOT NULL DEFAULT 0,
-  `GeoBoxMaxZ` float NOT NULL DEFAULT 0,
-  `WorldEffectScale` float NOT NULL DEFAULT 0,
-  `AttachedEffectScale` float NOT NULL DEFAULT 0,
-  `MissileCollisionRadius` float NOT NULL DEFAULT 0,
-  `MissileCollisionPush` float NOT NULL DEFAULT 0,
-  `MissileCollisionRaise` float NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Flags` int NOT NULL DEFAULT '0',
+  `ModelName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `SizeClass` int NOT NULL DEFAULT '0',
+  `ModelScale` float NOT NULL DEFAULT '0',
+  `BloodID` int NOT NULL DEFAULT '0',
+  `FootprintTextureID` int NOT NULL DEFAULT '0',
+  `FootprintTextureLength` float NOT NULL DEFAULT '0',
+  `FootprintTextureWidth` float NOT NULL DEFAULT '0',
+  `FootprintParticleScale` float NOT NULL DEFAULT '0',
+  `FoleyMaterialID` int NOT NULL DEFAULT '0',
+  `FootstepShakeSize` int NOT NULL DEFAULT '0',
+  `DeathThudShakeSize` int NOT NULL DEFAULT '0',
+  `SoundID` int NOT NULL DEFAULT '0',
+  `CollisionWidth` float NOT NULL DEFAULT '0',
+  `CollisionHeight` float NOT NULL DEFAULT '0',
+  `MountHeight` float NOT NULL DEFAULT '0',
+  `GeoBoxMinX` float NOT NULL DEFAULT '0',
+  `GeoBoxMinY` float NOT NULL DEFAULT '0',
+  `GeoBoxMinZ` float NOT NULL DEFAULT '0',
+  `GeoBoxMaxX` float NOT NULL DEFAULT '0',
+  `GeoBoxMaxY` float NOT NULL DEFAULT '0',
+  `GeoBoxMaxZ` float NOT NULL DEFAULT '0',
+  `WorldEffectScale` float NOT NULL DEFAULT '0',
+  `AttachedEffectScale` float NOT NULL DEFAULT '0',
+  `MissileCollisionRadius` float NOT NULL DEFAULT '0',
+  `MissileCollisionPush` float NOT NULL DEFAULT '0',
+  `MissileCollisionRaise` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.creaturemodeldata_dbc: 0 rows
+-- Dumping data for table acore_world.creaturemodeldata_dbc: ~0 rows (approximately)
 DELETE FROM `creaturemodeldata_dbc`;
-/*!40000 ALTER TABLE `creaturemodeldata_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `creaturemodeldata_dbc` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

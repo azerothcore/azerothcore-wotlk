@@ -86,28 +86,29 @@ bool BattlegroundQueue::SelectionPool::KickGroup(const uint32 size)
 
     // find last group with proper size or largest
     bool foundProper = false;
-    auto groupToKick = SelectedGroups.begin();
-    for (auto& itr = groupToKick; itr != SelectedGroups.end(); ++itr)
+    GroupQueueInfo* groupToKick{ SelectedGroups.front() };
+
+    for (auto const& gInfo : SelectedGroups)
     {
         // if proper size - overwrite to kick last one
-        if (std::abs(int32((*itr)->Players.size()) - (int32)size) <= 1)
+        if (std::abs(int32(gInfo->Players.size()) - (int32)size) <= 1)
         {
-            groupToKick = itr;
+            groupToKick = gInfo;
             foundProper = true;
         }
-        else if (!foundProper && (*itr)->Players.size() >= (*groupToKick)->Players.size())
-            groupToKick = itr;
+        else if (!foundProper && gInfo->Players.size() >= groupToKick->Players.size())
+            groupToKick = gInfo;
     }
 
     // remove selected from pool
-    GroupQueueInfo* ginfo = (*groupToKick);
-    SelectedGroups.erase(groupToKick);
-    PlayerCount -= ginfo->Players.size();
+    auto playersCountInGroup{ groupToKick->Players.size() };
+    PlayerCount -= playersCountInGroup;
+    std::erase(SelectedGroups, groupToKick);
 
     if (foundProper)
         return false;
 
-    return (ginfo->Players.size() > size);
+    return playersCountInGroup > size;
 }
 
 // returns true if added or desired count not yet reached
@@ -572,10 +573,18 @@ bool BattlegroundQueue::CheckPremadeMatch(BattlegroundBracketId bracket_id, uint
 // this method tries to create battleground or arena with MinPlayersPerTeam against MinPlayersPerTeam
 bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers)
 {
-    if (sScriptMgr->IsCheckNormalMatch(this, bgTemplate, bracket_id, minPlayers, maxPlayers))
+    auto CanStartMatch = [this, bgTemplate, minPlayers]()
     {
-        return true;
-    }
+        //allow 1v0 if debug bg
+        if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
+            return true;
+
+        //return true if there are enough players in selection pools - enable to work .debug bg command correctly
+        return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+    };
+
+    if (sScriptMgr->IsCheckNormalMatch(this, bgTemplate, bracket_id, minPlayers, maxPlayers))
+        return CanStartMatch();
 
     GroupsQueueType::const_iterator itr_team[PVP_TEAMS_COUNT];
     for (uint32 i = 0; i < PVP_TEAMS_COUNT; i++)
@@ -614,12 +623,7 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
             return false;
     }
 
-    //allow 1v0 if debug bg
-    if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
-        return true;
-
-    //return true if there are enough players in selection pools - enable to work .debug bg command correctly
-    return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+    return CanStartMatch();
 }
 
 // this method will check if we can invite players to same faction skirmish match
@@ -891,8 +895,8 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
             {
                 if (!(*itr3)->IsInvitedToBGInstanceGUID
                     && (((*itr3)->ArenaMatchmakerRating >= arenaMinRating && (*itr3)->ArenaMatchmakerRating <= arenaMaxRating) || (int32)(*itr3)->JoinTime < discardTime)
-                    && ((*itr_teams[0])->ArenaTeamId != (*itr3)->PreviousOpponentsTeamId || ((int32)(*itr3)->JoinTime < discardOpponentsTime))
-                    && (*itr_teams[0])->ArenaTeamId != (*itr3)->ArenaTeamId)
+                    && ((*(itr_teams[0]))->ArenaTeamId != (*itr3)->PreviousOpponentsTeamId || ((int32)(*itr3)->JoinTime < discardOpponentsTime))
+                    && (*(itr_teams[0]))->ArenaTeamId != (*itr3)->ArenaTeamId)
                 {
                     itr_teams[found++] = itr3;
                     break;
@@ -903,8 +907,8 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
         //if we have 2 teams, then start new arena and invite players!
         if (found == 2)
         {
-            GroupQueueInfo* aTeam = *itr_teams[TEAM_ALLIANCE];
-            GroupQueueInfo* hTeam = *itr_teams[TEAM_HORDE];
+            GroupQueueInfo* aTeam = *(itr_teams[TEAM_ALLIANCE]);
+            GroupQueueInfo* hTeam = *(itr_teams[TEAM_HORDE]);
 
             Battleground* arena = sBattlegroundMgr->CreateNewBattleground(bgTypeId, bracketEntry, arenaType, true);
             if (!arena)

@@ -106,6 +106,11 @@ void EventMap::Repeat(Milliseconds time)
     RepeatEvent(time.count());
 }
 
+void EventMap::Repeat(Milliseconds minTime, Milliseconds maxTime)
+{
+    RepeatEvent(randtime(minTime, maxTime).count());
+}
+
 uint32 EventMap::ExecuteEvent()
 {
     while (!Empty())

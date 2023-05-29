@@ -24,6 +24,27 @@
 #include <tuple>
 #include <vector>
 
+template<typename T>
+struct ResultIterator
+{
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type   = std::ptrdiff_t;
+    using value_type        = T;
+    using pointer           = T*;
+    using reference         = T&;
+
+    explicit ResultIterator(pointer ptr) : _ptr(ptr) { }
+
+    reference operator*() const { return *_ptr; }
+    pointer operator->() { return _ptr; }
+    ResultIterator& operator++() { if (!_ptr->NextRow()) _ptr = nullptr; return *this; }
+
+    bool operator!=(const ResultIterator& right) { return _ptr != right._ptr; }
+
+private:
+    pointer _ptr;
+};
+
 class AC_DATABASE_API ResultSet
 {
 public:
@@ -53,6 +74,9 @@ public:
 
         return theTuple;
     }
+
+    auto begin()      { return ResultIterator<ResultSet>(this); }
+    static auto end() { return ResultIterator<ResultSet>(nullptr); }
 
 protected:
     std::vector<QueryResultFieldMetadata> _fieldMetadata;
@@ -99,6 +123,9 @@ public:
 
         return theTuple;
     }
+
+    auto begin()        { return ResultIterator<PreparedResultSet>(this); }
+    static auto end()   { return ResultIterator<PreparedResultSet>(nullptr); }
 
 protected:
     std::vector<QueryResultFieldMetadata> m_fieldMetadata;

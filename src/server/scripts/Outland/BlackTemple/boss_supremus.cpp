@@ -67,9 +67,9 @@ public:
             BossAI::Reset();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             SchedulePhase(false);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 900000);
@@ -80,7 +80,7 @@ public:
         {
             events.CancelEventGroup(EVENT_GROUP_ABILITIES);
             events.ScheduleEvent(EVENT_SWITCH_PHASE, 60000);
-            DoResetThreat();
+            DoResetThreatList();
 
             if (!run)
             {
@@ -126,7 +126,7 @@ public:
         Unit* FindHatefulStrikeTarget()
         {
             Unit* target = nullptr;
-            ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
+            ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().GetThreatList();
             for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
             {
                 Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
@@ -167,7 +167,7 @@ public:
                 case EVENT_SWITCH_TARGET:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
-                        DoResetThreat();
+                        DoResetThreatList();
                         me->AddThreat(target, 5000000.0f);
                         Talk(EMOTE_NEW_TARGET);
                     }

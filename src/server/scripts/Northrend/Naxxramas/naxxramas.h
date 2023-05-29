@@ -21,6 +21,8 @@
 #include "CreatureAIImpl.h"
 #include "SpellScript.h"
 
+#define DataHeader "NAX"
+
 #define NaxxramasScriptName "instance_naxxramas"
 
 enum Encouters

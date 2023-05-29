@@ -72,6 +72,8 @@ namespace Acore::String
     AC_COMMON_API Str Trim(const Str& s, const std::locale& loc = std::locale());
 
     AC_COMMON_API std::string TrimRightInPlace(std::string& str);
+
+    AC_COMMON_API std::string AddSuffixIfNotExists(std::string str, const char suffix);
 }
 
 #endif

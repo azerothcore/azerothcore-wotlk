@@ -24,11 +24,12 @@
 #include "PassiveAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "TaskScheduler.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -156,7 +157,9 @@ enum eHallowsEndCandy
     SPELL_HALLOWS_END_CANDY_1               = 24924,
     SPELL_HALLOWS_END_CANDY_2               = 24925,
     SPELL_HALLOWS_END_CANDY_3               = 24926,
-    SPELL_HALLOWS_END_CANDY_4               = 24927,
+    SPELL_HALLOWS_END_CANDY_3_FEMALE        = 44742,
+    SPELL_HALLOWS_END_CANDY_3_MALE          = 44743,
+    SPELL_HALLOWS_END_CANDY_4               = 24927
 };
 
 class spell_hallows_end_candy : public SpellScript
@@ -168,13 +171,41 @@ class spell_hallows_end_candy : public SpellScript
         if (Player* target = GetHitPlayer())
         {
             uint32 spellId = SPELL_HALLOWS_END_CANDY_1 + urand(0, 3);
-            GetCaster()->CastSpell(target, spellId, true, nullptr);
+            GetCaster()->CastSpell(target, spellId, true);
         }
     }
 
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_hallows_end_candy::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_hallows_end_candy_pirate_costume : public AuraScript
+{
+    PrepareAuraScript(spell_hallows_end_candy_pirate_costume);
+
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->CastSpell(target, target->getGender() == GENDER_MALE ? SPELL_HALLOWS_END_CANDY_3_MALE : SPELL_HALLOWS_END_CANDY_3_FEMALE, true);
+        }
+    }
+
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->RemoveAurasDueToSpell(SPELL_HALLOWS_END_CANDY_3_MALE);
+            target->RemoveAurasDueToSpell(SPELL_HALLOWS_END_CANDY_3_FEMALE);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_hallows_end_candy_pirate_costume::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_SWIM_SPEED, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_hallows_end_candy_pirate_costume::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_INCREASE_SWIM_SPEED, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -233,8 +264,6 @@ enum costumedOrphan
 
     // Actions
     ACTION_START_EVENT                      = 1,
-    DATA_EVENT                              = 1,
-    DATA_ALLOW_START                        = 2,
 
     // Talks
     TALK_SHADE_CONFLAGRATION                = 0,
@@ -323,7 +352,7 @@ class spell_hallows_end_base_fire : public AuraScript
 
 struct npc_costumed_orphan_matron : public ScriptedAI
 {
-    npc_costumed_orphan_matron(Creature* c) : ScriptedAI(c) { }
+    npc_costumed_orphan_matron(Creature* c) : ScriptedAI(c) {}
 
     uint32 eventStarted;
     bool allowQuest;
@@ -340,48 +369,48 @@ struct npc_costumed_orphan_matron : public ScriptedAI
     {
         switch (me->GetAreaId())
         {
-            case 87: // Goldshire
-                x = -9494.4f;
-                y = 48.53f;
-                z = 70.5f;
-                o = 0.5f;
-                path = 235431;
-                break;
-            case 131: // Kharanos
-                x = -5558.34f;
-                y = -499.46f;
-                z = 414.12f;
-                o = 2.08f;
-                path = 235432;
-                break;
-            case 3576: // Azure Watch
-                x = -4163.58f;
-                y = -12460.30f;
-                z = 63.02f;
-                o = 4.31f;
-                path = 235433;
-                break;
-            case 362: // Razor Hill
-                x = 373.2f;
-                y = -4723.4f;
-                z = 31.2f;
-                o = 3.2f;
-                path = 235434;
-                break;
-            case 159: // Brill
-                x = 2195.2f;
-                y = 264.0f;
-                z = 55.62f;
-                o = 0.15f;
-                path = 235435;
-                break;
-            case 3665: // Falcon Wing Square
-                x = 9547.91f;
-                y = -6809.9f;
-                z = 27.96f;
-                o = 3.4f;
-                path = 235436;
-                break;
+        case 87: // Goldshire
+            x = -9494.4f;
+            y = 48.53f;
+            z = 70.5f;
+            o = 0.5f;
+            path = 235431;
+            break;
+        case 131: // Kharanos
+            x = -5558.34f;
+            y = -499.46f;
+            z = 414.12f;
+            o = 2.08f;
+            path = 235432;
+            break;
+        case 3576: // Azure Watch
+            x = -4163.58f;
+            y = -12460.30f;
+            z = 63.02f;
+            o = 4.31f;
+            path = 235433;
+            break;
+        case 362: // Razor Hill
+            x = 373.2f;
+            y = -4723.4f;
+            z = 31.2f;
+            o = 3.2f;
+            path = 235434;
+            break;
+        case 159: // Brill
+            x = 2195.2f;
+            y = 264.0f;
+            z = 55.62f;
+            o = 0.15f;
+            path = 235435;
+            break;
+        case 3665: // Falcon Wing Square
+            x = 9547.91f;
+            y = -6809.9f;
+            z = 27.96f;
+            o = 3.4f;
+            path = 235436;
+            break;
         }
     }
 
@@ -403,14 +432,6 @@ struct npc_costumed_orphan_matron : public ScriptedAI
         }
     }
 
-    uint32 GetData(uint32 param) const override
-    {
-        if (param == DATA_ALLOW_START)
-            return allowQuest;
-
-        return 0;
-    }
-
     void UpdateAI(uint32 diff) override
     {
         if (eventStarted)
@@ -423,67 +444,78 @@ struct npc_costumed_orphan_matron : public ScriptedAI
             }
         }
     }
-};
 
-bool OnGossipHello(Player* player, Creature* creature)
-{
-    QuestRelationBounds pObjectQR = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
-    QuestRelationBounds pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
-
-    QuestMenu& qm = player->PlayerTalkClass->GetQuestMenu();
-    qm.ClearMenu();
-
-    for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
+    void sGossipHello(Player* player) override
     {
-        uint32 quest_id = i->second;
-        QuestStatus status = player->GetQuestStatus(quest_id);
-        if (status == QUEST_STATUS_COMPLETE)
-            qm.AddMenuItem(quest_id, 4);
-        else if (status == QUEST_STATUS_INCOMPLETE)
-            qm.AddMenuItem(quest_id, 4);
-    }
+        QuestRelationBounds pObjectQR = sObjectMgr->GetCreatureQuestRelationBounds(me->GetEntry());
+        QuestRelationBounds pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(me->GetEntry());
 
-    for (QuestRelations::const_iterator i = pObjectQR.first; i != pObjectQR.second; ++i)
-    {
-        uint32 quest_id = i->second;
-        Quest const* pQuest = sObjectMgr->GetQuestTemplate(quest_id);
-        if (!pQuest)
-            continue;
+        QuestMenu& qm = player->PlayerTalkClass->GetQuestMenu();
+        qm.ClearMenu();
 
-        if (!player->CanTakeQuest(pQuest, false))
-            continue;
-        else if (player->GetQuestStatus(quest_id) == QUEST_STATUS_NONE)
+        for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
         {
-            switch (quest_id)
+            uint32 quest_id = i->second;
+            QuestStatus status = player->GetQuestStatus(quest_id);
+            if (status == QUEST_STATUS_COMPLETE)
             {
-                case QUEST_LET_THE_FIRES_COME_A:
-                case QUEST_LET_THE_FIRES_COME_H:
-                    if (!creature->AI()->GetData(DATA_ALLOW_START))
-                        qm.AddMenuItem(quest_id, 2);
-                    break;
-                case QUEST_STOP_THE_FIRES_A:
-                case QUEST_STOP_THE_FIRES_H:
-                    if (creature->AI()->GetData(DATA_ALLOW_START))
-                        qm.AddMenuItem(quest_id, 2);
-                    break;
-                default:
-                    qm.AddMenuItem(quest_id, 2);
-                    break;
+                qm.AddMenuItem(quest_id, 4);
+            }
+            else if (status == QUEST_STATUS_INCOMPLETE)
+            {
+                qm.AddMenuItem(quest_id, 4);
             }
         }
+
+        for (QuestRelations::const_iterator i = pObjectQR.first; i != pObjectQR.second; ++i)
+        {
+            uint32 quest_id = i->second;
+            Quest const* pQuest = sObjectMgr->GetQuestTemplate(quest_id);
+            if (!pQuest)
+            {
+                continue;
+            }
+
+            if (!player->CanTakeQuest(pQuest, false))
+            {
+                continue;
+            }
+            else if (player->GetQuestStatus(quest_id) == QUEST_STATUS_NONE)
+            {
+                switch (quest_id)
+                {
+                    case QUEST_LET_THE_FIRES_COME_A:
+                    case QUEST_LET_THE_FIRES_COME_H:
+                        if (!allowQuest)
+                        {
+                            qm.AddMenuItem(quest_id, 2);
+                        }
+                        break;
+                    case QUEST_STOP_THE_FIRES_A:
+                    case QUEST_STOP_THE_FIRES_H:
+                        if (allowQuest)
+                        {
+                            qm.AddMenuItem(quest_id, 2);
+                        }
+                        break;
+                    default:
+                        qm.AddMenuItem(quest_id, 2);
+                        break;
+                }
+            }
+        }
+
+        player->SendPreparedQuest(me->GetGUID());
     }
 
-    player->SendPreparedQuest(creature->GetGUID());
-    return true;
-}
-
-bool OnQuestAccept(Player*  /*player*/, Creature* creature, Quest const* quest)
-{
-    if ((quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_A || quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_H) && !creature->AI()->GetData(DATA_ALLOW_START))
-        creature->AI()->DoAction(ACTION_START_EVENT);
-
-    return true;
-}
+    void sQuestAccept(Player*  /*player*/, Quest const* quest) override
+    {
+        if ((quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_A || quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_H) && !allowQuest)
+        {
+            DoAction(ACTION_START_EVENT);
+        }
+    }
+};
 
 struct npc_soh_fire_trigger : public NullCreatureAI
 {
@@ -567,7 +599,7 @@ struct npc_hallows_end_soh : public ScriptedAI
     int32 pos;
     TaskScheduler scheduler;
 
-    void EnterCombat(Unit*) override
+    void JustEngagedWith(Unit*) override
     {
         scheduler.Schedule(6s, [this](TaskContext context)
         {
@@ -648,10 +680,10 @@ struct npc_hallows_end_soh : public ScriptedAI
             unitList.push_back((*itr)->GetGUID());
         }
 
-        events.ScheduleEvent(1, 3000);
-        events.ScheduleEvent(2, 25000);
-        events.ScheduleEvent(2, 43000);
-        events.ScheduleEvent(3, 63000);
+        events.ScheduleEvent(1, 3s);
+        events.ScheduleEvent(2, 25s);
+        events.ScheduleEvent(2, 43s);
+        events.ScheduleEvent(3, 63s);
 
         me->SetReactState(REACT_PASSIVE);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -950,14 +982,29 @@ enum headlessHorseman
     EVENT_HORSEMAN_CONFLAGRATION                    = 5,
     EVENT_SUMMON_PUMPKIN                            = 6,
     EVENT_HORSEMAN_FOLLOW                           = 7,
+
+    // Headless Horseman
+    TALK_ENTRANCE                                   = 0,
+    TALK_REJOINED                                   = 1,
+    TALK_CONFLAGRATION                              = 2,
+    TALK_SPROUTING_PUMPKINS                         = 3,
+    TALK_DEATH                                      = 4,
+    TALK_PLAYER_DEATH                               = 5,
+
+    // Head of the Horseman
+    TALK_LAUGH                                      = 0,
+    TALK_LOST_HEAD                                  = 1,
+
+    // Player
+    TALK_PLAYER_RISE                                = 22695,
+    TALK_PLAYER_TIME_IS_NIGH                        = 22696,
+    TALK_PLAYER_FELT_DEATH                          = 22720,
+    TALK_PLAYER_KNOW_DEMISE                         = 22721,
 };
 
-enum hhSounds
+enum hhMisc
 {
-    SOUND_AGGRO                                     = 11961,
-    SOUND_SLAY                                      = 11962,
-    SOUND_SPROUT                                    = 11963,
-    SOUND_DEATH                                     = 11964,
+    DATA_HORSEMAN_EVENT                             = 5,
 };
 
 struct boss_headless_horseman : public ScriptedAI
@@ -975,8 +1022,7 @@ struct boss_headless_horseman : public ScriptedAI
     void JustDied(Unit*  /*killer*/) override
     {
         summons.DespawnAll();
-        me->Say("This end have I reached before. What new adventure lies in store?", LANG_UNIVERSAL);
-        me->PlayDirectSound(SOUND_DEATH);
+        Talk(TALK_DEATH);
         std::list<Creature*> unitList;
         me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
         for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
@@ -985,12 +1031,14 @@ struct boss_headless_horseman : public ScriptedAI
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
         if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
             sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_HEADLESS_HORSEMAN, me->FindMap());
+
+        if (InstanceScript* instance = me->GetInstanceScript())
+            instance->SetData(DATA_HORSEMAN_EVENT, DONE);
     }
 
     void KilledUnit(Unit*  /*who*/) override
     {
-        me->Yell("Your body lies beaten, battered and broken. Let my curse be your own, fate has spoken.", LANG_UNIVERSAL);
-        me->PlayDirectSound(SOUND_SLAY);
+        Talk(TALK_PLAYER_DEATH);
     }
 
     void DoAction(int32 param) override
@@ -1003,7 +1051,7 @@ struct boss_headless_horseman : public ScriptedAI
         if (spellInfo->Id == SPELL_SUMMONING_RHYME_TARGET)
         {
             playerGUID = target->GetGUID();
-            events.ScheduleEvent(EVENT_HH_PLAYER_TALK, 2000);
+            events.ScheduleEvent(EVENT_HH_PLAYER_TALK, 2s);
         }
     }
 
@@ -1021,12 +1069,12 @@ struct boss_headless_horseman : public ScriptedAI
             events.CancelEvent(EVENT_HORSEMAN_WHIRLWIND);
             events.CancelEvent(EVENT_HORSEMAN_CONFLAGRATION);
             events.CancelEvent(EVENT_SUMMON_PUMPKIN);
-            me->Yell("Here's my body, fit and pure! Now, your blackened souls I'll cure!", LANG_UNIVERSAL);
+            Talk(TALK_REJOINED);
 
             if (phase == 1)
-                events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6000);
+                events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6s);
             else if (phase == 2)
-                events.ScheduleEvent(EVENT_SUMMON_PUMPKIN, 6000);
+                events.ScheduleEvent(EVENT_SUMMON_PUMPKIN, 6s);
         }
     }
 
@@ -1043,15 +1091,15 @@ struct boss_headless_horseman : public ScriptedAI
 
                 me->SetInCombatWithZone();
                 inFight = true;
-                events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500);
-                events.ScheduleEvent(EVENT_HORSEMAN_CLEAVE, 7000);
+                events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500ms);
+                events.ScheduleEvent(EVENT_HORSEMAN_CLEAVE, 7s);
             }
         }
     }
 
     Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : nullptr; }
 
-    void EnterCombat(Unit*) override { me->SetInCombatWithZone(); }
+    void JustEngagedWith(Unit*) override { me->SetInCombatWithZone(); }
     void MoveInLineOfSight(Unit*  /*who*/) override {}
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -1078,8 +1126,8 @@ struct boss_headless_horseman : public ScriptedAI
                 if (phase < 2)
                     phase++;
 
-                events.ScheduleEvent(EVENT_HORSEMAN_WHIRLWIND, 6000);
-                events.ScheduleEvent(EVENT_HORSEMAN_CHECK_HEALTH, 1000);
+                events.ScheduleEvent(EVENT_HORSEMAN_WHIRLWIND, 6s);
+                events.ScheduleEvent(EVENT_HORSEMAN_CHECK_HEALTH, 1s);
             }
         }
     }
@@ -1098,6 +1146,14 @@ struct boss_headless_horseman : public ScriptedAI
 
         me->SetDisableGravity(true);
         me->SetSpeed(MOVE_WALK, 5.0f, true);
+    }
+
+    void JustReachedHome() override
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            instance->SetData(DATA_HORSEMAN_EVENT, FAIL);
+
+        me->DespawnOrUnsummon();
     }
 
     void UpdateAI(uint32 diff) override
@@ -1121,23 +1177,22 @@ struct boss_headless_horseman : public ScriptedAI
                     switch (talkCount)
                     {
                         case 1:
-                            player->Say("Horseman rise...", LANG_UNIVERSAL);
+                            player->Say(TALK_PLAYER_RISE);
                             break;
                         case 2:
-                            player->Say("Your time is nigh...", LANG_UNIVERSAL);
+                            player->Say(TALK_PLAYER_TIME_IS_NIGH);
                             if (Creature* trigger = me->SummonTrigger(1765.28f, 1347.46f, 17.5514f, 0.0f, 15 * IN_MILLISECONDS))
                                 trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
                             break;
                         case 3:
                             me->GetMotionMaster()->MovePath(236820, false);
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
-                            player->Say("You felt death once...", LANG_UNIVERSAL);
-                            me->Say("It is over, your search is done. Let fate choose now, the righteous one.", LANG_UNIVERSAL);
-                            me->PlayDirectSound(SOUND_AGGRO);
+                            player->Say(TALK_PLAYER_FELT_DEATH);
+                            Talk(TALK_ENTRANCE);
                             break;
                         case 4:
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_MEDIUM, true);
-                            player->Say("Now, know demise!", LANG_UNIVERSAL);
+                            player->Say(TALK_PLAYER_KNOW_DEMISE);
                             talkCount = 0;
                             return; // pop and return, skip repeat
                     }
@@ -1189,7 +1244,7 @@ struct boss_headless_horseman : public ScriptedAI
                     {
                         me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
                         target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
-                        me->Say("Harken, cur! Tis you I spurn! Now feel... the burn!", LANG_UNIVERSAL, target);
+                        Talk(TALK_CONFLAGRATION);
                     }
 
                     events.RepeatEvent(12500);
@@ -1205,8 +1260,7 @@ struct boss_headless_horseman : public ScriptedAI
                     }
                     else
                     {
-                        me->Say("Soldiers arise, stand and fight! Bring victory at last to this fallen knight!", LANG_UNIVERSAL);
-                        me->PlayDirectSound(SOUND_SPROUT);
+                        Talk(TALK_SPROUTING_PUMPKINS);
                         events.RepeatEvent(15000);
                         talkCount = 0;
                     }
@@ -1303,6 +1357,8 @@ struct boss_headless_horseman_head : public ScriptedAI
             me->CastSpell(me, SPELL_THROW_HEAD_BACK, true);
             if (Unit* owner = GetOwner())
                 owner->RemoveAura(SPELL_HORSEMAN_IMMUNITY);
+
+            Talk(TALK_LOST_HEAD);
         }
     }
 
@@ -1320,20 +1376,8 @@ struct boss_headless_horseman_head : public ScriptedAI
         if (timer >= 30000)
         {
             timer = urand(0, 15000);
-            uint32 sound = 11965;
-            switch (urand(0, 2))
-            {
-                case 1:
-                    sound = 11975;
-                    break;
-                case 2:
-                    sound = 11976;
-                    break;
-            }
-
             me->CastSpell(me, SPELL_HORSEMAN_SPEAKS, true);
-            me->TextEmote("Headless Horseman laughs");
-            me->PlayDirectSound(sound);
+            Talk(TALK_LAUGH);
         }
     }
 };
@@ -1419,12 +1463,40 @@ public:
     }
 };
 
+class go_pumpkin_shrine : public GameObjectScript
+{
+public:
+    go_pumpkin_shrine() : GameObjectScript("go_pumpkin_shrine") {}
+
+    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 /*action*/) override
+    {
+        CloseGossipMenuFor(player);
+
+        if (InstanceScript* instance = go->GetInstanceScript())
+        {
+            if (instance->GetData(DATA_HORSEMAN_EVENT) == IN_PROGRESS || instance->GetData(DATA_HORSEMAN_EVENT) == DONE)
+                return true;
+
+            if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
+                return true;
+
+            if (Creature* horseman = go->SummonCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 1754.00f, 1346.00f, 17.50f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
+
+            instance->SetData(DATA_HORSEMAN_EVENT, IN_PROGRESS);
+        }
+
+        return true;
+    }
+};
+
 void AddSC_event_hallows_end_scripts()
 {
     // Spells
     RegisterSpellScript(spell_hallows_end_trick);
     RegisterSpellScript(spell_hallows_end_trick_or_treat);
     RegisterSpellScript(spell_hallows_end_candy);
+    RegisterSpellScript(spell_hallows_end_candy_pirate_costume);
     RegisterSpellScript(spell_hallows_end_tricky_treat);
     RegisterSpellScriptWithArgs(spell_hallows_end_put_costume, "spell_hallows_end_pirate_costume", SPELL_PIRATE_COSTUME_MALE, SPELL_PIRATE_COSTUME_FEMALE);
     RegisterSpellScriptWithArgs(spell_hallows_end_put_costume, "spell_hallows_end_leper_costume", SPELL_LEPER_GNOME_COSTUME_MALE, SPELL_LEPER_GNOME_COSTUME_FEMALE);
@@ -1443,6 +1515,7 @@ void AddSC_event_hallows_end_scripts()
 
     // Headless Horseman
     new go_loosely_turned_soil();
+    new go_pumpkin_shrine();
     RegisterCreatureAI(boss_headless_horseman);
     RegisterCreatureAI(boss_headless_horseman_head);
     RegisterCreatureAI(boss_headless_horseman_pumpkin);

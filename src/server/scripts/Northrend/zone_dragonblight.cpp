@@ -26,6 +26,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 
@@ -388,7 +389,7 @@ public:
 
             phase = 0;
             events.Reset();
-            events.ScheduleEvent(EVENT_START_EVENT, 4000);
+            events.ScheduleEvent(EVENT_START_EVENT, 4s);
         }
 
         Player* GetPlayer() {return ObjectAccessor::GetPlayer(*me, pGUID);}
@@ -419,12 +420,12 @@ public:
                 case EVENT_START_EVENT:
                     if (Creature* cr = GetCopy())
                         cr->AI()->Talk(SAY_HOURGLASS_START_1, GetPlayer());
-                    events.ScheduleEvent(EVENT_FIGHT_1, 7000);
+                    events.ScheduleEvent(EVENT_FIGHT_1, 7s);
                     break;
                 case EVENT_FIGHT_1:
                     if (Creature* cr = GetCopy())
                         cr->AI()->Talk(SAY_HOURGLASS_START_2, GetPlayer());
-                    events.ScheduleEvent(EVENT_FIGHT_2, 6000);
+                    events.ScheduleEvent(EVENT_FIGHT_2, 6s);
                     break;
                 case EVENT_FIGHT_2:
                     {
@@ -455,19 +456,19 @@ public:
                                 cr->AI()->AttackStart(me);
                             }
 
-                            events.ScheduleEvent(EVENT_CHECK_FINISH, 20000);
+                            events.ScheduleEvent(EVENT_CHECK_FINISH, 20s);
                             return;
                         }
 
                         ++phase;
-                        events.ScheduleEvent(EVENT_FIGHT_2, 35000);
+                        events.ScheduleEvent(EVENT_FIGHT_2, 35s);
                         break;
                     }
                 case EVENT_CHECK_FINISH:
                     {
                         if (me->FindNearestCreature(NPC_INFINITE_TIMERENDER, 50.0f))
                         {
-                            events.RepeatEvent(5000);
+                            events.Repeat(5s);
                             return;
                         }
 
@@ -480,7 +481,7 @@ public:
                             cr->SetFacingToObject(me->FindNearestCreature(NPC_NOZDORMU, 100.0f, true));
                             cr->AI()->Talk(SAY_HOURGLASS_END_1, GetPlayer());
                         }
-                        events.ScheduleEvent(EVENT_FINISH_EVENT, 6000);
+                        events.ScheduleEvent(EVENT_FINISH_EVENT, 6s);
                         break;
                     }
                 case EVENT_FINISH_EVENT:
@@ -631,6 +632,264 @@ public:
             }
         }
     };
+};
+
+enum WintergardeGryphon
+{
+    SPELL_RESCUE_VILLAGER                       = 48363,
+    SPELL_DROP_OFF_VILLAGER                     = 48397,
+    SPELL_RIDE_VEHICLE                          = 43671,
+
+    NPC_HELPLESS_VILLAGER_A                     = 27315,
+    NPC_HELPLESS_VILLAGER_B                     = 27336,
+
+    EVENT_VEHICLE_GET                           = 1,
+    EVENT_TAKE_OFF                              = 2,
+    EVENT_GET_VILLAGER                          = 3,
+
+    EVENT_PHASE_FEAR                            = 1,
+    EVENT_PHASE_VEHICLE                         = 2,
+
+    POINT_LAND                                  = 1,
+    POINT_TAKE_OFF                              = 2,
+
+    QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER    = 12237,
+    GO_TEMP_GRYPHON_STATION                     = 188679,
+    AREA_WINTERGARDE_KEEP                       = 4177
+};
+
+class npc_wintergarde_gryphon : public VehicleAI
+{
+public:
+    npc_wintergarde_gryphon(Creature* creature) : VehicleAI(creature)
+    {
+        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        me->DespawnOrUnsummon(3s, 0s);
+    }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        me->SetFacingToObject(summoner);
+        Position pos = summoner->GetPosition();
+        me->GetMotionMaster()->MovePoint(POINT_LAND, pos);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_LAND)
+            events.ScheduleEvent(EVENT_VEHICLE_GET, 0s);
+    }
+
+    void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+    {
+        if (!apply && seatId == 0)
+        {
+            // left the vehicle with a passenger will result in despawn
+            if (Vehicle* gryphon = me->GetVehicleKit())
+                if (Unit* villager = gryphon->GetPassenger(1))
+                {
+                    if (villager->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    if (Creature* seat = villager->ToCreature())
+                    {
+                        seat->ExitVehicle();
+                        seat->DespawnOrUnsummon();
+                    }
+                }
+
+            me->RemoveVehicleKit(); // not Crash (;
+            events.ScheduleEvent(EVENT_TAKE_OFF, 2s);
+            me->CastSpell(passenger, VEHICLE_SPELL_PARACHUTE, true);
+        }
+    }
+
+    Creature* getVillager() { return ObjectAccessor::GetCreature(*me, villagerGUID); }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events.Update(diff);
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_VEHICLE_GET:
+                {
+                    me->SetDisableGravity(false);
+                    me->SetHover(false);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    break;
+                }
+                case EVENT_TAKE_OFF:
+                {
+                    me->DespawnOrUnsummon(4050);
+                    me->SetOrientation(2.5f);
+                    me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
+                    Position pos = me->GetPosition();
+                    Position offset = { 14.0f, 14.0f, 16.0f, 0.0f };
+                    pos.RelocateOffset(offset);
+                    me->GetMotionMaster()->MovePoint(POINT_TAKE_OFF, pos);
+                    break;
+                }
+                case EVENT_GET_VILLAGER:
+                {
+                    if (getVillager())
+                    {
+                        getVillager()->GetMotionMaster()->MovePoint(0, 3660.0f, -706.4f, 215.0f);
+                        getVillager()->DespawnOrUnsummon(7s, 0s);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    {
+        if (spell->Id != SPELL_DROP_OFF_VILLAGER)
+            return;
+
+        if (Vehicle* gryphon = me->GetVehicleKit())
+            if (Unit* villager = gryphon->GetPassenger(1))
+            {
+                villager->ExitVehicle();
+                villager->GetMotionMaster()->Clear(false);
+                villager->GetMotionMaster()->MoveIdle();
+                villager->SetCanFly(false); // prevents movement in flight
+                villagerGUID = villager->GetGUID();
+                villager->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
+                events.ScheduleEvent(EVENT_GET_VILLAGER, 3s);
+            }
+    }
+private:
+    ObjectGuid villagerGUID;
+};
+
+class spell_q12237_rescue_villager : public SpellScript
+{
+    PrepareSpellScript(spell_q12237_rescue_villager);
+
+    SpellCastResult CheckCast()
+    {
+        Player* owner = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+        if (!owner)
+            return SPELL_FAILED_DONT_REPORT;
+
+        SpellCustomErrors extension = SPELL_CUSTOM_ERROR_NONE;
+        SpellCastResult result = SPELL_CAST_OK;
+
+        if (GetCaster()->GetAreaId() == AREA_WINTERGARDE_KEEP)
+        {
+            extension = SPELL_CUSTOM_ERROR_MUST_BE_NEAR_HELPLESS_VILLAGER;
+            result = SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        if (!GetCaster()->FindNearestCreature(NPC_HELPLESS_VILLAGER_A, 5.0f) && !GetCaster()->FindNearestCreature(NPC_HELPLESS_VILLAGER_B, 5.0f))
+        {
+            extension = SPELL_CUSTOM_ERROR_MUST_BE_NEAR_HELPLESS_VILLAGER;
+            result = SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        if (GetCaster()->FindNearestGameObject(GO_TEMP_GRYPHON_STATION, 15.0f))
+        {
+            extension = SPELL_CUSTOM_ERROR_NEED_HELPLESS_VILLAGER;
+            result = SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        if (GetCaster()->HasAura(SPELL_RIDE_VEHICLE))
+            result = SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+
+        if (result != SPELL_CAST_OK)
+        {
+            Spell::SendCastResult(owner, GetSpellInfo(), 0, result, extension);
+            return result;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12237_rescue_villager::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnCheckCast += SpellCheckCastFn(spell_q12237_rescue_villager::CheckCast);
+    }
+};
+
+class spell_q12237_drop_off_villager : public SpellScript
+{
+    PrepareSpellScript(spell_q12237_drop_off_villager);
+
+    SpellCastResult CheckCast()
+    {
+        Player* master = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+        if (!master)
+            return SPELL_FAILED_DONT_REPORT;
+
+        SpellCustomErrors extension = SPELL_CUSTOM_ERROR_NONE;
+        SpellCastResult result = SPELL_CAST_OK;
+
+        if (!GetCaster()->FindNearestGameObject(GO_TEMP_GRYPHON_STATION, 10.0f))
+            result = SPELL_FAILED_REQUIRES_SPELL_FOCUS;
+
+        if (!GetCaster()->HasAura(SPELL_RIDE_VEHICLE))
+        {
+            extension = SPELL_CUSTOM_ERROR_NO_PASSENGER;
+            result = SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        if (result != SPELL_CAST_OK)
+        {
+            Spell::SendCastResult(master, GetSpellInfo(), 0, result, extension);
+            return result;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_q12237_drop_off_villager::CheckCast);
+    }
+};
+
+class spell_call_wintergarde_gryphon : public SpellScript
+{
+    PrepareSpellScript(spell_call_wintergarde_gryphon);
+
+    void SetDest(SpellDestination& dest)
+    {
+        // Adjust effect summon position
+        Position const offset = { 0.0f, 0.0f, 9.0f, 0.0f };
+        dest.RelocateOffset(offset);
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        if (Player* playerCaster = GetCaster()->ToPlayer())
+        {
+            if (playerCaster->GetQuestStatus(QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER) == QUEST_STATUS_INCOMPLETE)
+                return SPELL_CAST_OK;
+        }
+        return SPELL_FAILED_DONT_REPORT;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_call_wintergarde_gryphon::CheckRequirement);
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_call_wintergarde_gryphon::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
+    }
 };
 
 class npc_heated_battle : public CreatureScript
@@ -836,9 +1095,9 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(998, 10000);
-            events.ScheduleEvent(999, 0);
-            events.ScheduleEvent(1, 3000);
+            events.ScheduleEvent(998, 10s);
+            events.ScheduleEvent(999, 0ms);
+            events.ScheduleEvent(1, 3s);
             summons.DespawnAll();
             playerGUID.Clear();
 
@@ -863,8 +1122,8 @@ public:
 
             me->setActive(true);
             playerGUID = guid;
-            events.ScheduleEvent(2, 900000);
-            events.ScheduleEvent(3, 0);
+            events.ScheduleEvent(2, 15min);
+            events.ScheduleEvent(3, 0ms);
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -872,7 +1131,7 @@ public:
             if (!playerGUID || type != data)
                 return;
             if (data == 1)
-                events.ScheduleEvent(15, 0);
+                events.ScheduleEvent(15, 0ms);
             else if (data == 2)
             {
                 if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_2, 150.0f))
@@ -884,7 +1143,7 @@ public:
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
                         p->KnockbackFrom(c->GetPositionX(), c->GetPositionY(), 5.0f, 3.0f);
                 }
-                events.ScheduleEvent(18, 3000);
+                events.ScheduleEvent(18, 3s);
             }
             else if (data == 3)
             {
@@ -895,7 +1154,7 @@ public:
                     if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_3, 150.0f))
                         go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     playerGUID.Clear();
-                    events.RescheduleEvent(2, 60000);
+                    events.RescheduleEvent(2, 1min);
                 }
             }
         }
@@ -931,7 +1190,7 @@ public:
                             return;
                         }
                     }
-                    events.ScheduleEvent(1, 3000);
+                    events.ScheduleEvent(1, 3s);
                     break;
                 case 2: // reset timer
                     Reset();
@@ -946,24 +1205,24 @@ public:
                         path.push_back(G3D::Vector3(4825.35f, -582.99f, 164.83f));
                         path.push_back(G3D::Vector3(4813.38f, -580.94f, 162.62f));
                         me->GetMotionMaster()->MoveSplinePath(&path);
-                        events.ScheduleEvent(4, 10000);
+                        events.ScheduleEvent(4, 10s);
                     }
                     break;
                 case 4: // talk 0
                     Talk(0);
-                    events.ScheduleEvent(5, 6000);
+                    events.ScheduleEvent(5, 6s);
                     break;
                 case 5: // talk 1
                     Talk(1);
-                    events.ScheduleEvent(6, 4000);
-                    events.ScheduleEvent(7, 11000);
+                    events.ScheduleEvent(6, 4s);
+                    events.ScheduleEvent(7, 11s);
                     break;
                 case 6: // repel hammer
                     me->CastSpell((Unit*)nullptr, SPELL_SAC_REPEL_HAMMER, false);
                     if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_1, 150.0f, true))
                         c->CastSpell(c, SPELL_SAC_BLUE_EXPLOSION, true);
 
-                    events.ScheduleEvent(65, 3500);
+                    events.ScheduleEvent(65, 3500ms);
                     break;
                 case 65: // spawn hammer go
                     if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_BUNNY, 150.0f, true))
@@ -974,20 +1233,20 @@ public:
                     break;
                 case 7: // talk 2
                     Talk(2);
-                    events.ScheduleEvent(8, 8000);
-                    events.ScheduleEvent(9, 11500);
+                    events.ScheduleEvent(8, 8s);
+                    events.ScheduleEvent(9, 11s + 500ms);
                     break;
                 case 8: // summon ghouls
                     me->CastSpell((Unit*)nullptr, SPELL_SAC_SUMMON_GHOULS_AURA, false);
                     break;
                 case 9: // talk 3
                     Talk(3);
-                    events.ScheduleEvent(10, 10000);
+                    events.ScheduleEvent(10, 10s);
                     break;
                 case 10: // summon vegard
                     me->SummonCreature(NPC_SAC_VEGARD_1, 4812.12f, -586.08f, 162.49f, 3.14f, TEMPSUMMON_MANUAL_DESPAWN);
-                    events.ScheduleEvent(11, 4000);
-                    events.ScheduleEvent(12, 5000);
+                    events.ScheduleEvent(11, 4s);
+                    events.ScheduleEvent(12, 5s);
                     break;
                 case 11: // vagard shield
                     if (Creature* c = me->FindNearestCreature(NPC_SAC_VEGARD_1, 50.0f, true))
@@ -997,8 +1256,8 @@ public:
                     Talk(4);
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
                         me->CastSpell(p, SPELL_SAC_ZAP_PLAYER, false);
-                    events.ScheduleEvent(13, 3500);
-                    events.ScheduleEvent(14, 6000);
+                    events.ScheduleEvent(13, 3500ms);
+                    events.ScheduleEvent(14, 6s);
                     break;
                 case 13: // despawn
                     me->CastSpell(me, SPELL_SAC_LK_DESPAWN_ANIM, false);
@@ -1029,7 +1288,7 @@ public:
                                 //l->ClearUnitState(UNIT_STATE_ONVEHICLE);
                                 l->CastSpell(l, SPELL_SAC_HOLY_BOMB_VISUAL, false);
                                 l->AddAura(SPELL_SAC_HOLY_BOMB_VISUAL, l);
-                                events.ScheduleEvent(16, 5000);
+                                events.ScheduleEvent(16, 5s);
                             }
                         }
                     break;
@@ -1038,7 +1297,7 @@ public:
                         c->CastSpell(c, SPELL_SAC_ZAP_GHOULS_AURA, true);
                     if (Creature* c = me->FindNearestCreature(NPC_SAC_VEGARD_1, 50.0f, true))
                         c->RemoveAurasDueToSpell(SPELL_SAC_VEGARD_SUMMON_GHOULS_AURA);
-                    events.ScheduleEvent(17, 12000);
+                    events.ScheduleEvent(17, 12s);
                     break;
                 case 17: // kill vegard
                     {
@@ -1177,7 +1436,7 @@ public:
             else if (a == -2)
             {
                 me->CastSpell(me, SPELL_SAC_GHOUL_EXPLODE, true);
-                Unit::Kill(me, me);
+                me->KillSelf();
                 me->m_Events.KillAllEvents(true);
                 Deactivate();
             }
@@ -1320,12 +1579,12 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
-            events.ScheduleEvent(1, 7000);
-            events.ScheduleEvent(2, urand(7000, 20000));
-            events.ScheduleEvent(3, urand(7000, 20000));
-            events.ScheduleEvent(4, urand(7000, 20000));
-            events.ScheduleEvent(5, urand(7000, 20000));
-            events.ScheduleEvent(6, 1);
+            events.ScheduleEvent(1, 7s);
+            events.ScheduleEvent(2, 7s, 20s);
+            events.ScheduleEvent(3, 7s, 20s);
+            events.ScheduleEvent(4, 7s, 20s);
+            events.ScheduleEvent(5, 7s, 20s);
+            events.ScheduleEvent(6, 1ms);
         }
 
         EventMap events;
@@ -1362,22 +1621,22 @@ public:
                     break;
                 case 2:
                     me->CastSpell((Unit*)nullptr, 70866, false);
-                    events.RepeatEvent(urand(30000, 35000));
+                    events.Repeat(30s, 35s);
                     break;
                 case 3:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), 70886, false);
-                    events.RepeatEvent(urand(15000, 30000));
+                    events.Repeat(15s, 30s);
                     break;
                 case 4:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), 71003, false);
-                    events.RepeatEvent(urand(15000, 30000));
+                    events.Repeat(15s, 30s);
                     break;
                 case 5:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), 70864, false);
-                    events.RepeatEvent(urand(8000, 12000));
+                    events.Repeat(8s, 12s);
                     break;
                 case 6:
                     Talk(0);
@@ -1419,7 +1678,7 @@ public:
             return 5;
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -1431,7 +1690,7 @@ public:
             summoner->ToPlayer()->SendDirectMessage(&data);
 
             if (id == 1)
-                if (Aura* aura = summoner->GetAura(47189)) // Transform Aura
+                if (Aura* aura = summoner->ToUnit()->GetAura(47189)) // Transform Aura
                     aura->SetDuration(aura->GetDuration() - MINUTE * IN_MILLISECONDS);
         }
     };
@@ -1568,8 +1827,8 @@ public:
             for (uint8 i = 0; i < 5; ++i)
                 imageList[i].Clear();
 
-            _events.ScheduleEvent(EVENT_GET_TARGETS, 5000);
-            _events.ScheduleEvent(EVENT_START_RANDOM, 20000);
+            _events.ScheduleEvent(EVENT_GET_TARGETS, 5s);
+            _events.ScheduleEvent(EVENT_START_RANDOM, 20s);
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -1589,7 +1848,7 @@ public:
                                 {
                                     case 0:
                                         ChangeImage(NPC_IMAGE_OF_KELTHUZAD, MODEL_IMAGE_OF_KELTHUZAD, SAY_KELTHUZAD_1);
-                                        _events.ScheduleEvent(EVENT_KELTHUZAD_2, 8000);
+                                        _events.ScheduleEvent(EVENT_KELTHUZAD_2, 8s);
                                         break;
                                     case 1:
                                         ChangeImage(NPC_IMAGE_OF_SAPPHIRON, MODEL_IMAGE_OF_SAPPHIRON, SAY_SAPPHIRON);
@@ -1609,7 +1868,7 @@ public:
                                         break;
                                     case 2:
                                         ChangeImage(NPC_IMAGE_OF_THANE, MODEL_IMAGE_OF_THANE, SAY_DEATH_KNIGHTS_1);
-                                        _events.ScheduleEvent(EVENT_DEATH_KNIGHTS_2, 10000);
+                                        _events.ScheduleEvent(EVENT_DEATH_KNIGHTS_2, 10s);
                                         break;
                                 }
                             }
@@ -1658,7 +1917,7 @@ public:
                                         break;
                                     case 1:
                                         ChangeImage(NPC_IMAGE_OF_HEIGAN, MODEL_IMAGE_OF_HEIGAN, SAY_HEIGAN_1);
-                                        _events.ScheduleEvent(EVENT_HEIGAN_2, 8000);
+                                        _events.ScheduleEvent(EVENT_HEIGAN_2, 8s);
                                         break;
                                     case 2:
                                         ChangeImage(NPC_IMAGE_OF_LOATHEB, MODEL_IMAGE_OF_LOATHEB, SAY_LOATHEB);
@@ -1667,7 +1926,7 @@ public:
                             }
                             break;
                         case 5: // Home
-                            _events.ScheduleEvent(EVENT_START_RANDOM, 30000);
+                            _events.ScheduleEvent(EVENT_START_RANDOM, 30s);
                             break;
                     }
                 }
@@ -1712,7 +1971,7 @@ public:
                 creature->SetEntry(entry);
                 creature->SetDisplayId(model);
                 creature->CastSpell(creature, SPELL_HEROIC_IMAGE_CHANNEL);
-                _events.ScheduleEvent(EVENT_TALK_COMPLETE, 40000);
+                _events.ScheduleEvent(EVENT_TALK_COMPLETE, 40s);
             }
         }
 
@@ -1736,7 +1995,7 @@ public:
                     case EVENT_START_RANDOM:
                         talkWing = urand (0, 4);
                         Talk(talkWing);
-                        _events.ScheduleEvent(EVENT_MOVE_TO_POINT, 8000);
+                        _events.ScheduleEvent(EVENT_MOVE_TO_POINT, 8s);
                         break;
                     case EVENT_MOVE_TO_POINT:
                         me->SetWalk(true);
@@ -1746,14 +2005,14 @@ public:
                     case EVENT_TALK_COMPLETE:
                         talkWing = 5;
                         Talk(talkWing);
-                        _events.ScheduleEvent(EVENT_MOVE_TO_POINT, 5000);
+                        _events.ScheduleEvent(EVENT_MOVE_TO_POINT, 5s);
                         break;
                     case EVENT_GET_TARGETS:
                         StoreTargets();
                         break;
                     case EVENT_KELTHUZAD_2:
                         Talk(SAY_KELTHUZAD_2);
-                        _events.ScheduleEvent(EVENT_KELTHUZAD_3, 8000);
+                        _events.ScheduleEvent(EVENT_KELTHUZAD_3, 8s);
                         break;
                     case EVENT_KELTHUZAD_3:
                         Talk(SAY_KELTHUZAD_3);
@@ -1765,7 +2024,7 @@ public:
                             creature->SetEntry(NPC_IMAGE_OF_BLAUMEUX);
                             creature->SetDisplayId(MODEL_IMAGE_OF_BLAUMEUX);
                         }
-                        _events.ScheduleEvent(EVENT_DEATH_KNIGHTS_3, 10000);
+                        _events.ScheduleEvent(EVENT_DEATH_KNIGHTS_3, 10s);
                         break;
                     case EVENT_DEATH_KNIGHTS_3:
                         Talk(SAY_DEATH_KNIGHTS_3);
@@ -1774,7 +2033,7 @@ public:
                             creature->SetEntry(NPC_IMAGE_OF_ZELIEK);
                             creature->SetDisplayId(MODEL_IMAGE_OF_ZELIEK);
                         }
-                        _events.ScheduleEvent(EVENT_DEATH_KNIGHTS_4, 10000);
+                        _events.ScheduleEvent(EVENT_DEATH_KNIGHTS_4, 10s);
                         break;
                     case EVENT_DEATH_KNIGHTS_4:
                         Talk(SAY_DEATH_KNIGHTS_4);
@@ -1929,7 +2188,7 @@ public:
             _playerGUID.Clear();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             _events.ScheduleEvent(EVENT_HEMORRHAGE, urand(5000, 8000));
             _events.ScheduleEvent(EVENT_KIDNEY_SHOT, urand(12000, 15000));
@@ -1976,11 +2235,11 @@ public:
                 {
                     case EVENT_HEMORRHAGE:
                         DoCastVictim(SPELL_HEMORRHAGE);
-                        _events.ScheduleEvent(EVENT_HEMORRHAGE, urand(12000, 168000));
+                        _events.ScheduleEvent(EVENT_HEMORRHAGE, 12s, 168s);
                         break;
                     case EVENT_KIDNEY_SHOT:
                         DoCastVictim(SPELL_KIDNEY_SHOT);
-                        _events.ScheduleEvent(EVENT_KIDNEY_SHOT, urand(20000, 26000));
+                        _events.ScheduleEvent(EVENT_KIDNEY_SHOT, 20s, 26s);
                         break;
                     default:
                         break;
@@ -2000,6 +2259,38 @@ public:
     }
 };
 
+// 47447 - Corrosive Spit
+class spell_dragonblight_corrosive_spit : public AuraScript
+{
+    PrepareAuraScript(spell_dragonblight_corrosive_spit);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->GetEffect(EFFECT_0).CalcValue()) });
+    }
+
+    void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTarget()->HasAura(aurEff->GetSpellInfo()->GetEffect(EFFECT_0).CalcValue()))
+            GetAura()->Remove();
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        if (GetTarget()->HasAura(aurEff->GetSpellInfo()->GetEffect(EFFECT_0).CalcValue()))
+        {
+            PreventDefaultAction();
+            GetAura()->Remove();
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_dragonblight_corrosive_spit::AfterApply, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dragonblight_corrosive_spit::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
 void AddSC_dragonblight()
 {
     // Ours
@@ -2009,6 +2300,10 @@ void AddSC_dragonblight()
     new npc_future_you();
     new npc_mindless_ghoul();
     new npc_injured_7th_legion_soldier();
+    RegisterCreatureAI(npc_wintergarde_gryphon);
+    RegisterSpellScript(spell_q12237_rescue_villager);
+    RegisterSpellScript(spell_q12237_drop_off_villager);
+    RegisterSpellScript(spell_call_wintergarde_gryphon);
     new npc_heated_battle();
     new spell_q12478_frostmourne_cavern();
     new spell_q12243_fire_upon_the_waters();
@@ -2025,4 +2320,6 @@ void AddSC_dragonblight()
     new spell_q12096_q12092_dummy();
     new spell_q12096_q12092_bark();
     new npc_torturer_lecraft();
+
+    RegisterSpellScript(spell_dragonblight_corrosive_spit);
 }

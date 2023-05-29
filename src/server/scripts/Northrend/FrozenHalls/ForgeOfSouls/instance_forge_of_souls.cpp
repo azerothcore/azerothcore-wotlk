@@ -20,6 +20,12 @@
 #include "ScriptedCreature.h"
 #include "forge_of_souls.h"
 
+BossBoundaryData const boundaries =
+{
+    { DATA_BRONJAHM,    new CircleBoundary(Position(5297.3f, 2506.45f), 100.96)                                                                                   },
+    { DATA_DEVOURER,    new ParallelogramBoundary(Position(5663.56f, 2570.53f), Position(5724.39f, 2520.45f), Position(5570.36f, 2461.42f)) }
+};
+
 class instance_forge_of_souls : public InstanceMapScript
 {
 public:
@@ -32,7 +38,11 @@ public:
 
     struct instance_forge_of_souls_InstanceScript : public InstanceScript
     {
-        instance_forge_of_souls_InstanceScript(Map* map) : InstanceScript(map) {}
+        instance_forge_of_souls_InstanceScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders(DataHeader);
+            LoadBossBoundaries(boundaries);
+        }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         TeamId teamIdInInstance;
@@ -191,46 +201,15 @@ public:
             return false;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "F S " << m_auiEncounter[0] << ' ' << m_auiEncounter[1];
-            str_data = saveStream.str();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return str_data;
+            data >> m_auiEncounter[0];
+            data >> m_auiEncounter[1];
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-            uint32 data0, data1;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1;
-
-            if (dataHead1 == 'F' && dataHead2 == 'S')
-            {
-                m_auiEncounter[0] = data0;
-                m_auiEncounter[1] = data1;
-
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                    if (m_auiEncounter[i] == IN_PROGRESS)
-                        m_auiEncounter[i] = NOT_STARTED;
-            }
-            else OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << m_auiEncounter[0] << ' ' << m_auiEncounter[1];
         }
     };
 };

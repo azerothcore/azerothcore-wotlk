@@ -33,18 +33,18 @@ IF %M%==4 GOTO ALL
 IF %M%==5 GOTO :EOF
 
 :MAPS
-start /b /w mapextractor.exe
+start /b /w map_extractor.exe
 GOTO MENU
 
 :VMAPS
-start /b /w vmap4extractor.exe
+start /b /w vmap4_extractor.exe
 if exist vmaps\ (
     echo folder found.
 ) else (
     echo creating folder "vmaps".
     mkdir "vmaps"
 )
-start /b /w vmap4assembler.exe Buildings vmaps
+start /b /w vmap4_assembler.exe Buildings vmaps
 rmdir Buildings /s /q
 GOTO MENU
 
@@ -75,9 +75,9 @@ if exist mmaps\ (
     echo creating folder "mmaps".
     mkdir "mmaps"
 )
-start /b /w mapextractor.exe
-start /b /w vmap4extractor.exe
-start /b /w vmap4assembler.exe Buildings vmaps
+start /b /w map_extractor.exe
+start /b /w vmap4_extractor.exe
+start /b /w vmap4_assembler.exe Buildings vmaps
 rmdir Buildings /s /q
 start /b /w mmaps_generator.exe
 GOTO MENU

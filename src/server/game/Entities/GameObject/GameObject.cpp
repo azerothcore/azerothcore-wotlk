@@ -52,6 +52,7 @@ GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_respawnDelayTime = 300;
     m_despawnDelay = 0;
     m_despawnRespawnTime = 0s;
+    m_restockTime = 0s;
     m_lootState = GO_NOT_READY;
     m_spawnedByDefault = true;
     m_allowModifyDestructibleBuilding = true;
@@ -96,7 +97,7 @@ bool GameObject::AIM_Initialize()
     return true;
 }
 
-std::string GameObject::GetAIName() const
+std::string const& GameObject::GetAIName() const
 {
     return sObjectMgr->GetGameObjectTemplate(GetEntry())->AIName;
 }
@@ -131,7 +132,7 @@ void GameObject::RemoveFromOwner()
         return;
     }
 
-    LOG_FATAL("entities.gameobject", "Delete GameObject ({} Entry: {} SpellId {} LinkedGO {}) that lost references to owner {} GO list. Crash possible later.",
+    LOG_DEBUG("entities.gameobject", "Delete GameObject ({} Entry: {} SpellId {} LinkedGO {}) that lost references to owner {} GO list.",
         GetGUID().ToString(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), ownerGUID.ToString());
 
     SetOwnerGUID(ObjectGuid::Empty);
@@ -158,6 +159,8 @@ void GameObject::AddToWorld()
         EnableCollision(GetGoState() == GO_STATE_READY || IsTransport()); // pussywizard: this startOpen is unneeded here, collision depends entirely on GOState
 
         WorldObject::AddToWorld();
+
+        loot.sourceWorldObjectGUID = GetGUID();
 
         sScriptMgr->OnGameObjectAddWorld(this);
     }
@@ -583,6 +586,16 @@ void GameObject::Update(uint32 diff)
                             spellCaster->CastSpell(spellCaster, spellId, triggered);
                             return;
                         }
+                    case GAMEOBJECT_TYPE_CHEST:
+                        if (m_restockTime > GameTime::GetGameTime())
+                        {
+                            return;
+                        }
+                        // If there is no restock timer, or if the restock timer passed, the chest becomes ready to loot
+                        m_restockTime = 0s;
+                        m_lootState = GO_READY;
+                        AddToObjectUpdateIfNeeded();
+                        break;
                     default:
                         m_lootState = GO_READY;                         // for other GOis same switched without delay to GO_READY
                         break;
@@ -766,6 +779,14 @@ void GameObject::Update(uint32 diff)
                                 m_groupLootTimer -= diff;
                             }
                         }
+
+                        // Non-consumable chest was partially looted and restock time passed, restock all loot now
+                        if (GetGOInfo()->chest.consumable == 0 && GameTime::GetGameTime() >= m_restockTime)
+                        {
+                            m_restockTime = 0s;
+                            m_lootState = GO_READY;
+                            AddToObjectUpdateIfNeeded();
+                        }
                         break;
                     case GAMEOBJECT_TYPE_TRAP:
                     {
@@ -824,21 +845,29 @@ void GameObject::Update(uint32 diff)
 
                 loot.clear();
 
-                //! If this is summoned by a spell with ie. SPELL_EFFECT_SUMMON_OBJECT_WILD, with or without owner, we check respawn criteria based on spell
-                //! The GetOwnerGUID() check is mostly for compatibility with hacky scripts - 99% of the time summoning should be done trough spells.
-                if (GetSpellId() || GetOwnerGUID())
+                // Do not delete chests or goobers that are not consumed on loot, while still allowing them to despawn when they expire if summoned
+                bool isSummonedAndExpired = (GetOwner() || GetSpellId()) && m_respawnTime == 0;
+                if ((GetGoType() == GAMEOBJECT_TYPE_CHEST || GetGoType() == GAMEOBJECT_TYPE_GOOBER) && !GetGOInfo()->IsDespawnAtAction() && !isSummonedAndExpired)
                 {
-                    //Don't delete spell spawned chests, which are not consumed on loot
-                    if (m_respawnTime > 0 && GetGoType() == GAMEOBJECT_TYPE_CHEST && !GetGOInfo()->IsDespawnAtAction())
+                    if (GetGoType() == GAMEOBJECT_TYPE_CHEST && GetGOInfo()->chest.chestRestockTime > 0)
                     {
-                        UpdateObjectVisibility();
-                        SetLootState(GO_READY);
+                        // Start restock timer when the chest is fully looted
+                        m_restockTime = GameTime::GetGameTime() + Seconds(GetGOInfo()->chest.chestRestockTime);
+                        SetLootState(GO_NOT_READY);
+                        AddToObjectUpdateIfNeeded();
                     }
                     else
                     {
-                        SetRespawnTime(0);
-                        Delete();
+                        SetLootState(GO_READY);
                     }
+
+                    UpdateObjectVisibility();
+                    return;
+                }
+                else if (GetOwnerGUID() || GetSpellId())
+                {
+                    SetRespawnTime(0);
+                    Delete();
                     return;
                 }
 
@@ -1011,7 +1040,7 @@ void GameObject::SaveToDB(bool saveAddon /*= false*/)
 {
     // this should only be used when the gameobject has already been loaded
     // preferably after adding to map, because mapid may not be valid otherwise
-    GameObjectData const* data = sObjectMgr->GetGOData(m_spawnId);
+    GameObjectData const* data = sObjectMgr->GetGameObjectData(m_spawnId);
     if (!data)
     {
         LOG_ERROR("entities.gameobject", "GameObject::SaveToDB failed, cannot get gameobject data!");
@@ -1090,7 +1119,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
 
 bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap)
 {
-    GameObjectData const* data = sObjectMgr->GetGOData(spawnId);
+    GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
 
     if (!data)
     {
@@ -1314,7 +1343,7 @@ bool GameObject::ActivateToQuest(Player* target) const
         case GAMEOBJECT_TYPE_CHEST:
             {
                 // scan GO chest with loot including quest items
-                if (LootTemplates_Gameobject.HaveQuestLootForPlayer(GetGOInfo()->GetLootId(), target))
+                if (target->GetQuestStatus(GetGOInfo()->chest.questId) == QUEST_STATUS_INCOMPLETE || LootTemplates_Gameobject.HaveQuestLootForPlayer(GetGOInfo()->GetLootId(), target))
                 {
                     //TODO: fix this hack
                     //look for battlegroundAV for some objects which are only activated after mine gots captured by own team
@@ -1412,7 +1441,7 @@ void GameObject::UseDoorOrButton(uint32 time_to_restore, bool alternative /* = f
 void GameObject::SetGoArtKit(uint8 kit)
 {
     SetByteValue(GAMEOBJECT_BYTES_1, 2, kit);
-    GameObjectData* data = const_cast<GameObjectData*>(sObjectMgr->GetGOData(m_spawnId));
+    GameObjectData* data = const_cast<GameObjectData*>(sObjectMgr->GetGameObjectData(m_spawnId));
     if (data)
         data->artKit = kit;
 }
@@ -1423,10 +1452,10 @@ void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType l
     if (go)
     {
         go->SetGoArtKit(artkit);
-        data = go->GetGOData();
+        data = go->GetGameObjectData();
     }
     else if (lowguid)
-        data = sObjectMgr->GetGOData(lowguid);
+        data = sObjectMgr->GetGameObjectData(lowguid);
 
     if (data)
         const_cast<GameObjectData*>(data)->artKit = artkit;
@@ -1455,7 +1484,6 @@ void GameObject::Use(Unit* user)
     Unit* spellCaster = user;
     uint32 spellId = 0;
     bool triggered = false;
-    bool tmpfish = false;
 
     if (Player* playerUser = user->ToPlayer())
     {
@@ -1678,7 +1706,6 @@ void GameObject::Use(Unit* user)
                 // cast this spell later if provided
                 spellId = info->goober.spellId;
                 spellCaster = user;
-                tmpfish = true;
 
                 break;
             }
@@ -1742,11 +1769,13 @@ void GameObject::Use(Unit* user)
 
                             LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} chance {} roll: {}", skill, zone_skill, chance, roll);
 
+                            if (sScriptMgr->OnUpdateFishingSkill(player, skill, zone_skill, chance, roll))
+                            {
+                                player->UpdateFishingSkill();
+                            }
                             // but you will likely cause junk in areas that require a high fishing skill (not yet implemented)
                             if (chance >= roll)
                             {
-                                player->UpdateFishingSkill();
-
                                 //TODO: I do not understand this hack. Need some explanation.
                                 // prevent removing GO at spell cancel
                                 RemoveFromOwner();
@@ -1765,8 +1794,6 @@ void GameObject::Use(Unit* user)
                             }
                             else // else: junk
                                 player->SendLoot(GetGUID(), LOOT_FISHING_JUNK);
-
-                            tmpfish = true;
                             break;
                         }
                     case GO_JUST_DEACTIVATED:                   // nothing to do, will be deleted at next update
@@ -1780,11 +1807,7 @@ void GameObject::Use(Unit* user)
                             break;
                         }
                 }
-
-                if(tmpfish)
-                    player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
-                else
-                    player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+                player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
                 return;
             }
 
@@ -1885,10 +1908,10 @@ void GameObject::Use(Unit* user)
                     return;
 
                 //required lvl checks!
-                uint8 level = player->getLevel();
+                uint8 level = player->GetLevel();
                 if (level < info->meetingstone.minLevel)
                     return;
-                level = targetPlayer->getLevel();
+                level = targetPlayer->GetLevel();
                 if (level < info->meetingstone.minLevel)
                     return;
 
@@ -2053,20 +2076,19 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
     if (!spellInfo)
         return;
 
-    bool self = false;
+    bool self = true;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        if (spellInfo->Effects[i].TargetA.GetTarget() == TARGET_UNIT_CASTER)
+        if (spellInfo->Effects[i].TargetA.GetReferenceType() != TARGET_REFERENCE_TYPE_CASTER || spellInfo->Effects[i].TargetB.GetTarget())
         {
-            self = true;
+            self = false;
             break;
         }
     }
 
-    if (self)
+    if (self && target && target->GetGUID() != GetGUID())
     {
-        if (target)
-            target->CastSpell(target, spellInfo, true);
+        target->CastSpell(target, spellInfo, true);
         return;
     }
 
@@ -2077,7 +2099,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
 
     if (Unit* owner = GetOwner())
     {
-        trigger->SetLevel(owner->getLevel(), false);
+        trigger->SetLevel(owner->GetLevel(), false);
         trigger->SetFaction(owner->GetFaction());
         // needed for GO casts for proper target validation checks
         trigger->SetOwnerGUID(owner->GetGUID());
@@ -2085,10 +2107,16 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
         if (owner->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
             trigger->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
         if (owner->IsFFAPvP())
-            trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        {
+            if (!trigger->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
+            {
+                sScriptMgr->OnFfaPvpStateUpdate(trigger, true);
+                trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+            }
 
+        }
         // xinef: Remove Immunity flags
-        trigger->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        trigger->SetImmuneToNPC(false);
         // xinef: set proper orientation, fixes cast against stealthed targets
         if (target)
             trigger->SetInFront(target);
@@ -2165,7 +2193,7 @@ void GameObject::EventInform(uint32 eventId)
 
 uint32 GameObject::GetScriptId() const
 {
-    if (GameObjectData const* gameObjectData = GetGOData())
+    if (GameObjectData const* gameObjectData = GetGameObjectData())
         if (uint32 scriptId = gameObjectData->ScriptId)
             return scriptId;
 
@@ -2271,7 +2299,7 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/
     Player* player = attackerOrHealer->GetCharmerOrOwnerPlayerOrPlayerItself();
 
     // dealing damage, send packet
-    // TODO: is there any packet for healing?
+    /// @todo: is there any packet for healing?
     if (player)
     {
         WorldPacket data(SMSG_DESTRUCTIBLE_BUILDING_DAMAGE, 8 + 8 + 8 + 4 + 4);
@@ -2412,6 +2440,13 @@ void GameObject::SetLootState(LootState state, Unit* unit)
 
     AI()->OnStateChanged(state, unit);
     sScriptMgr->OnGameObjectLootStateChanged(this, state, unit);
+
+    // Start restock timer if the chest is partially looted or not looted at all
+    if (GetGoType() == GAMEOBJECT_TYPE_CHEST && state == GO_ACTIVATED && GetGOInfo()->chest.chestRestockTime > 0 && m_restockTime == 0s)
+    {
+        m_restockTime = GameTime::GetGameTime() + Seconds(GetGOInfo()->chest.chestRestockTime);
+    }
+
     // pussywizard: lootState has nothing to do with collision, it depends entirely on GOState. Loot state is for timed close/open door and respawning, which then sets GOState
     /*if (m_model)
     {
@@ -2447,7 +2482,7 @@ void GameObject::SetGoState(GOState state)
         // startOpen determines whether we are going to add or remove the LoS on activation
         /*bool startOpen = (GetGoType() == GAMEOBJECT_TYPE_DOOR || GetGoType() == GAMEOBJECT_TYPE_BUTTON ? GetGOInfo()->door.startOpen : false);
 
-        if (GetGOData() && GetGOData()->go_state == GO_STATE_READY)
+        if (GetGameObjectData() && GetGameObjectData()->go_state == GO_STATE_READY)
             startOpen = !startOpen;
 
         if (state == GO_STATE_ACTIVE || state == GO_STATE_ACTIVE_ALTERNATIVE)
@@ -2786,13 +2821,17 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
                     case GAMEOBJECT_TYPE_CHEST:
                     case GAMEOBJECT_TYPE_GOOBER:
                         if (ActivateToQuest(target))
-                            dynFlags |= GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE;
+                        {
+                            dynFlags |= GO_DYNFLAG_LO_ACTIVATE;
+                            if (sWorld->getBoolConfig(CONFIG_OBJECT_SPARKLES))
+                                dynFlags |= GO_DYNFLAG_LO_SPARKLE;
+                        }
                         else if (targetIsGM)
                             dynFlags |= GO_DYNFLAG_LO_ACTIVATE;
                         break;
                     case GAMEOBJECT_TYPE_SPELL_FOCUS:
                     case GAMEOBJECT_TYPE_GENERIC:
-                        if (ActivateToQuest(target))
+                        if (ActivateToQuest(target) && sWorld->getBoolConfig(CONFIG_OBJECT_SPARKLES))
                             dynFlags |= GO_DYNFLAG_LO_SPARKLE;
                         break;
                     case GAMEOBJECT_TYPE_TRANSPORT:
@@ -2847,7 +2886,7 @@ void GameObject::GetRespawnPosition(float& x, float& y, float& z, float* ori /* 
 {
     if (m_spawnId)
     {
-        if (GameObjectData const* data = sObjectMgr->GetGOData(m_spawnId))
+        if (GameObjectData const* data = sObjectMgr->GetGameObjectData(m_spawnId))
         {
             x = data->posX;
             y = data->posY;
@@ -3088,4 +3127,12 @@ bool GameObject::IsInSkillupList(ObjectGuid playerGuid) const
     }
 
     return false;
+}
+
+std::string GameObject::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << WorldObject::GetDebugInfo() << "\n"
+        << "SpawnId: " << GetSpawnId() << " GoState: " << std::to_string(GetGoState()) << " ScriptId: " << GetScriptId() << " AIName: " << GetAIName();
+    return sstr.str();
 }

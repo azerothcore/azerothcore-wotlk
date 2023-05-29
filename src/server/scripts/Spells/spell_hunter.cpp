@@ -31,7 +31,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -463,7 +463,7 @@ class spell_hun_chimera_shot : public SpellScript
 
                         // Amount of one aura tick
                         basePoint = int32(CalculatePct(unitTarget->GetMaxPower(POWER_MANA), aurEff->GetAmount()));
-                        int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_MANA) / 50; // TODO: Caster uses unitTarget?
+                        int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_MANA) / 50; /// @todo: Caster uses unitTarget?
                         if (basePoint > casterBasePoint)
                             basePoint = casterBasePoint;
                         ApplyPct(basePoint, TickCount * 60);
@@ -655,23 +655,31 @@ class spell_hun_readiness : public SpellScript
 
         SpellCooldowns& cooldowns = caster->GetSpellCooldownMap();
 
-        SpellCooldowns::iterator itr, next;
-        for (itr = cooldowns.begin(); itr != cooldowns.end(); itr = next)
-        {
-            next = itr;
-            ++next;
+        std::set<std::pair<uint32, bool>> spellsToRemove;
+        std::set<uint32> categoriesToRemove;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+        for (const auto& [spellId, cooldown] : cooldowns)
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (spellInfo
             && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
             && spellInfo->Id != SPELL_HUNTER_READINESS
             && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH
-            && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU
-            && spellInfo->GetRecoveryTime() > 0)
+            && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU)
             {
-                caster->RemoveSpellCooldown(spellInfo->Id, itr->second.needSendToClient);
+                if (spellInfo->RecoveryTime > 0)
+                    spellsToRemove.insert(std::make_pair(spellInfo->Id, cooldown.needSendToClient));
+
+                if (spellInfo->CategoryRecoveryTime > 0)
+                    categoriesToRemove.insert(spellInfo->GetCategory());
             }
         }
+
+        // we can't remove spell cooldowns while iterating.
+        for (const auto& [spellId, sendToClient] : spellsToRemove)
+            caster->RemoveSpellCooldown(spellId, sendToClient);
+        for (const auto& category : categoriesToRemove)
+            caster->RemoveCategoryCooldown(category);
     }
 
     void Register() override
@@ -942,7 +950,7 @@ class spell_hun_tame_beast : public SpellScript
 
         if (Creature* target = GetExplTargetUnit()->ToCreature())
         {
-            if (target->getLevel() > player->getLevel())
+            if (target->GetLevel() > player->GetLevel())
             {
                 player->SendTameFailure(PET_TAME_TOO_HIGHLEVEL);
                 return SPELL_FAILED_DONT_REPORT;

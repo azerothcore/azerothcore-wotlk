@@ -62,15 +62,15 @@ namespace lfg
 
     private:
         // General
-        LfgState m_State;                                  ///< State if group in LFG
-        LfgState m_OldState;                               ///< Old State
-        ObjectGuid m_Leader;                               ///< Leader GUID
-        LfgGuidSet m_Players;                              ///< Players in group
+        LfgState m_State;                   ///< State if group in LFG
+        LfgState m_OldState;                ///< Old State
+        ObjectGuid m_Leader;                ///< Leader GUID
+        LfgGuidSet m_Players;               ///< Players in group
         // Dungeon
-        uint32 m_Dungeon;                                  ///< Dungeon entry
+        uint32 m_Dungeon;                   ///< Dungeon entry
         bool _isLFGGroup;
         // Vote Kick
-        uint8 m_KicksLeft;                                 ///< Number of kicks left
+        uint8 m_KicksLeft;                  ///< Number of kicks left
     };
 
 } // namespace lfg

@@ -39,89 +39,71 @@ enum MaidenOfVirtue
     EVENT_KILL_TALK             = 5
 };
 
-class boss_maiden_of_virtue : public CreatureScript
+struct boss_maiden_of_virtue : public BossAI
 {
-public:
-    boss_maiden_of_virtue() : CreatureScript("boss_maiden_of_virtue") { }
+    boss_maiden_of_virtue(Creature* creature) : BossAI(creature, DATA_MAIDEN) { }
 
-    struct boss_maiden_of_virtueAI : public BossAI
+    void JustEngagedWith(Unit* who) override
     {
-        boss_maiden_of_virtueAI(Creature* creature) : BossAI(creature, DATA_MAIDEN) { }
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
 
-        void Reset() override
-        {
-            BossAI::Reset();
-        }
+        DoCastAOE(SPELL_HOLY_GROUND, true);
+        events.ScheduleEvent(EVENT_SPELL_REPENTANCE, 25s);
+        events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, 8s);
+        events.ScheduleEvent(EVENT_SPELL_HOLY_WRATH, 15s);
+        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 10min);
+    }
 
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-            {
-                Talk(SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 5000);
-            }
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            BossAI::JustDied(killer);
-            Talk(SAY_DEATH);
-        }
-
-        void EnterCombat(Unit* who) override
-        {
-            BossAI::EnterCombat(who);
-            Talk(SAY_AGGRO);
-
-            me->CastSpell(me, SPELL_HOLY_GROUND, true);
-            events.ScheduleEvent(EVENT_SPELL_REPENTANCE, 25000);
-            events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, 8000);
-            events.ScheduleEvent(EVENT_SPELL_HOLY_WRATH, 15000);
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
-            DoZoneInCombat();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_REPENTANCE:
-                    me->CastSpell(me, SPELL_REPENTANCE, true);
-                    events.ScheduleEvent(EVENT_SPELL_REPENTANCE, urand(25000, 35000));
-                    break;
-                case EVENT_SPELL_HOLY_FIRE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
-                        me->CastSpell(target, SPELL_HOLY_FIRE, true);
-                    events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, urand(8000, 18000));
-                    break;
-                case EVENT_SPELL_HOLY_WRATH:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
-                        me->CastSpell(target, SPELL_HOLY_WRATH, true);
-                    events.ScheduleEvent(EVENT_SPELL_HOLY_WRATH, urand(20000, 25000));
-                    break;
-                case EVENT_SPELL_ENRAGE:
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void KilledUnit(Unit* /*victim*/) override
     {
-        return GetKarazhanAI<boss_maiden_of_virtueAI>(creature);
+        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+        {
+            Talk(SAY_SLAY);
+            events.ScheduleEvent(EVENT_KILL_TALK, 5s);
+        }
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        Talk(SAY_DEATH);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_SPELL_REPENTANCE:
+                DoCastAOE(SPELL_REPENTANCE, true);
+                Talk(SAY_REPENTANCE);
+                events.Repeat(25s, 35s);
+                break;
+            case EVENT_SPELL_HOLY_FIRE:
+                DoCastRandomTarget(SPELL_HOLY_FIRE, 0, 50.0f);
+                events.Repeat(8s, 18s);
+                break;
+            case EVENT_SPELL_HOLY_WRATH:
+                DoCastRandomTarget(SPELL_HOLY_WRATH, 0, 80.0f);
+                events.Repeat(20s, 25s);
+                break;
+            case EVENT_SPELL_ENRAGE:
+                DoCastSelf(SPELL_BERSERK, true);
+                break;
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
 void AddSC_boss_maiden_of_virtue()
 {
-    new boss_maiden_of_virtue();
+    RegisterKarazhanCreatureAI(boss_maiden_of_virtue);
 }

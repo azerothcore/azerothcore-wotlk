@@ -27,17 +27,15 @@
 
 enum Yells
 {
-    SAY_AGGRO                       = 14,
-    SAY_SLAY_1                      = 15,
-    SAY_DEATH                       = 17,
-    SAY_FORGE_1                     = 18,
-    SAY_FORGE_2                     = 19,
-
-    SAY_BOULDER_HIT                 = 16,
-    EMOTE_DEEP_FREEZE               = 23,
+    SAY_AGGRO                       = 0,
+    SAY_HP_66                       = 1,
+    SAY_HP_33                       = 2,
+    SAY_DEATH                       = 3,
+    SAY_SLAY                        = 4,
+    SAY_BOULDER_HIT                 = 5,
+    WHISPER_BOULDER                 = 6,
+    EMOTE_DEEP_FREEZE               = 7,
 };
-
-#define EMOTE_THROW_SARONITE        "%s hurls a massive saronite boulder at you!"
 
 enum MiscData
 {
@@ -109,13 +107,13 @@ public:
                 pInstance->SetData(DATA_ACHIEV_ELEVEN, 0);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->CastSpell(me, SPELL_PERMAFROST, true);
 
             Talk(SAY_AGGRO);
             DoZoneInCombat();
-            events.RescheduleEvent(EVENT_SPELL_THROW_SARONITE, urand(5000, 7500));
+            events.RescheduleEvent(EVENT_SPELL_THROW_SARONITE, 5000ms, 7500ms);
 
             if (pInstance)
                 pInstance->SetData(DATA_GARFROST, IN_PROGRESS);
@@ -129,9 +127,9 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->SetTarget();
                 me->SendMeleeAttackStop(me->GetVictim());
-                events.DelayEvents(8000);
+                events.DelayEvents(8s);
                 me->CastSpell(me, SPELL_THUNDERING_STOMP, false);
-                events.RescheduleEvent(EVENT_JUMP, 1250);
+                events.RescheduleEvent(EVENT_JUMP, 1250ms);
                 return;
             }
 
@@ -142,9 +140,9 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->SetTarget();
                 me->SendMeleeAttackStop(me->GetVictim());
-                events.DelayEvents(8000);
+                events.DelayEvents(8s);
                 me->CastSpell(me, SPELL_THUNDERING_STOMP, false);
-                events.RescheduleEvent(EVENT_JUMP, 1250);
+                events.RescheduleEvent(EVENT_JUMP, 1250ms);
                 return;
             }
         }
@@ -158,14 +156,14 @@ public:
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->CastSpell(me, SPELL_FORGE_BLADE, false);
-                Talk(SAY_FORGE_1);
+                Talk(SAY_HP_66);
             }
             else if (phase == 2)
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->RemoveAurasDueToSpell(SPELL_FORGE_BLADE);
                 me->CastSpell(me, SPELL_FORGE_MACE, false);
-                Talk(SAY_FORGE_2);
+                Talk(SAY_HP_33);
             }
         }
 
@@ -194,7 +192,7 @@ public:
             }
             else if (spell->Id == uint32(SPELL_FORGE_MACE))
             {
-                events.RescheduleEvent(EVENT_SPELL_DEEP_FREEZE, 10000);
+                events.RescheduleEvent(EVENT_SPELL_DEEP_FREEZE, 10s);
                 SetEquipmentSlots(false, EQUIP_ID_MACE);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetControlled(false, UNIT_STATE_ROOT);
@@ -244,12 +242,10 @@ public:
                     bCanSayBoulderHit = true;
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true))
                     {
-                        WorldPacket data;
-                        ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, EMOTE_THROW_SARONITE);
-                        target->ToPlayer()->GetSession()->SendPacket(&data);
+                        Talk(WHISPER_BOULDER, target);
                         me->CastSpell(target, SPELL_THROW_SARONITE, false);
                     }
-                    events.RepeatEvent(urand(12500, 20000));
+                    events.Repeat(12s + 500ms, 20s);
                     break;
                 case EVENT_JUMP:
                     me->DisableRotate(true);
@@ -261,7 +257,7 @@ public:
                     break;
                 case EVENT_SPELL_CHILLING_WAVE:
                     me->CastSpell(me->GetVictim(), SPELL_CHILLING_WAVE, false);
-                    events.RepeatEvent(35000);
+                    events.Repeat(35s);
                     break;
                 case EVENT_SPELL_DEEP_FREEZE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
@@ -269,7 +265,7 @@ public:
                         Talk(EMOTE_DEEP_FREEZE, target);
                         me->CastSpell(target, SPELL_DEEP_FREEZE, false);
                     }
-                    events.RepeatEvent(35000);
+                    events.Repeat(35s);
                     break;
             }
 
@@ -286,7 +282,7 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY_1);
+                Talk(SAY_SLAY);
         }
 
         void EnterEvadeMode(EvadeReason why) override

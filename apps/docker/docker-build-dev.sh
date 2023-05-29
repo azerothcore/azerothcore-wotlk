@@ -2,8 +2,6 @@
 
 CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-IMPORT_DB=$1
-
 source "$CUR_PATH/docker-build-prod.sh"
 
 echo "Fixing EOL..."
@@ -14,5 +12,3 @@ for file in "env/dist/etc/"*
 do
     dos2unix -n $file $file
 done
-
-[[ $IMPORT_DB != 0 ]] && bash acore.sh db-assembler import-all || true

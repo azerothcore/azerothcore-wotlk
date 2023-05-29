@@ -821,19 +821,19 @@ public:
                             if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
                                 break;
 
-                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            std::list<Player*> targets;
+                            Acore::AnyPlayerInObjectRangeCheck check(me, me->GetVisibilityRange(), false);
+                            Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
+                            Cell::VisitWorldObjects(me, searcher, me->GetVisibilityRange());
+                            for (Player* player : targets)
                             {
-                                if (Player* player = itr->GetSource())
+                                if (player->GetTeamId() == TEAM_HORDE)
                                 {
-                                    if (player->GetTeamId() == TEAM_HORDE)
-                                    {
-                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
-                                    }
-                                    else
-                                    {
-                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
-                                    }
+                                    me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
+                                }
+                                else
+                                {
+                                    me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
                                 }
                             }
 
@@ -1073,7 +1073,11 @@ public:
         //player->CastSpell(player, SPELL_SUMMON_RIZZLE, false);
 
         if (Creature* creature = player->SummonCreature(NPC_RIZZLE, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
-            creature->CastSpell(player, SPELL_BLACKJACK, false);
+        {
+            // no need casting spell blackjack, it's casted by script npc_rizzle_sprysprocket.
+            //creature->CastSpell(player, SPELL_BLACKJACK, false);
+            creature->AI()->AttackStart(player);
+        }
 
         return false;
     }
@@ -1446,39 +1450,6 @@ public:
     {
         go_soulwellAI(GameObject* go) : GameObjectAI(go)
         {
-            _stoneSpell = 0;
-            _stoneId = 0;
-            switch (go->GetEntry())
-            {
-                case GO_SOUL_WELL_R1:
-                    _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R0;
-                    if (Unit* owner = go->GetOwner())
-                    {
-                        if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
-                            _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R1;
-                        else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
-                            _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R2;
-                    }
-                    break;
-                case GO_SOUL_WELL_R2:
-                    _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R0;
-                    if (Unit* owner = go->GetOwner())
-                    {
-                        if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
-                            _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R1;
-                        else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
-                            _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R2;
-                    }
-                    break;
-            }
-            if (_stoneSpell == 0) // Should never happen
-                return;
-
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(_stoneSpell);
-            if (!spellInfo)
-                return;
-
-            _stoneId = spellInfo->Effects[EFFECT_0].ItemType;
         }
 
         /// Due to the fact that this GameObject triggers CMSG_GAMEOBJECT_USE
@@ -1491,40 +1462,93 @@ public:
                 return false;
 
             Unit* owner = me->GetOwner();
-            if (_stoneSpell == 0 || _stoneId == 0)
+            if (!owner)
+                return true;
+
+            uint32 stoneId = 0;
+            uint32 stoneSpell = 0;
+            switch (me->GetEntry())
             {
-                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
-                    Spell::SendCastResult(player, spell, 0, SPELL_FAILED_ERROR);
+                case GO_SOUL_WELL_R1:
+                    stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R0;
+                    if (Unit* owner = me->GetOwner())
+                    {
+                        if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
+                        {
+                            stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R1;
+                        }
+                        else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
+                        {
+                            stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R2;
+                        }
+                    }
+                    break;
+                case GO_SOUL_WELL_R2:
+                    stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R0;
+                    if (Unit* owner = me->GetOwner())
+                    {
+                        if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
+                        {
+                            stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R1;
+                        }
+                        else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
+                        {
+                            stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R2;
+                        }
+                    }
+                    break;
+            }
+
+            if (!stoneSpell)
+            {
                 return true;
             }
 
-            if (!owner || owner->GetTypeId() != TYPEID_PLAYER || !player->IsInSameRaidWith(owner->ToPlayer()))
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(stoneSpell);
+            if (!spellInfo)
             {
-                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
+                return true;
+            }
+
+            stoneId = spellInfo->Effects[EFFECT_0].ItemType;
+            if (!stoneId)
+            {
+                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(stoneSpell))
+                {
+                    Spell::SendCastResult(player, spell, 0, SPELL_FAILED_ERROR);
+                }
+                return true;
+            }
+
+            if (owner->GetTypeId() != TYPEID_PLAYER || !player->IsInSameRaidWith(owner->ToPlayer()))
+            {
+                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(stoneSpell))
+                {
                     Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TARGET_NOT_IN_RAID);
+                }
                 return true;
             }
 
             // Don't try to add a stone if we already have one.
-            if (player->HasItemCount(_stoneId))
+            if (player->HasItemCount(stoneId))
             {
-                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
+                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(stoneSpell))
+                {
                     Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TOO_MANY_OF_ITEM);
+                }
                 return true;
             }
 
-            player->CastSpell(player, _stoneSpell, false);
+            player->CastSpell(player, stoneSpell, false);
 
             // Item has to actually be created to remove a charge on the well.
-            if (player->HasItemCount(_stoneId))
+            if (player->HasItemCount(stoneId))
+            {
                 me->AddUse();
+            }
 
             return true;
         }
-
-    private:
-        uint32 _stoneSpell;
-        uint32 _stoneId;
     };
 
     GameObjectAI* GetAI(GameObject* go) const override
@@ -1876,6 +1900,12 @@ public:
                     tm local_tm = Acore::Time::TimeBreakdown();
                     uint8 _rings = (local_tm.tm_hour) % 12;
                     _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
+
+                    // Dwarf hourly horn should only play a single time, each time the next hour begins.
+                    if (_soundId == BELLTOLLDWARFGNOME)
+                    {
+                        _rings = 1;
+                    }
 
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)

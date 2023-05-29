@@ -28,6 +28,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "WorldSession.h"
 
@@ -133,6 +134,17 @@ void InstanceScript::LoadBossBoundaries(const BossBoundaryData& data)
             bosses[entry.bossId].boundary.push_back(entry.boundary);
 }
 
+void InstanceScript::SetHeaders(std::string const& dataHeaders)
+{
+    for (char header : dataHeaders)
+    {
+        if (isalpha(header))
+        {
+            headers.push_back(header);
+        }
+    }
+}
+
 void InstanceScript::LoadMinionData(const MinionData* data)
 {
     while (data->entry)
@@ -196,7 +208,10 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
                 minion->Respawn();
             else
             {
-                minion->AI()->DoZoneInCombat(nullptr, 100.0f);
+                if (minion->GetReactState() == REACT_AGGRESSIVE)
+                {
+                    minion->AI()->DoZoneInCombat(nullptr, 100.0f);
+                }
             }
             break;
         default:
@@ -307,6 +322,7 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
     if (id < bosses.size())
     {
         BossInfo* bossInfo = &bosses[id];
+        sScriptMgr->OnBeforeSetBossState(id, state, bossInfo->state, instance);
         if (bossInfo->state == TO_BE_DECIDED) // loading
         {
             bossInfo->state = state;
@@ -338,28 +354,130 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
     return false;
 }
 
-std::string InstanceScript::LoadBossState(const char* data)
+void InstanceScript::StorePersistentData(uint32 index, uint32 data)
+{
+    if (index > persistentData.size())
+    {
+        LOG_ERROR("scripts", "InstanceScript::StorePersistentData() index larger than storage size. Index: {} Size: {} Data: {}.", index, persistentData.size(), data);
+        return;
+    }
+
+    persistentData[index] = data;
+}
+
+void InstanceScript::DoForAllMinions(uint32 id, std::function<void(Creature*)> exec)
+{
+    BossInfo* bossInfo = &bosses[id];
+    MinionSet listCopy = bossInfo->minion;
+
+    for (auto const& minion : listCopy)
+    {
+        if (minion)
+        {
+            exec(minion);
+        }
+    }
+}
+
+void InstanceScript::Load(const char* data)
 {
     if (!data)
-        return nullptr;
+    {
+        OUT_LOAD_INST_DATA_FAIL;
+        return;
+    }
+
+    OUT_LOAD_INST_DATA(data);
+
     std::istringstream loadStream(data);
-    uint32 buff;
+
+    if (ReadSaveDataHeaders(loadStream))
+    {
+        ReadSaveDataBossStates(loadStream);
+        ReadSavePersistentData(loadStream);
+        ReadSaveDataMore(loadStream);
+    }
+    else
+        OUT_LOAD_INST_DATA_FAIL;
+
+    OUT_LOAD_INST_DATA_COMPLETE;
+}
+
+bool InstanceScript::ReadSaveDataHeaders(std::istringstream& data)
+{
+    for (char header : headers)
+    {
+        char buff;
+        data >> buff;
+
+        if (header != buff)
+            return false;
+    }
+
+    return true;
+}
+
+void InstanceScript::ReadSaveDataBossStates(std::istringstream& data)
+{
     uint32 bossId = 0;
     for (std::vector<BossInfo>::iterator i = bosses.begin(); i != bosses.end(); ++i, ++bossId)
     {
-        loadStream >> buff;
+        uint32 buff;
+        data >> buff;
+        if (buff == IN_PROGRESS || buff == FAIL || buff == SPECIAL)
+            buff = NOT_STARTED;
+
         if (buff < TO_BE_DECIDED)
-            SetBossState(bossId, (EncounterState)buff);
+            SetBossState(bossId, EncounterState(buff));
     }
-    return loadStream.str();
 }
 
-std::string InstanceScript::GetBossSaveData()
+void InstanceScript::ReadSavePersistentData(std::istringstream& data)
 {
+    for (uint32 i = 0; i < persistentData.size(); ++i)
+    {
+        data >> persistentData[i];
+    }
+}
+
+std::string InstanceScript::GetSaveData()
+{
+    OUT_SAVE_INST_DATA;
+
     std::ostringstream saveStream;
-    for (std::vector<BossInfo>::iterator i = bosses.begin(); i != bosses.end(); ++i)
-        saveStream << (uint32)i->state << ' ';
+
+    WriteSaveDataHeaders(saveStream);
+    WriteSaveDataBossStates(saveStream);
+    WritePersistentData(saveStream);
+    WriteSaveDataMore(saveStream);
+
+    OUT_SAVE_INST_DATA_COMPLETE;
+
     return saveStream.str();
+}
+
+void InstanceScript::WriteSaveDataHeaders(std::ostringstream& data)
+{
+    for (char header : headers)
+    {
+        data << header << ' ';
+    }
+}
+
+void InstanceScript::WriteSaveDataBossStates(std::ostringstream& data)
+{
+    for (BossInfo const& bossInfo : bosses)
+    {
+        data << uint32(bossInfo.state) << ' ';
+    }
+}
+
+void InstanceScript::WritePersistentData(std::ostringstream& data)
+{
+    for (auto const& entry : persistentData)
+    {
+        data << entry << ' ';
+    }
 }
 
 void InstanceScript::DoUseDoorOrButton(ObjectGuid uiGuid, uint32 uiWithRestoreTime, bool bUseAlternativeState)
@@ -387,16 +505,26 @@ void InstanceScript::DoRespawnGameObject(ObjectGuid uiGuid, uint32 uiTimeToDespa
 {
     if (GameObject* go = instance->GetGameObject(uiGuid))
     {
-        //not expect any of these should ever be handled
-        if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE || go->GetGoType() == GAMEOBJECT_TYPE_DOOR ||
-                go->GetGoType() == GAMEOBJECT_TYPE_BUTTON || go->GetGoType() == GAMEOBJECT_TYPE_TRAP)
-            return;
+        switch (go->GetGoType())
+        {
+            case GAMEOBJECT_TYPE_DOOR:
+            case GAMEOBJECT_TYPE_BUTTON:
+            case GAMEOBJECT_TYPE_TRAP:
+            case GAMEOBJECT_TYPE_FISHINGNODE:
+                // not expect any of these should ever be handled
+                LOG_ERROR("scripts", "InstanceScript: DoRespawnGameObject can't respawn gameobject entry {}, because type is {}.", go->GetEntry(), go->GetGoType());
+                return;
+            default:
+                break;
+        }
 
         if (go->isSpawned())
             return;
 
         go->SetRespawnTime(uiTimeToDespawn);
     }
+    else
+        LOG_DEBUG("scripts", "InstanceScript: DoRespawnGameObject failed");
 }
 
 void InstanceScript::DoRespawnCreature(ObjectGuid guid, bool force)
@@ -509,6 +637,35 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->CastSpell(player, spell, true);
+}
+
+void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets /*= false*/, bool includeControlled /*= false*/)
+{
+    if (!player)
+        return;
+
+    player->CastSpell(player, spell, true);
+
+    if (!includePets)
+        return;
+
+    for (uint8 itr2 = 0; itr2 < MAX_SUMMON_SLOT; ++itr2)
+    {
+        ObjectGuid summonGUID = player->m_SummonSlot[itr2];
+        if (!summonGUID.IsEmpty())
+            if (Creature* summon = instance->GetCreature(summonGUID))
+                summon->CastSpell(player, spell, true);
+    }
+
+    if (!includeControlled)
+        return;
+
+    for (auto itr2 = player->m_Controlled.begin(); itr2 != player->m_Controlled.end(); ++itr2)
+    {
+        if (Unit* controlled = *itr2)
+            if (controlled->IsInWorld() && controlled->GetTypeId() == TYPEID_UNIT)
+                controlled->CastSpell(player, spell, true);
+    }
 }
 
 bool InstanceScript::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= nullptr*/, uint32 /*miscvalue1*/ /*= 0*/)

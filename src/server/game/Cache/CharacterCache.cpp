@@ -86,7 +86,7 @@ void CharacterCache::LoadCharacterCacheStorage()
         } while (mailCountResult->NextRow());
     }
 
-    LOG_INFO("server.loading", "Loaded character infos for {} characters in {} ms", _characterCacheStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded Character Infos For {} Characters in {} ms", _characterCacheStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 

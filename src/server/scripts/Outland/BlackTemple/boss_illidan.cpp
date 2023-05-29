@@ -228,7 +228,7 @@ public:
             me->SetDisableGravity(false);
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
             me->LoadEquipment(0, true);
-            me->ReplaceAllUnitFlags(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             beamPosId = urand(0, 3);
         }
 
@@ -321,10 +321,10 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_FRENZY, 40000);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             summons.DespawnAll();
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             ScheduleNormalEvents(1);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 25 * MINUTE * IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_SUMMON_MINIONS, 1000);
@@ -957,7 +957,7 @@ public:
                 case EVENT_AKAMA_SCENE_29:
                     if (Creature* illidan = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDAN_STORMRAGE)))
                     {
-                        illidan->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        illidan->SetImmuneToAll(false);
                         illidan->SetInCombatWithZone();
                         AttackStart(illidan);
                     }

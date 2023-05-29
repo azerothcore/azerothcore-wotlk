@@ -219,7 +219,7 @@ public:
             if (creature->AI()->GetData(DATA_IN_PROGRESS))
                 return true;
 
-            creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            creature->SetImmuneToPC(false);
             creature->RemoveUnitFlag(UNIT_FLAG_SWIMMING);
 
             player->CastSpell(creature, SPELL_DUEL, false);
@@ -290,12 +290,12 @@ public:
                 timer = 600000; // clear playerGUIDs after 10 minutes if no one initiates a duel
                 me->GetMotionMaster()->MoveFollow(caster, 2.0f, 0.0f);
 
-                events.ScheduleEvent(EVENT_SPEAK, 3000);
-                events.ScheduleEvent(EVENT_SPEAK + 1, 7000);
-                events.ScheduleEvent(EVENT_SPEAK + 2, 8000);
-                events.ScheduleEvent(EVENT_SPEAK + 3, 9000);
-                events.ScheduleEvent(EVENT_SPEAK + 4, 10000);
-                events.ScheduleEvent(EVENT_SPEAK + 5, 11000);
+                events.ScheduleEvent(EVENT_SPEAK, 3s);
+                events.ScheduleEvent(EVENT_SPEAK + 1, 7s);
+                events.ScheduleEvent(EVENT_SPEAK + 2, 8s);
+                events.ScheduleEvent(EVENT_SPEAK + 3, 9s);
+                events.ScheduleEvent(EVENT_SPEAK + 4, 10s);
+                events.ScheduleEvent(EVENT_SPEAK + 5, 11s);
             }
         }
 
@@ -308,8 +308,8 @@ public:
                 else if (damage >= me->GetHealth())
                 {
                     damage = 0;
-                    events.ScheduleEvent(EVENT_DUEL_LOST, 2000);
-                    events.ScheduleEvent(EVENT_DUEL_LOST + 1, 6000);
+                    events.ScheduleEvent(EVENT_DUEL_LOST, 2s);
+                    events.ScheduleEvent(EVENT_DUEL_LOST + 1, 6s);
                     _duelGUID.Clear();
                     _duelInProgress = 0;
 
@@ -491,8 +491,8 @@ public:
             ScriptedAI::InitializeAI();
             me->SetReactState(REACT_PASSIVE);
 
-            events.ScheduleEvent(EVENT_GHOUL_EMOTE, 1);
-            events.ScheduleEvent(EVENT_GHOUL_RESTORE_STATE, 3500);
+            events.ScheduleEvent(EVENT_GHOUL_EMOTE, 1ms);
+            events.ScheduleEvent(EVENT_GHOUL_RESTORE_STATE, 3500ms);
         }
 
         void OwnerAttackedBy(Unit* attacker) override
@@ -504,7 +504,7 @@ public:
         void SetGUID(ObjectGuid guid, int32) override
         {
             gothikGUID = guid;
-            events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3000);
+            events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3s);
             me->GetMotionMaster()->Clear(false);
         }
 
@@ -535,7 +535,7 @@ public:
                     me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                     if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                         me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, frand(0.0f, 2 * M_PI));
-                    events.ScheduleEvent(EVENT_GHOUL_CHECK_COMBAT, 1000);
+                    events.ScheduleEvent(EVENT_GHOUL_CHECK_COMBAT, 1s);
                     return;
                 case EVENT_GHOUL_CHECK_COMBAT:
                     if (!me->IsInCombat())
@@ -584,7 +584,7 @@ public:
         {
             ScriptedAI::MoveInLineOfSight(who);
 
-            if (!who->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC) && who->GetEntry() == NPC_GHOUL && me->IsWithinDistInMap(who, 10.0f))
+            if (!who->IsImmuneToNPC() && who->GetEntry() == NPC_GHOUL && me->IsWithinDistInMap(who, 10.0f))
                 if (Unit* owner = who->GetOwner())
                     if (Player* player = owner->ToPlayer())
                     {
@@ -593,7 +593,7 @@ public:
                             creature->CastSpell(owner, 52517, true);
 
                         creature->AI()->SetGUID(me->GetGUID());
-                        creature->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        creature->SetImmuneToAll(true);
                     }
         }
 
@@ -743,17 +743,17 @@ public:
             phase = PHASE_CHAINED;
             events.Reset();
             me->SetFaction(FACTION_CREATURE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(true);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
             me->LoadEquipment(0, true);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_ICY_TOUCH, 1000, GCD_CAST);
-            events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 3000, GCD_CAST);
-            events.ScheduleEvent(EVENT_BLOOD_STRIKE, 2000, GCD_CAST);
-            events.ScheduleEvent(EVENT_DEATH_COIL, 5000, GCD_CAST);
+            events.ScheduleEvent(EVENT_ICY_TOUCH, 1s, GCD_CAST);
+            events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 3s, GCD_CAST);
+            events.ScheduleEvent(EVENT_BLOOD_STRIKE, 2s, GCD_CAST);
+            events.ScheduleEvent(EVENT_DEATH_COIL, 5s, GCD_CAST);
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -844,7 +844,7 @@ public:
                         else
                         {
                             me->SetFaction(FACTION_MONSTER);
-                            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                            me->SetImmuneToPC(false);
                             phase = PHASE_ATTACKING;
 
                             if (Player* target = ObjectAccessor::GetPlayer(*me, playerGUID))
@@ -866,22 +866,22 @@ public:
                             case EVENT_ICY_TOUCH:
                                 DoCastVictim(SPELL_ICY_TOUCH);
                                 events.DelayEvents(1000, GCD_CAST);
-                                events.ScheduleEvent(EVENT_ICY_TOUCH, 5000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_ICY_TOUCH, 5s, GCD_CAST);
                                 break;
                             case EVENT_PLAGUE_STRIKE:
                                 DoCastVictim(SPELL_PLAGUE_STRIKE);
                                 events.DelayEvents(1000, GCD_CAST);
-                                events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 5000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 5s, GCD_CAST);
                                 break;
                             case EVENT_BLOOD_STRIKE:
                                 DoCastVictim(SPELL_BLOOD_STRIKE);
                                 events.DelayEvents(1000, GCD_CAST);
-                                events.ScheduleEvent(EVENT_BLOOD_STRIKE, 5000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_BLOOD_STRIKE, 5s, GCD_CAST);
                                 break;
                             case EVENT_DEATH_COIL:
                                 DoCastVictim(SPELL_DEATH_COIL);
                                 events.DelayEvents(1000, GCD_CAST);
-                                events.ScheduleEvent(EVENT_DEATH_COIL, 5000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_DEATH_COIL, 5s, GCD_CAST);
                                 break;
                         }
                     }
@@ -964,7 +964,7 @@ public:
     {
         npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
         {
-            me->ReplaceAllUnitFlags(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->SetFaction(FACTION_FRIENDLY);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
@@ -987,7 +987,8 @@ public:
                 me->SetSpeed(MOVE_RUN, 1.25f);
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
-                me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(true);
                 me->SetFaction(FACTION_FRIENDLY);
             }
         }
@@ -1097,7 +1098,8 @@ public:
                     {
                         me->SetFacingToObject(car);
                         // xinef: add some flags
-                        car->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        car->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
+                        car->SetImmuneToAll(true);
                         car->SetFaction(FACTION_FRIENDLY);
                     }
                     Talk(SAY_SCARLET_MINER_0);

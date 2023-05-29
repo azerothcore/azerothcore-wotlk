@@ -61,6 +61,17 @@ SourceDirectory = ""
 #
 
 MySQLExecutable = ""
+
+#
+#    TempDir
+#        Description: Temp directory setting.
+#        Important:   TempDir needs to be quoted, as the string might contain space characters.
+#                     TempDir directory must exists, or the server can't work properly
+#        Example:     "/home/youruser/azerothcore/temp"
+#        Default:     "" - (Temp files will be stored in the current path)
+
+TempDir = ""
+
 ###################################################################################################
 
 ###################################################################################################

@@ -20,13 +20,12 @@
 #include "ScriptedCreature.h"
 #include "violet_hold.h"
 
-#define CLEANUP_CHECK_INTERVAL  5000
-#define SPAWN_TIME              20000
-
 enum vYells
 {
     CYANIGOSA_SAY_SPAWN       = 3,
-    SAY_SINCLARI_1            = 0
+    SAY_SINCLARI_LEAVING      = 0,
+    SAY_SINCLARI_DOOR_LOCK    = 1,
+    SAY_SINCLARI_COMPLETE     = 2,
 };
 
 class instance_violet_hold : public InstanceMapScript
@@ -84,6 +83,7 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             CLEANED = false;
             EncounterStatus = NOT_STARTED;
@@ -216,12 +216,12 @@ public:
                     {
                         EncounterStatus = IN_PROGRESS;
                         if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
-                            c->AI()->Talk(SAY_SINCLARI_1);
-                        events.RescheduleEvent(EVENT_GUARDS_FALL_BACK, 4000);
+                            c->AI()->Talk(SAY_SINCLARI_LEAVING);
+                        events.RescheduleEvent(EVENT_GUARDS_FALL_BACK, 4s);
                     }
                     break;
                 case DATA_PORTAL_DEFEATED:
-                    events.RescheduleEvent(EVENT_SUMMON_PORTAL, 3000);
+                    events.RescheduleEvent(EVENT_SUMMON_PORTAL, 3s);
                     break;
                 case DATA_PORTAL_LOCATION:
                     PortalLocation = data;
@@ -253,11 +253,16 @@ public:
                         EncounterStatus = DONE;
                         HandleGameObject(GO_MainGateGUID, true);
                         DoUpdateWorldState(WORLD_STATE_VH_SHOW, 0);
-                        if (Creature* c = instance->GetCreature(NPC_SinclariGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); }
+                        if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
+                        {
+                            c->AI()->Talk(SAY_SINCLARI_COMPLETE);
+                            c->DespawnOrUnsummon();
+                            c->SetRespawnTime(3);
+                        }
                     }
                     SaveToDB();
                     if (WaveCount < 18)
-                        events.RescheduleEvent(EVENT_SUMMON_PORTAL, 35000);
+                        events.RescheduleEvent(EVENT_SUMMON_PORTAL, 35s);
                     break;
                 case DATA_FAILED:
                     CLEANED = false;
@@ -345,13 +350,15 @@ public:
                     if (Creature* pGuard1 = instance->GetCreature(NPC_ErekemGuardGUID[0]))
                     {
                         pGuard1->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        pGuard1->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                        pGuard1->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        pGuard1->SetImmuneToNPC(false);
                         pGuard1->GetMotionMaster()->MovePoint(0, BossStartMove21);
                     }
                     if (Creature* pGuard2 = instance->GetCreature(NPC_ErekemGuardGUID[1]))
                     {
                         pGuard2->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        pGuard2->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                        pGuard2->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        pGuard2->SetImmuneToNPC(false);
                         pGuard2->GetMotionMaster()->MovePoint(0, BossStartMove22);
                     }
                     break;
@@ -384,7 +391,8 @@ public:
             if (pBoss)
             {
                 pBoss->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                pBoss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                pBoss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                pBoss->SetImmuneToNPC(false);
                 pBoss->SetReactState(REACT_AGGRESSIVE);
                 if ((WaveCount == 6 && m_auiEncounter[0] == DONE) || (WaveCount == 12 && m_auiEncounter[1] == DONE))
                     pBoss->SetLootMode(0);
@@ -402,7 +410,7 @@ public:
                     {
                         if( DoNeedCleanup(false) )
                             InstanceCleanup();
-                        events.RepeatEvent(CLEANUP_CHECK_INTERVAL);
+                        events.Repeat(5s);
                     }
                     break;
                 case EVENT_GUARDS_FALL_BACK:
@@ -415,7 +423,7 @@ public:
                                 c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 c->GetMotionMaster()->MovePoint(0, guardMovePosition);
                             }
-                        events.RescheduleEvent(EVENT_GUARDS_DISAPPEAR, 5000);
+                        events.RescheduleEvent(EVENT_GUARDS_DISAPPEAR, 5s);
                     }
                     break;
                 case EVENT_GUARDS_DISAPPEAR:
@@ -423,7 +431,7 @@ public:
                         for (uint8 i = 0; i < 4; ++i)
                             if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
                                 c->SetVisible(false);
-                        events.RescheduleEvent(EVENT_SINCLARI_FALL_BACK, 2000);
+                        events.RescheduleEvent(EVENT_SINCLARI_FALL_BACK, 2s);
                     }
                     break;
                 case EVENT_SINCLARI_FALL_BACK:
@@ -434,13 +442,19 @@ public:
                             c->GetMotionMaster()->MovePoint(0, sinclariOutsidePosition);
                         }
                         SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 0);
-                        events.RescheduleEvent(EVENT_START_ENCOUNTER, 4000);
+                        events.RescheduleEvent(EVENT_START_ENCOUNTER, 4s);
                     }
                     break;
                 case EVENT_START_ENCOUNTER:
                     {
+                        if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
+                        {
+                            c->AI()->Talk(SAY_SINCLARI_DOOR_LOCK);
+                        }
                         if (Creature* c = instance->GetCreature(NPC_DoorSealGUID))
+                        {
                             c->RemoveAllAuras(); // just to be sure...
+                        }
                         GateHealth = 100;
                         HandleGameObject(GO_MainGateGUID, false);
                         DoUpdateWorldState(WORLD_STATE_VH_SHOW, 1);
@@ -453,7 +467,7 @@ public:
                                 HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
                                 go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // make it useable
                             }
-                        events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4000);
+                        events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4s);
                     }
                     break;
                 case EVENT_SUMMON_PORTAL:
@@ -483,7 +497,7 @@ public:
                                 cyanigosa->AI()->Talk(CYANIGOSA_SAY_SPAWN);
                                 cyanigosa->GetMotionMaster()->MoveJump(MiddleRoomLocation.GetPositionX(), MiddleRoomLocation.GetPositionY(), MiddleRoomLocation.GetPositionZ(), 10.0f, 20.0f);
                             }
-                            events.RescheduleEvent(EVENT_CYANIGOSSA_TRANSFORM, 10000);
+                            events.RescheduleEvent(EVENT_CYANIGOSSA_TRANSFORM, 10s);
                         }
                     }
                     break;
@@ -492,12 +506,15 @@ public:
                     {
                         c->RemoveAurasDueToSpell(SPELL_CYANIGOSA_BLUE_AURA);
                         c->CastSpell(c, SPELL_CYANIGOSA_TRANSFORM, 0);
-                        events.RescheduleEvent(EVENT_CYANIGOSA_ATTACK, 2500);
+                        events.RescheduleEvent(EVENT_CYANIGOSA_ATTACK, 2500ms);
                     }
                     break;
                 case EVENT_CYANIGOSA_ATTACK:
                     if (Creature* c = instance->GetCreature(NPC_CyanigosaGUID))
-                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                    {
+                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        c->SetImmuneToNPC(false);
+                    }
                     break;
             }
         }
@@ -516,7 +533,7 @@ public:
             else
                 plr->SendUpdateWorldState(WORLD_STATE_VH_SHOW, 0);
 
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         bool DoNeedCleanup(bool enter)
@@ -594,15 +611,15 @@ public:
                 HandleGameObject(GO_ZuramatCellGUID, false);
 
                 // respawn bosses
-                if (Creature* c = instance->GetCreature(NPC_MoraggGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_MoraggGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_ErekemGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_ErekemGuardGUID[0])) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_ErekemGuardGUID[1])) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_IchoronGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_LavanthorGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_XevozzGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_ZuramatGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
+                if (Creature* c = instance->GetCreature(NPC_MoraggGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); c->SetImmuneToNPC(true); }
+                if (Creature* c = instance->GetCreature(NPC_MoraggGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); c->SetImmuneToNPC(true); }
+                if (Creature* c = instance->GetCreature(NPC_ErekemGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); c->SetImmuneToNPC(true); }
+                if (Creature* c = instance->GetCreature(NPC_ErekemGuardGUID[0])) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); c->SetImmuneToNPC(true); }
+                if (Creature* c = instance->GetCreature(NPC_ErekemGuardGUID[1])) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); c->SetImmuneToNPC(true); }
+                if (Creature* c = instance->GetCreature(NPC_IchoronGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); c->SetImmuneToNPC(true); }
+                if (Creature* c = instance->GetCreature(NPC_LavanthorGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); c->SetImmuneToNPC(true); }
+                if (Creature* c = instance->GetCreature(NPC_XevozzGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); c->SetImmuneToNPC(true); }
+                if (Creature* c = instance->GetCreature(NPC_ZuramatGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); c->SetImmuneToNPC(true); }
                 if (Creature* c = instance->GetCreature(NPC_CyanigosaGUID)) { c->DespawnOrUnsummon(); }
             }
 
@@ -615,7 +632,7 @@ public:
             if (m_auiEncounter[MAX_ENCOUNTER - 1] == DONE)
                 EncounterStatus = DONE;
             events.Reset();
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
@@ -631,57 +648,26 @@ public:
             return false;
         }
 
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "V H " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << uiFirstBoss << ' ' << uiSecondBoss;
-            str_data = saveStream.str();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return str_data;
-        }
-
-        void Load(const char* in) override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
             EncounterStatus = NOT_STARTED;
             CLEANED = false;
             events.Reset();
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0);
 
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
+            data >> m_auiEncounter[0];
+            data >> m_auiEncounter[1];
+            data >> m_auiEncounter[2];
+            data >> uiFirstBoss;
+        }
 
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-            uint32 data0, data1, data2, data3, data4;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1 >> data2 >> data3 >> data4;
-
-            if (dataHead1 == 'V' && dataHead2 == 'H')
-            {
-                m_auiEncounter[0] = data0;
-                m_auiEncounter[1] = data1;
-                m_auiEncounter[2] = data2;
-                uiFirstBoss = data3;
-                uiSecondBoss = data4;
-
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                    if (m_auiEncounter[i] == IN_PROGRESS)
-                        m_auiEncounter[i] = NOT_STARTED;
-
-                if (m_auiEncounter[MAX_ENCOUNTER - 1] == DONE)
-                    EncounterStatus = DONE;
-            }
-            else OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+        void WriteSaveDataMore(std::ostringstream& data) override
+        {
+            data << m_auiEncounter[0] << ' '
+                << m_auiEncounter[1] << ' '
+                << m_auiEncounter[2] << ' '
+                << uiFirstBoss << ' '
+                << uiSecondBoss << ' ';
         }
     };
 };

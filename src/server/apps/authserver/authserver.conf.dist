@@ -167,13 +167,23 @@ SourceDirectory = ""
 #        Description: The path to your MySQL CLI binary.
 #                     If the path is left empty, built-in path from cmake is used.
 #        Example:     "C:/Program Files/MariaDB 10.5/bin/mysql.exe"
-#                     "C:/Program Files/MySQL/MySQL Server 5.6/bin/mysql.exe"
+#                     "C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe"
 #                     "mysql.exe"
 #                     "/usr/bin/mysql"
 #        Default:     ""
 #
 
 MySQLExecutable = ""
+
+#
+#    TempDir
+#        Description: Temp directory setting.
+#        Important:   TempDir needs to be quoted, as the string might contain space characters.
+#                     TempDir directory must exists, or the server can't work properly
+#        Example:     "/home/youruser/azerothcore/temp"
+#        Default:     "" - (Temp files will be stored in the current path)
+
+TempDir = ""
 
 #
 #    IPLocationFile

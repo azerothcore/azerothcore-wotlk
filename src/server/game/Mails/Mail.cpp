@@ -153,13 +153,7 @@ void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType se
 {
     Player* receiver = ObjectAccessor::FindPlayerByLowGUID(receiver_guid);
 
-    uint32 rc_account = 0;
-    if (!receiver)
-    {
-        rc_account = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, receiver_guid));
-    }
-
-    if (!receiver && !rc_account)                            // sender not exist
+    if (!receiver && !sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, receiver_guid)))
     {
         deleteIncludedItems(trans, true);
         return;
@@ -200,7 +194,6 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
         return;
 
     Player* pReceiver = receiver.GetPlayer();               // can be nullptr
-    Player* pSender = ObjectAccessor::FindPlayerByLowGUID(sender.GetSenderId());
 
     if (pReceiver)
         prepareItems(pReceiver, trans);                            // generate mail template items
@@ -219,14 +212,14 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
     else if (sender.GetMailMessageType() == MAIL_CREATURE && sBattlegroundMgr->GetBattleMasterBG(sender.GetSenderId()) != BATTLEGROUND_TYPE_NONE)
         expire_delay = DAY;
     // default case: expire time if COD 3 days, if no COD 30 days (or 90 days if sender is a game master)
+    else if (m_COD)
+        expire_delay = 3 * DAY;
+    else if (custom_expiration > 0)
+        expire_delay = custom_expiration * DAY;
     else
     {
-        if (m_COD)
-            expire_delay = 3 * DAY;
-        else if (custom_expiration > 0 )
-            expire_delay = custom_expiration * DAY;
-        else
-            expire_delay = pSender && pSender->GetSession()->GetSecurity() ? 90 * DAY : 30 * DAY;
+        Player* pSender = ObjectAccessor::FindPlayerByLowGUID(sender.GetSenderId());
+        expire_delay = pSender && pSender->GetSession()->GetSecurity() ? 90 * DAY : 30 * DAY;
     }
 
     time_t expire_time = deliver_time + expire_delay;
@@ -235,27 +228,26 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
     uint8 index = 0;
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL);
     stmt->SetData(  index, mailId);
-    stmt->SetData (++index, uint8(sender.GetMailMessageType()));
-    stmt->SetData  (++index, int8(sender.GetStationery()));
+    stmt->SetData(++index, uint8(sender.GetMailMessageType()));
+    stmt->SetData(++index, int8(sender.GetStationery()));
     stmt->SetData(++index, GetMailTemplateId());
     stmt->SetData(++index, sender.GetSenderId());
     stmt->SetData(++index, receiver.GetPlayerGUIDLow());
     stmt->SetData(++index, GetSubject());
     stmt->SetData(++index, GetBody());
-    stmt->SetData  (++index, !m_items.empty());
+    stmt->SetData(++index, !m_items.empty());
     stmt->SetData(++index, uint32(expire_time));
     stmt->SetData(++index, uint32(deliver_time));
     stmt->SetData(++index, m_money);
     stmt->SetData(++index, m_COD);
-    stmt->SetData (++index, uint8(checked));
+    stmt->SetData(++index, uint8(checked));
     trans->Append(stmt);
 
     for (MailItemMap::const_iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
     {
-        Item* pItem = mailItemIter->second;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL_ITEM);
         stmt->SetData(0, mailId);
-        stmt->SetData(1, pItem->GetGUID().GetCounter());
+        stmt->SetData(1, mailItemIter->second->GetGUID().GetCounter());
         stmt->SetData(2, receiver.GetPlayerGUIDLow());
         trans->Append(stmt);
     }
@@ -302,7 +294,6 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
     }
     else if (!m_items.empty())
     {
-        CharacterDatabaseTransaction temp = CharacterDatabaseTransaction(nullptr);
-        deleteIncludedItems(temp);
+        deleteIncludedItems(CharacterDatabaseTransaction(nullptr));
     }
 }

@@ -133,10 +133,11 @@ public:
             events.Reset();
             events2.Reset();
             if (!Started)
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(true);
             else
             {
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(false);
                 me->SetHover(true);
             }
         }
@@ -152,7 +153,7 @@ public:
             if (data != 1 || param != 1 || Started || (instance && instance->GetData(DATA_SVALA_SORROWGRAVE) == DONE))
                 return;
 
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             Started = true;
             me->setActive(true);
             events2.ScheduleEvent(EVENT_SVALA_START, 5000);
@@ -174,14 +175,14 @@ public:
                 summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_SORROWGRAVE_SS, 3000);
-            events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 11000);
-            events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL, 25000);
+            events.ScheduleEvent(EVENT_SORROWGRAVE_SS, 3s);
+            events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 11s);
+            events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL, 25s);
 
             if (instance)
                 instance->SetData(DATA_SVALA_SORROWGRAVE, IN_PROGRESS);
@@ -214,25 +215,25 @@ public:
             {
                 case EVENT_SVALA_START:
                     Talk(TALK_INTRO_S1);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK1, 8000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK1, 8s);
                     break;
                 case EVENT_SVALA_TALK1:
                     if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                         Arthas->AI()->Talk(TALK_INTRO_A1);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK2, 9000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK2, 9s);
                     break;
                 case EVENT_SVALA_TALK2:
                     if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                         Arthas->CastSpell(me, SPELL_ARTHAS_TRANSFORMING_SVALA, false);
                     me->CastSpell(me, SPELL_SVALA_TRANSFORMING2, true);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK3, 3000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK3, 3s);
                     break;
                 case EVENT_SVALA_TALK3:
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
                     me->SetHover(true);
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-                    events2.ScheduleEvent(30, 1000);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK4, 9000);
+                    events2.ScheduleEvent(30, 1s);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK4, 9s);
                     break;
                 case 30:
                     {
@@ -247,12 +248,12 @@ public:
                         me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
                         me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
                         me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
-                        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->SetImmuneToAll(true);
                         if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                             Arthas->InterruptNonMeleeSpells(false);
                         me->RemoveAllAuras();
                         me->SetWalk(false);
-                        events2.ScheduleEvent(EVENT_SVALA_TALK5, 2000);
+                        events2.ScheduleEvent(EVENT_SVALA_TALK5, 2s);
 
                         std::list<Creature*> creatureList;
                         me->GetCreaturesWithEntryInRange(creatureList, 100.0f, NPC_DRAGONFLAYER_SPECTATOR);
@@ -263,27 +264,27 @@ public:
                     }
                 case EVENT_SVALA_TALK5:
                     Talk(TALK_INTRO_S2);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK6, 12000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK6, 12s);
                     break;
                 case EVENT_SVALA_TALK6:
                     if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                         Arthas->AI()->Talk(TALK_INTRO_A2);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK7, 9000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK7, 9s);
                     break;
                 case EVENT_SVALA_TALK7:
                     me->SetFacingTo(M_PI / 2.0f);
                     Talk(TALK_INTRO_S3);
                     if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_SVALA_MIRROR)))
                         mirror->SetGoState(GO_STATE_ACTIVE);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK8, 13000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK8, 13s);
                     break;
                 case EVENT_SVALA_TALK8:
                     me->GetMotionMaster()->MoveFall(0, true);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK9, 2000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK9, 2s);
                     break;
                 case EVENT_SVALA_TALK9:
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 3.0f);
-                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(false);
                     me->LoadEquipment(1, true);
                     me->setActive(false);
                     if (Player* target = SelectTargetFromPlayerList(100.0f))
@@ -302,14 +303,14 @@ public:
             {
                 case EVENT_SORROWGRAVE_SS:
                     me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SINSTER_STRIKE_H : SPELL_SINSTER_STRIKE_N, false);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_SS, urand(3000, 5000));
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_SS, 3s, 5s);
                     break;
                 case EVENT_SORROWGRAVE_FLAMES:
                     summons.DespawnAll();
                     me->CastSpell(me, SPELL_CALL_FLAMES, false);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 500);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 1000);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, urand(8000, 12000));
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 500ms);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 1s);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 8s, 12s);
                     break;
                 case EVENT_SORROWGRAVE_FLAMES2:
                     {
@@ -323,7 +324,7 @@ public:
                         break;
                     }
                 case EVENT_SORROWGRAVE_RITUAL:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         Talk(SAY_SACRIFICE_PLAYER);
 
@@ -341,8 +342,8 @@ public:
                     }
 
                     events.DelayEvents(25001); // +1 just to be sure
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL_SPELLS, 0);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FINISH_RITUAL, 25000);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL_SPELLS, 0ms);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FINISH_RITUAL, 25s);
                     return;
                 case EVENT_SORROWGRAVE_RITUAL_SPELLS:
                     //me->CastSpell(me, SPELL_RITUAL_OF_THE_SWORD, false);

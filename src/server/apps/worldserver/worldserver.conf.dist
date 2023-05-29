@@ -82,6 +82,16 @@ DataDir = "."
 LogsDir = ""
 
 #
+#    TempDir
+#        Description: Temp directory setting.
+#        Important:   TempDir needs to be quoted, as the string might contain space characters.
+#                     TempDir directory must exists, or the server can't work properly
+#        Example:     "/home/youruser/azerothcore/temp"
+#        Default:     "" - (Temp files will be stored in the current path)
+
+TempDir = ""
+
+#
 #    LoginDatabaseInfo
 #    WorldDatabaseInfo
 #    CharacterDatabaseInfo
@@ -193,7 +203,7 @@ SourceDirectory = ""
 #    MySQLExecutable
 #        Description: The path to your MySQL CLI binary.
 #                     If the path is left empty, built-in path from cmake is used.
-#        Example:     "C:/Program Files/MySQL/MySQL Server 5.7/bin/mysql.exe"
+#        Example:     "C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe"
 #                     "mysql.exe"
 #                     "/usr/bin/mysql"
 #        Default:     ""
@@ -330,11 +340,18 @@ SocketTimeOutTimeActive = 60000
 SessionAddDelay = 10000
 
 #
+#    MinWorldUpdateTime
+#        Description: Minimum time (milliseconds) between world update ticks (for mostly idle servers).
+#        Default:     1 - (0.001 second)
+
+MinWorldUpdateTime = 1
+
+#
 #    MapUpdateInterval
 #        Description: Time (milliseconds) for map update interval.
-#        Default:     100 - (0.1 second)
+#        Default:     10 - (0.01 second)
 
-MapUpdateInterval = 100
+MapUpdateInterval = 10
 
 #
 #    ChangeWeatherInterval
@@ -457,6 +474,7 @@ LogDB.Opt.ClearTime = 1209600
 #
 #    MaxCoreStuckTime
 #        Description: Time (in seconds) before the server is forced to crash if it is frozen.
+#                     FreezeDetector
 #        Default:     0   - (Disabled)
 #                     10+ - (Enabled, Recommended 30+)
 # Note: If enabled and the setting is too low, it can cause unexpected crash.
@@ -615,6 +633,24 @@ RealmZone = 1
 #                     0 - (Disabled)
 
 World.RealmAvailability = 1
+
+#
+#   StrictNames.Reserved
+#       Description: Use the Reserved Filter from DBC.
+#                    Prevents Player, Pet & Charter names from containing reserved names.
+#       Default:     1 - Enabled
+#                    0 - Disabled
+
+StrictNames.Reserved = 1
+
+#
+#   StrictNames.Profanity
+#       Description: Use the Profanity Filter from DBC.
+#                    Prevents Player, Pet & Charter names from containing profanity.
+#       Default:     1 - Enabled
+#                    0 - Disabled
+
+StrictNames.Profanity = 1
 
 #
 #    StrictPlayerNames
@@ -867,6 +903,14 @@ StartHeroicPlayerLevel = 55
 #                     100 - (1 Silver)
 
 StartPlayerMoney = 0
+
+#
+#    StartHeroicPlayerMoney
+#        Description: Amount of money (in Copper) that heroic class characters have after creation.
+#        Default:     2000
+#                     2000 - (20 Silver)
+
+StartHeroicPlayerMoney = 2000
 
 #
 #    MaxHonorPoints
@@ -1222,26 +1266,6 @@ BeepAtStart = 1
 FlashAtStart = 1
 
 #
-#    Motd
-#        Description: Message of the Day, displayed at login.
-#                     Use '@' for a newline and be sure to escape special characters.
-#        Example:     "Welcome to John\'s Server@"
-#        Default:     "Welcome to an AzerothCore server."
-
-Motd = "Welcome to an AzerothCore server."
-
-#    PLEASE NOTE: another (hardcoded) text will appear below the MOTD:
-#
-#        "This server runs on AzerothCore www.azerothcore.org"
-#
-#    All the AzerothCore contributors, as well as its father projects (MaNGOS, TrinityCore, etc..),
-#    have worked for free to provide you this software. Please do not remove the credits.
-#
-#    All AzerothCore contributors and its father projects are publicly listed in
-#    our official repository. Credits to open source contributions should always be shown.
-#
-
-#
 #    Server.LoginInfo
 #        Description: Display core version (.server info) on login.
 #        Default:     0 - (Disabled)
@@ -1284,6 +1308,14 @@ DeletedCharacterTicketTrace = 0
 #        Default:     5
 
 DungeonFinder.OptionsMask = 5
+
+#
+#   DBC.EnforceItemAttributes
+#        Disallow overriding item attributes stored in DBC files with values from the database
+#        Default: 0 - Off, Use DB values
+#                 1 - On, Enforce DBC Values (default)
+
+DBC.EnforceItemAttributes = 1
 
 #
 #   AccountInstancesPerHour
@@ -1877,8 +1909,23 @@ ChatFlood.MessageCount = 10
 ChatFlood.MessageDelay = 1
 
 #
+#    ChatFlood.AddonMessageCount
+#        Description: Chat flood protection, number of addon messages before player gets muted.
+#        Default:     100 - (Enabled)
+#                     0  - (Disabled)
+
+ChatFlood.AddonMessageCount = 100
+
+#
+#    ChatFlood.AddonMessageDelay
+#        Description: Time (in seconds) between addon messages to be counted into ChatFlood.AddonMessageCount.
+#        Default:     1
+
+ChatFlood.AddonMessageDelay = 1
+
+#
 #    ChatFlood.MuteTime
-#        Description: Time (in seconds) characters get muted for violating ChatFlood.MessageCount.
+#        Description: Time (in seconds) characters get muted for violating ChatFlood.MessageCount / ChatFlood.AddonMessageCount.
 #        Default:     10
 
 ChatFlood.MuteTime = 10
@@ -2130,6 +2177,22 @@ Visibility.Notify.Period.InInstances  = 1000
 Visibility.Notify.Period.InBGArenas   = 1000
 
 #
+#    Visibility.ObjectSparkles
+#        Description: Whether or not to display sparkles on gameobjects related to active quests.
+#        Default:     1 - (Show Sparkles)
+#                     0 - (Hide Sparkles)
+
+Visibility.ObjectSparkles = 1
+
+#
+#    Visibility.ObjectQuestMarkers
+#        Description: Show quest icons above game objects in the same way as creature quest givers.
+#        Default:     1 - (Show quest markers, post patch 2.3 behavior)
+#                     0 - (Hide quest markers, pre patch 2.3 behavior)
+
+Visibility.ObjectQuestMarkers = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -2204,7 +2267,20 @@ Rate.Drop.Item.Artifact         = 1
 Rate.Drop.Item.Referenced       = 1
 Rate.Drop.Money                 = 1
 
-#    RewardBonusMoney
+#    Rate.Drop.Item.ReferencedAmount
+#        Description: Multiplier for referenced loot amount. Makes many raid bosses (and others) drop additional loot.
+#        Default:     1
+
+Rate.Drop.Item.ReferencedAmount = 1
+
+#
+#    Rate.Drop.Item.GroupAmount
+#        Description: Multiplier for grouped items. Makes many dungeon bosses (and others) drop additional loot.
+#        Default:     1
+
+Rate.Drop.Item.GroupAmount = 1
+
+#    Rate.RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
 #                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
 #                     NOTE: the final amount will also affected by Rate.Drop.Money
@@ -2267,13 +2343,6 @@ Rate.BuyValue.Item.Epic             = 1
 Rate.BuyValue.Item.Legendary        = 1
 Rate.BuyValue.Item.Artifact         = 1
 Rate.BuyValue.Item.Heirloom         = 1
-
-#
-#    Rate.Drop.Item.ReferencedAmount
-#        Description: Multiplier for referenced loot amount.
-#        Default:     1
-
-Rate.Drop.Item.ReferencedAmount = 1
 
 #
 #    Rate.XP.Kill
@@ -2419,7 +2488,25 @@ Rate.InstanceResetTime = 1
 #       The lower the rate the less experience is required.
 #        Default:     0.05
 #
+
 Rate.Pet.LevelXP = 0.05
+
+#
+#    WaterBreath.Timer
+#        Description: The timer for player's breath underwater in milliseconds
+#        Default:     180000 (3 minutes)
+#
+
+WaterBreath.Timer = 180000
+
+#
+#    EnableLowLevelRegenBoost
+#        Description: Greatly increase Health and Mana regen rates for players under level 15 (Added in patch 3.3)
+#        Default:     1 - Enabled
+#                     0 - Disabled
+#
+
+EnableLowLevelRegenBoost = 1
 
 #
 #    SkillGain.Crafting
@@ -2857,8 +2944,9 @@ Battleground.SpeedBuffRespawn = 150
 #
 #     Wintergrasp.Enable
 #         Description: Enable the Wintergrasp battlefield.
-#         Default:     0 - (Disabled)
-#                      1 - (Enabled, Experimental as of still being in development)
+#         Default:     1 - (Enabled, Experimental as of still being in development)
+#                      0 - (Battleground disabled, Wintergrasp world processing still occurs)
+#                      2 - (Disable all Wintergrasp processing)
 
 Wintergrasp.Enable = 1
 
@@ -3585,6 +3673,16 @@ Calculate.Creature.Zone.Area.Data = 0
 Calculate.Gameoject.Zone.Area.Data = 0
 
 #
+#    Group.Raid.LevelRestriction
+#
+#     The Group members need to the same, or higher level than the specified value.
+#     Minimum level is 10.
+#        Default: 10
+#
+
+Group.Raid.LevelRestriction = 10
+
+#
 #    LFG.Location.All
 #
 #     Includes satellite to search for work elsewhere LFG
@@ -3722,6 +3820,14 @@ JoinBGAndLFG.Enable = 0
 LeaveGroupOnLogout.Enabled = 1
 
 #
+#   QuestPOI.Enabled
+#        Description: Show points of interest on the map
+#        Default:     1 - Enabled
+#                     0 - Disabled
+
+QuestPOI.Enabled = 1
+
+#
 #     ChangeFaction.MaxMoney
 #        Description: Maximum amount of gold allowed on the character to perform a faction change.
 #        Default:     0 - Disabled
@@ -3729,6 +3835,14 @@ LeaveGroupOnLogout.Enabled = 1
 #        Example:     If set to 10000, the maximum amount of money allowed on the character would be 1 gold.
 
 ChangeFaction.MaxMoney = 0
+
+#
+#     Pet.RankMod.Health
+#        Description: Allows pet health to be modified by rank health rates (set in config)
+#        Default:     1 - Enabled
+#                     0 - Disabled
+
+Pet.RankMod.Health = 1
 
 #
 ###################################################################################################
@@ -3839,6 +3953,7 @@ Logger.module=4,Console Server
 #Logger.addon=4,Console Server
 #Logger.ahbot=4,Console Server
 #Logger.auctionHouse=4,Console Server
+#Logger.autobroadcast=4, Console Server
 #Logger.bg.arena=4,Console Server
 #Logger.bg.battlefield=4,Console Server
 #Logger.bg.battleground=4,Console Server

@@ -1,0 +1,106 @@
+name: Auto Assign to Project(s)
+
+on:
+  issues:
+    types: [opened, labeled]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  assign_one_project:
+    runs-on: ubuntu-latest
+    name: Assign to One Project
+    steps:
+
+    - name: Assign issues with `ChromieCraft Generic` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, 'ChromieCraft Generic')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/20'
+
+    - name: Assign issues with `1-19` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '1-19')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/14'
+
+    - name: Assign issues with `20-29` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '20-29')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/17'
+
+    - name: Assign issues with `30-39` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '30-39')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/23'
+
+    - name: Assign issues with `40-49` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '40-49')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/24'
+
+    - name: Assign issues with `50-59` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '50-59')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/25'
+
+    - name: Assign issues with `60` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '60')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/22'
+
+    - name: Assign issues with `61-64` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '61-64')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/32'
+
+    - name: Assign issues with `65-69` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '65-69')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/36'
+
+    - name: Assign issues with `70` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '70')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/26'
+
+    - name: Assign issues with `71-74` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '71-74')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/33'
+
+    - name: Assign issues with `75-79` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '75-79')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/37'
+
+    - name: Assign issues with `80` label to their project
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, '80')
+      with:
+        project: 'https://github.com/azerothcore/azerothcore-wotlk/projects/38'
+    

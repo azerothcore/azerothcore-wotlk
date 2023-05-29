@@ -20,12 +20,16 @@
 /env/docker/*
 !/env/docker/bin/.gitkeep
 !/env/docker/data/.gitkeep
-!/env/docker/etc/authserver.conf.dockerdist
-!/env/docker/etc/worldserver.conf.dockerdist
+!/env/docker/etc/
+/env/docker/etc/*
+!/env/docker/etc/*.conf.dockerdist
 !/env/docker/logs/.gitkeep
 /.env*
 /apps/joiner
 /deps/deno
+/data/sql/custom/*
+/src/server/scripts/Custom/*
+!/src/server/scripts/Custom/README.md
 
 /docker-compose.override.yml
 
@@ -63,8 +67,7 @@ nbproject/
 *.kate-swp
 .browse.VC*
 .idea
-cmake-build-debug/*
-cmake-build-debug-coverage/*
+cmake-build-*/*
 coverage-report/
 
 #

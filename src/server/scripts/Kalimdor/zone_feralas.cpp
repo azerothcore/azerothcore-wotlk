@@ -99,7 +99,7 @@ public:
         void InitializeAI() override
         {
             me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->RestoreFaction();
 
             _events.Reset();
@@ -146,7 +146,7 @@ public:
             }
 
             _events.CancelEvent(EVENT_WANDERING_START);
-            _events.ScheduleEvent(EVENT_FINAL_TALK, 5 * IN_MILLISECONDS);
+            _events.ScheduleEvent(EVENT_FINAL_TALK, 5s);
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -203,12 +203,12 @@ public:
                 Talk(TALK_0, player);
 
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(false);
                 me->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
                 me->GetMotionMaster()->MoveFollow(player, 3.f, M_PI);
 
-                _events.ScheduleEvent(EVENT_WANDERING_START, urand(40 * IN_MILLISECONDS, 70 * IN_MILLISECONDS));
-                _events.ScheduleEvent(EVENT_CHECK_FOLLOWER, 30 * IN_MILLISECONDS);
+                _events.ScheduleEvent(EVENT_WANDERING_START, 40s, 70s);
+                _events.ScheduleEvent(EVENT_CHECK_FOLLOWER, 30s);
             }
         }
 
@@ -243,9 +243,9 @@ public:
                         Position pos = me->GetFirstCollisionPosition(15.f, rand_norm() * static_cast<float>(2 * M_PI));
                         me->GetMotionMaster()->MovePoint(0, pos);
                         Talk(TALK_2);
-                        _events.ScheduleEvent(EVENT_WANDERING_START, urand(60 * IN_MILLISECONDS, 70 * IN_MILLISECONDS));
-                        _events.ScheduleEvent(EVENT_WANDERING_TALK, 3 * IN_MILLISECONDS);
-                        _events.ScheduleEvent(EVENT_WANDERING_RANDOM, 8 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_WANDERING_START, 60s, 70s);
+                        _events.ScheduleEvent(EVENT_WANDERING_TALK, 3s);
+                        _events.ScheduleEvent(EVENT_WANDERING_RANDOM, 8s);
                         break;
                     }
                     case EVENT_WANDERING_TALK:

@@ -131,7 +131,7 @@ public:
     int32 CalcMaxDuration() const { return CalcMaxDuration(GetCaster()); }
     int32 CalcMaxDuration(Unit* caster) const;
     int32 GetDuration() const { return m_duration; }
-    void SetDuration(int32 duration, bool withMods = false);
+    void SetDuration(int32 duration, bool withMods = false);    /// @todo - Look to convert to std::chrono
     void RefreshDuration(bool withMods = false);
     void RefreshTimers(bool periodicReset = false);
     void RefreshTimersWithMods();
@@ -196,7 +196,7 @@ public:
     // and some dependant problems fixed before it can replace old proc system (for example cooldown handling)
     // currently proc system functionality is implemented in Unit::ProcDamageAndSpell
     bool IsProcOnCooldown() const;
-    void AddProcCooldown(uint32 msec);
+    void AddProcCooldown(Milliseconds msec);
     bool IsUsingCharges() const { return m_isUsingCharges; }
     void SetUsingCharges(bool val) { m_isUsingCharges = val; }
     void PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo);
@@ -226,6 +226,7 @@ public:
 
     // Spell Proc Hooks
     bool CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
+    bool CallScriptAfterCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent);
     bool CallScriptPrepareProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     bool CallScriptProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     void CallScriptAfterProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
@@ -235,6 +236,8 @@ public:
     AuraScript* GetScriptByName(std::string const& scriptName) const;
 
     std::list<AuraScript*> m_loadedScripts;
+
+    virtual std::string GetDebugInfo() const;
 
     void SetTriggeredByAuraSpellInfo(SpellInfo const* triggeredByAuraSpellInfo);
     SpellInfo const* GetTriggeredByAuraSpellInfo() const;

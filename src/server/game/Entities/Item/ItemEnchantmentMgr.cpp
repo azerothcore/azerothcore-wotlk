@@ -68,7 +68,7 @@ void LoadRandomEnchantmentsTable()
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", ">> Loaded {} Item Enchantment definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} Item Enchantment Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
     else

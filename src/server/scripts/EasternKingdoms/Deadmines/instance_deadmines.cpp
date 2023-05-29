@@ -28,6 +28,7 @@ public:
     {
         instance_deadmines_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
         }
 
         void Initialize() override
@@ -49,8 +50,9 @@ public:
                     break;
                 case GO_FACTORY_DOOR:
                     gameobject->UpdateSaveToDb(true);
+                    // GoState (Door opened) is restored during GO creation, but we need to set LootState to prevent Lever from closing it again
                     if (_encounters[TYPE_RHAHK_ZOR] == DONE)
-                        gameobject->SetGoState(GO_STATE_ACTIVE);
+                        gameobject->SetLootState(GO_ACTIVATED);
                     break;
                 case GO_IRON_CLAD_DOOR:
                     gameobject->UpdateSaveToDb(true);

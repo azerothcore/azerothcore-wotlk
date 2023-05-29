@@ -85,7 +85,7 @@ enum SpellFamilyFlag
     SPELLFAMILYFLAG_DK_DEATH_STRIKE         = 0x00000010,
     SPELLFAMILYFLAG_DK_DEATH_COIL           = 0x00002000,
 
-    // TODO: Figure out a more accurate name for the following familyflag(s)
+    /// @todo: Figure out a more accurate name for the following familyflag(s)
     SPELLFAMILYFLAG_SHAMAN_TOTEM_EFFECTS    = 0x04000000,  // Seems to be linked to most totems and some totem effects
 };
 
@@ -263,7 +263,7 @@ enum ProcFlagsHit
     PROC_HIT_REFLECT             = 0x0000800,
     PROC_HIT_INTERRUPT           = 0x0001000, // (not used atm)
     PROC_HIT_FULL_BLOCK          = 0x0002000,
-    PROC_HIT_MASK_ALL = 0x2FFF,
+    PROC_HIT_MASK_ALL            = 0x0002FFF,
 };
 
 enum ProcAttributes
@@ -288,27 +288,33 @@ typedef std::unordered_map<uint32, SpellProcEventEntry> SpellProcEventMap;
 
 struct SpellProcEntry
 {
-    uint32      schoolMask;                                 // if nonzero - bitmask for matching proc condition based on spell's school
-    uint32      spellFamilyName;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyName
-    flag96      spellFamilyMask;                            // if nonzero - bitmask for matching proc condition based on candidate spell's SpellFamilyFlags
-    uint32      typeMask;                                   // if nonzero - owerwrite procFlags field for given Spell.dbc entry, bitmask for matching proc condition, see enum ProcFlags
-    uint32      spellTypeMask;                              // if nonzero - bitmask for matching proc condition based on candidate spell's damage/heal effects, see enum ProcFlagsSpellType
-    uint32      spellPhaseMask;                             // if nonzero - bitmask for matching phase of a spellcast on which proc occurs, see enum ProcFlagsSpellPhase
-    uint32      hitMask;                                    // if nonzero - bitmask for matching proc condition based on hit result, see enum ProcFlagsHit
-    uint32      attributesMask;                             // bitmask, see ProcAttributes
-    float       ratePerMinute;                              // if nonzero - chance to proc is equal to value * aura caster's weapon speed / 60
-    float       chance;                                     // if nonzero - owerwrite procChance field for given Spell.dbc entry, defines chance of proc to occur, not used if perMinuteRate set
-    uint32      cooldown;                                   // if nonzero - cooldown in secs for aura proc, applied to aura
-    uint32      charges;                                    // if nonzero - owerwrite procCharges field for given Spell.dbc entry, defines how many times proc can occur before aura remove, 0 - infinite
+    uint32       SchoolMask;                                 // if nonzero - bitmask for matching proc condition based on spell's school
+    uint32       SpellFamilyName;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyName
+    flag96       SpellFamilyMask;                            // if nonzero - bitmask for matching proc condition based on candidate spell's SpellFamilyFlags
+    uint32       ProcFlags;                                  // if nonzero - owerwrite procFlags field for given Spell.dbc entry, bitmask for matching proc condition, see enum ProcFlags
+    uint32       SpellTypeMask;                              // if nonzero - bitmask for matching proc condition based on candidate spell's damage/heal effects, see enum ProcFlagsSpellType
+    uint32       SpellPhaseMask;                             // if nonzero - bitmask for matching phase of a spellcast on which proc occurs, see enum ProcFlagsSpellPhase
+    uint32       HitMask;                                    // if nonzero - bitmask for matching proc condition based on hit result, see enum ProcFlagsHit
+    uint32       AttributesMask;                             // bitmask, see ProcAttributes
+    float        ProcsPerMinute;                             // if nonzero - chance to proc is equal to value * aura caster's weapon speed / 60
+    float        Chance;                                     // if nonzero - owerwrite procChance field for given Spell.dbc entry, defines chance of proc to occur, not used if ProcsPerMinute set
+    Milliseconds Cooldown;                                   // if nonzero - cooldown in secs for aura proc, applied to aura
+    uint32       Charges;                                    // if nonzero - owerwrite procCharges field for given Spell.dbc entry, defines how many times proc can occur before aura remove, 0 - infinite
 };
 
 typedef std::unordered_map<uint32, SpellProcEntry> SpellProcMap;
+
+enum EnchantProcAttributes
+{
+    ENCHANT_PROC_ATTR_EXCLUSIVE     = 0x1 // Only one instance of that effect can be active
+};
 
 struct SpellEnchantProcEntry
 {
     uint32      customChance;
     float       PPMChance;
     uint32      procEx;
+    uint32      attributeMask;
 };
 
 typedef std::unordered_map<uint32, SpellEnchantProcEntry> SpellEnchantProcEventMap;
@@ -381,7 +387,7 @@ struct SpellThreatEntry
     float       apPctMod;                                   // Pct of AP that is added as Threat - default: 0.0f
 };
 
-typedef std::map<uint32, SpellThreatEntry> SpellThreatMap;
+typedef std::unordered_map<uint32, SpellThreatEntry> SpellThreatMap;
 typedef std::map<uint32, float> SpellMixologyMap;
 
 // coordinates for spells (accessed using SpellMgr functions)
@@ -596,6 +602,16 @@ typedef std::vector<SpellInfo*> SpellInfoMap;
 
 typedef std::map<int32, std::vector<int32> > SpellLinkedMap;
 
+struct SpellCooldownOverride
+{
+    uint32 RecoveryTime;
+    uint32 CategoryRecoveryTime;
+    uint32 StartRecoveryTime;
+    uint32 StartRecoveryCategory;
+};
+
+typedef std::map<uint32, SpellCooldownOverride> SpellCooldownOverrideMap;
+
 bool IsPrimaryProfessionSkill(uint32 skill);
 
 inline bool IsProfessionSkill(uint32 skill)
@@ -736,6 +752,9 @@ public:
     // Talent Additional Set
     [[nodiscard]] bool IsAdditionalTalentSpell(uint32 spellId) const;
 
+    [[nodiscard]] bool HasSpellCooldownOverride(uint32 spellId) const;
+    [[nodiscard]] SpellCooldownOverride GetSpellCooldownOverride(uint32 spellId) const;
+
 private:
     SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
 
@@ -752,7 +771,7 @@ public:
     void LoadSpellGroupStackRules();
     void LoadSpellProcEvents();
     void LoadSpellProcs();
-    void LoadSpellBonusess();
+    void LoadSpellBonuses();
     void LoadSpellThreats();
     void LoadSpellMixology();
     void LoadSkillLineAbilityMap();
@@ -764,6 +783,7 @@ public:
     void LoadPetDefaultSpells();
     void LoadSpellAreas();
     void LoadSpellInfoStore();
+    void LoadSpellCooldownOverrides();
     void UnloadSpellInfoStore();
     void UnloadSpellInfoImplicitTargetConditionLists();
     void LoadSpellInfoCustomAttributes();
@@ -797,6 +817,7 @@ private:
     PetLevelupSpellMap         mPetLevelupSpellMap;
     PetDefaultSpellsMap        mPetDefaultSpellsMap;           // only spells not listed in related mPetLevelupSpellMap entry
     SpellInfoMap               mSpellInfoMap;
+    SpellCooldownOverrideMap   mSpellCooldownOverrideMap;
     TalentAdditionalSet        mTalentSpellAdditionalSet;
 };
 

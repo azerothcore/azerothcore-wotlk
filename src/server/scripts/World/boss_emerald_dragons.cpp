@@ -22,6 +22,7 @@
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 
 //
 //  Emerald Dragon NPCs and IDs (kept here for reference)
@@ -34,6 +35,9 @@ enum EmeraldDragonNPC
     DRAGON_LETHON                   = 14888,
     DRAGON_EMERISS                  = 14889,
     DRAGON_TAERAR                   = 14890,
+
+    GUID_DRAGON                     = 1,
+    GUID_FOG_TARGET                 = 2
 };
 
 //
@@ -64,6 +68,7 @@ enum Events
     EVENT_SEEPING_FOG = 1,
     EVENT_NOXIOUS_BREATH,
     EVENT_TAIL_SWEEP,
+    EVENT_SUMMON_PLAYER,
 
     // Ysondre
     EVENT_LIGHTNING_WAVE,
@@ -102,6 +107,7 @@ struct emerald_dragonAI : public WorldBossAI
         events.ScheduleEvent(EVENT_TAIL_SWEEP, 4000);
         events.ScheduleEvent(EVENT_NOXIOUS_BREATH, urand(7500, 15000));
         events.ScheduleEvent(EVENT_SEEPING_FOG, urand(12500, 20000));
+        events.ScheduleEvent(EVENT_SUMMON_PLAYER, 1s);
     }
 
     // Target killed during encounter, mark them as suspectible for Aura Of Nature
@@ -133,6 +139,20 @@ struct emerald_dragonAI : public WorldBossAI
                 DoCast(me, SPELL_TAIL_SWEEP);
                 events.ScheduleEvent(EVENT_TAIL_SWEEP, 2000);
                 break;
+            case EVENT_SUMMON_PLAYER:
+                if (Unit* target = me->GetVictim())
+                    if (!target->IsWithinRange(me, 50.f))
+                        DoCast(target, SPELL_SUMMON_PLAYER);
+                events.ScheduleEvent(EVENT_SUMMON_PLAYER, 500ms);
+                break;
+        }
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_DREAM_FOG)
+        {
+            summon->AI()->SetGUID(me->GetGUID(), GUID_DRAGON);
         }
     }
 
@@ -149,9 +169,6 @@ struct emerald_dragonAI : public WorldBossAI
         while (uint32 eventId = events.ExecuteEvent())
             ExecuteEvent(eventId);
 
-        if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, -50.0f, true))
-            DoCast(target, SPELL_SUMMON_PLAYER);
-
         DoMeleeAttackIfReady();
     }
 };
@@ -167,13 +184,66 @@ public:
 
     struct npc_dream_fogAI : public ScriptedAI
     {
-        npc_dream_fogAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        npc_dream_fogAI(Creature* creature) : ScriptedAI(creature) { }
 
         void Reset() override
         {
-            _roamTimer = 0;
+            ScheduleEvents();
+        }
+
+        void ScheduleEvents()
+        {
+            _scheduler.CancelAll();
+
+            _scheduler.Schedule(1s, [this](TaskContext context)
+            {
+                // Chase target, but don't attack - otherwise just roam around
+                if (Unit* chaseTarget = GetRandomUnitFromDragonThreatList())
+                {
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveFollow(chaseTarget, 0.02f, 0.0f);
+                    _targetGUID = chaseTarget->GetGUID();
+                    context.Repeat(15s, 30s);
+                }
+                else
+                {
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveRandom(25.0f);
+                    context.Repeat(2500ms);
+                }
+
+                // Seeping fog movement is slow enough for a player to be able to walk backwards and still outpace it
+                me->SetWalk(true);
+                me->SetSpeed(MOVE_WALK, 0.75f);
+            });
+        }
+
+        void SetGUID(ObjectGuid guid, int32 type) override
+        {
+            if (type == GUID_DRAGON)
+            {
+                _dragonGUID = guid;
+            }
+            else if (type == GUID_FOG_TARGET)
+            {
+                if (guid == _targetGUID)
+                {
+                    ScheduleEvents();
+                }
+            }
+        }
+
+        Unit* GetRandomUnitFromDragonThreatList()
+        {
+            if (Creature* dragon = ObjectAccessor::GetCreature(*me, _dragonGUID))
+            {
+                if (dragon->GetAI())
+                {
+                    return dragon->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
+                }
+            }
+
+            return nullptr;
         }
 
         void UpdateAI(uint32 diff) override
@@ -181,31 +251,13 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (!_roamTimer)
-            {
-                // Chase target, but don't attack - otherwise just roam around
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                {
-                    _roamTimer = urand(15000, 30000);
-                    me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MoveChase(target, 0.2f);
-                }
-                else
-                {
-                    _roamTimer = 2500;
-                    me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MoveRandom(25.0f);
-                }
-                // Seeping fog movement is slow enough for a player to be able to walk backwards and still outpace it
-                me->SetWalk(true);
-                me->SetSpeed(MOVE_WALK, 0.75f);
-            }
-            else
-                _roamTimer -= diff;
+            _scheduler.Update(diff);
         }
 
     private:
-        uint32 _roamTimer;
+        ObjectGuid _targetGUID;
+        ObjectGuid _dragonGUID;
+        TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -255,10 +307,10 @@ public:
             events.ScheduleEvent(EVENT_LIGHTNING_WAVE, 12000);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_YSONDRE_AGGRO);
-            WorldBossAI::EnterCombat(who);
+            WorldBossAI::JustEngagedWith(who);
         }
 
         // Summon druid spirits on 75%, 50% and 25% health
@@ -268,7 +320,19 @@ public:
             {
                 Talk(SAY_YSONDRE_SUMMON_DRUIDS);
 
-                for (uint8 i = 0; i < 10; ++i)
+                auto const& attackers = me->GetThreatMgr().GetThreatList();
+                uint8 attackersCount = 0;
+
+                for (const auto attacker : attackers)
+                {
+                    if ((*attacker)->ToPlayer() && (*attacker)->IsAlive())
+                        ++attackersCount;
+                }
+
+                uint8 amount = attackersCount < 30 ? attackersCount * 0.5f : 15;
+                amount = amount < 1 ? 1 : amount;
+
+                for (uint8 i = 0; i < amount; ++i)
                     DoCast(me, SPELL_SUMMON_DRUID_SPIRITS, true);
                 ++_stage;
             }
@@ -348,10 +412,10 @@ public:
             me->RemoveAurasDueToSpell(SPELL_SHADOW_BOLT_WHIRL);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_LETHON_AGGRO);
-            WorldBossAI::EnterCombat(who);
+            WorldBossAI::JustEngagedWith(who);
             DoCastSelf(SPELL_SHADOW_BOLT_WHIRL, true);
         }
 
@@ -395,13 +459,18 @@ public:
         {
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
 
+            if (summoner->GetTypeId() != TYPEID_UNIT)
+            {
+                return;
+            }
+
             _summonerGuid = summoner->GetGUID();
-            me->GetMotionMaster()->MoveFollow(summoner, 0.0f, 0.0f);
+            me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), 0.0f, 0.0f);
         }
 
         void MovementInform(uint32 moveType, uint32 data) override
@@ -470,10 +539,10 @@ public:
             emerald_dragonAI::KilledUnit(who);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_EMERISS_AGGRO);
-            WorldBossAI::EnterCombat(who);
+            WorldBossAI::JustEngagedWith(who);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -561,10 +630,10 @@ public:
             events.ScheduleEvent(EVENT_BELLOWING_ROAR, 30000);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_TAERAR_AGGRO);
-            emerald_dragonAI::EnterCombat(who);
+            emerald_dragonAI::JustEngagedWith(who);
         }
 
         void SummonedCreatureDies(Creature* /*summon*/, Unit*) override
@@ -597,6 +666,7 @@ public:
                 ++_stage;
             }
         }
+
         void ExecuteEvent(uint32 eventId) override
         {
             switch (eventId)
@@ -643,6 +713,12 @@ public:
             emerald_dragonAI::UpdateAI(diff);
         }
 
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        }
+
     private:
         bool   _banished;                              // used for shades activation testing
         uint32 _banishedTimer;                         // counter for banishment timeout
@@ -669,6 +745,17 @@ public:
     {
         PrepareSpellScript(spell_dream_fog_sleep_SpellScript);
 
+        void HandleEffect(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Unit* target = GetHitUnit())
+                {
+                    caster->GetAI()->SetGUID(target->GetGUID(), GUID_FOG_TARGET);
+                }
+            }
+        }
+
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SLEEP));
@@ -676,6 +763,7 @@ public:
 
         void Register() override
         {
+            OnEffectHitTarget += SpellEffectFn(spell_dream_fog_sleep_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dream_fog_sleep_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
         }
     };

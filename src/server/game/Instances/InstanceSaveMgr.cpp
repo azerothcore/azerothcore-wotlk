@@ -94,7 +94,7 @@ InstanceSave* InstanceSaveMgr::AddInstanceSave(uint32 mapId, uint32 instanceId, 
     }
     else
     {
-        resetTime = GameTime::GetGameTime().count() + 3 * DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
+        resetTime = GameTime::GetGameTime().count() + static_cast<long long>(3) * DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
         extendedResetTime = 0;
     }
     InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, resetTime, extendedResetTime);
@@ -136,6 +136,8 @@ bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMa
 
         // clear respawn times (if map is loaded do it just to be sure, if already unloaded it won't do it by itself)
         Map::DeleteRespawnTimesInDB(save->GetMapId(), save->GetInstanceId());
+
+        sScriptMgr->OnInstanceIdRemoved(save->GetInstanceId());
 
         if (deleteSave)
         {
@@ -290,7 +292,7 @@ void InstanceSaveMgr::LoadInstances()
     // Sanitize pending rows on Instance_saved_data for data that wasn't deleted properly
     SanitizeInstanceSavedData();
 
-    LOG_INFO("server.loading", ">> Loaded instances and binds in {} ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded Instances And Binds in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -528,6 +530,8 @@ void InstanceSaveMgr::_ResetSave(InstanceSaveHashMap::iterator& itr)
         // clear respawn times if the map is already unloaded and won't do it by itself
         if (!sMapMgr->FindMap(itr->second->GetMapId(), itr->second->GetInstanceId()))
             Map::DeleteRespawnTimesInDB(itr->second->GetMapId(), itr->second->GetInstanceId());
+
+        sScriptMgr->OnInstanceIdRemoved(itr->second->GetInstanceId());
 
         delete itr->second;
         m_instanceSaveById.erase(itr);

@@ -128,7 +128,7 @@ static ChatSubCommandMap COMMAND_MAP;
             if (std::holds_alternative<std::monostate>(cmd->_help))
                 cmd->_help.emplace<std::string>(help);
             else
-                LOG_ERROR("sql.sql", "Table `command` contains legacy help text for command '{}', which uses `trinity_string`. Skipped.", name);
+                LOG_ERROR("sql.sql", "Table `command` contains legacy help text for command '{}', which uses `acore_string`. Skipped.", name);
         } while (result->NextRow());
     }
 

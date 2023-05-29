@@ -22,13 +22,17 @@
 #include "PassiveAI.h"
 #include "SpellScript.h"
 
+#define DataHeader "TBM"
+
+uint32 const EncounterCount = 3;
+
 #define TheBlackMorassScriptName "instance_the_black_morass"
 
 enum DataTypes
 {
-    TYPE_CHRONO_LORD_DEJA               = 0,
-    TYPE_TEMPORUS                       = 1,
-    TYPE_AEONUS                         = 2,
+    DATA_CHRONO_LORD_DEJA               = 0,
+    DATA_TEMPORUS                       = 1,
+    DATA_AEONUS                         = 2,
     MAX_ENCOUNTER                       = 3,
 
     DATA_MEDIVH                         = 10,
@@ -38,7 +42,7 @@ enum DataTypes
     DATA_RIFT_NUMBER                    = 14,
 
     DATA_SUMMONED_NPC                   = 20,
-    DATA_DELETED_NPC                    = 21,
+    DATA_DELETED_NPC                    = 21
 };
 
 enum WorldStateIds
@@ -73,19 +77,51 @@ enum CreatureIds
 
     NPC_INFINITE_ASSASIN                = 17835,
     NPC_INFINITE_WHELP                  = 21818,
-    NPC_INFINITE_CRONOMANCER            = 17892,
+    NPC_INFINITE_CHRONOMANCER           = 17892,
     NPC_INFINITE_EXECUTIONER            = 18994,
-    NPC_INFINITE_VANQUISHER             = 18995
+    NPC_INFINITE_VANQUISHER             = 18995,
+
+    NPC_INFINITE_ASSASIN_2              = 21137,
+    NPC_INFINITE_CHRONOMANCER_2         = 21136,
+    NPC_INFINITE_EXECUTIONER_2          = 21138,
+    NPC_INFINITE_VANQUISHER_2           = 21139,
+
+    NPC_DP_EMITTER_STALKER              = 18582,
+    NPC_DP_CRYSTAL_STALKER              = 18553,
+    NPC_DP_BEAM_STALKER                 = 18555
 };
 
 enum Misc
 {
     SPELL_RIFT_CHANNEL                  = 31387,
+    SPELL_TELEPORT_VISUAL               = 7791,
 
-    EVENT_NEXT_PORTAL                   = 1,
-    EVENT_SUMMON_KEEPER                 = 2,
+    ACTION_OUTRO                        = 1,
 
-    ACTION_OUTRO                        = 1
+    CONTEXT_GROUP_RIFTS                 = 1
+};
+
+enum medivhSays
+{
+    SAY_MEDIVH_ENTER                    = 0,
+    SAY_MEDIVH_DEATH                    = 5,
+    SAY_MEDIVH_WIN                      = 6,
+    SAY_MEDIVH_ORCS_ENTER               = 7,
+
+    SAY_MEDIVH_ORCS_ANSWER              = 0
+};
+
+enum medivhSpells
+{
+    SPELL_MANA_SHIELD           = 31635,
+    SPELL_MEDIVH_CHANNEL        = 31556,
+    SPELL_BLACK_CRYSTAL         = 32563,
+    SPELL_PORTAL_CRYSTALS       = 32564,
+    SPELL_BANISH_PURPLE         = 32566,
+    SPELL_BANISH_GREEN          = 32567,
+
+    SPELL_CORRUPT               = 31326,
+    SPELL_CORRUPT_AEONUS        = 37853,
 };
 
 template <class AI, class T>
@@ -93,5 +129,7 @@ inline AI* GetTheBlackMorassAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TheBlackMorassScriptName);
 }
+
+#define RegisterTheBlackMorassCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTheBlackMorassAI)
 
 #endif

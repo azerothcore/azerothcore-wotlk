@@ -92,7 +92,7 @@ void WorldSession::HandleMoveWorldportAck()
     if (!newMap || newMap->CannotEnter(GetPlayer(), false))
     {
         LOG_ERROR("network.opcode", "Map {} could not be created for player {}, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUID().ToString());
-        GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation());
+        GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->m_homebindO);
         return;
     }
 
@@ -111,7 +111,7 @@ void WorldSession::HandleMoveWorldportAck()
             GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString(), loc.GetMapId());
         GetPlayer()->ResetMap();
         GetPlayer()->SetMap(oldMap);
-        GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation());
+        GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->m_homebindO);
         return;
     }
 
@@ -187,6 +187,22 @@ void WorldSession::HandleMoveWorldportAck()
     newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
     GetPlayer()->SendInitialPacketsAfterAddToMap();
+
+    // flight fast teleport case
+    if (GetPlayer()->IsInFlight())
+    {
+        if (!GetPlayer()->InBattleground())
+        {
+            // short preparations to continue flight
+            MovementGenerator* movementGenerator = GetPlayer()->GetMotionMaster()->top();
+            movementGenerator->Initialize(GetPlayer());
+            return;
+        }
+
+        // battleground state prepare, stop flight
+        GetPlayer()->GetMotionMaster()->MovementExpired();
+        GetPlayer()->CleanupAfterTaxiFlight();
+    }
 
     // resurrect character at enter into instance where his corpse exist after add to map
     Corpse* corpse = GetPlayer()->GetMap()->GetCorpseByPlayer(GetPlayer()->GetGUID());
@@ -353,6 +369,15 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     MovementInfo movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
+
+    // Stop emote on move
+    if (Player* plrMover = mover->ToPlayer())
+    {
+        if (plrMover->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_ONESHOT_NONE)
+        {
+            plrMover->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+        }
+    }
 
     if (!movementInfo.pos.IsPositionValid())
     {

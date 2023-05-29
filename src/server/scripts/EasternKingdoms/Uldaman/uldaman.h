@@ -18,6 +18,8 @@
 #ifndef DEF_ULDAMAN_H
 #define DEF_ULDAMAN_H
 
+#define DataHeader "UD"
+
 enum DataTypes
 {
     DATA_IRONAYA_DOORS                  = 0,

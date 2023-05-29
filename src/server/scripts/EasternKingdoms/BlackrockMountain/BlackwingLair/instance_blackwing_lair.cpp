@@ -35,8 +35,9 @@ DoorData const doorData[] =
     { GO_PORTCULLIS_RAZORGORE_ROOM, DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_ROOM,   }, // ID 176964 || GUID 75158
     { GO_PORTCULLIS_VAELASTRASZ,    DATA_VAELASTRAZ_THE_CORRUPT, DOOR_TYPE_PASSAGE }, // ID 175185 || GUID 7229
     { GO_PORTCULLIS_BROODLORD,      DATA_BROODLORD_LASHLAYER,    DOOR_TYPE_PASSAGE }, // ID 179365 || GUID 75159
-    { GO_PORTCULLIS_NEFARIAN,       DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE }, // ID 179116 || GUID 75161
-    { GO_PORTCULLIS_NEFARIAN,       DATA_NEFARIAN,               DOOR_TYPE_ROOM    }, // ID 179117 || GUID 75164
+    { GO_PORTCULLIS_CHROMAGGUS_EXIT,DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE }, // ID 179117 || GUID 75164
+    { GO_PORTCULLIS_CHROMAGGUS_EXIT,DATA_NEFARIAN,               DOOR_TYPE_ROOM    }, // ID 179117 || GUID 75164
+    { GO_PORTCULLIS_NEFARIAN,       DATA_NEFARIAN,               DOOR_TYPE_ROOM    }, // ID 176966
     { 0,                            0,                           DOOR_TYPE_ROOM    }  // END
 };
 
@@ -45,12 +46,13 @@ ObjectData const creatureData[] =
     { NPC_GRETHOK,         DATA_GRETHOK              },
     { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS      },
     { NPC_VICTOR_NEFARIUS, DATA_LORD_VICTOR_NEFARIUS },
-    { NPC_CHROMAGGUS,      DATA_CHROMAGGUS           }
+    { NPC_CHROMAGGUS,      DATA_CHROMAGGUS           },
 };
 
 ObjectData const objectData[] =
 {
-    { GO_PORTCULLIS_CHROMAGGUS, DATA_GO_CHROMAGGUS_DOOR }
+    { GO_PORTCULLIS_CHROMAGGUS, DATA_GO_CHROMAGGUS_DOOR },
+    { GO_PORTCULLIS_CHROMAGGUS_EXIT, DATA_GO_CHROMAGGUS_DOOR_EXIT }
 };
 
 Position const SummonPosition[8] =
@@ -76,7 +78,7 @@ public:
     {
         instance_blackwing_lair_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            //SetHeaders(DataHeader);
+            SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, objectData);
@@ -227,7 +229,7 @@ public:
                         for (ObjectGuid const& guid : EggList)
                         {
                             // Eggs should be destroyed instead
-                            // @todo: after dynamic spawns
+                           /// @todo: after dynamic spawns
                             if (GameObject* egg = instance->GetGameObject(guid))
                             {
                                 egg->SetPhaseMask(2, true);
@@ -239,7 +241,7 @@ public:
                     switch (state)
                     {
                         case FAIL:
-                            _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15 * 60 * IN_MILLISECONDS); //15min
+                            _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15min);
                             [[fallthrough]];
                         case NOT_STARTED:
                             if (Creature* nefarian = instance->GetCreature(nefarianGUID))
@@ -268,7 +270,7 @@ public:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
                         break;
                     case IN_PROGRESS:
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45 * IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45s);
                         EggEvent = data;
                         EggCount = 0;
                         addsCount.fill(0);
@@ -303,7 +305,7 @@ public:
                                 razor->RemoveAurasDueToSpell(19832); // MindControl
                                 DoRemoveAurasDueToSpellOnPlayers(19832);
                             }
-                            _events.ScheduleEvent(EVENT_RAZOR_PHASE_TWO, 1000);
+                            _events.ScheduleEvent(EVENT_RAZOR_PHASE_TWO, 1s);
                             _events.CancelEvent(EVENT_RAZOR_SPAWN);
                         }
                         break;
@@ -430,52 +432,15 @@ public:
             }
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "B W L " << GetBossSaveData() << NefarianLeftTunnel << ' ' << NefarianRightTunnel;
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
+            data >> NefarianLeftTunnel;
+            data >> NefarianRightTunnel;
         }
 
-        void Load(char const* data) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!data)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(data);
-
-            char dataHead1, dataHead2, dataHead3;
-
-            std::istringstream loadStream(data);
-            loadStream >> dataHead1 >> dataHead2 >> dataHead3;
-
-            if (dataHead1 == 'B' && dataHead2 == 'W' && dataHead3 == 'L')
-            {
-                for (uint32 i = 0; i < EncounterCount; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState == FAIL || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
-
-                loadStream >> NefarianLeftTunnel;
-                loadStream >> NefarianRightTunnel;
-            }
-            else
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-            }
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << NefarianLeftTunnel << ' ' << NefarianRightTunnel;
         }
 
     protected:

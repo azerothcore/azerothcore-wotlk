@@ -44,7 +44,7 @@ namespace DisableMgr
 
         DisableMap m_DisableMap;
 
-        uint8 MAX_DISABLE_TYPES = 10;
+        uint8 MAX_DISABLE_TYPES = 11;
     }
 
     void LoadDisables()
@@ -258,6 +258,8 @@ namespace DisableMgr
                         }
                         break;
                     }
+                    case DISABLE_TYPE_LOOT:
+                        break;
                 default:
                     break;
             }
@@ -266,7 +268,7 @@ namespace DisableMgr
             ++total_count;
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", ">> Loaded {} disables in {} ms", total_count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} Disables in {} ms", total_count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
 
@@ -297,13 +299,18 @@ namespace DisableMgr
             ++itr;
         }
 
-        LOG_INFO("server.loading", ">> Checked {} quest disables in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Checked {} Quest Disables in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
 
     bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags)
     {
-        ASSERT(type < MAX_DISABLE_TYPES);
+        if (type > MAX_DISABLE_TYPES)
+        {
+            LOG_ERROR("server", "Disables::IsDisabledFor() called with unknown disable type {}!  (entry {}, flags {}).", type, entry, flags);
+            return false;
+        }
+
         if (m_DisableMap[type].empty())
             return false;
 
@@ -388,6 +395,8 @@ namespace DisableMgr
             case DISABLE_TYPE_GO_LOS:
                 return true;
             case DISABLE_TYPE_GAME_EVENT:
+                return true;
+            case DISABLE_TYPE_LOOT:
                 return true;
         }
 

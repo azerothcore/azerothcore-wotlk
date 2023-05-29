@@ -195,13 +195,14 @@ void AuthSession::CheckIpCallback(PreparedQueryResult result)
     {
         bool banned = false;
 
-        do
+        for (auto const& fields : *result)
         {
-            Field* fields = result->Fetch();
             if (fields[0].Get<uint64>() != 0)
+            {
                 banned = true;
-
-        } while (result->NextRow());
+                break;
+            }
+        }
 
         if (banned)
         {

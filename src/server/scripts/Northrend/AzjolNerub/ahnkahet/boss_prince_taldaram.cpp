@@ -119,7 +119,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         }
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Replace sphere instantly if sphere is summoned after prince death
         if (instance->GetBossState(DATA_PRINCE_TALDARAM) != IN_PROGRESS)
@@ -131,7 +131,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         DoCastSelf(SPELL_FLAME_SPHERE_SPAWN_EFFECT);
         DoCastSelf(SPELL_FLAME_SPHERE_VISUAL);
 
-        // TODO: replace with DespawnOrUnsummon
+        /// @todo: replace with DespawnOrUnsummon
         uiDespawnTimer = 13000;
     }
 
@@ -214,7 +214,7 @@ struct boss_taldaram : public BossAI
         // Event not started
         if (instance->GetData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetData(DATA_TELDRAM_SPHERE2) != DONE)
         {
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->SetDisableGravity(true);
             me->SetHover(true);
             if (!me->HasAura(SPELL_BEAM_VISUAL))
@@ -260,7 +260,8 @@ struct boss_taldaram : public BossAI
                 me->SetDisableGravity(false);
                 me->SetHover(false);
                 me->RemoveAllAuras();
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE| UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
                 me->UpdatePosition(me->GetHomePosition(), true);
             }
             summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
@@ -274,7 +275,8 @@ struct boss_taldaram : public BossAI
             me->SetDisableGravity(false);
             me->SetHover(false);
             me->RemoveAllAuras();
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE| UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToAll(false);
         }
     }
 
@@ -318,9 +320,9 @@ struct boss_taldaram : public BossAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
         ScheduleCombatEvents();
 
@@ -381,7 +383,7 @@ struct boss_taldaram : public BossAI
                 case EVENT_PRINCE_BLOODTHIRST:
                 {
                     DoCastSelf(SPELL_BLOODTHIRST);
-                    events.RepeatEvent(10000);
+                    events.Repeat(10s);
                     break;
                 }
                 case EVENT_PRINCE_FLAME_SPHERES:
@@ -394,22 +396,22 @@ struct boss_taldaram : public BossAI
 
                     if (!events.GetNextEventTime(EVENT_PRINCE_VANISH))
                     {
-                        events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
+                        events.RescheduleEvent(EVENT_PRINCE_VANISH, 14s);
                     }
                     else
                     {
                         // Make sure that Vanish won't get triggered at same time as sphere summon
-                        events.DelayEvents(4000);
+                        events.DelayEvents(4s);
                     }
 
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 }
                 case EVENT_PRINCE_VANISH:
                 {
                     //Count alive players
                     uint8 count = 0;
-                    std::list<HostileReference*> const t_list = me->GetThreatMgr().getThreatList();
+                    std::list<HostileReference*> const t_list = me->GetThreatMgr().GetThreatList();
                     if (!t_list.empty())
                     {
                         for (HostileReference const* reference : t_list)
@@ -437,7 +439,7 @@ struct boss_taldaram : public BossAI
 
                         events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
                         events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
-                        events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499);
+                        events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499ms);
                     }
                     break;
                 }
@@ -451,7 +453,7 @@ struct boss_taldaram : public BossAI
                         me->RemoveAura(SPELL_VANISH);
                     }
 
-                    events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20000);
+                    events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20s);
                     break;
                 }
                 case EVENT_PRINCE_RESCHEDULE:
@@ -481,14 +483,14 @@ private:
     void ScheduleCombatEvents()
     {
         events.Reset();
-        events.RescheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10000);
-        events.RescheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10000);
+        events.RescheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10s);
+        events.RescheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10s);
         vanishTarget_GUID.Clear();
         vanishDamage = 0;
     }
 };
 
-// TODO: Turn into new script type when Gossips have been updated
+/// @todo: Turn into new script type when Gossips have been updated
 class go_prince_taldaram_sphere : public GameObjectScript
 {
 public:

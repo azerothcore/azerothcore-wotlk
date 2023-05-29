@@ -422,7 +422,7 @@ void MotionTransport::LoadStaticPassengers()
             // GameObjects on transport
             guidEnd = cellItr->second.gameobjects.end();
             for (CellGuidSet::const_iterator guidItr = cellItr->second.gameobjects.begin(); guidItr != guidEnd; ++guidItr)
-                CreateGOPassenger(*guidItr, sObjectMgr->GetGOData(*guidItr));
+                CreateGOPassenger(*guidItr, sObjectMgr->GetGameObjectData(*guidItr));
         }
     }
 }
@@ -1003,4 +1003,11 @@ void StaticTransport::RemovePassenger(WorldObject* passenger, bool withAll)
             passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
         }
     }
+}
+
+std::string MotionTransport::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << GameObject::GetDebugInfo();
+    return sstr.str();
 }

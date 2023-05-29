@@ -139,7 +139,7 @@ namespace WeatherMgr
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", ">> Loaded {} weather definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} Weather Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
 

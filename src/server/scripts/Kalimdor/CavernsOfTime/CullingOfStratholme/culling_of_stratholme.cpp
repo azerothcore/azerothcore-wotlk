@@ -385,7 +385,7 @@ public:
         void ScheduleNextEvent(uint32 currentEvent, uint32 time);
         void SummonNextWave();
         void ReorderInstance(uint32 data);
-        void EnterCombat(Unit* /*who*/) override ;
+        void JustEngagedWith(Unit* /*who*/) override ;
         void SendNextWave(uint32 entry);
         void SpawnTimeRift();
 
@@ -472,7 +472,7 @@ public:
                 {
                     summons.Despawn(cr);
                     summons.Summon(cr);
-                    cr->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    cr->SetImmuneToAll(true);
                     cr->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 }
                 Talk(SAY_PHASE501);
@@ -972,7 +972,7 @@ public:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN))
                         {
                             cr->UpdateEntry(NPC_INFINITE_HUNTER, nullptr, false);
-                            cr->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            cr->SetImmuneToAll(true);
                             cr->SetReactState(REACT_PASSIVE);
                         }
                         ScheduleNextEvent(currentEvent, 2000);
@@ -981,7 +981,7 @@ public:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN4))
                         {
                             cr->UpdateEntry(NPC_INFINITE_AGENT, nullptr, false);
-                            cr->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            cr->SetImmuneToAll(true);
                             cr->SetReactState(REACT_PASSIVE);
                         }
                         ScheduleNextEvent(currentEvent, 2000);
@@ -996,14 +996,14 @@ public:
                         }
                         if (Creature* cr = GetEventNpc(NPC_INFINITE_AGENT)) // it is infinite agent now :)
                         {
-                            cr->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            cr->SetImmuneToAll(false);
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->SetInCombatWithZone();
                             cr->AddThreat(me, 0.0f);
                         }
                         if (Creature* cr = GetEventNpc(NPC_INFINITE_HUNTER)) // it is infinite hunter now :)
                         {
-                            cr->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            cr->SetImmuneToAll(false);
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->SetInCombatWithZone();
                             cr->AddThreat(me, 0.0f);
@@ -1076,7 +1076,7 @@ public:
                         me->SummonCreature(NPC_TIME_RIFT, EventPos[EVENT_SRC_EPOCH], TEMPSUMMON_TIMED_DESPAWN, 20000);
                         if (Creature* cr = me->SummonCreature(NPC_EPOCH, EventPos[EVENT_SRC_EPOCH]))
                         {
-                            cr->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            cr->SetImmuneToAll(true);
                             cr->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             me->SetTarget(cr->GetGUID());
                             cr->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_EPOCH]);
@@ -1097,7 +1097,7 @@ public:
                     case EVENT_ACTION_PHASE3+18:
                         if (Creature* cr = GetEventNpc(NPC_EPOCH))
                         {
-                            cr->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            cr->SetImmuneToAll(false);
                             cr->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->AddThreat(me, 0.0f);
@@ -1122,7 +1122,7 @@ public:
                     case EVENT_ACTION_PHASE5:
                         if (Creature* cr = GetEventNpc(NPC_MAL_GANIS))
                         {
-                            cr->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            cr->SetImmuneToAll(false);
                             cr->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             cr->SetInCombatWithZone();
                             cr->AddThreat(me, 0.0f);
@@ -1232,7 +1232,7 @@ void npc_arthas::npc_arthasAI::SummonNextWave()
         me->SummonCreature(/*entry*/(uint32)WavesLocations[tableId][i][0], WavesLocations[tableId][i][1], WavesLocations[tableId][i][2], WavesLocations[tableId][i][3], WavesLocations[tableId][i][4]);
 }
 
-void npc_arthas::npc_arthasAI::EnterCombat(Unit* /*who*/)
+void npc_arthas::npc_arthasAI::JustEngagedWith(Unit* /*who*/)
 {
     DoCast(me, SPELL_ARTHAS_AURA);
 

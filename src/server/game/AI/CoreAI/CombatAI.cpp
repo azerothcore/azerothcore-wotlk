@@ -26,11 +26,11 @@
 // AggressorAI
 /////////////////
 
-int AggressorAI::Permissible(Creature const* creature)
+int32 AggressorAI::Permissible(Creature const* creature)
 {
     // have some hostile factions, it will be selected by IsHostileTo check at MoveInLineOfSight
     if (!creature->IsCivilian() && !creature->IsNeutralToAll())
-        return PERMIT_BASE_PROACTIVE;
+        return PERMIT_BASE_REACTIVE;
 
     return PERMIT_BASE_NO;
 }
@@ -68,7 +68,12 @@ void CombatAI::JustDied(Unit* killer)
             me->CastSpell(killer, *i, true);
 }
 
-void CombatAI::EnterCombat(Unit* who)
+/**
+ * @brief Called for reaction when initially engaged
+ *
+ * @param who Who 'me' Engaged combat with
+ */
+void CombatAI::JustEngagedWith(Unit* who)
 {
     for (SpellVct::iterator i = spells.begin(); i != spells.end(); ++i)
     {
@@ -114,7 +119,12 @@ void CasterAI::InitializeAI()
         m_attackDist = MELEE_RANGE;
 }
 
-void CasterAI::EnterCombat(Unit* who)
+/**
+ * @brief Called for reaction when initially engaged
+ *
+ * @param who Who 'me' Engaged combat with
+ */
+void CasterAI::JustEngagedWith(Unit* who)
 {
     if (spells.empty())
         return;
@@ -228,7 +238,7 @@ TurretAI::TurretAI(Creature* c) : CreatureAI(c)
 
 bool TurretAI::CanAIAttack(Unit const* /*who*/) const
 {
-    // TODO: use one function to replace it
+    /// @todo: use one function to replace it
     if (!me->IsWithinCombatRange(me->GetVictim(), me->m_CombatDistance)
             || (m_minRange && me->IsWithinCombatRange(me->GetVictim(), m_minRange)))
         return false;
@@ -319,4 +329,12 @@ void VehicleAI::CheckConditions(uint32 diff)
     }
     else
         m_ConditionsTimer -= diff;
+}
+
+int32 VehicleAI::Permissible(Creature const* creature)
+{
+    if (creature->IsVehicle())
+        return PERMIT_BASE_SPECIAL;
+
+    return PERMIT_BASE_NO;
 }

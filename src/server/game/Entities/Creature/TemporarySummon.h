@@ -52,17 +52,24 @@ public:
     [[nodiscard]] Unit* GetSummonerUnit() const;
     [[nodiscard]] Creature* GetSummonerCreatureBase() const;
     [[nodiscard]] GameObject* GetSummonerGameObject() const;
-    ObjectGuid GetSummonerGUID() { return m_summonerGUID; }
-    TempSummonType const& GetSummonType() { return m_type; }
+    ObjectGuid GetSummonerGUID() const { return m_summonerGUID; }
+    TempSummonType GetSummonType() const { return m_type; }
     uint32 GetTimer() { return m_timer; }
     void SetTimer(uint32 t) { m_timer = t; }
 
+    void SetVisibleBySummonerOnly(bool visibleBySummonerOnly) { _visibleBySummonerOnly = visibleBySummonerOnly; }
+    [[nodiscard]] bool IsVisibleBySummonerOnly() const { return _visibleBySummonerOnly; }
+
     const SummonPropertiesEntry* const m_Properties;
+
+    std::string GetDebugInfo() const override;
+
 private:
     TempSummonType m_type;
     uint32 m_timer;
     uint32 m_lifetime;
     ObjectGuid m_summonerGUID;
+    bool _visibleBySummonerOnly;
 };
 
 class Minion : public TempSummon
@@ -77,6 +84,8 @@ public:
     [[nodiscard]] bool IsPetGhoul() const {return GetEntry() == 26125 /*normal ghoul*/ || GetEntry() == 30230 /*Raise Ally ghoul*/;} // Ghoul may be guardian or pet
     [[nodiscard]] bool IsGuardianPet() const;
     void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
+
+    std::string GetDebugInfo() const override;
 protected:
     const ObjectGuid m_owner;
     float m_followAngle;
@@ -97,6 +106,8 @@ public:
     void UpdateMaxPower(Powers power) override;
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void UpdateDamagePhysical(WeaponAttackType attType) override;
+
+    std::string GetDebugInfo() const override;
 };
 
 class Puppet : public Minion

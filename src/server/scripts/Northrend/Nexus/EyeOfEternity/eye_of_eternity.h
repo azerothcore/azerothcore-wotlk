@@ -21,6 +21,7 @@
 #include "Chat.h"
 #include "CreatureAIImpl.h"
 
+#define DataHeader "EOE"
 #define EyeOfEternityScriptName "instance_eye_of_eternity"
 
 enum Objects

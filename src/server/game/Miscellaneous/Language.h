@@ -218,7 +218,7 @@ enum AcoreStrings
     LANG_GRID_POSITION                  = 178,
     // 179-185 used in other client versions
     LANG_TRANSPORT_POSITION             = 186,
-    // 187
+    LANG_PROFANITY_NAME                 = 187,
     LANG_2FA_SECRET_TOO_LONG            = 188,
     LANG_2FA_SECRET_INVALID             = 189,
     LANG_2FA_SECRET_SET_COMPLETE        = 190,
@@ -1146,7 +1146,11 @@ enum AcoreStrings
 
     LANG_CMD_GOQUEST_INVALID_SYNTAX     = 5082,
 
-    // Room for more strings    5083-9999
+    LANG_CMD_CHAR_CHANGE_ACC_SUCCESS    = 5083,
+
+    LANG_CMD_CAST_ERROR_CODE            = 5084,
+
+    // Room for more strings    5084-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

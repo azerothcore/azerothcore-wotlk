@@ -239,8 +239,9 @@ void ArenaTeamMgr::DistributeArenaPoints()
     {
         if (ArenaTeam* at = titr->second)
         {
-            at->FinishWeek();
-            at->SaveToDB();
+            if (at->FinishWeek())
+                at->SaveToDB(true);
+
             at->NotifyStatsChanged();
         }
     }

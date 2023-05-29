@@ -51,7 +51,7 @@ public:
 
         boss_draganthaurissanAI(Creature* creature) : BossAI(creature, DATA_EMPEROR){}
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             if (hasYelled != 5)
             {
@@ -63,8 +63,8 @@ public:
             }
 
             me->CallForHelp(VISIBLE_RANGE);
-            events.ScheduleEvent(SPELL_HANDOFTHAURISSAN, urand(4000, 7000));
-            events.ScheduleEvent(SPELL_AVATAROFFLAME, urand(10000, 12000));
+            events.ScheduleEvent(SPELL_HANDOFTHAURISSAN, 4s, 7s);
+            events.ScheduleEvent(SPELL_AVATAROFFLAME, 10s, 12s);
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -118,11 +118,11 @@ public:
                 case SPELL_HANDOFTHAURISSAN:
                     DoCast(SelectTarget(SelectTargetMethod::Random), SPELL_HANDOFTHAURISSAN);
                     //DoCastVictim(SPELL_HANDOFTHAURISSAN);
-                    events.ScheduleEvent(SPELL_HANDOFTHAURISSAN, urand(4000, 7000));
+                    events.ScheduleEvent(SPELL_HANDOFTHAURISSAN, 4s, 7s);
                     break;
                 case SPELL_AVATAROFFLAME:
                     DoCastSelf(SPELL_AVATAROFFLAME);
-                    events.ScheduleEvent(SPELL_AVATAROFFLAME, urand(23000, 27000));
+                    events.ScheduleEvent(SPELL_AVATAROFFLAME, 23s, 27s);
                     break;
                 default:
                     break;

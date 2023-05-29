@@ -82,13 +82,13 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (who->GetEntry() == NPC_MADRIGOSA)
                 return;
 
             Talk(YELL_AGGRO);
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SPELL_SLASH, 11000);
             events.ScheduleEvent(EVENT_SPELL_STOMP, 30000);
@@ -140,7 +140,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_STOMP, 30000);
                     break;
                 case EVENT_SPELL_BURN:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, -SPELL_BURN_DAMAGE))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, true, -SPELL_BURN_DAMAGE))
                         me->CastSpell(target, SPELL_BURN, false);
                     events.ScheduleEvent(EVENT_SPELL_BURN, 60000);
                     break;

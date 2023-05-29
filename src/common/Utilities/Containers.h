@@ -140,6 +140,21 @@ namespace Acore::Containers
     }
 
     /*
+     * Select a random element from a container.
+     *
+     * Note: container cannot be empty
+     */
+    template<class C, class Predicate>
+    inline auto SelectRandomContainerElementIf(C const& container, Predicate&& predicate) -> typename std::add_const<decltype(*std::begin(container))>::type&
+    {
+        C containerCopy;
+        std::copy_if(std::begin(container), std::end(container), std::inserter(containerCopy, std::end(containerCopy)), predicate);
+        auto it = std::begin(containerCopy);
+        std::advance(it, urand(0, uint32(std::size(containerCopy)) - 1));
+        return *it;
+    }
+
+    /*
      * Select a random element from a container where each element has a different chance to be selected.
      *
      * @param container Container to select an element from

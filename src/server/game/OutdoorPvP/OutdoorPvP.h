@@ -138,6 +138,16 @@ public:
     bool SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o = 0,
                              float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
 
+    void SetSlider(float slider)
+    {
+        m_value = std::clamp<float>(slider, -m_maxValue, m_maxValue);
+    }
+
+    float GetSlider()
+    {
+        return m_value;
+    }
+
 protected:
     bool AddObject(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o,
                    float rotation0, float rotation1, float rotation2, float rotation3);

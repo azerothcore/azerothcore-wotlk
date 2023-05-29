@@ -329,7 +329,7 @@ public:
 
 enum SentryPoint
 {
-    SPELL_TELEPORT_VISUAL    = 799,  // TODO Find the correct spell
+    SPELL_TELEPORT_VISUAL    = 799,  /// @todo Find the correct spell
     QUEST_MISSING_DIPLO_PT14 = 1265,
     NPC_TERVOSH              = 4967
 };

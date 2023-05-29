@@ -1269,7 +1269,7 @@ void Map::RemoveAllPlayers()
             {
                 // this is happening for bg
                 LOG_ERROR("maps", "Map::UnloadAll: player {} is still in map {} during unload, this should not happen!", player->GetName(), GetId());
-                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
             }
         }
     }
@@ -1946,11 +1946,11 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
             {
                 // Get water level
                 float liquid_level = _liquidMap ? _liquidMap[lx_int * _liquidWidth + ly_int] : _liquidLevel;
-                // Get ground level (sub 0.2 for fix some errors)
+                // Get ground level
                 float ground_level = getHeight(x, y);
 
-                // Check water level and ground level
-                if (liquid_level >= ground_level && z >= ground_level)
+                // Check water level and ground level (sub 0.2 for fix some errors)
+                if (liquid_level >= ground_level && z >= ground_level - 0.2f)
                 {
                     // All ok in water -> store data
                     liquidData.Entry  = entry;
@@ -2525,6 +2525,7 @@ void Map::SendInitSelf(Player* player)
 {
     LOG_DEBUG("maps", "Creating player data for himself {}", player->GetGUID().ToString());
 
+    WorldPacket packet;
     UpdateData data;
 
     // attach to player data current transport data
@@ -2534,15 +2535,25 @@ void Map::SendInitSelf(Player* player)
     // build data for self presence in world at own client (one time for map)
     player->BuildCreateUpdateBlockForPlayer(&data, player);
 
+    // build and send self update packet before sending to player his own auras
+    data.BuildPacket(&packet);
+    player->SendDirectMessage(&packet);
+
+    // send to player his own auras (this is needed here for timely initialization of some fields on client)
+    player->GetAurasForTarget(player, true);
+
+    // clean buffers for further work
+    packet.clear();
+    data.Clear();
+
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
     if (Transport* transport = player->GetTransport())
         for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
             if (player != (*itr) && player->HaveAtClient(*itr))
                 (*itr)->BuildCreateUpdateBlockForPlayer(&data, player);
 
-    WorldPacket packet;
     data.BuildPacket(&packet);
-    player->GetSession()->SendPacket(&packet);
+    player->SendDirectMessage(&packet);
 }
 
 void Map::SendInitTransports(Player* player)
@@ -2854,6 +2865,9 @@ void InstanceMap::InitVisibilityDistance()
         case 724: // Ruby Sanctum
             m_VisibleDistance = 200.0f;
             break;
+        case 531: // Ahn'Qiraj Temple
+            m_VisibleDistance = 300.0f;
+            break;
     }
 }
 
@@ -2958,6 +2972,11 @@ bool InstanceMap::AddPlayerToMap(Player* player)
                     playerBind->save->CanReset(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), mapSave->CanReset());
                 return false;
             }
+        }
+        else if (player->GetSession()->PlayerLoading() && playerBind && playerBind->save != mapSave)
+        {
+            // Prevent "Convert to Raid" exploit to reset instances
+            return false;
         }
         else
         {
@@ -3629,7 +3648,7 @@ Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= 
         bones->SetPhaseMask(corpse->GetPhaseMask(), false);
 
         bones->SetUInt32Value(CORPSE_FIELD_FLAGS, CORPSE_FLAG_UNK2 | CORPSE_FLAG_BONES);
-        bones->SetGuidValue(CORPSE_FIELD_OWNER, ObjectGuid::Empty);
+        bones->SetGuidValue(CORPSE_FIELD_OWNER, corpse->GetOwnerGUID());
 
         for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
             if (corpse->GetUInt32Value(CORPSE_FIELD_ITEM + i))
@@ -3801,7 +3820,7 @@ void Map::DoForAllPlayers(std::function<void(Player*)> exec)
 bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
     G3D::Vector3 prevPath = path->GetStartPosition();
-    for (auto & vector : path->GetPath())
+    for (auto& vector : path->GetPath())
     {
         float x = vector.x;
         float y = vector.y;
@@ -4015,4 +4034,22 @@ void Map::DeleteCorpseData()
     stmt->SetData(0, GetId());
     stmt->SetData(1, GetInstanceId());
     CharacterDatabase.Execute(stmt);
+}
+
+std::string Map::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << std::boolalpha
+        << "Id: " << GetId() << " InstanceId: " << GetInstanceId() << " Difficulty: " << std::to_string(GetDifficulty())
+        << " HasPlayers: " << HavePlayers();
+    return sstr.str();
+}
+
+std::string InstanceMap::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Map::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "ScriptId: " << GetScriptId() << " ScriptName: " << GetScriptName();
+    return sstr.str();
 }

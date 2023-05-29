@@ -36,7 +36,7 @@
             "externalConsole": true,
             "pipeTransport": {
                 "debuggerPath": "/usr/bin/gdb",
-                "pipeProgram": "docker-compose",
+                "pipeProgram": "docker compose",
                 "pipeArgs": [
                     "exec", "-T", "ac-worldserver", "sh", "-c"
                 ],

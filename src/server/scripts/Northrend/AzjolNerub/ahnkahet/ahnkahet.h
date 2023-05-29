@@ -18,6 +18,7 @@
 #ifndef DEF_AHNKAHET_H
 #define DEF_AHNKAHET_H
 
+#define DataHeader "AK"
 #define AhnKahetScriptName "instance_ahnkahet"
 constexpr uint32 MAX_ENCOUNTER = 5;
 enum AhnkahetData

@@ -79,16 +79,17 @@ public:
 
         void Reset() override
         {
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToPC(true);
             events.Reset();
             // Apply auras on spawn and reset
             // DoCast(me, SPELL_FIRE_SHIELD_TRIGGER); // Need to find this in old DBC if possible
             me->RemoveAura(SPELL_EMBERSEER_FULL_STRENGTH);
             me->RemoveAura(SPELL_EMBERSEER_GROWING);
             me->RemoveAura(SPELL_EMBERSEER_GROWING_TRIGGER);
-            events.ScheduleEvent(EVENT_RESPAWN, 5000);
+            events.ScheduleEvent(EVENT_RESPAWN, 5s);
             // Hack for missing trigger spell
-            events.ScheduleEvent(EVENT_FIRE_SHIELD, 3000);
+            events.ScheduleEvent(EVENT_FIRE_SHIELD, 3s);
 
             // Open doors on reset
             if (instance->GetBossState(DATA_PYROGAURD_EMBERSEER) == IN_PROGRESS)
@@ -100,7 +101,7 @@ public:
             switch (data)
             {
                 case 1:
-                    events.ScheduleEvent(EVENT_PLAYER_CHECK, 5000);
+                    events.ScheduleEvent(EVENT_PLAYER_CHECK, 5s);
                     break;
                 case 2:
                     // Close these two doors on Blackhand Incarcerators aggro
@@ -119,12 +120,12 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             // ### TODO Check combat timing ###
-            events.ScheduleEvent(EVENT_FIRENOVA,    6000);
-            events.ScheduleEvent(EVENT_FLAMEBUFFET, 3000);
-            events.ScheduleEvent(EVENT_PYROBLAST,  14000);
+            events.ScheduleEvent(EVENT_FIRENOVA,    6s);
+            events.ScheduleEvent(EVENT_FLAMEBUFFET, 3s);
+            events.ScheduleEvent(EVENT_PYROBLAST,  14s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -157,8 +158,9 @@ public:
                     me->CastSpell(me, SPELL_EMBERSEER_FULL_STRENGTH);
                     Talk(EMOTE_FREE_OF_BONDS);
                     Talk(YELL_FREE_OF_BONDS);
-                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
-                    events.ScheduleEvent(EVENT_ENTER_COMBAT, 2000);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetImmuneToPC(false);
+                    events.ScheduleEvent(EVENT_ENTER_COMBAT, 2s);
                 }
             }
         }
@@ -233,7 +235,7 @@ public:
                                     if (Creature* creature = *itr)
                                         creature->AI()->SetData(1, 1);
                                 }
-                                events.ScheduleEvent(EVENT_PRE_FIGHT_2, 32000);
+                                events.ScheduleEvent(EVENT_PRE_FIGHT_2, 32s);
                                 break;
                             }
                         case EVENT_PRE_FIGHT_2:
@@ -244,7 +246,7 @@ public:
                         case EVENT_FIRE_SHIELD:
                             // #### Spell isn't doing any damage ??? ####
                             DoCast(me, SPELL_FIRE_SHIELD);
-                            events.ScheduleEvent(EVENT_FIRE_SHIELD, 3000);
+                            events.ScheduleEvent(EVENT_FIRE_SHIELD, 3s);
                             break;
                         case EVENT_PLAYER_CHECK:
                             {
@@ -258,7 +260,7 @@ public:
 
                                 if (_hasAura)
                                 {
-                                    events.ScheduleEvent(EVENT_PRE_FIGHT_1, 1000);
+                                    events.ScheduleEvent(EVENT_PRE_FIGHT_1, 1s);
                                     instance->SetBossState(DATA_PYROGAURD_EMBERSEER, IN_PROGRESS);
                                 }
                                 break;
@@ -281,19 +283,19 @@ public:
                 {
                     case EVENT_FIRE_SHIELD:
                         DoCast(me, SPELL_FIRE_SHIELD);
-                        events.ScheduleEvent(EVENT_FIRE_SHIELD, 3000);
+                        events.ScheduleEvent(EVENT_FIRE_SHIELD, 3s);
                         break;
                     case EVENT_FIRENOVA:
                         DoCast(me, SPELL_FIRENOVA);
-                        events.ScheduleEvent(EVENT_FIRENOVA, 6000);
+                        events.ScheduleEvent(EVENT_FIRENOVA, 6s);
                         break;
                     case EVENT_FLAMEBUFFET:
                         DoCast(me, SPELL_FLAMEBUFFET);
-                        events.ScheduleEvent(EVENT_FLAMEBUFFET, 14000);
+                        events.ScheduleEvent(EVENT_FLAMEBUFFET, 14s);
                         break;
                     case EVENT_PYROBLAST:
                         DoCastRandomTarget(SPELL_PYROBLAST, 0, 100.0f);
-                        events.ScheduleEvent(EVENT_PYROBLAST, 15000);
+                        events.ScheduleEvent(EVENT_PYROBLAST, 15s);
                         break;
                     default:
                         break;
@@ -338,7 +340,7 @@ public:
 
         void Reset() override
         {
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
                 Emberseer->AI()->SetData(1, 3);
 
@@ -364,17 +366,17 @@ public:
         {
             if (data == 1 && value == 1)
             {
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(false);
                 me->InterruptSpell(CURRENT_CHANNELED_SPELL);
                 DoZoneInCombat();
                 _events.CancelEvent(EVENT_ENCAGED_EMBERSEER);
             }
 
             if (data == 1 && value == 2)
-                _events.ScheduleEvent(EVENT_ENCAGED_EMBERSEER, 1000);
+                _events.ScheduleEvent(EVENT_ENCAGED_EMBERSEER, 1s);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             // Used to close doors
             if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
@@ -389,8 +391,8 @@ public:
                     creature->SetInCombatWithZone();    // AI()->AttackStart(me->GetVictim());
             }
 
-            _events.ScheduleEvent(EVENT_STRIKE, urand(8000, 16000));
-            _events.ScheduleEvent(EVENT_ENCAGE, urand(10000, 20000));
+            _events.ScheduleEvent(EVENT_STRIKE, 8s, 16s);
+            _events.ScheduleEvent(EVENT_ENCAGE, 10s, 20s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -424,11 +426,11 @@ public:
                 {
                     case EVENT_STRIKE:
                         DoCastVictim(SPELL_STRIKE, true);
-                        _events.ScheduleEvent(EVENT_STRIKE, urand(14000, 23000));
+                        _events.ScheduleEvent(EVENT_STRIKE, 14s, 23s);
                         break;
                     case EVENT_ENCAGE:
                         DoCast(SelectTarget(SelectTargetMethod::Random, 0, 100, true), EVENT_ENCAGE, true);
-                        _events.ScheduleEvent(EVENT_ENCAGE, urand(6000, 12000));
+                        _events.ScheduleEvent(EVENT_ENCAGE, 6s, 12s);
                         break;
                     default:
                         break;

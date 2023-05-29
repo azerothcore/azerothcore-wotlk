@@ -9,7 +9,7 @@ USER_CONF_PATH=${USER_CONF_PATH:-"$AC_PATH_CONF/config.sh"}
 if [ -f  "$USER_CONF_PATH" ]; then
     source "$USER_CONF_PATH" # should overwrite previous
 else
-    echo "NOTICE: file <$USER_CONF_PATH> has not been found, you should create and configure it."
+    echo "NOTICE: file <$USER_CONF_PATH> not found, we use default configuration only."
 fi
 
 #

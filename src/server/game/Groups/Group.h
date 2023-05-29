@@ -214,6 +214,7 @@ public:
     bool isBFGroup()   const;
     bool isBGGroup()   const;
     bool IsCreated()   const;
+    GroupType GetGroupType() const;
     ObjectGuid GetLeaderGUID() const;
     Player* GetLeader();
     ObjectGuid GetGUID() const;
@@ -245,6 +246,7 @@ public:
     uint8 GetMemberGroup(ObjectGuid guid) const;
 
     void ConvertToLFG(bool restricted = true);
+    bool CheckLevelForRaid();
     void ConvertToRaid();
 
     void SetBattlegroundGroup(Battleground* bg);

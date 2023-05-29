@@ -67,8 +67,7 @@ enum MillhouseEvents
 
     EVENT_MILL_CHECK_HEALTH     = 20,
     EVENT_MILL_PYROBLAST        = 21,
-    EVENT_MILL_BASE_SPELL       = 22,
-    EVENT_MILL_ICEBLOCK         = 23
+    EVENT_MILL_BASE_SPELL       = 22
 };
 
 class npc_millhouse_manastorm : public CreatureScript
@@ -81,6 +80,7 @@ public:
         npc_millhouse_manastormAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
+            _usedIceblock = false;
         }
 
         InstanceScript* instance;
@@ -92,7 +92,7 @@ public:
             ScriptedAI::InitializeAI();
 
             me->SetReactState(REACT_PASSIVE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             events2.Reset();
             events2.ScheduleEvent(EVENT_TELEPORT_VISUAL, 0);
             events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO1, 3000);
@@ -101,6 +101,7 @@ public:
         void Reset() override
         {
             events.Reset();
+            _usedIceblock = false;
         }
 
         void AttackStart(Unit* who) override
@@ -119,12 +120,21 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_MILL_CHECK_HEALTH, 1000);
             events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30000);
             events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 2000);
-            events.ScheduleEvent(EVENT_MILL_ICEBLOCK, 1000);
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        {
+            if (me->HealthBelowPctDamaged(50, damage) && !_usedIceblock)
+            {
+                _usedIceblock = true;
+                Talk(SAY_ICEBLOCK);
+                DoCastSelf(SPELL_ICEBLOCK, true);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -174,7 +184,7 @@ public:
                 case EVENT_MILLHOUSE_INTRO9:
                     me->SetFacingTo(M_PI * 1.5f);
                     me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), M_PI * 1.5f);
-                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     events2.ScheduleEvent(EVENT_SEARCH_FIGHT, 1000);
                     break;
@@ -208,15 +218,6 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_PYROBLAST, false);
                     events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30000);
                     break;
-                case EVENT_MILL_ICEBLOCK:
-                    if (me->GetDistance(me->GetVictim()) < 5.0f)
-                    {
-                        Talk(SAY_ICEBLOCK);
-                        me->CastSpell(me, SPELL_ICEBLOCK, true);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_MILL_ICEBLOCK, 1000);
-                    break;
                 case EVENT_MILL_BASE_SPELL:
                     switch (RAND(SPELL_FIREBALL, SPELL_ARCANE_MISSILES, SPELL_FROSTBOLT))
                     {
@@ -240,6 +241,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+        private:
+            bool _usedIceblock;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -340,12 +344,15 @@ public:
         {
             if (summon->GetEntry() == NPC_HARBINGER_SKYRISS)
             {
-                Unit::Kill(me, me);
+                me->KillSelf();
                 me->setActive(false);
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, DONE);
                 if (Creature* creature = summons.GetCreatureWithEntry(NPC_MILLHOUSE))
                 {
-                    instance->DoCastSpellOnPlayers(SPELL_QID10886);
+                    if (IsHeroic())
+                    {
+                        instance->DoCastSpellOnPlayers(SPELL_QID10886);
+                    }
                     creature->AI()->Talk(SAY_COMPLETE);
                     creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                 }
@@ -354,7 +361,7 @@ public:
 
         void MoveInLineOfSight(Unit*) override { }
         void AttackStart(Unit*) override { }
-        void EnterCombat(Unit*) override { }
+        void JustEngagedWith(Unit*) override { }
 
         void JustDied(Unit*) override
         {
@@ -365,7 +372,7 @@ public:
         {
             _Reset();
             me->setActive(false);
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
             me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
             me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
             me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
@@ -379,7 +386,7 @@ public:
             {
                 me->setActive(true);
                 me->InterruptNonMeleeSpells(false);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(true);
                 events.ScheduleEvent(EVENT_WARDEN_INTRO1, 1500);
                 events.ScheduleEvent(EVENT_WARDEN_CHECK_PLAYERS, 1000);
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, IN_PROGRESS);
@@ -535,7 +542,7 @@ public:
                 case EVENT_WARDEN_INTRO25:
                     if (Creature* cr = me->SummonCreature(NPC_HARBINGER_SKYRISS, 445.763f, -191.639f, 44.64f, 1.60f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
-                        cr->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        cr->SetImmuneToAll(true);
                         cr->CastSpell(cr, SPELL_TELEPORT_VISUAL, true);
                     }
                     events.ScheduleEvent(EVENT_WARDEN_INTRO26, 1000);
@@ -562,7 +569,7 @@ public:
                     me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     if (Creature* creature = summons.GetCreatureWithEntry(NPC_HARBINGER_SKYRISS))
                     {
-                        creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        creature->SetImmuneToAll(false);
                         if (Player* player = SelectTargetFromPlayerList(50.0f))
                             AttackStart(player);
                     }

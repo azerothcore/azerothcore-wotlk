@@ -20,6 +20,8 @@
 
 #include "CreatureAIImpl.h"
 
+#define DataHeader "HOL"
+
 #define HallsOfLightningScriptName "instance_halls_of_lightning"
 
 enum HoLEvents

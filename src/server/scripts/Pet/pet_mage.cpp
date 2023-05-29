@@ -101,7 +101,7 @@ struct npc_pet_mage_mirror_image : CasterAI
         while (ref)
         {
             if (Unit* unit = ref->GetSource()->GetOwner())
-                unit->AddThreat(me, ref->getThreat() - ref->getTempThreatModifier());
+                unit->AddThreat(me, ref->GetThreat() - ref->getTempThreatModifier());
             ref = ref->next();
         }
 

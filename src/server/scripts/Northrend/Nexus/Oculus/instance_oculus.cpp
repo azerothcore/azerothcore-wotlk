@@ -52,6 +52,7 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             CentrifugeCount = 0;
             bAmberVoid = false;
             bEmeraldVoid = false;
@@ -238,43 +239,22 @@ public:
             return ObjectGuid::Empty;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "T O " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' ' << CentrifugeCount;
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
+            data >> m_auiEncounter[0];
+            data >> m_auiEncounter[1];
+            data >> m_auiEncounter[2];
+            data >> m_auiEncounter[3];
+            data >> CentrifugeCount;
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if( !in )
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if( dataHead1 == 'T' && dataHead2 == 'O' )
-            {
-                loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> CentrifugeCount;
-
-                for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
-                    if( m_auiEncounter[i] == IN_PROGRESS )
-                        m_auiEncounter[i] = NOT_STARTED;
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << m_auiEncounter[0] << ' '
+                << m_auiEncounter[1] << ' '
+                << m_auiEncounter[2] << ' '
+                << m_auiEncounter[3] << ' '
+                << CentrifugeCount;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override

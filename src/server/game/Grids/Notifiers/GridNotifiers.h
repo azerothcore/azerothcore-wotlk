@@ -597,7 +597,7 @@ namespace Acore
         void Visit(PlayerMapType& m)
         {
             for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(i_searcher) && itr->GetSource()->IsWithinDist(i_searcher, i_dist))
+                if (itr->GetSource()->HaveAtClient(i_searcher) && itr->GetSource()->IsWithinDist(i_searcher, i_dist))
                     i_do(itr->GetSource());
         }
 
@@ -860,7 +860,7 @@ namespace Acore
         AnyUnfriendlyUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range) : i_obj(obj), i_funit(funit), i_range(range) {}
         bool operator()(Unit* u)
         {
-            if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u) &&
+            if (u->IsAlive() && !u->IsCritter() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u) &&
                     (i_funit->GetTypeId() != TYPEID_UNIT || !i_funit->ToCreature()->IsAvoidingAOE())) // pussywizard
                 return true;
             else
@@ -925,7 +925,16 @@ namespace Acore
                 return false;
             }
 
-            if (!i_obj->IsWithinDistInMap(u, i_range) || !i_owner->IsValidAttackTarget(u) || !i_obj->IsWithinLOSInMap(u))
+            uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
+            Optional<float> collisionHeight = { };
+            if (i_obj->GetTypeId() == TYPEID_GAMEOBJECT)
+            {
+                losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
+                collisionHeight = i_owner->GetCollisionHeight();
+            }
+
+            if (!i_obj->IsWithinDistInMap(u, i_range) || !i_owner->IsValidAttackTarget(u) ||
+                !i_obj->IsWithinLOSInMap(u, VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks(losChecks), collisionHeight))
             {
                 return false;
             }
@@ -1113,7 +1122,7 @@ namespace Acore
         {}
         bool operator()(Unit* u)
         {
-            if (!u->IsAlive() || u->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
+            if (!u->IsAlive() || u->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->IsImmuneToPC() && !u->IsInCombat()))
                 return false;
             if (u->GetGUID() == i_funit->GetGUID())
                 return false;

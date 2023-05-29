@@ -117,9 +117,9 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_SWITCH_PLATFORM, 0);
         }
 
@@ -323,7 +323,7 @@ public:
                 else
                 {
                     me->resetAttackTimer();
-                    ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
+                    ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
                     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                         if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                             if (me->IsWithinMeleeRange(unit))

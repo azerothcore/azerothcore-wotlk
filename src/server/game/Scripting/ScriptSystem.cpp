@@ -41,7 +41,7 @@ void SystemMgr::LoadScriptWaypoints()
     if (result)
         uiCreatureCount = result->GetRowCount();
 
-    LOG_INFO("server.loading", "Loading Script Waypoints for {} creature(s)...", uiCreatureCount);
+    LOG_INFO("server.loading", "Loading Script Waypoints For {} Creature(s)...", uiCreatureCount);
 
     //                                     0       1         2           3           4           5
     result = WorldDatabase.Query("SELECT entry, pointid, location_x, location_y, location_z, waittime FROM script_waypoint ORDER BY pointid");

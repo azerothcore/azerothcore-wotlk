@@ -296,7 +296,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     switch (getPetType())
     {
         case SUMMON_PET:
-            petlevel = owner->getLevel();
+            petlevel = owner->GetLevel();
 
             if (IsPetGhoul())
                 SetUInt32Value(UNIT_FIELD_BYTES_0, 0x400); // class = rogue
@@ -553,8 +553,10 @@ void Pet::SavePetToDB(PetSaveMode mode)
         // save pet
         std::string actionBar = GenerateActionBarData();
 
-        ASSERT(owner->GetPetStable()->CurrentPet && owner->GetPetStable()->CurrentPet->PetNumber == m_charmInfo->GetPetNumber());
-        FillPetInfo(&owner->GetPetStable()->CurrentPet.value());
+        if (owner->GetPetStable()->CurrentPet && owner->GetPetStable()->CurrentPet->PetNumber == m_charmInfo->GetPetNumber())
+        {
+            FillPetInfo(&owner->GetPetStable()->CurrentPet.value());
+        }
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_PET);
         stmt->SetData(0, m_charmInfo->GetPetNumber());
@@ -563,7 +565,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         stmt->SetData(3, GetNativeDisplayId());
         stmt->SetData(4, GetUInt32Value(UNIT_CREATED_BY_SPELL));
         stmt->SetData(5, uint8(getPetType()));
-        stmt->SetData(6, getLevel());
+        stmt->SetData(6, GetLevel());
         stmt->SetData(7, GetUInt32Value(UNIT_FIELD_PETEXPERIENCE));
         stmt->SetData(8, uint8(GetReactState()));
         stmt->SetData(9, GetName());
@@ -885,8 +887,8 @@ void Pet::GivePetXP(uint32 xp)
     if (!IsAlive())
         return;
 
-    uint8 maxlevel = std::min((uint8)sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), GetOwner()->getLevel());
-    uint8 petlevel = getLevel();
+    uint8 maxlevel = std::min((uint8)sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), GetOwner()->GetLevel());
+    uint8 petlevel = GetLevel();
 
     // If pet is detected to be at, or above(?) the players level, don't hand out XP
     if (petlevel >= maxlevel)
@@ -913,7 +915,7 @@ void Pet::GivePetXP(uint32 xp)
 
 void Pet::GivePetLevel(uint8 level)
 {
-    if (!level || level == getLevel())
+    if (!level || level == GetLevel())
         return;
 
     if (getPetType() == HUNTER_PET)
@@ -990,7 +992,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     setPowerType(POWER_FOCUS);
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(getLevel() + 1)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
+    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(GetLevel() + 1)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
     ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
     if (cinfo->type == CREATURE_TYPE_BEAST)
@@ -1003,7 +1005,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     return true;
 }
 
-// TODO: Move stat mods code to pet passive auras
+/// @todo: Move stat mods code to pet passive auras
 bool Guardian::InitStatsForLevel(uint8 petlevel)
 {
     CreatureTemplate const* cinfo = GetCreatureTemplate();
@@ -1046,11 +1048,23 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             else if (petType != SUMMON_PET)
                 LOG_ERROR("entities.pet", "Unknown type pet {} is summoned by player class {}", GetEntry(), owner->getClass());
         }
+
+        if (petType == HUNTER_PET || petType == SUMMON_PET)
+        {
+            SetSpeed(MOVE_RUN, 1.15f);
+        }
     }
 
     uint32 creature_ID = (petType == HUNTER_PET) ? 1 : cinfo->Entry;
 
-    SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+    if (petType == HUNTER_PET)
+    {
+        SetMeleeDamageSchool(SPELL_SCHOOL_NORMAL);
+    }
+    else
+    {
+        SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+    }
 
     SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
 
@@ -1064,20 +1078,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 
-    //scale
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family);
-    if (cFamily && cFamily->minScale > 0.0f && petType == HUNTER_PET)
-    {
-        float scale;
-        if (getLevel() >= cFamily->maxScaleLevel)
-            scale = 1.0f;
-        else if (getLevel() <= cFamily->minScaleLevel)
-            scale = 0.5f;
-        else
-            scale = 0.5f + 0.5f * float(getLevel() - cFamily->minScaleLevel) / float(cFamily->maxScaleLevel  - cFamily->minScaleLevel);
-
-        SetObjectScale(scale);
-    }
+    // scale
+    SetObjectScale(GetNativeObjectScale());
 
     // Resistance
     // xinef: hunter pets should not inherit template resistances
@@ -1111,17 +1113,22 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         float factorHealth = owner->GetTypeId() == TYPEID_PLAYER ? std::min(1.0f, cinfo->ModHealth) : cinfo->ModHealth;
         float factorMana = owner->GetTypeId() == TYPEID_PLAYER ? std::min(1.0f, cinfo->ModMana) : cinfo->ModMana;
 
+        if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
+        {
+            factorHealth *= _GetHealthMod(cinfo->rank);
+        }
+
         SetCreateHealth(std::max<uint32>(1, stats->BaseHealth[cinfo->expansion]*factorHealth));
         SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, GetCreateHealth());
         SetCreateMana(stats->BaseMana * factorMana);
         SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, GetCreateMana());
 
         // xinef: added some multipliers so debuffs can affect pets in any way...
-        SetCreateStat(STAT_STRENGTH, 22 + 2 * petlevel);
-        SetCreateStat(STAT_AGILITY, 22 + 1.5f * petlevel);
-        SetCreateStat(STAT_STAMINA, 25 + 2 * petlevel);
-        SetCreateStat(STAT_INTELLECT, 28 + 2 * petlevel);
-        SetCreateStat(STAT_SPIRIT, 27 + 1.5f * petlevel);
+        SetCreateStat(STAT_STRENGTH, 22);
+        SetCreateStat(STAT_AGILITY, 22);
+        SetCreateStat(STAT_STAMINA, 25);
+        SetCreateStat(STAT_INTELLECT, 28);
+        SetCreateStat(STAT_SPIRIT, 27);
     }
 
     switch (petType)
@@ -1152,7 +1159,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         {
                             // xinef: Glyph of Felguard, so ugly im crying... no appropriate spell
                             if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_FELGUARD))
-                                SetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, 1.0f + float(aurEff->GetAmount() / 100.0f));
+                            {
+                                HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
+                            }
 
                             break;
                         }
@@ -1277,6 +1286,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_01, this);
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_02, this);
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_03, this);
+
+                            if (owner->getRace() == RACE_ORC)
+                            {
+                                CastSpell(this, SPELL_ORC_RACIAL_COMMAND_SHAMAN, true, nullptr, nullptr, owner->GetGUID());
+                            }
+
                             break;
                         }
                     case NPC_MIRROR_IMAGE: // Mirror Image
@@ -1333,6 +1348,14 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
                             break;
                         }
+                    case NPC_VENOMOUS_SNAKE:
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 0.7 - 38));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 0.8 - 40));
+                        break;
+                    case NPC_VIPER:
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(1.3 * petlevel - 64));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(1.5 * petlevel - 68));
+                        break;
                     case NPC_GENERIC_IMP:
                     case NPC_GENERIC_VOIDWALKER:
                         {
@@ -1353,7 +1376,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
         // xinef: fixes orc death knight command racial
         if (owner->getRace() == RACE_ORC)
-            CastSpell(this, SPELL_ORC_RACIAL_COMMAND, true, nullptr, nullptr, owner->GetGUID());
+            CastSpell(this, SPELL_ORC_RACIAL_COMMAND_DK, true, nullptr, nullptr, owner->GetGUID());
 
         // Avoidance, Night of the Dead
         if (Aura* aur = AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this))
@@ -1404,13 +1427,13 @@ bool Pet::HaveInDiet(ItemTemplate const* item) const
 uint32 Pet::GetCurrentFoodBenefitLevel(uint32 itemlevel) const
 {
     // -5 or greater food level
-    if (getLevel() <= itemlevel + 5)                         //possible to feed level 60 pet with level 55 level food for full effect
+    if (GetLevel() <= itemlevel + 5)                         //possible to feed level 60 pet with level 55 level food for full effect
         return 35000;
     // -10..-6
-    else if (getLevel() <= itemlevel + 10)                   //pure guess, but sounds good
+    else if (GetLevel() <= itemlevel + 10)                   //pure guess, but sounds good
         return 17000;
     // -14..-11
-    else if (getLevel() <= itemlevel + 14)                   //level 55 food gets green on 70, makes sense to me
+    else if (GetLevel() <= itemlevel + 14)                   //level 55 food gets green on 70, makes sense to me
         return 8000;
     // -15 or less
     else
@@ -1482,7 +1505,7 @@ void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans)
         {
             m_CreatureSpellCooldowns.erase(itr2);
         }
-        else if (itr2->second.end <= infTime && (itr2->second.end > (curMSTime + 30 * IN_MILLISECONDS)))
+        else if (itr2->second.end <= infTime)
         {
             uint32 cooldown = ((itr2->second.end - curMSTime) / IN_MILLISECONDS) + curTime;
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL_COOLDOWN);
@@ -1594,7 +1617,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             }
 
             // avoid higher level auras if any, and adjust
-            SpellInfo const* scaledSpellInfo = spellInfo->GetAuraRankForLevel(getLevel());
+            SpellInfo const* scaledSpellInfo = spellInfo->GetAuraRankForLevel(GetLevel());
             if (scaledSpellInfo != spellInfo)
                 spellInfo = scaledSpellInfo;
 
@@ -1847,7 +1870,7 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
     uint32 talentCost = GetTalentSpellCost(spellId);
     if (talentCost)
     {
-        int32 free_points = GetMaxTalentPointsForLevel(getLevel());
+        int32 free_points = GetMaxTalentPointsForLevel(GetLevel());
         m_usedTalentCount += talentCost;
         // update free talent points
         free_points -= m_usedTalentCount;
@@ -1875,7 +1898,7 @@ bool Pet::learnSpell(uint32 spell_id)
 
 void Pet::InitLevelupSpellsForLevel()
 {
-    uint8 level = getLevel();
+    uint8 level = GetLevel();
 
     if (PetLevelupSpellSet const* levelupSpells = GetCreatureTemplate()->family ? sSpellMgr->GetPetLevelupSpellList(GetCreatureTemplate()->family) : nullptr)
     {
@@ -1953,7 +1976,7 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
         else
             m_usedTalentCount = 0;
         // update free talent points
-        int32 free_points = GetMaxTalentPointsForLevel(getLevel()) - m_usedTalentCount;
+        int32 free_points = GetMaxTalentPointsForLevel(GetLevel()) - m_usedTalentCount;
         SetFreeTalentPoints(free_points > 0 ? free_points : 0);
     }
 
@@ -2027,7 +2050,7 @@ bool Pet::resetTalents()
 
     Player* player = owner->ToPlayer();
 
-    uint8 level = getLevel();
+    uint8 level = GetLevel();
     uint32 talentPointsForLevel = GetMaxTalentPointsForLevel(level);
 
     if (m_usedTalentCount == 0)
@@ -2086,34 +2109,52 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
 {
     // not need after this call
     if (owner->ToPlayer()->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
+    {
         owner->ToPlayer()->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS, true);
+    }
 
     // reset for online
     if (onlinePet)
+    {
         onlinePet->resetTalents();
+    }
 
     PetStable* petStable = owner->GetPetStable();
     if (!petStable)
+    {
         return;
+    }
 
     std::unordered_set<uint32> petIds;
     if (petStable->CurrentPet)
+    {
         petIds.insert(petStable->CurrentPet->PetNumber);
+    }
 
     for (Optional<PetStable::PetInfo> const& stabledPet : petStable->StabledPets)
+    {
         if (stabledPet)
+        {
             petIds.insert(stabledPet->PetNumber);
+        }
+    }
 
     for (PetStable::PetInfo const& unslottedPet : petStable->UnslottedPets)
+    {
         petIds.insert(unslottedPet.PetNumber);
+    }
 
     // now need only reset for offline pets (all pets except online case)
     if (onlinePet)
+    {
         petIds.erase(onlinePet->GetCharmInfo()->GetPetNumber());
+    }
 
     // no offline pets
-    if (!petIds.empty())
+    if (petIds.empty())
+    {
         return;
+    }
 
     bool need_comma = false;
     std::ostringstream ss;
@@ -2122,7 +2163,9 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
     for (uint32 id : petIds)
     {
         if (need_comma)
+        {
             ss << ',';
+        }
 
         ss << id;
 
@@ -2135,7 +2178,9 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
     for (uint32 spell : sPetTalentSpells)
     {
         if (need_comma)
+        {
             ss << ',';
+        }
 
         ss << spell;
 
@@ -2149,7 +2194,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
 
 void Pet::InitTalentForLevel()
 {
-    uint8 level = getLevel();
+    uint8 level = GetLevel();
     uint32 talentPointsForLevel = GetMaxTalentPointsForLevel(level);
 
     Unit* owner = GetOwner();
@@ -2332,14 +2377,14 @@ void Pet::SynchronizeLevelWithOwner()
     {
         // always same level
         case SUMMON_PET:
-            GivePetLevel(owner->getLevel());
+            GivePetLevel(owner->GetLevel());
             break;
         // can't be greater owner level
         case HUNTER_PET:
-            if (getLevel() > owner->getLevel())
-                GivePetLevel(owner->getLevel());
-            else if (getLevel() + 5 < owner->getLevel())
-                GivePetLevel(owner->getLevel() - 5);
+            if (GetLevel() > owner->GetLevel())
+                GivePetLevel(owner->GetLevel());
+            else if (GetLevel() + 5 < owner->GetLevel())
+                GivePetLevel(owner->GetLevel() - 5);
             break;
         default:
             break;
@@ -2404,7 +2449,7 @@ void Pet::FillPetInfo(PetStable::PetInfo* petInfo) const
     petInfo->PetNumber = m_charmInfo->GetPetNumber();
     petInfo->CreatureId = GetEntry();
     petInfo->DisplayId = GetNativeDisplayId();
-    petInfo->Level = getLevel();
+    petInfo->Level = GetLevel();
     petInfo->Experience = GetUInt32Value(UNIT_FIELD_PETEXPERIENCE);
     petInfo->ReactState = GetReactState();
     petInfo->Name = GetName();
@@ -2423,6 +2468,29 @@ Player* Pet::GetOwner() const
     return m_owner;
 }
 
+float Pet::GetNativeObjectScale() const
+{
+    CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(GetCreatureTemplate()->family);
+    if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
+    {
+        float scale;
+        if (GetLevel() >= creatureFamily->maxScaleLevel)
+            scale = creatureFamily->maxScale;
+        else if (GetLevel() <= creatureFamily->minScaleLevel)
+            scale = creatureFamily->minScale;
+        else
+            scale = creatureFamily->minScale + float(GetLevel() - creatureFamily->minScaleLevel) / creatureFamily->maxScaleLevel * (creatureFamily->maxScale - creatureFamily->minScale);
+
+        if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
+            if (displayInfo->scale > 1.f && GetCreatureTemplate()->IsExotic())
+                scale *= displayInfo->scale;
+
+        return scale;
+    }
+
+    return Guardian::GetNativeObjectScale();
+}
+
 std::string Pet::GenerateActionBarData() const
 {
     std::ostringstream oss;
@@ -2434,4 +2502,14 @@ std::string Pet::GenerateActionBarData() const
     }
 
     return oss.str();
+}
+
+std::string Pet::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Guardian::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "PetType: " << std::to_string(getPetType()) << " "
+        << "PetNumber: " << m_charmInfo->GetPetNumber();
+    return sstr.str();
 }
