@@ -1871,7 +1871,7 @@ public:
         // the max level of the new profession.
         uint16 max = maxPureSkill ? *maxPureSkill : targetHasSkill ? target->GetPureMaxSkillValue(skillID) : uint16(level);
 
-        if (level <= 0 || level > max || max <= 0)
+        if (level < 0 || level > max || max < 0)
         {
             return false;
         }
