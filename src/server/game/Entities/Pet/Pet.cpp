@@ -1108,7 +1108,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             SetCreateMana(pInfo->mana);
             SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, (float)pInfo->mana);
         }
-
+        
         if (pInfo->armor > 0)
             SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
 
