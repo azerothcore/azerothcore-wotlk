@@ -238,7 +238,6 @@ struct boss_grand_warlock_nethekurse : public BossAI
         else if (action == ACTION_START_INTRO)
         {
             // Hack: Prevent from pulling from behind door
-            // Additional hack: prevent them from attacking pets that run by when jumping down the sewer
             me->SetImmuneToAll(false);
             _canAggro = true;
 
