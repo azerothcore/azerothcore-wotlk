@@ -1,5 +1,5 @@
 /*
- * This file is part of the AzerothCore Project. It has been originally created by the AzerothCore community. See AUTHORS file for Copyright information
+ * This file is originally created by the AzerothCore community. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
