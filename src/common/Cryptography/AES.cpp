@@ -1,8 +1,4 @@
 /*
-<<<<<<< HEAD
- * Copyright (C) 2016+  AzerothCore <www.azerothcore.org>, released under GNU GPL v2 or later license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE
- * Copyright (C) 2021+  WarheadCore <https://github.com/WarheadCore>
-=======
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -17,7 +13,6 @@
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
->>>>>>> upstream/master
  */
 
 #include "AES.h"
