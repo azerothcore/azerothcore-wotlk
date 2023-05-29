@@ -1095,7 +1095,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         float factorHealth = 1;
         // If config is set to allow pets to use health modifiers, apply it to creatures with a DB entry
         // Pet.RankMod.Health = 1 use the factor value based on the rank of the pet, most pets have a rank of 0 and so use
-        // the Elite rank which is set as the default in Creature.cpp >> Creature::_GetHealthMod(int32 Rank) 
+        // the Elite rank which is set as the default in Creature.cpp >> Creature::_GetHealthMod(int32 Rank)
         if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
         {
             factorHealth *= _GetHealthMod(cinfo->rank);
