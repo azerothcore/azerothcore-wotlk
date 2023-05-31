@@ -68,6 +68,8 @@ struct boss_nethermancer_sepethrea : public BossAI
                 }
             }
         }
+
+        return true;
     }
 
     void JustEngagedWith(Unit*  /*who*/) override
