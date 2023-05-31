@@ -1139,7 +1139,22 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_DIE:
         {
-            if (me && !me->isDead())
+            if (e.action.die.milliseconds)
+            {
+                if (me && !me->isDead())
+                {
+                    me->m_Events.AddEventAtOffset([&]
+                        {
+                            // We need to check again to see if we didn't die in the process.
+                            if (me && !me->isDead())
+                            {
+                                me->KillSelf();
+                                LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_DIE: Creature {}", me->GetGUID().ToString());
+                            }
+                        }, Milliseconds(e.action.die.milliseconds));
+                }
+            }
+            else if (me && !me->isDead())
             {
                 me->KillSelf();
                 LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_DIE: Creature {}", me->GetGUID().ToString());
