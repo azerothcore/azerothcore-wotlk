@@ -1715,8 +1715,9 @@ class spell_dk_impurity : public AuraScript
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986 /*Impurity IconID*/, EFFECT_0))
-            AddPct(amount, aurEff->GetAmount());
+        if (Unit* caster = GetCaster())
+            if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986 /*Impurity IconID*/, EFFECT_0))
+                AddPct(amount, aurEff->GetAmount());
     }
 
     void Register() override
