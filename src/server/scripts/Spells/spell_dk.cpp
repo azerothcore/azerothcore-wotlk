@@ -2245,6 +2245,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_improved_blood_presence);
     RegisterSpellScript(spell_dk_improved_frost_presence);
     RegisterSpellScript(spell_dk_improved_unholy_presence);
+    RegisterSpellScript(spell_dk_impurity);
     RegisterSpellScript(spell_dk_pestilence);
     RegisterSpellScript(spell_dk_presence);
     RegisterSpellScript(spell_dk_raise_dead);
