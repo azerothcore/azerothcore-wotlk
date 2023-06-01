@@ -1708,24 +1708,6 @@ class spell_dk_improved_unholy_presence : public AuraScript
     }
 };
 
-// -49220 - Impurity
-class spell_dk_impurity : public AuraScript
-{
-    PrepareAuraScript(spell_dk_impurity);
-
-    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-    {
-        if (Unit* caster = GetCaster())
-            if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986 /*Impurity IconID*/, EFFECT_0))
-                AddPct(amount, aurEff->GetAmount());
-    }
-
-    void Register() override
-    {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_impurity::CalculateAmount, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
 // 50842 - Pestilence
 class spell_dk_pestilence : public SpellScript
 {
@@ -2245,7 +2227,6 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_improved_blood_presence);
     RegisterSpellScript(spell_dk_improved_frost_presence);
     RegisterSpellScript(spell_dk_improved_unholy_presence);
-    RegisterSpellScript(spell_dk_impurity);
     RegisterSpellScript(spell_dk_pestilence);
     RegisterSpellScript(spell_dk_presence);
     RegisterSpellScript(spell_dk_raise_dead);
