@@ -694,8 +694,9 @@ enum SMART_ACTION
     SMART_ACTION_ATTACK_STOP                        = 224,    //
     SMART_ACTION_SET_GUID                           = 225,    // Sends the invoker's or the base object's own ObjectGuid to target
     SMART_ACTION_DISABLE                            = 226,    // Disable the targeted creatures, setting them Invisible and Immune to All
+    SMART_ACTION_SET_SCALE                          = 227,    // Modifies the target's scale
 
-    SMART_ACTION_AC_END                             = 227,    // placeholder
+    SMART_ACTION_AC_END                             = 228,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1376,6 +1377,12 @@ struct SmartAction
         {
             SAIBool state;
         } disable;
+
+        struct
+        {
+            uint32 scaleInteger;
+            uint32 scaleFraction;
+        } setScale;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
