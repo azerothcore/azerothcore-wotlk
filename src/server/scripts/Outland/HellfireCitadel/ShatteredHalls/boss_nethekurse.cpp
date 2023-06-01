@@ -114,7 +114,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
 
         if (!_canAggro)
         {
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetImmuneToAll(true);
         }
     }
 
@@ -235,11 +235,13 @@ struct boss_grand_warlock_nethekurse : public BossAI
             me->SetInCombatWithZone();
             return;
         }
-        else if (action == ACTION_START_INTRO)
+        else if (action == ACTION_START_INTRO && !_introStarted)
         {
             // Hack: Prevent from pulling from behind door
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetImmuneToAll(false);
             _canAggro = true;
+            // Bit of a hack to make sure it can't be started with the areatrigger AND the door opening
+            _introStarted = true;
 
             std::list<Creature*> creatureList;
             GetCreatureListWithEntryInGrid(creatureList, me, NPC_PEON, 60.0f);
@@ -247,7 +249,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
             {
                 if (creature)
                 {
-                    creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    creature->SetImmuneToAll(false);
                 }
             }
             IntroRP();
@@ -257,6 +259,21 @@ struct boss_grand_warlock_nethekurse : public BossAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
+
+        // this should never be called if the action to start intro has been called
+        if (!_introStarted)
+        {
+            // find the door that is nearest to the entrance
+            if (GameObject* nethekursedoor = GetClosestGameObjectWithEntry(me, GO_GRAND_WARLOCK_CHAMBER_DOOR_1, 100.0f))
+            {
+                // check if door is openened
+                //this should only happen before the intro, if the door is picked by someone
+                if(nethekursedoor->GetGoState() == 0)
+                {
+                    DoAction(ACTION_START_INTRO);
+                }
+            }
+        }
 
         if (!UpdateVictim())
             return;
@@ -272,6 +289,7 @@ private:
     uint8 PeonEngagedCount = 0;
     uint8 PeonKilledCount = 0;
     bool _canAggro = false;
+    bool _introStarted = false;
 };
 
 class spell_tsh_shadow_bolt : public SpellScript
