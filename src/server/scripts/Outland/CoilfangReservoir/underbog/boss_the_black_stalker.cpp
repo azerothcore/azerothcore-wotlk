@@ -62,8 +62,6 @@ struct boss_the_black_stalker : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        float x, y, z, o;
-
         scheduler.Schedule(8s, 12s, [this](TaskContext context)
         {
             DoCastSelf(SPELL_LEVITATE);
