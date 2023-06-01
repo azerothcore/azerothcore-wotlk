@@ -78,7 +78,7 @@ struct boss_ghazan : public BossAI
             DoCastVictim(SPELL_TAIL_SWEEP);
             context.Repeat(7s, 9s);
         });
-        
+
         _JustEngagedWith();
     }
 
