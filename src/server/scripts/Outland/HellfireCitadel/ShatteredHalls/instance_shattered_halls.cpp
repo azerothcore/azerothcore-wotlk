@@ -17,6 +17,7 @@
 
 #include "CreatureTextMgr.h"
 #include "InstanceScript.h"
+#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "shattered_halls.h"
 
@@ -24,7 +25,17 @@ ObjectData const creatureData[] =
 {
     { NPC_GRAND_WARLOCK_NETHEKURSE  , DATA_NETHEKURSE     },
     { NPC_WARCHIEF_KARGATH          , DATA_KARGATH        },
-    { 0,                                                  0                                }
+    { NPC_OMROGG_LEFT_HEAD          , DATA_OMROGG_LEFT_HEAD },
+    { NPC_OMROGG_RIGHT_HEAD         , DATA_OMROGG_RIGHT_HEAD },
+    { NPC_WARCHIEF_PORTAL           , DATA_WARCHIEF_PORTAL },
+    { 0                             , 0                   }
+};
+
+DoorData const doorData[] =
+{
+    { GO_GRAND_WARLOCK_CHAMBER_DOOR_1, DATA_NETHEKURSE, DOOR_TYPE_PASSAGE },
+    { GO_GRAND_WARLOCK_CHAMBER_DOOR_2, DATA_NETHEKURSE, DOOR_TYPE_PASSAGE },
+    { 0,                                             0, DOOR_TYPE_ROOM    } // END
 };
 
 class instance_shattered_halls : public InstanceMapScript
@@ -45,6 +56,7 @@ public:
         {
             SetBossNumber(ENCOUNTER_COUNT);
             LoadObjectData(creatureData, nullptr);
+            LoadDoorData(doorData);
 
             TeamIdInInstance = TEAM_NEUTRAL;
             RescueTimer = 100 * MINUTE * IN_MILLISECONDS;
@@ -54,23 +66,6 @@ public:
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
                 TeamIdInInstance = player->GetTeamId();
-        }
-
-        void OnGameObjectCreate(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_GRAND_WARLOCK_CHAMBER_DOOR_1:
-                    nethekurseDoor1GUID = go->GetGUID();
-                    if (GetBossState(DATA_NETHEKURSE) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
-                case GO_GRAND_WARLOCK_CHAMBER_DOOR_2:
-                    nethekurseDoor2GUID = go->GetGUID();
-                    if (GetBossState(DATA_NETHEKURSE) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
-            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -85,9 +80,6 @@ public:
 
             switch (creature->GetEntry())
             {
-                case NPC_WARCHIEF_KARGATH:
-                    warchiefKargathGUID = creature->GetGUID();
-                    break;
                 case NPC_SHATTERED_EXECUTIONER:
                     if (RescueTimer > 25 * MINUTE * IN_MILLISECONDS)
                         creature->AddLootMode(2);
@@ -112,29 +104,6 @@ public:
             InstanceScript::OnCreatureCreate(creature);
         }
 
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (!InstanceScript::SetBossState(type, state))
-                return false;
-
-            switch (type)
-            {
-                case DATA_NETHEKURSE:
-                    if (state == IN_PROGRESS)
-                    {
-                        HandleGameObject(nethekurseDoor1GUID, false);
-                        HandleGameObject(nethekurseDoor2GUID, false);
-                    }
-                    else
-                    {
-                        HandleGameObject(nethekurseDoor1GUID, true);
-                        HandleGameObject(nethekurseDoor2GUID, true);
-                    }
-                    break;
-            }
-            return true;
-        }
-
         void SetData(uint32 type, uint32 data) override
         {
             if (type == DATA_ENTERED_ROOM && data == DATA_ENTERED_ROOM && RescueTimer == 100 * MINUTE * IN_MILLISECONDS)
@@ -142,7 +111,7 @@ public:
                 DoCastSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_1);
                 instance->LoadGrid(230, -80);
 
-                if (Creature* kargath = instance->GetCreature(warchiefKargathGUID))
+                if (Creature* kargath = GetCreature(DATA_KARGATH))
                     sCreatureTextMgr->SendChat(kargath, TeamIdInInstance == TEAM_ALLIANCE ? 3 : 4, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
 
                 RescueTimer = 80 * MINUTE * IN_MILLISECONDS;
@@ -206,16 +175,226 @@ public:
         }
 
     protected:
-        ObjectGuid warchiefKargathGUID;
-        ObjectGuid grandWarlockNethekurseGUID;
-        ObjectGuid nethekurseDoor1GUID;
-        ObjectGuid nethekurseDoor2GUID;
-
         ObjectGuid executionerGUID;
         ObjectGuid prisonerGUID[3];
         uint32 RescueTimer;
         TeamId TeamIdInInstance;
     };
+};
+
+enum ScoutMisc
+{
+    SAY_INVADERS_BREACHED    = 0,
+
+    SAY_PORUNG_ARCHERS       = 0,
+    SAY_PORUNG_READY         = 1,
+    SAY_PORUNG_AIM           = 2,
+    SAY_PORUNG_FIRE          = 3,
+
+    SPELL_CLEAR_ALL          = 28471,
+    SPELL_SUMMON_ZEALOTS     = 30976,
+    SPELL_SHOOT_FLAME_ARROW  = 30952,
+
+    POINT_SCOUT_WP_END       = 3,
+
+    SET_DATA_ARBITRARY_VALUE = 1
+};
+
+struct npc_shattered_hand_scout : public ScriptedAI
+{
+    npc_shattered_hand_scout(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && me->IsWithinDist2d(who, 50.0f) && who->GetPositionZ() > -3.0f
+            && who->IsPlayer())
+        {
+            me->SetReactState(REACT_PASSIVE);
+            DoCastSelf(SPELL_CLEAR_ALL);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            Talk(SAY_INVADERS_BREACHED);
+            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+
+            _firstZealots.clear();
+            std::list<Creature*> creatureList;
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_SH_ZEALOT, 15.0f);
+            for (Creature* creature : creatureList)
+            {
+                if (creature)
+                {
+                    _firstZealots.insert(creature->GetGUID());
+                }
+            }
+        }
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+    {
+        if (damage >= me->GetHealth())
+        {
+            // Let creature fall to 1 HP but prevent it from dying.
+            damage = me->GetHealth() - 1;
+        }
+    }
+
+    void MovementInform(uint32 type, uint32 point) override
+    {
+        if (type == WAYPOINT_MOTION_TYPE && point == POINT_SCOUT_WP_END)
+        {
+            me->SetVisible(false);
+
+            if (Creature* porung = GetPorung())
+            {
+                porung->setActive(true);
+                porung->AI()->DoCastAOE(SPELL_SUMMON_ZEALOTS);
+                porung->AI()->Talk(SAY_PORUNG_ARCHERS);
+
+                _scheduler.Schedule(45s, [this](TaskContext context)
+                {
+                    if (Creature* porung = GetPorung())
+                    {
+                        porung->AI()->DoCastAOE(SPELL_SUMMON_ZEALOTS);
+                    }
+
+                    context.Repeat();
+                });
+            }
+
+            _scheduler.Schedule(1s, [this](TaskContext /*context*/)
+            {
+                _zealotGUIDs.clear();
+                std::list<Creature*> creatureList;
+                GetCreatureListWithEntryInGrid(creatureList, me, NPC_SH_ZEALOT, 100.0f);
+                for (Creature* creature : creatureList)
+                {
+                    if (creature)
+                    {
+                        creature->AI()->SetData(SET_DATA_ARBITRARY_VALUE, SET_DATA_ARBITRARY_VALUE);
+                        _zealotGUIDs.insert(creature->GetGUID());
+                    }
+                }
+
+                for (auto const& guid : _firstZealots)
+                {
+                    if (Creature* zealot = ObjectAccessor::GetCreature(*me, guid))
+                    {
+                        zealot->SetInCombatWithZone();
+                    }
+                }
+
+                if (Creature* porung = GetPorung())
+                {
+                    porung->AI()->Talk(SAY_PORUNG_READY, 3600ms);
+                    porung->AI()->Talk(SAY_PORUNG_AIM, 4800ms);
+                }
+
+                _scheduler.Schedule(5800ms, [this](TaskContext /*context*/)
+                {
+                    std::list<Creature*> creatureList;
+                    GetCreatureListWithEntryInGrid(creatureList, me, NPC_SH_ARCHER, 100.0f);
+                    for (Creature* creature : creatureList)
+                    {
+                        if (creature)
+                        {
+                            creature->AI()->DoCastAOE(SPELL_SHOOT_FLAME_ARROW);
+                        }
+                    }
+
+                    if (Creature* porung = GetPorung())
+                    {
+                        porung->AI()->Talk(SAY_PORUNG_FIRE, 200ms);
+                    }
+
+                    _scheduler.Schedule(2s, 9750ms, [this](TaskContext context)
+                    {
+                        if (FireArrows())
+                        {
+                            context.Repeat();
+                        }
+
+                        if (!me->SelectNearestPlayer(250.0f))
+                        {
+                            me->SetVisible(true);
+                            me->DespawnOrUnsummon(5s, 5s);
+
+                            for (auto const& guid : _zealotGUIDs)
+                            {
+                                if (Creature* zealot = ObjectAccessor::GetCreature(*me, guid))
+                                {
+                                    if (zealot->IsAlive())
+                                    {
+                                        zealot->DespawnOrUnsummon(5s, 5s);
+                                    }
+                                    else
+                                    {
+                                        zealot->Respawn(true);
+                                    }
+                                }
+                            }
+
+                            for (auto const& guid : _firstZealots)
+                            {
+                                if (Creature* zealot = ObjectAccessor::GetCreature(*me, guid))
+                                {
+                                    if (zealot->IsAlive())
+                                    {
+                                        zealot->DespawnOrUnsummon(5s, 5s);
+                                    }
+                                    else
+                                    {
+                                        zealot->Respawn(true);
+                                    }
+                                }
+                            }
+
+                            _scheduler.CancelAll();
+                        }
+                    });
+                });
+            });
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+    bool FireArrows()
+    {
+        std::list<Creature*> creatureList;
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_SH_ARCHER, 100.0f);
+
+        if (creatureList.empty())
+        {
+            return false;
+        }
+
+        for (Creature* creature : creatureList)
+        {
+            if (creature)
+            {
+                creature->AI()->DoCastAOE(SPELL_SHOOT_FLAME_ARROW);
+            }
+        }
+
+        return true;
+    }
+
+    Creature* GetPorung()
+    {
+        return me->FindNearestCreature(IsHeroic() ? NPC_PORUNG : NPC_BLOOD_GUARD, 100.0f);
+    }
+
+private:
+    TaskScheduler _scheduler;
+    GuidSet _zealotGUIDs;
+    GuidSet _firstZealots;
 };
 
 class spell_tsh_shoot_flame_arrow : public SpellScriptLoader
@@ -229,6 +408,15 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            unitList.remove_if([&](WorldObject* target) -> bool
+            {
+                return !target->SelectNearestPlayer(15.0f);
+            });
+
             Acore::Containers::RandomResize(unitList, 1);
         }
 
@@ -260,7 +448,12 @@ public:
     bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (InstanceScript* instanceScript = player->GetInstanceScript())
-            instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);
+        {
+            if (player->GetMap()->IsHeroic())
+            {
+                instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);
+            }
+        }
 
         return true;
     }
@@ -269,6 +462,7 @@ public:
 void AddSC_instance_shattered_halls()
 {
     new instance_shattered_halls();
+    RegisterShatteredHallsCreatureAI(npc_shattered_hand_scout);
     new spell_tsh_shoot_flame_arrow();
     new at_shattered_halls_execution();
 }
