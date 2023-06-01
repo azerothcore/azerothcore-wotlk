@@ -76,7 +76,7 @@ struct boss_the_black_stalker : public BossAI
         {
             DoCastRandomTarget(SPELL_STATIC_CHARGE, false);
             context.Repeat(10s);
-        }).Schedule(5s, [this, x, y, z, o](TaskContext /*context*/)
+        }).Schedule(5s, [this](TaskContext /*context*/)
         {
             float x, y, z, o = 0.f;
             me->GetHomePosition(x, y, z, o);
