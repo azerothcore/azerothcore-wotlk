@@ -1,3 +1,4 @@
+-- DB update 2023_06_01_02 -> 2023_06_01_03
 -- 5097: Lupine Delusion (Shadowfang Keep)
 -- 6493: Illusionary Phantasm (Scarlet Monastery Graveyard)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (5097, 6493);
