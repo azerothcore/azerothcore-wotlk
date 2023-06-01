@@ -1,3 +1,4 @@
+-- DB update 2023_06_01_03 -> 2023_06_01_04
 -- Sul'lithuz Abomination and Sandfury Guardian creature formations
 DELETE FROM `creature_formations` WHERE `memberGUID` IN (81527, 81565, 37998, 37999, 38000, 38001);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
