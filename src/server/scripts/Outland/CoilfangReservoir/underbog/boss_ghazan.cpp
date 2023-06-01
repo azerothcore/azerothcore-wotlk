@@ -50,15 +50,12 @@ struct boss_ghazan : public BossAI
 
     void Reset() override
     {
-        _Reset();
-        _enraged = false;
         if (!_reachedPlatform)
         {
             _movedToPlatform = false;
         }
 
         ScheduleHealthCheckEvent(20, [&] {
-            _enraged = true;
             DoCastSelf(SPELL_ENRAGE);
         });
     }
@@ -133,7 +130,6 @@ struct boss_ghazan : public BossAI
     }
 
     private:
-        bool _enraged;
         bool _movedToPlatform;
         bool _reachedPlatform;
 };
