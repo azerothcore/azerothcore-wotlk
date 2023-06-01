@@ -134,7 +134,7 @@ struct boss_swamplord_muselek : public BossAI
                         if (me->IsWithinMeleeRange(me->GetVictim()))
                         {
                             me->GetMotionMaster()->Clear();
-                            me->GetMotionMaster()->MoveChase(me->GetVictim(), -10.0f);
+                            me->GetMotionMaster()->MoveForwards(me->GetVictim(), 10.0f);
                         }
 
                         me->m_Events.AddEventAtOffset([this]()
