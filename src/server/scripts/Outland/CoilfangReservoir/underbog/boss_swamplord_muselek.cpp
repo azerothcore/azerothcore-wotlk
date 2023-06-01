@@ -189,10 +189,6 @@ struct npc_claw : public ScriptedAI
     void Reset() override
     {
         _scheduler.CancelAll();
-
-        ScheduleHealthCheckEvent(20, [&] {
-            me->SetFaction(942);
-        });
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -229,7 +225,24 @@ struct npc_claw : public ScriptedAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
-            return
+            return;
+        
+        //has to be in UpdateAI so we can keep checking
+        if (me->HealthPctBelow(20))
+        {
+            if (me->GetFaction() == 942)
+            {
+                return;
+            }
+
+            if (Creature* muselek = instance->GetCreature(DATA_MUSELEK))
+            {
+                if (muselek->isDead())
+                {
+                    me->SetFaction(942);
+                }
+            }   
+        }
         
         _scheduler.Update(diff, [this]
         {
