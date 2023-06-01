@@ -559,7 +559,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_INST_DATA                      = 34,     // Field, Data
     SMART_ACTION_SET_INST_DATA64                    = 35,     // Field,
     SMART_ACTION_UPDATE_TEMPLATE                    = 36,     // Entry, UpdateLevel
-    SMART_ACTION_DIE                                = 37,     // No Params
+    SMART_ACTION_DIE                                = 37,     // Milliseconds
     SMART_ACTION_SET_IN_COMBAT_WITH_ZONE            = 38,     // Range (if outside of dungeon)
     SMART_ACTION_CALL_FOR_HELP                      = 39,     // Radius, With Emote
     SMART_ACTION_SET_SHEATH                         = 40,     // Sheath (0-unarmed, 1-melee, 2-ranged)
@@ -924,6 +924,11 @@ struct SmartAction
             uint32 creature;
             SAIBool updateLevel;
         } updateTemplate;
+
+        struct
+        {
+            uint32 milliseconds;
+        } die;
 
         struct
         {
