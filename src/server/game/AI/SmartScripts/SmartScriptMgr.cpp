@@ -1921,6 +1921,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_PLAY_CINEMATIC:
         case SMART_ACTION_SET_GUID:
         case SMART_ACTION_DISABLE:
+        case SMART_ACTION_SET_SCALE:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);
