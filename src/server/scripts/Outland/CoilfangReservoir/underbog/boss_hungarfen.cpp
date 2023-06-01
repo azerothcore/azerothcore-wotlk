@@ -44,18 +44,16 @@ enum Misc
 
 struct boss_hungarfen : public BossAI
 {
-    boss_hungarfen(Creature* creature) : BossAI(creature, DATA_HUNGARFEN), _foul_spores(false) { }
+    boss_hungarfen(Creature* creature) : BossAI(creature, DATA_HUNGARFEN) { }
 
     void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override { }
 
     void Reset() override
     {
-        _foul_spores = false;
         _scheduler.CancelAll();
         DoCastAOE(SPELL_DESPAWN_MUSHROOMS, true);
 
         ScheduleHealthCheckEvent(20, [&] {
-            _foul_spores = true;
             me->AddUnitState(UNIT_STATE_ROOT);
             Talk(EMOTE_ROARS);
             DoCastSelf(SPELL_FOUL_SPORES);
@@ -104,7 +102,6 @@ struct boss_hungarfen : public BossAI
 
 private:
     TaskScheduler _scheduler;
-    bool _foul_spores;
 };
 
 struct npc_underbog_mushroom : public ScriptedAI
