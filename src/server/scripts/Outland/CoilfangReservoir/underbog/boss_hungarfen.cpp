@@ -46,10 +46,9 @@ struct boss_hungarfen : public BossAI
 {
     boss_hungarfen(Creature* creature) : BossAI(creature, DATA_HUNGARFEN) { }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override { }
-
     void Reset() override
     {
+        _Reset();
         _scheduler.CancelAll();
         DoCastAOE(SPELL_DESPAWN_MUSHROOMS, true);
 

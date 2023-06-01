@@ -50,6 +50,7 @@ struct boss_ghazan : public BossAI
 
     void Reset() override
     {
+        _Reset();
         if (!_reachedPlatform)
         {
             _movedToPlatform = false;
@@ -78,8 +79,6 @@ struct boss_ghazan : public BossAI
 
         _JustEngagedWith();
     }
-
-    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override { }
 
     void DoAction(int32 type) override
     {
