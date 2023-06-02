@@ -990,7 +990,7 @@ public:
                 Reset();
         }
 
-        void PatientSaved(Creature* /*soldier*/, Player* player, Location* point)
+        void PatientSaved(Creature* savedPatient, Player* player, Location* point)
         {
             if (player && PlayerGUID == player->GetGUID())
             {
@@ -1004,8 +1004,9 @@ public:
                         {
                             for (ObjectGuid const& guid : Patients)
                             {
-                                if (Creature* patient = ObjectAccessor::GetCreature(*me, guid))
-                                    patient->setDeathState(JUST_DIED);
+                                if (guid != savedPatient->GetGUID()) // Don't kill the last guy we just saved
+                                    if (Creature* patient = ObjectAccessor::GetCreature(*me, guid))
+                                        patient->setDeathState(JUST_DIED);
                             }
                         }
 
@@ -1069,6 +1070,9 @@ public:
             //no regen health
             me->SetUnitFlag(UNIT_FLAG_IN_COMBAT);
 
+            //prevent using normal bandages
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANDAGE, true);
+
             //to make them lay with face down
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
 
@@ -1078,18 +1082,26 @@ public:
             {
                 //lower max health
                 case 12923:
-                case 12938:                                     //Injured Soldier
-                    me->SetHealth(me->CountPctFromMaxHealth(75));
+                case 12938:                                     //Injured Soldier, 65 seconds to die
+                    me->SetHealth(me->CountPctFromMaxHealth(65));
                     break;
                 case 12924:
-                case 12936:                                     //Badly injured Soldier
-                    me->SetHealth(me->CountPctFromMaxHealth(50));
+                case 12936:                                     //Badly injured Soldier, 35 seconds to die
+                    me->SetHealth(me->CountPctFromMaxHealth(35));
                     break;
                 case 12925:
-                case 12937:                                     //Critically injured Soldier
+                case 12937:                                     //Critically injured Soldier, 25 seconds to die
                     me->SetHealth(me->CountPctFromMaxHealth(25));
                     break;
             }
+
+            // Schedule health reduction every 1 second
+            _scheduler.Schedule(1s, [this](TaskContext context)
+            {
+                // Reduction of 1% per second, matching WotLK Classic timing
+                me->ModifyHealth(me->CountPctFromMaxHealth(1) * -1);
+                context.Repeat(1s);
+            });
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }
@@ -1134,13 +1146,12 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/) override
+        void UpdateAI(uint32 diff) override
         {
-            //lower HP on every world tick makes it a useful counter, not officlone though
-            if (me->IsAlive() && me->GetHealth() > 6)
-                me->ModifyHealth(-5);
 
-            if (me->IsAlive() && me->GetHealth() <= 6)
+            _scheduler.Update(diff);
+
+            if (me->IsAlive() && me->GetHealth() < me->CountPctFromMaxHealth(1))
             {
                 me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -1152,6 +1163,10 @@ public:
                         CAST_AI(npc_doctor::npc_doctorAI, doctor->AI())->PatientDied(Coord);
             }
         }
+
+        private:
+            TaskScheduler _scheduler;
+
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1162,7 +1177,7 @@ public:
 
 void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
 {
-    if (Event && SummonPatientCount >= 20)
+    if (Event && SummonPatientCount >= 24) // Need to keep the event going long enough to save the last few patients
     {
         Reset();
         return;
@@ -1170,7 +1185,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
 
     if (Event)
     {
-        if (SummonPatientTimer <= diff)
+        if (SummonPatientTimer <= diff || SummonPatientCount < 6) // Starts with 6 beds filled for both factions
         {
             if (Coordinates.empty())
                 return;
