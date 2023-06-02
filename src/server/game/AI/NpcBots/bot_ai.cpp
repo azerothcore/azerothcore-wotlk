@@ -4543,16 +4543,17 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
 
     static constexpr std::array<uint32, 2> WMOAreaGroupMuru = { 41736, 42759 }; // Shrine of the Eclipse
     static constexpr std::array<uint32, 2> WMOAreaGroupNajentus = { 41129, 41130 }; // Karabor Sewers
+    static constexpr std::array<uint32, 1> WMOAreaGroupVashj = { 37594 }; // Serpentshrine Cavern
 
-    static auto isInWMOArea = [this](auto const& ids) {
+    static auto isInWMOArea = [](auto lastWMO, auto const& ids) {
         for (auto wmoId : ids) {
-            if (wmoId == _lastWMOAreaId)
+            if (wmoId == lastWMO)
                 return true;
         }
         return false;
     };
 
-    if (me->GetMapId() == 580 && isInWMOArea(WMOAreaGroupMuru)) // Sunwell - M'uru
+    if (me->GetMapId() == 580 && isInWMOArea(_lastWMOAreaId, WMOAreaGroupMuru)) // Sunwell - M'uru
     {
         static const uint32 SPELL_PURGE_1 = 370u;
         static const uint32 SPELL_DISPEL_MAGIC_1 = 527u;
@@ -4581,7 +4582,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
             }
         }
     }
-    if (me->GetMapId() == 564 && isInWMOArea(WMOAreaGroupNajentus) && Rand() < 10) // Black Temple - High Warlord Naj'entus
+    if (me->GetMapId() == 564 && isInWMOArea(_lastWMOAreaId, WMOAreaGroupNajentus) && Rand() < 10) // Black Temple - High Warlord Naj'entus
     {
         if (Group const* gr = master->GetGroup())
         {
@@ -4665,6 +4666,96 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
                     receiver->AddItem(32408, 1); // Naj'entus Spine
                     return true;
                 }
+            }
+        }
+    }
+
+    if (me->GetMapId() == 548 && isInWMOArea(_lastWMOAreaId, WMOAreaGroupVashj) && Rand() < 15) // Serpentshrine Cavern - Lady Vashj
+    {
+        uint32 alive_players = 0;
+        std::vector<Player*> taintPlayers;
+        for (MapReference const& ref : me->GetMap()->GetPlayers())
+        {
+            if (Player* player = ref.GetSource())
+            {
+                if (player->IsAlive())
+                    ++alive_players;
+                if (player->HasAuraType(SPELL_AURA_MOD_ROOT) && me->IsWithinDistInMap(player, 20.0f) &&
+                    player->HasItemCount(31088, 1)) // Tainted Core
+                    taintPlayers.push_back(player);
+            }
+        }
+
+        if (!taintPlayers.empty() && alive_players <= 1)
+        {
+#if defined(TRINITY_COMPILER)
+            static const uint32 ShieldGeneratorTriggerNPC = 19870;
+#elif defined(AC_COMPILER)
+            static const uint32 ShieldGeneratorTriggerNPC = WORLD_TRIGGER;
+#endif
+            std::list<Creature*> cList;
+            Acore::AllCreaturesOfEntryInRange check(me, ShieldGeneratorTriggerNPC, 100.f); // Invis KV Shield Generator
+            Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> csearcher(me, cList, check);
+            Cell::VisitAllObjects(me, csearcher, 100.f);
+
+            std::list<GameObject*> gList;
+            auto is_shield_go = [](GameObject const* gobject) {
+                switch (gobject->GetEntry())
+                {
+                    case 185051:
+                    case 185052:
+                    case 185053:
+                    case 185054:
+                        return true;
+                    default:
+                        return false;
+                }
+            };
+            Acore::GameObjectListSearcher gsearcher(me, gList, is_shield_go);
+            Cell::VisitAllObjects(me, gsearcher, 100.f);
+
+            static const auto get_shield_creature = [](GameObject const* gobject, std::list<Creature*> const& clist) {
+                Creature* c = nullptr;
+                float mindist = 10.0f;
+                for (Creature* creature : clist)
+                {
+                    float dist = gobject->GetDistance(creature);
+                    if (dist < mindist)
+                    {
+                        c = creature;
+                        mindist = dist;
+                    }
+                }
+                return c;
+            };
+
+            gList.remove_if([&cList](GameObject const* gobject) {
+                Creature const* c = get_shield_creature(gobject, cList);
+                return !c || c->GetCurrentSpell(CURRENT_CHANNELED_SPELL) == nullptr;
+            });
+            cList.remove_if([](Creature const* creature) {
+                return creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL) == nullptr;
+            });
+
+            ASSERT(cList.size() == gList.size());
+
+            if (!gList.empty())
+            {
+                Player* player = taintPlayers.size() == 1u ? taintPlayers.front() : Acore::Containers::SelectRandomContainerElement(taintPlayers);
+                BotWhisper("Taking Tainted Core from you");
+                GameObject* go = gList.size() == 1u ? gList.front() : Acore::Containers::SelectRandomContainerElement(gList);
+#if defined(TRINITY_COMPILER)
+                Item* item = player->GetItemByEntry(31088); // Tainted Core
+                SpellCastTargets targets;
+                targets.SetGOTarget(go);
+                sScriptMgr->OnItemUse(player, item, targets);
+#elif defined(AC_COMPILER)
+                Creature* cre = get_shield_creature(go, cList);
+                ASSERT(cre);
+                cre->DespawnOrUnsummon(1);
+                player->DestroyItemCount(31088, 1, true); // Tainted Core
+#endif
+                return true;
             }
         }
     }
