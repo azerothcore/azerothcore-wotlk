@@ -6833,6 +6833,9 @@ void bot_ai::_OnAreaUpdate(uint32 areaId)
     Unit::AuraMap const& ownerAuras = me->GetOwnedAuras();
     for (Unit::AuraMap::const_iterator iter = ownerAuras.cbegin(); iter != ownerAuras.cend(); ++iter)
     {
+        if (iter->second->GetSpellInfo()->HasAura(SPELL_AURA_MOUNTED))
+            continue;
+
         if (iter->second->GetSpellInfo()->CheckLocation(me->GetMapId(), _lastZoneId, areaId, master, false) != SPELL_CAST_OK)
         {
             //me->RemoveOwnedAura(iter);
