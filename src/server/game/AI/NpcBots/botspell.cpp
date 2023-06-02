@@ -386,6 +386,7 @@ void GenerateBotCustomSpells()
     sinfo->SpellFamilyName = SPELLFAMILY_WARLOCK;
     sinfo->SpellLevel = 0;
     sinfo->RecoveryTime = 3000;
+    sinfo->CategoryRecoveryTime = 0;
     sinfo->CategoryEntry = nullptr;
     sinfo->PowerType = POWER_MANA;
     sinfo->CastTimeEntry = nullptr;//sSpellCastTimesStore.LookupEntry(2); //250ms
