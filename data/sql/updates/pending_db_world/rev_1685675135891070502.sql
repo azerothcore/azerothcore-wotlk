@@ -26,8 +26,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2748, 0, 22, 23, 6, 0, 100, 512, 0, 0, 0, 0, 0, 34, 2, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archaedas - On Death - Set Instance Data'),
 (2748, 0, 23, 25, 61, 0, 100, 512, 0, 0, 0, 0, 0, 11, 10604, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archaedas - On Death - Cast Destroy Earthen Guards'),
 (2748, 0, 24, 0, 31, 0, 100, 512, 10604, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Archaedas - Spell Hit Target - Despawn'),
-(2748, 0, 25, 26, 61, 0, 100, 512, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 9, 10120, 0, 50, 0, 0, 0, 0, 0, 'Archaedas - On Just Died - Despawn Vault Warders'),
-(2748, 0, 26, 27, 61, 0, 100, 512, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 9, 7076, 0, 50, 0, 0, 0, 0, 0, 'Archaedas - On Just Died - Despawn Earthen Guardians'),
-(2748, 0, 27, 28, 61, 0, 100, 512, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 9, 7077, 0, 50, 0, 0, 0, 0, 0, 'Archaedas - On Just Died - Despawn Earthen Hallshapers'),
-(2748, 0, 28, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 9, 7309, 0, 50, 0, 0, 0, 0, 0, 'Archaedas - On Just Died - Despawn Earthen Custodians');
+(2748, 0, 25, 26, 61, 0, 100, 512, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 9, 10120, 0, 100, 0, 0, 0, 0, 0, 'Archaedas - On Just Died - Despawn Vault Warders'),
+(2748, 0, 26, 27, 61, 0, 100, 512, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 9, 7076, 0, 100, 0, 0, 0, 0, 0, 'Archaedas - On Just Died - Despawn Earthen Guardians'),
+(2748, 0, 27, 28, 61, 0, 100, 512, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 9, 7077, 0, 100, 0, 0, 0, 0, 0, 'Archaedas - On Just Died - Despawn Earthen Hallshapers'),
+(2748, 0, 28, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 9, 7309, 0, 100, 0, 0, 0, 0, 0, 'Archaedas - On Just Died - Despawn Earthen Custodians');
 
