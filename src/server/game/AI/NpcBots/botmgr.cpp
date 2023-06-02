@@ -134,6 +134,7 @@ float _mult_dmg_seawitch;
 float _mult_dmg_cryptlord;
 float _bothk_rate_honor;
 std::vector<float> _mult_dmg_levels;
+BotBrackets _botwanderer_pct_level_brackets;
 
 bool __firstload = true;
 
@@ -340,7 +341,7 @@ void BotMgr::LoadConfig(bool reload)
 
     std::string mult_dps_by_levels  = sConfigMgr->GetStringDefault("NpcBot.Mult.Damage.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
     std::vector<std::string_view> toks = Acore::Tokenize(mult_dps_by_levels, ',', false);
-    ASSERT(toks.size() >= DEFAULT_MAX_LEVEL / 10 + 1, "NpcBot.Mult.Damage.Levels must has at least %u values", DEFAULT_MAX_LEVEL / 10 + 1);
+    ASSERT(toks.size() >= BracketsCount, "NpcBot.Mult.Damage.Levels must has at least %u values", BracketsCount);
     _mult_dmg_levels.reserve(toks.size());
     for (decltype(toks)::size_type i = 0; i != toks.size(); ++i)
     {
@@ -351,6 +352,22 @@ void BotMgr::LoadConfig(bool reload)
         RoundToInterval(fval, 0.1f, 10.f);
         _mult_dmg_levels.push_back(fval);
     }
+
+    _botwanderer_pct_level_brackets = {};
+    std::string wanderers_by_levels  = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.Continents.Levels", "20,15,15,10,10,15,15,0,0");
+    std::vector<std::string_view> toks2 = Acore::Tokenize(wanderers_by_levels, ',', false);
+    ASSERT(toks2.size() >= BracketsCount, "NpcBot.WanderingBots.Continents.Levels must has at least %u values", BracketsCount);
+    uint32 total_pct = 0;
+    for (decltype(toks)::size_type i = 0; i != toks2.size(); ++i)
+    {
+        Optional<uint32> val = Acore::StringTo<uint32>(toks2[i]);
+        if (val == std::nullopt)
+            LOG_ERROR("server.loading", "NpcBot.Mult.Damage.Levels contains invalid uint32 value '{}', set to default", std::string(toks[i]).c_str());
+        uint32 uval = val.value_or(uint32(0));
+        total_pct += uval;
+        _botwanderer_pct_level_brackets[i] = uval;
+    }
+    ASSERT(total_pct == 100u, "NpcBot.WanderingBots.Continents.Levels sum of values must be exactly 100!");
 
     //limits
     RoundToInterval(_mult_dmg_physical, 0.1f, 10.f);
@@ -2111,6 +2128,10 @@ float BotMgr::GetBotWandererHPMod()
 float BotMgr::GetBotWandererSpeedMod()
 {
     return _mult_speed_wanderer;
+}
+BotBrackets BotMgr::GetBotWandererLevelBrackets()
+{
+    return _botwanderer_pct_level_brackets;
 }
 float BotMgr::GetBotDamageModByClass(uint8 botclass)
 {

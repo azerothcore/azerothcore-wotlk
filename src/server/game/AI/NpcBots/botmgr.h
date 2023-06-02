@@ -29,6 +29,7 @@ enum CurrentSpellTypes : uint8;
 enum DamageEffectType : uint8;
 
 constexpr size_t TargetIconNamesCacheSize = 8u; // Group.h TARGETICONCOUNT
+constexpr size_t BracketsCount = DEFAULT_MAX_LEVEL / 10 + 1; //0-9, 10-19, 20-29, 30-39, 40-49, 50-59, 60-69, 70-79, 80-83
 
 enum BotAddResult
 {
@@ -69,6 +70,7 @@ enum BotAttackAngle
 };
 
 typedef std::unordered_map<ObjectGuid /*guid*/, Creature* /*bot*/> BotMap;
+typedef std::array<uint32, BracketsCount> BotBrackets;
 
 class AC_GAME_API BotMgr
 {
@@ -130,6 +132,7 @@ class AC_GAME_API BotMgr
         static float GetBotWandererHealingMod();
         static float GetBotWandererHPMod();
         static float GetBotWandererSpeedMod();
+        static BotBrackets GetBotWandererLevelBrackets();
         static float GetBotDamageModByClass(uint8 botclass);
         static float GetBotDamageModByLevel(uint8 botlevel);
 

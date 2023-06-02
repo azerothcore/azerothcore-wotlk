@@ -4538,6 +4538,16 @@ NpcBot.EnrageOnDismiss = 1
 NpcBot.WanderingBots.Continents.Count = 0
 
 #
+#    NpcBot.WanderingBots.Continents.Levels
+#        Description: Percentage of wandering bots to spawn per level bracket:
+#                     0-9, 10-19, 20,29, ... , 70-79, 80+.
+#        Note:        Total percentage must be exactly 100.
+#        Note2:       Classes with minimum level requirement may ignore this parameter.
+#        Default:     25,15,15,10,5,10,20,0,0
+
+NpcBot.WanderingBots.Continents.Levels = 25,15,15,10,5,10,20,0,0
+
+#
 #    NpcBot.WanderingBots.BG.Enable
 #        Description: Allow wandering bots generation for Battlegrounds.
 #        Note:        Bots are temporarily borrowed from non-spawned bots pool.
