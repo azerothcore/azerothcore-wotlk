@@ -483,14 +483,21 @@ public:
             return false;
 
         uint32 total_bots_in_brackets = 0;
-        for (size_t i = 0; i + 1u < BracketsCount; ++i)
+        for (size_t k = 0; k < BracketsCount; ++k)
         {
-            if (!bracketPcts[i])
+            if (!bracketPcts[k])
                 continue;
-            bots_per_bracket[i] = CalculatePct(count, bracketPcts[i]);
-            total_bots_in_brackets += bots_per_bracket[i];
+            bots_per_bracket[k] = CalculatePct(count, bracketPcts[k]);
+            total_bots_in_brackets += bots_per_bracket[k];
         }
-        bots_per_bracket[BracketsCount - 1] = count - total_bots_in_brackets;
+        for (int32 j = BracketsCount - 1; j >= 0; --j)
+        {
+            if (bots_per_bracket[j])
+            {
+                bots_per_bracket[j] += count - total_bots_in_brackets;
+                break;
+            }
+        }
 
         for (uint32 i = 1; i <= count && !teamSpareBotIdsPerClass.empty();) // i is a counter, NOT used as index or value
         {
