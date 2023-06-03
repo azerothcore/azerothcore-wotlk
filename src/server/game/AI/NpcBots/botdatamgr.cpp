@@ -499,11 +499,21 @@ public:
             }
         }
 
-        for (uint32 i = 1; i <= count && !teamSpareBotIdsPerClass.empty();) // i is a counter, NOT used as index or value
+        std::vector<uint8> brackets_shuffled;
+        brackets_shuffled.reserve(count);
+        for (uint8 bracket = 0; bracket < BracketsCount; ++bracket)
         {
-            uint8 bracket;
-            for (bracket = 0; bracket < BracketsCount && bots_per_bracket[bracket] == 0; ++bracket) {}
-            ASSERT(bots_per_bracket[bracket] > 0);
+            while (bots_per_bracket[bracket])
+            {
+                brackets_shuffled.push_back(bracket);
+                --bots_per_bracket[bracket];
+            }
+        }
+        Acore::Containers::RandomShuffle(brackets_shuffled);
+
+        for (size_t i = 0; i < brackets_shuffled.size() && !teamSpareBotIdsPerClass.empty();) // i is a counter, NOT used as index or value
+        {
+            uint8 bracket = brackets_shuffled[i];
 
             int8 tries = 100;
             do {
@@ -512,7 +522,6 @@ public:
                 {
                     ++i;
                     ++spawned;
-                    --bots_per_bracket[bracket];
                     break;
                 }
             } while (tries >= 0);
