@@ -505,6 +505,31 @@ class spell_dru_glyph_of_starfire : public SpellScript
     }
 };
 
+// 34246 - Idol of the Emerald Queen
+// 60779 - Idol of Lush Moss
+class spell_dru_idol_lifebloom : public AuraScript
+{
+    PrepareAuraScript(spell_dru_idol_lifebloom);
+
+    void HandleEffectCalcSpellMod(AuraEffect const* aurEff, SpellModifier*& spellMod)
+    {
+        if (!spellMod)
+        {
+            spellMod = new SpellModifier(GetAura());
+            spellMod->op = SPELLMOD_DOT;
+            spellMod->type = SPELLMOD_FLAT;
+            spellMod->spellId = GetId();
+            spellMod->mask = aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].SpellClassMask;
+        }
+        spellMod->value = aurEff->GetAmount() / 7;
+    }
+
+    void Register() override
+    {
+        DoEffectCalcSpellMod += AuraEffectCalcSpellModFn(spell_dru_idol_lifebloom::HandleEffectCalcSpellMod, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 // 29166 - Innervate
 class spell_dru_innervate : public AuraScript
 {
@@ -1222,6 +1247,7 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_dash);
     RegisterSpellScript(spell_dru_enrage);
     RegisterSpellScript(spell_dru_glyph_of_starfire);
+    RegisterSpellScript(spell_dru_idol_lifebloom);
     RegisterSpellScript(spell_dru_innervate);
     RegisterSpellScript(spell_dru_lifebloom);
     RegisterSpellScript(spell_dru_living_seed);
