@@ -559,7 +559,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_INST_DATA                      = 34,     // Field, Data
     SMART_ACTION_SET_INST_DATA64                    = 35,     // Field,
     SMART_ACTION_UPDATE_TEMPLATE                    = 36,     // Entry, UpdateLevel
-    SMART_ACTION_DIE                                = 37,     // No Params
+    SMART_ACTION_DIE                                = 37,     // Milliseconds
     SMART_ACTION_SET_IN_COMBAT_WITH_ZONE            = 38,     // Range (if outside of dungeon)
     SMART_ACTION_CALL_FOR_HELP                      = 39,     // Radius, With Emote
     SMART_ACTION_SET_SHEATH                         = 40,     // Sheath (0-unarmed, 1-melee, 2-ranged)
@@ -693,8 +693,9 @@ enum SMART_ACTION
     SMART_ACTION_DO_ACTION                          = 223,    // ActionId
     SMART_ACTION_ATTACK_STOP                        = 224,    //
     SMART_ACTION_SET_GUID                           = 225,    // Sends the invoker's or the base object's own ObjectGuid to target
+    SMART_ACTION_DISABLE                            = 226,    // Disable the targeted creatures, setting them Invisible and Immune to All
 
-    SMART_ACTION_AC_END                             = 226,    // placeholder
+    SMART_ACTION_AC_END                             = 227,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -923,6 +924,11 @@ struct SmartAction
             uint32 creature;
             SAIBool updateLevel;
         } updateTemplate;
+
+        struct
+        {
+            uint32 milliseconds;
+        } die;
 
         struct
         {
@@ -1365,6 +1371,11 @@ struct SmartAction
             SAIBool invokerGUID;
             uint32 index;
         } setGuid;
+
+        struct
+        {
+            SAIBool state;
+        } disable;
         //! Note for any new future actions
         //! All parameters must have type uint32
 

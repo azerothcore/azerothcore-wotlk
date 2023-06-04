@@ -37,124 +37,111 @@ enum Spells
     SPELL_DEMONIC_SHIELD        = 31901
 };
 
-class boss_omor_the_unscarred : public CreatureScript
+struct boss_omor_the_unscarred : public BossAI
 {
-public:
-    boss_omor_the_unscarred() : CreatureScript("boss_omor_the_unscarred") { }
-
-    struct boss_omor_the_unscarredAI : public BossAI
+    boss_omor_the_unscarred(Creature* creature) : BossAI(creature, DATA_OMOR_THE_UNSCARRED)
     {
-        boss_omor_the_unscarredAI(Creature* creature) : BossAI(creature, DATA_OMOR_THE_UNSCARRED)
+        SetCombatMovement(false);
+        scheduler.SetValidator([this]
         {
-            SetCombatMovement(false);
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
-            scheduler.SetValidator([this]
+    void Reset() override
+    {
+        Talk(SAY_WIPE);
+        _Reset();
+        _targetGUID.Clear();
+        ScheduleHealthCheckEvent(21, [&]{
+            DoCastSelf(SPELL_DEMONIC_SHIELD);
+            scheduler.Schedule(15s, [this](TaskContext context)
             {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-        }
-
-        void Reset() override
-        {
-            Talk(SAY_WIPE);
-            _Reset();
-            _targetGUID.Clear();
-
-            ScheduleHealthCheckEvent(21, [&]{
                 DoCastSelf(SPELL_DEMONIC_SHIELD);
-                scheduler.Schedule(15s, [this](TaskContext context)
-                {
-                    DoCastSelf(SPELL_DEMONIC_SHIELD);
-                    context.Repeat(15s);
-                });
-            });
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-            _JustEngagedWith();
-
-            scheduler.Schedule(6s, [this](TaskContext context)
-            {
-                if (roll_chance_i(33))
-                {
-                    Talk(SAY_CURSE);
-                }
-                DoCastRandomTarget(SPELL_TREACHEROUS_AURA);
-                context.Repeat(12s, 18s);
-            }).Schedule(10s, [this](TaskContext /*context*/)
-            {
-                DoCastSelf(SPELL_SUMMON_FIENDISH_HOUND);
-            }).Schedule(25s, [this](TaskContext context)
-            {
-                DoCastSelf(SPELL_SUMMON_FIENDISH_HOUND);
                 context.Repeat(15s);
             });
-        }
-
-        void KilledUnit(Unit*) override
-        {
-            if(!_hasSpoken)
-            {
-                _hasSpoken = true;
-                Talk(SAY_KILL);
-            }
-            scheduler.Schedule(6s, [this](TaskContext /*context*/)
-            {
-                _hasSpoken = false;
-            });
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            Talk(SAY_SUMMON);
-            summons.Summon(summon);
-            summon->SetInCombatWithZone();
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DIE);
-            _JustDied();
-        }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            if (!me->GetVictim() || !me->isAttackReady())
-                return;
-
-            if (me->IsWithinMeleeRange(me->GetVictim()))
-            {
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
-                DoMeleeAttackIfReady();
-            }
-            else
-            {
-                me->GetMotionMaster()->Clear();
-                me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
-                me->resetAttackTimer();
-            }
-        }
-
-    private:
-        ObjectGuid _targetGUID;
-        bool _hasSpoken;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetHellfireRampartsAI<boss_omor_the_unscarredAI>(creature);
+        });
     }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        Talk(SAY_AGGRO);
+        _JustEngagedWith();
+        scheduler.Schedule(6s, [this](TaskContext context)
+        {
+            if (roll_chance_i(33))
+            {
+                Talk(SAY_CURSE);
+            }
+            DoCastRandomTarget(SPELL_TREACHEROUS_AURA);
+            context.Repeat(12s, 18s);
+        }).Schedule(10s, [this](TaskContext /*context*/)
+        {
+            DoCastSelf(SPELL_SUMMON_FIENDISH_HOUND);
+        }).Schedule(25s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_SUMMON_FIENDISH_HOUND);
+            context.Repeat(15s);
+        });
+    }
+
+    void KilledUnit(Unit*) override
+    {
+        if(!_hasSpoken)
+        {
+            _hasSpoken = true;
+            Talk(SAY_KILL);
+        }
+        scheduler.Schedule(6s, [this](TaskContext /*context*/)
+        {
+            _hasSpoken = false;
+        });
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        Talk(SAY_SUMMON);
+        summons.Summon(summon);
+        summon->SetInCombatWithZone();
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DIE);
+        _JustDied();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        if (!me->GetVictim() || !me->isAttackReady())
+            return;
+
+        if (me->IsWithinMeleeRange(me->GetVictim()))
+        {
+            me->GetMotionMaster()->MoveChase(me->GetVictim());
+            DoMeleeAttackIfReady();
+        }
+        else
+        {
+            me->GetMotionMaster()->Clear();
+            DoCastVictim(SPELL_SHADOW_BOLT);
+            me->resetAttackTimer();
+        }
+    }
+
+private:
+    ObjectGuid _targetGUID;
+    bool _hasSpoken;
 };
 
 void AddSC_boss_omor_the_unscarred()
 {
-    new boss_omor_the_unscarred();
+    RegisterHellfireRampartsCreatureAI(boss_omor_the_unscarred);
 }
