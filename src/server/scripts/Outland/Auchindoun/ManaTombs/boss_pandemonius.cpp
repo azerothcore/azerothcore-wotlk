@@ -20,7 +20,7 @@
 #include "ScriptedCreature.h"
 #include "mana_tombs.h"
 
-enum Text
+enum Texts
 {
     SAY_AGGRO           = 0,
     SAY_KILL            = 1,
@@ -30,94 +30,71 @@ enum Text
 
 enum Spells
 {
-    SPELL_VOID_BLAST    = 32325,
-    SPELL_DARK_SHELL    = 32358
+    SPELL_VOID_BLAST = 32325,
+    SPELL_DARK_SHELL = 32358
 };
 
-enum GroupPhase
+enum Groups
 {
-    GROUP_PHASE_1       = 0,
-    GROUP_PHASE_2       = 1
+    GROUP_VOID_BLAST = 1
 };
+
+constexpr uint8 MAX_VOID_BLAST = 5;
 
 struct boss_pandemonius : public BossAI
 {
     boss_pandemonius(Creature* creature) : BossAI(creature, DATA_PANDEMONIUS)
     {
         scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
     }
 
-    void Reset() override
+    void JustEngagedWith(Unit* who) override
     {
-        _Reset();
-        VoidBlastCounter = 0;
-    }
-
-    void JustEngagedWith(Unit*) override
-    {
-        _JustEngagedWith();
         Talk(SAY_AGGRO);
-        scheduler.Schedule(20s, GROUP_PHASE_1, [this](TaskContext context)
-        {
-            if (me->IsNonMeleeSpellCast(false))
-            {
-                me->InterruptNonMeleeSpells(true);
-            }
-            Talk(EMOTE_DARK_SHELL);
-            DoCastSelf(SPELL_DARK_SHELL);
-            context.Repeat(20s);
-        }).Schedule(8s, 23s, GROUP_PHASE_2, [this](TaskContext /*context*/)
-        {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-            {
-                DoCast(target, SPELL_VOID_BLAST);
-                ++VoidBlastCounter;
-            }
 
-            if (VoidBlastCounter == 5)
+        scheduler.
+            Schedule(20s, GROUP_VOID_BLAST, [this](TaskContext context)
             {
-                VoidBlastCounter = 0;
-                scheduler.RescheduleGroup(GROUP_PHASE_2, 15s, 25s);
-            }
-            else
-            {
-                scheduler.RescheduleGroup(GROUP_PHASE_2, 500ms);
-                scheduler.DelayGroup(GROUP_PHASE_1, 500ms);
-            }
-        });
+                if (me->IsNonMeleeSpellCast(false))
+                {
+                    me->InterruptNonMeleeSpells(true);
+                }
+
+                Talk(EMOTE_DARK_SHELL);
+                DoCastSelf(SPELL_DARK_SHELL);
+                context.Repeat();
+            })
+            .Schedule(8s, 23s, [this](TaskContext context)
+                {
+                    if (!(context.GetRepeatCounter() % (MAX_VOID_BLAST + 1)))
+                    {
+                        context.Repeat(15s, 25s);
+                    }
+                    else
+                    {
+                        DoCastRandomTarget(SPELL_VOID_BLAST);
+                        context.Repeat(500ms);
+                        context.DelayGroup(GROUP_VOID_BLAST, 500ms);
+                    }
+                });
+
+        BossAI::JustEngagedWith(who);
     }
 
     void KilledUnit(Unit* victim) override
     {
         if (victim->GetTypeId() == TYPEID_PLAYER)
-        {
             Talk(SAY_KILL);
-        }
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustDied(Unit* killer) override
     {
-        _JustDied();
         Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
     }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-
-private:
-    uint32 VoidBlastCounter;
 };
 
 void AddSC_boss_pandemonius()
