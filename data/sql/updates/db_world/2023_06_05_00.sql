@@ -1,3 +1,4 @@
+-- DB update 2023_06_02_09 -> 2023_06_05_00
 --
 DELETE FROM `holiday_dates` WHERE `id` IN (374, 375, 376);
 INSERT INTO `holiday_dates` (`id`, `date_id`, `date_value`) VALUES
