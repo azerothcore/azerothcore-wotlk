@@ -3026,6 +3026,13 @@ public:
             return false;
         }
 
+        if (id == BOT_ENTRY_MIRROR_IMAGE_BM)
+        {
+            handler->PSendSysMessage("creature %u is a mirror image and cannot be spawned!", id);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (BotDataMgr::SelectNpcBotData(id))
         {
             handler->PSendSysMessage("Npcbot %u already exists in `characters_npcbot` table!", id);

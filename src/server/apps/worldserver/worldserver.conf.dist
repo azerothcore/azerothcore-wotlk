@@ -4452,28 +4452,48 @@ NpcBot.Gossip.ShowEquipmentListItems = 0
 NpcBot.GearBank.Enable = 0
 
 #
-#    NpcBot.NewClasses.<Class>.Enable
-#        Description: Allow players to hire bots of non-standard classes.
-#        Note:        Some bot abilities may be unbalanced or game breaking.
-#        Default:     1 - (NpcBot.NewClasses.Blademaster.Enable)
-#                     1 - (NpcBot.NewClasses.ObsidianDestroyer.Enable)
-#                     1 - (NpcBot.NewClasses.Archmage.Enable)
-#                     1 - (NpcBot.NewClasses.Dreadlord.Enable)
-#                     1 - (NpcBot.NewClasses.SpellBreaker.Enable)
-#                     1 - (NpcBot.NewClasses.DarkRanger.Enable)
-#                     1 - (NpcBot.NewClasses.Necromancer.Enable)
-#                     1 - (NpcBot.NewClasses.SeaWitch.Enable)
-#                     1 - (NpcBot.NewClasses.CryptLord.Enable)
+#    NpcBot.Classes.<Class>.Enable
+#        Description: Allow players to hire bots of certain classes.
+#        Note:        Some non-standard class abilities may be unbalanced or game breaking.
+#        Default:     1 - (NpcBot.Classes.Warrior.Enable)
+#                     1 - (NpcBot.Classes.Paladin.Enable)
+#                     1 - (NpcBot.Classes.Hunter.Enable)
+#                     1 - (NpcBot.Classes.Rogue.Enable)
+#                     1 - (NpcBot.Classes.Priest.Enable)
+#                     1 - (NpcBot.Classes.DeathKnight.Enable)
+#                     1 - (NpcBot.Classes.Shaman.Enable)
+#                     1 - (NpcBot.Classes.Mage.Enable)
+#                     1 - (NpcBot.Classes.Warlock.Enable)
+#                     1 - (NpcBot.Classes.Druid.Enable)
+#                     0 - (NpcBot.Classes.Blademaster.Enable)
+#                     1 - (NpcBot.Classes.ObsidianDestroyer.Enable)
+#                     1 - (NpcBot.Classes.Archmage.Enable)
+#                     1 - (NpcBot.Classes.Dreadlord.Enable)
+#                     1 - (NpcBot.Classes.SpellBreaker.Enable)
+#                     1 - (NpcBot.Classes.DarkRanger.Enable)
+#                     1 - (NpcBot.Classes.Necromancer.Enable)
+#                     1 - (NpcBot.Classes.SeaWitch.Enable)
+#                     1 - (NpcBot.Classes.CryptLord.Enable)
 
-NpcBot.NewClasses.Blademaster.Enable       = 1
-NpcBot.NewClasses.ObsidianDestroyer.Enable = 1
-NpcBot.NewClasses.Archmage.Enable          = 1
-NpcBot.NewClasses.Dreadlord.Enable         = 1
-NpcBot.NewClasses.SpellBreaker.Enable      = 1
-NpcBot.NewClasses.DarkRanger.Enable        = 1
-NpcBot.NewClasses.Necromancer.Enable       = 1
-NpcBot.NewClasses.SeaWitch.Enable          = 1
-NpcBot.NewClasses.CryptLord.Enable         = 1
+NpcBot.Classes.Warrior.Enable           = 1
+NpcBot.Classes.Paladin.Enable           = 1
+NpcBot.Classes.Hunter.Enable            = 1
+NpcBot.Classes.Rogue.Enable             = 1
+NpcBot.Classes.Priest.Enable            = 1
+NpcBot.Classes.DeathKnight.Enable       = 1
+NpcBot.Classes.Shaman.Enable            = 1
+NpcBot.Classes.Mage.Enable              = 1
+NpcBot.Classes.Warlock.Enable           = 1
+NpcBot.Classes.Druid.Enable             = 1
+NpcBot.Classes.Blademaster.Enable       = 0
+NpcBot.Classes.ObsidianDestroyer.Enable = 1
+NpcBot.Classes.Archmage.Enable          = 1
+NpcBot.Classes.Dreadlord.Enable         = 1
+NpcBot.Classes.SpellBreaker.Enable      = 1
+NpcBot.Classes.DarkRanger.Enable        = 1
+NpcBot.Classes.Necromancer.Enable       = 1
+NpcBot.Classes.SeaWitch.Enable          = 1
+NpcBot.Classes.CryptLord.Enable         = 1
 
 #
 #    NpcBot.Stats.Limits.Enable
