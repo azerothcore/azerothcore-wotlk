@@ -5044,7 +5044,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         target->AddThreat(caster, 10.0f);
                     break;
 
-              //  This Script is all wrong, it creates an additional Buff that bugs the characters. there shouldn't be here.
+              //  This Script is all wrong, it creates an additional Buff that bugs the characters. it shouldn't be here.
               //  case 13139:                                     // net-o-matic
               //      // root to self part of (root_target->charge->root_self sequence
               //      if (caster)
