@@ -5050,7 +5050,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
               //      if (caster)
               //         caster->CastSpell(caster, 13138, true, nullptr, this);
               //      break;
-				   
+
                 case 34026:   // kill command
                     {
                         Unit* pet = target->GetGuardianPet();
