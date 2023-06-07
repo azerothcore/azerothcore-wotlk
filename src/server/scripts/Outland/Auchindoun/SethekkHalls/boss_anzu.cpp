@@ -196,7 +196,7 @@ struct npc_anzu_spirit : public ScriptedAI
 
     bool HasDruidHot()
     {
-        for (uint8 i = 0; i < MAX_DRUID_SPELLS; i++)
+        for (uint32 spellId : druidSpells)
         {
             if (me->HasAura(druidSpells[i]))
                 return true;
