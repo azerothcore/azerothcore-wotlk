@@ -198,7 +198,7 @@ struct npc_anzu_spirit : public ScriptedAI
     {
         for (uint32 spellId : druidSpells)
         {
-            if (me->HasAura(druidSpells[spellId]))
+            if (me->HasAura(spellId))
                 return true;
         }
         return false;
