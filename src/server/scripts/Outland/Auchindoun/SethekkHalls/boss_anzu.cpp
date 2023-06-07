@@ -64,7 +64,7 @@ struct boss_anzu : public BossAI
         me->AddAura(SPELL_SHADOWFORM, me);
     }
 
-    std::vector<Position> const AnzuSpiritPos = 
+    std::vector<Position> const AnzuSpiritPos =
     {
         {-96.4816f, 304.236f, 26.5135f, 5.23599f},    // Hawk Spirit
         {-72.3434f, 290.861f, 26.4851f, 3.29867f},    // Falcon Spirit
