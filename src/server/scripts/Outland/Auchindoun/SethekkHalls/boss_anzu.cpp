@@ -44,15 +44,15 @@ enum Spirits
     SPELL_HAWK                  = 40237,
     SPELL_FALCON                = 40241,
     SPELL_EAGLE                 = 40240,
-                                
+
     SPELL_DURATION              = 40250,
-                                
+
     SPELL_FREEZE_ANIM           = 16245,
     SPELL_STONEFORM             = 40308,
-                                
+
     SAY_STONED                  = 0,
 
-    MAX_DRUID_SPELLS            = 27,          
+    MAX_DRUID_SPELLS            = 27
 };
 
 float AnzuSpiritPos[3][4] =
