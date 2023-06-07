@@ -39,6 +39,27 @@ enum Anzu
     EVENT_ANZU_HEALTH2          = 5
 };
 
+enum Spirits
+{
+    SPELL_HAWK                  = 40237,
+    SPELL_FALCON                = 40241,
+    SPELL_EAGLE                 = 40240,
+                                
+    SPELL_DURATION              = 40250,
+                                
+    SPELL_FREEZE_ANIM           = 16245,
+    SPELL_STONEFORM             = 40308,
+                                
+    SAY_STONED                  = 0,
+};
+
+float AnzuSpiritPos[3][4] =
+{
+    {-96.4816f, 304.236f, 26.5135f, 5.23599f},    // Hawk Spirit
+    {-72.3434f, 290.861f, 26.4851f, 3.29867f},    // Falcon Spirit
+    {-99.5906f, 276.661f, 26.8467f, 0.750492f},   // Eagle Spirit
+};
+
 struct boss_anzu : public BossAI
 {
     boss_anzu(Creature* creature) : BossAI(creature, DATA_ANZU)
@@ -49,18 +70,25 @@ struct boss_anzu : public BossAI
     }
 
     uint32 talkTimer;
+    bool _spiritsSummoned = false;
 
     void SummonedCreatureDies(Creature* summon, Unit*) override
     {
-        summons.Despawn(summon);
-        summons.RemoveNotExisting();
-        if (summons.empty())
-            me->RemoveAurasDueToSpell(SPELL_BANISH_SELF);
+        if (summon->GetEntry() == NPC_BROOD_OF_ANZU)
+        {
+            summons.Despawn(summon);
+            summons.RemoveNotExisting();
+            if (summons.empty())
+            {
+                me->RemoveAurasDueToSpell(SPELL_BANISH_SELF);
+            }
+        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
+        SummonSpirits();
         events.Reset();
         events.ScheduleEvent(EVENT_SPELL_SCREECH, 14000);
         events.ScheduleEvent(EVENT_SPELL_BOMB, 5000);
@@ -74,7 +102,18 @@ struct boss_anzu : public BossAI
         Talk(SAY_SUMMON);
         me->CastSpell(me, SPELL_BANISH_SELF, true);
         for (uint8 i = 0; i < 5; ++i)
-            me->SummonCreature(23132 /*NPC_BROOD_OF_ANZU*/, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * std::sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+            me->SummonCreature(NPC_BROOD_OF_ANZU, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * std::sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+    }
+
+    void SummonSpirits()
+    {
+        if (_spiritsSummoned)
+        {
+            me->SummonCreature(NPC_HAWK_SPIRIT, AnzuSpiritPos[0][0], AnzuSpiritPos[0][1], AnzuSpiritPos[0][2], AnzuSpiritPos[0][3], TEMPSUMMON_MANUAL_DESPAWN);
+            me->SummonCreature(NPC_FALCON_SPIRIT, AnzuSpiritPos[1][0], AnzuSpiritPos[1][1], AnzuSpiritPos[1][2], AnzuSpiritPos[1][3], TEMPSUMMON_MANUAL_DESPAWN);
+            me->SummonCreature(NPC_EAGLE_SPIRIT, AnzuSpiritPos[2][0], AnzuSpiritPos[2][1], AnzuSpiritPos[2][2], AnzuSpiritPos[2][3], TEMPSUMMON_MANUAL_DESPAWN);
+            _spiritsSummoned = true;
+        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -146,7 +185,62 @@ struct boss_anzu : public BossAI
     }
 };
 
+struct npc_anzu_spirit : public ScriptedAI
+{
+    npc_anzu_spirit(Creature* creature) : ScriptedAI(creature) { }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        _scheduler.Schedule(2400ms, [this](TaskContext task)
+            {
+                // Check for Druid HoTs every 2400ms
+                if (me->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x00800000, 0x0, 0x0))
+                {
+                    me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
+                    me->RemoveAurasDueToSpell(SPELL_STONEFORM);
+
+                    switch (me->GetEntry())
+                    {
+                    case NPC_HAWK_SPIRIT:
+                        DoCastSelf(SPELL_HAWK);
+                        break;
+                    case NPC_FALCON_SPIRIT:
+                        DoCastSelf(SPELL_FALCON);
+                        break;
+                    case NPC_EAGLE_SPIRIT:
+                        DoCastSelf(SPELL_EAGLE);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                else
+                {
+                    Talk(SAY_STONED);
+                    DoCastSelf(SPELL_FREEZE_ANIM, true);
+                    DoCastSelf(SPELL_STONEFORM, true);
+                }
+
+                task.Repeat(2400ms);
+            });
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 void AddSC_boss_anzu()
 {
     RegisterSethekkHallsCreatureAI(boss_anzu);
+    RegisterSethekkHallsCreatureAI(npc_anzu_spirit);
 }
