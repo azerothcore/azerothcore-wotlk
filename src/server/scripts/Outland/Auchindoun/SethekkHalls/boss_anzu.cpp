@@ -50,9 +50,7 @@ enum Spirits
     SPELL_FREEZE_ANIM           = 16245,
     SPELL_STONEFORM             = 40308,
 
-    SAY_STONED                  = 0,
-
-    MAX_DRUID_SPELLS            = 27
+    SAY_STONED                  = 0
 };
 
 std::vector<Position> const AnzuSpiritPos = 
