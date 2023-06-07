@@ -1,2 +1,2 @@
 --
-UPDATE `creature_template` SET `DamageModifier` = 35 WHERE `entry` = 18728;
+UPDATE `creature_template` SET `DamageModifier` = 65 WHERE `entry` = 18728;
