@@ -14,3 +14,9 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (23134, 0, 0, '%s returns to stone.', 16, 0, 100, 0, 0, 0, 20980, 0, 'Hawk Spirit'),
 (23135, 0, 0, '%s returns to stone.', 16, 0, 100, 0, 0, 0, 20980, 0, 'Falcon Spirit'),
 (23136, 0, 0, '%s returns to stone.', 16, 0, 100, 0, 0, 0, 20980, 0, 'Eagle Spirit');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (40240, 40237, 40241));
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 3, 40240, 0, 0, 31, 0, 3, 23035, 0, 0, 0, 0, '', 'Spite of the Eagle (40240) only targets Anzu (23035)'),
+(13, 1, 40237, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Protection of the Hawk (40237) only targets Players'),
+(13, 1, 40241, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Speed of the Falcon (40241) only targets Players');

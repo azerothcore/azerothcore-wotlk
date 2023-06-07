@@ -51,6 +51,8 @@ enum Spirits
     SPELL_STONEFORM             = 40308,
                                 
     SAY_STONED                  = 0,
+
+    MAX_DRUID_SPELLS            = 27,          
 };
 
 float AnzuSpiritPos[3][4] =
@@ -70,7 +72,6 @@ struct boss_anzu : public BossAI
     }
 
     uint32 talkTimer;
-    bool _spiritsSummoned = false;
 
     void SummonedCreatureDies(Creature* summon, Unit*) override
     {
@@ -107,13 +108,9 @@ struct boss_anzu : public BossAI
 
     void SummonSpirits()
     {
-        if (_spiritsSummoned)
-        {
-            me->SummonCreature(NPC_HAWK_SPIRIT, AnzuSpiritPos[0][0], AnzuSpiritPos[0][1], AnzuSpiritPos[0][2], AnzuSpiritPos[0][3], TEMPSUMMON_MANUAL_DESPAWN);
-            me->SummonCreature(NPC_FALCON_SPIRIT, AnzuSpiritPos[1][0], AnzuSpiritPos[1][1], AnzuSpiritPos[1][2], AnzuSpiritPos[1][3], TEMPSUMMON_MANUAL_DESPAWN);
-            me->SummonCreature(NPC_EAGLE_SPIRIT, AnzuSpiritPos[2][0], AnzuSpiritPos[2][1], AnzuSpiritPos[2][2], AnzuSpiritPos[2][3], TEMPSUMMON_MANUAL_DESPAWN);
-            _spiritsSummoned = true;
-        }
+        me->SummonCreature(NPC_HAWK_SPIRIT, AnzuSpiritPos[0][0], AnzuSpiritPos[0][1], AnzuSpiritPos[0][2], AnzuSpiritPos[0][3], TEMPSUMMON_MANUAL_DESPAWN);
+        me->SummonCreature(NPC_FALCON_SPIRIT, AnzuSpiritPos[1][0], AnzuSpiritPos[1][1], AnzuSpiritPos[1][2], AnzuSpiritPos[1][3], TEMPSUMMON_MANUAL_DESPAWN);
+        me->SummonCreature(NPC_EAGLE_SPIRIT, AnzuSpiritPos[2][0], AnzuSpiritPos[2][1], AnzuSpiritPos[2][2], AnzuSpiritPos[2][3], TEMPSUMMON_MANUAL_DESPAWN);
     }
 
     void UpdateAI(uint32 diff) override
@@ -123,6 +120,7 @@ struct boss_anzu : public BossAI
             talkTimer += diff;
             if (talkTimer >= 1000 && talkTimer < 10000)
             {
+                me->SetImmuneToAll(true);
                 Talk(SAY_ANZU_INTRO1);
                 talkTimer = 10000;
             }
@@ -132,6 +130,7 @@ struct boss_anzu : public BossAI
                 me->RemoveAurasDueToSpell(SPELL_SHADOWFORM);
                 Talk(SAY_ANZU_INTRO2);
                 talkTimer = 0;
+                me->SetInCombatWithZone();
             }
         }
 
@@ -189,12 +188,28 @@ struct npc_anzu_spirit : public ScriptedAI
 {
     npc_anzu_spirit(Creature* creature) : ScriptedAI(creature) { }
 
+    std::array<uint32, MAX_DRUID_SPELLS> const druidSpells =
+    {
+      774, 1058, 1430, 2090, 2091, 3627, 8910, 9839, 9840, 9841, 25299, 26981, 26982, 48440, 48441, /* Rejuvenation */
+      8936, 8938, 8939, 8940, 8941, 9750, 9856, 9857, 9858, 26980, 48442, 48443, /* Regrowth */
+    };
+
+    bool HasDruidHot()
+    {
+        for (uint8 i = 0; i < MAX_DRUID_SPELLS; i++)
+        {
+            if (me->HasAura(druidSpells[i]))
+                return true;
+        }
+        return false;
+    }
+
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
-        _scheduler.Schedule(2400ms, [this](TaskContext task)
+        _scheduler.Schedule(1ms, [this](TaskContext task)
             {
                 // Check for Druid HoTs every 2400ms
-                if (me->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x00800000, 0x0, 0x0))
+                if (HasDruidHot())
                 {
                     me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
                     me->RemoveAurasDueToSpell(SPELL_STONEFORM);
@@ -214,7 +229,7 @@ struct npc_anzu_spirit : public ScriptedAI
                         break;
                     }
                 }
-                else
+                else if (!me->HasAura(SPELL_STONEFORM))
                 {
                     Talk(SAY_STONED);
                     DoCastSelf(SPELL_FREEZE_ANIM, true);
