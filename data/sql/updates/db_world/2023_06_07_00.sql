@@ -1,3 +1,4 @@
+-- DB update 2023_06_05_01 -> 2023_06_07_00
 --
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'boss_porung' WHERE `entry` = 20923;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (20923, 17461) AND `source_type` = 0;
