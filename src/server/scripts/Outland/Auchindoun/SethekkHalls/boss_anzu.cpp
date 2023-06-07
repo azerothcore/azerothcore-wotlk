@@ -70,7 +70,7 @@ struct boss_anzu : public BossAI
         {-72.3434f, 290.861f, 26.4851f, 3.29867f},    // Falcon Spirit
         {-99.5906f, 276.661f, 26.8467f, 0.750492f},   // Eagle Spirit
     };
-	
+
     uint32 talkTimer;
 
     void SummonedCreatureDies(Creature* summon, Unit*) override
