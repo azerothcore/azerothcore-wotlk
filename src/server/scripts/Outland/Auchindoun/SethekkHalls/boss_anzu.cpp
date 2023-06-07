@@ -55,13 +55,6 @@ enum Spirits
     MAX_DRUID_SPELLS            = 27
 };
 
-std::vector<Position> const AnzuSpiritPos = 
-{
-    {-96.4816f, 304.236f, 26.5135f, 5.23599f},    // Hawk Spirit
-    {-72.3434f, 290.861f, 26.4851f, 3.29867f},    // Falcon Spirit
-    {-99.5906f, 276.661f, 26.8467f, 0.750492f},   // Eagle Spirit
-};
-
 struct boss_anzu : public BossAI
 {
     boss_anzu(Creature* creature) : BossAI(creature, DATA_ANZU)
@@ -71,6 +64,13 @@ struct boss_anzu : public BossAI
         me->AddAura(SPELL_SHADOWFORM, me);
     }
 
+    std::vector<Position> const AnzuSpiritPos = 
+    {
+        {-96.4816f, 304.236f, 26.5135f, 5.23599f},    // Hawk Spirit
+        {-72.3434f, 290.861f, 26.4851f, 3.29867f},    // Falcon Spirit
+        {-99.5906f, 276.661f, 26.8467f, 0.750492f},   // Eagle Spirit
+    };
+	
     uint32 talkTimer;
 
     void SummonedCreatureDies(Creature* summon, Unit*) override
