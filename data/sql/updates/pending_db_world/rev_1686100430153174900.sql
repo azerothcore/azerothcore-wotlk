@@ -20,3 +20,6 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (13, 3, 40240, 0, 0, 31, 0, 3, 23035, 0, 0, 0, 0, '', 'Spite of the Eagle (40240) only targets Anzu (23035)'),
 (13, 1, 40237, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Protection of the Hawk (40237) only targets Players'),
 (13, 1, 40241, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Speed of the Falcon (40241) only targets Players');
+
+-- Hack: Add PLAYER_CONTROLLED to allow for players to heal them. Flag 64 is sniffed, though
+UPDATE `creature_template` SET `unit_flags` = `unit_flags`|64|8 WHERE (`entry` IN (23134, 23135, 23136));
