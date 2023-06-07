@@ -188,11 +188,7 @@ struct npc_anzu_spirit : public ScriptedAI
 {
     npc_anzu_spirit(Creature* creature) : ScriptedAI(creature) { }
 
-    std::array<uint32, MAX_DRUID_SPELLS> const druidSpells =
-    {
-      774, 1058, 1430, 2090, 2091, 3627, 8910, 9839, 9840, 9841, 25299, 26981, 26982, 48440, 48441, /* Rejuvenation */
-      8936, 8938, 8939, 8940, 8941, 9750, 9856, 9857, 9858, 26980, 48442, 48443, /* Regrowth */
-    };
+    std::array<uint32, MAX_DRUID_SPELLS> const druidSpells = { 774, 1058, 1430, 2090, 2091, 3627, 8910, 9839, 9840, 9841, 25299, 26981, 26982, 48440, 48441, 8936, 8938, 8939, 8940, 8941, 9750, 9856, 9857, 9858, 26980, 48442, 48443 };
 
     bool HasDruidHot()
     {
