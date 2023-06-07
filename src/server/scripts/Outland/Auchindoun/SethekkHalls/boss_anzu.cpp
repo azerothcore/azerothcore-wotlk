@@ -55,7 +55,7 @@ enum Spirits
     MAX_DRUID_SPELLS            = 27
 };
 
-float AnzuSpiritPos[3][4] =
+std::vector<Position> const AnzuSpiritPos = 
 {
     {-96.4816f, 304.236f, 26.5135f, 5.23599f},    // Hawk Spirit
     {-72.3434f, 290.861f, 26.4851f, 3.29867f},    // Falcon Spirit
@@ -108,9 +108,9 @@ struct boss_anzu : public BossAI
 
     void SummonSpirits()
     {
-        me->SummonCreature(NPC_HAWK_SPIRIT, AnzuSpiritPos[0][0], AnzuSpiritPos[0][1], AnzuSpiritPos[0][2], AnzuSpiritPos[0][3], TEMPSUMMON_MANUAL_DESPAWN);
-        me->SummonCreature(NPC_FALCON_SPIRIT, AnzuSpiritPos[1][0], AnzuSpiritPos[1][1], AnzuSpiritPos[1][2], AnzuSpiritPos[1][3], TEMPSUMMON_MANUAL_DESPAWN);
-        me->SummonCreature(NPC_EAGLE_SPIRIT, AnzuSpiritPos[2][0], AnzuSpiritPos[2][1], AnzuSpiritPos[2][2], AnzuSpiritPos[2][3], TEMPSUMMON_MANUAL_DESPAWN);
+        me->SummonCreature(NPC_HAWK_SPIRIT, AnzuSpiritPos[0], TEMPSUMMON_MANUAL_DESPAWN);
+        me->SummonCreature(NPC_FALCON_SPIRIT, AnzuSpiritPos[1], TEMPSUMMON_MANUAL_DESPAWN);
+        me->SummonCreature(NPC_EAGLE_SPIRIT, AnzuSpiritPos[2], TEMPSUMMON_MANUAL_DESPAWN);
     }
 
     void UpdateAI(uint32 diff) override
