@@ -1,3 +1,4 @@
+-- DB update 2023_06_07_03 -> 2023_06_07_04
 UPDATE `creature_template` SET `mechanic_immune_mask` = 0 WHERE `entry` IN (16507, 16700, 17465, 17670, 17671, 20593, 20589, 20583, 20588, 20584, 20582, 20590, 20587, 20586); -- setting to 0
 
 UPDATE `creature_template` SET `mechanic_immune_mask` = `mechanic_immune_mask`|1|2|8|16|64|128|1024|2048|4096|8192|65536|8388608|536870912 WHERE `entry` IN (17671, 20584); -- full cc
