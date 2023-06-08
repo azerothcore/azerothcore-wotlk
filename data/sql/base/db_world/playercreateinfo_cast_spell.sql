@@ -19,17 +19,15 @@ DROP TABLE IF EXISTS `playercreateinfo_cast_spell`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_cast_spell` (
   `raceMask` int unsigned NOT NULL DEFAULT '0',
   `classMask` int unsigned NOT NULL DEFAULT '0',
-  `spell` mediumint unsigned NOT NULL DEFAULT '0',
-  `note` varchar(255) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+  `spell` int unsigned NOT NULL DEFAULT '0',
+  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.playercreateinfo_cast_spell: 2 rows
+-- Dumping data for table acore_world.playercreateinfo_cast_spell: ~2 rows (approximately)
 DELETE FROM `playercreateinfo_cast_spell`;
-/*!40000 ALTER TABLE `playercreateinfo_cast_spell` DISABLE KEYS */;
 INSERT INTO `playercreateinfo_cast_spell` (`raceMask`, `classMask`, `spell`, `note`) VALUES
 	(0, 32, 48266, 'Death Knight - Blood Presence'),
 	(0, 1, 2457, 'Warrior - Battle Stance');
-/*!40000 ALTER TABLE `playercreateinfo_cast_spell` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

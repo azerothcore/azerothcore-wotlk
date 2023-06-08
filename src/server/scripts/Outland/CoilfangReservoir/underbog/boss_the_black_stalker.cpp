@@ -47,14 +47,6 @@ enum eBlackStalker
     SPELL_SUSPENSION_PRIMER         = 31720,
     SPELL_SUSPENSION                = 31719,
 
-    EVENT_LEVITATE                  = 1,
-    EVENT_SPELL_CHAIN               = 2,
-    EVENT_SPELL_STATIC              = 3,
-    EVENT_SPELL_SPORES              = 4,
-    EVENT_CHECK                     = 5,
-    EVENT_LEVITATE_TARGET_1         = 6,
-    EVENT_LEVITATE_TARGET_2         = 7,
-
     ENTRY_SPORE_STRIDER             = 22299
 };
 
@@ -62,18 +54,47 @@ struct boss_the_black_stalker : public BossAI
 {
     boss_the_black_stalker(Creature* creature) : BossAI(creature, DATA_BLACK_STALKER)
     {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        events.ScheduleEvent(EVENT_LEVITATE, urand(8000, 12000));
-        events.ScheduleEvent(EVENT_SPELL_CHAIN, 6000);
-        events.ScheduleEvent(EVENT_SPELL_STATIC, 10000);
-        events.ScheduleEvent(EVENT_CHECK, 5000);
-        if (IsHeroic())
-            events.ScheduleEvent(EVENT_SPELL_SPORES, urand(10000, 15000));
+        scheduler.Schedule(8s, 12s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_LEVITATE);
+            context.Repeat(18s, 24s);
+        }).Schedule(6s, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_CHAIN_LIGHTNING, false);
+            context.Repeat(9s);
+        }).Schedule(10s, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_STATIC_CHARGE, false);
+            context.Repeat(10s);
+        }).Schedule(5s, [this](TaskContext /*context*/)
+        {
+            float x, y, z, o = 0.f;
+            me->GetHomePosition(x, y, z, o);
+            if (!me->IsWithinDist3d(x, y, z, 60.0f))
+            {
+                EnterEvadeMode();
+                return;
+            }
+        });
 
-        BossAI::JustEngagedWith(who);
+        if (IsHeroic())
+        {
+            scheduler.Schedule(10s, 15s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_SUMMON_SPORE_STRIDER, false);
+                context.Repeat(10s, 15s);
+            });
+        }
+
+        _JustEngagedWith();
     }
 
     void JustSummoned(Creature* summon) override
@@ -89,8 +110,6 @@ struct boss_the_black_stalker : public BossAI
     void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
     {
         summons.Despawn(summon);
-        for (uint8 i = 0; i < 3; ++i)
-            me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
     }
 
     void UpdateAI(uint32 diff) override
@@ -98,45 +117,7 @@ struct boss_the_black_stalker : public BossAI
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-            case EVENT_CHECK:
-                float x, y, z, o;
-                me->GetHomePosition(x, y, z, o);
-                if (!me->IsWithinDist3d(x, y, z, 60))
-                {
-                    EnterEvadeMode();
-                    return;
-                }
-                events.RepeatEvent(5000);
-                break;
-            case EVENT_SPELL_SPORES:
-                me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
-                events.RepeatEvent(urand(10000, 15000));
-                break;
-            case EVENT_SPELL_CHAIN:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
-                events.RepeatEvent(9000);
-                break;
-            case EVENT_SPELL_STATIC:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30, true))
-                    me->CastSpell(target, SPELL_STATIC_CHARGE, false);
-                events.RepeatEvent(10000);
-                break;
-            case EVENT_LEVITATE:
-                DoCastSelf(SPELL_LEVITATE);
-                events.RepeatEvent(urand(18000, 24000));
-                break;
-        }
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
+        scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
     }

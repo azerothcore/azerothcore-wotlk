@@ -21,17 +21,25 @@ CREATE TABLE IF NOT EXISTS `gameobject_addon` (
   `invisibilityType` tinyint unsigned NOT NULL DEFAULT '0',
   `invisibilityValue` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gameobject_addon: 32 rows
+-- Dumping data for table acore_world.gameobject_addon: ~32 rows (approximately)
 DELETE FROM `gameobject_addon`;
-/*!40000 ALTER TABLE `gameobject_addon` DISABLE KEYS */;
 INSERT INTO `gameobject_addon` (`guid`, `invisibilityType`, `invisibilityValue`) VALUES
 	(270, 9, 1000),
+	(5141, 0, 0),
+	(5193, 0, 0),
+	(5205, 0, 0),
+	(5382, 0, 0),
+	(5398, 0, 0),
+	(5405, 0, 0),
+	(5425, 0, 0),
 	(6134, 9, 1000),
 	(6135, 9, 1000),
 	(6342, 8, 1000),
 	(6343, 8, 1000),
+	(20458, 0, 0),
+	(20459, 0, 0),
 	(24222, 0, 0),
 	(24223, 0, 0),
 	(25023, 0, 0),
@@ -41,25 +49,15 @@ INSERT INTO `gameobject_addon` (`guid`, `invisibilityType`, `invisibilityValue`)
 	(25120, 0, 0),
 	(25256, 0, 0),
 	(25257, 0, 0),
+	(26628, 0, 0),
+	(31619, 0, 0),
 	(50347, 0, 0),
 	(268853, 8, 1000),
 	(268854, 5, 1000),
 	(2133392, 7, 1000),
 	(2133393, 7, 1000),
 	(2133394, 7, 1000),
-	(2133395, 7, 1000),
-	(26628, 0, 0),
-	(5141, 0, 0),
-	(5193, 0, 0),
-	(5205, 0, 0),
-	(5382, 0, 0),
-	(5398, 0, 0),
-	(5405, 0, 0),
-	(5425, 0, 0),
-	(20458, 0, 0),
-	(20459, 0, 0),
-	(31619, 0, 0);
-/*!40000 ALTER TABLE `gameobject_addon` ENABLE KEYS */;
+	(2133395, 7, 1000);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

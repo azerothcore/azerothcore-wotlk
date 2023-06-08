@@ -17,8 +17,8 @@
 -- Dumping structure for table acore_world.areatrigger_teleport
 DROP TABLE IF EXISTS `areatrigger_teleport`;
 CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
-  `ID` mediumint unsigned NOT NULL DEFAULT '0',
-  `Name` text,
+  `ID` int unsigned NOT NULL DEFAULT '0',
+  `Name` text COLLATE utf8mb4_unicode_ci,
   `target_map` smallint unsigned NOT NULL DEFAULT '0',
   `target_position_x` float NOT NULL DEFAULT '0',
   `target_position_y` float NOT NULL DEFAULT '0',
@@ -26,11 +26,10 @@ CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
   `target_orientation` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
   FULLTEXT KEY `name` (`Name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Trigger System';
 
--- Dumping data for table acore_world.areatrigger_teleport: 273 rows
+-- Dumping data for table acore_world.areatrigger_teleport: ~273 rows (approximately)
 DELETE FROM `areatrigger_teleport`;
-/*!40000 ALTER TABLE `areatrigger_teleport` DISABLE KEYS */;
 INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES
 	(45, 'Scarlet Monastery - Graveyard (Entrance)', 189, 1688.99, 1053.48, 18.6775, 0.00117),
 	(78, 'DeadMines Entrance', 36, -16.4, -383.07, 61.78, 1.86),
@@ -305,7 +304,6 @@ INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position
 	(5688, 'Forge of Souls (Exit)', 571, 5667.72, 2007.19, 798.042, 2.31535),
 	(5869, 'The Ruby Sanctum (Entrance)', 724, 3274, 533.531, 87.665, 3.16),
 	(5872, 'The Ruby Sanctum (Exit)', 571, 3604.23, 192.083, -110.821, 2.195);
-/*!40000 ALTER TABLE `areatrigger_teleport` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `account_instance_times` (
   `instanceId` int unsigned NOT NULL DEFAULT '0',
   `releaseTime` bigint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`accountId`,`instanceId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.account_instance_times: ~0 rows (approximately)
 DELETE FROM `account_instance_times`;

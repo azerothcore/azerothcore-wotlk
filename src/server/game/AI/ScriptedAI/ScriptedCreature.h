@@ -470,6 +470,7 @@ public:
     void UpdateAI(uint32 diff) override;
 
     void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec);
+    void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec);
 
     // Hook used to execute events scheduled into EventMap without the need
     // to override UpdateAI
