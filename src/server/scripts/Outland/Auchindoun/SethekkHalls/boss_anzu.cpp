@@ -38,7 +38,10 @@ enum Spells
 
 enum Npc
 {
-    NPC_BROOD_OF_ANZU           = 23132
+    NPC_BROOD_OF_ANZU           = 23132,
+    NPC_HAWK_SPIRIT             = 23134,
+    NPC_FALCON_SPIRIT           = 23135,
+    NPC_EAGLE_SPIRIT            = 23136
 };
 
 enum Spirits
