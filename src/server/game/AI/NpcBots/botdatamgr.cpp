@@ -1227,11 +1227,22 @@ void BotDataMgr::GenerateWanderingBots()
 
 bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unused]] Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo)
 {
+    if (!BotMgr::IsBotGenerationEnabledBGs())
+        return true;
+
     BattlegroundTypeId bgTypeId = gqinfo->BgTypeId;
     uint8 atype = gqinfo->ArenaType;
     uint32 ammr = gqinfo->ArenaMatchmakerRating;
     BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
     BattlegroundQueueTypeId bgqTypeId = sBattlegroundMgr->BGQueueTypeId(bgTypeId, atype);
+
+    uint32 tarteamplayers = BotMgr::GetBGTargetTeamPlayersCount(bgTypeId);
+
+    if (tarteamplayers == 0)
+    {
+        LOG_INFO("npcbots", "[Disabled] BG {} wandering bots generation is disabled (not implemented?)", uint32(bgTypeId));
+        return true;
+    }
 
     uint32 spareBots = sBotGen->GetSpareBotsCount();
 
@@ -1269,7 +1280,8 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
 
     uint32 minteamplayers = bg_template->GetMinPlayersPerTeam();
     uint32 maxteamplayers = bg_template->GetMaxPlayersPerTeam();
-    uint32 avgteamplayers = (minteamplayers + 1 + maxteamplayers) / 2;
+
+    RoundToInterval(tarteamplayers, minteamplayers, maxteamplayers);
 
     uint32 queued_players_a = 0;
     uint32 queued_players_h = 0;
@@ -1284,8 +1296,8 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
         }
     }
 
-    uint32 needed_bots_count_a = (queued_players_a < avgteamplayers) ? (avgteamplayers - queued_players_a) : 0;
-    uint32 needed_bots_count_h = (queued_players_h < avgteamplayers) ? (avgteamplayers - queued_players_h) : 0;
+    uint32 needed_bots_count_a = (queued_players_a < tarteamplayers) ? (tarteamplayers - queued_players_a) : 0;
+    uint32 needed_bots_count_h = (queued_players_h < tarteamplayers) ? (tarteamplayers - queued_players_h) : 0;
 
     ASSERT(needed_bots_count_a <= maxteamplayers);
     ASSERT(needed_bots_count_h <= maxteamplayers);

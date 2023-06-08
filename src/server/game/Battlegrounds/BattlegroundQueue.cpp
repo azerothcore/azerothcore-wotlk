@@ -230,8 +230,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* group, Battle
         SendMessageBGQueue(leader, bg, bracketEntry);
 
     //npcbot: try to queue wandering bots
-    if (!isRated && !arenaType && !arenaTeamId && !sBattlegroundMgr->isTesting() && BotMgr::IsBotGenerationEnabledBGs() &&
-        (bgTypeId == BATTLEGROUND_WS || bgTypeId == BATTLEGROUND_AB))
+    if (!isRated && !arenaType && !arenaTeamId && !sBattlegroundMgr->isTesting())
     {
         if (!BotDataMgr::GenerateBattlegroundBots(leader, group, this, bracketEntry, ginfo))
         {
