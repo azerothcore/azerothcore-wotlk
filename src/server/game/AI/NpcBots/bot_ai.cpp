@@ -17961,6 +17961,7 @@ void bot_ai::OnBotEnterVehicle(Vehicle const* vehicle)
 
         if (Unit* oVeh = master->GetVehicleBase())
         {
+            CreatureTemplate const* vehTemplate = vehicle->GetBase()->GetTypeId() == TYPEID_UNIT ? vehicle->GetBase()->ToCreature()->GetCreatureTemplate() : nullptr;
             ////Set hp and mana percent to avoid abuse
             //vehicle->GetBase()->SetHealth(vehicle->GetBase()->GetMaxHealth() * oVeh->GetHealthPct() / 100.f + 0.5f);
             //if (oVeh->GetPowerType() == POWER_MANA)
@@ -17969,8 +17970,9 @@ void bot_ai::OnBotEnterVehicle(Vehicle const* vehicle)
             //    vehicle->GetBase()->SetPower(POWER_MANA, vehicle->GetBase()->GetMaxPower(POWER_MANA) * mpPct / 100.f + 0.5f);
             //}
             //speed
-            if (vehicle->GetBase()->GetTypeId() == TYPEID_UNIT &&
-                (vehicle->GetBase()->ToCreature()->GetCreatureTemplate()->Movement.Flight == CreatureFlightMovementType::CanFly))
+            if (vehTemplate &&
+                (vehTemplate->Movement.Flight == CreatureFlightMovementType::CanFly ||
+                vehTemplate->Movement.Flight == CreatureFlightMovementType::DisableGravity))
             {
                 //hack to use vehicle speed
                 vehicle->GetBase()->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED);
@@ -17981,8 +17983,8 @@ void bot_ai::OnBotEnterVehicle(Vehicle const* vehicle)
                 vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_VEHICLE_SPEED_ALWAYS, true);
                 vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK, true);
                 vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK, true);
-                vehicle->GetBase()->SetSpeed(MOVE_FLIGHT, oVeh->GetSpeedRate(MOVE_FLIGHT) * 1.17f);
-                vehicle->GetBase()->SetSpeed(MOVE_RUN, oVeh->GetSpeedRate(MOVE_FLIGHT) * 1.17f);
+                vehicle->GetBase()->SetSpeedRate(MOVE_FLIGHT, oVeh->GetSpeedRate(MOVE_FLIGHT) * 1.17f);
+                vehicle->GetBase()->SetSpeedRate(MOVE_RUN, oVeh->GetSpeedRate(MOVE_FLIGHT) * 1.17f);
                 vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
                 vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_SPEED_SLOW_ALL, true);
             }

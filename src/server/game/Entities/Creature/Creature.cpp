@@ -3507,6 +3507,17 @@ void Creature::UpdateMovementFlags()
     if (!info)
         return;
 
+    //npcbot: do not update movement flags for vehicles controlled by npcbots
+    if (GetCharmerGUID().IsCreature())
+    {
+        if (CreatureTemplate const* bot_template = sObjectMgr->GetCreatureTemplate(GetCharmerGUID().GetEntry()))
+        {
+            if (bot_template->IsNPCBot())
+                return;
+        }
+    }
+    //end npcbot
+
     // Creatures with CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE should control MovementFlags in your own scripts
     if (info->flags_extra & CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE)
         return;
