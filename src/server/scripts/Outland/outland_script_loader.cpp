@@ -75,6 +75,7 @@ void AddSC_instance_blood_furnace();
 void AddSC_boss_magtheridon();               //HC Magtheridon's Lair
 void AddSC_instance_magtheridons_lair();
 void AddSC_boss_grand_warlock_nethekurse();  //HC Shattered Halls
+void AddSC_boss_porung();
 void AddSC_boss_warbringer_omrogg();
 void AddSC_boss_warchief_kargath_bladefist();
 void AddSC_instance_shattered_halls();
@@ -179,6 +180,7 @@ void AddOutlandScripts()
     AddSC_boss_magtheridon();               //HC Magtheridon's Lair
     AddSC_instance_magtheridons_lair();
     AddSC_boss_grand_warlock_nethekurse();  //HC Shattered Halls
+    AddSC_boss_porung();
     AddSC_boss_warbringer_omrogg();
     AddSC_boss_warchief_kargath_bladefist();
     AddSC_instance_shattered_halls();

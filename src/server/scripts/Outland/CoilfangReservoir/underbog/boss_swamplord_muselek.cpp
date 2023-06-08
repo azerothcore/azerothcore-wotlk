@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 #include "the_underbog.h"
 
 enum Spells
@@ -27,14 +28,14 @@ enum Spells
     SPELL_MULTISHOT           = 34974,
     SPELL_THROW_FREEZING_TRAP = 31946,
     SPELL_AIMED_SHOT          = 31623,
-    SPELL_HUNTERS_MARK        = 31615
+    SPELL_HUNTERS_MARK        = 31615,
 };
 
 enum Text
 {
-    SAY_AGGRO     = 1,
-    SAY_KILL      = 2,
-    SAY_JUST_DIED = 3
+    SAY_AGGRO       = 1,
+    SAY_KILL        = 2,
+    SAY_JUST_DIED   = 3
 };
 
 enum Misc
@@ -133,7 +134,7 @@ struct boss_swamplord_muselek : public BossAI
                         if (me->IsWithinMeleeRange(me->GetVictim()))
                         {
                             me->GetMotionMaster()->Clear();
-                            me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
+                            me->GetMotionMaster()->MoveForwards(me->GetVictim(), 10.0f);
                         }
 
                         me->m_Events.AddEventAtOffset([this]()

@@ -104,7 +104,14 @@ struct boss_talon_king_ikiss : public BossAI
             context.Repeat(7s, 12s);
         }).Schedule(8s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_POLYMORPH);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_POLYMORPH);
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* target) -> bool
+                {
+                    return target && !target->IsImmunedToSpell(spellInfo);
+                }))
+            {
+                DoCast(target, SPELL_POLYMORPH);
+            }
             context.Repeat(15s, 17500ms);
         });
 
