@@ -29,7 +29,8 @@ enum DataTypes
     DATA_NETHEKURSE                 = 0,
     DATA_OMROGG                     = 1,
     DATA_KARGATH                    = 2,
-    ENCOUNTER_COUNT                 = 3,
+    DATA_PORUNG                     = 3,
+    ENCOUNTER_COUNT                 = 4,
 
     DATA_ENTERED_ROOM               = 10,
     DATA_PRISONER_1                 = 11,
@@ -49,6 +50,7 @@ enum CreatureIds
     NPC_BLOOD_GUARD                 = 17461,
     NPC_SH_ZEALOT                   = 17462,
     NPC_SH_ARCHER                   = 17427,
+    NPC_SH_SCOUT                    = 17693,
 
     // Warchief Kargath
     NPC_WARCHIEF_KARGATH            = 16808,

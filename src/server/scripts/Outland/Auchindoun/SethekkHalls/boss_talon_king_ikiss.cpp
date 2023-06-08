@@ -20,13 +20,13 @@
 #include "SpellScript.h"
 #include "sethekk_halls.h"
 
-enum TailonkingIkiss
+enum Text
 {
     SAY_INTRO                   = 0,
     SAY_AGGRO                   = 1,
     SAY_SLAY                    = 2,
     SAY_DEATH                   = 3,
-    EMOTE_ARCANE_EXP            = 4,
+    EMOTE_ARCANE_EXP            = 4
 };
 
 enum Spells
@@ -38,7 +38,7 @@ enum Spells
     SPELL_SLOW                  = 35032,
     SPELL_POLYMORPH             = 38245,
     SPELL_ARCANE_VOLLEY         = 35059,
-    SPELL_ARCANE_EXPLOSION      = 38197,
+    SPELL_ARCANE_EXPLOSION      = 38197
 };
 
 struct boss_talon_king_ikiss : public BossAI
@@ -55,14 +55,12 @@ struct boss_talon_king_ikiss : public BossAI
     {
         _Reset();
         _spoken = false;
-
         ScheduleHealthCheckEvent({ 80, 50, 25 }, [&] {
             me->InterruptNonMeleeSpells(false);
             DoCastAOE(SPELL_BLINK);
             DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             Talk(EMOTE_ARCANE_EXP);
-
-            scheduler.Schedule(1s, [this](TaskContext)
+            scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
                 DoCastAOE(SPELL_ARCANE_EXPLOSION);
             }).Schedule(6500ms, [this](TaskContext /*context*/)
@@ -72,7 +70,7 @@ struct boss_talon_king_ikiss : public BossAI
         });
 
         ScheduleHealthCheckEvent(20, [&] {
-            DoCast(me, SPELL_MANA_SHIELD);
+            DoCastSelf(SPELL_MANA_SHIELD);
         });
     }
 
@@ -89,7 +87,6 @@ struct boss_talon_king_ikiss : public BossAI
             Talk(SAY_INTRO);
             _spoken = true;
         }
-
         ScriptedAI::MoveInLineOfSight(who);
     }
 
@@ -97,7 +94,6 @@ struct boss_talon_king_ikiss : public BossAI
     {
         _JustEngagedWith();
         Talk(SAY_AGGRO);
-
         scheduler.Schedule(5s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_ARCANE_VOLLEY);
@@ -114,7 +110,6 @@ struct boss_talon_king_ikiss : public BossAI
             }
             context.Repeat(15s, 17500ms);
         });
-
         if (IsHeroic())
         {
             scheduler.Schedule(15s, 25s, [this](TaskContext context)
@@ -129,17 +124,18 @@ struct boss_talon_king_ikiss : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
-
         if (GameObject* coffer = instance->GetGameObject(DATA_GO_TALON_KING_COFFER))
         {
             coffer->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE | GO_FLAG_INTERACT_COND);
         }
     }
 
-    void KilledUnit(Unit* /*victim*/) override
+    void KilledUnit(Unit* victim) override
     {
-        if (urand(0, 1))
+        if (victim->IsPlayer() && urand(0, 1))
+        {
             Talk(SAY_SLAY);
+        }
     }
 
 private:

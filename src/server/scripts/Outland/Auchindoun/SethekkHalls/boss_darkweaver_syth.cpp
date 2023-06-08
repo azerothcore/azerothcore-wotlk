@@ -19,30 +19,25 @@
 #include "ScriptedCreature.h"
 #include "sethekk_halls.h"
 
-enum Spells
-{
-    SPELL_FLAME_SHOCK_N         = 15039,
-    SPELL_FLAME_SHOCK_H         = 15616,
-    SPELL_ARCANE_SHOCK_N        = 33534,
-    SPELL_ARCANE_SHOCK_H        = 38135,
-    SPELL_FROST_SHOCK_N         = 12548,
-    SPELL_FROST_SHOCK_H         = 21401,
-    SPELL_SHADOW_SHOCK_N        = 33620,
-    SPELL_SHADOW_SHOCK_H        = 38137,
-    SPELL_CHAIN_LIGHTNING_N     = 15659,
-    SPELL_CHAIN_LIGHTNING_H     = 15305,
-    SPELL_SUMMON_ARC_ELE        = 33538,
-    SPELL_SUMMON_FIRE_ELE       = 33537,
-    SPELL_SUMMON_FROST_ELE      = 33539,
-    SPELL_SUMMON_SHADOW_ELE     = 33540
-};
-
 enum Text
 {
     SAY_SUMMON                  = 0,
     SAY_AGGRO                   = 1,
     SAY_SLAY                    = 2,
     SAY_DEATH                   = 3
+};
+
+enum Spells
+{
+    SPELL_FLAME_SHOCK           = 15039,
+    SPELL_ARCANE_SHOCK          = 33534,
+    SPELL_FROST_SHOCK           = 12548,
+    SPELL_SHADOW_SHOCK          = 33620,
+    SPELL_CHAIN_LIGHTNING       = 15659,
+    SPELL_SUMMON_ARC_ELE        = 33538,
+    SPELL_SUMMON_FIRE_ELE       = 33537,
+    SPELL_SUMMON_FROST_ELE      = 33539,
+    SPELL_SUMMON_SHADOW_ELE     = 33540
 };
 
 struct boss_darkweaver_syth : public BossAI
@@ -58,7 +53,6 @@ struct boss_darkweaver_syth : public BossAI
     void Reset() override
     {
         _Reset();
-
         ScheduleHealthCheckEvent({90, 50, 10}, [&] {
             Talk(SAY_SUMMON);
             DoCastSelf(SPELL_SUMMON_ARC_ELE);
@@ -72,26 +66,25 @@ struct boss_darkweaver_syth : public BossAI
     {
         _JustEngagedWith();
         Talk(SAY_AGGRO);
-
         scheduler.Schedule(2s, [this](TaskContext context)
         {
-            DoCastRandomTarget(DUNGEON_MODE(SPELL_FLAME_SHOCK_N, SPELL_FLAME_SHOCK_H));
+            DoCastRandomTarget(SPELL_FLAME_SHOCK);
             context.Repeat(10s, 15s);
         }).Schedule(4s, [this](TaskContext context)
         {
-            DoCastRandomTarget(DUNGEON_MODE(SPELL_ARCANE_SHOCK_N, SPELL_ARCANE_SHOCK_H));
+            DoCastRandomTarget(SPELL_ARCANE_SHOCK);
             context.Repeat(10s, 15s);
         }).Schedule(6s, [this](TaskContext context)
         {
-            DoCastRandomTarget(DUNGEON_MODE(SPELL_FROST_SHOCK_N, SPELL_FROST_SHOCK_H));
+            DoCastRandomTarget(SPELL_FROST_SHOCK);
             context.Repeat(10s, 15s);
         }).Schedule(8s, [this](TaskContext context)
         {
-            DoCastRandomTarget(DUNGEON_MODE(SPELL_SHADOW_SHOCK_N, SPELL_SHADOW_SHOCK_H));
+            DoCastRandomTarget(SPELL_SHADOW_SHOCK);
             context.Repeat(10s, 15s);
         }).Schedule(15s, [this](TaskContext context)
         {
-            DoCastRandomTarget(DUNGEON_MODE(SPELL_CHAIN_LIGHTNING_N, SPELL_CHAIN_LIGHTNING_H));
+            DoCastRandomTarget(SPELL_CHAIN_LIGHTNING);
             context.Repeat(10s, 15s);
         });
     }
@@ -99,13 +92,15 @@ struct boss_darkweaver_syth : public BossAI
     void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
-
         Talk(SAY_DEATH);
     }
 
-    void KilledUnit(Unit* /*victim*/) override
+    void KilledUnit(Unit* victim) override
     {
-        Talk(SAY_SLAY);
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+        {
+            Talk(SAY_SLAY);
+        }
     }
 };
 
