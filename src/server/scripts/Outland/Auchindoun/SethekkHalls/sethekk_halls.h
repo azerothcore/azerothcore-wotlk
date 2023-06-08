@@ -48,10 +48,6 @@ enum eIds
 {
     NPC_VOICE_OF_THE_RAVEN_GOD  = 21851,
     NPC_ANZU                    = 23035,
-    NPC_BROOD_OF_ANZU           = 23132,
-    NPC_HAWK_SPIRIT             = 23134,
-    NPC_FALCON_SPIRIT           = 23135,
-    NPC_EAGLE_SPIRIT            = 23136,
 
     GO_IKISS_DOOR               = 183398,
     GO_THE_TALON_KINGS_COFFER   = 187372
