@@ -1,1 +1,0 @@
-UPDATE `creature` SET `MovementType` = 1 WHERE `guid` IN (6974,6989,7210); -- correcting MovementType for creatures Dustbelcher Mauler, Dustbelcher Wyrmhunter, and Dustbelcher Shaman
