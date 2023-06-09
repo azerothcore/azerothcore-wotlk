@@ -34,6 +34,11 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+//npcbot: try query bot name
+#include "CreatureData.h"
+#include "botmgr.h"
+//end npcbot
+
 class Aura;
 
 /* differeces from off:
@@ -986,6 +991,21 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: Received CMSG_REQUEST_PARTY_MEMBER_STATS");
     ObjectGuid Guid;
     recvData >> Guid;
+
+    //npcbot: try send bot group member info
+    if (Guid.IsCreature())
+    {
+        uint32 creatureId = Guid.GetEntry();
+        CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(creatureId);
+        if (creatureTemplate && creatureTemplate->IsNPCBot())
+        {
+            WorldPacket bpdata(SMSG_PARTY_MEMBER_STATS_FULL, 4+2+2+2+1+2*6+8+1+8);
+            BotMgr::BuildBotPartyMemberStatsPacket(Guid, &bpdata);
+            SendPacket(&bpdata);
+            return;
+        }
+    }
+    //end npcbot
 
     Player* player = HashMapHolder<Player>::Find(Guid);
     if (!player)

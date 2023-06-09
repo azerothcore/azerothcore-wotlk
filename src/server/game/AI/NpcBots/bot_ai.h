@@ -479,8 +479,6 @@ class bot_ai : public CreatureAI
         void BotJumpInPlaceInFrontOf(Position const* pos, float speedXY, float maxHeight);
         void DismountBot();
 
-        void BuildGrouUpdatePacket(WorldPacket* data);
-
         void BotSay(const std::string &text, Player const* target = nullptr) const;
         void BotWhisper(const std::string &text, Player const* target = nullptr) const;
         void BotYell(const std::string &text, Player const* target = nullptr) const;

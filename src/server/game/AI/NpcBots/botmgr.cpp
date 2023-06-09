@@ -27,6 +27,7 @@
 #include "SpellAuraEffects.h"
 #include "Tokenize.h"
 #include "Transport.h"
+#include "Vehicle.h"
 #include "World.h"
 /*
 Npc Bot Manager by Trickerer (onlysuffering@gmail.com)
@@ -1699,14 +1700,80 @@ uint8 BotMgr::BotClassByClassName(std::string const& className)
     return BOT_CLASS_NONE;
 }
 
+uint8 BotMgr::GetBotPlayerClass(uint8 bot_class)
+{
+    if (bot_class >= BOT_CLASS_EX_START)
+    {
+        switch (bot_class)
+        {
+            case BOT_CLASS_BM:
+                return BOT_CLASS_WARRIOR;
+            case BOT_CLASS_SPHYNX:
+                return BOT_CLASS_WARLOCK;
+            case BOT_CLASS_ARCHMAGE:
+                return BOT_CLASS_MAGE;
+            case BOT_CLASS_DREADLORD:
+                return BOT_CLASS_WARLOCK;
+            case BOT_CLASS_SPELLBREAKER:
+                return BOT_CLASS_PALADIN;
+            case BOT_CLASS_DARK_RANGER:
+                return BOT_CLASS_HUNTER;
+            case BOT_CLASS_NECROMANCER:
+                return BOT_CLASS_WARLOCK;
+            case BOT_CLASS_SEA_WITCH:
+                return BOT_CLASS_MAGE;
+            case BOT_CLASS_CRYPT_LORD:
+                return BOT_CLASS_WARRIOR;
+            default:
+                LOG_ERROR("npcbots", "GetPlayerClass: unknown Ex bot class {}!", bot_class);
+                return BOT_CLASS_PALADIN;
+        }
+    }
+
+    return bot_class;
+}
+
+uint8 BotMgr::GetBotPlayerRace(uint8 bot_class, uint8 bot_race)
+{
+    if (bot_class >= BOT_CLASS_EX_START)
+    {
+        switch (bot_class)
+        {
+            case BOT_CLASS_BM:
+                return RACE_ORC;
+            case BOT_CLASS_SPHYNX:
+                return RACE_UNDEAD_PLAYER;
+            case BOT_CLASS_ARCHMAGE:
+                return RACE_HUMAN;
+            case BOT_CLASS_DREADLORD:
+                return RACE_UNDEAD_PLAYER;
+            case BOT_CLASS_SPELLBREAKER:
+                return RACE_BLOODELF;
+            case BOT_CLASS_DARK_RANGER:
+                return RACE_BLOODELF;
+            case BOT_CLASS_NECROMANCER:
+                return RACE_HUMAN;
+            case BOT_CLASS_SEA_WITCH:
+                return RACE_TROLL;
+            case BOT_CLASS_CRYPT_LORD:
+                return RACE_UNDEAD_PLAYER;
+            default:
+                LOG_ERROR("npcbots", "GetBotPlayerRace: unknown Ex bot class {}!", bot_class);
+                return RACE_HUMAN;
+        }
+    }
+
+    return bot_race;
+}
+
 uint8 BotMgr::GetBotPlayerClass(Creature const* bot)
 {
-    return bot->GetBotAI()->GetPlayerClass();
+    return GetBotPlayerClass(bot->GetBotAI()->GetBotClass());
 }
 
 uint8 BotMgr::GetBotPlayerRace(Creature const* bot)
 {
-    return bot->GetBotAI()->GetPlayerRace();
+    return GetBotPlayerRace(bot->GetBotAI()->GetBotClass(), bot->GetRace());
 }
 
 std::string BotMgr::GetTargetIconString(uint8 icon) const
@@ -1819,6 +1886,121 @@ void BotMgr::UpdatePvPForBots()
         if (itr->second->GetBotsPet())
             itr->second->GetBotsPet()->SetByteValue(UNIT_FIELD_BYTES_2, 1, _owner->GetByteValue(UNIT_FIELD_BYTES_2, 1));
     }
+}
+
+void BotMgr::BuildBotPartyMemberStatsPacket(ObjectGuid bot_guid, WorldPacket* data)
+{
+    Creature const* bot = BotDataMgr::FindBot(bot_guid.GetEntry());
+    if (!bot)
+    {
+        *data << uint8(0);
+        *data << bot_guid.WriteAsPacked();
+        *data << uint32(GROUP_UPDATE_FLAG_STATUS);
+        *data << uint16(MEMBER_STATUS_OFFLINE);
+        return;
+    }
+
+    Creature const* pet = nullptr; //bot->GetBotAI()->GetBotsPet();
+    Powers powerType = bot->GetPowerType();
+
+    *data << uint8(0);                                       // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
+    *data << bot->GetPackGUID();
+
+    uint32 updateFlags = GROUP_UPDATE_FLAG_STATUS | GROUP_UPDATE_FLAG_CUR_HP | GROUP_UPDATE_FLAG_MAX_HP
+                      | GROUP_UPDATE_FLAG_CUR_POWER | GROUP_UPDATE_FLAG_MAX_POWER | GROUP_UPDATE_FLAG_LEVEL
+                      | GROUP_UPDATE_FLAG_ZONE | GROUP_UPDATE_FLAG_POSITION | GROUP_UPDATE_FLAG_AURAS
+                      | GROUP_UPDATE_FLAG_PET_NAME | GROUP_UPDATE_FLAG_PET_MODEL_ID | GROUP_UPDATE_FLAG_PET_AURAS;
+
+    if (powerType != POWER_MANA)
+        updateFlags |= GROUP_UPDATE_FLAG_POWER_TYPE;
+
+    if (pet)
+        updateFlags |= GROUP_UPDATE_FLAG_PET_GUID | GROUP_UPDATE_FLAG_PET_CUR_HP | GROUP_UPDATE_FLAG_PET_MAX_HP
+                    | GROUP_UPDATE_FLAG_PET_POWER_TYPE | GROUP_UPDATE_FLAG_PET_CUR_POWER | GROUP_UPDATE_FLAG_PET_MAX_POWER;
+
+    if (bot->GetVehicle())
+        updateFlags |= GROUP_UPDATE_FLAG_VEHICLE_SEAT;
+
+    uint16 playerStatus = MEMBER_STATUS_ONLINE;
+    if (bot->IsPvP())
+        playerStatus |= MEMBER_STATUS_PVP;
+
+    if (!bot->IsAlive())
+        playerStatus |= MEMBER_STATUS_DEAD;
+
+    if (bot->IsFFAPvP())
+        playerStatus |= MEMBER_STATUS_PVP_FFA;
+
+    *data << uint32(updateFlags);
+    *data << uint16(playerStatus);                           // GROUP_UPDATE_FLAG_STATUS
+    *data << uint32(bot->GetHealth());                    // GROUP_UPDATE_FLAG_CUR_HP
+    *data << uint32(bot->GetMaxHealth());                 // GROUP_UPDATE_FLAG_MAX_HP
+    if (updateFlags & GROUP_UPDATE_FLAG_POWER_TYPE)
+        *data << uint8(powerType);
+
+    *data << uint16(bot->GetPower(powerType));            // GROUP_UPDATE_FLAG_CUR_POWER
+    *data << uint16(bot->GetMaxPower(powerType));         // GROUP_UPDATE_FLAG_MAX_POWER
+    *data << uint16(bot->GetLevel());                     // GROUP_UPDATE_FLAG_LEVEL
+    *data << uint16(bot->GetZoneId());                    // GROUP_UPDATE_FLAG_ZONE
+    *data << uint16(bot->GetPositionX());                 // GROUP_UPDATE_FLAG_POSITION
+    *data << uint16(bot->GetPositionY());                 // GROUP_UPDATE_FLAG_POSITION
+
+    uint64 auraMask = 0;
+    size_t maskPos = data->wpos();
+    *data << uint64(auraMask);                               // placeholder
+    for (uint8 i = 0; i < MAX_AURAS_GROUP_UPDATE; ++i)
+    {
+        if (AuraApplication const* aurApp = const_cast<Creature*>(bot)->GetVisibleAura(i))
+        {
+            auraMask |= uint64(1) << i;
+            *data << uint32(aurApp->GetBase()->GetId());
+            *data << uint8(aurApp->GetFlags());
+        }
+    }
+
+    data->put<uint64>(maskPos, auraMask);                    // GROUP_UPDATE_FLAG_AURAS
+
+    if (updateFlags & GROUP_UPDATE_FLAG_PET_GUID)
+        *data << pet->GetGUID();
+
+    *data << std::string(pet ? pet->GetName() : "");         // GROUP_UPDATE_FLAG_PET_NAME
+    *data << uint16(pet ? pet->GetDisplayId() : 0);          // GROUP_UPDATE_FLAG_PET_MODEL_ID
+
+    if (updateFlags & GROUP_UPDATE_FLAG_PET_CUR_HP)
+        *data << uint32(pet->GetHealth());
+
+    if (updateFlags & GROUP_UPDATE_FLAG_PET_MAX_HP)
+        *data << uint32(pet->GetMaxHealth());
+
+    if (updateFlags & GROUP_UPDATE_FLAG_PET_POWER_TYPE)
+        *data << (uint8)pet->GetPowerType();
+
+    if (updateFlags & GROUP_UPDATE_FLAG_PET_CUR_POWER)
+        *data << uint16(pet->GetPower(pet->GetPowerType()));
+
+    if (updateFlags & GROUP_UPDATE_FLAG_PET_MAX_POWER)
+        *data << uint16(pet->GetMaxPower(pet->GetPowerType()));
+
+    uint64 petAuraMask = 0;
+    maskPos = data->wpos();
+    *data << uint64(petAuraMask);                            // placeholder
+    if (pet)
+    {
+        for (uint8 i = 0; i < MAX_AURAS_GROUP_UPDATE; ++i)
+        {
+            if (AuraApplication const* aurApp = const_cast<Creature*>(pet)->GetVisibleAura(i))
+            {
+                petAuraMask |= uint64(1) << i;
+                *data << uint32(aurApp->GetBase()->GetId());
+                *data << uint8(aurApp->GetFlags());
+            }
+        }
+    }
+
+    data->put<uint64>(maskPos, petAuraMask);                 // GROUP_UPDATE_FLAG_PET_AURAS
+
+    if (updateFlags & GROUP_UPDATE_FLAG_VEHICLE_SEAT)
+        *data << uint32(bot->GetVehicle()->GetVehicleInfo()->m_seatID[bot->m_movementInfo.transport.seat]);
 }
 
 void BotMgr::PropagateEngageTimers() const
