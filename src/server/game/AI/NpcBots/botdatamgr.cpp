@@ -63,6 +63,13 @@ static uint32 next_wandering_bot_spawn_delay = 0;
 
 static EventProcessor botDataEvents;
 
+bool BotBankItemCompare::operator()(Item const* item1, Item const* item2) const
+{
+    ItemTemplate const* proto1 = item1->GetTemplate();
+    ItemTemplate const* proto2 = item2->GetTemplate();
+    return proto1->Name1 < proto2->Name1;
+}
+
 class BotBattlegroundEnterEvent : public BasicEvent
 {
     const ObjectGuid _playerGUID;
@@ -939,7 +946,7 @@ void BotDataMgr::LoadNpcBotGearStorage()
         ObjectGuid player_guid = ObjectGuid::Create<HighGuid::Player>(player_guidlow);
         ASSERT(item->LoadFromDB(item_guidlow, player_guid, fields, item_id), "LoadNpcBotGearStorage(): unable to load item {} id {}! Owner: {}", item_guidlow, item_id, player_guid.ToString().c_str());
 
-        _botStoredGearMap[player_guid].push_back(item);
+        _botStoredGearMap[player_guid].insert(item);
         player_guids.insert(player_guidlow);
         ++count;
 
@@ -2647,7 +2654,7 @@ Item* BotDataMgr::WithdrawBotBankItem(ObjectGuid playerGuid, ObjectGuid::LowType
 
 void BotDataMgr::DepositBotBankItem(ObjectGuid playerGuid, Item* item)
 {
-    _botStoredGearMap[playerGuid].push_back(item);
+    _botStoredGearMap[playerGuid].insert(item);
 }
 
 void BotDataMgr::SaveNpcBotStoredGear(ObjectGuid playerGuid, CharacterDatabaseTransaction trans)

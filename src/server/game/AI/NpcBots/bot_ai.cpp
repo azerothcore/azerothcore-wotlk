@@ -9308,9 +9308,12 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
 
             subMenu = true;
 
-            for (size_t i = page * items_per_page; i < botBankItems->size() && counter < items_per_page; ++i)
+            BotBankItemContainer::const_iterator bcit = botBankItems->cbegin();
+            size_t i = 0;
+            for (; i < page * items_per_page && i < botBankItems->size(); ++i, ++bcit);
+            for (; i < botBankItems->size() && counter < items_per_page; ++i, ++bcit)
             {
-                Item const* item = botBankItems->at(i);
+                Item const* item = *bcit;
                 ++counter;
                 std::ostringstream name;
                 _AddItemLink(player, item, name);

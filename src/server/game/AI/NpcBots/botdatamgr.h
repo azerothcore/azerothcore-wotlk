@@ -143,7 +143,9 @@ public:
 };
 
 typedef std::set<Creature const*> NpcBotRegistry;
-typedef std::vector<Item*> BotBankItemContainer;
+
+struct BotBankItemCompare{ bool operator()(Item const* item1, Item const* item2) const; };
+typedef std::set<Item*, BotBankItemCompare> BotBankItemContainer;
 
 class BotDataMgr
 {
