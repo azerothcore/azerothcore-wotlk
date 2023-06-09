@@ -125,11 +125,12 @@ struct boss_murmur : public BossAI
 
     void JustEngagedWith(Unit* who) override
     {
-        if (!who->IsInCombatWith(me))
+        // Boss engages mobs during roleplay, this checks prevents it from setting the zone in combat before players engage it.
+        if (who->IsPlayer() || who->IsPet() || who->IsGuardian())
         {
-            return;
+            _JustEngagedWith();
         }
-        _JustEngagedWith();
+
         scheduler.Schedule(28s, [this](TaskContext context)
         {
             Talk(EMOTE_SONIC_BOOM);
@@ -186,6 +187,7 @@ struct boss_murmur : public BossAI
                 context.Repeat(3650ms, 9150ms);
             });
         }
+
         me->m_Events.CancelEventGroup(GROUP_OOC_CAST);
     }
 };
