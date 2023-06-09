@@ -1168,6 +1168,15 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
             bot->BotStopMovement();
             bot->GetBotAI()->UnsummonAll();
 
+            if (mymap != newMap)
+            {
+                bot->RemoveAurasByType(SPELL_AURA_MOD_STUN);
+                bot->RemoveAurasByType(SPELL_AURA_MOD_FEAR);
+                bot->RemoveAurasByType(SPELL_AURA_MOD_CONFUSE);
+                bot->RemoveAurasByType(SPELL_AURA_MOD_ROOT);
+                bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
+            }
+
             bot->InterruptNonMeleeSpells(true);
 
             if (bot->IsInWorld())
