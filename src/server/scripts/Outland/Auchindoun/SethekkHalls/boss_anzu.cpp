@@ -20,23 +20,25 @@
 #include "SpellScript.h"
 #include "sethekk_halls.h"
 
-enum Anzu
+enum Text
 {
     SAY_ANZU_INTRO1             = 0,
     SAY_ANZU_INTRO2             = 1,
-    SAY_SUMMON                  = 2,
+    SAY_SUMMON                  = 2
+};
 
+enum Spells
+{
     SPELL_PARALYZING_SCREECH    = 40184,
     SPELL_SPELL_BOMB            = 40303,
     SPELL_CYCLONE               = 40321,
     SPELL_BANISH_SELF           = 42354,
-    SPELL_SHADOWFORM            = 40973,
+    SPELL_SHADOWFORM            = 40973
+};
 
-    EVENT_SPELL_SCREECH         = 1,
-    EVENT_SPELL_BOMB            = 2,
-    EVENT_SPELL_CYCLONE         = 3,
-    EVENT_ANZU_HEALTH1          = 4,
-    EVENT_ANZU_HEALTH2          = 5
+enum Npc
+{
+    NPC_BROOD_OF_ANZU           = 23132
 };
 
 struct boss_anzu : public BossAI
@@ -46,6 +48,10 @@ struct boss_anzu : public BossAI
         talkTimer = 1;
         me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
         me->AddAura(SPELL_SHADOWFORM, me);
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     uint32 talkTimer;
@@ -55,18 +61,45 @@ struct boss_anzu : public BossAI
         summons.Despawn(summon);
         summons.RemoveNotExisting();
         if (summons.empty())
+        {
             me->RemoveAurasDueToSpell(SPELL_BANISH_SELF);
+        }
+    }
+
+    void Reset() override
+    {
+        _Reset();
+        ScheduleHealthCheckEvent({ 66, 33 }, [&] {
+            SummonBroods();
+            scheduler.DelayAll(10s);
+        });
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
-        events.Reset();
-        events.ScheduleEvent(EVENT_SPELL_SCREECH, 14000);
-        events.ScheduleEvent(EVENT_SPELL_BOMB, 5000);
-        events.ScheduleEvent(EVENT_SPELL_CYCLONE, 8000);
-        events.ScheduleEvent(EVENT_ANZU_HEALTH1, 2000);
-        events.ScheduleEvent(EVENT_ANZU_HEALTH2, 2001);
+        scheduler.Schedule(14s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_PARALYZING_SCREECH);
+            context.Repeat(23s);
+            scheduler.DelayAll(3s);
+        }).Schedule(5s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
+            {
+                DoCast(target, SPELL_SPELL_BOMB);
+            }
+            context.Repeat(16s, 24500ms);
+            scheduler.DelayAll(3s);
+        }).Schedule(8s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 45.0f, true))
+            {
+                DoCast(target, SPELL_CYCLONE);
+            }
+            context.Repeat(22s, 27s);
+            scheduler.DelayAll(3s);
+        });
     }
 
     void SummonBroods()
@@ -74,7 +107,9 @@ struct boss_anzu : public BossAI
         Talk(SAY_SUMMON);
         me->CastSpell(me, SPELL_BANISH_SELF, true);
         for (uint8 i = 0; i < 5; ++i)
-            me->SummonCreature(23132 /*NPC_BROOD_OF_ANZU*/, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * std::sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+        {
+            me->SummonCreature(NPC_BROOD_OF_ANZU, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * std::sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -99,48 +134,9 @@ struct boss_anzu : public BossAI
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
+        scheduler.Update(diff);
         if (me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
             return;
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SPELL_SCREECH:
-            me->CastSpell(me, SPELL_PARALYZING_SCREECH, false);
-            events.RepeatEvent(23000);
-            events.DelayEvents(3000);
-            break;
-        case EVENT_SPELL_BOMB:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                me->CastSpell(target, SPELL_SPELL_BOMB, false);
-            events.RepeatEvent(urand(16000, 24500));
-            events.DelayEvents(3000);
-            break;
-        case EVENT_SPELL_CYCLONE:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 45.0f, true))
-                me->CastSpell(target, SPELL_CYCLONE, false);
-            events.RepeatEvent(urand(22000, 27000));
-            events.DelayEvents(3000);
-            break;
-        case EVENT_ANZU_HEALTH1:
-            if (me->HealthBelowPct(66))
-            {
-                SummonBroods();
-                events.DelayEvents(10000);
-                return;
-            }
-            events.RepeatEvent(1000);
-            break;
-        case EVENT_ANZU_HEALTH2:
-            if (me->HealthBelowPct(33))
-            {
-                SummonBroods();
-                events.DelayEvents(10000);
-                return;
-            }
-            events.RepeatEvent(1000);
-            break;
-        }
 
         DoMeleeAttackIfReady();
     }
