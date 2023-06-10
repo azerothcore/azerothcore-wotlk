@@ -196,6 +196,7 @@ public:
     bool Create(Creature* leader);
     bool AddMember(Creature* creature);
     void LoadCreatureMemberFromDB(uint32 entry, uint8 memberFlags, uint8 subgroup, uint8 roles);
+    void UpdateBotOutOfRange(Creature* creature);
     //end npcbot
     bool   AddInvite(Player* player);
     void   RemoveInvite(Player* player);

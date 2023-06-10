@@ -34,6 +34,7 @@ class Aura;
 class Battleground;
 class DamageInfo;
 class GameObject;
+class Group;
 class Item;
 class Spell;
 class SpellCastTargets;
@@ -105,7 +106,7 @@ class bot_ai : public CreatureAI
         void CheckOwnerExpiry();
         uint8 GetBotClass() const { return _botclass; }
         uint32 GetLastDiff() const { return lastdiff; }
-        virtual void UpdateDeadAI(uint32 /*diff*/) {}
+        virtual void UpdateDeadAI(uint32 diff);
         void ReturnHome() { _atHome = false; }
         void CommonTimers(uint32 diff);
         void ResetBotAI(uint8 resetType);
@@ -166,6 +167,16 @@ class bot_ai : public CreatureAI
         void SetWanderer();
         WanderNode const* GetNextTravelNode(Position const* from, bool random) const;
         void OnWanderNodeReached();
+
+        Group* GetGroup() const { return _group; }
+        void SetGroup(Group* group) { _group = group; }
+        void SetGroupUpdateFlag(uint32 flag) { _groupUpdateMask |= flag; }
+        uint32 GetGroupUpdateFlag() const { return _groupUpdateMask; }
+        uint64 GetAuraUpdateMaskForRaid() const { return _auraRaidUpdateMask; }
+        void SetAuraUpdateMaskForRaid(uint8 slot) { _auraRaidUpdateMask |= (uint64(1) << slot); }
+        void ResetAuraUpdateMaskForRaid() { _auraRaidUpdateMask = 0; }
+        void SendUpdateToOutOfRangeBotGroupMembers();
+
         Battleground* GetBG() const { return _bg; }
         void SetBG(Battleground* bg) { _bg = bg; }
 
@@ -655,6 +666,7 @@ class bot_ai : public CreatureAI
         uint32 indoorsTimer;
         uint32 outdoorsTimer;
         uint32 _contestedPvPTimer;
+        uint32 _groupUpdateTimer;
         //save timers
         uint32 _saveDisabledSpellsTimer;
 
@@ -678,6 +690,10 @@ class bot_ai : public CreatureAI
         uint8 _baseLevel;
         WanderNode const* _travel_node_last;
         WanderNode const* _travel_node_cur;
+
+        uint32 _groupUpdateMask;
+        uint64 _auraRaidUpdateMask;
+        Group* _group;
         Battleground* _bg;
 
         float _energyFraction;

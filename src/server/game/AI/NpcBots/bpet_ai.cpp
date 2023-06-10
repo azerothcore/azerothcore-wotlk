@@ -92,6 +92,8 @@ bot_pet_ai::bot_pet_ai(Creature* creature) : CreatureAI(creature)
 
     _wanderer = false;
 
+    _auraRaidUpdateMask = 0;
+
     myType = 0;
     petOwner = nullptr;
     canUpdate = true;
@@ -2267,6 +2269,9 @@ void bot_pet_ai::IsSummonedBy(WorldObject* summoner)
         me->Relocate(bot_ai::GetAbsoluteTransportPosition(petOwner));
         me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
     }
+    //Send group update if not a minion
+    if (petOwner->GetBotAI()->GetBotsPet() == me && petOwner->GetBotAI()->GetGroup())
+        BotMgr::SetBotGroupUpdateFlag(petOwner, GROUP_UPDATE_PET);
 }
 //This function is called after Spell::SendSpellCooldown() and Spell::DoAllEffects...() call
 void bot_pet_ai::OnBotPetSpellGo(Spell const* spell, bool ok)

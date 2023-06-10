@@ -9,6 +9,7 @@
 class Battleground;
 class Creature;
 class GameObject;
+class Group;
 class Map;
 class Player;
 class Spell;
@@ -254,7 +255,17 @@ class AC_GAME_API BotMgr
         void SetBotsShouldUpdateStats();
         void UpdatePhaseForBots();
         void UpdatePvPForBots();
+
         static void BuildBotPartyMemberStatsPacket(ObjectGuid bot_guid, WorldPacket* data);
+        static void BuildBotPartyMemberStatsChangedPacket(Creature const* bot, WorldPacket* data);
+        //static uint32 GetBotGroupUpdateFlag(Creature const* bot);
+        static void SetBotGroupUpdateFlag(Creature const* bot, uint32 flag);
+        static uint64 GetBotAuraUpdateMaskForRaid(Creature const* bot);
+        static void SetBotAuraUpdateMaskForRaid(Creature const* bot, uint8 slot);
+        static void ResetBotAuraUpdateMaskForRaid(Creature const* bot);
+        static uint64 GetBotPetAuraUpdateMaskForRaid(Creature const* botpet);
+        static void SetBotPetAuraUpdateMaskForRaid(Creature const* botpet, uint8 slot);
+        static void ResetBotPetAuraUpdateMaskForRaid(Creature const* botpet);
 
         void TrackDamage(Unit const* u, uint32 damage);
         uint32 GetDPSTaken(Unit const* u) const;
@@ -272,6 +283,10 @@ class AC_GAME_API BotMgr
         void UpdateTargetIconName(uint8 id, std::string const& name);
         void ResetTargetIconNames();
 
+        static Group* GetBotGroup(Creature const* bot);
+        static void SetBotGroup(Creature const* bot, Group* group);
+        static void SetBotGroup(ObjectGuid botguid, Group* group);
+        static void SetBotGroup(ObjectGuid::LowType bot_id, Group* group);
         static void InviteBotToBG(ObjectGuid botguid, GroupQueueInfo* ginfo, Battleground* bg);
 
         static bool IsBotInAreaTriggerRadius(Creature const* bot, AreaTrigger const* trigger);

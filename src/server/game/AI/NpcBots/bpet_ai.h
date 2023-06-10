@@ -59,6 +59,10 @@ class bot_pet_ai : public CreatureAI
         bool IsWanderer() const { return _wanderer; }
         void SetWanderer() { if (IAmFree()) _wanderer = true; }
 
+        uint64 GetAuraUpdateMaskForRaid() const { return _auraRaidUpdateMask; }
+        void SetAuraUpdateMaskForRaid(uint8 slot) { _auraRaidUpdateMask |= (uint64(1) << slot); }
+        void ResetAuraUpdateMaskForRaid() { _auraRaidUpdateMask = 0; }
+
         static bool CCed(Unit const* target, bool root = false);
 
         inline void SetShouldUpdateStats() { shouldUpdateStats = true; }
@@ -167,6 +171,8 @@ class bot_pet_ai : public CreatureAI
 
         //wandering bots
         bool _wanderer;
+
+        uint64 _auraRaidUpdateMask;
 
         float _energyFraction;
 

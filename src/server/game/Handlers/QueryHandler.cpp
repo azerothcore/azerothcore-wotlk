@@ -28,7 +28,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-//npcbot: try query bot name
+//npcbot
 #include "CreatureData.h"
 #include "botdatamgr.h"
 #include "botmgr.h"
@@ -44,6 +44,7 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
         if (creatureTemplate && creatureTemplate->IsNPCBot())
         {
             NpcBotExtras const* extData = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(creatureId));
+            NpcBotAppearanceData const* appData = BotDataMgr::SelectNpcBotAppearance(creatureId);
 
             WorldPacket bpdata(SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+10));
             bpdata << guid.WriteAsPacked();
@@ -51,8 +52,8 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
             bpdata << creatureTemplate->Name;
             bpdata << uint8(0);
             bpdata << uint8(BotMgr::GetBotPlayerRace(extData->bclass, extData->race));
-            bpdata << uint8(GENDER_NONE);
-            bpdata << uint8(extData->bclass);
+            bpdata << uint8(appData ? appData->gender : GENDER_MALE);
+            bpdata << uint8(BotMgr::GetBotPlayerClass(extData->bclass));
             bpdata << uint8(0);
             SendPacket(&bpdata);
             return;
