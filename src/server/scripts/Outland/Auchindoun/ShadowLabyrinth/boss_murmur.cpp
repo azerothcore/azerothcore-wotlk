@@ -20,10 +20,8 @@
 #include "SpellInfo.h"
 #include "shadow_labyrinth.h"
 
-enum Murmur
+enum Spells
 {
-    EMOTE_SONIC_BOOM            = 0,
-
     SPELL_SUPPRESSION               = 33332,
     SPELL_SHOCKWAVE                 = 33686,
     SPELL_SHOCKWAVE_SERVERSIDE      = 33673,
@@ -34,12 +32,14 @@ enum Murmur
     SPELL_MURMUR_WRATH_AOE          = 33329,
     SPELL_MURMUR_WRATH              = 33331,
 
-    SPELL_SONIC_BOOM_CAST_N         = 33923,
-    SPELL_SONIC_BOOM_CAST_H         = 38796,
-    SPELL_SONIC_BOOM_EFFECT_N       = 38795,
-    SPELL_SONIC_BOOM_EFFECT_H       = 33666,
-    SPELL_MURMURS_TOUCH_N           = 33711,
-    SPELL_MURMURS_TOUCH_H           = 38794,
+    SPELL_SONIC_BOOM_CAST           = 33923,
+    SPELL_SONIC_BOOM_EFFECT         = 38795,
+    SPELL_MURMURS_TOUCH             = 33711
+};
+
+enum Misc
+{
+    EMOTE_SONIC_BOOM                = 0,
 
     GROUP_RESONANCE                 = 1,
     GROUP_OOC_CAST                  = 2,
@@ -47,7 +47,7 @@ enum Murmur
     GUID_MURMUR_NPCS                = 1
 };
 
-enum Creatures
+enum Npc
 {
     NPC_CABAL_SPELLBINDER           = 18639
 };
@@ -57,7 +57,6 @@ struct boss_murmur : public BossAI
     boss_murmur(Creature* creature) : BossAI(creature, DATA_MURMUR)
     {
         SetCombatMovement(false);
-
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -75,7 +74,6 @@ struct boss_murmur : public BossAI
     void CastSupressionOOC()
     {
         me->m_Events.CancelEventGroup(GROUP_OOC_CAST);
-
         me->m_Events.AddEventAtOffset([this] {
             if (me->FindNearestCreature(NPC_CABAL_SPELLBINDER, 35.0f))
             {
@@ -106,13 +104,11 @@ struct boss_murmur : public BossAI
             {
                 return true;
             }
-
             if (Unit* victimTarget = victim->GetVictim())
             {
                 return victimTarget != me;
             }
         }
-
         return true;
     }
 
@@ -129,27 +125,26 @@ struct boss_murmur : public BossAI
 
     void JustEngagedWith(Unit* who) override
     {
-        if (!who->IsInCombatWith(me))
+        // Boss engages mobs during roleplay, this checks prevents it from setting the zone in combat before players engage it.
+        if (who->IsPlayer() || who->IsPet() || who->IsGuardian())
         {
-            return;
+            _JustEngagedWith();
         }
-
-        _JustEngagedWith();
 
         scheduler.Schedule(28s, [this](TaskContext context)
         {
             Talk(EMOTE_SONIC_BOOM);
-            DoCastAOE(DUNGEON_MODE(SPELL_SONIC_BOOM_CAST_N, SPELL_SONIC_BOOM_CAST_H));
+            DoCastAOE(SPELL_SONIC_BOOM_CAST);
 
             scheduler.Schedule(1500ms, [this](TaskContext)
             {
-                DoCastAOE(DUNGEON_MODE(SPELL_SONIC_BOOM_EFFECT_N, SPELL_SONIC_BOOM_EFFECT_H), true);
+                DoCastAOE(SPELL_SONIC_BOOM_EFFECT, true);
             });
 
             context.Repeat(34s, 40s);
         }).Schedule(14600ms, 25500ms, [this](TaskContext context)
         {
-            DoCastRandomTarget(DUNGEON_MODE(SPELL_MURMURS_TOUCH_N, SPELL_MURMURS_TOUCH_H));
+            DoCastRandomTarget(SPELL_MURMURS_TOUCH);
             context.Repeat(14600ms, 25500ms);
         }).Schedule(15s, 30s, [this](TaskContext context)
         {
@@ -177,7 +172,6 @@ struct boss_murmur : public BossAI
                     });
                 }
             }
-
             context.Repeat();
         });
 
