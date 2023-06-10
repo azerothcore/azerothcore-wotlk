@@ -145,7 +145,7 @@ public:
 typedef std::set<Creature const*> NpcBotRegistry;
 
 struct BotBankItemCompare{ bool operator()(Item const* item1, Item const* item2) const; };
-typedef std::set<Item*, BotBankItemCompare> BotBankItemContainer;
+typedef std::multiset<Item*, BotBankItemCompare> BotBankItemContainer;
 
 class BotDataMgr
 {
