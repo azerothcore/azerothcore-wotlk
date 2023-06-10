@@ -52,7 +52,7 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
             bpdata << creatureTemplate->Name;
             bpdata << uint8(0);
             bpdata << uint8(BotMgr::GetBotPlayerRace(extData->bclass, extData->race));
-            bpdata << uint8(appData ? appData->gender : GENDER_MALE);
+            bpdata << uint8(appData ? appData->gender : uint8(GENDER_MALE));
             bpdata << uint8(BotMgr::GetBotPlayerClass(extData->bclass));
             bpdata << uint8(0);
             SendPacket(&bpdata);
