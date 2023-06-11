@@ -251,6 +251,7 @@ public:
                 case NPC_INFINITE_VANQUISHER:
                 case NPC_INFINITE_VANQUISHER_2:
                 case NPC_DP_BEAM_STALKER:
+                case NPC_DP_EMITTER_STALKER:
                     _encounterNPCs.insert(creature->GetGUID());
                     break;
             }
@@ -295,6 +296,7 @@ public:
                 case NPC_INFINITE_EXECUTIONER_2:
                 case NPC_INFINITE_VANQUISHER:
                 case NPC_INFINITE_VANQUISHER_2:
+                case NPC_DP_EMITTER_STALKER:
                     _encounterNPCs.erase(creature->GetGUID());
                     break;
             }
