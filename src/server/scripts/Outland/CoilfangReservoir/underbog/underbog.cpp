@@ -41,7 +41,7 @@ struct npc_underbat : public ScriptedAI
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
             {
-                return u->IsAlive() && !u->IsPet() && me->IsWithinCombatRange(u, 5.f) && !me->HasInArc(M_PI, u);
+                return u->IsAlive() && !u->IsPet() && me->IsWithinCombatRange(u, 5.0f) && !me->HasInArc(M_PI, u);
             }))
             {
                 DoCast(target, SPELL_TENTACLE_LASH);
