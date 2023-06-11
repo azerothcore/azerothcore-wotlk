@@ -7497,9 +7497,9 @@ SpellCastResult Spell::CheckItems()
                     // Xinef: Apply item level restriction if the enchanting spell has max level restrition set
                     if (m_CastItem && m_spellInfo->MaxLevel > 0)
                     {
-                        if (item->GetTemplate()->ItemLevel < m_CastItem->GetTemplate()->RequiredLevel)
+                        if (item->GetTemplate()->RequiredLevel < m_CastItem->GetTemplate()->RequiredLevel)
                             return SPELL_FAILED_LOWLEVEL;
-                        if (item->GetTemplate()->ItemLevel > m_spellInfo->MaxLevel)
+                        if (item->GetTemplate()->RequiredLevel > m_spellInfo->MaxLevel)
                             return SPELL_FAILED_HIGHLEVEL;
                     }
 
