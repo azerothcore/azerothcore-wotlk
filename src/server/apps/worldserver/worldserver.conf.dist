@@ -4567,6 +4567,14 @@ NpcBot.WanderingBots.Continents.Count = 0
 NpcBot.WanderingBots.Continents.Levels = 25,15,15,10,5,10,20,0,0
 
 #
+#    NpcBot.WanderingBots.Continents.Maps
+#        Description: Continent map IDs where wandering bots are allowed to spawn.
+#        Note:        Wandering bots will never outlevel the map they are in.
+#        Default:     0,1,530,571 - (Eastern Kingdoms, Kalimdor, Outland, Northrend)
+
+NpcBot.WanderingBots.Continents.Maps = 0,1,530,571
+
+#
 #    NpcBot.WanderingBots.BG.Enable
 #        Description: Allow wandering bots generation for Battlegrounds.
 #        Note:        Bots are temporarily borrowed from non-spawned bots pool.

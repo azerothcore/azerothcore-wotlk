@@ -1007,6 +1007,7 @@ void BotDataMgr::LoadWanderMap(bool reload)
     std::map<uint32, bool> spawn_node_exists_h;
     std::map<uint32, bool> spawn_node_exists_n;
     std::unordered_map<uint32, std::pair<WanderNode*, std::vector<std::pair<std::string, std::string>>>> links_to_create;
+    uint32 disabled_nodes = 0;
     do
     {
         Field* fields = wres->Fetch();
@@ -1065,6 +1066,12 @@ void BotDataMgr::LoadWanderMap(bool reload)
             LOG_WARN("server.loading", "WP {} has conflicting flags {}+{}! Removing both...",
                 id, AsUnderlyingType(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY), AsUnderlyingType(BotWPFlags::BOTWP_FLAG_HORDE_ONLY));
             flags &= ~conflicting_flags_1;
+        }
+
+        if (mapEntry->IsContinent() && !BotMgr::IsBotGenerationEnabledWorldMapId(mapId))
+        {
+            ++disabled_nodes;
+            continue;
         }
 
         WanderNode* wp = new WanderNode(id, mapId, x, y, z, o, zoneId, areaId, name);
@@ -1159,15 +1166,17 @@ void BotDataMgr::LoadWanderMap(bool reload)
                 LOG_ERROR("server.loading", "WP {} map {} has link {} ON A DIFFERENT MAP {}!", vt.first, vt.second.first->GetMapId(), lid, lwp->GetMapId());
                 continue;
             }
+
+            bool is_continent = sMapStore.LookupEntry(vt.second.first->GetMapId())->IsContinent();
             float lwpdist2d = vt.second.first->GetExactDist2d(lwp);
             if (lwpdist2d > MAX_WANDER_NODE_DISTANCE)
                 LOG_WARN("server.loading", "Warning! Link distance between WP {} and {} is too great ({})", vt.first, lid, lwpdist2d);
-            if (lwpdist2d < MIN_WANDER_NODE_DISTANCE && !sMapStore.LookupEntry(vt.second.first->GetMapId())->IsBattlegroundOrArena())
+            if (lwpdist2d < MIN_WANDER_NODE_DISTANCE && is_continent)
                 LOG_WARN("server.loading", "Warning! Link distance between WP {} and {} is low ({})", vt.first, lid, lwpdist2d);
 
             vt.second.first->Link(lwp, true);
 
-            if (sMapStore.LookupEntry(vt.second.first->GetMapId())->IsContinent())
+            if (is_continent)
             {
                 float dist2d = vt.second.first->GetExactDist2d(lwp);
                 if (dist2d < mindist)
@@ -1218,8 +1227,8 @@ void BotDataMgr::LoadWanderMap(bool reload)
         }
     });
 
-    LOG_INFO("server.loading", ">> Loaded {} bot wander nodes on {} maps (total {} tops) in {} ms. Distances: min {}, max {}",
-        uint32(WanderNode::GetAllWPsCount()), uint32(WanderNode::GetWPMapsCount()), uint32(tops.size()), GetMSTimeDiffToNow(botoldMSTime), mindist, maxdist);
+    LOG_INFO("server.loading", ">> Loaded {} bot wander nodes on {} maps (total {} tops) in {} ms.",
+        uint32(WanderNode::GetAllWPsCount()), disabled_nodes, uint32(WanderNode::GetWPMapsCount()), uint32(tops.size()), GetMSTimeDiffToNow(botoldMSTime));
 }
 
 void BotDataMgr::GenerateWanderingBots()
