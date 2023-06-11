@@ -704,6 +704,8 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
         //npcbot: skip group size check before removing a bot
         if (guid.IsCreature())
         {
+            BotMgr::SetBotGroup(guid, nullptr);
+
             // Remove bot from group in DB
             if (!isBGGroup() && !isBFGroup())
             {
@@ -712,17 +714,13 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
                 stmt->SetData(0, guid.GetEntry());
                 CharacterDatabase.Execute(stmt);
             }
+
             // Update subgroups
             member_witerator slot = _getMemberWSlot(guid);
             if (slot != m_memberSlots.end())
             {
                 SubGroupCounterDecrease(slot->group);
                 m_memberSlots.erase(slot);
-
-                if (!isBGGroup() && !isBFGroup())
-                {
-                    sCharacterCache->ClearCharacterGroup(guid);
-                }
             }
 
             sScriptMgr->OnGroupRemoveMember(this, guid, method, kicker, reason);
