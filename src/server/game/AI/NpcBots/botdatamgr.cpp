@@ -305,7 +305,7 @@ private:
         }
         else
         {
-            bot_template.minlevel = std::min<uint32>(std::max<uint32>(desired_bracket * 10, 1), DEFAULT_MAX_LEVEL);
+            bot_template.minlevel = std::min<uint32>(std::max<uint32>(desired_bracket * 10, spawnLoc->GetLevels().first), DEFAULT_MAX_LEVEL);
             bot_template.maxlevel = std::min<uint32>(std::min<uint32>(desired_bracket * 10 + 9, spawnLoc->GetLevels().second), DEFAULT_MAX_LEVEL);
             bot_template.flags_extra &= ~(CREATURE_FLAG_EXTRA_NO_XP);
         }
