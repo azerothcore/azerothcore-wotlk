@@ -3600,7 +3600,7 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell, bool secondary) cons
     //    return false;
     if (target->CanHaveThreatList() && GetEngageTimer() > lastdiff)
         return false;
-    if (!BotMgr::IsPvPEnabled() && !IAmFree() && target->IsControlledByPlayer())
+    if (!BotMgr::IsPvPEnabled() && me->IsPvP() && target->IsControlledByPlayer())
         return false;
     if (me->GetFaction() == 35 && IAmFree() && target->GetTypeId() == TYPEID_UNIT && target->GetVictim() != me)
         return false;
