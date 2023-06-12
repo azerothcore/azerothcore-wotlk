@@ -6366,7 +6366,7 @@ GameObject* Unit::GetFirstGameObjectById(uint32 id) const
 
 void Unit::SetCreator(Unit* creator)
 {
-    SetCreatorGUID(creator ? creator->GetGUID() : ObjectGuid::Empty);
+    //creator is unrelated to creator guid
     m_creator = creator;
 }
 //end npcbot
@@ -11216,6 +11216,12 @@ Player* Unit::GetCharmerOrOwnerPlayerOrPlayerItself() const
     if (guid.IsPlayer())
         return ObjectAccessor::GetPlayer(*this, guid);
 
+    //npcbot
+    if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBotOrPet())
+        if (Unit* creator = ToUnit()->GetCreator())
+            return creator->ToPlayer();
+    //end npcbot
+
     return const_cast<Unit*>(this)->ToPlayer();
 }
 
@@ -15046,9 +15052,8 @@ bool Unit::IsAlwaysVisibleFor(WorldObject const* seer) const
                     return true;
 
     //npcbot - bots are always visible for owner
-    if (Creature const* bot = ToCreature())
-        if ((bot->GetBotAI() || bot->GetBotPetAI()) && seer->GetGUID() == bot->GetBotOwner()->GetGUID())
-            return true;
+    if (GetCreator() && seer->GetGUID() == GetCreator()->GetGUID())
+        return true;
     //end npcbot
 
     return false;
@@ -16423,7 +16428,7 @@ void Unit::SetHealth(uint32 val)
             if (BotMgr::GetBotGroup(ToCreature()))
                 BotMgr::SetBotGroupUpdateFlag(ToCreature(), GROUP_UPDATE_FLAG_CUR_HP);
         }
-        else if (GetOwnerGUID().IsCreature())
+        else
         {
             Unit const* owner = GetOwner();
             if (owner && owner->IsNPCBot() && owner->ToCreature()->GetBotsPet() == this && BotMgr::GetBotGroup(owner->ToCreature()))
@@ -16474,7 +16479,7 @@ void Unit::SetMaxHealth(uint32 val)
             if (BotMgr::GetBotGroup(ToCreature()))
                 BotMgr::SetBotGroupUpdateFlag(ToCreature(), GROUP_UPDATE_FLAG_MAX_HP);
         }
-        else if (GetOwnerGUID().IsCreature())
+        else
         {
             Unit const* owner = GetOwner();
             if (owner && owner->IsNPCBot() && owner->ToCreature()->GetBotsPet() == this && BotMgr::GetBotGroup(owner->ToCreature()))
@@ -16558,7 +16563,7 @@ void Unit::SetPower(Powers power, uint32 val, bool withPowerUpdate /*= true*/, b
             if (BotMgr::GetBotGroup(ToCreature()))
                 BotMgr::SetBotGroupUpdateFlag(ToCreature(), GROUP_UPDATE_FLAG_CUR_POWER);
         }
-        else if (GetOwnerGUID().IsCreature())
+        else
         {
             Unit const* owner = GetOwner();
             if (owner && owner->IsNPCBot() && owner->ToCreature()->GetBotsPet() == this && BotMgr::GetBotGroup(owner->ToCreature()))
@@ -16600,7 +16605,7 @@ void Unit::SetMaxPower(Powers power, uint32 val)
             if (BotMgr::GetBotGroup(ToCreature()))
                 BotMgr::SetBotGroupUpdateFlag(ToCreature(), GROUP_UPDATE_FLAG_MAX_POWER);
         }
-        else if (GetOwnerGUID().IsCreature())
+        else
         {
             Unit const* owner = GetOwner();
             if (owner && owner->IsNPCBot() && owner->ToCreature()->GetBotsPet() == this && BotMgr::GetBotGroup(owner->ToCreature()))
@@ -18151,6 +18156,13 @@ void Unit::SendComboPoints()
     {
         owner = ObjectAccessor::GetPlayer(*this, ownerGuid);
     }
+    //npcbot
+    else if (IsNPCBotOrPet())
+    {
+        if (Unit* creator = ToUnit()->GetCreator())
+            owner = creator->ToPlayer();
+    }
+    //end npcbot
 
     if (m_movedByPlayer || owner)
     {
@@ -18482,7 +18494,7 @@ void Unit::UpdateAuraForGroup(uint8 slot)
                 BotMgr::SetBotAuraUpdateMaskForRaid(ToCreature(), slot);
             }
         }
-        else if (GetOwnerGUID().IsCreature())
+        else
         {
             Unit const* owner = GetOwner();
             if (owner && owner->IsNPCBot() && owner->ToCreature()->GetBotsPet() == this && BotMgr::GetBotGroup(owner->ToCreature()))
@@ -19011,11 +19023,8 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     Creature* creature = victim->ToCreature();
 
     //npcbot - loot recipient of bot's vehicle is owner
-    if (!player && killer && killer->IsVehicle() && killer->GetCharmerGUID().IsCreature() && killer->GetCreatorGUID().IsPlayer())
-    {
-        if (Unit* uowner = killer->GetCreator())
-            player = uowner->ToPlayer();
-    }
+    if (!player && killer && killer->IsVehicle() && killer->GetCharmerGUID().IsCreature() && killer->GetCreator() && killer->GetCreator()->IsPlayer())
+        player = killer->GetCreator()->ToPlayer();
     //end npcbot
 
     bool isRewardAllowed = true;

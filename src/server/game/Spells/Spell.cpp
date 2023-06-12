@@ -6796,7 +6796,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_CHARMED;
 
                         //npcbot: do not allow to charm owned npcbots
-                        if (target->GetCreatorGUID() && target->GetCreatorGUID().IsPlayer())
+                        if (target->GetCreator() && target->GetCreator()->IsPlayer())
                             return SPELL_FAILED_TARGET_IS_PLAYER_CONTROLLED;
                         else if (target->IsNPCBotOrPet())
                             return SPELL_FAILED_CANT_BE_CHARMED;
