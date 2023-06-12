@@ -75,7 +75,18 @@ public:
             instance->LoadGrid(-2023.0f, 7121.0f);
             if (Creature* medivh = GetCreature(DATA_MEDIVH))
             {
-                medivh->DespawnOrUnsummon(0ms, 3s);
+                medivh->Respawn();
+            }
+            for (ObjectGuid const& guid : _encounterNPCs)
+            {
+                if (guid.GetEntry() == NPC_DP_BEAM_STALKER)
+                {
+                    if (Creature* creature = instance->GetCreature(guid))
+                    {
+                            creature->Respawn();
+                    }
+                    break;
+                }
             }
         }
 
@@ -316,21 +327,6 @@ public:
 
                     ScheduleNextPortal(3s, Position(0.0f, 0.0f, 0.0f, 0.0f));
 
-                    for (ObjectGuid const& guid : _encounterNPCs)
-                    {
-                        if (guid.GetEntry() == NPC_DP_BEAM_STALKER)
-                        {
-                            if (Creature* creature = instance->GetCreature(guid))
-                            {
-                                if (!creature->IsAlive())
-                                {
-                                    creature->Respawn(true);
-                                }
-                            }
-                            break;
-                        }
-                    }
-
                     break;
                 }
                 case DATA_DAMAGE_SHIELD:
@@ -406,6 +402,12 @@ public:
                                             GuidSet encounterNPCSCopy = _encounterNPCs;
                                             for (ObjectGuid const& guid : encounterNPCSCopy)
                                             {
+                                                // Don't despawn permanent visual effect NPC twice or it won't respawn correctly
+                                                if (guid.GetEntry() == NPC_DP_BEAM_STALKER)
+                                                {
+                                                    continue;
+                                                }
+
                                                 if (Creature* creature = instance->GetCreature(guid))
                                                 {
                                                     creature->CastSpell(creature, SPELL_TELEPORT_VISUAL, true);
