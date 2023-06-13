@@ -84,7 +84,7 @@ public:
 
     struct boss_magtheridonAI : public BossAI
     {
-        boss_magtheridonAI(Creature* creature) : BossAI(creature, TYPE_MAGTHERIDON) 
+        boss_magtheridonAI(Creature* creature) : BossAI(creature, TYPE_MAGTHERIDON)
         {
             scheduler.SetValidator([this]
             {
