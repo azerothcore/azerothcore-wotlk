@@ -36,13 +36,10 @@ enum DataTypes
     MAX_ENCOUNTER                       = 3,
 
     DATA_MEDIVH                         = 10,
-    DATA_RIFT_KILLED                    = 11,
+
     DATA_DAMAGE_SHIELD                  = 12,
     DATA_SHIELD_PERCENT                 = 13,
-    DATA_RIFT_NUMBER                    = 14,
-
-    DATA_SUMMONED_NPC                   = 20,
-    DATA_DELETED_NPC                    = 21
+    DATA_RIFT_NUMBER                    = 14
 };
 
 enum WorldStateIds
@@ -81,13 +78,13 @@ enum CreatureIds
     NPC_INFINITE_TIMEREAVER             = 21698,
     NPC_AEONUS                          = 17881,
 
-    NPC_INFINITE_ASSASIN                = 17835,
+    NPC_INFINITE_ASSASSIN               = 17835,
     NPC_INFINITE_WHELP                  = 21818,
     NPC_INFINITE_CHRONOMANCER           = 17892,
     NPC_INFINITE_EXECUTIONER            = 18994,
     NPC_INFINITE_VANQUISHER             = 18995,
 
-    NPC_INFINITE_ASSASIN_2              = 21137,
+    NPC_INFINITE_ASSASSIN_2             = 21137,
     NPC_INFINITE_CHRONOMANCER_2         = 21136,
     NPC_INFINITE_EXECUTIONER_2          = 21138,
     NPC_INFINITE_VANQUISHER_2           = 21139,

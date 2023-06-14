@@ -56,7 +56,7 @@ public:
             _currentRift = 0;
             _shieldPercent = 100;
             _encounterNPCs.clear();
-            _canSpawnPortal = true; // Delay after bosses
+            _noBossSpawnDelay = true; // Delay after bosses
             _eventStatus = EVENT_PREPARE;
         }
 
@@ -74,7 +74,7 @@ public:
             }
 
             // prevent getting stuck if event fails during boss break
-            _canSpawnPortal = true;
+            _noBossSpawnDelay = true;
 
             instance->LoadGrid(-2023.0f, 7121.0f);
             if (Creature* medivh = GetCreature(DATA_MEDIVH))
@@ -136,8 +136,8 @@ public:
                                     case NPC_RIFT_LORD:
                                     case NPC_RIFT_LORD_2:
                                     case NPC_TIME_RIFT:
-                                    case NPC_INFINITE_ASSASIN:
-                                    case NPC_INFINITE_ASSASIN_2:
+                                    case NPC_INFINITE_ASSASSIN:
+                                    case NPC_INFINITE_ASSASSIN_2:
                                     case NPC_INFINITE_WHELP:
                                     case NPC_INFINITE_CHRONOMANCER:
                                     case NPC_INFINITE_CHRONOMANCER_2:
@@ -158,11 +158,11 @@ public:
                     case DATA_CHRONO_LORD_DEJA:
                     case DATA_TEMPORUS:
                     {
-                        _canSpawnPortal = false;
+                        _noBossSpawnDelay = false;
 
                         _scheduler.Schedule(2min + 30s, [this](TaskContext)
                         {
-                            _canSpawnPortal = true;
+                            _noBossSpawnDelay = true;
                             ScheduleNextPortal(0s, Position(0.0f, 0.0f, 0.0f, 0.0f));
                         });
 
@@ -190,6 +190,7 @@ public:
 
         void ScheduleNextPortal(Milliseconds time, Position lastPosition)
         {
+            // only one rift can be scheduled at any time
             _scheduler.CancelGroup(CONTEXT_GROUP_RIFTS);
 
             _scheduler.Schedule(time, [this, lastPosition](TaskContext context)
@@ -197,7 +198,7 @@ public:
                 if (GetCreature(DATA_MEDIVH))
                 {
                     // Spawning prevented: after-boss-delay or event failed/not started or last portal spawned
-                    if (!_canSpawnPortal || _eventStatus == EVENT_PREPARE || _currentRift >= 18)
+                    if (!_noBossSpawnDelay || _eventStatus == EVENT_PREPARE || _currentRift >= 18)
                     {
                         return;
                     }
@@ -223,19 +224,10 @@ public:
 
                         instance->SummonCreature(NPC_TIME_RIFT, spawnPos);
 
-                        // Here we check if we have available rift spots.
-                        if (_currentRift < 18)
-                        {
-                            if (!_availableRiftPositions.empty())
-                            {
-                                context.Repeat((_currentRift >= 13 ? 2min : 90s));
-                            }
-                            else
-                            {
-                                context.Repeat(4s);
-                            }
-                        }
+                        // queue next portal if group doesn't kill keepers fast enough
+                        context.Repeat((_currentRift >= 13 ? 2min : 90s));
                     }
+                    // if no rift positions are available, the next rift will be scheduled in OnCreatureRemove
                 }
 
                 context.SetGroup(CONTEXT_GROUP_RIFTS);
@@ -256,8 +248,8 @@ public:
                 case NPC_RIFT_KEEPER_MAGE:
                 case NPC_RIFT_LORD:
                 case NPC_RIFT_LORD_2:
-                case NPC_INFINITE_ASSASIN:
-                case NPC_INFINITE_ASSASIN_2:
+                case NPC_INFINITE_ASSASSIN:
+                case NPC_INFINITE_ASSASSIN_2:
                 case NPC_INFINITE_WHELP:
                 case NPC_INFINITE_CHRONOMANCER:
                 case NPC_INFINITE_CHRONOMANCER_2:
@@ -279,7 +271,7 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_TIME_RIFT:
-                    if (_currentRift < 18 && _canSpawnPortal && _eventStatus == EVENT_IN_PROGRESS)
+                    if (_currentRift < 18 && _noBossSpawnDelay && _eventStatus == EVENT_IN_PROGRESS)
                     {
                         if (_availableRiftPositions.size() < 3)
                         {
@@ -302,8 +294,8 @@ public:
                 case NPC_RIFT_KEEPER_MAGE:
                 case NPC_RIFT_LORD:
                 case NPC_RIFT_LORD_2:
-                case NPC_INFINITE_ASSASIN:
-                case NPC_INFINITE_ASSASIN_2:
+                case NPC_INFINITE_ASSASSIN:
+                case NPC_INFINITE_ASSASSIN_2:
                 case NPC_INFINITE_WHELP:
                 case NPC_INFINITE_CHRONOMANCER:
                 case NPC_INFINITE_CHRONOMANCER_2:
@@ -469,7 +461,7 @@ public:
         GuidSet _encounterNPCs;
         uint8 _currentRift;
         int8 _shieldPercent;
-        bool _canSpawnPortal;
+        bool _noBossSpawnDelay;
         EventStatus _eventStatus;
         TaskScheduler _scheduler;
     };
