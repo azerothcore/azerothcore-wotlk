@@ -73,6 +73,9 @@ public:
                 _availableRiftPositions.push_back(pos);
             }
 
+            // prevent getting stuck if event fails during boss break
+            _canSpawnPortal = true;
+
             instance->LoadGrid(-2023.0f, 7121.0f);
             if (Creature* medivh = GetCreature(DATA_MEDIVH))
             {
@@ -160,9 +163,9 @@ public:
                         _scheduler.Schedule(2min + 30s, [this](TaskContext)
                         {
                             _canSpawnPortal = true;
+                            ScheduleNextPortal(0s, Position(0.0f, 0.0f, 0.0f, 0.0f));
                         });
 
-                        ScheduleNextPortal(2min + 30s, Position(0.0f, 0.0f, 0.0f, 0.0f));
                         break;
                     }
                     default:
