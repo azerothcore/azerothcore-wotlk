@@ -41,7 +41,7 @@ NpcBotExtrasMap _botsExtras;
 NpcBotTransmogDataMap _botsTransmogData;
 NpcBotRegistry _existingBots;
 
-std::map<uint32, uint8> _wpMaxLevelPerMapId;
+std::map<uint32, uint8> _wpMaxSpawnLevelPerMapId;
 std::map<uint8, std::set<uint32>> _spareBotIdsPerClassMap;
 CreatureTemplateContainer _botsWanderCreatureTemplates;
 std::unordered_map<uint32, EquipmentInfo const*> _botsWanderCreatureEquipmentTemplates;
@@ -893,8 +893,6 @@ void BotDataMgr::LoadNpcBots(bool spawn)
         LOG_INFO("server.loading", ">> Loaded 0 npcbots. Table `characters_npcbot` is empty!");
 
     allBotsLoaded = true;
-
-    GenerateWanderingBots();
 }
 
 void BotDataMgr::LoadNpcBotGroupData()
@@ -982,6 +980,10 @@ void BotDataMgr::LoadNpcBotGearStorage()
 
 void BotDataMgr::LoadWanderMap(bool reload)
 {
+    using SpawnMapEx = std::map<uint32, bool>;
+
+    const std::array<uint32, 4> ALL_CONTINENT_MAPS = { 0u, 1u, 530, 571 };
+
     if (WanderNode::GetAllWPsCount() > 0u)
     {
         if (!reload)
@@ -989,6 +991,8 @@ void BotDataMgr::LoadWanderMap(bool reload)
 
         WanderNode::RemoveAllWPs();
     }
+
+    _wpMaxSpawnLevelPerMapId.clear();
 
     uint32 botoldMSTime = getMSTime();
 
@@ -1004,10 +1008,16 @@ void BotDataMgr::LoadWanderMap(bool reload)
 
     const uint32 maxof_minclasslvl_nr = GetMinLevelForBotClass(BOT_CLASS_DEATH_KNIGHT); // 55
     const uint32 maxof_minclasslvl_ex = GetMinLevelForBotClass(BOT_CLASS_DREADLORD); // 60
-    std::map<uint32, bool> spawn_node_exists_a;
-    std::map<uint32, bool> spawn_node_exists_h;
-    std::map<uint32, bool> spawn_node_exists_n;
+    SpawnMapEx spawn_node_exists_a;
+    SpawnMapEx spawn_node_exists_h;
+    SpawnMapEx spawn_node_exists_n;
     std::unordered_map<uint32, std::pair<WanderNode*, std::vector<std::pair<std::string, std::string>>>> links_to_create;
+
+    for (SpawnMapEx* smap : { &spawn_node_exists_a, &spawn_node_exists_h, &spawn_node_exists_n })
+        for (uint32 mapId : ALL_CONTINENT_MAPS)
+            if (BotMgr::IsBotGenerationEnabledWorldMapId(mapId))
+                smap->emplace(mapId, false);
+
     uint32 disabled_nodes = 0;
     do
     {
@@ -1079,12 +1089,15 @@ void BotDataMgr::LoadWanderMap(bool reload)
         wp->SetLevels(minLevel, maxLevel);
         wp->SetFlags(BotWPFlags(flags));
 
-        spawn_node_exists_a[mapId] |= (!lstr.empty() && maxLevel >= maxof_minclasslvl_nr && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY));
-        spawn_node_exists_h[mapId] |= (!lstr.empty() && maxLevel >= maxof_minclasslvl_nr && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY));
-        spawn_node_exists_n[mapId] |= (!lstr.empty() && maxLevel >= maxof_minclasslvl_ex && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY));
+        if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && !lstr.empty())
+        {
+            spawn_node_exists_a[mapId] |= (maxLevel >= maxof_minclasslvl_nr && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY));
+            spawn_node_exists_h[mapId] |= (maxLevel >= maxof_minclasslvl_nr && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY));
+            spawn_node_exists_n[mapId] |= (maxLevel >= maxof_minclasslvl_ex && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY));
 
-        decltype(_wpMaxLevelPerMapId)::const_iterator cit = _wpMaxLevelPerMapId.find(mapId);
-        _wpMaxLevelPerMapId[mapId] = std::max<uint8>((cit != _wpMaxLevelPerMapId.cend()) ? cit->second : 0u, maxLevel);
+            decltype(_wpMaxSpawnLevelPerMapId)::const_iterator cit = _wpMaxSpawnLevelPerMapId.find(mapId);
+            _wpMaxSpawnLevelPerMapId[mapId] = std::max<uint8>((cit != _wpMaxSpawnLevelPerMapId.cend()) ? cit->second : 0u, maxLevel);
+        }
 
         if (lstr.empty())
         {
@@ -1237,9 +1250,6 @@ void BotDataMgr::LoadWanderMap(bool reload)
 
 void BotDataMgr::GenerateWanderingBots()
 {
-    LoadWanderMap();
-    CreateWanderingBotsSortedGear();
-
     const uint32 wandering_bots_desired = BotMgr::GetDesiredWanderingBotsCount();
 
     if (wandering_bots_desired == 0)
@@ -2441,8 +2451,8 @@ uint8 BotDataMgr::GetLevelBonusForBotRank(uint32 rank)
 
 uint8 BotDataMgr::GetMaxLevelForMapId(uint32 mapId)
 {
-    decltype(_wpMaxLevelPerMapId)::const_iterator cit = _wpMaxLevelPerMapId.find(mapId);
-    if (cit != _wpMaxLevelPerMapId.cend())
+    decltype(_wpMaxSpawnLevelPerMapId)::const_iterator cit = _wpMaxSpawnLevelPerMapId.find(mapId);
+    if (cit != _wpMaxSpawnLevelPerMapId.cend())
         return cit->second;
 
     switch (mapId)

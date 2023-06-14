@@ -144,6 +144,7 @@ class AC_GAME_API BotMgr
         static void Initialize();
         static void ReloadConfig();
         static void LoadConfig(bool reload = false);
+        static void ResolveConfigConflicts();
 
         //onEvent hooks
         static void OnBotWandererKilled(Creature const* bot, Player* looter);
