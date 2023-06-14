@@ -41,6 +41,7 @@ NpcBotExtrasMap _botsExtras;
 NpcBotTransmogDataMap _botsTransmogData;
 NpcBotRegistry _existingBots;
 
+std::map<uint32, uint8> _wpMaxLevelPerMapId;
 std::map<uint8, std::set<uint32>> _spareBotIdsPerClassMap;
 CreatureTemplateContainer _botsWanderCreatureTemplates;
 std::unordered_map<uint32, EquipmentInfo const*> _botsWanderCreatureEquipmentTemplates;
@@ -1082,6 +1083,9 @@ void BotDataMgr::LoadWanderMap(bool reload)
         spawn_node_exists_h[mapId] |= (!lstr.empty() && maxLevel >= maxof_minclasslvl_nr && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY));
         spawn_node_exists_n[mapId] |= (!lstr.empty() && maxLevel >= maxof_minclasslvl_ex && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY));
 
+        decltype(_wpMaxLevelPerMapId)::const_iterator cit = _wpMaxLevelPerMapId.find(mapId);
+        _wpMaxLevelPerMapId[mapId] = std::max<uint8>((cit != _wpMaxLevelPerMapId.cend()) ? cit->second : 0u, maxLevel);
+
         if (lstr.empty())
         {
             LOG_ERROR("server.loading", "WP {} has no links!", id);
@@ -1660,7 +1664,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                 }
                 break;
             case ITEM_CLASS_WEAPON:
-                if (proto.Damage[0].DamageMin < 1.0f)
+                if (proto.Damage[0].DamageMin < 1.0f || proto.Damage[0].DamageMax < 2.0f || proto.Delay < 1000)
                     break;
                 switch (proto.SubClass)
                 {
@@ -2437,6 +2441,10 @@ uint8 BotDataMgr::GetLevelBonusForBotRank(uint32 rank)
 
 uint8 BotDataMgr::GetMaxLevelForMapId(uint32 mapId)
 {
+    decltype(_wpMaxLevelPerMapId)::const_iterator cit = _wpMaxLevelPerMapId.find(mapId);
+    if (cit != _wpMaxLevelPerMapId.cend())
+        return cit->second;
+
     switch (mapId)
     {
         case 0:
