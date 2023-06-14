@@ -52,6 +52,12 @@ enum WorldStateIds
     WORLD_STATE_BM_RIFT                 = 2784
 };
 
+enum EventStatus
+{
+    EVENT_PREPARE                       = 0,
+    EVENT_IN_PROGRESS                   = 1
+};
+
 enum QuestIds
 {
     QUEST_OPENING_PORTAL                = 10297,

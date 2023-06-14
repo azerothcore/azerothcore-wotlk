@@ -57,6 +57,7 @@ public:
             _shieldPercent = 100;
             _encounterNPCs.clear();
             _canSpawnPortal = true; // Delay after bosses
+            _eventStatus = EVENT_PREPARE;
         }
 
         void CleanupInstance()
@@ -174,12 +175,12 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (instance->GetPlayersCountExceptGMs() <= 1 && GetBossState(DATA_AEONUS) != DONE)
+            if (instance->GetPlayersCountExceptGMs() <= 1 && GetBossState(DATA_AEONUS) != DONE && _eventStatus != EVENT_IN_PROGRESS)
             {
                 CleanupInstance();
             }
 
-            player->SendUpdateWorldState(WORLD_STATE_BM, _currentRift > 0 ? 1 : 0);
+            player->SendUpdateWorldState(WORLD_STATE_BM, _eventStatus);
             player->SendUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
             player->SendUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
         }
@@ -192,8 +193,8 @@ public:
             {
                 if (GetCreature(DATA_MEDIVH))
                 {
-                    // Spawning prevented - there's a 150s delay after a boss dies.
-                    if (!_canSpawnPortal)
+                    // Spawning prevented: after-boss-delay or event failed/not started or last portal spawned
+                    if (!_canSpawnPortal || _eventStatus == EVENT_PREPARE || _currentRift >= 18)
                     {
                         return;
                     }
@@ -275,7 +276,7 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_TIME_RIFT:
-                    if (_currentRift < 18)
+                    if (_currentRift < 18 && _canSpawnPortal && _eventStatus == EVENT_IN_PROGRESS)
                     {
                         if (_availableRiftPositions.size() < 3)
                         {
@@ -321,7 +322,9 @@ public:
             {
                 case DATA_MEDIVH:
                 {
-                    DoUpdateWorldState(WORLD_STATE_BM, 1);
+                    _eventStatus = EVENT_IN_PROGRESS;
+
+                    DoUpdateWorldState(WORLD_STATE_BM, _eventStatus);
                     DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
                     DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
 
@@ -346,6 +349,8 @@ public:
 
                     if (!_shieldPercent)
                     {
+                        _eventStatus = EVENT_PREPARE;
+
                         if (Creature* medivh = GetCreature(DATA_MEDIVH))
                         {
                             if (medivh->IsAlive() && medivh->IsAIEnabled)
@@ -452,6 +457,7 @@ public:
         uint8 _currentRift;
         int8 _shieldPercent;
         bool _canSpawnPortal;
+        EventStatus _eventStatus;
         TaskScheduler _scheduler;
     };
 };
