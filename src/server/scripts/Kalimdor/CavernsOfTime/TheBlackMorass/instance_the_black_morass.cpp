@@ -424,6 +424,16 @@ public:
                                             }
 
                                             _scheduler.CancelAll();
+
+                                            // Step 4 - Schedule instance cleanup without player interaction
+                                            _scheduler.Schedule(300s, [this](TaskContext)
+                                            {
+                                                CleanupInstance();
+
+                                                DoUpdateWorldState(WORLD_STATE_BM, _eventStatus);
+                                                DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
+                                                DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
+                                            });
                                         });
                                     });
                                 });
