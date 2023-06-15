@@ -981,6 +981,7 @@ void BotDataMgr::LoadNpcBotGearStorage()
 void BotDataMgr::LoadWanderMap(bool reload)
 {
     using SpawnMapEx = std::map<uint32, bool>;
+    using SpawnVector = std::vector<WanderNode const*>;
 
     const std::array<uint32, 4> ALL_CONTINENT_MAPS = { 0u, 1u, 530, 571 };
 
@@ -1008,11 +1009,13 @@ void BotDataMgr::LoadWanderMap(bool reload)
 
     const uint32 maxof_minclasslvl_nr = GetMinLevelForBotClass(BOT_CLASS_DEATH_KNIGHT); // 55
     const uint32 maxof_minclasslvl_ex = GetMinLevelForBotClass(BOT_CLASS_DREADLORD); // 60
+    SpawnVector all_spawn_nodes;
     SpawnMapEx spawn_node_exists_a;
     SpawnMapEx spawn_node_exists_h;
     SpawnMapEx spawn_node_exists_n;
     std::unordered_map<uint32, std::pair<WanderNode*, std::vector<std::pair<std::string, std::string>>>> links_to_create;
 
+    all_spawn_nodes.reserve(wres->GetRowCount() >> 8);
     for (SpawnMapEx* smap : { &spawn_node_exists_a, &spawn_node_exists_h, &spawn_node_exists_n })
         for (uint32 mapId : ALL_CONTINENT_MAPS)
             if (BotMgr::IsBotGenerationEnabledWorldMapId(mapId))
@@ -1090,14 +1093,7 @@ void BotDataMgr::LoadWanderMap(bool reload)
         wp->SetFlags(BotWPFlags(flags));
 
         if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && !lstr.empty())
-        {
-            spawn_node_exists_a[mapId] |= (maxLevel >= maxof_minclasslvl_nr && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY));
-            spawn_node_exists_h[mapId] |= (maxLevel >= maxof_minclasslvl_nr && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY));
-            spawn_node_exists_n[mapId] |= (maxLevel >= maxof_minclasslvl_ex && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY));
-
-            decltype(_wpMaxSpawnLevelPerMapId)::const_iterator cit = _wpMaxSpawnLevelPerMapId.find(mapId);
-            _wpMaxSpawnLevelPerMapId[mapId] = std::max<uint8>((cit != _wpMaxSpawnLevelPerMapId.cend()) ? cit->second : 0u, maxLevel);
-        }
+            all_spawn_nodes.push_back(wp);
 
         if (lstr.empty())
         {
@@ -1122,6 +1118,19 @@ void BotDataMgr::LoadWanderMap(bool reload)
         }
 
     } while (wres->NextRow());
+
+    for (WanderNode const* wp : all_spawn_nodes)
+    {
+        uint32 mapId = wp->GetMapId();
+        uint8 maxLevel = wp->GetLevels().second;
+
+        spawn_node_exists_a[mapId] |= (maxLevel >= maxof_minclasslvl_nr && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY));
+        spawn_node_exists_h[mapId] |= (maxLevel >= maxof_minclasslvl_nr && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY));
+        spawn_node_exists_n[mapId] |= (maxLevel >= maxof_minclasslvl_ex && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY));
+
+        decltype(_wpMaxSpawnLevelPerMapId)::const_iterator cit = _wpMaxSpawnLevelPerMapId.find(mapId);
+        _wpMaxSpawnLevelPerMapId[mapId] = std::max<uint8>((cit != _wpMaxSpawnLevelPerMapId.cend()) ? cit->second : 0u, maxLevel);
+    }
 
     bool spawn_node_minclasslvl_exists_all = true;
     for (auto& kv : spawn_node_exists_a)
@@ -1158,6 +1167,49 @@ void BotDataMgr::LoadWanderMap(bool reload)
     }
     if (!spawn_node_minclasslvl_exists_all)
         ABORT();
+
+    const uint8 TEAMS_COUNT = TEAM_NEUTRAL + 1;
+    char const* const team_strs[TEAMS_COUNT] = { "Alliance", "Horde", "Neutral" };
+    std::array<bool, DEFAULT_MAX_LEVEL> spawn_node_levels[TEAMS_COUNT]{false};
+    uint8 min_spawn_level = DEFAULT_MAX_LEVEL;
+    uint8 max_spawn_level = 0;
+    for (WanderNode const* wp : all_spawn_nodes)
+    {
+        if (sMapStore.LookupEntry(wp->GetMapId())->IsContinent() && BotMgr::IsBotGenerationEnabledWorldMapId(wp->GetMapId()))
+        {
+            auto [minLevel, maxLevel] = wp->GetLevels();
+            min_spawn_level = std::min<uint32>(min_spawn_level, minLevel);
+            max_spawn_level = std::max<uint32>(max_spawn_level, maxLevel);
+        }
+    }
+    for (WanderNode const* wp : all_spawn_nodes)
+    {
+        if (sMapStore.LookupEntry(wp->GetMapId())->IsContinent())
+        {
+            auto [minLevel, maxLevel] = wp->GetLevels();
+            minLevel = std::max<uint8>(minLevel, 1);
+            maxLevel = std::min<uint8>(maxLevel, max_spawn_level);
+            for (uint8 k = 0; k < TEAMS_COUNT; ++k)
+            {
+                if ((k == 0 && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY)) ||
+                    (k == 1 && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY)) ||
+                    (k == 2 && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY)))
+                {
+                    for (uint8 i = minLevel; i <= maxLevel; ++i)
+                        spawn_node_levels[k][i - 1] = true;
+                }
+            }
+        }
+    }
+    for (uint8 k = 0; k < TEAMS_COUNT; ++k)
+    {
+        auto const& vec = spawn_node_levels[k];
+        for (uint32 i = min_spawn_level; i <= max_spawn_level; ++i)
+        {
+            if (vec[i - 1] == false)
+                LOG_ERROR("server.loading", "No {} spawn node found for level {}! Wandering bots may cause a crash!", team_strs[k], i);
+        }
+    }
 
     float mindist = 50000.f;
     float maxdist = 0.f;
