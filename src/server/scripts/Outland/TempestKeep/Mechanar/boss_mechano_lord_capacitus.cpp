@@ -34,27 +34,27 @@ enum Spells
     SPELL_SUMMON_NETHER_CHARGE_NE   = 35153,
     SPELL_SUMMON_NETHER_CHARGE_NW   = 35904,
     SPELL_SUMMON_NETHER_CHARGE_SE   = 35905,
-    SPELL_SUMMON_NETHER_CHARGE_SW   = 35906,
+    SPELL_SUMMON_NETHER_CHARGE_SW   = 35906
 };
 
 enum Yells
 {
-    SAY_AGGRO                      = 0,
-    SAY_REFLECTIVE_MAGIC_SHIELD    = 1,
-    SAY_REFLECTIVE_DAMAGE_SHIELD   = 2,
-    SAY_KILL                       = 3,
-    SAY_DEATH                      = 4
+    SAY_AGGRO                       = 0,
+    SAY_REFLECTIVE_MAGIC_SHIELD     = 1,
+    SAY_REFLECTIVE_DAMAGE_SHIELD    = 2,
+    SAY_KILL                        = 3,
+    SAY_DEATH                       = 4
 };
 
 enum polarityShift
 {
-    SPELL_POSITIVE_POLARITY = 39088,
-    SPELL_POSITIVE_CHARGE_STACK = 39089,
-    SPELL_POSITIVE_CHARGE = 39090,
+    SPELL_POSITIVE_POLARITY         = 39088,
+    SPELL_POSITIVE_CHARGE_STACK     = 39089,
+    SPELL_POSITIVE_CHARGE           = 39090,
 
-    SPELL_NEGATIVE_POLARITY = 39091,
-    SPELL_NEGATIVE_CHARGE_STACK = 39092,
-    SPELL_NEGATIVE_CHARGE = 39093
+    SPELL_NEGATIVE_POLARITY         = 39091,
+    SPELL_NEGATIVE_CHARGE_STACK     = 39092,
+    SPELL_NEGATIVE_CHARGE           = 39093
 };
 
 struct boss_mechano_lord_capacitus : public BossAI
