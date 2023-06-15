@@ -131,7 +131,7 @@ struct boss_mechano_lord_capacitus : public BossAI
         Talk(SAY_DEATH);
         if (IsHeroic() && instance)
         {
-            scheduler.Schedule(1min, [this](TaskContext context)
+            scheduler.Schedule(1min, [this](TaskContext /*context*/)
             {
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSITIVE_CHARGE_STACK);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_NEGATIVE_CHARGE_STACK);
