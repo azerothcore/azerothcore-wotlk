@@ -46,6 +46,17 @@ enum Yells
     SAY_DEATH                      = 4
 };
 
+enum polarityShift
+{
+    SPELL_POSITIVE_POLARITY = 39088,
+    SPELL_POSITIVE_CHARGE_STACK = 39089,
+    SPELL_POSITIVE_CHARGE = 39090,
+
+    SPELL_NEGATIVE_POLARITY = 39091,
+    SPELL_NEGATIVE_CHARGE_STACK = 39092,
+    SPELL_NEGATIVE_CHARGE = 39093
+};
+
 struct boss_mechano_lord_capacitus : public BossAI
 {
     boss_mechano_lord_capacitus(Creature* creature) : BossAI(creature, DATA_MECHANOLORD_CAPACITUS)
@@ -132,17 +143,6 @@ struct boss_mechano_lord_capacitus : public BossAI
     {
         summon->GetMotionMaster()->MoveRandom(30.0f);
     }
-};
-
-enum polarityShift
-{
-    SPELL_POSITIVE_POLARITY         = 39088,
-    SPELL_POSITIVE_CHARGE_STACK     = 39089,
-    SPELL_POSITIVE_CHARGE           = 39090,
-
-    SPELL_NEGATIVE_POLARITY         = 39091,
-    SPELL_NEGATIVE_CHARGE_STACK     = 39092,
-    SPELL_NEGATIVE_CHARGE           = 39093
 };
 
 class spell_capacitus_polarity_charge : public SpellScript
