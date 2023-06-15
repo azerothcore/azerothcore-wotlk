@@ -18842,8 +18842,6 @@ bool bot_ai::IsContestedPvP() const
 }
 void bot_ai::SetContestedPvP()
 {
-    ASSERT(IAmFree());
-
     _contestedPvPTimer = 30000;
     if (!me->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
     {
