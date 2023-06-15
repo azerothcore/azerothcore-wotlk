@@ -1857,13 +1857,13 @@ void BotMgr::ReviveAllBots()
         _reviveBot(itr->second);
 }
 
-void BotMgr::SendBotCommandState(uint8 state)
+void BotMgr::SendBotCommandState(uint32 state)
 {
     for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
         itr->second->GetBotAI()->SetBotCommandState(state, true);
 }
 
-void BotMgr::SendBotCommandStateRemove(uint8 state)
+void BotMgr::SendBotCommandStateRemove(uint32 state)
 {
     for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
         itr->second->GetBotAI()->RemoveBotCommandState(state);

@@ -167,13 +167,13 @@ void bot_pet_ai::_calculatePos(Position& pos) const
     pos.m_positionY = y;
     pos.m_positionZ = z;
 }
-void bot_pet_ai::SetBotCommandState(uint8 st, bool force, Position* newpos)
+void bot_pet_ai::SetBotCommandState(uint32 st, bool force, Position* newpos)
 {
-    if (!me->IsAlive())
-        return;
-
-    if (JumpingOrFalling())
-        return;
+    if (!(st & (BOT_COMMAND_INACTION)))
+    {
+        if (!me->IsAlive() || JumpingOrFalling())
+            return;
+    }
 
     switch (myType)
     {
@@ -209,6 +209,14 @@ void bot_pet_ai::SetBotCommandState(uint8 st, bool force, Position* newpos)
         }
         RemoveBotCommandState(BOT_COMMAND_STAY | BOT_COMMAND_FULLSTOP | BOT_COMMAND_ATTACK | BOT_COMMAND_COMBATRESET);
     }
+    else if (st & BOT_COMMAND_INACTION)
+    {
+        uint32 removeMask = BOT_COMMAND_INACTION & GetBotCommandState();
+        st &= ~removeMask;
+        RemoveBotCommandState(removeMask | BOT_COMMAND_MASK_NOCAST_ANY | BOT_COMMAND_STAY | BOT_COMMAND_FULLSTOP | BOT_COMMAND_ATTACK);
+        me->AttackStop();
+        me->InterruptNonMeleeSpells(true);
+    }
     else if (st & BOT_COMMAND_FULLSTOP)
     {
         RemoveBotCommandState(BOT_COMMAND_FOLLOW | BOT_COMMAND_STAY | BOT_COMMAND_ATTACK);
@@ -234,7 +242,7 @@ void bot_pet_ai::SetBotCommandState(uint8 st, bool force, Position* newpos)
     m_botCommandState |= st;
 }
 
-void bot_pet_ai::RemoveBotCommandState(uint8 st)
+void bot_pet_ai::RemoveBotCommandState(uint32 st)
 {
     m_botCommandState &= ~st;
 }
@@ -1481,7 +1489,7 @@ void bot_pet_ai::RefreshAura(uint32 spellId, int8 count, Unit* target) const
 //All code above 'x = _getTarget() call must not dereference opponent since it can be invalid
 Unit* bot_pet_ai::_getTarget(bool &reset) const
 {
-    if (petOwner->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
+    if (petOwner->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP | BOT_COMMAND_INACTION))
         return nullptr;
     if (petOwner->GetBotAI()->GetEngageTimer() > lastdiff)
         return nullptr;
@@ -2514,7 +2522,8 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
     if (HasBotCommandState(BOT_COMMAND_FULLSTOP))
         return false;
 
-    CheckAttackState();
+    if (!HasBotCommandState(BOT_COMMAND_INACTION))
+        CheckAttackState();
 
     //second alive check - CheckAttackState() can cause bot to die
     if (!me->IsAlive())
@@ -2556,6 +2565,9 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
         return false;
 
     GenerateRand();
+
+    if (HasBotCommandState(BOT_COMMAND_INACTION))
+        return false;
 
     return true;
 }

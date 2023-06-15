@@ -550,15 +550,23 @@ public:
             { "spec",       HandleNpcBotSetSpecCommand,             rbac::RBAC_PERM_COMMAND_NPCBOT_SET_SPEC,           Console::No  },
         };
 
+        static ChatCommandTable npcbotCommandFollowCommandTable =
+        {
+            { "",           HandleNpcBotCommandFollowCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_FOLLOW,     Console::No  },
+            { "only",       HandleNpcBotCommandFollowOnlyCommand,   rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_FOLLOW,     Console::No  },
+        };
+
         static ChatCommandTable npcbotCommandCommandTable =
         {
             { "standstill", HandleNpcBotCommandStandstillCommand,   rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_STANDSTILL, Console::No  },
             { "stopfully",  HandleNpcBotCommandStopfullyCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_STOPFULLY,  Console::No  },
-            { "follow",     HandleNpcBotCommandFollowCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_FOLLOW,     Console::No  },
+            { "follow",     npcbotCommandFollowCommandTable                                                                         },
             { "walk",       HandleNpcBotCommandWalkCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
             { "nogossip",   HandleNpcBotCommandNoGossipCommand,     rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
             { "unbind",     HandleNpcBotCommandUnBindCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
             { "rebind",     HandleNpcBotCommandReBindCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
+            { "nocast",     HandleNpcBotCommandNoCastCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
+            { "nolongcast", HandleNpcBotCommandNoLongCastCommand,   rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
         };
 
         static ChatCommandTable npcbotAttackDistanceCommandTable =
@@ -3637,6 +3645,90 @@ public:
         {
             owner->GetBotMgr()->SendBotCommandState(BOT_COMMAND_FULLSTOP);
             msg = "Bots' command state set to 'FULLSTOP'";
+        }
+
+        handler->SendSysMessage(msg.c_str());
+        return true;
+    }
+
+    static bool HandleNpcBotCommandNoLongCastCommand(ChatHandler* handler)
+    {
+        Player* owner = handler->GetSession()->GetPlayer();
+
+        if (!owner->HaveBot())
+        {
+            handler->SendSysMessage(".npcbot command nolongcast");
+            handler->SendSysMessage("Makes npcbots unable to cast spells with non-zero cast time");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::string msg;
+        if (!owner->GetBotMgr()->GetBotMap()->begin()->second->GetBotAI()->HasBotCommandState(BOT_COMMAND_NO_CAST_LONG))
+        {
+            owner->GetBotMgr()->SendBotCommandState(BOT_COMMAND_NO_CAST_LONG);
+            msg = "Bots' command state set to 'NOLONGCAST'";
+        }
+        else
+        {
+            owner->GetBotMgr()->SendBotCommandStateRemove(BOT_COMMAND_NO_CAST_LONG);
+            msg = "Bots' command state 'NOLONGCAST' was removed";
+        }
+
+        handler->SendSysMessage(msg.c_str());
+        return true;
+    }
+
+    static bool HandleNpcBotCommandNoCastCommand(ChatHandler* handler)
+    {
+        Player* owner = handler->GetSession()->GetPlayer();
+
+        if (!owner->HaveBot())
+        {
+            handler->SendSysMessage(".npcbot command nocast");
+            handler->SendSysMessage("Makes npcbots unable to cast ANY spells");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::string msg;
+        if (!owner->GetBotMgr()->GetBotMap()->begin()->second->GetBotAI()->HasBotCommandState(BOT_COMMAND_NO_CAST))
+        {
+            owner->GetBotMgr()->SendBotCommandState(BOT_COMMAND_NO_CAST);
+            msg = "Bots' command state set to 'NOCAST'";
+        }
+        else
+        {
+            owner->GetBotMgr()->SendBotCommandStateRemove(BOT_COMMAND_NO_CAST);
+            msg = "Bots' command state 'NOCAST' was removed";
+        }
+
+        handler->SendSysMessage(msg.c_str());
+        return true;
+    }
+
+    static bool HandleNpcBotCommandFollowOnlyCommand(ChatHandler* handler)
+    {
+        Player* owner = handler->GetSession()->GetPlayer();
+
+        if (!owner->HaveBot())
+        {
+            handler->SendSysMessage(".npcbot command follow only");
+            handler->SendSysMessage("Makes npcbots follow you and do nothing else");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::string msg;
+        if (!owner->GetBotMgr()->GetBotMap()->begin()->second->GetBotAI()->HasBotCommandState(BOT_COMMAND_INACTION))
+        {
+            owner->GetBotMgr()->SendBotCommandState(BOT_COMMAND_INACTION);
+            msg = "Bots' command state set to 'INACTION'";
+        }
+        else
+        {
+            owner->GetBotMgr()->SendBotCommandStateRemove(BOT_COMMAND_INACTION);
+            msg = "Bots' command state 'INACTION' was removed";
         }
 
         handler->SendSysMessage(msg.c_str());
