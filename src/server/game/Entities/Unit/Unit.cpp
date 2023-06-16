@@ -14683,6 +14683,9 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             return false;
     }
     // check flags
+    //npcbot: rewrite all that
+    /*
+    //end npcbot
     if (target->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2)
             || (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->IsImmuneToNPC())
             || (!target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToNPC())
@@ -14690,6 +14693,28 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             // check if this is a world trigger cast - GOs are using world triggers to cast their spells, so we need to ignore their immunity flag here, this is a temp workaround, needs removal when go cast is implemented properly
             || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToPC()))
         return false;
+    //npcbot
+    */
+    if (target->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
+        return false;
+
+    // not checked in AC for some reason - not changing
+    //if (!(bySpell && bySpell->IsPositive() && bySpell->HasAttribute(SPELL_ATTR6_CAN_ASSIST_IMMUNE_PC)))
+    {
+        if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && !IsNPCBotOrPet() && target->IsImmuneToNPC())
+            return false;
+
+        if (!target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && !target->IsNPCBotOrPet() && IsImmuneToNPC())
+            return false;
+
+        if ((HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) || IsNPCBotOrPet()) && target->IsImmuneToPC())
+            return false;
+
+        if ((target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) || target->IsNPCBotOrPet()) && IsImmuneToPC() &&
+            GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT)))
+            return false;
+    }
+    //end npcbot
 
     //npcbot: CvB, BvC case
     if (((IsNPCBotOrPet() && ToCreature()->IsFreeBot()) || (target->IsNPCBotOrPet() && target->ToCreature()->IsFreeBot())) &&
