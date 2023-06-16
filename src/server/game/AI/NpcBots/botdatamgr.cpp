@@ -41,6 +41,7 @@ NpcBotExtrasMap _botsExtras;
 NpcBotTransmogDataMap _botsTransmogData;
 NpcBotRegistry _existingBots;
 
+std::map<uint32, uint8> _wpMinSpawnLevelPerMapId;
 std::map<uint32, uint8> _wpMaxSpawnLevelPerMapId;
 std::map<uint8, std::set<uint32>> _spareBotIdsPerClassMap;
 CreatureTemplateContainer _botsWanderCreatureTemplates;
@@ -993,6 +994,7 @@ void BotDataMgr::LoadWanderMap(bool reload)
         WanderNode::RemoveAllWPs();
     }
 
+    _wpMinSpawnLevelPerMapId.clear();
     _wpMaxSpawnLevelPerMapId.clear();
 
     uint32 botoldMSTime = getMSTime();
@@ -1122,14 +1124,16 @@ void BotDataMgr::LoadWanderMap(bool reload)
     for (WanderNode const* wp : all_spawn_nodes)
     {
         uint32 mapId = wp->GetMapId();
-        uint8 maxLevel = wp->GetLevels().second;
+        auto [minLevel, maxLevel] = wp->GetLevels();
 
         spawn_node_exists_a[mapId] |= (maxLevel >= maxof_minclasslvl_nr && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY));
         spawn_node_exists_h[mapId] |= (maxLevel >= maxof_minclasslvl_nr && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY));
         spawn_node_exists_n[mapId] |= (maxLevel >= maxof_minclasslvl_ex && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY));
 
-        decltype(_wpMaxSpawnLevelPerMapId)::const_iterator cit = _wpMaxSpawnLevelPerMapId.find(mapId);
-        _wpMaxSpawnLevelPerMapId[mapId] = std::max<uint8>((cit != _wpMaxSpawnLevelPerMapId.cend()) ? cit->second : 0u, maxLevel);
+        decltype(_wpMinSpawnLevelPerMapId)::const_iterator mincit = _wpMinSpawnLevelPerMapId.find(mapId);
+        _wpMinSpawnLevelPerMapId[mapId] = std::min<uint8>((mincit != _wpMinSpawnLevelPerMapId.cend()) ? mincit->second : DEFAULT_MAX_LEVEL, minLevel);
+        decltype(_wpMaxSpawnLevelPerMapId)::const_iterator maxcit = _wpMaxSpawnLevelPerMapId.find(mapId);
+        _wpMaxSpawnLevelPerMapId[mapId] = std::max<uint8>((maxcit != _wpMaxSpawnLevelPerMapId.cend()) ? maxcit->second : 1u, maxLevel);
     }
 
     bool spawn_node_minclasslvl_exists_all = true;
@@ -2501,6 +2505,25 @@ uint8 BotDataMgr::GetLevelBonusForBotRank(uint32 rank)
     }
 }
 
+uint8 BotDataMgr::GetMinLevelForMapId(uint32 mapId)
+{
+    decltype(_wpMinSpawnLevelPerMapId)::const_iterator cit = _wpMinSpawnLevelPerMapId.find(mapId);
+    if (cit != _wpMinSpawnLevelPerMapId.cend())
+        return cit->second;
+
+    switch (mapId)
+    {
+        case 0:
+        case 1:
+            return 1;
+        case 530:
+            return 61;
+        case 571:
+            return 71;
+        default:
+            return 1;
+    }
+}
 uint8 BotDataMgr::GetMaxLevelForMapId(uint32 mapId)
 {
     decltype(_wpMaxSpawnLevelPerMapId)::const_iterator cit = _wpMaxSpawnLevelPerMapId.find(mapId);

@@ -477,9 +477,24 @@ void BotMgr::ResolveConfigConflicts()
 
     if (!_enabled_wander_node_maps.empty())
     {
+        uint8 minbotlevel = DEFAULT_MAX_LEVEL;
         uint8 maxbotlevel = 0;
         for (uint32 mapid : _enabled_wander_node_maps)
+        {
+            minbotlevel = std::min<uint8>(minbotlevel, BotDataMgr::GetMinLevelForMapId(mapid));
             maxbotlevel = std::max<uint8>(maxbotlevel, BotDataMgr::GetMaxLevelForMapId(mapid));
+        }
+        for (int8 j = minbotlevel / 10 - 1; j >= 0; --j)
+        {
+            if (_botwanderer_pct_level_brackets[j] > 0)
+            {
+                uint32 pct = _botwanderer_pct_level_brackets[j];
+                _botwanderer_pct_level_brackets[minbotlevel / 10] += pct;
+                _botwanderer_pct_level_brackets[j] = 0;
+                LOG_WARN("server.loading", "NpcBot.WanderingBots.Continents.Levels conflicts with NpcBot.WanderingBots.Continents.Maps: no map for levels {}-{}! Transferring extra {}% to levels {}-{}",
+                    uint32(j ? j * 10 : 1), uint32(j * 10 + 9), pct, std::max<uint32>(minbotlevel / 10 * 10, 1), uint32(minbotlevel / 10 * 10 + 9));
+            }
+        }
         for (uint8 i = maxbotlevel / 10 + 1; i < _botwanderer_pct_level_brackets.size(); ++i)
         {
             if (_botwanderer_pct_level_brackets[i] > 0)
@@ -488,7 +503,7 @@ void BotMgr::ResolveConfigConflicts()
                 _botwanderer_pct_level_brackets[maxbotlevel / 10] += pct;
                 _botwanderer_pct_level_brackets[i] = 0;
                 LOG_WARN("server.loading", "NpcBot.WanderingBots.Continents.Levels conflicts with NpcBot.WanderingBots.Continents.Maps: no map for levels {}-{}! Transferring extra {}% to levels {}-{}",
-                    uint32((i ? i * 10 : 1)), uint32(i * 10 + 9), pct, std::max<uint32>(maxbotlevel, 1), uint32(maxbotlevel + 9));
+                    uint32(i ? i * 10 : 1), uint32(i * 10 + 9), pct, std::max<uint32>(maxbotlevel, 1), uint32(maxbotlevel + 9));
             }
         }
     }

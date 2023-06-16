@@ -191,6 +191,7 @@ class BotDataMgr
         static EquipmentInfo const* GetBotEquipmentInfo(uint32 entry);
 
         static uint8 GetLevelBonusForBotRank(uint32 rank);
+        static uint8 GetMinLevelForMapId(uint32 mapId);
         static uint8 GetMaxLevelForMapId(uint32 mapId);
         static uint8 GetMinLevelForBotClass(uint8 m_class);
         static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
