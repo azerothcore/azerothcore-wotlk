@@ -1,3 +1,4 @@
+-- DB update 2023_06_17_03 -> 2023_06_17_04
 --
 DELETE FROM `spell_proc_event` WHERE `entry` IN (27997, 33511, 33522, 33510, 24256);
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `procPhase`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES
