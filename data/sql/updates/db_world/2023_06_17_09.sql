@@ -1,3 +1,4 @@
+-- DB update 2023_06_17_08 -> 2023_06_17_09
 --
 -- Antu'Sul (Zul'Farrak)
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 8127);
