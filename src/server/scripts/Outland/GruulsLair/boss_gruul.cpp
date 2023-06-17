@@ -124,7 +124,7 @@ struct boss_gruul : public BossAI
             Talk(SAY_SLAY);
             _recentlySpoken = true;
         }
-        
+
         scheduler.Schedule(5s, [this](TaskContext)
         {
             _recentlySpoken = false;

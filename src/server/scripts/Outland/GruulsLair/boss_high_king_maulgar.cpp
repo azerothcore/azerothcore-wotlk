@@ -177,7 +177,6 @@ struct boss_olm_the_summoner : public ScriptedAI
         });
     }
 
-    EventMap events;
     SummonList summons;
     InstanceScript* instance;
 
@@ -254,7 +253,6 @@ struct boss_kiggler_the_crazed : public ScriptedAI
         });
     }
 
-    EventMap events;
     InstanceScript* instance;
 
     void Reset() override
@@ -328,7 +326,6 @@ struct boss_blindeye_the_seer : public ScriptedAI
         });
     }
 
-    EventMap events;
     InstanceScript* instance;
 
     void Reset() override
@@ -389,7 +386,6 @@ struct boss_krosh_firehand : public ScriptedAI
         });
     }
 
-    EventMap events;
     InstanceScript* instance;
 
     void Reset() override
