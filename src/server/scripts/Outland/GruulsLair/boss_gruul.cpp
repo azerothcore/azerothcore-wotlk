@@ -95,11 +95,11 @@ struct boss_gruul : public BossAI
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 5.0f))
             {
-                me->CastSpell(target, SPELL_HURTFUL_STRIKE, false);
+                DoCast(target, SPELL_HURTFUL_STRIKE);
             }
             else
             {
-                me->CastSpell(me->GetVictim(), SPELL_HURTFUL_STRIKE, false);
+                DoCastVictim(SPELL_HURTFUL_STRIKE);
             }
             context.Repeat(15s);
         }).Schedule(35s, [this](TaskContext context)
