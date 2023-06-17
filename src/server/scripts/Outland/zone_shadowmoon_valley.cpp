@@ -1548,7 +1548,7 @@ public:
                         {
                             DoCastVictim(SPELL_AIR_SPIRIT_CHAIN_LIGHTNING);
                         }
-                        _scheduler.Schedule(3s, 5s, [this](TaskContext context)
+                        _scheduler.Schedule(3s, 5s, [this](TaskContext /*context*/)
                         {
                             if (UpdateVictim())
                             {
