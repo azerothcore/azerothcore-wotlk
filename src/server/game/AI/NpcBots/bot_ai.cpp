@@ -1236,7 +1236,7 @@ void bot_ai::SetBotCommandState(uint32 st, bool force, Position* newpos)
         {
             uint32 removeMask = BOT_COMMAND_INACTION & GetBotCommandState();
             st &= ~removeMask;
-            RemoveBotCommandState(removeMask | BOT_COMMAND_MASK_NOCAST_ANY | BOT_COMMAND_STAY | BOT_COMMAND_FULLSTOP | BOT_COMMAND_ATTACK);
+            RemoveBotCommandState(removeMask | BOT_COMMAND_MASK_NOCAST_ANY | BOT_COMMAND_STAY | BOT_COMMAND_FULLSTOP | BOT_COMMAND_ATTACK | BOT_COMMAND_COMBATRESET);
             me->AttackStop();
             me->InterruptNonMeleeSpells(true);
             if (mover != me->ToUnit())
@@ -1244,6 +1244,7 @@ void bot_ai::SetBotCommandState(uint32 st, bool force, Position* newpos)
                 mover->AttackStop();
                 mover->InterruptNonMeleeSpells(true);
             }
+            opponent = nullptr;
         }
         else if (st & BOT_COMMAND_FULLSTOP)
         {
@@ -1255,6 +1256,7 @@ void bot_ai::SetBotCommandState(uint32 st, bool force, Position* newpos)
                 mover->AttackStop();
                 mover->InterruptNonMeleeSpells(true);
             }
+            opponent = nullptr;
             if (mover->isMoving())
                 mover->ToCreature()->BotStopMovement();
         }
@@ -14654,6 +14656,8 @@ void bot_ai::FindMaster()
         return;
     if (!_atHome || _evadeMode)
         return;
+    if (!BotMgr::IsClassEnabled(_botclass))
+        return;
 
     //delay
     if (checkMasterTimer > lastdiff)
@@ -16652,10 +16656,7 @@ void bot_ai::UpdateDeadAI(uint32 diff)
 {
     // group update
     if (_groupUpdateTimer <= diff)
-    {
         SendUpdateToOutOfRangeBotGroupMembers();
-        _groupUpdateTimer = BOT_GROUP_UPDATE_TIMER;
-    }
 }
 //opponent unsafe
 bool bot_ai::GlobalUpdate(uint32 diff)
@@ -16759,10 +16760,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
 
     // group update
     if (_groupUpdateTimer <= diff)
-    {
         SendUpdateToOutOfRangeBotGroupMembers();
-        _groupUpdateTimer = BOT_GROUP_UPDATE_TIMER;
-    }
 
     if (ordersTimer <= diff)
         _ProcessOrders();
@@ -18905,6 +18903,8 @@ void bot_ai::UpdateContestedPvP()
 
 void bot_ai::SendUpdateToOutOfRangeBotGroupMembers()
 {
+    _groupUpdateTimer = BOT_GROUP_UPDATE_TIMER;
+
     if (_groupUpdateMask == GROUP_UPDATE_FLAG_NONE)
         return;
     if (Group* group = GetGroup())
