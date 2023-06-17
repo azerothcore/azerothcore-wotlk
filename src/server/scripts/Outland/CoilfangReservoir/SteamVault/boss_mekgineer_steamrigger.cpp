@@ -30,8 +30,6 @@ enum MekgineerSteamrigger
     SPELL_SAW_BLADE             = 31486,
     SPELL_ELECTRIFIED_NET       = 35107,
     SPELL_ENRAGE                = 26662,
-    SPELL_REPAIR_N              = 31532,
-    SPELL_REPAIR_H              = 37936,
 
     SPELL_SUMMON_MECHANICS_1    = 31528,
     SPELL_SUMMON_MECHANICS_2    = 31529,
@@ -85,23 +83,17 @@ struct boss_mekgineer_steamrigger : public BossAI
         {
             DoCastRandomTarget(SPELL_ELECTRIFIED_NET);
             context.Repeat(21800ms, 34200ms);
-        }).Schedule(5min, [this](TaskContext /*context*/)
-        {
-            DoCastSelf(SPELL_ENRAGE, true);
         });
 
-        if (!IsHeroic())
+        ScheduleHealthCheckEvent({ 75, 50, 25 }, [&] {
+        Talk(SAY_MECHANICS);
+        for (auto const& spell : { SPELL_SUMMON_MECHANICS_1, SPELL_SUMMON_MECHANICS_2, SPELL_SUMMON_MECHANICS_3 })
         {
-            ScheduleHealthCheckEvent({ 75, 50, 25 }, [&] {
-                Talk(SAY_MECHANICS);
-
-                for (auto const& spell : { SPELL_SUMMON_MECHANICS_1, SPELL_SUMMON_MECHANICS_2, SPELL_SUMMON_MECHANICS_3 })
-                {
-                    DoCastAOE(spell, true);
-                }
-            });
+            DoCastAOE(spell, true);
         }
-        else
+        });
+
+        if (IsHeroic())
         {
             scheduler.Schedule(15600ms, [this](TaskContext context)
             {
@@ -109,9 +101,11 @@ struct boss_mekgineer_steamrigger : public BossAI
                 {
                     Talk(SAY_MECHANICS);
                 }
-
                 DoCastAOE(RAND(SPELL_SUMMON_MECHANICS_1, SPELL_SUMMON_MECHANICS_2, SPELL_SUMMON_MECHANICS_3), true);
                 context.Repeat(15600ms, 25400ms);
+            }).Schedule(5min, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_ENRAGE, true);
             });
         }
     }
