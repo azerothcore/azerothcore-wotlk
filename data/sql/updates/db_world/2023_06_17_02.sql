@@ -1,3 +1,4 @@
+-- DB update 2023_06_17_01 -> 2023_06_17_02
 --
 UPDATE `gameobject` SET `spawnMask` = `spawnMask`&~2 WHERE `guid`=9890 AND `id` = 184465;
 
