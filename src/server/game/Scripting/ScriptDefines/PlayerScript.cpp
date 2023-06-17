@@ -582,6 +582,14 @@ void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid 
     });
 }
 
+void ScriptMgr::OnBeforeFillQuestLootItem(Player* player, LootItem& item)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnBeforeFillQuestLootItem(player, item);
+    });
+}
+
 void ScriptMgr::OnStoreNewItem(Player* player, Item* item, uint32 count)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
