@@ -102,12 +102,11 @@ struct boss_commander_sarannis : public BossAI
 
     void ScheduleReinforcements()
     {
-        scheduler.Schedule(IsHeroic() ? 30s : 1s, [this](TaskContext context)
+        scheduler.Schedule(IsHeroic() ? 30s : 1ms, [this](TaskContext context)
         {
             Talk(EMOTE_SUMMON);
             Talk(SAY_SUMMON);
             DoCast(SPELL_SUMMON_REINFORCEMENTS);
-
             if (IsHeroic())
             {
                 context.Repeat(1min);
