@@ -1,4 +1,4 @@
-name: cpp-check
+name: cpp-check-everdawn
 on:
   push:
     branches:
