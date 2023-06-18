@@ -369,6 +369,7 @@ public:
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);
     void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res, uint32 val = 0);
     void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2, 3);
+    void SendAreaTriggerMessage(uint32 entry, ...);
     void SendSetPhaseShift(uint32 phaseShift);
     void SendQueryTimeResponse();
 
