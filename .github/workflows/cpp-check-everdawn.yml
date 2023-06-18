@@ -15,14 +15,14 @@ on:
       - "!docs/**"
 
 jobs:
-  cpp-check:
+  cpp-check-everdawn:
     strategy:
       fail-fast: false
     runs-on: ubuntu-22.04
-    name: cpp check
+    name: cpp check everdawn
     steps:
       - uses: actions/checkout@v2
-      - name: cpp check
+      - name: cpp check everdawn
         run: |
           sudo apt update -y
           sudo apt install -y cppcheck
