@@ -1,5 +1,5 @@
-#ifndef BOSSHEIGAN_H_
-#define BOSSHEIGAN_H_
+#ifndef BOSS_HEIGAN_H_
+#define BOSS_HEIGAN_H_
 
 #include "Player.h"
 #include "ScriptMgr.h"
