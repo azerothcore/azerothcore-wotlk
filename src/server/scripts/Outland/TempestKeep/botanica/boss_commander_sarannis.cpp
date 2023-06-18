@@ -102,7 +102,7 @@ struct boss_commander_sarannis : public BossAI
 
     void ScheduleReinforcements()
     {
-        scheduler.Schedule(IsHeroic() ? 1min : 1s, [this](TaskContext context)
+        scheduler.Schedule(IsHeroic() ? 30s : 1s, [this](TaskContext context)
         {
             Talk(EMOTE_SUMMON);
             Talk(SAY_SUMMON);
@@ -110,7 +110,7 @@ struct boss_commander_sarannis : public BossAI
 
             if (IsHeroic())
             {
-                context.Repeat();
+                context.Repeat(1min);
             }
         });
     }
