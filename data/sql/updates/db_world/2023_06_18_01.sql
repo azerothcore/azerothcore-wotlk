@@ -1,3 +1,4 @@
+-- DB update 2023_06_18_00 -> 2023_06_18_01
 --
 UPDATE `creature_template` SET `minlevel` = 72, `maxlevel` = 72 WHERE  `entry` IN (
 20738, -- Chrono Lord Deja (1)
