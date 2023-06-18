@@ -147,6 +147,13 @@ typedef std::set<Creature const*> NpcBotRegistry;
 struct BotBankItemCompare{ bool operator()(Item const* item1, Item const* item2) const; };
 typedef std::multiset<Item*, BotBankItemCompare> BotBankItemContainer;
 
+constexpr uint8 ITEM_SORTING_LEVEL_STEP = 5;
+constexpr uint8 LEVEL_STEPS = DEFAULT_MAX_LEVEL / ITEM_SORTING_LEVEL_STEP + 1;
+typedef std::vector<uint32> ItemIdVector;
+typedef std::array<ItemIdVector, LEVEL_STEPS> ItemLeveledArr;
+typedef std::array<ItemLeveledArr, BOT_INVENTORY_SIZE> ItemPerSlot;
+typedef std::array<ItemPerSlot, BOT_CLASS_END> ItemPerBotClassMap;
+
 class BotDataMgr
 {
     public:
@@ -186,6 +193,7 @@ class BotDataMgr
         static void GenerateWanderingBots();
         static bool GenerateBattlegroundBots(Player const* groupLeader, Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo);
         static void CreateWanderingBotsSortedGear();
+        static ItemPerBotClassMap const& GetWanderingBotsSortedGearMap();
         static Item* GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(ItemTemplate const*)>&& check);
         static CreatureTemplate const* GetBotExtraCreatureTemplate(uint32 entry);
         static EquipmentInfo const* GetBotEquipmentInfo(uint32 entry);

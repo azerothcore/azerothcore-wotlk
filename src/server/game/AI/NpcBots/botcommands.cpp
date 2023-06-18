@@ -541,6 +541,7 @@ public:
             { "states",     HandleNpcBotDebugStatesCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
             { "spells",     HandleNpcBotDebugSpellsCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
             { "guids",      HandleNpcBotDebugGuidsCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
+            { "wbequips",   HandleNpcBotDebugWBEquipsCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::Yes },
         };
 
         static ChatCommandTable npcbotSetCommandTable =
@@ -1367,6 +1368,77 @@ public:
         }
 
         player->TeleportTo(WorldLocation(wp->GetMapId(), *wp), TELE_TO_GM_MODE);
+
+        return true;
+    }
+
+    static bool HandleNpcBotDebugWBEquipsCommand(ChatHandler* handler, Optional<uint32> bc, Optional<uint32> bs, Optional<EXACT_SEQUENCE("ids")> ids)
+    {
+        const std::array<char const*, BOT_INVENTORY_SIZE> snames {
+            "MHAND", "OHAND", "RANGED", "HEAD", "SHOULDERS", "CHEST", "WAIST", "LEGS", "FEET", "WRIST", "HANDS", "BACK", "BODY", "FINGER", "FINGER", "TRINKET", "TRINKET", "NECK"
+        };
+
+        if (!bc || !bs || *bc >= BOT_CLASS_END || *bs >= BOT_INVENTORY_SIZE)
+        {
+            handler->SendSysMessage("Syntax: .npcbot debug wbequips #class #slot #['ids']");
+            handler->SendSysMessage("List all generated equip templates (or just ids) for wandering bots of class #botclass");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::ostringstream ss;
+        for (uint32 c = BOT_CLASS_WARRIOR; c < BOT_CLASS_END; ++c)
+        {
+            if (c != *bc)
+                continue;
+            std::string cname, dummy;
+            GetBotClassNameAndColor(c, dummy, cname);
+            ItemPerBotClassMap const& bot_gear = BotDataMgr::GetWanderingBotsSortedGearMap();
+            ItemPerSlot const& ips_arr = bot_gear.at(c);
+            for (uint32 s = BOT_SLOT_MAINHAND; s < BOT_INVENTORY_SIZE; ++s)
+            {
+                if (s != *bs)
+                    continue;
+                ItemLeveledArr const& il_arr = ips_arr[s];
+                for (uint32 lstep = 0; lstep < LEVEL_STEPS; ++lstep)
+                {
+                    uint32 minlvl = std::max<uint32>(lstep * ITEM_SORTING_LEVEL_STEP, 1);
+                    uint32 maxlvl = (lstep + 1) * ITEM_SORTING_LEVEL_STEP - 1;
+                    ItemIdVector const& vec = il_arr[lstep];
+                    ss << cname << ' ' << snames[s] << ' ' << minlvl << '-' << maxlvl << " (" << uint32(vec.size()) << "):";
+                    for (uint32 itemId : vec)
+                    {
+                        if (ids != std::nullopt)
+                            ss << "\n " << itemId;
+                        else
+                        {
+                            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                            if (!proto)
+                                ss << "\n [Invalid] " << itemId;
+                            else
+                            {
+                                ss << "\n |c";
+                                switch (proto->Quality)
+                                {
+                                    case ITEM_QUALITY_POOR:     ss << "ff9d9d9d"; break;  //GREY
+                                    case ITEM_QUALITY_NORMAL:   ss << "ffffffff"; break;  //WHITE
+                                    case ITEM_QUALITY_UNCOMMON: ss << "ff1eff00"; break;  //GREEN
+                                    case ITEM_QUALITY_RARE:     ss << "ff0070dd"; break;  //BLUE
+                                    case ITEM_QUALITY_EPIC:     ss << "ffa335ee"; break;  //PURPLE
+                                    case ITEM_QUALITY_LEGENDARY:ss << "ffff8000"; break;  //ORANGE
+                                    case ITEM_QUALITY_ARTIFACT: ss << "ffe6cc80"; break;  //LIGHT YELLOW
+                                    case ITEM_QUALITY_HEIRLOOM: ss << "ffe6cc80"; break;  //LIGHT YELLOW
+                                    default:                    ss << "ff000000"; break;  //UNK BLACK
+                                }
+                                ss << "|Hitem:" << uint32(proto->ItemId) << ":0:0:0:0:0:0:0:0:0|h[" << proto->Name1 << "]|h|r";
+                            }
+                        }
+                    }
+                    handler->PSendSysMessage("%s", ss.str().c_str());
+                    ss.str("");
+                }
+            }
+        }
 
         return true;
     }
