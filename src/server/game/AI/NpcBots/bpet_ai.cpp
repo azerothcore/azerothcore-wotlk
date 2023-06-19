@@ -136,9 +136,9 @@ void bot_pet_ai::_calculatePos(Position& pos) const
 
     float x,y,z;
     //destination
-    if (!petOwner->GetMotionMaster()->GetDestination(x, y, z) || petOwner->GetTransport())
-        petOwner->GetPosition(x, y, z);
+    petOwner->GetPosition(x, y, z);
     //relative angle
+    uint32 movFlags = petOwner->m_movementInfo.GetMovementFlags();
     float o = petOwner->GetOrientation() + PET_FOLLOW_ANGLE;
     uint8 posNum = petOwner->GetBotAI()->GetPetPositionNumber(me);
     if (petOwner->GetBotClass() == BOT_CLASS_DEATH_KNIGHT)
@@ -158,6 +158,12 @@ void bot_pet_ai::_calculatePos(Position& pos) const
     //distance
     x += (PET_FOLLOW_DIST + me->GetCombatReach() + petOwner->GetCombatReach()) * std::cos(o);
     y += (PET_FOLLOW_DIST + me->GetCombatReach() + petOwner->GetCombatReach()) * std::sin(o);
+    if (movFlags & MOVEMENTFLAG_FORWARD)
+    {
+        static float const aheadDist = 6.f;
+        x = x + aheadDist * std::cos(petOwner->GetOrientation());
+        y = y + aheadDist * std::sin(petOwner->GetOrientation());
+    }
     if (!petOwner->GetTransport())
         me->UpdateGroundPositionZ(x, y, z);
     if (me->GetPositionZ() < z)
@@ -190,7 +196,7 @@ void bot_pet_ai::SetBotCommandState(uint32 st, bool force, Position* newpos)
         if (me->isMoving() && Rand() > 10) return;
 
         float x,y,z;
-        if (petOwner->GetMotionMaster()->GetDestination(x, y, z) && me->GetDistance(x, y, z) < 6.f)
+        if (petOwner->GetMotionMaster()->GetDestination(x, y, z) && (me->GetDistance(x, y, z) < 6.f || me->GetDistance(x, y, z) > 20.f))
         {
             if (!me->HasUnitState(UNIT_STATE_FOLLOW))
                 me->GetMotionMaster()->MoveFollow(petOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
@@ -2492,22 +2498,10 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
     if (!opponent && !IsCasting())
     {
         _calculatePos(movepos);
-        if (!petOwner->isMoving())
-        {
-            if (me->GetExactDist(&movepos) > 5.f)
-                SetBotCommandState(BOT_COMMAND_FOLLOW, true, &movepos);
-            else
-                closeToOwner = !me->isMoving();
-        }
+        if (me->GetExactDist(&movepos) > 5.f)
+            SetBotCommandState(BOT_COMMAND_FOLLOW, true, &movepos);
         else
-        {
-            Position destPos;
-            me->GetMotionMaster()->GetDestination(destPos.m_positionX, destPos.m_positionY, destPos.m_positionZ);
-            if (destPos.GetExactDist(&movepos) > 5.f)
-                SetBotCommandState(BOT_COMMAND_FOLLOW, true, &movepos);
-            else
-                closeToOwner = !me->isMoving();
-        }
+            closeToOwner = !me->isMoving();
     }
     if (closeToOwner || me->IsInCombat())
     {

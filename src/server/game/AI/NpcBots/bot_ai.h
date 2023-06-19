@@ -111,13 +111,13 @@ class bot_ai : public CreatureAI
         void CommonTimers(uint32 diff);
         void ResetBotAI(uint8 resetType);
         void KillEvents(bool force);
-        void BotMovement(BotMovementType type, Position const* pos, Unit* target = nullptr, bool generatePath = true) const;
+        void BotMovement(BotMovementType type, Position const* pos, Unit* target = nullptr, bool generatePath = true, float speed = 0.0f) const;
         bool CanBotMoveVehicle() const;
         void MoveToSendPosition(uint32 point_id);
         void MoveToSendPosition(Position const& mpos);
         void MoveToLastSendPosition() { MoveToSendPosition(sendlastpos); }
         void MarkSendPosition(uint32 point_id);
-        void SetBotCommandState(uint32 st, bool force = false, Position* newpos = nullptr);
+        void SetBotCommandState(uint32 st, bool force = false, Position* newpos = nullptr, float* speed = nullptr);
         void RemoveBotCommandState(uint32 st);
         bool HasBotCommandState(uint32 st) const { return (_botCommandState & st); }
         void SetBotAwaitState(uint8 state);
@@ -582,7 +582,7 @@ class bot_ai : public CreatureAI
 
         bool _canCureTarget(Unit const* target, uint32 cureSpell) const;
         void _getBotDispellableAuraList(Unit const* target, uint32 dispelMask, std::list<Aura const*> &dispelList) const;
-        void _calculatePos(Unit const* followUnit, Position& pos) const;
+        void _calculatePos(Unit const* followUnit, Position& pos, float* speed = nullptr) const;
         uint32 _selectMountSpell() const;
         void _updateMountedState();
         void _updateStandState() const;
