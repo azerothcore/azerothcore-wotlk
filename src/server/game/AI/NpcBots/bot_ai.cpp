@@ -7839,7 +7839,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         {
                             std::ostringstream msg;
                             msg << obj->GetGOInfo()->name << " (" << LocalizedNpcText(player, BOT_TEXT_DISTANCE_SHORT) << " = " << player->GetExactDist(obj) << ")";
-                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, msg.str().c_str(), GOSSIP_SENDER_CLASS_ACTION, GOSSIP_ACTION_INFO_DEF + ++count);
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, msg.str().c_str(), GOSSIP_SENDER_CLASS_ACTION1, GOSSIP_ACTION_INFO_DEF + ++count);
                         }
 
                         //2 Inventory
@@ -7863,7 +7863,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                     {
                                         std::ostringstream name;
                                         _AddItemLink(player, item, name, false);
-                                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_CLASS_ACTION, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_CLASS_ACTION1, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                                         break;
                                     }
                                 }
@@ -7890,7 +7890,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                             {
                                                 std::ostringstream name;
                                                 _AddItemLink(player, item, name, false);
-                                                AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_CLASS_ACTION, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                                                AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_CLASS_ACTION1, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                                                 ++count;
                                                 break;
                                             }
@@ -8213,7 +8213,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             }
             break;
         }
-        case GOSSIP_SENDER_CLASS_ACTION:
+        case GOSSIP_SENDER_CLASS_ACTION1:
         {
             switch (_botclass)
             {
