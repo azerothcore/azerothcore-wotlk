@@ -13443,7 +13443,7 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg
     if (!item || item->is_looted)
     {
         Player* player = nullptr;
-        if (!sScriptMgr->CanSendErrorArleadyLooted(player))
+        if (!sScriptMgr->CanSendErrorAlreadyLooted(player))
         {
             SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
         }

@@ -1459,7 +1459,7 @@ public:
     [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/) { return true; }
     [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, bool /*jump*/) { return true; }
 
-    virtual bool CanSendErrorArleadyLooted(Player* /*player*/) { return true; }
+    virtual bool CanSendErrorAlreadyLooted(Player* /*player*/) { return true; }
 
     virtual bool CanSendCreatureLoot(Player* /*player*/) { return true; }
     virtual void OnBeforeCreatureLootMoney(Player* /*player*/) { }
@@ -2386,7 +2386,7 @@ public: /* PlayerScript */
     void OnPlayerEnterCombat(Player* player, Unit* enemy);
     void OnPlayerLeaveCombat(Player* player);
     void OnQuestAbandon(Player* player, uint32 questId);
-    bool CanSendErrorArleadyLooted(Player* player);
+    bool CanSendErrorAlreadyLooted(Player* player);
     bool CanSendCreatureLoot(Player* player);
     void OnBeforeCreatureLootMoney(Player* player);
 

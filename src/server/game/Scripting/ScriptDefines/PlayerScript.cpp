@@ -905,11 +905,11 @@ bool ScriptMgr::CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid 
     return true;
 }
 
-bool ScriptMgr::CanSendErrorArleadyLooted(Player* player)
+bool ScriptMgr::CanSendErrorAlreadyLooted(Player* player)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
     {
-        return !script->CanSendErrorArleadyLooted(player);
+        return !script->CanSendErrorAlreadyLooted(player);
     });
 
     if (ret && *ret)
