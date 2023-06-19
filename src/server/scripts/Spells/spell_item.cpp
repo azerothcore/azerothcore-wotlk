@@ -625,19 +625,19 @@ class spell_item_feast : public SpellScript
             {
                 case SPELL_GREAT_FEAST:
                     if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
+                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
                     break;
                 case SPELL_FISH_FEAST:
                     if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(FISH_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
+                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
                     break;
                 case SPELL_SMALL_FEAST:
                     if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
+                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
                     break;
                 case SPELL_GIGANTIC_FEAST:
                     if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
+                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
                     break;
             }
         }
@@ -811,6 +811,44 @@ class spell_item_gnomish_shrink_ray : public SpellScript
     }
 };
 
+enum GoblinWeatherMachiene
+{
+    SPELL_PERSONALIZED_WEATHER_RAIN = 46736,
+    SPELL_PERSONALIZED_WEATHER_SNOW = 46738,
+    SPELL_PERSONALIZED_WEATHER_SUN  = 46739,
+    SPELL_PERSONALIZED_WEATHER_CLOUDS = 46740
+};
+
+uint32 WeatherForcast()
+{
+    if (!SpellScript::ValidateSpellInfo({
+        SPELL_PERSONALIZED_WEATHER_RAIN,
+        SPELL_PERSONALIZED_WEATHER_SNOW,
+        SPELL_PERSONALIZED_WEATHER_SUN,
+        SPELL_PERSONALIZED_WEATHER_CLOUDS
+        }))
+        return 0;
+
+    uint32 spellId = 0;
+    switch (urand(0, 3))
+    {
+        case 0:
+            spellId = SPELL_PERSONALIZED_WEATHER_RAIN;
+            break;
+        case 1:
+            spellId = SPELL_PERSONALIZED_WEATHER_SNOW;
+            break;
+        case 2:
+            spellId = SPELL_PERSONALIZED_WEATHER_SUN;
+            break;
+        case 3:
+            spellId = SPELL_PERSONALIZED_WEATHER_CLOUDS;
+            break;
+    }
+
+    return spellId;
+}
+
 class spell_item_goblin_weather_machine : public SpellScript
 {
     PrepareSpellScript(spell_item_goblin_weather_machine);
@@ -819,18 +857,13 @@ class spell_item_goblin_weather_machine : public SpellScript
     {
         if (Unit* target = GetHitUnit())
         {
-            uint32 spellId = 46736;
-            if (uint8 add = urand(0, 3))
-                spellId += add + 1;
-
-            target->CastSpell(target, spellId, true);
+            target->CastSpell(target, WeatherForcast(), true);
         }
     }
 
     void Register() override
     {
-        if (m_scriptSpellId == 46203)
-            OnEffectHitTarget += SpellEffectFn(spell_item_goblin_weather_machine::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnEffectHitTarget += SpellEffectFn(spell_item_goblin_weather_machine::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -843,17 +876,12 @@ class spell_item_goblin_weather_machine_aura : public AuraScript
         if (roll_chance_i(50))
             return;
 
-        uint32 spellId = 46736;
-        if (uint8 add = urand(0, 3))
-            spellId += add + 1;
-
-        GetUnitOwner()->CastSpell(GetUnitOwner(), spellId, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), WeatherForcast(), true);
     }
 
     void Register() override
     {
-        if (m_scriptSpellId != 46203)
-            AfterEffectRemove += AuraEffectRemoveFn(spell_item_goblin_weather_machine_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_item_goblin_weather_machine_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -3845,7 +3873,8 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_strong_anti_venom);
     RegisterSpellScript(spell_item_anti_venom);
     RegisterSpellScript(spell_item_gnomish_shrink_ray);
-    RegisterSpellAndAuraScriptPair(spell_item_goblin_weather_machine, spell_item_goblin_weather_machine_aura);
+    RegisterSpellScript(spell_item_goblin_weather_machine);
+    RegisterSpellScript(spell_item_goblin_weather_machine_aura);
     RegisterSpellScript(spell_item_light_lamp);
     RegisterSpellScript(spell_item_fetch_ball);
     RegisterSpellScript(spell_item_oracle_ablutions);

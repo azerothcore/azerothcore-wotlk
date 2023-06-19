@@ -303,6 +303,18 @@ public:
     void EndBattleground(TeamId winnerTeamId) override;
     GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
+    //npcbot
+    GraveyardStruct const* GetClosestGraveyardForBot(Creature* bot) const override;
+    void AddBot(Creature* bot) override;
+    void RewardKillScore(TeamId teamId, uint32 amount);
+    void HandleBotKillPlayer(Creature* killer, Player* victim) override;
+    void HandleBotKillBot(Creature* killer, Creature* victim) override;
+    void HandlePlayerKillBot(Creature* victim, Player* killer) override;
+    void EventBotClickedOnFlag(Creature* bot, GameObject* target_obj) override;
+    bool IsNodeOccupied(uint8 node, TeamId teamId) const;
+    bool IsNodeContested(uint8 node, TeamId teamId) const;
+    //end npcbot
+
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
     void FillInitialWorldStates(WorldPacket& data) override;
     void EventPlayerClickedOnFlag(Player* source, GameObject* gameObject) override;

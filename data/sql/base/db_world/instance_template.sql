@@ -1,36 +1,38 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.instance_template
+-- Dumping structure for table acore_world.instance_template
 DROP TABLE IF EXISTS `instance_template`;
 CREATE TABLE IF NOT EXISTS `instance_template` (
   `map` smallint unsigned NOT NULL,
   `parent` smallint unsigned NOT NULL,
-  `script` varchar(128) NOT NULL DEFAULT '',
+  `script` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `allowMount` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`map`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.instance_template: 85 rows
+-- Dumping data for table acore_world.instance_template: ~85 rows (approximately)
 DELETE FROM `instance_template`;
-/*!40000 ALTER TABLE `instance_template` DISABLE KEYS */;
 INSERT INTO `instance_template` (`map`, `parent`, `script`, `allowMount`) VALUES
 	(30, 0, '', 1),
 	(33, 0, 'instance_shadowfang_keep', 0),
 	(34, 0, 'instance_the_stockade', 0),
 	(36, 0, 'instance_deadmines', 0),
 	(43, 1, 'instance_wailing_caverns', 0),
+	(44, 0, '', 0),
 	(47, 1, 'instance_razorfen_kraul', 0),
 	(48, 1, 'instance_blackfathom_deeps', 0),
 	(70, 0, 'instance_uldaman', 0),
@@ -109,10 +111,9 @@ INSERT INTO `instance_template` (`map`, `parent`, `script`, `allowMount`) VALUES
 	(650, 571, 'instance_trial_of_the_champion', 0),
 	(658, 0, 'instance_pit_of_saron', 1),
 	(668, 0, 'instance_halls_of_reflection', 1),
-	(724, 0, 'instance_ruby_sanctum', 1),
-	(44, 0, '', 0);
-/*!40000 ALTER TABLE `instance_template` ENABLE KEYS */;
+	(724, 0, 'instance_ruby_sanctum', 1);
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

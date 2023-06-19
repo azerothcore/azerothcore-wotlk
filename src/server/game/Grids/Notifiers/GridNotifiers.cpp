@@ -79,8 +79,7 @@ void VisibleNotifier::SendToSelf()
             if (i_largeOnly != obj->IsVisibilityOverridden())
                 continue;
             //npcbot:
-            if (obj->GetTypeId() == TYPEID_UNIT && obj->ToCreature()->IsNPCBotOrPet() &&
-                i_player.GetDistance2d(obj) < i_player.GetVisibilityRange() && i_player.CanSeeOrDetect(obj, false, true))
+            if (obj->IsNPCBotOrPet() && i_player.GetDistance2d(obj) < i_player.GetVisibilityRange() && i_player.CanSeeOrDetect(obj, false, true))
                 continue;
             //end npcbot
         }

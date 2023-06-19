@@ -70,7 +70,7 @@ class ImmunityShieldDispelTargetCheck
         me(unit), range(dist), ai(m_ai) { free = ai->IAmFree(); }
         bool operator()(Unit const* u)
         {
-            if (!_botPvP && !free && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (!u->IsInCombat())
                 return false;
@@ -87,7 +87,7 @@ class ImmunityShieldDispelTargetCheck
             if (!u->HasAuraWithMechanic(1<<MECHANIC_IMMUNE_SHIELD))
                 return false;
 
-            if (!u->IsWithinLOSInMap(me))
+            if (!u->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS))
                 return false;
 
             return true;
@@ -110,18 +110,23 @@ class NearestHostileUnitCheck
 
     public:
         NearestHostileUnitCheck(NearestHostileUnitCheck const&) = delete;
-        explicit NearestHostileUnitCheck(Unit const* unit, float dist, bool magic, bot_ai const* m_ai, bool targetCCed = false, bool withSecondary = false) :
+        explicit NearestHostileUnitCheck(Unit const* unit, float dist, bool magic, bot_ai const* m_ai, bool targetCCed, bool withSecondary) :
         me(unit), m_range(dist), byspell(magic), ai(m_ai), AttackCCed(targetCCed), checkSecondary(withSecondary)
-        { free = ai->IAmFree(); }
+        { free = ai->IAmFree(); berserk = free && (ai->IsWanderer() || unit->GetFaction() == 14); }
+        explicit NearestHostileUnitCheck(Unit const* unit, float dist, bool magic, bot_ai const* m_ai) :
+        NearestHostileUnitCheck(unit, dist, magic, m_ai, true, false)
+        {}
         uint32 operator()(Unit const* u)
         {
             if (u == me)
                 return INVALID;
-            if (!me->IsWithinDistInMap(u, m_range))
+            if (!me->IsWithinDistInMap(u, m_range, !berserk))
+                return INVALID;
+            if (berserk && std::fabs(me->GetPositionZ() - u->GetPositionZ()) > (m_range * 0.25f + 5.0f))
                 return INVALID;
             if (me->HasUnitState(UNIT_STATE_ROOT) && (ai->HasRole(BOT_ROLE_RANGED) == me->IsWithinDistInMap(u, 8.f)))
                 return INVALID;
-            if (/*!free && */!u->IsInCombat())
+            if (!berserk && !u->IsInCombat())
                 return INVALID;
             //if (ai->InDuel(u))
             //    return false;
@@ -132,19 +137,14 @@ class NearestHostileUnitCheck
             //        if (Spell* spell = u->GetCurrentSpell(i))
             //            if (ai->IsInBotParty(spell->m_targets.GetUnitTarget()))
             //                return true;
-            if (!ai->IsInBotParty(u->GetVictim()))
+            if (!berserk && !ai->IsInBotParty(u->GetVictim()))
                 return INVALID;
 
-            if (free)
-            {
-                if (u->IsControlledByPlayer() && !u->IsInCombat())
-                    return INVALID;
-            }
-            else
-            {
-                if (!u->IsWithinLOSInMap(me))
-                    return INVALID;
-            }
+            if (free && !berserk && u->IsControlledByPlayer() && !u->IsInCombat())
+                return INVALID;
+
+            if (!u->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_ALL_CHECKS))
+                return INVALID;
 
             uint32 res = VALID_PRIMARY;
             if (!ai->CanBotAttack(u, byspell))
@@ -166,6 +166,7 @@ class NearestHostileUnitCheck
         bool AttackCCed;
         bool checkSecondary;
         bool free;
+        bool berserk;
 };
 
 class NearbyHostileVehicleTargetCheck
@@ -180,7 +181,7 @@ class NearbyHostileVehicleTargetCheck
                 return false;
             if (!u->IsInCombat())
                 return false;
-            if (!_botPvP && !ai->IAmFree() && u->IsControlledByPlayer())
+            if (!_botPvP && veh->IsPvP() && u->IsControlledByPlayer())
                 return false;
             //if (!veh->IsValidAttackTarget(u))
             //    return false;
@@ -211,7 +212,7 @@ class HostileDispelTargetCheck
         me(unit), m_range(dist), checksteal(stealable), ai(m_ai) { }
         bool operator()(Unit const* u) const
         {
-            if (!_botPvP && !ai->IAmFree() && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (u->IsInCombat() &&
                 u->InSamePhase(me) &&
@@ -334,7 +335,7 @@ class PolyUnitCheck
         explicit PolyUnitCheck(Unit const* unit, float dist) : me(unit), m_range(dist) {}
         bool operator()(Unit const* u) const
         {
-            if (!_botPvP && !(me->ToCreature() && me->ToCreature()->IsFreeBot()) && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (!me->GetVictim() || u == me->GetVictim())
                 return false;
@@ -385,7 +386,7 @@ class FearUnitCheck
         explicit FearUnitCheck(Unit const* unit, float dist = 30) : me(unit), m_range(dist) {}
         bool operator()(Unit const* u) const
         {
-            if (!_botPvP && !(me->ToCreature() && me->ToCreature()->IsFreeBot()) && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (!u->IsAlive())
                 return false;
@@ -439,7 +440,7 @@ class StunUnitCheck
         explicit StunUnitCheck(Unit const* unit, float dist = 20) : me(unit), m_range(dist) {}
         bool operator()(Unit const* u) const
         {
-            if (!_botPvP && !(me->ToCreature() && me->ToCreature()->IsFreeBot()) && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (!u->IsAlive())
                 return false;
@@ -516,7 +517,7 @@ class UndeadCCUnitCheck
         me(unit), m_range(dist), m_ai(ai), m_spellId(spell), _unattacked(unattacked) { }
         bool operator()(Unit const* u) const
         {
-            if (!_botPvP && !(me->ToCreature() && me->ToCreature()->IsFreeBot()) && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (!me->IsWithinDistInMap(u, m_range))
                 return false;
@@ -571,7 +572,7 @@ class RootUnitCheck
         me(unit), m_range(dist), m_ai(ai), m_spellId(spell) { if (!spell) return; }
         bool operator()(Unit const* u) const
         {
-            if (!_botPvP && !(me->ToCreature() && me->ToCreature()->IsFreeBot()) && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (u == me->GetVictim())
                 return false;
@@ -634,7 +635,7 @@ class CastingUnitCheck
                 return false;
             if (u->IsTotem())
                 return false;
-            if (!_botPvP && !(me->ToCreature() && me->ToCreature()->IsFreeBot()) && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (u->HealthBelowPct(m_minHpPct))
                 return false;
@@ -766,7 +767,7 @@ class SecondEnemyCheck
                 return false;//We need to find SECONDARY target
             if (u->isMoving() != mytar->isMoving())//only when both targets idle or both moving
                 return false;
-            if (!_botPvP && !ai->IAmFree() && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (!me->IsWithinDistInMap(u, m_range))//distance check
                 return false;
@@ -793,7 +794,7 @@ class TranquilTargetCheck
         me(unit), min_range(mindist), max_range(maxdist), ai(m_ai) { }
         bool operator()(Unit const* u) const
         {
-            if (!_botPvP && !ai->IAmFree() && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (u != me->GetVictim() &&//check hunter_bot::hunter_botAI::CheckTranquil(uint32)
                 u->IsWithinDistInMap(me, max_range) &&
@@ -854,7 +855,7 @@ class NearbyHostileUnitCheck
                 return false;
             if (me->HasUnitState(UNIT_STATE_ROOT) && (ai->HasRole(BOT_ROLE_RANGED) == me->IsWithinDistInMap(u, 8.f)))
                 return false;
-            if (!_botPvP && !ai->IAmFree() && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (u->GetCreatureType() == CREATURE_TYPE_CRITTER)
                 return false;
@@ -910,7 +911,7 @@ class NearbyHostileUnitInConeCheck
                 return false;
             if (!free && !ai->CanBotAttack(u))
                 return false;
-            if (!_botPvP && !ai->IAmFree() && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (!me->IsWithinDistInMap(u, max_range))
                 return false;
@@ -1042,7 +1043,7 @@ class ManaDrainUnitCheck
         { maxPool = me->GetMaxPower(POWER_MANA) * 3 / 2; }
         bool operator()(Unit const* u)
         {
-            if (!_botPvP && !ai->IAmFree() && u->IsControlledByPlayer())
+            if (!_botPvP && me->IsPvP() && u->IsControlledByPlayer())
                 return false;
             if (u == me)
                 return false;

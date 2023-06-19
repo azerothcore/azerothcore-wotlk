@@ -16,6 +16,7 @@ enum ArchmagePetBaseSpells
 
 enum ArchmagePetSpecial
 {
+    ELEMENTAL_DURATION      = 60000 //1 min
 };
 
 class archmage_pet_bot : public CreatureScript
@@ -32,7 +33,7 @@ public:
     {
         awater_elemental_botpetAI(Creature* creature) : bot_pet_ai(creature) { }
 
-        void EnterCombat(Unit* u) override { bot_pet_ai::EnterCombat(u); }
+        void JustEngagedWith(Unit* u) override { bot_pet_ai::JustEngagedWith(u); }
         void KilledUnit(Unit* u) override { bot_pet_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_pet_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_pet_ai::MoveInLineOfSight(u); }
@@ -48,6 +49,13 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if ((liveTimer += diff) >= uint32(IAmFree() ? (1 * HOUR * IN_MILLISECONDS) : ELEMENTAL_DURATION))
+            {
+                canUpdate = false;
+                me->setDeathState(JUST_DIED);
+                return;
+            }
+
             if (!GlobalUpdate(diff))
                 return;
 
@@ -120,6 +128,7 @@ public:
 
         void Reset() override
         {
+            liveTimer = 0;
         }
 
         void InitPetSpells() override
@@ -132,6 +141,7 @@ public:
         }
 
     private:
+        uint32 liveTimer;
     };
 };
 

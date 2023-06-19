@@ -52,7 +52,7 @@
 #include "Tokenize.h"
 #include "StringConvert.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -1091,7 +1091,7 @@ void WorldObject::setActive(bool on)
         return;
 
     //npcbot: bots should never be removed from active
-    if (on == false && GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
+    if (on == false && IsNPCBotOrPet())
         return;
     //end npcbot
 
@@ -1868,7 +1868,9 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
             return false;
 
     if (!CanDetect(obj, ignoreStealth, !distanceCheck, checkAlert))
+    {
         return false;
+    }
 
     return true;
 }
@@ -1885,7 +1887,7 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool che
     WorldObject const* seer = this;
 
     //npcbot: master's invisibility should not affect bots' sight
-    if (!(GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot()))
+    if (!IsNPCBot())
     //end npcbot
     // Pets don't have detection, they use the detection of their masters
     if (Unit const* thisUnit = ToUnit())
@@ -1898,7 +1900,9 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool che
     if (!ignoreStealth)
     {
         if (!seer->CanDetectInvisibilityOf(obj)) // xinef: added ignoreStealth, allow AoE spells to hit invisible targets!
+        {
             return false;
+        }
 
         if (!seer->CanDetectStealthOf(obj, checkAlert))
         {
@@ -1931,11 +1935,32 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
     // It seems like that only Units are affected by this check (couldn't see arena doors with preparation invisibility)
     if (obj->ToUnit())
     {
-        uint32 objMask = m_invisibility.GetFlags() & obj->m_invisibilityDetect.GetFlags();
-        // xinef: include invisible flags of caster in the mask, 2 invisible objects should be able to detect eachother
-        objMask |= m_invisibility.GetFlags() & obj->m_invisibility.GetFlags();
-        if (objMask != m_invisibility.GetFlags())
-            return false;
+        // Permanently invisible creatures should be able to engage non-invisible targets.
+        // ex. Skulking Witch (20882) / Greater Invisibility (16380)
+        bool isPermInvisibleCreature = false;
+        if (Creature const* baseObj = ToCreature())
+        {
+            auto auraEffects = baseObj->GetAuraEffectsByType(SPELL_AURA_MOD_INVISIBILITY);
+            for (auto const effect : auraEffects)
+            {
+                if (SpellInfo const* spell = effect->GetSpellInfo())
+                {
+                    if (spell->GetMaxDuration() == -1)
+                    {
+                        isPermInvisibleCreature = true;
+                    }
+                }
+            }
+        }
+
+        if (!isPermInvisibleCreature)
+        {
+            uint32 objMask = m_invisibility.GetFlags() & obj->m_invisibilityDetect.GetFlags();
+            // xinef: include invisible flags of caster in the mask, 2 invisible objects should be able to detect eachother
+            objMask |= m_invisibility.GetFlags() & obj->m_invisibility.GetFlags();
+            if (objMask != m_invisibility.GetFlags())
+                return false;
+        }
     }
 
     for (uint32 i = 0; i < TOTAL_INVISIBILITY_TYPES; ++i)
@@ -2203,7 +2228,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             break;
         case UNIT_MASK_TOTEM:
             //npcbot: totem emul step 1
-            if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->ToCreature()->IsNPCBot())
+            if (summoner && summoner->IsNPCBot())
                 summon = new Totem(properties, summoner->ToCreature()->GetBotOwner()->GetGUID());
             else
             //end npcbot
@@ -2224,17 +2249,20 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     }
 
     //npcbot: totem emul step 2
-    if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->ToCreature()->IsNPCBot())
+    if (summoner && summoner->IsNPCBot())
     {
-        summon->SetFaction(summoner->ToCreature()->GetFaction());
-        summon->SetPvP(summoner->ToCreature()->IsPvP());
         summon->SetCreatorGUID(summoner->GetGUID()); // see TempSummon::InitStats()
-        //set key flags if needed
-        if (!summoner->ToCreature()->IsFreeBot())
+        if (mask == UNIT_MASK_TOTEM)
         {
-            summon->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
-            summon->SetOwnerGUID(summoner->ToCreature()->GetBotOwner()->GetGUID());
-            summon->SetControlledByPlayer(true);
+            summon->SetFaction(summoner->ToCreature()->GetFaction());
+            summon->SetPvP(summoner->ToCreature()->IsPvP());
+            //set key flags if needed
+            if (!summoner->ToCreature()->IsFreeBot())
+            {
+                summon->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
+                summon->SetOwnerGUID(summoner->ToCreature()->GetBotOwner()->GetGUID());
+                summon->SetControlledByPlayer(true);
+            }
         }
     }
     //end npcbot
@@ -2256,7 +2284,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     summon->InitSummon();
 
     //npcbot: totem emul step 3
-    if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->ToCreature()->IsNPCBot())
+    if (summoner && summoner->IsNPCBot())
         summoner->ToCreature()->OnBotSummon(summon);
     //end npcbot
 
@@ -2845,14 +2873,14 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
     return pos;
 }
 
-Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
+Position WorldObject::GetFirstCollisionPosition(float dist, float angle) const
 {
     Position pos = GetPosition();
     MovePositionToFirstCollision(pos, dist, angle);
     return pos;
 }
 
-void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
+void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle) const
 {
     angle += GetOrientation();
     float destx, desty, destz;
@@ -2923,7 +2951,7 @@ void WorldObject::DestroyForNearbyPlayers()
         if (!player->HaveAtClient(this))
             continue;
 
-        if (isType(TYPEMASK_UNIT) && ((Unit*)this)->GetCharmerGUID() == player->GetGUID()) // TODO: this is for puppet
+        if (isType(TYPEMASK_UNIT) && ((Unit*)this)->GetCharmerGUID() == player->GetGUID()) /// @todo: this is for puppet
             continue;
 
         DestroyForPlayer(player);

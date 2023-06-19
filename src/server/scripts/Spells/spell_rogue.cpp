@@ -161,7 +161,7 @@ class spell_rog_cheat_death : public AuraScript
     {
         absorbChance = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
         //npcbot
-        if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT && GetUnitOwner()->ToCreature()->IsNPCBot())
+        if (GetUnitOwner()->IsNPCBot())
             return true;
         //end npcbot
         return GetUnitOwner()->ToPlayer();
@@ -586,7 +586,7 @@ class spell_rog_rupture : public AuraScript
     {
         Unit* caster = GetCaster();
         //npcbot
-        if (caster && caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+        if (caster && caster->IsNPCBot())
             return true;
         //end npcbot
         return caster && caster->GetTypeId() == TYPEID_PLAYER;
@@ -727,6 +727,24 @@ class spell_rog_tricks_of_the_trade_proc : public AuraScript
     }
 };
 
+class spell_rog_pickpocket : public SpellScript
+{
+    PrepareSpellScript(spell_rog_pickpocket);
+
+    SpellCastResult CheckCast()
+    {
+        if (!GetExplTargetUnit() || !GetCaster()->IsValidAttackTarget(GetExplTargetUnit(), GetSpellInfo()))
+            return SPELL_FAILED_BAD_TARGETS;
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_rog_pickpocket::CheckCast);
+    }
+};
+
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
@@ -742,4 +760,5 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_shiv);
     RegisterSpellScript(spell_rog_tricks_of_the_trade);
     RegisterSpellScript(spell_rog_tricks_of_the_trade_proc);
+    RegisterSpellScript(spell_rog_pickpocket);
 }

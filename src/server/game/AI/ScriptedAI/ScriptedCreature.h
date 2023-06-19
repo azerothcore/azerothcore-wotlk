@@ -23,6 +23,7 @@
 #include "CreatureAIImpl.h"
 #include "InstanceScript.h"
 #include "EventMap.h"
+#include "TaskScheduler.h"
 
 #define CAST_AI(a, b)   (dynamic_cast<a*>(b))
 
@@ -134,6 +135,20 @@ public:
             else if (!summon)
             {
                 storage_.remove(guid);
+            }
+        }
+    }
+
+    void DoForAllSummons(std::function<void(WorldObject*)> exec)
+    {
+        // We need to use a copy of SummonList here, otherwise original SummonList would be modified
+        StorageType listCopy = storage_;
+
+        for (auto const& guid : listCopy)
+        {
+            if (WorldObject* summon = ObjectAccessor::GetWorldObject(*me, guid))
+            {
+                exec(summon);
             }
         }
     }
@@ -277,9 +292,9 @@ struct ScriptedAI : public CreatureAI
     void Reset() override {}
 
     //Called at creature aggro either by MoveInLOS or Attack Start
-    void EnterCombat(Unit* /*victim*/) override {}
+    void JustEngagedWith(Unit* /*who*/) override {}
 
-    // Called before EnterCombat even before the creature is in combat.
+    // Called before JustEngagedWith even before the creature is in combat.
     void AttackStart(Unit* /*target*/) override;
 
     // *************
@@ -429,6 +444,14 @@ private:
     bool _isHeroic;
 };
 
+struct HealthCheckEventData
+{
+    HealthCheckEventData(uint8 healthPct, std::function<void()> exec) : _healthPct(healthPct), _exec(exec) { };
+
+    uint8 _healthPct;
+    std::function<void()> _exec;
+};
+
 class BossAI : public ScriptedAI
 {
 public:
@@ -437,11 +460,17 @@ public:
 
     InstanceScript* const instance;
 
+    bool CanRespawn() override;
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
     void SummonedCreatureDespawnAll() override;
 
     void UpdateAI(uint32 diff) override;
+
+    void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec);
+    void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec);
 
     // Hook used to execute events scheduled into EventMap without the need
     // to override UpdateAI
@@ -449,24 +478,29 @@ public:
     // is supposed to run more than once
     virtual void ExecuteEvent(uint32 /*eventId*/) { }
 
+    virtual void ScheduleTasks() { }
+
     void Reset() override { _Reset(); }
-    void EnterCombat(Unit* /*who*/) override { _EnterCombat(); }
+    void JustEngagedWith(Unit* /*who*/) override { _JustEngagedWith(); }
     void JustDied(Unit* /*killer*/) override { _JustDied(); }
     void JustReachedHome() override { _JustReachedHome(); }
 
 protected:
     void _Reset();
-    void _EnterCombat();
+    void _JustEngagedWith();
     void _JustDied();
     void _JustReachedHome() { me->setActive(false); }
+    [[nodiscard]] bool _ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const;
 
     void TeleportCheaters();
 
     EventMap events;
     SummonList summons;
+    TaskScheduler scheduler;
 
 private:
     uint32 const _bossId;
+    std::list<HealthCheckEventData> _healthCheckEvents;
 };
 
 class WorldBossAI : public ScriptedAI
@@ -487,12 +521,12 @@ public:
     virtual void ExecuteEvent(uint32 /*eventId*/) { }
 
     void Reset() override { _Reset(); }
-    void EnterCombat(Unit* /*who*/) override { _EnterCombat(); }
+    void JustEngagedWith(Unit* /*who*/) override { _JustEngagedWith(); }
     void JustDied(Unit* /*killer*/) override { _JustDied(); }
 
 protected:
     void _Reset();
-    void _EnterCombat();
+    void _JustEngagedWith();
     void _JustDied();
 
     EventMap events;

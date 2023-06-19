@@ -1,4 +1,4 @@
--- 
+--
 SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 -- Table structure for creature_template_outfits
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_outfits` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records 
+-- Records
 -- ----------------------------
 INSERT INTO `creature_template_outfits` VALUES
 ('70551', '2', '0', '0', '14', '9', '7', '5', '0', '0', '0', '0', '59194', '64674', '0', '36248', '0', '0', '0'),

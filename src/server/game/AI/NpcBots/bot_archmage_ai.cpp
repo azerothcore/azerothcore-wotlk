@@ -58,19 +58,19 @@ public:
         return new archmage_botAI(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         return creature->GetBotAI()->OnGossipHello(player, 0);
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
         if (bot_ai* ai = creature->GetBotAI())
             return ai->OnGossipSelect(player, creature, sender, action);
         return true;
     }
 
-    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code)
+    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code) override
     {
         if (bot_ai* ai = creature->GetBotAI())
             return ai->OnGossipSelectCode(player, creature, sender, action, code);
@@ -111,7 +111,7 @@ public:
             GetInPosition(force, u);
         }
 
-        void EnterCombat(Unit* u) override { bot_ai::EnterCombat(u); }
+        void JustEngagedWith(Unit* u) override { bot_ai::JustEngagedWith(u); }
         void AttackStart(Unit*) override { }
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
@@ -170,6 +170,8 @@ public:
             if (IsCasting())
                 return;
 
+            CheckUsableItems(diff);
+
             Attack(diff);
         }
 
@@ -180,6 +182,10 @@ public:
                 return;
 
             StartAttack(mytar, IsMelee());
+
+            CheckAttackState();
+            if (!me->IsAlive() || !mytar->IsAlive())
+                return;
 
             MoveBehind(mytar);
 
@@ -288,7 +294,7 @@ public:
             Position pos;
 
             //water elemetal 1 minute duration
-            Creature* myPet = me->SummonCreature(entry, *me, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, (IAmFree() ? 60 : 1) * MINUTE * IN_MILLISECONDS);
+            Creature* myPet = me->SummonCreature(entry, *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             me->GetNearPoint(myPet, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 0.f, 2, me->GetOrientation());
             myPet->GetMotionMaster()->MovePoint(me->GetMapId(), pos);
             myPet->SetCreator(master);
@@ -296,7 +302,6 @@ public:
             myPet->SetFaction(master->GetFaction());
             myPet->SetControlledByPlayer(!IAmFree());
             myPet->SetPvP(me->IsPvP());
-            myPet->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             myPet->SetByteValue(UNIT_FIELD_BYTES_2, 1, master->GetByteValue(UNIT_FIELD_BYTES_2, 1));
             myPet->SetUInt32Value(UNIT_CREATED_BY_SPELL, SUMMON_WATER_ELEMENTAL_1);
 

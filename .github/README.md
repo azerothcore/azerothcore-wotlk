@@ -65,9 +65,22 @@ NPCBots installation guide is available in the [NPCBots Readme](https://github.c
 
 ## Support
 
-Our self-made wiki probably has a lot of answers for you.
+AzerothCore self-made wiki probably has a lot of answers for you.
 
 For help requests, it is recommended to ask your question on [StackOverflow](https://stackoverflow.com/questions/tagged/azerothcore) and link it in [our chat](https://discordapp.com/channels/217589275766685707/284406375495368704).
+
+
+## Reporting issues
+
+NPCBots issues can be reported via the [Github issue tracker](https://github.com/trickerer/Trinity-Bots/issues/).
+
+Please take the time to review existing issues before submitting your own to
+prevent duplicates.
+
+
+## Submitting fixes
+
+C++ fixes are submitted as [pull requests](https://github.com/trickerer/Azerothcore-wotlk-with-NPCBots/pulls).
 
 
 ## Authors & Contributors
@@ -100,11 +113,3 @@ This project exists thanks to:
 
 - The new AzerothCore source components are released under the [GNU AGPL v3](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3)
 - The old sources based on MaNGOS/TrinityCore are released under the [GNU GPL v2](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2)
-
-
-## Special thanks
-
-[JetBrains](https://www.jetbrains.com/?from=AzerothCore) is providing free [open-source licenses](https://www.jetbrains.com/community/opensource/) to the AzerothCore developers.
-
-[![JetBrains](https://user-images.githubusercontent.com/75517/51205146-7f225c80-1905-11e9-82e0-835627be170d.png)](https://www.jetbrains.com/?from=AzerothCore)
-

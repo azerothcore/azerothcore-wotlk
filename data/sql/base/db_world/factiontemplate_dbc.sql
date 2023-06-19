@@ -1,18 +1,20 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.factiontemplate_dbc
+-- Dumping structure for table acore_world.factiontemplate_dbc
 DROP TABLE IF EXISTS `factiontemplate_dbc`;
 CREATE TABLE IF NOT EXISTS `factiontemplate_dbc` (
   `ID` int NOT NULL DEFAULT '0',
@@ -30,13 +32,11 @@ CREATE TABLE IF NOT EXISTS `factiontemplate_dbc` (
   `Friend_3` int NOT NULL DEFAULT '0',
   `Friend_4` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.factiontemplate_dbc: 841 rows
+-- Dumping data for table acore_world.factiontemplate_dbc: ~841 rows (approximately)
 DELETE FROM `factiontemplate_dbc`;
-/*!40000 ALTER TABLE `factiontemplate_dbc` DISABLE KEYS */;
 INSERT INTO `factiontemplate_dbc` (`ID`, `Faction`, `Flags`, `FactionGroup`, `FriendGroup`, `EnemyGroup`, `Enemies_1`, `Enemies_2`, `Enemies_3`, `Enemies_4`, `Friend_1`, `Friend_2`, `Friend_3`, `Friend_4`) VALUES
-	(80, 69, 72, 3, 2, 12, 0, 0, 0, 0, 69, 0, 0, 0),
 	(1, 1, 72, 3, 2, 12, 0, 0, 0, 0, 0, 0, 0, 0),
 	(2, 2, 72, 5, 4, 10, 0, 0, 0, 0, 0, 0, 0, 0),
 	(3, 3, 72, 3, 2, 12, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -112,9 +112,10 @@ INSERT INTO `factiontemplate_dbc` (`ID`, `Faction`, `Flags`, `FactionGroup`, `Fr
 	(77, 62, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 	(78, 63, 0, 8, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0),
 	(79, 69, 2081, 3, 2, 12, 0, 0, 0, 0, 0, 0, 0, 0),
+	(80, 69, 72, 3, 2, 12, 0, 0, 0, 0, 69, 0, 0, 0),
 	(81, 64, 1025, 8, 0, 1, 0, 0, 0, 0, 64, 0, 0, 0),
 	(82, 65, 1, 8, 0, 1, 0, 0, 0, 0, 65, 0, 0, 0),
-	(96, 79, 0, 2, 2, 0, 66, 0, 0, 0, 79, 0, 0, 0),
+	(83, 66, 0, 4, 4, 10, 79, 0, 0, 0, 66, 0, 0, 0),
 	(84, 189, 33, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0),
 	(85, 76, 2081, 5, 4, 10, 0, 0, 0, 0, 0, 0, 0, 0),
 	(86, 770, 64, 0, 1, 0, 769, 0, 0, 0, 771, 0, 0, 0),
@@ -127,7 +128,7 @@ INSERT INTO `factiontemplate_dbc` (`ID`, `Faction`, `Flags`, `FactionGroup`, `Fr
 	(93, 14, 8, 8, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0),
 	(94, 77, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 	(95, 78, 1, 8, 0, 1, 0, 0, 0, 0, 78, 0, 0, 0),
-	(83, 66, 0, 4, 4, 10, 79, 0, 0, 0, 66, 0, 0, 0),
+	(96, 79, 0, 2, 2, 0, 66, 0, 0, 0, 79, 0, 0, 0),
 	(97, 70, 64, 8, 0, 0, 79, 0, 0, 0, 70, 0, 0, 0),
 	(98, 68, 8, 4, 4, 10, 0, 0, 0, 0, 0, 0, 0, 0),
 	(99, 36, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -877,8 +878,8 @@ INSERT INTO `factiontemplate_dbc` (`ID`, `Faction`, `Flags`, `FactionGroup`, `Fr
 	(2230, 1106, 72, 0, 0, 0, 1107, 20, 0, 0, 1106, 0, 0, 0),
 	(2235, 1160, 0, 0, 5, 2, 0, 0, 0, 0, 1160, 0, 0, 0),
 	(2236, 1159, 0, 0, 3, 4, 0, 0, 0, 0, 1159, 0, 0, 0);
-/*!40000 ALTER TABLE `factiontemplate_dbc` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

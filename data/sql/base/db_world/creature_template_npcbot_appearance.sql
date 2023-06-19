@@ -1,4 +1,4 @@
--- 
+--
 SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 -- Table structure for creature_template_npcbot_appearance
@@ -17,7 +17,7 @@ CREATE TABLE `creature_template_npcbot_appearance` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records 
+-- Records
 -- ----------------------------
 INSERT INTO `creature_template_npcbot_appearance` VALUES
 ('70001', 'Llane', '0', '3', '0', '1', '1', '6'),

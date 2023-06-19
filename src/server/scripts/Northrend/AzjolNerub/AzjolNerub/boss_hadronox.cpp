@@ -97,10 +97,10 @@ public:
             {
                 instance->SetBossState(DATA_HADRONOX_EVENT, IN_PROGRESS);
                 me->setActive(true);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE1, 20000);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE2, 40000);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE3, 60000);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE4, 80000);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE1, 20s);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE2, 40s);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE3, 60s);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE4, 80s);
             }
         }
 
@@ -137,12 +137,12 @@ public:
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
-            events.RescheduleEvent(EVENT_HADRONOX_ACID, 10000);
-            events.RescheduleEvent(EVENT_HADRONOX_LEECH, 4000);
-            events.RescheduleEvent(EVENT_HADRONOX_PIERCE, 1000);
-            events.RescheduleEvent(EVENT_HADRONOX_GRAB, 15000);
+            events.RescheduleEvent(EVENT_HADRONOX_ACID, 10s);
+            events.RescheduleEvent(EVENT_HADRONOX_LEECH, 4s);
+            events.RescheduleEvent(EVENT_HADRONOX_PIERCE, 1s);
+            events.RescheduleEvent(EVENT_HADRONOX_GRAB, 15s);
         }
 
         bool AnyPlayerValid() const
@@ -153,6 +153,21 @@ public:
                     return true;
 
             return false;
+        }
+
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            if ((!who || !who->IsControlledByPlayer()) && me->HealthBelowPct(70))
+            {
+                if (me->HealthBelowPctDamaged(5, damage))
+                {
+                    damage = 0;
+                }
+                else
+                {
+                    damage *= (me->GetHealthPct() - 5.0f) / 65.0f;
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -168,24 +183,24 @@ public:
             {
                 case EVENT_HADRONOX_PIERCE:
                     me->CastSpell(me->GetVictim(), SPELL_PIERCE_ARMOR, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_PIERCE, 8000);
+                    events.ScheduleEvent(EVENT_HADRONOX_PIERCE, 8s);
                     break;
                 case EVENT_HADRONOX_ACID:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, false))
                         me->CastSpell(target, SPELL_ACID_CLOUD, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_ACID, 25000);
+                    events.ScheduleEvent(EVENT_HADRONOX_ACID, 25s);
                     break;
                 case EVENT_HADRONOX_LEECH:
                     me->CastSpell(me, SPELL_LEECH_POISON, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_LEECH, 12000);
+                    events.ScheduleEvent(EVENT_HADRONOX_LEECH, 12s);
                     break;
                 case EVENT_HADRONOX_GRAB:
                     me->CastSpell(me, SPELL_WEB_GRAB, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_GRAB, 25000);
+                    events.ScheduleEvent(EVENT_HADRONOX_GRAB, 25s);
                     break;
                 case EVENT_HADRONOX_MOVE4:
                     me->CastSpell(me, SPELL_WEB_FRONT_DOORS, true);
-                    [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                    [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                 case EVENT_HADRONOX_MOVE1:
                 case EVENT_HADRONOX_MOVE2:
                 case EVENT_HADRONOX_MOVE3:
@@ -254,7 +269,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             if (me->ToTempSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
@@ -266,8 +281,8 @@ public:
                         Talk(SAY_CRUSHER_AGGRO);
                     }
 
-            events.ScheduleEvent(EVENT_CRUSHER_SMASH, 8000, 0, 0);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+            events.ScheduleEvent(EVENT_CRUSHER_SMASH, 8s, 0, 0);
+            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -283,7 +298,7 @@ public:
             {
                 case EVENT_CRUSHER_SMASH:
                     me->CastSpell(me->GetVictim(), SPELL_SMASH, false);
-                    events.ScheduleEvent(EVENT_CRUSHER_SMASH, 15000);
+                    events.ScheduleEvent(EVENT_CRUSHER_SMASH, 15s);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(30))
@@ -292,7 +307,7 @@ public:
                         me->CastSpell(me, SPELL_FRENZY, false);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
                     break;
             }
 

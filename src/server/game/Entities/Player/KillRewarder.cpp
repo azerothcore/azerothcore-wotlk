@@ -75,6 +75,10 @@ KillRewarder::KillRewarder(Player* killer, Unit* victim, bool isBattleGround) :
     // mark the credit as pvp if victim is player
     if (victim->GetTypeId() == TYPEID_PLAYER)
         _isPvP = true;
+    //npcbot
+    else if (victim->IsNPCBotOrPet())
+        _isPvP = true;
+    //end npcbot
         // or if its owned by player and its not a vehicle
     else if (victim->GetCharmerOrOwnerGUID().IsPlayer())
         _isPvP = !victim->IsVehicle();
@@ -181,6 +185,7 @@ void KillRewarder::_RewardXP(Player* player, float rate)
         //end npcbot
 
         // 4.2.3. Give XP to player.
+        sScriptMgr->OnGivePlayerXP(player, xp, _victim, PlayerXPSource::XPSOURCE_KILL);
         player->GiveXP(xp, _victim, _groupRate);
         if (Pet* pet = player->GetPet())
             // 4.2.4. If player has pet, reward pet with XP (100% for single player, 50% for group case).

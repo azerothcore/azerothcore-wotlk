@@ -69,19 +69,19 @@ public:
         return new dreadlord_botAI(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         return creature->GetBotAI()->OnGossipHello(player, 0);
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
         if (bot_ai* ai = creature->GetBotAI())
             return ai->OnGossipSelect(player, creature, sender, action);
         return true;
     }
 
-    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code)
+    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code) override
     {
         if (bot_ai* ai = creature->GetBotAI())
             return ai->OnGossipSelectCode(player, creature, sender, action, code);
@@ -150,7 +150,7 @@ public:
             GetInPosition(force, u);
         }
 
-        void EnterCombat(Unit* u) override { bot_ai::EnterCombat(u); }
+        void JustEngagedWith(Unit* u) override { bot_ai::JustEngagedWith(u); }
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
@@ -164,7 +164,7 @@ public:
 
             checkAuraTimer = 10000;
 
-            if (!IAmFree() && !me->HasAura(VAMPIRIC_AURA, me->GetGUID()))
+            if (!me->HasAura(VAMPIRIC_AURA, me->GetGUID()))
                 RefreshAura(VAMPIRIC_AURA);
         }
 
@@ -213,6 +213,8 @@ public:
             if (!CheckAttackTarget())
                 return;
 
+            CheckUsableItems(diff);
+
             CheckSleep(diff);
 
             Attack(diff);
@@ -225,6 +227,10 @@ public:
                 return;
 
             StartAttack(mytar, IsMelee());
+
+            CheckAttackState();
+            if (!me->IsAlive() || !mytar->IsAlive())
+                return;
 
             MoveBehind(mytar);
 
@@ -421,7 +427,6 @@ public:
             myPet->SetFaction(master->GetFaction());
             myPet->SetControlledByPlayer(!IAmFree());
             myPet->SetPvP(me->IsPvP());
-            myPet->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             myPet->SetByteValue(UNIT_FIELD_BYTES_2, 1, master->GetByteValue(UNIT_FIELD_BYTES_2, 1));
 
             //immune

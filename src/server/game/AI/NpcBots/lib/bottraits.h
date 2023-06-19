@@ -34,13 +34,13 @@ typename fixed_tuple<T,N>::tuple_type to_tuple(std::array<T, N>&& arr)
 }
 
 template<typename T, std::size_t N, std::size_t... Is>
-typename fixed_tuple<typename T::second_type,N>::tuple_type to_spell_school_affect_bool_tuple_helper(std::array<T, N>&& arr, std::index_sequence<Is...>&&)
+typename fixed_tuple<typename T::second_type, N>::tuple_type to_spell_school_affect_bool_tuple_helper(std::array<T, N>&& arr, std::index_sequence<Is...>&&)
 {
     return std::make_tuple(arr[Is].second...);
 }
 
 template<typename T, size_t N>
-typename fixed_tuple<typename T::second_type,N>::tuple_type to_spell_school_affect_bool_tuple(std::array<T, N>&& arr)
+typename fixed_tuple<typename T::second_type, N>::tuple_type to_spell_school_affect_bool_tuple(std::array<T, N>&& arr)
 {
     return to_spell_school_affect_bool_tuple_helper(std::forward<std::array<T, N>>(arr), std::make_index_sequence<N>{});
 }
@@ -109,7 +109,7 @@ CanAffectVictimSchools(Unit const* target, Schools... schools)
     {
         if (SpellSchoolMask immune_mask = SpellSchoolMask(immune_effect->GetMiscValue()))
         {
-            for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+            for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
             {
                 if (immune_mask & (1 << i))
                 {

@@ -63,9 +63,9 @@ enum Events
     EVENT_PYROBLAST                 = 6,
     // Hack due to trigger spell not in dbc
     EVENT_FIRE_SHIELD               = 7,
-    // Make sure all players have aura from altar
-    EVENT_PLAYER_CHECK              = 8,
-    EVENT_ENTER_COMBAT              = 9
+    EVENT_PRE_ENTER_COMBAT_1        = 8,
+    EVENT_PRE_ENTER_COMBAT_2        = 9,
+    EVENT_ENTER_COMBAT              = 10
 };
 
 class boss_pyroguard_emberseer : public CreatureScript
@@ -87,9 +87,9 @@ public:
             me->RemoveAura(SPELL_EMBERSEER_FULL_STRENGTH);
             me->RemoveAura(SPELL_EMBERSEER_GROWING);
             me->RemoveAura(SPELL_EMBERSEER_GROWING_TRIGGER);
-            events.ScheduleEvent(EVENT_RESPAWN, 5000);
+            events.ScheduleEvent(EVENT_RESPAWN, 5s);
             // Hack for missing trigger spell
-            events.ScheduleEvent(EVENT_FIRE_SHIELD, 3000);
+            events.ScheduleEvent(EVENT_FIRE_SHIELD, 3s);
 
             // Open doors on reset
             if (instance->GetBossState(DATA_PYROGAURD_EMBERSEER) == IN_PROGRESS)
@@ -101,7 +101,8 @@ public:
             switch (data)
             {
                 case 1:
-                    events.ScheduleEvent(EVENT_PLAYER_CHECK, 5000);
+                    events.ScheduleEvent(EVENT_PRE_FIGHT_1, 2s);
+                    instance->SetBossState(DATA_PYROGAURD_EMBERSEER, IN_PROGRESS);
                     break;
                 case 2:
                     // Close these two doors on Blackhand Incarcerators aggro
@@ -120,12 +121,12 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             // ### TODO Check combat timing ###
-            events.ScheduleEvent(EVENT_FIRENOVA,    6000);
-            events.ScheduleEvent(EVENT_FLAMEBUFFET, 3000);
-            events.ScheduleEvent(EVENT_PYROBLAST,  14000);
+            events.ScheduleEvent(EVENT_FIRENOVA,    6s);
+            events.ScheduleEvent(EVENT_FLAMEBUFFET, 3s);
+            events.ScheduleEvent(EVENT_PYROBLAST,  14s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -153,14 +154,12 @@ public:
 
                 if (me->GetAuraCount(SPELL_EMBERSEER_GROWING_TRIGGER) == 20)
                 {
-                    me->RemoveAura(SPELL_ENCAGED_EMBERSEER);
-                    me->RemoveAura(SPELL_FREEZE_ANIM);
-                    me->CastSpell(me, SPELL_EMBERSEER_FULL_STRENGTH);
-                    Talk(EMOTE_FREE_OF_BONDS);
-                    Talk(YELL_FREE_OF_BONDS);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetImmuneToPC(false);
-                    events.ScheduleEvent(EVENT_ENTER_COMBAT, 2000);
+                    events.CancelEvent(EVENT_FIRE_SHIELD); // temporarily cancel fire shield to keep it from interrupting combat start
+
+                    // Schedule out the pre-combat scene
+                    events.ScheduleEvent(EVENT_PRE_ENTER_COMBAT_1, 0s);
+                    events.ScheduleEvent(EVENT_PRE_ENTER_COMBAT_2, 2s);
+                    events.ScheduleEvent(EVENT_ENTER_COMBAT, 5s);
                 }
             }
         }
@@ -235,7 +234,7 @@ public:
                                     if (Creature* creature = *itr)
                                         creature->AI()->SetData(1, 1);
                                 }
-                                events.ScheduleEvent(EVENT_PRE_FIGHT_2, 32000);
+                                events.ScheduleEvent(EVENT_PRE_FIGHT_2, 2s);
                                 break;
                             }
                         case EVENT_PRE_FIGHT_2:
@@ -246,27 +245,23 @@ public:
                         case EVENT_FIRE_SHIELD:
                             // #### Spell isn't doing any damage ??? ####
                             DoCast(me, SPELL_FIRE_SHIELD);
-                            events.ScheduleEvent(EVENT_FIRE_SHIELD, 3000);
+                            events.ScheduleEvent(EVENT_FIRE_SHIELD, 3s);
                             break;
-                        case EVENT_PLAYER_CHECK:
-                            {
-                                // Check to see if all players in instance have aura SPELL_EMBERSEER_START before starting event
-                                bool _hasAura = false;
-                                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                    if (Player* player = itr->GetSource()->ToPlayer())
-                                        if (player->HasAura(SPELL_EMBERSEER_OBJECT_VISUAL))
-                                            _hasAura = true;
-
-                                if (_hasAura)
-                                {
-                                    events.ScheduleEvent(EVENT_PRE_FIGHT_1, 1000);
-                                    instance->SetBossState(DATA_PYROGAURD_EMBERSEER, IN_PROGRESS);
-                                }
-                                break;
-                            }
+                        case EVENT_PRE_ENTER_COMBAT_1:
+                            me->RemoveAura(SPELL_ENCAGED_EMBERSEER);
+                            me->RemoveAura(SPELL_FREEZE_ANIM);
+                            me->CastSpell(me, SPELL_EMBERSEER_FULL_STRENGTH);
+                            Talk(EMOTE_FREE_OF_BONDS);
+                            break;
+                        case EVENT_PRE_ENTER_COMBAT_2:
+                            Talk(YELL_FREE_OF_BONDS);
+                            break;
                         case EVENT_ENTER_COMBAT:
+                            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetImmuneToPC(false);
                             DoZoneInCombat();
+                            // re-enable fire shield
+                            events.ScheduleEvent(EVENT_FIRE_SHIELD, 0s);
                             break;
                         default:
                             break;
@@ -283,19 +278,19 @@ public:
                 {
                     case EVENT_FIRE_SHIELD:
                         DoCast(me, SPELL_FIRE_SHIELD);
-                        events.ScheduleEvent(EVENT_FIRE_SHIELD, 3000);
+                        events.ScheduleEvent(EVENT_FIRE_SHIELD, 3s);
                         break;
                     case EVENT_FIRENOVA:
                         DoCast(me, SPELL_FIRENOVA);
-                        events.ScheduleEvent(EVENT_FIRENOVA, 6000);
+                        events.ScheduleEvent(EVENT_FIRENOVA, 6s);
                         break;
                     case EVENT_FLAMEBUFFET:
                         DoCast(me, SPELL_FLAMEBUFFET);
-                        events.ScheduleEvent(EVENT_FLAMEBUFFET, 14000);
+                        events.ScheduleEvent(EVENT_FLAMEBUFFET, 14s);
                         break;
                     case EVENT_PYROBLAST:
                         DoCastRandomTarget(SPELL_PYROBLAST, 0, 100.0f);
-                        events.ScheduleEvent(EVENT_PYROBLAST, 15000);
+                        events.ScheduleEvent(EVENT_PYROBLAST, 15s);
                         break;
                     default:
                         break;
@@ -347,11 +342,6 @@ public:
             _fleedForAssistance = false;
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            me->DespawnOrUnsummon(10000);
-        }
-
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
         {
             if (!_fleedForAssistance && me->HealthBelowPctDamaged(30, damage))
@@ -373,10 +363,10 @@ public:
             }
 
             if (data == 1 && value == 2)
-                _events.ScheduleEvent(EVENT_ENCAGED_EMBERSEER, 1000);
+                _events.ScheduleEvent(EVENT_ENCAGED_EMBERSEER, 1s);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             // Used to close doors
             if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
@@ -391,8 +381,7 @@ public:
                     creature->SetInCombatWithZone();    // AI()->AttackStart(me->GetVictim());
             }
 
-            _events.ScheduleEvent(EVENT_STRIKE, urand(8000, 16000));
-            _events.ScheduleEvent(EVENT_ENCAGE, urand(10000, 20000));
+            _events.ScheduleEvent(EVENT_STRIKE, 8s, 16s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -426,11 +415,11 @@ public:
                 {
                     case EVENT_STRIKE:
                         DoCastVictim(SPELL_STRIKE, true);
-                        _events.ScheduleEvent(EVENT_STRIKE, urand(14000, 23000));
+                        _events.ScheduleEvent(EVENT_STRIKE, 14s, 23s);
                         break;
                     case EVENT_ENCAGE:
                         DoCast(SelectTarget(SelectTargetMethod::Random, 0, 100, true), EVENT_ENCAGE, true);
-                        _events.ScheduleEvent(EVENT_ENCAGE, urand(6000, 12000));
+                        _events.ScheduleEvent(EVENT_ENCAGE, 6s, 12s);
                         break;
                     default:
                         break;

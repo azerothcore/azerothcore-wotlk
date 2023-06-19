@@ -75,444 +75,397 @@ enum HKMEvents
     EVENT_ADD_ABILITY4          = 13
 };
 
-class boss_high_king_maulgar : public CreatureScript
+struct boss_high_king_maulgar : public BossAI
 {
-public:
-    boss_high_king_maulgar() : CreatureScript("boss_high_king_maulgar") { }
+    boss_high_king_maulgar(Creature* creature) : BossAI(creature, DATA_MAULGAR) { }
 
-    struct boss_high_king_maulgarAI : public BossAI
+    void Reset() override
     {
-        boss_high_king_maulgarAI(Creature* creature) : BossAI(creature, DATA_MAULGAR) { }
+        _Reset();
+        me->SetLootMode(0);
+    }
 
-        void Reset() override
-        {
-            _Reset();
-            me->SetLootMode(0);
-        }
-
-        void KilledUnit(Unit*  /*victim*/) override
-        {
-            if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
-            {
-                events.ScheduleEvent(EVENT_RECENTLY_SPOKEN, 5000);
-                Talk(SAY_SLAY);
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            if (instance->GetData(DATA_ADDS_KILLED) == MAX_ADD_NUMBER)
-                _JustDied();
-        }
-
-        void DoAction(int32 actionId) override
-        {
-            if (me->IsAlive())
-            {
-                Talk(SAY_OGRE_DEATH);
-                if (actionId == MAX_ADD_NUMBER)
-                    me->SetLootMode(1);
-            }
-            else if (actionId == MAX_ADD_NUMBER)
-            {
-                me->loot.clear();
-                me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1, me);
-                me->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
-                _JustDied();
-            }
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            _EnterCombat();
-            Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_ARCING_SMASH, 6000);
-            events.ScheduleEvent(EVENT_MIGHTY_BLOW, 20000);
-            events.ScheduleEvent(EVENT_WHIRLWIND, 30000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ARCING_SMASH:
-                    me->CastSpell(me->GetVictim(), SPELL_ARCING_SMASH, false);
-                    events.ScheduleEvent(EVENT_ARCING_SMASH, 10000);
-                    break;
-                case EVENT_MIGHTY_BLOW:
-                    me->CastSpell(me->GetVictim(), SPELL_MIGHTY_BLOW, false);
-                    events.ScheduleEvent(EVENT_MIGHTY_BLOW, 16000);
-                    break;
-                case EVENT_WHIRLWIND:
-                    events.DelayEvents(15000);
-                    me->CastSpell(me, SPELL_WHIRLWIND, false);
-                    events.ScheduleEvent(EVENT_WHIRLWIND, 54000);
-                    break;
-                case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(50))
-                    {
-                        Talk(SAY_ENRAGE);
-                        me->CastSpell(me, SPELL_FLURRY, true);
-                        events.ScheduleEvent(EVENT_CHARGING, 0);
-                        events.ScheduleEvent(EVENT_ROAR, 3000);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
-                    break;
-                case EVENT_ROAR:
-                    me->CastSpell(me, SPELL_ROAR, false);
-                    events.ScheduleEvent(EVENT_ROAR, 40000);
-                    break;
-                case EVENT_CHARGING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
-                        me->CastSpell(target, SPELL_BERSERKER_C, false);
-                    events.ScheduleEvent(EVENT_CHARGING, 35000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void KilledUnit(Unit*  /*victim*/) override
     {
-        return GetGruulsLairAI<boss_high_king_maulgarAI>(creature);
+        if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
+        {
+            events.ScheduleEvent(EVENT_RECENTLY_SPOKEN, 5s);
+            Talk(SAY_SLAY);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
+        if (instance->GetData(DATA_ADDS_KILLED) == MAX_ADD_NUMBER)
+            _JustDied();
+    }
+
+    void DoAction(int32 actionId) override
+    {
+        if (me->IsAlive())
+        {
+            Talk(SAY_OGRE_DEATH);
+            if (actionId == MAX_ADD_NUMBER)
+            {
+                me->AddLootMode(1);
+            }
+        }
+        else if (actionId == MAX_ADD_NUMBER)
+        {
+            me->AddLootMode(1);
+            me->loot.clear();
+            me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, me->GetLootMode(), me);
+            me->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
+            _JustDied();
+        }
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+
+        events.ScheduleEvent(EVENT_ARCING_SMASH, 10s);
+        events.ScheduleEvent(EVENT_MIGHTY_BLOW, 15s);
+        events.ScheduleEvent(EVENT_WHIRLWIND, 54s);
+        events.ScheduleEvent(EVENT_CHECK_HEALTH, 500ms);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_ARCING_SMASH:
+                me->CastSpell(me->GetVictim(), SPELL_ARCING_SMASH, false);
+                events.ScheduleEvent(EVENT_ARCING_SMASH, 10s);
+                break;
+            case EVENT_MIGHTY_BLOW:
+                me->CastSpell(me->GetVictim(), SPELL_MIGHTY_BLOW, false);
+                events.ScheduleEvent(EVENT_MIGHTY_BLOW, 15s);
+                break;
+            case EVENT_WHIRLWIND:
+                events.DelayEvents(15s);
+                me->CastSpell(me, SPELL_WHIRLWIND, false);
+                events.ScheduleEvent(EVENT_WHIRLWIND, 54s);
+                break;
+            case EVENT_CHECK_HEALTH:
+                if (me->HealthBelowPct(50))
+                {
+                    Talk(SAY_ENRAGE);
+                    me->CastSpell(me, SPELL_FLURRY, true);
+                    events.ScheduleEvent(EVENT_CHARGING, 0s);
+                    events.ScheduleEvent(EVENT_ROAR, 30s);
+                    break;
+                }
+                events.ScheduleEvent(EVENT_CHECK_HEALTH, 500ms);
+                break;
+            case EVENT_ROAR:
+                me->CastSpell(me, SPELL_ROAR, false);
+                events.ScheduleEvent(EVENT_ROAR, 40s);
+                break;
+            case EVENT_CHARGING:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                    me->CastSpell(target, SPELL_BERSERKER_C, false);
+                events.ScheduleEvent(EVENT_CHARGING, 35s);
+                break;
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
-class boss_olm_the_summoner : public CreatureScript
+struct boss_olm_the_summoner : public ScriptedAI
 {
-public:
-    boss_olm_the_summoner() : CreatureScript("boss_olm_the_summoner") { }
-
-    struct boss_olm_the_summonerAI : public ScriptedAI
+    boss_olm_the_summoner(Creature* creature) : ScriptedAI(creature), summons(me)
     {
-        boss_olm_the_summonerAI(Creature* creature) : ScriptedAI(creature), summons(me)
-        {
-            instance = creature->GetInstanceScript();
-        }
+        instance = creature->GetInstanceScript();
+    }
 
-        EventMap events;
-        SummonList summons;
-        InstanceScript* instance;
+    EventMap events;
+    SummonList summons;
+    InstanceScript* instance;
 
-        void Reset() override
-        {
-            events.Reset();
-            summons.DespawnAll();
-            instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
-        }
-
-        void AttackStart(Unit* who) override
-        {
-            if (!who)
-                return;
-
-            if (me->Attack(who, true))
-                me->GetMotionMaster()->MoveChase(who, 25.0f);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            me->SetInCombatWithZone();
-            instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
-
-            events.ScheduleEvent(EVENT_ADD_ABILITY1, 10000);
-            events.ScheduleEvent(EVENT_ADD_ABILITY2, 15000);
-            events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetData(DATA_ADDS_KILLED, 1);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ADD_ABILITY1:
-                    me->CastSpell(me->GetVictim(), SPELL_DARK_DECAY, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY1, 20000);
-                    break;
-                case EVENT_ADD_ABILITY2:
-                    me->CastSpell(me, SPELL_SUMMON_WFH, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY2, 30000);
-                    break;
-                case EVENT_ADD_ABILITY3:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_DEATH_COIL, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetGruulsLairAI<boss_olm_the_summonerAI>(creature);
+        events.Reset();
+        summons.DespawnAll();
+        instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (!who)
+            return;
+
+        if (me->Attack(who, true))
+            me->GetMotionMaster()->MoveChase(who, 25.0f);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        me->SetInCombatWithZone();
+        instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
+
+        events.ScheduleEvent(EVENT_ADD_ABILITY1, 500ms);
+        events.ScheduleEvent(EVENT_ADD_ABILITY2, 5s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY3, 6500ms);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        instance->SetData(DATA_ADDS_KILLED, 1);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_ADD_ABILITY1:
+                me->CastSpell(me, SPELL_SUMMON_WFH, false);
+                events.ScheduleEvent(EVENT_ADD_ABILITY1, 50s);
+                break;
+            case EVENT_ADD_ABILITY2:
+                DoCastVictim(SPELL_DARK_DECAY);
+                events.ScheduleEvent(EVENT_ADD_ABILITY2, 6500ms);
+                break;
+            case EVENT_ADD_ABILITY3:
+                DoCastRandomTarget(SPELL_DEATH_COIL);
+                events.ScheduleEvent(EVENT_ADD_ABILITY3, 7s);
+                break;
+        }
+        DoMeleeAttackIfReady();
     }
 };
 
-class boss_kiggler_the_crazed : public CreatureScript
+struct boss_kiggler_the_crazed : public ScriptedAI
 {
-public:
-    boss_kiggler_the_crazed() : CreatureScript("boss_kiggler_the_crazed") { }
-
-    struct boss_kiggler_the_crazedAI : public ScriptedAI
+    boss_kiggler_the_crazed(Creature* creature) : ScriptedAI(creature)
     {
-        boss_kiggler_the_crazedAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-        }
+        instance = creature->GetInstanceScript();
+    }
 
-        EventMap events;
-        InstanceScript* instance;
+    EventMap events;
+    InstanceScript* instance;
 
-        void Reset() override
-        {
-            events.Reset();
-            instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            me->SetInCombatWithZone();
-            instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
-
-            events.ScheduleEvent(EVENT_ADD_ABILITY1, 5000);
-            events.ScheduleEvent(EVENT_ADD_ABILITY2, 10000);
-            events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
-            events.ScheduleEvent(EVENT_ADD_ABILITY4, 30000);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetData(DATA_ADDS_KILLED, 1);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ADD_ABILITY1:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
-                        me->CastSpell(target, SPELL_GREATER_POLYMORPH, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY1, 20000);
-                    break;
-                case EVENT_ADD_ABILITY2:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
-                        me->CastSpell(target, SPELL_LIGHTNING_BOLT, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY2, 15000);
-                    break;
-                case EVENT_ADD_ABILITY3:
-                    me->CastSpell(me->GetVictim(), SPELL_ARCANE_SHOCK, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
-                    break;
-                case EVENT_ADD_ABILITY4:
-                    me->CastSpell(me, SPELL_ARCANE_EXPLOSION, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY4, 30000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetGruulsLairAI<boss_kiggler_the_crazedAI>(creature);
+        events.Reset();
+        instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        me->SetInCombatWithZone();
+        instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
+
+        events.ScheduleEvent(EVENT_ADD_ABILITY1, 1500ms);
+        events.ScheduleEvent(EVENT_ADD_ABILITY2, 5s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY3, 25s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY4, 30s);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        instance->SetData(DATA_ADDS_KILLED, 1);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_ADD_ABILITY1:
+                DoCastVictim(SPELL_LIGHTNING_BOLT);
+                events.ScheduleEvent(EVENT_ADD_ABILITY1, 1500ms);
+                break;
+            case EVENT_ADD_ABILITY2:
+                DoCastVictim(SPELL_ARCANE_SHOCK);
+                events.ScheduleEvent(EVENT_ADD_ABILITY2, 5s);
+                break;
+            case EVENT_ADD_ABILITY3:
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1)) //target method should perhaps change
+                    me->CastSpell(target, SPELL_GREATER_POLYMORPH, false);
+                events.ScheduleEvent(EVENT_ADD_ABILITY3, 11s);
+                break;
+            case EVENT_ADD_ABILITY4:
+            if (me->SelectNearestPlayer(30.0f))
+                {
+                     DoCastAOE(SPELL_ARCANE_EXPLOSION);
+                }
+                events.ScheduleEvent(EVENT_ADD_ABILITY4, 30s);
+                break;
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
-class boss_blindeye_the_seer : public CreatureScript
+struct boss_blindeye_the_seer : public ScriptedAI
 {
-public:
-    boss_blindeye_the_seer() : CreatureScript("boss_blindeye_the_seer") { }
-
-    struct boss_blindeye_the_seerAI : public ScriptedAI
+    boss_blindeye_the_seer(Creature* creature) : ScriptedAI(creature)
     {
-        boss_blindeye_the_seerAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-        }
+        instance = creature->GetInstanceScript();
+    }
 
-        EventMap events;
-        InstanceScript* instance;
+    EventMap events;
+    InstanceScript* instance;
 
-        void Reset() override
-        {
-            events.Reset();
-            instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            me->SetInCombatWithZone();
-            instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
-
-            events.ScheduleEvent(EVENT_ADD_ABILITY1, 5000);
-            events.ScheduleEvent(EVENT_ADD_ABILITY2, 10000);
-            events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetData(DATA_ADDS_KILLED, 1);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ADD_ABILITY1:
-                    me->CastSpell(me, SPELL_GREATER_PW_SHIELD, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY1, 30000);
-                    break;
-                case EVENT_ADD_ABILITY2:
-                    if (Unit* target = DoSelectLowestHpFriendly(60.0f, 50000))
-                        me->CastSpell(target, SPELL_HEAL, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY2, 25000);
-                    break;
-                case EVENT_ADD_ABILITY3:
-                    me->CastSpell(me, SPELL_PRAYER_OH, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY3, 30000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetGruulsLairAI<boss_blindeye_the_seerAI>(creature);
+        events.Reset();
+        instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        me->SetInCombatWithZone();
+        instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
+
+        events.ScheduleEvent(EVENT_ADD_ABILITY1, 11s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY2, 30s);
+        events.ScheduleEvent(EVENT_ADD_ABILITY3, 31s);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        instance->SetData(DATA_ADDS_KILLED, 1);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_ADD_ABILITY1:
+                if (Unit* target = DoSelectLowestHpFriendly(60.0f, 50000))
+                {
+                    DoCast(target, SPELL_HEAL);
+                }
+                events.ScheduleEvent(EVENT_ADD_ABILITY1, 6s);
+                break;
+            case EVENT_ADD_ABILITY2:
+                DoCastSelf(SPELL_GREATER_PW_SHIELD);
+                events.ScheduleEvent(EVENT_ADD_ABILITY2, 30s);
+                break;
+            case EVENT_ADD_ABILITY3:
+                me->CastSpell(me, SPELL_PRAYER_OH, false);
+                events.ScheduleEvent(EVENT_ADD_ABILITY3, 30s);
+                break;
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
-class boss_krosh_firehand : public CreatureScript
+struct boss_krosh_firehand : public ScriptedAI
 {
-public:
-    boss_krosh_firehand() : CreatureScript("boss_krosh_firehand") { }
-
-    struct boss_krosh_firehandAI : public ScriptedAI
+    boss_krosh_firehand(Creature* creature) : ScriptedAI(creature)
     {
-        boss_krosh_firehandAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-        }
+        instance = creature->GetInstanceScript();
+    }
 
-        EventMap events;
-        InstanceScript* instance;
+    EventMap events;
+    InstanceScript* instance;
 
-        void Reset() override
-        {
-            events.Reset();
-            instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
-        }
-
-        void AttackStart(Unit* who) override
-        {
-            if (!who)
-                return;
-
-            if (me->Attack(who, true))
-                me->GetMotionMaster()->MoveChase(who, 25.0f);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            me->SetInCombatWithZone();
-            instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
-
-            events.ScheduleEvent(EVENT_ADD_ABILITY1, 1000);
-            events.ScheduleEvent(EVENT_ADD_ABILITY2, 5000);
-            events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetData(DATA_ADDS_KILLED, 1);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ADD_ABILITY1:
-                    me->CastSpell(me->GetVictim(), SPELL_GREATER_FIREBALL, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY1, 3500);
-                    break;
-                case EVENT_ADD_ABILITY2:
-                    me->CastSpell(me, SPELL_SPELLSHIELD, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY2, 40000);
-                    break;
-                case EVENT_ADD_ABILITY3:
-                    me->CastSpell(me, SPELL_BLAST_WAVE, false);
-                    events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetGruulsLairAI<boss_krosh_firehandAI>(creature);
+        events.Reset();
+        instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (!who)
+            return;
+
+        if (me->Attack(who, true))
+            me->GetMotionMaster()->MoveChase(who, 25.0f);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        me->SetInCombatWithZone();
+        instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
+
+        events.ScheduleEvent(EVENT_ADD_ABILITY1, 1500ms); //spellshield
+        events.ScheduleEvent(EVENT_ADD_ABILITY2, 3500ms); //greater fireball
+        events.ScheduleEvent(EVENT_ADD_ABILITY3, 8s); //blast wave (needs to check for players in range)
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        instance->SetData(DATA_ADDS_KILLED, 1);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_ADD_ABILITY1:
+                DoCastSelf(SPELL_SPELLSHIELD);
+                events.ScheduleEvent(EVENT_ADD_ABILITY1, 30s);
+                break;
+            case EVENT_ADD_ABILITY2:
+                DoCastVictim(SPELL_GREATER_FIREBALL);
+                events.ScheduleEvent(EVENT_ADD_ABILITY2, 1s);
+                break;
+            case EVENT_ADD_ABILITY3:
+                if (me->SelectNearestPlayer(15.0f))
+                {
+                     DoCastAOE(SPELL_BLAST_WAVE);
+                }
+                events.ScheduleEvent(EVENT_ADD_ABILITY3, 8s);
+                break;
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
 void AddSC_boss_high_king_maulgar()
 {
-    new boss_high_king_maulgar();
-    new boss_kiggler_the_crazed();
-    new boss_blindeye_the_seer();
-    new boss_olm_the_summoner();
-    new boss_krosh_firehand();
+    RegisterGruulsLairAI(boss_high_king_maulgar);
+    RegisterGruulsLairAI(boss_kiggler_the_crazed);
+    RegisterGruulsLairAI(boss_blindeye_the_seer);
+    RegisterGruulsLairAI(boss_olm_the_summoner);
+    RegisterGruulsLairAI(boss_krosh_firehand);
 }

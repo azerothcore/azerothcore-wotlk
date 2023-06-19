@@ -61,6 +61,7 @@ enum Texts
     SAY_TIRION_INTRO_2              = 1,
     SAY_TIRION_OUTRO_1              = 2,
     SAY_TIRION_OUTRO_2              = 3,
+    SAY_TIRION_OUTRO_3              = 4,
 
     // Terenas Menethil (outro)
     SAY_TERENAS_OUTRO_1             = 0,
@@ -308,6 +309,7 @@ enum Phases
 };
 
 Position const CenterPosition     = {503.6282f, -2124.655f, 840.8569f, 0.0f};
+Position const TirionSpawn        = { 505.2118f, -2124.353f, 840.9403f, 3.141593f };
 Position const TirionIntro        = {488.2970f, -2124.840f, 840.8569f, 0.0f};
 Position const TirionCharge       = {472.8500f, -2124.350f, 840.8570f, 0.0f};
 Position const LichKingIntro[3]   = { {432.0851f, -2123.673f, 864.6582f, 0.0f}, {457.8351f, -2123.423f, 841.1582f, 0.0f}, {465.0730f, -2123.470f, 840.8569f, 0.0f} };
@@ -342,6 +344,7 @@ enum MiscData
 {
     LIGHT_SNOWSTORM             = 2490,
     LIGHT_SOULSTORM             = 2508,
+    EQUIP_ASHBRINGER            = 13262,
     MUSIC_FROZEN_THRONE         = 17457,
     MUSIC_SPECIAL               = 17458, // Summon Shambling Horror, Remorseless Winter, Quake, Summon Val'kyr Periodic, Harvest Soul, Vile Spirits
     MUSIC_FURY_OF_FROSTMOURNE   = 17459,
@@ -660,6 +663,21 @@ public:
             SetEquipmentSlots(true);
             if (me->IsImmuneToPC())
                 me->SetStandState(UNIT_STAND_STATE_SIT);
+
+            DoAction(ACTION_RESTORE_LIGHT);
+
+            // Reset The Frozen Throne gameobjects
+            FrozenThroneResetWorker reset;
+            Acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
+            Cell::VisitGridObjects(me, worker, 333.0f);
+
+            me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
+            me->SetImmuneToPC(true);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetStandState(UNIT_STAND_STATE_SIT);
+
+            if (!ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
+                me->SummonCreature(NPC_HIGHLORD_TIRION_FORDRING_LK, TirionSpawn, TEMPSUMMON_MANUAL_DESPAWN);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -669,7 +687,7 @@ public:
             me->PlayDirectSound(17374);
         }
 
-        void EnterCombat(Unit* target) override
+        void JustEngagedWith(Unit* target) override
         {
             if (!instance->CheckRequiredBosses(DATA_THE_LICH_KING, target->ToPlayer()) || !me->IsVisible())
             {
@@ -684,29 +702,13 @@ public:
             me->SetInCombatWithZone();
             me->RemoveAurasDueToSpell(SPELL_EMOTE_SIT_NO_SHEATH); // just to be sure
 
-            events.ScheduleEvent(EVENT_BERSERK, 900000, EVENT_GROUP_BERSERK);
-            events.ScheduleEvent(EVENT_SUMMON_SHAMBLING_HORROR, 15000, EVENT_GROUP_ABILITIES);
-            events.ScheduleEvent(EVENT_SUMMON_DRUDGE_GHOUL, 10000, EVENT_GROUP_ABILITIES);
-            events.ScheduleEvent(EVENT_INFEST, 5000, EVENT_GROUP_ABILITIES);
-            events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, urand(30000, 31000), EVENT_GROUP_ABILITIES);
+            events.ScheduleEvent(EVENT_BERSERK, 15min, EVENT_GROUP_BERSERK);
+            events.ScheduleEvent(EVENT_SUMMON_SHAMBLING_HORROR, 15s, EVENT_GROUP_ABILITIES);
+            events.ScheduleEvent(EVENT_SUMMON_DRUDGE_GHOUL, 10s, EVENT_GROUP_ABILITIES);
+            events.ScheduleEvent(EVENT_INFEST, 5s, EVENT_GROUP_ABILITIES);
+            events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, 30s, 31s, EVENT_GROUP_ABILITIES);
             if (IsHeroic())
-                events.ScheduleEvent(EVENT_SHADOW_TRAP, 15500, EVENT_GROUP_ABILITIES);
-        }
-
-        void JustReachedHome() override
-        {
-            _JustReachedHome();
-            DoAction(ACTION_RESTORE_LIGHT);
-
-            // Reset The Frozen Throne gameobjects
-            FrozenThroneResetWorker reset;
-            Acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
-            Cell::VisitGridObjects(me, worker, 333.0f);
-
-            me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
-            me->SetImmuneToPC(true);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetStandState(UNIT_STAND_STATE_SIT);
+                events.ScheduleEvent(EVENT_SHADOW_TRAP, 15s + 500ms, EVENT_GROUP_ABILITIES);
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -737,7 +739,7 @@ public:
                     me->GetMap()->SetZoneWeather(AREA_THE_FROZEN_THRONE, WEATHER_STATE_FINE, 0.5f);
                     break;
                 case ACTION_START_ATTACK:
-                    events.ScheduleEvent(EVENT_START_ATTACK, 5250);
+                    events.ScheduleEvent(EVENT_START_ATTACK, 5250ms);
                     break;
                 case ACTION_BREAK_FROSTMOURNE:
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_BROKEN_FROSTMOURNE, true);
@@ -749,7 +751,7 @@ public:
                 case ACTION_TELEPORT_BACK:
                     {
                         if (_phase == PHASE_FROSTMOURNE)
-                            events.RescheduleEvent(EVENT_START_ATTACK, 1000);
+                            events.RescheduleEvent(EVENT_START_ATTACK, 1s);
                         EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
                         summons.DoAction(ACTION_TELEPORT_BACK, pred);
                         if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime().count())
@@ -833,8 +835,7 @@ public:
                     _bFordringMustFallYell = true;
                     if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     {
-                        tirion->Yell("The Lich King must fall!", LANG_UNIVERSAL);
-                        tirion->PlayDirectSound(17389);
+                        tirion->AI()->Talk(SAY_TIRION_OUTRO_3);
                     }
                 }
             }
@@ -844,6 +845,11 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
+            if (summon->GetEntry() == NPC_HIGHLORD_TIRION_FORDRING_LK)
+            {
+                return;
+            }
+
             switch (summon->GetEntry())
             {
                 case NPC_SHAMBLING_HORROR:
@@ -935,10 +941,10 @@ public:
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     me->CastSpell(me, SPELL_REMORSELESS_WINTER_1, false);
                     //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, 15mins on movies
-                    events.ScheduleEvent(EVENT_QUAKE, 62500);
-                    events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8000, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4000, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_QUAKE, 62s + 500ms);
+                    events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500ms, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4s, EVENT_GROUP_ABILITIES);
                     break;
                 case POINT_CENTER_2:
                     me->SetFacingTo(0.0f);
@@ -947,10 +953,10 @@ public:
                     me->CastSpell(me, SPELL_REMORSELESS_WINTER_2, false);
                     summons.DespawnEntry(NPC_VALKYR_SHADOWGUARD);
                     //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, 15 mins on movies
-                    events.ScheduleEvent(EVENT_QUAKE_2, 62500);
-                    events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8000, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4000, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_QUAKE_2, 62s + 500ms);
+                    events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500ms, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4s, EVENT_GROUP_ABILITIES);
                     break;
                 default:
                     break;
@@ -999,8 +1005,8 @@ public:
                     {
                         _bFrostmournePhase = false;
                         _phase = PHASE_THREE;
-                        events.RescheduleEvent(EVENT_DEFILE, 0, EVENT_GROUP_ABILITIES);
-                        events.RescheduleEvent(EVENT_SOUL_REAPER, urand(7000, 12000), EVENT_GROUP_ABILITIES);
+                        events.RescheduleEvent(EVENT_DEFILE, 0ms, EVENT_GROUP_ABILITIES);
+                        events.RescheduleEvent(EVENT_SOUL_REAPER, 7s, 12s, EVENT_GROUP_ABILITIES);
 
                         for (SummonList::iterator i = summons.begin(); i != summons.end(); ++i)
                             if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
@@ -1011,10 +1017,10 @@ public:
                 case EVENT_QUAKE:
                     _phase = PHASE_TWO;
                     events.CancelEventGroup(EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_INFEST, 14000, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_VALKYR, 20000, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SOUL_REAPER, 40000, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_DEFILE, 38000, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_INFEST, 14s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_VALKYR, 20s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SOUL_REAPER, 40s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_DEFILE, 38s, EVENT_GROUP_ABILITIES);
 
                     me->InterruptNonMeleeSpells(false);
                     me->ClearUnitState(UNIT_STATE_CASTING);
@@ -1026,10 +1032,10 @@ public:
                 case EVENT_QUAKE_2:
                     _phase = PHASE_THREE;
                     events.CancelEventGroup(EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SOUL_REAPER, 40000, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_DEFILE, 38000, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_VILE_SPIRITS, 20000, EVENT_GROUP_VILE_SPIRITS);
-                    events.ScheduleEvent(IsHeroic() ? EVENT_HARVEST_SOULS : EVENT_HARVEST_SOUL, 14000, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SOUL_REAPER, 40s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_DEFILE, 38s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_VILE_SPIRITS, 20s, EVENT_GROUP_VILE_SPIRITS);
+                    events.ScheduleEvent(IsHeroic() ? EVENT_HARVEST_SOULS : EVENT_HARVEST_SOUL, 14s, EVENT_GROUP_ABILITIES);
 
                     me->InterruptNonMeleeSpells(false);
                     me->ClearUnitState(UNIT_STATE_CASTING);
@@ -1043,30 +1049,30 @@ public:
                 case EVENT_SUMMON_SHAMBLING_HORROR:
                     me->CastSpell(me, SPELL_SUMMON_SHAMBLING_HORROR, false);
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
-                    events.ScheduleEvent(EVENT_SUMMON_SHAMBLING_HORROR, 60000, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_SHAMBLING_HORROR, 60s, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SUMMON_DRUDGE_GHOUL:
                     me->CastSpell(me, SPELL_SUMMON_DRUDGE_GHOULS, false);
-                    events.ScheduleEvent(EVENT_SUMMON_DRUDGE_GHOUL, 30000, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_DRUDGE_GHOUL, 30s, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_INFEST:
                     me->CastSpell(me, SPELL_INFEST, false);
-                    events.ScheduleEvent(EVENT_INFEST, 22500, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_INFEST, 22s + 500ms, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_NECROTIC_PLAGUE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NecroticPlagueTargetCheck(me, NECROTIC_PLAGUE_LK, NECROTIC_PLAGUE_PLR)))
                     {
                         Talk(EMOTE_NECROTIC_PLAGUE_WARNING, target);
                         me->CastSpell(target, SPELL_NECROTIC_PLAGUE, false);
-                        events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, urand(30000, 31000), EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, 30s, 31s, EVENT_GROUP_ABILITIES);
                     }
                     else
-                        events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, 5000, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, 5s, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SHADOW_TRAP:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ShadowTrapLKTargetSelector(me, true, true, 100.0f)))
                         me->CastSpell(target, SPELL_SHADOW_TRAP, false);
-                    events.ScheduleEvent(EVENT_SHADOW_TRAP, 15500, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SHADOW_TRAP, 15s + 500ms, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_PAIN_AND_SUFFERING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
@@ -1079,12 +1085,12 @@ public:
                     break;
                 case EVENT_SUMMON_ICE_SPHERE:
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_ICE_SPHERE, false);
-                    events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 7500, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 7500ms, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SUMMON_RAGING_SPIRIT:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_RAGING_SPIRIT, false);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, (!HealthAbovePct(40) ? 15000 : 20000), EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, (!HealthAbovePct(40) ? 15s : 20s), EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_DEFILE:
                     {
@@ -1104,7 +1110,7 @@ public:
 
                             // if valkyr is coming between 1.5 and 3 seconds after defile then we've to
                             // delay valkyr just a bit
-                            events.RescheduleEvent(EVENT_SUMMON_VALKYR, 5000, EVENT_GROUP_ABILITIES);
+                            events.RescheduleEvent(EVENT_SUMMON_VALKYR, 5s, EVENT_GROUP_ABILITIES);
                         }
 
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, DefileTargetSelector(me)))
@@ -1113,12 +1119,12 @@ public:
                             me->CastSpell(target, SPELL_DEFILE, false);
                             // defile has a fixed CD (from dbm) that can be variable only
                             // if no target has been found at the moment (schedule after 1 second)
-                            events.ScheduleEvent(EVENT_DEFILE, 32500, EVENT_GROUP_ABILITIES);
+                            events.ScheduleEvent(EVENT_DEFILE, 32s + 500ms, EVENT_GROUP_ABILITIES);
                         }
                         else
                         {
                             // be sure it happen trying each seconds if no target
-                            events.ScheduleEvent(EVENT_DEFILE, 1000, EVENT_GROUP_ABILITIES);
+                            events.ScheduleEvent(EVENT_DEFILE, 1s, EVENT_GROUP_ABILITIES);
                         }
                     }
                     break;
@@ -1126,17 +1132,17 @@ public:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->CastSpell(me->GetVictim(), SPELL_SOUL_REAPER, false);
-                        events.ScheduleEvent(EVENT_SOUL_REAPER, 30500, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_SOUL_REAPER, 30s + 500ms, EVENT_GROUP_ABILITIES);
                     }
                     else
-                        events.ScheduleEvent(EVENT_SOUL_REAPER, 1000, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_SOUL_REAPER, 1s, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SUMMON_VALKYR:
                     {
                         me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                         Talk(SAY_LK_SUMMON_VALKYR);
                         me->CastSpell((Unit*)nullptr, SUMMON_VALKYR, false);
-                        events.ScheduleEvent(EVENT_SUMMON_VALKYR, 45000, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_SUMMON_VALKYR, 45s, EVENT_GROUP_ABILITIES);
 
                         // schedule a defile (or reschedule it) if next defile event
                         // doesn't exist ( now > next defile ) or defile is coming too soon
@@ -1151,17 +1157,17 @@ public:
                 case EVENT_VILE_SPIRITS:
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     me->CastSpell((Unit*)nullptr, SPELL_VILE_SPIRITS, false);
-                    events.ScheduleEvent(EVENT_VILE_SPIRITS, 30000, EVENT_GROUP_VILE_SPIRITS);
+                    events.ScheduleEvent(EVENT_VILE_SPIRITS, 30s, EVENT_GROUP_VILE_SPIRITS);
                     break;
                 case EVENT_HARVEST_SOUL:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NonTankLKTargetSelector(me, true, true, 55.0f)))
                     {
                         Talk(SAY_LK_HARVEST_SOUL);
                         me->CastSpell(target, SPELL_HARVEST_SOUL, false);
-                        events.ScheduleEvent(EVENT_HARVEST_SOUL, 75000, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_HARVEST_SOUL, 75s, EVENT_GROUP_ABILITIES);
                     }
                     else
-                        events.ScheduleEvent(EVENT_HARVEST_SOUL, 10000, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_HARVEST_SOUL, 10s, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_HARVEST_SOULS:
                     Talk(SAY_LK_HARVEST_SOUL);
@@ -1169,12 +1175,12 @@ public:
                     _phase = PHASE_FROSTMOURNE;
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    events.ScheduleEvent(EVENT_START_ATTACK, 55000);
+                    events.ScheduleEvent(EVENT_START_ATTACK, 55s);
                     events.DelayEvents(52500, EVENT_GROUP_VILE_SPIRITS);
                     events.CancelEvent(EVENT_DEFILE);
                     events.CancelEvent(EVENT_SOUL_REAPER);
-                    events.ScheduleEvent(EVENT_FROSTMOURNE_HEROIC, 6000, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_HARVEST_SOULS, urand(100000, 110000), EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_FROSTMOURNE_HEROIC, 6s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_HARVEST_SOULS, 100s, 110s, EVENT_GROUP_ABILITIES);
 
                     for (SummonList::iterator i = summons.begin(); i != summons.end(); ++i)
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
@@ -1262,7 +1268,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
 
             if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
-                tirion->AI()->EnterEvadeMode();
+                tirion->DespawnOrUnsummon();
         }
     };
 
@@ -1307,11 +1313,11 @@ public:
                         theLichKing->RemoveAurasDueToSpell(SPELL_EMOTE_SIT_NO_SHEATH);
                         theLichKing->AI()->Talk(SAY_LK_INTRO_1);
                         me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_FROZEN_THRONE);
-                        _events.ScheduleEvent(EVENT_INTRO_LK_MOVE, 3000);
+                        _events.ScheduleEvent(EVENT_INTRO_LK_MOVE, 3s);
                     }
                     break;
                 case POINT_TIRION_OUTRO:
-                    _events.ScheduleEvent(EVENT_OUTRO_FORDRING_JUMP, 1);
+                    _events.ScheduleEvent(EVENT_OUTRO_FORDRING_JUMP, 1ms);
                     break;
             }
         }
@@ -1321,18 +1327,18 @@ public:
             switch (action)
             {
                 case ACTION_OUTRO:
-                    _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_1, 2600);
-                    _events.ScheduleEvent(EVENT_OUTRO_LK_EMOTE_TALK, 6600);
-                    _events.ScheduleEvent(EVENT_OUTRO_LK_EMOTE_TALK, 17600);
-                    _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_2, 30000);
-                    _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_3, 39000);
-                    _events.ScheduleEvent(EVENT_OUTRO_LK_EMOTE_CAST_SHOUT, 50000);
-                    _events.ScheduleEvent(EVENT_OUTRO_LK_EMOTE_TALK, 54000);
-                    _events.ScheduleEvent(EVENT_OUTRO_LK_MOVE_CENTER, 65000);
+                    _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_1, 2600ms);
+                    _events.ScheduleEvent(EVENT_OUTRO_LK_EMOTE_TALK, 6600ms);
+                    _events.ScheduleEvent(EVENT_OUTRO_LK_EMOTE_TALK, 17s + 600ms);
+                    _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_2, 30s);
+                    _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_3, 39s);
+                    _events.ScheduleEvent(EVENT_OUTRO_LK_EMOTE_CAST_SHOUT, 50s);
+                    _events.ScheduleEvent(EVENT_OUTRO_LK_EMOTE_TALK, 54s);
+                    _events.ScheduleEvent(EVENT_OUTRO_LK_MOVE_CENTER, 65s);
                     break;
                 case ACTION_BREAK_FROSTMOURNE:
-                    _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_6, 2500);
-                    _events.ScheduleEvent(EVENT_OUTRO_SOUL_BARRAGE, 6500);
+                    _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_6, 2500ms);
+                    _events.ScheduleEvent(EVENT_OUTRO_SOUL_BARRAGE, 6500ms);
                     break;
             }
         }
@@ -1349,7 +1355,7 @@ public:
             {
                 // remove glow on ashbringer and tirion
                 me->RemoveAllAuras();
-                SetEquipmentSlots(true);
+                SetEquipmentSlots(false, EQUIP_ASHBRINGER);
             }
         }
 
@@ -1399,7 +1405,7 @@ public:
                             path.push_back(G3D::Vector3(LichKingIntro[i].GetPositionX(), LichKingIntro[i].GetPositionY(), LichKingIntro[i].GetPositionZ()));
                         theLichKing->SetWalk(true);
                         theLichKing->GetMotionMaster()->MoveSplinePath(&path);
-                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_TALK_1, 11000);
+                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_TALK_1, 11s);
                     }
                     break;
                 case EVENT_INTRO_LK_TALK_1:
@@ -1407,10 +1413,10 @@ public:
                     {
                         theLichKing->AI()->Talk(SAY_LK_INTRO_2);
                         theLichKing->HandleEmoteCommand(EMOTE_ONESHOT_TALK_NO_SHEATHE);
-                        _events.ScheduleEvent(EVENT_INTRO_LK_EMOTE_CAST_SHOUT, 7000);
-                        _events.ScheduleEvent(EVENT_INTRO_LK_EMOTE_1, 13000);
-                        _events.ScheduleEvent(EVENT_INTRO_LK_EMOTE_CAST_SHOUT, 18000);
-                        _events.ScheduleEvent(EVENT_INTRO_LK_CAST_FREEZE, 31000);
+                        _events.ScheduleEvent(EVENT_INTRO_LK_EMOTE_CAST_SHOUT, 7s);
+                        _events.ScheduleEvent(EVENT_INTRO_LK_EMOTE_1, 13s);
+                        _events.ScheduleEvent(EVENT_INTRO_LK_EMOTE_CAST_SHOUT, 18s);
+                        _events.ScheduleEvent(EVENT_INTRO_LK_CAST_FREEZE, 31s);
                     }
                     break;
                 case EVENT_INTRO_LK_EMOTE_CAST_SHOUT:
@@ -1426,21 +1432,21 @@ public:
                     {
                         theLichKing->AI()->Talk(SAY_LK_INTRO_3);
                         theLichKing->CastSpell((Unit*)nullptr, SPELL_ICE_LOCK, false);
-                        _events.ScheduleEvent(EVENT_INTRO_FINISH, 1000);
+                        _events.ScheduleEvent(EVENT_INTRO_FINISH, 1s);
                     }
                     break;
                 case EVENT_INTRO_FORDRING_TALK_1:
                     {
                         Talk(SAY_TIRION_INTRO_1);
-                        _events.ScheduleEvent(EVENT_INTRO_LK_TALK_1, 9000);
-                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_TALK_2, 34000);
+                        _events.ScheduleEvent(EVENT_INTRO_LK_TALK_1, 9s);
+                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_TALK_2, 34s);
                     }
                     break;
                 case EVENT_INTRO_FORDRING_TALK_2:
                     {
                         Talk(SAY_TIRION_INTRO_2);
-                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_EMOTE_1, 2000);
-                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_CHARGE, 5000);
+                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_EMOTE_1, 2s);
+                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_CHARGE, 5s);
                     }
                     break;
                 case EVENT_INTRO_FORDRING_EMOTE_1:
@@ -1522,10 +1528,10 @@ public:
                     if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_5);
-                        _events.ScheduleEvent(EVENT_OUTRO_FORDRING_TALK_1, 7000);
-                        _events.ScheduleEvent(EVENT_OUTRO_FORDRING_BLESS, 18000);
-                        _events.ScheduleEvent(EVENT_OUTRO_FORDRING_REMOVE_ICE, 23000);
-                        _events.ScheduleEvent(EVENT_OUTRO_FORDRING_MOVE_1, 25000);
+                        _events.ScheduleEvent(EVENT_OUTRO_FORDRING_TALK_1, 7s);
+                        _events.ScheduleEvent(EVENT_OUTRO_FORDRING_BLESS, 18s);
+                        _events.ScheduleEvent(EVENT_OUTRO_FORDRING_REMOVE_ICE, 23s);
+                        _events.ScheduleEvent(EVENT_OUTRO_FORDRING_MOVE_1, 25s);
                     }
                     break;
                 case EVENT_OUTRO_LK_TALK_6:
@@ -1538,8 +1544,8 @@ public:
                         me->GetMap()->SetZoneOverrideLight(AREA_THE_FROZEN_THRONE, LIGHT_SOULSTORM, 10s);
                         me->GetMap()->SetZoneWeather(AREA_THE_FROZEN_THRONE, WEATHER_STATE_BLACKSNOW, 0.5f);
 
-                        _events.ScheduleEvent(EVENT_OUTRO_AFTER_SUMMON_BROKEN_FROSTMOURNE, 1000);
-                        _events.ScheduleEvent(EVENT_OUTRO_KNOCK_BACK, 3000);
+                        _events.ScheduleEvent(EVENT_OUTRO_AFTER_SUMMON_BROKEN_FROSTMOURNE, 1s);
+                        _events.ScheduleEvent(EVENT_OUTRO_KNOCK_BACK, 3s);
                         break;
                     }
                     break;
@@ -1559,12 +1565,12 @@ public:
                         theLichKing->SetDisableGravity(true);
                         theLichKing->GetMotionMaster()->MovePoint(0, OutroFlying);
 
-                        _events.ScheduleEvent(EVENT_OUTRO_AFTER_SOUL_BARRAGE, 3000);
+                        _events.ScheduleEvent(EVENT_OUTRO_AFTER_SOUL_BARRAGE, 3s);
                     }
                     break;
                 case EVENT_OUTRO_AFTER_SOUL_BARRAGE:
                     Talk(SAY_TIRION_OUTRO_2);
-                    _events.ScheduleEvent(EVENT_OUTRO_SUMMON_TERENAS, 6000);
+                    _events.ScheduleEvent(EVENT_OUTRO_SUMMON_TERENAS, 6s);
                     break;
                 case EVENT_OUTRO_SUMMON_TERENAS:
                     if (Creature* frostmourne = me->FindNearestCreature(NPC_FROSTMOURNE_TRIGGER, 50.0f))
@@ -1573,8 +1579,8 @@ public:
                         if (Creature* terenas = me->FindNearestCreature(NPC_TERENAS_MENETHIL_OUTRO, 50.0f))
                             terenas->SetFacingToObject(frostmourne);
                     }
-                    _events.ScheduleEvent(EVENT_OUTRO_TERENAS_TALK_1, 2000);
-                    _events.ScheduleEvent(EVENT_OUTRO_TERENAS_TALK_2, 14000);
+                    _events.ScheduleEvent(EVENT_OUTRO_TERENAS_TALK_1, 2s);
+                    _events.ScheduleEvent(EVENT_OUTRO_TERENAS_TALK_2, 14s);
                     break;
                 case EVENT_OUTRO_TERENAS_TALK_1:
                     if (Creature* terenas = me->FindNearestCreature(NPC_TERENAS_MENETHIL_OUTRO, 50.0f))
@@ -1590,12 +1596,12 @@ public:
                             lichKing->SetImmuneToNPC(false);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                             me->RemoveAllAuras();
-                            SetEquipmentSlots(true);
+                            SetEquipmentSlots(false, EQUIP_ASHBRINGER);
                             me->Attack(lichKing, true);
                             me->GetMotionMaster()->MovePoint(0, 512.16f, -2120.25f, 840.86f);
                         }
-                        _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_7, 7000);
-                        _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_8, 17000);
+                        _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_7, 7s);
+                        _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_8, 17s);
                     }
                     break;
                 case EVENT_OUTRO_LK_TALK_7:
@@ -1819,8 +1825,8 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _events.ScheduleEvent(EVENT_SHOCKWAVE, urand(20000, 25000));
-            _events.ScheduleEvent(EVENT_ENRAGE, urand(11000, 14000));
+            _events.ScheduleEvent(EVENT_SHOCKWAVE, 20s, 25s);
+            _events.ScheduleEvent(EVENT_ENRAGE, 11s, 14s);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -1846,11 +1852,11 @@ public:
             {
                 case EVENT_SHOCKWAVE:
                     me->CastSpell(me->GetVictim(), SPELL_SHOCKWAVE, false);
-                    _events.ScheduleEvent(EVENT_SHOCKWAVE, urand(20000, 25000));
+                    _events.ScheduleEvent(EVENT_SHOCKWAVE, 20s, 25s);
                     break;
                 case EVENT_ENRAGE:
                     me->CastSpell(me, SPELL_ENRAGE, false);
-                    _events.ScheduleEvent(EVENT_ENRAGE, urand(20000, 25000));
+                    _events.ScheduleEvent(EVENT_ENRAGE, 20s, 25s);
                     break;
                 default:
                     break;
@@ -2318,8 +2324,8 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _events.ScheduleEvent(EVENT_RAGING_SPIRIT_UNROOT, 3000);
-            _events.ScheduleEvent(EVENT_SOUL_SHRIEK, urand(12000, 15000));
+            _events.ScheduleEvent(EVENT_RAGING_SPIRIT_UNROOT, 3s);
+            _events.ScheduleEvent(EVENT_SOUL_SHRIEK, 12s, 15s);
 
             bool valid = false;
             me->CastSpell(me, SPELL_RAGING_SPIRIT_VISUAL, true);
@@ -2339,7 +2345,7 @@ public:
             }
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             // player is the spellcaster so register summon manually
             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
@@ -2401,7 +2407,7 @@ public:
                 case EVENT_SOUL_SHRIEK:
                     if (!me->HasReactState(REACT_PASSIVE))
                         me->CastSpell(me->GetVictim(), SPELL_SOUL_SHRIEK, false);
-                    _events.ScheduleEvent(EVENT_SOUL_SHRIEK, urand(12000, 15000));
+                    _events.ScheduleEvent(EVENT_SOUL_SHRIEK, 12s, 15s);
                     break;
                 default:
                     break;
@@ -2521,7 +2527,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
             _events.Reset();
-            _events.ScheduleEvent(EVENT_GRAB_PLAYER, 2500);
+            _events.ScheduleEvent(EVENT_GRAB_PLAYER, 2500ms);
             me->SetWalk(false);
         }
 
@@ -2543,7 +2549,7 @@ public:
             _destPoint.Relocate(CenterPosition.GetPositionX() + dist * cos(angle), CenterPosition.GetPositionY() + dist * std::sin(angle), 855.0f + frand(0.0f, 4.0f), 0.0f);
             me->SetHomePosition(_destPoint);
             _events.Reset();
-            _events.ScheduleEvent(EVENT_MOVE_TO_SIPHON_POS, 0);
+            _events.ScheduleEvent(EVENT_MOVE_TO_SIPHON_POS, 0ms);
         }
 
         void OnCharmed(bool  /*apply*/) override {}
@@ -2599,13 +2605,13 @@ public:
                                         me->CastSpell(target, SPELL_VALKYR_CARRY, false);
                                         _destPoint.Relocate(triggers.front());
                                         _events.Reset();
-                                        _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 1000);
+                                        _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 1s);
                                     }
                                 }
                         if (!valid)
                         {
                             _events.Reset();
-                            _events.ScheduleEvent(EVENT_GRAB_PLAYER, 500);
+                            _events.ScheduleEvent(EVENT_GRAB_PLAYER, 500ms);
                             _grabbedPlayer.Clear();
                         }
                     }
@@ -2617,7 +2623,7 @@ public:
                         if (me->GetExactDist(&_destPoint) > 1.5f) // movement was interrupted (probably by a stun, start again)
                         {
                             _events.Reset();
-                            _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 0);
+                            _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 0ms);
                             break;
                         }
                         dropped = true;
@@ -2638,12 +2644,12 @@ public:
                     if (me->GetExactDist(&_destPoint) > 1.5f) // movement was interrupted (probably by a stun, start again)
                     {
                         _events.Reset();
-                        _events.ScheduleEvent(EVENT_MOVE_TO_SIPHON_POS, 0);
+                        _events.ScheduleEvent(EVENT_MOVE_TO_SIPHON_POS, 0ms);
                         break;
                     }
                     me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
-                    _events.ScheduleEvent(EVENT_LIFE_SIPHON, 2000);
+                    _events.ScheduleEvent(EVENT_LIFE_SIPHON, 2s);
                     break;
             }
         }
@@ -2666,7 +2672,7 @@ public:
                     if (!_grabbedPlayer)
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_VALKYR_TARGET_SEARCH, false);
-                        _events.ScheduleEvent(EVENT_GRAB_PLAYER, 2000);
+                        _events.ScheduleEvent(EVENT_GRAB_PLAYER, 2s);
                     }
                     break;
                 case EVENT_MOVE_TO_DROP_POS:
@@ -2702,7 +2708,7 @@ public:
                                 target = lichKing->AI()->SelectTarget(SelectTargetMethod::Random, 0, NonTankLKTargetSelector(lichKing, true, false, 100.0f));
                         if (target)
                             me->CastSpell(target, SPELL_LIFE_SIPHON, false);
-                        _events.ScheduleEvent(EVENT_LIFE_SIPHON, 2500);
+                        _events.ScheduleEvent(EVENT_LIFE_SIPHON, 2500ms);
                     }
                     break;
                 default:
@@ -3121,7 +3127,7 @@ public:
         EventMap _events;
         InstanceScript* _instance;
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
                 return;
@@ -3134,17 +3140,17 @@ public:
                 path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), 843.0f));
                 me->GetMotionMaster()->MoveSplinePath(&path);
 
-                ObjectGuid petGUID = summoner->GetPetGUID();
-                summoner->SetPetGUID(ObjectGuid::Empty);
-                summoner->StopMoving();
-                me->CastSpell(summoner, SPELL_HARVEST_SOUL_VEHICLE, true);
+                ObjectGuid petGUID = summoner->ToUnit()->GetPetGUID();
+                summoner->ToUnit()->SetPetGUID(ObjectGuid::Empty);
+                summoner->ToUnit()->StopMoving();
+                me->CastSpell(summoner->ToUnit(), SPELL_HARVEST_SOUL_VEHICLE, true);
                 //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);
-                summoner->SendMovementFlagUpdate(true);
-                summoner->SetPetGUID(petGUID);
+                summoner->ToUnit()->SendMovementFlagUpdate(true);
+                summoner->ToUnit()->SetPetGUID(petGUID);
                 _events.Reset();
-                _events.ScheduleEvent(EVENT_MOVE_TO_LICH_KING, 1000);
-                _events.ScheduleEvent(EVENT_TELEPORT, 6250);
-                _events.ScheduleEvent(EVENT_DESPAWN_SELF, 6000 + 70000);
+                _events.ScheduleEvent(EVENT_MOVE_TO_LICH_KING, 1s);
+                _events.ScheduleEvent(EVENT_TELEPORT, 6250ms);
+                _events.ScheduleEvent(EVENT_DESPAWN_SELF, 76s);
 
                 // this will let us easily access all creatures of this entry on heroic mode when its time to teleport back
                 lichKing->AI()->JustSummoned(me);
@@ -3219,7 +3225,7 @@ public:
                             else
                             {
                                 summoner->ExitVehicle(summoner);
-                                _events.RescheduleEvent(EVENT_DESPAWN_SELF, 0);
+                                _events.RescheduleEvent(EVENT_DESPAWN_SELF, 0ms);
                             }
                         }
                     break;
@@ -3272,13 +3278,13 @@ public:
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->setActive(true);
                     _events.Reset();
-                    _events.ScheduleEvent(EVENT_FROSTMOURNE_TALK_1, 2000);
-                    _events.ScheduleEvent(EVENT_FROSTMOURNE_TALK_2, 11000);
+                    _events.ScheduleEvent(EVENT_FROSTMOURNE_TALK_1, 2s);
+                    _events.ScheduleEvent(EVENT_FROSTMOURNE_TALK_2, 11s);
                     if (!IsHeroic())
                     {
                         me->SetHealth(me->GetMaxHealth() / 2);
-                        _events.ScheduleEvent(EVENT_DESTROY_SOUL, 60000);
-                        _events.ScheduleEvent(EVENT_FROSTMOURNE_TALK_3, 25000);
+                        _events.ScheduleEvent(EVENT_DESTROY_SOUL, 1min);
+                        _events.ScheduleEvent(EVENT_FROSTMOURNE_TALK_3, 25s);
                     }
                     break;
                 case ACTION_TELEPORT_BACK:
@@ -3302,7 +3308,7 @@ public:
                 if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 {
                     _events.Reset();
-                    _events.ScheduleEvent(EVENT_TELEPORT_BACK, 1000);
+                    _events.ScheduleEvent(EVENT_TELEPORT_BACK, 1s);
                     if (Creature* warden = me->FindNearestCreature(NPC_SPIRIT_WARDEN, 20.0f))
                     {
                         warden->CastSpell((Unit*)nullptr, SPELL_DESTROY_SOUL, false);
@@ -3347,7 +3353,7 @@ public:
                     me->AttackStop();
                     me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     _events.Reset();
-                    _events.ScheduleEvent(EVENT_TELEPORT_BACK, 1000);
+                    _events.ScheduleEvent(EVENT_TELEPORT_BACK, 1s);
                     break;
                 case EVENT_TELEPORT_BACK:
                     if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
@@ -3486,7 +3492,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _events.ScheduleEvent(EVENT_SOUL_RIP, urand(12000, 15000));
+            _events.ScheduleEvent(EVENT_SOUL_RIP, 12s, 15s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -3505,7 +3511,7 @@ public:
             if (_events.ExecuteEvent() == EVENT_SOUL_RIP)
             {
                 me->CastSpell(me->GetVictim(), SPELL_SOUL_RIP, false);
-                _events.ScheduleEvent(EVENT_SOUL_RIP, urand(23000, 27000));
+                _events.ScheduleEvent(EVENT_SOUL_RIP, 23s, 27s);
             }
 
             DoMeleeAttackIfReady();
@@ -3652,7 +3658,7 @@ public:
 
         uint16 timer;
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             float destX, destY, destZ;
             me->GetPosition(destX, destY);

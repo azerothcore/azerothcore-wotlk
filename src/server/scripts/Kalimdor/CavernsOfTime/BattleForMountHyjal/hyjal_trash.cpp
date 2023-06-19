@@ -191,7 +191,7 @@ hyjal_trashAI::hyjal_trashAI(Creature* creature) : npc_escortAI(creature)
 void hyjal_trashAI::DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask)
 {
     //npcbot:
-    if (done_by && done_by->GetTypeId() == TYPEID_UNIT && done_by->ToCreature()->IsNPCBotOrPet())
+    if (done_by && done_by->IsNPCBotOrPet())
     {
         damageTaken += damage;
         instance->SetData(DATA_RAIDDAMAGE, damage);
@@ -445,7 +445,7 @@ public:
             imol = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void WaypointReached(uint32 waypointId) override
         {
@@ -598,7 +598,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -699,7 +699,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -820,7 +820,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -916,7 +916,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -1015,7 +1015,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -1102,7 +1102,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -1198,7 +1198,7 @@ public:
             me->SetPosition(x, y, z, 0);
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -1446,7 +1446,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
         }
 

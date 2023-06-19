@@ -320,7 +320,7 @@ private:
         absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
 
         //npcbot - allow for npcbots
-        if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT && GetUnitOwner()->ToCreature()->IsNPCBot())
+        if (GetUnitOwner()->IsNPCBot())
             return true;
         //end npcbot
 
@@ -548,7 +548,7 @@ class spell_pal_divine_sacrifice : public AuraScript
         if (Unit* caster = GetCaster())
         {
             //npcbot: handle for bots
-            if (caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot())
+            if (caster->IsNPCBot())
             {
                 Player const* owner = caster->ToCreature()->GetBotOwner();
                 if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
@@ -1044,7 +1044,7 @@ class spell_pal_righteous_defense : public SpellScript
         Unit* caster = GetCaster();
         if (caster->GetTypeId() != TYPEID_PLAYER)
             //npcbot: this player check makes no sense
-            if (!(caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsNPCBot()))
+            if (!caster->IsNPCBot())
             //end npcbot
             return SPELL_FAILED_DONT_REPORT;
 

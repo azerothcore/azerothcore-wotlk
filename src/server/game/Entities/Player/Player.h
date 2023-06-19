@@ -999,6 +999,16 @@ enum PlayerCommandStates
     CHEAT_WATERWALK = 0x10
 };
 
+// Used for OnGiveXP PlayerScript hook
+enum PlayerXPSource
+{
+    XPSOURCE_KILL = 0,
+    XPSOURCE_QUEST = 1,
+    XPSOURCE_QUEST_DF = 2,
+    XPSOURCE_EXPLORE = 3,
+    XPSOURCE_BATTLEGROUND = 4
+};
+
 enum InstantFlightGossipAction
 {
     GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT = 500
@@ -1805,7 +1815,7 @@ public:
     {
         Unit::SetPvP(state);
         if (!m_Controlled.empty())
-            for (auto itr : m_Controlled)
+            for (auto& itr : m_Controlled)
                 itr->SetPvP(state);
     }
     void UpdatePvP(bool state, bool _override = false);
@@ -2187,7 +2197,7 @@ public:
     void SendBGWeekendWorldStates();
     void SendBattlefieldWorldStates();
 
-    void GetAurasForTarget(Unit* target);
+    void GetAurasForTarget(Unit* target, bool force = false);
 
     PlayerMenu* PlayerTalkClass;
     std::vector<ItemSetEffect*> ItemSetEff;
@@ -2302,8 +2312,8 @@ public:
     void SetSeer(WorldObject* target) { m_seer = target; }
     void SetViewpoint(WorldObject* target, bool apply);
     [[nodiscard]] WorldObject* GetViewpoint() const;
-    void StopCastingCharm();
-    void StopCastingBindSight();
+    void StopCastingCharm(Aura* except = nullptr);
+    void StopCastingBindSight(Aura* except = nullptr);
 
     [[nodiscard]] uint32 GetSaveTimer() const { return m_nextSave; }
     void SetSaveTimer(uint32 timer) { m_nextSave = timer; }
@@ -2579,12 +2589,13 @@ public:
     [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
     void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
 
+    void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
+
     std::string GetDebugInfo() const override;
 
     /*****************************************************************/
     /***                        NPCBOT SYSTEM                      ***/
     /*****************************************************************/
-    void SetBotMgr(BotMgr* mgr) { ASSERT (!_botMgr); _botMgr = mgr; }
     BotMgr* GetBotMgr() const { return _botMgr; }
     bool HaveBot() const;
     uint8 GetNpcBotsCount() const;

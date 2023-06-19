@@ -218,6 +218,14 @@ struct boss_viscidus : public BossAI
         SpellSchoolMask spellSchoolMask = spellInfo->GetSchoolMask();
         if (spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON && spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_WEAPON_WAND))
         {
+            //npcbot: get bot's wand
+            if (caster->GetTypeId() == TYPEID_UNIT)
+            {
+                if (Item const* pItem = caster->ToCreature()->GetBotEquips(2/*BOT_SLOT_RANGED*/))
+                    spellSchoolMask = SpellSchoolMask(uint32(spellSchoolMask) | (1ul << pItem->GetTemplate()->Damage[0].DamageType));
+            }
+            else
+            //end npcbot
             if (Item* pItem = caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK))
             {
                 spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
@@ -276,9 +284,9 @@ struct boss_viscidus : public BossAI
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         InitSpells();
     }
 
@@ -362,7 +370,7 @@ struct boss_glob_of_viscidus : public ScriptedAI
         if (id == ROOM_CENTER)
         {
             DoCastSelf(SPELL_REJOIN_VISCIDUS);
-            Unit::Kill(me, me);
+            me->KillSelf();
         }
     }
 

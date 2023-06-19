@@ -18,17 +18,18 @@ class TeleportHomeEvent : public BasicEvent
 {
     friend class bot_ai;
     protected:
-        TeleportHomeEvent(bot_ai* ai) : _ai(ai) {}
+        TeleportHomeEvent(bot_ai* ai, bool reset) : _ai(ai), _reset(reset) {}
         ~TeleportHomeEvent() {}
 
         bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
         {
-            _ai->TeleportHome();
+            _ai->TeleportHome(_reset);
             return true;
         }
 
     private:
         bot_ai* _ai;
+        bool _reset;
 };
 //Delayed teleport finish: adds bot back to world on new location
 class TeleportFinishEvent : public BasicEvent
@@ -36,18 +37,19 @@ class TeleportFinishEvent : public BasicEvent
     friend class bot_ai;
     friend class BotMgr;
     protected:
-        TeleportFinishEvent(bot_ai* ai) : _ai(ai) {}
+        TeleportFinishEvent(bot_ai* ai, bool reset) : _ai(ai), _reset(reset) {}
         ~TeleportFinishEvent() {}
 
         //Execute is always called while creature is out of world so ai is never deleted
         bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
         {
-            _ai->FinishTeleport();
+            _ai->FinishTeleport(_reset);
             return true;
         }
 
     private:
         bot_ai* _ai;
+        bool _reset;
 };
 //Await state removal
 class AwaitStateRemovalEvent : public BasicEvent

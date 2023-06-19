@@ -1,31 +1,32 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.achievement_criteria_data
+-- Dumping structure for table acore_world.achievement_criteria_data
 DROP TABLE IF EXISTS `achievement_criteria_data`;
 CREATE TABLE IF NOT EXISTS `achievement_criteria_data` (
-  `criteria_id` mediumint NOT NULL,
+  `criteria_id` int NOT NULL,
   `type` tinyint unsigned NOT NULL DEFAULT '0',
-  `value1` mediumint unsigned NOT NULL DEFAULT '0',
-  `value2` mediumint unsigned NOT NULL DEFAULT '0',
-  `ScriptName` char(64) NOT NULL DEFAULT '',
+  `value1` int unsigned NOT NULL DEFAULT '0',
+  `value2` int unsigned NOT NULL DEFAULT '0',
+  `ScriptName` char(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`criteria_id`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Achievment system';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Achievment system';
 
--- Dumpar data för tabell acore_world.achievement_criteria_data: 2 789 rows
+-- Dumping data for table acore_world.achievement_criteria_data: ~2,787 rows (approximately)
 DELETE FROM `achievement_criteria_data`;
-/*!40000 ALTER TABLE `achievement_criteria_data` DISABLE KEYS */;
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
 	(100, 0, 0, 0, ''),
 	(102, 0, 0, 0, ''),
@@ -438,12 +439,10 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 	(3923, 0, 0, 0, ''),
 	(3924, 0, 0, 0, ''),
 	(3929, 1, 8403, 0, ''),
-	(3929, 5, 70233, 0, ''),
-	(3929, 7, 27571, 0, ''),
+	(3929, 11, 0, 0, 'achievement_flirt_with_disaster_perf_check'),
 	(3929, 15, 3, 0, ''),
 	(3931, 1, 9099, 0, ''),
-	(3931, 5, 70233, 0, ''),
-	(3931, 7, 27571, 0, ''),
+	(3931, 11, 0, 0, 'achievement_flirt_with_disaster_perf_check'),
 	(3931, 15, 3, 0, ''),
 	(3936, 5, 44827, 0, ''),
 	(3937, 5, 44825, 0, ''),
@@ -456,7 +455,7 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 	(4112, 5, 55005, 0, ''),
 	(4112, 6, 4395, 0, ''),
 	(4227, 1, 8403, 0, ''),
-	(4227, 5, 70233, 0, ''),
+	(4227, 11, 0, 0, 'achievement_flirt_with_disaster_perf_check'),
 	(4227, 15, 3, 0, ''),
 	(4230, 5, 55000, 0, ''),
 	(4230, 16, 141, 0, ''),
@@ -487,6 +486,25 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 	(4521, 0, 0, 0, ''),
 	(4522, 0, 0, 0, ''),
 	(4523, 0, 0, 0, ''),
+	(4768, 25, 4, 0, ''),
+	(4769, 25, 4, 0, ''),
+	(4770, 25, 4, 0, ''),
+	(4771, 25, 4, 0, ''),
+	(4772, 25, 4, 0, ''),
+	(4773, 25, 4, 0, ''),
+	(4774, 25, 4, 0, ''),
+	(4775, 25, 4, 0, ''),
+	(4776, 25, 4, 0, ''),
+	(4777, 25, 4, 0, ''),
+	(4778, 25, 4, 0, ''),
+	(4779, 25, 4, 0, ''),
+	(4780, 25, 4, 0, ''),
+	(4781, 25, 4, 0, ''),
+	(4782, 25, 4, 0, ''),
+	(4783, 25, 4, 0, ''),
+	(4784, 25, 4, 0, ''),
+	(4785, 25, 4, 0, ''),
+	(4786, 25, 4, 0, ''),
 	(4944, 0, 0, 0, ''),
 	(4946, 11, 0, 0, 'achievement_killed_exp_or_honor_target'),
 	(4948, 8, 1, 0, ''),
@@ -786,6 +804,9 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 	(5897, 0, 0, 0, ''),
 	(5898, 0, 0, 0, ''),
 	(5899, 0, 0, 0, ''),
+	(6140, 25, 4, 0, ''),
+	(6141, 25, 5, 0, ''),
+	(6142, 25, 4, 0, ''),
 	(6225, 1, 5661, 0, ''),
 	(6226, 1, 26044, 0, ''),
 	(6228, 1, 739, 0, ''),
@@ -1166,8 +1187,8 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 	(7315, 12, 1, 0, ''),
 	(7316, 11, 0, 0, 'achievement_chaos_theory'),
 	(7316, 12, 1, 0, ''),
-	(7317, 12, 1, 0, ''),
 	(7317, 11, 0, 0, 'achievement_respect_your_elders'),
+	(7317, 12, 1, 0, ''),
 	(7318, 11, 0, 0, 'achievement_better_off_dred'),
 	(7318, 12, 1, 0, ''),
 	(7319, 11, 0, 0, 'achievement_less_rabi'),
@@ -1200,8 +1221,8 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 	(7332, 18, 0, 0, ''),
 	(7333, 12, 1, 0, ''),
 	(7333, 18, 0, 0, ''),
-	(7359, 12, 1, 0, ''),
 	(7359, 11, 0, 0, 'achievement_volunteer_work'),
+	(7359, 12, 1, 0, ''),
 	(7361, 11, 0, 0, 'achievement_oh_novos'),
 	(7361, 12, 1, 0, ''),
 	(7363, 11, 0, 0, 'achievement_snakes_whyd_it_have_to_be_snakes'),
@@ -2453,7 +2474,7 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 	(12828, 12, 1, 0, ''),
 	(12846, 0, 0, 0, ''),
 	(12859, 1, 9099, 0, ''),
-	(12859, 5, 70233, 0, ''),
+	(12859, 11, 0, 0, 'achievement_flirt_with_disaster_perf_check'),
 	(12859, 15, 3, 0, ''),
 	(12909, 12, 1, 0, ''),
 	(12912, 23, 177, 0, ''),
@@ -2793,31 +2814,9 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 	(13465, 12, 1, 0, ''),
 	(13466, 12, 0, 0, ''),
 	(13467, 12, 3, 0, ''),
-	(13468, 12, 2, 0, ''),
-	(6140, 25, 4, 0, ''),
-	(6141, 25, 5, 0, ''),
-	(6142, 25, 4, 0, ''),
-	(4768, 25, 4, 0, ''),
-	(4769, 25, 4, 0, ''),
-	(4770, 25, 4, 0, ''),
-	(4771, 25, 4, 0, ''),
-	(4772, 25, 4, 0, ''),
-	(4773, 25, 4, 0, ''),
-	(4774, 25, 4, 0, ''),
-	(4775, 25, 4, 0, ''),
-	(4776, 25, 4, 0, ''),
-	(4777, 25, 4, 0, ''),
-	(4778, 25, 4, 0, ''),
-	(4779, 25, 4, 0, ''),
-	(4780, 25, 4, 0, ''),
-	(4781, 25, 4, 0, ''),
-	(4782, 25, 4, 0, ''),
-	(4783, 25, 4, 0, ''),
-	(4784, 25, 4, 0, ''),
-	(4785, 25, 4, 0, ''),
-	(4786, 25, 4, 0, '');
-/*!40000 ALTER TABLE `achievement_criteria_data` ENABLE KEYS */;
+	(13468, 12, 2, 0, '');
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

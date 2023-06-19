@@ -63,7 +63,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 
- // TODO: this import is not necessary for compilation and marked as unused by the IDE
+ /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -486,7 +486,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         damage += int32(CalculatePct(m_caster->GetComboPoints() * ap, 7));
                     }
                     //npcbot: Ferocious Bite support
-                    else if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsNPCBot() && (m_spellInfo->SpellFamilyFlags[0] & 0x800000) && m_spellInfo->SpellVisual[0] == 6587)
+                    else if (m_caster->IsNPCBot() && (m_spellInfo->SpellFamilyFlags[0] & 0x800000) && m_spellInfo->SpellVisual[0] == 6587)
                     {
                         // converts each extra point of energy into ($f1+$AP/410) additional damage
                         float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
@@ -557,7 +557,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         }
                     }
                     //npcbot: Envenom support
-                    else if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsNPCBot())
+                    else if (m_caster->IsNPCBot())
                     {
                         // consume from stack dozes not more that have combo-points
                         if (uint8 combo = m_caster->ToCreature()->GetCreatureComboPoints())
@@ -618,7 +618,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             }
                         }
                         //npcbot: Eviscerate support
-                        else if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsNPCBot())
+                        else if (m_caster->IsNPCBot())
                         {
                             if (uint32 combo = m_caster->ToCreature()->GetCreatureComboPoints())
                             {
@@ -657,7 +657,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             }
                         }
 
-                        // TODO: should this be put on taken but not done?
+                        /// @todo: should this be put on taken but not done?
                         if (found)
                             damage += m_spellInfo->Effects[EFFECT_1].CalcValue();
 
@@ -683,7 +683,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             damage += int32(caster->GetAmmoDPS() * caster->GetAttackTime(RANGED_ATTACK) * 0.001f);
                         }
                         //npcbot: calculate bot weapon damage
-                        if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsNPCBot())
+                        if (m_caster->IsNPCBot())
                         {
                             if (Item* item = m_caster->ToCreature()->GetBotEquips(2/*BOT_SLOT_RANGED*/))
                             {
@@ -729,7 +729,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             damage += count * int32(average * IN_MILLISECONDS) / m_caster->GetAttackTime(BASE_ATTACK);
                         }
                         //npcbot: creature weaoin damage
-                        else if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsNPCBot())
+                        else if (m_caster->IsNPCBot())
                         {
                             float minTotal = 0.f;
                             float maxTotal = 0.f;
@@ -909,7 +909,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
 
     uint32 triggered_spell_id = m_spellInfo->Effects[effIndex].TriggerSpell;
 
-    // todo: move those to spell scripts
+    /// @todo: move those to spell scripts
     if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_TRIGGER_SPELL
             && effectHandleMode == SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
     {
@@ -1603,7 +1603,7 @@ void Spell::EffectSendEvent(SpellEffIndex effIndex)
         // some spells have no target entries in dbc and they use focus target
         if (focusObject)
             target = focusObject;
-        // TODO: there should be a possibility to pass dest target to event script
+        /// @todo: there should be a possibility to pass dest target to event script
     }
 
     LOG_DEBUG("spells.aura", "Spell ScriptStart {} for spellid {} in EffectSendEvent ", m_spellInfo->Effects[effIndex].MiscValue, m_spellInfo->Id);
@@ -2008,7 +2008,7 @@ void Spell::EffectCreateItem2(SpellEffIndex effIndex)
         else
             player->AutoStoreLoot(m_spellInfo->Id, LootTemplates_Spell);    // create some random items
     }
-    // TODO: ExecuteLogEffectCreateItem(i, m_spellInfo->Effects[i].ItemType);
+    /// @todo: ExecuteLogEffectCreateItem(i, m_spellInfo->Effects[i].ItemType);
 }
 
 void Spell::EffectCreateRandomItem(SpellEffIndex /*effIndex*/)
@@ -2027,7 +2027,7 @@ void Spell::EffectCreateRandomItem(SpellEffIndex /*effIndex*/)
 
     // create some random items
     player->AutoStoreLoot(m_spellInfo->Id, LootTemplates_Spell);
-    // TODO: ExecuteLogEffectCreateItem(i, m_spellInfo->Effects[i].ItemType);
+    /// @todo: ExecuteLogEffectCreateItem(i, m_spellInfo->Effects[i].ItemType);
 }
 
 void Spell::EffectPersistentAA(SpellEffIndex effIndex)
@@ -2273,6 +2273,40 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
+    //npcbot
+    if (m_caster->IsNPCBot() && gameObjTarget)
+    {
+        GameObjectTemplate const* botGoInfo = gameObjTarget->GetGOInfo();
+        Creature* bot = m_caster->ToCreature();
+
+        // Arathi Basin banner opening. /// @todo Verify correctness of this check
+        if ((botGoInfo->type == GAMEOBJECT_TYPE_BUTTON && botGoInfo->button.noDamageImmune) ||
+            (botGoInfo->type == GAMEOBJECT_TYPE_GOOBER && botGoInfo->goober.losOK))
+        {
+            //CanUseBattlegroundObject() already called in CheckCast()
+            // in battleground check
+            if (Battleground* bg = bot->GetBotBG())
+            {
+                bg->EventBotClickedOnFlag(bot, gameObjTarget);
+                return;
+            }
+        }
+        else if (botGoInfo->type == GAMEOBJECT_TYPE_FLAGSTAND)
+        {
+            //CanUseBattlegroundObject() already called in CheckCast()
+            // in battleground check
+            if (Battleground* bg = bot->GetBotBG())
+            {
+                if (bg->GetBgTypeID(true) == BATTLEGROUND_EY)
+                    bg->EventBotClickedOnFlag(bot, gameObjTarget);
+                return;
+            }
+        }
+
+        return;
+    }
+    //end npcbot
+
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
     {
         LOG_DEBUG("spells.aura", "WORLD: Open Lock - No Player Caster!");
@@ -2288,7 +2322,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
     if (gameObjTarget)
     {
         GameObjectTemplate const* goInfo = gameObjTarget->GetGOInfo();
-        // Arathi Basin banner opening. // TODO: Verify correctness of this check
+        // Arathi Basin banner opening. /// @todo: Verify correctness of this check
         if ((goInfo->type == GAMEOBJECT_TYPE_BUTTON && goInfo->button.noDamageImmune) ||
                 (goInfo->type == GAMEOBJECT_TYPE_GOOBER && goInfo->goober.losOK))
         {
@@ -2320,7 +2354,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
             }
             return;
         }
-        // TODO: Add script for spell 41920 - Filling, becouse server it freze when use this spell
+        /// @todo: Add script for spell 41920 - Filling, becouse server it freze when use this spell
         // handle outdoor pvp object opening, return true if go was registered for handling
         // these objects must have been spawned by outdoorpvp!
         else if (gameObjTarget->GetGOInfo()->type == GAMEOBJECT_TYPE_GOOBER && sOutdoorPvPMgr->HandleOpenGo(player, gameObjTarget))
@@ -2868,7 +2902,7 @@ void Spell::EffectDualWield(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectPull(SpellEffIndex effIndex)
 {
-    // TODO: create a proper pull towards distract spell center for distract
+    /// @todo: create a proper pull towards distract spell center for distract
     EffectNULL(effIndex);
 }
 
@@ -2885,11 +2919,8 @@ void Spell::EffectDistract(SpellEffIndex /*effIndex*/)
     if (unitTarget->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING))
         return;
 
-    unitTarget->SetFacingTo(unitTarget->GetAngle(destTarget));
-    unitTarget->ClearUnitState(UNIT_STATE_MOVING);
-
-    if (unitTarget->GetTypeId() == TYPEID_UNIT)
-        unitTarget->GetMotionMaster()->MoveDistract(damage * IN_MILLISECONDS);
+    unitTarget->SetFacingTo(unitTarget->GetAngle(destTarget)); /// @BUG Causes the player to stop moving + interrupts spellcast.
+    unitTarget->GetMotionMaster()->MoveDistract(damage * IN_MILLISECONDS);
 }
 
 void Spell::EffectPickPocket(SpellEffIndex /*effIndex*/)
@@ -2900,13 +2931,7 @@ void Spell::EffectPickPocket(SpellEffIndex /*effIndex*/)
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    // victim must be creature and attackable
-    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT || m_caster->IsFriendlyTo(unitTarget))
-        return;
-
-    // victim have to be alive and humanoid or undead
-    if (unitTarget->IsAlive() && (unitTarget->GetCreatureTypeMask() &CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD) != 0)
-        m_caster->ToPlayer()->SendLoot(unitTarget->GetGUID(), LOOT_PICKPOCKETING);
+    m_caster->ToPlayer()->SendLoot(unitTarget->GetGUID(), LOOT_PICKPOCKETING);
 }
 
 void Spell::EffectAddFarsight(SpellEffIndex effIndex)
@@ -3539,6 +3564,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     // some spell specific modifiers
     float totalDamagePercentMod  = 100.0f;                  // applied to final bonus+weapon damage
     int32 spell_bonus = 0;                                  // bonus specific for spell
+    bool normalized = false;
 
     switch (m_spellInfo->SpellFamilyName)
     {
@@ -3593,7 +3619,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
 
                     //npcbot: handle bot weapons
                     // 50% more damage with daggers
-                    if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsNPCBot())
+                    if (m_caster->IsNPCBot())
                         if (Item const* weapon = m_caster->ToCreature()->GetBotEquips(m_attackType))
                             if (weapon->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
                                 totalDamagePercentMod *= 1.5f;
@@ -3627,11 +3653,17 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
         case SPELLFAMILY_PALADIN:
             {
-                // Seal of Command Unleashed
-                if (m_spellInfo->Id == 20467)
+                switch (m_spellInfo->Id)
                 {
-                    spell_bonus += int32(0.08f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
-                    spell_bonus += int32(0.13f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
+                    case 20467: // Seal of Command Unleashed
+                        spell_bonus += int32(0.08f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                        spell_bonus += int32(0.13f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
+                        break;
+                    case 53385:  // Divine Storm deals normalized damage
+                        normalized = true;
+                        break;
+                    default:
+                        break;
                 }
                 break;
             }
@@ -3752,13 +3784,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
     }
 
-    bool normalized = false;
     float weaponDamagePercentMod = 100.0f;
     int32 fixed_bonus = 0;
-
-    // xinef: Divine Storm deals normalized damage
-    if (m_spellInfo->Id == 53385)
-        normalized = true;
 
     for (int j = 0; j < MAX_SPELL_EFFECTS; ++j)
     {
@@ -3907,7 +3934,7 @@ void Spell::EffectInterruptCast(SpellEffIndex effIndex)
     if (!unitTarget || !unitTarget->IsAlive())
         return;
 
-    // TODO: not all spells that used this effect apply cooldown at school spells
+    /// @todo: not all spells that used this effect apply cooldown at school spells
     // also exist case: apply cooldown to interrupted cast only and to all spells
     // there is no CURRENT_AUTOREPEAT_SPELL spells that can be interrupted
     for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_AUTOREPEAT_SPELL; ++i)
@@ -3976,6 +4003,14 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
             if (Battleground* bg = player->GetBattleground())
                 bg->SetDroppedFlagGUID(pGameObj->GetGUID(), player->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
 
+    //npcbot
+    if (m_caster->IsNPCBot() && pGameObj->GetGoType() == GAMEOBJECT_TYPE_FLAGDROP)
+    {
+        if (Battleground* bg = m_caster->ToCreature()->GetBotBG())
+            bg->SetDroppedFlagGUID(pGameObj->GetGUID(), bg->GetOtherTeamId(bg->GetBotTeamId(m_caster->GetGUID())));
+    }
+    //end npcbot
+
     if (GameObject* linkedTrap = pGameObj->GetLinkedTrap())
     {
         linkedTrap->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS :0);
@@ -3989,7 +4024,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    // TODO: we must implement hunter pet summon at login there (spell 6962)
+    /// @todo: we must implement hunter pet summon at login there (spell 6962)
 
     switch (m_spellInfo->SpellFamilyName)
     {
@@ -4089,7 +4124,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             const char* gender = "his";
                             if (m_caster->getGender() > 0)
                                 gender = "her";
-                            sprintf(buf, "%s rubs %s [Decahedral Dwarven Dice] between %s hands and rolls. One %u and one %u.", m_caster->GetName().c_str(), gender, gender, urand(1, 10), urand(1, 10));
+                            snprintf(buf, sizeof(buf), "%s rubs %s [Decahedral Dwarven Dice] between %s hands and rolls. One %u and one %u.", m_caster->GetName().c_str(), gender, gender, urand(1, 10), urand(1, 10));
                             m_caster->TextEmote(buf);
                             break;
                         }
@@ -4749,7 +4784,7 @@ void Spell::EffectFeedPet(SpellEffIndex effIndex)
 
     uint32 count = 1;
     player->DestroyItemCount(foodItem, count, true);
-    // TODO: fix crash when a spell has two effects, both pointed at the same item target
+    /// @todo: fix crash when a spell has two effects, both pointed at the same item target
 
     m_caster->CastCustomSpell(pet, m_spellInfo->Effects[effIndex].TriggerSpell, &benefit, nullptr, nullptr, true);
 }
@@ -5134,7 +5169,8 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             m_caster->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), m_caster->GetPositionZ());
 
         ObjectGuid targetGUID = ObjectGuid::Empty;
-        if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetTarget() == unitTarget->GetGUID())
+        if (!m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) && !m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER &&
+            m_caster->GetTarget() == unitTarget->GetGUID())
         {
             targetGUID = unitTarget->GetGUID();
         }
@@ -5443,7 +5479,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
         return;
     }
 
-    // TODO: Better to fail Hunter's "Revive Pet" at cast instead of here when casting ends
+    /// @todo: Better to fail Hunter's "Revive Pet" at cast instead of here when casting ends
     if (pet->IsAlive())
     {
         return;

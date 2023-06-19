@@ -1,42 +1,42 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.spell_loot_template
+-- Dumping structure for table acore_world.spell_loot_template
 DROP TABLE IF EXISTS `spell_loot_template`;
 CREATE TABLE IF NOT EXISTS `spell_loot_template` (
-  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `Item` mediumint unsigned NOT NULL DEFAULT '0',
-  `Reference` mediumint NOT NULL DEFAULT '0',
+  `Entry` int unsigned NOT NULL DEFAULT '0',
+  `Item` int unsigned NOT NULL DEFAULT '0',
+  `Reference` int NOT NULL DEFAULT '0',
   `Chance` float NOT NULL DEFAULT '100',
   `QuestRequired` tinyint NOT NULL DEFAULT '0',
   `LootMode` smallint unsigned NOT NULL DEFAULT '1',
   `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
   `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
   `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
-  `Comment` varchar(255) DEFAULT NULL,
+  `Comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumpar data för tabell acore_world.spell_loot_template: 164 rows
+-- Dumping data for table acore_world.spell_loot_template: ~163 rows (approximately)
 DELETE FROM `spell_loot_template`;
-/*!40000 ALTER TABLE `spell_loot_template` DISABLE KEYS */;
 INSERT INTO `spell_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(48247, 37168, 0, 100, 0, 1, 0, 1, 1, 'Mysterious Tarot'),
 	(57844, 36782, 0, 89, 0, 1, 1, 1, 3, 'Succulent Clam Meat'),
 	(57844, 36783, 0, 10, 0, 1, 1, 1, 1, 'Northsea Pearl'),
 	(57844, 36784, 0, 1, 0, 1, 1, 1, 1, 'Siren\'s Tear'),
-	(58160, 13926, 0, 5, 0, 1, 1, 1, 1, 'Golden Pearl'),
 	(58160, 24477, 0, 100, 0, 1, 0, 1, 1, 'Jaggal Clam Meat'),
 	(58160, 24478, 0, 15, 0, 1, 1, 1, 1, 'Jaggal Pearl'),
 	(58160, 24479, 0, 1, 0, 1, 1, 1, 1, 'Shadow Pearl'),
@@ -196,8 +196,8 @@ INSERT INTO `spell_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Ques
 	(64202, 36784, 0, 5, 0, 1, 1, 1, 1, 'Siren\'s Tear'),
 	(69412, 34054, 0, 0, 0, 1, 1, 7, 17, 'Infinite Dust'),
 	(69412, 34055, 0, 0, 0, 1, 1, 2, 6, 'Greater Cosmic Essence');
-/*!40000 ALTER TABLE `spell_loot_template` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

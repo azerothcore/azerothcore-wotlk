@@ -1,33 +1,34 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.npc_trainer
+-- Dumping structure for table acore_world.npc_trainer
 DROP TABLE IF EXISTS `npc_trainer`;
 CREATE TABLE IF NOT EXISTS `npc_trainer` (
-  `ID` mediumint unsigned NOT NULL DEFAULT '0',
-  `SpellID` mediumint NOT NULL DEFAULT '0',
+  `ID` int unsigned NOT NULL DEFAULT '0',
+  `SpellID` int NOT NULL DEFAULT '0',
   `MoneyCost` int unsigned NOT NULL DEFAULT '0',
   `ReqSkillLine` smallint unsigned NOT NULL DEFAULT '0',
   `ReqSkillRank` smallint unsigned NOT NULL DEFAULT '0',
   `ReqLevel` tinyint unsigned NOT NULL DEFAULT '0',
   `ReqSpell` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`SpellID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.npc_trainer: 4 986 rows
+-- Dumping data for table acore_world.npc_trainer: ~4,971 rows (approximately)
 DELETE FROM `npc_trainer`;
-/*!40000 ALTER TABLE `npc_trainer` DISABLE KEYS */;
 INSERT INTO `npc_trainer` (`ID`, `SpellID`, `MoneyCost`, `ReqSkillLine`, `ReqSkillRank`, `ReqLevel`, `ReqSpell`) VALUES
 	(198, -200007, 0, 0, 0, 0, 0),
 	(328, -200008, 0, 0, 0, 0, 0),
@@ -982,7 +983,6 @@ INSERT INTO `npc_trainer` (`ID`, `SpellID`, `MoneyCost`, `ReqSkillLine`, `ReqSki
 	(18993, -202004, 0, 0, 0, 0, 0),
 	(19052, -201002, 0, 0, 0, 0, 0),
 	(19052, -201001, 0, 0, 0, 0, 0),
-	(19063, -201026, 0, 0, 0, 0, 0),
 	(19063, -201025, 0, 0, 0, 0, 0),
 	(19063, -201024, 0, 0, 0, 0, 0),
 	(19180, -201037, 0, 0, 0, 0, 0),
@@ -1350,46 +1350,32 @@ INSERT INTO `npc_trainer` (`ID`, `SpellID`, `MoneyCost`, `ReqSkillLine`, `ReqSki
 	(33603, -201023, 0, 0, 0, 0, 0),
 	(33603, -201022, 0, 0, 0, 0, 0),
 	(33603, -201021, 0, 0, 0, 0, 0),
-	(33608, -201003, 0, 0, 0, 0, 0),
 	(33608, -201002, 0, 0, 0, 0, 0),
 	(33608, -201001, 0, 0, 0, 0, 0),
-	(33609, -201006, 0, 0, 0, 0, 0),
 	(33609, -201005, 0, 0, 0, 0, 0),
 	(33609, -201004, 0, 0, 0, 0, 0),
-	(33610, -201011, 0, 0, 0, 0, 0),
 	(33610, -201010, 0, 0, 0, 0, 0),
 	(33610, -201009, 0, 0, 0, 0, 0),
-	(33611, -201014, 0, 0, 0, 0, 0),
 	(33611, -201013, 0, 0, 0, 0, 0),
 	(33611, -201012, 0, 0, 0, 0, 0),
-	(33612, -201029, 0, 0, 0, 0, 0),
 	(33612, -201028, 0, 0, 0, 0, 0),
 	(33612, -201027, 0, 0, 0, 0, 0),
-	(33613, -201041, 0, 0, 0, 0, 0),
 	(33613, -201040, 0, 0, 0, 0, 0),
 	(33613, -201039, 0, 0, 0, 0, 0),
-	(33614, -201026, 0, 0, 0, 0, 0),
 	(33614, -201025, 0, 0, 0, 0, 0),
 	(33614, -201024, 0, 0, 0, 0, 0),
-	(33615, -201023, 0, 0, 0, 0, 0),
 	(33615, -201022, 0, 0, 0, 0, 0),
 	(33615, -201021, 0, 0, 0, 0, 0),
-	(33616, -201020, 0, 0, 0, 0, 0),
 	(33616, -201019, 0, 0, 0, 0, 0),
 	(33616, -201018, 0, 0, 0, 0, 0),
-	(33617, -201035, 0, 0, 0, 0, 0),
 	(33617, -201034, 0, 0, 0, 0, 0),
 	(33617, -201033, 0, 0, 0, 0, 0),
-	(33618, -201038, 0, 0, 0, 0, 0),
 	(33618, -201037, 0, 0, 0, 0, 0),
 	(33618, -201036, 0, 0, 0, 0, 0),
-	(33619, -202006, 0, 0, 0, 0, 0),
 	(33619, -202005, 0, 0, 0, 0, 0),
 	(33619, -202004, 0, 0, 0, 0, 0),
-	(33621, -202009, 0, 0, 0, 0, 0),
 	(33621, -202008, 0, 0, 0, 0, 0),
 	(33621, -202007, 0, 0, 0, 0, 0),
-	(33623, -202003, 0, 0, 0, 0, 0),
 	(33623, -202002, 0, 0, 0, 0, 0),
 	(33623, -202001, 0, 0, 0, 0, 0),
 	(33630, -201002, 0, 0, 0, 0, 0),
@@ -4882,6 +4868,7 @@ INSERT INTO `npc_trainer` (`ID`, `SpellID`, `MoneyCost`, `ReqSkillLine`, `ReqSki
 	(201040, 26772, 20000, 197, 335, 0, 0),
 	(201040, 26791, 100000, 197, 275, 50, 0),
 	(201040, 31460, 20000, 197, 300, 0, 0),
+	(201040, 60969, 105000, 197, 300, 0, 0),
 	(201041, 51308, 350000, 197, 350, 65, 0),
 	(201041, 55642, 125000, 197, 420, 0, 0),
 	(201041, 55769, 125000, 197, 420, 0, 0),
@@ -4943,7 +4930,6 @@ INSERT INTO `npc_trainer` (`ID`, `SpellID`, `MoneyCost`, `ReqSkillLine`, `ReqSki
 	(201041, 59587, 100000, 197, 420, 0, 0),
 	(201041, 59588, 120000, 197, 420, 0, 0),
 	(201041, 59589, 120000, 197, 420, 0, 0),
-	(201041, 60969, 105000, 197, 300, 0, 0),
 	(201041, 60971, 150000, 197, 425, 0, 0),
 	(201041, 60990, 180000, 197, 420, 0, 0),
 	(201041, 60993, 180000, 197, 425, 0, 0),
@@ -5015,8 +5001,8 @@ INSERT INTO `npc_trainer` (`ID`, `SpellID`, `MoneyCost`, `ReqSkillLine`, `ReqSki
 	(202011, 34090, 2500000, 762, 150, 60, 0),
 	(202011, 34091, 50000000, 762, 225, 70, 0),
 	(202012, 54197, 10000000, 762, 225, 77, 0);
-/*!40000 ALTER TABLE `npc_trainer` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

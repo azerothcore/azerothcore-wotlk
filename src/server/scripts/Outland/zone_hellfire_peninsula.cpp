@@ -15,20 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Hellfire_Peninsula
-SD%Complete: 100
-SDComment: Quest support: 9375, 9410, 9418, 10129, 10146, 10162, 10163, 10340, 10346, 10347, 10382 (Special flight paths) "Needs update"
-SDCategory: Hellfire Peninsula
-EndScriptData */
-
-/* ContentData
-npc_aeranas
-npc_ancestral_wolf
-npc_wounded_blood_elf
-npc_fel_guard_hound
-EndContentData */
-
+#include "GameObjectAI.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -261,7 +248,7 @@ public:
 
         void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
                 Talk(SAY_ELF_AGGRO);
@@ -329,7 +316,8 @@ public:
 enum FelGuard
 {
     SPELL_SUMMON_POO            = 37688,
-    NPC_DERANGED_HELBOAR        = 16863
+    NPC_DERANGED_HELBOAR        = 16863,
+    QUEST_SHIZZ_WORK            = 10629,
 };
 
 class npc_fel_guard_hound : public CreatureScript
@@ -358,7 +346,7 @@ public:
                 DoCast(SPELL_SUMMON_POO);
 
                 if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-                    me->GetMotionMaster()->MoveFollow(owner, 0.0f, 0.0f);
+                    me->GetMotionMaster()->MoveFollow(owner, 1.0f, 90.0f);
             }
         }
 
@@ -372,6 +360,13 @@ public:
                     {
                         helboarGUID = helboar->GetGUID();
                         me->GetMotionMaster()->MovePoint(1, helboar->GetPositionX(), helboar->GetPositionY(), helboar->GetPositionZ());
+                    }
+                }
+                if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                {
+                    if (!owner->HasQuest(QUEST_SHIZZ_WORK))
+                    {
+                        me->DespawnOrUnsummon();
                     }
                 }
                 checkTimer = 5000;
@@ -395,6 +390,62 @@ public:
     }
 };
 
+enum Beacon
+{
+    NPC_STONESCHYE_WHELP        = 16927,
+};
+
+class go_beacon : public GameObjectScript
+{
+public:
+    go_beacon() : GameObjectScript("go_beacon") { }
+
+    struct go_beaconAI : public GameObjectAI
+    {
+        go_beaconAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
+
+        std::list<Creature*> creatureList;
+
+        void OnStateChanged(uint32 state, Unit*  /*unit*/) override
+        {
+            if (state == GO_ACTIVATED)
+            {
+                me->GetCreaturesWithEntryInRange(creatureList, 40, NPC_STONESCHYE_WHELP);
+                {
+                    for (Creature* whelp : creatureList)
+                    {
+                        if (whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
+                        {
+                            whelp->GetMotionMaster()->MovePoint(0, me->GetNearPosition(4.0f, whelp->GetOrientation()));
+                        }
+                    }
+                }
+            }
+            else if (state == GO_JUST_DEACTIVATED)
+            {
+                {
+                    for (Creature* whelp : creatureList)
+                    {
+                        if (whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
+                        {
+                            whelp->GetMotionMaster()->MoveTargetedHome();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                creatureList.clear();
+            }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_beaconAI(go);
+    }
+};
+
 void AddSC_hellfire_peninsula()
 {
     // Ours
@@ -405,4 +456,5 @@ void AddSC_hellfire_peninsula()
     new npc_ancestral_wolf();
     new npc_wounded_blood_elf();
     new npc_fel_guard_hound();
+    new go_beacon();
 }

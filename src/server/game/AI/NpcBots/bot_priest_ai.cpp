@@ -156,19 +156,19 @@ public:
         return new priest_botAI(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         return creature->GetBotAI()->OnGossipHello(player, 0);
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
         if (bot_ai* ai = creature->GetBotAI())
             return ai->OnGossipSelect(player, creature, sender, action);
         return true;
     }
 
-    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code)
+    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code) override
     {
         if (bot_ai* ai = creature->GetBotAI())
             return ai->OnGossipSelectCode(player, creature, sender, action, code);
@@ -453,7 +453,7 @@ public:
             GetInPosition(force, u);
         }
 
-        void EnterCombat(Unit* u) override { bot_ai::EnterCombat(u); }
+        void JustEngagedWith(Unit* u) override { bot_ai::JustEngagedWith(u); }
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
@@ -566,6 +566,8 @@ public:
             if (!CheckAttackTarget())
                 return;
 
+            CheckUsableItems(diff);
+
             Attack(diff);
         }
 
@@ -576,6 +578,10 @@ public:
                 return;
 
             StartAttack(mytar, IsMelee());
+
+            CheckAttackState();
+            if (!me->IsAlive() || !mytar->IsAlive())
+                return;
 
             MoveBehind(mytar);
 
@@ -635,7 +641,7 @@ public:
                             return;
                 }
                 if (IsSpellReady(DEVOURING_PLAGUE_1, diff) && can_do_shadow && !Devcheck && Rand() < 80 &&
-                    (_spec == BOT_SPEC_PRIEST_SHADOW || mytar->IsControlledByPlayer()) &&
+                    (GetSpec() == BOT_SPEC_PRIEST_SHADOW || mytar->IsControlledByPlayer()) &&
                     mytar->GetHealth() > me->GetMaxHealth()/2 * (1 + mytar->getAttackers().size()) &&
                     !(mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1)))) &&
                     !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_LEECH, SPELLFAMILY_PRIEST, 0x02000000, 0x0, 0x0, me->GetGUID()) &&
@@ -889,7 +895,7 @@ public:
             DispelcheckTimer = urand(750, 1000);
 
             uint32 DM = GetSpell(DISPEL_MAGIC_1);
-            uint32 MD = (_spec == BOT_SPEC_PRIEST_DISCIPLINE) ? GetSpell(MASS_DISPEL_1) : 0;
+            uint32 MD = (GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) ? GetSpell(MASS_DISPEL_1) : 0;
 
             if (!DM && !MD)
                 return;
@@ -1118,7 +1124,7 @@ public:
                 }
             }
             // Heal myself
-            if (GetHealthPCT(me) < 95 && !b_attackers.empty())
+            if ((GetHealthPCT(me) < 95 && !b_attackers.empty()) || (IsWanderer() && IsFlagCarrier(me)))
             {
                 if (ShieldTarget(me, diff)) return;
 
@@ -1203,18 +1209,18 @@ public:
             if (lvl >= 10 && (schoolMask & SPELL_SCHOOL_MASK_HOLY))
                 crit_chance += 5.f;
             //Mind Melt (part 1): 4% additional critical chance for Mind Blast, Mind Flay and Mind Sear
-            if ((_spec == BOT_SPEC_PRIEST_SHADOW) &&
+            if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) &&
                 lvl >= 35 && ((spellInfo->SpellFamilyFlags[0] & 0x802000) || (spellInfo->SpellFamilyFlags[1] & 0x80000)))
                 crit_chance += 4.f;
             //Mind Melt (part 2): 6% additional critical chance for Vampiric Touch, Devouring Plague and SW: Pain
-            if ((_spec == BOT_SPEC_PRIEST_SHADOW) &&
+            if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) &&
                 lvl >= 35 && ((spellInfo->SpellFamilyFlags[0] & 0x2008000) || (spellInfo->SpellFamilyFlags[1] & 0x400)))
                 crit_chance += 6.f;
             //Improved Flash Heal (part 2): 10% additional critical chance on targets at or below 50% hp for Flash Heal
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 40 && baseId == FLASH_HEAL_1 && GetHealthPCT(victim) <= 50)
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 40 && baseId == FLASH_HEAL_1 && GetHealthPCT(victim) <= 50)
                 crit_chance += 10.f;
             //Renewed Hope part 1: 4% additional critical chance on targets affected by Weakened Soul for Flash Heal, Greater Heal and Penance (Heal)
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) &&
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) &&
                 lvl >= 45 && (baseId == FLASH_HEAL_1 || baseId == HEAL || baseId == PENANCE_HEAL_1) &&
                 victim->HasAuraTypeWithFamilyFlags(SPELL_AURA_MECHANIC_IMMUNITY, SPELLFAMILY_PRIEST, 0x20000000))
                 crit_chance += 4.f;
@@ -1258,16 +1264,16 @@ public:
             if (lvl >= 15 && baseId == SW_PAIN_1)
                 pctbonus += 0.06f;
             //Focused Power part 1: 4% bonus damage for all spells
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 35)
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 35)
                 pctbonus += 0.04f;
             //Improved Devouring Plague part 1: 15% bonus damage Devouring Plague
-            if ((_spec == BOT_SPEC_PRIEST_SHADOW) && lvl >= 35 && baseId == DEVOURING_PLAGUE_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) && lvl >= 35 && baseId == DEVOURING_PLAGUE_1)
                 pctbonus += 0.15f;
             //Shadowform: 15% bonus damage for shadow spells (handled)
             //if (lvl >= 40 && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW) && me->GetShapeshiftForm() == FORM_SHADOW)
             //    pctbonus += 0.15f;
             //Misery part 3: 15% bonus damage (from spellpower) for Mind Blast, Mind Flay and Mind Sear
-            if ((_spec == BOT_SPEC_PRIEST_SHADOW) && lvl >= 45)
+            if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) && lvl >= 45)
             {
                 if (baseId == MIND_BLAST_1 || baseId == MIND_FLAY_DAMAGE || baseId == MIND_SEAR_DAMAGE_1)
                     fdamage += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.15f * me->CalculateDefaultCoefficient(spellInfo, DIRECT_DAMAGE) * me->CalculateLevelPenalty(spellInfo);
@@ -1281,7 +1287,7 @@ public:
                 if (baseId == MIND_FLAY_DAMAGE)
                     pctbonus += 0.1f;
                 //Twisted Faith (part 1): 10% bonus damage for Mind Blast and Mind Flay
-                if ((_spec == BOT_SPEC_PRIEST_SHADOW) && lvl >= 55)
+                if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) && lvl >= 55)
                     pctbonus += 0.1f;
             }
 
@@ -1298,7 +1304,7 @@ public:
                 //if (lvl >= 60) //buffed
                 //    pctbonus -= 0.95f;
                 //Pain and Suffering (part 2): 30% reduced backlash damage
-                if ((_spec == BOT_SPEC_PRIEST_SHADOW) && lvl >= 50)
+                if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) && lvl >= 50)
                     pctbonus -= 0.3f;
             }
 
@@ -1327,16 +1333,16 @@ public:
             if (lvl >= 10 && baseId == RENEW_1)
                 pctbonus += 0.15f;
             //Focused Power part 2: 4% bonus heal for all spells
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 35)
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 35)
                 pctbonus += 0.04f;
             //Spiritual Healing: 10% bonus healing for all spells
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) && lvl >= 35)
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) && lvl >= 35)
                 pctbonus += 0.15f;
             //Blessend Resilience part 1: 3% bonus healing for all spells
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) && lvl >= 40)
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) && lvl >= 40)
                 pctbonus += 0.03f;
             //Empowered Healing: 40% bonus (from spellpower) for Greater Heal and 20% bonus (from spellpower) for Flash Heal and Binding Heal
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) && lvl >= 45)
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) && lvl >= 45)
             {
                 if (baseId == HEAL)
                     flat_mod += me->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.4f * me->CalculateDefaultCoefficient(spellInfo, damagetype) * 1.88f * me->CalculateLevelPenalty(spellInfo) * stack;
@@ -1344,13 +1350,13 @@ public:
                     flat_mod += me->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.2f * me->CalculateDefaultCoefficient(spellInfo, damagetype) * 1.88f * me->CalculateLevelPenalty(spellInfo) * stack;
             }
             //Empowered Renew (heal bonus part): 15% bonus healing (from spellpower) for Renew
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) && lvl >= 50 && baseId == RENEW_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) && lvl >= 50 && baseId == RENEW_1)
                 flat_mod += me->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.15f * me->CalculateDefaultCoefficient(spellInfo, damagetype) * 1.88f * me->CalculateLevelPenalty(spellInfo) * stack;
             //Test of Faith: 12% bonus healing on targets at or below 50% health
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) && lvl >= 50 && GetHealthPCT(victim) <= 50)
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) && lvl >= 50 && GetHealthPCT(victim) <= 50)
                 pctbonus += 0.12f;
             //Divine Providence: 10% bonus healing for Circle of Healing, Binding Heal, Holy Nova, Prayer of Healing, Divine Hymn and Prayer of Mending
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) && lvl >= 55 &&
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) && lvl >= 55 &&
                 ((spellInfo->SpellFamilyFlags[0] & 0x18000200) ||
                 (spellInfo->SpellFamilyFlags[1] & 0x4) ||
                 (spellInfo->SpellFamilyFlags[2] & 0x4)))
@@ -1394,29 +1400,29 @@ public:
             if (lvl >= 15 && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
                 pctbonus += 0.06f;
             //Absolution:
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 25 && (spellInfo->SpellFamilyFlags[1] & 0x81))
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 25 && (spellInfo->SpellFamilyFlags[1] & 0x81))
                 pctbonus += 0.15f;
             //Mental Agility:
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 25 && !spellInfo->CastTimeEntry)
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 25 && !spellInfo->CastTimeEntry)
                 pctbonus += 0.1f;
             //Improved Healing:
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) &&
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) &&
                 lvl >= 25 && (baseId == HEAL || baseId == DIVINE_HYMN_1 || baseId == PENANCE_HEAL_1))
                 pctbonus += 0.15f;
             //Soul Warding part 2
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 30 && baseId == PW_SHIELD_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 30 && baseId == PW_SHIELD_1)
                 pctbonus += 0.15f;
             //Healing Prayers:
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) &&
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) &&
                 lvl >= 30 && (baseId == PRAYER_OF_HEALING_1 || baseId == PRAYER_OF_MENDING_1))
                 pctbonus += 0.2f;
             //Focused Mind
-            if ((_spec == BOT_SPEC_PRIEST_SHADOW) &&
+            if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) &&
                 lvl >= 30 && (baseId == MIND_BLAST_1 || baseId == MIND_FLAY_1 ||
                 baseId == MIND_SEAR_1/* || baseId == MIND_CONTROL_1*/))
                 pctbonus += 0.15f;
             //Improved Flash Heal part 1
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) && lvl >= 40 && baseId == FLASH_HEAL_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) && lvl >= 40 && baseId == FLASH_HEAL_1)
                 pctbonus += 0.15f;
 
             //Glyph of Fading
@@ -1480,7 +1486,7 @@ public:
             if (lvl >= 15 && (baseId == HEAL || baseId == SMITE_1 || baseId == HOLY_FIRE_1))
                 timebonus += 500;
             //Focused Power part 3
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 35 && baseId == MASS_DISPEL_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 35 && baseId == MASS_DISPEL_1)
                 timebonus += 1000;
             //Improved Mana Burn
             //if (lvl >= 35 && baseId == MANA_BURN_1)
@@ -1504,7 +1510,7 @@ public:
 
             //pct mods
             //Aspiration
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) &&
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) &&
                 lvl >= 45 && (baseId == INNER_FOCUS_1 || baseId == POWER_INFUSION_1 || baseId == PAIN_SUPPRESSION_1))
                 pctbonus += 0.2f;
 
@@ -1533,10 +1539,10 @@ public:
 
             //pct mods
             //Aspiration
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 45 && baseId == PENANCE_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 45 && baseId == PENANCE_1)
                 pctbonus += 0.2f;
             //Divine Providence:
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) && lvl >= 55 && baseId == PRAYER_OF_MENDING_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) && lvl >= 55 && baseId == PRAYER_OF_MENDING_1)
                 pctbonus += 0.3f;
 
             //flat mods
@@ -1551,10 +1557,10 @@ public:
             if (lvl >= 20 && baseId == MIND_BLAST_1)
                 timebonus += 2500;
             //Veiled Shadows part 1
-            if ((_spec == BOT_SPEC_PRIEST_SHADOW) && lvl >= 25 && baseId == FADE_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) && lvl >= 25 && baseId == FADE_1)
                 timebonus += 6000;
             //Soul Warding part 1
-            if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 30 && baseId == PW_SHIELD_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 30 && baseId == PW_SHIELD_1)
                 timebonus += 4000;
 
             //Glyph of Fade
@@ -1590,7 +1596,7 @@ public:
 
             //pct mods
             //Holy Reach
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) &&
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) &&
                 lvl >= 25 && ((spellInfo->SpellFamilyFlags[0] & 0x18400200) || (spellInfo->SpellFamilyFlags[2] & 0x4)))
                 pctbonus += 0.2f;
 
@@ -1612,13 +1618,13 @@ public:
 
             //pct mods
             //Shadow Reach: +20% range for Shadow Spells
-            if ((_spec == BOT_SPEC_PRIEST_SHADOW) && lvl >= 25 &&
+            if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) && lvl >= 25 &&
                 ((spellInfo->SpellFamilyFlags[0] & 0x682A004) ||
                 (spellInfo->SpellFamilyFlags[1] & 0x300502) ||
                 (spellInfo->SpellFamilyFlags[2] & 0x2040)))
                 pctbonus += 0.2f;
             //Holy Reach: +20% range for Holy Spells
-            if ((_spec == BOT_SPEC_PRIEST_HOLY) && lvl >= 25 && (spellInfo->SpellFamilyFlags[0] & 0x100080))
+            if ((GetSpec() == BOT_SPEC_PRIEST_HOLY) && lvl >= 25 && (spellInfo->SpellFamilyFlags[0] & 0x100080))
                 pctbonus += 0.2f;
 
             //flat mods
@@ -1688,7 +1694,7 @@ public:
             }
 
             //Improved Mind Blast part 2
-            if ((_spec == BOT_SPEC_PRIEST_SHADOW) && lvl >= 20 && baseId == MIND_BLAST_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) && lvl >= 20 && baseId == MIND_BLAST_1)
                 me->CastSpell(target, IMPROVED_MIND_BLAST_DEBUFF, true);
 
             if (lvl >= 15 && baseId == PW_FORTITUDE_1)
@@ -1702,7 +1708,7 @@ public:
                 {
                     float amount = float(eff->GetAmount());
                     //Borrowed Time: +40% of spellpower
-                    if ((_spec == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 55)
+                    if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 55)
                         amount += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.4f;
                     //Improved PWSH: +15% effect
                     eff->ChangeAmount(int32(amount * 1.15f));
@@ -1719,7 +1725,7 @@ public:
                 }
             }
             //Pain and Suffering (part 1): 100% to refresh Shadow Word: Pain on target hit by Mind Flay
-            if ((_spec == BOT_SPEC_PRIEST_SHADOW) && lvl >= 50 && baseId == MIND_FLAY_1 && GetSpell(SW_PAIN_1))
+            if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) && lvl >= 50 && baseId == MIND_FLAY_1 && GetSpell(SW_PAIN_1))
                 if (Aura* pain = target->GetAura(GetSpell(SW_PAIN_1), me->GetGUID()))
                     pain->RefreshDuration();
             if (baseId == FEAR_WARD_1)
@@ -1780,7 +1786,7 @@ public:
                 }
             }
             //Improved Vampiric Embrace
-            if ((_spec == BOT_SPEC_PRIEST_SHADOW) && lvl >= 30 && baseId == VAMPIRIC_EMBRACE_1)
+            if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) && lvl >= 30 && baseId == VAMPIRIC_EMBRACE_1)
             {
                 if (AuraEffect* vamp = me->GetAuraEffect(spellId, 0))
                     vamp->ChangeAmount(vamp->GetAmount() + 10); //67% is essentially this
@@ -1825,7 +1831,7 @@ public:
             //Position pos;
 
             //15 sec duration
-            Creature* myPet = me->SummonCreature(entry, *me, TEMPSUMMON_MANUAL_DESPAWN);
+            Creature* myPet = me->SummonCreature(entry, *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             //me->GetNearPoint(myPet, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 0, 2, me->GetOrientation());
             //myPet->GetMotionMaster()->MovePoint(me->GetMapId(), pos);
             myPet->SetCreator(master);
@@ -1833,14 +1839,13 @@ public:
             myPet->SetFaction(master->GetFaction());
             myPet->SetControlledByPlayer(!IAmFree());
             myPet->SetPvP(me->IsPvP());
-            myPet->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             myPet->SetByteValue(UNIT_FIELD_BYTES_2, 1, master->GetByteValue(UNIT_FIELD_BYTES_2, 1));
             myPet->SetUInt32Value(UNIT_CREATED_BY_SPELL, SHADOWFIEND_1);
 
             botPet = myPet;
 
             myPet->Attack(target, true);
-            if (!HasBotCommandState(BOT_COMMAND_STAY))
+            if (!HasBotCommandState(BOT_COMMAND_MASK_UNCHASE))
                 myPet->GetMotionMaster()->MoveChase(target);
         }
 
@@ -1907,9 +1912,9 @@ public:
         void InitSpells() override
         {
             uint8 lvl = me->GetLevel();
-            bool isDisc = _spec == BOT_SPEC_PRIEST_DISCIPLINE;
-            bool isHoly = _spec == BOT_SPEC_PRIEST_HOLY;
-            bool isShad = _spec == BOT_SPEC_PRIEST_SHADOW;
+            bool isDisc = GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE;
+            bool isHoly = GetSpec() == BOT_SPEC_PRIEST_HOLY;
+            bool isShad = GetSpec() == BOT_SPEC_PRIEST_SHADOW;
 
             InitSpellMap(DISPEL_MAGIC_1);
             InitSpellMap(MASS_DISPEL_1);
@@ -1969,9 +1974,9 @@ public:
         void ApplyClassPassives() const override
         {
             uint8 level = master->GetLevel();
-            bool isDisc = _spec == BOT_SPEC_PRIEST_DISCIPLINE;
-            bool isHoly = _spec == BOT_SPEC_PRIEST_HOLY;
-            bool isShad = _spec == BOT_SPEC_PRIEST_SHADOW;
+            bool isDisc = GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE;
+            bool isHoly = GetSpec() == BOT_SPEC_PRIEST_HOLY;
+            bool isShad = GetSpec() == BOT_SPEC_PRIEST_SHADOW;
 
             RefreshAura(UNBREAKABLE_WILL, level >= 10 ? 1 : 0);
             RefreshAura(MEDITATION, level >= 20 ? 1 : 0);

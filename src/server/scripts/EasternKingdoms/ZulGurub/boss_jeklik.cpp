@@ -132,7 +132,7 @@ struct boss_jeklik : public BossAI
         BossAI::EnterEvadeMode(why);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
@@ -147,16 +147,16 @@ struct boss_jeklik : public BossAI
     {
         me->SetHover(false);
         me->SetDisableGravity(false);
-        _EnterCombat();
+        _JustEngagedWith();
         SetCombatMovement(true);
         me->SetReactState(REACT_AGGRESSIVE);
         events.SetPhase(PHASE_ONE);
-        events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(10000, 20000), PHASE_ONE);
-        events.ScheduleEvent(EVENT_PIERCE_ARMOR, urand(5000, 15000), PHASE_ONE);
-        events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(5000, 15000), PHASE_ONE);
-        events.ScheduleEvent(EVENT_SONIC_BURST, urand(5000, 15000), PHASE_ONE);
-        events.ScheduleEvent(EVENT_SWOOP, 20000, PHASE_ONE);
-        events.ScheduleEvent(EVENT_SPAWN_BATS, 30000, PHASE_ONE);
+        events.ScheduleEvent(EVENT_CHARGE_JEKLIK, 10s, 20s, PHASE_ONE);
+        events.ScheduleEvent(EVENT_PIERCE_ARMOR, 5s, 15s, PHASE_ONE);
+        events.ScheduleEvent(EVENT_BLOOD_LEECH, 5s, 15s, PHASE_ONE);
+        events.ScheduleEvent(EVENT_SONIC_BURST, 5s, 15s, PHASE_ONE);
+        events.ScheduleEvent(EVENT_SWOOP, 20s, PHASE_ONE);
+        events.ScheduleEvent(EVENT_SPAWN_BATS, 30s, PHASE_ONE);
     }
 
     void DamageTaken(Unit* /*who*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
@@ -168,12 +168,12 @@ struct boss_jeklik : public BossAI
             events.SetPhase(PHASE_TWO);
             events.CancelEventGroup(PHASE_ONE);
 
-            events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, urand(5000, 15000), PHASE_TWO);
-            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(10000, 15000), PHASE_TWO);
-            events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, urand(25000, 35000), PHASE_TWO);
-            events.ScheduleEvent(EVENT_MIND_FLAY, urand(10000, 30000), PHASE_TWO);
-            events.ScheduleEvent(EVENT_GREATER_HEAL, 25000, PHASE_TWO);
-            events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10000, PHASE_TWO);
+            events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, 5s, 15s, PHASE_TWO);
+            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 10s, 15s, PHASE_TWO);
+            events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, 25s, 35s, PHASE_TWO);
+            events.ScheduleEvent(EVENT_MIND_FLAY, 10s, 30s, PHASE_TWO);
+            events.ScheduleEvent(EVENT_GREATER_HEAL, 25s, PHASE_TWO);
+            events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10s, PHASE_TWO);
 
             return;
         }
@@ -200,23 +200,23 @@ struct boss_jeklik : public BossAI
                         DoCast(target, SPELL_CHARGE);
                         AttackStart(target);
                     }
-                    events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(15000, 30000), PHASE_ONE);
+                    events.ScheduleEvent(EVENT_CHARGE_JEKLIK, 15s, 30s, PHASE_ONE);
                     break;
                 case EVENT_PIERCE_ARMOR:
                     DoCastVictim(SPELL_PIERCE_ARMOR);
-                    events.ScheduleEvent(EVENT_PIERCE_ARMOR, urand(20000, 30000), PHASE_ONE);
+                    events.ScheduleEvent(EVENT_PIERCE_ARMOR, 20s, 30s, PHASE_ONE);
                     break;
                 case EVENT_BLOOD_LEECH:
                     DoCastVictim(SPELL_BLOOD_LEECH);
-                    events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(10000, 20000), PHASE_ONE);
+                    events.ScheduleEvent(EVENT_BLOOD_LEECH, 10s, 20s, PHASE_ONE);
                     break;
                 case EVENT_SONIC_BURST:
                     DoCastVictim(SPELL_SONIC_BURST);
-                    events.ScheduleEvent(EVENT_SONIC_BURST, urand(20000, 30000), PHASE_ONE);
+                    events.ScheduleEvent(EVENT_SONIC_BURST, 20s, 30s, PHASE_ONE);
                     break;
                 case EVENT_SWOOP:
                     DoCastVictim(SPELL_SWOOP);
-                    events.ScheduleEvent(EVENT_SWOOP, urand(20000, 30000), PHASE_ONE);
+                    events.ScheduleEvent(EVENT_SWOOP, 20s, 30s, PHASE_ONE);
                     break;
                 case EVENT_SPAWN_BATS:
                     Talk(EMOTE_SUMMON_BATS);
@@ -224,37 +224,37 @@ struct boss_jeklik : public BossAI
                         for (uint8 i = 0; i < 6; ++i)
                             if (Creature* bat = me->SummonCreature(NPC_BLOODSEEKER_BAT, SpawnBat[i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 bat->AI()->AttackStart(target);
-                    events.ScheduleEvent(EVENT_SPAWN_BATS, 30000, PHASE_ONE);
+                    events.ScheduleEvent(EVENT_SPAWN_BATS, 30s, PHASE_ONE);
                     break;
                     //Phase two
                 case EVENT_CURSE_OF_BLOOD:
                     DoCastSelf(SPELL_CURSE_OF_BLOOD);
-                    events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, urand(25000, 30000), PHASE_TWO);
+                    events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, 25s, 30s, PHASE_TWO);
                     break;
                 case EVENT_PSYCHIC_SCREAM:
                     DoCastVictim(SPELL_PSYCHIC_SCREAM);
-                    events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, urand(35000, 45000), PHASE_TWO);
+                    events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, 35s, 45s, PHASE_TWO);
                     break;
                 case EVENT_SHADOW_WORD_PAIN:
                     DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN, 0, true);
-                    events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(12000, 18000), PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 12s, 18s, PHASE_TWO);
                     break;
                 case EVENT_MIND_FLAY:
                     DoCastVictim(SPELL_MIND_FLAY);
-                    events.ScheduleEvent(EVENT_MIND_FLAY, urand(20000, 40000), PHASE_TWO);
+                    events.ScheduleEvent(EVENT_MIND_FLAY, 20s, 40s, PHASE_TWO);
                     break;
                 case EVENT_GREATER_HEAL:
                     Talk(EMOTE_GREAT_HEAL);
                     me->InterruptNonMeleeSpells(false);
                     DoCastSelf(SPELL_GREATER_HEAL);
-                    events.ScheduleEvent(EVENT_GREATER_HEAL, 25000, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_GREATER_HEAL, 25s, PHASE_TWO);
                     break;
                 case EVENT_SPAWN_FLYING_BATS:
                     Talk(SAY_CALL_RIDERS);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         if (Creature* flyingBat = me->SummonCreature(NPC_FRENZIED_BAT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                             flyingBat->AI()->DoZoneInCombat();
-                    events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, urand(10000, 15000), PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10s, 15s, PHASE_TWO);
                     break;
                 default:
                     break;
@@ -285,7 +285,7 @@ struct npc_batrider : public ScriptedAI
         me->AddUnitState(UNIT_STATE_ROOT);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.Schedule(2s, [this](TaskContext context)
         {

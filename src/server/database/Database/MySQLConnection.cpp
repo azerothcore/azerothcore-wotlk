@@ -304,7 +304,7 @@ bool MySQLConnection::_Query(PreparedStatementBase* stmt, MySQLPreparedStatement
     m_mStmt->ClearParameters();
 
     *pResult = reinterpret_cast<MySQLResult*>(mysql_stmt_result_metadata(msql_STMT));
-    *pRowCount = mysql_stmt_num_rows(msql_STMT);
+    *pRowCount = mysql_stmt_affected_rows(msql_STMT);
     *pFieldCount = mysql_stmt_field_count(msql_STMT);
 
     return true;

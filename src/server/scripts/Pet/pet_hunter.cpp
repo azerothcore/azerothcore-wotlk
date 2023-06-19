@@ -96,24 +96,17 @@ struct npc_pet_hunter_snake_trap : public ScriptedAI
         {
             _init = true;
 
-            CreatureTemplate const* Info = me->GetCreatureTemplate();
-            CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(me->GetLevel(), Info->unit_class);
             uint32 health = uint32(107 * (me->GetLevel() - 40) * 0.025f);
             me->SetCreateHealth(health);
-
-            for (uint8 stat = 0; stat < MAX_STATS; ++stat)
-            {
-                me->SetStat(Stats(stat), 0);
-                me->SetCreateStat(Stats(stat), 0);
-            }
-
             me->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
             me->SetMaxHealth(health);
+
             //Add delta to make them not all hit the same time
             uint32 delta = urand(0, 700);
-            me->SetAttackTime(BASE_ATTACK, Info->BaseAttackTime + delta);
-            me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER, float(stats->AttackPower));
-            me->CastSpell(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
+            me->SetAttackTime(BASE_ATTACK, me->GetAttackTime(BASE_ATTACK) + delta);
+
+            if (me->GetEntry() == NPC_VENOMOUS_SNAKE)
+                DoCastSelf(SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
 
             // Glyph of Snake Trap
             if (Unit* owner = me->GetOwner())

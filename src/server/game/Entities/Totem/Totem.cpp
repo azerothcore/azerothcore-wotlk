@@ -40,8 +40,8 @@ void Totem::Update(uint32 time)
 {
     Unit* owner = GetOwner();
     //npcbot: do not despawn bot totem if master is dead
-    Creature const* botOwner = (owner->GetTypeId() == TYPEID_PLAYER && owner->ToPlayer()->HaveBot()) ?
-       GetOwner()->ToPlayer()->GetBotMgr()->GetBot(GetCreatorGUID()) : nullptr;
+    Creature const* botOwner = (owner && owner->IsPlayer() && owner->ToPlayer()->HaveBot()) ?
+       owner->ToPlayer()->GetBotMgr()->GetBot(GetCreatorGUID()) : nullptr;
 
     if (botOwner)
     {
@@ -188,10 +188,9 @@ void Totem::UnSummon(uint32 msTime)
     }
 
     //npcbot: send SummonedCreatureDespawn()
-    if (GetCreatorGUID() && GetCreatorGUID().IsCreature())
-        if (Creature* bot = ObjectAccessor::GetCreature(*GetOwner(), GetCreatorGUID()))
-            if (bot->IsNPCBot())
-                bot->OnBotDespawn(this);
+    if (Unit* creator = GetCreator())
+        if (creator->IsNPCBot())
+            creator->ToCreature()->OnBotDespawn(this);
     //end npcbot
 
     AddObjectToRemoveList();

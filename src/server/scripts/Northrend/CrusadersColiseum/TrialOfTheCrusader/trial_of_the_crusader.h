@@ -22,6 +22,8 @@
 #include "GridNotifiers.h"
 #include "SpellAuraEffects.h"
 
+#define DataHeader "TCR"
+
 #define TrialOfTheCrusaderScriptName "instance_trial_of_the_crusader"
 
 enum DataTypes

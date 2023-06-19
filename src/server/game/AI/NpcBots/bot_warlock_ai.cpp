@@ -199,19 +199,19 @@ public:
         return new warlock_botAI(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         return creature->GetBotAI()->OnGossipHello(player, 0);
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
         if (bot_ai* ai = creature->GetBotAI())
             return ai->OnGossipSelect(player, creature, sender, action);
         return true;
     }
 
-    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code)
+    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code) override
     {
         if (bot_ai* ai = creature->GetBotAI())
             return ai->OnGossipSelectCode(player, creature, sender, action, code);
@@ -236,7 +236,7 @@ public:
             return bot_ai::doCast(victim, spellId);
         }
 
-        void EnterCombat(Unit* u) override { canShadowWard = false; bot_ai::EnterCombat(u); }
+        void JustEngagedWith(Unit* u) override { canShadowWard = false; bot_ai::JustEngagedWith(u); }
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
@@ -492,7 +492,7 @@ public:
                     return;
             }
             //Howl of Terror (only instant cast)
-            if ((_spec == BOT_SPEC_WARLOCK_AFFLICTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) &&
                 !busyCasting && me->GetLevel() >= 45 && IsSpellReady(HOWL_OF_TERROR_1, diff))
             {
                 Unit* u = FindCastingTarget(8, 0, FEAR_1); //same immunity
@@ -624,29 +624,32 @@ public:
             else
             {
                 spell = me->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-                if (spell)
+                SpellInfo const* baseSpellInfo = spell ? spell->GetSpellInfo()->GetFirstRankSpell() : nullptr;
+                uint32 base_id = baseSpellInfo ? baseSpellInfo->Id : 0;
+                if (baseSpellInfo && (base_id == FEAR_1 || base_id == BANISH_1 || baseSpellInfo->SpellVisual[0] == 99))
                 {
-                    //Fear interrupt
-                    if (spell->GetSpellInfo()->GetFirstRankSpell()->Id == FEAR_1 && spell->m_targets.GetUnitTarget() &&
-                        spell->m_targets.GetUnitTarget()->HasAuraType(SPELL_AURA_MOD_FEAR))
-                        me->InterruptSpell(CURRENT_GENERIC_SPELL);
-                    //Banish interrupt
-                    else if (spell->GetSpellInfo()->GetFirstRankSpell()->Id == BANISH_1 && spell->m_targets.GetUnitTarget())
+                    if (Unit const* target = ObjectAccessor::GetUnit(*me, spell->m_targets.GetObjectTargetGUID()))
                     {
-                        if (AuraEffect const* bani = spell->m_targets.GetUnitTarget()->GetAuraEffect(SPELL_AURA_SCHOOL_IMMUNITY, SPELLFAMILY_WARLOCK, 0x0, 0x8000000, 0x0))
+                        //Fear interrupt
+                        if (base_id == FEAR_1 && target->HasAuraType(SPELL_AURA_MOD_FEAR))
+                            me->InterruptSpell(CURRENT_GENERIC_SPELL);
+                        //Banish interrupt
+                        else if (base_id == BANISH_1)
                         {
-                            //Already banished
-                            //check spell cast time
-                            if (bani->GetBase()->GetDuration() > bani->GetBase()->GetMaxDuration() - 1500)
+                            if (AuraEffect const* bani = target->GetAuraEffect(SPELL_AURA_SCHOOL_IMMUNITY, SPELLFAMILY_WARLOCK, 0x0, 0x8000000, 0x0))
+                            {
+                                //Already banished
+                                //check spell cast time
+                                if (bani->GetBase()->GetDuration() > bani->GetBase()->GetMaxDuration() - 1500)
+                                    me->InterruptSpell(CURRENT_GENERIC_SPELL);
+                            }
+                            else if (!target->getAttackers().empty())
                                 me->InterruptSpell(CURRENT_GENERIC_SPELL);
                         }
-                        else if (!spell->m_targets.GetUnitTarget()->getAttackers().empty())
+                        //Soulstone resurrection interrupt
+                        else if (spell->GetSpellInfo()->SpellVisual[0] == 99 && target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
                             me->InterruptSpell(CURRENT_GENERIC_SPELL);
                     }
-                    //Soulstone resurrection interrupt
-                    else if (spell->GetSpellInfo()->SpellVisual[0] == 99 && spell->m_targets.GetUnitTarget() &&
-                        spell->m_targets.GetUnitTarget()->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
-                        me->InterruptSpell(CURRENT_GENERIC_SPELL);
                 }
             }
 
@@ -723,6 +726,8 @@ public:
             if (IsCasting())
                 return;
 
+            CheckUsableItems(diff);
+
             DoNormalAttack(diff);
         }
 
@@ -733,6 +738,10 @@ public:
                 return;
 
             StartAttack(mytar, IsMelee());
+
+            CheckAttackState();
+            if (!me->IsAlive() || !mytar->IsAlive())
+                return;
 
             MoveBehind(mytar);
 
@@ -1033,15 +1042,15 @@ public:
             }
 
             //Devastation: 5% additional critical chance for Destruction spells
-            if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) &&
                 lvl >= 30 && spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK &&
                 ((spellInfo->SpellFamilyFlags[0] & 0x3E5) || (spellInfo->SpellFamilyFlags[1] & 0x8310C0)))
                 crit_chance += 5.f;
             //Fire and Brimstone part 2: 25% additional critical chance for Conflagrate
-            if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 55 && baseId == CONFLAGRATE_1)
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 55 && baseId == CONFLAGRATE_1)
                 crit_chance += 25.f;
             //Malediction part 2: 9% additional critical chance for Corruption and Unstable Affliction
-            if ((_spec == BOT_SPEC_WARLOCK_AFFLICTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) &&
                 lvl >= 45 && (baseId == CORRUPTION_1 || baseId == UNSTABLE_AFFLICTION_1))
                 crit_chance += 9.f;
             //Glyph of Shadowburn: 20% additional critical chance for Shadowburn on targets 35% hp and below
@@ -1051,15 +1060,15 @@ public:
             if (lvl >= 10 && (baseId == SEED_OF_CORRUPTION_1 || baseId == SEED_OF_CORRUPTION_FINAL_DAMAGE_1))
                 crit_chance += 5.f;
             //Improved Searing Pain: 10% additional critical chance for Searing Pain
-            if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 25 && baseId == SEARING_PAIN_1)
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 25 && baseId == SEARING_PAIN_1)
                 crit_chance += 10.f;
 
             //Master Demonologist part 1.2 (me): 5% additional critical chance for Fire spells
-            if ((_spec == BOT_SPEC_WARLOCK_DEMONOLOGY) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DEMONOLOGY) &&
                 lvl >= 35 && botPet && myPetType == BOT_PET_IMP && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE))
                 crit_chance += 5.f;
             //Master Demonologist part 3.2 (me): 5% additional critical chance for Shadow spells
-            if ((_spec == BOT_SPEC_WARLOCK_DEMONOLOGY) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DEMONOLOGY) &&
                 lvl >= 35 && botPet && myPetType == BOT_PET_SUCCUBUS && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
                 crit_chance += 5.f;
 
@@ -1085,7 +1094,7 @@ public:
                     ((spellInfo->SpellFamilyFlags[0] & 0x13E5) || (spellInfo->SpellFamilyFlags[1] & 0xC310C0)))
                     pctbonus += 0.333f;
                 //Pandemic part 2,3: crit damage for periodics and haunt
-                if ((_spec == BOT_SPEC_WARLOCK_AFFLICTION) &&
+                if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) &&
                     lvl >= 50 && spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK &&
                     ((spellInfo->SpellFamilyFlags[0] & 0x2) || (spellInfo->SpellFamilyFlags[1] & 0x40100)))
                     pctbonus += 0.333f;
@@ -1100,20 +1109,20 @@ public:
             if (baseId == INCINERATE_1)
                 pctbonus += 0.05f;
             //Improved Immolate: 30% bonus damage for Immolate
-            if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 30 && baseId == IMMOLATE_1)
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 30 && baseId == IMMOLATE_1)
                 pctbonus += 0.3f;
             //EmberStorm part 1: 15% bonus damage for Fire spells
-            if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) &&
                 lvl >= 35 && spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK &&
                 ((spellInfo->SpellFamilyFlags[0] & 0x364) || (spellInfo->SpellFamilyFlags[1] & 0x8200C0)))
                 pctbonus += 0.15f;
             //Fire and Brimstone part 1: 10% bonus damage for Incinerate and Chaos Bolt
-            if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) &&
                 lvl >= 55 && (baseId == INCINERATE_1 || baseId == CHAOS_BOLT_1) &&
                 damageinfo.target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x4, 0x0, 0x0, me->GetGUID()))
                 pctbonus += 0.1f;
             //Molten Core part 1: 18% bonus damage for Incinerate and Soul Fire
-            if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) &&
                 lvl >= 35 && (baseId == INCINERATE_1 || baseId == SOUL_FIRE_1))
             {
                 if (me->HasAura(MOLTEN_CORE_BUFF))
@@ -1126,10 +1135,10 @@ public:
             if (lvl >= 40 && baseId == CORRUPTION_1)
                 pctbonus += 0.12f;
             //Malediction part 1: 3% bonus damage for All spells
-            if ((_spec == BOT_SPEC_WARLOCK_AFFLICTION) && lvl >= 45)
+            if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) && lvl >= 45)
                 pctbonus += 0.03f;
             //Death's Embrace part 2: 12% bonus damage for Shadow spells on targets below 35 pct health
-            if ((_spec == BOT_SPEC_WARLOCK_AFFLICTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) &&
                 lvl >= 50 && damageinfo.target->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT) &&
                 ((spellInfo->SpellFamilyFlags[0] & 0x8248B) || (spellInfo->SpellFamilyFlags[1] & 0x59913)))
                 pctbonus += 0.12f;
@@ -1138,11 +1147,11 @@ public:
             if (lvl >= 25 && baseId == CORRUPTION_1)
                 fdamage += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.36f * me->CalculateDefaultCoefficient(spellInfo, DOT) * me->CalculateLevelPenalty(spellInfo);
             //Shadow and Flame: 20% spellpower bonus for Shadow Bolt, Shadowburn, Chaos Bolt and Incineration
-            if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 45 &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 45 &&
                 (baseId == SHADOW_BOLT_1 || baseId == CHAOS_BOLT_1 || baseId == SHADOWBURN_1 || baseId == INCINERATE_1))
                 fdamage += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.2f * me->CalculateDefaultCoefficient(spellInfo, SPELL_DIRECT_DAMAGE) * me->CalculateLevelPenalty(spellInfo);
             //Everlasting Affliction part 1: 5% spellpower bonus for Corruption and Unstable Affliction
-            if ((_spec == BOT_SPEC_WARLOCK_AFFLICTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) &&
                 lvl >= 55 && (baseId == CORRUPTION_1 || baseId == UNSTABLE_AFFLICTION_1))
                 fdamage += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.05f * me->CalculateDefaultCoefficient(spellInfo, DOT) * me->CalculateLevelPenalty(spellInfo);
 
@@ -1160,11 +1169,11 @@ public:
             if (lvl >= 10 && baseId == CURSE_OF_AGONY_1)
                 pctbonus += 0.1f;
             //Shadow Mastery: 15% bonus damage for Shadow Spells
-            if ((_spec == BOT_SPEC_WARLOCK_AFFLICTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) &&
                 lvl >= 35 && ((spellInfo->SpellFamilyFlags[0] & 0x80091) || spellInfo->SpellFamilyFlags[1] & 0x451910))
                 pctbonus += 0.15f;
             //Contagion: 5% bonus damage for Curse of Agony, Corruption and Seed of Corruption
-            if ((_spec == BOT_SPEC_WARLOCK_AFFLICTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) &&
                 lvl >= 40 && (baseId == CORRUPTION_1 || baseId == SEED_OF_CORRUPTION_1 ||
                 baseId == SEED_OF_CORRUPTION_FINAL_DAMAGE_1 || baseId == CURSE_OF_AGONY_1))
                 pctbonus += 0.05f;
@@ -1183,14 +1192,14 @@ public:
                 pctbonus += 0.1f;
 
             //Demonic Pact part 1: 10% bonus damage for all spells
-            if ((_spec == BOT_SPEC_WARLOCK_DEMONOLOGY) && lvl >= 55)
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DEMONOLOGY) && lvl >= 55)
                 pctbonus *= 1.1f;
             //Master Demonologist part 1.1 (me): 5% bonus damage for Fire spells
-            if ((_spec == BOT_SPEC_WARLOCK_DEMONOLOGY) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DEMONOLOGY) &&
                 lvl >= 35 && botPet && myPetType == BOT_PET_IMP && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE))
                 pctbonus *= 1.05f;
             //Master Demonologist part 3.1 (me): 5% bonus damage for Shadow spells
-            if ((_spec == BOT_SPEC_WARLOCK_DEMONOLOGY) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DEMONOLOGY) &&
                 lvl >= 35 && botPet && myPetType == BOT_PET_SUCCUBUS && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
                 pctbonus *= 1.05f;
 
@@ -1260,7 +1269,7 @@ public:
                     timebonus += casttime;
             }
             //Improved Howl of Terror: -1.5sec (-100%) cast time for Howl of Terror
-            if ((_spec == BOT_SPEC_WARLOCK_AFFLICTION) && lvl >= 45 && baseId == HOWL_OF_TERROR_1)
+            if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) && lvl >= 45 && baseId == HOWL_OF_TERROR_1)
                 timebonus += casttime;
             //Chaotic Mind (custom)
             if (baseId == SOUL_FIRE_1)
@@ -1301,7 +1310,7 @@ public:
                     timebonus += 2000;
             }
             //EmberStorm part 2: -0.25 sec cast time for Incinerate
-            if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 35 && baseId == INCINERATE_1)
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 35 && baseId == INCINERATE_1)
                 timebonus += 250;
             //Glyph of Unstable Affliction: -0.2 sec cast time for Unstable Affliction
             if (lvl >= 50 && baseId == UNSTABLE_AFFLICTION_1)
@@ -1367,7 +1376,7 @@ public:
 
             //pct mods
             //BackDraft: -30% global cooldown for Destruction spells
-            if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) &&
+            if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) &&
                 lvl >= 50 && spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK &&
                 ((spellInfo->SpellFamilyFlags[0] & 0x165) || (spellInfo->SpellFamilyFlags[1] & 0x310C0)) &&
                 me->HasAura(BACKDRAFT_BUFF))
@@ -1514,7 +1523,7 @@ public:
                 //level * 3 based on in-game tooltip and spellwork (BasePoints = 2000 + Level * 4,00)
                 int32 damage = spell->Effects[0].CalcValue(me);
                 int32 manaGain = damage;
-                damage += int32(me->GetLevel() * 3);
+                //damage += int32(me->GetLevel() * 3);
                 manaGain += 0.5f * me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC);
 
                 //Life Tap (id: 28830)
@@ -1530,7 +1539,7 @@ public:
                 me->CastCustomSpell(me, LIFE_TAP_ENERGIZE, &manaGain, nullptr, nullptr, false);
 
                 //Mana Feed
-                if ((_spec == BOT_SPEC_WARLOCK_DEMONOLOGY) && me->GetLevel() >= 35 && botPet)
+                if ((GetSpec() == BOT_SPEC_WARLOCK_DEMONOLOGY) && me->GetLevel() >= 35 && botPet)
                     me->EnergizeBySpell(botPet, LIFE_TAP_ENERGIZE_PET, manaGain, POWER_MANA);
             }
 
@@ -1600,7 +1609,7 @@ public:
             }
 
             //Improved Felhunter part 3
-            if ((_spec == BOT_SPEC_WARLOCK_AFFLICTION) && lvl >= 35 && baseId == FEL_INTELLIGENCE_1 && botPet)
+            if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) && lvl >= 35 && baseId == FEL_INTELLIGENCE_1 && botPet)
             {
                 Aura const* feli = target->GetAura(spellId, botPet->GetGUID());
                 if (feli)
@@ -1635,7 +1644,7 @@ public:
                     //Improved Corruption and Immolate (37380): +3 sec duration for Immolate and Corruption
                     uint32 dur = per->GetDuration() + 3000;
                     //Molten Core: + 9 sec duration for Immolate
-                    if ((_spec == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 35 && baseId == IMMOLATE_1)
+                    if ((GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION) && lvl >= 35 && baseId == IMMOLATE_1)
                         dur += 9000;
                     per->SetDuration(dur);
                     per->SetMaxDuration(dur);
@@ -1719,7 +1728,7 @@ public:
 
             if (myPetType)
                 entry = myPetType;
-            else if (me->GetLevel() >= 50 && _spec == BOT_SPEC_WARLOCK_DEMONOLOGY)
+            else if (me->GetLevel() >= 50 && GetSpec() == BOT_SPEC_WARLOCK_DEMONOLOGY)
                 entry = BOT_PET_FELGUARD;
             else if (!IAmFree())
             {
@@ -1772,7 +1781,6 @@ public:
             myPet->SetFaction(master->GetFaction());
             myPet->SetControlledByPlayer(!IAmFree());
             myPet->SetPvP(me->IsPvP());
-            myPet->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             myPet->SetByteValue(UNIT_FIELD_BYTES_2, 1, master->GetByteValue(UNIT_FIELD_BYTES_2, 1));
 
             //fix scale and equips
@@ -1844,7 +1852,7 @@ public:
                 case BOTAI_MISC_PET_AVAILABLE_4:
                     return me->GetLevel() >= 30 ? BOT_PET_FELHUNTER : 0;
                 case BOTAI_MISC_PET_AVAILABLE_5:
-                    return me->GetLevel() >= 50 && _spec == BOT_SPEC_WARLOCK_DEMONOLOGY ? BOT_PET_FELGUARD : 0;
+                    return me->GetLevel() >= 50 && GetSpec() == BOT_SPEC_WARLOCK_DEMONOLOGY ? BOT_PET_FELGUARD : 0;
                 default:
                     return 0;
             }
@@ -1914,9 +1922,9 @@ public:
         void InitSpells() override
         {
             uint8 lvl = me->GetLevel();
-            bool isAffl = _spec == BOT_SPEC_WARLOCK_AFFLICTION;
-            //bool isDemo = _spec == BOT_SPEC_WARLOCK_DEMONOLOGY;
-            bool isDest = _spec == BOT_SPEC_WARLOCK_DESTRUCTION;
+            bool isAffl = GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION;
+            //bool isDemo = GetSpec() == BOT_SPEC_WARLOCK_DEMONOLOGY;
+            bool isDest = GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION;
 
             InitSpellMap(CURSE_OF_WEAKNESS_1);
             InitSpellMap(CURSE_OF_AGONY_1);
@@ -1968,9 +1976,9 @@ public:
         void ApplyClassPassives() const override
         {
             uint8 level = master->GetLevel();
-            bool isAffl = _spec == BOT_SPEC_WARLOCK_AFFLICTION;
-            bool isDemo = _spec == BOT_SPEC_WARLOCK_DEMONOLOGY;
-            bool isDest = _spec == BOT_SPEC_WARLOCK_DESTRUCTION;
+            bool isAffl = GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION;
+            bool isDemo = GetSpec() == BOT_SPEC_WARLOCK_DEMONOLOGY;
+            bool isDest = GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION;
 
             RefreshAura(CHAOS_BOLT_PASSIVE);
             RefreshAura(DEMONIC_IMMOLATE_PASSIVE);

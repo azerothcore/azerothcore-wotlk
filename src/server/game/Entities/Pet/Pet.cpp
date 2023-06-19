@@ -1005,7 +1005,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     return true;
 }
 
-// TODO: Move stat mods code to pet passive auras
+/// @todo: Move stat mods code to pet passive auras
 bool Guardian::InitStatsForLevel(uint8 petlevel)
 {
     CreatureTemplate const* cinfo = GetCreatureTemplate();
@@ -1047,6 +1047,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
             else if (petType != SUMMON_PET)
                 LOG_ERROR("entities.pet", "Unknown type pet {} is summoned by player class {}", GetEntry(), owner->getClass());
+        }
+
+        if (petType == HUNTER_PET || petType == SUMMON_PET)
+        {
+            SetSpeed(MOVE_RUN, 1.15f);
         }
     }
 
@@ -1108,17 +1113,22 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         float factorHealth = owner->GetTypeId() == TYPEID_PLAYER ? std::min(1.0f, cinfo->ModHealth) : cinfo->ModHealth;
         float factorMana = owner->GetTypeId() == TYPEID_PLAYER ? std::min(1.0f, cinfo->ModMana) : cinfo->ModMana;
 
+        if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
+        {
+            factorHealth *= _GetHealthMod(cinfo->rank);
+        }
+
         SetCreateHealth(std::max<uint32>(1, stats->BaseHealth[cinfo->expansion]*factorHealth));
         SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, GetCreateHealth());
         SetCreateMana(stats->BaseMana * factorMana);
         SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, GetCreateMana());
 
         // xinef: added some multipliers so debuffs can affect pets in any way...
-        SetCreateStat(STAT_STRENGTH, 22 + 2 * petlevel);
-        SetCreateStat(STAT_AGILITY, 22 + 1.5f * petlevel);
-        SetCreateStat(STAT_STAMINA, 25 + 2 * petlevel);
-        SetCreateStat(STAT_INTELLECT, 28 + 2 * petlevel);
-        SetCreateStat(STAT_SPIRIT, 27 + 1.5f * petlevel);
+        SetCreateStat(STAT_STRENGTH, 22);
+        SetCreateStat(STAT_AGILITY, 22);
+        SetCreateStat(STAT_STAMINA, 25);
+        SetCreateStat(STAT_INTELLECT, 28);
+        SetCreateStat(STAT_SPIRIT, 27);
     }
 
     switch (petType)
@@ -1338,6 +1348,14 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
                             break;
                         }
+                    case NPC_VENOMOUS_SNAKE:
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 0.7 - 38));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 0.8 - 40));
+                        break;
+                    case NPC_VIPER:
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(1.3 * petlevel - 64));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(1.5 * petlevel - 68));
+                        break;
                     case NPC_GENERIC_IMP:
                     case NPC_GENERIC_VOIDWALKER:
                         {
@@ -2091,34 +2109,52 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
 {
     // not need after this call
     if (owner->ToPlayer()->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
+    {
         owner->ToPlayer()->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS, true);
+    }
 
     // reset for online
     if (onlinePet)
+    {
         onlinePet->resetTalents();
+    }
 
     PetStable* petStable = owner->GetPetStable();
     if (!petStable)
+    {
         return;
+    }
 
     std::unordered_set<uint32> petIds;
     if (petStable->CurrentPet)
+    {
         petIds.insert(petStable->CurrentPet->PetNumber);
+    }
 
     for (Optional<PetStable::PetInfo> const& stabledPet : petStable->StabledPets)
+    {
         if (stabledPet)
+        {
             petIds.insert(stabledPet->PetNumber);
+        }
+    }
 
     for (PetStable::PetInfo const& unslottedPet : petStable->UnslottedPets)
+    {
         petIds.insert(unslottedPet.PetNumber);
+    }
 
     // now need only reset for offline pets (all pets except online case)
     if (onlinePet)
+    {
         petIds.erase(onlinePet->GetCharmInfo()->GetPetNumber());
+    }
 
     // no offline pets
-    if (!petIds.empty())
+    if (petIds.empty())
+    {
         return;
+    }
 
     bool need_comma = false;
     std::ostringstream ss;
@@ -2127,7 +2163,9 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
     for (uint32 id : petIds)
     {
         if (need_comma)
+        {
             ss << ',';
+        }
 
         ss << id;
 
@@ -2140,7 +2178,9 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
     for (uint32 spell : sPetTalentSpells)
     {
         if (need_comma)
+        {
             ss << ',';
+        }
 
         ss << spell;
 

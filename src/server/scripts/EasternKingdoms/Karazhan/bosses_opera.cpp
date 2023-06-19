@@ -126,17 +126,19 @@ public:
     {
         boss_dorotheeAI(Creature* creature) : ScriptedAI(creature)
         {
+            SetCombatMovement(false);
+            //this is kinda a big no-no. but it will prevent her from moving to chase targets. she should just cast her spells. in this case, since there is not really something to LOS her with or get out of range this would work. but a more elegant solution would be better
             Initialize();
             instance = creature->GetInstanceScript();
         }
 
         void Initialize()
         {
-            AggroTimer = 500;
+            AggroTimer = 12000;
 
-            WaterBoltTimer = 5000;
+            WaterBoltTimer = 0;
             FearTimer = 15000;
-            SummonTitoTimer = 47500;
+            SummonTitoTimer = 41000;
 
             SummonedTito = false;
             TitoDied = false;
@@ -152,16 +154,16 @@ public:
 
         bool SummonedTito;
         bool TitoDied;
+        bool IntroDone = false;
 
         void Reset() override
         {
             Initialize();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            Talk(SAY_DOROTHEE_AGGRO);
-            DoZoneInCombat();
+            me->SetInCombatWithZone();
         }
 
         void JustReachedHome() override
@@ -175,6 +177,7 @@ public:
         {
             Talk(SAY_DOROTHEE_DEATH);
             SummonCroneIfReady(instance, me);
+            me->DespawnOrUnsummon();
         }
 
         void AttackStart(Unit* who) override
@@ -186,7 +189,6 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
@@ -194,13 +196,35 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
+                instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+                me->DespawnOrUnsummon();
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
+            if(!IntroDone)
+            {
+                if(!me->IsInEvadeMode())
+                {
+                    Talk(SAY_DOROTHEE_AGGRO);
+                    IntroDone = true;
+                }
+            }
+
             if (AggroTimer)
             {
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
+                    me->SetInCombatWithZone();
                     AggroTimer = 0;
                 }
                 else
@@ -213,7 +237,7 @@ public:
             if (WaterBoltTimer <= diff)
             {
                 DoCast(SelectTarget(SelectTargetMethod::Random, 0), SPELL_WATERBOLT);
-                WaterBoltTimer = TitoDied ? 1500 : 5000;
+                WaterBoltTimer = 1500;
             }
             else
                 WaterBoltTimer -= diff;
@@ -262,7 +286,7 @@ public:
             YipTimer = 10000;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }
@@ -278,6 +302,7 @@ public:
                     Talk(SAY_DOROTHEE_TITO_DEATH, Dorothee);
                 }
             }
+            me->DespawnOrUnsummon();
         }
 
         void UpdateAI(uint32 diff) override
@@ -310,6 +335,136 @@ void boss_dorothee::boss_dorotheeAI::SummonTito()
     }
 }
 
+class boss_roar : public CreatureScript
+{
+public:
+    boss_roar() : CreatureScript("boss_roar") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetKarazhanAI<boss_roarAI>(creature);
+    }
+
+    struct boss_roarAI : public ScriptedAI
+    {
+        boss_roarAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = creature->GetInstanceScript();
+        }
+
+        InstanceScript* instance;
+
+        uint32 AggroTimer;
+        uint32 MangleTimer;
+        uint32 ShredTimer;
+        uint32 ScreamTimer;
+
+        void Reset() override
+        {
+            AggroTimer = 16670;
+            MangleTimer = 5000;
+            ShredTimer  = 10000;
+            ScreamTimer = 15000;
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+
+        {
+            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+                return;
+
+            ScriptedAI::MoveInLineOfSight(who);
+        }
+
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
+                instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+                me->DespawnOrUnsummon();
+            }
+        }
+
+        void AttackStart(Unit* who) override
+        {
+            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+                return;
+
+            ScriptedAI::AttackStart(who);
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            Talk(SAY_ROAR_AGGRO);
+            DoZoneInCombat();
+        }
+
+        void JustReachedHome() override
+        {
+            me->DespawnOrUnsummon();
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_ROAR_DEATH);
+            SummonCroneIfReady(instance, me);
+            me->DespawnOrUnsummon();
+        }
+
+        void KilledUnit(Unit* /*victim*/) override
+        {
+            Talk(SAY_ROAR_SLAY);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (AggroTimer)
+            {
+                if (AggroTimer <= diff)
+                {
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
+                    me->SetInCombatWithZone();
+                    AggroTimer = 0;
+                }
+                else
+                    AggroTimer -= diff;
+            }
+
+            if (!UpdateVictim())
+                return;
+
+            if (MangleTimer <= diff)
+            {
+                DoCastVictim(SPELL_MANGLE);
+                MangleTimer = urand(5000, 8000);
+            }
+            else
+                MangleTimer -= diff;
+
+            if (ShredTimer <= diff)
+            {
+                DoCastVictim(SPELL_SHRED);
+                ShredTimer = urand(10000, 15000);
+            }
+            else
+                ShredTimer -= diff;
+
+            if (ScreamTimer <= diff)
+            {
+                DoCastVictim(SPELL_FRIGHTENED_SCREAM);
+                ScreamTimer = urand(20000, 30000);
+            }
+            else
+                ScreamTimer -= diff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+};
+
 class boss_strawman : public CreatureScript
 {
 public:
@@ -335,7 +490,7 @@ public:
 
         void Reset() override
         {
-            AggroTimer = 11000;
+            AggroTimer = 26300;
             BrainBashTimer = 5000;
             BrainWipeTimer = 7000;
         }
@@ -349,7 +504,6 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
@@ -357,7 +511,17 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
+                instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+                me->DespawnOrUnsummon();
+            }
+        }
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_STRAWMAN_AGGRO);
             DoZoneInCombat();
@@ -384,8 +548,8 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_STRAWMAN_DEATH);
-
             SummonCroneIfReady(instance, me);
+            me->DespawnOrUnsummon();
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -400,6 +564,8 @@ public:
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
+                    me->SetInCombatWithZone();
                     AggroTimer = 0;
                 }
                 else
@@ -458,14 +624,14 @@ public:
 
         void Reset() override
         {
-            AggroTimer = 15000;
+            AggroTimer = 34470;
             CleaveTimer = 5000;
             RustTimer   = 15000;
 
             RustCount   = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_TINHEAD_AGGRO);
             DoZoneInCombat();
@@ -485,7 +651,6 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
@@ -493,11 +658,22 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            ScriptedAI::EnterEvadeMode(reason);
+
+            if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
+                instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+                me->DespawnOrUnsummon();
+            }
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_TINHEAD_DEATH);
-
             SummonCroneIfReady(instance, me);
+            me->DespawnOrUnsummon();
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -512,6 +688,8 @@ public:
                 if (AggroTimer <= diff)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToPC(false);
+                    me->SetInCombatWithZone();
                     AggroTimer = 0;
                 }
                 else
@@ -541,123 +719,6 @@ public:
                 else
                     RustTimer -= diff;
             }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
-class boss_roar : public CreatureScript
-{
-public:
-    boss_roar() : CreatureScript("boss_roar") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetKarazhanAI<boss_roarAI>(creature);
-    }
-
-    struct boss_roarAI : public ScriptedAI
-    {
-        boss_roarAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-        }
-
-        InstanceScript* instance;
-
-        uint32 AggroTimer;
-        uint32 MangleTimer;
-        uint32 ShredTimer;
-        uint32 ScreamTimer;
-
-        void Reset() override
-        {
-            AggroTimer = 20000;
-            MangleTimer = 5000;
-            ShredTimer  = 10000;
-            ScreamTimer = 15000;
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-
-        {
-            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
-                return;
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void AttackStart(Unit* who) override
-        {
-            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
-                return;
-
-            ScriptedAI::AttackStart(who);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            Talk(SAY_ROAR_AGGRO);
-            DoZoneInCombat();
-        }
-
-        void JustReachedHome() override
-        {
-            me->DespawnOrUnsummon();
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_ROAR_DEATH);
-
-            SummonCroneIfReady(instance, me);
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            Talk(SAY_ROAR_SLAY);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (AggroTimer)
-            {
-                if (AggroTimer <= diff)
-                {
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    AggroTimer = 0;
-                }
-                else
-                    AggroTimer -= diff;
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            if (MangleTimer <= diff)
-            {
-                DoCastVictim(SPELL_MANGLE);
-                MangleTimer = urand(5000, 8000);
-            }
-            else
-                MangleTimer -= diff;
-
-            if (ShredTimer <= diff)
-            {
-                DoCastVictim(SPELL_SHRED);
-                ShredTimer = urand(10000, 15000);
-            }
-            else
-                ShredTimer -= diff;
-
-            if (ScreamTimer <= diff)
-            {
-                DoCastVictim(SPELL_FRIGHTENED_SCREAM);
-                ScreamTimer = urand(20000, 30000);
-            }
-            else
-                ScreamTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -703,7 +764,7 @@ public:
             Talk(SAY_CRONE_SLAY);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_CRONE_AGGRO);
             DoZoneInCombat();
@@ -771,7 +832,7 @@ public:
             MoveTimer = 1000;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void MoveInLineOfSight(Unit* /*who*/) override
 
@@ -882,7 +943,7 @@ public:
             IsChasing = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_WOLF_AGGRO);
             DoZoneInCombat();
@@ -1114,7 +1175,7 @@ public:
             RomuloDead = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }
@@ -1284,7 +1345,7 @@ public:
             //LOG_ERROR("scripts", "boss_romuloAI: DamageTaken reach end of code, that should not happen.");
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
             Talk(SAY_ROMULO_AGGRO);

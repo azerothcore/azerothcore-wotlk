@@ -16,6 +16,8 @@ enum BotTexts : uint32
     GOSSIP_NORMAL_CUSTOM_DARKRANGER     = 70009,
     GOSSIP_GREET_CUSTOM_SEAWITCH        = 70010,
     GOSSIP_NORMAL_CUSTOM_SEAWITCH       = 70011,
+    GOSSIP_GREET_CUSTOM_CRYPTLORD       = 70012,
+    GOSSIP_NORMAL_CUSTOM_CRYPTLORD      = 70013,
     //70012-70100 reserved for bot gossip texts (not selectable)
     GOSSIP_CLASSDESC_BM                 = 70101,
     GOSSIP_CLASSDESC_SPHYNX             = 70102,
@@ -25,6 +27,7 @@ enum BotTexts : uint32
     GOSSIP_CLASSDESC_DARKRANGER         = 70106,
     GOSSIP_CLASSDESC_NECROMANCER        = 70107,
     GOSSIP_CLASSDESC_SEAWITCH           = 70108,
+    GOSSIP_CLASSDESC_CRYPTLORD          = 70109,
     //70109-70200 reserved for bot class descriptions gossip texts (not selectable)
     GOSSIP_BOTGIVER_GREET               = 70201,
     GOSSIP_BOTGIVER_HIRE                = 70202,
@@ -392,7 +395,19 @@ enum BotTexts : uint32
     BOT_TEXT_TRANSMOGRIFICATION         = 70658, //"Transmogrification..."
     BOT_TEXT_DISABLE_COMBAT_POSITIONING = 70659, //"DISABLE combat positioning"
     BOT_TEXT_PRIORITY_TARGET            = 70660, //"Priority target"
-    //70661-70799 reserved for custom localization strings
+    BOT_TEXT_BOT_GEAR_BANK              = 70661, //"Bot gear bank..."
+    BOT_TEXT_DEPOSIT_ITEMS              = 70662, //"Deposit items..."
+    BOT_TEXT_WITHDRAW_ITEMS             = 70663, //"Withdraw items..."
+    BOT_TEXT_BANK_IS_EMPTY              = 70664, //"Bank is empty"
+    BOT_TEXT_PREVIOUS_PAGE              = 70665, //"Previous page"
+    BOT_TEXT_NEXT_PAGE                  = 70666, //"Next page"
+    BOT_TEXT_HIREWARN_CRYPTLORD         = 70667, //"Do you really want to spend all this money to make Crypt Lord move again?"
+    BOT_TEXT_HIREOPTION_CRYPTLORD       = 70668, //"I doubt your ability to do much harm in your current state, but I am willing to lead you and help you restore your powers."
+    BOT_TEXT_CLASS_CRYPT_LORD_PLU       = 70669, //"Crypt Lords"
+    BOT_TEXT_CLASS_CRYPT_LORD           = 70670, //"Crypt Lord"
+    BOT_TEXT_REFLECT                    = 70671, //"Reflect"
+    BOT_TEXT_LOCUSTS                    = 70672, //"Locusts"
+    //70673-70799 reserved for custom localization strings
 };
 
 #endif //BOTTEXT_H

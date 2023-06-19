@@ -1,4 +1,4 @@
--- 
+--
 SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 -- Table structure for creature_template_npcbot_extras
@@ -12,7 +12,7 @@ CREATE TABLE `creature_template_npcbot_extras` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records 
+-- Records
 -- ----------------------------
 INSERT INTO `creature_template_npcbot_extras` VALUES
 ('70001', '1', '1'),

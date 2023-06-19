@@ -1,6 +1,7 @@
 #ifndef _BOTCOMMON_H
 #define _BOTCOMMON_H
 
+#include "ObjectGuid.h"
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 
@@ -35,11 +36,17 @@ enum BotCommonValues
     GO_REFRESHMENT_TABLE_2              = 193061,//lvl 80 req80
     GO_SOULWELL_1                       = 181621,//lvl 60 req68
     GO_SOULWELL_2                       = 193169,//lvl 69 req80
+    GO_BOT_MONEY_BAG                    = 186736,
 //COMMON CDs
     POTION_CD                           = 60000,//default 60sec potion cd
     REGEN_CD                            = 1000, //update hp/mana every X milliseconds
 //COMMON TIMERS
     ITEM_ENCHANTMENT_EXPIRE_TIMER       = 3600000, //1 Hour
+    REVIVE_TIMER_DEFAULT                = 180000, //3 Minutes
+    REVIVE_TIMER_MEDIUM                 = 90000, //1.5 Minutes
+    REVIVE_TIMER_SHORT                  = 60000, //1 Minute
+    INOUTDOORS_ENSURE_TIMER             = 1000,
+    BOT_GROUP_UPDATE_TIMER              = 2000,
 //VEHICLE CREATURES
     CREATURE_NEXUS_SKYTALON_1           = 32535, // [Q] Aces High
     CREATURE_EOE_SKYTALON_N             = 30161, // Eye of Eternity
@@ -80,6 +87,8 @@ enum BotCommonValues
     CREATURE_ICC_MUTATED_ABOMINATION8   = 38787,
 //COMMON AOE TRIGGERS
     CREATURE_ZA_FIRE_BOMB               = 23920,
+    CREATURE_UK_SHADOW_AXE_N            = 23997,
+    CREATURE_UK_SHADOW_AXE_H            = 31835,
     CREATURE_EOE_STATIC_FIELD           = 30592,
     CREATURE_ICC_OOZE_PUDDLE            = 37690,
 //COMMON ENEMY CREATURES
@@ -143,6 +152,10 @@ enum BotCommonValues
     BOTAI_MISC_WEAPON_SPEC,
     BOTPETAI_MISC_DURATION,
     BOTPETAI_MISC_MAXLEVEL,
+    BOTPETAI_MISC_FIXEDLEVEL,
+    BOTPETAI_MISC_CARRY,
+    BOTPETAI_MISC_CAPACITY,
+    BOTPETAI_MISC_MAX_ATTACKERS,
   //SOUNDS
     SOUND_FREEZE_IMPACT_WINDWALK        = 29,
     SOUND_AXE_2H_IMPACT_FLESH_CRIT      = 158,
@@ -176,11 +189,18 @@ enum BotClasses : uint8
     BOT_CLASS_DARK_RANGER,
     BOT_CLASS_NECROMANCER,
     BOT_CLASS_SEA_WITCH,
+    BOT_CLASS_CRYPT_LORD,
 
     BOT_CLASS_END,
 
     BOT_CLASS_EX_START                  = BOT_CLASS_BM
 };
+
+constexpr uint32 ALL_BOT_CLASSES_MASK =
+    ((1 << BOT_CLASS_WARRIOR)|(1 << BOT_CLASS_PALADIN)|(1 << BOT_CLASS_HUNTER)|(1 << BOT_CLASS_ROGUE)|(1 << BOT_CLASS_PRIEST)|
+    (1 << BOT_CLASS_DEATH_KNIGHT)|(1 << BOT_CLASS_SHAMAN)|(1 << BOT_CLASS_MAGE)|(1 << BOT_CLASS_WARLOCK)|(1 << BOT_CLASS_DRUID)|
+    (1 << BOT_CLASS_BM)|(1 << BOT_CLASS_SPHYNX)|(1 << BOT_CLASS_ARCHMAGE)|(1 << BOT_CLASS_DREADLORD)|(1 << BOT_CLASS_SPELLBREAKER)|
+    (1 << BOT_CLASS_DARK_RANGER)|(1 << BOT_CLASS_NECROMANCER)|(1 << BOT_CLASS_SEA_WITCH)|(1 << BOT_CLASS_CRYPT_LORD));
 
 enum BotStances
 {
@@ -372,7 +392,14 @@ enum BotPetTypes
     //Necromancer
     BOT_PET_NECROSKELETON               = 70580,
 
+    //Sea Witch
     BOT_PET_TORNADO                     = 70586,
+
+    //Crypt Lord
+    BOT_PET_CARRION_BEETLE1             = 70592,
+    BOT_PET_CARRION_BEETLE2             = 70593,
+    BOT_PET_CARRION_BEETLE3             = 70594,
+    BOT_PET_LOCUST_SWARM                = 70595,
 
     BOT_PET_INVALID                     = 99999
 };
@@ -485,8 +512,9 @@ enum BotAIResetType
 {
     BOTAI_RESET_INIT                    = 0x01,
     BOTAI_RESET_DISMISS                 = 0x02,
-    BOTAI_RESET_LOST                    = 0x04,
+    BOTAI_RESET_UNBIND                  = 0x04,
     BOTAI_RESET_LOGOUT                  = 0x08,
+    BOTAI_RESET_FORCERECALL             = 0x10,
 
     BOTAI_RESET_MASK_ABANDON_MASTER     = (BOTAI_RESET_INIT | BOTAI_RESET_DISMISS)
 };
@@ -509,9 +537,13 @@ enum BotCommandStates : uint32
     BOT_COMMAND_WALK                    = 0x00000040,
     BOT_COMMAND_NOGOSSIP                = 0x00000080,
     BOT_COMMAND_UNBIND                  = 0x00000100,
+    BOT_COMMAND_NO_CAST                 = 0x00000200,
+    BOT_COMMAND_NO_CAST_LONG            = 0x00000400,
+    BOT_COMMAND_INACTION                = 0x00000800,
 
-    BOT_COMMAND_MASK_UNCHASE            = BOT_COMMAND_STAY | BOT_COMMAND_FOLLOW | BOT_COMMAND_FULLSTOP,
-    BOT_COMMAND_MASK_UNMOVING           = BOT_COMMAND_STAY | BOT_COMMAND_FULLSTOP | BOT_COMMAND_ISSUED_ORDER
+    BOT_COMMAND_MASK_UNCHASE            = BOT_COMMAND_STAY | BOT_COMMAND_FOLLOW | BOT_COMMAND_FULLSTOP | BOT_COMMAND_INACTION,
+    BOT_COMMAND_MASK_UNMOVING           = BOT_COMMAND_STAY | BOT_COMMAND_FULLSTOP | BOT_COMMAND_ISSUED_ORDER,
+    BOT_COMMAND_MASK_NOCAST_ANY         = BOT_COMMAND_NO_CAST | BOT_COMMAND_NO_CAST_LONG
 };
 
 enum BotAwaitStates

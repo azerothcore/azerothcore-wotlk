@@ -369,7 +369,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
                 _me->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
         }
         //npcbot: do not allow other passengers on bot vehicles
-        if (unit->GetTypeId() == TYPEID_UNIT && unit->ToCreature()->IsNPCBot()/* &&
+        if (unit->IsNPCBot()/* &&
             (Seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)*/)
         {
             if (_me->GetTypeId() == TYPEID_PLAYER)
@@ -527,11 +527,11 @@ void Vehicle::RemovePassenger(Unit* unit)
     if (_me->IsFlying() && !_me->GetInstanceId() && unit->GetTypeId() == TYPEID_PLAYER && !(unit->ToPlayer()->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT) && _me->GetEntry() != 30275 /*NPC_WILD_WYRM*/)
         _me->CastSpell(unit, VEHICLE_SPELL_PARACHUTE, true);
 
+    if (_me->GetTypeId() == TYPEID_UNIT)
+        sScriptMgr->OnRemovePassenger(this, unit);
+
     if (_me->GetTypeId() == TYPEID_UNIT && _me->ToCreature()->IsAIEnabled)
         _me->ToCreature()->AI()->PassengerBoarded(unit, seat->first, false);
-
-    if (GetBase()->GetTypeId() == TYPEID_UNIT)
-        sScriptMgr->OnRemovePassenger(this, unit);
 }
 
 void Vehicle::RelocatePassengers()

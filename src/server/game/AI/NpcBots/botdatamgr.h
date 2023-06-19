@@ -2,12 +2,33 @@
 #define _BOTDATAMGR_H
 
 #include "botcommon.h"
+#include "DatabaseEnvFwd.h"
 
+#include <functional>
 #include <set>
 #include <shared_mutex>
 #include <vector>
 
+class BattlegroundQueue;
 class Creature;
+class Group;
+class Item;
+class Player;
+class WanderNode;
+class WorldLocation;
+
+struct EquipmentInfo;
+struct CreatureTemplate;
+struct FactionEntry;
+struct GroupQueueInfo;
+struct ItemTemplate;
+struct Position;
+struct PvPDifficultyEntry;
+
+enum LocaleConstant : uint8;
+
+constexpr float MIN_WANDER_NODE_DISTANCE = 50.0f; // VISIBILITY_DISTANCE_NORMAL * 0.5f;
+constexpr float MAX_WANDER_NODE_DISTANCE = 800.0f; //SIZE_OF_GRIDS * 1.5f;
 
 enum NpcBotDataUpdateType
 {
@@ -27,6 +48,7 @@ struct NpcBotData
     typedef std::set<uint32> DisabledSpellsContainer;
 
     friend class BotDataMgr;
+    friend struct WanderingBotsGenerator;
 public:
     uint32 owner;
     uint32 roles;
@@ -47,6 +69,7 @@ private:
 struct NpcBotAppearanceData
 {
     friend class BotDataMgr;
+    friend struct WanderingBotsGenerator;
 public:
     uint8 gender;
     uint8 skin;
@@ -62,6 +85,7 @@ private:
 struct NpcBotExtras
 {
     friend class BotDataMgr;
+    friend struct WanderingBotsGenerator;
 public:
     uint8 race;
     uint8 bclass;
@@ -74,12 +98,12 @@ struct NpcBotTransmogData
 {
     friend class BotDataMgr;
 public:
-    std::pair<uint32 /*item_id*/, uint32 /*fake_id*/> transmogs[BOT_TRANSMOG_INVENTORY_SIZE];
+    std::pair<uint32 /*item_id*/, int32 /*fake_id*/> transmogs[BOT_TRANSMOG_INVENTORY_SIZE];
 private:
     explicit NpcBotTransmogData()
     {
         for (uint8 i = 0; i != BOT_TRANSMOG_INVENTORY_SIZE; ++i)
-            transmogs[i] = { 0, 0 };
+            transmogs[i] = { 0, -1 };
     }
     NpcBotTransmogData(NpcBotTransmogData const&);
 };
@@ -120,11 +144,24 @@ public:
 
 typedef std::set<Creature const*> NpcBotRegistry;
 
+struct BotBankItemCompare{ bool operator()(Item const* item1, Item const* item2) const; };
+typedef std::multiset<Item*, BotBankItemCompare> BotBankItemContainer;
+
+constexpr uint8 ITEM_SORTING_LEVEL_STEP = 5;
+constexpr uint8 LEVEL_STEPS = DEFAULT_MAX_LEVEL / ITEM_SORTING_LEVEL_STEP + 1;
+typedef std::vector<uint32> ItemIdVector;
+typedef std::array<ItemIdVector, LEVEL_STEPS> ItemLeveledArr;
+typedef std::array<ItemLeveledArr, BOT_INVENTORY_SIZE> ItemPerSlot;
+typedef std::array<ItemPerSlot, BOT_CLASS_END> ItemPerBotClassMap;
+
 class BotDataMgr
 {
     public:
+        static void Update(uint32 diff);
+
         static void LoadNpcBots(bool spawn = true);
         static void LoadNpcBotGroupData();
+        static void LoadNpcBotGearStorage();
 
         static void AddNpcBotData(uint32 entry, uint32 roles, uint8 spec, uint32 faction);
         static NpcBotData const* SelectNpcBotData(uint32 entry);
@@ -136,7 +173,7 @@ class BotDataMgr
         static NpcBotExtras const* SelectNpcBotExtras(uint32 entry);
 
         static NpcBotTransmogData const* SelectNpcBotTransmogs(uint32 entry);
-        static void UpdateNpcBotTransmogData(uint32 entry, uint8 slot, uint32 item_id, uint32 fake_id, bool update_db = true);
+        static void UpdateNpcBotTransmogData(uint32 entry, uint8 slot, uint32 item_id, int32 fake_id, bool update_db = true);
         static void ResetNpcBotTransmogData(uint32 entry, bool update_db = true);
 
         static bool AllBotsLoaded();
@@ -144,12 +181,38 @@ class BotDataMgr
         static void RegisterBot(Creature const* bot);
         static void UnregisterBot(Creature const* bot);
         static Creature const* FindBot(uint32 entry);
-        static Creature const* FindBot(std::string_view name, LocaleConstant loc);
+        static Creature const* FindBot(std::string_view name, LocaleConstant loc, std::vector<uint32> const* not_ids = nullptr);
         static NpcBotRegistry const& GetExistingNPCBots();
         static void GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid);
         static ObjectGuid GetNPCBotGuid(uint32 entry);
         static std::vector<uint32> GetExistingNPCBotIds();
         static uint8 GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask = 0);
+
+        static void DespawnWandererBot(uint32 entry);
+        static void LoadWanderMap(bool reload = false);
+        static void GenerateWanderingBots();
+        static bool GenerateBattlegroundBots(Player const* groupLeader, Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo);
+        static void CreateWanderingBotsSortedGear();
+        static ItemPerBotClassMap const& GetWanderingBotsSortedGearMap();
+        static Item* GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(ItemTemplate const*)>&& check);
+        static CreatureTemplate const* GetBotExtraCreatureTemplate(uint32 entry);
+        static EquipmentInfo const* GetBotEquipmentInfo(uint32 entry);
+
+        static uint8 GetLevelBonusForBotRank(uint32 rank);
+        static uint8 GetMinLevelForMapId(uint32 mapId);
+        static uint8 GetMaxLevelForMapId(uint32 mapId);
+        static uint8 GetMinLevelForBotClass(uint8 m_class);
+        static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
+        static TeamId GetTeamIdForFaction(uint32 factionTemplateId);
+        static uint32 GetTeamForFaction(uint32 factionTemplateId);
+        static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport);
+        static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* fromPos, Creature const* bot, uint8 lvl, bool random);
+        static WanderNode const* GetClosestWanderNode(WorldLocation const* loc);
+
+        static BotBankItemContainer const* GetBotBankItems(ObjectGuid playerGuid);
+        static Item* WithdrawBotBankItem(ObjectGuid playerGuid, ObjectGuid::LowType itemGuidLow);
+        static void DepositBotBankItem(ObjectGuid playerGuid, Item* item);
+        static void SaveNpcBotStoredGear(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
 
         static std::shared_mutex* GetLock();
 

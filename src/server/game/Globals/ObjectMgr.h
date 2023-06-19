@@ -578,9 +578,9 @@ struct ReputationOnKillEntry
     uint32 RepFaction1;
     uint32 RepFaction2;
     uint32 ReputationMaxCap1;
-    int32 RepValue1;
+    float RepValue1;
     uint32 ReputationMaxCap2;
-    int32 RepValue2;
+    float RepValue2;
     bool IsTeamAward1;
     bool IsTeamAward2;
     bool TeamDependent;
@@ -687,6 +687,8 @@ typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
 typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
+typedef std::vector<uint32> CreatureCustomIDsContainer;
+
 enum SkillRangeType
 {
     SKILL_RANGE_LANGUAGE,                                   // 300..300
@@ -704,6 +706,8 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 #define MAX_CHARTER_NAME         24                         // max allowed by client name length
 #define MAX_CHANNEL_NAME         50                         // pussywizard
 
+bool ReservedNames(std::wstring& name);
+bool ProfanityNames(std::wstring& name);
 bool normalizePlayerName(std::string& name);
 
 struct LanguageDesc
@@ -1035,6 +1039,7 @@ public:
     void LoadCreatureTemplateAddons();
     void LoadCreatureTemplateResistances();
     void LoadCreatureTemplateSpells();
+    void LoadCreatureCustomIDs();
     void CheckCreatureTemplate(CreatureTemplate const* cInfo);
     void CheckCreatureMovement(char const* table, uint64 id, CreatureMovementData& creatureMovement);
     void LoadGameObjectQuestItems();
@@ -1087,6 +1092,7 @@ public:
     void LoadPetLevelInfo();
     void LoadExplorationBaseXP();
     void LoadPetNames();
+    void LoadPetNamesLocales();
     void LoadPetNumber();
     void LoadFishingBaseSkillLevel();
     void ChangeFishingBaseSkillLevel(uint32 entry, int32 skill);
@@ -1112,6 +1118,7 @@ public:
     void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell);
 
     std::string GeneratePetName(uint32 entry);
+    std::string GeneratePetNameLocale(uint32 entry, LocaleConstant locale);
     uint32 GetBaseXP(uint8 level);
     [[nodiscard]] uint32 GetXPForLevel(uint8 level) const;
 
@@ -1224,7 +1231,7 @@ public:
     }
 
     [[nodiscard]] GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
-    [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
+    [[nodiscard]] GameObjectData const* GetGameObjectData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
         if (itr == _gameObjectDataStore.end()) return nullptr;
@@ -1346,6 +1353,11 @@ public:
     void LoadReservedPlayersNames();
     [[nodiscard]] bool IsReservedName(std::string_view name) const;
     void AddReservedPlayerName(std::string const& name);
+
+    // profanity names
+    void LoadProfanityPlayersNames();
+    [[nodiscard]] bool IsProfanityName(std::string_view name) const;
+    void AddProfanityPlayerName(std::string const& name);
 
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string_view name, bool create = false);
@@ -1518,6 +1530,10 @@ private:
     typedef std::set<std::wstring> ReservedNamesContainer;
     ReservedNamesContainer _reservedNamesStore;
 
+    //character profanity names
+    typedef std::set<std::wstring> ProfanityNamesContainer;
+    ReservedNamesContainer _profanityNamesStore;
+
     GameTeleContainer _gameTeleStore;
 
     ScriptNameContainer _scriptNamesStore;
@@ -1567,6 +1583,9 @@ private:
     typedef std::map<uint32, std::vector<std::string>> HalfNameContainer;
     HalfNameContainer _petHalfName0;
     HalfNameContainer _petHalfName1;
+    typedef std::map<std::pair<uint32, LocaleConstant>, std::vector<std::string>> HalfNameContainerLocale;
+    HalfNameContainerLocale _petHalfLocaleName0;
+    HalfNameContainerLocale _petHalfLocaleName1;
 
     typedef std::unordered_map<uint32, ItemSetNameEntry> ItemSetNameContainer;
     ItemSetNameContainer _itemSetNameStore;
@@ -1576,6 +1595,7 @@ private:
     CellObjectGuids _emptyCellObjectGuids;
     CreatureDataContainer _creatureDataStore;
     CreatureTemplateContainer _creatureTemplateStore;
+    CreatureCustomIDsContainer _creatureCustomIDsStore;
     std::vector<CreatureTemplate*> _creatureTemplateStoreFast; // pussywizard
     CreatureModelContainer _creatureModelStore;
     CreatureAddonContainer _creatureAddonStore;

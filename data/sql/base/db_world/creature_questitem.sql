@@ -1,30 +1,31 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.creature_questitem
+-- Dumping structure for table acore_world.creature_questitem
 DROP TABLE IF EXISTS `creature_questitem`;
 CREATE TABLE IF NOT EXISTS `creature_questitem` (
   `CreatureEntry` int unsigned NOT NULL DEFAULT '0',
   `Idx` int unsigned NOT NULL DEFAULT '0',
   `ItemId` int unsigned NOT NULL DEFAULT '0',
-  `VerifiedBuild` smallint NOT NULL DEFAULT '0',
+  `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`CreatureEntry`,`Idx`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.creature_questitem: 4 416 rows
+-- Dumping data for table acore_world.creature_questitem: ~4,416 rows (approximately)
 DELETE FROM `creature_questitem`;
-/*!40000 ALTER TABLE `creature_questitem` DISABLE KEYS */;
 INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBuild`) VALUES
 	(3, 0, 884, 0),
 	(3, 1, 1129, 0),
@@ -1724,6 +1725,7 @@ INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBui
 	(6140, 0, 10599, 0),
 	(6140, 1, 10598, 0),
 	(6140, 2, 10600, 0),
+	(6141, 0, 5808, 0),
 	(6146, 0, 11405, 0),
 	(6147, 0, 11405, 0),
 	(6148, 0, 11405, 0),
@@ -2637,7 +2639,13 @@ INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBui
 	(16245, 0, 22893, 0),
 	(16246, 0, 22894, 0),
 	(16294, 0, 22487, 0),
+	(16301, 0, 22641, 0),
+	(16302, 0, 22641, 0),
+	(16303, 0, 22642, 0),
 	(16304, 0, 22580, 0),
+	(16305, 0, 22642, 0),
+	(16307, 0, 22642, 0),
+	(16308, 0, 22642, 0),
 	(16310, 0, 22580, 0),
 	(16323, 0, 22566, 0),
 	(16324, 0, 22567, 0),
@@ -2659,10 +2667,13 @@ INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBui
 	(16349, 0, 22570, 0),
 	(16350, 0, 22570, 0),
 	(16350, 1, 23707, 0),
+	(16350, 2, 22644, 0),
 	(16351, 0, 22570, 0),
 	(16351, 1, 23707, 0),
+	(16351, 2, 22644, 0),
 	(16352, 0, 22570, 0),
 	(16352, 1, 23707, 0),
+	(16352, 2, 22644, 0),
 	(16353, 0, 22570, 0),
 	(16354, 0, 22570, 0),
 	(16355, 0, 22570, 0),
@@ -2774,6 +2785,8 @@ INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBui
 	(17198, 0, 23845, 0),
 	(17199, 0, 23845, 0),
 	(17200, 0, 23676, 0),
+	(17201, 0, 23676, 0),
+	(17201, 1, 23677, 0),
 	(17206, 0, 23688, 0),
 	(17207, 0, 23681, 0),
 	(17216, 0, 23757, 0),
@@ -4429,21 +4442,9 @@ INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBui
 	(39755, 0, 3083, 0),
 	(39755, 1, 3084, 0),
 	(39819, 0, 3083, 0),
-	(39819, 1, 3084, 0),
-	(6141, 0, 5808, 0),
-	(17201, 0, 23676, 0),
-	(17201, 1, 23677, 0),
-	(16350, 2, 22644, 0),
-	(16351, 2, 22644, 0),
-	(16352, 2, 22644, 0),
-	(16303, 0, 22642, 0),
-	(16305, 0, 22642, 0),
-	(16307, 0, 22642, 0),
-	(16308, 0, 22642, 0),
-	(16301, 0, 22641, 0),
-	(16302, 0, 22641, 0);
-/*!40000 ALTER TABLE `creature_questitem` ENABLE KEYS */;
+	(39819, 1, 3084, 0);
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

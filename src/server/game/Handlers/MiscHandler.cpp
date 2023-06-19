@@ -431,7 +431,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     bool preventAfkLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 2
                             && GetPlayer()->isAFK();
 
-    /// TODO: Possibly add RBAC permission to log out in combat
+    /// @todo: Possibly add RBAC permission to log out in combat
     bool canLogoutInCombat = GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_RESTING);
 
     uint32 reason = 0;
@@ -481,6 +481,10 @@ void WorldSession::HandlePlayerLogoutOpcode(WorldPackets::Character::PlayerLogou
 
 void WorldSession::HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& /*logoutCancel*/)
 {
+    // Player have already logged out serverside, too late to cancel
+    if (!GetPlayer())
+        return;
+
     SetLogoutStartTime(0);
 
     SendPacket(WorldPackets::Character::LogoutCancelAck().Write());
@@ -533,16 +537,6 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
     recv_data >> guid;
-
-    if (!guid)
-    {
-        // Clear any active gossip related to current selection if not present at player's client
-        GossipMenu& gossipMenu = _player->PlayerTalkClass->GetGossipMenu();
-        if (gossipMenu.GetSenderGUID() == _player->GetTarget())
-        {
-            _player->PlayerTalkClass->SendCloseGossip();
-        }
-    }
 
     _player->SetSelection(guid);
 
@@ -722,6 +716,27 @@ void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
     data << length;
     data << szStr;
     SendPacket(&data);
+}
+
+void WorldSession::SendAreaTriggerMessage(uint32 entry, ...)
+{
+    char const* format = GetAcoreString(entry);
+    if (format)
+    {
+        va_list ap;
+        char szStr[1024];
+        szStr[0] = '\0';
+
+        va_start(ap, entry);
+        vsnprintf(szStr, 1024, format, ap);
+        va_end(ap);
+
+        uint32 length = strlen(szStr) + 1;
+        WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
+        data << length;
+        data << szStr;
+        SendPacket(&data);
+    }
 }
 
 void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)

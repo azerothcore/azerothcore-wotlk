@@ -1,31 +1,32 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.creature_model_info
+-- Dumping structure for table acore_world.creature_model_info
 DROP TABLE IF EXISTS `creature_model_info`;
 CREATE TABLE IF NOT EXISTS `creature_model_info` (
-  `DisplayID` mediumint unsigned NOT NULL DEFAULT '0',
+  `DisplayID` int unsigned NOT NULL DEFAULT '0',
   `BoundingRadius` float NOT NULL DEFAULT '0',
   `CombatReach` float NOT NULL DEFAULT '0',
   `Gender` tinyint unsigned NOT NULL DEFAULT '2',
-  `DisplayID_Other_Gender` mediumint unsigned NOT NULL DEFAULT '0',
+  `DisplayID_Other_Gender` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`DisplayID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Creature System (Model related info)';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Creature System (Model related info)';
 
--- Dumpar data för tabell acore_world.creature_model_info: 24 143 rows
+-- Dumping data for table acore_world.creature_model_info: ~23,729 rows (approximately)
 DELETE FROM `creature_model_info`;
-/*!40000 ALTER TABLE `creature_model_info` DISABLE KEYS */;
 INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `Gender`, `DisplayID_Other_Gender`) VALUES
 	(4, 2, 3, 2, 0),
 	(13, 0, 0, 2, 0),
@@ -9958,7 +9959,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(15552, 0.306, 1.5, 0, 15552),
 	(15553, 0, 0, 0, 0),
 	(15554, 0.6, 1, 2, 0),
-	(15555, 2, 0, 2, 0),
+	(15555, 2, 8, 2, 0),
 	(15556, 1, 15, 2, 0),
 	(15557, 0.3519, 1.725, 0, 0),
 	(15558, 0.347, 1.5, 0, 0),
@@ -10194,10 +10195,10 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(15787, 1, 1, 2, 0),
 	(15788, 0.96, 2.5, 2, 0),
 	(15789, 1.1, 1, 2, 0),
-	(15790, 2, 0, 2, 0),
+	(15790, 2, 15, 2, 0),
 	(15791, 0, 0, 2, 0),
 	(15792, 0, 0, 2, 0),
-	(15793, 1.1, 1, 2, 0),
+	(15793, 1.1, 15, 2, 0),
 	(15794, 0.558, 5, 2, 0),
 	(15795, 0, 0, 1, 15796),
 	(15796, 0, 0, 1, 15795),
@@ -24172,8 +24173,8 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(32179, 1.75, 12.25, 0, 0),
 	(32670, 0.09, 0, 2, 0),
 	(32754, 1.25, 6.25, 2, 0);
-/*!40000 ALTER TABLE `creature_model_info` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

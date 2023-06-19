@@ -85,7 +85,7 @@ enum SpellFamilyFlag
     SPELLFAMILYFLAG_DK_DEATH_STRIKE         = 0x00000010,
     SPELLFAMILYFLAG_DK_DEATH_COIL           = 0x00002000,
 
-    // TODO: Figure out a more accurate name for the following familyflag(s)
+    /// @todo: Figure out a more accurate name for the following familyflag(s)
     SPELLFAMILYFLAG_SHAMAN_TOTEM_EFFECTS    = 0x04000000,  // Seems to be linked to most totems and some totem effects
 };
 
@@ -304,11 +304,17 @@ struct SpellProcEntry
 
 typedef std::unordered_map<uint32, SpellProcEntry> SpellProcMap;
 
+enum EnchantProcAttributes
+{
+    ENCHANT_PROC_ATTR_EXCLUSIVE     = 0x1 // Only one instance of that effect can be active
+};
+
 struct SpellEnchantProcEntry
 {
     uint32      customChance;
     float       PPMChance;
     uint32      procEx;
+    uint32      attributeMask;
 };
 
 typedef std::unordered_map<uint32, SpellEnchantProcEntry> SpellEnchantProcEventMap;
@@ -596,6 +602,16 @@ typedef std::vector<SpellInfo*> SpellInfoMap;
 
 typedef std::map<int32, std::vector<int32> > SpellLinkedMap;
 
+struct SpellCooldownOverride
+{
+    uint32 RecoveryTime;
+    uint32 CategoryRecoveryTime;
+    uint32 StartRecoveryTime;
+    uint32 StartRecoveryCategory;
+};
+
+typedef std::map<uint32, SpellCooldownOverride> SpellCooldownOverrideMap;
+
 bool IsPrimaryProfessionSkill(uint32 skill);
 
 inline bool IsProfessionSkill(uint32 skill)
@@ -736,6 +752,9 @@ public:
     // Talent Additional Set
     [[nodiscard]] bool IsAdditionalTalentSpell(uint32 spellId) const;
 
+    [[nodiscard]] bool HasSpellCooldownOverride(uint32 spellId) const;
+    [[nodiscard]] SpellCooldownOverride GetSpellCooldownOverride(uint32 spellId) const;
+
 private:
     SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
 
@@ -764,6 +783,7 @@ public:
     void LoadPetDefaultSpells();
     void LoadSpellAreas();
     void LoadSpellInfoStore();
+    void LoadSpellCooldownOverrides();
     void UnloadSpellInfoStore();
     void UnloadSpellInfoImplicitTargetConditionLists();
     void LoadSpellInfoCustomAttributes();
@@ -797,6 +817,7 @@ private:
     PetLevelupSpellMap         mPetLevelupSpellMap;
     PetDefaultSpellsMap        mPetDefaultSpellsMap;           // only spells not listed in related mPetLevelupSpellMap entry
     SpellInfoMap               mSpellInfoMap;
+    SpellCooldownOverrideMap   mSpellCooldownOverrideMap;
     TalentAdditionalSet        mTalentSpellAdditionalSet;
 };
 

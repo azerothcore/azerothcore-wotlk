@@ -422,7 +422,7 @@ void MotionTransport::LoadStaticPassengers()
             // GameObjects on transport
             guidEnd = cellItr->second.gameobjects.end();
             for (CellGuidSet::const_iterator guidItr = cellItr->second.gameobjects.begin(); guidItr != guidEnd; ++guidItr)
-                CreateGOPassenger(*guidItr, sObjectMgr->GetGOData(*guidItr));
+                CreateGOPassenger(*guidItr, sObjectMgr->GetGameObjectData(*guidItr));
         }
     }
 }
@@ -447,7 +447,7 @@ void MotionTransport::UnloadNonStaticPassengers()
             continue;
         }
         //npcbot: do not unload bots
-        if ((*itr)->GetTypeId() == TYPEID_UNIT && (*itr)->ToCreature()->IsNPCBotOrPet())
+        if ((*itr)->IsNPCBotOrPet())
         {
             ++itr;
             continue;
@@ -564,7 +564,7 @@ void MotionTransport::DelayedTeleportTransport()
         {
             case TYPEID_UNIT:
                 //npcbot: do not add bots to transport (handled inside AI)
-                if (obj->ToCreature()->IsNPCBotOrPet())
+                if (obj->IsNPCBotOrPet())
                     break;
                 //end npcbot
                 _passengers.erase(obj);
