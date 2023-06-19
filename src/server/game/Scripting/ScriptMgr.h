@@ -1461,7 +1461,7 @@ public:
 
     virtual bool CanSendErrorArleadyLooted(Player* /*player*/) { return true; }
 
-    virtual bool CanSendCreatureLoot(Creature* /*creature*/, Player* /*player*/) { return true; }
+    virtual bool CanSendCreatureLoot(Player* /*player*/) { return true; }
     virtual void OnBeforeCreatureLootMoney(Player* /*player*/) { }
 };
 
@@ -2387,7 +2387,7 @@ public: /* PlayerScript */
     void OnPlayerLeaveCombat(Player* player);
     void OnQuestAbandon(Player* player, uint32 questId);
     bool CanSendErrorArleadyLooted(Player* player);
-    bool CanSendCreatureLoot(Creature* creature, Player* player);
+    bool CanSendCreatureLoot(Player* player);
     void OnBeforeCreatureLootMoney(Player* player);
 
     // Anti cheat

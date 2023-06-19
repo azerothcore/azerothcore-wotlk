@@ -920,11 +920,11 @@ bool ScriptMgr::CanSendErrorArleadyLooted(Player* player)
     return true;
 }
 
-bool ScriptMgr::CanSendCreatureLoot(Creature* creature, Player* player)
+bool ScriptMgr::CanSendCreatureLoot(Player* player)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
     {
-        return !script->CanSendCreatureLoot(creature, player);
+        return !script->CanSendCreatureLoot(player);
     });
 
     if (ret && *ret)

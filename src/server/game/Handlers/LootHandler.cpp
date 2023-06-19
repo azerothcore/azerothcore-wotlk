@@ -83,8 +83,6 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     {
         Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
-        sScriptMgr->CanSendCreatureLoot(creature, player);
-
         bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
         if (!lootAllowed || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
         {
@@ -94,6 +92,8 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
         loot = &creature->loot;
     }
+
+    sScriptMgr->CanSendCreatureLoot(player);
 
     InventoryResult msg;
     LootItem* lootItem = player->StoreLootItem(lootSlot, loot, msg);
@@ -179,7 +179,6 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
     if (loot)
     {
-        sScriptMgr->OnBeforeLootMoney(player, loot);
         loot->NotifyMoneyRemoved();
         if (shareMoney && player->GetGroup())      //item, pickpocket and players can be looted only single player
         {
