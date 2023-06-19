@@ -14728,6 +14728,14 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
                     return true;
             }
         }
+        else if (IsNPCBotOrPet() && target->IsContestedGuard())
+        {
+            if (Unit const* bot = IsNPCBotPet() ? GetCreator() : this)
+            {
+                if (BotMgr::IsBotContestedPvP(bot->ToCreature()))
+                    return true;
+            }
+        }
 
         auto const* ft1 = sFactionTemplateStore.LookupEntry(GetFaction());
         auto const* ft2 = sFactionTemplateStore.LookupEntry(target->GetFaction());
