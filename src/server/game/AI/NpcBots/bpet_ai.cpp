@@ -1818,7 +1818,7 @@ void bot_pet_ai::RegeneratePetFocus()
         if (curValue == maxValue || regenTimer >= REGEN_CD)
             me->SetPower(POWER_FOCUS, curValue);
         else
-            me->UpdateUInt32Value(UNIT_FIELD_POWER1 + POWER_FOCUS, curValue);
+            me->UpdateUInt32Value(UNIT_FIELD_POWER1 + uint16(POWER_FOCUS), curValue);
     }
 }
 
@@ -1851,7 +1851,7 @@ void bot_pet_ai::RegeneratePetEnergy()
         if (curValue == maxValue || regenTimer >= REGEN_CD)
             me->SetPower(POWER_ENERGY, curValue);
         else
-            me->UpdateUInt32Value(UNIT_FIELD_POWER1 + POWER_ENERGY, curValue);
+            me->UpdateUInt32Value(UNIT_FIELD_POWER1 + uint16(POWER_ENERGY), curValue);
     }
 }
 //////////
