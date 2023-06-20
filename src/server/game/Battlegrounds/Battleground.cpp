@@ -1163,9 +1163,6 @@ void Battleground::RemoveBotAtLeave(ObjectGuid guid)
 
     RemoveBotFromResurrectQueue(guid);
 
-    // GetStatus might be changed in RemovePlayer - define it here
-    BattlegroundStatus status = GetStatus();
-
     // BG subclass specific code
     RemoveBot(guid);
 
