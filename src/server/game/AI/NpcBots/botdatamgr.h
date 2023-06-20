@@ -3,6 +3,7 @@
 
 #include "botcommon.h"
 #include "DatabaseEnvFwd.h"
+#include "DBCEnums.h"
 
 #include <functional>
 #include <set>

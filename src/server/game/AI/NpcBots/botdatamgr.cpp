@@ -1169,7 +1169,10 @@ void BotDataMgr::LoadWanderMap(bool reload)
 
     const uint8 TEAMS_COUNT = TEAM_NEUTRAL + 1;
     char const* const team_strs[TEAMS_COUNT] = { "Alliance", "Horde", "Neutral" };
-    std::array<bool, DEFAULT_MAX_LEVEL> spawn_node_levels[TEAMS_COUNT]{false};
+    std::array<bool, DEFAULT_MAX_LEVEL> spawn_node_levels[TEAMS_COUNT];
+    for (auto& arr : spawn_node_levels)
+        for (std::size_t arri = 0; arri < arr.size(); ++arri)
+            arr[arri] = false;
     uint8 min_spawn_level = DEFAULT_MAX_LEVEL;
     uint8 max_spawn_level = 0;
     for (WanderNode const* wp : all_spawn_nodes)
