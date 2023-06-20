@@ -20925,7 +20925,7 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
                             return 8571;
                     }
                 }
-                else if (Player::TeamIdForRace(GetRace()) == ALLIANCE)
+                else if (Player::TeamIdForRace(GetRace()) == TEAM_ALLIANCE)
                     return 892;
                 else
                     return 8571;
@@ -21004,16 +21004,16 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
                             return 2289;
                     }
                 }
-                else if (Player::TeamIdForRace(GetRace()) == ALLIANCE)
+                else if (Player::TeamIdForRace(GetRace()) == TEAM_ALLIANCE)
                     return 2281;
                 else
                     return 2289;
             case FORM_FLIGHT:
-                if (Player::TeamIdForRace(GetRace()) == ALLIANCE)
+                if (Player::TeamIdForRace(GetRace()) == TEAM_ALLIANCE)
                     return 20857;
                 return 20872;
             case FORM_FLIGHT_EPIC:
-                if (Player::TeamIdForRace(GetRace()) == ALLIANCE)
+                if (Player::TeamIdForRace(GetRace()) == TEAM_ALLIANCE)
                     return 21243;
                 return 21244;
             default:
