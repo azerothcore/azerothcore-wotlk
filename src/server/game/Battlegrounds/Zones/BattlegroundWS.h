@@ -249,9 +249,9 @@ public:
     GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
     //npcbot
-    void AddBot(Creature* bot) override;
     GraveyardStruct const* GetClosestGraveyardForBot(Creature* bot) const override;
-    //void RemoveBot(ObjectGuid guid) override;
+    void AddBot(Creature* bot) override;
+    void RemoveBot(ObjectGuid guid) override;
     bool UpdateBotScore(Creature const* bot, uint32 type, uint32 value) override;
     void HandleBotKillPlayer(Creature* killer, Player* victim) override;
     void HandleBotKillBot(Creature* killer, Creature* victim) override;

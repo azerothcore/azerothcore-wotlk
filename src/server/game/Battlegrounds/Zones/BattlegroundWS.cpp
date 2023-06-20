@@ -596,6 +596,35 @@ void BattlegroundWS::EventBotClickedOnFlag(Creature* bot, GameObject* target_obj
         }
     }
 }
+
+void BattlegroundWS::RemoveBot(ObjectGuid guid)
+{
+    // sometimes flag aura not removed :(
+    if (GetFlagPickerGUID(TEAM_ALLIANCE) == guid)
+    {
+        Creature const* bot = BotDataMgr::FindBot(guid.GetEntry());
+        if (!bot)
+        {
+            LOG_ERROR("bg.battleground", "BattlegroundWS: Removing offline bot {} who has the FLAG!!", guid.GetEntry());
+            SetFlagPicker(ObjectGuid::Empty, TEAM_ALLIANCE);
+            RespawnFlagAfterDrop(TEAM_ALLIANCE);
+        }
+        else
+            EventBotDroppedFlag(const_cast<Creature*>(bot));
+    }
+    if (GetFlagPickerGUID(TEAM_HORDE) == guid)
+    {
+        Creature const* bot = BotDataMgr::FindBot(guid.GetEntry());
+        if (!bot)
+        {
+            LOG_ERROR("bg.battleground", "BattlegroundWS: Removing offline bot {} who has the FLAG!!", guid.GetEntry());
+            SetFlagPicker(ObjectGuid::Empty, GetOtherTeamId(GetBotTeamId(bot->GetGUID())));
+            RespawnFlagAfterDrop(TEAM_HORDE);
+        }
+        else
+            EventBotDroppedFlag(const_cast<Creature*>(bot));
+    }
+}
 //end npcbot
 
 void BattlegroundWS::RemovePlayer(Player* player)

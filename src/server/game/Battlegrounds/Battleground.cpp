@@ -1166,7 +1166,6 @@ void Battleground::RemoveBotAtLeave(ObjectGuid guid)
     // BG subclass specific code
     RemoveBot(guid);
 
-    // if the player was a match participant
     if (participant)
     {
         // remove from raid group if player is member
@@ -2109,7 +2108,6 @@ void Battleground::HandleBotKillPlayer(Creature* killer, Player* victim)
         }
     }
 }
-
 void Battleground::HandleBotKillBot(Creature* killer, Creature* victim)
 {
     UpdateBotScore(victim, SCORE_DEATHS, 1);
@@ -2138,7 +2136,6 @@ void Battleground::HandleBotKillBot(Creature* killer, Creature* victim)
         }
     }
 }
-
 void Battleground::HandlePlayerKillBot(Creature* victim, Player* killer)
 {
     UpdateBotScore(victim, SCORE_DEATHS, 1);
@@ -2156,7 +2153,7 @@ void Battleground::HandlePlayerKillBot(Creature* victim, Player* killer)
             if (creditedPlayer == killer)
                 continue;
 
-            if (creditedPlayer->GetBgTeamId() == killer->GetBgTeamId() && (creditedPlayer == killer || creditedPlayer->IsAtGroupRewardDistance(victim)))
+            if (creditedPlayer->GetBgTeamId() == killer->GetBgTeamId() && creditedPlayer->IsAtGroupRewardDistance(victim))
                 UpdatePlayerScore(creditedPlayer, SCORE_HONORABLE_KILLS, 1);
         }
 
@@ -2222,9 +2219,12 @@ uint32 Battleground::GetAlivePlayersCountByTeam(TeamId teamId) const
     //npcbot
     for (BattlegroundBotMap::const_iterator itr = m_Bots.begin(); itr != m_Bots.end(); ++itr)
     {
-        Creature const* bot = BotDataMgr::FindBot(itr->first.GetEntry());
-        if (bot && bot->IsAlive() && !bot->HasByteFlag(UNIT_FIELD_BYTES_2, 3, FORM_SPIRITOFREDEMPTION) && GetBotTeamId(itr->first) == teamId)
-            ++count;
+        if (GetBotTeamId(itr->first) == teamId)
+        {
+            Creature const* bot = BotDataMgr::FindBot(itr->first.GetEntry());
+            if (bot && bot->IsAlive() && !bot->HasByteFlag(UNIT_FIELD_BYTES_2, 3, FORM_SPIRITOFREDEMPTION))
+                ++count;
+        }
     }
     //end npcbot
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
