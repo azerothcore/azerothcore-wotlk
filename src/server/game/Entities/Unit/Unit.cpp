@@ -3857,12 +3857,14 @@ float Unit::GetUnitParryChance() const
         if (ToCreature()->isWorldBoss())
             chance = 13.4f; // + 0.6 by skill diff
         else if (GetCreatureType() == CREATURE_TYPE_HUMANOID)
+        {
             //npcbot - custom parry chance instead of bunch of auras
             if (IsNPCBot())
                 chance = ToCreature()->GetCreatureParryChance();
             else
             //end npcbot
             chance = 5.0f;
+        }
 
         // Xinef: if aura is present, type should not matter
         chance += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
