@@ -1463,7 +1463,7 @@ public:
      * @brief This hook is called, to avoid displaying the error message that the body has already been stripped
      *
      * @param player Contains information about the Player
-     * 
+     *
      * @return true Avoiding displaying the error message that the loot has already been taken.
      */
     virtual bool CanSendErrorAlreadyLooted(Player* /*player*/) { return true; }
