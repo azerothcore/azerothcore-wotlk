@@ -10642,10 +10642,20 @@ ReputationRank Unit::GetReactionTo(Unit const* target, bool checkOriginalFaction
                 return *repRank;
     }
 
+    //npcbot
+    /*
     if (HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
     {
         if (target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
         {
+    */
+    if (HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) || IsNPCBotOrPet())
+    {
+        if (target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) || target->IsNPCBotOrPet())
+        {
+            if (IsInRaidWith(target))
+                return REP_FRIENDLY;
+    //end npcbot
             if (selfPlayerOwner && targetPlayerOwner)
             {
                 // always friendly to other unit controlled by player, or to the player himself
