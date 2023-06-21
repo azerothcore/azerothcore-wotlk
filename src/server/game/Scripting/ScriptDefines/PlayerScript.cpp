@@ -935,11 +935,11 @@ bool ScriptMgr::CanSendCreatureLoot(Player* player)
     return true;
 }
 
-void ScriptMgr::OnBeforeCreatureLootMoney(Player* player)
+void ScriptMgr::OnAfterCreatureLootMoney(Player* player)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
-        script->OnBeforeCreatureLootMoney(player);
+        script->OnAfterCreatureLootMoney(player);
     });
 }
 

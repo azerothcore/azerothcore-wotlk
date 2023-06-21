@@ -1459,10 +1459,30 @@ public:
     [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/) { return true; }
     [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, bool /*jump*/) { return true; }
 
+    /**
+     * @brief This hook is called, to avoid displaying the error message that the body has already been stripped
+     *
+     * @param player Contains information about the Player
+     * 
+     * @return true Avoiding displaying the error message that the loot has already been taken.
+     */
     virtual bool CanSendErrorAlreadyLooted(Player* /*player*/) { return true; }
 
+    /**
+     * @brief It is used when an item is taken from a creature.
+     *
+     * @param player Contains information about the Player
+     *
+     * @return true Confirming that it is possible to take the spoils in area
+    */
     virtual bool CanSendCreatureLoot(Player* /*player*/) { return true; }
-    virtual void OnBeforeCreatureLootMoney(Player* /*player*/) { }
+
+    /**
+     * @brief After a creature's money is taken
+     *
+     * @param player Contains information about the Player
+     */
+    virtual void OnAfterCreatureLootMoney(Player* /*player*/) { }
 };
 
 class AccountScript : public ScriptObject
@@ -2388,7 +2408,7 @@ public: /* PlayerScript */
     void OnQuestAbandon(Player* player, uint32 questId);
     bool CanSendErrorAlreadyLooted(Player* player);
     bool CanSendCreatureLoot(Player* player);
-    void OnBeforeCreatureLootMoney(Player* player);
+    void OnAfterCreatureLootMoney(Player* player);
 
     // Anti cheat
     void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
