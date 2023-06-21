@@ -697,9 +697,6 @@ public:
                 {
                     Drained = true;
                     int32 uHpPct = int32(me->GetHealthPct());
-
-                    me->UpdateEntry(NPC_DRAINED_PHASE_HUNTER_ENTRY);
-
                     me->SetHealth(me->CountPctFromMaxHealth(uHpPct));
                     me->LowerPlayerDamageReq(me->GetMaxHealth() - me->GetHealth());
                     me->SetInCombatWith(player);
@@ -911,6 +908,61 @@ public:
     }
 };
 
+class spell_q10190_battery_recharging_blaster : public SpellScriptLoader
+{
+public:
+    spell_q10190_battery_recharging_blaster() : SpellScriptLoader("spell_q10190_battery_recharging_blaster") { }
+
+    class spell_q10190_battery_recharging_blaster_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q10190_battery_recharging_blaster_SpellScript);
+
+        SpellCastResult CheckCast()
+        {
+            if (Unit* target = GetExplTargetUnit())
+                if (target->GetHealthPct() <= 25.0f)
+                    return SPELL_CAST_OK;
+
+            return SPELL_FAILED_BAD_TARGETS;
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_q10190_battery_recharging_blaster_SpellScript::CheckCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_q10190_battery_recharging_blaster_SpellScript();
+    }
+
+    class spell_q10190_battery_recharging_blaster_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_q10190_battery_recharging_blaster_AuraScript);
+
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+                return;
+
+            if (Creature* phasehunter = GetTarget()->ToCreature())
+                if (phasehunter->GetEntry() == NPC_PHASE_HUNTER_ENTRY)
+                    phasehunter->UpdateEntry(NPC_DRAINED_PHASE_HUNTER_ENTRY);
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_q10190_battery_recharging_blaster_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_q10190_battery_recharging_blaster_AuraScript();
+    }
+};
+
 void AddSC_netherstorm()
 {
     // Ours
@@ -922,5 +974,6 @@ void AddSC_netherstorm()
     new npc_phase_hunter();
     new npc_bessy();
     new npc_maxx_a_million_escort();
+    new spell_q10190_battery_recharging_blaster();
 
 }
