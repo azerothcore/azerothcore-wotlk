@@ -22,6 +22,8 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 // Ours
 enum saeed
