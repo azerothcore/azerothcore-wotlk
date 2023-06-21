@@ -1,3 +1,4 @@
+-- DB update 2023_06_18_03 -> 2023_06_21_00
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 22355);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 (22355, 1, 0, 0, 1, 0, 0, 0);
