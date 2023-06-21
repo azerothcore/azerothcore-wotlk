@@ -1102,7 +1102,9 @@ class NearbyRezTargetCheck
                 return false;
             if (!me->IsWithinDistInMap(u, max_range))
                 return false;
-            if (Player const* p = u->ToPlayer())
+            if (!me->CanSeeOrDetect(u))
+                return false;
+            if (Player const* p = u->IsPlayer() ? u->ToPlayer() : ObjectAccessor::FindPlayer(u->ToCorpse()->GetOwnerGUID()))
             {
                 if (p->IsAlive())
                     return false;
@@ -1111,11 +1113,7 @@ class NearbyRezTargetCheck
                 if (!ai->IsInBotParty(p))
                     return false;
             }
-            if (!me->CanSeeOrDetect(u))
-                return false;
-            if (urand(0,100) > 20)
-                return false;
-            if (u->GetTypeId() == TYPEID_CORPSE && !ObjectAccessor::FindPlayer(u->ToCorpse()->GetOwnerGUID()))
+            else
                 return false;
 
             return true;
