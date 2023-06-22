@@ -983,6 +983,20 @@ void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, 
     });
 }
 
+void ScriptMgr::OnUpdateGatheringSkill(Player *player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32 &gain) {
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnUpdateGatheringSkill(player, skillId, gray, green, yellow, currentLevel, gain);
+    });
+}
+
+void ScriptMgr::OnUpdateCraftingSkill(Player *player, SkillLineAbilityEntry const* skill, uint32 currentLevel, uint32& gain) {
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnUpdateCraftingSkill(player, skill, currentLevel, gain);
+    });
+}
+
 bool ScriptMgr::OnUpdateFishingSkill(Player* player, int32 skill, int32 zone_skill, int32 chance, int32 roll)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
