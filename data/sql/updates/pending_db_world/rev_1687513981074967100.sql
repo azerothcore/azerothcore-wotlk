@@ -1,4 +1,4 @@
---------------- Hearts of the Pure Rp -------------
+-- Hearts of the Pure Rp -------------
 
 -- The orientation of the initial NPC This is roughly towards the coordinates that need to be sniffed
 UPDATE `creature` SET `orientation`=4.41048 WHERE `guid`=41833;
@@ -25,7 +25,7 @@ UPDATE `creature_text` SET `Emote`=11 WHERE `CreatureID`=5693 AND `GroupID`=4 AN
 UPDATE `creature_template` SET `unit_flags` = 33555200 WHERE (`entry` = 5691);
 UPDATE `creature_template` SET `unit_flags` = 33555200 WHERE (`entry` = 5692);
 
------------------------------- SmatAI Start-------------------------------------
+-- SmatAI Start-------------------------------------
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 5693);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (5693, 0, 0, 0, 19, 0, 100, 0, 1476, 0, 0, 0, 0, 80, 569300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Giving Hearts of the Pure');
@@ -47,4 +47,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (569300, 9, 11, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearts of the Pure - Godrick Farsan - Talk'),
 (569300, 9, 12, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearts of the Pure - Godrick Farsan - Remove Active'),
 (569300, 9, 13, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearts of the Pure - Godrick Farsan - Add NPC Flags');
------------------- SmatAI End -------------------------
+-- SmatAI End -------------------------
