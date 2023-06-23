@@ -58,17 +58,6 @@ enum Spells
     SPELL_STONED                        = 33652,
 };
 
-enum Events
-{
-    EVENT_GROWTH                = 1,
-    EVENT_CAVE_IN               = 2,
-    EVENT_GROUND_SLAM           = 3,
-    EVENT_HURTFUL_STRIKE        = 4,
-    EVENT_REVERBERATION         = 5,
-    EVENT_SHATTER               = 6,
-    EVENT_RECENTLY_SPOKEN       = 7
-};
-
 struct boss_gruul : public BossAI
 {
     boss_gruul(Creature* creature) : BossAI(creature, DATA_GRUUL) { }
@@ -76,7 +65,8 @@ struct boss_gruul : public BossAI
     void Reset() override
     {
         _Reset();
-        _caveInTimer = 29000;
+        _recentlySpoken = false;
+        _caveInTimer = 29000ms;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -84,20 +74,61 @@ struct boss_gruul : public BossAI
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 
-        events.ScheduleEvent(EVENT_GROWTH, 30000);
-        events.ScheduleEvent(EVENT_CAVE_IN, _caveInTimer);
-        events.ScheduleEvent(EVENT_REVERBERATION, 20000);
-        events.ScheduleEvent(EVENT_HURTFUL_STRIKE, 10000);
-        events.ScheduleEvent(EVENT_GROUND_SLAM, 35000);
+        scheduler.Schedule(30300ms, [this](TaskContext context)
+        {
+            Talk(EMOTE_GROW);
+            DoCastSelf(SPELL_GROWTH);
+            context.Repeat(30300ms);
+        }).Schedule(_caveInTimer, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_CAVE_IN);
+            if (_caveInTimer > 4000ms)
+            {
+                _caveInTimer = _caveInTimer - 1500ms;
+            }
+            context.Repeat(_caveInTimer);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_REVERBERATION);
+            context.Repeat(22s);
+        }).Schedule(10s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 5.0f))
+            {
+                DoCast(target, SPELL_HURTFUL_STRIKE);
+            }
+            else
+            {
+                DoCastVictim(SPELL_HURTFUL_STRIKE);
+            }
+            context.Repeat(15s);
+        }).Schedule(35s, [this](TaskContext context)
+        {
+            Talk(SAY_SLAM);
+            DoCastSelf(SPELL_GROUND_SLAM);
+            scheduler.DelayAll(9701ms);
+            scheduler.Schedule(9700ms, [this](TaskContext)
+            {
+                Talk(SAY_SHATTER);
+                me->RemoveAurasDueToSpell(SPELL_LOOK_AROUND);
+                DoCastSelf(SPELL_SHATTER);
+            });
+            context.Repeat(60s);
+        });
     }
 
     void KilledUnit(Unit* /*who*/) override
     {
-        if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
+        if (!_recentlySpoken)
         {
-            events.ScheduleEvent(EVENT_RECENTLY_SPOKEN, 5000);
             Talk(SAY_SLAY);
+            _recentlySpoken = true;
         }
+
+        scheduler.Schedule(5s, [this](TaskContext)
+        {
+            _recentlySpoken = false;
+        });
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -111,52 +142,7 @@ struct boss_gruul : public BossAI
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-            case EVENT_GROWTH:
-                Talk(EMOTE_GROW);
-                DoCast(me, SPELL_GROWTH);
-                events.ScheduleEvent(EVENT_GROWTH, 30000);
-                break;
-            case EVENT_CAVE_IN:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    me->CastSpell(target, SPELL_CAVE_IN, false);
-                if (_caveInTimer >= 4000)
-                    _caveInTimer -= 1500;
-                events.ScheduleEvent(EVENT_CAVE_IN, _caveInTimer);
-                break;
-            case EVENT_REVERBERATION:
-                me->CastSpell(me, SPELL_REVERBERATION, false);
-                events.ScheduleEvent(EVENT_REVERBERATION, 22000);
-                break;
-            case EVENT_HURTFUL_STRIKE:
-                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 5.0f))
-                {
-                    me->CastSpell(target, SPELL_HURTFUL_STRIKE, false);
-                }
-                else
-                {
-                    me->CastSpell(me->GetVictim(), SPELL_HURTFUL_STRIKE, false);
-                }
-                events.ScheduleEvent(EVENT_HURTFUL_STRIKE, 15000);
-                break;
-            case EVENT_GROUND_SLAM:
-                Talk(SAY_SLAM);
-                me->CastSpell(me, SPELL_GROUND_SLAM, false);
-                events.DelayEvents(8001);
-                events.ScheduleEvent(EVENT_GROUND_SLAM, 60000);
-                events.ScheduleEvent(EVENT_SHATTER, 8000);
-                break;
-            case EVENT_SHATTER:
-                Talk(SAY_SHATTER);
-                me->RemoveAurasDueToSpell(SPELL_LOOK_AROUND);
-                me->CastSpell(me, SPELL_SHATTER, false);
-                break;
-        }
+        scheduler.Update(diff);
 
         if (!me->HasUnitState(UNIT_STATE_ROOT))
         {
@@ -165,7 +151,8 @@ struct boss_gruul : public BossAI
     }
 
 private:
-    uint32 _caveInTimer;
+    std::chrono::milliseconds _caveInTimer;
+    bool _recentlySpoken;
 };
 
 struct npc_invisible_tractor_beam_source : public NullCreatureAI

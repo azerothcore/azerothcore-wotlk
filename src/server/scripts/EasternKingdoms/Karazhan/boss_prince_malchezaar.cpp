@@ -119,6 +119,47 @@ struct boss_malchezaar : public BossAI
     {
         Initialize();
         _Reset();
+
+        ScheduleHealthCheckEvent(60, [&] {
+            me->InterruptNonMeleeSpells(false);
+            _phase = 2;
+            DoCastSelf(SPELL_EQUIP_AXES);
+            Talk(SAY_AXE_TOSS1);
+            DoCastSelf(SPELL_THRASH_AURA, true);
+            SetEquipmentSlots(false, EQUIP_ID_AXE, EQUIP_ID_AXE, EQUIP_NO_CHANGE);
+            me->SetCanDualWield(true);
+            me->SetAttackTime(OFF_ATTACK, (me->GetAttackTime(BASE_ATTACK) * 150) / 100);
+
+            scheduler.Schedule(5s, 10s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_SUNDER_ARMOR);
+                context.Repeat();
+            });
+
+            scheduler.CancelGroup(GROUP_SHADOW_WORD_PAIN);
+        });
+
+        ScheduleHealthCheckEvent(30, [&] {
+            me->RemoveAurasDueToSpell(SPELL_THRASH_AURA);
+            Talk(SAY_AXE_TOSS2);
+            _phase = PHASE_THREE;
+            clearweapons();
+
+            me->SummonCreature(NPC_MALCHEZARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+
+            scheduler.Schedule(20s, 30s, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_AMPLIFY_DAMAGE, 1);
+                context.Repeat();
+            }).Schedule(20s, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN);
+                context.SetGroup(GROUP_SHADOW_WORD_PAIN);
+                context.Repeat();
+            });
+
+            scheduler.CancelGroup(GROUP_ENFEEBLE);
+        });
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -181,49 +222,6 @@ struct boss_malchezaar : public BossAI
             context.SetGroup(GROUP_SHADOW_WORD_PAIN);
             context.Repeat();
         });
-    }
-
-    void DamageTaken(Unit* /*done_by*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        if (me->HealthBelowPctDamaged(60, damage) && _phase == PHASE_ONE)
-        {
-            me->InterruptNonMeleeSpells(false);
-            _phase = 2;
-            DoCastSelf( SPELL_EQUIP_AXES);
-            Talk(SAY_AXE_TOSS1);
-            DoCastSelf( SPELL_THRASH_AURA, true);
-            SetEquipmentSlots(false, EQUIP_ID_AXE, EQUIP_ID_AXE, EQUIP_NO_CHANGE);
-            me->SetCanDualWield(true);
-            me->SetAttackTime(OFF_ATTACK, (me->GetAttackTime(BASE_ATTACK) * 150) / 100);
-
-            scheduler.Schedule(5s, 10s, [this](TaskContext context)
-            {
-                DoCastVictim(SPELL_SUNDER_ARMOR);
-                context.Repeat();
-            });
-
-            scheduler.CancelGroup(GROUP_SHADOW_WORD_PAIN);
-        }
-        else if (me->HealthBelowPctDamaged(30, damage) && _phase == PHASE_TWO)
-        {
-            me->RemoveAurasDueToSpell(SPELL_THRASH_AURA);
-            Talk(SAY_AXE_TOSS2);
-            _phase = PHASE_THREE;
-            clearweapons();
-
-            me->SummonCreature(NPC_MALCHEZARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-
-            scheduler.Schedule(20s, 30s, [this](TaskContext context)
-            {
-                DoCastRandomTarget(SPELL_AMPLIFY_DAMAGE, 1);
-                context.Repeat();
-            }).Schedule(20s, [this](TaskContext context)
-            {
-                DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN);
-                context.SetGroup(GROUP_SHADOW_WORD_PAIN);
-                context.Repeat();
-            });;
-        }
     }
 
     void EnfeebleHealthEffect()

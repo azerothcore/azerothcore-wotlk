@@ -109,17 +109,6 @@ public:
         SummonList summons;
         ObjectGuid InvokerGUID;
 
-        bool CanBeSeen(Player const* player) override
-        {
-            if (player->IsGameMaster())
-            {
-                return true;
-            }
-
-            Group const* group = player->GetGroup();
-            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_FROST_LORD_AHUNE;
-        }
-
         void StartPhase1()
         {
             me->CastSpell(me, SPELL_AHUNES_SHIELD, true);
@@ -331,8 +320,18 @@ public:
     {
         if (!player || !go)
             return true;
-        if (!player->HasItemCount(ITEM_MAGMA_TOTEM))
-            return true;
+
+        if (!player->IsGameMaster())
+        {
+            if (Group const* group = player->GetGroup())
+            {
+                if (sLFGMgr->GetDungeon(group->GetGUID()) != lfg::LFG_DUNGEON_FROST_LORD_AHUNE)
+                {
+                    return true;
+                }
+            }
+        }
+
         if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
             return true;
 
@@ -345,9 +344,19 @@ public:
     {
         if (!player || !go)
             return true;
+
+        if (!player->IsGameMaster())
+        {
+            if (Group const* group = player->GetGroup())
+            {
+                if (sLFGMgr->GetDungeon(group->GetGUID()) != lfg::LFG_DUNGEON_FROST_LORD_AHUNE)
+                {
+                    return true;
+                }
+            }
+        }
+
         if (action != GOSSIP_ACTION_INFO_DEF + 1337)
-            return true;
-        if (!player->HasItemCount(ITEM_MAGMA_TOTEM))
             return true;
         if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
             return true;
