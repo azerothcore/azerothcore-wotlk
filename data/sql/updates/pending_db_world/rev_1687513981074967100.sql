@@ -7,7 +7,7 @@ UPDATE `creature` SET `orientation`=4.41048 WHERE `guid`=41833;
 DELETE FROM `quest_details` WHERE `ID`=1476;
 -- EMOTE_ONESHOT_QUESTION && EMOTE_ONESHOT_LAUGH && EMOTE_ONESHOT_TALK
 INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `VerifiedBuild`) VALUES
-(1476, 6, 11, 1, 0, 0, 0, 0, 0, 0);
+(1476, 6, 11, 1, 0, 200, 0, 0, 0, 0);
 
 UPDATE `quest_offer_reward` SET `Emote1`=1 WHERE `ID`=1472;-- EMOTE_ONESHOT_TALK
 
