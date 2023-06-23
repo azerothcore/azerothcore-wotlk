@@ -920,19 +920,12 @@ bool ScriptMgr::CanSendErrorAlreadyLooted(Player* player)
     return true;
 }
 
-bool ScriptMgr::CanSendCreatureLoot(Player* player)
+void ScriptMgr::OnAfterCreatureLoot(Player* player)
 {
-    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
-        return !script->CanSendCreatureLoot(player);
+        script->OnAfterCreatureLoot(player);
     });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
 }
 
 void ScriptMgr::OnAfterCreatureLootMoney(Player* player)

@@ -1473,9 +1473,8 @@ public:
      *
      * @param player Contains information about the Player
      *
-     * @return true Confirming that it is possible to take the spoils in area
     */
-    virtual bool CanSendCreatureLoot(Player* /*player*/) { return true; }
+    virtual void OnAfterCreatureLoot(Player* /*player*/) { }
 
     /**
      * @brief After a creature's money is taken
@@ -2407,7 +2406,7 @@ public: /* PlayerScript */
     void OnPlayerLeaveCombat(Player* player);
     void OnQuestAbandon(Player* player, uint32 questId);
     bool CanSendErrorAlreadyLooted(Player* player);
-    bool CanSendCreatureLoot(Player* player);
+    void OnAfterCreatureLoot(Player* player);
     void OnAfterCreatureLootMoney(Player* player);
 
     // Anti cheat
