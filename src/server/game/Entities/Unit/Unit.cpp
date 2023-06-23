@@ -13121,30 +13121,30 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
     // mods for SPELL_SCHOOL_MASK_NORMAL are already factored in base melee damage calculation
     if (!(damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL))
     {
-        if (spellProto
-            && spellProto->Effects[0].Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE
+		if (spellProto
+			&& spellProto->Effects[0].Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE
             && spellProto->Effects[1].Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE
             && spellProto->Effects[2].Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
-            {
-            // Some spells don't benefit from pct done mods
-            AuraEffectList const& mModDamagePercentDone = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-            for (AuraEffectList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
-            {
-                if (!spellProto || (spellProto->ValidateAttribute6SpellDamageMods(this, *i, false) &&
-                    sScriptMgr->IsNeedModMeleeDamagePercent(this, *i, DoneTotalMod, spellProto)))
-                {
-                    if (((*i)->GetMiscValue() & damageSchoolMask))
-                    {
-                        if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
-                            AddPct(DoneTotalMod, (*i)->GetAmount());
-                        else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
-                            AddPct(DoneTotalMod, (*i)->GetAmount());
-                        else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements((*i)->GetSpellInfo()))
-                            AddPct(DoneTotalMod, (*i)->GetAmount());
-                    }
-                }
-            }
-        }
+			{
+			// Some spells don't benefit from pct done mods
+			AuraEffectList const& mModDamagePercentDone = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+			for (AuraEffectList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
+			{
+				if (!spellProto || (spellProto->ValidateAttribute6SpellDamageMods(this, *i, false) &&
+					sScriptMgr->IsNeedModMeleeDamagePercent(this, *i, DoneTotalMod, spellProto)))
+				{
+					if (((*i)->GetMiscValue() & damageSchoolMask))
+					{
+						if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
+							AddPct(DoneTotalMod, (*i)->GetAmount());
+						else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
+							AddPct(DoneTotalMod, (*i)->GetAmount());
+						else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements((*i)->GetSpellInfo()))
+							AddPct(DoneTotalMod, (*i)->GetAmount());
+					}
+				}
+			}
+		}
     }
 
     AuraEffectList const& mDamageDoneVersus = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
