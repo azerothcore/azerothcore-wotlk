@@ -1963,12 +1963,12 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
 
                     if (delta > collisionHeight)
                         liquidData.Status = LIQUID_MAP_UNDER_WATER;
+                    else if (delta > 0.0f && delta - collisionHeight / 2.0f < 0.0f)
+                        liquidData.Status = LIQUID_MAP_ABOVE_WATER;
                     else if (delta > 0.0f)
                         liquidData.Status = LIQUID_MAP_IN_WATER;
                     else if (delta > -0.1f)
                         liquidData.Status = LIQUID_MAP_WATER_WALK;
-                    else
-                        liquidData.Status = LIQUID_MAP_ABOVE_WATER;
                 }
             }
         }
