@@ -47,4 +47,3 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (569300, 9, 11, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearts of the Pure - Godrick Farsan - Talk'),
 (569300, 9, 12, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearts of the Pure - Godrick Farsan - Remove Active'),
 (569300, 9, 13, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearts of the Pure - Godrick Farsan - Add NPC Flags');
--- SmatAI End -------------------------
