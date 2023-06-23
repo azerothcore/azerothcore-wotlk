@@ -22,8 +22,8 @@ UPDATE `creature_text` SET `Emote`=1 WHERE `CreatureID`=5693 AND `GroupID`=3 AND
 UPDATE `creature_text` SET `Emote`=11 WHERE `CreatureID`=5693 AND `GroupID`=4 AND `ID`=0;-- EMOTE_ONESHOT_LAUGH
 
 -- Update unit_flags Make summoned NPCs unattackable and unselectable
-UPDATE `creature_template` SET `unit_flags` = 33554434 WHERE (`entry` = 5691);
-UPDATE `creature_template` SET `unit_flags` = 33554434 WHERE (`entry` = 5692);
+UPDATE `creature_template` SET `unit_flags` = 33555200 WHERE (`entry` = 5691);
+UPDATE `creature_template` SET `unit_flags` = 33555200 WHERE (`entry` = 5692);
 
 ------------------------------ SmatAI Start-------------------------------------
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 5693);
