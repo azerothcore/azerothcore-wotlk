@@ -46,38 +46,6 @@ public:
     }
 };
 
-struct npc_midsummer_bonfire : public ScriptedAI
-{
-    npc_midsummer_bonfire(Creature* creature) : ScriptedAI(creature)
-    {
-        me->IsAIEnabled = true;
-        goGUID.Clear();
-    }
-
-    ObjectGuid goGUID;
-
-    void SpellHit(Unit*, SpellInfo const* spellInfo) override
-    {
-        if (!goGUID)
-            return;
-
-        // Extinguish fire
-        if (spellInfo->Id == SPELL_STAMP_OUT_BONFIRE)
-        {
-            if (GameObject* go = ObjectAccessor::GetGameObject(*me, goGUID))
-                go->SetPhaseMask(2, true);
-        }
-        else if (spellInfo->Id == SPELL_LIGHT_BONFIRE)
-        {
-            if (GameObject* go = ObjectAccessor::GetGameObject(*me, goGUID))
-            {
-                go->SetPhaseMask(1, true);
-                go->SendCustomAnim(1);
-            }
-        }
-    }
-};
-
 struct npc_midsummer_torch_target : public ScriptedAI
 {
     npc_midsummer_torch_target(Creature* creature) : ScriptedAI(creature)
@@ -537,7 +505,6 @@ void AddSC_event_midsummer_scripts()
 {
     // NPCs
     new go_midsummer_bonfire();
-    RegisterCreatureAI(npc_midsummer_bonfire);
     RegisterCreatureAI(npc_midsummer_torch_target);
 
     // Spells
