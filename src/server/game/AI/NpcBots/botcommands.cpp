@@ -495,6 +495,7 @@ public:
         { _wp->SetCreature(me); }
 
         void JustDied(Unit*) override { _wp->SetCreature(nullptr); }
+        //void OnDespawn() override { _wp->SetCreature(nullptr); }
 
         bool CanAIAttack(Unit const*) const override { return false; }
         void MoveInLineOfSight(Unit*) override {}
@@ -706,7 +707,7 @@ public:
         wpc->SetPowerType(POWER_MANA);
         wpc->SetMaxPower(POWER_MANA, uint32(wp->GetLinks().size()));
         wpc->SetPower(POWER_MANA, wpc->GetMaxPower(POWER_MANA));
-        wpc->SetObjectScale(10.0f);
+        wpc->SetObjectScale(5.0f);
         wpc->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, wpc->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM));
         return wpc;
     }
@@ -898,7 +899,7 @@ public:
                 continue;
             }
 
-            WanderNode* lwp = WanderNode::FindInMapWPs(lid, wp->GetMapId());
+            WanderNode* lwp = WanderNode::FindInMapWPs(wp->GetMapId(), lid);
             if (!lwp)
             {
                 handler->PSendSysMessage("WP %u is not found in map %u!", lid, wp->GetMapId());
@@ -1255,7 +1256,7 @@ public:
                     linkIds.push_back(twp->GetWPId());
         if (linkIds.empty())
         {
-            if (WanderNode const* pwp = WanderNode::FindInMapWPs(wp->GetWPId() - 1, player->GetMapId()))
+            if (WanderNode const* pwp = WanderNode::FindInMapWPs(player->GetMapId(), wp->GetWPId() - 1))
                 if (wp->GetExactDist2d(pwp) < MAX_VISIBILITY_DISTANCE)
                     linkIds.push_back(pwp->GetWPId());
         }
@@ -1333,12 +1334,15 @@ public:
                 areaId = *oareaId;
         }
 
+        AreaTableEntry const* zone = sAreaTableStore.LookupEntry(zoneId);
+        AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId);
+
         std::ostringstream ss;
-        ss << "Zone " << zoneId << " (" << std::string(sAreaTableStore.LookupEntry(zoneId)->area_name[0]) << ") wps:";
+        ss << "Zone " << zoneId << " (" << std::string(zone ? zone->area_name[0] : "unknown") << ") wps:";
         WanderNode::DoForAllZoneWPs(zoneId, [&ss](WanderNode const* wp) {
             ss << "\n" << wp->ToString();
         });
-        ss << "\nArea " << areaId << " (" << std::string(sAreaTableStore.LookupEntry(areaId)->area_name[0]) << ") wps:";
+        ss << "\nArea " << areaId << " (" << std::string(area ? area->area_name[0] : "unknown") << ") wps:";
         WanderNode::DoForAllAreaWPs(areaId, [&ss](WanderNode const* wp) {
             ss << "\n" << wp->ToString();
         });
