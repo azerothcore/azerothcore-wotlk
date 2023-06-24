@@ -18308,7 +18308,6 @@ void bot_ai::OnWanderNodeReached()
                     static const uint32 SPELL_OPENING_FLAG = 21651u;
 
                     GameObject* obj = nullptr;
-                    uint32 node = 0;
 
                     BattlegroundAV* av = dynamic_cast<BattlegroundAV*>(bg);
                     for (BG_AV_Nodes counter = BG_AV_NODES_FIRSTAID_STATION; counter < BG_AV_NODES_MAX; ++counter)
@@ -18323,7 +18322,6 @@ void bot_ai::OnWanderNodeReached()
                             if (go && me->IsWithinDistInMap(go, 10.0f))
                             {
                                 obj = go;
-                                node = counter;
                                 break;
                             }
                         }
