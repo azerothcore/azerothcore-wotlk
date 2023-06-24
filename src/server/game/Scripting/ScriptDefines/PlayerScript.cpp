@@ -905,6 +905,37 @@ bool ScriptMgr::CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid 
     return true;
 }
 
+bool ScriptMgr::CanSendErrorAlreadyLooted(Player* player)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+    {
+        return !script->CanSendErrorAlreadyLooted(player);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void ScriptMgr::OnAfterCreatureLoot(Player* player)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnAfterCreatureLoot(player);
+    });
+}
+
+void ScriptMgr::OnAfterCreatureLootMoney(Player* player)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnAfterCreatureLootMoney(player);
+    });
+}
+
 void ScriptMgr::PetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
