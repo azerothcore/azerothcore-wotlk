@@ -2727,6 +2727,33 @@ float BotMgr::GetBotDamageModByLevel(uint8 botlevel)
     return 1.0f;
 }
 
+std::vector<Unit*> BotMgr::GetAllGroupMembers(Unit const* searcher)
+{
+    std::vector<Unit*> group_members;
+
+    Group const* group = (searcher->IsNPCBot() && searcher->ToCreature()->GetBotAI()) ? searcher->ToCreature()->GetBotAI()->GetGroup() :
+        searcher->IsPlayer() ? searcher->ToPlayer()->GetGroup() : nullptr;
+
+    if (group && searcher->IsInWorld())
+    {
+        group_members.reserve(group->GetMembersCount());
+        for (GroupReference const* ref = group->GetFirstMember(); ref != nullptr; ref = ref->next())
+        {
+            if (Player* pl = ref->GetSource())
+                group_members.push_back(pl);
+        }
+        for (auto const& slot : group->GetMemberSlots())
+        {
+            if (slot.guid.IsCreature())
+            {
+                if (Creature* grbot = searcher->GetMap()->GetCreature(slot.guid))
+                    group_members.push_back(grbot);
+            }
+        }
+    }
+
+    return group_members;
+}
 Group* BotMgr::GetBotGroup(Creature const* bot)
 {
     return bot->GetBotAI() ? bot->GetBotAI()->GetGroup() : nullptr;

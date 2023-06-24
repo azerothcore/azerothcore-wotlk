@@ -166,6 +166,7 @@ class bot_ai : public CreatureAI
         bool IsWanderer() const { return _wanderer; }
         void SetWanderer();
         WanderNode const* GetNextTravelNode(Position const* from, bool random) const;
+        WanderNode const* GetNextBGTravelNode() const;
         void OnWanderNodeReached();
 
         Group* GetGroup() const { return _group; }

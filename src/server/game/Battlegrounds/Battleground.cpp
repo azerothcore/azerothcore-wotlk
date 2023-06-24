@@ -443,7 +443,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
             if (guid.IsCreature())
             {
                 if (Creature const* cbot = BotDataMgr::FindBot(guid.GetEntry()))
-                    BotMgr::ReviveBot(const_cast<Creature*>(cbot));
+                    cbot->GetBotAI()->UpdateReviveTimer(std::numeric_limits<uint32>::max());
                 continue;
             }
             //end npcbot
@@ -781,6 +781,12 @@ void Battleground::RemoveAuraOnTeam(uint32 spellId, TeamId teamId)
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
         if (itr->second->GetBgTeamId() == teamId)
             itr->second->RemoveAura(spellId);
+    //npcbot
+    for (auto const& kv : m_Bots)
+        if (kv.second.Team == teamId)
+            if (Creature* bot = GetBgMap()->GetCreature(kv.first))
+                bot->CastSpell(bot, spellId, true);
+    //end npcbot
 }
 
 void Battleground::YellToAll(Creature* creature, char const* text, uint32 language)
@@ -1646,8 +1652,25 @@ void Battleground::RelocateDeadPlayers(ObjectGuid queueIndex)
     if (!ghostList.empty())
     {
         GraveyardStruct const* closestGrave = nullptr;
+        //npcbot
+        GraveyardStruct const* closestBotGrave = nullptr;
+        //end npcbot
         for (ObjectGuid const& guid : ghostList)
         {
+            //npcbot
+            if (guid.IsCreature())
+            {
+                if (Creature const* bot = BotDataMgr::FindBot(guid.GetEntry()))
+                {
+                    if (!closestBotGrave)
+                        closestBotGrave = GetClosestGraveyardForBot(const_cast<Creature*>(bot));
+                    if (closestBotGrave)
+                        const_cast<Creature*>(bot)->NearTeleportTo(closestBotGrave->x, closestBotGrave->y, closestBotGrave->z, bot->GetOrientation());
+                }
+                continue;
+            }
+            //end npcbot
+
             Player* player = ObjectAccessor::FindPlayer(guid);
             if (!player)
                 continue;

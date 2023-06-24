@@ -1,5 +1,6 @@
 #include "Battleground.h"
 #include "BattlegroundAB.h"
+#include "BattlegroundAV.h"
 #include "BattlegroundWS.h"
 #include "bot_ai.h"
 #include "bot_Events.h"
@@ -15243,7 +15244,7 @@ void bot_ai::KilledUnit(Unit* u)
         }
     }
 
-    //handle BG kill BvP, BvB
+    //handle BG kill BvP, BvB, BvC
     if (me->GetMap()->IsBattleground())
     {
         Battleground* bg = GetBG();
@@ -15257,6 +15258,8 @@ void bot_ai::KilledUnit(Unit* u)
             else if (u->IsNPCBot())
                 bg->HandleBotKillBot(me, u->ToCreature());
         }
+        else if (u->GetTypeId() == TYPEID_UNIT && !u->IsNPCBotOrPet())
+            bg->HandleBotKillUnit(me, u->ToCreature());
     }
 
     if (u->isType(TYPEMASK_PLAYER))
@@ -17440,7 +17443,8 @@ void bot_ai::UpdateReviveTimer(uint32 diff)
                     if (gy)
                     {
                         safePos.Relocate(gy->x, gy->y, gy->z, me->GetOrientation());
-                        BotMgr::TeleportBot(me, sMapMgr->CreateBaseMap(gy->Map), &safePos);
+                        if (me->GetDistance(safePos) > 15.0f)
+                            BotMgr::TeleportBot(me, sMapMgr->CreateBaseMap(gy->Map), &safePos);
                     }
                     else
                         safePos.Relocate(me);
@@ -17461,7 +17465,7 @@ void bot_ai::UpdateReviveTimer(uint32 diff)
 
                     homepos.Relocate(nextNode);
 
-                    LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} died on the way from node {} to {} ('{}'), NEW {} ('{}'), {}, dist {} yd!",
+                    LOG_TRACE("npcbots", "Bot {} id {} class {} level {} died on the way from node {} to {} ('{}'), NEW {} ('{}'), {}, dist {} yd!",
                         me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), _travel_node_last ? _travel_node_last->GetWPId() : 0, _travel_node_cur->GetWPId(),
                         _travel_node_cur->GetName().c_str(), nextNode->GetWPId(), nextNode->GetName().c_str(), homepos.ToString().c_str(), safePos.GetExactDist(homepos));
 
@@ -17601,17 +17605,28 @@ void bot_ai::Evade()
                     return;
                 }
 
-                homepos.Relocate(nextNode);
+                if (nextNode == _travel_node_cur)
+                {
+                    //same node: mill about
+                    float angle = Position::NormalizeOrientation(me->GetRelativeAngle(nextNode) + frand(float(-M_PI_2), float(M_PI_2)));
+                    Position cnpos = me->GetFirstCollisionPosition(frand(8.0f, 15.0f), angle);
+                    homepos.Relocate(cnpos);
+                }
+                else
+                    homepos.Relocate(nextNode);
 
                 LOG_TRACE("npcbots", "Bot {} id {} class {} level {} wandered from node {} to {}, next {} ('{}'), {}, dist {} yd!",
                     me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), _travel_node_last ? _travel_node_last->GetWPId() : 0, _travel_node_cur->GetWPId(),
                     nextNode->GetWPId(), nextNode->GetName().c_str(), homepos.ToString().c_str(), pos.GetExactDist(homepos));
 
+                if (me->GetMap()->GetEntry()->IsContinent())
+                    evadeDelayTimer = urand(3000, 7000);
+                else if (nextNode == _travel_node_cur)
+                    evadeDelayTimer = urand(4000, 6000);
+
                 _travel_node_last = _travel_node_cur;
                 _travel_node_cur = nextNode;
                 _evadeCount = 0;
-                if (me->GetMap()->GetEntry()->IsContinent())
-                    evadeDelayTimer = urand(3000, 7000);
                 return;
             }
 
@@ -17879,7 +17894,388 @@ WanderNode const* bot_ai::GetNextTravelNode(Position const* from, bool random) c
 
     int8 mylevelbonus = BotDataMgr::GetLevelBonusForBotRank(me->GetCreatureTemplate()->rank);
     uint8 mylevelbase = std::max<int8>(int8(me->GetLevel()) - mylevelbonus, int8(BotDataMgr::GetMinLevelForBotClass(_botclass)));
+
+    if (!random)
+    {
+        if (WanderNode const* bgNode = GetNextBGTravelNode())
+            return bgNode;
+    }
+
     return BotDataMgr::GetNextWanderNode(_travel_node_cur, _travel_node_last, from, me, mylevelbase, random);
+}
+
+WanderNode const* bot_ai::GetNextBGTravelNode() const
+{
+    if (!me->GetMap()->IsBattleground() || !GetBG() || !GetGroup() || _travel_node_cur->GetLinks().size() <= 1)
+        return nullptr;
+
+    Battleground* bg = GetBG();
+    switch (bg->GetBgTypeID())
+    {
+        case BATTLEGROUND_AV:
+        {
+            using NodeList = std::list<WanderNode const*>;
+
+            constexpr uint32 CRETYPE_CAPTAIN_A = AV_CPLACE_MAX + 61;
+            constexpr uint32 CRETYPE_CAPTAIN_H = AV_CPLACE_MAX + 59;
+            constexpr uint32 CRETYPE_BOSS_A = AV_CPLACE_MAX + 60;
+            constexpr uint32 CRETYPE_BOSS_H = AV_CPLACE_MAX + 122;
+
+            static const std::function boss_room_wp_pred_a = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_BOSS_ROOM); };
+            static const std::function boss_room_wp_pred_h = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_BOSS_ROOM); };
+
+            uint32 faction = me->GetFaction();
+            TeamId myTeamId = bg->GetBotTeamId(me->GetGUID());
+            std::vector<Unit*> const team_members = BotMgr::GetAllGroupMembers(me);
+            WanderNode const* curNode = _travel_node_cur;
+            NodeList links;
+            for (WanderNode const* wp : curNode->GetLinks())
+            {
+                if (BotDataMgr::IsWanderNodeAvailableForBotFaction(wp, faction, false))
+                    links.push_back(wp);
+            }
+            if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
+                links.remove(_travel_node_last);
+
+            //if (links.size() == 1)
+            //    return links.front();
+
+            BattlegroundAV* av = dynamic_cast<BattlegroundAV*>(bg);
+            // Above all: check conditions to rush final boss
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                //Condition 1: all bunkers/towers destroyed
+                bool all_tb_down = true;
+                for (BG_AV_Nodes counter = BG_AV_NODES_DUNBALDAR_SOUTH; counter <= BG_AV_NODES_FROSTWOLF_WTOWER; ++counter)
+                {
+                    BG_AV_NodeInfo const& c = av->GetNodes()[counter];
+                    switch (counter)
+                    {
+                        case BG_AV_NODES_DUNBALDAR_SOUTH:
+                        case BG_AV_NODES_DUNBALDAR_NORTH:
+                        case BG_AV_NODES_ICEWING_BUNKER:
+                        case BG_AV_NODES_STONEHEART_BUNKER:
+                            if (teamId == TEAM_HORDE && c.State != BG_AV_States::POINT_DESTROYED)
+                                all_tb_down = false;
+                            break;
+                        case BG_AV_NODES_ICEBLOOD_TOWER:
+                        case BG_AV_NODES_TOWER_POINT:
+                        case BG_AV_NODES_FROSTWOLF_ETOWER:
+                        case BG_AV_NODES_FROSTWOLF_WTOWER:
+                            if (teamId == TEAM_ALLIANCE && c.State != BG_AV_States::POINT_DESTROYED)
+                                all_tb_down = false;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (all_tb_down)
+                {
+                    //Condition 2: boss node is in reach
+                    auto const& pred = teamId == TEAM_ALLIANCE ? boss_room_wp_pred_h : boss_room_wp_pred_a;
+                    Creature const* boss = ASSERT_NOTNULL(av->GetBGCreature(teamId == TEAM_ALLIANCE ? CRETYPE_BOSS_H : CRETYPE_BOSS_A));
+                    WanderNode const* bossWP = ASSERT_NOTNULL(WanderNode::FindInAreaWPs(boss->GetAreaId(), pred));
+                    if (curNode->HasLink(bossWP))
+                    {
+                        //Condition 3: team is ready OR boss is already engaged
+                        bool team_ready = boss->IsInCombat();
+                        if (!team_ready)
+                        {
+                            uint32 ready_count = 0;
+                            for (Unit const* member : team_members)
+                            {
+                                if (!member->IsAlive())
+                                    continue;
+                                if (member->IsPlayer() && (member->IsWithinDist2d(me, 40.0f) || member->ToPlayer()->GetTarget() == boss->GetGUID()))
+                                    ++ready_count;
+                                else if (member->ToCreature()->GetBotAI()->_travel_node_cur == bossWP || member->GetVictim() == boss ||
+                                    (!member->GetVictim() && member->IsWithinDist2d(me, 30.0f)))
+                                    ++ready_count;
+                            }
+                            team_ready = ready_count >= team_members.size() / 4u * 3u;
+                        }
+                        if (team_ready)
+                            return bossWP;
+                        else
+                            return curNode;
+                    }
+                }
+            }
+            // Firstly: check a boss room to defend
+            for (auto const& p : { std::pair{TEAM_ALLIANCE, CRETYPE_BOSS_A}, std::pair{TEAM_HORDE, CRETYPE_BOSS_H} })
+            {
+                if (myTeamId != p.first)
+                    continue;
+                Creature const* boss = ASSERT_NOTNULL(av->GetBGCreature(p.second));
+                if (boss->IsInCombat())
+                {
+                    auto const& pred = p.first == TEAM_ALLIANCE ? boss_room_wp_pred_a : boss_room_wp_pred_h;
+                    WanderNode const* bossWP = ASSERT_NOTNULL(WanderNode::FindInAreaWPs(boss->GetAreaId(), pred));
+                    NodeList vlinks = curNode->GetShortestPathLinks(bossWP, links);
+                    if (!vlinks.empty())
+                        return vlinks.size() == 1u ? vlinks.front() : Acore::Containers::SelectRandomContainerElement(vlinks);
+                }
+            }
+            // Secondly: check captain room to defend
+            for (auto const& p : { std::pair{TEAM_ALLIANCE, CRETYPE_CAPTAIN_A}, std::pair{TEAM_HORDE, CRETYPE_CAPTAIN_H} })
+            {
+                if (myTeamId != p.first)
+                    continue;
+                Creature const* captain = ASSERT_NOTNULL(av->GetBGCreature(p.second));
+                if (captain->IsAlive() && captain->IsInCombat())
+                {
+                    WanderNode const* cap_node = nullptr;
+                    float mindist = 50000.0f;
+                    WanderNode::DoForAllAreaWPs(captain->GetAreaId(), [&cap_node, &mindist, fac = faction, pos = captain](WanderNode const* wp) {
+                        float dist = pos->GetExactDist2d(wp);
+                        if (dist < mindist && BotDataMgr::IsWanderNodeAvailableForBotFaction(wp, fac, false))
+                        {
+                            mindist = dist;
+                            cap_node = wp;
+                        }
+                    });
+                    if (cap_node && curNode->HasLink(cap_node))
+                        return cap_node;
+                }
+            }
+            // Thirdly: find next defend point
+            // Fourthly: find a currently assaulted point by our team and make sure someone defends it
+            // Ex. some GYs to base on are beyound directly accessible tower/bunker or captain room
+            // Fithly: find a GY/tower/bunker in non-assaulted state in reach to assault
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                constexpr std::array<uint8, BG_AV_NODES_MAX> defend_priority_a{ 9, 7, 6, 3, 4, 2, 1, 8, 8, 5, 5, 0, 0, 0, 0 };
+                constexpr std::array<uint8, BG_AV_NODES_MAX> defend_priority_h{ 1, 2, 4, 3, 6, 7, 9, 0, 0, 0, 0, 5, 5, 8, 8 };
+
+                static const std::function flag_wp_pred = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET); };
+                static const std::function bunker_wp_pred = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET) && wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY); };
+                static const std::function tower_wp_pred = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET) && wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY); };
+
+                auto const& def_prio = teamId == TEAM_ALLIANCE ? defend_priority_a : defend_priority_h;
+                auto const& defe_pred = teamId == TEAM_ALLIANCE ? bunker_wp_pred : tower_wp_pred;
+                auto const& assa_pred = teamId == TEAM_ALLIANCE ? tower_wp_pred : bunker_wp_pred;
+
+                std::pair<uint8, WanderNode const*> defNode{};
+                NodeList assdlist;
+                NodeList assalist;
+                std::set<std::pair<uint8, BG_AV_NodeInfo const*>> defendable_nodes;
+                std::set<std::pair<uint32, BG_AV_NodeInfo const*>> assaulted_nodes;
+                std::set<std::pair<uint32, BG_AV_NodeInfo const*>> assaultable_nodes;
+                NodeList accessible_nodes = links; //copy
+                accessible_nodes.push_back(curNode);
+                for (BG_AV_Nodes counter = BG_AV_NODES_FIRSTAID_STATION; counter < BG_AV_NODES_MAX; ++counter)
+                {
+                    BG_AV_NodeInfo const& c = av->GetNodes()[counter];
+                    if (c.State == BG_AV_States::POINT_ASSAULTED)
+                    {
+                        if (c.OwnerId != myTeamId && def_prio[counter] > 0)
+                            defendable_nodes.insert({ uint8(counter), &c });
+                        else if (c.OwnerId == myTeamId)
+                            assaulted_nodes.insert({ av->GetObjectThroughNodeForBot(counter), &c });
+                    }
+                    else if (c.State == BG_AV_States::POINT_NEUTRAL || (c.State == BG_AV_States::POINT_CONTROLED && c.OwnerId != myTeamId))
+                    {
+                        if (c.Tower)
+                            assaultable_nodes.insert({ av->GetObjectThroughNodeForBot(counter), &c });
+                        else
+                            assaultable_nodes.insert({ av->GetObjectThroughNodeForBot(counter), &c });
+                    }
+                    else if (counter == (teamId == TEAM_ALLIANCE ? BG_AV_NODES_FROSTWOLF_HUT : BG_AV_NODES_FIRSTAID_STATION))
+                        assaultable_nodes.insert({ av->GetObjectThroughNodeForBot(counter), &c });
+                }
+                WanderNode::DoForAllMapWPs(av->GetMapId(), [&](WanderNode const* wp) {
+                    if (defe_pred(wp))
+                    {
+                        for (auto const& vt : defendable_nodes)
+                        {
+                            if (defNode.second != nullptr && def_prio[vt.first] < def_prio[defNode.first])
+                                continue;
+                            uint32 objType = av->GetObjectThroughNodeForBot(BG_AV_Nodes(vt.first));
+                            if (GameObject const* go = av->BgObjects[objType] ? av->GetBGObject(objType) : nullptr)
+                            {
+                                if (go->IsWithinDist2d(wp, INTERACTION_DISTANCE * 2.0f))
+                                {
+                                    defNode = { vt.first, wp };
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+                if (WanderNode const* dnode = defNode.second)
+                {
+                    NodeList defLinks = curNode->GetShortestPathLinks(dnode, links);
+                    if (!defLinks.empty())
+                        return defLinks.size() == 1u ? defLinks.front() : Acore::Containers::SelectRandomContainerElement(defLinks);
+                }
+                WanderNode::DoForContainerWPs(accessible_nodes, [&](WanderNode const* wp) {
+                    if (flag_wp_pred(wp))
+                    {
+                        for (auto const& vt : assaulted_nodes)
+                        {
+                            uint32 defenders_count = 0;
+                            for (Unit const* member : team_members)
+                            {
+                                if (member != me && member->IsAlive() && (member->GetExactDist2d(wp) < 40.0f ||
+                                    (member->IsNPCBot() && member->ToCreature()->GetBotAI()->_travel_node_cur == wp)))
+                                    ++defenders_count;
+                            }
+                            if (defenders_count >= 2)
+                                continue;
+                            if (GameObject const* go = av->BgObjects[vt.first] ? av->GetBGObject(vt.first) : nullptr)
+                            {
+                                if (go->IsWithinDist2d(wp, INTERACTION_DISTANCE * 2.0f))
+                                {
+                                    assdlist.push_back(wp);
+                                    break;
+                                }
+                            }
+                        }
+                        if (assa_pred(wp))
+                        {
+                            for (auto const& vt : assaultable_nodes)
+                            {
+                                if (vt.first == BG_AV_OBJECT_FLAG_N_SNOWFALL_GRAVE)
+                                {
+                                    uint32 attackers_count = 0;
+                                    for (Unit const* member : team_members)
+                                        if (member != me && member->IsAlive() && member->IsNPCBot() && member->ToCreature()->GetBotAI()->_travel_node_cur == wp)
+                                            ++attackers_count;
+                                    if (attackers_count >= 3)
+                                        continue;
+                                }
+                                if (GameObject const* go = av->BgObjects[vt.first] ? av->GetBGObject(vt.first) : nullptr)
+                                {
+                                    if (go->IsWithinDist2d(wp, INTERACTION_DISTANCE * 2.0f))
+                                    {
+                                        assalist.push_back(wp);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                if (!assdlist.empty())
+                {
+                    if (std::find(assdlist.cbegin(), assdlist.cend(), curNode) != assdlist.cend())
+                        return curNode;
+                    //remove non-empty points
+                    assdlist.remove_if([&team_members, except_wp = curNode](WanderNode const* wp) {
+                        if (wp != except_wp)
+                        {
+                            for (Unit const* member : team_members)
+                            {
+                                if (member->IsAlive() && (member->GetExactDist2d(wp) < 40.0f ||
+                                    (member->IsNPCBot() && member->ToCreature()->GetBotAI()->_travel_node_cur == wp)))
+                                    return true;
+                            }
+                        }
+                        return false;
+                    });
+                }
+                if (!assdlist.empty())
+                    return assdlist.size() == 1u ? assdlist.front() : Acore::Containers::SelectRandomContainerElement(assdlist);
+                if (!assalist.empty())
+                    return assalist.size() == 1u ? assalist.front() : Acore::Containers::SelectRandomContainerElement(assalist);
+            }
+            //Last thing: try to capture the mines (2 people at most)
+            for (auto const& p : { std::pair{TEAM_ALLIANCE, std::array{AV_CPLACE_MINE_N_3, AV_CPLACE_MINE_S_3}}, std::pair{TEAM_HORDE, std::array{AV_CPLACE_MINE_S_3, AV_CPLACE_MINE_N_3}} })
+            {
+                if (myTeamId != p.first)
+                    continue;
+
+                static const std::function mine_pred = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_MISC_OBJECTIVE_1); };
+
+                for (BG_AV_CreaturePlace sptype : p.second)
+                {
+                    Creature const* mboss = ASSERT_NOTNULL(av->GetBGCreature(uint32(sptype)));
+                    if (mboss->IsAlive() && !mboss->IsInCombat() && me->IsWithinDist2d(mboss, SIZE_OF_GRIDS * 0.75f))
+                    {
+                        WanderNode const* mineWP = ASSERT_NOTNULL(WanderNode::FindInAreaWPs(mboss->GetAreaId(), mine_pred));
+                        WanderNode const* mineLink = mineWP->GetLinks().front();
+                        NodeList mlinks = curNode->GetShortestPathLinks(mineWP, links);
+                        if (!mlinks.empty())
+                        {
+                            uint32 attackers_count = 0;
+                            for (Unit const* member : team_members)
+                            {
+                                if (member == me || !member->IsAlive() || !member->IsNPCBot())
+                                    continue;
+                                WanderNode const* mwp = member->ToCreature()->GetBotAI()->_travel_node_cur;
+                                if (mwp == mineWP || mwp == mineLink || member->GetVictim() == mboss ||
+                                    std::find(mlinks.cbegin(), mlinks.cend(), mwp) != mlinks.cend() ||
+                                    (!mwp->GetLinks().empty() && std::find(mwp->GetLinks().cbegin(), mwp->GetLinks().cend(), mineLink) != mwp->GetLinks().cend()))
+                                    ++attackers_count;
+                            }
+                            if (attackers_count <= 1)
+                            {
+                                LOG_DEBUG("npcbots", "Bot {} {} team {} goes for a mine! Cur node: {} {}",
+                                    me->GetName().c_str(), me->GetEntry(), uint32(myTeamId), curNode->GetWPId(), curNode->GetName().c_str());
+                                return mlinks.size() == 1u ? mlinks.front() : Acore::Containers::SelectRandomContainerElement(mlinks);
+                            }
+                        }
+                    }
+                }
+            }
+            //No immediate target: rush enemy captain
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+                Creature const* captain = av->GetBGCreature(teamId == TEAM_ALLIANCE ? CRETYPE_CAPTAIN_H : CRETYPE_CAPTAIN_A);
+                if (captain && captain->IsAlive())
+                {
+                    WanderNode const* cap_node = nullptr;
+                    float mindist = 50000.0f;
+                    WanderNode::DoForAllAreaWPs(captain->GetAreaId(), [&cap_node, &mindist, fac = faction, pos = captain](WanderNode const* wp) {
+                        float dist = pos->GetExactDist2d(wp);
+                        if (dist < mindist && BotDataMgr::IsWanderNodeAvailableForBotFaction(wp, fac, false))
+                        {
+                            mindist = dist;
+                            cap_node = wp;
+                        }
+                    });
+                    if (cap_node && curNode->HasLink(cap_node))
+                        return cap_node;
+                }
+            }
+            //No immediate target: find a point next to enemy boss and try going there
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+                if (Creature const* boss = av->GetBGCreature(teamId == TEAM_ALLIANCE ? CRETYPE_BOSS_H : CRETYPE_BOSS_A))
+                {
+                    auto const& pred = teamId == TEAM_ALLIANCE ? boss_room_wp_pred_h : boss_room_wp_pred_a;
+                    WanderNode const* bossWP = ASSERT_NOTNULL(WanderNode::FindInAreaWPs(boss->GetAreaId(), pred));
+                    NodeList vlinks = curNode->GetShortestPathLinks(bossWP->GetLinks().front(), links);
+                    if (!vlinks.empty())
+                        return vlinks.size() == 1u ? vlinks.front() : Acore::Containers::SelectRandomContainerElement(vlinks);
+                }
+            }
+
+            if (links.size() > 1)
+            {
+                LOG_DEBUG("npcbots", "Bot {} {} team {} has no target point in BG_AV! Falling back to random (%u links)!. Cur node: {} {}",
+                    me->GetName().c_str(), me->GetEntry(), uint32(myTeamId), uint32(curNode->GetLinks().size()), curNode->GetWPId(), curNode->GetName().c_str());
+            }
+
+            break;
+        }
+        case BATTLEGROUND_WS:
+        case BATTLEGROUND_AB:
+        default:
+            break;
+    }
+
+    return nullptr;
 }
 
 void bot_ai::OnWanderNodeReached()
@@ -17907,6 +18303,60 @@ void bot_ai::OnWanderNodeReached()
         {
             switch (bg->GetBgTypeID())
             {
+                case BATTLEGROUND_AV:
+                {
+                    static const uint32 SPELL_OPENING_FLAG = 21651u;
+
+                    GameObject* obj = nullptr;
+                    uint32 node = 0;
+
+                    BattlegroundAV* av = dynamic_cast<BattlegroundAV*>(bg);
+                    for (BG_AV_Nodes counter = BG_AV_NODES_FIRSTAID_STATION; counter < BG_AV_NODES_MAX; ++counter)
+                    {
+                        BG_AV_NodeInfo const& c = av->GetNodes()[counter];
+                        if (c.State == BG_AV_States::POINT_DESTROYED)
+                            continue;
+                        if (c.State == BG_AV_States::POINT_NEUTRAL || c.OwnerId != bg->GetBotTeamId(me->GetGUID()))
+                        {
+                            uint32 node_type = av->GetObjectThroughNodeForBot(counter);
+                            GameObject* go = bg->BgObjects[node_type] ? bg->GetBGObject(node_type) : nullptr;
+                            if (go && me->IsWithinDistInMap(go, 10.0f))
+                            {
+                                obj = go;
+                                node = counter;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!obj)
+                        break;
+
+                    bool already_used = false;
+                    for (Unit const* member : BotMgr::GetAllGroupMembers(me))
+                    {
+                        if (member->GetGUID() == me->GetGUID())
+                            continue;
+                        if (Spell const* curSpell = member->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                        {
+                            if (curSpell->m_spellInfo->Id == SPELL_OPENING_FLAG && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID())
+                            {
+                                already_used = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (already_used)
+                        break;
+
+                    //TC_LOG_ERROR("npcbots", "OnWanderNodeReached: [AV] Bot %s USES flag %s at node %u", me->GetName().c_str(), obj->GetName().c_str(), node);
+
+                    if (me->IsMounted())
+                        DismountBot();
+                    me->CastSpell(obj, SPELL_OPENING_FLAG, false);
+
+                    break;
+                }
                 case BATTLEGROUND_WS:
                 {
                     if (bg->GetBotTeamId(me->GetGUID()) == TEAM_ALLIANCE && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY))

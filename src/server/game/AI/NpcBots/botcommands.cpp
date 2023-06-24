@@ -1250,7 +1250,7 @@ public:
 
         std::vector<uint32> linkIds;
         if (Unit* twpc = player->GetSelectedUnit())
-            if (WanderNode const* twp = WanderNode::FindInMapWPs(twpc->ToCreature(), player->GetMapId()))
+            if (WanderNode const* twp = WanderNode::FindInMapWPs(player->GetMapId(), twpc->ToCreature()))
                 if (twp->GetWPId() != wp->GetWPId() - 1)
                     linkIds.push_back(twp->GetWPId());
         if (linkIds.empty())

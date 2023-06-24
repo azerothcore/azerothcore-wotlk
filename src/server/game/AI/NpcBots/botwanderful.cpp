@@ -2,7 +2,9 @@
 #include "DBCStores.h"
 #include "TemporarySummon.h"
 
+#include <algorithm>
 #include <iomanip>
+#include <unordered_set>
 
 #ifdef _MSC_VER
 # pragma warning(push, 4)
@@ -57,7 +59,7 @@ WanderNode* WanderNode::FindInAllWPs(Creature const* creature)
     return ci == ALL_WPS.cend() ? nullptr : *ci;
 }
 
-WanderNode* WanderNode::FindInMapWPs(Creature const* creature, uint32 mapId)
+WanderNode* WanderNode::FindInMapWPs(uint32 mapId, Creature const* creature)
 {
     if (!creature)
         return nullptr;
@@ -74,18 +76,42 @@ WanderNode* WanderNode::FindInMapWPs(Creature const* creature, uint32 mapId)
     return ci == ALL_WPS_PER_MAP.at(mapId).cend() ? nullptr : *ci;
 }
 
-WanderNode* WanderNode::FindInMapWPs(uint32 wpId, uint32 mapId)
+WanderNode* WanderNode::FindInMapWPs(uint32 mapId, uint32 wpId)
 {
     lock_type lock(*GetLock());
 
     auto cim = ALL_WPS_PER_MAP.find(mapId);
     if (cim == ALL_WPS_PER_MAP.cend())
         return nullptr;
-    auto ci = std::find_if(ALL_WPS_PER_MAP.at(mapId).cbegin(), ALL_WPS_PER_MAP.at(mapId).cend(), [wpId = wpId](WanderNode const* wp) {
+    auto ci = std::find_if(ALL_WPS_PER_MAP.at(mapId).cbegin(), ALL_WPS_PER_MAP.at(mapId).cend(), [=](WanderNode const* wp) {
         return wp->GetWPId() == wpId;
     });
 
     return ci == ALL_WPS_PER_MAP.at(mapId).cend() ? nullptr : *ci;
+}
+
+WanderNode* WanderNode::FindInMapWPs(uint32 mapId, node_check_ftype_c const& pred)
+{
+    lock_type lock(*GetLock());
+
+    auto cim = ALL_WPS_PER_MAP.find(mapId);
+    if (cim == ALL_WPS_PER_MAP.cend())
+        return nullptr;
+    auto ci = std::find_if(ALL_WPS_PER_MAP.at(mapId).cbegin(), ALL_WPS_PER_MAP.at(mapId).cend(), pred);
+
+    return ci == ALL_WPS_PER_MAP.at(mapId).cend() ? nullptr : *ci;
+}
+
+WanderNode* WanderNode::FindInAreaWPs(uint32 areaId, node_check_ftype_c const& pred)
+{
+    lock_type lock(*GetLock());
+
+    auto cim = ALL_WPS_PER_AREA.find(areaId);
+    if (cim == ALL_WPS_PER_AREA.cend())
+        return nullptr;
+    auto ci = std::find_if(ALL_WPS_PER_AREA.at(areaId).cbegin(), ALL_WPS_PER_AREA.at(areaId).cend(), pred);
+
+    return ci == ALL_WPS_PER_AREA.at(areaId).cend() ? nullptr : *ci;
 }
 
 void WanderNode::DoForAllWPs(node_proc_ftype&& func)
@@ -189,6 +215,74 @@ void WanderNode::RemoveAllWPs()
 
     while (!ALL_WPS.empty())
         RemoveWP(ALL_WPS.front());
+}
+
+WanderNode::node_ltype_c WanderNode::GetShortestPathLinks(WanderNode const* target, WanderNode::node_ltype_c const& base_links) const
+{
+    using NodeList = WanderNode::node_ltype_c;
+
+    ASSERT(std::all_of(base_links.cbegin(), base_links.cend(), [this](WanderNode const* wp) { return HasLink(wp); }));
+
+    NodeList retlist;
+    if (this == target)
+        retlist.push_back(this);
+    else
+    {
+        std::list<std::pair<uint32 /*level*/, WanderNode const*>> validLinks;
+        for (WanderNode const* link : base_links)
+        {
+            if (link == target)
+            {
+                retlist.push_back(link);
+                validLinks.clear();
+                break;
+            }
+
+            std::unordered_set<WanderNode const*> checked_links;
+            checked_links.insert(this);
+            NodeList vlinks_cur;
+            NodeList clinks;
+            clinks.push_back(link);
+            for (uint32 level = 0; !clinks.empty(); ++level)
+            {
+                for (WanderNode const* wp : clinks)
+                {
+                    if (wp->HasLink(target))
+                        vlinks_cur.push_back(link);
+                }
+                if (!vlinks_cur.empty())
+                {
+                    validLinks.emplace_back(level, link);
+                    break;
+                }
+                NodeList clinks_new;
+                for (WanderNode const* wp : clinks)
+                {
+                    checked_links.insert(wp); // cut off all ways back (2-ways, circular)
+                    std::copy_if(wp->GetLinks().begin(), wp->GetLinks().end(), std::back_inserter(clinks_new), [&checked_links](WanderNode const* cwp) {
+                        return !checked_links.count(cwp);
+                    });
+                }
+                clinks = std::move(clinks_new);
+            }
+        }
+
+        if (!validLinks.empty())
+        {
+            //only choose one of the shortest routes
+            if (validLinks.size() > 1)
+            {
+                auto minlevel = std::numeric_limits<decltype(validLinks)::value_type::first_type>::max();
+                for (auto const& kv : validLinks)
+                    minlevel = std::min<decltype(minlevel)>(minlevel, kv.first);
+                validLinks.remove_if([=](decltype(validLinks)::value_type const& p) { return p.first > minlevel; });
+            }
+            for (decltype(validLinks)::value_type const& vt : validLinks)
+                retlist.emplace_back(std::move(vt.second));
+        }
+    }
+
+    return retlist;
 }
 
 void WanderNode::SetCreature(Creature* creature)

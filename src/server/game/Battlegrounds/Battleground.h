@@ -540,6 +540,7 @@ public:
     virtual void HandleBotKillPlayer(Creature* killer, Player* victim);
     virtual void HandleBotKillBot(Creature* killer, Creature* victim);
     virtual void HandlePlayerKillBot(Creature* victim, Player* killer);
+    virtual void HandleBotKillUnit(Creature* /*killer*/, Creature* /*victim*/) { }
     TeamId GetBotTeamId(ObjectGuid guid) const;
     virtual GraveyardStruct const* GetClosestGraveyardForBot(Creature* bot) const;
     virtual void RemoveBot(ObjectGuid /*guid*/) {}
