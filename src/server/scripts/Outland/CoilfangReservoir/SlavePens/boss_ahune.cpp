@@ -311,7 +311,6 @@ struct boss_ahune : public ScriptedAI
     }
 };
 
-
 class go_ahune_ice_stone : public GameObjectScript
 {
 public:
