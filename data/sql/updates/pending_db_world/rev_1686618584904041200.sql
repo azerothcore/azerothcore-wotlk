@@ -7,4 +7,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18478, 0, 1, 0, 0, 0, 100, 0, 6500, 11500, 6200, 15700, 0, 11, 16145, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of the Martyred - In Combat - Cast \'Sunder Armor\''),
 (18478, 0, 2, 0, 1, 0, 100, 512, 30000, 30000, 30000, 30000, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of the Martyred - Out of Combat - Despawn After 30s'),
 (18478, 0, 3, 4, 54, 0, 100, 0, 0, 0, 0, 0, 0, 11, 33422, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of the Martyred - On Just Summoned - Cast \'Phase In\''),
-(18478, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of the Martyred - On Just Summoned - Set In Combat With Zone');
+(18478, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of the Martyred - On Just Summoned - Set In Combat With Zone'),
+(18478, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 116, 900, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Avatar of the Martyred - On Just Summoned - Set Corpse Delay to 15 Minutes');
