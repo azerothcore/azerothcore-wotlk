@@ -52,11 +52,6 @@ struct npc_midsummer_bonfire : public ScriptedAI
     {
         me->IsAIEnabled = true;
         goGUID.Clear();
-        if (GameObject* go = me->SummonGameObject(GO_MIDSUMMER_BONFIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0))
-        {
-            goGUID = go->GetGUID();
-            me->RemoveGameObject(go, false);
-        }
     }
 
     ObjectGuid goGUID;
