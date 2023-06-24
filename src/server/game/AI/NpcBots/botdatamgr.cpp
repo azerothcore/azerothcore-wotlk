@@ -181,11 +181,11 @@ private:
     using NodeVec = std::vector<WanderNode const*>;
 
     const std::map<uint8, uint32> wbot_faction_for_ex_class = {
-        {BOT_CLASS_BM, 2u},
+        {BOT_CLASS_BM, 14u/*2u*/},
         {BOT_CLASS_SPHYNX, 14u},
-        {BOT_CLASS_ARCHMAGE, 1u},
+        {BOT_CLASS_ARCHMAGE, 14u/*1u*/},
         {BOT_CLASS_DREADLORD, 14u},
-        {BOT_CLASS_SPELLBREAKER, 1610u},
+        {BOT_CLASS_SPELLBREAKER, 14u/*1610u*/},
         {BOT_CLASS_DARK_RANGER, 14u},
         {BOT_CLASS_NECROMANCER, 14u},
         {BOT_CLASS_SEA_WITCH, 14u},
