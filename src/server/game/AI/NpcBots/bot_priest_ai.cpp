@@ -1646,6 +1646,27 @@ public:
             targets = targets + bonusTargets;
         }
 
+        void ApplyClassEffectMods(SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
+        {
+            uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
+            uint8 lvl = me->GetLevel();
+            float pctbonus = 1.0f;
+
+            //Improved Power Word: Fortitude
+            if (lvl >= 15 && baseId == PW_FORTITUDE_1 && effIndex == EFFECT_0)
+                pctbonus *= 1.3f;
+            if (lvl >= 20 && baseId == PW_SHIELD_1 && effIndex == EFFECT_0)
+            {
+                //Improved PWSH: +15% effect
+                pctbonus *= 1.15f;
+                //Borrowed Time: +40% of spellpower
+                if (GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE && lvl >= 55)
+                    value += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.4f;
+            }
+
+            value = value * pctbonus;
+        }
+
         void OnClassSpellGo(SpellInfo const* spellInfo) override
         {
             //Surge of Light
@@ -1697,23 +1718,6 @@ public:
             if ((GetSpec() == BOT_SPEC_PRIEST_SHADOW) && lvl >= 20 && baseId == MIND_BLAST_1)
                 me->CastSpell(target, IMPROVED_MIND_BLAST_DEBUFF, true);
 
-            if (lvl >= 15 && baseId == PW_FORTITUDE_1)
-            {
-                if (AuraEffect* eff = target->GetAuraEffect(spellId, 0, me->GetGUID()))
-                    eff->ChangeAmount(int32(eff->GetAmount() * 1.3f));
-            }
-            if (lvl >= 20 && baseId == PW_SHIELD_1)
-            {
-                if (AuraEffect* eff = target->GetAuraEffect(spellId, 0, me->GetGUID()))
-                {
-                    float amount = float(eff->GetAmount());
-                    //Borrowed Time: +40% of spellpower
-                    if ((GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE) && lvl >= 55)
-                        amount += me->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) * 0.4f;
-                    //Improved PWSH: +15% effect
-                    eff->ChangeAmount(int32(amount * 1.15f));
-                }
-            }
             //Weakened Soul Reduction (id: 33333): -2 sec to Weakened Soul duration
             if (lvl >= 51 && baseId == WEAKENED_SOUL_DEBUFF)
             {
@@ -1750,16 +1754,6 @@ public:
                     buff->SetMaxDuration(dur);
                 }
             }
-
-            //convert to effect bonus somehow, this code gonna cause constant stack
-            //if (baseId == PRAYER_OF_MENDING_AURA_1)
-            //{
-            //    //Prayer of Mending Bounce (60154): +1 charge
-            //    if (Aura* mend = target->GetAura(spellId, me->GetGUID()))
-            //    {
-            //        mend->SetCharges(mend->GetCharges() + 1);
-            //    }
-            //}
 
             OnSpellHitTarget(target, spell);
         }

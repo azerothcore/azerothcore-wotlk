@@ -13097,7 +13097,7 @@ float bot_ai::_getTotalBotStat(BotStatMods stat) const
                         fval *= 1.04f;
                     break;
                 case BOT_CLASS_PRIEST:
-                    //Improved Power Word: Shield
+                    //Improved Power Word: Fortitude
                     if (lvl >= 15)
                         fval *= 1.04f;
                     break;
