@@ -1,3 +1,4 @@
+-- DB update 2023_06_24_01 -> 2023_06_24_02
 --
 DELETE FROM `npc_trainer` WHERE `SpellID` IN (
 39973, -- Frost Grenades
