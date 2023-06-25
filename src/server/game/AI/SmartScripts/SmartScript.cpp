@@ -2848,13 +2848,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_SUMMON_RADIAL:
         {
-            // creatureid
-            // number of summons
-            // summon duration
-            // starting orientation offset (>=0: source orientation + offset, <0: absolute orientation)
-            // orientation step in degrees
-            // @todo: position offset (RelocatePolarOffset)?
-
             if (!me)
                 break;
 
@@ -2863,7 +2856,18 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             float startAngle = me->GetOrientation() + (static_cast<float>(e.action.radialSummon.startAngle) * M_PI / 180.0f);
             float stepAngle = static_cast<float>(e.action.radialSummon.stepAngle) * M_PI / 180.0f;
 
-            for (int32 itr = 0; itr < e.action.radialSummon.repetitions; itr++)
+            if (e.action.radialSummon.dist)
+            {
+                for (uint32 itr = 0; itr < e.action.radialSummon.repetitions; itr++)
+                {
+                    Position summonPos = me->GetPosition();
+                    summonPos.RelocatePolarOffset(itr * stepAngle, static_cast<float>(e.action.radialSummon.dist));
+                    me->SummonCreature(e.action.radialSummon.summonEntry, summonPos, spawnType, e.action.radialSummon.summonDuration);
+                }
+                break;
+            }
+
+            for (uint32 itr = 0; itr < e.action.radialSummon.repetitions; itr++)
             {
                 float currentAngle = startAngle + (itr * stepAngle);
                 me->SummonCreature(e.action.radialSummon.summonEntry, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), currentAngle, spawnType, e.action.radialSummon.summonDuration);

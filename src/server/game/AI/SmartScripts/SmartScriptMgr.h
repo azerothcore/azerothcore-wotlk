@@ -1392,6 +1392,7 @@ struct SmartAction
             uint32 repetitions;
             uint32 startAngle;
             uint32 stepAngle;
+            uint32 dist;
         } radialSummon;
         //! Note for any new future actions
         //! All parameters must have type uint32
