@@ -19,142 +19,26 @@
 #include "ScriptedCreature.h"
 #include "auchenai_crypts.h"
 
-enum ExarchMaladaar
+enum Text
 {
     SAY_INTRO                   = 0,
     SAY_SUMMON                  = 1,
     SAY_AGGRO                   = 2,
     SAY_ROAR                    = 3,
     SAY_SLAY                    = 4,
-    SAY_DEATH                   = 5,
+    SAY_DEATH                   = 5
+};
 
+enum Spells
+{
+    // Exarch Maladaar
     SPELL_RIBBON_OF_SOULS       = 32422,
     SPELL_SOUL_SCREAM           = 32421,
     SPELL_STOLEN_SOUL           = 32346,
     SPELL_STOLEN_SOUL_VISUAL    = 32395,
     SPELL_SUMMON_AVATAR         = 32424,
 
-    ENTRY_STOLEN_SOUL           = 18441,
-
-    EVENT_SPELL_FEAR            = 1,
-    EVENT_SPELL_RIBBON          = 2,
-    EVENT_SPELL_SOUL            = 3,
-    EVENT_CHECK_HEALTH          = 4
-};
-
-class boss_exarch_maladaar : public CreatureScript
-{
-public:
-    boss_exarch_maladaar() : CreatureScript("boss_exarch_maladaar") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetAuchenaiCryptsAI<boss_exarch_maladaarAI>(creature);
-    }
-
-    struct boss_exarch_maladaarAI : public ScriptedAI
-    {
-        boss_exarch_maladaarAI(Creature* creature) : ScriptedAI(creature)
-        {
-            _talked = false;
-        }
-
-        bool _talked;
-        EventMap events;
-
-        void Reset() override
-        {
-            events.Reset();
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!_talked && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 150.0f))
-            {
-                Talk(SAY_INTRO);
-                _talked = true;
-            }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_SPELL_FEAR, 15000);
-            events.ScheduleEvent(EVENT_SPELL_RIBBON, 5000);
-            events.ScheduleEvent(EVENT_SPELL_SOUL, 25000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 5000);
-        }
-
-        void KilledUnit(Unit*) override
-        {
-            if (urand(0, 1))
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit*) override
-        {
-            Talk(SAY_DEATH);
-
-            //When Exarch Maladar is defeated D'ore appear.
-            me->SummonCreature(19412, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 600000);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_CHECK_HEALTH:
-                    if (HealthBelowPct(25))
-                    {
-                        Talk(SAY_SUMMON);
-                        me->CastSpell(me, SPELL_SUMMON_AVATAR, false);
-                        return;
-                    }
-                    events.RepeatEvent(2000);
-                    break;
-                case EVENT_SPELL_SOUL:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                    {
-                        Talk(SAY_ROAR);
-                        me->CastSpell(target, SPELL_STOLEN_SOUL, false);
-                        if (Creature* summon = me->SummonCreature(ENTRY_STOLEN_SOUL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
-                        {
-                            summon->CastSpell(summon, SPELL_STOLEN_SOUL_VISUAL, false);
-                            summon->SetDisplayId(target->GetDisplayId());
-                            summon->AI()->DoAction(target->getClass());
-                            summon->AI()->AttackStart(target);
-                        }
-                    }
-                    events.RepeatEvent(urand(25000, 30000));
-                    break;
-                case EVENT_SPELL_RIBBON:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_RIBBON_OF_SOULS, false);
-                    events.RepeatEvent(urand(10000, 20000));
-                    break;
-                case EVENT_SPELL_FEAR:
-                    me->CastSpell(me, SPELL_SOUL_SCREAM, false);
-                    events.RepeatEvent(urand(15000, 25000));
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
-enum stolenSoul
-{
+    // Stolen Soul
     SPELL_MOONFIRE              = 37328,
     SPELL_FIREBALL              = 37329,
     SPELL_MIND_FLAY             = 37330,
@@ -164,99 +48,211 @@ enum stolenSoul
     SPELL_MORTAL_STRIKE         = 37335,
     SPELL_FREEZING_TRAP         = 37368,
     SPELL_HAMMER_OF_JUSTICE     = 37369,
-    SPELL_PLAGUE_STRIKE         = 58839,
-
-    EVENT_STOLEN_SOUL_SPELL     = 1,
+    SPELL_PLAGUE_STRIKE         = 58839
 };
 
-class npc_stolen_soul : public CreatureScript
+enum Npc
 {
-public:
-    npc_stolen_soul() : CreatureScript("npc_stolen_soul") { }
+    ENTRY_STOLEN_SOUL           = 18441
+};
 
-    CreatureAI* GetAI(Creature* creature) const override
+struct boss_exarch_maladaar : public BossAI
+{
+    boss_exarch_maladaar(Creature* creature) : BossAI(creature, DATA_EXARCH_MALADAAR)
     {
-        return GetAuchenaiCryptsAI<npc_stolen_soulAI>(creature);
+        _talked = false;
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
-    struct npc_stolen_soulAI : public ScriptedAI
+    bool _talked;
+
+    void Reset() override
     {
-        npc_stolen_soulAI(Creature* creature) : ScriptedAI(creature) {}
+        _Reset();
+        ScheduleHealthCheckEvent(25, [&] {
+            Talk(SAY_SUMMON);
+            DoCastSelf(SPELL_SUMMON_AVATAR);
+        });
+    }
 
-        uint8 myClass;
-        EventMap events;
-
-        void Reset() override
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_talked && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 150.0f))
         {
-            myClass = CLASS_WARRIOR;
-            events.ScheduleEvent(EVENT_STOLEN_SOUL_SPELL, 1000);
+            _talked = true;
+            Talk(SAY_INTRO);
         }
+        ScriptedAI::MoveInLineOfSight(who);
+    }
 
-        void DoAction(int32 pClass) override
+    void JustEngagedWith(Unit*) override
+    {
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+        scheduler.Schedule(15s, [this] (TaskContext context)
         {
-            myClass = pClass;
-        }
-
-        void UpdateAI(uint32 diff) override
+            DoCastSelf(SPELL_SOUL_SCREAM);
+            context.Repeat(15s, 25s);
+        }).Schedule(5s, [this](TaskContext context)
         {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (events.ExecuteEvent() == EVENT_STOLEN_SOUL_SPELL)
+            DoCastRandomTarget(SPELL_RIBBON_OF_SOULS);
+            context.Repeat(10s, 20s);
+        }).Schedule(25s, [this](TaskContext context)
+        {
+            if (Unit * target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
             {
-                switch (myClass)
+                Talk(SAY_ROAR);
+                DoCast(target, SPELL_STOLEN_SOUL);
+                if (Creature* summon = me->SummonCreature(ENTRY_STOLEN_SOUL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
                 {
-                    case CLASS_WARRIOR:
-                        me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
-                        events.RepeatEvent(6000);
-                        break;
-                    case CLASS_PALADIN:
-                        me->CastSpell(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE, false);
-                        events.RepeatEvent(6000);
-                        break;
-                    case CLASS_HUNTER:
-                        me->CastSpell(me->GetVictim(), SPELL_FREEZING_TRAP, false);
-                        events.RepeatEvent(20000);
-                        break;
-                    case CLASS_ROGUE:
-                        me->CastSpell(me->GetVictim(), SPELL_HEMORRHAGE, false);
-                        events.RepeatEvent(10000);
-                        break;
-                    case CLASS_PRIEST:
-                        me->CastSpell(me->GetVictim(), SPELL_MIND_FLAY, false);
-                        events.RepeatEvent(5000);
-                        break;
-                    case CLASS_SHAMAN:
-                        me->CastSpell(me->GetVictim(), SPELL_FROSTSHOCK, false);
-                        events.RepeatEvent(8000);
-                        break;
-                    case CLASS_MAGE:
-                        me->CastSpell(me->GetVictim(), SPELL_FIREBALL, false);
-                        events.RepeatEvent(5000);
-                        break;
-                    case CLASS_WARLOCK:
-                        me->CastSpell(me->GetVictim(), SPELL_CURSE_OF_AGONY, false);
-                        events.RepeatEvent(20000);
-                        break;
-                    case CLASS_DRUID:
-                        me->CastSpell(me->GetVictim(), SPELL_MOONFIRE, false);
-                        events.RepeatEvent(10000);
-                        break;
-                    case CLASS_DEATH_KNIGHT:
-                        me->CastSpell(me->GetVictim(), SPELL_PLAGUE_STRIKE, false);
-                        events.RepeatEvent(6000);
-                        break;
+                    summon->CastSpell(summon, SPELL_STOLEN_SOUL_VISUAL, false);
+                    summon->SetDisplayId(target->GetDisplayId());
+                    summon->AI()->DoAction(target->getClass());
+                    summon->AI()->AttackStart(target);
                 }
             }
+            context.Repeat(25s, 30s);
+        });
+    }
 
-            DoMeleeAttackIfReady();
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer() && urand(0, 1))
+        {
+            Talk(SAY_SLAY);
         }
-    };
+    }
+
+    void JustDied(Unit*) override
+    {
+        Talk(SAY_DEATH);
+        me->SummonCreature(19412, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+        _JustDied();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct npc_stolen_soul : public ScriptedAI
+{
+    npc_stolen_soul(Creature* creature) : ScriptedAI(creature) {}
+
+    uint8 myClass;
+
+    void Reset() override
+    {
+        myClass = CLASS_WARRIOR;
+        _scheduler.Schedule(1s, [this] (TaskContext /*context*/)
+        {
+            switch (myClass)
+            {
+                case CLASS_WARRIOR:
+                    _scheduler.Schedule(0ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_MORTAL_STRIKE);
+                        context.Repeat(6s);
+                    });
+                    break;
+                case CLASS_PALADIN:
+                    _scheduler.Schedule(0ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_HAMMER_OF_JUSTICE);
+                        context.Repeat(6s);
+                    });
+                    break;
+                case CLASS_HUNTER:
+                    _scheduler.Schedule(0ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_FREEZING_TRAP);
+                        context.Repeat(20s);
+                    });
+                    break;
+                case CLASS_ROGUE:
+                    _scheduler.Schedule(0ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_HEMORRHAGE);
+                        context.Repeat(10s);
+                    });
+                    break;
+                case CLASS_PRIEST:
+                    _scheduler.Schedule(0ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_MIND_FLAY);
+                        context.Repeat(5s);
+                    });
+                    break;
+                case CLASS_SHAMAN:
+                    _scheduler.Schedule(0ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_FROSTSHOCK);
+                        context.Repeat(8s);
+                    });
+                    break;
+                case CLASS_MAGE:
+                    _scheduler.Schedule(0ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_FIREBALL);
+                        context.Repeat(5s);
+                    });
+                    break;
+                case CLASS_WARLOCK:
+                    _scheduler.Schedule(0ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_CURSE_OF_AGONY);
+                        context.Repeat(20s);
+                    });
+                    break;
+                case CLASS_DRUID:
+                    _scheduler.Schedule(0ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_MOONFIRE);
+                        context.Repeat(10s);
+                    });
+                    break;
+                case CLASS_DEATH_KNIGHT:
+                    _scheduler.Schedule(0ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_PLAGUE_STRIKE);
+                        context.Repeat(6s);
+                    });
+                    break;
+            }
+        });
+    }
+
+    void DoAction(int32 pClass) override
+    {
+        myClass = pClass;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff);
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 void AddSC_boss_exarch_maladaar()
 {
-    new boss_exarch_maladaar();
-    new npc_stolen_soul();
+    RegisterAuchenaiCryptsCreatureAI(boss_exarch_maladaar);
+    RegisterAuchenaiCryptsCreatureAI(npc_stolen_soul);
 }

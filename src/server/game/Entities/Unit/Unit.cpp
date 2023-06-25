@@ -12465,32 +12465,6 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
 
     switch (spellProto->SpellFamilyName)
     {
-        case SPELLFAMILY_DRUID:
-        {
-            // Nourish vs Idol of the Flourishing Life
-            if (spellProto->SpellFamilyFlags[1] & 0x02000000)
-            {
-                if (AuraEffect const* relicAurEff = GetAuraEffect(64949, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
-            }
-
-            // Lifebloom vs Idol of Lush Moss/Increased Lifebloom Periodic
-            if (spellProto->SpellFamilyFlags[1] & 00000010)
-            {
-                if (AuraEffect const* relicAurEff = GetAuraEffect(60779, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
-
-                if (AuraEffect const* relicAurEff = GetAuraEffect(34246, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
-            }
-            break;
-        }
         case SPELLFAMILY_DEATHKNIGHT:
         {
             // Impurity
