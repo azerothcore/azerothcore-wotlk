@@ -55,12 +55,19 @@ enum EventSpells
     SPELL_SUMMON_COLDWAVE       = 45952,
     SPELL_SUMMON_FROSTWIND      = 45953,
 
+    SPELL_CHILLING_AURA         = 46542,
+
     /*
     SPELL_SUMMON_ICE_SPEAR_BUNNY= 46359, // any dest
     SPELL_ICE_SPEAR_KNOCKBACK   = 46360, // src caster
     SPELL_ICE_SPEAR_SUMMON_OBJ  = 46369,
     SPELL_ICE_SPEAR_CONTROL_AURA= 46371, // periodic dummy
     */
+};
+
+enum CreatureIds
+{
+    NPC_AHUNITE_HAILSTONE = 25755
 };
 
 enum eEvents
@@ -244,7 +251,7 @@ struct boss_ahune : public ScriptedAI
                 float angle = rand_norm() * 2 * M_PI;
                 me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle) * dist, MinionSummonPos.GetPositionY() + std::sin(angle) * dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_FROSTWIND, false);
             }
-            events.RepeatEvent(6000);
+            events.RepeatEvent(12000);
             break;
 
         default:
@@ -268,10 +275,17 @@ struct boss_ahune : public ScriptedAI
 
     void JustSummoned(Creature* summon) override
     {
-        if (summon)
+        summons.Summon(summon);
+        summon->SetInCombatWithZone();
+
+        if (summon->GetEntry() == NPC_AHUNITE_HAILSTONE)
         {
-            summons.Summon(summon);
-            summon->SetInCombatWithZone();
+            // Doesn't work when cast normally or when added to
+            // creature template addon. Needs further investigation.
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_CHILLING_AURA))
+            {
+                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, summon, summon);
+            }
         }
     }
 
