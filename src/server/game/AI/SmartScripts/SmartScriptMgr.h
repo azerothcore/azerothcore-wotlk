@@ -694,7 +694,7 @@ enum SMART_ACTION
     SMART_ACTION_ATTACK_STOP                        = 224,    //
     SMART_ACTION_SET_GUID                           = 225,    // Sends the invoker's or the base object's own ObjectGuid to target
     SMART_ACTION_DISABLE                            = 226,    // state
-    SMART_ACTION_SET_SCALE                          = 227,    // scaleInteger, scaleFraction
+    SMART_ACTION_SET_SCALE                          = 227,    // scale
     SMART_ACTION_SUMMON_RADIAL                      = 228,    // summonEntry, summonDuration, repetitions, startAngle, stepAngle
 
     SMART_ACTION_AC_END                             = 229,    // placeholder
@@ -1382,8 +1382,7 @@ struct SmartAction
 
         struct
         {
-            uint32 scaleInteger;
-            uint32 scaleFraction;
+            uint32 scale;
         } setScale;
 
         struct

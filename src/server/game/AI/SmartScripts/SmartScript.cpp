@@ -2835,9 +2835,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_SET_SCALE:
         {
-            uint32 scaleInteger = e.action.setScale.scaleInteger;
-            uint32 scaleFraction = e.action.setScale.scaleFraction;
-            float scale = float(scaleInteger) + float(scaleFraction) / std::pow(10, std::floor(std::log10(float(scaleFraction ? scaleFraction : 1)) + 1));
+            float scale = static_cast<float>(e.action.setScale.scale) / 100.0f;
 
             for (WorldObject* target : targets)
             {
