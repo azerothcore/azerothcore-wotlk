@@ -5645,7 +5645,8 @@ void bot_ai::_updateMountedState()
     }
 
     if (me->IsMounted() || me->GetVehicle() || me->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) || !IsOutdoors() ||
-        master->IsInCombat() || me->IsInCombat() || me->GetVictim() || IsCasting() || IsFlagCarrier(me))
+        master->IsInCombat() || me->IsInCombat() || me->GetVictim() || IsCasting() || IsFlagCarrier(me) ||
+        (HasBotCommandState(BOT_COMMAND_STAY) && GetBG() && GetBG()->GetStatus() != STATUS_IN_PROGRESS))
         return;
 
     if (IAmFree())
@@ -18573,6 +18574,41 @@ void bot_ai::OnWanderNodeReached()
                 }
                 default:
                     break;
+            }
+        }
+    }
+}
+
+void bot_ai::OnBotEnterBattleground()
+{
+    Battleground* bg = ASSERT_NOTNULL(GetBG());
+
+    if (bg->GetStatus() != STATUS_IN_PROGRESS && IsWanderer())
+    {
+        uint32 mapId = bg->GetBgMap()->GetId();
+        float mindist = 50000.0f;
+        WanderNode const* startNode = nullptr;
+        WanderNode::DoForAllMapWPs(mapId, [pos = me->GetPosition(), &mindist, &startNode](WanderNode const* wp) {
+            if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN))
+            {
+                float dist = pos.GetExactDist2d(wp);
+                if (dist < mindist)
+                {
+                    startNode = wp;
+                    mindist = dist;
+                }
+            }
+        });
+
+        SetBotCommandState(BOT_COMMAND_STAY);
+        if (startNode)
+        {
+            if (TempSummon* wpc = me->GetMap()->SummonCreature(VISUAL_WAYPOINT, *startNode, nullptr, 1000))
+            {
+                wpc->SetTempSummonType(TEMPSUMMON_TIMED_DESPAWN);
+                float angle = bg->GetBgTypeID() == BATTLEGROUND_WS ? frand(float(M_PI * 0.75), float(M_PI * 1.25)) : frand(0.001f, float(M_PI * 1.995));
+                Position myStartPos = wpc->GetFirstCollisionPosition(frand(5.0f, 20.0f), angle);
+                BotMovement(BOT_MOVE_POINT, &myStartPos);
             }
         }
     }

@@ -1372,8 +1372,7 @@ void Battleground::AddBot(Creature* bot)
     AddOrSetBotToCorrectBgGroup(bot, teamId);
 
     bot->GetBotAI()->SetBG(this);
-    if (GetStatus() != STATUS_IN_PROGRESS && bot->IsWandererBot())
-        bot->GetBotAI()->SetBotCommandState(BOT_COMMAND_STAY);
+    bot->GetBotAI()->OnBotEnterBattleground();
 }
 //end npcbot
 

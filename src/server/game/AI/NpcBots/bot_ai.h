@@ -168,6 +168,7 @@ class bot_ai : public CreatureAI
         WanderNode const* GetNextTravelNode(Position const* from, bool random) const;
         WanderNode const* GetNextBGTravelNode() const;
         void OnWanderNodeReached();
+        void OnBotEnterBattleground();
 
         Group* GetGroup() const { return _group; }
         void SetGroup(Group* group) { _group = group; }
