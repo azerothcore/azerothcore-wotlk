@@ -988,7 +988,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!IsSmart())
                 break;
 
-            if (targets.empty())
+            if (e.target.type == SMART_TARGET_NONE || e.target.type == SMART_TARGET_SELF)
             {
                 CAST_AI(SmartAI, me->AI())->StopFollow(false);
                 break;
