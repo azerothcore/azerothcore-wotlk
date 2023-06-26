@@ -236,7 +236,6 @@ struct boss_ahune : public ScriptedAI
             float dist = (float)urand(3, 10);
             float angle = rand_norm() * 2 * M_PI;
             me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle) * dist, MinionSummonPos.GetPositionY() + std::sin(angle) * dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
-            events.RepeatEvent(30000);
         }
         break;
         case EVENT_SPELL_SUMMON_COLDWAVE:
