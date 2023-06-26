@@ -1469,14 +1469,13 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     ASSERT(uint32(spawned_bots_a.size()) == needed_bots_count_a);
     ASSERT(uint32(spawned_bots_h.size()) == needed_bots_count_h);
 
-    uint32 seconds_delay = 5;
-
     botBGJoinEvents[groupLeader->GetGUID()].AddEventAtOffset([ammr = ammr, atype = atype, bgqTypeId = bgqTypeId, bgTypeId = bgTypeId, bracketId = bracketId]() {
         sBattlegroundMgr->ScheduleQueueUpdate(ammr, atype, bgqTypeId, bgTypeId, bracketId);
     }, Seconds(2));
 
     for (NpcBotRegistry const* registry3 : { &spawned_bots_a, &spawned_bots_h })
     {
+        uint32 seconds_delay = 5;
         for (Creature const* bot : *registry3)
         {
             bot->GetBotAI()->SetBotCommandState(BOT_COMMAND_STAY);
@@ -1486,7 +1485,7 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
             queue->AddBotAsGroup(bot->GetGUID(), GetTeamIdForFaction(bot->GetFaction()),
                 bgTypeId, bracketEntry, atype, false, gqinfo->ArenaTeamRating, ammr);
 
-            seconds_delay += std::max<uint32>(1u, uint32((MINUTE / 2) / (needed_bots_count_a + needed_bots_count_h)));
+            seconds_delay += std::max<uint32>(1u, uint32((MINUTE / 2) / std::min<uint32>(needed_bots_count_a, needed_bots_count_h)));
 
             BotBattlegroundEnterEvent* bbe = new BotBattlegroundEnterEvent(groupLeader->GetGUID(), bot->GetGUID(), bgqTypeId,
                 botBGJoinEvents[groupLeader->GetGUID()].CalculateTime(Milliseconds(uint32(INVITE_ACCEPT_WAIT_TIME) + uint32(BG_START_DELAY_2M)).count()));
