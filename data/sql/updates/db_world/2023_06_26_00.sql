@@ -1,3 +1,4 @@
+-- DB update 2023_06_24_06 -> 2023_06_26_00
 -- Shay Leafrunner - On Quest - Wandering Shay --
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 7774);
 
