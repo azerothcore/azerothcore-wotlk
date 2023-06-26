@@ -58,7 +58,8 @@ static bool allBotsLoaded = false;
 
 static uint32 next_wandering_bot_spawn_delay = 0;
 
-static EventProcessor botDataEvents;
+static EventProcessor botSpawnEvents;
+static std::unordered_map<ObjectGuid, EventProcessor> botBGJoinEvents;
 
 bool BotBankItemCompare::operator()(Item const* item1, Item const* item2) const
 {
@@ -85,6 +86,13 @@ public:
         BotDataMgr::DespawnWandererBot(_botGUID.GetEntry());
     }
 
+    void AbortAll()
+    {
+        LOG_ERROR("npcbots", "BotBattlegroundEnterEvent: Aborting ALL bots by {} bg {}!", _playerGUID.GetCounter(), uint32(_bgQueueTypeId));
+        AbortMe();
+        botBGJoinEvents.at(_playerGUID).KillAllEvents(false);
+    }
+
     bool Execute(uint64 e_time, uint32 /*p_time*/) override
     {
         if (e_time >= _removeTime)
@@ -102,7 +110,7 @@ public:
                 //full, some players connected
                 if (bg->GetPlayersCountByTeam(TEAM_ALLIANCE) + bg->GetPlayersCountByTeam(TEAM_HORDE) >= bg->GetMaxPlayersPerTeam() * 2)
                 {
-                    AbortMe();
+                    AbortAll();
                     return true;
                 }
 
@@ -121,10 +129,10 @@ public:
                 TeamId teamId = BotDataMgr::GetTeamIdForFaction(bot->GetFaction());
                 BotMgr::TeleportBot(const_cast<Creature*>(bot), bgPlayer->GetMap(), bg->GetTeamStartPosition(teamId), true, false);
             }
-            else if (bgPlayer && bgPlayer->InBattlegroundQueue())
-                botDataEvents.AddEventAtOffset(new BotBattlegroundEnterEvent(_playerGUID, _botGUID, _bgQueueTypeId, _removeTime), 2s);
+            else if (bgPlayer && bgPlayer->InBattlegroundQueue() && bgPlayer->GetBattlegroundQueueIndex(_bgQueueTypeId) < PLAYER_MAX_BATTLEGROUND_QUEUES)
+                botBGJoinEvents.at(_playerGUID).AddEventAtOffset(new BotBattlegroundEnterEvent(_playerGUID, _botGUID, _bgQueueTypeId, _removeTime), 2s);
             else
-                AbortMe();
+                AbortAll();
         }
 
         return true;
@@ -570,7 +578,9 @@ public:
 
 void BotDataMgr::Update(uint32 diff)
 {
-    botDataEvents.Update(diff);
+    botSpawnEvents.Update(diff);
+    for (auto& kv : botBGJoinEvents)
+        kv.second.Update(diff);
 
     if (!_botsWanderCreaturesToDespawn.empty())
     {
@@ -1461,7 +1471,7 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
 
     uint32 seconds_delay = 5;
 
-    botDataEvents.AddEventAtOffset([ammr = ammr, atype = atype, bgqTypeId = bgqTypeId, bgTypeId = bgTypeId, bracketId = bracketId]() {
+    botBGJoinEvents[groupLeader->GetGUID()].AddEventAtOffset([ammr = ammr, atype = atype, bgqTypeId = bgqTypeId, bgTypeId = bgTypeId, bracketId = bracketId]() {
         sBattlegroundMgr->ScheduleQueueUpdate(ammr, atype, bgqTypeId, bgTypeId, bracketId);
     }, Seconds(2));
 
@@ -1479,8 +1489,8 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
             seconds_delay += std::max<uint32>(1u, uint32((MINUTE / 2) / (needed_bots_count_a + needed_bots_count_h)));
 
             BotBattlegroundEnterEvent* bbe = new BotBattlegroundEnterEvent(groupLeader->GetGUID(), bot->GetGUID(), bgqTypeId,
-                botDataEvents.CalculateTime(Milliseconds(uint32(INVITE_ACCEPT_WAIT_TIME) + uint32(BG_START_DELAY_2M)).count()));
-            botDataEvents.AddEventAtOffset(bbe, Seconds(seconds_delay));
+                botBGJoinEvents[groupLeader->GetGUID()].CalculateTime(Milliseconds(uint32(INVITE_ACCEPT_WAIT_TIME) + uint32(BG_START_DELAY_2M)).count()));
+            botBGJoinEvents[groupLeader->GetGUID()].AddEventAtOffset(bbe, Seconds(seconds_delay));
         }
     }
 
@@ -2791,7 +2801,12 @@ class AC_GAME_API BotDataMgrShutdownScript : public WorldScript
 public:
     BotDataMgrShutdownScript() : WorldScript("BotDataMgrShutdownScript") {}
 
-    void OnShutdown() override { botDataEvents.KillAllEvents(true); }
+    void OnShutdown() override
+    {
+        botSpawnEvents.KillAllEvents(true);
+        for (auto& kv : botBGJoinEvents)
+            kv.second.KillAllEvents(true);
+    }
 };
 
 void AddSC_botdatamgr_scripts()
