@@ -205,6 +205,22 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             return;
         }
 
+        //npcbot: do not allow entering as group if there are bots in group
+        if (_player->GetGroup() && _player->HaveBot())
+        {
+            for (auto const& mslot : _player->GetGroup()->GetMemberSlots())
+            {
+                if (mslot.guid.IsCreature() && _player->GetBotMgr()->GetBot(mslot.guid))
+                {
+                    WorldPacket data;
+                    sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, ERR_BATTLEGROUND_JOIN_FAILED);
+                    _player->SendDirectMessage(&data);
+                    return;
+                }
+            }
+        }
+        //end npcbot
+
         GroupQueueInfo* ginfo = bgQueue.AddGroup(_player, nullptr, bgTypeId, bracketEntry, 0, false, isPremade, 0, 0);
         uint32 avgWaitTime = bgQueue.GetAverageQueueWaitTime(ginfo);
         uint32 queueSlot = _player->AddBattlegroundQueueId(bgQueueTypeId);
