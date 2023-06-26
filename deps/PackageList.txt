@@ -59,3 +59,7 @@ recastnavigation (Recast is state of the art navigation mesh construction toolse
 {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
   https://github.com/fmtlib/fmt
   Version: 7.1.3
+
+wxWidgets is a C++ library that lets developers create applications GUI for Windows, macOS, Linux and other platforms with a single code base.
+  https://github.com/wxWidgets/wxWidgets
+  Version: 3.1.4

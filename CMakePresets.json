@@ -1,0 +1,44 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "Ubuntu",
+      "displayName": "Debug",
+      "description": "Sets Unix Makefiles generator, compilers, build and install directory, debug build type",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/",
+      "toolset": "clang",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "/usr/bin/clang",
+        "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+        "CMAKE_INSTALL_PREFIX": "$env{HOME}/everdawn-wotlk",
+        "MODULES": "static",
+        "SCRIPTS": "static",
+        "TOOLS_BUILD": "everdawn-only",
+        "WITH_WARNINGS": "/usr/bin/clang++",
+        "APPS_BUILD": "none"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "Linux" ],
+          "intelliSenseMode": "windows-clang-x64",
+          "enableMicrosoftCodeAnalysis": false
+        },
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}",
+          "hostBinaryDir": "$ms{localSourceDir}/.vs/out/$ms{targetConnectionName}/build/${presetName}"
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug",
+      "displayName": "Build",
+      "configurePreset": "Ubuntu",
+      "jobs": 12,
+      "configuration": "RelWithDebInfo"
+    }
+  ]
+}
