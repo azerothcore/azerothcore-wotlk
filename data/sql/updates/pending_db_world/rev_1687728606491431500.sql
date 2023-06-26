@@ -326,3 +326,5 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 (1, @OGUID+75),
 (1, @OGUID+76),
 (1, @OGUID+77);
+
+DELETE FROM `game_event_gameobject` WHERE `eventEntry` = 1 AND `guid` BETWEEN 242500 AND 242577;
