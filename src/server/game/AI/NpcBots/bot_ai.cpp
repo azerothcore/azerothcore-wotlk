@@ -855,7 +855,8 @@ bool bot_ai::doCast(Unit* victim, uint32 spellId, TriggerCastFlags flags)
             {
                 if (JumpingOrFalling() || HasBotCommandState(BOT_COMMAND_STAY))
                     return false;
-                if (!me->GetVictim() && me->IsInWorld() && (me->GetMap()->IsRaid() || me->GetMap()->IsHeroic()))
+                if (!me->GetVictim() && me->IsInWorld() && (me->GetMap()->IsRaid() || me->GetMap()->IsHeroic()) &&
+                    !m_botSpellInfo->HasAura(SPELL_AURA_MOUNTED))
                     return false;
                 if (!m_botSpellInfo->HasEffect(SPELL_EFFECT_HEAL) && Rand() > (IAmFree() ? 80 : 50))
                     return false;
