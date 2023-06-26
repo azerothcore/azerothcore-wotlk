@@ -14392,6 +14392,7 @@ void bot_ai::InitEquips()
                                 return stat.ItemStatType == ITEM_MOD_RESILIENCE_RATING && stat.ItemStatValue > 0;
                             }))
                                 return false;
+                            break;
                         default:
                             break;
                     }
@@ -14422,7 +14423,6 @@ void bot_ai::InitEquips()
                         }
                         break;
                     case BOT_SPEC_WARRIOR_PROTECTION:
-                    case BOT_SPEC_PALADIN_PROTECTION:
                         switch (lslot)
                         {
                             case BOT_SLOT_MAINHAND:
@@ -14433,15 +14433,50 @@ void bot_ai::InitEquips()
                                 break;
                         }
                         break;
+                    case BOT_SPEC_PALADIN_PROTECTION:
+                        switch (lslot)
+                        {
+                            case BOT_SLOT_MAINHAND:
+                                if (!(proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND))
+                                    return false;
+                                if (me->GetLevel() < 70)
+                                    break;
+                                return !std::any_of(std::cbegin(proto->ItemStat), std::cend(proto->ItemStat), [](_ItemStat const& stat) {
+                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
+                                });
+                            case BOT_SLOT_OFFHAND:
+                                if (!(proto->InventoryType == INVTYPE_SHIELD))
+                                    return false;
+                                if (me->GetLevel() < 70)
+                                    break;
+                                return !std::any_of(std::cbegin(proto->ItemStat), std::cend(proto->ItemStat), [](_ItemStat const& stat) {
+                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
+                                });
+                            default:
+                                break;
+                        }
+                        break;
                     case BOT_SPEC_PALADIN_HOLY:
                     case BOT_SPEC_SHAMAN_ELEMENTAL:
                     case BOT_SPEC_SHAMAN_RESTORATION:
                         switch (lslot)
                         {
                             case BOT_SLOT_MAINHAND:
-                                return proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND;
+                                if (!(proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND))
+                                    return false;
+                                if (me->GetLevel() < 70)
+                                    break;
+                                return std::any_of(std::cbegin(proto->ItemStat), std::cend(proto->ItemStat), [](_ItemStat const& stat) {
+                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
+                                });
                             case BOT_SLOT_OFFHAND:
-                                return proto->InventoryType == INVTYPE_SHIELD;
+                                if (!(proto->InventoryType == INVTYPE_SHIELD))
+                                    return false;
+                                if (me->GetLevel() < 70)
+                                    break;
+                                return std::any_of(std::cbegin(proto->ItemStat), std::cend(proto->ItemStat), [](_ItemStat const& stat) {
+                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
+                                });
                             default:
                                 if (me->GetLevel() < 70)
                                     break;
@@ -14573,7 +14608,7 @@ void bot_ai::InitEquips()
             {
                 if (i <= BOT_SLOT_RANGED && einfo->ItemEntry[i] != 0)
                 {
-                    LOG_INFO("npcbots", "Wanderer bot {} id {} level {} can't generate req gear in slot {}, generating standard item!",
+                    LOG_WARN("npcbots", "Wanderer bot {} id {} level {} can't generate req gear in slot {}, generating standard item!",
                         me->GetName().c_str(), me->GetEntry(), uint32(me->GetLevel()), uint32(i));
 
                     item = Item::CreateItem(einfo->ItemEntry[i], 1);
@@ -14584,6 +14619,8 @@ void bot_ai::InitEquips()
             else
             {
                 _equips[i] = item;
+                if (GetSpec() != BOT_SPEC_DEFAULT && BotDataMgr::GenerateWanderingBotItemEnchants(item, i, GetSpec())) {}
+
                 gss << " [" << uint32(i) << "] " << _equips[i]->GetTemplate()->Name1 << " (" << _equips[i]->GetEntry() << ')';
             }
         }
