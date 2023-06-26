@@ -1271,23 +1271,22 @@ void BotDataMgr::LoadWanderMap(bool reload)
         {
             LOG_DEBUG("server.loading", "Node {} ('{}') has single connection!", wp->GetWPId(), wp->GetName().c_str());
             WanderNode const* tn = wp->GetLinks().front();
+            WanderNode const* prev = nullptr;
             std::vector<WanderNode const*> sc_chain;
             sc_chain.push_back(wp);
             tops.emplace(wp);
             while (tn != wp)
             {
-                if (tn->GetLinks().size() != 2u)
+                if (tn->GetLinks().size() != 2u || !tn->HasLink(prev ? prev : wp))
                 {
                     sc_chain.push_back(tn);
                     break;
                 }
-                uint32 prevId = sc_chain.back()->GetWPId();
+                prev = sc_chain.back();
                 sc_chain.push_back(tn);
-                tn = *std::find_if_not(std::cbegin(tn->GetLinks()), std::cend(tn->GetLinks()), [nId = prevId](WanderNode const* lwp) {
-                    return lwp->GetWPId() == nId;
-                });
+                tn = *std::find_if_not(std::cbegin(tn->GetLinks()), std::cend(tn->GetLinks()), [=](WanderNode const* lwp) { return lwp == prev; });
             }
-            if (sc_chain.back()->GetLinks().size() == 1u)
+            if (sc_chain.back()->GetLinks().size() == 1u && prev && sc_chain.back()->GetLinks().front() == prev)
             {
                 LOG_DEBUG("server.loading", "Node {} ('{}') has single connection!", tn->GetWPId(), tn->GetName().c_str());
                 tops.emplace(sc_chain.back());
