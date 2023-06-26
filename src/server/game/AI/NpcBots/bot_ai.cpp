@@ -14127,9 +14127,10 @@ uint8 bot_ai::SelectSpecForClass(uint8 m_class)
     specs.reserve(3);
     switch (m_class)
     {
-        case BOT_CLASS_WARRIOR: //arms, fury
+        case BOT_CLASS_WARRIOR: //any
             specs.push_back(BOT_SPEC_WARRIOR_ARMS);
             specs.push_back(BOT_SPEC_WARRIOR_FURY);
+            specs.push_back(BOT_SPEC_WARRIOR_PROTECTION);
             break;
         case BOT_CLASS_PALADIN: //retri
             specs.push_back(BOT_SPEC_PALADIN_RETRIBUTION);
@@ -14144,7 +14145,8 @@ uint8 bot_ai::SelectSpecForClass(uint8 m_class)
             specs.push_back(BOT_SPEC_ROGUE_COMBAT);
             specs.push_back(BOT_SPEC_ROGUE_SUBTLETY);
             break;
-        case BOT_CLASS_PRIEST: //shadow
+        case BOT_CLASS_PRIEST: //discipline, shadow
+            specs.push_back(BOT_SPEC_PRIEST_DISCIPLINE);
             specs.push_back(BOT_SPEC_PRIEST_SHADOW);
             break;
         case BOT_CLASS_DEATH_KNIGHT: //any
@@ -14354,6 +14356,7 @@ void bot_ai::InitEquips()
 
     if (IsWanderer())
     {
+        GenerateRand();
         uint8 lvl = me->GetLevel();
         std::ostringstream gss;
         gss << "bot_ai::InitEquips(): Wanderer bot " << me->GetName() << " id " << me->GetEntry() << ' ' << "level " << uint32(lvl) << " generated gear:";
@@ -14369,6 +14372,30 @@ void bot_ai::InitEquips()
             Item* item = BotDataMgr::GenerateWanderingBotItem(i, _botclass, lvl, [this, lslot = i](ItemTemplate const* proto) {
                 if (!_canEquip(proto, lslot, true))
                     return false;
+
+                if (me->GetMap()->IsBattlegroundOrArena() && Rand() < 50)
+                {
+                    //if (Rand() < 20 && proto->ItemLevel < 245)
+                    //    return false;
+
+                    switch (lslot)
+                    {
+                        case BOT_SLOT_HEAD:
+                        case BOT_SLOT_SHOULDERS:
+                        case BOT_SLOT_CHEST:
+                        case BOT_SLOT_WAIST:
+                        case BOT_SLOT_LEGS:
+                        case BOT_SLOT_FEET:
+                        case BOT_SLOT_WRIST:
+                        case BOT_SLOT_HANDS:
+                            if (!std::any_of(std::cbegin(proto->ItemStat), std::cend(proto->ItemStat), [](_ItemStat const& stat) {
+                                return stat.ItemStatType == ITEM_MOD_RESILIENCE_RATING && stat.ItemStatValue > 0;
+                            }))
+                                return false;
+                        default:
+                            break;
+                    }
+                }
 
                 switch (GetSpec())
                 {
@@ -14386,19 +14413,16 @@ void bot_ai::InitEquips()
                         {
                             case BOT_SLOT_MAINHAND:
                                 return (me->GetLevel() < 60) ? (proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND) :
-                                    proto->InventoryType == INVTYPE_2HWEAPON;
+                                    (proto->InventoryType == INVTYPE_2HWEAPON);
                             case BOT_SLOT_OFFHAND:
                                 return (me->GetLevel() < 60) ? (proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONOFFHAND) :
-                                    proto->InventoryType == INVTYPE_2HWEAPON;
+                                    (proto->InventoryType == INVTYPE_2HWEAPON);
                             default:
                                 break;
                         }
                         break;
                     case BOT_SPEC_WARRIOR_PROTECTION:
-                    case BOT_SPEC_PALADIN_HOLY:
                     case BOT_SPEC_PALADIN_PROTECTION:
-                    case BOT_SPEC_SHAMAN_ELEMENTAL:
-                    case BOT_SPEC_SHAMAN_RESTORATION:
                         switch (lslot)
                         {
                             case BOT_SLOT_MAINHAND:
@@ -14409,12 +14433,45 @@ void bot_ai::InitEquips()
                                 break;
                         }
                         break;
+                    case BOT_SPEC_PALADIN_HOLY:
+                    case BOT_SPEC_SHAMAN_ELEMENTAL:
+                    case BOT_SPEC_SHAMAN_RESTORATION:
+                        switch (lslot)
+                        {
+                            case BOT_SLOT_MAINHAND:
+                                return proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND;
+                            case BOT_SLOT_OFFHAND:
+                                return proto->InventoryType == INVTYPE_SHIELD;
+                            default:
+                                if (me->GetLevel() < 70)
+                                    break;
+                                return std::any_of(std::cbegin(proto->ItemStat), std::cend(proto->ItemStat), [](_ItemStat const& stat) {
+                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
+                                });
+                        }
+                        break;
                     case BOT_SPEC_PALADIN_RETRIBUTION:
                         switch (lslot)
                         {
                             case BOT_SLOT_MAINHAND:
                                 return proto->InventoryType == INVTYPE_2HWEAPON;
                             default:
+                                break;
+                        }
+                        break;
+                    case BOT_SPEC_HUNTER_BEASTMASTERY:
+                    case BOT_SPEC_HUNTER_MARKSMANSHIP:
+                    case BOT_SPEC_HUNTER_SURVIVAL:
+                        switch (lslot)
+                        {
+                            case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
+                                break;
+                            default:
+                                if (me->GetLevel() < 70)
+                                    break;
+                                return std::any_of(std::cbegin(proto->ItemStat), std::cend(proto->ItemStat), [](_ItemStat const& stat) {
+                                    return stat.ItemStatType == ITEM_MOD_AGILITY && stat.ItemStatValue > 0;
+                                });
                                 break;
                         }
                         break;
@@ -14465,17 +14522,44 @@ void bot_ai::InitEquips()
                         {
                             case BOT_SLOT_OFFHAND:
                                 return proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONOFFHAND;
-                            default:
+                            case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
                                 break;
+                            default:
+                                if (me->GetLevel() < 70)
+                                    break;
+                                return std::any_of(std::cbegin(proto->ItemStat), std::cend(proto->ItemStat), [](_ItemStat const& stat) {
+                                    return stat.ItemStatType == ITEM_MOD_AGILITY && stat.ItemStatValue > 0;
+                                });
                         }
                         break;
                     case BOT_SPEC_DRUID_FERAL:
                         switch (lslot)
                         {
-                            case BOT_SLOT_MAINHAND:
-                                return proto->InventoryType == INVTYPE_2HWEAPON;
-                            default:
+                            case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
                                 break;
+                            case BOT_SLOT_MAINHAND:
+                                if (proto->InventoryType != INVTYPE_2HWEAPON)
+                                    return false;
+                            [[fallthrough]];
+                            default:
+                                if (me->GetLevel() < 70)
+                                    break;
+                                return std::any_of(std::cbegin(proto->ItemStat), std::cend(proto->ItemStat), [](_ItemStat const& stat) {
+                                    return stat.ItemStatType == ITEM_MOD_AGILITY && stat.ItemStatValue > 0;
+                                });
+                        }
+                        break;
+                    case BOT_SPEC_DRUID_BALANCE:
+                        switch (lslot)
+                        {
+                            case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
+                                break;
+                            default:
+                                if (me->GetLevel() < 70)
+                                    break;
+                                return std::any_of(std::cbegin(proto->ItemStat), std::cend(proto->ItemStat), [](_ItemStat const& stat) {
+                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
+                                });
                         }
                         break;
                     default:
