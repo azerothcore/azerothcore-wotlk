@@ -1130,7 +1130,7 @@ void bot_ai::BotMovement(BotMovementType type, Position const* pos, Unit* target
     {
         case BOT_MOVE_CHASE:
             ASSERT(target);
-            mover->GetMotionMaster()->MoveChase(target, {}, ChaseAngle(0, float(M_PI / 8.0)));
+            mover->GetMotionMaster()->MoveChase(target, {}, ChaseAngle(target->GetRelativeAngle(me), float(M_PI / 8.0)));
             break;
         case BOT_MOVE_POINT:
             mover->GetMotionMaster()->Add(new PointMovementGenerator<Creature>(1, pos->m_positionX, pos->m_positionY, pos->m_positionZ, speed, 0.0f, nullptr, generatePath));
@@ -14375,10 +14375,10 @@ void bot_ai::InitEquips()
                 if (!_canEquip(proto, lslot, true))
                     return false;
 
-                if (me->GetMap()->IsBattlegroundOrArena() && Rand() < 50)
+                if (me->GetLevel() >= DEFAULT_MAX_LEVEL && me->GetMap()->IsBattlegroundOrArena() && Rand() < 50)
                 {
-                    //if (Rand() < 20 && proto->ItemLevel < 245)
-                    //    return false;
+                    if (Rand() < 20 && proto->ItemLevel < 245)
+                        return false;
 
                     switch (lslot)
                     {
@@ -15031,7 +15031,7 @@ void bot_ai::_LocalizeItem(Player const* forPlayer, std::string &itemName, std::
     std::wstring wnamepart;
 
     ItemLocale const* itemInfo = sObjectMgr->GetItemLocale(item->GetEntry());
-    if (loc > 0 && itemInfo && !itemInfo->Name[loc].empty())
+    if (loc > 0 && itemInfo && itemInfo->Name.size() > loc && !itemInfo->Name[loc].empty())
     {
         const std::string name = itemInfo->Name[loc];
         if (Utf8FitTo(name, wnamepart))
@@ -18332,6 +18332,8 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                                 if (member == me || !member->IsAlive() || !member->IsNPCBot())
                                     continue;
                                 WanderNode const* mwp = member->ToCreature()->GetBotAI()->_travel_node_cur;
+                                if (!mwp)
+                                    continue;
                                 if (mwp == mineWP || mwp == mineLink || member->GetVictim() == mboss ||
                                     std::find(mlinks.cbegin(), mlinks.cend(), mwp) != mlinks.cend() ||
                                     (!mwp->GetLinks().empty() && std::find(mwp->GetLinks().cbegin(), mwp->GetLinks().cend(), mineLink) != mwp->GetLinks().cend()))

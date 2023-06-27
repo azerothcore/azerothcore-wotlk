@@ -1665,7 +1665,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         if (!is_caster_item)
                             push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
                         if (is_caster_item || proto.RequiredLevel < 60 || (proto.RequiredLevel < 69 && (proto.RandomProperty || proto.RandomSuffix)))
-                            push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_PALADIN, BOT_CLASS_SHAMAN, BOT_CLASS_SPELLBREAKER });
+                            push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_PALADIN, BOT_CLASS_SHAMAN, BOT_CLASS_SPELLBREAKER });
                         break;
                     case INVTYPE_HEAD:
                     case INVTYPE_SHOULDERS:
@@ -1976,7 +1976,7 @@ Item* BotDataMgr::GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 lev
     if (!itemIdVec->empty())
     {
         ItemIdVector validVec;
-        validVec.reserve(itemIdVec->size() / 4);
+        validVec.reserve(itemIdVec->size());
         for (uint32 iid : *itemIdVec)
         {
             ItemTemplate const* proto = sObjectMgr->GetItemTemplate(iid);
