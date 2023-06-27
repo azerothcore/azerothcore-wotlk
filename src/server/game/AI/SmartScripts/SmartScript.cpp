@@ -1644,6 +1644,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 break;
             }
 
+            if (e.action.orientation.turnAngle)
+            {
+                float turnOri = me->GetOrientation() + (static_cast<float>(e.action.orientation.turnAngle) * M_PI / 180.0f);
+                me->SetFacingTo(turnOri);
+                if (e.action.orientation.quickChange)
+                    me->SetOrientation(turnOri);
+                break;
+            }
+
             if (e.GetTargetType() == SMART_TARGET_SELF)
             {
                 me->SetFacingTo((me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && me->GetTransGUID() ? me->GetTransportHomePosition() : me->GetHomePosition()).GetOrientation());
@@ -2822,6 +2831,48 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     target->ToUnit()->SetVisible(e.action.disable.state);
                 }
             }
+            break;
+        }
+        case SMART_ACTION_SET_SCALE:
+        {
+            float scale = static_cast<float>(e.action.setScale.scale) / 100.0f;
+
+            for (WorldObject* target : targets)
+            {
+                if (IsUnit(target))
+                {
+                    target->ToUnit()->SetObjectScale(scale);
+                }
+            }
+            break;
+        }
+        case SMART_ACTION_SUMMON_RADIAL:
+        {
+            if (!me)
+                break;
+
+            TempSummonType spawnType = (e.action.radialSummon.summonDuration > 0) ? TEMPSUMMON_TIMED_DESPAWN : TEMPSUMMON_CORPSE_DESPAWN;
+
+            float startAngle = me->GetOrientation() + (static_cast<float>(e.action.radialSummon.startAngle) * M_PI / 180.0f);
+            float stepAngle = static_cast<float>(e.action.radialSummon.stepAngle) * M_PI / 180.0f;
+
+            if (e.action.radialSummon.dist)
+            {
+                for (uint32 itr = 0; itr < e.action.radialSummon.repetitions; itr++)
+                {
+                    Position summonPos = me->GetPosition();
+                    summonPos.RelocatePolarOffset(itr * stepAngle, static_cast<float>(e.action.radialSummon.dist));
+                    me->SummonCreature(e.action.radialSummon.summonEntry, summonPos, spawnType, e.action.radialSummon.summonDuration);
+                }
+                break;
+            }
+
+            for (uint32 itr = 0; itr < e.action.radialSummon.repetitions; itr++)
+            {
+                float currentAngle = startAngle + (itr * stepAngle);
+                me->SummonCreature(e.action.radialSummon.summonEntry, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), currentAngle, spawnType, e.action.radialSummon.summonDuration);
+            }
+
             break;
         }
         default:

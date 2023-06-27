@@ -588,7 +588,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_COUNTER                        = 63,     // id, value, reset (0/1)
     SMART_ACTION_STORE_TARGET_LIST                  = 64,     // varID,
     SMART_ACTION_WP_RESUME                          = 65,     // none
-    SMART_ACTION_SET_ORIENTATION                    = 66,     // quick change, random orientation? (0/1)
+    SMART_ACTION_SET_ORIENTATION                    = 66,     // quick change, random orientation? (0/1), turnAngle
     SMART_ACTION_CREATE_TIMED_EVENT                 = 67,     // id, InitialMin, InitialMax, RepeatMin(only if it repeats), RepeatMax(only if it repeats), chance
     SMART_ACTION_PLAYMOVIE                          = 68,     // entry
     SMART_ACTION_MOVE_TO_POS                        = 69,     // PointId (optional x,y,z offset), transport, controlled, ContactDistance
@@ -693,9 +693,11 @@ enum SMART_ACTION
     SMART_ACTION_DO_ACTION                          = 223,    // ActionId
     SMART_ACTION_ATTACK_STOP                        = 224,    //
     SMART_ACTION_SET_GUID                           = 225,    // Sends the invoker's or the base object's own ObjectGuid to target
-    SMART_ACTION_DISABLE                            = 226,    // Disable the targeted creatures, setting them Invisible and Immune to All
+    SMART_ACTION_DISABLE                            = 226,    // state
+    SMART_ACTION_SET_SCALE                          = 227,    // scale
+    SMART_ACTION_SUMMON_RADIAL                      = 228,    // summonEntry, summonDuration, repetitions, startAngle, stepAngle, dist
 
-    SMART_ACTION_AC_END                             = 227,    // placeholder
+    SMART_ACTION_AC_END                             = 229,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1289,6 +1291,7 @@ struct SmartAction
         {
             uint32 quickChange;
             uint32 random;
+            uint32 turnAngle;
         } orientation;
 
         struct
@@ -1376,6 +1379,21 @@ struct SmartAction
         {
             SAIBool state;
         } disable;
+
+        struct
+        {
+            uint32 scale;
+        } setScale;
+
+        struct
+        {
+            uint32 summonEntry;
+            uint32 summonDuration;
+            uint32 repetitions;
+            uint32 startAngle;
+            uint32 stepAngle;
+            uint32 dist;
+        } radialSummon;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
