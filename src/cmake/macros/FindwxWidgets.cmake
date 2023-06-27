@@ -39,8 +39,6 @@ select a configuration):
                             commonly required libs (e.g., png tiff
                             jpeg zlib regex expat).
 
-
-
 For unix style it uses the wx-config utility.  You can select between
 debug/release, unicode/ansi, universal/non-universal, and
 static/shared in the QtDialog or ccmake interfaces by turning ON/OFF
@@ -61,8 +59,6 @@ to use the base toolkit found in the /usr/local path, set the variable
 ::
 
   set(wxWidgets_CONFIG_OPTIONS --toolkit=base --prefix=/usr)
-
-
 
 The following are set after the configuration is done for both windows
 and unix style:
@@ -90,7 +86,6 @@ and unix style:
   The following environment variables can be used as hints: ``WX_CONFIG``,
   ``WXRC_CMD``.
 
-
 Sample usage:
 
 ::
@@ -102,8 +97,6 @@ Sample usage:
      # and for each of your dependent executable/library targets:
      target_link_libraries(<YourTarget> ${wxWidgets_LIBRARIES})
    endif()
-
-
 
 If wxWidgets is required (i.e., not an optional part):
 
@@ -172,7 +165,6 @@ This module defines the following :prop_tgt:`IMPORTED` targets:
 # default to "std" instead of "base core" as it is now. To implement
 # "std" will basically boil down to a FOR_EACH lib-FOUND, but maybe
 # checking whether a minimal set was found.
-
 
 # FIXME: This and all the DBG_MSG calls should be removed after the
 # module stabilizes.
