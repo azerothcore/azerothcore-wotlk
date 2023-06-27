@@ -1,0 +1,1 @@
+#include "Resources/loading.xpm"

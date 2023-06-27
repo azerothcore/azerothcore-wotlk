@@ -12,21 +12,24 @@ namespace everdawn
     class Observable
     {
     public:
-        // Instantiate one of these to allow modification.
-        // The observers will be notified when this is destroyed after the modification.
-        class Transaction
+        class Subscription
         {
+            const Observable* m_observable;
+            friend class Observable;
+            boost::signals2::connection connection;
         public:
-            explicit Transaction(Observable& parent) :
-                object(parent.object), parent(parent) {}
-            ~Transaction() { parent.changed(object); }
-            Type& object;
-
-        private:
-            Transaction(const Transaction&);    // prevent copying
-            void operator=(const Transaction&); // prevent assignment
-
-            Observable& parent;
+            explicit Subscription(const Observable* observable = nullptr)
+                : m_observable(observable)
+            {
+            }
+            void Unsubscribe()
+            {
+                if (m_observable)
+                {
+                    m_observable->changed.disconnect(connection);
+                    m_observable = nullptr;
+                }
+            }
         };
 
         void Next(Type object)
@@ -35,15 +38,17 @@ namespace everdawn
             changed(this->object);
         }
 
-        // Connect an observer to this object.
         template <typename Slot>
-        void Subscribe(const Slot& slot) { changed.connect(slot); }
+        Subscription Subscribe(const Slot& slot) const
+        {
+            auto subscription = Subscription(this);
+            subscription.connection = changed.connect(slot);
+            return subscription;
+        }
 
-        // Read-only access to the object.
         const Type& Get() const { return object; }
-
     private:
-        boost::signals2::signal<void(const Type&)> changed;
+        mutable boost::signals2::signal<void(const Type&)> changed;
         Type object;
     };
 } // namespace everdawn

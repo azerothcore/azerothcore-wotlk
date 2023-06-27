@@ -3,7 +3,6 @@
 namespace everdawn
 {
 
-
     MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
         : wxFrame(NULL, wxID_ANY, title, pos, size)
     {
@@ -20,15 +19,18 @@ namespace everdawn
 
         CreateStatusBar(3);
     }
+
     void MainFrame::OnExit(wxCommandEvent& event)
     {
         Close(true);
     }
+
     void MainFrame::OnAbout(wxCommandEvent& event)
     {
         wxMessageBox(wxT("Everdawn tool."),
             wxT("About Instance Creator"), wxOK | wxICON_INFORMATION);
     }
+
     void MainFrame::OnStatusChange(StatusChangeEvent& event)
     {
         switch (event.status.code)

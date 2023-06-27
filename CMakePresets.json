@@ -22,7 +22,7 @@
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
           "hostOS": [ "Linux" ],
-          "intelliSenseMode": "windows-clang-x64",
+          "intelliSenseMode": "linux-gcc-x64",
           "enableMicrosoftCodeAnalysis": false
         },
         "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
