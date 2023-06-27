@@ -216,6 +216,7 @@ struct boss_ahune : public ScriptedAI
             me->CastSpell(me, SPELL_EMERGE_0, false);
             // me->CastSpell(me, SPELL_AHUNE_RESURFACES, true); // done in SummonedCreatureDespawn
             me->RemoveAura(SPELL_SUBMERGE_0);
+            summons.DespawnEntry(NPC_FROZEN_CORE);
             StartPhase1();
             break;
 
