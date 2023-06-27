@@ -1,6 +1,6 @@
 #include "MainFrame.hpp"
 #include "WorldDataBaseFacade.hpp"
-#include "Models/Status.hpp"
+#include "Status.hpp"
 #include "Images.hpp"
 
 #include <wx/splash.h>

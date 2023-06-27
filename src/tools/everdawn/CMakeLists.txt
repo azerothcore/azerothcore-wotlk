@@ -20,7 +20,7 @@ foreach(EVERDAWN_TOOL_NAME ${EVERDAWN_TOOLS_BUILD_LIST})
 
     GetPathToEverdawnTool(${EVERDAWN_TOOL_NAME} EVERDAWN_SOURCE_TOOL_PATH)
 
-    unset(TOOL_PRIVATE_SOURCES)
+    unset(EVERDAWN_TOOL_PRIVATE_SOURCES)
     CollectSourceFiles(
         ${EVERDAWN_SOURCE_TOOL_PATH}
         EVERDAWN_TOOL_PRIVATE_SOURCES)
@@ -65,5 +65,17 @@ foreach(EVERDAWN_TOOL_NAME ${EVERDAWN_TOOLS_BUILD_LIST})
         FOLDER
           "tools")
 
-    install(TARGETS ${EVERDAWN_TOOL_PROJECT_NAME} DESTINATION bin)
+    get_target_property(defs ${EVERDAWN_TOOL_PROJECT_NAME} COMPILE_DEFINITIONS)
+
+    if (UNIX)
+        # Buggy visual studio 2022 cmake intelisense
+        # list(FILTER defs EXCLUDE REGEX [[^_WIN32$]])
+        # list(FILTER defs EXCLUDE REGEX [[^__WIN32__$]])
+        # list(FILTER defs EXCLUDE REGEX [[^__WXMSW__$]])
+        install(TARGETS ${EVERDAWN_TOOL_PROJECT_NAME} DESTINATION bin)
+    elseif (WIN32)
+        install(TARGETS ${EVERDAWN_TOOL_PROJECT_NAME} DESTINATION "${CMAKE_INSTALL_PREFIX}")
+    endif()
+
+    set_property(TARGET ${EVERDAWN_TOOL_PROJECT_NAME} PROPERTY COMPILE_DEFINITIONS ${defs})
 endforeach()
