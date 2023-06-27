@@ -21,8 +21,12 @@
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "hostOS": [ "Linux" ],
-          "intelliSenseMode": "linux-gcc-x64",
+          "hostOS": "Linux",
+          "intelliSenseMode": "linux-gcc-x86",
+          "intelliSenseOptions": {
+            "useCompilerDefaults": true,
+            "additionalCompilerArgs": [ "" ]
+          },
           "enableMicrosoftCodeAnalysis": false
         },
         "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {

@@ -31,6 +31,16 @@ foreach(EVERDAWN_TOOL_NAME ${EVERDAWN_TOOLS_BUILD_LIST})
        add_executable(${EVERDAWN_TOOL_PROJECT_NAME} WIN32 ${EVERDAWN_TOOL_PRIVATE_SOURCES})
     endif()
 
+    list(APPEND EVERDAWN_TOOLS_LIBS boost database ${wxWidgets_LIBRARIES})
+
+    target_include_directories(${EVERDAWN_TOOL_PROJECT_NAME}
+    SYSTEM
+    PUBLIC
+        boost
+        database
+    PRIVATE
+        ${wxWidgets_LIBRARIES})
+
     target_link_libraries(${EVERDAWN_TOOL_PROJECT_NAME}
         PUBLIC
             boost

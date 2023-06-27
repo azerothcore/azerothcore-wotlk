@@ -4,20 +4,33 @@ namespace everdawn
 {
 
     MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
-        : wxFrame(NULL, wxID_ANY, title, pos, size)
+        : wxFrame(nullptr, wxID_ANY, title, pos, size)
     {
-        wxMenu* menuFile = new wxMenu;
-
+        const auto menuFile = new wxMenu;
         menuFile->AppendSeparator();
         menuFile->Append(wxID_EXIT);
-        wxMenu* menuHelp = new wxMenu;
+
+        const auto menuHelp = new wxMenu;
         menuHelp->Append(wxID_ABOUT);
-        wxMenuBar* menuBar = new wxMenuBar;
+
+        const auto menuBar = new wxMenuBar;
         menuBar->Append(menuFile, wxT("&File"));
         menuBar->Append(menuHelp, wxT("&Help"));
-        SetMenuBar(menuBar);
 
-        CreateStatusBar(3);
+        SetMenuBar(menuBar);
+        CreateStatusBar();
+
+        const auto panel_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
+        panel_top->SetBackgroundColour(wxColor(100, 100, 200));
+
+        const auto panel_bottom = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
+        panel_bottom->SetBackgroundColour(wxColor(100, 200, 100));
+
+        const auto sizer = new wxBoxSizer(wxVERTICAL);
+        sizer->Add(panel_top, 1, wxEXPAND | wxLEFT | wxTOP | wxRIGHT, 10);
+        sizer->Add(panel_bottom, 1, wxEXPAND | wxALL, 10);
+
+        SetSizer(sizer);
     }
 
     void MainFrame::OnExit(wxCommandEvent& event)

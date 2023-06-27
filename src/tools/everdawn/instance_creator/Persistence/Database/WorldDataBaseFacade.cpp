@@ -10,11 +10,9 @@ namespace everdawn
 {
     void WorldDatabaseFacade::Load()
     {
-        m_status.Next({ StatusCode::loading, "MYSQL INIT CONNECTION" });
-
         std::thread([]()
             {
-                std::this_thread::sleep_for(std::chrono::seconds(5));
+                m_status.Next({ StatusCode::loading, "MYSQL INIT CONNECTION" });
 
                 MySQL::Library_Init();
                 m_connectionInfo = std::make_unique<MySQLConnectionInfo>("127.0.0.1;3306;everdawn;everdawn;everdawn_world");
@@ -24,13 +22,18 @@ namespace everdawn
 
                 if (error)
                 {
-                    m_status.Next({ StatusCode::error, "MYSQL CONNECTION ERROR" });
+                    std::stringstream ss;
+                    ss << "MYSQL CONNECTION ERROR CODE: " << error;
+                    m_status.Next({ StatusCode::error, ss.str().c_str() });
                     return;
                 }
 
-                auto version = m_connection->GetServerVersion();
+                m_status.Next({ StatusCode::loading, "MYSQL PREPARING STATEMENTS" });
+
+                m_connection->DoPrepareStatements();
+
                 std::stringstream ss;
-                ss << "MYSQL VERSION: " << version;
+                ss << "MYSQL VERSION: " << m_connection->GetServerVersion();
 
                 m_status.Next({ StatusCode::ready, ss.str().c_str() });
             }).detach();

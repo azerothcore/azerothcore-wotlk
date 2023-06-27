@@ -2,6 +2,7 @@
 #define EVERDAWN_WORLDDATABASEFACADE_HPP
 
 #include "MySQLConnection.h"
+#include "WorldDatabase.h"
 #include "Observable.hpp"
 #include "Status.hpp"
 
@@ -16,13 +17,11 @@ namespace everdawn
         inline static std::unique_ptr<MySQLConnectionInfo> m_connectionInfo = nullptr;
         inline static  Observable<Status> m_status;
 
-        class WorldDatabaseDecorator : public MySQLConnection
+        class WorldDatabaseDecorator : public WorldDatabaseConnection
         {
             friend class WorldDatabaseFacade;
         public:
-            WorldDatabaseDecorator(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
-
-            void DoPrepareStatements() override {}
+            WorldDatabaseDecorator(MySQLConnectionInfo& connInfo) : WorldDatabaseConnection(connInfo) {}
         };
 
     public:

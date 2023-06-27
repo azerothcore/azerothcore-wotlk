@@ -12,11 +12,10 @@
 
 namespace everdawn {
 
-    class MainFrame : public wxFrame
+    class MainFrame final : public wxFrame
     {
     public:
         MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
-
     private:
         void OnExit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
