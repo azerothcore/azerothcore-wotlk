@@ -2639,7 +2639,7 @@ public:
     {
     }
 
-    void IsSummonedBy(WorldObject* summoner) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         _scheduler.Schedule(180s, [this](TaskContext /*context*/)
         {
