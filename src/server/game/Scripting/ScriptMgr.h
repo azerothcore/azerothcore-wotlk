@@ -1480,7 +1480,7 @@ public:
      * @param zoneId Contains information about the current zone
      * @param bySpell Contains information about the spell that invoked the check
      */
-    [[nodiscard]] virtual bool OnCanPlayerFlyInZone(const Player* /*player*/, uint32 /*mapId*/, uint32 /*zoneId*/, SpellInfo const* /*bySpell*/) { return true; }
+    [[nodiscard]] virtual bool OnCanPlayerFlyInZone(Player const* /*player*/, uint32 /*mapId*/, uint32 /*zoneId*/, SpellInfo const* /*bySpell*/) { return true; }
 
     // Passive Anticheat System
     virtual void AnticheatSetSkipOnePacketForASH(Player* /*player*/, bool /*apply*/) { }
@@ -2443,7 +2443,7 @@ public: /* PlayerScript */
     bool CanSendErrorAlreadyLooted(Player* player);
     void OnAfterCreatureLoot(Player* player);
     void OnAfterCreatureLootMoney(Player* player);
-    bool OnCanPlayerFlyInZone(const Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell);
+    bool OnCanPlayerFlyInZone(Player const* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell);
 
     // Anti cheat
     void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
