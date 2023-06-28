@@ -4223,7 +4223,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (playerCount >= e.event.nearPlayer.minCount)
                     ProcessAction(e, unit);
             }
-            RecalcTimer(e, e.event.nearPlayer.minTimer, e.event.nearPlayer.maxTimer);
+            RecalcTimer(e, e.event.nearPlayer.repeatMin, e.event.nearPlayer.repeatMax);
             break;
         }
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
@@ -4243,7 +4243,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (playerCount <= e.event.nearPlayer.minCount)
                     ProcessAction(e, unit);
             }
-            RecalcTimer(e, e.event.nearPlayerNegation.minTimer, e.event.nearPlayerNegation.maxTimer);
+            RecalcTimer(e, e.event.nearPlayerNegation.repeatMin, e.event.nearPlayerNegation.repeatMax);
             break;
         }
         default:

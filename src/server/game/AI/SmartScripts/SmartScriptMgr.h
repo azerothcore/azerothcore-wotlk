@@ -206,8 +206,8 @@ enum SMART_EVENT
     /* AC Custom Events */
     SMART_EVENT_AC_START                 = 100,
 
-    SMART_EVENT_NEAR_PLAYERS             = 101,      // min, radius, first timer, min timer, max timer
-    SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // min, radius, first timer, check timer
+    SMART_EVENT_NEAR_PLAYERS             = 101,      // min, radius, first timer, repeatMin, repeatMax
+    SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // max, radius, first timer, repeatMin, repeatMax
 
     SMART_EVENT_AC_END                   = 103
 };
@@ -482,8 +482,8 @@ struct SmartEvent
             uint32 minCount;
             uint32 radius;
             uint32 firstTimer;
-            uint32 minTimer;
-            uint32 maxTimer;
+            uint32 repeatMin;
+            uint32 repeatMax;
         } nearPlayer;
 
         struct
@@ -491,7 +491,8 @@ struct SmartEvent
             uint32 minCount;
             uint32 radius;
             uint32 firstTimer;
-            uint32 checkTimer;
+            uint32 repeatMin;
+            uint32 repeatMax;
         } nearPlayerNegation;
 
         struct
