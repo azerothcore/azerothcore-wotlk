@@ -4209,19 +4209,19 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         case SMART_EVENT_NEAR_PLAYERS:
         {
             uint32 playerCount = 0;
-            ObjectVector units;
-            GetWorldObjectsInDist(units, static_cast<float>(e.event.nearPlayer.radius));
+            ObjectVector targets;
+            GetWorldObjectsInDist(targets, static_cast<float>(e.event.nearPlayer.radius));
 
-            if (!units.empty())
+            if (!targets.empty())
             {
-                for (WorldObject* unit : units)
+                for (WorldObject* target : targets)
                 {
-                    if (unit->GetTypeId() == TYPEID_PLAYER)
+                    if (IsPlayer(target))
                         playerCount++;
-                }
 
-                if (playerCount >= e.event.nearPlayer.minCount)
-                    ProcessAction(e, unit);
+                    if (playerCount >= e.event.nearPlayer.minCount)
+                        ProcessAction(e, target->ToUnit());
+                }
             }
             RecalcTimer(e, e.event.nearPlayer.repeatMin, e.event.nearPlayer.repeatMax);
             break;
@@ -4229,18 +4229,18 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
         {
             uint32 playerCount = 0;
-            ObjectVector units;
-            GetWorldObjectsInDist(units, static_cast<float>(e.event.nearPlayerNegation.radius));
+            ObjectVector targets;
+            GetWorldObjectsInDist(targets, static_cast<float>(e.event.nearPlayerNegation.radius));
 
-            if (!units.empty())
+            if (!targets.empty())
             {
-                for (WorldObject* unit : units)
+                for (WorldObject* target : targets)
                 {
-                    if (unit->GetTypeId() == TYPEID_PLAYER)
+                    if (IsPlayer(target))
                         playerCount++;
                 }
 
-                if (playerCount <= e.event.nearPlayer.minCount)
+                if (playerCount <= e.event.nearPlayerNegation.minCount)
                     ProcessAction(e, unit);
             }
             RecalcTimer(e, e.event.nearPlayerNegation.repeatMin, e.event.nearPlayerNegation.repeatMax);
