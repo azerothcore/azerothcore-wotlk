@@ -768,7 +768,7 @@ public:
             if (!FOCUSMAGIC)
                 return;
 
-            if (Unit* target = FindAffectedTarget(FOCUSMAGIC, me->GetGUID(), 70, 3))
+            if (FindAffectedTarget(FOCUSMAGIC, me->GetGUID(), 70, 3))
             {
                 fmCheckTimer = 15000;
                 return;
