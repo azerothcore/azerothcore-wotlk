@@ -48,15 +48,15 @@ namespace everdawn
     {
         switch (event.status.code)
         {
-        case StatusCode::loading:
-            this->Disable();
+        case StatusCode::Loading:
+            this->Enable();
             SetStatusText(wxString::Format(wxT("Loading! -- %s"), event.status.message), 0);
             break;
-        case StatusCode::ready:
+        case StatusCode::Ready:
             this->Enable();
             SetStatusText(wxString::Format(wxT("Ready! -- %s"), event.status.message), 0);
             break;
-        case StatusCode::error:
+        case StatusCode::Error:
             this->Enable();
             SetStatusText(wxString::Format(wxT("Error! -- %s"), event.status.message), 0);
             break;

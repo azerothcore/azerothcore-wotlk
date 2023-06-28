@@ -10,6 +10,12 @@
 
 namespace everdawn
 {
+    namespace StatusType::Database
+    {
+        constexpr int WorldDatabase = 2002;
+        constexpr int WorldDatabaseConnection = 2003;
+    }
+
     class WorldDatabaseFacade
     {
         class WorldDatabaseDecorator;

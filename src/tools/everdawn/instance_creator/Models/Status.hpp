@@ -12,9 +12,9 @@ namespace everdawn
 
     namespace StatusCode
     {
-        constexpr int loading = 1001;
-        constexpr int ready = 1002;
-        constexpr int error = 1003;
+        constexpr int Loading = 1001;
+        constexpr int Ready = 1002;
+        constexpr int Error = 1003;
     };
 
     struct Status
@@ -24,18 +24,18 @@ namespace everdawn
 
         static Status Error(const char* message)
         {
-           return { StatusCode::error, message };
+           return { StatusCode::Error, message };
         }
 
         static Status Loading(const char* message)
         {
-            return {StatusCode::loading, message };
+            return {StatusCode::Loading, message };
         }
 
 
         static Status Ready(const char* message)
         {
-            return {StatusCode::ready, message };
+            return {StatusCode::Ready, message };
         }
     };
 
