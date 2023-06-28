@@ -38,4 +38,24 @@ public:
     [[nodiscard]] uint8 getSubGroup() const { return iSubGroup; }
     void setSubGroup(uint8 pSubGroup) { iSubGroup = pSubGroup; }
 };
+
+//npcbot
+class Creature;
+
+class GroupBotReference : public Reference<Group, Creature>
+{
+    protected:
+        uint8 iSubGroup;
+        void targetObjectBuildLink() override;
+        void targetObjectDestroyLink() override;
+        void sourceObjectDestroyLink() override;
+    public:
+        GroupBotReference() : Reference<Group, Creature>(), iSubGroup(0) { }
+        ~GroupBotReference() { unlink(); }
+        GroupBotReference* next() { return (GroupBotReference*)Reference<Group, Creature>::next(); }
+        GroupBotReference const* next() const { return (GroupBotReference const*)Reference<Group, Creature>::next(); }
+        uint8 getSubGroup() const { return iSubGroup; }
+        void setSubGroup(uint8 pSubGroup) { iSubGroup = pSubGroup; }
+};
+//end npcbot
 #endif

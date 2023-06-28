@@ -2727,14 +2727,14 @@ float BotMgr::GetBotDamageModByLevel(uint8 botlevel)
     return 1.0f;
 }
 
-std::vector<Unit*> BotMgr::GetAllGroupMembers(Unit const* searcher)
+std::vector<Unit*> BotMgr::GetAllGroupMembers(Unit const* source)
 {
     std::vector<Unit*> group_members;
 
-    Group const* group = (searcher->IsNPCBot() && searcher->ToCreature()->GetBotAI()) ? searcher->ToCreature()->GetBotAI()->GetGroup() :
-        searcher->IsPlayer() ? searcher->ToPlayer()->GetGroup() : nullptr;
+    Group const* group = (source->IsNPCBot() && source->ToCreature()->GetBotAI()) ? source->ToCreature()->GetBotAI()->GetGroup() :
+        source->IsPlayer() ? source->ToPlayer()->GetGroup() : nullptr;
 
-    if (group && searcher->IsInWorld())
+    if (group && source->IsInWorld())
     {
         group_members.reserve(group->GetMembersCount());
         for (GroupReference const* ref = group->GetFirstMember(); ref != nullptr; ref = ref->next())
@@ -2742,35 +2742,14 @@ std::vector<Unit*> BotMgr::GetAllGroupMembers(Unit const* searcher)
             if (Player* pl = ref->GetSource())
                 group_members.push_back(pl);
         }
-        for (auto const& slot : group->GetMemberSlots())
+        for (GroupBotReference const* ref = group->GetFirstBotMember(); ref != nullptr; ref = ref->next())
         {
-            if (slot.guid.IsCreature())
-            {
-                if (Creature* grbot = searcher->GetMap()->GetCreature(slot.guid))
-                    group_members.push_back(grbot);
-            }
+            if (Creature* cr = ref->GetSource())
+                group_members.push_back(cr);
         }
     }
 
     return group_members;
-}
-Group* BotMgr::GetBotGroup(Creature const* bot)
-{
-    return bot->GetBotAI() ? bot->GetBotAI()->GetGroup() : nullptr;
-}
-void BotMgr::SetBotGroup(Creature const* bot, Group* group)
-{
-    bot->GetBotAI()->SetGroup(group);
-}
-void BotMgr::SetBotGroup(ObjectGuid::LowType bot_id, Group* group)
-{
-    Creature const* bot = BotDataMgr::FindBot(bot_id);
-    ASSERT(bot);
-    SetBotGroup(bot, group);
-}
-void BotMgr::SetBotGroup(ObjectGuid botguid, Group* group)
-{
-    SetBotGroup(botguid.GetEntry(), group);
 }
 
 void BotMgr::InviteBotToBG(ObjectGuid botguid, GroupQueueInfo* ginfo, Battleground* bg)

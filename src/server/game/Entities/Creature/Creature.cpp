@@ -4036,6 +4036,54 @@ bool Creature::IsWandererBot() const
     return bot_AI ? bot_AI->IsWanderer() : bot_pet_AI ? bot_pet_AI->IsWanderer() : false;
 }
 
+Group* Creature::GetBotGroup() const
+{
+    return bot_AI ? bot_AI->GetGroup() : nullptr;
+}
+void Creature::SetBotGroup(Group* group, int8 subgroup)
+{
+    if (bot_AI)
+        bot_AI->SetGroup(group, subgroup);
+}
+uint8 Creature::GetSubGroup() const
+{
+    return bot_AI ? bot_AI->GetSubGroup() : 0;
+}
+void Creature::SetSubGroup(uint8 subgroup)
+{
+    if (bot_AI)
+        bot_AI->SetSubGroup(subgroup);
+}
+
+void Creature::SetBattlegroundOrBattlefieldRaid(Group* group, int8 subgroup)
+{
+    if (bot_AI)
+        bot_AI->SetBattlegroundOrBattlefieldRaid(group, subgroup);
+}
+void Creature::RemoveFromBattlegroundOrBattlefieldRaid()
+{
+    if (bot_AI)
+        bot_AI->RemoveFromBattlegroundOrBattlefieldRaid();
+}
+Group* Creature::GetOriginalGroup() const
+{
+    return bot_AI ? bot_AI->GetOriginalGroup() : nullptr;
+}
+void Creature::SetOriginalGroup(Group* group, int8 subgroup)
+{
+    if (bot_AI)
+        bot_AI->SetOriginalGroup(group, subgroup);
+}
+uint8 Creature::GetOriginalSubGroup() const
+{
+    return bot_AI ? bot_AI->GetOriginalSubGroup() : 0;
+}
+void Creature::SetOriginalSubGroup(uint8 subgroup)
+{
+    if (bot_AI)
+        bot_AI->SetOriginalSubGroup(subgroup);
+}
+
 Battleground* Creature::GetBotBG() const
 {
     return bot_AI ? bot_AI->GetBG() : nullptr;

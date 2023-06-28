@@ -188,21 +188,13 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* group, Battle
             ginfo->Players.emplace(member->GetGUID());
         });
         //npcbot: queue bots (bg only)
-        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        if (!arenaTeamId)
         {
-            Player const* member = itr->GetSource();
-            if (!member)
-                continue;   // this should never happen
-            if (arenaTeamId || !member->HaveBot())
-                continue;
-
-            BotMap const* map = member->GetBotMgr()->GetBotMap();
-            for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
+            for (GroupBotReference* itr = group->GetFirstBotMember(); itr != nullptr; itr = itr->next())
             {
-                Creature const* bot = itr->second;
-                if (!bot || !group->IsMember(bot->GetGUID()))
+                Creature const* bot = itr->GetSource();
+                if (!bot)
                     continue;
-
                 m_QueuedPlayers[bot->GetGUID()] = ginfo;
                 ginfo->Players.emplace(bot->GetGUID());
             }

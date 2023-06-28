@@ -926,6 +926,7 @@ void BotDataMgr::LoadNpcBotGroupData()
         Field* fields = result->Fetch();
 
         uint32 creature_id = fields[1].Get<uint32>();
+        uint8 subgroup = fields[3].Get<uint8>();
         if (!SelectNpcBotExtras(creature_id))
         {
             LOG_WARN("server.loading", "Table `characters_npcbot_group_member` contains non-NPCBot creature {} which will not be loaded!", creature_id);
@@ -934,8 +935,8 @@ void BotDataMgr::LoadNpcBotGroupData()
 
         if (Group* group = sGroupMgr->GetGroupByGUID(fields[0].Get<uint32>()))
         {
-            group->LoadCreatureMemberFromDB(creature_id, fields[2].Get<uint8>(), fields[3].Get<uint8>(), fields[4].Get<uint8>());
-            BotMgr::SetBotGroup(creature_id, group);
+            group->LoadCreatureMemberFromDB(creature_id, fields[2].Get<uint8>(), subgroup, fields[4].Get<uint8>());
+            const_cast<Creature*>(ASSERT_NOTNULL(BotDataMgr::FindBot(creature_id)))->SetBotGroup(group, subgroup);
         }
         else
             LOG_ERROR("misc", "BotDataMgr::LoadNpcBotGroupData: Consistency failed, can't find group (storage id: {})", fields[0].Get<uint32>());

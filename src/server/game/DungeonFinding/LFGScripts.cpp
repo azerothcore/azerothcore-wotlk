@@ -116,6 +116,12 @@ namespace lfg
                 if (Player* member = itr->GetSource())
                     player->GetSession()->SendNameQueryOpcode(member->GetGUID());
 
+            //npcbot
+            for (GroupBotReference* itr = group->GetFirstBotMember(); itr != nullptr; itr = itr->next())
+                if (Creature* member = itr->GetSource())
+                    player->GetSession()->SendNameQueryOpcode(member->GetGUID());
+            //end npcbot
+
             if (group->IsLfgWithBuff())
                 player->CastSpell(player, LFG_SPELL_LUCK_OF_THE_DRAW, true);
         }

@@ -273,7 +273,6 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature)
 
     _groupUpdateMask = 0;
     _auraRaidUpdateMask = 0;
-    _group = nullptr;
     _bg = nullptr;
 
     opponent = nullptr;
@@ -1361,50 +1360,26 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
 
     if (IAmFree())
     {
-        //heals
-        //if (HealTarget(me, diff))
-        //    return;
-        //if (botPet)
-        //{
-        //    if (botPet->IsAlive())
-        //    {
-        //        if (HealTarget(botPet, diff))
-        //            return;
-        //    }
-        //}
-
-        bool omniHostile = (me->GetFaction() == 14 || me->HasAura(BERSERK));
-
-        //if (!omniHostile && HasRole(BOT_ROLE_HEAL))
-        //{
-        //    std::list<Unit*> targets1;
-        //    GetNearbyFriendlyTargetsList(targets1, 38);
-        //    targets1.remove_if(BOTAI_PRED::HealTargetExclude());
-        //    if (!targets1.empty() && HealTarget(Acore::Containers::SelectRandomContainerElement(targets1), diff))
-        //        return;
-        //}
-
-        //buffs
         if (BuffTarget(me, diff))
             return;
 
         if (HealTarget(me, diff))
             return;
 
-        if (!omniHostile)
-        {
-            std::list<Unit*> targets2;
-            GetNearbyFriendlyTargetsList(targets2, 30);
-            targets2.remove_if(BOTAI_PRED::BuffTargetExclude());
-            targets2.remove_if([this](Unit const* unit) {
-                return unit->GetTypeId() != TYPEID_PLAYER && !(IsWanderer() && unit->IsNPCBot() && unit->ToCreature()->GetBotAI()->IsWanderer());
-            });
-            if (!targets2.empty() && BuffTarget(targets2.size() == 1 ? targets2.front() : Acore::Containers::SelectRandomContainerElement(targets2), diff))
-                return;
-            for (std::list<Unit*>::const_iterator itr = targets2.begin(); itr != targets2.end(); ++itr)
-                if (GetHealthPCT(*itr) < 95 && urand(1, 100) <= (30 + 30*uint32(GetBG() != nullptr)) && HealTarget(*itr, diff))
-                    return;
-        }
+        if (me->GetFaction() == 14 || me->HasAura(BERSERK))
+            return;
+
+        std::list<Unit*> targets2;
+        GetNearbyFriendlyTargetsList(targets2, 30);
+        targets2.remove_if(BOTAI_PRED::BuffTargetExclude());
+        targets2.remove_if([this](Unit const* unit) {
+            return unit->GetTypeId() != TYPEID_PLAYER && !(IsWanderer() && unit->IsNPCBot() && unit->ToCreature()->GetBotAI()->IsWanderer());
+        });
+        if (!targets2.empty() && BuffTarget(targets2.size() == 1 ? targets2.front() : Acore::Containers::SelectRandomContainerElement(targets2), diff))
+            return;
+        for (std::list<Unit*>::const_iterator itr = targets2.begin(); itr != targets2.end(); ++itr)
+            if (GetHealthPCT(*itr) < 95 && urand(1, 100) <= (30 + 30*uint32(GetBG() != nullptr)) && HealTarget(*itr, diff))
+                break;
 
         return;
     }
@@ -18536,24 +18511,11 @@ void bot_ai::OnWanderNodeReached()
                         ASSERT(obj != nullptr);
 
                         bool already_used = false;
-                        Group const* gr = bg->GetBgRaid(teamId);
-                        ASSERT(gr != nullptr);
-                        for (auto const& slot : gr->GetMemberSlots())
+                        for (Unit const* member : BotMgr::GetAllGroupMembers(me))
                         {
-                            if (slot.guid == me->GetGUID())
+                            if (member->GetGUID() == me->GetGUID())
                                 continue;
-                            Unit const* gunit = nullptr;
-                            if (slot.guid.IsPlayer())
-                            {
-                                if (Player const* other_player = ObjectAccessor::FindPlayer(slot.guid))
-                                    gunit = other_player->ToUnit();
-                            }
-                            else
-                            {
-                                if (Creature const* other_bot = bg->GetBgMap()->GetCreature(slot.guid))
-                                    gunit = other_bot->ToUnit();
-                            }
-                            if (Spell const* curSpell = gunit ? gunit->GetCurrentSpell(CURRENT_GENERIC_SPELL) : nullptr)
+                            if (Spell const* curSpell = member->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                             {
                                 if (curSpell->m_spellInfo->Id == SPELL_OPENING_FLAG && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID())
                                 {
@@ -18562,7 +18524,6 @@ void bot_ai::OnWanderNodeReached()
                                 }
                             }
                         }
-
                         if (already_used)
                             break;
 
@@ -19529,6 +19490,49 @@ void bot_ai::UpdateContestedPvP()
 {
     if (_contestedPvPTimer > 0 && _contestedPvPTimer <= lastdiff && !me->IsInCombat())
         ResetContestedPvP();
+}
+
+void bot_ai::SetGroup(Group* group, int8 subgroup)
+{
+    if (group == nullptr)
+        _group.unlink();
+    else
+    {
+        // never use SetGroup without a subgroup unless you specify NULL for group
+        ASSERT(subgroup >= 0);
+        _group.link(group, me);
+        _group.setSubGroup((uint8)subgroup);
+    }
+
+    me->UpdateObjectVisibility(false);
+}
+void bot_ai::SetBattlegroundOrBattlefieldRaid(Group* group, int8 subgroup)
+{
+    SetOriginalGroup(GetGroup(), GetSubGroup());
+    _group.unlink();
+    _group.link(group, me);
+    _group.setSubGroup((uint8)subgroup);
+}
+void bot_ai::RemoveFromBattlegroundOrBattlefieldRaid()
+{
+    _group.unlink();
+    if (Group* group = GetOriginalGroup())
+    {
+        _group.link(group, me);
+        _group.setSubGroup(GetOriginalSubGroup());
+    }
+    SetOriginalGroup(nullptr, -1);
+}
+void bot_ai::SetOriginalGroup(Group* group, int8 subgroup)
+{
+    if (group == nullptr)
+        _originalGroup.unlink();
+    else
+    {
+        ASSERT(subgroup >= 0);
+        _originalGroup.link(group, me);
+        _originalGroup.setSubGroup((uint8)subgroup);
+    }
 }
 
 void bot_ai::SendUpdateToOutOfRangeBotGroupMembers()
