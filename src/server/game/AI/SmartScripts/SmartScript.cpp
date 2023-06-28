@@ -4208,34 +4208,42 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             break;
         case SMART_EVENT_NEAR_PLAYERS:
         {
+            uint32 playerCount = 0;
             ObjectVector units;
             GetWorldObjectsInDist(units, static_cast<float>(e.event.nearPlayer.radius));
 
             if (!units.empty())
             {
-                if (!unit || unit->GetTypeId() != TYPEID_PLAYER)
-                    return;
+                for (WorldObject* unit : units)
+                {
+                    if (unit->GetTypeId() == TYPEID_PLAYER)
+                        playerCount++;
+                }
 
-                if (units.size() >= e.event.nearPlayer.minCount)
+                if (playerCount >= e.event.nearPlayer.minCount)
                     ProcessAction(e, unit);
             }
-            RecalcTimer(e, e.event.nearPlayer.checkTimer, e.event.nearPlayer.checkTimer);
+            RecalcTimer(e, e.event.nearPlayer.minTimer, e.event.nearPlayer.maxTimer);
             break;
         }
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
         {
+            uint32 playerCount = 0;
             ObjectVector units;
             GetWorldObjectsInDist(units, static_cast<float>(e.event.nearPlayerNegation.radius));
 
             if (!units.empty())
             {
-                if (!unit || unit->GetTypeId() != TYPEID_PLAYER)
-                    return;
+                for (WorldObject* unit : units)
+                {
+                    if (unit->GetTypeId() == TYPEID_PLAYER)
+                        playerCount++;
+                }
 
-                if (units.size() < e.event.nearPlayerNegation.minCount)
+                if (playerCount <= e.event.nearPlayer.minCount)
                     ProcessAction(e, unit);
             }
-            RecalcTimer(e, e.event.nearPlayerNegation.checkTimer, e.event.nearPlayerNegation.checkTimer);
+            RecalcTimer(e, e.event.nearPlayerNegation.minTimer, e.event.nearPlayerNegation.maxTimer);
             break;
         }
         default:
