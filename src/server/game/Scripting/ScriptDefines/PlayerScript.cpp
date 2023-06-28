@@ -1009,7 +1009,7 @@ void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, 
 void ScriptMgr::OnUpdateGatheringSkill(Player *player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32 &gain) {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
-        script->OnUpdateGatheringSkill(player, skillId, gray, green, yellow, currentLevel, gain);
+        script->OnUpdateGatheringSkill(player, skillId, currentLevel, gray, green, yellow, gain);
     });
 }
 
