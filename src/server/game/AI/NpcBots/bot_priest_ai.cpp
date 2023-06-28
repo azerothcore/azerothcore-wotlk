@@ -193,218 +193,110 @@ public:
 
         void CheckHymnOfHope(uint32 diff)
         {
-            if (!IsSpellReady(HYMN_OF_HOPE_1, diff) || IAmFree() || Rand() > 45 || IsCasting() || IsTank())
+            if (!IsSpellReady(HYMN_OF_HOPE_1, diff) || Rand() > 45 || IsCasting() || IsTank())
                 return;
 
-            Group const* gr = master->GetGroup();
+            Group const* gr = !IAmFree() ? master->GetGroup() : GetGroup();
             if (!gr)
                 return;
 
             uint8 LMPcount = 0;
-            for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
+            for (Unit const* member : BotMgr::GetAllGroupMembers(gr))
             {
-                Player const* player = itr->GetSource();
-                if (!player || me->GetMap() != player->FindMap())
+                if (me->GetMap() != member->FindMap() || !member->IsAlive() || !member->IsInCombat() ||
+                    me->GetDistance(member) > 40 || GetManaPCT(member) > (HasRole(BOT_ROLE_HEAL) ? 10 : 50) ||
+                    (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
+                    member->GetAuraEffect(SPELL_AURA_MOD_INCREASE_ENERGY, SPELLFAMILY_PRIEST, 0x0, 0x0, 0x10))
                     continue;
-                if (player->IsAlive() && player->IsInCombat() && me->GetDistance(player) < 40 &&
-                    GetManaPCT(player) < (HasRole(BOT_ROLE_HEAL) ? 10 : 50) &&
-                    !player->GetAuraEffect(SPELL_AURA_MOD_INCREASE_ENERGY, SPELLFAMILY_PRIEST, 0x0, 0x0, 0x10))
-                    if (++LMPcount > 2)
-                        break;
-
-                if (!player->HaveBot())
-                    continue;
-                BotMap const* map = player->GetBotMgr()->GetBotMap();
-                for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                {
-                    Creature const* bot = it->second;
-                    if (bot->IsInWorld() && bot->IsAlive() && bot->IsInCombat() && me->GetDistance(bot) < 40 &&
-                        GetManaPCT(bot) < (HasRole(BOT_ROLE_HEAL) ? 10 : 50) &&
-                        !bot->GetAuraEffect(SPELL_AURA_MOD_INCREASE_ENERGY, SPELLFAMILY_PRIEST, 0x0, 0x0, 0x10))
-                        if (++LMPcount > 2)
-                            break;
-                }
-                if (LMPcount > 2)
+                if (++LMPcount > 2)
                     break;
             }
+
             if (LMPcount > 2 && doCast(me, GetSpell(HYMN_OF_HOPE_1)))
                 return;
         }
 
         bool MassGroupHeal(uint32 diff)
         {
-            if (!HasRole(BOT_ROLE_HEAL)) return false;
-            if (IAmFree() || !master->GetGroup()) return false;
-            if (IsCasting()) return false;
-            if (Rand() > 65 + 40 * me->GetMap()->IsRaid()) return false;
+            if (!HasRole(BOT_ROLE_HEAL) || IsCasting() || Rand() > (65 + 40 * me->GetMap()->IsRaid()))
+                return false;
 
-            Group const* gr = master->GetGroup();
-            if (IsSpellReady(DIVINE_HYMN_1, diff, false))
+            Group const* gr = !IAmFree() ? master->GetGroup() : GetGroup();
+            if (!gr)
+                return false;
+
+            bool canHymn = IsSpellReady(DIVINE_HYMN_1, diff, false);
+            bool canPray = !!GetSpell(PRAYER_OF_HEALING_1);
+            bool canCirc = IsSpellReady(CIRCLE_OF_HEALING_1, diff, false);
+
+            uint8 LHPcount1, LHPcount2, LHPcount3;
+            LHPcount1 = LHPcount2 = LHPcount3 = 0;
+            uint8 lowestPCT = 100;
+            Unit* castTarget = nullptr;
+
+            for (Unit* member : BotMgr::GetAllGroupMembers(gr))
             {
-                uint8 LHPcount = 0;
-                for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
+                if (me->GetMap() != member->FindMap() || !member->IsAlive() || !member->IsInCombat() ||
+                    member->isPossessed() || member->IsCharmed() || (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
+                    member->GetAuraEffect(SPELL_AURA_MOD_INCREASE_ENERGY, SPELLFAMILY_PRIEST, 0x0, 0x0, 0x10))
+                    continue;
+
+                float dist = me->GetDistance(member);
+                uint8 pct = GetHealthPCT(member);
+                if (canHymn && pct < std::min<uint32>(80, 50 + member->getAttackers().size()*10) && GetLostHP(member) > 4000 && dist < 40)
                 {
-                    Player const* tPlayer = itr->GetSource();
-                    if (!tPlayer || me->GetMap() != tPlayer->FindMap() || tPlayer->isPossessed() || tPlayer->IsCharmed())
-                        continue;
-                    if (tPlayer->IsAlive() && tPlayer->IsInCombat() && me->GetDistance(tPlayer) < 48)
-                    {
-                        uint32 pct = 50 + tPlayer->getAttackers().size()*10;
-                        pct = pct < 80 ? pct : 80;
-                        if (GetHealthPCT(tPlayer) < pct && GetLostHP(tPlayer) > 4000)
-                            if (++LHPcount > 2)
-                                break;
-                    }
-                    if (!tPlayer->HaveBot())
-                        continue;
-                    BotMap const* map = tPlayer->GetBotMgr()->GetBotMap();
-                    for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                    {
-                        Creature const* bot = it->second;
-                        if (bot && bot->IsAlive() && bot->IsInCombat() && GetHealthPCT(bot) < 60 &&
-                            GetLostHP(bot) > 4000 && me->GetDistance(bot) < 48)
-                            if (++LHPcount > 2)
-                                break;
-                    }
-                    if (LHPcount > 2)
+                    if (++LHPcount1 > 2)
                         break;
                 }
-                if (LHPcount > 2 && doCast(me, GetSpell(DIVINE_HYMN_1)))
+                if (canPray && pct < 65 && dist < 36)
+                {
+                    if (++LHPcount2 > 3)
+                        break;
+                }
+                if (canCirc && pct < 85 && dist < 40 && (!castTarget || castTarget->GetDistance(member) < 18))
+                {
+                    if (++LHPcount3 > 1)
+                        break;
+                    if (pct < lowestPCT)
+                    {
+                        lowestPCT = pct;
+                        castTarget = member;
+                    }
+                }
+            }
+
+            if (LHPcount1 > 2 && doCast(me, GetSpell(DIVINE_HYMN_1)))
+                return true;
+            if (LHPcount2 > 3)
+            {
+                if (me->IsInCombat() && IsSpellReady(INNER_FOCUS_1, diff) && GetManaPCT(me) < 70 &&
+                    doCast(me, GetSpell(INNER_FOCUS_1)))
+                {}
+                if (doCast(me, GetSpell(PRAYER_OF_HEALING_1)))
                     return true;
             }
-            if (GetSpell(PRAYER_OF_HEALING_1))
-            {
-                uint8 LHPcount = 0;
-                for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
-                {
-                    //uint8 lowestPCT = 100;
-                    Player* tPlayer = itr->GetSource();
-                    if (!tPlayer || me->GetMap() != tPlayer->FindMap() || tPlayer->isPossessed() || tPlayer->IsCharmed())
-                        continue;
-                    if (tPlayer->IsAlive() && GetHealthPCT(tPlayer) < 65 && me->GetDistance(tPlayer) < 36)
-                        if (++LHPcount > 3)
-                            break;
-                    if (!tPlayer->HaveBot())
-                        continue;
-                    BotMap const* map = tPlayer->GetBotMgr()->GetBotMap();
-                    for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                    {
-                        Creature* bot = it->second;
-                        if (bot->IsInWorld() && bot->IsAlive() && GetHealthPCT(bot) < 65 && me->GetDistance(bot) < 36)
-                            if (++LHPcount > 3)
-                                break;
-                    }
-                    if (LHPcount > 3)
-                        break;
-                }
-
-                if (LHPcount > 3)
-                {
-                    if (me->IsInCombat() && IsSpellReady(INNER_FOCUS_1, diff) && GetManaPCT(me) < 70 &&
-                        doCast(me, GetSpell(INNER_FOCUS_1)))
-                    {}
-                    if (doCast(me, GetSpell(PRAYER_OF_HEALING_1)))
-                        return true;
-                }
-            }
-            if (IsSpellReady(CIRCLE_OF_HEALING_1, diff))
-            {
-                Unit* castTarget = nullptr;
-                uint8 LHPcount = 0;
-                for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
-                {
-                    uint8 lowestPCT = 100;
-                    Player* tPlayer = itr->GetSource();
-                    if (!tPlayer || me->GetMap() != tPlayer->FindMap() || tPlayer->isPossessed() || tPlayer->IsCharmed())
-                        continue;
-                    if (GetHealthPCT(tPlayer) < 85 && me->GetDistance(tPlayer) < 40 &&
-                        (!castTarget || castTarget->GetDistance(tPlayer) < 18))
-                    {
-                        ++LHPcount;
-                        if (GetHealthPCT(tPlayer) < lowestPCT)
-                        {
-                            lowestPCT = GetHealthPCT(tPlayer);
-                            castTarget = tPlayer;
-                        }
-                    }
-                    if (LHPcount > 1)
-                        break;
-                    if (!tPlayer->HaveBot())
-                        continue;
-                    BotMap const* map = tPlayer->GetBotMgr()->GetBotMap();
-                    for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                    {
-                        Creature* bot = it->second;
-                        if (bot && bot->IsInWorld() && GetHealthPCT(bot) < 85 && me->GetDistance(bot) < 40 &&
-                            (!castTarget || castTarget->GetDistance(bot) < 18))
-                        {
-                            ++LHPcount;
-                            if (GetHealthPCT(bot) < lowestPCT)
-                            {
-                                lowestPCT = GetHealthPCT(bot);
-                                castTarget = bot;
-                            }
-                        }
-                        if (LHPcount > 1)
-                            break;
-                    }
-                }
-
-                if (LHPcount > 1 && castTarget && doCast(castTarget, GetSpell(CIRCLE_OF_HEALING_1)))
-                    return true;
-            }
+            if (LHPcount3 > 1 && castTarget && doCast(castTarget, GetSpell(CIRCLE_OF_HEALING_1)))
+                return true;
 
             return false;
         }
 
         bool ShieldGroup(uint32 diff)
         {
-            if (GC_Timer > diff || IAmFree() || IsCasting()) return false;
-            if (!IsSpellReady(PW_SHIELD_1, diff)) return false;
-            if (Rand() > 65 + 100 * (me->GetMap()->IsRaid())) return false;
-            if (me->GetLevel() >= 30 && _spec != BOT_SPEC_PRIEST_DISCIPLINE &&
+            if (!IsSpellReady(PW_SHIELD_1, false, diff) || IsCasting() || Rand() > 65 + 100 * (me->GetMap()->IsRaid()))
+                return false;
+            if (!IAmFree() && !(me->GetLevel() >= 30 && _spec == BOT_SPEC_PRIEST_DISCIPLINE) &&
                 master->GetBotMgr()->HasBotWithSpec(BOT_SPEC_PRIEST_DISCIPLINE))
                 return false;
 
-            Group const* gr = master->GetGroup();
-            Unit* u = master;
+            Group const* gr = !IAmFree() ? master->GetGroup() : GetGroup();
             if (!gr)
             {
+                Unit* u = master;
                 if (u->IsAlive() && !u->getAttackers().empty() && (IsTank(u) || GetHealthPCT(u) < 75) && me->GetDistance(u) < 40 &&
                     ShieldTarget(u, diff))
                     return true;
-                BotMap const* map = master->GetBotMgr()->GetBotMap();
-                for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
-                {
-                    u = itr->second;
-                    if (u->IsAlive() && !u->getAttackers().empty() && !u->ToCreature()->IsTempBot() &&
-                        (IsTank(u) || GetHealthPCT(u) < 75) && me->GetDistance(u) < 40 &&
-                        ShieldTarget(u, diff))
-                        return true;
-                }
-                for (Unit::ControlSet::const_iterator itr = master->m_Controlled.begin(); itr != master->m_Controlled.end(); ++itr)
-                {
-                    u = *itr;
-                    if (!u || !u->IsPet() || !u->IsInWorld() || me->GetMap() != u->FindMap() || u->IsTotem()) continue;
-                    if (u->IsAlive() && !u->getAttackers().empty() &&
-                        !(u->GetTypeId() == TYPEID_UNIT && u->ToCreature()->IsTempBot()) &&
-                        (IsTank(u) || GetHealthPCT(u) < 75) && me->GetDistance(u) < 40 &&
-                        ShieldTarget(u, diff))
-                        return true;
-                }
-                return false;
-            }
-
-            for (GroupReference const* gitr = gr->GetFirstMember(); gitr != nullptr; gitr = gitr->next())
-            {
-                Player* tPlayer = gitr->GetSource();
-                if (!tPlayer || me->GetMap() != tPlayer->FindMap() || tPlayer->isPossessed() || tPlayer->IsCharmed())
-                    continue;
-                u = tPlayer;
-                if (u->IsAlive() && !u->getAttackers().empty() && (IsTank(u) || GetHealthPCT(u) < 75) && me->GetDistance(u) < 40 &&
-                    ShieldTarget(u, diff))
-                    return true;
-                if (tPlayer->HaveBot())
+                if (!IAmFree())
                 {
                     BotMap const* map = master->GetBotMgr()->GetBotMap();
                     for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
@@ -415,16 +307,33 @@ public:
                             ShieldTarget(u, diff))
                             return true;
                     }
+                    for (Unit::ControlSet::const_iterator itr = master->m_Controlled.begin(); itr != master->m_Controlled.end(); ++itr)
+                    {
+                        u = *itr;
+                        if (!u || !u->IsPet() || me->GetMap() != u->FindMap())
+                            continue;
+                        if (u->IsAlive() && !u->getAttackers().empty() && (IsTank(u) || GetHealthPCT(u) < 75) && me->GetDistance(u) < 40 &&
+                            ShieldTarget(u, diff))
+                            return true;
+                    }
                 }
-                for (Unit::ControlSet::const_iterator itr = tPlayer->m_Controlled.begin(); itr != tPlayer->m_Controlled.end(); ++itr)
+            }
+            else
+            {
+                std::vector<Unit*> members = BotMgr::GetAllGroupMembers(gr);
+                for (uint8 i = 0; i < 2; ++i)
                 {
-                    u = *itr;
-                    if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || u->IsTotem()) continue;
-                    if (u->IsAlive() && !u->getAttackers().empty() &&
-                        !(u->GetTypeId() == TYPEID_UNIT && u->ToCreature()->IsTempBot()) &&
-                        (IsTank(u) || GetHealthPCT(u) < 75) && me->GetDistance(u) < 40 &&
-                        ShieldTarget(u, diff))
-                        return true;
+                    for (Unit* member : members)
+                    {
+                        if (!(i == 0 ? member->IsPlayer() : member->IsNPCBot()) || me->GetMap() != member->FindMap() ||
+                            !member->IsAlive() || me->GetDistance(member) > 40 || member->isPossessed() || member->IsCharmed() || 
+                            member->getAttackers().empty() || (!IsTank(member) && GetHealthPCT(member) > 75) ||
+                            (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
+                            member->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 0x0, 0x80000, 0x0))
+                            continue;
+                        if (ShieldTarget(member, diff))
+                            return true;
+                    }
                 }
             }
             return false;
@@ -434,8 +343,6 @@ public:
         {
             if (!IsSpellReady(PW_SHIELD_1, diff) || IsCasting())
                 return false;
-            //if (target->HasAura(WEAKENED_SOUL_DEBUFF) || HasAuraName(target, PW_SHIELD_1))
-            //    return false;
             if (target->HasAuraTypeWithFamilyFlags(SPELL_AURA_MECHANIC_IMMUNITY, SPELLFAMILY_PRIEST, 0x20000000) ||
                 target->HasAuraTypeWithFamilyFlags(SPELL_AURA_SCHOOL_ABSORB, SPELLFAMILY_PRIEST, 0x1))
                 return false;
@@ -910,41 +817,27 @@ public:
 
         void CheckMending(uint32 diff)
         {
-            if (Mend_Timer > diff || !HasRole(BOT_ROLE_HEAL) || !IsSpellReady(PRAYER_OF_MENDING_1, diff) ||
-                IAmFree() || !master->GetGroup() || IsCasting() || Rand() > 75)
+            if (Mend_Timer > diff || !IsSpellReady(PRAYER_OF_MENDING_1, diff) || !HasRole(BOT_ROLE_HEAL) || IsCasting() || Rand() > 75)
                 return;
 
             Mend_Timer = urand(1000, 3000);
 
-            uint32 MENDING_AURA = InitSpell(me, PRAYER_OF_MENDING_AURA_1); //always valid
+            Group const* gr = !IAmFree() ? master->GetGroup() : GetGroup();
+            if (!gr)
+                return;
+
+            uint32 MENDING_AURA = InitSpell(me, PRAYER_OF_MENDING_AURA_1);
             if (FindAffectedTarget(MENDING_AURA, me->GetGUID(), 70, 4))
                 return;
 
-            Group const* gr = master->GetGroup();
-            for (GroupReference const* gitr = gr->GetFirstMember(); gitr != nullptr; gitr = gitr->next())
+            for (Unit* member : BotMgr::GetAllGroupMembers(gr))
             {
-                Player* player = gitr->GetSource();
-                if (player && player->IsAlive() && !player->getAttackers().empty() &&
-                    IsTank(player) && GetHealthPCT(player) < 85 && me->IsWithinDistInMap(player, 40) &&
-                    !player->HasAuraType(SPELL_AURA_RAID_PROC_FROM_CHARGE_WITH_VALUE))
+                if (me->GetMap() == member->FindMap() && member->IsAlive() && !member->getAttackers().empty() &&
+                    (IsTank(member) || GetBG()) && GetHealthPCT(member) < 85 && me->IsWithinDistInMap(member, 40) &&
+                    !member->HasAuraType(SPELL_AURA_RAID_PROC_FROM_CHARGE_WITH_VALUE))
                 {
-                    if (doCast(player, GetSpell(PRAYER_OF_MENDING_1)))
+                    if (doCast(member, GetSpell(PRAYER_OF_MENDING_1)))
                         return;
-                }
-
-                if (player->HaveBot())
-                {
-                    BotMap const* map = player->GetBotMgr()->GetBotMap();
-                    for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
-                    {
-                        if (gr->IsMember(itr->second->GetGUID()) && itr->second->IsAlive() && !itr->second->getAttackers().empty() &&
-                            IsTank(itr->second) && GetHealthPCT(player) < 85 && me->IsWithinDistInMap(itr->second, 40) &&
-                            !itr->second->HasAuraType(SPELL_AURA_RAID_PROC_FROM_CHARGE_WITH_VALUE))
-                        {
-                            if (doCast(itr->second, GetSpell(PRAYER_OF_MENDING_1)))
-                                return;
-                        }
-                    }
                 }
             }
         }

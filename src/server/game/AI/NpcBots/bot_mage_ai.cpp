@@ -773,86 +773,44 @@ public:
                 fmCheckTimer = 15000;
                 return;
             }
+
+            std::set<Unit*> targets;
+            if (Group const* gr = master->GetGroup())
+            {
+                std::vector<Unit*> members = BotMgr::GetAllGroupMembers(gr);
+                for (uint8 i = 0; i < 3 && !targets.empty(); ++i)
+                {
+                    for (Unit* member : members)
+                    {
+                        if (!(i == 0 ? member->IsPlayer() : member->IsNPCBot()) || me->GetMap() != member->FindMap() ||
+                            !member->IsAlive() || member->GetPowerType() != POWER_MANA || me->GetExactDist(member) > 30 ||
+                            member->HasAura(FOCUSMAGIC))
+                            continue;
+                        if (i > 0)
+                        {
+                            Creature const* bot = member->ToCreature();
+                            if (bot->GetBotAI()->HasRole(BOT_ROLE_TANK) ||
+                                bot->GetBotClass() == BOT_CLASS_BM || bot->GetBotClass() == BOT_CLASS_HUNTER ||
+                                bot->GetBotClass() == BOT_CLASS_SPELLBREAKER || bot->GetBotClass() == BOT_CLASS_DARK_RANGER ||
+                                bot->GetBotClass() == BOT_CLASS_SEA_WITCH)
+                                continue;
+                            if (i < 2 && bot->GetBotAI()->HasRole(BOT_ROLE_DPS))
+                                continue;
+                        }
+                        targets.insert(member);
+                    }
+                }
+            }
             else
             {
-                Group const* pGroup = master->GetGroup();
-                if (!pGroup)
-                {
-                    if (master->GetPowerType() == POWER_MANA && me->GetExactDist(master) < 30 &&
-                        !master->HasAura(FOCUSMAGIC))
-                        target = master;
-                }
-                else
-                {
-                    for (GroupReference const* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    {
-                        Player* pPlayer = itr->GetSource();
-                        if (!pPlayer || !pPlayer->IsInWorld() || !pPlayer->IsAlive()) continue;
-                        if (me->GetMapId() != pPlayer->GetMapId()) continue;
-                        if (pPlayer->GetPowerType() == POWER_MANA && me->GetExactDist(pPlayer) < 30 &&
-                            !pPlayer->HasAura(FOCUSMAGIC))
-                        {
-                            target = pPlayer;
-                            break;
-                        }
-                    }
-                    //damaging bots
-                    if (!target)
-                    {
-                        for (GroupReference const* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-                        {
-                            Player* pPlayer = itr->GetSource();
-                            if (!pPlayer || !pPlayer->IsInWorld() || !pPlayer->HaveBot()) continue;
-                            if (me->GetMapId() != pPlayer->GetMapId()) continue;
-                            BotMap const* map = pPlayer->GetBotMgr()->GetBotMap();
-                            for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                            {
-                                Creature* cre = it->second;
-                                if (!cre || !cre->IsInWorld() || cre == me || !cre->IsAlive() ||
-                                    cre->GetPowerType() != POWER_MANA || cre->GetBotAI()->HasRole(BOT_ROLE_TANK) ||
-                                    cre->GetBotClass() == BOT_CLASS_BM || cre->GetBotClass() == BOT_CLASS_HUNTER ||
-                                    cre->GetBotClass() == BOT_CLASS_SPELLBREAKER || cre->GetBotClass() == BOT_CLASS_DARK_RANGER ||
-                                    cre->GetBotClass() == BOT_CLASS_SEA_WITCH)
-                                    continue;
-                                if (cre->GetBotAI()->HasRole(BOT_ROLE_DPS) && me->GetExactDist(cre) < 30 &&
-                                    !cre->HasAura(FOCUSMAGIC))
-                                {
-                                    target = cre;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    //any bot
-                    if (!target)
-                    {
-                        for (GroupReference const* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-                        {
-                            Player* pPlayer = itr->GetSource();
-                            if (!pPlayer || !pPlayer->IsInWorld() || !pPlayer->HaveBot()) continue;
-                            if (me->GetMapId() != pPlayer->GetMapId()) continue;
-                            BotMap const* map = pPlayer->GetBotMgr()->GetBotMap();
-                            for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                            {
-                                Creature* cre = it->second;
-                                if (!cre || !cre->IsInWorld() || cre == me || !cre->IsAlive() ||
-                                    cre->GetPowerType() != POWER_MANA || cre->GetBotAI()->HasRole(BOT_ROLE_TANK) ||
-                                    cre->GetBotClass() == BOT_CLASS_BM || cre->GetBotClass() == BOT_CLASS_HUNTER ||
-                                    cre->GetBotClass() == BOT_CLASS_SPELLBREAKER || cre->GetBotClass() == BOT_CLASS_DARK_RANGER ||
-                                    cre->GetBotClass() == BOT_CLASS_SEA_WITCH)
-                                    continue;
-                                if (me->GetExactDist(cre) < 30 &&
-                                    !cre->HasAura(FOCUSMAGIC))
-                                {
-                                    target = cre;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
+                if (master->GetPowerType() == POWER_MANA && me->GetExactDist(master) < 30 && !master->HasAura(FOCUSMAGIC))
+                    targets.insert(master);
+            }
 
-                if (target && doCast(target, FOCUSMAGIC))
+            if (!targets.empty())
+            {
+                Unit* target = targets.size() == 1u ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
+                if (doCast(target, FOCUSMAGIC))
                 {
                     fmCheckTimer = 30000;
                     return;

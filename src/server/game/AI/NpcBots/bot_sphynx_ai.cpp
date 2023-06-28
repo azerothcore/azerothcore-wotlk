@@ -269,37 +269,16 @@ public:
 
             bool haveHp = false;
             uint8 partycombat = 0, partynocombat = 0;
-            for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
+            for (Unit const* member : BotMgr::GetAllGroupMembers(gr))
             {
-                Player const* player = itr->GetSource();
-                if (!player || me->GetMap() != player->FindMap())
-                    continue;
-
-                if (player->IsInCombat())
-                    partycombat++;
-                else if (player->IsAlive())
-                    partynocombat++;
-
-                if (!haveHp && player->IsAlive() && me->GetDistance(player) < 15 &&
-                    GetHealthPCT(player) < 95)
-                    haveHp = true;
-
-                if (!player->HaveBot())
-                    continue;
-
-                BotMap const* map = player->GetBotMgr()->GetBotMap();
-                for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
+                if (me->GetMap() == member->FindMap())
                 {
-                    Creature const* bot = it->second;
-                    if (!bot->IsInWorld())
-                        continue;
-
-                    if (bot->IsInCombat())
+                    if (member->IsInCombat())
                         partycombat++;
-                    else if (bot->IsAlive())
+                    else if (member->IsAlive())
                         partynocombat++;
 
-                    if (!haveHp && bot != me && bot->IsAlive() && me->GetDistance(bot) < 15 && GetHealthPCT(bot) < 95)
+                    if (!haveHp && member->IsAlive() && me->GetDistance(member) < 15 && GetHealthPCT(member) < 95)
                         haveHp = true;
                 }
             }
@@ -323,39 +302,17 @@ public:
 
             bool haveMana = false;
             uint8 partycombat = 0, partynocombat = 0;
-            for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
+            for (Unit const* member : BotMgr::GetAllGroupMembers(gr))
             {
-                Player const* player = itr->GetSource();
-                if (!player || me->GetMap() != player->FindMap())
-                    continue;
-
-                if (player->IsInCombat())
-                    partycombat++;
-                else if (player->IsAlive())
-                    partynocombat++;
-
-                if (!haveMana && player->IsAlive() && me->GetDistance(player) < 15 &&
-                    GetManaPCT(player) < 95)
-                    haveMana = true;
-
-                if (!player->HaveBot())
-                    continue;
-
-                BotMap const* map = player->GetBotMgr()->GetBotMap();
-                for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
+                if (me->GetMap() == member->FindMap())
                 {
-                    Creature const* bot = it->second;
-                    if (!bot->IsInWorld())
-                        continue;
-
-                    if (bot->IsInCombat())
+                    if (member->IsInCombat())
                         partycombat++;
-                    else if (bot->IsAlive())
+                    else if (member->IsAlive())
                         partynocombat++;
 
-                    if (!haveMana && bot->IsInWorld() && bot->IsAlive() && me->GetDistance(bot) < 15 &&
-                        bot->GetBotClass() != BOT_CLASS_SPHYNX &&
-                        GetManaPCT(bot) < 95)
+                    if (!haveMana && member->IsAlive() && me->GetDistance(member) < 15 && GetManaPCT(member) < 95 &&
+                        !(member->IsNPCBot() && member->ToCreature()->GetBotClass() == BOT_CLASS_SPHYNX))
                         haveMana = true;
                 }
             }

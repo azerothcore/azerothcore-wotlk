@@ -2727,14 +2727,10 @@ float BotMgr::GetBotDamageModByLevel(uint8 botlevel)
     return 1.0f;
 }
 
-std::vector<Unit*> BotMgr::GetAllGroupMembers(Unit const* source)
+std::vector<Unit*> BotMgr::GetAllGroupMembers(Group const* group)
 {
     std::vector<Unit*> group_members;
-
-    Group const* group = (source->IsNPCBot() && source->ToCreature()->GetBotAI()) ? source->ToCreature()->GetBotAI()->GetGroup() :
-        source->IsPlayer() ? source->ToPlayer()->GetGroup() : nullptr;
-
-    if (group && source->IsInWorld())
+    if (group)
     {
         group_members.reserve(group->GetMembersCount());
         for (GroupReference const* ref = group->GetFirstMember(); ref != nullptr; ref = ref->next())
@@ -2750,6 +2746,12 @@ std::vector<Unit*> BotMgr::GetAllGroupMembers(Unit const* source)
     }
 
     return group_members;
+}
+std::vector<Unit*> BotMgr::GetAllGroupMembers(Unit const* source)
+{
+    Group const* group = (source->IsNPCBot() && source->ToCreature()->GetBotAI()) ? source->ToCreature()->GetBotAI()->GetGroup() :
+        source->IsPlayer() ? source->ToPlayer()->GetGroup() : nullptr;
+    return GetAllGroupMembers(group);
 }
 
 void BotMgr::InviteBotToBG(ObjectGuid botguid, GroupQueueInfo* ginfo, Battleground* bg)

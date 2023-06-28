@@ -658,31 +658,12 @@ public:
             //find tank
             //stacks
             std::list<Unit*> tanks;
-            Group const* gr = master->GetGroup();
-            for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
+            for (Unit* member : BotMgr::GetAllGroupMembers(master))
             {
-                Player* player = itr->GetSource();
-                if (!player || !player->IsInWorld() || me->GetMap() != player->FindMap())
-                    continue;
-
-                if (player->IsAlive() && player->IsInCombat() && IsTank(player) && player->GetVictim())
-                    tanks.push_back(player);
-
-                if (!player->HaveBot())
-                    continue;
-
-                BotMap const* map = player->GetBotMgr()->GetBotMap();
-                for (BotMap::const_iterator bitr = map->begin(); bitr != map->end(); ++bitr)
+                if (member->IsInWorld() && me->GetMap() == member->FindMap() && member->IsAlive() &&
+                    member->GetVictim() && member->IsInCombat() && IsTank(member))
                 {
-                    if (bitr->second == me)
-                        continue;
-                    if (!gr->IsMember(bitr->second->GetGUID()))
-                        continue;
-
-                    Unit* u = bitr->second;
-                    if (u->IsInWorld() && u->IsAlive() && u->IsInCombat() && IsTank(u) &&
-                        (u->GetVictim() || !u->getAttackers().empty()))
-                        tanks.push_back(u);
+                    tanks.push_back(member);
                 }
             }
 
@@ -1058,174 +1039,44 @@ public:
 
             flareTimer = urand(2000, 4000);
 
-            Unit* attacker = me->GetVictim();
-            if (attacker)
+            std::set<Unit*> targets;
+            if (Group const* gr = !IAmFree() ? master->GetGroup() : GetGroup())
             {
-                if ((attacker->GetTypeId() == TYPEID_PLAYER ? attacker->GetClass() == CLASS_ROGUE :
-                    attacker->ToCreature()->GetBotClass() == BOT_CLASS_ROGUE) ||
-                    attacker->HasInvisibilityAura() || attacker->HasStealthAura())
+                for (Unit* member : BotMgr::GetAllGroupMembers(gr))
                 {
-                    if (doCast(attacker, GetSpell(FLARE_1)))
-                        return;
-                }
-            }
-
-            if (IAmFree())
-            {
-                Unit::AttackerSet const& b_attackers = me->getAttackers();
-                if (b_attackers.empty())
-                    return;
-
-                for (Unit::AttackerSet::const_iterator itr = b_attackers.begin(); itr != b_attackers.end(); ++itr)
-                {
-                    attacker = *itr;
-                    if (me->GetDistance(attacker) > 15)
+                    if (me->GetMap() != member->FindMap() || !member->IsAlive())
                         continue;
-
-                    if ((attacker->GetTypeId() == TYPEID_PLAYER ? attacker->GetClass() == CLASS_ROGUE :
-                        attacker->ToCreature()->GetBotClass() == BOT_CLASS_ROGUE) ||
-                        attacker->HasInvisibilityAura() || attacker->HasStealthAura())
+                    for (Unit* attacker : member->getAttackers())
                     {
-                        if (doCast(me, GetSpell(FLARE_1)))
-                            return;
-
-                        break;
-                    }
-                }
-
-                return;
-            }
-
-            attacker = master->GetVictim();
-            if (attacker && me->GetDistance(attacker) < 30)
-            {
-                if ((attacker->GetTypeId() == TYPEID_PLAYER ? attacker->GetClass() == CLASS_ROGUE :
-                    attacker->ToCreature()->GetBotClass() == BOT_CLASS_ROGUE) ||
-                    attacker->HasInvisibilityAura() || attacker->HasStealthAura())
-                {
-                    if (doCast(attacker, GetSpell(FLARE_1)))
-                        return;
-                }
-            }
-
-            Group const* gr = master->GetGroup();
-            if (!gr)
-            {
-                if (me->GetDistance(master) > 30)
-                    return;
-
-                Unit::AttackerSet const& m_attackers = master->getAttackers();
-                if (m_attackers.empty())
-                    return;
-
-                for (Unit::AttackerSet::const_iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
-                {
-                    attacker = *itr;
-                    if (master->GetDistance(attacker) > 15 || me->GetDistance(attacker) > 30)
-                        continue;
-
-                    if ((attacker->GetTypeId() == TYPEID_PLAYER ? attacker->GetClass() == CLASS_ROGUE :
-                        attacker->ToCreature()->GetBotClass() == BOT_CLASS_ROGUE) ||
-                        attacker->HasInvisibilityAura() || attacker->HasStealthAura())
-                    {
-                        if (doCast(urand(1,100) <= 50 ? master : attacker, GetSpell(FLARE_1)))
-                            return;
-
-                        break;
-                    }
-                }
-
-                return;
-            }
-
-            for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
-            {
-                Player* tPlayer = itr->GetSource();
-                if (tPlayer == nullptr) continue;
-                if (me->GetMap() != tPlayer->FindMap()) continue;
-                if (!tPlayer->IsAlive()) continue;
-                if (me->GetDistance(tPlayer) > 30) continue;
-                attacker = tPlayer->GetVictim();
-                if (attacker && me->GetDistance(attacker) < 30)
-                {
-                    if ((attacker->GetTypeId() == TYPEID_PLAYER ? attacker->GetClass() == CLASS_ROGUE :
-                        attacker->ToCreature()->GetBotClass() == BOT_CLASS_ROGUE) ||
-                        attacker->HasInvisibilityAura() || attacker->HasStealthAura())
-                    {
-                        if (doCast(attacker, GetSpell(FLARE_1)))
-                            return;
-                    }
-                }
-                Unit::AttackerSet const& p_attackers = tPlayer->getAttackers();
-                if (p_attackers.empty())
-                    continue;
-
-                for (Unit::AttackerSet::const_iterator bitr = p_attackers.begin(); bitr != p_attackers.end(); ++bitr)
-                {
-                    attacker = *bitr;
-                    if (tPlayer->GetDistance(attacker) > 15 || me->GetDistance(attacker) > 30)
-                        continue;
-
-                    if ((attacker->GetTypeId() == TYPEID_PLAYER ? attacker->GetClass() == CLASS_ROGUE :
-                        attacker->ToCreature()->GetBotClass() == BOT_CLASS_ROGUE) ||
-                        attacker->HasInvisibilityAura() || attacker->HasStealthAura())
-                    {
-                        if (doCast(urand(1,100) <= 50 ? tPlayer : attacker, GetSpell(FLARE_1)))
-                            return;
-
-                        break;
-                    }
-                }
-            }
-            for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
-            {
-                Player const* gPlayer = itr->GetSource();
-                if (gPlayer == nullptr) continue;
-                if (me->GetMap() != gPlayer->FindMap()) continue;
-                if (!gPlayer->HaveBot())
-                    continue;
-
-                BotMap const* map = gPlayer->GetBotMgr()->GetBotMap();
-                for (BotMap::const_iterator bitr = map->begin(); bitr != map->end(); ++bitr)
-                {
-                    Unit* u = bitr->second;
-                    if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->IsAlive() ||
-                        u->IsTotem() || me->GetDistance(u) > 30)
-                        continue;
-
-                    attacker = u->GetVictim();
-                    if (attacker && me->GetDistance(attacker) < 30)
-                    {
-                        if ((attacker->GetTypeId() == TYPEID_PLAYER ? attacker->GetClass() == CLASS_ROGUE :
-                            attacker->ToCreature()->GetBotClass() == BOT_CLASS_ROGUE) ||
-                            attacker->HasInvisibilityAura() || attacker->HasStealthAura())
+                        if (attacker->GetClass() == CLASS_ROGUE || attacker->HasInvisibilityAura() || attacker->HasStealthAura())
                         {
-                            if (doCast(attacker, GetSpell(FLARE_1)))
-                                return;
-                        }
-                    }
-                    Unit::AttackerSet const& u_attackers = u->getAttackers();
-                    if (u_attackers.empty())
-                        continue;
-
-                    for (Unit::AttackerSet::const_iterator aitr = u_attackers.begin(); aitr != u_attackers.end(); ++aitr)
-                    {
-                        attacker = *aitr;
-                        if (u->GetDistance(attacker) > 15 || me->GetDistance(attacker) > 30)
-                            continue;
-
-                        if ((attacker->GetTypeId() == TYPEID_PLAYER ? attacker->GetClass() == CLASS_ROGUE :
-                            attacker->ToCreature()->GetBotClass() == BOT_CLASS_ROGUE) ||
-                            attacker->HasInvisibilityAura() || attacker->HasStealthAura())
-                        {
-                            if (doCast(urand(1,100) <= 50 ? u : attacker, GetSpell(FLARE_1)))
-                                return;
-
-                            break;
+                            if (member->GetDistance(attacker) < 15)
+                            {
+                                targets.insert(member);
+                                break;
+                            }
                         }
                     }
                 }
             }
+            for (Unit* attacker : me->getAttackers())
+            {
+                if (attacker->GetClass() == CLASS_ROGUE || attacker->HasInvisibilityAura() || attacker->HasStealthAura())
+                {
+                    if (me->GetDistance(attacker) < 15)
+                    {
+                        targets.insert(me);
+                        break;
+                    }
+                }
+            }
+
+            if (targets.empty())
+                return;
+
+            Unit* target = targets.size() == 1u ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
+            if (doCast(target, GetSpell(FLARE_1)))
+                return;
         }
 
         void CheckReadiness(uint32 diff)

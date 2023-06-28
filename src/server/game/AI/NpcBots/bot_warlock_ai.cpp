@@ -295,53 +295,41 @@ public:
             if (!IAmFree() && hasSoulstone && soulstoneTimer <= diff && GetSpell(CREATE_SOULSTONE_1))
             {
                 Group const* gr = master->GetGroup();
-                Unit* u = master;
+                std::set<Unit*> targets;
                 if (!gr)
                 {
-                    if (!u->IsAlive() || u->isPossessed() || u->IsCharmed() ||
-                        me->GetDistance(u) > 30 || u->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
-                        u = nullptr;
+                    if (master->IsAlive() && !master->isPossessed() && !master->IsCharmed() &&
+                        me->GetDistance(master) < 30 && !master->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
+                        targets.insert(master);
                 }
                 else
                 {
-                    //check rezzers first
-                    for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
+                    for (uint8 i = 0; i < 2 && !targets.empty(); ++i)
                     {
-                        u = itr->GetSource();
-                        if (!u || u->GetLevel() < 20 || !u->IsAlive() || me->GetMap() != u->FindMap() ||
-                            u->isPossessed() || u->IsCharmed() || me->GetDistance(u) > 30 ||
-                            u->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
+                        for (Unit* member : BotMgr::GetAllGroupMembers(gr))
                         {
-                            u = nullptr;
-                            continue;
-                        }
-                        if (u->GetClass() == CLASS_PRIEST || u->GetClass() == CLASS_PALADIN ||
-                            u->GetClass() == CLASS_DRUID || u->GetClass() == CLASS_SHAMAN)
-                            break;
-                    }
-                    if (!u)
-                    {
-                        for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
-                        {
-                            u = itr->GetSource();
-                            if (!u || u->GetLevel() < 20 || !u->IsAlive() || me->GetMap() != u->FindMap() ||
-                                u->isPossessed() || u->IsCharmed() || me->GetDistance(u) > 30 ||
-                                u->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
+                            if ((i == 0 ? member->IsPlayer() : member->IsNPCBot()) && me->GetMap() == member->FindMap() &&
+                                member->IsAlive() && !member->isPossessed() && !member->IsCharmed() &&
+                                !(member->IsNPCBot() && member->ToCreature()->IsTempBot()) &&
+                                me->GetDistance(member) < 30 && !member->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
                             {
-                                u = nullptr;
-                                continue;
+                                if (i > 0 || member->GetClass() == CLASS_PRIEST || member->GetClass() == CLASS_PALADIN ||
+                                    member->GetClass() == CLASS_DRUID || member->GetClass() == CLASS_SHAMAN)
+                                {
+                                    targets.insert(member);
+                                }
                             }
-                            break;
                         }
                     }
                 }
 
-                if (u)
+                if (!targets.empty())
                 {
+                    Unit* target = targets.size() == 1 ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(CREATE_SOULSTONE_1);
                     uint32 rank = spellInfo->GetRank();
 
-                    while (rank < 7 && u->GetLevel() > spellInfo->SpellLevel && spellInfo->GetNextRankSpell())
+                    while (rank + 1 < std::size(_healthStoneSpells) && target->GetLevel() > spellInfo->SpellLevel && spellInfo->GetNextRankSpell())
                     {
                         spellInfo = spellInfo->GetNextRankSpell();
                         rank = spellInfo->GetRank();
@@ -362,7 +350,7 @@ public:
                             spellId = SOULSTONE_RESURRECTION_1;
                             break;
                     }
-                    me->CastSpell(u, spellId, false);
+                    me->CastSpell(target, spellId, false);
                 }
             }
         }

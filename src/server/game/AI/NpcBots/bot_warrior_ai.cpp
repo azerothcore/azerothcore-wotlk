@@ -1006,16 +1006,13 @@ public:
 
         void CheckVigilance(uint32 diff)
         {
-            if (vigiCheckTimer > diff || Rand() > 30 || !IsSpellReady(VIGILANCE_1, diff) || me->IsInCombat() ||
-                me->IsMounted() || IsCasting())
+            if (vigiCheckTimer > diff || Rand() > 30 || !IsSpellReady(VIGILANCE_1, diff) || me->IsInCombat() || me->IsMounted() || IsCasting())
                 return;
 
-            vigiCheckTimer = urand(1000, 3000);
+            vigiCheckTimer = urand(1500, 3000);
             uint32 VIGILANCE = GetSpell(VIGILANCE_1);
 
-            Unit* u = vigilanceTargetGuid ? ObjectAccessor::GetUnit(*me, vigilanceTargetGuid) : nullptr;
-
-            if (u)
+            if (Unit* u = vigilanceTargetGuid ? ObjectAccessor::GetUnit(*me, vigilanceTargetGuid) : nullptr)
             {
                 bool myVig = u->HasAura(VIGILANCE, me->GetGUID());
                 if (!IsTank() || !myVig)
@@ -1029,165 +1026,89 @@ public:
             else if (vigilanceTargetGuid)
                 vigilanceTargetGuid = ObjectGuid::Empty;
 
-            if (IAmFree() || !IsTank())
+            if (!IAmFree() && !IsTank())
                 return;
 
-            Group const* gr = master->GetGroup();
-            if (gr)
+            Unit* target = nullptr;
+            if (Group const* gr = GetGroup())
             {
-                //tanks
-                for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
+                std::set<Unit*> targets;
+                for (uint8 i = 0; i < 4 && !targets.empty(); ++i)
                 {
-                    Player* pPlayer = itr->GetSource();
-                    if (!pPlayer || !pPlayer->IsInWorld()) continue;
-                    if (me->GetMapId() != pPlayer->GetMapId()) continue;
-                    if (pPlayer->IsAlive() && IsTankingClass(pPlayer->GetClass()) && me->GetDistance(pPlayer) < 30 &&
-                        !pPlayer->HasAura(VIGILANCE) && !pPlayer->HasAura(DAMAGE_REDUCTION))
+                    for (Unit* member : BotMgr::GetAllGroupMembers(gr))
                     {
-                        u = pPlayer;
-                        break;
+                        if (!(!(i & 1) ? member->IsPlayer() : member->IsNPCBot()) || me->GetMap() != member->FindMap() ||
+                            !member->IsAlive() || me->GetDistance(member) > 30 ||
+                            (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
+                            (i < 2 && !(i == 0 ? IsTankingClass(member->GetClass()) : IsTank(member))) ||
+                            (i == 3 && !member->ToCreature()->GetBotAI()->HasRole(BOT_ROLE_DPS)) ||
+                            member->HasAura(VIGILANCE) || member->HasAura(DAMAGE_REDUCTION))
+                            continue;
+                        targets.insert(member);
                     }
                 }
-                if (!u)
-                {
-                    for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    {
-                        Player const* pPlayer = itr->GetSource();
-                        if (!pPlayer || !pPlayer->IsInWorld() || !pPlayer->HaveBot()) continue;
-                        if (me->GetMapId() != pPlayer->GetMapId()) continue;
-                        BotMap const* map = pPlayer->GetBotMgr()->GetBotMap();
-                        for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                        {
-                            Creature* cre = it->second;
-                            if (!cre || cre == me || !cre->IsInWorld() || !cre->IsAlive()) continue;
-                            if (cre->GetBotAI()->HasRole(BOT_ROLE_TANK) &&
-                                me->GetDistance(cre) < 30 && !cre->HasAura(VIGILANCE) && !cre->HasAura(DAMAGE_REDUCTION))
-                            {
-                                u = cre;
-                                break;
-                            }
-                        }
-                    }
-                }
-                //any players
-                if (!u)
-                {
-                    for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    {
-                        Player* pPlayer = itr->GetSource();
-                        if (!pPlayer || !pPlayer->IsInWorld() || pPlayer == master) continue;
-                        if (me->GetMapId() != pPlayer->GetMapId()) continue;
-                        if (pPlayer->IsAlive() && me->GetDistance(pPlayer) < 30 &&
-                            !pPlayer->HasAura(VIGILANCE))
-                        {
-                            u = pPlayer;
-                            break;
-                        }
-                    }
-                }
-                //damage-dealing bots
-                if (!u)
-                {
-                    for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    {
-                        Player const* pPlayer = itr->GetSource();
-                        if (!pPlayer || !pPlayer->IsInWorld() || !pPlayer->HaveBot()) continue;
-                        if (me->GetMapId() != pPlayer->GetMapId()) continue;
-                        BotMap const* map = pPlayer->GetBotMgr()->GetBotMap();
-                        for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                        {
-                            Creature* cre = it->second;
-                            if (!cre || cre == me || !cre->IsInWorld() || !cre->IsAlive() || cre->IsTempBot()) continue;
-                            if (cre->GetBotAI()->HasRole(BOT_ROLE_DPS) && me->GetDistance(cre) < 30 &&
-                                !cre->HasAura(VIGILANCE))
-                            {
-                                u = cre;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            if (!u && master->IsAlive() && me->IsWithinDistInMap(master, 30) && !master->HasAura(VIGILANCE))
-                u = master;
 
-            if (u && doCast(u, VIGILANCE))
+                if (!targets.empty())
+                    target = targets.size() == 1 ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
+            }
+
+            if (!target && !IAmFree() && master->IsAlive() && me->IsWithinDistInMap(master, 30) && !master->HasAura(VIGILANCE))
+                target = master;
+
+            if (target && doCast(target, VIGILANCE))
                 return;
         }
 
         void CheckIntervene(uint32 diff)
         {
-            //lvl 70 - warbringer always present
-            if (IsSpellReady(INTERVENE_1, diff, false) && !HasBotCommandState(BOT_COMMAND_STAY) &&
-                !me->IsMounted() && rage >= rcost(INTERVENE_1) &&
-                !IAmFree() && !IsCasting() && Rand() < (IsTank() ? 40 : 80))
+            if (!IsSpellReady(INTERVENE_1, diff, false) || HasBotCommandState(BOT_COMMAND_STAY) || me->IsMounted() ||
+                Rand() > (IsTank() ? 40 : 80) || rage < rcost(INTERVENE_1) || IsCasting() ||
+                !(_inStance(2) || stancetimer <= diff || (GetSpec() == BOT_SPEC_WARRIOR_PROTECTION && me->GetLevel() >= 50)))
+                return;
+
+            Unit* target = nullptr;
+            if (!me->GetVictim() && master->getAttackers().empty() && master->isMoving())
             {
-                if (!me->GetVictim() && master->getAttackers().empty() && master->isMoving())
+                float mydist = me->GetDistance(master);
+                if (mydist < 25 && mydist > 18)
+                    target = master;
+            }
+
+            Group const* gr = GetGroup();
+            if (!target && !gr)
+            {
+                if (GetHealthPCT(master) < 95 && !master->getAttackers().empty() &&
+                    me->getAttackers().size() <= master->getAttackers().size())
                 {
                     float mydist = me->GetDistance(master);
-                    if (mydist < 25 && mydist > 18)
-                    {
-                        if (doCast(master, GetSpell(INTERVENE_1)))
-                            return;
-                    }
+                    if (mydist < 25 && mydist > 8)
+                        target = master;
                 }
-                Group const* gr = master->GetGroup();
-                if (!gr)
-                {
-                    if (GetHealthPCT(master) < 95 && !master->getAttackers().empty() &&
-                        me->getAttackers().size() <= master->getAttackers().size())
-                    {
-                        float mydist = me->GetDistance(master);
-                        if (mydist < 25 && mydist > 8)
-                        {
-                            if (doCast(master, GetSpell(INTERVENE_1)))
-                                return;
-                        }
-                    }
-                }
-                else if (!IsTank() || !me->GetVictim())
-                {
-                    bool Bots = false;
-                    float dist;
-                    for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    {
-                        Player* tPlayer = itr->GetSource();
-                        if (!tPlayer || tPlayer->IsBeingTeleported() || tPlayer->FindMap() != me->GetMap()) continue;
-                        if (tPlayer->HaveBot())
-                            Bots = true;
-                        if (!tPlayer->IsAlive() || GetHealthPCT(tPlayer) > 70 ||
-                            tPlayer->HasAuraType(SPELL_AURA_ADD_CASTER_HIT_TRIGGER)) continue;
-                        if (tPlayer->getAttackers().size() < me->getAttackers().size()) continue;
-                        dist = me->GetDistance(tPlayer);
-                        if (dist > 25 || dist < 8) continue;
-
-                        if (doCast(tPlayer, GetSpell(INTERVENE_1)))
-                            return;
-                    }
-                    if (!Bots) return;
-                    for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    {
-                        Player* tPlayer = itr->GetSource();
-                        if (!tPlayer || !tPlayer->HaveBot() || tPlayer->IsBeingTeleported() || tPlayer->FindMap() != me->GetMap()) continue;
-                        BotMap const* map = tPlayer->GetBotMgr()->GetBotMap();
-                        for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                        {
-                            Creature* bot = it->second;
-                            if (bot == me || !bot->IsInWorld() || !bot->IsAlive() || bot->IsTempBot()) continue;
-                            if (GetHealthPCT(bot) > (70 - 30 * IsTank(bot)) ||
-                                bot->HasAuraType(SPELL_AURA_ADD_CASTER_HIT_TRIGGER)) continue;
-                            if (bot->getAttackers().size() <= me->getAttackers().size()) continue;
-                            dist = me->GetDistance(bot);
-                            if (dist > 25 || dist < 8) continue;
-
-                            if (doCast(bot, GetSpell(INTERVENE_1)))
-                                return;
-                        }
-                    }
-                }
-
-                SetSpellCooldown(INTERVENE_1, 500); //fail
             }
+            if (!target && gr && (!IsTank() || !me->GetVictim()))
+            {
+                std::set<Unit*> targets;
+                for (Unit* member : BotMgr::GetAllGroupMembers(gr))
+                {
+                    if (me->GetMap() == member->FindMap() && member->IsAlive() && GetHealthPCT(member) <= 70 &&
+                        !member->HasAuraType(SPELL_AURA_ADD_CASTER_HIT_TRIGGER) &&
+                        member->getAttackers().size() >= me->getAttackers().size() &&
+                        !(member->IsNPCBot() && member->ToCreature()->IsTempBot()))
+                    {
+                        float dist = me->GetDistance(member);
+                        if (dist < 25 && dist > 8)
+                            targets.insert(member);
+                    }
+                }
+                if (!targets.empty())
+                    target = targets.size() == 1u ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
+            }
+
+            if (target && (_inStance(2) || (GetSpec() == BOT_SPEC_WARRIOR_PROTECTION && me->GetLevel() >= 50) || stanceChange(diff, 2)) &&
+                doCast(target, GetSpell(INTERVENE_1)))
+                return;
+
+            SetSpellCooldown(INTERVENE_1, 500); //fail
         }
 
         void CheckSpellReflect(uint32 diff)

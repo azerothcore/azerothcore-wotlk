@@ -465,6 +465,9 @@ public:
 
             std::map<uint32, uint32> idMap;
             uint32 mask = _getTotemsMask(idMap);
+            Group const* gr = GetGroup();
+            std::vector<Unit*> members = BotMgr::GetAllGroupMembers(gr);
+            uint8 subgr = GetSubGroup();
 
             //EARTH
             //EARTHsituative1 : tremor
@@ -472,40 +475,22 @@ public:
                 IsSpellReady(TREMOR_TOTEM_1, diff, false) && _totems[T_EARTH].second._type != BOT_TOTEM_TREMOR)
             {
                 //Tremor no cd, party members only
-                Group const* gr = master->GetGroup();
-                if (gr && gr->IsMember(me->GetGUID()))
+                uint8 count = 0;
+                for (Unit const* member : members)
                 {
-                    uint8 subgr = gr->GetMemberGroup(me->GetGUID());
-                    uint8 count = 0;
-                    for (GroupReference const* ref = gr->GetFirstMember(); ref != nullptr; ref = ref->next())
-                    {
-                        if (ref->getSubGroup() != subgr) continue;
-                        Player* pl = ref->GetSource();
-                        if (!pl || !pl->IsInWorld() || pl->IsBeingTeleported()) continue;
-                        if (me->GetMap() != pl->FindMap() || !pl->InSamePhase(me)) continue;
-                        if (me->GetDistance(pl) < 20 &&
-                            pl->HasAuraWithMechanic((1<<MECHANIC_CHARM)|(1<<MECHANIC_FEAR)|(1<<MECHANIC_SLEEP)))
-                            ++count;
-
-                        if (!pl->HaveBot()) continue;
-                        BotMap const* map = pl->GetBotMgr()->GetBotMap();
-                        for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                        {
-                            if (!gr->IsMember(it->second->GetGUID()) || gr->GetMemberGroup(it->second->GetGUID()) != subgr) continue;
-                            Creature* bot = it->second;
-                            if (!bot || !bot->IsInWorld() || me->GetMap() != bot->FindMap() ||
-                                !bot->InSamePhase(me) || me->GetDistance(bot) > 20) continue;
-                            if (bot->HasAuraWithMechanic((1<<MECHANIC_CHARM)|(1<<MECHANIC_FEAR)|(1<<MECHANIC_SLEEP)))
-                                ++count;
-                        }
-                    }
-
-                    if (count >= (1 + 1*((mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH) != 0)))
-                    {
-                        if (doCast(me, GetSpell(TREMOR_TOTEM_1), CotE ? TRIGGERED_CAST_DIRECTLY : TRIGGERED_NONE))
-                            if (!CotE)
-                                return;
-                    }
+                    if (me->GetMap() != member->FindMap() || !member->InSamePhase(me) ||
+                        !member->IsAlive() || me->GetDistance(member) > 20 ||
+                        (member->IsPlayer() ? member->ToPlayer()->GetSubGroup() : member->ToCreature()->GetSubGroup()) != subgr ||
+                        (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
+                        !member->HasAuraWithMechanic((1<<MECHANIC_CHARM)|(1<<MECHANIC_FEAR)|(1<<MECHANIC_SLEEP)))
+                        continue;
+                    ++count;
+                }
+                if (count >= (1 + 1*(!!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH))))
+                {
+                    if (doCast(me, GetSpell(TREMOR_TOTEM_1), CotE ? TRIGGERED_CAST_DIRECTLY : TRIGGERED_NONE))
+                        if (!CotE)
+                            return;
                 }
                 //check if casted
                 if (_totems[T_EARTH].second._type != BOT_TOTEM_TREMOR)
@@ -664,44 +649,26 @@ public:
             {
                 //5 min cd, party members only, instant effect +4 ticks in 12 secs
                 bool cast = false;
-                Group const* gr = master->GetGroup();
-                if (gr && gr->IsMember(me->GetGUID()))
+                if (master->IsInCombat() && master->GetPowerType() == POWER_MANA &&
+                    GetManaPCT(master) < 35 && me->GetDistance(master) < 18)
+                    cast = true;
+                else if (me->IsInCombat() && GetManaPCT(me) < 35)
+                    cast = true;
+                else
                 {
                     uint8 count = 0;
-                    uint8 subgr = gr->GetMemberGroup(me->GetGUID());
-                    for (GroupReference const* ref = gr->GetFirstMember(); ref != nullptr; ref = ref->next())
+                    for (Unit const* member : members)
                     {
-                        if (ref->getSubGroup() != subgr) continue;
-                        Player* pl = ref->GetSource();
-                        if (!pl || !pl->IsInWorld() || pl->IsBeingTeleported()) continue;
-                        if (me->GetMap() != pl->FindMap() || !pl->InSamePhase(me)) continue;
-                        if (pl->IsInCombat() && pl->GetPowerType() == POWER_MANA &&
-                            GetManaPCT(pl) < 35 && me->GetDistance(pl) < 25)
-                            ++count;
-
-                        if (!pl->HaveBot()) continue;
-                        BotMap const* map = pl->GetBotMgr()->GetBotMap();
-                        for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                        {
-                            if (!gr->IsMember(it->second->GetGUID()) || gr->GetMemberGroup(it->second->GetGUID()) != subgr) continue;
-                            Creature* bot = it->second;
-                            if (!bot || !bot->IsInWorld() || me->GetMap() != bot->FindMap() || !bot->InSamePhase(me)) continue;
-                            if (bot->IsInCombat() && bot->GetPowerType() == POWER_MANA &&
-                                GetManaPCT(bot) < 35 && me->GetDistance(bot) < 20)
-                                ++count;
-                        }
+                        if (me->GetMap() != member->FindMap() || !member->InSamePhase(me) ||
+                            !member->IsAlive() || !member->IsInCombat() || member->GetPowerType() != POWER_MANA ||
+                            (member->IsPlayer() ? member->ToPlayer()->GetSubGroup() : member->ToCreature()->GetSubGroup()) != subgr ||
+                            GetManaPCT(member) > 35 || me->GetDistance(member) > 20 ||
+                            (member->IsNPCBot() && member->ToCreature()->IsTempBot()))
+                            continue;
+                        ++count;
                     }
-                    cast = (count >= (3 + 1*((mask & BOT_TOTEM_MASK_MY_TOTEM_WATER) != 0)));
+                    cast = (count >= (3 + 1*(!!(mask & BOT_TOTEM_MASK_MY_TOTEM_WATER))));
                 }
-                if (!cast)
-                {
-                    if (master->IsInCombat() && master->GetPowerType() == POWER_MANA &&
-                        GetManaPCT(master) < 35 && me->GetDistance(master) < 18)
-                        cast = true;
-                    else if (me->IsInCombat() && GetManaPCT(me) < 35)
-                        cast = true;
-                }
-
                 if (cast)
                 {
                     if (doCast(me, GetSpell(MANA_TIDE_TOTEM_1), CotE ? TRIGGERED_CAST_DIRECTLY : TRIGGERED_NONE))
@@ -725,45 +692,23 @@ public:
                 {
                     //no cd
                     bool cast = false;
-                    if (!IAmFree())
-                    {
-                        Group const* gr = master->GetGroup();
-                        if (gr)
-                        {
-                            for (GroupReference const* ref = gr->GetFirstMember(); ref != nullptr; ref = ref->next())
-                            {
-                                Player* pl = ref->GetSource();
-                                if (!pl || !pl->IsInWorld() || pl->IsBeingTeleported()) continue;
-                                if (me->GetMap() != pl->FindMap() || !pl->InSamePhase(me)) continue;
-                                if (pl->isMoving()) continue;
-                                if (pl->GetPowerType() == POWER_MANA && GetManaPCT(pl) < 85 && me->GetDistance(pl) < 25)
-                                {
-                                    cast = true;
-                                    break;
-                                }
-
-                                if (!pl->HaveBot()) continue;
-                                BotMap const* map = pl->GetBotMgr()->GetBotMap();
-                                for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
-                                {
-                                    Creature* bot = it->second;
-                                    if (!bot || !bot->IsInWorld() || me->GetMap() != bot->FindMap() || !bot->InSamePhase(me)) continue;
-                                    if (bot->GetPowerType() == POWER_MANA && GetManaPCT(bot) < 35 && me->GetDistance(bot) < 25)
-                                    {
-                                        cast = true;
-                                        break;
-                                    }
-                                }
-                                if (cast)
-                                    break;
-                            }
-                        }
-                        else if (!master->isMoving() && master->GetPowerType() == POWER_MANA && GetManaPCT(master) < 85)
-                            cast = true;
-                    }
-                    if (!me->isMoving() && GetManaPCT(me) < 95)
+                    if (!master->isMoving() && master->GetPowerType() == POWER_MANA && GetManaPCT(master) < 85)
                         cast = true;
-
+                    else if (!me->isMoving() && GetManaPCT(me) < 95)
+                        cast = true;
+                    else
+                    {
+                        for (Unit const* member : members)
+                        {
+                            if (me->GetMap() != member->FindMap() || !member->InSamePhase(me) ||
+                                !member->IsAlive() || member->GetPowerType() != POWER_MANA ||
+                                GetManaPCT(member) > 85 || me->GetDistance(member) > 25 ||
+                                (member->IsNPCBot() && member->ToCreature()->IsTempBot()))
+                                continue;
+                            cast = true;
+                            break;
+                        }
+                    }
                     if (cast)
                     {
                         if (doCast(me, MSpring, CotE ? TRIGGERED_CAST_DIRECTLY : TRIGGERED_NONE))
@@ -793,23 +738,16 @@ public:
             {
                 //grounding 15 sec cd, party members only (and bot and master of course)
                 bool cast = false;
-                Unit* u = FindCastingTarget(27); //totem must be within cast distance
-                if (u && !IsChanneling(u)) //do not waste grounding on periodic ticks
+                if (Unit const* u = FindCastingTarget(27)) //totem must be within cast distance
                 {
-                    Group const* gr = !IAmFree() ? master->GetGroup() : nullptr;
-                    for (uint8 i = CURRENT_FIRST_NON_MELEE_SPELL; i != CURRENT_AUTOREPEAT_SPELL; ++i)
+                    if (Spell const* spell = u->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                     {
-                        if (Spell const* spell = u->GetCurrentSpell(i))
+                        ObjectGuid tGuid = spell->m_targets.GetUnitTargetGUID();
+                        if (tGuid == me->GetGUID() || tGuid == master->GetGUID() || (gr && gr->IsMember(tGuid) && gr->SameSubGroup(tGuid, me->GetGUID())))
                         {
-                            ObjectGuid tGuid = spell->m_targets.GetUnitTargetGUID();
-                            if (tGuid == me->GetGUID() || tGuid == master->GetGUID() ||
-                                (gr && gr->IsMember(tGuid) && gr->IsMember(me->GetGUID()) && gr->SameSubGroup(tGuid, me->GetGUID())))
-                            {
-                                Unit* t = ObjectAccessor::GetUnit(*me, tGuid);
-                                if (t && t->GetDistance(me) < 27 && !t->HasAuraType(SPELL_AURA_SPELL_MAGNET))
-                                    cast = true;
-                            }
-                            break;
+                            Unit const* t = ObjectAccessor::GetUnit(*me, tGuid);
+                            if (t && t->GetDistance(me) < 27 && !t->HasAuraType(SPELL_AURA_SPELL_MAGNET))
+                                cast = true;
                         }
                     }
                 }
@@ -1328,57 +1266,24 @@ public:
 
         void CheckEarthShield(uint32 diff)
         {
-            if (!IsSpellReady(EARTH_SHIELD_1, diff) || IAmFree() || Earthy == true || Rand() > (65 - 45 * me->IsInCombat()))
+            if (!IsSpellReady(EARTH_SHIELD_1, diff) || Earthy == true || Rand() > (65 - 45 * me->IsInCombat()))
                 return;
 
-            static auto can_affect = [](WorldObject const* o, Unit const* unit)
+            static const auto can_affect = [](WorldObject const* o, Unit const* unit)
             {
                 AuraEffect const* eShield = unit->GetAuraEffect(SPELL_AURA_REDUCE_PUSHBACK, SPELLFAMILY_SHAMAN, 0x0, 0x400, 0x0);
                 return (!eShield || eShield->GetBase()->GetCharges() < 5 || eShield->GetBase()->GetDuration() < 30000) && o->GetDistance(unit) < 40 && (unit->IsInCombat() || !unit->isMoving());
             };
 
-            Group const* gr = master->GetGroup();
+            Group const* gr = !IAmFree() ? master->GetGroup() : GetGroup();
             if (!gr)
             {
-                Player* pl = master;
-
-                if (IsTank(pl) && can_affect(me, pl) && doCast(pl, GetSpell(EARTH_SHIELD_1)))
+                if (IsTank(master) && can_affect(me, master) && doCast(master, GetSpell(EARTH_SHIELD_1)))
                     return;
 
-                BotMap const* map = pl->GetBotMgr()->GetBotMap();
-                for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
+                if (!IAmFree())
                 {
-                    Unit* u = it->second;
-                    if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->InSamePhase(me))
-                        continue;
-
-                    if (IsTank(u))
-                    {
-                        if (can_affect(me, u))
-                        {
-                            if (doCast(u, GetSpell(EARTH_SHIELD_1)))
-                            {
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                for (GroupReference const* ref = gr->GetFirstMember(); ref != nullptr; ref = ref->next())
-                {
-                    Player* pl = ref->GetSource();
-                    if (!pl || !pl->IsInWorld() || me->GetMap() != pl->FindMap() || !pl->InSamePhase(me))
-                        continue;
-
-                    if (IsTank(pl) && can_affect(me, pl) && doCast(pl, GetSpell(EARTH_SHIELD_1)))
-                        return;
-
-                    if (!pl->HaveBot())
-                        continue;
-
-                    BotMap const* map = pl->GetBotMgr()->GetBotMap();
+                    BotMap const* map = master->GetBotMgr()->GetBotMap();
                     for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
                     {
                         Unit* u = it->second;
@@ -1389,8 +1294,24 @@ public:
                     }
                 }
             }
+            else
+            {
+                std::set<Unit*> tanks;
+                for (Unit* member : BotMgr::GetAllGroupMembers(gr))
+                {
+                    if (me->GetMap() == member->FindMap() && member->IsAlive() && member->InSamePhase(me) && IsTank(member) && can_affect(me, member))
+                        tanks.insert(member);
+                }
 
-            if (can_affect(me, master) && doCast(master, GetSpell(EARTH_SHIELD_1)))
+                if (!tanks.empty())
+                {
+                    Unit* target = tanks.size() == 1 ? *tanks.begin() : Acore::Containers::SelectRandomContainerElement(tanks);
+                    if (doCast(target, GetSpell(EARTH_SHIELD_1)))
+                        return;
+                }
+            }
+
+            if (!IAmFree() && can_affect(me, master) && doCast(master, GetSpell(EARTH_SHIELD_1)))
                 return;
         }
 
