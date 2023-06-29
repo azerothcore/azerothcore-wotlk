@@ -11,7 +11,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2530, 0, 2, 0, 20, 0, 100, 0, 593, 0, 0, 0, 0, 80, 253001, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - On Quest \'Filling the Soul Gem\' Finished - Run Script'),
 (2530, 0, 3, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - On Respawn - Remove Flags Immune To Players & Immune To NPC\'s');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 253000);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (253000, 253001));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (253000, 9, 0, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 18, 6, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Orientation Closest Player'),
 (253000, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Say Line 0'),
@@ -19,10 +19,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (253000, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33536, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Flags Immune To Players & Immune To NPC\'s'),
 (253000, 9, 4, 0, 0, 0, 100, 0, 60000, 60000, 0, 0, 0, 28, 18970, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Remove Aura \'Self Stun - (Visual only)\''),
 (253000, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s'),
-(253000, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 28, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Faction 28');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 253001);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(253000, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 28, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Faction 28'),
 (253001, 9, 0, 0, 0, 0, 100, 0, 60000, 60000, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s'),
 (253001, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 28, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Faction 28'),
 (253001, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 28, 18970, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Remove Aura \'Self Stun - (Visual only)\'');
