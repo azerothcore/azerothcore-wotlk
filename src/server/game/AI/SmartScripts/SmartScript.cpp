@@ -114,7 +114,7 @@ void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint3
 void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, uint32 var1, bool bvar, SpellInfo const* spell, GameObject* gob)
 {
     //calc random
-    if (e.GetEventType() != SMART_EVENT_LINK && e.event.event_chance < 100 && e.event.event_chance)
+    if (e.event.event_chance < 100 && e.event.event_chance)
     {
         uint32 rnd = urand(1, 100);
         if (e.event.event_chance <= rnd)
@@ -640,12 +640,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     me->CastSpell(target->ToUnit(), e.action.cast.spell, triggerFlags);
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_CAST: Unit {} casts spell {} on target {} with castflags {}",
-                              me->GetGUID().ToString().c_str(), e.action.cast.spell, target->GetGUID().ToString().c_str(), e.action.cast.castFlags);
+                              me->GetGUID().ToString(), e.action.cast.spell, target->GetGUID().ToString(), e.action.cast.castFlags);
                 }
                 else
                 {
                     LOG_DEBUG("scripts.ai", "Spell {} not cast because it has flag SMARTCAST_AURA_NOT_PRESENT and the target {} already has the aura",
-                              e.action.cast.spell, target->GetGUID().ToString().c_str());
+                              e.action.cast.spell, target->GetGUID().ToString());
                 }
             }
             break;
@@ -729,12 +729,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     tempLastInvoker->CastSpell(target->ToUnit(), e.action.cast.spell, triggerFlags);
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_INVOKER_CAST: Invoker {} casts spell {} on target {} with castflags {}",
-                              tempLastInvoker->GetGUID().ToString().c_str(), e.action.cast.spell, target->GetGUID().ToString().c_str(), e.action.cast.castFlags);
+                              tempLastInvoker->GetGUID().ToString(), e.action.cast.spell, target->GetGUID().ToString(), e.action.cast.castFlags);
                 }
                 else
                 {
                     LOG_DEBUG("scripts.ai", "Spell {} not cast because it has flag SMARTCAST_AURA_NOT_PRESENT and the target {} already has the aura",
-                              e.action.cast.spell, target->GetGUID().ToString().c_str());
+                              e.action.cast.spell, target->GetGUID().ToString());
                 }
             }
             break;
@@ -988,7 +988,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!IsSmart())
                 break;
 
-            if (targets.empty())
+            if (e.target.type == SMART_TARGET_NONE || e.target.type == SMART_TARGET_SELF)
             {
                 CAST_AI(SmartAI, me->AI())->StopFollow(false);
                 break;
@@ -1139,7 +1139,22 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_DIE:
         {
-            if (me && !me->isDead())
+            if (e.action.die.milliseconds)
+            {
+                if (me && !me->isDead())
+                {
+                    me->m_Events.AddEventAtOffset([&]
+                        {
+                            // We need to check again to see if we didn't die in the process.
+                            if (me && !me->isDead())
+                            {
+                                me->KillSelf();
+                                LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_DIE: Creature {}", me->GetGUID().ToString());
+                            }
+                        }, Milliseconds(e.action.die.milliseconds));
+                }
+            }
+            else if (me && !me->isDead())
             {
                 me->KillSelf();
                 LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_DIE: Creature {}", me->GetGUID().ToString());
@@ -1626,6 +1641,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 me->SetFacingTo(randomOri);
                 if (e.action.orientation.quickChange)
                     me->SetOrientation(randomOri);
+                break;
+            }
+
+            if (e.action.orientation.turnAngle)
+            {
+                float turnOri = me->GetOrientation() + (static_cast<float>(e.action.orientation.turnAngle) * M_PI / 180.0f);
+                me->SetFacingTo(turnOri);
+                if (e.action.orientation.quickChange)
+                    me->SetOrientation(turnOri);
                 break;
             }
 
@@ -2795,6 +2819,60 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     object->AI()->SetGUID(guidToSend, e.action.setGuid.index);
                 }
             }
+            break;
+        }
+        case SMART_ACTION_DISABLE:
+        {
+            for (WorldObject* target : targets)
+            {
+                if (IsUnit(target))
+                {
+                    target->ToUnit()->SetImmuneToAll(!e.action.disable.state);
+                    target->ToUnit()->SetVisible(e.action.disable.state);
+                }
+            }
+            break;
+        }
+        case SMART_ACTION_SET_SCALE:
+        {
+            float scale = static_cast<float>(e.action.setScale.scale) / 100.0f;
+
+            for (WorldObject* target : targets)
+            {
+                if (IsUnit(target))
+                {
+                    target->ToUnit()->SetObjectScale(scale);
+                }
+            }
+            break;
+        }
+        case SMART_ACTION_SUMMON_RADIAL:
+        {
+            if (!me)
+                break;
+
+            TempSummonType spawnType = (e.action.radialSummon.summonDuration > 0) ? TEMPSUMMON_TIMED_DESPAWN : TEMPSUMMON_CORPSE_DESPAWN;
+
+            float startAngle = me->GetOrientation() + (static_cast<float>(e.action.radialSummon.startAngle) * M_PI / 180.0f);
+            float stepAngle = static_cast<float>(e.action.radialSummon.stepAngle) * M_PI / 180.0f;
+
+            if (e.action.radialSummon.dist)
+            {
+                for (uint32 itr = 0; itr < e.action.radialSummon.repetitions; itr++)
+                {
+                    Position summonPos = me->GetPosition();
+                    summonPos.RelocatePolarOffset(itr * stepAngle, static_cast<float>(e.action.radialSummon.dist));
+                    me->SummonCreature(e.action.radialSummon.summonEntry, summonPos, spawnType, e.action.radialSummon.summonDuration);
+                }
+                break;
+            }
+
+            for (uint32 itr = 0; itr < e.action.radialSummon.repetitions; itr++)
+            {
+                float currentAngle = startAngle + (itr * stepAngle);
+                me->SummonCreature(e.action.radialSummon.summonEntry, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), currentAngle, spawnType, e.action.radialSummon.summonDuration);
+            }
+
             break;
         }
         default:

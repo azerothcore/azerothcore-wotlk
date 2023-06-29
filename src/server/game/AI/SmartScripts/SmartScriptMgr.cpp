@@ -641,7 +641,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_INST_DATA: return sizeof(SmartAction::setInstanceData);
             case SMART_ACTION_SET_INST_DATA64: return sizeof(SmartAction::setInstanceData64);
             case SMART_ACTION_UPDATE_TEMPLATE: return sizeof(SmartAction::updateTemplate);
-            case SMART_ACTION_DIE: return NO_PARAMS;
+            case SMART_ACTION_DIE: return sizeof(SmartAction::die);
             case SMART_ACTION_SET_IN_COMBAT_WITH_ZONE: return NO_PARAMS;
             case SMART_ACTION_CALL_FOR_HELP: return sizeof(SmartAction::callHelp);
             case SMART_ACTION_SET_SHEATH: return sizeof(SmartAction::setSheath);
@@ -671,7 +671,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_COUNTER: return sizeof(SmartAction::setCounter);
             case SMART_ACTION_STORE_TARGET_LIST: return sizeof(SmartAction::storeTargets);
             case SMART_ACTION_WP_RESUME: return NO_PARAMS;
-            case SMART_ACTION_SET_ORIENTATION: return NO_PARAMS;
+            case SMART_ACTION_SET_ORIENTATION: return sizeof(SmartAction::orientation);
             case SMART_ACTION_CREATE_TIMED_EVENT: return sizeof(SmartAction::timeEvent);
             case SMART_ACTION_PLAYMOVIE: return sizeof(SmartAction::movie);
             case SMART_ACTION_MOVE_TO_POS: return sizeof(SmartAction::moveToPos);
@@ -762,6 +762,9 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_LOAD_GRID: return NO_PARAMS;
             case SMART_ACTION_MUSIC: return sizeof(SmartAction::music);
             case SMART_ACTION_SET_GUID: return sizeof(SmartAction::setGuid);
+            case SMART_ACTION_DISABLE: return sizeof(SmartAction::disable);
+            case SMART_ACTION_SET_SCALE: return sizeof(SmartAction::setScale);
+            case SMART_ACTION_SUMMON_RADIAL: return sizeof(SmartAction::radialSummon);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -1918,6 +1921,9 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_ATTACK_STOP:
         case SMART_ACTION_PLAY_CINEMATIC:
         case SMART_ACTION_SET_GUID:
+        case SMART_ACTION_DISABLE:
+        case SMART_ACTION_SET_SCALE:
+        case SMART_ACTION_SUMMON_RADIAL:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);
