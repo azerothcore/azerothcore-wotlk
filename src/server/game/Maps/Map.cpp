@@ -3820,7 +3820,7 @@ void Map::DoForAllPlayers(std::function<void(Player*)> exec)
 bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
     G3D::Vector3 prevPath = path->GetStartPosition();
-    for (auto & vector : path->GetPath())
+    for (auto& vector : path->GetPath())
     {
         float x = vector.x;
         float y = vector.y;

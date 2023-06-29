@@ -116,6 +116,11 @@ DoorData const doorData[] =
     {0,                                      0,                          DOOR_TYPE_ROOM       }
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_SINDRAGOSA, DATA_SINDRAGOSA }
+};
+
 // this doesnt have to only store questgivers, also can be used for related quest spawns
 struct WeeklyQuest
 {
@@ -203,6 +208,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             SetPersistentDataCount(MAX_DATA_INDEXES);
             LoadBossBoundaries(boundaries);
+            LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
             TeamIdInInstance = TEAM_NEUTRAL;
             HeroicAttempts = MaxHeroicAttempts;
@@ -257,7 +263,7 @@ public:
             if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                 SpawnGunship();
 
-            if (GetBossState(DATA_SINDRAGOSA) != DONE && IsSindragosaIntroDone && SindragosaGUID.IsEmpty() && Events.GetTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA) == Milliseconds::max())
+            if (GetBossState(DATA_SINDRAGOSA) != DONE && IsSindragosaIntroDone && !GetCreature(DATA_SINDRAGOSA) && Events.GetTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA) == Milliseconds::max())
             {
                 Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
             }
@@ -518,12 +524,16 @@ public:
                 default:
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnCreatureRemove(Creature* creature) override
         {
             if (creature->GetEntry() == NPC_SINDRAGOSA)
                 SindragosaGUID.Clear();
+
+            InstanceScript::OnCreatureRemove(creature);
         }
 
         uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
@@ -1447,7 +1457,7 @@ public:
 
         bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
         {
-            if (player->GetSession()->GetSecurity() >= SEC_MODERATOR)
+            if (player && player->GetSession() && player->GetSession()->GetSecurity() >= SEC_MODERATOR)
             {
                 return true;
             }
@@ -1764,15 +1774,18 @@ public:
                         SpawnGunship();
                         break;
                     case EVENT_RESPAWN_SINDRAGOSA:
-                        if (Creature* sindragosa = instance->SummonCreature(NPC_SINDRAGOSA, SindragosaSpawnPos))
+                        if (!GetCreature(DATA_SINDRAGOSA))
                         {
-                            sindragosa->setActive(true);
-                            sindragosa->SetDisableGravity(true);
-                            sindragosa->GetMotionMaster()->MovePath(NPC_SINDRAGOSA * 10, true);
-
-                            if (TempSummon* summon = sindragosa->ToTempSummon())
+                            if (Creature* sindragosa = instance->SummonCreature(NPC_SINDRAGOSA, SindragosaSpawnPos))
                             {
-                                summon->SetTempSummonType(TEMPSUMMON_DEAD_DESPAWN);
+                                sindragosa->setActive(true);
+                                sindragosa->SetDisableGravity(true);
+                                sindragosa->GetMotionMaster()->MovePath(NPC_SINDRAGOSA * 10, true);
+
+                                if (TempSummon* summon = sindragosa->ToTempSummon())
+                                {
+                                    summon->SetTempSummonType(TEMPSUMMON_DEAD_DESPAWN);
+                                }
                             }
                         }
                         // Could happen more than once if more than one player enters before she respawns.

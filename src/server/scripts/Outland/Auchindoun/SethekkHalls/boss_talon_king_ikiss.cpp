@@ -56,16 +56,19 @@ struct boss_talon_king_ikiss : public BossAI
         _Reset();
         _spoken = false;
 
-        ScheduleHealthCheckEvent(80, [&] {
-            TeleportAndCastExplosion();
-        });
+        ScheduleHealthCheckEvent({ 80, 50, 25 }, [&] {
+            me->InterruptNonMeleeSpells(false);
+            DoCastAOE(SPELL_BLINK);
+            DoCastSelf(SPELL_ARCANE_BUBBLE, true);
+            Talk(EMOTE_ARCANE_EXP);
 
-        ScheduleHealthCheckEvent(50, [&] {
-            TeleportAndCastExplosion();
-        });
-
-        ScheduleHealthCheckEvent(25, [&] {
-            TeleportAndCastExplosion();
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+            }).Schedule(6500ms, [this](TaskContext /*context*/)
+            {
+                me->GetThreatMgr().ResetAllThreat();
+            });
         });
 
         ScheduleHealthCheckEvent(20, [&] {
@@ -77,22 +80,6 @@ struct boss_talon_king_ikiss : public BossAI
     bool CanAIAttack(Unit const* /*victim*/) const override
     {
         return _spoken;
-    }
-
-    void TeleportAndCastExplosion()
-    {
-        me->InterruptNonMeleeSpells(false);
-        DoCastSelf(SPELL_ARCANE_BUBBLE, true);
-        DoCastAOE(SPELL_BLINK);
-        Talk(EMOTE_ARCANE_EXP);
-
-        scheduler.Schedule(1s, [this](TaskContext)
-        {
-            DoCastAOE(SPELL_ARCANE_EXPLOSION);
-        }).Schedule(6500ms, [this](TaskContext /*context*/)
-        {
-            me->GetThreatMgr().ResetAllThreat();
-        });
     }
 
     void MoveInLineOfSight(Unit* who) override

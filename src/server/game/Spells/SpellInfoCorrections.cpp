@@ -430,13 +430,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000040, 0x00000000, 0x00000000);
     });
 
-    // Idol of the Flourishing Life
-    ApplySpellFix({ 64949 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000000, 0x02000000, 0x00000000);
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_ADD_FLAT_MODIFIER;
-    });
-
     ApplySpellFix({
         34231,  // Libram of the Lightbringer
         60792,  // Libram of Tolerance
@@ -713,8 +706,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     ApplySpellFix({
         5171,   // Slice and Dice
-        6774,   // Slice and Dice
-        1725    // Distract
+        6774    // Slice and Dice
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
@@ -4461,7 +4453,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Self Visual - Sleep Until Cancelled(DND)
-    ApplySpellFix({ 14915 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 6606, 14915, 16093 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_SEATED;
     });

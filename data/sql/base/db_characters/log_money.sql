@@ -19,20 +19,18 @@ DROP TABLE IF EXISTS `log_money`;
 CREATE TABLE IF NOT EXISTS `log_money` (
   `sender_acc` int unsigned NOT NULL,
   `sender_guid` int unsigned NOT NULL,
-  `sender_name` text NOT NULL,
-  `sender_ip` text NOT NULL,
+  `sender_name` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sender_ip` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `receiver_acc` int unsigned NOT NULL,
-  `receiver_name` text NOT NULL,
+  `receiver_name` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `money` bigint unsigned NOT NULL,
-  `topic` text NOT NULL,
+  `topic` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `date` datetime NOT NULL,
   `type` tinyint NOT NULL COMMENT '1=COD,2=AH,3=GB DEPOSIT,4=GB WITHDRAW,5=MAIL,6=TRADE'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_characters.log_money: 0 rows
+-- Dumping data for table acore_characters.log_money: ~0 rows (approximately)
 DELETE FROM `log_money`;
-/*!40000 ALTER TABLE `log_money` DISABLE KEYS */;
-/*!40000 ALTER TABLE `log_money` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

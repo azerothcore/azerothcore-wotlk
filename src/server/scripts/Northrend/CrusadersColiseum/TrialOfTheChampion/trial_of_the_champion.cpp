@@ -21,10 +21,23 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 
-#define GOSSIP_START_EVENT1a "I am ready."
-#define GOSSIP_START_EVENT1b "I am ready. However I'd like to skip the pageantry."
-#define GOSSIP_START_EVENT2  "I'm ready for the next challenge."
-#define GOSSIP_START_EVENT3  "I'm ready."
+enum Texts
+{
+    NPC_TEXT_NOT_MOUNTED_H = 15043,  // Horde text
+    NPC_TEXT_NOT_MOUNTED_A = 14757,  // Alliance text
+
+    NPC_TEXT_CHALLENGE_1   = 14688,
+    NPC_TEXT_CHALLENGE_2   = 14737,
+    NPC_TEXT_CHALLENGE_3   = 14738,
+
+    GOSSIP_MENU_STAGE      = 10614,
+
+    GOSSIP_START_EVENT_1A  = 0,
+    GOSSIP_START_EVENT_1B  = 3, // Skip roleplay
+    GOSSIP_START_EVENT_2   = 1,
+    GOSSIP_START_EVENT_3   = 2,
+
+};
 
 class npc_announcer_toc5 : public CreatureScript
 {
@@ -47,29 +60,28 @@ public:
                 if (!player->GetVehicle())
                 {
                     if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
-                        gossipTextId = 15043; //Horde text
+                        gossipTextId = NPC_TEXT_NOT_MOUNTED_H;
                     else
-                        gossipTextId = 14757; //Alliance text
+                        gossipTextId = NPC_TEXT_NOT_MOUNTED_A;
                 }
                 else
                 {
-                    gossipTextId = 14688;
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1a, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1338);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1b, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1341);
+                    gossipTextId = NPC_TEXT_CHALLENGE_1;
+                    AddGossipItemFor(player, GOSSIP_MENU_STAGE, GOSSIP_START_EVENT_1A, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, GOSSIP_MENU_STAGE, GOSSIP_START_EVENT_1B, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 }
                 break;
             case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
-                gossipTextId = 14737;
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1339);
+                gossipTextId = NPC_TEXT_CHALLENGE_2;
+                AddGossipItemFor(player, GOSSIP_MENU_STAGE, GOSSIP_START_EVENT_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 break;
             case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
-                gossipTextId = 14738;
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1340);
+                gossipTextId = NPC_TEXT_CHALLENGE_3;
+                AddGossipItemFor(player, GOSSIP_MENU_STAGE, GOSSIP_START_EVENT_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 break;
             default:
                 return true;
         }
-
         SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
         return true;
     }
@@ -83,9 +95,9 @@ public:
         if(!pInstance)
             return true;
 
-        if(uiAction == GOSSIP_ACTION_INFO_DEF + 1338 || uiAction == GOSSIP_ACTION_INFO_DEF + 1341 || uiAction == GOSSIP_ACTION_INFO_DEF + 1339 || uiAction == GOSSIP_ACTION_INFO_DEF + 1340)
+        if(uiAction == GOSSIP_ACTION_INFO_DEF + 1 || uiAction == GOSSIP_ACTION_INFO_DEF + 2 || uiAction == GOSSIP_ACTION_INFO_DEF + 3 || uiAction == GOSSIP_ACTION_INFO_DEF + 4)
         {
-            pInstance->SetData(DATA_ANNOUNCER_GOSSIP_SELECT, (uiAction == GOSSIP_ACTION_INFO_DEF + 1341 ? 1 : 0));
+            pInstance->SetData(DATA_ANNOUNCER_GOSSIP_SELECT, (uiAction == GOSSIP_ACTION_INFO_DEF + 2 ? 1 : 0));
             creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 

@@ -25,6 +25,17 @@
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
 
+/**
+ *  @todo: Missing dialog/RP (already populated in DB) && spawns (can use ToC25 locations?) for:
+ *
+ *    Garrosh Hellscream 34995
+ *    King Varian Wrynn 34990
+ *   Lady Jaina Proudmoore 34992 (missing in DB)
+ *   Thrall 34994
+ *
+ *  And possibly NPC_TIRION 33628 is wrong (should be 34996, from ToC25, needs a sniff to confirm, check .h)
+ */
+
 class Group;
 
 class instance_trial_of_the_champion : public InstanceMapScript
@@ -523,9 +534,9 @@ public:
                             {
                                 Counter = urand(0, 1);
                                 if( Counter )
-                                    announcer->AI()->Talk(TEXT_INTRODUCE_EADRIC);
+                                    announcer->AI()->Talk(SAY_EADRIC_INTRO_ANNOUNCER);
                                 else
-                                    announcer->AI()->Talk(TEXT_INTRODUCE_PALETRESS);
+                                    announcer->AI()->Talk(SAY_JAEREN_PALETRESS_INTRO);
                             }
                             HandleGameObject(GO_EnterGateGUID, false);
                             events.RescheduleEvent(EVENT_START_ARGENT_CHALLENGE_INTRO, 0ms);
@@ -702,27 +713,27 @@ public:
                 case 0:
                     CHAMPION_TO_SUMMON = NPC_MOKRA;
                     MINION_TO_SUMMON = NPC_ORGRIMMAR_MINION;
-                    TEXT_ID = TEXT_MOKRA_SKILLCRUSHER;
+                    TEXT_ID = SAY_GRAND_CHAMPIONS_INTRO_SKULLCRUSHER;
                     break;
                 case 1:
                     CHAMPION_TO_SUMMON = NPC_ERESSEA;
                     MINION_TO_SUMMON = NPC_SILVERMOON_MINION;
-                    TEXT_ID = TEXT_ERESSEA_DAWNSINGER;
+                    TEXT_ID = SAY_GRAND_CHAMPIONS_INTRO_DAWNSINGER;
                     break;
                 case 2:
                     CHAMPION_TO_SUMMON = NPC_RUNOK;
                     MINION_TO_SUMMON = NPC_THUNDER_BLUFF_MINION;
-                    TEXT_ID = TEXT_RUNOK_WILDMANE;
+                    TEXT_ID = SAY_GRAND_CHAMPIONS_INTRO_WILDMANE;
                     break;
                 case 3:
                     CHAMPION_TO_SUMMON = NPC_ZULTORE;
                     MINION_TO_SUMMON = NPC_SENJIN_MINION;
-                    TEXT_ID = TEXT_ZUL_TORE;
+                    TEXT_ID = SAY_GRAND_CHAMPIONS_INTRO_ZULTORE;
                     break;
                 case 4:
                     CHAMPION_TO_SUMMON = NPC_VISCERI;
                     MINION_TO_SUMMON = NPC_UNDERCITY_MINION;
-                    TEXT_ID = TEXT_DEATHSTALKER_VESCERI;
+                    TEXT_ID = SAY_GRAND_CHAMPIONS_INTRO_DEATHSTALKER;
                     break;
                 default:
                     return;
@@ -767,10 +778,7 @@ public:
             if (!shortver)
                 if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                 {
-                    if( TeamIdInInstance == TEAM_HORDE )
-                        TEXT_ID -= 10;
-                    announcer->AI()->Talk(TEXT_ID);
-                    announcer->AI()->Talk(TEXT_ID + 1);
+                    announcer->AI()->Talk(TEXT_ID); /// @todo: Missing Argent Raid Spectator cheers.
                 }
         }
 
@@ -1007,16 +1015,6 @@ public:
                                 HandleGameObject(GO_MainGateGUID, true, gate);
                                 HandleGameObject(GO_EnterGateGUID, false, gate);
                             }
-                            if( Counter )
-                            {
-                                announcer->AI()->Talk(TEXT_CHEER_EADRIC_1);
-                                announcer->AI()->Talk(TEXT_CHEER_EADRIC_2);
-                            }
-                            else
-                            {
-                                announcer->AI()->Talk(TEXT_CHEER_PALETRESS_1);
-                                announcer->AI()->Talk(TEXT_CHEER_PALETRESS_2);
-                            }
                         }
 
                         for( int8 i = 0; i < 3; ++i )
@@ -1060,7 +1058,7 @@ public:
                 case EVENT_ARGENT_CHALLENGE_SAY_1:
                     {
                         if( Creature* ac = instance->GetCreature(NPC_ArgentChampionGUID) )
-                            ac->AI()->Talk(Counter ? TEXT_EADRIC_SAY_1 : TEXT_PALETRESS_SAY_1);
+                            ac->AI()->Talk(Counter ? SAY_EADRIC_INTRO : SAY_PALETRESS_INTRO_1);
                         if( !Counter )
                             events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_SAY_2, 6s);
                     }
@@ -1068,7 +1066,7 @@ public:
                 case EVENT_ARGENT_CHALLENGE_SAY_2:
                     {
                         if( Creature* ac = instance->GetCreature(NPC_ArgentChampionGUID) )
-                            ac->AI()->Talk(TEXT_PALETRESS_SAY_2);
+                            ac->AI()->Talk(SAY_PALETRESS_INTRO_2);
                     }
                     break;
                 case EVENT_ARGENT_SOLDIER_GROUP_ATTACK:
@@ -1163,7 +1161,7 @@ public:
                                     }
 
                                 announcer->SetFacingToObject(bk_vehicle);
-                                announcer->AI()->Talk(TEXT_BK_RAFTERS);
+                                announcer->AI()->Talk(SAY_KNIGHT_INTRO);
                             }
                     }
                     break;
@@ -1174,7 +1172,7 @@ public:
                             Position exitPos = { 751.003357f, 638.145508f, 411.570129f, M_PI };
                             bk->ExitVehicle(/*&exitPos*/);
                             bk->GetMotionMaster()->MoveJump(exitPos, 2.0f, 2.0f);
-                            bk->AI()->Talk(TEXT_BK_SPOILED);
+                            bk->AI()->Talk(SAY_BK_INTRO_1);
                         }
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_CAST_ANNOUNCER, 2s);
                     }
@@ -1212,7 +1210,7 @@ public:
                         {
                             bk->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
                             bk->GetMotionMaster()->MovePoint(0, 746.81f, 623.15f, 411.42f);
-                            bk->AI()->Talk(TEXT_BK_LICH);
+                            bk->AI()->Talk(SAY_BK_INTRO_2);
                         }
                         if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                             if (announcer->IsAlive())
@@ -1225,7 +1223,7 @@ public:
                         if( Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
                         {
                             bk->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                            bk->AI()->Talk(TEXT_BK_TASK);
+                            bk->AI()->Talk(SAY_BK_INTRO_3);
                         }
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_ATTACK, 5s);
                     }

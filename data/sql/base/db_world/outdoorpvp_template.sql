@@ -18,14 +18,13 @@
 DROP TABLE IF EXISTS `outdoorpvp_template`;
 CREATE TABLE IF NOT EXISTS `outdoorpvp_template` (
   `TypeId` tinyint unsigned NOT NULL,
-  `ScriptName` char(64) NOT NULL DEFAULT '',
-  `comment` text,
+  `ScriptName` char(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `comment` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`TypeId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='OutdoorPvP Templates';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OutdoorPvP Templates';
 
--- Dumping data for table acore_world.outdoorpvp_template: 7 rows
+-- Dumping data for table acore_world.outdoorpvp_template: ~7 rows (approximately)
 DELETE FROM `outdoorpvp_template`;
-/*!40000 ALTER TABLE `outdoorpvp_template` DISABLE KEYS */;
 INSERT INTO `outdoorpvp_template` (`TypeId`, `ScriptName`, `comment`) VALUES
 	(1, 'outdoorpvp_hp', 'Hellfire Peninsula'),
 	(2, 'outdoorpvp_na', 'Nagrand'),
@@ -34,7 +33,6 @@ INSERT INTO `outdoorpvp_template` (`TypeId`, `ScriptName`, `comment`) VALUES
 	(5, 'outdoorpvp_si', 'Silithus'),
 	(6, 'outdoorpvp_ep', 'Eastern Plaguelands'),
 	(7, 'outdoorpvp_gh', 'Grizzly Hills');
-/*!40000 ALTER TABLE `outdoorpvp_template` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
