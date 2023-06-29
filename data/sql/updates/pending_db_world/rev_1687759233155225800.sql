@@ -17,10 +17,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (253000, 9, 0, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 18, 6, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Orientation Closest Player'),
 (253000, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Say Line 0'),
 (253000, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 75, 18970, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Add Aura \'Self Stun - (Visual only)\''),
-(253000, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33536, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Flags Immune To Players & Immune To NPC\'s'),
-(253000, 9, 4, 0, 0, 0, 100, 0, 60000, 60000, 0, 0, 0, 28, 18970, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Remove Aura \'Self Stun - (Visual only)\''),
-(253000, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s'),
-(253000, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 28, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Faction 28'),
-(253001, 9, 0, 0, 0, 0, 100, 0, 60000, 60000, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s'),
-(253001, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 28, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Faction 28'),
-(253001, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 28, 18970, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Remove Aura \'Self Stun - (Visual only)\'');
+(253000, 9, 3, 0, 0, 0, 100, 0, 60000, 60000, 0, 0, 0, 28, 18970, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Remove Aura \'Self Stun - (Visual only)\''),
+(253000, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 28, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Faction 28'),
+(253001, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 28, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Set Faction 28'),
+(253001, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 28, 18970, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Yenniku - Actionlist - Remove Aura \'Self Stun - (Visual only)\'');
