@@ -1,7 +1,7 @@
 -- Fix SAI Yenniku --
 DELETE FROM `creature_text` WHERE (`CreatureID` = 2530 AND `GroupID` = 0);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(2530, 0, 0, '%s is struck dumb by the Soul Gem!', 16, 0, 0, 0, 1500, 0, 681, 0, ' ');
+(2530, 0, 0, '%s is struck dumb by the Soul Gem!', 16, 0, 100, 0, 0, 0, 681, 0, 'Yenniku');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 2530);
 
