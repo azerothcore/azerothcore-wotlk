@@ -810,7 +810,7 @@ struct npc_pet_darting_hatchling : public NullCreatureAI
         checkTimer += diff;
         if (checkTimer >= 2000)
         {
-            me->RemoveAura(SPELL_DARTING_FEAR);
+            me->RemoveAurasDueToSpell(SPELL_DARTING_FEAR);
             checkTimer = 0;
             goFast = false;
         }
