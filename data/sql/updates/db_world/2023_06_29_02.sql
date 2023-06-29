@@ -1,3 +1,4 @@
+-- DB update 2023_06_29_01 -> 2023_06_29_02
 -- Fix SAI Yenniku --
 DELETE FROM `creature_text` WHERE (`CreatureID` = 2530 AND `GroupID` = 0);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
