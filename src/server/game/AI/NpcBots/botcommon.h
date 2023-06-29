@@ -45,7 +45,7 @@ enum BotCommonValues
     REVIVE_TIMER_DEFAULT                = 180000, //3 Minutes
     REVIVE_TIMER_MEDIUM                 = 90000, //1.5 Minutes
     REVIVE_TIMER_SHORT                  = 60000, //1 Minute
-    INOUTDOORS_ENSURE_TIMER             = 1000,
+    INOUTDOORS_ENSURE_TIMER             = 1500,
     BOT_GROUP_UPDATE_TIMER              = 2000,
 //VEHICLE CREATURES
     CREATURE_NEXUS_SKYTALON_1           = 32535, // [Q] Aces High

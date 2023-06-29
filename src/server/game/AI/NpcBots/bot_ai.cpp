@@ -15358,8 +15358,10 @@ void bot_ai::KilledUnit(Unit* u)
             else if (u->IsNPCBot())
                 bg->HandleBotKillBot(me, u->ToCreature());
         }
-        else if (u->GetTypeId() == TYPEID_UNIT && !u->IsNPCBotOrPet())
+        else if (bg && u->GetTypeId() == TYPEID_UNIT && !u->IsNPCBotOrPet())
             bg->HandleBotKillUnit(me, u->ToCreature());
+
+        outdoorsTimer = 0;
     }
 
     if (u->isType(TYPEMASK_PLAYER))
@@ -17503,6 +17505,8 @@ void bot_ai::UpdateReviveTimer(uint32 diff)
 
             if (IsWanderer())
             {
+                outdoorsTimer = 0;
+
                 Position safePos;
                 if (me->GetMap()->GetEntry()->IsContinent())
                 {
