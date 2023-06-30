@@ -381,7 +381,7 @@ public:
             }
             //Blind: in pvp only for restealth
             if (IsSpellReady(BLIND_1, diff) && !stealthed && !shadowdance && dist <= 15 && Rand() < 30 &&
-                !CCed(mytar) && energy >= ecost(BLIND_1) &&
+                !CCed(mytar) && !mytar->IsTotem() && energy >= ecost(BLIND_1) &&
                 ((energy <= 30 && mytar->GetTarget() == me->GetGUID() &&
                 mytar->getAttackers().size() <= 1 &&
                 !mytar->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) &&

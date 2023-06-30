@@ -520,7 +520,9 @@ public:
             //TAUNT //No GCD
             if (IsSpellReady(TAUNT_1, diff, false) && u && u != me && Rand() < 50 && dist < 30 &&
                 mytar->CanHaveThreatList() && !CCed(mytar) && !mytar->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
-                (!IsTank(u) || (IsTank() && GetHealthPCT(u) < 30 && GetHealthPCT(me) > 67)) &&
+                (!IsTank(u) || (IsTank() && GetHealthPCT(me) > 67 &&
+                (GetHealthPCT(u) < 30 || (IsOffTank() && !IsOffTank(u) && IsPointedOffTankingTarget(mytar)) ||
+                (!IsOffTank() && IsOffTank(u) && IsPointedTankingTarget(mytar))))) &&
                 ((!IsTankingClass(u->GetClass()) && (GetHealthPCT(u) < 80 || _inStance(2))) || IsTank()) &&
                 IsInBotParty(u) &&
                 (_inStance(2) || (stancetimer <= diff && stanceChange(diff, 2))))

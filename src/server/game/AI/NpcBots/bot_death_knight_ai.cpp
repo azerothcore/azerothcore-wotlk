@@ -715,8 +715,10 @@ public:
             if (IsSpellReady(DARK_COMMAND_1, diff, false) && u && u != me && dist < 30 &&
                 mytar->GetTypeId() == TYPEID_UNIT && !mytar->IsControlledByPlayer() && Rand() < 50 &&
                 !CCed(mytar) && !mytar->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
-                (!IsTank(u) || (IsTank() && GetHealthPCT(u) < 30 && GetHealthPCT(me) > 67)) &&
-                (IsTank() || (!IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80)) &&
+                (!IsTank(u) || (IsTank() && GetHealthPCT(me) > 67 &&
+                (GetHealthPCT(u) < 30 || (IsOffTank() && !IsOffTank(u) && IsPointedOffTankingTarget(mytar)) ||
+                (!IsOffTank() && IsOffTank(u) && IsPointedTankingTarget(mytar))))) &&
+                ((!IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80) || IsTank()) &&
                 IsInBotParty(u))
             {
                 if (doCast(mytar, GetSpell(DARK_COMMAND_1)))

@@ -328,6 +328,7 @@ class bot_ai : public CreatureAI
         bool IsPointedTarget(Unit const* target, uint8 targetFlags) const;
         bool IsPointedHealTarget(Unit const* target) const;
         bool IsPointedTankingTarget(Unit const* target) const;
+        bool IsPointedOffTankingTarget(Unit const* target) const;
         bool IsPointedDPSTarget(Unit const* target) const;
         bool IsPointedRangedDPSTarget(Unit const* target) const;
         bool IsPointedNoDPSTarget(Unit const* target) const;
