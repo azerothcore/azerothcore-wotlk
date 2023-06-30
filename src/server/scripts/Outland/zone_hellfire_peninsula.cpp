@@ -403,59 +403,54 @@ enum Aledis
     SPELL_FROSTNOVA = 11831,
 };
 
-class npc_magister_aledis : public CreatureScript
+struct npc_magister_aledis : public ScriptedAI
 {
-public:
-    npc_magister_aledis() : CreatureScript("npc_magister_aledis") { }
+    npc_magister_aledis(Creature* creature) : ScriptedAI(creature) { }
 
-    struct npc_magister_aledisAI : public ScriptedAI
+    void StartFight(Player* player)
     {
-        npc_magister_aledisAI(Creature* creature) : ScriptedAI(creature) { }
+        me->Dismount();
+        me->SetFacingToObject(player);
+        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        _playerGUID = player->GetGUID();
+        _events.ScheduleEvent(EVENT_TALK, 2s);
+    }
 
-        void StartFight(Player* player)
-        {
-            me->Dismount();
-            me->SetFacingToObject(player);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-            _playerGUID = player->GetGUID();
-            _events.ScheduleEvent(EVENT_TALK, 2s);
-        }
+    void Reset() override
+    {
+        me->RestoreFaction();
+        me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        me->SetImmuneToPC(true);
+    }
 
-        void Reset() override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*spellInfo = nullptr*/) override
+    {
+        if (damage > me->GetHealth() || me->HealthBelowPctDamaged(20, damage))
         {
+            damage = 0;
+
+            _events.Reset();
             me->RestoreFaction();
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveAllAuras();
+            me->GetThreatMgr().ClearAllThreat();
+            me->CombatStop(true);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             me->SetImmuneToPC(true);
+            Talk(SAY_DEFEATED);
+
+            _events.ScheduleEvent(EVENT_EVADE, 1min);
         }
+    }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*spellInfo = nullptr*/) override
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        while (uint32 eventId = _events.ExecuteEvent())
         {
-            if (damage > me->GetHealth() || me->HealthBelowPctDamaged(20, damage))
+            switch (eventId)
             {
-                damage = 0;
-
-                _events.Reset();
-                me->RestoreFaction();
-                me->RemoveAllAuras();
-                me->GetThreatMgr().ClearAllThreat();
-                me->CombatStop(true);
-                me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-                me->SetImmuneToPC(true);
-                Talk(SAY_DEFEATED);
-
-                _events.ScheduleEvent(EVENT_EVADE, 1min);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
                 case EVENT_TALK:
                     Talk(SAY_CHALLENGE);
                     _events.ScheduleEvent(EVENT_ATTACK, 2s);
@@ -481,31 +476,25 @@ public:
                 case EVENT_EVADE:
                     EnterEvadeMode();
                     break;
-                }
             }
+        }
 
-            if (!UpdateVictim())
-                return;
-
+        if (UpdateVictim())
+        {
             DoMeleeAttackIfReady();
         }
-
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
-        {
-            CloseGossipMenuFor(player);
-            me->StopMoving();
-            StartFight(player);
-        }
-
-    private:
-        EventMap _events;
-        ObjectGuid _playerGUID;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_magister_aledisAI(creature);
     }
+
+    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
+    {
+        CloseGossipMenuFor(player);
+        me->StopMoving();
+        StartFight(player);
+    }
+
+private:
+    EventMap _events;
+    ObjectGuid _playerGUID;
 };
 
 enum Beacon
@@ -574,6 +563,7 @@ void AddSC_hellfire_peninsula()
     new npc_ancestral_wolf();
     new npc_wounded_blood_elf();
     new npc_fel_guard_hound();
-    new npc_magister_aledis();
     new go_beacon();
+
+    RegisterCreatureAI(npc_magister_aledis);
 }
