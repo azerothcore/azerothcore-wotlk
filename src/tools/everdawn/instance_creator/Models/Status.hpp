@@ -12,6 +12,7 @@ namespace everdawn
 
     namespace StatusCode
     {
+        constexpr int Idle = 1000;
         constexpr int Loading = 1001;
         constexpr int Ready = 1002;
         constexpr int Error = 1003;
@@ -21,36 +22,20 @@ namespace everdawn
     {
         int code;
         const char* message;
-
-        static Status Error(const char* message)
-        {
-           return { StatusCode::Error, message };
-        }
-
-        static Status Loading(const char* message)
-        {
-            return {StatusCode::Loading, message };
-        }
-
-
-        static Status Ready(const char* message)
-        {
-            return {StatusCode::Ready, message };
-        }
     };
 
 
     class StatusChangeEvent;
     wxDECLARE_EVENT(STATUS_EVENT_TYPE, StatusChangeEvent);
 
-    class StatusChangeEvent : public wxCommandEvent
+    class StatusChangeEvent final : public wxCommandEvent
     {
     public:
         const Status status;
-        StatusChangeEvent(Status status, int id = 0) :wxCommandEvent(STATUS_EVENT_TYPE, id), status(status) {};
+        explicit StatusChangeEvent(const Status status, const int id = 0) :wxCommandEvent(STATUS_EVENT_TYPE, id), status(status) {};
         StatusChangeEvent(const StatusChangeEvent& event)
             : wxCommandEvent(event), status(event.status) {};
-        wxEvent* Clone() const { return new StatusChangeEvent(*this); }
+        [[nodiscard]] wxEvent* Clone() const override { return new StatusChangeEvent(*this); }
     };
 
     typedef void (wxEvtHandler::* StatusChangeEventFunction)(StatusChangeEvent&);

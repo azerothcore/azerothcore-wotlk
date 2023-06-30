@@ -10,10 +10,12 @@
 
 namespace everdawn
 {
-    namespace StatusType::Database
+    namespace StatusCode::DatabaseConnection
     {
-        constexpr int WorldDatabase = 2002;
-        constexpr int WorldDatabaseConnection = 2003;
+        constexpr int Disconnected = 2002;
+        constexpr int Loading = 2003;
+        constexpr int Ready = 2004;
+        constexpr int Error = 2005;
     }
 
     class WorldDatabaseFacade
@@ -21,13 +23,13 @@ namespace everdawn
         class WorldDatabaseDecorator;
         inline static std::unique_ptr<WorldDatabaseDecorator> m_connection = nullptr;
         inline static std::unique_ptr<MySQLConnectionInfo> m_connectionInfo = nullptr;
-        inline static  Observable<Status> m_status;
+        inline static  Observable<Status> m_status = Observable<Status>({ StatusCode::DatabaseConnection::Disconnected, "MYSQL DISCONNECTED" });
 
-        class WorldDatabaseDecorator : public WorldDatabaseConnection
+        class WorldDatabaseDecorator final : public WorldDatabaseConnection
         {
             friend class WorldDatabaseFacade;
         public:
-            WorldDatabaseDecorator(MySQLConnectionInfo& connInfo) : WorldDatabaseConnection(connInfo) {}
+            explicit WorldDatabaseDecorator(MySQLConnectionInfo& conn_info) : WorldDatabaseConnection(conn_info) {}
         };
 
     public:

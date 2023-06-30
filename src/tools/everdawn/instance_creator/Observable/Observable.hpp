@@ -11,6 +11,8 @@ namespace everdawn
     template <typename Type>
     class Observable
     {
+        mutable boost::signals2::signal<void(const Type&)> changed;
+        Type object;
     public:
         class Subscription
         {
@@ -32,6 +34,12 @@ namespace everdawn
             }
         };
 
+
+        explicit Observable(Type object = Type())
+            : object(object)
+        {
+        }
+
         void Next(Type object)
         {
             this->object = object;
@@ -47,9 +55,6 @@ namespace everdawn
         }
 
         const Type& Get() const { return object; }
-    private:
-        mutable boost::signals2::signal<void(const Type&)> changed;
-        Type object;
     };
 } // namespace everdawn
 
