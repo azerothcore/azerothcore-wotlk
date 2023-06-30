@@ -1307,7 +1307,7 @@ void BotDataMgr::LoadWanderMap(bool reload)
         }
     });
 
-    LOG_INFO("server.loading", ">> Loaded {} bot wander nodes on {} maps (total {} tops) in {} ms",
+    LOG_INFO("server.loading", ">> Loaded {} bot wander nodes ({} disabled) on {} maps (total {} tops) in {} ms",
         uint32(WanderNode::GetAllWPsCount()), disabled_nodes, uint32(WanderNode::GetWPMapsCount()), uint32(tops.size()), GetMSTimeDiffToNow(botoldMSTime));
 }
 

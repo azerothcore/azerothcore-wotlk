@@ -13836,7 +13836,6 @@ bool bot_ai::IsOffTank(Unit const* unit) const
     if (Creature const* bot = unit->ToCreature())
         return bot->GetBotAI() && bot->GetBotAI()->HasRole(BOT_ROLE_TANK_OFF);
 
-    //Unused part
     if (Player const* player = unit->ToPlayer())
     {
         if (Group const* gr = player->GetGroup())
