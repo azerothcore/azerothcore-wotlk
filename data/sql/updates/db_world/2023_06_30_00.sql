@@ -1,3 +1,4 @@
+-- DB update 2023_06_29_02 -> 2023_06_30_00
 --
 UPDATE `creature_loot_template` SET `Chance` = 0, `GroupId` = 1 WHERE (`Entry` = 20303);
 
