@@ -1,5 +1,5 @@
-
 set(BUILD_TOOLS_EVERDAWN 0)
+list(APPEND EVERDAWN_TOOLS_LIBRARIES "common")
 
 # Stores the absolut path of the given tool in the variable
 function(GetPathToEverdawnTool tool variable)
@@ -20,7 +20,7 @@ function(GetEverdawnToolsList variable)
 
   foreach(SOURCE_TOOL ${LOCALE_SOURCE_TOOL_LIST})
     GetPathToEverdawnTool(${SOURCE_TOOL} SOURCE_TOOL_PATH)
-    if(IS_DIRECTORY ${SOURCE_TOOL_PATH})
+    if((IS_DIRECTORY ${SOURCE_TOOL_PATH}) AND NOT (${SOURCE_TOOL} IN_LIST EVERDAWN_TOOLS_LIBRARIES))
       list(APPEND ${variable} ${SOURCE_TOOL})
     endif()
   endforeach()

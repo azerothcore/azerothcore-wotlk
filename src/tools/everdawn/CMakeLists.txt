@@ -1,3 +1,16 @@
+GetEverdawnToolsList(EVERDAWN_TOOLS_BUILD_LIST)
+
+# Display the graphs
+message("")
+message("* Everdawn Tools build list:")
+message("  |  tools:")
+
+foreach(TOOL_BUILD_GRAPH_KEY ${EVERDAWN_TOOLS_BUILD_LIST})
+  message("  |   +- ${TOOL_BUILD_GRAPH_KEY}")
+endforeach()
+
+message("")
+
 find_package(wxWidgets QUIET)
 if(NOT wxWidgets_FOUND)
     return()
@@ -5,12 +18,22 @@ endif()
 
 include(${wxWidgets_USE_FILE})
 
-list(APPEND EVERDAWN_TOOLS_BUILD_LIST "instance_creator" "realm_manager")
-
 if(NOT TARGET database)
     message("Database target not found, adding it")
     add_subdirectory(${CMAKE_SOURCE_DIR}/src/server/database deps/acore-database)
 endif()
+
+foreach(EVERDAWN_TOOL_LIBRARY ${EVERDAWN_TOOLS_LIBRARIES})
+    set(EVERDAWN_TOOL_LIBRARY_NAME "everdawn_${EVERDAWN_TOOL_LIBRARY}")
+    message("Creating tool library ${EVERDAWN_TOOL_LIBRARY_NAME}")
+    GetPathToEverdawnTool(${EVERDAWN_TOOL_LIBRARY} EVERDAWN_SOURCE_TOOL_LIBRARY_PATH)
+    CollectSourceFiles(
+        ${EVERDAWN_SOURCE_TOOL_LIBRARY_PATH}
+        EVERDAWN_TOOL_LIBRARY_SOURCES)
+    add_library(${EVERDAWN_TOOL_LIBRARY_NAME} INTERFACE ${EVERDAWN_TOOL_LIBRARY_SOURCES})
+endforeach()
+
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 foreach(EVERDAWN_TOOL_NAME ${EVERDAWN_TOOLS_BUILD_LIST})
 
@@ -33,21 +56,33 @@ foreach(EVERDAWN_TOOL_NAME ${EVERDAWN_TOOLS_BUILD_LIST})
 
     list(APPEND EVERDAWN_TOOLS_LIBS boost database ${wxWidgets_LIBRARIES})
 
-    target_include_directories(${EVERDAWN_TOOL_PROJECT_NAME}
-    SYSTEM
-    PUBLIC
-        boost
-        database
-    PRIVATE
-        ${wxWidgets_LIBRARIES})
-
-    target_link_libraries(${EVERDAWN_TOOL_PROJECT_NAME}
+    if(${EVERDAWN_TOOL_PROJECT_NAME} MATCHES "instance_creator")
+        target_include_directories(${EVERDAWN_TOOL_PROJECT_NAME}
+        SYSTEM
         PUBLIC
-            boost
             database
+        )
+
+        target_link_libraries(${EVERDAWN_TOOL_PROJECT_NAME}
+            PUBLIC
+                database
+        )
+    endif()
+
+     target_include_directories(${EVERDAWN_TOOL_PROJECT_NAME}
+        SYSTEM
+        PUBLIC
+            everdawn_common
         PRIVATE
             ${wxWidgets_LIBRARIES}
-    )
+     )
+
+        target_link_libraries(${EVERDAWN_TOOL_PROJECT_NAME}
+            PUBLIC
+                everdawn_common
+            PRIVATE
+                ${wxWidgets_LIBRARIES}
+        )
 
     unset(EVERDAWN_TOOL_PUBLIC_INCLUDES)
     CollectIncludeDirectories(
@@ -66,7 +101,7 @@ foreach(EVERDAWN_TOOL_NAME ${EVERDAWN_TOOLS_BUILD_LIST})
 
     unset(EVERDAWN_TOOLS_RESOURCES)
     file(GLOB EVERDAWN_TOOLS_RESOURCES
-      "${CMAKE_CURRENT_SOURCE_DIR}/Resources/*.xpm"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Resources/*"
     )
     file(COPY ${EVERDAWN_TOOLS_RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Resources)
 

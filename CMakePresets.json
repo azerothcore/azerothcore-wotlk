@@ -15,9 +15,9 @@
         "CMAKE_INSTALL_PREFIX": "$env{HOME}/everdawn-wotlk",
         "MODULES": "static",
         "SCRIPTS": "static",
-        "TOOLS_BUILD": "none",
+        "TOOLS_BUILD": "everdawn-only",
         "WITH_WARNINGS": "/usr/bin/clang++",
-        "APPS_BUILD": "all"
+        "APPS_BUILD": "none"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
