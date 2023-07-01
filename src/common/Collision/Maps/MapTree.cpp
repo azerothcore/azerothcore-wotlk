@@ -176,13 +176,7 @@ namespace VMAP
         // direction with length of 1
         G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1) / maxDist);
 
-        if (GetIntersectionTime(ray, maxDist, true, ignoreFlags))
-        {
-
-            return false;
-        }
-
-        return true;
+        return !GetIntersectionTime(ray, maxDist, true, ignoreFlags);
     }
     //=========================================================
     /**
