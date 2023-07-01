@@ -1917,6 +1917,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 owner->RemoveAurasDueToSpell(34471);
                         }
                     }
+                case 34026: // Kill Command
+                    // T4 Dungeon Set
+                    if (caster->HasAura(37483))
+                    {
+                        if (apply)
+                        {
+                            caster->CastSpell(caster, 37482, true);
+                        }
+                    }
                     break;
             }
             break;
