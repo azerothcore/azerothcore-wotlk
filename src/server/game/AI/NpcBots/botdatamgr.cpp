@@ -1655,8 +1655,11 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                     case INVTYPE_TRINKET:
                         if (proto.Quality < ITEM_QUALITY_UNCOMMON)
                             break;
-                        push_gear_to_classes(proto, BOT_SLOT_TRINKET1, reqLstep, IntUsers);
-                        push_gear_to_classes(proto, BOT_SLOT_TRINKET2, reqLstep, IntUsers);
+                        if (!is_strength_item && !is_agility_item)
+                        {
+                            push_gear_to_classes(proto, BOT_SLOT_TRINKET1, reqLstep, IntUsers);
+                            push_gear_to_classes(proto, BOT_SLOT_TRINKET2, reqLstep, IntUsers);
+                        }
                         if (!is_caster_item)
                         {
                             push_gear_to_classes(proto, BOT_SLOT_TRINKET1, reqLstep, StrUsers);
@@ -1666,11 +1669,11 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         }
                         break;
                     case INVTYPE_CLOAK:
-                        if (is_caster_item || proto.StatsCount == 0)
+                        if (is_caster_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
                             push_gear_to_classes(proto, BOT_SLOT_BACK, reqLstep, IntUsers);
-                        if (!is_strength_item || proto.StatsCount == 0)
+                        if (is_strength_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
                             push_gear_to_classes(proto, BOT_SLOT_BACK, reqLstep, StrUsers);
-                        if (!is_agility_item || proto.StatsCount == 0)
+                        if (is_agility_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
                             push_gear_to_classes(proto, BOT_SLOT_BACK, reqLstep, AgiUsers);
                         break;
                     case INVTYPE_HOLDABLE:

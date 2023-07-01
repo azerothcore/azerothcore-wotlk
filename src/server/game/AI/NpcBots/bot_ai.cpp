@@ -14357,6 +14357,8 @@ void bot_ai::InitEquips()
                 {
                     if (Rand() < 20 && proto->ItemLevel < 245)
                         return false;
+                    if (Rand() < 10 && proto->ItemLevel < 264)
+                        return false;
 
                     switch (lslot)
                     {
