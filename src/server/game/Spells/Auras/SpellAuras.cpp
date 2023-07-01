@@ -1918,7 +1918,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                     }
                 case 34026: // Kill Command
-                    // T4 Dungeon Set
+                    // Dungeon Set 3
                     if (caster->HasAura(37483))
                     {
                         if (apply)
