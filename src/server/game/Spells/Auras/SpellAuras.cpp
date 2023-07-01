@@ -1917,6 +1917,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 owner->RemoveAurasDueToSpell(34471);
                         }
                     }
+                    break;
                 case 34026: // Kill Command
                     // Dungeon Set 3
                     if (caster->HasAura(37483))
