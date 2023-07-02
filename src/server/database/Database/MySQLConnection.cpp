@@ -70,8 +70,8 @@ MySQLConnectionInfo::MySQLConnectionInfo(std::string_view infoString)
 
 MySQLConnection::MySQLConnection(MySQLConnectionInfo& connInfo, ProducerConsumerQueue<AsyncOperation*>* dbQueue, bool isDynamic /*= false*/) :
     _connectionInfo(connInfo),
-    _isDynamic(isDynamic),
     _connectionFlags(dbQueue ? ConnectionFlags::Async : ConnectionFlags::Sync),
+    _isDynamic(isDynamic),
     _queue(dbQueue)
 {
     if (_queue)
