@@ -1,7 +1,4 @@
 #include "MainFrame.hpp"
-#include "WorldDataBaseFacade.hpp"
-#include "Status.hpp"
-#include "SmartEnum.h"
 
 #include <wx/wxprec.h>
 
@@ -35,4 +32,4 @@ namespace everdawn {
 
 } // namespace everdawn
 
-wxIMPLEMENT_APP(everdawn::InstanceCreator);
+wxIMPLEMENT_APP(everdawn::Launcher);

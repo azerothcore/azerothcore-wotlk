@@ -2,8 +2,6 @@
 #define EVERDAWN_WXMAINWINDOW_HPP_
 #pragma once
 
-#include "Status.hpp"
-
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP

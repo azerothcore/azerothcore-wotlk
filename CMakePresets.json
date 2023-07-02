@@ -2,8 +2,8 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "Ubuntu",
-      "displayName": "Debug",
+      "name": "Linux",
+      "displayName": "Debug Linux",
       "description": "Sets Unix Makefiles generator, compilers, build and install directory, debug build type",
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build/",
@@ -34,13 +34,61 @@
           "hostBinaryDir": "$ms{localSourceDir}/.vs/out/$ms{targetConnectionName}/build/${presetName}"
         }
       }
+    },
+    {
+      "name": "Windows",
+      "hidden": false,
+      "displayName": "Debug Windows",
+      "description": "Sets Windows MSBuild generator, compilers, build and install directory, debug build type",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/",
+      "installDir": "${sourceDir}/build/install/",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "toolset": "ClangCL",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "CMAKE_TOOLCHAIN_FILE": {
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+          "type": "FILEPATH"
+        },
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_INSTALL_PREFIX": "{sourceDir}/build/bin/everdawn-wotlk",
+        "MODULES": "static",
+        "SCRIPTS": "static",
+        "TOOLS_BUILD": "everdawn-only",
+        "APPS_BUILD": "none"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": "Windows",
+          "intelliSenseMode": "windows-clang-x64",
+          "intelliSenseOptions": {
+            "useCompilerDefaults": true,
+            "additionalCompilerArgs": [ "" ]
+          },
+          "enableMicrosoftCodeAnalysis": false
+        }
+      }
     }
   ],
   "buildPresets": [
     {
-      "name": "Debug",
+      "name": "Debug Linux",
       "displayName": "Build",
-      "configurePreset": "Ubuntu",
+      "configurePreset": "Linux",
+      "jobs": 12,
+      "configuration": "RelWithDebInfo"
+    },
+    {
+      "name": "Debug Windows",
+      "displayName": "Build",
+      "configurePreset": "Windows",
       "jobs": 12,
       "configuration": "RelWithDebInfo"
     }
