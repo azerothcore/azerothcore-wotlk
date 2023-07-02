@@ -2395,7 +2395,7 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
     return true;
 }
 
-const CompletedAchievementMap& AchievementMgr::getCompletedAchievementMap() {
+const CompletedAchievementMap& AchievementMgr::GetCompletedAchievements() {
     return _completedAchievements;
 }
 
