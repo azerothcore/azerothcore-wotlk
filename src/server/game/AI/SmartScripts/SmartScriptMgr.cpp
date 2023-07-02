@@ -283,6 +283,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
             case SMART_EVENT_AREA_CASTING:
                 if (temp.event.areaCasting.repeatMin == 0 && temp.event.areaCasting.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
+                break;
             case SMART_EVENT_FRIENDLY_IS_CC:
                 if (temp.event.friendlyCC.repeatMin == 0 && temp.event.friendlyCC.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
