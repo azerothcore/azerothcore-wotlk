@@ -525,6 +525,7 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condi
     for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList->begin(); i != achievementCriteriaList->end(); ++i)
     {
         AchievementCriteriaEntry const* achievementCriteria = (*i);
+
         AchievementEntry const* achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
         if (!achievement)
             continue;
@@ -2392,6 +2393,10 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
         return false;
 
     return true;
+}
+
+const CompletedAchievementMap& AchievementMgr::getCompletedAchievementMap() {
+    return _completedAchievements;
 }
 
 AchievementGlobalMgr* AchievementGlobalMgr::instance()
