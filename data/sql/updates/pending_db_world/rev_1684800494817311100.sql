@@ -4,7 +4,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (38249, 'spell_calling_korkron_or_wildhammer'),
 (38119, 'spell_calling_korkron_or_wildhammer');
 
-UPDATE `creature_template` SET `ScriptName`='npc_korkron_or_wildhammer' WHERE entry in (22059, 21998);
+UPDATE `creature_template` SET `ScriptName`='npc_korkron_or_wildhammer' WHERE `entry` IN (22059, 21998);
 
 UPDATE `creature_template` SET `speed_run` = 1.14286 WHERE (`entry` = 21998);
 

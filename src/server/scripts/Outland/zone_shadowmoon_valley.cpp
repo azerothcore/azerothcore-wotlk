@@ -1637,8 +1637,8 @@ public:
 
 enum KorWild
 {
-    SAY_LAND = 0,
-    POINT_LAND = 1
+    SAY_LAND    = 0,
+    POINT_LAND  = 1
 };
 
 class npc_korkron_or_wildhammer : public ScriptedAI
@@ -1673,8 +1673,9 @@ public:
     {
         if (type == POINT_MOTION_TYPE && id == POINT_LAND)
         {
-            Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
-            Talk(SAY_LAND, player);
+            if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
+                Talk(SAY_LAND, player);
+
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
     }
@@ -1720,6 +1721,6 @@ void AddSC_shadowmoon_valley()
     new npc_torloth_the_magnificent();
     new npc_enraged_spirit();
     new npc_shadowmoon_tuber_node();
-    RegisterSpellScript(spell_calling_korkron_or_wildhammer);
     RegisterCreatureAI(npc_korkron_or_wildhammer);
+    RegisterSpellScript(spell_calling_korkron_or_wildhammer);
 }
