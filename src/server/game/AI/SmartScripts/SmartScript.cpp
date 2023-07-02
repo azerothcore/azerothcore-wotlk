@@ -4240,10 +4240,73 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                         playerCount++;
                 }
 
-                if (playerCount <= e.event.nearPlayerNegation.minCount)
+                if (playerCount <= e.event.nearPlayerNegation.maxCount)
                     ProcessAction(e, unit);
             }
             RecalcTimer(e, e.event.nearPlayerNegation.repeatMin, e.event.nearPlayerNegation.repeatMax);
+            break;
+        }
+        case SMART_EVENT_NEAR_UNIT:
+        {
+            uint32 unitCount = 0;
+            ObjectVector targets;
+            GetWorldObjectsInDist(targets, static_cast<float>(e.event.nearUnit.range));
+
+            if (!targets.empty())
+            {
+                if (e.event.nearUnit.type)
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsGameObject(target) && target->GetEntry() == e.event.nearUnit.entry)
+                            unitCount++;
+                    }
+                }
+                else
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target) && target->GetEntry() == e.event.nearUnit.entry)
+                            unitCount++;
+                    }
+                }
+
+                if (unitCount >= e.event.nearUnit.count)
+                    ProcessAction(e, unit);
+            }
+            RecalcTimer(e, e.event.nearUnit.timer, e.event.nearUnit.timer);
+            break;
+        }
+        case SMART_EVENT_AREA_CASTING:
+        {
+            if (!me || !me->IsEngaged())
+                return;
+
+            float range = static_cast<float>(e.event.areaCasting.range);
+            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
+            for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                {
+                    if (e.event.areaCasting.range && !me->IsWithinDistInMap(target, range))
+                        continue;
+
+                    if (!target || !target->IsNonMeleeSpellCast(false, false, true))
+                        continue;
+
+                    if (e.event.areaCasting.spellId > 0)
+                        if (Spell* currSpell = target->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                            if (currSpell->m_spellInfo->Id != e.event.areaCasting.spellId)
+                                continue;
+
+                    ProcessAction(e, target);
+                    RecalcTimer(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMin);
+                    return;
+                }
+            }
+
+            // If no targets are found and it's off cooldown, check again
+            RecalcTimer(e, e.event.areaCasting.checkTimer, e.event.areaCasting.checkTimer);
             break;
         }
         default:
@@ -4281,6 +4344,12 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_DISTANCE_CREATURE:
         case SMART_EVENT_DISTANCE_GAMEOBJECT:
             RecalcTimer(e, e.event.distance.repeat, e.event.distance.repeat);
+            break;
+        case SMART_EVENT_NEAR_UNIT:
+            RecalcTimer(e, e.event.nearUnit.timer, e.event.nearUnit.timer);
+            break;
+        case SMART_EVENT_AREA_CASTING:
+            RecalcTimer(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax);
             break;
         default:
             e.active = true;
@@ -4335,6 +4404,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         {
             case SMART_EVENT_NEAR_PLAYERS:
             case SMART_EVENT_NEAR_PLAYERS_NEGATION:
+            case SMART_EVENT_NEAR_UNIT:
             case SMART_EVENT_UPDATE:
             case SMART_EVENT_UPDATE_OOC:
             case SMART_EVENT_UPDATE_IC:
@@ -4344,6 +4414,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_TARGET_MANA_PCT:
             case SMART_EVENT_RANGE:
             case SMART_EVENT_VICTIM_CASTING:
+            case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_FRIENDLY_HEALTH:
             case SMART_EVENT_FRIENDLY_IS_CC:
             case SMART_EVENT_FRIENDLY_MISSING_BUFF:

@@ -208,8 +208,10 @@ enum SMART_EVENT
 
     SMART_EVENT_NEAR_PLAYERS             = 101,      // min, radius, first timer, repeatMin, repeatMax
     SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // max, radius, first timer, repeatMin, repeatMax
+    SMART_EVENT_NEAR_UNIT                = 103,      // type (0: creature 1: gob), entry, count, range, timer
+    SMART_EVENT_AREA_CASTING             = 104,      // spellId (0: any), range (0: any), repeatMin, repeatMax, checkTimer
 
-    SMART_EVENT_AC_END                   = 103
+    SMART_EVENT_AC_END                   = 105
 };
 
 struct SmartEvent
@@ -488,12 +490,30 @@ struct SmartEvent
 
         struct
         {
-            uint32 minCount;
+            uint32 maxCount;
             uint32 radius;
             uint32 firstTimer;
             uint32 repeatMin;
             uint32 repeatMax;
         } nearPlayerNegation;
+
+        struct
+        {
+            uint32 type;
+            uint32 entry;
+            uint32 count;
+            uint32 range;
+            uint32 timer;
+        } nearUnit;
+
+        struct
+        {
+            uint32 spellId;
+            uint32 range;
+            uint32 repeatMin;
+            uint32 repeatMax;
+            uint32 checkTimer;
+        } areaCasting;
 
         struct
         {
@@ -1797,8 +1817,10 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     { 0, 0 }, // 98
     { 0, 0 }, // 99
     { 0, 0 }, // 100
-    {SMART_EVENT_NEAR_PLAYERS,              SMART_SCRIPT_TYPE_MASK_CREATURE },
-    {SMART_EVENT_NEAR_PLAYERS_NEGATION,     SMART_SCRIPT_TYPE_MASK_CREATURE }
+    {SMART_EVENT_NEAR_PLAYERS,              SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_NEAR_PLAYERS_NEGATION,     SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_NEAR_UNIT,                 SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_AREA_CASTING,              SMART_SCRIPT_TYPE_MASK_CREATURE }
 };
 
 enum SmartEventFlags
