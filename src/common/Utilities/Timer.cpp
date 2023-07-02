@@ -17,6 +17,7 @@
 
 #include "Timer.h"
 #include "StringFormat.h"
+#include "StringConvert.h"
 #include <iomanip>
 #include <sstream>
 
@@ -70,6 +71,105 @@ AC_COMMON_API uint32 Acore::Time::TimeStringTo<Seconds>(std::string_view timestr
     }
 
     return secs;
+}
+
+std::string Acore::Time::ToTimeString(Microseconds durationTime, uint8 outCount /*= 3*/, TimeFormat timeFormat /*= TimeFormat::ShortText*/)
+{
+    uint64 microsecs = durationTime.count() % 1000;
+    uint64 millisecs = (durationTime.count() / TimeDiff::MILLISECONDS) % 1000;
+    uint64 secs = (durationTime.count() / TimeDiff::SECONDS) % 60;
+    uint64 minutes = (durationTime.count() / TimeDiff::MINUTES) % 60;
+    uint64 hours = (durationTime.count() / TimeDiff::HOURS) % 24;
+    uint64 days = durationTime.count() / TimeDiff::DAYS;
+
+    std::string out;
+    uint8 count = 0;
+    bool isFirst = false;
+
+    if (timeFormat == TimeFormat::Numeric)
+    {
+        auto AddOutNumerlic = [&isFirst, &out, &count, outCount](uint64 time)
+        {
+            if (count >= outCount)
+                return;
+
+            if (!isFirst)
+            {
+                isFirst = true;
+                out.append(Acore::StringFormatFmt("{}:", time));
+            }
+            else
+                out.append(Acore::StringFormatFmt("{:02}:", time));
+
+            count++;
+        };
+
+        if (days)
+            AddOutNumerlic(days);
+
+        if (hours)
+            AddOutNumerlic(hours);
+
+        if (minutes)
+            AddOutNumerlic(minutes);
+
+        if (secs)
+            AddOutNumerlic(secs);
+
+        if (millisecs)
+            AddOutNumerlic(millisecs);
+
+        if (microsecs)
+            AddOutNumerlic(microsecs);
+
+        // Delete last (:)
+        if (!out.empty())
+            out.pop_back();
+
+        return out;
+    }
+
+    auto AddOut = [&out, &count, timeFormat, outCount](uint32 timeCount, std::string_view shortText, std::string_view fullText1, std::string_view fullText)
+    {
+        if (count >= outCount)
+            return;
+
+        out.append(Acore::ToString(timeCount));
+
+        switch (timeFormat)
+        {
+            case TimeFormat::ShortText:
+                out.append(shortText);
+                break;
+            case TimeFormat::FullText:
+                out.append(timeCount == 1 ? fullText1 : fullText);
+                break;
+            default:
+                out.append("<Unknown time format>");
+        }
+
+        count++;
+    };
+
+    if (days)
+        AddOut(days, "d ", " Day ", " Days ");
+
+    if (hours)
+        AddOut(hours, "h ", " Hour ", " Hours ");
+
+    if (minutes)
+        AddOut(minutes, "m ", " Minute ", " Minutes ");
+
+    if (secs)
+        AddOut(secs, "s ", " Second ", " Seconds ");
+
+    if (millisecs)
+        AddOut(millisecs, "ms ", " Millisecond ", " Milliseconds ");
+
+    if (microsecs)
+        AddOut(microsecs, "us ", " Microsecond ", " Microseconds ");
+
+    return std::string{ Acore::String::TrimRight(out) };
 }
 
 template<>

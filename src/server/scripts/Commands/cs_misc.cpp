@@ -28,8 +28,6 @@
 #include "GuildMgr.h"
 #include "IPLocation.h"
 #include "InstanceSaveMgr.h"
-#include "LFG.h"
-#include "Language.h"
 #include "MapMgr.h"
 #include "MiscPackets.h"
 #include "MovementGenerator.h"
@@ -43,6 +41,7 @@
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
 #include "WeatherMgr.h"
+#include "DatabaseEnv.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -1899,8 +1898,8 @@ public:
 
         Player* playerTarget = target->GetConnectedPlayer();
 
-        CharacterDatabasePreparedStatement* stmt = nullptr;
-        LoginDatabasePreparedStatement* loginStmt = nullptr;
+        CharacterDatabasePreparedStatement stmt = nullptr;
+        LoginDatabasePreparedStatement loginStmt = nullptr;
 
         // Account data print variables
         std::string userName          = handler->GetAcoreString(LANG_ERROR);
@@ -2066,7 +2065,7 @@ public:
         std::string nameLink = handler->playerLink(target->GetName());
 
         // Returns banType, banTime, bannedBy, banreason
-        LoginDatabasePreparedStatement* banQuery = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
+        LoginDatabasePreparedStatement banQuery = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
         banQuery->SetData(0, accId);
 
         PreparedQueryResult accBannedResult = LoginDatabase.Query(banQuery);
@@ -2087,7 +2086,7 @@ public:
         }
 
         // Can be used to query data from World database
-        WorldDatabasePreparedStatement* xpQuery = WorldDatabase.GetPreparedStatement(WORLD_SEL_REQ_XP);
+        WorldDatabasePreparedStatement xpQuery = WorldDatabase.GetPreparedStatement(WORLD_SEL_REQ_XP);
         xpQuery->SetData(0, level);
 
         PreparedQueryResult xpResult = WorldDatabase.Query(xpQuery);
@@ -2098,7 +2097,7 @@ public:
         }
 
         // Can be used to query data from Characters database
-        CharacterDatabasePreparedStatement* charXpQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_XP);
+        CharacterDatabasePreparedStatement charXpQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_XP);
         charXpQuery->SetData(0, lowguid);
 
         PreparedQueryResult charXpResult = CharacterDatabase.Query(charXpQuery);
@@ -2110,7 +2109,7 @@ public:
 
             if (gguid != 0)
             {
-                CharacterDatabasePreparedStatement* guildQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER_EXTENDED);
+                CharacterDatabasePreparedStatement guildQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER_EXTENDED);
                 guildQuery->SetData(0, lowguid);
 
                 PreparedQueryResult guildInfoResult = CharacterDatabase.Query(guildQuery);
@@ -2312,7 +2311,7 @@ public:
 
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"
-        CharacterDatabasePreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
+        CharacterDatabasePreparedStatement mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
         mailQuery->SetData(0, lowguid);
 
         PreparedQueryResult mailInfoResult = CharacterDatabase.Query(mailQuery);
@@ -2423,7 +2422,7 @@ public:
             return false;
         }
 
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
+        LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         int32 muteDuration = TimeStringToSecs(notSpeakTime);
         if (muteDuration <= 0)
         {
@@ -2543,7 +2542,7 @@ public:
             playerTarget->GetSession()->m_muteTime = 0;
         }
 
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
+        LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         stmt->SetData(0, 0);
         stmt->SetData(1, "");
         stmt->SetData(2, "");
@@ -2583,7 +2582,7 @@ public:
     // helper for mutehistory
     static bool HandleMuteInfoHelper(ChatHandler* handler, uint32 accountId, char const* accountName)
     {
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
+        LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
         stmt->SetData(0, accountId);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -2908,7 +2907,7 @@ public:
         }
         else if (!creatureTarget && target && !target->IsConnected())
         {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
             stmt->SetData(0, target->GetGUID().GetCounter());
             CharacterDatabase.Execute(stmt);
             handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, target->GetName().c_str());

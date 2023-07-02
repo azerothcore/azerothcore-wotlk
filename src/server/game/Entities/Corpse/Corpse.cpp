@@ -94,7 +94,7 @@ void Corpse::SaveToDB()
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     DeleteFromDB(trans);
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CORPSE);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CORPSE);
     stmt->SetData(0, GetOwnerGUID().GetCounter());                            // guid
     stmt->SetData (1, GetPositionX());                                         // posX
     stmt->SetData (2, GetPositionY());                                         // posY
@@ -124,7 +124,7 @@ void Corpse::DeleteFromDB(CharacterDatabaseTransaction trans)
 
 void Corpse::DeleteFromDB(ObjectGuid const ownerGuid, CharacterDatabaseTransaction trans)
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSE);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSE);
     stmt->SetData(0, ownerGuid.GetCounter());
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }

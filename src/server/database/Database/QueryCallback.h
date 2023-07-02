@@ -19,12 +19,9 @@
 #define _QUERY_CALLBACK_H
 
 #include "DatabaseEnvFwd.h"
-#include "Define.h"
 #include <functional>
-#include <future>
 #include <list>
 #include <queue>
-#include <utility>
 
 class AC_DATABASE_API QueryCallback
 {

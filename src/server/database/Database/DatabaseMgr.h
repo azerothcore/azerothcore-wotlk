@@ -15,68 +15,67 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DatabaseLoader_h__
-#define DatabaseLoader_h__
+#ifndef _DATABASE_MGR_H_
+#define _DATABASE_MGR_H_
 
-#include "Define.h"
+#include "DatabaseEnvFwd.h"
+#include "Duration.h"
+#include <atomic>
 #include <functional>
 #include <queue>
 #include <stack>
-#include <string>
+#include <vector>
 
-template <class T>
 class DatabaseWorkerPool;
 
-// A helper class to initiate all database worker pools,
-// handles updating, delays preparing of statements and cleans up on failure.
-class AC_DATABASE_API DatabaseLoader
+class AC_DATABASE_API DatabaseMgr
 {
 public:
-    DatabaseLoader(std::string const& logger, uint32 const defaultUpdateMask = 0, std::string_view modulesList = {});
+    DatabaseMgr();
+    ~DatabaseMgr();
 
-    // Register a database to the loader (lazy implemented)
-    template <class T>
-    DatabaseLoader& AddDatabase(DatabaseWorkerPool<T>& pool, std::string const& name);
+    static DatabaseMgr* instance();
 
-    // Load all databases
+    void AddDatabase(DatabaseWorkerPool& pool, std::string_view name);
+    void Update(Milliseconds diff);
     bool Load();
+    void CloseAllConnections();
 
-    enum DatabaseTypeFlags
-    {
-        DATABASE_NONE       = 0,
+    [[nodiscard]] uint32 GetUpdateFlags() const { return _updateFlags; }
 
-        DATABASE_LOGIN      = 1,
-        DATABASE_CHARACTER  = 2,
-        DATABASE_WORLD      = 4,
+    static uint32 GetDatabaseLibraryVersion();
+    static std::string_view GetClientInfo();
+    static std::string_view GetServerVersion();
 
-        DATABASE_MASK_ALL   = DATABASE_LOGIN | DATABASE_CHARACTER | DATABASE_WORLD
-    };
-
-    [[nodiscard]] uint32 GetUpdateFlags() const
-    {
-        return _updateFlags;
-    }
+    void SetModuleList(std::string_view modulesList) { _modulesList = modulesList; }
 
 private:
+    using Predicate = std::function<bool()>;
+    using Closer = std::function<void()>;
+
     bool OpenDatabases();
     bool PopulateDatabases();
     bool UpdateDatabases();
     bool PrepareStatements();
 
-    using Predicate = std::function<bool()>;
-    using Closer = std::function<void()>;
-
     // Invokes all functions in the given queue and closes the databases on errors.
     // Returns false when there was an error.
     bool Process(std::queue<Predicate>& queue);
 
-    std::string const _logger;
-    std::string_view _modulesList;
-    bool const _autoSetup;
-    uint32 const _updateFlags;
+    std::string _modulesList;
+    bool _autoSetup{};
+    uint32 _updateFlags{};
 
     std::queue<Predicate> _open, _populate, _update, _prepare;
     std::stack<Closer> _close;
+    std::vector<DatabaseWorkerPool*> _poolList;
+
+    DatabaseMgr(DatabaseMgr const&) = delete;
+    DatabaseMgr(DatabaseMgr&&) = delete;
+    DatabaseMgr& operator=(DatabaseMgr const&) = delete;
+    DatabaseMgr& operator=(DatabaseMgr&&) = delete;
 };
 
-#endif // DatabaseLoader_h__
+#define sDatabaseMgr DatabaseMgr::instance()
+
+#endif

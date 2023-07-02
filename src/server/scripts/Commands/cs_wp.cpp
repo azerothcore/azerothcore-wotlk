@@ -28,6 +28,7 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "WaypointMgr.h"
+#include "DatabaseEnv.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -97,7 +98,7 @@ public:
                 pathid = target->GetWaypointPath();
             else
             {
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_MAX_ID);
+                WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_MAX_ID);
 
                 PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -118,7 +119,7 @@ public:
             return true;
         }
 
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_MAX_POINT);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_MAX_POINT);
         stmt->SetData(0, pathid);
         PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -185,7 +186,7 @@ public:
 
         guidLow = target->GetSpawnId();
 
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_ADDON_BY_GUID);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_ADDON_BY_GUID);
 
         stmt->SetData(0, guidLow);
 
@@ -254,7 +255,7 @@ public:
         {
             if (target->GetCreatureAddon()->path_id != 0)
             {
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE_ADDON);
+                WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE_ADDON);
                 stmt->SetData(0, guildLow);
 
                 WorldDatabase.Execute(stmt);
@@ -301,13 +302,13 @@ public:
 
             if (id)
             {
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPT_ID_BY_GUID);
+                WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPT_ID_BY_GUID);
                 stmt->SetData(0, id);
                 PreparedQueryResult result = WorldDatabase.Query(stmt);
 
                 if (!result)
                 {
-                    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_WAYPOINT_SCRIPT);
+                    WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_WAYPOINT_SCRIPT);
 
                     stmt->SetData(0, id);
 
@@ -320,7 +321,7 @@ public:
             }
             else
             {
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPTS_MAX_ID);
+                WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPTS_MAX_ID);
 
                 PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -352,7 +353,7 @@ public:
             float a8, a9, a10, a11;
             char const* a7;
 
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPT_BY_ID);
+            WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPT_BY_ID);
             stmt->SetData(0, id);
             PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -392,7 +393,7 @@ public:
 
             id = atoi(arg_id);
 
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPT_ID_BY_GUID);
+            WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPT_ID_BY_GUID);
 
             stmt->SetData(0, id);
 
@@ -400,7 +401,7 @@ public:
 
             if (result)
             {
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_WAYPOINT_SCRIPT);
+                WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_WAYPOINT_SCRIPT);
 
                 stmt->SetData(0, id);
 
@@ -463,7 +464,7 @@ public:
                 uint32 newid = atoi(arg_3);
                 handler->PSendSysMessage("%s%s|r|cff00ffff%u|r|cff00ff00%s|r|cff00ffff%u|r", "|cff00ff00", "Wp Event: Wypoint scipt guid: ", newid, " id changed: ", id);
 
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_ID);
+                WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_ID);
 
                 stmt->SetData(0, newid);
                 stmt->SetData(1, id);
@@ -474,7 +475,7 @@ public:
             }
             else
             {
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPT_ID_BY_GUID);
+                WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPT_ID_BY_GUID);
                 stmt->SetData(0, id);
                 PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -486,7 +487,7 @@ public:
 
                 if (arg_str_2 == "posx")
                 {
-                    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_X);
+                    WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_X);
 
                     stmt->SetData(0, float(atof(arg_3)));
                     stmt->SetData(1, id);
@@ -498,7 +499,7 @@ public:
                 }
                 else if (arg_str_2 == "posy")
                 {
-                    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_Y);
+                    WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_Y);
 
                     stmt->SetData(0, float(atof(arg_3)));
                     stmt->SetData(1, id);
@@ -510,7 +511,7 @@ public:
                 }
                 else if (arg_str_2 == "posz")
                 {
-                    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_Z);
+                    WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_Z);
 
                     stmt->SetData(0, float(atof(arg_3)));
                     stmt->SetData(1, id);
@@ -522,7 +523,7 @@ public:
                 }
                 else if (arg_str_2 == "orientation")
                 {
-                    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_O);
+                    WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_O);
 
                     stmt->SetData(0, float(atof(arg_3)));
                     stmt->SetData(1, id);
@@ -595,7 +596,7 @@ public:
         // User did select a visual waypoint?
 
         // Check the creature
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_BY_WPGUID);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_BY_WPGUID);
         stmt->SetData(0, wpSpawnId);
         PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -610,7 +611,7 @@ public:
             // See also: http://dev.mysql.com/doc/refman/5.0/en/problems-with-float.html
             std::string maxDiff = "0.01";
 
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_BY_POS);
+            WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_BY_POS);
             stmt->SetData(0, target->GetPositionX());
             stmt->SetData(1, maxDiff);
             stmt->SetData(2, target->GetPositionY());
@@ -656,7 +657,7 @@ public:
                     wpCreature->AddObjectToRemoveList();
                 }
 
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_WAYPOINT_DATA);
+            WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_WAYPOINT_DATA);
             stmt->SetData(0, pathid);
             stmt->SetData(1, point);
 
@@ -713,7 +714,7 @@ public:
                     //sMapMgr->GetMap(npcCreature->GetMapId())->Add(wpCreature2);
                 }
 
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_POSITION);
+                WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_POSITION);
 
                 stmt->SetData(0, chr->GetPositionX());
                 stmt->SetData(1, chr->GetPositionY());
@@ -805,7 +806,7 @@ public:
                 return false;
             }
 
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_ALL_BY_WPGUID);
+            WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_ALL_BY_WPGUID);
 
             stmt->SetData(0, target->GetSpawnId());
 
@@ -840,7 +841,7 @@ public:
 
         if (show == "on")
         {
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_BY_ID);
+            WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_BY_ID);
 
             stmt->SetData(0, pathid);
 
@@ -876,7 +877,7 @@ public:
                         handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, wpguid);
                         hasError = true;
 
-                        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
+                        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
                         stmt->SetData(0, wpguid);
 
                         WorldDatabase.Execute(stmt);
@@ -920,7 +921,7 @@ public:
                 }
 
                 // Set "wpguid" column to the visual waypoint
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_WPGUID);
+                WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_WPGUID);
                 stmt->SetData(0, int32(wpCreature->GetSpawnId()));
                 stmt->SetData(1, pathid);
                 stmt->SetData(2, point);
@@ -952,7 +953,7 @@ public:
         {
             handler->PSendSysMessage("|cff00ff00DEBUG: wp first, GUID: %u|r", pathid);
 
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_FIRST_BY_ID);
+            WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_FIRST_BY_ID);
             stmt->SetData(0, pathid);
 
             PreparedQueryResult result = WorldDatabase.Query(stmt);
@@ -1002,7 +1003,7 @@ public:
         {
             handler->PSendSysMessage("|cff00ff00DEBUG: wp last, PathID: |r|cff00ffff%u|r", pathid);
 
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_LAST_BY_ID);
+            WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_LAST_BY_ID);
             stmt->SetData(0, pathid);
 
             PreparedQueryResult result = WorldDatabase.Query(stmt);
@@ -1050,7 +1051,7 @@ public:
 
         if (show == "off")
         {
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_BY_ID);
+            WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_BY_ID);
             stmt->SetArguments(1, 1, 1);
 
             PreparedQueryResult result = WorldDatabase.Query(stmt);
@@ -1073,7 +1074,7 @@ public:
                     handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, guid);
                     hasError = true;
 
-                    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
+                    WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
 
                     stmt->SetData(0, guid);
 

@@ -1261,9 +1261,7 @@ public:
     static bool HandleWPGPSCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
-
-        LOG_INFO("sql.dev", "(@PATH, XX, {0:.3f}, {0:.3f}, {0:.5f}, 0,0, 0,100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
-
+        LOG_INFO("db.query", "(@PATH, XX, {0:.3f}, {0:.3f}, {0:.5f}, 0,0, 0,100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
         handler->PSendSysMessage("Waypoint SQL written to SQL Developer log");
         return true;
     }

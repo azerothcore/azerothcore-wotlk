@@ -48,7 +48,7 @@ bool PlayerSocial::AddToSocialList(ObjectGuid friendGuid, SocialFlag flag)
     {
         itr->second.Flags |= flag;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_CHARACTER_SOCIAL_FLAGS);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_CHARACTER_SOCIAL_FLAGS);
 
         stmt->SetData(0, itr->second.Flags);
         stmt->SetData(1, GetPlayerGUID().GetCounter());
@@ -60,7 +60,7 @@ bool PlayerSocial::AddToSocialList(ObjectGuid friendGuid, SocialFlag flag)
     {
         m_playerSocialMap[friendGuid].Flags |= flag;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SOCIAL);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SOCIAL);
 
         stmt->SetData(0, GetPlayerGUID().GetCounter());
         stmt->SetData(1, friendGuid.GetCounter());
@@ -81,7 +81,7 @@ void PlayerSocial::RemoveFromSocialList(ObjectGuid friendGuid, SocialFlag flag)
 
     if (itr->second.Flags == 0)
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SOCIAL);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SOCIAL);
 
         stmt->SetData(0, GetPlayerGUID().GetCounter());
         stmt->SetData(1, friendGuid.GetCounter());
@@ -92,7 +92,7 @@ void PlayerSocial::RemoveFromSocialList(ObjectGuid friendGuid, SocialFlag flag)
     }
     else
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_REM_CHARACTER_SOCIAL_FLAGS);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_REM_CHARACTER_SOCIAL_FLAGS);
 
         stmt->SetData(0, flag);
         stmt->SetData(1, GetPlayerGUID().GetCounter());
@@ -110,7 +110,7 @@ void PlayerSocial::SetFriendNote(ObjectGuid friendGuid, std::string note)
 
     utf8truncate(note, 48);                                  // DB and client size limitation
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_SOCIAL_NOTE);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_SOCIAL_NOTE);
 
     stmt->SetData(0, note);
     stmt->SetData(1, GetPlayerGUID().GetCounter());

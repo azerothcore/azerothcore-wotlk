@@ -134,7 +134,7 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
 
     LOG_DEBUG("server.authserver", "Updating Realm List...");
 
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REALMLIST);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REALMLIST);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
     std::map<RealmHandle, std::string> existingRealms;

@@ -18,10 +18,9 @@
 #include "Banner.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
-#include "DatabaseLoader.h"
+#include "DatabaseMgr.h"
 #include "IoContext.h"
 #include "Log.h"
-#include "MySQLThreading.h"
 #include "OpenSSLCrypto.h"
 #include "Util.h"
 #include <boost/program_options.hpp>
@@ -96,16 +95,12 @@ int main(int argc, char** argv)
 /// Initialize connection to the database
 bool StartDB()
 {
-    MySQL::Library_Init();
+    sDatabaseMgr->AddDatabase(LoginDatabase, "Login");
+    sDatabaseMgr->AddDatabase(CharacterDatabase, "Character");
+    sDatabaseMgr->AddDatabase(WorldDatabase, "World");
+//    sDatabaseMgr->AddDatabase(DBCDatabase, "Dbc");
 
-    // Load databases
-    DatabaseLoader loader("dbimport");
-    loader
-        .AddDatabase(LoginDatabase, "Login")
-        .AddDatabase(CharacterDatabase, "Character")
-        .AddDatabase(WorldDatabase, "World");
-
-    if (!loader.Load())
+    if (!sDatabaseMgr->Load())
         return false;
 
     LOG_INFO("dbimport", "Started database connection pool.");
@@ -115,10 +110,7 @@ bool StartDB()
 /// Close the connection to the database
 void StopDB()
 {
-    CharacterDatabase.Close();
-    WorldDatabase.Close();
-    LoginDatabase.Close();
-    MySQL::Library_End();
+    sDatabaseMgr->CloseAllConnections();
 }
 
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile)

@@ -1,7 +1,6 @@
 ###############################################
 # AzerothCore Auth Server configuration file #
 ###############################################
-[authserver]
 
 ###################################################################################################
 # SECTION INDEX
@@ -234,22 +233,20 @@ Database.Reconnect.Seconds = 15
 Database.Reconnect.Attempts = 20
 
 #
-#    LoginDatabase.WorkerThreads
-#        Description: The amount of worker threads spawned to handle asynchronous (delayed) MySQL
-#                     statements. Each worker thread is mirrored with its own connection to the
-#        Default:     1
-
-LoginDatabase.WorkerThreads = 1
-
-#
-#    LoginDatabase.SynchThreads
-#        Description: The amount of MySQL connections spawned to handle.
-#        Default:     1 - (LoginDatabase.WorkerThreads)
+#    MaxQueueSize
+#        Description: Max size queue before open new dynamic async connect for db
+#        Default:     10
 #
 
-LoginDatabase.SynchThreads = 1
+MaxQueueSize = 10
 
 #
+#    MaxPingTime
+#        Description: Time (in minutes) between database pings.
+#        Default:     30
+#
+
+MaxPingTime = 30
 ###################################################################################################
 
 ###################################################################################################

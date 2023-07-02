@@ -26,10 +26,10 @@ public:
     static constexpr AppenderType type = APPENDER_DB;
 
     AppenderDB(uint8 id, std::string const& name, LogLevel level, AppenderFlags flags, std::vector<std::string_view> const& args);
-    ~AppenderDB();
+    ~AppenderDB() override;
 
     void setRealmId(uint32 realmId) override;
-    AppenderType getType() const override { return type; }
+    [[nodiscard]] AppenderType getType() const override { return type; }
 
 private:
     uint32 realmId;

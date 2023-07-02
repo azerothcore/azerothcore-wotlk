@@ -1,7 +1,6 @@
 ################################################
 # AzerothCore World Server configuration file #
 ################################################
-[worldserver]
 
 ###################################################################################################
 # SECTION INDEX
@@ -123,37 +122,18 @@ Database.Reconnect.Seconds = 15
 Database.Reconnect.Attempts = 20
 
 #
-#    LoginDatabase.WorkerThreads
-#    WorldDatabase.WorkerThreads
-#    CharacterDatabase.WorkerThreads
-#        Description: The amount of worker threads spawned to handle asynchronous (delayed) MySQL
-#                     statements. Each worker thread is mirrored with its own connection to the
-#                     MySQL server and their own thread on the MySQL server.
-#        Default:     1 - (LoginDatabase.WorkerThreads)
-#                     1 - (WorldDatabase.WorkerThreads)
-#                     1 - (CharacterDatabase.WorkerThreads)
-
-LoginDatabase.WorkerThreads     = 1
-WorldDatabase.WorkerThreads     = 1
-CharacterDatabase.WorkerThreads = 1
-
+#    MaxQueueSize
+#        Description: Max size queue before open new dynamic async connect for db
+#        Default:     10
 #
-#    LoginDatabase.SynchThreads
-#    WorldDatabase.SynchThreads
-#    CharacterDatabase.SynchThreads
-#        Description: The amount of MySQL connections spawned to handle.
-#        Default:     1 - (LoginDatabase.WorkerThreads)
-#                     1 - (WorldDatabase.WorkerThreads)
-#                     2 - (CharacterDatabase.WorkerThreads)
 
-LoginDatabase.SynchThreads     = 1
-WorldDatabase.SynchThreads     = 1
-CharacterDatabase.SynchThreads = 2
+MaxQueueSize = 10
 
 #
 #    MaxPingTime
 #        Description: Time (in minutes) between database pings.
 #        Default:     30
+#
 
 MaxPingTime = 30
 
@@ -3954,6 +3934,11 @@ Logger.sql.sql=2,Console DBErrors
 Logger.sql=4,Console Server
 Logger.time.update=4,Console Server
 Logger.module=4,Console Server
+Logger.db = 3,Console Server
+Logger.db.query = 2,Console DBErrors
+Logger.db.update = 4,Console Server
+Logger.db.pool = 4,Console Server
+Logger.db.connection = 4,Console Server
 
 #Logger.achievement=4,Console Server
 #Logger.addon=4,Console Server

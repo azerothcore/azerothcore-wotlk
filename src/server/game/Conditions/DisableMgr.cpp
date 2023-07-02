@@ -26,6 +26,7 @@
 #include "World.h"
 #include "Tokenize.h"
 #include "StringConvert.h"
+#include "DatabaseEnv.h"
 
 namespace DisableMgr
 {
@@ -75,7 +76,7 @@ namespace DisableMgr
             DisableType type = DisableType(fields[0].Get<uint32>());
             if (type >= MAX_DISABLE_TYPES)
             {
-                LOG_ERROR("sql.sql", "Invalid type {} specified in `disables` table, skipped.", type);
+                LOG_ERROR("db.query", "Invalid type {} specified in `disables` table, skipped.", type);
                 continue;
             }
 
@@ -92,22 +93,22 @@ namespace DisableMgr
                 case DISABLE_TYPE_GO_LOS:
                     if (!sObjectMgr->GetGameObjectTemplate(entry))
                     {
-                        LOG_ERROR("sql.sql", "Gameobject entry {} from `disables` doesn't exist in dbc, skipped.", entry);
+                        LOG_ERROR("db.query", "Gameobject entry {} from `disables` doesn't exist in dbc, skipped.", entry);
                         continue;
                     }
                     if (flags)
-                        LOG_ERROR("sql.sql", "Disable flags specified for gameobject {}, useless data.", entry);
+                        LOG_ERROR("db.query", "Disable flags specified for gameobject {}, useless data.", entry);
                     break;
                 case DISABLE_TYPE_SPELL:
                     if (!(sSpellMgr->GetSpellInfo(entry) || flags & SPELL_DISABLE_DEPRECATED_SPELL))
                     {
-                        LOG_ERROR("sql.sql", "Spell entry {} from `disables` doesn't exist in dbc, skipped.", entry);
+                        LOG_ERROR("db.query", "Spell entry {} from `disables` doesn't exist in dbc, skipped.", entry);
                         continue;
                     }
 
                     if (!flags || flags > MAX_SPELL_DISABLE_TYPE)
                     {
-                        LOG_ERROR("sql.sql", "Disable flags for spell {} are invalid, skipped.", entry);
+                        LOG_ERROR("db.query", "Disable flags for spell {} are invalid, skipped.", entry);
                         continue;
                     }
 
@@ -118,7 +119,7 @@ namespace DisableMgr
                             if (Optional<uint32> mapId = Acore::StringTo<uint32>(mapStr))
                                 data.params[0].insert(*mapId);
                             else
-                                LOG_ERROR("sql.sql", "Disable map '{}' for spell {} is invalid, skipped.", mapStr, entry);
+                                LOG_ERROR("db.query", "Disable map '{}' for spell {} is invalid, skipped.", mapStr, entry);
                         }
                     }
 
@@ -129,7 +130,7 @@ namespace DisableMgr
                             if (Optional<uint32> areaId = Acore::StringTo<uint32>(areaStr))
                                 data.params[1].insert(*areaId);
                             else
-                                LOG_ERROR("sql.sql", "Disable area '{}' for spell {} is invalid, skipped.", areaStr, entry);
+                                LOG_ERROR("db.query", "Disable area '{}' for spell {} is invalid, skipped.", areaStr, entry);
                         }
                     }
 
@@ -150,7 +151,7 @@ namespace DisableMgr
                         MapEntry const* mapEntry = sMapStore.LookupEntry(entry);
                         if (!mapEntry)
                         {
-                            LOG_ERROR("sql.sql", "Map entry {} from `disables` doesn't exist in dbc, skipped.", entry);
+                            LOG_ERROR("db.query", "Map entry {} from `disables` doesn't exist in dbc, skipped.", entry);
                             continue;
                         }
                         bool isFlagInvalid = false;
@@ -171,12 +172,12 @@ namespace DisableMgr
                                 break;
                             case MAP_BATTLEGROUND:
                             case MAP_ARENA:
-                                LOG_ERROR("sql.sql", "Battleground map {} specified to be disabled in map case, skipped.", entry);
+                                LOG_ERROR("db.query", "Battleground map {} specified to be disabled in map case, skipped.", entry);
                                 continue;
                         }
                         if (isFlagInvalid)
                         {
-                            LOG_ERROR("sql.sql", "Disable flags for map {} are invalid, skipped.", entry);
+                            LOG_ERROR("db.query", "Disable flags for map {} are invalid, skipped.", entry);
                             continue;
                         }
                         break;
@@ -184,36 +185,36 @@ namespace DisableMgr
                 case DISABLE_TYPE_BATTLEGROUND:
                     if (!sBattlemasterListStore.LookupEntry(entry))
                     {
-                        LOG_ERROR("sql.sql", "Battleground entry {} from `disables` doesn't exist in dbc, skipped.", entry);
+                        LOG_ERROR("db.query", "Battleground entry {} from `disables` doesn't exist in dbc, skipped.", entry);
                         continue;
                     }
                     if (flags)
-                        LOG_ERROR("sql.sql", "Disable flags specified for battleground {}, useless data.", entry);
+                        LOG_ERROR("db.query", "Disable flags specified for battleground {}, useless data.", entry);
                     break;
                 case DISABLE_TYPE_OUTDOORPVP:
                     if (entry > MAX_OUTDOORPVP_TYPES)
                     {
-                        LOG_ERROR("sql.sql", "OutdoorPvPTypes value {} from `disables` is invalid, skipped.", entry);
+                        LOG_ERROR("db.query", "OutdoorPvPTypes value {} from `disables` is invalid, skipped.", entry);
                         continue;
                     }
                     if (flags)
-                        LOG_ERROR("sql.sql", "Disable flags specified for outdoor PvP {}, useless data.", entry);
+                        LOG_ERROR("db.query", "Disable flags specified for outdoor PvP {}, useless data.", entry);
                     break;
                 case DISABLE_TYPE_ACHIEVEMENT_CRITERIA:
                     if (!sAchievementCriteriaStore.LookupEntry(entry))
                     {
-                        LOG_ERROR("sql.sql", "Achievement Criteria entry {} from `disables` doesn't exist in dbc, skipped.", entry);
+                        LOG_ERROR("db.query", "Achievement Criteria entry {} from `disables` doesn't exist in dbc, skipped.", entry);
                         continue;
                     }
                     if (flags)
-                        LOG_ERROR("sql.sql", "Disable flags specified for Achievement Criteria {}, useless data.", entry);
+                        LOG_ERROR("db.query", "Disable flags specified for Achievement Criteria {}, useless data.", entry);
                     break;
                 case DISABLE_TYPE_VMAP:
                     {
                         MapEntry const* mapEntry = sMapStore.LookupEntry(entry);
                         if (!mapEntry)
                         {
-                            LOG_ERROR("sql.sql", "Map entry {} from `disables` doesn't exist in dbc, skipped.", entry);
+                            LOG_ERROR("db.query", "Map entry {} from `disables` doesn't exist in dbc, skipped.", entry);
                             continue;
                         }
                         switch (mapEntry->map_type)
@@ -290,12 +291,12 @@ namespace DisableMgr
             const uint32 entry = itr->first;
             if (!sObjectMgr->GetQuestTemplate(entry))
             {
-                LOG_ERROR("sql.sql", "Quest entry {} from `disables` doesn't exist, skipped.", entry);
+                LOG_ERROR("db.query", "Quest entry {} from `disables` doesn't exist, skipped.", entry);
                 m_DisableMap[DISABLE_TYPE_QUEST].erase(itr++);
                 continue;
             }
             if (itr->second.flags)
-                LOG_ERROR("sql.sql", "Disable flags specified for quest {}, useless data.", entry);
+                LOG_ERROR("db.query", "Disable flags specified for quest {}, useless data.", entry);
             ++itr;
         }
 

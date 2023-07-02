@@ -250,7 +250,7 @@ void PlayerMenu::SendPointOfInterest(uint32 poiId) const
     PointOfInterest const* poi = sObjectMgr->GetPointOfInterest(poiId);
     if (!poi)
     {
-        LOG_ERROR("sql.sql", "Request to send non-existing POI (Id: {}), ignored.", poiId);
+        LOG_ERROR("db.query", "Request to send non-existing POI (Id: {}), ignored.", poiId);
         return;
     }
 

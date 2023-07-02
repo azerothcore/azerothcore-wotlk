@@ -138,7 +138,7 @@ void MailDraft::deleteIncludedItems(CharacterDatabaseTransaction trans, bool inD
 
         if (inDB)
         {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
             stmt->SetData(0, item->GetGUID().GetCounter());
             trans->Append(stmt);
         }
@@ -170,7 +170,7 @@ void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType se
             Item* item = mailItemIter->second;
             item->SaveToDB(trans);                      // item not in inventory and can be save standalone
             // owner in data will set at mail receive and item extracting
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
             stmt->SetData(0, receiver_guid);
             stmt->SetData(1, item->GetGUID().GetCounter());
             trans->Append(stmt);
@@ -226,7 +226,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
 
     // Add to DB
     uint8 index = 0;
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL);
     stmt->SetData(  index, mailId);
     stmt->SetData(++index, uint8(sender.GetMailMessageType()));
     stmt->SetData(++index, int8(sender.GetStationery()));

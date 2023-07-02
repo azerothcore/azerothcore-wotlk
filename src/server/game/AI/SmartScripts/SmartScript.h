@@ -93,7 +93,7 @@ public:
             smart = false;
 
         if (!smart)
-            LOG_ERROR("sql.sql", "SmartScript: Action target Creature(entry: {}) is not using SmartAI, action skipped to prevent crash.", c ? c->GetEntry() : (me ? me->GetEntry() : 0));
+            LOG_ERROR("db.query", "SmartScript: Action target Creature(entry: {}) is not using SmartAI, action skipped to prevent crash.", c ? c->GetEntry() : (me ? me->GetEntry() : 0));
 
         return smart;
     }
@@ -107,7 +107,7 @@ public:
         if (!go || go->GetAIName() != "SmartGameObjectAI")
             smart = false;
         if (!smart)
-            LOG_ERROR("sql.sql", "SmartScript: Action target GameObject(entry: {}) is not using SmartGameObjectAI, action skipped to prevent crash.", g ? g->GetEntry() : (go ? go->GetEntry() : 0));
+            LOG_ERROR("db.query", "SmartScript: Action target GameObject(entry: {}) is not using SmartGameObjectAI, action skipped to prevent crash.", g ? g->GetEntry() : (go ? go->GetEntry() : 0));
 
         return smart;
     }

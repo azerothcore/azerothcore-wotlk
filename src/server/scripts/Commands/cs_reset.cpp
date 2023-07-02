@@ -24,11 +24,11 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "Chat.h"
-#include "Language.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "DatabaseEnv.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -177,7 +177,7 @@ public:
         }
         else
         {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->SetData(0, uint16(AT_LOGIN_RESET_SPELLS));
             stmt->SetData(1, targetGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
@@ -251,7 +251,7 @@ public:
         }
         else if (targetGuid)
         {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->SetData(0, uint16(AT_LOGIN_RESET_TALENTS | AT_LOGIN_RESET_PET_TALENTS));
             stmt->SetData(1, targetGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
@@ -297,7 +297,7 @@ public:
             return false;
         }
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ALL_AT_LOGIN_FLAGS);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ALL_AT_LOGIN_FLAGS);
         stmt->SetData(0, uint16(atLogin));
         CharacterDatabase.Execute(stmt);
 

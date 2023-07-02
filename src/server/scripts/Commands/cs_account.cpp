@@ -28,14 +28,13 @@ EndScriptData */
 #include "Chat.h"
 #include "CryptoGenerics.h"
 #include "IPLocation.h"
-#include "Language.h"
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SecretMgr.h"
 #include "StringConvert.h"
 #include "TOTP.h"
-#include <openssl/rand.h>
+#include "DatabaseEnv.h"
 #include <unordered_map>
 
 #if AC_COMPILER == AC_COMPILER_GNU
@@ -120,7 +119,7 @@ public:
         uint32 const accountId = handler->GetSession()->GetAccountId();
 
         { // check if 2FA already enabled
-            auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET);
+            auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET);
             stmt->SetData(0, accountId);
             PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -154,7 +153,7 @@ public:
                 if (masterKey)
                     Acore::Crypto::AEEncryptWithRandomIV<Acore::Crypto::AES>(pair.first->second, *masterKey);
 
-                auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
+                auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
                 stmt->SetData(0, pair.first->second);
                 stmt->SetData(1, accountId);
                 LoginDatabase.Execute(stmt);
@@ -195,7 +194,7 @@ public:
         uint32 const accountId = handler->GetSession()->GetAccountId();
         Acore::Crypto::TOTP::Secret secret;
         { // get current TOTP secret
-            auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET);
+            auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET);
             stmt->SetData(0, accountId);
             PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -234,7 +233,7 @@ public:
 
             if (Acore::Crypto::TOTP::ValidateToken(secret, *token))
             {
-                auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
+                auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
                 stmt->SetData(0);
                 stmt->SetData(1, accountId);
                 LoginDatabase.Execute(stmt);
@@ -271,7 +270,7 @@ public:
             return false;
         }
 
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
+        LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
 
         stmt->SetData(0, *expansion);
         stmt->SetData(1, accountId);
@@ -392,7 +391,7 @@ public:
     static bool HandleAccountOnlineListCommand(ChatHandler* handler, char const* /*args*/)
     {
         ///- Get the list of accounts ID logged to the realm
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ONLINE);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ONLINE);
 
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -416,7 +415,7 @@ public:
 
             ///- Get the username, last IP and GM level of each account
             // No SQL injection. account is uint32.
-            LoginDatabasePreparedStatement* loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO);
+            LoginDatabasePreparedStatement loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO);
             loginStmt->SetData(0, account);
             PreparedQueryResult resultLogin = LoginDatabase.Query(loginStmt);
 
@@ -466,7 +465,7 @@ public:
             return false;
         }
 
-        auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
+        auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
         stmt->SetData(0, "00");
         stmt->SetData(1, accountId);
         LoginDatabase.Execute(stmt);
@@ -492,7 +491,7 @@ public:
             {
                 if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(handler->GetSession()->GetRemoteAddress()))
                 {
-                    auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
+                    auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
                     stmt->SetData(0, location->CountryCode);
                     stmt->SetData(1, handler->GetSession()->GetAccountId());
                     LoginDatabase.Execute(stmt);
@@ -507,7 +506,7 @@ public:
             }
             else if (param == "off")
             {
-                auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
+                auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
                 stmt->SetData(0, "00");
                 stmt->SetData(1, handler->GetSession()->GetAccountId());
                 LoginDatabase.Execute(stmt);
@@ -534,7 +533,7 @@ public:
 
         if (!param.empty())
         {
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK);
+            LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK);
 
             if (param == "on")
             {
@@ -657,7 +656,7 @@ public:
 
         if (secret == "off")
         {
-            auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
+            auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
             stmt->SetData(0);
             stmt->SetData(1, targetAccountId);
             LoginDatabase.Execute(stmt);
@@ -691,7 +690,7 @@ public:
         if (masterKey)
             Acore::Crypto::AEEncryptWithRandomIV<Acore::Crypto::AES>(*decoded, *masterKey);
 
-        auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
+        auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
         stmt->SetData(0, *decoded);
         stmt->SetData(1, targetAccountId);
         LoginDatabase.Execute(stmt);
@@ -760,7 +759,7 @@ public:
         if (!expansion || *expansion > sWorld->getIntConfig(CONFIG_EXPANSION))
             return false;
 
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
+        LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
 
         stmt->SetData(0, *expansion);
         stmt->SetData(1, accountId);
@@ -839,7 +838,7 @@ public:
         // Check and abort if the target gm has a higher rank on one of the realms and the new realm is -1
         if (gmRealmID == -1 && !AccountMgr::IsConsoleAccount(playerSecurity))
         {
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS_GMLEVEL_TEST);
+            LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS_GMLEVEL_TEST);
 
             stmt->SetData(0, targetAccountId);
             stmt->SetData(1, uint8(gm));
@@ -863,7 +862,7 @@ public:
         }
 
         // If gmRealmID is -1, delete all values for the account id, else, insert values for the specific realm.Id.Realm
-        LoginDatabasePreparedStatement* stmt;
+        LoginDatabasePreparedStatement stmt;
 
         if (gmRealmID == -1)
         {

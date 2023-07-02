@@ -19,7 +19,6 @@
 #include "ArenaTeamMgr.h"
 #include "Guild.h"
 #include "GuildMgr.h"
-#include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -29,6 +28,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "DatabaseEnv.h"
 
 void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
 {
@@ -211,7 +211,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
 
     // xinef: petition pointer is invalid from now on
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION);
     stmt->SetData(0, _player->GetGUID().GetCounter());
     stmt->SetData(1, charter->GetGUID().GetCounter());
     stmt->SetData(2, name);
@@ -371,7 +371,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
         }
     }
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PETITION_NAME);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PETITION_NAME);
 
     stmt->SetData(0, newName);
     stmt->SetData(1, petitionGuid.GetCounter());
@@ -493,7 +493,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
         return;
     }
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION_SIGNATURE);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION_SIGNATURE);
 
     stmt->SetData(0, petition->ownerGuid.GetCounter());
     stmt->SetData(1, petitionGuid.GetCounter());
@@ -786,7 +786,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_GUID);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_GUID);
     stmt->SetData(0, petitionGuid.GetCounter());
     trans->Append(stmt);
 

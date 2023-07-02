@@ -23,12 +23,10 @@
  EndScriptData */
 
 #include "Chat.h"
-#include "Config.h"
 #include "GameTime.h"
 #include "GitRevision.h"
-#include "Language.h"
 #include "ModuleMgr.h"
-#include "MySQLThreading.h"
+#include "DatabaseMgr.h"
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
@@ -37,6 +35,7 @@
 #include "UpdateTime.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "DatabaseEnv.h"
 #include <boost/version.hpp>
 #include <filesystem>
 #include <numeric>
@@ -131,7 +130,7 @@ public:
         handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
         handler->PSendSysMessage("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
         handler->PSendSysMessage("Using Boost version: %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
-        handler->PSendSysMessage("Using MySQL version: %u", MySQL::GetLibraryVersion());
+        handler->PSendSysMessage("Using MySQL version: %u", sDatabaseMgr->GetDatabaseLibraryVersion());
         handler->PSendSysMessage("Using CMake version: %s", GitRevision::GetCMakeVersion());
 
         handler->PSendSysMessage("Compiled on: %s", GitRevision::GetHostOSVersion());
@@ -211,17 +210,15 @@ public:
         }
 
         handler->PSendSysMessage("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[defaultLocale], availableLocales.c_str());
-
         handler->PSendSysMessage("Using World DB: %s", sWorld->GetDBVersion());
-
-        handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
-        handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
-        handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
+        handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.GetQueueSize());
+        handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.GetQueueSize());
+        handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.GetQueueSize());
 
         if (Acore::Module::GetEnableModulesList().empty())
             handler->SendSysMessage("No modules enabled");
         else
-            handler->SendSysMessage("> List enable modules:");
+            handler->SendSysMessage("List enable modules:");
 
         for (auto const& modName : Acore::Module::GetEnableModulesList())
         {
@@ -524,7 +521,7 @@ public:
         }
 
         LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_MOTD);
+        LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_MOTD);
         stmt->SetData(0, Acore::StringTo<int32>(realmId).value());
         stmt->SetData(1, strMotd);
         trans->Append(stmt);

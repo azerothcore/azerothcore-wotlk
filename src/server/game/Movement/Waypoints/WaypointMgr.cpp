@@ -86,7 +86,7 @@ void WaypointMgr::Load()
 
         if (wp->move_type >= WAYPOINT_MOVE_TYPE_MAX)
         {
-            //LOG_ERROR("sql.sql", "Waypoint {} in waypoint_data has invalid move_type, ignoring", wp->id);
+            //LOG_ERROR("db.query", "Waypoint {} in waypoint_data has invalid move_type, ignoring", wp->id);
             delete wp;
             continue;
         }
@@ -114,7 +114,7 @@ void WaypointMgr::ReloadPath(uint32 id)
         _waypointStore.erase(itr);
     }
 
-    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_BY_ID);
+    WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_BY_ID);
 
     stmt->SetData(0, id);
 
@@ -149,7 +149,7 @@ void WaypointMgr::ReloadPath(uint32 id)
 
         if (wp->move_type >= WAYPOINT_MOVE_TYPE_MAX)
         {
-            //LOG_ERROR("sql.sql", "Waypoint {} in waypoint_data has invalid move_type, ignoring", wp->id);
+            //LOG_ERROR("db.query", "Waypoint {} in waypoint_data has invalid move_type, ignoring", wp->id);
             delete wp;
             continue;
         }

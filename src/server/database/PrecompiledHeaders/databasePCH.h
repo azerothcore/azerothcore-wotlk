@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DatabaseAsyncOperation.h"
 #include "DatabaseEnvFwd.h"
 #include "Define.h"
 #include "Errors.h"
@@ -25,11 +26,11 @@
 #include "MySQLWorkaround.h"
 #include "PreparedStatement.h"
 #include "QueryResult.h"
-#include "SQLOperation.h"
 #include "Transaction.h"
+#include <string>
+#include <vector>
+
 #ifdef _WIN32 // hack for broken mysql.h not including the correct winsock header for SOCKET definition, fixed in 5.7
 #include <winsock2.h>
 #endif
 #include <mysql.h>
-#include <string>
-#include <vector>

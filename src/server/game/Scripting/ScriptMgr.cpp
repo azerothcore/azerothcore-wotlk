@@ -195,7 +195,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<GroupScript>::GetScriptById(sid) &&
                 !ScriptRegistry<DatabaseScript>::GetScriptById(sid))
                 {
-                    LOG_ERROR("sql.sql", "Script named '{}' is assigned in the database, but has no code!", scriptName);
+                    LOG_ERROR("db.query", "Script named '{}' is assigned in the database, but has no code!", scriptName);
                 }
         }
     }

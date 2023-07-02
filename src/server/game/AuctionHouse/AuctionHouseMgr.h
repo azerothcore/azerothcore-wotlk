@@ -20,7 +20,7 @@
 
 #include "Common.h"
 #include "DBCStructure.h"
-#include "DatabaseEnv.h"
+#include "DatabaseEnvFwd.h"
 #include "EventProcessor.h"
 #include "ObjectGuid.h"
 #include "WorldPacket.h"

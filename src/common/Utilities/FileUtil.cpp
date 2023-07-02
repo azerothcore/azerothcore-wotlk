@@ -15,36 +15,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _WORKERTHREAD_H
-#define _WORKERTHREAD_H
+#include "FileUtil.h"
+#include <algorithm>
+#include <filesystem>
 
-#include "Define.h"
-#include <atomic>
-#include <thread>
+namespace fs = std::filesystem;
 
-template <typename T>
-class ProducerConsumerQueue;
-
-class MySQLConnection;
-class SQLOperation;
-
-class AC_DATABASE_API DatabaseWorker
+void Acore::File::CorrectDirPath(std::string& path)
 {
-public:
-    DatabaseWorker(ProducerConsumerQueue<SQLOperation*>* newQueue, MySQLConnection* connection);
-    ~DatabaseWorker();
+    if (path.empty())
+    {
+        path = fs::absolute(fs::current_path()).generic_string();
+        return;
+    }
 
-private:
-    ProducerConsumerQueue<SQLOperation*>* _queue;
-    MySQLConnection* _connection;
+    std::replace(std::begin(path), std::end(path), '\\', '/');
 
-    void WorkerThread();
-    std::thread _workerThread;
+    if (path.at(path.length() - 1) != '/')
+        path.push_back('/');
+}
 
-    std::atomic<bool> _cancelationToken;
+bool Acore::File::CreateDirIfNeed(std::string_view path)
+{
+    if (path.empty())
+        return true;
 
-    DatabaseWorker(DatabaseWorker const& right) = delete;
-    DatabaseWorker& operator=(DatabaseWorker const& right) = delete;
-};
+    fs::path dirPath{ path };
 
-#endif
+    if (fs::exists(dirPath) && fs::is_directory(path))
+        return true;
+
+    try
+    {
+        return fs::create_directory(dirPath);
+    }
+    catch (...)
+    {
+        return false;
+    }
+}

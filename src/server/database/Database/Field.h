@@ -19,24 +19,10 @@
 #define _FIELD_H
 
 #include "DatabaseEnvFwd.h"
-#include "Define.h"
 #include "Duration.h"
 #include <array>
 #include <string_view>
 #include <vector>
-
-namespace Acore::Types
-{
-    template <typename T>
-    using is_chrono_v = std::enable_if_t<std::is_same_v<Milliseconds, T>
-        || std::is_same_v<Seconds, T>
-        || std::is_same_v<Minutes, T>
-        || std::is_same_v<Hours, T>
-        || std::is_same_v<Days, T>
-        || std::is_same_v<Weeks, T>
-        || std::is_same_v<Years, T>
-        || std::is_same_v<Months, T>, T>;
-}
 
 using Binary = std::vector<uint8>;
 
@@ -56,13 +42,13 @@ enum class DatabaseFieldTypes : uint8
 
 struct QueryResultFieldMetadata
 {
-    std::string TableName{};
-    std::string TableAlias{};
-    std::string Name{};
-    std::string Alias{};
-    std::string TypeName{};
-    uint32 Index = 0;
-    DatabaseFieldTypes Type = DatabaseFieldTypes::Null;
+    std::string TableName;
+    std::string TableAlias;
+    std::string Name;
+    std::string Alias;
+    std::string TypeName;
+    uint32 Index{ 0 };
+    DatabaseFieldTypes Type{ DatabaseFieldTypes::Null };
 };
 
 /**
@@ -97,17 +83,12 @@ struct QueryResultFieldMetadata
 */
 class AC_DATABASE_API Field
 {
-friend class ResultSet;
-friend class PreparedResultSet;
+    friend class ResultSet;
+    friend class PreparedResultSet;
 
 public:
     Field();
     ~Field() = default;
-
-    [[nodiscard]] inline bool IsNull() const
-    {
-        return data.value == nullptr;
-    }
 
     template<typename T>
     inline std::enable_if_t<std::is_arithmetic_v<T>, T> Get() const
@@ -136,15 +117,20 @@ public:
     template <typename T, size_t S>
     inline std::enable_if_t<std::is_same_v<Binary, T>, std::array<uint8, S>> Get() const
     {
-        std::array<uint8, S> buf = {};
+        std::array<uint8, S> buf{};
         GetBinarySizeChecked(buf.data(), S);
         return buf;
     }
 
     template<typename T>
-    inline Acore::Types::is_chrono_v<T> Get(bool convertToUin32 = true) const
+    inline std::enable_if_t<std::is_convertible_v<T, Milliseconds>, T> Get(bool convertToUin32 = true) const
     {
         return convertToUin32 ? T(GetData<uint32>()) : T(GetData<uint64>());
+    }
+
+    [[nodiscard]] inline bool IsNull() const
+    {
+        return data.value == nullptr;
     }
 
     DatabaseFieldTypes GetType() { return meta->Type; }
@@ -152,27 +138,29 @@ public:
 protected:
     struct
     {
-        char const* value;      // Actual data in memory
-        uint32 length;          // Length
-        bool raw;               // Raw bytes? (Prepared statement or ad hoc)
+        char const* value; // Actual data in memory
+        uint32 length;     // Length
+        bool raw;          // Raw bytes? (Prepared statement or ad hoc)
     } data;
 
     void SetByteValue(char const* newValue, uint32 length);
     void SetStructuredValue(char const* newValue, uint32 length);
+
     [[nodiscard]] bool IsType(DatabaseFieldTypes type) const;
     [[nodiscard]] bool IsNumeric() const;
 
 private:
     template<typename T>
-    T GetData() const;
+    [[nodiscard]] T GetData() const;
 
-    std::string GetDataString() const;
-    std::string_view GetDataStringView() const;
-    Binary GetDataBinary() const;
+    [[nodiscard]] std::string GetDataString() const;
+    [[nodiscard]] std::string_view GetDataStringView() const;
+    [[nodiscard]] Binary GetDataBinary() const;
 
     QueryResultFieldMetadata const* meta;
     void LogWrongType(std::string_view getter, std::string_view typeName) const;
     void SetMetadata(QueryResultFieldMetadata const* fieldMeta);
+
     void GetBinarySizeChecked(uint8* buf, size_t size) const;
 };
 

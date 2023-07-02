@@ -211,7 +211,7 @@ void ArenaTeamMgr::DistributeArenaPoints()
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    CharacterDatabasePreparedStatement* stmt;
+    CharacterDatabasePreparedStatement stmt;
 
     // Cycle that gives points to all players
     for (std::map<ObjectGuid, uint32>::iterator playerItr = PlayerPoints.begin(); playerItr != PlayerPoints.end(); ++playerItr)

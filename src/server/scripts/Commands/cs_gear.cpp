@@ -21,6 +21,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "WorldSession.h"
+#include "DatabaseEnv.h"
 
 using namespace Acore::ChatCommands;
 
@@ -92,7 +93,7 @@ public:
 
         if (sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE))
         {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_STATS);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_STATS);
             stmt->SetData(0, player->GetGUID().GetCounter());
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
 

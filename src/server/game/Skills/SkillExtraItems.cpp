@@ -75,28 +75,28 @@ void LoadSkillPerfectItemTable()
 
         if (!sSpellMgr->GetSpellInfo(spellId))
         {
-            LOG_ERROR("sql.sql", "Skill perfection data for spell {} has non-existent spell id in `skill_perfect_item_template`!", spellId);
+            LOG_ERROR("db.query", "Skill perfection data for spell {} has non-existent spell id in `skill_perfect_item_template`!", spellId);
             continue;
         }
 
         uint32 requiredSpecialization = fields[1].Get<uint32>();
         if (!sSpellMgr->GetSpellInfo(requiredSpecialization))
         {
-            LOG_ERROR("sql.sql", "Skill perfection data for spell {} has non-existent required specialization spell id {} in `skill_perfect_item_template`!", spellId, requiredSpecialization);
+            LOG_ERROR("db.query", "Skill perfection data for spell {} has non-existent required specialization spell id {} in `skill_perfect_item_template`!", spellId, requiredSpecialization);
             continue;
         }
 
         float perfectCreateChance = fields[2].Get<float>();
         if (perfectCreateChance <= 0.0f)
         {
-            LOG_ERROR("sql.sql", "Skill perfection data for spell {} has impossibly low proc chance in `skill_perfect_item_template`!", spellId);
+            LOG_ERROR("db.query", "Skill perfection data for spell {} has impossibly low proc chance in `skill_perfect_item_template`!", spellId);
             continue;
         }
 
         uint32 perfectItemType = fields[3].Get<uint32>();
         if (!sObjectMgr->GetItemTemplate(perfectItemType))
         {
-            LOG_ERROR("sql.sql", "Skill perfection data for spell {} references non-existent perfect item id {} in `skill_perfect_item_template`!", spellId, perfectItemType);
+            LOG_ERROR("db.query", "Skill perfection data for spell {} references non-existent perfect item id {} in `skill_perfect_item_template`!", spellId, perfectItemType);
             continue;
         }
 
@@ -161,28 +161,28 @@ void LoadSkillExtraItemTable()
 
         if (!sSpellMgr->GetSpellInfo(spellId))
         {
-            LOG_ERROR("sql.sql", "Skill specialization {} has non-existent spell id in `skill_extra_item_template`!", spellId);
+            LOG_ERROR("db.query", "Skill specialization {} has non-existent spell id in `skill_extra_item_template`!", spellId);
             continue;
         }
 
         uint32 requiredSpecialization = fields[1].Get<uint32>();
         if (!sSpellMgr->GetSpellInfo(requiredSpecialization))
         {
-            LOG_ERROR("sql.sql", "Skill specialization {} have not existed required specialization spell id {} in `skill_extra_item_template`!", spellId, requiredSpecialization);
+            LOG_ERROR("db.query", "Skill specialization {} have not existed required specialization spell id {} in `skill_extra_item_template`!", spellId, requiredSpecialization);
             continue;
         }
 
         float additionalCreateChance = fields[2].Get<float>();
         if (additionalCreateChance <= 0.0f)
         {
-            LOG_ERROR("sql.sql", "Skill specialization {} has too low additional create chance in `skill_extra_item_template`!", spellId);
+            LOG_ERROR("db.query", "Skill specialization {} has too low additional create chance in `skill_extra_item_template`!", spellId);
             continue;
         }
 
         int32 newMaxOrEntry = fields[3].Get<int32>();
         if (!newMaxOrEntry)
         {
-            LOG_ERROR("sql.sql", "Skill specialization {} has 0 max number of extra items in `skill_extra_item_template`!", spellId);
+            LOG_ERROR("db.query", "Skill specialization {} has 0 max number of extra items in `skill_extra_item_template`!", spellId);
             continue;
         }
 

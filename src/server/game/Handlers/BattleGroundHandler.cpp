@@ -23,13 +23,13 @@
 #include "DisableMgr.h"
 #include "GameTime.h"
 #include "Group.h"
-#include "Language.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "DatabaseEnv.h"
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
 {
@@ -571,7 +571,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
         {
             if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
             {
-                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
+                CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
                 stmt->SetData(0, _player->GetGUID().GetCounter());
                 stmt->SetData(1, BG_DESERTION_TYPE_LEAVE_QUEUE);
                 CharacterDatabase.Execute(stmt);

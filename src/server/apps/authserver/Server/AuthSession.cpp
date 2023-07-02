@@ -173,7 +173,7 @@ void AuthSession::Start()
     std::string ip_address = GetRemoteIpAddress().to_string();
     LOG_TRACE("session", "Accepted connection from {}", ip_address);
 
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_INFO);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_INFO);
     stmt->SetData(0, ip_address);
 
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::CheckIpCallback, this, std::placeholders::_1)));
@@ -309,7 +309,7 @@ bool AuthSession::HandleLogonChallenge()
         _localizationName[i] = challenge->country[4 - i - 1];
 
     // Get the account details from the account table
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
     stmt->SetData(0, GetRemoteIpAddress().to_string());
     stmt->SetData(1, login);
 
@@ -517,7 +517,7 @@ bool AuthSession::HandleLogonProof()
         // No SQL injection (escaped user name) and IP address as received by socket
 
         std::string address = sConfigMgr->GetOption<bool>("AllowLoggingIPAddressesInDatabase", true, true) ? GetRemoteIpAddress().to_string() : "0.0.0.0";
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
+        LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
         stmt->SetData(0, _sessionKey);
         stmt->SetData(1, address);
         stmt->SetData(2, GetLocaleByName(_localizationName));
@@ -573,7 +573,7 @@ bool AuthSession::HandleLogonProof()
         // We can not include the failed account login hook. However, this is a workaround to still log this.
         if (sConfigMgr->GetOption<bool>("WrongPass.Logging", false))
         {
-            LoginDatabasePreparedStatement* logstmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FALP_IP_LOGGING);
+            LoginDatabasePreparedStatement logstmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FALP_IP_LOGGING);
             logstmt->SetData(0, _accountInfo.Id);
             logstmt->SetData(1, GetRemoteIpAddress().to_string());
             logstmt->SetData(2, "Login to WoW Failed - Incorrect Password");
@@ -584,7 +584,7 @@ bool AuthSession::HandleLogonProof()
         if (MaxWrongPassCount > 0)
         {
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
+            LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
             stmt->SetData(0, _accountInfo.Login);
             LoginDatabase.Execute(stmt);
 
@@ -647,7 +647,7 @@ bool AuthSession::HandleReconnectChallenge()
         _localizationName[i] = challenge->country[4 - i - 1];
 
     // Get the account details from the account table
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_RECONNECTCHALLENGE);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_RECONNECTCHALLENGE);
     stmt->SetData(0, GetRemoteIpAddress().to_string());
     stmt->SetData(1, login);
 
@@ -733,7 +733,7 @@ bool AuthSession::HandleRealmList()
 {
     LOG_DEBUG("server.authserver", "Entering _HandleRealmList");
 
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REALM_CHARACTER_COUNTS);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REALM_CHARACTER_COUNTS);
     stmt->SetData(0, _accountInfo.Id);
 
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::RealmListCallback, this, std::placeholders::_1)));

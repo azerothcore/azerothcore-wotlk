@@ -20,6 +20,7 @@
 #include "Chat.h"
 #include "Player.h"
 #include "GridNotifiers.h"
+#include "DatabaseEnv.h"
 
 AutobroadcastMgr* AutobroadcastMgr::instance()
 {
@@ -35,7 +36,7 @@ void AutobroadcastMgr::LoadAutobroadcasts()
     _autobroadcastsWeights.clear();
 
     uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST);
     stmt->SetData(0, realmId);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 

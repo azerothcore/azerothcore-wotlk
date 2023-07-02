@@ -134,28 +134,25 @@ public:
         MAX
     };
 
-    PetLoadQueryHolder(ObjectGuid::LowType ownerGuid, uint32 petNumber)
+    PetLoadQueryHolder(ObjectGuid::LowType ownerGuid, uint32 petNumber) : CharacterDatabaseQueryHolder("PetLoadQueryHolder")
     {
-        SetSize(MAX);
-
-        CharacterDatabasePreparedStatement* stmt = nullptr;
-
+        CharacterDatabasePreparedStatement stmt = nullptr;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_DECLINED_NAME);
         stmt->SetData(0, ownerGuid);
         stmt->SetData(1, petNumber);
-        SetPreparedQuery(DECLINED_NAMES, stmt);
+        AddPreparedQuery(DECLINED_NAMES, stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_AURA);
         stmt->SetData(0, petNumber);
-        SetPreparedQuery(AURAS, stmt);
+        AddPreparedQuery(AURAS, stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL);
         stmt->SetData(0, petNumber);
-        SetPreparedQuery(SPELLS, stmt);
+        AddPreparedQuery(SPELLS, stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL_COOLDOWN);
         stmt->SetData(0, petNumber);
-        SetPreparedQuery(COOLDOWNS, stmt);
+        AddPreparedQuery(COOLDOWNS, stmt);
     }
 };
 
@@ -536,7 +533,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         trans = CharacterDatabase.BeginTransaction();
         // remove current data
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
         stmt->SetData(0, m_charmInfo->GetPetNumber());
         trans->Append(stmt);
 
@@ -592,7 +589,7 @@ void Pet::DeleteFromDB(ObjectGuid::LowType guidlow)
 {
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
     stmt->SetData(0, guidlow);
     trans->Append(stmt);
 
@@ -1486,7 +1483,7 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
 
 void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans)
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_COOLDOWNS);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_COOLDOWNS);
     stmt->SetData(0, m_charmInfo->GetPetNumber());
     trans->Append(stmt);
 
@@ -1541,7 +1538,7 @@ void Pet::_SaveSpells(CharacterDatabaseTransaction trans)
         if (itr->second.type == PETSPELL_FAMILY)
             continue;
 
-        CharacterDatabasePreparedStatement* stmt;
+        CharacterDatabasePreparedStatement stmt;
 
         switch (itr->second.state)
         {
@@ -1662,7 +1659,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
 
 void Pet::_SaveAuras(CharacterDatabaseTransaction trans)
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_AURAS);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_AURAS);
     stmt->SetData(0, m_charmInfo->GetPetNumber());
     trans->Append(stmt);
 
@@ -1722,7 +1719,7 @@ void Pet::_SaveAuras(CharacterDatabaseTransaction trans)
 
         uint8 index = 0;
 
-        CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
+        CharacterDatabasePreparedStatement stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
         stmt2->SetData(index++, m_charmInfo->GetPetNumber());
         stmt2->SetData(index++, casterGUID.GetRawValue());
         stmt2->SetData(index++, itr->second->GetId());
@@ -1752,7 +1749,7 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
         {
             LOG_ERROR("entities.pet", "Pet::addSpell: Non-existed in SpellStore spell #{} request, deleting for all pets in `pet_spell`.", spellId);
 
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_PET_SPELL);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_PET_SPELL);
             stmt->SetData(0, spellId);
             CharacterDatabase.Execute(stmt);
         }

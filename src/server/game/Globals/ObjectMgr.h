@@ -22,7 +22,7 @@
 #include "ConditionMgr.h"
 #include "Corpse.h"
 #include "Creature.h"
-#include "DatabaseEnv.h"
+#include "DatabaseEnvFwd.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "ItemTemplate.h"

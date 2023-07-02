@@ -628,7 +628,7 @@ void ReputationMgr::SaveToDB(CharacterDatabaseTransaction trans)
     {
         if (itr->second.needSave)
         {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_REPUTATION_BY_FACTION);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_REPUTATION_BY_FACTION);
             stmt->SetData(0, _player->GetGUID().GetCounter());
             stmt->SetData(1, uint16(itr->second.ID));
             trans->Append(stmt);

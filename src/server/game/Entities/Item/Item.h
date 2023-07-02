@@ -19,7 +19,7 @@
 #define AZEROTHCORE_ITEM_H
 
 #include "Common.h"
-#include "DatabaseEnv.h"
+#include "DatabaseEnvFwd.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
 #include "Object.h"

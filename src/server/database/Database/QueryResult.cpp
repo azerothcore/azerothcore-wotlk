@@ -17,14 +17,12 @@
 
 #include "QueryResult.h"
 #include "Errors.h"
-#include "Field.h"
 #include "Log.h"
 #include "MySQLHacks.h"
-#include "MySQLWorkaround.h"
 
 namespace
 {
-    static uint32 SizeForType(MYSQL_FIELD* field)
+    uint32 SizeForType(MYSQL_FIELD* field)
     {
         switch (field->type)
         {
@@ -69,7 +67,7 @@ namespace
                 MYSQL_TYPE_SET:
                 */
             default:
-                LOG_WARN("sql.sql", "SQL::SizeForType(): invalid field type {}", uint32(field->type));
+                LOG_WARN("db.query", "SQL::SizeForType(): invalid field type {}", uint32(field->type));
                 return 0;
         }
     }
@@ -111,14 +109,14 @@ namespace
             case MYSQL_TYPE_VAR_STRING:
                 return DatabaseFieldTypes::Binary;
             default:
-                LOG_WARN("sql.sql", "MysqlTypeToFieldType(): invalid field type {}", uint32(type));
+                LOG_WARN("db.query", "MysqlTypeToFieldType(): invalid field type {}", uint32(type));
                 break;
         }
 
         return DatabaseFieldTypes::Null;
     }
 
-    static std::string FieldTypeToString(enum_field_types type)
+    std::string FieldTypeToString(enum_field_types type)
     {
         switch (type)
         {
@@ -171,12 +169,12 @@ ResultSet::ResultSet(MySQLResult* result, MySQLField* fields, uint64 rowCount, u
     _fields(fields)
 {
     _fieldMetadata.resize(_fieldCount);
-    _currentRow = new Field[_fieldCount];
+    _currRow = std::make_unique<Field[]>(_fieldCount);
 
     for (uint32 i = 0; i < _fieldCount; i++)
     {
         InitializeDatabaseFieldMetadata(&_fieldMetadata[i], &_fields[i], i);
-        _currentRow[i].SetMetadata(&_fieldMetadata[i]);
+        _currRow[i].SetMetadata(&_fieldMetadata[i]);
     }
 }
 
@@ -187,12 +185,10 @@ ResultSet::~ResultSet()
 
 bool ResultSet::NextRow()
 {
-    MYSQL_ROW row;
-
     if (!_result)
         return false;
 
-    row = mysql_fetch_row(_result);
+    auto row = mysql_fetch_row(_result);
     if (!row)
     {
         CleanUp();
@@ -202,13 +198,13 @@ bool ResultSet::NextRow()
     unsigned long* lengths = mysql_fetch_lengths(_result);
     if (!lengths)
     {
-        LOG_WARN("sql.sql", "{}:mysql_fetch_lengths, cannot retrieve value lengths. Error {}.", __FUNCTION__, mysql_error(_result->handle));
+        LOG_WARN("db.query", "{}:mysql_fetch_lengths, cannot retrieve value lengths. Error {}.", __FUNCTION__, mysql_error(_result->handle));
         CleanUp();
         return false;
     }
 
     for (uint32 i = 0; i < _fieldCount; i++)
-        _currentRow[i].SetStructuredValue(row[i], lengths[i]);
+        _currRow[i].SetStructuredValue(row[i], lengths[i]);
 
     return true;
 }
@@ -221,12 +217,6 @@ std::string ResultSet::GetFieldName(uint32 index) const
 
 void ResultSet::CleanUp()
 {
-    if (_currentRow)
-    {
-        delete[] _currentRow;
-        _currentRow = nullptr;
-    }
-
     if (_result)
     {
         mysql_free_result(_result);
@@ -237,144 +227,142 @@ void ResultSet::CleanUp()
 Field const& ResultSet::operator[](std::size_t index) const
 {
     ASSERT(index < _fieldCount);
-    return _currentRow[index];
+    return _currRow[index];
 }
 
-void ResultSet::AssertRows(std::size_t sizeRows)
+void ResultSet::AssertRows(std::size_t sizeRows) const
 {
     ASSERT(sizeRows == _fieldCount);
 }
 
 PreparedResultSet::PreparedResultSet(MySQLStmt* stmt, MySQLResult* result, uint64 rowCount, uint32 fieldCount) :
-    m_rowCount(rowCount),
-    m_rowPosition(0),
-    m_fieldCount(fieldCount),
-    m_rBind(nullptr),
-    m_stmt(stmt),
-    m_metadataResult(result)
+    _rowCount(rowCount),
+    _fieldCount(fieldCount),
+    _stmt(stmt),
+    _metadataResult(result)
 {
-    if (!m_metadataResult)
+    if (!_metadataResult)
         return;
 
-    if (m_stmt->bind_result_done)
+    if (_stmt->bind_result_done)
     {
-        delete[] m_stmt->bind->length;
-        delete[] m_stmt->bind->is_null;
+        delete[] _stmt->bind->length;
+        delete[] _stmt->bind->is_null;
     }
 
-    m_rBind = new MySQLBind[m_fieldCount];
+    _rBind = new MySQLBind[_fieldCount];
 
     //- for future readers wondering where this is freed - mysql_stmt_bind_result moves pointers to these
     // from m_rBind to m_stmt->bind and it is later freed by the `if (m_stmt->bind_result_done)` block just above here
     // MYSQL_STMT lifetime is equal to connection lifetime
-    MySQLBool* m_isNull = new MySQLBool[m_fieldCount];
-    unsigned long* m_length = new unsigned long[m_fieldCount];
+    auto* isNull = new MySQLBool[_fieldCount];
+    auto* length = new unsigned long[_fieldCount];
 
-    memset(m_isNull, 0, sizeof(MySQLBool) * m_fieldCount);
-    memset(m_rBind, 0, sizeof(MySQLBind) * m_fieldCount);
-    memset(m_length, 0, sizeof(unsigned long) * m_fieldCount);
+    memset(isNull, 0, sizeof(MySQLBool) * _fieldCount);
+    memset(_rBind, 0, sizeof(MySQLBind) * _fieldCount);
+    memset(length, 0, sizeof(unsigned long) * _fieldCount);
 
     //- This is where we store the (entire) resultset
-    if (mysql_stmt_store_result(m_stmt))
+    if (mysql_stmt_store_result(_stmt))
     {
-        LOG_WARN("sql.sql", "{}:mysql_stmt_store_result, cannot bind result from MySQL server. Error: {}", __FUNCTION__, mysql_stmt_error(m_stmt));
-        delete[] m_rBind;
-        delete[] m_isNull;
-        delete[] m_length;
+        LOG_WARN("db.query", "{}:mysql_stmt_store_result, cannot bind result from MySQL server. Error: {}", __FUNCTION__, mysql_stmt_error(_stmt));
+        delete[] _rBind;
+        delete[] isNull;
+        delete[] length;
         return;
     }
 
-    m_rowCount = mysql_stmt_num_rows(m_stmt);
+    _rowCount = mysql_stmt_num_rows(_stmt);
 
     //- This is where we prepare the buffer based on metadata
-    MySQLField* field = reinterpret_cast<MySQLField*>(mysql_fetch_fields(m_metadataResult));
-    m_fieldMetadata.resize(m_fieldCount);
+    auto* field = reinterpret_cast<MySQLField*>(mysql_fetch_fields(_metadataResult));
+    _fieldMetadata.resize(_fieldCount);
     std::size_t rowSize = 0;
 
-    for (uint32 i = 0; i < m_fieldCount; ++i)
+    for (uint32 i = 0; i < _fieldCount; ++i)
     {
         uint32 size = SizeForType(&field[i]);
         rowSize += size;
 
-        InitializeDatabaseFieldMetadata(&m_fieldMetadata[i], &field[i], i);
+        InitializeDatabaseFieldMetadata(&_fieldMetadata[i], &field[i], i);
 
-        m_rBind[i].buffer_type = field[i].type;
-        m_rBind[i].buffer_length = size;
-        m_rBind[i].length = &m_length[i];
-        m_rBind[i].is_null = &m_isNull[i];
-        m_rBind[i].error = nullptr;
-        m_rBind[i].is_unsigned = field[i].flags & UNSIGNED_FLAG;
+        _rBind[i].buffer_type = field[i].type;
+        _rBind[i].buffer_length = size;
+        _rBind[i].length = &length[i];
+        _rBind[i].is_null = &isNull[i];
+        _rBind[i].error = nullptr;
+        _rBind[i].is_unsigned = field[i].flags & UNSIGNED_FLAG;
     }
 
-    char* dataBuffer = new char[rowSize * m_rowCount];
-    for (uint32 i = 0, offset = 0; i < m_fieldCount; ++i)
+    char* dataBuffer = new char[rowSize * _rowCount];
+    for (uint32 i = 0, offset = 0; i < _fieldCount; ++i)
     {
-        m_rBind[i].buffer = dataBuffer + offset;
-        offset += m_rBind[i].buffer_length;
+        _rBind[i].buffer = dataBuffer + offset;
+        offset += _rBind[i].buffer_length;
     }
 
     //- This is where we bind the bind the buffer to the statement
-    if (mysql_stmt_bind_result(m_stmt, m_rBind))
+    if (mysql_stmt_bind_result(_stmt, _rBind))
     {
-        LOG_WARN("sql.sql", "{}:mysql_stmt_bind_result, cannot bind result from MySQL server. Error: {}", __FUNCTION__, mysql_stmt_error(m_stmt));
-        mysql_stmt_free_result(m_stmt);
+        LOG_WARN("db.query", "{}:mysql_stmt_bind_result, cannot bind result from MySQL server. Error: {}", __FUNCTION__, mysql_stmt_error(_stmt));
+        mysql_stmt_free_result(_stmt);
         CleanUp();
-        delete[] m_isNull;
-        delete[] m_length;
+        delete[] isNull;
+        delete[] length;
         return;
     }
 
-    m_rows.resize(uint32(m_rowCount) * m_fieldCount);
+    _rows.resize(uint32(_rowCount) * _fieldCount);
 
     while (_NextRow())
     {
-        for (uint32 fIndex = 0; fIndex < m_fieldCount; ++fIndex)
+        for (uint32 fIndex = 0; fIndex < _fieldCount; ++fIndex)
         {
-            m_rows[uint32(m_rowPosition) * m_fieldCount + fIndex].SetMetadata(&m_fieldMetadata[fIndex]);
+            _rows[uint32(_rowPosition) * _fieldCount + fIndex].SetMetadata(&_fieldMetadata[fIndex]);
 
-            unsigned long buffer_length = m_rBind[fIndex].buffer_length;
-            unsigned long fetched_length = *m_rBind[fIndex].length;
-            if (!*m_rBind[fIndex].is_null)
+            unsigned long buffer_length = _rBind[fIndex].buffer_length;
+            unsigned long fetched_length = *_rBind[fIndex].length;
+            if (!*_rBind[fIndex].is_null)
             {
-                void* buffer = m_stmt->bind[fIndex].buffer;
-                switch (m_rBind[fIndex].buffer_type)
+                void* buffer = _stmt->bind[fIndex].buffer;
+                switch (_rBind[fIndex].buffer_type)
                 {
-                case MYSQL_TYPE_TINY_BLOB:
-                case MYSQL_TYPE_MEDIUM_BLOB:
-                case MYSQL_TYPE_LONG_BLOB:
-                case MYSQL_TYPE_BLOB:
-                case MYSQL_TYPE_STRING:
-                case MYSQL_TYPE_VAR_STRING:
-                    // warning - the string will not be null-terminated if there is no space for it in the buffer
-                    // when mysql_stmt_fetch returned MYSQL_DATA_TRUNCATED
-                    // we cannot blindly null-terminate the data either as it may be retrieved as binary blob and not specifically a string
-                    // in this case using Field::GetCString will result in garbage
-                    /// @todo: remove Field::GetCString and use std::string_view in C++17
-                    if (fetched_length < buffer_length)
-                        *((char*)buffer + fetched_length) = '\0';
-                    break;
-                default:
-                    break;
+                    case MYSQL_TYPE_TINY_BLOB:
+                    case MYSQL_TYPE_MEDIUM_BLOB:
+                    case MYSQL_TYPE_LONG_BLOB:
+                    case MYSQL_TYPE_BLOB:
+                    case MYSQL_TYPE_STRING:
+                    case MYSQL_TYPE_VAR_STRING:
+                        // warning - the string will not be null-terminated if there is no space for it in the buffer
+                        // when mysql_stmt_fetch returned MYSQL_DATA_TRUNCATED
+                        // we cannot blindly null-terminate the data either as it may be retrieved as binary blob and not specifically a string
+                        // in this case using Field::GetCString will result in garbage
+                        // TODO: remove Field::GetCString and use std::string_view in C++17
+                        if (fetched_length < buffer_length)
+                            *((char*)buffer + fetched_length) = '\0';
+                        break;
+                    default:
+                        break;
                 }
 
-                m_rows[uint32(m_rowPosition) * m_fieldCount + fIndex].SetByteValue((char const*)buffer, fetched_length);
+                _rows[uint32(_rowPosition) * _fieldCount + fIndex].SetByteValue((char const*)buffer, fetched_length);
 
                 // move buffer pointer to next part
-                m_stmt->bind[fIndex].buffer = (char*)buffer + rowSize;
+                _stmt->bind[fIndex].buffer = (char*)buffer + rowSize;
             }
             else
             {
-                m_rows[uint32(m_rowPosition) * m_fieldCount + fIndex].SetByteValue(nullptr, *m_rBind[fIndex].length);
+                _rows[uint32(_rowPosition) * _fieldCount + fIndex].SetByteValue(nullptr, *_rBind[fIndex].length);
             }
         }
 
-        m_rowPosition++;
+        _rowPosition++;
     }
 
-    m_rowPosition = 0;
+    _rowPosition = 0;
 
     /// All data is buffered, let go of mysql c api structures
-    mysql_stmt_free_result(m_stmt);
+    mysql_stmt_free_result(_stmt);
 }
 
 PreparedResultSet::~PreparedResultSet()
@@ -386,7 +374,7 @@ bool PreparedResultSet::NextRow()
 {
     /// Only updates the m_rowPosition so upper level code knows in which element
     /// of the rows vector to look
-    if (++m_rowPosition >= m_rowCount)
+    if (++_rowPosition >= _rowCount)
         return false;
 
     return true;
@@ -396,41 +384,41 @@ bool PreparedResultSet::_NextRow()
 {
     /// Only called in low-level code, namely the constructor
     /// Will iterate over every row of data and buffer it
-    if (m_rowPosition >= m_rowCount)
+    if (_rowPosition >= _rowCount)
         return false;
 
-    int retval = mysql_stmt_fetch(m_stmt);
-    return retval == 0 || retval == MYSQL_DATA_TRUNCATED;
+    int mysqlStmtFetch = mysql_stmt_fetch(_stmt);
+    return mysqlStmtFetch == 0 || mysqlStmtFetch == MYSQL_DATA_TRUNCATED;
 }
 
 Field* PreparedResultSet::Fetch() const
 {
-    ASSERT(m_rowPosition < m_rowCount);
-    return const_cast<Field*>(&m_rows[uint32(m_rowPosition) * m_fieldCount]);
+    ASSERT(_rowPosition < _rowCount);
+    return const_cast<Field*>(&_rows[uint32(_rowPosition) * _fieldCount]);
 }
 
 Field const& PreparedResultSet::operator[](std::size_t index) const
 {
-    ASSERT(m_rowPosition < m_rowCount);
-    ASSERT(index < m_fieldCount);
-    return m_rows[uint32(m_rowPosition) * m_fieldCount + index];
+    ASSERT(_rowPosition < _rowCount);
+    ASSERT(index < _fieldCount);
+    return _rows[uint32(_rowPosition) * _fieldCount + index];
 }
 
 void PreparedResultSet::CleanUp()
 {
-    if (m_metadataResult)
-        mysql_free_result(m_metadataResult);
+    if (_metadataResult)
+        mysql_free_result(_metadataResult);
 
-    if (m_rBind)
+    if (_rBind)
     {
-        delete[](char*)m_rBind->buffer;
-        delete[] m_rBind;
-        m_rBind = nullptr;
+        delete[] (char*)_rBind->buffer;
+        delete[] _rBind;
+        _rBind = nullptr;
     }
 }
 
-void PreparedResultSet::AssertRows(std::size_t sizeRows)
+void PreparedResultSet::AssertRows(std::size_t sizeRows) const
 {
-    ASSERT(m_rowPosition < m_rowCount);
-    ASSERT(sizeRows == m_fieldCount, "> Tuple size != count fields");
+    ASSERT(_rowPosition < _rowCount);
+    ASSERT(sizeRows == _fieldCount, "> Tuple size != count fields");
 }

@@ -18,6 +18,7 @@
 #include "Player.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
+#include "DatabaseEnv.h"
 
 /*********************************************************/
 /***              PLAYER SETTINGS SYSTEM               ***/
@@ -104,7 +105,7 @@ void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
             data << setting.value << ' ';
         }
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_SETTINGS);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_SETTINGS);
         stmt->SetData(0, GetGUID().GetCounter());
         stmt->SetData(1, itr.first);
         stmt->SetData(2, data.str());

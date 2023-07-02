@@ -28,7 +28,7 @@
 #include "BanMgr.h"
 #include "CircularBuffer.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
+#include "DatabaseEnvFwd.h"
 #include "GossipDef.h"
 #include "Packet.h"
 #include "SharedDefines.h"

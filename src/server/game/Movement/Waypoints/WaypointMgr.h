@@ -21,6 +21,7 @@
 #include "Common.h"
 #include <unordered_map>
 #include <vector>
+#include <optional>
 
 enum WaypointMoveType
 {

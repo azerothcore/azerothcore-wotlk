@@ -109,7 +109,7 @@ void SecretMgr::AttemptLoad(Secrets i, LogLevel errorLevel, std::unique_lock<std
 
     Optional<std::string> oldDigest;
     {
-        auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_SECRET_DIGEST);
+        auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_SECRET_DIGEST);
         stmt->SetData(0, i);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
         if (result)
@@ -198,7 +198,7 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
                 if (newSecret)
                     Acore::Crypto::AEEncryptWithRandomIV<Acore::Crypto::AES>(totpSecret, newSecret->ToByteArray<Acore::Crypto::AES::KEY_SIZE_BYTES>());
 
-                auto* updateStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
+                auto updateStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
                 updateStmt->SetData(0, totpSecret);
                 updateStmt->SetData(1, id);
                 trans->Append(updateStmt);
@@ -212,7 +212,7 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
 
     if (hadOldSecret)
     {
-        auto* deleteStmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_SECRET_DIGEST);
+        auto deleteStmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_SECRET_DIGEST);
         deleteStmt->SetData(0, i);
         trans->Append(deleteStmt);
     }
@@ -225,7 +225,7 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
         if (!hash)
             return std::string("Failed to hash new secret");
 
-        auto* insertStmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_SECRET_DIGEST);
+        auto insertStmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_SECRET_DIGEST);
         insertStmt->SetData(0, i);
         insertStmt->SetData(1, *hash);
         trans->Append(insertStmt);

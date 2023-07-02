@@ -1163,7 +1163,7 @@ void SmartGameObjectAI::Reset()
 // Called when a player opens a gossip dialog with the gameobject.
 bool SmartGameObjectAI::GossipHello(Player* player, bool reportUse)
 {
-    LOG_DEBUG("sql.sql", "SmartGameObjectAI::GossipHello");
+    LOG_DEBUG("db.query", "SmartGameObjectAI::GossipHello");
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_HELLO, player, (uint32)reportUse, 0, false, nullptr, me);
     return false;
 }
@@ -1253,7 +1253,7 @@ public:
         if (!player->IsAlive())
             return false;
 
-        LOG_DEBUG("sql.sql", "AreaTrigger {} is using SmartTrigger script", trigger->entry);
+        LOG_DEBUG("db.query", "AreaTrigger {} is using SmartTrigger script", trigger->entry);
         SmartScript script;
         script.OnInitialize(nullptr, trigger);
         script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->entry);

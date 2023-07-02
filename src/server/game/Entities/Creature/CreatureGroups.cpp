@@ -21,6 +21,7 @@
 #include "Log.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
+#include "DatabaseEnv.h"
 
 FormationMgr::~FormationMgr()
 {
@@ -111,13 +112,13 @@ void FormationMgr::LoadCreatureFormations()
         {
             if (!group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
             {
-                LOG_ERROR("sql.sql", "creature_formations table leader guid {} and member guid {} has unsupported GroupAI flag value ({}). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
+                LOG_ERROR("db.query", "creature_formations table leader guid {} and member guid {} has unsupported GroupAI flag value ({}). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
                 continue;
             }
 
             if (!group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)) && (follow_dist > 0.0f || follow_angle > 0.0f))
             {
-                LOG_ERROR("sql.sql", "creature_formations table member guid {} and leader guid {} cannot have follow distance or follow angle because don't have GROUP_AI_FLAG_FOLLOW_LEADER flag. Values are not gonna be used", memberGUID, group_member.leaderGUID);
+                LOG_ERROR("db.query", "creature_formations table member guid {} and leader guid {} cannot have follow distance or follow angle because don't have GROUP_AI_FLAG_FOLLOW_LEADER flag. Values are not gonna be used", memberGUID, group_member.leaderGUID);
                 group_member.follow_dist       = 0.0f;
                 group_member.follow_angle      = 0.0f;
             }
@@ -132,7 +133,7 @@ void FormationMgr::LoadCreatureFormations()
             // Leader can have 0 AI flags - its allowed
             if (group_member.groupAI && !group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
             {
-                LOG_ERROR("sql.sql", "creature_formations table leader guid {} and member guid {} has unsupported GroupAI flag value ({}). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
+                LOG_ERROR("db.query", "creature_formations table leader guid {} and member guid {} has unsupported GroupAI flag value ({}). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
                 continue;
             }
 
@@ -140,19 +141,19 @@ void FormationMgr::LoadCreatureFormations()
             group_member.follow_angle      = 0.0f;
             if (follow_dist > 0.0f || follow_angle > 0.0f)
             {
-                LOG_ERROR("sql.sql", "creature_formations table member guid {} and leader guid {} cannot have follow distance or follow angle. Values are not gonna be used", memberGUID, group_member.leaderGUID);
+                LOG_ERROR("db.query", "creature_formations table member guid {} and leader guid {} cannot have follow distance or follow angle. Values are not gonna be used", memberGUID, group_member.leaderGUID);
             }
         }
 
         if (!sObjectMgr->GetCreatureData(group_member.leaderGUID))
         {
-            LOG_ERROR("sql.sql", "creature_formations table leader guid {} incorrect (does not exist). Skipped", group_member.leaderGUID);
+            LOG_ERROR("db.query", "creature_formations table leader guid {} incorrect (does not exist). Skipped", group_member.leaderGUID);
             continue;
         }
 
         if (!sObjectMgr->GetCreatureData(memberGUID))
         {
-            LOG_ERROR("sql.sql", "creature_formations table member guid {} incorrect (does not exist). Skipped", memberGUID);
+            LOG_ERROR("db.query", "creature_formations table member guid {} incorrect (does not exist). Skipped", memberGUID);
             continue;
         }
 

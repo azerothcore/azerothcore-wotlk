@@ -37,6 +37,7 @@
 #include "Vehicle.h"
 #include "WeatherMgr.h"
 #include "WorldStatePackets.h"
+#include "DatabaseEnv.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -127,7 +128,7 @@ void Player::Update(uint32 p_time)
     if (GetSession()->m_muteTime && GetSession()->m_muteTime < now)
     {
         GetSession()->m_muteTime = 0;
-        LoginDatabasePreparedStatement* stmt =
+        LoginDatabasePreparedStatement stmt =
             LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         stmt->SetData(0, 0); // Set the mute time to 0
         stmt->SetData(1, "");
@@ -434,7 +435,7 @@ void Player::UpdateNextMailTimeAndUnreads()
     // Update the next delivery time and unread mails
     time_t cTime = GameTime::GetGameTime().count();
     // Get the next delivery time
-    CharacterDatabasePreparedStatement* stmtNextDeliveryTime =
+    CharacterDatabasePreparedStatement stmtNextDeliveryTime =
         CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
     stmtNextDeliveryTime->SetData(0, GetGUID().GetCounter());
     stmtNextDeliveryTime->SetData(1, uint32(cTime));
@@ -447,7 +448,7 @@ void Player::UpdateNextMailTimeAndUnreads()
     }
 
     // Get unread mails count
-    CharacterDatabasePreparedStatement* stmtUnreadAmount =
+    CharacterDatabasePreparedStatement stmtUnreadAmount =
         CharacterDatabase.GetPreparedStatement(
             CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
     stmtUnreadAmount->SetData(0, GetGUID().GetCounter());
@@ -2153,7 +2154,7 @@ void Player::UpdateSpecCount(uint8 count)
         ActivateSpec(0);
 
     CharacterDatabaseTransaction        trans = CharacterDatabase.BeginTransaction();
-    CharacterDatabasePreparedStatement* stmt  = nullptr;
+    CharacterDatabasePreparedStatement stmt  = nullptr;
 
     // Copy spec data
     if (count > curCount)

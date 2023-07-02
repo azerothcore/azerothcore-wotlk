@@ -23,71 +23,54 @@
 #include <filesystem>
 #include <string>
 
-template <class T>
 class DatabaseWorkerPool;
-
-namespace boost
-{
-    namespace filesystem
-    {
-        class path;
-    }
-}
 
 class AC_DATABASE_API UpdateException : public std::exception
 {
 public:
-    UpdateException(std::string const& msg) : _msg(msg) { }
-    ~UpdateException() throw() { }
+    explicit UpdateException(std::string_view msg) : _msg(msg) { }
+    ~UpdateException() noexcept override = default;
 
-    char const* what() const throw() override { return _msg.c_str(); }
+    [[nodiscard]] char const* what() const noexcept override { return _msg.c_str(); }
+    [[nodiscard]] std::string_view GetMessage() const noexcept { return _msg; }
 
 private:
-    std::string const _msg;
-};
-
-enum BaseLocation
-{
-    LOCATION_REPOSITORY,
-    LOCATION_DOWNLOAD
+    std::string _msg;
 };
 
 class AC_DATABASE_API DBUpdaterUtil
 {
 public:
     static std::string GetCorrectedMySQLExecutable();
-
     static bool CheckExecutable();
 
 private:
     static std::string& corrected_path();
 };
 
-template <class T>
 class AC_DATABASE_API DBUpdater
 {
 public:
     using Path = std::filesystem::path;
 
-    static inline std::string GetConfigEntry();
-    static inline std::string GetTableName();
-    static std::string GetBaseFilesDirectory();
-    static bool IsEnabled(uint32 const updateMask);
-    static BaseLocation GetBaseLocationType();
-    static bool Create(DatabaseWorkerPool<T>& pool);
-    static bool Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList = {});
-    static bool Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories);
-    static bool Populate(DatabaseWorkerPool<T>& pool);
+    static std::string GetConfigEntry(DatabaseWorkerPool const& pool);
+    static std::string GetTableName(DatabaseWorkerPool const& pool);
+    static std::string GetBaseFilesDirectory(DatabaseWorkerPool const& pool);
+    static bool IsEnabled(DatabaseWorkerPool& pool, uint32 updateMask);
+    static bool Create(DatabaseWorkerPool& pool);
+    static bool Update(DatabaseWorkerPool& pool, std::string_view modulesList = {});
+    static bool Update(DatabaseWorkerPool& pool, std::vector<std::string> const* setDirectories);
+    static bool Populate(DatabaseWorkerPool& pool);
 
     // module
-    static std::string GetDBModuleName();
+    static std::string GetDBModuleName(DatabaseWorkerPool const& pool);
 
 private:
-    static QueryResult Retrieve(DatabaseWorkerPool<T>& pool, std::string const& query);
-    static void Apply(DatabaseWorkerPool<T>& pool, std::string const& query);
-    static void ApplyFile(DatabaseWorkerPool<T>& pool, Path const& path);
-    static void ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
-                          std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path);
+    static QueryResult Retrieve(DatabaseWorkerPool& pool, std::string_view query);
+    static void Apply(DatabaseWorkerPool& pool, std::string_view query);
+    static void ApplyFile(DatabaseWorkerPool& pool, Path const& path);
+    static void ApplyFile(DatabaseWorkerPool& pool, std::string_view host, std::string_view user,
+        std::string_view password, std::string_view port_or_socket, std::string_view database, std::string_view ssl, Path const& path);
 };
 
 #endif // DBUpdater_h__

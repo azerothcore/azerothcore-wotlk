@@ -48,7 +48,7 @@ BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& 
     LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
     // pussywizard: check existing ban to prevent overriding by a shorter one! >_>
-    LoginDatabasePreparedStatement* stmtAccountBanned = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
+    LoginDatabasePreparedStatement stmtAccountBanned = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
     stmtAccountBanned->SetData(0, AccountID);
 
     PreparedQueryResult banresult = LoginDatabase.Query(stmtAccountBanned);
@@ -56,7 +56,7 @@ BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& 
         return BAN_LONGER_EXISTS;
 
     // make sure there is only one active ban
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
     stmt->SetData(0, AccountID);
     trans->Append(stmt);
 
@@ -110,7 +110,7 @@ BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::
     LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
     // pussywizard: check existing ban to prevent overriding by a shorter one! >_>
-    LoginDatabasePreparedStatement* stmtAccountBanned = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
+    LoginDatabasePreparedStatement stmtAccountBanned = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
     stmtAccountBanned->SetData(0, AccountID);
 
     PreparedQueryResult banresult = LoginDatabase.Query(stmtAccountBanned);
@@ -118,7 +118,7 @@ BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::
         return BAN_LONGER_EXISTS;
 
     // make sure there is only one active ban
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
     stmt->SetData(0, AccountID);
     trans->Append(stmt);
 
@@ -169,7 +169,7 @@ BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std:
     uint32 DurationSecs = TimeStringToSecs(Duration);
 
     // No SQL injection with prepared statements
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
     stmt->SetData(0, IP);
     PreparedQueryResult resultAccounts = LoginDatabase.Query(stmt);
 
@@ -236,7 +236,7 @@ BanReturn BanMgr::BanCharacter(std::string const& CharacterName, std::string con
         TargetGUID = target->GetGUID();
 
     // make sure there is only one active ban
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_BAN);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_BAN);
     stmt->SetData(0, TargetGUID.GetCounter());
     CharacterDatabase.Execute(stmt);
 
@@ -274,7 +274,7 @@ bool BanMgr::RemoveBanAccount(std::string const& AccountName)
         return false;
 
     // NO SQL injection as account is uint32
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
     stmt->SetData(0, AccountID);
     LoginDatabase.Execute(stmt);
 
@@ -289,7 +289,7 @@ bool BanMgr::RemoveBanAccountByPlayerName(std::string const& CharacterName)
         return false;
 
     // NO SQL injection as account is uint32
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
     stmt->SetData(0, AccountID);
     LoginDatabase.Execute(stmt);
 
@@ -299,7 +299,7 @@ bool BanMgr::RemoveBanAccountByPlayerName(std::string const& CharacterName)
 /// Remove a ban from an account
 bool BanMgr::RemoveBanIP(std::string const& IP)
 {
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_IP_NOT_BANNED);
+    LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_IP_NOT_BANNED);
     stmt->SetData(0, IP);
     LoginDatabase.Execute(stmt);
 
@@ -321,7 +321,7 @@ bool BanMgr::RemoveBanCharacter(std::string const& CharacterName)
     if (!guid)
         return false;
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_BAN);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_BAN);
     stmt->SetData(0, guid.GetCounter());
     CharacterDatabase.Execute(stmt);
     return true;

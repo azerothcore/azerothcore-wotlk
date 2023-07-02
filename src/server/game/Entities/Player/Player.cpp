@@ -3569,7 +3569,7 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
 
 void Player::_SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout)
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_COOLDOWN);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_COOLDOWN);
     stmt->SetData(0, GetGUID().GetCounter());
     trans->Append(stmt);
 
@@ -3955,7 +3955,7 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
     // Remove signs from petitions (also remove petitions if owner);
     RemovePetitionsAndSigns(playerGuid, 10);
 
-    CharacterDatabasePreparedStatement* stmt = nullptr;
+    CharacterDatabasePreparedStatement stmt = nullptr;
 
     switch (charDelete_method)
     {
@@ -4286,7 +4286,7 @@ void Player::DeleteOldCharacters(uint32 keepDays)
     LOG_INFO("server.loading", "Player::DeleteOldChars: Deleting all characters which have been deleted {} days before...", keepDays);
     LOG_INFO("server.loading", " ");
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_OLD_CHARS);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_OLD_CHARS);
     stmt->SetData(0, uint32(GameTime::GetGameTime().count() - time_t(keepDays * DAY)));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -4491,7 +4491,7 @@ void Player::KillPlayer()
 void Player::OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans)
 {
     Corpse::DeleteFromDB(guid, trans);
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
     stmt->SetData(0, uint16(AT_LOGIN_RESURRECT));
     stmt->SetData(1, guid.GetCounter());
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
@@ -4602,7 +4602,7 @@ void Player::SpawnCorpseBones(bool triggerSave /*= true*/)
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
             // pussywizard: update only ghost flag instead of whole character table entry! data integrity is crucial
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_REMOVE_GHOST);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_REMOVE_GHOST);
             stmt->SetData(0, GetGUID().GetCounter());
             trans->Append(stmt);
 
@@ -6189,7 +6189,7 @@ void Player::ModifyHonorPoints(int32 value, CharacterDatabaseTransaction trans)
 
     if (trans)
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS);
         stmt->SetData(0, newValue);
         stmt->SetData(1, GetGUID().GetCounter());
         trans->Append(stmt);
@@ -6205,7 +6205,7 @@ void Player::ModifyArenaPoints(int32 value, CharacterDatabaseTransaction trans)
 
     if (trans)
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS);
         stmt->SetData(0, newValue);
         stmt->SetData(1, GetGUID().GetCounter());
         trans->Append(stmt);
@@ -6214,7 +6214,7 @@ void Player::ModifyArenaPoints(int32 value, CharacterDatabaseTransaction trans)
 
 uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, uint8 type)
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
     stmt->SetData(0, guid.GetCounter());
     stmt->SetData(1, type);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
@@ -6230,7 +6230,7 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
 {
     ObjectGuid::LowType guidLow = guid.GetCounter();
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ZONE);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ZONE);
     stmt->SetData(0, guidLow);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -9007,7 +9007,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         if (mode == PET_SAVE_NOT_IN_SLOT && m_petStable && m_petStable->CurrentPet)
         {
             // Handle removing pet while it is in "temporarily unsummoned" state, for example on mount
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
             stmt->SetData(0, PET_SAVE_NOT_IN_SLOT);
             stmt->SetData(1, GetGUID().GetCounter());
             stmt->SetData(2, m_petStable->CurrentPet->PetNumber);
@@ -10052,13 +10052,13 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
 
     if (type == 10)
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ALL_PETITION_SIGNATURES);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ALL_PETITION_SIGNATURES);
         stmt->SetData(0, guid.GetCounter());
         CharacterDatabase.Execute(stmt);
     }
     else
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_SIGNATURE);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_SIGNATURE);
         stmt->SetData(0, guid.GetCounter());
         stmt->SetData(1, uint8(type));
         CharacterDatabase.Execute(stmt);
@@ -10067,7 +10067,7 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     if (type == 10)
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_OWNER);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_OWNER);
         stmt->SetData(0, guid.GetCounter());
         trans->Append(stmt);
 
@@ -10080,7 +10080,7 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
     }
     else
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_OWNER_AND_TYPE);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_OWNER_AND_TYPE);
         stmt->SetData(0, guid.GetCounter());
         stmt->SetData(1, uint8(type));
         trans->Append(stmt);
@@ -10099,7 +10099,7 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
 void Player::LeaveAllArenaTeams(ObjectGuid guid)
 {
     // xinef: sync query
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_ARENA_TEAMS);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_ARENA_TEAMS);
     stmt->SetData(0, guid.GetCounter());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -11251,7 +11251,7 @@ void Player::LeaveBattleground(Battleground* bg)
     {
         if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
         {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
             stmt->SetData(0, GetGUID().GetCounter());
             stmt->SetData(1, BG_DESERTION_TYPE_LEAVE_BG);
             CharacterDatabase.Execute(stmt);
@@ -13623,7 +13623,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
             {
                 LOG_ERROR("entities.player", "Character {} has skill {} with value 0. Will be deleted.", GetGUID().ToString(), skill);
 
-                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SKILL);
+                CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SKILL);
 
                 stmt->SetData(0, GetGUID().GetCounter());
                 stmt->SetData(1, skill);
@@ -14463,7 +14463,7 @@ void Player::_SaveEquipmentSets(CharacterDatabaseTransaction trans)
     {
         uint32 index = itr->first;
         EquipmentSet& eqset = itr->second;
-        CharacterDatabasePreparedStatement* stmt = nullptr;
+        CharacterDatabasePreparedStatement stmt = nullptr;
         uint8 j = 0;
         switch (eqset.state)
         {
@@ -14515,7 +14515,7 @@ void Player::_SaveEntryPoint(CharacterDatabaseTransaction trans)
     if (!mEntry)
         return;
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_ENTRY_POINT);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_ENTRY_POINT);
     stmt->SetData(0, GetGUID().GetCounter());
     trans->Append(stmt);
 
@@ -14553,7 +14553,7 @@ void Player::RemoveAtLoginFlag(AtLoginFlags flags, bool persist /*= false*/)
 
     if (persist)
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_REM_AT_LOGIN_FLAG);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_REM_AT_LOGIN_FLAG);
 
         stmt->SetData(0, uint16(flags));
         stmt->SetData(1, GetGUID().GetCounter());
@@ -14593,7 +14593,7 @@ void Player::SetMap(Map* map)
 
 void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
 {
-    CharacterDatabasePreparedStatement* stmt = nullptr;
+    CharacterDatabasePreparedStatement stmt = nullptr;
     uint8 index = 0;
 
     auto finiteAlways = [](float f) { return std::isfinite(f) ? f : 0.0f; };
@@ -14895,7 +14895,7 @@ void Player::_SaveGlyphs(CharacterDatabaseTransaction trans)
     if (!NeedToSaveGlyphs())
         return;
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_GLYPHS);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_GLYPHS);
     stmt->SetData(0, GetGUID().GetCounter());
     trans->Append(stmt);
 
@@ -14939,7 +14939,7 @@ void Player::_LoadTalents(PreparedQueryResult result)
 
 void Player::_SaveTalents(CharacterDatabaseTransaction trans)
 {
-    CharacterDatabasePreparedStatement* stmt = nullptr;
+    CharacterDatabasePreparedStatement stmt = nullptr;
 
     for (PlayerTalentMap::iterator itr = m_talents.begin(); itr != m_talents.end();)
     {
@@ -15135,7 +15135,7 @@ void Player::ActivateSpec(uint8 spec)
 
     // load them asynchronously
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS_SPEC);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS_SPEC);
         stmt->SetData(0, GetGUID().GetCounter());
         stmt->SetData(1, m_activeSpec);
 
@@ -15621,7 +15621,7 @@ void Player::SetRandomWinner(bool isWinner)
     m_IsBGRandomWinner = isWinner;
     if (m_IsBGRandomWinner)
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_BATTLEGROUND_RANDOM);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_BATTLEGROUND_RANDOM);
         stmt->SetData(0, GetGUID().GetCounter());
         CharacterDatabase.Execute(stmt);
     }
@@ -15720,7 +15720,7 @@ void Player::_LoadBrewOfTheMonth(PreparedQueryResult result)
         draft.SendMailTo(trans, MailReceiver(this, GetGUID().GetCounter()), sender);
 
         // Update Event Id
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_BREW_OF_THE_MONTH);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_BREW_OF_THE_MONTH);
         stmt->SetData(0, GetGUID().GetCounter());
         stmt->SetData(1, uint32(eventId));
         trans->Append(stmt);
@@ -15786,7 +15786,7 @@ void Player::_SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans)
     if (_instanceResetTimes.empty())
         return;
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_INSTANCE_LOCK_TIMES);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_INSTANCE_LOCK_TIMES);
     stmt->SetData(0, GetSession()->GetAccountId());
     trans->Append(stmt);
 

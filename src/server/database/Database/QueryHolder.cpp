@@ -16,80 +16,126 @@
  */
 
 #include "QueryHolder.h"
-#include "Errors.h"
+#include "Containers.h"
 #include "Log.h"
 #include "MySQLConnection.h"
 #include "PreparedStatement.h"
 #include "QueryResult.h"
+#include <utility>
 
-bool SQLQueryHolderBase::SetPreparedQueryImpl(size_t index, PreparedStatementBase* stmt)
+QueryResult SQLQueryHolderBase::GetResult(std::size_t index) const
 {
-    if (m_queries.size() <= index)
+    auto const& itr = _queries.find(index);
+    if (itr == _queries.end())
     {
-        LOG_ERROR("sql.sql", "Query index ({}) out of range (size: {}) for prepared statement", uint32(index), (uint32)m_queries.size());
+        LOG_ERROR("db.query", "Query holder result tried to access non exist index {}. Holder name: {}. Type: QueryResult", index, _name);
+        return nullptr;
+    }
+
+    try
+    {
+        auto result{ std::get<QueryResult>(itr->second.HolderResult) };
+        if (!result || !result->GetRowCount() || !result->NextRow())
+            return nullptr;
+
+        return result;
+    }
+    catch (...) {  }
+
+    return nullptr;
+}
+
+PreparedQueryResult SQLQueryHolderBase::GetPreparedResult(std::size_t index) const
+{
+    auto const& itr = _queries.find(index);
+    if (itr == _queries.end())
+    {
+        LOG_ERROR("db.query", "Query holder result tried to access non exist index {}. Holder name: {}. Type: PreparedQueryResult", index, _name);
+        return nullptr;
+    }
+
+    try
+    {
+        auto result{ std::get<PreparedQueryResult>(itr->second.HolderResult) };
+        if (!result || !result->GetRowCount())
+            return nullptr;
+
+        return result;
+    }
+    catch (...) {  }
+
+    return nullptr;
+}
+
+void SQLQueryHolderBase::SetResult(std::size_t index, QueryResult result)
+{
+    if (result && !result->GetRowCount())
+        result.reset();
+
+    /// store the result in the holder
+    if (auto query = Acore::Containers::MapGetValuePtr(_queries, index))
+        query->HolderResult = std::move(result);
+}
+
+void SQLQueryHolderBase::SetPreparedResult(std::size_t index, PreparedQueryResult result)
+{
+    if (result && !result->GetRowCount())
+        result.reset();
+
+    /// store the result in the holder
+    if (auto query = Acore::Containers::MapGetValuePtr(_queries, index))
+        query->HolderResult = std::move(result);
+}
+
+bool SQLQueryHolderBase::AddQuery(std::size_t index, std::string_view sql)
+{
+    if (_queries.contains(index))
+    {
+        LOG_ERROR("db.query", "Trying add query holder with index {} exist. Holder name: {}. Type: QueryResult", index, _name);
         return false;
     }
 
-    m_queries[index].first = stmt;
+    SQLQueryHolderQuery query{};
+    query.HolderQuery.emplace<std::string>(sql);
+
+    _queries.emplace(index, std::move(query));
     return true;
 }
 
-PreparedQueryResult SQLQueryHolderBase::GetPreparedResult(size_t index) const
+bool SQLQueryHolderBase::AddPreparedQuery(std::size_t index, PreparedStatement stmt)
 {
-    // Don't call to this function if the index is of a prepared statement
-    ASSERT(index < m_queries.size(), "Query holder result index out of range, tried to access index {} but there are only {} results",
-        index, m_queries.size());
-
-    return m_queries[index].second;
-}
-
-void SQLQueryHolderBase::SetPreparedResult(size_t index, PreparedResultSet* result)
-{
-    if (result && !result->GetRowCount())
+    if (_queries.contains(index))
     {
-        delete result;
-        result = nullptr;
+        LOG_ERROR("db.query", "Trying add query holder with index {} exist. Holder name: {}. Type: PreparedQueryResult", index, _name);
+        return false;
     }
 
-    /// store the result in the holder
-    if (index < m_queries.size())
-        m_queries[index].second = PreparedQueryResult(result);
+    SQLQueryHolderQuery query{};
+    query.HolderQuery = std::move(stmt);
+
+    _queries.emplace(index, std::move(query));
+    return true;
 }
 
-SQLQueryHolderBase::~SQLQueryHolderBase()
-{
-    for (std::pair<PreparedStatementBase*, PreparedQueryResult>& query : m_queries)
-    {
-        /// if the result was never used, free the resources
-        /// results used already (getresult called) are expected to be deleted
-        delete query.first;
-    }
-}
-
-void SQLQueryHolderBase::SetSize(size_t size)
-{
-    /// to optimize push_back, reserve the number of queries about to be executed
-    m_queries.resize(size);
-}
-
-SQLQueryHolderTask::~SQLQueryHolderTask() = default;
-
-bool SQLQueryHolderTask::Execute()
+void SQLQueryHolderTask::ExecuteQuery()
 {
     /// execute all queries in the holder and pass the results
-    for (size_t i = 0; i < m_holder->m_queries.size(); ++i)
-        if (PreparedStatementBase* stmt = m_holder->m_queries[i].first)
-            m_holder->SetPreparedResult(i, m_conn->Query(stmt));
+    for (auto const& [index, query] : _holder->_queries)
+    {
+        if (std::holds_alternative<std::string>(query.HolderQuery))
+            _holder->SetResult(index, _connection->Query(std::get<std::string>(query.HolderQuery)));
+        else
+            _holder->SetPreparedResult(index, _connection->Query(std::get<PreparedStatement>(query.HolderQuery)));
+    }
 
-    m_result.set_value();
-    return true;
+    _result.set_value();
 }
 
 bool SQLQueryHolderCallback::InvokeIfReady()
 {
-    if (m_future.valid() && m_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+    if (_future.valid() && _future.wait_for(0s) == std::future_status::ready)
     {
-        m_callback(*m_holder);
+        _callback(*_holder);
         return true;
     }
 

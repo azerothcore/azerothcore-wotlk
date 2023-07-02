@@ -18,72 +18,80 @@
 #ifndef _QUERYHOLDER_H
 #define _QUERYHOLDER_H
 
-#include "SQLOperation.h"
-#include <vector>
+#include "DatabaseAsyncOperation.h"
+#include "StringFormat.h"
+#include <unordered_map>
+#include <variant>
+
+struct SQLQueryHolderQuery
+{
+    std::variant<std::monostate, std::string, PreparedStatement> HolderQuery;
+    std::variant<std::monostate, QueryResult, PreparedQueryResult> HolderResult;
+};
 
 class AC_DATABASE_API SQLQueryHolderBase
 {
-friend class SQLQueryHolderTask;
+    friend class SQLQueryHolderTask;
 
 public:
-    SQLQueryHolderBase() = default;
-    virtual ~SQLQueryHolderBase();
-    void SetSize(size_t size);
-    PreparedQueryResult GetPreparedResult(size_t index) const;
-    void SetPreparedResult(size_t index, PreparedResultSet* result);
+    SQLQueryHolderBase(std::string_view name) : _name(name) { }
+    virtual ~SQLQueryHolderBase() = default;
 
-protected:
-    bool SetPreparedQueryImpl(size_t index, PreparedStatementBase* stmt);
+    [[nodiscard]] PreparedQueryResult GetPreparedResult(std::size_t index) const;
+    [[nodiscard]] QueryResult GetResult(std::size_t index) const;
 
-private:
-    std::vector<std::pair<PreparedStatementBase*, PreparedQueryResult>> m_queries;
-};
+    void SetPreparedResult(std::size_t index, PreparedQueryResult result);
+    void SetResult(std::size_t index, QueryResult result);
 
-template<typename T>
-class SQLQueryHolder : public SQLQueryHolderBase
-{
-public:
-    bool SetPreparedQuery(size_t index, PreparedStatement<T>* stmt)
+    bool AddPreparedQuery(std::size_t index, PreparedStatement stmt);
+    bool AddQuery(std::size_t index, std::string_view sql);
+
+    template<typename... Args>
+    inline bool AddQuery(std::size_t index, std::string_view fmt, Args&&... args)
     {
-        return SetPreparedQueryImpl(index, stmt);
+        return AddQuery(index, Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
     }
-};
-
-class AC_DATABASE_API SQLQueryHolderTask : public SQLOperation
-{
-public:
-    explicit SQLQueryHolderTask(std::shared_ptr<SQLQueryHolderBase> holder)
-        : m_holder(std::move(holder)) { }
-
-    ~SQLQueryHolderTask();
-
-    bool Execute() override;
-    QueryResultHolderFuture GetFuture() { return m_result.get_future(); }
 
 private:
-    std::shared_ptr<SQLQueryHolderBase> m_holder;
-    QueryResultHolderPromise m_result;
+    std::unordered_map<std::size_t, SQLQueryHolderQuery> _queries;
+    std::string _name;
+};
+
+class AC_DATABASE_API SQLQueryHolderTask : public AsyncOperation
+{
+public:
+    explicit SQLQueryHolderTask(SQLQueryHolder holder) :
+        AsyncOperation(), _holder(std::move(holder)) { }
+
+    ~SQLQueryHolderTask() override = default;
+
+    void ExecuteQuery() override;
+    QueryResultHolderFuture GetFuture() { return _result.get_future(); }
+
+private:
+    std::shared_ptr<SQLQueryHolderBase> _holder;
+    QueryResultHolderPromise _result;
 };
 
 class AC_DATABASE_API SQLQueryHolderCallback
 {
 public:
-    SQLQueryHolderCallback(std::shared_ptr<SQLQueryHolderBase>&& holder, QueryResultHolderFuture&& future)
-        : m_holder(std::move(holder)), m_future(std::move(future)) { }
+    SQLQueryHolderCallback(SQLQueryHolder&& holder, QueryResultHolderFuture&& future) :
+        _holder(std::move(holder)), _future(std::move(future)) { }
 
     SQLQueryHolderCallback(SQLQueryHolderCallback&&) = default;
     SQLQueryHolderCallback& operator=(SQLQueryHolderCallback&&) = default;
 
-    void AfterComplete(std::function<void(SQLQueryHolderBase const&)> callback) &
+    void AfterComplete(std::function<void(SQLQueryHolderBase const&)>&& callback)
     {
-        m_callback = std::move(callback);
+        _callback = std::move(callback);
     }
 
     bool InvokeIfReady();
 
-    std::shared_ptr<SQLQueryHolderBase> m_holder;
-    QueryResultHolderFuture m_future;
-    std::function<void(SQLQueryHolderBase const&)> m_callback;
+    SQLQueryHolder _holder;
+    QueryResultHolderFuture _future;
+    std::function<void(SQLQueryHolderBase const&)> _callback;
 };
 
 #endif

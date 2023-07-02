@@ -27,6 +27,7 @@
 #include "Weather.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "DatabaseEnv.h"
 #include <memory>
 
 namespace WeatherMgr
@@ -118,19 +119,19 @@ namespace WeatherMgr
                 if (wzc.data[season].rainChance > 100)
                 {
                     wzc.data[season].rainChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong rain chance > 100%", zone_id, season);
+                    LOG_ERROR("db.query", "Weather for zone {} season {} has wrong rain chance > 100%", zone_id, season);
                 }
 
                 if (wzc.data[season].snowChance > 100)
                 {
                     wzc.data[season].snowChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong snow chance > 100%", zone_id, season);
+                    LOG_ERROR("db.query", "Weather for zone {} season {} has wrong snow chance > 100%", zone_id, season);
                 }
 
                 if (wzc.data[season].stormChance > 100)
                 {
                     wzc.data[season].stormChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong storm chance > 100%", zone_id, season);
+                    LOG_ERROR("db.query", "Weather for zone {} season {} has wrong storm chance > 100%", zone_id, season);
                 }
             }
 

@@ -804,7 +804,7 @@ void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
     instanceBind->extended = (bool)toggleExtendOn;
 
     // update in db
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_EXTENDED);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_EXTENDED);
     stmt->SetData(0, toggleExtendOn ? 1 : 0);
     stmt->SetData(1, GetPlayer()->GetGUID().GetCounter());
     stmt->SetData(2, instanceBind->save->GetInstanceId());

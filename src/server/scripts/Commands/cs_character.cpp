@@ -114,7 +114,7 @@ public:
     static bool GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::string searchString)
     {
         PreparedQueryResult result;
-        CharacterDatabasePreparedStatement* stmt = nullptr;
+        CharacterDatabasePreparedStatement stmt = nullptr;
         if (!searchString.empty())
         {
             // search by GUID
@@ -232,7 +232,7 @@ public:
             return;
         }
 
-        auto* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_RESTORE_DELETE_INFO);
+        auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_RESTORE_DELETE_INFO);
         stmt->SetData(0, delInfo.name);
         stmt->SetData(1, delInfo.accountId);
         stmt->SetData(2, delInfo.lowGuid);
@@ -267,7 +267,7 @@ public:
         else
         {
             // Update level and reset XP, everything else will be updated at login
-            auto* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_LEVEL);
+            auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_LEVEL);
             stmt->SetData(0, uint8(newLevel));
             stmt->SetData(1, playerGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
@@ -370,7 +370,7 @@ public:
                 return false;
             }
 
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
             stmt->SetData(0, newName);
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
             if (result)
@@ -421,7 +421,7 @@ public:
 
                 handler->PSendSysMessage(LANG_RENAME_PLAYER_GUID, handler->playerLink(*player).c_str(), player->GetGUID().GetCounter());
 
-                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+                CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
                 stmt->SetData(0, uint16(AT_LOGIN_RENAME));
                 stmt->SetData(1, player->GetGUID().GetCounter());
                 CharacterDatabase.Execute(stmt);
@@ -476,7 +476,7 @@ public:
         else
         {
             handler->PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, handler->playerLink(*player).c_str(), player->GetGUID().GetCounter());
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->SetData(0, static_cast<uint16>(AT_LOGIN_CUSTOMIZE));
             stmt->SetData(1, player->GetGUID().GetCounter());
             CharacterDatabase.Execute(stmt);
@@ -500,7 +500,7 @@ public:
         else
         {
             handler->PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, handler->playerLink(*player).c_str(), player->GetGUID().GetCounter());
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->SetData(0, uint16(AT_LOGIN_CHANGE_FACTION));
             stmt->SetData(1, player->GetGUID().GetCounter());
             CharacterDatabase.Execute(stmt);
@@ -524,7 +524,7 @@ public:
         else
         {
             handler->PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, handler->playerLink(*player).c_str(), player->GetGUID().GetCounter());
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->SetData(0, uint16(AT_LOGIN_CHANGE_RACE));
             stmt->SetData(1, player->GetGUID().GetCounter());
             CharacterDatabase.Execute(stmt);

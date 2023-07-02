@@ -20,9 +20,8 @@
 
 #include "Define.h"
 #include "Duration.h"
-#include "Optional.h"
-#include "SQLOperation.h"
-#include <future>
+#include <string>
+#include <string_view>
 #include <tuple>
 #include <variant>
 #include <vector>
@@ -67,13 +66,11 @@ struct PreparedStatementData
 //- Upper-level class that is used in code
 class AC_DATABASE_API PreparedStatementBase
 {
-friend class PreparedStatementTask;
-
 public:
     explicit PreparedStatementBase(uint32 index, uint8 capacity);
-    virtual ~PreparedStatementBase();
+    virtual ~PreparedStatementBase() = default;
 
-    // Set numerlic and default binary
+    // Set numeric and default binary
     template<typename T>
     inline Acore::Types::is_default<T> SetData(const uint8 index, T value)
     {
@@ -108,8 +105,8 @@ public:
     }
 
     // Set duration
-    template<class _Rep, class _Period>
-    inline void SetData(const uint8 index, std::chrono::duration<_Rep, _Period> const& value, bool convertToUin32 = true)
+    template<class Rep, class Period>
+    inline void SetData(const uint8 index, std::chrono::duration<Rep, Period> const& value, bool convertToUin32 = true)
     {
         SetValidData(index, convertToUin32 ? static_cast<uint32>(value.count()) : value.count());
     }
@@ -121,18 +118,19 @@ public:
         SetDataTuple(std::make_tuple(std::forward<Args>(args)...));
     }
 
-    [[nodiscard]] uint32 GetIndex() const { return m_index; }
-    [[nodiscard]] std::vector<PreparedStatementData> const& GetParameters() const { return statement_data; }
+    [[nodiscard]] uint32 GetIndex() const { return _index; }
+    [[nodiscard]] std::vector<PreparedStatementData> const& GetParameters() const { return _statementData; }
+    [[nodiscard]] std::pair<bool, uint8> IsAllParamsSet() const;
 
 protected:
     template<typename T>
-    Acore::Types::is_non_string_view_v<T> SetValidData(const uint8 index, T const& value);
+    Acore::Types::is_non_string_view_v<T> SetValidData(uint8 index, T const& value);
 
-    void SetValidData(const uint8 index);
-    void SetValidData(const uint8 index, std::string_view value);
+    void SetValidData(uint8 index);
+    void SetValidData(uint8 index, std::string_view value);
 
     template<typename... Ts>
-    inline void SetDataTuple(std::tuple<Ts...> const& argsList)
+    void SetDataTuple(std::tuple<Ts...> const& argsList)
     {
         std::apply
         (
@@ -144,42 +142,14 @@ protected:
         );
     }
 
-    uint32 m_index;
+    uint32 _index;
+    std::vector<bool> _paramsSet;
 
     //- Buffer of parameters, not tied to MySQL in any way yet
-    std::vector<PreparedStatementData> statement_data;
+    std::vector<PreparedStatementData> _statementData;
 
     PreparedStatementBase(PreparedStatementBase const& right) = delete;
     PreparedStatementBase& operator=(PreparedStatementBase const& right) = delete;
-};
-
-template<typename T>
-class PreparedStatement : public PreparedStatementBase
-{
-public:
-    explicit PreparedStatement(uint32 index, uint8 capacity) : PreparedStatementBase(index, capacity)
-    {
-    }
-
-private:
-    PreparedStatement(PreparedStatement const& right) = delete;
-    PreparedStatement& operator=(PreparedStatement const& right) = delete;
-};
-
-//- Lower-level class, enqueuable operation
-class AC_DATABASE_API PreparedStatementTask : public SQLOperation
-{
-public:
-    PreparedStatementTask(PreparedStatementBase* stmt, bool async = false);
-    ~PreparedStatementTask() override;
-
-    bool Execute() override;
-    PreparedQueryResultFuture GetFuture() { return m_result->get_future(); }
-
-protected:
-    PreparedStatementBase* m_stmt;
-    bool m_has_result;
-    PreparedQueryResultPromise* m_result;
 };
 
 #endif

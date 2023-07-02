@@ -43,6 +43,8 @@ namespace Acore::Time
     template <class T>
     AC_COMMON_API uint32 TimeStringTo(std::string_view timeString);
 
+    AC_COMMON_API std::string ToTimeString(Microseconds durationTime, uint8 outCount = 3, TimeFormat timeFormat = TimeFormat::ShortText);
+
     template<class T>
     AC_COMMON_API std::string ToTimeString(uint64 durationTime, TimeOutput timeOutput = TimeOutput::Seconds, TimeFormat timeFormat = TimeFormat::ShortText);
 

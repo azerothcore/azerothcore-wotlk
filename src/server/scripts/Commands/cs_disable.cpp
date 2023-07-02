@@ -25,12 +25,12 @@ EndScriptData */
 #include "AchievementMgr.h"
 #include "Chat.h"
 #include "DisableMgr.h"
-#include "Language.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellMgr.h"
+#include "DatabaseEnv.h"
 
 using namespace Acore::ChatCommands;
 
@@ -147,7 +147,7 @@ public:
                 break;
         }
 
-        WorldDatabasePreparedStatement* stmt = nullptr;
+        WorldDatabasePreparedStatement stmt = nullptr;
         stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_DISABLES);
         stmt->SetData(0, entry);
         stmt->SetData(1, disableType);
@@ -235,7 +235,7 @@ public:
                 break;
         }
 
-        WorldDatabasePreparedStatement* stmt = nullptr;
+        WorldDatabasePreparedStatement stmt = nullptr;
         stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_DISABLES);
         stmt->SetData(0, entry);
         stmt->SetData(1, disableType);

@@ -72,7 +72,7 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
     QueryResult result = CharacterDatabase.Query("SELECT DISTINCT {} FROM {}", column, table);
     if (!result)
     {
-        LOG_INFO("sql.sql", "Table {} is empty.", table);
+        LOG_INFO("db.query", "Table {} is empty.", table);
         return;
     }
 

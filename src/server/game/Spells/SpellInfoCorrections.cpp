@@ -28,7 +28,7 @@ inline void ApplySpellFix(std::initializer_list<uint32> spellIds, void(*fix)(Spe
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo)
         {
-            LOG_ERROR("sql.sql", "Spell info correction specified for non-existing spell {}", spellId);
+            LOG_ERROR("db.query", "Spell info correction specified for non-existing spell {}", spellId);
             continue;
         }
 

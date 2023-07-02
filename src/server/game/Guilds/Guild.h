@@ -820,12 +820,7 @@ private:
     inline BankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
     inline BankTab const* GetBankTab(uint8 tabId) const { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
 
-    inline void _DeleteMemberFromDB(ObjectGuid::LowType lowguid) const
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_MEMBER);
-        stmt->SetData(0, lowguid);
-        CharacterDatabase.Execute(stmt);
-    }
+    static void _DeleteMemberFromDB(ObjectGuid::LowType lowguid) ;
 
     // Tries to create new bank tab
     void _CreateNewBankTab();

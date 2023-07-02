@@ -31,7 +31,6 @@ EndScriptData */
 #include "DisableMgr.h"
 #include "GameGraveyard.h"
 #include "LFGMgr.h"
-#include "Language.h"
 #include "MapMgr.h"
 #include "ServerMotd.h"
 #include "ObjectMgr.h"
@@ -45,6 +44,7 @@ EndScriptData */
 #include "Tokenize.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMgr.h"
+#include "DatabaseEnv.h"
 
 using namespace Acore::ChatCommands;
 
@@ -455,7 +455,7 @@ public:
         {
             uint32 entry = Acore::StringTo<uint32>(entryStr).value_or(0);
 
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEMPLATE);
+            WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEMPLATE);
             stmt->SetData(0, entry);
             PreparedQueryResult result = WorldDatabase.Query(stmt);
 

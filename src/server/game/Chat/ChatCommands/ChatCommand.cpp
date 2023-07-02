@@ -105,7 +105,7 @@ static ChatSubCommandMap COMMAND_MAP;
                 }
                 else
                 {
-                    LOG_ERROR("sql.sql", "Table `command` contains data for non-existant command '{}'. Skipped.", name);
+                    LOG_ERROR("db.query", "Table `command` contains data for non-existant command '{}'. Skipped.", name);
                     cmd = nullptr;
                     break;
                 }
@@ -116,19 +116,19 @@ static ChatSubCommandMap COMMAND_MAP;
 
             if (cmd->_invoker && (cmd->_permission.RequiredLevel != secLevel))
             {
-                LOG_WARN("sql.sql", "Table `command` has permission {} for '{}' which does not match the core ({}). Overriding.",
+                LOG_WARN("db.query", "Table `command` has permission {} for '{}' which does not match the core ({}). Overriding.",
                     secLevel, name, cmd->_permission.RequiredLevel);
 
                 cmd->_permission.RequiredLevel = secLevel;
             }
 
             if (std::holds_alternative<std::string>(cmd->_help))
-                LOG_ERROR("sql.sql", "Table `command` contains duplicate data for command '{}'. Skipped.", name);
+                LOG_ERROR("db.query", "Table `command` contains duplicate data for command '{}'. Skipped.", name);
 
             if (std::holds_alternative<std::monostate>(cmd->_help))
                 cmd->_help.emplace<std::string>(help);
             else
-                LOG_ERROR("sql.sql", "Table `command` contains legacy help text for command '{}', which uses `acore_string`. Skipped.", name);
+                LOG_ERROR("db.query", "Table `command` contains legacy help text for command '{}', which uses `acore_string`. Skipped.", name);
         } while (result->NextRow());
     }
 
@@ -139,7 +139,7 @@ static ChatSubCommandMap COMMAND_MAP;
 void Acore::Impl::ChatCommands::ChatCommandNode::ResolveNames(std::string name)
 {
     if (_invoker && std::holds_alternative<std::monostate>(_help))
-        LOG_WARN("sql.sql", "Table `command` is missing help text for command '{}'.", name);
+        LOG_WARN("db.query", "Table `command` is missing help text for command '{}'.", name);
 
     _name = name;
 

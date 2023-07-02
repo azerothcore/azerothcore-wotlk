@@ -72,7 +72,7 @@ public:
         }
 
         // Check existence of item in recovery table
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM);
         stmt->SetData(0, restoreId);
         PreparedQueryResult fields = CharacterDatabase.Query(stmt);
 
@@ -111,7 +111,7 @@ public:
         }
 
         // Remove from recovery table
-        CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_RECOVERY_ID);
+        CharacterDatabasePreparedStatement delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_RECOVERY_ID);
         delStmt->SetData(0, (*fields)[0].Get<uint32>());
         CharacterDatabase.Execute(delStmt);
 
@@ -129,7 +129,7 @@ public:
             return false;
         }
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_LIST);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_LIST);
         stmt->SetData(0, player.GetGUID().GetCounter());
         PreparedQueryResult disposedItems = CharacterDatabase.Query(stmt);
 
@@ -260,7 +260,7 @@ public:
         else
         {
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-            CharacterDatabasePreparedStatement* stmt;
+            CharacterDatabasePreparedStatement stmt;
 
             ObjectGuid::LowType guid = player.GetGUID().GetCounter();
 

@@ -18,71 +18,76 @@
 #ifndef DatabaseEnvFwd_h__
 #define DatabaseEnvFwd_h__
 
+#include "Define.h"
 #include <future>
 #include <memory>
 
-struct QueryResultFieldMetadata;
+template<typename T>
+class AsyncCallbackProcessor;
+
+enum class ConnectionFlags : uint8
+{
+    Async   = 0x1,
+    Sync    = 0x2,
+    Both    = Async | Sync
+};
+
+enum class DatabaseType : uint8
+{
+    None,
+    Auth        = 1,
+    Character   = 2,
+    World       = 4,
+//    Dbc         = 8,
+    All   = Auth | Character | World /*| Dbc*/
+};
+
 class Field;
+class MySQLConnection;
+class MySQLPreparedStatement;
+class SQLQueryHolderBase;
+
+struct MySQLConnectionInfo;
+struct QueryResultFieldMetadata;
 
 class ResultSet;
 using QueryResult = std::shared_ptr<ResultSet>;
 using QueryResultFuture = std::future<QueryResult>;
 using QueryResultPromise = std::promise<QueryResult>;
 
-class CharacterDatabaseConnection;
-class LoginDatabaseConnection;
-class WorldDatabaseConnection;
-
-class PreparedStatementBase;
-
-template<typename T>
-class PreparedStatement;
-
-using CharacterDatabasePreparedStatement = PreparedStatement<CharacterDatabaseConnection>;
-using LoginDatabasePreparedStatement = PreparedStatement<LoginDatabaseConnection>;
-using WorldDatabasePreparedStatement = PreparedStatement<WorldDatabaseConnection>;
-
 class PreparedResultSet;
 using PreparedQueryResult = std::shared_ptr<PreparedResultSet>;
 using PreparedQueryResultFuture = std::future<PreparedQueryResult>;
 using PreparedQueryResultPromise = std::promise<PreparedQueryResult>;
 
-class QueryCallback;
+class PreparedStatementBase;
+using PreparedStatement = std::shared_ptr<PreparedStatementBase>;
+using CharacterDatabasePreparedStatement = PreparedStatement;
+using AuthDatabasePreparedStatement = PreparedStatement;
+using WorldDatabasePreparedStatement = PreparedStatement;
 
-template<typename T>
-class AsyncCallbackProcessor;
-
-using QueryCallbackProcessor = AsyncCallbackProcessor<QueryCallback>;
-
-class TransactionBase;
-
+class Transaction;
 using TransactionFuture = std::future<bool>;
 using TransactionPromise = std::promise<bool>;
-
-template<typename T>
-class Transaction;
-
-class TransactionCallback;
-
-template<typename T>
-using SQLTransaction = std::shared_ptr<Transaction<T>>;
-
-using CharacterDatabaseTransaction = SQLTransaction<CharacterDatabaseConnection>;
-using LoginDatabaseTransaction = SQLTransaction<LoginDatabaseConnection>;
-using WorldDatabaseTransaction = SQLTransaction<WorldDatabaseConnection>;
+using SQLTransaction = std::shared_ptr<Transaction>;
+using CharacterDatabaseTransaction = SQLTransaction;
+using AuthDatabaseTransaction = SQLTransaction;
+using WorldDatabaseTransaction = SQLTransaction;
 
 class SQLQueryHolderBase;
 using QueryResultHolderFuture = std::future<void>;
 using QueryResultHolderPromise = std::promise<void>;
+using SQLQueryHolder = std::shared_ptr<SQLQueryHolderBase>;
+using CharacterDatabaseQueryHolder = SQLQueryHolderBase;
+using AuthDatabaseQueryHolder = SQLQueryHolderBase;
+using WorldDatabaseQueryHolder = SQLQueryHolderBase;
 
-template<typename T>
-class SQLQueryHolder;
-
-using CharacterDatabaseQueryHolder = SQLQueryHolder<CharacterDatabaseConnection>;
-using LoginDatabaseQueryHolder = SQLQueryHolder<LoginDatabaseConnection>;
-using WorldDatabaseQueryHolder = SQLQueryHolder<WorldDatabaseConnection>;
-
+class QueryCallback;
 class SQLQueryHolderCallback;
+class TransactionCallback;
+using QueryCallbackProcessor = AsyncCallbackProcessor<QueryCallback>;
+using TransactionCallbackProcessor = AsyncCallbackProcessor<TransactionCallback>;
+using QueryHolderCallbackProcessor = AsyncCallbackProcessor<SQLQueryHolderCallback>;
 
 // mysql
 struct MySQLHandle;
@@ -90,5 +95,10 @@ struct MySQLResult;
 struct MySQLField;
 struct MySQLBind;
 struct MySQLStmt;
+
+// AC
+using LoginDatabasePreparedStatement = PreparedStatement;
+using LoginDatabaseTransaction = SQLTransaction;
+using LoginDatabaseQueryHolder = SQLQueryHolderBase;
 
 #endif // DatabaseEnvFwd_h__

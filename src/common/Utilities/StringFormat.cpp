@@ -19,6 +19,8 @@
 #include "Define.h"
 #include <locale>
 
+constexpr char CHAR_WHITESPACE = ' ';
+
 template<class Str>
 AC_COMMON_API Str Acore::String::Trim(const Str& s, const std::locale& loc /*= std::locale()*/)
 {
@@ -50,6 +52,22 @@ AC_COMMON_API Str Acore::String::Trim(const Str& s, const std::locale& loc /*= s
     return s;
 }
 
+std::string_view Acore::String::TrimLeft(std::string_view str)
+{
+    while (!str.empty() && (str.front() == CHAR_WHITESPACE))
+        str.remove_prefix(1);
+
+    return str;
+}
+
+std::string_view Acore::String::TrimRight(std::string_view str)
+{
+    while (!str.empty() && (str.back() == CHAR_WHITESPACE))
+        str.remove_suffix(1);
+
+    return str;
+}
+
 std::string Acore::String::TrimRightInPlace(std::string& str)
 {
     int pos = int(str.size()) - 1;
@@ -71,7 +89,8 @@ std::string Acore::String::TrimRightInPlace(std::string& str)
  * @param suffix Character to add at the end of the str
  * @return std::string Suffixed string
  */
-std::string Acore::String::AddSuffixIfNotExists(std::string str, const char suffix) {
+std::string Acore::String::AddSuffixIfNotExists(std::string& str, char suffix)
+{
     if (str.empty() || (str.at(str.length() - 1) != suffix))
         str.push_back(suffix);
 

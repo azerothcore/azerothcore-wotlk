@@ -23,10 +23,10 @@
 */
 
 #include "Chat.h"
-#include "Language.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "DatabaseEnv.h"
 
 using namespace Acore::ChatCommands;
 
@@ -195,7 +195,7 @@ public:
             }
 
             uint8 index = 0;
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
             stmt->SetData(index++, guid.GetCounter());
             stmt->SetData(index++, guid.GetCounter());
             stmt->SetData(index++, 0);

@@ -38,6 +38,7 @@
 #include "SocialMgr.h"
 #include "SpellAuras.h"
 #include "WorldSession.h"
+#include "DatabaseEnv.h"
 
 namespace lfg
 {
@@ -99,7 +100,7 @@ namespace lfg
         if (!guid.IsGroup())
             return;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_LFG_DATA);
+        CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_LFG_DATA);
         stmt->SetData(0, guid.GetCounter());
         stmt->SetData(1, GetDungeon(guid));
         stmt->SetData(2, GetState(guid));

@@ -23,16 +23,15 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "CreatureAI.h"
 #include "CreatureGroups.h"
 #include "GameTime.h"
-#include "Language.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "Transport.h"
+#include "DatabaseEnv.h"
 #include <string>
 
 using namespace Acore::ChatCommands;
@@ -315,7 +314,7 @@ public:
         }
 
         // Update movement type
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_MOVEMENT_TYPE);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_MOVEMENT_TYPE);
         stmt->SetData(0, uint8(WAYPOINT_MOTION_TYPE));
         stmt->SetData(1, uint32(lowGuid));
         WorldDatabase.Execute(stmt);
@@ -465,7 +464,7 @@ public:
             const_cast<CreatureTemplate*>(cinfo)->faction = factionId;
 
         // ..and DB
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_FACTION);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_FACTION);
 
         stmt->SetData(0, uint16(factionId));
         stmt->SetData(1, creature->GetEntry());
@@ -526,7 +525,7 @@ public:
 
         creature->ReplaceAllNpcFlags(NPCFlags(npcFlags));
 
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_NPCFLAG);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_NPCFLAG);
 
         stmt->SetData(0, NPCFlags(npcFlags));
         stmt->SetData(1, creature->GetEntry());
@@ -690,7 +689,7 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_NEAREST);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_NEAREST);
         stmt->SetData(0, player->GetPositionX());
         stmt->SetData(1, player->GetPositionY());
         stmt->SetData(2, player->GetPositionZ());
@@ -780,7 +779,7 @@ public:
             }
         }
 
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_POSITION);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_POSITION);
         stmt->SetData(0, x);
         stmt->SetData(1, y);
         stmt->SetData(2, z);
@@ -1005,7 +1004,7 @@ public:
             creature->Respawn();
         }
 
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_WANDER_DISTANCE);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_WANDER_DISTANCE);
 
         stmt->SetData(0, option);
         stmt->SetData(1, uint8(mtype));
@@ -1049,7 +1048,7 @@ public:
             return false;
         }
 
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_TIME_SECS);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_TIME_SECS);
         stmt->SetData(0, spawnTime);
         stmt->SetData(1, creature->GetSpawnId());
         WorldDatabase.Execute(stmt);
@@ -1270,7 +1269,7 @@ public:
         sFormationMgr->CreatureGroupMap[lowguid] = group_member;
         creature->SearchFormation();
 
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE_FORMATION);
+        WorldDatabasePreparedStatement stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE_FORMATION);
         stmt->SetData(0, leaderGUID);
         stmt->SetData(1, lowguid);
         stmt->SetData(2, group_member.follow_dist);

@@ -35,6 +35,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "DatabaseEnv.h"
 
 void WorldSession::HandleDismissCritter(WorldPackets::Pet::DismissCritter& packet)
 {
@@ -899,7 +900,7 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
     {
         if (sWorld->getBoolConfig(CONFIG_DECLINED_NAMES_USED))
         {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_DECLINEDNAME);
+            CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_DECLINEDNAME);
             stmt->SetData(0, pet->GetCharmInfo()->GetPetNumber());
             trans->Append(stmt);
 
@@ -913,7 +914,7 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
         }
     }
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_NAME);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_NAME);
     stmt->SetData(0, name);
     stmt->SetData(1, _player->GetGUID().GetCounter());
     stmt->SetData(2, pet->GetCharmInfo()->GetPetNumber());

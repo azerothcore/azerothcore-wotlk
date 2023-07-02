@@ -21,7 +21,7 @@
 #include "Cell.h"
 #include "Common.h"
 #include "CreatureData.h"
-#include "DatabaseEnv.h"
+#include "DatabaseEnvFwd.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
 #include "Unit.h"

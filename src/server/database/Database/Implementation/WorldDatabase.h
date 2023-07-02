@@ -18,7 +18,7 @@
 #ifndef _WORLDDATABASE_H
 #define _WORLDDATABASE_H
 
-#include "MySQLConnection.h"
+#include "DatabaseWorkerPool.h"
 
 enum WorldDatabaseStatements : uint32
 {
@@ -101,21 +101,20 @@ enum WorldDatabaseStatements : uint32
     WORLD_SEL_REQ_XP,
     WORLD_INS_GAMEOBJECT_ADDON,
 
-    MAX_WORLDDATABASE_STATEMENTS
+    MAX_WORLD_DATABASE_STATEMENTS
 };
 
-class AC_DATABASE_API WorldDatabaseConnection : public MySQLConnection
+class AC_DATABASE_API WorldDatabasePool : public DatabaseWorkerPool
 {
 public:
-    typedef WorldDatabaseStatements Statements;
-
-    //- Constructors for sync and async connections
-    WorldDatabaseConnection(MySQLConnectionInfo& connInfo);
-    WorldDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
-    ~WorldDatabaseConnection() override;
+    WorldDatabasePool() : DatabaseWorkerPool(DatabaseType::World) { }
+    ~WorldDatabasePool() = default;
 
     //- Loads database type specific prepared statements
     void DoPrepareStatements() override;
 };
+
+/// Accessor to the world database
+AC_DATABASE_API extern WorldDatabasePool WorldDatabase;
 
 #endif

@@ -15,27 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ADHOCSTATEMENT_H
-#define _ADHOCSTATEMENT_H
+#ifndef AC_FILE_UTIL_H_
+#define AC_FILE_UTIL_H_
 
-#include "DatabaseEnvFwd.h"
 #include "Define.h"
-#include "SQLOperation.h"
+#include <string_view>
 
-/*! Raw, ad-hoc query. */
-class AC_DATABASE_API BasicStatementTask : public SQLOperation
+namespace Acore::File
 {
-public:
-    BasicStatementTask(std::string_view sql, bool async = false);
-    ~BasicStatementTask();
-
-    bool Execute() override;
-    QueryResultFuture GetFuture() const { return m_result->get_future(); }
-
-private:
-    std::string m_sql; //- Raw query to be executed
-    bool m_has_result;
-    QueryResultPromise* m_result;
-};
+    AC_COMMON_API void CorrectDirPath(std::string& path);
+    AC_COMMON_API bool CreateDirIfNeed(std::string_view path);
+}
 
 #endif

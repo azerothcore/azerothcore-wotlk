@@ -18,7 +18,7 @@
 #ifndef _LOGINDATABASE_H
 #define _LOGINDATABASE_H
 
-#include "MySQLConnection.h"
+#include "DatabaseWorkerPool.h"
 
 enum LoginDatabaseStatements : uint32
 {
@@ -118,21 +118,20 @@ enum LoginDatabaseStatements : uint32
     LOGIN_SEL_ACCOUNT_TOTP_SECRET,
     LOGIN_UPD_ACCOUNT_TOTP_SECRET,
 
-    MAX_LOGINDATABASE_STATEMENTS
+    MAX_LOGIN_DATABASE_STATEMENTS
 };
 
-class AC_DATABASE_API LoginDatabaseConnection : public MySQLConnection
+class AC_DATABASE_API LoginDatabasePool : public DatabaseWorkerPool
 {
 public:
-    typedef LoginDatabaseStatements Statements;
-
-    //- Constructors for sync and async connections
-    LoginDatabaseConnection(MySQLConnectionInfo& connInfo);
-    LoginDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
-    ~LoginDatabaseConnection() override;
+    LoginDatabasePool() : DatabaseWorkerPool(DatabaseType::Auth) { }
+    ~LoginDatabasePool() = default;
 
     //- Loads database type specific prepared statements
     void DoPrepareStatements() override;
 };
+
+/// Accessor to the realm/login database
+AC_DATABASE_API extern LoginDatabasePool LoginDatabase;
 
 #endif

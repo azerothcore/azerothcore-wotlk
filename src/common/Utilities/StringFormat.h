@@ -71,9 +71,10 @@ namespace Acore::String
     template<class Str>
     AC_COMMON_API Str Trim(const Str& s, const std::locale& loc = std::locale());
 
+    AC_COMMON_API std::string_view TrimLeft(std::string_view str);
+    AC_COMMON_API std::string_view TrimRight(std::string_view str);
     AC_COMMON_API std::string TrimRightInPlace(std::string& str);
-
-    AC_COMMON_API std::string AddSuffixIfNotExists(std::string str, const char suffix);
+    AC_COMMON_API std::string AddSuffixIfNotExists(std::string& str, char suffix);
 }
 
 #endif

@@ -19,7 +19,7 @@
 #define AZEROTHCORE_GAMEOBJECT_H
 
 #include "Common.h"
-#include "DatabaseEnv.h"
+#include "DatabaseEnvFwd.h"
 #include "G3D/Quat.h"
 #include "LootMgr.h"
 #include "Object.h"

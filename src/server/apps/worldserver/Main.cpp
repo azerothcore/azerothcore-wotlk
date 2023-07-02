@@ -30,7 +30,7 @@
 #include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
-#include "DatabaseLoader.h"
+#include "DatabaseMgr.h"
 #include "DeadlineTimer.h"
 #include "GitRevision.h"
 #include "IoContext.h"
@@ -38,7 +38,6 @@
 #include "Metric.h"
 #include "ModuleMgr.h"
 #include "ModulesScriptLoader.h"
-#include "MySQLThreading.h"
 #include "OpenSSLCrypto.h"
 #include "OutdoorPvPMgr.h"
 #include "ProcessPriority.h"
@@ -288,9 +287,9 @@ int main(int argc, char** argv)
     sMetric->Initialize(realm.Name, *ioContext, []()
     {
         METRIC_VALUE("online_players", sWorld->GetPlayerCount());
-        METRIC_VALUE("db_queue_login", uint64(LoginDatabase.QueueSize()));
-        METRIC_VALUE("db_queue_character", uint64(CharacterDatabase.QueueSize()));
-        METRIC_VALUE("db_queue_world", uint64(WorldDatabase.QueueSize()));
+        METRIC_VALUE("db_queue_login", uint64(LoginDatabase.GetQueueSize()));
+        METRIC_VALUE("db_queue_character", uint64(CharacterDatabase.GetQueueSize()));
+        METRIC_VALUE("db_queue_world", uint64(WorldDatabase.GetQueueSize()));
     });
 
     METRIC_EVENT("events", "Worldserver started", "");
@@ -430,16 +429,15 @@ int main(int argc, char** argv)
 /// Initialize connection to the databases
 bool StartDB()
 {
-    MySQL::Library_Init();
+    sDatabaseMgr->SetModuleList(AC_MODULES_LIST);
 
     // Load databases
-    DatabaseLoader loader("server.worldserver", DatabaseLoader::DATABASE_NONE, AC_MODULES_LIST);
-    loader
-        .AddDatabase(LoginDatabase, "Login")
-        .AddDatabase(CharacterDatabase, "Character")
-        .AddDatabase(WorldDatabase, "World");
+    sDatabaseMgr->AddDatabase(LoginDatabase, "Login");
+    sDatabaseMgr->AddDatabase(CharacterDatabase, "Character");
+    sDatabaseMgr->AddDatabase(WorldDatabase, "World");
+//    sDatabaseMgr->AddDatabase(DBCDatabase, "Dbc");
 
-    if (!loader.Load())
+    if (!sDatabaseMgr->Load())
         return false;
 
     ///- Get the realm Id from the configuration file
@@ -470,21 +468,15 @@ bool StartDB()
     WorldDatabase.Execute("UPDATE version SET core_version = '{}', core_revision = '{}'", GitRevision::GetFullVersion(), GitRevision::GetHash());        // One-time query
 
     sWorld->LoadDBVersion();
-
     LOG_INFO("server.loading", "> Version DB world:     {}", sWorld->GetDBVersion());
-
-    sScriptMgr->OnAfterDatabasesLoaded(loader.GetUpdateFlags());
+    sScriptMgr->OnAfterDatabasesLoaded(sDatabaseMgr->GetUpdateFlags());
 
     return true;
 }
 
 void StopDB()
 {
-    CharacterDatabase.Close();
-    WorldDatabase.Close();
-    LoginDatabase.Close();
-
-    MySQL::Library_End();
+    sDatabaseMgr->CloseAllConnections();
 }
 
 /// Clear 'online' status for all accounts with characters in this realm

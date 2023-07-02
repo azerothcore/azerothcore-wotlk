@@ -19,10 +19,8 @@
 #define QUERYRESULT_H
 
 #include "DatabaseEnvFwd.h"
-#include "Define.h"
 #include "Field.h"
-#include <tuple>
-#include <vector>
+#include <unordered_map>
 
 template<typename T>
 struct ResultIterator
@@ -56,7 +54,7 @@ public:
     [[nodiscard]] uint32 GetFieldCount() const { return _fieldCount; }
     [[nodiscard]] std::string GetFieldName(uint32 index) const;
 
-    [[nodiscard]] Field* Fetch() const { return _currentRow; }
+    [[nodiscard]] auto* Fetch() const { return _currRow.get(); }
     Field const& operator[](std::size_t index) const;
 
     template<typename... Ts>
@@ -64,12 +62,12 @@ public:
     {
         AssertRows(sizeof...(Ts));
 
-        std::tuple<Ts...> theTuple = {};
+        std::tuple<Ts...> theTuple{};
 
         std::apply([this](Ts&... args)
         {
-            uint8 index{ 0 };
-            ((args = _currentRow[index].Get<Ts>(), index++), ...);
+            uint8 index{};
+            ((args = _currRow[index].Get<Ts>(), index++), ...);
         }, theTuple);
 
         return theTuple;
@@ -81,12 +79,12 @@ public:
 protected:
     std::vector<QueryResultFieldMetadata> _fieldMetadata;
     uint64 _rowCount;
-    Field* _currentRow;
+    std::unique_ptr<Field[]> _currRow;
     uint32 _fieldCount;
 
 private:
     void CleanUp();
-    void AssertRows(std::size_t sizeRows);
+    void AssertRows(std::size_t sizeRows) const;
 
     MySQLResult* _result;
     MySQLField* _fields;
@@ -102,8 +100,8 @@ public:
     ~PreparedResultSet();
 
     bool NextRow();
-    [[nodiscard]] uint64 GetRowCount() const { return m_rowCount; }
-    [[nodiscard]] uint32 GetFieldCount() const { return m_fieldCount; }
+    [[nodiscard]] uint64 GetRowCount() const { return _rowCount; }
+    [[nodiscard]] uint32 GetFieldCount() const { return _fieldCount; }
 
     [[nodiscard]] Field* Fetch() const;
     Field const& operator[](std::size_t index) const;
@@ -118,7 +116,7 @@ public:
         std::apply([this](Ts&... args)
         {
             uint8 index{ 0 };
-            ((args = m_rows[uint32(m_rowPosition) * m_fieldCount + index].Get<Ts>(), index++), ...);
+            ((args = _rows[uint32(_rowPosition) * _fieldCount + index].Get<Ts>(), index++), ...);
         }, theTuple);
 
         return theTuple;
@@ -128,21 +126,21 @@ public:
     static auto end()   { return ResultIterator<PreparedResultSet>(nullptr); }
 
 protected:
-    std::vector<QueryResultFieldMetadata> m_fieldMetadata;
-    std::vector<Field> m_rows;
-    uint64 m_rowCount;
-    uint64 m_rowPosition;
-    uint32 m_fieldCount;
+    std::vector<QueryResultFieldMetadata> _fieldMetadata;
+    std::vector<Field> _rows;
+    uint64 _rowCount;
+    uint64 _rowPosition{};
+    uint32 _fieldCount;
 
 private:
-    MySQLBind* m_rBind;
-    MySQLStmt* m_stmt;
-    MySQLResult* m_metadataResult;    ///< Field metadata, returned by mysql_stmt_result_metadata
+    MySQLBind* _rBind{ nullptr };
+    MySQLStmt* _stmt;
+    MySQLResult* _metadataResult;    ///< Field metadata, returned by mysql_stmt_result_metadata
 
     void CleanUp();
     bool _NextRow();
 
-    void AssertRows(std::size_t sizeRows);
+    void AssertRows(std::size_t sizeRows) const;
 
     PreparedResultSet(PreparedResultSet const& right) = delete;
     PreparedResultSet& operator=(PreparedResultSet const& right) = delete;

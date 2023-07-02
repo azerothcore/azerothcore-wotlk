@@ -24,19 +24,18 @@
 #include <set>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 struct AC_DATABASE_API UpdateResult
 {
-    UpdateResult()
-        : updated(0), recent(0), archived(0) { }
-
+    UpdateResult() = default;
     UpdateResult(size_t const updated_, size_t const recent_, size_t const archived_)
         : updated(updated_), recent(recent_), archived(archived_) { }
 
-    size_t updated;
-    size_t recent;
-    size_t archived;
+    size_t updated{};
+    size_t recent{};
+    size_t archived{};
 };
 
 class AC_DATABASE_API UpdateFetcher
@@ -45,21 +44,20 @@ class AC_DATABASE_API UpdateFetcher
 
 public:
     UpdateFetcher(Path const& updateDirectory,
-                  std::function<void(std::string const&)> const& apply,
-                  std::function<void(Path const& path)> const& applyFile,
-                  std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName, std::vector<std::string> const* setDirectories = nullptr);
+                    std::function<void(std::string_view)> const& apply,
+                    std::function<void(Path const& path)> const& applyFile,
+                    std::function<QueryResult(std::string_view)> const& retrieve, std::string_view dbNameForModule, std::vector<std::string> const* setDirectories = nullptr);
 
     UpdateFetcher(Path const& updateDirectory,
-        std::function<void(std::string const&)> const& apply,
-        std::function<void(Path const& path)> const& applyFile,
-        std::function<QueryResult(std::string const&)> const& retrieve,
-        std::string const& dbModuleName,
-        std::string_view modulesList = {});
+                    std::function<void(std::string_view)> const& apply,
+                    std::function<void(Path const& path)> const& applyFile,
+                    std::function<QueryResult(std::string_view)> const& retrieve,
+                    std::string_view dbNameForModule,
+                    std::string_view modulesList = {});
 
-    ~UpdateFetcher();
+    ~UpdateFetcher() = default;
 
-    UpdateResult Update(bool const redundancyChecks, bool const allowRehash,
-                        bool const archivedRedundancy, int32 const cleanDeadReferencesMaxCount) const;
+    [[nodiscard]] UpdateResult Update() const;
 
 private:
     enum UpdateMode
@@ -78,15 +76,15 @@ private:
 
     struct AppliedFileEntry
     {
-        AppliedFileEntry(std::string const& name_, std::string const& hash_, State state_, uint64 timestamp_)
-            : name(name_), hash(hash_), state(state_), timestamp(timestamp_) { }
+        AppliedFileEntry(std::string_view name_, std::string_view hash_, State state_, uint64 timestamp_)
+                : name(name_), hash(hash_), state(state_), timestamp(timestamp_) { }
 
         std::string const name;
         std::string const hash;
         State const state;
         uint64 const timestamp;
 
-        static inline State StateConvert(std::string const& state)
+        static inline State StateConvert(std::string_view state)
         {
             if (state == "RELEASED")
                 return RELEASED;
@@ -115,7 +113,7 @@ private:
             }
         }
 
-        std::string GetStateAsString() const
+        [[nodiscard]] std::string GetStateAsString() const
         {
             return StateConvert(state);
         }
@@ -135,33 +133,32 @@ private:
     typedef std::unordered_map<std::string, AppliedFileEntry> AppliedFileStorage;
     typedef std::vector<UpdateFetcher::DirectoryEntry> DirectoryStorage;
 
-    LocaleFileStorage GetFileList() const;
-    void FillFileListRecursively(Path const& path, LocaleFileStorage& storage,
-                                 State const state, uint32 const depth) const;
+    [[nodiscard]] LocaleFileStorage GetFileList() const;
+    static void FillFileListRecursively(Path const& path, LocaleFileStorage& storage,
+                                    State state, uint32 depth) ;
 
-    DirectoryStorage ReceiveIncludedDirectories() const;
-    AppliedFileStorage ReceiveAppliedFiles() const;
+    [[nodiscard]] DirectoryStorage ReceiveIncludedDirectories() const;
+    [[nodiscard]] AppliedFileStorage ReceiveAppliedFiles() const;
 
-    std::string ReadSQLUpdate(Path const& file) const;
+    [[nodiscard]] static std::string ReadSQLUpdate(Path const& file) ;
 
-    uint32 Apply(Path const& path) const;
+    [[nodiscard]] Milliseconds Apply(Path const& path) const;
 
-    void UpdateEntry(AppliedFileEntry const& entry, uint32 const speed = 0) const;
+    void UpdateEntry(AppliedFileEntry const& entry, Milliseconds speed = 0ms) const;
     void RenameEntry(std::string const& from, std::string const& to) const;
     void CleanUp(AppliedFileStorage const& storage) const;
 
-    void UpdateState(std::string const& name, State const state) const;
+    void UpdateState(std::string const& name, State state) const;
 
     std::unique_ptr<Path> const _sourceDirectory;
-
-    std::function<void(std::string const&)> const _apply;
+    std::function<void(std::string_view)> const _apply;
     std::function<void(Path const& path)> const _applyFile;
-    std::function<QueryResult(std::string const&)> const _retrieve;
+    std::function<QueryResult(std::string_view)> const _retrieve;
 
     // modules
     std::string const _dbModuleName;
     std::vector<std::string> const* _setDirectories;
-    std::string_view _modulesList = {};
+    std::string _modulesList;
 };
 
 #endif // UpdateFetcher_h__

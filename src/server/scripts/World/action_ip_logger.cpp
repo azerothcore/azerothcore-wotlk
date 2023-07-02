@@ -19,6 +19,7 @@
 #include "Group.h"
 #include "Guild.h"
 #include "ScriptMgr.h"
+#include "DatabaseEnv.h"
 
 enum IPLoggingTypes
 {
@@ -140,7 +141,7 @@ public:
         {
             // As we can assume most account actions are NOT failed login, so this is the more accurate check.
             // For those, we need last_ip...
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
+            LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
 
             stmt->SetData(0, playerGuid);
             stmt->SetData(1, characterGuid);
@@ -151,7 +152,7 @@ public:
         }
         else // ... but for failed login, we query last_attempt_ip from account table. Which we do with an unique query
         {
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FACL_IP_LOGGING);
+            LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FACL_IP_LOGGING);
 
             stmt->SetData(0, playerGuid);
             stmt->SetData(1, characterGuid);
@@ -236,7 +237,7 @@ public:
         }
 
         // Once we have done everything, we can insert the new log.
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_CHAR_IP_LOGGING);
+        LoginDatabasePreparedStatement stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_CHAR_IP_LOGGING);
 
         stmt->SetData(0, playerGuid);
         stmt->SetData(1, characterGuid);
@@ -299,7 +300,7 @@ public:
         }
 
         // Once we have done everything, we can insert the new log.
-        LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
+        LoginDatabasePreparedStatement stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
         stmt2->SetData(0, playerGuid);
         stmt2->SetData(1, characterGuid);
         stmt2->SetData(2, aType);

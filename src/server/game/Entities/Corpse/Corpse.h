@@ -18,7 +18,7 @@
 #ifndef AZEROTHCORE_CORPSE_H
 #define AZEROTHCORE_CORPSE_H
 
-#include "DatabaseEnv.h"
+#include "DatabaseEnvFwd.h"
 #include "GridDefines.h"
 #include "LootMgr.h"
 #include "Object.h"

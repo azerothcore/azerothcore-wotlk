@@ -19,7 +19,7 @@
 #define AZEROTHCORE_QUEST_H
 
 #include "DBCEnums.h"
-#include "DatabaseEnv.h"
+#include "DatabaseEnvFwd.h"
 #include "Define.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"

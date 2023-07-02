@@ -438,7 +438,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
     //so firstly delete the old one
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
+    CharacterDatabasePreparedStatement stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
     stmt->SetData(0, mailId);
     trans->Append(stmt);
 

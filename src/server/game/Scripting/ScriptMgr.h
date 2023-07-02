@@ -2850,7 +2850,7 @@ public:
                 {
                     // The script uses a script name from database, but isn't assigned to anything.
                     if (script->GetName().find("Smart") == std::string::npos)
-                        LOG_ERROR("sql.sql", "Script named '{}' is not assigned in the database.",
+                        LOG_ERROR("db.query", "Script named '{}' is not assigned in the database.",
                                          script->GetName());
                 }
             }

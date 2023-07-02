@@ -18,17 +18,8 @@
 #include "Field.h"
 #include "Errors.h"
 #include "Log.h"
-#include "MySQLHacks.h"
 #include "StringConvert.h"
 #include "Types.h"
-
-Field::Field()
-{
-    data.value = nullptr;
-    data.length = 0;
-    data.raw = false;
-    meta = nullptr;
-}
 
 namespace
 {
@@ -57,7 +48,7 @@ namespace
                 return true;
         }
 
-        // In16
+        // Int16
         if constexpr (std::is_same_v<T, uint16> || std::is_same_v<T, int16>)
         {
             if (type == DatabaseFieldTypes::Int16)
@@ -85,7 +76,7 @@ namespace
                 return true;
         }
 
-        // dobule
+        // double
         if constexpr (std::is_same_v<T, double>)
         {
             if (type == DatabaseFieldTypes::Double || type == DatabaseFieldTypes::Decimal)
@@ -102,7 +93,7 @@ namespace
         return false;
     }
 
-    inline Optional<std::string_view> GetCleanAliasName(std::string_view alias)
+    inline std::optional<std::string_view> GetCleanAliasName(std::string_view alias)
     {
         if (alias.empty())
             return {};
@@ -144,6 +135,14 @@ namespace
     }
 }
 
+Field::Field()
+{
+    data.value = nullptr;
+    data.length = 0;
+    data.raw = false;
+    meta = nullptr;
+}
+
 void Field::GetBinarySizeChecked(uint8* buf, size_t length) const
 {
     ASSERT(data.value && (data.length == length), "Expected {}-byte binary blob, got {}data ({} bytes) instead", length, data.value ? "" : "no ", data.length);
@@ -183,7 +182,7 @@ bool Field::IsNumeric() const
 
 void Field::LogWrongType(std::string_view getter, std::string_view typeName) const
 {
-    LOG_WARN("sql.sql", "Warning: {}<{}> on {} field {}.{} ({}.{}) at index {}.",
+    LOG_WARN("db.query", "Warning: {}<{}> on {} field {}.{} ({}.{}) at index {}.",
         getter, typeName, meta->TypeName, meta->TableAlias, meta->Alias, meta->TableName, meta->Name, meta->Index);
 }
 
@@ -208,12 +207,21 @@ T Field::GetData() const
     }
 #endif
 
-    Optional<T> result = {};
+    std::optional<T> result;
 
     if (data.raw)
         result = *reinterpret_cast<T const*>(data.value);
     else
         result = Acore::StringTo<T>(data.value);
+
+    if (!result)
+    {
+        if constexpr (std::is_unsigned_v<T> && !std::is_same_v<T, bool>)
+        {
+            if (auto newResult = Acore::StringTo<std::make_signed_t<T>>(data.value))
+                result = static_cast<T>(*newResult);
+        }
+    }
 
     // Correct double fields... this undefined behavior :/
     if constexpr (std::is_same_v<T, double>)
@@ -224,50 +232,35 @@ T Field::GetData() const
             result = Acore::StringTo<float>(data.value);
     }
 
-    // Check -1 for *_dbc db tables
-    if constexpr (std::is_same_v<T, uint32>)
-    {
-        std::string_view tableName{ meta->TableName };
-
-        if (!tableName.empty() && tableName.size() > 4)
-        {
-            auto signedResult = Acore::StringTo<int32>(data.value);
-
-            if (signedResult && !result && tableName.substr(tableName.length() - 4) == "_dbc")
-            {
-                LOG_DEBUG("sql.sql", "> Found incorrect value '{}' for type '{}' in _dbc table.", data.value, typeid(T).name());
-                LOG_DEBUG("sql.sql", "> Table name '{}'. Field name '{}'. Try return int32 value", meta->TableName, meta->Name);
-                return GetData<int32>();
-            }
-        }
-    }
-
     if (auto alias = GetCleanAliasName(meta->Alias))
     {
         if ((StringEqualI(*alias, "min") || StringEqualI(*alias, "max")) && !IsCorrectAlias<T>(meta->Type, *alias))
         {
-            LogWrongType(__FUNCTION__, typeid(T).name());
+            LogWrongType(__FUNCTION__, GetTypeName<T>());
+            //ABORT();
         }
 
         if ((StringEqualI(*alias, "sum") || StringEqualI(*alias, "avg")) && !IsCorrectAlias<T>(meta->Type, *alias))
         {
-            LogWrongType(__FUNCTION__, typeid(T).name());
-            LOG_WARN("sql.sql", "> Please use GetData<double>()");
+            LogWrongType(__FUNCTION__, GetTypeName<T>());
+            LOG_WARN("db.query", "> Please use GetData<double>()");
             return GetData<double>();
+            //ABORT();
         }
 
         if (StringEqualI(*alias, "count") && !IsCorrectAlias<T>(meta->Type, *alias))
         {
-            LogWrongType(__FUNCTION__, typeid(T).name());
-            LOG_WARN("sql.sql", "> Please use GetData<uint64>()");
+            LogWrongType(__FUNCTION__, GetTypeName<T>());
+            LOG_WARN("db.query", "> Please use GetData<uint64>()");
             return GetData<uint64>();
+            //ABORT();
         }
     }
 
     if (!result)
     {
-        LOG_FATAL("sql.sql", "> Incorrect value '{}' for type '{}'. Value is raw ? '{}'", data.value, typeid(T).name(), data.raw);
-        LOG_FATAL("sql.sql", "> Table name '{}'. Field name '{}'", meta->TableName, meta->Name);
+        LOG_FATAL("db.query", "> Incorrect value '{}' for type '{}'. Value is raw ? '{}'", data.value, GetTypeName<T>(), data.raw);
+        LOG_FATAL("db.query", "> Table name '{}'. Field name '{}'", meta->TableName, meta->Name);
         //ABORT();
         return GetDefaultValue<T>();
     }
@@ -275,17 +268,17 @@ T Field::GetData() const
     return *result;
 }
 
-template bool Field::GetData() const;
-template uint8 Field::GetData() const;
-template uint16 Field::GetData() const;
-template uint32 Field::GetData() const;
-template uint64 Field::GetData() const;
-template int8 Field::GetData() const;
-template int16 Field::GetData() const;
-template int32 Field::GetData() const;
-template int64 Field::GetData() const;
-template float Field::GetData() const;
-template double Field::GetData() const;
+template AC_DATABASE_API bool Field::GetData() const;
+template AC_DATABASE_API uint8 Field::GetData() const;
+template AC_DATABASE_API uint16 Field::GetData() const;
+template AC_DATABASE_API uint32 Field::GetData() const;
+template AC_DATABASE_API uint64 Field::GetData() const;
+template AC_DATABASE_API int8 Field::GetData() const;
+template AC_DATABASE_API int16 Field::GetData() const;
+template AC_DATABASE_API int32 Field::GetData() const;
+template AC_DATABASE_API int64 Field::GetData() const;
+template AC_DATABASE_API float Field::GetData() const;
+template AC_DATABASE_API double Field::GetData() const;
 
 std::string Field::GetDataString() const
 {
