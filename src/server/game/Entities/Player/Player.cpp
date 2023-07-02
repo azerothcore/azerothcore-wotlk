@@ -13564,6 +13564,7 @@ bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) c
     {
         return false;
     }
+
     // continent checked in SpellInfo::CheckLocation at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
     if (v_map == 571 && !bySpell->HasAttribute(SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT))
