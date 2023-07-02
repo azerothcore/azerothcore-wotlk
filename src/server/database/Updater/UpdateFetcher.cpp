@@ -89,7 +89,7 @@ UpdateFetcher::LocaleFileStorage UpdateFetcher::GetFileList() const
     return files;
 }
 
-void UpdateFetcher::FillFileListRecursively(Path const& path, LocaleFileStorage& storage, State const state, uint32 const depth)
+void UpdateFetcher::FillFileListRecursively(Path const& path, LocaleFileStorage& storage, State const state, uint32 const /*depth*/)
 {
     for (auto const& dirEntry : fs::recursive_directory_iterator(path))
     {

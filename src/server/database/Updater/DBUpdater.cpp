@@ -147,8 +147,8 @@ bool DBUpdater::Create(DatabaseWorkerPool& pool)
 
     try
     {
-        DBUpdater::ApplyFile(pool, pool.GetConnectionInfo()->Host, pool.GetConnectionInfo()->User, pool.GetConnectionInfo()->Password,
-            pool.GetConnectionInfo()->PortOrSocket, "", pool.GetConnectionInfo()->SSL, temp);
+        DBUpdater::ApplyFile(pool, pool.GetConnectionInfo()->Host, pool.GetConnectionInfo()->User,
+                             pool.GetConnectionInfo()->PortOrSocket, "", pool.GetConnectionInfo()->SSL, temp);
     }
     catch (UpdateException const&)
     {
@@ -361,12 +361,12 @@ void DBUpdater::Apply(DatabaseWorkerPool& pool, std::string_view query)
 
 void DBUpdater::ApplyFile(DatabaseWorkerPool& pool, Path const& path)
 {
-    DBUpdater::ApplyFile(pool, pool.GetConnectionInfo()->Host, pool.GetConnectionInfo()->User, pool.GetConnectionInfo()->Password,
-        pool.GetConnectionInfo()->PortOrSocket, pool.GetConnectionInfo()->Database, pool.GetConnectionInfo()->SSL, path);
+    DBUpdater::ApplyFile(pool, pool.GetConnectionInfo()->Host, pool.GetConnectionInfo()->User,
+                         pool.GetConnectionInfo()->PortOrSocket, pool.GetConnectionInfo()->Database, pool.GetConnectionInfo()->SSL, path);
 }
 
-void DBUpdater::ApplyFile(DatabaseWorkerPool& pool, std::string_view host, std::string_view user, std::string_view password,
-    std::string_view port_or_socket, std::string_view database, std::string_view ssl, Path const& path)
+void DBUpdater::ApplyFile(DatabaseWorkerPool &pool, std::string_view host, std::string_view user, std::string_view port_or_socket, std::string_view database, std::string_view ssl,
+                          Path const &path)
 {
     std::vector<std::string> args;
     args.reserve(9);

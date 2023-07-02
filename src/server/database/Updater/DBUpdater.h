@@ -69,8 +69,8 @@ private:
     static QueryResult Retrieve(DatabaseWorkerPool& pool, std::string_view query);
     static void Apply(DatabaseWorkerPool& pool, std::string_view query);
     static void ApplyFile(DatabaseWorkerPool& pool, Path const& path);
-    static void ApplyFile(DatabaseWorkerPool& pool, std::string_view host, std::string_view user,
-        std::string_view password, std::string_view port_or_socket, std::string_view database, std::string_view ssl, Path const& path);
+    static void ApplyFile(DatabaseWorkerPool &pool, std::string_view host, std::string_view user, std::string_view port_or_socket, std::string_view database, std::string_view ssl,
+                          Path const &path);
 };
 
 #endif // DBUpdater_h__
