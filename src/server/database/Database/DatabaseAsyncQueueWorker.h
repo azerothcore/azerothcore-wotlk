@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WARHEAD_ASYNC_DB_QUEUE_WORKER_H_
-#define WARHEAD_ASYNC_DB_QUEUE_WORKER_H_
+#ifndef ASYNC_DB_QUEUE_WORKER_H_
+#define ASYNC_DB_QUEUE_WORKER_H_
 
 #include "Define.h"
 #include <atomic>
