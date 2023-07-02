@@ -115,7 +115,7 @@ void DatabaseMgr::AddDatabase(DatabaseWorkerPool& pool, std::string_view name)
     // Populate and update only if updates are enabled for this pool
     if (updatesEnabledForThis)
     {
-        _populate.emplace([this, name, &pool]() -> bool
+        _populate.emplace([name, &pool]() -> bool
         {
            if (!DBUpdater::Populate(pool))
            {
