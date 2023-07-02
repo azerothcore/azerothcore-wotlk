@@ -2001,6 +2001,7 @@ public:
 
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
+    virtual void OnBeforeDatabasesLoaded() { }
     virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) { }
 };
 
@@ -2642,6 +2643,7 @@ public: /* CommandSC */
 
 public: /* DatabaseScript */
 
+    void OnBeforeDatabasesLoaded();
     void OnAfterDatabasesLoaded(uint32 updateFlags);
 
 public: /* WorldObjectScript */

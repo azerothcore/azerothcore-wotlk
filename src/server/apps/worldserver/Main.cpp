@@ -437,6 +437,8 @@ bool StartDB()
     sDatabaseMgr->AddDatabase(WorldDatabase, "World");
 //    sDatabaseMgr->AddDatabase(DBCDatabase, "Dbc");
 
+    sScriptMgr->OnBeforeDatabasesLoaded();
+
     if (!sDatabaseMgr->Load())
         return false;
 

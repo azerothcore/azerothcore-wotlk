@@ -18,9 +18,17 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
+void ScriptMgr::OnBeforeDatabasesLoaded()
+{
+    ExecuteScript<DatabaseScript>([](DatabaseScript* script)
+    {
+        script->OnBeforeDatabasesLoaded();
+    });
+}
+
 void ScriptMgr::OnAfterDatabasesLoaded(uint32 updateFlags)
 {
-    ExecuteScript<DatabaseScript>([&](DatabaseScript* script)
+    ExecuteScript<DatabaseScript>([=](DatabaseScript* script)
     {
         script->OnAfterDatabasesLoaded(updateFlags);
     });
